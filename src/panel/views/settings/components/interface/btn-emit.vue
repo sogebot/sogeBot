@@ -1,18 +1,30 @@
 <template>
-<button ref="button" @click="emitToBackend" :disabled="state !== 0 || !emit" :class="this.state === 2 ? 'btn-danger' : ''">
-    <fa v-if="state === 1" icon="circle-notch" spin/>
-    <fa v-if="state === 2" icon="exclamation"/>
-    {{translate(this.title)}}
+  <button
+    ref="button"
+    :disabled="state !== 0 || !emit"
+    :class="this.state === 2 ? 'btn-danger' : ''"
+    @click="emitToBackend"
+  >
+    <fa
+      v-if="state === 1"
+      icon="circle-notch"
+      spin
+    />
+    <fa
+      v-if="state === 2"
+      icon="exclamation"
+    />
+    {{ translate(this.title) }}
   </button>
 </template>
 
 <script lang="ts">
-import {
-  Component, Prop, Vue, 
-} from 'vue-property-decorator';
 
-import { getSocket } from 'src/panel/helpers/socket';
-import translate from 'src/panel/helpers/translate';
+import { getSocket } from '@sogebot/ui-helpers/socket';
+import translate from '@sogebot/ui-helpers/translate';
+import {
+  Component, Prop, Vue,
+} from 'vue-property-decorator';
 
 @Component({})
 export default class btnEmit extends Vue {

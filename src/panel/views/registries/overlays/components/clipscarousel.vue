@@ -16,11 +16,10 @@
 </template>
 
 <script lang="ts">
+import translate from '@sogebot/ui-helpers/translate';
 import {
   defineComponent, ref, watch,
 } from '@vue/composition-api';
-
-import translate from 'src/panel/helpers/translate';
 
 const prepareOpts = (data: any) => {
   if (!data || data.volume === null || typeof data.volume === 'undefined') {

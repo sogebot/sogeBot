@@ -21,14 +21,14 @@
 </template>
 
 <script lang="ts">
+import { getSocket } from '@sogebot/ui-helpers/socket';
+import translate from '@sogebot/ui-helpers/translate';
 import {
-  defineComponent, onMounted, ref, 
+  defineComponent, onMounted, ref,
 } from '@vue/composition-api';
 import { chunk } from 'lodash-es';
 
 import { EventBus } from 'src/panel/helpers/event-bus';
-import { getSocket } from 'src/panel/helpers/socket';
-import translate from 'src/panel/helpers/translate';
 
 const socket = getSocket('/widgets/joinpart');
 

@@ -1,44 +1,69 @@
 <template>
   <div>
     <b-input-group>
-      <template v-slot:prepend v-if="multiple">
-        <ul v-if="currentValue.length > 0" class="list-inline d-inline-block m-0 border border-right-0 px-1"
+      <template
+        v-if="multiple"
+        #prepend
+      >
+        <ul
+          v-if="currentValue.length > 0"
+          class="list-inline d-inline-block m-0 border border-right-0 px-1"
           :class="{
             'focus-border': (isFocused || isHovered),
             'border-input': !(isFocused || isHovered),
             'border-bottom-0': !isSearching && isDirty && (isFocused || isHovered),
-          }">
-          <li v-for="tag in currentValue" :key="tag" class="list-inline-item mr-0" style="transform: translateY(4px);">
+          }"
+        >
+          <li
+            v-for="tag in currentValue"
+            :key="tag"
+            class="list-inline-item mr-0"
+            style="transform: translateY(4px);"
+          >
             <b-form-tag
               style="font-size: 75%; text-transform: initial; font-weight: normal;"
-              @remove="removeTag(tag)"
               :title="tag"
               variant="info"
-            >{{ tag }}</b-form-tag>
+              @remove="removeTag(tag)"
+            >
+              {{ tag }}
+            </b-form-tag>
           </li>
         </ul>
       </template>
       <b-input
-        class="form-control"
         v-model="addToCurrentValue"
-        v-on:keyup="emitSearch"
-        v-on:keyup.delete="removeTag()"
-        @focus="isFocused = true"
-        @blur="isFocused = false"
+        class="form-control"
         :placeholder="placeholder"
         :class="{
           'border-right-0': isSearching,
           'border-left-0': multiple && currentValue.length > 0,
           'border-bottom-0': !isSearching && isDirty && (isFocused || isHovered),
-        }"/>
-      <template v-slot:append v-if="isSearching">
-        <div class="border border-left-0 input-bg" :class="{'focus-border': (isFocused || isHovered), 'border-input': !(isFocused || isHovered) }">
-          <b-spinner style="position: relative; top: 2px;" variant="primary" label="Spinning" small class="m-2"></b-spinner>
+        }"
+        @keyup="emitSearch"
+        @keyup.delete="removeTag()"
+        @focus="isFocused = true"
+        @blur="isFocused = false"
+      />
+      <template
+        v-if="isSearching"
+        #append
+      >
+        <div
+          class="border border-left-0 input-bg"
+          :class="{'focus-border': (isFocused || isHovered), 'border-input': !(isFocused || isHovered) }"
+        >
+          <b-spinner
+            style="position: relative; top: 2px;"
+            variant="primary"
+            label="Spinning"
+            small
+            class="m-2"
+          />
         </div>
       </template>
-      <b-list-group v-if="isDirty && !isSearching && (isFocused || isHovered)"
-        @mouseenter="isHovered = true;"
-        @mouseleave="isHovered = false;"
+      <b-list-group
+        v-if="isDirty && !isSearching && (isFocused || isHovered)"
         class="focus-border"
         :style="{
           position: 'absolute',
@@ -50,33 +75,37 @@
           overflow: 'auto',
           border: '1px solid',
           'border-top': '0',
-        }">
+        }"
+        @mouseenter="isHovered = true;"
+        @mouseleave="isHovered = false;"
+      >
         <b-list-group-item
           v-if="options.length === 0"
           class="btn text-left px-2"
           style="padding-top:0.2rem; padding-bottom:0.2rem"
-        >{{ translate('no-options-found-for-this-search') }}
+        >
+          {{ translate('no-options-found-for-this-search') }}
         </b-list-group-item>
         <b-list-group-item
+          v-for="option of options"
+          :key="option"
           class="btn text-left px-2"
           style="padding-top:0.2rem; padding-bottom:0.2rem"
-          v-for="option of options"
-          v-html="option.replace(regexp, '<strong class=\'text-primary\'>' + addToCurrentValue + '</strong>')"
           @click="addToCurrentValue = option; isDirty = showAllOptions; isHovered = false; emitUpdate()"
-          :key="option"/>
+          v-html="option.replace(regexp, '<strong class=\'text-primary\'>' + addToCurrentValue + '</strong>')"
+        />
       </b-list-group>
     </b-input-group>
   </div>
 </template>
 
 <script lang="ts">
+import translate from '@sogebot/ui-helpers/translate';
 import {
-  defineComponent, ref, watch, 
+  defineComponent, ref, watch,
 } from '@vue/composition-api';
 import type { Ref } from '@vue/composition-api';
 import { isEqual } from 'lodash';
-
-import translate from 'src/panel/helpers/translate';
 
 interface Props {
   value: string[];

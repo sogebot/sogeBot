@@ -1,32 +1,69 @@
 <template>
-  <b-container fluid ref="window">
+  <b-container
+    ref="window"
+    fluid
+  >
     <b-row>
       <b-col>
         <span class="title text-default mb-2">
           {{ translate('menu.registry') }}
-          <small><fa icon="angle-right"/></small>
+          <small><fa icon="angle-right" /></small>
           {{ translate('menu.custom-variables') }}
           <template v-if="state.loaded && $route.params.id">
-            <small><fa icon="angle-right"/></small>
-            {{variableName}}
-            <small class="text-muted text-monospace" style="font-size:0.7rem">{{$route.params.id}}</small>
+            <small><fa icon="angle-right" /></small>
+            {{ variableName }}
+            <small
+              class="text-muted text-monospace"
+              style="font-size:0.7rem"
+            >{{ $route.params.id }}</small>
           </template>
         </span>
       </b-col>
     </b-row>
 
     <panel>
-      <template v-slot:left>
-        <button-with-icon class="btn-secondary btn-reverse" icon="caret-left" href="#/registry/customvariables/list">{{translate('commons.back')}}</button-with-icon>
-        <hold-button v-if="$route.params.id" icon="trash" class="btn-danger" @trigger="remove()">
-          <template slot="title">{{translate('dialog.buttons.delete')}}</template>
-          <template slot="onHoldTitle">{{translate('dialog.buttons.hold-to-delete')}}</template>
+      <template #left>
+        <button-with-icon
+          class="btn-secondary btn-reverse"
+          icon="caret-left"
+          href="#/registry/customvariables/list"
+        >
+          {{ translate('commons.back') }}
+        </button-with-icon>
+        <hold-button
+          v-if="$route.params.id"
+          icon="trash"
+          class="btn-danger"
+          @trigger="remove()"
+        >
+          <template slot="title">
+            {{ translate('dialog.buttons.delete') }}
+          </template>
+          <template slot="onHoldTitle">
+            {{ translate('dialog.buttons.hold-to-delete') }}
+          </template>
         </hold-button>
       </template>
-      <template v-slot:right>
-        <b-alert show variant="info" v-if="pending" v-html="translate('dialog.changesPending')" class="mr-2 p-2 mb-0"></b-alert>
-        <b-alert show variant="danger" v-if="error" v-html="error" class="mr-2 p-2 mb-0"></b-alert>
-        <state-button @click="save()" text="saveChanges" :state="state.save"/>
+      <template #right>
+        <b-alert
+          v-if="pending"
+          show
+          variant="info"
+          class="mr-2 p-2 mb-0"
+          v-html="translate('dialog.changesPending')"
+        />
+        <b-alert
+          v-if="error"
+          show
+          variant="danger"
+          class="mr-2 p-2 mb-0"
+          v-html="error"
+        />
+        <state-button
+          text="saveChanges"
+          :state="state.save"
+          @click="save()"
+        />
       </template>
     </panel>
 
@@ -42,7 +79,7 @@
           v-model="variableName"
           type="text"
           :placeholder="translate('registry.customvariables.variable.placeholder')"
-        ></b-form-input>
+        />
       </b-form-group>
 
       <b-form-group
@@ -55,92 +92,162 @@
           v-model="description"
           type="text"
           :placeholder="translate('registry.customvariables.description.placeholder')"
-        ></b-form-input>
+        />
       </b-form-group>
 
       <b-form-group>
-        <label>{{translate('registry.customvariables.urls')}}</label> <b-button size="sm" :variant="showCurlExample ? 'secondary' : 'outline-secondary'" @click="showCurlExample = !showCurlExample">{{translate('registry.customvariables.show-examples')}}</b-button>
+        <label>{{ translate('registry.customvariables.urls') }}</label> <b-button
+          size="sm"
+          :variant="showCurlExample ? 'secondary' : 'outline-secondary'"
+          @click="showCurlExample = !showCurlExample"
+        >
+          {{ translate('registry.customvariables.show-examples') }}
+        </b-button>
         <b-row v-if="showCurlExample">
           <b-col class="mb-0 p-3 mt-3 ml-3 mr-3 border">
             <kbd style="font-size: 0.7rem;">
-              $ curl -X GET {{origin}}/customvariables/&lt;generated-id&gt; <br/>
-              { "value": "{{currentValue}}" }
+              $ curl -X GET {{ origin }}/customvariables/&lt;generated-id&gt; <br>
+              { "value": "{{ currentValue }}" }
             </kbd>
           </b-col>
           <b-col class="mb-0 p-3 mt-3 ml-3 mr-3 border">
             <kbd style="font-size: 0.7rem;">
-              $ curl -X POST {{origin}}/customvariables/&lt;generated-id&gt; -H "Content-Type:
- application/json" -d '{ "value": "yourNewValue" }' <br/>
-              { "oldValue": "{{currentValue}}", "value": "yourNewValue" }
+              $ curl -X POST {{ origin }}/customvariables/&lt;generated-id&gt; -H "Content-Type:
+              application/json" -d '{ "value": "yourNewValue" }' <br>
+              { "oldValue": "{{ currentValue }}", "value": "yourNewValue" }
             </kbd>
           </b-col>
         </b-row>
         <b-row v-if="showCurlExample">
           <b-col class="mb-0 p-3 mt-3 ml-3 mr-3 border">
             <kbd style="font-size: 0.7rem;">
-              $ curl -X GET {{origin}}/customvariables/&lt;generated-id&gt; <br/>
+              $ curl -X GET {{ origin }}/customvariables/&lt;generated-id&gt; <br>
               { "error": "This endpoint is not enabled for GET", code: 403 }
             </kbd>
           </b-col>
           <b-col class="mb-0 p-3 mt-3 ml-3 mr-3 border">
             <kbd style="font-size: 0.7rem;">
-              $ curl -X POST {{origin}}/customvariables/&lt;generated-id&gt; -H "Content-Type:
- application/json" -d '{ "value": "yourNewValue" }' <br/>
+              $ curl -X POST {{ origin }}/customvariables/&lt;generated-id&gt; -H "Content-Type:
+              application/json" -d '{ "value": "yourNewValue" }' <br>
               { "error": "This endpoint is not enabled for POST", code: 400 }
             </kbd>
           </b-col>
         </b-row>
         <b-row v-if="showCurlExample">
-          <b-col class="p-3 m-3"></b-col>
+          <b-col class="p-3 m-3" />
           <b-col class="p-3 m-3 border">
             <kbd style="font-size: 0.7rem;">
-              $ curl -X POST {{origin}}/customvariables/&lt;generated-id&gt; -H "Content-Type:
- application/json" -d '{ "value": "yourNewValue" }' <br/>
+              $ curl -X POST {{ origin }}/customvariables/&lt;generated-id&gt; -H "Content-Type:
+              application/json" -d '{ "value": "yourNewValue" }' <br>
               { "error": "This value is not applicable for this endpoint", code: 400 }
             </kbd>
           </b-col>
         </b-row>
         <b-row v-if="showCurlExample">
-          <b-col class="p-3 m-3"></b-col>
+          <b-col class="p-3 m-3" />
           <b-col class="p-3 m-3 border">
             <kbd style="font-size: 0.7rem;">
-              $ curl -X POST {{origin}}/customvariables/&lt;generated-id&gt; -H "Content-Type:
- application/json" -d '{ "value": "yourNewValue" }' <br/>
+              $ curl -X POST {{ origin }}/customvariables/&lt;generated-id&gt; -H "Content-Type:
+              application/json" -d '{ "value": "yourNewValue" }' <br>
               { "error": "This value is not applicable for this endpoint", acceptableValues: ['value1', 'value2'], code: 400 }
             </kbd>
           </b-col>
         </b-row>
         <b-list-group>
-          <b-list-group-item v-for="url of urls" :key="url.id" class="p-0 d-flex">
-            <b-button-group size="sm" class="btn-block" style="flex-basis: 0;">
-              <b-button :variant="url.GET ? 'success' : 'danger'" @click="url.GET = !url.GET">GET</b-button>
-              <b-button :variant="url.POST ? 'success' : 'danger'" @click="url.POST = !url.POST">POST</b-button>
-              <b-button :variant="url.showResponse ? 'success' : 'danger'" @click="url.showResponse = !url.showResponse">{{ translate('registry.customvariables.response.show') }}</b-button>
+          <b-list-group-item
+            v-for="url of urls"
+            :key="url.id"
+            class="p-0 d-flex"
+          >
+            <b-button-group
+              size="sm"
+              class="btn-block"
+              style="flex-basis: 0;"
+            >
+              <b-button
+                :variant="url.GET ? 'success' : 'danger'"
+                @click="url.GET = !url.GET"
+              >
+                GET
+              </b-button>
+              <b-button
+                :variant="url.POST ? 'success' : 'danger'"
+                @click="url.POST = !url.POST"
+              >
+                POST
+              </b-button>
+              <b-button
+                :variant="url.showResponse ? 'success' : 'danger'"
+                @click="url.showResponse = !url.showResponse"
+              >
+                {{ translate('registry.customvariables.response.show') }}
+              </b-button>
             </b-button-group>
-            <div class="w-100 p-2">{{origin}}/customvariables/{{url.id}}</div>
-            <b-button-group size="sm" class="btn-block" style="flex-basis: 0;">
-              <hold-button class="btn-danger btn-sm" icon="trash" @trigger="removeURL(url.id)"/>
+            <div class="w-100 p-2">
+              {{ origin }}/customvariables/{{ url.id }}
+            </div>
+            <b-button-group
+              size="sm"
+              class="btn-block"
+              style="flex-basis: 0;"
+            >
+              <hold-button
+                class="btn-danger btn-sm"
+                icon="trash"
+                @trigger="removeURL(url.id)"
+              />
             </b-button-group>
           </b-list-group-item>
-          <b-list-group-item button variant="info" @click="generateURL"><fa icon="plus"/> {{ translate('registry.customvariables.generateurl') }}</b-list-group-item>
+          <b-list-group-item
+            button
+            variant="info"
+            @click="generateURL"
+          >
+            <fa icon="plus" /> {{ translate('registry.customvariables.generateurl') }}
+          </b-list-group-item>
         </b-list-group>
       </b-form-group>
 
       <b-row>
         <b-col>
           <b-form-group
+            v-if="selectedType !== 'eval'"
             :label="translate('registry.customvariables.response.name')"
             label-for="response"
-            v-if="selectedType !== 'eval'"
           >
-            <button :class="[responseType === 0 ? 'btn-primary' : 'btn-outline-primary']" type="button" class="btn" @click="responseType = 0; responseText = ''">{{ translate('registry.customvariables.response.default') }}</button>
-            <button :class="[responseType === 1 ? 'btn-primary' : 'btn-outline-primary']" type="button" class="btn" @click="responseType = 1; responseText = ''">{{ translate('registry.customvariables.response.custom') }}</button>
-            <button ref="tooltip1" :class="[responseType === 2 ? 'btn-primary' : 'btn-outline-primary']" type="button" class="btn" @click="responseType = 2; responseText = ''">{{ translate('registry.customvariables.response.command') }}
-              <fa icon="question"/>
+            <button
+              :class="[responseType === 0 ? 'btn-primary' : 'btn-outline-primary']"
+              type="button"
+              class="btn"
+              @click="responseType = 0; responseText = ''"
+            >
+              {{ translate('registry.customvariables.response.default') }}
+            </button>
+            <button
+              :class="[responseType === 1 ? 'btn-primary' : 'btn-outline-primary']"
+              type="button"
+              class="btn"
+              @click="responseType = 1; responseText = ''"
+            >
+              {{ translate('registry.customvariables.response.custom') }}
+            </button>
+            <button
+              ref="tooltip1"
+              :class="[responseType === 2 ? 'btn-primary' : 'btn-outline-primary']"
+              type="button"
+              class="btn"
+              @click="responseType = 2; responseText = ''"
+            >
+              {{ translate('registry.customvariables.response.command') }}
+              <fa icon="question" />
             </button>
 
-            <b-tooltip :target="() => $refs['tooltip1']" placement="bottom" triggers="hover">
-              {{translate('registry.customvariables.useIfInCommand')}}
+            <b-tooltip
+              :target="() => $refs['tooltip1']"
+              placement="bottom"
+              triggers="hover"
+            >
+              {{ translate('registry.customvariables.useIfInCommand') }}
             </b-tooltip>
           </b-form-group>
           <b-form-group
@@ -151,7 +258,7 @@
               v-model="responseText"
               type="text"
               :placeholder="translate('registry.customvariables.response.default-placeholder')"
-            ></b-form-input>
+            />
           </b-form-group>
         </b-col>
         <b-col>
@@ -159,8 +266,16 @@
             :label="translate('registry.customvariables.permissionToChange')"
             label-for="permission"
           >
-            <b-form-select plain v-model="permission" id="permission">
-              <option v-for="p of permissions" v-bind:value="p.id" :key="p.id">
+            <b-form-select
+              id="permission"
+              v-model="permission"
+              plain
+            >
+              <option
+                v-for="p of permissions"
+                :key="p.id"
+                :value="p.id"
+              >
                 {{ getPermissionName(p.id) | capitalize }}
               </option>
             </b-form-select>
@@ -174,8 +289,16 @@
             :label="translate('registry.customvariables.type.name')"
             label-for="type"
           >
-            <b-form-select plain v-model="selectedType" id="selectedType">
-              <option v-for="type in types" v-bind:value="type.value" :key="type.value">
+            <b-form-select
+              id="selectedType"
+              v-model="selectedType"
+              plain
+            >
+              <option
+                v-for="type in types"
+                :key="type.value"
+                :value="type.value"
+              >
                 {{ type.text }}
               </option>
             </b-form-select>
@@ -188,17 +311,31 @@
           >
             <b-input-group>
               <b-form-input
-                name="currentValue"
                 v-if="selectedType !== 'options'"
                 v-model="currentValue"
+                name="currentValue"
                 :readonly="(['', 'eval'].includes(selectedType))"
                 :placeholder="translate('registry.customvariables.response.default-placeholder')"
-              ></b-form-input>
-              <b-form-select plain v-model="currentValue" id="selectedType" v-else>
-                <option v-for="option in usableOptionsArray" :value="option" :key="option">{{ option }}</option>
+              />
+              <b-form-select
+                v-else
+                id="selectedType"
+                v-model="currentValue"
+                plain
+              >
+                <option
+                  v-for="option in usableOptionsArray"
+                  :key="option"
+                  :value="option"
+                >
+                  {{ option }}
+                </option>
               </b-form-select>
               <b-input-group-append v-if="selectedType !== 'eval'">
-                <b-button :variant="readOnly ? 'danger' : 'success'" @click="readOnly = !readOnly">
+                <b-button
+                  :variant="readOnly ? 'danger' : 'success'"
+                  @click="readOnly = !readOnly"
+                >
                   <template v-if="readOnly">
                     {{ translate('registry.customvariables.isReadOnly') }}
                   </template>
@@ -208,7 +345,10 @@
                 </b-button>
               </b-input-group-append>
             </b-input-group>
-            <small class="form-text text-muted" v-html="translate('registry.customvariables.currentValue.help')"></small>
+            <small
+              class="form-text text-muted"
+              v-html="translate('registry.customvariables.currentValue.help')"
+            />
           </b-form-group>
         </b-col>
       </b-row>
@@ -222,42 +362,68 @@
           id="usableOptions"
           v-model="usableOptions"
           :placeholder="translate('registry.customvariables.usableOptions.placeholder')"
-        ></b-form-input>
-        <small class="form-text text-muted" v-html="translate('registry.customvariables.usableOptions.help')"></small>
+        />
+        <small
+          class="form-text text-muted"
+          v-html="translate('registry.customvariables.usableOptions.help')"
+        />
       </b-form-group>
 
       <b-row v-if="selectedType.toLowerCase() === 'eval'">
         <b-col cols="8">
-          <label for="inline-form-input-name">{{translate('registry.customvariables.scriptToEvaluate')}}</label>
+          <label for="inline-form-input-name">{{ translate('registry.customvariables.scriptToEvaluate') }}</label>
           <codemirror
-            style="font-size: 12px;"
             v-model="evalValue"
+            style="font-size: 12px;"
             :options="cmOptions"
           />
         </b-col>
         <b-col cols="4">
           <label for="selectedRunEvery">{{ translate('registry.customvariables.runScript.name') }}</label>
-            <div class="d-flex">
-              <b-form-select plain v-model="selectedRunEvery" id="selectedRunEvery">
-                <option v-for="option in runEveryOptions" v-bind:value="option.type" v-bind:key="option.type">
-                  {{ translate('registry.customvariables.runEvery.' + option.type) }}
-                </option>
-              </b-form-select>
-              <b-form-input
-                id="RunEvery"
-                type="number"
-                min="0"
-                v-model="runEveryX"
-                v-if="selectedRunEvery !== 'isUsed'"
-              />
-            </div>
+          <div class="d-flex">
+            <b-form-select
+              id="selectedRunEvery"
+              v-model="selectedRunEvery"
+              plain
+            >
+              <option
+                v-for="option in runEveryOptions"
+                :key="option.type"
+                :value="option.type"
+              >
+                {{ translate('registry.customvariables.runEvery.' + option.type) }}
+              </option>
+            </b-form-select>
+            <b-form-input
+              v-if="selectedRunEvery !== 'isUsed'"
+              id="RunEvery"
+              v-model="runEveryX"
+              type="number"
+              min="0"
+            />
+          </div>
 
-            <button type="button" class="btn btn-block btn-info mt-4" v-on:click="testScript()" :disabled="state.test != State.IDLE">
-              <fa icon="spinner" spin v-if="state.test === State.PROGRESS"/>
-              {{ translate('registry.customvariables.testCurrentScript.name') }}
-            </button>
-            <small class="form-text text-muted" v-html="translate('registry.customvariables.testCurrentScript.help')"></small>
-            <pre v-if="evalError" class="alert alert-danger mt-2">{{ evalError }}</pre>
+          <button
+            type="button"
+            class="btn btn-block btn-info mt-4"
+            :disabled="state.test != State.IDLE"
+            @click="testScript()"
+          >
+            <fa
+              v-if="state.test === State.PROGRESS"
+              icon="spinner"
+              spin
+            />
+            {{ translate('registry.customvariables.testCurrentScript.name') }}
+          </button>
+          <small
+            class="form-text text-muted"
+            v-html="translate('registry.customvariables.testCurrentScript.help')"
+          />
+          <pre
+            v-if="evalError"
+            class="alert alert-danger mt-2"
+          >{{ evalError }}</pre>
         </b-col>
       </b-row>
 
@@ -266,14 +432,20 @@
         :label="translate('registry.customvariables.history')"
         label-for="history"
       >
-        <b-table class="hide-headers" :fields="['time', 'sender', 'newValue']" :items="history" borderless small>
-          <template v-slot:cell(time)="data">
-            {{ dayjs(data.item.changedAt).format('LL')}} {{ dayjs(data.item.changedAt).format('LTS') }}
+        <b-table
+          class="hide-headers"
+          :fields="['time', 'sender', 'newValue']"
+          :items="history"
+          borderless
+          small
+        >
+          <template #cell(time)="data">
+            {{ dayjs(data.item.changedAt).format('LL') }} {{ dayjs(data.item.changedAt).format('LTS') }}
           </template>
-          <template v-slot:cell(sender)="data">
-            {{ data.item.username !== 'n/a' ? data.item.username : 'Dashboard'}}
+          <template #cell(sender)="data">
+            {{ data.item.username !== 'n/a' ? data.item.username : 'Dashboard' }}
           </template>
-          <template v-slot:cell(newValue)="data">
+          <template #cell(newValue)="data">
             {{ data.item.currentValue }}
           </template>
         </b-table>
@@ -283,22 +455,22 @@
 </template>
 
 <script lang="ts">
+import { getSocket } from '@sogebot/ui-helpers/socket';
+import translate from '@sogebot/ui-helpers/translate';
 import { NextFunction } from 'express';
 import {
-  chunk, get, orderBy, 
+  chunk, get, orderBy,
 } from 'lodash-es';
 import { v4 as uuid } from 'uuid';
 import { codemirror } from 'vue-codemirror';
 import {
-  Component, Vue, Watch, 
+  Component, Vue, Watch,
 } from 'vue-property-decorator';
 import { Route } from 'vue-router';
 
 import type { PermissionsInterface } from 'src/bot/database/entity/permissions';
 import type { VariableInterface } from 'src/bot/database/entity/variable';
 import { dayjs } from 'src/bot/helpers/dayjs';
-import { getSocket } from 'src/panel/helpers/socket';
-import translate from 'src/panel/helpers/translate';
 
 import 'codemirror/lib/codemirror.css';
 
@@ -312,7 +484,7 @@ Component.registerHooks([
 
 type State = { IDLE: 0, PROGRESS: 1, DONE: 2, ERROR: 3 };
 const State: State = {
-  IDLE: 0, PROGRESS: 1, DONE: 2, ERROR: 3, 
+  IDLE: 0, PROGRESS: 1, DONE: 2, ERROR: 3,
 };
 
 @Component({
@@ -340,7 +512,7 @@ export default class customVariablesEdit extends Vue {
 
   State: State = State;
   state: { loaded: boolean; save: number; test: number } = {
-    loaded: false, save: 0, test: State.IDLE, 
+    loaded: false, save: 0, test: State.IDLE,
   };
   pending = false;
 

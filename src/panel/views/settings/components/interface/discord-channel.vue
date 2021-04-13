@@ -1,54 +1,85 @@
 <template>
   <div>
-    <div class="d-flex" v-if="Array.isArray(currentValue) || typeof currentValue === 'string'">
+    <div
+      v-if="Array.isArray(currentValue) || typeof currentValue === 'string'"
+      class="d-flex"
+    >
       <div class="input-group-prepend">
         <span class="input-group-text">
           <template v-if="typeof translatedTitle === 'string'">{{ translatedTitle }}</template>
           <template v-else>
             {{ translatedTitle.title }}
-            <small class="text-info" data-toggle="tooltip" data-html="true" :title="translatedTitle.help">[?]</small>
+            <small
+              class="text-info"
+              data-toggle="tooltip"
+              data-html="true"
+              :title="translatedTitle.help"
+            >[?]</small>
           </template>
         </span>
       </div>
       <template v-if="Array.isArray(currentValue)">
         <div class="w-100">
-          <b-form-select v-for="(value, index) of currentValue" :key="'dc-' + index" v-model="currentValue[index]" :options="channels"></b-form-select>
+          <b-form-select
+            v-for="(value, index) of currentValue"
+            :key="'dc-' + index"
+            v-model="currentValue[index]"
+            :options="channels"
+          />
         </div>
       </template>
-      <b-form-select v-if="typeof currentValue === 'string'" v-model="currentValue" :options="channels"></b-form-select>
+      <b-form-select
+        v-if="typeof currentValue === 'string'"
+        v-model="currentValue"
+        :options="channels"
+      />
     </div>
     <h4 v-else>
       <title-divider>
-        <template v-if="typeof translatedTitle === 'string'">{{ translatedTitle }}</template>
+        <template v-if="typeof translatedTitle === 'string'">
+          {{ translatedTitle }}
+        </template>
         <template v-else>
           {{ translatedTitle.title }}
-          <small class="text-info" data-toggle="tooltip" data-html="true" :title="translatedTitle.help">[?]</small>
+          <small
+            class="text-info"
+            data-toggle="tooltip"
+            data-html="true"
+            :title="translatedTitle.help"
+          >[?]</small>
         </template>
       </title-divider>
     </h4>
 
     <template v-if="typeof currentValue === 'object' && !Array.isArray(currentValue)">
-      <div class="d-flex" v-for="key of Object.keys(currentValue)" :key="key" >
+      <div
+        v-for="key of Object.keys(currentValue)"
+        :key="key"
+        class="d-flex"
+      >
         <div class="input-group-prepend">
           <span class="input-group-text">
             {{ key }}
           </span>
         </div>
-        <b-form-select v-model="currentValue[key]" :options="channels"></b-form-select>
+        <b-form-select
+          v-model="currentValue[key]"
+          :options="channels"
+        />
       </div>
     </template>
   </div>
 </template>
 
 <script lang="ts">
+import { getSocket } from '@sogebot/ui-helpers/socket';
+import translate from '@sogebot/ui-helpers/translate';
 import { isEqual } from 'lodash';
 import {
-  Component, Prop, Vue, Watch, 
+  Component, Prop, Vue, Watch,
 } from 'vue-property-decorator';
 
 import { announceTypes } from 'src/bot/helpers/commons';
-import { getSocket } from 'src/panel/helpers/socket';
-import translate from 'src/panel/helpers/translate';
 
 type Channel = { text: string, value: string };
 

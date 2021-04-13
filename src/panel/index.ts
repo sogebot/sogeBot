@@ -1,6 +1,4 @@
 // eslint-disable-next-line
-import LoadScript from 'vue-plugin-load-script';
-
 import { library } from '@fortawesome/fontawesome-svg-core';
 import {
   faSpotify, faTwitch, faTwitter,
@@ -22,10 +20,12 @@ import {
   faTv, faUpload, faUser, faUsers,  faVial, faVolumeDown, faVolumeOff, faVolumeUp,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { getConfiguration, getTranslations } from '@sogebot/ui-helpers/socket';
 import VueCompositionAPI from '@vue/composition-api';
 import BootstrapVue from 'bootstrap-vue';
 import { get } from 'lodash-es';
 import Vue from 'vue';
+import LoadScript from 'vue-plugin-load-script';
 import VueRouter from 'vue-router';
 import Vuelidate from 'vuelidate';
 
@@ -37,7 +37,6 @@ import { getListOf, populateListOf } from './helpers/getListOf';
 import { setMainLoaded } from './helpers/isAvailableVariable';
 import { isBotStarted } from './helpers/isBotStarted';
 import { isUserLoggedIn } from './helpers/isUserLoggedIn';
-import { getConfiguration, getTranslations } from './helpers/socket';
 import { store } from './helpers/store';
 import urlParam from './helpers/urlParam';
 

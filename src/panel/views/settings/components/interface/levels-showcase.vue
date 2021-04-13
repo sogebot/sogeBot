@@ -3,25 +3,49 @@
     <b-row class="w-100">
       <b-col>
         <b-table-simple small>
-          <b-tr v-for="(xp, idx) in data" :key="'Level '+ idx + ': ' + xp" v-show="idx > 0 && idx < 8">
-            <b-td style="vertical-align: middle">{{idx}}</b-td>
-            <b-td style="vertical-align: middle">{{xp}}</b-td>
+          <b-tr
+            v-for="(xp, idx) in data"
+            v-show="idx > 0 && idx < 8"
+            :key="'Level '+ idx + ': ' + xp"
+          >
+            <b-td style="vertical-align: middle">
+              {{ idx }}
+            </b-td>
+            <b-td style="vertical-align: middle">
+              {{ xp }}
+            </b-td>
           </b-tr>
         </b-table-simple>
       </b-col>
       <b-col>
         <b-table-simple small>
-          <b-tr v-for="(xp, idx) in data" :key="'Level '+ idx + ': ' + xp" v-show="idx >= 8 && idx < 15">
-            <b-td style="vertical-align: middle">{{idx}}</b-td>
-            <b-td style="vertical-align: middle">{{xp}}</b-td>
+          <b-tr
+            v-for="(xp, idx) in data"
+            v-show="idx >= 8 && idx < 15"
+            :key="'Level '+ idx + ': ' + xp"
+          >
+            <b-td style="vertical-align: middle">
+              {{ idx }}
+            </b-td>
+            <b-td style="vertical-align: middle">
+              {{ xp }}
+            </b-td>
           </b-tr>
         </b-table-simple>
       </b-col>
       <b-col>
         <b-table-simple small>
-          <b-tr v-for="(xp, idx) in data" :key="'Level '+ idx + ': ' + xp" v-show="idx >= 15">
-            <b-td style="vertical-align: middle">{{idx}}</b-td>
-            <b-td style="vertical-align: middle">{{xp}}</b-td>
+          <b-tr
+            v-for="(xp, idx) in data"
+            v-show="idx >= 15"
+            :key="'Level '+ idx + ': ' + xp"
+          >
+            <b-td style="vertical-align: middle">
+              {{ idx }}
+            </b-td>
+            <b-td style="vertical-align: middle">
+              {{ xp }}
+            </b-td>
           </b-tr>
         </b-table-simple>
       </b-col>
@@ -30,12 +54,12 @@
 </template>
 
 <script lang="ts">
-import {
-  defineComponent, onMounted, ref, 
-} from '@vue/composition-api';
 
-import { getSocket } from 'src/panel/helpers/socket';
-import translate from 'src/panel/helpers/translate';
+import { getSocket } from '@sogebot/ui-helpers/socket';
+import translate from '@sogebot/ui-helpers/translate';
+import {
+  defineComponent, onMounted, ref,
+} from '@vue/composition-api';
 
 export default defineComponent({
   props: {
@@ -59,7 +83,7 @@ export default defineComponent({
     });
 
     return {
-      data, translatedTitle, translate, 
+      data, translatedTitle, translate,
     };
   },
 });

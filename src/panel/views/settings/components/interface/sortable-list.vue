@@ -5,25 +5,55 @@
         <template v-if="typeof translatedTitle === 'string'">{{ translatedTitle }}</template>
         <template v-else>
           {{ translatedTitle.title }}
-          <small class="text-info" data-toggle="tooltip" data-html="true" :title="translatedTitle.help">[?]</small>
+          <small
+            class="text-info"
+            data-toggle="tooltip"
+            data-html="true"
+            :title="translatedTitle.help"
+          >[?]</small>
         </template>
       </span>
     </div>
-    <transition-group name="list" tag="ul" class="list-group list-group-flush w-100 border border-input">
-      <li class="list-group-item border-0 d-flex" v-for='(v, index) of currentValues' :ref="'list_' + index" :key="v">
-        <div class="text-muted btn"
+    <transition-group
+      name="list"
+      tag="ul"
+      class="list-group list-group-flush w-100 border border-input"
+    >
+      <li
+        v-for="(v, index) of currentValues"
+        :ref="'list_' + index"
+        :key="v"
+        class="list-group-item border-0 d-flex"
+      >
+        <div
+          class="text-muted btn"
           style="cursor: grab;"
-          v-on:dragstart.passive="dragstart(index, $event)"
-          v-on:dragend.passive="dragend(index, $event)"
-          v-on:dragenter.passive="dragenter(index, $event)"
-          draggable="true">
-          <fa icon="ellipsis-v"></fa>
+          draggable="true"
+          @dragstart.passive="dragstart(index, $event)"
+          @dragend.passive="dragend(index, $event)"
+          @dragenter.passive="dragenter(index, $event)"
+        >
+          <fa icon="ellipsis-v" />
         </div>
-        <div class="w-100" :key="index">
-          <input type="text" class="form-control" v-model="currentValues[index]" readonly="true"/>
+        <div
+          :key="index"
+          class="w-100"
+        >
+          <input
+            v-model="currentValues[index]"
+            type="text"
+            class="form-control"
+            readonly="true"
+          >
         </div>
-        <button class="btn btn-outline-dark border-0" @click="toggleItem(index)">
-          <fa :icon="isToggled(index) ? toggleofficon : toggleonicon" fixed-width></fa>
+        <button
+          class="btn btn-outline-dark border-0"
+          @click="toggleItem(index)"
+        >
+          <fa
+            :icon="isToggled(index) ? toggleofficon : toggleonicon"
+            fixed-width
+          />
         </button>
       </li>
     </transition-group>
@@ -33,14 +63,13 @@
 <script lang="ts">
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faEyeSlash } from '@fortawesome/free-regular-svg-icons';
+import translate from '@sogebot/ui-helpers/translate';
 import {
-  defineComponent, ref, watch, 
+  defineComponent, ref, watch,
 } from '@vue/composition-api';
 import { xor } from 'lodash-es';
 
 library.add(faEyeSlash);
-
-import translate from 'src/panel/helpers/translate';
 
 export default defineComponent({
   props: {

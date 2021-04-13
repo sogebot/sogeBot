@@ -1,23 +1,35 @@
 <template>
-  <perfect-scrollbar class="main-menu" :options="{useBothWheelAxes: true, suppressScrollY: true}">
-    <nav id="menu-detach" class="nav d-flex justify-content-between" style="width: max-content">
-      <b-nav-item :key="item.name" v-for="item of menu" :href="'#/' + item.id.replace(/\./g, '/')">
-        {{translate('menu.' + item.name)}}
+  <perfect-scrollbar
+    class="main-menu"
+    :options="{useBothWheelAxes: true, suppressScrollY: true}"
+  >
+    <nav
+      id="menu-detach"
+      class="nav d-flex justify-content-between"
+      style="width: max-content"
+    >
+      <b-nav-item
+        v-for="item of menu"
+        :key="item.name"
+        :href="'#/' + item.id.replace(/\./g, '/')"
+      >
+        {{ translate('menu.' + item.name) }}
       </b-nav-item>
     </nav>
   </perfect-scrollbar>
 </template>
 
 <script lang="ts">
+import { getSocket } from '@sogebot/ui-helpers/socket';
+import translate from '@sogebot/ui-helpers/translate';
 import {
-  defineComponent, onMounted, ref, 
+  defineComponent, onMounted, ref,
 } from '@vue/composition-api';
 import { PerfectScrollbar } from 'vue2-perfect-scrollbar';
-import 'vue2-perfect-scrollbar/dist/vue2-perfect-scrollbar.css';
 
 import type { menuPublic } from 'src/bot/helpers/panel';
-import { getSocket } from 'src/panel/helpers/socket';
-import translate from 'src/panel/helpers/translate';
+
+import 'vue2-perfect-scrollbar/dist/vue2-perfect-scrollbar.css';
 
 const socket = getSocket('/');
 

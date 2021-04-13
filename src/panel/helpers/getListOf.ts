@@ -1,4 +1,4 @@
-import { getSocket } from 'src/panel/helpers/socket';
+import { getSocket } from '@sogebot/ui-helpers/socket';
 
 export interface getListOfReturn {
   systems: {

@@ -4,27 +4,45 @@
       <b-col>
         <span class="title text-default mb-2">
           {{ translate('menu.manage') }}
-          <small><fa icon="angle-right"/></small>
+          <small><fa icon="angle-right" /></small>
           {{ translate('menu.alias') }}
         </span>
       </b-col>
-      <b-col v-if="!$systems.find(o => o.name === 'alias').enabled" style=" text-align: right;">
-        <b-alert show variant="danger" style="padding: .5rem; margin: 0; display: inline-block;">
-          <fa icon="exclamation-circle" fixed-width/> {{ translate('this-system-is-disabled') }}
+      <b-col
+        v-if="!$systems.find(o => o.name === 'alias').enabled"
+        style=" text-align: right;"
+      >
+        <b-alert
+          show
+          variant="danger"
+          style="padding: .5rem; margin: 0; display: inline-block;"
+        >
+          <fa
+            icon="exclamation-circle"
+            fixed-width
+          /> {{ translate('this-system-is-disabled') }}
         </b-alert>
       </b-col>
     </b-row>
 
-    <panel search @search="search = $event">
-      <template v-slot:left>
-        <button-with-icon class="btn-primary btn-reverse" icon="plus" @click="newItem">{{translate('systems.alias.new')}}</button-with-icon>
+    <panel
+      search
+      @search="search = $event"
+    >
+      <template #left>
+        <button-with-icon
+          class="btn-primary btn-reverse"
+          icon="plus"
+          @click="newItem"
+        >
+          {{ translate('systems.alias.new') }}
+        </button-with-icon>
       </template>
     </panel>
 
-    <loading v-if="state.loadingAls !== $state.success || state.loadingPrm !== $state.success"/>
+    <loading v-if="state.loadingAls !== $state.success || state.loadingPrm !== $state.success" />
     <template v-else>
       <b-sidebar
-        @change="isSidebarVisibleChange"
         :visible="isSidebarVisible"
         :no-slide="!sidebarSlideEnabled"
         width="600px"
@@ -32,11 +50,27 @@
         shadow
         no-header
         right
-        backdrop>
-        <template v-slot:footer="{ hide }">
-          <div class="d-flex bg-opaque align-items-center px-3 py-2 border-top border-gray" style="justify-content: flex-end">
-            <b-button class="mx-2" @click="hide" variant="link">{{ translate('dialog.buttons.close') }}</b-button>
-            <state-button @click="save()" text="saveChanges" :state="state.save" :invalid="!!$v.$invalid && !!$v.$dirty"/>
+        backdrop
+        @change="isSidebarVisibleChange"
+      >
+        <template #footer="{ hide }">
+          <div
+            class="d-flex bg-opaque align-items-center px-3 py-2 border-top border-gray"
+            style="justify-content: flex-end"
+          >
+            <b-button
+              class="mx-2"
+              variant="link"
+              @click="hide"
+            >
+              {{ translate('dialog.buttons.close') }}
+            </b-button>
+            <state-button
+              text="saveChanges"
+              :state="state.save"
+              :invalid="!!$v.$invalid && !!$v.$dirty"
+              @click="save()"
+            />
           </div>
         </template>
         <div class="px-3 py-2">
@@ -50,96 +84,211 @@
                     v-model="editationItem.alias"
                     type="text"
                     :placeholder="translate('systems.alias.alias.placeholder')"
-                    @input="$v.editationItem.alias.$touch()"
                     :state="$v.editationItem.alias.$invalid && $v.editationItem.alias.$dirty ? false : null"
-                  ></b-form-input>
+                    @input="$v.editationItem.alias.$touch()"
+                  />
                 </b-input-group>
-                <b-form-invalid-feedback :state="!($v.editationItem.alias.$invalid && $v.editationItem.alias.$dirty)">{{ translate('dialog.errors.required') }}</b-form-invalid-feedback>
+                <b-form-invalid-feedback :state="!($v.editationItem.alias.$invalid && $v.editationItem.alias.$dirty)">
+                  {{ translate('dialog.errors.required') }}
+                </b-form-invalid-feedback>
               </template>
-              <b-skeleton v-else type="input" class="w-100"></b-skeleton>
+              <b-skeleton
+                v-else
+                type="input"
+                class="w-100"
+              />
             </b-form-group>
 
             <b-form-group>
               <label-inside>{{ translate('systems.alias.command.name') }}</label-inside>
               <template v-if="editationItem">
                 <textarea-with-tags
-                  @input="$v.editationItem.command.$touch()"
                   :value.sync="editationItem.command"
                   :placeholder="translate('systems.alias.command.placeholder')"
-                  v-bind:filters="['global', 'sender', 'param', '!param', 'touser']"
+                  :filters="['global', 'sender', 'param', '!param', 'touser']"
                   :state="$v.editationItem.command.$invalid && $v.editationItem.command.$dirty ? false : null"
-                  v-on:update="editationItem.command = $event"></textarea-with-tags>
-                <b-form-invalid-feedback :state="!($v.editationItem.command.$invalid && $v.editationItem.command.$dirty)">{{ translate('dialog.errors.required') }}</b-form-invalid-feedback>
+                  @input="$v.editationItem.command.$touch()"
+                  @update="editationItem.command = $event"
+                />
+                <b-form-invalid-feedback :state="!($v.editationItem.command.$invalid && $v.editationItem.command.$dirty)">
+                  {{ translate('dialog.errors.required') }}
+                </b-form-invalid-feedback>
               </template>
-              <b-skeleton v-else type="input" class="w-100" style="height: 600px !important"></b-skeleton>
+              <b-skeleton
+                v-else
+                type="input"
+                class="w-100"
+                style="height: 600px !important"
+              />
             </b-form-group>
           </b-form>
         </div>
       </b-sidebar>
-      <b-alert show variant="danger" v-if="fItems.length === 0 && search.length > 0">
-        <fa icon="search"/> <span v-html="translate('systems.alias.emptyAfterSearch').replace('$search', search)"/>
+      <b-alert
+        v-if="fItems.length === 0 && search.length > 0"
+        show
+        variant="danger"
+      >
+        <fa icon="search" /> <span v-html="translate('systems.alias.emptyAfterSearch').replace('$search', search)" />
       </b-alert>
-      <b-alert show v-else-if="items.length === 0">
-        {{translate('systems.alias.empty')}}
+      <b-alert
+        v-else-if="items.length === 0"
+        show
+      >
+        {{ translate('systems.alias.empty') }}
       </b-alert>
-      <b-card v-else no-body v-for="group of groups" v-bind:key="group">
-        <b-card-header header-tag="header" class="p-1" role="tab">
+      <b-card
+        v-for="group of groups"
+        v-else
+        :key="group"
+        no-body
+      >
+        <b-card-header
+          header-tag="header"
+          class="p-1"
+          role="tab"
+        >
           <div class="d-flex">
-            <b-button block v-b-toggle="'alias-accordion-' + group" variant="dark" class="text-left">
-              {{group === null ? 'Unnassigned group' : group }} ({{ fItems.filter(o => o.group === group).length }})
+            <b-button
+              v-b-toggle="'alias-accordion-' + group"
+              block
+              variant="dark"
+              class="text-left"
+            >
+              {{ group === null ? 'Unnassigned group' : group }} ({{ fItems.filter(o => o.group === group).length }})
             </b-button>
-              <button-with-icon v-b-tooltip.hover.noninteractive :title="translate('dialog.buttons.delete')" @click="removeGroup(group)" class="btn-danger btn-reverse btn-only-icon" v-if="group !== null">
-                <template slot="icon">
-                  <font-awesome-layers>
-                    <fa icon="slash" transform="down-1" :mask="['fas', 'object-group']" />
-                    <fa icon="slash" transform="up-1 left-1"/>
-                  </font-awesome-layers>
-                </template>
-                <template slot="title">{{translate('dialog.buttons.delete')}}</template>
-                <template slot="onHoldTitle">{{translate('dialog.buttons.hold-to-delete')}}</template>
-              </button-with-icon>
+            <button-with-icon
+              v-if="group !== null"
+              v-b-tooltip.hover.noninteractive
+              :title="translate('dialog.buttons.delete')"
+              class="btn-danger btn-reverse btn-only-icon"
+              @click="removeGroup(group)"
+            >
+              <template slot="icon">
+                <font-awesome-layers>
+                  <fa
+                    icon="slash"
+                    transform="down-1"
+                    :mask="['fas', 'object-group']"
+                  />
+                  <fa
+                    icon="slash"
+                    transform="up-1 left-1"
+                  />
+                </font-awesome-layers>
+              </template>
+              <template slot="title">
+                {{ translate('dialog.buttons.delete') }}
+              </template>
+              <template slot="onHoldTitle">
+                {{ translate('dialog.buttons.hold-to-delete') }}
+              </template>
+            </button-with-icon>
           </div>
         </b-card-header>
-        <b-collapse :id="'alias-accordion-' + group" accordion="alias-accordion" role="tabpanel" :visible="group === null">
+        <b-collapse
+          :id="'alias-accordion-' + group"
+          accordion="alias-accordion"
+          role="tabpanel"
+          :visible="group === null"
+        >
           <b-card-body>
-            <b-table striped small hover :items="fItems.filter(o => o.group === group)" :fields="fields" @row-clicked="linkTo($event)" >
-              <template v-slot:cell(buttons)="data">
-                <div class="float-right" style="width: max-content !important;">
-                  <button-with-icon v-b-tooltip.hover.noninteractive :title="translate('dialog.buttons.' + (data.item.enabled? 'enabled' : 'disabled'))" :class="[ data.item.enabled ? 'btn-success' : 'btn-danger' ]" class="btn-only-icon btn-reverse" icon="power-off" @click="data.item.enabled = !data.item.enabled; update(data.item)">
+            <b-table
+              striped
+              small
+              hover
+              :items="fItems.filter(o => o.group === group)"
+              :fields="fields"
+              @row-clicked="linkTo($event)"
+            >
+              <template #cell(buttons)="data">
+                <div
+                  class="float-right"
+                  style="width: max-content !important;"
+                >
+                  <button-with-icon
+                    v-b-tooltip.hover.noninteractive
+                    :title="translate('dialog.buttons.' + (data.item.enabled? 'enabled' : 'disabled'))"
+                    :class="[ data.item.enabled ? 'btn-success' : 'btn-danger' ]"
+                    class="btn-only-icon btn-reverse"
+                    icon="power-off"
+                    @click="data.item.enabled = !data.item.enabled; update(data.item)"
+                  >
                     {{ translate('dialog.buttons.' + (data.item.enabled? 'enabled' : 'disabled')) }}
                   </button-with-icon>
-                  <button-with-icon v-b-tooltip.hover.noninteractive :title="translate('dialog.buttons.edit')" class="btn-only-icon btn-primary btn-reverse" icon="edit" v-bind:href="'#/manage/alias/edit/' + data.item.id">
+                  <button-with-icon
+                    v-b-tooltip.hover.noninteractive
+                    :title="translate('dialog.buttons.edit')"
+                    class="btn-only-icon btn-primary btn-reverse"
+                    icon="edit"
+                    :href="'#/manage/alias/edit/' + data.item.id"
+                  >
                     {{ translate('dialog.buttons.edit') }}
                   </button-with-icon>
-                  <b-dropdown no-caret class="alias-table-btn" v-b-tooltip.hover.noninteractive :title="translate('dialog.buttons.permission')" >
-                    <template v-slot:button-content><fa icon="key" fixed-width/></template>
+                  <b-dropdown
+                    v-b-tooltip.hover.noninteractive
+                    no-caret
+                    class="alias-table-btn"
+                    :title="translate('dialog.buttons.permission')"
+                  >
+                    <template #button-content>
+                      <fa
+                        icon="key"
+                        fixed-width
+                      />
+                    </template>
                     <b-dropdown-item
                       v-for="permission of permissions"
                       :key="data.item.id + permission.id"
-                      @click="updatePermission(data.item.id, permission.id)">
+                      @click="updatePermission(data.item.id, permission.id)"
+                    >
                       {{ permission.name }}
                     </b-dropdown-item>
                   </b-dropdown>
-                  <b-dropdown no-caret class="alias-table-btn" v-b-tooltip.hover.noninteractive :title="translate('dialog.buttons.group')" >
-                    <template v-slot:button-content><fa icon="object-group" fixed-width/></template>
+                  <b-dropdown
+                    v-b-tooltip.hover.noninteractive
+                    no-caret
+                    class="alias-table-btn"
+                    :title="translate('dialog.buttons.group')"
+                  >
+                    <template #button-content>
+                      <fa
+                        icon="object-group"
+                        fixed-width
+                      />
+                    </template>
                     <b-dropdown-item
                       v-for="group of groups"
                       :key="data.item.id + group"
-                      @click="updateGroup(data.item.id, group)">
+                      @click="updateGroup(data.item.id, group)"
+                    >
                       {{ group === null ? 'Unnassigned group' : group }}
                     </b-dropdown-item>
-                    <b-dropdown-divider/>
+                    <b-dropdown-divider />
                     <b-dropdown-item
+                      :key="data.item.id + 'newgroup'"
                       v-b-modal.create-new-group
                       @click="newGroupForAliasId = data.item.id"
-                      :key="data.item.id + 'newgroup'">
+                    >
                       Add new group
                     </b-dropdown-item>
                   </b-dropdown>
-                  <button-with-icon v-b-tooltip.hover.noninteractive :title="translate('dialog.buttons.visibility')"  class="btn-only-icon btn-dark btn-reverse" :icon="['fas', data.item.visible ? 'eye' : 'eye-slash']" @click="data.item.visible = !data.item.visible; update(data.item)">
+                  <button-with-icon
+                    v-b-tooltip.hover.noninteractive
+                    :title="translate('dialog.buttons.visibility')"
+                    class="btn-only-icon btn-dark btn-reverse"
+                    :icon="['fas', data.item.visible ? 'eye' : 'eye-slash']"
+                    @click="data.item.visible = !data.item.visible; update(data.item)"
+                  >
                     {{ translate('dialog.buttons.visibility') }}
                   </button-with-icon>
-                  <button-with-icon v-b-tooltip.hover.noninteractive :title="translate('dialog.buttons.delete')" class="btn-only-icon btn-danger btn-reverse" icon="trash" @click="del(data.item.id)">
+                  <button-with-icon
+                    v-b-tooltip.hover.noninteractive
+                    :title="translate('dialog.buttons.delete')"
+                    class="btn-only-icon btn-danger btn-reverse"
+                    icon="trash"
+                    @click="del(data.item.id)"
+                  >
                     {{ translate('dialog.buttons.delete') }}
                   </button-with-icon>
                 </div>
@@ -149,11 +298,18 @@
         </b-collapse>
       </b-card>
     </template>
-    <b-modal id="create-new-group" title="New group name" centered
+    <b-modal
+      id="create-new-group"
+      title="New group name"
+      centered
       @show="resetModal"
       @hidden="resetModal"
-      @ok="handleOk">
-      <form ref="form" @submit.stop.prevent="handleSubmit">
+      @ok="handleOk"
+    >
+      <form
+        ref="form"
+        @submit.stop.prevent="handleSubmit"
+      >
         <b-form-group
           :state="newGroupNameValidity"
           label="Name"
@@ -164,9 +320,9 @@
             id="name-input"
             v-model="newGroupName"
             :state="newGroupNameValidity"
-            @keydown="newGroupNameUpdated = true"
             required
-          ></b-form-input>
+            @keydown="newGroupNameUpdated = true"
+          />
         </b-form-group>
       </form>
     </b-modal>
@@ -178,6 +334,8 @@
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faKey, faObjectGroup } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeLayers } from '@fortawesome/vue-fontawesome';
+import { getSocket } from '@sogebot/ui-helpers/socket';
+import translate from '@sogebot/ui-helpers/translate';
 import {
   computed, defineComponent, getCurrentInstance, onMounted, ref, watch,
 } from '@vue/composition-api';
@@ -194,8 +352,6 @@ import { defaultPermissions } from 'src/bot/helpers/permissions/defaultPermissio
 import { ButtonStates } from 'src/panel/helpers/buttonStates';
 import { error } from 'src/panel/helpers/error';
 import { getPermissionName } from 'src/panel/helpers/getPermissionName';
-import { getSocket } from 'src/panel/helpers/socket';
-import translate from 'src/panel/helpers/translate';
 
 library.add(faKey, faObjectGroup);
 
@@ -205,12 +361,12 @@ const socket = {
 } as const;
 
 export default defineComponent({
-  mixins:     [ validationMixin ],
   components: {
     'loading':             () => import('src/panel/components/loading.vue'),
     'font-awesome-layers': FontAwesomeLayers,
     'label-inside':        () => import('src/panel/components/label-inside.vue'),
   },
+  mixins:      [ validationMixin ],
   validations: {
     editationItem: {
       alias:   { required },

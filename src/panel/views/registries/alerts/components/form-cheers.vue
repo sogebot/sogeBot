@@ -522,7 +522,7 @@
 </template>
 
 <script lang="ts">
-
+import translate from '@sogebot/ui-helpers/translate';
 import { get } from 'lodash-es';
 import { codemirror } from 'vue-codemirror';
 import {
@@ -540,7 +540,6 @@ import { minValue, required } from 'vuelidate/lib/validators';
 import textjs from 'src/bot/data/templates/alerts-js.txt';
 import text from 'src/bot/data/templates/alerts-with-message.txt';
 import type { AlertInterface, AlertTipInterface } from 'src/bot/database/entity/alert';
-import translate from 'src/panel/helpers/translate';
 
 @Component({
   components: {

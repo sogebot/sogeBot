@@ -1,24 +1,32 @@
 <template>
-<ul>
-  <li
-    v-for="event of events"
-    :key="event._id"
-    class="event"
-    :class="[event.type]">
-    <template v-for="type of display">
-      <strong v-if="type === 'username'" class="username" :key="type">{{ event.username }}</strong>
-      <span v-else class="event" :key="type">{{ event.summary }}</span>
-    </template>
-  </li>
-</ul>
+  <ul>
+    <li
+      v-for="event of events"
+      :key="event._id"
+      class="event"
+      :class="[event.type]"
+    >
+      <template v-for="type of display">
+        <strong
+          v-if="type === 'username'"
+          :key="type"
+          class="username"
+        >{{ event.username }}</strong>
+        <span
+          v-else
+          :key="type"
+          class="event"
+        >{{ event.summary }}</span>
+      </template>
+    </li>
+  </ul>
 </template>
 
 <script lang="ts">
+import { getSocket } from '@sogebot/ui-helpers/socket';
+import translate from '@sogebot/ui-helpers/translate';
 import { orderBy } from 'lodash-es';
 import { Component, Vue } from 'vue-property-decorator';
-
-import { getSocket } from 'src/panel/helpers/socket';
-import translate from 'src/panel/helpers/translate';
 
 import { EventListInterface } from '../../bot/database/entity/eventList';
 

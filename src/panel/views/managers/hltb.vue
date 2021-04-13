@@ -200,6 +200,8 @@
 <script lang="ts">
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faRedo } from '@fortawesome/free-solid-svg-icons';
+import { getSocket } from '@sogebot/ui-helpers/socket';
+import translate from '@sogebot/ui-helpers/translate';
 import {
   computed, defineComponent, onMounted, ref, watch,
 } from '@vue/composition-api';
@@ -209,9 +211,6 @@ import { HowLongToBeatGameInterface, HowLongToBeatGameItemInterface } from 'src/
 import { getTime, timestampToObject } from 'src/bot/helpers/getTime';
 import { ButtonStates } from 'src/panel/helpers/buttonStates';
 import { error } from 'src/panel/helpers/error';
-import translate from 'src/panel/helpers/translate';
-
-import { getSocket } from '../../helpers/socket';
 
 library.add(faRedo);
 

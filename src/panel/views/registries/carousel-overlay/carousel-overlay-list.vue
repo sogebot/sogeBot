@@ -4,65 +4,128 @@
       <b-col>
         <span class="title text-default mb-2">
           {{ translate('menu.registry') }}
-          <small><fa icon="angle-right"/></small>
+          <small><fa icon="angle-right" /></small>
           {{ translate('menu.carouseloverlay') }}
         </span>
       </b-col>
     </b-row>
 
     <panel>
-      <template v-slot:left>
-        <form enctype="multipart/form-data" novalidate>
-          <label class="custom-file-upload" for="uploadImageInput">
-            <button type="button" class="btn btn-primary" :disabled="state.uploading === $state.progress" @click="$refs.uploadFileInput.click()">
+      <template #left>
+        <form
+          enctype="multipart/form-data"
+          novalidate
+        >
+          <label
+            class="custom-file-upload"
+            for="uploadImageInput"
+          >
+            <button
+              type="button"
+              class="btn btn-primary"
+              :disabled="state.uploading === $state.progress"
+              @click="$refs.uploadFileInput.click()"
+            >
               <template v-if="state.uploading === $state.progress">
-                  <fa icon="circle-notch" fixed-width spin></fa>
-                  {{ translate('dialog.buttons.upload.progress') }}</template>
-                <template v-else>
-                  <fa icon="upload" fixed-width></fa>
-                  {{ translate('dialog.buttons.upload.idle') }}</template>
+                <fa
+                  icon="circle-notch"
+                  fixed-width
+                  spin
+                />
+                {{ translate('dialog.buttons.upload.progress') }}</template>
+              <template v-else>
+                <fa
+                  icon="upload"
+                  fixed-width
+                />
+                {{ translate('dialog.buttons.upload.idle') }}</template>
             </button>
           </label>
-            <input
-              class="d-none input-file"
-              type="file"
-              ref="uploadFileInput"
-              :disabled="state.uploading === $state.progress"
-              @change="filesChange($event.target.files)"
-              accept="image/*"/>
+          <input
+            ref="uploadFileInput"
+            class="d-none input-file"
+            type="file"
+            :disabled="state.uploading === $state.progress"
+            accept="image/*"
+            @change="filesChange($event.target.files)"
+          >
         </form>
       </template>
     </panel>
 
-    <b-table v-if="items.length > 0" striped small hover :items="items" :fields="fields" @row-clicked="linkTo($event)" sort-by="order">
-      <template v-slot:cell(thumbnail)="data">
-        <img class="float-left pr-3" v-bind:src="'data:' + data.item.type + ';base64,' + data.item.base64">
+    <b-table
+      v-if="items.length > 0"
+      striped
+      small
+      hover
+      :items="items"
+      :fields="fields"
+      sort-by="order"
+      @row-clicked="linkTo($event)"
+    >
+      <template #cell(thumbnail)="data">
+        <img
+          class="float-left pr-3"
+          :src="'data:' + data.item.type + ';base64,' + data.item.base64"
+        >
       </template>
 
-      <template v-slot:cell(info)="data">
+      <template #cell(info)="data">
         <template v-for="key of Object.keys(data.item)">
-          <b-row v-if="!['_id', 'id', 'order', 'base64', 'type'].includes(key)" :key="key">
-            <dt class="col-6">{{translate('page.settings.overlays.carousel.titles.' + key)}}</dt>
-            <dd class="col-6">{{data.item[key]}}</dd>
+          <b-row
+            v-if="!['_id', 'id', 'order', 'base64', 'type'].includes(key)"
+            :key="key"
+          >
+            <dt class="col-6">
+              {{ translate('page.settings.overlays.carousel.titles.' + key) }}
+            </dt>
+            <dd class="col-6">
+              {{ data.item[key] }}
+            </dd>
           </b-row>
         </template>
       </template>
 
-      <template v-slot:cell(buttons)="data">
-        <div class="float-right" style="width: max-content !important;">
-          <button-with-icon v-if="data.item.order != 0" class="btn-only-icon btn-secondary btn-reverse" icon="long-arrow-alt-up" @click="moveUp(data.item.order)"/>
-          <button-with-icon v-if="data.item.order < (items.length - 1)" class="btn-only-icon btn-secondary btn-reverse" icon="long-arrow-alt-down" @click="moveDown(data.item.order)"/>
-          <button-with-icon class="btn-only-icon btn-primary btn-reverse" icon="edit" v-bind:href="'#/registry/carousel/edit/' + data.item.id">
+      <template #cell(buttons)="data">
+        <div
+          class="float-right"
+          style="width: max-content !important;"
+        >
+          <button-with-icon
+            v-if="data.item.order != 0"
+            class="btn-only-icon btn-secondary btn-reverse"
+            icon="long-arrow-alt-up"
+            @click="moveUp(data.item.order)"
+          />
+          <button-with-icon
+            v-if="data.item.order < (items.length - 1)"
+            class="btn-only-icon btn-secondary btn-reverse"
+            icon="long-arrow-alt-down"
+            @click="moveDown(data.item.order)"
+          />
+          <button-with-icon
+            class="btn-only-icon btn-primary btn-reverse"
+            icon="edit"
+            :href="'#/registry/carousel/edit/' + data.item.id"
+          >
             {{ translate('dialog.buttons.edit') }}
           </button-with-icon>
-          <hold-button @trigger="remove(data.item)" icon="trash" class="btn-danger btn-reverse btn-only-icon">
-            <template slot="title">{{translate('dialog.buttons.delete')}}</template>
-            <template slot="onHoldTitle">{{translate('dialog.buttons.hold-to-delete')}}</template>
+          <hold-button
+            icon="trash"
+            class="btn-danger btn-reverse btn-only-icon"
+            @trigger="remove(data.item)"
+          >
+            <template slot="title">
+              {{ translate('dialog.buttons.delete') }}
+            </template>
+            <template slot="onHoldTitle">
+              {{ translate('dialog.buttons.hold-to-delete') }}
+            </template>
           </hold-button>
         </div>
       </template>
     </b-table>
-    <loading v-if="state.loading !== $state.success"/>
+    <loading v-if="state.loading !== $state.success" />
   </b-container>
 </template>
 
@@ -70,17 +133,17 @@
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import {
-  faCircleNotch, faLongArrowAltDown, faLongArrowAltUp, faUpload, 
+  faCircleNotch, faLongArrowAltDown, faLongArrowAltUp, faUpload,
 } from '@fortawesome/free-solid-svg-icons';
+import { getSocket } from '@sogebot/ui-helpers/socket';
+import translate from '@sogebot/ui-helpers/translate';
 import {
-  Component, Vue, Watch, 
+  Component, Vue, Watch,
 } from 'vue-property-decorator';
 
 library.add(faCircleNotch, faUpload, faLongArrowAltUp, faLongArrowAltDown);
 
 import { CarouselInterface } from 'src/bot/database/entity/carousel';
-import { getSocket } from 'src/panel/helpers/socket';
-import translate from 'src/panel/helpers/translate';
 
 @Component({ components: { loading: () => import('../../../components/loading.vue') } })
 export default class carouselOverlayList extends Vue {
@@ -89,7 +152,7 @@ export default class carouselOverlayList extends Vue {
 
   fields = [
     {
-      key: 'thumbnail', label: '', tdClass: 'fitThumbnail', 
+      key: 'thumbnail', label: '', tdClass: 'fitThumbnail',
     },
     { key: 'info', label: '' },
     { key: 'buttons', label: '' },

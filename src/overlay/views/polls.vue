@@ -1,56 +1,93 @@
 <template>
-<div style="height: 100%; display: flex;">
-  <div v-if="urlParam('debug')">
-    <json-viewer :value="{currentVote, votes, settings, shouldShow: settings.display.hideAfterInactivity && inactivityTime < settings.display.inactivityTime, inactivityTime }" boxed copyable :expand-depth="10"></json-viewer>
-  </div>
-  <transition name="fade">
-    <div id="box"
-      v-if="currentVote !== null"
-      v-show="!settings.display.hideAfterInactivity || (settings.display.hideAfterInactivity && inactivityTime < settings.display.inactivityTime)"
-      :class="[getTheme(settings.display.theme)]"
-      style="display: inline-block; width: 100%;"
-      :style="{ 'align-self': settings.display.align === 'top' ? 'flex-start' : 'flex-end' }">
-      <strong class="title">{{currentVote.title}}</strong>
-      <div class="helper" v-if="currentVote.type === 'normal'">{{ translate('systems.polls.overlay.type') }} <kbd>{{ voteCommand }} 1</kbd>, <kbd>{{ voteCommand }} 2</kbd>, {{ translate('systems.polls.overlay.inChatToVote') }}</div>
-      <div class="helper" v-else-if="currentVote.type === 'numbers'">{{ translate('systems.polls.overlay.type') }} <kbd>1</kbd>, <kbd>2</kbd>,  {{ translate('systems.polls.overlay.inChatToVote') }}</div>
-      <div class="helper" v-else-if="currentVote.type === 'tips'">{{ translate('systems.polls.overlay.add') }} <kbd>#vote1</kbd>, <kbd>#vote2</kbd>, <span v-html="translate('systems.polls.overlay.toYourMessage').replace('$type', translate('systems.polls.overlay.tips'))"></span></div>
-      <div class="helper" v-else>{{ translate('systems.polls.overlay.add') }} <kbd>#vote1</kbd>, <kbd>#vote2</kbd>, <span v-html="translate('systems.polls.overlay.toYourMessage').replace('$type', translate('systems.polls.overlay.bits'))"></span></div>
-      <div class="options"
-        v-for="(option, index) in currentVote.options"
-        :key="option"
-        :class="[index === 0 ? 'first' : '', index === currentVote.options.length - 1 ? 'last': '']">
-        <div class="numbers">{{index+1}}</div>
-        <div style="width:100%">
-          <div>{{option}}</div>
-          <div class="background-bar"></div>
-          <div class="bar"
-            v-bind:style="{
-            'width': getPercentage(index) === 0 ? '5px' : getPercentage(index) + '%'
-            }"
-          ></div>
-        </div>
-        <div class="percentage">{{getPercentage(index, 1)}}%</div>
-      </div>
-      <div id="footer">
-        <div style="width: 100%">{{translate('systems.polls.totalVotes')}}
-          <strong v-if="currentVote.type !== 'tips'">{{ totalVotes }}</strong>
-          <strong v-else>{{ Number(totalVotes).toFixed(1) }}</strong>
-        </div>
-        <div style="width: 100%">{{translate('systems.polls.activeFor')}} <strong>{{ dayjs().from(dayjs(activeTime), true) }}</strong></div>
-      </div>
+  <div style="height: 100%; display: flex;">
+    <div v-if="urlParam('debug')">
+      <json-viewer
+        :value="{currentVote, votes, settings, shouldShow: settings.display.hideAfterInactivity && inactivityTime < settings.display.inactivityTime, inactivityTime }"
+        boxed
+        copyable
+        :expand-depth="10"
+      />
     </div>
-  </transition>
-</div>
+    <transition name="fade">
+      <div
+        v-if="currentVote !== null"
+        v-show="!settings.display.hideAfterInactivity || (settings.display.hideAfterInactivity && inactivityTime < settings.display.inactivityTime)"
+        id="box"
+        :class="[getTheme(settings.display.theme)]"
+        style="display: inline-block; width: 100%;"
+        :style="{ 'align-self': settings.display.align === 'top' ? 'flex-start' : 'flex-end' }"
+      >
+        <strong class="title">{{ currentVote.title }}</strong>
+        <div
+          v-if="currentVote.type === 'normal'"
+          class="helper"
+        >
+          {{ translate('systems.polls.overlay.type') }} <kbd>{{ voteCommand }} 1</kbd>, <kbd>{{ voteCommand }} 2</kbd>, {{ translate('systems.polls.overlay.inChatToVote') }}
+        </div>
+        <div
+          v-else-if="currentVote.type === 'numbers'"
+          class="helper"
+        >
+          {{ translate('systems.polls.overlay.type') }} <kbd>1</kbd>, <kbd>2</kbd>,  {{ translate('systems.polls.overlay.inChatToVote') }}
+        </div>
+        <div
+          v-else-if="currentVote.type === 'tips'"
+          class="helper"
+        >
+          {{ translate('systems.polls.overlay.add') }} <kbd>#vote1</kbd>, <kbd>#vote2</kbd>, <span v-html="translate('systems.polls.overlay.toYourMessage').replace('$type', translate('systems.polls.overlay.tips'))" />
+        </div>
+        <div
+          v-else
+          class="helper"
+        >
+          {{ translate('systems.polls.overlay.add') }} <kbd>#vote1</kbd>, <kbd>#vote2</kbd>, <span v-html="translate('systems.polls.overlay.toYourMessage').replace('$type', translate('systems.polls.overlay.bits'))" />
+        </div>
+        <div
+          v-for="(option, index) in currentVote.options"
+          :key="option"
+          class="options"
+          :class="[index === 0 ? 'first' : '', index === currentVote.options.length - 1 ? 'last': '']"
+        >
+          <div class="numbers">
+            {{ index+1 }}
+          </div>
+          <div style="width:100%">
+            <div>{{ option }}</div>
+            <div class="background-bar" />
+            <div
+              class="bar"
+              :style="{
+                'width': getPercentage(index) === 0 ? '5px' : getPercentage(index) + '%'
+              }"
+            />
+          </div>
+          <div class="percentage">
+            {{ getPercentage(index, 1) }}%
+          </div>
+        </div>
+        <div id="footer">
+          <div style="width: 100%">
+            {{ translate('systems.polls.totalVotes') }}
+            <strong v-if="currentVote.type !== 'tips'">{{ totalVotes }}</strong>
+            <strong v-else>{{ Number(totalVotes).toFixed(1) }}</strong>
+          </div>
+          <div style="width: 100%">
+            {{ translate('systems.polls.activeFor') }} <strong>{{ dayjs().from(dayjs(activeTime), true) }}</strong>
+          </div>
+        </div>
+      </div>
+    </transition>
+  </div>
 </template>
 
 <script lang="ts">
+import { getSocket } from '@sogebot/ui-helpers/socket';
 import JsonViewer from 'vue-json-viewer';
 import {
-  Component, Vue, Watch, 
+  Component, Vue, Watch,
 } from 'vue-property-decorator';
 
 import { dayjs } from 'src/bot/helpers/dayjs';
-import { getSocket } from 'src/panel/helpers/socket';
 
 import { PollInterface } from '../../bot/database/entity/poll';
 

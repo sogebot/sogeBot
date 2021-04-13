@@ -1,152 +1,387 @@
 <template>
-<div class="widget">
-  <b-card class="border-0 h-100" no-body="no-body">
-    <b-tabs class="h-100" pills="pills" card="card" style="overflow:hidden">
-      <template v-slot:tabs-start>
-        <template v-if="!popout">
-          <li class="nav-item px-2 grip text-secondary align-self-center" v-if="typeof nodrag === 'undefined'">
-            <fa icon="grip-vertical" fixed-width="fixed-width"></fa>
+  <div class="widget">
+    <b-card
+      class="border-0 h-100"
+      no-body="no-body"
+    >
+      <b-tabs
+        class="h-100"
+        pills="pills"
+        card="card"
+        style="overflow:hidden"
+      >
+        <template #tabs-start>
+          <template v-if="!popout">
+            <li
+              v-if="typeof nodrag === 'undefined'"
+              class="nav-item px-2 grip text-secondary align-self-center"
+            >
+              <fa
+                icon="grip-vertical"
+                fixed-width="fixed-width"
+              />
+            </li>
+          </template>
+          <li class="nav-item">
+            <b-dropdown
+              ref="dropdown"
+              boundary="window"
+              no-caret="no-caret"
+              :text="translate('widget-title-eventlist')"
+              variant="outline-primary"
+              toggle-class="border-0"
+            >
+              <b-dropdown-group header="Events filtering">
+                <b-dropdown-form>
+                  <b-button
+                    :variant="settings.widgetEventlistFollows ? 'success' : 'danger'"
+                    @click="toggle('widgetEventlistFollows')"
+                  >
+                    <fa icon="heart" />
+                  </b-button>
+                  <b-button
+                    :variant="settings.widgetEventlistHosts ? 'success' : 'danger'"
+                    @click="toggle('widgetEventlistHosts')"
+                  >
+                    <fa icon="tv" />
+                  </b-button>
+                  <b-button
+                    :variant="settings.widgetEventlistRaids ? 'success' : 'danger'"
+                    @click="toggle('widgetEventlistRaids')"
+                  >
+                    <fa icon="random" />
+                  </b-button>
+                  <b-button
+                    :variant="settings.widgetEventlistCheers ? 'success' : 'danger'"
+                    @click="toggle('widgetEventlistCheers')"
+                  >
+                    <fa icon="gem" />
+                  </b-button>
+                  <b-button
+                    :variant="settings.widgetEventlistSubs ? 'success' : 'danger'"
+                    @click="toggle('widgetEventlistSubs')"
+                  >
+                    <fa icon="star" />
+                  </b-button>
+                  <b-button
+                    :variant="settings.widgetEventlistSubgifts ? 'success' : 'danger'"
+                    @click="toggle('widgetEventlistSubgifts')"
+                  >
+                    <fa icon="gift" />
+                  </b-button>
+                  <b-button
+                    :variant="settings.widgetEventlistSubcommunitygifts ? 'success' : 'danger'"
+                    @click="toggle('widgetEventlistSubcommunitygifts')"
+                  >
+                    <fa icon="box-open" />
+                  </b-button>
+                  <b-button
+                    :variant="settings.widgetEventlistResubs ? 'success' : 'danger'"
+                    @click="toggle('widgetEventlistResubs')"
+                  >
+                    <font-awesome-layers>
+                      <fa icon="star-half" />
+                      <fa icon="long-arrow-alt-right" />
+                    </font-awesome-layers>
+                  </b-button>
+                  <b-button
+                    :variant="settings.widgetEventlistTips ? 'success' : 'danger'"
+                    @click="toggle('widgetEventlistTips')"
+                  >
+                    <fa icon="dollar-sign" />
+                  </b-button>
+                </b-dropdown-form>
+              </b-dropdown-group>
+              <template v-if="!popout">
+                <b-dropdown-divider />
+                <b-dropdown-item @click="state.editation = $state.progress">
+                  Edit events
+                </b-dropdown-item>
+                <b-dropdown-item
+                  target="_blank"
+                  href="/popout/#eventlist"
+                >
+                  {{ translate('popout') }}
+                </b-dropdown-item>
+                <b-dropdown-divider />
+                <b-dropdown-item>
+                  <a
+                    class="text-danger"
+                    href="#"
+                    @click.prevent="$refs.dropdown.hide(); $nextTick(() => EventBus.$emit('remove-widget', 'eventlist'))"
+                    v-html="translate('remove-widget').replace('$name', translate('widget-title-eventlist'))"
+                  />
+                </b-dropdown-item>
+              </template>
+            </b-dropdown>
           </li>
         </template>
-        <li class="nav-item">
-          <b-dropdown ref="dropdown" boundary="window" no-caret="no-caret" :text="translate('widget-title-eventlist')" variant="outline-primary" toggle-class="border-0">
-            <b-dropdown-group header="Events filtering">
-              <b-dropdown-form>
-                <b-button @click="toggle('widgetEventlistFollows')" :variant="settings.widgetEventlistFollows ? 'success' : 'danger'">
-                  <fa icon="heart"></fa>
-                </b-button>
-                <b-button @click="toggle('widgetEventlistHosts')" :variant="settings.widgetEventlistHosts ? 'success' : 'danger'">
-                  <fa icon="tv"></fa>
-                </b-button>
-                <b-button @click="toggle('widgetEventlistRaids')" :variant="settings.widgetEventlistRaids ? 'success' : 'danger'">
-                  <fa icon="random"></fa>
-                </b-button>
-                <b-button @click="toggle('widgetEventlistCheers')" :variant="settings.widgetEventlistCheers ? 'success' : 'danger'">
-                  <fa icon="gem"></fa>
-                </b-button>
-                <b-button @click="toggle('widgetEventlistSubs')" :variant="settings.widgetEventlistSubs ? 'success' : 'danger'">
-                  <fa icon="star"></fa>
-                </b-button>
-                <b-button @click="toggle('widgetEventlistSubgifts')" :variant="settings.widgetEventlistSubgifts ? 'success' : 'danger'">
-                  <fa icon="gift"></fa>
-                </b-button>
-                <b-button @click="toggle('widgetEventlistSubcommunitygifts')" :variant="settings.widgetEventlistSubcommunitygifts ? 'success' : 'danger'">
-                  <fa icon="box-open"></fa>
-                </b-button>
-                <b-button @click="toggle('widgetEventlistResubs')" :variant="settings.widgetEventlistResubs ? 'success' : 'danger'">
-                  <font-awesome-layers>
-                    <fa icon="star-half"></fa>
-                    <fa icon="long-arrow-alt-right"></fa>
-                  </font-awesome-layers>
-                </b-button>
-                <b-button @click="toggle('widgetEventlistTips')" :variant="settings.widgetEventlistTips ? 'success' : 'danger'">
-                  <fa icon="dollar-sign"></fa>
-                </b-button>
-              </b-dropdown-form>
-            </b-dropdown-group>
-            <template v-if="!popout">
-              <b-dropdown-divider></b-dropdown-divider>
-              <b-dropdown-item @click="state.editation = $state.progress">Edit events</b-dropdown-item>
-              <b-dropdown-item target="_blank" href="/popout/#eventlist">{{ translate('popout') }}</b-dropdown-item>
-              <b-dropdown-divider></b-dropdown-divider>
-              <b-dropdown-item><a class="text-danger" href="#" @click.prevent="$refs.dropdown.hide(); $nextTick(() => EventBus.$emit('remove-widget', 'eventlist'))" v-html="translate('remove-widget').replace('$name', translate('widget-title-eventlist'))"></a></b-dropdown-item>
-            </template>
-          </b-dropdown>
-        </li>
-      </template>
-      <b-tab active="active">
-        <template v-slot:title>
-          <fa :icon="['far', 'calendar']" fixed-width="fixed-width"></fa>
-        </template>
-        <b-card-text>
-          <loading v-if="state.loading === $state.progress"></loading>
-          <template v-else>
-            <div class="text-right" v-if="state.editation === $state.progress">
-              <b-button variant="danger" @click="removeSelected" :disabled="selected.length === 0">
-                <fa icon="trash-alt"></fa>
-              </b-button>
-              <b-button variant="primary" @click="editationDone">Done</b-button>
-            </div>
-            <b-list-group>
-              <b-list-group-item @mouseover="isHovered = event.id" @mouseleave="isHovered = ''" v-for="(event, index) of fEvents" :key="index" :active="selected.includes(event.id)" style="cursor: pointer; border-left: 0; border-right: 0; padding: 0.2rem 1.25rem 0.4rem 1.25rem" :style="{opacity: event.isTest ? 0.75 : 1}" @click="state.editation !== $state.idle ? toggleSelected(event) : null"><i class="eventlist-text" :title="dayjs(event.timestamp).format('LLLL')"><span class="text-danger" v-if="event.isTest">TEST</span>
-                  {{dayjs(event.timestamp).fromNow()}}</i>
-                <div class="eventlist-username" :style="{'font-size': eventlistSize + 'px'}">
-                  <div class="d-flex">
-                    <div class="w-100"><span :title="event.username" style="z-index: 9">{{event.username}}</span><span class="pl-1" v-html="prepareMessage(event)"></span></div>
-                    <div style="flex-shrink: 15;"><span v-if="isHovered !== event.id || state.editation !== $state.idle">
-                        <fa v-if="event.event === 'follow'" icon="heart" :class="[`icon-${event.event}`, 'icon']"></fa>
-                        <fa v-if="event.event === 'host'" icon="tv" :class="[`icon-${event.event}`, 'icon']"></fa>
-                        <fa v-if="event.event === 'raid'" icon="random" :class="[`icon-${event.event}`, 'icon']"></fa>
-                        <fa v-if="event.event === 'sub'" icon="star" :class="[`icon-${event.event}`, 'icon']"></fa>
-                        <fa v-if="event.event === 'subgift'" icon="gift" :class="[`icon-${event.event}`, 'icon']"></fa>
-                        <fa v-if="event.event === 'subcommunitygift'" icon="box-open" :class="[`icon-${event.event}`, 'icon']"></fa>
-                        <font-awesome-layers v-if="event.event === 'resub'" :class="[`icon-${event.event}`, 'icon']">
-                          <fa icon="star-half"></fa>
-                          <fa icon="long-arrow-alt-right"></fa>
-                        </font-awesome-layers>
-                        <fa v-if="event.event === 'cheer'" icon="gem" :class="[`icon-${event.event}`, 'icon']"></fa>
-                        <fa v-if="event.event === 'tip'" icon="dollar-sign" :class="[`icon-${event.event}`, 'icon']"></fa></span><span v-else>
-                        <fa class="pointer" icon="redo-alt" :class="['icon']" @click="resendAlert(event.id)"></fa></span></div>
-                  </div>
-                </div>
-              </b-list-group-item>
-            </b-list-group>
+        <b-tab active="active">
+          <template #title>
+            <fa
+              :icon="['far', 'calendar']"
+              fixed-width="fixed-width"
+            />
           </template>
-        </b-card-text>
-      </b-tab>
-      <b-tab>
-        <template v-slot:title>
-          <fa icon="cog" fixed-width="fixed-width"></fa>
+          <b-card-text>
+            <loading v-if="state.loading === $state.progress" />
+            <template v-else>
+              <div
+                v-if="state.editation === $state.progress"
+                class="text-right"
+              >
+                <b-button
+                  variant="danger"
+                  :disabled="selected.length === 0"
+                  @click="removeSelected"
+                >
+                  <fa icon="trash-alt" />
+                </b-button>
+                <b-button
+                  variant="primary"
+                  @click="editationDone"
+                >
+                  Done
+                </b-button>
+              </div>
+              <b-list-group>
+                <b-list-group-item
+                  v-for="(event, index) of fEvents"
+                  :key="index"
+                  :active="selected.includes(event.id)"
+                  style="cursor: pointer; border-left: 0; border-right: 0; padding: 0.2rem 1.25rem 0.4rem 1.25rem"
+                  :style="{opacity: event.isTest ? 0.75 : 1}"
+                  @mouseover="isHovered = event.id"
+                  @mouseleave="isHovered = ''"
+                  @click="state.editation !== $state.idle ? toggleSelected(event) : null"
+                >
+                  <i
+                    class="eventlist-text"
+                    :title="dayjs(event.timestamp).format('LLLL')"
+                  ><span
+                     v-if="event.isTest"
+                     class="text-danger"
+                   >TEST</span>
+                    {{ dayjs(event.timestamp).fromNow() }}</i>
+                  <div
+                    class="eventlist-username"
+                    :style="{'font-size': eventlistSize + 'px'}"
+                  >
+                    <div class="d-flex">
+                      <div class="w-100">
+                        <span
+                          :title="event.username"
+                          style="z-index: 9"
+                        >{{ event.username }}</span><span
+                          class="pl-1"
+                          v-html="prepareMessage(event)"
+                        />
+                      </div>
+                      <div style="flex-shrink: 15;">
+                        <span v-if="isHovered !== event.id || state.editation !== $state.idle">
+                          <fa
+                            v-if="event.event === 'follow'"
+                            icon="heart"
+                            :class="[`icon-${event.event}`, 'icon']"
+                          />
+                          <fa
+                            v-if="event.event === 'host'"
+                            icon="tv"
+                            :class="[`icon-${event.event}`, 'icon']"
+                          />
+                          <fa
+                            v-if="event.event === 'raid'"
+                            icon="random"
+                            :class="[`icon-${event.event}`, 'icon']"
+                          />
+                          <fa
+                            v-if="event.event === 'sub'"
+                            icon="star"
+                            :class="[`icon-${event.event}`, 'icon']"
+                          />
+                          <fa
+                            v-if="event.event === 'subgift'"
+                            icon="gift"
+                            :class="[`icon-${event.event}`, 'icon']"
+                          />
+                          <fa
+                            v-if="event.event === 'subcommunitygift'"
+                            icon="box-open"
+                            :class="[`icon-${event.event}`, 'icon']"
+                          />
+                          <font-awesome-layers
+                            v-if="event.event === 'resub'"
+                            :class="[`icon-${event.event}`, 'icon']"
+                          >
+                            <fa icon="star-half" />
+                            <fa icon="long-arrow-alt-right" />
+                          </font-awesome-layers>
+                          <fa
+                            v-if="event.event === 'cheer'"
+                            icon="gem"
+                            :class="[`icon-${event.event}`, 'icon']"
+                          />
+                          <fa
+                            v-if="event.event === 'tip'"
+                            icon="dollar-sign"
+                            :class="[`icon-${event.event}`, 'icon']"
+                          /></span><span v-else>
+                          <fa
+                            class="pointer"
+                            icon="redo-alt"
+                            :class="['icon']"
+                            @click="resendAlert(event.id)"
+                          /></span>
+                      </div>
+                    </div>
+                  </div>
+                </b-list-group-item>
+              </b-list-group>
+            </template>
+          </b-card-text>
+        </b-tab>
+        <b-tab>
+          <template #title>
+            <fa
+              icon="cog"
+              fixed-width="fixed-width"
+            />
+          </template>
+          <b-card-text>
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <span class="input-group-text">{{ translate('eventlist-show-number') }}</span>
+              </div>
+              <input
+                v-model="eventlistShow"
+                class="form-control"
+                type="text"
+              >
+              <div class="input-group-append">
+                <span class="input-group-text">{{ translate('eventlist-show') }}</span>
+              </div>
+            </div>
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <span class="input-group-text">{{ translate('followers-size') }}</span>
+              </div>
+              <input
+                v-model="eventlistSize"
+                class="form-control"
+                type="text"
+              >
+              <div class="input-group-append">
+                <span class="input-group-text">px</span>
+              </div>
+            </div>
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <span class="input-group-text">{{ translate('followers-message-size') }}</span>
+              </div>
+              <input
+                v-model="eventlistMessageSize"
+                class="form-control"
+                type="text"
+              >
+              <div class="input-group-append">
+                <span class="input-group-text">px</span>
+              </div>
+            </div>
+            <hold-button
+              class="mt-2 btn btn-danger w-100"
+              icon="eraser"
+              @trigger="cleanup()"
+            >
+              <template slot="title">
+                Cleanup
+              </template>
+              <template slot="onHoldTitle">
+                Hold to cleanup
+              </template>
+            </hold-button>
+          </b-card-text>
+        </b-tab>
+        <template #tabs-end>
+          <li
+            class="nav-item text-right"
+            style="flex-grow: 1;"
+          >
+            <b-button-group>
+              <b-button
+                id="eventlistAlertsSkipButton"
+                class="border-0"
+                :variant="'outline-dark'"
+                @click="emitSkipAlertEvent()"
+              >
+                <fa
+                  icon="forward"
+                  fixed-width
+                />
+              </b-button>
+              <b-button
+                id="eventlistAlertsTTSButton"
+                class="border-0"
+                :variant="isTTSMuted ? 'outline-secondary' : 'outline-dark'"
+                @click="isTTSMuted = !isTTSMuted"
+              >
+                <strong>TTS</strong>
+              </b-button>
+              <b-button
+                id="eventlistSoundToggleButton"
+                class="border-0"
+                :variant="isSoundMuted ? 'outline-secondary' : 'outline-dark'"
+                @click="isSoundMuted = !isSoundMuted"
+              >
+                <fa
+                  v-if="!isSoundMuted"
+                  icon="volume-up"
+                  fixed-width
+                />
+                <fa
+                  v-else
+                  icon="volume-mute"
+                  fixed-width
+                />
+              </b-button>
+              <b-button
+                id="eventlistAlertsToggleButton"
+                class="border-0"
+                :variant="areAlertsMuted ? 'outline-secondary' : 'outline-dark'"
+                @click="areAlertsMuted = !areAlertsMuted"
+              >
+                <fa
+                  v-if="!areAlertsMuted"
+                  icon="bell"
+                  fixed-width
+                />
+                <fa
+                  v-else
+                  icon="bell-slash"
+                  fixed-width
+                />
+              </b-button>
+            </b-button-group>
+            <b-tooltip
+              target="eventlistAlertsSkipButton"
+              :title="'Skip alert'"
+            />
+            <b-tooltip
+              target="eventlistAlertsTTSButton"
+              :title="isTTSMuted ? 'TTS is disabled.' : 'TTS is enabled!'"
+            />
+            <b-tooltip
+              target="eventlistSoundToggleButton"
+              :title="isSoundMuted ? 'Sound is muted.' : 'Sound is enabled!'"
+            />
+            <b-tooltip
+              target="eventlistAlertsToggleButton"
+              :title="areAlertsMuted ? 'Alerts are disabled.' : 'Alerts are enabled!'"
+            />
+          </li>
         </template>
-        <b-card-text>
-          <div class="input-group">
-            <div class="input-group-prepend"><span class="input-group-text">{{translate('eventlist-show-number')}}</span></div>
-            <input class="form-control" type="text" v-model="eventlistShow"/>
-            <div class="input-group-append"><span class="input-group-text">{{translate('eventlist-show')}}</span></div>
-          </div>
-          <div class="input-group">
-            <div class="input-group-prepend"><span class="input-group-text">{{translate('followers-size')}}</span></div>
-            <input class="form-control" type="text" v-model="eventlistSize"/>
-            <div class="input-group-append"><span class="input-group-text">px</span></div>
-          </div>
-          <div class="input-group">
-            <div class="input-group-prepend"><span class="input-group-text">{{translate('followers-message-size')}}</span></div>
-            <input class="form-control" type="text" v-model="eventlistMessageSize"/>
-            <div class="input-group-append"><span class="input-group-text">px</span></div>
-          </div>
-          <hold-button class="mt-2 btn btn-danger w-100" icon="eraser" @trigger="cleanup()">
-            <template slot="title">Cleanup</template>
-            <template slot="onHoldTitle">Hold to cleanup</template>
-          </hold-button>
-        </b-card-text>
-      </b-tab>
-      <template v-slot:tabs-end>
-        <li class="nav-item text-right" style="flex-grow: 1;">
-          <b-button-group>
-            <b-button @click="emitSkipAlertEvent()" class="border-0" :variant="'outline-dark'" id="eventlistAlertsSkipButton">
-              <fa icon="forward" fixed-width />
-            </b-button>
-            <b-button @click="isTTSMuted = !isTTSMuted" class="border-0" :variant="isTTSMuted ? 'outline-secondary' : 'outline-dark'" id="eventlistAlertsTTSButton">
-              <strong>TTS</strong>
-            </b-button>
-            <b-button @click="isSoundMuted = !isSoundMuted" class="border-0" :variant="isSoundMuted ? 'outline-secondary' : 'outline-dark'" id="eventlistSoundToggleButton">
-              <fa icon="volume-up" fixed-width v-if="!isSoundMuted" />
-              <fa icon="volume-mute" fixed-width v-else />
-            </b-button>
-            <b-button @click="areAlertsMuted = !areAlertsMuted" class="border-0" :variant="areAlertsMuted ? 'outline-secondary' : 'outline-dark'" id="eventlistAlertsToggleButton">
-              <fa icon="bell" fixed-width v-if="!areAlertsMuted" />
-              <fa icon="bell-slash" fixed-width v-else />
-            </b-button>
-          </b-button-group>
-          <b-tooltip target="eventlistAlertsSkipButton" :title="'Skip alert'"></b-tooltip>
-          <b-tooltip target="eventlistAlertsTTSButton" :title="isTTSMuted ? 'TTS is disabled.' : 'TTS is enabled!'"></b-tooltip>
-          <b-tooltip target="eventlistSoundToggleButton" :title="isSoundMuted ? 'Sound is muted.' : 'Sound is enabled!'"></b-tooltip>
-          <b-tooltip target="eventlistAlertsToggleButton" :title="areAlertsMuted ? 'Alerts are disabled.' : 'Alerts are enabled!'"></b-tooltip>
-        </li>
-      </template>
-    </b-tabs>
-  </b-card>
-</div>
+      </b-tabs>
+    </b-card>
+  </div>
 </template>
 
 <script>
@@ -155,6 +390,8 @@ import {
   faBell, faBellSlash, faRedoAlt, faVolumeMute,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeLayers } from '@fortawesome/vue-fontawesome';
+import { getSocket } from '@sogebot/ui-helpers/socket';
+import translate from '@sogebot/ui-helpers/translate';
 import {
   chunk, debounce, get,
 } from 'lodash-es';
@@ -162,19 +399,17 @@ import {
 import { dayjs } from 'src/bot/helpers/dayjs';
 import { toBoolean } from 'src/bot/helpers/toBoolean';
 import { EventBus } from 'src/panel/helpers/event-bus';
-import { getSocket } from 'src/panel/helpers/socket';
-import translate from 'src/panel/helpers/translate';
 
 library.add(faRedoAlt, faBell, faBellSlash, faVolumeMute);
 
 export default {
-  props:      ['popout', 'nodrag'],
   components: {
     'font-awesome-layers': FontAwesomeLayers,
     holdButton:            () => import('../../components/holdButton.vue'),
     loading:               () => import('src/panel/components/loading.vue'),
   },
-  data: function () {
+  props: ['popout', 'nodrag'],
+  data:  function () {
     return {
       translate,
       dayjs,
@@ -207,6 +442,39 @@ export default {
       isTTSMuted:           false,
       isSoundMuted:         false,
     };
+  },
+  computed: {
+    fEvents: function () {
+      const toShow = [];
+      if (this.settings.widgetEventlistFollows) {
+        toShow.push('follow');
+      }
+      if (this.settings.widgetEventlistHosts) {
+        toShow.push('host');
+      }
+      if (this.settings.widgetEventlistRaids) {
+        toShow.push('raid');
+      }
+      if (this.settings.widgetEventlistCheers) {
+        toShow.push('cheer');
+      }
+      if (this.settings.widgetEventlistSubs) {
+        toShow.push('sub');
+      }
+      if (this.settings.widgetEventlistSubgifts) {
+        toShow.push('subgift');
+      }
+      if (this.settings.widgetEventlistSubcommunitygifts) {
+        toShow.push('subcommunitygift');
+      }
+      if (this.settings.widgetEventlistResubs) {
+        toShow.push('resub');
+      }
+      if (this.settings.widgetEventlistTips) {
+        toShow.push('tip');
+      }
+      return chunk(this.events.filter(o => toShow.includes(o.event)), this.eventlistShow)[0];
+    },
   },
   beforeDestroy: function() {
     for(const interval of this.interval) {
@@ -252,39 +520,6 @@ export default {
     // refresh timestamps
     this.interval.push(setInterval(() => this.socket.emit('eventlist::get', this.eventlistShow), 60000));
   },
-  computed: {
-    fEvents: function () {
-      const toShow = [];
-      if (this.settings.widgetEventlistFollows) {
-        toShow.push('follow');
-      }
-      if (this.settings.widgetEventlistHosts) {
-        toShow.push('host');
-      }
-      if (this.settings.widgetEventlistRaids) {
-        toShow.push('raid');
-      }
-      if (this.settings.widgetEventlistCheers) {
-        toShow.push('cheer');
-      }
-      if (this.settings.widgetEventlistSubs) {
-        toShow.push('sub');
-      }
-      if (this.settings.widgetEventlistSubgifts) {
-        toShow.push('subgift');
-      }
-      if (this.settings.widgetEventlistSubcommunitygifts) {
-        toShow.push('subcommunitygift');
-      }
-      if (this.settings.widgetEventlistResubs) {
-        toShow.push('resub');
-      }
-      if (this.settings.widgetEventlistTips) {
-        toShow.push('tip');
-      }
-      return chunk(this.events.filter(o => toShow.includes(o.event)), this.eventlistShow)[0];
-    },
-  },
   watch: {
     '$route': function(val) {
       this.socketAlerts.emit('alerts::areAlertsMuted', null, (err, value) => {
@@ -299,17 +534,17 @@ export default {
     },
     'areAlertsMuted': function(val) {
       this.socketAlerts.emit('alerts::areAlertsMuted', this.areAlertsMuted, () => {
-        return; 
+        return;
       });
     },
     'isTTSMuted': function(val) {
       this.socketAlerts.emit('alerts::isTTSMuted', this.isTTSMuted, () => {
-        return; 
+        return;
       });
     },
     'isSoundMuted': function(val) {
       this.socketAlerts.emit('alerts::isSoundMuted', this.isSoundMuted, () => {
-        return; 
+        return;
       });
     },
     'state.editation': function (val) {
@@ -344,7 +579,7 @@ export default {
   methods: {
     removeSelected() {
       this.socket.emit('eventlist::removeById', this.selected, () => {
-        return; 
+        return;
       });
       this.events = this.events.filter(o => !this.selected.includes(o.id));
       this.selected = [];

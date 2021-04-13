@@ -1,140 +1,177 @@
 <template>
-<div class="w-100 h-100" v-if="group">
-  <template v-for="(goal, index) of group.goals">
-    <transition
-      @before-enter="beforeEnter"
-      @enter="doEnterAnimation"
-      @leave="doLeaveAnimation"
-      :css="false"
-      :key="index">
-      <b-progress
-        v-if="goal.display === 'simple' && (group.goals.length === 1 || show === index || group.display.type === 'multi')"
-        :height="goal.customizationBar.height + 'px'"
-        :max="Number(goal.goalAmount)"
-        style="border-radius: 0;"
-        class="w-100"
-        :class="{ disabled: isDisabled(index), 'position-absolute': group.display.type !== 'multi' }"
-        :style="{
-          border: goal.customizationBar.borderPx + 'px solid ' + goal.customizationBar.borderColor,
-          'background-color': goal.customizationBar.backgroundColor ,
-          'font-family': getFontFamilyCSS(goal.customizationFont.family),
-          'margin-top': index !== 0 && group.goals.length > 0 && group.display.type === 'multi' ? group.display.spaceBetweenGoalsInPx + 'px' : '0px',
-        }">
-        <b-progress-bar
-          :value="Number(goal.currentAmount)"
-          :style="{
-            'background-color': goal.customizationBar.color
-          }"></b-progress-bar>
-        <div class="row no-gutters"
-          :style="{
-            'position': 'absolute',
-            'height': (goal.customizationBar.height - (goal.customizationBar.borderPx * 2)) + 'px',
-            'line-height': (goal.customizationBar.height - (goal.customizationBar.borderPx * 2)) + 'px',
-            'width': '100%',
-            'color': goal.customizationFont.color,
-            'font-weight': goal.customizationFont.weight,
-            'font-size': goal.customizationFont.size + 'px',
-            'text-shadow': [textStrokeGenerator(goal.customizationFont.borderPx, goal.customizationFont.borderColor), shadowGenerator(goal.customizationFont.shadow)].filter(Boolean).join(', ')
-          }">
-          <div class="col-4 text-left text-nowrap pl-2 pr-2">{{ goal.name }}</div>
-          <div class="col-4 text-nowrap text-center">
-            <template v-if="goal.type === 'tips'">
-              {{ Intl.NumberFormat($store.state.configuration.lang, { style: 'currency', currency: $store.state.configuration.currency }).format(goal.currentAmount) }}
-            </template>
-            <template v-else>{{ goal.currentAmount }}</template>
-          </div>
-          <div class="col-4 text-nowrap text-right pr-2">
-            <template v-if="goal.type === 'tips'">
-              {{ Intl.NumberFormat($store.state.configuration.lang, { style: 'currency', currency: $store.state.configuration.currency }).format(goal.goalAmount) }}
-            </template>
-            <template v-else>{{ goal.goalAmount }}</template></div>
-        </div>
-      </b-progress>
-      <div
-        :class="{ disabled: isDisabled(index), 'position-absolute': group.display.type !== 'multi' }"
-        style="width: 100%"
-        :style="{
-          'padding-top': index !== 0 && group.goals.length > 0 && group.display.type === 'multi' ? group.display.spaceBetweenGoalsInPx + 'px' : '0px',
-        }"
-        v-else-if="goal.display === 'full' && (group.goals.length === 1 || group.display.type === 'multi' || show === index)">
-        <div class="row no-gutters"
-          :style="{
-            'color': goal.customizationFont.color,
-            'font-size': goal.customizationFont.size + 'px',
-            'text-shadow': [textStrokeGenerator(goal.customizationFont.borderPx, goal.customizationFont.borderColor), shadowGenerator(goal.customizationFont.shadow)].filter(Boolean).join(', ')
-          }">
-          <div class="col text-center text-truncate pl-2 pr-2">{{ goal.name }}</div>
-        </div>
+  <div
+    v-if="group"
+    class="w-100 h-100"
+  >
+    <template v-for="(goal, index) of group.goals">
+      <transition
+        :key="index"
+        :css="false"
+        @before-enter="beforeEnter"
+        @enter="doEnterAnimation"
+        @leave="doLeaveAnimation"
+      >
         <b-progress
+          v-if="goal.display === 'simple' && (group.goals.length === 1 || show === index || group.display.type === 'multi')"
           :height="goal.customizationBar.height + 'px'"
-          :max="goal.goalAmount"
+          :max="Number(goal.goalAmount)"
           style="border-radius: 0;"
           class="w-100"
-          :class="{ disabled: isDisabled(index) }"
+          :class="{ disabled: isDisabled(index), 'position-absolute': group.display.type !== 'multi' }"
           :style="{
             border: goal.customizationBar.borderPx + 'px solid ' + goal.customizationBar.borderColor,
-            'background-color': goal.customizationBar.backgroundColor,
-            'font-family': getFontFamilyCSS(goal.customizationFont.family)
-          }">
+            'background-color': goal.customizationBar.backgroundColor ,
+            'font-family': getFontFamilyCSS(goal.customizationFont.family),
+            'margin-top': index !== 0 && group.goals.length > 0 && group.display.type === 'multi' ? group.display.spaceBetweenGoalsInPx + 'px' : '0px',
+          }"
+        >
           <b-progress-bar
             :value="Number(goal.currentAmount)"
             :style="{
               'background-color': goal.customizationBar.color
-            }"></b-progress-bar>
-          <div class="row no-gutters"
+            }"
+          />
+          <div
+            class="row no-gutters"
             :style="{
               'position': 'absolute',
               'height': (goal.customizationBar.height - (goal.customizationBar.borderPx * 2)) + 'px',
               'line-height': (goal.customizationBar.height - (goal.customizationBar.borderPx * 2)) + 'px',
               'width': '100%',
               'color': goal.customizationFont.color,
+              'font-weight': goal.customizationFont.weight,
               'font-size': goal.customizationFont.size + 'px',
               'text-shadow': [textStrokeGenerator(goal.customizationFont.borderPx, goal.customizationFont.borderColor), shadowGenerator(goal.customizationFont.shadow)].filter(Boolean).join(', ')
-            }">
-            <div class="col text-center">
+            }"
+          >
+            <div class="col-4 text-left text-nowrap pl-2 pr-2">
+              {{ goal.name }}
+            </div>
+            <div class="col-4 text-nowrap text-center">
               <template v-if="goal.type === 'tips'">
                 {{ Intl.NumberFormat($store.state.configuration.lang, { style: 'currency', currency: $store.state.configuration.currency }).format(goal.currentAmount) }}
-                ({{ Intl.NumberFormat($store.state.configuration.lang, { style: 'percent' }).format(goal.currentAmount / goal.goalAmount) }})
               </template>
-              <template v-else>{{ goal.currentAmount }} ({{ Intl.NumberFormat($store.state.configuration.lang, { style: 'percent' }).format(goal.currentAmount / goal.goalAmount) }})</template>
+              <template v-else>
+                {{ goal.currentAmount }}
+              </template>
+            </div>
+            <div class="col-4 text-nowrap text-right pr-2">
+              <template v-if="goal.type === 'tips'">
+                {{ Intl.NumberFormat($store.state.configuration.lang, { style: 'currency', currency: $store.state.configuration.currency }).format(goal.goalAmount) }}
+              </template>
+              <template v-else>
+                {{ goal.goalAmount }}
+              </template>
             </div>
           </div>
         </b-progress>
-        <div class="row no-gutters"
+        <div
+          v-else-if="goal.display === 'full' && (group.goals.length === 1 || group.display.type === 'multi' || show === index)"
+          :class="{ disabled: isDisabled(index), 'position-absolute': group.display.type !== 'multi' }"
+          style="width: 100%"
           :style="{
-            'width': '100%',
-            'color': goal.customizationFont.color,
-            'font-size': goal.customizationFont.size + 'px',
-            'text-shadow': [textStrokeGenerator(goal.customizationFont.borderPx, goal.customizationFont.borderColor), shadowGenerator(goal.customizationFont.shadow)].filter(Boolean).join(', ')
-          }">
-          <div class="col text-left pl-2">
-            <template v-if="goal.type === 'tips'">
-              {{ Intl.NumberFormat($store.state.configuration.lang, { style: 'currency', currency: $store.state.configuration.currency }).format(0) }}
-            </template>
-            <template v-else>0</template>
+            'padding-top': index !== 0 && group.goals.length > 0 && group.display.type === 'multi' ? group.display.spaceBetweenGoalsInPx + 'px' : '0px',
+          }"
+        >
+          <div
+            class="row no-gutters"
+            :style="{
+              'color': goal.customizationFont.color,
+              'font-size': goal.customizationFont.size + 'px',
+              'text-shadow': [textStrokeGenerator(goal.customizationFont.borderPx, goal.customizationFont.borderColor), shadowGenerator(goal.customizationFont.shadow)].filter(Boolean).join(', ')
+            }"
+          >
+            <div class="col text-center text-truncate pl-2 pr-2">
+              {{ goal.name }}
+            </div>
           </div>
-          <div class="col-auto text-truncate text-center text-uppercase pl-2 pr-2" v-if="!goal.endAfterIgnore">
-            {{ dayjs().to(goal.endAfter) }}
-          </div>
-          <div class="col text-right pr-2">
-            <template v-if="goal.type === 'tips'">
+          <b-progress
+            :height="goal.customizationBar.height + 'px'"
+            :max="goal.goalAmount"
+            style="border-radius: 0;"
+            class="w-100"
+            :class="{ disabled: isDisabled(index) }"
+            :style="{
+              border: goal.customizationBar.borderPx + 'px solid ' + goal.customizationBar.borderColor,
+              'background-color': goal.customizationBar.backgroundColor,
+              'font-family': getFontFamilyCSS(goal.customizationFont.family)
+            }"
+          >
+            <b-progress-bar
+              :value="Number(goal.currentAmount)"
+              :style="{
+                'background-color': goal.customizationBar.color
+              }"
+            />
+            <div
+              class="row no-gutters"
+              :style="{
+                'position': 'absolute',
+                'height': (goal.customizationBar.height - (goal.customizationBar.borderPx * 2)) + 'px',
+                'line-height': (goal.customizationBar.height - (goal.customizationBar.borderPx * 2)) + 'px',
+                'width': '100%',
+                'color': goal.customizationFont.color,
+                'font-size': goal.customizationFont.size + 'px',
+                'text-shadow': [textStrokeGenerator(goal.customizationFont.borderPx, goal.customizationFont.borderColor), shadowGenerator(goal.customizationFont.shadow)].filter(Boolean).join(', ')
+              }"
+            >
+              <div class="col text-center">
+                <template v-if="goal.type === 'tips'">
+                  {{ Intl.NumberFormat($store.state.configuration.lang, { style: 'currency', currency: $store.state.configuration.currency }).format(goal.currentAmount) }}
+                  ({{ Intl.NumberFormat($store.state.configuration.lang, { style: 'percent' }).format(goal.currentAmount / goal.goalAmount) }})
+                </template>
+                <template v-else>
+                  {{ goal.currentAmount }} ({{ Intl.NumberFormat($store.state.configuration.lang, { style: 'percent' }).format(goal.currentAmount / goal.goalAmount) }})
+                </template>
+              </div>
+            </div>
+          </b-progress>
+          <div
+            class="row no-gutters"
+            :style="{
+              'width': '100%',
+              'color': goal.customizationFont.color,
+              'font-size': goal.customizationFont.size + 'px',
+              'text-shadow': [textStrokeGenerator(goal.customizationFont.borderPx, goal.customizationFont.borderColor), shadowGenerator(goal.customizationFont.shadow)].filter(Boolean).join(', ')
+            }"
+          >
+            <div class="col text-left pl-2">
+              <template v-if="goal.type === 'tips'">
+                {{ Intl.NumberFormat($store.state.configuration.lang, { style: 'currency', currency: $store.state.configuration.currency }).format(0) }}
+              </template>
+              <template v-else>
+                0
+              </template>
+            </div>
+            <div
+              v-if="!goal.endAfterIgnore"
+              class="col-auto text-truncate text-center text-uppercase pl-2 pr-2"
+            >
+              {{ dayjs().to(goal.endAfter) }}
+            </div>
+            <div class="col text-right pr-2">
+              <template v-if="goal.type === 'tips'">
                 {{ Intl.NumberFormat($store.state.configuration.lang, { style: 'currency', currency: $store.state.configuration.currency }).format(goal.goalAmount) }}
-            </template>
-            <template v-else>{{ goal.goalAmount }}</template>
+              </template>
+              <template v-else>
+                {{ goal.goalAmount }}
+              </template>
+            </div>
           </div>
         </div>
-      </div>
-      <div
-        v-else-if="goal.display === 'custom' && (group.goals.length === 1 || group.display.type === 'multi' || show === index)"
-        class="wrap"
-        :id="'wrap-' + goal.id"
-        v-html="goal.customizationHtml"></div>
-    </transition>
-  </template>
-</div>
+        <div
+          v-else-if="goal.display === 'custom' && (group.goals.length === 1 || group.display.type === 'multi' || show === index)"
+          :id="'wrap-' + goal.id"
+          class="wrap"
+          v-html="goal.customizationHtml"
+        />
+      </transition>
+    </template>
+  </div>
 </template>
 
 <script lang="ts">
+import { getSocket } from '@sogebot/ui-helpers/socket';
 import { ProgressPlugin } from 'bootstrap-vue/esm/components/progress';
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-vue/dist/bootstrap-vue.css';
@@ -145,7 +182,6 @@ import { Component, Vue } from 'vue-property-decorator';
 
 import { GoalGroupInterface, GoalInterface } from 'src/bot/database/entity/goal';
 import { dayjs } from 'src/bot/helpers/dayjs';
-import { getSocket } from 'src/panel/helpers/socket';
 import { shadowGenerator, textStrokeGenerator } from 'src/panel/helpers/text';
 
 Vue.use(ProgressPlugin);

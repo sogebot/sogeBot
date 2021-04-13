@@ -308,6 +308,8 @@
 </template>
 
 <script lang="ts">
+import { getSocket } from '@sogebot/ui-helpers/socket';
+import translate from '@sogebot/ui-helpers/translate';
 import { NextFunction } from 'express';
 import {
   cloneDeep, every, remove,
@@ -321,8 +323,6 @@ import { Validations } from 'vuelidate-property-decorators';
 import { required } from 'vuelidate/lib/validators';
 
 import type { AlertInterface, CommonSettingsInterface } from 'src/bot/database/entity/alert';
-import { getSocket } from 'src/panel/helpers/socket';
-import translate from 'src/panel/helpers/translate';
 
 import defaultAudio from '!!base64-loader!./media/456968__funwithsound__success-resolution-video-game-fanfare-sound-effect.mp3';
 import defaultImage from '!!base64-loader!./media/cow01.gif';

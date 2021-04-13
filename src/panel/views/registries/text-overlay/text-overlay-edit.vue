@@ -172,6 +172,8 @@
 </template>
 
 <script lang="ts">
+import { getSocket } from '@sogebot/ui-helpers/socket';
+import translate from '@sogebot/ui-helpers/translate';
 import { v4 as uuid } from 'uuid';
 import { codemirror } from 'vue-codemirror';
 import {
@@ -179,9 +181,6 @@ import {
 } from 'vue-property-decorator';
 import { Validate } from 'vuelidate-property-decorators';
 import { required } from 'vuelidate/lib/validators';
-
-import { getSocket } from 'src/panel/helpers/socket';
-import translate from 'src/panel/helpers/translate';
 
 import 'codemirror/lib/codemirror.css';
 

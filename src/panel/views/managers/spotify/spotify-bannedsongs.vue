@@ -4,54 +4,119 @@
       <b-col>
         <span class="title text-default mb-2">
           {{ translate('menu.manage') }}
-          <small><fa icon="angle-right"/></small>
+          <small><fa icon="angle-right" /></small>
           {{ translate('menu.spotify') }}
           {{ translate('menu.bannedsongs') }}
         </span>
       </b-col>
-      <b-col v-if="!$integrations.find(o => o.name === 'spotify').enabled" style=" text-align: right;">
-        <b-alert show variant="danger" style="padding: .5rem; margin: 0; display: inline-block;">
-          <fa icon="exclamation-circle" fixed-width/> {{ translate('this-system-is-disabled') }}
+      <b-col
+        v-if="!$integrations.find(o => o.name === 'spotify').enabled"
+        style=" text-align: right;"
+      >
+        <b-alert
+          show
+          variant="danger"
+          style="padding: .5rem; margin: 0; display: inline-block;"
+        >
+          <fa
+            icon="exclamation-circle"
+            fixed-width
+          /> {{ translate('this-system-is-disabled') }}
         </b-alert>
       </b-col>
     </b-row>
 
-    <panel search @search="search = $event">
-      <template v-slot:left>
-        <b-form inline @submit="addSongOrPlaylist">
+    <panel
+      search
+      @search="search = $event"
+    >
+      <template #left>
+        <b-form
+          inline
+          @submit="addSongOrPlaylist"
+        >
           <b-input-group>
-            <b-input input type="text" class="form-control w-auto col-6" v-model="toAdd" placeholder="Paste your spotifyUri" />
+            <b-input
+              v-model="toAdd"
+              input
+              type="text"
+              class="form-control w-auto col-6"
+              placeholder="Paste your spotifyUri"
+            />
             <b-input-group-append>
-              <b-button type="submit" v-if="state.import == 0" variant="primary" class="btn mr-2" v-on:click="addSongOrPlaylist()">
-                <fa icon="plus"></fa> {{ translate('systems.songs.add_song') }}</b-button>
-              <b-button v-else-if="state.import == 1" class="btn mr-2" variant="info" disabled="disabled">
-                <fa icon="circle-notch" spin></fa> {{ translate('systems.songs.importing') }}</b-button>
-              <b-button v-else class="btn mr-2" variant="success" disabled="disabled">
-                <fa icon="check"></fa> {{ translate('systems.songs.importing_done') }}</b-button>
+              <b-button
+                v-if="state.import == 0"
+                type="submit"
+                variant="primary"
+                class="btn mr-2"
+                @click="addSongOrPlaylist()"
+              >
+                <fa icon="plus" /> {{ translate('systems.songs.add_song') }}
+              </b-button>
+              <b-button
+                v-else-if="state.import == 1"
+                class="btn mr-2"
+                variant="info"
+                disabled="disabled"
+              >
+                <fa
+                  icon="circle-notch"
+                  spin
+                /> {{ translate('systems.songs.importing') }}
+              </b-button>
+              <b-button
+                v-else
+                class="btn mr-2"
+                variant="success"
+                disabled="disabled"
+              >
+                <fa icon="check" /> {{ translate('systems.songs.importing_done') }}
+              </b-button>
             </b-input-group-append>
           </b-input-group>
         </b-form>
       </template>
     </panel>
 
-    <loading v-if="state.loading !== $state.success"/>
+    <loading v-if="state.loading !== $state.success" />
     <template v-else>
-      <b-alert show variant="danger" v-if="fItems.length === 0 && search.length > 0">
-        <fa icon="search"/> <span v-html="translate('systems.songs.bannedSongsEmptyAfterSearch').replace('$search', search)"/>
+      <b-alert
+        v-if="fItems.length === 0 && search.length > 0"
+        show
+        variant="danger"
+      >
+        <fa icon="search" /> <span v-html="translate('systems.songs.bannedSongsEmptyAfterSearch').replace('$search', search)" />
       </b-alert>
-      <b-alert show v-else-if="items.length === 0">
-        {{translate('systems.songs.bannedSongsEmpty')}}
+      <b-alert
+        v-else-if="items.length === 0"
+        show
+      >
+        {{ translate('systems.songs.bannedSongsEmpty') }}
       </b-alert>
-      <b-table v-else striped small :items="fItems" :fields="fields" class="table-p-0">
-        <template v-slot:cell(title)="data">
+      <b-table
+        v-else
+        striped
+        small
+        :items="fItems"
+        :fields="fields"
+        class="table-p-0"
+      >
+        <template #cell(title)="data">
           {{ data.item.title }}
         </template>
-        <template v-slot:cell(artists)="data">
+        <template #cell(artists)="data">
           {{ data.item.artists.join(', ') }}
         </template>
-        <template v-slot:cell(buttons)="data">
-          <div class="float-right pr-2" style="width: max-content !important;">
-            <button-with-icon class="btn-only-icon btn-danger btn-reverse" icon="trash" @click="deleteItem(data.item.spotifyUri)">
+        <template #cell(buttons)="data">
+          <div
+            class="float-right pr-2"
+            style="width: max-content !important;"
+          >
+            <button-with-icon
+              class="btn-only-icon btn-danger btn-reverse"
+              icon="trash"
+              @click="deleteItem(data.item.spotifyUri)"
+            >
               {{ translate('dialog.buttons.delete') }}
             </button-with-icon>
           </div>
@@ -63,15 +128,15 @@
 
 <script lang="ts">
 
+import { getSocket } from '@sogebot/ui-helpers/socket';
+import translate from '@sogebot/ui-helpers/translate';
 import {
-  computed, defineComponent, onMounted, ref, 
+  computed, defineComponent, onMounted, ref,
 } from '@vue/composition-api';
 import { escapeRegExp, isNil } from 'lodash-es';
 
 import { SpotifySongBanInterface } from 'src/bot/database/entity/spotify';
 import { ButtonStates } from 'src/panel/helpers/buttonStates';
-import { getSocket } from 'src/panel/helpers/socket';
-import translate from 'src/panel/helpers/translate';
 
 const socket = getSocket('/integrations/spotify');
 

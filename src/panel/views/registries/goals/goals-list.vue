@@ -176,6 +176,8 @@
 <script lang="ts">
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faClone } from '@fortawesome/free-solid-svg-icons';
+import { getSocket } from '@sogebot/ui-helpers/socket';
+import translate from '@sogebot/ui-helpers/translate';
 import {
   chunk, filter, orderBy,
 } from 'lodash-es';
@@ -183,8 +185,6 @@ import { v4 as uuid } from 'uuid';
 import Vue from 'vue';
 
 import { GoalGroupInterface } from 'src/bot/database/entity/goal';
-import { getSocket } from 'src/panel/helpers/socket';
-import translate from 'src/panel/helpers/translate';
 
 library.add(faClone);
 

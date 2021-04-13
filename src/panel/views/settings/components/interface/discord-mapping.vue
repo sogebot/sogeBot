@@ -1,20 +1,41 @@
 <template>
   <div>
-    <loading no-margin slow v-if="loading === $state.progress"/>
-    <b-alert show variant="danger" v-else-if="loading === $state.fail" style="margin: auto">
+    <loading
+      v-if="loading === $state.progress"
+      no-margin
+      slow
+    />
+    <b-alert
+      v-else-if="loading === $state.fail"
+      show
+      variant="danger"
+      style="margin: auto"
+    >
       Something went wrong loading data
     </b-alert>
-    <div v-for="permission of permissions" v-bind:key="permission.id" v-else class="d-flex">
+    <div
+      v-for="permission of permissions"
+      v-else
+      :key="permission.id"
+      class="d-flex"
+    >
       <div class="input-group">
         <div class="input-group-prepend">
           <span class="input-group-text">
-            {{permission.name}}
+            {{ permission.name }}
           </span>
           <span class="input-group-text">
-            <fa icon="long-arrow-alt-right" fixed-width />
+            <fa
+              icon="long-arrow-alt-right"
+              fixed-width
+            />
           </span>
         </div>
-        <b-form-select :value="currentValue[permission.id] || ''" :options="roles" @change="updateMapping(permission.id, $event)"></b-form-select>
+        <b-form-select
+          :value="currentValue[permission.id] || ''"
+          :options="roles"
+          @change="updateMapping(permission.id, $event)"
+        />
       </div>
     </div>
   </div>
@@ -23,14 +44,14 @@
 <script lang="ts">
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faLongArrowAltRight } from '@fortawesome/free-solid-svg-icons';
+import { getSocket } from '@sogebot/ui-helpers/socket';
+import translate from '@sogebot/ui-helpers/translate';
 import { orderBy } from 'lodash-es';
 import {
   Component, PropSync, Vue, Watch,
 } from 'vue-property-decorator';
 
 import type { PermissionsInterface } from 'src/bot/database/entity/permissions';
-import { getSocket } from 'src/panel/helpers/socket';
-import translate from 'src/panel/helpers/translate';
 
 library.add(faLongArrowAltRight);
 
@@ -88,7 +109,7 @@ export default class discordChannel extends Vue {
     });
 
     Promise.race([ getDataFromServer, timeout ]).then(() => {
-      return; 
+      return;
     });
   }
 

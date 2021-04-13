@@ -1,39 +1,56 @@
 <template>
-  <div class="container-fluid" ref="window">
+  <div
+    ref="window"
+    class="container-fluid"
+  >
     <div class="row">
       <div class="col-12">
         <span class="title text-default mb-2">
           {{ translate('menu.registry') }}
-          <small><fa icon="angle-right"/></small>
+          <small><fa icon="angle-right" /></small>
           {{ translate('menu.custom-variables') }}
         </span>
       </div>
     </div>
 
-    <panel cards search @search="search = $event">
-      <template v-slot:left>
-        <button-with-icon class="btn-primary btn-reverse" icon="plus" href="#/registry/customVariables/edit">{{translate('dialog.title.add')}}</button-with-icon>
+    <panel
+      cards
+      search
+      @search="search = $event"
+    >
+      <template #left>
+        <button-with-icon
+          class="btn-primary btn-reverse"
+          icon="plus"
+          href="#/registry/customVariables/edit"
+        >
+          {{ translate('dialog.title.add') }}
+        </button-with-icon>
       </template>
     </panel>
 
     <loading v-if="!state.loaded /* State.DONE */" />
-    <b-table v-else :fields="fields" :items="filteredVariables">
-      <template v-slot:cell(description)="data">
-        <small v-bind:class="{ 'text-muted': String(data.value).length === 0 }">
+    <b-table
+      v-else
+      :fields="fields"
+      :items="filteredVariables"
+    >
+      <template #cell(description)="data">
+        <small :class="{ 'text-muted': String(data.value).length === 0 }">
           {{ String(data.value).length !== 0 ? data.value : translate('not-available') }}
         </small>
       </template>
-      <template v-slot:cell(type)="data">
+      <template #cell(type)="data">
         <div style="font-size: 1.2rem;">
           {{ translate('registry.customvariables.types.' + data.value) }}
         </div>
       </template>
-      <template v-slot:cell(currentValue)="data">
-        <small v-bind:class="{ 'text-muted': String(data.item.currentValue).length === 0 }">
+      <template #cell(currentValue)="data">
+        <small :class="{ 'text-muted': String(data.item.currentValue).length === 0 }">
           {{ String(data.item.currentValue).length !== 0 ? data.item.currentValue : translate('not-available') }}
         </small>
       </template>
-      <template v-slot:cell(additional-info)="data">
+      <template #cell(additional-info)="data">
         <span v-if="data.item.type === 'eval'">
           <strong>{{ translate('registry.customvariables.run-script') }}:</strong>
           <template v-if="data.item.runEveryTypeValue > 0">
@@ -64,15 +81,31 @@
         <div>
           <strong> {{ translate('registry.customvariables.permissionToChange') }}:</strong>
           <span v-if="getPermissionName(data.item.permission)">{{ getPermissionName(data.item.permission) }}</span>
-          <span v-else class="text-danger"><fa icon="exclamation-triangle"/> Permission not found</span>
+          <span
+            v-else
+            class="text-danger"
+          ><fa icon="exclamation-triangle" /> Permission not found</span>
         </div>
       </template>
-      <template v-slot:cell(buttons)="data">
-        <button-with-icon class="btn-only-icon btn-secondary btn-reverse" icon="clone" @click="clone(data.item)"/>
-        <button-with-icon class="btn-only-icon btn-primary btn-reverse" icon="edit" v-bind:href="'#/registry/customVariables/edit/' + data.item.id">
+      <template #cell(buttons)="data">
+        <button-with-icon
+          class="btn-only-icon btn-secondary btn-reverse"
+          icon="clone"
+          @click="clone(data.item)"
+        />
+        <button-with-icon
+          class="btn-only-icon btn-primary btn-reverse"
+          icon="edit"
+          :href="'#/registry/customVariables/edit/' + data.item.id"
+        >
           {{ translate('dialog.buttons.edit') }}
         </button-with-icon>
-        <button-with-icon v-if="data.item.type === 'eval'" class="btn-only-icon btn-secondary btn-reverse" icon="cog" @click="debouncedRunScript(data.item.id)"/>
+        <button-with-icon
+          v-if="data.item.type === 'eval'"
+          class="btn-only-icon btn-secondary btn-reverse"
+          icon="cog"
+          @click="debouncedRunScript(data.item.id)"
+        />
       </template>
     </b-table>
   </div>
@@ -81,13 +114,13 @@
 <script lang="ts">
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
+import { getSocket } from '@sogebot/ui-helpers/socket';
+import translate from '@sogebot/ui-helpers/translate';
 import { debounce, orderBy } from 'lodash-es';
 import { v4 as uuid } from 'uuid';
 import { Component, Vue } from 'vue-property-decorator';
 
 import type { PermissionsInterface } from 'src/bot/database/entity/permissions';
-import { getSocket } from 'src/panel/helpers/socket';
-import translate from 'src/panel/helpers/translate';
 
 import { VariableInterface } from '../../../../bot/database/entity/variable';
 
@@ -112,11 +145,11 @@ export default class customVariablesList extends Vue {
 
   fields = [
     {
-      key: 'variableName', label: '$_', sortable: true, 
+      key: 'variableName', label: '$_', sortable: true,
     },
     { key: 'description', label: translate('registry.customvariables.description.name') },
     {
-      key: 'type', sortable: true, label: translate('registry.customvariables.type.name'), 
+      key: 'type', sortable: true, label: translate('registry.customvariables.type.name'),
     },
     { key: 'currentValue', label: translate('registry.customvariables.currentValue.name') },
     // virtual attributes
@@ -194,7 +227,7 @@ export default class customVariablesList extends Vue {
 
   clone(item: VariableInterface) {
     this.socket.emit('customvariables::save', {
-      ...item, history: [], urls: [], id: uuid(), description: '(clone) of ' + item.variableName, variableName: `$_${Math.random().toString(36).substr(2, 5)}`, 
+      ...item, history: [], urls: [], id: uuid(), description: '(clone) of ' + item.variableName, variableName: `$_${Math.random().toString(36).substr(2, 5)}`,
     }, (err: string | null, data: VariableInterface) => {
       if (err) {
         console.error(err);

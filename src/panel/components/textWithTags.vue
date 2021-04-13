@@ -1,15 +1,18 @@
 <template>
-  <div style="flex: 1 1 auto;" v-html="filter(value)"></div>
+  <div
+    style="flex: 1 1 auto;"
+    v-html="filter(value)"
+  />
 </template>
 
 <script lang="ts">
+import translate from '@sogebot/ui-helpers/translate';
 import { defineComponent } from '@vue/composition-api';
 import {
-  isNil, keys, sortBy, 
+  isNil, keys, sortBy,
 } from 'lodash-es';
 
 import { flatten } from 'src/bot/helpers/flatten';
-import translate from 'src/panel/helpers/translate';
 
 interface Props {
   value: string;

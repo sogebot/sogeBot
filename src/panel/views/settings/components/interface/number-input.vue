@@ -5,25 +5,43 @@
         <template v-if="typeof translatedTitle === 'string'">{{ translatedTitle }}</template>
         <template v-else>
           {{ translatedTitle.title }}
-          <small class="text-info pl-1" data-toggle="tooltip" data-html="true" :title="translatedTitle.help">[?]</small>
+          <small
+            class="text-info pl-1"
+            data-toggle="tooltip"
+            data-html="true"
+            :title="translatedTitle.help"
+          >[?]</small>
         </template>
       </span>
     </div>
-    <input :min="min" :max="max" @focus="show = true" @blur="show = false" v-model.number="currentValue" :step="step || 1" type="number" class="form-control" :readonly="readonly" />
-    <div class="input-group-append" v-if="defaultValue !== currentValue && !readonly">
+    <input
+      v-model.number="currentValue"
+      :min="min"
+      :max="max"
+      :step="step || 1"
+      type="number"
+      class="form-control"
+@focus="show = true" :readonly="readonly" @blur="show = false"
+    >
+    <div
+      v-if="defaultValue !== currentValue && !readonly"
+      class="input-group-append"
+    >
       <b-button @click="currentValue = defaultValue">
-        <fa icon="history" fixed-width/>
+        <fa
+          icon="history"
+          fixed-width
+        />
       </b-button>
     </div>
   </div>
 </template>
 
 <script lang="ts">
+import translate from '@sogebot/ui-helpers/translate';
 import {
-  defineComponent, ref, watch, 
+  defineComponent, ref, watch,
 } from '@vue/composition-api';
-
-import translate from 'src/panel/helpers/translate';
 
 export default defineComponent({
   props: {

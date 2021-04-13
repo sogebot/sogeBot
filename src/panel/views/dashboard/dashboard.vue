@@ -129,6 +129,7 @@
 </template>
 
 <script>
+import { getSocket } from '@sogebot/ui-helpers/socket';
 import {
   defineComponent, onMounted, ref,
 } from '@vue/composition-api';
@@ -136,7 +137,6 @@ import { sortBy } from 'lodash-es';
 import VueGridLayout from 'vue-grid-layout';
 
 import { EventBus } from 'src/panel/helpers/event-bus';
-import { getSocket } from 'src/panel/helpers/socket';
 
 const socket = getSocket('/');
 

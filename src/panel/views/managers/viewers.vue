@@ -1149,6 +1149,8 @@ import { library } from '@fortawesome/fontawesome-svg-core';
 import {
   faLock, faSortAlphaDown, faSortAlphaUp, faSortDown, faSortUp, faSync, faUnlock,
 } from '@fortawesome/free-solid-svg-icons';
+import { getSocket } from '@sogebot/ui-helpers/socket';
+import translate from '@sogebot/ui-helpers/translate';
 import {
   defineComponent, getCurrentInstance, onMounted, ref, watch,
 } from '@vue/composition-api';
@@ -1165,8 +1167,6 @@ import { dayjs } from 'src/bot/helpers/dayjs';
 import { ButtonStates } from 'src/panel/helpers/buttonStates';
 import { capitalize } from 'src/panel/helpers/capitalize';
 import { error, success } from 'src/panel/helpers/error';
-import { getSocket } from 'src/panel/helpers/socket';
-import translate from 'src/panel/helpers/translate';
 
 import 'flatpickr/dist/flatpickr.css';
 

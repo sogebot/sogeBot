@@ -5,22 +5,33 @@
         <template v-if="typeof translatedTitle === 'string'">{{ translatedTitle }}</template>
         <template v-else>
           {{ translatedTitle.title }}
-          <small class="text-info" data-toggle="tooltip" data-html="true" :title="translatedTitle.help">[?]</small>
+          <small
+            class="text-info"
+            data-toggle="tooltip"
+            data-html="true"
+            :title="translatedTitle.help"
+          >[?]</small>
         </template>
       </span>
     </div>
     <ul class="list-group list-group-flush w-100 border border-input">
-      <li class="list-group-item border-0" :key="index" v-for='(v, index) of value' :class="[current.includes(v) ? 'list-group-item-success' : 'list-group-item-danger']">{{ v }}</li>
+      <li
+        v-for="(v, index) of value"
+        :key="index"
+        class="list-group-item border-0"
+        :class="[current.includes(v) ? 'list-group-item-success' : 'list-group-item-danger']"
+      >
+        {{ v }}
+      </li>
     </ul>
   </div>
 </template>
 
 <script lang="ts">
+import translate from '@sogebot/ui-helpers/translate';
 import {
-  Component, Prop, Vue, 
+  Component, Prop, Vue,
 } from 'vue-property-decorator';
-
-import translate from 'src/panel/helpers/translate';
 
 @Component({})
 export default class btnEmit extends Vue {

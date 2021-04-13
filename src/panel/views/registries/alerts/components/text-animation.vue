@@ -1,15 +1,37 @@
 <template>
   <b-container class="p-0">
     <b-row>
-      <b-col><b-form-select v-model="animType" :options="options" class="col" plain></b-form-select></b-col>
+      <b-col>
+        <b-form-select
+          v-model="animType"
+          :options="options"
+          class="col"
+          plain
+        />
+      </b-col>
       <b-col v-if="animType !== 'baffle'">
-        <div class="char d-inline-block animate__animated animate__infinite" :class="['animate__' + animType, 'animate__' + animOptions.speed]" :style="{'animation-delay' : (index * 50) + 'ms'}" v-for="(char, index) of text.split('')" v-bind:key="char + index">{{ char === ' ' ? '&nbsp;' : char }}</div>
+        <div
+          v-for="(char, index) of text.split('')"
+          :key="char + index"
+          class="char d-inline-block animate__animated animate__infinite"
+          :class="['animate__' + animType, 'animate__' + animOptions.speed]"
+          :style="{'animation-delay' : (index * 50) + 'ms'}"
+        >
+          {{ char === ' ' ? '&nbsp;' : char }}
+        </div>
       </b-col>
       <b-col v-else>
-        <baffle class="char" text="Sample text" :options="animOptions"/>
+        <baffle
+          class="char"
+          text="Sample text"
+          :options="animOptions"
+        />
       </b-col>
     </b-row>
-    <b-row v-if="!['baffle', 'wiggle', 'wiggle2' ,'wave'].includes(animType)" class="pt-2">
+    <b-row
+      v-if="!['baffle', 'wiggle', 'wiggle2' ,'wave'].includes(animType)"
+      class="pt-2"
+    >
       <b-col>
         <b-form-group
           label-cols-sm="4"
@@ -17,7 +39,12 @@
           :label="translate('registry.alerts.speed.name')"
           label-for="speed"
         >
-          <b-form-select v-model="animOptions.speed" :options="speedOptions" class="col" plain />
+          <b-form-select
+            v-model="animOptions.speed"
+            :options="speedOptions"
+            class="col"
+            plain
+          />
         </b-form-group>
       </b-col>
     </b-row>
@@ -29,14 +56,15 @@
             label-cols-sm="4"
             label-cols-lg="3"
             :label="translate('registry.alerts.speed.name')"
-            :label-for="'speed' + uuid">
+            :label-for="'speed' + uuid"
+          >
             <b-form-input
               :id="'speed' + uuid"
               v-model.number="animOptions.speed"
               type="number"
               min="0"
               :label="translate('registry.alerts.speed.name')"
-            ></b-form-input>
+            />
           </b-form-group>
         </b-col>
       </b-row>
@@ -55,7 +83,7 @@
               type="number"
               min="0"
               :label="translate('registry.alerts.maxTimeToDecrypt.name')"
-            ></b-form-input>
+            />
           </b-form-group>
         </b-col>
       </b-row>
@@ -72,7 +100,7 @@
               :id="'characters' + uuid"
               v-model="animOptions.characters"
               :label="translate('registry.alerts.characters.name')"
-            ></b-form-input>
+            />
           </b-form-group>
         </b-col>
       </b-row>
@@ -81,12 +109,11 @@
 </template>
 
 <script lang="ts">
+import translate from '@sogebot/ui-helpers/translate';
 import { v4 as uuid } from 'uuid';
 import {
-  Component, PropSync, Vue, Watch, 
+  Component, PropSync, Vue, Watch,
 } from 'vue-property-decorator';
-
-import translate from 'src/panel/helpers/translate';
 
 require('../../../../../../scss/letter-animations.css');
 require('animate.css');

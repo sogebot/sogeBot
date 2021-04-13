@@ -48,8 +48,8 @@
 </template>
 
 <script>
-import { getSocket } from 'src/panel/helpers/socket';
-import translate from 'src/panel/helpers/translate';
+import { getSocket } from '@sogebot/ui-helpers/socket';
+import translate from '@sogebot/ui-helpers/translate';
 
 export default {
   props: ['dashboardId'],

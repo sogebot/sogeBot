@@ -4,79 +4,166 @@
       <b-col>
         <span class="title text-default mb-2">
           {{ translate('menu.registry') }}
-          <small><fa icon="angle-right"/></small>
+          <small><fa icon="angle-right" /></small>
           {{ translate('menu.gallery') }}
         </span>
       </b-col>
     </b-row>
 
     <panel>
-      <template v-slot:left>
-        <form enctype="multipart/form-data" novalidate>
-          <label class="custom-file-upload" for="uploadImageInput">
-            <button type="button" class="btn btn-primary" :disabled="state.uploading === $state.progress" @click="$refs.uploadFileInput.click()">
+      <template #left>
+        <form
+          enctype="multipart/form-data"
+          novalidate
+        >
+          <label
+            class="custom-file-upload"
+            for="uploadImageInput"
+          >
+            <button
+              type="button"
+              class="btn btn-primary"
+              :disabled="state.uploading === $state.progress"
+              @click="$refs.uploadFileInput.click()"
+            >
               <template v-if="state.uploading === $state.progress">
-                  <fa icon="circle-notch" fixed-width spin></fa>
-                  {{ translate('dialog.buttons.upload.progress') }}</template>
-                <template v-else>
-                  <fa icon="upload" fixed-width></fa>
-                  {{ translate('dialog.buttons.upload.idle') }}</template>
+                <fa
+                  icon="circle-notch"
+                  fixed-width
+                  spin
+                />
+                {{ translate('dialog.buttons.upload.progress') }}</template>
+              <template v-else>
+                <fa
+                  icon="upload"
+                  fixed-width
+                />
+                {{ translate('dialog.buttons.upload.idle') }}</template>
             </button>
           </label>
-            <input
-              class="d-none input-file"
-              type="file"
-              ref="uploadFileInput"
-              :disabled="state.uploading === $state.progress"
-              @change="filesChange($event.target.files)"
-              multiple
-              accept="image/*, video/mp4, audio/*"/>
+          <input
+            ref="uploadFileInput"
+            class="d-none input-file"
+            type="file"
+            :disabled="state.uploading === $state.progress"
+            multiple
+            accept="image/*, video/mp4, audio/*"
+            @change="filesChange($event.target.files)"
+          >
         </form>
       </template>
-      <template v-slot:right>
-        <b-button variant="danger" v-if="markToDeleteIdx.length > 0" @click="remove">
+      <template #right>
+        <b-button
+          v-if="markToDeleteIdx.length > 0"
+          variant="danger"
+          @click="remove"
+        >
           Delete {{ markToDeleteIdx.length }} item(s)
         </b-button>
 
-        <button class="btn btn-primary border-0" :class="[exclude.includes('audio') ? 'btn-secondary' : 'btn-primary']" v-on:click="toggle('audio')">
-          <fa :icon="['far', exclude.includes('audio') ? 'square' : 'check-square']" fixed-width></fa> Audio
+        <button
+          class="btn btn-primary border-0"
+          :class="[exclude.includes('audio') ? 'btn-secondary' : 'btn-primary']"
+          @click="toggle('audio')"
+        >
+          <fa
+            :icon="['far', exclude.includes('audio') ? 'square' : 'check-square']"
+            fixed-width
+          /> Audio
         </button>
-        <button class="btn btn-primary border-0" :class="[exclude.includes('video') ? 'btn-secondary' : 'btn-primary']" v-on:click="toggle('video')">
-          <fa :icon="['far', exclude.includes('video') ? 'square' : 'check-square']" fixed-width></fa> Video
+        <button
+          class="btn btn-primary border-0"
+          :class="[exclude.includes('video') ? 'btn-secondary' : 'btn-primary']"
+          @click="toggle('video')"
+        >
+          <fa
+            :icon="['far', exclude.includes('video') ? 'square' : 'check-square']"
+            fixed-width
+          /> Video
         </button>
-        <button class="btn btn-primary border-0" :class="[exclude.includes('images') ? 'btn-secondary' : 'btn-primary']" v-on:click="toggle('images')">
-          <fa :icon="['far', exclude.includes('images') ? 'square' : 'check-square']" fixed-width></fa> Images
+        <button
+          class="btn btn-primary border-0"
+          :class="[exclude.includes('images') ? 'btn-secondary' : 'btn-primary']"
+          @click="toggle('images')"
+        >
+          <fa
+            :icon="['far', exclude.includes('images') ? 'square' : 'check-square']"
+            fixed-width
+          /> Images
         </button>
       </template>
     </panel>
 
     <loading v-if="state.loading === $state.progress" />
-    <div class="card-deck mb-3" v-else-if="filtered.length > 0" v-for="(chunk, index) of chunk(filtered, itemCountPerRow)" :key="'chunk-' + index">
-      <b-card no-body :bg-variant="markToDeleteIdx.includes(item.id) ? 'info' : undefined" :text-variant="markToDeleteIdx.includes(item.id) ? 'white' : undefined" v-for="item of chunk" :key="item.id">
+    <div
+      v-for="(chunk, index) of chunk(filtered, itemCountPerRow)"
+      v-else-if="filtered.length > 0"
+      :key="'chunk-' + index"
+      class="card-deck mb-3"
+    >
+      <b-card
+        v-for="item of chunk"
+        :key="item.id"
+        no-body
+        :bg-variant="markToDeleteIdx.includes(item.id) ? 'info' : undefined"
+        :text-variant="markToDeleteIdx.includes(item.id) ? 'white' : undefined"
+      >
         <b-card-body class="p-0">
           <b-card-title>
-            <a v-bind:href="'/gallery/'+ item.id" class="btn btn-outline-dark p-3 border-0 w-100" target="_blank"><fa icon="link"></fa> {{ item.name || item.id }}</a>
+            <a
+              :href="'/gallery/'+ item.id"
+              class="btn btn-outline-dark p-3 border-0 w-100"
+              target="_blank"
+            ><fa icon="link" /> {{ item.name || item.id }}</a>
           </b-card-title>
           <b-card-text>
-            <img class="w-100" :src="'/gallery/'+ item.id" v-if="item.type.includes('png') || item.type.includes('jpg') || item.type.includes('jpeg') || item.type.includes('gif')">
-            <video class="w-100" v-if="item.type.includes('mp4')" controls>
-              <source :type="item.type" :src="'/gallery/'+ item.id">
+            <img
+              v-if="item.type.includes('png') || item.type.includes('jpg') || item.type.includes('jpeg') || item.type.includes('gif')"
+              class="w-100"
+              :src="'/gallery/'+ item.id"
+            >
+            <video
+              v-if="item.type.includes('mp4')"
+              class="w-100"
+              controls
+            >
+              <source
+                :type="item.type"
+                :src="'/gallery/'+ item.id"
+              >
             </video>
-            <audio class="w-100" v-if="item.type.includes('audio')" controls>
-              <source :type="item.type" :src="'/gallery/'+ item.id">
+            <audio
+              v-if="item.type.includes('audio')"
+              class="w-100"
+              controls
+            >
+              <source
+                :type="item.type"
+                :src="'/gallery/'+ item.id"
+              >
             </audio>
           </b-card-text>
         </b-card-body>
 
         <b-card-footer class="p-0">
-          <button-with-icon :class="markToDeleteIdx.includes(item.id) ? 'btn-info' : 'btn-danger'" class="btn-reverse w-100" icon="trash" @click="toggleMarkResponse(item.id)">
+          <button-with-icon
+            :class="markToDeleteIdx.includes(item.id) ? 'btn-info' : 'btn-danger'"
+            class="btn-reverse w-100"
+            icon="trash"
+            @click="toggleMarkResponse(item.id)"
+          >
             {{ translate('dialog.buttons.delete') }}
           </button-with-icon>
         </b-card-footer>
       </b-card>
 
       <!-- add empty invisible cards if chunk is < 3-->
-      <div class="card" v-for="index in (itemCountPerRow - chunk.length)" style="visibility: hidden" :key="'empty-' + index"></div>
+      <div
+        v-for="index in (itemCountPerRow - chunk.length)"
+        :key="'empty-' + index"
+        class="card"
+        style="visibility: hidden"
+      />
     </div>
   </b-container>
 </template>
@@ -85,8 +172,10 @@
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faCheckSquare, faSquare } from '@fortawesome/free-regular-svg-icons';
 import { faLink, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { getSocket } from '@sogebot/ui-helpers/socket';
+import translate from '@sogebot/ui-helpers/translate';
 import {
-  computed, defineComponent, onMounted, onUnmounted, ref, watch, 
+  computed, defineComponent, onMounted, onUnmounted, ref, watch,
 } from '@vue/composition-api';
 import { chunk, xor } from 'lodash-es';
 import { v4 as uuid } from 'uuid';
@@ -96,8 +185,6 @@ library.add(faLink, faTrash, faCheckSquare, faSquare);
 import type { GalleryInterface } from 'src/bot/database/entity/gallery';
 import { ButtonStates } from 'src/panel/helpers/buttonStates';
 import { error } from 'src/panel/helpers/error';
-import { getSocket } from 'src/panel/helpers/socket';
-import translate from 'src/panel/helpers/translate';
 
 const socket = getSocket('/overlays/gallery');
 let interval = 0;

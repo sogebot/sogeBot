@@ -111,12 +111,11 @@
 </template>
 
 <script lang="ts">
+import { getSocket } from '@sogebot/ui-helpers/socket';
+import translate from '@sogebot/ui-helpers/translate';
 import { chunk, isEqual } from 'lodash-es';
 import { v4 as uuid } from 'uuid';
 import Vue from 'vue';
-
-import { getSocket } from 'src/panel/helpers/socket';
-import translate from 'src/panel/helpers/translate';
 
 export default Vue.extend({
   props: ['ids'],
@@ -197,7 +196,7 @@ export default Vue.extend({
       } else {
         this.testUsername = val;
         this.usersSocket.emit('find.viewers', {
-          search: val, state, exactUsernameFromTwitch: true, 
+          search: val, state, exactUsernameFromTwitch: true,
         }, (err: string | null, r: string[]) => {
           if (err) {
             return console.error(err);

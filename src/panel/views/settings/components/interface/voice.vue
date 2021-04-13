@@ -5,24 +5,44 @@
         <template v-if="typeof translatedTitle === 'string'">{{ translatedTitle }}</template>
         <template v-else-if="typeof translatedTitle === 'object'">
           {{ translatedTitle.title }}
-          <small style="cursor: help;" class="text-info ml-1" data-toggle="tooltip" data-html="true" :title="translatedTitle.help">[?]</small>
+          <small
+            style="cursor: help;"
+            class="text-info ml-1"
+            data-toggle="tooltip"
+            data-html="true"
+            :title="translatedTitle.help"
+          >[?]</small>
         </template>
       </span>
     </div>
-    <div class="form-control" v-if="loading === 0">
-      <b-spinner variant="primary" small /> {{ translate('loading') }}
+    <div
+      v-if="loading === 0"
+      class="form-control"
+    >
+      <b-spinner
+        variant="primary"
+        small
+      /> {{ translate('loading') }}
     </div>
-    <div class="form-control is-invalid alert-danger" v-else-if="loading === 1" v-html="translate('overlays.texttospeech.settings.responsiveVoiceKeyNotSet')" />
-    <b-form-select v-else v-model="currentValue" :options="voices" plain></b-form-select>
+    <div
+      v-else-if="loading === 1"
+      class="form-control is-invalid alert-danger"
+      v-html="translate('overlays.texttospeech.settings.responsiveVoiceKeyNotSet')"
+    />
+    <b-form-select
+      v-else
+      v-model="currentValue"
+      :options="voices"
+      plain
+    />
   </div>
 </template>
 
 <script lang="ts">
+import translate from '@sogebot/ui-helpers/translate';
 import {
-  defineComponent, onMounted, ref, watch, 
+  defineComponent, onMounted, ref, watch,
 } from '@vue/composition-api';
-
-import translate from 'src/panel/helpers/translate';
 
 declare global {
   interface Window {

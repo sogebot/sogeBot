@@ -5,32 +5,48 @@
         <template v-if="typeof translatedTitle === 'string'">{{ translatedTitle }}</template>
         <template v-else-if="typeof translatedTitle === 'object'">
           {{ translatedTitle.title }}
-          <small style="cursor: help;" class="text-info ml-1" data-toggle="tooltip" data-html="true" :title="translatedTitle.help">[?]</small>
+          <small
+            style="cursor: help;"
+            class="text-info ml-1"
+            data-toggle="tooltip"
+            data-html="true"
+            :title="translatedTitle.help"
+          >[?]</small>
         </template>
       </span>
     </div>
     <div class="form-control border-0 h-auto p-0">
-      <input v-model="_value" class="form-control" />
+      <input
+        v-model="_value"
+        class="form-control"
+      >
       <div class="input-group">
         <div class="input-group-prepend">
-          <b-select :options="exampleOptions" v-model="selectedExampleOption"/>
+          <b-select
+            v-model="selectedExampleOption"
+            :options="exampleOptions"
+          />
         </div>
-        <input v-model="computedExample" class="form-control" :readonly="true" />
+        <input
+          v-model="computedExample"
+          class="form-control"
+          :readonly="true"
+        >
       </div>
     </div>
   </div>
 </template>
 
 <script lang="ts">
+import { getSocket } from '@sogebot/ui-helpers/socket';
+import translate from '@sogebot/ui-helpers/translate';
 import {
-  computed, defineComponent, onMounted, ref, watch, 
+  computed, defineComponent, onMounted, ref, watch,
 } from '@vue/composition-api';
 import { escapeRegExp } from 'lodash';
 
 import { flatten } from 'src/bot/helpers/flatten';
 import { error } from 'src/panel/helpers/error';
-import { getSocket } from 'src/panel/helpers/socket';
-import translate from 'src/panel/helpers/translate';
 
 const socket = getSocket('/integrations/pubg');
 

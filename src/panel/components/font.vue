@@ -391,6 +391,7 @@
 </template>
 
 <script lang="ts">
+import translate from '@sogebot/ui-helpers/translate';
 import {
   defineComponent, onBeforeMount, ref, watch,
 } from '@vue/composition-api';
@@ -398,7 +399,6 @@ import { cloneDeep } from 'lodash-es';
 import { v4 as uuidv4 } from 'uuid';
 
 import { shadowGenerator, textStrokeGenerator } from 'src/panel/helpers/text';
-import translate from 'src/panel/helpers/translate';
 
 function loadFont(value: string) {
   const head = document.getElementsByTagName('head')[0];

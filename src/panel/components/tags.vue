@@ -1,44 +1,54 @@
 <template>
   <div>
     <b-input-group>
-      <template v-slot:prepend>
-        <ul v-if="currentValue.length > 0" class="list-inline d-inline-block m-0 border border-right-0 px-1"
+      <template #prepend>
+        <ul
+          v-if="currentValue.length > 0"
+          class="list-inline d-inline-block m-0 border border-right-0 px-1"
           :class="{
             'focus-border': (isFocused || isHovered),
             'border-input': !(isFocused || isHovered)
-          }">
-          <li v-for="tag in currentValue" :key="tag" class="list-inline-item mr-0" style="transform: translateY(4px);">
+          }"
+        >
+          <li
+            v-for="tag in currentValue"
+            :key="tag"
+            class="list-inline-item mr-0"
+            style="transform: translateY(4px);"
+          >
             <b-form-tag
               style="font-size: 75%; text-transform: initial; font-weight: normal;"
-              @remove="removeTag(tag)"
               :title="tag"
               variant="info"
-            >{{ tag }}</b-form-tag>
+              @remove="removeTag(tag)"
+            >
+              {{ tag }}
+            </b-form-tag>
           </li>
         </ul>
       </template>
       <b-input
-        class="form-control"
         v-model="addToCurrentValue"
-        v-on:keyup.delete="removeTag()"
-        v-on:keyup.enter="addTag()"
-        @focus="isFocused = true"
-        @blur="isFocused = false"
+        class="form-control"
         :placeholder="placeholder"
         :class="{
           'border-left-0': currentValue.length > 0,
-        }"/>
+        }"
+        @keyup.delete="removeTag()"
+        @keyup.enter="addTag()"
+        @focus="isFocused = true"
+        @blur="isFocused = false"
+      />
     </b-input-group>
   </div>
 </template>
 
 <script lang="ts">
+import translate from '@sogebot/ui-helpers/translate';
 import {
-  defineComponent, ref, watch, 
+  defineComponent, ref, watch,
 } from '@vue/composition-api';
 import { isEqual } from 'lodash';
-
-import translate from 'src/panel/helpers/translate';
 
 interface Props {
   value: string[];

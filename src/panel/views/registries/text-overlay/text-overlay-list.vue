@@ -183,13 +183,12 @@ import { faHtml5 } from '@fortawesome/free-brands-svg-icons';
 import {
   faClone, faEllipsisH, faEllipsisV, faPencilAlt,
 } from '@fortawesome/free-solid-svg-icons';
+import { getSocket } from '@sogebot/ui-helpers/socket';
+import translate from '@sogebot/ui-helpers/translate';
 import { isNil, orderBy } from 'lodash-es';
 import { v4 as uuid } from 'uuid';
 import Prism from 'vue-prism-component';
 import { Component, Vue } from 'vue-property-decorator';
-
-import { getSocket } from 'src/panel/helpers/socket';
-import translate from 'src/panel/helpers/translate';
 
 library.add(faPencilAlt, faHtml5, faEllipsisH, faEllipsisV, faClone);
 

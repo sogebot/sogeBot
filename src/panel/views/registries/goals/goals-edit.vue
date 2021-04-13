@@ -536,6 +536,8 @@
 </template>
 
 <script lang="ts">
+import { getSocket } from '@sogebot/ui-helpers/socket';
+import translate from '@sogebot/ui-helpers/translate';
 import { get } from 'lodash-es';
 import { v4 as uuid } from 'uuid';
 import Vue from 'vue';
@@ -550,8 +552,6 @@ import VueFlatPickr from 'vue-flatpickr-component';
 import 'flatpickr/dist/flatpickr.css';
 
 import { GoalGroupInterface, GoalInterface } from 'src/bot/database/entity/goal';
-import { getSocket } from 'src/panel/helpers/socket';
-import translate from 'src/panel/helpers/translate';
 
 export default Vue.extend({
   components: {

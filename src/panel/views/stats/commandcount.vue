@@ -1,10 +1,13 @@
 <template>
-  <div class="container-fluid" ref="window">
+  <div
+    ref="window"
+    class="container-fluid"
+  >
     <div class="row">
       <div class="col-12">
         <span class="title text-default mb-2">
           {{ translate('menu.stats') }}
-          <small><fa icon="angle-right"/></small>
+          <small><fa icon="angle-right" /></small>
           {{ translate('menu.commandcount') }}
         </span>
       </div>
@@ -13,35 +16,99 @@
     <panel cards>
       <template slot="right">
         <div class="form-group">
-          <b-form-datepicker v-model="fromDate" :max="maxFrom" value-as-date></b-form-datepicker>
-          <b-form-datepicker v-model="toDate" :min="minTo" :max="maxTo" value-as-date></b-form-datepicker>
+          <b-form-datepicker
+            v-model="fromDate"
+            :max="maxFrom"
+            value-as-date
+          />
+          <b-form-datepicker
+            v-model="toDate"
+            :min="minTo"
+            :max="maxTo"
+            value-as-date
+          />
         </div>
       </template>
     </panel>
 
-    <line-chart :data="generateChartData()"></line-chart>
+    <line-chart :data="generateChartData()" />
 
     <table class="table table-striped">
       <thead>
         <tr>
-          <th scope="col" class="border-0 pb-0">{{ translate('stats.commandcount.command') }}</th>
-          <th colspan="5" scope="col" class="border-0 pb-0 text-center">{{ translate('stats.commandcount.usage') }}</th>
-          <th scope="col" class="border-0 pb-0 "></th>
+          <th
+            scope="col"
+            class="border-0 pb-0"
+          >
+            {{ translate('stats.commandcount.command') }}
+          </th>
+          <th
+            colspan="5"
+            scope="col"
+            class="border-0 pb-0 text-center"
+          >
+            {{ translate('stats.commandcount.usage') }}
+          </th>
+          <th
+            scope="col"
+            class="border-0 pb-0 "
+          />
         </tr>
         <tr>
-          <th scope="col" class="pt-0"></th>
-          <th scope="col" class="pt-0">{{ translate('stats.commandcount.hour') }}</th>
-          <th scope="col" class="pt-0">{{ translate('stats.commandcount.day') }}</th>
-          <th scope="col" class="pt-0">{{ translate('stats.commandcount.week') }}</th>
-          <th scope="col" class="pt-0">{{ translate('stats.commandcount.month') }}</th>
-          <th scope="col" class="pt-0">{{ translate('stats.commandcount.year') }}</th>
-          <th scope="col" class="pt-0">{{ translate('stats.commandcount.total') }}</th>
-          <th scope="col" class="pt-0"></th>
+          <th
+            scope="col"
+            class="pt-0"
+          />
+          <th
+            scope="col"
+            class="pt-0"
+          >
+            {{ translate('stats.commandcount.hour') }}
+          </th>
+          <th
+            scope="col"
+            class="pt-0"
+          >
+            {{ translate('stats.commandcount.day') }}
+          </th>
+          <th
+            scope="col"
+            class="pt-0"
+          >
+            {{ translate('stats.commandcount.week') }}
+          </th>
+          <th
+            scope="col"
+            class="pt-0"
+          >
+            {{ translate('stats.commandcount.month') }}
+          </th>
+          <th
+            scope="col"
+            class="pt-0"
+          >
+            {{ translate('stats.commandcount.year') }}
+          </th>
+          <th
+            scope="col"
+            class="pt-0"
+          >
+            {{ translate('stats.commandcount.total') }}
+          </th>
+          <th
+            scope="col"
+            class="pt-0"
+          />
         </tr>
       </thead>
       <tbody>
-        <tr v-for="command of commands" :key="command">
-          <th scope="row">{{ command }}</th>
+        <tr
+          v-for="command of commands"
+          :key="command"
+        >
+          <th scope="row">
+            {{ command }}
+          </th>
           <td>{{ totalInInterval(command, 1000 * 60 * 60) }}</td>
           <td>{{ totalInInterval(command, 1000 * 60 * 60 * 24) }}</td>
           <td>{{ totalInInterval(command, 1000 * 60 * 60 * 24 * 7) }}</td>
@@ -51,9 +118,10 @@
           <td>
             <button
               class="btn border-0"
+              :class="[showChartCommands.includes(command) ? 'btn-success' : 'btn-outline-dark']"
               @click="toggleCommandChart(command)"
-              :class="[showChartCommands.includes(command) ? 'btn-success' : 'btn-outline-dark']">
-              <font-awesome-icon icon="chart-line"></font-awesome-icon>
+            >
+              <font-awesome-icon icon="chart-line" />
             </button>
           </td>
         </tr>
@@ -66,17 +134,15 @@
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faChartLine } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { getSocket } from '@sogebot/ui-helpers/socket';
+import translate from '@sogebot/ui-helpers/translate';
 import Chart from 'chart.js';
 import { countBy } from 'lodash-es';
 import Vue from 'vue';
 import Chartkick from 'vue-chartkick';
 
-import translate from 'src/panel/helpers/translate';
-
 library.add(faChartLine);
 Vue.use(Chartkick.use(Chart));
-
-import { getSocket } from '../../helpers/socket';
 
 export default Vue.extend({
   components: {
@@ -110,24 +176,6 @@ export default Vue.extend({
       toDate:            new Date(new Date().getFullYear(), (new Date().getMonth() + 1), new Date().getDate()),
     };
     return object;
-  },
-  watch: {
-    showChartCommands() {
-      localStorage.setItem('/stats/commandcount/showChartCommands', JSON.stringify(this.showChartCommands));
-    },
-    toDate(val) {
-      this.maxFrom = new Date(val);
-      this.maxFrom.setDate(new Date(this.maxFrom).getDate() - 1);
-      localStorage.setItem('/stats/commandcount/toDate', val);
-    },
-    fromDate(val) {
-      this.minTo = new Date(val);
-      this.minTo.setDate(new Date(this.minTo).getDate() + 1);
-      if (this.toDate.getTime() < this.minTo.getTime()) {
-        this.toDate.setDate(new Date(this.minTo).getDate() + 1);
-      }
-      localStorage.setItem('/stats/commandcount/fromDate', val);
-    },
   },
   computed: {
     commands(): string[] {
@@ -178,6 +226,56 @@ export default Vue.extend({
         return 1000 * 60 * 60 * 24 * 30 * 12; // year
       }
     },
+  },
+  watch: {
+    showChartCommands() {
+      localStorage.setItem('/stats/commandcount/showChartCommands', JSON.stringify(this.showChartCommands));
+    },
+    toDate(val) {
+      this.maxFrom = new Date(val);
+      this.maxFrom.setDate(new Date(this.maxFrom).getDate() - 1);
+      localStorage.setItem('/stats/commandcount/toDate', val);
+    },
+    fromDate(val) {
+      this.minTo = new Date(val);
+      this.minTo.setDate(new Date(this.minTo).getDate() + 1);
+      if (this.toDate.getTime() < this.minTo.getTime()) {
+        this.toDate.setDate(new Date(this.minTo).getDate() + 1);
+      }
+      localStorage.setItem('/stats/commandcount/fromDate', val);
+    },
+  },
+  mounted() {
+    this.socket.emit('commands::count', (err: string | null, val: { command: string, timestamp: number, _id: string }[]) => {
+      if (err) {
+        return console.error(err);
+      }
+
+      const cacheShowChartCommands = localStorage.getItem('/stats/commandcount/showChartCommands');
+      if (!cacheShowChartCommands) {
+        this.showChartCommands = val.splice(0, 5).map(o => o.command);
+        localStorage.setItem('/stats/commandcount/showChartCommands', JSON.stringify(this.showChartCommands));
+      } else {
+        this.showChartCommands = JSON.parse(cacheShowChartCommands);
+      }
+
+      const cacheFromDate = localStorage.getItem('/stats/commandcount/fromDate');
+      if (!cacheFromDate) {
+        this.fromDate = new Date(new Date().getFullYear(), (new Date().getMonth() + 1), (new Date().getDate() - 14));
+        localStorage.setItem('/stats/commandcount/fromDate', String(this.fromDate));
+      } else {
+        this.fromDate = new Date(cacheFromDate);
+      }
+
+      const cacheToDate = localStorage.getItem('/stats/commandcount/toDate');
+      if (!cacheToDate) {
+        this.toDate = new Date(new Date().getFullYear(), (new Date().getMonth() + 1), new Date().getDate());
+        localStorage.setItem('/stats/commandcount/toDate', String(this.toDate));
+      } else {
+        this.toDate = new Date(cacheToDate);
+      }
+      this.commandsUsage = val;
+    });
   },
   methods: {
     toggleCommandChart(command: string) {
@@ -246,38 +344,6 @@ export default Vue.extend({
     total(command: string): number {
       return this.commandsUsage.filter(o => o.command === command).length;
     },
-  },
-  mounted() {
-    this.socket.emit('commands::count', (err: string | null, val: { command: string, timestamp: number, _id: string }[]) => {
-      if (err) {
-        return console.error(err);
-      }
-
-      const cacheShowChartCommands = localStorage.getItem('/stats/commandcount/showChartCommands');
-      if (!cacheShowChartCommands) {
-        this.showChartCommands = val.splice(0, 5).map(o => o.command);
-        localStorage.setItem('/stats/commandcount/showChartCommands', JSON.stringify(this.showChartCommands));
-      } else {
-        this.showChartCommands = JSON.parse(cacheShowChartCommands);
-      }
-
-      const cacheFromDate = localStorage.getItem('/stats/commandcount/fromDate');
-      if (!cacheFromDate) {
-        this.fromDate = new Date(new Date().getFullYear(), (new Date().getMonth() + 1), (new Date().getDate() - 14));
-        localStorage.setItem('/stats/commandcount/fromDate', String(this.fromDate));
-      } else {
-        this.fromDate = new Date(cacheFromDate);
-      }
-
-      const cacheToDate = localStorage.getItem('/stats/commandcount/toDate');
-      if (!cacheToDate) {
-        this.toDate = new Date(new Date().getFullYear(), (new Date().getMonth() + 1), new Date().getDate());
-        localStorage.setItem('/stats/commandcount/toDate', String(this.toDate));
-      } else {
-        this.toDate = new Date(cacheToDate);
-      }
-      this.commandsUsage = val;
-    });
   },
 });
 </script>

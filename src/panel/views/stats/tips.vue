@@ -1,10 +1,13 @@
 <template>
-  <div class="container-fluid" ref="window">
+  <div
+    ref="window"
+    class="container-fluid"
+  >
     <div class="row">
       <div class="col-12">
         <span class="title text-default mb-2">
           {{ translate('menu.stats') }}
-          <small><fa icon="angle-right"/></small>
+          <small><fa icon="angle-right" /></small>
           {{ translate('menu.tips') }}
         </span>
       </div>
@@ -13,26 +16,35 @@
     <panel>
       <template slot="right">
         <div class="form-group">
-          <b-form-select v-model="selectedYear" :options="years"></b-form-select>
+          <b-form-select
+            v-model="selectedYear"
+            :options="years"
+          />
         </div>
       </template>
     </panel>
 
-    <column-chart :data="generateChartData()" :ytitle="$store.state.configuration.currency"></column-chart>
+    <column-chart
+      :data="generateChartData()"
+      :ytitle="$store.state.configuration.currency"
+    />
 
-    <b-table striped small
+    <b-table
+      striped
+      small
       class="mt-3"
       :items="tipsByYear[selectedYear]"
       :fields="fields"
       :sort-by.sync="sortBy"
-      :sort-desc.sync="sortDesc">
-      <template v-slot:cell(tippedAt)='data'>
+      :sort-desc.sync="sortDesc"
+    >
+      <template #cell(tippedAt)="data">
         {{ dayjs(Number(data.item.tippedAt)).format('LLL') }}
       </template>
-      <template v-slot:cell(sortAmount)='data'>
+      <template #cell(sortAmount)="data">
         {{ Intl.NumberFormat($store.state.configuration.lang, { style: 'currency', currency: data.item.currency }).format(data.item.amount) }}
       </template>
-      <template v-slot:cell(user)='data'>
+      <template #cell(user)="data">
         <router-link :to="{ name: 'viewersManagerEdit', params: { id: data.item.user.userId }}">
           {{ data.item.user.username }}&nbsp;<small class="text-muted">{{ data.item.user.userId }}</small>
         </router-link>
@@ -42,17 +54,16 @@
 </template>
 
 <script lang="ts">
+import { getSocket } from '@sogebot/ui-helpers/socket';
+import translate from '@sogebot/ui-helpers/translate';
 import Chart from 'chart.js';
 import Vue from 'vue';
 import Chartkick from 'vue-chartkick';
 
 import type { UserTipInterface } from 'src/bot/database/entity/user';
 import { dayjs } from 'src/bot/helpers/dayjs';
-import translate from 'src/panel/helpers/translate';
 
 Vue.use(Chartkick.use(Chart));
-
-import { getSocket } from '../../helpers/socket';
 
 export default Vue.extend({
   components: { panel: () => import('../../components/panel.vue') },
@@ -78,10 +89,10 @@ export default Vue.extend({
 
       fields: [
         {
-          key: 'tippedAt', label: 'tippedAt', sortable: true, 
+          key: 'tippedAt', label: 'tippedAt', sortable: true,
         },
         {
-          key: 'sortAmount', label: 'amount', sortable: true, 
+          key: 'sortAmount', label: 'amount', sortable: true,
         },
         { key: 'message', label: 'message' },
         { key: 'user', label: 'user' },
@@ -123,6 +134,14 @@ export default Vue.extend({
       return d;
     },
   },
+  mounted() {
+    this.socket.emit('generic::getAll', (err: string | null, val: Required<UserTipInterface>[]) => {
+      if (err) {
+        return console.error(err);
+      }
+      this.tips = val;
+    });
+  },
   methods: {
     generateChartData(): [ string, number ][] {
       const data: [ string, number ][] = [];
@@ -139,14 +158,6 @@ export default Vue.extend({
       }
       return data;
     },
-  },
-  mounted() {
-    this.socket.emit('generic::getAll', (err: string | null, val: Required<UserTipInterface>[]) => {
-      if (err) {
-        return console.error(err);
-      }
-      this.tips = val;
-    });
   },
 });
 </script>

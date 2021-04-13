@@ -1,15 +1,34 @@
 <template>
-<div>
-  <div ref="label" class="label" v-if="isPlaying" v-show="getPlayingSettings().label">
-    <font-awesome-icon icon="circle" class="pr-1" style="font-size: 2vw" />
-    CLIP
+  <div>
+    <div
+      v-if="isPlaying"
+      v-show="getPlayingSettings().label"
+      ref="label"
+      class="label"
+    >
+      <font-awesome-icon
+        icon="circle"
+        class="pr-1"
+        style="font-size: 2vw"
+      />
+      CLIP
+    </div>
+    <transition name="fade">
+      <video
+        v-show="isPlaying"
+        v-if="getPlayingClip()"
+        ref="video"
+        playsinline
+        autoplay="true"
+        :class="['filter-' + getPlayingSettings().filter]"
+      >
+        <source
+          :src="getPlayingClip().mp4"
+          type="video/mp4"
+        >
+      </video>
+    </transition>
   </div>
-  <transition name="fade">
-    <video playsinline v-show="isPlaying" v-if="getPlayingClip()" ref="video" autoplay="true" :class="['filter-' + getPlayingSettings().filter]">
-      <source :src="getPlayingClip().mp4" type="video/mp4">
-    </video>
-  </transition>
-</div>
 </template>
 
 <script lang="ts">
@@ -17,12 +36,11 @@
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faCircle } from '@fortawesome/free-solid-svg-icons/faCircle';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { getSocket } from '@sogebot/ui-helpers/socket';
 import gsap from 'gsap';
 import {
-  Component, Vue, Watch, 
+  Component, Vue, Watch,
 } from 'vue-property-decorator';
-
-import { getSocket } from 'src/panel/helpers/socket';
 
 library.add(faCircle);
 
@@ -70,7 +88,7 @@ export default class ClipsOverlay extends Vue {
       this.$nextTick(function () {
         if (this.getPlayingSettings().label && this.$refs.label) {
           gsap.fromTo(this.$refs.label, { duration: 1, opacity: 0 }, {
-            opacity: 1, yoyo: true, repeat: -1, 
+            opacity: 1, yoyo: true, repeat: -1,
           } );
         }
       });

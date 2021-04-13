@@ -143,6 +143,8 @@
 </template>
 
 <script lang="ts">
+import { getSocket } from '@sogebot/ui-helpers/socket';
+import translate from '@sogebot/ui-helpers/translate';
 import {
   computed, defineComponent, getCurrentInstance, onMounted, ref, watch,
 } from '@vue/composition-api';
@@ -153,8 +155,6 @@ import { TimerInterface } from 'src/bot/database/entity/timer';
 import { ButtonStates } from 'src/panel/helpers/buttonStates';
 import { capitalize } from 'src/panel/helpers/capitalize';
 import { EventBus } from 'src/panel/helpers/event-bus';
-import { getSocket } from 'src/panel/helpers/socket';
-import translate from 'src/panel/helpers/translate';
 
 const socket = getSocket('/systems/timers');
 

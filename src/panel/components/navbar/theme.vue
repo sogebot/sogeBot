@@ -1,20 +1,34 @@
 <template>
-  <b-btn @click="toggleTheme" class="border-0 ml-1 p-1 pl-2 pr-2" variant="null">
-    <fa icon="sun" fixed-width style="color: rgb(253, 177, 0)" v-if="theme === 'light'"/>
-    <fa icon="moon" fixed-width style="color: #d0d5d2" v-else/>
+  <b-btn
+    class="border-0 ml-1 p-1 pl-2 pr-2"
+    variant="null"
+    @click="toggleTheme"
+  >
+    <fa
+      v-if="theme === 'light'"
+      icon="sun"
+      fixed-width
+      style="color: rgb(253, 177, 0)"
+    />
+    <fa
+      v-else
+      icon="moon"
+      fixed-width
+      style="color: #d0d5d2"
+    />
   </b-btn>
 </template>
 
 <script lang="ts">
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faMoon, faSun } from '@fortawesome/free-solid-svg-icons';
+import { getSocket } from '@sogebot/ui-helpers/socket';
 import {
   defineComponent, onMounted, ref,
 } from '@vue/composition-api';
 import { get } from 'lodash-es';
 
 import { isUserLoggedIn } from 'src/panel/helpers/isUserLoggedIn';
-import { getSocket } from 'src/panel/helpers/socket';
 
 library.add(faSun, faMoon);
 

@@ -4,27 +4,45 @@
       <b-col>
         <span class="title text-default mb-2">
           {{ translate('menu.manage') }}
-          <small><fa icon="angle-right"/></small>
+          <small><fa icon="angle-right" /></small>
           {{ translate('menu.ranks') }}
         </span>
       </b-col>
-      <b-col v-if="!$systems.find(o => o.name === 'ranks').enabled" style=" text-align: right;">
-        <b-alert show variant="danger" style="padding: .5rem; margin: 0; display: inline-block;">
-          <fa icon="exclamation-circle" fixed-width/> {{ translate('this-system-is-disabled') }}
+      <b-col
+        v-if="!$systems.find(o => o.name === 'ranks').enabled"
+        style=" text-align: right;"
+      >
+        <b-alert
+          show
+          variant="danger"
+          style="padding: .5rem; margin: 0; display: inline-block;"
+        >
+          <fa
+            icon="exclamation-circle"
+            fixed-width
+          /> {{ translate('this-system-is-disabled') }}
         </b-alert>
       </b-col>
     </b-row>
 
-    <panel search @search="search = $event">
-      <template v-slot:left>
-        <button-with-icon class="btn-primary btn-reverse" icon="plus" @click="newItem">{{translate('systems.ranks.new')}}</button-with-icon>
+    <panel
+      search
+      @search="search = $event"
+    >
+      <template #left>
+        <button-with-icon
+          class="btn-primary btn-reverse"
+          icon="plus"
+          @click="newItem"
+        >
+          {{ translate('systems.ranks.new') }}
+        </button-with-icon>
       </template>
     </panel>
 
-    <loading v-if="state.loading !== $state.success"/>
+    <loading v-if="state.loading !== $state.success" />
     <template v-else>
       <b-sidebar
-        @change="isSidebarVisibleChange"
         :visible="isSidebarVisible"
         :no-slide="!sidebarSlideEnabled"
         width="600px"
@@ -32,11 +50,27 @@
         shadow
         no-header
         right
-        backdrop>
-        <template v-slot:footer="{ hide }">
-          <div class="d-flex bg-opaque align-items-center px-3 py-2 border-top border-gray" style="justify-content: flex-end">
-            <b-button class="mx-2" @click="hide" variant="link">{{ translate('dialog.buttons.close') }}</b-button>
-            <state-button @click="save()" text="saveChanges" :state="state.save" :invalid="!!$v.$invalid && !!$v.$dirty"/>
+        backdrop
+        @change="isSidebarVisibleChange"
+      >
+        <template #footer="{ hide }">
+          <div
+            class="d-flex bg-opaque align-items-center px-3 py-2 border-top border-gray"
+            style="justify-content: flex-end"
+          >
+            <b-button
+              class="mx-2"
+              variant="link"
+              @click="hide"
+            >
+              {{ translate('dialog.buttons.close') }}
+            </b-button>
+            <state-button
+              text="saveChanges"
+              :state="state.save"
+              :invalid="!!$v.$invalid && !!$v.$dirty"
+              @click="save()"
+            />
           </div>
         </template>
         <div class="px-3 py-2">
@@ -49,19 +83,30 @@
                   id="name"
                   v-model="editationItem.rank"
                   type="text"
-                  @input="$v.editationItem.rank.$touch()"
                   :state="$v.editationItem.rank.$invalid && $v.editationItem.rank.$dirty ? false : null"
-                ></b-form-input>
+                  @input="$v.editationItem.rank.$touch()"
+                />
               </b-input-group>
-              <b-form-invalid-feedback :state="!($v.editationItem.rank.$invalid && $v.editationItem.rank.$dirty)">{{ translate('dialog.errors.required') }}</b-form-invalid-feedback>
+              <b-form-invalid-feedback :state="!($v.editationItem.rank.$invalid && $v.editationItem.rank.$dirty)">
+                {{ translate('dialog.errors.required') }}
+              </b-form-invalid-feedback>
             </b-form-group>
 
             <b-form-group>
               <label-inside>{{ translate('type') }}</label-inside>
-              <b-form-select v-model="editationItem.type" class="mb-3">
-                <b-form-select-option value="viewer">Watch Time</b-form-select-option>
-                <b-form-select-option value="follower">Follow time</b-form-select-option>
-                <b-form-select-option value="subscriber">Sub time</b-form-select-option>
+              <b-form-select
+                v-model="editationItem.type"
+                class="mb-3"
+              >
+                <b-form-select-option value="viewer">
+                  Watch Time
+                </b-form-select-option>
+                <b-form-select-option value="follower">
+                  Follow time
+                </b-form-select-option>
+                <b-form-select-option value="subscriber">
+                  Sub time
+                </b-form-select-option>
               </b-form-select>
             </b-form-group>
 
@@ -73,76 +118,183 @@
                   v-model.number="editationItem.value"
                   type="number"
                   min="0"
-                  @input="$v.editationItem.value.$touch()"
                   :state="$v.editationItem.value.$invalid && $v.editationItem.value.$dirty ? false : null"
-                ></b-form-input>
+                  @input="$v.editationItem.value.$touch()"
+                />
               </b-input-group>
-              <b-form-invalid-feedback :state="!($v.editationItem.value.$invalid && $v.editationItem.value.$dirty)">{{ translate('dialog.errors.minValue').replace('$value', 0) }}</b-form-invalid-feedback>
+              <b-form-invalid-feedback :state="!($v.editationItem.value.$invalid && $v.editationItem.value.$dirty)">
+                {{ translate('dialog.errors.minValue').replace('$value', 0) }}
+              </b-form-invalid-feedback>
             </b-form-group>
           </b-form>
         </div>
       </b-sidebar>
       <b-row>
-        <b-col md="4" sm="12">
+        <b-col
+          md="4"
+          sm="12"
+        >
           <span class="title"><small>Watch time</small></span>
-          <b-table striped small hover :items="fViewerItems" :fields="fields" @row-clicked="linkTo($event)" show-empty>
-            <template v-slot:empty>
-              <b-alert show variant="danger" class="m-0" v-if="search.length > 0"><fa icon="search"/> <span v-html="translate('systems.ranks.emptyAfterSearch').replace('$search', search)"/></b-alert>
-              <b-alert show class="m-0" v-else>{{translate('systems.ranks.empty')}}</b-alert>
+          <b-table
+            striped
+            small
+            hover
+            :items="fViewerItems"
+            :fields="fields"
+            show-empty
+            @row-clicked="linkTo($event)"
+          >
+            <template #empty>
+              <b-alert
+                v-if="search.length > 0"
+                show
+                variant="danger"
+                class="m-0"
+              >
+                <fa icon="search" /> <span v-html="translate('systems.ranks.emptyAfterSearch').replace('$search', search)" />
+              </b-alert>
+              <b-alert
+                v-else
+                show
+                class="m-0"
+              >
+                {{ translate('systems.ranks.empty') }}
+              </b-alert>
             </template>
-            <template v-slot:cell(value)="data">
+            <template #cell(value)="data">
               <span class="font-weight-bold text-primary font-bigger">{{ data.item.value }}</span>
             </template>
-            <template v-slot:cell(buttons)="data">
-              <div class="float-right" style="width: max-content !important;">
-                <button-with-icon class="btn-only-icon btn-primary btn-reverse" icon="edit" v-bind:href="'#/manage/ranks/edit/' + data.item.id">
+            <template #cell(buttons)="data">
+              <div
+                class="float-right"
+                style="width: max-content !important;"
+              >
+                <button-with-icon
+                  class="btn-only-icon btn-primary btn-reverse"
+                  icon="edit"
+                  :href="'#/manage/ranks/edit/' + data.item.id"
+                >
                   {{ translate('dialog.buttons.edit') }}
                 </button-with-icon>
-                <button-with-icon class="btn-only-icon btn-danger btn-reverse" icon="trash" @click="del(data.item.id)">
+                <button-with-icon
+                  class="btn-only-icon btn-danger btn-reverse"
+                  icon="trash"
+                  @click="del(data.item.id)"
+                >
                   {{ translate('dialog.buttons.delete') }}
                 </button-with-icon>
               </div>
             </template>
           </b-table>
         </b-col>
-        <b-col md="4" sm="12">
+        <b-col
+          md="4"
+          sm="12"
+        >
           <span class="title"><small>Follow time</small></span>
-          <b-table striped small hover :items="fFollowerItems" :fields="fields2" @row-clicked="linkTo($event)" show-empty>
-            <template v-slot:empty>
-              <b-alert show variant="danger" class="m-0" v-if="search.length > 0"><fa icon="search"/> <span v-html="translate('systems.ranks.emptyAfterSearch').replace('$search', search)"/></b-alert>
-              <b-alert show class="m-0" v-else>{{translate('systems.ranks.empty')}}</b-alert>
+          <b-table
+            striped
+            small
+            hover
+            :items="fFollowerItems"
+            :fields="fields2"
+            show-empty
+            @row-clicked="linkTo($event)"
+          >
+            <template #empty>
+              <b-alert
+                v-if="search.length > 0"
+                show
+                variant="danger"
+                class="m-0"
+              >
+                <fa icon="search" /> <span v-html="translate('systems.ranks.emptyAfterSearch').replace('$search', search)" />
+              </b-alert>
+              <b-alert
+                v-else
+                show
+                class="m-0"
+              >
+                {{ translate('systems.ranks.empty') }}
+              </b-alert>
             </template>
-            <template v-slot:cell(value)="data">
+            <template #cell(value)="data">
               <span class="font-weight-bold text-primary font-bigger">{{ data.item.value }}</span>
             </template>
-            <template v-slot:cell(buttons)="data">
-              <div class="float-right" style="width: max-content !important;">
-                <button-with-icon class="btn-only-icon btn-primary btn-reverse" icon="edit" v-bind:href="'#/manage/ranks/edit/' + data.item.id">
+            <template #cell(buttons)="data">
+              <div
+                class="float-right"
+                style="width: max-content !important;"
+              >
+                <button-with-icon
+                  class="btn-only-icon btn-primary btn-reverse"
+                  icon="edit"
+                  :href="'#/manage/ranks/edit/' + data.item.id"
+                >
                   {{ translate('dialog.buttons.edit') }}
                 </button-with-icon>
-                <button-with-icon class="btn-only-icon btn-danger btn-reverse" icon="trash" @click="del(data.item.id)">
+                <button-with-icon
+                  class="btn-only-icon btn-danger btn-reverse"
+                  icon="trash"
+                  @click="del(data.item.id)"
+                >
                   {{ translate('dialog.buttons.delete') }}
                 </button-with-icon>
               </div>
             </template>
           </b-table>
         </b-col>
-        <b-col md="4" sm="12">
+        <b-col
+          md="4"
+          sm="12"
+        >
           <span class="title"><small>Sub time</small></span>
-          <b-table striped small hover :items="fSubscriberItems" :fields="fields2" @row-clicked="linkTo($event)" show-empty>
-            <template v-slot:empty>
-              <b-alert show variant="danger" class="m-0" v-if="search.length > 0"><fa icon="search"/> <span v-html="translate('systems.ranks.emptyAfterSearch').replace('$search', search)"/></b-alert>
-              <b-alert show class="m-0" v-else>{{translate('systems.ranks.empty')}}</b-alert>
+          <b-table
+            striped
+            small
+            hover
+            :items="fSubscriberItems"
+            :fields="fields2"
+            show-empty
+            @row-clicked="linkTo($event)"
+          >
+            <template #empty>
+              <b-alert
+                v-if="search.length > 0"
+                show
+                variant="danger"
+                class="m-0"
+              >
+                <fa icon="search" /> <span v-html="translate('systems.ranks.emptyAfterSearch').replace('$search', search)" />
+              </b-alert>
+              <b-alert
+                v-else
+                show
+                class="m-0"
+              >
+                {{ translate('systems.ranks.empty') }}
+              </b-alert>
             </template>
-            <template v-slot:cell(value)="data">
+            <template #cell(value)="data">
               <span class="font-weight-bold text-primary font-bigger">{{ data.item.value }}</span>
             </template>
-            <template v-slot:cell(buttons)="data">
-              <div class="float-right" style="width: max-content !important;">
-                <button-with-icon class="btn-only-icon btn-primary btn-reverse" icon="edit" v-bind:href="'#/manage/ranks/edit/' + data.item.id">
+            <template #cell(buttons)="data">
+              <div
+                class="float-right"
+                style="width: max-content !important;"
+              >
+                <button-with-icon
+                  class="btn-only-icon btn-primary btn-reverse"
+                  icon="edit"
+                  :href="'#/manage/ranks/edit/' + data.item.id"
+                >
                   {{ translate('dialog.buttons.edit') }}
                 </button-with-icon>
-                <button-with-icon class="btn-only-icon btn-danger btn-reverse" icon="trash" @click="del(data.item.id)">
+                <button-with-icon
+                  class="btn-only-icon btn-danger btn-reverse"
+                  icon="trash"
+                  @click="del(data.item.id)"
+                >
                   {{ translate('dialog.buttons.delete') }}
                 </button-with-icon>
               </div>
@@ -155,6 +307,8 @@
 </template>
 
 <script lang="ts">
+import { getSocket } from '@sogebot/ui-helpers/socket';
+import translate from '@sogebot/ui-helpers/translate';
 import {
   computed, defineComponent, getCurrentInstance, onMounted, ref, watch,
 } from '@vue/composition-api';
@@ -167,17 +321,15 @@ import { RankInterface } from 'src/bot/database/entity/rank';
 import { ButtonStates } from 'src/panel/helpers/buttonStates';
 import { capitalize } from 'src/panel/helpers/capitalize';
 import { error } from 'src/panel/helpers/error';
-import { getSocket } from 'src/panel/helpers/socket';
-import translate from 'src/panel/helpers/translate';
 
 const socket = getSocket('/systems/ranks');
 
 export default defineComponent({
-  mixins:     [ validationMixin ],
   components: {
     'loading':      () => import('src/panel/components/loading.vue'),
     'label-inside': () => import('src/panel/components/label-inside.vue'),
   },
+  mixins:      [ validationMixin ],
   validations: {
     editationItem: {
       rank:  { required },
@@ -326,7 +478,7 @@ export default defineComponent({
               refresh();
               state.value.pending = false;
               ctx.root.$router.push({ name: 'RanksManagerEdit', params: { id: String(data.id) } }).catch(() => {
-                return; 
+                return;
               });
             });
           }
@@ -354,7 +506,7 @@ export default defineComponent({
         }
         isSidebarVisible.value = isVisible;
         ctx.root.$router.push({ name: 'RanksManagerList' }).catch(() => {
-          return; 
+          return;
         });
       } else {
         state.value.save = ButtonStates.idle;
@@ -389,7 +541,7 @@ export default defineComponent({
     };
     const newItem = () => {
       ctx.root.$router.push({ name: 'RanksManagerEdit', params: { id: uuid() } }).catch(() => {
-        return; 
+        return;
       });
     };
 

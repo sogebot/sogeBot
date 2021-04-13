@@ -173,21 +173,21 @@
 
 <script>
 import { FontAwesomeLayers } from '@fortawesome/vue-fontawesome';
+import { getSocket } from '@sogebot/ui-helpers/socket';
+import translate from '@sogebot/ui-helpers/translate';
 import { orderBy } from 'lodash-es';
 import Vue from 'vue';
 
 import loading from 'src/panel/components/loading.vue';
 import { EventBus } from 'src/panel/helpers/event-bus';
-import { getSocket } from 'src/panel/helpers/socket';
-import translate from 'src/panel/helpers/translate';
 
 export default {
-  props:      ['popout', 'nodrag'],
   components: {
     loading, /* somehow () => import() is not working in this context */
     'font-awesome-layers': FontAwesomeLayers,
   },
-  data: function () {
+  props: ['popout', 'nodrag'],
+  data:  function () {
     return {
       EventBus,
       orderBy: orderBy,
@@ -238,6 +238,29 @@ export default {
       return (this.participants.filter(o => o.isEligible)).length;
     },
   },
+  watch: {
+    keyword: function () {
+      if (!this.keyword.startsWith('!')) {
+        this.keyword = '!' + this.keyword;
+      }
+    },
+    ticketsMax(val) {
+      if (val < this.ticketsMin) {
+        this.ticketsMin = this.ticketsMax;
+      }
+      if (val < 1) {
+        this.ticketsMax = 1;
+      }
+    },
+    ticketsMin(val) {
+      if (val > this.ticketsMax) {
+        this.ticketsMax = this.ticketsMin;
+      }
+      if (val < 1) {
+        this.ticketsMin = 1;
+      }
+    },
+  },
   destroyed () {
     clearInterval(this.cacheInterval);
     clearTimeout(this.refreshTimeout);
@@ -267,29 +290,6 @@ export default {
     }, 1000);
 
     this.refresh();
-  },
-  watch: {
-    keyword: function () {
-      if (!this.keyword.startsWith('!')) {
-        this.keyword = '!' + this.keyword;
-      }
-    },
-    ticketsMax(val) {
-      if (val < this.ticketsMin) {
-        this.ticketsMin = this.ticketsMax;
-      }
-      if (val < 1) {
-        this.ticketsMax = 1;
-      }
-    },
-    ticketsMin(val) {
-      if (val > this.ticketsMax) {
-        this.ticketsMax = this.ticketsMin;
-      }
-      if (val < 1) {
-        this.ticketsMin = 1;
-      }
-    },
   },
   methods: {
     refresh: async function () {

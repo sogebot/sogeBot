@@ -21,15 +21,15 @@
 </template>
 
 <script lang="ts">
+import { getSocket } from '@sogebot/ui-helpers/socket';
+import translate from '@sogebot/ui-helpers/translate';
 import {
-  defineComponent, onMounted, ref, watch, 
+  defineComponent, onMounted, ref, watch,
 } from '@vue/composition-api';
 import VueScrollTo from 'vue-scrollto';
 
 import { SongPlaylistInterface } from 'src/bot/database/entity/song';
 import { ButtonStates } from 'src/panel/helpers/buttonStates';
-import { getSocket } from 'src/panel/helpers/socket';
-import translate from 'src/panel/helpers/translate';
 
 const socket = getSocket('/systems/songs', true);
 
@@ -50,7 +50,7 @@ export default defineComponent({
 
     const fields = [
       {
-        key: 'thumbnail', label: '', tdClass: 'fitThumbnail', 
+        key: 'thumbnail', label: '', tdClass: 'fitThumbnail',
       },
       { key: 'title', label: '' },
       { key: 'buttons', label: '' },

@@ -106,6 +106,8 @@
 <script lang="ts">
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faChevronRight } from '@fortawesome/free-solid-svg-icons/faChevronRight';
+import { getSocket } from '@sogebot/ui-helpers/socket';
+import translate from '@sogebot/ui-helpers/translate';
 import {
   defineComponent, onMounted, ref, watch,
 } from '@vue/composition-api';
@@ -119,8 +121,6 @@ library.add(faChevronRight);
 import type { OverlayMapperInterface, OverlayMapperOBSWebsocket } from 'src/bot/database/entity/overlay';
 import { ButtonStates } from 'src/panel/helpers/buttonStates';
 import { error } from 'src/panel/helpers/error';
-import { getSocket } from 'src/panel/helpers/socket';
-import translate from 'src/panel/helpers/translate';
 
 const socket = getSocket('/registries/overlays');
 

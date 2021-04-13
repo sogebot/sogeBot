@@ -1,31 +1,61 @@
 <template>
-  <perfect-scrollbar class="main-menu" :options="{useBothWheelAxes: true, suppressScrollY: true}">
-    <nav id="menu-detach" class="nav d-flex justify-content-between" style="width: max-content">
-      <span v-for="category of categories" :key="category">
+  <perfect-scrollbar
+    class="main-menu"
+    :options="{useBothWheelAxes: true, suppressScrollY: true}"
+  >
+    <nav
+      id="menu-detach"
+      class="nav d-flex justify-content-between"
+      style="width: max-content"
+    >
+      <span
+        v-for="category of categories"
+        :key="category"
+      >
         <b-dropdown variant="light">
-          <template v-slot:button-content>
+          <template #button-content>
             {{ translate('menu.' + category) }}
           </template>
-          <b-dropdown-item v-for="item of menu.filter(o => o.category === category && o.enabled)"
-                           :key="item.id + item.name + item.category"
-                           :href="'#/' + item.id.replace(/\./g, '/')">
-            {{translate('menu.' + item.name)}}
+          <b-dropdown-item
+            v-for="item of menu.filter(o => o.category === category && o.enabled)"
+            :key="item.id + item.name + item.category"
+            :href="'#/' + item.id.replace(/\./g, '/')"
+          >
+            {{ translate('menu.' + item.name) }}
           </b-dropdown-item>
-          <b-dropdown-group id="dropdown-group-1" v-if="menu.filter(o => o.category === category && !o.enabled).length > 0" class="pt-2">
-            <template v-slot:header>
-              <header class="p-1" @click.prevent="isDisabledHidden = !isDisabledHidden" style="cursor: pointer;">
+          <b-dropdown-group
+            v-if="menu.filter(o => o.category === category && !o.enabled).length > 0"
+            id="dropdown-group-1"
+            class="pt-2"
+          >
+            <template #header>
+              <header
+                class="p-1"
+                style="cursor: pointer;"
+                @click.prevent="isDisabledHidden = !isDisabledHidden"
+              >
                 {{ translate('disabled') }}
                 <small>
-                  <fa icon="plus" fixed-width v-if="isDisabledHidden"/>
-                  <fa icon="minus" fixed-width v-else />
+                  <fa
+                    v-if="isDisabledHidden"
+                    icon="plus"
+                    fixed-width
+                  />
+                  <fa
+                    v-else
+                    icon="minus"
+                    fixed-width
+                  />
                 </small>
               </header>
             </template>
             <template v-if="!isDisabledHidden">
-              <b-dropdown-item v-for="item of menu.filter(o => o.category === category && !o.enabled)"
-                              :key="item.id + item.name + item.category"
-                              :href="'#/' + item.id.replace(/\./g, '/')">
-                {{translate('menu.' + item.name)}}
+              <b-dropdown-item
+                v-for="item of menu.filter(o => o.category === category && !o.enabled)"
+                :key="item.id + item.name + item.category"
+                :href="'#/' + item.id.replace(/\./g, '/')"
+              >
+                {{ translate('menu.' + item.name) }}
               </b-dropdown-item>
             </template>
           </b-dropdown-group>
@@ -36,14 +66,14 @@
 </template>
 
 <script lang="ts">
+import { getSocket } from '@sogebot/ui-helpers/socket';
+import translate from '@sogebot/ui-helpers/translate';
 import {
   defineComponent, onMounted, ref,
 } from '@vue/composition-api';
 import { PerfectScrollbar } from 'vue2-perfect-scrollbar';
 
 import type { menu as menuType } from 'src/bot/helpers/panel';
-import { getSocket } from 'src/panel/helpers/socket';
-import translate from 'src/panel/helpers/translate';
 
 import 'vue2-perfect-scrollbar/dist/vue2-perfect-scrollbar.css';
 

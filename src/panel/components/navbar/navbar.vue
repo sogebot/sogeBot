@@ -30,16 +30,15 @@ import { library } from '@fortawesome/fontawesome-svg-core';
 import {
   faBars, faSignInAlt, faSignOutAlt,
 } from '@fortawesome/free-solid-svg-icons';
+import { getSocket } from '@sogebot/ui-helpers/socket';
+import translate from '@sogebot/ui-helpers/translate';
 import {
   defineComponent, onMounted, ref,
 } from '@vue/composition-api';
 import Vue from 'vue';
 import vueHeadful from 'vue-headful';
 
-import { getSocket } from 'src/panel/helpers/socket';
-import translate from 'src/panel/helpers/translate';
-
-Vue.component('vue-headful', vueHeadful);
+Vue.component('VueHeadful', vueHeadful);
 library.add(faBars, faSignInAlt, faSignOutAlt);
 
 const socket = getSocket('/');

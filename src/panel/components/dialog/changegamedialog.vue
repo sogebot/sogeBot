@@ -184,6 +184,8 @@
 </template>
 
 <script lang="ts">
+import { getConfiguration, getSocket } from '@sogebot/ui-helpers/socket';
+import translate from '@sogebot/ui-helpers/translate';
 import {
   computed, defineComponent, onMounted, onUnmounted, ref, watch,
 } from '@vue/composition-api';
@@ -193,8 +195,6 @@ import { chunk, debounce } from 'lodash-es';
 import Vue from 'vue';
 
 import { EventBus } from 'src/panel/helpers/event-bus';
-import { getConfiguration, getSocket } from 'src/panel/helpers/socket';
-import translate from 'src/panel/helpers/translate';
 
 Vue.use(ModalPlugin);
 

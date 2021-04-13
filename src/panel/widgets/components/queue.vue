@@ -91,11 +91,11 @@
 </template>
 
 <script>
+import { getSocket } from '@sogebot/ui-helpers/socket';
+import translate from '@sogebot/ui-helpers/translate';
 import { debounce } from 'lodash-es';
 
 import { EventBus } from 'src/panel/helpers/event-bus';
-import { getSocket } from 'src/panel/helpers/socket';
-import translate from 'src/panel/helpers/translate';
 
 export default {
   props:         ['popout', 'nodrag'],
@@ -146,29 +146,12 @@ export default {
         },
       };
       this.socket.emit('settings.update', data, () => {
-        return; 
+        return;
       });
       this.socket.emit('set.value', { variable: 'locked', value: this.locked }, () => {
-        return; 
+        return;
       });
     }, 500),
-  },
-  computed: {
-    fUsers: function () {
-      if (this.eligibilityAll) {
-        return this.users;
-      } else {
-        let users = this.users;
-        if (this.eligibilityFollowers && this.eligibilitySubscribers) {
-          users = users.filter(o => o.is.follower || o.is.subscriber);
-        } else if (this.eligibilityFollowers) {
-          users = users.filter(o => o.is.follower);
-        } else if (this.eligibilitySubscribers) {
-          users = users.filter(o => o.is.subscriber);
-        }
-        return users.sort(o => -(new Date(o.created_at).getTime()));
-      }
-    },
   },
   data: function () {
     return {
@@ -189,6 +172,23 @@ export default {
       socket:                 getSocket('/systems/queue'),
       interval:               [],
     };
+  },
+  computed: {
+    fUsers: function () {
+      if (this.eligibilityAll) {
+        return this.users;
+      } else {
+        let users = this.users;
+        if (this.eligibilityFollowers && this.eligibilitySubscribers) {
+          users = users.filter(o => o.is.follower || o.is.subscriber);
+        } else if (this.eligibilityFollowers) {
+          users = users.filter(o => o.is.follower);
+        } else if (this.eligibilitySubscribers) {
+          users = users.filter(o => o.is.subscriber);
+        }
+        return users.sort(o => -(new Date(o.created_at).getTime()));
+      }
+    },
   },
   methods: {
     clear: function () {

@@ -10,8 +10,10 @@
       v-model="_value"
       style="min-height: 6em;"
       :placeholder="placeholder"
+      class="form-control"
+      :style="heightStyle"
       @keydown.enter="onEnter"
-class="form-control" :style="heightStyle" @blur="editation = false"
+      @blur="editation = false"
     />
 
     <div
@@ -297,14 +299,13 @@ class="form-control" :style="heightStyle" @blur="editation = false"
   </div>
 </template>
 <script lang="ts">
+import translate from '@sogebot/ui-helpers/translate';
 import {
   computed, defineComponent, Ref, ref, watch,
 } from '@vue/composition-api';
 import {
   isNil, keys, sortBy,
 } from 'lodash-es';
-
-import translate from 'src/panel/helpers/translate';
 
 import { flatten } from '../../bot/helpers/flatten';
 

@@ -1,23 +1,29 @@
 <template>
   <div id="emotes">
     <div v-if="urlParam('debug')">
-      <json-viewer :value="{threshold, url, count, inactivity, currentTime, updatedAt, isActive: currentTime - updatedAt < inactivity * 1000 }" boxed copyable :expand-depth="10"></json-viewer>
+      <json-viewer
+        :value="{threshold, url, count, inactivity, currentTime, updatedAt, isActive: currentTime - updatedAt < inactivity * 1000 }"
+        boxed
+        copyable
+        :expand-depth="10"
+      />
     </div>
     <transition name="fade">
       <img
         v-if="url !== null && count >= threshold && currentTime - updatedAt < inactivity * 1000"
-        :src="url" width="100%" />
+        :src="url"
+        width="100%"
+      >
     </transition>
   </div>
 </template>
 
 <script lang="ts">
+import { getSocket } from '@sogebot/ui-helpers/socket';
 import {
-  defineComponent, onMounted, ref, 
+  defineComponent, onMounted, ref,
 } from '@vue/composition-api';
 import JsonViewer from 'vue-json-viewer';
-
-import { getSocket } from 'src/panel/helpers/socket';
 
 const socket = getSocket('/overlays/emotes', true);
 export default defineComponent({
@@ -47,7 +53,7 @@ export default defineComponent({
       });
     });
     return {
-      threshold, url, count, inactivity, updatedAt, currentTime, 
+      threshold, url, count, inactivity, updatedAt, currentTime,
     };
   },
 });

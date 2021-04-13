@@ -84,19 +84,19 @@ import { library } from '@fortawesome/fontawesome-svg-core';
 import {
   faDice, faDiceFive, faDiceFour, faDiceOne, faDiceSix, faDiceThree, faDiceTwo,
 } from '@fortawesome/free-solid-svg-icons';
+import { getSocket } from '@sogebot/ui-helpers/socket';
+import translate from '@sogebot/ui-helpers/translate';
 import {
   isNil, orderBy, size,
 } from 'lodash-es';
 
 import { EventBus } from 'src/panel/helpers/event-bus';
-import { getSocket } from 'src/panel/helpers/socket';
-import translate from 'src/panel/helpers/translate';
 
 library.add(faDice, faDiceOne, faDiceTwo, faDiceThree, faDiceFour, faDiceFive, faDiceSix);
 
 export default {
-  props:      ['popout', 'nodrag'],
   components: { loading: () => import('src/panel/components/loading.vue') },
+  props:      ['popout', 'nodrag'],
   data:       function () {
     return {
       EventBus,
@@ -119,22 +119,6 @@ export default {
       interval: 0,
     };
   },
-  created: async function () {
-    this.state.loading = this.$state.progress;
-    await Promise.all([
-      this.refresh(),
-    ]);
-    this.state.loading = this.$state.success;
-
-    this.interval = setInterval(() => {
-      if (this.isSpinning) {
-        this.diceIconIdx = Math.floor(Math.random() * this.diceIcon.length);
-      }
-    }, 100);
-  },
-  beforeDestroy() {
-    clearInterval(this.interval);
-  },
   computed: {
     watchedItems: function () {
       return orderBy(this.items.filter((o) => o.widgetOrder !== -1), 'widgetOrder', 'asc');
@@ -155,11 +139,27 @@ export default {
       }
     },
   },
+  created: async function () {
+    this.state.loading = this.$state.progress;
+    await Promise.all([
+      this.refresh(),
+    ]);
+    this.state.loading = this.$state.success;
+
+    this.interval = setInterval(() => {
+      if (this.isSpinning) {
+        this.diceIconIdx = Math.floor(Math.random() * this.diceIcon.length);
+      }
+    }, 100);
+  },
+  beforeDestroy() {
+    clearInterval(this.interval);
+  },
   methods: {
     spin: function () {
       this.isSpinning = true;
       this.socket.emit('randomizer::startSpin', () => {
-        return; 
+        return;
       });
       setTimeout(() => {
         this.isSpinning = false;
@@ -192,7 +192,7 @@ export default {
     save() {
       this.state.editation = this.$state.idle;
       this.socket.emit('randomizer::save', this.items, () => {
-        return; 
+        return;
       });
     },
     refresh: function () {

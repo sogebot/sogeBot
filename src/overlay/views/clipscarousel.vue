@@ -46,13 +46,12 @@ isReady: {{ isReady }}
 
 <script lang="ts">
 
+import { getSocket } from '@sogebot/ui-helpers/socket';
 import gsap from 'gsap';
 import { cloneDeep } from 'lodash-es';
 import {
   Component, Prop, Vue, Watch,
 } from 'vue-property-decorator';
-
-import { getSocket } from 'src/panel/helpers/socket';
 
 @Component({})
 export default class ClipsCarouselOverlay extends Vue {

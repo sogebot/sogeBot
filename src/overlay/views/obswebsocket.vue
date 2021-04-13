@@ -3,6 +3,7 @@
 </template>
 
 <script lang="ts">
+import { getSocket } from '@sogebot/ui-helpers/socket';
 import { defineComponent, onMounted } from '@vue/composition-api';
 import OBSWebSocket from 'obs-websocket-js';
 
@@ -12,7 +13,6 @@ import { listScenes } from 'src/bot/helpers/obswebsocket/scenes';
 import { getSourcesList, getSourceTypesList } from 'src/bot/helpers/obswebsocket/sources';
 import { taskRunner } from 'src/bot/helpers/obswebsocket/taskrunner';
 import { getCurrentIP } from 'src/panel/helpers/getCurrentIP';
-import { getSocket } from 'src/panel/helpers/socket';
 
 type Props = {
   opts: {

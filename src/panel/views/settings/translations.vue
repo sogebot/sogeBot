@@ -1,46 +1,70 @@
 <template>
-  <b-container fluid ref="window">
+  <b-container
+    ref="window"
+    fluid
+  >
     <b-row>
       <b-col>
         <span class="title text-default mb-2">
           {{ translate('menu.settings') }}
-          <small><fa icon="angle-right"/></small>
+          <small><fa icon="angle-right" /></small>
           {{ translate('menu.translations') }}
         </span>
       </b-col>
     </b-row>
 
-    <panel search @search="search = $event">
-      <template v-slot:right>
+    <panel
+      search
+      @search="search = $event"
+    >
+      <template #right>
         <b-pagination
-          class="m-0"
           v-model="currentPage"
+          class="m-0"
           :total-rows="rows"
           :per-page="perPage"
           aria-controls="my-table"
-        ></b-pagination>
+        />
       </template>
     </panel>
 
     <loading v-if="state.loading === $state.progress || state.settings === $state.progress" />
-    <b-table show-empty v-else striped :fields="fields" :items="fItems" small style="cursor: pointer;" :per-page="perPage" :current-page="currentPage">
-      <template v-slot:empty>
-        <b-alert show class="m-0">
-          {{translate('dialog.nothingToShow')}}
+    <b-table
+      v-else
+      show-empty
+      striped
+      :fields="fields"
+      :items="fItems"
+      small
+      style="cursor: pointer;"
+      :per-page="perPage"
+      :current-page="currentPage"
+    >
+      <template #empty>
+        <b-alert
+          show
+          class="m-0"
+        >
+          {{ translate('dialog.nothingToShow') }}
         </b-alert>
       </template>
-      <template v-slot:cell(current)="data">
+      <template #cell(current)="data">
         <b-form>
           <b-form-group style="margin:0 !important">
             <b-input-group>
               <b-form-input
                 :id="data.item.name"
                 v-model="data.item.current"
-                @input="updateTranslation(data.item.name, data.item.current, data.item.default)"
                 type="text"
-              ></b-form-input>
+                @input="updateTranslation(data.item.name, data.item.current, data.item.default)"
+              />
               <b-input-group-append v-if="data.item.current !== data.item.default">
-                <b-button variant="primary" @click="data.item.current = data.item.default; revertTranslation(data.item.name)">Revert</b-button>
+                <b-button
+                  variant="primary"
+                  @click="data.item.current = data.item.default; revertTranslation(data.item.name)"
+                >
+                  Revert
+                </b-button>
               </b-input-group-append>
             </b-input-group>
           </b-form-group>
@@ -51,13 +75,12 @@
 </template>
 
 <script lang="ts">
+import { getSocket } from '@sogebot/ui-helpers/socket';
+import translate from '@sogebot/ui-helpers/translate';
 import { isNil } from 'lodash-es';
 import {
-  Component, Vue, Watch, 
+  Component, Vue, Watch,
 } from 'vue-property-decorator';
-
-import { getSocket } from 'src/panel/helpers/socket';
-import translate from 'src/panel/helpers/translate';
 
 @Component({ components: { 'loading': () => import('../../components/loading.vue') } })
 export default class translations extends Vue {

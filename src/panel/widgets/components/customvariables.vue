@@ -90,13 +90,13 @@
 </template>
 
 <script>
+import { getSocket } from '@sogebot/ui-helpers/socket';
+import translate from '@sogebot/ui-helpers/translate';
 import {
   isNil, orderBy, size,
 } from 'lodash-es';
 
 import { EventBus } from 'src/panel/helpers/event-bus';
-import { getSocket } from 'src/panel/helpers/socket';
-import translate from 'src/panel/helpers/translate';
 
 const numberOrTextComponent = {
   props: ['id', 'value', 'type'],
@@ -155,12 +155,12 @@ const numberOrTextComponent = {
     `,
 };
 export default {
-  props:      ['popout', 'nodrag'],
   components: {
     'number-or-text': numberOrTextComponent,
     loading:          () => import('src/panel/components/loading.vue'),
   },
-  data: function () {
+  props: ['popout', 'nodrag'],
+  data:  function () {
     return {
       translate,
       EventBus,
@@ -176,18 +176,6 @@ export default {
       socket:           getSocket('/widgets/customvariables'),
       draggingItem:     null,
     };
-  },
-  created: async function () {
-    this.state.loading = this.$state.progress;
-    this.socket.on('refresh', () => {
-      this.refreshVariablesList();
-      this.refreshWatchList();
-    });
-    await Promise.all([
-      this.refreshVariablesList(),
-      this.refreshWatchList(),
-    ]);
-    this.state.loading = this.$state.success;
   },
   computed: {
     watchedVariables: function () {
@@ -222,6 +210,18 @@ export default {
       }
     },
   },
+  created: async function () {
+    this.state.loading = this.$state.progress;
+    this.socket.on('refresh', () => {
+      this.refreshVariablesList();
+      this.refreshWatchList();
+    });
+    await Promise.all([
+      this.refreshVariablesList(),
+      this.refreshWatchList(),
+    ]);
+    this.state.loading = this.$state.success;
+  },
   methods: {
     onUpdate: function (id, value) {
       this.socket.emit('watched::setValue', { id, value }, (err) => {
@@ -253,7 +253,7 @@ export default {
     save() {
       this.state.editation = this.$state.idle;
       this.socket.emit('watched::save', this.watched, () => {
-        return; 
+        return;
       });
     },
     refreshVariablesList: function () {

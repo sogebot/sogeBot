@@ -31,12 +31,11 @@
 </template>
 
 <script lang="ts">
+import translate from '@sogebot/ui-helpers/translate';
 import {
   computed,
   defineComponent, ref, watch,
 } from '@vue/composition-api';
-
-import translate from 'src/panel/helpers/translate';
 
 export default defineComponent({
   props: {

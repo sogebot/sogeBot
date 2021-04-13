@@ -1,17 +1,22 @@
 <template>
   <div id="app">
-    <div v-if="state === null">Please wait, token is being processed</div>
-    <div v-if="state === false">Unexpected error, please try to authenticate again</div>
-    <div v-if="state === true">Saving token to a bot, refreshing back to a bot.</div>
+    <div v-if="state === null">
+      Please wait, token is being processed
+    </div>
+    <div v-if="state === false">
+      Unexpected error, please try to authenticate again
+    </div>
+    <div v-if="state === true">
+      Saving token to a bot, refreshing back to a bot.
+    </div>
   </div>
 </template>
 
 <script lang="ts">
+import { getSocket } from '@sogebot/ui-helpers/socket';
 import {
   defineComponent, Ref, ref,
 } from '@vue/composition-api';
-
-import { getSocket } from 'src/panel/helpers/socket';
 
 export default defineComponent({
   setup() {

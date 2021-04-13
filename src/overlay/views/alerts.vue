@@ -1,72 +1,88 @@
 <template>
   <div>
-      <pre class="debug" :class="[!urlParam('debug') ? 'hide' : '']">
+    <pre
+      class="debug"
+      :class="[!urlParam('debug') ? 'hide' : '']"
+    >
 isFinished: {{ isFinished }}
 isPlaying: {{ isPlaying }}
 current: {{ getCurrentAlertList() }}
 finishedCount: {{ finishedCount }}
 finished: {{ (getCurrentAlertList() || []).filter(o => o.finished) }}
       </pre>
-      <div class="absolute" v-if="isPlaying && !isFinished">
-        <transition
-          v-for="(alert, index) of getCurrentAlertList()" :key="index"
-          @enter="doEnterAnimation"
-          @leave="doLeaveAnimation"
-          :css="false"
+    <div
+      v-if="isPlaying && !isFinished"
+      class="absolute"
+    >
+      <transition
+        v-for="(alert, index) of getCurrentAlertList()"
+        :key="index"
+        :css="false"
+        @enter="doEnterAnimation"
+        @leave="doLeaveAnimation"
+      >
+        <iframe
+          v-if="alert.type === 'html' && alert.run"
+          v-show="alert.run && !alert.finished && !alert.leaveAnimation"
+          :data-index="index"
+          :class="[ alert.class ? alert.class : '']"
+          :src="alert.url"
+        />
+
+        <audio
+          v-if="alert.type === 'audio'"
+          ref="audio"
+          :src="alert.url"
+        />
+
+        <video
+          v-show="alert.run && alert.isLoaded && !alert.finished && !alert.leaveAnimation"
+          v-if="alert.type === 'video' || alert.type === 'clip'"
+          ref="video"
+          preload="metadata"
+          playsinline
+          :data-index="index"
+          :data-src="alert.url"
+          :class="[ alert.class ? alert.class : '']"
+          :style="{ width: alert['size'], top: alert['y-offset'] ? alert['y-offset'] + 'px' : 'inherit', left: alert['x-offset'] ? alert['x-offset'] + 'px' : 'inherit' }"
         >
-          <iframe
-            :data-index="index"
-            v-if="alert.type === 'html' && alert.run"
-            v-show="alert.run && !alert.finished && !alert.leaveAnimation"
-            :class="[ alert.class ? alert.class : '']"
-            :src="alert.url"></iframe>
+          <source
+            :src="alert.url + '#t=0.1'"
+            type="video/mp4"
+          >
+        </video>
 
-          <audio
-            ref="audio"
-            v-if="alert.type === 'audio'"
-            :src="alert.url"></audio>
+        <div
+          v-show="alert.run && !alert.finished && !alert.leaveAnimation"
+          v-if="alert.type === 'text'"
+          class="text"
+          :data-index="index"
+          :class="[ alert.class ? alert.class : '']"
+          :style="{ top: alert['y-offset'] ? alert['y-offset'] + 'px' : 'inherit', left: alert['x-offset'] ? alert['x-offset'] + 'px' : 'inherit', 'text-align': alert.align || 'left' }"
+        >
+          {{ alert.text }}
+        </div>
 
-          <video
-            preload="metadata"
-            playsinline
-            ref="video"
-            :data-index="index"
-            :data-src="alert.url"
-            :class="[ alert.class ? alert.class : '']"
-            :style="{ width: alert['size'], top: alert['y-offset'] ? alert['y-offset'] + 'px' : 'inherit', left: alert['x-offset'] ? alert['x-offset'] + 'px' : 'inherit' }"
-            v-show="alert.run && alert.isLoaded && !alert.finished && !alert.leaveAnimation"
-            v-if="alert.type === 'video' || alert.type === 'clip'">
-            <source :src="alert.url + '#t=0.1'" type="video/mp4">
-          </video>
-
-          <div
-            class='text'
-            :data-index="index"
-            :class="[ alert.class ? alert.class : '']"
-            v-show="alert.run && !alert.finished && !alert.leaveAnimation"
-            :style="{ top: alert['y-offset'] ? alert['y-offset'] + 'px' : 'inherit', left: alert['x-offset'] ? alert['x-offset'] + 'px' : 'inherit', 'text-align': alert.align || 'left' }"
-            v-if="alert.type === 'text'">{{alert.text}}</div>
-
-          <img
-            class="image"
-            :data-index="index"
-            :class="[ alert.class ? alert.class : '']"
-            v-show="alert.run && !alert.finished && !alert.leaveAnimation"
-            v-if="alert.type === 'image'"
-            :style="{ top: alert['y-offset'] ? alert['y-offset'] + 'px' : 'inherit', left: alert['x-offset'] ? alert['x-offset'] + 'px' : 'inherit' }"
-            :src="alert.url"/>
-        </transition>
+        <img
+          v-show="alert.run && !alert.finished && !alert.leaveAnimation"
+          v-if="alert.type === 'image'"
+          class="image"
+          :data-index="index"
+          :class="[ alert.class ? alert.class : '']"
+          :style="{ top: alert['y-offset'] ? alert['y-offset'] + 'px' : 'inherit', left: alert['x-offset'] ? alert['x-offset'] + 'px' : 'inherit' }"
+          :src="alert.url"
+        >
+      </transition>
     </div>
   </div>
 </template>
 
 <script lang="ts">
+import { getSocket } from '@sogebot/ui-helpers/socket';
 import gsap from 'gsap';
 import {
-  Component, Vue, Watch, 
+  Component, Vue, Watch,
 } from 'vue-property-decorator';
-
-import { getSocket } from 'src/panel/helpers/socket';
 
 @Component({})
 export default class AlertsOverlay extends Vue {

@@ -185,6 +185,7 @@
 </template>
 
 <script lang="ts">
+import { getSocket } from '@sogebot/ui-helpers/socket';
 import { get, isEqual } from 'lodash-es';
 import safeEval from 'safe-eval';
 import urlRegex from 'url-regex';
@@ -196,7 +197,6 @@ import {
   AlertInterface, AlertResubInterface, AlertRewardRedeemInterface, AlertTipInterface, CommonSettingsInterface, EmitData,
 } from 'src/bot/database/entity/alert';
 import { CacheEmotesInterface } from 'src/bot/database/entity/cacheEmotes';
-import { getSocket } from 'src/panel/helpers/socket';
 import { shadowGenerator, textStrokeGenerator } from 'src/panel/helpers/text';
 import { itemsToEvalPart } from 'src/panel/views/registries/alerts/components/query-filter.vue';
 

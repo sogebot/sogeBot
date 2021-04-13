@@ -1,24 +1,50 @@
 <template>
   <div>
     <b-form>
-      <b-form-group id="event-type-input" :label="translate('registry.alerts.testDlg.event')" label-for="event-type-input-select">
+      <b-form-group
+        id="event-type-input"
+        :label="translate('registry.alerts.testDlg.event')"
+        label-for="event-type-input-select"
+      >
         <b-form-select
           id="event-type-input-select"
           v-model="event"
         >
-          <b-form-select-option v-for="ev of events" :value="ev" :key="ev">
+          <b-form-select-option
+            v-for="ev of events"
+            :key="ev"
+            :value="ev"
+          >
             {{ translate('registry.alerts.event.' + ev) }}
           </b-form-select-option>
         </b-form-select>
       </b-form-group>
 
-      <b-form-group v-if="event !== 'rewardredeems'" id="event-username-input" :label="event === 'cmdredeems' ? translate('registry.alerts.testDlg.command') : translate('registry.alerts.testDlg.username')" label-for="event-username-input-text">
+      <b-form-group
+        v-if="event !== 'rewardredeems'"
+        id="event-username-input"
+        :label="event === 'cmdredeems' ? translate('registry.alerts.testDlg.command') : translate('registry.alerts.testDlg.username')"
+        label-for="event-username-input-text"
+      >
         <b-input-group>
           <template #prepend>
-            <b-button :variant="isUsernameRandomized ? 'success':'danger'" @click="isUsernameRandomized = !isUsernameRandomized">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-shuffle" viewBox="0 0 16 16">
-                <path fill-rule="evenodd" d="M0 3.5A.5.5 0 0 1 .5 3H1c2.202 0 3.827 1.24 4.874 2.418.49.552.865 1.102 1.126 1.532.26-.43.636-.98 1.126-1.532C9.173 4.24 10.798 3 13 3v1c-1.798 0-3.173 1.01-4.126 2.082A9.624 9.624 0 0 0 7.556 8a9.624 9.624 0 0 0 1.317 1.918C9.828 10.99 11.204 12 13 12v1c-2.202 0-3.827-1.24-4.874-2.418A10.595 10.595 0 0 1 7 9.05c-.26.43-.636.98-1.126 1.532C4.827 11.76 3.202 13 1 13H.5a.5.5 0 0 1 0-1H1c1.798 0 3.173-1.01 4.126-2.082A9.624 9.624 0 0 0 6.444 8a9.624 9.624 0 0 0-1.317-1.918C4.172 5.01 2.796 4 1 4H.5a.5.5 0 0 1-.5-.5z"/>
-                <path d="M13 5.466V1.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384l-2.36 1.966a.25.25 0 0 1-.41-.192zm0 9v-3.932a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384l-2.36 1.966a.25.25 0 0 1-.41-.192z"/>
+            <b-button
+              :variant="isUsernameRandomized ? 'success':'danger'"
+              @click="isUsernameRandomized = !isUsernameRandomized"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                fill="currentColor"
+                class="bi bi-shuffle"
+                viewBox="0 0 16 16"
+              >
+                <path
+                  fill-rule="evenodd"
+                  d="M0 3.5A.5.5 0 0 1 .5 3H1c2.202 0 3.827 1.24 4.874 2.418.49.552.865 1.102 1.126 1.532.26-.43.636-.98 1.126-1.532C9.173 4.24 10.798 3 13 3v1c-1.798 0-3.173 1.01-4.126 2.082A9.624 9.624 0 0 0 7.556 8a9.624 9.624 0 0 0 1.317 1.918C9.828 10.99 11.204 12 13 12v1c-2.202 0-3.827-1.24-4.874-2.418A10.595 10.595 0 0 1 7 9.05c-.26.43-.636.98-1.126 1.532C4.827 11.76 3.202 13 1 13H.5a.5.5 0 0 1 0-1H1c1.798 0 3.173-1.01 4.126-2.082A9.624 9.624 0 0 0 6.444 8a9.624 9.624 0 0 0-1.317-1.918C4.172 5.01 2.796 4 1 4H.5a.5.5 0 0 1-.5-.5z"
+                />
+                <path d="M13 5.466V1.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384l-2.36 1.966a.25.25 0 0 1-.41-.192zm0 9v-3.932a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384l-2.36 1.966a.25.25 0 0 1-.41-.192z" />
               </svg>
             </b-button>
           </template>
@@ -26,7 +52,7 @@
             id="event-username-input-text"
             v-model="username"
             :disabled="isUsernameRandomized"
-          ></b-form-input>
+          />
         </b-input-group>
       </b-form-group>
 
@@ -35,16 +61,37 @@
         :label="translate('events.definitions.titleOfReward.label')"
         :label-for="'selectReward'"
       >
-        <rewards :value.sync="reward" :state="null" />
-    </b-form-group>
+        <rewards
+          :value.sync="reward"
+          :state="null"
+        />
+      </b-form-group>
 
-      <b-form-group id="event-recipient-input" :label="translate('registry.alerts.testDlg.recipient')" label-for="event-recipient-input-text" v-if="haveRecipient">
+      <b-form-group
+        v-if="haveRecipient"
+        id="event-recipient-input"
+        :label="translate('registry.alerts.testDlg.recipient')"
+        label-for="event-recipient-input-text"
+      >
         <b-input-group>
           <template #prepend>
-            <b-button :variant="isRecipientRandomized ? 'success':'danger'" @click="isRecipientRandomized = !isRecipientRandomized">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-shuffle" viewBox="0 0 16 16">
-                <path fill-rule="evenodd" d="M0 3.5A.5.5 0 0 1 .5 3H1c2.202 0 3.827 1.24 4.874 2.418.49.552.865 1.102 1.126 1.532.26-.43.636-.98 1.126-1.532C9.173 4.24 10.798 3 13 3v1c-1.798 0-3.173 1.01-4.126 2.082A9.624 9.624 0 0 0 7.556 8a9.624 9.624 0 0 0 1.317 1.918C9.828 10.99 11.204 12 13 12v1c-2.202 0-3.827-1.24-4.874-2.418A10.595 10.595 0 0 1 7 9.05c-.26.43-.636.98-1.126 1.532C4.827 11.76 3.202 13 1 13H.5a.5.5 0 0 1 0-1H1c1.798 0 3.173-1.01 4.126-2.082A9.624 9.624 0 0 0 6.444 8a9.624 9.624 0 0 0-1.317-1.918C4.172 5.01 2.796 4 1 4H.5a.5.5 0 0 1-.5-.5z"/>
-                <path d="M13 5.466V1.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384l-2.36 1.966a.25.25 0 0 1-.41-.192zm0 9v-3.932a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384l-2.36 1.966a.25.25 0 0 1-.41-.192z"/>
+            <b-button
+              :variant="isRecipientRandomized ? 'success':'danger'"
+              @click="isRecipientRandomized = !isRecipientRandomized"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                fill="currentColor"
+                class="bi bi-shuffle"
+                viewBox="0 0 16 16"
+              >
+                <path
+                  fill-rule="evenodd"
+                  d="M0 3.5A.5.5 0 0 1 .5 3H1c2.202 0 3.827 1.24 4.874 2.418.49.552.865 1.102 1.126 1.532.26-.43.636-.98 1.126-1.532C9.173 4.24 10.798 3 13 3v1c-1.798 0-3.173 1.01-4.126 2.082A9.624 9.624 0 0 0 7.556 8a9.624 9.624 0 0 0 1.317 1.918C9.828 10.99 11.204 12 13 12v1c-2.202 0-3.827-1.24-4.874-2.418A10.595 10.595 0 0 1 7 9.05c-.26.43-.636.98-1.126 1.532C4.827 11.76 3.202 13 1 13H.5a.5.5 0 0 1 0-1H1c1.798 0 3.173-1.01 4.126-2.082A9.624 9.624 0 0 0 6.444 8a9.624 9.624 0 0 0-1.317-1.918C4.172 5.01 2.796 4 1 4H.5a.5.5 0 0 1-.5-.5z"
+                />
+                <path d="M13 5.466V1.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384l-2.36 1.966a.25.25 0 0 1-.41-.192zm0 9v-3.932a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384l-2.36 1.966a.25.25 0 0 1-.41-.192z" />
               </svg>
             </b-button>
           </template>
@@ -52,72 +99,180 @@
             id="event-recipient-input-text"
             v-model="recipient"
             :disabled="isRecipientRandomized"
-          ></b-form-input>
+          />
         </b-input-group>
       </b-form-group>
 
-      <b-form-group id="event-amount-input" :label="amountLabel" label-for="event-amount-input-text" v-if="haveAmount">
+      <b-form-group
+        v-if="haveAmount"
+        id="event-amount-input"
+        :label="amountLabel"
+        label-for="event-amount-input-text"
+      >
         <b-input-group>
           <template #prepend>
-            <b-button :variant="isAmountRandomized ? 'success':'danger'" @click="isAmountRandomized = !isAmountRandomized">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-shuffle" viewBox="0 0 16 16">
-                <path fill-rule="evenodd" d="M0 3.5A.5.5 0 0 1 .5 3H1c2.202 0 3.827 1.24 4.874 2.418.49.552.865 1.102 1.126 1.532.26-.43.636-.98 1.126-1.532C9.173 4.24 10.798 3 13 3v1c-1.798 0-3.173 1.01-4.126 2.082A9.624 9.624 0 0 0 7.556 8a9.624 9.624 0 0 0 1.317 1.918C9.828 10.99 11.204 12 13 12v1c-2.202 0-3.827-1.24-4.874-2.418A10.595 10.595 0 0 1 7 9.05c-.26.43-.636.98-1.126 1.532C4.827 11.76 3.202 13 1 13H.5a.5.5 0 0 1 0-1H1c1.798 0 3.173-1.01 4.126-2.082A9.624 9.624 0 0 0 6.444 8a9.624 9.624 0 0 0-1.317-1.918C4.172 5.01 2.796 4 1 4H.5a.5.5 0 0 1-.5-.5z"/>
-                <path d="M13 5.466V1.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384l-2.36 1.966a.25.25 0 0 1-.41-.192zm0 9v-3.932a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384l-2.36 1.966a.25.25 0 0 1-.41-.192z"/>
+            <b-button
+              :variant="isAmountRandomized ? 'success':'danger'"
+              @click="isAmountRandomized = !isAmountRandomized"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                fill="currentColor"
+                class="bi bi-shuffle"
+                viewBox="0 0 16 16"
+              >
+                <path
+                  fill-rule="evenodd"
+                  d="M0 3.5A.5.5 0 0 1 .5 3H1c2.202 0 3.827 1.24 4.874 2.418.49.552.865 1.102 1.126 1.532.26-.43.636-.98 1.126-1.532C9.173 4.24 10.798 3 13 3v1c-1.798 0-3.173 1.01-4.126 2.082A9.624 9.624 0 0 0 7.556 8a9.624 9.624 0 0 0 1.317 1.918C9.828 10.99 11.204 12 13 12v1c-2.202 0-3.827-1.24-4.874-2.418A10.595 10.595 0 0 1 7 9.05c-.26.43-.636.98-1.126 1.532C4.827 11.76 3.202 13 1 13H.5a.5.5 0 0 1 0-1H1c1.798 0 3.173-1.01 4.126-2.082A9.624 9.624 0 0 0 6.444 8a9.624 9.624 0 0 0-1.317-1.918C4.172 5.01 2.796 4 1 4H.5a.5.5 0 0 1-.5-.5z"
+                />
+                <path d="M13 5.466V1.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384l-2.36 1.966a.25.25 0 0 1-.41-.192zm0 9v-3.932a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384l-2.36 1.966a.25.25 0 0 1-.41-.192z" />
               </svg>
             </b-button>
           </template>
-          <template #append v-if="event === 'tips'">
-            <select class="form-control" v-model="currency">
-              <option value="USD">USD</option>
-              <option value="AUD">AUD</option>
-              <option value="BGN">BGN</option>
-              <option value="BRL">BRL</option>
-              <option value="CAD">CAD</option>
-              <option value="CHF">CHF</option>
-              <option value="CNY">CNY</option>
-              <option value="CZK">CZK</option>
-              <option value="DKK">DKK</option>
-              <option value="EUR">EUR</option>
-              <option value="GBP">GBP</option>
-              <option value="HKD">HKD</option>
-              <option value="HRK">HRK</option>
-              <option value="HUF">HUF</option>
-              <option value="IDR">IDR</option>
-              <option value="ILS">ILS</option>
-              <option value="INR">INR</option>
-              <option value="ISK">ISK</option>
-              <option value="JPY">JPY</option>
-              <option value="KRW">KRW</option>
-              <option value="MXN">MXN</option>
-              <option value="MYR">MYR</option>
-              <option value="NOK">NOK</option>
-              <option value="NZD">NZD</option>
-              <option value="PHP">PHP</option>
-              <option value="PLN">PLN</option>
-              <option value="RON">RON</option>
-              <option value="RUB">RUB</option>
-              <option value="SEK">SEK</option>
-              <option value="SGD">SGD</option>
-              <option value="THB">THB</option>
-              <option value="TRY">TRY</option>
-              <option value="ZAR">ZAR</option>
+          <template
+            v-if="event === 'tips'"
+            #append
+          >
+            <select
+              v-model="currency"
+              class="form-control"
+            >
+              <option value="USD">
+                USD
+              </option>
+              <option value="AUD">
+                AUD
+              </option>
+              <option value="BGN">
+                BGN
+              </option>
+              <option value="BRL">
+                BRL
+              </option>
+              <option value="CAD">
+                CAD
+              </option>
+              <option value="CHF">
+                CHF
+              </option>
+              <option value="CNY">
+                CNY
+              </option>
+              <option value="CZK">
+                CZK
+              </option>
+              <option value="DKK">
+                DKK
+              </option>
+              <option value="EUR">
+                EUR
+              </option>
+              <option value="GBP">
+                GBP
+              </option>
+              <option value="HKD">
+                HKD
+              </option>
+              <option value="HRK">
+                HRK
+              </option>
+              <option value="HUF">
+                HUF
+              </option>
+              <option value="IDR">
+                IDR
+              </option>
+              <option value="ILS">
+                ILS
+              </option>
+              <option value="INR">
+                INR
+              </option>
+              <option value="ISK">
+                ISK
+              </option>
+              <option value="JPY">
+                JPY
+              </option>
+              <option value="KRW">
+                KRW
+              </option>
+              <option value="MXN">
+                MXN
+              </option>
+              <option value="MYR">
+                MYR
+              </option>
+              <option value="NOK">
+                NOK
+              </option>
+              <option value="NZD">
+                NZD
+              </option>
+              <option value="PHP">
+                PHP
+              </option>
+              <option value="PLN">
+                PLN
+              </option>
+              <option value="RON">
+                RON
+              </option>
+              <option value="RUB">
+                RUB
+              </option>
+              <option value="SEK">
+                SEK
+              </option>
+              <option value="SGD">
+                SGD
+              </option>
+              <option value="THB">
+                THB
+              </option>
+              <option value="TRY">
+                TRY
+              </option>
+              <option value="ZAR">
+                ZAR
+              </option>
             </select>
           </template>
           <b-form-input
             id="event-amount-input-text"
             v-model.number="amount"
             :disabled="isAmountRandomized"
-          ></b-form-input>
+          />
         </b-input-group>
       </b-form-group>
 
-      <b-form-group id="event-message-input" :label="translate('registry.alerts.testDlg.message')" label-for="event-message-input-text" v-if="haveMessage">
+      <b-form-group
+        v-if="haveMessage"
+        id="event-message-input"
+        :label="translate('registry.alerts.testDlg.message')"
+        label-for="event-message-input-text"
+      >
         <b-input-group>
           <template #prepend>
-            <b-button :variant="isMessageRandomized ? 'success':'danger'" @click="isMessageRandomized = !isMessageRandomized">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-shuffle" viewBox="0 0 16 16">
-                <path fill-rule="evenodd" d="M0 3.5A.5.5 0 0 1 .5 3H1c2.202 0 3.827 1.24 4.874 2.418.49.552.865 1.102 1.126 1.532.26-.43.636-.98 1.126-1.532C9.173 4.24 10.798 3 13 3v1c-1.798 0-3.173 1.01-4.126 2.082A9.624 9.624 0 0 0 7.556 8a9.624 9.624 0 0 0 1.317 1.918C9.828 10.99 11.204 12 13 12v1c-2.202 0-3.827-1.24-4.874-2.418A10.595 10.595 0 0 1 7 9.05c-.26.43-.636.98-1.126 1.532C4.827 11.76 3.202 13 1 13H.5a.5.5 0 0 1 0-1H1c1.798 0 3.173-1.01 4.126-2.082A9.624 9.624 0 0 0 6.444 8a9.624 9.624 0 0 0-1.317-1.918C4.172 5.01 2.796 4 1 4H.5a.5.5 0 0 1-.5-.5z"/>
-                <path d="M13 5.466V1.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384l-2.36 1.966a.25.25 0 0 1-.41-.192zm0 9v-3.932a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384l-2.36 1.966a.25.25 0 0 1-.41-.192z"/>
+            <b-button
+              :variant="isMessageRandomized ? 'success':'danger'"
+              @click="isMessageRandomized = !isMessageRandomized"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                fill="currentColor"
+                class="bi bi-shuffle"
+                viewBox="0 0 16 16"
+              >
+                <path
+                  fill-rule="evenodd"
+                  d="M0 3.5A.5.5 0 0 1 .5 3H1c2.202 0 3.827 1.24 4.874 2.418.49.552.865 1.102 1.126 1.532.26-.43.636-.98 1.126-1.532C9.173 4.24 10.798 3 13 3v1c-1.798 0-3.173 1.01-4.126 2.082A9.624 9.624 0 0 0 7.556 8a9.624 9.624 0 0 0 1.317 1.918C9.828 10.99 11.204 12 13 12v1c-2.202 0-3.827-1.24-4.874-2.418A10.595 10.595 0 0 1 7 9.05c-.26.43-.636.98-1.126 1.532C4.827 11.76 3.202 13 1 13H.5a.5.5 0 0 1 0-1H1c1.798 0 3.173-1.01 4.126-2.082A9.624 9.624 0 0 0 6.444 8a9.624 9.624 0 0 0-1.317-1.918C4.172 5.01 2.796 4 1 4H.5a.5.5 0 0 1-.5-.5z"
+                />
+                <path d="M13 5.466V1.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384l-2.36 1.966a.25.25 0 0 1-.41-.192zm0 9v-3.932a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384l-2.36 1.966a.25.25 0 0 1-.41-.192z" />
               </svg>
             </b-button>
           </template>
@@ -127,17 +282,35 @@
             :disabled="isMessageRandomized"
             rows="3"
             max-rows="6"
-          ></b-form-textarea>
+          />
         </b-input-group>
       </b-form-group>
 
-      <b-form-group id="event-tier-input" :label="translate('registry.alerts.testDlg.tier')" label-for="event-tier-input-text" v-if="haveTier">
+      <b-form-group
+        v-if="haveTier"
+        id="event-tier-input"
+        :label="translate('registry.alerts.testDlg.tier')"
+        label-for="event-tier-input-text"
+      >
         <b-input-group>
           <template #prepend>
-            <b-button :variant="isTierRandomized ? 'success':'danger'" @click="isTierRandomized = !isTierRandomized">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-shuffle" viewBox="0 0 16 16">
-                <path fill-rule="evenodd" d="M0 3.5A.5.5 0 0 1 .5 3H1c2.202 0 3.827 1.24 4.874 2.418.49.552.865 1.102 1.126 1.532.26-.43.636-.98 1.126-1.532C9.173 4.24 10.798 3 13 3v1c-1.798 0-3.173 1.01-4.126 2.082A9.624 9.624 0 0 0 7.556 8a9.624 9.624 0 0 0 1.317 1.918C9.828 10.99 11.204 12 13 12v1c-2.202 0-3.827-1.24-4.874-2.418A10.595 10.595 0 0 1 7 9.05c-.26.43-.636.98-1.126 1.532C4.827 11.76 3.202 13 1 13H.5a.5.5 0 0 1 0-1H1c1.798 0 3.173-1.01 4.126-2.082A9.624 9.624 0 0 0 6.444 8a9.624 9.624 0 0 0-1.317-1.918C4.172 5.01 2.796 4 1 4H.5a.5.5 0 0 1-.5-.5z"/>
-                <path d="M13 5.466V1.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384l-2.36 1.966a.25.25 0 0 1-.41-.192zm0 9v-3.932a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384l-2.36 1.966a.25.25 0 0 1-.41-.192z"/>
+            <b-button
+              :variant="isTierRandomized ? 'success':'danger'"
+              @click="isTierRandomized = !isTierRandomized"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                fill="currentColor"
+                class="bi bi-shuffle"
+                viewBox="0 0 16 16"
+              >
+                <path
+                  fill-rule="evenodd"
+                  d="M0 3.5A.5.5 0 0 1 .5 3H1c2.202 0 3.827 1.24 4.874 2.418.49.552.865 1.102 1.126 1.532.26-.43.636-.98 1.126-1.532C9.173 4.24 10.798 3 13 3v1c-1.798 0-3.173 1.01-4.126 2.082A9.624 9.624 0 0 0 7.556 8a9.624 9.624 0 0 0 1.317 1.918C9.828 10.99 11.204 12 13 12v1c-2.202 0-3.827-1.24-4.874-2.418A10.595 10.595 0 0 1 7 9.05c-.26.43-.636.98-1.126 1.532C4.827 11.76 3.202 13 1 13H.5a.5.5 0 0 1 0-1H1c1.798 0 3.173-1.01 4.126-2.082A9.624 9.624 0 0 0 6.444 8a9.624 9.624 0 0 0-1.317-1.918C4.172 5.01 2.796 4 1 4H.5a.5.5 0 0 1-.5-.5z"
+                />
+                <path d="M13 5.466V1.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384l-2.36 1.966a.25.25 0 0 1-.41-.192zm0 9v-3.932a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384l-2.36 1.966a.25.25 0 0 1-.41-.192z" />
               </svg>
             </b-button>
           </template>
@@ -146,28 +319,48 @@
             v-model="tier"
             :disabled="isTierRandomized"
           >
-            <b-form-select-option v-for="t of tiers" :value="t" :key="t">{{t}}</b-form-select-option>
+            <b-form-select-option
+              v-for="t of tiers"
+              :key="t"
+              :value="t"
+            >
+              {{ t }}
+            </b-form-select-option>
           </b-form-select>
         </b-input-group>
       </b-form-group>
 
-      <div class="d-flex align-items-center px-3 pt-3 border-top" style="justify-content: flex-end">
-        <b-button class="mx-2" @click="$bvModal.hide('alert-test-modal')" variant="link">{{ translate('dialog.buttons.close') }}</b-button>
-        <b-button @click="onSubmit" variant="primary">Test</b-button>
+      <div
+        class="d-flex align-items-center px-3 pt-3 border-top"
+        style="justify-content: flex-end"
+      >
+        <b-button
+          class="mx-2"
+          variant="link"
+          @click="$bvModal.hide('alert-test-modal')"
+        >
+          {{ translate('dialog.buttons.close') }}
+        </b-button>
+        <b-button
+          variant="primary"
+          @click="onSubmit"
+        >
+          Test
+        </b-button>
       </div>
     </b-form>
   </div>
 </template>
 <script lang="ts">
+import { getSocket } from '@sogebot/ui-helpers/socket';
+import translate from '@sogebot/ui-helpers/translate';
 import {
-  computed, defineComponent, ref, 
+  computed, defineComponent, ref,
 } from '@vue/composition-api';
 
 import { EmitData } from 'src/bot/database/entity/alert';
 import { shuffle } from 'src/bot/helpers/array/shuffle';
 import { generateUsername } from 'src/bot/helpers/generateUsername';
-import { getSocket } from 'src/panel/helpers/socket';
-import translate from 'src/panel/helpers/translate';
 
 const socket = getSocket('/registries/alerts');
 

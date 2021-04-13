@@ -44,14 +44,14 @@
 <script lang="ts">
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faClone, faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
+import { getSocket } from '@sogebot/ui-helpers/socket';
+import translate from '@sogebot/ui-helpers/translate';
 import { orderBy } from 'lodash-es';
 import { v4 as uuid } from 'uuid';
 import { Component, Vue } from 'vue-property-decorator';
 
 import type { PermissionsInterface } from 'src/bot/database/entity/permissions';
 import type { RandomizerInterface } from 'src/bot/database/entity/randomizer';
-import { getSocket } from 'src/panel/helpers/socket';
-import translate from 'src/panel/helpers/translate';
 
 library.add(faExclamationTriangle, faClone);
 
@@ -163,7 +163,7 @@ export default class randomizerList extends Vue {
   startSpin() {
     this.spin = true;
     this.socket.emit('randomizer::startSpin', () => {
-      return; 
+      return;
     });
     setTimeout(() => {
       this.spin = false;

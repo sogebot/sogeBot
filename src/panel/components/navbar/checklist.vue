@@ -3,22 +3,44 @@
     <div
       class="btn btn-sm"
       style="overflow: hidden;max-height: 30px;"
+      :class="[completed === items.length ? btnClass + 'success' : btnClass + 'danger']"
       @click="toggleDisplay()"
-      v-bind:class="[completed === items.length ? btnClass + 'success' : btnClass + 'danger']">
-      {{completed}}/{{items.length}}
-      <span><fa icon="tasks"/></span>
+    >
+      {{ completed }}/{{ items.length }}
+      <span><fa icon="tasks" /></span>
     </div>
-    <div v-bind:class="[bDisplay ? 'd-block' : 'd-none']" style="position: absolute; width:200px; right: 1rem; z-index:9999999">
+    <div
+      :class="[bDisplay ? 'd-block' : 'd-none']"
+      style="position: absolute; width:200px; right: 1rem; z-index:9999999"
+    >
       <div class="list-group">
-        <button :key="index" v-for="(item, index) of items" type="button" style="padding: 0.25rem 1.25rem" class="list-group-item list-group-item-action" @click="toggle(item)">
-          <span class="pr-1" :class="[isItemCompleted(item)? 'text-success' : 'text-danger']">
-            <fa v-if="isItemCompleted(item)" :icon="['far', 'check-square']"></fa>
-            <fa v-else :icon="['far', 'square']"></fa>
+        <button
+          v-for="(item, index) of items"
+          :key="index"
+          type="button"
+          style="padding: 0.25rem 1.25rem"
+          class="list-group-item list-group-item-action"
+          @click="toggle(item)"
+        >
+          <span
+            class="pr-1"
+            :class="[isItemCompleted(item)? 'text-success' : 'text-danger']"
+          >
+            <fa
+              v-if="isItemCompleted(item)"
+              :icon="['far', 'check-square']"
+            />
+            <fa
+              v-else
+              :icon="['far', 'square']"
+            />
           </span>
           {{ item }}
         </button>
       </div>
-      <div class="list-group list-group-item-info text-info p-2">Add new items in <a href="#/settings/systems/checklist">checklist settings</a></div>
+      <div class="list-group list-group-item-info text-info p-2">
+        Add new items in <a href="#/settings/systems/checklist">checklist settings</a>
+      </div>
     </div>
   </div>
 </template>
@@ -26,6 +48,7 @@
 <script lang="ts">
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faCheckSquare, faSquare } from '@fortawesome/free-regular-svg-icons';
+import { getSocket } from '@sogebot/ui-helpers/socket';
 import {
   computed, defineComponent, onMounted, ref,
 } from '@vue/composition-api';
@@ -33,7 +56,6 @@ import type { Ref } from '@vue/composition-api';
 
 import type { ChecklistInterface } from 'src/bot/database/entity/checklist';
 import { getListOf } from 'src/panel/helpers/getListOf';
-import { getSocket } from 'src/panel/helpers/socket';
 
 library.add(faCheckSquare, faSquare);
 const socket = getSocket('/systems/checklist');

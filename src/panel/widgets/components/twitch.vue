@@ -38,9 +38,10 @@
 </template>
 
 <script>
+import { getSocket } from '@sogebot/ui-helpers/socket';
+import translate from '@sogebot/ui-helpers/translate';
+
 import { EventBus } from 'src/panel/helpers/event-bus';
-import { getSocket } from 'src/panel/helpers/socket';
-import translate from 'src/panel/helpers/translate';
 
 export default {
   props: ['popout', 'nodrag'],
@@ -54,14 +55,6 @@ export default {
       isRefreshing: false,
     };
   },
-  created: function () {
-    this.socket.emit('broadcaster', (err, room) => {
-      if (err) {
-        return console.error(err);
-      }
-      this.room = room;
-    });
-  },
   computed: {
     isHttps() {
       const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
@@ -73,14 +66,22 @@ export default {
       return `${window.location.protocol}//player.twitch.tv/?channel=${this.room}&autoplay=true&muted=true&parent=${window.location.hostname}`;
     },
   },
+  created: function () {
+    this.socket.emit('broadcaster', (err, room) => {
+      if (err) {
+        return console.error(err);
+      }
+      this.room = room;
+    });
+  },
+  mounted: function () {
+    this.$emit('mounted');
+  },
   methods: {
     refresh: function (event) {
       this.show = false;
       this.$nextTick(() => this.show = true);
     },
-  },
-  mounted: function () {
-    this.$emit('mounted');
   },
 };
 </script>

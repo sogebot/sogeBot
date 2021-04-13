@@ -5,26 +5,53 @@
         <template v-if="typeof translatedTitle === 'string'">{{ translatedTitle }}</template>
         <template v-else-if="typeof translatedTitle === 'object'">
           {{ translatedTitle.title }}
-          <small style="cursor: help;" class="text-info ml-1" data-toggle="tooltip" data-html="true" :title="translatedTitle.help">[?]</small>
+          <small
+            style="cursor: help;"
+            class="text-info ml-1"
+            data-toggle="tooltip"
+            data-html="true"
+            :title="translatedTitle.help"
+          >[?]</small>
         </template>
       </span>
     </div>
-    <input v-model="currentValue" class="form-control" :type="!show ? 'password' : 'text'" :readonly="true" />
+    <input
+      v-model="currentValue"
+      class="form-control"
+      :type="!show ? 'password' : 'text'"
+      :readonly="true"
+    >
     <div class="input-group-append">
-      <b-button variant="secondary" @mousedown="show = true" @mouseup="show=false">Show</b-button>
-      <b-button variant="primary" :disabled="copied" @click="copy">{{ copied ? 'Copied!': 'Copy to clipboard' }}</b-button>
-      <b-button variant="danger" @click="generate">Regenerate</b-button>
+      <b-button
+        variant="secondary"
+        @mousedown="show = true"
+        @mouseup="show=false"
+      >
+        Show
+      </b-button>
+      <b-button
+        variant="primary"
+        :disabled="copied"
+        @click="copy"
+      >
+        {{ copied ? 'Copied!': 'Copy to clipboard' }}
+      </b-button>
+      <b-button
+        variant="danger"
+        @click="generate"
+      >
+        Regenerate
+      </b-button>
     </div>
   </div>
 </template>
 
 <script lang="ts">
+import translate from '@sogebot/ui-helpers/translate';
 import {
-  defineComponent, ref, watch, 
+  defineComponent, ref, watch,
 } from '@vue/composition-api';
 import { v4 as uuid } from 'uuid';
-
-import translate from 'src/panel/helpers/translate';
 
 export default defineComponent({
   props: {

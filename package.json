@@ -11,6 +11,8 @@
   "author": "Michal Orlik <sogehige@gmail.com>",
   "license": "MIT",
   "dependencies": {
+    "@sogebot/ui-helpers": "^1.0.1",
+    "@sogebot/ui-login": "^1.0.0",
     "axios": "0.21.1",
     "basic-auth": "2.0.1",
     "better-sqlite3": "7.1.4",
@@ -64,7 +66,6 @@
     "socket.io-client": "4.0.1",
     "socket.io-client-legacy": "npm:socket.io-client@2.3.0",
     "socket.io-legacy": "npm:socket.io@2.3.0",
-    "@sogebot/ui-login": "^1.0.0",
     "source-map-support": "0.5.19",
     "spotify-web-api-node": "5.0.2",
     "stream-browserify": "3.0.0",

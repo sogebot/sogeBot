@@ -1,39 +1,38 @@
 <template>
-<span id="stats">
-  <span class="item viewers">
-    <font-awesome-icon icon="eye" />
-    <span>{{ stats.uptime === '00:00:00' ? '0' : stats.viewers }}</span>
-    <span class="text"></span>
-  </span>
+  <span id="stats">
+    <span class="item viewers">
+      <font-awesome-icon icon="eye" />
+      <span>{{ stats.uptime === '00:00:00' ? '0' : stats.viewers }}</span>
+      <span class="text" />
+    </span>
 
-  <span class="item uptime">
-    <font-awesome-icon icon="clock" />
-    <span>{{ stats.uptime }}</span>
-    <span class="text"></span>
-  </span>
+    <span class="item uptime">
+      <font-awesome-icon icon="clock" />
+      <span>{{ stats.uptime }}</span>
+      <span class="text" />
+    </span>
 
-  <span class="item followers">
-    <font-awesome-icon icon="users" />
-    <span>{{ stats.uptime === '00:00:00' ? '0' : stats.followers }}</span>
-    <span class="text"></span>
-  </span>
+    <span class="item followers">
+      <font-awesome-icon icon="users" />
+      <span>{{ stats.uptime === '00:00:00' ? '0' : stats.followers }}</span>
+      <span class="text" />
+    </span>
 
-  <span class="item subscribers">
-    <font-awesome-icon icon="star" />
-    <span>{{ stats.uptime === '00:00:00' ? '0' : stats.subscribers }}</span>
-    <span class="text"></span>
-  </span>
+    <span class="item subscribers">
+      <font-awesome-icon icon="star" />
+      <span>{{ stats.uptime === '00:00:00' ? '0' : stats.subscribers }}</span>
+      <span class="text" />
+    </span>
 
-  <span class="item bits">
-    <font-awesome-icon icon="gem" />
-    <span>{{ stats.uptime === '00:00:00' ? '0' : stats.bits }}</span>
-    <span class="text"></span>
+    <span class="item bits">
+      <font-awesome-icon icon="gem" />
+      <span>{{ stats.uptime === '00:00:00' ? '0' : stats.bits }}</span>
+      <span class="text" />
+    </span>
   </span>
-</span>
 </template>
 
 <script lang="ts">
-
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faClock } from '@fortawesome/free-solid-svg-icons/faClock';
 import { faEye } from '@fortawesome/free-solid-svg-icons/faEye';
@@ -41,11 +40,10 @@ import { faGem } from '@fortawesome/free-solid-svg-icons/faGem';
 import { faStar } from '@fortawesome/free-solid-svg-icons/faStar';
 import { faUsers } from '@fortawesome/free-solid-svg-icons/faUsers';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { getSocket } from '@sogebot/ui-helpers/socket';
 import { Component, Vue } from 'vue-property-decorator';
 
 library.add(faStar, faGem, faUsers, faClock, faEye);
-
-import { getSocket } from 'src/panel/helpers/socket';
 
 @Component({ components: { 'font-awesome-icon': FontAwesomeIcon } })
 export default class StatsOverlay extends Vue {

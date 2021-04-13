@@ -431,6 +431,8 @@ import { library } from '@fortawesome/fontawesome-svg-core';
 import {
   faExclamationTriangle, faEye, faEyeSlash, faKey, faPlay, faStop,
 } from '@fortawesome/free-solid-svg-icons';
+import { getSocket } from '@sogebot/ui-helpers/socket';
+import translate from '@sogebot/ui-helpers/translate';
 import {
   computed, defineComponent, getCurrentInstance, onMounted, ref, watch,
 } from '@vue/composition-api';
@@ -445,10 +447,8 @@ import type { CommandsInterface } from 'src/bot/database/entity/commands';
 import type { PermissionsInterface } from 'src/bot/database/entity/permissions';
 import { ButtonStates } from 'src/panel/helpers/buttonStates';
 import { error } from 'src/panel/helpers/error';
-import translate from 'src/panel/helpers/translate';
 
 import { getPermissionName } from '../../helpers/getPermissionName';
-import { getSocket } from '../../helpers/socket';
 
 library.add(faEye, faEyeSlash, faExclamationTriangle, faPlay, faKey, faStop);
 

@@ -247,6 +247,8 @@
 </template>
 
 <script lang="ts">
+import { getSocket } from '@sogebot/ui-helpers/socket';
+import translate from '@sogebot/ui-helpers/translate';
 import {
   computed, defineComponent, getCurrentInstance, onMounted, onUnmounted, ref, watch,
 } from '@vue/composition-api';
@@ -262,8 +264,6 @@ import { ButtonStates } from 'src/panel/helpers/buttonStates';
 import { capitalize } from 'src/panel/helpers/capitalize';
 import { error } from 'src/panel/helpers/error';
 import { EventBus } from 'src/panel/helpers/event-bus';
-import { getSocket } from 'src/panel/helpers/socket';
-import translate from 'src/panel/helpers/translate';
 
 const socket = getSocket('/core/events');
 

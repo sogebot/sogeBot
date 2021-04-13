@@ -5,10 +5,10 @@
       :key="e.id"
       :name="e.animation.type"
       :duration="e.animation.time"
-      @leave="doAnimation"
       :css="false"
-      v-on:before-leave="setTransition"
-      >
+      @leave="doAnimation"
+      @before-leave="setTransition"
+    >
       <img
         v-if="!e.animation.finished"
         v-show="e.show && !e.animation.running"
@@ -22,13 +22,12 @@
 </template>
 
 <script lang="ts">
+import { getSocket } from '@sogebot/ui-helpers/socket';
 import gsap from 'gsap';
 import {
-  every, random, sample, 
+  every, random, sample,
 } from 'lodash-es';
 import { Component, Vue } from 'vue-property-decorator';
-
-import { getSocket } from 'src/panel/helpers/socket';
 
 @Component({})
 export default class EmotesOverlay extends Vue {
@@ -111,7 +110,7 @@ export default class EmotesOverlay extends Vue {
         // show and after next tick hide -> trigger animation
         this.emotes[i].show = true;
         this.$nextTick(function () {
-          this.emotes[i].animation.running = true; 
+          this.emotes[i].animation.running = true;
         });
       }
     }

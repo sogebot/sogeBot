@@ -1,20 +1,27 @@
 <template>
-  <div class="container-fluid" ref="window">
+  <div
+    ref="window"
+    class="container-fluid"
+  >
     <div class="row">
       <div class="col-12">
         <span class="title text-default mb-2">
           {{ translate('menu.stats') }}
-          <small><fa icon="angle-right"/></small>
+          <small><fa icon="angle-right" /></small>
           {{ translate('menu.profiler') }}
         </span>
       </div>
     </div>
 
-    <panel/>
+    <panel />
 
-    <line-chart :data="generateChartData()"></line-chart>
+    <line-chart :data="generateChartData()" />
 
-    <b-table-simple small striped class="mt-3">
+    <b-table-simple
+      small
+      striped
+      class="mt-3"
+    >
       <b-thead head-variant="dark">
         <b-tr>
           <b-th>Function</b-th>
@@ -22,22 +29,28 @@
           <b-th>Min time</b-th>
           <b-th>Max time</b-th>
           <b-th>Average time</b-th>
-          <b-th></b-th>
+          <b-th />
         </b-tr>
       </b-thead>
       <b-tbody>
-        <b-tr v-for="key of Object.keys(profiler)" :key="key">
-          <b-th scope="row">{{ key }}</b-th>
-          <b-td><small class="text-muted">{{profiler[key].length}}</small></b-td>
+        <b-tr
+          v-for="key of Object.keys(profiler)"
+          :key="key"
+        >
+          <b-th scope="row">
+            {{ key }}
+          </b-th>
+          <b-td><small class="text-muted">{{ profiler[key].length }}</small></b-td>
           <b-td>{{ min(profiler[key]) }} <small class="text-muted">ms</small></b-td>
           <b-td>{{ max(profiler[key]) }} <small class="text-muted">ms</small></b-td>
           <b-td>{{ avg(profiler[key]) }} <small class="text-muted">ms</small></b-td>
           <b-td>
             <button
               class="btn border-0"
+              :class="[showChartFunctions.includes(key) ? 'btn-success' : 'btn-outline-dark']"
               @click="toggleFunctionChart(key)"
-              :class="[showChartFunctions.includes(key) ? 'btn-success' : 'btn-outline-dark']">
-              <font-awesome-icon icon="chart-line"></font-awesome-icon>
+            >
+              <font-awesome-icon icon="chart-line" />
             </button>
           </b-td>
         </b-tr>
@@ -50,19 +63,17 @@
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faChartLine } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { getSocket } from '@sogebot/ui-helpers/socket';
+import translate from '@sogebot/ui-helpers/translate';
 import {
-  defineComponent, onMounted, ref, watch, 
+  defineComponent, onMounted, ref, watch,
 } from '@vue/composition-api';
 import Chart from 'chart.js';
 import Vue from 'vue';
 import Chartkick from 'vue-chartkick';
 
-import translate from 'src/panel/helpers/translate';
-
 library.add(faChartLine);
 Vue.use(Chartkick.use(Chart));
-
-import { getSocket } from '../../helpers/socket';
 
 const socket = getSocket('/stats/profiler');
 

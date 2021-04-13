@@ -29,7 +29,7 @@
           :value="true"
           :unchecked-value="false"
         >
-          {{translate('timers.dialog.tickOffline')}}
+          {{ translate('timers.dialog.tickOffline') }}
         </b-form-checkbox>
       </b-form-group>
 
@@ -148,6 +148,8 @@
 </template>
 
 <script lang="ts">
+import { getSocket } from '@sogebot/ui-helpers/socket';
+import translate from '@sogebot/ui-helpers/translate';
 import {
   defineComponent, getCurrentInstance, onMounted, onUnmounted, ref, watch,
 } from '@vue/composition-api';
@@ -160,8 +162,6 @@ import { TimerInterface, TimerResponseInterface } from 'src/bot/database/entity/
 import { ButtonStates } from 'src/panel/helpers/buttonStates';
 import { error } from 'src/panel/helpers/error';
 import { EventBus } from 'src/panel/helpers/event-bus';
-import { getSocket } from 'src/panel/helpers/socket';
-import translate from 'src/panel/helpers/translate';
 
 type Props = {
   id: string;

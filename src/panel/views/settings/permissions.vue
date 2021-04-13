@@ -1,37 +1,62 @@
 <template>
-  <div class="container-fluid" ref="window">
+  <div
+    ref="window"
+    class="container-fluid"
+  >
     <div class="row">
       <div class="col-12">
         <span class="title text-default mb-2">
           {{ translate('menu.settings') }}
-          <small><fa icon="angle-right"/></small>
+          <small><fa icon="angle-right" /></small>
           {{ translate('menu.permissions') }}
         </span>
       </div>
     </div>
 
     <panel>
-      <template v-slot:left>
-        <button-with-icon @click="addNewPermissionGroup" class="btn-primary btn-reverse" icon="plus">{{translate('core.permissions.addNewPermissionGroup')}}</button-with-icon>
+      <template #left>
+        <button-with-icon
+          class="btn-primary btn-reverse"
+          icon="plus"
+          @click="addNewPermissionGroup"
+        >
+          {{ translate('core.permissions.addNewPermissionGroup') }}
+        </button-with-icon>
       </template>
 
-      <template v-slot:right>
-        <b-alert show variant="info" v-if="pending" v-html="translate('dialog.changesPending')" class="mr-2 p-2 mb-0"></b-alert>
-        <state-button @click="save()" text="saveChanges" :state="state.save"/>
+      <template #right>
+        <b-alert
+          v-if="pending"
+          show
+          variant="info"
+          class="mr-2 p-2 mb-0"
+          v-html="translate('dialog.changesPending')"
+        />
+        <state-button
+          text="saveChanges"
+          :state="state.save"
+          @click="save()"
+        />
       </template>
     </panel>
 
-    <loading v-if="state.loading !== $state.success"/>
-    <div class="row" v-else>
+    <loading v-if="state.loading !== $state.success" />
+    <div
+      v-else
+      class="row"
+    >
       <div class="col-3">
-        <list :permissions.sync="permissions"/>
+        <list :permissions.sync="permissions" />
         <em class="alert-danger p-3 mt-1 d-block">
-          <font-awesome-icon icon="exclamation-triangle" size="lg"></font-awesome-icon>
-          {{translate('core.permissions.higherPermissionHaveAccessToLowerPermissions')}}
+          <font-awesome-icon
+            icon="exclamation-triangle"
+            size="lg"
+          />
+          {{ translate('core.permissions.higherPermissionHaveAccessToLowerPermissions') }}
         </em>
       </div>
       <div class="col-9">
-        <edit :permissions.sync="permissions"/>
+        <edit :permissions.sync="permissions" />
       </div>
     </div>
   </div>
@@ -41,6 +66,8 @@
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
+import { getSocket } from '@sogebot/ui-helpers/socket';
+import translate from '@sogebot/ui-helpers/translate';
 import { NextFunction } from 'express';
 import { sortBy } from 'lodash-es';
 import { v4 as uuid } from 'uuid';
@@ -49,9 +76,6 @@ import { Route } from 'vue-router';
 
 import { PermissionsInterface } from 'src/bot/database/entity/permissions';
 import { defaultPermissions } from 'src/bot/helpers/permissions/defaultPermissions';
-import translate from 'src/panel/helpers/translate';
-
-import { getSocket } from '../../helpers/socket';
 
 library.add(faExclamationTriangle);
 
@@ -61,30 +85,6 @@ export default Vue.extend({
     loading: () => import('../../components/loading.vue'),
     list:    () => import('./components/permissions/list.vue'),
     edit:    () => import('./components/permissions/edit.vue'),
-  },
-  data: function () {
-    const object: {
-      translate: typeof translate;
-      socket: any,
-      pending: boolean,
-      state: {
-        loading: number,
-        reorder: number,
-        save: number,
-      },
-      permissions: PermissionsInterface[],
-    } = {
-      translate: translate,
-      socket:    getSocket('/core/permissions'),
-      pending:   false,
-      state:     {
-        loading: this.$state.progress,
-        reorder: this.$state.idle,
-        save:    this.$state.idle,
-      },
-      permissions: [],
-    };
-    return object;
   },
   beforeRouteUpdate(to: Route, from: Route, next: NextFunction) {
     if (to.name === 'PermissionsSettings') {
@@ -120,16 +120,29 @@ export default Vue.extend({
       }
     }
   },
-  mounted() {
-    this.socket.emit('permissions', (err: string | null, data: PermissionsInterface[]) => {
-      if (err) {
-        return console.error(err);
-      }
-      this.permissions = data;
-      this.$nextTick(() => {
-        this.state.loading = this.$state.success;
-      });
-    });
+  data: function () {
+    const object: {
+      translate: typeof translate;
+      socket: any,
+      pending: boolean,
+      state: {
+        loading: number,
+        reorder: number,
+        save: number,
+      },
+      permissions: PermissionsInterface[],
+    } = {
+      translate: translate,
+      socket:    getSocket('/core/permissions'),
+      pending:   false,
+      state:     {
+        loading: this.$state.progress,
+        reorder: this.$state.idle,
+        save:    this.$state.idle,
+      },
+      permissions: [],
+    };
+    return object;
   },
   watch: {
     permissions: {
@@ -140,6 +153,17 @@ export default Vue.extend({
         }
       },
     },
+  },
+  mounted() {
+    this.socket.emit('permissions', (err: string | null, data: PermissionsInterface[]) => {
+      if (err) {
+        return console.error(err);
+      }
+      this.permissions = data;
+      this.$nextTick(() => {
+        this.state.loading = this.$state.success;
+      });
+    });
   },
   methods: {
     async save() {

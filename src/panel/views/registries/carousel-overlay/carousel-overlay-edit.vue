@@ -4,34 +4,65 @@
       <b-col>
         <span class="title text-default mb-2">
           {{ translate('menu.registry') }}
-          <small><fa icon="angle-right"/></small>
+          <small><fa icon="angle-right" /></small>
           {{ translate('menu.carouseloverlay') }}
-          <small class="text-muted text-monospace" style="font-size:0.7rem">{{$route.params.id}}</small>
+          <small
+            class="text-muted text-monospace"
+            style="font-size:0.7rem"
+          >{{ $route.params.id }}</small>
         </span>
       </b-col>
     </b-row>
 
     <panel>
-      <template v-slot:left>
-        <button-with-icon class="btn-secondary btn-shrink btn-reverse" icon="caret-left" href="#/registry/carousel/list">{{translate('commons.back')}}</button-with-icon>
-        <hold-button @trigger="del()" icon="trash" class="btn-shrink btn-danger">
-          <template slot="title">{{translate('dialog.buttons.delete')}}</template>
-          <template slot="onHoldTitle">{{translate('dialog.buttons.hold-to-delete')}}</template>
+      <template #left>
+        <button-with-icon
+          class="btn-secondary btn-shrink btn-reverse"
+          icon="caret-left"
+          href="#/registry/carousel/list"
+        >
+          {{ translate('commons.back') }}
+        </button-with-icon>
+        <hold-button
+          icon="trash"
+          class="btn-shrink btn-danger"
+          @trigger="del()"
+        >
+          <template slot="title">
+            {{ translate('dialog.buttons.delete') }}
+          </template>
+          <template slot="onHoldTitle">
+            {{ translate('dialog.buttons.hold-to-delete') }}
+          </template>
         </hold-button>
-        <button-with-icon class="btn-shrink btn-reverse"
-                          :class="[ item.showOnlyOncePerStream ? 'btn-success' : 'btn-danger' ]"
-                          :icon="item.showOnlyOncePerStream ? 'check' : 'times'"
-                          @click="item.showOnlyOncePerStream = !item.showOnlyOncePerStream">
-          {{translate('page.settings.overlays.carousel.titles.showOnlyOncePerStream')}}
+        <button-with-icon
+          class="btn-shrink btn-reverse"
+          :class="[ item.showOnlyOncePerStream ? 'btn-success' : 'btn-danger' ]"
+          :icon="item.showOnlyOncePerStream ? 'check' : 'times'"
+          @click="item.showOnlyOncePerStream = !item.showOnlyOncePerStream"
+        >
+          {{ translate('page.settings.overlays.carousel.titles.showOnlyOncePerStream') }}
         </button-with-icon>
       </template>
-      <template v-slot:right>
-        <b-alert show variant="info" v-if="state.pending" v-html="translate('dialog.changesPending')" class="mr-2 p-2 mb-0"></b-alert>
-        <state-button @click="save()" text="saveChanges" class="btn-shrink" :state="state.save" :invalid="!!$v.$invalid && !!$v.$dirty"/>
+      <template #right>
+        <b-alert
+          v-if="state.pending"
+          show
+          variant="info"
+          class="mr-2 p-2 mb-0"
+          v-html="translate('dialog.changesPending')"
+        />
+        <state-button
+          text="saveChanges"
+          class="btn-shrink"
+          :state="state.save"
+          :invalid="!!$v.$invalid && !!$v.$dirty"
+          @click="save()"
+        />
       </template>
     </panel>
 
-    <loading v-if="state.loading === 1"/>
+    <loading v-if="state.loading === 1" />
     <b-form v-else>
       <b-form-group
         :label="translate('page.settings.overlays.carousel.titles.waitBefore')"
@@ -43,11 +74,13 @@
             v-model.number="item.waitBefore"
             type="number"
             min="0"
-            @input="$v.item.$touch()"
             :state="$v.item.waitBefore.$invalid && $v.item.waitBefore.$dirty ? false : null"
-          ></b-form-input>
+            @input="$v.item.$touch()"
+          />
         </b-input-group>
-        <b-form-invalid-feedback :state="!($v.item.waitBefore.$invalid && $v.item.waitBefore.$dirty)">{{ translate('dialog.errors.minValue').replace('$value', 0) }}</b-form-invalid-feedback>
+        <b-form-invalid-feedback :state="!($v.item.waitBefore.$invalid && $v.item.waitBefore.$dirty)">
+          {{ translate('dialog.errors.minValue').replace('$value', 0) }}
+        </b-form-invalid-feedback>
       </b-form-group>
       <b-form-group
         :label="translate('page.settings.overlays.carousel.titles.waitAfter')"
@@ -59,11 +92,13 @@
             v-model.number="item.waitAfter"
             type="number"
             min="0"
-            @input="$v.item.$touch()"
             :state="$v.item.waitAfter.$invalid && $v.item.waitAfter.$dirty ? false : null"
-          ></b-form-input>
+            @input="$v.item.$touch()"
+          />
         </b-input-group>
-        <b-form-invalid-feedback :state="!($v.item.waitAfter.$invalid && $v.item.waitAfter.$dirty)">{{ translate('dialog.errors.minValue').replace('$value', 0) }}</b-form-invalid-feedback>
+        <b-form-invalid-feedback :state="!($v.item.waitAfter.$invalid && $v.item.waitAfter.$dirty)">
+          {{ translate('dialog.errors.minValue').replace('$value', 0) }}
+        </b-form-invalid-feedback>
       </b-form-group>
 
       <b-row>
@@ -72,7 +107,11 @@
             :label="translate('page.settings.overlays.carousel.titles.animationIn')"
             label-for="animationIn"
           >
-            <b-form-select v-model="item.animationIn" :options="animationInOptions" plain></b-form-select>
+            <b-form-select
+              v-model="item.animationIn"
+              :options="animationInOptions"
+              plain
+            />
           </b-form-group>
         </b-col>
         <b-col>
@@ -86,11 +125,13 @@
                 v-model.number="item.animationInDuration"
                 type="number"
                 min="100"
-                @input="$v.item.$touch()"
                 :state="$v.item.animationInDuration.$invalid && $v.item.animationInDuration.$dirty ? false : null"
-              ></b-form-input>
+                @input="$v.item.$touch()"
+              />
             </b-input-group>
-            <b-form-invalid-feedback :state="!($v.item.animationInDuration.$invalid && $v.item.animationInDuration.$dirty)">{{ translate('dialog.errors.minValue').replace('$value', 100) }}</b-form-invalid-feedback>
+            <b-form-invalid-feedback :state="!($v.item.animationInDuration.$invalid && $v.item.animationInDuration.$dirty)">
+              {{ translate('dialog.errors.minValue').replace('$value', 100) }}
+            </b-form-invalid-feedback>
           </b-form-group>
         </b-col>
       </b-row>
@@ -101,7 +142,11 @@
             :label="translate('page.settings.overlays.carousel.titles.animationOut')"
             label-for="animationOut"
           >
-            <b-form-select v-model="item.animationOut" :options="animationOutOptions" plain></b-form-select>
+            <b-form-select
+              v-model="item.animationOut"
+              :options="animationOutOptions"
+              plain
+            />
           </b-form-group>
         </b-col>
         <b-col>
@@ -115,32 +160,38 @@
                 v-model.number="item.animationOutDuration"
                 type="number"
                 min="100"
-                @input="$v.item.$touch()"
                 :state="$v.item.animationOutDuration.$invalid && $v.item.animationOutDuration.$dirty ? false : null"
-              ></b-form-input>
+                @input="$v.item.$touch()"
+              />
             </b-input-group>
-            <b-form-invalid-feedback :state="!($v.item.animationOutDuration.$invalid && $v.item.animationOutDuration.$dirty)">{{ translate('dialog.errors.minValue').replace('$value', 100) }}</b-form-invalid-feedback>
+            <b-form-invalid-feedback :state="!($v.item.animationOutDuration.$invalid && $v.item.animationOutDuration.$dirty)">
+              {{ translate('dialog.errors.minValue').replace('$value', 100) }}
+            </b-form-invalid-feedback>
           </b-form-group>
         </b-col>
       </b-row>
 
-      <b-img thumbnail fluid :src="'data:' + item.type + ';base64,' + item.base64"></b-img>
+      <b-img
+        thumbnail
+        fluid
+        :src="'data:' + item.type + ';base64,' + item.base64"
+      />
     </b-form>
   </b-container>
 </template>
 
 <script lang="ts">
+import { getSocket } from '@sogebot/ui-helpers/socket';
+import translate from '@sogebot/ui-helpers/translate';
 import { NextFunction } from 'express';
 import {
-  Component, Vue, Watch, 
+  Component, Vue, Watch,
 } from 'vue-property-decorator';
 import { Route } from 'vue-router';
 import { Validations } from 'vuelidate-property-decorators';
 import { minValue, required } from 'vuelidate/lib/validators';
 
 import { CarouselInterface } from 'src/bot/database/entity/carousel';
-import { getSocket } from 'src/panel/helpers/socket';
-import translate from 'src/panel/helpers/translate';
 
 Component.registerHooks([
   'beforeRouteEnter',

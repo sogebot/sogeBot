@@ -1,13 +1,16 @@
 <template>
-  <b-alert show v-html="translatedTitle" :variant="fullObject.variant || 'info'"></b-alert>
+  <b-alert
+    show
+    :variant="fullObject.variant || 'info'"
+    v-html="translatedTitle"
+  />
 </template>
 
 <script lang="ts">
+import translate from '@sogebot/ui-helpers/translate';
 import {
-  Component, Prop, Vue, 
+  Component, Prop, Vue,
 } from 'vue-property-decorator';
-
-import translate from 'src/panel/helpers/translate';
 
 @Component({})
 export default class helpbox extends Vue {

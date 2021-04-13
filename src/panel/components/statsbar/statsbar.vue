@@ -573,6 +573,8 @@
 <script lang="ts">
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faCaretDown, faCaretUp } from '@fortawesome/free-solid-svg-icons';
+import { getSocket } from '@sogebot/ui-helpers/socket';
+import translate from '@sogebot/ui-helpers/translate';
 import {
   computed, ComputedRef, defineComponent, onMounted, onUnmounted, reactive, ref, watch,
 } from '@vue/composition-api';
@@ -582,8 +584,6 @@ import { isNil } from 'lodash-es';
 import { getTime } from 'src/bot/helpers/getTime';
 import type { UIError } from 'src/bot/helpers/panel/alerts';
 import { EventBus } from 'src/panel/helpers/event-bus';
-import { getSocket } from 'src/panel/helpers/socket';
-import translate from 'src/panel/helpers/translate';
 
 library.add(faCaretDown, faCaretUp);
 

@@ -1,11 +1,10 @@
 <template>
-  <div></div>
+  <div />
 </template>
 
 <script lang="ts">
+import { getSocket } from '@sogebot/ui-helpers/socket';
 import { Component, Vue } from 'vue-property-decorator';
-
-import { getSocket } from 'src/panel/helpers/socket';
 
 declare global {
   interface Window {
@@ -56,7 +55,7 @@ export default class AlertsRegistryOverlays extends Vue {
         // unload if values doesn't match
         this.$unloadScript('https://code.responsivevoice.org/responsivevoice.js?key=' + this.responsiveAPIKey)
           .catch(() => {
-            return; 
+            return;
           }); // skip error
         if (value.trim().length > 0) {
           this.$loadScript('https://code.responsivevoice.org/responsivevoice.js?key=' + value)

@@ -1,13 +1,27 @@
 <template>
   <span>
     <b-input-group>
-      <b-form-select v-model="selectedReward" :options="redeemRewards" :state="state">
+      <b-form-select
+        v-model="selectedReward"
+        :options="redeemRewards"
+        :state="state"
+      >
         <template #first>
-          <b-form-select-option :value="null" disabled>-- Please select a custom reward --</b-form-select-option>
+          <b-form-select-option
+            :value="null"
+            disabled
+          >-- Please select a custom reward --</b-form-select-option>
         </template>
       </b-form-select>
       <b-input-group-append>
-        <b-button text="Refresh" variant="secondary" @click="refreshRedeemedRewards()"><fa icon="sync" :spin="progress.redeemRewards === ButtonStates.progress"/></b-button>
+        <b-button
+          text="Refresh"
+          variant="secondary"
+          @click="refreshRedeemedRewards()"
+        ><fa
+          icon="sync"
+          :spin="progress.redeemRewards === ButtonStates.progress"
+        /></b-button>
       </b-input-group-append>
     </b-input-group>
     <small><strong>{{ translate("events.myRewardIsNotListed") }}</strong> {{ translate("events.redeemAndClickRefreshToSeeReward") }}</small>
@@ -15,12 +29,12 @@
 </template>
 
 <script lang="ts">
-import {
-  defineComponent, onMounted, ref, watch, 
-} from '@vue/composition-api';
 
-import { getSocket } from 'src/panel/helpers/socket';
-import translate from 'src/panel/helpers/translate';
+import { getSocket } from '@sogebot/ui-helpers/socket';
+import translate from '@sogebot/ui-helpers/translate';
+import {
+  defineComponent, onMounted, ref, watch,
+} from '@vue/composition-api';
 
 import { ButtonStates } from '../helpers/buttonStates';
 import { error } from '../helpers/error';

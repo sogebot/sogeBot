@@ -2,20 +2,19 @@
   <div>
     <img
       v-for="e of images"
-      :key="e.id"
       v-show="currentImage === e.order"
       :id="e.id"
+      :key="e.id"
       :ref="e.id"
-      :src="'data:' + e.type + ';base64,'  + e.base64"
+      :src="'data:' + e.type + ';base64,' + e.base64"
     >
   </div>
 </template>
 
 <script lang="ts">
+import { getSocket } from '@sogebot/ui-helpers/socket';
 import gsap from 'gsap';
 import { Component, Vue } from 'vue-property-decorator';
-
-import { getSocket } from 'src/panel/helpers/socket';
 
 @Component({})
 export default class CarouselOverlay extends Vue {

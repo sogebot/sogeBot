@@ -4,27 +4,65 @@
       v-if="type === 'image' && b64data.startsWith('data:video')"
       :style="{ height: isUploading ? '150px' : 'inherit'}"
     >
-      <loading no-margin slow v-if="isUploading"/>
-      <video ref="video" class="w-100 pb-3" style="max-width:500px;">
-        <source :src="b64data" type="video/webm">
+      <loading
+        v-if="isUploading"
+        no-margin
+        slow
+      />
+      <video
+        ref="video"
+        class="w-100 pb-3"
+        style="max-width:500px;"
+      >
+        <source
+          :src="b64data"
+          type="video/webm"
+        >
         Your browser does not support the video tag.
       </video>
       <b-card-text class="absolute">
-        <b-button squared variant="outline-danger" class="border-0" @click="removeMedia()" v-if="b64data.length > 0">
-          <fa icon="times" class="mr-1"/> {{ translate('dialog.buttons.delete') }}
+        <b-button
+          v-if="b64data.length > 0"
+          squared
+          variant="outline-danger"
+          class="border-0"
+          @click="removeMedia()"
+        >
+          <fa
+            icon="times"
+            class="mr-1"
+          /> {{ translate('dialog.buttons.delete') }}
         </b-button>
-        <b-button squared variant="outline-primary" class="border-0" v-if="b64data.length > 0" @click="isPlaying ? stop() : play()">
-          <fa :icon="isPlaying ? 'stop' : 'play'" class="mr-1"/> {{ translate(isPlaying ? 'dialog.buttons.stop' : 'dialog.buttons.play') }} ({{duration}}s)
+        <b-button
+          v-if="b64data.length > 0"
+          squared
+          variant="outline-primary"
+          class="border-0"
+          @click="isPlaying ? stop() : play()"
+        >
+          <fa
+            :icon="isPlaying ? 'stop' : 'play'"
+            class="mr-1"
+          /> {{ translate(isPlaying ? 'dialog.buttons.stop' : 'dialog.buttons.play') }} ({{ duration }}s)
         </b-button>
-        <b-button squared variant="outline-dark" class="border-0" @click="$refs.uploadImage.click()">
-          <fa icon="upload" class="mr-1"/> {{ translate('dialog.buttons.upload.idle') }}
+        <b-button
+          squared
+          variant="outline-dark"
+          class="border-0"
+          @click="$refs.uploadImage.click()"
+        >
+          <fa
+            icon="upload"
+            class="mr-1"
+          /> {{ translate('dialog.buttons.upload.idle') }}
         </b-button>
         <input
+          ref="uploadImage"
           class="d-none"
           type="file"
-          ref="uploadImage"
+          accept="image/*, video/webm"
           @change="filesChange($event.target.files)"
-          accept="image/*, video/webm"/>
+        >
       </b-card-text>
     </b-card>
     <b-card
@@ -33,50 +71,119 @@
       :img-src="!isUploading ? b64data : ''"
       :style="{ height: isUploading ? '150px' : 'inherit'}"
     >
-      <loading no-margin slow v-if="isUploading"/>
+      <loading
+        v-if="isUploading"
+        no-margin
+        slow
+      />
       <b-card-text class="absolute">
-        <b-button squared variant="outline-danger" class="border-0" @click="removeMedia()" v-if="b64data.length > 0">
-          <fa icon="times" class="mr-1"/> {{ translate('dialog.buttons.delete') }}
+        <b-button
+          v-if="b64data.length > 0"
+          squared
+          variant="outline-danger"
+          class="border-0"
+          @click="removeMedia()"
+        >
+          <fa
+            icon="times"
+            class="mr-1"
+          /> {{ translate('dialog.buttons.delete') }}
         </b-button>
-        <b-button squared variant="outline-dark" class="border-0" @click="$refs.uploadImage.click()">
-          <fa icon="upload" class="mr-1"/> {{ translate('dialog.buttons.upload.idle') }}
+        <b-button
+          squared
+          variant="outline-dark"
+          class="border-0"
+          @click="$refs.uploadImage.click()"
+        >
+          <fa
+            icon="upload"
+            class="mr-1"
+          /> {{ translate('dialog.buttons.upload.idle') }}
         </b-button>
         <input
+          ref="uploadImage"
           class="d-none"
           type="file"
-          ref="uploadImage"
+          accept="image/*, video/webm"
           @change="filesChange($event.target.files)"
-          accept="image/*, video/webm"/>
+        >
       </b-card-text>
     </b-card>
     <b-card v-else-if="type === 'audio'">
-      <loading no-margin slow v-if="isUploading"/>
-      <b-card-text v-show="b64data.length > 0" :style="{position: b64data.length === 0 ? 'absolute' : 'inherit'}">
-        <audio :src="b64data" ref="audio" controls="true" preload="metadata" style="visibility:hidden; position: absolute;" ></audio>
-        <av-line canv-class="w-100" ref-link="audio" :canv-width="1000" v-show="b64data.length > 0"></av-line>
+      <loading
+        v-if="isUploading"
+        no-margin
+        slow
+      />
+      <b-card-text
+        v-show="b64data.length > 0"
+        :style="{position: b64data.length === 0 ? 'absolute' : 'inherit'}"
+      >
+        <audio
+          ref="audio"
+          :src="b64data"
+          controls="true"
+          preload="metadata"
+          style="visibility:hidden; position: absolute;"
+        />
+        <av-line
+          v-show="b64data.length > 0"
+          canv-class="w-100"
+          ref-link="audio"
+          :canv-width="1000"
+        />
       </b-card-text>
       <b-card-text class="absolute">
-        <b-button squared variant="outline-danger" class="border-0" @click="removeMedia()" v-if="b64data.length > 0">
-          <fa icon="times" class="mr-1"/> {{ translate('dialog.buttons.delete') }}
+        <b-button
+          v-if="b64data.length > 0"
+          squared
+          variant="outline-danger"
+          class="border-0"
+          @click="removeMedia()"
+        >
+          <fa
+            icon="times"
+            class="mr-1"
+          /> {{ translate('dialog.buttons.delete') }}
         </b-button>
-        <b-button squared variant="outline-primary" class="border-0" v-if="b64data.length > 0" @click="isPlaying ? stop() : play()">
-          <fa :icon="isPlaying ? 'stop' : 'play'" class="mr-1"/> {{ translate(isPlaying ? 'dialog.buttons.stop' : 'dialog.buttons.play') }} ({{duration}}s)
+        <b-button
+          v-if="b64data.length > 0"
+          squared
+          variant="outline-primary"
+          class="border-0"
+          @click="isPlaying ? stop() : play()"
+        >
+          <fa
+            :icon="isPlaying ? 'stop' : 'play'"
+            class="mr-1"
+          /> {{ translate(isPlaying ? 'dialog.buttons.stop' : 'dialog.buttons.play') }} ({{ duration }}s)
         </b-button>
-        <b-button squared variant="outline-dark" class="border-0" @click="$refs['uploadAudio-' + media].click()">
-          <fa icon="upload" class="mr-1"/> {{ translate('dialog.buttons.upload.idle') }}
+        <b-button
+          squared
+          variant="outline-dark"
+          class="border-0"
+          @click="$refs['uploadAudio-' + media].click()"
+        >
+          <fa
+            icon="upload"
+            class="mr-1"
+          /> {{ translate('dialog.buttons.upload.idle') }}
         </b-button>
         <input
+          :ref="'uploadAudio-' + media"
           class="d-none"
           type="file"
-          :ref="'uploadAudio-' + media"
+          accept="audio/*"
           @change="filesChange($event.target.files)"
-          accept="audio/*"/>
+        >
       </b-card-text>
     </b-card>
   </div>
 </template>
 
 <script lang="ts">
+import { getSocket } from '@sogebot/ui-helpers/socket';
+import translate from '@sogebot/ui-helpers/translate';
 import {
   defineComponent, onMounted, onUnmounted, ref,
 } from '@vue/composition-api';
@@ -87,8 +194,6 @@ import Vue from 'vue';
 import AudioVisual from 'vue-audio-visual';
 
 import type { AlertMediaInterface } from 'src/bot/database/entity/alert';
-import { getSocket } from 'src/panel/helpers/socket';
-import translate from 'src/panel/helpers/translate';
 
 Vue.use(AudioVisual);
 

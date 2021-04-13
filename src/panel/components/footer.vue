@@ -38,11 +38,10 @@
 </template>
 
 <script lang="ts">
+import { getSocket } from '@sogebot/ui-helpers/socket';
 import {
   defineComponent, onMounted, reactive, ref,
 } from '@vue/composition-api';
-
-import { getSocket } from '../helpers/socket';
 
 const socket = getSocket('/');
 

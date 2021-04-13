@@ -4,38 +4,72 @@
       <b-col>
         <span class="title text-default mb-2">
           {{ translate('menu.manage') }}
-          <small><fa icon="angle-right"/></small>
+          <small><fa icon="angle-right" /></small>
           {{ translate('menu.price') }}
         </span>
       </b-col>
-      <b-col v-if="!$systems.find(o => o.name === 'price').enabled" style=" text-align: right;">
-        <b-alert show variant="danger" style="padding: .5rem; margin: 0; display: inline-block;">
-          <fa icon="exclamation-circle" fixed-width/> {{ translate('this-system-is-disabled') }}
+      <b-col
+        v-if="!$systems.find(o => o.name === 'price').enabled"
+        style=" text-align: right;"
+      >
+        <b-alert
+          show
+          variant="danger"
+          style="padding: .5rem; margin: 0; display: inline-block;"
+        >
+          <fa
+            icon="exclamation-circle"
+            fixed-width
+          /> {{ translate('this-system-is-disabled') }}
         </b-alert>
       </b-col>
     </b-row>
 
-    <panel search @search="search = $event">
-      <template v-slot:left>
-        <button-with-icon class="btn-primary btn-reverse" icon="plus" @click="newItem">{{translate('systems.price.new')}}</button-with-icon>
+    <panel
+      search
+      @search="search = $event"
+    >
+      <template #left>
+        <button-with-icon
+          class="btn-primary btn-reverse"
+          icon="plus"
+          @click="newItem"
+        >
+          {{ translate('systems.price.new') }}
+        </button-with-icon>
       </template>
     </panel>
 
-    <loading v-if="state.loading === 1"/>
+    <loading v-if="state.loading === 1" />
     <template v-else>
       <b-sidebar
-        @change="isSidebarVisibleChange"
         :visible="isSidebarVisible"
         :no-slide="!sidebarSlideEnabled"
         no-close-on-route-change
         shadow
         no-header
         right
-        backdrop>
-        <template v-slot:footer="{ hide }">
-          <div class="d-flex bg-opaque align-items-center px-3 py-2 border-top border-gray" style="justify-content: flex-end">
-            <b-button class="mx-2" @click="hide" variant="link">{{ translate('dialog.buttons.close') }}</b-button>
-            <state-button @click="save()" text="saveChanges" :state="state.save" :invalid="!!$v.$invalid && !!$v.$dirty"/>
+        backdrop
+        @change="isSidebarVisibleChange"
+      >
+        <template #footer="{ hide }">
+          <div
+            class="d-flex bg-opaque align-items-center px-3 py-2 border-top border-gray"
+            style="justify-content: flex-end"
+          >
+            <b-button
+              class="mx-2"
+              variant="link"
+              @click="hide"
+            >
+              {{ translate('dialog.buttons.close') }}
+            </b-button>
+            <state-button
+              text="saveChanges"
+              :state="state.save"
+              :invalid="!!$v.$invalid && !!$v.$dirty"
+              @click="save()"
+            />
           </div>
         </template>
         <div class="px-3 py-2">
@@ -49,19 +83,28 @@
                   v-model="editationItem.command"
                   type="text"
                   :placeholder="translate('systems.price.command.placeholder')"
-                  @input="$v.editationItem.command.$touch()"
                   :state="$v.editationItem.command.$invalid && $v.editationItem.command.$dirty ? false : null"
-                ></b-form-input>
-                <b-skeleton v-else type="input" class="w-100"></b-skeleton>
+                  @input="$v.editationItem.command.$touch()"
+                />
+                <b-skeleton
+                  v-else
+                  type="input"
+                  class="w-100"
+                />
               </b-input-group>
-              <b-form-invalid-feedback :state="!($v.editationItem.command.$invalid && $v.editationItem.command.$dirty)">{{ translate('dialog.errors.required') }}</b-form-invalid-feedback>
+              <b-form-invalid-feedback :state="!($v.editationItem.command.$invalid && $v.editationItem.command.$dirty)">
+                {{ translate('dialog.errors.required') }}
+              </b-form-invalid-feedback>
             </b-form-group>
 
             <b-form-group>
               <label-inside>{{ translate('systems.price.price.name') }}</label-inside>
               <b-input-group>
-                <b-input-group-text slot="append" class="pr-3 pl-3">
-                  {{ getLocalizedName(editationItem ? editationItem.price : 0, $store.state.configuration.systems.Points.customization.name)}}
+                <b-input-group-text
+                  slot="append"
+                  class="pr-3 pl-3"
+                >
+                  {{ getLocalizedName(editationItem ? editationItem.price : 0, $store.state.configuration.systems.Points.customization.name) }}
                 </b-input-group-text>
                 <b-form-input
                   v-if="editationItem"
@@ -70,20 +113,29 @@
                   type="number"
                   min="0"
                   :placeholder="translate('systems.price.price.placeholder')"
-                  @input="$v.editationItem.price.$touch()"
                   :state="$v.editationItem.price.$invalid && $v.editationItem.price.$dirty ? false : null"
-                ></b-form-input>
-                <b-skeleton v-else type="input" class="w-100"></b-skeleton>
+                  @input="$v.editationItem.price.$touch()"
+                />
+                <b-skeleton
+                  v-else
+                  type="input"
+                  class="w-100"
+                />
               </b-input-group>
               <b-form-invalid-feedback :state="!($v.editationItem.price.$invalid && $v.editationItem.price.$dirty)">
                 <template v-if="$v.editationItem.priceBits.oneValueIsAboveZero">
                   {{ translate('dialog.errors.minValue').replace('$value', '1') }}
                 </template>
               </b-form-invalid-feedback>
-              <div class="text-muted text-center">{{translate('or')}}</div>
+              <div class="text-muted text-center">
+                {{ translate('or') }}
+              </div>
               <b-input-group>
-                <b-input-group-text slot="append" class="pr-3 pl-3">
-                  {{ getLocalizedName(editationItem ? editationItem.priceBits : 0, translate('bot.bits'))}}
+                <b-input-group-text
+                  slot="append"
+                  class="pr-3 pl-3"
+                >
+                  {{ getLocalizedName(editationItem ? editationItem.priceBits : 0, translate('bot.bits')) }}
                 </b-input-group-text>
                 <b-form-input
                   v-if="editationItem"
@@ -92,10 +144,14 @@
                   type="number"
                   min="0"
                   :placeholder="translate('systems.price.priceBits.placeholder')"
-                  @input="$v.editationItem.priceBits.$touch()"
                   :state="$v.editationItem.priceBits.$invalid && $v.editationItem.priceBits.$dirty ? false : null"
-                ></b-form-input>
-                <b-skeleton v-else type="input" class="w-100"></b-skeleton>
+                  @input="$v.editationItem.priceBits.$touch()"
+                />
+                <b-skeleton
+                  v-else
+                  type="input"
+                  class="w-100"
+                />
               </b-input-group>
               <b-form-checkbox
                 v-if="editationItem && editationItem.priceBits > 0"
@@ -106,41 +162,83 @@
                 {{ translate('systems.price.emitRedeemEvent') }}
               </b-form-checkbox>
               <b-form-invalid-feedback :state="!($v.editationItem.priceBits.$invalid && $v.editationItem.priceBits.$dirty)">
-                <template v-if="!$v.editationItem.priceBits.oneValueIsAboveZero">{{ translate('errors.one_of_inputs_must_be_set') }}</template>
-                <template v-else>{{ translate('dialog.errors.minValue').replace('$value', '0') }}</template>
+                <template v-if="!$v.editationItem.priceBits.oneValueIsAboveZero">
+                  {{ translate('errors.one_of_inputs_must_be_set') }}
+                </template>
+                <template v-else>
+                  {{ translate('dialog.errors.minValue').replace('$value', '0') }}
+                </template>
               </b-form-invalid-feedback>
             </b-form-group>
           </b-form>
         </div>
       </b-sidebar>
-      <b-alert show variant="danger" v-if="fItems.length === 0 && search.length > 0">
-        <fa icon="search"/> <span v-html="translate('systems.price.emptyAfterSearch').replace('$search', search)"/>
+      <b-alert
+        v-if="fItems.length === 0 && search.length > 0"
+        show
+        variant="danger"
+      >
+        <fa icon="search" /> <span v-html="translate('systems.price.emptyAfterSearch').replace('$search', search)" />
       </b-alert>
-      <b-alert show v-else-if="items.length === 0">
-        {{translate('systems.price.empty')}}
+      <b-alert
+        v-else-if="items.length === 0"
+        show
+      >
+        {{ translate('systems.price.empty') }}
       </b-alert>
-      <b-table hover v-else striped small :items="fItems" :fields="fields" @row-clicked="linkTo($event)" sort-by="command">
-        <template v-slot:cell(price)="data">
-          <div v-html="priceFormatter(data.item)"/>
+      <b-table
+        v-else
+        hover
+        striped
+        small
+        :items="fItems"
+        :fields="fields"
+        sort-by="command"
+        @row-clicked="linkTo($event)"
+      >
+        <template #cell(price)="data">
+          <div v-html="priceFormatter(data.item)" />
         </template>
-        <template v-slot:cell(emitRedeemEvent)="data">
+        <template #cell(emitRedeemEvent)="data">
           <div v-if="data.item.emitRedeemEvent && data.item.priceBits > 0">
-            <fa icon="check" fixed-width /> {{ translate('systems.price.emitRedeemEvent') }}
+            <fa
+              icon="check"
+              fixed-width
+            /> {{ translate('systems.price.emitRedeemEvent') }}
           </div>
-          <div v-else-if="data.item.priceBits > 0" class="text-muted">
-            <fa icon="times" fixed-width /> {{ translate('systems.price.emitRedeemEvent') }}
+          <div
+            v-else-if="data.item.priceBits > 0"
+            class="text-muted"
+          >
+            <fa
+              icon="times"
+              fixed-width
+            /> {{ translate('systems.price.emitRedeemEvent') }}
           </div>
         </template>
 
-        <template v-slot:cell(buttons)="data">
+        <template #cell(buttons)="data">
           <div class="text-right">
-            <button-with-icon :class="[ data.item.enabled ? 'btn-success' : 'btn-danger' ]" class="btn-only-icon btn-reverse" icon="power-off" @click="data.item.enabled = !data.item.enabled; update(data.item)">
+            <button-with-icon
+              :class="[ data.item.enabled ? 'btn-success' : 'btn-danger' ]"
+              class="btn-only-icon btn-reverse"
+              icon="power-off"
+              @click="data.item.enabled = !data.item.enabled; update(data.item)"
+            >
               {{ translate('dialog.buttons.' + (data.item.enabled? 'enabled' : 'disabled')) }}
             </button-with-icon>
-            <button-with-icon class="btn-only-icon btn-primary btn-reverse" icon="edit" v-bind:href="'#/manage/price/edit/' + data.item.id">
+            <button-with-icon
+              class="btn-only-icon btn-primary btn-reverse"
+              icon="edit"
+              :href="'#/manage/price/edit/' + data.item.id"
+            >
               {{ translate('dialog.buttons.edit') }}
             </button-with-icon>
-            <button-with-icon class="btn-only-icon btn-danger btn-reverse" icon="trash" @click="del(data.item.id)">
+            <button-with-icon
+              class="btn-only-icon btn-danger btn-reverse"
+              icon="trash"
+              @click="del(data.item.id)"
+            >
               {{ translate('dialog.buttons.delete') }}
             </button-with-icon>
           </div>
@@ -151,6 +249,8 @@
 </template>
 
 <script lang="ts">
+import { getSocket } from '@sogebot/ui-helpers/socket';
+import translate from '@sogebot/ui-helpers/translate';
 import {
   computed, defineComponent, getCurrentInstance, onMounted, ref, watch,
 } from '@vue/composition-api';
@@ -163,16 +263,14 @@ import type { PriceInterface } from 'src/bot/database/entity/price';
 import { getLocalizedName } from 'src/bot/helpers/getLocalized';
 import { ButtonStates } from 'src/panel/helpers/buttonStates';
 import { error } from 'src/panel/helpers/error';
-import { getSocket } from 'src/panel/helpers/socket';
-import translate from 'src/panel/helpers/translate';
 
 const socket = getSocket('/systems/price');
 export default defineComponent({
-  mixins:     [ validationMixin ],
   components: {
     'loading':      () => import('src/panel/components/loading.vue'),
     'label-inside': () => import('src/panel/components/label-inside.vue'),
   },
+  mixins:      [ validationMixin ],
   validations: {
     editationItem: {
       command: { required },
@@ -277,7 +375,7 @@ export default defineComponent({
         }
         isSidebarVisible.value = isVisible;
         ctx.root.$router.push({ name: 'PriceManager' }).catch(() => {
-          return; 
+          return;
         });
       } else {
         state.value.save = ButtonStates.idle;
@@ -342,13 +440,13 @@ export default defineComponent({
     };
     const newItem = () => {
       ctx.root.$router.push({ name: 'PriceManagerEdit', params: { id: uuid() } }).catch(() => {
-        return; 
+        return;
       });
     };
     const linkTo = (item: Required<PriceInterface>) => {
       console.debug('Clicked', item.id);
       ctx.root.$router.push({ name: 'PriceManagerEdit', params: { id: item.id } }).catch(() => {
-        return; 
+        return;
       });
     };
     const save = () => {
@@ -368,7 +466,7 @@ export default defineComponent({
             refresh();
             state.value.pending = false;
             ctx.root.$router.push({ name: 'PriceManagerEdit', params: { id: String(editationItem.value?.id) } }).catch(() => {
-              return; 
+              return;
             });
           });
           setTimeout(() => {

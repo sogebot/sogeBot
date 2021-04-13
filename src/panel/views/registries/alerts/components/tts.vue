@@ -100,13 +100,13 @@
 </template>
 
 <script lang="ts">
+import translate from '@sogebot/ui-helpers/translate';
 import {
   defineComponent, onMounted, ref, watch,
 } from '@vue/composition-api';
 
 import type { CommonSettingsInterface } from 'src/bot/database/entity/alert';
 import { ButtonStates } from 'src/panel/helpers/buttonStates';
-import translate from 'src/panel/helpers/translate';
 
 declare global {
   interface Window {

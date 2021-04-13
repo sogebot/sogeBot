@@ -84,13 +84,12 @@ import { faWindows } from '@fortawesome/free-brands-svg-icons/faWindows';
 import { faXbox } from '@fortawesome/free-brands-svg-icons/faXbox';
 import { faYoutube } from '@fortawesome/free-brands-svg-icons/faYoutube';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { getSocket } from '@sogebot/ui-helpers/socket';
 import gsap from 'gsap';
 import { groupBy } from 'lodash-es';
 import {
   Component, Vue, Watch,
 } from 'vue-property-decorator';
-
-import { getSocket } from 'src/panel/helpers/socket';
 
 library.add(faDeviantart, faDiscord, faFacebook, faGithub, faGoogle, faInstagram, faLinkedin, faPaypal, faPinterest, faPlaystation, faReddit, faSkype, faSnapchat, faSpotify, faSteam, faStrava, faTelegram, faTwitter, faVk, faWindows, faXbox, faYoutube);
 

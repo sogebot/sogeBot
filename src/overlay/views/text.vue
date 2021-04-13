@@ -6,11 +6,10 @@
 </template>
 
 <script lang="ts">
+import { getSocket } from '@sogebot/ui-helpers/socket';
 import {
   defineComponent, onMounted, ref, watch,
 } from '@vue/composition-api';
-
-import { getSocket } from 'src/panel/helpers/socket';
 
 const socket = getSocket('/registries/text', true);
 

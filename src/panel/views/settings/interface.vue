@@ -361,6 +361,8 @@
 <script lang="ts">
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
+import { getConfiguration, getSocket } from '@sogebot/ui-helpers/socket';
+import translate from '@sogebot/ui-helpers/translate';
 import {
   cloneDeep, filter, get, orderBy, pickBy, set, size,
 } from 'lodash-es';
@@ -371,8 +373,6 @@ import {
 import { PermissionsInterface } from 'src/bot/database/entity/permissions';
 import { flatten, unflatten } from 'src/bot/helpers/flatten';
 import { getListOf } from 'src/panel/helpers/getListOf';
-import { getConfiguration, getSocket } from 'src/panel/helpers/socket';
-import translate from 'src/panel/helpers/translate';
 
 library.add(faExclamationTriangle);
 

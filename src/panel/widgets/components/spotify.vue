@@ -58,21 +58,21 @@
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faList, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeLayers } from '@fortawesome/vue-fontawesome';
+import { getSocket } from '@sogebot/ui-helpers/socket';
+import translate from '@sogebot/ui-helpers/translate';
 import { debounce } from 'lodash-es';
 
 import { EventBus } from 'src/panel/helpers/event-bus';
-import { getSocket } from 'src/panel/helpers/socket';
-import translate from 'src/panel/helpers/translate';
 
 library.add(faList, faTimes);
 
 export default {
-  props:      ['popout', 'nodrag'],
   components: {
     holdButton:            () => import('../../components/holdButton.vue'),
     'font-awesome-layers': FontAwesomeLayers,
   },
-  data: function () {
+  props: ['popout', 'nodrag'],
+  data:  function () {
     return {
       translate,
       EventBus,
@@ -95,38 +95,6 @@ export default {
       this.socket.emit('settings.update', { output: { continueOnPlaylistAfterRequest: val } });
     }, 500),
   },
-  methods: {
-    next(index) {
-      this.requests.splice(index, 1);
-      this.socket.emit('spotify::skip', () => {
-        return; 
-      });
-    },
-    cleanupSongRequestList() {
-      this.requests = [];
-      this.socket.emit('set.value', { variable: 'uris', value: this.requests }, () => {
-        return; 
-      });
-    },
-    removeSongRequest(index) {
-      this.requests.splice(index, 1);
-      this.socket.emit('set.value', { variable: 'uris', value: this.requests }, () => {
-        return; 
-      });
-    },
-    fetchCurrentSong() {
-      this.socket.emit('get.value', 'currentSong', (err, v) => {
-        this.currentSong = JSON.parse(v);
-        setTimeout(this.fetchCurrentSong, 1000);
-      });
-    },
-    fetchSongRequests() {
-      this.socket.emit('get.value', 'uris', (err, v) => {
-        this.requests = v;
-        setTimeout(this.fetchSongRequests, 1000);
-      });
-    },
-  },
   beforeDestroy() {
     window.clearInterval(this.interval);
   },
@@ -144,6 +112,38 @@ export default {
   },
   mounted: function () {
     this.widgetWidth = this.$refs.widget.clientWidth;
+  },
+  methods: {
+    next(index) {
+      this.requests.splice(index, 1);
+      this.socket.emit('spotify::skip', () => {
+        return;
+      });
+    },
+    cleanupSongRequestList() {
+      this.requests = [];
+      this.socket.emit('set.value', { variable: 'uris', value: this.requests }, () => {
+        return;
+      });
+    },
+    removeSongRequest(index) {
+      this.requests.splice(index, 1);
+      this.socket.emit('set.value', { variable: 'uris', value: this.requests }, () => {
+        return;
+      });
+    },
+    fetchCurrentSong() {
+      this.socket.emit('get.value', 'currentSong', (err, v) => {
+        this.currentSong = JSON.parse(v);
+        setTimeout(this.fetchCurrentSong, 1000);
+      });
+    },
+    fetchSongRequests() {
+      this.socket.emit('get.value', 'uris', (err, v) => {
+        this.requests = v;
+        setTimeout(this.fetchSongRequests, 1000);
+      });
+    },
   },
 };
 </script>

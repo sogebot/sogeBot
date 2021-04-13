@@ -1,14 +1,18 @@
 <template>
-  <component v-if="type" :is="type.value" :opts="type.opts" />
+  <component
+    :is="type.value"
+    v-if="type"
+    :opts="type.opts"
+  />
 </template>
 
 <script lang="ts">
+import { getSocket } from '@sogebot/ui-helpers/socket';
 import {
-  defineComponent, onMounted, ref, 
+  defineComponent, onMounted, ref,
 } from '@vue/composition-api';
 
 import type { OverlayMapperInterface, OverlayMapperOBSWebsocket } from 'src/bot/database/entity/overlay';
-import { getSocket } from 'src/panel/helpers/socket';
 
 const socket = getSocket('/registries/overlays', true);
 export default defineComponent({

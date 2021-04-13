@@ -1,23 +1,34 @@
 <template>
-  <b-container fluid ref="window">
+  <b-container
+    ref="window"
+    fluid
+  >
     <b-row>
       <b-col>
         <span class="title text-default mb-2">
           {{ translate('menu.registry') }}
-          <small><fa icon="angle-right"/></small>
+          <small><fa icon="angle-right" /></small>
           {{ translate('menu.obswebsocket') }}
         </span>
       </b-col>
     </b-row>
 
-    <panel search @search="search = $event">
-      <template v-slot:left>
-        <button-with-icon class="btn-primary btn-reverse" icon="plus" @click="newItem">{{translate('integrations.obswebsocket.new')}}</button-with-icon>
+    <panel
+      search
+      @search="search = $event"
+    >
+      <template #left>
+        <button-with-icon
+          class="btn-primary btn-reverse"
+          icon="plus"
+          @click="newItem"
+        >
+          {{ translate('integrations.obswebsocket.new') }}
+        </button-with-icon>
       </template>
     </panel>
 
     <b-sidebar
-      @change="isSidebarVisibleChange"
       :visible="isSidebarVisible"
       :no-slide="!sidebarSlideEnabled"
       width="800px"
@@ -25,35 +36,94 @@
       shadow
       no-header
       right
-      backdrop>
-      <template v-slot:footer="{ hide }">
-        <div class="d-flex bg-opaque align-items-center px-3 py-2 border-top border-gray" style="justify-content: flex-end">
-          <b-button class="mx-2" @click="hide" variant="link">{{ translate('dialog.buttons.close') }}</b-button>
-          <state-button @click="EventBus.$emit('registry::obswebsocket::test::' + $route.params.id)" text="test" icon="vial" :state="state.test" :invalid="state.invalid" class="mx-2"/>
-          <state-button @click="EventBus.$emit('registry::obswebsocket::save::' + $route.params.id)" text="saveChanges" :state="state.save" :invalid="state.invalid"/>
+      backdrop
+      @change="isSidebarVisibleChange"
+    >
+      <template #footer="{ hide }">
+        <div
+          class="d-flex bg-opaque align-items-center px-3 py-2 border-top border-gray"
+          style="justify-content: flex-end"
+        >
+          <b-button
+            class="mx-2"
+            variant="link"
+            @click="hide"
+          >
+            {{ translate('dialog.buttons.close') }}
+          </b-button>
+          <state-button
+            text="test"
+            icon="vial"
+            :state="state.test"
+            :invalid="state.invalid"
+            class="mx-2"
+            @click="EventBus.$emit('registry::obswebsocket::test::' + $route.params.id)"
+          />
+          <state-button
+            text="saveChanges"
+            :state="state.save"
+            :invalid="state.invalid"
+            @click="EventBus.$emit('registry::obswebsocket::save::' + $route.params.id)"
+          />
         </div>
       </template>
-      <obswebsocket-edit v-if="$route.params.id" :id="$route.params.id" :saveState.sync="state.save" :testState.sync="state.test" :invalid.sync="state.invalid" :pending.sync="state.pending" @refresh="refresh"/>
+      <obswebsocket-edit
+        v-if="$route.params.id"
+        :id="$route.params.id"
+        :save-state.sync="state.save"
+        :test-state.sync="state.test"
+        :invalid.sync="state.invalid"
+        :pending.sync="state.pending"
+        @refresh="refresh"
+      />
     </b-sidebar>
     <loading v-if="state.loading === $state.progress" />
     <div v-else>
-      <b-alert show variant="danger" v-if="state.loading === $state.success && filtered.length === 0 && search.length > 0">
-        <fa icon="search"/> <span v-html="translate('integrations.obswebsocket.emptyAfterSearch').replace('$search', search)"/>
+      <b-alert
+        v-if="state.loading === $state.success && filtered.length === 0 && search.length > 0"
+        show
+        variant="danger"
+      >
+        <fa icon="search" /> <span v-html="translate('integrations.obswebsocket.emptyAfterSearch').replace('$search', search)" />
       </b-alert>
-      <b-alert show v-else-if="state.loading === $state.success && items.length === 0">
-        {{translate('integrations.obswebsocket.empty')}}
+      <b-alert
+        v-else-if="state.loading === $state.success && items.length === 0"
+        show
+      >
+        {{ translate('integrations.obswebsocket.empty') }}
       </b-alert>
-      <b-table v-else :fields="fields" :items="filtered" small hover striped style="cursor: pointer;">
-        <template v-slot:cell(command)="data">
-          <span class="variable" v-b-tooltip.hover :title="copied ? 'Copied!': 'Copy to clipboard'" @click="copy(command + ' ' + data.item.id)">{{command}} {{data.item.id}}</span>
+      <b-table
+        v-else
+        :fields="fields"
+        :items="filtered"
+        small
+        hover
+        striped
+        style="cursor: pointer;"
+      >
+        <template #cell(command)="data">
+          <span
+            v-b-tooltip.hover
+            class="variable"
+            :title="copied ? 'Copied!': 'Copy to clipboard'"
+            @click="copy(command + ' ' + data.item.id)"
+          >{{ command }} {{ data.item.id }}</span>
         </template>
-        <template v-slot:cell(buttons)="data">
+        <template #cell(buttons)="data">
           <div class="text-right">
-            <button-with-icon class="btn-only-icon btn-primary btn-reverse" icon="edit" v-bind:href="'#/registry/obswebsocket/edit/' + data.item.id">
+            <button-with-icon
+              class="btn-only-icon btn-primary btn-reverse"
+              icon="edit"
+              :href="'#/registry/obswebsocket/edit/' + data.item.id"
+            >
               {{ translate('dialog.buttons.edit') }}
             </button-with-icon>
 
-            <button-with-icon class="btn-only-icon btn-danger btn-reverse" icon="trash" @click="del(data.item)">
+            <button-with-icon
+              class="btn-only-icon btn-danger btn-reverse"
+              icon="trash"
+              @click="del(data.item)"
+            >
               {{ translate('dialog.buttons.delete') }}
             </button-with-icon>
           </div>
@@ -66,6 +136,8 @@
 <script lang="ts">
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faVial } from '@fortawesome/free-solid-svg-icons';
+import { getSocket } from '@sogebot/ui-helpers/socket';
+import translate from '@sogebot/ui-helpers/translate';
 import {
   computed, defineComponent, getCurrentInstance, onMounted, ref, watch,
 } from '@vue/composition-api';
@@ -78,8 +150,6 @@ import type { OBSWebsocketInterface } from 'src/bot/database/entity/obswebsocket
 import { ButtonStates } from 'src/panel/helpers/buttonStates';
 import { capitalize } from 'src/panel/helpers/capitalize';
 import { EventBus } from 'src/panel/helpers/event-bus';
-import { getSocket } from 'src/panel/helpers/socket';
-import translate from 'src/panel/helpers/translate';
 
 const socket = getSocket('/integrations/obswebsocket');
 
@@ -158,7 +228,7 @@ export default defineComponent({
 
     const newItem = () => {
       ctx.root.$router.push({ name: 'OBSWebsocketRegistryEdit', params: { id: shortid.generate() } }).catch(() => {
-        return; 
+        return;
       });
     };
     const isSidebarVisibleChange = (isVisible: boolean, ev: any) => {
@@ -179,7 +249,7 @@ export default defineComponent({
         }
         isSidebarVisible.value = isVisible;
         ctx.root.$router.push({ name: 'OBSWebsocketRegistryList' }).catch(() => {
-          return; 
+          return;
         });
       } else {
         state.value.save = ButtonStates.idle;

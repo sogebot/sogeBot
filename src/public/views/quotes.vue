@@ -18,16 +18,16 @@
 </template>
 
 <script lang="ts">
+import { getSocket } from '@sogebot/ui-helpers/socket';
+import translate from '@sogebot/ui-helpers/translate';
 import {
-  defineComponent, onMounted, ref, 
+  defineComponent, onMounted, ref,
 } from '@vue/composition-api';
 import VueScrollTo from 'vue-scrollto';
 
 import { QuotesInterface } from 'src/bot/database/entity/quotes';
 import { dayjs } from 'src/bot/helpers/dayjs';
 import { ButtonStates } from 'src/panel/helpers/buttonStates';
-import { getSocket } from 'src/panel/helpers/socket';
-import translate from 'src/panel/helpers/translate';
 
 const socket = getSocket('/systems/quotes', true);
 export default defineComponent({
@@ -42,14 +42,14 @@ export default defineComponent({
 
     const fields = [
       {
-        key: 'createdAt', label: translate('systems.quotes.date.name'), sortable: true, 
+        key: 'createdAt', label: translate('systems.quotes.date.name'), sortable: true,
       },
       {
-        key: 'quote', label: translate('systems.quotes.quote.name'), sortable: true, 
+        key: 'quote', label: translate('systems.quotes.quote.name'), sortable: true,
       },
       { key: 'tags', label: translate('systems.quotes.tags.name') },
       {
-        key: 'quotedByName', label: translate('systems.quotes.by.name'), sortable: true, 
+        key: 'quotedByName', label: translate('systems.quotes.by.name'), sortable: true,
       },
       // virtual attributes
       { key: 'buttons', label: '' },

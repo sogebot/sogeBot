@@ -1,39 +1,48 @@
 <template>
-  <buttonWithIcon icon="exclamation"
-                  :class="'btn-danger'"
-                  disabled
-                  :text="translate('dialog.buttons.' + this.text + '.invalid')"
-                  v-if="invalid"/>
-  <buttonWithIcon :icon="icon || 'save'"
-                  :class="cl || 'btn-primary'"
-                  event="save"
-                  @save="save()"
-                  :text="translate('dialog.buttons.' + this.text + '.idle')"
-                  v-else-if="state === 0"/>
-  <buttonWithIcon icon="spinner"
-                  spin
-                  :class="cl || 'btn-primary'"
-                  disabled
-                  :text="translate('dialog.buttons.' + this.text + '.progress')"
-                  v-else-if="state === 1"/>
-  <buttonWithIcon icon="check"
-                  class="btn-success"
-                  :class="{ 'btn-shrink': (cl || '').includes('shrink') }"
-                  disabled
-                  :text="translate('dialog.buttons.' + this.text + '.done')"
-                  v-else-if="state === 2"/>
-  <buttonWithIcon icon="times"
-                  class="btn-danger"
-                  :class="{ 'btn-shrink': (cl || '').includes('shrink') }"
-                  disabled
-                  :text="translate('dialog.buttons.something-went-wrong')"
-                  v-else-if="state === 3"/>
+  <buttonWithIcon
+    v-if="invalid"
+    icon="exclamation"
+    :class="'btn-danger'"
+    disabled
+    :text="translate('dialog.buttons.' + this.text + '.invalid')"
+  />
+  <buttonWithIcon
+    v-else-if="state === 0"
+    :icon="icon || 'save'"
+    :class="cl || 'btn-primary'"
+    event="save"
+    :text="translate('dialog.buttons.' + this.text + '.idle')"
+    @save="save()"
+  />
+  <buttonWithIcon
+    v-else-if="state === 1"
+    icon="spinner"
+    spin
+    :class="cl || 'btn-primary'"
+    disabled
+    :text="translate('dialog.buttons.' + this.text + '.progress')"
+  />
+  <buttonWithIcon
+    v-else-if="state === 2"
+    icon="check"
+    class="btn-success"
+    :class="{ 'btn-shrink': (cl || '').includes('shrink') }"
+    disabled
+    :text="translate('dialog.buttons.' + this.text + '.done')"
+  />
+  <buttonWithIcon
+    v-else-if="state === 3"
+    icon="times"
+    class="btn-danger"
+    :class="{ 'btn-shrink': (cl || '').includes('shrink') }"
+    disabled
+    :text="translate('dialog.buttons.something-went-wrong')"
+  />
 </template>
 
 <script lang="ts">
+import translate from '@sogebot/ui-helpers/translate';
 import { defineComponent } from '@vue/composition-api';
-
-import translate from 'src/panel/helpers/translate';
 
 export default defineComponent({
   components: { buttonWithIcon: () => import('./button.vue') },

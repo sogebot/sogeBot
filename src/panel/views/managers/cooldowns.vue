@@ -4,27 +4,45 @@
       <b-col>
         <span class="title text-default mb-2">
           {{ translate('menu.manage') }}
-          <small><fa icon="angle-right"/></small>
+          <small><fa icon="angle-right" /></small>
           {{ translate('menu.cooldown') }}
         </span>
       </b-col>
-      <b-col v-if="!$systems.find(o => o.name === 'cooldown').enabled" style=" text-align: right;">
-        <b-alert show variant="danger" style="padding: .5rem; margin: 0; display: inline-block;">
-          <fa icon="exclamation-circle" fixed-width/> {{ translate('this-system-is-disabled') }}
+      <b-col
+        v-if="!$systems.find(o => o.name === 'cooldown').enabled"
+        style=" text-align: right;"
+      >
+        <b-alert
+          show
+          variant="danger"
+          style="padding: .5rem; margin: 0; display: inline-block;"
+        >
+          <fa
+            icon="exclamation-circle"
+            fixed-width
+          /> {{ translate('this-system-is-disabled') }}
         </b-alert>
       </b-col>
     </b-row>
 
-    <panel search @search="search = $event">
-      <template v-slot:left>
-        <button-with-icon class="btn-primary btn-reverse" icon="plus" @click="newItem">{{translate('systems.cooldown.new')}}</button-with-icon>
+    <panel
+      search
+      @search="search = $event"
+    >
+      <template #left>
+        <button-with-icon
+          class="btn-primary btn-reverse"
+          icon="plus"
+          @click="newItem"
+        >
+          {{ translate('systems.cooldown.new') }}
+        </button-with-icon>
       </template>
     </panel>
 
-    <loading v-if="state.loading !== $state.success"/>
+    <loading v-if="state.loading !== $state.success" />
     <template v-else>
       <b-sidebar
-        @change="isSidebarVisibleChange"
         :visible="isSidebarVisible"
         :no-slide="!sidebarSlideEnabled"
         width="800px"
@@ -32,108 +50,191 @@
         shadow
         no-header
         right
-        backdrop>
-        <template v-slot:footer="{ hide }">
-          <div class="d-flex bg-opaque align-items-center px-3 py-2 border-top border-gray" style="justify-content: flex-end">
-            <b-button class="mx-2" @click="hide" variant="link">{{ translate('dialog.buttons.close') }}</b-button>
-            <state-button @click="save()" text="saveChanges" :state="state.save" :invalid="!!$v.$invalid && !!$v.$dirty"/>
+        backdrop
+        @change="isSidebarVisibleChange"
+      >
+        <template #footer="{ hide }">
+          <div
+            class="d-flex bg-opaque align-items-center px-3 py-2 border-top border-gray"
+            style="justify-content: flex-end"
+          >
+            <b-button
+              class="mx-2"
+              variant="link"
+              @click="hide"
+            >
+              {{ translate('dialog.buttons.close') }}
+            </b-button>
+            <state-button
+              text="saveChanges"
+              :state="state.save"
+              :invalid="!!$v.$invalid && !!$v.$dirty"
+              @click="save()"
+            />
           </div>
         </template>
         <panel sidebar>
-          <template v-slot:left>
+          <template #left>
             <template v-if="editationItem">
-              <button-with-icon :class="[ editationItem.isErrorMsgQuiet ? 'btn-success' : 'btn-danger' ]" class="btn-reverse" :icon="editationItem.isErrorMsgQuiet ? 'volume-off' : 'volume-up'" @click="editationItem.isErrorMsgQuiet = !editationItem.isErrorMsgQuiet">
+              <button-with-icon
+                :class="[ editationItem.isErrorMsgQuiet ? 'btn-success' : 'btn-danger' ]"
+                class="btn-reverse"
+                :icon="editationItem.isErrorMsgQuiet ? 'volume-off' : 'volume-up'"
+                @click="editationItem.isErrorMsgQuiet = !editationItem.isErrorMsgQuiet"
+              >
                 {{ translate(editationItem.isErrorMsgQuiet? 'quiet' : 'noisy') | capitalize }}
               </button-with-icon>
-              <button-with-icon :class="[ editationItem.isOwnerAffected ? 'btn-success' : 'btn-danger' ]" class="btn-reverse" :icon="editationItem.isOwnerAffected ? 'check' : 'times'" @click="editationItem.isOwnerAffected = !editationItem.isOwnerAffected">
+              <button-with-icon
+                :class="[ editationItem.isOwnerAffected ? 'btn-success' : 'btn-danger' ]"
+                class="btn-reverse"
+                :icon="editationItem.isOwnerAffected ? 'check' : 'times'"
+                @click="editationItem.isOwnerAffected = !editationItem.isOwnerAffected"
+              >
                 {{ translate('core.permissions.casters') | capitalize }}
               </button-with-icon>
-              <button-with-icon :class="[ editationItem.isModeratorAffected ? 'btn-success' : 'btn-danger' ]" class="btn-reverse" :icon="editationItem.isModeratorAffected ? 'check' : 'times'" @click="editationItem.isModeratorAffected = !editationItem.isModeratorAffected">
+              <button-with-icon
+                :class="[ editationItem.isModeratorAffected ? 'btn-success' : 'btn-danger' ]"
+                class="btn-reverse"
+                :icon="editationItem.isModeratorAffected ? 'check' : 'times'"
+                @click="editationItem.isModeratorAffected = !editationItem.isModeratorAffected"
+              >
                 {{ translate('core.permissions.moderators') | capitalize }}
               </button-with-icon>
-              <button-with-icon :class="[ editationItem.isSubscriberAffected ? 'btn-success' : 'btn-danger' ]" class="btn-reverse" :icon="editationItem.isSubscriberAffected ? 'check' : 'times'" @click="editationItem.isSubscriberAffected = !editationItem.isSubscriberAffected">
+              <button-with-icon
+                :class="[ editationItem.isSubscriberAffected ? 'btn-success' : 'btn-danger' ]"
+                class="btn-reverse"
+                :icon="editationItem.isSubscriberAffected ? 'check' : 'times'"
+                @click="editationItem.isSubscriberAffected = !editationItem.isSubscriberAffected"
+              >
                 {{ translate('core.permissions.subscribers') | capitalize }}
               </button-with-icon>
-              <button-with-icon :class="[ editationItem.isFollowerAffected ? 'btn-success' : 'btn-danger' ]" class="btn-reverse" :icon="editationItem.isFollowerAffected ? 'check' : 'times'" @click="editationItem.isFollowerAffected = !editationItem.isFollowerAffected">
+              <button-with-icon
+                :class="[ editationItem.isFollowerAffected ? 'btn-success' : 'btn-danger' ]"
+                class="btn-reverse"
+                :icon="editationItem.isFollowerAffected ? 'check' : 'times'"
+                @click="editationItem.isFollowerAffected = !editationItem.isFollowerAffected"
+              >
                 {{ translate('core.permissions.followers') | capitalize }}
               </button-with-icon>
-              <button-with-icon :class="[ editationItem.type === 'global' ? 'btn-primary' : 'btn-secondary' ]" class="btn-reverse" :icon="editationItem.type === 'global' ? 'globe-europe' : 'user'" @click="editationItem.type = editationItem.type === 'global' ? 'user' : 'global'">
+              <button-with-icon
+                :class="[ editationItem.type === 'global' ? 'btn-primary' : 'btn-secondary' ]"
+                class="btn-reverse"
+                :icon="editationItem.type === 'global' ? 'globe-europe' : 'user'"
+                @click="editationItem.type = editationItem.type === 'global' ? 'user' : 'global'"
+              >
                 {{ translate(editationItem.type) | capitalize }}
               </button-with-icon>
             </template>
           </template>
         </panel>
         <div class="px-3 py-2">
-          <loading v-if="!editationItem"/>
+          <loading v-if="!editationItem" />
           <b-form v-else>
             <b-form-group>
-              <label-inside>{{'!' + translate('command') + ' ' + translate('or') + ' ' + translate('keyword')}}</label-inside>
+              <label-inside>{{ '!' + translate('command') + ' ' + translate('or') + ' ' + translate('keyword') }}</label-inside>
               <b-input-group>
                 <b-form-input
                   id="name"
                   v-model="editationItem.name"
                   type="text"
                   :placeholder="'!' + translate('command') + ' ' + translate('or') + ' ' + translate('keyword')"
-                  @input="$v.editationItem.name.$touch()"
                   :state="$v.editationItem.name.$invalid && $v.editationItem.name.$dirty ? false : null"
-                ></b-form-input>
+                  @input="$v.editationItem.name.$touch()"
+                />
               </b-input-group>
               <b-form-invalid-feedback :state="!($v.editationItem.name.$invalid && $v.editationItem.name.$dirty)">
-                <template v-if="!$v.editationItem.name.minLength">{{ translate('errors.minLength_of_value_is').replace('$value', 2) }}</template>
-                <template v-else>{{ translate('dialog.errors.required') }}</template>
+                <template v-if="!$v.editationItem.name.minLength">
+                  {{ translate('errors.minLength_of_value_is').replace('$value', 2) }}
+                </template>
+                <template v-else>
+                  {{ translate('dialog.errors.required') }}
+                </template>
               </b-form-invalid-feedback>
             </b-form-group>
             <b-form-group>
-              <label-inside>{{translate('cooldown') + ' (' + translate('in-seconds') + ')'}}</label-inside>
+              <label-inside>{{ translate('cooldown') + ' (' + translate('in-seconds') + ')' }}</label-inside>
               <b-input-group>
                 <b-form-input
                   id="name"
                   v-model.number="seconds"
                   type="number"
                   min="0"
-                  @input="$v.editationItem.miliseconds.$touch()"
                   :state="$v.editationItem.miliseconds.$invalid && $v.editationItem.miliseconds.$dirty ? false : null"
-                ></b-form-input>
+                  @input="$v.editationItem.miliseconds.$touch()"
+                />
               </b-input-group>
-              <b-form-invalid-feedback :state="!($v.editationItem.miliseconds.$invalid && $v.editationItem.miliseconds.$dirty)">{{ translate('dialog.errors.minValue').replace('$value', 0) }}</b-form-invalid-feedback>
+              <b-form-invalid-feedback :state="!($v.editationItem.miliseconds.$invalid && $v.editationItem.miliseconds.$dirty)">
+                {{ translate('dialog.errors.minValue').replace('$value', 0) }}
+              </b-form-invalid-feedback>
             </b-form-group>
           </b-form>
         </div>
       </b-sidebar>
-      <b-alert show variant="danger" v-if="fItems.length === 0 && search.length > 0">
-        <fa icon="search"/> <span v-html="translate('systems.cooldown.emptyAfterSearch').replace('$search', search)"/>
+      <b-alert
+        v-if="fItems.length === 0 && search.length > 0"
+        show
+        variant="danger"
+      >
+        <fa icon="search" /> <span v-html="translate('systems.cooldown.emptyAfterSearch').replace('$search', search)" />
       </b-alert>
-      <b-alert show v-else-if="items.length === 0">
-        {{translate('systems.cooldown.empty')}}
+      <b-alert
+        v-else-if="items.length === 0"
+        show
+      >
+        {{ translate('systems.cooldown.empty') }}
       </b-alert>
-      <b-table v-else striped small hover :items="fItems" :fields="fields" @row-clicked="linkTo($event)">
-        <template v-slot:cell(miliseconds)="data">
-          <span class="font-weight-bold text-primary font-bigger">{{Number(data.item.miliseconds / 60000).toFixed(1)}}</span> {{translate('minutes')}}
+      <b-table
+        v-else
+        striped
+        small
+        hover
+        :items="fItems"
+        :fields="fields"
+        @row-clicked="linkTo($event)"
+      >
+        <template #cell(miliseconds)="data">
+          <span class="font-weight-bold text-primary font-bigger">{{ Number(data.item.miliseconds / 60000).toFixed(1) }}</span> {{ translate('minutes') }}
         </template>
-        <template v-slot:cell(isErrorMsgQuiet)="data">
+        <template #cell(isErrorMsgQuiet)="data">
           {{ data.item.isErrorMsgQuiet ? translate('commons.yes') : translate('commons.no') }}
         </template>
-        <template v-slot:cell(isOwnerAffected)="data">
+        <template #cell(isOwnerAffected)="data">
           {{ data.item.isOwnerAffected ? translate('commons.yes') : translate('commons.no') }}
         </template>
-        <template v-slot:cell(isModeratorAffected)="data">
+        <template #cell(isModeratorAffected)="data">
           {{ data.item.isModeratorAffected ? translate('commons.yes') : translate('commons.no') }}
         </template>
-        <template v-slot:cell(isSubscriberAffected)="data">
+        <template #cell(isSubscriberAffected)="data">
           {{ data.item.isSubscriberAffected ? translate('commons.yes') : translate('commons.no') }}
         </template>
-        <template v-slot:cell(isFollowerAffected)="data">
+        <template #cell(isFollowerAffected)="data">
           {{ data.item.isFollowerAffected ? translate('commons.yes') : translate('commons.no') }}
         </template>
-        <template v-slot:cell(buttons)="data">
-          <div class="float-right" style="width: max-content !important;">
-            <button-with-icon :class="[ data.item.isEnabled ? 'btn-success' : 'btn-danger' ]" class="btn-only-icon btn-reverse" icon="power-off" @click="data.item.isEnabled = !data.item.isEnabled; update(data.item)">
+        <template #cell(buttons)="data">
+          <div
+            class="float-right"
+            style="width: max-content !important;"
+          >
+            <button-with-icon
+              :class="[ data.item.isEnabled ? 'btn-success' : 'btn-danger' ]"
+              class="btn-only-icon btn-reverse"
+              icon="power-off"
+              @click="data.item.isEnabled = !data.item.isEnabled; update(data.item)"
+            >
               {{ translate('dialog.buttons.' + (data.item.isEnabled? 'enabled' : 'disabled')) }}
             </button-with-icon>
-            <button-with-icon class="btn-only-icon btn-primary btn-reverse" icon="edit" v-bind:href="'#/manage/cooldowns/edit/' + data.item.id">
+            <button-with-icon
+              class="btn-only-icon btn-primary btn-reverse"
+              icon="edit"
+              :href="'#/manage/cooldowns/edit/' + data.item.id"
+            >
               {{ translate('dialog.buttons.edit') }}
             </button-with-icon>
-            <button-with-icon class="btn-only-icon btn-danger btn-reverse" icon="trash" @click="del(data.item.id)">
+            <button-with-icon
+              class="btn-only-icon btn-danger btn-reverse"
+              icon="trash"
+              @click="del(data.item.id)"
+            >
               {{ translate('dialog.buttons.delete') }}
             </button-with-icon>
           </div>
@@ -145,6 +246,8 @@
 
 <script lang="ts">
 
+import { getSocket } from '@sogebot/ui-helpers/socket';
+import translate from '@sogebot/ui-helpers/translate';
 import {
   computed, defineComponent, getCurrentInstance, onMounted, ref, watch,
 } from '@vue/composition-api';
@@ -159,13 +262,10 @@ import { CooldownInterface } from 'src/bot/database/entity/cooldown';
 import { ButtonStates } from 'src/panel/helpers/buttonStates';
 import { capitalize } from 'src/panel/helpers/capitalize';
 import { error } from 'src/panel/helpers/error';
-import { getSocket } from 'src/panel/helpers/socket';
-import translate from 'src/panel/helpers/translate';
 
 const socket = getSocket('/systems/cooldown');
 
 export default defineComponent({
-  mixins:     [ validationMixin ],
   components: {
     loading:        () => import('../../components/loading.vue'),
     'label-inside': () => import('src/panel/components/label-inside.vue'),
@@ -179,6 +279,7 @@ export default defineComponent({
       return value.charAt(0).toUpperCase() + value.slice(1);
     },
   },
+  mixins:      [ validationMixin ],
   validations: {
     editationItem: {
       name:        { required, minLength: minLength(2) },
@@ -390,7 +491,7 @@ export default defineComponent({
           refresh();
           state.value.pending = false;
           ctx.root.$router.push({ name: 'cooldownsManagerEdit', params: { id: editationItem.value?.id || '' } }).catch(err => {
-            return; 
+            return;
           });
         });
       }

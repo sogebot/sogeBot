@@ -1,90 +1,160 @@
 <template>
-  <div class="container-fluid" ref="window">
+  <div
+    ref="window"
+    class="container-fluid"
+  >
     <div class="row">
       <div class="col-12">
         <span class="title text-default mb-2">
           {{ translate('menu.registry') }}
-          <small><fa icon="angle-right"/></small>
+          <small><fa icon="angle-right" /></small>
           {{ translate('menu.alerts') }}
         </span>
       </div>
     </div>
 
-    <panel search @search="search = $event">
-      <template v-slot:left>
-        <button-with-icon class="btn-primary btn-reverse" icon="plus" href="#/registry/alerts/edit">{{translate('dialog.title.add')}}</button-with-icon>
+    <panel
+      search
+      @search="search = $event"
+    >
+      <template #left>
+        <button-with-icon
+          class="btn-primary btn-reverse"
+          icon="plus"
+          href="#/registry/alerts/edit"
+        >
+          {{ translate('dialog.title.add') }}
+        </button-with-icon>
       </template>
-      <template v-slot:right>
-        <b-button @click="areAlertsMuted = !areAlertsMuted" class="border-0" :variant="areAlertsMuted ? 'secondary' : 'dark'" id="registryAlertsToggleButton">
-          <fa icon="bell" fixed-width v-if="!areAlertsMuted" />
-          <fa icon="bell-slash" fixed-width v-else />
+      <template #right>
+        <b-button
+          id="registryAlertsToggleButton"
+          class="border-0"
+          :variant="areAlertsMuted ? 'secondary' : 'dark'"
+          @click="areAlertsMuted = !areAlertsMuted"
+        >
+          <fa
+            v-if="!areAlertsMuted"
+            icon="bell"
+            fixed-width
+          />
+          <fa
+            v-else
+            icon="bell-slash"
+            fixed-width
+          />
         </b-button>
-        <b-tooltip target="registryAlertsToggleButton" :title="areAlertsMuted ? 'Alerts are disabled.' : 'Alerts are enabled!'"></b-tooltip>
-        <b-button variant="secondary" v-b-modal.alert-test-modal>{{translate('registry.alerts.test')}}</b-button>
+        <b-tooltip
+          target="registryAlertsToggleButton"
+          :title="areAlertsMuted ? 'Alerts are disabled.' : 'Alerts are enabled!'"
+        />
+        <b-button
+          v-b-modal.alert-test-modal
+          variant="secondary"
+        >
+          {{ translate('registry.alerts.test') }}
+        </b-button>
       </template>
     </panel>
 
-    <b-modal id="alert-test-modal" :title="translate('registry.alerts.testDlg.alertTester')" hide-footer><test/></b-modal>
+    <b-modal
+      id="alert-test-modal"
+      :title="translate('registry.alerts.testDlg.alertTester')"
+      hide-footer
+    >
+      <test />
+    </b-modal>
 
     <loading v-if="state.loaded === $state.progress" />
-    <b-alert show variant="danger" v-else-if="state.loaded === $state.success && filtered.length === 0 && search.length > 0">
-      <fa icon="search"/> <span v-html="translate('registry.alerts.emptyAfterSearch').replace('$search', search)"/>
+    <b-alert
+      v-else-if="state.loaded === $state.success && filtered.length === 0 && search.length > 0"
+      show
+      variant="danger"
+    >
+      <fa icon="search" /> <span v-html="translate('registry.alerts.emptyAfterSearch').replace('$search', search)" />
     </b-alert>
-    <b-alert show v-else-if="state.loaded === $state.success && items.length === 0">
-      {{translate('registry.alerts.empty')}}
+    <b-alert
+      v-else-if="state.loaded === $state.success && items.length === 0"
+      show
+    >
+      {{ translate('registry.alerts.empty') }}
     </b-alert>
-    <b-table v-else :fields="fields" :items="filtered" hover small style="cursor: pointer;" @row-clicked="linkTo($event)">
-      <template v-slot:cell(additional-info)="data">
+    <b-table
+      v-else
+      :fields="fields"
+      :items="filtered"
+      hover
+      small
+      style="cursor: pointer;"
+      @row-clicked="linkTo($event)"
+    >
+      <template #cell(additional-info)="data">
         <span :class="{'text-primary': data.item.follows.length > 0, 'text-muted': data.item.follows.length === 0}">
-          FOLLOW<span v-if="data.item.follows.length > 0">({{data.item.follows.length}})</span>
+          FOLLOW<span v-if="data.item.follows.length > 0">({{ data.item.follows.length }})</span>
         </span>
         <span :class="{'text-primary': data.item.hosts.length > 0, 'text-muted': data.item.hosts.length === 0}">
-          HOSTS<span v-if="data.item.hosts.length > 0">({{data.item.hosts.length}})</span>
+          HOSTS<span v-if="data.item.hosts.length > 0">({{ data.item.hosts.length }})</span>
         </span>
         <span :class="{'text-primary': data.item.raids.length > 0, 'text-muted': data.item.raids.length === 0}">
-          RAID<span v-if="data.item.raids.length > 0">({{data.item.raids.length}})</span>
+          RAID<span v-if="data.item.raids.length > 0">({{ data.item.raids.length }})</span>
         </span>
         <span :class="{'text-primary': data.item.cheers.length > 0, 'text-muted': data.item.cheers.length === 0}">
-          CHEERS<span v-if="data.item.cheers.length > 0">({{data.item.cheers.length}})</span>
+          CHEERS<span v-if="data.item.cheers.length > 0">({{ data.item.cheers.length }})</span>
         </span>
         <span :class="{'text-primary': data.item.subs.length > 0, 'text-muted': data.item.subs.length === 0}">
-          SUBS<span v-if="data.item.subs.length > 0">({{data.item.subs.length}})</span>
+          SUBS<span v-if="data.item.subs.length > 0">({{ data.item.subs.length }})</span>
         </span>
         <span :class="{'text-primary': data.item.resubs.length > 0, 'text-muted': data.item.resubs.length === 0}">
-          RESUBS<span v-if="data.item.resubs.length > 0">({{data.item.resubs.length}})</span>
+          RESUBS<span v-if="data.item.resubs.length > 0">({{ data.item.resubs.length }})</span>
         </span>
         <span :class="{'text-primary': data.item.subgifts.length > 0, 'text-muted': data.item.subgifts.length === 0}">
-          SUBGIFTS<span v-if="data.item.subgifts.length > 0">({{data.item.subgifts.length}})</span>
+          SUBGIFTS<span v-if="data.item.subgifts.length > 0">({{ data.item.subgifts.length }})</span>
         </span>
         <span :class="{'text-primary': data.item.subcommunitygifts.length > 0, 'text-muted': data.item.subcommunitygifts.length === 0}">
-          SUBCOMMUNITYGIFTS<span v-if="data.item.subcommunitygifts.length > 0">({{data.item.subcommunitygifts.length}})</span>
+          SUBCOMMUNITYGIFTS<span v-if="data.item.subcommunitygifts.length > 0">({{ data.item.subcommunitygifts.length }})</span>
         </span>
         <span :class="{'text-primary': data.item.tips.length > 0, 'text-muted': data.item.tips.length === 0}">
-          TIPS<span v-if="data.item.tips.length > 0">({{data.item.tips.length}})</span>
+          TIPS<span v-if="data.item.tips.length > 0">({{ data.item.tips.length }})</span>
         </span>
         <span :class="{'text-primary': data.item.cmdredeems.length > 0, 'text-muted': data.item.cmdredeems.length === 0}">
-          CMDREDEEMS<span v-if="data.item.cmdredeems.length > 0">({{data.item.cmdredeems.length}})</span>
+          CMDREDEEMS<span v-if="data.item.cmdredeems.length > 0">({{ data.item.cmdredeems.length }})</span>
         </span>
         <span :class="{'text-primary': data.item.rewardredeems.length > 0, 'text-muted': data.item.rewardredeems.length === 0}">
-          RWDREDEEMS<span v-if="data.item.rewardredeems.length > 0">({{data.item.rewardredeems.length}})</span>
+          RWDREDEEMS<span v-if="data.item.rewardredeems.length > 0">({{ data.item.rewardredeems.length }})</span>
         </span>
       </template>
-      <template v-slot:cell(buttons)="data">
+      <template #cell(buttons)="data">
         <div class="text-right">
-          <button-with-icon class="btn-only-icon btn-secondary btn-reverse" icon="clone" @click="clone(data.item)"/>
+          <button-with-icon
+            class="btn-only-icon btn-secondary btn-reverse"
+            icon="clone"
+            @click="clone(data.item)"
+          />
           <button-with-icon
             :text="'/overlays/alerts/' + data.item.id"
             :href="'/overlays/alerts/' + data.item.id"
             class="btn-dark btn-only-icon"
             icon="link"
             target="_blank"
-            />
-          <button-with-icon class="btn-only-icon btn-primary btn-reverse" icon="edit" v-bind:href="'#/registry/alerts/edit/' + data.item.id">
+          />
+          <button-with-icon
+            class="btn-only-icon btn-primary btn-reverse"
+            icon="edit"
+            :href="'#/registry/alerts/edit/' + data.item.id"
+          >
             {{ translate('dialog.buttons.edit') }}
           </button-with-icon>
-          <hold-button @trigger="del(data.item)" icon="trash" class="btn-danger btn-reverse btn-only-icon">
-            <template slot="title">{{translate('dialog.buttons.delete')}}</template>
-            <template slot="onHoldTitle">{{translate('dialog.buttons.hold-to-delete')}}</template>
+          <hold-button
+            icon="trash"
+            class="btn-danger btn-reverse btn-only-icon"
+            @trigger="del(data.item)"
+          >
+            <template slot="title">
+              {{ translate('dialog.buttons.delete') }}
+            </template>
+            <template slot="onHoldTitle">
+              {{ translate('dialog.buttons.hold-to-delete') }}
+            </template>
           </hold-button>
         </div>
       </template>
@@ -97,14 +167,14 @@ import { library } from '@fortawesome/fontawesome-svg-core';
 import {
   faBell, faBellSlash, faClone,
 } from '@fortawesome/free-solid-svg-icons';
+import { getSocket } from '@sogebot/ui-helpers/socket';
+import translate from '@sogebot/ui-helpers/translate';
 import { v4 as uuid } from 'uuid';
 import {
   Component, Vue, Watch,
 } from 'vue-property-decorator';
 
 import type { AlertInterface } from 'src/bot/database/entity/alert';
-import { getSocket } from 'src/panel/helpers/socket';
-import translate from 'src/panel/helpers/translate';
 
 library.add(faClone, faBell, faBellSlash);
 

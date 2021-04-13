@@ -168,6 +168,8 @@
 </template>
 
 <script lang="ts">
+import { getSocket } from '@sogebot/ui-helpers/socket';
+import translate from '@sogebot/ui-helpers/translate';
 import {
   computed, defineComponent, onMounted, onUnmounted, ref, watch,
 } from '@vue/composition-api';
@@ -180,8 +182,6 @@ import type { SongRequestInterface } from 'src/bot/database/entity/song';
 import type { currentSongType } from 'src/bot/systems/songs';
 import { error } from 'src/panel/helpers/error';
 import { EventBus } from 'src/panel/helpers/event-bus';
-import { getSocket } from 'src/panel/helpers/socket';
-import translate from 'src/panel/helpers/translate';
 
 Vue.use(VuePlyr, { plyr: {} });
 

@@ -68,15 +68,15 @@
 </template>
 
 <script>
+import { getSocket } from '@sogebot/ui-helpers/socket';
+import translate from '@sogebot/ui-helpers/translate';
 import { orderBy } from 'lodash-es';
 
 import { EventBus } from 'src/panel/helpers/event-bus';
-import { getSocket } from 'src/panel/helpers/socket';
-import translate from 'src/panel/helpers/translate';
 
 export default {
-  props:      ['popout', 'nodrag'],
   components: { loading: () => import('src/panel/components/loading.vue') },
+  props:      ['popout', 'nodrag'],
   data:       function () {
     return {
       translate,
@@ -138,7 +138,7 @@ export default {
     },
     remove() {
       this.socket.emit('cmdboard::remove', this.items.filter(o => this.selected.includes(String(o.id))), () => {
-        return; 
+        return;
       });
       this.items = this.items.filter(o => !this.selected.includes(String(o.id)));
       this.selected = [];

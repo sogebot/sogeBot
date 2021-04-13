@@ -1,4 +1,4 @@
-import { getSocket } from './socket';
+import { getSocket } from '@sogebot/ui-helpers/socket';
 
 const cache: { [id: string]: string } = {};
 const socket = getSocket('/core/users');

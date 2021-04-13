@@ -1,22 +1,38 @@
 <template>
   <div>
     <transition name="fade">
-      <div id="bet" v-if="currentBet" v-show="currentBet && !currentBet.isLocked">
-        <strong class="title">{{currentBet.title}}</strong>
+      <div
+        v-if="currentBet"
+        v-show="currentBet && !currentBet.isLocked"
+        id="bet"
+      >
+        <strong class="title">{{ currentBet.title }}</strong>
         <strong class="timer">
-          <span style="color: red" v-if="this.timeToEnd < 1">&lt;1min</span>
-          <span v-else>{{this.timeToEnd}}min</span>
+          <span
+            v-if="this.timeToEnd < 1"
+            style="color: red"
+          >&lt;1min</span>
+          <span v-else>{{ this.timeToEnd }}min</span>
         </strong>
         <div id="options">
-          <div v-for="(option, index) in currentBet.options" :key="option">
-            <div class="title">{{index + 1}} ... {{option}}</div>
-            <div class="percentage">{{getPercentage(index)}}%</div>
-            <div class="bar"
-              v-bind:style="{
+          <div
+            v-for="(option, index) in currentBet.options"
+            :key="option"
+          >
+            <div class="title">
+              {{ index + 1 }} ... {{ option }}
+            </div>
+            <div class="percentage">
+              {{ getPercentage(index) }}%
+            </div>
+            <div
+              class="bar"
+              :style="{
                 'background-color': getColor(index),
                 'width': getPercentage(index) === 0 ? '5px' : getPercentage(index) + '%'
-                }"
-              style="height: 1.4em; ;"></div>
+              }"
+              style="height: 1.4em; ;"
+            />
           </div>
         </div>
       </div>
@@ -25,10 +41,10 @@
 </template>
 
 <script lang="ts">
+import { getSocket } from '@sogebot/ui-helpers/socket';
 import { Component, Vue } from 'vue-property-decorator';
 
 import { BetsInterface } from 'src/bot/database/entity/bets';
-import { getSocket } from 'src/panel/helpers/socket';
 
 @Component({})
 export default class BetsOverlay extends Vue {

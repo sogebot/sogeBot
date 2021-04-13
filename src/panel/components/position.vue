@@ -1,31 +1,85 @@
 <template>
   <b-card no-body>
-    <b-card-header header-tag="header" class="p-1" role="tab">
-      <b-button block v-b-toggle="'accordion-position-' + uuid" variant="light" class="text-left">{{translate('dialog.position.settings')}}</b-button>
+    <b-card-header
+      header-tag="header"
+      class="p-1"
+      role="tab"
+    >
+      <b-button
+        v-b-toggle="'accordion-position-' + uuid"
+        block
+        variant="light"
+        class="text-left"
+      >
+        {{ translate('dialog.position.settings') }}
+      </b-button>
     </b-card-header>
-    <b-collapse :id="'accordion-position-' + uuid" :accordion="'accordion-position-' + uuid" role="tabpanel">
+    <b-collapse
+      :id="'accordion-position-' + uuid"
+      :accordion="'accordion-position-' + uuid"
+      role="tabpanel"
+    >
       <b-card-body>
         <b-form-group>
           <label for="type_selector"> {{ translate('dialog.position.anchorX') }}</label>
-          <b-form-select v-model="pos.anchorX" id="anchorX_selector">
-            <option value="left" key="left"> {{translate('dialog.position.left') }}</option>
-            <option value="middle" key="middle"> {{translate('dialog.position.middle') }}</option>
-            <option value="right" key="right"> {{translate('dialog.position.right') }}</option>
+          <b-form-select
+            id="anchorX_selector"
+            v-model="pos.anchorX"
+          >
+            <option
+              key="left"
+              value="left"
+            >
+              {{ translate('dialog.position.left') }}
+            </option>
+            <option
+              key="middle"
+              value="middle"
+            >
+              {{ translate('dialog.position.middle') }}
+            </option>
+            <option
+              key="right"
+              value="right"
+            >
+              {{ translate('dialog.position.right') }}
+            </option>
           </b-form-select>
         </b-form-group>
 
         <b-form-group>
           <label for="type_selector"> {{ translate('dialog.position.anchorY') }}</label>
-          <b-form-select v-model="pos.anchorY" id="anchorY_selector">
-            <option value="top" key="top"> {{translate('dialog.position.top') }}</option>
-            <option value="middle" key="middle"> {{translate('dialog.position.middle') }}</option>
-            <option value="bottom" key="bottom"> {{translate('dialog.position.bottom') }}</option>
+          <b-form-select
+            id="anchorY_selector"
+            v-model="pos.anchorY"
+          >
+            <option
+              key="top"
+              value="top"
+            >
+              {{ translate('dialog.position.top') }}
+            </option>
+            <option
+              key="middle"
+              value="middle"
+            >
+              {{ translate('dialog.position.middle') }}
+            </option>
+            <option
+              key="bottom"
+              value="bottom"
+            >
+              {{ translate('dialog.position.bottom') }}
+            </option>
           </b-form-select>
         </b-form-group>
 
-        <b-form-group label-cols-sm="4" label-cols-lg="3"
-                :label="translate('dialog.position.x')"
-                label-for="font.size">
+        <b-form-group
+          label-cols-sm="4"
+          label-cols-lg="3"
+          :label="translate('dialog.position.x')"
+          label-for="font.size"
+        >
           <b-input-group class="mb-2 mr-sm-2 mb-sm-0">
             <b-form-input
               id="position.x"
@@ -34,18 +88,24 @@
               min="0"
               max="100"
               step="0.01"
-            ></b-form-input>
-            <b-input-group-text slot="append" class="pr-3 pl-3">
+            />
+            <b-input-group-text
+              slot="append"
+              class="pr-3 pl-3"
+            >
               <div style="width: 3rem;">
-                {{pos.x}}%
+                {{ pos.x }}%
               </div>
             </b-input-group-text>
           </b-input-group>
         </b-form-group>
 
-        <b-form-group label-cols-sm="4" label-cols-lg="3"
-                :label="translate('dialog.position.y')"
-                label-for="font.size">
+        <b-form-group
+          label-cols-sm="4"
+          label-cols-lg="3"
+          :label="translate('dialog.position.y')"
+          label-for="font.size"
+        >
           <b-input-group class="mb-2 mr-sm-2 mb-sm-0">
             <b-form-input
               id="position.y"
@@ -54,21 +114,47 @@
               min="0"
               max="100"
               step="0.01"
-            ></b-form-input>
-            <b-input-group-text slot="append" class="pr-3 pl-3">
+            />
+            <b-input-group-text
+              slot="append"
+              class="pr-3 pl-3"
+            >
               <div style="width: 3rem;">
-                {{pos.y}}%
+                {{ pos.y }}%
               </div>
             </b-input-group-text>
           </b-input-group>
         </b-form-group>
       </b-card-body>
 
-      <div class="w-25 m-auto pb-4" :key="timestamp">
-        <div class="w-100" ref="example">
-          <b-aspect aspect="16:9" class="border-primary border" style="position: relative">
-            <fa icon="square" size="xs" class="text-primary" style="position:absolute;" :style="positionGenerator('anchor')" ref="anchor"/>
-            <div style="font-size: 1rem; position:absolute;" :style="positionGenerator('text')" ref="text">EXAMPLE TEXT</div>
+      <div
+        :key="timestamp"
+        class="w-25 m-auto pb-4"
+      >
+        <div
+          ref="example"
+          class="w-100"
+        >
+          <b-aspect
+            aspect="16:9"
+            class="border-primary border"
+            style="position: relative"
+          >
+            <fa
+              ref="anchor"
+              icon="square"
+              size="xs"
+              class="text-primary"
+              style="position:absolute;"
+              :style="positionGenerator('anchor')"
+            />
+            <div
+              ref="text"
+              style="font-size: 1rem; position:absolute;"
+              :style="positionGenerator('text')"
+            >
+              EXAMPLE TEXT
+            </div>
           </b-aspect>
         </div>
       </div>
@@ -79,6 +165,7 @@
 <script lang="ts">
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faSquare } from '@fortawesome/free-solid-svg-icons';
+import translate from '@sogebot/ui-helpers/translate';
 import {
   defineComponent, onMounted, onUnmounted, reactive, ref, toRefs, watch,
 } from '@vue/composition-api';
@@ -86,7 +173,6 @@ import type { Ref } from '@vue/composition-api';
 import { v4 as uuidv4 } from 'uuid';
 
 import type { RandomizerInterface } from 'src/bot/database/entity/randomizer';
-import translate from 'src/panel/helpers/translate';
 
 library.add(faSquare);
 

@@ -212,6 +212,8 @@
 <script lang="ts">
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
+import { getSocket } from '@sogebot/ui-helpers/socket';
+import translate from '@sogebot/ui-helpers/translate';
 import { NextFunction } from 'express';
 import {
   cloneDeep, isEqual, orderBy,
@@ -228,8 +230,6 @@ import type { PermissionsInterface } from 'src/bot/database/entity/permissions';
 import type { RandomizerInterface, RandomizerItemInterface } from 'src/bot/database/entity/randomizer';
 import { defaultPermissions } from 'src/bot/helpers/permissions/defaultPermissions';
 import { getContrastColor, getRandomColor } from 'src/panel/helpers/color';
-import { getSocket } from 'src/panel/helpers/socket';
-import translate from 'src/panel/helpers/translate';
 
 library.add(faExclamationTriangle);
 

@@ -6,37 +6,74 @@
           <template v-if="typeof translatedTitle === 'string'">{{ translatedTitle }}</template>
           <template v-else>
             {{ translatedTitle.title }}
-            <small class="text-info" data-toggle="tooltip" data-html="true" :title="translatedTitle.help">[?]</small>
+            <small
+              class="text-info"
+              data-toggle="tooltip"
+              data-html="true"
+              :title="translatedTitle.help"
+            >[?]</small>
           </template>
         </span>
       </div>
 
-      <input class="form-control w-100" type="text" placeholder="Type id or username to search through global ignore list" v-model="search"/>
+      <input
+        v-model="search"
+        class="form-control w-100"
+        type="text"
+        placeholder="Type id or username to search through global ignore list"
+      >
     </div>
-    <ul style="font-size: 0.75rem;" class="list-group list-group-horizontal text-left" v-for="(chunkValues, index) of chunk(excludedValues, 2)" :key="'a' + index">
-      <button type="button" @click="removeFromExcludeList(key)" class="list-group-item w-50 list-group-item-primary" v-for="key of chunkValues" :key="'b' + key">
-      <strong>ID:</strong> {{ key }}<strong><br>Known aliases:</strong> {{ values[key].known_aliases.join(', ') }}<br><strong>Reason:</strong> {{ values[key].reason }}
-      </button>
-    </ul>
-    <ul style="font-size: 0.75rem;" class="list-group list-group-horizontal text-left" v-for="(chunkValues, index) of chunk(Object.keys(computedValues), 2)" :key="'c' + index">
-      <button type="button" @click="addToExcludeList(key)" class="list-group-item w-50 list-group-item-dark" v-for="key of chunkValues" :key="'d' + key">
+    <ul
+      v-for="(chunkValues, index) of chunk(excludedValues, 2)"
+      :key="'a' + index"
+      style="font-size: 0.75rem;"
+      class="list-group list-group-horizontal text-left"
+    >
+      <button
+        v-for="key of chunkValues"
+        :key="'b' + key"
+        type="button"
+        class="list-group-item w-50 list-group-item-primary"
+        @click="removeFromExcludeList(key)"
+      >
         <strong>ID:</strong> {{ key }}<strong><br>Known aliases:</strong> {{ values[key].known_aliases.join(', ') }}<br><strong>Reason:</strong> {{ values[key].reason }}
       </button>
     </ul>
-    <ul class="list-group list-group-horizontal" style="font-size:0.75rem;">
-      <li class="list-group-item w-100 text-center list-group-item-info">Use search input, there are <strong style="font-size: 1.25rem">{{Object.keys(values).length}}</strong> globally ignored users.</li>
+    <ul
+      v-for="(chunkValues, index) of chunk(Object.keys(computedValues), 2)"
+      :key="'c' + index"
+      style="font-size: 0.75rem;"
+      class="list-group list-group-horizontal text-left"
+    >
+      <button
+        v-for="key of chunkValues"
+        :key="'d' + key"
+        type="button"
+        class="list-group-item w-50 list-group-item-dark"
+        @click="addToExcludeList(key)"
+      >
+        <strong>ID:</strong> {{ key }}<strong><br>Known aliases:</strong> {{ values[key].known_aliases.join(', ') }}<br><strong>Reason:</strong> {{ values[key].reason }}
+      </button>
+    </ul>
+    <ul
+      class="list-group list-group-horizontal"
+      style="font-size:0.75rem;"
+    >
+      <li class="list-group-item w-100 text-center list-group-item-info">
+        Use search input, there are <strong style="font-size: 1.25rem">{{ Object.keys(values).length }}</strong> globally ignored users.
+      </li>
     </ul>
   </div>
 </template>
 
 <script lang="ts">
+import translate from '@sogebot/ui-helpers/translate';
 import { chunk } from 'lodash-es';
 import {
-  Component, Prop, Vue, Watch, 
+  Component, Prop, Vue, Watch,
 } from 'vue-property-decorator';
 
 import { globalIgnoreList } from 'src/bot/data/globalIgnoreList';
-import translate from 'src/panel/helpers/translate';
 
 @Component({})
 export default class btnEmit extends Vue {

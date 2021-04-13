@@ -15,12 +15,12 @@
 </template>
 
 <script lang="ts">
+import translate from '@sogebot/ui-helpers/translate';
 import {
   defineComponent, ref, watch,
 } from '@vue/composition-api';
 
 import { getCurrentIP } from 'src/panel/helpers/getCurrentIP';
-import translate from 'src/panel/helpers/translate';
 
 export default defineComponent({
   props: { opts: Object },

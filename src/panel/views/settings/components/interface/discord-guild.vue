@@ -5,21 +5,29 @@
         <template v-if="typeof translatedTitle === 'string'">{{ translatedTitle }}</template>
         <template v-else>
           {{ translatedTitle.title }}
-          <small class="text-info" data-toggle="tooltip" data-html="true" :title="translatedTitle.help">[?]</small>
+          <small
+            class="text-info"
+            data-toggle="tooltip"
+            data-html="true"
+            :title="translatedTitle.help"
+          >[?]</small>
         </template>
       </span>
     </div>
-    <b-form-select v-model="currentValue" :options="guilds"></b-form-select>
+    <b-form-select
+      v-model="currentValue"
+      :options="guilds"
+    />
   </div>
 </template>
 
 <script lang="ts">
-import {
-  Component, Prop, Vue, Watch, 
-} from 'vue-property-decorator';
 
-import { getSocket } from 'src/panel/helpers/socket';
-import translate from 'src/panel/helpers/translate';
+import { getSocket } from '@sogebot/ui-helpers/socket';
+import translate from '@sogebot/ui-helpers/translate';
+import {
+  Component, Prop, Vue, Watch,
+} from 'vue-property-decorator';
 
 type Guild = { text: string, value: string };
 

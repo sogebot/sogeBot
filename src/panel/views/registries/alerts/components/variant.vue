@@ -1,15 +1,19 @@
 <template>
   <b-input-group>
-    <b-form-select v-model="_amount" :options="randomOptions" class="col" plain></b-form-select>
+    <b-form-select
+      v-model="_amount"
+      :options="randomOptions"
+      class="col"
+      plain
+    />
   </b-input-group>
 </template>
 
 <script lang="ts">
+import translate from '@sogebot/ui-helpers/translate';
 import {
-  defineComponent, ref, watch, 
+  defineComponent, ref, watch,
 } from '@vue/composition-api';
-
-import translate from 'src/panel/helpers/translate';
 
 type Props = {
   event: string; state: boolean; condition: string; amount: number;

@@ -53,12 +53,12 @@
 </template>
 
 <script>
+import { getSocket } from '@sogebot/ui-helpers/socket';
+import translate from '@sogebot/ui-helpers/translate';
 import { flatten, sortedUniq } from 'lodash-es';
 import { get } from 'lodash-es';
 
 import { EventBus } from 'src/panel/helpers/event-bus';
-import { getSocket } from 'src/panel/helpers/socket';
-import translate from 'src/panel/helpers/translate';
 
 export default {
   props: ['popout', 'nodrag'],
@@ -76,12 +76,6 @@ export default {
       show:         true,
     };
   },
-
-  beforeDestroy: function() {
-    for(const interval of this.interval) {
-      clearInterval(interval);
-    }
-  },
   computed: {
     isHttps() {
       const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
@@ -97,6 +91,29 @@ export default {
         + (this.theme === 'dark' ? '?darkpopout' : '')
         + (this.theme === 'dark' ? '&parent=' + window.location.hostname : '?parent=' + window.location.hostname);
     },
+  },
+
+  beforeDestroy: function() {
+    for(const interval of this.interval) {
+      clearInterval(interval);
+    }
+  },
+  created: function () {
+    this.interval.push(setInterval(() => {
+      this._chatters();
+    }, 60000));
+
+    this.socket.emit('room', (err, room) => {
+      if (err) {
+        return console.error(err);
+      }
+      this.room = room;
+      this._chatters();
+    });
+
+    this.interval.push(setInterval(() => {
+      this.theme = (localStorage.getItem('theme') || get(this.$store.state, 'configuration.core.ui.theme', 'light'));
+    }, 100));
   },
   methods: {
     refresh: function (event) {
@@ -124,23 +141,6 @@ export default {
         });
       }
     },
-  },
-  created: function () {
-    this.interval.push(setInterval(() => {
-      this._chatters();
-    }, 60000));
-
-    this.socket.emit('room', (err, room) => {
-      if (err) {
-        return console.error(err);
-      }
-      this.room = room;
-      this._chatters();
-    });
-
-    this.interval.push(setInterval(() => {
-      this.theme = (localStorage.getItem('theme') || get(this.$store.state, 'configuration.core.ui.theme', 'light'));
-    }, 100));
   },
 };
 </script>

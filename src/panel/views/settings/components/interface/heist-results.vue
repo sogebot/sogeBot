@@ -1,35 +1,66 @@
 <template>
   <div class="mt-3">
-    <div v-if="w_results.length === 0" class="alert alert-info">
+    <div
+      v-if="w_results.length === 0"
+      class="alert alert-info"
+    >
       {{ translate('games.heist.noResultsFound') }}
     </div>
-    <div class="row" :class="{'mt-3' : index > 0}" :key="index" v-for="(result, index) of w_results">
+    <div
+      v-for="(result, index) of w_results"
+      :key="index"
+      class="row"
+      :class="{'mt-3' : index > 0}"
+    >
       <div class="col-11">
         <div class="input-group">
-          <span class="input-group-text">{{translate('games.heist.message')}}</span>
-          <input type="text" v-model="result.message" class='form-control' @keydown="update" @change="update">
+          <span class="input-group-text">{{ translate('games.heist.message') }}</span>
+          <input
+            v-model="result.message"
+            type="text"
+            class="form-control"
+            @keydown="update"
+            @change="update"
+          >
         </div>
         <div class="input-group mt-1">
-          <span class="input-group-text">{{translate('games.heist.percentage')}}</span>
-          <input type="number" min="1" v-model="result.percentage" class='form-control' @keydown="update" @change="update">
+          <span class="input-group-text">{{ translate('games.heist.percentage') }}</span>
+          <input
+            v-model="result.percentage"
+            type="number"
+            min="1"
+            class="form-control"
+            @keydown="update"
+            @change="update"
+          >
         </div>
       </div>
 
       <div class="col-1 pl-0">
-        <button class="btn btn-danger h-100 w-100" @click="removeResult(index)"><fa icon="trash-alt"></fa></button>
+        <button
+          class="btn btn-danger h-100 w-100"
+          @click="removeResult(index)"
+        >
+          <fa icon="trash-alt" />
+        </button>
       </div>
     </div>
-    <button class="btn btn-success btn-block mt-2" @click="addResult"><fa icon="plus"></fa></button>
+    <button
+      class="btn btn-success btn-block mt-2"
+      @click="addResult"
+    >
+      <fa icon="plus" />
+    </button>
   </div>
 </template>
 
 <script lang="ts">
+import translate from '@sogebot/ui-helpers/translate';
 import {
-  Component, Prop, Vue, Watch, 
+  Component, Prop, Vue, Watch,
 } from 'vue-property-decorator';
 
 import type { Result } from 'src/bot/games/heist';
-import translate from 'src/panel/helpers/translate';
 
 @Component({})
 export default class heistResults extends Vue {

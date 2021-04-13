@@ -4,39 +4,82 @@
       <b-col>
         <span class="title text-default mb-2">
           {{ translate('menu.manage') }}
-          <small><fa icon="angle-right"/></small>
+          <small><fa icon="angle-right" /></small>
           {{ translate('menu.highlights') }}
         </span>
       </b-col>
-      <b-col v-if="!$systems.find(o => o.name === 'highlights').enabled" style=" text-align: right;">
-        <b-alert show variant="danger" style="padding: .5rem; margin: 0; display: inline-block;">
-          <fa icon="exclamation-circle" fixed-width/> {{ translate('this-system-is-disabled') }}
+      <b-col
+        v-if="!$systems.find(o => o.name === 'highlights').enabled"
+        style=" text-align: right;"
+      >
+        <b-alert
+          show
+          variant="danger"
+          style="padding: .5rem; margin: 0; display: inline-block;"
+        >
+          <fa
+            icon="exclamation-circle"
+            fixed-width
+          /> {{ translate('this-system-is-disabled') }}
         </b-alert>
       </b-col>
     </b-row>
 
-    <panel search @search="search = $event"/>
+    <panel
+      search
+      @search="search = $event"
+    />
 
-    <loading v-if="state.loading !== $state.success"/>
-    <b-table v-else striped small :items="filtered" :fields="fields" class="table-p-0">
-      <template v-slot:cell(thumbnail)="data">
-        <img class="float-left pr-3" v-bind:src="generateThumbnail(data.item.game)">
+    <loading v-if="state.loading !== $state.success" />
+    <b-table
+      v-else
+      striped
+      small
+      :items="filtered"
+      :fields="fields"
+      class="table-p-0"
+    >
+      <template #cell(thumbnail)="data">
+        <img
+          class="float-left pr-3"
+          :src="generateThumbnail(data.item.game)"
+        >
       </template>
-      <template v-slot:cell(title)="data">
+      <template #cell(title)="data">
         {{ data.item.title }}
         <small class="d-block">
-          <fa :icon="[ 'far', 'clock' ]"></fa> {{ timestampToString(data.item.timestamp) }}
-          <fa class="ml-2" :icon="['far', 'calendar-alt']"></fa> {{ new Date(data.item.createdAt).toLocaleString() }}
-          <fa class="ml-2" :icon="['fas', 'gamepad']"></fa> {{ data.item.game }}
+          <fa :icon="[ 'far', 'clock' ]" /> {{ timestampToString(data.item.timestamp) }}
+          <fa
+            class="ml-2"
+            :icon="['far', 'calendar-alt']"
+          /> {{ new Date(data.item.createdAt).toLocaleString() }}
+          <fa
+            class="ml-2"
+            :icon="['fas', 'gamepad']"
+          /> {{ data.item.game }}
         </small>
       </template>
-      <template v-slot:cell(buttons)="data">
-        <div class="float-right pr-2" style="width: max-content !important;">
-          <button-with-icon class="btn-only-icon btn-secondary btn-reverse" icon="link" :href="'https://www.twitch.tv/videos/' + data.item.videoId + '?t=' + timestampToString(data.item.timestamp)">
-          </button-with-icon>
-          <hold-button @trigger="deleteItem(data.item.id)" icon="trash" class="btn-danger btn-reverse btn-only-icon">
-            <template slot="title">{{translate('dialog.buttons.delete')}}</template>
-            <template slot="onHoldTitle">{{translate('dialog.buttons.hold-to-delete')}}</template>
+      <template #cell(buttons)="data">
+        <div
+          class="float-right pr-2"
+          style="width: max-content !important;"
+        >
+          <button-with-icon
+            class="btn-only-icon btn-secondary btn-reverse"
+            icon="link"
+            :href="'https://www.twitch.tv/videos/' + data.item.videoId + '?t=' + timestampToString(data.item.timestamp)"
+          />
+          <hold-button
+            icon="trash"
+            class="btn-danger btn-reverse btn-only-icon"
+            @trigger="deleteItem(data.item.id)"
+          >
+            <template slot="title">
+              {{ translate('dialog.buttons.delete') }}
+            </template>
+            <template slot="onHoldTitle">
+              {{ translate('dialog.buttons.hold-to-delete') }}
+            </template>
           </hold-button>
         </div>
       </template>
@@ -48,11 +91,10 @@
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faCalendarAlt } from '@fortawesome/free-regular-svg-icons';
 import { faGamepad } from '@fortawesome/free-solid-svg-icons';
+import { getSocket } from '@sogebot/ui-helpers/socket';
+import translate from '@sogebot/ui-helpers/translate';
 import { isNil } from 'lodash-es';
 import { Component, Vue } from 'vue-property-decorator';
-
-import { getSocket } from 'src/panel/helpers/socket';
-import translate from 'src/panel/helpers/translate';
 
 import { HighlightInterface } from '../../../bot/database/entity/highlight';
 
@@ -67,7 +109,7 @@ export default class highlightsList extends Vue {
 
   fields = [
     {
-      key: 'thumbnail', label: '', tdClass: 'fitThumbnail', 
+      key: 'thumbnail', label: '', tdClass: 'fitThumbnail',
     },
     { key: 'title', label: '' },
     { key: 'buttons', label: '' },
