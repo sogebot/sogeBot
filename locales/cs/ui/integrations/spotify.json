@@ -12,6 +12,10 @@
     },
     "clientId": "clientId",
     "clientSecret": "clientSecret",
+    "manualDeviceId": {
+      "title": "Vynucené ID zařízení",
+      "help": "Prázdné = vypnuté, vynucené spotify ID zařízení, které bude použito pro skladby ve frontě. Zkontrolujte logy aktuálního aktivního zařízení nebo použijte tlačítko při přehrávání písně po dobu nejméně 10 sekund."
+    },
     "redirectURI": "redirectURI",
     "format": {
       "title": "Formát",
