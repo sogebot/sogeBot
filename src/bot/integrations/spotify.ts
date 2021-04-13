@@ -287,7 +287,7 @@ class Spotify extends Integration {
     clearTimeout(this.timeouts.getMe);
 
     try {
-      if ((this.enabled) && !_.isNil(this.client) && !this.isUnauthorized) {
+      if ((this.enabled) && !_.isNil(this.client)) {
         const data = await this.client.getMe();
 
         this.username = data.body.display_name ? data.body.display_name : data.body.id;
@@ -295,6 +295,7 @@ class Spotify extends Integration {
           info(chalk.yellow('SPOTIFY: ') + `Logged in as ${this.username}#${data.body.id}`);
         }
         this.userId = data.body.id;
+        this.isUnauthorized = false;
       }
     } catch (e) {
       if (e.message.includes('The access token expired.')) {
@@ -304,9 +305,11 @@ class Spotify extends Integration {
         }
         firstAuthorizationDone = true;
         this.getMe();
-      } else  if (e.message !== 'Unauthorized') {
-        this.isUnauthorized = true;
-        info(chalk.yellow('SPOTIFY: ') + 'Get of user failed, check your credentials');
+      } else if (e.message !== 'Unauthorized') {
+        if (!this.isUnauthorized) {
+          this.isUnauthorized = true;
+          info(chalk.yellow('SPOTIFY: ') + 'Get of user failed, check your credentials');
+        }
       }
       this.username = '';
       this.userId = null;
@@ -725,6 +728,9 @@ class Spotify extends Integration {
         return true;
       } catch (e) {
         if (e.stack.includes('WebapiPlayerError')) {
+          if (e.message.includes('NO_ACTIVE_DEVICE')) {
+            throw new Error('NO_ACTIVE_DEVICE');
+          }
           if (e.message.includes('PREMIUM_REQUIRED')) {
             throw new Error('PREMIUM_REQUIRED');
           }
