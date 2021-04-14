@@ -4,6 +4,7 @@ import * as _ from 'lodash';
 import { Brackets, getRepository } from 'typeorm';
 
 import { EventList as EventListEntity } from '../database/entity/eventList';
+import { warning } from '../helpers/log';
 import { adminEndpoint, publicEndpoint } from '../helpers/socket';
 import { isBotId } from '../helpers/user/isBot';
 import users from '../users';
@@ -95,6 +96,7 @@ class EventList extends Overlay {
 
   async add (data: EventList.Event) {
     if (!data.userId.includes('__anonymous__') && isBotId(data.userId)) {
+      warning(`Event ${data.event} won't be saved in eventlist, coming from bot account.`);
       return;
     } // don't save event from a bot
 
