@@ -123,7 +123,7 @@ export const init = () => {
     if (!nuxtCache.get(req.url)) {
       // search through node_modules to find correct nuxt file
       const paths = [
-        path.join(__dirname, '..', 'node_modules', '@sogebot', 'ui-login', 'dist', '_nuxt'),
+        path.join(__dirname, '..', 'node_modules', '@sogebot', 'ui-oauth', 'dist', '_nuxt'),
       ];
       for (const dir of paths) {
         const pathToFile = path.join(dir, req.url.replace('_nuxt', ''));
@@ -164,14 +164,11 @@ export const init = () => {
   app?.get('/popout/', function (req, res) {
     res.sendFile(path.join(__dirname, '..', 'public', 'popout.html'));
   });
-  app?.get('/oauth', function (req, res) {
-    res.sendFile(path.join(__dirname, '..', 'node_modules', '@sogebot', 'ui-login', 'dist', 'oauth', 'index.html'));
+  app?.get('/oauth/:page?', function (req, res) {
+    res.sendFile(path.join(__dirname, '..', 'node_modules', '@sogebot', 'ui-oauth', 'dist', 'oauth', 'index.html'));
   });
   app?.get('/login', function (req, res) {
-    res.sendFile(path.join(__dirname, '..', 'node_modules', '@sogebot', 'ui-login', 'dist', 'login', 'index.html'));
-  });
-  app?.get('/oauth/:page', function (req, res) {
-    res.sendFile(path.join(__dirname, '..', 'public', 'oauth-' + sanitize(req.params.page) + '.html'));
+    res.sendFile(path.join(__dirname, '..', 'node_modules', '@sogebot', 'ui-oauth', 'dist', 'login', 'index.html'));
   });
   app?.get('/overlays/:overlay', function (req, res) {
     res.sendFile(path.join(__dirname, '..', 'public', 'overlays.html'));

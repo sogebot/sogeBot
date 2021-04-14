@@ -11,8 +11,8 @@
   "author": "Michal Orlik <sogehige@gmail.com>",
   "license": "MIT",
   "dependencies": {
-    "@sogebot/ui-helpers": "^1.0.1",
-    "@sogebot/ui-login": "^1.0.0",
+    "@sogebot/ui-helpers": "^1.0.3",
+    "@sogebot/ui-oauth": "^1.1.5",
     "axios": "0.21.1",
     "basic-auth": "2.0.1",
     "better-sqlite3": "7.1.4",

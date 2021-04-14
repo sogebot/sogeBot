@@ -40,7 +40,6 @@ const webpackConfig = {
     popout: './src/panel/popout.ts',
     overlay: './src/overlay/index.ts',
     public: './src/public/index.ts',
-    spotify: './src/oauth/spotify.ts',
   },
   resolve: {
     fallback: {
@@ -87,12 +86,6 @@ const webpackConfig = {
     }),
     new HtmlWebpackPlugin({
       filename: '../../overlays.html', template: 'src/overlay/index.html', chunks: ['overlay']
-    }),
-    new HtmlWebpackPlugin({
-      filename: '../../oauth.html', template: 'src/oauth/index.html', chunks: []
-    }),
-    new HtmlWebpackPlugin({
-      filename: '../../oauth-spotify.html', template: 'src/oauth/spotify.html', chunks: ['spotify']
     }),
   ],
   module: {
