@@ -5,6 +5,7 @@ import { getRepository } from 'typeorm';
 import WebSocket from 'ws';
 
 import currency from '../currency';
+import type { currency as currencyType } from '../currency';
 import { User, UserTipInterface } from '../database/entity/user';
 import { settings } from '../decorators';
 import { ui } from '../decorators.js';
@@ -28,7 +29,7 @@ type DonationAlertsEvent = {
   message: string;
   message_type: string;
   amount: number;
-  currency: currency;
+  currency: currencyType;
   billing_system: string;
 };
 

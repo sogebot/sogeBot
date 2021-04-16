@@ -4,6 +4,7 @@ import { io, Socket } from 'socket.io-client';
 import { getRepository } from 'typeorm';
 
 import currency from '../currency';
+import type { currency as currencyType } from '../currency';
 import { User, UserTipInterface } from '../database/entity/user';
 import {
   persistent, settings, ui,
@@ -33,7 +34,7 @@ namespace StreamlabsEvent {
       formatted_amount: string;
       formattedAmount: string;
       message: string;
-      currency: currency;
+      currency: currencyType;
       emotes: null;
       iconClassName: string;
       to: {
@@ -201,7 +202,7 @@ class Streamlabs extends Integration {
           // incorrect currency on event rerun
           const parsedCurrency = (event.formatted_amount as string).match(/(?<currency>[A-Z\$]{3}|\$)/);
           if (parsedCurrency && parsedCurrency.groups) {
-            event.currency = (parsedCurrency.groups.currency === '$' ? 'USD' : parsedCurrency.groups.currency) as currency;
+            event.currency = (parsedCurrency.groups.currency === '$' ? 'USD' : parsedCurrency.groups.currency) as currencyType;
           }
 
           const created_at = (event.created_at * 1000) || Date.now();

@@ -1,3 +1,5 @@
+import type { currency } from '../../currency';
+
 let _mainCurrency: currency = 'EUR';
 
 const mainCurrency = {

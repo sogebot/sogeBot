@@ -5,6 +5,7 @@ type KnownNoticeMessageIds = import('twitch-js').KnownNoticeMessageIds;
 
 type DiscordJsTextChannel = import('discord.js').TextChannel;
 type DiscordJsUser = import('discord.js').User;
+type currency = import('../src/bot/currency').currency;
 
 declare class Stringified<T> extends String {
   private ___stringified: T;
@@ -15,8 +16,6 @@ interface JSON {
   parse<T>(text: Stringified<T>, reviver?: (key: any, value: any) => any): T
   parse(text: string, reviver?: (key: any, value: any) => any): any
 }
-
-type currency = 'USD' | 'AUD' | 'BGN' | 'BRL' | 'CAD' | 'CHF' | 'CNY' | 'CZK' | 'DKK' | 'EUR' | 'GBP' | 'HKD' | 'HRK' | 'HUF' | 'IDR' | 'ILS' | 'INR' | 'ISK' | 'JPY' | 'KRW' | 'MXN' | 'MYR' | 'NOK' | 'NZD' | 'PHP' | 'PLN' | 'RON' | 'RUB' | 'SEK' | 'SGD' | 'THB' | 'TRY' | 'ZAR';
 
 type TimestampObject = {
   hours: number; minutes: number; seconds: number

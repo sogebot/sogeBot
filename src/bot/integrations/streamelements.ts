@@ -4,6 +4,7 @@ import io from 'socket.io-client-legacy';
 import { getRepository } from 'typeorm';
 
 import currency from '../currency';
+import type { currency as currencyType } from '../currency';
 import { User, UserTipInterface } from '../database/entity/user';
 import { settings, ui } from '../decorators';
 import { onChange, onStartup } from '../decorators/on';
@@ -31,7 +32,7 @@ type StreamElementsEvent = {
     tipId: string;
     username: string;
     amount: number;
-    currency: currency;
+    currency: currencyType;
     message: string;
     items: any[];
     avatar: string;

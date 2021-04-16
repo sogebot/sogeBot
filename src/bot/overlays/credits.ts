@@ -3,6 +3,7 @@ import { getRepository, MoreThanOrEqual } from 'typeorm';
 
 import api from '../api';
 import currency from '../currency';
+import type { currency as currencyType } from '../currency';
 import { EventList, EventListInterface } from '../database/entity/eventList';
 import { settings, ui } from '../decorators';
 import {
@@ -102,7 +103,7 @@ class Credits extends Overlay {
       const when = isStreamOnline.value ? streamStatusChangeSince.value : Date.now() - 50000000000;
       const timestamp = new Date(when).getTime();
       const events: (EventListInterface & { username?: string, values?: {
-        currency: currency; amount: number;
+        currency: currencyType; amount: number;
       };})[] = await getRepository(EventList).find({
         order: { timestamp: 'DESC' },
         where: { timestamp: MoreThanOrEqual(timestamp) },

@@ -1,5 +1,6 @@
 import { EntitySchema } from 'typeorm';
 
+import type { currency } from '../../currency';
 import { ColumnNumericTransformer, SafeNumberTransformer } from './_transformer';
 
 export interface UserInterface {
