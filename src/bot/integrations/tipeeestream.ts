@@ -4,7 +4,6 @@ import io from 'socket.io-client-legacy';
 import { getRepository } from 'typeorm';
 
 import currency from '../currency';
-import type { currency as currencyType } from '../currency';
 import { User, UserTipInterface } from '../database/entity/user';
 import { settings } from '../decorators';
 import { ui } from '../decorators.js';
@@ -142,7 +141,7 @@ class TipeeeStream extends Integration {
     try {
       const { amount, message } = data.event.parameters;
       const username = data.event.parameters.username.toLowerCase();
-      const donationCurrency = data.event.parameters.currency as currencyType;
+      const donationCurrency = data.event.parameters.currency as currency;
 
       eventlist.add({
         event:     'tip',
