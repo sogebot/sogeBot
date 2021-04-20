@@ -6,28 +6,22 @@ export class removeTipsAndBitsRelation1618939162326 implements MigrationInterfac
   public async up(queryRunner: QueryRunner): Promise<void> {
     const tips: any[] = await queryRunner.query(`SELECT * from "user_tip"`);
     const bits: any[] = await queryRunner.query(`SELECT * from "user_bit"`);
-    console.log('a');
     await queryRunner.query(`DROP TABLE "user_tip"`);
     await queryRunner.query(`DROP TABLE "user_bit"`);
-    console.log('b');
     await queryRunner.query(`CREATE TABLE "user_tip" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "amount" float NOT NULL, "sortAmount" float NOT NULL, "exchangeRates" text NOT NULL, "currency" varchar NOT NULL, "message" text NOT NULL, "tippedAt" bigint NOT NULL DEFAULT (0), "userId" varchar)`);
     await queryRunner.query(`CREATE TABLE "user_bit" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "amount" bigint NOT NULL, "message" text NOT NULL, "cheeredAt" bigint NOT NULL DEFAULT (0), "userId" varchar)`);
-    console.log('d');
 
     for (const tip of tips as any) {
       tip.userId = tip.userUserId;
       delete tip.userUserId;
       await queryRunner.manager.getRepository(`user_tip`).save(tip);
     }
-    console.log('e');
 
     for (const bit of bits as any) {
       bit.userId = bit.userUserId;
       delete bit.userUserId;
       await queryRunner.manager.getRepository(`user_bit`).save(bit);
     }
-    console.log('f');
-
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
