@@ -5,7 +5,7 @@ import { getRepository } from 'typeorm';
 import WebSocket from 'ws';
 
 import currency from '../currency';
-import { User, UserTipInterface } from '../database/entity/user';
+import { UserTip, UserTipInterface } from '../database/entity/user';
 import { settings } from '../decorators';
 import { ui } from '../decorators.js';
 import { onChange, onStartup } from '../decorators/on.js';
@@ -189,9 +189,9 @@ class Donationalerts extends Integration {
         message:       data.message,
         tippedAt:      Date.now(),
         exchangeRates: currency.rates,
+        userId:        user.userId,
       };
-      user.tips.push(newTip);
-      getRepository(User).save(user);
+      getRepository(UserTip).save(newTip);
 
       tip(`${data.username.toLowerCase()}${user.userId ? '#' + user.userId : ''}, amount: ${Number(data.amount).toFixed(2)}${data.currency}, message: ${data.message}`);
 

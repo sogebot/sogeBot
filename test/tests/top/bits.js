@@ -1,19 +1,18 @@
 /* global describe it before */
-const { getOwner } = require('../../../dest/helpers/commons/getOwner');
+/* global describe it before */
+const assert = require('assert');
 
 require('../../general.js');
+const { getRepository } = require('typeorm');
 
+const currency = require('../../../dest/currency').default;
+const { User, UserBit } = require('../../../dest/database/entity/user');
+const { getOwner } = require('../../../dest/helpers/commons/getOwner');
+const { prepare } = require('../../../dest/helpers/commons/prepare');
+const top = (require('../../../dest/systems/top')).default;
+const tmi = (require('../../../dest/tmi')).default;
 const db = require('../../general.js').db;
 const message = require('../../general.js').message;
-
-const top = (require('../../../dest/systems/top')).default;
-
-const { getRepository } = require('typeorm');
-const { User, UserBit } = require('../../../dest/database/entity/user');
-
-const { prepare } = require('../../../dest/helpers/commons/prepare');
-const tmi = (require('../../../dest/tmi')).default;
-const assert = require('assert');
 
 // users
 const owner = { username: '__broadcaster__' };
@@ -26,24 +25,23 @@ describe('Top - !top bits', () => {
 
   it ('Add 10 users into db and last user will don\'t have any bits', async () => {
     for (let i = 0; i < 10; i++) {
-      const user = {
-        bits: [],
-        ...await getRepository(User).save({ userId: String(Math.floor(Math.random() * 100000)), username: 'user' + i }),
-      };
+      const userId = String(Math.floor(Math.random() * 100000));
+      const bits = [];
+      const user = { ...await getRepository(User).save({ userId, username: 'user' + i }) };
 
       if (i === 0) {
         continue;
       }
 
       for (let j = 0; j <= i; j++) {
-        user.bits.push({
-          amount: j,
+        bits.push({
+          amount:    j,
           cheeredAt: Date.now(),
-          message: '',
+          message:   '',
+          userId,
         });
       }
-
-      await getRepository(User).save(user);
+      await getRepository(UserBit).save(bits);
     }
   });
 

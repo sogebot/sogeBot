@@ -3,7 +3,9 @@ import { getRepository } from 'typeorm';
 import api from '../api';
 import { dateDiff } from '../commons';
 import currency from '../currency';
-import { User } from '../database/entity/user';
+import {
+  User, UserBit, UserTip, 
+} from '../database/entity/user';
 import {
   command, default_permission, settings, ui,
 } from '../decorators';
@@ -226,6 +228,8 @@ class UserInfo extends System {
         where: { userId: opts.sender.userId },
         cache: true,
       });
+      const tips =  await getRepository(UserTip).find({ where: { userId: opts.sender.userId } });
+      const bits =  await getRepository(UserBit).find({ where: { userId: opts.sender.userId } });
 
       if (!user) {
         throw Error(`User ${opts.sender.username}#${opts.sender.userId} not found.`);
@@ -279,7 +283,6 @@ class UserInfo extends System {
 
       if (message.includes('$tips')) {
         const idx = message.indexOf('$tips');
-        const tips = user.tips;
         let tipAmount = 0;
         for (const t of tips) {
           tipAmount += currency.exchange(Number(t.amount), t.currency, mainCurrency.value);
@@ -289,7 +292,6 @@ class UserInfo extends System {
 
       if (message.includes('$bits')) {
         const idx = message.indexOf('$bits');
-        const bits = user.bits;
         const bitAmount = bits.map(o => Number(o.amount)).reduce((a, b) => a + b, 0);
         message[idx] = `${bitAmount} ${getLocalizedName(bitAmount, translate('core.bits'))}`;
       }

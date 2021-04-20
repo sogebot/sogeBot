@@ -4,7 +4,7 @@ import io from 'socket.io-client-legacy';
 import { getRepository } from 'typeorm';
 
 import currency from '../currency';
-import { User, UserTipInterface } from '../database/entity/user';
+import { UserTip, UserTipInterface } from '../database/entity/user';
 import { settings, ui } from '../decorators';
 import { onChange, onStartup } from '../decorators/on';
 import { isStreamOnline, stats } from '../helpers/api/index.js';
@@ -151,15 +151,6 @@ class StreamElements extends Integration {
     const { username, amount, message } = eventData.data;
     const DONATION_CURRENCY = eventData.data.currency;
 
-    const newTip: UserTipInterface = {
-      amount:        Number(amount),
-      currency:      DONATION_CURRENCY,
-      sortAmount:    currency.exchange(Number(amount), DONATION_CURRENCY, mainCurrency.value),
-      message,
-      tippedAt:      Date.now(),
-      exchangeRates: currency.rates,
-    };
-
     if (isStreamOnline.value) {
       stats.value.currentTips = stats.value.currentTips + currency.exchange(amount, DONATION_CURRENCY, mainCurrency.value);
     }
@@ -167,8 +158,16 @@ class StreamElements extends Integration {
     let isAnonymous = false;
     users.getUserByUsername(username)
       .then(async(user) => {
-        user.tips.push(newTip);
-        getRepository(User).save(user);
+        const newTip: UserTipInterface = {
+          amount:        Number(amount),
+          currency:      DONATION_CURRENCY,
+          sortAmount:    currency.exchange(Number(amount), DONATION_CURRENCY, mainCurrency.value),
+          message,
+          tippedAt:      Date.now(),
+          exchangeRates: currency.rates,
+          userId:        user.userId,
+        };
+        getRepository(UserTip).save(newTip);
         tip(`${username.toLowerCase()}${user.userId ? '#' + user.userId : ''}, amount: ${Number(amount).toFixed(2)}${DONATION_CURRENCY}, message: ${message}`);
         eventlist.add({
           event:     'tip',
