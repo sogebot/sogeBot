@@ -4,7 +4,7 @@ import { io, Socket } from 'socket.io-client';
 import { getRepository } from 'typeorm';
 
 import currency from '../currency';
-import { User, UserTipInterface } from '../database/entity/user';
+import { UserTip, UserTipInterface } from '../database/entity/user';
 import {
   persistent, settings, ui,
 } from '../decorators';
@@ -196,6 +196,7 @@ class Streamlabs extends Integration {
         debug('streamlabs', event);
         if (!event.isTest) {
           const user = await users.getUserByUsername(event.from.toLowerCase());
+          const tips = await getRepository(UserTip).find({ where: { userId: user.userId } });
 
           // workaround for https://github.com/sogehige/sogeBot/issues/3338
           // incorrect currency on event rerun
@@ -206,7 +207,7 @@ class Streamlabs extends Integration {
 
           const created_at = (event.created_at * 1000) || Date.now();
           // check if it is new tip (by message and by tippedAt time interval)
-          if (user.tips.find(item => {
+          if (tips.find(item => {
             return item.message === event.message
             && (item.tippedAt || 0) - 30000 < created_at
             && (item.tippedAt || 0) + 30000 > created_at;
@@ -221,9 +222,9 @@ class Streamlabs extends Integration {
             message:       event.message,
             tippedAt:      created_at,
             exchangeRates: currency.rates,
+            userId:        user.userId,
           };
-          user.tips.push(newTip);
-          getRepository(User).save(user);
+          getRepository(UserTip).save(newTip);
 
           if (isStreamOnline.value) {
             stats.value.currentTips = stats.value.currentTips + Number(currency.exchange(Number(event.amount), event.currency, mainCurrency.value));

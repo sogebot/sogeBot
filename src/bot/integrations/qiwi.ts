@@ -2,7 +2,7 @@ import axios from 'axios';
 import { getRepository } from 'typeorm';
 
 import currency from '../currency';
-import { User, UserTipInterface } from '../database/entity/user';
+import { UserTip, UserTipInterface } from '../database/entity/user';
 import { settings } from '../decorators';
 import { ui } from '../decorators.js';
 import { onChange, onStartup } from '../decorators/on.js';
@@ -79,10 +79,9 @@ class Qiwi extends Integration {
           message:       message,
           tippedAt:      Date.now(),
           exchangeRates: currency.rates,
+          userId:        user.userId,
         };
-        user.tips.push(newTip);
-        getRepository(User).save(user);
-
+        getRepository(UserTip).save(newTip);
       }
 
       if (isStreamOnline.value) {

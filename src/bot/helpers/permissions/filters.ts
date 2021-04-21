@@ -1,6 +1,10 @@
+import { getRepository } from 'typeorm';
+
 import currency from '../../currency';
 import { PermissionFiltersInterface } from '../../database/entity/permissions';
-import { UserInterface } from '../../database/entity/user';
+import {
+  UserBit, UserInterface, UserTip,
+} from '../../database/entity/user';
 import type { default as levelType } from '../../systems/levels';
 import type { default as ranksType } from '../../systems/ranks';
 import { mainCurrency } from '../currency';
@@ -29,7 +33,8 @@ async function _filters(
         amount = levels.getLevelOf(user);
         break;
       case 'bits':
-        amount = user.bits.reduce((a, b) => (a + b.amount), 0);
+        const bits = await getRepository(UserBit).find({ where: { userId: user.userId } });
+        amount = bits.reduce((a, b) => (a + b.amount), 0);
         break;
       case 'messages':
         amount = user.messages;
@@ -47,7 +52,8 @@ async function _filters(
         amount = user.subscribeTier === 'Prime' ? 0 : Number(user.subscribeTier);
         break;
       case 'tips':
-        amount = user.tips.reduce((a, b) => (a + currency.exchange(b.amount, b.currency, mainCurrency.value)), 0);
+        const tips = await getRepository(UserTip).find({ where: { userId: user.userId } });
+        amount = tips.reduce((a, b) => (a + currency.exchange(b.amount, b.currency, mainCurrency.value)), 0);
         break;
       case 'followtime':
         amount = (Date.now() - user.followedAt) / (31 * 24 * 60 * 60 * 1000 /*months*/);

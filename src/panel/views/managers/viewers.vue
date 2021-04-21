@@ -1162,7 +1162,9 @@ import { validationMixin } from 'vuelidate';
 import { minValue, required } from 'vuelidate/lib/validators';
 
 import { EventListInterface } from 'src/bot/database/entity/eventList';
-import { UserInterface } from 'src/bot/database/entity/user';
+import {
+  UserBitInterface, UserInterface, UserTipInterface, 
+} from 'src/bot/database/entity/user';
 import { dayjs } from 'src/bot/helpers/dayjs';
 import { ButtonStates } from 'src/panel/helpers/buttonStates';
 import { capitalize } from 'src/panel/helpers/capitalize';
@@ -1194,7 +1196,7 @@ export default defineComponent({
     const sidebarSlideEnabled = ref(true);
 
     const items = ref([] as Required<UserInterface>[]);
-    const editationItem = ref(null as UserInterface | null);
+    const editationItem = ref(null as (UserInterface & { bits: UserBitInterface[], tips: UserTipInterface[]}) | null);
     const editationItemEvents = ref(null as Required<EventListInterface>[] | null);
     const editationItemWatchedTime = ref(0);
     const editingTipsIds = ref([] as number[]);
@@ -1422,7 +1424,7 @@ export default defineComponent({
         return;
       }
       await new Promise<void>((resolve, reject) => {
-        socket.emit('viewers::findOne', ctx.root.$route.params.id, (err: string | null, data: Readonly<Required<UserInterface>> & { aggregatedTips: number; aggregatedBits: number; permission: string }) => {
+        socket.emit('viewers::findOne', ctx.root.$route.params.id, (err: string | null, data: Readonly<Required<(UserInterface & { bits: UserBitInterface[], tips: UserTipInterface[]})>> & { aggregatedTips: number; aggregatedBits: number; permission: string }) => {
           if (err) {
             reject(console.error(err));
           }
@@ -1512,7 +1514,7 @@ export default defineComponent({
       $v?.$touch();
       if (!$v?.$invalid) {
         state.value.save = ButtonStates.progress;
-        socket.emit('viewers::save', editationItem.value, (err: string | null, viewer: UserInterface) => {
+        socket.emit('viewers::save', editationItem.value, (err: string | null, viewer: (UserInterface & { bits: UserBitInterface[], tips: UserTipInterface[]})) => {
           if (err) {
             console.error(err);
             return state.value.save = ButtonStates.fail;

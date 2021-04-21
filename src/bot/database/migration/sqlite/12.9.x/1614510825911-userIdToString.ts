@@ -9,8 +9,8 @@ export class userIdToString1614510825911 implements MigrationInterface {
     const pointsChangelog = await queryRunner.manager.getRepository(`points_changelog`).find();
     const quotes = await queryRunner.manager.getRepository(`quotes`).find();
     const user: any[] = (await queryRunner.manager.getRepository(`user`).find()).map((o: any) => ({ ...o, userId: String(o.userId) }));
-    const user_bit: any[] = (await queryRunner.manager.getRepository(`user_bit`).find()).map((o: any) => ({ ...o, userId: String(o.userId) }));
-    const user_tip: any[] = (await queryRunner.manager.getRepository(`user_tip`).find()).map((o: any) => ({ ...o, userId: String(o.userId) }));
+    const user_bit: any[] = (await queryRunner.query(`SELECT * from "user_tip"`)).map((o: any) => ({ ...o, userId: String(o.userId) }));
+    const user_tip: any[] = (await queryRunner.query(`SELECT * from "user_bit"`)).map((o: any) => ({ ...o, userId: String(o.userId) }));
 
     await queryRunner.query(`DROP INDEX "IDX_eb26a8222f1ed29abbef861295"`);
     await queryRunner.query(`CREATE TABLE "temporary_bets_participations" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "userId" integer NOT NULL, "username" varchar NOT NULL, "points" bigint NOT NULL, "optionIdx" bigint NOT NULL, "betId" integer, CONSTRAINT "FK_f4888a939a9c39297bd786c5e9c" FOREIGN KEY ("betId") REFERENCES "bets" ("id") ON DELETE CASCADE ON UPDATE CASCADE)`);

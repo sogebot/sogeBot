@@ -13,7 +13,9 @@ import { parserReply } from './commons';
 import * as constants from './constants';
 import type { EmitData } from './database/entity/alert';
 import { Price } from './database/entity/price';
-import { User, UserBitInterface } from './database/entity/user';
+import {
+  User, UserBit, UserBitInterface, 
+} from './database/entity/user';
 import { settings, ui } from './decorators';
 import { command, default_permission } from './decorators';
 import {
@@ -837,9 +839,9 @@ class TMI extends Core {
         amount:    Number(userstate.bits),
         cheeredAt: Date.now(),
         message:   messageFromUser,
+        userId:    String(userId),
       };
-      user.bits.push(newBits);
-      getRepository(User).save(user);
+      getRepository(UserBit).save(newBits);
 
       eventEmitter.emit('cheer', {
         username, bits: Number(userstate.bits), message: messageFromUser,

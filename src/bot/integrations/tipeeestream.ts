@@ -4,7 +4,7 @@ import io from 'socket.io-client-legacy';
 import { getRepository } from 'typeorm';
 
 import currency from '../currency';
-import { User, UserTipInterface } from '../database/entity/user';
+import { UserTip, UserTipInterface } from '../database/entity/user';
 import { settings } from '../decorators';
 import { ui } from '../decorators.js';
 import { onChange, onStartup } from '../decorators/on.js';
@@ -180,9 +180,9 @@ class TipeeeStream extends Integration {
         message,
         exchangeRates: currency.rates,
         tippedAt:      Date.now(),
+        userId:        user.userId,
       };
-      user.tips.push(newTip);
-      getRepository(User).save(user);
+      getRepository(UserTip).save(newTip);
 
       tip(`${username}${user.userId ? '#' + user.userId : ''}, amount: ${amount.toFixed(2)}${donationCurrency}, message: ${message}`);
 

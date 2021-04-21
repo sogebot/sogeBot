@@ -17,7 +17,9 @@ import type { RankInterface } from '../database/entity/rank';
 import type { SongPlaylistInterface } from '../database/entity/song';
 import type { TextInterface } from '../database/entity/text';
 import type { TimerInterface } from '../database/entity/timer';
-import type { UserInterface } from '../database/entity/user';
+import type {
+  UserBitInterface, UserInterface, UserTipInterface, 
+} from '../database/entity/user';
 import type { VariableInterface, VariableWatchInterface } from '../database/entity/variable';
 import type PUBG from '../integrations/pubg';
 
@@ -104,7 +106,7 @@ function adminEndpoint (nsp: string, on: 'ranks::save', callback: (item: Readonl
 function adminEndpoint (nsp: string, on: 'timers::save', callback: (item: Readonly<Required<TimerInterface>> & Readonly<Required<RandomizerInterface>>[], cb: (error: Error | string | null, ...response: any) => void) => void): void;
 function adminEndpoint (nsp: string, on: 'cmdboard::save' | 'cmdboard::remove', callback: (items: Readonly<Required<CommandsBoardInterface>> & Readonly<Required<CommandsBoardInterface>>[], cb: (error: Error | string | null, ...response: any) => void) => void): void;
 function adminEndpoint (nsp: string, on: 'eventlist::removeById', callback: (id: string | string[], cb: (error: Error | string | null, ...response: any) => void) => void): void;
-function adminEndpoint (nsp: string, on: 'viewers::save' | 'viewers::remove', callback: (item: Readonly<Required<UserInterface>> & Readonly<Required<RandomizerInterface>>[], cb: (error: Error | string | null, ...response: any) => void) => void): void;
+function adminEndpoint (nsp: string, on: 'viewers::save' | 'viewers::remove', callback: (item: Required<UserInterface> & { tips: UserTipInterface[], bits: UserBitInterface[] }, cb: (error: Error | string | null, ...response: any) => void) => void): void;
 function adminEndpoint (nsp: string, on: 'find.viewers', callback: (opts:  { exactUsernameFromTwitch?: boolean, state?: any; search?: string; filter?: { subscribers: null | boolean; followers: null | boolean; active: null | boolean; vips: null | boolean }; page: number; order?: { orderBy: string; sortOrder: 'ASC' | 'DESC' } }, cb: (error: Error | string | null, ...response: any) => void) => void): void;
 function adminEndpoint (nsp: string, on: 'watched::save', callback: (item: Readonly<Required<VariableWatchInterface>> & Readonly<Required<VariableWatchInterface>>[], cb: (error: Error | string | null, ...response: any) => void) => void): void;
 function adminEndpoint (nsp: string, on: 'songs::save', callback: (item: Readonly<Required<SongPlaylistInterface>> & Readonly<Required<SongPlaylistInterface>>[], cb: (error: Error | string | null, ...response: any) => void) => void): void;

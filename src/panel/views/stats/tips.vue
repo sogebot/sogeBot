@@ -45,8 +45,8 @@
         {{ Intl.NumberFormat($store.state.configuration.lang, { style: 'currency', currency: data.item.currency }).format(data.item.amount) }}
       </template>
       <template #cell(user)="data">
-        <router-link :to="{ name: 'viewersManagerEdit', params: { id: data.item.user.userId }}">
-          {{ data.item.user.username }}&nbsp;<small class="text-muted">{{ data.item.user.userId }}</small>
+        <router-link :to="{ name: 'viewersManagerEdit', params: { id: data.item.userId }}">
+          {{ data.item.username }}&nbsp;<small class="text-muted">{{ data.item.userId }}</small>
         </router-link>
       </template>
     </b-table>

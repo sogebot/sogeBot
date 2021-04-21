@@ -10,7 +10,7 @@ export interface UserInterface {
   watchedTime?: number; chatTimeOnline?: number; chatTimeOffline?: number;
   points?: number; pointsOnlineGivenAt?: number; pointsOfflineGivenAt?: number; pointsByMessageGivenAt?: number;
   subscribeTier?: string; subscribeCumulativeMonths?: number; subscribeStreak?: number; giftedSubscribes?: number;
-  tips: UserTipInterface[]; bits: UserBitInterface[]; messages?: number;
+  messages?: number;
   extra: {
     levels?: {
       xp: string; // we need to use string as we cannot stringify bigint in typeorm
@@ -24,13 +24,13 @@ export interface UserInterface {
 }
 
 export interface UserTipInterface {
-  id?: string; user?: UserInterface; amount: number; currency: currency; message: string; tippedAt?: number; sortAmount: number;
-  exchangeRates: { [key in currency]: number }; userId?: string;
+  id?: string; amount: number; currency: currency; message: string; tippedAt?: number; sortAmount: number;
+  exchangeRates: { [key in currency]: number }; userId: string;
 }
 
 export interface UserBitInterface {
-  id?: string; user?: UserInterface; amount: number; message: string; cheeredAt?: number;
-  userId?: string;
+  id?: string; amount: number; message: string; cheeredAt?: number;
+  userId: string;
 }
 
 export const User = new EntitySchema<Readonly<Required<UserInterface>>>({
@@ -113,22 +113,6 @@ export const User = new EntitySchema<Readonly<Required<UserInterface>>>({
       columns: [ 'username' ],
     },
   ],
-  relations: {
-    bits: {
-      type:        'one-to-many',
-      target:      'user_bit',
-      inverseSide: 'user',
-      eager:       true,
-      cascade:     true,
-    },
-    tips: {
-      type:        'one-to-many',
-      target:      'user_tip',
-      inverseSide: 'user',
-      eager:       true,
-      cascade:     true,
-    },
-  },
 });
 
 export const UserTip = new EntitySchema<Readonly<Required<UserTipInterface>>>({
@@ -147,19 +131,7 @@ export const UserTip = new EntitySchema<Readonly<Required<UserTipInterface>>>({
     tippedAt:      {
       type: 'bigint', default: 0, transformer: new ColumnNumericTransformer(),
     },
-    userId: {
-      type: String, nullable: true, name: 'userUserId',
-    },
-  },
-  relations: {
-    user: {
-      type:        'many-to-one',
-      target:      'user',
-      inverseSide: 'tips',
-      joinColumn:  { name: 'userUserId' },
-      onDelete:    'CASCADE',
-      onUpdate:    'CASCADE',
-    },
+    userId: { type: String, nullable: true },
   },
 });
 
@@ -176,18 +148,6 @@ export const UserBit = new EntitySchema<Readonly<Required<UserBitInterface>>>({
     cheeredAt: {
       type: 'bigint', default: 0, transformer: new ColumnNumericTransformer(),
     },
-    userId: {
-      type: String, nullable: true, name: 'userUserId',
-    },
-  },
-  relations: {
-    user: {
-      type:        'many-to-one',
-      target:      'user',
-      joinColumn:  { name: 'userUserId' },
-      inverseSide: 'bits',
-      onDelete:    'CASCADE',
-      onUpdate:    'CASCADE',
-    },
+    userId: { type: String, nullable: true },
   },
 });

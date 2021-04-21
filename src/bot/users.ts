@@ -2,7 +2,7 @@ import { setTimeout } from 'timers';
 
 import axios from 'axios';
 import {
-  Brackets, FindOneOptions, getConnection, getRepository, IsNull,
+  Brackets, FindOneOptions, getConnection, getManager, getRepository,
 } from 'typeorm';
 
 import Core from './_interface';
@@ -301,7 +301,7 @@ class Users extends Core {
         cb(null);
       }
     });
-    adminEndpoint(this.nsp, 'viewers::save', async (viewer: Required<UserInterface>, cb) => {
+    adminEndpoint(this.nsp, 'viewers::save', async (viewer, cb) => {
       try {
         // recount sortAmount and add exchangeRates if needed
         for (const tip of viewer.tips) {
@@ -309,17 +309,27 @@ class Users extends Core {
             tip.exchangeRates = currency.rates;
           }
           tip.sortAmount = currency.exchange(Number(tip.amount), tip.currency, 'EUR');
+          tip.userId = viewer.userId;
+        }
+        for (const bit of viewer.bits) {
+          bit.userId = viewer.userId;
         }
 
         if (viewer.messages < viewer.pointsByMessageGivenAt) {
           viewer.pointsByMessageGivenAt = viewer.messages;
         }
 
+        await getManager().transaction(async transactionalEntityManager => {
+          await transactionalEntityManager.getRepository(UserTip).delete({ userId: viewer.userId });
+          await transactionalEntityManager.getRepository(UserBit).delete({ userId: viewer.userId });
+          await transactionalEntityManager.getRepository(UserTip).save(viewer.tips);
+          await transactionalEntityManager.getRepository(UserBit).save(viewer.bits);
+        });
+
         const result = await getRepository(User).save(viewer);
-        // as cascade remove set ID as null, we need to get rid of tips/bits
-        await getRepository(UserTip).delete({ userId: IsNull() });
-        await getRepository(UserBit).delete({ userId: IsNull() });
-        cb(null, result);
+        cb(null, {
+          ...result, tips: viewer.tips ?? [], bits: viewer.bits ?? [], 
+        });
       } catch (e) {
         error(e);
         cb(e.stack, viewer);
@@ -349,8 +359,8 @@ class Users extends Core {
           SQL query:
             select user.*, COALESCE(sumTips, 0) as sumTips, COALESCE(sumBits, 0) as sumBits
             from user
-              left join (select userUserId, sum(sortAmount) as sumTips from user_tip group by userUserId) user_tip on user.userId = user_tip.userUserId
-              left join (select userUserId, sum(amount) as sumBits from user_bit group by userUserId) user_bit on user.userId = user_bit.userUserId
+              left join (select userId, sum(sortAmount) as sumTips from user_tip group by userId) user_tip on user.userId = user_tip.userId
+              left join (select userId, sum(amount) as sumBits from user_bit group by userId) user_bit on user.userId = user_bit.userId
         */
         let query;
         if (connection.options.type === 'postgres') {
@@ -361,8 +371,8 @@ class Users extends Core {
             .addSelect('"user".*')
             .offset(opts.page * 25)
             .limit(25)
-            .leftJoin('(select "userUserId", sum("amount") as "sumBits" from "user_bit" group by "userUserId")', 'user_bit', '"user_bit"."userUserId" = "user"."userId"')
-            .leftJoin('(select "userUserId", sum("sortAmount") as "sumTips" from "user_tip" group by "userUserId")', 'user_tip', '"user_tip"."userUserId" = "user"."userId"');
+            .leftJoin('(select "userId", sum("amount") as "sumBits" from "user_bit" group by "userId")', 'user_bit', '"user_bit"."userId" = "user"."userId"')
+            .leftJoin('(select "userId", sum("sortAmount") as "sumTips" from "user_tip" group by "userId")', 'user_tip', '"user_tip"."userId" = "user"."userId"');
         } else {
           query = getRepository(User).createQueryBuilder('user')
             .orderBy(opts.order?.orderBy ?? 'user.username' , opts.order?.sortOrder ?? 'ASC')
@@ -371,8 +381,8 @@ class Users extends Core {
             .addSelect('user.*')
             .offset(opts.page * 25)
             .limit(25)
-            .leftJoin('(select userUserId, sum(amount) as sumBits from user_bit group by userUserId)', 'user_bit', 'user_bit.userUserId = user.userId')
-            .leftJoin('(select userUserId, sum(sortAmount) as sumTips from user_tip group by userUserId)', 'user_tip', 'user_tip.userUserId = user.userId');
+            .leftJoin('(select userId, sum(amount) as sumBits from user_bit group by userId)', 'user_bit', 'user_bit.userId = user.userId')
+            .leftJoin('(select userId, sum(sortAmount) as sumTips from user_tip group by userId)', 'user_tip', 'user_tip.userId = user.userId');
         }
 
         if (typeof opts.order !== 'undefined') {
@@ -460,15 +470,17 @@ class Users extends Core {
     viewerEndpoint(this.nsp, 'viewers::findOne', async (userId, cb) => {
       try {
         const viewer = await getRepository(User).findOne({ where: { userId } });
+        const tips =  await getRepository(UserTip).find({ where: { userId } });
+        const bits =  await getRepository(UserBit).find({ where: { userId } });
 
         if (viewer) {
-          const aggregatedTips = viewer.tips.map((o) => currency.exchange(o.amount, o.currency, mainCurrency.value)).reduce((a, b) => a + b, 0);
-          const aggregatedBits = viewer.bits.map((o) => Number(o.amount)).reduce((a, b) => a + b, 0);
+          const aggregatedTips = tips.map((o) => currency.exchange(o.amount, o.currency, mainCurrency.value)).reduce((a, b) => a + b, 0);
+          const aggregatedBits = bits.map((o) => Number(o.amount)).reduce((a, b) => a + b, 0);
 
           const permId = await getUserHighestPermission(userId);
           const permissionGroup = (await getRepository(Permissions).findOneOrFail({ where: { id: permId || defaultPermissions.VIEWERS } }));
           cb(null, {
-            ...viewer, aggregatedBits, aggregatedTips, permission: permissionGroup,
+            ...viewer, aggregatedBits, aggregatedTips, permission: permissionGroup, tips, bits,
           });
         } else {
           cb(null);
