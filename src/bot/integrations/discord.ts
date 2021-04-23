@@ -538,7 +538,7 @@ class Discord extends Integration {
   async replaceLinkedUsernameInMessage(message: string) {
     // search linked users and change to @<id>
     let match;
-    const usernameRegexp = /@(?<username>[A-Za-z0-9_]{3,15})/g;
+    const usernameRegexp = /@(?<username>[A-Za-z0-9_]{3,15})\b/g;
     while ((match = usernameRegexp.exec(message)) !== null) {
       if (match) {
         const username = match.groups?.username as string;
