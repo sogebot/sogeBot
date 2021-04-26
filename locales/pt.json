@@ -42,13 +42,13 @@
     "this-system-is-disabled": "Este sistema está desativado",
     "loading": "Carregando",
     "this-may-take-a-while": "Isto <strong>pode</strong> demorar um pouco",
-    "display-as": "Display as",
+    "display-as": "Exibir como",
     "go-to-admin": "Painel do administrador",
     "go-to-public": "Painel do usuario",
-    "logout": "Logout",
+    "logout": "Finalizar sessão",
     "popout": "Popout",
-    "not-logged-in": "Not logged in",
-    "remove-widget": "Remove <strong>$name</strong> widget",
+    "not-logged-in": "Desconectado",
+    "remove-widget": "Remover o widget <strong>$name</strong>",
     "join-channel": "Join bot to channel",
     "leave-channel": "Leave bot from channel",
     "set-default": "Definir como padrão",
@@ -67,7 +67,7 @@
       "number": "número",
       "text": "texto",
       "options-placeholder": "option1, option2, option3, here is option 4",
-      "no-options-set": "You didn't set your options yet"
+      "no-options-set": "Você ainda não definiu suas opções"
     },
     "timers": {
       "title": "Timers",
@@ -132,20 +132,20 @@
       "buttons": {
         "test": "Test",
         "enable": "Enable",
-        "disable": "Disable",
-        "edit": "Edit",
-        "delete": "Delete",
-        "yes": "Yes",
-        "no": "No"
+        "disable": "Desativar",
+        "edit": "Editar",
+        "delete": "Deletar",
+        "yes": "Sim",
+        "no": "Não"
       },
       "popovers": {
         "are_you_sure_you_want_to_delete_event": "Are you sure you want to <strong class='text-danger'>delete</strong> event",
         "example_of_user_object_data": "Example of user object data"
       },
       "errors": {
-        "command_must_start_with_!": "Command must start with !",
-        "this_value_must_be_a_positive_number_or_0": "This value must be a positive number or 0",
-        "value_cannot_be_empty": "Value cannot be empty"
+        "command_must_start_with_!": "O comando deve começar com !",
+        "this_value_must_be_a_positive_number_or_0": "Este valor deve ser um número positivo ou 0",
+        "value_cannot_be_empty": "O valor não pode estar vazio"
       },
       "dialog": {
         "title": {
@@ -157,16 +157,16 @@
         },
         "alerts": {
           "success": "Event was <strong>successfully</strong> saved.",
-          "fail": "Something went <strong>wrong</strong>."
+          "fail": "Alguma coisa deu <strong>errada</strong>."
         },
-        "close": "Close",
-        "save-changes": "Save changes",
+        "close": "Fechar",
+        "save-changes": "Salvar alterações",
         "event": "Event",
-        "name": "Name",
+        "name": "Nome",
         "usable-events-variables": "Usable events variables",
         "settings": "Settings",
-        "filters": "Filters",
-        "operations": "Operations"
+        "filters": "Filtros",
+        "operations": "Operações"
       },
       "definitions": {
         "filter": {
