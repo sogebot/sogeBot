@@ -130,11 +130,26 @@ class Top extends System {
       case TYPE.LEVEL:
         let rawSQL = '';
         if (connection.options.type === 'better-sqlite3') {
-          rawSQL = `SELECT json_extract("user"."extra", '$.levels.xp') AS "data", "userId", "username" FROM "user" "user" WHERE "user"."username" IS NOT ? AND "user"."username" IS NOT ? ORDER BY length(data) DESC, data DESC LIMIT ?`;
+          rawSQL = `SELECT JSON_EXTRACT("user"."extra", '$.levels.xp') AS "data", "userId", "username"
+            FROM "user" "user"
+            WHERE "user"."username" IS NOT '${oauth.botUsername.toLowerCase()}'
+              AND "user"."username" IS NOT '${oauth.broadcasterUsername.toLowerCase()}'
+            ORDER BY length(data) DESC, data DESC LIMIT ${_total}`;
+        } else if (connection.options.type === 'postgres') {
+          rawSQL = `SELECT "user"."userId", "user"."username", CAST("data" as text)
+            FROM "user", JSON_EXTRACT_PATH("extra"::json, 'levels') AS "data"
+            WHERE "user"."username" != '${oauth.botUsername.toLowerCase()}'
+              AND "user"."username" != '${oauth.broadcasterUsername.toLowerCase()}'
+            ORDER BY length("data"::text) DESC, "data"::text DESC
+            LIMIT ${_total}`;
+        } else if (connection.options.type === 'mysql') {
+          rawSQL = `SELECT JSON_EXTRACT(\`user\`.\`extra\`, '$.levels.xp') AS \`data\`, \`userId\`, \`username\`
+            FROM \`user\` \`user\`
+            WHERE \`user\`.\`username\` != '${oauth.botUsername.toLowerCase()}'
+              AND \`user\`.\`username\` != '${oauth.broadcasterUsername.toLowerCase()}'
+            ORDER BY length(\`data\`) DESC, data DESC LIMIT ${_total}`;
         }
-        const users = (await getManager().query(rawSQL,
-          [ oauth.botUsername.toLowerCase(), oauth.broadcasterUsername.toLowerCase(), _total ],
-        )).filter((o: any) => !isIgnored({ username: o.username, userId: o.userId }));
+        const users = (await getManager().query(rawSQL)).filter((o: any) => !isIgnored({ username: o.username, userId: o.userId }));
 
         for (const rawUser of users) {
           const user = await getRepository(User).findOne({ userId: rawUser.userId });
