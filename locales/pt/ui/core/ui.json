@@ -2,8 +2,8 @@
   "settings": {
     "theme": "Tema padrão",
     "domain": {
-      "title": "Domain",
-      "help": "Format without http/https: yourdomain.com or your.domain.com"
+      "title": "Domínio",
+      "help": "Formato sem http/https: seudominio.com ou seu.dominio.com"
     },
     "percentage": "Diferença de porcentagem para estatísticas",
     "shortennumbers": "Formato curto dos números",

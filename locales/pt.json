@@ -1,37 +1,37 @@
 {
   "core": {
-    "loaded": "is loaded and",
-    "enabled": "enabled",
-    "disabled": "disabled",
-    "usage": "Usage",
-    "lang-selected": "Bot language is currently set to english",
-    "refresh-panel": "You will need to refresh UI to see changes.",
-    "command-parse": "Sorry, $sender, but this command is not correct, use",
-    "error": "Sorry, $sender, but something went wrong!",
+    "loaded": "está carregado e",
+    "enabled": "habilitado",
+    "disabled": "desabilitado",
+    "usage": "Utilização",
+    "lang-selected": "O idioma do bot está atualmente definido como português do brazil",
+    "refresh-panel": "Você precisará atualizar a interface do usuário para ver as alterações.",
+    "command-parse": "Desculpe, $sender, mas esse comando não está correto, use",
+    "error": "Desculpe, $sender, mas algo deu errado!",
     "no-response": "",
     "no-response-bool": {
       "true": "",
       "false": ""
     },
     "api": {
-      "error": "$sender, API is not responding correctly!",
-      "not-available": "not available"
+      "error": "$sender, API não está respondendo corretamente!",
+      "not-available": "indisponível"
     },
     "percentage": {
       "true": "",
       "false": ""
     },
-    "years": "year|years",
-    "months": "month|months",
-    "days": "day|days",
-    "hours": "hour|hours",
-    "minutes": "minute|minutes",
-    "seconds": "second|seconds",
-    "messages": "message|messages",
+    "years": "ano|anos",
+    "months": "mês|meses",
+    "days": "dia|dias",
+    "hours": "hora|horas",
+    "minutes": "minuto|minutos",
+    "seconds": "segundo|segundos",
+    "messages": "mensagem|mensagens",
     "bits": "bit|bits",
     "links": "link|links",
     "entries": "entry|entries",
-    "empty": "empty",
+    "empty": "vazio",
     "isRegistered": "$sender, you cannot use !$keyword, because is already in use for another action!"
   },
   "uptime": {
@@ -39,35 +39,35 @@
     "offline": "Stream is currently offline for (if $days>0|$daysd )(if $hours>0|$hoursh )(if $minutes>0|$minutesm )(if $seconds>0|$secondss)"
   },
   "webpanel": {
-    "this-system-is-disabled": "This system is disabled",
-    "loading": "Loading",
-    "this-may-take-a-while": "This <strong>may</strong> take a while",
-    "display-as": "Display as",
-    "go-to-admin": "Go to Admin",
-    "go-to-public": "Go to Public",
-    "logout": "Logout",
+    "this-system-is-disabled": "Este sistema está desativado",
+    "loading": "Carregando",
+    "this-may-take-a-while": "Isto <strong>pode</strong> demorar um pouco",
+    "display-as": "Exibir como",
+    "go-to-admin": "Painel do administrador",
+    "go-to-public": "Painel do usuario",
+    "logout": "Finalizar sessão",
     "popout": "Popout",
-    "not-logged-in": "Not logged in",
-    "remove-widget": "Remove <strong>$name</strong> widget",
+    "not-logged-in": "Desconectado",
+    "remove-widget": "Remover o widget <strong>$name</strong>",
     "join-channel": "Join bot to channel",
     "leave-channel": "Leave bot from channel",
-    "set-default": "Set default",
-    "add": "Add",
+    "set-default": "Definir como padrão",
+    "add": "Adicionar",
     "placeholders": {
-      "text-url-generator": "Paste your text or html to generate base64 below and URL above",
-      "text-decode-base64": "Paste your base64 to generate URL and text above",
-      "creditsSpeed": "Set speed of credits rolling, lower = faster"
+      "text-url-generator": "Cole seu texto ou html para gerar base64 abaixo e URL acima",
+      "text-decode-base64": "Cole seu base64 para gerar o URL e o texto acima",
+      "creditsSpeed": "Definir velocidade de execução de créditos, mais baixo = mais rápido"
     },
     "custom-variables": {
-      "set-your-variables-to-watch-here": "Set your variables to watch here",
-      "type": "type",
+      "set-your-variables-to-watch-here": "Defina suas variáveis para acompanhar aqui",
+      "type": "tipo",
       "unwatch": "Unwatch",
-      "watch": "Watch",
-      "options": "options",
-      "number": "number",
-      "text": "text",
+      "watch": "Acompanhar",
+      "options": "opções",
+      "number": "número",
+      "text": "texto",
       "options-placeholder": "option1, option2, option3, here is option 4",
-      "no-options-set": "You didn't set your options yet"
+      "no-options-set": "Você ainda não definiu suas opções"
     },
     "timers": {
       "title": "Timers",
@@ -132,20 +132,20 @@
       "buttons": {
         "test": "Test",
         "enable": "Enable",
-        "disable": "Disable",
-        "edit": "Edit",
-        "delete": "Delete",
-        "yes": "Yes",
-        "no": "No"
+        "disable": "Desativar",
+        "edit": "Editar",
+        "delete": "Deletar",
+        "yes": "Sim",
+        "no": "Não"
       },
       "popovers": {
         "are_you_sure_you_want_to_delete_event": "Are you sure you want to <strong class='text-danger'>delete</strong> event",
         "example_of_user_object_data": "Example of user object data"
       },
       "errors": {
-        "command_must_start_with_!": "Command must start with !",
-        "this_value_must_be_a_positive_number_or_0": "This value must be a positive number or 0",
-        "value_cannot_be_empty": "Value cannot be empty"
+        "command_must_start_with_!": "O comando deve começar com !",
+        "this_value_must_be_a_positive_number_or_0": "Este valor deve ser um número positivo ou 0",
+        "value_cannot_be_empty": "O valor não pode estar vazio"
       },
       "dialog": {
         "title": {
@@ -157,16 +157,16 @@
         },
         "alerts": {
           "success": "Event was <strong>successfully</strong> saved.",
-          "fail": "Something went <strong>wrong</strong>."
+          "fail": "Alguma coisa deu <strong>errada</strong>."
         },
-        "close": "Close",
-        "save-changes": "Save changes",
+        "close": "Fechar",
+        "save-changes": "Salvar alterações",
         "event": "Event",
-        "name": "Name",
+        "name": "Nome",
         "usable-events-variables": "Usable events variables",
         "settings": "Settings",
-        "filters": "Filters",
-        "operations": "Operations"
+        "filters": "Filtros",
+        "operations": "Operações"
       },
       "definitions": {
         "filter": {
