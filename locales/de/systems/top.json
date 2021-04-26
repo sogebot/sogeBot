@@ -1,6 +1,7 @@
 {
   "time": "Top $amount (watch time): ",
   "tips": "Top $amount (Spenden): ",
+  "level": "Top $amount (level): ",
   "points": "Top $amount (Punkte): ",
   "messages": "Top $amount (Nachrichten): ",
   "followage": "Top $amount (followage): ",
