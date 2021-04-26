@@ -1,6 +1,7 @@
 {
   "time": "Top $amount (tid i chatten): ",
   "tips": "Top $amount (tips): ",
+  "level": "Top $amount (level): ",
   "points": "Top $amount (points): ",
   "messages": "Top $amount (beskeder): ",
   "followage": "Top $amount (tid som følger): ",
