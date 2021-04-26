@@ -637,7 +637,7 @@
     "roll-a-winner": "Sorteggia un vincitore",
     "send-message": "Invia un messaggio",
     "messages": "Messaggi",
-    "level": "Level",
+    "level": "Livello",
     "announce-every": "Annunciare ogni",
     "create": "Crea",
     "cooldown": "Ricarica",
@@ -908,21 +908,21 @@
     "keyword-is-ambiguous": "$sender, la parola chiave $keyword è ambigua, usa l'ID della parola chiave",
     "keyword-was-not-found": "$sender, la parola chiave $keyword non è stata trovata nel database",
     "response-was-not-found": "$sender, risposta #$response della parola chiave $keyword non è stata trovata nel database",
-    "keyword-was-edited": "$sender, keyword $keyword is changed to '$response'",
-    "keyword-was-added": "$sender, keyword $keyword ($id) was added",
-    "list-is-not-empty": "$sender, list of keywords: $list",
-    "list-is-empty": "$sender, list of keywords is empty",
-    "keyword-was-enabled": "$sender, keyword $keyword was enabled",
-    "keyword-was-disabled": "$sender, keyword $keyword was disabled",
-    "keyword-was-removed": "$sender, keyword $keyword was removed",
-    "list-of-responses-is-empty": "$sender, $keyword have no responses or doesn't exists",
-    "response": "$keyword#$index ($permission) $after| $response"
+    "keyword-was-edited": "$sender, la parola chiave $keyword è cambiata in '$response'",
+    "keyword-was-added": "$sender, è stata aggiunta la parola chiave $keyword ($id)",
+    "list-is-not-empty": "$sender, elenco delle parole chiave: $list",
+    "list-is-empty": "$sender, l'elenco delle parole chiave è vuoto",
+    "keyword-was-enabled": "$sender, parola chiave $keyword è stata abilitata",
+    "keyword-was-disabled": "$sender, la parola chiave $keyword è stata disattivata",
+    "keyword-was-removed": "$sender, la parola chiave $keyword è stata rimossa",
+    "list-of-responses-is-empty": "$sender, $keyword non ha risposte o non esiste",
+    "response": "$keyword#$index ($permission) $after<unk> $response"
   },
   "points": {
     "success": {
-      "undo": "$sender, points '$command' for $username was reverted ($updatedValue $updatedValuePointsLocale to $originalValue $originalValuePointsLocale).",
-      "set": "$username was set to $amount $pointsName",
-      "give": "$sender just gave his $amount $pointsName to $username",
+      "undo": "$sender, i punti '$command' per $username sono stati ripristinati ($updatedValue $updatedValuePointsLocale a $originalValue $originalValuePointsLocale).",
+      "set": "$username è stato impostato su $amount $pointsName",
+      "give": "$sender ha appena dato il suo $amount $pointsName a $username",
       "online": {
         "positive": "All online users just received $amount $pointsName!",
         "negative": "All online users just lost $amount $pointsName!"
