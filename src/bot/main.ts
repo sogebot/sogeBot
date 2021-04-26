@@ -16,7 +16,6 @@ import _ from 'lodash';
 import { createConnection, getConnectionOptions } from 'typeorm';
 import { MysqlConnectionOptions } from 'typeorm/driver/mysql/MysqlConnectionOptions';
 
-import { changelog } from './changelog';
 import { autoLoad } from './helpers/autoLoad';
 import { setIsBotStarted } from './helpers/database';
 import { getMigrationType } from './helpers/getMigrationType';
@@ -97,7 +96,6 @@ async function main () {
     setTimeout(() => {
       translate = require('./translate');
 
-      changelog();
       translate.default._load().then(async () => {
         panelInit();
         require('./general');
