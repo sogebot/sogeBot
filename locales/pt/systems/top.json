@@ -1,6 +1,7 @@
 {
   "time": "Top $amount (tempo assistido): ",
   "tips": "Top $amount (doações): ",
+  "level": "Top $amount (level): ",
   "points": "Top $amount (pontos): ",
   "messages": "Top $amount (mensagens): ",
   "followage": "Top $amount (seguidores antigos): ",
