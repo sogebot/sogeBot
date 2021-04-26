@@ -120,9 +120,14 @@ class TipeeeStream extends Integration {
           info(chalk.yellow('TIPEEESTREAM.COM:') + ' Trying to reconnect to service');
         });
         this.socketToTipeeestream.on('disconnect', () => {
-          info(chalk.yellow('TIPEEESTREAM.COM:') + ' Socket disconnected from service');
-          this.disconnect();
-          this.socketToTipeeestream = null;
+          if (this.enabled) {
+            info(chalk.yellow('TIPEEESTREAM.COM:') + ' Trying to reconnect to service');
+            this.connect();
+          } else {
+            info(chalk.yellow('TIPEEESTREAM.COM:') + ' Socket disconnected from service');
+            this.disconnect();
+            this.socketToTipeeestream = null;
+          }
         });
 
         this.socketToTipeeestream.on('new-event', async (data: TipeeestreamEvent) => {
@@ -143,61 +148,75 @@ class TipeeeStream extends Integration {
       const username = data.event.parameters.username.toLowerCase();
       const donationCurrency = data.event.parameters.currency as currency;
 
-      eventlist.add({
-        event:     'tip',
-        amount,
-        currency:  donationCurrency,
-        userId:    String(await users.getIdByName(username)),
-        message,
-        timestamp: Date.now(),
-      });
-
-      eventEmitter.emit('tip', {
-        username,
-        isAnonymous:         false,
-        amount:              Number(amount).toFixed(2),
-        currency:            donationCurrency,
-        amountInBotCurrency: Number(currency.exchange(amount, donationCurrency, mainCurrency.value)).toFixed(2),
-        currencyInBot:       mainCurrency.value,
-        message,
-      });
-
-      alerts.trigger({
-        event:      'tips',
-        name:       username,
-        amount:     Number(Number(amount).toFixed(2)),
-        tier:       null,
-        currency:   donationCurrency,
-        monthsName: '',
-        message,
-      });
-
-      const user = await users.getUserByUsername(username);
-      const newTip: UserTipInterface = {
-        amount,
-        currency:      donationCurrency,
-        sortAmount:    currency.exchange(Number(amount), donationCurrency, mainCurrency.value),
-        message,
-        exchangeRates: currency.rates,
-        tippedAt:      Date.now(),
-        userId:        user.userId,
-      };
-      getRepository(UserTip).save(newTip);
-
-      tip(`${username}${user.userId ? '#' + user.userId : ''}, amount: ${amount.toFixed(2)}${donationCurrency}, message: ${message}`);
-
       if (isStreamOnline.value) {
         stats.value.currentTips = stats.value.currentTips + Number(currency.exchange(amount, donationCurrency, mainCurrency.value));
       }
 
-      triggerInterfaceOnTip({
-        username,
-        amount,
-        message,
-        currency:  donationCurrency,
-        timestamp: Date.now(),
-      });
+      let isAnonymous = false;
+      users.getUserByUsername(username)
+        .then(async(user) => {
+          const newTip: UserTipInterface = {
+            amount,
+            currency:      donationCurrency,
+            sortAmount:    currency.exchange(Number(amount), donationCurrency, mainCurrency.value),
+            message,
+            exchangeRates: currency.rates,
+            tippedAt:      Date.now(),
+            userId:        user.userId,
+          };
+          getRepository(UserTip).save(newTip);
+          tip(`${username.toLowerCase()}${user.userId ? '#' + user.userId : ''}, amount: ${Number(amount).toFixed(2)}${donationCurrency}, message: ${message}`);
+          eventlist.add({
+            event:     'tip',
+            amount,
+            currency:  donationCurrency,
+            userId:    user.userId,
+            message,
+            timestamp: Date.now(),
+          });
+        })
+        .catch(() => {
+          // user not found on Twitch
+          tip(`${username.toLowerCase()}#__anonymous__, amount: ${Number(amount).toFixed(2)}${donationCurrency}, message: ${message}`);
+          eventlist.add({
+            event:     'tip',
+            amount,
+            currency:  donationCurrency,
+            userId:    `${username}#__anonymous__`,
+            message,
+            timestamp: Date.now(),
+          });
+          isAnonymous = true;
+        }).finally(() => {
+          eventEmitter.emit('tip', {
+            username:            username.toLowerCase(),
+            amount:              Number(amount).toFixed(2),
+            currency:            donationCurrency,
+            amountInBotCurrency: Number(currency.exchange(amount, donationCurrency, mainCurrency.value)).toFixed(2),
+            currencyInBot:       mainCurrency.value,
+            message,
+            isAnonymous,
+          });
+          alerts.trigger({
+            event:      'tips',
+            name:       username.toLowerCase(),
+            amount:     Number(Number(amount).toFixed(2)),
+            tier:       null,
+            currency:   donationCurrency,
+            monthsName: '',
+            message,
+          });
+
+          triggerInterfaceOnTip({
+            username:  username.toLowerCase(),
+            amount,
+            message,
+            currency:  donationCurrency,
+            timestamp: Date.now(),
+          });
+        });
     } catch (e) {
+      error(`TIPEESTREAM: Error in parsing event: ${JSON.stringify(data.event)})`);
       error(e);
     }
   }
