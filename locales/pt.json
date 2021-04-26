@@ -1,8 +1,8 @@
 {
   "core": {
-    "loaded": "is loaded and",
-    "enabled": "enabled",
-    "disabled": "disabled",
+    "loaded": "está carregado e",
+    "enabled": "habilitado",
+    "disabled": "desabilitado",
     "usage": "Usage",
     "lang-selected": "Bot language is currently set to english",
     "refresh-panel": "You will need to refresh UI to see changes.",
