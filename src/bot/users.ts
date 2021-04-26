@@ -328,7 +328,7 @@ class Users extends Core {
 
         const result = await getRepository(User).save(viewer);
         cb(null, {
-          ...result, tips: viewer.tips ?? [], bits: viewer.bits ?? [], 
+          ...result, tips: viewer.tips ?? [], bits: viewer.bits ?? [],
         });
       } catch (e) {
         error(e);
@@ -373,10 +373,22 @@ class Users extends Core {
             .limit(25)
             .leftJoin('(select "userId", sum("amount") as "sumBits" from "user_bit" group by "userId")', 'user_bit', '"user_bit"."userId" = "user"."userId"')
             .leftJoin('(select "userId", sum("sortAmount") as "sumTips" from "user_tip" group by "userId")', 'user_tip', '"user_tip"."userId" = "user"."userId"');
+        } else if (connection.options.type === 'better-sqlite3') {
+          query = getRepository(User).createQueryBuilder('user')
+            .orderBy(opts.order?.orderBy ?? 'user.username' , opts.order?.sortOrder ?? 'ASC')
+            .select('JSON_EXTRACT("user"."extra", \'$.levels.xp\')', 'levelXP')
+            .addSelect('COALESCE(sumTips, 0)', 'sumTips')
+            .addSelect('COALESCE(sumBits, 0)', 'sumBits')
+            .addSelect('user.*')
+            .offset(opts.page * 25)
+            .limit(25)
+            .leftJoin('(select userId, sum(amount) as sumBits from user_bit group by userId)', 'user_bit', 'user_bit.userId = user.userId')
+            .leftJoin('(select userId, sum(sortAmount) as sumTips from user_tip group by userId)', 'user_tip', 'user_tip.userId = user.userId');
         } else {
           query = getRepository(User).createQueryBuilder('user')
             .orderBy(opts.order?.orderBy ?? 'user.username' , opts.order?.sortOrder ?? 'ASC')
-            .select('COALESCE(sumTips, 0)', 'sumTips')
+            .select('JSON_EXTRACT(`user`.`extra`, \'$.levels.xp\')', 'levelXP')
+            .addSelect('COALESCE(sumTips, 0)', 'sumTips')
             .addSelect('COALESCE(sumBits, 0)', 'sumBits')
             .addSelect('user.*')
             .offset(opts.page * 25)
@@ -386,10 +398,22 @@ class Users extends Core {
         }
 
         if (typeof opts.order !== 'undefined') {
-          if (connection.options.type === 'postgres') {
+          if (opts.order.orderBy === 'user.level') {
+            if (connection.options.type === 'better-sqlite3') {
+              query.orderBy('LENGTH("levelXP")', opts.order.sortOrder);
+              query.addOrderBy('"levelXP"', opts.order.sortOrder);
+            } else if (connection.options.type === 'postgres') {
+              query.orderBy('length(COALESCE(JSON_EXTRACT_PATH("extra"::json, \'levels\'), \'{}\')::text)', opts.order.sortOrder);
+              query.addOrderBy('COALESCE(JSON_EXTRACT_PATH("extra"::json, \'levels\'), \'{}\')::text', opts.order.sortOrder);
+            } else {
+              query.orderBy('LENGTH(`levelXP`)', opts.order.sortOrder);
+              query.addOrderBy('`levelXP`', opts.order.sortOrder);
+            }
+          } else if (connection.options.type === 'postgres') {
             opts.order.orderBy = opts.order.orderBy.split('.').map(o => `"${o}"`).join('.');
+          } else {
+            query.orderBy({ [opts.order.orderBy]: opts.order.sortOrder });
           }
-          query.orderBy({ [opts.order.orderBy]: opts.order.sortOrder });
         }
 
         if (typeof opts.filter !== 'undefined') {
@@ -420,6 +444,13 @@ class Users extends Core {
         }
 
         const viewers = await query.getRawMany();
+
+        const levels = require('./systems/levels').default;
+        for (const viewer of viewers) {
+          // add level to user
+          viewer.extra = JSON.parse(viewer.extra);
+          viewer.level = levels.getLevelOf(viewer);
+        }
         let count = await query.getCount();
 
         if (opts.exactUsernameFromTwitch && opts.search) {
