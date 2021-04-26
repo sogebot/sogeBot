@@ -1,5 +1,7 @@
 import _ from 'lodash';
-import { getConnection, getRepository } from 'typeorm';
+import {
+  getConnection, getManager, getRepository,
+} from 'typeorm';
 
 import { User } from '../database/entity/user';
 import { command, default_permission } from '../decorators';
@@ -10,11 +12,13 @@ import { getLocalizedName } from '../helpers/getLocalized';
 import { debug } from '../helpers/log';
 import { defaultPermissions } from '../helpers/permissions/';
 import { getPointsName } from '../helpers/points';
+import { unserialize } from '../helpers/type';
 import { getIgnoreList, isIgnored } from '../helpers/user/isIgnored';
 import oauth from '../oauth';
 import tmi from '../tmi';
 import { translate } from '../translate';
 import System from './_interface';
+import levels from './levels';
 import points from './points';
 
 enum TYPE {
@@ -27,6 +31,7 @@ enum TYPE {
   BITS = '6',
   GIFTS = '7',
   SUBMONTHS = '8',
+  LEVEL = '9',
 }
 
 /*
@@ -105,8 +110,15 @@ class Top extends System {
     return this.showTop(opts);
   }
 
+  @command('!top level')
+  @default_permission(defaultPermissions.CASTERS)
+  async level(opts: CommandOptions) {
+    opts.parameters = TYPE.LEVEL;
+    return this.showTop(opts);
+  }
+
   private async showTop(opts: CommandOptions): Promise<CommandResponse[]> {
-    let sorted: {username: string; value: number}[] = [];
+    let sorted: {username: string; value: string | number}[] = [];
     let message;
     let i = 0;
     const type = opts.parameters;
@@ -115,6 +127,39 @@ class Top extends System {
     const _total = 10 + getIgnoreList().length;
     const connection = await getConnection();
     switch (type) {
+      case TYPE.LEVEL:
+        let rawSQL = '';
+        if (connection.options.type === 'better-sqlite3') {
+          rawSQL = `SELECT JSON_EXTRACT("user"."extra", '$.levels.xp') AS "data", "userId", "username"
+            FROM "user" "user"
+            WHERE "user"."username" IS NOT '${oauth.botUsername.toLowerCase()}'
+              AND "user"."username" IS NOT '${oauth.broadcasterUsername.toLowerCase()}'
+            ORDER BY length(data) DESC, data DESC LIMIT ${_total}`;
+        } else if (connection.options.type === 'postgres') {
+          rawSQL = `SELECT "user"."userId", "user"."username", CAST("data" as text)
+            FROM "user", JSON_EXTRACT_PATH("extra"::json, 'levels') AS "data"
+            WHERE "user"."username" != '${oauth.botUsername.toLowerCase()}'
+              AND "user"."username" != '${oauth.broadcasterUsername.toLowerCase()}'
+            ORDER BY length("data"::text) DESC, "data"::text DESC
+            LIMIT ${_total}`;
+        } else if (connection.options.type === 'mysql') {
+          rawSQL = `SELECT JSON_EXTRACT(\`user\`.\`extra\`, '$.levels.xp') AS \`data\`, \`userId\`, \`username\`
+            FROM \`user\` \`user\`
+            WHERE \`user\`.\`username\` != '${oauth.botUsername.toLowerCase()}'
+              AND \`user\`.\`username\` != '${oauth.broadcasterUsername.toLowerCase()}'
+            ORDER BY length(\`data\`) DESC, data DESC LIMIT ${_total}`;
+        }
+        const users = (await getManager().query(rawSQL)).filter((o: any) => !isIgnored({ username: o.username, userId: o.userId }));
+
+        for (const rawUser of users) {
+          const user = await getRepository(User).findOne({ userId: rawUser.userId });
+          if (user) {
+            const currentXP = unserialize<bigint>(user.extra?.levels?.xp) ?? BigInt(0);
+            sorted.push({ username: user.username, value: `${levels.getLevelOf(user)} (${currentXP}XP)` });
+          }
+        }
+        message = translate('systems.top.level').replace(/\$amount/g, 10);
+        break;
       case TYPE.TIME:
         sorted
           = (await getRepository(User).createQueryBuilder('user')
@@ -262,20 +307,21 @@ class Top extends System {
           case TYPE.TIME:
             message += Intl.NumberFormat(general.lang, {
               style: 'unit', unit: 'hour', minimumFractionDigits: 1, maximumFractionDigits: 1,
-            }).format(user.value / 1000 / 60 / 60);
+            }).format(Number(user.value) / 1000 / 60 / 60);
             break;
           case TYPE.SUBMONTHS:
             message += [user.value, getLocalizedName(user.value, translate('core.months'))].join(' ');
             break;
           case TYPE.TIPS:
-            message += Intl.NumberFormat(general.lang, { style: 'currency', currency: mainCurrency.value }).format(user.value);
+            message += Intl.NumberFormat(general.lang, { style: 'currency', currency: mainCurrency.value }).format(Number(user.value));
             break;
           case TYPE.POINTS:
-            message += user.value + ' ' + getPointsName(user.value);
+            message += user.value + ' ' + getPointsName(Number(user.value));
             break;
           case TYPE.MESSAGES:
           case TYPE.BITS:
           case TYPE.GIFTS:
+          case TYPE.LEVEL:
             message += String(user.value);
             break;
           case TYPE.FOLLOWAGE:
