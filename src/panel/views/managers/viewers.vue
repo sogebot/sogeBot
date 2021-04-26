@@ -28,6 +28,7 @@
               <template v-if="sort === 'user.subscribedAt'">{{ translate('subscribed-since') }}</template>
               <template v-if="sort === 'user.points'">{{ translate('points') }}</template>
               <template v-if="sort === 'user.messages'">{{ translate('messages') }}</template>
+              <template v-if="sort === 'user.level'">{{ translate('level') }}</template>
               <template v-if="sort === 'sumTips'">{{ translate('tips') }}</template>
               <template v-if="sort === 'sumBits'">{{ translate('bits') }}</template>
               <template v-if="sort === 'user.giftedSubscribes'">{{ translate('subgifts') }}</template>
@@ -59,6 +60,9 @@
           </b-dropdown-item>
           <b-dropdown-item @click="sort = 'user.messages'; sortDesc = true">
             {{ translate('messages') }}
+          </b-dropdown-item>
+          <b-dropdown-item @click="sort = 'user.level'; sortDesc = true">
+            {{ translate('level') }}
           </b-dropdown-item>
           <b-dropdown-item @click="sort = 'sumTips'; sortDesc = true">
             {{ translate('tips') }}
@@ -1090,6 +1094,12 @@
           </div>
           <div>
             <strong style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">
+              {{ translate('level') }}:
+            </strong>
+            {{ Intl.NumberFormat($store.state.configuration.lang).format(data.item.level) }}
+          </div>
+          <div>
+            <strong style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">
               {{ translate('points') }}:
             </strong>
             {{ Intl.NumberFormat($store.state.configuration.lang).format(data.item.points) }}
@@ -1163,7 +1173,7 @@ import { minValue, required } from 'vuelidate/lib/validators';
 
 import { EventListInterface } from 'src/bot/database/entity/eventList';
 import {
-  UserBitInterface, UserInterface, UserTipInterface, 
+  UserBitInterface, UserInterface, UserTipInterface,
 } from 'src/bot/database/entity/user';
 import { dayjs } from 'src/bot/helpers/dayjs';
 import { ButtonStates } from 'src/panel/helpers/buttonStates';
