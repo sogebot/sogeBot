@@ -3,7 +3,6 @@ import {
 } from 'lodash';
 import { getRepository } from 'typeorm';
 
-import { change } from './changelog';
 import { SECOND } from './constants';
 import { Settings } from './database/entity/settings';
 import { getFunctionList } from './decorators/on';
@@ -96,9 +95,6 @@ export const VariableWatcher = {
           namespace: checkedModule.nsp,
           value:     JSON.stringify(value),
         });
-
-        // we need this with __permission_based__
-        change(`${type}.${name}.${variable}`);
 
         if (variable.includes('__permission_based__')) {
           variable = variable.replace('__permission_based__', '');
