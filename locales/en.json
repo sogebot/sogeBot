@@ -1073,7 +1073,7 @@
     "user-is-warned-about-long-message": "Long messages are not allowed [$count warnings left]",
     "user-is-warned-about-caps": "No excessive caps usage [$count warnings left]",
     "user-is-warned-about-spam": "Spamming is not allowed [$count warnings left]",
-    "user-is-warned-about-color": "Colors and /me is not allowed [$count warnings left]",
+    "user-is-warned-about-color": "Italic and /me is not allowed [$count warnings left]",
     "user-is-warned-about-emotes": "No emotes spamming [$count warnings left]",
     "user-is-warned-about-forbidden-words": "No forbidden words [$count warnings left]",
     "user-have-timeout-for-links": "No links allowed, ask for !permit",
@@ -1081,7 +1081,7 @@
     "user-have-timeout-for-long-message": "Long message are not allowed",
     "user-have-timeout-for-caps": "No excessive caps usage",
     "user-have-timeout-for-spam": "Spamming is not allowed",
-    "user-have-timeout-for-color": "Colors and /me is not allowed",
+    "user-have-timeout-for-color": "Italic and /me is not allowed",
     "user-have-timeout-for-emotes": "No emotes spamming",
     "user-have-timeout-for-forbidden-words": "No forbidden words"
   },
