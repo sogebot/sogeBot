@@ -14,10 +14,8 @@ info:
 dependencies:
 	@echo -ne "\n\t ----- Cleaning up dependencies\n"
 	@rm -rf node_modules
-	@echo -ne "\n\t ----- Installation of production dependencies\n"
-	@npm install --production
-	@echo -ne "\n\t ----- Installation of development dependencies\n"
-	@npm install --only=dev
+	@echo -ne "\n\t ----- Installation of dependencies\n"
+	@npm install --also=dev
 	@echo -ne "\n\t ----- Installation of husky\n"
 	npx husky install
 	@echo -ne "\n\t ----- Going through node_modules patches\n"
