@@ -1068,7 +1068,7 @@
     "user-is-warned-about-long-message": "Длинные сообщения недопустимы [$count предупреждений]",
     "user-is-warned-about-caps": "Капс запрещён [$count предупреждений]",
     "user-is-warned-about-spam": "Спам запрещён [ осталось предупреждений$count]",
-    "user-is-warned-about-color": "/me запрещено [$count предупреждений осталось]",
+    "user-is-warned-about-color": "Italic and /me is not allowed [$count warnings left]",
     "user-is-warned-about-emotes": "Спам смайликами запрещён [$count предупреждений осталось]",
     "user-is-warned-about-forbidden-words": "No forbidden words [$count warnings left]",
     "user-have-timeout-for-links": "Ссылки запрещены, попросите !permit",
@@ -1076,7 +1076,7 @@
     "user-have-timeout-for-long-message": "Длинные сообщения запрещены",
     "user-have-timeout-for-caps": "Чрезмерное использование капса",
     "user-have-timeout-for-spam": "Спам запрещён",
-    "user-have-timeout-for-color": "/me запрещено",
+    "user-have-timeout-for-color": "Italic and /me is not allowed",
     "user-have-timeout-for-emotes": "Спам смайликами запрещён",
     "user-have-timeout-for-forbidden-words": "No forbidden words"
   },
