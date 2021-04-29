@@ -1068,7 +1068,7 @@
     "user-is-warned-about-long-message": "Dlouhé zprávy nejsou povoleny [$count varování zbývá]",
     "user-is-warned-about-caps": "Přílišné používání velkých písmen není povoleno [$count varování zbývá]",
     "user-is-warned-about-spam": "Spamování není povoleno [$count varování zbývá]",
-    "user-is-warned-about-color": "Používání /me není povoleno [$count varování zbývá]",
+    "user-is-warned-about-color": "Italic and /me is not allowed [$count warnings left]",
     "user-is-warned-about-emotes": "Žádné spamování smajlíkama! [$count varování zbývá]",
     "user-is-warned-about-forbidden-words": "Žádná zakázaná slova [$count varování zbývá]",
     "user-have-timeout-for-links": "Nejsou povoleny žádné odkazy, požádejte o povolení",
@@ -1076,7 +1076,7 @@
     "user-have-timeout-for-long-message": "Dlouhé zprávy nejsou povoleny",
     "user-have-timeout-for-caps": "Přílišné používání velkých písmen není povoleno",
     "user-have-timeout-for-spam": "Spamování není povoleno",
-    "user-have-timeout-for-color": "Používání /me není povoleno",
+    "user-have-timeout-for-color": "Italic and /me is not allowed",
     "user-have-timeout-for-emotes": "Žádné spamování smajlíkama",
     "user-have-timeout-for-forbidden-words": "Žádná zakázaná slova"
   },
