@@ -34,7 +34,7 @@
   "conversion": "Conversion",
   "xp": "XP",
   "caps_filter": "Caps filter",
-  "color_filter": "Color (/me) filter",
+  "color_filter": "Italic (/me) filter",
   "links_filter": "Links filter",
   "symbols_filter": "Symbols filter",
   "longMessage_filter": "Message length filter",
