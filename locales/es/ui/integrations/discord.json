@@ -1,0 +1,26 @@
+{
+  "settings": {
+    "enabled": "Status",
+    "guild": "Guild",
+    "listenAtChannels": "Listen for commands on this channel",
+    "sendOnlineAnnounceToChannel": "Send online announcement to this channel",
+    "sendAnnouncesToChannel": "Setup sending of announcements to channels",
+    "deleteMessagesAfterWhile": "Delete message after while",
+    "clientId": "ClientId",
+    "token": "Token",
+    "joinToServerBtn": "Click to join bot to your server",
+    "cannotJoinToServerBtn": "Set token and clientId to be able to join bot to your server",
+    "noChannelSelected": "no channel selected",
+    "noRoleSelected": "no role selected",
+    "noGuildSelected": "no guild selected",
+    "noGuildSelectedBox": "Select guild where bot should work and you'll see more settings",
+    "onlinePresenceStatusDefault": "Default Status",
+    "onlinePresenceStatusDefaultName": "Default Status Message",
+    "onlinePresenceStatusOnStream": "Status when Streaming",
+    "onlinePresenceStatusOnStreamName": "Status Message when Streaming",
+    "ignorelist": {
+      "title": "Ignore list",
+      "help": "username, username#0000 or userID"
+    }
+  }
+}
