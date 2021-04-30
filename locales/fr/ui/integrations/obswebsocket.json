@@ -5,8 +5,8 @@
       "title": "Access by",
       "help": "Direct - connect directly from a bot | Overlay - connect via overlay browser source"
     },
-    "address": "Address",
-    "password": "Password"
+    "address": "Adresse",
+    "password": "Mot de passe"
   },
   "noSourceSelected": "No source selected",
   "noSceneSelected": "No scene selected",
