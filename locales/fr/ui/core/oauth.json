@@ -1,7 +1,7 @@
 {
   "settings": {
-    "generalChannel": "Channel",
-    "generalOwners": "Owners",
+    "generalChannel": "Chaine",
+    "generalOwners": "Propriétaires",
     "botAccessToken": "AccessToken",
     "broadcasterAccessToken": "AccessToken",
     "botRefreshToken": "RefreshToken",
