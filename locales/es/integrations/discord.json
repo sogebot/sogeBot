@@ -1,0 +1,12 @@
+{
+  "your-account-is-not-linked": "your account is not linked, use `$command`",
+  "all-your-links-were-deleted": "all your links were deleted",
+  "all-your-links-were-deleted-with-sender": "$sender, {integrations.discord.all-your-links-were-deleted-discord}",
+  "this-account-was-linked-with": "$sender, this account was linked with $discordTag.",
+  "invalid-or-expired-token": "$sender, invalid or expired token.",
+  "help-message": "$sender, to link your account on Discord: 1. Go to Discord server and send $command in bot channel. | 2. Wait for PM from bot | 3. Send command from your Discord PM here in twitch chat.",
+  "started-at": "Started At",
+  "streamed-at": "Streamed At",
+  "link-whisper": "Hello $tag, to link this Discord account with your Twitch account on $broadcaster channel, go to <https://twitch.tv/$broadcaster>, login to your account and send this command to chat \n\n\t\t`$command $id`\n\nNOTE: This expires in 10 minutes.",
+  "check-your-dm": "check your DMs for steps to link your account."
+}
