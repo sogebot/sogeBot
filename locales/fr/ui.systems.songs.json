@@ -22,7 +22,7 @@
   "add_or_import": "Add song or import from playlist",
   "importing": "Importing",
   "importing_done": "Importing Done",
-  "seconds": "Seconds",
+  "seconds": "Secondes",
   "calculated": "Calculated",
   "set_manually": "Set manually",
   "bannedSongsEmptyAfterSearch": "No banned songs were found by your search for <strong>\"$search\"</strong>.",
