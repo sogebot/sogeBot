@@ -1,6 +1,6 @@
 {
   "settings": {
-    "theme": "Default theme",
+    "theme": "Thème par défaut",
     "domain": {
       "title": "Domain",
       "help": "Format without http/https: yourdomain.com or your.domain.com"
