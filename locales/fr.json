@@ -1183,7 +1183,7 @@
       "notEnoughOptions": "$sender, you need to select user to fight.",
       "broadcaster": "ψ(｀∇´)ψ $winner is a god among you. Beware $loser! This fight was decided even before it started.",
       "bothModerators": "$challenger (*-`ω´- )人(*-`ω´- ) $sender, this fight will take milleniums to decide!",
-      "oneModerator": "¯\\_(ツ)_/¯ $winner is under divine protection. Sorry, $loser."
+      "oneModerator": "¯ \\ _ (ツ) _ / ¯ $winner est sous la protection divine. Désolé, $loser."
     },
     "gamble": {
       "chanceToWin": "$sender, chance to win !gamble set to $value%",
