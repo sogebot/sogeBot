@@ -62,7 +62,7 @@
     "name": "Test current script",
     "help": "Click <strong>Test current script</strong> to see value in <strong>Current value</strong> input"
   },
-  "history": "History",
+  "history": "Historique",
   "historyIsEmpty": "History for this variable is empty!",
   "warning": "<strong>Warning:</strong> All data of this variable will be discarded!",
   "choose": "Choose...",
@@ -74,9 +74,9 @@
   },
   "runEvery": {
     "isUsed": "When variable is used",
-    "seconds": "Seconds",
+    "seconds": "Secondes",
     "minutes": "Minutes",
-    "hours": "Hours",
+    "hours": "Heures",
     "days": "Days"
   }
 }
