@@ -5,14 +5,14 @@
     "command": "Command",
     "username": "Username",
     "recipient": "Recipient",
-    "message": "Message",
+    "message": "Message ",
     "tier": "Tier",
     "amountOfViewers": "Amount of viewers",
     "amountOfBits": "Amount of bits",
     "amountOfGifts": "Amount of gifts",
     "amountOfMonths": "Amount of months",
     "amountOfTips": "Tip",
-    "event": "Event"
+    "event": "Événement"
   },
   "empty": "Alerts registry is empty, create new alerts.",
   "emptyAfterSearch": "Alerts registry is empty in searching for \"<strong>$search</strong>\"",
@@ -60,7 +60,7 @@
   "filter": {
     "name": "Occurence filter",
     "operator": "Operator",
-    "rule": "Rule",
+    "rule": "Règle",
     "addRule": "Add rule",
     "addGroup": "Add group",
     "comparator": "Comparator",
