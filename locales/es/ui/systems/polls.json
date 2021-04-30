@@ -1,0 +1,39 @@
+{
+  "settings": {
+    "enabled": "Status",
+    "everyXMessages": {
+      "title": "Remind every X messages",
+      "help": "0 = disabled; both remind conditions must be true to bot print remind"
+    },
+    "everyXSeconds": {
+      "title": "Remind every X seconds",
+      "help": "0 = disabled; both remind conditions must be true to bot print remind"
+    }
+  },
+  "overlay": {
+    "type": "Type",
+    "add": "Add",
+    "inChatToVote": "... in the chat to vote",
+    "tips": "tip",
+    "bits": "bits",
+    "toYourMessage": "... in your <strong>$type</strong> message"
+  },
+  "title": "Title",
+  "done": "DONE",
+  "running": "RUNNING",
+  "stop": "Stop",
+  "copy": "Copy",
+  "totalVotes": "Total votes",
+  "cannotCopyIfInProgress": "Cannot copy, if another poll is in progress",
+  "closedAt": "Closed at",
+  "activeFor": "Active for",
+  "votingBy": "Voting by",
+  "tips": "tips",
+  "numbers": "numbers",
+  "bits": "bits",
+  "command": "!vote",
+  "create": "Click to create new poll",
+  "cannotCreateIfEmpty": "Cannot create new poll without at least 2 options",
+  "cannotCreateWithoutTitle": "Cannot create new poll without title",
+  "cannotCreateNewVoteIfInProgress": "Cannot create new poll, if another poll in in progress"
+}
