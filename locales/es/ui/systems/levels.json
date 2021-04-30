@@ -1,0 +1,21 @@
+{
+  "settings": {
+    "enabled": "Status",
+    "conversionRate": "Conversion rate 1 XP for x Points",
+    "firstLevelStartsAt": "First level starts at XP",
+    "nextLevelFormula": {
+      "title": "Next level calculation formula",
+      "help": "Available variables: $prevLevel, $prevLevelXP"
+    },
+    "levelShowcaseHelp": "Levels example will be refreshed on save",
+    "xpName": "Name",
+    "interval": "Minutes interval to add xp to online users when stream online",
+    "offlineInterval": "Minutes interval to add xp to online users when stream offline",
+    "messageInterval": "How many messages to add xp",
+    "messageOfflineInterval": "How many messages to add xp when stream offline",
+    "perInterval": "How many xp to add per online interval",
+    "perOfflineInterval": "How many xp to add per offline interval",
+    "perMessageInterval": "How many xp to add per message interval",
+    "perMessageOfflineInterval": "How many xp to add per message offline interval"
+  }
+}
