@@ -1,0 +1,24 @@
+{
+  "options": "options",
+  "popover": {
+    "are_you_sure_you_want_to_delete_this_image": "Are you sure to <strong class='text-danger'>delete</strong> this image?"
+  },
+  "button": {
+    "update": "Update",
+    "fix_your_errors_first": "Fix errors before save"
+  },
+  "errors": {
+    "number_greater_or_equal_than_0": "Value must be a number >= 0",
+    "value_must_not_be_empty": "Value must not be empty"
+  },
+  "titles": {
+    "waitBefore": "Wait before image show (in ms)",
+    "waitAfter": "Wait after image disappear (in ms)",
+    "duration": "How long image should be shown (in ms)",
+    "animationIn": "Animation In",
+    "animationOut": "Animation Out",
+    "animationInDuration": "Animation In duration (in ms)",
+    "animationOutDuration": "Animation Out duration (in ms)",
+    "showOnlyOncePerStream": "Show only once per stream"
+  }
+}
