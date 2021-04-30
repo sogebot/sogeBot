@@ -1,0 +1,13 @@
+{
+  "settings": {
+    "responsiveVoiceKeyNotSet": "You haven't properly set <a href='#/settings/integrations/responsivevoice'>ResponsiveVoice key</a>",
+    "voice": {
+      "title": "Voice",
+      "help": "If voices are not properly loading after ResponsiveVoice key update, try to refresh browser"
+    },
+    "volume": "Volume",
+    "rate": "Rate",
+    "pitch": "Pitch",
+    "triggerTTSByHighlightedMessage": "Text to Speech will be triggered by highlighted message"
+  }
+}
