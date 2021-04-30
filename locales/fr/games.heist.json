@@ -21,8 +21,8 @@
     "bankVan": "Bank van",
     "cityBank": "City bank",
     "stateBank": "State bank",
-    "nationalReserve": "National reserve",
-    "federalReserve": "Federal reserve"
+    "nationalReserve": "Réserve nationale",
+    "federalReserve": "Réserve fédérale"
   },
   "results": "The heist payouts are: $users",
   "andXMore": "and $count more..."
