@@ -1,38 +1,38 @@
 {
   "core": {
-    "loaded": "is loaded and",
-    "enabled": "enabled",
-    "disabled": "disabled",
-    "usage": "Usage",
-    "lang-selected": "Bot language is currently set to english",
-    "refresh-panel": "You will need to refresh UI to see changes.",
-    "command-parse": "Sorry, $sender, but this command is not correct, use",
-    "error": "Sorry, $sender, but something went wrong!",
+    "loaded": "está cargado y",
+    "enabled": "habilitado",
+    "disabled": "deshabilitado",
+    "usage": "Uso",
+    "lang-selected": "El idioma del bot está establecido en español",
+    "refresh-panel": "Es necesario actualizar la interfaz para ver los cambios.",
+    "command-parse": "Lo siento, $sender, pero este comando no es correcto, usa",
+    "error": "Lo siento, $sender, pero algo salió mal!",
     "no-response": "",
     "no-response-bool": {
       "true": "",
       "false": ""
     },
     "api": {
-      "error": "$sender, API is not responding correctly!",
-      "not-available": "not available"
+      "error": "$sender, la API no responde correctamente!",
+      "not-available": "no disponible"
     },
     "percentage": {
       "true": "",
       "false": ""
     },
-    "years": "year|years",
-    "months": "month|months",
-    "days": "day|days",
-    "hours": "hour|hours",
-    "minutes": "minute|minutes",
-    "seconds": "second|seconds",
-    "messages": "message|messages",
+    "years": "año|años",
+    "months": "mes|meses",
+    "days": "día|días",
+    "hours": "hora|horas",
+    "minutes": "minuto|minutos",
+    "seconds": "segundo|segundos",
+    "messages": "mensaje|mensajes",
     "bits": "bit|bits",
     "links": "link|links",
-    "entries": "entry|entries",
-    "empty": "empty",
-    "isRegistered": "$sender, you cannot use !$keyword, because is already in use for another action!"
+    "entries": "entrada|entradas",
+    "empty": "vacío",
+    "isRegistered": "$sender, no puedes usar !$keyword, ¡porque ya está en uso para otra acción!"
   },
   "uptime": {
     "online": "Stream is online for (if $days>0|$daysd )(if $hours>0|$hoursh )(if $minutes>0|$minutesm )(if $seconds>0|$secondss)",
