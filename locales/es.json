@@ -70,22 +70,22 @@
       "no-options-set": "Aún no has establecido tus opciones"
     },
     "timers": {
-      "title": "Timers",
-      "timer": "Timer",
-      "messages": "messages",
-      "seconds": "seconds",
+      "title": "Temporizadores",
+      "timer": "Temporizador",
+      "messages": "mensajes",
+      "seconds": "segundos",
       "badges": {
-        "enabled": "Enabled",
-        "disabled": "Disabled"
+        "enabled": "Habilitado",
+        "disabled": "Deshabilitado"
       },
       "errors": {
-        "timer_name_must_be_compliant": "This value can contain only a-zA-Z09_",
-        "this_value_must_be_a_positive_number_or_0": "This value must be a positive number or 0",
-        "value_cannot_be_empty": "Value cannot be empty"
+        "timer_name_must_be_compliant": "Este valor sólo puede contener a-zA-Z09_",
+        "this_value_must_be_a_positive_number_or_0": "El valor debe ser un número positivo o 0",
+        "value_cannot_be_empty": "El valor no puede estar vacío"
       },
       "dialog": {
-        "timer": "Timer",
-        "name": "Name",
+        "timer": "Temporizador",
+        "name": "Nombre",
         "tickOffline": "Should tick if stream offline",
         "interval": "Interval",
         "responses": "Responses",
