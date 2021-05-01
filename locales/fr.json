@@ -85,12 +85,12 @@
       },
       "dialog": {
         "timer": "Timer",
-        "name": "Name",
+        "name": "Nom",
         "tickOffline": "Should tick if stream offline",
         "interval": "Intervalle",
         "responses": "Réponses",
-        "messages": "Trigger every X Messages",
-        "seconds": "Trigger every X Seconds",
+        "messages": "Déclencher tous les X Messages",
+        "seconds": "Déclencher toutes les X Secondes",
         "title": {
           "new": "New timer",
           "edit": "Edit timer"
@@ -108,33 +108,33 @@
       "buttons": {
         "close": "Fermer",
         "save-changes": "Save changes",
-        "disable": "Disable",
-        "enable": "Enable",
+        "disable": "Désactiver",
+        "enable": "Activer",
         "edit": "Edit",
         "delete": "Delete",
         "yes": "Oui",
         "no": "Non"
       },
       "popovers": {
-        "are_you_sure_you_want_to_delete_timer": "Are you sure you want to <strong class='text-danger'>delete</strong> timer"
+        "are_you_sure_you_want_to_delete_timer": "Êtes-vous sûr de vouloir <strong class='text-danger'>supprimer</strong> le minuteur"
       }
     },
     "events": {
       "event": "Événement",
-      "noEvents": "No events found in database.",
+      "noEvents": "Aucun événement trouvé dans la base de données.",
       "whatsthis": "what's this?",
       "myRewardIsNotListed": "Ma récompense n'est pas répertoriée !",
       "redeemAndClickRefreshToSeeReward": "If you are missing your created reward in a list, refresh by clicking on refresh icon.",
       "badges": {
-        "enabled": "Enabled",
-        "disabled": "Disabled"
+        "enabled": "Activé",
+        "disabled": "Désactivé"
       },
       "buttons": {
         "test": "Test",
-        "enable": "Enable",
-        "disable": "Disable",
-        "edit": "Edit",
-        "delete": "Delete",
+        "enable": "Activer",
+        "disable": "Désactiver",
+        "edit": "Editer",
+        "delete": "Supprimer",
         "yes": "Oui",
         "no": "Non"
       },
