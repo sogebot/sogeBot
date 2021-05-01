@@ -35,39 +35,39 @@
     "isRegistered": "$sender, no puedes usar !$keyword, ¡porque ya está en uso para otra acción!"
   },
   "uptime": {
-    "online": "Stream is online for (if $days>0|$daysd )(if $hours>0|$hoursh )(if $minutes>0|$minutesm )(if $seconds>0|$secondss)",
-    "offline": "Stream is currently offline for (if $days>0|$daysd )(if $hours>0|$hoursh )(if $minutes>0|$minutesm )(if $seconds>0|$secondss)"
+    "online": "La transmisión ha estado online durante (if $days>0|$daysd )(if $hours>0|$hoursh )(if $minutes>0|$minutesm )(if $seconds>0|$secondss)",
+    "offline": "La transmisión ha estado offline durante (if $days>0|$daysd )(if $hours>0|$hoursh )(if $minutes>0|$minutesm )(if $seconds>0|$secondss)"
   },
   "webpanel": {
-    "this-system-is-disabled": "This system is disabled",
-    "loading": "Loading",
-    "this-may-take-a-while": "This <strong>may</strong> take a while",
-    "display-as": "Display as",
-    "go-to-admin": "Go to Admin",
-    "go-to-public": "Go to Public",
-    "logout": "Logout",
+    "this-system-is-disabled": "Esta configuración está desactivada",
+    "loading": "Cargando",
+    "this-may-take-a-while": "Este <strong>puede tardar</strong> un poco",
+    "display-as": "Mostrar como",
+    "go-to-admin": "Ingresar a Admin",
+    "go-to-public": "Ingresar a Público",
+    "logout": "Cerrar sesión",
     "popout": "Popout",
-    "not-logged-in": "Not logged in",
-    "remove-widget": "Remove <strong>$name</strong> widget",
-    "join-channel": "Join bot to channel",
-    "leave-channel": "Leave bot from channel",
-    "set-default": "Set default",
-    "add": "Add",
+    "not-logged-in": "Sesión no iniciada",
+    "remove-widget": "Quitar el widget <strong>$name</strong>",
+    "join-channel": "Unir el bot al canal",
+    "leave-channel": "Quitar el bot del canal",
+    "set-default": "Establecer predeterminado",
+    "add": "Añadir",
     "placeholders": {
-      "text-url-generator": "Paste your text or html to generate base64 below and URL above",
-      "text-decode-base64": "Paste your base64 to generate URL and text above",
-      "creditsSpeed": "Set speed of credits rolling, lower = faster"
+      "text-url-generator": "Pega tu texto o html para generar base64 abajo y la URL anterior",
+      "text-decode-base64": "Pega tu base64 para generar URL y texto arriba",
+      "creditsSpeed": "Define la velocidad de desplazamiento de créditos, más baja = más rápido"
     },
     "custom-variables": {
-      "set-your-variables-to-watch-here": "Set your variables to watch here",
-      "type": "type",
-      "unwatch": "Unwatch",
-      "watch": "Watch",
-      "options": "options",
-      "number": "number",
-      "text": "text",
-      "options-placeholder": "option1, option2, option3, here is option 4",
-      "no-options-set": "You didn't set your options yet"
+      "set-your-variables-to-watch-here": "Configura tus variables para ver aquí",
+      "type": "tipo",
+      "unwatch": "Dejar de ver",
+      "watch": "Verlo",
+      "options": "opciones",
+      "number": "número",
+      "text": "texto",
+      "options-placeholder": "opción1, opción2, opción3, aquí está la opción 4",
+      "no-options-set": "Aún no has establecido tus opciones"
     },
     "timers": {
       "title": "Timers",
@@ -145,18 +145,18 @@
       "errors": {
         "command_must_start_with_!": "Command must start with !",
         "this_value_must_be_a_positive_number_or_0": "This value must be a positive number or 0",
-        "value_cannot_be_empty": "Value cannot be empty"
+        "value_cannot_be_empty": "El valor no puede estar vacío"
       },
       "dialog": {
         "title": {
-          "new": "New event listener",
-          "edit": "Edit event listener"
+          "new": "Nuevo detector de eventos",
+          "edit": "Editar detector de eventos"
         },
         "placeholders": {
-          "name": "Set name of your event listener (if empty, name will be generated)"
+          "name": "Establece el nombre del detector de eventos (si está vacío, se generará el nombre)"
         },
         "alerts": {
-          "success": "Event was <strong>successfully</strong> saved.",
+          "success": "El evento se ha guardado <strong>con éxito.</strong>",
           "fail": "Something went <strong>wrong</strong>."
         },
         "close": "Close",
