@@ -970,78 +970,78 @@
     "song-is-too-long": "Spiacenti, $sender, ma questo brano è troppo lungo",
     "incorrect-category": "Siamo spiacenti, $sender, ma questo brano deve essere una categoria musicale",
     "song-was-added-to-queue": "$sender, il brano $name è stato aggiunto alla coda",
-    "song-was-added-to-playlist": "$sender, song $name was added to playlist",
-    "song-is-already-in-playlist": "$sender, song $name is already in playlist",
-    "song-was-removed-from-playlist": "$sender, song $name was removed from playlist",
-    "song-was-removed-from-queue": "$sender, your song $name was removed from queue",
-    "playlist-current": "$sender, current playlist is $playlist.",
-    "playlist-list": "$sender, available playlists: $list.",
-    "playlist-not-exist": "$sender, your requested playlist $playlist doesn't exist.",
-    "playlist-set": "$sender, you changed playlist to $playlist."
+    "song-was-added-to-playlist": "$sender, il brano $name è stato aggiunto alla playlist",
+    "song-is-already-in-playlist": "$sender, il brano $name è già nella playlist",
+    "song-was-removed-from-playlist": "$sender, il brano $name è stato rimosso dalla playlist",
+    "song-was-removed-from-queue": "$sender, il brano $name è stato rimosso dalla coda",
+    "playlist-current": "$sender, la playlist attuale è $playlist.",
+    "playlist-list": "$sender, playlist disponibili: $list.",
+    "playlist-not-exist": "$sender, la tua playlist richiesta $playlist non esiste.",
+    "playlist-set": "$sender, hai cambiato la playlist in $playlist."
   },
   "price": {
     "price-parse-failed": "{core.command-parse} !price",
-    "price-was-set": "$sender, price for $command was set to $amount $pointsName",
-    "price-was-unset": "$sender, price for $command was unset",
-    "price-was-not-found": "$sender, price for $command was not found",
-    "price-was-enabled": "$sender, price for $command was enabled",
-    "price-was-disabled": "$sender, price for $command was disabled",
-    "user-have-not-enough-points": "Sorry, $sender, but you don't have $amount $pointsName to use $command",
-    "user-have-not-enough-points-or-bits": "Sorry, $sender, but you don't have $amount $pointsName or redeem command by $bitsAmount bits to use $command",
-    "user-have-not-enough-bits": "Sorry, $sender, but you need to redeem command by $bitsAmount bits to use $command",
-    "list-is-empty": "$sender, list of prices is empty",
-    "list-is-not-empty": "$sender, list of prices: $list"
+    "price-was-set": "$sender, il prezzo per $command è stato impostato a $amount $pointsName",
+    "price-was-unset": "$sender, il prezzo per $command non è stato impostato",
+    "price-was-not-found": "$sender, il prezzo per $command non è stato trovato",
+    "price-was-enabled": "$sender, il prezzo per $command è stato abilitato",
+    "price-was-disabled": "$sender, il prezzo per $command è stato disabilitato",
+    "user-have-not-enough-points": "Siamo spiacenti, $sender, ma non hai $amount $pointsName per usare $command",
+    "user-have-not-enough-points-or-bits": "Siamo spiacenti, $sender, ma non hai $amount $pointsName o riscattare il comando di $bitsAmount bit per usare $command",
+    "user-have-not-enough-bits": "Siamo spiacenti, $sender, ma devi riscattare il comando di $bitsAmount bit per usare $command",
+    "list-is-empty": "$sender, l'elenco dei prezzi è vuoto",
+    "list-is-not-empty": "$sender, elenco dei prezzi: $list"
   },
   "ranks": {
     "rank-parse-failed": "{core.command-parse} !rank help",
-    "rank-was-added": "$sender, new rank $type $rank($hours$hlocale) was added",
-    "rank-was-edited": "$sender, rank for $type $hours$hlocale was changed to $rank",
-    "rank-was-removed": "$sender, rank for $type $hours$hlocale was removed",
-    "rank-already-exist": "$sender, there is already a rank for $type $hours$hlocale",
-    "rank-was-not-found": "$sender, rank for $type $hours$hlocale was not found",
-    "custom-rank-was-set-to-user": "$sender, you set $rank to $username",
-    "custom-rank-was-unset-for-user": "$sender, custom rank for $username was unset",
-    "list-is-empty": "$sender, no ranks was found",
-    "list-is-not-empty": "$sender, ranks list: $list",
-    "show-rank-without-next-rank": "$sender, you have $rank rank",
-    "show-rank-with-next-rank": "$sender, you have $rank rank. Next rank - $nextrank",
-    "user-dont-have-rank": "$sender, you don't have a rank yet"
+    "rank-was-added": "$sender, nuovo rango $type $rank($hours$hlocale) è stato aggiunto",
+    "rank-was-edited": "$sender, il rango per $type $hours$hlocale è stato cambiato in $rank",
+    "rank-was-removed": "$sender, il rango per $type $hours$hlocale è stato rimosso",
+    "rank-already-exist": "$sender, c'è già un rango per $type $hours$hlocale",
+    "rank-was-not-found": "$sender, il rango per $type $hours$hlocale non è stato trovato",
+    "custom-rank-was-set-to-user": "$sender, hai impostato $rank a $username",
+    "custom-rank-was-unset-for-user": "$sender, il rango personalizzato per $username è stato azzerato",
+    "list-is-empty": "$sender, non sono stati trovati ranghi",
+    "list-is-not-empty": "$sender, elenco ranghi: $list",
+    "show-rank-without-next-rank": "$sender, hai $rank rango",
+    "show-rank-with-next-rank": "$sender, hai $rank rango. Prossimo rango - $nextrank",
+    "user-dont-have-rank": "$sender, non hai ancora un rango"
   },
   "followage": {
     "success": {
-      "never": "$sender, $username is not a channel follower",
-      "time": "$sender, $username is following channel $diff"
+      "never": "$sender, $username non è un follower del canale",
+      "time": "$sender, $username sta seguendo il canale $diff"
     },
     "successSameUsername": {
-      "never": "$sender, you are not follower of this channel",
-      "time": "$sender, you are following this channel for $diff"
+      "never": "$sender, non sei follower di questo canale",
+      "time": "$sender, stai seguendo questo canale per $diff"
     }
   },
   "subage": {
     "success": {
-      "never": "$sender, $username is not a channel subscriber.",
-      "notNow": "$sender, $username is currently not a channel subscriber. In total of $subCumulativeMonths $subCumulativeMonthsName.",
-      "timeWithSubStreak": "$sender, $username is subscriber of channel. Current sub streak for $diff ($subStreak $subStreakMonthsName) and in total of $subCumulativeMonths $subCumulativeMonthsName.",
-      "time": "$sender, $username is subscriber of channel. In total of $subCumulativeMonths $subCumulativeMonthsName."
+      "never": "$sender, $username non è un abbonato al canale.",
+      "notNow": "$sender, $username non è attualmente un abbonato al canale. In totale $subCumulativeMonths $subCumulativeMonthsName.",
+      "timeWithSubStreak": "$sender, $username è iscritto al canale. Sub streak attuale per $diff ($subStreak $subStreakMonthsName) e in totale di $subCumulativeMonths $subCumulativeMonthsName.",
+      "time": "$sender, $username è iscritto al canale. In totale $subCumulativeMonths $subCumulativeMonthsName."
     },
     "successSameUsername": {
-      "never": "$sender, you are not a channel subscriber.",
-      "notNow": "$sender, you are currently not a channel subscriber. In total of $subCumulativeMonths $subCumulativeMonthsName.",
-      "timeWithSubStreak": "$sender, you are subscriber of channel. Current sub streak for $diff ($subStreak $subStreakMonthsName) and in total of $subCumulativeMonths $subCumulativeMonthsName.",
-      "time": "$sender, you are subscriber of channel. In total of $subCumulativeMonths $subCumulativeMonthsName."
+      "never": "$sender, non sei un abbonato al canale.",
+      "notNow": "$sender, al momento non sei un abbonato al canale. In totale $subCumulativeMonths $subCumulativeMonthsName.",
+      "timeWithSubStreak": "$sender, sei iscritto al canale. Sub streak attuale per $diff ($subStreak $subStreakMonthsName) e in totale di $subCumulativeMonths $subCumulativeMonthsName.",
+      "time": "$sender, sei iscritto al canale. In totale $subCumulativeMonths $subCumulativeMonthsName."
     }
   },
   "age": {
-    "failed": "$sender, I don't have data for $username account age",
+    "failed": "$sender, Non ho dati per l'età dell'account $username",
     "success": {
-      "withUsername": "$sender, account age for $username is $diff",
-      "withoutUsername": "$sender, your account age is $diff"
+      "withUsername": "$sender, l'età del conto per $username è $diff",
+      "withoutUsername": "$sender, l'età del tuo account è $diff"
     }
   },
   "lastseen": {
     "success": {
-      "never": "$username was never in this channel!",
-      "time": "$username was last seen at $when in this channel"
+      "never": "$username non è mai stato in questo canale!",
+      "time": "$username è stato visto l'ultima volta alle $when in questo canale"
     },
     "failed": {
       "parse": "{core.command-parse} !lastseen [username]"
