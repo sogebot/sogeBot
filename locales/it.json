@@ -924,16 +924,16 @@
       "set": "$username è stato impostato su $amount $pointsName",
       "give": "$sender ha appena dato il suo $amount $pointsName a $username",
       "online": {
-        "positive": "All online users just received $amount $pointsName!",
-        "negative": "All online users just lost $amount $pointsName!"
+        "positive": "Tutti gli utenti online hanno appena ricevuto $amount $pointsName!",
+        "negative": "Tutti gli utenti online hanno appena perso $amount $pointsName!"
       },
       "all": {
-        "positive": "All users just received $amount $pointsName!",
-        "negative": "All users just lost $amount $pointsName!"
+        "positive": "Tutti gli utenti hanno appena ricevuto $amount $pointsName!",
+        "negative": "Tutti gli utenti hanno appena perso $amount $pointsName!"
       },
-      "rain": "Make it rain! All online users just received up to $amount $pointsName!",
-      "add": "$username just received $amount $pointsName!",
-      "remove": "Ouch, $amount $pointsName was removed from $username!"
+      "rain": "Fai piovere! Tutti gli utenti online hanno appena ricevuto fino a $amount $pointsName!",
+      "add": "$username ha appena ricevuto $amount $pointsName!",
+      "remove": "Ahia, $amount $pointsName è stato rimosso da $username!"
     },
     "failed": {
       "undo": "$sender, username wasn't found in database or user have no undo operations",
