@@ -939,8 +939,8 @@
       "undo": "$sender, il nome utente non è stato trovato nel database o l'utente non ha operazioni di annullamento",
       "set": "{core.command-parse} $command [username] [amount]",
       "give": "{core.command-parse} $command [username] [amount]",
-      "giveNotEnough": "Sorry, $sender, you don't have $amount $pointsName to give it to $username",
-      "cannotGiveZeroPoints": "Sorry, $sender, you cannot give $amount $pointsName to $username",
+      "giveNotEnough": "Siamo spiacenti, $sender, non hai $amount $pointsName da dare a $username",
+      "cannotGiveZeroPoints": "Siamo spiacenti, $sender, non puoi dare $amount $pointsName a $username",
       "get": "{core.command-parse} $command [username]",
       "online": "{core.command-parse} $command [amount]",
       "all": "{core.command-parse} $command [amount]",
@@ -949,23 +949,23 @@
       "remove": "{core.command-parse} $command [username] [amount]"
     },
     "defaults": {
-      "pointsResponse": "$username has currently $amount $pointsName. Your position is $order/$count."
+      "pointsResponse": "$username ha al momento $amount $pointsName. La tua posizione è $order/$count."
     }
   },
   "songs": {
-    "playlist-is-empty": "$sender, playlist to import is empty",
-    "playlist-imported": "$sender, imported $imported and skipped $skipped to playlist",
+    "playlist-is-empty": "$sender, la scaletta da importare è vuota",
+    "playlist-imported": "$sender, importato $imported ed è saltato $skipped alla scaletta",
     "not-playing": "Non In Riproduzione",
     "song-was-banned": "La canzone $name è stata bandita e non sarà mai più riprodotta!",
     "song-was-banned-timeout-message": "Sei stato sospeso per aver pubblicato un brano bandito",
     "song-was-unbanned": "Il brano è stato sbloccato con successo",
     "song-was-not-banned": "Questa canzone non è stata bandita",
     "no-song-is-currently-playing": "Nessun brano è attualmente in riproduzione",
-    "current-song-from-playlist": "Current song is $name from playlist",
-    "current-song-from-songrequest": "Current song is $name requested by $username",
-    "songrequest-disabled": "Sorry, $sender, song requests are disabled",
-    "song-is-banned": "Sorry, $sender, but this song is banned",
-    "youtube-is-not-responding-correctly": "Sorry, $sender, but YouTube is sending unexpected responses, please try again later.",
+    "current-song-from-playlist": "Il brano corrente è $name dalla playlist",
+    "current-song-from-songrequest": "Il brano corrente è $name richiesto da $username",
+    "songrequest-disabled": "Spiacenti, $sender, le richieste dei brani sono disabilitate",
+    "song-is-banned": "Spiacenti, $sender, ma questa canzone è bandita",
+    "youtube-is-not-responding-correctly": "Spiacenti, $sender, ma YouTube sta inviando risposte impreviste, riprova più tardi.",
     "song-was-not-found": "Sorry, $sender, but this song was not found",
     "song-is-too-long": "Sorry, $sender, but this song is too long",
     "incorrect-category": "Sorry, $sender, but this song must be music category",
