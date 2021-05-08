@@ -1087,32 +1087,32 @@
       "opened": "$sender, {queue.open}"
     },
     "join": {
-      "closed": "Sorry $sender, queue is currently closed",
-      "opened": "$sender were added into queue"
+      "closed": "Spiacenti $sender, la coda è attualmente chiusa",
+      "opened": "$sender sono stati aggiunti nella coda"
     },
-    "open": "Queue is currently OPENED! Join to queue with !queue join",
-    "close": "Queue is currently closed!",
-    "clear": "Queue were completely cleared",
+    "open": "La coda è attualmente APERTA! Unisciti alla coda con !queue join",
+    "close": "La coda è attualmente chiusa!",
+    "clear": "La coda è stata completamente cancellata",
     "picked": {
-      "single": "This user was picked from queue: $users",
-      "multi": "These users were picked from queue: $users",
-      "none": "No users were found in queue"
+      "single": "Questo utente è stato scelto dalla coda: $users",
+      "multi": "Questi utenti sono stati selezionati dalla coda: $users",
+      "none": "Nessun utente trovato in coda"
     }
   },
   "title": {
-    "current": "$sender, title of stream is '$title'.",
+    "current": "$sender, il titolo del flusso è '$title'.",
     "change": {
-      "success": "$sender, title was set to: $title"
+      "success": "$sender, il titolo è stato impostato a: $title"
     }
   },
   "game": {
-    "current": "$sender, streamer is currently playing $game.",
+    "current": "$sender, lo streamer sta attualmente giocando $game.",
     "change": {
-      "success": "$sender, game was set to: $game"
+      "success": "$sender, gioco impostato a: $game"
     }
   },
   "cooldowns": {
-    "cooldown-was-set": "$sender, $type cooldown for $command was set to $secondss",
+    "cooldown-was-set": "$sender, $type ricarica per $command è stato impostato a $secondss",
     "cooldown-was-unset": "$sender, cooldown for $command was unset",
     "cooldown-triggered": "$sender, you cannot use $command, remaining $secondss",
     "cooldown-not-found": "$sender, cooldown for $command was not found",
