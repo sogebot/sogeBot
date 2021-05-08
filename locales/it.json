@@ -1149,9 +1149,9 @@
   },
   "gambling": {
     "duel": {
-      "bank": "$sender, current bank for $command is $points $pointsName",
-      "lowerThanMinimalBet": "$sender, minimal bet for $command is $points $pointsName",
-      "cooldown": "$sender, you cannot use $command for $cooldown $minutesName.",
+      "bank": "$sender, la banca corrente per $command è $points $pointsName",
+      "lowerThanMinimalBet": "$sender, la scommessa minima per $command è $points $pointsName",
+      "cooldown": "$sender, non puoi usare $command per $cooldown $minutesName.",
       "joined": "$sender, good luck with your dueling skills. You bet on yourself $points $pointsName!",
       "added": "$sender really thinks he is better than others raising his bet to $points $pointsName!",
       "new": "$sender is your new duel challenger! To participate use $command [points], you have $minutes $minutesName left to join.",
