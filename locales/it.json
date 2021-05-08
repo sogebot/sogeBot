@@ -1152,93 +1152,93 @@
       "bank": "$sender, la banca corrente per $command è $points $pointsName",
       "lowerThanMinimalBet": "$sender, la scommessa minima per $command è $points $pointsName",
       "cooldown": "$sender, non puoi usare $command per $cooldown $minutesName.",
-      "joined": "$sender, good luck with your dueling skills. You bet on yourself $points $pointsName!",
-      "added": "$sender really thinks he is better than others raising his bet to $points $pointsName!",
-      "new": "$sender is your new duel challenger! To participate use $command [points], you have $minutes $minutesName left to join.",
-      "zeroBet": "$sender, you cannot duel 0 $pointsName",
-      "notEnoughOptions": "$sender, you need to specify points to dueling",
-      "notEnoughPoints": "$sender, you don't have $points $pointsName to duel!",
-      "noContestant": "Only $winner have courage to join duel! Your bet of $points $pointsName are returned to you.",
-      "winner": "Congratulations to $winner! He is last man standing and he won $points $pointsName ($probability% with bet of $tickets $ticketsName)!"
+      "joined": "$sender, buona fortuna con le tue abilità di duellamento. Scommetti su di te $points $pointsName!",
+      "added": "$sender pensa davvero di essere meglio di altri che alzare la sua scommessa a $points $pointsName!",
+      "new": "$sender è il tuo nuovo duello sfidante! Per partecipare usa $command [points], hai ancora $minutes $minutesName per partecipare.",
+      "zeroBet": "$sender, non puoi duellare 0 $pointsName",
+      "notEnoughOptions": "$sender, è necessario specificare i punti in dueling",
+      "notEnoughPoints": "$sender, non hai $points $pointsName da duellare!",
+      "noContestant": "Solo $winner ha il coraggio di unirsi al duello! La tua scommessa di $points $pointsName ti viene restituita.",
+      "winner": "Congratulazioni a $winner! È l'ultimo uomo in piedi e ha vinto $points $pointsName ($probability% con scommessa di $tickets $ticketsName)!"
     },
     "roulette": {
-      "trigger": "$sender is trying his luck and pulled a trigger",
-      "alive": "$sender is alive! Nothing happened.",
-      "dead": "$sender's brain was splashed on the wall!",
-      "mod": "$sender is incompement and completely missed his head!",
-      "broadcaster": "$sender is using blanks, boo!",
-      "timeout": "Roulette timeout set to $values"
+      "trigger": "$sender sta provando la sua fortuna e ha premuto il grilletto",
+      "alive": "$sender è vivo! Non è successo nulla.",
+      "dead": "Il cervello di $senderè stato schizzato sul muro!",
+      "mod": "$sender è incompemente e ha completamente perso la testa!",
+      "broadcaster": "$sender sta usando degli spazi vuoti, boo!",
+      "timeout": "Sospensione della roulette impostato a $values"
     },
     "seppuku": {
-      "text": "$sender has committed seppuku.",
-      "mod": "$sender tried to commit seppuku, but broke a sword.",
-      "broadcaster": "$sender tried to commit seppuku, but lost a sword.",
-      "timeout": "Seppuku timeout set to $values"
+      "text": "$sender ha commesso seppuku.",
+      "mod": "$sender ha provato a commettere seppuku, ma ha rotto una spada.",
+      "broadcaster": "$sender ha provato a commettere seppuku, ma ha perso una spada.",
+      "timeout": "Sospensione Seppuku impostato a $values"
     },
     "fightme": {
-      "cannotFightWithYourself": "$sender, you cannot fight with yourself!",
-      "cooldown": "$sender, you cannot use $command for $cooldown $minutesName.",
-      "challenge": "(ง'̀-'́)ง $sender wants to fight you $username! If you accept, send $command $sender",
-      "winner": "٩(^ᴗ^)۶ $winner is proud winner and $loser is sore loser! Who's next?",
-      "notEnoughOptions": "$sender, you need to select user to fight.",
-      "broadcaster": "ψ(｀∇´)ψ $winner is a god among you. Beware $loser! This fight was decided even before it started.",
-      "bothModerators": "$challenger (*-`ω´- )人(*-`ω´- ) $sender, this fight will take milleniums to decide!",
-      "oneModerator": "¯\\_(ツ)_/¯ $winner is under divine protection. Sorry, $loser."
+      "cannotFightWithYourself": "$sender, non puoi combattere con te stesso!",
+      "cooldown": "$sender, non puoi usare $command per $cooldown $minutesName.",
+      "challenge": "(<unk> '<unk> -'↓)<unk> $sender vuole combatterti $username! Se accetti, invia $command $sender",
+      "winner": "<unk> (^<unk> ^)<unk> $winner è orgoglioso vincitore e $loser è dolorante! Chi è il prossimo?",
+      "notEnoughOptions": "$sender, è necessario selezionare l'utente per combattere.",
+      "broadcaster": "● (`<unk> 국)<unk> $winner è un dio tra di te. Attenzione a $loser! Questa lotta è stata decisa anche prima che iniziasse.",
+      "bothModerators": "$challenger (*-`<unk> 국- )<unk> (*-`<unk> 국- ) $sender, questa lotta richiederà millenni per decidere!",
+      "oneModerator": "<unk> \\_(<unk>)_/ <unk> $winner è sotto protezione divina. Siamo spiacenti, $loser."
     },
     "gamble": {
-      "chanceToWin": "$sender, chance to win !gamble set to $value%",
-      "zeroBet": "$sender, you cannot gamble 0 $pointsName",
-      "minimalBet": "$sender, minimal bet for !gamble is set to $value",
-      "lowerThanMinimalBet": "$sender, minimal bet for !gamble is $points $pointsName",
-      "notEnoughOptions": "$sender, you need to specify points to gamble",
-      "notEnoughPoints": "$sender, you don't have $points $pointsName to gamble",
-      "win": "$sender, you WON! You now have $points $pointsName",
-      "winJackpot": "$sender, you hit JACKPOT! You won $jackpot $jackpotName in addition to your bet. You now have $points $pointsName",
-      "loseWithJackpot": "$sender, you LOST! You now have $points $pointsName. Jackpot increased to $jackpot $jackpotName",
-      "lose": "$sender, you LOST! You now have $points $pointsName",
-      "currentJackpot": "$sender, current jackpot for $command is $points $pointsName",
-      "jackpotIsDisabled": "$sender, jackpot is disabled for $command."
+      "chanceToWin": "$sender, possibilità di vincere!gioca impostata al $value%",
+      "zeroBet": "$sender, non puoi giocare 0 $pointsName",
+      "minimalBet": "$sender, la scommessa minima per !gamble è impostata su $value",
+      "lowerThanMinimalBet": "$sender, scommessa minima per !gamble è $points $pointsName",
+      "notEnoughOptions": "$sender, è necessario specificare i punti per giocare",
+      "notEnoughPoints": "$sender, non hai $points $pointsName da giocare",
+      "win": "$sender, hai vinto! Ora hai $points $pointsName",
+      "winJackpot": "$sender, hai colpito JACKPOT! Hai vinto $jackpot $jackpotName in aggiunta alla tua scommessa. Ora hai $points $pointsName",
+      "loseWithJackpot": "$sender, LOST! Ora hai $points $pointsName. Il Jackpot è aumentato a $jackpot $jackpotName",
+      "lose": "$sender, LOST! Ora hai $points $pointsName",
+      "currentJackpot": "$sender, il jackpot attuale per $command è $points $pointsName",
+      "jackpotIsDisabled": "$sender, il jackpot è disabilitato per $command."
     }
   },
   "highlights": {
-    "saved": "$sender, highlight was saved for $hoursh$minutesm$secondss",
+    "saved": "$sender, l'evidenziazione è stata salvata per $hoursh$minutesm$secondss",
     "list": {
-      "items": "$sender, list of saved highlights for latest stream: $items",
-      "empty": "$sender, no highlights were saved"
+      "items": "$sender, elenco dei punti salienti salvati per l'ultimo stream: $items",
+      "empty": "$sender, nessuna evidenziazione è stata salvata"
     },
-    "offline": "$sender, cannot save highlight, stream is offline"
+    "offline": "$sender, impossibile salvare l'evidenziazione, lo stream è fuori rete"
   },
   "whisper": {
     "settings": {
       "disablePermissionWhispers": {
-        "true": "Bot won't send permissions insufficient errors",
-        "false": "Bot will send permissions insufficient errors through whispers"
+        "true": "Il bot non invierà i permessi errori insufficienti",
+        "false": "Il bot invierà permessi insufficienti tramite sussurri"
       },
       "disableCooldownWhispers": {
-        "true": "Bot won't send cooldown notifications",
-        "false": "Bot will send cooldown notifications through whispers"
+        "true": "Il bot non invierà notifiche di ricarica",
+        "false": "Il bot invierà notifiche di ricarica tramite sussurri"
       }
     }
   },
   "phillipsHue": {
-    "list": "$sender, List of Phillips Hue connected lights: "
+    "list": "$sender, Elenco delle luci collegate Phillips Hue: "
   },
-  "time": "Current streamers time in his timezone is $time",
-  "subs": "$sender, there is currently $onlineSubCount online subscribers. Last sub/resub was $lastSubUsername $lastSubAgo",
-  "followers": "$sender, there is currently $onlineFollowersCount online followers. Last follow was $lastFollowUsername $lastFollowAgo",
+  "time": "L'ora attuale dei streamer nel suo fuso orario è $time",
+  "subs": "$sender, c'è attualmente $onlineSubCount abbonati online. L'ultimo sub/resub è stato $lastSubUsername $lastSubAgo",
+  "followers": "$sender, c'è attualmente $onlineFollowersCount follower online. Ultimo seguito è stato $lastFollowUsername $lastFollowAgo",
   "ignore": {
     "user": {
       "is": {
         "not": {
-          "ignored": "$sender, user $username is not ignored by bot"
+          "ignored": "$sender, l'utente $username non è ignorato dal bot"
         },
-        "added": "$sender, user $username is added to bot ignorelist",
-        "removed": "$sender, user $username is removed from bot ignorelist",
-        "ignored": "$sender, user $username is ignored by bot"
+        "added": "$sender, l'utente $username è stato aggiunto al bot ignorelist",
+        "removed": "$sender, l'utente $username è stato rimosso dal bot ignorelist",
+        "ignored": "$sender, l'utente $username è ignorato dal bot"
       }
     }
   },
   "filters": {
-    "setVariable": "$sender, $variable was set to $value."
+    "setVariable": "$sender, $variable è stato impostato a $value."
   }
 }
