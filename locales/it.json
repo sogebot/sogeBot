@@ -969,7 +969,7 @@
     "song-was-not-found": "Siamo spiacenti, $sender, ma questo brano non è stato trovato",
     "song-is-too-long": "Spiacenti, $sender, ma questo brano è troppo lungo",
     "incorrect-category": "Siamo spiacenti, $sender, ma questo brano deve essere una categoria musicale",
-    "song-was-added-to-queue": "$sender, song $name was added to queue",
+    "song-was-added-to-queue": "$sender, il brano $name è stato aggiunto alla coda",
     "song-was-added-to-playlist": "$sender, song $name was added to playlist",
     "song-is-already-in-playlist": "$sender, song $name is already in playlist",
     "song-was-removed-from-playlist": "$sender, song $name was removed from playlist",
