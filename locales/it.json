@@ -1049,39 +1049,39 @@
   },
   "watched": {
     "success": {
-      "time": "$username watched this channel for $time hours"
+      "time": "$username ha guardato questo canale per $time ore"
     },
     "failed": {
-      "parse": "{core.command-parse} !watched or !watched [username]"
+      "parse": "{core.command-parse} !visto o !visto [username]"
     }
   },
   "permissions": {
-    "without-permission": "You don't have enough permissions for '$command'"
+    "without-permission": "Non hai abbastanza permessi per '$command'"
   },
   "moderation": {
-    "user-have-immunity": "$sender, user $username have $type immunity for $time seconds",
-    "user-have-immunity-parameterError": "$sender, parameter error. $command <username> <type> <duration>",
-    "user-have-link-permit": "User $username can post a $count $link to chat",
-    "permit-parse-failed": "{core.command-parse} !permit [username]",
-    "user-is-warned-about-links": "No links allowed, ask for !permit [$count warnings left]",
-    "user-is-warned-about-symbols": "No excessive symbols usage [$count warnings left]",
-    "user-is-warned-about-long-message": "Long messages are not allowed [$count warnings left]",
-    "user-is-warned-about-caps": "No excessive caps usage [$count warnings left]",
-    "user-is-warned-about-spam": "Spamming is not allowed [$count warnings left]",
-    "user-is-warned-about-color": "Italic and /me is not allowed [$count warnings left]",
-    "user-is-warned-about-emotes": "No emotes spamming [$count warnings left]",
-    "user-is-warned-about-forbidden-words": "No forbidden words [$count warnings left]",
-    "user-have-timeout-for-links": "No links allowed, ask for !permit",
-    "user-have-timeout-for-symbols": "No excessive symbols usage",
-    "user-have-timeout-for-long-message": "Long message are not allowed",
-    "user-have-timeout-for-caps": "No excessive caps usage",
-    "user-have-timeout-for-spam": "Spamming is not allowed",
-    "user-have-timeout-for-color": "Italic and /me is not allowed",
-    "user-have-timeout-for-emotes": "No emotes spamming",
-    "user-have-timeout-for-forbidden-words": "No forbidden words"
+    "user-have-immunity": "$sender, l'utente $username ha $type immunità per $time secondi",
+    "user-have-immunity-parameterError": "$sender, parametro error. $command <username> <type> <duration>",
+    "user-have-link-permit": "L'utente $username può pubblicare un $count $link per chattare",
+    "permit-parse-failed": "{core.command-parse} !allow [username]",
+    "user-is-warned-about-links": "Nessun link permesso, chiedi !allow [$count avvisi rimasti]",
+    "user-is-warned-about-symbols": "Nessun uso eccessivo di simboli [$count avvisi rimasti]",
+    "user-is-warned-about-long-message": "I messaggi lunghi non sono ammessi [$count avvisi rimasti]",
+    "user-is-warned-about-caps": "Nessun utilizzo eccessivo dei limiti [$count avvisi rimasti]",
+    "user-is-warned-about-spam": "Lo spamming non è consentito [$count avvisi rimasti]",
+    "user-is-warned-about-color": "Corsivo e /me non sono ammessi [$count avvisi rimasti]",
+    "user-is-warned-about-emotes": "No emotes spamming [$count avvisi rimasti]",
+    "user-is-warned-about-forbidden-words": "Nessuna parola proibita [$count avvisi rimasti]",
+    "user-have-timeout-for-links": "Nessun link permesso, chiedi !allow",
+    "user-have-timeout-for-symbols": "Nessun uso eccessivo di simboli",
+    "user-have-timeout-for-long-message": "Il messaggio lungo non è consentito",
+    "user-have-timeout-for-caps": "Nessun uso eccessivo di caps",
+    "user-have-timeout-for-spam": "Lo spamming non è consentito",
+    "user-have-timeout-for-color": "Corsivo ed /me non è consentito",
+    "user-have-timeout-for-emotes": "Nessuno spamming delle emotes",
+    "user-have-timeout-for-forbidden-words": "Nessuna parola proibita"
   },
   "queue": {
-    "list": "$sender, current queue pool: $users",
+    "list": "$sender, attuale gruppo di coda: $users",
     "info": {
       "closed": "$sender, {queue.close}",
       "opened": "$sender, {queue.open}"
