@@ -936,7 +936,7 @@
       "remove": "Ahia, $amount $pointsName è stato rimosso da $username!"
     },
     "failed": {
-      "undo": "$sender, username wasn't found in database or user have no undo operations",
+      "undo": "$sender, il nome utente non è stato trovato nel database o l'utente non ha operazioni di annullamento",
       "set": "{core.command-parse} $command [username] [amount]",
       "give": "{core.command-parse} $command [username] [amount]",
       "giveNotEnough": "Sorry, $sender, you don't have $amount $pointsName to give it to $username",
