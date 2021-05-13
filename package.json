@@ -74,7 +74,7 @@
     "source-map-support": "0.5.19",
     "spotify-web-api-node": "5.0.2",
     "stream-browserify": "3.0.0",
-    "strip-ansi": "7.0.0",
+    "strip-ansi": "6.0.0",
     "strip-comments": "2.0.1",
     "tiny-typed-emitter": "2.0.3",
     "tlds": "1.221.1",
