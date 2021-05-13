@@ -1114,7 +1114,7 @@
   "cooldowns": {
     "cooldown-was-set": "$sender, $type cooldown for $command was set to $secondss",
     "cooldown-was-unset": "$sender, cooldown for $command was unset",
-    "cooldown-triggered": "$sender, you cannot use $command, remaining $secondss",
+    "cooldown-triggered": "$sender, '$command' is on cooldown, remaining $secondss",
     "cooldown-not-found": "$sender, cooldown for $command was not found",
     "cooldown-was-enabled": "$sender, cooldown for $command was enabled",
     "cooldown-was-disabled": "$sender, cooldown for $command was disabled",
