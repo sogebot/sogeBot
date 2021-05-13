@@ -1114,7 +1114,7 @@
   "cooldowns": {
     "cooldown-was-set": "$sender, $type Abklingzeit für $command wurde auf $secondss gesetzt",
     "cooldown-was-unset": "$sender, cooldown for $command was unset",
-    "cooldown-triggered": "$sender, Sie können nicht $command verwenden, verbleibende Zeit $secondss",
+    "cooldown-triggered": "$sender, '$command' is on cooldown, remaining $secondss",
     "cooldown-not-found": "$sender, Abklingzeit für $command wurde nicht gefunden",
     "cooldown-was-enabled": "$sender, Abklingzeit für $command wurde aktiviert",
     "cooldown-was-disabled": "$sender, Abklingzeit für $command wurde deaktiviert",
