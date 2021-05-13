@@ -1114,7 +1114,7 @@
   "cooldowns": {
     "cooldown-was-set": "$sender, $type кулдаун $command установлен на $secondss",
     "cooldown-was-unset": "$sender, cooldown for $command was unset",
-    "cooldown-triggered": "$sender, вы не можете использовать $command, осталось $secondsс",
+    "cooldown-triggered": "$sender, '$command' is on cooldown, remaining $secondss",
     "cooldown-not-found": "$sender, кулдаун $command не найден",
     "cooldown-was-enabled": "$sender, кулдаун $command включён",
     "cooldown-was-disabled": "$sender, кулдаун $command выключен",
