@@ -485,7 +485,7 @@ class API extends Core {
       // save remaining api calls
       setRateLimit('bot', request.headers);
 
-      if (tags.length === 100) {
+      if (request.data.pagination.cursor) {
         // move to next page
         return this.getAllStreamTags({ cursor: request.data.pagination.cursor });
       }
@@ -551,7 +551,7 @@ class API extends Core {
       // save remaining api calls
       setRateLimit('broadcaster', request.headers);
 
-      if (subscribers.length === 100) {
+      if (request.data.pagination.cursor) {
         // move to next page
         return this.getChannelSubscribers({
           ...opts, cursor: request.data.pagination.cursor, subscribers: opts.subscribers,
@@ -760,7 +760,7 @@ class API extends Core {
     return { state: true };
   }
 
-  async getChannelFollowers (opts: any) {
+  async getChannelFollowers (opts: { cursor?: string }) {
     opts = opts || {};
 
     const cid = channelId.value;
@@ -814,11 +814,11 @@ class API extends Core {
             followed_at: f.followed_at,
           };
         }), true).then(async () => {
-          if (followers.length === 100) {
+          if (request.data.pagination.cursor) {
             // move to next page
             // we don't care about return
             setImmediateAwait().then(() => {
-              this.getChannelFollowers({ cursor: request.data.pagination.cursor });
+              this.getChannelFollowers({ cursor: request.data.pagination.cursor  });
             });
           }
         });
