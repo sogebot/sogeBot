@@ -1,5 +1,5 @@
 {
-  "no-quotes-found": "We're sorry, no quotes were found in database.",
+  "no-quotes-found": "Nous sommes désolés, aucune citation n'a été trouvée dans la base de données.",
   "new": "Add new quote",
   "empty": "List of quotes is empty, create new quote.",
   "emptyAfterSearch": "List of quotes is empty in searching for \"<strong>$search</strong>\"",

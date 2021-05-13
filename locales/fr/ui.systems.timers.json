@@ -1,10 +1,10 @@
 {
   "new": "New Timer",
   "empty": "No timers were created yet.",
-  "emptyAfterSearch": "No timers were found by your search for <strong>\"$search\"</strong>.",
-  "add_response": "Add Response",
+  "emptyAfterSearch": "Aucune minuterie n'a été trouvée lors de votre recherche de <strong>\"$search\"</strong>.",
+  "add_response": "Ajouter une réponse",
   "settings": {
     "enabled": "Status"
   },
-  "warning": "This action cannot be reverted!"
+  "warning": "Cette action ne peut pas être annulée !"
 }

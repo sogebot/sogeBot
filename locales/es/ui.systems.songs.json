@@ -1,0 +1,32 @@
+{
+  "settings": {
+    "enabled": "Status",
+    "volume": "Volume",
+    "calculateVolumeByLoudness": "Dynamic volume by loudness",
+    "duration": {
+      "title": "Max song duration",
+      "help": "In minutes"
+    },
+    "shuffle": "Shuffle",
+    "songrequest": "Play from song request",
+    "playlist": "Play from playlist",
+    "onlyMusicCategory": "Allow only category music",
+    "notify": "Send message on song change"
+  },
+  "error": {
+    "isEmpty": "This value cannot be empty"
+  },
+  "startTime": "Start song at",
+  "endTime": "End song at",
+  "add_song": "Add song",
+  "add_or_import": "Add song or import from playlist",
+  "importing": "Importing",
+  "importing_done": "Importing Done",
+  "seconds": "Seconds",
+  "calculated": "Calculated",
+  "set_manually": "Set manually",
+  "bannedSongsEmptyAfterSearch": "No banned songs were found by your search for <strong>\"$search\"</strong>.",
+  "emptyAfterSearch": "No songs were found by your search for <strong>\"$search\"</strong>.",
+  "empty": "No songs were added yet.",
+  "bannedSongsEmpty": "No songs were added to banlist yet."
+}

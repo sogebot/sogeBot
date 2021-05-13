@@ -1,6 +1,7 @@
 {
   "time": "Top $amount (čas sledováni): ",
   "tips": "Top $amount (spropitné): ",
+  "level": "Top $amount (úroveň): ",
   "points": "Top $amount (body): ",
   "messages": "Top $amount (zprávy): ",
   "followage": "Top $amount (followage): ",

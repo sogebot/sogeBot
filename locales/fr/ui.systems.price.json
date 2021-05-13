@@ -8,13 +8,13 @@
     "placeholder": ""
   },
   "price": {
-    "name": "price",
+    "name": "prix",
     "placeholder": ""
   },
   "error": {
     "isEmpty": "This value cannot be empty"
   },
-  "warning": "This action cannot be reverted!",
+  "warning": "Cette action ne peut pas être annulée !",
   "settings": {
     "enabled": "Status"
   }

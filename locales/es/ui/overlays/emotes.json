@@ -1,0 +1,41 @@
+{
+	"settings": {
+		"btnRemoveCache": "Delete cache",
+		"btnTestExplosion": "Emote explosion",
+		"btnTestEmote": "Emote",
+		"btnTestFirework": "Emote firework",
+		"cEmotesSize": "Emotes size",
+		"cEmotesMaxEmotesPerMessage": "Maximum of emotes per messge",
+		"cEmotesAnimation": "Animation",
+		"cEmotesAnimationTime": "Animation duration",
+		"cExplosionNumOfEmotes": "No. of emotes",
+		"cExplosionNumOfEmotesPerExplosion": "No. of emotes per explosion",
+		"cExplosionNumOfExplosions": "No. of explosions",
+		"enableEmotesCombo": "Enable emotes combo",
+		"comboBreakMessages": "Combo break messages",
+		"threshold": "Threshold",
+		"noMessagesFound": "No messages found.",
+		"message": "Message",
+		"showEmoteInOverlayThreshold": "Minimal message threshold to show emote in overlay",
+		"hideEmoteInOverlayAfter": {
+			"title": "Hide emote in overlay after inactivity",
+			"help": "Will hide emote in overlay after certain time in seconds"
+		},
+		"comboCooldown": {
+			"title": "Combo cooldown",
+			"help": "Cooldown of combo in seconds"
+		},
+		"comboMessageMinThreshold": {
+			"title": "Minimal message threshold",
+			"help": "Minimal message threshold to count emotes as combo (until then won't trigger cooldown)"
+		},
+		"comboMessages": "Combo messages"
+	},
+	"message": {
+		"3": "$amountx $emote combo",
+		"5": "$amountx $emote combo SeemsGood",
+		"10": "$amountx $emote combo PogChamp",
+		"15": "$amountx $emote combo TriHard",
+		"20": "$sender ruined $amountx $emote combo! NotLikeThis"
+	}
+}

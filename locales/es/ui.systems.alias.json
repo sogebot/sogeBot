@@ -1,0 +1,20 @@
+{
+  "new": "New Alias",
+  "empty": "No alias were created yet.",
+  "emptyAfterSearch": "No alias were found by your search for <strong>\"$search\"</strong>.",
+  "alias": {
+    "name": "alias",
+    "placeholder": "Set your !alias here"
+  },
+  "command": {
+    "name": "command",
+    "placeholder": "Set your !command for alias"
+  },
+  "error": {
+    "isEmpty": "This value cannot be empty"
+  },
+  "warning": "This action cannot be reverted!",
+  "settings": {
+    "enabled": "Status"
+  }
+}

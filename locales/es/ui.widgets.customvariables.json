@@ -1,0 +1,5 @@
+{
+  "no-custom-variable-found": "No custom variables found, add at <a href=\"/#/registry/customVariables/list\">custom variables registry</a>",
+  "add-variable-into-watchlist": "Add variable to watchlist",
+  "watchlist": "Watchlist"
+}

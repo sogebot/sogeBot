@@ -85,12 +85,12 @@
       },
       "dialog": {
         "timer": "Timer",
-        "name": "Name",
+        "name": "Nom",
         "tickOffline": "Should tick if stream offline",
-        "interval": "Interval",
-        "responses": "Responses",
-        "messages": "Trigger every X Messages",
-        "seconds": "Trigger every X Seconds",
+        "interval": "Intervalle",
+        "responses": "Réponses",
+        "messages": "Déclencher tous les X Messages",
+        "seconds": "Déclencher toutes les X Secondes",
         "title": {
           "new": "New timer",
           "edit": "Edit timer"
@@ -106,37 +106,37 @@
         }
       },
       "buttons": {
-        "close": "Close",
+        "close": "Fermer",
         "save-changes": "Save changes",
-        "disable": "Disable",
-        "enable": "Enable",
+        "disable": "Désactiver",
+        "enable": "Activer",
         "edit": "Edit",
         "delete": "Delete",
-        "yes": "Yes",
-        "no": "No"
+        "yes": "Oui",
+        "no": "Non"
       },
       "popovers": {
-        "are_you_sure_you_want_to_delete_timer": "Are you sure you want to <strong class='text-danger'>delete</strong> timer"
+        "are_you_sure_you_want_to_delete_timer": "Êtes-vous sûr de vouloir <strong class='text-danger'>supprimer</strong> le minuteur"
       }
     },
     "events": {
-      "event": "Event",
-      "noEvents": "No events found in database.",
+      "event": "Événement",
+      "noEvents": "Aucun événement trouvé dans la base de données.",
       "whatsthis": "what's this?",
-      "myRewardIsNotListed": "My reward is not listed!",
+      "myRewardIsNotListed": "Ma récompense n'est pas répertoriée !",
       "redeemAndClickRefreshToSeeReward": "If you are missing your created reward in a list, refresh by clicking on refresh icon.",
       "badges": {
-        "enabled": "Enabled",
-        "disabled": "Disabled"
+        "enabled": "Activé",
+        "disabled": "Désactivé"
       },
       "buttons": {
         "test": "Test",
-        "enable": "Enable",
-        "disable": "Disable",
-        "edit": "Edit",
-        "delete": "Delete",
-        "yes": "Yes",
-        "no": "No"
+        "enable": "Activer",
+        "disable": "Désactiver",
+        "edit": "Editer",
+        "delete": "Supprimer",
+        "yes": "Oui",
+        "no": "Non"
       },
       "popovers": {
         "are_you_sure_you_want_to_delete_event": "Are you sure you want to <strong class='text-danger'>delete</strong> event",
@@ -162,7 +162,7 @@
         "close": "Close",
         "save-changes": "Save changes",
         "event": "Event",
-        "name": "Name",
+        "name": "Nom",
         "usable-events-variables": "Usable events variables",
         "settings": "Settings",
         "filters": "Filters",
@@ -281,7 +281,7 @@
           "placeholder": ""
         },
         "value": {
-          "label": "Value",
+          "label": "Valeur",
           "placeholder": ""
         },
         "numberToDecrement": {
@@ -327,11 +327,11 @@
         "response": "Response",
         "list": "Populated list",
         "type": "Type",
-        "days": "Days",
-        "hours": "Hours",
+        "days": "Jours",
+        "hours": "Heures",
         "minutesName": "Singular or Plural of word minute",
         "minutes": "Minutes",
-        "seconds": "Seconds",
+        "seconds": "Secondes",
         "description": "Description",
         "quiet": "Quiet (bool)",
         "id": "ID",
@@ -379,13 +379,13 @@
         "subStreakName": "localized name of month (1 month, 2 months) for current sub strek",
         "subCumulativeMonths": "Cumulative subscribe months",
         "subCumulativeMonthsName": "localized name of month (1 month, 2 months) for cumulative subscribe months",
-        "message": "Message",
+        "message": "Message ",
         "reason": "Reason",
         "target": "Target",
         "duration": "Duration",
         "method": "Method",
         "tier": "Tier",
-        "months": "Months",
+        "months": "Mois",
         "monthsName": "localized name of month (1 month, 2 months)",
         "oldGame": "Game before change",
         "recipientObject": "Full recipient object",
@@ -479,9 +479,9 @@
         "timeouts": "Timeouts"
       },
       "range": {
-        "day": "a day",
+        "day": "un jour",
         "week": "a week",
-        "month": "a month",
+        "month": "un mois",
         "year": "an year",
         "all": "All time"
       },
@@ -539,7 +539,7 @@
     "cooldown-quiet-header": "Show cooldown message",
     "cooldown-quiet-toggle-no": "Notify",
     "cooldown-quiet-toggle-yes": "Won't notify",
-    "cooldown-moderators": "Moderators",
+    "cooldown-moderators": "Modérateurs",
     "cooldown-owners": "Owners",
     "cooldown-subscribers": "Subscribers",
     "cooldown-followers": "Followers",
@@ -581,8 +581,8 @@
     "price": "Price",
     "rank": "Rank",
     "previous": "Previous",
-    "next": "Next",
-    "or": "or",
+    "next": "Suivant",
+    "or": "ou",
     "close": "Close",
     "save-changes": "Save changes",
     "saving": "Saving...",
@@ -627,9 +627,9 @@
     "follower": "Follower",
     "subscriber": "Subscriber",
     "minutes": "minutes",
-    "seconds": "seconds",
-    "hours": "hours",
-    "months": "months",
+    "seconds": "secondes",
+    "hours": "heures",
+    "months": "mois",
     "eligible-to-enter": "Eligible to enter:",
     "followers-only": "Followers only",
     "subscribers-only": "Subscribers only",
@@ -637,6 +637,7 @@
     "roll-a-winner": "Roll a winner",
     "send-message": "Send Message",
     "messages": "Messages",
+    "level": "Level",
     "announce-every": "Announce every",
     "create": "Create",
     "cooldown": "Cooldown",
@@ -665,7 +666,7 @@
     "end-time": "End Time",
     "watched-time": "Watched time",
     "currentsong": "Current song",
-    "group": "Group",
+    "group": "Groupe",
     "followed-since": "Followed since",
     "subscribed-since": "Subscribed since",
     "username": "Username",
@@ -675,8 +676,8 @@
     "scopes": "Scopes",
     "last-seen": "Last Seen",
     "date": "Date",
-    "points": "Points",
-    "calendar": "Calendar",
+    "points": "Points ",
+    "calendar": "Calendrier",
     "stream-events": "Stream Events",
     "select-date-from-calendar": "Select date from calendar",
     "select-stream-from-calendar-and-events": "Select stream from calendar and events",
@@ -706,7 +707,7 @@
     "long-messages": "Long Messages",
     "capitals": "Capitals",
     "spam": "Spam",
-    "colors": "Colors",
+    "colors": "Couleurs",
     "emotes": "Emotes",
     "one-record-per-line": "one record per line",
     "on": "on",
@@ -1067,7 +1068,7 @@
     "user-is-warned-about-long-message": "Long messages are not allowed [$count warnings left]",
     "user-is-warned-about-caps": "No excessive caps usage [$count warnings left]",
     "user-is-warned-about-spam": "Spamming is not allowed [$count warnings left]",
-    "user-is-warned-about-color": "Colors and /me is not allowed [$count warnings left]",
+    "user-is-warned-about-color": "Italic and /me is not allowed [$count warnings left]",
     "user-is-warned-about-emotes": "No emotes spamming [$count warnings left]",
     "user-is-warned-about-forbidden-words": "No forbidden words [$count warnings left]",
     "user-have-timeout-for-links": "No links allowed, ask for !permit",
@@ -1075,7 +1076,7 @@
     "user-have-timeout-for-long-message": "Long message are not allowed",
     "user-have-timeout-for-caps": "No excessive caps usage",
     "user-have-timeout-for-spam": "Spamming is not allowed",
-    "user-have-timeout-for-color": "Colors and /me is not allowed",
+    "user-have-timeout-for-color": "Italic and /me is not allowed",
     "user-have-timeout-for-emotes": "No emotes spamming",
     "user-have-timeout-for-forbidden-words": "No forbidden words"
   },
@@ -1113,7 +1114,7 @@
   "cooldowns": {
     "cooldown-was-set": "$sender, $type cooldown for $command was set to $secondss",
     "cooldown-was-unset": "$sender, cooldown for $command was unset",
-    "cooldown-triggered": "$sender, you cannot use $command, remaining $secondss",
+    "cooldown-triggered": "$sender, '$command' is on cooldown, remaining $secondss",
     "cooldown-not-found": "$sender, cooldown for $command was not found",
     "cooldown-was-enabled": "$sender, cooldown for $command was enabled",
     "cooldown-was-disabled": "$sender, cooldown for $command was disabled",
@@ -1182,7 +1183,7 @@
       "notEnoughOptions": "$sender, you need to select user to fight.",
       "broadcaster": "ψ(｀∇´)ψ $winner is a god among you. Beware $loser! This fight was decided even before it started.",
       "bothModerators": "$challenger (*-`ω´- )人(*-`ω´- ) $sender, this fight will take milleniums to decide!",
-      "oneModerator": "¯\\_(ツ)_/¯ $winner is under divine protection. Sorry, $loser."
+      "oneModerator": "¯ \\ _ (ツ) _ / ¯ $winner est sous la protection divine. Désolé, $loser."
     },
     "gamble": {
       "chanceToWin": "$sender, chance to win !gamble set to $value%",

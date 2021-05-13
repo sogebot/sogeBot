@@ -637,6 +637,7 @@
     "roll-a-winner": "Sorteggia un vincitore",
     "send-message": "Invia un messaggio",
     "messages": "Messaggi",
+    "level": "Livello",
     "announce-every": "Annunciare ogni",
     "create": "Crea",
     "cooldown": "Ricarica",
@@ -907,39 +908,39 @@
     "keyword-is-ambiguous": "$sender, la parola chiave $keyword è ambigua, usa l'ID della parola chiave",
     "keyword-was-not-found": "$sender, la parola chiave $keyword non è stata trovata nel database",
     "response-was-not-found": "$sender, risposta #$response della parola chiave $keyword non è stata trovata nel database",
-    "keyword-was-edited": "$sender, keyword $keyword is changed to '$response'",
-    "keyword-was-added": "$sender, keyword $keyword ($id) was added",
-    "list-is-not-empty": "$sender, list of keywords: $list",
-    "list-is-empty": "$sender, list of keywords is empty",
-    "keyword-was-enabled": "$sender, keyword $keyword was enabled",
-    "keyword-was-disabled": "$sender, keyword $keyword was disabled",
-    "keyword-was-removed": "$sender, keyword $keyword was removed",
-    "list-of-responses-is-empty": "$sender, $keyword have no responses or doesn't exists",
-    "response": "$keyword#$index ($permission) $after| $response"
+    "keyword-was-edited": "$sender, la parola chiave $keyword è cambiata in '$response'",
+    "keyword-was-added": "$sender, è stata aggiunta la parola chiave $keyword ($id)",
+    "list-is-not-empty": "$sender, elenco delle parole chiave: $list",
+    "list-is-empty": "$sender, l'elenco delle parole chiave è vuoto",
+    "keyword-was-enabled": "$sender, parola chiave $keyword è stata abilitata",
+    "keyword-was-disabled": "$sender, la parola chiave $keyword è stata disattivata",
+    "keyword-was-removed": "$sender, la parola chiave $keyword è stata rimossa",
+    "list-of-responses-is-empty": "$sender, $keyword non ha risposte o non esiste",
+    "response": "$keyword#$index ($permission) $after<unk> $response"
   },
   "points": {
     "success": {
-      "undo": "$sender, points '$command' for $username was reverted ($updatedValue $updatedValuePointsLocale to $originalValue $originalValuePointsLocale).",
-      "set": "$username was set to $amount $pointsName",
-      "give": "$sender just gave his $amount $pointsName to $username",
+      "undo": "$sender, i punti '$command' per $username sono stati ripristinati ($updatedValue $updatedValuePointsLocale a $originalValue $originalValuePointsLocale).",
+      "set": "$username è stato impostato su $amount $pointsName",
+      "give": "$sender ha appena dato il suo $amount $pointsName a $username",
       "online": {
-        "positive": "All online users just received $amount $pointsName!",
-        "negative": "All online users just lost $amount $pointsName!"
+        "positive": "Tutti gli utenti online hanno appena ricevuto $amount $pointsName!",
+        "negative": "Tutti gli utenti online hanno appena perso $amount $pointsName!"
       },
       "all": {
-        "positive": "All users just received $amount $pointsName!",
-        "negative": "All users just lost $amount $pointsName!"
+        "positive": "Tutti gli utenti hanno appena ricevuto $amount $pointsName!",
+        "negative": "Tutti gli utenti hanno appena perso $amount $pointsName!"
       },
-      "rain": "Make it rain! All online users just received up to $amount $pointsName!",
-      "add": "$username just received $amount $pointsName!",
-      "remove": "Ouch, $amount $pointsName was removed from $username!"
+      "rain": "Fai piovere! Tutti gli utenti online hanno appena ricevuto fino a $amount $pointsName!",
+      "add": "$username ha appena ricevuto $amount $pointsName!",
+      "remove": "Ahia, $amount $pointsName è stato rimosso da $username!"
     },
     "failed": {
-      "undo": "$sender, username wasn't found in database or user have no undo operations",
+      "undo": "$sender, il nome utente non è stato trovato nel database o l'utente non ha operazioni di annullamento",
       "set": "{core.command-parse} $command [username] [amount]",
       "give": "{core.command-parse} $command [username] [amount]",
-      "giveNotEnough": "Sorry, $sender, you don't have $amount $pointsName to give it to $username",
-      "cannotGiveZeroPoints": "Sorry, $sender, you cannot give $amount $pointsName to $username",
+      "giveNotEnough": "Siamo spiacenti, $sender, non hai $amount $pointsName da dare a $username",
+      "cannotGiveZeroPoints": "Siamo spiacenti, $sender, non puoi dare $amount $pointsName a $username",
       "get": "{core.command-parse} $command [username]",
       "online": "{core.command-parse} $command [amount]",
       "all": "{core.command-parse} $command [amount]",
@@ -948,99 +949,99 @@
       "remove": "{core.command-parse} $command [username] [amount]"
     },
     "defaults": {
-      "pointsResponse": "$username has currently $amount $pointsName. Your position is $order/$count."
+      "pointsResponse": "$username ha al momento $amount $pointsName. La tua posizione è $order/$count."
     }
   },
   "songs": {
-    "playlist-is-empty": "$sender, playlist to import is empty",
-    "playlist-imported": "$sender, imported $imported and skipped $skipped to playlist",
+    "playlist-is-empty": "$sender, la scaletta da importare è vuota",
+    "playlist-imported": "$sender, importato $imported ed è saltato $skipped alla scaletta",
     "not-playing": "Non In Riproduzione",
     "song-was-banned": "La canzone $name è stata bandita e non sarà mai più riprodotta!",
     "song-was-banned-timeout-message": "Sei stato sospeso per aver pubblicato un brano bandito",
     "song-was-unbanned": "Il brano è stato sbloccato con successo",
     "song-was-not-banned": "Questa canzone non è stata bandita",
     "no-song-is-currently-playing": "Nessun brano è attualmente in riproduzione",
-    "current-song-from-playlist": "Current song is $name from playlist",
-    "current-song-from-songrequest": "Current song is $name requested by $username",
-    "songrequest-disabled": "Sorry, $sender, song requests are disabled",
-    "song-is-banned": "Sorry, $sender, but this song is banned",
-    "youtube-is-not-responding-correctly": "Sorry, $sender, but YouTube is sending unexpected responses, please try again later.",
-    "song-was-not-found": "Sorry, $sender, but this song was not found",
-    "song-is-too-long": "Sorry, $sender, but this song is too long",
-    "incorrect-category": "Sorry, $sender, but this song must be music category",
-    "song-was-added-to-queue": "$sender, song $name was added to queue",
-    "song-was-added-to-playlist": "$sender, song $name was added to playlist",
-    "song-is-already-in-playlist": "$sender, song $name is already in playlist",
-    "song-was-removed-from-playlist": "$sender, song $name was removed from playlist",
-    "song-was-removed-from-queue": "$sender, your song $name was removed from queue",
-    "playlist-current": "$sender, current playlist is $playlist.",
-    "playlist-list": "$sender, available playlists: $list.",
-    "playlist-not-exist": "$sender, your requested playlist $playlist doesn't exist.",
-    "playlist-set": "$sender, you changed playlist to $playlist."
+    "current-song-from-playlist": "Il brano corrente è $name dalla playlist",
+    "current-song-from-songrequest": "Il brano corrente è $name richiesto da $username",
+    "songrequest-disabled": "Spiacenti, $sender, le richieste dei brani sono disabilitate",
+    "song-is-banned": "Spiacenti, $sender, ma questa canzone è bandita",
+    "youtube-is-not-responding-correctly": "Spiacenti, $sender, ma YouTube sta inviando risposte impreviste, riprova più tardi.",
+    "song-was-not-found": "Siamo spiacenti, $sender, ma questo brano non è stato trovato",
+    "song-is-too-long": "Spiacenti, $sender, ma questo brano è troppo lungo",
+    "incorrect-category": "Siamo spiacenti, $sender, ma questo brano deve essere una categoria musicale",
+    "song-was-added-to-queue": "$sender, il brano $name è stato aggiunto alla coda",
+    "song-was-added-to-playlist": "$sender, il brano $name è stato aggiunto alla playlist",
+    "song-is-already-in-playlist": "$sender, il brano $name è già nella playlist",
+    "song-was-removed-from-playlist": "$sender, il brano $name è stato rimosso dalla playlist",
+    "song-was-removed-from-queue": "$sender, il brano $name è stato rimosso dalla coda",
+    "playlist-current": "$sender, la playlist attuale è $playlist.",
+    "playlist-list": "$sender, playlist disponibili: $list.",
+    "playlist-not-exist": "$sender, la tua playlist richiesta $playlist non esiste.",
+    "playlist-set": "$sender, hai cambiato la playlist in $playlist."
   },
   "price": {
     "price-parse-failed": "{core.command-parse} !price",
-    "price-was-set": "$sender, price for $command was set to $amount $pointsName",
-    "price-was-unset": "$sender, price for $command was unset",
-    "price-was-not-found": "$sender, price for $command was not found",
-    "price-was-enabled": "$sender, price for $command was enabled",
-    "price-was-disabled": "$sender, price for $command was disabled",
-    "user-have-not-enough-points": "Sorry, $sender, but you don't have $amount $pointsName to use $command",
-    "user-have-not-enough-points-or-bits": "Sorry, $sender, but you don't have $amount $pointsName or redeem command by $bitsAmount bits to use $command",
-    "user-have-not-enough-bits": "Sorry, $sender, but you need to redeem command by $bitsAmount bits to use $command",
-    "list-is-empty": "$sender, list of prices is empty",
-    "list-is-not-empty": "$sender, list of prices: $list"
+    "price-was-set": "$sender, il prezzo per $command è stato impostato a $amount $pointsName",
+    "price-was-unset": "$sender, il prezzo per $command non è stato impostato",
+    "price-was-not-found": "$sender, il prezzo per $command non è stato trovato",
+    "price-was-enabled": "$sender, il prezzo per $command è stato abilitato",
+    "price-was-disabled": "$sender, il prezzo per $command è stato disabilitato",
+    "user-have-not-enough-points": "Siamo spiacenti, $sender, ma non hai $amount $pointsName per usare $command",
+    "user-have-not-enough-points-or-bits": "Siamo spiacenti, $sender, ma non hai $amount $pointsName o riscattare il comando di $bitsAmount bit per usare $command",
+    "user-have-not-enough-bits": "Siamo spiacenti, $sender, ma devi riscattare il comando di $bitsAmount bit per usare $command",
+    "list-is-empty": "$sender, l'elenco dei prezzi è vuoto",
+    "list-is-not-empty": "$sender, elenco dei prezzi: $list"
   },
   "ranks": {
     "rank-parse-failed": "{core.command-parse} !rank help",
-    "rank-was-added": "$sender, new rank $type $rank($hours$hlocale) was added",
-    "rank-was-edited": "$sender, rank for $type $hours$hlocale was changed to $rank",
-    "rank-was-removed": "$sender, rank for $type $hours$hlocale was removed",
-    "rank-already-exist": "$sender, there is already a rank for $type $hours$hlocale",
-    "rank-was-not-found": "$sender, rank for $type $hours$hlocale was not found",
-    "custom-rank-was-set-to-user": "$sender, you set $rank to $username",
-    "custom-rank-was-unset-for-user": "$sender, custom rank for $username was unset",
-    "list-is-empty": "$sender, no ranks was found",
-    "list-is-not-empty": "$sender, ranks list: $list",
-    "show-rank-without-next-rank": "$sender, you have $rank rank",
-    "show-rank-with-next-rank": "$sender, you have $rank rank. Next rank - $nextrank",
-    "user-dont-have-rank": "$sender, you don't have a rank yet"
+    "rank-was-added": "$sender, nuovo rango $type $rank($hours$hlocale) è stato aggiunto",
+    "rank-was-edited": "$sender, il rango per $type $hours$hlocale è stato cambiato in $rank",
+    "rank-was-removed": "$sender, il rango per $type $hours$hlocale è stato rimosso",
+    "rank-already-exist": "$sender, c'è già un rango per $type $hours$hlocale",
+    "rank-was-not-found": "$sender, il rango per $type $hours$hlocale non è stato trovato",
+    "custom-rank-was-set-to-user": "$sender, hai impostato $rank a $username",
+    "custom-rank-was-unset-for-user": "$sender, il rango personalizzato per $username è stato azzerato",
+    "list-is-empty": "$sender, non sono stati trovati ranghi",
+    "list-is-not-empty": "$sender, elenco ranghi: $list",
+    "show-rank-without-next-rank": "$sender, hai $rank rango",
+    "show-rank-with-next-rank": "$sender, hai $rank rango. Prossimo rango - $nextrank",
+    "user-dont-have-rank": "$sender, non hai ancora un rango"
   },
   "followage": {
     "success": {
-      "never": "$sender, $username is not a channel follower",
-      "time": "$sender, $username is following channel $diff"
+      "never": "$sender, $username non è un follower del canale",
+      "time": "$sender, $username sta seguendo il canale $diff"
     },
     "successSameUsername": {
-      "never": "$sender, you are not follower of this channel",
-      "time": "$sender, you are following this channel for $diff"
+      "never": "$sender, non sei follower di questo canale",
+      "time": "$sender, stai seguendo questo canale per $diff"
     }
   },
   "subage": {
     "success": {
-      "never": "$sender, $username is not a channel subscriber.",
-      "notNow": "$sender, $username is currently not a channel subscriber. In total of $subCumulativeMonths $subCumulativeMonthsName.",
-      "timeWithSubStreak": "$sender, $username is subscriber of channel. Current sub streak for $diff ($subStreak $subStreakMonthsName) and in total of $subCumulativeMonths $subCumulativeMonthsName.",
-      "time": "$sender, $username is subscriber of channel. In total of $subCumulativeMonths $subCumulativeMonthsName."
+      "never": "$sender, $username non è un abbonato al canale.",
+      "notNow": "$sender, $username non è attualmente un abbonato al canale. In totale $subCumulativeMonths $subCumulativeMonthsName.",
+      "timeWithSubStreak": "$sender, $username è iscritto al canale. Sub streak attuale per $diff ($subStreak $subStreakMonthsName) e in totale di $subCumulativeMonths $subCumulativeMonthsName.",
+      "time": "$sender, $username è iscritto al canale. In totale $subCumulativeMonths $subCumulativeMonthsName."
     },
     "successSameUsername": {
-      "never": "$sender, you are not a channel subscriber.",
-      "notNow": "$sender, you are currently not a channel subscriber. In total of $subCumulativeMonths $subCumulativeMonthsName.",
-      "timeWithSubStreak": "$sender, you are subscriber of channel. Current sub streak for $diff ($subStreak $subStreakMonthsName) and in total of $subCumulativeMonths $subCumulativeMonthsName.",
-      "time": "$sender, you are subscriber of channel. In total of $subCumulativeMonths $subCumulativeMonthsName."
+      "never": "$sender, non sei un abbonato al canale.",
+      "notNow": "$sender, al momento non sei un abbonato al canale. In totale $subCumulativeMonths $subCumulativeMonthsName.",
+      "timeWithSubStreak": "$sender, sei iscritto al canale. Sub streak attuale per $diff ($subStreak $subStreakMonthsName) e in totale di $subCumulativeMonths $subCumulativeMonthsName.",
+      "time": "$sender, sei iscritto al canale. In totale $subCumulativeMonths $subCumulativeMonthsName."
     }
   },
   "age": {
-    "failed": "$sender, I don't have data for $username account age",
+    "failed": "$sender, Non ho dati per l'età dell'account $username",
     "success": {
-      "withUsername": "$sender, account age for $username is $diff",
-      "withoutUsername": "$sender, your account age is $diff"
+      "withUsername": "$sender, l'età del conto per $username è $diff",
+      "withoutUsername": "$sender, l'età del tuo account è $diff"
     }
   },
   "lastseen": {
     "success": {
-      "never": "$username was never in this channel!",
-      "time": "$username was last seen at $when in this channel"
+      "never": "$username non è mai stato in questo canale!",
+      "time": "$username è stato visto l'ultima volta alle $when in questo canale"
     },
     "failed": {
       "parse": "{core.command-parse} !lastseen [username]"
@@ -1048,196 +1049,196 @@
   },
   "watched": {
     "success": {
-      "time": "$username watched this channel for $time hours"
+      "time": "$username ha guardato questo canale per $time ore"
     },
     "failed": {
-      "parse": "{core.command-parse} !watched or !watched [username]"
+      "parse": "{core.command-parse} !visto o !visto [username]"
     }
   },
   "permissions": {
-    "without-permission": "You don't have enough permissions for '$command'"
+    "without-permission": "Non hai abbastanza permessi per '$command'"
   },
   "moderation": {
-    "user-have-immunity": "$sender, user $username have $type immunity for $time seconds",
-    "user-have-immunity-parameterError": "$sender, parameter error. $command <username> <type> <duration>",
-    "user-have-link-permit": "User $username can post a $count $link to chat",
-    "permit-parse-failed": "{core.command-parse} !permit [username]",
-    "user-is-warned-about-links": "No links allowed, ask for !permit [$count warnings left]",
-    "user-is-warned-about-symbols": "No excessive symbols usage [$count warnings left]",
-    "user-is-warned-about-long-message": "Long messages are not allowed [$count warnings left]",
-    "user-is-warned-about-caps": "No excessive caps usage [$count warnings left]",
-    "user-is-warned-about-spam": "Spamming is not allowed [$count warnings left]",
-    "user-is-warned-about-color": "Colors and /me is not allowed [$count warnings left]",
-    "user-is-warned-about-emotes": "No emotes spamming [$count warnings left]",
-    "user-is-warned-about-forbidden-words": "No forbidden words [$count warnings left]",
-    "user-have-timeout-for-links": "No links allowed, ask for !permit",
-    "user-have-timeout-for-symbols": "No excessive symbols usage",
-    "user-have-timeout-for-long-message": "Long message are not allowed",
-    "user-have-timeout-for-caps": "No excessive caps usage",
-    "user-have-timeout-for-spam": "Spamming is not allowed",
-    "user-have-timeout-for-color": "Colors and /me is not allowed",
-    "user-have-timeout-for-emotes": "No emotes spamming",
-    "user-have-timeout-for-forbidden-words": "No forbidden words"
+    "user-have-immunity": "$sender, l'utente $username ha $type immunità per $time secondi",
+    "user-have-immunity-parameterError": "$sender, parametro error. $command <username> <type> <duration>",
+    "user-have-link-permit": "L'utente $username può pubblicare un $count $link per chattare",
+    "permit-parse-failed": "{core.command-parse} !allow [username]",
+    "user-is-warned-about-links": "Nessun link permesso, chiedi !allow [$count avvisi rimasti]",
+    "user-is-warned-about-symbols": "Nessun uso eccessivo di simboli [$count avvisi rimasti]",
+    "user-is-warned-about-long-message": "I messaggi lunghi non sono ammessi [$count avvisi rimasti]",
+    "user-is-warned-about-caps": "Nessun utilizzo eccessivo dei limiti [$count avvisi rimasti]",
+    "user-is-warned-about-spam": "Lo spamming non è consentito [$count avvisi rimasti]",
+    "user-is-warned-about-color": "Corsivo e /me non sono ammessi [$count avvisi rimasti]",
+    "user-is-warned-about-emotes": "No emotes spamming [$count avvisi rimasti]",
+    "user-is-warned-about-forbidden-words": "Nessuna parola proibita [$count avvisi rimasti]",
+    "user-have-timeout-for-links": "Nessun link permesso, chiedi !allow",
+    "user-have-timeout-for-symbols": "Nessun uso eccessivo di simboli",
+    "user-have-timeout-for-long-message": "Il messaggio lungo non è consentito",
+    "user-have-timeout-for-caps": "Nessun uso eccessivo di caps",
+    "user-have-timeout-for-spam": "Lo spamming non è consentito",
+    "user-have-timeout-for-color": "Corsivo ed /me non è consentito",
+    "user-have-timeout-for-emotes": "Nessuno spamming delle emotes",
+    "user-have-timeout-for-forbidden-words": "Nessuna parola proibita"
   },
   "queue": {
-    "list": "$sender, current queue pool: $users",
+    "list": "$sender, attuale gruppo di coda: $users",
     "info": {
       "closed": "$sender, {queue.close}",
       "opened": "$sender, {queue.open}"
     },
     "join": {
-      "closed": "Sorry $sender, queue is currently closed",
-      "opened": "$sender were added into queue"
+      "closed": "Spiacenti $sender, la coda è attualmente chiusa",
+      "opened": "$sender sono stati aggiunti nella coda"
     },
-    "open": "Queue is currently OPENED! Join to queue with !queue join",
-    "close": "Queue is currently closed!",
-    "clear": "Queue were completely cleared",
+    "open": "La coda è attualmente APERTA! Unisciti alla coda con !queue join",
+    "close": "La coda è attualmente chiusa!",
+    "clear": "La coda è stata completamente cancellata",
     "picked": {
-      "single": "This user was picked from queue: $users",
-      "multi": "These users were picked from queue: $users",
-      "none": "No users were found in queue"
+      "single": "Questo utente è stato scelto dalla coda: $users",
+      "multi": "Questi utenti sono stati selezionati dalla coda: $users",
+      "none": "Nessun utente trovato in coda"
     }
   },
   "title": {
-    "current": "$sender, title of stream is '$title'.",
+    "current": "$sender, il titolo del flusso è '$title'.",
     "change": {
-      "success": "$sender, title was set to: $title"
+      "success": "$sender, il titolo è stato impostato a: $title"
     }
   },
   "game": {
-    "current": "$sender, streamer is currently playing $game.",
+    "current": "$sender, lo streamer sta attualmente giocando $game.",
     "change": {
-      "success": "$sender, game was set to: $game"
+      "success": "$sender, gioco impostato a: $game"
     }
   },
   "cooldowns": {
-    "cooldown-was-set": "$sender, $type cooldown for $command was set to $secondss",
-    "cooldown-was-unset": "$sender, cooldown for $command was unset",
-    "cooldown-triggered": "$sender, you cannot use $command, remaining $secondss",
-    "cooldown-not-found": "$sender, cooldown for $command was not found",
-    "cooldown-was-enabled": "$sender, cooldown for $command was enabled",
-    "cooldown-was-disabled": "$sender, cooldown for $command was disabled",
-    "cooldown-was-enabled-for-moderators": "$sender, cooldown for $command was enabled for moderators",
-    "cooldown-was-disabled-for-moderators": "$sender, cooldown for $command was disabled for moderators",
-    "cooldown-was-enabled-for-owners": "$sender, cooldown for $command was enabled for owners",
-    "cooldown-was-disabled-for-owners": "$sender, cooldown for $command was disabled for owners",
-    "cooldown-was-enabled-for-subscribers": "$sender, cooldown for $command was enabled for subscribers",
-    "cooldown-was-disabled-for-subscribers": "$sender, cooldown for $command was disabled for subscribers",
-    "cooldown-was-enabled-for-followers": "$sender, cooldown for $command was enabled for followers",
-    "cooldown-was-disabled-for-followers": "$sender, cooldown for $command was disabled for followers"
+    "cooldown-was-set": "$sender, $type ricarica per $command è stato impostato a $secondss",
+    "cooldown-was-unset": "$sender, il tempo di ricarica per $command è stato disattivato",
+    "cooldown-triggered": "$sender, '$command' is on cooldown, remaining $secondss",
+    "cooldown-not-found": "$sender, il tempo di ricarica per $command non è stato trovato",
+    "cooldown-was-enabled": "$sender, è stato attivato il tempo di ricarica per $command",
+    "cooldown-was-disabled": "$sender, ricarica per $command è stato disabilitato",
+    "cooldown-was-enabled-for-moderators": "$sender, è stato attivato il tempo di ricarica per $command per i moderatori",
+    "cooldown-was-disabled-for-moderators": "$sender, il tempo di ricarica per $command è stato disabilitato per moderatori",
+    "cooldown-was-enabled-for-owners": "$sender, è stato attivato il tempo di ricarica per $command per i proprietari",
+    "cooldown-was-disabled-for-owners": "$sender, il tempo di ricarica per $command è stato disabilitato per i proprietari",
+    "cooldown-was-enabled-for-subscribers": "$sender, è stato attivato il tempo di ricarica per $command per gli abbonati",
+    "cooldown-was-disabled-for-subscribers": "$sender, ricarica per $command è stato disabilitato per gli abbonati",
+    "cooldown-was-enabled-for-followers": "$sender, è stato attivato il tempo di ricarica per $command per i seguaci",
+    "cooldown-was-disabled-for-followers": "$sender, il tempo di ricarica per $command è stato disabilitato per i seguaci"
   },
   "timers": {
-    "id-must-be-defined": "$sender, response id must be defined.",
-    "id-or-name-must-be-defined": "$sender, response id or timer name must be defined.",
-    "name-must-be-defined": "$sender, timer name must be defined.",
-    "response-must-be-defined": "$sender, timer response must be defined.",
-    "cannot-set-messages-and-seconds-0": "$sender, you cannot set both messages and seconds to 0.",
-    "timer-was-set": "$sender, timer $name was set with $messages messages and $seconds seconds to trigger",
-    "timer-was-set-with-offline-flag": "$sender, timer $name was set with $messages messages and $seconds seconds to trigger even when stream is offline",
-    "timer-not-found": "$sender, timer (name: $name) was not found in database. Check timers with !timers list",
-    "timer-deleted": "$sender, timer $name and its responses was deleted.",
-    "timer-enabled": "$sender, timer (name: $name) was enabled",
-    "timer-disabled": "$sender, timer (name: $name) was disabled",
-    "timers-list": "$sender, timers list: $list",
-    "responses-list": "$sender, timer (name: $name) list",
-    "response-deleted": "$sender, response (id: $id) was deleted.",
-    "response-was-added": "$sender, response (id: $id) for timer (name: $name) was added - '$response'",
-    "response-not-found": "$sender, response (id: $id) was not found in database",
-    "response-enabled": "$sender, response (id: $id) was enabled",
-    "response-disabled": "$sender, response (id: $id) was disabled"
+    "id-must-be-defined": "$sender, l'id della risposta deve essere definito.",
+    "id-or-name-must-be-defined": "$sender, deve essere definito l'id della risposta o il nome del timer.",
+    "name-must-be-defined": "$sender, il nome del timer deve essere definito.",
+    "response-must-be-defined": "$sender, la risposta del timer deve essere definita.",
+    "cannot-set-messages-and-seconds-0": "$sender, non puoi impostare sia i messaggi che i secondi a 0.",
+    "timer-was-set": "$sender, il timer $name è stato impostato con $messages messaggi e $seconds secondi per attivare",
+    "timer-was-set-with-offline-flag": "$sender, il timer $name è stato impostato con $messages messaggi e $seconds secondi per attivare anche quando lo stream è fuori rete",
+    "timer-not-found": "$sender, timer (nome: $name) non è stato trovato nel database. Controlla i timer con la lista !timers",
+    "timer-deleted": "$sender, timer $name e le sue risposte sono state eliminate.",
+    "timer-enabled": "$sender, timer (nome: $name) è stato abilitato",
+    "timer-disabled": "$sender, timer (nome: $name) è stato disabilitato",
+    "timers-list": "$sender, lista timer: $list",
+    "responses-list": "$sender, timer (nome: $name) list",
+    "response-deleted": "$sender, risposta (id: $id) è stata eliminata.",
+    "response-was-added": "$sender, risposta (id: $id) per timer (nome: $name) è stato aggiunto - '$response'",
+    "response-not-found": "$sender, risposta (id: $id) non è stato trovato nel database",
+    "response-enabled": "$sender, risposta (id: $id) è stata abilitata",
+    "response-disabled": "$sender, risposta (id: $id) è stata disabilitata"
   },
   "gambling": {
     "duel": {
-      "bank": "$sender, current bank for $command is $points $pointsName",
-      "lowerThanMinimalBet": "$sender, minimal bet for $command is $points $pointsName",
-      "cooldown": "$sender, you cannot use $command for $cooldown $minutesName.",
-      "joined": "$sender, good luck with your dueling skills. You bet on yourself $points $pointsName!",
-      "added": "$sender really thinks he is better than others raising his bet to $points $pointsName!",
-      "new": "$sender is your new duel challenger! To participate use $command [points], you have $minutes $minutesName left to join.",
-      "zeroBet": "$sender, you cannot duel 0 $pointsName",
-      "notEnoughOptions": "$sender, you need to specify points to dueling",
-      "notEnoughPoints": "$sender, you don't have $points $pointsName to duel!",
-      "noContestant": "Only $winner have courage to join duel! Your bet of $points $pointsName are returned to you.",
-      "winner": "Congratulations to $winner! He is last man standing and he won $points $pointsName ($probability% with bet of $tickets $ticketsName)!"
+      "bank": "$sender, la banca corrente per $command è $points $pointsName",
+      "lowerThanMinimalBet": "$sender, la scommessa minima per $command è $points $pointsName",
+      "cooldown": "$sender, non puoi usare $command per $cooldown $minutesName.",
+      "joined": "$sender, buona fortuna con le tue abilità di duellamento. Scommetti su di te $points $pointsName!",
+      "added": "$sender pensa davvero di essere meglio di altri che alzare la sua scommessa a $points $pointsName!",
+      "new": "$sender è il tuo nuovo duello sfidante! Per partecipare usa $command [points], hai ancora $minutes $minutesName per partecipare.",
+      "zeroBet": "$sender, non puoi duellare 0 $pointsName",
+      "notEnoughOptions": "$sender, è necessario specificare i punti in dueling",
+      "notEnoughPoints": "$sender, non hai $points $pointsName da duellare!",
+      "noContestant": "Solo $winner ha il coraggio di unirsi al duello! La tua scommessa di $points $pointsName ti viene restituita.",
+      "winner": "Congratulazioni a $winner! È l'ultimo uomo in piedi e ha vinto $points $pointsName ($probability% con scommessa di $tickets $ticketsName)!"
     },
     "roulette": {
-      "trigger": "$sender is trying his luck and pulled a trigger",
-      "alive": "$sender is alive! Nothing happened.",
-      "dead": "$sender's brain was splashed on the wall!",
-      "mod": "$sender is incompement and completely missed his head!",
-      "broadcaster": "$sender is using blanks, boo!",
-      "timeout": "Roulette timeout set to $values"
+      "trigger": "$sender sta provando la sua fortuna e ha premuto il grilletto",
+      "alive": "$sender è vivo! Non è successo nulla.",
+      "dead": "Il cervello di $senderè stato schizzato sul muro!",
+      "mod": "$sender è incompemente e ha completamente perso la testa!",
+      "broadcaster": "$sender sta usando degli spazi vuoti, boo!",
+      "timeout": "Sospensione della roulette impostato a $values"
     },
     "seppuku": {
-      "text": "$sender has committed seppuku.",
-      "mod": "$sender tried to commit seppuku, but broke a sword.",
-      "broadcaster": "$sender tried to commit seppuku, but lost a sword.",
-      "timeout": "Seppuku timeout set to $values"
+      "text": "$sender ha commesso seppuku.",
+      "mod": "$sender ha provato a commettere seppuku, ma ha rotto una spada.",
+      "broadcaster": "$sender ha provato a commettere seppuku, ma ha perso una spada.",
+      "timeout": "Sospensione Seppuku impostato a $values"
     },
     "fightme": {
-      "cannotFightWithYourself": "$sender, you cannot fight with yourself!",
-      "cooldown": "$sender, you cannot use $command for $cooldown $minutesName.",
-      "challenge": "(ง'̀-'́)ง $sender wants to fight you $username! If you accept, send $command $sender",
-      "winner": "٩(^ᴗ^)۶ $winner is proud winner and $loser is sore loser! Who's next?",
-      "notEnoughOptions": "$sender, you need to select user to fight.",
-      "broadcaster": "ψ(｀∇´)ψ $winner is a god among you. Beware $loser! This fight was decided even before it started.",
-      "bothModerators": "$challenger (*-`ω´- )人(*-`ω´- ) $sender, this fight will take milleniums to decide!",
-      "oneModerator": "¯\\_(ツ)_/¯ $winner is under divine protection. Sorry, $loser."
+      "cannotFightWithYourself": "$sender, non puoi combattere con te stesso!",
+      "cooldown": "$sender, non puoi usare $command per $cooldown $minutesName.",
+      "challenge": "(<unk> '<unk> -'↓)<unk> $sender vuole combatterti $username! Se accetti, invia $command $sender",
+      "winner": "<unk> (^<unk> ^)<unk> $winner è orgoglioso vincitore e $loser è dolorante! Chi è il prossimo?",
+      "notEnoughOptions": "$sender, è necessario selezionare l'utente per combattere.",
+      "broadcaster": "● (`<unk> 국)<unk> $winner è un dio tra di te. Attenzione a $loser! Questa lotta è stata decisa anche prima che iniziasse.",
+      "bothModerators": "$challenger (*-`<unk> 국- )<unk> (*-`<unk> 국- ) $sender, questa lotta richiederà millenni per decidere!",
+      "oneModerator": "<unk> \\_(<unk>)_/ <unk> $winner è sotto protezione divina. Siamo spiacenti, $loser."
     },
     "gamble": {
-      "chanceToWin": "$sender, chance to win !gamble set to $value%",
-      "zeroBet": "$sender, you cannot gamble 0 $pointsName",
-      "minimalBet": "$sender, minimal bet for !gamble is set to $value",
-      "lowerThanMinimalBet": "$sender, minimal bet for !gamble is $points $pointsName",
-      "notEnoughOptions": "$sender, you need to specify points to gamble",
-      "notEnoughPoints": "$sender, you don't have $points $pointsName to gamble",
-      "win": "$sender, you WON! You now have $points $pointsName",
-      "winJackpot": "$sender, you hit JACKPOT! You won $jackpot $jackpotName in addition to your bet. You now have $points $pointsName",
-      "loseWithJackpot": "$sender, you LOST! You now have $points $pointsName. Jackpot increased to $jackpot $jackpotName",
-      "lose": "$sender, you LOST! You now have $points $pointsName",
-      "currentJackpot": "$sender, current jackpot for $command is $points $pointsName",
-      "jackpotIsDisabled": "$sender, jackpot is disabled for $command."
+      "chanceToWin": "$sender, possibilità di vincere!gioca impostata al $value%",
+      "zeroBet": "$sender, non puoi giocare 0 $pointsName",
+      "minimalBet": "$sender, la scommessa minima per !gamble è impostata su $value",
+      "lowerThanMinimalBet": "$sender, scommessa minima per !gamble è $points $pointsName",
+      "notEnoughOptions": "$sender, è necessario specificare i punti per giocare",
+      "notEnoughPoints": "$sender, non hai $points $pointsName da giocare",
+      "win": "$sender, hai vinto! Ora hai $points $pointsName",
+      "winJackpot": "$sender, hai colpito JACKPOT! Hai vinto $jackpot $jackpotName in aggiunta alla tua scommessa. Ora hai $points $pointsName",
+      "loseWithJackpot": "$sender, LOST! Ora hai $points $pointsName. Il Jackpot è aumentato a $jackpot $jackpotName",
+      "lose": "$sender, LOST! Ora hai $points $pointsName",
+      "currentJackpot": "$sender, il jackpot attuale per $command è $points $pointsName",
+      "jackpotIsDisabled": "$sender, il jackpot è disabilitato per $command."
     }
   },
   "highlights": {
-    "saved": "$sender, highlight was saved for $hoursh$minutesm$secondss",
+    "saved": "$sender, l'evidenziazione è stata salvata per $hoursh$minutesm$secondss",
     "list": {
-      "items": "$sender, list of saved highlights for latest stream: $items",
-      "empty": "$sender, no highlights were saved"
+      "items": "$sender, elenco dei punti salienti salvati per l'ultimo stream: $items",
+      "empty": "$sender, nessuna evidenziazione è stata salvata"
     },
-    "offline": "$sender, cannot save highlight, stream is offline"
+    "offline": "$sender, impossibile salvare l'evidenziazione, lo stream è fuori rete"
   },
   "whisper": {
     "settings": {
       "disablePermissionWhispers": {
-        "true": "Bot won't send permissions insufficient errors",
-        "false": "Bot will send permissions insufficient errors through whispers"
+        "true": "Il bot non invierà i permessi errori insufficienti",
+        "false": "Il bot invierà permessi insufficienti tramite sussurri"
       },
       "disableCooldownWhispers": {
-        "true": "Bot won't send cooldown notifications",
-        "false": "Bot will send cooldown notifications through whispers"
+        "true": "Il bot non invierà notifiche di ricarica",
+        "false": "Il bot invierà notifiche di ricarica tramite sussurri"
       }
     }
   },
   "phillipsHue": {
-    "list": "$sender, List of Phillips Hue connected lights: "
+    "list": "$sender, Elenco delle luci collegate Phillips Hue: "
   },
-  "time": "Current streamers time in his timezone is $time",
-  "subs": "$sender, there is currently $onlineSubCount online subscribers. Last sub/resub was $lastSubUsername $lastSubAgo",
-  "followers": "$sender, there is currently $onlineFollowersCount online followers. Last follow was $lastFollowUsername $lastFollowAgo",
+  "time": "L'ora attuale dei streamer nel suo fuso orario è $time",
+  "subs": "$sender, c'è attualmente $onlineSubCount abbonati online. L'ultimo sub/resub è stato $lastSubUsername $lastSubAgo",
+  "followers": "$sender, c'è attualmente $onlineFollowersCount follower online. Ultimo seguito è stato $lastFollowUsername $lastFollowAgo",
   "ignore": {
     "user": {
       "is": {
         "not": {
-          "ignored": "$sender, user $username is not ignored by bot"
+          "ignored": "$sender, l'utente $username non è ignorato dal bot"
         },
-        "added": "$sender, user $username is added to bot ignorelist",
-        "removed": "$sender, user $username is removed from bot ignorelist",
-        "ignored": "$sender, user $username is ignored by bot"
+        "added": "$sender, l'utente $username è stato aggiunto al bot ignorelist",
+        "removed": "$sender, l'utente $username è stato rimosso dal bot ignorelist",
+        "ignored": "$sender, l'utente $username è ignorato dal bot"
       }
     }
   },
   "filters": {
-    "setVariable": "$sender, $variable was set to $value."
+    "setVariable": "$sender, $variable è stato impostato a $value."
   }
 }

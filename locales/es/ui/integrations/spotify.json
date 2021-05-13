@@ -1,0 +1,35 @@
+{
+  "settings": {
+    "enabled": "Status",
+    "songRequests": "Song Requests",
+    "fetchCurrentSongWhenOffline": {
+      "title": "Fetch current song when stream is offline",
+      "help": "It's advised to have this disabled to avoid reach API limits"
+    },
+    "queueWhenOffline": {
+      "title": "Queue songs when stream is offline",
+      "help": "It's advised to have this disabled to avoid queueing when you are just listening music"
+    },
+    "clientId": "clientId",
+    "clientSecret": "clientSecret",
+    "manualDeviceId": {
+      "title": "Forced Device ID",
+      "help": "Empty = disabled, force spotify device ID to be used to queue songs. Check logs for current active device or use button when playing song for at least 10 seconds."
+    },
+    "redirectURI": "redirectURI",
+    "format": {
+      "title": "Format",
+      "help": "Available variables: $song, $artist, $artists"
+    },
+    "username": "Authorized user",
+    "revokeBtn": "Revoke user authorization",
+    "authorizeBtn": "Authorize user",
+    "scopes": "Scopes",
+    "playlistToPlay": {
+      "title": "Spotify URI of main playlist",
+      "help": "If set, after request finished this playlist will continue"
+    },
+    "continueOnPlaylistAfterRequest": "Continue on playing of playlist after song request",
+    "notify": "Send message on song change"
+  }
+}

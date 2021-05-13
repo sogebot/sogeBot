@@ -1,0 +1,29 @@
+{
+  "copsOnPatrol": "$sender, cops are still searching for last heist team. Try again after $cooldown.",
+  "copsCooldownMessage": "Alright guys, looks like police forces are eating donuts and we can get that sweet money!",
+  "entryMessage": "$sender has started planning a bank heist! Looking for a bigger crew for a bigger score. Join in! Type $command <points> to enter.",
+  "lateEntryMessage": "$sender, heist is currently in progress!",
+  "entryInstruction": "$sender, type $command <points> to enter.",
+  "levelMessage": "With this crew, we can heist $bank! Let's see if we can get enough crew to heist $nextBank",
+  "maxLevelMessage": "With this crew, we can heist $bank! It cannot be any better!",
+  "started": "Alright guys, check your equipment, this is what we trained for. This is not a game, this is real life. We will get money from $bank!",
+  "noUser": "Nobody joins a crew to heist.",
+  "singleUserSuccess": "$user was like a ninja. Nobody noticed missing money.",
+  "singleUserFailed": "$user failed to get rid of police and will be spending his time in jail.",
+  "result": {
+    "0": "Everyone was mercilessly obliterated. This is slaughter.",
+    "33": "Only 1/3rd of team get its money from heist.",
+    "50": "Half of heist team was killed or catched by police.",
+    "99": "Some loses of heist team is nothing of what remaining crew have in theirs pockets.",
+    "100": "God divinity, nobody is dead, everyone won!"
+  },
+  "levels": {
+    "bankVan": "Bank van",
+    "cityBank": "City bank",
+    "stateBank": "State bank",
+    "nationalReserve": "National reserve",
+    "federalReserve": "Federal reserve"
+  },
+  "results": "The heist payouts are: $users",
+  "andXMore": "and $count more..."
+}

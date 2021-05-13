@@ -20,11 +20,11 @@
     "singleUserFailed": "Fail message for one user",
     "noUser": "Message if no user participated"
   },
-  "message": "Message",
+  "message": "Message ",
   "winPercentage": "Win percentage",
   "payoutMultiplier": "Payout multiplier",
   "maxUsers": "Max users for level",
-  "percentage": "Percentage",
+  "percentage": "Pourcentage",
   "noResultsFound": "No results found. Click button below to add new result.",
   "noLevelsFound": "No levels found. Click button below to add new level."
 }

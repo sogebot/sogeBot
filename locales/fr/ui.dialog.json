@@ -1,15 +1,15 @@
 {
   "title": {
     "edit": "Edit",
-    "add": "Add"
+    "add": "Ajouter"
   },
   "position": {
     "settings": "Position settings",
     "anchorX": "Anchor X position",
     "anchorY": "Anchor Y position",
-    "left": "Left",
+    "left": "Gauche",
     "right": "Right",
-    "middle": "Middle",
+    "middle": "Milieu",
     "top": "Top",
     "bottom": "Bottom",
     "x": "X",
@@ -19,8 +19,8 @@
     "shadowShiftRight": "Shift Right",
     "shadowShiftDown": "Shift Down",
     "shadowBlur": "Blur",
-    "shadowOpacity": "Opacity",
-    "color": "Color"
+    "shadowOpacity": "Opacité",
+    "color": "Couleur"
   },
   "errors": {
     "required": "This input cannot be empty.",
@@ -33,7 +33,7 @@
       "progress": "Uploading",
       "done": "Uploaded"
     },
-    "cancel": "Cancel",
+    "cancel": "Annuler",
     "close": "Close",
     "test": {
       "idle": "Test",
@@ -57,11 +57,11 @@
     "play": "Play",
     "stop": "Stop",
     "hold-to-delete": "Hold to delete",
-    "yes": "Yes",
-    "no": "No",
+    "yes": "Oui",
+    "no": "Non",
     "permission": "Permission",
-    "group": "Group",
-    "visibility": "Visibility",
+    "group": "Groupe",
+    "visibility": "Visibilité",
     "reset": "Reset "
   },
   "changesPending": "Your changes was not saved.",

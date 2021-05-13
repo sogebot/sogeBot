@@ -4,7 +4,7 @@
     "cooldown": "Cooldown",
     "timeout": {
       "title": "Timeout duration",
-      "help": "Seconds"
+      "help": "Secondes"
     },
     "bypassCooldownByOwnerAndMods": "Bypass cooldown by owner and mods",
     "winnerWillGet": "How many points will be added on win",

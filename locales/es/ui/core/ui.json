@@ -1,0 +1,13 @@
+{
+  "settings": {
+    "theme": "Default theme",
+    "domain": {
+      "title": "Domain",
+      "help": "Format without http/https: yourdomain.com or your.domain.com"
+    },
+    "percentage": "Percentage difference for stats",
+    "shortennumbers": "Short format of numbers",
+    "stickystats": "Stick stats to top",
+    "showdiff": "Show difference"
+  }
+}

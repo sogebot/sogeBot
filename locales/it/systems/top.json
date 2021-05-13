@@ -1,6 +1,7 @@
 {
   "time": "Top $amount (ora dell'orologio): ",
   "tips": "Top $amount (consigli): ",
+  "level": "Migliore $amount (livello): ",
   "points": "Top $amount (punti): ",
   "messages": "Top $amount (messaggi): ",
   "followage": "Top $amount (seguimento): ",

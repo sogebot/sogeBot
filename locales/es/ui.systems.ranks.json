@@ -1,0 +1,20 @@
+{
+  "new": "New Rank",
+  "empty": "No ranks were created yet.",
+  "emptyAfterSearch": "No ranks were found by your search for <strong>\"$search\"</strong>.",
+  "rank": {
+    "name": "rank",
+    "placeholder": ""
+  },
+  "value": {
+    "name": "hours",
+    "placeholder": ""
+  },
+  "error": {
+    "isEmpty": "This value cannot be empty"
+  },
+  "warning": "This action cannot be reverted!",
+  "settings": {
+    "enabled": "Status"
+  }
+}

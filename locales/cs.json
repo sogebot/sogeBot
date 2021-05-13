@@ -637,6 +637,7 @@
     "roll-a-winner": "Losovat vítěze",
     "send-message": "Poslat zprávu",
     "messages": "Zprávy",
+    "level": "Úroveň",
     "announce-every": "Oznámit každých",
     "create": "Vytvořit",
     "cooldown": "Cooldown",
@@ -1113,7 +1114,7 @@
   "cooldowns": {
     "cooldown-was-set": "$sender, $type cooldown pro $command byl nastaven na $secondss",
     "cooldown-was-unset": "$sender, cooldown pro $command byl zrušen",
-    "cooldown-triggered": "$sender, nemůžete použít $command, zbývá $secondss",
+    "cooldown-triggered": "$sender, '$command' má cooldown, zbývá $secondss",
     "cooldown-not-found": "$sender, cooldown pro $command nebyl nalezen",
     "cooldown-was-enabled": "$sender, cooldown pro $command byl zapnut",
     "cooldown-was-disabled": "$sender, cooldown pro $command byl vypnut",
