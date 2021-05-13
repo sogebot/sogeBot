@@ -760,7 +760,7 @@ class API extends Core {
     return { state: true };
   }
 
-  async getChannelFollowers (opts: any) {
+  async getChannelFollowers (opts: { cursor?: string, followersProcessed?: number}) {
     opts = opts || {};
 
     const cid = channelId.value;
@@ -778,6 +778,7 @@ class API extends Core {
       url += '&after=' + opts.cursor;
     } else {
       debug('api.getChannelFollowers', 'started');
+      await this.getLatest100Followers();
     }
 
     try {
@@ -814,11 +815,12 @@ class API extends Core {
             followed_at: f.followed_at,
           };
         }), true).then(async () => {
-          if (followers.length === 100) {
+          opts.followersProcessed = (opts.followersProcessed ?? 0) + followers.length;
+          if (followers.length === 100 || opts.followersProcessed >= stats.currentFollowers) {
             // move to next page
             // we don't care about return
             setImmediateAwait().then(() => {
-              this.getChannelFollowers({ cursor: request.data.pagination.cursor });
+              this.getChannelFollowers({ cursor: request.data.pagination.cursor  });
             });
           }
         });
