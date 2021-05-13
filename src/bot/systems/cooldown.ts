@@ -24,19 +24,20 @@ import { isOwner } from '../helpers/user';
 import Parser from '../parser';
 import { translate } from '../translate';
 import System from './_interface';
+import alias from './alias';
 import customCommands from './customcommands';
 
 const cache: { id: string; cooldowns: CooldownInterface[] }[] = [];
 const defaultCooldowns: { name: string; lastRunAt: number, permId: string }[] = [];
 
 /*
- * !cooldown [keyword|!command] [global|user] [seconds] [true/false] - set cooldown for keyword or !command, true/false set quiet mode
- * !cooldown unset [keyword|!command] - unset cooldown for keyword or !command, true/false set quiet mode
- * !cooldown toggle moderators [keyword|!command] [global|user]      - enable/disable specified keyword or !command cooldown for moderators
- * !cooldown toggle owners [keyword|!command] [global|user]          - enable/disable specified keyword or !command cooldown for owners
- * !cooldown toggle subscribers [keyword|!command] [global|user]     - enable/disable specified keyword or !command cooldown for owners
- * !cooldown toggle followers [keyword|!command] [global|user]       - enable/disable specified keyword or !command cooldown for owners
- * !cooldown toggle enabled [keyword|!command] [global|user]         - enable/disable specified keyword or !command cooldown
+ * !cooldown [keyword|!command|g:group] [global|user] [seconds] [true/false] - set cooldown for keyword or !command, true/false set quiet mode
+ * !cooldown unset [keyword|!command|g:group] - unset cooldown for keyword or !command, true/false set quiet mode
+ * !cooldown toggle moderators [keyword|!command|g:group] [global|user]      - enable/disable specified keyword or !command cooldown for moderators
+ * !cooldown toggle owners [keyword|!command|g:group] [global|user]          - enable/disable specified keyword or !command cooldown for owners
+ * !cooldown toggle subscribers [keyword|!command|g:group] [global|user]     - enable/disable specified keyword or !command cooldown for owners
+ * !cooldown toggle followers [keyword|!command|g:group] [global|user]       - enable/disable specified keyword or !command cooldown for owners
+ * !cooldown toggle enabled [keyword|!command|g:group] [global|user]         - enable/disable specified keyword or !command cooldown
  */
 
 class Cooldown extends System {
@@ -186,7 +187,7 @@ class Cooldown extends System {
         .toArray();
 
       if (!_.isNil(cmd)) { // command
-        let name: string = subcommand ? `${cmd} ${subcommand}` : cmd;
+        let name = subcommand ? `${cmd} ${subcommand}` : cmd;
         let isFound = false;
 
         const parsed = await (new Parser().find(subcommand ? `${cmd} ${subcommand}` : cmd, null));
@@ -210,7 +211,17 @@ class Cooldown extends System {
           name = cmd; // revert to basic command if nothing was found
         }
 
-        const cooldown = await getRepository(CooldownEntity).findOne({ where: { name }, relations: ['viewers'] });
+        // get alias group
+        let groupName = name;
+        if (opts.message.startsWith('!')) {
+          const [parsedAlias] = await alias.search(opts);
+          if (parsedAlias && parsedAlias.group) {
+            debug('cooldown.check', `Will be searching for group '${parsedAlias.group}' as well.`);
+            groupName = `g:${parsedAlias.group}`;
+          }
+        }
+
+        const cooldown = await getRepository(CooldownEntity).findOne({ where: [{ name }, { name: groupName }], relations: ['viewers'] });
         if (!cooldown) {
           const defaultValue = await this.getPermissionBasedSettingsValue('defaultCooldownOfCommandsInSeconds');
           const permId = await getUserHighestPermission(opts.sender.userId);
@@ -356,11 +367,11 @@ class Cooldown extends System {
         } else {
           if (!cooldown.isErrorMsgQuiet) {
             if (this.cooldownNotifyAsWhisper) {
-              const response = prepare('cooldowns.cooldown-triggered', { command: cooldown.name, seconds: Math.ceil((cooldown.miliseconds - now + timestamp) / 1000) });
+              const response = prepare('cooldowns.cooldown-triggered', { command: opts.message, seconds: Math.ceil((cooldown.miliseconds - now + timestamp) / 1000) });
               parserReply(response, opts, 'whisper'); // we want to whisp cooldown message
             }
             if (this.cooldownNotifyAsChat) {
-              const response = prepare('cooldowns.cooldown-triggered', { command: cooldown.name, seconds: Math.ceil((cooldown.miliseconds - now + timestamp) / 1000) });
+              const response = prepare('cooldowns.cooldown-triggered', { command: opts.message, seconds: Math.ceil((cooldown.miliseconds - now + timestamp) / 1000) });
               parserReply(response, opts, 'chat');
             }
           }

@@ -131,13 +131,13 @@
           <loading v-if="!editationItem" />
           <b-form v-else>
             <b-form-group>
-              <label-inside>{{ '!' + translate('command') + ' ' + translate('or') + ' ' + translate('keyword') }}</label-inside>
+              <label-inside>{{ '!' + translate('command') + ', ' + translate('keyword') + ' ' + translate('or') + ' g:' + translate('group') }}</label-inside>
               <b-input-group>
                 <b-form-input
                   id="name"
                   v-model="editationItem.name"
                   type="text"
-                  :placeholder="'!' + translate('command') + ' ' + translate('or') + ' ' + translate('keyword')"
+                  :placeholder="'!' + translate('command') + ', ' + translate('keyword') + ' ' + translate('or') + ' g:' + translate('group')"
                   :state="$v.editationItem.name.$invalid && $v.editationItem.name.$dirty ? false : null"
                   @input="$v.editationItem.name.$touch()"
                 />
@@ -306,7 +306,7 @@ export default defineComponent({
 
     const fields = [
       {
-        key: 'name', label: '!' + translate('command') + ' ' + translate('or') + ' ' + translate('keyword'), sortable: true,
+        key: 'name', label: '!' + translate('command') + ', ' + translate('keyword') + ' ' + translate('or') + ' g:' + translate('group'), sortable: true,
       },
       {
         key:      'miliseconds',

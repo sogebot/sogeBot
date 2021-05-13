@@ -5,7 +5,7 @@ import { getRepository } from 'typeorm';
 
 import { parserReply } from '../commons';
 import * as constants from '../constants';
-import { Alias as AliasEntity } from '../database/entity/alias';
+import { Alias as AliasEntity, AliasInterface } from '../database/entity/alias';
 import {
   command, default_permission, parser,
 } from '../decorators';
@@ -83,17 +83,15 @@ class Alias extends System {
     });
   }
 
-  @parser({ priority: constants.LOW })
-  async run (opts: ParserOptions): Promise<boolean> {
-    const p = new Parser();
-    let alias;
+  async search(opts: ParserOptions): Promise<[Readonly<Required<AliasInterface>> | null, string[]]> {
+    let alias: Readonly<Required<AliasInterface>> | undefined;
+    const cmdArray = opts.message.toLowerCase().split(' ');
 
     // is it an command?
     if (!opts.message.startsWith('!')) {
-      return true;
+      return [null, cmdArray];
     }
 
-    let cmdArray = opts.message.toLowerCase().split(' ');
     const length = opts.message.toLowerCase().split(' ').length;
     for (let i = 0; i < length; i++) {
       alias = await getRepository(AliasEntity).findOne({ alias: cmdArray.join(' '), enabled: true });
@@ -102,14 +100,22 @@ class Alias extends System {
       }
       cmdArray.pop(); // remove last array item if not found
     }
+    return [alias ?? null, cmdArray];
+  }
+
+  @parser({ priority: constants.LOW })
+  async run (opts: ParserOptions): Promise<boolean> {
+    let [alias, cmdArray] = await this.search(opts);
     if (!alias) {
       return true;
     } // no alias was found - return
+    const p = new Parser();
 
     const replace = new RegExp(`${alias.alias}`, 'i');
     cmdArray = opts.message.replace(replace, `${alias.command}`).split(' ');
     let tryingToBypass = false;
 
+    const length = opts.message.toLowerCase().split(' ').length;
     for (let i = 0; i < length; i++) { // search for correct alias
       if (cmdArray.length === alias.command.split(' ').length) {
         break;
