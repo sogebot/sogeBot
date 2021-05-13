@@ -116,6 +116,18 @@
 3. Run `make`
 4. Start bot `npm start`
 
+## Unofficial Installer
+
+- Download the binary (linux) or exe (windows) from https://github.com/liadala/sogeToGo/releases
+- Execute the Binary/Exe
+- Add bot as channel editor
+  in [Permissions settings](http://twitch.tv/dashboard/permissions) on Twitch
+
+- To access webpanel, go to `http://localhost:20000`
+
+This will also keep your Bot updated (check on every start)
+for issues or problems please open a [issue](https://github.com/liadala/sogeToGo/issues) at this repository
+
 ## Oauth generation
 
 Generate your oauth tokens in `ui->settings->general->oauth` and paste your
