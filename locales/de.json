@@ -1070,15 +1070,15 @@
     "user-is-warned-about-spam": "Spamming ist nicht erlaubt [$count Warnungen übrig]",
     "user-is-warned-about-color": "Kursiv und /me ist nicht erlaubt [$count Warnungen übrig]",
     "user-is-warned-about-emotes": "Keine Emotes Spamming [$count Warnungen übrig]",
-    "user-is-warned-about-forbidden-words": "No forbidden words [$count warnings left]",
+    "user-is-warned-about-forbidden-words": "Keine verbotenen Wörter [$count Warnungen übrig]",
     "user-have-timeout-for-links": "Keine Links erlaubt. Frage nach !permit",
     "user-have-timeout-for-symbols": "Keine übermäßige Verwendung von Symbolen",
     "user-have-timeout-for-long-message": "Lange Nachricht ist nicht erlaubt",
     "user-have-timeout-for-caps": "Keine übermäßige Verwendung von Caps",
     "user-have-timeout-for-spam": "Spammen ist nicht erlaubt",
-    "user-have-timeout-for-color": "Italic and /me is not allowed",
+    "user-have-timeout-for-color": "Kursiv und /me ist nicht erlaubt",
     "user-have-timeout-for-emotes": "Kein Emotes Spamming",
-    "user-have-timeout-for-forbidden-words": "No forbidden words"
+    "user-have-timeout-for-forbidden-words": "Keine verbotenen Wörter"
   },
   "queue": {
     "list": "$sender, aktueller Warteschlangen pool: $users",
