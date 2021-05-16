@@ -3,7 +3,7 @@
     "theme": "Standard Design",
     "domain": {
       "title": "Domain",
-      "help": "Format without http/https: yourdomain.com or your.domain.com"
+      "help": "Format ohne http/https: yourdomain.com oder dein.domain.com"
     },
     "percentage": "Prozentsatz Differenz für Statistiken",
     "shortennumbers": "Kurzes Format der Nummern",
