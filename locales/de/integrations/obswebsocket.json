@@ -1,7 +1,7 @@
 {
   "runTask": {
-    "EntityNotFound": "$sender, there is no action set for id:$id!",
-    "ParameterError": "$sender, you need to specify id!",
-    "UnknownError": "$sender, something went wrong. Check bot logs for additional informations."
+    "EntityNotFound": "$sender, es gibt keine Aktion für Id:$id!",
+    "ParameterError": "$sender, Sie müssen Id angeben!",
+    "UnknownError": "$sender, etwas ist schief gelaufen. Überprüfen Sie die Bot-Logs auf zusätzliche Informationen."
   }
 }
