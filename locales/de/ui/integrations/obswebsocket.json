@@ -3,14 +3,14 @@
     "enabled": "Status",
     "accessBy": {
       "title": "Zugriff durch",
-      "help": "Direct - connect directly from a bot | Overlay - connect via overlay browser source"
+      "help": "Direkt - direkt von einem Bot verbinden | Overlay - via Overlay Browser Quelle verbinden"
     },
-    "address": "Address",
-    "password": "Password"
+    "address": "Adresse",
+    "password": "Passwort"
   },
-  "noSourceSelected": "No source selected",
-  "noSceneSelected": "No scene selected",
-  "empty": "No action sets were created yet.",
+  "noSourceSelected": "Keine Quelle ausgewählt",
+  "noSceneSelected": "Keine Szene ausgewählt",
+  "empty": "Es wurden noch keine Aktionssätze erstellt.",
   "emptyAfterSearch": "No action sets were found by your search for <strong>\"$search\"</strong>.",
   "command": "Command",
   "new": "Neue OBS Websocket Aktion erstellen",
