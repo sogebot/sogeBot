@@ -11,8 +11,8 @@
   "noSourceSelected": "Keine Quelle ausgewählt",
   "noSceneSelected": "Keine Szene ausgewählt",
   "empty": "Es wurden noch keine Aktionssätze erstellt.",
-  "emptyAfterSearch": "No action sets were found by your search for <strong>\"$search\"</strong>.",
-  "command": "Command",
+  "emptyAfterSearch": "Ihre Suche nach <strong>\"$search\"</strong> hat keine Aktionssätze gefunden.",
+  "command": "Befehl",
   "new": "Neue OBS Websocket Aktion erstellen",
   "actions": "Aktionen",
   "name": {
