@@ -58,12 +58,12 @@
     "name": "Variantenvorkommen"
   },
   "filter": {
-    "name": "Occurence filter",
+    "name": "Auftretender Filter",
     "operator": "Operator",
     "rule": "Regel",
     "addRule": "Neue Regel",
     "addGroup": "Neue Gruppe",
-    "comparator": "Comparator",
+    "comparator": "Vergleicher",
     "value": "Wert",
     "valueSplitByComma": "Werte durch Komma getrennt (z.B. val1, val2)",
     "isEven": "ist gleich",
@@ -93,10 +93,10 @@
   "greater-than-or-equal-to-amount": "Größer als oder gleich dem Betrag",
   "tier-exact-amount": "Stufe ist",
   "tier-greater-than-or-equal-to-amount": "Stufe ist höher oder gleich",
-  "months-exact-amount": "Months amount is exactly",
-  "months-greater-than-or-equal-to-amount": "Months amount is higher or equal to",
-  "gifts-exact-amount": "Gifts amount is exactly",
-  "gifts-greater-than-or-equal-to-amount": "Gifts amount is higher or equal to",
+  "months-exact-amount": "Anzahl der Monate ist exakt",
+  "months-greater-than-or-equal-to-amount": "Anzahl der Monate ist höher oder gleich",
+  "gifts-exact-amount": "Gif Subs betrage ist gleich",
+  "gifts-greater-than-or-equal-to-amount": "Gif Subs betrage ist höher oder gleich",
   "very-rarely": "Sehr selten",
   "rarely": "Selten",
   "default": "Standard",
@@ -106,7 +106,7 @@
   "messageTemplate": {
     "name": "Nachrichtenvorlage",
     "placeholder": "Nachrichtenvorlage festlegen",
-    "help": "Available variables: {name}, {amount} (cheers, subs, tips, subgifts, sub community gifts, command redeems), {recipient} (subgifts, command redeems), {monthsName} (subs, subgifts), {currency} (tips)"
+    "help": "Verfügbare Variablen: {name}, {amount} (Grüße, Subs, Tipps, Subgeschenke, Sub Community Geschenke, Befehlseinlöse), {recipient} (Subgeschenke, Befehlseinlöse), {monthsName} (Subgeschenke, Subgeschenke), {currency} (Tipps)"
   },
   "animationText": {
     "name": "Animationstext"
@@ -130,18 +130,18 @@
     "name": "Skalieren"
   },
   "translateY": {
-    "name": "Move -Up / +Down"
+    "name": "Nach oben / +Runter"
   },
   "translateX": {
-    "name": "Move -Left / +Right"
+    "name": "Bewege -links / +Rechts"
   },
   "image": {
-    "name": "Image / Video(.webm)",
-    "setting": "Image / Video(.webm) settings"
+    "name": "Bild / Video(.webm)",
+    "setting": "Bild / Video(.webm) Einstellungen"
   },
   "sound": {
     "name": "Sound",
-    "setting": "Sound settings"
+    "setting": "Sound-Einstellungen"
   },
   "soundVolume": {
     "name": "Alert Lautstärke"
@@ -150,7 +150,7 @@
   "font": {
     "setting": "Schrifteinstellungen",
     "name": "Schriftartfamilie",
-    "overrideGlobal": "Override global font settings",
+    "overrideGlobal": "Globale Schriftarteinstellungen überschreiben",
     "align": {
       "name": "Ausrichtung",
       "left": "Links",
