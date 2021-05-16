@@ -1114,7 +1114,7 @@
   "cooldowns": {
     "cooldown-was-set": "$sender, $type ricarica per $command è stato impostato a $secondss",
     "cooldown-was-unset": "$sender, il tempo di ricarica per $command è stato disattivato",
-    "cooldown-triggered": "$sender, '$command' is on cooldown, remaining $secondss",
+    "cooldown-triggered": "$sender, il '$command' è in cooldown, remimangono $secondss di attesa",
     "cooldown-not-found": "$sender, il tempo di ricarica per $command non è stato trovato",
     "cooldown-was-enabled": "$sender, è stato attivato il tempo di ricarica per $command",
     "cooldown-was-disabled": "$sender, ricarica per $command è stato disabilitato",
