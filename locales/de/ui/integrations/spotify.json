@@ -13,8 +13,8 @@
     "clientId": "clientId",
     "clientSecret": "clientSecret",
     "manualDeviceId": {
-      "title": "Forced Device ID",
-      "help": "Empty = disabled, force spotify device ID to be used to queue songs. Check logs for current active device or use button when playing song for at least 10 seconds."
+      "title": "Erzwungene Geräte-ID",
+      "help": "Leer = deaktiviert, erzwinge die ID des Geräts für die Warteschlange von Songs. Prüfen Sie Logs für das aktuelle aktive Gerät oder verwenden Sie die Schaltfläche beim Abspielen von Liedes für mindestens 10 Sekunden."
     },
     "redirectURI": "redirectURI",
     "format": {
