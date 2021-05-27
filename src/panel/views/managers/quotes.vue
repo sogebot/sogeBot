@@ -212,6 +212,7 @@
 </template>
 
 <script lang="ts">
+import { dayjs } from '@sogebot/ui-helpers/dayjsHelper';
 import { getSocket } from '@sogebot/ui-helpers/socket';
 import translate from '@sogebot/ui-helpers/translate';
 import {
@@ -224,7 +225,6 @@ import { validationMixin } from 'vuelidate';
 import { required } from 'vuelidate/lib/validators';
 
 import { QuotesInterface } from 'src/bot/database/entity/quotes';
-import { dayjs } from 'src/bot/helpers/dayjs';
 import { ButtonStates } from 'src/panel/helpers/buttonStates';
 import { error } from 'src/panel/helpers/error';
 import { getUsernameById } from 'src/panel/helpers/userById';

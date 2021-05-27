@@ -2,6 +2,7 @@
 
 // bot libraries
 
+import { dayjs, timezone } from '@sogebot/ui-helpers/dayjsHelper';
 import chalk from 'chalk';
 import * as DiscordJs from 'discord.js';
 import { get } from 'lodash';
@@ -28,7 +29,6 @@ import {
   announceTypes, getOwner, isUUID, prepare,
 } from '../helpers/commons';
 import { isBotStarted, isDbConnected } from '../helpers/database';
-import { dayjs, timezone } from '../helpers/dayjs';
 import { debounce } from '../helpers/debounce';
 import { eventEmitter } from '../helpers/events';
 import {

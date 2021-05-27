@@ -1,16 +1,16 @@
+import { dayjs, timezone } from '@sogebot/ui-helpers/dayjsHelper';
 import { getRepository } from 'typeorm';
 
 import Core from './_interface';
 import { EventList } from './database/entity/eventList';
 import { User } from './database/entity/user';
 import {
-  command, default_permission, settings, 
+  command, default_permission, settings,
 } from './decorators';
 import {
-  isStreamOnline, stats, streamStatusChangeSince, 
+  isStreamOnline, stats, streamStatusChangeSince,
 } from './helpers/api';
 import { prepare } from './helpers/commons/prepare';
-import { dayjs, timezone } from './helpers/dayjs';
 import { getTime } from './helpers/getTime';
 import { defaultPermissions } from './helpers/permissions/';
 import { adminEndpoint } from './helpers/socket';

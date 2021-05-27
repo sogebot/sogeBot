@@ -455,6 +455,7 @@
 </template>
 
 <script lang="ts">
+import { dayjs } from '@sogebot/ui-helpers/dayjsHelper';
 import { getSocket } from '@sogebot/ui-helpers/socket';
 import translate from '@sogebot/ui-helpers/translate';
 import { NextFunction } from 'express';
@@ -470,7 +471,6 @@ import { Route } from 'vue-router';
 
 import type { PermissionsInterface } from 'src/bot/database/entity/permissions';
 import type { VariableInterface } from 'src/bot/database/entity/variable';
-import { dayjs } from 'src/bot/helpers/dayjs';
 
 import 'codemirror/lib/codemirror.css';
 

@@ -1159,6 +1159,7 @@ import { library } from '@fortawesome/fontawesome-svg-core';
 import {
   faLock, faSortAlphaDown, faSortAlphaUp, faSortDown, faSortUp, faSync, faUnlock,
 } from '@fortawesome/free-solid-svg-icons';
+import { dayjs } from '@sogebot/ui-helpers/dayjsHelper';
 import { getSocket } from '@sogebot/ui-helpers/socket';
 import translate from '@sogebot/ui-helpers/translate';
 import {
@@ -1175,7 +1176,6 @@ import { EventListInterface } from 'src/bot/database/entity/eventList';
 import {
   UserBitInterface, UserInterface, UserTipInterface,
 } from 'src/bot/database/entity/user';
-import { dayjs } from 'src/bot/helpers/dayjs';
 import { ButtonStates } from 'src/panel/helpers/buttonStates';
 import { capitalize } from 'src/panel/helpers/capitalize';
 import { error, success } from 'src/panel/helpers/error';

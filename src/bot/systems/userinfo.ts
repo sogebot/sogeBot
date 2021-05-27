@@ -1,10 +1,11 @@
+import { dayjs, timezone } from '@sogebot/ui-helpers/dayjsHelper';
 import { getRepository } from 'typeorm';
 
 import api from '../api';
 import { dateDiff } from '../commons';
 import currency from '../currency';
 import {
-  User, UserBit, UserTip, 
+  User, UserBit, UserTip,
 } from '../database/entity/user';
 import {
   command, default_permission, settings, ui,
@@ -13,7 +14,6 @@ import Expects from '../expects';
 import general from '../general';
 import { prepare } from '../helpers/commons/';
 import { mainCurrency } from '../helpers/currency';
-import { dayjs, timezone } from '../helpers/dayjs';
 import { getLocalizedName } from '../helpers/getLocalized';
 import { debug, error } from '../helpers/log';
 import { get, getUserHighestPermission } from '../helpers/permissions/';

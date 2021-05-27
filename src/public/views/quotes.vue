@@ -18,6 +18,7 @@
 </template>
 
 <script lang="ts">
+import { dayjs } from '@sogebot/ui-helpers/dayjsHelper';
 import { getSocket } from '@sogebot/ui-helpers/socket';
 import translate from '@sogebot/ui-helpers/translate';
 import {
@@ -26,7 +27,6 @@ import {
 import VueScrollTo from 'vue-scrollto';
 
 import { QuotesInterface } from 'src/bot/database/entity/quotes';
-import { dayjs } from 'src/bot/helpers/dayjs';
 import { ButtonStates } from 'src/panel/helpers/buttonStates';
 
 const socket = getSocket('/systems/quotes', true);

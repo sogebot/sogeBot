@@ -1,5 +1,6 @@
 import { setTimeout } from 'timers';
 
+import { dayjs } from '@sogebot/ui-helpers/dayjsHelper';
 import axios from 'axios';
 import {
   Brackets, FindOneOptions, getConnection, getManager, getRepository,
@@ -36,6 +37,7 @@ class Users extends Core {
 
   @onStartup()
   startup() {
+    console.log(dayjs.utc('2021-05-27T20:31:54Z').valueOf());
     this.updateWatchTime(true);
     this.checkDuplicateUsernames();
   }
@@ -492,7 +494,7 @@ class Users extends Core {
         if (request.data.total === 0) {
           throw new Error('Not a follower');
         } else {
-          cb(null, new Date(request.data.data[0].followed_at).getTime());
+          cb(null, dayjs.utc(request.data.data[0].followed_at).valueOf());
         }
       } catch (e) {
         cb(e.stack, null);

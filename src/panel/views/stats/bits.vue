@@ -51,6 +51,7 @@
 </template>
 
 <script lang="ts">
+import { dayjs } from '@sogebot/ui-helpers/dayjsHelper';
 import { getSocket } from '@sogebot/ui-helpers/socket';
 import translate from '@sogebot/ui-helpers/translate';
 import Chart from 'chart.js';
@@ -58,7 +59,6 @@ import Vue from 'vue';
 import Chartkick from 'vue-chartkick';
 
 import type { UserBitInterface } from 'src/bot/database/entity/user';
-import { dayjs } from 'src/bot/helpers/dayjs';
 
 Vue.use(Chartkick.use(Chart));
 

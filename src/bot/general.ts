@@ -1,5 +1,6 @@
 import { readdirSync, writeFileSync } from 'fs';
 
+import { setLocale } from '@sogebot/ui-helpers/dayjsHelper';
 import gitCommitInfo from 'git-commit-info';
 import {
   get, isNil, map,
@@ -16,7 +17,6 @@ import {
   onChange, onLoad, onStartup,
 } from './decorators/on';
 import { isStreamOnline } from './helpers/api';
-import { setLocale } from './helpers/dayjs';
 import { setValue } from './helpers/general';
 import { setLang } from './helpers/locales';
 import {

@@ -1,5 +1,6 @@
+import { timezone } from '@sogebot/ui-helpers/dayjsHelper';
 import {
-  filter, isString, set, 
+  filter, isString, set,
 } from 'lodash';
 
 import Core from './_interface';
@@ -7,7 +8,6 @@ import { settings, ui } from './decorators';
 import { onChange, onLoad } from './decorators/on';
 import general from './general';
 import { mainCurrency, symbol } from './helpers/currency';
-import { timezone } from './helpers/dayjs';
 import { getBroadcaster } from './helpers/getBroadcaster';
 import { generalChannel } from './helpers/oauth/generalChannel';
 import { generalOwners } from './helpers/oauth/generalOwners';

@@ -19,6 +19,7 @@ import {
   faVolumeDown, faVolumeOff, faVolumeUp,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { setLocale } from '@sogebot/ui-helpers/dayjsHelper';
 import { getConfiguration, getTranslations } from '@sogebot/ui-helpers/socket';
 import VueCompositionAPI from '@vue/composition-api';
 import BootstrapVue from 'bootstrap-vue';
@@ -28,7 +29,6 @@ import LoadScript from 'vue-plugin-load-script';
 import VueRouter from 'vue-router';
 import Vuelidate from 'vuelidate';
 
-import { setLocale } from 'src/bot/helpers/dayjs';
 import { ButtonStates, states } from 'src/panel/helpers/buttonStates';
 import type { getListOfReturn } from 'src/panel/helpers/getListOf';
 import { getListOf, populateListOf } from 'src/panel/helpers/getListOf';

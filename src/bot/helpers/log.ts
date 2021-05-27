@@ -2,11 +2,11 @@ import fs from 'fs';
 import os from 'os';
 import util from 'util';
 
+import { dayjs, timezone } from '@sogebot/ui-helpers/dayjsHelper';
 import { createStream, Generator } from 'rotating-file-stream';
 import stripAnsi from 'strip-ansi';
 
 import { isDbConnected } from './database';
-import { dayjs, timezone } from './dayjs';
 import { getFunctionNameFromStackTrace } from './stacktrace';
 
 const logDir = './logs';

@@ -171,6 +171,7 @@
 </template>
 
 <script lang="ts">
+import { dayjs } from '@sogebot/ui-helpers/dayjsHelper';
 import { getSocket } from '@sogebot/ui-helpers/socket';
 import { ProgressPlugin } from 'bootstrap-vue/esm/components/progress';
 import 'bootstrap/dist/css/bootstrap.css';
@@ -181,7 +182,6 @@ import safeEval from 'safe-eval';
 import { Component, Vue } from 'vue-property-decorator';
 
 import { GoalGroupInterface, GoalInterface } from 'src/bot/database/entity/goal';
-import { dayjs } from 'src/bot/helpers/dayjs';
 import { shadowGenerator, textStrokeGenerator } from 'src/panel/helpers/text';
 
 Vue.use(ProgressPlugin);

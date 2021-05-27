@@ -93,6 +93,7 @@
 </template>
 
 <script lang="ts">
+import { dayjs } from '@sogebot/ui-helpers/dayjsHelper';
 import { getSocket } from '@sogebot/ui-helpers/socket';
 import translate from '@sogebot/ui-helpers/translate';
 import {
@@ -104,8 +105,6 @@ import {
 } from 'lodash-es';
 import Vue from 'vue';
 import Chartkick from 'vue-chartkick';
-
-import { dayjs } from 'src/bot/helpers/dayjs';
 
 Vue.use(Chartkick.use(Chart));
 

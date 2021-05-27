@@ -1,6 +1,7 @@
 import { setInterval } from 'timers';
 import util from 'util';
 
+import { dayjs } from '@sogebot/ui-helpers/dayjsHelper';
 import { isNil } from 'lodash';
 import TwitchJs, {
   BaseMessage, HostTargetMessage, Message, PrivateMessages, UserNoticeMessages, UserStateTags,
@@ -14,7 +15,7 @@ import * as constants from './constants';
 import type { EmitData } from './database/entity/alert';
 import { Price } from './database/entity/price';
 import {
-  User, UserBit, UserBitInterface, 
+  User, UserBit, UserBitInterface,
 } from './database/entity/user';
 import { settings, ui } from './decorators';
 import { command, default_permission } from './decorators';
@@ -27,7 +28,6 @@ import {
   getOwner, getUserSender, prepare,
 } from './helpers/commons';
 import { sendMessage } from './helpers/commons/sendMessage';
-import { dayjs } from './helpers/dayjs';
 import { eventEmitter } from './helpers/events';
 import { getLocalizedName } from './helpers/getLocalized';
 import {

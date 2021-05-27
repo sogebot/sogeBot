@@ -1,13 +1,13 @@
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faCaretLeft } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { setLocale } from '@sogebot/ui-helpers/dayjsHelper';
 import { getConfiguration, getTranslations } from '@sogebot/ui-helpers/socket';
 import VueCompositionAPI from '@vue/composition-api';
 import BootstrapVue from 'bootstrap-vue';
 import Vue from 'vue';
 import VueRouter from 'vue-router';
 
-import { setLocale } from 'src/bot/helpers/dayjs';
 import { ButtonStates } from 'src/panel/helpers/buttonStates';
 import { setMainLoaded } from 'src/panel/helpers/isAvailableVariable';
 import { isBotStarted } from 'src/panel/helpers/isBotStarted';

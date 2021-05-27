@@ -1,3 +1,5 @@
+import { dayjs } from '@sogebot/ui-helpers/dayjsHelper';
+
 import type { StreamEndpoint } from '../../api';
 import { getFunctionList } from '../../decorators/on';
 import { getGameNameFromId } from '../../microservices/getGameNameFromId';
@@ -29,7 +31,7 @@ async function start(data: StreamEndpoint['data'][number], webhooks = false) {
   stats.value.currentTips = 0;
   chatMessagesAtStart.value = linesParsed;
 
-  streamStatusChangeSince.value = new Date(data.started_at).getTime();
+  streamStatusChangeSince.value = dayjs.utc(data.started_at).valueOf();
   streamId.value = data.id;
   streamType.value = data.type;
   isStreamOnline.value = true;

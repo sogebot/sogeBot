@@ -1,6 +1,7 @@
 import querystring from 'querystring';
 import { setTimeout } from 'timers';
 
+import { dayjs } from '@sogebot/ui-helpers/dayjsHelper';
 import axios, { AxiosResponse } from 'axios';
 import chalk from 'chalk';
 import {
@@ -29,7 +30,6 @@ import { streamId } from './helpers/api/streamId';
 import { streamType } from './helpers/api/streamType';
 import * as stream from './helpers/core/stream';
 import { isDbConnected } from './helpers/database';
-import { dayjs } from './helpers/dayjs';
 import { eventEmitter } from './helpers/events';
 import { getBroadcaster } from './helpers/getBroadcaster';
 import { triggerInterfaceOnFollow } from './helpers/interface/triggers';
@@ -81,7 +81,7 @@ const updateFollowerState = async(users: Readonly<Required<UserInterface>>[], us
     // handle users currently not following
     for (const user of users.filter(o => !o.isFollower)) {
       const apiUser = usersFromAPI.find(userFromAPI => userFromAPI.from_id === user.userId) as typeof usersFromAPI[0];
-      if (new Date().getTime() - new Date(apiUser.followed_at).getTime() < 2 * constants.HOUR) {
+      if (new Date().getTime() - dayjs.utc(apiUser.followed_at).valueOf() < 2 * constants.HOUR) {
         if (user.followedAt === 0 || new Date().getTime() - user.followedAt > 60000 * 60 && !webhooks.existsInCache('follows', user.userId)) {
           webhooks.addIdToCache('follows', user.userId);
           eventlist.add({
@@ -116,7 +116,7 @@ const updateFollowerState = async(users: Readonly<Required<UserInterface>>[], us
       const apiUser = usersFromAPI.find(userFromAPI => userFromAPI.from_id === user.userId) as typeof usersFromAPI[0];
       return {
         ...user,
-        followedAt:    user.haveFollowedAtLock ? user.followedAt : new Date(apiUser.followed_at).getTime(),
+        followedAt:    user.haveFollowedAtLock ? user.followedAt : dayjs.utc(apiUser.followed_at).valueOf(),
         isFollower:    user.haveFollowerLock? user.isFollower : true,
         followCheckAt: Date.now(),
       };
@@ -730,9 +730,9 @@ class API extends Core {
 
       if (request.status === 200 && !isNil(request.data.data)) {
         // we will go through only new users
-        if (request.data.data.length > 0 && new Date(request.data.data[0].followed_at).getTime() !== latestFollowedAtTimestamp) {
+        if (request.data.data.length > 0 && dayjs.utc(request.data.data[0].followed_at).valueOf() !== latestFollowedAtTimestamp) {
           processFollowerState(request.data.data
-            .filter(f => latestFollowedAtTimestamp < new Date(f.followed_at).getTime())
+            .filter(f => latestFollowedAtTimestamp < dayjs.utc(f.followed_at).valueOf())
             .map(f => {
               return {
                 from_name:   String(f.from_name).toLowerCase(),
@@ -925,8 +925,8 @@ class API extends Core {
           eventEmitter.emit('every-x-minutes-of-stream', { reset: false } );
         }
 
-        if (dayjs(streamData.started_at).valueOf() >=  dayjs(streamStatusChangeSince.value).valueOf()) {
-          streamStatusChangeSince.value = (new Date(streamData.started_at)).getTime();
+        if (dayjs.utc(streamData.started_at).valueOf() >=  dayjs(streamStatusChangeSince.value).valueOf()) {
+          streamStatusChangeSince.value = dayjs.utc(streamData.started_at).valueOf();
         }
         if (!isStreamOnline.value || streamType.value !== streamData.type) {
           if (!webhooks.enabled.streams && Number(streamId.value) !== Number(streamData.id)) {
@@ -1179,7 +1179,7 @@ class API extends Core {
       }
       return;
     }
-    await getRepository(User).update({ userId: id }, { createdAt: new Date(request.data.created_at).getTime() });
+    await getRepository(User).update({ userId: id }, { createdAt: dayjs.utc(request.data.created_at).valueOf() });
   }
 
   async isFollowerUpdate (user: UserInterface | undefined) {
@@ -1252,7 +1252,7 @@ class API extends Core {
       return { isFollower: user.isFollower, followedAt: user.followedAt };
     } else {
       // is follower
-      if (!user.isFollower && new Date().getTime() - new Date(request.data.data[0].followed_at).getTime() < 60000 * 60) {
+      if (!user.isFollower && new Date().getTime() - dayjs.utc(request.data.data[0].followed_at).valueOf() < 60000 * 60) {
         eventlist.add({
           event:     'follow',
           userId:    String(id),

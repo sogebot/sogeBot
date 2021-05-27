@@ -1,3 +1,4 @@
+import { setLocale } from '@sogebot/ui-helpers/dayjsHelper';
 import { getConfiguration, getTranslations } from '@sogebot/ui-helpers/socket';
 import translate from '@sogebot/ui-helpers/translate';
 import VueCompositionAPI from '@vue/composition-api';
@@ -5,7 +6,6 @@ import Vue from 'vue';
 import LoadScript from 'vue-plugin-load-script';
 import VueRouter from 'vue-router';
 
-import { setLocale } from 'src/bot/helpers/dayjs';
 import { store } from 'src/panel/helpers/store';
 
 import { ButtonStates, states } from '../panel/helpers/buttonStates';

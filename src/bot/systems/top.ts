@@ -1,3 +1,4 @@
+import { dayjs } from '@sogebot/ui-helpers/dayjsHelper';
 import _ from 'lodash';
 import {
   getConnection, getManager, getRepository,
@@ -7,7 +8,6 @@ import { User } from '../database/entity/user';
 import { command, default_permission } from '../decorators';
 import general from '../general';
 import { mainCurrency } from '../helpers/currency';
-import { dayjs } from '../helpers/dayjs';
 import { getLocalizedName } from '../helpers/getLocalized';
 import { debug } from '../helpers/log';
 import { defaultPermissions } from '../helpers/permissions/';

@@ -287,6 +287,7 @@
 </template>
 
 <script lang="ts">
+import { dayjs } from '@sogebot/ui-helpers/dayjsHelper';
 import { getSocket } from '@sogebot/ui-helpers/socket';
 import translate from '@sogebot/ui-helpers/translate';
 import {
@@ -296,7 +297,6 @@ import { v4 as uuid } from 'uuid';
 import Vue from 'vue';
 
 import { PollInterface } from 'src/bot/database/entity/poll';
-import { dayjs } from 'src/bot/helpers/dayjs';
 
 export default Vue.extend({
   components: { panel: () => import('../../components/panel.vue') },

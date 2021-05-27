@@ -1,4 +1,4 @@
-import { dayjs } from './dayjs';
+import { dayjs } from '@sogebot/ui-helpers/dayjsHelper';
 
 export function getTime(time: null | number, isChat: boolean) {
   let days: string | number = 0;
@@ -7,9 +7,9 @@ export function getTime(time: null | number, isChat: boolean) {
   let seconds: string | number = 0;
   const now = time === null || !time
     ? {
-      days: 0, hours: 0, minutes: 0, seconds: 0, 
+      days: 0, hours: 0, minutes: 0, seconds: 0,
     }
-    : timestampToObject(dayjs().valueOf() - dayjs(time).valueOf());
+    : timestampToObject(dayjs().valueOf() - dayjs.utc(time).valueOf());
   if (isChat) {
     days = now.days > 0 ? now.days : '';
     hours = now.hours > 0 ? now.hours : '';
@@ -23,7 +23,7 @@ export function getTime(time: null | number, isChat: boolean) {
       days,
       hours,
       minutes,
-      seconds, 
+      seconds,
     };
   } else {
     days = now.days > 0 ? now.days + 'd' : '';

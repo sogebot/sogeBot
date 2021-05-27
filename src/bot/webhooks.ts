@@ -1,6 +1,7 @@
 import { setTimeout } from 'timers';
 import util from 'util';
 
+import { dayjs } from '@sogebot/ui-helpers/dayjsHelper';
 import axios from 'axios';
 import { getRepository } from 'typeorm';
 
@@ -322,7 +323,7 @@ class Webhooks {
       }
 
       // Always keep this updated
-      streamStatusChangeSince.value = (new Date(streamEvent.started_at)).getTime();
+      streamStatusChangeSince.value = dayjs.utc(streamEvent.started_at).valueOf();
       streamId.value = streamEvent.id;
       streamType.value = streamEvent.type;
       stats.value.currentTitle = streamEvent.title;

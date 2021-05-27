@@ -81,13 +81,12 @@
 </template>
 
 <script lang="ts">
+import { dayjs } from '@sogebot/ui-helpers/dayjsHelper';
 import { getSocket } from '@sogebot/ui-helpers/socket';
 import JsonViewer from 'vue-json-viewer';
 import {
   Component, Vue, Watch,
 } from 'vue-property-decorator';
-
-import { dayjs } from 'src/bot/helpers/dayjs';
 
 import { PollInterface } from '../../bot/database/entity/poll';
 

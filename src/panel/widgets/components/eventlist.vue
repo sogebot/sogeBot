@@ -390,13 +390,13 @@ import {
   faBell, faBellSlash, faRedoAlt, faVolumeMute,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeLayers } from '@fortawesome/vue-fontawesome';
+import { dayjs } from '@sogebot/ui-helpers/dayjsHelper';
 import { getSocket } from '@sogebot/ui-helpers/socket';
 import translate from '@sogebot/ui-helpers/translate';
 import {
   chunk, debounce, get,
 } from 'lodash-es';
 
-import { dayjs } from 'src/bot/helpers/dayjs';
 import { toBoolean } from 'src/bot/helpers/toBoolean';
 import { EventBus } from 'src/panel/helpers/event-bus';
 
