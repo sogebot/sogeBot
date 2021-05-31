@@ -193,7 +193,12 @@ class API extends Core {
 
   @onStartup()
   async intervalCheck () {
+    let isBlocking: boolean | string = false;
     const check = async () => {
+      if (isBlocking) {
+        debug('api.interval', chalk.yellow(isBlocking + '() ') + 'still in progress.');
+        return;
+      }
       for (const fnc of intervals.keys()) {
         await setImmediateAwait();
         debug('api.interval', chalk.yellow(fnc + '() ') + 'check');
@@ -211,16 +216,22 @@ class API extends Core {
           continue;
         }
         if (Date.now() - interval.lastRunAt >= interval.interval) {
+          isBlocking = fnc;
           debug('api.interval', chalk.yellow(fnc + '() ') + 'start');
           const time = process.hrtime();
           const time2 = Date.now();
           try {
             const value = await Promise.race<Promise<any>>([
-              new Promise((resolve) => {
+              new Promise((resolve, reject) => {
                 if (fnc === 'updateChannelViewsAndBroadcasterType') {
-                  return updateChannelViewsAndBroadcasterType().then((data: any) => resolve(data));
+                  updateChannelViewsAndBroadcasterType()
+                    .then((data: any) => resolve(data))
+                    .catch((e) => reject(e));
+                } else {
+                  (this as any)[fnc](interval?.opts)
+                    .then((data: any) => resolve(data))
+                    .catch((e: any) => reject(e));
                 }
-                return (this as any)[fnc](interval?.opts).then((data: any) => resolve(data));
               }),
               new Promise((_resolve, reject) => setTimeout(() => reject(), 10 * constants.MINUTE)),
             ]);
@@ -260,7 +271,11 @@ class API extends Core {
             }
           } catch (e) {
             warning(`API call for ${fnc} is probably frozen (took more than 10minutes), forcefully unblocking`);
+            debug('api.interval', chalk.yellow(fnc + '() ') + e);
             continue;
+          } finally {
+            debug('api.interval', chalk.yellow(fnc + '() ') + 'unblocked.');
+            isBlocking = false;
           }
         } else {
           debug('api.interval', chalk.yellow(fnc + '() ') + `skip run, lastRunAt: ${interval.lastRunAt}`  );
