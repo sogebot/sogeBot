@@ -86,7 +86,7 @@
       "dialog": {
         "timer": "Timer",
         "name": "Name",
-        "tickOffline": "Should tick if stream offline",
+        "tickOffline": "Soll markiert werden, wenn Stream offline ist",
         "interval": "Intervall",
         "responses": "Rückmeldungen",
         "messages": "Alle X Nachrichten auslösen",
@@ -174,7 +174,7 @@
         },
         "linkFilter": {
           "label": "Link Overlay Filter",
-          "placeholder": "If using overlay, add link or id of your overlay"
+          "placeholder": "Wenn Overlay verwendet wird, Link oder ID des Overlays hinzufügen"
         },
         "hashtag": {
           "label": "Hashtag oder Schlüsselwort",
@@ -281,7 +281,7 @@
           "placeholder": ""
         },
         "value": {
-          "label": "Value",
+          "label": "Wert",
           "placeholder": ""
         },
         "numberToDecrement": {
@@ -814,7 +814,7 @@
     "create-a-clip": "Clip erstellen",
     "create-a-clip-and-play-replay": "einen Clip erstellen und als Wiedergabe abspielen (Overlay/Alers)",
     "increment-custom-variable": "Erhöhen Sie eine benutzerdefinierte Variable",
-    "set-custom-variable": "set a custom variable",
+    "set-custom-variable": "eine eigene Variable setzen",
     "decrement-custom-variable": "Verringern Sie eine benutzerdefinierte Variable",
     "omit": "weglassen",
     "comply": "erfüllen",
@@ -987,8 +987,8 @@
     "price-was-enabled": "$sender, Preis für $command wurde aktiviert",
     "price-was-disabled": "$sender, der Preis für $command wurde deaktiviert",
     "user-have-not-enough-points": "Entschuldigung, $sender, aber du hast nicht $amount $pointsName um $command zu benutzen",
-    "user-have-not-enough-points-or-bits": "Sorry, $sender, but you don't have $amount $pointsName or redeem command by $bitsAmount bits to use $command",
-    "user-have-not-enough-bits": "Sorry, $sender, but you need to redeem command by $bitsAmount bits to use $command",
+    "user-have-not-enough-points-or-bits": "Sorry, $sender, aber Sie haben nicht $amount $pointsName oder einlösen Befehl von $bitsAmount Bits um $command zu verwenden",
+    "user-have-not-enough-bits": "Sorry, $sender, aber du musse für den Befehl $bitsAmount Bits einlösen, um $command zu verwenden",
     "list-is-empty": "$sender, Liste der Preise ist leer",
     "list-is-not-empty": "$sender, Liste der Preise: $list"
   },
@@ -1059,8 +1059,8 @@
     "without-permission": "Du hast nicht genügend Berechtigungen für '$command'"
   },
   "moderation": {
-    "user-have-immunity": "$sender, user $username have $type immunity for $time seconds",
-    "user-have-immunity-parameterError": "$sender, parameter error. $command <username> <type> <duration>",
+    "user-have-immunity": "$sender, Benutzer $username haben $type Immunität für $time Sekunden",
+    "user-have-immunity-parameterError": "$sender, Parameterfehler. $command <username> <type> <duration>",
     "user-have-link-permit": "Benutzer $username kann $count $link im Chat schreiben",
     "permit-parse-failed": "{core.command-parse} !permit [username]",
     "user-is-warned-about-links": "Keine Links erlaubt, frage nach !permit [$count warnungen übrig]",
@@ -1068,17 +1068,17 @@
     "user-is-warned-about-long-message": "Lange Nachrichten sind nicht erlaubt [$count warnungen übrig]",
     "user-is-warned-about-caps": "Keine übermäßige Verwendung von Caps [$count Warnungen übrig]",
     "user-is-warned-about-spam": "Spamming ist nicht erlaubt [$count Warnungen übrig]",
-    "user-is-warned-about-color": "Italic and /me is not allowed [$count warnings left]",
+    "user-is-warned-about-color": "Kursiv und /me ist nicht erlaubt [$count Warnungen übrig]",
     "user-is-warned-about-emotes": "Keine Emotes Spamming [$count Warnungen übrig]",
-    "user-is-warned-about-forbidden-words": "No forbidden words [$count warnings left]",
+    "user-is-warned-about-forbidden-words": "Keine verbotenen Wörter [$count Warnungen übrig]",
     "user-have-timeout-for-links": "Keine Links erlaubt. Frage nach !permit",
     "user-have-timeout-for-symbols": "Keine übermäßige Verwendung von Symbolen",
     "user-have-timeout-for-long-message": "Lange Nachricht ist nicht erlaubt",
     "user-have-timeout-for-caps": "Keine übermäßige Verwendung von Caps",
     "user-have-timeout-for-spam": "Spammen ist nicht erlaubt",
-    "user-have-timeout-for-color": "Italic and /me is not allowed",
+    "user-have-timeout-for-color": "Kursiv und /me ist nicht erlaubt",
     "user-have-timeout-for-emotes": "Kein Emotes Spamming",
-    "user-have-timeout-for-forbidden-words": "No forbidden words"
+    "user-have-timeout-for-forbidden-words": "Keine verbotenen Wörter"
   },
   "queue": {
     "list": "$sender, aktueller Warteschlangen pool: $users",
@@ -1113,8 +1113,8 @@
   },
   "cooldowns": {
     "cooldown-was-set": "$sender, $type Abklingzeit für $command wurde auf $secondss gesetzt",
-    "cooldown-was-unset": "$sender, cooldown for $command was unset",
-    "cooldown-triggered": "$sender, '$command' is on cooldown, remaining $secondss",
+    "cooldown-was-unset": "$sender, Abklingzeit für $command wurde nicht gesetzt",
+    "cooldown-triggered": "$sender, '$command' ist auf Abklingzeit, verbleibend $secondss",
     "cooldown-not-found": "$sender, Abklingzeit für $command wurde nicht gefunden",
     "cooldown-was-enabled": "$sender, Abklingzeit für $command wurde aktiviert",
     "cooldown-was-disabled": "$sender, Abklingzeit für $command wurde deaktiviert",
@@ -1134,7 +1134,7 @@
     "response-must-be-defined": "$sender, Timer Antwort muss definiert werden.",
     "cannot-set-messages-and-seconds-0": "$sender, Sie können nicht beide Nachrichten und Sekunden auf 0 setzen.",
     "timer-was-set": "$sender, der Timer $name wurde mit der Nachricht $messages und $seconds Sekunden gesetzt, um ihn auszulösen",
-    "timer-was-set-with-offline-flag": "$sender, timer $name was set with $messages messages and $seconds seconds to trigger even when stream is offline",
+    "timer-was-set-with-offline-flag": "$sender, der Timer $name wurde mit $messages Nachrichten und $seconds Sekunden gesetzt, um ihn auszulösen, auch wenn der Stream offline ist",
     "timer-not-found": "$sender, Timer (Name: $name) wurde in der Datenbank nicht gefunden. Überprüfe Timer mit der !timers list",
     "timer-deleted": "$sender, Timer $name und seine Antworten wurden gelöscht.",
     "timer-enabled": "$sender, timer (name: $name) wurde aktiviert",

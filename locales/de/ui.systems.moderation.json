@@ -11,7 +11,7 @@
     "cEmotesEnabled": "Erzwinge die Regel",
     "cListsWhitelist": {
       "title": "Erlaubte Wörter",
-      "help": "To allow domains use \"domain:prtzl.io\""
+      "help": "Um Domains zu erlauben, verwenden Sie \"domain:prtzl.io\""
     },
     "cListsBlacklist": "Verbotene Wörter",
     "cListsTimeout": "Dauer der Zeitüberschreitung",
