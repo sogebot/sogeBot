@@ -456,8 +456,14 @@ export default class AlertsRegistryOverlays extends Vue {
               message = message.replace(match, '');
             }
           }
-          if (!this.runningAlert.isTTSMuted && !this.runningAlert.isSoundMuted && this.data?.tts) {
-            this.speak(message, this.data.tts.voice, this.data.tts.rate, this.data.tts.pitch, this.data.tts.volume);
+          if (!this.runningAlert.isTTSMuted && !this.runningAlert.isSoundMuted && this.data) {
+            if (this.data?.tts === null) {
+              // use default values
+              console.log('TTS running with default values.');
+              this.speak(message, 'UK English Female', 1, 1, 1);
+            } else {
+              this.speak(message, this.data.tts.voice, this.data.tts.rate, this.data.tts.pitch, this.data.tts.volume);
+            }
           } else {
             console.log('TTS is muted.');
           }
