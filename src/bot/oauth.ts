@@ -367,13 +367,15 @@ class OAuth extends Core {
       }
 
       const request = await axios.post(url + encodeURIComponent(type === 'bot' ? this.botRefreshToken : this.broadcasterRefreshToken));
+      debug('oauth.validate', 'https://twitchtokengenerator.com/api/refresh/ =>');
+      debug('oauth.validate', JSON.stringify(request.data, null, 2));
       if (!request.data.success) {
         throw new Error(`Token refresh for ${type}: ${request.data.message}`);
       }
-      if (typeof request.data.token !== 'string') {
+      if (typeof request.data.token !== 'string' || request.data.token.length === 0) {
         throw new Error(`Access token for ${type} was not correctly fetched (not a string)`);
       }
-      if (typeof request.data.refresh !== 'string') {
+      if (typeof request.data.refresh !== 'string' || request.data.refresh.length === 0) {
         throw new Error(`Refresh token for ${type} was not correctly fetched (not a string)`);
       }
       if (type === 'bot') {
