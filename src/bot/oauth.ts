@@ -328,6 +328,7 @@ class OAuth extends Core {
       this.toWait = 10;
       this.getChannelId();
     } catch (e) {
+      error(e);
       error(e.stack);
       status = false;
       if ((type === 'bot' ? this.botRefreshToken : this.broadcasterRefreshToken) !== '') {
