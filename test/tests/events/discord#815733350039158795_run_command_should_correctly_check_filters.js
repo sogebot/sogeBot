@@ -81,9 +81,7 @@ describe('Events - event run command should correctly parse filters and be able 
   });
 
   it('trigger follow event', async () => {
-    await events.fire('follow', {
-      username: user.viewer.username, userId: user.viewer.userId, webhooks: _.random(1) === 1,
-    });
+    await events.fire('follow', { username: user.viewer.username, userId: user.viewer.userId });
   });
 
   it('commands should be triggered', async () => {
@@ -96,9 +94,7 @@ describe('Events - event run command should correctly parse filters and be able 
   });
 
   it('trigger follow event', async () => {
-    await events.fire('follow', {
-      username: user.viewer2.username, userId: user.viewer2.userId, webhooks: _.random(1) === 1,
-    });
+    await events.fire('follow', { username: user.viewer2.username, userId: user.viewer2.userId });
   });
 
   it('commands should be triggered', async () => {
@@ -106,9 +102,7 @@ describe('Events - event run command should correctly parse filters and be able 
   });
 
   it('trigger follow event', async () => {
-    await events.fire('follow', {
-      username: user.viewer3.username, userId: user.viewer3.userId, webhooks: _.random(1) === 1,
-    });
+    await events.fire('follow', { username: user.viewer3.username, userId: user.viewer3.userId });
   });
 
   it('commands should be triggered', async () => {

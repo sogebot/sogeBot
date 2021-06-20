@@ -53,9 +53,7 @@ describe('Events - event run command should be able to skip pricing and cooldown
       await message.prepare();
     });
     it('trigger follow event', async () => {
-      await events.fire('follow', {
-        username: follower.username, userId: follower.userId, webhooks: _.random(1) === 1,
-      });
+      await events.fire('follow', { username: follower.username, userId: follower.userId });
     });
 
     it('parsers should be skipped', async () => {

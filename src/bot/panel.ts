@@ -55,7 +55,6 @@ import highlights from './systems/highlights';
 import songs from './systems/songs';
 import tmi from './tmi';
 import translateLib, { translate } from './translate';
-import webhooks from './webhooks';
 
 const port = process.env.PORT ?? '20000';
 const secureport = process.env.SECUREPORT ?? '20443';
@@ -75,23 +74,6 @@ export const init = () => {
   app?.use(bodyParser.json());
   app?.use(bodyParser.urlencoded({ extended: true }));
   setServer();
-
-  // webhooks integration
-  app?.post('/webhooks/hub/follows', (req, res) => {
-    webhooks.follower(req.body);
-    res.sendStatus(200);
-  });
-  app?.post('/webhooks/hub/streams', (req, res) => {
-    webhooks.stream(req.body);
-    res.sendStatus(200);
-  });
-
-  app?.get('/webhooks/hub/follows', (req, res) => {
-    webhooks.challenge(req, res);
-  });
-  app?.get('/webhooks/hub/streams', (req, res) => {
-    webhooks.challenge(req, res);
-  });
 
   // highlights system
   app?.get('/highlights/:id', (req, res) => {
