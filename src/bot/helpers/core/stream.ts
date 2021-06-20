@@ -15,9 +15,9 @@ import { channelId } from '../oauth';
 import { linesParsed } from '../parser';
 import { find } from '../register';
 
-async function start(data: StreamEndpoint['data'][number], webhooks = false) {
+async function start(data: StreamEndpoint['data'][number]) {
   startLog(
-    `id: ${data.id} ${webhooks ? '| webhooks' : ''} | startedAt: ${data.started_at} | title: ${data.title} | game: ${await getGameNameFromId(Number(data.game_id))} | type: ${data.type} | channel ID: ${channelId.value}`,
+    `id: ${data.id} | startedAt: ${data.started_at} | title: ${data.title} | game: ${await getGameNameFromId(Number(data.game_id))} | type: ${data.type} | channel ID: ${channelId.value}`,
   );
 
   // reset quick stats on stream start

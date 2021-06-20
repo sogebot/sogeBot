@@ -109,7 +109,6 @@ async function main () {
         require('./twitch');
         require('./permissions');
         require('./oauth');
-        require('./webhooks');
         require('./api');
         require('./pubsub');
         await autoLoad('./dest/stats/');

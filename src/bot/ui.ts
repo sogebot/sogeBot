@@ -1,10 +1,9 @@
 import {
-  filter, isString, set, 
+  filter, isString, set,
 } from 'lodash';
 
 import Core from './_interface';
 import { settings, ui } from './decorators';
-import { onChange, onLoad } from './decorators/on';
 import general from './general';
 import { mainCurrency, symbol } from './helpers/currency';
 import { timezone } from './helpers/dayjs';
@@ -13,9 +12,7 @@ import { generalChannel } from './helpers/oauth/generalChannel';
 import { generalOwners } from './helpers/oauth/generalOwners';
 import { find, list } from './helpers/register';
 import { adminEndpoint, publicEndpoint } from './helpers/socket';
-import { domain } from './helpers/ui';
 import { default as uiModule } from './ui';
-import webhooks from './webhooks';
 
 class UI extends Core {
   @settings()
@@ -39,17 +36,6 @@ class UI extends Core {
 
   @settings()
   public showdiff = true;
-
-  @onChange('domain')
-  @onLoad('domain')
-  subscribeWebhook() {
-    domain.value = this.domain;
-    if (typeof webhooks === 'undefined') {
-      setTimeout(() => this.subscribeWebhook(), 1000);
-    } else {
-      webhooks.subscribeAll();
-    }
-  }
 
   sockets() {
     adminEndpoint(this.nsp, 'configuration', async (cb) => {

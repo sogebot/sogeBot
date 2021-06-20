@@ -59,7 +59,6 @@ import eventlist from './overlays/eventlist';
 import alerts from './registries/alerts';
 import stats from './stats';
 import twitch from './twitch';
-import webhooks from './webhooks';
 import joinpart from './widgets/joinpart';
 
 let latestFollowedAtTimestamp = 0;
@@ -82,8 +81,7 @@ const updateFollowerState = async(users: Readonly<Required<UserInterface>>[], us
     for (const user of users.filter(o => !o.isFollower)) {
       const apiUser = usersFromAPI.find(userFromAPI => userFromAPI.from_id === user.userId) as typeof usersFromAPI[0];
       if (new Date().getTime() - new Date(apiUser.followed_at).getTime() < 2 * constants.HOUR) {
-        if (user.followedAt === 0 || new Date().getTime() - user.followedAt > 60000 * 60 && !webhooks.existsInCache('follows', user.userId)) {
-          webhooks.addIdToCache('follows', user.userId);
+        if (user.followedAt === 0 || new Date().getTime() - user.followedAt > 60000 * 60) {
           eventlist.add({
             event:     'follow',
             userId:    user.userId,
@@ -947,7 +945,7 @@ class API extends Core {
           streamStatusChangeSince.value = (new Date(streamData.started_at)).getTime();
         }
         if (!isStreamOnline.value || streamType.value !== streamData.type) {
-          if (!webhooks.enabled.streams && Number(streamId.value) !== Number(streamData.id)) {
+          if (Number(streamId.value) !== Number(streamData.id)) {
             debug('api.stream', 'API: ' + JSON.stringify(streamData));
 
             stream.end();
