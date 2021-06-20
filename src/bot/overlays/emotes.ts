@@ -1,6 +1,6 @@
 import { setImmediate } from 'timers';
 
-import axios from 'axios';
+import axios, { AxiosResponse } from 'axios';
 import { shuffle } from 'lodash';
 import { getManager, getRepository } from 'typeorm';
 import { v4 as uuid } from 'uuid';
@@ -10,19 +10,39 @@ import { parserReply } from '../commons';
 import * as constants from '../constants';
 import { CacheEmotes, CacheEmotesInterface } from '../database/entity/cacheEmotes';
 import {
-  parser, settings, ui, 
+  parser, settings, ui,
 } from '../decorators';
-import { onStartup, onStreamStart } from '../decorators/on';
+import { onStartup } from '../decorators/on';
 import { prepare } from '../helpers/commons';
 import {
-  error, info, warning, 
+  debug,
+  error, info, warning,
 } from '../helpers/log';
 import { channelId } from '../helpers/oauth';
 import { ioServer } from '../helpers/panel';
+import { setImmediateAwait } from '../helpers/setImmediateAwait';
 import { adminEndpoint, publicEndpoint } from '../helpers/socket';
 import oauth from '../oauth';
 import { translate } from '../translate';
 import Overlay from './_interface';
+
+interface EmotesCommons {
+  id: string,
+  name: string,
+  images: {
+    url_1x: string,
+    url_2x: string,
+    url_4x: string,
+  },
+}
+
+interface GlobalEmotesEndpoint { data: EmotesCommons[]}
+
+interface ChannelEmotesEndpoint { data: (EmotesCommons & {
+  tier: string,
+  emote_type: 'subscriptions' | 'bitstier' | 'follower',
+  emote_set_id: string,
+})[]}
 
 class Emotes extends Overlay {
   fetch = {
@@ -51,35 +71,35 @@ class Emotes extends Overlay {
 
   @settings('explosion')
   @ui({
-    type: 'number-input', step: '1', min: '1', 
+    type: 'number-input', step: '1', min: '1',
   })
   cExplosionNumOfEmotes = 20;
 
   @settings('fireworks')
   @ui({
-    type: 'number-input', step: '1', min: '1', 
+    type: 'number-input', step: '1', min: '1',
   })
   cExplosionNumOfEmotesPerExplosion = 10;
   @settings('fireworks')
   @ui({
-    type: 'number-input', step: '1', min: '1', 
+    type: 'number-input', step: '1', min: '1',
   })
   cExplosionNumOfExplosions = 5;
 
   @ui({
-    type: 'btn-emit', class: 'btn btn-secondary btn-block mt-1 mb-1', emit: 'testExplosion', 
+    type: 'btn-emit', class: 'btn btn-secondary btn-block mt-1 mb-1', emit: 'testExplosion',
   }, 'test')
   btnTestExplosion = null;
   @ui({
-    type: 'btn-emit', class: 'btn btn-secondary btn-block mt-1 mb-1', emit: 'test', 
+    type: 'btn-emit', class: 'btn btn-secondary btn-block mt-1 mb-1', emit: 'test',
   }, 'test')
   btnTestEmote = null;
   @ui({
-    type: 'btn-emit', class: 'btn btn-secondary btn-block mt-1 mb-1', emit: 'testFireworks', 
+    type: 'btn-emit', class: 'btn btn-secondary btn-block mt-1 mb-1', emit: 'testFireworks',
   }, 'test')
   btnTestFirework = null;
   @ui({
-    type: 'btn-emit', class: 'btn btn-danger btn-block mt-1 mb-1', emit: 'removeCache', 
+    type: 'btn-emit', class: 'btn btn-danger btn-block mt-1 mb-1', emit: 'removeCache',
   }, 'emotes')
   btnRemoveCache = null;
 
@@ -107,20 +127,21 @@ class Emotes extends Overlay {
   comboLastBreak = 0;
 
   @onStartup()
-  @onStreamStart()
   onStartup() {
-    if (!this.fetch.global) {
-      this.fetchEmotesGlobal();
-    }
-    if (!this.fetch.channel) {
-      this.fetchEmotesChannel();
-    }
-    if (!this.fetch.ffz) {
-      this.fetchEmotesFFZ();
-    }
-    if (!this.fetch.bttv) {
-      this.fetchEmotesBTTV();
-    }
+    setInterval(() => {
+      if (!this.fetch.global) {
+        this.fetchEmotesGlobal();
+      }
+      if (!this.fetch.channel) {
+        this.fetchEmotesChannel();
+      }
+      if (!this.fetch.ffz) {
+        this.fetchEmotesFFZ();
+      }
+      if (!this.fetch.bttv) {
+        this.fetchEmotesBTTV();
+      }
+    }, 1000);
   }
 
   sockets () {
@@ -178,22 +199,34 @@ class Emotes extends Overlay {
       if (oauth.broadcasterType === '') {
         info(`EMOTES: Skipping fetching of ${cid} emotes - not subscriber/affiliate`);
       } else {
-        info(`EMOTES: Fetching channel ${cid} emotes`);
         this.lastSubscriberEmoteChk = Date.now();
         this.lastChannelChk = cid;
         try {
-          const request = await axios.get('https://api.twitchemotes.com/api/v4/channels/' + cid);
-          const emotes = request.data.emotes;
-          for (let j = 0, length2 = emotes.length; j < length2; j++) {
-            const cachedEmote = (await getRepository(CacheEmotes).findOne({ code: emotes[j].code, type: 'twitch' }));
+          await oauth.validateOAuth('bot');
+          const token = oauth.botAccessToken;
+          if (!token) {
+            this.lastSubscriberEmoteChk = 0; // recheck next tick
+            this.fetch.channel = false;
+            return;
+          }
+          info(`EMOTES: Fetching channel ${cid} emotes`);
+          const request = await axios.get('https://api.twitch.tv/helix/chat/emotes?broadcaster_id=' + cid, {
+            headers: {
+              'Authorization': 'Bearer ' + token,
+              'Client-ID':     oauth.botClientId,
+            },
+            timeout: 20000,
+          }) as AxiosResponse<ChannelEmotesEndpoint>;
+          const emotes = request.data.data;
+          for (const emote of emotes) {
+            debug('emotes.channel', `Saving to cache ${emote.name}#${emote.id}`);
             await getRepository(CacheEmotes).save({
-              ...cachedEmote,
-              code: emotes[j].code,
+              code: emote.name,
               type: 'twitch',
               urls: {
-                '1': 'https://static-cdn.jtvnw.net/emoticons/v1/' + emotes[j].id + '/1.0',
-                '2': 'https://static-cdn.jtvnw.net/emoticons/v1/' + emotes[j].id + '/2.0',
-                '3': 'https://static-cdn.jtvnw.net/emoticons/v1/' + emotes[j].id + '/3.0',
+                '1': emote.images.url_1x,
+                '2': emote.images.url_2x,
+                '3': emote.images.url_4x,
               },
             });
           }
@@ -207,9 +240,8 @@ class Emotes extends Overlay {
           }
         }
       }
-
-      this.fetch.channel = false;
     }
+    this.fetch.channel = false;
   }
 
   async fetchEmotesGlobal () {
@@ -217,21 +249,34 @@ class Emotes extends Overlay {
 
     // we want to update once every week
     if (Date.now() - this.lastGlobalEmoteChk > 1000 * 60 * 60 * 24 * 7) {
-      info('EMOTES: Fetching global emotes');
       this.lastGlobalEmoteChk = Date.now();
       try {
-        const request = await axios.get('https://api.twitchemotes.com/api/v4/channels/0');
-        const emotes = request.data.emotes;
-        for (let i = 0, length = emotes.length; i < length; i++) {
-          const cachedEmote = (await getRepository(CacheEmotes).findOne({ code: emotes[i].code, type: 'twitch' }));
+        await oauth.validateOAuth('bot');
+        const token = oauth.botAccessToken;
+        if (!token) {
+          this.lastGlobalEmoteChk = 0; // recheck next tick
+          this.fetch.global = false;
+          return;
+        }
+        info('EMOTES: Fetching global emotes');
+        const request = await axios.get('https://api.twitch.tv/helix/chat/emotes/global', {
+          headers: {
+            'Authorization': 'Bearer ' + token,
+            'Client-ID':     oauth.botClientId,
+          },
+          timeout: 20000,
+        }) as AxiosResponse<GlobalEmotesEndpoint>;
+        const emotes = request.data.data;
+        for (const emote of emotes) {
+          await setImmediateAwait();
+          debug('emotes.global', `Saving to cache ${emote.name}#${emote.id}`);
           await getRepository(CacheEmotes).save({
-            ...cachedEmote,
-            code: emotes[i].code,
+            code: emote.name,
             type: 'twitch',
             urls: {
-              '1': 'https://static-cdn.jtvnw.net/emoticons/v1/' + emotes[i].id + '/1.0',
-              '2': 'https://static-cdn.jtvnw.net/emoticons/v1/' + emotes[i].id + '/2.0',
-              '3': 'https://static-cdn.jtvnw.net/emoticons/v1/' + emotes[i].id + '/3.0',
+              '1': emote.images.url_1x,
+              '2': emote.images.url_2x,
+              '3': emote.images.url_4x,
             },
           });
         }
