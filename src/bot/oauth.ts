@@ -266,7 +266,6 @@ class OAuth extends Core {
     if (global.mocha) {
       return true;
     }
-    clearTimeout(this.timeouts[`validateOAuth-${type}`]);
 
     const url = 'https://id.twitch.tv/oauth2/validate';
     let status = true;
@@ -284,7 +283,7 @@ class OAuth extends Core {
         debug('oauth.validate', JSON.stringify(request.data));
       } catch (e) {
         if (e.isAxiosError) {
-          if ((typeof e.response === 'undefined' || e.response.status !== 401) && retry < 5) {
+          if ((typeof e.response === 'undefined' || (e.response.status !== 401 && e.response.status !== 403)) && retry < 5) {
             // retry validation if error is different than 401 Invalid Access Token
             await new Promise<void>((resolve) => {
               setTimeout(() => resolve(), 1000 + (retry ** 2));
@@ -329,9 +328,7 @@ class OAuth extends Core {
       this.toWait = 10;
       this.getChannelId();
     } catch (e) {
-      if (!e.message.includes('no access token')) {
-        error(e.stack);
-      }
+      error(e.stack);
       status = false;
       if ((type === 'bot' ? this.botRefreshToken : this.broadcasterRefreshToken) !== '') {
         this.refreshAccessToken(type);
@@ -347,7 +344,6 @@ class OAuth extends Core {
         }
       }
     }
-    this.timeouts[`validateOAuth-${type}`] = global.setTimeout(() => this.validateOAuth(type), 60000);
     return status;
   }
 

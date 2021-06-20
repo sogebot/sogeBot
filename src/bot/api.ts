@@ -217,6 +217,11 @@ class API extends Core {
         }
         if (Date.now() - interval.lastRunAt >= interval.interval) {
           isBlocking = fnc;
+
+          // run validation before any requests
+          await oauth.validateOAuth('bot');
+          await oauth.validateOAuth('broadcaster');
+
           debug('api.interval', chalk.yellow(fnc + '() ') + 'start');
           const time = process.hrtime();
           const time2 = Date.now();
