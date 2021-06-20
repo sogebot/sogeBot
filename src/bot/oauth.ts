@@ -393,6 +393,7 @@ class OAuth extends Core {
 
       return request.data.token;
     } catch (e) {
+      error(e.stack);
       if (type === 'bot') {
         botId.value = '';
         this.botUsername = '';
