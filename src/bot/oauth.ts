@@ -26,6 +26,9 @@ import { cleanViewersCache } from './helpers/permissions';
 import { tmiEmitter } from './helpers/tmi';
 import { getIdFromTwitch } from './microservices/getIdFromTwitch';
 
+let botTokenErrorSent = false;
+let broadcasterTokenErrorSent = false;
+
 class OAuth extends Core {
   private toWait = 10;
 
@@ -312,9 +315,11 @@ class OAuth extends Core {
       if (type === 'bot') {
         this.botUsername = request.data.login;
         this.botCurrentScopes = request.data.scopes;
+        botTokenErrorSent = false;
       } else {
         this.broadcasterUsername = request.data.login;
         this.broadcasterCurrentScopes = request.data.scopes;
+        broadcasterTokenErrorSent = false;
       }
 
       const cache = this.cache[type];
@@ -328,8 +333,19 @@ class OAuth extends Core {
       this.toWait = 10;
       this.getChannelId();
     } catch (e) {
-      error(e);
-      error(e.stack);
+      if (e.message.includes('no access token for')) {
+        if ((type === 'bot' && !botTokenErrorSent) || (type === 'broadcaster' && !broadcasterTokenErrorSent)) {
+          warning(`Access token ${type} account not found. Please set it in UI.`);
+          if (type === 'broadcaster') {
+            broadcasterTokenErrorSent = true;
+          } else {
+            botTokenErrorSent = true;
+          }
+        }
+      } else {
+        error(e);
+        error(e.stack);
+      }
       status = false;
       if ((type === 'bot' ? this.botRefreshToken : this.broadcasterRefreshToken) !== '') {
         this.refreshAccessToken(type);
