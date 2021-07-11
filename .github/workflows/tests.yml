@@ -27,6 +27,9 @@ jobs:
     - name: Install latest npm
       run: |
         npm install -g npm@latest
+    - name: Remove npm cache
+      run: |
+        npm cache clean --force
     - name: Install eslint and dependencies
       run: |
         npm install glob;
@@ -54,6 +57,9 @@ jobs:
     - name: Install latest npm
       run: |
         npm install -g npm@latest
+    - name: Remove npm cache
+      run: |
+        npm cache clean --force
     - name: Install all dependencies and build just a bot
       if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
       run: ENV=development make info clean dependencies bot
@@ -100,6 +106,9 @@ jobs:
     - name: Install latest npm
       run: |
         npm install -g npm@latest
+    - name: Remove npm cache
+      run: |
+        npm cache clean --force
     - name: Install all dependencies and build just a bot
       if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
       run: ENV=development make info clean dependencies bot
@@ -148,6 +157,9 @@ jobs:
     - name: Install latest npm
       run: |
         npm install -g npm@latest
+    - name: Remove npm cache
+      run: |
+        npm cache clean --force
     - name: Install all dependencies and build just a bot
       if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
       run: ENV=development make info clean dependencies bot
@@ -185,6 +197,9 @@ jobs:
     - name: Install latest npm
       run: |
         npm install -g npm@latest
+    - name: Remove npm cache
+      run: |
+        npm cache clean --force
     - name: Install all dependencies and build everything
       if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
       run: ENV=development make

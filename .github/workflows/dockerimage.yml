@@ -24,6 +24,9 @@ jobs:
       - name: Install latest npm
         run: |
           npm install -g npm@latest
+      - name: Remove npm cache
+        run: |
+          npm cache clean --force
 
       - name: Build a bot
         run: make
