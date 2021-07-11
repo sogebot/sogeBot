@@ -238,7 +238,7 @@
     "webpack": "5.37.0",
     "webpack-bundle-analyzer": "4.4.1",
     "webpack-cli": "4.7.0",
-    "winwheel": "https://git@github.com/sogehige/javascript-winwheel.git"
+    "winwheel": "git+https://git@github.com/sogehige/javascript-winwheel.git"
   },
   "lint-staged": {
     "*.js": [
