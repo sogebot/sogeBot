@@ -513,7 +513,7 @@ class Events extends Core {
     }
   }
   public async fireIncrementCustomVariable(operation: Events.OperationDefinitions) {
-    const customVariableName = operation.customVariable;
+    const customVariableName = String(operation.customVariable).replace('$_', '');
     const numberToIncrement = Number(operation.numberToIncrement);
 
     // check if value is number
@@ -521,9 +521,9 @@ class Events extends Core {
     if (!_.isFinite(parseInt(currentValue, 10))) {
       currentValue = String(numberToIncrement);
     } else {
-      currentValue = String(parseInt(currentValue, 10) - numberToIncrement);
+      currentValue = String(parseInt(currentValue, 10) + numberToIncrement);
     }
-    await setValueOf(String(customVariableName), currentValue, {});
+    await setValueOf(String('$_' + customVariableName), currentValue, {});
 
     // Update widgets and titles
     csEmitter.emit('refresh');
@@ -536,7 +536,7 @@ class Events extends Core {
   }
 
   public async fireDecrementCustomVariable(operation: Events.OperationDefinitions) {
-    const customVariableName = String(operation.customVariable);
+    const customVariableName = String(operation.customVariable).replace('$_', '');
     const numberToDecrement = Number(operation.numberToDecrement);
 
     // check if value is number
@@ -546,7 +546,7 @@ class Events extends Core {
     } else {
       currentValue = String(parseInt(currentValue, 10) - numberToDecrement);
     }
-    await setValueOf(customVariableName, currentValue, {});
+    await setValueOf(String('$_' + customVariableName), currentValue, {});
 
     // Update widgets and titles
     csEmitter.emit('refresh');
