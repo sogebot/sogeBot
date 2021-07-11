@@ -198,7 +198,7 @@
     "nyc": "15.1.0",
     "postcss": "8.2.15",
     "postcss-cli": "8.3.1",
-    "prismjs": "1.23.0",
+    "prismjs": "1.24.0",
     "process": "0.11.10",
     "pug": "3.0.2",
     "pug-plain-loader": "1.1.0",
