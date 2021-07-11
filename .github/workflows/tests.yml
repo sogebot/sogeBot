@@ -29,7 +29,7 @@ jobs:
         npm install -g npm@latest
     - name: Install eslint and dependencies
       run: |
-        npm install glob typescript eslint jsonlint-mod @typescript-eslint/parser @typescript-eslint/eslint-plugin mkdirp@latest;
+        make dependencies
     - name: Run eslint
       run: ENV=development make eslint
     - name: Run jsonlint
