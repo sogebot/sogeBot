@@ -15,7 +15,7 @@ dependencies:
 	@echo -ne "\n\t ----- Cleaning up dependencies\n"
 	@rm -rf node_modules
 	@echo -ne "\n\t ----- Installation of dependencies\n"
-	@npm install --also=dev
+	@npm ci --also=dev
 	@echo -ne "\n\t ----- Installation of simple-git-hooks\n"
 	git config core.hooksPath .git/hooks/
 	npx simple-git-hooks
