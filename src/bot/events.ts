@@ -498,9 +498,9 @@ class Events extends Core {
     events.fireSendChatMessageOrWhisper(operation, attributes, false);
   }
 
-  public async fireSetCustomVariable(operation: Events.OperationDefinitions) {
+  public async fireSetCustomVariable(operation: Events.OperationDefinitions, attributes: Events.Attributes) {
     const customVariableName = operation.customVariable;
-    const value = operation.value;
+    const value = attributesReplace(attributes, String(operation.value));
     await setValueOf(String(customVariableName), value, {});
 
     // Update widgets and titles
