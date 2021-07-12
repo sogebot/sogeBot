@@ -17,6 +17,9 @@ COPY . /app
 # Change working directory
 WORKDIR /app
 
+# Install latest npm
+RUN npm install -g npm@latest
+
 # Install dependencies
 RUN make
 # Remove dev dependencies (not needed anymore)
