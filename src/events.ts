@@ -11,7 +11,7 @@ import Core from './_interface';
 import api from './api';
 import { parserReply } from './commons';
 import {
-  Event, EventInterface, EventsEntity,
+  Event, EventInterface, Events as EventsEntity,
 } from './database/entity/event';
 import { User } from './database/entity/user';
 import { onStreamEnd } from './decorators/on';
@@ -227,7 +227,7 @@ class Events extends Core {
     debug('events', JSON.stringify({ eventId, attributes }));
 
     if (!attributes.isAnonymous) {
-      if (attributes.username !== null && typeof attributes.username !== 'undefined' && (!attributes.userId && !excludedUsers.has(attributes.username))) {
+      if (attributes.username !== null && typeof attributes.username !== 'undefined' && (attributes.userId || !attributes.userId && !excludedUsers.has(attributes.username))) {
         excludedUsers.delete(attributes.username); // remove from excluded users if passed first if
 
         const user = attributes.userId
