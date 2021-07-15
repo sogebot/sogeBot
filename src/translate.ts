@@ -47,7 +47,7 @@ class Translate {
 
         glob('./locales/**', (err, files) => {
           if (err) {
-            reject(err);
+            return reject(err);
           }
           for (const f of files) {
             if (!f.endsWith('.json')) {

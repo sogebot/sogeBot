@@ -100,7 +100,7 @@ export const init = () => {
     if (err instanceof ValidateError) {
       return res.status(400).json({
         message: 'Validation Failed',
-        details: err?.fields,
+        details: err.fields,
       });
     }
     if (err instanceof UnauthorizedError || err instanceof TokenExpiredError || err instanceof JsonWebTokenError) {

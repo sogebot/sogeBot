@@ -54,8 +54,7 @@ async function clearMedia(): Promise<void> {
       await getRepository(AlertMedia).delete({ id: Not(In(mediaIds)) });
     }
   } catch (e) {
-    console.error();
-    (e);
+    console.error(e);
   }
   return;
 }
