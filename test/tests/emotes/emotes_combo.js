@@ -17,7 +17,7 @@ describe('Emotes - combo', () => {
       await db.cleanup();
       await message.prepare();
       await user.prepare();
-      emotes = (require('../../../dest/core/emotes')).default;
+      emotes = (require('../../../dest/emotes')).default;
       emotes.enableEmotesCombo = true;
     });
     after(() => {
@@ -65,7 +65,7 @@ describe('Emotes - combo', () => {
       await db.cleanup();
       await message.prepare();
       await user.prepare();
-      emotes = (require('../../../dest/core/emotes')).default;
+      emotes = (require('../../../dest/emotes')).default;
       emotes.comboLastBreak = 0;
       emotes.enableEmotesCombo = true;
       emotes.comboCooldown = 60;
