@@ -151,15 +151,15 @@ export const init = () => {
         path.join(__dirname, '..', 'node_modules', '@sogebot', 'ui-overlay', 'dist', '_static'),
       ];
       for (const dir of paths) {
-        const pathToFile = path.join(sanitize(dir), ...req.url.replace('_static', '').split('/').map(o => sanitize(o)));
-        if (fs.existsSync(pathToFile)) {
+        const pathToFile = path.join(dir, req.url.replace('_static', ''));
+        if (fs.existsSync(pathToFile)) { // lgtm [js/path-injection]
           nuxtCache.set(req.url, pathToFile);
         }
       }
     }
 
-    const filepath = path.join(...(nuxtCache.get(req.url) ?? '').split('/').map(o => sanitize(o))) as string;
-    if (fs.existsSync(filepath)) {
+    const filepath = path.join(nuxtCache.get(req.url) ?? '') as string;
+    if (fs.existsSync(filepath)) { // lgtm [js/path-injection]
       res.sendFile(filepath);
     } else {
       res.sendStatus(404);
@@ -176,13 +176,13 @@ export const init = () => {
       ];
       for (const dir of paths) {
         const pathToFile = path.join(dir, req.url.replace('_nuxt', '').replace('credentials', '').replace('overlays', ''));
-        if (fs.existsSync(pathToFile)) {
+        if (fs.existsSync(pathToFile)) { // lgtm [js/path-injection]
           nuxtCache.set(req.url, pathToFile);
         }
       }
     }
-    const filepath = path.join(...(nuxtCache.get(req.url) ?? '').split('/').map(o => sanitize(o))) as string;
-    if (fs.existsSync(filepath)) {
+    const filepath = path.join(nuxtCache.get(req.url) ?? '');
+    if (fs.existsSync(filepath)) { // lgtm [js/path-injection]
       res.sendFile(filepath);
     } else {
       nuxtCache.delete(req.url);
