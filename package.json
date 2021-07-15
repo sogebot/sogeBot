@@ -95,9 +95,9 @@
     "build": "cross-env ENV=development make bot",
     "test": "node tools/runTests.js",
     "test:migration": "node tools/migrationCheck.js",
-    "test:config:mysql": "cp src/bot/data/.env.mysql .env",
-    "test:config:postgres": "cp src/bot/data/.env.postgres .env",
-    "test:config:sqlite": "cp src/bot/data/.env.sqlite .env",
+    "test:config:mysql": "cp src/data/.env.mysql .env",
+    "test:config:postgres": "cp src/data/.env.postgres .env",
+    "test:config:sqlite": "cp src/data/.env.sqlite .env",
     "start": "cross-env NODE_ENV=production node --experimental-report --report-on-fatalerror --report-directory=./logs/ --always_compact --optimize_for_size --gc_interval=100 -r source-map-support/register  ./dest/main || true",
     "debug": "cross-env NODE_ENV=development node --experimental-report --report-on-fatalerror --report-directory=./logs/ --trace-warnings --always_compact --optimize_for_size --gc_interval=100 --require source-map-support/register --inspect=0.0.0.0:9229 --nolazy ./dest/main || true",
     "gc": "cross-env NODE_ENV=development node --experimental-report --report-on-fatalerror --report-directory=./logs/ --trace-warnings --trace_gc --trace_gc_verbose --always_compact --optimize_for_size --gc_interval=100 --require source-map-support/register --inspect=0.0.0.0:9229 --nolazy ./dest/main || true"

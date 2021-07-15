@@ -151,14 +151,14 @@ export const init = () => {
         path.join(__dirname, '..', 'node_modules', '@sogebot', 'ui-overlay', 'dist', '_static'),
       ];
       for (const dir of paths) {
-        const pathToFile = path.join(dir, req.url.replace('_static', ''));
+        const pathToFile = path.join(sanitize(dir), ...req.url.replace('_static', '').split('/').map(o => sanitize(o)));
         if (fs.existsSync(pathToFile)) {
           nuxtCache.set(req.url, pathToFile);
         }
       }
     }
 
-    const filepath = nuxtCache.get(req.url) as string;
+    const filepath = path.join(...(nuxtCache.get(req.url) ?? '').split('/').map(o => sanitize(o))) as string;
     if (fs.existsSync(filepath)) {
       res.sendFile(filepath);
     } else {
@@ -181,8 +181,7 @@ export const init = () => {
         }
       }
     }
-
-    const filepath = nuxtCache.get(req.url) as string;
+    const filepath = path.join(...(nuxtCache.get(req.url) ?? '').split('/').map(o => sanitize(o))) as string;
     if (fs.existsSync(filepath)) {
       res.sendFile(filepath);
     } else {

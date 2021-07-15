@@ -105,14 +105,14 @@ class Alias extends System {
 
   @parser({ priority: constants.LOW })
   async run (opts: ParserOptions): Promise<boolean> {
-    let [alias, cmdArray] = await this.search(opts);
+    const alias = (await this.search(opts))[0];
     if (!alias) {
       return true;
     } // no alias was found - return
     const p = new Parser();
 
     const replace = new RegExp(`${alias.alias}`, 'i');
-    cmdArray = opts.message.replace(replace, `${alias.command}`).split(' ');
+    const cmdArray = opts.message.replace(replace, `${alias.command}`).split(' ');
     let tryingToBypass = false;
 
     const length = opts.message.toLowerCase().split(' ').length;
