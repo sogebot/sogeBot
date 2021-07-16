@@ -7,8 +7,8 @@
     },
     "isPointResetIntervalEnabled": "Interval mazání bodů",
     "resetIntervalCron": {
-      "name": "Cron interval",
-      "help": "<a href='https://crontab.guru/'>CronTab generator</a>"
+      "name": "Interval cronu",
+      "help": "<a href='https://crontab.guru/'>CronTab generátor</a>"
     },
     "interval": "Minutový interval pro přidání bodů online uživatelům při online streamu",
     "offlineInterval": "Minutový interval pro přidání bodů online uživatelům při offline streamu",
