@@ -23,7 +23,7 @@
     },
     "raffleAnnounceInterval": {
       "title": "Interval oznámení",
-      "help": "v minutách"
+      "help": "Minutes"
     },
     "raffleAnnounceMessageInterval": {
       "title": "Interval oznámení - zprávy",
