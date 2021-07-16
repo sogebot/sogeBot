@@ -49,13 +49,10 @@
       "title": "Typ"
     },
     "nameGroup": {
-      "title": "Název této skupiny",
-      "placeholder": "Nastavte název této skupiny",
-      "help": "Pokud bude prázdný, jméno bude náhodně generováno."
+      "title": "Název této skupiny"
     },
     "name": {
-      "title": "Název tohoto cíle",
-      "placeholder": "Nastavte název tohoto cíle"
+      "title": "Název tohoto cíle"
     },
     "displayAs": {
       "title": "Zobrazit jako",
