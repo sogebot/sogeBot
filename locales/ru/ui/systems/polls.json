@@ -15,15 +15,12 @@
     "add": "Добавить",
     "inChatToVote": "... в чате, чтобы проголосовать",
     "tips": "донат",
-    "bits": "чирсы",
+    "bits": "cheer",
     "toYourMessage": "... в вашем <strong>$type</strong> сообщении"
   },
   "title": "Название",
-  "done": "ГОТОВО",
-  "running": "ЗАПУСК",
-  "stop": "Остановить",
-  "copy": "Копировать",
   "totalVotes": "Всего голосов",
+  "copy": "Копировать",
   "cannotCopyIfInProgress": "Копирование невозможно, если выполняется другой опрос",
   "closedAt": "Закрыто",
   "activeFor": "Активно для",
@@ -31,9 +28,5 @@
   "tips": "донаты",
   "numbers": "numbers",
   "bits": "битсы",
-  "command": "!vote",
-  "create": "Нажмите, чтобы создать новый опрос",
-  "cannotCreateIfEmpty": "Невозможно создать новый опрос с менее чем 2 вариантами",
-  "cannotCreateWithoutTitle": "Невозможно создать новый опрос без заголовка",
-  "cannotCreateNewVoteIfInProgress": "Не удается создать новый опрос, если в процессе другой опрос"
+  "normal": "!vote"
 }
