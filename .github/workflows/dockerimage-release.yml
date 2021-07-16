@@ -19,6 +19,10 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: 14
+          check-latest: true
+      - name: Install latest npm
+        run: |
+          npm install -g npm@latest
 
       - name: Build a bot
         run: make

@@ -108,12 +108,12 @@ describe('Price - check()', () => {
       command: '!a', price: 100, priceBits: 10,
     });
     tmi.cheer({
-      tags: {
+      tags: {
         username: user.viewer.username,
         userId:   user.viewer.userId,
         bits:     100,
       },
-      message: '!a',
+      message: '!a',
     });
     await message.isSentRaw('Usage => http://sogehige.github.io/sogeBot/#/_master/systems/alias', user.viewer.username, 20000);
   });
@@ -124,12 +124,12 @@ describe('Price - check()', () => {
       command: '!b', price: 100, priceBits: 10,
     });
     tmi.cheer({
-      tags: {
+      tags: {
         username: user.viewer.username,
         userId:   user.viewer.userId,
         bits:     100,
       },
-      message: '!b',
+      message: '!b',
     });
     await message.isSentRaw('Lorem Ipsum', user.viewer.username, 20000);
   });
@@ -139,12 +139,12 @@ describe('Price - check()', () => {
       command: '!me', price: 100, priceBits: 10,
     });
     tmi.cheer({
-      tags: {
+      tags: {
         username: user.viewer.username,
         userId:   user.viewer.userId,
         bits:     100,
       },
-      message: '!me',
+      message: '!me',
     });
     await message.isSentRaw('@__viewer__ | Level 0 | 0.0h | 0 points | 0 messages | €0.00 | 100 bits', user.viewer.username, 20000);
   });

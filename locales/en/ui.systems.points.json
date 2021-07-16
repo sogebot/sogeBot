@@ -6,7 +6,10 @@
       "help": "<strong>Possible formats:</strong><br> point|points <br> bod|4:body|bodu"
     },
     "isPointResetIntervalEnabled": "Interval of points reset",
-    "resetIntervalCron": "Cron interval<br><a href='https://crontab.guru/'>CronTab generator</a>",
+    "resetIntervalCron": {
+      "name": "Cron interval",
+      "help": "<a href='https://crontab.guru/'>CronTab generator</a>"
+    },
     "interval": "Minutes interval to add points to online users when stream online",
     "offlineInterval": "Minutes interval to add points to online users when stream offline",
     "messageInterval": "How many messages to add points",

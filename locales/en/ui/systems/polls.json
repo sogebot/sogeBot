@@ -19,11 +19,8 @@
     "toYourMessage": "... in your <strong>$type</strong> message"
   },
   "title": "Title",
-  "done": "DONE",
-  "running": "RUNNING",
-  "stop": "Stop",
-  "copy": "Copy",
   "totalVotes": "Total votes",
+  "copy": "Copy",
   "cannotCopyIfInProgress": "Cannot copy, if another poll is in progress",
   "closedAt": "Closed at",
   "activeFor": "Active for",
@@ -31,9 +28,5 @@
   "tips": "tips",
   "numbers": "numbers",
   "bits": "bits",
-  "command": "!vote",
-  "create": "Click to create new poll",
-  "cannotCreateIfEmpty": "Cannot create new poll without at least 2 options",
-  "cannotCreateWithoutTitle": "Cannot create new poll without title",
-  "cannotCreateNewVoteIfInProgress": "Cannot create new poll, if another poll in in progress"
+  "normal": "!vote"
 }

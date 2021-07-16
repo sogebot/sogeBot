@@ -1,9 +1,9 @@
 /* global describe it before */
 const assert = require('assert');
 
+const constants = require('@sogebot/ui-helpers/constants');
 const { getRepository } = require('typeorm');
 
-const constants = require('../../../dest/constants');
 const { User } = require('../../../dest/database/entity/user');
 const { getOwner } = require('../../../dest/helpers/commons/getOwner');
 const { prepare } = require('../../../dest/helpers/commons/prepare');

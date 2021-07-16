@@ -40,16 +40,16 @@ describe('Timers - disabled response should not be sent to chat - https://discor
     isStreamOnline.value = false;
   });
 
-  it('We should have response 1 in chat in a while', async () => {
+  it('We should have response 1 in chat in a while', async () => {
     await message.isSentRaw('1', 'bot', 45000);
     // we need to wait little more as interval when offline is 30s
   }).timeout(60000);
 
-  it('We should NOT have response 2 in chat in a while', async () => {
+  it('We should NOT have response 2 in chat in a while', async () => {
     await message.isNotSentRaw('2', 'bot', 5000);
   })
 
-  it('We should have response 3 in chat in a while', async () => {
+  it('We should have response 3 in chat in a while', async () => {
     await message.isSentRaw('3', 'bot', 5000);
   })
 });
@@ -100,16 +100,16 @@ describe('Timers - disabled responses should not be sent to chat - https://disco
     assert(checkTimer, 'Timer was not updated in 60s');
   }).timeout(65000)
 
-  it('We should NOT have response 1 in chat in a while', async () => {
+  it('We should NOT have response 1 in chat in a while', async () => {
     await message.isNotSentRaw('1', 'bot', 2000);
     // we need to wait little more as interval when offline is 45s (15s should be OK in general)
   })
 
-  it('We should NOT have response 2 in chat in a while', async () => {
+  it('We should NOT have response 2 in chat in a while', async () => {
     await message.isNotSentRaw('2', 'bot', 2000);
   })
 
-  it('We should NOT have response 3 in chat in a while', async () => {
+  it('We should NOT have response 3 in chat in a while', async () => {
     await message.isNotSentRaw('3', 'bot', 2000);
   })
 });

@@ -19,7 +19,7 @@ describe('Custom Variable - #3820 - For loop should work corectly', () => {
     result = await runScript('let i = 0; for(let j=0; j<10; j++) { i++; } return i;', {});
   });
 
-  it ('We should have eval result', async () => {
+  it ('We should have eval result', async () => {
     assert.strictEqual(result, 10);
   });
 });

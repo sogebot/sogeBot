@@ -1,19 +1,17 @@
 /* global describe it before */
-const { getOwner } = require('../../../dest/helpers/commons/getOwner');
+const assert = require('assert');
 
 require('../../general.js');
+const constants = require('@sogebot/ui-helpers/constants');
+const { getRepository } = require('typeorm');
 
-const db = require('../../general.js').db;
-const message = require('../../general.js').message;
-const constants = require('../../../dest/constants');
-
+const { User } = require('../../../dest/database/entity/user');
+const { getOwner } = require('../../../dest/helpers/commons/getOwner');
+const { prepare } = require('../../../dest/helpers/commons/prepare');
 const top = (require('../../../dest/systems/top')).default;
 const tmi = (require('../../../dest/tmi')).default;
-
-const { prepare } = require('../../../dest/helpers/commons/prepare');
-const { getRepository } = require('typeorm');
-const { User } = require('../../../dest/database/entity/user');
-const assert = require('assert');
+const db = require('../../general.js').db;
+const message = require('../../general.js').message;
 
 // users
 const owner = { username: '__broadcaster__' };
@@ -27,8 +25,8 @@ describe('Top - !top time', () => {
   it ('Add 10 users into db and last user will don\'t have any time', async () => {
     for (let i = 0; i < 10; i++) {
       await getRepository(User).save({
-        userId: String(Math.floor(Math.random() * 100000)),
-        username: 'user' + i,
+        userId:      String(Math.floor(Math.random() * 100000)),
+        username:    'user' + i,
         watchedTime: i * constants.HOUR,
       });
     }

@@ -1,6 +1,7 @@
 #!/bin/bash
 cd /app
 
+
 if [ -z "$PROFILER" ]
 then
   npm start

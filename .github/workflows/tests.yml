@@ -23,10 +23,13 @@ jobs:
       uses: actions/setup-node@v2
       with:
         node-version: 14
+        check-latest: true
+    - name: Install latest npm
+      run: |
+        npm install -g npm@latest
     - name: Install eslint and dependencies
       run: |
-        npm install glob;
-        npm install --only=dev typescript eslint jsonlint-mod @typescript-eslint/parser @typescript-eslint/eslint-plugin mkdirp@latest;
+        make dependencies
     - name: Run eslint
       run: ENV=development make eslint
     - name: Run jsonlint
@@ -46,6 +49,10 @@ jobs:
       uses: actions/setup-node@v2
       with:
         node-version: 14
+        check-latest: true
+    - name: Install latest npm
+      run: |
+        npm install -g npm@latest
     - name: Install all dependencies and build just a bot
       if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
       run: ENV=development make info clean dependencies bot
@@ -88,6 +95,10 @@ jobs:
       uses: actions/setup-node@v2
       with:
         node-version: 14
+        check-latest: true
+    - name: Install latest npm
+      run: |
+        npm install -g npm@latest
     - name: Install all dependencies and build just a bot
       if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
       run: ENV=development make info clean dependencies bot
@@ -132,6 +143,10 @@ jobs:
       uses: actions/setup-node@v2
       with:
         node-version: 14
+        check-latest: true
+    - name: Install latest npm
+      run: |
+        npm install -g npm@latest
     - name: Install all dependencies and build just a bot
       if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
       run: ENV=development make info clean dependencies bot
@@ -165,6 +180,10 @@ jobs:
       uses: actions/setup-node@v2
       with:
         node-version: 14
+        check-latest: true
+    - name: Install latest npm
+      run: |
+        npm install -g npm@latest
     - name: Install all dependencies and build everything
       if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
       run: ENV=development make
