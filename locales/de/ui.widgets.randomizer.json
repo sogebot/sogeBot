@@ -1,4 +1,4 @@
 {
-  "no-randomizer-found": "Kein Zufallsgenerator gefunden! Bitte füge einen im <a href=\"/#/registry/randomizer/list\">Zufallsgenerator-Register</a> hinzu",
+  "no-randomizer-found": "Kein Zufallsgenerator gefunden! Bitte füge einen im <a href=\"/#/registry/randomizer/\">Zufallsgenerator-Register</a> hinzu",
   "add-randomizer-to-widget": "Zufallsgenerator zum Widget hinzufügen"
 }

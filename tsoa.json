@@ -1,0 +1,24 @@
+{
+  "entryFile": "src/main.ts",
+  "noImplicitAdditionalProperties": "throw-on-extras",
+  "controllerPathGlobs": ["src/api/*.ts", "src/api/**/*.ts"],
+  "spec": {
+    "outputDirectory": "src/.cache/",
+    "specVersion": 3,
+    "securityDefinitions": {
+      "bearerAuth": {
+          "type": "http",
+          "scheme": "bearer",
+          "bearerFormat": "JWT"
+      }
+    }
+  },
+  "routes": {
+    "routesDir": "src/.cache/",
+    "authenticationModule": "./src/helpers/api/authenticate.ts"
+  },
+  "ignore": [
+    "**/node_modules/@types/lodash/**",
+    "**/node_modules/@types/webpack-sources/**"
+  ]
+}

@@ -36,11 +36,11 @@ describe('TMI - redeem command', () => {
     assert.strictEqual(r2[0].response, '$sender, command !test2 was added');
   });
 
-  it(`Add price !test with emitRedeemEvent`, async () => {
-    await getRepository(Price).save({ command: '!test', price: 0, priceBits: 10, emitRedeemEvent: true });
+  it(`Add price !test with emitRedeemEvent`, async () => {
+    await getRepository(Price).save({ command: '!test', price: 0, priceBits: 10, emitRedeemEvent: true });
   });
 
-  it(`Add price !test2 without emitRedeemEvent`, async () => {
+  it(`Add price !test2 without emitRedeemEvent`, async () => {
     await getRepository(Price).save({ command: '!test2', price: 0, priceBits: 10, emitRedeemEvent: false });
   });
 

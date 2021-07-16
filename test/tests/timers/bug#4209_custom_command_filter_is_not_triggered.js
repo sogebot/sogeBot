@@ -53,12 +53,12 @@ describe('Timers - https://github.com/sogehige/sogeBot/issues/4209 - custom comm
     assert.strictEqual(r[0].response, `$sender, response (id: ${item.id}) for timer (name: test) was added - '(!telemetry)'`);
   });
 
-  it('Set manually stream to be online and manually trigger timers check', () => {
+  it('Set manually stream to be online and manually trigger timers check', () => {
     isStreamOnline.value = true;
     timers.check();
   });
 
-  it('We should have correct response in chat in a while', async () => {
+  it('We should have correct response in chat in a while', async () => {
     await message.isSentRaw('Lorem Ipsum Dolor Sit Amet', 'bot', 5000);
   });
 });

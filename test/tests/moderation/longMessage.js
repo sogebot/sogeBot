@@ -75,7 +75,7 @@ describe('systems/moderation - longMessage()', () => {
     });
 
     it(`add user immunity`, async () => {
-      const r = await moderation.immune({ parameters: `${user.viewer.username} longmessage 5s` });
+      const r = await moderation.immune({ parameters: `${user.viewer.username} longmessage 5s` });
       assert(r[0].response === '$sender, user @__viewer__ have longmessage immunity for 5 seconds');
     });
 
