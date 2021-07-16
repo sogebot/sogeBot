@@ -192,7 +192,7 @@ export const init = () => {
   app?.get('/popout/', function (req, res) {
     res.sendFile(path.join(__dirname, '..', 'public', 'popout.html'));
   });
-  app?.get(['/overlays/:id', '/overlays/text/:id'], function (req, res) {
+  app?.get(['/overlays/:id', '/overlays/text/:id', '/overlays/alerts/:id', '/overlays/goals/:id'], function (req, res) {
     res.sendFile(path.join(__dirname, '..', 'node_modules', '@sogebot', 'ui-overlay', 'dist', 'index.html'));
   });
   app?.get('/public/', function (req, res) {
