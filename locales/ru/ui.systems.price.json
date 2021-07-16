@@ -1,12 +1,5 @@
 {
-  "new": "Новая Цена",
-  "empty": "Цены еще не созданы.",
-  "emptyAfterSearch": "По вашему запросу не найдено цен <strong>\"$search\"</strong>.",
   "emitRedeemEvent": "Emit redeem event if bits are used",
-  "command": {
-    "name": "команда",
-    "placeholder": ""
-  },
   "price": {
     "name": "цена",
     "placeholder": ""
