@@ -1,7 +1,4 @@
 {
-  "new": "Nuovo Tempo d'attesa",
-  "empty": "Nessun tempo di attesa ancora creato.",
-  "emptyAfterSearch": "Nessun tempo di attesa è stato trovato dalla tua ricerca per <strong>\"$search\"</strong>.",
   "notify-as-whisper": "Notifica come sussurro",
   "settings": {
     "enabled": "Stato",

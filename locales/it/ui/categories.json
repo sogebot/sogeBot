@@ -1,4 +1,5 @@
 {
+  "announcements": "Announcements",
   "currency": "Valuta",
   "general": "Generale",
   "settings": "Impostazioni",
@@ -12,6 +13,7 @@
   "levels": "Livelli",
   "notifications": "Notifiche",
   "options": "Opzioni",
+  "messages": "Messages",
   "results": "Risultati",
   "customization": "Personalizzazione",
   "status": "Stato",

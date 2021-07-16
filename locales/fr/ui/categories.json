@@ -1,4 +1,5 @@
 {
+  "announcements": "Announcements",
   "currency": "Currency",
   "general": "Général",
   "settings": "Paramètres",
@@ -12,6 +13,7 @@
   "levels": "Levels",
   "notifications": "Notifications",
   "options": "Options",
+  "messages": "Messages",
   "results": "Résultats",
   "customization": "Personnalisation",
   "status": "Status",

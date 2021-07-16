@@ -6,7 +6,10 @@
       "help": "<strong>Возможные форматы:</strong><br> поинт|поинтов <br> поинт|4:поинта|поинтов"
     },
     "isPointResetIntervalEnabled": "Интервал сброса поинтов",
-    "resetIntervalCron": "Cron<br><a href='https://crontab.guru/'>CronTab generator</a>",
+    "resetIntervalCron": {
+      "name": "Cron interval",
+      "help": "<a href='https://crontab.guru/'>CronTab generator</a>"
+    },
     "interval": "Интервал в минутах для добавления поинтов онлайн пользователям когда стрим ОНЛАЙН",
     "offlineInterval": "Интервал в минутах для добавления поинтов онлайн пользователям когда стрим ОФФЛАЙН",
     "messageInterval": "За сколько сообщений добавлять поинтов",

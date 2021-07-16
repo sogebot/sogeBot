@@ -1,12 +1,5 @@
 {
-  "new": "Nuovo Comando Personalizzato",
   "no-responses-set": "Nessuna risposta",
-  "empty": "Nessun comando personalizzato è stato ancora creato.",
-  "emptyAfterSearch": "Nessun comando personalizzato è stato trovato dalla tua ricerca per <strong>\"$search\"</strong>.",
-  "command": {
-    "name": "comando personalizzato",
-    "placeholder": ""
-  },
   "addResponse": "Aggiungi risposta",
   "response": {
     "name": "Risposta",
@@ -15,9 +8,5 @@
   "filter": {
     "name": "filtro",
     "placeholder": "Aggiungi filtro per questa risposta"
-  },
-  "warning": "Questa azione non può essere annullata!",
-  "settings": {
-    "enabled": "Stato"
   }
 }

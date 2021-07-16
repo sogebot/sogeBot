@@ -1,7 +1,4 @@
 {
-  "new": "New Cooldown",
-  "empty": "No cooldowns were created yet.",
-  "emptyAfterSearch": "No cooldown were found by your search for <strong>\"$search\"</strong>.",
   "notify-as-whisper": "Notify as whisper",
   "settings": {
     "enabled": "Status",

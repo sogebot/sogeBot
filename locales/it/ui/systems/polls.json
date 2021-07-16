@@ -15,15 +15,12 @@
     "add": "Aggiungi",
     "inChatToVote": "... nella chat per votare",
     "tips": "tip",
-    "bits": "bits",
+    "bits": "cheer",
     "toYourMessage": "... nel tuo messaggio <strong>$type</strong>"
   },
   "title": "Titolo",
-  "done": "FATTO",
-  "running": "IN CORSO",
-  "stop": "Ferma",
-  "copy": "Copia",
   "totalVotes": "Voti totali",
+  "copy": "Copia",
   "cannotCopyIfInProgress": "Impossibile copiare, se un altro sondaggio è in corso",
   "closedAt": "Chiuso a",
   "activeFor": "Attivo per",
@@ -31,9 +28,5 @@
   "tips": "donazioni",
   "numbers": "numeri",
   "bits": "bits",
-  "command": "!vote",
-  "create": "Fai clic per creare un nuovo sondaggio",
-  "cannotCreateIfEmpty": "Impossibile creare un nuovo sondaggio senza almeno 2 opzioni",
-  "cannotCreateWithoutTitle": "Impossibile creare un nuovo sondaggio senza il titolo",
-  "cannotCreateNewVoteIfInProgress": "Impossibile creare un nuovo sondaggio, se un altro sondaggio è in atto"
+  "normal": "!vote"
 }

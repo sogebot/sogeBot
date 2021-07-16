@@ -6,7 +6,10 @@
       "help": "<strong>Možné formáty:</strong><br> point|points <br> bod|4:body|bodu"
     },
     "isPointResetIntervalEnabled": "Interval mazání bodů",
-    "resetIntervalCron": "Cron interval<br><a href='https://crontab.guru/'>CronTab generátor</a>",
+    "resetIntervalCron": {
+      "name": "Interval cronu",
+      "help": "<a href='https://crontab.guru/'>CronTab generátor</a>"
+    },
     "interval": "Minutový interval pro přidání bodů online uživatelům při online streamu",
     "offlineInterval": "Minutový interval pro přidání bodů online uživatelům při offline streamu",
     "messageInterval": "Kolik zpráv pro přidání body",

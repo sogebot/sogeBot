@@ -15,15 +15,12 @@
     "add": "Hinzufügen",
     "inChatToVote": "... im Chat zur Abstimmung",
     "tips": "spenden",
-    "bits": "Cheer",
+    "bits": "cheer",
     "toYourMessage": "... in Ihrer <strong>$type</strong> Nachricht"
   },
   "title": "Titel",
-  "done": "Fertig",
-  "running": "LÄUFT",
-  "stop": "Stop",
-  "copy": "Kopieren",
   "totalVotes": "Stimmen insgesamt",
+  "copy": "Kopieren",
   "cannotCopyIfInProgress": "Kann nicht kopiert werden, wenn eine andere Umfrage läuft",
   "closedAt": "Geschlossen am",
   "activeFor": "Aktiv für",
@@ -31,9 +28,5 @@
   "tips": "Spenden",
   "numbers": "Nummern",
   "bits": "Bits",
-  "command": "!vote",
-  "create": "Klicken, um ein neue Umfrage zu erstellen",
-  "cannotCreateIfEmpty": "Neue Umfrage kann ohne mindestens 2 Optionen nicht erstellt werden",
-  "cannotCreateWithoutTitle": "Neue Umfrage kann ohne Titel nicht erstellt werden",
-  "cannotCreateNewVoteIfInProgress": "Kann keine neue Umfrage erstellen, solange eine andere Umfrage läuft"
+  "normal": "!vote"
 }

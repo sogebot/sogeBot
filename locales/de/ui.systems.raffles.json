@@ -23,7 +23,7 @@
     },
     "raffleAnnounceInterval": {
       "title": "Intervall ankündigen",
-      "help": "in Minuten"
+      "help": "Minutes"
     },
     "raffleAnnounceMessageInterval": {
       "title": "Nachrichtenintervall ankündigen",

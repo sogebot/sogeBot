@@ -49,13 +49,10 @@
       "title": "Tipo"
     },
     "nameGroup": {
-      "title": "Nome di questo gruppo di obiettivi",
-      "placeholder": "Imposta il nome di questo gruppo di obiettivi",
-      "help": "Se mantenuto vuoto, il nome verrà generato in modo casuale"
+      "title": "Nome di questo gruppo di obiettivi"
     },
     "name": {
-      "title": "Nome di questo gruppo di obiettivi",
-      "placeholder": "Imposta il nome di questo gruppo di obiettivi"
+      "title": "Nome di questo gruppo di obiettivi"
     },
     "displayAs": {
       "title": "Visualizza come",

@@ -1,4 +1,5 @@
 {
+  "announcements": "Oznámení",
   "currency": "Měna",
   "general": "Obecné",
   "settings": "Nastavení",
@@ -12,6 +13,7 @@
   "levels": "Úrovně",
   "notifications": "Oznámení",
   "options": "Možnosti",
+  "messages": "Zprávy",
   "results": "Výsledky",
   "customization": "Přizpůsobení",
   "status": "Status",

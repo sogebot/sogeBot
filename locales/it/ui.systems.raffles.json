@@ -23,7 +23,7 @@
     },
     "raffleAnnounceInterval": {
       "title": "Intervallo annunci",
-      "help": "in minuti"
+      "help": "Minutes"
     },
     "raffleAnnounceMessageInterval": {
       "title": "Intervallo annunci messaggi",

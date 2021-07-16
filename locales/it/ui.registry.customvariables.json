@@ -24,7 +24,7 @@
     "help": "Il nome della variabile deve essere unico, ad esempio $_wins, $_loses, $_top3",
     "placeholder": "Inserisci il nome della variabile univoco",
     "error": {
-      "isNotUnique": "La variabile deve avere il nome <strong>univoco</strong>.",
+      "isNotUnique": "Variable must have unique name.",
       "isEmpty": "Il nome della variabile non deve essere vuoto."
     }
   },

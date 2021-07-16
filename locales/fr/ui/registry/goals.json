@@ -49,13 +49,10 @@
       "title": "Type"
     },
     "nameGroup": {
-      "title": "Name of this goal group",
-      "placeholder": "Set name of this goal group",
-      "help": "If kept empty, name will be randomly generated"
+      "title": "Name of this goal group"
     },
     "name": {
-      "title": "Name of this goal",
-      "placeholder": "Set name of this goal"
+      "title": "Name of this goal"
     },
     "displayAs": {
       "title": "Display as",

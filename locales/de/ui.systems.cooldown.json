@@ -1,7 +1,4 @@
 {
-  "new": "Neuer Cooldown",
-  "empty": "Bisher wurde noch kein Cooldown erstellt.",
-  "emptyAfterSearch": "Bei der Suche nach <strong>\"$search\"</strong> wurde kein Cooldown gefunden.",
   "notify-as-whisper": "Antwort über Privat Nachricht",
   "settings": {
     "enabled": "Status",
