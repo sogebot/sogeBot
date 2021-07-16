@@ -24,7 +24,7 @@
     "help": "Název proměnné musí být jedinečný, například $_wins, $_loses, $_top3",
     "placeholder": "Zadejte jedinečný název proměnné",
     "error": {
-      "isNotUnique": "Proměnná musí mít <strong>jedinečný</strong> název.",
+      "isNotUnique": "Variable must have unique name.",
       "isEmpty": "Název proměnné nesmí být prázdný."
     }
   },
