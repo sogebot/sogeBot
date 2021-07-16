@@ -1,9 +1,9 @@
 {
 	"settings": {
 		"btnRemoveCache": "Очистить кэш",
-		"btnTestExplosion": "Взрыв смайликов",
-		"btnTestEmote": "Эмоция",
-		"btnTestFirework": "Фейерверк смайликов",
+		"btnTestExplosion": "Test emote explosion",
+		"btnTestEmote": "Test emote",
+		"btnTestFirework": "Test emote firework",
 		"cEmotesSize": "Размер эмоций",
 		"cEmotesMaxEmotesPerMessage": "Максимум смайликов за сообщение",
 		"cEmotesAnimation": "Анимация",
