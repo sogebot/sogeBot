@@ -1,7 +1,4 @@
 {
-  "new": "Nový Cooldown",
-  "empty": "Žádný cooldown nebyl vytvořen.",
-  "emptyAfterSearch": "Žádný cooldown nebyl nalezen pro tvé hledání <strong>\"$search\"</strong>.",
   "notify-as-whisper": "Oznámit šepotem",
   "settings": {
     "enabled": "Status",
