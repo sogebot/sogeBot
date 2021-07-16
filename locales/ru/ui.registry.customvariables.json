@@ -24,7 +24,7 @@
     "help": "Имя переменной должно быть уникальным, например $_wins, $_loses, $_top3",
     "placeholder": "Введите уникальное имя переменной",
     "error": {
-      "isNotUnique": "Переменная должна иметь <strong>уникальное</strong> имя.",
+      "isNotUnique": "Variable must have unique name.",
       "isEmpty": "Имя переменной не должно быть пустым."
     }
   },
