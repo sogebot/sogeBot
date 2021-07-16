@@ -15,15 +15,12 @@
     "add": "Přidej",
     "inChatToVote": "... do chatu pro hlasování",
     "tips": "spropitného",
-    "bits": "bitů",
+    "bits": "cheer",
     "toYourMessage": "... do tvé zprávy <strong>$type</strong>"
   },
   "title": "Název",
-  "done": "HOTOVO",
-  "running": "PROBÍHÁ",
-  "stop": "Zastavit",
-  "copy": "Kopírovat",
   "totalVotes": "Celkem hlasů",
+  "copy": "Kopírovat",
   "cannotCopyIfInProgress": "Nelze kopírovat, pokud již probíhá jiné hlasování",
   "closedAt": "Uzavřeno v",
   "activeFor": "Aktivní po",
@@ -31,9 +28,5 @@
   "tips": "tipů",
   "numbers": "čísla",
   "bits": "bitů",
-  "command": "!vote",
-  "create": "Klikni k vytvoření hlasování",
-  "cannotCreateIfEmpty": "Nelze vytvořit nové hlasování bez 2 možností",
-  "cannotCreateWithoutTitle": "Nelze vytvořit nové hlasování bez nadpisu",
-  "cannotCreateNewVoteIfInProgress": "Nelze vytvořit nové hlasování, pokud již probíhá jiné hlasování"
+  "normal": "!vote"
 }
