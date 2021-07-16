@@ -49,13 +49,10 @@
       "title": "Typ"
     },
     "nameGroup": {
-      "title": "Name dieser Zielgruppe",
-      "placeholder": "Name dieser Zielgruppe festlegen",
-      "help": "Wenn leer, wird der Name zufällig generiert"
+      "title": "Name dieser Zielgruppe"
     },
     "name": {
-      "title": "Name des Ziels",
-      "placeholder": "Name des Ziels festlegen"
+      "title": "Name des Ziels"
     },
     "displayAs": {
       "title": "Anzeigen als",
