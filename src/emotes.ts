@@ -39,6 +39,8 @@ interface ChannelEmotesEndpoint { data: (EmotesCommons & {
   emote_set_id: string,
 })[]}
 
+let broadcasterWarning = false;
+
 class Emotes extends Core {
   fetch = {
     global:  false,
@@ -119,9 +121,11 @@ class Emotes extends Core {
     this.fetch.channel = true;
 
     if (cid && oauth.broadcasterType !== null && (Date.now() - this.lastSubscriberEmoteChk > 1000 * 60 * 60 * 24 * 7 || this.lastChannelChk !== cid)) {
-      if (oauth.broadcasterType === '') {
+      if (oauth.broadcasterType === '' && !broadcasterWarning) {
         info(`EMOTES: Skipping fetching of ${cid} emotes - not subscriber/affiliate`);
+        broadcasterWarning = true;
       } else {
+        broadcasterWarning = false;
         this.lastSubscriberEmoteChk = Date.now();
         this.lastChannelChk = cid;
         try {
