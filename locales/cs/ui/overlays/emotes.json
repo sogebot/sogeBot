@@ -1,9 +1,9 @@
 {
 	"settings": {
 		"btnRemoveCache": "Smazat cache",
-		"btnTestExplosion": "Exploze emotikonů",
-		"btnTestEmote": "Emotikon",
-		"btnTestFirework": "Ohňostroj emotikonů",
+		"btnTestExplosion": "Test emote explosion",
+		"btnTestEmote": "Test emote",
+		"btnTestFirework": "Test emote firework",
 		"cEmotesSize": "Velikost emotikonů",
 		"cEmotesMaxEmotesPerMessage": "Maximální počet emotikonů",
 		"cEmotesAnimation": "Animace",
