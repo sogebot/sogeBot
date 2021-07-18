@@ -47,7 +47,7 @@ export class migrateOverlaySettings1626383147273 implements MigrationInterface {
         if (item.name === 'cClipsFilter') {
           item.name = 'filter';
         }
-        if (item.name === 'cClipsLabel') {
+        if (item.name === 'cClipsLabel' || item.name === 'showLabel') {
           item.name = 'label';
         }
         opts = {
@@ -140,7 +140,7 @@ export class migrateOverlaySettings1626383147273 implements MigrationInterface {
           set(opts, 'text.lastMessage', JSON.parse(item.value));
         }
         if (item.name === 'cTextLastSubMessage') {
-          set(opts, 'text.lastSubmessage', JSON.parse(item.value));
+          set(opts, 'text.lastSubMessage', JSON.parse(item.value));
         }
         if (item.name === 'cTextStreamBy') {
           set(opts, 'text.streamBy', JSON.parse(item.value));
