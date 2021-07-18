@@ -72,6 +72,9 @@ export class migrateOverlaySettings1626383147273 implements MigrationInterface {
       const clipscarouselSettings = settings.filter((o: any) => o.namespace === '/overlays/clipscarousel') as any;
       for (const item of clipscarouselSettings) {
         await queryRunner.manager.getRepository(`settings`).remove(item);
+        if (item.name === 'cClipsTimeToNextClip') {
+          continue;
+        }
         if (item.name === 'cClipsCustomPeriodInDays') {
           item.name = 'customPeriod';
         }
