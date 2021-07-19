@@ -16,7 +16,9 @@ import { getRepository } from 'typeorm';
 
 import { parserReply } from '../commons';
 import { QuickAction, QuickActions } from '../database/entity/dashboard';
+import { Variable , VariableInterface } from '../database/entity/variable';
 import { getUserSender } from '../helpers/commons';
+import { setValueOf } from '../helpers/customvariables/setValueOf';
 import { info } from '../helpers/log';
 
 @Route('/api/v1/quickaction')
@@ -35,6 +37,34 @@ export class QuickActionController extends Controller {
       data:   actions,
       paging: null,
     };
+  }
+  @Response('401', 'Unauthorized')
+  @Get('/{id}')
+  public async getOne(@Request() req: any, @Path() id: string): Promise<{ data: QuickActions.Item | null, paging: null, customvariable?: VariableInterface | null}> {
+    const userId = req.user.userId as string;
+    let customvariable = null;
+
+    try {
+      const action = await getRepository(QuickAction).findOneOrFail({ where: { userId, id } });
+      if (action.type === 'customvariable') {
+        customvariable = await getRepository(Variable).findOne({ where: { variableName: action.options.customvariable } });
+        if (!customvariable) {
+          setValueOf(action.options.customvariable, '', {});
+        }
+        customvariable = await getRepository(Variable).findOne({ where: { variableName: action.options.customvariable } });
+      }
+      return {
+        data:   action,
+        customvariable,
+        paging: null,
+      };
+    } catch {
+      this.setStatus(404);
+      return {
+        data:   null,
+        paging: null,
+      };
+    }
   }
   @SuccessResponse('201', 'Created')
   @Response('401', 'Unauthorized')
@@ -61,9 +91,10 @@ export class QuickActionController extends Controller {
   public async trigger(@Request() req: any, @Path() id: string): Promise<void> {
     const userId = req.user.userId as string;
     const username = req.user.username as string;
+
     try {
       const item = await getRepository(QuickAction).findOneOrFail({ where: { id, userId } });
-      trigger(item, { userId, username });
+      trigger(item, { userId, username }, req.body.value);
       this.setStatus(200);
     } catch (e) {
       this.setStatus(404);
@@ -89,7 +120,7 @@ export class QuickActionController extends Controller {
   }
 }
 
-const trigger = async (item: QuickActions.Item, user: { userId: string, username: string }) => {
+const trigger = async (item: QuickActions.Item, user: { userId: string, username: string }, value?: string) => {
   info(`Quick Action ${item.id} triggered by ${user.username}#${user.userId}`);
   switch (item.type) {
     case 'command': {
@@ -101,6 +132,10 @@ const trigger = async (item: QuickActions.Item, user: { userId: string, username
         }, 500 * i);
       }
 
+      break;
+    }
+    case 'customvariable': {
+      setValueOf(item.options.customvariable, value, {});
       break;
     }
   }
