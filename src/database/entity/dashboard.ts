@@ -6,6 +6,12 @@ export type CommandItem = QuickActions.defaultAttributes & {
     command: string,
   },
 };
+export type CustomVariableItem = QuickActions.defaultAttributes & {
+  type: 'customvariable',
+  options: QuickActions.defaultOptions & {
+    customvariable: string,
+  },
+};
 export declare namespace QuickActions {
   type defaultAttributes = {
     id: string,
@@ -18,7 +24,7 @@ export declare namespace QuickActions {
     color: string,
   };
 
-  type Item = CommandItem;
+  type Item = CommandItem | CustomVariableItem;
 }
 
 export const QuickAction = new EntitySchema<Readonly<Required<QuickActions.Item>>>({
