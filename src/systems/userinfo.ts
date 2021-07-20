@@ -39,7 +39,7 @@ import ranks from './ranks';
 
 class UserInfo extends System {
   @settings('me')
-  order: string[] = ['$sender', '$level', '$rank', '$role', '$watched', '$points', '$messages', '$tips', '$bits'];
+  order: string[] = ['$sender', '$level', '$rank', '$role', '$watched', '$points', '$messages', '$tips', '$bits', '$subMonths'];
 
   @settings('me')
   _formatDisabled: string[] = ['$role'];
@@ -281,6 +281,11 @@ class UserInfo extends System {
           tipAmount += currency.exchange(Number(t.amount), t.currency, mainCurrency.value);
         }
         message[idx] = Intl.NumberFormat(general.lang, { style: 'currency', currency: mainCurrency.value }).format(tipAmount);
+      }
+
+      if (message.includes('$subMonths')) {
+        const idx = message.indexOf('$subMonths');
+        message[idx] = user.subscribeCumulativeMonths + ' ' + getLocalizedName(user.subscribeCumulativeMonths, translate('core.months'));
       }
 
       if (message.includes('$bits')) {
