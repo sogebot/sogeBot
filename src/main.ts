@@ -160,7 +160,7 @@ async function main () {
 main();
 
 const checkUIUpdates = async () => {
-  if ((process.env.NODE_ENV || 'development') === 'development') {
+  if ((process.env.NODE_ENV || 'development') === 'development' || (global as any).mocha) {
     info('Skipping UI version checks - development mode.');
     return; // do nothing on dev mode
   }

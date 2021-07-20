@@ -4,7 +4,7 @@ const fs = require('fs');
 let status = 0;
 async function retest() {
   const file = fs.readFileSync('report').toString();
-  const regexp = /^  \d\)(.*)$/gm;
+  const regexp = /^ {2}\d\)(.*)$/gm;
   const match = file.match(regexp);
 
   if (match) {
