@@ -11,6 +11,7 @@ import {
 import { broadcasterId } from './helpers/oauth/broadcasterId';
 import { addUIError } from './helpers/panel/alerts';
 import oauth from './oauth';
+import eventlist from './overlays/eventlist';
 import alerts from './registries/alerts';
 
 const pubsubEndpoint: Readonly<string> = 'wss://pubsub-edge.twitch.tv';
@@ -99,6 +100,14 @@ const connect = () => {
         } else {
           redeem(`${dataMessage.data.redemption.user.login}#${dataMessage.data.redemption.user.id} redeemed ${dataMessage.data.redemption.reward.title}`);
         }
+
+        eventlist.add({
+          event:         'rewardredeem',
+          userId:        String(dataMessage.data.redemption.user.id),
+          message:       dataMessage.data.redemption.user_input,
+          timestamp:     Date.now(),
+          titleOfReward: dataMessage.data.redemption.reward.title,
+        });
         alerts.trigger({
           event:      'rewardredeems',
           name:       dataMessage.data.redemption.reward.title,
