@@ -62,7 +62,7 @@ class EventList extends Overlay {
         .getMany();
       if (events) {
         events = _.uniqBy(events, o =>
-          (o.userId + (o.event === 'cheer' ? crypto.randomBytes(64).toString('hex') : o.event)),
+          (o.userId + (['cheer', 'rewardredeem'].includes(o.event) ? crypto.randomBytes(64).toString('hex') : o.event)),
         );
       }
 

@@ -7,6 +7,7 @@ declare namespace EventList {
     isTest?: boolean;
     message?: string;
     amount?: number;
+    titleOfReward?: string;
     currency?: string;
     months?: number;
     bits?: number;

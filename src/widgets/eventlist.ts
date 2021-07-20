@@ -109,6 +109,18 @@ class EventList extends Widget {
               message:    values.message,
             });
             break;
+          case 'rewardredeems':
+            alerts.trigger({
+              event:      eventType,
+              name:       values.titleOfReward,
+              amount:     0,
+              tier:       null,
+              currency:   '',
+              monthsName: '',
+              message:    values.message,
+              recipient:  await users.getNameById(event.userId),
+            });
+            break;
           default:
             error(`Eventtype ${event.event} cannot be retriggered`);
         }

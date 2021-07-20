@@ -304,7 +304,8 @@
       "resub": "<strong>resubbed</strong> you for $subStreak $subStreakName | $tier",
       "resubWithoutStreak": "<strong>resubbed</strong> | $tier | in total of $subCumulativeMonths $subCumulativeMonthsName",
       "cheer": "<strong>cheered</strong> you for $bits bits",
-      "tip": "<strong>tipped</strong> you for $formatted_amount"
+      "tip": "<strong>tipped</strong> you for $formatted_amount",
+      "rewardredeem": "just <strong>redeemed</strong> reward $titleOfReward"
     },
     "responses": {
       "variable": {
