@@ -25,7 +25,7 @@ async function retest() {
           '--grep="' + suite.replace('(!#)', '') + '"',
           '--recursive',
           'test/',
-        ], { shell: true, env: { NODE_ENV: 'development' } });
+        ], { shell: true, env: { ...process.env, NODE_ENV: 'development' } });
 
         let output = '';
         p.stdout.on('data', (data) => {
@@ -88,7 +88,7 @@ async function test() {
       '--exit',
       '--recursive',
       'test/',
-    ], { shell: true, env: { NODE_ENV: 'development' } });
+    ], { shell: true, env: { ...process.env, NODE_ENV: 'development' } });
 
     const report = fs.createWriteStream('report');
     p.stdout.on('data', (data) => {
