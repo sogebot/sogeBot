@@ -4,7 +4,7 @@ const fs = require('fs');
 let status = 0;
 async function retest() {
   const file = fs.readFileSync('report').toString();
-  const regexp = /^  \d\)(.*)$/gm;
+  const regexp = /^ {2}\d\)(.*)$/gm;
   const match = file.match(regexp);
 
   if (match) {
@@ -25,7 +25,7 @@ async function retest() {
           '--grep="' + suite.replace('(!#)', '') + '"',
           '--recursive',
           'test/',
-        ], { shell: true });
+        ], { shell: true, env: { NODE_ENV: 'development' } });
 
         let output = '';
         p.stdout.on('data', (data) => {
@@ -88,7 +88,7 @@ async function test() {
       '--exit',
       '--recursive',
       'test/',
-    ], { shell: true });
+    ], { shell: true, env: { NODE_ENV: 'development' } });
 
     const report = fs.createWriteStream('report');
     p.stdout.on('data', (data) => {
