@@ -4,10 +4,12 @@ Error.stackTraceLimit = Infinity;
 
 import 'reflect-metadata';
 
+import { execSync } from 'child_process';
 import { existsSync, unlinkSync } from 'fs';
 import { normalize } from 'path';
 import util from 'util';
 
+import { HOUR } from '@sogebot/ui-helpers/constants';
 import blocked from 'blocked-at';
 import chalk from 'chalk';
 import figlet from 'figlet';
@@ -156,6 +158,45 @@ async function main () {
 }
 
 main();
+
+const checkUIUpdates = async () => {
+  if ((process.env.NODE_ENV || 'development') === 'development') {
+    info('Skipping UI version checks - development mode.');
+    return; // do nothing on dev mode
+  }
+
+  const packages = [ '@sogebot/ui-admin', '@sogebot/ui-helpers', '@sogebot/ui-oauth', '@sogebot/ui-overlay', '@sogebot/ui-public'];
+
+  for (const pkg of packages) {
+    const versions = JSON.parse(execSync(`npm view ${pkg} versions --json`).toString());
+    const [actualMajor, actualMinor, actualPatch] = execSync(`node -p "require('${pkg}/package.json').version"`).toString().replace('\n', '').split('.');
+    execSync(`node -p "delete require.cache[require.resolve('${pkg}/package.json')]"`);
+
+    let applicableVersion = [actualMajor, actualMinor, actualPatch].join('.');
+    // we are assuming that except first number, we can update
+    // get latest applicable update
+    for (const version of versions) {
+      const [possibleMajor, possibleMinor, possiblePatch] = version.split('.');
+      if (possibleMajor === actualMajor) {
+        if (possibleMinor >= actualMinor || (possibleMinor === actualMinor && possiblePatch >= actualPatch)) {
+          applicableVersion = [possibleMajor, possibleMinor, possiblePatch].join('.');
+        }
+      } else {
+        continue;
+      }
+    }
+
+    if ([actualMajor, actualMinor, actualPatch].join('.') !== applicableVersion) {
+      info(`New version of ${pkg} package found, updating to ${applicableVersion}`);
+      execSync(`npm install ${pkg}@${applicableVersion}`);
+    }
+  }
+};
+
+setInterval(() => {
+  checkUIUpdates();
+}, HOUR);
+checkUIUpdates();
 
 process.on('unhandledRejection', function (reason, p) {
   error(`Possibly Unhandled Rejection at: ${util.inspect(p)} reason: ${reason}`);
