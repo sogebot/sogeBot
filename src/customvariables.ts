@@ -10,6 +10,7 @@ import {
 import { onStartup } from './decorators/on';
 import { getBot } from './helpers/commons';
 import { runScript, updateWidgetAndTitle } from './helpers/customvariables';
+import { csEmitter } from './helpers/customvariables/emitter';
 import { isDbConnected } from './helpers/database';
 import { adminEndpoint } from './helpers/socket';
 
@@ -100,6 +101,7 @@ class CustomVariables extends Core {
         await getRepository(VariableURL).delete({ variableId: IsNull() });
 
         updateWidgetAndTitle(item.variableName);
+        csEmitter.emit('variable-changed', item.variableName);
         cb(null, item.id);
       } catch (e) {
         cb(e.stack, item.id);
