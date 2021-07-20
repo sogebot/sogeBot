@@ -306,7 +306,7 @@
       "resubWithoutStreak": "ti dal <strong>resub</strong> | $tier | celkově $subCumulativeMonths $subCumulativeMonthsName",
       "cheer": "ti dal <strong>cheer</strong> $bits bitů",
       "tip": "ti dal <strong>tip</strong> $formatted_amount",
-      "rewardredeem": "just <strong>redeemed</strong> reward $titleOfReward"
+      "rewardredeem": "si <strong>vyzvedl(a)</strong> odměnu $titleOfReward"
     },
     "responses": {
       "variable": {
