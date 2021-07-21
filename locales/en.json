@@ -1191,6 +1191,7 @@
       "loseWithJackpot": "$sender, you LOST! You now have $points $pointsName. Jackpot increased to $jackpot $jackpotName",
       "lose": "$sender, you LOST! You now have $points $pointsName",
       "currentJackpot": "$sender, current jackpot for $command is $points $pointsName",
+      "winJackpotCount": "$sender, you won $count jackpots",
       "jackpotIsDisabled": "$sender, jackpot is disabled for $command."
     }
   },

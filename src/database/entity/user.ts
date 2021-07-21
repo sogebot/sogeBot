@@ -12,6 +12,7 @@ export interface UserInterface {
   subscribeTier?: string; subscribeCumulativeMonths?: number; subscribeStreak?: number; giftedSubscribes?: number;
   messages?: number;
   extra: {
+    jackpotWins?: number;
     levels?: {
       xp: string; // we need to use string as we cannot stringify bigint in typeorm
       xpOfflineGivenAt: number;
