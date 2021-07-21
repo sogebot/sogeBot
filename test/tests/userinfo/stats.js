@@ -25,11 +25,11 @@ describe('Userinfo - stats()', () => {
 
   it('!stats testuser should show testuser data', async () => {
     const r = await userinfo.showStats({ parameters: user.viewer.username, sender: user.owner });
-    assert.strictEqual(r[0].response, `$touser | Level ${level} | ${hours}h | ${points} points | ${messages} messages | €${tips} | ${bits} bits`, user.owner, 1000);
+    assert.strictEqual(r[0].response, `$touser | Level ${level} | ${hours}h | ${points} points | ${messages} messages | €${tips} | ${bits} bits | 0 months`, user.owner, 1000);
   });
 
   it('!stats should show owner data', async () => {
     const r = await userinfo.showStats({ parameters: '', sender: user.owner });
-    assert.strictEqual(r[0].response, `$sender | Level ${level} | ${hours}h | ${points} points | ${messages} messages | €${tips} | ${bits} bits`, user.owner, 1000);
+    assert.strictEqual(r[0].response, `$sender | Level ${level} | ${hours}h | ${points} points | ${messages} messages | €${tips} | ${bits} bits | 0 months`, user.owner, 1000);
   });
 });
