@@ -15,7 +15,7 @@ import {
 import { getRepository } from 'typeorm';
 
 import {
-  OverlayMapper, OverlayMapperAlerts, OverlayMapperClips, OverlayMapperClipsCarousel, OverlayMapperCredits, OverlayMapperEmotes, OverlayMapperEmotesCombo, OverlayMapperEmotesExplode, OverlayMapperEmotesFireworks, OverlayMapperInterface, OverlayMapperOBSWebsocket, OverlayMapperPolls, OverlayMappers, OverlayMapperTTS,
+  OverlayMapper, OverlayMapperAlerts, OverlayMapperClips, OverlayMapperClipsCarousel, OverlayMapperCredits, OverlayMapperEmotes, OverlayMapperEmotesCombo, OverlayMapperEmotesExplode, OverlayMapperEmotesFireworks, OverlayMapperEventlist, OverlayMapperInterface, OverlayMapperOBSWebsocket, OverlayMapperPolls, OverlayMappers, OverlayMapperTTS,
 } from '../../database/entity/overlay';
 
 @Route('/api/v1/overlay')
@@ -67,6 +67,7 @@ export class RegistryOverlayController extends Controller {
     @Path() id: string,
       @Body() data:
       Partial<OverlayMapperAlerts>
+      | Partial<OverlayMapperEventlist>
       | Partial<OverlayMapperEmotesCombo>
       | Partial<OverlayMapperCredits>
       | Partial<OverlayMapperClips>

@@ -47,13 +47,13 @@ class EventList extends Overlay {
         };
       }));
     });
-    publicEndpoint(this.nsp, 'getEvents', async (opts: { ignore: string; limit: number }, cb) => {
+    publicEndpoint(this.nsp, 'getEvents', async (opts: { ignore: string[]; limit: number }, cb) => {
       let events = await getRepository(EventListEntity)
         .createQueryBuilder('events')
         .select('events')
         .orderBy('events.timestamp', 'DESC')
         .where(new Brackets(qb => {
-          const ignored = opts.ignore.split(',').map(value => value.trim());
+          const ignored = opts.ignore.map(value => value.trim());
           for (let i = 0; i < ignored.length; i++) {
             qb.andWhere(`events.event != :event_${i}`, { ['event_' + i]: ignored[i] });
           }
