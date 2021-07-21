@@ -305,7 +305,8 @@
       "resub": "<strong>ti ha riabbonato a</strong> per $subStreak $subStreakName <unk> $tier",
       "resubWithoutStreak": "<strong>ti ha riabbonato</strong> <unk> $tier <unk> in totale di $subCumulativeMonths $subCumulativeMonthsName",
       "cheer": "<strong>ti ha rallegrato</strong> per $bits bit",
-      "tip": "<strong>ti ha dato una mancia</strong> per $formatted_amount"
+      "tip": "<strong>ti ha dato una mancia</strong> per $formatted_amount",
+      "rewardredeem": "just <strong>redeemed</strong> reward $titleOfReward"
     },
     "responses": {
       "variable": {
@@ -1185,6 +1186,7 @@
       "loseWithJackpot": "$sender, LOST! Ora hai $points $pointsName. Il Jackpot è aumentato a $jackpot $jackpotName",
       "lose": "$sender, LOST! Ora hai $points $pointsName",
       "currentJackpot": "$sender, il jackpot attuale per $command è $points $pointsName",
+      "winJackpotCount": "$sender, you won $count jackpots",
       "jackpotIsDisabled": "$sender, il jackpot è disabilitato per $command."
     }
   },
