@@ -508,6 +508,7 @@ describe('Permissions - check()', () => {
         let messages = '0';
         let tips = '0.00';
         let bits = '0';
+        let months = '0';
         let rank = '';
         if (users[j].username === '__viewer_points__') {
           points = '100';
@@ -530,7 +531,10 @@ describe('Permissions - check()', () => {
         if (users[j].username === '__viewer_level5__') {
           level = 'Level 5';
         }
-        assert.strictEqual(r[0].response, `$sender | ${level} | ${rank}${hours}h | ${points} points | ${messages} messages | €${tips} | ${bits} bits`);
+        if (users[j].username === '__viewer_subcumulativemonths__') {
+          months = '2';
+        }
+        assert.strictEqual(r[0].response, `$sender | ${level} | ${rank}${hours}h | ${points} points | ${messages} messages | €${tips} | ${bits} bits | ${months} months`);
       });
     }
   });
