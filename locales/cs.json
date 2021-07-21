@@ -1186,6 +1186,7 @@
       "loseWithJackpot": "$sender, PROHRÁLS! Aktuálně máš $points $pointsName. Jackpot se zvýšil na $jackpot $jackpotName",
       "lose": "$sender, PROHRÁLS! Aktuálně máš $points $pointsName",
       "currentJackpot": "$sender, současný jackpot pro $command je $points $pointsName",
+      "winJackpotCount": "$sender, you won $count jackpots",
       "jackpotIsDisabled": "$sender, jackpot je vypnutý pro $command."
     }
   },
