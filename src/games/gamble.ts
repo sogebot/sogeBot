@@ -1,4 +1,6 @@
-import _ from 'lodash';
+import {
+  get, isNil, random, set, 
+} from 'lodash';
 import { getRepository } from 'typeorm';
 
 import { User } from '../database/entity/user';
@@ -11,6 +13,7 @@ import { getUserHighestPermission } from '../helpers/permissions/';
 import { getPointsName } from '../helpers/points';
 import pointsSystem from '../systems/points';
 import { translate } from '../translate';
+import users from '../users';
 import Game from './_interface';
 
 const ERROR_NOT_ENOUGH_OPTIONS = '0';
@@ -55,7 +58,7 @@ class Gamble extends Game {
     opts.sender['message-type'] = 'chat'; // force responses to chat
     try {
       const parsed = opts.parameters.trim().match(/^([\d]+|all)$/);
-      if (_.isNil(parsed)) {
+      if (isNil(parsed)) {
         throw Error(ERROR_NOT_ENOUGH_OPTIONS);
       }
 
@@ -79,9 +82,14 @@ class Gamble extends Game {
 
       const chanceToWin = await this.getPermissionBasedSettingsValue('chanceToWin');
       const chanceToTriggerJackpot = await this.getPermissionBasedSettingsValue('chanceToTriggerJackpot');
-      if (this.enableJackpot && _.random(0, 100, false) <= chanceToTriggerJackpot[permId]) {
+      if (this.enableJackpot && random(0, 100, false) <= chanceToTriggerJackpot[permId]) {
         const incrementPointsWithJackpot = (points * 2) + this.jackpotValue;
         await getRepository(User).increment({ userId: opts.sender.userId }, 'points', incrementPointsWithJackpot);
+
+        const user = await users.getUserByUsername(opts.sender.username);
+        set(user, 'extra.jackpotWins', get(user, 'extra.jackpotWins', 0) + 1);
+        await getRepository(User).save(user);
+
         const currentPointsOfUser = await pointsSystem.getPointsOf(opts.sender.userId);
         message = prepare('gambling.gamble.winJackpot', {
           pointsName:  getPointsName(currentPointsOfUser),
@@ -90,7 +98,7 @@ class Gamble extends Game {
           jackpot:     this.jackpotValue,
         });
         this.jackpotValue = 0;
-      } else if (_.random(0, 100, false) <= chanceToWin[permId]) {
+      } else if (random(0, 100, false) <= chanceToWin[permId]) {
         await getRepository(User).increment({ userId: opts.sender.userId }, 'points', points * 2);
         const updatedPoints = await pointsSystem.getPointsOf(opts.sender.userId);
         message = prepare('gambling.gamble.win', {
@@ -152,6 +160,21 @@ class Gamble extends Game {
         command:    this.getCommand('!gamble'),
         pointsName: getPointsName(this.jackpotValue),
         points:     this.jackpotValue,
+      });
+    } else {
+      message = prepare('gambling.gamble.jackpotIsDisabled', { command: this.getCommand('!gamble') });
+    }
+    return [{ response: message, ...opts }];
+  }
+
+  @command('!gamble wins')
+  async wins (opts: CommandOptions): Promise<CommandResponse[]> {
+    let message: string;
+    const user = await users.getUserByUsername(opts.sender.username);
+    if (this.enableJackpot) {
+      message = prepare('gambling.gamble.winJackpotCount', {
+        command: this.getCommand('!gamble wins'),
+        count:   get(user, 'extra.jackpotWins', 0),
       });
     } else {
       message = prepare('gambling.gamble.jackpotIsDisabled', { command: this.getCommand('!gamble') });
