@@ -13,8 +13,8 @@
   "invalid_regexp_format": "Questo non è un regex valido.",
   "owner_and_broadcaster_oauth_is_not_set": "Proprietario e emittente oauth non è impostato",
   "channel_is_not_set": "Il canale non è impostato",
-  "please_set_your_broadcaster_oauth_or_owners": "Si prega di impostare <a href=\"#/settings/core/oauth\">l'emittente o i proprietari</a>, o tutti gli utenti <strong>avranno accesso</strong> a questa dashboard e saranno considerati <strong>caster</strong>.",
-  "please_set_your_channel": "Per favore imposta il tuo <a href=\"#/settings/core/oauth\">canale</a>o il bot <strong>non saprà</strong> dove connettersi e <strong>non funzionerà</strong>.",
+  "please_set_your_broadcaster_oauth_or_owners": "Please set your <a href=\"#/settings/modules/core/oauth\">broadcaster oauth or owners</a>, or all users <strong>will have access</strong> to this dashboard and will be considered as <strong>casters</strong>.",
+  "please_set_your_channel": "Please set your <a href=\"#/settings/modules/core/oauth\">channel</a>, or bot <strong>won't know</strong> where to connect and <strong>will not be working</strong>.",
   "new_update_available": "Nuovo aggiornamento disponibile",
   "new_bot_version_available_at": "Nuova versione del bot $version disponibile su <a href=\"https://github.com/sogehige/sogeBot/releases/tag/$version\">GitHub</a>.",
   "one_of_inputs_must_be_set": "Uno degli input deve essere impostato"
