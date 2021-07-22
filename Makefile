@@ -57,7 +57,7 @@ pack:
 	@echo -ne "\n\t ----- Packing into sogeBot-$(VERSION).zip\n"
 	@cp ./src/data/.env* ./
 	@cp ./src/data/.env.sqlite ./.env
-	@npx bestzip sogeBot-$(VERSION).zip .npmrc .env* package-lock.json patches/ dest/ locales/ public/ LICENSE package.json docs/ AUTHORS tools/ bin/ bat/ fonts.json
+	@npx bestzip sogeBot-$(VERSION).zip .npmrc .env* package-lock.json patches/ dest/ locales/ public/ LICENSE package.json docs/ AUTHORS tools/ bin/ bat/ fonts.json assets/
 
 prepare:
 	@echo -ne "\n\t ----- Cleaning up node_modules\n"
