@@ -159,7 +159,7 @@ export const init = () => {
     }
 
     const filepath = path.join(nuxtCache.get(req.url) ?? '') as string;
-    if (fs.existsSync(filepath)) { // lgtm [js/path-injection]
+    if (fs.existsSync(filepath) && nuxtCache.has(req.url)) { // lgtm [js/path-injection]
       res.sendFile(filepath);
     } else {
       res.sendStatus(404);
@@ -182,7 +182,7 @@ export const init = () => {
       }
     }
     const filepath = path.join(nuxtCache.get(req.url) ?? '');
-    if (fs.existsSync(filepath)) { // lgtm [js/path-injection]
+    if (fs.existsSync(filepath) && nuxtCache.has(req.url)) { // lgtm [js/path-injection]
       res.sendFile(filepath);
     } else {
       nuxtCache.delete(req.url);
