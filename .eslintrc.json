@@ -77,7 +77,7 @@
       "jsx": true
     },
     "useJSXTextNode": true,
-    "project": [ "./tsconfig.json" ],
+    "project": [ "./tsconfig.eslint.json" ],
     "tsconfigRootDir": "./",
     "extraFileExtensions": [".vue"]
   },

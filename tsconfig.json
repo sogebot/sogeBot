@@ -23,15 +23,15 @@
     "baseUrl": "./src",
     "outDir": "./dest",
     "inlineSourceMap": true,
-    "typeRoots": ["./node_modules/@types"],
-    "allowJs": true,
+    "typeRoots": ["./node_modules/@types"]
   },
   "include": [
-    "./**/*",
+    "./",
     "../d.ts/types.d.ts",
     "../d.ts/*",
   ],
   "exclude": [
+    "test",
     "node_modules"
   ]
 }
