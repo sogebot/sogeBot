@@ -77,12 +77,13 @@
       "jsx": true
     },
     "useJSXTextNode": true,
-    "project": [ "./tsconfig.json", "./src/bot/tsconfig.json" ],
+    "project": [ "./tsconfig.json" ],
     "tsconfigRootDir": "./",
     "extraFileExtensions": [".vue"]
   },
   "env": {
-    "node": true
+    "node": true,
+    "mocha": true
   },
   "settings": {
     "import/resolver": {

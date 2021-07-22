@@ -72,7 +72,7 @@ describe('Message - https://discordapp.com/channels/317348946144002050/619437014
         userId:    String(i),
         bits:      i,
         message:   `message${i-30}`,
-        timestamp: Date.now(),
+        timestamp: 4000 * i,
       });
     }
   });
