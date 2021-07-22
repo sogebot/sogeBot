@@ -222,9 +222,9 @@ class HowLongToBeat extends System {
       return [{ response: prepare('systems.howlongtobeat.error', { game: gameInput }), ...opts }];
     }
     const timestamps = await getRepository(HowLongToBeatGameItem).find({ where: { hltb_id: gameToShow.id } });
-    const timeToBeatMain = timestamps.filter(o => o.isMainCounted).reduce((prev, cur) => prev += cur.timestamp + cur.offset , 0) + (gameToShow.offset / constants.HOUR);
-    const timeToBeatMainExtra = timestamps.filter(o => o.isExtraCounted).reduce((prev, cur) => prev += cur.timestamp + cur.offset, 0) + (gameToShow.offset / constants.HOUR);
-    const timeToBeatCompletionist = timestamps.filter(o => o.isCompletionistCounted).reduce((prev, cur) => prev += cur.timestamp + cur.offset, 0) + (gameToShow.offset / constants.HOUR);
+    const timeToBeatMain = (timestamps.filter(o => o.isMainCounted).reduce((prev, cur) => prev += cur.timestamp + cur.offset , 0) + gameToShow.offset) / constants.HOUR;
+    const timeToBeatMainExtra = (timestamps.filter(o => o.isExtraCounted).reduce((prev, cur) => prev += cur.timestamp + cur.offset, 0) + gameToShow.offset) / constants.HOUR;
+    const timeToBeatCompletionist = (timestamps.filter(o => o.isCompletionistCounted).reduce((prev, cur) => prev += cur.timestamp + cur.offset, 0) + gameToShow.offset) / constants.HOUR;
 
     const gameplayMain = gameToShow.gameplayMain;
     const gameplayMainExtra = gameToShow.gameplayMainExtra;
