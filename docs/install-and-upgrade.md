@@ -67,6 +67,10 @@
 - Set your [database environment](configuration/database)
 - Add bot as channel editor
   in [Permissions settings](http://twitch.tv/dashboard/permissions) on Twitch
+- be sure that you have latest npm installed
+
+    `npm install -g npm@latest`
+
 - before starting a bot, you need to install npm dependencies
 
     `npm ci`
@@ -98,6 +102,10 @@
 - Set your [database environment](configuration/database)
 - Add bot as channel editor
   in [Permissions settings](http://twitch.tv/dashboard/permissions) on Twitch
+- be sure that you have latest npm installed
+
+    `npm install -g npm@latest`
+
 - before starting a bot, you need to build a bot
 
     `make`
@@ -113,8 +121,9 @@
 
 1. Backup your database
 2. Update bot with `git pull -r origin master`
-3. Run `make`
-4. Start bot `npm start`
+3. Run `npm install -g npm@latest`
+4. Run `make`
+5. Start bot `npm start`
 
 ## Unofficial Installer
 
