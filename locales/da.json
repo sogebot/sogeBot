@@ -423,6 +423,7 @@
         "source": "Nuværende kilde (Twitch eller Discord)",
         "userInput": "User input during reward redeem",
         "isBotSubscriber": "Er bot sub? (bool)",
+        "isStreamOnline": "Is stream online (bool)",
         "is": {
           "moderator": "Er bruger mod? (bool)",
           "subscriber": "Er bruger sub? (bool)",
