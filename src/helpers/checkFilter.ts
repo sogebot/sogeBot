@@ -4,7 +4,7 @@ import { getRepository } from 'typeorm';
 
 import { User } from '../database/entity/user';
 import ranks from '../systems/ranks';
-import { stats } from './api';
+import { isStreamOnline, stats } from './api';
 import { getAll } from './customvariables';
 import {
   isOwner, isSubscriber, isVIP,
@@ -58,6 +58,7 @@ export const checkFilter = async (opts: CommandOptions | ParserOptions, filter: 
     $followers:       stats.value.currentFollowers,
     $subscribers:     stats.value.currentSubscribers,
     $isBotSubscriber: isBotSubscriber(),
+    $isStreamOnline:  isStreamOnline.value,
     ...customVariables,
   };
   let result =  false;

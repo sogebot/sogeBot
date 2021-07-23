@@ -37,10 +37,11 @@ class Message {
       title:           stats.value.currentTitle,
       source:          opts.sender && typeof opts.sender.discord !== 'undefined' ? 'discord' : 'twitch',
       isBotSubscriber: isBotSubscriber(),
+      isStreamOnline:  isStreamOnline.value,
     };
     for (const variable of Object.keys(variables)) {
       const regexp = new RegExp(`\\$${variable}`, 'g');
-      this.message = this.message.replace(regexp, String(variables[variable as keyof typeof variables] || ''));
+      this.message = this.message.replace(regexp, String(variables[variable as keyof typeof variables] ?? ''));
     }
 
     const version = _.get(process, 'env.npm_package_version', 'x.y.z');

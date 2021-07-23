@@ -725,6 +725,7 @@ class Events extends Core {
       $followers:       stats.value.currentFollowers,
       $subscribers:     stats.value.currentSubscribers,
       $isBotSubscriber: isBotSubscriber(),
+      $isStreamOnline:  isStreamOnline.value,
       ...customVariables,
     };
     let result = false;
