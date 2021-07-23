@@ -19,8 +19,9 @@ ifeq ($(ENV),production)
 	npm ci --also=dev
 else
 	npm cache clean --force
-	rm package-lock.json
+	rm package-lock.json || true
 	npm install --also=dev
+	sed -i 's/git+ssh/git+https/g' package-lock.json
 endif
 	@echo -ne "\n\t ----- Installation of simple-git-hooks\n"
 	git config core.hooksPath .git/hooks/
