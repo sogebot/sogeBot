@@ -423,6 +423,7 @@
         "source": "Current source (twitch or discord)",
         "userInput": "User input during reward redeem",
         "isBotSubscriber": "Is bot subscriber (bool)",
+        "isStreamOnline": "Is stream online (bool)",
         "is": {
           "moderator": "Пользователь модератор? (bool)",
           "subscriber": "Пользователь сабскрайбер? (bool)",
