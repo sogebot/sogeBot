@@ -423,6 +423,7 @@
         "source": "Aktuální zdroj (twitch nebo discord)",
         "userInput": "Vstup uživatele během odměny",
         "isBotSubscriber": "Je bot předplatitelem (bool)",
+        "isStreamOnline": "Is stream online (bool)",
         "is": {
           "moderator": "Je uživatel mod? (bool)",
           "subscriber": "Je uživatel sub? (bool)",
