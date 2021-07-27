@@ -65,6 +65,15 @@ let intervalBot: NodeJS.Timeout;
 let intervalBroadcasterPONG = Date.now();
 let intervalBotPONG = Date.now();
 
+const refreshedToken = {
+  bot:         0,
+  broadcaster: 0,
+};
+const warningRefreshedToken = {
+  bot:         false,
+  broadcaster: false,
+};
+
 class TMI extends Core {
   shouldConnect = false;
 
@@ -216,7 +225,22 @@ class TMI extends Core {
         token,
         username,
         log,
-        onAuthenticationFailure: () => oauth.refreshAccessToken(type).then(refresh_token => refresh_token),
+        onAuthenticationFailure: () => {
+          return new Promise(_resolve => {
+            if (Date.now() - refreshedToken[type] > constants.HOUR) {
+              warning(`Refresh of ${type} token triggered by TMI onAuthenticationFailure.`);
+              refreshedToken[type] = Date.now();
+              oauth.refreshAccessToken(type).then(refresh_token => _resolve(refresh_token));
+            } else {
+              if (!warningRefreshedToken[type]) {
+                warning(`Token was refreshed recently, but ${type} connection to TMI failed. Bot will retry connection until will connect.`);
+                warningRefreshedToken[type] = true;
+              }
+              setTimeout(() => this.initClient(type), constants.MINUTE * 1);
+              _resolve('');
+            }
+          });
+        },
       });
       await (this.client[type] as TwitchJs).chat.connect();
       await this.join(type, channel);
@@ -270,9 +294,24 @@ class TMI extends Core {
       await client.chat.reconnect({
         token,
         username,
-        onAuthenticationFailure: () => oauth.refreshAccessToken(type).then(refresh_token => refresh_token),
-        connectionTimeout:       60000,
-        joinTimeout:             60000,
+        onAuthenticationFailure: () => {
+          return new Promise(_resolve => {
+            if (Date.now() - refreshedToken[type] > constants.HOUR) {
+              warning(`Refresh of ${type} token triggered by TMI onAuthenticationFailure.`);
+              refreshedToken[type] = Date.now();
+              oauth.refreshAccessToken(type).then(refresh_token => _resolve(refresh_token));
+            } else {
+              if (!warningRefreshedToken[type]) {
+                warning(`Token was refreshed recently, but ${type} connection to TMI failed. Bot will retry connection until will connect.`);
+                warningRefreshedToken[type] = true;
+              }
+              setTimeout(() => this.initClient(type), constants.MINUTE * 1);
+              _resolve('');
+            }
+          });
+        },
+        connectionTimeout: 60000,
+        joinTimeout:       60000,
       });
 
       this.loadListeners(type);
@@ -297,6 +336,7 @@ class TMI extends Core {
         info(`TMI: ${type} joined channel ${channel}`);
         if (type ==='bot') {
           setStatus('TMI', constants.CONNECTED);
+          warningRefreshedToken[type] = false;
         }
         this.channel = channel;
 
