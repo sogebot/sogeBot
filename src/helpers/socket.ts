@@ -129,6 +129,7 @@ function adminEndpoint (nsp: string, on: 'integration::obswebsocket::listScene',
 function adminEndpoint (nsp: string, on: 'integration::obswebsocket::listSources', callback: (cb: (error: Error | string | null, scenes: any, types: any) => void, socket: Socket) => void): void;
 function adminEndpoint (nsp: string, on: 'integration::obswebsocket::test', callback: (item: OBSWebsocketInterface['simpleModeTasks'] | string, cb: (error: Error | string | null) => void, socket: Socket) => void): void;
 function adminEndpoint (nsp: string, on: 'generic::setCoreCommand', callback: (commands: any, cb: (error: Error | string | null) => void, socket: Socket) => void): void;
+function adminEndpoint (nsp: string, on: 'test.event', callback: (opts: { id: string, randomized: string[], values: any[], variables: string[] }, cb: (error: Error | string | null) => void, socket: Socket) => void): void;
 
 // generic functions
 function adminEndpoint (nsp: string, on: string, callback: (opts: { [x: string]: any }, cb?: (error: Error | string | null, ...response: any) => void) => void, socket?: Socket): void;

@@ -3,7 +3,9 @@ import { setTimeout } from 'timers'; // tslint workaround
 import { sample } from '@sogebot/ui-helpers/array';
 import { generateUsername } from '@sogebot/ui-helpers/generateUsername';
 import axios from 'axios';
-import _ from 'lodash';
+import _, {
+  clone, cloneDeep, get, isNil, random,
+} from 'lodash';
 import safeEval from 'safe-eval';
 import { getRepository } from 'typeorm';
 
@@ -31,7 +33,6 @@ import { csEmitter } from './helpers/customvariables/emitter';
 import { isDbConnected } from './helpers/database';
 import { dayjs } from './helpers/dayjs';
 import { eventEmitter } from './helpers/events/emitter';
-import { flatten } from './helpers/flatten';
 import { getLocalizedName } from './helpers/getLocalized';
 import {
   debug, error, info, warning,
@@ -52,7 +53,6 @@ import { getIdFromTwitch } from './microservices/getIdFromTwitch';
 import { setTitleAndGame } from './microservices/setTitleAndGame';
 import oauth from './oauth';
 import tmi from './tmi';
-import { translate } from './translate';
 import users from './users';
 
 const excludedUsers = new Set<string>();
@@ -223,7 +223,7 @@ class Events extends Core {
   }
 
   public async fire(eventId: string, attributes: EventsEntity.Attributes): Promise<void> {
-    attributes = _.cloneDeep(attributes) || {};
+    attributes = cloneDeep(attributes) || {};
     debug('events', JSON.stringify({ eventId, attributes }));
 
     if (!attributes.isAnonymous) {
@@ -261,7 +261,7 @@ class Events extends Core {
         };
       }
     }
-    if (!_.isNil(_.get(attributes, 'recipient', null))) {
+    if (!isNil(get(attributes, 'recipient', null))) {
       const user = await getRepository(User).findOne({ username: attributes.recipient });
       if (!user) {
         await getRepository(User).save({
@@ -282,7 +282,7 @@ class Events extends Core {
         owner:       isOwner(attributes.recipient),
       };
     }
-    if (_.get(attributes, 'reset', false)) {
+    if (get(attributes, 'reset', false)) {
       this.reset(eventId);
       return;
     }
@@ -295,8 +295,8 @@ class Events extends Core {
       },
     }))) {
       const [shouldRunByFilter, shouldRunByDefinition] = await Promise.all([
-        this.checkFilter(event, _.cloneDeep(attributes)),
-        this.checkDefinition(_.clone(event), _.cloneDeep(attributes)),
+        this.checkFilter(event, cloneDeep(attributes)),
+        this.checkDefinition(clone(event), cloneDeep(attributes)),
       ]);
       if ((!shouldRunByFilter || !shouldRunByDefinition)) {
         continue;
@@ -308,7 +308,7 @@ class Events extends Core {
         if (isOperationSupported) {
           const foundOp = this.supportedOperationsList.find((o) =>  o.id === operation.name);
           if (foundOp) {
-            foundOp.fire(operation.definitions, _.cloneDeep(attributes));
+            foundOp.fire(operation.definitions, cloneDeep(attributes));
           }
         }
       }
@@ -416,7 +416,7 @@ class Events extends Core {
   }
 
   public async fireRunCommand(operation: EventsEntity.OperationDefinitions, attributes: EventsEntity.Attributes) {
-    const username = _.isNil(attributes.username) ? getOwner() : attributes.username;
+    const username = isNil(attributes.username) ? getOwner() : attributes.username;
     const userId = attributes.userId ? attributes.userId : await users.getIdByName(username);
 
     let command = String(operation.commandToRun);
@@ -435,7 +435,7 @@ class Events extends Core {
         sender:  { username, userId: String(userId) },
         message: command,
         skip:    true,
-        quiet:   _.get(operation, 'isCommandQuiet', false) as boolean,
+        quiet:   get(operation, 'isCommandQuiet', false) as boolean,
       }, (responses) => {
         for (let i = 0; i < responses.length; i++) {
           setTimeout(async () => {
@@ -450,13 +450,13 @@ class Events extends Core {
           message: command,
         },
         skip:  true,
-        quiet: !!_.get(operation, 'isCommandQuiet', false),
+        quiet: !!get(operation, 'isCommandQuiet', false),
       });
     }
   }
 
   public async fireSendChatMessageOrWhisper(operation: EventsEntity.OperationDefinitions, attributes: EventsEntity.Attributes, whisper: boolean): Promise<void> {
-    const username = _.isNil(attributes.username) ? getOwner() : attributes.username;
+    const username = isNil(attributes.username) ? getOwner() : attributes.username;
     let userId = attributes.userId;
     const userObj = await getRepository(User).findOne({ username });
     if (!userObj && !attributes.test) {
@@ -561,8 +561,8 @@ class Events extends Core {
 
   public async everyXMinutesOfStream(event: EventInterface) {
     // set to Date.now() because 0 will trigger event immediatelly after stream start
-    const shouldSave = _.get(event, 'triggered.runEveryXMinutes', 0) === 0 || typeof _.get(event, 'triggered.runEveryXMinutes', 0) !== 'number';
-    event.triggered.runEveryXMinutes = _.get(event, 'triggered.runEveryXMinutes', Date.now());
+    const shouldSave = get(event, 'triggered.runEveryXMinutes', 0) === 0 || typeof get(event, 'triggered.runEveryXMinutes', 0) !== 'number';
+    event.triggered.runEveryXMinutes = get(event, 'triggered.runEveryXMinutes', Date.now());
 
     const shouldTrigger = Date.now() - new Date(event.triggered.runEveryXMinutes).getTime() >= Number(event.definitions.runEveryXMinutes) * 60 * 1000;
     if (shouldTrigger || shouldSave) {
@@ -593,7 +593,7 @@ class Events extends Core {
     if (!isStreamOnline.value) {
       return false;
     }
-    event.triggered.runAfterXMinutes = _.get(event, 'triggered.runAfterXMinutes', 0);
+    event.triggered.runAfterXMinutes = get(event, 'triggered.runAfterXMinutes', 0);
     const shouldTrigger = event.triggered.runAfterXMinutes === 0
                           && Number(dayjs.utc().unix()) - Number(dayjs.utc(streamStatusChangeSince.value).unix()) > Number(event.definitions.runAfterXMinutes) * 60;
     if (shouldTrigger) {
@@ -604,7 +604,7 @@ class Events extends Core {
   }
 
   public async checkNumberOfViewersIsAtLeast(event: EventInterface) {
-    event.triggered.runInterval = _.get(event, 'triggered.runInterval', 0);
+    event.triggered.runInterval = get(event, 'triggered.runInterval', 0);
 
     event.definitions.runInterval = Number(event.definitions.runInterval); // force Integer
     event.definitions.viewersAtLeast = Number(event.definitions.viewersAtLeast); // force Integer
@@ -627,8 +627,8 @@ class Events extends Core {
     let shouldTrigger = false;
     attributes.message += ' ';
     if (attributes.message.match(regexp)) {
-      event.triggered.runEveryXCommands = _.get(event, 'triggered.runEveryXCommands', 0);
-      event.triggered.runInterval = _.get(event, 'triggered.runInterval', 0);
+      event.triggered.runEveryXCommands = get(event, 'triggered.runEveryXCommands', 0);
+      event.triggered.runInterval = get(event, 'triggered.runInterval', 0);
 
       event.definitions.runInterval = Number(event.definitions.runInterval); // force Integer
       event.triggered.runInterval = Number(event.triggered.runInterval); // force Integer
@@ -654,8 +654,8 @@ class Events extends Core {
     attributes.message += ' ';
     const match = attributes.message.match(regexp);
     if (match) {
-      event.triggered.runEveryXKeywords = _.get(event, 'triggered.runEveryXKeywords', 0);
-      event.triggered.runInterval = _.get(event, 'triggered.runInterval', 0);
+      event.triggered.runEveryXKeywords = get(event, 'triggered.runEveryXKeywords', 0);
+      event.triggered.runInterval = get(event, 'triggered.runInterval', 0);
 
       event.definitions.runInterval = Number(event.definitions.runInterval); // force Integer
       event.triggered.runInterval = Number(event.triggered.runInterval); // force Integer
@@ -696,28 +696,28 @@ class Events extends Core {
     const customVariables = await getAll();
     const toEval = `(function evaluation () { return ${event.filter} })()`;
     const context = {
-      $username: _.get(attributes, 'username', null),
-      $source:   _.get(attributes, 'source', null),
+      $username: get(attributes, 'username', null),
+      $source:   get(attributes, 'source', null),
       $is:       {
-        moderator:   _.get(attributes, 'is.moderator', false),
-        subscriber:  _.get(attributes, 'is.subscriber', false),
-        vip:         _.get(attributes, 'is.vip', false),
-        follower:    _.get(attributes, 'is.follower', false),
-        broadcaster: _.get(attributes, 'is.broadcaster', false),
-        bot:         _.get(attributes, 'is.bot', false),
-        owner:       _.get(attributes, 'is.owner', false),
+        moderator:   get(attributes, 'is.moderator', false),
+        subscriber:  get(attributes, 'is.subscriber', false),
+        vip:         get(attributes, 'is.vip', false),
+        follower:    get(attributes, 'is.follower', false),
+        broadcaster: get(attributes, 'is.broadcaster', false),
+        bot:         get(attributes, 'is.bot', false),
+        owner:       get(attributes, 'is.owner', false),
       },
-      $method:          _.get(attributes, 'method', null),
-      $months:          _.get(attributes, 'months', null),
-      $monthsName:      _.get(attributes, 'monthsName', null),
-      $message:         _.get(attributes, 'message', null),
-      $command:         _.get(attributes, 'command', null),
-      $count:           _.get(attributes, 'count', null),
-      $bits:            _.get(attributes, 'bits', null),
-      $reason:          _.get(attributes, 'reason', null),
-      $target:          _.get(attributes, 'target', null),
-      $viewers:         _.get(attributes, 'viewers', null),
-      $duration:        _.get(attributes, 'duration', null),
+      $method:          get(attributes, 'method', null),
+      $months:          get(attributes, 'months', null),
+      $monthsName:      get(attributes, 'monthsName', null),
+      $message:         get(attributes, 'message', null),
+      $command:         get(attributes, 'command', null),
+      $count:           get(attributes, 'count', null),
+      $bits:            get(attributes, 'bits', null),
+      $reason:          get(attributes, 'reason', null),
+      $target:          get(attributes, 'target', null),
+      $viewers:         get(attributes, 'viewers', null),
+      $duration:        get(attributes, 'duration', null),
       // add global variables
       $game:            stats.value.currentGame,
       $title:           stats.value.currentTitle,
@@ -779,74 +779,72 @@ class Events extends Core {
       }
     });
 
-    adminEndpoint(this.nsp, 'test.event', async (eventId, cb) => {
+    adminEndpoint(this.nsp, 'test.event', async ({ id, randomized, values, variables }, cb) => {
       try {
-        const username = sample(['short', 'someFreakingLongUsername', generateUsername()]);
-        const recipient = sample(['short', 'someFreakingLongUsername', generateUsername()]);
-        const months = _.random(0, 99, false);
-        const attributes = {
-          test:   true,
-          userId: '0',
-          username,
-          is:     {
-            moderator:   _.random(0, 1, false) === 0,
-            subscriber:  _.random(0, 1, false) === 0,
-            broadcaster: _.random(0, 1, false) === 0,
-            bot:         _.random(0, 1, false) === 0,
-            owner:       _.random(0, 1, false) === 0,
-          },
-          recipient,
-          recipientis: {
-            moderator:   _.random(0, 1, false) === 0,
-            subscriber:  _.random(0, 1, false) === 0,
-            broadcaster: _.random(0, 1, false) === 0,
-            bot:         _.random(0, 1, false) === 0,
-            owner:       _.random(0, 1, false) === 0,
-          },
-          subStreakShareEnabled:   _.random(0, 1, false) === 0,
-          subStreak:               _.random(10, 99, false),
-          subStreakName:           getLocalizedName(_.random(10, 99, false), 'core.months'),
-          subCumulativeMonths:     _.random(10, 99, false),
-          subCumulativeMonthsName: getLocalizedName(_.random(10, 99, false), 'core.months'),
-          months,
-          tier:                    _.random(0, 3, false),
-          monthsName:              getLocalizedName(months, translate('core.months')),
-          message:                 sample(['', 'Lorem Ipsum Dolor Sit Amet']),
-          viewers:                 _.random(0, 9999, false),
-          bits:                    _.random(1, 1000000, false),
-          duration:                sample([30, 60, 90, 120, 150, 180]),
-          reason:                  sample(['', 'Lorem Ipsum Dolor Sit Amet']),
-          command:                 '!testcommand',
-          count:                   _.random(0, 9999, false),
-          method:                  _.random(0, 1, false) === 0 ? 'Twitch Prime' : '',
-          amount:                  _.random(0, 9999, true).toFixed(2),
-          currency:                sample(['CZK', 'USD', 'EUR']),
-          currencyInBot:           mainCurrency.value,
-          amountInBotCurrency:     _.random(0, 9999, true).toFixed(2),
+        const attributes: Record<string, any> = {
+          test:     true,
+          userId:   '0',
+          currency: sample(['CZK', 'USD', 'EUR']),
+          ...variables.map((variable, idx) => {
+            if (variable === 'username' || variable === 'recipient' || variable === 'target') {
+              return { [variable]: randomized.includes(variable) ? generateUsername() : values[idx] };
+            } else if (['userInput', 'message', 'reason'].includes(variable)) {
+              return { [variable]: randomized.includes(variable) ? sample(['', 'Lorem Ipsum Dolor Sit Amet']) : values[idx] };
+            } else if (['source'].includes(variable)) {
+              return { [variable]: randomized.includes(variable) ? sample(['Twitch', 'Discord']) : values[idx] };
+            } else if (['tier'].includes(variable)) {
+              return { [variable]: randomized.includes(variable) ? random(0, 3, false) : (values[idx] === 'Prime' ? 0 : Number(values[idx]))  };
+            } else if (['duration', 'viewers', 'bits', 'subCumulativeMonths', 'count', 'subStreak', 'amount', 'amountInBotCurrency'].includes(variable)) {
+              return { [variable]: randomized.includes(variable) ? random(10, 10000000000, false) : values[idx]  };
+            } else if (['game', 'oldGame'].includes(variable)) {
+              return {
+                [variable]: randomized.includes(variable)
+                  ? sample(['Dota 2', 'Escape From Tarkov', 'Star Citizen', 'Elite: Dangerous'])
+                  : values[idx],
+              };
+            } else if (['command'].includes(variable)) {
+              return { [variable]: randomized.includes(variable) ? sample(['!me', '!top', '!points']) : values[idx]  };
+            } else if (['subStreakShareEnabled'].includes(variable) || variable.startsWith('is.') || variable.startsWith('recipientis.')) {
+              return { [variable]: randomized.includes(variable) ? random(0, 1, false) === 0 : values[idx]  };
+            }
+          }).reduce((prev, cur) => {
+            return { ...prev, ...cur };
+          }, {}),
         };
+
+        if (attributes.subStreak !== undefined) {
+          attributes.subStreakName = getLocalizedName(attributes.subStreak, 'core.months');
+        }
+
+        if (attributes.subCumulativeMonths !== undefined) {
+          attributes.subCumulativeMonthsName = getLocalizedName(attributes.subCumulativeMonths, 'core.months');
+        }
+
+        if (attributes.subCumulativeMonths !== undefined) {
+          attributes.subCumulativeMonthsName = getLocalizedName(attributes.subCumulativeMonths, 'core.months');
+        }
+
+        if (attributes.amountInBotCurrency !== undefined) {
+          attributes.currencyInBot = mainCurrency.value;
+        }
+
+        if (attributes.amountInBotCurrency !== undefined) {
+          attributes.currencyInBot = mainCurrency.value;
+        }
+
+        if (attributes.amount !== undefined) {
+          attributes.amount = Number(attributes.amount).toFixed(2);
+        }
 
         const event = await getRepository(Event).findOne({
           relations: ['operations'],
-          where:     { id: eventId },
+          where:     { id },
         });
         if (event) {
           for (const operation of event.operations) {
-            if (!_.isNil(attributes.is)) {
-              // flatten is
-              const is = attributes.is;
-              _.merge(attributes, flatten({ is }));
-            }
-            if (!_.isNil(attributes.recipientis)) {
-              // flatten recipientis
-              const recipientis = attributes.recipientis;
-              _.merge(attributes, flatten({ recipientis }));
-            }
-            const isOperationSupported = typeof this.supportedOperationsList.find((o) => o.id === operation.name) !== 'undefined';
-            if (isOperationSupported) {
-              const foundOp = this.supportedOperationsList.find((o) =>  o.id === operation.name);
-              if (foundOp) {
-                foundOp.fire(operation.definitions, attributes);
-              }
+            const foundOp = this.supportedOperationsList.find((o) => o.id === operation.name);
+            if (foundOp) {
+              foundOp.fire(operation.definitions, attributes);
             }
           }
         }
@@ -882,7 +880,7 @@ class Events extends Core {
         .where('event.name = :event1', { event1: 'command-send-x-times' })
         .orWhere('event.name = :event2', { event2: 'keyword-send-x-times ' })
         .getMany())) {
-        if (_.isNil(_.get(event, 'triggered.fadeOutInterval', null))) {
+        if (isNil(get(event, 'triggered.fadeOutInterval', null))) {
           // fadeOutInterval init
           event.triggered.fadeOutInterval = Date.now();
           await getRepository(Event).save(event);
@@ -890,7 +888,7 @@ class Events extends Core {
           if (Date.now() - event.triggered.fadeOutInterval >= Number(event.definitions.fadeOutInterval) * 1000) {
             // fade out commands
             if (event.name === 'command-send-x-times') {
-              if (!_.isNil(_.get(event, 'triggered.runEveryXCommands', null))) {
+              if (!isNil(get(event, 'triggered.runEveryXCommands', null))) {
                 if (event.triggered.runEveryXCommands <= 0) {
                   continue;
                 }
@@ -900,7 +898,7 @@ class Events extends Core {
                 await getRepository(Event).save(event);
               }
             } else if (event.name === 'keyword-send-x-times') {
-              if (!_.isNil(_.get(event, 'triggered.runEveryXKeywords', null))) {
+              if (!isNil(get(event, 'triggered.runEveryXKeywords', null))) {
                 if (event.triggered.runEveryXKeywords <= 0) {
                   continue;
                 }
