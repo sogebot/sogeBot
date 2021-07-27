@@ -423,6 +423,7 @@
         "source": "Sorgente corrente (twitch o discord)",
         "userInput": "Inserimento utente durante il riscatto dei premi",
         "isBotSubscriber": "È abbonato al bot (bool)",
+        "isStreamOnline": "Is stream online (bool)",
         "is": {
           "moderator": "L'utente è mod? (bool)",
           "subscriber": "L'utente è abbonato? (bool)",

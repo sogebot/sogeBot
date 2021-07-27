@@ -423,6 +423,7 @@
         "source": "Aktuelle Quelle (twitch oder discord)",
         "userInput": "Benutzereingabe beim Einlösen der Belohnung",
         "isBotSubscriber": "Ist Bot Abonnent (bool)",
+        "isStreamOnline": "Is stream online (bool)",
         "is": {
           "moderator": "Ist Benutzer Mod? (Bool)",
           "subscriber": "Ist Benutzer Sub? (Bool)",
