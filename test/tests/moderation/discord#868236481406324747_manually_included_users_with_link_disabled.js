@@ -3,7 +3,7 @@
 const assert = require('assert');
 
 require('../../general.js');
-const { getRepository } = require('typeorm');
+const { getRepository, getConnection } = require('typeorm');
 
 const { Permissions } = require('../../../dest/database/entity/permissions');
 const { defaultPermissions } = require('../../../dest/helpers/permissions/defaultPermissions');
@@ -15,7 +15,12 @@ const user = require('../../general.js').user;
 
 describe('discord#868236481406324747 - Manually included users with link disabled should not be purged', () => {
   after(async () => {
-    await getRepository(Permissions).clear();
+    await getConnection()
+      .createQueryBuilder()
+      .delete()
+      .from(Permissions)
+      .where('1 = 1')
+      .execute();
     await getRepository(Permissions).insert({
       id:                 defaultPermissions.CASTERS,
       name:               'Casters',
@@ -89,7 +94,12 @@ describe('discord#868236481406324747 - Manually included users with link disable
     await message.prepare();
     await user.prepare();
 
-    await getRepository(Permissions).clear();
+    await getConnection()
+      .createQueryBuilder()
+      .delete()
+      .from(Permissions)
+      .where('1 = 1')
+      .execute();
     await getRepository(Permissions).insert({
       id:                 defaultPermissions.CASTERS,
       name:               'Casters',
@@ -177,6 +187,10 @@ describe('discord#868236481406324747 - Manually included users with link disable
       filters:            [],
     });
     moderation.__permission_based__cLinksEnabled[defaultPermissions.VIEWERS] = true;
+  });
+
+  it (`Enable link moderation for Test group`, () => {
+    moderation.__permission_based__cLinksEnabled['162e0172-bf00-41d7-b363-346bea52838b'] = true;
   });
 
   it(`Link 'http://www.foobarpage.com' should timeout`, async () => {

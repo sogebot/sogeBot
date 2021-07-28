@@ -13,6 +13,13 @@ async function retest() {
     }))) {
       await new Promise((resolve) => {
         console.log('------------------------------------------------------------------------------');
+        console.log('\tRemoving sogebot.db file');
+        console.log('------------------------------------------------------------------------------');
+        if (fs.existsSync('./sogebot.db')) {
+          fs.unlinkSync('./sogebot.db');
+        }
+
+        console.log('------------------------------------------------------------------------------');
         console.log('\t=> Re-Running ' + suite + ' tests');
         console.log('------------------------------------------------------------------------------');
         const p = child_process.spawn('npx', [
