@@ -179,6 +179,10 @@ describe('discord#868236481406324747 - Manually included users with link disable
     moderation.__permission_based__cLinksEnabled[defaultPermissions.VIEWERS] = true;
   });
 
+  it (`Enable link moderation for Test group`, () => {
+    moderation.__permission_based__cLinksEnabled['162e0172-bf00-41d7-b363-346bea52838b'] = true;
+  });
+
   it(`Link 'http://www.foobarpage.com' should timeout`, async () => {
     assert(!(await moderation.containsLink({ sender: user.viewer, message: 'http://www.foobarpage.com' })));
   });
