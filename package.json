@@ -19,7 +19,7 @@
   "author": "Michal Orlik <sogehige@gmail.com>",
   "license": "MIT",
   "dependencies": {
-    "@sogebot/ui-admin": "^2.0.3",
+    "@sogebot/ui-admin": "^3.0.0",
     "@sogebot/ui-helpers": "^2.4.1",
     "@sogebot/ui-oauth": "~1.2.1",
     "@sogebot/ui-overlay": "~0.0.19",
@@ -80,7 +80,7 @@
     "tsoa": "^3.8.0",
     "twitch-js": "2.0.0-beta.42",
     "twitter": "1.7.1",
-    "typeorm": "0.2.35",
+    "typeorm": "0.2.34",
     "url-join": "4.0.1",
     "uuid": "8.3.2",
     "velocity-animate": "1.5.2",
