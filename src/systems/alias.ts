@@ -103,7 +103,7 @@ class Alias extends System {
     return [alias ?? null, cmdArray];
   }
 
-  @parser({ priority: constants.LOW })
+  @parser({ priority: constants.LOW, fireAndForget: true })
   async run (opts: ParserOptions): Promise<boolean> {
     const alias = (await this.search(opts))[0];
     if (!alias) {
