@@ -270,7 +270,7 @@ class CustomCommands extends System {
     }
   }
 
-  @parser({ priority: constants.LOW })
+  @parser({ priority: constants.LOW, fireAndForget: true })
   async run (opts: ParserOptions & { quiet?: boolean, processedCommands?: string[] }): Promise<boolean> {
     if (!opts.message.startsWith('!')) {
       return true;

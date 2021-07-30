@@ -118,7 +118,7 @@ class Parser {
 
         const time = Date.now();
         if (parser.fireAndForget) {
-          parser.fnc.apply(parser.this, [opts]);
+          setTimeout(() => parser.fnc.apply(parser.this, [opts], 1));
         } else {
           const status = await parser.fnc.apply(parser.this, [opts]);
           if (!status) {
@@ -148,7 +148,8 @@ class Parser {
     }
 
     if (this.isCommand) {
-      return this.command(this.sender, this.message.trim());
+      const output = this.command(this.sender, this.message.trim());
+      return output;
     }
     return [];
   }
