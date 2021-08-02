@@ -306,7 +306,7 @@
       "resubWithoutStreak": "<strong>ti ha riabbonato</strong> <unk> $tier <unk> in totale di $subCumulativeMonths $subCumulativeMonthsName",
       "cheer": "<strong>ti ha rallegrato</strong> per $bits bit",
       "tip": "<strong>ti ha dato una mancia</strong> per $formatted_amount",
-      "rewardredeem": "just <strong>redeemed</strong> reward $titleOfReward"
+      "rewardredeem": "ha appena <strong>riscattato</strong> la ricompensa $titleOfReward"
     },
     "responses": {
       "variable": {
@@ -423,7 +423,7 @@
         "source": "Sorgente corrente (twitch o discord)",
         "userInput": "Inserimento utente durante il riscatto dei premi",
         "isBotSubscriber": "È abbonato al bot (bool)",
-        "isStreamOnline": "Is stream online (bool)",
+        "isStreamOnline": "Lo stream è online (bool)",
         "is": {
           "moderator": "L'utente è mod? (bool)",
           "subscriber": "L'utente è abbonato? (bool)",
@@ -632,7 +632,7 @@
     "seconds": "secondi",
     "hours": "ore",
     "months": "mesi",
-    "eligible-to-enter": "Eligible to enter",
+    "eligible-to-enter": "Ha facoltà di entrare",
     "followers-only": "Solo i follower",
     "subscribers-only": "Solo gli abbonati",
     "everyone": "Tutti",
@@ -731,13 +731,13 @@
     "custom-ban-message": "Messaggio di ban personalizzato",
     "custom-ban-message-warning": "Messaggio d'avviso personalizzato",
     "minimal-watched-time": "Tempo minimo guardato:",
-    "widget-title-custom": "CUSTOM",
+    "widget-title-custom": "PERSONALIZZATO",
     "widget-title-eventlist": "LISTA-EVENTI",
     "widget-title-chat": "CHAT",
     "widget-title-queue": "CODA",
     "widget-title-raffles": "TOMBOLE",
     "widget-title-social": "SOCIAL",
-    "widget-title-ytplayer": "MUSIC PLAYER",
+    "widget-title-ytplayer": "LETTORE MUSICALE",
     "event": "evento",
     "operation": "operazione",
     "tweet-post-with-hashtag": "Tweet pubblicato con hashtag",
@@ -1187,7 +1187,7 @@
       "loseWithJackpot": "$sender, LOST! Ora hai $points $pointsName. Il Jackpot è aumentato a $jackpot $jackpotName",
       "lose": "$sender, LOST! Ora hai $points $pointsName",
       "currentJackpot": "$sender, il jackpot attuale per $command è $points $pointsName",
-      "winJackpotCount": "$sender, you won $count jackpots",
+      "winJackpotCount": "$sender, hai vinto $count di jackpot",
       "jackpotIsDisabled": "$sender, il jackpot è disabilitato per $command."
     }
   },
