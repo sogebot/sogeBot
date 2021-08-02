@@ -7,8 +7,8 @@
     },
     "isPointResetIntervalEnabled": "Intervallo di reset punti",
     "resetIntervalCron": {
-      "name": "Cron interval",
-      "help": "<a href='https://crontab.guru/'>CronTab generator</a>"
+      "name": "Intervallo cron",
+      "help": "<a href='https://crontab.guru/'>Generatore CronTab</a>"
     },
     "interval": "Intervallo di minuti per aggiungere punti agli utenti online quando lo stream online",
     "offlineInterval": "Intervallo di minuti per aggiungere punti agli utenti online quando lo stream è offline",
