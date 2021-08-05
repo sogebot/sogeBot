@@ -19,7 +19,7 @@
   "modules": "Modules",
   "viewers": "Viewers",
   "alias": "Aliases",
-  "cooldowns": "Cooldowns",
+  "cooldown": "Cooldowns",
   "highlights": "Highlights",
   "price": "Price",
   "logs": "Logs",
