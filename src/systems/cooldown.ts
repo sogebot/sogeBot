@@ -30,7 +30,7 @@ const cache: { id: string; cooldowns: CooldownInterface[] }[] = [];
 const defaultCooldowns: { name: string; lastRunAt: number, permId: string }[] = [];
 
 /*
- * !cooldown [keyword|!command|g:group] [global|user] [seconds] [true/false] - set cooldown for keyword or !command, true/false set quiet mode
+ * !cooldown set [keyword|!command|g:group] [global|user] [seconds] [true/false] - set cooldown for keyword or !command, true/false set quiet mode
  * !cooldown unset [keyword|!command|g:group] - unset cooldown for keyword or !command, true/false set quiet mode
  * !cooldown toggle moderators [keyword|!command|g:group] [global|user]      - enable/disable specified keyword or !command cooldown for moderators
  * !cooldown toggle owners [keyword|!command|g:group] [global|user]          - enable/disable specified keyword or !command cooldown for owners
@@ -115,7 +115,7 @@ class Cooldown extends System {
     return [{ response: translate('core.usage') + ' => ' + url, ...opts }];
   }
 
-  @command('!cooldown')
+  @command('!cooldown set')
   @default_permission(defaultPermissions.CASTERS)
   async main (opts: CommandOptions): Promise<CommandResponse[]> {
     try {
