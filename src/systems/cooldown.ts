@@ -1,7 +1,6 @@
 import * as constants from '@sogebot/ui-helpers/constants';
 import _ from 'lodash';
 import { getRepository } from 'typeorm';
-import XRegExp from 'xregexp';
 
 import { parserReply } from '../commons';
 import {
@@ -244,15 +243,7 @@ class Cooldown extends System {
               permId,
             });
           } else {
-            // command is not on cooldown or default cooldown -> recheck with text only
-            const replace = new RegExp(`${XRegExp.escape(name)}`, 'ig');
-            const message = opts.message.replace(replace, '').trim();
-            if (message.length > 0 && opts.message !== message) {
-              debug('cooldown.check', `Command ${name} not on cooldown, checking: ${message}`);
-              return this.check({ ...opts, message });
-            } else {
-              return true;
-            }
+            return true;
           }
         } else {
           data = [cooldown];
