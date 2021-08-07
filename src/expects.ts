@@ -555,7 +555,9 @@ class Expects {
 
   string (opts?: any) {
     opts = opts || {};
-    defaults(opts, { exec: false, optional: false });
+    defaults(opts, {
+      exec: false, optional: false, additionalChars: '', withSpaces: false, 
+    });
     if (!opts.exec) {
       this.toExec.push({ fnc: 'string', opts });
       return this;
@@ -567,7 +569,10 @@ class Expects {
       });
     }
 
-    const regexp = XRegExp(`(?<string> \\S* )`, 'igx');
+    const regexp = opts.withSpaces
+      ? XRegExp(`(?<string>('[\\S${opts.additionalChars} ]+')|([\\S${opts.additionalChars}]+))`, 'igx')
+      : XRegExp(`(?<string>[\\S${opts.additionalChars}]*)`, 'igx');
+
     const match = XRegExp.exec(`${this.text.trim()}`, regexp);
     if (match && match.groups) {
       this.match.push(match.groups.string.trim());
