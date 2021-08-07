@@ -22,7 +22,7 @@
     "noResolve": false,
     "baseUrl": "./src",
     "outDir": "./dest",
-    "inlineSourceMap": false,
+    "inlineSourceMap": true,
     "typeRoots": ["./node_modules/@types"]
   },
   "include": [
