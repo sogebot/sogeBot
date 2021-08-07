@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
-/* global describe it before */
+/* global */
 
 require('../../general.js');
 
@@ -588,7 +588,7 @@ describe('Cooldowns - check()', () => {
     });
 
     it('create cooldown on !test me [user 60]', async () => {
-      const [command, type, seconds, quiet] = ['"!test me"', 'user', '60', true];
+      const [command, type, seconds, quiet] = ['\'!test me\'', 'user', '60', true];
       const r = await cooldown.main({ sender: owner, parameters: `${command} ${type} ${seconds} ${quiet}` });
       assert.strictEqual(r[0].response, '$sender, user cooldown for !test me was set to 60s');
     });

@@ -120,12 +120,16 @@ class Cooldown extends System {
   @default_permission(defaultPermissions.CASTERS)
   async main (opts: CommandOptions): Promise<CommandResponse[]> {
     try {
-      const [name, type, seconds, quiet] = new Expects(opts.parameters)
-        .command({ canBeWithoutExclamationMark: true })
+      let [name, type, seconds, quiet] = new Expects(opts.parameters)
+        .string({ additionalChars: ':!', withSpaces: true })
         .oneOf({ values: ['global', 'user'], name: 'type' })
         .number()
         .oneOf({ values: ['true'], optional: true })
         .toArray();
+
+      if (name.includes('\'')) {
+        name = name.replace(/'/g, '');
+      }
 
       const cooldown = await getRepository(CooldownEntity).findOne({
         where: {
@@ -417,7 +421,7 @@ class Cooldown extends System {
   async toggle (opts: CommandOptions, type: 'isEnabled' | 'isModeratorAffected' | 'isOwnerAffected' | 'isSubscriberAffected' | 'isFollowerAffected' | 'isErrorMsgQuiet' | 'type'): Promise<CommandResponse[]> {
     try {
       const [name, typeParameter] = new Expects(opts.parameters)
-        .command({ canBeWithoutExclamationMark: true })
+        .string({ additionalChars: ':!' })
         .oneOf({ values: ['global', 'user'], name: 'type' })
         .toArray();
 
