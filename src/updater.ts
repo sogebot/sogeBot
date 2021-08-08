@@ -1,4 +1,4 @@
-import { execSync } from 'child_process';
+import { exec, execSync } from 'child_process';
 
 import { HOUR } from '@sogebot/ui-helpers/constants';
 import axios from 'axios';
@@ -7,7 +7,7 @@ import { clone } from 'lodash';
 import Core from './_interface';
 import { settings } from './decorators';
 import { onStartup } from './decorators/on';
-import { info } from './helpers/log';
+import { error as errorLog, info } from './helpers/log';
 import { adminEndpoint } from './helpers/socket';
 
 const versions = {
@@ -53,18 +53,21 @@ class Updater extends Core {
 
   sockets() {
     adminEndpoint(this.nsp, 'updater::trigger', async (opts, cb) => {
-      try {
-        info(`Update for ${opts.pkg}@${opts.version} manually triggered. Update processing.`);
-        execSync(`npm install ${opts.pkg}@${opts.version}`);
-        this.versions[opts.pkg as keyof typeof versions] = opts.version;
-        if (cb) {
-          cb(null, '');
+      info(`Update for ${opts.pkg}@${opts.version} manually triggered. Update processing.`);
+      exec(`npm install ${opts.pkg}@${opts.version}`, (error, _, stderr) => {
+        if (!error) {
+          this.versions[opts.pkg as keyof typeof versions] = opts.version;
+          info(`${opts.pkg}@${opts.version} updated succesfully!`);
+          if (cb) {
+            cb(null, '');
+          }
+        } else {
+          errorLog(stderr);
+          if (cb) {
+            cb(stderr, '');
+          }
         }
-      } catch (e) {
-        if (cb) {
-          cb(e.stack, '');
-        }
-      }
+      });
     });
   }
 
@@ -103,7 +106,13 @@ class Updater extends Core {
         if (this.isAutomaticUpdateEnabled
           && ((process.env.NODE_ENV || 'development') === 'production' && !(global as any).mocha)) {
           info(`New version of ${pkg}@${applicableVersion} package found. Automatic update processing.`);
-          execSync(`npm install ${pkg}@${applicableVersion}`);
+          exec(`npm install ${pkg}@${applicableVersion}`, (error, _, stderr) => {
+            if (!error) {
+              info(`${pkg}@${applicableVersion} updated succesfully!`);
+            } else {
+              errorLog(stderr);
+            }
+          });
         } else {
           info(`New version of ${pkg}@${applicableVersion} package found. Automatic update disabled.`);
         }
@@ -112,6 +121,5 @@ class Updater extends Core {
     }
   }
 }
-
 const update = new Updater();
 export default update;
