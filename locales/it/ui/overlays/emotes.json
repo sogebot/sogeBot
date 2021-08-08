@@ -1,9 +1,9 @@
 {
 	"settings": {
 		"btnRemoveCache": "Cancella cache",
-		"btnTestExplosion": "Test emote explosion",
+		"btnTestExplosion": "Test Esplosione di Emote",
 		"btnTestEmote": "Test emote",
-		"btnTestFirework": "Test emote firework",
+		"btnTestFirework": "Test fuochi d'artificio emote",
 		"cEmotesSize": "Dimensione degli Emotes",
 		"cEmotesMaxEmotesPerMessage": "Massimo di emotes per messge",
 		"cEmotesAnimation": "Animazione",
