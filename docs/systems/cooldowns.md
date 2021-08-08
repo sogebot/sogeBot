@@ -1,5 +1,5 @@
 ## Cooldowns system
-`!cooldown <!command|keyword|g:group> <global|user> <seconds> <true|false>`
+`!cooldown set <!command|keyword|g:group> <global|user> <seconds> <true|false>`
 
 - **OWNER** - set cooldown for command or keyword (per user or global), true/false sets whisper message
 - If your command have subcommand, use quote marks, e.g. `!cooldown '!test command' user 60 true`

@@ -73,6 +73,8 @@ bot it is twitch by default
 
 `$isBotSubscriber` - return true/false (boolean) if bot is subscriber
 
+`$isStreamOnline` - return true/false (boolean) if stream is online
+
 ## Eval
 `(eval <yourJScode>)` - will evaluate your javascript code - there **must** be return value
 
