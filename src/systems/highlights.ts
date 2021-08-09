@@ -76,7 +76,11 @@ class Highlights extends System {
   }
 
   public async url(req: Request, res: Response) {
-    const url = this.urls.find((o) => o.url.endsWith(req.get('host') + req.originalUrl));
+    const url = this.urls.find((o) => {
+      const splitURL = o.url.split('/');
+      const id = splitURL[splitURL.length - 1];
+      return req.params.id === id;
+    });
     if (url) {
       if (!this.enabled) {
         return res.status(412).send({ error: 'Highlights system is disabled' });
