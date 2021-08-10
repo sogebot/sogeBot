@@ -27,6 +27,13 @@ class EmotesCombo extends System {
   @settings()
   comboMessageMinThreshold = 3;
   @settings()
+  hypeMessagesEnabled = true;
+  @settings()
+  hypeMessages = [
+    { messagesCount: 5, message: translate('ui.overlays.emotes.hype.5') },
+    { messagesCount: 15, message: translate('ui.overlays.emotes.hype.15') },
+  ];
+  @settings()
   comboMessages = [
     { messagesCount: 3, message: translate('ui.overlays.emotes.message.3') },
     { messagesCount: 5, message: translate('ui.overlays.emotes.message.5') },
@@ -113,6 +120,21 @@ class EmotesCombo extends System {
         } else {
           this.comboEmoteCount++;
           this.comboEmote = uniqueEmotes[0];
+
+          if (this.hypeMessagesEnabled) {
+            const message = this.hypeMessages
+              .sort((a, b) => a.messagesCount - b.messagesCount)
+              .find(o => o.messagesCount === this.comboEmoteCount);
+            if (message) {
+              parserReply(
+                prepare(message.message, {
+                  emote:  this.comboEmote,
+                  amount: this.comboEmoteCount,
+                }, false),
+                opts,
+              );
+            }
+          }
           ioServer?.of('/overlays/emotes').emit('combo', { count: this.comboEmoteCount, url: usedEmotes[this.comboEmote].urls['3'] });
         }
       }
