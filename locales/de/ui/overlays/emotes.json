@@ -1,6 +1,7 @@
 {
 	"settings": {
 		"btnRemoveCache": "Cache leeren",
+		"hypeMessagesEnabled": "Show hype messages in chat",
 		"btnTestExplosion": "Test emote explosion",
 		"btnTestEmote": "Test emote",
 		"btnTestFirework": "Test emote firework",
@@ -30,6 +31,10 @@
 			"help": "Minimaler Nachrichtenschwellenwert, um Emotes als combo zu zählen (bis dahin wird keine Abklingzeit ausgelöst)"
 		},
 		"comboMessages": "Combo Nachrichten"
+	},
+	"hype": {
+		"5": "Let's go! We got $amountx $emote combo so far! SeemsGood",
+		"15": "Keep it going! Can we get more than $amountx $emote? TriHard"
 	},
 	"message": {
 		"3": "$amountx $emote Combo",
