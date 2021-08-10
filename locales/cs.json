@@ -423,7 +423,7 @@
         "source": "Aktuální zdroj (twitch nebo discord)",
         "userInput": "Vstup uživatele během odměny",
         "isBotSubscriber": "Je bot předplatitelem (bool)",
-        "isStreamOnline": "Is stream online (bool)",
+        "isStreamOnline": "Je stream online (bool)",
         "is": {
           "moderator": "Je uživatel mod? (bool)",
           "subscriber": "Je uživatel sub? (bool)",
@@ -1188,7 +1188,7 @@
       "loseWithJackpot": "$sender, PROHRÁLS! Aktuálně máš $points $pointsName. Jackpot se zvýšil na $jackpot $jackpotName",
       "lose": "$sender, PROHRÁLS! Aktuálně máš $points $pointsName",
       "currentJackpot": "$sender, současný jackpot pro $command je $points $pointsName",
-      "winJackpotCount": "$sender, you won $count jackpots",
+      "winJackpotCount": "$sender, vyhrál/a jsi $count jackpotů",
       "jackpotIsDisabled": "$sender, jackpot je vypnutý pro $command."
     }
   },
