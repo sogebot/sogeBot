@@ -1,7 +1,7 @@
 {
 	"settings": {
 		"btnRemoveCache": "Smazat cache",
-		"hypeMessagesEnabled": "Show hype messages in chat",
+		"hypeMessagesEnabled": "Zobrazit hype zprávy v chatu",
 		"btnTestExplosion": "Otestovat výbuch emotikonů",
 		"btnTestEmote": "Testovat emote",
 		"btnTestFirework": "Otestovat ohňostroj emotikonů",
@@ -33,8 +33,8 @@
 		"comboMessages": "Kombo zprávy"
 	},
 	"hype": {
-		"5": "Let's go! We got $amountx $emote combo so far! SeemsGood",
-		"15": "Keep it going! Can we get more than $amountx $emote? TriHard"
+		"5": "Pojďme do toho! Zatím máme kombo $amountx $emote! SeemsGood",
+		"15": "Pokračujte! Získáme více než $amountx $emote? TriHard"
 	},
 	"message": {
 		"3": "$amountx $emote kombo",
