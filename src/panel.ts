@@ -218,7 +218,7 @@ export const init = () => {
     res.sendFile(path.join(__dirname, '..', 'fonts.json'));
   });
   app?.get('/favicon.ico', function (req, res) {
-    res.sendFile(path.join(__dirname, '..', 'public', 'favicon.ico'));
+    res.sendFile(path.join(__dirname, '..', 'favicon.ico'));
   });
   app?.get('/:page?', function (req, res) {
     res.sendFile(path.join(__dirname, '..', 'node_modules', '@sogebot', 'ui-admin', 'dist', 'index.html'));
