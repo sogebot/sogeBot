@@ -1353,7 +1353,7 @@ class API extends Core {
       } else {
         error(e.stack);
         ioServer?.emit('api.stats', {
-          method: e.config.method.toUpperCase(), timestamp: Date.now(), call: 'createMarker', api: 'helix', endpoint: e.config.url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: calls.bot,
+          method: 'POST', timestamp: Date.now(), call: 'createMarker', api: 'helix', endpoint: url, code: 'n/a', data: e.stack, remaining: calls.bot,
         });
       }
       ioServer?.emit('api.stats', {
