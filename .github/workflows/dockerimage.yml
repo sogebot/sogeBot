@@ -54,8 +54,8 @@ jobs:
       - name: build the image
         run: |
           docker buildx build \
-            --tag sogehige/sogebot:nightly:${{ github.sha }} \
-            --tag sogehige/sogebot:nightly:latest \
+            --tag sogehige/sogebot/nightly:${{ github.sha }} \
+            --tag sogehige/sogebot/nightly:latest \
             --platform linux/amd64,linux/arm/v7,linux/arm64 .
 #      - name: Build & Push to GitHub Package with shasum
 #        uses: opspresso/action-docker@v0.2.1
