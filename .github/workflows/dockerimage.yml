@@ -1,12 +1,9 @@
 name: Nightlies
 
-#on:
-#  push:
-#    branches:
-#      - master
-
 on:
-  push
+  push:
+    branches:
+      - master
 
 jobs:
   artifact:
