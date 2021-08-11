@@ -1,9 +1,12 @@
 name: Nightlies
 
+#on:
+#  push:
+#    branches:
+#      - master
+
 on:
-  push:
-    branches:
-      - master
+  push
 
 jobs:
   artifact:
@@ -43,31 +46,42 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
       - uses: actions/checkout@master
-      - name: Build & Push to GitHub Package with shasum
-        uses: opspresso/action-docker@v0.2.1
-        env:
-          USERNAME: ${{ secrets.DOCKER_USERNAME }}
-          PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-          REGISTRY: docker.pkg.github.com
-          IMAGE_NAME: "sogehige/sogebot"
-          TAG_NAME: nightly:${{ github.sha }}
-      - name: Build & Push to GitHub Package as latest
-        uses: opspresso/action-docker@v0.2.1
-        env:
-          USERNAME: ${{ secrets.DOCKER_USERNAME }}
-          PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-          REGISTRY: docker.pkg.github.com
-          IMAGE_NAME: "sogehige/sogebot"
-          TAG_NAME: nightly:latest
-      - name: Docker Build & Push to Docker Hub
-        uses: opspresso/action-docker@v0.2.8
+      - name: install buildx
+        id: buildx
+        uses: crazy-max/ghaction-docker-buildx@v1
         with:
-          args: --docker
-        env:
-          USERNAME: ${{ secrets.DOCKER_REGISTRY_USERNAME }}
-          PASSWORD: ${{ secrets.DOCKER_REGISTRY_PASSWORD }}
-          DOCKERFILE: "Dockerfile"
-          IMAGE_NAME: "sogebot/nightly"
-          TAG_NAME: ${{ github.sha }}
-          LATEST: "true"
+          version: latest
+      - name: build the image
+        run: |
+          docker buildx build \
+            --tag sogehige/sogebot:nightly:${{ github.sha }} \
+            --tag sogehige/sogebot:nightly:latest \
+            --platform linux/amd64,linux/arm/v7,linux/arm64 .
+#      - name: Build & Push to GitHub Package with shasum
+#        uses: opspresso/action-docker@v0.2.1
+#        env:
+#          USERNAME: ${{ secrets.DOCKER_USERNAME }}
+#          PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+#          REGISTRY: docker.pkg.github.com
+#          IMAGE_NAME: "sogehige/sogebot"
+#          TAG_NAME: nightly:${{ github.sha }}
+#      - name: Build & Push to GitHub Package as latest
+#        uses: opspresso/action-docker@v0.2.1
+#        env:
+#          USERNAME: ${{ secrets.DOCKER_USERNAME }}
+#          PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+#          REGISTRY: docker.pkg.github.com
+#          IMAGE_NAME: "sogehige/sogebot"
+#          TAG_NAME: nightly:latest
+#      - name: Docker Build & Push to Docker Hub
+#        uses: opspresso/action-docker@v0.2.8
+#        with:
+#          args: --docker
+#        env:
+#          USERNAME: ${{ secrets.DOCKER_REGISTRY_USERNAME }}
+#          PASSWORD: ${{ secrets.DOCKER_REGISTRY_PASSWORD }}
+#          DOCKERFILE: "Dockerfile"
+#          IMAGE_NAME: "sogebot/nightly"
+#          TAG_NAME: ${{ github.sha }}
+#          LATEST: "true"
 
