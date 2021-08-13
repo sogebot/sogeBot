@@ -74,10 +74,7 @@ class Message {
     }
 
     // latestTip, latestTipAmount, latestTipCurrency, latestTipMessage
-    if (this.message.includes('$latestTip')
-      || this.message.includes('$latestTipAmount')
-      || this.message.includes('$latestTipCurrency')
-      || this.message.includes('$latestTipMessage')) {
+    if (this.message.includes('$latestTip')) {
       const latestTip = await getRepository(EventList).createQueryBuilder('events')
         .select('events')
         .orderBy('events.timestamp', 'DESC')
@@ -91,9 +88,7 @@ class Message {
     }
 
     // latestCheer, latestCheerAmount, latestCheerCurrency, latestCheerMessage
-    if (this.message.includes('$latestCheerAmount')
-    || this.message.includes('$latestCheerMessage')
-    || this.message.includes('$latestCheer')) {
+    if (this.message.includes('$latestCheer')) {
       const latestCheer = await getRepository(EventList).createQueryBuilder('events')
         .select('events')
         .orderBy('events.timestamp', 'DESC')
