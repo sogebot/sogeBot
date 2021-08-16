@@ -5,6 +5,7 @@ require('../../general.js');
 
 const { getRepository } = require('typeorm');
 
+const { setImmediateAwait } = require('../../../dest//helpers/setImmediateAwait');
 const { EventList } = require('../../../dest/database/entity/eventList');
 const { User } = require('../../../dest/database/entity/user');
 const Message = require('../../../dest/message').default;
@@ -30,10 +31,11 @@ describe('Message - https://discordapp.com/channels/317348946144002050/619437014
       await getRepository(EventList).save({
         isTest:      false,
         event:       'follow',
-        timestamp:   1000 * i,
+        timestamp:   i,
         userId:      `${i}`,
         values_json: '{}',
       });
+      await setImmediateAwait();
     }
   });
 
@@ -42,10 +44,11 @@ describe('Message - https://discordapp.com/channels/317348946144002050/619437014
       await getRepository(EventList).save({
         isTest:      false,
         event:       ['sub', 'resub', 'subgift'][Math.floor(Math.random() * 3)],
-        timestamp:   2000 * i,
+        timestamp:   i,
         userId:      `${i}`,
         values_json: '{}',
       });
+      await setImmediateAwait();
     }
   });
 
@@ -54,7 +57,7 @@ describe('Message - https://discordapp.com/channels/317348946144002050/619437014
       await getRepository(EventList).save({
         isTest:      false,
         event:       'tip',
-        timestamp:   3000 * i,
+        timestamp:   i,
         userId:      `${i}`,
         values_json: JSON.stringify({
           amount:   i,
@@ -62,18 +65,23 @@ describe('Message - https://discordapp.com/channels/317348946144002050/619437014
           message:  `message${i-20}`,
         }),
       });
+      await setImmediateAwait();
     }
   });
 
   it ('Add 10 cheer events', async () => {
     for (let i = 10000030; i < 10000040; i++) {
-      await eventlist.add({
-        event:     'cheer',
-        userId:    String(i),
-        bits:      i,
-        message:   `message${i-30}`,
-        timestamp: 4000 * i,
+      await getRepository(EventList).save({
+        isTest:      false,
+        event:       'cheer',
+        timestamp:   i,
+        userId:      `${i}`,
+        values_json: JSON.stringify({
+          bits:    i,
+          message: `message${i-30}`,
+        }),
       });
+      await setImmediateAwait();
     }
   });
 
