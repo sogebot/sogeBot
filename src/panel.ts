@@ -39,13 +39,13 @@ import {
   getDEBUG, info, setDEBUG,
 } from './helpers/log';
 import {
-  app, ioServer, menu, menuPublic, server, serverSecure, setApp, setServer,
+  app, ioServer, server, serverSecure, setApp, setServer,
 } from './helpers/panel';
 import { socketsConnectedDec, socketsConnectedInc } from './helpers/panel/';
 import { errors, warns } from './helpers/panel/alerts';
 import { linesParsed, status as statusObj } from './helpers/parser';
 import { list, systems } from './helpers/register';
-import { adminEndpoint, publicEndpoint } from './helpers/socket';
+import { adminEndpoint } from './helpers/socket';
 import lastfm from './integrations/lastfm';
 import spotify from './integrations/spotify';
 import { sendGameFromTwitch } from './microservices/sendGameFromTwitch';
@@ -222,14 +222,6 @@ export const init = () => {
   });
   app?.get('/:page?', function (req, res) {
     res.sendFile(path.join(__dirname, '..', 'node_modules', '@sogebot', 'ui-admin', 'dist', 'index.html'));
-  });
-
-  menu.push({
-    category: 'main', name: 'dashboard', id: 'dashboard', this: null,
-  });
-
-  menu.push({
-    category: 'stats', name: 'api-explorer', id: 'stats/api-explorer', this: null,
   });
 
   setTimeout(() => {
@@ -521,16 +513,6 @@ export const init = () => {
 
     socket.on('parser.isRegistered', function (data: { emit: string, command: string }) {
       socket.emit(data.emit, { isRegistered: new Parser().find(data.command) });
-    });
-
-    adminEndpoint('/', 'menu', (cb) => {
-      cb(null, menu.map((o) => ({
-        category: o.category, name: o.name, id: o.id, enabled: o.this ? o.this.enabled : true,
-      })));
-    });
-
-    publicEndpoint('/', 'menu::public', (cb) => {
-      cb(null, menuPublic);
     });
 
     socket.on('translations', (cb: (lang: Record<string, any>) => void) => {

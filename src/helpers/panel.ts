@@ -12,6 +12,14 @@ import { info } from './log';
 export const menu: { category?: string; name: string; id: string; this: Module | null }[] = [];
 export const menuPublic: { name: string; id: string }[] = [];
 
+menu.push({
+  category: 'main', name: 'dashboard', id: 'dashboard', this: null,
+});
+
+menu.push({
+  category: 'stats', name: 'api-explorer', id: 'stats/api-explorer', this: null,
+});
+
 export let ioServer: io | null = null;
 export let app: express.Application | null = null;
 export let server: Server;
