@@ -30,7 +30,7 @@ describe('Message - https://discordapp.com/channels/317348946144002050/619437014
       await getRepository(EventList).save({
         isTest:      false,
         event:       'follow',
-        timestamp:   1000 * i,
+        timestamp:   i,
         userId:      `${i}`,
         values_json: '{}',
       });
@@ -42,7 +42,7 @@ describe('Message - https://discordapp.com/channels/317348946144002050/619437014
       await getRepository(EventList).save({
         isTest:      false,
         event:       ['sub', 'resub', 'subgift'][Math.floor(Math.random() * 3)],
-        timestamp:   2000 * i,
+        timestamp:   i,
         userId:      `${i}`,
         values_json: '{}',
       });
@@ -54,7 +54,7 @@ describe('Message - https://discordapp.com/channels/317348946144002050/619437014
       await getRepository(EventList).save({
         isTest:      false,
         event:       'tip',
-        timestamp:   3000 * i,
+        timestamp:   i,
         userId:      `${i}`,
         values_json: JSON.stringify({
           amount:   i,
@@ -72,7 +72,7 @@ describe('Message - https://discordapp.com/channels/317348946144002050/619437014
         userId:    String(i),
         bits:      i,
         message:   `message${i-30}`,
-        timestamp: 4000 * i,
+        timestamp: i,
       });
     }
   });
