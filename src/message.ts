@@ -49,7 +49,6 @@ class Message {
 
     if (this.message.includes('$latestFollower')) {
       const latestFollower = await getRepository(EventList).findOne({ order: { timestamp: 'DESC' }, where: { event: 'follow' } });
-      console.log(await getRepository(EventList).find({ order: { timestamp: 'DESC' }, where: { event: 'follow ' } }));
       this.message = this.message.replace(/\$latestFollower/g, !_.isNil(latestFollower) ? await users.getNameById(latestFollower.userId) : 'n/a');
     }
 
@@ -59,10 +58,6 @@ class Message {
         order: { timestamp: 'DESC' },
         where: { event: In(['sub', 'resub', 'subgift']) },
       });
-      console.log(await getRepository(EventList).find({
-        order: { timestamp: 'DESC' },
-        where: { event: In(['sub', 'resub', 'subgift']) },
-      }));
 
       if (latestSubscriber && (this.message.includes('$latestSubscriberMonths') || this.message.includes('$latestSubscriberStreak'))) {
         const latestSubscriberUser = await getRepository(User).findOne({ userId: latestSubscriber.userId });
@@ -75,7 +70,6 @@ class Message {
     // latestTip, latestTipAmount, latestTipCurrency, latestTipMessage
     if (this.message.includes('$latestTip')) {
       const latestTip = await getRepository(EventList).findOne({ order: { timestamp: 'DESC' }, where: { event: 'tip', isTest: false } });
-      console.log(await getRepository(EventList).find({ order: { timestamp: 'DESC' }, where: { event: 'tip', isTest: false } }));
       this.message = this.message.replace(/\$latestTipAmount/g, !_.isNil(latestTip) ? parseFloat(JSON.parse(latestTip.values_json).amount).toFixed(2) : 'n/a');
       this.message = this.message.replace(/\$latestTipCurrency/g, !_.isNil(latestTip) ? JSON.parse(latestTip.values_json).currency : 'n/a');
       this.message = this.message.replace(/\$latestTipMessage/g, !_.isNil(latestTip) ? JSON.parse(latestTip.values_json).message : 'n/a');
@@ -85,7 +79,6 @@ class Message {
     // latestCheer, latestCheerAmount, latestCheerCurrency, latestCheerMessage
     if (this.message.includes('$latestCheer')) {
       const latestCheer = await getRepository(EventList).findOne({ order: { timestamp: 'DESC' }, where: { event: 'cheer' } });
-      console.log(await getRepository(EventList).find({ order: { timestamp: 'DESC' }, where: { event: 'cheer' } }));
       this.message = this.message.replace(/\$latestCheerAmount/g, !_.isNil(latestCheer) ? JSON.parse(latestCheer.values_json).bits : 'n/a');
       this.message = this.message.replace(/\$latestCheerMessage/g, !_.isNil(latestCheer) ? JSON.parse(latestCheer.values_json).message : 'n/a');
       this.message = this.message.replace(/\$latestCheer/g, !_.isNil(latestCheer) ? await users.getNameById(latestCheer.userId) : 'n/a');

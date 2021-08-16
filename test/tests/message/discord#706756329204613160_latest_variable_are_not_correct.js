@@ -5,6 +5,7 @@ require('../../general.js');
 
 const { getRepository } = require('typeorm');
 
+const { setImmediateAwait } = require('../../../dest//helpers/setImmediateAwait');
 const { EventList } = require('../../../dest/database/entity/eventList');
 const { User } = require('../../../dest/database/entity/user');
 const Message = require('../../../dest/message').default;
@@ -34,6 +35,7 @@ describe('Message - https://discordapp.com/channels/317348946144002050/619437014
         userId:      `${i}`,
         values_json: '{}',
       });
+      await setImmediateAwait();
     }
   });
 
@@ -46,6 +48,7 @@ describe('Message - https://discordapp.com/channels/317348946144002050/619437014
         userId:      `${i}`,
         values_json: '{}',
       });
+      await setImmediateAwait();
     }
   });
 
@@ -62,6 +65,7 @@ describe('Message - https://discordapp.com/channels/317348946144002050/619437014
           message:  `message${i-20}`,
         }),
       });
+      await setImmediateAwait();
     }
   });
 
@@ -74,6 +78,7 @@ describe('Message - https://discordapp.com/channels/317348946144002050/619437014
         message:   `message${i-30}`,
         timestamp: i,
       });
+      await setImmediateAwait();
     }
   });
 
