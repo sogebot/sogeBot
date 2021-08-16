@@ -70,6 +70,7 @@ const mod = {
 module.exports = {
   prepare: async () => {
     const { default: oauth } = require('../../dest/oauth');
+    const { cleanViewersCache } = require('../../dest/helpers/permissions/cache');
 
     await getRepository(User).save(viewer);
     await getRepository(User).save(viewer2);
@@ -83,6 +84,8 @@ module.exports = {
     // set owner as broadcaster
     oauth.broadcasterUsername = owner.username;
     generalOwners.value = [owner.username];
+    // clean perm cache
+    cleanViewersCache();
   },
   viewer,
   viewer2,
