@@ -4,6 +4,7 @@ export class charUUID1626398375129 implements MigrationInterface {
   name = 'charUUID1626398375129';
 
   public async up(queryRunner: QueryRunner): Promise<any> {
+    await queryRunner.query('SET FOREIGN_KEY_CHECKS=0;', undefined);
     await queryRunner.query('ALTER TABLE `alert` MODIFY `id` char(36) NOT NULL', undefined);
     await queryRunner.query('ALTER TABLE `alert_follow` MODIFY `id` char(36) NOT NULL', undefined);
     await queryRunner.query('ALTER TABLE `alert_sub` MODIFY `id` char(36) NOT NULL', undefined);
@@ -27,6 +28,7 @@ export class charUUID1626398375129 implements MigrationInterface {
     await queryRunner.query('ALTER TABLE `cooldown` MODIFY `id` char(36) NOT NULL', undefined);
     await queryRunner.query('ALTER TABLE `cooldown_viewer` MODIFY `id` char(36) NOT NULL', undefined);
     await queryRunner.query('ALTER TABLE `quickaction` MODIFY `id` char(36) NOT NULL', undefined);
+    await queryRunner.query('SET FOREIGN_KEY_CHECKS=1;', undefined);
 
   }
 
