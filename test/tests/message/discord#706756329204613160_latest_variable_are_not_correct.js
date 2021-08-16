@@ -71,12 +71,15 @@ describe('Message - https://discordapp.com/channels/317348946144002050/619437014
 
   it ('Add 10 cheer events', async () => {
     for (let i = 10000030; i < 10000040; i++) {
-      await eventlist.add({
-        event:     'cheer',
-        userId:    String(i),
-        bits:      i,
-        message:   `message${i-30}`,
-        timestamp: i,
+      await getRepository(EventList).save({
+        isTest:      false,
+        event:       'cheer',
+        timestamp:   i,
+        userId:      `${i}`,
+        values_json: JSON.stringify({
+          bits:    i,
+          message: `message${i-30}`,
+        }),
       });
       await setImmediateAwait();
     }
