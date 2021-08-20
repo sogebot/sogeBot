@@ -21,6 +21,7 @@ import { onStartup } from './decorators/on';
 import {
   stats as apiStats, calls, chatMessagesAtStart, currentStreamTags, emptyRateLimit, gameCache, gameOrTitleChangedManually, isStreamOnline, rawStatus, setRateLimit, streamStatusChangeSince,
 } from './helpers/api';
+import * as hypeTrain from './helpers/api/hypeTrain';
 import { parseTitle } from './helpers/api/parseTitle';
 import {
   curRetries, maxRetries, retries, setCurrentRetries,
@@ -73,6 +74,40 @@ const intervals = new Map<string, {
 type SubscribersEndpoint = { data: { broadcaster_id: string; broadcaster_name: string; is_gift: boolean; tier: string; plan_name: string; user_id: string; user_name: string; }[], pagination: { cursor: string } };
 type FollowsEndpoint = { total: number; data: { from_id: string; from_name: string; to_id: string; toname: string; followed_at: string; }[], pagination: { cursor: string } };
 export type StreamEndpoint = { data: { id: string; user_id: string, user_name: string, game_id: string, type: 'live' | '', title: string , viewer_count: number, started_at: string, language: string; thumbnail_url: string; tag_ids: string[] }[], pagination: { cursor: string } };
+
+type RFC3339 = string; // 2020-04-24T20:07:24Z
+
+type HypeTrainEndpoint = {
+  data: {
+    id: string,
+    event_type: 'hypetrain.progression',
+    event_timestamp: RFC3339,
+    version: '1.0',
+    event_data: {
+      broadcaster_id: string,
+      cooldown_end_time: RFC3339,
+      expires_at: RFC3339,
+      goal: number,
+      id: string,
+      last_contribution: {
+        total: number,
+        type: 'BITS' | 'SUBS',
+        user: string
+      },
+      level: 1 | 2 | 3 | 4 | 5,
+      started_at: RFC3339,
+      top_contributions: [
+        {
+          total: number,
+          type: 'BITS' | 'SUBS',
+          user: string,
+        }
+      ],
+      total: number
+    }
+  }[],
+  pagination: any
+};
 
 const updateFollowerState = async(users: Readonly<Required<UserInterface>>[], usersFromAPI: { from_name: string; from_id: string; followed_at: string }[], fullScale: boolean) => {
   if (!fullScale) {
@@ -170,6 +205,7 @@ class API extends Core {
     this.interval('getChannelSubscribers', 2 * constants.MINUTE);
     this.interval('getChannelChattersUnofficialAPI', 5 * constants.MINUTE);
     this.interval('getChannelInformation', constants.MINUTE);
+    this.interval('getHypeTrain', constants.MINUTE);
     this.interval('checkClips', constants.MINUTE);
     this.interval('getAllStreamTags', constants.DAY);
     this.interval('getModerators', 10 * constants.MINUTE);
@@ -640,6 +676,77 @@ class API extends Core {
           });
       }
     }
+  }
+
+  async getHypeTrain (opts: any) {
+    if (!oauth.broadcasterCurrentScopes.includes('channel:read:hype_train')) {
+      if (!opts.isWarned) {
+        opts.isWarned = true;
+        warning('Missing Broadcaster oAuth scope channel:read:hype_train to read hype train API.');
+        addUIError({ name: 'OAUTH', message: 'Missing Broadcaster oAuth scope channel:read:hype_train to read hype train API.' });
+      }
+      return { state: false, opts };
+    }
+
+    const cid = channelId.value;
+    const url = `https://api.twitch.tv/helix/hypetrain/events?broadcaster_id=${cid}`;
+
+    const token = oauth.broadcasterAccessToken;
+    const needToWait = isNil(cid) || cid === '' || token === '';
+    if (needToWait) {
+      return { state: false, opts };
+    }
+
+    let request;
+    try {
+      request = await axios.get<HypeTrainEndpoint>(url, {
+        headers: {
+          'Authorization': 'Bearer ' + token,
+          'Client-ID':     oauth.broadcasterClientId,
+        },
+        timeout: 20000,
+      });
+      // save remaining api calls
+      setRateLimit('broadcaster', request.headers);
+
+      if (request.data.data.length > 0) {
+        const data = request.data.data[0];
+        hypeTrain.setTotal(data.event_data.total);
+        hypeTrain.setGoal(data.event_data.goal);
+        hypeTrain.setLastContribution(data.event_data.last_contribution.total, data.event_data.last_contribution.type, data.event_data.last_contribution.user);
+        for (const top of data.event_data.top_contributions) {
+          hypeTrain.setTopContributions(top.type, top.total, top.user);
+        }
+        hypeTrain.setCurrentLevel(data.event_data.level);
+        hypeTrain.setStartedAt(data.event_data.started_at);
+        hypeTrain.setExpiresAt(data.event_data.expires_at);
+      } else {
+        // no hypetrain is going on
+        hypeTrain.setTotal(0);
+        hypeTrain.setGoal(0);
+        hypeTrain.setLastContribution(0, 'BITS', null);
+        hypeTrain.setTopContributions('BITS', 0, null);
+        hypeTrain.setTopContributions('SUBS', 0, null);
+        hypeTrain.setCurrentLevel(1);
+        hypeTrain.setStartedAt(null);
+        hypeTrain.setExpiresAt(null);
+      }
+
+      console.log(request.data.data);
+
+      ioServer?.emit('api.stats', {
+        method: 'GET', data: request.data.data, timestamp: Date.now(), call: 'getHypeTrain', api: 'helix', endpoint: url, code: request.status, remaining: calls.broadcaster,
+      });
+    } catch (e) {
+      error(`${url} - ${e.message}`);
+      ioServer?.emit('api.stats', {
+        method: 'GET', timestamp: Date.now(), call: 'getHypeTrain', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: calls.broadcaster,
+      });
+      return { state: false, opts };
+    }
+
+    retries.getChannelInformation = 0;
+    return { state: true, opts };
   }
 
   async getChannelInformation (opts: any) {
