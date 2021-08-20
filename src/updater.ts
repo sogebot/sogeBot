@@ -77,7 +77,7 @@ class Updater extends Core {
     }
   }
 
-  checkUpdate() {
+  async checkUpdate() {
     for (const pkg of Object.keys(this.versions) as Array<keyof typeof versions>) {
       this.getChangelog(pkg);
     }
@@ -106,12 +106,15 @@ class Updater extends Core {
         if (this.isAutomaticUpdateEnabled
           && ((process.env.NODE_ENV || 'development') === 'production' && !(global as any).mocha)) {
           info(`New version of ${pkg}@${applicableVersion} package found. Automatic update processing.`);
-          exec(`npm install ${pkg}@${applicableVersion}`, (error, _, stderr) => {
-            if (!error) {
-              info(`${pkg}@${applicableVersion} updated succesfully!`);
-            } else {
-              errorLog(stderr);
-            }
+          await new Promise((resolve) => {
+            exec(`npm install ${pkg}@${applicableVersion}`, (error, _, stderr) => {
+              if (!error) {
+                info(`${pkg}@${applicableVersion} updated succesfully!`);
+              } else {
+                errorLog(stderr);
+              }
+              resolve(true);
+            });
           });
         } else {
           info(`New version of ${pkg}@${applicableVersion} package found. Automatic update disabled.`);
