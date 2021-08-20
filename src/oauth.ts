@@ -72,6 +72,7 @@ class OAuth extends Core {
     'channel:edit:commercial',
     'channel:read:redemptions',
     'moderation:read',
+    'channel:read:hype_train',
   ];
 
   @settings('broadcaster')

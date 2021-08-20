@@ -79,6 +79,9 @@ class Events extends Core {
     super();
 
     this.supportedEventsList = [
+      { id: 'hypetrain-started', variables: [ ] },
+      { id: 'hypetrain-ended', variables: [ 'level', 'total', 'goal', 'topContributionsBitsUserId', 'topContributionsBitsUsername', 'topContributionsBitsTotal', 'topContributionsSubsUserId', 'topContributionsSubsUsername', 'topContributionsSubsTotal', 'lastContributionType', 'lastContributionUserId', 'lastContributionUsername', 'lastContributionTotal' ] },
+      { id: 'hypetrain-level-reached', variables: [ 'level', 'total', 'goal', 'topContributionsBitsUserId', 'topContributionsBitsUsername', 'topContributionsBitsTotal', 'topContributionsSubsUserId', 'topContributionsSubsUsername', 'topContributionsSubsTotal', 'lastContributionType', 'lastContributionUserId', 'lastContributionUsername', 'lastContributionTotal' ] },
       { id: 'user-joined-channel', variables: [ 'username', 'is.moderator', 'is.subscriber', 'is.vip', 'is.follower', 'is.broadcaster', 'is.bot', 'is.owner' ] },
       { id: 'user-parted-channel', variables: [ 'username', 'is.moderator', 'is.subscriber', 'is.vip', 'is.follower', 'is.broadcaster', 'is.bot', 'is.owner' ] },
       { id: 'follow', variables: [ 'username', 'is.moderator', 'is.subscriber', 'is.vip', 'is.follower', 'is.broadcaster', 'is.bot', 'is.owner' ] },
@@ -178,6 +181,9 @@ class Events extends Core {
 
     // emitter .on listeners
     for (const event of [
+      'hypetrain-started',
+      'hypetrain-ended',
+      'hypetrain-level-reached',
       'action',
       'commercial',
       'game-changed',
@@ -786,7 +792,7 @@ class Events extends Core {
           userId:   '0',
           currency: sample(['CZK', 'USD', 'EUR']),
           ...variables.map((variable, idx) => {
-            if (variable === 'username' || variable === 'recipient' || variable === 'target') {
+            if (['username', 'recipient', 'target', 'topContributionsBitsUsername', 'topContributionsSubsUsername', 'lastContributionUsername'].includes(variable)) {
               return { [variable]: randomized.includes(variable) ? generateUsername() : values[idx] };
             } else if (['userInput', 'message', 'reason'].includes(variable)) {
               return { [variable]: randomized.includes(variable) ? sample(['', 'Lorem Ipsum Dolor Sit Amet']) : values[idx] };
@@ -794,7 +800,7 @@ class Events extends Core {
               return { [variable]: randomized.includes(variable) ? sample(['Twitch', 'Discord']) : values[idx] };
             } else if (['tier'].includes(variable)) {
               return { [variable]: randomized.includes(variable) ? random(0, 3, false) : (values[idx] === 'Prime' ? 0 : Number(values[idx]))  };
-            } else if (['duration', 'viewers', 'bits', 'subCumulativeMonths', 'count', 'subStreak', 'amount', 'amountInBotCurrency'].includes(variable)) {
+            } else if (['lastContributionTotal', 'topContributionsSubsTotal', 'topContributionsBitsTotal', 'duration', 'viewers', 'bits', 'subCumulativeMonths', 'count', 'subStreak', 'amount', 'amountInBotCurrency'].includes(variable)) {
               return { [variable]: randomized.includes(variable) ? random(10, 10000000000, false) : values[idx]  };
             } else if (['game', 'oldGame'].includes(variable)) {
               return {
@@ -806,6 +812,12 @@ class Events extends Core {
               return { [variable]: randomized.includes(variable) ? sample(['!me', '!top', '!points']) : values[idx]  };
             } else if (['subStreakShareEnabled'].includes(variable) || variable.startsWith('is.') || variable.startsWith('recipientis.')) {
               return { [variable]: randomized.includes(variable) ? random(0, 1, false) === 0 : values[idx]  };
+            } else if (['level'].includes(variable)) {
+              return { [variable]: randomized.includes(variable) ? random(1, 5, false)  : values[idx]  };
+            } else if (['topContributionsSubsUserId', 'topContributionsBitsUserId', 'lastContributionUserId'].includes(variable)) {
+              return { [variable]: randomized.includes(variable) ? String(random(90000, 900000, false)) : values[idx]  };
+            } else if (['lastContributionType'].includes(variable)) {
+              return { [variable]: randomized.includes(variable) ? sample(['BITS', 'SUBS']) : values[idx]  };
             }
           }).reduce((prev, cur) => {
             return { ...prev, ...cur };
