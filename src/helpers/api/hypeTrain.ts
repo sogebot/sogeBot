@@ -72,7 +72,8 @@ function setTopContributions(type: 'BITS' | 'SUBS', total_: typeof lastContribut
 }
 
 function setId(id_: string) {
-  if (id !== id_) {
+  // id is different and hypetrain is not expired
+  if (id !== id_ && expiresAt && new Date(expiresAt).getTime() > Date.now()) {
     startedId = id_;
     eventEmitter.emit('hypetrain-started');
   }
