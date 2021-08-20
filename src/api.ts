@@ -732,8 +732,6 @@ class API extends Core {
         hypeTrain.setExpiresAt(null);
       }
 
-      console.log(request.data.data);
-
       ioServer?.emit('api.stats', {
         method: 'GET', data: request.data.data, timestamp: Date.now(), call: 'getHypeTrain', api: 'helix', endpoint: url, code: request.status, remaining: calls.broadcaster,
       });
