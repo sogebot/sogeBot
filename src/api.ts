@@ -720,8 +720,10 @@ class API extends Core {
         hypeTrain.setCurrentLevel(data.event_data.level);
         hypeTrain.setStartedAt(data.event_data.started_at);
         hypeTrain.setExpiresAt(data.event_data.expires_at);
+        hypeTrain.setId(data.id);
       } else {
         // no hypetrain is going on
+        hypeTrain.setId('');
         hypeTrain.setTotal(0);
         hypeTrain.setGoal(0);
         hypeTrain.setLastContribution(0, 'BITS', null);

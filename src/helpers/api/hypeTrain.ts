@@ -5,9 +5,12 @@ import { eventEmitter } from '../events';
 
 type RFC3339 = string; // 2020-04-24T20:07:24Z
 
+let id = '';
+let endedId = '';
+let startedId = '';
 let latestLevel = 1 as 1 | 2 | 3 | 4 | 5;
 let startedAt = null as null | string;
-let expiresAt = '2020-04-24T20:05:47.30473127Z' as null | string;
+let expiresAt = null as null | string;
 let total = 0;
 let goal = 0;
 
@@ -68,10 +71,16 @@ function setTopContributions(type: 'BITS' | 'SUBS', total_: typeof lastContribut
   }
 }
 
-function setStartedAt(date: null | RFC3339) {
-  if (date && date !== startedAt) {
+function setId(id_: string) {
+  // id is different and hypetrain is not expired
+  if (id !== id_ && expiresAt && new Date(expiresAt).getTime() > Date.now()) {
+    startedId = id_;
     eventEmitter.emit('hypetrain-started');
   }
+  id = id_;
+}
+
+function setStartedAt(date: null | RFC3339) {
   startedAt = date;
 }
 
@@ -89,7 +98,8 @@ function setGoal(value: number) {
 
 setInterval(async () => {
   if (expiresAt) {
-    if (new Date(expiresAt).getTime() < Date.now()) {
+    if (new Date(expiresAt).getTime() < Date.now() && endedId !== id && id === startedId) {
+      endedId = id;
       eventEmitter.emit('hypetrain-ended', {
         level: latestLevel,
         total,
@@ -108,7 +118,6 @@ setInterval(async () => {
         lastContributionUserId:   lastContributionUserId ? lastContributionUserId : 'n/a',
         lastContributionUsername: lastContributionUserId ? await users.getNameById(lastContributionUserId) : 'n/a',
       });
-      expiresAt = null;
     }
   }
 }, 30 * SECOND);
@@ -118,6 +127,7 @@ export {
   setCurrentLevel,
   getStartedAt,
   setStartedAt,
+  setId,
   setExpiresAt,
   setTotal,
   setGoal,
