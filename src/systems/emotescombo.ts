@@ -116,7 +116,7 @@ class EmotesCombo extends System {
           }
           this.comboEmoteCount = 0;
           this.comboEmote = '';
-          ioServer?.of('/overlays/emotes').emit('combo', { count: this.comboEmoteCount, url: null });
+          ioServer?.of('/systems/emotescombo').emit('combo', { count: this.comboEmoteCount, url: null });
         } else {
           this.comboEmoteCount++;
           this.comboEmote = uniqueEmotes[0];
@@ -135,7 +135,7 @@ class EmotesCombo extends System {
               );
             }
           }
-          ioServer?.of('/overlays/emotes').emit('combo', { count: this.comboEmoteCount, url: usedEmotes[this.comboEmote].urls['3'] });
+          ioServer?.of('/systems/emotescombo').emit('combo', { count: this.comboEmoteCount, url: usedEmotes[this.comboEmote].urls['3'] });
         }
       }
     }
