@@ -213,7 +213,7 @@ class Discord extends Integration {
             debug('discord.roles', `User ${user.userId} already have role ${role.name}`);
           } else {
             discordUser.roles.add(role).catch(roleError => {
-              warning('Cannot add role to user, check permission for bot (bot cannot set role above his own)');
+              warning(`Cannot add role '${role.name}' to user ${user.userId}, check permission for bot (bot cannot set role above his own)`);
               warning(roleError);
             }).then(member => {
               debug('discord.roles', `User ${user.userId} have new role ${role.name}`);
