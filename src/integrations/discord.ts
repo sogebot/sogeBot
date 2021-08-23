@@ -172,11 +172,16 @@ class Discord extends Integration {
       if (!guild) {
         return warning('No servers found for discord');
       }
-      const discordUser = guild.member(await guild.members.fetch(user.discordId));
-      if (!discordUser) {
-        warning('Discord user not found');
+
+      let discordUser: DiscordJs.GuildMember;
+      try {
+        discordUser = guild.member(await guild.members.fetch(user.discordId)) as DiscordJs.GuildMember;
+      } catch (e) {
+        await getRepository(DiscordLink).delete({ userId: user.userId });
+        warning(`Discord user ${user.tag}@${user.discordId} not found - removed from link table`);
         continue;
       }
+
       const botPermissionsSortedByPriority = await getRepository(PermissionsEntity).find({
         relations: ['filters'],
         order:     { order: 'ASC' },
