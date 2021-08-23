@@ -1,11 +1,11 @@
+import * as constants from '@sogebot/ui-helpers/constants';
 import Axios from 'axios';
 import chalk from 'chalk';
-import io from 'socket.io-client-legacy';
 import { getRepository } from 'typeorm';
 
 import currency from '../currency';
 import { UserTip, UserTipInterface } from '../database/entity/user';
-import { settings } from '../decorators';
+import { persistent, settings } from '../decorators';
 import { onChange, onStartup } from '../decorators/on';
 import { isStreamOnline, stats } from '../helpers/api/index.js';
 import { mainCurrency } from '../helpers/currency';
@@ -20,27 +20,25 @@ import users from '../users';
 import Integration from './_interface';
 
 type StreamElementsEvent = {
-  _id: string;
-  channel: string;
-  type: 'cheer' | 'follow' | 'host' | 'raid' | 'subscriber' | 'tip';
-  provider: 'twitch' | 'facebook' | 'youtube';
-  flagged: boolean;
-  createdAt: string;
-  updatedAt: string;
-  data: {
-    tipId: string;
-    username: string;
-    amount: number;
-    currency: currency;
-    message: string;
-    items: any[];
-    avatar: string;
-    providerId: string;
-    displayName: string;
-    streak: number;
-    tier: '1000' | '2000' | '3000' | 'prime';
-    quantity: number
-  }
+  donation: {
+    user: {
+      username: string,
+      geo: null,
+      email: string,
+    },
+    message: string,
+    amount: number,
+    currency: currency
+  },
+  provider: string,
+  status: string,
+  deleted: boolean,
+  _id: string,
+  channel: string,
+  transactionId: string,
+  approved: string,
+  createdAt: string,
+  updatedAt: string
 };
 
 /* example payload (eventData)
@@ -61,11 +59,54 @@ type StreamElementsEvent = {
   },
   updatedAt: '2019-10-03T22:42:33.023Z'
 } */
+
+function getTips (offset: number, channel: string, jwtToken: string, afterDate: number): Promise<[total: number, tips: any[]]> {
+  return new Promise((resolve) => {
+    Axios(`https://api.streamelements.com/kappa/v2/tips/${channel}?limit=100&after=${afterDate}&offset=${offset}`, {
+      method:  'GET',
+      headers: {
+        Accept:        'application/json',
+        Authorization: 'Bearer ' + jwtToken,
+      },
+    }).then(response => {
+      const data = response.data;
+      resolve([Number(data.total), data.docs]);
+    });
+  });
+}
+
 class StreamElements extends Integration {
-  socketToStreamElements: any | null = null;
+  channel = '';
+
+  @persistent()
+  afterDate = Date.now();
 
   @settings()
   jwtToken = '';
+
+  @onStartup()
+  interval() {
+    this.afterDate = 0;
+    setInterval(async () => {
+      if (this.channel.length === 0) {
+        return;
+      }
+
+      // get initial data
+      let [total, tips] = await getTips(0, this.channel, this.jwtToken, this.afterDate);
+
+      while (tips.length < total) {
+        tips = [...tips, ...await getTips(tips.length, this.channel, this.jwtToken, this.afterDate)];
+      }
+
+      for (const item of tips.filter(o => new Date(o.createdAt).getTime() >= this.afterDate)) {
+        this.parse(item);
+      }
+
+      this.afterDate = Date.now();
+
+    }, constants.MINUTE);
+  }
 
   @onStartup()
   @onChange('enabled')
@@ -73,82 +114,38 @@ class StreamElements extends Integration {
     if (val) {
       this.connect();
     } else {
-      this.disconnect();
-    }
-  }
-
-  async disconnect () {
-    if (this.socketToStreamElements !== null) {
-      this.socketToStreamElements.removeAllListeners();
-      this.socketToStreamElements.disconnect();
+      this.channel = '';
     }
   }
 
   @onChange('jwtToken')
   async connect () {
-    this.disconnect();
-
     if (this.jwtToken.trim() === '' || !this.enabled) {
       return;
     }
 
     // validate token
     try {
-      await Axios('https://api.streamelements.com/kappa/v2/channels/me', {
+      const request = await Axios('https://api.streamelements.com/kappa/v2/channels/me', {
         method:  'GET',
         headers: {
           Accept:        'application/json',
           Authorization: 'Bearer ' + this.jwtToken,
         },
       });
-      info(chalk.yellow('STREAMELEMENTS:') + ' JWT token check OK.');
+      this.channel = request.data._id;
+      info(chalk.yellow('STREAMELEMENTS:') + ` JWT token check OK. Using channel ${request.data.username}@${request.data._id}`);
     } catch (e) {
       error(chalk.yellow('STREAMELEMENTS:') + ' JWT token is not valid.');
       return;
     }
-
-    this.socketToStreamElements = io('https://realtime.streamelements.com', {
-      reconnection:         true,
-      reconnectionDelay:    1000,
-      reconnectionDelayMax: 5000,
-      reconnectionAttempts: Infinity,
-      transports:           ['websocket'],
-    });
-
-    this.socketToStreamElements.on('reconnect_attempt', () => {
-      info(chalk.yellow('STREAMELEMENTS:') + ' Trying to reconnect to service');
-    });
-
-    this.socketToStreamElements.on('connect', () => {
-      info(chalk.yellow('STREAMELEMENTS:') + ' Successfully connected socket to service');
-      if (this.socketToStreamElements !== null) {
-        this.socketToStreamElements.emit('authenticate', { method: 'jwt', token: this.jwtToken });
-      }
-    });
-
-    this.socketToStreamElements.on('authenticated', ({ channelId }: { channelId: string }) => {
-      info(chalk.yellow('STREAMELEMENTS:') + ` Successfully authenticated on service (channel ${channelId})`);
-    });
-
-    this.socketToStreamElements.on('disconnect', () => {
-      info(chalk.yellow('STREAMELEMENTS:') + ' Socket disconnected from service');
-      if (this.socketToStreamElements) {
-        this.socketToStreamElements.open();
-      }
-    });
-
-    this.socketToStreamElements.on('event', async (eventData: StreamElementsEvent) => {
-      this.parse(eventData);
-    });
   }
 
   async parse(eventData: StreamElementsEvent) {
-    if (eventData.type !== 'tip') {
-      return;
-    }
-
-    const { username, amount, message } = eventData.data;
-    const DONATION_CURRENCY = eventData.data.currency;
+    const username = eventData.donation.user.username;
+    const amount = eventData.donation.amount;
+    const message = eventData.donation.message;
+    const DONATION_CURRENCY = eventData.donation.currency;
 
     if (isStreamOnline.value) {
       stats.value.currentTips = stats.value.currentTips + currency.exchange(amount, DONATION_CURRENCY, mainCurrency.value);
@@ -204,7 +201,7 @@ class StreamElements extends Integration {
         alerts.trigger({
           event:      'tips',
           name:       username.toLowerCase(),
-          amount:     Number(Number(eventData.data.amount).toFixed(2)),
+          amount:     Number(Number(amount).toFixed(2)),
           tier:       null,
           currency:   DONATION_CURRENCY,
           monthsName: '',

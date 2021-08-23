@@ -2,8 +2,6 @@
   "upgrade": true,
   "reject": [
     "node-hue-api",
-    "socket.io-client-legacy",
-    "socket.io-legacy",
     "strip-ansi"
   ]
 }
