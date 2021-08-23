@@ -36,7 +36,7 @@
     "currency-symbol-map": "5.0.1",
     "dayjs": "1.10.7",
     "decode-html": "2.0.0",
-    "discord.js": "12.5.3",
+    "discord.js": "13.2.0",
     "dotenv": "10.0.0",
     "emoji-regex": "9.2.2",
     "express": "^4.17.1",

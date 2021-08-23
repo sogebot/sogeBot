@@ -120,27 +120,27 @@ class Discord extends Integration {
           if (message && embed) {
             embed.spliceFields(0, embed.fields.length);
             embed.addFields([
-              { name: prepare('webpanel.responses.variable.game'), value: stats.value.currentGame },
-              { name: prepare('webpanel.responses.variable.title'), value: stats.value.currentTitle },
+              { name: prepare('webpanel.responses.variable.game'), value: stats.value.currentGame ?? '' },
+              { name: prepare('webpanel.responses.variable.title'), value: stats.value.currentTitle ?? '' },
               {
                 name: prepare('integrations.discord.started-at'), value: this.embedStartedAt, inline: true,
               },
               {
-                name: prepare('webpanel.viewers'), value: stats.value.currentViewers, inline: true,
+                name: prepare('webpanel.viewers'), value: String(stats.value.currentViewers), inline: true,
               },
               {
-                name: prepare('webpanel.views'), value: stats.value.currentViews, inline: true,
+                name: prepare('webpanel.views'), value: String(stats.value.currentViews), inline: true,
               },
               {
-                name: prepare('webpanel.followers'), value: stats.value.currentFollowers, inline: true,
+                name: prepare('webpanel.followers'), value: String(stats.value.currentFollowers), inline: true,
               },
             ]);
             embed.setImage(`https://static-cdn.jtvnw.net/previews-ttv/live_user_${generalChannel.value}-1920x1080.jpg?${Date.now()}`);
 
             if (oauth.broadcasterType !== '') {
-              embed.addField(prepare('webpanel.subscribers'), stats.value.currentSubscribers, true);
+              embed.addField(prepare('webpanel.subscribers'), String(stats.value.currentSubscribers), true);
             }
-            message.edit(embed);
+            message.edit({ embeds: [embed] });
           }
         }
       }
@@ -176,8 +176,8 @@ class Discord extends Integration {
 
       let discordUser: DiscordJs.GuildMember;
       try {
-        discordUser = guild.member(await guild.members.fetch(user.discordId)) as DiscordJs.GuildMember;
-      } catch (e: any) {
+        discordUser = await guild.members.fetch(user.discordId);
+      } catch (e) {
         await getRepository(DiscordLink).delete({ userId: user.userId });
         warning(`Discord user ${user.tag}@${user.discordId} not found - removed from link table`);
         continue;
@@ -316,24 +316,24 @@ class Discord extends Integration {
           embed.setDescription(`${generalChannel.value.charAt(0).toUpperCase() + generalChannel.value.slice(1)} is not streaming anymore! Check it next time!`);
           embed.spliceFields(0, embed.fields.length);
           embed.addFields([
-            { name: prepare('webpanel.responses.variable.game'), value: stats.value.currentGame },
-            { name: prepare('webpanel.responses.variable.title'), value: stats.value.currentTitle },
+            { name: prepare('webpanel.responses.variable.game'), value: stats.value.currentGame ?? '' },
+            { name: prepare('webpanel.responses.variable.title'), value: stats.value.currentTitle ?? '' },
             {
               name: prepare('integrations.discord.streamed-at'), value: `${this.embedStartedAt} - ${dayjs().tz(timezone).format('LLL')}`, inline: true,
             },
             {
-              name: prepare('webpanel.views'), value: stats.value.currentViews, inline: true,
+              name: prepare('webpanel.views'), value: String(stats.value.currentViews), inline: true,
             },
             {
-              name: prepare('webpanel.followers'), value: stats.value.currentFollowers, inline: true,
+              name: prepare('webpanel.followers'), value: String(stats.value.currentFollowers), inline: true,
             },
           ]);
           embed.setImage(`https://static-cdn.jtvnw.net/ttv-static/404_preview-1920x1080.jpg?${Date.now()}`);
 
           if (oauth.broadcasterType !== '') {
-            embed.addField(prepare('webpanel.subscribers'), stats.value.currentSubscribers, true);
+            embed.addField(prepare('webpanel.subscribers'), String(stats.value.currentSubscribers), true);
           }
-          message.edit(embed);
+          message.edit({ embeds: [embed] });
         }
       } catch (e: any) {
         warning(`Discord embed couldn't be changed to offline - ${e.message}`);
@@ -356,16 +356,16 @@ class Discord extends Integration {
         const embed = new DiscordJs.MessageEmbed()
           .setURL('https://twitch.tv/' + generalChannel.value)
           .addFields([
-            { name: prepare('webpanel.responses.variable.game'), value: stats.value.currentGame },
-            { name: prepare('webpanel.responses.variable.title'), value: stats.value.currentTitle },
+            { name: prepare('webpanel.responses.variable.game'), value: stats.value.currentGame ?? '' },
+            { name: prepare('webpanel.responses.variable.title'), value: stats.value.currentTitle ?? '' },
             {
               name: prepare('integrations.discord.started-at'), value: this.embedStartedAt, inline: true,
             },
             {
-              name: prepare('webpanel.views'), value: stats.value.currentViews, inline: true,
+              name: prepare('webpanel.views'), value: String(stats.value.currentViews), inline: true,
             },
             {
-              name: prepare('webpanel.followers'), value: stats.value.currentFollowers, inline: true,
+              name: prepare('webpanel.followers'), value: String(stats.value.currentFollowers), inline: true,
             },
           ])
           // Set the title of the field
@@ -379,10 +379,10 @@ class Discord extends Integration {
           .setFooter('Announced by sogeBot - https://www.sogebot.xyz');
 
         if (oauth.broadcasterType !== '') {
-          embed.addField(prepare('webpanel.subscribers'), stats.value.currentSubscribers, true);
+          embed.addField(prepare('webpanel.subscribers'), String(stats.value.currentSubscribers), true);
         }
         // Send the embed to the same channel as the message
-        const message = await (channel as DiscordJs.TextChannel).send(embed);
+        const message = await (channel as DiscordJs.TextChannel).send({ embeds: [embed] });
         this.embedMessageId = message.id;
         chatOut(`#${(channel as DiscordJs.TextChannel).name}: [[online announce embed]] [${this.client.user?.tag}]`);
       }
@@ -408,23 +408,24 @@ class Discord extends Integration {
         if (this.onlinePresenceStatusOnStream === 'streaming') {
           this.client?.user?.setStatus('online');
           this.client?.user?.setPresence({
-            status:   'online', activity: {
+            status:     'online',
+            activities: [{
               name: activityString, type: 'STREAMING', url: `https://twitch.tv/${generalChannel.value}`,
-            },
+            }],
           });
         } else {
           this.client?.user?.setStatus(this.onlinePresenceStatusOnStream);
           if (activityString !== '') {
             this.client?.user?.setActivity('');
           } else {
-            this.client?.user?.setPresence({ status: this.onlinePresenceStatusOnStream, activity: { name: activityString } });
+            this.client?.user?.setPresence({ status: this.onlinePresenceStatusOnStream, activities: [{ name: activityString }] });
           }
         }
       } else {
         const activityString = await new Message(this.onlinePresenceStatusDefaultName).parse();
         if (activityString !== ''){
           this.client?.user?.setStatus(this.onlinePresenceStatusDefault);
-          this.client?.user?.setPresence({ status: this.onlinePresenceStatusDefault, activity: { name: activityString } });
+          this.client?.user?.setPresence({ status: this.onlinePresenceStatusDefault, activities: [{ name: activityString }] });
         } else {
           this.client?.user?.setActivity('');
           this.client?.user?.setStatus(this.onlinePresenceStatusDefault);
@@ -494,8 +495,8 @@ class Discord extends Integration {
   initClient() {
     if (!this.client) {
       this.client = new DiscordJs.Client({
+        intents:  [DiscordJs.Intents.FLAGS.GUILDS,DiscordJs.Intents.FLAGS.GUILD_MESSAGES],
         partials: ['REACTION', 'MESSAGE', 'CHANNEL'],
-        ws:       { intents: ['GUILD_MESSAGES', 'GUILDS'] },
       });
       this.client.on('ready', () => {
         if (this.client) {
@@ -509,7 +510,7 @@ class Discord extends Integration {
         if (this.client && this.guild) {
 
           const isSelf = msg.author.tag === get(this.client, 'user.tag', null);
-          const isDM = msg.channel.type === 'dm';
+          const isDM = msg.channel.type === 'DM';
           const isDifferentGuild = msg.guild?.id !== this.guild;
           const isInIgnoreList
              = this.ignorelist.includes(msg.author.tag)
@@ -519,7 +520,7 @@ class Discord extends Integration {
             return;
           }
 
-          if (msg.channel.type === 'text') {
+          if (msg.channel.type === 'GUILD_TEXT') {
             const listenAtChannels = [
               ...Array.isArray(this.listenAtChannels) ? this.listenAtChannels : [this.listenAtChannels],
             ].filter(o => o !== '');
@@ -601,7 +602,7 @@ class Discord extends Integration {
           if (responses) {
             for (let i = 0; i < responses.length; i++) {
               setTimeout(async () => {
-                if (channel.type === 'text') {
+                if (channel.type === 'GUILD_TEXT') {
                   const messageToSend = await new Message(await responses[i].response).parse({
                     ...responses[i].attr,
                     forceWithoutAt: true, // we dont need @
@@ -696,7 +697,7 @@ class Discord extends Integration {
       try {
         if (this.client && this.guild) {
           cb(null, this.client.guilds.cache.get(this.guild)?.channels.cache
-            .filter(o => o.type === 'text')
+            .filter(o => o.type === 'GUILD_TEXT')
             .sort((a, b) => {
               const nameA = (a as DiscordJs.TextChannel).name.toUpperCase(); // ignore upper and lowercase
               const nameB = (b as DiscordJs.TextChannel).name.toUpperCase(); // ignore upper and lowercase

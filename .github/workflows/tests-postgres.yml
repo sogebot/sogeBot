@@ -30,7 +30,7 @@ jobs:
       if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
       uses: actions/setup-node@v2
       with:
-        node-version: 14
+        node-version: 16
         check-latest: true
     - name: Install latest npm
       if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
@@ -68,7 +68,7 @@ jobs:
       if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
       uses: actions/setup-node@v2
       with:
-        node-version: 14
+        node-version: 16
         check-latest: true
     - name: Install latest npm
       if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
@@ -112,7 +112,7 @@ jobs:
       if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
       uses: actions/setup-node@v2
       with:
-        node-version: 14
+        node-version: 16
         check-latest: true
     - name: Install latest npm
       if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
@@ -156,7 +156,7 @@ jobs:
       if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
       uses: actions/setup-node@v2
       with:
-        node-version: 14
+        node-version: 16
         check-latest: true
     - name: Install latest npm
       if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
