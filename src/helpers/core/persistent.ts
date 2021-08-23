@@ -1,4 +1,5 @@
 import DeepProxy from 'proxy-deep';
+import { EntityNotFoundError } from 'typeorm';
 import { getRepository } from 'typeorm';
 
 import { Settings } from '../../database/entity/settings';
@@ -69,7 +70,7 @@ function persistent<T>({ value, name, namespace, onChange }: { value: T, name: s
       );
     } catch (e) {
       debug('persistent.load', `Data not found, creating ${namespace}/${name}`);
-      if (e.name !== 'EntityNotFound') {
+      if (!(e instanceof EntityNotFoundError)) {
         await setImmediateAwait();
         await getRepository(Settings).delete({ name, namespace });
       }

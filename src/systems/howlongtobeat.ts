@@ -1,5 +1,6 @@
 import * as constants from '@sogebot/ui-helpers/constants';
 import { HowLongToBeatService } from 'howlongtobeat';
+import { EntityNotFoundError } from 'typeorm';
 import { getRepository } from 'typeorm';
 
 import { HowLongToBeatGame, HowLongToBeatGameItem } from '../database/entity/howLongToBeatGame';
@@ -158,7 +159,7 @@ class HowLongToBeat extends System {
         });
       }
     } catch (e) {
-      if (e.name === 'EntityNotFound') {
+      if (e instanceof EntityNotFoundError) {
         const gameFromHltb = (await this.hltbService.search(stats.value.currentGame))[0];
         if (gameFromHltb) {
           debug('hltb', `Game ${stats.value.currentGame} found on HLTB service`);

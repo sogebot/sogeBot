@@ -1,4 +1,5 @@
 import { SECOND } from '@sogebot/ui-helpers/constants';
+import { EntityNotFoundError } from 'typeorm';
 import { getRepository } from 'typeorm';
 
 import { Events } from '../database/entity/event';
@@ -182,7 +183,7 @@ class OBSWebsocket extends Integration {
 
       return [];
     } catch (err) {
-      const isEntityNotFound = err.name === 'EntityNotFound';
+      const isEntityNotFound = (err instanceof EntityNotFoundError);
       const isParameterError = (err instanceof ParameterError);
 
       if (isEntityNotFound) {
