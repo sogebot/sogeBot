@@ -60,9 +60,9 @@ type StreamElementsEvent = {
   updatedAt: '2019-10-03T22:42:33.023Z'
 } */
 
-function getTips (offset: number, channel: string, jwtToken: string, afterDate: number): Promise<[total: number, tips: any[]]> {
+function getTips (offset: number, channel: string, jwtToken: string, beforeDate: number, afterDate: number): Promise<[total: number, tips: any[]]> {
   return new Promise((resolve) => {
-    Axios(`https://api.streamelements.com/kappa/v2/tips/${channel}?limit=100&after=${afterDate}&offset=${offset}`, {
+    Axios(`https://api.streamelements.com/kappa/v2/tips/${channel}?limit=100&before=${beforeDate}&after=${afterDate}&offset=${offset}`, {
       method:  'GET',
       headers: {
         Accept:        'application/json',
@@ -86,24 +86,24 @@ class StreamElements extends Integration {
 
   @onStartup()
   interval() {
-    this.afterDate = 0;
     setInterval(async () => {
       if (this.channel.length === 0) {
         return;
       }
+      const beforeDate = Date.now();
 
       // get initial data
-      let [total, tips] = await getTips(0, this.channel, this.jwtToken, this.afterDate);
+      let [total, tips] = await getTips(0, this.channel, this.jwtToken, beforeDate, this.afterDate);
 
       while (tips.length < total) {
-        tips = [...tips, ...await getTips(tips.length, this.channel, this.jwtToken, this.afterDate)];
+        tips = [...tips, ...await getTips(tips.length, this.channel, this.jwtToken, beforeDate, this.afterDate)];
       }
 
       for (const item of tips.filter(o => new Date(o.createdAt).getTime() >= this.afterDate)) {
         this.parse(item);
       }
 
-      this.afterDate = Date.now();
+      this.afterDate = beforeDate;
 
     }, constants.MINUTE);
   }
