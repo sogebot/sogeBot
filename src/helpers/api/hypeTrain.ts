@@ -25,26 +25,35 @@ let topContributionsSubsUserId = null as null | string;
 
 async function setCurrentLevel(level: 1 | 2 | 3 | 4 | 5) {
   if (level > latestLevel && level > 1) {
-    eventEmitter.emit('hypetrain-level-reached', {
-      level,
-      total,
-      goal,
+    let waitForNextLevel = false;
+    while(latestLevel < level) {
+      if (waitForNextLevel) {
+        // wait for a while before new level is triggered
+        await new Promise((resolve) => setTimeout(() => resolve(true), 10000));
+      }
+      waitForNextLevel = true;
+      latestLevel++;
 
-      topContributionsBitsUserId:   topContributionsBitsUserId ? topContributionsBitsUserId : 'n/a',
-      topContributionsBitsUsername: topContributionsBitsUserId ? await users.getNameById(topContributionsBitsUserId) : 'n/a',
-      topContributionsBitsTotal,
+      eventEmitter.emit('hypetrain-level-reached', {
+        level: latestLevel as 1 | 2 | 3 | 4 | 5,
+        total,
+        goal,
 
-      topContributionsSubsUserId:   topContributionsSubsUserId ? topContributionsSubsUserId : 'n/a',
-      topContributionsSubsUsername: topContributionsSubsUserId ? await users.getNameById(topContributionsSubsUserId) : 'n/a',
-      topContributionsSubsTotal,
+        topContributionsBitsUserId:   topContributionsBitsUserId ? topContributionsBitsUserId : 'n/a',
+        topContributionsBitsUsername: topContributionsBitsUserId ? await users.getNameById(topContributionsBitsUserId) : 'n/a',
+        topContributionsBitsTotal,
 
-      lastContributionTotal,
-      lastContributionType,
-      lastContributionUserId:   lastContributionUserId ? lastContributionUserId : 'n/a',
-      lastContributionUsername: lastContributionUserId ? await users.getNameById(lastContributionUserId) : 'n/a',
-    });
+        topContributionsSubsUserId:   topContributionsSubsUserId ? topContributionsSubsUserId : 'n/a',
+        topContributionsSubsUsername: topContributionsSubsUserId ? await users.getNameById(topContributionsSubsUserId) : 'n/a',
+        topContributionsSubsTotal,
+
+        lastContributionTotal,
+        lastContributionType,
+        lastContributionUserId:   lastContributionUserId ? lastContributionUserId : 'n/a',
+        lastContributionUsername: lastContributionUserId ? await users.getNameById(lastContributionUserId) : 'n/a',
+      });
+    }
   }
-  latestLevel = level;
 }
 
 function getCurrentLevel() {
