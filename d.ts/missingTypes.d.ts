@@ -12,7 +12,6 @@ declare module 'html-entities';
 declare module 'strip-comments';
 declare module 'vue-plyr';
 declare module 'blocked-at';
-declare module 'socket.io-client-legacy';
 
 declare module 'js-beautify' {
   export function js(code: string): string;
