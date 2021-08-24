@@ -1,4 +1,4 @@
-import { SECOND } from '@sogebot/ui-helpers/constants';
+import { MINUTE, SECOND } from '@sogebot/ui-helpers/constants';
 
 import users from '../../users';
 import { eventEmitter } from '../events';
@@ -98,7 +98,8 @@ function setGoal(value: number) {
 
 setInterval(async () => {
   if (expiresAt) {
-    if (new Date(expiresAt).getTime() < Date.now() && endedId !== id && id === startedId) {
+    // we need to be lenient with expiresAt due to API poll
+    if (new Date(expiresAt).getTime() < Date.now() - 3 * MINUTE && endedId !== id && id === startedId) {
       endedId = id;
       eventEmitter.emit('hypetrain-ended', {
         level: latestLevel,
