@@ -111,6 +111,7 @@ async function main () {
         require('./permissions');
         require('./oauth');
         require('./api');
+        require('./eventsub');
         require('./pubsub');
         require('./updater');
         await autoLoad('./dest/stats/');
