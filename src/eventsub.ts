@@ -16,6 +16,7 @@ import {
   error, info, warning,
 } from './helpers/log';
 import { channelId } from './helpers/oauth';
+import { ioServer } from './helpers/panel';
 
 const messagesProcessed: string[] = [];
 let isErrorEventsShown = false;
@@ -70,6 +71,12 @@ class EventSub extends Core {
           }
           hypeTrain.setLastContribution(data.event.last_contribution.total, data.event.last_contribution.type, data.event.last_contribution.user_id, data.event.last_contribution.user_login);
           hypeTrain.setCurrentLevel(data.event.level);
+
+          // update overlay
+          ioServer?.of('/core/eventsub').emit('hypetrain-update', {
+            total: data.event.total, goal: data.event.goal, level: data.event.level,
+          });
+
           res.status(200).send('OK');
         } else if (data.subscription.type === 'channel.hype_train.end') {
           await hypeTrain.triggerHypetrainEnd();
