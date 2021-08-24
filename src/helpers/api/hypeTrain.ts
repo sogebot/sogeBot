@@ -1,27 +1,20 @@
-import { MINUTE, SECOND } from '@sogebot/ui-helpers/constants';
-
-import users from '../../users';
 import { eventEmitter } from '../events';
 
-type RFC3339 = string; // 2020-04-24T20:07:24Z
-
-let id = '';
-let endedId = '';
-let startedId = '';
 let latestLevel = 1 as 1 | 2 | 3 | 4 | 5;
-let startedAt = null as null | string;
-let expiresAt = null as null | string;
 let total = 0;
 let goal = 0;
 
 let lastContributionTotal = 0;
-let lastContributionType = 'BITS' as 'BITS' | 'SUBS';
+let lastContributionType = 'bits' as 'bits' | 'subs';
 let lastContributionUserId = null as null | string;
+let lastContributionUserName = null as null | string;
 
 let topContributionsBitsTotal = 0;
 let topContributionsBitsUserId = null as null | string;
+let topContributionsBitsUserName = null as null | string;
 let topContributionsSubsTotal = 0;
 let topContributionsSubsUserId = null as null | string;
+let topContributionsSubsUserName = null as null | string;
 
 async function setCurrentLevel(level: 1 | 2 | 3 | 4 | 5) {
   if (level > latestLevel && level > 1) {
@@ -40,17 +33,17 @@ async function setCurrentLevel(level: 1 | 2 | 3 | 4 | 5) {
         goal,
 
         topContributionsBitsUserId:   topContributionsBitsUserId ? topContributionsBitsUserId : 'n/a',
-        topContributionsBitsUsername: topContributionsBitsUserId ? await users.getNameById(topContributionsBitsUserId) : 'n/a',
+        topContributionsBitsUsername: topContributionsBitsUserName ? topContributionsBitsUserName : 'n/a',
         topContributionsBitsTotal,
 
         topContributionsSubsUserId:   topContributionsSubsUserId ? topContributionsSubsUserId : 'n/a',
-        topContributionsSubsUsername: topContributionsSubsUserId ? await users.getNameById(topContributionsSubsUserId) : 'n/a',
+        topContributionsSubsUsername: topContributionsSubsUserName ? topContributionsSubsUserName : 'n/a',
         topContributionsSubsTotal,
 
         lastContributionTotal,
         lastContributionType,
         lastContributionUserId:   lastContributionUserId ? lastContributionUserId : 'n/a',
-        lastContributionUsername: lastContributionUserId ? await users.getNameById(lastContributionUserId) : 'n/a',
+        lastContributionUsername: lastContributionUserName ? lastContributionUserName : 'n/a',
       });
     }
   }
@@ -60,41 +53,23 @@ function getCurrentLevel() {
   return latestLevel;
 }
 
-function getStartedAt() {
-  return startedAt;
-}
-
-function setLastContribution(total_: typeof lastContributionTotal, type: typeof lastContributionType, userId: typeof lastContributionUserId) {
+function setLastContribution(total_: typeof lastContributionTotal, type: typeof lastContributionType, userId: typeof lastContributionUserId, username: typeof lastContributionUserName) {
   lastContributionTotal = total_;
   lastContributionType = type;
   lastContributionUserId = userId;
+  lastContributionUserName = username;
 }
 
-function setTopContributions(type: 'BITS' | 'SUBS', total_: typeof lastContributionTotal, userId: typeof topContributionsBitsUserId) {
-  if (type === 'BITS') {
+function setTopContributions(type: 'bits' | 'subs', total_: typeof lastContributionTotal, userId: typeof topContributionsBitsUserId, username: typeof lastContributionUserName) {
+  if (type === 'bits') {
     topContributionsBitsTotal = total_;
     topContributionsBitsUserId = userId;
+    topContributionsBitsUserName = username;
   } else {
     topContributionsSubsTotal = total_;
     topContributionsSubsUserId = userId;
+    topContributionsSubsUserName = username;
   }
-}
-
-function setId(id_: string) {
-  // id is different and hypetrain is not expired
-  if (startedId !== id_ && expiresAt && new Date(expiresAt).getTime() > Date.now()) {
-    startedId = id_;
-    eventEmitter.emit('hypetrain-started');
-  }
-  id = id_;
-}
-
-function setStartedAt(date: null | RFC3339) {
-  startedAt = date;
-}
-
-function setExpiresAt(date: null | RFC3339) {
-  expiresAt = date;
 }
 
 function setTotal(value: number) {
@@ -105,42 +80,33 @@ function setGoal(value: number) {
   goal = value;
 }
 
-setInterval(async () => {
-  if (expiresAt) {
-    // we need to be lenient with expiresAt due to API poll
-    if (new Date(expiresAt).getTime() < Date.now() - 3 * MINUTE && endedId !== id && id === startedId) {
-      endedId = id;
-      eventEmitter.emit('hypetrain-ended', {
-        level: latestLevel,
-        total,
-        goal,
+async function triggerHypetrainEnd() {
+  eventEmitter.emit('hypetrain-ended', {
+    level: latestLevel,
+    total,
+    goal,
 
-        topContributionsBitsUserId:   topContributionsBitsUserId ? topContributionsBitsUserId : 'n/a',
-        topContributionsBitsUsername: topContributionsBitsUserId ? await users.getNameById(topContributionsBitsUserId) : 'n/a',
-        topContributionsBitsTotal,
+    topContributionsBitsUserId:   topContributionsBitsUserId ? topContributionsBitsUserId : 'n/a',
+    topContributionsBitsUsername: topContributionsBitsUserName ? topContributionsBitsUserName : 'n/a',
+    topContributionsBitsTotal,
 
-        topContributionsSubsUserId:   topContributionsSubsUserId ? topContributionsSubsUserId : 'n/a',
-        topContributionsSubsUsername: topContributionsSubsUserId ? await users.getNameById(topContributionsSubsUserId) : 'n/a',
-        topContributionsSubsTotal,
+    topContributionsSubsUserId:   topContributionsSubsUserId ? topContributionsSubsUserId : 'n/a',
+    topContributionsSubsUsername: topContributionsSubsUserName ? topContributionsSubsUserName : 'n/a',
+    topContributionsSubsTotal,
 
-        lastContributionTotal,
-        lastContributionType,
-        lastContributionUserId:   lastContributionUserId ? lastContributionUserId : 'n/a',
-        lastContributionUsername: lastContributionUserId ? await users.getNameById(lastContributionUserId) : 'n/a',
-      });
-    }
-  }
-}, 30 * SECOND);
+    lastContributionTotal,
+    lastContributionType,
+    lastContributionUserId:   lastContributionUserId ? lastContributionUserId : 'n/a',
+    lastContributionUsername: lastContributionUserName ? lastContributionUserName : 'n/a',
+  });
+}
 
 export {
   getCurrentLevel,
   setCurrentLevel,
-  getStartedAt,
-  setStartedAt,
-  setId,
-  setExpiresAt,
   setTotal,
   setGoal,
   setTopContributions,
   setLastContribution,
+  triggerHypetrainEnd,
 };

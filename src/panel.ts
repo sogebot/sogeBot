@@ -78,8 +78,16 @@ export const init = () => {
   setApp(express());
   app?.use(limiter);
   app?.use(cors());
-  app?.use(express.json({ limit: '500mb' }));
+  app?.use(express.json({
+    limit:  '500mb',
+    verify: (req, _res, buf) =>{
+    // Small modification to the JSON bodyParser to expose the raw body in the request object
+    // The raw body is required at signature verification
+      (req as any).rawBody = buf;
+    },
+  }));
   app?.use(express.urlencoded({ extended: true, limit: '500mb' }));
+  app?.use(express.raw());
   app?.use('/frame-api-explorer', swaggerUi.serve, swaggerUi.setup({
     ...swaggerJSON,
     info: {
@@ -188,6 +196,10 @@ export const init = () => {
       nuxtCache.delete(req.url);
       res.sendStatus(404);
     }
+  });
+  app?.post('/webhooks/callback', function (req, res) {
+    const eventsub = require('./eventsub').default;
+    eventsub.handler(req, res);
   });
   app?.get('/popout/', function (req, res) {
     res.sendFile(path.join(__dirname, '..', 'public', 'popout.html'));
