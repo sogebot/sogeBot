@@ -59,8 +59,8 @@ import songs from './systems/songs';
 import tmi from './tmi';
 import translateLib, { translate } from './translate';
 
-const port = process.env.PORT ?? '20000';
-const secureport = process.env.SECUREPORT ?? '20443';
+const port = Number(process.env.PORT ?? 20000);
+const secureport = Number(process.env.SECUREPORT ?? 20443);
 
 const limiter = RateLimit({
   windowMs: 60 * 1000,
@@ -547,10 +547,10 @@ export const getApp = function () {
 };
 
 export const expose = function () {
-  server.listen(port, () => {
+  server.listen(port, '0.0.0.0', () => {
     info(`WebPanel is available at http://localhost:${port}`);
   });
-  serverSecure?.listen(secureport, () => {
+  serverSecure?.listen(secureport, '0.0.0.0', () => {
     info(`WebPanel is available at https://localhost:${secureport}`);
   });
 };
