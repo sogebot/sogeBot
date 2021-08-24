@@ -216,6 +216,8 @@ class Polls extends System {
       for (const index of Object.keys(options)) {
         if (type === 'normal') {
           responses.push({ response: this.getCommand('!vote') + ` ${(Number(index) + 1)} => ${options[index]}`, ...opts });
+        } else if (type === 'numbers') {
+          responses.push({ response: `${index} => ${options[index]}`, ...opts });
         } else {
           responses.push({ response: `#vote${(Number(index) + 1)} => ${options[index]}`, ...opts });
         }
