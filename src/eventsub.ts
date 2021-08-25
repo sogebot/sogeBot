@@ -119,7 +119,7 @@ class EventSub extends Core {
 
   @onStartup()
   interval() {
-    setInterval(() => this.onStartup(), 10 * MINUTE);
+    setInterval(() => this.onStartup(), MINUTE);
   }
 
   @onStartup()
@@ -173,6 +173,22 @@ class EventSub extends Core {
             && ['webhook_callback_verification_pending', 'enabled'].includes(o.status)
             && o.condition.broadcaster_user_id === channelId.value;
         });
+
+        if (enabledOrPendingEvents) {
+          // check if domain is same
+          if (enabledOrPendingEvents.transport.callback !== `${this.domain}/webhooks/callback`) {
+            info(`EVENTSUB: ${event} callback endpoint doesn't match domain, revoking.`);
+            await axios.delete(`${url}?id=${enabledOrPendingEvents.id}`, {
+              headers: {
+                'Authorization': 'Bearer ' + token,
+                'Client-ID':     this.clientId,
+              },
+              timeout: 20000,
+            });
+          }
+          return this.onStartup();
+        }
+
         if (!enabledOrPendingEvents) {
           await this.subscribe(event);
         }
