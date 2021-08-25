@@ -183,7 +183,7 @@ class EventSub extends Core {
 
         if (enabledOrPendingEvents) {
           // check if domain is same
-          if (enabledOrPendingEvents.transport.callback !== `${this.domain}/webhooks/callback`) {
+          if (enabledOrPendingEvents.transport.callback !== `https://${this.domain}/webhooks/callback`) {
             info(`EVENTSUB: ${event} callback endpoint doesn't match domain, revoking.`);
             await axios.delete(`${url}?id=${enabledOrPendingEvents.id}`, {
               headers: {
