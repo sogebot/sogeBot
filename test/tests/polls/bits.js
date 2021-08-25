@@ -39,6 +39,9 @@ describe('Polls - bits', () => {
     it('Open new voting', async () => {
       const r = await polls.open({ sender: owner, parameters: '-bits -title "Lorem Ipsum test?" Lorem | Ipsum | Dolor Sit' });
       assert.strictEqual(r[0].response, 'Poll by cheers opened for "Lorem Ipsum test?"! You can vote by adding hashtag #voteX into bit message');
+      assert.strictEqual(r[1].response, '#vote1 => Lorem');
+      assert.strictEqual(r[2].response, '#vote2 => Ipsum');
+      assert.strictEqual(r[3].response, '#vote3 => Dolor Sit');
     });
     it('Close voting', async () => {
       const r = await polls.close({ sender: owner });
@@ -54,6 +57,9 @@ describe('Polls - bits', () => {
     it('Open new voting', async () => {
       const r = await polls.open({ sender: owner, parameters: '-bits -title "Lorem Ipsum?" Lorem | Ipsum | Dolor Sit' });
       assert.strictEqual(r[0].response, 'Poll by cheers opened for "Lorem Ipsum?"! You can vote by adding hashtag #voteX into bit message');
+      assert.strictEqual(r[1].response, '#vote1 => Lorem');
+      assert.strictEqual(r[2].response, '#vote2 => Ipsum');
+      assert.strictEqual(r[3].response, '#vote3 => Dolor Sit');
     });
     it('Open another voting should fail - will return current poll info', async () => {
       const r = await polls.open({ sender: owner, parameters: '-bits -title "Lorem Ipsum test?" Lorem | Ipsum | Dolor Sit' });

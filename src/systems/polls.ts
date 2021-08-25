@@ -216,6 +216,8 @@ class Polls extends System {
       for (const index of Object.keys(options)) {
         if (type === 'normal') {
           responses.push({ response: this.getCommand('!vote') + ` ${(Number(index) + 1)} => ${options[index]}`, ...opts });
+        } else if (type === 'numbers') {
+          responses.push({ response: `${Number(index) + 1} => ${options[index]}`, ...opts });
         } else {
           responses.push({ response: `#vote${(Number(index) + 1)} => ${options[index]}`, ...opts });
         }
@@ -244,7 +246,7 @@ class Polls extends System {
             if (cVote.type === 'normal') {
               responses.push({ response: this.getCommand('!poll open') + ` ${index} => ${cVote.options[Number(index)]}`, ...opts });
             } else if (cVote.type === 'numbers') {
-              responses.push({ response: `${index} => ${cVote.options[Number(index)]}`, ...opts });
+              responses.push({ response: `${Number(index) + 1} => ${cVote.options[Number(index)]}`, ...opts });
             } else {
               responses.push({ response: `#vote${(Number(index) + 1)} => ${cVote.options[Number(index)]}`, ...opts });
             }
@@ -303,7 +305,7 @@ class Polls extends System {
           .number()
           .toArray();
         index = index - 1;
-        if (cVote.options.length < index + 1 || index < 0) {
+        if (cVote.options.length < Number(index) + 1 || index < 0) {
           throw new Error(String(ERROR.INVALID_VOTE));
         } else {
           const vote = cVote.votes.find(o => o.votedBy === opts.sender.username);
