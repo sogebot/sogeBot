@@ -1,5 +1,6 @@
 import crypto from 'crypto';
 
+import { MINUTE } from '@sogebot/ui-helpers/constants';
 import axios from 'axios';
 import type { Request, Response } from 'express';
 import type QueryString from 'qs';
@@ -16,10 +17,11 @@ import {
 import { channelId } from './helpers/oauth';
 
 const messagesProcessed: string[] = [];
+let isErrorEventsShown = false;
 
 class EventSub extends Core {
   @settings()
-  domain = 'localhost';
+  domain = '';
   @settings()
   clientId = '';
   @settings()
@@ -47,7 +49,7 @@ class EventSub extends Core {
       res.status(403).send('Forbidden');
     } else {
       if (req.header('twitch-eventsub-message-type') === 'webhook_callback_verification') {
-        info(`EVENTSUB: ${'channel.hype_train.begin'} is verified.`);
+        info(`EVENTSUB: ${req.header('twitch-eventsub-subscription-type')} is verified.`);
         res.status(200).send(req.body.challenge);
       } else if (req.header('twitch-eventsub-message-type') === 'notification') {
         const data = req.body;
@@ -98,13 +100,26 @@ class EventSub extends Core {
     }
 
     if (this.clientId.length > 0 && this.clientSecret.length > 0) {
-      const url = `https://id.twitch.tv/oauth2/token?client_id=${this.clientId}&client_secret=${this.clientSecret}&grant_type=client_credentials&scope=channel:read:hype_train`;
-      const request = axios.post(url);
-      this.appToken = (await request).data.access_token;
-      return this.appToken;
+      try {
+        const url = `https://id.twitch.tv/oauth2/token?client_id=${this.clientId}&client_secret=${this.clientSecret}&grant_type=client_credentials&scope=channel:read:hype_train`;
+        const request = axios.post(url);
+        this.appToken = (await request).data.access_token;
+        return this.appToken;
+      } catch (e) {
+        if (e.response) {
+          // Request made and server responded
+          throw new Error(`Token call returned ${e.response.data.status} - ${e.response.data.message}`);
+        }
+        throw new Error(`Something wen wrong during token call - ${e.stack}`);
+      }
     } else {
       throw new Error('Missing clientId or clientSecret for EventSub');
     }
+  }
+
+  @onStartup()
+  interval() {
+    setInterval(() => this.onStartup(), 10 * MINUTE);
   }
 
   @onStartup()
@@ -117,7 +132,10 @@ class EventSub extends Core {
     }
 
     if (this.domain.includes('localhost')) {
-      warning('EVENTSUB: you need to set proper domain on 443 port, not localhost, for eventsub.');
+      if (!isErrorEventsShown) {
+        warning('EVENTSUB: you need to set proper domain on 443 port, not localhost, for eventsub.');
+        isErrorEventsShown = true;
+      }
       return;
     }
 
@@ -125,9 +143,13 @@ class EventSub extends Core {
       // check if domain is available in https mode
       await axios.get(`https://${this.domain}/webhooks/callback`, { headers: { 'sogebot-test': 'true' } });
     } catch (e) {
-      warning(`EVENTSUB: Bot not responding correctly on https://${this.domain}/webhooks/callback, eventsub will not work.`);
+      if (!isErrorEventsShown) {
+        warning(`EVENTSUB: Bot not responding correctly on https://${this.domain}/webhooks/callback, eventsub will not work.`);
+        isErrorEventsShown = true;
+      }
       return;
     }
+
     try {
       const token = await this.generateAppToken();
       const url = 'https://api.twitch.tv/helix/eventsub/subscriptions';
@@ -138,7 +160,6 @@ class EventSub extends Core {
         },
         timeout: 20000,
       });
-      info('EVENTSUB: Connection established');
 
       const events = [
         'channel.hype_train.begin',
