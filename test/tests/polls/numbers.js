@@ -39,9 +39,9 @@ describe('Polls - numbers', () => {
     it('Open new voting', async () => {
       const r = await polls.open({ sender: owner, parameters: '-numbers -title "Lorem Ipsum test?" Lorem | Ipsum | Dolor Sit' });
       assert.strictEqual(r[0].response, 'Poll by numbers opened for "Lorem Ipsum test?"! You can vote by typing number into chat.');
-      assert.strictEqual(r[1].response, '1 - Lorem');
-      assert.strictEqual(r[1].response, '2 - Ipsum');
-      assert.strictEqual(r[1].response, '3 - Dolor Sit');
+      assert.strictEqual(r[1].response, '1 => Lorem');
+      assert.strictEqual(r[2].response, '2 => Ipsum');
+      assert.strictEqual(r[3].response, '3 => Dolor Sit');
     });
     it('Close voting', async () => {
       const r = await polls.close({ sender: owner });
@@ -57,9 +57,9 @@ describe('Polls - numbers', () => {
     it('Open new voting', async () => {
       const r = await polls.open({ sender: owner, parameters: '-numbers -title "Lorem Ipsum?" Lorem | Ipsum | Dolor Sit' });
       assert.strictEqual(r[0].response, 'Poll by numbers opened for "Lorem Ipsum?"! You can vote by typing number into chat.');
-      assert.strictEqual(r[1].response, '1 - Lorem');
-      assert.strictEqual(r[1].response, '2 - Ipsum');
-      assert.strictEqual(r[1].response, '3 - Dolor Sit');
+      assert.strictEqual(r[1].response, '1 => Lorem');
+      assert.strictEqual(r[2].response, '2 => Ipsum');
+      assert.strictEqual(r[3].response, '3 => Dolor Sit');
     });
     it('Open another voting should fail', async () => {
       const r = await polls.open({ sender: owner, parameters: '-numbers -title "Lorem Ipsum2?" Lorem2 | Ipsum2 | Dolor Sit2' });
