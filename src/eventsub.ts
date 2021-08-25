@@ -115,10 +115,10 @@ class EventSub extends Core {
           // Request made and server responded
           throw new Error(`Token call returned ${e.response.data.status} - ${e.response.data.message}`);
         }
-        throw new Error(`Something wen wrong during token call - ${e.stack}`);
+        throw new Error(`Something went wrong during token call - ${e.stack}`);
       }
     } else {
-      throw new Error('Missing clientId or clientSecret for EventSub');
+      return null;
     }
   }
 
@@ -160,6 +160,11 @@ class EventSub extends Core {
 
     try {
       const token = await this.generateAppToken();
+
+      if (!token) {
+        return;
+      }
+
       const url = 'https://api.twitch.tv/helix/eventsub/subscriptions';
       const request = await axios.get(url, {
         headers: {
