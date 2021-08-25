@@ -55,7 +55,7 @@ class EventSub extends Core {
         if (!this.enabledSubscriptions.includes(String(req.header('twitch-eventsub-subscription-type')))) {
           this.enabledSubscriptions.push(String(req.header('twitch-eventsub-subscription-type')));
         }
-        res.status(200).send(req.body.challenge);
+        res.status(200).send(req.body.challenge); // lgtm [js/reflected-xss]
       } else if (req.header('twitch-eventsub-message-type') === 'notification') {
         const data = req.body;
         if (data.subscription.type === 'channel.hype_train.begin') {
