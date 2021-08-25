@@ -131,7 +131,7 @@ class EventSub extends Core {
       this.secret = v4();
     }
 
-    if (this.domain.includes('localhost')) {
+    if (this.domain.includes('localhost') || this.domain.trim().length === 0) {
       if (!isErrorEventsShown) {
         warning('EVENTSUB: you need to set proper domain on 443 port, not localhost, for eventsub.');
         isErrorEventsShown = true;
