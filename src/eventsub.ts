@@ -26,6 +26,8 @@ class EventSub extends Core {
   clientId = '';
   @settings()
   clientSecret = '';
+  @settings()
+  enabledSubscriptions: string[] = [];
   @persistent()
   appToken = '';
   @persistent()
@@ -50,6 +52,9 @@ class EventSub extends Core {
     } else {
       if (req.header('twitch-eventsub-message-type') === 'webhook_callback_verification') {
         info(`EVENTSUB: ${req.header('twitch-eventsub-subscription-type')} is verified.`);
+        if (!this.enabledSubscriptions.includes(String(req.header('twitch-eventsub-subscription-type')))) {
+          this.enabledSubscriptions.push(String(req.header('twitch-eventsub-subscription-type')));
+        }
         res.status(200).send(req.body.challenge);
       } else if (req.header('twitch-eventsub-message-type') === 'notification') {
         const data = req.body;
@@ -167,6 +172,8 @@ class EventSub extends Core {
         'channel.hype_train.end',
       ];
 
+      this.enabledSubscriptions = [];
+
       for (const event of events) {
         const enabledOrPendingEvents = request.data.data.find((o: any) => {
           return o.type === event
@@ -185,8 +192,15 @@ class EventSub extends Core {
               },
               timeout: 20000,
             });
+            setTimeout(() => {
+              this.onStartup();
+            }, 5000);
+            return;
+          } else {
+            if (!this.enabledSubscriptions.includes(event)) {
+              this.enabledSubscriptions.push(event);
+            }
           }
-          return this.onStartup();
         }
 
         if (!enabledOrPendingEvents) {
