@@ -3,6 +3,7 @@ import crypto from 'crypto';
 import { MINUTE } from '@sogebot/ui-helpers/constants';
 import axios from 'axios';
 import type { Request, Response } from 'express';
+import localtunnel from 'localtunnel';
 import type QueryString from 'qs';
 import { v4 } from 'uuid';
 
@@ -20,7 +21,6 @@ const messagesProcessed: string[] = [];
 let isErrorEventsShown = false;
 
 class EventSub extends Core {
-  @settings()
   domain = '';
   @settings()
   clientId = '';
@@ -132,24 +132,27 @@ class EventSub extends Core {
   @onChange('clientSecret')
   @onChange('domain')
   async onStartup() {
+    if (this.domain.length === 0) {
+      const tunnel = await localtunnel({ port: Number(process.env.PORT ?? 20000) });
+      this.domain = tunnel.url;
+
+      tunnel.on('error', () => {
+        info(`EVENTSUB: Something went wrong during tunneling, retrying.`);
+        this.domain = '';
+      });
+      info(`EVENTSUB: Tunneling through ${this.domain}`);
+    }
+
     if (this.secret.length === 0) {
       this.secret = v4();
     }
 
-    if (this.domain.includes('localhost') || this.domain.trim().length === 0) {
-      if (!isErrorEventsShown) {
-        warning('EVENTSUB: you need to set proper domain on 443 port, not localhost, for eventsub.');
-        isErrorEventsShown = true;
-      }
-      return;
-    }
-
     try {
       // check if domain is available in https mode
-      await axios.get(`https://${this.domain}/webhooks/callback`, { headers: { 'sogebot-test': 'true' } });
+      await axios.get(`${this.domain}/webhooks/callback`, { headers: { 'sogebot-test': 'true' } });
     } catch (e) {
       if (!isErrorEventsShown) {
-        warning(`EVENTSUB: Bot not responding correctly on https://${this.domain}/webhooks/callback, eventsub will not work.`);
+        warning(`EVENTSUB: Bot not responding correctly on ${this.domain}/webhooks/callback, eventsub will not work.`);
         isErrorEventsShown = true;
       }
       return;
@@ -183,7 +186,7 @@ class EventSub extends Core {
 
         if (enabledOrPendingEvents) {
           // check if domain is same
-          if (enabledOrPendingEvents.transport.callback !== `https://${this.domain}/webhooks/callback`) {
+          if (enabledOrPendingEvents.transport.callback !== `${this.domain}/webhooks/callback`) {
             info(`EVENTSUB: ${event} callback endpoint doesn't match domain, revoking.`);
             await axios.delete(`${url}?id=${enabledOrPendingEvents.id}`, {
               headers: {
@@ -230,7 +233,7 @@ class EventSub extends Core {
           'condition': { 'broadcaster_user_id': channelId.value },
           'transport': {
             'method':   'webhook',
-            'callback': `https://${this.domain}/webhooks/callback`,
+            'callback': `${this.domain}/webhooks/callback`,
             'secret':   this.secret,
           },
         },
