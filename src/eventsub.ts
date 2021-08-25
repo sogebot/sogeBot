@@ -11,9 +11,11 @@ import { onChange, onStartup } from './decorators/on';
 import * as hypeTrain from './helpers/api/hypeTrain';
 import { eventEmitter } from './helpers/events';
 import {
-  error, info, warning, 
+  error, info, warning,
 } from './helpers/log';
 import { channelId } from './helpers/oauth';
+
+const messagesProcessed: string[] = [];
 
 class EventSub extends Core {
   @settings()
@@ -28,10 +30,12 @@ class EventSub extends Core {
   secret = '';
 
   async handler(req: Request<Record<string, any>, any, any, QueryString.ParsedQs, Record<string, any>>, res: Response<any, Record<string, any>>) {
-    if (String(req.headers['sogebot-test'])) {
-      // testing for UI
-      res.status(200).send('OK');
+    if (req.headers['sogebot-test'] || messagesProcessed.includes(String(req.header('twitch-eventsub-message-id')))) {
+      // testing for UI and if message is already processed
+      return res.status(200).send('OK');
     }
+    messagesProcessed.unshift(String(req.header('twitch-eventsub-message-id')));
+    messagesProcessed.length = 50;
 
     // check if its from twitch
     const hmac_message = String(req.headers['twitch-eventsub-message-id'])
@@ -45,7 +49,7 @@ class EventSub extends Core {
       if (req.header('twitch-eventsub-message-type') === 'webhook_callback_verification') {
         info(`EVENTSUB: ${'channel.hype_train.begin'} is verified.`);
         res.status(200).send(req.body.challenge);
-      } else {
+      } else if (req.header('twitch-eventsub-message-type') === 'notification') {
         const data = req.body;
         if (data.subscription.type === 'channel.hype_train.begin') {
           hypeTrain.setCurrentLevel(1);
@@ -73,6 +77,10 @@ class EventSub extends Core {
           error(`EVENTSUB: ${data.subscription.type} not implemented`);
           res.status(400).send('not implemented');
         }
+      } else if (req.header('twitch-eventsub-message-type') === 'revocation') {
+        info(`EVENTSUB: ${req.header('twitch-eventsub-subscription-type')} revoked. Retrying subscription.`);
+        this.subscribe(String(req.header('twitch-eventsub-subscription-type')));
+        res.status(200).send('OK');
       }
     }
   }
@@ -110,8 +118,16 @@ class EventSub extends Core {
 
     if (this.domain.includes('localhost')) {
       warning('EVENTSUB: you need to set proper domain on 443 port, not localhost, for eventsub.');
+      return;
     }
 
+    try {
+      // check if domain is available in https mode
+      await axios.get(`https://${this.domain}/webhooks/callback`, { headers: { 'sogebot-test': 'true' } });
+    } catch (e) {
+      warning(`EVENTSUB: Bot not responding correctly on https://${this.domain}/webhooks/callback, eventsub will not work.`);
+      return;
+    }
     try {
       const token = await this.generateAppToken();
       const url = 'https://api.twitch.tv/helix/eventsub/subscriptions';
@@ -125,9 +141,9 @@ class EventSub extends Core {
       info('EVENTSUB: Connection established');
 
       const events = [
-        /* 'channel.hype_train.begin',
+        'channel.hype_train.begin',
         'channel.hype_train.progress',
-        'channel.hype_train.end'*/
+        'channel.hype_train.end',
       ];
 
       for (const event of events) {
