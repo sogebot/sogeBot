@@ -76,10 +76,19 @@ const limiter = RateLimit({
 
 export const init = () => {
   setApp(express());
+  app?.enable('trust proxy');
   app?.use(limiter);
   app?.use(cors());
-  app?.use(express.json({ limit: '500mb' }));
+  app?.use(express.json({
+    limit:  '500mb',
+    verify: (req, _res, buf) =>{
+    // Small modification to the JSON bodyParser to expose the raw body in the request object
+    // The raw body is required at signature verification
+      (req as any).rawBody = buf;
+    },
+  }));
   app?.use(express.urlencoded({ extended: true, limit: '500mb' }));
+  app?.use(express.raw());
   app?.use('/frame-api-explorer', swaggerUi.serve, swaggerUi.setup({
     ...swaggerJSON,
     info: {
@@ -188,6 +197,17 @@ export const init = () => {
       nuxtCache.delete(req.url);
       res.sendStatus(404);
     }
+  });
+  app?.get('/webhooks/callback', function (req, res) {
+    if (req.secure) {
+      res.status(200).send('OK');
+    } else {
+      res.status(400).send('You can only use this endpoint with SSL');
+    }
+  });
+  app?.post('/webhooks/callback', function (req, res) {
+    const eventsub = require('./eventsub').default;
+    eventsub.handler(req, res);
   });
   app?.get('/popout/', function (req, res) {
     res.sendFile(path.join(__dirname, '..', 'public', 'popout.html'));
@@ -452,7 +472,7 @@ export const init = () => {
     });
     socket.on('core', async (cb: (err: string | null, toEmit: { name: string; type: string; }[]) => void) => {
       const toEmit: { name: string; type: string; }[] = [];
-      for (const system of ['oauth', 'tmi', 'currency', 'ui', 'general', 'twitch', 'socket', 'updater']) {
+      for (const system of ['oauth', 'tmi', 'currency', 'ui', 'general', 'twitch', 'socket', 'eventsub', 'updater']) {
         toEmit.push({ name: system.toLowerCase(), type: 'core' });
       }
       cb(null, toEmit);
