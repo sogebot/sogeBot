@@ -6,8 +6,6 @@
 - **HDD**: Minimum 500MB
 - Twitch bot account
 
-> Optional: **[Git](https://git-scm.com/downloads)** or on linux `sudo apt install git`
-
 !> You need **separate** account for your bot, bot **won't** work on your
    broadcaster account
 
@@ -95,7 +93,7 @@
 
 ### Build prerequisites
 
-- **Bash**, **Make**
+- **Bash**, **Make**, **Git**
 
 ### GIT Installation
 
