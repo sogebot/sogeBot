@@ -1,7 +1,7 @@
 {
 	"settings": {
 		"btnRemoveCache": "Cancella cache",
-		"hypeMessagesEnabled": "Show hype messages in chat",
+		"hypeMessagesEnabled": "Mostra i messaggi di hype nella chat",
 		"btnTestExplosion": "Test Esplosione di Emote",
 		"btnTestEmote": "Test emote",
 		"btnTestFirework": "Test fuochi d'artificio emote",
@@ -33,8 +33,8 @@
 		"comboMessages": "Messaggi combinati"
 	},
 	"hype": {
-		"5": "Let's go! We got $amountx $emote combo so far! SeemsGood",
-		"15": "Keep it going! Can we get more than $amountx $emote? TriHard"
+		"5": "Evvai! Abbiamo ottenuto $amountx $emote combo finora! SeemsGood",
+		"15": "Teniamo duro! Possiamo ottenere più di $amountx $emote? TriHard"
 	},
 	"message": {
 		"3": "$amountx $emote combo",
