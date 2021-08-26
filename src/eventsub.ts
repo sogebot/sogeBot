@@ -21,6 +21,10 @@ const messagesProcessed: string[] = [];
 let isErrorEventsShown = false;
 
 class EventSub extends Core {
+  @settings()
+  useTunneling = false;
+  tunnelDomain = '';
+  @settings()
   domain = '';
   @settings()
   clientId = '';
@@ -132,15 +136,15 @@ class EventSub extends Core {
   @onChange('clientSecret')
   @onChange('domain')
   async onStartup() {
-    if (this.domain.length === 0) {
+    if (this.useTunneling && this.tunnelDomain.length === 0) {
       const tunnel = await localtunnel({ port: Number(process.env.PORT ?? 20000) });
-      this.domain = tunnel.url;
+      this.tunnelDomain = tunnel.url;
 
       tunnel.on('error', () => {
         info(`EVENTSUB: Something went wrong during tunneling, retrying.`);
-        this.domain = '';
+        this.tunnelDomain = '';
       });
-      info(`EVENTSUB: Tunneling through ${this.domain}`);
+      info(`EVENTSUB: (Unreliable) Tunneling through ${this.tunnelDomain}`);
     }
 
     if (this.secret.length === 0) {
@@ -149,10 +153,10 @@ class EventSub extends Core {
 
     try {
       // check if domain is available in https mode
-      await axios.get(`${this.domain}/webhooks/callback`, { headers: { 'sogebot-test': 'true' } });
+      await axios.get(`${this.useTunneling ? this.tunnelDomain : 'https://' + this.domain}/webhooks/callback`, { headers: { 'sogebot-test': 'true' } });
     } catch (e) {
       if (!isErrorEventsShown) {
-        warning(`EVENTSUB: Bot not responding correctly on ${this.domain}/webhooks/callback, eventsub will not work.`);
+        warning(`EVENTSUB: Bot not responding correctly on ${this.useTunneling ? this.tunnelDomain : 'https://' + this.domain}/webhooks/callback, eventsub will not work.`);
         isErrorEventsShown = true;
       }
       return;
@@ -191,7 +195,7 @@ class EventSub extends Core {
 
         if (enabledOrPendingEvents) {
           // check if domain is same
-          if (enabledOrPendingEvents.transport.callback !== `${this.domain}/webhooks/callback`) {
+          if (enabledOrPendingEvents.transport.callback !== `${this.useTunneling ? this.tunnelDomain : 'https://' + this.domain}/webhooks/callback`) {
             info(`EVENTSUB: ${event} callback endpoint doesn't match domain, revoking.`);
             await axios.delete(`${url}?id=${enabledOrPendingEvents.id}`, {
               headers: {
@@ -238,7 +242,7 @@ class EventSub extends Core {
           'condition': { 'broadcaster_user_id': channelId.value },
           'transport': {
             'method':   'webhook',
-            'callback': `${this.domain}/webhooks/callback`,
+            'callback': `${this.useTunneling ? this.tunnelDomain : 'https://' + this.domain}/webhooks/callback`,
             'secret':   this.secret,
           },
         },
@@ -248,7 +252,7 @@ class EventSub extends Core {
       error('EVENTSUB: Something went wrong during event subscription, please authorize yourself on this url and try again.');
       error(`=> https://id.twitch.tv/oauth2/authorize
       ?client_id=${this.clientId}
-      &redirect_uri=${this.domain}
+      &redirect_uri=${this.useTunneling ? this.tunnelDomain : 'https://' + this.domain}
       &response_type=token
       &force_verify=true
       &scope=channel:read:hype_train`);
