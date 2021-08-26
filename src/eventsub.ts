@@ -146,16 +146,19 @@ class EventSub extends Core {
   @onChange('clientId')
   @onChange('clientSecret')
   @onChange('domain')
+  @onChange('useTunneling')
   async onStartup() {
-    if (this.useTunneling && this.tunnelDomain.length === 0) {
-      const tunnel = await localtunnel({ port: Number(process.env.PORT ?? 20000) });
-      this.tunnelDomain = tunnel.url;
+    if (this.useTunneling) {
+      if (this.tunnelDomain.length === 0) {
+        const tunnel = await localtunnel({ port: Number(process.env.PORT ?? 20000) });
+        this.tunnelDomain = tunnel.url;
 
-      tunnel.on('error', () => {
-        info(`EVENTSUB: Something went wrong during tunneling, retrying.`);
-        this.tunnelDomain = '';
-      });
-      info(`EVENTSUB: (Unreliable) Tunneling through ${this.tunnelDomain}`);
+        tunnel.on('error', () => {
+          info(`EVENTSUB: Something went wrong during tunneling, retrying.`);
+          this.tunnelDomain = '';
+        });
+        info(`EVENTSUB: (Unreliable) Tunneling through ${this.tunnelDomain}`);
+      }
     } else if(this.domain.length === 0) {
       if (!isErrorSetupShown) {
         info(`EVENTSUB: Domain or unreliable tunneling not set, please set it in UI.`);
