@@ -16,6 +16,7 @@ import {
   error, info, warning,
 } from './helpers/log';
 import { channelId } from './helpers/oauth';
+import { ioServer } from './helpers/panel';
 
 const messagesProcessed: string[] = [];
 let isErrorEventsShown = false;
@@ -63,10 +64,12 @@ class EventSub extends Core {
       } else if (req.header('twitch-eventsub-message-type') === 'notification') {
         const data = req.body;
         if (data.subscription.type === 'channel.hype_train.begin') {
+          hypeTrain.setIsStarted(true);
           hypeTrain.setCurrentLevel(1);
           eventEmitter.emit('hypetrain-started');
           res.status(200).send('OK');
         } else if (data.subscription.type === 'channel.hype_train.progress') {
+          hypeTrain.setIsStarted(true);
           hypeTrain.setTotal(data.event.total);
           hypeTrain.setGoal(data.event.goal);
           for (const top of data.event.top_contributions) {
@@ -74,6 +77,12 @@ class EventSub extends Core {
           }
           hypeTrain.setLastContribution(data.event.last_contribution.total, data.event.last_contribution.type, data.event.last_contribution.user_id, data.event.last_contribution.user_login);
           hypeTrain.setCurrentLevel(data.event.level);
+
+          // update overlay
+          ioServer?.of('/core/eventsub').emit('hypetrain-update', {
+            total: data.event.total, goal: data.event.goal, level: data.event.level, subs: Object.fromEntries(hypeTrain.subs),
+          });
+
           res.status(200).send('OK');
         } else if (data.subscription.type === 'channel.hype_train.end') {
           await hypeTrain.triggerHypetrainEnd();
@@ -83,6 +92,7 @@ class EventSub extends Core {
           hypeTrain.setTopContributions('bits', 0, null, null);
           hypeTrain.setTopContributions('subs', 0, null, null);
           hypeTrain.setCurrentLevel(1);
+          ioServer?.of('/core/eventsub').emit('hypetrain-end');
           res.status(200).send('OK');
         } else {
           error(`EVENTSUB: ${data.subscription.type} not implemented`);

@@ -4,6 +4,9 @@ let latestLevel = 1 as 1 | 2 | 3 | 4 | 5;
 let total = 0;
 let goal = 0;
 
+let isStarted = false;
+const subs = new Map<string, string>();
+
 let lastContributionTotal = 0;
 let lastContributionType = 'bits' as 'bits' | 'subs';
 let lastContributionUserId = null as null | string;
@@ -15,6 +18,13 @@ let topContributionsBitsUserName = null as null | string;
 let topContributionsSubsTotal = 0;
 let topContributionsSubsUserId = null as null | string;
 let topContributionsSubsUserName = null as null | string;
+
+function setIsStarted(value: boolean) {
+  isStarted = value;
+  if (!value) {
+    subs.clear();
+  }
+}
 
 async function setCurrentLevel(level: 1 | 2 | 3 | 4 | 5) {
   if (level > latestLevel && level > 1) {
@@ -81,6 +91,7 @@ function setGoal(value: number) {
 }
 
 async function triggerHypetrainEnd() {
+  setIsStarted(false);
   eventEmitter.emit('hypetrain-ended', {
     level: latestLevel,
     total,
@@ -101,7 +112,15 @@ async function triggerHypetrainEnd() {
   });
 }
 
+const addSub = (sub: { username: string, profileImageUrl: string }) => {
+  if (isStarted) {
+    subs.set(sub.username, sub.profileImageUrl);
+  }
+};
+
 export {
+  addSub,
+  subs,
   getCurrentLevel,
   setCurrentLevel,
   setTotal,
@@ -109,4 +128,5 @@ export {
   setTopContributions,
   setLastContribution,
   triggerHypetrainEnd,
+  setIsStarted,
 };
