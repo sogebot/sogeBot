@@ -11,6 +11,7 @@ import Core from './_interface';
 import { persistent, settings } from './decorators';
 import { onChange, onStartup } from './decorators/on';
 import * as hypeTrain from './helpers/api/hypeTrain';
+import { TokenError } from './helpers/errors';
 import { eventEmitter } from './helpers/events';
 import {
   error, info, warning,
@@ -128,9 +129,9 @@ class EventSub extends Core {
       } catch (e) {
         if (e.response) {
           // Request made and server responded
-          throw new Error(`Token call returned ${e.response.data.status} - ${e.response.data.message}`);
+          throw new TokenError(`Token call returned ${e.response.data.status} - ${e.response.data.message}`);
         }
-        throw new Error(`Something went wrong during token call - ${e.stack}`);
+        throw new TokenError(`Something went wrong during token call - ${e.stack}`);
       }
     } else {
       return null;
@@ -273,13 +274,17 @@ class EventSub extends Core {
         timeout: 20000,
       });
     } catch (e) {
-      error('EVENTSUB: Something went wrong during event subscription, please authorize yourself on this url and try again.');
-      error(`=> https://id.twitch.tv/oauth2/authorize
-      ?client_id=${this.clientId}
-      &redirect_uri=${this.useTunneling ? this.tunnelDomain : 'https://' + this.domain}
-      &response_type=token
-      &force_verify=true
-      &scope=channel:read:hype_train`);
+      if (e instanceof TokenError) {
+        error(`EVENTSUB: ${e.stack}`);
+      } else {
+        error('EVENTSUB: Something went wrong during event subscription, please authorize yourself on this url and try again.');
+        error(`=> https://id.twitch.tv/oauth2/authorize
+        ?client_id=${this.clientId}
+        &redirect_uri=${this.useTunneling ? this.tunnelDomain : 'https://' + this.domain}
+        &response_type=token
+        &force_verify=true
+        &scope=channel:read:hype_train`);
+      }
     }
   }
 }
