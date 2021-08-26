@@ -23,6 +23,7 @@ import {
 } from './decorators/on';
 import Expects from './expects';
 import { isStreamOnline, stats } from './helpers/api';
+import * as hypeTrain from './helpers/api/hypeTrain';
 import {
   getOwner, getUserSender, prepare,
 } from './helpers/commons';
@@ -46,6 +47,7 @@ import {
 import { isOwner } from './helpers/user';
 import { isBot } from './helpers/user/isBot';
 import { isIgnored } from './helpers/user/isIgnored';
+import { getUserFromTwitch } from './microservices/getUserFromTwitch';
 import oauth from './oauth';
 import eventlist from './overlays/eventlist';
 import { Parser } from './parser';
@@ -615,6 +617,11 @@ class TMI extends Core {
         return;
       }
 
+      let profileImageUrl = null;
+      if (user.profileImageUrl.length === 0) {
+        profileImageUrl = (await getUserFromTwitch(user.username)).profile_image_url;
+      }
+
       await getRepository(User).save({
         ...user,
         isSubscriber:              user.haveSubscriberLock ? user.isSubscriber : true,
@@ -622,6 +629,12 @@ class TMI extends Core {
         subscribeTier:             String(tier),
         subscribeCumulativeMonths: subCumulativeMonths,
         subscribeStreak:           0,
+        profileImageUrl:           profileImageUrl ? profileImageUrl : user.profileImageUrl,
+      });
+
+      hypeTrain.addSub({
+        username:        user.username,
+        profileImageUrl: profileImageUrl ? profileImageUrl : user.profileImageUrl,
       });
 
       eventlist.add({
@@ -681,6 +694,11 @@ class TMI extends Core {
         return;
       }
 
+      let profileImageUrl = null;
+      if (user.profileImageUrl.length === 0) {
+        profileImageUrl = (await getUserFromTwitch(user.username)).profile_image_url;
+      }
+
       await getRepository(User).save({
         ...user,
         isSubscriber:              true,
@@ -688,6 +706,12 @@ class TMI extends Core {
         subscribeTier:             String(tier),
         subscribeCumulativeMonths: subCumulativeMonths,
         subscribeStreak:           subStreak,
+        profileImageUrl:           profileImageUrl ? profileImageUrl : user.profileImageUrl,
+      });
+
+      hypeTrain.addSub({
+        username:        user.username,
+        profileImageUrl: profileImageUrl ? profileImageUrl : user.profileImageUrl,
       });
 
       eventlist.add({
