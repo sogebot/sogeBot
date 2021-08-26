@@ -20,6 +20,7 @@ import { ioServer } from './helpers/panel';
 
 const messagesProcessed: string[] = [];
 let isErrorEventsShown = false;
+let isErrorSetupShown = false;
 
 class EventSub extends Core {
   @settings()
@@ -155,6 +156,13 @@ class EventSub extends Core {
         this.tunnelDomain = '';
       });
       info(`EVENTSUB: (Unreliable) Tunneling through ${this.tunnelDomain}`);
+    } else if(this.domain.length === 0) {
+      if (!isErrorSetupShown) {
+        info(`EVENTSUB: Domain or unreliable tunneling not set, please set it in UI.`);
+        isErrorSetupShown = true;
+      }
+      this.enabledSubscriptions = [];
+      return;
     }
 
     if (this.secret.length === 0) {
@@ -169,16 +177,19 @@ class EventSub extends Core {
         warning(`EVENTSUB: Bot not responding correctly on ${this.useTunneling ? this.tunnelDomain : 'https://' + this.domain}/webhooks/callback, eventsub will not work.`);
         isErrorEventsShown = true;
       }
+      this.enabledSubscriptions = [];
       return;
     }
 
     try {
+      isErrorEventsShown = false;
+      isErrorSetupShown = false;
       const token = await this.generateAppToken();
 
       if (!token) {
+        this.enabledSubscriptions = [];
         return;
       }
-
       const url = 'https://api.twitch.tv/helix/eventsub/subscriptions';
       const request = await axios.get(url, {
         headers: {
