@@ -93,7 +93,7 @@
 
 ### Build prerequisites
 
-- **Bash**, **Make**
+- **Bash**, **Make**, **Git**
 
 ### GIT Installation
 
