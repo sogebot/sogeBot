@@ -39,7 +39,7 @@ class Spotify extends Integration {
   retry: { IRefreshToken: number } = { IRefreshToken: 0 };
   state: any = null;
 
-  isUnauthorized = false;
+  isUnauthorized = true;
   userId: string | null = null;
 
   @persistent()
