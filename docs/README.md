@@ -20,7 +20,7 @@ Free Twitch Bot built on Node.js
 - **FORUM, IDEAS & SUGGESTIONS**: https://community.sogebot.xyz/
 
 #### Screenshots
-<img src="https://drive.google.com/uc?id=1yaD6hiHQ8CuZ1konVSK_Iy_7Dbb3-WQC" width="200"> <img src="https://drive.google.com/uc?id=1j0immtX6yutNcNGErHDSwjtqDz2AGfLS" width="200"> <img src="https://drive.google.com/uc?id=1Nshe2MqYpd3fzNyCXmbWDJmR61_RWpVE" width="200"> <img src="https://drive.google.com/uc?id=1mPg3wkFdP_F3jVV5eYenf1CiCenvuU-P" width="200"> <img src="https://drive.google.com/uc?id=1k7vyakPrKid73rGx7qfJcxzBUGcxl8dS" width="200"> <img src="https://drive.google.com/uc?id=1AAZMLew__TkpiQ_QbRZPxV-r9p_So7vG" width="200"> <img src="https://drive.google.com/uc?id=1jcS7GDld7gaMqDYbdGqM8wOqWEpP7Jfo" width="200">
+<img src="https://raw.githubusercontent.com/sogehige/sogeBot/master/docs/_images/screenshots/1.png" width="200"> <img src="https://raw.githubusercontent.com/sogehige/sogeBot/master/docs/_images/screenshots/2.png" width="200"> <img src="https://raw.githubusercontent.com/sogehige/sogeBot/master/docs/_images/screenshots/3.png" width="200"> <img src="https://raw.githubusercontent.com/sogehige/sogeBot/master/docs/_images/screenshots/4.png" width="200"> <img src="https://raw.githubusercontent.com/sogehige/sogeBot/master/docs/_images/screenshots/5.png" width="200"> <img src="https://raw.githubusercontent.com/sogehige/sogeBot/master/docs/_images/screenshots/6.png" width="200"> <img src="https://raw.githubusercontent.com/sogehige/sogeBot/master/docs/_images/screenshots/7.png" width="200">
 
 #### Issues
 If you found an issue with a bot, feel free to create issue at https://github.com/sogehige/SogeBot/issues.
