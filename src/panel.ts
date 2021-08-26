@@ -76,7 +76,6 @@ const limiter = RateLimit({
 
 export const init = () => {
   setApp(express());
-  app?.enable('trust proxy');
   app?.use(limiter);
   app?.use(cors());
   app?.use(express.json({
@@ -199,11 +198,7 @@ export const init = () => {
     }
   });
   app?.get('/webhooks/callback', function (req, res) {
-    if (req.secure) {
-      res.status(200).send('OK');
-    } else {
-      res.status(400).send('You can only use this endpoint with SSL');
-    }
+    res.status(200).send('OK');
   });
   app?.post('/webhooks/callback', function (req, res) {
     const eventsub = require('./eventsub').default;
