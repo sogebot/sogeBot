@@ -18,7 +18,7 @@ type Filter = {
   operator: string;
   items: (Filter | {
     comparator: string;
-    value: string;
+    value: string | number;
     type: string;
     typeof: string;
   })[]
