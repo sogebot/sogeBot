@@ -74,12 +74,6 @@ export interface CommonSettingsInterface {
     css: string;
     js: null | string;
   };
-  tts: {
-    enabled: boolean;
-    skipUrls: boolean;
-    keepAlertShown: boolean;
-    minAmountToPlay: number;
-  };
   font: {
     align: 'left' | 'center' | 'right';
     family: string;
@@ -176,6 +170,12 @@ export interface AlertRewardRedeemInterface extends AlertTipInterface {
 }
 
 export interface AlertTipInterface extends CommonSettingsInterface {
+  tts: {
+    enabled: boolean;
+    skipUrls: boolean;
+    keepAlertShown: boolean;
+    minAmountToPlay: number;
+  };
   message: {
     minAmountToShow: number;
     allowEmotes: {
