@@ -18,7 +18,7 @@ type Filter = {
   operator: string;
   items: (Filter | {
     comparator: string;
-    value: string | number;
+    value: string;
     type: string;
     typeof: string;
   })[]
@@ -73,12 +73,6 @@ export interface CommonSettingsInterface {
     html: null | string;
     css: string;
     js: null | string;
-  };
-  tts: {
-    enabled: boolean;
-    skipUrls: boolean;
-    keepAlertShown: boolean;
-    minAmountToPlay: number;
   };
   font: {
     align: 'left' | 'center' | 'right';
@@ -176,6 +170,12 @@ export interface AlertRewardRedeemInterface extends AlertTipInterface {
 }
 
 export interface AlertTipInterface extends CommonSettingsInterface {
+  tts: {
+    enabled: boolean;
+    skipUrls: boolean;
+    keepAlertShown: boolean;
+    minAmountToPlay: number;
+  };
   message: {
     minAmountToShow: number;
     allowEmotes: {
