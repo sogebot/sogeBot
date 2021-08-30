@@ -66,6 +66,12 @@ export interface CommonSettingsInterface {
   };
   soundId: string;
   soundVolume: number;
+  tts: {
+    enabled: boolean;
+    skipUrls: boolean;
+    keepAlertShown: boolean;
+    minAmountToPlay: number;
+  };
   alertDurationInMs: number;
   alertTextDelayInMs: number;
   enableAdvancedMode: boolean;
@@ -170,12 +176,6 @@ export interface AlertRewardRedeemInterface extends AlertTipInterface {
 }
 
 export interface AlertTipInterface extends CommonSettingsInterface {
-  tts: {
-    enabled: boolean;
-    skipUrls: boolean;
-    keepAlertShown: boolean;
-    minAmountToPlay: number;
-  };
   message: {
     minAmountToShow: number;
     allowEmotes: {
