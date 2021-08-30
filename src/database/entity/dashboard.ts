@@ -12,6 +12,12 @@ export type CustomVariableItem = QuickActions.defaultAttributes & {
     customvariable: string,
   },
 };
+export type RandomizerItem = QuickActions.defaultAttributes & {
+  type: 'randomizer',
+  options: QuickActions.defaultOptions & {
+    randomizerId: string,
+  },
+};
 export declare namespace QuickActions {
   type defaultAttributes = {
     id: string,
@@ -24,7 +30,7 @@ export declare namespace QuickActions {
     color: string,
   };
 
-  type Item = CommandItem | CustomVariableItem;
+  type Item = CommandItem | CustomVariableItem | RandomizerItem;
 }
 
 export const QuickAction = new EntitySchema<Readonly<Required<QuickActions.Item>>>({
