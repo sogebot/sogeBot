@@ -31,10 +31,10 @@ import * as stream from './helpers/core/stream';
 import { isDbConnected } from './helpers/database';
 import { dayjs } from './helpers/dayjs';
 import { eventEmitter } from './helpers/events';
+import { follow } from './helpers/events/follow';
 import { getBroadcaster } from './helpers/getBroadcaster';
-import { triggerInterfaceOnFollow } from './helpers/interface/triggers';
 import {
-  debug, error, follow, info, unfollow, warning,
+  debug, error, info, unfollow, warning,
 } from './helpers/log';
 import { channelId, loadedTokens } from './helpers/oauth';
 import { botId } from './helpers/oauth/botId';
@@ -45,9 +45,7 @@ import { linesParsed, setStatus } from './helpers/parser';
 import { logAvgTime } from './helpers/profiler';
 import { setImmediateAwait } from './helpers/setImmediateAwait';
 import { SQLVariableLimit } from './helpers/sql';
-import {
-  isBot, isBotId, isBotSubscriber,
-} from './helpers/user/isBot';
+import { isBotId, isBotSubscriber } from './helpers/user/isBot';
 import { isIgnored } from './helpers/user/isIgnored';
 import { getChannelChattersUnofficialAPI } from './microservices/getChannelChattersUnofficialAPI';
 import { getCustomRewards } from './microservices/getCustomRewards';
@@ -55,8 +53,6 @@ import { getGameNameFromId } from './microservices/getGameNameFromId';
 import { setTitleAndGame } from './microservices/setTitleAndGame';
 import { updateChannelViewsAndBroadcasterType } from './microservices/updateChannelViewsAndBroadcasterType';
 import oauth from './oauth';
-import eventlist from './overlays/eventlist';
-import alerts from './registries/alerts';
 import stats from './stats';
 import twitch from './twitch';
 import joinpart from './widgets/joinpart';
@@ -82,29 +78,7 @@ const updateFollowerState = async(users: Readonly<Required<UserInterface>>[], us
       const apiUser = usersFromAPI.find(userFromAPI => userFromAPI.from_id === user.userId) as typeof usersFromAPI[0];
       if (new Date().getTime() - new Date(apiUser.followed_at).getTime() < 2 * constants.HOUR) {
         if (user.followedAt === 0 || new Date().getTime() - user.followedAt > 60000 * 60) {
-          eventlist.add({
-            event:     'follow',
-            userId:    user.userId,
-            timestamp: Date.now(),
-          });
-          if (!isBot(user.username)) {
-            follow(user.username);
-            eventEmitter.emit('follow', { username: user.username, userId: user.userId });
-            alerts.trigger({
-              event:      'follows',
-              name:       user.username,
-              amount:     0,
-              tier:       null,
-              currency:   '',
-              monthsName: '',
-              message:    '',
-            });
-
-            triggerInterfaceOnFollow({
-              username: user.username,
-              userId:   user.userId,
-            });
-          }
+          follow(user.userId, user.username, user.followedAt);
         }
       }
     }
@@ -1274,35 +1248,9 @@ class API extends Core {
     } else {
       // is follower
       if (!user.isFollower && new Date().getTime() - new Date(request.data.data[0].followed_at).getTime() < 60000 * 60) {
-        eventlist.add({
-          event:     'follow',
-          userId:    String(id),
-          timestamp: Date.now(),
-        });
-        follow(user.username);
-        eventEmitter.emit('follow', { username: user.username, userId: id });
-        alerts.trigger({
-          event:      'follows',
-          name:       user.username,
-          amount:     0,
-          tier:       null,
-          currency:   '',
-          monthsName: '',
-          message:    '',
-        });
-
-        triggerInterfaceOnFollow({
-          username: user.username,
-          userId:   id,
-        });
+        follow(user.userId, user.username, request.data.data[0].followed_at);
       }
 
-      await getRepository(User).update({ userId: user.userId },
-        {
-          followedAt:    user.haveFollowedAtLock ? user.followedAt : dayjs(request.data.data[0].followed_at).valueOf(),
-          isFollower:    user.haveFollowerLock? user.isFollower : true,
-          followCheckAt: Date.now(),
-        });
       return { isFollower: user.isFollower, followedAt: user.followedAt };
     }
   }

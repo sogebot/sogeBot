@@ -13,15 +13,12 @@ import { onChange, onStartup } from './decorators/on';
 import * as hypeTrain from './helpers/api/hypeTrain';
 import { TokenError } from './helpers/errors';
 import { eventEmitter } from './helpers/events';
-import { triggerInterfaceOnFollow } from './helpers/interface';
+import { follow } from './helpers/events/follow';
 import {
-  error, follow, info, warning,
+  error, info, warning,
 } from './helpers/log';
 import { channelId } from './helpers/oauth';
 import { ioServer } from './helpers/panel';
-import { isBot } from './helpers/user';
-import eventlist from './overlays/eventlist';
-import alerts from './registries/alerts';
 
 const messagesProcessed: string[] = [];
 let isErrorEventsShown = false;
@@ -112,30 +109,8 @@ class EventSub extends Core {
               followed_at: '2021-08-30T08:30:52.278418443Z'
             }
           } */
-          eventlist.add({
-            event:     'follow',
-            userId:    data.event.user_id,
-            timestamp: Date.now(),
-          });
-          if (!isBot(data.event.user_name)) {
-            follow(data.event.user_name);
-            eventEmitter.emit('follow', { username: data.event.user_name, userId: data.event.user_id });
-            alerts.trigger({
-              event:      'follows',
-              name:       data.event.user_name,
-              amount:     0,
-              tier:       null,
-              currency:   '',
-              monthsName: '',
-              message:    '',
-            });
 
-            triggerInterfaceOnFollow({
-              username: data.event.user_name,
-              userId:   data.event.user_id,
-            });
-          }
-
+          follow(data.event.user_id, data.event.user_name, data.event.followed_at);
           res.status(200).send('OK');
         } else {
           error(`EVENTSUB: ${data.subscription.type} not implemented`);
@@ -332,4 +307,5 @@ class EventSub extends Core {
 }
 
 const eventsub = new EventSub();
+
 export default eventsub;
