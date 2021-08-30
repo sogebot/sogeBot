@@ -13,11 +13,15 @@ import { onChange, onStartup } from './decorators/on';
 import * as hypeTrain from './helpers/api/hypeTrain';
 import { TokenError } from './helpers/errors';
 import { eventEmitter } from './helpers/events';
+import { triggerInterfaceOnFollow } from './helpers/interface';
 import {
-  error, info, warning,
+  error, follow, info, warning,
 } from './helpers/log';
 import { channelId } from './helpers/oauth';
 import { ioServer } from './helpers/panel';
+import { isBot } from './helpers/user';
+import eventlist from './overlays/eventlist';
+import alerts from './registries/alerts';
 
 const messagesProcessed: string[] = [];
 let isErrorEventsShown = false;
@@ -95,6 +99,43 @@ class EventSub extends Core {
           hypeTrain.setTopContributions('subs', 0, null, null);
           hypeTrain.setCurrentLevel(1);
           ioServer?.of('/core/eventsub').emit('hypetrain-end');
+          res.status(200).send('OK');
+        } else if (data.subscription.type === 'channel.follow') {
+          /* {
+            event: {
+              user_id: '95143085',
+              user_login: 'testFromUser',
+              user_name: 'testFromUser',
+              broadcaster_user_id: '17369638',
+              broadcaster_user_login: '17369638',
+              broadcaster_user_name: 'testBroadcaster',
+              followed_at: '2021-08-30T08:30:52.278418443Z'
+            }
+          } */
+          eventlist.add({
+            event:     'follow',
+            userId:    data.event.user_id,
+            timestamp: Date.now(),
+          });
+          if (!isBot(data.event.user_name)) {
+            follow(data.event.user_name);
+            eventEmitter.emit('follow', { username: data.event.user_name, userId: data.event.user_id });
+            alerts.trigger({
+              event:      'follows',
+              name:       data.event.user_name,
+              amount:     0,
+              tier:       null,
+              currency:   '',
+              monthsName: '',
+              message:    '',
+            });
+
+            triggerInterfaceOnFollow({
+              username: data.event.user_name,
+              userId:   data.event.user_id,
+            });
+          }
+
           res.status(200).send('OK');
         } else {
           error(`EVENTSUB: ${data.subscription.type} not implemented`);
@@ -204,6 +245,7 @@ class EventSub extends Core {
       });
 
       const events = [
+        'channel.follow',
         'channel.hype_train.begin',
         'channel.hype_train.progress',
         'channel.hype_train.end',
