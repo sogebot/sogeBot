@@ -211,6 +211,9 @@ class Socket extends Core {
           debug('socket', JSON.stringify(token, null, 4));
           initEndpoints(socket, token.privileges);
         } catch (e) {
+          if (e instanceof Error) {
+            debug('socket', e.stack);
+          }
           next(Error(e));
           return;
         }
@@ -218,6 +221,7 @@ class Socket extends Core {
         initEndpoints(socket, {
           haveAdminPrivileges: Authorized.NotAuthorized, haveModPrivileges: Authorized.NotAuthorized, haveViewerPrivileges: Authorized.NotAuthorized,
         });
+        debug('socket', `Authorize endpoint failed with token '${authToken}'`);
         setTimeout(() => socket.emit('forceDisconnect'), 1000); // force disconnect if we must be logged in
       }
     }
