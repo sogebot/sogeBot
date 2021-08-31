@@ -182,9 +182,12 @@ class Socket extends Core {
               userId:   data.userId,
               username: data.username,
             }, this.JWTKey, { expiresIn: `${this.refreshTokenExpirationTime}s` });
-            res.status(200).send({
+            const payload = {
               accessToken, refreshToken, userType: userPermission === defaultPermissions.CASTERS ? 'admin' : 'viewer',
-            });
+            };
+            debug('socket', '/socket/refresh ->');
+            debug('socket', JSON.stringify(payload, null, 2));
+            res.status(200).send(payload);
           } catch(e) {
             debug('socket', e.stack);
             res.status(400).send('You don\'t have access to this server.');
