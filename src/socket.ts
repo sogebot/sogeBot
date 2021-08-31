@@ -1,7 +1,7 @@
 import { DAY } from '@sogebot/ui-helpers/constants';
 import axios from 'axios';
 import { NextFunction } from 'express';
-import jwt from 'jsonwebtoken';
+import jwt, { JsonWebTokenError } from 'jsonwebtoken';
 import { Socket as SocketIO } from 'socket.io';
 import { getRepository } from 'typeorm';
 import { v4 as uuid } from 'uuid';
@@ -12,7 +12,7 @@ import {
   persistent, settings, ui,
 } from './decorators';
 import { onLoad } from './decorators/on';
-import { debug } from './helpers/log';
+import { debug, error } from './helpers/log';
 import { app, ioServer } from './helpers/panel';
 import {
   check, defaultPermissions, getUserHighestPermission,
@@ -211,7 +211,10 @@ class Socket extends Core {
           debug('socket', JSON.stringify(token, null, 4));
           initEndpoints(socket, token.privileges);
         } catch (e) {
-          if (e instanceof Error) {
+          if (e instanceof JsonWebTokenError) {
+            error('Used token for authorization is malformed');
+            debug('socket', e.stack);
+          } else if (e instanceof Error) {
             debug('socket', e.stack);
           }
           next(Error(e));
