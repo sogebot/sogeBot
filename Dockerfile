@@ -24,6 +24,8 @@ RUN npm install -g npm@latest
 RUN make
 # Remove dev dependencies (not needed anymore)
 RUN npm prune --production
+# Get latest ui dependencies in time of build
+RUN npm update @sogebot/ui-admin @sogebot/ui-overlay @sogebot/ui-helpers @sogebot/ui-oauth @sogebot/ui-public
 
 # Expose API port to the outside
 EXPOSE 20000
