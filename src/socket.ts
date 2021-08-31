@@ -65,8 +65,8 @@ const initEndpoints = async(socket: SocketIO, privileges: Unpacked<ReturnType<ty
         adminEndpointInit.callback(opts, cb ?? socket, socket);
         return;
       } else if (!viewerEndpoint && !publicEndpoint) {
-        debug('sockets', `User dont have admin access to ${socket.nsp.name}`);
-        debug('sockets', privileges);
+        debug('socket', `User dont have admin access to ${socket.nsp.name}`);
+        debug('socket', privileges);
         cb('User doesn\'t have access to this endpoint', null);
         return;
       }
@@ -75,8 +75,8 @@ const initEndpoints = async(socket: SocketIO, privileges: Unpacked<ReturnType<ty
         viewerEndpoint.callback(opts, cb ?? socket, socket);
         return;
       } else if (!publicEndpoint) {
-        debug('sockets', `User dont have viewer access to ${socket.nsp.name}`);
-        debug('sockets', privileges);
+        debug('socket', `User dont have viewer access to ${socket.nsp.name}`);
+        debug('socket', privileges);
         cb('User doesn\'t have access to this endpoint', null);
         return;
       }
