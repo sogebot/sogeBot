@@ -1,6 +1,6 @@
 import { getRepository } from 'typeorm';
 
-import currency from '../../currency';
+import type { default as currencyType } from '../../currency';
 import { PermissionFiltersInterface } from '../../database/entity/permissions';
 import {
   UserBit, UserInterface, UserTip,
@@ -9,8 +9,9 @@ import type { default as levelType } from '../../systems/levels';
 import type { default as ranksType } from '../../systems/ranks';
 import { mainCurrency } from '../currency';
 
-let levels: typeof levelType;
+let levels: typeof levelType; 
 let ranks: typeof ranksType;
+let currency: typeof currencyType;
 
 async function _filters(
   user: Required<UserInterface>,
@@ -55,6 +56,9 @@ async function _filters(
         break;
       case 'tips': {
         const tips = await getRepository(UserTip).find({ where: { userId: user.userId } });
+        if (!currency) {
+          currency = require('../../currency').default;
+        }
         amount = tips.reduce((a, b) => (a + currency.exchange(b.amount, b.currency, mainCurrency.value)), 0);
         break;
       }

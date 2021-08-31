@@ -23,7 +23,6 @@ import {
   debug, error, info, isDebugEnabled, setDEBUG, warning,
 } from './helpers/log';
 import { TypeORMLogger } from './helpers/logTypeorm';
-import { expose as panelExpose, init as panelInit } from './panel';
 import { startWatcher } from './watchers';
 
 const connect = async function () {
@@ -97,7 +96,6 @@ async function main () {
       translate = require('./translate');
 
       translate.default._load().then(async () => {
-        panelInit();
         require('./general');
         require('./socket');
         require('./ui');
@@ -114,6 +112,7 @@ async function main () {
         require('./eventsub');
         require('./pubsub');
         require('./updater');
+        require('./panel');
         await autoLoad('./dest/stats/');
         await autoLoad('./dest/registries/');
         await autoLoad('./dest/systems/');
@@ -123,8 +122,6 @@ async function main () {
         await autoLoad('./dest/integrations/');
 
         const tmi = require('./tmi');
-
-        panelExpose();
 
         if (process.env.HEAP) {
           warning(chalk.bgRed.bold('HEAP debugging is ENABLED'));

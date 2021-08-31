@@ -18,10 +18,12 @@ import {
 
 import { RegisterRoutes } from './.cache/routes';
 import * as swaggerJSON from './.cache/swagger.json';
+import Core from './_interface';
 import { CacheTitles } from './database/entity/cacheTitles';
 import { Translation } from './database/entity/translation';
 import { TwitchTag, TwitchTagInterface } from './database/entity/twitch';
 import { User } from './database/entity/user';
+import { onStartup } from './decorators/on';
 import {
   chatMessagesAtStart, currentStreamTags, isStreamOnline, rawStatus, stats, streamStatusChangeSince,
 } from './helpers/api';
@@ -74,381 +76,398 @@ const limiter = RateLimit({
   },
 });
 
-export const init = () => {
-  setApp(express());
-  app?.use(limiter);
-  app?.use(cors());
-  app?.use(express.json({
-    limit:  '500mb',
-    verify: (req, _res, buf) =>{
-    // Small modification to the JSON bodyParser to expose the raw body in the request object
-    // The raw body is required at signature verification
-      (req as any).rawBody = buf;
-    },
-  }));
-  app?.use(express.urlencoded({ extended: true, limit: '500mb' }));
-  app?.use(express.raw());
-  app?.use('/frame-api-explorer', swaggerUi.serve, swaggerUi.setup({
-    ...swaggerJSON,
-    info: {
-      ...swaggerJSON.info,
-      title:       'API Explorer',
-      description: {},
-      contact:     {},
-      license:     {},
-    },
-  }));
-  RegisterRoutes(app as any);
-  app?.use(function errorHandler(
-    err: UnauthorizedError | Error,
-    _req: any,
-    res: any,
-    next: () => void,
-  ): Express.Response | void {
-    if (err instanceof ValidateError) {
-      return res.status(400).json({
-        message: 'Validation Failed',
-        details: err.fields,
-      });
-    }
-    if (err instanceof UnauthorizedError || err instanceof TokenExpiredError || err instanceof JsonWebTokenError) {
-      return res.status(401).send(err.message);
-    }
-    if (err instanceof Error) {
-      error(err);
-      return res.status(500).send('Internal Server Error');
-    }
+class Panel extends Core {
+  @onStartup()
+  onStartup() {
+    this.init();
+    this.expose();
+    sendStreamData();
+  }
 
-    next();
-  });
-
-  setServer();
-
-  // highlights system
-  app?.get('/highlights/:id', (req, res) => {
-    highlights.url(req, res);
-  });
-
-  app?.get('/health', (req, res) => {
-    if (getIsBotStarted()) {
-      res.status(200).send('OK');
-    } else {
-      res.status(503).send('Not OK');
-    }
-  });
-
-  // customvariables system
-  app?.get('/customvariables/:id', (req, res) => {
-    getURL(req, res);
-  });
-  app?.post('/customvariables/:id', (req, res) => {
-    postURL(req, res);
-  });
-
-  // static routing
-  app?.use('/dist', express.static(path.join(__dirname, '..', 'public', 'dist')));
-
-  const nuxtCache = new Map<string, string>();
-  app?.get(['/_static/*', '/credentials/_static/*'], (req, res) => {
-    if (!nuxtCache.get(req.url)) {
-      // search through node_modules to find correct nuxt file
-      const paths = [
-        path.join(__dirname, '..', 'node_modules', '@sogebot', 'ui-oauth', 'dist', '_static'),
-        path.join(__dirname, '..', 'node_modules', '@sogebot', 'ui-public', 'dist', '_static'),
-        path.join(__dirname, '..', 'node_modules', '@sogebot', 'ui-admin', 'dist', '_static'),
-        path.join(__dirname, '..', 'node_modules', '@sogebot', 'ui-overlay', 'dist', '_static'),
-      ];
-      for (const dir of paths) {
-        const pathToFile = path.join(dir, req.url.replace('_static', ''));
-        if (fs.existsSync(pathToFile)) { // lgtm [js/path-injection]
-          nuxtCache.set(req.url, pathToFile);
-        }
-      }
-    }
-
-    const filepath = path.join(nuxtCache.get(req.url) ?? '') as string;
-    if (fs.existsSync(filepath) && nuxtCache.has(req.url)) { // lgtm [js/path-injection]
-      res.sendFile(filepath);
-    } else {
-      res.sendStatus(404);
-    }
-  });
-  app?.get(['/_nuxt/*', '/credentials/_nuxt/*', '/overlays/_nuxt/*'], (req, res) => {
-    if (!nuxtCache.get(req.url)) {
-      // search through node_modules to find correct nuxt file
-      const paths = [
-        path.join(__dirname, '..', 'node_modules', '@sogebot', 'ui-oauth', 'dist', '_nuxt'),
-        path.join(__dirname, '..', 'node_modules', '@sogebot', 'ui-public', 'dist', '_nuxt'),
-        path.join(__dirname, '..', 'node_modules', '@sogebot', 'ui-admin', 'dist', '_nuxt'),
-        path.join(__dirname, '..', 'node_modules', '@sogebot', 'ui-overlay', 'dist', '_nuxt'),
-      ];
-      for (const dir of paths) {
-        const pathToFile = path.join(dir, req.url.replace('_nuxt', '').replace('credentials', '').replace('overlays', ''));
-        if (fs.existsSync(pathToFile)) { // lgtm [js/path-injection]
-          nuxtCache.set(req.url, pathToFile);
-        }
-      }
-    }
-    const filepath = path.join(nuxtCache.get(req.url) ?? '');
-    if (fs.existsSync(filepath) && nuxtCache.has(req.url)) { // lgtm [js/path-injection]
-      res.sendFile(filepath);
-    } else {
-      nuxtCache.delete(req.url);
-      res.sendStatus(404);
-    }
-  });
-  app?.get('/webhooks/callback', function (req, res) {
-    res.status(200).send('OK');
-  });
-  app?.post('/webhooks/callback', function (req, res) {
-    const eventsub = require('./eventsub').default;
-    eventsub.handler(req, res);
-  });
-  app?.get('/popout/', function (req, res) {
-    res.sendFile(path.join(__dirname, '..', 'public', 'popout.html'));
-  });
-  app?.get(['/overlays/:id', '/overlays/text/:id', '/overlays/alerts/:id', '/overlays/goals/:id'], function (req, res) {
-    res.sendFile(path.join(__dirname, '..', 'node_modules', '@sogebot', 'ui-overlay', 'dist', 'index.html'));
-  });
-  app?.get('/public/', function (req, res) {
-    res.sendFile(path.join(__dirname, '..', 'node_modules', '@sogebot', 'ui-public', 'dist', 'index.html'));
-  });
-  app?.get('/credentials/oauth/:page?', function (req, res) {
-    res.sendFile(path.join(__dirname, '..', 'node_modules', '@sogebot', 'ui-oauth', 'dist', 'oauth', 'index.html'));
-  });
-  app?.get('/credentials/login', function (req, res) {
-    res.sendFile(path.join(__dirname, '..', 'node_modules', '@sogebot', 'ui-oauth', 'dist', 'login', 'index.html'));
-  });
-  app?.get('/assets/:asset/:file?', function (req, res) {
-    if (req.params.file) {
-      res.sendFile(path.join(__dirname, '..', 'assets', sanitize(req.params.asset), sanitize(req.params.file)));
-    } else {
-      res.sendFile(path.join(__dirname, '..', 'assets', sanitize(req.params.asset)));
-    }
-  });
-  app?.get('/custom/:custom', function (req, res) {
-    res.sendFile(path.join(__dirname, '..', 'public', 'custom', sanitize(req.params.custom) + '.html'));
-  });
-  app?.get('/fonts', function (req, res) {
-    res.sendFile(path.join(__dirname, '..', 'fonts.json'));
-  });
-  app?.get('/favicon.ico', function (req, res) {
-    res.sendFile(path.join(__dirname, '..', 'favicon.ico'));
-  });
-  app?.get('/:page?', function (req, res) {
-    res.sendFile(path.join(__dirname, '..', 'node_modules', '@sogebot', 'ui-admin', 'dist', 'index.html'));
-  });
-
-  setTimeout(() => {
-    adminEndpoint('/', 'panel::resetStatsState', () => lastDataSent = null);
-  }, 5000);
-
-  ioServer?.use(socketSystem.authorize);
-
-  ioServer?.on('connect', async (socket) => {
-    socket.on('disconnect', () => {
-      socketsConnectedDec();
+  expose () {
+    server.listen(port, '0.0.0.0', () => {
+      info(`WebPanel is available at http://localhost:${port}`);
     });
-    socketsConnectedInc();
+    serverSecure?.listen(secureport, '0.0.0.0', () => {
+      info(`WebPanel is available at https://localhost:${secureport}`);
+    });
+  }
 
-    socket.on('getCachedTags', async (cb: (results: TwitchTagInterface[]) => void) => {
-      const connection = await getConnection();
-      const joinQuery = connection.options.type === 'postgres' ? '"names"."tagId" = "tag_id" AND "names"."locale"' : 'names.tagId = tag_id AND names.locale';
-      let query = getRepository(TwitchTag)
-        .createQueryBuilder('tags')
-        .select('names.locale', 'locale')
-        .addSelect('names.value', 'value')
-        .addSelect('tags.tag_id', 'tag_id')
-        .addSelect('tags.is_auto', 'is_auto')
-        .addSelect('tags.is_current', 'is_current')
-        .leftJoinAndSelect('twitch_tag_localization_name', 'names', `${joinQuery} like :tag`)
-        .setParameter('tag', '%' + getLang() +'%');
+  init () {
+    setApp(express());
+    app?.use(limiter);
+    app?.use(cors());
+    app?.use(express.json({
+      limit:  '500mb',
+      verify: (req, _res, buf) =>{
+        // Small modification to the JSON bodyParser to expose the raw body in the request object
+        // The raw body is required at signature verification
+        (req as any).rawBody = buf;
+      },
+    }));
+    app?.use(express.urlencoded({ extended: true, limit: '500mb' }));
+    app?.use(express.raw());
+    app?.use('/frame-api-explorer', swaggerUi.serve, swaggerUi.setup({
+      ...swaggerJSON,
+      info: {
+        ...swaggerJSON.info,
+        title:       'API Explorer',
+        description: {},
+        contact:     {},
+        license:     {},
+      },
+    }));
+    RegisterRoutes(app as any);
+    app?.use(function errorHandler(
+      err: UnauthorizedError | Error,
+      _req: any,
+      res: any,
+      next: () => void,
+    ): Express.Response | void {
+      if (err instanceof ValidateError) {
+        return res.status(400).json({
+          message: 'Validation Failed',
+          details: err.fields,
+        });
+      }
+      if (err instanceof UnauthorizedError || err instanceof TokenExpiredError || err instanceof JsonWebTokenError) {
+        return res.status(401).send(err.message);
+      }
+      if (err instanceof Error) {
+        error(err);
+        return res.status(500).send('Internal Server Error');
+      }
 
-      let results = await query.execute();
-      if (results.length > 0) {
-        cb(results);
+      next();
+    });
+
+    setServer();
+
+    // highlights system
+    app?.get('/highlights/:id', (req, res) => {
+      highlights.url(req, res);
+    });
+
+    app?.get('/health', (req, res) => {
+      if (getIsBotStarted()) {
+        res.status(200).send('OK');
       } else {
-        // if we don';t have results with our selected locale => reload with en-us
-        query = getRepository(TwitchTag)
+        res.status(503).send('Not OK');
+      }
+    });
+
+    // customvariables system
+    app?.get('/customvariables/:id', (req, res) => {
+      getURL(req, res);
+    });
+    app?.post('/customvariables/:id', (req, res) => {
+      postURL(req, res);
+    });
+
+    // static routing
+    app?.use('/dist', express.static(path.join(__dirname, '..', 'public', 'dist')));
+
+    const nuxtCache = new Map<string, string>();
+    app?.get(['/_static/*', '/credentials/_static/*'], (req, res) => {
+      if (!nuxtCache.get(req.url)) {
+      // search through node_modules to find correct nuxt file
+        const paths = [
+          path.join(__dirname, '..', 'node_modules', '@sogebot', 'ui-oauth', 'dist', '_static'),
+          path.join(__dirname, '..', 'node_modules', '@sogebot', 'ui-public', 'dist', '_static'),
+          path.join(__dirname, '..', 'node_modules', '@sogebot', 'ui-admin', 'dist', '_static'),
+          path.join(__dirname, '..', 'node_modules', '@sogebot', 'ui-overlay', 'dist', '_static'),
+        ];
+        for (const dir of paths) {
+          const pathToFile = path.join(dir, req.url.replace('_static', ''));
+          if (fs.existsSync(pathToFile)) { // lgtm [js/path-injection]
+            nuxtCache.set(req.url, pathToFile);
+          }
+        }
+      }
+
+      const filepath = path.join(nuxtCache.get(req.url) ?? '') as string;
+      if (fs.existsSync(filepath) && nuxtCache.has(req.url)) { // lgtm [js/path-injection]
+        res.sendFile(filepath);
+      } else {
+        res.sendStatus(404);
+      }
+    });
+    app?.get(['/_nuxt/*', '/credentials/_nuxt/*', '/overlays/_nuxt/*'], (req, res) => {
+      if (!nuxtCache.get(req.url)) {
+      // search through node_modules to find correct nuxt file
+        const paths = [
+          path.join(__dirname, '..', 'node_modules', '@sogebot', 'ui-oauth', 'dist', '_nuxt'),
+          path.join(__dirname, '..', 'node_modules', '@sogebot', 'ui-public', 'dist', '_nuxt'),
+          path.join(__dirname, '..', 'node_modules', '@sogebot', 'ui-admin', 'dist', '_nuxt'),
+          path.join(__dirname, '..', 'node_modules', '@sogebot', 'ui-overlay', 'dist', '_nuxt'),
+        ];
+        for (const dir of paths) {
+          const pathToFile = path.join(dir, req.url.replace('_nuxt', '').replace('credentials', '').replace('overlays', ''));
+          if (fs.existsSync(pathToFile)) { // lgtm [js/path-injection]
+            nuxtCache.set(req.url, pathToFile);
+          }
+        }
+      }
+      const filepath = path.join(nuxtCache.get(req.url) ?? '');
+      if (fs.existsSync(filepath) && nuxtCache.has(req.url)) { // lgtm [js/path-injection]
+        res.sendFile(filepath);
+      } else {
+        nuxtCache.delete(req.url);
+        res.sendStatus(404);
+      }
+    });
+    app?.get('/webhooks/callback', function (req, res) {
+      res.status(200).send('OK');
+    });
+    app?.post('/webhooks/callback', function (req, res) {
+      const eventsub = require('./eventsub').default;
+      eventsub.handler(req, res);
+    });
+    app?.get('/popout/', function (req, res) {
+      res.sendFile(path.join(__dirname, '..', 'public', 'popout.html'));
+    });
+    app?.get(['/overlays/:id', '/overlays/text/:id', '/overlays/alerts/:id', '/overlays/goals/:id'], function (req, res) {
+      res.sendFile(path.join(__dirname, '..', 'node_modules', '@sogebot', 'ui-overlay', 'dist', 'index.html'));
+    });
+    app?.get('/public/', function (req, res) {
+      res.sendFile(path.join(__dirname, '..', 'node_modules', '@sogebot', 'ui-public', 'dist', 'index.html'));
+    });
+    app?.get('/credentials/oauth/:page?', function (req, res) {
+      res.sendFile(path.join(__dirname, '..', 'node_modules', '@sogebot', 'ui-oauth', 'dist', 'oauth', 'index.html'));
+    });
+    app?.get('/credentials/login', function (req, res) {
+      res.sendFile(path.join(__dirname, '..', 'node_modules', '@sogebot', 'ui-oauth', 'dist', 'login', 'index.html'));
+    });
+    app?.get('/assets/:asset/:file?', function (req, res) {
+      if (req.params.file) {
+        res.sendFile(path.join(__dirname, '..', 'assets', sanitize(req.params.asset), sanitize(req.params.file)));
+      } else {
+        res.sendFile(path.join(__dirname, '..', 'assets', sanitize(req.params.asset)));
+      }
+    });
+    app?.get('/custom/:custom', function (req, res) {
+      res.sendFile(path.join(__dirname, '..', 'public', 'custom', sanitize(req.params.custom) + '.html'));
+    });
+    app?.get('/fonts', function (req, res) {
+      res.sendFile(path.join(__dirname, '..', 'fonts.json'));
+    });
+    app?.get('/favicon.ico', function (req, res) {
+      res.sendFile(path.join(__dirname, '..', 'favicon.ico'));
+    });
+    app?.get('/:page?', function (req, res) {
+      res.sendFile(path.join(__dirname, '..', 'node_modules', '@sogebot', 'ui-admin', 'dist', 'index.html'));
+    });
+
+    setTimeout(() => {
+      adminEndpoint('/', 'panel::resetStatsState', () => lastDataSent = null);
+    }, 5000);
+
+    ioServer?.use(socketSystem.authorize);
+
+    ioServer?.on('connect', async (socket) => {
+      socket.on('disconnect', () => {
+        socketsConnectedDec();
+      });
+      socketsConnectedInc();
+
+      socket.on('getCachedTags', async (cb: (results: TwitchTagInterface[]) => void) => {
+        const connection = await getConnection();
+        const joinQuery = connection.options.type === 'postgres' ? '"names"."tagId" = "tag_id" AND "names"."locale"' : 'names.tagId = tag_id AND names.locale';
+        let query = getRepository(TwitchTag)
           .createQueryBuilder('tags')
           .select('names.locale', 'locale')
           .addSelect('names.value', 'value')
           .addSelect('tags.tag_id', 'tag_id')
           .addSelect('tags.is_auto', 'is_auto')
           .addSelect('tags.is_current', 'is_current')
-          .leftJoinAndSelect('twitch_tag_localization_name', 'names', `${joinQuery} = :tag`)
-          .setParameter('tag', 'en-us');
-        results = await query.execute();
-      }
-      cb(results);
-    });
-    // twitch game and title change
-    socket.on('getGameFromTwitch', function (game: string, cb) {
-      sendGameFromTwitch(game).then((data) => cb(data));
-    });
-    socket.on('getUserTwitchGames', async (cb) => {
-      const titles = await getRepository(CacheTitles).find();
-      cb(titles);
-    });
-    socket.on('cleanupGameAndTitle', async () => {
-      // remove empty titles
-      await getManager()
-        .createQueryBuilder()
-        .delete()
-        .from(CacheTitles, 'titles')
-        .where('title = :title', { title: '' })
-        .execute();
+          .leftJoinAndSelect('twitch_tag_localization_name', 'names', `${joinQuery} like :tag`)
+          .setParameter('tag', '%' + getLang() +'%');
 
-      // remove duplicates
-      const allTitles = await getRepository(CacheTitles).find();
-      for (const t of allTitles) {
-        const titles = allTitles.filter(o => o.game === t.game && o.title === t.title);
-        if (titles.length > 1) {
-          // remove title if we have more than one title
-          await getManager()
-            .createQueryBuilder()
-            .delete()
-            .from(CacheTitles, 'titles')
-            .where('id = :id', { id: t.id })
-            .execute();
+        let results = await query.execute();
+        if (results.length > 0) {
+          cb(results);
+        } else {
+        // if we don';t have results with our selected locale => reload with en-us
+          query = getRepository(TwitchTag)
+            .createQueryBuilder('tags')
+            .select('names.locale', 'locale')
+            .addSelect('names.value', 'value')
+            .addSelect('tags.tag_id', 'tag_id')
+            .addSelect('tags.is_auto', 'is_auto')
+            .addSelect('tags.is_current', 'is_current')
+            .leftJoinAndSelect('twitch_tag_localization_name', 'names', `${joinQuery} = :tag`)
+            .setParameter('tag', 'en-us');
+          results = await query.execute();
         }
-      }
-    });
-    socket.on('updateGameAndTitle', async (data: { game: string, title: string, tags: string[] }, cb: (status: boolean | null) => void) => {
-      const status = await setTitleAndGame(data);
-      await setTags(data.tags);
-
-      if (!status) { // twitch refused update
-        cb(true);
-      }
-
-      data.title = data.title.trim();
-      data.game = data.game.trim();
-
-      const item = await getRepository(CacheTitles).findOne({
-        game:  data.game,
-        title: data.title,
+        cb(results);
       });
-
-      if (!item) {
+      // twitch game and title change
+      socket.on('getGameFromTwitch', function (game: string, cb) {
+        sendGameFromTwitch(game).then((data) => cb(data));
+      });
+      socket.on('getUserTwitchGames', async (cb) => {
+        const titles = await getRepository(CacheTitles).find();
+        cb(titles);
+      });
+      socket.on('cleanupGameAndTitle', async () => {
+      // remove empty titles
         await getManager()
           .createQueryBuilder()
-          .insert()
-          .into(CacheTitles)
-          .values([
-            {
-              game: data.game, title: data.title, timestamp: Date.now(),
-            },
-          ])
+          .delete()
+          .from(CacheTitles, 'titles')
+          .where('title = :title', { title: '' })
           .execute();
-      } else {
+
+        // remove duplicates
+        const allTitles = await getRepository(CacheTitles).find();
+        for (const t of allTitles) {
+          const titles = allTitles.filter(o => o.game === t.game && o.title === t.title);
+          if (titles.length > 1) {
+          // remove title if we have more than one title
+            await getManager()
+              .createQueryBuilder()
+              .delete()
+              .from(CacheTitles, 'titles')
+              .where('id = :id', { id: t.id })
+              .execute();
+          }
+        }
+      });
+      socket.on('updateGameAndTitle', async (data: { game: string, title: string, tags: string[] }, cb: (status: boolean | null) => void) => {
+        const status = await setTitleAndGame(data);
+        await setTags(data.tags);
+
+        if (!status) { // twitch refused update
+          cb(true);
+        }
+
+        data.title = data.title.trim();
+        data.game = data.game.trim();
+
+        const item = await getRepository(CacheTitles).findOne({
+          game:  data.game,
+          title: data.title,
+        });
+
+        if (!item) {
+          await getManager()
+            .createQueryBuilder()
+            .insert()
+            .into(CacheTitles)
+            .values([
+              {
+                game: data.game, title: data.title, timestamp: Date.now(),
+              },
+            ])
+            .execute();
+        } else {
         // update timestamp
-        await getRepository(CacheTitles).save({ ...item, timestamp: Date.now() });
-      }
-      cb(null);
-    });
-    socket.on('joinBot', async () => {
-      tmi.join('bot', tmi.channel);
-    });
-    socket.on('leaveBot', async () => {
-      tmi.part('bot');
-      // force all users offline
-      await getRepository(User).update({}, { isOnline: false });
-    });
-
-    // custom var
-    socket.on('custom.variable.value', async (variable: string, cb: (error: string | null, value: string) => void) => {
-      let value = translate('webpanel.not-available');
-      const isVarSet = await isVariableSet(variable);
-      if (isVarSet) {
-        value = await getValueOf(variable);
-      }
-      cb(null, value);
-    });
-
-    socket.on('responses.get', async function (at: string | null, callback: (responses: Record<string, string>) => void) {
-      const responses = flatten(!_.isNil(at) ? translateLib.translations[getLang()][at] : translateLib.translations[getLang()]);
-      _.each(responses, function (value, key) {
-        const _at = !_.isNil(at) ? at + '.' + key : key;
-        responses[key] = {}; // remap to obj
-        responses[key].default = translate(_at, true);
-        responses[key].current = translate(_at);
+          await getRepository(CacheTitles).save({ ...item, timestamp: Date.now() });
+        }
+        cb(null);
       });
-      callback(responses);
-    });
-    socket.on('responses.set', function (data: { key: string }) {
-      _.remove(translateLib.custom, function (o: any) {
-        return o.key === data.key;
+      socket.on('joinBot', async () => {
+        tmi.join('bot', tmi.channel);
       });
-      translateLib.custom.push(data);
-      translateLib._save();
-
-      const lang = {};
-      _.merge(
-        lang,
-        translate({ root: 'webpanel' }),
-        translate({ root: 'ui' }), // add ui root -> slowly refactoring to new name
-      );
-      socket.emit('lang', lang);
-    });
-    socket.on('responses.revert', async function (data: { name: string }, callback: (translation: string) => void) {
-      _.remove(translateLib.custom, function (o: any) {
-        return o.name === data.name;
+      socket.on('leaveBot', async () => {
+        tmi.part('bot');
+        // force all users offline
+        await getRepository(User).update({}, { isOnline: false });
       });
-      await getRepository(Translation).delete({ name: data.name });
-      callback(translate(data.name));
-    });
 
-    adminEndpoint('/', 'debug::get', (cb) => {
-      cb(null, getDEBUG());
-    });
-
-    adminEndpoint('/', 'debug::set', (data) => {
-      setDEBUG(data);
-    });
-
-    adminEndpoint('/', 'panel::alerts', (cb) => {
-      const toShow: { errors: typeof errors, warns: typeof warns }  = { errors: [], warns: [] };
-      do {
-        const err = errors.shift();
-        if (!err) {
-          break;
+      // custom var
+      socket.on('custom.variable.value', async (variable: string, cb: (error: string | null, value: string) => void) => {
+        let value = translate('webpanel.not-available');
+        const isVarSet = await isVariableSet(variable);
+        if (isVarSet) {
+          value = await getValueOf(variable);
         }
+        cb(null, value);
+      });
 
-        if (!toShow.errors.find((o) => {
-          return o.name === err.name && o.message === err.message;
-        })) {
-          toShow.errors.push(err);
-        }
-      } while (errors.length > 0);
-      do {
-        const warn = warns.shift();
-        if (!warn) {
-          break;
-        }
+      socket.on('responses.get', async function (at: string | null, callback: (responses: Record<string, string>) => void) {
+        const responses = flatten(!_.isNil(at) ? translateLib.translations[getLang()][at] : translateLib.translations[getLang()]);
+        _.each(responses, function (value, key) {
+          const _at = !_.isNil(at) ? at + '.' + key : key;
+          responses[key] = {}; // remap to obj
+          responses[key].default = translate(_at, true);
+          responses[key].current = translate(_at);
+        });
+        callback(responses);
+      });
+      socket.on('responses.set', function (data: { key: string }) {
+        _.remove(translateLib.custom, function (o: any) {
+          return o.key === data.key;
+        });
+        translateLib.custom.push(data);
+        translateLib._save();
 
-        if (!toShow.warns.find((o) => {
-          return o.name === warn.name && o.message === warn.message;
-        })) {
-          toShow.warns.push(warn);
-        }
-      } while (warns.length > 0);
-      cb(null, toShow);
-    });
+        const lang = {};
+        _.merge(
+          lang,
+          translate({ root: 'webpanel' }),
+          translate({ root: 'ui' }), // add ui root -> slowly refactoring to new name
+        );
+        socket.emit('lang', lang);
+      });
+      socket.on('responses.revert', async function (data: { name: string }, callback: (translation: string) => void) {
+        _.remove(translateLib.custom, function (o: any) {
+          return o.name === data.name;
+        });
+        await getRepository(Translation).delete({ name: data.name });
+        callback(translate(data.name));
+      });
 
-    socket.on('connection_status', (cb: (status: typeof statusObj) => void) => {
-      cb(statusObj);
-    });
-    socket.on('saveConfiguration', function (data: any) {
-      _.each(data, async function (index, value) {
-        if (value.startsWith('_')) {
-          return true;
-        }
-        setValue({
-          sender: getOwnerAsSender(), createdAt: 0, command: '', parameters: value + ' ' + index, attr: { quiet: data._quiet },
+      adminEndpoint('/', 'debug::get', (cb) => {
+        cb(null, getDEBUG());
+      });
+
+      adminEndpoint('/', 'debug::set', (data) => {
+        setDEBUG(data);
+      });
+
+      adminEndpoint('/', 'panel::alerts', (cb) => {
+        const toShow: { errors: typeof errors, warns: typeof warns }  = { errors: [], warns: [] };
+        do {
+          const err = errors.shift();
+          if (!err) {
+            break;
+          }
+
+          if (!toShow.errors.find((o) => {
+            return o.name === err.name && o.message === err.message;
+          })) {
+            toShow.errors.push(err);
+          }
+        } while (errors.length > 0);
+        do {
+          const warn = warns.shift();
+          if (!warn) {
+            break;
+          }
+
+          if (!toShow.warns.find((o) => {
+            return o.name === warn.name && o.message === warn.message;
+          })) {
+            toShow.warns.push(warn);
+          }
+        } while (warns.length > 0);
+        cb(null, toShow);
+      });
+
+      socket.on('connection_status', (cb: (status: typeof statusObj) => void) => {
+        cb(statusObj);
+      });
+      socket.on('saveConfiguration', function (data: any) {
+        _.each(data, async function (index, value) {
+          if (value.startsWith('_')) {
+            return true;
+          }
+          setValue({
+            sender: getOwnerAsSender(), createdAt: 0, command: '', parameters: value + ' ' + index, attr: { quiet: data._quiet },
+          });
         });
       });
-    });
 
     type toEmit = { name: string; enabled: boolean; areDependenciesEnabled: boolean; isDisabledByEnv: boolean; type: string; }[];
     // send enabled systems
@@ -550,8 +569,9 @@ export const init = () => {
       { bot: translate({ root: 'core' }) },
     );
     socket.emit('lang', lang);
-  });
-};
+    });
+  }
+}
 
 export const getServer = function () {
   return server;
@@ -559,15 +579,6 @@ export const getServer = function () {
 
 export const getApp = function () {
   return app;
-};
-
-export const expose = function () {
-  server.listen(port, '0.0.0.0', () => {
-    info(`WebPanel is available at http://localhost:${port}`);
-  });
-  serverSecure?.listen(secureport, '0.0.0.0', () => {
-    info(`WebPanel is available at https://localhost:${secureport}`);
-  });
 };
 
 let lastDataSent: null | Record<string, unknown> = null;
@@ -607,11 +618,13 @@ const sendStreamData = async () => {
     }
     lastDataSent = data;
   } catch (e) {
-    if (e.message !== 'Translation not yet loaded') {
-      error(e);
+    if (e instanceof Error) {
+      if (e.message !== 'Translation not yet loaded') {
+        error(e);
+      }
     }
   }
   setTimeout(async () => await sendStreamData(), 5000);
 };
 
-sendStreamData();
+export default new Panel();
