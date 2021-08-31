@@ -116,7 +116,7 @@ class OAuth extends Core {
     loadedTokens.value++;
   }
 
-  @onChange('generalOwner')
+  @onChange('generalOwners')
   @onChange('broadcasterUsername')
   clearCache() {
     cleanViewersCache();
