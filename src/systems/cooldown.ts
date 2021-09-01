@@ -110,7 +110,7 @@ class Cooldown extends System {
   async help (opts: CommandOptions): Promise<CommandResponse[]> {
     let url = 'http://sogehige.github.io/sogeBot/#/systems/cooldown';
     if ((process.env?.npm_package_version ?? 'x.y.z-SNAPSHOT').includes('SNAPSHOT')) {
-      url = 'http://sogehige.github.io/sogeBot/#/_master/systems/cooldown';
+      url = 'http://sogehige.github.io/sogeBot/#/_master/systems/cooldowns';
     }
     return [{ response: translate('core.usage') + ' => ' + url, ...opts }];
   }

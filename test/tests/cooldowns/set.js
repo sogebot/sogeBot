@@ -17,17 +17,17 @@ describe('Cooldowns - set()', () => {
 
   it('', async () => {
     const r = await cooldown.main({ sender: owner, parameters: '' });
-    assert.strictEqual(r[0].response, 'Usage => http://sogehige.github.io/sogeBot/#/_master/systems/cooldown');
+    assert.strictEqual(r[0].response, 'Usage => http://sogehige.github.io/sogeBot/#/_master/systems/cooldowns');
   });
 
   it('!alias', async () => {
     const r = await cooldown.main({ sender: owner, parameters: '!alias' });
-    assert.strictEqual(r[0].response, 'Usage => http://sogehige.github.io/sogeBot/#/_master/systems/cooldown');
+    assert.strictEqual(r[0].response, 'Usage => http://sogehige.github.io/sogeBot/#/_master/systems/cooldowns');
   });
 
   it('alias', async () => {
     const r = await cooldown.main({ sender: owner, parameters: 'alias' });
-    assert.strictEqual(r[0].response, 'Usage => http://sogehige.github.io/sogeBot/#/_master/systems/cooldown');
+    assert.strictEqual(r[0].response, 'Usage => http://sogehige.github.io/sogeBot/#/_master/systems/cooldowns');
   });
 
   it('test global 20', async () => {
@@ -117,6 +117,6 @@ describe('Cooldowns - set()', () => {
 
   it('unset without param', async () => {
     const r = await cooldown.unset({ sender: owner, parameters: '' });
-    assert.strictEqual(r[0].response, 'Usage => http://sogehige.github.io/sogeBot/#/_master/systems/cooldown');
+    assert.strictEqual(r[0].response, 'Usage => http://sogehige.github.io/sogeBot/#/_master/systems/cooldowns');
   });
 });
