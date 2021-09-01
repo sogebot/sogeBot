@@ -30,7 +30,7 @@ describe('Cooldowns - toggleSubscribers()', () => {
     const r2 = await cooldown.toggleSubscribers({ sender: owner, parameters: command });
 
     assert.strictEqual(r[0].response, '$sender, user cooldown for !me was set to 60s');
-    assert.strictEqual(r2[0].response, 'Usage => http://sogehige.github.io/sogeBot/#/_master/systems/cooldown');
+    assert.strictEqual(r2[0].response, 'Usage => http://sogehige.github.io/sogeBot/#/_master/systems/cooldowns');
   });
 
   it('correct toggle', async () => {
