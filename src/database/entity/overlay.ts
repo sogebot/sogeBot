@@ -176,14 +176,20 @@ export interface OverlayMapperGroup {
   id: string;
   value: 'group';
   opts: {
-    id: string;
-    width: number;
-    height: number;
-    alignX: number;
-    alignY: number;
-    type: string;
-    opts: any;
-  }[],
+    canvas: {
+      width: number;
+      height: number;
+    },
+    items: {
+      id: string;
+      width: number;
+      height: number;
+      alignX: number;
+      alignY: number;
+      type: string;
+      opts: any;
+    }[],
+  }
 }
 
 export type OverlayMappers = OverlayMapperGroup | OverlayMapperEventlist | OverlayMapperEmotesCombo | OverlayMapperCredits | OverlayMapperClips | OverlayMapperAlerts | OverlayMapperEmotes | OverlayMapperEmotesExplode | OverlayMapperEmotesFireworks | OverlayMapperPolls | OverlayMapperTTS | OverlayMapperInterface | OverlayMapperOBSWebsocket | OverlayMapperClipsCarousel | OverlayMapperHypeTrain;
