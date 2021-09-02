@@ -56,7 +56,6 @@
     "mkdir": "0.0.2",
     "multer": "^1.4.3",
     "mysql2": "2.3.0",
-    "node-fetch": "^3.0.0",
     "node-hue-api": "3.4.3",
     "npm": "^7.21.1",
     "npm-check-updates": "^11.8.3",
