@@ -78,7 +78,7 @@ class Scrim extends System {
         unit: getLocalizedName(minutes, translate('core.minutes')),
       }), 'scrim');
       return [];
-    } catch (e) {
+    } catch (e: any) {
       if (isNaN(Number(e.message))) {
         return [{ response: '$sender, cmd_error [' + opts.command + ']: ' + e.message, ...opts }];
       }
@@ -100,7 +100,7 @@ class Scrim extends System {
           matchId,
         });
       }
-    } catch (e) {
+    } catch (e: any) {
       if (isNaN(Number(e.message))) {
         return [{ response: '$sender, cmd_error [' + opts.command + ']: ' + e.message, ...opts }];
       }

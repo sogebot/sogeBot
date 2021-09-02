@@ -58,7 +58,7 @@ class Gallery extends Overlay {
           select: ['id', 'name', 'type', 'folder'],
         });
         cb(null, item);
-      } catch (e) {
+      } catch (e: any) {
         cb(e.stack, null);
       }
     });
@@ -66,7 +66,7 @@ class Gallery extends Overlay {
       try {
         const items = await getRepository(GalleryEntity).find({ select: ['id', 'name', 'type', 'folder'] });
         cb(null, items);
-      } catch (e) {
+      } catch (e: any) {
         cb(e.stack, []);
       }
     });
@@ -74,7 +74,7 @@ class Gallery extends Overlay {
       try {
         await getRepository(GalleryEntity).delete({ id: String(id) });
         cb(null);
-      } catch (e) {
+      } catch (e: any) {
         cb(e.stack);
       }
     });
@@ -85,7 +85,7 @@ class Gallery extends Overlay {
           ...opts.item,
         }));
         cb(null);
-      } catch (e) {
+      } catch (e: any) {
         cb(e.stack);
       }
     });
@@ -113,7 +113,7 @@ class Gallery extends Overlay {
         if (cb) {
           cb(null);
         }
-      } catch (e) {
+      } catch (e: any) {
         if (cb) {
           cb(e.stack);
         }

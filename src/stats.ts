@@ -103,7 +103,7 @@ class Stats extends Core {
             ...cachedStats, currentFollowers: _self.currentFollowers, currentViews: _self.currentViews, currentSubscribers: _self.currentSubscribers,
           });
         }
-      } catch (e) {
+      } catch (e: any) {
         error(e);
         cb(e.stack, {});
       }

@@ -83,7 +83,7 @@ async function main () {
       }
     }
     await connect();
-  } catch (e) {
+  } catch (e: any) {
     error('Bot was unable to connect to database, check your database configuration');
     error(e);
     error('Exiting bot.');
@@ -148,7 +148,7 @@ async function main () {
         }, 30000);
       });
     }, 5000);
-  } catch (e) {
+  } catch (e: any) {
     error(e);
     process.exit();
   }

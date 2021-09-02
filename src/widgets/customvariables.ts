@@ -24,7 +24,7 @@ class CustomVariables extends Widget {
         await getRepository(VariableWatch).delete({});
         const variables = await getRepository(VariableWatch).save(items);
         cb(null, variables);
-      } catch (e) {
+      } catch (e: any) {
         cb(e.stack, []);
       }
     });
@@ -32,7 +32,7 @@ class CustomVariables extends Widget {
       try {
         const variables = await getRepository(Variable).find();
         cb(null, variables);
-      } catch (e) {
+      } catch (e: any) {
         cb(e.stack, []);
       }
     });
@@ -40,7 +40,7 @@ class CustomVariables extends Widget {
       try {
         const variables = await getRepository(VariableWatch).find({ order: { order: 'ASC' } });
         cb(null, variables);
-      } catch (e) {
+      } catch (e: any) {
         cb(e.stack, []);
       }
     });
@@ -53,7 +53,7 @@ class CustomVariables extends Widget {
         if (cb) {
           cb(null);
         }
-      } catch (e) {
+      } catch (e: any) {
         if (cb) {
           cb(e.stack);
         }

@@ -49,7 +49,7 @@ export class RegistryRegistryController extends Controller {
     try {
       const item = await getRepository(Randomizer).findOneOrFail({ where: { id }, relations: ['items'] });
       return item;
-    } catch (e) {
+    } catch (e: any) {
       this.setStatus(404);
     }
     return;
@@ -63,7 +63,7 @@ export class RegistryRegistryController extends Controller {
     try {
       await getRepository(Randomizer).save(requestBody);
       this.setStatus(201);
-    } catch (e) {
+    } catch (e: any) {
       this.setStatus(400);
     }
     return;
@@ -78,7 +78,7 @@ export class RegistryRegistryController extends Controller {
       await getRepository(Randomizer).update({}, { isShown: false });
       this.setStatus(200);
 
-    } catch (e) {
+    } catch (e: any) {
       this.setStatus(400);
     }
     return;
@@ -102,7 +102,7 @@ export class RegistryRegistryController extends Controller {
       await getRepository(RandomizerItem).delete({ randomizerId: IsNull() });
       this.setStatus(200);
       return item;
-    } catch (e) {
+    } catch (e: any) {
       this.setStatus(400);
     }
     return;

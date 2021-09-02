@@ -50,7 +50,7 @@ export const find = (type: string, name: string) => {
         warning(`Some modules are not loaded yet`);
       }
       return String(m.__moduleName__).toLowerCase() === name.toLowerCase();
-    } catch (e) {
+    } catch (e: any) {
       error(e);
     }
   });

@@ -79,7 +79,7 @@ export class QuickActionController extends Controller {
       await getRepository(QuickAction).save({ ...item, userId });
       this.setStatus(201);
 
-    } catch (e) {
+    } catch (e: any) {
       this.setStatus(400);
     }
     return;
@@ -96,7 +96,7 @@ export class QuickActionController extends Controller {
       const item = await getRepository(QuickAction).findOneOrFail({ where: { id, userId } });
       trigger(item, { userId, username }, req.body.value);
       this.setStatus(200);
-    } catch (e) {
+    } catch (e: any) {
       this.setStatus(404);
     }
     return;

@@ -55,14 +55,14 @@ class HowLongToBeat extends System {
     adminEndpoint(this.nsp, 'generic::getAll', async (cb) => {
       try {
         cb(null, await getRepository(HowLongToBeatGame).find(), await getRepository(HowLongToBeatGameItem).find());
-      } catch (e) {
+      } catch (e: any) {
         cb(e.stack, []);
       }
     });
     adminEndpoint(this.nsp, 'hltb::save', async (item, cb) => {
       try {
         cb(null, await getRepository(HowLongToBeatGame).save(item));
-      } catch (e) {
+      } catch (e: any) {
         cb(e.stack);
       }
     });
@@ -82,7 +82,7 @@ class HowLongToBeat extends System {
           throw new Error(`Game ${game} not found on HLTB service`);
         }
         cb(null);
-      } catch (e) {
+      } catch (e: any) {
         cb(e.stack);
       }
     });
@@ -96,7 +96,7 @@ class HowLongToBeat extends System {
             return !games.map(a => a.game.toLowerCase()).includes(o.name.toLowerCase());
           })
           .map((o: any) => o.name));
-      } catch (e) {
+      } catch (e: any) {
         cb(e.stack, []);
       }
     });
@@ -110,7 +110,7 @@ class HowLongToBeat extends System {
     adminEndpoint(this.nsp, 'hltb::saveStreamChange', async (stream, cb) => {
       try {
         cb(null, await getRepository(HowLongToBeatGameItem).save(stream));
-      } catch (e) {
+      } catch (e: any) {
         cb(e.stack);
       }
     });
@@ -127,7 +127,7 @@ class HowLongToBeat extends System {
           getRepository(HowLongToBeatGame).update({ id: game.id }, { imageUrl: gameFromHltb.imageUrl });
         }
       }
-    } catch (e) {
+    } catch (e: any) {
       error(e);
     }
     setTimeout(() => this.refreshImageThumbnail(), constants.HOUR);
@@ -158,7 +158,7 @@ class HowLongToBeat extends System {
           timestamp: this.interval,
         });
       }
-    } catch (e) {
+    } catch (e: any) {
       if (e instanceof EntityNotFoundError) {
         const gameFromHltb = (await this.hltbService.search(stats.value.currentGame))[0];
         if (gameFromHltb) {

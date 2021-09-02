@@ -246,7 +246,7 @@ class API extends Core {
                 lastRunAt: 0,
               });
             }
-          } catch (e) {
+          } catch (e: any) {
             warning(`API call for ${fnc} is probably frozen (took more than 10minutes), forcefully unblocking`);
             debug('api.interval', chalk.yellow(fnc + '() ') + e);
             continue;
@@ -300,7 +300,7 @@ class API extends Core {
       await getRepository(User).update({ userId: In(data.map(o => o.user_id)) }, { isModerator: true });
 
       setStatus('MOD', data.map(o => o.user_id).includes(botId.value));
-    } catch (e) {
+    } catch (e: any) {
       if (e.isAxiosError) {
         error(`API: ${e.config.method.toUpperCase()} ${e.config.url} - ${e.response?.status ?? 0}\n${JSON.stringify(e.response?.data ?? '--nodata--', null, 4)}\n\n${e.stack}`);
         ioServer?.emit('api.stats', {
@@ -371,7 +371,7 @@ class API extends Core {
         method: 'GET', data: request.data, timestamp: Date.now(), call: 'getUsernameFromTwitch', api: 'helix', endpoint: url, code: request.status, remaining: calls.bot,
       });
       return request.data.data[0].login;
-    } catch (e) {
+    } catch (e: any) {
       if (typeof e.response !== 'undefined' && e.response.status === 429) {
         emptyRateLimit('bot', e.response.headers);
       }
@@ -484,7 +484,7 @@ class API extends Core {
         // move to next page
         return this.getAllStreamTags({ cursor: request.data.pagination.cursor });
       }
-    } catch (e) {
+    } catch (e: any) {
       error(`${url} - ${e.message}`);
       ioServer?.emit('api.stats', {
         method: 'GET', timestamp: Date.now(), call: 'getAllStreamTags', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: calls.bot,
@@ -564,7 +564,7 @@ class API extends Core {
       // reset warning after correct calls (user may have affiliate or have correct oauth)
       opts.noAffiliateOrPartnerWarningSent = false;
       opts.notCorrectOauthWarningSent = false;
-    } catch (e) {
+    } catch (e: any) {
       if ((e.message === '403 Forbidden' || e.message === 'Request failed with status code 401')) {
         if (!opts.notCorrectOauthWarningSent) {
           opts.notCorrectOauthWarningSent = true;
@@ -683,7 +683,7 @@ class API extends Core {
       } else {
         gameOrTitleChangedManually.value = false;
       }
-    } catch (e) {
+    } catch (e: any) {
       error(`${url} - ${e.message}`);
       ioServer?.emit('api.stats', {
         method: 'GET', timestamp: Date.now(), call: 'getChannelInformation', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: calls.bot,
@@ -741,7 +741,7 @@ class API extends Core {
         }
       }
       apiStats.value.currentFollowers = request.data.total;
-    } catch (e) {
+    } catch (e: any) {
       if (typeof e.response !== 'undefined' && e.response.status === 429) {
         emptyRateLimit('bot', e.response.headers);
       }
@@ -818,7 +818,7 @@ class API extends Core {
           }
         });
       }
-    } catch (e) {
+    } catch (e: any) {
       if (typeof e.response !== 'undefined' && e.response.status === 429) {
         emptyRateLimit('bot', e.response.headers);
       }
@@ -870,7 +870,7 @@ class API extends Core {
           currentStreamTags.push({ is_auto: tag.is_auto, localization_names: tag.localization_names });
         }
       }
-    } catch (e) {
+    } catch (e: any) {
       error(`${url} - ${e.message}`);
       ioServer?.emit('api.stats', {
         method: 'GET', timestamp: Date.now(), call: 'getCurrentStreamTags', api: 'getCurrentStreamTags', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: calls.bot,
@@ -942,7 +942,7 @@ class API extends Core {
           stream.end();
         }
       }
-    } catch (e) {
+    } catch (e: any) {
       if (typeof e.response !== 'undefined' && e.response.status === 429) {
         emptyRateLimit('bot', e.response.headers);
       }
@@ -1024,7 +1024,7 @@ class API extends Core {
         // clip found in twitch api
         await getRepository(TwitchClips).update({ clipId: clip.id }, { isChecked: true });
       }
-    } catch (e) {
+    } catch (e: any) {
       if (typeof e.response !== 'undefined' && e.response.status === 429) {
         emptyRateLimit('bot', e.response.headers);
       }
@@ -1095,7 +1095,7 @@ class API extends Core {
       ioServer?.emit('api.stats', {
         method: 'POST', data: request.data, timestamp: Date.now(), call: 'createClip', api: 'helix', endpoint: url, code: request.status, remaining: calls.bot,
       });
-    } catch (e) {
+    } catch (e: any) {
       if (typeof e.response !== 'undefined' && e.response.status === 429) {
         emptyRateLimit('bot', e.response.headers);
       }
@@ -1147,7 +1147,7 @@ class API extends Core {
       ioServer?.emit('api.stats', {
         method: 'GET', data: request.data, timestamp: Date.now(), call: 'fetchAccountAge', api: 'helix', endpoint: url, code: request.status, remaining: calls.bot,
       });
-    } catch (e) {
+    } catch (e: any) {
       if (e.errno === 'ECONNRESET' || e.errno === 'ECONNREFUSED' || e.errno === 'ETIMEDOUT') {
         return;
       } // ignore ECONNRESET errors
@@ -1212,7 +1212,7 @@ class API extends Core {
       ioServer?.emit('api.stats', {
         method: 'GET', data: request.data, timestamp: Date.now(), call: 'isFollowerUpdate', api: 'helix', endpoint: url, code: request.status, remaining: calls.bot,
       });
-    } catch (e) {
+    } catch (e: any) {
       if (typeof e.response !== 'undefined' && e.response.status === 429) {
         emptyRateLimit('bot', e.response.headers);
       }
@@ -1288,7 +1288,7 @@ class API extends Core {
       ioServer?.emit('api.stats', {
         method: 'POST', request: { data: { user_id: String(cid), description: 'Marked from sogeBot' } }, timestamp: Date.now(), call: 'createMarker', api: 'helix', endpoint: url, code: request.status, remaining: calls.bot, data: request,
       });
-    } catch (e) {
+    } catch (e: any) {
       if (e.errno === 'ECONNRESET' || e.errno === 'ECONNREFUSED' || e.errno === 'ETIMEDOUT') {
         setTimeout(() => this.createMarker(), 1000);
         return;
@@ -1335,7 +1335,7 @@ class API extends Core {
         method: 'GET', data: request.data, timestamp: Date.now(), call: 'getClipById', api: 'helix', endpoint: url, code: request.status, remaining: calls.bot,
       });
       return request.data;
-    } catch (e) {
+    } catch (e: any) {
       error(`${url} - ${e.message}`);
       ioServer?.emit('api.stats', {
         method: 'GET', timestamp: Date.now(), call: 'getClipById', api: 'helix', endpoint: url, code: `${e.status} ${get(e, 'body.message', e.statusText)}`, remaining: calls.bot,
@@ -1388,7 +1388,7 @@ class API extends Core {
         for (const item of request.data.data) {
           videos.push(item.id);
         }
-      } catch (e) {
+      } catch (e: any) {
         if (e.isAxiosError) {
           if (e.response?.status !== 404) {
             error(`API: ${e.config.method.toUpperCase()} ${e.config.url} - ${e.response?.status ?? 0}\n${JSON.stringify(e.response?.data ?? '--nodata--', null, 4)}\n\n${e.stack}`);
@@ -1459,7 +1459,7 @@ class API extends Core {
         c.game = await getGameNameFromId(c.game_id);
       }
       return request.data.data;
-    } catch (e) {
+    } catch (e: any) {
       if (e.isAxiosError) {
         error(`API: ${e.config.method.toUpperCase()} ${e.config.url} - ${e.response?.status ?? 0}\n${JSON.stringify(e.response?.data ?? '--nodata--', null, 4)}\n\n${e.stack}`);
         ioServer?.emit('api.stats', {

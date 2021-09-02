@@ -83,7 +83,7 @@ class Raffles extends System {
           null,
           await getRepository(User).findOne({ username }),
         );
-      } catch (e) {
+      } catch (e: any) {
         cb(e.stack);
       }
     });
@@ -93,7 +93,7 @@ class Raffles extends System {
           null,
           await getRepository(RaffleParticipant).update({ id }, { isEligible }),
         );
-      } catch (e) {
+      } catch (e: any) {
         cb(e.stack);
       }
     });
@@ -106,7 +106,7 @@ class Raffles extends System {
             order:     { timestamp: 'DESC' },
           }),
         );
-      } catch (e) {
+      } catch (e: any) {
         cb (e);
       }
     });
@@ -192,7 +192,7 @@ class Raffles extends System {
       });
 
       announce(message, 'raffles');
-    } catch (e) {
+    } catch (e: any) {
       warning('No active raffle found to announce added entries.');
     }
     announceNewEntriesTime = 0;

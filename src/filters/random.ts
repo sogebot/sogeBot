@@ -101,7 +101,7 @@ const random: ResponseFilter = {
 
     try {
       return Math.floor(Number(numbers[0]) + (Math.random() * (Number(numbers[1]) - Number(numbers[0]))));
-    } catch (e) {
+    } catch (e: any) {
       return 0;
     }
   },

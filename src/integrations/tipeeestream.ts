@@ -109,7 +109,7 @@ class TipeeeStream extends Integration {
         }
 
         this.afterDate = beforeDate;
-      } catch (e) {
+      } catch (e: any) {
         error(e.stack);
       }
 
@@ -191,7 +191,7 @@ class TipeeeStream extends Integration {
             timestamp,
           });
         });
-    } catch (e) {
+    } catch (e: any) {
       error(`TIPEESTREAM: Error in parsing event: ${JSON.stringify(data)})`);
       error(e);
     }

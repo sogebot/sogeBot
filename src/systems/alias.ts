@@ -55,7 +55,7 @@ class Alias extends System {
     publicEndpoint(this.nsp, 'generic::getAll', async (cb) => {
       try {
         cb(null, await getRepository(AliasEntity).find());
-      } catch (e) {
+      } catch (e: any) {
         cb(e.stack, []);
       }
     });
@@ -63,7 +63,7 @@ class Alias extends System {
     adminEndpoint(this.nsp, 'generic::getOne', async (id, cb) => {
       try {
         cb(null, await getRepository(AliasEntity).findOne({ id: String(id) }));
-      } catch (e) {
+      } catch (e: any) {
         cb(e.stack);
       }
     });
@@ -72,7 +72,7 @@ class Alias extends System {
       try {
         const item = await getRepository(AliasEntity).save({ ...(await getRepository(AliasEntity).findOne({ id: String(opts.id) })), ...opts.item });
         cb(null, item);
-      } catch (e) {
+      } catch (e: any) {
         cb(e.stack, null);
       }
     });
@@ -254,7 +254,7 @@ class Alias extends System {
       } else {
         throw new Error('-set, -unset, -enable, -disable or -list not found in command.');
       }
-    } catch (e) {
+    } catch (e: any) {
       error(e.stack);
       return [{ response: prepare('alias.alias-parse-failed'), ...opts }];
     }
@@ -295,7 +295,7 @@ class Alias extends System {
 
       const response = prepare('alias.alias-was-edited', { alias, command: cmd });
       return [{ response, ...opts }];
-    } catch (e) {
+    } catch (e: any) {
       return [{ response: prepare('alias.alias-parse-failed'), ...opts }];
     }
   }
@@ -333,7 +333,7 @@ class Alias extends System {
         }),
       );
       return [{ response, ...opts }];
-    } catch (e) {
+    } catch (e: any) {
       return [{ response: prepare('alias.alias-parse-failed'), ...opts }];
     }
   }
@@ -370,7 +370,7 @@ class Alias extends System {
       await getRepository(AliasEntity).save({ ...item, enabled: !item.enabled });
       const response = prepare(!item.enabled ? 'alias.alias-was-enabled' : 'alias.alias-was-disabled', item);
       return [{ response, ...opts }];
-    } catch (e) {
+    } catch (e: any) {
       const response = prepare('alias.alias-parse-failed');
       return [{ response, ...opts }];
     }
@@ -396,7 +396,7 @@ class Alias extends System {
       await getRepository(AliasEntity).save({ ...item, visible: !item.visible });
       const response = prepare(!item.visible ? 'alias.alias-was-exposed' : 'alias.alias-was-concealed', item);
       return [{ response, ...opts }];
-    } catch (e) {
+    } catch (e: any) {
       const response = prepare('alias.alias-parse-failed');
       return [{ response, ...opts }];
     }
@@ -422,7 +422,7 @@ class Alias extends System {
       await getRepository(AliasEntity).remove(item);
       const response = prepare('alias.alias-was-removed', { alias });
       return [{ response, ...opts }];
-    } catch (e) {
+    } catch (e: any) {
       const response = prepare('alias.alias-parse-failed');
       return [{ response, ...opts }];
     }

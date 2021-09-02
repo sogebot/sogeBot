@@ -176,7 +176,7 @@ export const getChannelChattersUnofficialAPI = async (): Promise<{ partedUsers: 
     debug('microservice', 'return::getChannelChattersUnofficialAPI');
     debug('microservice', { partedUsers, joinedUsers });
     return { partedUsers, joinedUsers };
-  } catch (e) {
+  } catch (e: any) {
     warning('Microservice getChannelChattersUnofficialAPI ended with error');
     warning(e);
     if (!isMainThread) {

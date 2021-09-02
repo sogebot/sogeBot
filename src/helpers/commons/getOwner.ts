@@ -3,7 +3,7 @@ import { generalOwners } from '../oauth/generalOwners';
 export function getOwner() {
   try {
     return generalOwners.value[0].trim();
-  } catch (e) {
+  } catch (e: any) {
     return '';
   }
 }

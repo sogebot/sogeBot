@@ -52,7 +52,7 @@ class Qiwi extends Integration {
     let request: any;
     try {
       request = await axios(`https://donate.qiwi.com/api/stream/v1/widgets/${this.secretToken}/events?limit=50`);
-    } catch (e) {
+    } catch (e: any) {
       error(`Qiwi: error on api request: ${e.message}`);
       return;
     }

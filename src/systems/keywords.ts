@@ -39,7 +39,7 @@ class Keywords extends System {
         if (typeof cb === 'function') {
           cb(null, item);
         }
-      } catch (e) {
+      } catch (e: any) {
         if (typeof cb === 'function') {
           cb(e.stack);
         }
@@ -58,7 +58,7 @@ class Keywords extends System {
           order:     { keyword: 'ASC' },
         });
         cb(null, items);
-      } catch (e) {
+      } catch (e: any) {
         cb(e.stack, []);
       }
     });
@@ -129,7 +129,7 @@ class Keywords extends System {
       return [{
         response: prepare('keywords.keyword-was-added', kDb), ...opts, id: kDb.id,
       }];
-    } catch (e) {
+    } catch (e: any) {
       error(e.stack);
       return [{
         response: prepare('keywords.keyword-parse-failed'), ...opts, id: null,
@@ -193,7 +193,7 @@ class Keywords extends System {
         await getRepository(Keyword).save(keyword);
         return [{ response: prepare('keywords.keyword-was-edited', { keyword: keyword.keyword, response }), ...opts }];
       }
-    } catch (e) {
+    } catch (e: any) {
       error(e.stack);
       return [{ response: prepare('keywords.keyword-parse-failed'), ...opts }];
     }
@@ -291,7 +291,7 @@ class Keywords extends System {
           return [{ response: prepare('keywords.keyword-was-removed', keyword), ...opts }];
         }
       }
-    } catch (e) {
+    } catch (e: any) {
       error(e.stack);
       return [{ response: prepare('keywords.keyword-parse-failed'), ...opts }];
     }
@@ -331,7 +331,7 @@ class Keywords extends System {
         await getRepository(Keyword).save(keywords);
         return [{ response: prepare(keywords[0].enabled ? 'keywords.keyword-was-enabled' : 'keywords.keyword-was-disabled', keywords[0]), ...opts }];
       }
-    } catch (e) {
+    } catch (e: any) {
       error(e.stack);
       return [{ response: prepare('keywords.keyword-parse-failed'), ...opts }];
     }

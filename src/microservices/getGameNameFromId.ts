@@ -42,7 +42,7 @@ async function getGameNameFromId (id: number) {
     const name = request.data.data[0].name;
     await getRepository(CacheGames).save({ id, name });
     return name;
-  } catch (e) {
+  } catch (e: any) {
     if (typeof e.response !== 'undefined' && e.response.status === 429) {
       emptyRateLimit('bot', e.response.headers);
     }

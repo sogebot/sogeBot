@@ -148,7 +148,7 @@ class OAuth extends Core {
         } else {
           throw new Error();
         }
-      } catch (e) {
+      } catch (e: any) {
         error(e.stack);
         error(`Cannot get channel ID of ${this.generalChannel} - waiting ${this.toWait.toFixed()}s`);
         timeout = this.toWait * 1000;
@@ -256,7 +256,7 @@ class OAuth extends Core {
         debug('oauth.validate', `Checking ${type} - retry no. ${retry}`);
         request = await axios.get(url, { headers: { Authorization: 'OAuth ' + (type === 'bot' ? this.botAccessToken : this.broadcasterAccessToken) } });
         debug('oauth.validate', JSON.stringify(request.data));
-      } catch (e) {
+      } catch (e: any) {
         if (e.isAxiosError) {
           if ((typeof e.response === 'undefined' || (e.response.status !== 401 && e.response.status !== 403)) && retry < 5) {
             // retry validation if error is different than 401 Invalid Access Token
@@ -308,7 +308,7 @@ class OAuth extends Core {
 
       this.toWait = 10;
       this.getChannelId();
-    } catch (e) {
+    } catch (e: any) {
       if (e.message.includes('no access token for')) {
         if ((type === 'bot' && !botTokenErrorSent) || (type === 'broadcaster' && !broadcasterTokenErrorSent)) {
           warning(`Access token ${type} account not found. Please set it in UI.`);
@@ -385,7 +385,7 @@ class OAuth extends Core {
       this.validateOAuth(type);
 
       return request.data.token;
-    } catch (e) {
+    } catch (e: any) {
       error(e.stack);
       if (type === 'bot') {
         botId.value = '';

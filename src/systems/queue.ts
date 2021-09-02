@@ -38,7 +38,7 @@ class Queue extends System {
     adminEndpoint(this.nsp, 'queue::getAllPicked', async(cb) => {
       try {
         cb(null, this.pickedUsers);
-      } catch (e) {
+      } catch (e: any) {
         cb(e.stack, []);
       }
     });
@@ -48,7 +48,7 @@ class Queue extends System {
           null,
           await getRepository(QueueEntity).find(),
         );
-      } catch (e) {
+      } catch (e: any) {
         cb(e.stack, []);
       }
     });
@@ -58,7 +58,7 @@ class Queue extends System {
           null,
           await getRepository(QueueEntity).clear(),
         );
-      } catch (e) {
+      } catch (e: any) {
         cb(e.stack);
       }
     });
@@ -85,7 +85,7 @@ class Queue extends System {
             }, data.random)).users);
           }
         }
-      } catch (e) {
+      } catch (e: any) {
         if (cb) {
           cb(e.stack);
         }

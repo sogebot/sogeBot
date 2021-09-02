@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 import {
-  calls, emptyRateLimit, getClientId, getToken, setRateLimit, 
+  calls, emptyRateLimit, getClientId, getToken, setRateLimit,
 } from '../helpers/api';
 import { error } from '../helpers/log';
 import { ioServer } from '../helpers/panel';
@@ -47,20 +47,20 @@ async function getIdFromTwitch (username: string, isChannelId = false): Promise<
     calls.bot.refresh = request.headers['ratelimit-reset'];
 
     ioServer?.emit('api.stats', {
-      method: 'GET', data: request.data, timestamp: Date.now(), call: 'getIdFromTwitch', api: 'helix', endpoint: url, code: request.status, remaining: calls.bot, 
+      method: 'GET', data: request.data, timestamp: Date.now(), call: 'getIdFromTwitch', api: 'helix', endpoint: url, code: request.status, remaining: calls.bot,
     });
 
     return String(request.data.data[0].id);
-  } catch (e) {
+  } catch (e: any) {
     if (typeof e.response !== 'undefined' && e.response.status === 429) {
       emptyRateLimit('bot', e.response.headers);
 
       ioServer?.emit('api.stats', {
-        method: 'GET', timestamp: Date.now(), call: 'getIdFromTwitch', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: calls.bot, 
+        method: 'GET', timestamp: Date.now(), call: 'getIdFromTwitch', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: calls.bot,
       });
     } else {
       ioServer?.emit('api.stats', {
-        method: 'GET', timestamp: Date.now(), call: 'getIdFromTwitch', api: 'helix', endpoint: url, code: 'n/a', data: e.stack, remaining: calls.bot, 
+        method: 'GET', timestamp: Date.now(), call: 'getIdFromTwitch', api: 'helix', endpoint: url, code: 'n/a', data: e.stack, remaining: calls.bot,
       });
     }
     error(`User ${username} not found on Twitch.`);

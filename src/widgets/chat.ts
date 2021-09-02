@@ -35,7 +35,7 @@ class Chat extends Widget {
           chatters.viewers = chatters.viewers.filter((o) => !getIgnoreList().includes(o));
           cb(null, { chatters });
         }
-      } catch (e) {
+      } catch (e: any) {
         cb(e.message, {});
       }
     });

@@ -81,7 +81,7 @@ class Polls extends System {
           relations: ['votes'],
           order:     { openedAt: 'DESC' },
         }));
-      } catch(e) {
+      } catch(e: any) {
         cb(e.stack, []);
       }
     });
@@ -97,7 +97,7 @@ class Polls extends System {
         });
         this.sendResponse(response);
         cb(null, null);
-      } catch (e) {
+      } catch (e: any) {
         cb(e.stack, null);
       }
     });
@@ -112,7 +112,7 @@ class Polls extends System {
         });
         this.sendResponse(response);
         cb(null);
-      } catch (e) {
+      } catch (e: any) {
         cb(e.stack);
       }
     });
@@ -164,7 +164,7 @@ class Polls extends System {
           }
         }
       }
-    } catch (e) {
+    } catch (e: any) {
       switch (e.message) {
         case String(ERROR.ALREADY_CLOSED):
           responses.push({ response: translate('systems.polls.notInProgress'), ...opts });
@@ -225,7 +225,7 @@ class Polls extends System {
 
       this.lastTimeRemind = Date.now();
       return responses;
-    } catch (e) {
+    } catch (e: any) {
       switch (e.message) {
         case String(ERROR.NOT_ENOUGH_OPTIONS):
           return [{ response: translate('voting.notEnoughOptions'), ...opts }];
@@ -325,7 +325,7 @@ class Polls extends System {
         throw new Error(String(ERROR.INVALID_VOTE_TYPE));
       }
       return responses;
-    } catch (e) {
+    } catch (e: any) {
       switch (e.message) {
         case String(ERROR.NO_VOTING_IN_PROGRESS):
           return [{ response: prepare('systems.polls.notInProgress'), ...opts }];
@@ -359,7 +359,7 @@ class Polls extends System {
           }
         }
       }
-    } catch (e) {
+    } catch (e: any) {
       warning(e.stack);
     }
     return true;

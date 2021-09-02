@@ -54,7 +54,7 @@ class FightMe extends Game {
       const username = match[1].toLowerCase();
       user = await getRepository(User).findOneOrFail({ where: { username: username.toLowerCase() } });
       challenger = await getRepository(User).findOneOrFail({ where: { userId: opts.sender.userId } });
-    } catch (e) {
+    } catch (e: any) {
       return [{ response: translate('gambling.fightme.notEnoughOptions'), ...opts }];
     }
 

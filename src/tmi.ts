@@ -172,7 +172,7 @@ class TMI extends Core {
         )];
       // update ignore list
       return [{ response: prepare('ignore.user.is.added', { username }), ...opts }];
-    } catch (e) {
+    } catch (e: any) {
       error(e.stack);
     }
     return [];
@@ -186,7 +186,7 @@ class TMI extends Core {
       this.ignorelist = this.ignorelist.filter(o => o !== username);
       // update ignore list
       return [{ response: prepare('ignore.user.is.removed', { username }), ...opts }];
-    } catch (e) {
+    } catch (e: any) {
       error(e.stack);
     }
     return [];
@@ -199,7 +199,7 @@ class TMI extends Core {
       const username = new Expects(opts.parameters).username().toArray()[0].toLowerCase();
       const isUserIgnored = isIgnored({ username });
       return [{ response: prepare(isUserIgnored ? 'ignore.user.is.ignored' : 'ignore.user.is.not.ignored', { username }), ...opts }];
-    } catch (e) {
+    } catch (e: any) {
       error(e.stack);
     }
     return [];
@@ -247,7 +247,7 @@ class TMI extends Core {
       await (this.client[type] as TwitchJs).chat.connect();
       await this.join(type, channel);
       this.loadListeners(type);
-    } catch (e) {
+    } catch (e: any) {
       if (type === 'broadcaster' && !this.broadcasterWarning) {
         error('Broadcaster oauth is not properly set - hosts will not be loaded');
         error('Broadcaster oauth is not properly set - subscribers will not be loaded');
@@ -318,7 +318,7 @@ class TMI extends Core {
 
       this.loadListeners(type);
       await this.join(type, channel);
-    } catch (e) {
+    } catch (e: any) {
       this.initClient(type); // connect properly
     }
   }
@@ -663,7 +663,7 @@ class TMI extends Core {
         userId:   userstate.userId,
         subCumulativeMonths,
       });
-    } catch (e) {
+    } catch (e: any) {
       error('Error parsing subscription event');
       error(util.inspect(message));
       error(e.stack);
@@ -746,7 +746,7 @@ class TMI extends Core {
         monthsName: getLocalizedName(subCumulativeMonths, translate('core.months')),
         message:    messageFromUser,
       });
-    } catch (e) {
+    } catch (e: any) {
       error('Error parsing resub event');
       error(util.inspect(message));
       error(e.stack);
@@ -785,7 +785,7 @@ class TMI extends Core {
         monthsName: '',
         message:    '',
       });
-    } catch (e) {
+    } catch (e: any) {
       error('Error parsing subscriptionGiftCommunity event');
       error(util.inspect(message));
       error(e.stack);
@@ -866,7 +866,7 @@ class TMI extends Core {
       if (!(isIgnored({ username, userId })) && !isGiftIgnored) {
         await getRepository(User).increment({ userId }, 'giftedSubscribes', 1);
       }
-    } catch (e) {
+    } catch (e: any) {
       error('Error parsing subgift event');
       error(util.inspect(message));
       error(e.stack);
@@ -961,7 +961,7 @@ class TMI extends Core {
               });
             }
           }
-        } catch (e) {
+        } catch (e: any) {
           debug('tmi.cheer', e.stack);
         }
       }
@@ -976,7 +976,7 @@ class TMI extends Core {
           message:    messageFromUser,
         });
       }
-    } catch (e) {
+    } catch (e: any) {
       error('Error parsing cheer event');
       error(util.inspect(message));
       error(e.stack);

@@ -77,7 +77,7 @@ class Emotes extends Core {
     publicEndpoint(this.nsp, 'getCache', async (cb) => {
       try {
         cb(null, await getRepository(CacheEmotes).find());
-      } catch (e) {
+      } catch (e: any) {
         cb(e.stack, []);
       }
     });
@@ -158,7 +158,7 @@ class Emotes extends Core {
             });
           }
           info(`EMOTES: Fetched channel ${cid} emotes`);
-        } catch (e) {
+        } catch (e: any) {
           if (String(e).includes('404')) {
             error(`EMOTES: Error fetching channel ${cid} emotes. Your channel was not found on twitchemotes.com. Add your channel at https://twitchemotes.com/contact/tip`);
           } else {
@@ -208,7 +208,7 @@ class Emotes extends Core {
           });
         }
         info('EMOTES: Fetched global emotes');
-      } catch (e) {
+      } catch (e: any) {
         error(e);
         error(e.stack);
       }
@@ -249,7 +249,7 @@ class Emotes extends Core {
           });
         }
         info('EMOTES: Fetched ffz emotes');
-      } catch (e) {
+      } catch (e: any) {
         if (e.response.status === 404) {
           warning(`EMOTES: Channel ${channel} not found in ffz`);
         } else {
@@ -295,7 +295,7 @@ class Emotes extends Core {
           });
         }
         info('EMOTES: Fetched bttv emotes');
-      } catch (e) {
+      } catch (e: any) {
         if (e.response.status === 404) {
           warning(`EMOTES: Channel ${channel} not found in bttv`);
         } else {
@@ -399,7 +399,7 @@ class Emotes extends Core {
         if (items.length > 0) {
           emotesArray.push(items[0].urls);
         }
-      } catch (e) {
+      } catch (e: any) {
         continue;
       }
     }

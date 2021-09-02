@@ -98,7 +98,7 @@ export const getCustomRewards = async (): Promise<getCustomRewardReturn> => {
       parentPort?.postMessage(toReturn);
     }
     return toReturn;
-  } catch (e) {
+  } catch (e: any) {
     debug('microservice', 'getCustomRewards::error - ' + JSON.stringify(e));
     if (e.message.includes('channelId')) {
       e.message = 'You need to set your channel first.';

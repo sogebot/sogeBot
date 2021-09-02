@@ -71,14 +71,14 @@ class Users extends Core {
               await getRepository(User).update({ userId: user.userId }, { username: newUsername });
               debug('users', `Duplicate username ${user.username}#${user.userId} changed to ${newUsername}#${user.userId}`);
             }
-          } catch (e) {
+          } catch (e: any) {
             // we are tagging user as __AnonymousUser__, we don't want to get rid of all information
             debug('users', `Duplicate username ${user.username}#${user.userId} not found on Twitch => __AnonymousUser__#${user.userId}`);
             await getRepository(User).update({ userId: user.userId }, { username: '__AnonymousUser__' });
           }
         }));
       }));
-    } catch(e) {
+    } catch(e: any) {
       error(e);
     } finally {
       setTimeout(() => this.checkDuplicateUsernames(), HOUR);
@@ -142,7 +142,7 @@ class Users extends Core {
           await getRepository(User).increment({ isOnline: true }, 'chatTimeOffline', interval);
         }
       }
-    } catch (e) {
+    } catch (e: any) {
       error(e.stack);
     } finally {
       setTimeout(() => this.updateWatchTime(), interval);
@@ -314,14 +314,14 @@ class Users extends Core {
         await getRepository(UserTip).delete({ userId: IsNull() });
         await getRepository(UserBit).delete({ userId: IsNull() });
         cb(null);
-      } catch (e) {
+      } catch (e: any) {
         cb(e.stack);
       }
     });
     adminEndpoint(this.nsp, 'viewers::remove', async (viewer: Required<UserInterface>, cb) => {
       try {
         cb(null, await getRepository(User).remove(viewer));
-      } catch (e) {
+      } catch (e: any) {
         error(e);
         cb(e.stack);
       }
@@ -329,7 +329,7 @@ class Users extends Core {
     adminEndpoint(this.nsp, 'getNameById', async (id, cb) => {
       try {
         cb(null, await this.getNameById(id));
-      } catch (e) {
+      } catch (e: any) {
         cb(e.stack, null);
       }
     });
@@ -438,14 +438,14 @@ class Users extends Core {
               const userId = await getIdFromTwitch(opts.search);
               viewers.unshift({ userId, username: opts.search });
               count++;
-            } catch (e) {
+            } catch (e: any) {
               // we don't care if user is not found
             }
           }
         }
 
         cb(null, viewers, count, opts.state);
-      } catch (e) {
+      } catch (e: any) {
         cb(e.stack, [], null, null);
       }
     });
@@ -471,7 +471,7 @@ class Users extends Core {
         } else {
           cb(null, new Date(request.data.data[0].followed_at).getTime());
         }
-      } catch (e) {
+      } catch (e: any) {
         cb(e.stack, null);
       }
     });
@@ -493,7 +493,7 @@ class Users extends Core {
         } else {
           cb(null);
         }
-      } catch (e) {
+      } catch (e: any) {
         cb(e.stack);
       }
     });

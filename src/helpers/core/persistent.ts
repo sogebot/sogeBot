@@ -30,7 +30,7 @@ function persistent<T>({ value, name, namespace, onChange }: { value: T, name: s
         } else {
           return val;
         }
-      } catch (e) {
+      } catch (e: any) {
         console.log(e);
         return undefined;
       }
@@ -68,7 +68,7 @@ function persistent<T>({ value, name, namespace, onChange }: { value: T, name: s
       proxy.value = JSON.parse(
         (await getRepository(Settings).findOneOrFail({ namespace, name })).value,
       );
-    } catch (e) {
+    } catch (e: any) {
       debug('persistent.load', `Data not found, creating ${namespace}/${name}`);
       if (!(e instanceof EntityNotFoundError)) {
         await setImmediateAwait();

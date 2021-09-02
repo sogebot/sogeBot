@@ -61,7 +61,7 @@ class Highlights extends System {
         }
         const highlights = await getRepository(Highlight).find({ order: { createdAt: 'DESC' } });
         cb(null, highlights, availableVideos);
-      } catch (err) {
+      } catch (err: any) {
         cb(err.stack);
       }
     });
@@ -69,7 +69,7 @@ class Highlights extends System {
       try {
         await getRepository(Highlight).delete({ id });
         cb(null);
-      } catch (err) {
+      } catch (err: any) {
         cb(err.message);
       }
     });
@@ -148,7 +148,7 @@ class Highlights extends System {
         method: 'GET', data: request.data, timestamp: Date.now(), call: 'highlights', api: 'helix', endpoint: url, code: request.status, remaining: calls.bot.remaining,
       });
       return this.add(highlight, timestamp, opts);
-    } catch (err) {
+    } catch (err: any) {
       ioServer?.emit('api.stats', {
         method: 'GET', timestamp: Date.now(), call: 'highlights', api: 'helix', endpoint: url, code: err.stack, remaining: calls.bot.remaining,
       });

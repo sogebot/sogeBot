@@ -209,7 +209,7 @@ class Spotify extends Integration {
         }
         return responses;
       }
-    } catch (e) {
+    } catch (e: any) {
       if (e instanceof CommandError) {
         return [{ response: prepare('integrations.spotify.' + e.message), ...opts }];
       } else {
@@ -257,7 +257,7 @@ class Spotify extends Integration {
             error('SPOTIFY: cannot get active device, please reauthenticate to include scope user-read-playback-state');
           });
       }
-    } catch (e) {
+    } catch (e: any) {
       error(e);
     }
   }
@@ -276,7 +276,7 @@ class Spotify extends Integration {
         this.userId = data.body.id;
         this.isUnauthorized = false;
       }
-    } catch (e) {
+    } catch (e: any) {
       if (e.message.includes('The access token expired.')) {
         await this.IRefreshToken();
         if (firstAuthorizationDone) {
@@ -326,7 +326,7 @@ class Spotify extends Integration {
       currentSong.is_playing = data.body.is_playing;
       currentSong.is_enabled = this.enabled;
       this.currentSong = JSON.stringify(currentSong);
-    } catch (e) {
+    } catch (e: any) {
       this.currentSong = JSON.stringify(null);
     }
     this.timeouts.ICurrentSong = global.setTimeout(() => this.ICurrentSong(), 5000);
@@ -345,7 +345,7 @@ class Spotify extends Integration {
             method: 'GET', data: data.body, timestamp: Date.now(), call: 'spotify::refreshToken', api: 'other', endpoint: 'n/a', code: 200,
           });
         }
-      } catch (e) {
+      } catch (e: any) {
         this.retry.IRefreshToken++;
         ioServer?.emit('api.stats', {
           method: 'GET', data: e.message, timestamp: Date.now(), call: 'spotify::refreshToken', api: 'other', endpoint: 'n/a', code: 500,
@@ -397,7 +397,7 @@ class Spotify extends Integration {
         await getRepository(SpotifySongBan).save({
           artists: track.artists.map(o => o.name), spotifyUri: track.uri, title: track.name,
         });
-      } catch (e) {
+      } catch (e: any) {
         if (e.message !== 'client') {
           if (cb) {
             cb(e, null);
@@ -473,7 +473,7 @@ class Spotify extends Integration {
         info(chalk.yellow('SPOTIFY: ') + `Access to account ${username} is revoked`);
 
         cb(null, { do: 'refresh' });
-      } catch (e) {
+      } catch (e: any) {
         cb(e.stack);
       } finally {
         this.timeouts.IRefreshToken = global.setTimeout(() => this.IRefreshToken(), 60000);
@@ -494,7 +494,7 @@ class Spotify extends Integration {
           } else {
             cb(null, { do: 'redirect', opts: [authorizeURI] });
           }
-        } catch (e) {
+        } catch (e: any) {
           error(e.stack);
           cb(e.stack, null);
         }
@@ -553,12 +553,12 @@ class Spotify extends Integration {
         if (isNewConnection) {
           info(chalk.yellow('SPOTIFY: ') + 'Client connected to service');
         }
-      } catch (e) {
+      } catch (e: any) {
         error(e.stack);
         addUIError({ name: 'SPOTIFY', message: 'Client connection failed.' });
         info(chalk.yellow('SPOTIFY: ') + 'Client connection failed');
       }
-    } catch (e) {
+    } catch (e: any) {
       info(chalk.yellow('SPOTIFY: ') + e.message);
     }
   }
@@ -588,7 +588,7 @@ class Spotify extends Integration {
           artist: songToUnban.artists[0], uri: songToUnban.spotifyUri, name: songToUnban.title,
         }), ...opts,
       }];
-    } catch (e) {
+    } catch (e: any) {
       return [{ response: prepare('integrations.spotify.song-not-found-in-banlist', { uri: opts.parameters }), ...opts }];
     }
   }
@@ -688,7 +688,7 @@ class Spotify extends Integration {
           return [{ response: prepare('integrations.spotify.cannot-request-song-is-banned', { name: track.name, artist: track.artists[0].name }), ...opts }];
         }
       }
-    } catch (e) {
+    } catch (e: any) {
       if (e.message === 'PREMIUM_REQUIRED') {
         error('Spotify Premium is required to request a song.');
       } else if (e.message !== 'Song not found') {
@@ -711,7 +711,7 @@ class Spotify extends Integration {
           method: 'POST', data: queueResponse.body, timestamp: Date.now(), call: 'spotify::queue', api: 'other', endpoint: 'https://api.spotify.com/v1/me/player/queue?uri=' + uri, code: queueResponse.statusCode,
         });
         return true;
-      } catch (e) {
+      } catch (e: any) {
         if (e.stack.includes('WebapiPlayerError')) {
           if (e.message.includes('NO_ACTIVE_DEVICE')) {
             throw new Error('NO_ACTIVE_DEVICE');

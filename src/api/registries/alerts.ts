@@ -53,7 +53,7 @@ async function clearMedia(): Promise<void> {
     if (mediaIds.length > 0) {
       await getRepository(AlertMedia).delete({ id: Not(In(mediaIds)) });
     }
-  } catch (e) {
+  } catch (e: any) {
     console.error(e);
   }
   return;
@@ -117,7 +117,7 @@ export class RegistryAlertsController extends Controller {
         });
         res.end(data);
       }
-    } catch (e) {
+    } catch (e: any) {
       this.setStatus(404);
     }
     return;
@@ -141,7 +141,7 @@ export class RegistryAlertsController extends Controller {
       await clearMedia();
       this.setStatus(201);
 
-    } catch (e) {
+    } catch (e: any) {
       this.setStatus(400);
     }
     return;
@@ -160,7 +160,7 @@ export class RegistryAlertsController extends Controller {
       });
       this.setStatus(201);
       return item;
-    } catch (e) {
+    } catch (e: any) {
       this.setStatus(400);
     }
     return 'Something went wrong';
@@ -179,7 +179,7 @@ export class RegistryAlertsController extends Controller {
       });
       this.setStatus(201);
       return item;
-    } catch (e) {
+    } catch (e: any) {
       this.setStatus(400);
     }
     return 'Something went wrong';
@@ -192,7 +192,7 @@ export class RegistryAlertsController extends Controller {
       await getRepository(AlertMedia).delete({ id }),
       this.setStatus(201);
 
-    } catch (e) {
+    } catch (e: any) {
       this.setStatus(400);
     }
     return;
@@ -204,7 +204,7 @@ export class RegistryAlertsController extends Controller {
     try {
       const item = await getRepository(Alert).findOneOrFail({ where: { id }, relations: ['rewardredeems', 'cmdredeems', 'cheers', 'follows', 'hosts', 'raids', 'resubs', 'subcommunitygifts', 'subgifts', 'subs', 'tips'] });
       return item;
-    } catch (e) {
+    } catch (e: any) {
       this.setStatus(404);
     }
     return;
@@ -217,7 +217,7 @@ export class RegistryAlertsController extends Controller {
     try {
       await getRepository(Alert).delete(id);
       await clearMedia();
-    } catch (e) {
+    } catch (e: any) {
       error(e);
     }
     this.setStatus(404);
@@ -237,7 +237,7 @@ export class RegistryAlertsController extends Controller {
       this.setStatus(201);
       return item;
 
-    } catch (e) {
+    } catch (e: any) {
       this.setStatus(400);
     }
     return;

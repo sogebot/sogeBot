@@ -16,7 +16,7 @@ const youtube: ResponseFilter = {
       } else {
         return 'n/a';
       }
-    } catch (e) {
+    } catch (e: any) {
       const response = await axios.get('https://www.youtube.com/user/'+channel+'/videos?view=0&sort=dd');
       const match = new RegExp('"videoId":"(.*?)",.*?title":{"runs":\\[{"text":"(.*?)"}]', 'gm').exec(response.data);
       if (match) {
@@ -39,7 +39,7 @@ const youtube: ResponseFilter = {
       } else {
         return 'n/a';
       }
-    } catch (e) {
+    } catch (e: any) {
       const response = await axios.get('https://www.youtube.com/user/'+channel+'/videos?view=0&sort=dd');
       const match = new RegExp('"videoId":"(.*?)",.*?title":{"runs":\\[{"text":"(.*?)"}]', 'gm').exec(response.data);
       if (match) {

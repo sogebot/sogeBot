@@ -184,7 +184,7 @@ class Moderation extends System {
           time: time / 1000,
         }), ...opts,
       }];
-    } catch (err) {
+    } catch (err: any) {
       const isParameterError = (err instanceof ParameterError);
 
       if (isParameterError) {
@@ -313,7 +313,7 @@ class Moderation extends System {
         username: parsed[1].toLowerCase(), link: getLocalizedName(count, translate('core.links')), count: count,
       });
       return [{ response, ...opts }];
-    } catch (e) {
+    } catch (e: any) {
       return [{ response: translate('moderation.permit-parse-failed'), ...opts }];
     }
   }

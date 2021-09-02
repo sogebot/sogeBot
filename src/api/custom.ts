@@ -46,7 +46,7 @@ export class CustomController extends Controller {
       await getRepository(WidgetCustom).save({ ...item, userId });
       this.setStatus(201);
 
-    } catch (e) {
+    } catch (e: any) {
       this.setStatus(400);
     }
     return;

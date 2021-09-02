@@ -136,7 +136,7 @@ class PUBG extends Integration {
           }
         }
         throw new Error('No current season found.');
-      } catch (e) {
+      } catch (e: any) {
         cb(e.message, null);
       }
     });
@@ -157,7 +157,7 @@ class PUBG extends Integration {
           this.gameModeStats = request.data.data.attributes.gameModeStats;
         }
         cb(null, request.data.data.attributes[ranked ? 'rankedGameModeStats' : 'gameModeStats']);
-      } catch (e) {
+      } catch (e: any) {
         cb(e.message, null);
       }
     });
@@ -173,7 +173,7 @@ class PUBG extends Integration {
           },
         );
         cb(null, request.data);
-      } catch (e) {
+      } catch (e: any) {
         cb(e.message, null);
       }
     });
@@ -181,7 +181,7 @@ class PUBG extends Integration {
       try {
         const messageToSend = await new Message(text).parse() as string;
         cb(null, messageToSend);
-      } catch (e) {
+      } catch (e: any) {
         cb(e.message, null);
       }
     });
@@ -199,7 +199,7 @@ class PUBG extends Integration {
         text = text.replace(new RegExp(escapeRegExp(`$${key}`), 'gi'), flatten(this.gameModeStats[gameType])[key]);
       }
       return [{ response: await new Message(`$sender, ${text}`).parse(), ...opts }];
-    } catch (e) {
+    } catch (e: any) {
       if (e.message.includes('Expected parameter')) {
         return [{ response: prepare('integrations.pubg.expected_one_of_these_parameters', { list: Object.keys(this.gameModeStats).join(', ') }), ...opts }];
       } else {
@@ -221,7 +221,7 @@ class PUBG extends Integration {
         text = text.replace(new RegExp(escapeRegExp(`$${key}`), 'gi'), flatten(this.rankedGameModeStats[gameType])[key]);
       }
       return [{ response: await new Message(`$sender, ${text}`).parse(), ...opts }];
-    } catch (e) {
+    } catch (e: any) {
       if (e.message.includes('Expected parameter')) {
         return [{ response: prepare('integrations.pubg.expected_one_of_these_parameters', { list: Object.keys(this.rankedGameModeStats).join(', ') }), ...opts }];
       } else {

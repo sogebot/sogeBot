@@ -220,7 +220,7 @@ class Module {
       } else {
         return undefined;
       }
-    } catch (e) {
+    } catch (e: any) {
       error({ key, variable });
       error(e);
       return undefined;
@@ -278,7 +278,7 @@ class Module {
         }
         this._commands.push(c);
       }
-    } catch (e) {
+    } catch (e: any) {
       error(e);
     }
   }
@@ -297,7 +297,7 @@ class Module {
       adminEndpoint(this.nsp, 'settings', async (cb) => {
         try {
           cb(null, await this.getAllSettings(), await this.getUI());
-        } catch (e) {
+        } catch (e: any) {
           cb(e.stack, null, null);
         }
       });
@@ -366,7 +366,7 @@ class Module {
               (this as any)[key] = value;
             }
           }
-        } catch (e) {
+        } catch (e: any) {
           error(e.stack);
           if (typeof cb === 'function') {
             setTimeout(() => cb(e.stack), 1000);
@@ -386,7 +386,7 @@ class Module {
           if (cb) {
             cb(null, { variable: opts.variable, value: opts.value });
           }
-        } catch (e) {
+        } catch (e: any) {
           if (cb) {
             cb(e.stack, null);
           }
@@ -395,7 +395,7 @@ class Module {
       publicEndpoint(this.nsp, 'get.value', async (variable, cb) => {
         try {
           cb(null, await (this as any)[variable]);
-        } catch (e) {
+        } catch (e: any) {
           cb(e.stack, undefined);
         }
       });

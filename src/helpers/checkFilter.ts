@@ -64,7 +64,7 @@ export const checkFilter = async (opts: CommandOptions | ParserOptions, filter: 
   let result =  false;
   try {
     result = safeEval(toEval, { ...context, _ });
-  } catch (e) {
+  } catch (e: any) {
     // do nothing
   }
   return !!result; // force boolean

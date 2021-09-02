@@ -95,7 +95,7 @@ class OBSWebsocket extends Integration {
 
           this.reconnecting = false;
           this.enableHeartBeat = true;
-        } catch (e) {
+        } catch (e: any) {
           this.enableHeartBeat = false;
           if (e.code === 'CONNECTION_ERROR') {
             if (!this.reconnecting && !isHeartBeat) {
@@ -182,7 +182,7 @@ class OBSWebsocket extends Integration {
       await this.triggerTask(task.advancedMode ? task.advancedModeCode : task.simpleModeTasks);
 
       return [];
-    } catch (err) {
+    } catch (err: any) {
       const isEntityNotFound = (err instanceof EntityNotFoundError);
       const isParameterError = (err instanceof ParameterError);
 

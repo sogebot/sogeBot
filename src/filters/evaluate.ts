@@ -32,7 +32,7 @@ const evaluate: ResponseFilter = {
         let response = await axios.get(url);
         try {
           response.data = JSON.parse(response.data.toString());
-        } catch (e) {
+        } catch (e: any) {
           // JSON failed, treat like string
           response = response.data.toString();
         }

@@ -42,7 +42,7 @@ const getPrivileges = async(type: 'admin' | 'viewer' | 'public', userId: string)
       haveModPrivileges:    isModerator(user) ? Authorized.isAuthorized : Authorized.NotAuthorized,
       haveViewerPrivileges: Authorized.isAuthorized,
     };
-  } catch (e) {
+  } catch (e: any) {
     return {
       haveAdminPrivileges:  Authorized.NotAuthorized,
       haveModPrivileges:    Authorized.NotAuthorized,
@@ -150,7 +150,7 @@ class Socket extends Core {
             res.status(200).send({
               accessToken, refreshToken, userType: haveCasterPermission ? 'admin' : 'viewer',
             });
-          } catch(e) {
+          } catch(e: any) {
             debug('socket', e.stack);
             res.status(400).send('You don\'t have access to this server.');
           }
@@ -188,7 +188,7 @@ class Socket extends Core {
             debug('socket', '/socket/refresh ->');
             debug('socket', JSON.stringify(payload, null, 2));
             res.status(200).send(payload);
-          } catch(e) {
+          } catch(e: any) {
             debug('socket', e.stack);
             res.status(400).send('You don\'t have access to this server.');
           }
@@ -213,7 +213,7 @@ class Socket extends Core {
           };
           debug('socket', JSON.stringify(token, null, 4));
           initEndpoints(socket, token.privileges);
-        } catch (e) {
+        } catch (e: any) {
           if (e instanceof JsonWebTokenError) {
             error('Used token for authorization is malformed');
             debug('socket', e.stack);

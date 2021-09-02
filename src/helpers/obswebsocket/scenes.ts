@@ -16,7 +16,7 @@ const listScenes = (obs: OBSWebSocket) => {
 const setCurrentScene = (obs: OBSWebSocket, sceneName: string) => {
   try {
     return obs.send('SetCurrentScene', { 'scene-name': sceneName });
-  } catch (e) {
+  } catch (e: any) {
     handleOBSError(e);
   }
 };

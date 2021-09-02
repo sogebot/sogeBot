@@ -50,7 +50,7 @@ export async function parserReply(response: string | Promise<string>, opts: { se
 export function getChannel() {
   try {
     return generalChannel.value.toLowerCase().trim();
-  } catch (e) {
+  } catch (e: any) {
     return '';
   }
 }

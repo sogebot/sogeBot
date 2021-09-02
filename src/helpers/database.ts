@@ -6,7 +6,7 @@ export let isBotStarted = false;
 async function setIsDbConnected () {
   try {
     isDbConnected = (await getManager()).connection.isConnected;
-  } catch (e) {
+  } catch (e: any) {
     require('./log').debug('database', 'Database not yet connected.');
   }
   if (!isDbConnected) {

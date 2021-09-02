@@ -43,7 +43,7 @@ export const check = async (forceCheck = false) => {
       await VariableWatcher.check();
       logAvgTime('VariableWatcher.check()', process.hrtime(time));
       debug('watcher', `watcher::check Finished after ${process.hrtime(time)[0]}s ${process.hrtime(time)[1] / 1000000}ms`);
-    } catch (e) {
+    } catch (e: any) {
       error(e.stack);
     } finally {
       checkInProgress = false;

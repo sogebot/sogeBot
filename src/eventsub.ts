@@ -131,7 +131,7 @@ class EventSub extends Core {
         const validateUrl = `https://id.twitch.tv/oauth2/validate`;
         await axios.get(validateUrl, { headers: { Authorization: `OAuth ${this.appToken}` } });
         return this.appToken;
-      } catch (e) {
+      } catch (e: any) {
         error(e.stack);
       }
     }
@@ -142,7 +142,7 @@ class EventSub extends Core {
         const request = axios.post(url);
         this.appToken = (await request).data.access_token;
         return this.appToken;
-      } catch (e) {
+      } catch (e: any) {
         if (e.response) {
           // Request made and server responded
           throw new TokenError(`Token call returned ${e.response.data.status} - ${e.response.data.message}`);
@@ -192,7 +192,7 @@ class EventSub extends Core {
     try {
       // check if domain is available in https mode
       await axios.get(`${this.useTunneling ? this.tunnelDomain : 'https://' + this.domain}/webhooks/callback`, { headers: { 'sogebot-test': 'true' } });
-    } catch (e) {
+    } catch (e: any) {
       if (!isErrorEventsShown) {
         warning(`EVENTSUB: Bot not responding correctly on ${this.useTunneling ? this.tunnelDomain : 'https://' + this.domain}/webhooks/callback, eventsub will not work.`);
         isErrorEventsShown = true;
@@ -261,7 +261,7 @@ class EventSub extends Core {
           await this.subscribe(event);
         }
       }
-    } catch (e) {
+    } catch (e: any) {
       error(e);
     }
   }
@@ -290,7 +290,7 @@ class EventSub extends Core {
         },
         timeout: 20000,
       });
-    } catch (e) {
+    } catch (e: any) {
       if (e instanceof TokenError) {
         error(`EVENTSUB: ${e.stack}`);
       } else {

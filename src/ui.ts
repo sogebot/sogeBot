@@ -60,7 +60,7 @@ class UI extends Core {
         data.isChannelSet = filter(generalChannel.value, (o) => isString(o) && o.trim().length > 0).length > 0;
 
         cb(null, data);
-      } catch (e) {
+      } catch (e: any) {
         cb(e.stack);
       }
     });
@@ -86,7 +86,7 @@ class UI extends Core {
         data.lang = general.lang;
 
         cb(null, data);
-      } catch (e) {
+      } catch (e: any) {
         cb(e.stack);
       }
     });
