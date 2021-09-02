@@ -56,7 +56,7 @@ export class SettingsPermissionsController extends Controller {
     try {
       cleanViewersCache();
       return await getRepository(PermissionsEntity).save(requestBody);
-    } catch (e) {
+    } catch (e: any) {
       this.setStatus(500);
       error(e);
       return 'Unexpected error during create.';

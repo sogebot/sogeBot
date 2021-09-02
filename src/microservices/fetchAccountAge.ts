@@ -25,7 +25,7 @@ async function fetchAccountAge (id?: string | null) {
     ioServer?.emit('api.stats', {
       method: 'GET', data: request.data, timestamp: Date.now(), call: 'fetchAccountAge', api: 'helix', endpoint: url, code: request.status, remaining: request.headers,
     });
-  } catch (e) {
+  } catch (e: any) {
     if (e.errno === 'ECONNRESET' || e.errno === 'ECONNREFUSED' || e.errno === 'ETIMEDOUT') {
       return;
     } // ignore ECONNRESET errors

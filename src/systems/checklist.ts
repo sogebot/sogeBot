@@ -16,7 +16,7 @@ class Checklist extends System {
       try {
         const checkedItems = await getRepository(ChecklistEntity).find();
         cb(null, this.itemsArray, checkedItems);
-      } catch(e) {
+      } catch(e: any) {
         cb(e.stack, [], []);
       }
     });

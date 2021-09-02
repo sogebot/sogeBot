@@ -19,7 +19,7 @@ export async function message(type: 'say' | 'whisper' | 'me', username: string |
         tmi.client.bot?.chat[type](username, messageToSend);
       }
     }
-  } catch (e) {
+  } catch (e: any) {
     if (retry) {
       setTimeout(() => message(type, username, messageToSend, false), 5000);
     } else {

@@ -130,7 +130,7 @@ class General extends Core {
           }
         }
         cb(null, commands);
-      } catch (e) {
+      } catch (e: any) {
         cb(e, []);
       }
     });
@@ -289,7 +289,7 @@ class General extends Core {
       if (!found) {
         throw new Error(`Not found - ${type}s - ${name}`);
       }
-    } catch (e) {
+    } catch (e: any) {
       error(e.stack);
     }
   }

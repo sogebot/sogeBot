@@ -34,7 +34,7 @@ class Alerts extends Registry {
         } else {
           cb(null, false, 0);
         }
-      } catch (e) {
+      } catch (e: any) {
         cb(e.stack, false, 0);
       }
     });
@@ -44,7 +44,7 @@ class Alerts extends Registry {
           null,
           await getRepository(Alert).save(item),
         );
-      } catch (e) {
+      } catch (e: any) {
         cb(e.stack, null);
       }
     });
@@ -64,7 +64,7 @@ class Alerts extends Registry {
         if (cb) {
           cb(null);
         }
-      } catch (e) {
+      } catch (e: any) {
         cb(e.stack);
       }
     });

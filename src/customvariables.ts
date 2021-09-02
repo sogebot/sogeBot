@@ -45,7 +45,7 @@ class CustomVariables extends Core {
         cb(null, await getRepository(Variable).save({
           ...item, currentValue: newCurrentValue, runAt,
         }));
-      } catch (e) {
+      } catch (e: any) {
         cb(e.stack, null);
       }
     });
@@ -57,7 +57,7 @@ class CustomVariables extends Core {
             username: 'testuser', userId: '0', source: 'twitch',
           },
         });
-      } catch (e) {
+      } catch (e: any) {
         cb(e.stack, null);
       }
       cb(null, returnedValue);
@@ -103,7 +103,7 @@ class CustomVariables extends Core {
         updateWidgetAndTitle(item.variableName);
         csEmitter.emit('variable-changed', item.variableName);
         cb(null, item.id);
-      } catch (e) {
+      } catch (e: any) {
         cb(e.stack, item.id);
       }
     });
@@ -131,7 +131,7 @@ class CustomVariables extends Core {
           await getRepository(Variable).save(item);
           await updateWidgetAndTitle(item.variableName);
         }
-      } catch (e) {
+      } catch (e: any) {
         continue;
       } // silence errors
     }

@@ -43,7 +43,7 @@ export class IntegrationOBSWebsocketController extends Controller {
     try {
       await integration.triggerTask(tasks);
       this.setStatus(201);
-    } catch (e) {
+    } catch (e: any) {
       this.setStatus(400);
       error(e);
     }
@@ -77,7 +77,7 @@ export class IntegrationOBSWebsocketController extends Controller {
           setTimeout(() => resolve([]), 10000);
         });
       return { data: await availableScenes };
-    } catch (e) {
+    } catch (e: any) {
       return { data: [] };
     }
   }
@@ -120,7 +120,7 @@ export class IntegrationOBSWebsocketController extends Controller {
           setTimeout(() => resolve([]), 10000);
         });
       return { data: { sources: await availableSources, types: await availableTypes } };
-    } catch (e) {
+    } catch (e: any) {
       return { data: { sources: [], types: [] } };
     }
   }
@@ -131,7 +131,7 @@ export class IntegrationOBSWebsocketController extends Controller {
     try {
       const item = await getRepository(OBSWebsocketEntity).findOneOrFail({ where: { id } });
       return item;
-    } catch (e) {
+    } catch (e: any) {
       this.setStatus(404);
     }
     return;
@@ -146,7 +146,7 @@ export class IntegrationOBSWebsocketController extends Controller {
       await getRepository(OBSWebsocketEntity).save(requestBody);
       this.setStatus(201);
 
-    } catch (e) {
+    } catch (e: any) {
       this.setStatus(400);
     }
     return;
@@ -161,7 +161,7 @@ export class IntegrationOBSWebsocketController extends Controller {
       const item = await getRepository(OBSWebsocketEntity).save({ ...data, id });
       this.setStatus(200);
       return item;
-    } catch (e) {
+    } catch (e: any) {
       this.setStatus(400);
     }
     return;

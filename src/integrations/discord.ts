@@ -176,7 +176,7 @@ class Discord extends Integration {
       let discordUser: DiscordJs.GuildMember;
       try {
         discordUser = guild.member(await guild.members.fetch(user.discordId)) as DiscordJs.GuildMember;
-      } catch (e) {
+      } catch (e: any) {
         await getRepository(DiscordLink).delete({ userId: user.userId });
         warning(`Discord user ${user.tag}@${user.discordId} not found - removed from link table`);
         continue;
@@ -288,7 +288,7 @@ class Discord extends Integration {
       // link user
       await getRepository(DiscordLink).save({ ...link, userId: opts.sender.userId });
       return [{ response: prepare('integrations.discord.this-account-was-linked-with', { sender: opts.sender, discordTag: link.tag }), ...opts }];
-    } catch (e) {
+    } catch (e: any) {
       if (e.message.includes('Expected parameter')) {
         return [
           { response: prepare('integrations.discord.help-message', { sender: opts.sender, command: this.getCommand('!link') }), ...opts },
@@ -334,7 +334,7 @@ class Discord extends Integration {
           }
           message.edit(embed);
         }
-      } catch (e) {
+      } catch (e: any) {
         warning(`Discord embed couldn't be changed to offline - ${e.message}`);
       }
     }
@@ -385,7 +385,7 @@ class Discord extends Integration {
         this.embedMessageId = message.id;
         chatOut(`#${(channel as DiscordJs.TextChannel).name}: [[online announce embed]] [${this.client.user?.tag}]`);
       }
-    } catch (e) {
+    } catch (e: any) {
       warning(e.stack);
     }
   }
@@ -429,7 +429,7 @@ class Discord extends Integration {
           this.client?.user?.setStatus(this.onlinePresenceStatusDefault);
         }
       }
-    } catch (e) {
+    } catch (e: any) {
       warning(e.stack);
     }
   }
@@ -470,7 +470,7 @@ class Discord extends Integration {
       const channel = await self.client.guilds.cache.get(self.guild)?.channels.cache.get(dMchannel);
       await (channel as DiscordJs.TextChannel).send(messageContent);
       chatOut(`#${(channel as DiscordJs.TextChannel).name}: ${messageContent} [${self.client.user?.tag}]`);
-    } catch (e) {
+    } catch (e: any) {
       warning(e.stack);
     }
   }
@@ -628,7 +628,7 @@ class Discord extends Integration {
           }
         });
       }
-    } catch (e) {
+    } catch (e: any) {
       const message = prepare('integrations.discord.your-account-is-not-linked', { command: this.getCommand('!link') });
       if (msg) {
         const reply = await msg.reply(message);
@@ -665,7 +665,7 @@ class Discord extends Integration {
         } else {
           cb(null, []);
         }
-      } catch (e) {
+      } catch (e: any) {
         cb(e.message, []);
       }
     });
@@ -689,7 +689,7 @@ class Discord extends Integration {
         } else {
           cb(null, []);
         }
-      } catch (e) {
+      } catch (e: any) {
         cb(e.message, []);
       }
     });
@@ -715,7 +715,7 @@ class Discord extends Integration {
         } else {
           cb(null, []);
         }
-      } catch (e) {
+      } catch (e: any) {
         cb(e.stack, []);
       }
     });
@@ -725,7 +725,7 @@ class Discord extends Integration {
       } else {
         try {
           cb(null, { do: 'redirect', opts: [`https://discordapp.com/oauth2/authorize?&scope=bot&permissions=8&client_id=${this.clientId}`] });
-        } catch (e) {
+        } catch (e: any) {
           error(e.stack);
           cb(e.stack, null);
         }

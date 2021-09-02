@@ -130,7 +130,7 @@ class Streamlabs extends Integration {
             event_id: '',
           });
         }
-      } catch (e) {
+      } catch (e: any) {
         if (e.isAxiosError) {
           ioServer?.emit('api.stats', {
             method: 'GET', data: e.message, timestamp: Date.now(), call: 'streamlabs', api: 'other', endpoint: url, code: e.response?.status ?? 'n/a',

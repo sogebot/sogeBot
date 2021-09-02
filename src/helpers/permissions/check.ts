@@ -106,7 +106,7 @@ async function check(userId: string, permId: string, partial = false): Promise<{
     }
     debug('permissions.check', JSON.stringify({ access: shouldProceed && filters(user, pItem.filters), permission: pItem }));
     return { access: shouldProceed && await filters(user, pItem.filters), permission: pItem };
-  } catch (e) {
+  } catch (e: any) {
     error(e.stack);
     return { access: false, permission: pItem };
   }

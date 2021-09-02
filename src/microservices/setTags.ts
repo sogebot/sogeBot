@@ -49,7 +49,7 @@ async function setTags (tagsArg: string[]) {
     ioServer?.emit('api.stats', {
       method: 'PUT', request: { data: { tag_ids } }, timestamp: Date.now(), call: 'setTags', api: 'helix', endpoint: url, code: request.status, data: request.data, remaining: calls.bot,
     });
-  } catch (e) {
+  } catch (e: any) {
     if (e.isAxiosError) {
       error(`API: ${e.config.method.toUpperCase()} ${e.config.url} - ${e.response?.status ?? 0}\n${JSON.stringify(e.response?.data ?? '--nodata--', null, 4)}\n\n${e.stack}`);
       ioServer?.emit('api.stats', {

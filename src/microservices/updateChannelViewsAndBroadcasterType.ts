@@ -40,7 +40,7 @@ async function updateChannelViewsAndBroadcasterType () {
       oauth.broadcasterType = request.data.data[0].broadcaster_type;
       stats.value.currentViews = request.data.data[0].view_count;
     }
-  } catch (e) {
+  } catch (e: any) {
     if (typeof e.response !== 'undefined' && e.response.status === 429) {
       emptyRateLimit('bot', e.response.headers);
     }

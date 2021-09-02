@@ -80,7 +80,7 @@ class Bets extends System {
         // bet is running;
         isEndAnnounced = false;
       }
-    } catch (e) {
+    } catch (e: any) {
       switch (e.message) {
         case ERROR_NOT_RUNNING:
           break;
@@ -100,7 +100,7 @@ class Bets extends System {
           order:     { createdAt: 'DESC' },
         });
         cb(null, currentBet);
-      } catch (e) {
+      } catch (e: any) {
         cb(e.stack);
       }
     });
@@ -174,7 +174,7 @@ class Bets extends System {
           command:  this.getCommand('!bet'),
         }), ...opts,
       }];
-    } catch (e) {
+    } catch (e: any) {
       switch (e.message) {
         case ERROR_NOT_ENOUGH_OPTIONS:
           return [{ response: prepare('bets.notEnoughOptions'), ...opts }];
@@ -265,7 +265,7 @@ class Bets extends System {
       } else {
         return this.info(opts);
       }
-    } catch (e) {
+    } catch (e: any) {
       switch (e.message) {
         case ERROR_ZERO_BET:
           return [{ response: prepare('bets.zeroBet').replace(/\$pointsName/g, getPointsName(0)), ...opts }];
@@ -301,7 +301,7 @@ class Bets extends System {
         await getRepository(User).increment({ userId: opts.sender.userId }, 'points', user.points);
       }
       return [{ response: prepare('bets.refund'), ...opts } ];
-    } catch (e) {
+    } catch (e: any) {
       switch (e.message) {
         case ERROR_NOT_RUNNING:
           return [{ response: prepare('bets.notRunning'), ...opts } ];
@@ -354,7 +354,7 @@ class Bets extends System {
         ...opts,
       }];
 
-    } catch (e) {
+    } catch (e: any) {
       switch (e.message) {
         case ERROR_NOT_ENOUGH_OPTIONS:
           return [{ response: prepare('bets.closeNotEnoughOptions'), ...opts } ];

@@ -617,7 +617,7 @@ const sendStreamData = async () => {
       ioServer?.emit('panel::stats', data);
     }
     lastDataSent = data;
-  } catch (e) {
+  } catch (e: any) {
     if (e instanceof Error) {
       if (e.message !== 'Translation not yet loaded') {
         error(e);

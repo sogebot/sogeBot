@@ -1,12 +1,12 @@
 import {
-  MigrationInterface, QueryRunner, TableColumn, 
+  MigrationInterface, QueryRunner, TableColumn,
 } from 'typeorm';
 
 let broadcasterId: null | number = null;
 
 const columnUserIdWithoutDefault = new TableColumn({ type: 'int', name: 'userId' });
 const columnTypeWithoutDefault = new TableColumn({
-  type: 'varchar', name: 'type', length: '6', 
+  type: 'varchar', name: 'type', length: '6',
 });
 
 export class dashboardPerTypeAndUser1584981805762 implements MigrationInterface {
@@ -17,15 +17,15 @@ export class dashboardPerTypeAndUser1584981805762 implements MigrationInterface 
     try {
       try {
         broadcasterId = Number(JSON.parse((await queryRunner.query('SELECT `value` from `settings` WHERE `namespace` = "/core/oauth" AND `name` = "broadcasterId"', undefined))[0].value));
-      } catch (e) {
+      } catch (e: any) {
         throw new Error('broadcasterId');
       }
 
       const columnUserId = new TableColumn({
-        type: 'int', default: broadcasterId, name: 'userId', 
+        type: 'int', default: broadcasterId, name: 'userId',
       });
       const columnType = new TableColumn({
-        type: 'varchar', default: '\'admin\'', name: 'type', length: '6', 
+        type: 'varchar', default: '\'admin\'', name: 'type', length: '6',
       });
 
       const widgets = await queryRunner.query('SELECT * from `widget` WHERE `dashboardId` IS NOT NULL');
@@ -45,7 +45,7 @@ export class dashboardPerTypeAndUser1584981805762 implements MigrationInterface 
           'INSERT INTO `widget`(`id`, `name`, `positionX`, `positionY`, `height`, `width`, `dashboardId`) values(?, ?, ?, ?, ?, ? ,?)',
           [widget.id, widget.name, widget.positionX, widget.positionY, widget.height, widget.width, widget.dashboardId]);
       }
-    } catch (e) {
+    } catch (e: any) {
       if (e.message !== 'broadcasterId') {
         throw new Error(e);
       }

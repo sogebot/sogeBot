@@ -8,7 +8,7 @@ class CommandCount extends Stats {
   constructor() {
     super();
     this.addMenu({
-      category: 'stats', name: 'commandcount', id: 'stats/commandcount', this: null, 
+      category: 'stats', name: 'commandcount', id: 'stats/commandcount', this: null,
     });
   }
 
@@ -16,7 +16,7 @@ class CommandCount extends Stats {
     adminEndpoint(this.nsp, 'commands::count', async (cb) => {
       try {
         cb(null, await getRepository(CommandsCount).find());
-      } catch (e) {
+      } catch (e: any) {
         cb(e.stack, []);
       }
     });

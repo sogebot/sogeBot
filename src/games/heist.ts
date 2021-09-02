@@ -229,7 +229,7 @@ class Heist extends Game {
     let points: number | string = 0;
     try {
       points = new Expects(opts.parameters).points({ all: true }).toArray()[0] as (number | string);
-    } catch (e) {
+    } catch (e: any) {
       if (!newHeist) {
         warning(`${opts.command} ${e.message}`);
         return [{ response: translate('games.heist.entryInstruction').replace('$command', opts.command), ...opts }];

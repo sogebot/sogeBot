@@ -92,7 +92,7 @@ class Points extends System {
           }
           this.lastCronRun = Date.now();
         }
-      } catch (e) {
+      } catch (e: any) {
         error(e);
       }
     }, MINUTE);
@@ -134,7 +134,7 @@ class Points extends System {
         }));
         await Promise.all(userPromises);
       }
-    } catch (e) {
+    } catch (e: any) {
       error(e);
       error(e.stack);
     } finally {
@@ -317,7 +317,7 @@ class Points extends System {
           updatedValuePointsLocale:  getPointsName(undoOperation.updatedValue),
         }), ...opts,
       }];
-    } catch (err) {
+    } catch (err: any) {
       error(err);
       return [{ response: translate('points.failed.undo').replace('$command', opts.command), ...opts }];
     }
@@ -348,7 +348,7 @@ class Points extends System {
         pointsName: getPointsName(points),
       });
       return [{ response, ...opts }];
-    } catch (err) {
+    } catch (err: any) {
       error(err);
       return [{ response: translate('points.failed.set').replace('$command', opts.command), ...opts }];
     }
@@ -417,7 +417,7 @@ class Points extends System {
         });
         return [{ response, ...opts }];
       }
-    } catch (err) {
+    } catch (err: any) {
       return [{ response: translate('points.failed.give').replace('$command', opts.command), ...opts }];
     }
   }
@@ -480,7 +480,7 @@ class Points extends System {
         order, count,
       });
       return [{ response, ...opts }];
-    } catch (err) {
+    } catch (err: any) {
       if (!(err instanceof ParameterError)) {
         error(err.stack);
       }
@@ -511,7 +511,7 @@ class Points extends System {
       }
 
       return [{ response, ...opts }];
-    } catch (err) {
+    } catch (err: any) {
       return [{ response: translate('points.failed.online').replace('$command', opts.command), ...opts }];
     }
   }
@@ -538,7 +538,7 @@ class Points extends System {
       }
 
       return [{ response, ...opts }];
-    } catch (err) {
+    } catch (err: any) {
       return [{ response: translate('points.failed.all').replace('$command', opts.command), ...opts }];
     }
   }
@@ -561,7 +561,7 @@ class Points extends System {
         pointsName: getPointsName(points),
       });
       return [{ response, ...opts }];
-    } catch (err) {
+    } catch (err: any) {
       return [{ response: translate('points.failed.rain').replace('$command', opts.command), ...opts }];
     }
   }
@@ -598,7 +598,7 @@ class Points extends System {
         pointsName: getPointsName(points),
       });
       return [{ response, ...opts }];
-    } catch (err) {
+    } catch (err: any) {
       return [{ response: translate('points.failed.add').replace('$command', opts.command), ...opts }];
     }
   }
@@ -638,7 +638,7 @@ class Points extends System {
         pointsName: getPointsName(points === 'all' ? 0 : points),
       });
       return [{ response, ...opts }];
-    } catch (err) {
+    } catch (err: any) {
       error(err);
       return [{ response: translate('points.failed.remove').replace('$command', opts.command), ...opts }];
     }

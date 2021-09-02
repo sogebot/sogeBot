@@ -182,7 +182,7 @@ async function runScript (script: string, opts: { sender: { userId: string; user
             },
           };
           return userObj;
-        } catch (e) {
+        } catch (e: any) {
           error(e.stack);
           return null;
         }
@@ -198,7 +198,7 @@ async function runScript (script: string, opts: { sender: { userId: string; user
     const value = await safeEval(toEval, context);
     debug('customvariables.eval', value);
     return value;
-  } catch (e) {
+  } catch (e: any) {
     debug('customvariables.eval', 'Running script seems to be in infinite loop.');
     error(`Script is causing error:`);
     error(`${jsBeautify(script)}`);

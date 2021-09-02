@@ -118,7 +118,7 @@ class Permissions extends Core {
         }),
         ...opts,
       }];
-    } catch (e) {
+    } catch (e: any) {
       error(e.stack);
       return [{ response: e.message, ...opts }];
     }
@@ -156,7 +156,7 @@ class Permissions extends Core {
         }),
         ...opts,
       }];
-    } catch (e) {
+    } catch (e: any) {
       return [{ response: e.message, ...opts }];
     }
   }
@@ -178,7 +178,7 @@ class Permissions extends Core {
     let p;
     try {
       p = await getRepository(PermissionsEntity).find();
-    } catch (e) {
+    } catch (e: any) {
       setTimeout(() => this.ensurePreservedPermissionsInDb(), 1000);
       return;
     }

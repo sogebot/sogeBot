@@ -199,7 +199,7 @@ class Duel extends Game {
         points:     tickets,
       });
       responses.push({ response, ...opts });
-    } catch (e) {
+    } catch (e: any) {
       switch (e.message) {
         case ERROR_NOT_ENOUGH_OPTIONS:
           responses.push({ response: translate('gambling.duel.notEnoughOptions'), ...opts });

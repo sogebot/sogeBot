@@ -32,7 +32,7 @@ class Quotes extends System {
             quotedByName: await users.getNameById(item.quotedBy),
           };
         })));
-      } catch (e) {
+      } catch (e: any) {
         cb(e.stack, []);
       }
     });
@@ -41,7 +41,7 @@ class Quotes extends System {
       try {
         const item = await getRepository(QuotesEntity).findOne({ id: Number(id) });
         cb(null, item);
-      } catch (e) {
+      } catch (e: any) {
         cb(e.stack);
       }
     });
@@ -53,7 +53,7 @@ class Quotes extends System {
         } else {
           cb(null, await getRepository(QuotesEntity).save({ ...(await getRepository(QuotesEntity).findOne({ id: Number(opts.id) })), ...opts.item }));
         }
-      } catch (e) {
+      } catch (e: any) {
         cb(e.stack);
       }
     });
@@ -64,7 +64,7 @@ class Quotes extends System {
           await getRepository(QuotesEntity).delete({ id });
         }
         cb(null);
-      } catch(e) {
+      } catch(e: any) {
         cb(e.stack);
       }
     });
@@ -93,7 +93,7 @@ class Quotes extends System {
       return [{
         response, ...opts, ...result,
       }];
-    } catch (e) {
+    } catch (e: any) {
       const response = prepare('systems.quotes.add.error', { command: opts.command });
       return [{
         response, ...opts, createdAt: 0, attr: {}, quote: '', quotedBy: '0', tags: [],
@@ -119,7 +119,7 @@ class Quotes extends System {
         const response = prepare('systems.quotes.remove.ok', { id });
         return [{ response, ...opts }];
       }
-    } catch (e) {
+    } catch (e: any) {
       const response = prepare('systems.quotes.remove.error');
       return [{ response, ...opts }];
     }
@@ -151,7 +151,7 @@ class Quotes extends System {
         const response = prepare('systems.quotes.set.error.not-found-by-id', { id });
         return [{ response, ...opts }];
       }
-    } catch (e) {
+    } catch (e: any) {
       const response = prepare('systems.quotes.set.error.no-parameters', { command: opts.command });
       return [{ response, ...opts }];
     }

@@ -1,5 +1,5 @@
 import {
-  get, isNil, random, set, 
+  get, isNil, random, set,
 } from 'lodash';
 import { getRepository } from 'typeorm';
 
@@ -123,7 +123,7 @@ class Gamble extends Game {
         }
       }
       return [{ response: message, ...opts }];
-    } catch (e) {
+    } catch (e: any) {
       if (e instanceof MinimalBetError) {
         message = prepare('gambling.gamble.lowerThanMinimalBet', {
           pointsName: getPointsName(Number(e.message)),

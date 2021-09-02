@@ -148,7 +148,7 @@ class UserInfo extends System {
         } else {
           throw new Error('retry');
         }
-      } catch (e) {
+      } catch (e: any) {
         if (e.message !== 'retry') {
           error(e);
         }
@@ -190,7 +190,7 @@ class UserInfo extends System {
             .replace(/\$when/g, dayjs(user.seenAt).tz(timezone).format(this.lastSeenFormat)), ...opts,
         }];
       }
-    } catch (e) {
+    } catch (e: any) {
       return [{ response: translate('lastseen.failed.parse'), ...opts }];
     }
   }
@@ -208,7 +208,7 @@ class UserInfo extends System {
       }
       const time = id ? Number((await users.getWatchedOf(id) / (60 * 60 * 1000))).toFixed(1) : 0;
       return [{ response: prepare('watched.success.time', { time: String(time), username }), ...opts }];
-    } catch (e) {
+    } catch (e: any) {
       return [{ response: translate('watched.failed.parse'), ...opts }];
     }
   }
@@ -314,7 +314,7 @@ class UserInfo extends System {
           response, sender: opts.sender, attr: opts.attr,
         }];
       }
-    } catch (e) {
+    } catch (e: any) {
       error(e.stack);
       return [];
     }
@@ -344,7 +344,7 @@ class UserInfo extends System {
           response: response.replace('$sender', '$touser'), sender: opts.sender, attr: { ...opts.attr, param: username },
         },
       ];
-    } catch (e) {
+    } catch (e: any) {
       if (e.message.includes('<username>')) {
         return this.showMe(opts) as Promise<CommandResponse[]>; // fallback to me without param
       } else {

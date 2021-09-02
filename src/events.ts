@@ -247,7 +247,7 @@ class Events extends Core {
               username: attributes.username,
             });
             return this.fire(eventId, attributes);
-          } catch (e) {
+          } catch (e: any) {
             excludedUsers.add(attributes.username);
             warning(`User ${attributes.username} triggered event ${eventId} was not found on Twitch.`);
             warning(`User ${attributes.username} will be excluded from events, until stream restarts or user writes in chat and his data will be saved.`);
@@ -394,7 +394,7 @@ class Events extends Core {
         method: 'POST', request: { data: { broadcaster_id: String(cid), length: Number(operation.durationOfCommercial) } }, timestamp: Date.now(), call: 'commercial', api: 'helix', endpoint: url, code: request.status, data: request.data, remaining: calls.broadcaster,
       });
       eventEmitter.emit('commercial', { duration: Number(operation.durationOfCommercial) });
-    } catch (e) {
+    } catch (e: any) {
       if (e.isAxiosError) {
         error(`API: ${url} - ${e.response.data.message}`);
         ioServer?.emit('api.stats', {
@@ -737,7 +737,7 @@ class Events extends Core {
     let result = false;
     try {
       result = safeEval(toEval, { ...context, _ });
-    } catch (e) {
+    } catch (e: any) {
       // do nothing
     }
     return !!result; // force boolean
@@ -748,14 +748,14 @@ class Events extends Core {
       try {
         const rewards = await api.getCustomRewards();
         cb(null, rewards?.data ? [...rewards?.data.map(o => o.title)] : []);
-      } catch (e) {
+      } catch (e: any) {
         cb(e.stack, []);
       }
     });
     adminEndpoint(this.nsp, 'generic::getAll', async (cb) => {
       try {
         cb(null, await getRepository(Event).find({ relations: ['operations'] }));
-      } catch (e) {
+      } catch (e: any) {
         cb(e.stack, []);
       }
     });
@@ -766,21 +766,21 @@ class Events extends Core {
           where:     { id },
         });
         cb(null, event);
-      } catch (e) {
+      } catch (e: any) {
         cb(e.stack, undefined);
       }
     });
     adminEndpoint(this.nsp, 'list.supported.events', (cb) => {
       try {
         cb(null, this.supportedEventsList);
-      } catch (e) {
+      } catch (e: any) {
         cb(e.stack, []);
       }
     });
     adminEndpoint(this.nsp, 'list.supported.operations', (cb) => {
       try {
         cb(null, this.supportedOperationsList);
-      } catch (e) {
+      } catch (e: any) {
         cb(e.stack, []);
       }
     });
@@ -861,7 +861,7 @@ class Events extends Core {
           }
         }
         cb(null);
-      } catch (e) {
+      } catch (e: any) {
         cb(e.stack);
       }
     });
@@ -869,7 +869,7 @@ class Events extends Core {
     adminEndpoint(this.nsp, 'events::save', async (event, cb) => {
       try {
         cb(null, await getRepository(Event).save({ ...event, operations: event.operations.filter(o => o.name !== 'do-nothing') }));
-      } catch (e) {
+      } catch (e: any) {
         cb(e.stack, event);
       }
     });
@@ -923,7 +923,7 @@ class Events extends Core {
           }
         }
       }
-    } catch (e) {
+    } catch (e: any) {
       error(e.stack);
     } finally {
       clearTimeout(this.timeouts.fadeOut);

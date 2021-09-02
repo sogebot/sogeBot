@@ -80,7 +80,7 @@ class Levels extends System {
       try {
         this.getLevelFromCache(21);
         cb(null, cachedLevels.map(xp => `${Intl.NumberFormat(general.lang).format(xp)} ${this.xpName}`));
-      } catch (e) {
+      } catch (e: any) {
         cb(e.stack, []);
       }
     });
@@ -116,7 +116,7 @@ class Levels extends System {
         }
         i++;
       }
-    } catch (e) {
+    } catch (e: any) {
       error(e);
       error(e.stack);
     } finally {
@@ -429,7 +429,7 @@ class Levels extends System {
         xpName:     this.xpName,
       });
       return [{ response, ...opts }];
-    } catch (e) {
+    } catch (e: any) {
       if (e instanceof ResponseError) {
         return [{ response: e.message, ...opts }];
       } else {
@@ -470,7 +470,7 @@ class Levels extends System {
         xpName: this.xpName,
       });
       return [{ response, ...opts }];
-    } catch (e) {
+    } catch (e: any) {
       return [{ response: translate('systems.levels.somethingGetWrong').replace('$command', opts.command), ...opts }];
     }
   }
@@ -499,7 +499,7 @@ class Levels extends System {
         xpName: this.xpName,
       });
       return [{ response, ...opts }];
-    } catch (e) {
+    } catch (e: any) {
       return [{ response: translate('systems.levels.somethingGetWrong').replace('$command', opts.command), ...opts }];
     }
   }

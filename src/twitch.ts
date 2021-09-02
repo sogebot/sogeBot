@@ -24,12 +24,12 @@ import users from './users';
 class Twitch extends Core {
   @settings('general')
   isTitleForced = false;
-  
+
   sockets() {
     adminEndpoint(this.nsp, 'broadcaster', (cb) => {
       try {
         cb(null, (oauth.broadcasterUsername).toLowerCase());
-      } catch (e) {
+      } catch (e: any) {
         cb(e.stack, '');
       }
     });

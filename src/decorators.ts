@@ -81,7 +81,7 @@ export function ui(opts: any, category?: string) {
           }
         }
         _.set(self, '_ui.' + path, opts);
-      } catch (e) {
+      } catch (e: any) {
         error(e);
       }
     };
@@ -133,7 +133,7 @@ export function settings(category?: string, isReadOnly = false) {
         self.settingsList.push({
           category, key, defaultValue: (self as any)[key],
         });
-      } catch (e) {
+      } catch (e: any) {
         error(e.stack);
       }
     };
@@ -203,7 +203,7 @@ export function permission_settings(category?: string, exclude: string[] = [], e
         self.settingsPermList.push({
           category, key, defaultValue: (self as any)[key],
         });
-      } catch (e) {
+      } catch (e: any) {
         // we don't care about error
       }
     };
@@ -240,7 +240,7 @@ export function persistent() {
           });
         };
         setTimeout(() => loadVariableValue(), 5000);
-      } catch (e) {
+      } catch (e: any) {
         error(e.stack);
       }
     };
@@ -322,7 +322,7 @@ function registerHelper(m: { type: string, name: string, fnc: string }, retry = 
       } else {
         c.isHelper = true;
       }
-    } catch (e) {
+    } catch (e: any) {
       if (retry < 100) {
         return setTimeout(() => registerHelper(m, retry++), 10);
       } else {
@@ -339,7 +339,7 @@ function registerRollback(m: { type: string, name: string, fnc: string }) {
       if (!self) {
         throw new Error(`${m.type}.${m.name} not found in list`);
       }    self._rollback.push({ name: m.fnc });
-    } catch (e) {
+    } catch (e: any) {
       error(e.stack);
     }
   }, 5000);
@@ -362,7 +362,7 @@ function registerParser(opts: {
         skippable:     opts.skippable,
         fireAndForget: opts.fireAndForget,
       });
-    } catch (e) {
+    } catch (e: any) {
       error(e.stack);
     }
   }, 5000);

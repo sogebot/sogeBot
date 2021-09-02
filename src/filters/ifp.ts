@@ -20,7 +20,7 @@ const ifp: ResponseFilter = {
         return ifTrue;
       }
       return isNil(ifFalse) ? '' : ifFalse;
-    } catch (e) {
+    } catch (e: any) {
       return '';
     }
   },

@@ -77,7 +77,7 @@ async function setTitleAndGame (args: { title?: string | null; game?: string | n
           'Authorization': 'OAuth ' + oauth.broadcasterAccessToken,
         },
       });
-    } catch (e) {
+    } catch (e: any) {
       error(`API: https://api.twitch.tv/kraken/channels/${cid} - ${e.message}`);
     }
 
@@ -97,7 +97,7 @@ async function setTitleAndGame (args: { title?: string | null; game?: string | n
     ioServer?.emit('api.stats', {
       method: 'PATCH', request: requestData, timestamp: Date.now(), call: 'setTitleAndGame', api: 'helix', endpoint: url, code: request.status, remaining: calls.bot,
     });
-  } catch (e) {
+  } catch (e: any) {
     if (e.isAxiosError) {
       error(`API: ${e.config.method.toUpperCase()} ${e.config.url} - ${e.response.status ?? 0}\n${JSON.stringify(e.response?.data ?? '--nodata--', null, 4)}\n\n${e.stack}`);
       ioServer?.emit('api.stats', {

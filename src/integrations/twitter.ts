@@ -184,7 +184,7 @@ class Twitter extends Integration {
         access_token_secret: this.secretToken.trim(),
       });
       info(chalk.yellow('TWITTER: ') + 'Client connected to service');
-    } catch (e) {
+    } catch (e: any) {
       info(chalk.yellow('TWITTER: ') + e.message);
     }
   }

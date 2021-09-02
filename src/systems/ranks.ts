@@ -45,14 +45,14 @@ class Ranks extends System {
     adminEndpoint(this.nsp, 'generic::getAll', async (cb) => {
       try {
         cb(null, await getRepository(Rank).find({ order: { value: 'ASC' } }));
-      } catch (e) {
+      } catch (e: any) {
         cb(e.stack, []);
       }
     });
     adminEndpoint(this.nsp, 'generic::getOne', async (id, cb) => {
       try {
         cb(null, await getRepository(Rank).findOne(id));
-      } catch(e) {
+      } catch(e: any) {
         cb(e.stack, undefined);
       }
     });
@@ -60,7 +60,7 @@ class Ranks extends System {
       try {
         await getRepository(Rank).delete(id);
         cb ? cb(null) : null;
-      } catch (e) {
+      } catch (e: any) {
         cb ? cb(e.stack) : null;
       }
     });
@@ -68,7 +68,7 @@ class Ranks extends System {
       try {
         await getRepository(Rank).save(item);
         cb(null, item);
-      } catch (e) {
+      } catch (e: any) {
         cb(e.stack, item);
       }
     });

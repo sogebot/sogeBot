@@ -33,7 +33,7 @@ class Text extends Registry {
       try {
         await getRepository(TextEntity).remove(item);
         cb(null);
-      } catch (e) {
+      } catch (e: any) {
         cb(e.stack);
       }
     });
@@ -43,7 +43,7 @@ class Text extends Registry {
           null,
           await getRepository(TextEntity).find(),
         );
-      } catch (e) {
+      } catch (e: any) {
         cb(e.stack);
       }
     });
@@ -53,7 +53,7 @@ class Text extends Registry {
           null,
           await getRepository(TextEntity).save(item),
         );
-      } catch (e) {
+      } catch (e: any) {
         cb(e.stack, null);
       }
     });
@@ -67,7 +67,7 @@ class Text extends Registry {
         }
 
         callback(null, { ...item, parsedText: text });
-      } catch(e) {
+      } catch(e: any) {
         callback(e.message, null);
       }
     });

@@ -135,7 +135,7 @@ class StreamElements extends Integration {
       });
       this.channel = request.data._id;
       info(chalk.yellow('STREAMELEMENTS:') + ` JWT token check OK. Using channel ${request.data.username}@${request.data._id}`);
-    } catch (e) {
+    } catch (e: any) {
       error(chalk.yellow('STREAMELEMENTS:') + ' JWT token is not valid.');
       return;
     }

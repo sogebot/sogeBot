@@ -62,7 +62,7 @@ const taskRunner = async (obs: ObsWebSocket, tasks: OBSWebsocketInterface['simpl
         }
       }
     }
-  } catch (e) {
+  } catch (e: any) {
     error(e);
     throw e;
   } finally {

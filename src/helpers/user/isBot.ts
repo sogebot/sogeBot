@@ -9,7 +9,7 @@ export function isBot(user: string | CommandOptions['sender'] | UserInterface | 
     } else {
       return false;
     }
-  } catch (e) {
+  } catch (e: any) {
     return true; // we can expect, if user is null -> bot or admin
   }
 }
@@ -21,7 +21,7 @@ export function isBotId(userId: string) {
     } else {
       return false;
     }
-  } catch (e) {
+  } catch (e: any) {
     return true; // we can expect, if user is null -> bot or admin
   }
 }

@@ -185,7 +185,7 @@ class EventList extends Widget {
           };
         }),
       );
-    } catch (e) {
+    } catch (e: any) {
       this.emit('update', []);
     }
   }

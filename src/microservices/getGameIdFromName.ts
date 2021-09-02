@@ -38,7 +38,7 @@ async function getGameIdFromName (name: string): Promise<number | null> {
     const id = Number(request.data.data[0].id);
     await getRepository(CacheGames).save({ id, name });
     return id;
-  } catch (e) {
+  } catch (e: any) {
     warning(`Couldn't find name of game for name ${name} - fallback to ${stats.value.currentGame}`);
     if (e.isAxiosError) {
       error(`API: ${e.config.method.toUpperCase()} ${e.config.url} - ${e.response?.status ?? 0}\n${JSON.stringify(e.response?.data ?? '--nodata--', null, 4)}\n\n${e.stack}`);

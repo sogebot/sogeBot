@@ -15,7 +15,7 @@ const qs: ResponseFilter = {
         throw new Error('Missing param.');
       }
       return encodeURI(attr.param);
-    } catch (e) {
+    } catch (e: any) {
       return '';
     }
   },

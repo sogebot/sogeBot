@@ -56,7 +56,7 @@ class Translate {
             const withoutLocales = f.replace('./locales/', '').replace('.json', '');
             try {
               _.set(this.translations, withoutLocales.split('/').join('.'), JSON.parse(fs.readFileSync(f, 'utf8')));
-            } catch (e) {
+            } catch (e: any) {
               error('Incorrect JSON file: ' + f);
               error(e.stack);
             }
@@ -126,7 +126,7 @@ class Translate {
         translated = translated.replace(toTranslate, this.get(toTranslate.replace('{', '').replace('}', ''), orig));
       });
       return translated;
-    } catch (err) {
+    } catch (err: any) {
       return '{missing_translation: ' + getLang() + '.' + String(text) + '}';
     }
   }

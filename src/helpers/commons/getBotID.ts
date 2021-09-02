@@ -3,7 +3,7 @@ import { botId } from '../oauth/botId';
 export function getBotID() {
   try {
     return botId.value;
-  } catch (e) {
+  } catch (e: any) {
     return '0';
   }
 }

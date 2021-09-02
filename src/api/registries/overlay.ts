@@ -38,7 +38,7 @@ export class RegistryOverlayController extends Controller {
     try {
       const item = await getRepository(OverlayMapper).findOneOrFail({ id });
       return item;
-    } catch (e) {
+    } catch (e: any) {
       this.setStatus(404);
     }
     return;
@@ -53,7 +53,7 @@ export class RegistryOverlayController extends Controller {
       await getRepository(OverlayMapper).save(requestBody);
       this.setStatus(201);
 
-    } catch (e) {
+    } catch (e: any) {
       this.setStatus(400);
     }
     return;
@@ -84,7 +84,7 @@ export class RegistryOverlayController extends Controller {
     try {
       await getRepository(OverlayMapper).update({ id }, data);
       this.setStatus(200);
-    } catch (e) {
+    } catch (e: any) {
       this.setStatus(400);
     }
     return;

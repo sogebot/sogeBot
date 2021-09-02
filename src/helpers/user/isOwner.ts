@@ -9,7 +9,7 @@ export function isOwner(user: string | CommandOptions['sender'] | UserInterface 
     } else {
       return false;
     }
-  } catch (e) {
+  } catch (e: any) {
     return true; // we can expect, if user is null -> bot or admin
   }
 }

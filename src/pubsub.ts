@@ -52,7 +52,7 @@ setInterval(() => {
         connect();
       }
     }
-  } catch (e) {
+  } catch (e: any) {
     warning(e.stack);
   }
 }, 1000);
@@ -62,7 +62,7 @@ const heartbeat = () => {
     const message = { type: 'PING' };
     ws?.send(JSON.stringify(message));
     debug('pubsub', 'SENT: ' + JSON.stringify(message));
-  } catch (e) {
+  } catch (e: any) {
     warning('PUBSUB: Ping failed, socket is probably reconnecting');
   }
 };
@@ -162,7 +162,7 @@ const connect = () => {
           } else if (dataMessage.data.moderation_action === 'emoteonly') {
             info(`${createdBy} enabled emote-only mode.`);
           }
-        } catch (e) {
+        } catch (e: any) {
           warning(`PUBSUB: Unknown moderation_action ${dataMessage.data.moderation_action}`);
           warning(`${JSON.stringify(dataMessage.data, null, 2)}`);
         }

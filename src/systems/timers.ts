@@ -46,7 +46,7 @@ class Timers extends System {
       try {
         const timers = await getRepository(Timer).find({ relations: ['messages'] });
         callback(null, timers);
-      } catch(e) {
+      } catch(e: any) {
         callback(e, []);
       }
     });
@@ -57,7 +57,7 @@ class Timers extends System {
           where:     { id },
         });
         callback(null, timer);
-      } catch (e) {
+      } catch (e: any) {
         callback(e);
       }
     });
@@ -68,7 +68,7 @@ class Timers extends System {
           await getRepository(Timer).remove(timer);
         }
         callback(null);
-      } catch (e) {
+      } catch (e: any) {
         callback(e);
       }
     });
@@ -76,7 +76,7 @@ class Timers extends System {
       try {
         const item = await getRepository(Timer).save({ ...(await getRepository(Timer).findOne({ id: String(opts.id) })), ...opts.item });
         cb(null, item);
-      } catch (e) {
+      } catch (e: any) {
         cb(e.stack, null);
       }
     });
@@ -230,7 +230,7 @@ class Timers extends System {
         response: translate('timers.response-deleted')
           .replace(/\$id/g, id), ...opts,
       }];
-    } catch (e) {
+    } catch (e: any) {
       return [{ response: translate('timers.id-must-be-defined'), ...opts }];
     }
   }

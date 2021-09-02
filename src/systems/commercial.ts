@@ -95,7 +95,7 @@ class Commercial extends System {
         if (!_.isNil(commercial.message)) {
           return [{ response: commercial.message, ...opts }];
         }
-      } catch (e) {
+      } catch (e: any) {
         if (e.isAxiosError) {
           error(`API: ${url} - ${e.response.data.message}`);
           ioServer?.emit('api.stats', {

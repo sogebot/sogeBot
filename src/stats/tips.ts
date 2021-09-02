@@ -23,7 +23,7 @@ class Tips extends Stats {
             username: await users.getNameById(item.userId),
           };
         })));
-      } catch (e) {
+      } catch (e: any) {
         cb(e.stack, []);
       }
     });

@@ -28,7 +28,7 @@ class Randomizer extends Registry {
         await getRepository(RandomizerEntity).update({}, { isShown: false });
         await getRepository(RandomizerEntity).update({ id: String(id) }, { isShown: true });
         cb(null);
-      } catch (e) {
+      } catch (e: any) {
         cb (e);
       }
     });

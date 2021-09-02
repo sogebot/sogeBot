@@ -48,7 +48,7 @@ export const fetchUser = async (id: string): Promise<{
     });
 
     return request.data.data[0];
-  } catch (e) {
+  } catch (e: any) {
     if (e instanceof Error) {
       error(e.stack);
     }

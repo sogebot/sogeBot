@@ -67,7 +67,7 @@ class CustomCommands extends System {
         if (typeof cb === 'function') {
           cb(null, item);
         }
-      } catch (e) {
+      } catch (e: any) {
         if (typeof cb === 'function') {
           cb(e.stack);
         }
@@ -88,7 +88,7 @@ class CustomCommands extends System {
         });
         const count = await getAllCountOfCommandUsage();
         cb(null, commands, count);
-      } catch (e) {
+      } catch (e: any) {
         cb(e.stack, [], null);
       }
     });
@@ -104,7 +104,7 @@ class CustomCommands extends System {
           const count = await getCountOfCommandUsage(cmd.command);
           cb(null, cmd, count);
         }
-      } catch (e) {
+      } catch (e: any) {
         cb (e);
       }
     });
@@ -170,7 +170,7 @@ class CustomCommands extends System {
       await getRepository(Commands).save(cDb);
       this.invalidateCache();
       return [{ response: prepare('customcmds.command-was-edited', { command: cmd, response }), ...opts }];
-    } catch (e) {
+    } catch (e: any) {
       return [{ response: prepare('customcmds.commands-parse-failed', { command: this.getCommand('!command') }), ...opts }];
     }
   }
@@ -224,7 +224,7 @@ class CustomCommands extends System {
       });
       this.invalidateCache();
       return [{ response: prepare('customcmds.command-was-added', { command: cmd }), ...opts }];
-    } catch (e) {
+    } catch (e: any) {
       return [{ response: prepare('customcmds.commands-parse-failed', { command: this.getCommand('!command') }), ...opts }];
     }
   }
@@ -376,7 +376,7 @@ class CustomCommands extends System {
       });
       this.invalidateCache();
       return [{ response: prepare(!cmd.enabled ? 'customcmds.command-was-enabled' : 'customcmds.command-was-disabled', { command: cmd.command }), ...opts }];
-    } catch (e) {
+    } catch (e: any) {
       const response = prepare('customcmds.commands-parse-failed', { command: this.getCommand('!command') });
       return [{ response, ...opts }];
     }
@@ -402,7 +402,7 @@ class CustomCommands extends System {
       this.invalidateCache();
       return [{ response, ...opts }];
 
-    } catch (e) {
+    } catch (e: any) {
       const response = prepare('customcmds.commands-parse-failed', { command: this.getCommand('!command') });
       return [{ response, ...opts }];
     }
@@ -450,7 +450,7 @@ class CustomCommands extends System {
         this.invalidateCache();
         return [{ response, ...opts }];
       }
-    } catch (e) {
+    } catch (e: any) {
       return [{ response: prepare('customcmds.commands-parse-failed', { command: this.getCommand('!command') }), ...opts }];
     }
   }

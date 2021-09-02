@@ -54,7 +54,7 @@ class Price extends System {
       try {
         await getRepository(PriceEntity).save(price);
         cb(null);
-      } catch (e) {
+      } catch (e: any) {
         error(e);
         cb(e.stack);
       }
@@ -64,7 +64,7 @@ class Price extends System {
       try {
         await getRepository(PriceEntity).delete({ id: String(id) });
         cb(null);
-      } catch (e) {
+      } catch (e: any) {
         error(e);
         cb(e.stack);
       }

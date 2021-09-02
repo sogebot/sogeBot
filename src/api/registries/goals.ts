@@ -46,7 +46,7 @@ export class RegistryGoalsController extends Controller {
     try {
       const item = await getRepository(GoalGroup).findOneOrFail({ where: { id }, relations: ['goals'] });
       return item;
-    } catch (e) {
+    } catch (e: any) {
       this.setStatus(404);
     }
     return;
@@ -61,7 +61,7 @@ export class RegistryGoalsController extends Controller {
       await getRepository(GoalGroup).save(requestBody);
       this.setStatus(201);
 
-    } catch (e) {
+    } catch (e: any) {
       this.setStatus(400);
     }
     return;
@@ -77,7 +77,7 @@ export class RegistryGoalsController extends Controller {
       getRepository(Goal).delete({ groupId: IsNull() });
       this.setStatus(200);
       return item;
-    } catch (e) {
+    } catch (e: any) {
       this.setStatus(400);
     }
     return;

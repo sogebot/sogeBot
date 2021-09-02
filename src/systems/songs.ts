@@ -116,7 +116,7 @@ class Songs extends System {
     adminEndpoint(this.nsp, 'get.playlist.tags', async (cb) => {
       try {
         cb(null, await this.getTags());
-      } catch (e) {
+      } catch (e: any) {
         cb(e, []);
       }
     });
@@ -204,7 +204,7 @@ class Songs extends System {
         cb(null, await this.banSong({
           parameters: this.getIdFromURL(url), sender: getBotSender(), command: '', createdAt: Date.now(), attr: {},
         }));
-      } catch (e) {
+      } catch (e: any) {
         cb(e.stack, []);
       }
     });
@@ -214,7 +214,7 @@ class Songs extends System {
         cb(null, await this.importPlaylist({
           parameters: playlist, sender: getBotSender(), command: '', createdAt: Date.now(), attr: { forcedTag },
         }));
-      } catch (e) {
+      } catch (e: any) {
         cb(e.stack, null);
       }
     });
@@ -223,7 +223,7 @@ class Songs extends System {
         cb(null, await this.addSongToPlaylist({
           parameters: playlist, sender: getBotSender(), command: '', createdAt: Date.now(), attr: { forcedTag },
         }));
-      } catch (e) {
+      } catch (e: any) {
         cb(e.stack, null);
       }
     });
@@ -343,7 +343,7 @@ class Songs extends System {
       const load = async () => {
         try {
           resolve(await ytdl.getInfo('https://www.youtube.com/watch?v=' + id));
-        } catch (e) {
+        } catch (e: any) {
           if (Number(retry ?? 0) < 5) {
             setTimeout(() => {
               retry++;
@@ -487,7 +487,7 @@ class Songs extends System {
       return this.addSongToPlaylist({
         sender: getBotSender(), parameters: currentSong.videoId, attr: {}, createdAt: Date.now(), command: '',
       });
-    } catch (err) {
+    } catch (err: any) {
       return [{ response: translate('songs.no-song-is-currently-playing'), ...opts }];
     }
   }
@@ -522,7 +522,7 @@ class Songs extends System {
 
       this.currentTag = opts.parameters;
       return [{ response: prepare('songs.playlist-set', { playlist: opts.parameters }), ...opts }];
-    } catch (e) {
+    } catch (e: any) {
       return [{ response: e.message, ...opts }];
 
     }
@@ -554,7 +554,7 @@ class Songs extends System {
           opts.parameters = videoId;
           return this.addSongToQueue(opts);
         }
-      } catch (e) {
+      } catch (e: any) {
         error(`SONGS: ${e.message}`);
         return [{ response: translate('songs.youtube-is-not-responding-correctly'), ...opts }];
       }
@@ -596,7 +596,7 @@ class Songs extends System {
         const response = prepare('songs.song-was-added-to-queue', { name: videoInfo.videoDetails.title });
         return [{ response, ...opts }];
       }
-    } catch (e) {
+    } catch (e: any) {
       if (Number(retry ?? 0) < 5) {
         // try once more to be sure
         await new Promise((resolve) => {
@@ -694,7 +694,7 @@ class Songs extends System {
     try {
       const data = await ytpl(playlist, { limit: Number.MAX_SAFE_INTEGER });
       return data.items.map(o => o.id);
-    } catch (e) {
+    } catch (e: any) {
       error(e);
     }
   }
@@ -746,7 +746,7 @@ class Songs extends System {
               endTime:      Number(videoInfo.videoDetails.lengthSeconds),
             });
             imported++;
-          } catch (e) {
+          } catch (e: any) {
             error(`=> Skipped ${id} - ${e.message}`);
           }
         }

@@ -32,7 +32,7 @@ async function sendGameFromTwitch (game: string) {
     ioServer?.emit('api.stats', {
       method: 'GET', data: request.data, timestamp: Date.now(), call: 'sendGameFromTwitch', api: 'helix', endpoint: url, code: request.status, remaining: calls.bot,
     });
-  } catch (e) {
+  } catch (e: any) {
     if (e.isAxiosError) {
       error(`API: ${e.config.method.toUpperCase()} ${e.config.url} - ${e.response?.status ?? 0}\n${JSON.stringify(e.response?.data ?? '--nodata--', null, 4)}\n\n${e.stack}`);
       ioServer?.emit('api.stats', {

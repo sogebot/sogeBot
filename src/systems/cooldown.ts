@@ -79,7 +79,7 @@ class Cooldown extends System {
       try {
         const item = await getRepository(CooldownEntity).save(dataset);
         cb(null, item);
-      } catch (e) {
+      } catch (e: any) {
         cb(e.stack);
       }
     });
@@ -93,7 +93,7 @@ class Cooldown extends System {
       try {
         const cooldown = await getRepository(CooldownEntity).find({ order: { name: 'ASC' } });
         cb(null, cooldown);
-      } catch (e) {
+      } catch (e: any) {
         cb(e.stack);
       }
     });
@@ -101,7 +101,7 @@ class Cooldown extends System {
       try {
         const cooldown = await getRepository(CooldownEntity).findOne({ where: { id } });
         cb(null, cooldown);
-      } catch (e) {
+      } catch (e: any) {
         cb(e.stack);
       }
     });
@@ -155,7 +155,7 @@ class Cooldown extends System {
           seconds, type, command: name,
         }), ...opts,
       }];
-    } catch (e) {
+    } catch (e: any) {
       error(`${opts.command} ${opts.parameters} [${opts.sender.username}#${opts.sender.userId}]`);
       error(e.stack);
       if (e instanceof ParameterError) {
@@ -173,7 +173,7 @@ class Cooldown extends System {
       const [ commandOrKeyword ] = new Expects(opts.parameters).everything().toArray();
       await getRepository(CooldownEntity).delete({ name: commandOrKeyword });
       return [{ response: prepare('cooldowns.cooldown-was-unset', { command: commandOrKeyword }), ...opts }];
-    } catch (e) {
+    } catch (e: any) {
       return this.help(opts);
     }
   }
@@ -382,7 +382,7 @@ class Cooldown extends System {
         cache.shift();
       }
       return result;
-    } catch (e) {
+    } catch (e: any) {
       return false;
     }
   }
@@ -459,7 +459,7 @@ class Cooldown extends System {
       } // those two are setable only from dashboard
 
       return [{ response: prepare(`cooldowns.cooldown-was-${status}${path}`, { command: cooldown.name }), ...opts }];
-    } catch (e) {
+    } catch (e: any) {
 
       error(`${opts.command} ${opts.parameters} [${opts.sender.username}#${opts.sender.userId}]`);
       error(e.stack);

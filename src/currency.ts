@@ -67,7 +67,7 @@ class Currency extends Core {
       } else {
         return value * rates[from];
       }
-    } catch (e) {
+    } catch (e: any) {
       warning(`Currency exchange error - ${e.message}`);
       warning(`Available currencies: ${Object.keys(this.rates).join(', ')}`);
       return Number(value); // don't change rate if code not found
@@ -114,7 +114,7 @@ class Currency extends Core {
         this.rates[code as currency] = Number((Number(rate.replace(',', '.')) / Number(count)).toFixed(3));
       }
       info(chalk.yellow('CURRENCY:') + ' fetched rates');
-    } catch (e) {
+    } catch (e: any) {
       error(e.stack);
       refresh = constants.SECOND;
     }

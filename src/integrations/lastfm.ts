@@ -43,7 +43,7 @@ class LastFM extends Integration {
           }
         }
 
-      } catch(e) {
+      } catch(e: any) {
         if (e.isAxiosError) {
           if (e.response.data.error === 8) {
             error('LAST.FM: Your username is probably invalid. ' + e.response.data.message);

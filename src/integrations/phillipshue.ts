@@ -3,7 +3,7 @@ import _ from 'lodash';
 import { HueApi, lightState } from 'node-hue-api';
 
 import {
-  command, default_permission, settings, 
+  command, default_permission, settings,
 } from '../decorators';
 import { onChange, onStartup } from '../decorators/on';
 import { error, info } from '../helpers/log';
@@ -126,7 +126,7 @@ class PhillipsHue extends Integration {
         output.push('id: ' + light.id + ', name: \'' + light.name + '\'');
       });
       return [{ response: translate('phillipsHue.list') + output.join(' | '), ...opts }];
-    } catch (e) {
+    } catch (e: any) {
       error(e.stack);
       return [];
     }

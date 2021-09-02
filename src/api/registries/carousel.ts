@@ -59,7 +59,7 @@ export class RegistryCarouselController extends Controller {
         'ETag':           id,
       });
       response.end(data);
-    } catch (e) {
+    } catch (e: any) {
       this.setStatus(404);
     }
     return;
@@ -81,7 +81,7 @@ export class RegistryCarouselController extends Controller {
         imageUrl: '/api/v1/carousel/image/' + id,
       };
       return item;
-    } catch (e) {
+    } catch (e: any) {
       this.setStatus(404);
     }
     return;
@@ -115,7 +115,7 @@ export class RegistryCarouselController extends Controller {
       });
       this.setStatus(201);
       return item.id;
-    } catch (e) {
+    } catch (e: any) {
       this.setStatus(400);
     }
     return {};
@@ -133,7 +133,7 @@ export class RegistryCarouselController extends Controller {
       await getRepository(Carousel).save(requestBody);
       this.setStatus(201);
 
-    } catch (e) {
+    } catch (e: any) {
       this.setStatus(400);
     }
     return;
@@ -147,7 +147,7 @@ export class RegistryCarouselController extends Controller {
     try {
       await getRepository(Carousel).update({ id }, data);
       this.setStatus(200);
-    } catch (e) {
+    } catch (e: any) {
       this.setStatus(400);
     }
     return;

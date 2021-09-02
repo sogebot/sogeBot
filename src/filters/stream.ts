@@ -39,7 +39,7 @@ const stream: ResponseFilter = {
       });
 
       return `'${request.data.data[0].game_name}'`;
-    } catch (e) {
+    } catch (e: any) {
       return 'n/a';
     } // return nothing on error
   },
@@ -69,7 +69,7 @@ const stream: ResponseFilter = {
       // save remaining api calls
       setRateLimit('bot', request.headers);
       return `'${request.data.data[0].title}'`;
-    } catch (e) {
+    } catch (e: any) {
       return 'n/a';
     } // return nothing on error
   },
@@ -98,7 +98,7 @@ const stream: ResponseFilter = {
       // save remaining api calls
       setRateLimit('bot', request.headers);
       return request.data.data[0].viewer_count;
-    } catch (e) {
+    } catch (e: any) {
       return '0';
     } // return nothing on error
   },
