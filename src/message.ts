@@ -6,7 +6,7 @@ import { getRepository, In } from 'typeorm';
 import { EventList } from './database/entity/eventList';
 import { User } from './database/entity/user';
 import {
-  command, custom, evaluate, ifp, info, list, math, online, param, price, qs, random, ResponseFilter, stream, youtube,
+  command, count, custom, evaluate, ifp, info, list, math, online, param, price, qs, random, ResponseFilter, stream, youtube,
 } from './filters';
 import { isStreamOnline, stats } from './helpers/api';
 import { getBotSender } from './helpers/commons/getBotSender';
@@ -147,6 +147,7 @@ class Message {
     await this.parseMessageEach(qs, attr, false);
     await this.parseMessageEach(list, attr);
     await this.parseMessageEach(stream, attr);
+    await this.parseMessageEach(count, attr);
     await this.parseMessageEval(evaluate, attr);
     await this.parseMessageApi();
 

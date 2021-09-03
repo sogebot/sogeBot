@@ -75,6 +75,23 @@ bot it is twitch by default
 
 `$isStreamOnline` - return true/false (boolean) if stream is online
 
+## Count subs / follows/ bits / tips in date interval
+
+- `(count|subs|<interval>)` - return subs+resubs count in interval
+  - **example:**
+    - `(count|subs|day)`
+- `(count|follows|<interval>)` - return follows count in interval
+  - **example:**
+    - `(count|follows|month)`
+- `(count|tips|<interval>)` - return tips count in interval
+  - **example:**
+    - `(count|tips|year)`
+- `(count|bits|<interval>)` - return bits count in interval
+  - **example:**
+    - `(count|bits|week)`
+
+- available **interval**: hour, day, week, month, year
+
 ## Eval
 `(eval <yourJScode>)` - will evaluate your javascript code - there **must** be return value
 

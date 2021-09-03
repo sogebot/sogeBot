@@ -1,4 +1,5 @@
 export * from './command';
+export * from './count';
 export * from './custom';
 export * from './evaluate';
 export * from './ifp';
