@@ -20,7 +20,7 @@ export class goalsUpdate1622378375126 implements MigrationInterface {
     await queryRunner.query(`CREATE INDEX "IDX_a1a6bd23cb8ef7ddf921f54c0b" ON "goal" ("groupId") `);
 
     // add shadow if missing
-    const goals = await queryRunner.manager.getRepository(`goal`).find();
+    const goals = await queryRunner.query('SELECT * FROM goal', undefined);
     for (const goal of goals as any) {
       goal.endAfter = new Date(origGoals.find((o: { id: any; }) => o.id === goal.id).endAfter).getTime();
       if (!goal.customizationFont.shadow) {
