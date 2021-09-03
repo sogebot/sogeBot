@@ -27,7 +27,7 @@ export class fontMissingShadow1592557005214 implements MigrationInterface {
       }
     }
 
-    const data3 = await queryRunner.manager.getRepository(Goal).find();
+    const data3 = await queryRunner.query('SELECT * FROM goal', undefined);
     for (const item of data3) {
       if (typeof item.customizationFont.shadow === 'undefined') {
         await queryRunner.manager.getRepository(Randomizer)
@@ -58,7 +58,7 @@ export class fontMissingShadow1592557005214 implements MigrationInterface {
       }
     }
 
-    const data3 = await queryRunner.manager.getRepository(Goal).find();
+    const data3 = await queryRunner.query('SELECT * FROM goal', undefined);
     for (const item of data3) {
       if (typeof item.customizationFont.shadow !== 'undefined') {
         const { shadow, ...customizationFont } = item.customizationFont;
