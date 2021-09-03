@@ -15,7 +15,7 @@ export class addIntervalToGoals1626478375130 implements MigrationInterface {
     await queryRunner.query(`CREATE INDEX "IDX_a1a6bd23cb8ef7ddf921f54c0b" ON "goal" ("groupId") `);
 
     // add interval if missing
-    const goals = await queryRunner.manager.getRepository(`goal`).find();
+    const goals = await queryRunner.query('SELECT * FROM goal', undefined);
     for (const goal of goals as any) {
       goal.endAfter = new Date(origGoals.find((o: { id: any; }) => o.id === goal.id).endAfter).getTime();
       if (!goal.interval) {
