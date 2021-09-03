@@ -73,6 +73,9 @@
       "help": "This value is in milliseconds",
       "placeholder": "Set your animation Out duration"
     },
+    "interval": {
+      "title": "What interval to count"
+    },
     "spaceBetweenGoalsInPx": {
       "title": "Space between goals",
       "help": "This value is in pixels",
