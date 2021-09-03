@@ -73,6 +73,9 @@
       "help": "Значение в миллисекундах",
       "placeholder": "Длительность анимации ИЗ"
     },
+    "interval": {
+      "title": "What interval to count"
+    },
     "spaceBetweenGoalsInPx": {
       "title": "Пространство между целями",
       "help": "Это значение в пикселях",
