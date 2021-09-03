@@ -18,6 +18,7 @@ import {
   Goal, GoalGroup, GoalGroupInterface,
 } from '../../database/entity/goal';
 import { stats } from '../../helpers/api';
+import { recountIntervals, types } from '../../helpers/goals/recountIntervals';
 
 @Route('/api/v1/registry/goals')
 @Tags('Registries / Goals')
@@ -59,6 +60,17 @@ export class RegistryGoalsController extends Controller {
   public async post(@Body() requestBody: GoalGroupInterface): Promise<void> {
     try {
       await getRepository(GoalGroup).save(requestBody);
+
+      const toRecount = new Set();
+      requestBody.goals.forEach(goal => {
+        if (goal.type.includes('interval')) {
+          toRecount.add(goal.type.replace('interval', '').toLowerCase());
+        }
+      });
+      toRecount.forEach(value => {
+        recountIntervals(value as typeof types[number]);
+      });
+
       this.setStatus(201);
 
     } catch (e: any) {
@@ -75,6 +87,16 @@ export class RegistryGoalsController extends Controller {
     try {
       const item = await getRepository(GoalGroup).save({ ...data, id });
       getRepository(Goal).delete({ groupId: IsNull() });
+
+      const toRecount = new Set();
+      data.goals?.forEach(goal => {
+        if (goal.type.includes('interval')) {
+          toRecount.add(goal.type.replace('interval', '').toLowerCase());
+        }
+      });
+      toRecount.forEach(value => {
+        recountIntervals(value as typeof types[number]);
+      });
       this.setStatus(200);
       return item;
     } catch (e: any) {

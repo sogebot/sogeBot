@@ -8,6 +8,7 @@ import {
   onBit, onFollow, onStartup, onSub, onTip,
 } from '../decorators/on';
 import { mainCurrency } from '../helpers/currency';
+import { recountIntervals } from '../helpers/goals/recountIntervals';
 import Overlay from '../overlays/_interface';
 
 class Goals extends Overlay {
@@ -37,6 +38,7 @@ class Goals extends Overlay {
         await getRepository(Goal).increment({ id: goal.id }, 'currentAmount', amount);
       }
     }
+    recountIntervals('bits');
   }
 
   @onTip()
@@ -48,6 +50,7 @@ class Goals extends Overlay {
         await getRepository(Goal).increment({ id: goal.id }, 'currentAmount', amount);
       }
     }
+    recountIntervals('tips');
   }
 
   @onFollow()
@@ -58,6 +61,7 @@ class Goals extends Overlay {
         await getRepository(Goal).increment({ id: goal.id }, 'currentAmount', 1);
       }
     }
+    recountIntervals('followers');
   }
 
   @onSub()
@@ -68,6 +72,7 @@ class Goals extends Overlay {
         await getRepository(Goal).increment({ id: goal.id }, 'currentAmount', 1);
       }
     }
+    recountIntervals('subscribers');
   }
 }
 

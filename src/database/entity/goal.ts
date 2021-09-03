@@ -23,10 +23,14 @@ export interface GoalInterface {
   group?: GoalGroupInterface;
   groupId?: string | null;
   name: string;
-  type: 'followers' | 'currentFollowers' | 'currentSubscribers' | 'subscribers' | 'tips' | 'bits';
+  type:
+  'followers' | 'currentFollowers' | 'currentSubscribers'
+  | 'subscribers' | 'tips' | 'bits' | 'intervalSubscribers'
+  | 'intervalFollowers' | 'intervalTips' | 'intervalBits';
   countBitsAsTips: boolean;
   display: 'simple' | 'full' | 'custom';
   timestamp?: number;
+  interval?: number;
   goalAmount?: number;
   currentAmount?: number;
   endAfter: number;
@@ -92,6 +96,9 @@ export const Goal = new EntitySchema<Readonly<Required<GoalInterface>>>({
     countBitsAsTips: { type: Boolean },
     display:         { type: 'varchar', length: 20 },
     timestamp:       {
+      type: 'bigint', transformer: new ColumnNumericTransformer(), default: 0,
+    },
+    interval: {
       type: 'bigint', transformer: new ColumnNumericTransformer(), default: 0,
     },
     goalAmount: {
