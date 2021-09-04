@@ -2,6 +2,9 @@ currentSnapshot=$(node tools/changelog.js nextSnapshot)
 nextTag=$(node tools/changelog.js nextTag)
 file=./package.json
 
+echo Building bot
+make
+
 echo Switching to master branch
 git checkout master
 
