@@ -111,6 +111,10 @@ export interface AlertInterface {
     en: boolean;
     ru: boolean;
   };
+  parry: {
+    enabled: boolean,
+    delay: number,
+  },
   tts: {
     voice: string;
     pitch: number;
@@ -275,6 +279,7 @@ export const Alert = new EntitySchema<Readonly<Required<AlertInterface>>>({
     tts:                       { type: 'simple-json', nullable: true },
     font:                      { type: 'simple-json' },
     fontMessage:               { type: 'simple-json' },
+    parry:                     { type: 'simple-json' },
   },
   relations: {
     follows: {
