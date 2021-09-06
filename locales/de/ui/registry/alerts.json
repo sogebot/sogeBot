@@ -24,6 +24,12 @@
   "alertDelayInMs": {
     "name": "Alert Verzögerung"
   },
+  "parryEnabled": {
+    "name": "Alert parries"
+  },
+  "parryDelay": {
+    "name": "Alert parry delay"
+  },
   "profanityFilterType": {
     "name": "Schimpfwort-Filter",
     "disabled": "Deaktiviert",
