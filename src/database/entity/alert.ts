@@ -10,7 +10,7 @@ export interface EmitData {
   recipient?: string;
   currency: string;
   monthsName: string;
-  event: keyof Omit<AlertInterface, 'id' | 'updatedAt' | 'name' |'alertDelayInMs' | 'profanityFilterType' | 'loadStandardProfanityList' | 'customProfanityList' | 'tts' | 'font' | 'fontMessage'>;
+  event: keyof Omit<AlertInterface, 'id' | 'updatedAt' | 'name' |'alertDelayInMs' | 'profanityFilterType' | 'loadStandardProfanityList' | 'customProfanityList' | 'tts' | 'font' | 'fontMessage' | 'parry'>;
   message: string;
 }
 
