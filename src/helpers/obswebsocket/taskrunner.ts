@@ -62,7 +62,11 @@ const taskRunner = async (obs: ObsWebSocket, tasks: OBSWebsocketInterface['simpl
       }
     }
   } catch (e: any) {
-    require('../log').error(e);
+    if (process.env.BUILD === 'web') {
+      console.error(e);
+    } else {
+      require('../log').error(e);
+    }
     throw e;
   } finally {
     runningTasks.splice(runningTasks.indexOf(hash), 1);
