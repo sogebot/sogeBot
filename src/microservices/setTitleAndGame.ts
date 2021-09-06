@@ -43,7 +43,7 @@ async function setTitleAndGame (args: { title?: string | null; game?: string | n
   let title;
   let game;
 
-  let requestData = '';
+  let requestData = {};
   try {
     if (!isNil(args.title)) {
       rawStatus.value = args.title; // save raw status to cache, if changing title
@@ -57,7 +57,7 @@ async function setTitleAndGame (args: { title?: string | null; game?: string | n
       game = gameCache.value;
     } // we are not setting game -> load last game
 
-    requestData = JSON.stringify({ game_id: await getGameIdFromName(game), title });
+    requestData = { game_id: await getGameIdFromName(game), title };
 
     /* workaround for https://github.com/twitchdev/issues/issues/224
       * Modify Channel Information is not propagated correctly on twitch #224
