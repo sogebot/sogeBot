@@ -99,7 +99,15 @@ async function setTitleAndGame (args: { title?: string | null; game?: string | n
     });
   } catch (e: any) {
     if (e.isAxiosError) {
-      error(`API: ${e.config.method.toUpperCase()} ${e.config.url} - ${e.response.status ?? 0}\n${JSON.stringify(e.response?.data ?? '--nodata--', null, 4)}\n\n${e.stack}`);
+      error(`API: ${e.config.method.toUpperCase()} ${e.config.url} - ${e.response.status ?? 0}
+        \n${JSON.stringify({
+    headers: {
+      'Authorization': 'Bearer ' + token,
+      'Client-ID':     oauth.broadcasterClientId,
+      'Content-Type':  'application/json',
+    },
+    request: requestData,
+  }, null, 4)}\n${JSON.stringify(e.response?.data ?? '--nodata--', null, 4)}\n\n${e.stack}`);
       ioServer?.emit('api.stats', {
         method: e.config.method.toUpperCase(), request: requestData, timestamp: Date.now(), call: 'setTitleAndGame', api: 'helix', endpoint: e.config.url, code: e.response.status, data: e.response?.data ?? 'n/a', remaining: calls.bot,
       });
