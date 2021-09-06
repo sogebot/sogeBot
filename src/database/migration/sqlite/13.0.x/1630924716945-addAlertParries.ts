@@ -67,7 +67,7 @@ export class addAlertParries1630924716945 implements MigrationInterface {
     alerts.global = await queryRunner.query('SELECT * FROM alert');
 
     await queryRunner.query(`DROP TABLE "alert"`);
-    await queryRunner.query(`CREATE TABLE "alert" ("id" varchar PRIMARY KEY NOT NULL, "updatedAt" bigint NOT NULL DEFAULT (0), "name" varchar NOT NULL, "alertDelayInMs" integer NOT NULL, "profanityFilterType" varchar NOT NULL, "loadStandardProfanityList" text NOT NULL, "customProfanityList" text NOT NULL, "tts" text, "font" text NOT NULL, "fontMessage" text NOT NULL)`);
+    await queryRunner.query(`CREATE TABLE "alert" ("id" varchar PRIMARY KEY NOT NULL, "updatedAt" bigint NOT NULL DEFAULT (0), "name" varchar NOT NULL, "alertDelayInMs" integer NOT NULL, "profanityFilterType" varchar NOT NULL, "loadStandardProfanityList" text NOT NULL, "customProfanityList" text NOT NULL, "tts" text, "font" text NOT NULL, "fontMessage" text NOT NULL, "parry" text NOT NULL)`);
 
     for (const alert of alerts.global) {
       delete alert.parry;
