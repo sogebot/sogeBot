@@ -41,6 +41,7 @@ export class addAlertParries1630924716945 implements MigrationInterface {
     ]) {
       await queryRunner.manager.getRepository(`alert_${type}`).clear();
       for (const alert of alerts[type]) {
+        alert.enabled = alert.enabled === '0';
         alert.animationTextOptions = JSON.parse(alert.animationTextOptions) as any;
         alert.imageOptions = JSON.parse(alert.imageOptions) as any;
         alert.advancedMode = JSON.parse(alert.advancedMode) as any;

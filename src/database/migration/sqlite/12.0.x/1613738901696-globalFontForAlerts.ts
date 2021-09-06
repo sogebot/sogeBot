@@ -1,7 +1,7 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class globalFontForAlerts1613738901696 implements MigrationInterface {
-  name = 'globalFontForAlerts16137389016965';
+  name = 'globalFontForAlerts1613738901696';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     // get all alerts
@@ -106,38 +106,32 @@ export class globalFontForAlerts1613738901696 implements MigrationInterface {
     await queryRunner.query(`ALTER TABLE "temporary_alert_reward_redeem" RENAME TO "alert_reward_redeem"`);
 
     for (const alert of alerts.global) {
-      alert.loadStandardProfanityList = JSON.parse(alert.loadStandardProfanityList) as any;
-      alert.tts = JSON.parse(alert.tts) as any;
-      await queryRunner.manager.getRepository(`alert`).insert({
-        ...alert,
-        fontMessage: {
-          align:       'left',
-          family:      'PT Sans',
-          size:        16,
-          borderPx:    1,
-          borderColor: '#000000',
-          weight:      500,
-          color:       '#ffffff',
-          shadow:      [],
-        },
-        font: {
-          align:          'center',
-          family:         'PT Sans',
-          size:           24,
-          borderPx:       1,
-          borderColor:    '#000000',
-          weight:         800,
-          color:          '#ffffff',
-          highlightcolor: '#00ff00',
-          shadow:         [] as {
-            shiftRight: number;
-            shiftDown: number;
-            blur: number;
-            opacity: number;
-            color: string;
-          }[],
-        },
+      alert.fontMessage = JSON.stringify({
+        align:       'left',
+        family:      'PT Sans',
+        size:        16,
+        borderPx:    1,
+        borderColor: '#000000',
+        weight:      500,
+        color:       '#ffffff',
+        shadow:      [],
       });
+      alert.font = JSON.stringify({
+        align:          'center',
+        family:         'PT Sans',
+        size:           24,
+        borderPx:       1,
+        borderColor:    '#000000',
+        weight:         800,
+        color:          '#ffffff',
+        highlightcolor: '#00ff00',
+        shadow:         [],
+      });
+      const keys = Object.keys(alert);
+      await queryRunner.query(
+        `INSERT INTO "alert"(${keys.map(o => `"${o}"`).join(', ')}) values (${keys.map(o => `?`).join(', ')})`,
+        [keys.map(key => alert[key])],
+      );
     }
 
     // resave all alerts

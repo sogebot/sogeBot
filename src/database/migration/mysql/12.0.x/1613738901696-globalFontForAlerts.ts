@@ -1,7 +1,7 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class globalFontForAlerts1613738901696 implements MigrationInterface {
-  name = 'globalFontForAlerts16137389016965';
+  name = 'globalFontForAlerts1613738901696';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query('ALTER TABLE `alert` ADD `font` text NOT NULL');
