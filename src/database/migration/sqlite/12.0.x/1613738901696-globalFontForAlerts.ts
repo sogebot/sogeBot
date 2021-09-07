@@ -1,9 +1,17 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class globalFontForAlerts1613738901696 implements MigrationInterface {
-  name = 'globalFontForAlerts16137389016965';
+  name = 'globalFontForAlerts1613738901696';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
+    // remove old migration
+    const response = await queryRunner.query(`SELECT * FROM "migrations" WHERE "name"='globalFontForAlerts16137389016965'`);
+    if (response.length > 0) {
+      await queryRunner.query(`DELETE FROM "migrations" WHERE "name"='globalFontForAlerts16137389016965'`);
+      console.log('Skipping migration globalFontForAlerts1613738901696 -> updating globalFontForAlerts16137389016965 to globalFontForAlerts1613738901696');
+      return;
+    }
+
     // get all alerts
     const alerts = {} as any;
     for (const type of [
