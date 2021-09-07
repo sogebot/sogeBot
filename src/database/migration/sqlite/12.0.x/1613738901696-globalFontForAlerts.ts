@@ -1,7 +1,7 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class globalFontForAlerts1613738901696 implements MigrationInterface {
-  name = 'globalFontForAlerts1613738901696';
+  name = 'globalFontForAlerts16137389016965';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     // get all alerts
