@@ -1,20 +1,20 @@
 import * as constants from '@sogebot/ui-helpers/constants';
-import axios from 'axios';
+import fetch from 'node-fetch';
 import { getRepository } from 'typeorm';
 
 import currency from '../currency';
 import { UserTip, UserTipInterface } from '../database/entity/user';
 import { persistent, settings } from '../decorators';
-import { onStartup } from '../decorators/on.js';
-import { isStreamOnline } from '../helpers/api/index.js';
-import { stats } from '../helpers/api/stats.js';
-import { mainCurrency } from '../helpers/currency';
-import { eventEmitter } from '../helpers/events';
-import { triggerInterfaceOnTip } from '../helpers/interface/triggers.js';
-import { error, tip } from '../helpers/log.js';
-import eventlist from '../overlays/eventlist.js';
-import alerts from '../registries/alerts.js';
-import users from '../users.js';
+import { onStartup } from '../decorators/on';
+import { isStreamOnline } from '../helpers/api/index';
+import { stats } from '../helpers/api/stats';
+import { mainCurrency } from '../helpers/currency/index';
+import { eventEmitter } from '../helpers/events/index';
+import { triggerInterfaceOnTip } from '../helpers/interface/triggers';
+import { error, tip } from '../helpers/log';
+import eventlist from '../overlays/eventlist';
+import alerts from '../registries/alerts';
+import users from '../users';
 import Integration from './_interface';
 
 type TipeeestreamEvent = {
@@ -99,18 +99,32 @@ class TipeeeStream extends Integration {
       }
       try {
         const beforeDate = Date.now();
-        const request = await axios.get<TipeeestreamEvent>(`https://api.tipeeestream.com/v1.0/events.json?apiKey=${this.apiKey}&type[]=donation&limit=100000&end=${(new Date(beforeDate)).toISOString()}&start=${(new Date(this.afterDate)).toISOString()}`);
-        if (request.data.message !== 'success') {
-          throw new Error(request.data.message);
-        }
+        const response = await fetch(`https://api.tipeeestream.com/v1.0/events.json?apiKey=${this.apiKey}&type[]=donation&limit=100000&end=${(new Date(beforeDate)).toISOString()}&start=${(new Date(this.afterDate)).toISOString()}`);
 
-        for (const item of request.data.datas.items) {
-          this.parse(item);
-        }
+        if (response.ok) {
+          const data = await response.json() as TipeeestreamEvent;
 
-        this.afterDate = beforeDate;
-      } catch (e: any) {
-        error(e.stack);
+          if (data.message !== 'success') {
+            throw new Error(data.message);
+          }
+
+          for (const item of data.datas.items) {
+            this.parse(item);
+          }
+
+          this.afterDate = beforeDate;
+        } else {
+          if (response.status === 401) {
+            setTimeout(() => this.status({ state: false }), 1000);
+            throw new Error('Unauthorized access, please check your apiKey. Disabling Tipeeestream integration.');
+          } else {
+            throw new Error(response.statusText);
+          }
+        }
+      } catch (e) {
+        if (e instanceof Error) {
+          error(`TIPEEESTREAM: ${e.stack}`);
+        }
       }
 
     }, constants.MINUTE);
