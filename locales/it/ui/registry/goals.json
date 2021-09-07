@@ -74,7 +74,7 @@
       "placeholder": "Imposta durata dell'animazione in uscita"
     },
     "interval": {
-      "title": "What interval to count"
+      "title": "Quale intervallo contare"
     },
     "spaceBetweenGoalsInPx": {
       "title": "Spazio tra gli obiettivi",
