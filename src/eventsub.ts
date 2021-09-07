@@ -129,8 +129,13 @@ class EventSub extends Core {
       // validate
       try {
         const validateUrl = `https://id.twitch.tv/oauth2/validate`;
-        await axios.get(validateUrl, { headers: { Authorization: `OAuth ${this.appToken}` } });
-        return this.appToken;
+        const response = await axios.get(validateUrl, { headers: { Authorization: `OAuth ${this.appToken}` } });
+        if (response.data.client_id !== this.clientId) {
+          warning(`EVENTSUB: Client ID of token and set Client ID not match. Invalidating token.`);
+          this.appToken = '';
+        } else {
+          return this.appToken;
+        }
       } catch (e: any) {
         error(e.stack);
       }
