@@ -74,7 +74,7 @@
       "placeholder": "Dauer der ausgehenden Animation festlegen"
     },
     "interval": {
-      "title": "What interval to count"
+      "title": "Welches Zeitintervall zu zählen"
     },
     "spaceBetweenGoalsInPx": {
       "title": "Abstand zwischen Zielen",
