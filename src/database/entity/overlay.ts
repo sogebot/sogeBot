@@ -6,6 +6,46 @@ export interface OverlayMapperInterface {
   opts: null
 }
 
+export interface OverlayMapperCountdown {
+  id: string;
+  value: 'countdown';
+  opts: null | {
+    time: number;
+    messageWhenReachedZero: string;
+    showMessageWhenReachedZero: boolean;
+    countdownFont: {
+      family: string;
+      size: number;
+      borderPx: number;
+      borderColor: string;
+      weight: number;
+      color: string;
+      shadow: {
+        shiftRight: number;
+        shiftDown: number;
+        blur: number;
+        opacity: number;
+        color: string;
+      }[];
+    }
+    messageFont: {
+      family: string;
+      size: number;
+      borderPx: number;
+      borderColor: string;
+      weight: number;
+      color: string;
+      shadow: {
+        shiftRight: number;
+        shiftDown: number;
+        blur: number;
+        opacity: number;
+        color: string;
+      }[];
+    }
+  },
+}
+
 export interface OverlayMapperCredits {
   id: string;
   value: 'credits';
@@ -192,7 +232,7 @@ export interface OverlayMapperGroup {
   }
 }
 
-export type OverlayMappers = OverlayMapperGroup | OverlayMapperEventlist | OverlayMapperEmotesCombo | OverlayMapperCredits | OverlayMapperClips | OverlayMapperAlerts | OverlayMapperEmotes | OverlayMapperEmotesExplode | OverlayMapperEmotesFireworks | OverlayMapperPolls | OverlayMapperTTS | OverlayMapperInterface | OverlayMapperOBSWebsocket | OverlayMapperClipsCarousel | OverlayMapperHypeTrain;
+export type OverlayMappers = OverlayMapperCountdown | OverlayMapperGroup | OverlayMapperEventlist | OverlayMapperEmotesCombo | OverlayMapperCredits | OverlayMapperClips | OverlayMapperAlerts | OverlayMapperEmotes | OverlayMapperEmotesExplode | OverlayMapperEmotesFireworks | OverlayMapperPolls | OverlayMapperTTS | OverlayMapperInterface | OverlayMapperOBSWebsocket | OverlayMapperClipsCarousel | OverlayMapperHypeTrain;
 
 export const OverlayMapper = new EntitySchema<Readonly<Required<OverlayMappers>>>({
   name:    'overlay_mapper',
