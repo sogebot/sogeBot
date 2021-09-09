@@ -1,3 +1,4 @@
+import { SECOND } from '@sogebot/ui-helpers/constants';
 import {
   Body,
   Controller,
@@ -17,6 +18,45 @@ import { getRepository } from 'typeorm';
 import {
   OverlayMapper, OverlayMapperAlerts, OverlayMapperClips, OverlayMapperClipsCarousel, OverlayMapperCountdown, OverlayMapperCredits, OverlayMapperEmotes, OverlayMapperEmotesCombo, OverlayMapperEmotesExplode, OverlayMapperEmotesFireworks, OverlayMapperEventlist, OverlayMapperGroup, OverlayMapperHypeTrain, OverlayMapperInterface, OverlayMapperOBSWebsocket, OverlayMapperPolls, OverlayMappers, OverlayMapperTTS,
 } from '../../database/entity/overlay';
+import { isBotStarted } from '../../helpers/database.js';
+
+const ticks: string[] = [];
+
+setInterval(async () => {
+  if (!isBotStarted) {
+    return;
+  }
+
+  while(ticks.length > 0) {
+    const id = ticks.shift() as string;
+    // check if it is without group
+    const item = await getRepository(OverlayMapper).findOne({ id });
+    if (item) {
+      if (item.value === 'countdown' && item.opts) {
+        await getRepository(OverlayMapper).update(id, {
+          opts: {
+            ...item.opts,
+            currentTime: item.opts.currentTime - 1000,
+          },
+        });
+      }
+    } else {
+      // go through groups and find id
+      for(const group of await getRepository(OverlayMapper).find({ value: 'group' })) {
+        if (group.value === 'group' && group.opts?.items) {
+          group.opts.items.forEach((groupItem, index) => {
+            if (groupItem.id === id && groupItem.type === 'countdown') {
+              group.opts.items[index].opts.currentTime -= 1000;
+            }
+          });
+        }
+
+        // resave
+        await getRepository(OverlayMapper).save(group);
+      }
+    }
+  }
+}, SECOND * 1);
 
 @Route('/api/v1/overlay')
 @Tags('Registries / Overlay')
@@ -46,20 +86,8 @@ export class RegistryOverlayController extends Controller {
 
   @Get('/{id}/tick')
   public async triggerTick(@Path() id: string): Promise<void> {
-    try {
-      const item = await getRepository(OverlayMapper).findOneOrFail({ id });
-      if (item.value === 'countdown' && item.opts) {
-        await getRepository(OverlayMapper).update(id, {
-          opts: {
-            ...item.opts,
-            currentTime: item.opts.currentTime - 1000,
-          },
-        });
-      }
-      this.setStatus(200);
-    } catch (e: any) {
-      this.setStatus(200);
-    }
+    ticks.push(id);
+    this.setStatus(200);
     return;
   }
 
