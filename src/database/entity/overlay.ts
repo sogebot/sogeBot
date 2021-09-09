@@ -11,6 +11,9 @@ export interface OverlayMapperCountdown {
   value: 'countdown';
   opts: null | {
     time: number;
+    currentTime: number;
+    isPersistent: boolean;
+    isStartedOnSourceLoad: boolean;
     messageWhenReachedZero: string;
     showMessageWhenReachedZero: boolean;
     countdownFont: {

@@ -44,6 +44,25 @@ export class RegistryOverlayController extends Controller {
     return;
   }
 
+  @Get('/{id}/tick')
+  public async triggerTick(@Path() id: string): Promise<void> {
+    try {
+      const item = await getRepository(OverlayMapper).findOneOrFail({ id });
+      if (item.value === 'countdown' && item.opts) {
+        await getRepository(OverlayMapper).update(id, {
+          opts: {
+            ...item.opts,
+            currentTime: item.opts.currentTime - 1000,
+          },
+        });
+      }
+      this.setStatus(200);
+    } catch (e: any) {
+      this.setStatus(200);
+    }
+    return;
+  }
+
   @SuccessResponse('201', 'Created')
   @Response('401', 'Unauthorized')
   @Security('bearerAuth', [])
