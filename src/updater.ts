@@ -109,6 +109,7 @@ class Updater extends Core {
           await new Promise((resolve) => {
             exec(`npm install ${pkg}@${applicableVersion}`, (error, _, stderr) => {
               if (!error) {
+                this.versions[pkg as keyof typeof versions] = applicableVersion;
                 info(`${pkg}@${applicableVersion} updated succesfully!`);
               } else {
                 errorLog(stderr);
