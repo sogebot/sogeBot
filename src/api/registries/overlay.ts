@@ -65,6 +65,7 @@ export class RegistryOverlayController extends Controller {
   * Retrieves the quick actions of an authenticated user.
   */
   @Get()
+  @Security('bearerAuth', [])
   public async getAll(): Promise<{ data: OverlayMappers[], paging: null}> {
     const items = await getRepository(OverlayMapper).find();
     return {
