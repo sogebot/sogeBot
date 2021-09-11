@@ -379,6 +379,19 @@ class TMI extends Core {
     }
   }
 
+  async ban (username: string, type: 'bot' | 'broadcaster' = 'bot' ) {
+    const client = this.client[type];
+    if (!client && type === 'bot') {
+      return this.ban(username, 'broadcaster');
+    } else if (!client) {
+      error(`TMI: Cannot ban user. Bot/Broadcaster is not connected to TMI.`);
+    } else {
+      await client.chat.ban(this.channel, username);
+      await client.chat.block(this.channel, username);
+      info(`TMI: User ${username} was banned and blocked.`);
+    }
+  }
+
   async part (type: 'bot' | 'broadcaster') {
     const client = this.client[type];
     if (!client) {

@@ -10,16 +10,20 @@ import { isBroadcaster } from './isBroadcaster';
 
 let globalIgnoreList = JSON.parse(readFileSync('./assets/globalIgnoreList.json', 'utf8'));
 
+export function isInGlobalIgnoreList (sender: { username: string | null; userId?: string }) {
+  return typeof getGlobalIgnoreList().find(data => {
+    return data.id === sender.userId || data.known_aliases.includes((sender.username || '').toLowerCase());
+  }) !== 'undefined';
+}
+
 export function isIgnored(sender: { username: string | null; userId?: string }) {
   if (sender.username === null) {
     return false; // null can be bot from dashboard or event
   }
 
   const isInIgnoreList = getIgnoreList().includes(sender.username) || getIgnoreList().includes(sender.userId);
-  const isInGlobalIgnoreList = typeof getGlobalIgnoreList().find(data => {
-    return data.id === sender.userId || data.known_aliases.includes((sender.username || '').toLowerCase());
-  }) !== 'undefined';
-  return (isInGlobalIgnoreList || isInIgnoreList) && !isBroadcaster(sender);
+
+  return (isInGlobalIgnoreList(sender) || isInIgnoreList) && !isBroadcaster(sender);
 }
 
 export function getIgnoreList() {

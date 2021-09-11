@@ -6,11 +6,14 @@ import { User } from '../../database/entity/user';
 import { fetchUser } from '../../microservices/fetchUser';
 import eventlist from '../../overlays/eventlist';
 import alerts from '../../registries/alerts';
+import tmi from '../../tmi';
 import { triggerInterfaceOnFollow } from '../interface';
 import {
   debug, error, follow as followLog,
 } from '../log';
-import { isBot, isIgnored } from '../user';
+import {
+  isBot, isIgnored, isInGlobalIgnoreList, 
+} from '../user';
 
 import { eventEmitter } from '.';
 
@@ -26,6 +29,10 @@ export function follow(userId: string, username: string, followedAt: string | nu
 
   if (isIgnored({ username, userId })) {
     debug('events', `User ${username}#${userId} is in ignore list.`);
+    if (isInGlobalIgnoreList({ username, userId })) {
+      // autoban + autoblock
+      tmi.ban(username);
+    }
     return;
   }
 
