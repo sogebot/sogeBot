@@ -73,6 +73,9 @@
       "help": "Dieser Wert ist in Millisekunden",
       "placeholder": "Dauer der ausgehenden Animation festlegen"
     },
+    "interval": {
+      "title": "Welches Zeitintervall zu zählen"
+    },
     "spaceBetweenGoalsInPx": {
       "title": "Abstand zwischen Zielen",
       "help": "Dieser Wert ist in Pixeln",

@@ -73,6 +73,9 @@
       "help": "Tato hodnota je v milisekundách",
       "placeholder": "Nastavte dobu trvání výstupní animace"
     },
+    "interval": {
+      "title": "What interval to count"
+    },
     "spaceBetweenGoalsInPx": {
       "title": "Prostor mezi cíly",
       "help": "Tato hodnota je v pixelech",

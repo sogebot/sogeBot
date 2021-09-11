@@ -24,6 +24,12 @@
   "alertDelayInMs": {
     "name": "Ritardo di allarme"
   },
+  "parryEnabled": {
+    "name": "Interrompi con nuovo alert"
+  },
+  "parryDelay": {
+    "name": "Ritardo interruzione nuovo alert"
+  },
   "profanityFilterType": {
     "name": "Filtro profanità",
     "disabled": "Disattivato",

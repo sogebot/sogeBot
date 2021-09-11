@@ -73,6 +73,9 @@
       "help": "Questo valore è in millisecondi",
       "placeholder": "Imposta durata dell'animazione in uscita"
     },
+    "interval": {
+      "title": "Quale intervallo contare"
+    },
     "spaceBetweenGoalsInPx": {
       "title": "Spazio tra gli obiettivi",
       "help": "Questo valore è in pixel",

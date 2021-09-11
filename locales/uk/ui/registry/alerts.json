@@ -24,6 +24,12 @@
   "alertDelayInMs": {
     "name": "Alert delay"
   },
+  "parryEnabled": {
+    "name": "Alert parries"
+  },
+  "parryDelay": {
+    "name": "Alert parry delay"
+  },
   "profanityFilterType": {
     "name": "Profanity filter",
     "disabled": "Disabled",
