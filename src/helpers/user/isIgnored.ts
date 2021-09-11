@@ -1,9 +1,14 @@
 import { readFileSync } from 'fs';
 
+import { HOUR } from '@sogebot/ui-helpers/constants';
+import { cloneDeep, isEqual } from 'lodash';
+import fetch from 'node-fetch';
+
+import { info } from '../log';
 import { globalIgnoreListExclude, ignorelist } from '../tmi/ignoreList';
 import { isBroadcaster } from './isBroadcaster';
 
-const globalIgnoreList = JSON.parse(readFileSync('./assets/globalIgnoreList.json', 'utf8'));
+let globalIgnoreList = JSON.parse(readFileSync('./assets/globalIgnoreList.json', 'utf8'));
 
 export function isIgnored(sender: { username: string | null; userId?: string }) {
   if (sender.username === null) {
@@ -22,6 +27,23 @@ export function getIgnoreList() {
     return typeof o === 'string' ? o.trim().toLowerCase() : o;
   });
 }
+
+setInterval(() => {
+  update();
+}, HOUR);
+
+const update = async () => {
+  const response = await fetch(`https://raw.githubusercontent.com/sogehige/sogeBot/master/assets/globalIgnoreList.json`);
+
+  if (response.ok) {
+    const data = await response.json();
+    if (!isEqual(data, globalIgnoreList)) {
+      globalIgnoreList = cloneDeep(data);
+      info('IGNORELIST: updated ignorelist from github');
+    }
+  }
+};
+update();
 
 export function getGlobalIgnoreList() {
   return Object.keys(globalIgnoreList)
