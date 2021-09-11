@@ -8,9 +8,9 @@ import eventlist from '../../overlays/eventlist';
 import alerts from '../../registries/alerts';
 import { triggerInterfaceOnFollow } from '../interface';
 import {
-  debug, error, follow as followLog, 
+  debug, error, follow as followLog,
 } from '../log';
-import { isBot } from '../user';
+import { isBot, isIgnored } from '../user';
 
 import { eventEmitter } from '.';
 
@@ -23,6 +23,11 @@ export function follow(userId: string, username: string, followedAt: string | nu
       events.delete(key);
     }
   });
+
+  if (isIgnored({ username, userId })) {
+    debug('events', `User ${username}#${userId} is in ignore list.`);
+    return;
+  }
 
   if (events.has(userId)) {
     debug('events', `User ${username}#${userId} already followed in hour.`);
