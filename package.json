@@ -19,7 +19,7 @@
   "author": "Michal Orlik <sogehige@gmail.com>",
   "license": "MIT",
   "dependencies": {
-    "@sogebot/ui-admin": "^14.0.0",
+    "@sogebot/ui-admin": "^15.0.0",
     "@sogebot/ui-helpers": "^2.5.7",
     "@sogebot/ui-oauth": "~1.2.1",
     "@sogebot/ui-overlay": "~5.0.0",
@@ -28,7 +28,6 @@
     "basic-auth": "2.0.1",
     "better-sqlite3": "^7.4.3",
     "blocked-at": "1.2.0",
-    "centrifuge": "2.8.1",
     "chalk": "4.1.2",
     "cors": "2.8.5",
     "cron-parser": "4.0.0",

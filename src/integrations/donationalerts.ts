@@ -1,52 +1,147 @@
-import { MINUTE, SECOND } from '@sogebot/ui-helpers/constants';
+import * as constants from '@sogebot/ui-helpers/constants';
 import axios from 'axios';
-import Centrifuge from 'centrifuge';
 import chalk from 'chalk';
 import { getRepository } from 'typeorm';
-import WebSocket from 'ws';
 
 import currency from '../currency';
 import { UserTip, UserTipInterface } from '../database/entity/user';
-import { settings } from '../decorators';
+import { persistent, settings } from '../decorators';
 import { onChange, onStartup } from '../decorators/on.js';
 import { isStreamOnline, stats } from '../helpers/api/index.js';
 import { mainCurrency } from '../helpers/currency';
 import { eventEmitter } from '../helpers/events';
 import { triggerInterfaceOnTip } from '../helpers/interface/triggers.js';
-import { info, tip } from '../helpers/log.js';
+import {
+  error, info, tip,
+} from '../helpers/log.js';
 import { adminEndpoint } from '../helpers/socket.js';
 import eventlist from '../overlays/eventlist.js';
 import alerts from '../registries/alerts.js';
 import users from '../users.js';
 import Integration from './_interface';
 
-const parsedTips: string[] = [];
-let reconnectionTimestamp = 0;
+const parsedTips: number[] = [];
 
-type DonationAlertsEvent = {
-  id: string;
-  name: string;
-  username: string;
-  message: string;
-  message_type: string;
-  amount: number;
-  currency: currency;
-  billing_system: string;
+type DonationAlertsResponse = {
+  'data': {
+    'id': number,
+    'name': string,
+    'username': string,
+    'message': string,
+    'amount': number,
+    'currency': currency,
+    'is_shown': number,
+    'created_at': string /* 2019-09-29 09:00:00 */,
+    'shown_at': null
+  }[],
+  'links': {
+    'first': string,
+    'last': string,
+    'prev': null | string,
+    'next': null | string
+  },
+  'meta': {
+    'current_page': number,
+    'from': number,
+    'last_page': number,
+    'path': 'https://www.donationalerts.com/api/v1/alerts/donations',
+    'per_page': number,
+    'to': number,
+    'total': number,
+  }
 };
 
+function getTips (page: number, jwtToken: string, afterDate: number): Promise<[last_page: number, tips: DonationAlertsResponse['data']]> {
+  return new Promise((resolve, reject) => {
+    axios.get<DonationAlertsResponse>(`https://www.donationalerts.com/api/v1/alerts/donations?page=${page}`, {
+      headers: {
+        Accept:        'application/json',
+        Authorization: 'Bearer ' + jwtToken,
+      },
+    }).then(response => {
+      const data = response.data;
+      // check if we are at afterDate
+      const tips = data.data.filter(o => new Date(o.created_at).getTime() > afterDate);
+      if (tips.length < data.data.length) {
+        resolve([1, tips]);
+      } else {
+        resolve([Number(data.meta.last_page), data.data]);
+      }
+    }).catch(e => reject(e));
+  });
+}
+
 class Donationalerts extends Integration {
-  socketToDonationAlerts: Centrifuge | null = null;
+  @persistent()
+  afterDate = 0;
+
+  channel = '';
 
   @settings()
   access_token = '';
 
+  @settings()
+  refresh_token = '';
+
   @onStartup()
-  @onChange('enabled')
-  onStateChange(key: string, val: boolean) {
-    if (val) {
-      this.connect();
+  interval() {
+    setInterval(async () => {
+      if (this.channel.length === 0) {
+        return;
+      }
+
+      try {
+        // get initial data
+        let [last_page, tips] = await getTips(1, this.access_token, this.afterDate);
+
+        if (last_page > 1) {
+          for(let page = 2; page <= last_page; page++) {
+            const data = await getTips(page, this.access_token, this.afterDate);
+            last_page = data[0];
+            tips = [...tips, ...data[1]];
+          }
+        }
+
+        for (const item of tips) {
+          this.parse(item);
+        }
+
+        if (tips.length > 0) {
+          this.afterDate = new Date(tips[0].created_at).getTime();
+        }
+      } catch (e) {
+        this.refresh();
+      }
+    }, 10 * constants.SECOND);
+  }
+
+  refresh() {
+    if (this.refresh_token.length > 0) {
+      // get new refresh and access token
+      axios.request<{
+        'token_type': 'Bearer',
+        'access_token': string,
+        'expires_in': number,
+        'refresh_token': string,
+      }>({
+        url:     'https://www.sogebot.xyz/.netlify/functions/donationalerts',
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        data:    { refreshToken: this.refresh_token },
+      }).then((response) => {
+        this.refresh_token = response.data.refresh_token;
+        this.access_token = response.data.access_token;
+      }).catch(() => {
+        error(chalk.yellow('DONATIONALERTS:') + ' Bot was unable to refresh access token. Please recreate your tokens.');
+        this.channel = '';
+        this.access_token = '';
+        this.refresh_token = '';
+      });
     } else {
-      this.disconnect();
+      error(chalk.yellow('DONATIONALERTS:') + ' Bot was unable to refresh access token. Please recreate your tokens.');
+      this.channel = '';
+      this.access_token = '';
+      this.refresh_token = '';
     }
   }
 
@@ -64,99 +159,35 @@ class Donationalerts extends Integration {
     });
   }
 
+  @onStartup()
+  @onChange('enabled')
+  onStateChange (key: string, val: boolean) {
+    if (val) {
+      this.connect();
+    } else {
+      this.channel = '';
+    }
+  }
+
   @onChange('access_token')
   async connect () {
-    this.disconnect();
-
     if (this.access_token.trim() === '' || !this.enabled) {
+      this.channel = '';
       return;
     }
 
-    if (Date.now() - reconnectionTimestamp < MINUTE) {
-      // wait a while to not hit rate limit
-      setTimeout(() => this.connect(), 10 * SECOND);
+    try {
+      const request = await axios.get('https://www.donationalerts.com/api/v1/user/oauth', { headers: { 'Authorization': `Bearer ${this.access_token}` } });
+      this.channel = request.data.data.name,
+      info(chalk.yellow('DONATIONALERTS:') + ` Access token check OK. Using channel ${this.channel}`);
+    } catch (e) {
+      error(chalk.yellow('DONATIONALERTS:') + ' Access token is not valid.');
+      this.channel = '';
       return;
-    } else {
-      reconnectionTimestamp = Date.now();
-    }
-
-    this.socketToDonationAlerts = new Centrifuge('wss://centrifugo.donationalerts.com/connection/websocket', {
-      websocket:          WebSocket,
-      onPrivateSubscribe: async ({ data }, cb) => {
-        const request = await axios.post('https://www.donationalerts.com/api/v1/centrifuge/subscribe', data, { headers: { 'Authorization': `Bearer ${this.access_token.trim()}` } });
-        cb({ status: 200, data: { channels: request.data.channels } });
-      },
-    });
-
-    const connectionOptions = await this.getOpts();
-
-    this.socketToDonationAlerts.setToken(connectionOptions.token);
-
-    await this.socketConnect();
-
-    this.socketToDonationAlerts.on('disconnect', (reason: unknown) => {
-      info(chalk.yellow('DONATIONALERTS.RU:') + ' Disconnected from socket: ' +  JSON.stringify(reason));
-      this.connect();
-    });
-
-    const channel = this.socketToDonationAlerts.subscribe(`$alerts:donation_${connectionOptions.id}`);
-    channel?.on('join', () => {
-      info(chalk.yellow('DONATIONALERTS.RU:') + ' Successfully joined in donations channel.');
-    });
-    channel?.on('leaved', (reason: unknown) => {
-      info(chalk.yellow('DONATIONALERTS.RU:') + ' Leaved from donations channel, reason: ' + JSON.stringify(reason));
-      this.connect();
-    });
-    channel?.on('error', (reason: unknown) => {
-      info(chalk.yellow('DONATIONALERTS.RU:') + ' Some error occured: ' +  JSON.stringify(reason));
-      this.connect();
-    });
-    channel?.on('unsubscribe', (reason: unknown) => {
-      info(chalk.yellow('DONATIONALERTS.RU:') + ' Unsubscribed, trying to resubscribe. Reason: ' +  JSON.stringify(reason));
-      this.connect();
-    });
-    channel?.on('publish', ({ data }: { data: DonationAlertsEvent }) => {
-      this.parseDonation(data);
-    });
-  }
-
-  async disconnect () {
-    if (this.socketToDonationAlerts !== null) {
-      this.socketToDonationAlerts.removeAllListeners();
-      this.socketToDonationAlerts.disconnect();
-      this.socketToDonationAlerts = null;
     }
   }
 
-  private async getOpts() {
-    if (this.access_token.trim() === '') {
-      throw new Error('Access token is empty.');
-    }
-
-    const request = await axios.get('https://www.donationalerts.com/api/v1/user/oauth', { headers: { 'Authorization': `Bearer ${this.access_token}` } });
-
-    return {
-      token: request.data.data.socket_connection_token,
-      id:    request.data.data.id,
-    };
-  }
-
-  private socketConnect() {
-    this.socketToDonationAlerts?.connect();
-    return new Promise<void>((resolve, reject) => {
-      this.socketToDonationAlerts?.on('connect', () => {
-        info(chalk.yellow('DONATIONALERTS.RU:') + ' Successfully connected socket to service.');
-        resolve();
-      });
-      setTimeout(() => {
-        if (!this.socketToDonationAlerts?.isConnected()) {
-          reject('Can\'t connect to DonationAlerts socket.');
-        }
-      }, 5 * 1000);
-    });
-  }
-
-  async parseDonation(data: DonationAlertsEvent) {
+  async parse(data: DonationAlertsResponse['data'][number]) {
     // we will save id to not parse it twice (websocket shenanigans may happen)
     if (parsedTips.includes(data.id)) {
       return;
@@ -196,24 +227,22 @@ class Donationalerts extends Integration {
       message:    data.message,
     });
 
-    if (data.billing_system !== 'fake') {
-      const user = await users.getUserByUsername(data.username);
-      const newTip: UserTipInterface = {
-        amount:        Number(data.amount),
-        currency:      data.currency,
-        sortAmount:    currency.exchange(Number(data.amount), data.currency, mainCurrency.value),
-        message:       data.message,
-        tippedAt:      timestamp,
-        exchangeRates: currency.rates,
-        userId:        user.userId,
-      };
-      getRepository(UserTip).save(newTip);
+    const user = await users.getUserByUsername(data.username);
+    const newTip: UserTipInterface = {
+      amount:        Number(data.amount),
+      currency:      data.currency,
+      sortAmount:    currency.exchange(Number(data.amount), data.currency, mainCurrency.value),
+      message:       data.message,
+      tippedAt:      timestamp,
+      exchangeRates: currency.rates,
+      userId:        user.userId,
+    };
+    getRepository(UserTip).save(newTip);
 
-      tip(`${data.username.toLowerCase()}${user.userId ? '#' + user.userId : ''}, amount: ${Number(data.amount).toFixed(2)}${data.currency}, message: ${data.message}`);
+    tip(`${data.username.toLowerCase()}${user.userId ? '#' + user.userId : ''}, amount: ${Number(data.amount).toFixed(2)}${data.currency}, message: ${data.message}`);
 
-      if (isStreamOnline.value) {
-        stats.value.currentTips = stats.value.currentTips + Number(currency.exchange(data.amount, data.currency, mainCurrency.value));
-      }
+    if (isStreamOnline.value) {
+      stats.value.currentTips = stats.value.currentTips + Number(currency.exchange(data.amount, data.currency, mainCurrency.value));
     }
 
     triggerInterfaceOnTip({
