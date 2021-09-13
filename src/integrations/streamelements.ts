@@ -96,7 +96,7 @@ class StreamElements extends Integration {
       let [total, tips] = await getTips(0, this.channel, this.jwtToken, beforeDate, this.afterDate);
 
       while (tips.length < total) {
-        tips = [...tips, ...await getTips(tips.length, this.channel, this.jwtToken, beforeDate, this.afterDate)];
+        tips = [...tips, ...(await getTips(tips.length, this.channel, this.jwtToken, beforeDate, this.afterDate))[1]];
       }
 
       for (const item of tips.filter(o => new Date(o.createdAt).getTime() >= this.afterDate)) {
