@@ -658,8 +658,12 @@ class API extends Core {
             // if we want title to be forced
             if (twitch.isTitleForced) {
               const game = gameCache.value;
-              info(`Title/game force enabled => ${game} | ${_rawStatus}`);
-              setTitleAndGame({});
+              if ((process.env.NODE_ENV || 'development') !== 'production') {
+                info(`Title/game force enabled (but disabled in debug mode) => ${game} | ${_rawStatus}`);
+              } else {
+                info(`Title/game force enabled => ${game} | ${_rawStatus}`);
+                setTitleAndGame({});
+              }
               return { state: true, opts };
             } else {
               info(`Title/game changed outside of a bot => ${request.data.data[0].game_name} | ${request.data.data[0].title}`);
