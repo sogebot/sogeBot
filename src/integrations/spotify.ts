@@ -355,7 +355,12 @@ class Spotify extends Integration {
     }
 
     if (this.retry.IRefreshToken >= 5) {
-      addUIError({ name: 'SPOTIFY', message: 'Refreshing access token failed.' });
+      addUIError({ name: 'SPOTIFY', message: 'Refreshing access token failed. Revoking access.' });
+      this.userId = null;
+      this._accessToken = null;
+      this._refreshToken = null;
+      this.username = '';
+      this.currentSong = JSON.stringify(null);
     }
     this.timeouts.IRefreshToken = global.setTimeout(() => this.IRefreshToken(), HOUR);
   }
@@ -436,10 +441,11 @@ class Spotify extends Integration {
                 .then((data) => {
                   this.username = data.body.display_name ? data.body.display_name : data.body.id;
                   resolve(true);
-                }, () => {
+                })
+                .catch(() => {
                   global.setTimeout(() => {
                     check();
-                  }, 1000);
+                  }, 10000);
                 });
             } else {
               resolve(true);
