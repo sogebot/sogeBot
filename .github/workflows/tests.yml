@@ -51,6 +51,7 @@ jobs:
         node-version: 14
         check-latest: true
     - name: Install latest npm
+      if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
       run: |
         npm install -g npm@latest
     - name: Install all dependencies and build just a bot
@@ -97,6 +98,7 @@ jobs:
         node-version: 14
         check-latest: true
     - name: Install latest npm
+      if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
       run: |
         npm install -g npm@latest
     - name: Install all dependencies and build just a bot
@@ -145,6 +147,7 @@ jobs:
         node-version: 14
         check-latest: true
     - name: Install latest npm
+      if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
       run: |
         npm install -g npm@latest
     - name: Install all dependencies and build just a bot
@@ -182,6 +185,7 @@ jobs:
         node-version: 14
         check-latest: true
     - name: Install latest npm
+      if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
       run: |
         npm install -g npm@latest
     - name: Install all dependencies and build everything
