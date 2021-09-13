@@ -51,7 +51,7 @@ function adminEndpoint (
   on: 'generic::getOne' | 'generic::deleteById' | 'customvariables::runScript' | 'customvariables::delete'
   | 'test.event' | 'alerts::deleteMedia' | 'alerts::getOneMedia' | 'randomizer::showById'
   | 'eventlist::resend' | 'viewers::followedAt' | 'quickactions::getAll'
-  | 'countdown::check' | 'stopwatch::check',
+  | 'countdown::check' | 'stopwatch::check' | 'donationalerts::validate',
   callback: (id: string, cb: (error: Error | string | null, ...response: any) => void) => void): void;
 
 // string + cb

@@ -1,3 +1,4 @@
+import { MINUTE, SECOND } from '@sogebot/ui-helpers/constants';
 import axios from 'axios';
 import Centrifuge from 'centrifuge';
 import chalk from 'chalk';
@@ -13,12 +14,14 @@ import { mainCurrency } from '../helpers/currency';
 import { eventEmitter } from '../helpers/events';
 import { triggerInterfaceOnTip } from '../helpers/interface/triggers.js';
 import { info, tip } from '../helpers/log.js';
+import { adminEndpoint } from '../helpers/socket.js';
 import eventlist from '../overlays/eventlist.js';
 import alerts from '../registries/alerts.js';
 import users from '../users.js';
 import Integration from './_interface';
 
 const parsedTips: string[] = [];
+let reconnectionTimestamp = 0;
 
 type DonationAlertsEvent = {
   id: string;
@@ -47,12 +50,34 @@ class Donationalerts extends Integration {
     }
   }
 
+  sockets() {
+    adminEndpoint(this.nsp, 'donationalerts::validate', (token, cb) => {
+      axios('https://www.donationalerts.com/api/v1/alerts/donations', {
+        method:  'GET',
+        headers: {
+          Accept:        'application/json',
+          Authorization: 'Bearer ' + token,
+        },
+      }).then(() => {
+        cb(null);
+      }).catch((e: unknown) => cb(e as Error));
+    });
+  }
+
   @onChange('access_token')
   async connect () {
     this.disconnect();
 
     if (this.access_token.trim() === '' || !this.enabled) {
       return;
+    }
+
+    if (Date.now() - reconnectionTimestamp < MINUTE) {
+      // wait a while to not hit rate limit
+      setTimeout(() => this.connect(), 10 * SECOND);
+      return;
+    } else {
+      reconnectionTimestamp = Date.now();
     }
 
     this.socketToDonationAlerts = new Centrifuge('wss://centrifugo.donationalerts.com/connection/websocket', {
