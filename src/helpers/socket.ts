@@ -42,7 +42,7 @@ function adminEndpoint (
   | 'removeCache' | 'testExplosion' | 'testFireworks' | 'test' | 'discord::authorize'
   | 'discord::getChannels' | 'discord::getRoles' | 'discord::getGuilds' | 'settings'
   | 'debug::get' | 'getLevelsExample' | 'profiler::load' | 'integration::obswebsocket::getCommand'
-  | 'songs::currentSong',
+  | 'songs::currentSong' | 'updater::check',
   callback: (cb: (error: Error | string | null, ...response: any) => void) => void | Promise<void>): void;
 
 // id + cb

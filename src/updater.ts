@@ -52,6 +52,11 @@ class Updater extends Core {
   }
 
   sockets() {
+    adminEndpoint(this.nsp, 'updater::check', async (cb) => {
+      info(`Manually triggered check for updater.`);
+      await this.checkUpdate();
+      cb(null, '');
+    });
     adminEndpoint(this.nsp, 'updater::trigger', async (opts, cb) => {
       info(`Update for ${opts.pkg}@${opts.version} manually triggered. Update processing.`);
       exec(`npm install ${opts.pkg}@${opts.version}`, (error, _, stderr) => {
