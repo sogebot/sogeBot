@@ -16,7 +16,7 @@ import {
 import { getRepository } from 'typeorm';
 
 import {
-  OverlayMapper, OverlayMapperAlerts, OverlayMapperClips, OverlayMapperClipsCarousel, OverlayMapperCountdown, OverlayMapperCredits, OverlayMapperEmotes, OverlayMapperEmotesCombo, OverlayMapperEmotesExplode, OverlayMapperEmotesFireworks, OverlayMapperEventlist, OverlayMapperGroup, OverlayMapperHypeTrain, OverlayMapperInterface, OverlayMapperOBSWebsocket, OverlayMapperPolls, OverlayMappers, OverlayMapperTTS,
+  OverlayMapper, OverlayMapperAlerts, OverlayMapperClips, OverlayMapperClipsCarousel, OverlayMapperCountdown, OverlayMapperCredits, OverlayMapperEmotes, OverlayMapperEmotesCombo, OverlayMapperEmotesExplode, OverlayMapperEmotesFireworks, OverlayMapperEventlist, OverlayMapperGroup, OverlayMapperHypeTrain, OverlayMapperInterface, OverlayMapperOBSWebsocket, OverlayMapperPolls, OverlayMappers, OverlayMapperStopwatch, OverlayMapperTTS,
 } from '../../database/entity/overlay';
 import { isBotStarted } from '../../helpers/database.js';
 
@@ -39,6 +39,13 @@ setInterval(async () => {
             currentTime: item.opts.currentTime - 1000,
           },
         });
+      }else if (item.value === 'stopwatch' && item.opts) {
+        await getRepository(OverlayMapper).update(id, {
+          opts: {
+            ...item.opts,
+            currentTime: item.opts.currentTime + 1000,
+          },
+        });
       }
     } else {
       // go through groups and find id
@@ -47,6 +54,8 @@ setInterval(async () => {
           group.opts.items.forEach((groupItem, index) => {
             if (groupItem.id === id && groupItem.type === 'countdown') {
               group.opts.items[index].opts.currentTime -= 1000;
+            }else if (groupItem.id === id && groupItem.type === 'stopwatch') {
+              group.opts.items[index].opts.currentTime += 1000;
             }
           });
         }
@@ -115,6 +124,7 @@ export class RegistryOverlayController extends Controller {
     @Path() id: string,
       @Body() data:
       Partial<OverlayMapperGroup>
+      | Partial<OverlayMapperStopwatch>
       | Partial<OverlayMapperCountdown>
       | Partial<OverlayMapperHypeTrain>
       | Partial<OverlayMapperAlerts>

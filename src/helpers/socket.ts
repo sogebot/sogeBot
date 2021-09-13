@@ -51,7 +51,7 @@ function adminEndpoint (
   on: 'generic::getOne' | 'generic::deleteById' | 'customvariables::runScript' | 'customvariables::delete'
   | 'test.event' | 'alerts::deleteMedia' | 'alerts::getOneMedia' | 'randomizer::showById'
   | 'eventlist::resend' | 'viewers::followedAt' | 'quickactions::getAll'
-  | 'countdown::check',
+  | 'countdown::check' | 'stopwatch::check',
   callback: (id: string, cb: (error: Error | string | null, ...response: any) => void) => void): void;
 
 // string + cb
@@ -76,6 +76,7 @@ function adminEndpoint (
 
 // non generic
 function adminEndpoint (nsp: string, on: 'countdown::update::set', callback: any) : void;
+function adminEndpoint (nsp: string, on: 'stopwatch::update::set', callback: any) : void;
 function adminEndpoint (nsp: string, on: 'eventlist::getUserEvents', callback: (username: string, cb: (error: Error | string | null, ...response: any) => void) => void): void;
 function adminEndpoint (nsp: string, on: 'eventlist::get', callback: (count: number, cb: (error: Error | string | null, ...response: any) => void) => void): void;
 function adminEndpoint (nsp: string, on: 'customvariables::list', callback: (cb: (error: Error | string | null, ...response: any) => void) => void): void;
