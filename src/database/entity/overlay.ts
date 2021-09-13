@@ -6,6 +6,31 @@ export interface OverlayMapperInterface {
   opts: null
 }
 
+export interface OverlayMapperStopwatch {
+  id: string;
+  value: 'stopwatch';
+  opts: null | {
+    currentTime: number;
+    isPersistent: boolean;
+    isStartedOnSourceLoad: boolean;
+    stopwatchFont: {
+      family: string;
+      size: number;
+      borderPx: number;
+      borderColor: string;
+      weight: number;
+      color: string;
+      shadow: {
+        shiftRight: number;
+        shiftDown: number;
+        blur: number;
+        opacity: number;
+        color: string;
+      }[];
+    }
+  },
+}
+
 export interface OverlayMapperCountdown {
   id: string;
   value: 'countdown';
@@ -235,7 +260,7 @@ export interface OverlayMapperGroup {
   }
 }
 
-export type OverlayMappers = OverlayMapperCountdown | OverlayMapperGroup | OverlayMapperEventlist | OverlayMapperEmotesCombo | OverlayMapperCredits | OverlayMapperClips | OverlayMapperAlerts | OverlayMapperEmotes | OverlayMapperEmotesExplode | OverlayMapperEmotesFireworks | OverlayMapperPolls | OverlayMapperTTS | OverlayMapperInterface | OverlayMapperOBSWebsocket | OverlayMapperClipsCarousel | OverlayMapperHypeTrain;
+export type OverlayMappers = OverlayMapperStopwatch | OverlayMapperCountdown | OverlayMapperGroup | OverlayMapperEventlist | OverlayMapperEmotesCombo | OverlayMapperCredits | OverlayMapperClips | OverlayMapperAlerts | OverlayMapperEmotes | OverlayMapperEmotesExplode | OverlayMapperEmotesFireworks | OverlayMapperPolls | OverlayMapperTTS | OverlayMapperInterface | OverlayMapperOBSWebsocket | OverlayMapperClipsCarousel | OverlayMapperHypeTrain;
 
 export const OverlayMapper = new EntitySchema<Readonly<Required<OverlayMappers>>>({
   name:    'overlay_mapper',

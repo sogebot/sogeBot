@@ -24,6 +24,12 @@ export type OverlayCountdownItem = QuickActions.defaultAttributes & {
     countdownId: string,
   },
 };
+export type OverlayStopwatchItem = QuickActions.defaultAttributes & {
+  type: 'overlayStopwatch',
+  options: QuickActions.defaultOptions & {
+    stopwatchId: string,
+  },
+};
 export declare namespace QuickActions {
   type defaultAttributes = {
     id: string,
@@ -36,7 +42,7 @@ export declare namespace QuickActions {
     color: string,
   };
 
-  type Item = CommandItem | CustomVariableItem | RandomizerItem | OverlayCountdownItem;
+  type Item = CommandItem | CustomVariableItem | RandomizerItem | OverlayCountdownItem | OverlayStopwatchItem;
 }
 
 export const QuickAction = new EntitySchema<Readonly<Required<QuickActions.Item>>>({
