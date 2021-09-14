@@ -894,14 +894,13 @@ class TMI extends Core {
   }
 
   @timer()
-  async cheer (message: Record<string, any>) {
+  async cheer (message: Record<string, any>): Promise<void> {
     try {
       const username = message.tags.username;
       const userId = message.tags.userId;
       const userstate = message.tags;
       // remove <string>X or <string>X from message, but exclude from remove #<string>X or !someCommand2
       const messageFromUser = message.message.replace(/(?<![#!])(\b\w+[\d]+\b)/g, '').trim();
-
       if (isIgnored({ username, userId })) {
         return;
       }
@@ -910,8 +909,7 @@ class TMI extends Core {
       if (!user) {
         // if we still doesn't have user, we create new
         await getRepository(User).save({ userId: userstate.userId, username });
-        this.cheer(message);
-        return;
+        return this.cheer(message);
       }
 
       eventlist.add({

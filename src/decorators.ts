@@ -382,23 +382,44 @@ export function timer() {
   return (_target: any, key: string | symbol, descriptor: any) => {
     const method = descriptor.value;
 
-    descriptor.value = async function (){
-      const Parser = require('./parser.js').Parser;
-      const Message = require('./message.js').Message;
+    if (method.constructor.name === 'AsyncFunction') {
+      descriptor.value = async function (){
+        const Parser = require('./parser.js').Parser;
+        const Message = require('./message.js').Message;
 
-      const start = Date.now();
-      // eslint-disable-next-line prefer-rest-params
-      const result = await method.apply(this, arguments);
-      if (this instanceof Parser) {
-        performance(`[PARSER#${this.id}|${String(key)}] ${Date.now() - start}ms`);
-      } else {
-        if (this instanceof Message) {
-          performance(`[MESSAGE#${this.id}|${String(key)}] ${Date.now() - start}ms`);
+        const start = Date.now();
+        // eslint-disable-next-line prefer-rest-params
+        const result = await method.apply(this, arguments);
+        if (this instanceof Parser) {
+          performance(`[PARSER#${this.id}|${String(key)}] ${Date.now() - start}ms`);
         } else {
-          performance(`[${this.constructor.name.toUpperCase()}|${String(key)}] ${Date.now() - start}ms`);
+          if (this instanceof Message) {
+            performance(`[MESSAGE#${this.id}|${String(key)}] ${Date.now() - start}ms`);
+          } else {
+            performance(`[${this.constructor.name.toUpperCase()}|${String(key)}] ${Date.now() - start}ms`);
+          }
         }
-      }
-      return result;
-    };
+        return result;
+      };
+    } else {
+      descriptor.value = function (){
+        const Parser = require('./parser.js').Parser;
+        const Message = require('./message.js').Message;
+
+        const start = Date.now();
+        // eslint-disable-next-line prefer-rest-params
+        const result = method.apply(this, arguments);
+        if (this instanceof Parser) {
+          performance(`[PARSER#${this.id}|${String(key)}] ${Date.now() - start}ms`);
+        } else {
+          if (this instanceof Message) {
+            performance(`[MESSAGE#${this.id}|${String(key)}] ${Date.now() - start}ms`);
+          } else {
+            performance(`[${this.constructor.name.toUpperCase()}|${String(key)}] ${Date.now() - start}ms`);
+          }
+        }
+        return result;
+      };
+    }
   };
 }

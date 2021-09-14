@@ -7,7 +7,7 @@ import fetch from 'node-fetch';
 import { timer } from '../../decorators.js';
 import { info } from '../log';
 import {
-  globalIgnoreListExclude, ignorelist, isIgnoredCache, 
+  globalIgnoreListExclude, ignorelist, isIgnoredCache,
 } from '../tmi/ignoreList';
 import { isBroadcaster } from './isBroadcaster';
 

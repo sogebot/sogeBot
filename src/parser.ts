@@ -110,11 +110,15 @@ class Parser {
     setTimeout(() => {
       // run fire and forget first
       for (const parser of parsers.filter(o => o.fireAndForget)) {
-        parserEmitter.emit('fireAndForget', {
-          this: parser.this,
-          fnc:  parser.fnc,
-          opts,
-        });
+        if (this.skip && parser.skippable) {
+          debug('parser.process', 'Skipped ' + parser.name);
+        } else {
+          parserEmitter.emit('fireAndForget', {
+            this: parser.this,
+            fnc:  parser.fnc,
+            opts,
+          });
+        }
       }
     }, 0);
 

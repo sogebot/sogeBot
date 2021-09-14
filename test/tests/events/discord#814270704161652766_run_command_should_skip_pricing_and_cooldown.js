@@ -1,4 +1,4 @@
-/* global describe it before */
+/* global */
 
 const assert = require('assert');
 
@@ -57,9 +57,9 @@ describe('Events - event run command should be able to skip pricing and cooldown
     });
 
     it('parsers should be skipped', async () => {
-      await message.debug('parser.process', 'Skipped Cooldown.check (fireAndForget: false)');
-      await message.debug('parser.process', 'Skipped Price.check (fireAndForget: false)');
-      await message.debug('parser.process', 'Skipped Points.messagePoints (fireAndForget: true)');
+      await message.debug('parser.process', 'Skipped Cooldown.check');
+      await message.debug('parser.process', 'Skipped Price.check');
+      await message.debug('parser.process', 'Skipped Points.messagePoints');
     });
 
     it('command should be triggered', async () => {
