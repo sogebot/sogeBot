@@ -1,6 +1,7 @@
 import { TextChannel } from 'discord.js';
 import _ from 'lodash';
 
+import { timer } from './decorators.js';
 import { prepare } from './helpers/commons/prepare';
 import { sendMessage } from './helpers/commons/sendMessage';
 import { chatOut, warning } from './helpers/log';
@@ -12,46 +13,58 @@ const isParserOpts = (opts: ParserOptions | { id?: undefined, sender: CommandOpt
   return typeof opts.id !== 'undefined';
 };
 
-export async function parserReply(response: string | Promise<string>, opts: ParserOptions | { id?: undefined, sender: CommandOptions['sender']; attr?: CommandOptions['attr'] }, messageType: 'chat' | 'whisper' = 'chat') {
-  if (!opts.sender) {
-    return;
-  }
-  const senderObject = {
-    ..._.cloneDeep(opts.sender),
-    'message-type': messageType,
-    forceWithoutAt: typeof opts.sender.discord !== 'undefined', // we dont need @
-  };
-  const messageToSend = await (async () => {
+// We need to add it to class to be able to use @timer decorator
+class Commons {
+  @timer()
+  async messageToSend(senderObject: any, response: string | Promise<string>, opts: ParserOptions | { id?: undefined, sender: CommandOptions['sender']; attr?: CommandOptions['attr'] }): Promise<string> {
     const sender = senderObject.discord
       ? { ...senderObject, discord: { author: senderObject.discord.author, channel: senderObject.discord.channel } } : senderObject;
     if (isParserOpts(opts) ? opts.skip : opts.attr?.skip) {
       return prepare(await response as string, { ...opts, sender }, false);
     } else {
-      return await new Message(await response as string).parse({ ...opts, sender }) as string;
+      return new Message(await response as string).parse({ ...opts, sender });
     }
-  })();
-  if (opts.sender.discord) {
-    if (Discord.client) {
-      if (messageType === 'chat') {
-        const msg = await opts.sender.discord.channel.send(messageToSend);
-        chatOut(`#${(opts.sender.discord.channel as TextChannel).name}: ${messageToSend} [${Discord.client.user?.tag}]`);
-        if (Discord.deleteMessagesAfterWhile) {
-          setTimeout(() => {
-            msg.delete().catch(() => {
-              return;
-            });
-          }, 10000);
+  }
+
+  @timer()
+  async parserReply(response: string | Promise<string>, opts: ParserOptions | { id?: undefined, sender: CommandOptions['sender']; attr?: CommandOptions['attr'] }, messageType: 'chat' | 'whisper' = 'chat') {
+    if (!opts.sender) {
+      return;
+    }
+    const senderObject = {
+      ..._.cloneDeep(opts.sender),
+      'message-type': messageType,
+      forceWithoutAt: typeof opts.sender.discord !== 'undefined', // we dont need @
+    };
+    const messageToSend = await this.messageToSend(senderObject, response, opts);
+    if (opts.sender.discord) {
+      if (Discord.client) {
+        if (messageType === 'chat') {
+          const msg = await opts.sender.discord.channel.send(messageToSend);
+          chatOut(`#${(opts.sender.discord.channel as TextChannel).name}: ${messageToSend} [${Discord.client.user?.tag}]`);
+          if (Discord.deleteMessagesAfterWhile) {
+            setTimeout(() => {
+              msg.delete().catch(() => {
+                return;
+              });
+            }, 10000);
+          }
+        } else {
+          opts.sender.discord.author.send(messageToSend);
         }
       } else {
-        opts.sender.discord.author.send(messageToSend);
+        warning('Discord client is not connected');
       }
     } else {
-      warning('Discord client is not connected');
+      // we skip as we are already parsing message
+      sendMessage(messageToSend, senderObject, { skip: true, ...(isParserOpts(opts) ? {} : opts.attr) });
     }
-  } else {
-    // we skip as we are already parsing message
-    sendMessage(messageToSend, senderObject, { skip: true, ...(isParserOpts(opts) ? {} : opts.attr) });
   }
+}
+const commons = new Commons();
+
+export async function parserReply(response: string | Promise<string>, opts: ParserOptions | { id?: undefined, sender: CommandOptions['sender']; attr?: CommandOptions['attr'] }, messageType: 'chat' | 'whisper' = 'chat') {
+  commons.parserReply(response, opts, messageType);
 }
 
 export function getChannel() {

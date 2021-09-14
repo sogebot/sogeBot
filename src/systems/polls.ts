@@ -62,11 +62,9 @@ class Polls extends System {
     });
   }
 
-  sendResponse(responses: CommandResponse[]) {
+  async sendResponse(responses: CommandResponse[]) {
     for (let i = 0; i < responses.length; i++) {
-      setTimeout(async () => {
-        parserReply(await responses[i].response, { sender: responses[i].sender });
-      }, i * 500);
+      await parserReply(responses[i].response, { sender: responses[i].sender });
     }
   }
 

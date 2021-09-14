@@ -4,11 +4,41 @@ import { HOUR } from '@sogebot/ui-helpers/constants';
 import { cloneDeep, isEqual } from 'lodash';
 import fetch from 'node-fetch';
 
+import { timer } from '../../decorators.js';
 import { info } from '../log';
-import { globalIgnoreListExclude, ignorelist } from '../tmi/ignoreList';
+import {
+  globalIgnoreListExclude, ignorelist, isIgnoredCache, 
+} from '../tmi/ignoreList';
 import { isBroadcaster } from './isBroadcaster';
 
 let globalIgnoreList = JSON.parse(readFileSync('./assets/globalIgnoreList.json', 'utf8'));
+
+class HelpersUserIsIgnored {
+  @timer()
+  isIgnored(sender: { username: string | null; userId?: string }) {
+    if (sender.username === null) {
+      return false; // null can be bot from dashboard or event
+    }
+
+    if (sender.userId && isIgnoredCache.has(sender.userId)) {
+      return isIgnoredCache.get(sender.userId);
+    }
+
+    if (isIgnoredCache.has(sender.username)) {
+      return isIgnoredCache.get(sender.username);
+    }
+
+    const isInIgnoreList = getIgnoreList().includes(sender.username) || getIgnoreList().includes(sender.userId);
+    const isIgnoredCheck = (isInGlobalIgnoreList(sender) || isInIgnoreList) && !isBroadcaster(sender);
+
+    if (sender.userId) {
+      isIgnoredCache.set(sender.userId, isIgnoredCheck);
+    }
+    isIgnoredCache.set(sender.username, isIgnoredCheck);
+    return isIgnoredCheck;
+  }
+}
+const cl = new HelpersUserIsIgnored();
 
 export function isInGlobalIgnoreList (sender: { username: string | null; userId?: string }) {
   return typeof getGlobalIgnoreList().find(data => {
@@ -17,13 +47,7 @@ export function isInGlobalIgnoreList (sender: { username: string | null; userId?
 }
 
 export function isIgnored(sender: { username: string | null; userId?: string }) {
-  if (sender.username === null) {
-    return false; // null can be bot from dashboard or event
-  }
-
-  const isInIgnoreList = getIgnoreList().includes(sender.username) || getIgnoreList().includes(sender.userId);
-
-  return (isInGlobalIgnoreList(sender) || isInIgnoreList) && !isBroadcaster(sender);
+  return cl.isIgnored(sender);
 }
 
 export function getIgnoreList() {
@@ -44,6 +68,7 @@ const update = async () => {
     if (!isEqual(data, globalIgnoreList)) {
       globalIgnoreList = cloneDeep(data);
       info('IGNORELIST: updated ignorelist from github');
+      isIgnoredCache.clear();
     }
   }
 };

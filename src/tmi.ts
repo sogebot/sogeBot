@@ -171,6 +171,7 @@ class TMI extends Core {
         ],
         )];
       // update ignore list
+
       return [{ response: prepare('ignore.user.is.added', { username }), ...opts }];
     } catch (e: any) {
       error(e.stack);
@@ -962,9 +963,7 @@ class TMI extends Core {
             }
             const responses = await new Parser().command(getUserSender(userId, username), messageFromUser, true);
             for (let i = 0; i < responses.length; i++) {
-              setTimeout(async () => {
-                parserReply(await responses[i].response, { sender: responses[i].sender, attr: responses[i].attr });
-              }, 500 * i);
+              await parserReply(responses[i].response, { sender: responses[i].sender, attr: responses[i].attr });
             }
             if (price.emitRedeemEvent) {
               redeemTriggered = true;
@@ -1047,8 +1046,11 @@ class TMI extends Core {
       chatIn(`${message} [${sender.username}]`);
     }
 
-    const isModerated = await parse.isModerated();
-    if (!isModerated && !isIgnored(sender)) {
+    // we need to moderate ignored users as well
+    const [isModerated, isIgnoredCheck] = await Promise.all(
+      [parse.isModerated(), isIgnored(sender)],
+    );
+    if (!isModerated && !isIgnoredCheck) {
       if (!skip && !isNil(sender.username)) {
         const subCumulativeMonths = function(senderObj: UserStateTags) {
           if (typeof senderObj.badgeInfo === 'string' && senderObj.badgeInfo.includes('subscriber')) {
