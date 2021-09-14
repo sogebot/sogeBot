@@ -16,7 +16,7 @@ import { Price } from './database/entity/price';
 import {
   User, UserBit, UserBitInterface,
 } from './database/entity/user';
-import { settings } from './decorators';
+import { settings, timer } from './decorators';
 import { command, default_permission } from './decorators';
 import {
   getFunctionList, onChange, onLoad, onStreamStart,
@@ -554,6 +554,7 @@ class TMI extends Core {
     }
   }
 
+  @timer()
   async usernotice(message: UserNoticeMessages) {
     debug('tmi.usernotice', message);
     if (message.event === 'RAID') {
@@ -612,6 +613,7 @@ class TMI extends Core {
     }
   }
 
+  @timer()
   async subscription (message: Record<string, any>) {
     try {
       const username = message.tags.login;
@@ -684,6 +686,7 @@ class TMI extends Core {
     }
   }
 
+  @timer()
   async resub (message: Record<string, any>) {
     try {
       const username = message.tags.login;
@@ -767,6 +770,7 @@ class TMI extends Core {
     }
   }
 
+  @timer()
   async subscriptionGiftCommunity (message: any) {
     try {
       const username = message.tags.login;
@@ -806,6 +810,7 @@ class TMI extends Core {
     }
   }
 
+  @timer()
   async subgift (message: Record<string, any>) {
     try {
       const username = message.tags.login;
@@ -887,6 +892,7 @@ class TMI extends Core {
     }
   }
 
+  @timer()
   async cheer (message: Record<string, any>) {
     try {
       const username = message.tags.username;
@@ -1008,6 +1014,7 @@ class TMI extends Core {
     this.client[client]?.chat.say(getOwner(), '/delete ' + msgId);
   }
 
+  @timer()
   async message (data: { skip?: boolean, quiet?: boolean, message: Pick<Message, 'message' | 'tags'>}) {
     // ignore if it is part of custom reward // we have it already logged in redeem log
     if (data.message.tags.customRewardId) {
@@ -1101,9 +1108,7 @@ class TMI extends Core {
       }
       const responses = await parse.process();
       for (let i = 0; i < responses.length; i++) {
-        setTimeout(() => {
-          sendMessage(responses[i].response, responses[i].sender, responses[i].attr);
-        }, 500 * i);
+        await sendMessage(responses[i].response, responses[i].sender, responses[i].attr);
       }
     }
   }

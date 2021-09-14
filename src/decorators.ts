@@ -7,7 +7,7 @@ import { xor } from 'lodash';
 import type { Module } from './_interface';
 import { isDbConnected } from './helpers/database';
 import {
-  debug, error, performance, 
+  debug, error, performance,
 } from './helpers/log';
 import { defaultPermissions } from './helpers/permissions/defaultPermissions';
 import { find } from './helpers/register';
@@ -384,12 +384,19 @@ export function timer() {
 
     descriptor.value = async function (){
       const Parser = require('./parser.js').Parser;
+      const Message = require('./message.js').Message;
 
       const start = Date.now();
       // eslint-disable-next-line prefer-rest-params
       const result = await method.apply(this, arguments);
       if (this instanceof Parser) {
         performance(`[PARSER#${this.id}|${String(key)}] ${Date.now() - start}ms`);
+      } else {
+        if (this instanceof Message) {
+          performance(`[MESSAGE#${this.id}|${String(key)}] ${Date.now() - start}ms`);
+        } else {
+          performance(`[${this.constructor.name.toUpperCase()}|${String(key)}] ${Date.now() - start}ms`);
+        }
       }
       return result;
     };
