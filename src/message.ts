@@ -2,9 +2,11 @@ import axios from 'axios';
 import gitCommitInfo from 'git-commit-info';
 import _ from 'lodash';
 import { getRepository, In } from 'typeorm';
+import { v4 } from 'uuid';
 
 import { EventList } from './database/entity/eventList';
 import { User } from './database/entity/user';
+import { timer } from './decorators.js';
 import {
   command, count, custom, evaluate, ifp, info, list, math, online, param, price, qs, random, ResponseFilter, stream, youtube,
 } from './filters';
@@ -20,12 +22,19 @@ import users from './users';
 
 class Message {
   message = '';
+  id = v4();
 
   constructor (message: string) {
     this.message = message;
   }
 
+  @timer()
   async global (opts: { escape?: string, sender?: CommandOptions['sender'] }) {
+    if (!this.message.includes('$')) {
+      // message doesn't have any variables
+      return this.message;
+    }
+
     const variables = {
       game:            stats.value.currentGame,
       language:        stats.value.language,
@@ -44,8 +53,10 @@ class Message {
       this.message = this.message.replace(regexp, String(variables[variable as keyof typeof variables] ?? ''));
     }
 
-    const version = _.get(process, 'env.npm_package_version', 'x.y.z');
-    this.message = this.message.replace(/\$version/g, version.replace('SNAPSHOT', gitCommitInfo().shortHash || 'SNAPSHOT'));
+    if (this.message.includes('$version')) {
+      const version = _.get(process, 'env.npm_package_version', 'x.y.z');
+      this.message = this.message.replace(/\$version/g, version.replace('SNAPSHOT', gitCommitInfo().shortHash || 'SNAPSHOT'));
+    }
 
     if (this.message.includes('$latestFollower')) {
       const latestFollower = await getRepository(EventList).findOne({ order: { timestamp: 'DESC' }, where: { event: 'follow' } });
@@ -114,6 +125,7 @@ class Message {
     return this.message;
   }
 
+  @timer()
   async parse (attr: { [name: string]: any, sender: CommandOptions['sender'], 'message-type'?: string, forceWithoutAt?: boolean } = { sender: getBotSender() }) {
     this.message = await this.message; // if is promise
 
@@ -154,6 +166,7 @@ class Message {
     return this.message;
   }
 
+  @timer()
   async parseMessageApi () {
     if (this.message.trim().length === 0) {
       return;
@@ -198,6 +211,7 @@ class Message {
     }
   }
 
+  @timer()
   async parseMessageCommand (filters: ResponseFilter, attr: Parameters<ResponseFilter[string]>[1]) {
     if (this.message.trim().length === 0) {
       return;
@@ -217,6 +231,7 @@ class Message {
     }
   }
 
+  @timer()
   async parseMessageOnline (filters: ResponseFilter, attr: Parameters<ResponseFilter[string]>[1]) {
     if (this.message.trim().length === 0) {
       return;
@@ -240,6 +255,7 @@ class Message {
     }
   }
 
+  @timer()
   async parseMessageEval (filters: ResponseFilter, attr: Parameters<ResponseFilter[string]>[1]) {
     if (this.message.trim().length === 0) {
       return;
@@ -263,6 +279,7 @@ class Message {
     }
   }
 
+  @timer()
   async parseMessageVariables (filters: ResponseFilter, attr: Parameters<ResponseFilter[string]>[1], removeWhenEmpty = true) {
     if (this.message.trim().length === 0) {
       return;
@@ -285,6 +302,7 @@ class Message {
     }
   }
 
+  @timer()
   async parseMessageEach (filters: ResponseFilter, attr: Parameters<ResponseFilter[string]>[1], removeWhenEmpty = true) {
     if (this.message.trim().length === 0) {
       return;
