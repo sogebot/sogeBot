@@ -21,6 +21,7 @@ import {
 } from '../helpers/permissions';
 import { check, defaultPermissions } from '../helpers/permissions/';
 import { adminEndpoint, publicEndpoint } from '../helpers/socket';
+import Parser from '../parser';
 import { translate } from '../translate';
 import System from './_interface';
 import customcommands from './customcommands';
@@ -147,7 +148,7 @@ class Alias extends System {
         break;
       } // command is correct (have same number of parameters as command)
 
-      const parsedCmd = await opts.parser.find(cmdArray.join(' '), null);
+      const parsedCmd = await (opts.parser || new Parser()).find(cmdArray.join(' '), null);
       const isRegistered = !_.isNil(parsedCmd) && parsedCmd.command.split(' ').length === cmdArray.length;
 
       if (isRegistered) {
@@ -176,7 +177,7 @@ class Alias extends System {
               },
             });
           debug('alias.process', response);
-          const responses = await opts.parser.command(opts.sender, response, true);
+          const responses = await (opts.parser || new Parser()).command(opts.sender, response, true);
           debug('alias.process', responses);
           for (let i = 0; i < responses.length; i++) {
             await parserReply(responses[i].response, { sender: responses[i].sender, attr: responses[i].attr });

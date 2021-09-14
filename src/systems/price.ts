@@ -17,6 +17,7 @@ import { defaultPermissions } from '../helpers/permissions/';
 import { getPointsName } from '../helpers/points';
 import { adminEndpoint } from '../helpers/socket';
 import { isOwner } from '../helpers/user';
+import Parser from '../parser';
 import { translate } from '../translate';
 import System from './_interface';
 import points from './points';
@@ -155,7 +156,7 @@ class Price extends System {
     if (!opts.sender || !parsed || isOwner(opts.sender)) {
       return true; // skip if not command or user is owner
     }
-    const helpers = (await opts.parser.getCommandsList()).filter(o => o.isHelper).map(o => o.command);
+    const helpers = (await (opts.parser || new Parser()).getCommandsList()).filter(o => o.isHelper).map(o => o.command);
     if (helpers.includes(opts.message)) {
       return true;
     }
@@ -193,7 +194,7 @@ class Price extends System {
       return true;
     }
     const parsed = opts.message.match(/^(![\S]+)/);
-    const helpers = (await opts.parser.getCommandsList()).filter(o => o.isHelper).map(o => o.command);
+    const helpers = (await (opts.parser || new Parser()).getCommandsList()).filter(o => o.isHelper).map(o => o.command);
     if (
       _.isNil(parsed)
       || isOwner(opts.sender)
