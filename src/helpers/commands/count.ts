@@ -17,7 +17,7 @@ export async function getCountOfCommandUsage (command: string): Promise<number> 
   return (await getRepository(CommandsCount).count({ command }) + count.filter(o => o.command === command).length);
 }
 
-export async function incrementCountOfCommandUsage (command: string): Promise<void> {
+export function incrementCountOfCommandUsage (command: string): void {
   count.push({ command, timestamp: Date.now() });
 }
 
