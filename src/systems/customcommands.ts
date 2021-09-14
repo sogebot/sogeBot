@@ -7,7 +7,7 @@ import {
   Commands, CommandsInterface, CommandsResponsesInterface,
 } from '../database/entity/commands';
 import {
-  command, default_permission, helper,
+  command, default_permission, helper, timer,
 } from '../decorators';
 import { parser } from '../decorators';
 import Expects from '../expects';
@@ -270,7 +270,8 @@ class CustomCommands extends System {
     }
   }
 
-  @parser({ priority: constants.LOW, fireAndForget: true })
+  @timer()
+  @parser({ priority: constants.HIGHEST, fireAndForget: true })
   async run (opts: ParserOptions & { quiet?: boolean, processedCommands?: string[] }): Promise<boolean> {
     if (!opts.message.startsWith('!') || !opts.sender) {
       return true;
@@ -292,14 +293,14 @@ class CustomCommands extends System {
       const _responses: CommandsResponsesInterface[] = [];
       // remove found command from message to get param
       const param = opts.message.replace(new RegExp('^(' + cmd.cmdArray.join(' ') + ')', 'i'), '').trim();
-      await incrementCountOfCommandUsage(cmd.command.command);
+      incrementCountOfCommandUsage(cmd.command.command);
       for (const r of _.orderBy(cmd.command.responses, 'order', 'asc')) {
         if (typeof getFromViewersCache(opts.sender.userId, r.permission) === 'undefined') {
           addToViewersCache(opts.sender.userId, r.permission, (await check(opts.sender.userId, r.permission, false)).access);
         }
 
         if ((opts.skip || getFromViewersCache(opts.sender.userId, r.permission))
-            && await checkFilter(opts, r.filter)) {
+            && (r.filter.length === 0 || (r.filter.length > 0 && await checkFilter(opts, r.filter)))) {
           _responses.push(r);
           atLeastOnePermissionOk = true;
           if (r.stopIfExecuted) {
@@ -317,11 +318,9 @@ class CustomCommands extends System {
     return atLeastOnePermissionOk;
   }
 
-  sendResponse(responses: (CommandsResponsesInterface)[], opts: { param: string; sender: CommandOptions['sender'], command: string, processedCommands?: string[] }) {
+  async sendResponse(responses: (CommandsResponsesInterface)[], opts: { param: string; sender: CommandOptions['sender'], command: string, processedCommands?: string[] }) {
     for (let i = 0; i < responses.length; i++) {
-      setTimeout(async () => {
-        parserReply(await responses[i].response, opts);
-      }, i * 500);
+      await parserReply(responses[i].response, opts);
     }
   }
 

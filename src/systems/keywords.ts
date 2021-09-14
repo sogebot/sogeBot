@@ -7,7 +7,7 @@ import {
   Keyword, KeywordInterface, KeywordsResponsesInterface,
 } from '../database/entity/keyword';
 import {
-  command, default_permission, helper, parser,
+  command, default_permission, helper, parser, timer,
 } from '../decorators';
 import Expects from '../expects';
 import { checkFilter } from '../helpers/checkFilter';
@@ -343,6 +343,7 @@ class Keywords extends System {
    * @param {ParserOptions} opts
    * @return true
    */
+  @timer()
   @parser({ fireAndForget: true })
   public async run(opts: ParserOptions) {
     if (!opts.sender || opts.message.trim().startsWith('!')) {
@@ -369,7 +370,7 @@ class Keywords extends System {
         }
 
         if (getFromViewersCache(opts.sender.userId, r.permission)
-            && await checkFilter(opts, r.filter)) {
+          && (r.filter.length === 0 || (r.filter.length > 0 && await checkFilter(opts, r.filter)))) {
           _responses.push(r);
           atLeastOnePermissionOk = true;
           if (r.stopIfExecuted) {
@@ -384,11 +385,9 @@ class Keywords extends System {
     return atLeastOnePermissionOk;
   }
 
-  sendResponse(responses: (KeywordsResponsesInterface)[], opts: { sender: CommandOptions['sender'] }) {
+  async sendResponse(responses: (KeywordsResponsesInterface)[], opts: { sender: CommandOptions['sender'] }) {
     for (let i = 0; i < responses.length; i++) {
-      setTimeout(async () => {
-        parserReply(await responses[i].response, opts);
-      }, i * 500);
+      await parserReply(responses[i].response, opts);
     }
   }
 }

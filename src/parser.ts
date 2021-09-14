@@ -25,6 +25,12 @@ parserEmitter.on('process', async (opts, cb) => {
   cb(await (new Parser(opts)).process());
 });
 
+parserEmitter.on('fireAndForget', async (opts) => {
+  setImmediate(() => {
+    opts.fnc.apply(opts.this, [opts.opts]);
+  });
+});
+
 class Parser {
   id = uuid();
   started_at = Date.now();
@@ -90,11 +96,33 @@ class Parser {
     debug('parser.process', 'PROCESS START of "' + this.message + '"');
 
     const parsers = this.cachedParsers ? this.cachedParsers : await this.parsers();
-    for (const parser of parsers) {
-      if (parser.priority === constants.MODERATION) {
-        continue;
-      } // skip moderation parsers
 
+    const text = this.message.trim().replace(/^(!\w+)/i, '');
+    const opts: ParserOptions = {
+      id:         this.id,
+      sender:     this.sender,
+      message:    this.message.trim(),
+      parameters: text.trim(),
+      skip:       this.skip,
+      parser:     this,
+    };
+
+    setTimeout(() => {
+      // run fire and forget first
+      for (const parser of parsers.filter(o => o.fireAndForget)) {
+        if (this.skip && parser.skippable) {
+          debug('parser.process', 'Skipped ' + parser.name);
+        } else {
+          parserEmitter.emit('fireAndForget', {
+            this: parser.this,
+            fnc:  parser.fnc,
+            opts,
+          });
+        }
+      }
+    }, 0);
+
+    for (const parser of parsers.filter(o => !o.fireAndForget && o.priority !== constants.MODERATION)) {
       if (this.sender) {
         const permissionCheckTime = Date.now();
         if (typeof getFromViewersCache(this.sender.userId, parser.permission) === 'undefined') {
@@ -112,45 +140,32 @@ class Parser {
           || this.skip
           || getFromViewersCache(this.sender.userId, parser.permission))
       ) {
-        debug('parser.process', 'Processing ' + parser.name + ' (fireAndForget: ' + parser.fireAndForget + ')');
-        const text = this.message.trim().replace(/^(!\w+)/i, '');
-        const opts: ParserOptions = {
-          id:         this.id,
-          sender:     this.sender,
-          message:    this.message.trim(),
-          parameters: text.trim(),
-          skip:       this.skip,
-          parser:     this,
-        };
+        debug('parser.process', 'Processing ' + parser.name);
 
         const time = Date.now();
-        if (parser.fireAndForget) {
-          setTimeout(() => parser.fnc.apply(parser.this, [opts], 1));
-        } else {
-          const status = await parser.fnc.apply(parser.this, [opts]);
-          if (!status) {
-            const rollbacks = await this.rollbacks();
-            for (const r of rollbacks) {
-              // rollback is needed (parser ran successfully)
-              if (this.successfullParserRuns.find((o) => {
-                const parserSystem = o.name.split('.')[0];
-                const rollbackSystem = r.name.split('.')[0];
-                return parserSystem === rollbackSystem;
-              })) {
-                debug('parser.process', 'Rollbacking ' + r.name);
-                await r.fnc.apply(r.this, [opts]);
-              } else {
-                debug('parser.process', 'Rollback skipped for ' + r.name);
-              }
+        const status = await parser.fnc.apply(parser.this, [opts]);
+        if (!status) {
+          const rollbacks = await this.rollbacks();
+          for (const r of rollbacks) {
+            // rollback is needed (parser ran successfully)
+            if (this.successfullParserRuns.find((o) => {
+              const parserSystem = o.name.split('.')[0];
+              const rollbackSystem = r.name.split('.')[0];
+              return parserSystem === rollbackSystem;
+            })) {
+              debug('parser.process', 'Rollbacking ' + r.name);
+              await r.fnc.apply(r.this, [opts]);
+            } else {
+              debug('parser.process', 'Rollback skipped for ' + r.name);
             }
-            return [];
-          } else {
-            this.successfullParserRuns.push({ name: parser.name, opts }); // need to save opts for permission rollback
           }
+          return [];
+        } else {
+          this.successfullParserRuns.push({ name: parser.name, opts }); // need to save opts for permission rollback
         }
-        debug('parser.time', 'Processed ' + parser.name + ' (fireAndForget: ' + parser.fireAndForget + ') took ' + ((Date.now() - time) / 1000));
+        debug('parser.time', 'Processed ' + parser.name + ' took ' + ((Date.now() - time) / 1000));
       } else {
-        debug('parser.process', 'Skipped ' + parser.name + ' (fireAndForget: ' + parser.fireAndForget + ')');
+        debug('parser.process', 'Skipped ' + parser.name);
       }
     }
 

@@ -9,6 +9,12 @@ interface Events {
       quiet: boolean
     },
     callback: (responses: CommandResponse[]) => void) => void;
+  'fireAndForget': (
+    opts: {
+      this: any,
+      fnc: any,
+      opts: ParserOptions,
+    }) => void;
 }
 
 class _ParserEmitter extends TypedEmitter<Events> {}

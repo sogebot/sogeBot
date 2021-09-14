@@ -40,7 +40,7 @@ const perfFile = createStream(perfFileName, {
   maxFiles: 5,
 });
 
-perfFile.write(`====================== ${new Date().toLocaleString()} ======================\n`);
+perfFile.write(`====================== ${dayjs().tz(timezone).format('YYYY-MM-DD[T]HH:mm:ss.SSS')} ======================\n`);
 
 // until https://github.com/typescript-eslint/typescript-eslint/pull/1898 fixed
 /* eslint-disable */
@@ -145,7 +145,7 @@ export function performance(message:string) {
   if (isDebugEnabled('performance')) {
     process.stdout.write(message.replace(/ /g, '\t') + '\n');
   }
-  perfFile.write((message.replace(/ /g, '\t')) + os.EOL);
+  perfFile.write(dayjs().tz(timezone).format('YYYY-MM-DD[T]HH:mm:ss.SSS') + ' ' + (message.replace(/ /g, '\t')) + os.EOL);
 }
 
 /* * category will be always shown */

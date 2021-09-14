@@ -89,9 +89,7 @@ const command: ResponseFilter = {
     }
     const responses = await new Parser().command(attr.sender, cmd, true);
     for (let i = 0; i < responses.length; i++) {
-      setTimeout(async () => {
-        parserReply(await responses[i].response, { sender: responses[i].sender, attr: responses[i].attr });
-      }, 500 * i);
+      await parserReply(responses[i].response, { sender: responses[i].sender, attr: responses[i].attr });
     }
     return '';
   },

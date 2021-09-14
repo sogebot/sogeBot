@@ -127,9 +127,7 @@ const trigger = async (item: QuickActions.Item, user: { userId: string, username
       const parser = new (require('../parser').default)();
       const responses = await parser.command(getUserSender(user.userId, user.username), item.options.command, true);
       for (let i = 0; i < responses.length; i++) {
-        setTimeout(async () => {
-          parserReply(await responses[i].response, { sender: responses[i].sender, attr: responses[i].attr });
-        }, 500 * i);
+        await parserReply(responses[i].response, { sender: responses[i].sender, attr: responses[i].attr });
       }
 
       break;

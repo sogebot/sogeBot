@@ -191,7 +191,7 @@ interface ParserOptions {
   parameters: string;
   message: string;
   skip: boolean;
-  parser: import('../src/parser.js').default;
+  parser?: import('../src/parser.js').default;
 }
 
 interface Vote {

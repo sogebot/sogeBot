@@ -20,6 +20,7 @@ import { getUserHighestPermission } from '../helpers/permissions/';
 import { defaultPermissions } from '../helpers/permissions/';
 import { adminEndpoint } from '../helpers/socket';
 import { isOwner } from '../helpers/user';
+import Parser from '../parser';
 import { translate } from '../translate';
 import System from './_interface';
 import alias from './alias';
@@ -195,7 +196,7 @@ class Cooldown extends System {
         let name = subcommand ? `${cmd} ${subcommand}` : cmd;
         let isFound = false;
 
-        const parsed = await (opts.parser.find(subcommand ? `${cmd} ${subcommand}` : cmd, null));
+        const parsed = await ((opts.parser || new Parser()).find(subcommand ? `${cmd} ${subcommand}` : cmd, null));
         if (parsed) {
           debug('cooldown.check', `Command found ${parsed.command}`);
           name = parsed.command;
