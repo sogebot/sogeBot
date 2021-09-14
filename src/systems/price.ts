@@ -17,7 +17,6 @@ import { defaultPermissions } from '../helpers/permissions/';
 import { getPointsName } from '../helpers/points';
 import { adminEndpoint } from '../helpers/socket';
 import { isOwner } from '../helpers/user';
-import Parser from '../parser';
 import { translate } from '../translate';
 import System from './_interface';
 import points from './points';
@@ -153,10 +152,10 @@ class Price extends System {
   @parser({ priority: constants.HIGH, skippable: true })
   async check (opts: ParserOptions): Promise<boolean> {
     const parsed = opts.message.match(/^(![\S]+)/);
-    if (!parsed || isOwner(opts.sender)) {
+    if (!opts.sender || !parsed || isOwner(opts.sender)) {
       return true; // skip if not command or user is owner
     }
-    const helpers = (await (new Parser()).getCommandsList()).filter(o => o.isHelper).map(o => o.command);
+    const helpers = (await opts.parser.getCommandsList()).filter(o => o.isHelper).map(o => o.command);
     if (helpers.includes(opts.message)) {
       return true;
     }
@@ -190,8 +189,11 @@ class Price extends System {
 
   @rollback()
   async restorePointsRollback (opts: ParserOptions): Promise<boolean> {
+    if (!opts.sender) {
+      return true;
+    }
     const parsed = opts.message.match(/^(![\S]+)/);
-    const helpers = (await (new Parser()).getCommandsList()).filter(o => o.isHelper).map(o => o.command);
+    const helpers = (await opts.parser.getCommandsList()).filter(o => o.isHelper).map(o => o.command);
     if (
       _.isNil(parsed)
       || isOwner(opts.sender)

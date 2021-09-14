@@ -22,7 +22,7 @@ class TextToSpeech extends Overlay {
    */
   @parser({ fireAndForget: true })
   async checkTriggerTTSByHighlightedMessage(opts: ParserOptions) {
-    if (opts.sender.msgId && opts.sender.msgId === 'highlighted-message') {
+    if (opts.sender && opts.sender.msgId && opts.sender.msgId === 'highlighted-message') {
       this.textToSpeech({
         parameters: opts.message, command: '!tts', createdAt: Date.now(), sender: opts.sender, attr: { highlight: true },
       });

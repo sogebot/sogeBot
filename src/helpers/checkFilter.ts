@@ -14,7 +14,7 @@ import { isBroadcaster } from './user/isBroadcaster';
 import { isModerator } from './user/isModerator';
 
 export const checkFilter = async (opts: CommandOptions | ParserOptions, filter: string): Promise<boolean> => {
-  if (typeof filter === 'undefined' || filter.trim().length === 0) {
+  if (!opts.sender || typeof filter === 'undefined' || filter.trim().length === 0) {
     return true;
   }
   const toEval = `(function evaluation () { return ${filter} })()`;

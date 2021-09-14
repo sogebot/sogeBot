@@ -345,7 +345,7 @@ class Keywords extends System {
    */
   @parser({ fireAndForget: true })
   public async run(opts: ParserOptions) {
-    if (opts.message.trim().startsWith('!')) {
+    if (!opts.sender || opts.message.trim().startsWith('!')) {
       return true;
     }
 

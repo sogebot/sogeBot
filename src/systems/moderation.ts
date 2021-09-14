@@ -320,7 +320,7 @@ class Moderation extends System {
 
   @parser({ priority: constants.MODERATION })
   async containsLink (opts: ParserOptions) {
-    if (immuneUsers.get('links')?.has(String(opts.sender.userId))) {
+    if (!opts.sender || immuneUsers.get('links')?.has(String(opts.sender.userId))) {
       return true;
     }
 
@@ -353,7 +353,7 @@ class Moderation extends System {
 
   @parser({ priority: constants.MODERATION })
   async symbols (opts: ParserOptions) {
-    if (immuneUsers.get('symbols')?.has(String(opts.sender.userId))) {
+    if (!opts.sender || immuneUsers.get('symbols')?.has(String(opts.sender.userId))) {
       return true;
     }
 
@@ -397,7 +397,7 @@ class Moderation extends System {
 
   @parser({ priority: constants.MODERATION })
   async longMessage (opts: ParserOptions) {
-    if (immuneUsers.get('longmessage')?.has(String(opts.sender.userId))) {
+    if (!opts.sender || immuneUsers.get('longmessage')?.has(String(opts.sender.userId))) {
       return true;
     }
 
@@ -426,7 +426,7 @@ class Moderation extends System {
 
   @parser({ priority: constants.MODERATION })
   async caps (opts: ParserOptions) {
-    if (immuneUsers.get('caps')?.has(String(opts.sender.userId))) {
+    if (!opts.sender || immuneUsers.get('caps')?.has(String(opts.sender.userId))) {
       return true;
     }
 
@@ -482,7 +482,7 @@ class Moderation extends System {
 
   @parser({ priority: constants.MODERATION })
   async spam (opts: ParserOptions) {
-    if (immuneUsers.get('spam')?.has(String(opts.sender.userId))) {
+    if (!opts.sender || immuneUsers.get('spam')?.has(String(opts.sender.userId))) {
       return true;
     }
 
@@ -517,7 +517,7 @@ class Moderation extends System {
 
   @parser({ priority: constants.MODERATION })
   async color (opts: ParserOptions) {
-    if (immuneUsers.get('color')?.has(String(opts.sender.userId))) {
+    if (!opts.sender || immuneUsers.get('color')?.has(String(opts.sender.userId))) {
       return true;
     }
 
@@ -542,7 +542,7 @@ class Moderation extends System {
 
   @parser({ priority: constants.MODERATION })
   async emotes (opts: ParserOptions) {
-    if (immuneUsers.get('emotes')?.has(String(opts.sender.userId))) {
+    if (!opts.sender || immuneUsers.get('emotes')?.has(String(opts.sender.userId))) {
       return true;
     }
 
@@ -581,7 +581,7 @@ class Moderation extends System {
 
   @parser({ priority: constants.MODERATION })
   async blacklist (opts: ParserOptions) {
-    if (immuneUsers.get('blacklist')?.has(String(opts.sender.userId))) {
+    if (!opts.sender || immuneUsers.get('blacklist')?.has(String(opts.sender.userId))) {
       return true;
     }
 

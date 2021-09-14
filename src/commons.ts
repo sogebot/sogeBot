@@ -8,7 +8,14 @@ import { generalChannel } from './helpers/oauth/generalChannel';
 import Discord from './integrations/discord';
 import { Message } from './message';
 
-export async function parserReply(response: string | Promise<string>, opts: { sender: CommandOptions['sender']; attr?: CommandOptions['attr'] }, messageType: 'chat' | 'whisper' = 'chat') {
+const isParserOpts = (opts: ParserOptions | { id?: undefined, sender: CommandOptions['sender']; attr?: CommandOptions['attr'] }): opts is ParserOptions => {
+  return typeof opts.id !== 'undefined';
+};
+
+export async function parserReply(response: string | Promise<string>, opts: ParserOptions | { id?: undefined, sender: CommandOptions['sender']; attr?: CommandOptions['attr'] }, messageType: 'chat' | 'whisper' = 'chat') {
+  if (!opts.sender) {
+    return;
+  }
   const senderObject = {
     ..._.cloneDeep(opts.sender),
     'message-type': messageType,
@@ -17,7 +24,7 @@ export async function parserReply(response: string | Promise<string>, opts: { se
   const messageToSend = await (async () => {
     const sender = senderObject.discord
       ? { ...senderObject, discord: { author: senderObject.discord.author, channel: senderObject.discord.channel } } : senderObject;
-    if (opts.attr?.skip) {
+    if (isParserOpts(opts) ? opts.skip : opts.attr?.skip) {
       return prepare(await response as string, { ...opts, sender }, false);
     } else {
       return await new Message(await response as string).parse({ ...opts, sender }) as string;
@@ -43,7 +50,7 @@ export async function parserReply(response: string | Promise<string>, opts: { se
     }
   } else {
     // we skip as we are already parsing message
-    sendMessage(messageToSend, senderObject, { skip: true, ...opts.attr });
+    sendMessage(messageToSend, senderObject, { skip: true, ...(isParserOpts(opts) ? {} : opts.attr) });
   }
 }
 

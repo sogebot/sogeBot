@@ -6,7 +6,9 @@ import { xor } from 'lodash';
 
 import type { Module } from './_interface';
 import { isDbConnected } from './helpers/database';
-import { debug, error } from './helpers/log';
+import {
+  debug, error, performance, 
+} from './helpers/log';
 import { defaultPermissions } from './helpers/permissions/defaultPermissions';
 import { find } from './helpers/register';
 import { VariableWatcher } from './watchers';
@@ -374,4 +376,22 @@ export function IsLoadingInProgress(name: symbol) {
 
 export function toggleLoadingInProgress(name: symbol) {
   loadingInProgress = xor(loadingInProgress, [name]);
+}
+
+export function timer() {
+  return (_target: any, key: string | symbol, descriptor: any) => {
+    const method = descriptor.value;
+
+    descriptor.value = async function (){
+      const Parser = require('./parser.js').Parser;
+
+      const start = Date.now();
+      // eslint-disable-next-line prefer-rest-params
+      const result = await method.apply(this, arguments);
+      if (this instanceof Parser) {
+        performance(`[PARSER#${this.id}|${String(key)}] ${Date.now() - start}ms`);
+      }
+      return result;
+    };
+  };
 }

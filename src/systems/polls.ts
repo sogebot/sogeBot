@@ -336,6 +336,9 @@ class Polls extends System {
 
   @parser()
   async participateByNumber(opts: ParserOptions) {
+    if (!opts.sender) {
+      return true;
+    }
     try {
       if (opts.message.match(/^(\d+)$/)) {
         const cVote = await getRepository(Poll).findOne({ isOpened: true, type: 'numbers' });

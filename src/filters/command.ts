@@ -44,13 +44,13 @@ const command: ResponseFilter = {
     // run custom commands
     if (customcommands.enabled) {
       await customcommands.run({
-        sender: (attr.sender as ParserOptions['sender']), id: 'null', skip: false, message: cmd, parameters: attr.param ?? '', processedCommands: attr.processedCommands, 
+        sender: (attr.sender as ParserOptions['sender']), id: 'null', skip: false, message: cmd, parameters: attr.param ?? '', processedCommands: attr.processedCommands, parser: new Parser(),
       });
     }
     // run alias
     if (alias.enabled) {
       await alias.run({
-        sender: (attr.sender as ParserOptions['sender']), id: 'null', skip: false, message: cmd, parameters: attr.param ?? '', 
+        sender: (attr.sender as ParserOptions['sender']), id: 'null', skip: false, message: cmd, parameters: attr.param ?? '', parser: new Parser(),
       });
     }
     await new Parser().command(attr.sender, cmd, true);
@@ -78,13 +78,13 @@ const command: ResponseFilter = {
     // run custom commands
     if (customcommands.enabled) {
       await customcommands.run({
-        sender: (attr.sender as ParserOptions['sender']), id: 'null', skip: false, message: cmd, parameters: attr.param ?? '', processedCommands: attr.processedCommands, 
+        sender: (attr.sender as ParserOptions['sender']), id: 'null', skip: false, message: cmd, parameters: attr.param ?? '', processedCommands: attr.processedCommands, parser: new Parser(),
       });
     }
     // run alias
     if (alias.enabled) {
       await alias.run({
-        sender: (attr.sender as ParserOptions['sender']), id: 'null', skip: false, message: cmd, parameters: attr.param ?? '', 
+        sender: (attr.sender as ParserOptions['sender']), id: 'null', skip: false, message: cmd, parameters: attr.param ?? '', parser: new Parser(),
       });
     }
     const responses = await new Parser().command(attr.sender, cmd, true);

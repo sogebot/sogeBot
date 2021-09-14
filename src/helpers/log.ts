@@ -23,10 +23,24 @@ const logFileName: Generator = (time: Date | number, index?: number) => {
   }
   return `./logs/sogebot.log.${(index ?? 1)-1}.gz`;
 };
+const perfFileName: Generator = (time: Date | number, index?: number) => {
+  if (!time) {
+    return './logs/performance.log';
+  }
+  return `./logs/performance.log.${(index ?? 1)-1}.gz`;
+};
 const logFile = createStream(logFileName, {
   size:     '5M',
   compress: 'gzip',
+  maxFiles: 5,
 });
+const perfFile = createStream(perfFileName, {
+  size:     '5M',
+  compress: 'gzip',
+  maxFiles: 5,
+});
+
+perfFile.write(`====================== ${new Date().toLocaleString()} ======================\n`);
 
 // until https://github.com/typescript-eslint/typescript-eslint/pull/1898 fixed
 /* eslint-disable */
@@ -125,6 +139,13 @@ function log(message: any) {
     process.stdout.write(formattedMessage + '\n');
     logFile.write(stripAnsi(formattedMessage) + os.EOL);
   }
+}
+
+export function performance(message:string) {
+  if (isDebugEnabled('performance')) {
+    process.stdout.write(message.replace(/ /g, '\t') + '\n');
+  }
+  perfFile.write((message.replace(/ /g, '\t')) + os.EOL);
 }
 
 /* * category will be always shown */

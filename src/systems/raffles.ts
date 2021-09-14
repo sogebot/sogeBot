@@ -129,7 +129,7 @@ class Raffles extends System {
 
   @parser({ fireAndForget: true })
   async messages (opts: ParserOptions) {
-    if (opts.skip) {
+    if (opts.skip || !opts.sender) {
       return true;
     }
 
@@ -387,7 +387,7 @@ class Raffles extends System {
 
   @parser()
   async participate (opts: ParserOptions): Promise<boolean> {
-    if (_.isNil(opts.sender) || _.isNil(opts.sender.username) || !opts.message.match(/^(![\S]+)/)) {
+    if (opts.sender === null || _.isNil(opts.sender.username) || !opts.message.match(/^(![\S]+)/)) {
       return true;
     }
 
@@ -430,7 +430,7 @@ class Raffles extends System {
       tickets = 0;
     }
 
-    const participant = raffle.participants.find(o => o.username === opts.sender.username);
+    const participant = raffle.participants.find(o => o.username === opts.sender?.username);
     let curTickets = 0;
     if (participant) {
       curTickets = participant.tickets;

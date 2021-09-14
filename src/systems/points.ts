@@ -203,7 +203,7 @@ class Points extends System {
 
   @parser({ fireAndForget: true, skippable: true })
   async messagePoints (opts: ParserOptions) {
-    if (opts.skip || opts.message.startsWith('!')) {
+    if (!opts.sender || opts.skip || opts.message.startsWith('!')) {
       return true;
     }
 

@@ -21,7 +21,6 @@ import {
 } from '../helpers/permissions';
 import { check, defaultPermissions } from '../helpers/permissions/';
 import { adminEndpoint, publicEndpoint } from '../helpers/socket';
-import Parser from '../parser';
 import { translate } from '../translate';
 import System from './_interface';
 import customcommands from './customcommands';
@@ -106,10 +105,9 @@ class Alias extends System {
   @parser({ priority: constants.LOW, fireAndForget: true })
   async run (opts: ParserOptions): Promise<boolean> {
     const alias = (await this.search(opts))[0];
-    if (!alias) {
+    if (!alias || !opts.sender) {
       return true;
     } // no alias was found - return
-    const p = new Parser();
 
     const replace = new RegExp(`${alias.alias}`, 'i');
     const cmdArray = opts.message.replace(replace, `${alias.command}`).split(' ');
@@ -121,7 +119,7 @@ class Alias extends System {
         break;
       } // command is correct (have same number of parameters as command)
 
-      const parsedCmd = await p.find(cmdArray.join(' '), null);
+      const parsedCmd = await opts.parser.find(cmdArray.join(' '), null);
       const isRegistered = !_.isNil(parsedCmd) && parsedCmd.command.split(' ').length === cmdArray.length;
 
       if (isRegistered) {
@@ -150,7 +148,7 @@ class Alias extends System {
               },
             });
           debug('alias.process', response);
-          const responses = await p.command(opts.sender, response, true);
+          const responses = await opts.parser.command(opts.sender, response, true);
           debug('alias.process', responses);
           responses.forEach(r => {
             parserReply(r.response, { sender: r.sender, attr: r.attr });

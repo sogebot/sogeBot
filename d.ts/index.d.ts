@@ -187,10 +187,11 @@ interface CommandOptions {
 
 interface ParserOptions {
   id: string;
-  sender: CommandOptions['sender'];
+  sender: CommandOptions['sender'] | null;
   parameters: string;
   message: string;
   skip: boolean;
+  parser: import('../src/parser.js').default;
 }
 
 interface Vote {

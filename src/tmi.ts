@@ -946,12 +946,12 @@ class TMI extends Core {
           if (price.priceBits <= Number(userstate.bits)) {
             if (customcommands.enabled) {
               await customcommands.run({
-                sender: getUserSender(userId, username), id: 'null', skip: true, quiet: false, message: messageFromUser.trim().toLowerCase(), parameters: '',
+                sender: getUserSender(userId, username), id: 'null', skip: true, quiet: false, message: messageFromUser.trim().toLowerCase(), parameters: '', parser: new Parser(),
               });
             }
             if (alias.enabled) {
               await alias.run({
-                sender: getUserSender(userId, username), id: 'null', skip: true, message: messageFromUser.trim().toLowerCase(), parameters: '',
+                sender: getUserSender(userId, username), id: 'null', skip: true, message: messageFromUser.trim().toLowerCase(), parameters: '', parser: new Parser(),
               });
             }
             const responses = await new Parser().command(getUserSender(userId, username), messageFromUser, true);
@@ -1009,7 +1009,7 @@ class TMI extends Core {
   }
 
   async message (data: { skip?: boolean, quiet?: boolean, message: Pick<Message, 'message' | 'tags'>}) {
-    // ignore if it is part of custom reward // we have it laready logged in redeem log
+    // ignore if it is part of custom reward // we have it already logged in redeem log
     if (data.message.tags.customRewardId) {
       return;
     }

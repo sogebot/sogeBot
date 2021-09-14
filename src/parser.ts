@@ -4,6 +4,7 @@ import * as constants from '@sogebot/ui-helpers/constants';
 import _ from 'lodash';
 import { v4 as uuid } from 'uuid';
 
+import { timer } from './decorators.js';
 import {
   addToParserFindCache, cachedCommandsPermissions, parserFindCache,
 } from './helpers/cache';
@@ -32,6 +33,7 @@ class Parser {
   skip = false;
   quiet = false;
   successfullParserRuns: any[] = [];
+  cachedParsers: null | any[] = null;
 
   constructor (opts: any = {}) {
     this.message = opts.message || '';
@@ -49,13 +51,14 @@ class Parser {
     return Date.now() - this.started_at;
   }
 
+  @timer()
   async isModerated () {
     debug('parser.process', 'ISMODERATED START of "' + this.message + '"');
     if (this.skip) {
       return false;
     }
 
-    const parsers = await this.parsers();
+    const parsers = this.cachedParsers ? this.cachedParsers : await this.parsers();
     for (const parser of parsers) {
       const time = Date.now();
       if (parser.priority !== constants.MODERATION) {
@@ -63,11 +66,13 @@ class Parser {
       } // skip non-moderation parsers
       debug('parser.process', 'Processing ' + parser.name);
       const text = this.message.trim().replace(/^(!\w+)/i, '');
-      const opts = {
+      const opts: ParserOptions = {
+        id:         this.id,
         sender:     this.sender,
         message:    this.message.trim(),
         parameters: text.trim(),
         skip:       this.skip,
+        parser:     this,
       };
       const isOk = await parser.fnc.apply(parser.this, [opts]);
 
@@ -80,10 +85,11 @@ class Parser {
     return false; // no parser failed
   }
 
+  @timer()
   async process (): Promise<CommandResponse[]> {
     debug('parser.process', 'PROCESS START of "' + this.message + '"');
 
-    const parsers = await this.parsers();
+    const parsers = this.cachedParsers ? this.cachedParsers : await this.parsers();
     for (const parser of parsers) {
       if (parser.priority === constants.MODERATION) {
         continue;
@@ -108,12 +114,13 @@ class Parser {
       ) {
         debug('parser.process', 'Processing ' + parser.name + ' (fireAndForget: ' + parser.fireAndForget + ')');
         const text = this.message.trim().replace(/^(!\w+)/i, '');
-        const opts = {
+        const opts: ParserOptions = {
           id:         this.id,
           sender:     this.sender,
           message:    this.message.trim(),
           parameters: text.trim(),
           skip:       this.skip,
+          parser:     this,
         };
 
         const time = Date.now();
@@ -159,6 +166,7 @@ class Parser {
    * @constructor
    * @returns object or empty list
    */
+  @timer()
   async parsers () {
     let parsers: any[] = [];
     for (let i = 0, length = populatedList.length; i < length; i++) {
@@ -167,6 +175,7 @@ class Parser {
       }
     }
     parsers = _.orderBy(_.flatMap(await Promise.all(parsers)), 'priority', 'asc');
+    this.cachedParsers = parsers;
     return parsers;
   }
 
@@ -175,6 +184,7 @@ class Parser {
    * @constructor
    * @returns object or empty list
    */
+  @timer()
   async rollbacks () {
     const rollbacks: any[] = [];
     for (let i = 0, length = populatedList.length; i < length; i++) {
@@ -192,6 +202,7 @@ class Parser {
    * @param {string[] | null} cmdlist - Set of commands to check, if null all registered commands are checked
    * @returns object or null if empty
    */
+  @timer()
   async find (message: string, cmdlist: {
     this: any; fnc: (opts: CommandOptions) => CommandResponse[]; command: string; id: string; permission: string | null; _fncName: string;
   }[] | null = null) {
@@ -225,6 +236,7 @@ class Parser {
     }
   }
 
+  @timer()
   async getCommandsList () {
     let commands: any[] = [];
     for (let i = 0, length = populatedList.length; i < length; i++) {
@@ -245,6 +257,7 @@ class Parser {
     return commands;
   }
 
+  @timer()
   async command (sender: CommandOptions['sender'] | null, message: string, disablePermissionCheck = false): Promise<CommandResponse[]> {
     debug('parser.command', { sender, message });
     if (!message.startsWith('!')) {

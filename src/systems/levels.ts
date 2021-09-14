@@ -246,7 +246,7 @@ class Levels extends System {
 
   @parser({ fireAndForget: true })
   async messageXP (opts: ParserOptions) {
-    if (opts.skip || opts.message.startsWith('!')) {
+    if (!opts.sender ||opts.skip || opts.message.startsWith('!')) {
       return true;
     }
 

@@ -20,7 +20,6 @@ import { getUserHighestPermission } from '../helpers/permissions/';
 import { defaultPermissions } from '../helpers/permissions/';
 import { adminEndpoint } from '../helpers/socket';
 import { isOwner } from '../helpers/user';
-import Parser from '../parser';
 import { translate } from '../translate';
 import System from './_interface';
 import alias from './alias';
@@ -181,6 +180,9 @@ class Cooldown extends System {
   @parser({ priority: constants.HIGH, skippable: true })
   async check (opts: ParserOptions): Promise<boolean> {
     try {
+      if (!opts.sender) {
+        return true;
+      }
       let data: (CooldownInterface | { type: 'default'; canBeRunAt: number; isEnabled: true; name: string; permId: string })[] = [];
       let viewer: CooldownViewerInterface | undefined;
       let timestamp, now;
@@ -193,7 +195,7 @@ class Cooldown extends System {
         let name = subcommand ? `${cmd} ${subcommand}` : cmd;
         let isFound = false;
 
-        const parsed = await (new Parser().find(subcommand ? `${cmd} ${subcommand}` : cmd, null));
+        const parsed = await (opts.parser.find(subcommand ? `${cmd} ${subcommand}` : cmd, null));
         if (parsed) {
           debug('cooldown.check', `Command found ${parsed.command}`);
           name = parsed.command;
@@ -325,7 +327,7 @@ class Cooldown extends System {
           continue;
         }
 
-        for (const item of cooldown.viewers?.filter(o => o.userId === opts.sender.userId) ?? []) {
+        for (const item of cooldown.viewers?.filter(o => o.userId === opts.sender?.userId) ?? []) {
           if (!viewer || viewer.timestamp < item.timestamp) {
             viewer = { ...item };
           } else {
@@ -389,6 +391,9 @@ class Cooldown extends System {
 
   @rollback()
   async cooldownRollback (opts: ParserOptions): Promise<boolean> {
+    if (!opts.sender) {
+      return true;
+    }
     const cached = cache.find(o => o.id === opts.id);
     if (cached) {
       for (const cooldown of cached.cooldowns) {
@@ -398,7 +403,7 @@ class Cooldown extends System {
           cooldown.viewers?.push({
             timestamp: 0,
             userId:    opts.sender.userId,
-            ...cooldown.viewers.find(o => o.userId === opts.sender.userId),
+            ...cooldown.viewers.find(o => o.userId === opts.sender?.userId),
           });
         }
         // rollback timestamp

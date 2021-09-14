@@ -43,7 +43,7 @@ class Randomizer extends Registry {
    */
   @parser({ priority: LOW, fireAndForget: true })
   async run (opts: ParserOptions) {
-    if (!opts.message.startsWith('!')) {
+    if (!opts.sender || !opts.message.startsWith('!')) {
       return true;
     } // do nothing if it is not a command
 
