@@ -3,16 +3,13 @@ import { dayjs } from '@sogebot/ui-helpers/dayjsHelper';
 import { getRepository } from 'typeorm';
 
 import { User } from '../../database/entity/user';
-import { fetchUser } from '../../microservices/fetchUser';
 import eventlist from '../../overlays/eventlist';
 import alerts from '../../registries/alerts';
 import tmi from '../../tmi';
 import { triggerInterfaceOnFollow } from '../interface';
+import { debug, follow as followLog } from '../log';
 import {
-  debug, error, follow as followLog,
-} from '../log';
-import {
-  isBot, isIgnored, isInGlobalIgnoreList, 
+  isBot, isIgnored, isInGlobalIgnoreList,
 } from '../user';
 
 import { eventEmitter } from '.';
@@ -74,20 +71,12 @@ export function follow(userId: string, username: string, followedAt: string | nu
           });
       })
       .catch(() => {
-        fetchUser(userId).then(user => {
-          getRepository(User).save({
-            userId,
-            username:        user.login,
-            profileImageUrl: user.profile_image_url,
-            followedAt:      dayjs(followedAt).valueOf(),
-            isFollower:      true,
-            followCheckAt:   Date.now(),
-          });
-        }).catch((e) => {
-          error('Something went wrong during follow event processing.');
-          if (e instanceof Error) {
-            error(e.stack);
-          }
+        getRepository(User).save({
+          userId,
+          username:      username,
+          followedAt:    dayjs(followedAt).valueOf(),
+          isFollower:    true,
+          followCheckAt: Date.now(),
         });
       });
 
