@@ -3,7 +3,7 @@ import { EntitySchema } from 'typeorm';
 import { ColumnNumericTransformer, SafeNumberTransformer } from './_transformer';
 
 export interface UserInterface {
-  id?: string; userId: string; username: string; displayname?: string; profileImageUrl?: string;
+  userId: string; username: string; displayname?: string; profileImageUrl?: string;
   isOnline?: boolean; isVIP?: boolean; isFollower?: boolean; isModerator?: boolean; isSubscriber?: boolean;
   haveSubscriberLock?: boolean; haveFollowerLock?: boolean; haveSubscribedAtLock?: boolean; haveFollowedAtLock?: boolean; rank?: string; haveCustomRank?: boolean;
   followedAt?: number; followCheckAt?: number; subscribedAt?: number; seenAt?: number; createdAt?: number;
