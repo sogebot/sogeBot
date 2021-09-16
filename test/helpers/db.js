@@ -94,7 +94,7 @@ module.exports = {
       oauth.generalChannel = '__broadcaster__';
       oauth.generalOwners = ['__broadcaster__', '__owner__'];
       oauth.broadcasterUsername = 'broadcaster';
-      oauth.botUsername = 'bot';
+      oauth.botUsername = '__bot_username__';
       oauth.botId = '12345';
 
       oauth.broadcasterId = '54321';

@@ -43,7 +43,7 @@ export function follow(userId: string, username: string, followedAt: string | nu
     timestamp: Date.now(),
   });
   if (!isBot(username)) {
-    followLog(username);
+    followLog(`${username}#${userId}`);
     eventEmitter.emit('follow', { username: username, userId: userId });
     alerts.trigger({
       event:      'follows',

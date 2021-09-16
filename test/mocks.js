@@ -37,7 +37,7 @@ global.mock
         'followed_at': String(new Date()),
       },
       {
-        'from_id':     '333',
+        'from_id':     '12345',
         'from_name':   '__bot_username__',
         'to_id':       '23161357',
         'to_name':     'LIRIK',

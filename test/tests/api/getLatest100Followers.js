@@ -7,6 +7,8 @@ const assert = require('assert');
 
 const api = (require('../../../dest/api')).default;
 const { eventEmitter } = (require('../../../dest/helpers/events/emitter'));
+const log = require('../../../dest/helpers/log');
+const { botId } = (require('../../../dest/helpers/oauth/botId'));
 const { botUsername } = (require('../../../dest/helpers/oauth/botUsername'));
 const { channelId } = (require('../../../dest/helpers/oauth/channelId'));
 const oauth = (require('../../../dest/oauth')).default;
@@ -21,7 +23,6 @@ describe('API - getLatest100Followers()', () => {
 
     channelId.value = '12345';
     oauth.botAccessToken = 'foobar';
-    botUsername.value = '__bot_username__';
   });
 
   after(() => {
