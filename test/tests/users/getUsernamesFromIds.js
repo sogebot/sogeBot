@@ -1,15 +1,14 @@
-/* global describe it before */
+/* global */
 
 const assert = require('assert');
 require('../../general.js');
 
+const { getRepository } = require('typeorm');
+
+const { User } = require('../../../dest/database/entity/user');
+const users = (require('../../../dest/users')).default;
 const db = require('../../general.js').db;
 const message = require('../../general.js').message;
-
-const { getRepository } = require('typeorm');
-const { User } = require('../../../dest/database/entity/user');
-
-const users = (require('../../../dest/users')).default;
 
 // users
 const testuser = { username: 'testuser', userId: 1 };
@@ -29,7 +28,7 @@ describe('User - getUsernamesFromIds', () => {
   });
 
   describe('getUsernamesFromIds should get correct usernames', () => {
-    let translatedIds: any[] = [];
+    let translatedIds = [];
     it('ask for 4 ids + 1 duplication', async () => {
       translatedIds = await users.getUsernamesFromIds([1,2,3,4,1]);
     });
