@@ -2,7 +2,6 @@ import _ from 'lodash';
 import { getRepository } from 'typeorm';
 
 import { Duel as DuelEntity, DuelInterface } from '../database/entity/duel';
-import { User } from '../database/entity/user';
 import {
   command, persistent, settings,
 } from '../decorators';
@@ -12,6 +11,7 @@ import { isDbConnected } from '../helpers/database';
 import { getLocalizedName } from '../helpers/getLocalized';
 import { error } from '../helpers/log';
 import { getPointsName } from '../helpers/points';
+import * as changelog from '../helpers/user/changelog.js';
 import { isBroadcaster } from '../helpers/user/isBroadcaster';
 import { isModerator } from '../helpers/user/isModerator';
 import points from '../systems/points';
@@ -74,7 +74,7 @@ class Duel extends Game {
     }
 
     let winner = _.random(0, total, false);
-    let winnerUser: DuelInterface | undefined;
+    let winnerUser: Required<DuelInterface> | undefined;
     for (const user of users) {
       winner = winner - user.tickets;
       if (winner <= 0) { // winner tickets are <= 0 , we have winner
@@ -97,7 +97,8 @@ class Duel extends Game {
       announce(m, 'duel');
 
       // give user his points
-      await getRepository(User).increment({ userId: winnerUser.id }, 'points', total);
+      await changelog.flush();
+      await changelog.increment(winnerUser.id, { points: total });
 
       // reset duel
       await getRepository(DuelEntity).clear();

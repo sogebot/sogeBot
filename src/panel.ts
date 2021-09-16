@@ -48,6 +48,7 @@ import { errors, warns } from './helpers/panel/alerts';
 import { linesParsed, status as statusObj } from './helpers/parser';
 import { list, systems } from './helpers/register';
 import { adminEndpoint } from './helpers/socket';
+import * as changelog from './helpers/user/changelog.js';
 import lastfm from './integrations/lastfm';
 import spotify from './integrations/spotify';
 import { sendGameFromTwitch } from './microservices/sendGameFromTwitch';
@@ -372,6 +373,7 @@ class Panel extends Core {
       socket.on('leaveBot', async () => {
         tmi.part('bot');
         // force all users offline
+        await changelog.flush();
         await getRepository(User).update({}, { isOnline: false });
       });
 

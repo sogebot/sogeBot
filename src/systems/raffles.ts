@@ -21,6 +21,7 @@ import { debug, warning } from '../helpers/log';
 import { linesParsed } from '../helpers/parser';
 import { defaultPermissions } from '../helpers/permissions/';
 import { adminEndpoint } from '../helpers/socket';
+import * as changelog from '../helpers/user/changelog.js';
 import tmi from '../tmi';
 import { translate } from '../translate';
 import System from './_interface';
@@ -79,6 +80,7 @@ class Raffles extends System {
   sockets () {
     adminEndpoint(this.nsp, 'raffle::getWinner', async (username: string, cb) => {
       try {
+        await changelog.flush();
         cb(
           null,
           await getRepository(User).findOne({ username }),
@@ -400,12 +402,9 @@ class Raffles extends System {
       return true;
     }
 
-    const user = await getRepository(User).findOne({ userId: opts.sender.userId });
+    const user = await changelog.get(opts.sender.userId);
     if (!user) {
-      await getRepository(User).save({
-        userId:   opts.sender.userId,
-        username: opts.sender.username,
-      });
+      changelog.update(opts.sender.userId, { username: opts.sender.username });
       return this.participate(opts);
     }
 

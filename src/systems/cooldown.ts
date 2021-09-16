@@ -7,7 +7,6 @@ import {
   Cooldown as CooldownEntity, CooldownInterface, CooldownViewer, CooldownViewerInterface,
 } from '../database/entity/cooldown';
 import { Keyword } from '../database/entity/keyword';
-import { User } from '../database/entity/user';
 import {
   command, default_permission, parser, permission_settings, rollback, settings,
 } from '../decorators';
@@ -20,6 +19,7 @@ import { getUserHighestPermission } from '../helpers/permissions/';
 import { defaultPermissions } from '../helpers/permissions/';
 import { adminEndpoint } from '../helpers/socket';
 import { isOwner } from '../helpers/user';
+import * as changelog from '../helpers/user/changelog.js';
 import Parser from '../parser';
 import { translate } from '../translate';
 import System from './_interface';
@@ -292,7 +292,7 @@ class Cooldown extends System {
         return true;
       }
 
-      const user = await getRepository(User).findOne({ userId: opts.sender.userId });
+      const user = await changelog.get(opts.sender.userId);
       if (!user) {
         return true;
       }

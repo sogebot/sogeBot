@@ -3,7 +3,6 @@ import { getRepository } from 'typeorm';
 
 import { parserReply } from '../commons';
 import { Bets as BetsEntity, BetsInterface } from '../database/entity/bets';
-import { User } from '../database/entity/user';
 import {
   command, default_permission, helper, settings, ui,
 } from '../decorators';
@@ -17,6 +16,7 @@ import { error, warning } from '../helpers/log';
 import { defaultPermissions } from '../helpers/permissions/';
 import { getPointsName } from '../helpers/points';
 import { adminEndpoint } from '../helpers/socket';
+import * as changelog from '../helpers/user/changelog.js';
 import System from './_interface';
 import points from './points';
 
@@ -296,7 +296,7 @@ class Bets extends System {
         throw Error(ERROR_NOT_RUNNING);
       }
       for (const user of currentBet.participations) {
-        await getRepository(User).increment({ userId: opts.sender.userId }, 'points', user.points);
+        changelog.increment(opts.sender.userId, { points: user.points });
       }
       return [{ response: prepare('bets.refund'), ...opts } ];
     } catch (e: any) {
@@ -338,7 +338,7 @@ class Bets extends System {
       for (const user of currentBet.participations) {
         if (user.optionIdx === index) {
           total += user.points + Math.round((user.points * percentGain));
-          await getRepository(User).increment({ userId: user.userId }, 'points', user.points + Math.round((user.points * percentGain)));
+          changelog.increment(opts.sender.userId, { points: user.points + Math.round((user.points * percentGain)) });
         }
       }
 

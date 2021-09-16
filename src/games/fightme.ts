@@ -7,6 +7,7 @@ import { command, settings } from '../decorators';
 import { prepare } from '../helpers/commons';
 import { getLocalizedName } from '../helpers/getLocalized';
 import { timeout } from '../helpers/tmi';
+import * as changelog from '../helpers/user/changelog.js';
 import { isBroadcaster } from '../helpers/user/isBroadcaster';
 import { isModerator } from '../helpers/user/isModerator';
 import points from '../systems/points';
@@ -52,8 +53,9 @@ class FightMe extends Game {
         throw new Error('Parameter match failed.');
       }
       const username = match[1].toLowerCase();
+      await changelog.flush();
       user = await getRepository(User).findOneOrFail({ where: { username: username.toLowerCase() } });
-      challenger = await getRepository(User).findOneOrFail({ where: { userId: opts.sender.userId } });
+      challenger = await changelog.getOrFail(opts.sender.userId);
     } catch (e: any) {
       return [{ response: translate('gambling.fightme.notEnoughOptions'), ...opts }];
     }
@@ -117,7 +119,7 @@ class FightMe extends Game {
       }
 
       const [winnerWillGet, loserWillLose] = await Promise.all([this.winnerWillGet, this.loserWillLose]);
-      await getRepository(User).increment({ userId: winner ? opts.sender.userId : user.userId }, 'points', Math.abs(Number(winnerWillGet)));
+      changelog.increment(winner ? opts.sender.userId : user.userId, { points: Math.abs(Number(winnerWillGet)) });
       await points.decrement({ userId: !winner ? opts.sender.userId : user.userId }, Math.abs(Number(loserWillLose)));
 
       timeout(winner ? opts.sender.username : user.username, this.timeout, false);

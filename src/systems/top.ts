@@ -13,6 +13,7 @@ import { debug } from '../helpers/log';
 import { defaultPermissions } from '../helpers/permissions/';
 import { getPointsName } from '../helpers/points';
 import { unserialize } from '../helpers/type';
+import * as changelog from '../helpers/user/changelog.js';
 import { getIgnoreList, isIgnored } from '../helpers/user/isIgnored';
 import oauth from '../oauth';
 import tmi from '../tmi';
@@ -126,6 +127,7 @@ class Top extends System {
     // count ignored users
     const _total = 10 + getIgnoreList().length;
     const connection = await getConnection();
+    await changelog.flush();
     switch (type) {
       case TYPE.LEVEL: {
         let rawSQL = '';
@@ -152,7 +154,7 @@ class Top extends System {
         const users = (await getManager().query(rawSQL)).filter((o: any) => !isIgnored({ username: o.username, userId: o.userId }));
 
         for (const rawUser of users) {
-          const user = await getRepository(User).findOne({ userId: rawUser.userId });
+          const user = await changelog.get(rawUser.userId);
           if (user) {
             const currentXP = unserialize<bigint>(user.extra?.levels?.xp) ?? BigInt(0);
             sorted.push({ username: user.username, value: `${levels.getLevelOf(user)} (${currentXP}XP)` });

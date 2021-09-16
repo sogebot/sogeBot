@@ -23,6 +23,7 @@ import { channelId } from './helpers/oauth';
 import { recacheOnlineUsersPermission } from './helpers/permissions';
 import { defaultPermissions, getUserHighestPermission } from './helpers/permissions/';
 import { adminEndpoint, viewerEndpoint } from './helpers/socket';
+import * as changelog from './helpers/user/changelog.js';
 import { getIdFromTwitch } from './microservices/getIdFromTwitch';
 import oauth from './oauth';
 
@@ -44,6 +45,7 @@ class Users extends Core {
     const connection = await getConnection();
     try {
       let query;
+      await changelog.flush();
       if (connection.options.type === 'postgres') {
         query = getRepository(User).createQueryBuilder('user')
           .select('COUNT(*)', 'count')
@@ -68,13 +70,13 @@ class Users extends Core {
               throw new Error('unknown');
             }
             if (newUsername !== username) {
-              await getRepository(User).update({ userId: user.userId }, { username: newUsername });
+              changelog.update(user.userId, { username: newUsername });
               debug('users', `Duplicate username ${user.username}#${user.userId} changed to ${newUsername}#${user.userId}`);
             }
           } catch (e: any) {
             // we are tagging user as __AnonymousUser__, we don't want to get rid of all information
             debug('users', `Duplicate username ${user.username}#${user.userId} not found on Twitch => __AnonymousUser__#${user.userId}`);
-            await getRepository(User).update({ userId: user.userId }, { username: '__AnonymousUser__' });
+            changelog.update(user.userId, { username: '__AnonymousUser__' });
           }
         }));
       }));
@@ -86,7 +88,7 @@ class Users extends Core {
   }
 
   async getChatOf (id: string, online: boolean): Promise<number> {
-    const user = await getRepository(User).findOne({ where: { userId: id } });
+    const user = await changelog.get(id);
     let chat = 0;
 
     if (user) {
@@ -110,21 +112,26 @@ class Users extends Core {
       if (isInit) {
         // set all users offline on start
         debug('tmi.watched', `Setting all users as offline.`);
+        await changelog.flush();
         await getRepository(User).update({}, { isOnline: false });
       } else {
         // get new users
+        await changelog.flush();
         const newChatters = await getRepository(User).find({ isOnline: true, watchedTime: 0 });
         debug('tmi.watched', `Adding ${newChatters.length} users as new chatters.`);
         stats.value.newChatters = stats.value.newChatters + newChatters.length;
 
         if (isStreamOnline.value) {
           debug('tmi.watched', `Incrementing watchedTime by ${interval}`);
+          await changelog.flush();
           const incrementedUsers = await getRepository(User).increment({ isOnline: true }, 'watchedTime', interval);
           // chatTimeOnline + chatTimeOffline is solely use for points distribution
           debug('tmi.watched', `Incrementing chatTimeOnline by ${interval}`);
+          await changelog.flush();
           await getRepository(User).increment({ isOnline: true }, 'chatTimeOnline', interval);
 
           if (typeof incrementedUsers.affected === 'undefined') {
+            await changelog.flush();
             const users = await getRepository(User).find({ isOnline: true });
             if (isDebugEnabled('tmi.watched')) {
               for (const user of users) {
@@ -139,6 +146,7 @@ class Users extends Core {
           recacheOnlineUsersPermission();
         } else {
           debug('tmi.watched', `Incrementing chatTimeOffline users by ${interval}`);
+          await changelog.flush();
           await getRepository(User).increment({ isOnline: true }, 'chatTimeOffline', interval);
         }
       }
@@ -150,7 +158,7 @@ class Users extends Core {
   }
 
   async getWatchedOf (id: string): Promise<number> {
-    const user = await getRepository(User).findOne({ where: { userId: id } });
+    const user = await changelog.get(id);
 
     if (user) {
       return Number(user.watchedTime) <= Number.MAX_SAFE_INTEGER
@@ -161,8 +169,8 @@ class Users extends Core {
     }
   }
 
-  async getMessagesOf (id: number): Promise<number> {
-    const user = await getRepository(User).findOne({ where: { userId: id } });
+  async getMessagesOf (id: string): Promise<number> {
+    const user = await changelog.get(id);
 
     if (user) {
       return Number(user.messages) <= Number.MAX_SAFE_INTEGER
@@ -177,7 +185,7 @@ class Users extends Core {
     const uniqueWithUsername = (await Promise.all(
       [...new Set(IdsList)]
         .map(async (id) => {
-          const user = await getRepository(User).findOne({ userId: id });
+          const user = await changelog.get(id);
           if (user) {
             return { [id]: user.username };
           }
@@ -192,15 +200,12 @@ class Users extends Core {
   }
 
   async getNameById (userId: string): Promise<string> {
-    const user = await getRepository(User).findOne({ userId });
+    const user = await await changelog.get(userId);
     if (!user) {
       const username = await api.getUsernameFromTwitch(userId);
       if (username) {
-        const savedUser = await getRepository(User).save({
-          userId,
-          username,
-        });
-        return savedUser.username;
+        await changelog.update(userId, { username });
+        return username;
       } else {
         throw new Error('Cannot get username for userId ' + userId);
       }
@@ -212,18 +217,18 @@ class Users extends Core {
     if (username.startsWith('@')) {
       username = username.substring(1);
     }
+    await changelog.flush();
     const user = await getRepository(User).findOne({ where: { username }, select: ['userId'] });
     if (!user) {
-      const savedUser = await getRepository(User).save({
-        userId: await getIdFromTwitch(username),
-        username,
-      });
-      return savedUser.userId;
+      const userId = await getIdFromTwitch(username);
+      changelog.update(userId, { username });
+      return userId;
     }
     return user.userId;
   }
 
   async getUserByUsername(username: string, select?: FindOneOptions<Readonly<Required<UserInterface>>>['select']) {
+    await changelog.flush();
     const userByUsername = await getRepository(User).findOne({ where: { username }, select });
 
     if (userByUsername) {
@@ -231,34 +236,36 @@ class Users extends Core {
     }
 
     const userId = await this.getIdByName(username);
-    const userById = await getRepository(User).findOne({ where: { userId } });
+    await changelog.flush();
+    const userById = await changelog.get(userId);
 
-    return userById || await getRepository(User).save({
-      userId,
-      username,
-    });
+    return userById as Readonly<Required<UserInterface>>;
   }
 
   sockets () {
     adminEndpoint(this.nsp, 'viewers::resetPointsAll', async (cb) => {
+      await changelog.flush();
       await getRepository(User).update({}, { points: 0 });
       if (cb) {
         cb(null);
       }
     });
     adminEndpoint(this.nsp, 'viewers::resetMessagesAll', async (cb) => {
+      await changelog.flush();
       await getRepository(User).update({}, { messages: 0, pointsByMessageGivenAt: 0 });
       if (cb) {
         cb(null);
       }
     });
     adminEndpoint(this.nsp, 'viewers::resetWatchedTimeAll', async (cb) => {
+      await changelog.flush();
       await getRepository(User).update({}, { watchedTime: 0 });
       if (cb) {
         cb(null);
       }
     });
     adminEndpoint(this.nsp, 'viewers::resetSubgiftsAll', async (cb) => {
+      await changelog.flush();
       await getRepository(User).update({}, { giftedSubscribes: 0 });
       if (cb) {
         cb(null);
@@ -309,7 +316,7 @@ class Users extends Core {
           update.pointsByMessageGivenAt = update.messages;
         }
 
-        await getRepository(User).update({ userId }, update);
+        await changelog.update(userId, update);
         // as cascade remove set ID as null, we need to get rid of tips/bits
         await getRepository(UserTip).delete({ userId: IsNull() });
         await getRepository(UserBit).delete({ userId: IsNull() });
@@ -320,6 +327,7 @@ class Users extends Core {
     });
     adminEndpoint(this.nsp, 'viewers::remove', async (viewer: Required<UserInterface>, cb) => {
       try {
+        await changelog.flush();
         cb(null, await getRepository(User).remove(viewer));
       } catch (e: any) {
         error(e);
@@ -349,6 +357,7 @@ class Users extends Core {
               left join (select userId, sum(sortAmount) as sumTips from user_tip group by userId) user_tip on user.userId = user_tip.userId
               left join (select userId, sum(amount) as sumBits from user_bit group by userId) user_bit on user.userId = user_bit.userId
         */
+        await changelog.flush();
         let query;
         if (connection.options.type === 'postgres') {
           query = getRepository(User).createQueryBuilder('user')
@@ -477,7 +486,7 @@ class Users extends Core {
     });
     viewerEndpoint(this.nsp, 'viewers::findOne', async (userId, cb) => {
       try {
-        const viewer = await getRepository(User).findOne({ where: { userId } });
+        const viewer = await changelog.get(userId);
         const tips =  await getRepository(UserTip).find({ where: { userId } });
         const bits =  await getRepository(UserBit).find({ where: { userId } });
 

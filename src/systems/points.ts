@@ -17,7 +17,7 @@ import {
 import Expects from '../expects';
 import { isStreamOnline } from '../helpers/api';
 import { prepare } from '../helpers/commons';
-import { getAllOnlineUsernames } from '../helpers/getAllOnlineUsernames';
+import { getAllOnlineIds } from '../helpers/getAllOnlineUsernames';
 import {
   debug, error, warning,
 } from '../helpers/log';
@@ -26,7 +26,8 @@ import { getUserHighestPermission } from '../helpers/permissions/';
 import { defaultPermissions } from '../helpers/permissions/';
 import { getPointsName, name } from '../helpers/points/';
 import { adminEndpoint } from '../helpers/socket';
-import { isBot } from '../helpers/user/isBot';
+import * as changelog from '../helpers/user/changelog.js';
+import { isBot, isBotId } from '../helpers/user/isBot';
 import { getIdFromTwitch } from '../microservices/getIdFromTwitch';
 import oauth from '../oauth';
 import { translate } from '../translate';
@@ -86,7 +87,9 @@ class Points extends System {
         if (lastProbableRun > this.lastCronRun) {
           if (this.isPointResetIntervalEnabled) {
             warning('Points were reset by cron');
-            getRepository(User).update({}, { points: 0 });
+            changelog.flush().then(() => {
+              getRepository(User).update({}, { points: 0 });
+            });
           } else {
             debug('points.cron', 'Cron would run, but it is disabled.');
           }
@@ -125,11 +128,11 @@ class Points extends System {
     try {
       const userPromises: Promise<void>[] = [];
       debug('points.update', `Started points adding, isStreamOnline: ${isStreamOnline.value}`);
-      for (const username of (await getAllOnlineUsernames())) {
-        if (isBot(username)) {
+      for (const userId of (await getAllOnlineIds())) {
+        if (isBotId(userId)) {
           continue;
         }
-        userPromises.push(this.processPoints(username, {
+        userPromises.push(this.processPoints(userId, {
           interval, offlineInterval, perInterval, perOfflineInterval, isStreamOnline: isStreamOnline.value,
         }));
         await Promise.all(userPromises);
@@ -143,61 +146,48 @@ class Points extends System {
     }
   }
 
-  private async processPoints(username: string, opts: {interval: {[permissionId: string]: any}; offlineInterval: {[permissionId: string]: any}; perInterval: {[permissionId: string]: any}; perOfflineInterval: {[permissionId: string]: any}; isStreamOnline: boolean}): Promise<void> {
-    const userId = await users.getIdByName(username);
-    if (!userId) {
-      debug('points.update', `User ${username} missing userId`);
-      return; // skip without id
+  private async processPoints(userId: string, opts: {interval: {[permissionId: string]: any}; offlineInterval: {[permissionId: string]: any}; perInterval: {[permissionId: string]: any}; perOfflineInterval: {[permissionId: string]: any}; isStreamOnline: boolean}): Promise<void> {
+    const user = await changelog.get(userId);
+    if (!user) {
+      return;
     }
 
     // get user max permission
     const permId = await getUserHighestPermission(userId);
     if (!permId) {
-      debug('points.update', `User ${username}#${userId} permId not found`);
+      debug('points.update', `User ${user.username}#${userId} permId not found`);
       return; // skip without id
     }
 
     const interval_calculated = opts.isStreamOnline ? opts.interval[permId] * 60 * 1000 : opts.offlineInterval[permId]  * 60 * 1000;
     const ptsPerInterval = opts.isStreamOnline ? opts.perInterval[permId]  : opts.perOfflineInterval[permId] ;
 
-    const user = await getRepository(User).findOne({ username });
-    if (!user) {
-      debug('points.update', `new user in db ${username}#${userId}[${permId}]`);
-      await getRepository(User).save({
-        userId,
-        username,
-        points:               0,
-        pointsOfflineGivenAt: 0,
-        pointsOnlineGivenAt:  0,
-      });
-    } else {
-      const chat = await users.getChatOf(userId, opts.isStreamOnline);
-      const userPointsKey = opts.isStreamOnline ? 'pointsOnlineGivenAt' : 'pointsOfflineGivenAt';
-      if (interval_calculated !== 0 && ptsPerInterval[permId]  !== 0) {
-        const givenAt = user[userPointsKey] + interval_calculated;
-        debug('points.update', `${user.username}#${userId}[${permId}] ${chat} | ${givenAt}`);
+    const chat = await users.getChatOf(userId, opts.isStreamOnline);
+    const userPointsKey = opts.isStreamOnline ? 'pointsOnlineGivenAt' : 'pointsOfflineGivenAt';
+    if (interval_calculated !== 0 && ptsPerInterval[permId]  !== 0) {
+      const givenAt = user[userPointsKey] + interval_calculated;
+      debug('points.update', `${user.username}#${userId}[${permId}] ${chat} | ${givenAt}`);
 
-        let modifier = 0;
-        let userTimePoints = givenAt + interval_calculated;
-        for (; userTimePoints <= chat; userTimePoints += interval_calculated) {
-          modifier++;
-        }
-        if (modifier > 0) {
-          // add points to user[userPointsKey] + interval to user to not overcalculate (this should ensure recursive add points in time)
-          debug('points.update', `${user.username}#${userId}[${permId}] +${Math.floor(ptsPerInterval * modifier)}`);
-          await getRepository(User).save({
-            ...user,
-            points:          user.points + ptsPerInterval * modifier,
-            [userPointsKey]: userTimePoints,
-          });
-        }
-      } else {
-        await getRepository(User).save({
-          ...user,
-          [userPointsKey]: chat,
-        });
-        debug('points.update', `${user.username}#${userId}[${permId}] points disabled or interval is 0, settint points time to chat`);
+      let modifier = 0;
+      let userTimePoints = givenAt + interval_calculated;
+      for (; userTimePoints <= chat; userTimePoints += interval_calculated) {
+        modifier++;
       }
+      if (modifier > 0) {
+        // add points to user[userPointsKey] + interval to user to not overcalculate (this should ensure recursive add points in time)
+        debug('points.update', `${user.username}#${userId}[${permId}] +${Math.floor(ptsPerInterval * modifier)}`);
+        changelog.update(userId, {
+          ...user,
+          points:          user.points + ptsPerInterval * modifier,
+          [userPointsKey]: userTimePoints,
+        });
+      }
+    } else {
+      changelog.update(userId, {
+        ...user,
+        [userPointsKey]: chat,
+      });
+      debug('points.update', `${user.username}#${userId}[${permId}] points disabled or interval is 0, settint points time to chat`);
     }
   }
 
@@ -227,13 +217,13 @@ class Points extends System {
       return;
     }
 
-    const user = await getRepository(User).findOne({ userId: opts.sender.userId });
+    const user = await changelog.get(opts.sender.userId);
     if (!user) {
       return true;
     }
 
     if (user.pointsByMessageGivenAt + interval_calculated <= user.messages) {
-      await getRepository(User).save({
+      changelog.update(opts.sender.userId, {
         ...user,
         points:                 user.points + ptsPerInterval,
         pointsByMessageGivenAt: user.messages,
@@ -258,7 +248,10 @@ class Points extends System {
     });
 
     adminEndpoint(this.nsp, 'reset', async () => {
-      getRepository(User).update({}, { points: 0 });
+      changelog.flush().then(() => {
+        getRepository(PointsChangelog).clear();
+        getRepository(User).update({}, { points: 0 });
+      });
     });
   }
 
@@ -269,11 +262,11 @@ class Points extends System {
   }
 
   async getPointsOf(userId: string) {
-    const user = await getRepository(User).findOne({ where: { userId } });
+    const user = await changelog.get(userId);
 
     if (user) {
       if (user.points < 0) {
-        await getRepository(User).save({
+        changelog.update(userId, {
           ...user,
           points: 0,
         });
@@ -305,7 +298,7 @@ class Points extends System {
       }
 
       await getRepository(PointsChangelog).delete({ id: undoOperation.id });
-      await getRepository(User).update({ userId }, { points: undoOperation.originalValue });
+      changelog.update(userId, { points: undoOperation.originalValue });
 
       return [{
         response: prepare('points.success.undo', {
@@ -329,11 +322,12 @@ class Points extends System {
     try {
       const [username, points] = new Expects(opts.parameters).username().points({ all: false }).toArray();
 
+      await changelog.flush();
       const originalUser = await getRepository(User).findOne({ username });
       if (!originalUser) {
         throw new Error(`User ${username} not found in database.`);
       }
-      await getRepository(User).update({ username }, { points });
+      changelog.update(originalUser.userId, { points });
       await getRepository(PointsChangelog).insert({
         userId:        originalUser.userId,
         updatedAt:     Date.now(),
@@ -361,19 +355,16 @@ class Points extends System {
       if (opts.sender.username.toLowerCase() === username.toLowerCase()) {
         return [];
       }
-
+      await changelog.flush();
       const guser = await getRepository(User).findOne({ username });
-      const sender = await getRepository(User).findOne({ userId: opts.sender.userId });
+      const sender = await changelog.get(opts.sender.userId);
 
       if (!sender) {
         throw new Error('Sender was not found in DB!');
       }
 
       if (!guser) {
-        await getRepository(User).save({
-          userId: await getIdFromTwitch(username),
-          username, points: 0,
-        });
+        changelog.update(await getIdFromTwitch(username), { username });
         return this.give(opts);
       }
 
@@ -395,10 +386,8 @@ class Points extends System {
         });
         return [{ response, ...opts }];
       } else if (points === 'all') {
-        await getRepository(User).save([
-          { ...guser, points: guser.points + availablePoints },
-          { ...sender, points: 0 },
-        ]);
+        changelog.increment(guser.userId, { points: availablePoints });
+        changelog.update(sender.userId, { points: 0 });
         const response = prepare('points.success.give', {
           amount:     availablePoints,
           username,
@@ -406,10 +395,8 @@ class Points extends System {
         });
         return [{ response, ...opts }];
       } else {
-        await getRepository(User).save([
-          { ...guser, points: guser.points + points },
-          { ...sender, points: sender.points - points },
-        ]);
+        changelog.increment(guser.userId, { points: points });
+        changelog.increment(sender.userId, { points: -points });
         const response = prepare('points.success.give', {
           amount:     points,
           username,
@@ -428,20 +415,18 @@ class Points extends System {
     try {
       const [username] = new Expects(opts.parameters).username({ optional: true, default: opts.sender.username }).toArray();
 
-      let user: Readonly<Required<UserInterface>> | undefined;
+      let user: Readonly<Required<UserInterface>> | null;
       if (opts.sender.username === username) {
-        user = await getRepository(User).findOne({ userId: opts.sender.userId });
+        user = await changelog.get(opts.sender.userId);
       } else {
-        user = await getRepository(User).findOne({ username });
+        await changelog.flush();
+        user = await getRepository(User).findOne({ username }) ?? null;
       }
 
       if (!user) {
         const userId = await getIdFromTwitch(username);
         if (userId) {
-          await getRepository(User).save({
-            userId,
-            username,
-          });
+          changelog.update(userId, { username });
           return this.get(opts);
         } else {
           throw new Error(`User ${username} not found on twitch`);
@@ -461,6 +446,7 @@ class Points extends System {
         }
       };
 
+      await changelog.flush();
       const orderQuery = await getRepository(User).query(query(connection.options.type));
       const count = await getRepository(User).count();
 
@@ -496,6 +482,7 @@ class Points extends System {
 
       let response: string;
       if (points >= 0) {
+        await changelog.flush();
         await getRepository(User).increment({}, 'points', points);
         response = prepare('points.success.online.positive', {
           amount:     points,
@@ -523,6 +510,7 @@ class Points extends System {
       let points: number = new Expects(opts.parameters).points({ all: false, negative: true }).toArray()[0];
       let response: string;
       if (points >= 0) {
+        await changelog.flush();
         await getRepository(User).increment({}, 'points', points);
         response = prepare('points.success.all.positive', {
           amount:     points,
@@ -548,13 +536,14 @@ class Points extends System {
   async rain (opts: CommandOptions): Promise<CommandResponse[]> {
     try {
       const points = new Expects(opts.parameters).points({ all: false }).toArray()[0];
+      await changelog.flush();
 
       for (const user of (await getRepository(User).find({ isOnline: true }))) {
         if (isBot(user.username)) {
           continue;
         }
 
-        getRepository(User).increment({ userId: user.userId }, 'points', Math.floor(Math.random() * points));
+        changelog.increment(user.userId, { points: Math.floor(Math.random() * points) });
       }
       const response = prepare('points.success.rain', {
         amount:     points,
@@ -572,16 +561,14 @@ class Points extends System {
     try {
       const [username, points] = new Expects(opts.parameters).username().points({ all: false }).toArray();
 
+      await changelog.flush();
       const user = await getRepository(User).findOne({ username });
 
       if (!user) {
-        await getRepository(User).save({
-          userId: await getIdFromTwitch(username),
-          username,
-        });
+        changelog.update(await getIdFromTwitch(username), { username });
         return this.add(opts);
       } else {
-        await getRepository(User).save({ ...user, points: user.points + points });
+        changelog.increment(user.userId, { points });
       }
 
       await getRepository(PointsChangelog).insert({
@@ -609,19 +596,17 @@ class Points extends System {
     try {
       const [username, points] = new Expects(opts.parameters).username().points({ all: true }).toArray();
 
+      await changelog.flush();
       const user = await getRepository(User).findOne({ username });
       if (!user) {
-        await getRepository(User).save({
-          userId: await getIdFromTwitch(username),
-          username, points: 0,
-        });
+        changelog.update(await getIdFromTwitch(username), { username });
         return this.remove(opts);
       }
 
       if (points === 'all') {
-        await getRepository(User).save({ ...user, points: 0 });
+        changelog.update(user.userId, { points: 0 });
       } else {
-        await getRepository(User).save({ ...user, points: Math.max(user.points - points, 0) });
+        changelog.update(user.userId, { points: Math.max(user.points - points, 0) });
       }
 
       await getRepository(PointsChangelog).insert({
@@ -650,6 +635,7 @@ class Points extends System {
   }
 
   async decrement(where: FindConditions<Readonly<Required<UserInterface>>>, points: number) {
+    await changelog.flush();
     await getRepository(User).decrement(where, 'points', points);
     await getRepository(User).createQueryBuilder()
       .update(User)

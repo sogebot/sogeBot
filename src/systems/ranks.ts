@@ -11,6 +11,7 @@ import { dayjs } from '../helpers/dayjs';
 import { getLocalizedName } from '../helpers/getLocalized';
 import { defaultPermissions } from '../helpers/permissions/';
 import { adminEndpoint } from '../helpers/socket';
+import * as changelog from '../helpers/user/changelog.js';
 import { translate } from '../translate';
 import users from '../users';
 import System from './_interface';
@@ -166,6 +167,7 @@ class Ranks extends System {
       return [{ response, ...opts }];
     }
 
+    await changelog.flush();
     await getRepository(User).update({ username: parsed[1] }, { haveCustomRank: true, rank: parsed[2].trim() });
     const response = prepare('ranks.custom-rank-was-set-to-user', { rank: parsed[2].trim(), username: parsed[1] });
     return [{ response, ...opts }];
@@ -180,7 +182,7 @@ class Ranks extends System {
       const response = prepare('ranks.rank-parse-failed');
       return [{ response, ...opts }];
     }
-
+    await changelog.flush();
     await getRepository(User).update({ username: parsed[1] }, { haveCustomRank: false, rank: '' });
     const response = prepare('ranks.custom-rank-was-unset-for-user', { username: parsed[1] });
     return [{ response, ...opts }];
@@ -255,7 +257,7 @@ class Ranks extends System {
 
   @command('!rank')
   async main (opts: CommandOptions): Promise<CommandResponse[]> {
-    const user = await getRepository(User).findOne({ userId: opts.sender.userId });
+    const user = await changelog.get(opts.sender.userId);
     const watched = await users.getWatchedOf(opts.sender.userId);
     const rank = await this.get(user);
 
@@ -295,7 +297,7 @@ class Ranks extends System {
     return [{ response, ...opts }];
   }
 
-  async get (user: Required<UserInterface> | undefined): Promise<{current: null | string | Required<RankInterface>; next: null | Required<RankInterface>}> {
+  async get (user: Required<UserInterface> | null): Promise<{current: null | string | Required<RankInterface>; next: null | Required<RankInterface>}> {
     if (!user) {
       return { current: null, next: null };
     }

@@ -8,6 +8,7 @@ import { getRepository } from 'typeorm';
 
 import { User } from '../database/entity/user';
 import { UserInterface } from '../database/entity/user';
+import * as changelog from '../helpers/user/changelog.js';
 import { isIgnored } from '../helpers/user/isIgnored';
 import oauth from '../oauth';
 import tmi from '../tmi';
@@ -43,6 +44,7 @@ const evaluate: ResponseFilter = {
 
     let allUsers: Readonly<Required<UserInterface>>[] = [];
     if (containUsers || containRandom) {
+      await changelog.flush();
       allUsers = await getRepository(User).find();
     }
     const user = await users.getUserByUsername(attr.sender.username);
@@ -52,6 +54,7 @@ const evaluate: ResponseFilter = {
     let onlineFollowers: Readonly<Required<UserInterface>>[] = [];
 
     if (containOnline) {
+      await changelog.flush();
       const viewers = (await getRepository(User).createQueryBuilder('user')
         .where('user.username != :botusername', { botusername: oauth.botUsername.toLowerCase() })
         .andWhere('user.username != :broadcasterusername', { broadcasterusername: oauth.broadcasterUsername.toLowerCase() })

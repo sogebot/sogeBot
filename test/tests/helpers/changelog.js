@@ -26,8 +26,8 @@ describe('User changelog tests', () => {
       userId:                    '999999',
       username:                  'lorem',
       watchedTime:               55555,
-      points:                    10,
-      messages:                  20,
+      points:                    9,
+      messages:                  19,
       subscribedAt:              0,
       subscribeTier:             '0',
       subscribeStreak:           0,
@@ -56,7 +56,7 @@ describe('User changelog tests', () => {
       createdAt:                 0,
       displayname:               '',
       extra:                     {
-        jackpotWins: 2,
+        jackpotWins: 3,
         levels:      {
           xp:                1,
           xpOfflineGivenAt:  2,
@@ -73,10 +73,10 @@ describe('User changelog tests', () => {
     changelog.update('999999', {
       username: 'lorem',
       points:   20,
-      messages: 20,
+      messages: 18,
     });
     changelog.update('999999', {
-      points: 10,
+      points: 8,
       extra:  {
         jackpotWins: 1,
         levels:      {
@@ -99,18 +99,22 @@ describe('User changelog tests', () => {
         },
       },
     });
+    changelog.increment('999999', {
+      points:   1,
+      messages: 1,
+      extra:    { jackpotWins: 1 },
+    });
     const data = await changelog.get('999999');
     assert.deepEqual(data, expected);
   });
 
   it('after flush all data should be in database', async () => {
-
     const expected = {
       userId:                    '999999',
       username:                  'lorem',
       watchedTime:               55555,
-      points:                    10,
-      messages:                  20,
+      points:                    9,
+      messages:                  19,
       subscribedAt:              0,
       subscribeTier:             '0',
       subscribeStreak:           0,
@@ -139,7 +143,7 @@ describe('User changelog tests', () => {
       createdAt:                 0,
       displayname:               '',
       extra:                     {
-        jackpotWins: 2,
+        jackpotWins: 3,
         levels:      {
           xp:                1,
           xpOfflineGivenAt:  2,

@@ -1,8 +1,6 @@
 import _ from 'lodash';
 import safeEval from 'safe-eval';
-import { getRepository } from 'typeorm';
 
-import { User } from '../database/entity/user';
 import { timer } from '../decorators.js';
 import ranks from '../systems/ranks';
 import { isStreamOnline, stats } from './api';
@@ -10,6 +8,7 @@ import { getAll } from './customvariables';
 import {
   isOwner, isSubscriber, isVIP,
 } from './user';
+import * as changelog from './user/changelog.js';
 import { isBot, isBotSubscriber } from './user/isBot';
 import { isBroadcaster } from './user/isBroadcaster';
 import { isModerator } from './user/isModerator';
@@ -22,9 +21,9 @@ class HelpersFilter {
     }
     const toEval = `(function evaluation () { return ${filter} })()`;
 
-    const $userObject = await getRepository(User).findOne({ userId: opts.sender.userId });
+    const $userObject = await changelog.get(opts.sender.userId);
     if (!$userObject) {
-      await getRepository(User).save({
+      changelog.update(opts.sender.userId, {
         userId:   opts.sender.userId,
         username: opts.sender.username,
       });

@@ -1,8 +1,6 @@
 import { HOUR } from '@sogebot/ui-helpers/constants';
 import { dayjs } from '@sogebot/ui-helpers/dayjsHelper';
-import { getRepository } from 'typeorm';
 
-import { User } from '../../database/entity/user';
 import eventlist from '../../overlays/eventlist';
 import alerts from '../../registries/alerts';
 import tmi from '../../tmi';
@@ -11,6 +9,7 @@ import { debug, follow as followLog } from '../log';
 import {
   isBot, isIgnored, isInGlobalIgnoreList,
 } from '../user';
+import * as changelog from '../user/changelog.js';
 
 import { eventEmitter } from '.';
 
@@ -61,18 +60,16 @@ export function follow(userId: string, username: string, followedAt: string | nu
       userId:   userId,
     });
 
-    getRepository(User).findOneOrFail({ userId })
+    changelog.getOrFail(userId)
       .then(user => {
-        getRepository(User).update({ userId },
-          {
-            followedAt:    user.haveFollowedAtLock ? user.followedAt : dayjs(followedAt).valueOf(),
-            isFollower:    user.haveFollowerLock? user.isFollower : true,
-            followCheckAt: Date.now(),
-          });
+        changelog.update(userId, {
+          followedAt:    user.haveFollowedAtLock ? user.followedAt : dayjs(followedAt).valueOf(),
+          isFollower:    user.haveFollowerLock? user.isFollower : true,
+          followCheckAt: Date.now(),
+        });
       })
       .catch(() => {
-        getRepository(User).save({
-          userId,
+        changelog.update(userId, {
           username:      username,
           followedAt:    dayjs(followedAt).valueOf(),
           isFollower:    true,
