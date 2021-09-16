@@ -1,0 +1,1250 @@
+███████╗ ██████╗  ██████╗ ███████╗██████╗  ██████╗ ████████╗     ██╗██████╗    ██╗██████╗     ██████╗       ██████╗ ██████╗ ██████╗ ███████╗██████╗ ██████╗ ███████╗
+██╔════╝██╔═══██╗██╔════╝ ██╔════╝██╔══██╗██╔═══██╗╚══██╔══╝    ███║╚════██╗  ███║╚════██╗   ██╔═████╗      ╚════██╗╚════██╗╚════██╗╚════██║██╔══██╗██╔══██╗╚════██║
+███████╗██║   ██║██║  ███╗█████╗  ██████╔╝██║   ██║   ██║       ╚██║ █████╔╝  ╚██║ █████╔╝   ██║██╔██║█████╗ █████╔╝ █████╔╝ █████╔╝    ██╔╝██║  ██║██████╔╝    ██╔╝
+╚════██║██║   ██║██║   ██║██╔══╝  ██╔══██╗██║   ██║   ██║        ██║ ╚═══██╗   ██║██╔═══╝    ████╔╝██║╚════╝██╔═══╝ ██╔═══╝ ██╔═══╝    ██╔╝ ██║  ██║██╔══██╗   ██╔╝ 
+███████║╚██████╔╝╚██████╔╝███████╗██████╔╝╚██████╔╝   ██║        ██║██████╔╝██╗██║███████╗██╗╚██████╔╝      ███████╗███████╗███████╗   ██║  ██████╔╝██████╔╝   ██║  
+╚══════╝ ╚═════╝  ╚═════╝ ╚══════╝╚═════╝  ╚═════╝    ╚═╝        ╚═╝╚═════╝ ╚═╝╚═╝╚══════╝╚═╝ ╚═════╝       ╚══════╝╚══════╝╚══════╝   ╚═╝  ╚═════╝ ╚═════╝    ╚═╝  
+                                                                                                                                                                    
+
+
+2021-09-16T20:13:48.595 | Bot is starting up (NodeJS: 14.17.6)
+2021-09-16T20:13:48.596 |! DEBUG set to: flush
+2021-09-16T20:13:48.809 DEBUG: flush empty
+
+
+  Alias - #3680 - alias should override command permission
+2021-09-16T20:13:51.250 | ENABLED: Points (systems)
+2021-09-16T20:13:53.470 | Bot timezone set to Europe/Prague
+2021-09-16T20:13:54.248 | Initialized SQLite3 database (E:\_GIT\bot\sogeBot\sogebot.db)
+2021-09-16T20:14:08.711 |! Bot language is currently set to english
+2021-09-16T20:14:43.733 | CURRENCY: fetching rates
+2021-09-16T20:14:43.736 DEBUG: flush empty
+2021-09-16T20:14:43.737 DEBUG: flush empty
+2021-09-16T20:14:43.738 | ENABLED: Ranks (systems)
+2021-09-16T20:14:43.740 | ENABLED: CustomCommands (systems)
+2021-09-16T20:14:43.741 | DISABLED: LastFM (integrations)
+2021-09-16T20:14:43.742 | DISABLED: Spotify (integrations)
+2021-09-16T20:14:43.742 | SPOTIFY: Client disconnected from service
+2021-09-16T20:14:43.744 | ENABLED: Songs (systems)
+2021-09-16T20:14:43.746 | DISABLED: Discord (integrations)
+2021-09-16T20:14:43.748 | ENABLED: Alias (systems)
+2021-09-16T20:14:43.750 | DISABLED: Duel (games)
+2021-09-16T20:14:43.751 | DISABLED: Gamble (games)
+2021-09-16T20:14:43.752 | ENABLED: Bets (systems)
+2021-09-16T20:14:43.754 | ENABLED: Cooldown (systems)
+2021-09-16T20:14:43.757 | ENABLED: Commercial (systems)
+2021-09-16T20:14:43.758 | DISABLED: FightMe (games)
+2021-09-16T20:14:43.758 | DISABLED: Roulette (games)
+2021-09-16T20:14:43.759 | DISABLED: Seppuku (games)
+2021-09-16T20:14:43.759 | ENABLED: Keywords (systems)
+2021-09-16T20:14:43.760 | ENABLED: Price (systems)
+2021-09-16T20:14:43.761 | ENABLED: Timers (systems)
+2021-09-16T20:14:43.762 | ENABLED: Moderation (systems)
+2021-09-16T20:14:43.765 | ENABLED: Polls (systems)
+2021-09-16T20:14:43.766 | DISABLED: Streamlabs (integrations)
+2021-09-16T20:14:43.766 | ENABLED: Quotes (systems)
+2021-09-16T20:14:43.767 | ENABLED: Raffles (systems)
+2021-09-16T20:14:43.769 | ENABLED: Scrim (systems)
+2021-09-16T20:14:43.772 | ENABLED: Levels (systems)
+2021-09-16T20:14:43.775 DEBUG: flush empty
+2021-09-16T20:14:43.776 | ENABLED: Top (systems)
+2021-09-16T20:14:43.777 | ENABLED: UserInfo (systems)
+2021-09-16T20:14:43.779 | EVENTSUB: Domain or unreliable tunneling not set, please set it in UI.
+2021-09-16T20:14:46.085 | New version of @sogebot/ui-admin@15.0.1 package found. Automatic update disabled.
+2021-09-16T20:14:54.501 | ENABLED: Highlights (systems)
+2021-09-16T20:14:54.511 | No certificates were provided, serving only HTTP.
+2021-09-16T20:14:54.514 | WebPanel is available at http://localhost:20000
+2021-09-16T20:14:54.515 | ENABLED: Checklist (systems)
+2021-09-16T20:14:54.516 | ENABLED: EmotesCombo (systems)
+2021-09-16T20:14:54.516 | ENABLED: HowLongToBeat (systems)
+2021-09-16T20:14:54.517 | ENABLED: Queue (systems)
+2021-09-16T20:14:54.520 | DISABLED: Heist (games)
+2021-09-16T20:14:54.521 | DISABLED: Donationalerts (integrations)
+2021-09-16T20:14:54.522 | DISABLED: OBSWebsocket (integrations)
+2021-09-16T20:14:54.523 | DISABLED: PhillipsHue (integrations)
+2021-09-16T20:14:54.523 | PHILLIPSHUE: Not connected to api
+2021-09-16T20:14:54.524 | DISABLED: PUBG (integrations)
+2021-09-16T20:14:54.525 | DISABLED: Qiwi (integrations)
+2021-09-16T20:14:54.526 | DISABLED: StreamElements (integrations)
+2021-09-16T20:14:54.526 | DISABLED: TipeeeStream (integrations)
+2021-09-16T20:14:54.527 | DISABLED: Twitter (integrations)
+2021-09-16T20:14:54.527 | TWITTER: Client disconnected from service
+2021-09-16T20:14:54.535 DEBUG: flush empty
+2021-09-16T20:14:54.540 DEBUG: flush empty
+2021-09-16T20:14:54.543 |! Missing Broadcaster oAuth scope moderation:read to read channel moderators.
+2021-09-16T20:14:54.619 | CURRENCY: fetched rates
+=============== Initial 30s wait until tests are started. =============== 
+2021-09-16T20:15:09.133 DEBUG: flush empty
+    ✔ create alias !test for command !alert (caster only)
+    ✔ call !alert directly with regular viewer should send permission error
+    ✔ call alias with regular viewer should process it correctly
+
+  Alias - #3738 - alias should trigger commands by variable
+2021-09-16T20:15:09.593 DEBUG: flush empty
+    ✔ create variable $_alert
+    ✔ create alias !test for command !alert (caster only)
+    ✔ call alias with regular viewer should process it correctly
+
+  Alias - add()
+    Expected parsed fail
+2021-09-16T20:15:10.021 DEBUG: flush empty
+      ✔   
+2021-09-16T20:15:10.425 DEBUG: flush empty
+      ✔  -a !alias 
+2021-09-16T20:15:10.832 DEBUG: flush empty
+      ✔  -a !alias -c asd
+2021-09-16T20:15:11.237 DEBUG: flush empty
+      ✔  -a alias 
+2021-09-16T20:15:11.641 DEBUG: flush empty
+      ✔  -a alias -c !asd
+2021-09-16T20:15:12.045 DEBUG: flush empty
+      ✔  -a alias -c asd
+2021-09-16T20:15:12.449 DEBUG: flush empty
+      ✔ -p unknownpermission -a !a -c !me
+2021-09-16T20:15:12.853 DEBUG: flush empty
+      ✔ -p 0efd7b1c-e460-4167-8e06-8aaf2c170319 -a !a -c !me
+    Expected to pass
+2021-09-16T20:15:13.257 DEBUG: flush empty
+      ✔  -a !a -c !me
+2021-09-16T20:15:13.661 DEBUG: flush empty
+      ✔  -a !한국어 -c !me
+2021-09-16T20:15:13.741 DEBUG: flush empty
+2021-09-16T20:15:13.742 DEBUG: flush empty
+2021-09-16T20:15:14.066 DEBUG: flush empty
+      ✔  -a !русский -c !me
+2021-09-16T20:15:14.472 DEBUG: flush empty
+      ✔  -a !with link -c !me http://google.com
+2021-09-16T20:15:14.876 DEBUG: flush empty
+      ✔  -a !a with spaces -c !top messages
+2021-09-16T20:15:15.280 DEBUG: flush empty
+      ✔ -p 0efd7b1c-e460-4167-8e06-8aaf2c170311 -a !a -c !me
+2021-09-16T20:15:15.685 DEBUG: flush empty
+      ✔ -p casters -a !a -c !me
+2021-09-16T20:15:16.089 DEBUG: flush empty
+      ✔ 2x - -a !a -c !me
+
+  Alias - discord#707718945515503748 - alias should parse response
+2021-09-16T20:15:16.493 DEBUG: flush empty
+    ✔ create alias !test for command !uptime
+    ✔ alias should return correct offline message
+
+  Alias - edit()
+    Expected parsed fail
+2021-09-16T20:15:16.938 DEBUG: flush empty
+      ✔   
+2021-09-16T20:15:17.342 DEBUG: flush empty
+      ✔  -a !alias 
+2021-09-16T20:15:17.745 DEBUG: flush empty
+      ✔  -a !alias -c uptime
+    Expected not found fail
+2021-09-16T20:15:18.148 DEBUG: flush empty
+      ✔  -a !unknown -c !uptime
+    Expected to pass
+2021-09-16T20:15:18.551 DEBUG: flush empty
+      ✔ -p 0efd7b1c-e460-4167-8e06-8aaf2c170311 -a !a -c !me => -p 0efd7b1c-e460-4167-8e06-8aaf2c170311 -a !a -c !uptime
+2021-09-16T20:15:18.956 DEBUG: flush empty
+      ✔ -p casters -a !a -c !me => -p 0efd7b1c-e460-4167-8e06-8aaf2c170311 -a !a -c !uptime
+2021-09-16T20:15:19.362 DEBUG: flush empty
+      ✔ -p 0efd7b1c-e460-4167-8e06-8aaf2c170311 -a !a -c !me => -p moderators -a !a -c !uptime
+2021-09-16T20:15:19.766 DEBUG: flush empty
+      ✔ -p 0efd7b1c-e460-4167-8e06-8aaf2c170311 -a !한국어 -c !me => -p 0efd7b1c-e460-4167-8e06-8aaf2c170311 -a !한국어 -c !uptime
+2021-09-16T20:15:20.171 DEBUG: flush empty
+      ✔ -p 0efd7b1c-e460-4167-8e06-8aaf2c170311 -a !русский -c !me => -p 0efd7b1c-e460-4167-8e06-8aaf2c170311 -a !русский -c !uptime
+2021-09-16T20:15:20.576 DEBUG: flush empty
+      ✔ -p 0efd7b1c-e460-4167-8e06-8aaf2c170311 -a !a with spaces -c !me => -p 0efd7b1c-e460-4167-8e06-8aaf2c170311 -a !a with spaces -c !uptime
+
+  Alias - list()
+2021-09-16T20:15:20.980 DEBUG: flush empty
+    ✔ empty list
+2021-09-16T20:15:21.383 DEBUG: flush empty
+    ✔ populated list
+
+  Alias - remove()
+2021-09-16T20:15:21.788 DEBUG: flush empty
+    ✔ 
+2021-09-16T20:15:22.191 DEBUG: flush empty
+    ✔ !alias
+2021-09-16T20:15:22.595 DEBUG: flush empty
+    ✔ alias
+2021-09-16T20:15:22.998 DEBUG: flush empty
+    ✔ !a
+2021-09-16T20:15:23.403 DEBUG: flush empty
+    ✔ !a with spaces
+2021-09-16T20:15:23.807 DEBUG: flush empty
+    ✔ !한국어
+2021-09-16T20:15:24.211 DEBUG: flush empty
+    ✔ !русский
+2021-09-16T20:15:24.615 DEBUG: flush empty
+    ✔ 2x - !a !me
+
+  Alias - run()
+2021-09-16T20:15:25.019 DEBUG: flush empty
+    ✔ !a should show correctly command with link (skip is true)
+2021-09-16T20:15:25.448 DEBUG: flush empty
+    ✔ !a will show !duel
+2021-09-16T20:15:25.875 DEBUG: flush empty
+    ✔ #668 - alias is case insensitive
+2021-09-16T20:15:26.300 DEBUG: flush empty
+    ✔ !a with spaces - will show !duel
+2021-09-16T20:15:26.722 DEBUG: flush empty
+    ✔ !한국어 - will show !duel
+2021-09-16T20:15:27.150 DEBUG: flush empty
+    ✔ !русский - will show !duel
+2021-09-16T20:15:27.571 DEBUG: flush empty
+    ✔ !крутить 1000 - will show !gamble 1000
+
+  Alias - toggle()
+2021-09-16T20:15:27.996 DEBUG: flush empty
+    ✔ 
+2021-09-16T20:15:28.400 DEBUG: flush empty
+    ✔ !unknown
+2021-09-16T20:15:28.803 DEBUG: flush empty
+    ✔ !a
+2021-09-16T20:15:29.210 DEBUG: flush empty
+    ✔ !a with spaces
+2021-09-16T20:15:29.615 DEBUG: flush empty
+    ✔ !한국어
+2021-09-16T20:15:30.021 DEBUG: flush empty
+    ✔ !русский
+
+  Alias - toggleVisibility()
+2021-09-16T20:15:30.426 DEBUG: flush empty
+    ✔ 
+2021-09-16T20:15:30.829 DEBUG: flush empty
+    ✔ !unknown
+2021-09-16T20:15:31.233 DEBUG: flush empty
+    ✔ !a
+2021-09-16T20:15:31.638 DEBUG: flush empty
+    ✔ !a with spaces
+2021-09-16T20:15:32.044 DEBUG: flush empty
+    ✔ !한국어
+2021-09-16T20:15:32.449 DEBUG: flush empty
+    ✔ !русский
+
+  API - getLatest100Followers()
+2021-09-16T20:15:32.854 DEBUG: flush empty
+    Example data
+2021-09-16T20:15:32.859 DEBUG: flush empty
+      ✔ should be properly parsed
+2021-09-16T20:15:32.862 +follow testfollow#111
+2021-09-16T20:15:32.862 DEBUG: flush start - 7d5ce453-5d4c-4c28-b7ac-0652725dce3c
+2021-09-16T20:15:32.863 DEBUG: flush queue: 7d5ce453-5d4c-4c28-b7ac-0652725dce3c
+2021-09-16T20:15:32.863 DEBUG: flush checking if 7d5ce453-5d4c-4c28-b7ac-0652725dce3c should run
+2021-09-16T20:15:32.864 +follow testfollow2#222
+2021-09-16T20:15:32.864 DEBUG: flush start - 94fbfe49-71e3-45ed-8c9a-f7209b1d68e7
+2021-09-16T20:15:32.865 DEBUG: flush queue: 7d5ce453-5d4c-4c28-b7ac-0652725dce3c, 94fbfe49-71e3-45ed-8c9a-f7209b1d68e7
+2021-09-16T20:15:32.865 DEBUG: flush checking if 94fbfe49-71e3-45ed-8c9a-f7209b1d68e7 should run
+2021-09-16T20:15:32.867 DEBUG: flush progress - 7d5ce453-5d4c-4c28-b7ac-0652725dce3c - changes: 10
+2021-09-16T20:15:32.876 DEBUG: flush done - 7d5ce453-5d4c-4c28-b7ac-0652725dce3c
+2021-09-16T20:15:32.878 DEBUG: flush queue: 94fbfe49-71e3-45ed-8c9a-f7209b1d68e7
+2021-09-16T20:15:32.878 DEBUG: flush checking if 94fbfe49-71e3-45ed-8c9a-f7209b1d68e7 should run
+2021-09-16T20:15:32.878 DEBUG: flush progress - 94fbfe49-71e3-45ed-8c9a-f7209b1d68e7 - changes: 2
+2021-09-16T20:15:32.882 DEBUG: flush done - 94fbfe49-71e3-45ed-8c9a-f7209b1d68e7
+2021-09-16T20:15:33.539 | EMOTES: Fetching global emotes
+2021-09-16T20:15:33.540 | EMOTES: Fetched global emotes
+2021-09-16T20:15:34.790 !!! ERROR !!! https://api.twitch.tv/helix/streams?user_id=12345 - Request failed with status code 401
+2021-09-16T20:15:35.023 !!! ERROR !!! https://api.twitch.tv/helix/streams/tags?broadcaster_id=12345 - Request failed with status code 401
+2021-09-16T20:15:35.025 !!! ERROR !!! https://api.twitch.tv/helix/users/?id=12345 - Missing bot oauth clientId
+2021-09-16T20:15:35.030 DEBUG: flush empty
+2021-09-16T20:15:35.266 !!! ERROR !!! https://api.twitch.tv/helix/channels?broadcaster_id=12345 - Request failed with status code 401
+2021-09-16T20:15:35.495 !!! ERROR !!! https://api.twitch.tv/helix/tags/streams?first=100 - Request failed with status code 401
+      ✔ should be two follow events after while (5000ms)
+      ✔ follow events should have correct usernames
+      ✔ second call should be properly parsed
+      ✔ should be two follow events, expecting no change (5000ms)
+      ✔ follow events should have correct usernames
+
+  Bets - bet open do not give infromation how to use | https://github.com/sogehige/sogeBot/issues/3301
+2021-09-16T20:15:43.289 DEBUG: flush start - 0b3f9cfc-5957-4899-aaf3-aefb05a0841d
+2021-09-16T20:15:43.289 DEBUG: flush queue: 0b3f9cfc-5957-4899-aaf3-aefb05a0841d
+2021-09-16T20:15:43.289 DEBUG: flush checking if 0b3f9cfc-5957-4899-aaf3-aefb05a0841d should run
+2021-09-16T20:15:43.290 DEBUG: flush progress - 0b3f9cfc-5957-4899-aaf3-aefb05a0841d - changes: 5
+2021-09-16T20:15:43.296 DEBUG: flush done - 0b3f9cfc-5957-4899-aaf3-aefb05a0841d
+2021-09-16T20:15:43.299 | TMI: bot parted channel 
+    ✔ Open new bet without any params
+    ✔ !bet open should have correct error message
+
+  Bets - bet should automatically be locked after given time with participants
+2021-09-16T20:15:43.703 DEBUG: flush empty
+    ✔ Seed database with soon to be closed bet
+2021-09-16T20:15:43.711 DEBUG: flush empty
+    ✔ !bet participate should be OK
+2021-09-16T20:15:43.742 DEBUG: flush empty
+2021-09-16T20:15:43.742 DEBUG: flush empty
+2021-09-16T20:15:43.780 DEBUG: flush empty
+2021-09-16T20:15:54.539 DEBUG: flush empty
+2021-09-16T20:15:54.544 DEBUG: flush empty
+    ✔ Bet should properly announce lock (10837ms)
+    ✔ Bet should be locked in db
+    ✔ !bet should not show any running bet
+    ✔ !bet participate should not show any running bet
+
+  Bets - bet should automatically be locked after given time without participants
+2021-09-16T20:15:54.956 DEBUG: flush empty
+    ✔ Seed database with soon to be closed bet
+    ✔ Bet should be locked in db in 15 seconds (9609ms)
+    ✔ !bet should not show any running bet
+    ✔ !bet participate should not show any running bet
+
+  Bets - closed bet shows as opened | https://discord.com/channels/317348946144002050/317349069024395264/781585551005319199
+2021-09-16T20:16:04.976 DEBUG: flush empty
+    ✔ Seed database with closed bet
+    ✔ !bet should not show any running bet
+    ✔ !bet participate should not show any running bet
+
+  Bets - workflow()
+    NG - -timeout 5 -title "Jak se umistim?" Vyhra
+2021-09-16T20:16:05.383 DEBUG: flush empty
+      ✔ Open new bet
+      ✔ Bet open should failed
+    OK - -timeout 5 -title "Jak se umistim?" Vyhra | Top 3 | Top 10
+2021-09-16T20:16:05.788 DEBUG: flush empty
+      ✔ Open new bet
+      ✔ !bet open should have correct message
+      ✔ !bet open should be correctly saved in db
+2021-09-16T20:16:05.798 DEBUG: flush empty
+      ✔ user sppfy will bet on 1 10 tickets
+2021-09-16T20:16:05.802 DEBUG: flush empty
+      ✔ user oufll will bet on 2 20 tickets
+2021-09-16T20:16:05.806 DEBUG: flush empty
+      ✔ user nzwtp will bet on 2 30 tickets
+2021-09-16T20:16:05.810 DEBUG: flush empty
+      ✔ user lfoyx will bet on 2 40 tickets
+2021-09-16T20:16:05.814 DEBUG: flush empty
+      ✔ user kdrdr will bet on 2 50 tickets
+2021-09-16T20:16:05.818 DEBUG: flush empty
+      ✔ user zokzw will bet on 2 60 tickets
+2021-09-16T20:16:05.822 DEBUG: flush empty
+      ✔ user rfvft will bet on 2 70 tickets
+2021-09-16T20:16:05.834 DEBUG: flush empty
+      ✔ user kwysv will bet on 2 80 tickets
+2021-09-16T20:16:05.838 DEBUG: flush empty
+      ✔ user gryat will bet on 3 90 tickets
+      ✔ Bet close should have correct win message
+2021-09-16T20:16:05.843 DEBUG: flush start - 76224bce-f6f8-45ae-b27b-06579d3a83ee
+2021-09-16T20:16:05.843 DEBUG: flush queue: 76224bce-f6f8-45ae-b27b-06579d3a83ee
+2021-09-16T20:16:05.843 DEBUG: flush checking if 76224bce-f6f8-45ae-b27b-06579d3a83ee should run
+2021-09-16T20:16:05.843 DEBUG: flush progress - 76224bce-f6f8-45ae-b27b-06579d3a83ee - changes: 1
+2021-09-16T20:16:05.845 DEBUG: flush done - 76224bce-f6f8-45ae-b27b-06579d3a83ee
+      ✔ WIN: user sppfy should have 106 tickets
+2021-09-16T20:16:05.846 DEBUG: flush empty
+      ✔ LOST: user oufll should have 80 tickets
+2021-09-16T20:16:05.848 DEBUG: flush empty
+      ✔ LOST: user nzwtp should have 70 tickets
+2021-09-16T20:16:05.849 DEBUG: flush empty
+      ✔ LOST: user lfoyx should have 60 tickets
+2021-09-16T20:16:05.850 DEBUG: flush empty
+      ✔ LOST: user kdrdr should have 50 tickets
+2021-09-16T20:16:05.852 DEBUG: flush empty
+      ✔ LOST: user zokzw should have 40 tickets
+2021-09-16T20:16:05.853 DEBUG: flush empty
+      ✔ LOST: user rfvft should have 30 tickets
+2021-09-16T20:16:05.854 DEBUG: flush empty
+      ✔ LOST: user kwysv should have 20 tickets
+2021-09-16T20:16:05.856 DEBUG: flush empty
+      ✔ LOST: user gryat should have 10 tickets
+    OK - -timeout 5 -title "Vyhra / Prohra" Vyhra | Prohra
+2021-09-16T20:16:06.256 DEBUG: flush empty
+      ✔ Open new bet
+      ✔ !bet open should have correct message
+      ✔ !bet open should be correctly saved in db
+2021-09-16T20:16:06.266 DEBUG: flush empty
+      ✔ user oaqpq will bet on 1 10 tickets
+2021-09-16T20:16:06.270 DEBUG: flush empty
+      ✔ user qjlrn will bet on 2 20 tickets
+2021-09-16T20:16:06.275 DEBUG: flush empty
+      ✔ user ukahe will bet on 2 30 tickets
+2021-09-16T20:16:06.279 DEBUG: flush empty
+      ✔ user ybcil will bet on 2 40 tickets
+2021-09-16T20:16:06.284 DEBUG: flush empty
+      ✔ user clwfy will bet on 2 50 tickets
+2021-09-16T20:16:06.288 DEBUG: flush empty
+      ✔ user rqdzl will bet on 2 60 tickets
+2021-09-16T20:16:06.291 DEBUG: flush empty
+      ✔ user tbeuw will bet on 2 70 tickets
+2021-09-16T20:16:06.296 DEBUG: flush empty
+      ✔ user sdks will bet on 2 80 tickets
+2021-09-16T20:16:06.299 DEBUG: flush empty
+      ✔ user gicsh will bet on 1 90 tickets
+      ✔ Bet close should have correct win message
+2021-09-16T20:16:06.303 DEBUG: flush start - 547d0c88-d957-4d80-8eac-b91590230cf0
+2021-09-16T20:16:06.304 DEBUG: flush queue: 547d0c88-d957-4d80-8eac-b91590230cf0
+2021-09-16T20:16:06.304 DEBUG: flush checking if 547d0c88-d957-4d80-8eac-b91590230cf0 should run
+2021-09-16T20:16:06.304 DEBUG: flush progress - 547d0c88-d957-4d80-8eac-b91590230cf0 - changes: 7
+2021-09-16T20:16:06.310 DEBUG: flush done - 547d0c88-d957-4d80-8eac-b91590230cf0
+      ✔ LOST: user oaqpq should have 90 tickets
+2021-09-16T20:16:06.312 DEBUG: flush empty
+      ✔ WIN: user qjlrn should have 108 tickets
+2021-09-16T20:16:06.313 DEBUG: flush empty
+      ✔ WIN: user ukahe should have 112 tickets
+2021-09-16T20:16:06.314 DEBUG: flush empty
+      ✔ WIN: user ybcil should have 116 tickets
+2021-09-16T20:16:06.316 DEBUG: flush empty
+      ✔ WIN: user clwfy should have 120 tickets
+2021-09-16T20:16:06.317 DEBUG: flush empty
+      ✔ WIN: user rqdzl should have 124 tickets
+2021-09-16T20:16:06.318 DEBUG: flush empty
+      ✔ WIN: user tbeuw should have 128 tickets
+2021-09-16T20:16:06.319 DEBUG: flush empty
+      ✔ WIN: user sdks should have 132 tickets
+2021-09-16T20:16:06.321 DEBUG: flush empty
+      ✔ LOST: user gicsh should have 10 tickets
+
+  Open bet twice should fail
+2021-09-16T20:16:06.721 DEBUG: flush empty
+    ✔ Open first bet
+    ✔ !bet open should have correct message
+    ✔ !bet open should be correctly saved in db
+    ✔ Open second bet
+    ✔ Expect bets.running error
+
+  Bet close should fail if bet is not opened
+2021-09-16T20:16:07.129 DEBUG: flush empty
+    ✔ close bet
+    ✔ Expect bets.notRunning error
+
+  Bet close should fail if wrong option is given
+2021-09-16T20:16:07.533 DEBUG: flush empty
+    ✔ Open bet
+    ✔ !bet open should have correct message
+    ✔ !bet open should be correctly saved in db
+    ✔ close bet with incorrect option
+    ✔ Expect bets.notRunning error
+
+  Incorrect participate should show info
+2021-09-16T20:16:07.941 DEBUG: flush empty
+    ✔ Open bet
+    ✔ !bet open should have correct message
+    ✔ !bet open should be correctly saved in db
+    ✔ Incorrect participate should show info
+    ✔ Expect bets.info
+
+  Bet info should show all correct states
+2021-09-16T20:16:08.350 DEBUG: flush empty
+    ✔ Run bet info without bet
+    ✔ Expect bets.notRunning
+    ✔ Open bet
+    ✔ !bet open should have correct message
+    ✔ !bet open should be correctly saved in db
+    ✔ Bet info when opened bet
+    ✔ Expect bets.info
+    ✔ Lock bet
+    ✔ Bet info when locked bet
+    ✔ Expect bets.lockedInfo
+
+  Custom Commands - add()
+    Expected parsed fail
+2021-09-16T20:16:08.763 DEBUG: flush empty
+      ✔   
+2021-09-16T20:16:09.167 DEBUG: flush empty
+      ✔  -c !cmd 
+2021-09-16T20:16:09.571 DEBUG: flush empty
+      ✔  -c cmd 
+2021-09-16T20:16:09.975 DEBUG: flush empty
+      ✔  -c cmd -r Lorem Ipsum Dolor Sit Amet
+2021-09-16T20:16:10.380 DEBUG: flush empty
+      ✔   -r Lorem Ipsum Dolor Sit Amet
+2021-09-16T20:16:10.784 DEBUG: flush empty
+      ✔ -p unknownpermission -c !cmd -r Lorem Ipsum Dolor Sit Amet
+2021-09-16T20:16:11.190 DEBUG: flush empty
+      ✔ -p 0efd7b1c-e460-4167-8e06-8aaf2c170319 -c !cmd -r Lorem Ipsum Dolor Sit Amet
+    Expected to pass
+2021-09-16T20:16:11.596 DEBUG: flush empty
+      ✔  -c !cmd -r Lorem Ipsum Dolor Sit Amet 1
+2021-09-16T20:16:12.009 DEBUG: flush empty
+      ✔  -c !한국어 -r Lorem Ipsum Dolor Sit Amet 2
+2021-09-16T20:16:12.419 DEBUG: flush empty
+      ✔  -c !русский -r Lorem Ipsum Dolor Sit Amet 3
+2021-09-16T20:16:12.829 DEBUG: flush empty
+      ✔ -p 0efd7b1c-e460-4167-8e06-8aaf2c170311 -c !cmd -r Lorem Ipsum Dolor Sit Amet 4
+2021-09-16T20:16:13.240 DEBUG: flush empty
+      ✔ -p casters -c !cmd -r Lorem Ipsum Dolor Sit Amet 5
+2021-09-16T20:16:13.651 DEBUG: flush empty
+      ✔ 2x - !a Lorem Ipsum
+
+  Custom Commands - count filter
+2021-09-16T20:16:13.745 DEBUG: flush empty
+2021-09-16T20:16:13.746 DEBUG: flush empty
+2021-09-16T20:16:14.058 DEBUG: flush empty
+    $count('!cmd2') should be properly parsed
+      ✔ create command and response with $count variable
+      ✔ create command to increment count
+      ✔ $count should be 0
+      ✔ 0 even second time
+      ✔ trigger command to increment count
+      ✔ $count should be 1 and 0
+    $count should be properly parsed
+      ✔ create command and response with $count variable
+      ✔ $count should be 1
+      ✔ $count should be 2
+
+  Custom Commands - https://discordapp.com/channels/317348946144002050/619437014001123338/715206737908465775 - Custom command can be called from custom command
+2021-09-16T20:16:14.507 DEBUG: flush empty
+    Custom command should correctly run second custom command
+      ✔ Add custom command !test to call !test2
+      ✔ Run custom command !test
+      ✔ Expect !test2 response
+    Custom command should warn if we have infinite loop between commands
+      ✔ Add custom command infinite loop test3 -> test4 -> test5 -> test3
+      ✔ Run custom command !test3
+2021-09-16T20:16:14.577 !!! ERROR !!! Response (!test3) seems to be in loop! !test3->!test4->!test5
+      ✔ Expect loop error
+
+  Custom Commands - https://discord.com/channels/317348946144002050/317349069024395264/794732878595752016 - Custom command $param filter should be properly evaluated
+2021-09-16T20:16:14.984 DEBUG: flush empty
+    ✔ Run custom command !test 1
+    ✔ Expect response 1
+    ✔ Run custom command !test 2
+    ✔ Expect response 2
+
+  Custom Commands - edit()
+    Expected parsed fail
+2021-09-16T20:16:15.439 DEBUG: flush empty
+      ✔    
+2021-09-16T20:16:15.845 DEBUG: flush empty
+      ✔  -c !cmd  
+2021-09-16T20:16:16.250 DEBUG: flush empty
+      ✔  -c !cmd  -rid 1
+2021-09-16T20:16:16.657 DEBUG: flush empty
+      ✔  -c cmd  -rid 1
+2021-09-16T20:16:17.061 DEBUG: flush empty
+      ✔  -c cmd -r Lorem Ipsum Dolor Sit Amet 
+2021-09-16T20:16:17.465 DEBUG: flush empty
+      ✔   -r Lorem Ipsum Dolor Sit Amet 
+2021-09-16T20:16:17.869 DEBUG: flush empty
+      ✔ -p unknownpermission -c cmd -r Lorem Ipsum Dolor Sit Amet -rid 1
+2021-09-16T20:16:18.273 DEBUG: flush empty
+      ✔ -p 0efd7b1c-e460-4167-8e06-8aaf2c170319 -c cmd -r Lorem Ipsum Dolor Sit Amet -rid 1
+    Expected command not found
+2021-09-16T20:16:18.677 DEBUG: flush empty
+      ✔ -p 0efd7b1c-e460-4167-8e06-8aaf2c170311 -c !cmd -r Lorem Ipsum Dolor Sit Amet -rid 1
+    Expected response not found
+2021-09-16T20:16:19.081 DEBUG: flush empty
+      ✔ -p 0efd7b1c-e460-4167-8e06-8aaf2c170311 -c !cmd -r Lorem Ipsum Dolor Sit Amet -rid 2
+    Expected to pass
+2021-09-16T20:16:19.488 DEBUG: flush empty
+      ✔  -c !cmd -r Lorem Ipsum -rid 1
+2021-09-16T20:16:19.907 DEBUG: flush empty
+      ✔ -p 0efd7b1c-e460-4167-8e06-8aaf2c170311 -c !cmd -r Lorem Ipsum -rid 1
+2021-09-16T20:16:20.324 DEBUG: flush empty
+      ✔ -p casters -c !cmd -r Lorem Ipsum -rid 1
+2021-09-16T20:16:20.741 DEBUG: flush empty
+      ✔  -c !한글 -r Lorem Ipsum -rid 1
+2021-09-16T20:16:21.158 DEBUG: flush empty
+      ✔  -c !русский -r Lorem Ipsum -rid 1
+2021-09-16T20:16:21.574 DEBUG: flush empty
+      ✔ !a Lorem Ipsum -> !a Ipsum Lorem
+
+  Custom Commands - list()
+2021-09-16T20:16:21.992 DEBUG: flush empty
+    ✔ empty list
+2021-09-16T20:16:22.395 DEBUG: flush empty
+    ✔ populated list
+
+  Custom Commands - remove()
+2021-09-16T20:16:22.804 DEBUG: flush empty
+    ✔ 
+2021-09-16T20:16:23.216 DEBUG: flush empty
+    ✔ !alias
+2021-09-16T20:16:23.627 DEBUG: flush empty
+    ✔ alias
+2021-09-16T20:16:24.047 DEBUG: flush empty
+    ✔ !a
+2021-09-16T20:16:24.460 DEBUG: flush empty
+    ✔ !한글
+2021-09-16T20:16:24.874 DEBUG: flush empty
+    ✔ !русский
+2021-09-16T20:16:25.287 DEBUG: flush empty
+    ✔ 2x - !a !me
+2021-09-16T20:16:25.700 DEBUG: flush empty
+    ✔ remove response
+
+  Custom Commands - run()
+2021-09-16T20:16:26.122 DEBUG: flush empty
+    ✔ !a will show Lorem Ipsum
+    ✔ !한글 will show Lorem Ipsum
+    ✔ !русский will show Lorem Ipsum
+    '!test qwerty' should trigger correct commands
+      ✔ create '!test' command with $_variable
+      ✔ create '!test' command with $param
+      ✔ create '!test' command without $param
+      ✔ create '!test qwerty' command without $param
+      ✔ create second '!test qwerty' command without $param
+      ✔ run command by owner
+      ✔ run command by viewer
+    !cmd with username filter
+      ✔ create command and response with filter
+      ✔ run command as user not defined in filter
+      ✔ run command as user defined in filter
+
+  Custom Commands - toggle()
+2021-09-16T20:16:26.628 DEBUG: flush empty
+    ✔ 
+2021-09-16T20:16:27.033 DEBUG: flush empty
+    ✔ !unknown
+2021-09-16T20:16:27.437 DEBUG: flush empty
+    ✔ !a
+2021-09-16T20:16:27.844 DEBUG: flush empty
+    ✔ !한글
+2021-09-16T20:16:28.251 DEBUG: flush empty
+    ✔ !русский
+
+  Custom Commands - toggleVisibility()
+2021-09-16T20:16:28.657 DEBUG: flush empty
+    ✔ 
+2021-09-16T20:16:29.060 DEBUG: flush empty
+    ✔ !unknown
+2021-09-16T20:16:29.465 DEBUG: flush empty
+    ✔ !a
+2021-09-16T20:16:29.872 DEBUG: flush empty
+    ✔ !한글
+2021-09-16T20:16:30.278 DEBUG: flush empty
+    ✔ !русский
+
+  Commons - #3620 - announce is not parsing message filters
+2021-09-16T20:16:30.686 DEBUG: flush empty
+    ✔ Announce() should have propery parsed filters
+
+  lib/commons - flatten()
+    ✔ Object with string should be correctly flatten
+    ✔ Object with array should be correctly flatten
+
+  lib/commons - unflatten()
+    ✔ Object with string should be correctly unflatten
+    ✔ Object with array should be correctly unflatten
+    ✔ Array of object should be correctly unflatten
+
+  lib/commons - isOwner()
+2021-09-16T20:16:31.111 DEBUG: flush empty
+    ✔ should be returned as owner
+    ✔ should not be returned as owner
+
+  lib/commons - round5()
+    ✔ 6 => 5
+    ✔ 10 => 10
+    ✔ 50 => 50
+    ✔ 9 => 10
+    ✔ 159 => 160
+
+  lib/commons - sendMessage()
+    remove /me when in color mode
+2021-09-16T20:16:31.533 DEBUG: flush empty
+      ✔ enable color-mode
+      ✔ send message containing /me
+      ✔ message is sent without /me
+    keep /me when in normal mode
+2021-09-16T20:16:31.943 DEBUG: flush empty
+      ✔ enable normal-mode
+      ✔ send message containing /me
+      ✔ message is sent with /me
+
+  Cooldowns - #3720 - global cooldown should be properly reverted
+2021-09-16T20:16:32.352 DEBUG: flush empty
+    ✔ create cooldown on !me [global 60]
+    ✔ check if cooldown is created
+    ✔ testuser should be able to use !me
+    ✔ save timestamp
+    ✔ add price for !me
+    ✔ wait 6s to cool off cooldown (5999ms)
+    ✔ testuser should not have enough points
+    ✔ cooldown should be reverted
+2021-09-16T20:16:38.420 DEBUG: flush empty
+    ✔ testuser2 should have enough points
+    ✔ cooldown should be changed
+    ✔ testuser2 should not have enough points
+    ✔ cooldown should be not changed (still on cooldown period)
+2021-09-16T20:16:43.746 DEBUG: flush empty
+2021-09-16T20:16:43.747 DEBUG: flush empty
+2021-09-16T20:16:43.783 DEBUG: flush empty
+    ✔ wait 6s to cool off cooldown (5999ms)
+    ✔ testuser2 should not have enough points
+    ✔ cooldown should be reverted
+
+  Cooldowns - check()
+    #1969 - commands with special chars should not threadlock check
+2021-09-16T20:16:44.848 DEBUG: flush empty
+      ✔ Command !_debug should pass
+      ✔ Command !$debug should pass
+      ✔ Command `!_debug test` should pass
+      ✔ Command `!$debug test` should pass
+      ✔ Command `!_debug te$st` should pass
+      ✔ Command `!$debug te$st` should pass
+    #1938 - !cmd with param (*)
+2021-09-16T20:16:45.284 DEBUG: flush empty
+      ✔ create command
+      ✔ Add !cmd to cooldown
+      ✔ First user should PASS
+      ✔ Second user should FAIL
+    #1658 - cooldown not working on not full cooldown object KonCha
+2021-09-16T20:16:45.704 DEBUG: flush empty
+      ✔ Add global KonCha to cooldown
+      ✔ Add koncha to keywords
+      ✔ First user should PASS
+      ✔ Other users should FAIL
+      ✔ Other users should FAIL
+      ✔ Other users should FAIL
+      ✔ Other users should FAIL
+      ✔ Other users should FAIL
+    #1658 - cooldown not working on !followage
+2021-09-16T20:16:46.122 DEBUG: flush empty
+      ✔ Add global !followage to cooldown
+      ✔ First user should PASS
+      ✔ Owner user should PASS
+      ✔ Moderator user should PASS
+      ✔ Other users should FAIL
+      ✔ Other users should FAIL
+      ✔ Other users should FAIL
+    #3209 - cooldown not working on gamble changed command to !фортуна
+2021-09-16T20:16:46.548 DEBUG: flush empty
+      ✔ testuser should not be affected by cooldown
+      ✔ testuser should be affected by cooldown second time
+      ✔ testuser2 should not be affected by cooldown
+      ✔ testuser2 should be affected by cooldown second time
+      ✔ owner should be affected by cooldown
+      ✔ owner should be affected by cooldown second time
+      ✔ owner should be affected by cooldown second time
+      ✔ testuser should be affected by cooldown third time
+    #3209 - cooldown not working on gamble changed command to !play
+2021-09-16T20:16:47.015 DEBUG: flush empty
+      ✔ create cooldown on !play [user 300]
+      ✔ check if cooldown is created
+      ✔ testuser should not be affected by cooldown
+      ✔ testuser should be affected by cooldown second time
+      ✔ testuser2 should not be affected by cooldown
+      ✔ testuser2 should be affected by cooldown second time
+      ✔ owner should not be affected by cooldown
+      ✔ owner should not be affected by cooldown second time
+      ✔ owner should not be affected by cooldown second time
+    #3209 - global cooldown not working on gamble changed command to !play
+2021-09-16T20:16:47.458 DEBUG: flush empty
+      ✔ create cooldown on !play [global 300]
+      ✔ check if cooldown is created
+      ✔ testuser should not be affected by cooldown
+      ✔ testuser should be affected by cooldown second time
+      ✔ testuser2 should be affected by cooldown second time
+      ✔ owner should not be affected by cooldown second time
+    #1406 - cooldown not working on gamble
+2021-09-16T20:16:47.895 DEBUG: flush empty
+      ✔ test
+    #1352 - command in a sentence
+2021-09-16T20:16:48.326 DEBUG: flush empty
+      ✔ test
+    command with subcommand - user
+2021-09-16T20:16:48.741 DEBUG: flush empty
+      ✔ create cooldown on !test me [user 60]
+      ✔ check if cooldown is created
+      ✔ testuser with `!test me` should not be affected by cooldown
+      ✔ testuser with `!test me` should be affected by cooldown second time
+      ✔ testuser2 with `!test me` should not be affected by cooldown
+      ✔ testuser2 with `!test me` should be affected by cooldown second time
+      ✔ testuser with `!test` should not be affected by cooldown
+      ✔ testuser with `!test` should not be affected by cooldown second time
+      ✔ testuser2 with `!test` should not be affected by cooldown
+      ✔ testuser2 with `!test` should not be affected by cooldown second time
+    command - user
+2021-09-16T20:16:49.186 DEBUG: flush empty
+      ✔ create cooldown on !test [user 60]
+      ✔ check if cooldown is created
+      ✔ testuser should not be affected by cooldown
+      ✔ testuser should be affected by cooldown second time
+      ✔ testuser2 should not be affected by cooldown
+      ✔ testuser2 should be affected by cooldown second time
+    command - global
+2021-09-16T20:16:49.618 DEBUG: flush empty
+      ✔ create cooldown on !test [global 60]
+      ✔ check if cooldown is created
+      ✔ testuser should not be affected by cooldown
+      ✔ testuser should be affected by cooldown second time
+      ✔ testuser2 should be affected by cooldown
+    keyword - user
+2021-09-16T20:16:50.047 DEBUG: flush empty
+      ✔ test
+    keyword - global
+2021-09-16T20:16:50.478 DEBUG: flush empty
+      ✔ test
+
+  Cooldowns - default check
+    command - default
+2021-09-16T20:16:50.890 DEBUG: flush empty
+2021-09-16T20:16:54.542 DEBUG: flush empty
+2021-09-16T20:16:54.550 DEBUG: flush empty
+      ✔ testuser should not be affected by cooldown
+      ✔ testuser should be affected by cooldown second time
+      ✔ wait 2 seconds (1999ms)
+      ✔ testuser2 should be affected by cooldown
+      ✔ subuser1 should NOT be affected by cooldown as it is different permGroup
+      ✔ wait 4 seconds (3999ms)
+      ✔ testuser2 should not be affected by cooldown second time
+    keyword - default
+2021-09-16T20:17:07.341 DEBUG: flush empty
+2021-09-16T20:17:13.750 DEBUG: flush empty
+2021-09-16T20:17:13.751 DEBUG: flush empty
+      ✔ test (6005ms)
+
+  cooldown check should not endlessly loop
+2021-09-16T20:17:23.752 DEBUG: flush empty
+    ✔ Command `!someCommand hello` should pass
+
+  Cooldowns - default cooldown can be overrided
+    command - override
+2021-09-16T20:17:24.166 DEBUG: flush empty
+      ✔ testuser should not be affected by cooldown
+      ✔ testuser should be affected by cooldown second time
+      ✔ Override !test global 0 true
+      ✔ testuser should not be affected by cooldown
+    keyword - override
+2021-09-16T20:17:34.593 DEBUG: flush empty
+      ✔ Create me keyword
+      ✔ testuser should not be affected by cooldown
+      ✔ testuser should be affected by cooldown second time
+      ✔ Override me global 0 true
+      ✔ testuser should not be affected by cooldown
+2021-09-16T20:17:43.751 DEBUG: flush empty
+2021-09-16T20:17:43.752 DEBUG: flush empty
+2021-09-16T20:17:43.787 DEBUG: flush empty
+
+  Cooldowns - set()
+2021-09-16T20:17:45.009 DEBUG: flush empty
+2021-09-16T20:17:45.011 !!! ERROR !!! undefined  [__broadcaster__#undefined]
+2021-09-16T20:17:45.033 !!! ERROR !!! ParameterError: Expected parameter <oneOf> at position 0
+    at Expects.checkText (E:\_GIT\bot\sogeBot\src\expects.ts:56:17)
+    at Expects.oneOf (E:\_GIT\bot\sogeBot\src\expects.ts:526:12)
+    at Cooldown.main (E:\_GIT\bot\sogeBot\src\systems\cooldown.ts:124:10)
+    at Context.<anonymous> (E:\_GIT\bot\sogeBot\test\tests\cooldowns\set.js:19:30)
+    at callFn (E:\_GIT\bot\sogeBot\node_modules\mocha\lib\runnable.js:366:21)
+    at Test.Runnable.run (E:\_GIT\bot\sogeBot\node_modules\mocha\lib\runnable.js:354:5)
+    at Runner.runTest (E:\_GIT\bot\sogeBot\node_modules\mocha\lib\runner.js:681:10)
+    at E:\_GIT\bot\sogeBot\node_modules\mocha\lib\runner.js:804:12
+    at next (E:\_GIT\bot\sogeBot\node_modules\mocha\lib\runner.js:596:14)
+    at E:\_GIT\bot\sogeBot\node_modules\mocha\lib\runner.js:606:7
+    at next (E:\_GIT\bot\sogeBot\node_modules\mocha\lib\runner.js:489:14)
+    at cbHookRun (E:\_GIT\bot\sogeBot\node_modules\mocha\lib\runner.js:554:7)
+    at done (E:\_GIT\bot\sogeBot\node_modules\mocha\lib\runnable.js:310:5)
+    at E:\_GIT\bot\sogeBot\node_modules\mocha\lib\runnable.js:371:11
+    ✔ 
+2021-09-16T20:17:45.435 DEBUG: flush empty
+2021-09-16T20:17:45.437 !!! ERROR !!! undefined !alias [__broadcaster__#undefined]
+2021-09-16T20:17:45.438 !!! ERROR !!! ParameterError: Expected parameter <oneOf> at position 1
+    at Expects.checkText (E:\_GIT\bot\sogeBot\src\expects.ts:56:17)
+    at Expects.oneOf (E:\_GIT\bot\sogeBot\src\expects.ts:526:12)
+    at Expects.exec (E:\_GIT\bot\sogeBot\src\expects.ts:40:28)
+    at Expects.toArray (E:\_GIT\bot\sogeBot\src\expects.ts:145:12)
+    at Cooldown.main (E:\_GIT\bot\sogeBot\src\systems\cooldown.ts:127:10)
+    at Context.<anonymous> (E:\_GIT\bot\sogeBot\test\tests\cooldowns\set.js:24:30)
+    at callFn (E:\_GIT\bot\sogeBot\node_modules\mocha\lib\runnable.js:366:21)
+    at Test.Runnable.run (E:\_GIT\bot\sogeBot\node_modules\mocha\lib\runnable.js:354:5)
+    at Runner.runTest (E:\_GIT\bot\sogeBot\node_modules\mocha\lib\runner.js:681:10)
+    at E:\_GIT\bot\sogeBot\node_modules\mocha\lib\runner.js:804:12
+    at next (E:\_GIT\bot\sogeBot\node_modules\mocha\lib\runner.js:596:14)
+    at E:\_GIT\bot\sogeBot\node_modules\mocha\lib\runner.js:606:7
+    at next (E:\_GIT\bot\sogeBot\node_modules\mocha\lib\runner.js:489:14)
+    at cbHookRun (E:\_GIT\bot\sogeBot\node_modules\mocha\lib\runner.js:554:7)
+    at done (E:\_GIT\bot\sogeBot\node_modules\mocha\lib\runnable.js:310:5)
+    at E:\_GIT\bot\sogeBot\node_modules\mocha\lib\runnable.js:371:11
+    ✔ !alias
+2021-09-16T20:17:45.839 DEBUG: flush empty
+2021-09-16T20:17:45.841 !!! ERROR !!! undefined alias [__broadcaster__#undefined]
+2021-09-16T20:17:45.842 !!! ERROR !!! ParameterError: Expected parameter <oneOf> at position 1
+    at Expects.checkText (E:\_GIT\bot\sogeBot\src\expects.ts:56:17)
+    at Expects.oneOf (E:\_GIT\bot\sogeBot\src\expects.ts:526:12)
+    at Expects.exec (E:\_GIT\bot\sogeBot\src\expects.ts:40:28)
+    at Expects.toArray (E:\_GIT\bot\sogeBot\src\expects.ts:145:12)
+    at Cooldown.main (E:\_GIT\bot\sogeBot\src\systems\cooldown.ts:127:10)
+    at Context.<anonymous> (E:\_GIT\bot\sogeBot\test\tests\cooldowns\set.js:29:30)
+    at callFn (E:\_GIT\bot\sogeBot\node_modules\mocha\lib\runnable.js:366:21)
+    at Test.Runnable.run (E:\_GIT\bot\sogeBot\node_modules\mocha\lib\runnable.js:354:5)
+    at Runner.runTest (E:\_GIT\bot\sogeBot\node_modules\mocha\lib\runner.js:681:10)
+    at E:\_GIT\bot\sogeBot\node_modules\mocha\lib\runner.js:804:12
+    at next (E:\_GIT\bot\sogeBot\node_modules\mocha\lib\runner.js:596:14)
+    at E:\_GIT\bot\sogeBot\node_modules\mocha\lib\runner.js:606:7
+    at next (E:\_GIT\bot\sogeBot\node_modules\mocha\lib\runner.js:489:14)
+    at cbHookRun (E:\_GIT\bot\sogeBot\node_modules\mocha\lib\runner.js:554:7)
+    at done (E:\_GIT\bot\sogeBot\node_modules\mocha\lib\runnable.js:310:5)
+    at E:\_GIT\bot\sogeBot\node_modules\mocha\lib\runnable.js:371:11
+    ✔ alias
+2021-09-16T20:17:46.243 DEBUG: flush empty
+    ✔ test global 20
+2021-09-16T20:17:46.647 DEBUG: flush empty
+    ✔ test user 20
+2021-09-16T20:17:47.050 DEBUG: flush empty
+    ✔ !test global 20
+2021-09-16T20:17:47.455 DEBUG: flush empty
+    ✔ !test user 20
+2021-09-16T20:17:47.859 DEBUG: flush empty
+    ✔ test global 20 true
+2021-09-16T20:17:48.262 DEBUG: flush empty
+    ✔ test user 20 true
+2021-09-16T20:17:48.666 DEBUG: flush empty
+    ✔ !test global 20 true
+2021-09-16T20:17:49.069 DEBUG: flush empty
+    ✔ !test user 20 true
+2021-09-16T20:17:49.473 DEBUG: flush empty
+    ✔ !한국어 global 20 true
+2021-09-16T20:17:49.888 DEBUG: flush empty
+    ✔ !한국어 user 20 true
+2021-09-16T20:17:50.293 DEBUG: flush empty
+    ✔ 한국어 global 20 true
+2021-09-16T20:17:50.696 DEBUG: flush empty
+    ✔ 한국어 user 20 true
+2021-09-16T20:17:51.100 DEBUG: flush empty
+    ✔ !русский global 20 true
+2021-09-16T20:17:51.503 DEBUG: flush empty
+    ✔ !русский user 20 true
+2021-09-16T20:17:51.907 DEBUG: flush empty
+    ✔ русский global 20 true
+2021-09-16T20:17:52.311 DEBUG: flush empty
+    ✔ русский user 20 true
+2021-09-16T20:17:52.715 DEBUG: flush empty
+    ✔ unset OK
+2021-09-16T20:17:53.118 DEBUG: flush empty
+    ✔ unset without param
+
+  Cooldowns - toggleEnabled()
+2021-09-16T20:17:53.521 DEBUG: flush empty
+2021-09-16T20:17:53.524 !!! ERROR !!! undefined !me [__broadcaster__#26598]
+2021-09-16T20:17:53.525 !!! ERROR !!! ParameterError: Expected parameter <oneOf> at position 1
+    at Expects.checkText (E:\_GIT\bot\sogeBot\src\expects.ts:56:17)
+    at Expects.oneOf (E:\_GIT\bot\sogeBot\src\expects.ts:526:12)
+    at Expects.exec (E:\_GIT\bot\sogeBot\src\expects.ts:40:28)
+    at Expects.toArray (E:\_GIT\bot\sogeBot\src\expects.ts:145:12)
+    at Cooldown.toggle (E:\_GIT\bot\sogeBot\src\systems\cooldown.ts:423:10)
+    at Cooldown.toggleEnabled (E:\_GIT\bot\sogeBot\src\systems\cooldown.ts:483:17)
+    at Context.<anonymous> (E:\_GIT\bot\sogeBot\test\tests\cooldowns\toggleEnabled.js:28:31)
+    ✔ incorrect toggle
+2021-09-16T20:17:53.926 DEBUG: flush empty
+    ✔ correct toggle - command
+2021-09-16T20:17:54.338 DEBUG: flush empty
+    ✔ correct toggle - group
+2021-09-16T20:17:54.544 DEBUG: flush empty
+2021-09-16T20:17:54.551 DEBUG: flush empty
+2021-09-16T20:17:54.745 DEBUG: flush empty
+    ✔ correct toggle - keyword
+
+  Cooldowns - toggleFollowers()
+2021-09-16T20:17:55.151 DEBUG: flush empty
+2021-09-16T20:17:55.156 !!! ERROR !!! undefined !me [__broadcaster__#42946]
+2021-09-16T20:17:55.157 !!! ERROR !!! ParameterError: Expected parameter <oneOf> at position 1
+    at Expects.checkText (E:\_GIT\bot\sogeBot\src\expects.ts:56:17)
+    at Expects.oneOf (E:\_GIT\bot\sogeBot\src\expects.ts:526:12)
+    at Expects.exec (E:\_GIT\bot\sogeBot\src\expects.ts:40:28)
+    at Expects.toArray (E:\_GIT\bot\sogeBot\src\expects.ts:145:12)
+    at Cooldown.toggle (E:\_GIT\bot\sogeBot\src\systems\cooldown.ts:423:10)
+    at Cooldown.toggleFollowers (E:\_GIT\bot\sogeBot\src\systems\cooldown.ts:507:17)
+    at Context.<anonymous> (E:\_GIT\bot\sogeBot\test\tests\cooldowns\toggleFollowers.js:40:31)
+    ✔ incorrect toggle
+2021-09-16T20:17:55.558 DEBUG: flush empty
+    ✔ correct toggle - follower user
+2021-09-16T20:17:55.978 DEBUG: flush empty
+    ✔ correct toggle - common user
+2021-09-16T20:17:56.395 DEBUG: flush empty
+    ✔ correct toggle - common user2
+
+  Cooldowns - toggleModerators()
+2021-09-16T20:17:56.813 DEBUG: flush empty
+2021-09-16T20:17:56.819 !!! ERROR !!! undefined !me [__broadcaster__#86254]
+2021-09-16T20:17:56.820 !!! ERROR !!! ParameterError: Expected parameter <oneOf> at position 1
+    at Expects.checkText (E:\_GIT\bot\sogeBot\src\expects.ts:56:17)
+    at Expects.oneOf (E:\_GIT\bot\sogeBot\src\expects.ts:526:12)
+    at Expects.exec (E:\_GIT\bot\sogeBot\src\expects.ts:40:28)
+    at Expects.toArray (E:\_GIT\bot\sogeBot\src\expects.ts:145:12)
+    at Cooldown.toggle (E:\_GIT\bot\sogeBot\src\systems\cooldown.ts:423:10)
+    at Cooldown.toggleModerators (E:\_GIT\bot\sogeBot\src\systems\cooldown.ts:489:17)
+    at Context.<anonymous> (E:\_GIT\bot\sogeBot\test\tests\cooldowns\toggleModerators.js:30:31)
+    ✔ incorrect toggle
+2021-09-16T20:17:57.221 DEBUG: flush empty
+    ✔ correct toggle
+
+  Cooldowns - toggleOwners()
+2021-09-16T20:17:57.636 DEBUG: flush empty
+2021-09-16T20:17:57.640 !!! ERROR !!! undefined !me [__broadcaster__#76728]
+2021-09-16T20:17:57.641 !!! ERROR !!! ParameterError: Expected parameter <oneOf> at position 1
+    at Expects.checkText (E:\_GIT\bot\sogeBot\src\expects.ts:56:17)
+    at Expects.oneOf (E:\_GIT\bot\sogeBot\src\expects.ts:526:12)
+    at Expects.exec (E:\_GIT\bot\sogeBot\src\expects.ts:40:28)
+    at Expects.toArray (E:\_GIT\bot\sogeBot\src\expects.ts:145:12)
+    at Cooldown.toggle (E:\_GIT\bot\sogeBot\src\systems\cooldown.ts:423:10)
+    at Cooldown.toggleOwners (E:\_GIT\bot\sogeBot\src\systems\cooldown.ts:495:17)
+    at Context.<anonymous> (E:\_GIT\bot\sogeBot\test\tests\cooldowns\toggleOwners.js:28:31)
+    ✔ incorrect toggle
+2021-09-16T20:17:58.041 DEBUG: flush empty
+    ✔ correct toggle
+
+  Cooldowns - toggleSubscribers()
+2021-09-16T20:17:58.457 DEBUG: flush empty
+2021-09-16T20:17:58.463 !!! ERROR !!! undefined !me [__broadcaster__#90632]
+2021-09-16T20:17:58.463 !!! ERROR !!! ParameterError: Expected parameter <oneOf> at position 1
+    at Expects.checkText (E:\_GIT\bot\sogeBot\src\expects.ts:56:17)
+    at Expects.oneOf (E:\_GIT\bot\sogeBot\src\expects.ts:526:12)
+    at Expects.exec (E:\_GIT\bot\sogeBot\src\expects.ts:40:28)
+    at Expects.toArray (E:\_GIT\bot\sogeBot\src\expects.ts:145:12)
+    at Cooldown.toggle (E:\_GIT\bot\sogeBot\src\systems\cooldown.ts:423:10)
+    at Cooldown.toggleSubscribers (E:\_GIT\bot\sogeBot\src\systems\cooldown.ts:501:17)
+    at Context.<anonymous> (E:\_GIT\bot\sogeBot\test\tests\cooldowns\toggleSubscribers.js:30:31)
+    ✔ incorrect toggle
+2021-09-16T20:17:58.864 DEBUG: flush empty
+    ✔ correct toggle
+
+  Currency - rates check
+    rates should be correctly calculated between each other
+      ✔ Checking if all rates are correctly computed with 'AUD' as base
+      ✔ Checking if all rates are correctly computed with 'BRL' as base
+      ✔ Checking if all rates are correctly computed with 'BGN' as base
+      ✔ Checking if all rates are correctly computed with 'CNY' as base
+      ✔ Checking if all rates are correctly computed with 'DKK' as base
+      ✔ Checking if all rates are correctly computed with 'EUR' as base
+      ✔ Checking if all rates are correctly computed with 'PHP' as base
+      ✔ Checking if all rates are correctly computed with 'HKD' as base
+      ✔ Checking if all rates are correctly computed with 'HRK' as base
+      ✔ Checking if all rates are correctly computed with 'INR' as base
+      ✔ Checking if all rates are correctly computed with 'IDR' as base
+      ✔ Checking if all rates are correctly computed with 'ISK' as base
+      ✔ Checking if all rates are correctly computed with 'ILS' as base
+      ✔ Checking if all rates are correctly computed with 'JPY' as base
+      ✔ Checking if all rates are correctly computed with 'ZAR' as base
+      ✔ Checking if all rates are correctly computed with 'CAD' as base
+      ✔ Checking if all rates are correctly computed with 'KRW' as base
+      ✔ Checking if all rates are correctly computed with 'HUF' as base
+      ✔ Checking if all rates are correctly computed with 'MYR' as base
+      ✔ Checking if all rates are correctly computed with 'MXN' as base
+      ✔ Checking if all rates are correctly computed with 'XDR' as base
+      ✔ Checking if all rates are correctly computed with 'NOK' as base
+      ✔ Checking if all rates are correctly computed with 'NZD' as base
+      ✔ Checking if all rates are correctly computed with 'PLN' as base
+      ✔ Checking if all rates are correctly computed with 'RON' as base
+      ✔ Checking if all rates are correctly computed with 'RUB' as base
+      ✔ Checking if all rates are correctly computed with 'SGD' as base
+      ✔ Checking if all rates are correctly computed with 'SEK' as base
+      ✔ Checking if all rates are correctly computed with 'CHF' as base
+      ✔ Checking if all rates are correctly computed with 'THB' as base
+      ✔ Checking if all rates are correctly computed with 'TRY' as base
+      ✔ Checking if all rates are correctly computed with 'USD' as base
+      ✔ Checking if all rates are correctly computed with 'GBP' as base
+
+  Custom Variable - #3379 - Command reply should return correct reply
+2021-09-16T20:17:59.477 DEBUG: flush empty
+    ✔ Create command `!test` with `My awesome variable is set to $_variable`
+    ✔ Create initial value 0 of $_variable
+    ✔ `!test` should return `My awesome variable is set to 0`
+    !_test 5
+      ✔ Run !_test 5
+      ✔ Expecting `My awesome variable is set to 5`
+    !_test +
+      ✔ Run !_test +
+      ✔ Expecting `My awesome variable is set to 6`
+    !_test -
+      ✔ Run !_test -
+      ✔ Expecting `My awesome variable is set to 5`
+
+  Custom Variable - #3737 - Infinite script loop should not lock bot
+2021-09-16T20:17:59.958 DEBUG: flush empty
+2021-09-16T20:17:59.971 !!! ERROR !!! Script is causing error:
+2021-09-16T20:17:59.972 !!! ERROR !!! let i = 0;
+while (true) {
+    i++;
+}
+return i;
+2021-09-16T20:17:59.974 !!! ERROR !!! Error: Running script seems to be in infinite loop.
+    at __opCounter__ (evalmachine.<anonymous>:11:134)
+    at evaluation (evalmachine.<anonymous>:14:1)
+    at evalmachine.<anonymous>:15:13
+    at Script.runInContext (vm.js:144:12)
+    at Script.runInNewContext (vm.js:149:17)
+    at Object.runInNewContext (vm.js:303:38)
+    at safeEval (E:\_GIT\bot\sogeBot\node_modules\safe-eval\index.js:24:6)
+    at runScript (E:\_GIT\bot\sogeBot\src\helpers\customvariables\runScript.ts:203:33)
+    at Context.<anonymous> (E:\_GIT\bot\sogeBot\test\tests\customvariable\#3737_infinite_script_loop_should_not_lock_bot.js:19:14)
+    ✔ Run infinite loop script
+    ✔ We should have loop error after 100000 operations
+    ✔ We should have empty result
+    ✔ Run normal loop script
+    ✔ We should have eval result
+
+  Custom Variable - #3820 - For loop should work corectly
+2021-09-16T20:18:00.389 DEBUG: flush empty
+    ✔ Run for loop script
+    ✔ We should have eval result
+
+  Custom Variable - #3879 - Eval should trigger with param with proper permissions
+2021-09-16T20:18:00.797 DEBUG: flush empty
+    ✔ Create command `!test` with `My awesome variable is set to $_variable`
+    ✔ Create eval $_variable to return param
+    !_test 4 by owner
+      ✔ Run !_test 4
+      ✔ Expecting `My awesome variable is set to 4`
+    !_test 5 by mod
+      ✔ Run !_test 5
+      ✔ Expecting `My awesome variable is set to 5`
+    !_test 6 by viewer
+      ✔ Run !_test 6
+      ✔ Expecting old value `My awesome variable is set to 5`
+    !_test by viewer
+      ✔ Run !_test
+      ✔ Expecting old value `My awesome variable is set to 5`
+    !_test by mod
+      ✔ Run !_test
+      ✔ Expecting value `My awesome variable is set to no param sent`
+
+  Custom Variable - #4083 - Get url on eval should return correct value
+2021-09-16T20:18:01.322 DEBUG: flush empty
+    ✔ Create eval $_variable to return Date.now()
+    ✔ Fetch endpoint for value and check
+
+  Custom Variable - helpers/customvariables/getURL
+2021-09-16T20:18:01.579 DEBUG: flush empty
+2021-09-16T20:18:01.583 !!! ERROR !!! User __bot_username__ not found on Twitch.
+2021-09-16T20:18:01.748 DEBUG: flush empty
+    ✔ with enabled GET
+    ✔ with disabled GET
+    ✔ Nonexistent id
+
+  Custom Variable - helpers/customvariables/postURL
+2021-09-16T20:18:02.158 DEBUG: flush empty
+    ✔ with enabled POST - correct value
+    1) with enabled POST and response type 0 - correct value
+    ✔ with enabled POST and response type 1 - correct value
+    ✔ with enabled POST - incorrect value
+    ✔ with disabled POST
+    ✔ Nonexistent id
+
+  Emotes - combo
+    Emotes combo should send proper message after 3 emotes
+2021-09-16T20:18:07.587 DEBUG: flush empty
+      ✔ Send a message with Kappa emote
+      ✔ Send a message with Kappa emote
+      ✔ Send a message with Kappa emote
+      ✔ Send a message with HeyGuys emote
+      ✔ We are expecting combo break message
+      ✔ Combo last break should be updated
+      ✔ Send a message with Kappa emote
+      ✔ Send a message with Kappa emote
+      ✔ Send a message with Kappa emote
+      ✔ Send a message with HeyGuys emote
+      ✔ We are expecting combo break message
+      ✔ Combo last break should be updated
+    Emotes combo should send proper message after 3 emotes with cooldown
+2021-09-16T20:18:08.020 DEBUG: flush empty
+      ✔ Send a message with Kappa emote
+      ✔ Send a message with Kappa emote
+      ✔ Send a message with Kappa emote
+      ✔ Send a message with HeyGuys emote
+      ✔ We are expecting combo break message
+      ✔ Combo last break should be updated
+      ✔ Send a message with Kappa emote
+      ✔ Send a message with Kappa emote
+      ✔ Send a message with Kappa emote
+      ✔ Send a message with HeyGuys emote
+      ✔ We are expecting combo break message
+      ✔ Combo last break should not be updated
+
+  Events - cheer event
+2021-09-16T20:18:08.447 DEBUG: flush empty
+    #1699 - Cheer event is not waiting for user to save id
+      losslezos cheer event
+2021-09-16T20:18:08.454 +cheer losslezos#97, bits: 1, message: rxvmm
+2021-09-16T20:18:08.454 DEBUG: flush start - 75a280cd-f3d2-4d47-885f-f449f4aa96f6
+2021-09-16T20:18:08.455 DEBUG: flush queue: 75a280cd-f3d2-4d47-885f-f449f4aa96f6
+2021-09-16T20:18:08.455 DEBUG: flush checking if 75a280cd-f3d2-4d47-885f-f449f4aa96f6 should run
+2021-09-16T20:18:08.456 DEBUG: flush progress - 75a280cd-f3d2-4d47-885f-f449f4aa96f6 - changes: 1
+        ✔ trigger cheer event for 1 bit - losslezos
+2021-09-16T20:18:08.458 DEBUG: flush done - 75a280cd-f3d2-4d47-885f-f449f4aa96f6
+2021-09-16T20:18:08.459 | Event cheer with attributes {"username":"losslezos","bits":1,"message":"rxvmm","is":{"moderator":false,"subscriber":false,"vip":false,"broadcaster":false,"bot":false,"owner":false}} is triggered and running of operations.
+2021-09-16T20:18:08.460 DEBUG: flush empty
+2021-09-16T20:18:08.475 DEBUG: flush empty
+        ✔ wait 1s (1000ms)
+        ✔ we are not expecting any messages to be sent - quiet mode
+2021-09-16T20:18:09.483 DEBUG: flush start - eeef97b3-4800-455d-88a3-d64a3496d71b
+2021-09-16T20:18:09.483 DEBUG: flush queue: eeef97b3-4800-455d-88a3-d64a3496d71b
+2021-09-16T20:18:09.484 DEBUG: flush checking if eeef97b3-4800-455d-88a3-d64a3496d71b should run
+2021-09-16T20:18:09.484 DEBUG: flush progress - eeef97b3-4800-455d-88a3-d64a3496d71b - changes: 1
+2021-09-16T20:18:09.485 DEBUG: flush done - eeef97b3-4800-455d-88a3-d64a3496d71b
+        ✔ user should have 10 points
+      rigneir cheer event
+2021-09-16T20:18:09.488 +cheer rigneir#9045, bits: 1, message: cthks
+2021-09-16T20:18:09.488 DEBUG: flush start - cadc8754-cc37-4ed2-9417-1e1c55a3ea81
+2021-09-16T20:18:09.488 DEBUG: flush queue: cadc8754-cc37-4ed2-9417-1e1c55a3ea81
+2021-09-16T20:18:09.489 DEBUG: flush checking if cadc8754-cc37-4ed2-9417-1e1c55a3ea81 should run
+2021-09-16T20:18:09.489 DEBUG: flush progress - cadc8754-cc37-4ed2-9417-1e1c55a3ea81 - changes: 1
+        ✔ trigger cheer event for 1 bit - rigneir
+2021-09-16T20:18:09.491 DEBUG: flush done - cadc8754-cc37-4ed2-9417-1e1c55a3ea81
+2021-09-16T20:18:09.492 | Event cheer with attributes {"username":"rigneir","bits":1,"message":"cthks","is":{"moderator":false,"subscriber":false,"vip":false,"broadcaster":false,"bot":false,"owner":false}} is triggered and running of operations.
+2021-09-16T20:18:09.493 DEBUG: flush empty
+2021-09-16T20:18:09.507 DEBUG: flush empty
+        ✔ wait 1s (999ms)
+        ✔ we are not expecting any messages to be sent - quiet mode
+2021-09-16T20:18:10.514 DEBUG: flush start - 7b90b3cc-cdc4-42c6-bd88-01bcf0ef6bd5
+2021-09-16T20:18:10.514 DEBUG: flush queue: 7b90b3cc-cdc4-42c6-bd88-01bcf0ef6bd5
+2021-09-16T20:18:10.515 DEBUG: flush checking if 7b90b3cc-cdc4-42c6-bd88-01bcf0ef6bd5 should run
+2021-09-16T20:18:10.515 DEBUG: flush progress - 7b90b3cc-cdc4-42c6-bd88-01bcf0ef6bd5 - changes: 1
+2021-09-16T20:18:10.516 DEBUG: flush done - 7b90b3cc-cdc4-42c6-bd88-01bcf0ef6bd5
+        ✔ user should have 10 points
+      mikasa_hraje cheer event
+2021-09-16T20:18:10.519 +cheer mikasa_hraje#8077, bits: 1, message: qgwnr
+2021-09-16T20:18:10.519 DEBUG: flush start - e943ec66-035c-4d61-a4e5-5a5baaa21214
+2021-09-16T20:18:10.519 DEBUG: flush queue: e943ec66-035c-4d61-a4e5-5a5baaa21214
+2021-09-16T20:18:10.519 DEBUG: flush checking if e943ec66-035c-4d61-a4e5-5a5baaa21214 should run
+2021-09-16T20:18:10.520 DEBUG: flush progress - e943ec66-035c-4d61-a4e5-5a5baaa21214 - changes: 1
+        ✔ trigger cheer event for 1 bit - mikasa_hraje
+2021-09-16T20:18:10.522 DEBUG: flush done - e943ec66-035c-4d61-a4e5-5a5baaa21214
+2021-09-16T20:18:10.523 | Event cheer with attributes {"username":"mikasa_hraje","bits":1,"message":"qgwnr","is":{"moderator":false,"subscriber":false,"vip":false,"broadcaster":false,"bot":false,"owner":false}} is triggered and running of operations.
+2021-09-16T20:18:10.523 DEBUG: flush empty
+2021-09-16T20:18:10.536 DEBUG: flush empty
+        ✔ wait 1s (999ms)
+        ✔ we are not expecting any messages to be sent - quiet mode
+2021-09-16T20:18:11.542 DEBUG: flush start - e99d6238-9d49-4646-b83b-935122ed204e
+2021-09-16T20:18:11.542 DEBUG: flush queue: e99d6238-9d49-4646-b83b-935122ed204e
+2021-09-16T20:18:11.542 DEBUG: flush checking if e99d6238-9d49-4646-b83b-935122ed204e should run
+2021-09-16T20:18:11.543 DEBUG: flush progress - e99d6238-9d49-4646-b83b-935122ed204e - changes: 1
+2021-09-16T20:18:11.544 DEBUG: flush done - e99d6238-9d49-4646-b83b-935122ed204e
+        ✔ user should have 10 points
+      foufhs cheer event
+2021-09-16T20:18:11.547 +cheer foufhs#219, bits: 1, message: mygtf
+2021-09-16T20:18:11.547 DEBUG: flush start - 7f5fac7d-ec68-4e52-897f-6e49ff8999bc
+2021-09-16T20:18:11.547 DEBUG: flush queue: 7f5fac7d-ec68-4e52-897f-6e49ff8999bc
+2021-09-16T20:18:11.547 DEBUG: flush checking if 7f5fac7d-ec68-4e52-897f-6e49ff8999bc should run
+2021-09-16T20:18:11.548 DEBUG: flush progress - 7f5fac7d-ec68-4e52-897f-6e49ff8999bc - changes: 1
+        ✔ trigger cheer event for 1 bit - foufhs
+2021-09-16T20:18:11.550 DEBUG: flush done - 7f5fac7d-ec68-4e52-897f-6e49ff8999bc
+2021-09-16T20:18:11.551 | Event cheer with attributes {"username":"foufhs","bits":1,"message":"mygtf","is":{"moderator":false,"subscriber":false,"vip":false,"broadcaster":false,"bot":false,"owner":false}} is triggered and running of operations.
+2021-09-16T20:18:11.551 DEBUG: flush empty
+2021-09-16T20:18:11.564 DEBUG: flush empty
+        ✔ wait 1s (999ms)
+        ✔ we are not expecting any messages to be sent - quiet mode
+2021-09-16T20:18:12.573 DEBUG: flush start - 77cc1f00-7816-4d97-8e36-271f1ba91155
+2021-09-16T20:18:12.573 DEBUG: flush queue: 77cc1f00-7816-4d97-8e36-271f1ba91155
+2021-09-16T20:18:12.573 DEBUG: flush checking if 77cc1f00-7816-4d97-8e36-271f1ba91155 should run
+2021-09-16T20:18:12.574 DEBUG: flush progress - 77cc1f00-7816-4d97-8e36-271f1ba91155 - changes: 1
+2021-09-16T20:18:12.575 DEBUG: flush done - 77cc1f00-7816-4d97-8e36-271f1ba91155
+        ✔ user should have 10 points
+
+  discord#752632256270696478 - event attrs are not correctly parsed
+2021-09-16T20:18:12.975 DEBUG: flush empty
+2021-09-16T20:18:12.981 +tip randomPerson, amount: 10.00EUR, message: Ahoj jak je
+2021-09-16T20:18:12.981 DEBUG: flush empty
+    ✔ trigger tip event for 10 EUR - randomPerson
+2021-09-16T20:18:12.982 DEBUG: flush start - 74926e7d-598d-41c9-af17-9102c9025290
+2021-09-16T20:18:12.982 DEBUG: flush queue: 74926e7d-598d-41c9-af17-9102c9025290
+2021-09-16T20:18:12.982 DEBUG: flush checking if 74926e7d-598d-41c9-af17-9102c9025290 should run
+2021-09-16T20:18:12.982 DEBUG: flush progress - 74926e7d-598d-41c9-af17-9102c9025290 - changes: 1
+2021-09-16T20:18:12.983 DEBUG: flush done - 74926e7d-598d-41c9-af17-9102c9025290
+2021-09-16T20:18:12.984 | Event tip with attributes {"userId":"NaN","username":"randomPerson","amount":10,"message":"Ahoj jak je","currency":"EUR","amountInBotCurrency":"100","currencyInBot":"CZK","is":{"moderator":false,"subscriber":false,"vip":false,"broadcaster":false,"bot":false,"owner":false}} is triggered and running of operations.
+2021-09-16T20:18:12.985 DEBUG: flush empty
+2021-09-16T20:18:13.753 DEBUG: flush empty
+2021-09-16T20:18:13.754 DEBUG: flush empty
+    ✔ wait 1s (999ms)
+    ✔ we are expecting correctly parsed message
+
+  Events - event run command should be able to run caster command and alias - https://discord.com/channels/317348946144002050/317349069024395264/812872046077411328
+2021-09-16T20:18:14.401 DEBUG: flush empty
+    ✔ reset message
+2021-09-16T20:18:14.415 DEBUG: flush empty
+2021-09-16T20:18:14.415 | Event follow with attributes {"username":"__viewer__","userId":"1","is":{"moderator":false,"subscriber":false,"vip":false,"broadcaster":false,"bot":false,"owner":false}} is triggered and running of operations.
+    ✔ trigger follow event
+    ✔ command should be triggered
+    ✔ alias should be triggered
+    ✔ wait 5s (4999ms)
+    ✔ reset message
+2021-09-16T20:18:19.459 DEBUG: flush empty
+2021-09-16T20:18:19.460 | Event follow with attributes {"username":"__viewer2__","userId":"3","is":{"moderator":false,"subscriber":false,"vip":false,"broadcaster":false,"bot":false,"owner":false}} is triggered and running of operations.
+    ✔ trigger follow event
+    ✔ command should be triggered
+    ✔ alias should be triggered

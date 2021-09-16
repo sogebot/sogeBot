@@ -67,15 +67,16 @@ export async function getOrFail(userId: string): Promise<Readonly<Required<UserI
   return data;
 }
 
+function checkLock(userId: string, resolve: (value: unknown) => void) {
+  if (!lock.get(userId)) {
+    resolve(true);
+  } else {
+    setTimeout(() => checkLock(userId, resolve), 10);
+  }
+}
 export async function get(userId: string): Promise<Readonly<Required<UserInterface>> | null> {
   await new Promise((resolve) => {
-    (function check() {
-      if (!lock.get(userId)) {
-        resolve(true);
-      } else {
-        setTimeout(() => check(), 10);
-      }
-    })();
+    checkLock(userId, resolve);
   });
 
   const user = await getRepository(User).findOne({ userId });
@@ -107,8 +108,26 @@ export async function get(userId: string): Promise<Readonly<Required<UserInterfa
   return data;
 }
 
+function checkQueue(id: string, resolve: (value: unknown) => void, reject: (reason?: any) => void) {
+  debug('flush', `queue: ${flushQueue.join(', ')}`);
+  if (changelog.length === 0) {
+    // nothing to do, just reject, no point to wait
+    flushQueue.splice(flushQueue.indexOf(id) ,1);
+    reject();
+  } else {
+    debug('flush', `checking if ${id} should run`);
+    // this flush should start
+    if (flushQueue[0] === id) {
+      resolve(true);
+    } else {
+      setImmediate(() => checkQueue(id, resolve, reject));
+    }
+  }
+}
+
 const flushQueue: string[] = [];
 export async function flush() {
+  debug('flush', `queued - ${flushQueue.length}`);
   if (changelog.length === 0) {
     // don't event start
     debug('flush', 'empty');
@@ -119,22 +138,7 @@ export async function flush() {
   debug('flush', `start - ${id}`);
   try {
     await new Promise((resolve, reject) => {
-      (function check() {
-        debug('flush', `queue: ${flushQueue.join(', ')}`);
-        if (changelog.length === 0) {
-          // nothing to do, just reject, no point to wait
-          flushQueue.splice(flushQueue.indexOf(id) ,1);
-          reject();
-        } else {
-          debug('flush', `checking if ${id} should run`);
-          // this flush should start
-          if (flushQueue[0] === id) {
-            resolve(true);
-          } else {
-            setImmediate(() => check());
-          }
-        }
-      })();
+      checkQueue(id, resolve, reject);
     });
   } catch (e) {
     debug('flush', `skip - ${id}`);
