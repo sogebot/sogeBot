@@ -34,7 +34,7 @@ export interface CommonSettingsInterface {
   layout: '1' | '2' | '3' | '4' | '5';
   filter: Filter;
   animationInDuration: number;
-  animationIn: 'fadeIn' | 'fadeInDown' | 'fadeInLeft' | 'fadeInRight'
+  animationIn: 'none' | 'fadeIn' | 'fadeInDown' | 'fadeInLeft' | 'fadeInRight'
   | 'fadeInUp' | 'fadeInDownBig' | 'fadeInLeftBig' | 'fadeInRightBig'
   | 'fadeInUpBig' | 'bounceIn' | 'bounceInDown' | 'bounceInLeft'
   | 'bounceInRight' | 'bounceInUp' | 'flipInX' | 'flipInY' | 'lightSpeedIn'
@@ -43,7 +43,7 @@ export interface CommonSettingsInterface {
   | 'slideInUp' | 'zoomIn' | 'zoomInDown' | 'zoomInLeft' | 'zoomInRight'
   | 'zoomInUp' | 'rollIn' | 'jackInTheBox';
   animationOutDuration: number;
-  animationOut: 'fadeOut' | 'fadeOutDown' | 'fadeOutLeft' | 'fadeOutRight' | 'fadeOutUp'
+  animationOut: 'none' | 'fadeOut' | 'fadeOutDown' | 'fadeOutLeft' | 'fadeOutRight' | 'fadeOutUp'
   | 'fadeOutDownBig' | 'fadeOutLeftBig' | 'fadeOutRightBig' | 'fadeOutUpBig'
   | 'bounceOut' | 'bounceOutDown' | 'bounceOutLeft' | 'bounceOutRight'
   | 'bounceOutUp' | 'flipOutX' | 'flipOutY' | 'lightSpeedOut' | 'rotateOut'
