@@ -50,4 +50,13 @@ global.mock
     'ratelimit-reset':     0,
     'ratelimit-limit':     800,
   })
+  .onGet('https://api.twitch.tv/helix/users/follows?to_id=12345&first=100&after=eyJiIjpudWxsLCJhIjoiMTUwMzQ0MTc3NjQyNDQyMjAwMCJ9').reply(200, {
+    'total':      12345,
+    'data':       [],
+    'pagination': { 'cursor': null },
+  }, {
+    'ratelimit-remaining': 800,
+    'ratelimit-reset':     0,
+    'ratelimit-limit':     800,
+  })
   .onAny().passThrough(); // pass through others
