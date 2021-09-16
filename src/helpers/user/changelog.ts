@@ -103,7 +103,6 @@ export async function get(userId: string): Promise<Readonly<Required<UserInterfa
 
 const flushQueue: string[] = [];
 export async function flush() {
-  debug('flush', 'start');
   if (changelog.length === 0) {
     // don't event start
     debug('flush', 'changelog empty in init');
@@ -111,20 +110,23 @@ export async function flush() {
   }
   const id = v4();
   flushQueue.push(id);
-
+  debug('flush', `start - ${id}`);
   try {
     await new Promise((resolve, reject) => {
       (function check() {
+        debug('flush', `queue: ${flushQueue.join(', ')}`);
         if (changelog.length === 0) {
           // nothing to do, just reject, no point to wait
           flushQueue.splice(flushQueue.indexOf(id) ,1);
           reject();
-        }
-        // this flush should start
-        if (flushQueue[0] === id) {
-          resolve(true);
         } else {
-          setImmediate(() => check());
+          debug('flush', `checking if ${id} should run`);
+          // this flush should start
+          if (flushQueue[0] === id) {
+            resolve(true);
+          } else {
+            setImmediate(() => check());
+          }
         }
       })();
     });
