@@ -25,7 +25,7 @@ describe('Raffles - user will lose points when join raffle with number and all #
 
   it('create ticket raffle', async () => {
     raffles.open({ sender: user.owner, parameters: '!winme -min 0 -max 100' });
-    await message.isSentRaw('Raffle is running (0 entries). To enter type "!winme <1-100>". Raffle is opened for everyone.', { username: '__bot_username__' });
+    await message.isSentRaw('Raffle is running (0 entries). To enter type "!winme <1-100>". Raffle is opened for everyone.', { username: 'bot' });
   });
 
   it('Update viewer and viewer2 to have 200 points', async () => {

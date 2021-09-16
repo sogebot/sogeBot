@@ -25,7 +25,7 @@ describe('Raffles - over max limit points not adding to raffle #3547', () => {
 
   it('create ticket raffle', async () => {
     raffles.open({ sender: user.owner, parameters: '!winme -min 0 -max 100' });
-    await message.isSentRaw('Raffle is running (0 entries). To enter type "!winme <1-100>". Raffle is opened for everyone.', { username: '__bot_username__' });
+    await message.isSentRaw('Raffle is running (0 entries). To enter type "!winme <1-100>". Raffle is opened for everyone.', { username: 'bot' });
   });
 
   it('Update viewer to have 1000 points', async () => {

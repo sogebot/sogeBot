@@ -28,7 +28,7 @@ describe('/t/raffle-owner-can-join-raffle-more-then-1-time/32', () => {
 
   it('create normal raffle', async () => {
     raffles.open({ sender: owner, parameters: '!winme' });
-    await message.isSentRaw('Raffle is running (0 entries). To enter type "!winme". Raffle is opened for everyone.', { username: '__bot_username__' });
+    await message.isSentRaw('Raffle is running (0 entries). To enter type "!winme". Raffle is opened for everyone.', { username: 'bot' });
   });
 
   it('loop through owner participations', async () => {

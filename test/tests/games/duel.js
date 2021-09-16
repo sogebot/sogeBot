@@ -95,7 +95,7 @@ describe('Gambling - duel', () => {
       await message.isSentRaw([
         'Congratulations to @user1! He is last man standing and he won 200 points (50% with bet of 100 points)!',
         'Congratulations to @user2! He is last man standing and he won 200 points (50% with bet of 100 points)!',
-      ], { username: '__bot_username__' });
+      ], { username: 'bot' });
     });
   });
 
