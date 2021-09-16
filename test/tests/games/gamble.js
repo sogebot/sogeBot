@@ -21,7 +21,7 @@ const command = '!gamble';
 
 describe('Gambling - gamble', () => {
   beforeEach(async () => {
-    const changelog = (require('../../dest/helpers/user/changelog'));
+    const changelog = (require('../../../dest/helpers/user/changelog'));
     await changelog.flush();
     await getRepository(User).save({
       userId: user1.userId, username: user1.username, points: 100,
