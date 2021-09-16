@@ -40,6 +40,7 @@ import { check } from '../helpers/permissions/';
 import { get as getPermission } from '../helpers/permissions/get';
 import { adminEndpoint } from '../helpers/socket';
 import { isModerator } from '../helpers/user';
+import * as changelog from '../helpers/user/changelog.js';
 import { Message } from '../message';
 import { getIdFromTwitch } from '../microservices/getIdFromTwitch';
 import oauth from '../oauth';
@@ -454,12 +455,10 @@ class Discord extends Integration {
         throw new Error('Discord integration is not connected');
       }
       const username = attributes.username === null || typeof attributes.username === 'undefined' ? getOwner() : attributes.username;
+      await changelog.flush();
       const userObj = await getRepository(User).findOne({ username });
       if (!userObj && !attributes.test) {
-        await getRepository(User).save({
-          userId: await getIdFromTwitch(username),
-          username,
-        });
+        changelog.update(await getIdFromTwitch(username), { username });
         return self.fireSendDiscordMessage(operation, { ...attributes, username });
       } else if (!userObj) {
         return;
@@ -579,7 +578,7 @@ class Discord extends Integration {
       // get linked account
       const link = await getRepository(DiscordLink).findOneOrFail({ tag: author.tag, userId: Not(IsNull()) });
       if (link.userId) {
-        const user = await getRepository(User).findOneOrFail({ userId: link.userId });
+        const user = await changelog.getOrFail(link.userId);
         const parser = new Parser();
         parser.started_at = (msg || { createdTimestamp: Date.now() }).createdTimestamp;
         parser.sender = {

@@ -25,6 +25,7 @@ import { error, info } from '../helpers/log';
 import { defaultPermissions } from '../helpers/permissions/';
 import { adminEndpoint, publicEndpoint } from '../helpers/socket';
 import { timeout } from '../helpers/tmi';
+import * as changelog from '../helpers/user/changelog.js';
 import { isModerator } from '../helpers/user/isModerator';
 import { translate } from '../translate';
 import System from './_interface';
@@ -308,6 +309,7 @@ class Songs extends System {
     if (JSON.parse(this.currentSong).videoId === videoID) {
       request.push(JSON.parse(this.currentSong).username);
     }
+    await changelog.flush();
     const users = await getRepository(User).find({ username: In(request) });
     for (const username of request) {
       const data = users.find(o => o.username === username);

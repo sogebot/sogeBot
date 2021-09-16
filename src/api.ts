@@ -45,6 +45,7 @@ import { linesParsed, setStatus } from './helpers/parser';
 import { logAvgTime } from './helpers/profiler';
 import { setImmediateAwait } from './helpers/setImmediateAwait';
 import { SQLVariableLimit } from './helpers/sql';
+import * as changelog from './helpers/user/changelog.js';
 import { isBotId, isBotSubscriber } from './helpers/user/isBot';
 import { isIgnored } from './helpers/user/isIgnored';
 import { getChannelChattersUnofficialAPI } from './microservices/getChannelChattersUnofficialAPI';
@@ -70,7 +71,7 @@ type SubscribersEndpoint = { data: { broadcaster_id: string; broadcaster_name: s
 type FollowsEndpoint = { total: number; data: { from_id: string; from_name: string; to_id: string; toname: string; followed_at: string; }[], pagination: { cursor: string } };
 export type StreamEndpoint = { data: { id: string; user_id: string, user_name: string, game_id: string, type: 'live' | '', title: string , viewer_count: number, started_at: string, language: string; thumbnail_url: string; tag_ids: string[] }[], pagination: { cursor: string } };
 
-const updateFollowerState = async(users: Readonly<Required<UserInterface>>[], usersFromAPI: { from_name: string; from_id: string; followed_at: string }[], fullScale: boolean) => {
+const updateFollowerState = async(users: (Readonly<Required<UserInterface>>)[], usersFromAPI: { from_name: string; from_id: string; followed_at: string }[], fullScale: boolean) => {
   if (!fullScale) {
     // we are handling only latest followers
     // handle users currently not following
@@ -83,18 +84,18 @@ const updateFollowerState = async(users: Readonly<Required<UserInterface>>[], us
       }
     }
   }
-  await getRepository(User).save(
-    users.map(user => {
-      const apiUser = usersFromAPI.find(userFromAPI => userFromAPI.from_id === user.userId) as typeof usersFromAPI[0];
-      return {
-        ...user,
-        followedAt:    user.haveFollowedAtLock ? user.followedAt : new Date(apiUser.followed_at).getTime(),
-        isFollower:    user.haveFollowerLock? user.isFollower : true,
-        followCheckAt: Date.now(),
-      };
-    }),
-    { chunk: Math.floor(SQLVariableLimit / Object.keys(users[0]).length) },
-  );
+
+  users.map(user => {
+    const apiUser = usersFromAPI.find(userFromAPI => userFromAPI.from_id === user.userId) as typeof usersFromAPI[0];
+    return {
+      ...user,
+      followedAt:    user.haveFollowedAtLock ? user.followedAt : new Date(apiUser.followed_at).getTime(),
+      isFollower:    user.haveFollowerLock? user.isFollower : true,
+      followCheckAt: Date.now(),
+    };
+  }).forEach(user => {
+    changelog.update(user.userId, user);
+  });
 };
 
 const processFollowerState = async (users: { from_name: string; from_id: string; followed_at: string }[], fullScale = false) => {
@@ -104,6 +105,7 @@ const processFollowerState = async (users: { from_name: string; from_id: string;
     return;
   }
   debug('api.followers', `Processing ${users.length} followers`);
+  await changelog.flush();
   const usersGotFromDb = (await Promise.all(
     chunk(users, SQLVariableLimit).map(async (bulk) => {
       return await getRepository(User).findByIds(bulk.map(user => user.from_id));
@@ -111,14 +113,16 @@ const processFollowerState = async (users: { from_name: string; from_id: string;
   )).flat();
   debug('api.followers', `Found ${usersGotFromDb.length} followers in database`);
   if (users.length > usersGotFromDb.length) {
-    const usersSavedToDb = await getRepository(User).save(
-      users
-        .filter(user => !usersGotFromDb.find(db => db.userId === user.from_id))
-        .map(user => {
-          return { userId: user.from_id, username: user.from_name };
-        }),
-      { chunk: Math.floor(SQLVariableLimit / Object.keys(users[0]).length) },
-    );
+    const usersSavedToDbPromise: Promise<Readonly<Required<UserInterface>>>[] = [];
+    users
+      .filter(user => !usersGotFromDb.find(db => db.userId === user.from_id))
+      .map(user => {
+        return { userId: user.from_id, username: user.from_name };
+      }).forEach(user => {
+        changelog.update(user.userId, user);
+        usersSavedToDbPromise.push(changelog.get(user.userId) as Promise<Readonly<Required<UserInterface>>>);
+      });
+    const usersSavedToDb = await Promise.all(usersSavedToDbPromise);
     await updateFollowerState([...usersSavedToDb, ...usersGotFromDb], users, fullScale);
   } else {
     await updateFollowerState(usersGotFromDb, users, fullScale);
@@ -296,6 +300,7 @@ class API extends Core {
       setRateLimit('broadcaster', request.headers);
 
       const data = request.data.data;
+      await changelog.flush();
       await getRepository(User).update({ userId: Not(In(data.map(o => o.user_id))) }, { isModerator: false });
       await getRepository(User).update({ userId: In(data.map(o => o.user_id)) }, { isModerator: true });
 
@@ -584,6 +589,7 @@ class API extends Core {
   }
 
   async setSubscribers (subscribers: SubscribersEndpoint['data']) {
+    await changelog.flush();
     const currentSubscribers = await getRepository(User).find({ where: { isSubscriber: true } });
 
     // check if current subscribers are still subs
@@ -592,7 +598,7 @@ class API extends Core {
         .map((o) => String(o.user_id))
         .includes(String(user.userId))) {
         // subscriber is not sub anymore -> unsub and set subStreak to 0
-        await getRepository(User).save({
+        changelog.update(user.userId, {
           ...user,
           isSubscriber:    false,
           subscribeStreak: 0,
@@ -606,12 +612,11 @@ class API extends Core {
       const isNotCurrentSubscriber = !current;
       const valuesNotMatch = current && (current.subscribeTier !== String(Number(user.tier) / 1000) || current.isSubscriber === false);
       if (isNotCurrentSubscriber || valuesNotMatch) {
-        await getRepository(User).update({ userId: user.user_id },
-          {
-            username:      user.user_name.toLowerCase(),
-            isSubscriber:  true,
-            subscribeTier: String(Number(user.tier) / 1000),
-          });
+        changelog.update(user.user_id, {
+          username:      user.user_name.toLowerCase(),
+          isSubscriber:  true,
+          subscribeTier: String(Number(user.tier) / 1000),
+        });
       }
     }
   }
@@ -1178,10 +1183,10 @@ class API extends Core {
       }
       return;
     }
-    await getRepository(User).update({ userId: id }, { createdAt: new Date(request.data.created_at).getTime() });
+    changelog.update(id, { createdAt: new Date(request.data.created_at).getTime() });
   }
 
-  async isFollowerUpdate (user: UserInterface | undefined) {
+  async isFollowerUpdate (user: UserInterface | null) {
     if (!user || !user.userId) {
       return;
     }
@@ -1241,13 +1246,11 @@ class API extends Core {
         unfollow(user.username);
         eventEmitter.emit('unfollow', { username: user.username });
       }
-
-      await getRepository(User).update({ userId: user.userId },
-        {
-          followedAt:    user.haveFollowedAtLock ? user.followedAt : 0,
-          isFollower:    user.haveFollowerLock? user.isFollower : false,
-          followCheckAt: Date.now(),
-        });
+      changelog.update(user.userId, {
+        followedAt:    user.haveFollowedAtLock ? user.followedAt : 0,
+        isFollower:    user.haveFollowerLock? user.isFollower : false,
+        followCheckAt: Date.now(),
+      });
       return { isFollower: user.isFollower, followedAt: user.followedAt };
     } else {
       // is follower

@@ -13,9 +13,7 @@ import api from './api';
 import { parserReply } from './commons';
 import type { EmitData } from './database/entity/alert';
 import { Price } from './database/entity/price';
-import {
-  User, UserBit, UserBitInterface,
-} from './database/entity/user';
+import { UserBit, UserBitInterface } from './database/entity/user';
 import { settings, timer } from './decorators';
 import { command, default_permission } from './decorators';
 import {
@@ -45,6 +43,7 @@ import {
   globalIgnoreListExclude, ignorelist, sendWithMe, setMuteStatus, showWithAt, tmiEmitter,
 } from './helpers/tmi/';
 import { isOwner } from './helpers/user';
+import * as changelog from './helpers/user/changelog.js';
 import { isBot } from './helpers/user/isBot';
 import { isIgnored } from './helpers/user/isIgnored';
 import { getUserFromTwitch } from './microservices/getUserFromTwitch';
@@ -627,9 +626,9 @@ class TMI extends Core {
         return;
       }
 
-      const user = await getRepository(User).findOne({ userId: userstate.userId });
+      const user = await changelog.get(userstate.userId);
       if (!user) {
-        await getRepository(User).save({ userId: userstate.userId, username });
+        changelog.update(userstate.userId, { username });
         this.subscription(message);
         return;
       }
@@ -639,7 +638,7 @@ class TMI extends Core {
         profileImageUrl = (await getUserFromTwitch(user.username)).profile_image_url;
       }
 
-      await getRepository(User).save({
+      changelog.update(user.userId, {
         ...user,
         isSubscriber:              user.haveSubscriberLock ? user.isSubscriber : true,
         subscribedAt:              user.haveSubscribedAtLock ? user.subscribedAt : Date.now(),
@@ -705,9 +704,9 @@ class TMI extends Core {
 
       const subStreak = subStreakShareEnabled ? streakMonths : 0;
 
-      const user = await getRepository(User).findOne({ userId: userstate.userId });
+      const user = await changelog.get(userstate.userId);
       if (!user) {
-        await getRepository(User).save({ userId: userstate.userId, username });
+        changelog.update(userstate.userId, { username });
         this.resub(message);
         return;
       }
@@ -717,7 +716,7 @@ class TMI extends Core {
         profileImageUrl = (await getUserFromTwitch(user.username)).profile_image_url;
       }
 
-      await getRepository(User).save({
+      changelog.update(user.userId, {
         ...user,
         isSubscriber:              true,
         subscribedAt:              Number(dayjs().subtract(streakMonths, 'month').unix()) * 1000,
@@ -778,7 +777,7 @@ class TMI extends Core {
       const userId = message.tags.userId;
       const count = Number(message.parameters.massGiftCount);
 
-      await getRepository(User).increment({ userId }, 'giftedSubscribes', Number(count));
+      changelog.increment(userId, { giftedSubscribes: Number(count) });
 
       const ignoreGifts = this.ignoreGiftsFromUser.get(username) ?? 0;
       this.ignoreGiftsFromUser.set(username, ignoreGifts + count);
@@ -856,14 +855,14 @@ class TMI extends Core {
         return;
       }
 
-      const user = await getRepository(User).findOne({ userId: recipientId });
+      const user = await changelog.get(recipientId);
       if (!user) {
-        await getRepository(User).save({ userId: recipientId, username });
+        changelog.update(recipientId, { userId: recipientId, username });
         this.subgift(message);
         return;
       }
 
-      await getRepository(User).save({
+      changelog.update(user.userId, {
         ...user,
         isSubscriber:              true,
         subscribedAt:              Date.now(),
@@ -884,7 +883,7 @@ class TMI extends Core {
 
       // also set subgift count to gifter
       if (!(isIgnored({ username, userId })) && !isGiftIgnored) {
-        await getRepository(User).increment({ userId }, 'giftedSubscribes', 1);
+        changelog.increment(userId, { giftedSubscribes: 1 });
       }
     } catch (e: any) {
       error('Error parsing subgift event');
@@ -905,10 +904,10 @@ class TMI extends Core {
         return;
       }
 
-      const user = await getRepository(User).findOne({ where: { userId: userId } });
+      const user = await changelog.get(userId);
       if (!user) {
         // if we still doesn't have user, we create new
-        await getRepository(User).save({ userId: userstate.userId, username });
+        changelog.update(userstate.userId, { username });
         return this.cheer(message);
       }
 
@@ -1059,14 +1058,14 @@ class TMI extends Core {
           }
           return undefined; // undefined will not change any values
         };
-        const user = await getRepository(User).findOne({ where: { userId: sender.userId } });
 
+        const user = await changelog.get(sender.userId);
         if (user) {
           if (!user.isOnline) {
             joinpart.send({ users: [sender.username], type: 'join' });
             eventEmitter.emit('user-joined-channel', { username: sender.username });
           }
-          await getRepository(User).save({
+          changelog.update(user.userId, {
             ...user,
             username:                  sender.username,
             userId:                    sender.userId,
@@ -1082,7 +1081,7 @@ class TMI extends Core {
         } else {
           joinpart.send({ users: [sender.username], type: 'join' });
           eventEmitter.emit('user-joined-channel', { username: sender.username });
-          await getRepository(User).save({
+          changelog.update(sender.userId, {
             username:     sender.username,
             userId:       sender.userId,
             isOnline:     true,
@@ -1103,7 +1102,7 @@ class TMI extends Core {
             username: sender.username, message: message, source: 'twitch',
           });
         } else if (!message.startsWith('!')) {
-          getRepository(User).increment({ userId: sender.userId }, 'messages', 1);
+          changelog.increment(sender.userId, { messages: 1 });
         }
       }
       const responses = await parse.process();

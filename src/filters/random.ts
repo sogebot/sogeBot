@@ -2,6 +2,7 @@ import { sample } from '@sogebot/ui-helpers/array';
 import { getRepository } from 'typeorm';
 
 import { User } from '../database/entity/user';
+import * as changelog from '../helpers/user/changelog.js';
 import { isIgnored } from '../helpers/user/isIgnored';
 import oauth from '../oauth';
 
@@ -9,6 +10,7 @@ import type { ResponseFilter } from '.';
 
 const random: ResponseFilter = {
   '(random.online.viewer)': async function () {
+    await changelog.flush();
     const viewers = (await getRepository(User).createQueryBuilder('user')
       .where('user.username != :botusername', { botusername: oauth.botUsername.toLowerCase() })
       .andWhere('user.username != :broadcasterusername', { broadcasterusername: oauth.broadcasterUsername.toLowerCase() })
@@ -24,6 +26,7 @@ const random: ResponseFilter = {
     return sample(viewers.map(o => o.username ));
   },
   '(random.online.follower)': async function () {
+    await changelog.flush();
     const followers = (await getRepository(User).createQueryBuilder('user')
       .where('user.username != :botusername', { botusername: oauth.botUsername.toLowerCase() })
       .andWhere('user.username != :broadcasterusername', { broadcasterusername: oauth.broadcasterUsername.toLowerCase() })
@@ -54,6 +57,7 @@ const random: ResponseFilter = {
     return sample(subscribers.map(o => o.username ));
   },
   '(random.viewer)': async function () {
+    await changelog.flush();
     const viewers = (await getRepository(User).createQueryBuilder('user')
       .where('user.username != :botusername', { botusername: oauth.botUsername.toLowerCase() })
       .andWhere('user.username != :broadcasterusername', { broadcasterusername: oauth.broadcasterUsername.toLowerCase() })
@@ -67,6 +71,7 @@ const random: ResponseFilter = {
     return sample(viewers.map(o => o.username ));
   },
   '(random.follower)': async function () {
+    await changelog.flush();
     const followers = (await getRepository(User).createQueryBuilder('user')
       .where('user.username != :botusername', { botusername: oauth.botUsername.toLowerCase() })
       .andWhere('user.username != :broadcasterusername', { broadcasterusername: oauth.broadcasterUsername.toLowerCase() })
@@ -81,6 +86,7 @@ const random: ResponseFilter = {
     return sample(followers.map(o => o.username ));
   },
   '(random.subscriber)': async function () {
+    await changelog.flush();
     const subscribers = (await getRepository(User).createQueryBuilder('user')
       .where('user.username != :botusername', { botusername: oauth.botUsername.toLowerCase() })
       .andWhere('user.username != :broadcasterusername', { broadcasterusername: oauth.broadcasterUsername.toLowerCase() })

@@ -1,13 +1,13 @@
 import { getRepository } from 'typeorm';
 
 import { Queue as QueueEntity, QueueInterface } from '../database/entity/queue';
-import { User } from '../database/entity/user';
 import {
   command, default_permission, settings,
 } from '../decorators';
 import { getBotSender, prepare } from '../helpers/commons';
 import { defaultPermissions } from '../helpers/permissions/';
 import { adminEndpoint } from '../helpers/socket';
+import * as changelog from '../helpers/user/changelog.js';
 import tmi from '../tmi';
 import { translate } from '../translate';
 import System from './_interface';
@@ -145,12 +145,9 @@ class Queue extends System {
   @command('!queue join')
   async join (opts: CommandOptions): Promise<CommandResponse[]> {
     if (!(this.locked)) {
-      const user = await getRepository(User).findOne({ userId: opts.sender.userId });
+      const user = await changelog.get(opts.sender.userId);
       if (!user) {
-        await getRepository(User).save({
-          userId:   opts.sender.userId,
-          username: opts.sender.username,
-        });
+        changelog.update(opts.sender.userId, { username: opts.sender.username });
         return this.join(opts);
       }
       const [all, followers, subscribers] = await Promise.all([this.eligibilityAll, this.eligibilityFollowers, this.eligibilitySubscribers]);

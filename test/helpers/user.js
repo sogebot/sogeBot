@@ -83,7 +83,7 @@ module.exports = {
     await getRepository(User).save(mod);
     // set owner as broadcaster
     oauth.broadcasterUsername = owner.username;
-    generalOwners.value = [owner.username];
+    generalOwners.value = [owner.username, '__owner__'];
     // clean perm cache
     cleanViewersCache();
   },

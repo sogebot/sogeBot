@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
-/* global describe it before */
+/* global */
 
 require('../../general.js');
 
@@ -10,6 +10,7 @@ const { getRepository } = require('typeorm');
 
 const { User } = require('../../../dest/database/entity/user');
 const roulette = (require('../../../dest/games/roulette')).default;
+const changelog = (require('../../../dest/helpers/user/changelog'));
 const points = (require('../../../dest/systems/points')).default;
 const db = require('../../general.js').db;
 const message = require('../../general.js').message;
@@ -48,7 +49,7 @@ describe('game/roulette - !roulette', () => {
           const msg1 = '$sender is alive! Nothing happened.';
           const msg2 = '$sender\'s brain was splashed on the wall!';
           assert(r[1].response === msg1 || r[1].response === msg2, JSON.stringify({
-            r, msg1, msg2, 
+            r, msg1, msg2,
           }, null, 2));
         });
       }
@@ -78,6 +79,7 @@ describe('game/roulette - !roulette', () => {
     });
 
     it(`User should not have negative points`, async () => {
+      await changelog.flush();
       const user1 = await getRepository(User).findOne({ userId: tests[0].user.userId });
       assert.strictEqual(user1.points, 0);
     });
@@ -115,7 +117,7 @@ describe('game/roulette - !roulette', () => {
         await user.prepare();
         roulette.loserWillLose = 100;
         await getRepository(User).save({
-          userId: user.viewer.userId, username: user.viewer.username, points: 100, 
+          userId: user.viewer.userId, username: user.viewer.username, points: 100,
         });
       });
       after(() => {

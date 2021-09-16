@@ -3,11 +3,9 @@ import axios from 'axios';
 import { NextFunction } from 'express';
 import jwt, { JsonWebTokenError } from 'jsonwebtoken';
 import { Socket as SocketIO } from 'socket.io';
-import { getRepository } from 'typeorm';
 import { v4 as uuid } from 'uuid';
 
 import Core from './_interface';
-import { User } from './database/entity/user';
 import {
   persistent, settings, ui,
 } from './decorators';
@@ -18,6 +16,7 @@ import {
   check, defaultPermissions, getUserHighestPermission,
 } from './helpers/permissions/';
 import { adminEndpoint, endpoints } from './helpers/socket';
+import * as changelog from './helpers/user/changelog.js';
 import { isModerator } from './helpers/user/isModerator';
 
 let _self: any = null;
@@ -36,7 +35,7 @@ type Unpacked<T> =
 
 const getPrivileges = async(type: 'admin' | 'viewer' | 'public', userId: string) => {
   try {
-    const user = await getRepository(User).findOneOrFail({ userId });
+    const user = await changelog.getOrFail(userId);
     return {
       haveAdminPrivileges:  type === 'admin' ? Authorized.isAuthorized : Authorized.NotAuthorized,
       haveModPrivileges:    isModerator(user) ? Authorized.isAuthorized : Authorized.NotAuthorized,
@@ -131,8 +130,8 @@ class Socket extends Core {
             }
             const username = twitchValidation.data.login;
             const haveCasterPermission = (await check(userId, defaultPermissions.CASTERS, true)).access;
-            const user = await getRepository(User).findOne({ userId });
-            await getRepository(User).save({
+            const user = await changelog.get(userId);
+            changelog.update(userId, {
               ...user,
               userId,
               username,
@@ -166,11 +165,10 @@ class Socket extends Core {
               userId: string; username: string;
             };
             const userPermission = await getUserHighestPermission(data.userId);
-            const user = await getRepository(User).findOne({ userId: data.userId });
-            await getRepository(User).save({
+            const user = await changelog.get(data.userId);
+            changelog.update(data.userId, {
               ...user,
-              userId:   data.userId,
-              username: data.username,
+              ...data,
             });
 
             const accessToken = jwt.sign({

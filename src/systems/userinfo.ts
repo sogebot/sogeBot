@@ -18,6 +18,7 @@ import { getLocalizedName } from '../helpers/getLocalized';
 import { debug, error } from '../helpers/log';
 import { get, getUserHighestPermission } from '../helpers/permissions/';
 import { getPointsName } from '../helpers/points';
+import * as changelog from '../helpers/user/changelog.js';
 import { fetchAccountAge } from '../microservices/fetchAccountAge';
 import { getUserFromTwitch } from '../microservices/getUserFromTwitch';
 import { translate } from '../translate';
@@ -54,9 +55,10 @@ class UserInfo extends System {
   protected async followage(opts: CommandOptions): Promise<CommandResponse[]> {
     const [username] = new Expects(opts.parameters).username({ optional: true, default: opts.sender.username }).toArray();
     const id = await users.getIdByName(username);
-    const isFollowerUpdate = await api.isFollowerUpdate(await getRepository(User).findOne({ userId: id }));
+    const isFollowerUpdate = await api.isFollowerUpdate(await changelog.get(id));
     debug('userinfo.followage', JSON.stringify(isFollowerUpdate));
 
+    await changelog.flush();
     const user = await getRepository(User).findOne({ username });
     if (!user || !user.isFollower || user.followedAt === 0) {
       return [{ response: prepare('followage.' + (opts.sender.username === username.toLowerCase() ? 'successSameUsername' : 'success') + '.never', { username }), ...opts }];
@@ -87,7 +89,7 @@ class UserInfo extends System {
   @command('!subage')
   protected async subage(opts: CommandOptions): Promise<CommandResponse[]> {
     const [username] = new Expects(opts.parameters).username({ optional: true, default: opts.sender.username }).toArray();
-
+    await changelog.flush();
     const user = await getRepository(User).findOne({ username });
     const subCumulativeMonths = user?.subscribeCumulativeMonths;
     const subStreak = user?.subscribeStreak;
@@ -131,16 +133,13 @@ class UserInfo extends System {
   @command('!age')
   protected async age(opts: CommandOptions, retry = false): Promise<CommandResponse[]> {
     const [username] = new Expects(opts.parameters).username({ optional: true, default: opts.sender.username }).toArray();
-
+    await changelog.flush();
     const user = await getRepository(User).findOne({ username });
     if (!user || user.createdAt === 0) {
       try {
         const { id: userId } = await getUserFromTwitch(username);
         if (!user) {
-          await getRepository(User).save({
-            userId,
-            username,
-          });
+          changelog.update(userId, { username });
         }
         await fetchAccountAge(userId);
         if (!retry) {
@@ -180,6 +179,7 @@ class UserInfo extends System {
   protected async lastseen(opts: CommandOptions): Promise<CommandResponse[]> {
     try {
       const [username] = new Expects(opts.parameters).username().toArray();
+      await changelog.flush();
       const user = await getRepository(User).findOne({ username: username });
       if (!user || user.seenAt === 0) {
         return [{ response: translate('lastseen.success.never').replace(/\$username/g, username), ...opts }];
@@ -217,10 +217,7 @@ class UserInfo extends System {
   async showMe(opts: CommandOptions, returnOnly = false): Promise<string | CommandResponse[]> {
     try {
       const message: (string | null)[] = [];
-      const user = await getRepository(User).findOne({
-        where: { userId: opts.sender.userId },
-        cache: true,
-      });
+      const user = await changelog.get(opts.sender.userId);
       const tips =  await getRepository(UserTip).find({ where: { userId: opts.sender.userId } });
       const bits =  await getRepository(UserBit).find({ where: { userId: opts.sender.userId } });
 
@@ -237,7 +234,7 @@ class UserInfo extends System {
 
       if (message.includes('$rank')) {
         const idx = message.indexOf('$rank');
-        const rank = await ranks.get(await getRepository(User).findOne({ userId: opts.sender.userId }));
+        const rank = await ranks.get(await changelog.get(opts.sender.userId));
         if (ranks.enabled && rank.current !== null) {
           message[idx] = typeof rank.current === 'string' ? rank.current : rank.current.rank;
         } else {
@@ -248,7 +245,7 @@ class UserInfo extends System {
       if (message.includes('$level')) {
         const idx = message.indexOf('$level');
         if (levels.enabled) {
-          const level = await levels.getLevelOf(await getRepository(User).findOne({ userId: opts.sender.userId }));
+          const level = await levels.getLevelOf(await changelog.get(opts.sender.userId));
           message[idx] = `Level ${level}`;
         } else {
           message.splice(idx, 1);
@@ -325,6 +322,7 @@ class UserInfo extends System {
   async showStats(opts: CommandOptions): Promise<CommandResponse[]> {
     try {
       const username = new Expects(opts.parameters).username().toArray()[0].toLowerCase();
+      await changelog.flush();
       const user = await getRepository(User).findOne({ where: { username: username.toLowerCase() } });
 
       if (!user) {

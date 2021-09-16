@@ -14,7 +14,7 @@ import general from '../general';
 import { isStreamOnline } from '../helpers/api';
 import { ResponseError } from '../helpers/commandError';
 import { prepare } from '../helpers/commons';
-import { getAllOnlineUsernames } from '../helpers/getAllOnlineUsernames';
+import { getAllOnlineIds } from '../helpers/getAllOnlineUsernames';
 import { debug, error } from '../helpers/log';
 import { getUserHighestPermission } from '../helpers/permissions/';
 import { defaultPermissions } from '../helpers/permissions/';
@@ -24,7 +24,8 @@ import { adminEndpoint } from '../helpers/socket';
 import {
   bigIntMax, serialize, unserialize,
 } from '../helpers/type';
-import { isBot } from '../helpers/user/isBot';
+import * as changelog from '../helpers/user/changelog.js';
+import { isBotId } from '../helpers/user/isBot';
 import { translate } from '../translate';
 import users from '../users';
 import System from './_interface';
@@ -104,11 +105,11 @@ class Levels extends System {
     try {
       debug('levels.update', `Started XP adding, isOnline: ${isStreamOnline.value}`);
       let i = 0;
-      for (const username of (await getAllOnlineUsernames())) {
-        if (isBot(username)) {
+      for (const userId of (await getAllOnlineIds())) {
+        if (isBotId(userId)) {
           continue;
         }
-        await this.process(username, {
+        await this.process(userId, {
           interval, offlineInterval, perInterval, perOfflineInterval, isOnline: isStreamOnline.value,
         });
         if ( i % 10 === 0) {
@@ -149,99 +150,91 @@ class Levels extends System {
     return cachedLevels[levelFromCache];
   }
 
-  private async process(username: string, opts: {interval: {[permissionId: string]: any}; offlineInterval: {[permissionId: string]: any}; perInterval: {[permissionId: string]: any}; perOfflineInterval: {[permissionId: string]: any}; isOnline: boolean}): Promise<void> {
-    const userId = await users.getIdByName(username);
-    if (!userId) {
-      debug('levels.update', `User ${username} missing userId`);
-      return; // skip without id
+  private async process(userId: string, opts: {interval: {[permissionId: string]: any}; offlineInterval: {[permissionId: string]: any}; perInterval: {[permissionId: string]: any}; perOfflineInterval: {[permissionId: string]: any}; isOnline: boolean}): Promise<void> {
+    const user = await changelog.get(userId);
+    if (!user) {
+      // user is not existing in db, skipping
+      return;
     }
 
     // get user max permission
     const permId = await getUserHighestPermission(userId);
     if (!permId) {
-      debug('levels.update', `User ${username}#${userId} permId not found`);
+      debug('levels.update', `User ${user.username}#${userId} permId not found`);
       return; // skip without id
     }
 
     const interval_calculated = opts.isOnline ? opts.interval[permId] * 60 * 1000 : opts.offlineInterval[permId]  * 60 * 1000;
     const ptsPerInterval = opts.isOnline ? opts.perInterval[permId]  : opts.perOfflineInterval[permId] ;
 
-    const user = await getRepository(User).findOne({ username });
-    if (!user) {
-      debug('levels.update', `new user in db ${username}#${userId}[${permId}]`);
-      await getRepository(User).save({
-        userId,
-        username,
-      });
-    } else {
-      const chat = await users.getChatOf(userId, true);
-      const chatOffline = await users.getChatOf(userId, false);
+    const chat = await users.getChatOf(userId, true);
+    const chatOffline = await users.getChatOf(userId, false);
 
-      // we need to save if extra.levels are not defined
-      if (typeof user.extra?.levels === 'undefined') {
-        debug('levels.update', `${user.username}#${userId}[${permId}] -- initial data --`);
-        const levels: NonNullable<UserInterface['extra']>['levels'] = {
-          xp:                serialize(BigInt(0)),
-          xpOfflineGivenAt:  chatOffline,
-          xpOfflineMessages: 0,
-          xpOnlineGivenAt:   chat,
-          xpOnlineMessages:  0,
-        };
-        await getRepository(User).update({ userId: user.userId },
-          {
-            extra: {
-              ...user.extra,
-              levels,
-            },
-          });
+    // we need to save if extra.levels are not defined
+    if (typeof user.extra?.levels === 'undefined') {
+      debug('levels.update', `${user.username}#${userId}[${permId}] -- initial data --`);
+      const levels: NonNullable<UserInterface['extra']>['levels'] = {
+        xp:                serialize(BigInt(0)),
+        xpOfflineGivenAt:  chatOffline,
+        xpOfflineMessages: 0,
+        xpOnlineGivenAt:   chat,
+        xpOnlineMessages:  0,
+      };
+      changelog.update(user.userId,
+        {
+          extra: {
+            ...user.extra,
+            levels,
+          },
+        });
+    }
+
+    if (interval_calculated !== 0 && ptsPerInterval[permId] !== 0) {
+      const givenAt = opts.isOnline
+        ? user.extra?.levels?.xpOnlineGivenAt ?? chat
+        : user.extra?.levels?.xpOfflineGivenAt ?? chat;
+      debug('levels.update', `${user.username}#${userId}[${permId}] ${chat} | ${givenAt}`);
+      let modifier = 0;
+      let userTimeXP = givenAt + interval_calculated;
+      for (; userTimeXP <= chat; userTimeXP += interval_calculated) {
+        modifier++;
       }
 
-      if (interval_calculated !== 0 && ptsPerInterval[permId] !== 0) {
-        const givenAt = opts.isOnline
-          ? user.extra?.levels?.xpOnlineGivenAt ?? chat
-          : user.extra?.levels?.xpOfflineGivenAt ?? chat;
-        debug('levels.update', `${user.username}#${userId}[${permId}] ${chat} | ${givenAt}`);
-        let modifier = 0;
-        let userTimeXP = givenAt + interval_calculated;
-        for (; userTimeXP <= chat; userTimeXP += interval_calculated) {
-          modifier++;
-        }
-
-        if (modifier > 0) {
-          debug('levels.update', `${user.username}#${userId}[${permId}] +${Math.floor(ptsPerInterval * modifier)}`);
-          const levels: NonNullable<UserInterface['extra']>['levels'] = {
-            xp:                serialize(BigInt(Math.floor(ptsPerInterval * modifier)) + (unserialize<bigint>(user.extra?.levels?.xp) ?? BigInt(0))),
-            xpOfflineGivenAt:  !opts.isOnline ? userTimeXP : user.extra?.levels?.xpOfflineGivenAt ?? chatOffline,
-            xpOfflineMessages: user.extra?.levels?.xpOfflineMessages ?? 0,
-            xpOnlineGivenAt:   opts.isOnline ? userTimeXP : user.extra?.levels?.xpOnlineGivenAt ?? chat,
-            xpOnlineMessages:  user.extra?.levels?.xpOnlineMessages ?? 0,
-          };
-          await getRepository(User).update({ userId: user.userId },
-            {
-              extra: {
-                ...user.extra,
-                levels,
-              },
-            });
-        }
-      } else {
+      if (modifier > 0) {
+        debug('levels.update', `${user.username}#${userId}[${permId}] +${Math.floor(ptsPerInterval * modifier)}`);
         const levels: NonNullable<UserInterface['extra']>['levels'] = {
-          xp:                serialize(BigInt(ptsPerInterval) + (unserialize<bigint>(user.extra?.levels?.xp) ?? BigInt(0))),
-          xpOfflineGivenAt:  !opts.isOnline ? chat : user.extra?.levels?.xpOfflineGivenAt ?? chat,
+          xp:                serialize(BigInt(Math.floor(ptsPerInterval * modifier)) + (unserialize<bigint>(user.extra?.levels?.xp) ?? BigInt(0))),
+          xpOfflineGivenAt:  !opts.isOnline ? userTimeXP : user.extra?.levels?.xpOfflineGivenAt ?? chatOffline,
           xpOfflineMessages: user.extra?.levels?.xpOfflineMessages ?? 0,
-          xpOnlineGivenAt:   opts.isOnline ? chat : user.extra?.levels?.xpOnlineGivenAt ?? chat,
+          xpOnlineGivenAt:   opts.isOnline ? userTimeXP : user.extra?.levels?.xpOnlineGivenAt ?? chat,
           xpOnlineMessages:  user.extra?.levels?.xpOnlineMessages ?? 0,
         };
-        await getRepository(User).update({ userId: user.userId },
+        changelog.update(user.userId,
           {
             extra: {
               ...user.extra,
               levels,
             },
           });
-        debug('levels.update', `${user.username}#${userId}[${permId}] levels disabled or interval is 0, settint levels time to chat`);
       }
+    } else {
+      const levels: NonNullable<UserInterface['extra']>['levels'] = {
+        xp:                serialize(BigInt(ptsPerInterval) + (unserialize<bigint>(user.extra?.levels?.xp) ?? BigInt(0))),
+        xpOfflineGivenAt:  !opts.isOnline ? chat : user.extra?.levels?.xpOfflineGivenAt ?? chat,
+        xpOfflineMessages: user.extra?.levels?.xpOfflineMessages ?? 0,
+        xpOnlineGivenAt:   opts.isOnline ? chat : user.extra?.levels?.xpOnlineGivenAt ?? chat,
+        xpOnlineMessages:  user.extra?.levels?.xpOnlineMessages ?? 0,
+      };
+      changelog.update(user.userId,
+        {
+          extra: {
+            ...user.extra,
+            levels,
+          },
+        });
+      debug('levels.update', `${user.username}#${userId}[${permId}] levels disabled or interval is 0, settint levels time to chat`);
     }
+
   }
 
   @parser({ fireAndForget: true })
@@ -270,7 +263,7 @@ class Levels extends System {
       return true;
     }
 
-    const user = await getRepository(User).findOne({ userId: opts.sender.userId });
+    const user = await changelog.get(opts.sender.userId);
     if (!user) {
       return true;
     }
@@ -296,7 +289,7 @@ class Levels extends System {
 
     if (messages >= interval_calculated) {
       // add xp and set offline/online messages to 0
-      await getRepository(User).update({ userId: user.userId },
+      changelog.update(user.userId,
         {
           extra: {
             ...user.extra,
@@ -308,7 +301,7 @@ class Levels extends System {
           },
         });
     } else {
-      await getRepository(User).update({ userId: user.userId },
+      changelog.update(user.userId,
         {
           extra: {
             ...user.extra,
@@ -348,7 +341,7 @@ class Levels extends System {
     return bigIntMax(prevLevelXP, BigInt(0));
   }
 
-  getLevelOf(user: UserInterface | undefined): number {
+  getLevelOf(user: UserInterface | null): number {
     if (!user) {
       return 0;
     }
@@ -385,7 +378,7 @@ class Levels extends System {
         throw new Error('Point system disabled.');
       }
 
-      const user = await getRepository(User).findOneOrFail({ userId: opts.sender.userId });
+      const user = await changelog.getOrFail(opts.sender.userId);
       const availablePoints = user.points;
       const currentLevel = this.getLevelOf(user);
       const xp = this.getLevelXP(currentLevel + 1);
@@ -412,7 +405,7 @@ class Levels extends System {
         xpOnlineGivenAt:   user.extra?.levels?.xpOnlineGivenAt ?? chat,
         xpOnlineMessages:  user.extra?.levels?.xpOnlineMessages ?? 0,
       };
-      await getRepository(User).update({ userId: user.userId },
+      changelog.update(user.userId,
         {
           points: user.points - neededPoints,
           extra:  {
@@ -446,6 +439,7 @@ class Levels extends System {
   async add (opts: CommandOptions): Promise<CommandResponse[]> {
     try {
       const [username, xp] = new Expects(opts.parameters).username().number({ minus: true }).toArray();
+      await changelog.flush();
       const user = await getRepository(User).findOneOrFail({ username });
       const chat = await users.getChatOf(user.userId, isStreamOnline.value);
 
@@ -456,7 +450,7 @@ class Levels extends System {
         xpOnlineGivenAt:   user.extra?.levels?.xpOnlineGivenAt ?? chat,
         xpOnlineMessages:  user.extra?.levels?.xpOnlineMessages ?? 0,
       };
-      await getRepository(User).update({ userId: user.userId },
+      changelog.update(user.userId,
         {
           extra: {
             ...user.extra,
@@ -479,6 +473,7 @@ class Levels extends System {
   async main (opts: CommandOptions): Promise<CommandResponse[]> {
     try {
       const [username] = new Expects(opts.parameters).username({ optional: true, default: opts.sender.username }).toArray();
+      await changelog.flush();
       const user = await getRepository(User).findOneOrFail({ username });
 
       let currentLevel = this.firstLevelStartsAt === 0 ? 1 : 0;

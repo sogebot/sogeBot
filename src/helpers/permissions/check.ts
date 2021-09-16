@@ -2,7 +2,6 @@ import _ from 'lodash';
 import { getRepository, LessThan } from 'typeorm';
 
 import { Permissions, PermissionsInterface } from '../../database/entity/permissions';
-import { User } from '../../database/entity/user';
 import { areDecoratorsLoaded } from '../../decorators';
 import { getBroadcaster } from '../getBroadcaster';
 import {
@@ -12,6 +11,7 @@ import { generalOwners } from '../oauth/generalOwners';
 import {
   isFollower, isOwner, isSubscriber, isVIP,
 } from '../user';
+import * as changelog from '../user/changelog.js';
 import { isBot } from '../user/isBot';
 import { isBroadcaster } from '../user/isBroadcaster';
 import { isModerator } from '../user/isModerator';
@@ -42,7 +42,7 @@ async function check(userId: string, permId: string, partial = false): Promise<{
     return { access: true, permission: pItem };
   }
 
-  const user = await getRepository(User).findOne({ where: { userId } });
+  const user = await changelog.get(userId);
   const pItem = (await getRepository(Permissions).findOne({
     relations: ['filters'],
     where:     { id: permId },

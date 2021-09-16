@@ -22,6 +22,7 @@ import {
   debug, error, info, warning,
 } from '../log';
 import { linesParsed } from '../parser';
+import * as changelog from '../user/changelog.js';
 import { isModerator } from '../user/isModerator';
 import { getAll } from './getAll';
 
@@ -49,6 +50,7 @@ async function runScript (script: string, opts: { sender: { userId: string; user
 
   let usersList: UserInterface[] = [];
   if (containUsers || containRandom) {
+    await changelog.flush();
     usersList = await getRepository(User).find();
   }
 
@@ -57,6 +59,7 @@ async function runScript (script: string, opts: { sender: { userId: string; user
   let onlineFollowers: string[] = [];
 
   if (containOnline) {
+    await changelog.flush();
     onlineViewers = await getAllOnlineUsernames();
     onlineSubscribers = (await getRepository(User).find({
       where: {
@@ -64,6 +67,7 @@ async function runScript (script: string, opts: { sender: { userId: string; user
         isOnline:     true,
       },
     })).map(o => o.username);
+    await changelog.flush();
     onlineFollowers = (await getRepository(User).find({
       where: {
         isFollower: true,
@@ -143,6 +147,7 @@ async function runScript (script: string, opts: { sender: { userId: string; user
     param:    param,
     _current: opts._current,
     user:     async (username: string) => {
+      await changelog.flush();
       const _user = await getRepository(User).findOne({ username });
       if (_user) {
         const userObj = {
@@ -162,7 +167,7 @@ async function runScript (script: string, opts: { sender: { userId: string; user
         try {
           // we don't have data of user, we will try to get them
           const userFromTwitch = await getUserFromTwitch(username);
-          const createdUser = await getRepository(User).save({
+          changelog.update(userFromTwitch.id, {
             username,
             userId:          userFromTwitch.id,
             displayname:     userFromTwitch.display_name,
@@ -171,14 +176,14 @@ async function runScript (script: string, opts: { sender: { userId: string; user
 
           const userObj = {
             username,
-            id:          createdUser.userId,
-            displayname: createdUser.displayname,
+            id:          userFromTwitch.id,
+            displayname: userFromTwitch.display_name,
             is:          {
-              online:     createdUser.isOnline ?? false,
-              follower:   get(createdUser, 'is.follower', false),
-              vip:        get(createdUser, 'is.vip', false),
-              subscriber: get(createdUser, 'is.subscriber', false),
-              mod:        isModerator(createdUser),
+              online:     false,
+              follower:   false,
+              vip:        false,
+              subscriber: false,
+              mod:        false,
             },
           };
           return userObj;

@@ -1,9 +1,8 @@
 import _ from 'lodash';
-import { getRepository } from 'typeorm';
 
-import { User } from '../database/entity/user';
 import { command, settings } from '../decorators';
 import { timeout } from '../helpers/tmi';
+import * as changelog from '../helpers/user/changelog.js';
 import { isBroadcaster } from '../helpers/user/isBroadcaster';
 import { isModerator } from '../helpers/user/isModerator';
 import points from '../systems/points';
@@ -55,9 +54,9 @@ class Roulette extends Game {
     }, 2000);
 
     if (isAlive) {
-      await getRepository(User).increment({ userId: opts.sender.userId }, 'points', Number(this.winnerWillGet));
+      changelog.increment(opts.sender.userId, { points: Number(this.winnerWillGet) });
     } else {
-      await points.decrement({ userId: opts.sender.userId }, Number(this.loserWillLose));
+      changelog.increment(opts.sender.userId, { points: -Number(this.loserWillLose) });
     }
     responses.push({
       response: isAlive ? translate('gambling.roulette.alive') : translate('gambling.roulette.dead'), ...opts, isAlive,

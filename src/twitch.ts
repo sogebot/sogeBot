@@ -14,6 +14,7 @@ import { prepare } from './helpers/commons/prepare';
 import { dayjs, timezone } from './helpers/dayjs';
 import { defaultPermissions } from './helpers/permissions/';
 import { adminEndpoint } from './helpers/socket';
+import * as changelog from './helpers/user/changelog.js';
 import { isIgnored } from './helpers/user/isIgnored';
 import { sendGameFromTwitch } from './microservices/sendGameFromTwitch';
 import { setTitleAndGame } from './microservices/setTitleAndGame';
@@ -63,6 +64,7 @@ class Twitch extends Core {
       .orderBy('events.timestamp', 'DESC')
       .where('events.event = :event', { event: 'follow' })
       .getMany();
+    await changelog.flush();
     const onlineFollowers = (await getRepository(User).createQueryBuilder('user')
       .where('user.username != :botusername', { botusername: oauth.botUsername.toLowerCase() })
       .andWhere('user.username != :broadcasterusername', { broadcasterusername: oauth.broadcasterUsername.toLowerCase() })
@@ -98,7 +100,7 @@ class Twitch extends Core {
       .orWhere('events.event = :event2', { event2: 'resub' })
       .orWhere('events.event = :event3', { event3: 'subgift' })
       .getMany();
-
+    await changelog.flush();
     const onlineSubscribers = (await getRepository(User).createQueryBuilder('user')
       .where('user.username != :botusername', { botusername: oauth.botUsername.toLowerCase() })
       .andWhere('user.username != :broadcasterusername', { broadcasterusername: oauth.broadcasterUsername.toLowerCase() })

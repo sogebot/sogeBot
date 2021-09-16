@@ -45,6 +45,7 @@ import { adminEndpoint } from './helpers/socket';
 import {
   isOwner, isSubscriber, isVIP,
 } from './helpers/user';
+import * as changelog from './helpers/user/changelog.js';
 import { isBot, isBotSubscriber } from './helpers/user/isBot';
 import { isBroadcaster } from './helpers/user/isBroadcaster';
 import { isModerator } from './helpers/user/isModerator';
@@ -236,16 +237,15 @@ class Events extends Core {
       if (attributes.username !== null && typeof attributes.username !== 'undefined' && (attributes.userId || !attributes.userId && !excludedUsers.has(attributes.username))) {
         excludedUsers.delete(attributes.username); // remove from excluded users if passed first if
 
+        await changelog.flush();
         const user = attributes.userId
           ? await getRepository(User).findOne({ userId: attributes.userId })
           : await getRepository(User).findOne({ username: attributes.username });
 
         if (!user) {
           try {
-            await getRepository(User).save({
-              userId:   attributes.userId ? attributes.userId : await getIdFromTwitch(attributes.username),
-              username: attributes.username,
-            });
+            const userId = attributes.userId ? attributes.userId : await getIdFromTwitch(attributes.username);
+            changelog.update(userId, { username: attributes.username });
             return this.fire(eventId, attributes);
           } catch (e: any) {
             excludedUsers.add(attributes.username);
@@ -268,12 +268,11 @@ class Events extends Core {
       }
     }
     if (!isNil(get(attributes, 'recipient', null))) {
+      await changelog.flush();
       const user = await getRepository(User).findOne({ username: attributes.recipient });
       if (!user) {
-        await getRepository(User).save({
-          userId:   await getIdFromTwitch(attributes.recipient),
-          username: attributes.recipient,
-        });
+        const userId = await getIdFromTwitch(attributes.recipient);
+        changelog.update(userId, { username: attributes.recipient });
         this.fire(eventId, attributes);
         return;
       }
@@ -356,6 +355,7 @@ class Events extends Core {
   public async fireBotWillLeaveChannel() {
     tmi.part('bot');
     // force all users offline
+    await changelog.flush();
     await getRepository(User).update({}, { isOnline: false });
   }
 
@@ -464,12 +464,18 @@ class Events extends Core {
   public async fireSendChatMessageOrWhisper(operation: EventsEntity.OperationDefinitions, attributes: EventsEntity.Attributes, whisper: boolean): Promise<void> {
     const username = isNil(attributes.username) ? getOwner() : attributes.username;
     let userId = attributes.userId;
-    const userObj = await getRepository(User).findOne({ username });
+
+    let userObj;
+    if (userId) {
+      userObj = await changelog.get(userId);
+    } else {
+      await changelog.flush();
+      userObj = await getRepository(User).findOne({ username });
+    }
+    await changelog.flush();
     if (!userObj && !attributes.test) {
-      await getRepository(User).save({
-        userId: await getIdFromTwitch(username),
-        username,
-      });
+      userId = await getIdFromTwitch(username);
+      changelog.update(userId, { username });
       return this.fireSendChatMessageOrWhisper(operation, {
         ...attributes, userId, username,
       }, whisper);

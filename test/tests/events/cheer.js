@@ -1,16 +1,16 @@
-/* global describe it before */
-
-require('../../general.js');
+/* global  */
 
 const assert = require('assert');
 
-const _ = require('lodash');
+require('../../general.js');
+
 const { getRepository } = require('typeorm');
 const { v4: uuidv4 } = require('uuid');
 
 const { Event } = require('../../../dest/database/entity/event');
 const { User } = require('../../../dest/database/entity/user');
 const log = require('../../../dest/helpers/log');
+const changelog = (require('../../../dest/helpers/user/changelog'));
 const tmi = (require('../../../dest/tmi')).default;
 const time = require('../../general.js').time;
 const db = require('../../general.js').db;
@@ -65,6 +65,7 @@ describe('Events - cheer event', () => {
         });
 
         it('user should have 10 points', async () => {
+          await changelog.flush();
           const user = await getRepository(User).findOne({ userId });
           assert.strict.equal(user.points, 10);
         });

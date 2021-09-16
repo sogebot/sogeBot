@@ -5,13 +5,13 @@ import { getRepository, In } from 'typeorm';
 import { v4 } from 'uuid';
 
 import { EventList } from './database/entity/eventList';
-import { User } from './database/entity/user';
 import { timer } from './decorators.js';
 import {
   command, count, custom, evaluate, ifp, info, list, math, online, param, price, qs, random, ResponseFilter, stream, youtube,
 } from './filters';
 import { isStreamOnline, stats } from './helpers/api';
 import { getBotSender } from './helpers/commons/getBotSender';
+import * as changelog from './helpers/user/changelog.js';
 import { isBotSubscriber } from './helpers/user/isBot';
 import lastfm from './integrations/lastfm';
 import spotify from './integrations/spotify';
@@ -71,7 +71,7 @@ class Message {
       });
 
       if (latestSubscriber && (this.message.includes('$latestSubscriberMonths') || this.message.includes('$latestSubscriberStreak'))) {
-        const latestSubscriberUser = await getRepository(User).findOne({ userId: latestSubscriber.userId });
+        const latestSubscriberUser = await changelog.get(latestSubscriber.userId);
         this.message = this.message.replace(/\$latestSubscriberMonths/g, latestSubscriberUser ? String(latestSubscriberUser.subscribeCumulativeMonths) : 'n/a');
         this.message = this.message.replace(/\$latestSubscriberStreak/g, latestSubscriberUser ? String(latestSubscriberUser.subscribeStreak) : 'n/a');
       }

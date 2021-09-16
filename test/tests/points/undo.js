@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
-/* global describe it before */
+/* global */
 
 require('../../general.js');
 
@@ -10,6 +10,7 @@ const { getRepository } = require('typeorm');
 
 const { PointsChangelog } = require('../../../dest/database/entity/points');
 const { User } = require('../../../dest/database/entity/user');
+const userChangelog = (require('../../../dest/helpers/user/changelog'));
 const points = (require('../../../dest/systems/points')).default;
 const db = require('../../general.js').db;
 const message = require('../../general.js').message;
@@ -25,7 +26,7 @@ describe('Points - undo()', () => {
   describe('!point add command should be undoable', () => {
     it('create user', async () => {
       await getRepository(User).save({
-        username: user.username, userId: user.userId, points: 150, 
+        username: user.username, userId: user.userId, points: 150,
       });
     });
 
@@ -35,6 +36,7 @@ describe('Points - undo()', () => {
     });
 
     it('User should have correctly added 100 points', async () => {
+      await userChangelog.flush();
       const updatedUser = await getRepository(User).findOne({ username: user.username });
       assert.strictEqual(updatedUser.points, 250);
     });
@@ -52,6 +54,7 @@ describe('Points - undo()', () => {
     });
 
     it('User should have correctly set 150 points', async () => {
+      await userChangelog.flush();
       const updatedUser = await getRepository(User).findOne({ username: user.username });
       assert.strictEqual(updatedUser.points, 150);
     });
@@ -70,7 +73,7 @@ describe('Points - undo()', () => {
   describe('!point set command should be undoable', () => {
     it('create user', async () => {
       await getRepository(User).save({
-        username: user.username, userId: user.userId, points: 0, 
+        username: user.username, userId: user.userId, points: 0,
       });
     });
 
@@ -80,6 +83,7 @@ describe('Points - undo()', () => {
     });
 
     it('User should have correctly set 100 points', async () => {
+      await userChangelog.flush();
       const updatedUser = await getRepository(User).findOne({ username: user.username });
       assert.strictEqual(updatedUser.points, 100);
     });
@@ -97,6 +101,7 @@ describe('Points - undo()', () => {
     });
 
     it('User should have correctly set 0 points', async () => {
+      await userChangelog.flush();
       const updatedUser = await getRepository(User).findOne({ username: user.username });
       assert.strictEqual(updatedUser.points, 0);
     });
@@ -115,7 +120,7 @@ describe('Points - undo()', () => {
   describe('!point remove command should be undoable', () => {
     it('create user', async () => {
       await getRepository(User).save({
-        username: user.username, userId: user.userId, points: 100, 
+        username: user.username, userId: user.userId, points: 100,
       });
     });
 
@@ -125,6 +130,7 @@ describe('Points - undo()', () => {
     });
 
     it('User should have 75 points', async () => {
+      await userChangelog.flush();
       const updatedUser = await getRepository(User).findOne({ username: user.username });
       assert.strictEqual(updatedUser.points, 75);
     });
@@ -142,6 +148,7 @@ describe('Points - undo()', () => {
     });
 
     it('User should have 0 points', async () => {
+      await userChangelog.flush();
       const updatedUser = await getRepository(User).findOne({ username: user.username });
       assert.strictEqual(updatedUser.points, 0);
     });
@@ -159,6 +166,7 @@ describe('Points - undo()', () => {
     });
 
     it('User should have correctly set 75 points', async () => {
+      await userChangelog.flush();
       const updatedUser = await getRepository(User).findOne({ username: user.username });
       assert.strictEqual(updatedUser.points, 75);
     });
@@ -174,6 +182,7 @@ describe('Points - undo()', () => {
     });
 
     it('User should have correctly set 100 points', async () => {
+      await userChangelog.flush();
       const updatedUser = await getRepository(User).findOne({ username: user.username });
       assert.strictEqual(updatedUser.points, 100);
     });

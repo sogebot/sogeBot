@@ -1,10 +1,9 @@
 import axios from 'axios';
-import { getRepository } from 'typeorm';
 
-import { User } from '../database/entity/user';
 import { getToken } from '../helpers/api';
 import { error } from '../helpers/log';
 import { ioServer } from '../helpers/panel';
+import * as changelog from '../helpers/user/changelog.js';
 
 async function fetchAccountAge (id?: string | null) {
   if (id === '0' || id === null || typeof id === 'undefined') {
@@ -52,7 +51,7 @@ async function fetchAccountAge (id?: string | null) {
     }
     return;
   }
-  await getRepository(User).update({ userId: id }, { createdAt: new Date(request.data.created_at).getTime() });
+  changelog.update(id, { createdAt: new Date(request.data.created_at).getTime() });
 }
 
 export { fetchAccountAge };

@@ -1,9 +1,7 @@
 import {
   get, isNil, random, set,
 } from 'lodash';
-import { getRepository } from 'typeorm';
 
-import { User } from '../database/entity/user';
 import {
   command, permission_settings, persistent, settings,
 } from '../decorators';
@@ -11,6 +9,7 @@ import { prepare } from '../helpers/commons';
 import { error } from '../helpers/log';
 import { getUserHighestPermission } from '../helpers/permissions/';
 import { getPointsName } from '../helpers/points';
+import * as changelog from '../helpers/user/changelog.js';
 import pointsSystem from '../systems/points';
 import { translate } from '../translate';
 import users from '../users';
@@ -84,11 +83,11 @@ class Gamble extends Game {
       const chanceToTriggerJackpot = await this.getPermissionBasedSettingsValue('chanceToTriggerJackpot');
       if (this.enableJackpot && random(0, 100, false) <= chanceToTriggerJackpot[permId]) {
         const incrementPointsWithJackpot = (points * 2) + this.jackpotValue;
-        await getRepository(User).increment({ userId: opts.sender.userId }, 'points', incrementPointsWithJackpot);
+        changelog.increment(opts.sender.userId, { points: incrementPointsWithJackpot });
 
         const user = await users.getUserByUsername(opts.sender.username);
         set(user, 'extra.jackpotWins', get(user, 'extra.jackpotWins', 0) + 1);
-        await getRepository(User).save(user);
+        changelog.update(user.userId, user);
 
         const currentPointsOfUser = await pointsSystem.getPointsOf(opts.sender.userId);
         message = prepare('gambling.gamble.winJackpot', {
@@ -99,7 +98,7 @@ class Gamble extends Game {
         });
         this.jackpotValue = 0;
       } else if (random(0, 100, false) <= chanceToWin[permId]) {
-        await getRepository(User).increment({ userId: opts.sender.userId }, 'points', points * 2);
+        changelog.increment(opts.sender.userId, { points: points * 2 });
         const updatedPoints = await pointsSystem.getPointsOf(opts.sender.userId);
         message = prepare('gambling.gamble.win', {
           pointsName: getPointsName(updatedPoints),

@@ -11,6 +11,7 @@ import { error } from './helpers/log';
 import { cleanViewersCache, get } from './helpers/permissions';
 import { check, defaultPermissions } from './helpers/permissions/';
 import { adminEndpoint } from './helpers/socket';
+import * as changelog from './helpers/user/changelog.js';
 import users from './users';
 
 class Permissions extends Core {
@@ -51,6 +52,7 @@ class Permissions extends Core {
         return;
       }
       if (typeof opts.value === 'string') {
+        await changelog.flush();
         const userByName = await getRepository(User).findOne({ username: opts.value });
         if (userByName) {
           const status = await check(userByName.userId, opts.pid);
@@ -63,7 +65,7 @@ class Permissions extends Core {
           return;
         }
       } else if(isFinite(opts.value)) {
-        const userById = await getRepository(User).findOne({ userId: String(opts.value) });
+        const userById = await changelog.get(String(opts.value));
         if (userById) {
           const status = await check(userById.userId, opts.pid);
           const partial = await check(userById.userId, opts.pid, true);

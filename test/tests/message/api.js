@@ -1,10 +1,12 @@
-/* global describe it beforeEach */
+/* global */
 require('../../general.js');
+require('../../mocks.js');
 
+const assert = require('assert');
+
+const Message = require('../../../dest/message').default;
 const db = require('../../general.js').db;
 const msg = require('../../general.js').message;
-const Message = require('../../../dest/message').default;
-const assert = require('assert');
 
 describe('Message - api filter', () => {
   beforeEach(async () => {
