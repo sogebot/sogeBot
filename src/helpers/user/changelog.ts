@@ -90,7 +90,13 @@ export async function get(userId: string): Promise<Readonly<Required<UserInterfa
         if (path === 'userId') {
           continue;
         }
-        set(data, path, _get(data, path, 0) + _get(change, path, 0));
+
+        const value = _get(data, path, 0) + _get(change, path, 0);
+        if (path === 'points' && value < 0) {
+          set(data, path, 0);
+        } else {
+          set(data, path, value);
+        }
       }
     }
   }
@@ -168,7 +174,13 @@ export async function flush() {
         if (path === 'userId') {
           continue;
         }
-        set(data, path, _get(data, path, 0) + _get(change, path, 0));
+
+        const value = _get(data, path, 0) + _get(change, path, 0);
+        if (path === 'points' && value < 0) {
+          set(data, path, 0);
+        } else {
+          set(data, path, value);
+        }
       }
       users.set(change.userId, data);
     }
