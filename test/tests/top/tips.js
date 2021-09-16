@@ -1,4 +1,4 @@
-/* global describe it before */
+/* global */
 const assert = require('assert');
 
 require('../../general.js');
