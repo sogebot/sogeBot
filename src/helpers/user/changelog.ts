@@ -119,6 +119,14 @@ export async function flush() {
     // set lock for this userId
     lock.set(change.userId, true);
 
+    if (!users.has(change.userId)) {
+      // initial values
+      const user = await getRepository(User).findOne({ userId: change.userId });
+      const data = cloneDeep(defaultData);
+      merge(data, { userId: change.userId }, user);
+      users.set(change.userId, data);
+    }
+
     if (changelogType === 'set') {
       users.set(change.userId, {
         ...users.get(change.userId) ?? {},
@@ -126,7 +134,7 @@ export async function flush() {
         userId: change.userId,
       });
     } else if (changelogType === 'increment') {
-      const data = users.get(change.userId) ?? {};
+      const data = users.get(change.userId) ?? { userId: change.userId };
       for (const path of Object.keys(flatten(change))) {
         if (path === 'userId') {
           continue;

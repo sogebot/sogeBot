@@ -338,7 +338,7 @@ class Bets extends System {
       for (const user of currentBet.participations) {
         if (user.optionIdx === index) {
           total += user.points + Math.round((user.points * percentGain));
-          changelog.increment(opts.sender.userId, { points: user.points + Math.round((user.points * percentGain)) });
+          changelog.increment(user.userId, { points: user.points + Math.round((user.points * percentGain)) });
         }
       }
 
