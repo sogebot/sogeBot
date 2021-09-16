@@ -204,7 +204,7 @@ class Users extends Core {
     if (!user) {
       const username = await api.getUsernameFromTwitch(userId);
       if (username) {
-        await changelog.update(userId, { username });
+        changelog.update(userId, { username });
         return username;
       } else {
         throw new Error('Cannot get username for userId ' + userId);
@@ -316,7 +316,7 @@ class Users extends Core {
           update.pointsByMessageGivenAt = update.messages;
         }
 
-        await changelog.update(userId, update);
+        changelog.update(userId, update);
         // as cascade remove set ID as null, we need to get rid of tips/bits
         await getRepository(UserTip).delete({ userId: IsNull() });
         await getRepository(UserBit).delete({ userId: IsNull() });

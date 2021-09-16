@@ -98,7 +98,7 @@ class Duel extends Game {
 
       // give user his points
       await changelog.flush();
-      await changelog.increment(winnerUser.id, { points: total });
+      changelog.increment(winnerUser.id, { points: total });
 
       // reset duel
       await getRepository(DuelEntity).clear();
