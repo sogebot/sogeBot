@@ -133,7 +133,7 @@ export async function flush() {
     return;
   }
 
-  debug('flush', 'progress');
+  debug('flush', `progress - changes: ${changelog.length}`);
 
   // prepare changes
   const length = changelog.length;
