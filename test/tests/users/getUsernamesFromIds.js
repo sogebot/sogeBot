@@ -11,10 +11,12 @@ const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 
 // users
-const testuser = { username: 'testuser', userId: 1 };
-const testuser2 = { username: 'testuser2', userId: 2 };
-const testuser3 = { username: 'testuser3', userId: 3 };
-const nightbot = { username: 'nightbot', userId: 4 };
+const testuser = { username: 'testuser', userId: '1' };
+const testuser2 = { username: 'testuser2', userId: '2' };
+const testuser3 = { username: 'testuser3', userId: '3' };
+const nightbot = { username: 'nightbot', userId: '4' };
+
+let translatedIds;
 
 describe('User - getUsernamesFromIds', () => {
   before(async () => {
@@ -28,18 +30,17 @@ describe('User - getUsernamesFromIds', () => {
   });
 
   describe('getUsernamesFromIds should get correct usernames', () => {
-    let translatedIds = [];
     it('ask for 4 ids + 1 duplication', async () => {
-      translatedIds = await users.getUsernamesFromIds([1,2,3,4,1]);
+      translatedIds = await users.getUsernamesFromIds(['1','2','3','4','1']);
     });
 
     it('expecting 4 values', async () => {
-      assert.strictEqual(translatedIds.length, 4);
+      assert.strictEqual(translatedIds.size, 4);
     });
 
     for (const user of [testuser, testuser2, testuser3, nightbot]) {
       it(`Expecting id ${user.userId} have correct username ${user.username}`, () => {
-        assert.strictEqual(translatedIds.find(o => o.id === user.userId).username, user.username);
+        assert.strictEqual(translatedIds.get(user.userId), user.username);
       });
     }
   });
