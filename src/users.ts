@@ -359,9 +359,7 @@ class Users extends Core {
             .offset(opts.page * opts.perPage)
             .limit(opts.perPage)
             .leftJoin('(select "userId", sum("amount") as "sumBits" from "user_bit" group by "userId")', 'user_bit', '"user_bit"."userId" = "user"."userId"')
-            .leftJoin('(select "userId", sum("sortAmount") as "sumTips" from "user_tip" group by "userId")', 'user_tip', '"user_tip"."userId" = "user"."userId"')
-            .leftJoinAndSelect('user.tips', 'tips')
-            .leftJoinAndSelect('user.bits', 'bits');
+            .leftJoin('(select "userId", sum("sortAmount") as "sumTips" from "user_tip" group by "userId")', 'user_tip', '"user_tip"."userId" = "user"."userId"');
         } else {
           query = getRepository(User).createQueryBuilder('user')
             .orderBy(opts.order?.orderBy ?? 'user.username' , opts.order?.sortOrder ?? 'ASC')
