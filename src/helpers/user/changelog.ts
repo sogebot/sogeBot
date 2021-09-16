@@ -105,7 +105,7 @@ const flushQueue: string[] = [];
 export async function flush() {
   if (changelog.length === 0) {
     // don't event start
-    debug('flush', 'changelog empty in init');
+    debug('flush', 'empty');
     return;
   }
   const id = v4();
