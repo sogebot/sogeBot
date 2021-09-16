@@ -4,6 +4,7 @@ import type { PermissionCommandsInterface } from '../database/entity/permissions
 import { PermissionCommands } from '../database/entity/permissions';
 import { isDbConnected } from './database';
 import { debug } from './log';
+import { cleanViewersCache } from './permissions';
 
 const cachedCommandsPermissions: PermissionCommandsInterface[] = [];
 const refreshCachedCommandPermissions = () => {
@@ -33,11 +34,12 @@ const invalidateParserCache = () => {
   while(parserFindCache.length) {
     parserFindCache.shift();
   }
+  cleanViewersCache();
 };
 const addToParserFindCache = (hash: string, command: { this: any; fnc: (opts: CommandOptions) => CommandResponse[]; command: string; id: string; permission: string | null; _fncName: string } | null) => {
   parserFindCache.push({ hash, command });
 };
 
 export {
-  addToParserFindCache, parserFindCache, invalidateParserCache, cachedCommandsPermissions, refreshCachedCommandPermissions, 
+  addToParserFindCache, parserFindCache, invalidateParserCache, cachedCommandsPermissions, refreshCachedCommandPermissions,
 };

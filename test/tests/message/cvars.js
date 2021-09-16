@@ -139,7 +139,7 @@ describe('Message - cvars filter', async () => {
     },
   ];
 
-  for (const p of Object.keys(defaultPermissions)) {
+  for (const p of ['CASTERS'] /*Object.keys(defaultPermissions)*/) {
     describe('Custom variable with ' + p + ' permission', async () => {
       for (const user of users) {
         describe('Custom variable with ' + p + ' permission => Testing with ' + user.username, async () => {
