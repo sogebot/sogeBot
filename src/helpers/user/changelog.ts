@@ -3,15 +3,14 @@ import {
   get as _get, cloneDeep, merge, set,
 } from 'lodash';
 import { getRepository } from 'typeorm';
+import { v4 } from 'uuid';
 
 import { User, UserInterface } from '../../database/entity/user';
 import { flatten } from '../flatten.js';
 import { debug } from '../log';
-import { setImmediateAwait } from '../setImmediateAwait';
 
 const changelog: (Partial<UserInterface> & { userId: string, changelogType: 'set' | 'increment' })[] = [];
 const lock = new Map<string, boolean>();
-let flushing = false;
 
 const defaultData: Readonly<Required<UserInterface>> = {
   userId:                    '',
@@ -69,12 +68,15 @@ export async function getOrFail(userId: string): Promise<Readonly<Required<UserI
 }
 
 export async function get(userId: string): Promise<Readonly<Required<UserInterface>> | null> {
-  await (async function isLocked(): Promise<void> {
-    if (lock.get(userId)) {
-      await setImmediateAwait();
-      return isLocked();
-    }
-  })();
+  await new Promise((resolve) => {
+    (function check() {
+      if (!lock.get(userId)) {
+        resolve(true);
+      } else {
+        setTimeout(() => check(), 10);
+      }
+    })();
+  });
 
   const user = await getRepository(User).findOne({ userId });
   const data = cloneDeep(defaultData);
@@ -99,22 +101,30 @@ export async function get(userId: string): Promise<Readonly<Required<UserInterfa
   return data;
 }
 
+const flushQueue: string[] = [];
 export async function flush() {
-  debug('flush', 'start');
-  await (async function isFlushing(): Promise<void> {
-    if (flushing) {
-      await setImmediateAwait();
-      return isFlushing();
-    }
-  })();
+  const id = v4();
+  flushQueue.push(id);
 
-  flushing = true;
+  debug('flush', 'start');
+  await new Promise((resolve) => {
+    (function check() {
+      // this flush should start
+      if (flushQueue[0] === id) {
+        resolve(true);
+      } else {
+        setTimeout(() => check(), 10);
+      }
+    })();
+  });
+
   // prepare changes
   const length = changelog.length;
 
   const users = new Map<string, Partial<UserInterface>>();
   for (let i = 0; i < length; i++) {
-    const { changelogType, ...change } = changelog.shift() as typeof changelog[number];
+    const shift = changelog.shift() as typeof changelog[number];
+    const { changelogType, ...change } = shift;
 
     // set lock for this userId
     lock.set(change.userId, true);
@@ -149,7 +159,8 @@ export async function flush() {
     await getRepository(User).save(user);
   }
   lock.clear();
-  flushing = false;
+
+  flushQueue.splice(flushQueue.indexOf(id) ,1);
   debug('flush', 'done');
 }
 

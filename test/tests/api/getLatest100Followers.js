@@ -1,19 +1,18 @@
-/* global describe it before, after */
-
+/* global */
 
 require('../../general.js');
-
-const db = require('../../general.js').db;
-const message = require('../../general.js').message;
-const time = require('../../general.js').time;
+require('../../mocks.js');
 
 const assert = require('assert');
 
-const oauth = (require('../../../dest/oauth')).default;
 const api = (require('../../../dest/api')).default;
-const {eventEmitter} = (require('../../../dest/helpers/events/emitter'));
-const {channelId} = (require('../../../dest/helpers/oauth/channelId'));
-const {botUsername} = (require('../../../dest/helpers/oauth/botUsername'));
+const { eventEmitter } = (require('../../../dest/helpers/events/emitter'));
+const { botUsername } = (require('../../../dest/helpers/oauth/botUsername'));
+const { channelId } = (require('../../../dest/helpers/oauth/channelId'));
+const oauth = (require('../../../dest/oauth')).default;
+const db = require('../../general.js').db;
+const time = require('../../general.js').time;
+const message = require('../../general.js').message;
 
 describe('API - getLatest100Followers()', () => {
   before(async () => {
