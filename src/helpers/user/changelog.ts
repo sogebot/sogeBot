@@ -7,7 +7,7 @@ import { v4 } from 'uuid';
 
 import { User, UserInterface } from '../../database/entity/user';
 import { flatten } from '../flatten.js';
-import { debug } from '../log';
+import { debug, error } from '../log';
 
 const changelog: (Partial<UserInterface> & { userId: string, changelogType: 'set' | 'increment' })[] = [];
 const lock = new Map<string, boolean>();
@@ -191,7 +191,13 @@ export async function flush() {
   }
 
   for (const user of users.values()) {
-    await getRepository(User).save(user);
+    try {
+      await getRepository(User).save(user);
+    } catch (e) {
+      if (e instanceof Error) {
+        error(e.stack);
+      }
+    }
   }
   lock.clear();
 
