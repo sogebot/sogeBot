@@ -25,7 +25,7 @@ describe('Raffles - raffle with 1 point cannot over point #3546', () => {
 
   it('create ticket raffle', async () => {
     raffles.open({ sender: user.owner, parameters: '!winme -min 0 -max 500' });
-    await message.isSentRaw('Raffle is running (0 entries). To enter type "!winme <1-500>". Raffle is opened for everyone.', { username: 'bot' });
+    await message.isSentRaw('Raffle is running (0 entries). To enter type "!winme <1-500>". Raffle is opened for everyone.', { username: '__bot_username__' });
   });
 
   it('Update viewer to have 1 point', async () => {

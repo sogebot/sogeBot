@@ -25,7 +25,7 @@ describe('Raffles - several raffle joins shouldnt go over max', () => {
 
   it('create ticket raffle', async () => {
     raffles.open({ sender: user.owner, parameters: '!winme -min 0 -max 100' });
-    await message.isSentRaw('Raffle is running (0 entries). To enter type "!winme <1-100>". Raffle is opened for everyone.', { username: 'bot' });
+    await message.isSentRaw('Raffle is running (0 entries). To enter type "!winme <1-100>". Raffle is opened for everyone.', { username: '__bot_username__' });
   });
 
   it('Update viewer and viewer2 to have 200 points', async () => {

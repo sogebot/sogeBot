@@ -31,7 +31,7 @@ describe('Raffles - announce should contain total entries #4175', () => {
 
   it('create ticket raffle', async () => {
     raffles.open({ sender: user.owner, parameters: '!winme -min 0 -max 100' });
-    await message.isSentRaw('Raffle is running (0 entries). To enter type "!winme <1-100>". Raffle is opened for everyone.', { username: 'bot' })
+    await message.isSentRaw('Raffle is running (0 entries). To enter type "!winme <1-100>". Raffle is opened for everyone.', { username: '__bot_username__' })
   });
 
   it('Update viewer and viewer2 to have 200 points', async () => {
@@ -70,6 +70,6 @@ describe('Raffles - announce should contain total entries #4175', () => {
     raffles.lastAnnounce = 0;
     raffles.raffleAnnounceMessageInterval = 0;
     await raffles.announce();
-    await message.isSentRaw('Raffle is running (150 entries). To enter type "!winme <1-100>". Raffle is opened for everyone.', { username: 'bot' })
+    await message.isSentRaw('Raffle is running (150 entries). To enter type "!winme <1-100>". Raffle is opened for everyone.', { username: '__bot_username__' })
   });
 });
