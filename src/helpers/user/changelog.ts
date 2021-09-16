@@ -131,11 +131,11 @@ export async function flush() {
       })();
     });
   } catch (e) {
-    debug('flush', 'changelog empty after loop check');
+    debug('flush', `skip - ${id}`);
     return;
   }
 
-  debug('flush', `progress - changes: ${changelog.length}`);
+  debug('flush', `progress - ${id} - changes: ${changelog.length}`);
 
   // prepare changes
   const length = changelog.length;
@@ -180,7 +180,7 @@ export async function flush() {
   lock.clear();
 
   flushQueue.splice(flushQueue.indexOf(id) ,1);
-  debug('flush', 'done');
+  debug('flush', `done - ${id}`);
 }
 
 (async function flushInterval() {
