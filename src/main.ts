@@ -71,13 +71,14 @@ async function main () {
   try {
     const version = _.get(process, 'env.npm_package_version', 'x.y.z');
     if (!existsSync('./restart.pid')) {
-      process.stdout.write(figlet.textSync('sogeBot ' + version.replace('SNAPSHOT', gitCommitInfo().shortHash || 'SNAPSHOT'), {
+      const versionString = version.replace('SNAPSHOT', gitCommitInfo().shortHash || 'SNAPSHOT');
+      process.stdout.write(figlet.textSync('sogeBot ' + versionString, {
         font:             'ANSI Shadow',
         horizontalLayout: 'default',
         verticalLayout:   'default',
       }));
       process.stdout.write('\n\n\n');
-      info(`Bot is starting up (NodeJS: ${process.versions.node})`);
+      info(`Bot is starting up (Bot version: ${versionString}, NodeJS: ${process.versions.node})`);
       if (process.env.DEBUG) {
         setDEBUG(process.env.DEBUG);
       }
