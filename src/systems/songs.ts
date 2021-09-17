@@ -3,7 +3,7 @@ import { setInterval } from 'timers';
 import * as _ from 'lodash';
 import io from 'socket.io';
 import {
-  Brackets, getConnection, getRepository, In,
+  Brackets, getConnection, getRepository, In, Like,
 } from 'typeorm';
 import ytdl from 'ytdl-core';
 import ytpl from 'ytpl';
@@ -60,6 +60,8 @@ class Songs extends System {
   shuffle = true;
   @settings()
   songrequest = true;
+  @settings()
+  allowRequestsOnlyFromPlaylist = false;
   @settings()
   playlist = true;
   @settings()
@@ -566,6 +568,19 @@ class Songs extends System {
     const ban = await getRepository(SongBan).findOne({ videoId: videoID });
     if (ban) {
       return [{ response: translate('songs.song-is-banned'), ...opts }];
+    }
+
+    // check if song is in playlist
+    if (this.allowRequestsOnlyFromPlaylist) {
+      const inPlaylist = await getRepository(SongPlaylist).count({
+        where: {
+          videoId: videoID,
+          tags:    Like(`%${this.currentTag}%`),
+        },
+      }) > 0;
+      if (!inPlaylist) {
+        return [{ response: translate('songs.this-song-is-not-in-playlist'), ...opts }];
+      }
     }
 
     try {
