@@ -11,6 +11,8 @@ import { debug, error } from '../log';
 
 const changelog: (Partial<UserInterface> & { userId: string, changelogType: 'set' | 'increment' })[] = [];
 const lock = new Map<string, boolean>();
+const userCache = new Map<string, Readonly<Required<UserInterface>>>();
+const userCacheLastAccess = new Map<string, number>();
 
 const defaultData: Readonly<Required<UserInterface>> = {
   userId:                    '',
@@ -67,6 +69,10 @@ export async function getOrFail(userId: string): Promise<Readonly<Required<UserI
   return data;
 }
 
+function getCachedUser(userId: string) {
+  userCacheLastAccess.set(userId, Date.now());
+  return userCache.get(userId);
+}
 function checkLock(userId: string, resolve: (value: unknown) => void) {
   if (!lock.get(userId)) {
     resolve(true);
@@ -79,9 +85,13 @@ export async function get(userId: string): Promise<Readonly<Required<UserInterfa
     checkLock(userId, resolve);
   });
 
-  const user = await getRepository(User).findOne({ userId });
+  const user = userCache.has(userId) ? getCachedUser(userId) : await getRepository(User).findOne({ userId });
+  if (user && !userCache.has(userId)) {
+    userCacheLastAccess.set(userId, Date.now());
+    userCache.set(user.userId, user);
+  }
   const data = cloneDeep(defaultData);
-  merge(data, { userId }, user);
+  merge(data, { userId }, user ?? {});
 
   for (const { changelogType, ...change } of changelog.filter(o => o.userId === userId)) {
     if (changelogType === 'set') {
@@ -150,7 +160,7 @@ export async function flush() {
   // prepare changes
   const length = changelog.length;
 
-  const users = new Map<string, Partial<UserInterface>>();
+  const users = new Map<string, Partial<UserInterface> & {userId: string}>();
   for (let i = 0; i < length; i++) {
     const shift = changelog.shift() as typeof changelog[number];
     const { changelogType, ...change } = shift;
@@ -193,6 +203,8 @@ export async function flush() {
   for (const user of users.values()) {
     try {
       await getRepository(User).save(user);
+      userCache.delete(user.userId);
+      userCacheLastAccess.delete(user.userId);
     } catch (e) {
       if (e instanceof Error) {
         error(e.stack);
@@ -207,5 +219,11 @@ export async function flush() {
 
 (async function flushInterval() {
   await flush();
+
+  for (const userId of userCache.keys()) {
+    if (Date.now() - (userCacheLastAccess.get(userId) ?? 0) > 10 * MINUTE) {
+      userCacheLastAccess.delete(userId);
+    }
+  }
   setTimeout(() => flushInterval(), MINUTE);
 })();
