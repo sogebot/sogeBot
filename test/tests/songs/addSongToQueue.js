@@ -274,7 +274,7 @@ describe('Songs - addSongToQueue()', () => {
     });
   });
 
-  describe.only('Add music song by url - allowRequestsOnlyFromPlaylist', () => {
+  describe('Add music song by url - allowRequestsOnlyFromPlaylist', () => {
     before(async () => {
       await db.cleanup();
       await message.prepare();
