@@ -11,6 +11,7 @@
     "songrequest": "Play from song request",
     "playlist": "Play from playlist",
     "onlyMusicCategory": "Allow only category music",
+    "allowRequestsOnlyFromPlaylist": "Allow song requests only from current playlist",
     "notify": "Send message on song change"
   },
   "error": {
