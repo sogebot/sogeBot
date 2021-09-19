@@ -28,7 +28,11 @@ setInterval(async () => {
   }
 
   while(ticks.length > 0) {
-    const id = ticks.shift() as string;
+    let id = ticks.shift() as string;
+    let time: number | string = 1000;
+    if (id.includes('|')) {
+      [id, time] = id.split('|');
+    }
     // check if it is without group
     const item = await getRepository(OverlayMapper).findOne({ id });
     if (item) {
@@ -36,14 +40,14 @@ setInterval(async () => {
         await getRepository(OverlayMapper).update(id, {
           opts: {
             ...item.opts,
-            currentTime: item.opts.currentTime - 1000,
+            currentTime: Number(time) > 0 ? Number(time) : item.opts.currentTime - Number(time),
           },
         });
       }else if (item.value === 'stopwatch' && item.opts) {
         await getRepository(OverlayMapper).update(id, {
           opts: {
             ...item.opts,
-            currentTime: item.opts.currentTime + 1000,
+            currentTime: Number(time) > 0 ? Number(time) : item.opts.currentTime - Number(time),
           },
         });
       }
@@ -97,6 +101,13 @@ export class RegistryOverlayController extends Controller {
   @Get('/{id}/tick')
   public async triggerTick(@Path() id: string): Promise<void> {
     ticks.push(id);
+    this.setStatus(200);
+    return;
+  }
+
+  @Get('/{id}/tick/{millis}')
+  public async triggerPartialTick(@Path() id: string, @Path() millis: string): Promise<void> {
+    ticks.push(`${id}|${millis}`);
     this.setStatus(200);
     return;
   }
