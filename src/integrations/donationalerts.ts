@@ -131,14 +131,16 @@ class Donationalerts extends Integration {
       }).then((response) => {
         this.refresh_token = response.data.refresh_token;
         this.access_token = response.data.access_token;
-      }).catch(() => {
+      }).catch((e) => {
         error(chalk.yellow('DONATIONALERTS:') + ' Bot was unable to refresh access token. Please recreate your tokens.');
+        error(e.stack);
         this.channel = '';
         this.access_token = '';
         this.refresh_token = '';
       });
     } else {
       error(chalk.yellow('DONATIONALERTS:') + ' Bot was unable to refresh access token. Please recreate your tokens.');
+      error(chalk.yellow('DONATIONALERTS:') + ' No refresh token');
       this.channel = '';
       this.access_token = '';
       this.refresh_token = '';
