@@ -11,6 +11,7 @@
     "songrequest": "Von Song-Request wiedergeben",
     "playlist": "Von Wiedergabeliste wiedergeben",
     "onlyMusicCategory": "Nur Musik aus Kategorien zulassen",
+    "allowRequestsOnlyFromPlaylist": "Allow song requests only from current playlist",
     "notify": "Nachricht bei Songwechsel senden"
   },
   "error": {
