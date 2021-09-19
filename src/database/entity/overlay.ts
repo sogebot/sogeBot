@@ -13,6 +13,7 @@ export interface OverlayMapperStopwatch {
     currentTime: number;
     isPersistent: boolean;
     isStartedOnSourceLoad: boolean;
+    showMilliseconds: boolean;
     stopwatchFont: {
       family: string;
       size: number;
@@ -41,6 +42,7 @@ export interface OverlayMapperCountdown {
     isStartedOnSourceLoad: boolean;
     messageWhenReachedZero: string;
     showMessageWhenReachedZero: boolean;
+    showMilliseconds: boolean;
     countdownFont: {
       family: string;
       size: number;

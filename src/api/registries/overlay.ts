@@ -98,16 +98,9 @@ export class RegistryOverlayController extends Controller {
     return;
   }
 
-  @Get('/{id}/tick')
-  public async triggerTick(@Path() id: string): Promise<void> {
-    ticks.push(id);
-    this.setStatus(200);
-    return;
-  }
-
-  @Get('/{id}/tick/{millis}')
-  public async triggerPartialTick(@Path() id: string, @Path() millis: string): Promise<void> {
-    ticks.push(`${id}|${millis}`);
+  @Post('/{id}/tick')
+  public async triggerTick(@Path() id: string, @Body() millis: { time: number }): Promise<void> {
+    ticks.push(`${id}|${millis.time}`);
     this.setStatus(200);
     return;
   }
