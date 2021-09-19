@@ -975,6 +975,7 @@
     "youtube-is-not-responding-correctly": "Spiacenti, $sender, ma YouTube sta inviando risposte impreviste, riprova più tardi.",
     "song-was-not-found": "Siamo spiacenti, $sender, ma questo brano non è stato trovato",
     "song-is-too-long": "Spiacenti, $sender, ma questo brano è troppo lungo",
+    "this-song-is-not-in-playlist": "Sorry, $sender, but this song is not in current playlist",
     "incorrect-category": "Siamo spiacenti, $sender, ma questo brano deve essere una categoria musicale",
     "song-was-added-to-queue": "$sender, il brano $name è stato aggiunto alla coda",
     "song-was-added-to-playlist": "$sender, il brano $name è stato aggiunto alla playlist",

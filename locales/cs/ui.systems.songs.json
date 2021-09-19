@@ -11,6 +11,7 @@
     "songrequest": "Přehrávání ze song requestu",
     "playlist": "Přehrávání z playlistu",
     "onlyMusicCategory": "Přehrávání pouze z kategorie Hudba",
+    "allowRequestsOnlyFromPlaylist": "Allow song requests only from current playlist",
     "notify": "Odeslat zprávu při změně skladby"
   },
   "error": {

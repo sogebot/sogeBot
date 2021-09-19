@@ -975,6 +975,7 @@
     "youtube-is-not-responding-correctly": "Omlouváme se, $sender, ale YouTube odesílá neočekávané odpovědi, zkuste to prosím později.",
     "song-was-not-found": "Omlouváme se, $sender, ale tato skladba nebyla nalezena",
     "song-is-too-long": "Omlouváme se, $sender, ale tato skladba je příliš dlouhá",
+    "this-song-is-not-in-playlist": "Sorry, $sender, but this song is not in current playlist",
     "incorrect-category": "Omlouváme se, $sender, ale tato skladba musí být kategorie hudby",
     "song-was-added-to-queue": "$sender, skladba $name byla přidána do fronty",
     "song-was-added-to-playlist": "$sender, skladba $name byla přidána do seznamu skladeb",
