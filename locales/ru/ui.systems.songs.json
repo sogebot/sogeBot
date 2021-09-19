@@ -11,6 +11,7 @@
     "songrequest": "Воспроизвести из запросов песен",
     "playlist": "Воспроизвести из плейлиста",
     "onlyMusicCategory": "Разрешить только категории музыки",
+    "allowRequestsOnlyFromPlaylist": "Allow song requests only from current playlist",
     "notify": "Отправить сообщение при смене песни"
   },
   "error": {
