@@ -975,6 +975,7 @@
     "youtube-is-not-responding-correctly": "Sorry, $sender, but YouTube is sending unexpected responses, please try again later.",
     "song-was-not-found": "Извините, $sender, но эта песня не найдена",
     "song-is-too-long": "Извините, $sender, но эта песня слишком длинная",
+    "this-song-is-not-in-playlist": "Sorry, $sender, but this song is not in current playlist",
     "incorrect-category": "Извините, $sender, но эта песня должна быть в категории музыка",
     "song-was-added-to-queue": "$sender, песня $name была добавлена в очередь",
     "song-was-added-to-playlist": "$sender, песня $name добавлена в плейлист",
