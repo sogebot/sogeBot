@@ -76,6 +76,7 @@ class Donationalerts extends Integration {
   afterDate = 0;
 
   channel = '';
+  isRefreshing = false;
 
   @settings()
   access_token = '';
@@ -116,7 +117,11 @@ class Donationalerts extends Integration {
   }
 
   refresh() {
+    if (this.isRefreshing) {
+      return;
+    }
     if (this.refresh_token.length > 0) {
+      this.isRefreshing = true;
       // get new refresh and access token
       axios.request<{
         'token_type': 'Bearer',
@@ -138,6 +143,8 @@ class Donationalerts extends Integration {
         this.channel = '';
         this.access_token = '';
         this.refresh_token = '';
+      }).finally(() => {
+        this.isRefreshing = false;
       });
     } else {
       error(chalk.yellow('DONATIONALERTS:') + ' Bot was unable to refresh access token. Please recreate your tokens.');
