@@ -131,6 +131,7 @@ class Donationalerts extends Integration {
       }).then((response) => {
         this.refresh_token = response.data.refresh_token;
         this.access_token = response.data.access_token;
+        info(chalk.yellow('DONATIONALERTS:') + ' Access token refreshed.');
       }).catch((e) => {
         error(chalk.yellow('DONATIONALERTS:') + ' Bot was unable to refresh access token. Please recreate your tokens.');
         error(e.stack);
