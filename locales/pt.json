@@ -975,6 +975,7 @@
     "youtube-is-not-responding-correctly": "Sorry, $sender, but YouTube is sending unexpected responses, please try again later.",
     "song-was-not-found": "Sorry, $sender, but this song was not found",
     "song-is-too-long": "Sorry, $sender, but this song is too long",
+    "this-song-is-not-in-playlist": "Sorry, $sender, but this song is not in current playlist",
     "incorrect-category": "Sorry, $sender, but this song must be music category",
     "song-was-added-to-queue": "$sender, song $name was added to queue",
     "song-was-added-to-playlist": "$sender, song $name was added to playlist",
