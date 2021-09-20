@@ -6,6 +6,63 @@ export interface OverlayMapperInterface {
   opts: null
 }
 
+export interface OverlayMapperMarathon {
+  id: string;
+  value: 'marathon';
+  opts: null | {
+    disableWhenReachedZero: boolean;
+    showProgressGraph: boolean;
+    endTime: number;
+    maxEndTime: number | null;
+    showMilliseconds: boolean;
+    values: {
+      sub: {
+        tier1: number;
+        tier2: number;
+        tier3: number;
+      },
+      resub: {
+        tier1: number;
+        tier2: number;
+        tier3: number;
+      },
+      bits: {
+        /*
+         * true:  value:bits is set to 10 and we got 15 -> 1.5x value will get added
+         * false: value:bits is set to 10 and we got 15 -> 1.0x value will get added
+         */
+        addFraction: boolean;
+        bits: number;
+        time: number;
+      },
+      tips: {
+        /*
+         * true:  value:tip is set to 10 and we got 15 -> 1.5x value will get added
+         * false: value:tip is set to 10 and we got 15 -> 1.0x value will get added
+         */
+        addFraction: boolean;
+        tips: number;
+        time: number;
+      },
+    }
+    marathonFont: {
+      family: string;
+      size: number;
+      borderPx: number;
+      borderColor: string;
+      weight: number;
+      color: string;
+      shadow: {
+        shiftRight: number;
+        shiftDown: number;
+        blur: number;
+        opacity: number;
+        color: string;
+      }[];
+    }
+  },
+}
+
 export interface OverlayMapperStopwatch {
   id: string;
   value: 'stopwatch';
@@ -262,7 +319,7 @@ export interface OverlayMapperGroup {
   }
 }
 
-export type OverlayMappers = OverlayMapperStopwatch | OverlayMapperCountdown | OverlayMapperGroup | OverlayMapperEventlist | OverlayMapperEmotesCombo | OverlayMapperCredits | OverlayMapperClips | OverlayMapperAlerts | OverlayMapperEmotes | OverlayMapperEmotesExplode | OverlayMapperEmotesFireworks | OverlayMapperPolls | OverlayMapperTTS | OverlayMapperInterface | OverlayMapperOBSWebsocket | OverlayMapperClipsCarousel | OverlayMapperHypeTrain;
+export type OverlayMappers = OverlayMapperMarathon | OverlayMapperStopwatch | OverlayMapperCountdown | OverlayMapperGroup | OverlayMapperEventlist | OverlayMapperEmotesCombo | OverlayMapperCredits | OverlayMapperClips | OverlayMapperAlerts | OverlayMapperEmotes | OverlayMapperEmotesExplode | OverlayMapperEmotesFireworks | OverlayMapperPolls | OverlayMapperTTS | OverlayMapperInterface | OverlayMapperOBSWebsocket | OverlayMapperClipsCarousel | OverlayMapperHypeTrain;
 
 export const OverlayMapper = new EntitySchema<Readonly<Required<OverlayMappers>>>({
   name:    'overlay_mapper',

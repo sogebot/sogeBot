@@ -16,7 +16,7 @@ import {
 import { getRepository } from 'typeorm';
 
 import {
-  OverlayMapper, OverlayMapperAlerts, OverlayMapperClips, OverlayMapperClipsCarousel, OverlayMapperCountdown, OverlayMapperCredits, OverlayMapperEmotes, OverlayMapperEmotesCombo, OverlayMapperEmotesExplode, OverlayMapperEmotesFireworks, OverlayMapperEventlist, OverlayMapperGroup, OverlayMapperHypeTrain, OverlayMapperInterface, OverlayMapperOBSWebsocket, OverlayMapperPolls, OverlayMappers, OverlayMapperStopwatch, OverlayMapperTTS,
+  OverlayMapper, OverlayMapperAlerts, OverlayMapperClips, OverlayMapperClipsCarousel, OverlayMapperCountdown, OverlayMapperCredits, OverlayMapperEmotes, OverlayMapperEmotesCombo, OverlayMapperEmotesExplode, OverlayMapperEmotesFireworks, OverlayMapperEventlist, OverlayMapperGroup, OverlayMapperHypeTrain, OverlayMapperInterface, OverlayMapperMarathon, OverlayMapperOBSWebsocket, OverlayMapperPolls, OverlayMappers, OverlayMapperStopwatch, OverlayMapperTTS,
 } from '../../database/entity/overlay';
 import { isBotStarted } from '../../helpers/database.js';
 
@@ -128,6 +128,7 @@ export class RegistryOverlayController extends Controller {
     @Path() id: string,
       @Body() data:
       Partial<OverlayMapperGroup>
+      | Partial<OverlayMapperMarathon>
       | Partial<OverlayMapperStopwatch>
       | Partial<OverlayMapperCountdown>
       | Partial<OverlayMapperHypeTrain>
@@ -145,7 +146,13 @@ export class RegistryOverlayController extends Controller {
       | Partial<OverlayMapperOBSWebsocket>
       | Partial<OverlayMapperTTS>): Promise<void> {
     try {
-      await getRepository(OverlayMapper).update({ id }, data);
+      if (data.value === 'marathon') {
+        // remove endTime from PATCH, we must not change that value with this patch
+        delete (data as any).opts.endTime;
+        await getRepository(OverlayMapper).update({ id }, data);
+      } else {
+        await getRepository(OverlayMapper).update({ id }, data);
+      }
       this.setStatus(200);
     } catch (e: any) {
       this.setStatus(400);
