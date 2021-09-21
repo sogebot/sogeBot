@@ -2,6 +2,7 @@ require('dotenv').config();
 
 const fs = require('fs');
 
+const _ = require('lodash');
 const { createConnection, getConnectionOptions, getManager } = require('typeorm');
 const argv = require('yargs') // eslint-disable-line
   .usage('node tools/backup.js')
@@ -95,7 +96,9 @@ async function main() {
         await connection.getRepository(entity.tableName).query(`DELETE FROM "${relation}" WHERE 1=1`);
       }
     }
-    await connection.getRepository(entity.tableName).save(backupData);
+    for (const ch of _.chunk(backupData, 100)) {
+      await connection.getRepository(entity.tableName).save(ch);
+    }
   }
 }
 main();
