@@ -16,11 +16,16 @@ import {
 import { getRepository } from 'typeorm';
 
 import {
-  OverlayMapper, OverlayMapperAlerts, OverlayMapperClips, OverlayMapperClipsCarousel, OverlayMapperCountdown, OverlayMapperCredits, OverlayMapperEmotes, OverlayMapperEmotesCombo, OverlayMapperEmotesExplode, OverlayMapperEmotesFireworks, OverlayMapperEventlist, OverlayMapperGroup, OverlayMapperHypeTrain, OverlayMapperInterface, OverlayMapperOBSWebsocket, OverlayMapperPolls, OverlayMappers, OverlayMapperStopwatch, OverlayMapperTTS,
+  OverlayMapper, OverlayMapperAlerts, OverlayMapperClips, OverlayMapperClipsCarousel, OverlayMapperCountdown, OverlayMapperCredits, OverlayMapperEmotes, OverlayMapperEmotesCombo, OverlayMapperEmotesExplode, OverlayMapperEmotesFireworks, OverlayMapperEventlist, OverlayMapperGroup, OverlayMapperHypeTrain, OverlayMapperInterface, OverlayMapperMarathon, OverlayMapperOBSWebsocket, OverlayMapperPolls, OverlayMappers, OverlayMapperStopwatch, OverlayMapperTTS,
 } from '../../database/entity/overlay';
 import { isBotStarted } from '../../helpers/database.js';
+import { cachedOverlays } from '../../overlays/marathon.js';
 
 const ticks: string[] = [];
+
+const isGroupOverlay = (o: any): o is OverlayMapperGroup => {
+  return o.value === 'group';
+};
 
 setInterval(async () => {
   if (!isBotStarted) {
@@ -128,6 +133,7 @@ export class RegistryOverlayController extends Controller {
     @Path() id: string,
       @Body() data:
       Partial<OverlayMapperGroup>
+      | Partial<OverlayMapperMarathon>
       | Partial<OverlayMapperStopwatch>
       | Partial<OverlayMapperCountdown>
       | Partial<OverlayMapperHypeTrain>
@@ -145,7 +151,59 @@ export class RegistryOverlayController extends Controller {
       | Partial<OverlayMapperOBSWebsocket>
       | Partial<OverlayMapperTTS>): Promise<void> {
     try {
-      await getRepository(OverlayMapper).update({ id }, data);
+      if (data.value === 'marathon') {
+        // remove endTime from PATCH, we must not change that value with this patch
+        const marathon = require('../../overlays/marathon.js').default;
+        await marathon.updateCache();
+
+        // get key
+        const key = Array.from(cachedOverlays.keys()).find(o => o.includes(id));
+        if (!key) {
+          throw new Error();
+        }
+        const item = cachedOverlays.get(key);
+        if (item) {
+          delete (data as any).opts.endTime;
+          cachedOverlays.set(key, {
+            ...item,
+            opts: {
+              ...item.opts,
+              ...data.opts,
+            },
+          });
+          marathon.flushCache();
+        }
+      } else {
+        if (isGroupOverlay(data) && data.opts) {
+          const marathon = require('../../overlays/marathon.js').default;
+          await marathon.flushCache();
+
+          // get original values
+          const orig = await getRepository(OverlayMapper).findOne(id);
+
+          if (orig && isGroupOverlay(orig)) {
+            for (const item of data.opts.items.filter(o => o.type === 'marathon')) {
+              // update back original values of endTime
+              const found = orig.opts.items.find(o => o.id === item.id);
+              if (found) {
+                item.opts.endTime = found.opts.endTime;
+              }
+            }
+            for (const item of data.opts.items.filter(o => o.type === 'stopwatch' || o.type === 'countdown')) {
+              // update back original values of currentTime
+              const found = orig.opts.items.find(o => o.id === item.id);
+              if (found) {
+                item.opts.currentTime = found.opts.currentTime;
+              }
+            }
+          }
+        }
+
+        // normal update
+        await getRepository(OverlayMapper).update({ id }, data);
+        cachedOverlays.clear();
+      }
+
       this.setStatus(200);
     } catch (e: any) {
       this.setStatus(400);
