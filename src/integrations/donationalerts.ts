@@ -102,7 +102,6 @@ class Donationalerts extends Integration {
             tips = [...tips, ...data[1]];
           }
         }
-
         for (const item of tips) {
           this.parse(item);
         }
@@ -207,61 +206,81 @@ class Donationalerts extends Integration {
     }
 
     const timestamp = Date.now();
+    const isAnonymous = data.username === '';
 
-    eventlist.add({
-      event:    'tip',
+    if (!isAnonymous) {
+      const user = await users.getUserByUsername(data.username);
+      tip(`${data.username.toLowerCase()}${user.userId ? '#' + user.userId : ''}, amount: ${Number(data.amount).toFixed(2)}${data.currency}, message: ${data.message}`);
+
+      eventlist.add({
+        event:    'tip',
+        amount:   data.amount,
+        currency: data.currency,
+        userId:   String(await users.getIdByName(data.username.toLowerCase()) ?? '0'),
+        message:  data.message,
+        timestamp,
+      });
+
+      eventEmitter.emit('tip', {
+        isAnonymous:         false,
+        username:            data.username.toLowerCase(),
+        amount:              data.amount.toFixed(2),
+        currency:            data.currency,
+        amountInBotCurrency: Number(currency.exchange(Number(data.amount), data.currency, mainCurrency.value)).toFixed(2),
+        currencyInBot:       mainCurrency.value,
+        message:             data.message,
+      });
+
+      alerts.trigger({
+        event:      'tips',
+        name:       data.username.toLowerCase(),
+        amount:     Number(data.amount.toFixed(2)),
+        tier:       null,
+        currency:   data.currency,
+        monthsName: '',
+        message:    data.message,
+      });
+
+      const newTip: UserTipInterface = {
+        amount:        Number(data.amount),
+        currency:      data.currency,
+        sortAmount:    currency.exchange(Number(data.amount), data.currency, mainCurrency.value),
+        message:       data.message,
+        tippedAt:      timestamp,
+        exchangeRates: currency.rates,
+        userId:        user.userId,
+      };
+      getRepository(UserTip).save(newTip);
+    } else {
+      tip(`anonymous#__anonymous__, amount: ${Number(data.amount).toFixed(2)}${data.currency}, message: ${data.message}`);
+      alerts.trigger({
+        event:      'tips',
+        name:       'anonymous',
+        amount:     Number(data.amount.toFixed(2)),
+        tier:       null,
+        currency:   data.currency,
+        monthsName: '',
+        message:    data.message,
+      });
+      eventlist.add({
+        event:    'tip',
+        amount:   data.amount,
+        currency: data.currency,
+        userId:   `anonymous#__anonymous__`,
+        message:  data.message,
+        timestamp,
+      });
+    }
+    triggerInterfaceOnTip({
+      username: isAnonymous ? 'anonymous' : data.username.toLowerCase(),
       amount:   data.amount,
-      currency: data.currency,
-      userId:   String(await users.getIdByName(data.username.toLowerCase()) ?? '0'),
       message:  data.message,
+      currency: data.currency,
       timestamp,
     });
-
-    eventEmitter.emit('tip', {
-      isAnonymous:         false,
-      username:            data.username.toLowerCase(),
-      amount:              data.amount.toFixed(2),
-      currency:            data.currency,
-      amountInBotCurrency: Number(currency.exchange(Number(data.amount), data.currency, mainCurrency.value)).toFixed(2),
-      currencyInBot:       mainCurrency.value,
-      message:             data.message,
-    });
-
-    alerts.trigger({
-      event:      'tips',
-      name:       data.username.toLowerCase(),
-      amount:     Number(data.amount.toFixed(2)),
-      tier:       null,
-      currency:   data.currency,
-      monthsName: '',
-      message:    data.message,
-    });
-
-    const user = await users.getUserByUsername(data.username);
-    const newTip: UserTipInterface = {
-      amount:        Number(data.amount),
-      currency:      data.currency,
-      sortAmount:    currency.exchange(Number(data.amount), data.currency, mainCurrency.value),
-      message:       data.message,
-      tippedAt:      timestamp,
-      exchangeRates: currency.rates,
-      userId:        user.userId,
-    };
-    getRepository(UserTip).save(newTip);
-
-    tip(`${data.username.toLowerCase()}${user.userId ? '#' + user.userId : ''}, amount: ${Number(data.amount).toFixed(2)}${data.currency}, message: ${data.message}`);
-
     if (isStreamOnline.value) {
       stats.value.currentTips = stats.value.currentTips + Number(currency.exchange(data.amount, data.currency, mainCurrency.value));
     }
-
-    triggerInterfaceOnTip({
-      username: data.username.toLowerCase(),
-      amount:   data.amount,
-      message:  data.message,
-      currency: data.currency,
-      timestamp,
-    });
   }
 }
 
