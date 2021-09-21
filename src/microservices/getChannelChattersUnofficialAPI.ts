@@ -19,9 +19,10 @@ import { Settings } from '../database/entity/settings';
 import { ThreadEvent } from '../database/entity/threadEvent';
 import { User } from '../database/entity/user';
 import { getAllOnlineUsernames } from '../helpers/getAllOnlineUsernames';
-import { getMigrationType } from '../helpers/getMigrationType';
-import { debug, warning } from '../helpers/log';
-import { TypeORMLogger } from '../helpers/logTypeorm';
+import {
+  debug, error, setDEBUG, warning,
+} from '../helpers/log';
+import { TypeORMLogger } from '../helpers/logTypeorm.js';
 import { SQLVariableLimit } from '../helpers/sql';
 import { isIgnored } from '../helpers/user/isIgnored';
 import { fetchAccountAge } from './fetchAccountAge';
@@ -31,53 +32,72 @@ const isThreadingEnabled = process.env.THREAD !== '0';
 
 export const getChannelChattersUnofficialAPI = async (): Promise<{ partedUsers: string[]; joinedUsers: string[] }> => {
   debug('microservice', 'getChannelChattersUnofficialAPI::isThreadingEnabled ' + isThreadingEnabled);
+  debug('microservice', 'getChannelChattersUnofficialAPI::isMainThread ' + isMainThread);
   debug('microservice', 'getChannelChattersUnofficialAPI::start');
-  if (!isMainThread && isThreadingEnabled) {
+
+  if (isMainThread) {
+    debug('microservice', 'getChannelChattersUnofficialAPI::getConnection');
+    const connection = await getConnection();
+    // spin up worker
+    if (connection.options.type !== 'better-sqlite3' && isThreadingEnabled) {
+      debug('microservice', 'getChannelChattersUnofficialAPI::worker');
+      const value = await new Promise((resolve, reject) => {
+        const worker = new Worker(__filename);
+        worker.on('message', resolve);
+        worker.on('error', reject);
+        worker.on('exit', (code) => {
+          debug('microservice', 'exit::getChannelChattersUnofficialAPI with code ' + code);
+          if (code !== 0) {
+            reject(new Error(`Worker stopped with exit code ${code}`));
+          }
+        });
+      });
+      return value as unknown as { partedUsers: string[]; joinedUsers: string[] };
+    }
+  } else {
+    if (process.env.DEBUG) {
+      setDEBUG(process.env.DEBUG);
+    }
     debug('microservice', 'getChannelChattersUnofficialAPI::createConnection');
     const connectionOptions = await getConnectionOptions();
     if (['mysql', 'mariadb'].includes(connectionOptions.type)) {
-      await createConnection({
-        ...connectionOptions,
-        logging:       ['error'],
-        logger:        new TypeORMLogger(),
-        synchronize:   false,
-        migrationsRun: true,
-        charset:       'UTF8MB4_GENERAL_CI',
-        entities:      [ 'dest/database/entity/*.js' ],
-        migrations:    [ `dest/database/migration/${getMigrationType(connectionOptions.type)}/**/*.js` ],
-      } as MysqlConnectionOptions);
-    } else {
-      await createConnection({
-        ...connectionOptions,
-        logging:       ['error'],
-        logger:        new TypeORMLogger(),
-        synchronize:   false,
-        migrationsRun: true,
-        entities:      [ 'dest/database/entity/*.js' ],
-        migrations:    [ `dest/database/migration/${getMigrationType(connectionOptions.type)}/**/*.js` ],
-      });
-    }
-    await new Promise( resolve => setTimeout(resolve, 3000, null) );
-  }
-  debug('microservice', 'getChannelChattersUnofficialAPI::getConnection');
-  const connection = await getConnection();
-
-  // spin up worker
-  if (isMainThread && connection.options.type !== 'better-sqlite3' && isThreadingEnabled) {
-    debug('microservice', 'getChannelChattersUnofficialAPI::worker');
-    const value = await new Promise((resolve, reject) => {
-      const worker = new Worker(__filename);
-      worker.on('message', resolve);
-      worker.on('error', reject);
-      worker.on('exit', (code) => {
-        debug('microservice', 'exit::getChannelChattersUnofficialAPI with code ' + code);
-        if (code !== 0) {
-          reject(new Error(`Worker stopped with exit code ${code}`));
+      try {
+        await createConnection({
+          ...connectionOptions,
+          logging:       ['error'],
+          logger:        new TypeORMLogger(),
+          synchronize:   false,
+          migrationsRun: false,
+          charset:       'UTF8MB4_GENERAL_CI',
+          entities:      [ 'dest/database/entity/*.js' ],
+        } as MysqlConnectionOptions);
+      } catch (e) {
+        if (e instanceof Error) {
+          if (!e.message.includes('it now has an active connection session')) {
+            error(`getChannelChattersUnofficialAPI: ${e.stack}`);
+          }
         }
-      });
-    });
-    return value as unknown as { partedUsers: string[]; joinedUsers: string[] };
+      }
+    } else {
+      try {
+        await createConnection({
+          ...connectionOptions,
+          logging:       ['error'],
+          logger:        new TypeORMLogger(),
+          synchronize:   false,
+          migrationsRun: false,
+          entities:      [ 'dest/database/entity/*.js' ],
+        });
+      } catch (e) {
+        if (e instanceof Error) {
+          if (!e.message.includes('it now has an active connection session')) {
+            error(`getChannelChattersUnofficialAPI: ${e.stack}`);
+          }
+        }
+      }
+    }
   }
+
   try {
     // lock thread
     await getManager()
@@ -186,13 +206,6 @@ export const getChannelChattersUnofficialAPI = async (): Promise<{ partedUsers: 
     debug('microservice', { partedUsers: [], joinedUsers: [] });
     return { partedUsers: [], joinedUsers: [] };
   } finally {
-    // free event
-    await getManager()
-      .createQueryBuilder()
-      .delete()
-      .from(ThreadEvent)
-      .where('event = :event', { event: 'getChannelChattersUnofficialAPI' })
-      .execute();
     setTimeout(() => {
       if (!isMainThread) {
         debug('microservice', 'getChannelChattersUnofficialAPI::kill');

@@ -14,9 +14,10 @@ import { MysqlConnectionOptions } from 'typeorm/driver/mysql/MysqlConnectionOpti
 import { Settings } from '../database/entity/settings';
 import { getClientId, getToken } from '../helpers/api';
 import type { rateHeaders } from '../helpers/api/calls';
-import { getMigrationType } from '../helpers/getMigrationType';
-import { debug, warning } from '../helpers/log';
-import { TypeORMLogger } from '../helpers/logTypeorm';
+import {
+  debug, error, setDEBUG, warning,
+} from '../helpers/log';
+import { TypeORMLogger } from '../helpers/logTypeorm.js';
 
 type CustomRewardEndpoint = { data: { broadcaster_name: string; broadcaster_id: string; id: string; image: string | null; background_color: string; is_enabled: boolean; cost: number; title: string; prompt: string; is_user_input_required: false; max_per_stream_setting: { is_enabled: boolean; max_per_stream: number; }; max_per_user_per_stream_setting: { is_enabled: boolean; max_per_user_per_stream: number }; global_cooldown_setting: { is_enabled: boolean; global_cooldown_seconds: number }; is_paused: boolean; is_in_stock: boolean; default_image: { url_1x: string; url_2x: string; url_4x: string; }; should_redemptions_skip_request_queue: boolean; redemptions_redeemed_current_stream: null | number; cooldown_expires_at: null | string; }[] };
 type getCustomRewardReturn = { headers: rateHeaders; method: string; response: CustomRewardEndpoint | null; status: number | string; url: string; error?: Error };
@@ -25,52 +26,70 @@ const isThreadingEnabled = process.env.THREAD !== '0';
 
 export const getCustomRewards = async (): Promise<getCustomRewardReturn> => {
   debug('microservice', 'getCustomRewards::isThreadingEnabled ' + isThreadingEnabled);
+  debug('microservice', 'getCustomRewards::isMainThread ' + isMainThread);
   debug('microservice', 'getCustomRewards::start');
-  if (!isMainThread && isThreadingEnabled) {
+
+  if (isMainThread) {
+    debug('microservice', 'getCustomRewards::getConnection');
+    const connection = await getConnection();
+    // spin up worker
+    if (connection.options.type !== 'better-sqlite3' && isThreadingEnabled) {
+      debug('microservice', 'getCustomRewards::worker');
+      const value = await new Promise((resolve, reject) => {
+        const worker = new Worker(__filename);
+        worker.on('message', resolve);
+        worker.on('error', reject);
+        worker.on('exit', (code) => {
+          debug('microservice', 'getCustomRewards::exit with code ' + code);
+          if (code !== 0) {
+            reject(new Error(`Worker stopped with exit code ${code}`));
+          }
+        });
+      });
+      return value as unknown as getCustomRewardReturn;
+    }
+  } else {
+    if (process.env.DEBUG) {
+      setDEBUG(process.env.DEBUG);
+    }
     debug('microservice', 'getCustomRewards::createConnection');
     const connectionOptions = await getConnectionOptions();
     if (['mysql', 'mariadb'].includes(connectionOptions.type)) {
-      await createConnection({
-        ...connectionOptions,
-        logging:       ['error'],
-        logger:        new TypeORMLogger(),
-        synchronize:   false,
-        migrationsRun: true,
-        charset:       'UTF8MB4_GENERAL_CI',
-        entities:      [ 'dest/database/entity/*.js' ],
-        migrations:    [ `dest/database/migration/${getMigrationType(connectionOptions.type)}/**/*.js` ],
-      } as MysqlConnectionOptions);
-    } else {
-      await createConnection({
-        ...connectionOptions,
-        logging:       ['error'],
-        logger:        new TypeORMLogger(),
-        synchronize:   false,
-        migrationsRun: true,
-        entities:      [ 'dest/database/entity/*.js' ],
-        migrations:    [ `dest/database/migration/${getMigrationType(connectionOptions.type)}/**/*.js` ],
-      });
-    }
-    await new Promise( resolve => setTimeout(resolve, 3000, null) );
-  }
-  debug('microservice', 'getCustomRewards::getConnection');
-  const connection = await getConnection();
-
-  // spin up worker
-  if (isMainThread && connection.options.type !== 'better-sqlite3' && isThreadingEnabled) {
-    debug('microservice', 'getCustomRewards::worker');
-    const value = await new Promise((resolve, reject) => {
-      const worker = new Worker(__filename);
-      worker.on('message', resolve);
-      worker.on('error', reject);
-      worker.on('exit', (code) => {
-        debug('microservice', 'getCustomRewards::exit with code ' + code);
-        if (code !== 0) {
-          reject(new Error(`Worker stopped with exit code ${code}`));
+      try {
+        await createConnection({
+          ...connectionOptions,
+          logging:       ['error'],
+          logger:        new TypeORMLogger(),
+          synchronize:   false,
+          migrationsRun: false,
+          charset:       'UTF8MB4_GENERAL_CI',
+          entities:      [ 'dest/database/entity/*.js' ],
+        } as MysqlConnectionOptions);
+      } catch (e) {
+        if (e instanceof Error) {
+          if (!e.message.includes('it now has an active connection session')) {
+            error(`getCustomRewards: ${e.stack}`);
+          }
         }
-      });
-    });
-    return value as unknown as getCustomRewardReturn;
+      }
+    } else {
+      try {
+        await createConnection({
+          ...connectionOptions,
+          logging:       ['error'],
+          logger:        new TypeORMLogger(),
+          synchronize:   false,
+          migrationsRun: false,
+          entities:      [ 'dest/database/entity/*.js' ],
+        });
+      } catch (e) {
+        if (e instanceof Error) {
+          if (!e.message.includes('it now has an active connection session')) {
+            error(`getCustomRewards: ${e.stack}`);
+          }
+        }
+      }
+    }
   }
   try {
     const channelId = JSON.parse((await getRepository(Settings).findOneOrFail({ name: 'channelId' })).value);
@@ -110,7 +129,7 @@ export const getCustomRewards = async (): Promise<getCustomRewardReturn> => {
       404: 'Not Found: No Custom Rewards with the specified IDs were found',
     } as const;
 
-    if (Object.keys(errors).includes(String(e.response.status))) {
+    if (e.response && Object.keys(errors).includes(String(e.response.status))) {
       warning(errors[e.response.status as keyof typeof errors]);
       const toReturn = {
         headers:  e.response.headers,
