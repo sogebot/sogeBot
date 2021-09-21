@@ -161,7 +161,7 @@ export class RegistryOverlayController extends Controller {
         if (!key) {
           throw new Error();
         }
-        const item = cachedOverlays.get(key || '');
+        const item = cachedOverlays.get(key);
         if (item) {
           delete (data as any).opts.endTime;
           cachedOverlays.set(key, {
