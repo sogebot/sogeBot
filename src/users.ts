@@ -396,6 +396,8 @@ class Users extends Core {
             }
           } else if (connection.options.type === 'postgres') {
             opts.order.orderBy = opts.order.orderBy.split('.').map(o => `"${o}"`).join('.');
+            query.orderBy(opts.order.orderBy, opts.order.sortOrder);
+
           } else {
             query.orderBy({ [opts.order.orderBy]: opts.order.sortOrder });
           }
