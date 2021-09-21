@@ -1,4 +1,3 @@
-import { SECOND } from '@sogebot/ui-helpers/constants';
 import { getRepository } from 'typeorm';
 
 import {
@@ -6,7 +5,9 @@ import {
 } from '../database/entity/overlay.js';
 import { onStartup } from '../decorators/on.js';
 import { eventEmitter } from '../helpers/events/emitter.js';
-import { adminEndpoint } from '../helpers/socket';
+import { error } from '../helpers/log.js';
+import { addUIError } from '../helpers/panel/alerts.js';
+import { adminEndpoint, publicEndpoint } from '../helpers/socket';
 import Overlay from './_interface';
 
 const cachedOverlays = new Map<string, Required<OverlayMapperGroup['opts']['items'][number] | OverlayMapperMarathon>>();
@@ -14,13 +15,6 @@ const cachedOverlays = new Map<string, Required<OverlayMapperGroup['opts']['item
 class Marathon extends Overlay {
   @onStartup()
   events() {
-    setInterval(() => {
-      //console.log('trigger sub');
-      eventEmitter.emit('subscription', {
-        username: 'test', method: 'aaa', subCumulativeMonths: 0, tier: 'Prime',
-      });
-    }, 10 * SECOND);
-
     eventEmitter.on('subscription', async (data) => {
       await this.updateCache();
       for (const [id, value] of cachedOverlays.entries()) {
@@ -29,7 +23,6 @@ class Marathon extends Overlay {
           && Date.now() < value.opts.maxEndTime) {
           value.opts.endTime = Date.now(); // reset endTime
         } else if (value.opts.endTime < Date.now()) {
-          //console.log('disabled');
           return;
         }
 
@@ -37,7 +30,7 @@ class Marathon extends Overlay {
         if (isNaN(tier)) {
           tier = 1;
         }
-        const timeToAdd = value.opts.values.sub[`tier${tier}`];
+        const timeToAdd = value.opts.values.sub[`tier${tier}`] * 1000;
         value.opts.endTime = Math.min(value.opts.endTime + timeToAdd, value.opts.maxEndTime);
         cachedOverlays.set(id, value);
       }
@@ -58,7 +51,7 @@ class Marathon extends Overlay {
         if (isNaN(tier)) {
           tier = 1;
         }
-        const timeToAdd = value.opts.values.resub[`tier${tier}`];
+        const timeToAdd = value.opts.values.resub[`tier${tier}`] * 1000;
         value.opts.endTime = Math.min(value.opts.endTime + timeToAdd, value.opts.maxEndTime);
         cachedOverlays.set(id, value);
       }
@@ -80,7 +73,7 @@ class Marathon extends Overlay {
         if (!value.opts.values.bits.addFraction) {
           multiplier = Math.floor(multiplier);
         }
-        const timeToAdd = value.opts.values.bits.time * multiplier;
+        const timeToAdd = value.opts.values.bits.time * multiplier * 1000;
         value.opts.endTime = Math.min(value.opts.endTime + timeToAdd, value.opts.maxEndTime);
         cachedOverlays.set(id, value);
       }
@@ -102,7 +95,7 @@ class Marathon extends Overlay {
         if (!value.opts.values.tips.addFraction) {
           multiplier = Math.floor(multiplier);
         }
-        const timeToAdd = value.opts.values.tips.time * multiplier;
+        const timeToAdd = value.opts.values.tips.time * multiplier * 1000;
         value.opts.endTime = Math.min(value.opts.endTime + timeToAdd, value.opts.maxEndTime);
         cachedOverlays.set(id, value);
       }
@@ -121,7 +114,9 @@ class Marathon extends Overlay {
 
     for (const overlay of (await getRepository(OverlayMapper).find({ value: 'group' }) as OverlayMapperGroup[])) {
       for(const item of overlay.opts.items.filter(o => o.type === 'marathon')) {
-        cachedOverlays.set(`${overlay.id}|${item.id}`, item);
+        if (!cachedOverlays.has(`${overlay.id}|${item.id}`)) {
+          cachedOverlays.set(`${overlay.id}|${item.id}`, item);
+        }
         ids.push(`${overlay.id}|${item.id}`);
       }
     }
@@ -155,6 +150,11 @@ class Marathon extends Overlay {
   }
 
   sockets () {
+    publicEndpoint(this.nsp, 'marathon::public', async (marathonId: string, cb) => {
+      // no updateCache
+      const key = Array.from(cachedOverlays.keys()).find(id => id.includes(marathonId));
+      cb(null, cachedOverlays.get(key ?? ''));
+    });
     adminEndpoint(this.nsp, 'marathon::check', async (marathonId: string, cb) => {
       await this.updateCache();
       const key = Array.from(cachedOverlays.keys()).find(id => id.includes(marathonId));
@@ -165,11 +165,21 @@ class Marathon extends Overlay {
       const key = Array.from(cachedOverlays.keys()).find(id => id.includes(data.id));
       const item = cachedOverlays.get(key ?? '');
       if (item) {
-        item.opts.endTime = Math.min(item.opts.endTime + data.time, item.opts.maxEndTime);
+        if (isNaN(item.opts.endTime) || item.opts.endTime < Date.now()) {
+          item.opts.endTime = Date.now();
+        }
+        item.opts.endTime += data.time;
+        if (item.opts.endTime > item.opts.maxEndTime) {
+          error('MARATHON: cannot set end time bigger than maximum end time');
+          addUIError({ name: 'MARATHON', message: 'Cannot set end time bigger than maximum end time.' });
+          item.opts.endTime = item.opts.maxEndTime;
+        }
         cachedOverlays.set(key ?? '', item);
       }
     });
   }
 }
 
-export default new Marathon();
+const marathon = new Marathon();
+export { cachedOverlays, marathon };
+export default marathon;
