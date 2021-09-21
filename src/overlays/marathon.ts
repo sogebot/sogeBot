@@ -15,7 +15,7 @@ class Marathon extends Overlay {
   @onStartup()
   events() {
     setInterval(() => {
-      console.log('trigger sub');
+      //console.log('trigger sub');
       eventEmitter.emit('subscription', {
         username: 'test', method: 'aaa', subCumulativeMonths: 0, tier: 'Prime',
       });
@@ -29,7 +29,7 @@ class Marathon extends Overlay {
           && Date.now() < value.opts.maxEndTime) {
           value.opts.endTime = Date.now(); // reset endTime
         } else if (value.opts.endTime < Date.now()) {
-          console.log('disabled');
+          //console.log('disabled');
           return;
         }
 
