@@ -1,6 +1,7 @@
 {
   "settings": {
     "lang": "Bot language",
+    "numberFormat": "Format of numbers in chat",
     "gracefulExitEachXHours": {
       "title": "Graceful exit each X hours",
       "help": "0 - disabled"
