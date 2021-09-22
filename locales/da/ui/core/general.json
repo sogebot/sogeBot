@@ -1,6 +1,7 @@
 {
   "settings": {
     "lang": "Bot sprog",
+    "numberFormat": "Format of numbers in chat",
     "gracefulExitEachXHours": {
       "title": "Hensynsfuld nedlukning hver X time",
       "help": "0 - deaktiveret"
