@@ -34,7 +34,7 @@ const failedTests = [
 
 const successTests = [
   {
-    keyword: 'test', response: '(!me)', actualResponse: '@__broadcaster__ | Level 0 | 0.0h | 0 points | 0 messages | €0.00 | 0 bits | 0 months',
+    keyword: 'test', response: '(!me)', actualResponse: '@__broadcaster__ | Level 0 | 0 hours | 0 points | 0 messages | €0.00 | 0 bits | 0 months',
     tests: [
       { type: 'add' },
       { type: 'run', triggers: ['This line will be triggered test'], '-triggers': [] },

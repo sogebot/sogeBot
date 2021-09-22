@@ -18,11 +18,11 @@ describe('Parser - case sensitive commands', async () => {
   const tests = [
     {
       test: '!me',
-      expected: '@__broadcaster__ | 0.0h | 0 points | 0 messages | 0.00€ | 0 bits',
+      expected: '@__broadcaster__ | 0 hours | 0 points | 0 messages | 0.00€ | 0 bits',
     },
     {
       test: '!ME',
-      expected: '@__broadcaster__ | 0.0h | 0 points | 0 messages | 0.00€ | 0 bits',
+      expected: '@__broadcaster__ | 0 hours | 0 points | 0 messages | 0.00€ | 0 bits',
     },
   ];
 

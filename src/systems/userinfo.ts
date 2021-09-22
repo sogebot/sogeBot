@@ -255,7 +255,7 @@ class UserInfo extends System {
 
       if (message.includes('$watched')) {
         const idx = message.indexOf('$watched');
-        message[idx] = format(general.numberFormat, 1)(user.watchedTime / 1000 / 60 / 60) + 'h';
+        message[idx] = format(general.numberFormat, 1)(user.watchedTime / 1000 / 60 / 60) + ' ' + getLocalizedName(user.watchedTime, translate('core.hours'));
       }
 
       if (message.includes('$points')) {
