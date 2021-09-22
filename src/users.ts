@@ -48,10 +48,10 @@ class Users extends Core {
       await changelog.flush();
       if (connection.options.type === 'postgres') {
         query = getRepository(User).createQueryBuilder('user')
-          .select('COUNT(*)', 'count')
+          .select('COUNT(*)')
           .addSelect('"user"."username"')
           .groupBy('"user"."username"')
-          .having('"count" > 1');
+          .having('COUNT(*) > 1');
       } else {
         query = getRepository(User).createQueryBuilder('user')
           .select('COUNT(*)', 'count')
