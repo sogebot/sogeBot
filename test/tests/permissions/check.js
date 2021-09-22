@@ -502,7 +502,7 @@ describe('Permissions - check()', () => {
         });
         const r = await parse.process();
 
-        let hours = '0.0';
+        let hours = '0';
         let level = 'Level 0';
         let points = '0';
         let messages = '0';
