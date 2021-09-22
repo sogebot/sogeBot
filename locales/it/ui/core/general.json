@@ -1,6 +1,7 @@
 {
   "settings": {
     "lang": "Lingua del bot",
+    "numberFormat": "Format of numbers in chat",
     "gracefulExitEachXHours": {
       "title": "Uscita graziosa ogni X ore",
       "help": "0 - disattivato"

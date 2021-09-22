@@ -1,6 +1,7 @@
 {
   "settings": {
     "lang": "Мова боту",
+    "numberFormat": "Format of numbers in chat",
     "gracefulExitEachXHours": {
       "title": "Граціозний вихід кожні X годин",
       "help": "0 - вимкнуто"
