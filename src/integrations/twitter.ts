@@ -4,7 +4,10 @@
 
 import chalk from 'chalk';
 import _ from 'lodash';
-import Client from 'twitter';
+import {
+  ETwitterStreamEvent,
+  TwitterApi,
+} from 'twitter-api-v2';
 import { getRepository } from 'typeorm';
 
 import { Event, Events } from '../database/entity/event';
@@ -24,7 +27,7 @@ class Twitter extends Integration {
     hash: string;
     stream: any;
   }[] = [];
-  public client: Client | null = null;
+  public client: TwitterApi | null = null;
 
   @settings('token')
   consumerKey = '';
@@ -70,36 +73,31 @@ class Twitter extends Integration {
     if (this.client === null) {
       throw new Error('Twitter integration is not connected');
     }
-    this.client.post('statuses/update', { status: text }, (postError, tweet, response) => {
-      if (postError) {
-        error(postError);
-      }
-    });
+    this.client.v1.post('statuses/update.json', { status: text }, { forceBodyMode: 'url' })
+      .catch(postError => error(chalk.yellow('TWITTER: ') + postError.message));
   }
 
   public async enableStreamForHash(hash: string): Promise<void> {
     if (!this.watchedStreams.find((o) => o.hash === hash)) {
-      this.client?.stream('statuses/filter', { track: hash }, (stream) => {
-        info(chalk.yellow('TWITTER: ') + 'Stream for ' + hash + ' was started.');
-        this.watchedStreams.push({ hash, stream });
-        stream.on('data', (tweet) => {
-          const data = {
-            id:          tweet.id_str,
-            type:        'twitter',
-            timestamp:   Date.now(),
-            hashtag:     hash,
-            text:        tweet.text,
-            username:    tweet.user.screen_name,
-            displayname: tweet.user.name,
-            url:         `https://twitter.com/${tweet.user.screen_name}/status/${tweet.id_str}`,
-          };
-          getRepository(WidgetSocial).save(data);
-          eventEmitter.emit('tweet-post-with-hashtag', { tweet: data });
-        });
-
-        stream.on('error', (onError) => {
-          error(chalk.yellow('TWITTER: ') + onError);
-        });
+      const stream = await this.client?.v1.stream.getStream('statuses/filter.json', { track: hash });
+      info(chalk.yellow('TWITTER: ') + 'Stream for ' + hash + ' was started.');
+      this.watchedStreams.push({ hash, stream });
+      await stream?.on(ETwitterStreamEvent.Data, (tweet) => {
+        const data = {
+          id:          tweet.id_str,
+          type:        'twitter',
+          timestamp:   Date.now(),
+          hashtag:     hash,
+          text:        tweet.text,
+          username:    tweet.user.screen_name,
+          displayname: tweet.user.name,
+          url:         `https://twitter.com/${tweet.user.screen_name}/status/${tweet.id_str}`,
+        };
+        getRepository(WidgetSocial).save(data);
+        eventEmitter.emit('tweet-post-with-hashtag', { tweet: data });
+      });
+      await stream?.on(ETwitterStreamEvent.ConnectionError, onError => {
+        error(chalk.yellow('TWITTER: ') + onError);
       });
     }
   }
@@ -177,11 +175,11 @@ class Twitter extends Integration {
         throw new Error(errors.join(', ') + 'missing');
       }
 
-      this.client = new Client({
-        consumer_key:        this.consumerKey.trim(),
-        consumer_secret:     this.consumerSecret.trim(),
-        access_token_key:    this.accessToken.trim(),
-        access_token_secret: this.secretToken.trim(),
+      this.client = new TwitterApi({
+        appKey:       this.consumerKey.trim(),
+        appSecret:    this.consumerSecret.trim(),
+        accessToken:  this.accessToken.trim(),
+        accessSecret: this.secretToken.trim(),
       });
       info(chalk.yellow('TWITTER: ') + 'Client connected to service');
     } catch (e: any) {
