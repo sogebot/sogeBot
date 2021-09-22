@@ -2,6 +2,7 @@ import { setInterval } from 'timers';
 import util from 'util';
 
 import * as constants from '@sogebot/ui-helpers/constants';
+import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized';
 import { isNil } from 'lodash';
 import TwitchJs, {
   BaseMessage, HostTargetMessage, Message, PrivateMessages, UserNoticeMessages, UserStateTags,
@@ -28,7 +29,6 @@ import {
 import { sendMessage } from './helpers/commons/sendMessage';
 import { dayjs } from './helpers/dayjs';
 import { eventEmitter } from './helpers/events';
-import { getLocalizedName } from './helpers/getLocalized';
 import {
   triggerInterfaceOnBit, triggerInterfaceOnMessage, triggerInterfaceOnSub,
 } from './helpers/interface/triggers';

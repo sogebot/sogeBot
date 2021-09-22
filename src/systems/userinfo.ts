@@ -1,3 +1,5 @@
+import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized';
+import { format } from '@sogebot/ui-helpers/number';
 import { getRepository } from 'typeorm';
 
 import api from '../api';
@@ -14,7 +16,6 @@ import general from '../general';
 import { prepare } from '../helpers/commons/';
 import { mainCurrency } from '../helpers/currency';
 import { dayjs, timezone } from '../helpers/dayjs';
-import { getLocalizedName } from '../helpers/getLocalized';
 import { debug, error } from '../helpers/log';
 import { get, getUserHighestPermission } from '../helpers/permissions/';
 import { getPointsName } from '../helpers/points';
@@ -254,13 +255,13 @@ class UserInfo extends System {
 
       if (message.includes('$watched')) {
         const idx = message.indexOf('$watched');
-        message[idx] = (user.watchedTime / 1000 / 60 / 60).toFixed(1) + 'h';
+        message[idx] = format(general.numberFormat, 1)(user.watchedTime / 1000 / 60 / 60) + 'h';
       }
 
       if (message.includes('$points')) {
         const idx = message.indexOf('$points');
         if (points.enabled) {
-          message[idx] = user.points + ' ' + getPointsName(user.points);
+          message[idx] = format(general.numberFormat, 0)(user.points) + ' ' + getPointsName(user.points);
         } else {
           message.splice(idx, 1);
         }
@@ -268,7 +269,7 @@ class UserInfo extends System {
 
       if (message.includes('$messages')) {
         const idx = message.indexOf('$messages');
-        message[idx] = user.messages + ' ' + getLocalizedName(user.messages, translate('core.messages'));
+        message[idx] = format(general.numberFormat, 0)(user.messages) + ' ' + getLocalizedName(user.messages, translate('core.messages'));
       }
 
       if (message.includes('$tips')) {
@@ -282,13 +283,13 @@ class UserInfo extends System {
 
       if (message.includes('$subMonths')) {
         const idx = message.indexOf('$subMonths');
-        message[idx] = user.subscribeCumulativeMonths + ' ' + getLocalizedName(user.subscribeCumulativeMonths, translate('core.months'));
+        message[idx] = format(general.numberFormat, 0)(user.subscribeCumulativeMonths) + ' ' + getLocalizedName(user.subscribeCumulativeMonths, translate('core.months'));
       }
 
       if (message.includes('$bits')) {
         const idx = message.indexOf('$bits');
         const bitAmount = bits.map(o => Number(o.amount)).reduce((a, b) => a + b, 0);
-        message[idx] = `${bitAmount} ${getLocalizedName(bitAmount, translate('core.bits'))}`;
+        message[idx] = `${format(general.numberFormat, 0)(bitAmount)} ${getLocalizedName(bitAmount, translate('core.bits'))}`;
       }
 
       if (message.includes('$role')) {

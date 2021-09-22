@@ -1,3 +1,5 @@
+import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized';
+import { format } from '@sogebot/ui-helpers/number';
 import _ from 'lodash';
 import { getRepository } from 'typeorm';
 
@@ -6,9 +8,9 @@ import {
   command, persistent, settings,
 } from '../decorators';
 import { onStartup } from '../decorators/on';
+import general from '../general.js';
 import { announce, prepare } from '../helpers/commons';
 import { isDbConnected } from '../helpers/database';
-import { getLocalizedName } from '../helpers/getLocalized';
 import { error } from '../helpers/log';
 import { getPointsName } from '../helpers/points';
 import * as changelog from '../helpers/user/changelog.js';
@@ -88,10 +90,10 @@ class Duel extends Game {
 
       const m = prepare(users.length === 1 ? 'gambling.duel.noContestant' : 'gambling.duel.winner', {
         pointsName:  getPointsName(total),
-        points:      total,
+        points:      format(general.numberFormat, 0)(total),
         probability: _.round(probability, 2),
         ticketsName: getPointsName(winnerUser.tickets),
-        tickets:     winnerUser.tickets,
+        tickets:     format(general.numberFormat, 0)(winnerUser.tickets),
         winner:      winnerUser.username,
       });
       announce(m, 'duel');
@@ -116,7 +118,7 @@ class Duel extends Game {
     return [{
       response: prepare('gambling.duel.bank', {
         command:    this.getCommand('!duel'),
-        points:     bank,
+        points:     format(general.numberFormat, 0)(bank),
         pointsName: getPointsName(bank),
       }),
       ...opts,
@@ -197,7 +199,7 @@ class Duel extends Game {
       const tickets = (await getRepository(DuelEntity).findOne({ id: opts.sender.userId }))?.tickets ?? 0;
       const response = prepare(isNewDuelist ? 'gambling.duel.joined' : 'gambling.duel.added', {
         pointsName: getPointsName(tickets),
-        points:     tickets,
+        points:     format(general.numberFormat, 0)(tickets),
       });
       responses.push({ response, ...opts });
     } catch (e: any) {
@@ -211,8 +213,8 @@ class Duel extends Game {
         case ERROR_NOT_ENOUGH_POINTS:
           responses.push({
             response: prepare('gambling.duel.notEnoughPoints', {
-              pointsName: getPointsName(bet || 0),
-              points:     bet,
+              pointsName: getPointsName(bet ?? 0),
+              points:     format(general.numberFormat, 0)(bet ?? 0),
             }), ...opts,
           });
           break;
@@ -221,7 +223,7 @@ class Duel extends Game {
           responses.push({
             response: prepare('gambling.duel.lowerThanMinimalBet', {
               pointsName: getPointsName(bet),
-              points:     bet,
+              points:     format(general.numberFormat, 0)(bet),
               command:    opts.command,
             }), ...opts,
           });

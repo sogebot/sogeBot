@@ -1,3 +1,4 @@
+import { format } from '@sogebot/ui-helpers/number';
 import _ from 'lodash';
 import { getRepository } from 'typeorm';
 
@@ -8,6 +9,7 @@ import {
 } from '../decorators';
 import { onStartup } from '../decorators/on';
 import Expects from '../expects';
+import general from '../general.js';
 import {
   announce, getBotSender, getOwner, prepare,
 } from '../helpers/commons';
@@ -348,7 +350,7 @@ class Bets extends System {
           .replace(/\$option/g, currentBet.options[index])
           .replace(/\$amount/g, String(currentBet.participations.filter((o) => o.optionIdx === index).length))
           .replace(/\$pointsName/g, getPointsName(total))
-          .replace(/\$points/g, String(total)),
+          .replace(/\$points/g, format(general.numberFormat, 0)(total)),
         ...opts,
       }];
 

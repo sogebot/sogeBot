@@ -1,2 +1,2 @@
-export * from './getPointsName';
+export * from './getPointsName.js';
 export * from './name';

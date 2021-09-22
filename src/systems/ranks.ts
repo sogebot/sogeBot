@@ -1,5 +1,6 @@
 'use strict';
 
+import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized';
 import * as _ from 'lodash';
 import { getRepository } from 'typeorm';
 
@@ -8,7 +9,6 @@ import { User, UserInterface } from '../database/entity/user';
 import { command, default_permission } from '../decorators';
 import { prepare } from '../helpers/commons';
 import { dayjs } from '../helpers/dayjs';
-import { getLocalizedName } from '../helpers/getLocalized';
 import { defaultPermissions } from '../helpers/permissions/';
 import { adminEndpoint } from '../helpers/socket';
 import * as changelog from '../helpers/user/changelog.js';

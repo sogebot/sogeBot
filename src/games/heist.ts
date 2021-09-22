@@ -1,3 +1,4 @@
+import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized';
 import _ from 'lodash';
 import { getRepository } from 'typeorm';
 
@@ -6,7 +7,6 @@ import { command, settings } from '../decorators';
 import { onStartup } from '../decorators/on';
 import Expects from '../expects.js';
 import { announce, prepare } from '../helpers/commons';
-import { getLocalizedName } from '../helpers/getLocalized';
 import { debug, warning } from '../helpers/log.js';
 import * as changelog from '../helpers/user/changelog.js';
 import { default as pointsSystem } from '../systems/points';

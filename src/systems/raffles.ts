@@ -1,5 +1,6 @@
 'use strict';
 
+import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized';
 import * as _ from 'lodash';
 import { getRepository } from 'typeorm';
 
@@ -16,7 +17,6 @@ import {
   announce, getOwnerAsSender, prepare,
 } from '../helpers/commons';
 import { isDbConnected } from '../helpers/database';
-import { getLocalizedName } from '../helpers/getLocalized';
 import { debug, warning } from '../helpers/log';
 import { linesParsed } from '../helpers/parser';
 import { defaultPermissions } from '../helpers/permissions/';

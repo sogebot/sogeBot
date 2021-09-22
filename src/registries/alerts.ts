@@ -1,10 +1,10 @@
+import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized';
 import { getRepository, IsNull } from 'typeorm';
 
 import {
   Alert, AlertCheer, AlertCommandRedeem, AlertFollow, AlertHost, AlertInterface, AlertRaid, AlertResub, AlertSub, AlertSubcommunitygift, AlertSubgift, AlertTip, EmitData,
 } from '../database/entity/alert';
 import { persistent } from '../decorators';
-import { getLocalizedName } from '../helpers/getLocalized';
 import { ioServer } from '../helpers/panel';
 import { adminEndpoint, publicEndpoint } from '../helpers/socket';
 import { translate } from '../translate';

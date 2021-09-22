@@ -1,3 +1,5 @@
+import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized';
+import { format } from '@sogebot/ui-helpers/number';
 import _ from 'lodash';
 import {
   getConnection, getManager, getRepository,
@@ -8,7 +10,6 @@ import { command, default_permission } from '../decorators';
 import general from '../general';
 import { mainCurrency } from '../helpers/currency';
 import { dayjs } from '../helpers/dayjs';
-import { getLocalizedName } from '../helpers/getLocalized';
 import { debug } from '../helpers/log';
 import { defaultPermissions } from '../helpers/permissions/';
 import { getPointsName } from '../helpers/points';
@@ -321,7 +322,7 @@ class Top extends System {
             message += Intl.NumberFormat(general.lang, { style: 'currency', currency: mainCurrency.value }).format(Number(user.value));
             break;
           case TYPE.POINTS:
-            message += user.value + ' ' + getPointsName(Number(user.value));
+            message += format(general.numberFormat, 0)(Number(user.value)) + ' ' + getPointsName(Number(user.value));
             break;
           case TYPE.MESSAGES:
           case TYPE.BITS:
