@@ -1,6 +1,7 @@
 {
   "settings": {
     "lang": "Bot-Sprache",
+    "numberFormat": "Format of numbers in chat",
     "gracefulExitEachXHours": {
       "title": "Geplantes Beenden alle X Stunden",
       "help": "0 - Deaktiviert"
