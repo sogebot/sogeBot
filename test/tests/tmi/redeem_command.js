@@ -15,7 +15,7 @@ const customcommands = (require('../../../dest/systems/customcommands')).default
 
 const { getRepository } = require('typeorm');
 const { Poll, PollVote } = require('../../../dest/database/entity/poll');
-const { getLocalizedName } = require('../../../dest/helpers/getLocalized');
+const { getLocalizedName } = require('@sogebot/ui-helpers/getLocalized');
 const translate = require('../../../dest/translate').translate;
 
 const assert = require('assert');

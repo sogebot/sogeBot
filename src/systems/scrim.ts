@@ -1,4 +1,5 @@
 import * as constants from '@sogebot/ui-helpers/constants';
+import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized';
 import { getRepository } from 'typeorm';
 
 import { ScrimMatchId } from '../database/entity/scrimMatchId';
@@ -11,7 +12,6 @@ import { announce } from '../helpers/commons/announce';
 import { getBotSender } from '../helpers/commons/getBotSender';
 import { prepare } from '../helpers/commons/prepare';
 import { round5 } from '../helpers/commons/round5';
-import { getLocalizedName } from '../helpers/getLocalized';
 import { debug } from '../helpers/log';
 import { defaultPermissions } from '../helpers/permissions/';
 import tmi from '../tmi';

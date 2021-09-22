@@ -9,7 +9,7 @@ const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 const time = require('../../general.js').time;
 
-const { getLocalizedName } = require('../../../dest/helpers/getLocalized');
+const { getLocalizedName } = require('@sogebot/ui-helpers/getLocalized');
 const { getRepository } = require('typeorm');
 const { User } = require('../../../dest/database/entity/user');
 const { Poll, PollVote } = require('../../../dest/database/entity/poll');

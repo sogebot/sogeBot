@@ -16,7 +16,7 @@ describe('Userinfo - stats()', () => {
     await user.prepare();
   });
 
-  const hours = '0.0';
+  const hours = '0';
   const points = '0';
   const messages = '0';
   const tips = '0.00';
@@ -25,11 +25,11 @@ describe('Userinfo - stats()', () => {
 
   it('!stats testuser should show testuser data', async () => {
     const r = await userinfo.showStats({ parameters: user.viewer.username, sender: user.owner });
-    assert.strictEqual(r[0].response, `$touser | Level ${level} | ${hours}h | ${points} points | ${messages} messages | €${tips} | ${bits} bits | 0 months`, user.owner, 1000);
+    assert.strictEqual(r[0].response, `$touser | Level ${level} | ${hours} hours | ${points} points | ${messages} messages | €${tips} | ${bits} bits | 0 months`, user.owner, 1000);
   });
 
   it('!stats should show owner data', async () => {
     const r = await userinfo.showStats({ parameters: '', sender: user.owner });
-    assert.strictEqual(r[0].response, `$sender | Level ${level} | ${hours}h | ${points} points | ${messages} messages | €${tips} | ${bits} bits | 0 months`, user.owner, 1000);
+    assert.strictEqual(r[0].response, `$sender | Level ${level} | ${hours} hours | ${points} points | ${messages} messages | €${tips} | ${bits} bits | 0 months`, user.owner, 1000);
   });
 });

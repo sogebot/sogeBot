@@ -1,10 +1,10 @@
 import { SECOND } from '@sogebot/ui-helpers/constants';
+import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized';
 import { Between, getRepository } from 'typeorm';
 
 import type { EmitData } from '../database/entity/alert';
 import { EventList as EventListDB } from '../database/entity/eventList';
 import { UserTip } from '../database/entity/user';
-import { getLocalizedName } from '../helpers/getLocalized';
 import { error } from '../helpers/log';
 import { adminEndpoint } from '../helpers/socket';
 import alerts from '../registries/alerts';

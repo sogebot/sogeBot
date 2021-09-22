@@ -1,3 +1,4 @@
+import { format } from '@sogebot/ui-helpers/number';
 import {
   get, isNil, random, set,
 } from 'lodash';
@@ -5,6 +6,7 @@ import {
 import {
   command, permission_settings, persistent, settings,
 } from '../decorators';
+import general from '../general.js';
 import { prepare } from '../helpers/commons';
 import { error } from '../helpers/log';
 import { getUserHighestPermission } from '../helpers/permissions/';
@@ -92,9 +94,9 @@ class Gamble extends Game {
         const currentPointsOfUser = await pointsSystem.getPointsOf(opts.sender.userId);
         message = prepare('gambling.gamble.winJackpot', {
           pointsName:  getPointsName(currentPointsOfUser),
-          points:      currentPointsOfUser,
+          points:      format(general.numberFormat, 0)(currentPointsOfUser),
           jackpotName: getPointsName(this.jackpotValue),
-          jackpot:     this.jackpotValue,
+          jackpot:     format(general.numberFormat, 0)(this.jackpotValue),
         });
         this.jackpotValue = 0;
       } else if (random(0, 100, false) <= chanceToWin[permId]) {
@@ -102,7 +104,7 @@ class Gamble extends Game {
         const updatedPoints = await pointsSystem.getPointsOf(opts.sender.userId);
         message = prepare('gambling.gamble.win', {
           pointsName: getPointsName(updatedPoints),
-          points:     updatedPoints,
+          points:     format(general.numberFormat, 0)(updatedPoints),
         });
       } else {
         if (this.enableJackpot) {
@@ -110,14 +112,14 @@ class Gamble extends Game {
           this.jackpotValue = Math.min(Math.ceil(this.jackpotValue + (points * (this.lostPointsAddedToJackpot / 100))), this.maxJackpotValue);
           message = prepare('gambling.gamble.loseWithJackpot', {
             pointsName:  getPointsName(currentPointsOfUser),
-            points:      currentPointsOfUser,
+            points:      format(general.numberFormat, 0)(currentPointsOfUser),
             jackpotName: getPointsName(this.jackpotValue),
-            jackpot:     this.jackpotValue,
+            jackpot:     format(general.numberFormat, 0)(this.jackpotValue),
           });
         } else {
           message = prepare('gambling.gamble.lose', {
             pointsName: getPointsName(await pointsSystem.getPointsOf(opts.sender.userId)),
-            points:     await pointsSystem.getPointsOf(opts.sender.userId),
+            points:     format(general.numberFormat, 0)(await pointsSystem.getPointsOf(opts.sender.userId)),
           });
         }
       }
@@ -126,7 +128,7 @@ class Gamble extends Game {
       if (e instanceof MinimalBetError) {
         message = prepare('gambling.gamble.lowerThanMinimalBet', {
           pointsName: getPointsName(Number(e.message)),
-          points:     Number(e.message),
+          points:     format(general.numberFormat, 0)(Number(e.message)),
         });
         return [{ response: message, ...opts }];
       } else {
@@ -139,7 +141,7 @@ class Gamble extends Game {
           case ERROR_NOT_ENOUGH_POINTS:
             message = prepare('gambling.gamble.notEnoughPoints', {
               pointsName: getPointsName(points ? Number(points) : 0),
-              points:     points,
+              points:     format(general.numberFormat, 0)(Number(points)),
             });
             return [{ response: message, ...opts }];
           /* istanbul ignore next */
@@ -158,7 +160,7 @@ class Gamble extends Game {
       message = prepare('gambling.gamble.currentJackpot', {
         command:    this.getCommand('!gamble'),
         pointsName: getPointsName(this.jackpotValue),
-        points:     this.jackpotValue,
+        points:     format(general.numberFormat, 0)(this.jackpotValue),
       });
     } else {
       message = prepare('gambling.gamble.jackpotIsDisabled', { command: this.getCommand('!gamble') });

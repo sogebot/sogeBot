@@ -1,6 +1,7 @@
 // 3rdparty libraries
 
 import * as constants from '@sogebot/ui-helpers/constants';
+import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized';
 import emojiRegex from 'emoji-regex';
 import * as _ from 'lodash';
 import tlds from 'tlds';
@@ -15,7 +16,6 @@ import {
 } from '../decorators';
 import Expects from '../expects';
 import { prepare } from '../helpers/commons';
-import { getLocalizedName } from '../helpers/getLocalized';
 import {
   error, timeout as timeoutLog, warning as warningLog,
 } from '../helpers/log';

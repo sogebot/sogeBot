@@ -1,3 +1,5 @@
+import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized';
+import { format } from '@sogebot/ui-helpers/number';
 import _ from 'lodash';
 import { getRepository } from 'typeorm';
 
@@ -6,7 +8,7 @@ import { Commands } from '../database/entity/commands';
 import { Cooldown } from '../database/entity/cooldown';
 import { Price } from '../database/entity/price';
 import { Rank } from '../database/entity/rank';
-import { getLocalizedName } from '../helpers/getLocalized';
+import general from '../general.js';
 import { enabled } from '../helpers/interface/enabled';
 import { error, warning } from '../helpers/log';
 import { get, getCommandPermission } from '../helpers/permissions';
@@ -30,8 +32,8 @@ const list: ResponseFilter = {
     let [alias, commands, cooldowns, ranks, prices] = await Promise.all([
       getRepository(Alias).find({
         where: typeof group !== 'undefined' ? {
-          visible: true, enabled: true, group, 
-        } : { visible: true, enabled: true }, 
+          visible: true, enabled: true, group,
+        } : { visible: true, enabled: true },
       }),
       getRepository(Commands).find({ relations: ['responses'], where: { visible: true, enabled: true } }),
       getRepository(Cooldown).find({ where: { isEnabled: true } }),
@@ -42,29 +44,29 @@ const list: ResponseFilter = {
     let listOutput: any = [];
     switch (system) {
       case 'alias':
-        return alias.length === 0 ? ' ' : (alias.map((o) => {
-          const findPrice = prices.find(p => p.command === o.alias);
+        return alias.length === 0 ? ' ' : (alias.map((o: { alias: string; }) => {
+          const findPrice = prices.find((p: { command: any; }) => p.command === o.alias);
           if (findPrice && enabled.status('/systems/price')) {
             if (findPrice.price > 0 && findPrice.priceBits === 0) {
-              return o.alias.replace('!', '') + `(${findPrice.price} ${getPointsName(findPrice.price)})`;
+              return o.alias.replace('!', '') + `(${format(general.numberFormat, 0)(findPrice.price)} ${getPointsName(findPrice.price)})`;
             } else if (findPrice.priceBits > 0 && findPrice.price === 0) {
-              return o.alias.replace('!', '') + `(${findPrice.priceBits} ${getLocalizedName(findPrice.priceBits, translate('core.bits'))})`;
+              return o.alias.replace('!', '') + `(${format(general.numberFormat, 0)(findPrice.priceBits)} ${getLocalizedName(findPrice.priceBits, translate('core.bits'))})`;
             } else {
-              return o.alias.replace('!', '') + `(${findPrice.price} ${getPointsName(findPrice.price)} or ${findPrice.priceBits} ${getLocalizedName(findPrice.priceBits, translate('core.bits'))})`;
+              return o.alias.replace('!', '') + `(${format(general.numberFormat, 0)(findPrice.price)} ${getPointsName(findPrice.price)} or ${findPrice.priceBits} ${getLocalizedName(findPrice.priceBits, translate('core.bits'))})`;
             }
           }
           return o.alias.replace('!', '');
         })).sort().join(', ');
       case '!alias':
-        return alias.length === 0 ? ' ' : (alias.map((o) => {
-          const findPrice = prices.find(p => p.command === o.alias);
+        return alias.length === 0 ? ' ' : (alias.map((o: { alias: string; }) => {
+          const findPrice = prices.find((p: { command: any; }) => p.command === o.alias);
           if (findPrice && enabled.status('/systems/price')) {
             if (findPrice.price > 0 && findPrice.priceBits === 0) {
-              return o.alias + `(${findPrice.price} ${getPointsName(findPrice.price)})`;
+              return o.alias + `(${format(general.numberFormat, 0)(findPrice.price)} ${getPointsName(findPrice.price)})`;
             } else if (findPrice.priceBits > 0 && findPrice.price === 0) {
-              return o.alias + `(${findPrice.priceBits} ${getLocalizedName(findPrice.priceBits, translate('core.bits'))})`;
+              return o.alias + `(${format(general.numberFormat, 0)(findPrice.priceBits)} ${getLocalizedName(findPrice.priceBits, translate('core.bits'))})`;
             } else {
-              return o.alias + `(${findPrice.price} ${getPointsName(findPrice.price)} or ${findPrice.priceBits} ${getLocalizedName(findPrice.priceBits, translate('core.bits'))})`;
+              return o.alias + `(${format(general.numberFormat, 0)(findPrice.price)} ${getPointsName(findPrice.price)} or ${findPrice.priceBits} ${getLocalizedName(findPrice.priceBits, translate('core.bits'))})`;
             }
           }
           return o.alias;
@@ -92,75 +94,75 @@ const list: ResponseFilter = {
         }
       case 'command':
         if (permission) {
-          const responses = commands.map(o => o.responses).flat();
+          const responses = commands.map((o: { responses: any; }) => o.responses).flat();
           const _permission = await get(permission);
           if (_permission) {
-            const commandIds = responses.filter((o) => o.permission === _permission.id).map((o) => o.id);
-            commands = commands.filter((o) => commandIds.includes(o.id));
+            const commandIds = responses.filter((o: { permission: string | undefined; }) => o.permission === _permission.id).map((o: { id: any; }) => o.id);
+            commands = commands.filter((o: { id: any; }) => commandIds.includes(o.id));
           } else {
             commands = [];
           }
         }
-        return commands.length === 0 ? ' ' : (commands.map((o) => {
-          const findPrice = prices.find(p => p.command === o.command);
+        return commands.length === 0 ? ' ' : (commands.map((o: { command: string; }) => {
+          const findPrice = prices.find((p: { command: any; }) => p.command === o.command);
           if (findPrice && enabled.status('/systems/price')) {
             if (findPrice.price > 0 && findPrice.priceBits === 0) {
-              return o.command.replace('!', '') + `(${findPrice.price} ${getPointsName(findPrice.price)})`;
+              return o.command.replace('!', '') + `(${format(general.numberFormat, 0)(findPrice.price)} ${getPointsName(findPrice.price)})`;
             } else if (findPrice.priceBits > 0 && findPrice.price === 0) {
               return o.command.replace('!', '') + `(${findPrice.priceBits} ${getLocalizedName(findPrice.priceBits, translate('core.bits'))})`;
             } else {
-              return o.command.replace('!', '') + `(${findPrice.price} ${getPointsName(findPrice.price)} or ${findPrice.priceBits} ${getLocalizedName(findPrice.priceBits, translate('core.bits'))})`;
+              return o.command.replace('!', '') + `(${format(general.numberFormat, 0)(findPrice.price)} ${getPointsName(findPrice.price)} or ${findPrice.priceBits} ${getLocalizedName(findPrice.priceBits, translate('core.bits'))})`;
             }
           }
           return o.command.replace('!', '');
         })).sort().join(', ');
       case '!command':
         if (permission) {
-          const responses = commands.map(o => o.responses).flat();
+          const responses = commands.map((o: { responses: any; }) => o.responses).flat();
           const _permission = await get(permission);
           if (_permission) {
-            const commandIds = responses.filter((o) => o.permission === _permission.id).map((o) => o.id);
-            commands = commands.filter((o) => commandIds.includes(o.id));
+            const commandIds = responses.filter((o: { permission: string | undefined; }) => o.permission === _permission.id).map((o: { id: any; }) => o.id);
+            commands = commands.filter((o: { id: any; }) => commandIds.includes(o.id));
           } else {
             commands = [];
           }
         }
-        return commands.length === 0 ? ' ' : (commands.map((o) => {
-          const findPrice = prices.find(p => p.command === o.command);
+        return commands.length === 0 ? ' ' : (commands.map((o: { command: string; }) => {
+          const findPrice = prices.find((p: { command: any; }) => p.command === o.command);
           if (findPrice && enabled.status('/systems/price')) {
             if (findPrice.price > 0 && findPrice.priceBits === 0) {
-              return o.command + `(${findPrice.price} ${getPointsName(findPrice.price)})`;
+              return o.command + `(${format(general.numberFormat, 0)(findPrice.price)} ${getPointsName(findPrice.price)})`;
             } else if (findPrice.priceBits > 0 && findPrice.price === 0) {
               return o.command + `(${findPrice.priceBits} ${getLocalizedName(findPrice.priceBits, translate('core.bits'))})`;
             } else {
-              return o.command + `(${findPrice.price} ${getPointsName(findPrice.price)} or ${findPrice.priceBits} ${getLocalizedName(findPrice.priceBits, translate('core.bits'))})`;
+              return o.command + `(${format(general.numberFormat, 0)(findPrice.price)} ${getPointsName(findPrice.price)} or ${findPrice.priceBits} ${getLocalizedName(findPrice.priceBits, translate('core.bits'))})`;
             }
           }
           return o.command;
         })).sort().join(', ');
       case 'cooldown':
-        listOutput = cooldowns.map((o) => {
+        listOutput = cooldowns.map((o: { miliseconds: any; name: string; }) => {
           const time = o.miliseconds;
           return o.name + ': ' + (time / 1000) + 's';
         }).sort().join(', ');
         return listOutput.length > 0 ? listOutput : ' ';
       case 'price':
-        listOutput = prices.map((o) => {
+        listOutput = prices.map((o: { command: any; price: any; }) => {
           return `${o.command} (${o.price}${getPointsName(o.price)})`;
         }).join(', ');
         return listOutput.length > 0 ? listOutput : ' ';
       case 'ranks':
-        listOutput = _.orderBy(ranks.filter(o => o.type === 'viewer'), 'value', 'asc').map((o) => {
+        listOutput = _.orderBy(ranks.filter((o: { type: string; }) => o.type === 'viewer'), 'value', 'asc').map((o) => {
           return `${o.rank} (${o.value}h)`;
         }).join(', ');
         return listOutput.length > 0 ? listOutput : ' ';
       case 'ranks.follow':
-        listOutput = _.orderBy(ranks.filter(o => o.type === 'follower'), 'value', 'asc').map((o) => {
+        listOutput = _.orderBy(ranks.filter((o: { type: string; }) => o.type === 'follower'), 'value', 'asc').map((o) => {
           return `${o.rank} (${o.value} ${getLocalizedName(o.value, translate('core.months'))})`;
         }).join(', ');
         return listOutput.length > 0 ? listOutput : ' ';
       case 'ranks.sub':
-        listOutput = _.orderBy(ranks.filter(o => o.type === 'subscriber'), 'value', 'asc').map((o) => {
+        listOutput = _.orderBy(ranks.filter((o: { type: string; }) => o.type === 'subscriber'), 'value', 'asc').map((o) => {
           return `${o.rank} (${o.value} ${getLocalizedName(o.value, translate('core.months'))})`;
         }).join(', ');
         return listOutput.length > 0 ? listOutput : ' ';

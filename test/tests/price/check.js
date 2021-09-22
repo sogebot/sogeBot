@@ -146,6 +146,6 @@ describe('Price - check()', () => {
       },
       message: '!me',
     });
-    await message.isSentRaw('@__viewer__ | Level 0 | 0.0h | 0 points | 0 messages | €0.00 | 100 bits | 0 months', user.viewer.username, 20000);
+    await message.isSentRaw('@__viewer__ | Level 0 | 0 hours | 0 points | 0 messages | €0.00 | 100 bits | 0 months', user.viewer.username, 20000);
   });
 });

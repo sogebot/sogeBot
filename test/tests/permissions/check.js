@@ -502,7 +502,7 @@ describe('Permissions - check()', () => {
         });
         const r = await parse.process();
 
-        let hours = '0.0';
+        let hours = '0';
         let level = 'Level 0';
         let points = '0';
         let messages = '0';
@@ -514,7 +514,7 @@ describe('Permissions - check()', () => {
           points = '100';
         }
         if (users[j].username === '__viewer_watched__') {
-          hours = '100.0';
+          hours = '100';
         }
         if (users[j].username === '__viewer_tips__') {
           tips = '100.00';
@@ -534,7 +534,7 @@ describe('Permissions - check()', () => {
         if (users[j].username === '__viewer_subcumulativemonths__') {
           months = '2';
         }
-        assert.strictEqual(r[0].response, `$sender | ${level} | ${rank}${hours}h | ${points} points | ${messages} messages | €${tips} | ${bits} bits | ${months} months`);
+        assert.strictEqual(r[0].response, `$sender | ${level} | ${rank}${hours} hours | ${points} points | ${messages} messages | €${tips} | ${bits} bits | ${months} months`);
       });
     }
   });

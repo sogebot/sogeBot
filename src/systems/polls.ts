@@ -1,3 +1,4 @@
+import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized';
 import _ from 'lodash';
 import { getRepository } from 'typeorm';
 
@@ -16,7 +17,6 @@ import {
   announce, getOwnerAsSender, prepare,
 } from '../helpers/commons';
 import { mainCurrency } from '../helpers/currency';
-import { getLocalizedName } from '../helpers/getLocalized';
 import { warning } from '../helpers/log.js';
 import { defaultPermissions } from '../helpers/permissions/';
 import { adminEndpoint } from '../helpers/socket';

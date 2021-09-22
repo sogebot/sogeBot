@@ -2,6 +2,7 @@ import { setTimeout } from 'timers'; // tslint workaround
 
 import { sample } from '@sogebot/ui-helpers/array';
 import { generateUsername } from '@sogebot/ui-helpers/generateUsername';
+import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized';
 import axios from 'axios';
 import _, {
   clone, cloneDeep, get, isNil, random,
@@ -33,7 +34,6 @@ import { csEmitter } from './helpers/customvariables/emitter';
 import { isDbConnected } from './helpers/database';
 import { dayjs } from './helpers/dayjs';
 import { eventEmitter } from './helpers/events/emitter';
-import { getLocalizedName } from './helpers/getLocalized';
 import {
   debug, error, info, warning,
 } from './helpers/log';

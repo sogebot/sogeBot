@@ -1,11 +1,11 @@
 import { MINUTE } from '@sogebot/ui-helpers/constants';
+import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized';
 import _ from 'lodash';
 import { getRepository } from 'typeorm';
 
 import { User, UserInterface } from '../database/entity/user';
 import { command, settings } from '../decorators';
 import { prepare } from '../helpers/commons';
-import { getLocalizedName } from '../helpers/getLocalized';
 import { timeout } from '../helpers/tmi';
 import * as changelog from '../helpers/user/changelog.js';
 import { isBroadcaster } from '../helpers/user/isBroadcaster';

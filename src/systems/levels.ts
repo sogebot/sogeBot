@@ -1,6 +1,7 @@
 'use strict';
 
 import { MINUTE, SECOND } from '@sogebot/ui-helpers/constants';
+import { format } from '@sogebot/ui-helpers/number';
 import { evaluate as mathJsEvaluate, round } from 'mathjs';
 import { getRepository } from 'typeorm';
 
@@ -388,7 +389,7 @@ class Levels extends System {
       if (neededPoints >= availablePoints) {
         throw new ResponseError(
           prepare('systems.levels.notEnoughPointsToBuy', {
-            points:     neededPoints,
+            points:     format(general.numberFormat, 0)(neededPoints),
             pointsName: getPointsName(neededPoints),
             amount:     xpNeeded,
             level:      currentLevel + 1,
@@ -415,7 +416,7 @@ class Levels extends System {
         });
 
       const response = prepare('systems.levels.XPBoughtByPoints', {
-        points:     neededPoints,
+        points:     format(general.numberFormat, 0)(neededPoints),
         pointsName: getPointsName(neededPoints),
         level:      currentLevel + 1,
         amount:     xpNeeded,

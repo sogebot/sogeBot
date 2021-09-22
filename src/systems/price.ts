@@ -1,6 +1,7 @@
 'use strict';
 
 import * as constants from '@sogebot/ui-helpers/constants';
+import { format } from '@sogebot/ui-helpers/number';
 import * as _ from 'lodash';
 import { getRepository } from 'typeorm';
 
@@ -10,6 +11,7 @@ import {
   command, default_permission, rollback,
 } from '../decorators';
 import { parser } from '../decorators';
+import general from '../general.js';
 import { prepare } from '../helpers/commons';
 import { error } from '../helpers/log';
 import { defaultPermissions } from '../helpers/permissions/';
@@ -97,7 +99,7 @@ class Price extends System {
       command: cmd, price: parseInt(argPrice, 10),
     });
     const response = prepare('price.price-was-set', {
-      command: cmd, amount: parseInt(argPrice, 10), pointsName: getPointsName(price.price),
+      command: cmd, amount: format(general.numberFormat, 0)(Number(argPrice)), pointsName: getPointsName(price.price),
     });
     return [{ response, ...opts }];
   }
@@ -179,7 +181,7 @@ class Price extends System {
     const haveEnoughPoints = price.price > 0 && availablePts >= removePts;
     if (!haveEnoughPoints) {
       const response = prepare(translation, {
-        bitsAmount: price.priceBits, amount: removePts, command: `${price.command}`, pointsName: getPointsName(removePts),
+        bitsAmount: price.priceBits, amount: format(general.numberFormat, 0)(removePts), command: `${price.command}`, pointsName: getPointsName(removePts),
       });
       parserReply(response, opts);
     } else {

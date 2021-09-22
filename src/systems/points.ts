@@ -1,6 +1,7 @@
 'use strict';
 
 import { MINUTE } from '@sogebot/ui-helpers/constants';
+import { format } from '@sogebot/ui-helpers/number';
 import * as cronparser from 'cron-parser';
 import {
   FindConditions, getConnection, getRepository, LessThanOrEqual,
@@ -15,6 +16,7 @@ import {
   onChange, onLoad, onStartup,
 } from '../decorators/on';
 import Expects from '../expects';
+import general from '../general.js';
 import { isStreamOnline } from '../helpers/api';
 import { prepare } from '../helpers/commons';
 import { getAllOnlineIds } from '../helpers/getAllOnlineUsernames';
@@ -304,9 +306,9 @@ class Points extends System {
         response: prepare('points.success.undo', {
           username,
           command:                   undoOperation.command,
-          originalValue:             undoOperation.originalValue,
+          originalValue:             format(general.numberFormat, 0)(undoOperation.originalValue),
           originalValuePointsLocale: getPointsName(undoOperation.originalValue),
-          updatedValue:              undoOperation.updatedValue,
+          updatedValue:              format(general.numberFormat, 0)(undoOperation.updatedValue),
           updatedValuePointsLocale:  getPointsName(undoOperation.updatedValue),
         }), ...opts,
       }];
@@ -337,7 +339,7 @@ class Points extends System {
       });
 
       const response = prepare('points.success.set', {
-        amount:     points,
+        amount:     format(general.numberFormat, 0)(points),
         username,
         pointsName: getPointsName(points),
       });
@@ -380,7 +382,7 @@ class Points extends System {
 
       if (points !== 'all' && availablePoints < points) {
         const response = prepare('points.failed.giveNotEnough'.replace('$command', opts.command), {
-          amount:     points,
+          amount:     format(general.numberFormat, 0)(points),
           username,
           pointsName: getPointsName(points),
         });
@@ -389,7 +391,7 @@ class Points extends System {
         changelog.increment(guser.userId, { points: availablePoints });
         changelog.update(sender.userId, { points: 0 });
         const response = prepare('points.success.give', {
-          amount:     availablePoints,
+          amount:     format(general.numberFormat, 0)(availablePoints),
           username,
           pointsName: getPointsName(availablePoints),
         });
@@ -398,7 +400,7 @@ class Points extends System {
         changelog.increment(guser.userId, { points: points });
         changelog.increment(sender.userId, { points: -points });
         const response = prepare('points.success.give', {
-          amount:     points,
+          amount:     format(general.numberFormat, 0)(points),
           username,
           pointsName: getPointsName(points),
         });
@@ -460,7 +462,7 @@ class Points extends System {
       }
 
       const response = prepare('points.defaults.pointsResponse', {
-        amount:     this.maxSafeInteger(user.points),
+        amount:     format(general.numberFormat, 0)(this.maxSafeInteger(user.points)),
         username:   username,
         pointsName: getPointsName(this.maxSafeInteger(user.points)),
         order, count,
@@ -485,14 +487,14 @@ class Points extends System {
         await changelog.flush();
         await getRepository(User).increment({}, 'points', points);
         response = prepare('points.success.online.positive', {
-          amount:     points,
+          amount:     format(general.numberFormat, 0)(points),
           pointsName: getPointsName(points),
         });
       } else {
         points = Math.abs(points);
         await this.decrement({}, points);
         response = prepare('points.success.online.negative', {
-          amount:     -points,
+          amount:     `-${format(general.numberFormat, 0)(points)}`,
           pointsName: getPointsName(points),
         });
       }
@@ -513,14 +515,14 @@ class Points extends System {
         await changelog.flush();
         await getRepository(User).increment({}, 'points', points);
         response = prepare('points.success.all.positive', {
-          amount:     points,
+          amount:     format(general.numberFormat, 0)(points),
           pointsName: getPointsName(points),
         });
       } else {
         points = Math.abs(points);
         await this.decrement({}, points);
         response = prepare('points.success.all.negative', {
-          amount:     -points,
+          amount:     `-${format(general.numberFormat, 0)(points)}`,
           pointsName: getPointsName(points),
         });
       }
@@ -546,7 +548,7 @@ class Points extends System {
         changelog.increment(user.userId, { points: Math.floor(Math.random() * points) });
       }
       const response = prepare('points.success.rain', {
-        amount:     points,
+        amount:     format(general.numberFormat, 0)(points),
         pointsName: getPointsName(points),
       });
       return [{ response, ...opts }];
@@ -580,7 +582,7 @@ class Points extends System {
       });
 
       const response = prepare('points.success.add', {
-        amount:     points,
+        amount:     format(general.numberFormat, 0)(points),
         username:   username,
         pointsName: getPointsName(points),
       });
@@ -618,7 +620,7 @@ class Points extends System {
       });
 
       const response = prepare('points.success.remove', {
-        amount:     points,
+        amount:     format(general.numberFormat, 0)(points),
         username:   username,
         pointsName: getPointsName(points === 'all' ? 0 : points),
       });

@@ -1,12 +1,13 @@
-/* global describe it before */
+/* global */
 const assert = require('assert');
 
+const { getLocalizedName } = require('@sogebot/ui-helpers/getLocalized');
+
+const { translate } = require('../../../dest/translate');
 require('../../general.js');
 const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 const user = require('../../general.js').user;
-const { translate } = require('../../../dest/translate');
-const { getLocalizedName } = require('../../../dest/helpers/getLocalized');
 
 let emotes;
 
@@ -28,24 +29,32 @@ describe('Emotes - combo', () => {
     for (let j = 0; j < 2; j++) {
       for (let i = 0; i < 3; i++) {
         it('Send a message with Kappa emote', async () => {
-          await emotes.containsEmotes({ sender: {...user.owner, emotes: [
-            {
-              id: '25',
-              start: 0,
-              end: 4,
-            },
-          ]}, parameters: 'Kappa', message: 'Kappa' });
+          await emotes.containsEmotes({
+            sender: {
+              ...user.owner, emotes: [
+                {
+                  id:    '25',
+                  start: 0,
+                  end:   4,
+                },
+              ],
+            }, parameters: 'Kappa', message: 'Kappa',
+          });
         });
       }
 
       it ('Send a message with HeyGuys emote', async () => {
-        await emotes.containsEmotes({ sender: {...user.owner, emotes: [
-          {
-            id: '30259',
-            start: 0,
-            end: 6,
-          },
-        ]}, parameters: 'HeyGuys', message: 'HeyGuys' });
+        await emotes.containsEmotes({
+          sender: {
+            ...user.owner, emotes: [
+              {
+                id:    '30259',
+                start: 0,
+                end:   6,
+              },
+            ],
+          }, parameters: 'HeyGuys', message: 'HeyGuys',
+        });
       });
 
       it ('We are expecting combo break message', async () => {
@@ -79,24 +88,32 @@ describe('Emotes - combo', () => {
     for (let j = 0; j < 2; j++) {
       for (let i = 0; i < 3; i++) {
         it('Send a message with Kappa emote', async () => {
-          await emotes.containsEmotes({ sender: {...user.owner, emotes: [
-            {
-              id: '25',
-              start: 0,
-              end: 4,
-            },
-          ]}, parameters: 'Kappa', message: 'Kappa' });
+          await emotes.containsEmotes({
+            sender: {
+              ...user.owner, emotes: [
+                {
+                  id:    '25',
+                  start: 0,
+                  end:   4,
+                },
+              ],
+            }, parameters: 'Kappa', message: 'Kappa',
+          });
         });
       }
 
       it ('Send a message with HeyGuys emote', async () => {
-        await emotes.containsEmotes({ sender: {...user.owner, emotes: [
-          {
-            id: '30259',
-            start: 0,
-            end: 6,
-          },
-        ]}, parameters: 'HeyGuys', message: 'HeyGuys' });
+        await emotes.containsEmotes({
+          sender: {
+            ...user.owner, emotes: [
+              {
+                id:    '30259',
+                start: 0,
+                end:   6,
+              },
+            ],
+          }, parameters: 'HeyGuys', message: 'HeyGuys',
+        });
       });
 
       it ('We are expecting combo break message', async () => {
