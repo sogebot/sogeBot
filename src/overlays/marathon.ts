@@ -31,7 +31,11 @@ class Marathon extends Overlay {
           tier = 1;
         }
         const timeToAdd = value.opts.values.sub[`tier${tier}`] * 1000;
-        value.opts.endTime = Math.min(value.opts.endTime + timeToAdd, value.opts.maxEndTime);
+        if (value.opts.maxEndTime !== null) {
+          value.opts.endTime = Math.min(value.opts.endTime + timeToAdd, value.opts.maxEndTime);
+        } else {
+          value.opts.endTime += timeToAdd;
+        }
         cachedOverlays.set(id, value);
       }
       await this.flushCache();
@@ -52,7 +56,12 @@ class Marathon extends Overlay {
           tier = 1;
         }
         const timeToAdd = value.opts.values.resub[`tier${tier}`] * 1000;
-        value.opts.endTime = Math.min(value.opts.endTime + timeToAdd, value.opts.maxEndTime);
+
+        if (value.opts.maxEndTime !== null) {
+          value.opts.endTime = Math.min(value.opts.endTime + timeToAdd, value.opts.maxEndTime);
+        } else {
+          value.opts.endTime += timeToAdd;
+        }
         cachedOverlays.set(id, value);
       }
       await this.flushCache();
@@ -74,7 +83,12 @@ class Marathon extends Overlay {
           multiplier = Math.floor(multiplier);
         }
         const timeToAdd = value.opts.values.bits.time * multiplier * 1000;
-        value.opts.endTime = Math.min(value.opts.endTime + timeToAdd, value.opts.maxEndTime);
+
+        if (value.opts.maxEndTime !== null) {
+          value.opts.endTime = Math.min(value.opts.endTime + timeToAdd, value.opts.maxEndTime);
+        } else {
+          value.opts.endTime += timeToAdd;
+        }
         cachedOverlays.set(id, value);
       }
       await this.flushCache();
@@ -96,7 +110,12 @@ class Marathon extends Overlay {
           multiplier = Math.floor(multiplier);
         }
         const timeToAdd = value.opts.values.tips.time * multiplier * 1000;
-        value.opts.endTime = Math.min(value.opts.endTime + timeToAdd, value.opts.maxEndTime);
+
+        if (value.opts.maxEndTime !== null) {
+          value.opts.endTime = Math.min(value.opts.endTime + timeToAdd, value.opts.maxEndTime);
+        } else {
+          value.opts.endTime += timeToAdd;
+        }
         cachedOverlays.set(id, value);
       }
       await this.flushCache();
@@ -169,7 +188,7 @@ class Marathon extends Overlay {
           item.opts.endTime = Date.now();
         }
         item.opts.endTime += data.time;
-        if (item.opts.endTime > item.opts.maxEndTime) {
+        if (item.opts.maxEndTime !== null && item.opts.endTime) {
           error('MARATHON: cannot set end time bigger than maximum end time');
           addUIError({ name: 'MARATHON', message: 'Cannot set end time bigger than maximum end time.' });
           item.opts.endTime = item.opts.maxEndTime;
