@@ -43,7 +43,7 @@ jobs:
       run: ENV=development make info clean dependencies bot
     - name: Set proper db to use
       if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
-      run: npm run test:config:postgres
+      run: npm run test:config:mysql
     - name: Run migration test
       if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
       run: npm run test:migration
@@ -83,7 +83,7 @@ jobs:
       run: ENV=development make info clean dependencies bot
     - name: Set proper db to use
       if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
-      run: npm run test:config:postgres
+      run: npm run test:config:mysql
     - name: Run mocha
       if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
       run: TESTS=@func1 npm test
@@ -129,7 +129,7 @@ jobs:
       run: ENV=development make info clean dependencies bot
     - name: Set proper db to use
       if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
-      run: npm run test:config:postgres
+      run: npm run test:config:mysql
     - name: Run mocha
       if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
       run: TESTS=@func2 npm test
@@ -175,7 +175,7 @@ jobs:
       run: ENV=development make info clean dependencies bot
     - name: Set proper db to use
       if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
-      run: npm run test:config:postgres
+      run: npm run test:config:mysql
     - name: Run mocha
       if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
       run: TESTS=@func3 npm test

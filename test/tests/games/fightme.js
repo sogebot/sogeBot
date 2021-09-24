@@ -60,7 +60,7 @@ const tests = [
   },
 ];
 
-describe('game/fightme - !fightme - @func2', () => {
+describe('game/fightme - !fightme - @func1', () => {
   describe('Challenge should be removed after a while', () => {
     before(async () => {
       await db.cleanup();
