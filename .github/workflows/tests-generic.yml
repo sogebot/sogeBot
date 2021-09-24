@@ -1,0 +1,59 @@
+name: Generic tests
+
+on:
+  push:
+    branches:
+      - 'master'
+  pull_request:
+
+jobs:
+  eslint:
+    name: ESLint check
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: All test should be run - tests are not containing describe.only
+      run: |
+          if ! grep -r -l 'describe.only' ./test/; then
+            exit 0
+          else
+            exit 1
+          fi;
+    - name: install node v14
+      uses: actions/setup-node@v2
+      with:
+        node-version: 14
+        check-latest: true
+    - name: Install latest npm
+      run: |
+        npm install -g npm@latest
+    - name: Install eslint and dependencies
+      run: |
+        make dependencies
+    - name: Run eslint
+      run: ENV=development make eslint
+    - name: Run jsonlint
+      run: ENV=development make jsonlint
+  fullbuild:
+    name: Make test
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+      with:
+        ref: ${{ github.event.pull_request.head.sha }}
+    - id: log
+      name: Load commit message for skip test check
+      run: echo ::set-output name=MESSAGE::$(git log --no-merges -1 --pretty=format:%s%b)
+    - name: install node v14
+      if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
+      uses: actions/setup-node@v2
+      with:
+        node-version: 14
+        check-latest: true
+    - name: Install latest npm
+      if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
+      run: |
+        npm install -g npm@latest
+    - name: Install all dependencies and build everything
+      if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
+      run: ENV=development make
