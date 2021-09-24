@@ -1,24 +1,15 @@
 import axios from 'axios';
-import gitCommitInfo from 'git-commit-info';
 import _ from 'lodash';
-import { getRepository, In } from 'typeorm';
 import { v4 } from 'uuid';
 
-import { EventList } from './database/entity/eventList';
 import { timer } from './decorators.js';
 import {
   command, count, custom, evaluate, ifp, info, list, math, online, param, price, qs, random, ResponseFilter, stream, youtube,
 } from './filters';
-import { isStreamOnline, stats } from './helpers/api';
+import { getGlobalVariables } from './helpers/checkFilter.js';
 import { getBotSender } from './helpers/commons/getBotSender';
-import * as changelog from './helpers/user/changelog.js';
-import { isBotSubscriber } from './helpers/user/isBot';
-import lastfm from './integrations/lastfm';
-import spotify from './integrations/spotify';
-import songs from './systems/songs';
 import tmi from './tmi';
 import { translate } from './translate';
-import users from './users';
 
 class Message {
   message = '';
@@ -35,91 +26,10 @@ class Message {
       return this.message;
     }
 
-    const variables = {
-      game:            stats.value.currentGame,
-      language:        stats.value.language,
-      viewers:         isStreamOnline.value ? stats.value.currentViewers : 0,
-      views:           stats.value.currentViews,
-      followers:       stats.value.currentFollowers,
-      subscribers:     stats.value.currentSubscribers,
-      bits:            isStreamOnline.value ? stats.value.currentBits : 0,
-      title:           stats.value.currentTitle,
-      source:          opts.sender && typeof opts.sender.discord !== 'undefined' ? 'discord' : 'twitch',
-      isBotSubscriber: isBotSubscriber(),
-      isStreamOnline:  isStreamOnline.value,
-    };
+    const variables = await getGlobalVariables(this.message, opts);
     for (const variable of Object.keys(variables)) {
-      const regexp = new RegExp(`\\$${variable}`, 'g');
+      const regexp = new RegExp(`\\${variable}`, 'g');
       this.message = this.message.replace(regexp, String(variables[variable as keyof typeof variables] ?? ''));
-    }
-
-    if (this.message.includes('$version')) {
-      const version = _.get(process, 'env.npm_package_version', 'x.y.z');
-      this.message = this.message.replace(/\$version/g, version.replace('SNAPSHOT', gitCommitInfo().shortHash || 'SNAPSHOT'));
-    }
-
-    if (this.message.includes('$latestFollower')) {
-      const latestFollower = await getRepository(EventList).findOne({ order: { timestamp: 'DESC' }, where: { event: 'follow' } });
-      this.message = this.message.replace(/\$latestFollower/g, !_.isNil(latestFollower) ? await users.getNameById(latestFollower.userId) : 'n/a');
-    }
-
-    // latestSubscriber
-    if (this.message.includes('$latestSubscriber')) {
-      const latestSubscriber = await getRepository(EventList).findOne({
-        order: { timestamp: 'DESC' },
-        where: { event: In(['sub', 'resub', 'subgift']) },
-      });
-
-      if (latestSubscriber && (this.message.includes('$latestSubscriberMonths') || this.message.includes('$latestSubscriberStreak'))) {
-        const latestSubscriberUser = await changelog.get(latestSubscriber.userId);
-        this.message = this.message.replace(/\$latestSubscriberMonths/g, latestSubscriberUser ? String(latestSubscriberUser.subscribeCumulativeMonths) : 'n/a');
-        this.message = this.message.replace(/\$latestSubscriberStreak/g, latestSubscriberUser ? String(latestSubscriberUser.subscribeStreak) : 'n/a');
-      }
-      this.message = this.message.replace(/\$latestSubscriber/g, !_.isNil(latestSubscriber) ? await users.getNameById(latestSubscriber.userId) : 'n/a');
-    }
-
-    // latestTip, latestTipAmount, latestTipCurrency, latestTipMessage
-    if (this.message.includes('$latestTip')) {
-      const latestTip = await getRepository(EventList).findOne({ order: { timestamp: 'DESC' }, where: { event: 'tip', isTest: false } });
-      this.message = this.message.replace(/\$latestTipAmount/g, !_.isNil(latestTip) ? parseFloat(JSON.parse(latestTip.values_json).amount).toFixed(2) : 'n/a');
-      this.message = this.message.replace(/\$latestTipCurrency/g, !_.isNil(latestTip) ? JSON.parse(latestTip.values_json).currency : 'n/a');
-      this.message = this.message.replace(/\$latestTipMessage/g, !_.isNil(latestTip) ? JSON.parse(latestTip.values_json).message : 'n/a');
-      this.message = this.message.replace(/\$latestTip/g, !_.isNil(latestTip) ? await users.getNameById(latestTip.userId) : 'n/a');
-    }
-
-    // latestCheer, latestCheerAmount, latestCheerCurrency, latestCheerMessage
-    if (this.message.includes('$latestCheer')) {
-      const latestCheer = await getRepository(EventList).findOne({ order: { timestamp: 'DESC' }, where: { event: 'cheer' } });
-      this.message = this.message.replace(/\$latestCheerAmount/g, !_.isNil(latestCheer) ? JSON.parse(latestCheer.values_json).bits : 'n/a');
-      this.message = this.message.replace(/\$latestCheerMessage/g, !_.isNil(latestCheer) ? JSON.parse(latestCheer.values_json).message : 'n/a');
-      this.message = this.message.replace(/\$latestCheer/g, !_.isNil(latestCheer) ? await users.getNameById(latestCheer.userId) : 'n/a');
-    }
-
-    const spotifySong = JSON.parse(spotify.currentSong);
-    if (spotifySong !== null && spotifySong.is_playing && spotifySong.is_enabled) {
-      // load spotify format
-      const format = spotify.format;
-      if (opts.escape) {
-        spotifySong.song = spotifySong.song.replace(new RegExp(opts.escape, 'g'), `\\${opts.escape}`);
-        spotifySong.artist = spotifySong.artist.replace(new RegExp(opts.escape, 'g'), `\\${opts.escape}`);
-      }
-      this.message = this.message.replace(/\$spotifySong/g, format.replace(/\$song/g, spotifySong.song).replace(/\$artist/g, spotifySong.artist));
-    } else {
-      this.message = this.message.replace(/\$spotifySong/g, translate('songs.not-playing'));
-    }
-
-    this.message = this.message.replace(/\$lastfmSong/g, lastfm.currentSong ? lastfm.currentSong : translate('songs.not-playing'));
-
-    if (songs.enabled
-        && this.message.includes('$ytSong')
-        && Object.values(songs.isPlaying).find(o => o)) {
-      let currentSong = _.get(JSON.parse(await songs.currentSong), 'title', translate('songs.not-playing'));
-      if (opts.escape) {
-        currentSong = currentSong.replace(new RegExp(opts.escape, 'g'), `\\${opts.escape}`);
-      }
-      this.message = this.message.replace(/\$ytSong/g, currentSong);
-    } else {
-      this.message = this.message.replace(/\$ytSong/g, translate('songs.not-playing'));
     }
 
     return this.message;
