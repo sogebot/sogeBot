@@ -18,7 +18,7 @@ const { Event } = require('../../../dest/database/entity/event');
 const events = (require('../../../dest/events')).default;
 const username = 'randomPerson';
 
-describe('discord#752632256270696478 - event attrs are not correctly parsed', () => {
+describe('discord#752632256270696478 - event attrs are not correctly parsed - @func3', () => {
   before(async () => {
     await db.cleanup();
     await message.prepare();

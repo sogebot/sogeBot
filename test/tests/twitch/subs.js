@@ -15,7 +15,7 @@ const user = require('../../general.js').user;
 
 require('../../general.js');
 
-describe('lib/twitch - subs()', () => {
+describe('lib/twitch - subs() - @func2', () => {
   before(async () => {
     await db.cleanup();
     await message.prepare();

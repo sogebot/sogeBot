@@ -19,7 +19,7 @@ const owner = { username: '__broadcaster__', userId: String(_.random(999999, fal
 const testuser = { username: 'testuser', userId: String(_.random(999999, false)) };
 const testuser2 = { username: 'testuser2', userId: String(_.random(999999, false)) };
 
-describe('Raffles - pick()', () => {
+describe('Raffles - pick() - @func2', () => {
   before(async () => {
     await db.cleanup();
     await message.prepare();

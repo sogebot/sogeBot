@@ -20,7 +20,7 @@ const tests = {
   ],
 };
 
-describe('systems/moderation - longMessage()', () => {
+describe('systems/moderation - longMessage() - @func3', () => {
   describe('moderationLongMessage=false', async () => {
     before(async () => {
       await db.cleanup();

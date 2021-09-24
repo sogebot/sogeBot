@@ -12,7 +12,7 @@ const time = require('../../general.js').time;
 const message = require('../../general.js').message;
 const user = require('../../general.js').user;
 
-describe('TMI - subcommunitygift after gifts should be ignored', () => {
+describe('TMI - subcommunitygift after gifts should be ignored - @func3', () => {
   before(async () => {
     await db.cleanup();
     await message.prepare();

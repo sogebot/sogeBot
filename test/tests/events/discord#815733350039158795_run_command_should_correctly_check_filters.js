@@ -21,7 +21,7 @@ const time = require('../../general.js').time;
 const user = require('../../general.js').user;
 
 let event;
-describe('Events - event run command should correctly parse filters and be able to use CASTERS permissions - https://discord.com/channels/317348946144002050/619437014001123338/8157333500391587958', () => {
+describe('Events - event run command should correctly parse filters and be able to use CASTERS permissions - https://discord.com/channels/317348946144002050/619437014001123338/8157333500391587958 - @func3', () => {
   before(async () => {
     await db.cleanup();
     await message.prepare();

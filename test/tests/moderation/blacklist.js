@@ -96,7 +96,7 @@ const tests = {
   },
 };
 
-describe('systems/moderation - blacklist()', () => {
+describe('systems/moderation - blacklist() - @func1', () => {
   before(async () => {
     await db.cleanup();
     await message.prepare();

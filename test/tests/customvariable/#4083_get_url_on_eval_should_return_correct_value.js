@@ -22,7 +22,7 @@ _.set(global, 'widgets.custom_variables.io.emit', function () {
   return;
 });
 
-describe('Custom Variable - #4083 - Get url on eval should return correct value', () => {
+describe('Custom Variable - #4083 - Get url on eval should return correct value - @func1', () => {
   before(async () => {
     await db.cleanup();
     await message.prepare();

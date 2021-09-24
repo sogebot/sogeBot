@@ -11,7 +11,7 @@ const { announce } = require('../../../dest/helpers/commons/announce');
 // users
 const owner = { username: '__broadcaster__' };
 
-describe('Commons - #3620 - announce is not parsing message filters', () => {
+describe('Commons - @func2 - #3620 - announce is not parsing message filters', () => {
   before(async () => {
     await db.cleanup();
     await message.prepare();

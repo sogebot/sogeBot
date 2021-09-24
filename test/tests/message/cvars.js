@@ -18,7 +18,7 @@ const { Variable } = require('../../../dest/database/entity/variable');
 // stub
 _.set(global, 'widgets.custom_variables.io.emit', function () {});
 
-describe('Message - cvars filter', async () => {
+describe('Message - cvars filter - @func3', async () => {
   const users = [
     { username: '__owner__', userId: String(Math.floor(Math.random() * 100000)), permission: defaultPermissions.CASTERS },
     { username: '__viewer__', userId: String(Math.floor(Math.random() * 100000)), permission: defaultPermissions.VIEWERS },

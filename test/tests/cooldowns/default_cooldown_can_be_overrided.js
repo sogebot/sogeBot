@@ -28,7 +28,7 @@ const testUser = { userId: String(Math.floor(Math.random() * 100000)), username:
 const testUser2 = { userId: String(Math.floor(Math.random() * 100000)), username: 'test2', badges: {} };
 
 
-describe('Cooldowns - default cooldown can be overrided', () => {
+describe('Cooldowns - @func3 - default cooldown can be overrided', () => {
   describe('command - override', async () => {
     before(async () => {
       await db.cleanup();

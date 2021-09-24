@@ -15,7 +15,7 @@ const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 const user = require('../../general.js').user;
 
-describe('Raffles - several raffle joins shouldnt go over max', () => {
+describe('Raffles - several raffle joins shouldnt go over max - @func3', () => {
   before(async () => {
     await db.cleanup();
     await message.prepare();

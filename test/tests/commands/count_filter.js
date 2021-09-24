@@ -16,7 +16,7 @@ const customcommands = (require('../../../dest/systems/customcommands')).default
 const owner = { username: '__broadcaster__', userId: String(Math.floor(Math.random() * 100000)) };
 const user1 = { username: 'user1', userId: String(Math.floor(Math.random() * 100000)) };
 
-describe('Custom Commands - count filter', () => {
+describe('Custom Commands - @func1 - count filter', () => {
   before(async () => {
     await db.cleanup();
     await message.prepare();

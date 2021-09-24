@@ -56,7 +56,7 @@ function generateCommand(opts) {
   return [p, a, c].join(' ');
 }
 
-describe('Alias - edit()', () => {
+describe('Alias - @func1 - edit()', () => {
   beforeEach(async () => {
     await db.cleanup();
     await message.prepare();

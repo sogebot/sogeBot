@@ -15,7 +15,7 @@ const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 const user = require('../../general.js').user;
 
-describe('Raffles - user will lose points when join raffle with number and all #3587', () => {
+describe('Raffles - user will lose points when join raffle with number and all #3587 - @func1', () => {
   before(async () => {
     await db.cleanup();
     await message.prepare();

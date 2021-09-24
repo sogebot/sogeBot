@@ -23,7 +23,7 @@ const { VariableWatcher } = require('../../../dest/watchers');
 const message = require('../../general.js').message;
 const db = require('../../general.js').db;
 
-describe('TMI - User should have counted messages - https://github.com/sogehige/sogeBot/issues/3106', () => {
+describe('TMI - User should have counted messages - https://github.com/sogehige/sogeBot/issues/3106 - @func3', () => {
   before(async () => {
     await db.cleanup();
     await message.prepare();

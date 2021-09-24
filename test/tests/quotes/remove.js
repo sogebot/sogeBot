@@ -25,7 +25,7 @@ const tests = [
   { sender: owner, parameters: '-id $id', id: 1, shouldFail: false, exist: true },
 ];
 
-describe('Quotes - remove()', () => {
+describe('Quotes - remove() - @func3', () => {
   for (const test of tests) {
     let responses = [];
     describe(test.parameters, async () => {

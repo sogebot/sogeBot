@@ -15,7 +15,7 @@ const { User } = require('../../../dest/database/entity/user');
 
 const assert = require('assert');
 
-describe('Bets - bet should automatically be locked after given time with participants', () => {
+describe('Bets - @func3 - bet should automatically be locked after given time with participants', () => {
   before(async () => {
     await db.cleanup();
     await message.prepare();

@@ -12,7 +12,7 @@ require('../../general.js');
 const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 
-describe('Custom Variable - helpers/customvariables/getURL', () => {
+describe('Custom Variable - helpers/customvariables/getURL - @func1', () => {
   let urlId;
   let urlIdWithoutGET;
 

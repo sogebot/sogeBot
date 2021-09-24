@@ -17,7 +17,7 @@ const assert = require('assert');
 // users
 const owner = { username: '__broadcaster__' };
 
-describe('Top - !top messages', () => {
+describe('Top - !top messages - @func2', () => {
   before(async () => {
     await db.cleanup();
     await message.prepare();

@@ -19,7 +19,7 @@ const time = require('../../general.js').time;
 
 const cooldown = (require('../../../dest/systems/cooldown')).default;
 
-describe('Cooldowns - #3720 - global cooldown should be properly reverted', () => {
+describe('Cooldowns - @func3 - #3720 - global cooldown should be properly reverted', () => {
   before(async () => {
     await db.cleanup();
     await message.prepare();

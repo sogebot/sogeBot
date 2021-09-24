@@ -17,7 +17,7 @@ const message = require('../../general.js').message;
 const user1 = { username: 'user1', userId: String(_.random(999999, false)) };
 const command = '!gamble';
 
-describe('Gambling - gamble with Jackpot', () => {
+describe('Gambling - gamble with Jackpot - @func1', () => {
   describe('User uses !gamble', () => {
     before(async () => {
       await db.cleanup();
@@ -37,20 +37,20 @@ describe('Gambling - gamble with Jackpot', () => {
 
     it('add points for user', async () => {
       await getRepository(User).save({
-        userId: user1.userId, username: user1.username, points: 1000, 
+        userId: user1.userId, username: user1.username, points: 1000,
       });
     });
 
     it('user should lose !gamble 125', async () => {
       const r = await gamble.main({
-        sender: user1, parameters: '125', command, 
+        sender: user1, parameters: '125', command,
       });
       assert.strictEqual(r[0].response, '$sender, you LOST! You now have 875 points. Jackpot increased to 13 points');
     });
 
     it('user should lose again !gamble 100', async () => {
       const r = await gamble.main({
-        sender: user1, parameters: '200', command, 
+        sender: user1, parameters: '200', command,
       });
       assert.strictEqual(r[0].response, '$sender, you LOST! You now have 675 points. Jackpot increased to 33 points');
     });
@@ -61,7 +61,7 @@ describe('Gambling - gamble with Jackpot', () => {
 
     it('user should lose again !gamble 100', async () => {
       const r = await gamble.main({
-        sender: user1, parameters: '100', command, 
+        sender: user1, parameters: '100', command,
       });
       assert.strictEqual(r[0].response, '$sender, you LOST! You now have 575 points. Jackpot increased to 133 points');
     });
@@ -77,7 +77,7 @@ describe('Gambling - gamble with Jackpot', () => {
 
     it('user should win jackpot !gamble 100', async () => {
       const r = await gamble.main({
-        sender: user1, parameters: '100', command, 
+        sender: user1, parameters: '100', command,
       });
       assert.strictEqual(r[0].response, '$sender, you hit JACKPOT! You won 133 points in addition to your bet. You now have 808 points');
     });

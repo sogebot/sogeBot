@@ -20,7 +20,7 @@ const users = [
   { username: '__excluded_viewer__', userId: String(7), id: 7 },
 ];
 
-describe('Permissions - https://community.sogebot.xyz/t/spotify-user-banlist/192 - exclude user from permission', () => {
+describe('Permissions - https://community.sogebot.xyz/t/spotify-user-banlist/192 - exclude user from permission - @func3', () => {
   before(async () => {
     await db.cleanup();
     await message.prepare();

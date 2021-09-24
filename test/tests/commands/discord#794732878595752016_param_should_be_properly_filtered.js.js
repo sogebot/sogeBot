@@ -14,7 +14,7 @@ const { Commands } = require('../../../dest/database/entity/commands');
 const customcommands = (require('../../../dest/systems/customcommands')).default;
 const { defaultPermissions } = (require('../../../dest/helpers/permissions/'));
 
-describe('Custom Commands - https://discord.com/channels/317348946144002050/317349069024395264/794732878595752016 - Custom command $param filter should be properly evaluated', () => {
+describe('Custom Commands - @func1 - https://discord.com/channels/317348946144002050/317349069024395264/794732878595752016 - Custom command $param filter should be properly evaluated', () => {
   before(async () => {
     await db.cleanup();
     await message.prepare();

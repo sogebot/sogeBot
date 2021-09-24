@@ -15,7 +15,7 @@ const assert = require('assert');
 // users
 const owner = { username: '__broadcaster__' };
 
-describe('Bets - bet should automatically be locked after given time without participants', () => {
+describe('Bets - @func3 - bet should automatically be locked after given time without participants', () => {
   before(async () => {
     await db.cleanup();
     await message.prepare();

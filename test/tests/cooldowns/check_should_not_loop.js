@@ -21,7 +21,7 @@ const owner = { userId: String(Math.floor(Math.random() * 100000)), username: '_
 const testUser = { userId: String(Math.floor(Math.random() * 100000)), username: 'test', badges: {} };
 
 
-describe('cooldown check should not endlessly loop', () => {
+describe('cooldown - @func3 check should not endlessly loop', () => {
   before(async () => {
     await db.cleanup();
     await message.prepare();

@@ -15,7 +15,7 @@ const owner = { userId: String(Math.floor(Math.random() * 100000)), username: '_
 const user1 = { userId: String(Math.floor(Math.random() * 100000)), username: 'user1', points: 100 };
 const user2 = { userId: String(Math.floor(Math.random() * 100000)), username: 'user2' };
 
-describe('Points - all()', () => {
+describe('Points - all() - @func1', () => {
   before(async () => {
     await db.cleanup();
     await message.prepare();

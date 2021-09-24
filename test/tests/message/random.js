@@ -23,7 +23,7 @@ async function setUsersOnline(users) {
   }
 }
 
-describe('Message - random filter', () => {
+describe('Message - random filter - @func3', () => {
   describe('(random.online.viewer) should exclude ignored user', () => {
     before(async () => {
       await db.cleanup();

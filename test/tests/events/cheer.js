@@ -16,7 +16,7 @@ const time = require('../../general.js').time;
 const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 
-describe('Events - cheer event', () => {
+describe('Events - cheer event - @func3', () => {
   before(async () => {
     await db.cleanup();
     await message.prepare();

@@ -10,7 +10,7 @@ const { prepare } = (require('../../../dest/helpers/commons/prepare'));
 // users
 const owner = { username: '__broadcaster__' };
 
-describe('Alias - toggleVisibility()', () => {
+describe('Alias - @func1 - toggleVisibility()', () => {
   beforeEach(async () => {
     await db.cleanup();
     await message.prepare();

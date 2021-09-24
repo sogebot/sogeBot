@@ -15,7 +15,7 @@ const { User } = require('../../../dest/database/entity/user');
 const owner = { userId: String(Math.floor(Math.random() * 100000)), badges: {}, username: '__broadcaster__' };
 const subscriber = { userId: String(Math.floor(Math.random() * 100000)), badges: { subscriber: 1 }, username: 'sub1'};
 
-describe('Cooldowns - toggleSubscribers()', () => {
+describe('Cooldowns - toggleSubscribers() - @func3', () => {
   beforeEach(async () => {
     await db.cleanup();
     await message.prepare();

@@ -9,7 +9,7 @@ const user = require('../../general.js').user;
 
 const seppuku = (require('../../../dest/games/seppuku')).default;
 
-describe('game/seppuku - !seppuku', () => {
+describe('game/seppuku - !seppuku - @func1', () => {
   before(async () => {
     await db.cleanup();
     await message.prepare();

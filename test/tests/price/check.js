@@ -56,7 +56,7 @@ const tests = [
   },
 ];
 
-describe('Price - check()', () => {
+describe('Price - check() - @func3', () => {
   beforeEach(async () => {
     await db.cleanup();
     await message.prepare();

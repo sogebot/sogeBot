@@ -16,7 +16,7 @@ const assert = require('assert');
 const owner = { username: '__broadcaster__' };
 const notOwner = { username: 'testuser' };
 
-describe('lib/commons - isOwner()', () => {
+describe('lib/commons - @func2 - isOwner()', () => {
   before(async () => {
     await db.cleanup();
     await message.prepare();

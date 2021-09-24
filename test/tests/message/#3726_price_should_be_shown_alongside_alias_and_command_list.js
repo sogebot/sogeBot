@@ -16,7 +16,7 @@ const owner = { username: '__broadcaster__', userId: String(Math.floor(Math.rand
 const { getRepository } = require('typeorm');
 const { Price } = require('../../../dest/database/entity/price');
 
-describe('Message - #3726 - price should be shown alongside alias and command list', () => {
+describe('Message - #3726 - price should be shown alongside alias and command list - @func3', () => {
   before(async () => {
     await db.cleanup();
     await message.prepare();

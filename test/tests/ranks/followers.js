@@ -26,7 +26,7 @@ const flwranks = [
   { months: 8, rank: 'Eight Follower' },
 ];
 
-describe('Ranks - followers', () => {
+describe('Ranks - followers - @func2', () => {
   before(async () => {
     await db.cleanup();
     await message.prepare();

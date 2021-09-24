@@ -16,7 +16,7 @@ const message = require('../../general.js').message;
 
 const owner = { username: '__broadcaster__', userId: String(_.random(999999, false)) };
 
-describe('/t/raffle-everyone-can-join-even-raffle-runned-for-subscribers/38', () => {
+describe('/t/raffle-everyone-can-join-even-raffle-runned-for-subscribers/38 - @func3', () => {
   before(async () => {
     await db.cleanup();
     await message.prepare();

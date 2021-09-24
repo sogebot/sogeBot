@@ -19,7 +19,7 @@ const message = require('../../general.js').message;
 const user1 = { username: 'user1', userId: String(_.random(999999, false)) };
 const command = '!gamble';
 
-describe('Gambling - gamble', () => {
+describe('Gambling - gamble - @func3', () => {
   beforeEach(async () => {
     const changelog = (require('../../../dest/helpers/user/changelog'));
     await changelog.flush();

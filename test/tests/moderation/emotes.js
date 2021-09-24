@@ -11,7 +11,7 @@ const message = require('../../general.js').message;
 const user = require('../../general.js').user;
 const time = require('../../general.js').time;
 
-describe('systems/moderation - Emotes()', () => {
+describe('systems/moderation - Emotes() - @func2', () => {
   const cEmotesEmojisAreEmotes = { message: '😀 😁 😂 🤣 😃 😄 😅 😆 😉 😊 😋 😎 😍 😘 😗 😙 😚 🙂 🤗 🤩 🤔 🤨 😐 😑 😶 🙄 😏 😣 😥 😮 🤐 😯 😪 😫 😴 😌 😛 😜 😝 🤤 😒 😓 😔 😕 🙃 🤑 😲 ☹️ 🙁 😖 😞 😟 😤 😢 😭 😦 😧 😨 😩 🤯 😬 😰 😱', sender: user.viewer };
 
   describe('cEmotesEmojisAreEmotes=false', async () => {

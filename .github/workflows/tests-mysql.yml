@@ -1,0 +1,187 @@
+name: MySQL/MariaDB tests
+
+on:
+  push:
+    branches:
+      - 'master'
+  pull_request:
+
+jobs:
+  migration:
+    name: MySQL/MariaDB tests - migration
+    runs-on: ubuntu-latest
+    steps:
+    - name: Shutdown Ubuntu MySQL (SUDO)
+      run: sudo service mysql stop # Shutdown the Default MySQL, "sudo" is necessary, please not remove it
+    - uses: mirromutth/mysql-action@v1.1
+      with:
+        host port: 3306 # Optional, default value is 3306. The port of host
+        container port: 3306 # Optional, default value is 3306. The port of container
+        character set server: 'utf8mb4' # Optional, default value is 'utf8mb4'. The '--character-set-server' option for mysqld
+        collation server: 'utf8mb4_general_ci' # Optional, default value is 'utf8mb4_general_ci'. The '--collation-server' option for mysqld
+        mysql version: '5.7' # Optional, default value is "latest". The version of the MySQL
+        mysql database: 'sogebot' # Optional, default value is "test". The specified database which will be create
+        mysql root password: 'Passw0rd' # Required if "mysql user" is empty, default is empty. The root superuser password
+    - uses: actions/checkout@master
+      with:
+        ref: ${{ github.event.pull_request.head.sha }}
+    - id: log
+      name: Load commit message for skip test check
+      run: echo ::set-output name=MESSAGE::$(git log --no-merges -1 --pretty=format:%s%b)
+    - name: install node v14
+      if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
+      uses: actions/setup-node@v2
+      with:
+        node-version: 14
+        check-latest: true
+    - name: Install latest npm
+      if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
+      run: |
+        npm install -g npm@latest
+    - name: Install all dependencies and build just a bot
+      if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
+      run: ENV=development make info clean dependencies bot
+    - name: Set proper db to use
+      if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
+      run: npm run test:config:mysql
+    - name: Run migration test
+      if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
+      run: npm run test:migration
+  postgres:
+    name: MySQL/MariaDB tests - part 1
+    runs-on: ubuntu-latest
+    steps:
+    - name: Shutdown Ubuntu MySQL (SUDO)
+      run: sudo service mysql stop # Shutdown the Default MySQL, "sudo" is necessary, please not remove it
+    - uses: mirromutth/mysql-action@v1.1
+      with:
+        host port: 3306 # Optional, default value is 3306. The port of host
+        container port: 3306 # Optional, default value is 3306. The port of container
+        character set server: 'utf8mb4' # Optional, default value is 'utf8mb4'. The '--character-set-server' option for mysqld
+        collation server: 'utf8mb4_general_ci' # Optional, default value is 'utf8mb4_general_ci'. The '--collation-server' option for mysqld
+        mysql version: '5.7' # Optional, default value is "latest". The version of the MySQL
+        mysql database: 'sogebot' # Optional, default value is "test". The specified database which will be create
+        mysql root password: 'Passw0rd' # Required if "mysql user" is empty, default is empty. The root superuser password
+    - uses: actions/checkout@master
+      with:
+        ref: ${{ github.event.pull_request.head.sha }}
+    - id: log
+      name: Load commit message for skip test check
+      run: echo ::set-output name=MESSAGE::$(git log --no-merges -1 --pretty=format:%s%b)
+    - name: install node v14
+      if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
+      uses: actions/setup-node@v2
+      with:
+        node-version: 14
+        check-latest: true
+    - name: Install latest npm
+      if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
+      run: |
+        npm install -g npm@latest
+    - name: Install all dependencies and build just a bot
+      if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
+      run: ENV=development make info clean dependencies bot
+    - name: Set proper db to use
+      if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
+      run: npm run test:config:mysql
+    - name: Run mocha
+      if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
+      run: TESTS=@func1 npm test
+    - uses: codecov/codecov-action@v1
+      if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }} # not required for public repos
+        name: codecov-postgres # optional
+        flags: postgres
+  postgres2:
+    name: MySQL/MariaDB tests - part 2
+    runs-on: ubuntu-latest
+    steps:
+    - name: Shutdown Ubuntu MySQL (SUDO)
+      run: sudo service mysql stop # Shutdown the Default MySQL, "sudo" is necessary, please not remove it
+    - uses: mirromutth/mysql-action@v1.1
+      with:
+        host port: 3306 # Optional, default value is 3306. The port of host
+        container port: 3306 # Optional, default value is 3306. The port of container
+        character set server: 'utf8mb4' # Optional, default value is 'utf8mb4'. The '--character-set-server' option for mysqld
+        collation server: 'utf8mb4_general_ci' # Optional, default value is 'utf8mb4_general_ci'. The '--collation-server' option for mysqld
+        mysql version: '5.7' # Optional, default value is "latest". The version of the MySQL
+        mysql database: 'sogebot' # Optional, default value is "test". The specified database which will be create
+        mysql root password: 'Passw0rd' # Required if "mysql user" is empty, default is empty. The root superuser password
+    - uses: actions/checkout@master
+      with:
+        ref: ${{ github.event.pull_request.head.sha }}
+    - id: log
+      name: Load commit message for skip test check
+      run: echo ::set-output name=MESSAGE::$(git log --no-merges -1 --pretty=format:%s%b)
+    - name: install node v14
+      if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
+      uses: actions/setup-node@v2
+      with:
+        node-version: 14
+        check-latest: true
+    - name: Install latest npm
+      if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
+      run: |
+        npm install -g npm@latest
+    - name: Install all dependencies and build just a bot
+      if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
+      run: ENV=development make info clean dependencies bot
+    - name: Set proper db to use
+      if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
+      run: npm run test:config:mysql
+    - name: Run mocha
+      if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
+      run: TESTS=@func2 npm test
+    - uses: codecov/codecov-action@v1
+      if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }} # not required for public repos
+        name: codecov-postgres # optional
+        flags: postgres
+  postgres3:
+    name: MySQL/MariaDB tests - part 3
+    runs-on: ubuntu-latest
+    steps:
+    - name: Shutdown Ubuntu MySQL (SUDO)
+      run: sudo service mysql stop # Shutdown the Default MySQL, "sudo" is necessary, please not remove it
+    - uses: mirromutth/mysql-action@v1.1
+      with:
+        host port: 3306 # Optional, default value is 3306. The port of host
+        container port: 3306 # Optional, default value is 3306. The port of container
+        character set server: 'utf8mb4' # Optional, default value is 'utf8mb4'. The '--character-set-server' option for mysqld
+        collation server: 'utf8mb4_general_ci' # Optional, default value is 'utf8mb4_general_ci'. The '--collation-server' option for mysqld
+        mysql version: '5.7' # Optional, default value is "latest". The version of the MySQL
+        mysql database: 'sogebot' # Optional, default value is "test". The specified database which will be create
+        mysql root password: 'Passw0rd' # Required if "mysql user" is empty, default is empty. The root superuser password
+    - uses: actions/checkout@master
+      with:
+        ref: ${{ github.event.pull_request.head.sha }}
+    - id: log
+      name: Load commit message for skip test check
+      run: echo ::set-output name=MESSAGE::$(git log --no-merges -1 --pretty=format:%s%b)
+    - name: install node v14
+      if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
+      uses: actions/setup-node@v2
+      with:
+        node-version: 14
+        check-latest: true
+    - name: Install latest npm
+      if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
+      run: |
+        npm install -g npm@latest
+    - name: Install all dependencies and build just a bot
+      if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
+      run: ENV=development make info clean dependencies bot
+    - name: Set proper db to use
+      if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
+      run: npm run test:config:mysql
+    - name: Run mocha
+      if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
+      run: TESTS=@func3 npm test
+    - uses: codecov/codecov-action@v1
+      if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }} # not required for public repos
+        name: codecov-postgres # optional
+        flags: postgres

@@ -9,7 +9,7 @@ const assert = require('assert');
 const customcommands = (require('../../../dest/systems/customcommands')).default;
 const Parser = require('../../../dest/parser').default;
 
-describe('Message - https://discordapp.com/channels/317348946144002050/619437014001123338/708371785157967873 - permission of command with (!#) should be ignored', () => {
+describe('Message - https://discordapp.com/channels/317348946144002050/619437014001123338/708371785157967873 - permission of command with (!#) should be ignored - @func3', () => {
   before(async () => {
     await db.cleanup();
     await message.prepare();
@@ -29,7 +29,7 @@ describe('Message - https://discordapp.com/channels/317348946144002050/619437014
   });
 });
 
-describe('Message - https://discordapp.com/channels/317348946144002050/619437014001123338/708371785157967873 - permission of command with (!!#) should be ignored', () => {
+describe('Message - https://discordapp.com/channels/317348946144002050/619437014001123338/708371785157967873 - permission of command with (!!#) should be ignored - @func3', () => {
   before(async () => {
     await db.cleanup();
     await message.prepare();

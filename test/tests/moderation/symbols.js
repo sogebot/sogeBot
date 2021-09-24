@@ -22,7 +22,7 @@ const tests = {
   ],
 };
 
-describe('systems/moderation - symbols()', () => {
+describe('systems/moderation - symbols() - @func3', () => {
   describe('moderationSymbols=false', async () => {
     before(async () => {
       await db.cleanup();

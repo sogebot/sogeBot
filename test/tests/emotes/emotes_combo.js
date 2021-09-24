@@ -11,7 +11,7 @@ const user = require('../../general.js').user;
 
 let emotes;
 
-describe('Emotes - combo', () => {
+describe('Emotes - combo - @func2', () => {
   describe('Emotes combo should send proper message after 3 emotes', () => {
     let comboLastBreak = 0;
     before(async () => {

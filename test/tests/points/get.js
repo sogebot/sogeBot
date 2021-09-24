@@ -19,7 +19,7 @@ const tinyPointsUser = {
   username: 'tinyuser', points: 100, userId: String(_.random(999999, false)),
 };
 
-describe('Points - get()', () => {
+describe('Points - get() - @func1', () => {
   before(async () => {
     await db.cleanup();
     await message.prepare();

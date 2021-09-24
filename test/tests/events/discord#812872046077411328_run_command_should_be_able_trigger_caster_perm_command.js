@@ -17,7 +17,7 @@ const message = require('../../general.js').message;
 const time = require('../../general.js').time;
 const user = require('../../general.js').user;
 
-describe('Events - event run command should be able to run caster command and alias - https://discord.com/channels/317348946144002050/317349069024395264/812872046077411328', () => {
+describe('Events - event run command should be able to run caster command and alias - https://discord.com/channels/317348946144002050/317349069024395264/812872046077411328 - @func3', () => {
   before(async () => {
     await db.cleanup();
     await message.prepare();

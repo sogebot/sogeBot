@@ -8,7 +8,7 @@ const message = require('../../general.js').message;
 const runScript = (require('../../../dest/helpers/customvariables/runScript')).runScript;
 const assert = require('assert');
 
-describe('Custom Variable - #3737 - Infinite script loop should not lock bot', () => {
+describe('Custom Variable - #3737 - Infinite script loop should not lock bot - @func1', () => {
   let result = '';
   before(async () => {
     await db.cleanup();

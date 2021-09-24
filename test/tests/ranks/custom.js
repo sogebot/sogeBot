@@ -9,7 +9,7 @@ const assert = require('assert');
 
 const ranks = (require('../../../dest/systems/ranks')).default;
 
-describe('Ranks - custom rank', () => {
+describe('Ranks - custom rank - @func2', () => {
   before(async () => {
     await db.cleanup();
     await message.prepare();

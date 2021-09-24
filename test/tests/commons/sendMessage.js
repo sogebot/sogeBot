@@ -11,7 +11,7 @@ const assert = require('assert');
 const { sendMessage } = require('../../../dest/helpers/commons/sendMessage');
 const { getOwnerAsSender } = require('../../../dest/helpers/commons/getOwnerAsSender');
 
-describe('lib/commons - sendMessage()', () => {
+describe('lib/commons - @func2 - sendMessage()', () => {
   describe('remove /me when in color mode', () => {
     before(async () => {
       await db.cleanup();

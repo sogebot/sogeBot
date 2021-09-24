@@ -21,7 +21,7 @@ _.set(global, 'widgets.custom_variables.io.emit', function () {
   return;
 });
 
-describe('Custom Variable - #3379 - Command reply should return correct reply', () => {
+describe('Custom Variable - #3379 - Command reply should return correct reply - @func1', () => {
   before(async () => {
     await db.cleanup();
     await message.prepare();

@@ -9,7 +9,7 @@ const user = require('../../general.js').user;
 const assert = require('assert');
 const userinfo = (require('../../../dest/systems/userinfo')).default;
 
-describe('Userinfo - stats()', () => {
+describe('Userinfo - stats() - @func3', () => {
   beforeEach(async () => {
     await db.cleanup();
     await message.prepare();

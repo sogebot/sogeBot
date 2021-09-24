@@ -12,7 +12,7 @@ const assert = require('assert');
 
 const owner = Object.freeze({ username: '__broadcaster__', badges: {}, userId: 12345 });
 
-describe('systems/moderation - permitLink()', () => {
+describe('systems/moderation - permitLink() - @func1', () => {
   before(async () => {
     await db.cleanup();
     await message.prepare();

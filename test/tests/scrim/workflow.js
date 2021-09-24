@@ -14,7 +14,7 @@ const owner = { username: '__broadcaster__' };
 let scrim;
 describe('Scrim - full workflow', () => {
   scrim = (require('../../../dest/systems/scrim')).default;
-  describe('cooldown only', () => {
+  describe('cooldown only - @func1', () => {
     before(async () => {
       await db.cleanup();
       await message.prepare();
@@ -94,7 +94,7 @@ describe('Scrim - full workflow', () => {
     });
   });
 
-  describe('without matches', () => {
+  describe('without matches - @func2', () => {
     before(async () => {
       await db.cleanup();
       await message.prepare();
@@ -174,7 +174,7 @@ describe('Scrim - full workflow', () => {
     });
   });
 
-  describe('with matches', () => {
+  describe('with matches - @func3', () => {
     before(async () => {
       await db.cleanup();
       await message.prepare();

@@ -33,7 +33,7 @@ const testUser2 = {
   userId: String(Math.floor(Math.random() * 100000)), username: 'test2', badges: {},
 };
 
-describe('Cooldowns - check()', () => {
+describe('Cooldowns - @func3 - check()', () => {
   describe('#1969 - commands with special chars should not threadlock check', () => {
     before(async () => {
       await db.cleanup();

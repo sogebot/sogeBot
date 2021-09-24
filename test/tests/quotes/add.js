@@ -30,7 +30,7 @@ const tests = [
   { sender: owner, parameters: ' -tags lorem ipsum, dolor sit -quote Lorem Ipsum Dolor', quote: 'Lorem Ipsum Dolor', tags: 'lorem ipsum, dolor sit', shouldFail: false },
 ];
 
-describe('Quotes - add()', () => {
+describe('Quotes - add() - @func3', () => {
   for (const test of tests) {
     describe(test.parameters, async () => {
       let id = null;

@@ -17,7 +17,7 @@ const isStreamOnline = (require('../../../dest/helpers/api/isStreamOnline')).isS
 
 const assert = require('assert');
 
-describe('Raffles - announce should contain delete info #4176', () => {
+describe('Raffles - announce should contain delete info #4176 - @func1', () => {
   before(async () => {
     await db.cleanup();
     await message.prepare();

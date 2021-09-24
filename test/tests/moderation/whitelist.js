@@ -170,7 +170,7 @@ const tests = {
   },
 };
 
-describe('systems/moderation - whitelist()', () => {
+describe('systems/moderation - whitelist() - @func1', () => {
   before(async () => {
     await db.cleanup();
     await message.prepare();

@@ -19,7 +19,7 @@ const customCommands = (require('../../../dest/systems/customcommands')).default
 const owner = { username: '__broadcaster__', userId: String(Math.floor(Math.random() * 100000)) };
 const user = { username: 'user', userId: String(Math.floor(Math.random() * 100000)) };
 
-describe('Alias - run()', () => {
+describe('Alias - @func1 - run()', () => {
   beforeEach(async () => {
     await db.cleanup();
     await message.prepare();

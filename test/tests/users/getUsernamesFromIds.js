@@ -18,7 +18,7 @@ const nightbot = { username: 'nightbot', userId: '4' };
 
 let translatedIds;
 
-describe('User - getUsernamesFromIds', () => {
+describe('User - getUsernamesFromIds - @func1', () => {
   before(async () => {
     await db.cleanup();
     await message.prepare();

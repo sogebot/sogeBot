@@ -22,7 +22,7 @@ const tests = [
   { user: user.mod },
 ];
 
-describe('game/roulette - !roulette', () => {
+describe('game/roulette - !roulette - @func3', () => {
   for (const test of tests) {
     describe(`${test.user.username} uses !roulette`, async () => {
       let r;

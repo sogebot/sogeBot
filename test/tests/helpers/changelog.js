@@ -9,7 +9,7 @@ const db = require('../../general.js').db;
 
 let changelog;
 let User;
-describe('User changelog tests', () => {
+describe('User changelog tests - @func1', () => {
   before(async () => {
     await db.cleanup();
     changelog = require('../../../dest/helpers/user/changelog');

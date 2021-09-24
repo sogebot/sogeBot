@@ -14,7 +14,7 @@ const { User } = require('../../../dest/database/entity/user');
 // users
 const owner = { userId: String(Math.floor(Math.random() * 100000)), username: '__broadcaster__', badges: {} };
 
-describe('Cooldowns - toggleOwners()', () => {
+describe('Cooldowns - toggleOwners() - @func3', () => {
   beforeEach(async () => {
     await db.cleanup();
     await message.prepare();

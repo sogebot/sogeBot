@@ -9,7 +9,7 @@ const message = require('../../general.js').message;
 // users
 const owner = { username: '__broadcaster__' };
 
-describe('Custom Commands - toggleVisibility()', () => {
+describe('Custom Commands - @func1 - toggleVisibility()', () => {
   beforeEach(async () => {
     await db.cleanup();
     await message.prepare();

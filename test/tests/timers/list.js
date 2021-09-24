@@ -15,7 +15,7 @@ const owner = { username: '__broadcaster__' };
 const { getRepository } = require('typeorm');
 const { Timer, TimerResponse } = require('../../../dest/database/entity/timer');
 
-describe('Timers - list()', () => {
+describe('Timers - list() - @func2', () => {
   beforeEach(async () => {
     await db.cleanup();
     await message.prepare();

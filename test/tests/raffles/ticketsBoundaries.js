@@ -21,7 +21,7 @@ const testuser2 = { username: 'testuser2', userId: String(_.random(999999, false
 const testuser3 = { username: 'testuser3', userId: String(_.random(999999, false)) };
 const testuser4 = { username: 'testuser4', userId: String(_.random(999999, false)) };
 
-describe('Raffles - user should be able to compete within boundaries of tickets', () => {
+describe('Raffles - user should be able to compete within boundaries of tickets - @func1', () => {
   before(async () => {
     await db.cleanup();
     await message.prepare();

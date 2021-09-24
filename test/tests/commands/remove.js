@@ -8,7 +8,7 @@ const user = require('../../general.js').user;
 
 const customcommands = (require('../../../dest/systems/customcommands')).default;
 
-describe('Custom Commands - remove()', () => {
+describe('Custom Commands - @func1 - remove()', () => {
   beforeEach(async () => {
     await db.cleanup();
     await message.prepare();

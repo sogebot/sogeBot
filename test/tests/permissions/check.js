@@ -70,7 +70,7 @@ const users = [
   },
 ];
 
-describe('Permissions - check()', () => {
+describe('Permissions - check() - @func1', () => {
   beforeEach(async () => {
     await db.cleanup();
     await message.prepare();
