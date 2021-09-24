@@ -40,7 +40,7 @@ function generateCommand(opts) {
   return [p, c, r].join(' ');
 }
 
-describe('Custom Commands - add()', () => {
+describe('Custom Commands - @func1 - add()', () => {
   beforeEach(async () => {
     await db.cleanup();
     await message.prepare();

@@ -6,7 +6,7 @@ require('../../general.js');
 const currency = (require('../../../dest/currency')).default;
 const assert = require('assert');
 
-describe('Currency - rates check', () => {
+describe('Currency - rates check - @func3', () => {
   const rates = {
     AUD: '16.065',
     BRL: '5.893',

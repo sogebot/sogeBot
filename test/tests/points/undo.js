@@ -17,7 +17,7 @@ const message = require('../../general.js').message;
 
 const user = { username: 'oneuser', userId: String(_.random(999999, false)) };
 
-describe('Points - undo()', () => {
+describe('Points - undo() - @func', () => {
   before(async () => {
     await db.cleanup();
     await message.prepare();

@@ -33,7 +33,7 @@ const tests = [
   { sender: owner, parameters: '-tag general', id: 1, tag: 'general', shouldFail: false, exist: false },
 ];
 
-describe('Quotes - main()', () => {
+describe('Quotes - main() - @func3', () => {
   for (const test of tests) {
     let id, r;
     describe(test.parameters, async () => {

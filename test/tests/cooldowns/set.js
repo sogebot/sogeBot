@@ -9,7 +9,7 @@ const assert = require('assert');
 // users
 const owner = { username: '__broadcaster__' };
 
-describe('Cooldowns - set()', () => {
+describe('Cooldowns - set() - @func3', () => {
   beforeEach(async () => {
     await db.cleanup();
     await message.prepare();

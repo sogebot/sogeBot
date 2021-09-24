@@ -51,7 +51,7 @@ function generateCommand(opts) {
   return [p, c, r, rid].join(' ');
 }
 
-describe('Custom Commands - edit()', () => {
+describe('Custom Commands - @func1 - edit()', () => {
   beforeEach(async () => {
     await db.cleanup();
     await message.prepare();

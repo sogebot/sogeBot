@@ -12,7 +12,7 @@ const permissions = (require('../../../dest/permissions')).default;
 // users
 const owner = { username: '__broadcaster__' };
 
-describe('Permissions - list()', () => {
+describe('Permissions - list() - @func3', () => {
   beforeEach(async () => {
     await db.cleanup();
     await message.prepare();

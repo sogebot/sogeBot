@@ -13,7 +13,7 @@ const { User } = require('../../../dest/database/entity/user');
 
 const customcommands = (require('../../../dest/systems/customcommands')).default;
 
-describe('Message - $touser filter', async () => {
+describe('Message - $touser filter - @func3', async () => {
   beforeEach(async () => {
     await db.cleanup();
     await message.prepare();

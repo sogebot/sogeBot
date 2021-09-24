@@ -5,7 +5,7 @@ require('../../general.js');
 const assert = require('assert');
 const songs = (require('../../../dest/systems/songs')).default;
 
-describe('Songs - getSongsIdsFromPlaylist()', () => {
+describe('Songs - getSongsIdsFromPlaylist() - @func1', () => {
   describe('Load songs ids', () => {
     let ids = [];
     it(`Load playlist video IDs`, async () => {

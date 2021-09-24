@@ -25,7 +25,7 @@ const commonUser2 = {
   badges: {}, username: 'user2', userId: String(_.random(999999, false)),
 };
 
-describe('Cooldowns - toggleFollowers()', () => {
+describe('Cooldowns - toggleFollowers() - @func3', () => {
   beforeEach(async () => {
     await db.cleanup();
     await message.prepare();

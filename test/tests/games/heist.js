@@ -16,7 +16,7 @@ const time = require('../../general.js').time;
 const command = '!bankheist';
 let heist;
 
-describe('Heist - !bankheist', () => {
+describe('Heist - !bankheist - @func2', () => {
   before(async () => {
     await db.cleanup();
     await user.prepare();

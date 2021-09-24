@@ -16,7 +16,7 @@ const raffles = (require('../../../dest/systems/raffles')).default;
 
 const assert = require('assert');
 
-describe('Raffles - allowOverTicketing', () => {
+describe('Raffles - allowOverTicketing - @func1', () => {
   describe('Disabled allowOverTicketing', () => {
     before(async () => {
       await db.cleanup();

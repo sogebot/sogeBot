@@ -13,7 +13,7 @@ const time = require('../../general.js').time;
 let stats;
 let onChangeTriggered = 0;
 
-describe('Persistent null', () => {
+describe('Persistent null - @func1', () => {
   before(async () => {
     await db.cleanup();
     const { persistent } =  require('../../../dest/helpers/core/persistent');

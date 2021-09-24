@@ -23,7 +23,7 @@ const botwithchangedname = { username: 'asdsadas', userId: String(24900234) };
 
 const { isIgnored } = require('../../../dest/helpers/user/isIgnored');
 
-describe('TMI - ignore', () => {
+describe('TMI - ignore - @func3', () => {
   before(async () => {
     await db.cleanup();
     await message.prepare();

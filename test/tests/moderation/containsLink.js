@@ -62,7 +62,7 @@ const tests = {
   ],
 };
 
-describe('systems/moderation - containsLink()', () => {
+describe('systems/moderation - containsLink() - @func3', () => {
   describe('moderationLinksClips=true & moderationLinksWithSpaces=true', async () => {
     before(async () => {
       await db.cleanup();

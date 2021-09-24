@@ -28,7 +28,7 @@ const tests = [
   { sender: owner, parameters: '-tag ipsum, dolor -id 99999', id: 99999, tags: 'ipsum, dolor', shouldFail: false, exist: false },
 ];
 
-describe('Quotes - set()', () => {
+describe('Quotes - set() - @func3', () => {
   for (const test of tests) {
     describe(test.parameters, async () => {
       before(async () => {

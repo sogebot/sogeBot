@@ -14,7 +14,7 @@ const owner = { username: '__broadcaster__', userId: String(Math.floor(Math.rand
 const { getRepository } = require('typeorm');
 const { User } = require('../../../dest/database/entity/user');
 
-describe('Parser - case sensitive commands', async () => {
+describe('Parser - case sensitive commands - @func2', async () => {
   const tests = [
     {
       test: '!me',

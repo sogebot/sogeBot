@@ -40,7 +40,7 @@ function generateCommand(opts) {
   return [p, a, c].join(' ');
 }
 
-describe('Alias - add()', () => {
+describe('Alias - @func1 - add()', () => {
   beforeEach(async () => {
     await db.cleanup();
     await message.prepare();

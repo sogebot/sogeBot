@@ -100,7 +100,7 @@ const successTests = [
 ];
 
 
-describe('Keywords - basic worflow (add, run, edit)', () => {
+describe('Keywords - basic worflow (add, run, edit) - @func2', () => {
   describe('Expected parsed fail', () => {
     before(async () => {
       await db.cleanup();

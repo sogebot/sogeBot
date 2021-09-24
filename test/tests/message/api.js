@@ -8,7 +8,7 @@ const Message = require('../../../dest/message').default;
 const db = require('../../general.js').db;
 const msg = require('../../general.js').message;
 
-describe('Message - api filter', () => {
+describe('Message - api filter - @func3', () => {
   beforeEach(async () => {
     await db.cleanup();
     await msg.prepare();

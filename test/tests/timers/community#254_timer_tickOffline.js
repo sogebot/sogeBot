@@ -15,7 +15,7 @@ const { Timer, TimerResponse } = require('../../../dest/database/entity/timer');
 
 const { linesParsed } = require('../../../dest/helpers/parser');
 
-describe('Timers - tickOffline should send response into chat when stream is off - https://community.sogebot.xyz/t/timers-offline-mode/254', () => {
+describe('Timers - tickOffline should send response into chat when stream is off - https://community.sogebot.xyz/t/timers-offline-mode/254 - @func2', () => {
   before(async () => {
     await db.cleanup();
     await message.prepare();

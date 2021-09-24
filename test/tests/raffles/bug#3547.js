@@ -15,7 +15,7 @@ const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 const user = require('../../general.js').user;
 
-describe('Raffles - over max limit points not adding to raffle #3547', () => {
+describe('Raffles - over max limit points not adding to raffle #3547 - @func3', () => {
   before(async () => {
     await db.cleanup();
     await message.prepare();

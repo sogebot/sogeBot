@@ -52,7 +52,7 @@ const getTimestamp = (idx) => {
   return Date.now() - (constants.DAY * 180);
 };
 
-describe('Message - (count|#) filter', async () => {
+describe('Message - (count|#) filter - @func3', async () => {
   beforeEach(async () => {
     await db.cleanup();
 

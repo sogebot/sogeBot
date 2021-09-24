@@ -119,7 +119,7 @@ const tests = {
   ],
 };
 
-describe('Bets - workflow()', () => {
+describe('Bets - @func3 - workflow()', () => {
   for (let [s, ta] of Object.entries(tests)) {
     s = s === 'true';
 

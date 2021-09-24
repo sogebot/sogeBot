@@ -16,7 +16,7 @@ const raffles = (require('../../../dest/systems/raffles')).default;
 const isStreamOnline = (require('../../../dest/helpers/api/isStreamOnline' )).isStreamOnline
 const assert = require('assert');
 
-describe('Raffles - announce should contain total entries #4175', () => {
+describe('Raffles - announce should contain total entries #4175 - @func3', () => {
   before(async () => {
     await db.cleanup();
     await message.prepare();

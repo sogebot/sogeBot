@@ -8,7 +8,7 @@ const message = require('../../general.js').message;
 const runScript = (require('../../../dest/helpers/customvariables/runScript')).runScript;
 const assert = require('assert');
 
-describe('Custom Variable - #3820 - For loop should work corectly', () => {
+describe('Custom Variable - #3820 - For loop should work corectly - @func1', () => {
   let result = '';
   before(async () => {
     await db.cleanup();

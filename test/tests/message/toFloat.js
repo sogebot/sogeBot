@@ -14,7 +14,7 @@ const tests = [
   { text: `(toFloat|2|0.43211123)`, expect: '0.43' },
 ];
 
-describe('Message - (toFloat|#) filter', async () => {
+describe('Message - (toFloat|#) filter - @func3', async () => {
   beforeEach(async () => {
     await db.cleanup();
   });

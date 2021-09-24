@@ -10,7 +10,7 @@ const { prepare } = (require('../../../dest/helpers/commons/prepare'));
 // users
 const owner = { username: '__broadcaster__' };
 
-describe('Alias - remove()', () => {
+describe('Alias - @func1 - remove()', () => {
   beforeEach(async () => {
     await db.cleanup();
     await message.prepare();

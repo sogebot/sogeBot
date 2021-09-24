@@ -15,7 +15,7 @@ const { Timer, TimerResponse } = require('../../../dest/database/entity/timer');
 
 const { linesParsed } = require('../../../dest/helpers/parser');
 
-describe('Timers - disabled response should not be sent to chat - https://discord.com/channels/317348946144002050/619437014001123338/794910249910796288', () => {
+describe('Timers - disabled response should not be sent to chat - https://discord.com/channels/317348946144002050/619437014001123338/794910249910796288 - @func2', () => {
   before(async () => {
     await db.cleanup();
     await message.prepare();

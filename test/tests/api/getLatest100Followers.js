@@ -16,7 +16,7 @@ const db = require('../../general.js').db;
 const time = require('../../general.js').time;
 const message = require('../../general.js').message;
 
-describe('API - getLatest100Followers()', () => {
+describe('API - @func2 - getLatest100Followers()', () => {
   before(async () => {
     await db.cleanup();
     await message.prepare();

@@ -14,7 +14,7 @@ const tests = [
   { text: `(toPercent|2|0.43211123)`, expect: '43.21' },
 ];
 
-describe('Message - (toPercent|#) filter', async () => {
+describe('Message - (toPercent|#) filter - @func3', async () => {
   beforeEach(async () => {
     await db.cleanup();
   });

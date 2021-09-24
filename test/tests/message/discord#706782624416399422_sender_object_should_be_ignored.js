@@ -18,7 +18,7 @@ const { linesParsed } = require('../../../dest/helpers/parser');
 // users
 const owner = { username: '__broadcaster__' };
 
-describe('Message - https://discordapp.com/channels/317348946144002050/619437014001123338/706782624416399422 - sender object should be owner on timers with (!#)', () => {
+describe('Message - https://discordapp.com/channels/317348946144002050/619437014001123338/706782624416399422 - sender object should be owner on timers with (!#) - @func3', () => {
   before(async () => {
     await db.cleanup();
     await message.prepare();

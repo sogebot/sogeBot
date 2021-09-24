@@ -34,7 +34,7 @@ const tests = {
   ],
 };
 
-describe('systems/moderation - Caps()', () => {
+describe('systems/moderation - Caps() - @func2', () => {
   describe('moderationCaps=false', async () => {
     before(async () => {
       await db.cleanup();

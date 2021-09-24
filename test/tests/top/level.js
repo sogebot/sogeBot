@@ -21,7 +21,7 @@ const owner = { username: '__broadcaster__' };
 
 let top, tmi;
 
-describe('Top - !top level', () => {
+describe('Top - !top level - @func1', () => {
   before(async () => {
     top = (require('../../../dest/systems/top')).default;
     tmi = (require('../../../dest/tmi')).default;

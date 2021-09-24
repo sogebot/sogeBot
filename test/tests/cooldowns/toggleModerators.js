@@ -15,7 +15,7 @@ const { User } = require('../../../dest/database/entity/user');
 const owner = { userId: String(Math.floor(Math.random() * 100000)), badges: {}, username: '__broadcaster__' };
 const mod = { userId: String(Math.floor(Math.random() * 100000)), badges: {}, username: 'mod' };
 
-describe('Cooldowns - toggleModerators()', () => {
+describe('Cooldowns - toggleModerators() - @func3', () => {
   beforeEach(async () => {
     await db.cleanup();
     await message.prepare();

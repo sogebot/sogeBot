@@ -16,7 +16,7 @@ const raffles = (require('../../../dest/systems/raffles')).default;
 
 const assert = require('assert');
 
-describe('Raffles - cumulativeTickets', () => {
+describe('Raffles - cumulativeTickets - @func1', () => {
   before(async () => {
     await db.cleanup();
     await message.prepare();

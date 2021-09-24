@@ -85,17 +85,34 @@ async function retest() {
 
 async function test() {
   await new Promise((resolve) => {
-    const p = child_process.spawn('npx', [
-      'nyc',
-      '--reporter=json',
-      '--clean=false',
-      'mocha',
-      '-r', 'source-map-support/register',
-      '--timeout', '120000',
-      '--exit',
-      '--recursive',
-      'test/',
-    ], { shell: true });
+    let p;
+    if (process.env.TESTS) {
+      p = child_process.spawn('npx', [
+        'nyc',
+        '--reporter=json',
+        '--clean=false',
+        'mocha',
+        '-r', 'source-map-support/register',
+        '--timeout', '120000',
+        '--grep="' + process.env.TESTS + '"',
+        '--exit',
+        '--recursive',
+        'test/',
+      ], { shell: true });
+    } else {
+      // run all default behavior
+      p = child_process.spawn('npx', [
+        'nyc',
+        '--reporter=json',
+        '--clean=false',
+        'mocha',
+        '-r', 'source-map-support/register',
+        '--timeout', '120000',
+        '--exit',
+        '--recursive',
+        'test/',
+      ], { shell: true });
+    }
 
     const report = fs.createWriteStream('report');
     p.stdout.on('data', (data) => {

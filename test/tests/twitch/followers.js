@@ -15,7 +15,7 @@ const user = require('../../general.js').user;
 
 require('../../general.js');
 
-describe('lib/twitch - followers()', () => {
+describe('lib/twitch - followers() - @func1', () => {
   before(async () => {
     await db.cleanup();
     await message.prepare();
@@ -25,7 +25,7 @@ describe('lib/twitch - followers()', () => {
   it('Set user.viewer, user.viewer2, user.viewer3 as followers', async () => {
     for (const u of [user.viewer, user.viewer2, user.viewer3]) {
       await getRepository(User).save({
-        userId: u.userId, username: u.username, isFollower: true, 
+        userId: u.userId, username: u.username, isFollower: true,
       });
     }
   });

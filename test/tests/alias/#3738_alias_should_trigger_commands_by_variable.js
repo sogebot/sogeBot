@@ -13,7 +13,7 @@ const { defaultPermissions } = require('../../../dest/helpers/permissions/');
 const { getRepository } = require('typeorm');
 const { Variable } = require('../../../dest/database/entity/variable');
 
-describe('Alias - #3738 - alias should trigger commands by variable', () => {
+describe('Alias - @func1 - #3738 - alias should trigger commands by variable', () => {
   before(async () => {
     await db.cleanup();
     await message.prepare();

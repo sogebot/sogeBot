@@ -18,7 +18,7 @@ require('../../general.js');
 // users
 const owner = { username: '__broadcaster__' };
 
-describe('Top - !top followage', () => {
+describe('Top - !top followage - @func2', () => {
   before(async () => {
     await db.cleanup();
     await message.prepare();

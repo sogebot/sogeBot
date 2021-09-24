@@ -22,7 +22,7 @@ const tests = {
   ],
 };
 
-describe('systems/moderation - Spam()', () => {
+describe('systems/moderation - Spam() - @func2', () => {
   describe('moderationSpam=false', async () => {
     before(async () => {
       await db.cleanup();

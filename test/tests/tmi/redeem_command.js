@@ -22,7 +22,7 @@ const assert = require('assert');
 
 const owner = { username: '__broadcaster__', userId: String(Math.floor(Math.random() * 10000)) };
 
-describe('TMI - redeem command', () => {
+describe('TMI - redeem command - @func3', () => {
   before(async () => {
     await db.cleanup();
     await time.waitMs(1000);

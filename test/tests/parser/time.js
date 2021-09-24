@@ -14,7 +14,7 @@ const owner = { username: '__broadcaster__', userId: String(Math.floor(Math.rand
 const { getRepository } = require('typeorm');
 const { User } = require('../../../dest/database/entity/user');
 
-describe('Parser - parse time check', async () => {
+describe('Parser - parse time check - @func2', async () => {
   const tests = [
     {
       test: '!me',

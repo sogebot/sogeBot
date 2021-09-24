@@ -16,7 +16,7 @@ const message = require('../../general.js').message;
 
 const owner = { username: '__broadcaster__', userId: String(Math.floor(Math.random() * 100000)) };
 
-describe('Message - list filter', () => {
+describe('Message - list filter - @func3', () => {
   before(async () => {
     await db.cleanup();
     await message.prepare();

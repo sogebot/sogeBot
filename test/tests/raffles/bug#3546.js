@@ -15,7 +15,7 @@ const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 const user = require('../../general.js').user;
 
-describe('Raffles - raffle with 1 point cannot over point #3546', () => {
+describe('Raffles - raffle with 1 point cannot over point #3546 - @func2', () => {
   before(async () => {
     await db.cleanup();
     await message.prepare();

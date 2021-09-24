@@ -14,7 +14,7 @@ const message = require('../../general.js').message;
 
 const user = { username: 'oneuser', userId: String(_.random(999999, false)) };
 
-describe('Points - set()', () => {
+describe('Points - set() - @func1', () => {
   before(async () => {
     await db.cleanup();
     await message.prepare();

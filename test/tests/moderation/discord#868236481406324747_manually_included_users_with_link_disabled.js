@@ -13,7 +13,7 @@ const variable = require('../../general.js').variable;
 const message = require('../../general.js').message;
 const user = require('../../general.js').user;
 
-describe('discord#868236481406324747 - Manually included users with link disabled should not be purged', () => {
+describe('discord#868236481406324747 - Manually included users with link disabled should not be purged - @func1', () => {
   after(async () => {
     await getConnection()
       .createQueryBuilder()

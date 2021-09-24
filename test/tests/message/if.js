@@ -6,7 +6,7 @@ const msg = require('../../general.js').message;
 const Message = require('../../../dest/message').default;
 const assert = require('assert');
 
-describe('Message - if filter', () => {
+describe('Message - if filter - @func3', () => {
   beforeEach(async () => {
     await db.cleanup();
     await msg.prepare();

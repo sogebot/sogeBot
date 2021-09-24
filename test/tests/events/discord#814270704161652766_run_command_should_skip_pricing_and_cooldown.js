@@ -20,7 +20,7 @@ const message = require('../../general.js').message;
 const time = require('../../general.js').time;
 const user = require('../../general.js').user;
 
-describe('Events - event run command should be able to skip pricing and cooldown - https://discord.com/channels/317348946144002050/619437014001123338/814270704161652766', () => {
+describe('Events - event run command should be able to skip pricing and cooldown - https://discord.com/channels/317348946144002050/619437014001123338/814270704161652766 - @func3', () => {
   before(async () => {
     await db.cleanup();
     await message.prepare();

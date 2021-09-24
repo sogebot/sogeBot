@@ -6,7 +6,7 @@ require('../../general.js');
 const assert = require('assert');
 const db = require('../../general.js').db;
 
-describe('SQLVariableLimit should have correct value', () => {
+describe('SQLVariableLimit should have correct value - @func1', () => {
   before(async () => {
     await db.cleanup();
   });

@@ -22,7 +22,7 @@ async function setUsersOnline(users) {
   }
 }
 
-describe('Points - online()', () => {
+describe('Points - online() - @func1', () => {
   before(async () => {
     await db.cleanup();
     await message.prepare();

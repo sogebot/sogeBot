@@ -15,7 +15,7 @@ const { Timer } = require('../../../dest/database/entity/timer');
 // users
 const owner = { username: '__broadcaster__' };
 
-describe('Timers - set()', () => {
+describe('Timers - set() - @func2', () => {
   beforeEach(async () => {
     await db.cleanup();
     await message.prepare();

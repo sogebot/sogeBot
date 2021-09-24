@@ -14,7 +14,7 @@ const message = require('../../general.js').message;
 const time = require('../../general.js').time;
 const user = require('../../general.js').user;
 
-describe('Events - follow event', () => {
+describe('Events - follow event - @func3', () => {
   before(async () => {
     await db.cleanup();
     await message.prepare();

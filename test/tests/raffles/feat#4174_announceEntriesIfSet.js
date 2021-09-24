@@ -17,7 +17,7 @@ const api = (require('../../../dest/api')).default;
 
 const assert = require('assert');
 
-describe('Raffles - announce entries if set #4174', () => {
+describe('Raffles - announce entries if set #4174 - @func2', () => {
   describe('ticket raffle', () => {
     before(async () => {
       await db.cleanup();

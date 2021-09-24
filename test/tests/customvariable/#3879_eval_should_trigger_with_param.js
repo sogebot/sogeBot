@@ -21,7 +21,7 @@ _.set(global, 'widgets.custom_variables.io.emit', function () {
   return;
 });
 
-describe('Custom Variable - #3879 - Eval should trigger with param with proper permissions', () => {
+describe('Custom Variable - #3879 - Eval should trigger with param with proper permissions - @func1', () => {
   before(async () => {
     await db.cleanup();
     await message.prepare();

@@ -10,7 +10,7 @@ const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 
 let songs;
-describe('Songs - addSongToQueue()', () => {
+describe('Songs - addSongToQueue() - @func1', () => {
   before(() => {
     songs = (require('../../../dest/systems/songs')).default;
   });

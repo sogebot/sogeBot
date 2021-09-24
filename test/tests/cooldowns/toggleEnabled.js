@@ -10,13 +10,13 @@ require('../../general.js');
 
 // users
 const owner = {
-  userId: String(Math.floor(Math.random() * 100000)), badges: {}, username: '__broadcaster__', 
+  userId: String(Math.floor(Math.random() * 100000)), badges: {}, username: '__broadcaster__',
 };
 const testUser = {
-  userId: String(Math.floor(Math.random() * 100000)), badges: {}, username: 'test', 
+  userId: String(Math.floor(Math.random() * 100000)), badges: {}, username: 'test',
 };
 
-describe('Cooldowns - toggleEnabled()', () => {
+describe('Cooldowns - toggleEnabled() - @func3', () => {
   beforeEach(async () => {
     await db.cleanup();
     await message.prepare();

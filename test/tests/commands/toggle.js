@@ -10,7 +10,7 @@ const message = require('../../general.js').message;
 // users
 const owner = { username: '__broadcaster__' };
 
-describe('Custom Commands - toggle()', () => {
+describe('Custom Commands - @func1 - toggle()', () => {
   beforeEach(async () => {
     await db.cleanup();
     await message.prepare();
