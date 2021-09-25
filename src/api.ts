@@ -12,6 +12,7 @@ import {
 } from 'typeorm';
 
 import Core from './_interface';
+import { BannedEventsInterface, BannedEventsTable } from './database/entity/bannedEvents';
 import { ThreadEvent } from './database/entity/threadEvent';
 import {
   TwitchClips, TwitchTag, TwitchTagLocalizationDescription, TwitchTagLocalizationName,
@@ -70,6 +71,7 @@ const intervals = new Map<string, {
 type SubscribersEndpoint = { data: { broadcaster_id: string; broadcaster_name: string; is_gift: boolean; tier: string; plan_name: string; user_id: string; user_name: string; }[], pagination: { cursor: string } };
 type FollowsEndpoint = { total: number; data: { from_id: string; from_name: string; to_id: string; toname: string; followed_at: string; }[], pagination: { cursor: string } };
 export type StreamEndpoint = { data: { id: string; user_id: string, user_name: string, game_id: string, type: 'live' | '', title: string , viewer_count: number, started_at: string, language: string; thumbnail_url: string; tag_ids: string[] }[], pagination: { cursor: string } };
+type getBannedEventsEndpoint = { data: BannedEventsInterface[], 'pagination': { 'cursor': string | null } };
 
 const updateFollowerState = async(users: (Readonly<Required<UserInterface>>)[], usersFromAPI: { from_name: string; from_id: string; followed_at: string }[], fullScale: boolean) => {
   if (!fullScale) {
@@ -151,6 +153,7 @@ class API extends Core {
     this.interval('checkClips', constants.MINUTE);
     this.interval('getAllStreamTags', constants.DAY);
     this.interval('getModerators', 10 * constants.MINUTE);
+    this.interval('getBannedEvents', 10 * constants.MINUTE);
 
     // free thread_event
     getManager()
@@ -886,6 +889,61 @@ class API extends Core {
       });
       return { state: false, opts };
     }
+    return { state: true, opts };
+  }
+
+  async getBannedEvents (opts: any) {
+    const cid = channelId.value;
+    const url = `https://api.twitch.tv/helix/moderation/banned/events?broadcaster_id=${cid}&first=100`;
+
+    if (!oauth.broadcasterCurrentScopes.includes('moderation:read')) {
+      if (!opts.isWarned) {
+        opts.isWarned = true;
+        warning('Missing Broadcaster oAuth scope moderation:read to read channel bans.');
+        addUIError({ name: 'OAUTH', message: 'Missing Broadcaster oAuth scope moderation:read to read channel bans.' });
+      }
+      return { state: false, opts };
+    }
+
+    const token = oauth.broadcasterAccessToken;
+    const needToWait = isNil(cid) || cid === '' || token === '';
+    const notEnoughAPICalls = calls.bot.remaining <= 30 && calls.bot.refresh > Date.now() / 1000;
+    if (needToWait || notEnoughAPICalls) {
+      return { state: false, opts };
+    }
+
+    let request;
+    try {
+      request = await axios.get(url, {
+        headers: {
+          'Authorization': 'Bearer ' + token,
+          'Client-ID':     oauth.botClientId,
+        },
+        timeout: 20000,
+      }) as AxiosResponse<getBannedEventsEndpoint>;
+
+      // save remaining api calls
+      setRateLimit('bot', request.headers);
+
+      ioServer?.emit('api.stats', {
+        method: 'GET', data: request.data, timestamp: Date.now(), call: 'getBannedEvents', api: 'helix', endpoint: url, code: request.status, remaining: calls.bot,
+      });
+
+      // save to db
+      for (const data of chunk(request.data.data, 50)) {
+        getRepository(BannedEventsTable).save(data as BannedEventsInterface[]);
+      }
+
+      debug('api.stream', 'API: ' + JSON.stringify(request.data));
+    } catch (e) {
+      if (e instanceof Error) {
+        error(`${url} - ${e.message}`);
+        ioServer?.emit('api.stats', {
+          method: 'GET', timestamp: Date.now(), call: 'getBannedEvents', api: 'helix', endpoint: url, code: 'n/a', data: e.stack, remaining: calls.bot,
+        });
+      }
+    }
+
     return { state: true, opts };
   }
 
