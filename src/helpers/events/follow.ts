@@ -1,6 +1,8 @@
 import { HOUR } from '@sogebot/ui-helpers/constants';
 import { dayjs } from '@sogebot/ui-helpers/dayjsHelper';
+import { getRepository } from 'typeorm';
 
+import { EventList } from '../../database/entity/eventList';
 import eventlist from '../../overlays/eventlist';
 import alerts from '../../registries/alerts';
 import tmi from '../../tmi';
@@ -28,6 +30,8 @@ export function follow(userId: string, username: string, followedAt: string | nu
     if (isInGlobalIgnoreList({ username, userId })) {
       // autoban + autoblock
       tmi.ban(username);
+      // remove from eventslit
+      getRepository(EventList).delete({ userId });
     }
     return;
   }
