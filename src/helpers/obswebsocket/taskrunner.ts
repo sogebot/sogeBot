@@ -3,18 +3,20 @@ import { createHash } from 'crypto';
 import type ObsWebSocket from 'obs-websocket-js';
 import safeEval from 'safe-eval';
 
+import { Events } from '../../database/entity/event.js';
 import { OBSWebsocketInterface, simpleModeTasks } from '../../database/entity/obswebsocket';
 import { setImmediateAwait } from '../setImmediateAwait';
 import { availableActions } from './actions';
 
 const runningTasks: string[] = [];
 
-const taskRunner = async (obs: ObsWebSocket, tasks: OBSWebsocketInterface['simpleModeTasks'] | string, hash?: string): Promise<void> => {
-  hash = hash ?? createHash('sha256').update(JSON.stringify(tasks)).digest('base64');
+const taskRunner = async (obs: ObsWebSocket, opts: { tasks: OBSWebsocketInterface['simpleModeTasks'] | string, hash?: string, attributes?: Events.Attributes }): Promise<void> => {
+  const hash = opts.hash ?? createHash('sha256').update(JSON.stringify(opts.tasks)).digest('base64');
+  const tasks = opts.tasks;
   if (runningTasks.includes(hash)) {
     // we need to have running only one
     await setImmediateAwait();
-    return taskRunner(obs, tasks, hash);
+    return taskRunner(obs, opts);
   }
 
   runningTasks.push(hash);
@@ -24,6 +26,7 @@ const taskRunner = async (obs: ObsWebSocket, tasks: OBSWebsocketInterface['simpl
       // advanced mode
       const toEval = `(async function evaluation () { ${tasks} })()`;
       await safeEval(toEval, {
+        event:  opts.attributes,
         obs,
         waitMs: (ms: number) => {
           return new Promise((resolve) => setTimeout(resolve, ms, null));
