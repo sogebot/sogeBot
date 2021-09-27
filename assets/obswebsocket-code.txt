@@ -6,6 +6,9 @@ Functions exposed to eval:
   (async) waitMs(miliseconds: number) - wait in script
   log(message: string) - log message in bot logs
 
+If triggered through event-listener, variable event is accessible
+  event - contains all attributes from event like event.username etc.
+
 Example:
   await obs.send('SetCurrentScene', {
     'scene-name': 'My Amazing Scene'

@@ -57,10 +57,20 @@ class OBSWebsocket extends Integration {
         variables:   [ 'sceneName' ],
         definitions: { linkFilter: '' },
         check:       this.eventIsProperlyFiltered,
-      },
-      );
+      });
+      events.supportedOperationsList.push({
+        id: 'run-obswebsocket-command', definitions: { taskId: '' }, fire: this.runObswebsocketCommand,
+      });
     }
   }
+
+  async runObswebsocketCommand(operation: Events.OperationDefinitions, attributes: Events.Attributes): Promise<void> {
+    const task = await getRepository(OBSWebsocketEntity).findOneOrFail({ id: String(operation.taskId) });
+
+    info(`OBSWEBSOCKETS: Task ${task.id} triggered by operation`);
+    await obsws.triggerTask(task.advancedMode ? task.advancedModeCode : task.simpleModeTasks, attributes);
+  }
+
   protected async eventIsProperlyFiltered(event: any, attributes: Events.Attributes): Promise<boolean> {
     const isDirect = attributes.isDirect;
     const isTriggeredByCorrectOverlay = (function triggeredByCorrectOverlayCheck () {
@@ -154,16 +164,16 @@ class OBSWebsocket extends Integration {
     });
   }
 
-  async triggerTask(tasks: OBSWebsocketInterface['simpleModeTasks'] | string) {
+  async triggerTask(tasks: OBSWebsocketInterface['simpleModeTasks'] | string, attributes?: Events.Attributes) {
     if (this.accessBy === 'direct') {
-      await taskRunner(obs, tasks);
+      await taskRunner(obs, { tasks, attributes });
     } else {
       await new Promise((resolve, reject) => {
         // we need to send on all sockets on /integrations/obswebsocket
         const sockets = ioServer?.of('/integrations/obswebsocket').sockets;
         if (sockets) {
           for (const socket of sockets.values()) {
-            socket.emit('integration::obswebsocket::trigger', tasks, () => resolve(true));
+            socket.emit('integration::obswebsocket::trigger', { tasks, attributes }, () => resolve(true));
           }
         }
         setTimeout(() => reject('Test timed out. Please check if your overlay is opened.'), 10000);
