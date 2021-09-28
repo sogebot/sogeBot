@@ -197,9 +197,12 @@ class EventSub extends Core {
     try {
       // check if domain is available in https mode
       await axios.get(`${this.useTunneling ? this.tunnelDomain : 'https://' + this.domain}/webhooks/callback`, { headers: { 'sogebot-test': 'true' } });
-    } catch (e: any) {
+    } catch (e) {
       if (!isErrorEventsShown) {
         warning(`EVENTSUB: Bot not responding correctly on ${this.useTunneling ? this.tunnelDomain : 'https://' + this.domain}/webhooks/callback, eventsub will not work.`);
+        if (e instanceof Error) {
+          warning(e.stack);
+        }
         isErrorEventsShown = true;
       }
       this.enabledSubscriptions = [];
