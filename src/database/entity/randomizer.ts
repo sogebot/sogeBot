@@ -14,7 +14,7 @@ export interface RandomizerInterface {
   shouldPlayTick: boolean;
   tickVolume: number;
   widgetOrder: number;
-  type: 'simple' | 'wheelOfFortune';
+  type: 'simple' | 'wheelOfFortune' | 'tape';
   position: {
     x: number; y: number; anchorX: 'left' | 'middle' | 'right'; anchorY: 'top' | 'middle' | 'bottom';
   };
