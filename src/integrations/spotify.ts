@@ -65,6 +65,10 @@ class Spotify extends Integration {
   queueWhenOffline = false;
   @settings()
   notify = false;
+  @settings()
+  allowApprovedArtistsOnly = false;
+  @settings()
+  approvedArtists = []; // uris or names
 
   @settings('customization')
   format = '$song - $artist';
@@ -664,6 +668,13 @@ class Spotify extends Integration {
         });
 
         const track = response.body;
+
+        if (this.allowApprovedArtistsOnly && this.approvedArtists.find((item) => {
+          return track.artists.find(artist => artist.name === item || artist.uri === item);
+        }) === undefined) {
+          return [{ response: prepare('integrations.spotify.cannot-request-song-from-unapproved-artist', { name: track.name, artist: track.artists[0].name }), ...opts }];
+        }
+
         if(await this.requestSongByAPI(track.uri)) {
           return [{
             response: prepare('integrations.spotify.song-requested', {
@@ -687,7 +698,13 @@ class Spotify extends Integration {
           throw new Error('Song not found');
         }
 
-        const track =  response.body.tracks.items[0]; //(response.body.tracks.items[0] as SpotifyTrack);
+        const track =  response.body.tracks.items[0];
+        if (this.allowApprovedArtistsOnly && this.approvedArtists.find((item) => {
+          return track.artists.find(artist => artist.name === item || artist.uri === item);
+        }) === undefined) {
+          return [{ response: prepare('integrations.spotify.cannot-request-song-from-unapproved-artist', { name: track.name, artist: track.artists[0].name }), ...opts }];
+        }
+
         if(await this.requestSongByAPI(track.uri)) {
           return [{ response: prepare('integrations.spotify.song-requested', { name: track.name, artist: track.artists[0].name }), ...opts }];
         } else {
