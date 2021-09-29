@@ -6,6 +6,7 @@
   "song-unbanned": "$sender, песня $name от $artist разбанена.",
   "song-not-found-in-banlist": "$sender, песня $uri не найдена в списке запретов.",
   "cannot-request-song-is-banned": "$sender, не может запросить забаненную песню $name от $artist.",
+  "cannot-request-song-from-unapproved-artist": "$sender, cannot request song from unapproved artist.",
   "no-songs-found-in-history": "$sender, в настоящее время нет песен в истории.",
   "return-one-song-from-history": "$sender, предыдущая песня $name от $artist.",
   "return-multiple-song-from-history": "$sender, $count предыдущих песен:",
