@@ -6,6 +6,11 @@
       "title": "Aktuellen Song abrufen, wenn der Stream offline ist",
       "help": "Es wird empfohlen, dies deaktiviert zu lassen, um API-Limitierungen zu vermeiden."
     },
+    "allowApprovedArtistsOnly": "Allow approved artists only",
+    "approvedArtists": {
+      "title": "Approved artists",
+      "help": "Name or SpotifyURI of artist, one item per line"
+    },
     "queueWhenOffline": {
       "title": "Stellt Songs in die Warteschlange, wenn der Stream offline ist.",
       "help": "Es wird empfohlen, diese Option zu deaktivieren, um Warteschlangen zu vermeiden, wenn Sie nur Musik hören."
