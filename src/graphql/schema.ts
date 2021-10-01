@@ -1,10 +1,10 @@
 import { buildSchemaSync }  from 'type-graphql';
 
 import { customAuthChecker } from './auth.js';
-import { AliasResolver } from './resolvers/aliasResolver.js';
+import * as resolvers from './resolvers';
 
 const schema = buildSchemaSync({
-  resolvers:   [AliasResolver],
+  resolvers:   Object.values(resolvers) as any,
   authChecker: customAuthChecker,
 });
 

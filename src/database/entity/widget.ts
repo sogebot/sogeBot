@@ -1,11 +1,26 @@
+import {
+  Field, ID, InputType, ObjectType, 
+} from 'type-graphql';
 import { EntitySchema } from 'typeorm';
 
 import { ColumnNumericTransformer } from './_transformer';
 
-export interface WidgetCustomInterface {
+@ObjectType()
+export class WidgetCustomInterface {
+  @Field(type => ID)
   id: string;
+  @Field()
   userId: string;
+  @Field()
   url: string;
+  @Field()
+  name: string;
+}
+@InputType()
+export class WidgetCustomInput {
+  @Field()
+  url: string;
+  @Field()
   name: string;
 }
 

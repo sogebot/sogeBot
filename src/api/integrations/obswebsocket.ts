@@ -1,4 +1,4 @@
-import OBSWebSocket from 'obs-websocket-js';
+/*import OBSWebSocket from 'obs-websocket-js';
 import {
   Body,
   Controller,
@@ -177,4 +177,4 @@ export class IntegrationOBSWebsocketController extends Controller {
     this.setStatus(404);
     return;
   }
-}
+}*/
