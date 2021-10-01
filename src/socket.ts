@@ -253,4 +253,4 @@ class Socket extends Core {
 
 _self = new Socket();
 export default _self;
-export { Socket };
+export { Socket, getPrivileges };

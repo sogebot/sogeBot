@@ -5,6 +5,7 @@ import path from 'path';
 
 import cors from 'cors';
 import express from 'express';
+import { graphqlHTTP } from 'express-graphql';
 import RateLimit from 'express-rate-limit';
 import gitCommitInfo from 'git-commit-info';
 import { JsonWebTokenError, TokenExpiredError } from 'jsonwebtoken';
@@ -24,6 +25,7 @@ import { Translation } from './database/entity/translation';
 import { TwitchTag, TwitchTagInterface } from './database/entity/twitch';
 import { User } from './database/entity/user';
 import { onStartup } from './decorators/on';
+import { schema } from './graphql/schema';
 import {
   chatMessagesAtStart, currentStreamTags, isStreamOnline, rawStatus, stats, streamStatusChangeSince,
 } from './helpers/api';
@@ -106,6 +108,12 @@ class Panel extends Core {
         (req as any).rawBody = buf;
       },
     }));
+
+    app?.use('/graphql', graphqlHTTP({
+      schema,
+      graphiql: true,
+    }));
+
     app?.use(express.urlencoded({ extended: true, limit: '500mb' }));
     app?.use(express.raw());
     app?.use('/frame-api-explorer', swaggerUi.serve, swaggerUi.setup({
