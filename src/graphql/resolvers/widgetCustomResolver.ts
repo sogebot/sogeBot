@@ -4,13 +4,15 @@ import {
 } from 'type-graphql';
 import { getRepository } from 'typeorm';
 
-import { WidgetCustomInput, WidgetCustomInterface } from '../../database/entity/widget';
+import {
+  WidgetCustom, WidgetCustomInput, WidgetCustomInterface, 
+} from '../../database/entity/widget';
 
 @Resolver()
 export class WidgetCustomResolver {
   @Query(returns => [WidgetCustomInterface])
   widgetCustomGet(@Ctx('user') user: JwtPayload) {
-    return getRepository(WidgetCustomInterface).find({
+    return getRepository(WidgetCustom).find({
       where: { userId: user.userId },
       order: { name: 'DESC' },
     });
@@ -23,7 +25,7 @@ export class WidgetCustomResolver {
       @Arg('data') data: WidgetCustomInput,
       @Ctx('user') user: JwtPayload,
   ): Promise<WidgetCustomInterface> {
-    return getRepository(WidgetCustomInterface).save({
+    return getRepository(WidgetCustom).save({
       id, ...data, userId: user.userId,
     });
   }
@@ -33,7 +35,7 @@ export class WidgetCustomResolver {
   async widgetCustomRemove(@Arg('id') id: string,
     @Ctx('user') user: JwtPayload,
   ) {
-    await getRepository(WidgetCustomInterface).delete({ id, userId: user.userId });
+    await getRepository(WidgetCustom).delete({ id, userId: user.userId });
     return true;
   }
 }
