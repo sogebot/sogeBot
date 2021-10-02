@@ -1,5 +1,5 @@
 import {
-  Field, ID, InputType, ObjectType, 
+  Field, ID, InputType, ObjectType,
 } from 'type-graphql';
 import { EntitySchema } from 'typeorm';
 
@@ -37,14 +37,23 @@ export const WidgetCustom = new EntitySchema<Readonly<Required<WidgetCustomInter
   },
 });
 
-export interface WidgetSocialInterface {
+@ObjectType()
+export class WidgetSocialInterface {
+  @Field(type => ID)
   id: string;
+  @Field()
   type: string;
+  @Field()
   hashtag: string;
+  @Field()
   text: string;
+  @Field()
   username: string;
+  @Field()
   displayname: string;
+  @Field()
   url: string;
+  @Field()
   timestamp: number;
 }
 
