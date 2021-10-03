@@ -13,7 +13,7 @@ export const menu: { category?: string; name: string; id: string; this: Module |
 export const menuPublic: { name: string; id: string }[] = [];
 
 menu.push({
-  category: 'main', name: 'dashboard', id: 'dashboard', this: null,
+  category: 'main', name: 'dashboard', id: '', this: null,
 });
 
 menu.push({
