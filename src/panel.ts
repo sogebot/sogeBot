@@ -290,7 +290,7 @@ class Panel extends Core {
       adminEndpoint('/', 'panel::resetStatsState', () => lastDataSent = null);
     }, 5000);
 
-    ioServer?.use(socketSystem.authorize);
+    ioServer?.use(socketSystem.authorize as any);
 
     ioServer?.on('connect', async (socket) => {
       socket.on('disconnect', () => {
