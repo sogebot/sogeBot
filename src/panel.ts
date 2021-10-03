@@ -6,7 +6,6 @@ import path from 'path';
 import cors from 'cors';
 import express from 'express';
 import { graphqlHTTP } from 'express-graphql';
-import { graphqlHTTP } from 'express-graphql';
 import RateLimit from 'express-rate-limit';
 import gitCommitInfo from 'git-commit-info';
 import jwt, { JsonWebTokenError, TokenExpiredError } from 'jsonwebtoken';
