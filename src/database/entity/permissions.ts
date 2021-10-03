@@ -1,23 +1,41 @@
+import {
+  Field, ID, ObjectType, 
+} from 'type-graphql';
 import { EntitySchema } from 'typeorm';
 
-export interface PermissionsInterface {
+@ObjectType()
+export class PermissionFiltersInterface {
+  @Field(type => ID)
   id?: string;
-  name: string;
-  order: number;
-  isCorePermission: boolean;
-  isWaterfallAllowed: boolean;
-  automation: 'none' | 'casters' | 'moderators' | 'subscribers' | 'viewers' | 'followers' | 'vip';
-  userIds: string[];
-  excludeUserIds: string[];
-  filters: PermissionFiltersInterface[];
+  @Field()
+  comparator: '<' | '>' | '==' | '<=' | '>=';
+  @Field()
+  type: 'level' | 'ranks' | 'points' | 'watched' | 'tips' | 'bits' | 'messages' | 'subtier' | 'subcumulativemonths' | 'substreakmonths' | 'followtime';
+  @Field()
+  value: string;
+  permission: PermissionsInterface;
 }
 
-export interface PermissionFiltersInterface {
+@ObjectType()
+export class PermissionsInterface {
+  @Field(type => ID)
   id?: string;
-  permission: PermissionsInterface;
-  comparator: '<' | '>' | '==' | '<=' | '>=';
-  type: 'level' | 'ranks' | 'points' | 'watched' | 'tips' | 'bits' | 'messages' | 'subtier' | 'subcumulativemonths' | 'substreakmonths' | 'followtime';
-  value: string;
+  @Field()
+  name: string;
+  @Field()
+  order: number;
+  @Field()
+  isCorePermission: boolean;
+  @Field()
+  isWaterfallAllowed: boolean;
+  @Field()
+  automation: 'none' | 'casters' | 'moderators' | 'subscribers' | 'viewers' | 'followers' | 'vip';
+  @Field(type => [String])
+  userIds: string[];
+  @Field(type => [String])
+  excludeUserIds: string[];
+  @Field(type => [PermissionFiltersInterface])
+  filters: PermissionFiltersInterface[];
 }
 
 export interface PermissionCommandsInterface {
