@@ -1,7 +1,37 @@
 import {
-  Field, ID, ObjectType, 
+  Field, ID, InputType, ObjectType,
 } from 'type-graphql';
 import { EntitySchema } from 'typeorm';
+
+@InputType()
+export class PermissionFiltersInput {
+  @Field()
+  comparator: '<' | '>' | '==' | '<=' | '>=';
+  @Field()
+  type: 'level' | 'ranks' | 'points' | 'watched' | 'tips' | 'bits' | 'messages' | 'subtier' | 'subcumulativemonths' | 'substreakmonths' | 'followtime';
+  @Field()
+  value: string;
+}
+
+@InputType()
+export class PermissionInput {
+  @Field({ nullable: true })
+  name?: string;
+  @Field({ nullable: true })
+  order?: number;
+  @Field({ nullable: true })
+  isCorePermission?: boolean;
+  @Field({ nullable: true })
+  isWaterfallAllowed?: boolean;
+  @Field({ nullable: true })
+  automation?: 'none' | 'casters' | 'moderators' | 'subscribers' | 'viewers' | 'followers' | 'vip';
+  @Field(type => [String], { nullable: true })
+  userIds?: string[];
+  @Field(type => [String], { nullable: true })
+  excludeUserIds?: string[];
+  @Field(type => [PermissionFiltersInput], { nullable: true })
+  filters?: PermissionFiltersInput[];
+}
 
 @ObjectType()
 export class PermissionFiltersInterface {
