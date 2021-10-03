@@ -1,7 +1,6 @@
 import { DAY } from '@sogebot/ui-helpers/constants';
 import axios from 'axios';
 import { NextFunction } from 'express';
-import { graphqlHTTP } from 'express-graphql';
 import jwt, { JsonWebTokenError } from 'jsonwebtoken';
 import { Socket as SocketIO } from 'socket.io';
 import { v4 as uuid } from 'uuid';
@@ -11,7 +10,6 @@ import {
   persistent, settings, ui,
 } from './decorators';
 import { onLoad } from './decorators/on';
-import { schema } from './graphql/schema';
 import { debug, error } from './helpers/log';
 import { app, ioServer } from './helpers/panel';
 import {
@@ -20,8 +18,6 @@ import {
 import { adminEndpoint, endpoints } from './helpers/socket';
 import * as changelog from './helpers/user/changelog.js';
 import { isModerator } from './helpers/user/isModerator';
-
-let _self: any = null;
 
 enum Authorized {
   inProgress,
@@ -118,28 +114,6 @@ class Socket extends Core {
         setTimeout(() => init(retry++), 100);
       } else {
         debug('ui', 'Socket oauth validate endpoint OK.');
-        app.use(
-          '/graphql',
-          function (req, _res, next) {
-            const token = req.headers.authorization as string | undefined;
-
-            try {
-              if (!token) {
-                throw new Error();
-              } else {
-                const data = jwt.verify(token.replace('Bearer', '').trim(), _self.JWTKey);
-                (req as any).user = data;
-              }
-            } catch {
-              (req as any).user = null;
-            }
-            next();
-          },
-          graphqlHTTP({
-            schema,
-            graphiql: true,
-          }),
-        );
 
         app.get('/socket/validate', async (req, res) => {
           const accessTokenHeader = req.headers['x-twitch-token'] as string | undefined;
@@ -276,6 +250,6 @@ class Socket extends Core {
   }
 }
 
-_self = new Socket();
+const _self = new Socket();
 export default _self;
 export { Socket, getPrivileges };

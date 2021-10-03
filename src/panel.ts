@@ -5,9 +5,11 @@ import path from 'path';
 
 import cors from 'cors';
 import express from 'express';
+import { graphqlHTTP } from 'express-graphql';
+import { graphqlHTTP } from 'express-graphql';
 import RateLimit from 'express-rate-limit';
 import gitCommitInfo from 'git-commit-info';
-import { JsonWebTokenError, TokenExpiredError } from 'jsonwebtoken';
+import jwt, { JsonWebTokenError, TokenExpiredError } from 'jsonwebtoken';
 import _, { isEqual } from 'lodash';
 import sanitize from 'sanitize-filename';
 import swaggerUi from 'swagger-ui-express';
@@ -24,6 +26,7 @@ import { Translation } from './database/entity/translation';
 import { TwitchTag, TwitchTagInterface } from './database/entity/twitch';
 import { User } from './database/entity/user';
 import { onStartup } from './decorators/on';
+import { schema } from './graphql/schema';
 import {
   chatMessagesAtStart, currentStreamTags, isStreamOnline, rawStatus, stats, streamStatusChangeSince,
 } from './helpers/api';
@@ -157,6 +160,29 @@ class Panel extends Core {
         res.status(503).send('Not OK');
       }
     });
+
+    app?.use(
+      '/graphql',
+      function (req, _res, next) {
+        const token = req.headers.authorization as string | undefined;
+
+        try {
+          if (!token) {
+            throw new Error();
+          } else {
+            const data = jwt.verify(token.replace('Bearer', '').trim(), socketSystem.JWTKey);
+            (req as any).user = data;
+          }
+        } catch {
+          (req as any).user = null;
+        }
+        next();
+      },
+      graphqlHTTP({
+        schema,
+        graphiql: true,
+      }),
+    );
 
     // customvariables system
     app?.get('/customvariables/:id', (req, res) => {
