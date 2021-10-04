@@ -1,8 +1,6 @@
 import {
   Body,
   Controller,
-  Delete,
-  Get,
   Path,
   Post,
   Request,
@@ -16,7 +14,6 @@ import { getRepository } from 'typeorm';
 
 import { parserReply } from '../commons';
 import { QuickAction, QuickActions } from '../database/entity/dashboard';
-import { Variable , VariableInterface } from '../database/entity/variable';
 import { getUserSender } from '../helpers/commons';
 import { setValueOf } from '../helpers/customvariables/setValueOf';
 import { info } from '../helpers/log';
@@ -25,47 +22,6 @@ import { info } from '../helpers/log';
 @Tags('Quick Actions')
 @Security('bearerAuth', [])
 export class QuickActionController extends Controller {
-  /**
-  * Retrieves the quick actions of an authenticated user.
-  */
-  @Response('401', 'Unauthorized')
-  @Get()
-  public async get(@Request() req: any): Promise<{ data: QuickActions.Item[], paging: null}> {
-    const userId = req.user.userId as string;
-    const actions = await getRepository(QuickAction).find({ where: { userId } });
-    return {
-      data:   actions,
-      paging: null,
-    };
-  }
-  @Response('401', 'Unauthorized')
-  @Get('/{id}')
-  public async getOne(@Request() req: any, @Path() id: string): Promise<{ data: QuickActions.Item | null, paging: null, customvariable?: VariableInterface | null}> {
-    const userId = req.user.userId as string;
-    let customvariable = null;
-
-    try {
-      const action = await getRepository(QuickAction).findOneOrFail({ where: { userId, id } });
-      if (action.type === 'customvariable') {
-        customvariable = await getRepository(Variable).findOne({ where: { variableName: action.options.customvariable } });
-        if (!customvariable) {
-          setValueOf(action.options.customvariable, '', {});
-        }
-        customvariable = await getRepository(Variable).findOne({ where: { variableName: action.options.customvariable } });
-      }
-      return {
-        data:   action,
-        customvariable,
-        paging: null,
-      };
-    } catch {
-      this.setStatus(404);
-      return {
-        data:   null,
-        paging: null,
-      };
-    }
-  }
   @SuccessResponse('201', 'Created')
   @Response('401', 'Unauthorized')
   @Post()
@@ -99,23 +55,6 @@ export class QuickActionController extends Controller {
     } catch (e: any) {
       this.setStatus(404);
     }
-    return;
-  }
-  @SuccessResponse('404', 'Not Found')
-  @Delete('/{id}')
-  public async delete(@Request() req: any, @Path() id: string): Promise<void> {
-    const userId = req.user.userId as string;
-    const item = await getRepository(QuickAction).findOne({ id, userId: String(userId) });
-    if (item) {
-      await getRepository(QuickAction).remove(item);
-
-      // reorder
-      const items = await getRepository(QuickAction).find({ where: { userId }, order: { order: 'ASC' } });
-      for (let i = 0; i < items.length; i++) {
-        await getRepository(QuickAction).save({ ...items[i], order: i });
-      }
-    }
-    this.setStatus(404);
     return;
   }
 }

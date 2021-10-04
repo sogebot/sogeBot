@@ -2,7 +2,7 @@ import { EntitySchema } from 'typeorm';
 
 import { ColumnNumericTransformer } from './_transformer';
 
-export interface VariableInterface {
+export class VariableInterface {
   id?: string;
   history?: VariableHistoryInterface[];
   urls?: VariableURLInterface[];

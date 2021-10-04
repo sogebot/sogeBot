@@ -1,6 +1,6 @@
 import { JwtPayload } from 'jsonwebtoken';
 import {
-  Arg, Authorized, Ctx, Query, Resolver,
+  Arg, Authorized, Ctx, Mutation, Query, Resolver,
 } from 'type-graphql';
 import { getRepository } from 'typeorm';
 
@@ -16,5 +16,12 @@ export class QuickActionResolver {
     } else {
       return getRepository(QuickAction).find({ where: { userId: user.userId } });
     }
+  }
+
+  @Authorized()
+  @Mutation(returns => Boolean)
+  async quickActionDelete(@Arg('id') id: string) {
+    await getRepository(QuickAction).delete(id);
+    return true;
   }
 }
