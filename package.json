@@ -22,7 +22,7 @@
     "@sogebot/ui-admin": "^22.0.0",
     "@sogebot/ui-helpers": "^2.7.2",
     "@sogebot/ui-oauth": "~1.2.1",
-    "@sogebot/ui-overlay": "^8.0.1",
+    "@sogebot/ui-overlay": "^8.1.1",
     "@sogebot/ui-public": "^2.0.0",
     "axios": "0.21.4",
     "basic-auth": "2.0.1",
