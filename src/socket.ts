@@ -137,7 +137,7 @@ class Socket extends Core {
             });
 
             const accessToken = jwt.sign({
-              userId:     Number(userId),
+              userId,
               username,
               privileges: await getPrivileges(haveCasterPermission ? 'admin' : 'viewer', userId),
             }, this.JWTKey, { expiresIn: `${this.accessTokenExpirationTime}s` });

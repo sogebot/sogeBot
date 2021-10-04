@@ -1,5 +1,6 @@
 export * from './aliasResolver';
 export * from './bannedEventsResolver';
+export * from './customVariableResolver';
 export * from './menuResolver';
 export * from './permissionResolver';
 export * from './quickActionsResolver.js';
