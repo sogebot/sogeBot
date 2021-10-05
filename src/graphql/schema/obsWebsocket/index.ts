@@ -6,3 +6,5 @@ export * from './setVolume';
 export * from './taskLog';
 export * from './waitMs';
 export * from './scene';
+export * from './source';
+export * from './type';

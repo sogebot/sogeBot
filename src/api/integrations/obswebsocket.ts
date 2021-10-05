@@ -27,64 +27,6 @@ import { ioServer } from '../../helpers/panel';
 @Route('/api/v1/integration/obswebsocket')
 @Tags('Integrations / OBSWebsocket')
 export class IntegrationOBSWebsocketController extends Controller {
-  @Response('401', 'Unauthorized')
-  @Security('bearerAuth', [])
-  @Post('/trigger')
-  public async triggerTask(@Body() tasks: any): Promise<void> {
-    const integration = (await import('../../integrations/obswebsocket')).default;
-    try {
-      await integration.triggerTask(tasks);
-      this.setStatus(201);
-    } catch (e: any) {
-      this.setStatus(400);
-      error(e);
-    }
-    return;
-  }
-  @Get('/sources')
-  @Security('bearerAuth', [])
-  public async getSources(): Promise<{ data: { sources: Source[], types: Type[] } }> {
-    const integration = (await import('../../integrations/obswebsocket')).default;
-    try {
-      const availableSources = integration.accessBy === 'direct'
-        ? await getSourcesList(obs)
-        : new Promise((resolve: (value: Source[]) => void) => {
-          const resolveSources = (sources: Source[]) => {
-            resolve(sources);
-          };
-
-          // we need to send on all sockets on /integrations/obswebsocket
-          const sockets = ioServer?.of('/integrations/obswebsocket').sockets;
-          if (sockets) {
-            for (const socket of sockets.values()) {
-              socket.emit('integration::obswebsocket::function', 'getSourcesList', resolveSources);
-            }
-          }
-          setTimeout(() => resolve([]), 10000);
-        });
-
-      const availableTypes = integration.accessBy === 'direct'
-        ? await getSourceTypesList(obs)
-        : new Promise((resolve: (value: Type[]) => void) => {
-          const resolveTypes = (type: Type[]) => {
-            resolve(type);
-          };
-
-          // we need to send on all sockets on /integrations/obswebsocket
-          const sockets = ioServer?.of('/integrations/obswebsocket').sockets;
-          if (sockets) {
-            for (const socket of sockets.values()) {
-              socket.emit('integration::obswebsocket::function', 'getTypesList', resolveTypes);
-            }
-          }
-          setTimeout(() => resolve([]), 10000);
-        });
-      return { data: { sources: await availableSources, types: await availableTypes } };
-    } catch (e: any) {
-      return { data: { sources: [], types: [] } };
-    }
-  }
-
   @SuccessResponse('201', 'Created')
   @Response('401', 'Unauthorized')
   @Security('bearerAuth', [])

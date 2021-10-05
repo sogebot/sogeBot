@@ -19,17 +19,19 @@ const getSourcesList = (obs: OBSWebSocket) => {
   });
 };
 
+type TypeCaps = {
+  canInteract: boolean,
+  doNotDuplicate: boolean,
+  doNotSelfMonitor: boolean,
+  hasAudio: boolean,
+  hasVideo: boolean,
+  isAsync: boolean,
+  isComposite: boolean,
+  isDeprecated: boolean,
+};
+
 type Type = {
-  caps: {
-    canInteract: boolean,
-    doNotDuplicate: boolean,
-    doNotSelfMonitor: boolean,
-    hasAudio: boolean,
-    hasVideo: boolean,
-    isAsync: boolean,
-    isComposite: boolean,
-    isDeprecated: boolean,
-  },
+  caps: TypeCaps,
   displayName: string,
   type: string,
   typeId: string,
@@ -47,5 +49,5 @@ const getSourceTypesList = (obs: OBSWebSocket) => {
 };
 
 export {
-  getSourcesList, getSourceTypesList, Type, Source,
+  getSourcesList, getSourceTypesList, Type, Source, TypeCaps,
 };

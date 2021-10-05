@@ -8,9 +8,11 @@ import {
 } from '../../database/entity/obswebsocket';
 import { obs } from '../../helpers/obswebsocket/client.js';
 import { listScenes } from '../../helpers/obswebsocket/scenes.js';
+import { getSourcesList, getSourceTypesList } from '../../helpers/obswebsocket/sources.js';
 import { ioServer } from '../../helpers/panel.js';
 import {
-  Recording, ReplayBuffer, Scene, SetCurrentScene, SetMute, SetVolume, TaskLog, WaitMS,
+  Recording, ReplayBuffer, Scene, SetCurrentScene,
+  SetMute, SetVolume, Source, TaskLog, Type, WaitMS,
 } from '../schema/obsWebsocket';
 
 export const OBSWebsocketUnion = createUnionType({
@@ -91,6 +93,68 @@ export class OBSWebsocketResolver {
           setTimeout(() => resolve([]), 10000);
         });
       return availableScenes;
+    } catch (e: any) {
+      return [];
+    }
+  }
+
+  @Authorized()
+  @Mutation(returns => Boolean)
+  async OBSWebsocketTrigger(@Arg('tasks') tasks: string) {
+    const integration = (await import('../../integrations/obswebsocket')).default;
+    await integration.triggerTask(JSON.parse(tasks));
+    return true;
+  }
+
+  @Authorized()
+  @Query(returns => [Source])
+  async OBSWebsocketGetSources() {
+    const integration = (await import('../../integrations/obswebsocket')).default;
+    try {
+      const availableSources = integration.accessBy === 'direct'
+        ? await getSourcesList(obs)
+        : new Promise((resolve: (value: Source[]) => void) => {
+          const resolveSources = (sources: Source[]) => {
+            resolve(sources);
+          };
+
+          // we need to send on all sockets on /integrations/obswebsocket
+          const sockets = ioServer?.of('/integrations/obswebsocket').sockets;
+          if (sockets) {
+            for (const socket of sockets.values()) {
+              socket.emit('integration::obswebsocket::function', 'getSourcesList', resolveSources);
+            }
+          }
+          setTimeout(() => resolve([]), 10000);
+        });
+      return availableSources;
+    } catch (e: any) {
+      return [];
+    }
+  }
+
+  @Authorized()
+  @Query(returns => [Type])
+  async OBSWebsocketGetSourceTypes() {
+    const integration = (await import('../../integrations/obswebsocket')).default;
+    try {
+      const availableTypes = integration.accessBy === 'direct'
+        ? await getSourceTypesList(obs)
+        : new Promise((resolve: (value: Type[]) => void) => {
+          const resolveTypes = (type: Type[]) => {
+            resolve(type);
+          };
+
+          // we need to send on all sockets on /integrations/obswebsocket
+          const sockets = ioServer?.of('/integrations/obswebsocket').sockets;
+          if (sockets) {
+            for (const socket of sockets.values()) {
+              socket.emit('integration::obswebsocket::function', 'getTypesList', resolveTypes);
+            }
+          }
+          setTimeout(() => resolve([]), 10000);
+        });
+      return availableTypes;
     } catch (e: any) {
       return [];
     }
