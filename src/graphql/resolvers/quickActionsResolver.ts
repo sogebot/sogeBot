@@ -6,7 +6,7 @@ import { getRepository } from 'typeorm';
 
 import { parserReply } from '../../commons';
 import {
-  QuickAction, QuickActions, SearchResultUnion,
+  QuickAction, QuickActionInput, QuickActions, SearchResultUnion,
 } from '../../database/entity/dashboard';
 import { getUserSender } from '../../helpers/commons';
 import { setValueOf } from '../../helpers/customvariables/setValueOf';
@@ -25,10 +25,30 @@ export class QuickActionResolver {
   }
 
   @Authorized()
-  @Mutation(returns => Boolean)
-  async quickActionSave(@Arg('id') id: string) {
-    await getRepository(QuickAction).delete(id);
-    return true;
+  @Mutation(returns => [SearchResultUnion])
+  async quickActionSave(
+  @Ctx('user') user: JwtPayload,
+    @Arg('data', type => QuickActionInput) data: QuickActionInput,
+  ) {
+    const userId = user.userId;
+
+    if (!data) {
+      return;
+    }
+
+    const items: Readonly<Required<QuickActions.Item>>[] = [];
+    for(const key of Object.keys(data)) {
+      if ((data as any)[key]) {
+        for (const item of (data as any)[key]) {
+          // get data
+          if (item.order === -1) {
+            item.order = await getRepository(QuickAction).count({ userId });
+          }
+          items.push(await getRepository(QuickAction).save({ ...item, userId }));
+        }
+      }
+    }
+    return items;
   }
 
   @Authorized()

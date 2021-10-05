@@ -1,5 +1,5 @@
 import {
-  createUnionType, Field, ID, ObjectType,
+  createUnionType, Field, ID, InputType, ObjectType,
 } from 'type-graphql';
 import { EntitySchema } from 'typeorm';
 
@@ -30,6 +30,7 @@ export const SearchResultUnion = createUnionType({
   },
 });
 @ObjectType()
+@InputType('QuickActionsDefaultAttributesInput')
 class QuickActionsDefaultAttributes {
   @Field(type => ID)
   id: string;
@@ -40,6 +41,7 @@ class QuickActionsDefaultAttributes {
 }
 
 @ObjectType()
+@InputType('QuickActionsDefaultOptionsInput')
 class QuickActionsDefaultOptions {
   @Field()
   label: string;
@@ -48,11 +50,13 @@ class QuickActionsDefaultOptions {
 }
 
 @ObjectType()
+@InputType('CommandItemOptionsInput')
 class CommandItemOptions extends QuickActionsDefaultOptions {
   @Field()
   command: string;
 }
 @ObjectType()
+@InputType('CommandItemInput')
 export class CommandItem extends QuickActionsDefaultAttributes {
   @Field()
   type: 'command';
@@ -61,11 +65,13 @@ export class CommandItem extends QuickActionsDefaultAttributes {
 }
 
 @ObjectType()
+@InputType('CustomVariableItemOptionsInput')
 class CustomVariableItemOptions extends QuickActionsDefaultOptions {
   @Field()
   customvariable: string;
 }
 @ObjectType()
+@InputType('CustomVariableItemInput')
 export class CustomVariableItem extends QuickActionsDefaultAttributes {
   @Field()
   type: 'customvariable';
@@ -74,11 +80,13 @@ export class CustomVariableItem extends QuickActionsDefaultAttributes {
 }
 
 @ObjectType()
+@InputType('RandomizerItemOptionsInput')
 class RandomizerItemOptions extends QuickActionsDefaultOptions {
   @Field()
   randomizerId: string;
 }
 @ObjectType()
+@InputType('RandomizerItemInput')
 export class RandomizerItem extends QuickActionsDefaultAttributes {
   @Field()
   type: 'randomizer';
@@ -87,11 +95,13 @@ export class RandomizerItem extends QuickActionsDefaultAttributes {
 }
 
 @ObjectType()
+@InputType('OverlayCountdownItemOptionsInput')
 class OverlayCountdownItemOptions extends QuickActionsDefaultOptions {
   @Field()
   countdownId: string;
 }
 @ObjectType()
+@InputType('OverlayCountdownItemInput')
 export class OverlayCountdownItem extends QuickActionsDefaultAttributes {
   @Field()
   type: 'overlayCountdown';
@@ -100,11 +110,13 @@ export class OverlayCountdownItem extends QuickActionsDefaultAttributes {
 }
 
 @ObjectType()
+@InputType('OverlayMarathonItemOptionsInput')
 class OverlayMarathonItemOptions extends QuickActionsDefaultOptions {
   @Field()
   marathonId: string;
 }
 @ObjectType()
+@InputType('OverlayMarathonItemInput')
 export class OverlayMarathonItem extends QuickActionsDefaultAttributes {
   @Field()
   type: 'overlayMarathon';
@@ -113,16 +125,34 @@ export class OverlayMarathonItem extends QuickActionsDefaultAttributes {
 }
 
 @ObjectType()
+@InputType('OverlayStopwatchItemOptionsInput')
 class OverlayStopwatchItemOptions extends QuickActionsDefaultOptions {
   @Field()
   stopwatchId: string;
 }
 @ObjectType()
+@InputType('OverlayStopwatchItemInput')
 export class OverlayStopwatchItem extends QuickActionsDefaultAttributes {
   @Field()
   type: 'overlayStopwatch';
   @Field()
   options: OverlayStopwatchItemOptions;
+}
+
+@InputType()
+export class QuickActionInput {
+  @Field(type => [CommandItem],{ nullable: true })
+  command?: CommandItem[];
+  @Field(type => [CustomVariableItem],{ nullable: true })
+  customvariable?: CustomVariableItem[];
+  @Field(type => [RandomizerItem],{ nullable: true })
+  randomizer?: RandomizerItem[];
+  @Field(type => [OverlayCountdownItem],{ nullable: true })
+  overlayCountdown?: OverlayCountdownItem[];
+  @Field(type => [OverlayMarathonItem],{ nullable: true })
+  overlayMarathon?: OverlayMarathonItem[];
+  @Field(type => [OverlayStopwatchItem],{ nullable: true })
+  overlayStopwatch?: OverlayStopwatchItem[];
 }
 
 export declare namespace QuickActions {
