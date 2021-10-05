@@ -27,14 +27,6 @@ import { ioServer } from '../../helpers/panel';
 @Route('/api/v1/integration/obswebsocket')
 @Tags('Integrations / OBSWebsocket')
 export class IntegrationOBSWebsocketController extends Controller {
-  @Get()
-  public async getAll(): Promise<{ data: OBSWebsocketInterface[], paging: null}> {
-    const items = await getRepository(OBSWebsocketEntity).find();
-    return {
-      data:   items,
-      paging: null,
-    };
-  }
   @Response('401', 'Unauthorized')
   @Security('bearerAuth', [])
   @Post('/trigger')
@@ -48,38 +40,6 @@ export class IntegrationOBSWebsocketController extends Controller {
       error(e);
     }
     return;
-  }
-  @Get('/command')
-  @Security('bearerAuth', [])
-  public async getCommand(): Promise<string> {
-    const integration = (await import('../../integrations/obswebsocket')).default;
-    return integration.getCommand('!obsws run');
-  }
-  @Get('/listScene')
-  @Security('bearerAuth', [])
-  public async getScene(): Promise<{ data: OBSWebSocket.Scene[] }> {
-    const integration = (await import('../../integrations/obswebsocket')).default;
-    try {
-      const availableScenes = integration.accessBy === 'direct'
-        ? await listScenes(obs)
-        : new Promise((resolve: (value: OBSWebSocket.Scene[]) => void) => {
-          const resolveScenes = (scenes: OBSWebSocket.Scene[]) => {
-            resolve(scenes);
-          };
-
-          // we need to send on all sockets on /integrations/obswebsocket
-          const sockets = ioServer?.of('/integrations/obswebsocket').sockets;
-          if (sockets) {
-            for (const socket of sockets.values()) {
-              socket.emit('integration::obswebsocket::function', 'listScenes', resolveScenes);
-            }
-          }
-          setTimeout(() => resolve([]), 10000);
-        });
-      return { data: await availableScenes };
-    } catch (e: any) {
-      return { data: [] };
-    }
   }
   @Get('/sources')
   @Security('bearerAuth', [])
@@ -124,18 +84,6 @@ export class IntegrationOBSWebsocketController extends Controller {
       return { data: { sources: [], types: [] } };
     }
   }
-  @Response('404', 'Not Found')
-  @Get('/{id}')
-  @Security('bearerAuth', [])
-  public async getOne(@Path() id: string): Promise<OBSWebsocketInterface | void> {
-    try {
-      const item = await getRepository(OBSWebsocketEntity).findOneOrFail({ where: { id } });
-      return item;
-    } catch (e: any) {
-      this.setStatus(404);
-    }
-    return;
-  }
 
   @SuccessResponse('201', 'Created')
   @Response('401', 'Unauthorized')
@@ -164,17 +112,6 @@ export class IntegrationOBSWebsocketController extends Controller {
     } catch (e: any) {
       this.setStatus(400);
     }
-    return;
-  }
-  @SuccessResponse('404', 'Not Found')
-  @Security('bearerAuth', [])
-  @Delete('/{id}')
-  public async delete(@Path() id: string): Promise<void> {
-    const item = await getRepository(OBSWebsocketEntity).findOne({ id });
-    if (item) {
-      await getRepository(OBSWebsocketEntity).remove(item);
-    }
-    this.setStatus(404);
     return;
   }
 }*/

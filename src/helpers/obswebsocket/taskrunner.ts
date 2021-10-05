@@ -4,7 +4,7 @@ import type ObsWebSocket from 'obs-websocket-js';
 import safeEval from 'safe-eval';
 
 import { Events } from '../../database/entity/event.js';
-import { OBSWebsocketInterface, simpleModeTasks } from '../../database/entity/obswebsocket';
+import { OBSWebsocketInterface } from '../../database/entity/obswebsocket';
 import { setImmediateAwait } from '../setImmediateAwait';
 import { availableActions } from './actions';
 
@@ -36,31 +36,24 @@ const taskRunner = async (obs: ObsWebSocket, opts: { tasks: OBSWebsocketInterfac
       });
     } else {
       for (const task of tasks) {
-        let args;
-        const event = task.event as keyof typeof availableActions;
-        switch(event) {
+        switch(task.event) {
           case 'Log':
-            args = task.args as simpleModeTasks.TaskLog['args'];
-            await availableActions[event](obs, args.logMessage);
+            await availableActions[task.event](obs, task.args.logMessage);
             break;
           case 'WaitMs':
-            args = task.args as simpleModeTasks.WaitMS['args'];
-            await availableActions[event](obs, args.miliseconds);
+            await availableActions[task.event](obs, task.args.miliseconds);
             break;
           case 'SetCurrentScene':
-            args = task.args as simpleModeTasks.SetCurrentScene['args'];
-            await availableActions[event](obs, args.sceneName);
+            await availableActions[task.event](obs, task.args.sceneName);
             break;
           case 'SetMute':
-            args = task.args as simpleModeTasks.SetMute['args'];
-            await availableActions[event](obs, args.source, args.mute);
+            await availableActions[task.event](obs, task.args.source, task.args.mute);
             break;
           case 'SetVolume':
-            args = task.args as simpleModeTasks.SetVolume['args'];
-            await availableActions[event](obs, args.source, args.volume);
+            await availableActions[task.event](obs, task.args.source, task.args.volume);
             break;
           default:
-            await availableActions[event](obs);
+            await availableActions[task.event](obs);
         }
       }
     }

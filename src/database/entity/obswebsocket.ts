@@ -19,12 +19,10 @@ export namespace simpleModeTasks {
   export type ReplayBuffer = {
     id: string,
     event: 'StartReplayBuffer' | 'StopReplayBuffer' | 'SaveReplayBuffer',
-    args: Record<string, never>
   };
   export type Recording = {
     id: string,
     event: 'StartRecording' | 'StopRecording' | 'PauseRecording' | 'ResumeRecording',
-    args: Record<string, never>
   };
   export type SetMute = {
     id: string,
