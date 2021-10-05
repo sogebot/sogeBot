@@ -161,6 +161,14 @@ export class OBSWebsocketResolver {
   }
 
   @Authorized()
+  @Mutation(returns => OBSWebsocket)
+  OBSWebsocketSave(
+    @Arg('data') data: string,
+  ): Promise<OBSWebsocketInterface> {
+    return getRepository(OBSWebsocketEntity).save(JSON.parse(data));
+  }
+
+  @Authorized()
   @Mutation(returns => Boolean)
   async OBSWebsocketRemove(@Arg('id') id: string) {
     await getRepository(OBSWebsocketEntity).delete(id);
