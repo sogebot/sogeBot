@@ -17,18 +17,10 @@ export class goalsResolver {
     if (id) {
       return getRepository(GoalGroup).find({ where: { id }, relations: ['goals'] });
     } else {
-      getRepository(GoalGroup).find({ relations: ['goals'] })
-        .then(data => {
-          console.log(JSON.stringify(data, null, 2));
-        })
-        .catch(console.log);
-      getRepository(Goal).findOne('b9464c17-32f5-48ec-a797-354028841c40').then(data => {
-        console.log(JSON.stringify(data, null, 2));
-      });
-
       return getRepository(GoalGroup).find({ relations: ['goals'] });
     }
   }
+  
   @Query(returns => [GoalsCurrent])
   goalsCurrent() {
     return {

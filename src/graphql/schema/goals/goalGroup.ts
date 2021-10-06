@@ -45,10 +45,10 @@ export class GoalGroupObject {
   id?: string;
   @Field(type => [GoalObject])
   goals: GoalObject[];
-  @Field(type => Int)
+  @Field(type => String)
   createdAt?: number;
   @Field()
   name: string;
-  @Field(type => [GoalGroupDisplayObjects])
+  @Field(type => GoalGroupDisplayObjects)
   display: GoalGroupDisplayFadeObject | GoalGroupDisplayMultiObject;
 }
