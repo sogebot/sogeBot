@@ -53,6 +53,7 @@ else
 	@echo -ne "\n\t ----- Building bot\n"
 	@npx tsc --removeComments false
 endif
+	@npx tsc-alias
 
 pack:
 	@echo -ne "\n\t ----- Packing into sogeBot-$(VERSION).zip\n"

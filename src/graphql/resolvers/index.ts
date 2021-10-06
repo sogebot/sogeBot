@@ -3,6 +3,7 @@ export * from './bannedEventsResolver';
 export * from './customVariableResolver';
 export * from './menuResolver';
 export * from './obsWebsocketResolver';
+export * from './goalsResolver';
 export * from './permissionResolver';
 export * from './quickActionsResolver';
 export * from './widgetCustomResolver';

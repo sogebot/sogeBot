@@ -21,6 +21,14 @@
     "declaration": false,
     "noResolve": false,
     "baseUrl": "./src",
+    "paths": {
+      "~/*": [
+        "./*"
+      ],
+      "@entity/*": [
+        "./database/entity/*"
+      ]
+    },
     "outDir": "./dest",
     "inlineSourceMap": true,
     "typeRoots": ["./node_modules/@types"]
