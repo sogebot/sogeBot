@@ -6,6 +6,7 @@
   "song-unbanned": "$sender, la canzone $name di $artist è stata sbannata.",
   "song-not-found-in-banlist": "$sender, canzone di spotifyURI $uri non è stata trovata nella lista ban.",
   "cannot-request-song-is-banned": "$sender, non puoi richiedere il brano $name di $artist perchè è bannato.",
+  "cannot-request-song-from-unapproved-artist": "$sender, cannot request song from unapproved artist.",
   "no-songs-found-in-history": "$sender, al momento non c'è nessuna canzone nella cronologia.",
   "return-one-song-from-history": "$sender, la canzone precedente era $name di $artist.",
   "return-multiple-song-from-history": "$sender, le $count canzoni precedenti erano:",

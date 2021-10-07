@@ -169,6 +169,9 @@
         "operations": "Operace"
       },
       "definitions": {
+        "taskId": {
+          "label": "Task ID"
+        },
         "filter": {
           "label": "Filtr"
         },
@@ -792,6 +795,7 @@
     "send-chat-message": "odeslat zprávu na twitch chat",
     "send-whisper": "poslat whisper",
     "run-command": "spusť příkaz",
+    "run-obswebsocket-command": "run an OBS Websocket command",
     "do-nothing": "--- nedělat nic ---",
     "count": "počet",
     "timestamp": "časové razítko",

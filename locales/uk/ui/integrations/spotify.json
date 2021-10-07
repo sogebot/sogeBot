@@ -6,6 +6,11 @@
       "title": "Fetch current song when stream is offline",
       "help": "It's advised to have this disabled to avoid reach API limits"
     },
+    "allowApprovedArtistsOnly": "Allow approved artists only",
+    "approvedArtists": {
+      "title": "Approved artists",
+      "help": "Name or SpotifyURI of artist, one item per line"
+    },
     "queueWhenOffline": {
       "title": "Queue songs when stream is offline",
       "help": "It's advised to have this disabled to avoid queueing when you are just listening music"

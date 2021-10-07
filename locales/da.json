@@ -169,6 +169,9 @@
         "operations": "Opgaver"
       },
       "definitions": {
+        "taskId": {
+          "label": "Task ID"
+        },
         "filter": {
           "label": "Filter"
         },
@@ -792,6 +795,7 @@
     "send-chat-message": "send en Twitch-chatbesked",
     "send-whisper": "send en whisper",
     "run-command": "kør en kommando",
+    "run-obswebsocket-command": "run an OBS Websocket command",
     "do-nothing": "--- gør intet ---",
     "count": "tæller",
     "timestamp": "tidsstempel",

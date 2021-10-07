@@ -5,6 +5,7 @@
     "command": "Comando",
     "permission": "Autorizzazione comando",
     "simple": "Semplice",
+    "tape": "Tape",
     "wheelOfFortune": "Ruota della Fortuna",
     "type": "Tipo",
     "options": "Opzioni",

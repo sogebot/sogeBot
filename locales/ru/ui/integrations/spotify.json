@@ -6,6 +6,11 @@
       "title": "Получить текущую песню, когда стрим не в сети",
       "help": "Рекомендуется отключить это во избежание достижения лимитов API"
     },
+    "allowApprovedArtistsOnly": "Allow approved artists only",
+    "approvedArtists": {
+      "title": "Approved artists",
+      "help": "Name or SpotifyURI of artist, one item per line"
+    },
     "queueWhenOffline": {
       "title": "Очередь треков, когда стрим оффлайн",
       "help": "Рекомендуется отключить этот параметр, чтобы избежать очереди, когда вы просто слушаете музыку"

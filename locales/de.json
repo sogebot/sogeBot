@@ -169,6 +169,9 @@
         "operations": "Operationen"
       },
       "definitions": {
+        "taskId": {
+          "label": "Task ID"
+        },
         "filter": {
           "label": "Filter"
         },
@@ -792,6 +795,7 @@
     "send-chat-message": "sende eine Twitch Chat Nachricht",
     "send-whisper": "einen Whisper senden",
     "run-command": "Einen Befehl ausführen",
+    "run-obswebsocket-command": "run an OBS Websocket command",
     "do-nothing": "--- nichts tun ---",
     "count": "Anzahl",
     "timestamp": "Zeitstempel",

@@ -6,6 +6,7 @@
   "song-unbanned": "$sender, skladba $name od $artist je odbanována.",
   "song-not-found-in-banlist": "$sender, skladba podle spotifyURI $uri nebyla nalezena v seznamu zakázaných položek.",
   "cannot-request-song-is-banned": "$sender, nelze žádat o zabanovanou skladbu $name od $artist.",
+  "cannot-request-song-from-unapproved-artist": "$sender, cannot request song from unapproved artist.",
   "no-songs-found-in-history": "$sender, momentálně není žádná skladba v seznamu historie.",
   "return-one-song-from-history": "$sender, předchozí skladba byla $name od $artist.",
   "return-multiple-song-from-history": "$sender, $count předchozích skladeb bylo:",

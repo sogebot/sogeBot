@@ -5,6 +5,7 @@
     "command": "Command",
     "permission": "Command permission",
     "simple": "Simple",
+    "tape": "Tape",
     "wheelOfFortune": "Wheel of Fortune",
     "type": "Type",
     "options": "Options",
