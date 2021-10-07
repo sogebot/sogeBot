@@ -198,8 +198,9 @@ class API extends Core {
           isBlocking = fnc;
 
           // run validation before any requests
-          await oauth.validateOAuth('bot');
-          await oauth.validateOAuth('broadcaster');
+          if (!(await oauth.validateOAuth('bot') || await oauth.validateOAuth('broadcaster'))) {
+            continue;
+          }
 
           debug('api.interval', chalk.yellow(fnc + '() ') + 'start');
           const time = process.hrtime();

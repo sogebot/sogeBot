@@ -22,6 +22,7 @@ import { broadcasterUsername } from './helpers/oauth/broadcasterUsername';
 import { generalChannel } from './helpers/oauth/generalChannel';
 import { generalOwners } from './helpers/oauth/generalOwners';
 import { setOAuthStatus } from './helpers/OAuthStatus';
+import { addUIError } from './helpers/panel/';
 import { setStatus } from './helpers/parser';
 import { cleanViewersCache } from './helpers/permissions';
 import { tmiEmitter } from './helpers/tmi';
@@ -30,6 +31,9 @@ import { getUserFromTwitch } from './microservices/getUserFromTwitch';
 
 let botTokenErrorSent = false;
 let broadcasterTokenErrorSent = false;
+
+let lastBotTokenValidation = 0;
+let lastBroadcasterTokenValidation = 0;
 
 class OAuth extends Core {
   private toWait = 10;
@@ -238,6 +242,21 @@ class OAuth extends Core {
       }
     */
   public async validateOAuth(type: 'bot' | 'broadcaster', retry = 0): Promise<boolean> {
+    if (type === 'bot' && Date.now() - lastBotTokenValidation < 10 * constants.MINUTE) {
+      return true;
+    }
+    if (type === 'broadcaster' && Date.now() - lastBroadcasterTokenValidation < 10 * constants.MINUTE) {
+      return true;
+    }
+
+    if (type === 'bot') {
+      lastBotTokenValidation = Date.now();
+    }
+
+    if (type === 'broadcaster') {
+      lastBroadcasterTokenValidation = Date.now();
+    }
+
     if ((global as any).mocha) {
       return true;
     }
@@ -363,6 +382,17 @@ class OAuth extends Core {
       debug('oauth.validate', 'https://twitchtokengenerator.com/api/refresh/ =>');
       debug('oauth.validate', JSON.stringify(request.data, null, 2));
       if (!request.data.success) {
+        if (request.data.message.includes('Invalid refresh token received')) {
+          warning(`Invalid refresh token for ${type}. Please reset your token.`);
+          addUIError({ name: 'Token Error!', message: `Invalid refresh token for ${type}. Please reset your token.` });
+          if (type === 'broadcaster') {
+            this.broadcasterAccessToken = '';
+            this.broadcasterRefreshToken = '';
+          } else {
+            this.botRefreshToken = '';
+            this.botAccessToken = '';
+          }
+        }
         throw new Error(`Token refresh for ${type}: ${request.data.message}`);
       }
       if (typeof request.data.token !== 'string' || request.data.token.length === 0) {
