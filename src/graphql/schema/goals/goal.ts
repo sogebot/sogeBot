@@ -3,6 +3,8 @@ import {
   Field, Float, ID, Int, ObjectType,
 } from 'type-graphql';
 
+import { CustomizationFontObject } from '../customization';
+
 @ObjectType()
 export class GoalCustomizationBarObject {
   @Field()
@@ -15,38 +17,6 @@ export class GoalCustomizationBarObject {
   borderPx: number;
   @Field(type => Int)
   height: number;
-}
-
-@ObjectType()
-export class GoalCustomizationFontShadowObject {
-  @Field(type => Int)
-  shiftRight: number;
-  @Field(type => Int)
-  shiftDown: number;
-  @Field(type => Int)
-  blur: number;
-  @Field(type => Int)
-  opacity: number;
-  @Field()
-  color: string;
-}
-
-@ObjectType()
-export class GoalCustomizationFontObject {
-  @Field()
-  family: string;
-  @Field()
-  color: string;
-  @Field(type => Int)
-  size: number;
-  @Field(type => Int)
-  weight: number;
-  @Field()
-  borderColor: string;
-  @Field(type => Int)
-  borderPx: number;
-  @Field(type => [GoalCustomizationFontShadowObject])
-  shadow: GoalCustomizationFontShadowObject[];
 }
 
 @ObjectType()
@@ -78,8 +48,8 @@ export class GoalObject implements GoalInterface {
   endAfterIgnore: boolean;
   @Field(type => GoalCustomizationBarObject)
   customizationBar: GoalCustomizationBarObject;
-  @Field(type => GoalCustomizationFontObject)
-  customizationFont: GoalCustomizationFontObject;
+  @Field(type => CustomizationFontObject)
+  customizationFont: GoalInterface['customizationFont'];
   @Field()
   customizationHtml: string;
   @Field()
