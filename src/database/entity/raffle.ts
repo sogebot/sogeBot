@@ -38,18 +38,18 @@ export const Raffle = new EntitySchema<Readonly<Required<RaffleInterface>>>({
   name:    'raffle',
   columns: {
     id: {
-      type: 'uuid', primary: true, generated: 'uuid', 
+      type: 'uuid', primary: true, generated: 'uuid',
     },
     winner:    { type: 'text', nullable: true },
     timestamp: {
-      type: 'bigint', transformer: new ColumnNumericTransformer(), default: 0, 
+      type: 'bigint', transformer: new ColumnNumericTransformer(), default: 0,
     },
     keyword:    { type: String },
     minTickets: {
-      type: 'bigint', transformer: new ColumnNumericTransformer(), default: 0, 
+      type: 'bigint', transformer: new ColumnNumericTransformer(), default: 0,
     },
     maxTickets: {
-      type: 'bigint', transformer: new ColumnNumericTransformer(), default: 0, 
+      type: 'bigint', transformer: new ColumnNumericTransformer(), default: 0,
     },
     type:           { type: Number },
     forFollowers:   { type: Boolean },
@@ -58,6 +58,7 @@ export const Raffle = new EntitySchema<Readonly<Required<RaffleInterface>>>({
   },
   indices: [
     { name: 'IDX_e83facaeb8fbe8b8ce9577209a', columns: ['keyword'] },
+    { name: 'IDX_raffleIsClosed', columns: ['isClosed'] },
   ],
   relations: {
     participants: {
@@ -73,7 +74,7 @@ export const RaffleParticipant = new EntitySchema<Readonly<Required<RafflePartic
   name:    'raffle_participant',
   columns: {
     id: {
-      type: 'uuid', primary: true, generated: 'uuid', 
+      type: 'uuid', primary: true, generated: 'uuid',
     },
     username:     { type: String },
     tickets:      { type: Number },
@@ -102,10 +103,10 @@ export const RaffleParticipantMessage = new EntitySchema<Readonly<Required<Raffl
   name:    'raffle_participant_message',
   columns: {
     id: {
-      type: 'uuid', primary: true, generated: 'uuid', 
+      type: 'uuid', primary: true, generated: 'uuid',
     },
     timestamp: {
-      type: 'bigint', transformer: new ColumnNumericTransformer(), default: 0, 
+      type: 'bigint', transformer: new ColumnNumericTransformer(), default: 0,
     },
     text: { type: 'text' },
   },

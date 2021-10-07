@@ -9,7 +9,7 @@ import {
 } from '../database/entity/raffle';
 import { User } from '../database/entity/user';
 import {
-  command, default_permission, parser, settings,
+  command, default_permission, parser, settings, timer,
 } from '../decorators';
 import { onStartup } from '../decorators/on';
 import { isStreamOnline } from '../helpers/api';
@@ -387,7 +387,8 @@ class Raffles extends System {
     return [{ response, ...opts }];
   }
 
-  @parser()
+  @parser({ fireAndForget: true })
+  @timer()
   async participate (opts: ParserOptions): Promise<boolean> {
     if (opts.sender === null || _.isNil(opts.sender.username) || !opts.message.match(/^(![\S]+)/)) {
       return true;
