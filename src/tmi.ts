@@ -672,7 +672,7 @@ class TMI extends Core {
       });
       sub(`${username}#${userstate.userId}, tier: ${tier}`);
       eventEmitter.emit('subscription', {
-        username: username, method: (isNil(method.prime) && method.prime) ? 'Twitch Prime' : '', subCumulativeMonths, tier: String(tier),
+        username: username, method: (isNil(method.prime) && method.prime) ? 'Twitch Prime' : '', subCumulativeMonths: amount, tier: String(tier),
       });
       alerts.trigger({
         event:      'subs',
