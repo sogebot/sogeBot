@@ -57,6 +57,8 @@ import { translate } from './translate';
 import users from './users';
 import joinpart from './widgets/joinpart';
 
+const commandRegexp = new RegExp(/^!\w+$/);
+
 const userHaveSubscriberBadges = (badges: Readonly<UserStateTags['badges']>) => {
   return typeof badges.subscriber !== 'undefined' || typeof badges.founder !== 'undefined';
 };
@@ -1053,62 +1055,71 @@ class TMI extends Core {
       chatIn(`${message} [${sender.username}]`);
     }
 
-    // we need to moderate ignored users as well
-    const [isModerated, isIgnoredCheck] = await Promise.all(
-      [parse.isModerated(), isIgnored(sender)],
-    );
-    if (!isModerated && !isIgnoredCheck) {
-      if (!skip && !isNil(sender.username)) {
-        const user = await changelog.get(sender.userId);
-        if (user) {
-          if (!user.isOnline) {
-            joinpart.send({ users: [sender.username], type: 'join' });
-            eventEmitter.emit('user-joined-channel', { username: sender.username });
-          }
-          changelog.update(user.userId, {
-            ...user,
-            username:                  sender.username,
-            userId:                    sender.userId,
-            isOnline:                  true,
-            isVIP:                     typeof sender.badges.vip !== 'undefined',
-            isModerator:               typeof sender.badges.moderator !== 'undefined',
-            isSubscriber:              user.haveSubscriberLock ? user.isSubscriber : userHaveSubscriberBadges(sender.badges),
-            messages:                  user.messages ?? 0,
-            subscribeTier:             String(userHaveSubscriberBadges(sender.badges) ? 0 : user.subscribeTier),
-            subscribeCumulativeMonths: subCumulativeMonths(sender) || user.subscribeCumulativeMonths,
-            seenAt:                    Date.now(),
-          });
-        } else {
+    if (commandRegexp.test(message)) {
+      // check only if ignored if it is just simple command
+      if (await isIgnored(sender)) {
+        return;
+      }
+    } else {
+      // we need to moderate ignored users as well
+      const [isModerated, isIgnoredCheck] = await Promise.all(
+        [parse.isModerated(), isIgnored(sender)],
+      );
+      if (isModerated || isIgnoredCheck) {
+        return;
+      }
+    }
+
+    if (!skip && !isNil(sender.username)) {
+      const user = await changelog.get(sender.userId);
+      if (user) {
+        if (!user.isOnline) {
           joinpart.send({ users: [sender.username], type: 'join' });
           eventEmitter.emit('user-joined-channel', { username: sender.username });
-          changelog.update(sender.userId, {
-            username:     sender.username,
-            userId:       sender.userId,
-            isOnline:     true,
-            isVIP:        typeof sender.badges.vip !== 'undefined',
-            isModerator:  typeof sender.badges.moderator !== 'undefined',
-            isSubscriber: userHaveSubscriberBadges(sender.badges),
-            seenAt:       Date.now(),
-          });
         }
+        changelog.update(user.userId, {
+          ...user,
+          username:                  sender.username,
+          userId:                    sender.userId,
+          isOnline:                  true,
+          isVIP:                     typeof sender.badges.vip !== 'undefined',
+          isModerator:               typeof sender.badges.moderator !== 'undefined',
+          isSubscriber:              user.haveSubscriberLock ? user.isSubscriber : userHaveSubscriberBadges(sender.badges),
+          messages:                  user.messages ?? 0,
+          subscribeTier:             String(userHaveSubscriberBadges(sender.badges) ? 0 : user.subscribeTier),
+          subscribeCumulativeMonths: subCumulativeMonths(sender) || user.subscribeCumulativeMonths,
+          seenAt:                    Date.now(),
+        });
+      } else {
+        joinpart.send({ users: [sender.username], type: 'join' });
+        eventEmitter.emit('user-joined-channel', { username: sender.username });
+        changelog.update(sender.userId, {
+          username:     sender.username,
+          userId:       sender.userId,
+          isOnline:     true,
+          isVIP:        typeof sender.badges.vip !== 'undefined',
+          isModerator:  typeof sender.badges.moderator !== 'undefined',
+          isSubscriber: userHaveSubscriberBadges(sender.badges),
+          seenAt:       Date.now(),
+        });
+      }
 
-        api.followerUpdatePreCheck(sender.username);
+      api.followerUpdatePreCheck(sender.username);
 
-        eventEmitter.emit('keyword-send-x-times', {
+      eventEmitter.emit('keyword-send-x-times', {
+        username: sender.username, message: message, source: 'twitch',
+      });
+      if (message.startsWith('!')) {
+        eventEmitter.emit('command-send-x-times', {
           username: sender.username, message: message, source: 'twitch',
         });
-        if (message.startsWith('!')) {
-          eventEmitter.emit('command-send-x-times', {
-            username: sender.username, message: message, source: 'twitch',
-          });
-        } else if (!message.startsWith('!')) {
-          changelog.increment(sender.userId, { messages: 1 });
-        }
+      } else if (!message.startsWith('!')) {
+        changelog.increment(sender.userId, { messages: 1 });
       }
-      const responses = await parse.process();
-      for (let i = 0; i < responses.length; i++) {
-        await sendMessage(responses[i].response, responses[i].sender, responses[i].attr);
-      }
+    }
+    const responses = await parse.process();
+    for (let i = 0; i < responses.length; i++) {
+      await sendMessage(responses[i].response, responses[i].sender, responses[i].attr);
     }
   }
 }
