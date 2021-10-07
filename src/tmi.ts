@@ -61,6 +61,16 @@ const userHaveSubscriberBadges = (badges: Readonly<UserStateTags['badges']>) => 
   return typeof badges.subscriber !== 'undefined' || typeof badges.founder !== 'undefined';
 };
 
+const subCumulativeMonths = function(senderObj: UserStateTags) {
+  if (typeof senderObj.badgeInfo === 'string' && senderObj.badgeInfo.includes('subscriber')) {
+    const match = senderObj.badgeInfo.match(/subscriber\/(\d+)/);
+    if (match) {
+      return Number(match[1]);
+    }
+  }
+  return undefined; // undefined will not change any values
+};
+
 let intervalBroadcaster: NodeJS.Timeout;
 let intervalBot: NodeJS.Timeout;
 let intervalBroadcasterPONG = Date.now();
@@ -617,7 +627,7 @@ class TMI extends Core {
   async subscription (message: Record<string, any>) {
     try {
       const username = message.tags.login;
-      const subCumulativeMonths = Number(message.parameters.cumulativeMonths);
+      const amount = Number(message.parameters.cumulativeMonths);
       const method = this.getMethod(message);
       const tier = (method.prime ? 'Prime' : String(method.plan / 1000)) as EmitData['tier'];
       const userstate = message.tags;
@@ -643,7 +653,7 @@ class TMI extends Core {
         isSubscriber:              user.haveSubscriberLock ? user.isSubscriber : true,
         subscribedAt:              user.haveSubscribedAtLock ? user.subscribedAt : Date.now(),
         subscribeTier:             String(tier),
-        subscribeCumulativeMonths: subCumulativeMonths,
+        subscribeCumulativeMonths: amount,
         subscribeStreak:           0,
         profileImageUrl:           profileImageUrl ? profileImageUrl : user.profileImageUrl,
       });
@@ -675,9 +685,9 @@ class TMI extends Core {
       });
 
       triggerInterfaceOnSub({
-        username: username,
-        userId:   userstate.userId,
-        subCumulativeMonths,
+        username:            username,
+        userId:              userstate.userId,
+        subCumulativeMonths: amount,
       });
     } catch (e: any) {
       error('Error parsing subscription event');
@@ -691,7 +701,7 @@ class TMI extends Core {
     try {
       const username = message.tags.login;
       const method = this.getMethod(message);
-      const subCumulativeMonths = Number(message.parameters.cumulativeMonths);
+      const amount = Number(message.parameters.cumulativeMonths);
       const subStreakShareEnabled = Number(message.parameters.shouldShareStreak) !== 0;
       const streakMonths = Number(message.parameters.multimonthTenure);
       const userstate = message.tags;
@@ -721,7 +731,7 @@ class TMI extends Core {
         isSubscriber:              true,
         subscribedAt:              Number(dayjs().subtract(streakMonths, 'month').unix()) * 1000,
         subscribeTier:             String(tier),
-        subscribeCumulativeMonths: subCumulativeMonths,
+        subscribeCumulativeMonths: amount,
         subscribeStreak:           subStreak,
         profileImageUrl:           profileImageUrl ? profileImageUrl : user.profileImageUrl,
       });
@@ -738,8 +748,8 @@ class TMI extends Core {
         subStreakShareEnabled,
         subStreak,
         subStreakName:           getLocalizedName(subStreak, translate('core.months')),
-        subCumulativeMonths,
-        subCumulativeMonthsName: getLocalizedName(subCumulativeMonths, translate('core.months')),
+        subCumulativeMonths:     amount,
+        subCumulativeMonthsName: getLocalizedName(amount, translate('core.months')),
         message:                 messageFromUser,
         timestamp:               Date.now(),
       });
@@ -750,17 +760,17 @@ class TMI extends Core {
         subStreakShareEnabled,
         subStreak,
         subStreakName:           getLocalizedName(subStreak, translate('core.months')),
-        subCumulativeMonths,
-        subCumulativeMonthsName: getLocalizedName(subCumulativeMonths, translate('core.months')),
+        subCumulativeMonths:     amount,
+        subCumulativeMonthsName: getLocalizedName(amount, translate('core.months')),
         message:                 messageFromUser,
       });
       alerts.trigger({
         event:      'resubs',
         name:       username,
-        amount:     Number(subCumulativeMonths),
+        amount:     Number(amount),
         tier,
         currency:   '',
-        monthsName: getLocalizedName(subCumulativeMonths, translate('core.months')),
+        monthsName: getLocalizedName(amount, translate('core.months')),
         message:    messageFromUser,
       });
     } catch (e: any) {
@@ -815,7 +825,7 @@ class TMI extends Core {
     try {
       const username = message.tags.login;
       const userId = message.tags.userId;
-      const subCumulativeMonths = Number(message.parameters.months);
+      const amount = Number(message.parameters.months);
       const recipient = message.parameters.recipientUserName.toLowerCase();
       const recipientId = message.parameters.recipientId;
       const tier = this.getMethod(message).plan / 1000;
@@ -834,10 +844,10 @@ class TMI extends Core {
           event:      'subgifts',
           name:       username,
           recipient,
-          amount:     subCumulativeMonths,
+          amount:     amount,
           tier:       null,
           currency:   '',
-          monthsName: getLocalizedName(subCumulativeMonths, translate('core.months')),
+          monthsName: getLocalizedName(amount, translate('core.months')),
           message:    '',
         });
         eventEmitter.emit('subgift', {
@@ -867,7 +877,7 @@ class TMI extends Core {
         isSubscriber:              true,
         subscribedAt:              Date.now(),
         subscribeTier:             String(tier),
-        subscribeCumulativeMonths: subCumulativeMonths,
+        subscribeCumulativeMonths: amount,
         subscribeStreak:           user.subscribeStreak + 1,
       });
 
@@ -875,11 +885,11 @@ class TMI extends Core {
         event:      'subgift',
         userId:     recipientId,
         fromId:     userId,
-        monthsName: getLocalizedName(subCumulativeMonths, translate('core.months')),
-        months:     subCumulativeMonths,
+        monthsName: getLocalizedName(amount, translate('core.months')),
+        months:     amount,
         timestamp:  Date.now(),
       });
-      subgift(`${recipient}#${recipientId}, from: ${username}#${userId}, months: ${subCumulativeMonths}`);
+      subgift(`${recipient}#${recipientId}, from: ${username}#${userId}, months: ${amount}`);
 
       // also set subgift count to gifter
       if (!(isIgnored({ username, userId })) && !isGiftIgnored) {
@@ -1049,16 +1059,6 @@ class TMI extends Core {
     );
     if (!isModerated && !isIgnoredCheck) {
       if (!skip && !isNil(sender.username)) {
-        const subCumulativeMonths = function(senderObj: UserStateTags) {
-          if (typeof senderObj.badgeInfo === 'string' && senderObj.badgeInfo.includes('subscriber')) {
-            const match = senderObj.badgeInfo.match(/subscriber\/(\d+)/);
-            if (match) {
-              return Number(match[1]);
-            }
-          }
-          return undefined; // undefined will not change any values
-        };
-
         const user = await changelog.get(sender.userId);
         if (user) {
           if (!user.isOnline) {
