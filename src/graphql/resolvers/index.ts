@@ -1,5 +1,6 @@
 export * from './aliasResolver';
 export * from './bannedEventsResolver';
+export * from './carouselResolver';
 export * from './customVariableResolver';
 export * from './menuResolver';
 export * from './obsWebsocketResolver';

@@ -2,12 +2,9 @@ import {
   Body,
   Controller,
   Delete,
-  Get,
-  Hidden,
   Patch,
   Path,
   Post,
-  Request,
   Response,
   Route,
   Security,
@@ -24,68 +21,6 @@ export type CarouselItem = Omit<CarouselInterface, 'base64' | 'type'> & { imageU
 @Route('/api/v1/carousel')
 @Tags('Registries / Carousel')
 export class RegistryCarouselController extends Controller {
-  /**
-  * Retrieves the quick actions of an authenticated user.
-  */
-  @Get()
-  public async getAll(): Promise<{ data: CarouselItem[], paging: null}> {
-    const items = (await getRepository(Carousel).find({
-      select: [
-        'id', 'order', 'waitAfter',
-        'waitBefore', 'duration',
-        'animationIn', 'animationInDuration',
-        'animationOut', 'animationOutDuration', 'showOnlyOncePerStream',
-      ],
-      order: { order: 'ASC' },
-    })).map(item => ({ ...item, imageUrl: '/api/v1/carousel/image/' + item.id })) as CarouselItem[];
-    return {
-      data:   items,
-      paging: null,
-    };
-  }
-
-  @Hidden()
-  @Get('/image/{id}')
-  public async getImage(@Request() request: any, @Path() id: string) {
-    try {
-      const response = (<any>request).res;
-
-      const file = await getRepository(Carousel).findOneOrFail({ id });
-      const data = Buffer.from(file.base64, 'base64');
-      response.writeHead(200, {
-        'Content-Type':   file.type,
-        'Content-Length': data.length,
-        'Cache-Control':  'public, max-age=31536000',
-        'ETag':           id,
-      });
-      response.end(data);
-    } catch (e: any) {
-      this.setStatus(404);
-    }
-    return;
-  }
-  @Response('404', 'Not Found')
-  @Get('/{id}')
-  public async getOne(@Path() id: string): Promise<CarouselItem | void> {
-    try {
-      const item = {
-        ...(await getRepository(Carousel).findOneOrFail({
-          select: [
-            'id', 'order', 'waitAfter',
-            'waitBefore', 'duration',
-            'animationIn', 'animationInDuration',
-            'animationOut', 'animationOutDuration', 'showOnlyOncePerStream',
-          ],
-          where: { id },
-        })),
-        imageUrl: '/api/v1/carousel/image/' + id,
-      };
-      return item;
-    } catch (e: any) {
-      this.setStatus(404);
-    }
-    return;
-  }
 
   @SuccessResponse('201', 'Created')
   @Response('401', 'Unauthorized')
