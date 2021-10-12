@@ -1,3 +1,4 @@
+export * from './alertResolver';
 export * from './aliasResolver';
 export * from './bannedEventsResolver';
 export * from './carouselResolver';

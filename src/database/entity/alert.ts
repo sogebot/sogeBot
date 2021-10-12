@@ -14,7 +14,7 @@ export interface EmitData {
   message: string;
 }
 
-type Filter = {
+export type Filter = {
   operator: string;
   items: (Filter | {
     comparator: string;
@@ -32,7 +32,10 @@ export interface CommonSettingsInterface {
   variantAmount: number;
   messageTemplate: string;
   layout: '1' | '2' | '3' | '4' | '5';
-  filter: Filter;
+  /*
+   * JSON type of Filter
+   */
+  filter: string | null;
   animationInDuration: number;
   animationIn: 'none' | 'fadeIn' | 'fadeInDown' | 'fadeInLeft' | 'fadeInRight'
   | 'fadeInUp' | 'fadeInDownBig' | 'fadeInLeftBig' | 'fadeInRightBig'
@@ -251,7 +254,7 @@ export const CommonSettingsSchema = {
   animationTextOptions: { type: 'simple-json' } as EntitySchemaColumnOptions,
   imageId:              { type: String } as EntitySchemaColumnOptions,
   imageOptions:         { type: 'simple-json' } as EntitySchemaColumnOptions,
-  filter:               { type: 'simple-json', nullable: true } as EntitySchemaColumnOptions,
+  filter:               { type: 'text', nullable: true } as EntitySchemaColumnOptions,
   soundId:              { type: String } as EntitySchemaColumnOptions,
   soundVolume:          { type: Number } as EntitySchemaColumnOptions,
   alertDurationInMs:    { type: Number } as EntitySchemaColumnOptions,
