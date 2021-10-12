@@ -1,4 +1,7 @@
-import { Alert, AlertMedia } from '@entity/alert';
+import {
+  Alert, AlertInterface, AlertMedia,
+} from '@entity/alert';
+import shortid from 'shortid';
 import {
   Arg, Authorized, Mutation, Query, Resolver,
 } from 'type-graphql';
@@ -51,6 +54,36 @@ export class alertResolver {
     } else {
       return getRepository(Alert).find({ relations });
     }
+  }
+
+  @Query(returns => Boolean)
+  async alertsSettingsGet(@Arg('name') name: 'areAlertsMuted' | 'isSoundMuted' | 'isTTSMuted') {
+    const alerts = (await import('../../registries/alerts')).default;
+    switch(name) {
+      case 'areAlertsMuted':
+        return alerts.areAlertsMuted;
+      case 'isSoundMuted':
+        return alerts.isSoundMuted;
+      case 'isTTSMuted':
+        return alerts.isTTSMuted;
+    }
+  }
+
+  @Mutation(returns => Boolean)
+  async alertsSettingsSet(@Arg('name') name: 'areAlertsMuted' | 'isSoundMuted' | 'isTTSMuted', @Arg('value') value: boolean) {
+    const alerts = (await import('../../registries/alerts')).default;
+    switch(name) {
+      case 'areAlertsMuted':
+        alerts.areAlertsMuted = value;
+        break;
+      case 'isSoundMuted':
+        alerts.isSoundMuted = value;
+        break;
+      case 'isTTSMuted':
+        alerts.isTTSMuted = value;
+        break;
+    }
+    return true;
   }
 
   @Authorized()
@@ -156,6 +189,16 @@ export class alertResolver {
   }
 
   @Authorized()
+  @Mutation(returns => AlertObject)
+  async alertSave(
+  @Arg('data') data_json: string,
+  ) {
+    const data: AlertInterface = JSON.parse(data_json);
+    setTimeout(() => clearMedia(), 10000);
+    return getRepository(Alert).save({ ...data, updatedAt: Date.now() });
+  }
+
+  @Authorized()
   @Mutation(returns => Boolean)
   async alertRemove(@Arg('id') id: string) {
     const item = await getRepository(Alert).findOne({ id });
@@ -171,5 +214,17 @@ export class alertResolver {
   async alertMediaRemove(@Arg('id') id: string) {
     await getRepository(AlertMedia).delete({ id });
     return true;
+  }
+
+  @Authorized()
+  @Mutation(returns => String)
+  async alertMediaUpload(
+  @Arg('data') b64data: string, @Arg('id', { nullable: true }) inputId?: string,
+  ) {
+    const id = inputId ? inputId : shortid();
+    const item = await getRepository(AlertMedia).save({
+      id, b64data, chunkNo: 0,
+    });
+    return item.id;
   }
 }

@@ -1,6 +1,6 @@
 import { AlertInterface } from '@entity/alert';
 import {
-  Field, ID, Int, ObjectType, 
+  Field, ID, Int, ObjectType,
 } from 'type-graphql';
 
 import { CustomizationFontObject, CustomizationTTSObject } from '../customization';
@@ -27,7 +27,7 @@ export class AlertObject implements AlertInterface {
   loadStandardProfanityList: LoadStandardProfanityListObject;
   @Field(type => ParryObject)
   parry: ParryObject;
-  @Field(type => CustomizationTTSObject)
+  @Field(type => CustomizationTTSObject, { nullable: true })
   tts: CustomizationTTSObject;
   @Field(type => CustomizationFontObject)
   fontMessage: CustomizationFontObject<'left' | 'center' | 'right', string>;

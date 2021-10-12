@@ -1,5 +1,5 @@
 import {
-  Field, Float, ObjectType, 
+  Field, Float, ObjectType,
 } from 'type-graphql';
 
 import { CustomizationFontObject } from '../customization';
@@ -9,8 +9,8 @@ import { AllowEmotesObject } from './AllowEmotesObject';
 export class MessageResubObject {
   @Field(type => AllowEmotesObject)
   allowEmotes: AllowEmotesObject;
-  @Field(type => CustomizationFontObject)
-  font: CustomizationFontObject<'left' | 'center' | 'right', string>;
+  @Field(type => CustomizationFontObject, { nullable: true })
+  font: CustomizationFontObject<'left' | 'center' | 'right', string> | null;
 }
 
 @ObjectType()

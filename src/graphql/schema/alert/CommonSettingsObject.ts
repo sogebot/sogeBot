@@ -50,6 +50,7 @@ export class CommonSettingsObject implements CommonSettingsInterface {
   @Field()
   animationText: 'none' | 'baffle' | 'bounce' | 'bounce2' | 'flip' | 'flash' | 'pulse2' | 'rubberBand'
   | 'shake2' | 'swing' | 'tada' | 'wave' | 'wobble' | 'wiggle' | 'wiggle2' | 'jello';
+  @Field(type => AnimationTextOptionsObject)
   animationTextOptions: AnimationTextOptionsObject;
   @Field()
   imageId: string;
@@ -69,6 +70,6 @@ export class CommonSettingsObject implements CommonSettingsInterface {
   enableAdvancedMode: boolean;
   @Field(type => AdvancedModeObject)
   advancedMode: AdvancedModeObject;
-  @Field(type => CustomizationFontObject)
-  font: CustomizationFontObject<'left' | 'center' | 'right', string, string>;
+  @Field(type => CustomizationFontObject, { nullable: true })
+  font: CustomizationFontObject<'left' | 'center' | 'right', string, string> | null;
 }
