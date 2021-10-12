@@ -6,6 +6,7 @@ import { getRepository } from 'typeorm';
 import { v4 } from 'uuid';
 
 import { User, UserInterface } from '../../database/entity/user';
+import { timer } from '../../decorators';
 import { flatten } from '../flatten.js';
 import { debug, error } from '../log';
 
@@ -71,41 +72,50 @@ function checkLock(userId: string, resolve: (value: unknown) => void) {
   if (!lock.get(userId)) {
     resolve(true);
   } else {
-    setTimeout(() => checkLock(userId, resolve), 10);
+    setImmediate(() => checkLock(userId, resolve));
   }
 }
-export async function get(userId: string): Promise<Readonly<Required<UserInterface>> | null> {
-  await new Promise((resolve) => {
-    checkLock(userId, resolve);
-  });
 
-  const user = await getRepository(User).findOne({ userId });
-  const data = cloneDeep(defaultData);
-  merge(data, { userId }, user);
+class Changelog {
+  @timer()
+  async get(userId: string): Promise<Readonly<Required<UserInterface>> | null> {
+    await new Promise((resolve) => {
+      checkLock(userId, resolve);
+    });
 
-  for (const { changelogType, ...change } of changelog.filter(o => o.userId === userId)) {
-    if (changelogType === 'set') {
-      merge(data, change);
-    } else if (changelogType === 'increment') {
-      for (const path of Object.keys(flatten(change))) {
-        if (path === 'userId') {
-          continue;
-        }
+    const user = await getRepository(User).findOne({ userId });
+    const data = cloneDeep(defaultData);
+    merge(data, { userId }, user);
 
-        const value = _get(data, path, 0) + _get(change, path, 0);
-        if (path === 'points' && value < 0) {
-          set(data, path, 0);
-        } else {
-          set(data, path, value);
+    for (const { changelogType, ...change } of changelog.filter(o => o.userId === userId)) {
+      if (changelogType === 'set') {
+        merge(data, change);
+      } else if (changelogType === 'increment') {
+        for (const path of Object.keys(flatten(change))) {
+          if (path === 'userId') {
+            continue;
+          }
+
+          const value = _get(data, path, 0) + _get(change, path, 0);
+          if (path === 'points' && value < 0) {
+            set(data, path, 0);
+          } else {
+            set(data, path, value);
+          }
         }
       }
     }
-  }
 
-  if (typeof user === 'undefined' && changelog.filter(o => o.userId === userId).length === 0) {
-    return null;
+    if (typeof user === 'undefined' && changelog.filter(o => o.userId === userId).length === 0) {
+      return null;
+    }
+    return data;
   }
-  return data;
+}
+const self = new Changelog();
+
+export async function get(userId: string): Promise<Readonly<Required<UserInterface>> | null> {
+  return self.get(userId);
 }
 
 function checkQueue(id: string, resolve: (value: unknown) => void, reject: (reason?: any) => void) {
