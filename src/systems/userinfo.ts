@@ -221,8 +221,8 @@ class UserInfo extends System {
       const [user, tips, bits] = await Promise.all([
         changelog.get(opts.sender.userId),
         getRepository(UserTip).find({ where: { userId: opts.sender.userId } }),
-        getRepository(UserBit).find({ where: { userId: opts.sender.userId } })
-      ])
+        getRepository(UserBit).find({ where: { userId: opts.sender.userId } }),
+      ]);
 
       if (!user) {
         throw Error(`User ${opts.sender.username}#${opts.sender.userId} not found.`);
