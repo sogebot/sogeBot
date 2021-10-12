@@ -133,6 +133,12 @@ export const UserTip = new EntitySchema<Readonly<Required<UserTipInterface>>>({
     },
     userId: { type: String, nullable: true },
   },
+  indices: [
+    {
+      name:    'IDX_user_tip_userId',
+      columns: [ 'userId' ],
+    },
+  ],
 });
 
 export const UserBit = new EntitySchema<Readonly<Required<UserBitInterface>>>({
@@ -150,4 +156,10 @@ export const UserBit = new EntitySchema<Readonly<Required<UserBitInterface>>>({
     },
     userId: { type: String, nullable: true },
   },
+  indices: [
+    {
+      name:    'IDX_user_bit_userId',
+      columns: [ 'userId' ],
+    },
+  ],
 });
