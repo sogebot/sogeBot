@@ -218,9 +218,11 @@ class UserInfo extends System {
   async showMe(opts: CommandOptions, returnOnly = false): Promise<string | CommandResponse[]> {
     try {
       const message: (string | null)[] = [];
-      const user = await changelog.get(opts.sender.userId);
-      const tips =  await getRepository(UserTip).find({ where: { userId: opts.sender.userId } });
-      const bits =  await getRepository(UserBit).find({ where: { userId: opts.sender.userId } });
+      const [user, tips, bits] = await Promise.all([
+        changelog.get(opts.sender.userId),
+        getRepository(UserTip).find({ where: { userId: opts.sender.userId } }),
+        getRepository(UserBit).find({ where: { userId: opts.sender.userId } })
+      ])
 
       if (!user) {
         throw Error(`User ${opts.sender.username}#${opts.sender.userId} not found.`);
