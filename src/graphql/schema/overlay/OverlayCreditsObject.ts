@@ -3,7 +3,7 @@ import {
   Field, ID, ObjectType,
 } from 'type-graphql';
 
-import { OverlayStopwatchOptionsObject } from './OverlayStopwatchOptionsObject';
+import { OverlayCreditsOptionsObject } from './OverlayCreditsOptionsObject';
 
 @ObjectType()
 export class OverlayCreditsObject implements OverlayMapperCredits {
@@ -11,6 +11,6 @@ export class OverlayCreditsObject implements OverlayMapperCredits {
   id: string;
   @Field()
   value: 'credits';
-  @Field(type => OverlayStopwatchOptionsObject, { nullable: true })
+  @Field(type => OverlayCreditsOptionsObject, { nullable: true })
   opts: OverlayMapperCredits['opts'];
 }

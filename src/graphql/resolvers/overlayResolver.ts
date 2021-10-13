@@ -8,7 +8,7 @@ import { OverlayObject } from '../schema/overlay/OverlayObject';
 
 @Resolver()
 export class overlayResolver {
-  @Query(returns => [OverlayObject])
+  @Query(returns => OverlayObject)
   async overlays(@Arg('id', { nullable: true }) id: string) {
     let items: Readonly<Required<OverlayMappers>>[];
     if (id) {
@@ -18,7 +18,7 @@ export class overlayResolver {
     }
 
     // we need to send it as OverlayObject
-    return {
+    const response = {
       marathon:        items.filter(o => o.value === 'marathon'),
       stopwatch:       items.filter(o => o.value === 'stopwatch'),
       countdown:       items.filter(o => o.value === 'countdown'),
@@ -37,5 +37,6 @@ export class overlayResolver {
       obswebsocket:    items.filter(o => o.value === 'obswebsocket'),
       group:           items.filter(o => o.value === 'group'),
     } as OverlayObject;
+    return response;
   }
 }
