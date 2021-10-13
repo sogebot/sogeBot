@@ -18,11 +18,17 @@ class Marathon extends Overlay {
     eventEmitter.on('subscription', async (data) => {
       await this.updateCache();
       for (const [id, value] of cachedOverlays.entries()) {
-        if (value.opts.endTime < Date.now()
-          && !value.opts.disableWhenReachedZero
-          && Date.now() < value.opts.maxEndTime) {
-          value.opts.endTime = Date.now(); // reset endTime
-        } else if (value.opts.endTime < Date.now()) {
+        if (!value.opts) {
+          continue;
+        }
+        const opts = typeof value.opts === 'string'
+          ? JSON.parse<NonNullable<OverlayMapperMarathon['opts']>>(value.opts as any)
+          : value.opts;
+        if (opts.endTime < Date.now()
+          && !opts.disableWhenReachedZero
+          && (!opts.maxEndTime || Date.now() < opts.maxEndTime)) {
+          opts.endTime = Date.now(); // reset endTime
+        } else if (opts.endTime < Date.now()) {
           return;
         }
 
@@ -30,12 +36,13 @@ class Marathon extends Overlay {
         if (isNaN(tier)) {
           tier = 1;
         }
-        const timeToAdd = value.opts.values.sub[`tier${tier}`] * 1000;
-        if (value.opts.maxEndTime !== null) {
-          value.opts.endTime = Math.min(value.opts.endTime + timeToAdd, value.opts.maxEndTime);
+        const timeToAdd = opts.values.sub[`tier${tier}` as keyof NonNullable<OverlayMapperMarathon['opts']>['values']['sub']] * 1000;
+        if (opts.maxEndTime !== null) {
+          opts.endTime = Math.min(opts.endTime + timeToAdd, opts.maxEndTime);
         } else {
-          value.opts.endTime += timeToAdd;
+          opts.endTime += timeToAdd;
         }
+        value.opts = typeof value.opts === 'string' ? JSON.stringify(opts) : value.opts;
         cachedOverlays.set(id, value);
       }
       await this.flushCache();
@@ -43,11 +50,17 @@ class Marathon extends Overlay {
     eventEmitter.on('resub', async (data) => {
       await this.updateCache();
       for (const [id, value] of cachedOverlays.entries()) {
-        if (value.opts.endTime < Date.now()
-          && !value.opts.disableWhenReachedZero
-          && Date.now() < value.opts.maxEndTime) {
-          value.opts.endTime = Date.now(); // reset endTime
-        } else if (value.opts.endTime < Date.now()) {
+        if (!value.opts) {
+          continue;
+        }
+        const opts = typeof value.opts === 'string'
+          ? JSON.parse<NonNullable<OverlayMapperMarathon['opts']>>(value.opts as any)
+          : value.opts;
+        if (opts.endTime < Date.now()
+          && !opts.disableWhenReachedZero
+          && (!opts.maxEndTime || Date.now() < opts.maxEndTime)) {
+          opts.endTime = Date.now(); // reset endTime
+        } else if (opts.endTime < Date.now()) {
           return;
         }
 
@@ -55,13 +68,14 @@ class Marathon extends Overlay {
         if (isNaN(tier)) {
           tier = 1;
         }
-        const timeToAdd = value.opts.values.resub[`tier${tier}`] * 1000;
+        const timeToAdd = opts.values.resub[`tier${tier}` as keyof NonNullable<OverlayMapperMarathon['opts']>['values']['resub']] * 1000;
 
-        if (value.opts.maxEndTime !== null) {
-          value.opts.endTime = Math.min(value.opts.endTime + timeToAdd, value.opts.maxEndTime);
+        if (opts.maxEndTime !== null) {
+          opts.endTime = Math.min(opts.endTime + timeToAdd, opts.maxEndTime);
         } else {
-          value.opts.endTime += timeToAdd;
+          opts.endTime += timeToAdd;
         }
+        value.opts = typeof value.opts === 'string' ? JSON.stringify(opts) : value.opts;
         cachedOverlays.set(id, value);
       }
       await this.flushCache();
@@ -69,26 +83,33 @@ class Marathon extends Overlay {
     eventEmitter.on('cheer', async (data) => {
       await this.updateCache();
       for (const [id, value] of cachedOverlays.entries()) {
-        if (value.opts.endTime < Date.now()
-          && !value.opts.disableWhenReachedZero
-          && Date.now() < value.opts.maxEndTime) {
-          value.opts.endTime = Date.now(); // reset endTime
-        } else if (value.opts.endTime < Date.now()) {
+        if (!value.opts) {
+          continue;
+        }
+        const opts = typeof value.opts === 'string'
+          ? JSON.parse<NonNullable<OverlayMapperMarathon['opts']>>(value.opts as any)
+          : value.opts;
+        if (opts.endTime < Date.now()
+          && !opts.disableWhenReachedZero
+          && (!opts.maxEndTime || Date.now() < opts.maxEndTime)) {
+          opts.endTime = Date.now(); // reset endTime
+        } else if (opts.endTime < Date.now()) {
           return;
         }
 
         // how much time to add
-        let multiplier = data.bits / value.opts.values.bits.bits;
-        if (!value.opts.values.bits.addFraction) {
+        let multiplier = data.bits / opts.values.bits.bits;
+        if (!opts.values.bits.addFraction) {
           multiplier = Math.floor(multiplier);
         }
-        const timeToAdd = value.opts.values.bits.time * multiplier * 1000;
+        const timeToAdd = opts.values.bits.time * multiplier * 1000;
 
-        if (value.opts.maxEndTime !== null) {
-          value.opts.endTime = Math.min(value.opts.endTime + timeToAdd, value.opts.maxEndTime);
+        if (opts.maxEndTime !== null) {
+          opts.endTime = Math.min(opts.endTime + timeToAdd, opts.maxEndTime);
         } else {
-          value.opts.endTime += timeToAdd;
+          opts.endTime += timeToAdd;
         }
+        value.opts = typeof value.opts === 'string' ? JSON.stringify(opts) : value.opts;
         cachedOverlays.set(id, value);
       }
       await this.flushCache();
@@ -96,26 +117,33 @@ class Marathon extends Overlay {
     eventEmitter.on('tip', async (data) => {
       await this.updateCache();
       for (const [id, value] of cachedOverlays.entries()) {
-        if (value.opts.endTime < Date.now()
-          && !value.opts.disableWhenReachedZero
-          && Date.now() < value.opts.maxEndTime) {
-          value.opts.endTime = Date.now(); // reset endTime
-        } else if (value.opts.endTime < Date.now()) {
+        if (!value.opts) {
+          continue;
+        }
+        const opts = typeof value.opts === 'string'
+          ? JSON.parse<NonNullable<OverlayMapperMarathon['opts']>>(value.opts as any)
+          : value.opts;
+        if (opts.endTime < Date.now()
+          && !opts.disableWhenReachedZero
+          && (!opts.maxEndTime || Date.now() < opts.maxEndTime)) {
+          opts.endTime = Date.now(); // reset endTime
+        } else if (opts.endTime < Date.now()) {
           return;
         }
 
         // how much time to add
-        let multiplier = Number(data.amountInBotCurrency) / value.opts.values.tips.tips;
-        if (!value.opts.values.tips.addFraction) {
+        let multiplier = Number(data.amountInBotCurrency) / opts.values.tips.tips;
+        if (!opts.values.tips.addFraction) {
           multiplier = Math.floor(multiplier);
         }
-        const timeToAdd = value.opts.values.tips.time * multiplier * 1000;
+        const timeToAdd = opts.values.tips.time * multiplier * 1000;
 
-        if (value.opts.maxEndTime !== null) {
-          value.opts.endTime = Math.min(value.opts.endTime + timeToAdd, value.opts.maxEndTime);
+        if (opts.maxEndTime !== null) {
+          opts.endTime = Math.min(opts.endTime + timeToAdd, opts.maxEndTime);
         } else {
-          value.opts.endTime += timeToAdd;
+          opts.endTime += timeToAdd;
         }
+        value.opts = typeof value.opts === 'string' ? JSON.stringify(opts) : value.opts;
         cachedOverlays.set(id, value);
       }
       await this.flushCache();
@@ -163,7 +191,7 @@ class Marathon extends Overlay {
         }
       } else {
         // single overlay
-        await getRepository(OverlayMapper).save(value);
+        await getRepository(OverlayMapper).save(value as OverlayMapperMarathon);
       }
     }
   }
@@ -184,14 +212,15 @@ class Marathon extends Overlay {
       const key = Array.from(cachedOverlays.keys()).find(id => id.includes(data.id));
       const item = cachedOverlays.get(key ?? '');
       if (item) {
-        if (isNaN(item.opts.endTime) || item.opts.endTime < Date.now()) {
-          item.opts.endTime = Date.now();
+        const opts = typeof item.opts === 'string' ? JSON.parse(item.opts) : item.opts;
+        if (isNaN(opts.endTime) || opts.endTime < Date.now()) {
+          opts.endTime = Date.now();
         }
-        item.opts.endTime += data.time;
-        if (item.opts.maxEndTime !== null && item.opts.endTime) {
+        opts.endTime += data.time;
+        if (opts.maxEndTime !== null && opts.endTime) {
           error('MARATHON: cannot set end time bigger than maximum end time');
           addUIError({ name: 'MARATHON', message: 'Cannot set end time bigger than maximum end time.' });
-          item.opts.endTime = item.opts.maxEndTime;
+          opts.endTime = opts.maxEndTime;
         }
         cachedOverlays.set(key ?? '', item);
       }

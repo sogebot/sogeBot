@@ -79,9 +79,11 @@ class Stopwatch extends Overlay {
           // we need to check in groups
           for (let group of await getRepository(OverlayMapper).find({ value: 'group' })) {
             group = group as OverlayMapperGroup;
-            const idx = group.opts.items.findIndex(o => o.id === data.id && o.type === 'stopwatch');
-            if (idx && group.opts.items[idx].opts.isPersistent) {
-              group.opts.items[idx].opts.currentTime = data.time;
+            const idx = group.opts.items.findIndex(o => o.id === data.id && o.type === 'countdown');
+            if (idx && JSON.parse(group.opts.items[idx].opts).isPersistent) {
+              const opts = JSON.parse(group.opts.items[idx].opts);
+              opts.currentTime = data.time;
+              group.opts.items[idx].opts = JSON.stringify(opts);
               await getRepository(OverlayMapper).save(group);
             }
           }

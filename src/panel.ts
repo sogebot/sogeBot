@@ -8,17 +8,13 @@ import express from 'express';
 import { graphqlHTTP } from 'express-graphql';
 import RateLimit from 'express-rate-limit';
 import gitCommitInfo from 'git-commit-info';
-import jwt, { JsonWebTokenError, TokenExpiredError } from 'jsonwebtoken';
+import jwt from 'jsonwebtoken';
 import _, { isEqual } from 'lodash';
 import sanitize from 'sanitize-filename';
-import swaggerUi from 'swagger-ui-express';
-import { ValidateError } from 'tsoa';
 import {
   getConnection, getManager, getRepository,
 } from 'typeorm';
 
-import { RegisterRoutes } from './.cache/routes';
-import * as swaggerJSON from './.cache/swagger.json';
 import Core from './_interface';
 import { CacheTitles } from './database/entity/cacheTitles';
 import { Translation } from './database/entity/translation';
@@ -34,7 +30,6 @@ import {
   getURL, getValueOf, isVariableSet, postURL,
 } from './helpers/customvariables';
 import { getIsBotStarted } from './helpers/database';
-import { UnauthorizedError } from './helpers/errors';
 import { flatten } from './helpers/flatten';
 import { setValue } from './helpers/general';
 import { getLang } from './helpers/locales';
@@ -111,39 +106,6 @@ class Panel extends Core {
 
     app?.use(express.urlencoded({ extended: true, limit: '500mb' }));
     app?.use(express.raw());
-    app?.use('/frame-api-explorer', swaggerUi.serve, swaggerUi.setup({
-      ...swaggerJSON,
-      info: {
-        ...swaggerJSON.info,
-        title:       'API Explorer',
-        description: {},
-        contact:     {},
-        license:     {},
-      },
-    }));
-    RegisterRoutes(app as any);
-    app?.use(function errorHandler(
-      err: UnauthorizedError | Error,
-      _req: any,
-      res: any,
-      next: () => void,
-    ): Express.Response | void {
-      if (err instanceof ValidateError) {
-        return res.status(400).json({
-          message: 'Validation Failed',
-          details: err.fields,
-        });
-      }
-      if (err instanceof UnauthorizedError || err instanceof TokenExpiredError || err instanceof JsonWebTokenError) {
-        return res.status(401).send(err.message);
-      }
-      if (err instanceof Error) {
-        error(err);
-        return res.status(500).send('Internal Server Error');
-      }
-
-      next();
-    });
 
     setServer();
 

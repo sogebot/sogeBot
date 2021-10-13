@@ -1,3 +1,4 @@
+/*
 import { SECOND } from '@sogebot/ui-helpers/constants';
 import {
   Body,
@@ -26,7 +27,7 @@ const ticks: string[] = [];
 const isGroupOverlay = (o: any): o is OverlayMapperGroup => {
   return o.value === 'group';
 };
-
+/*
 setInterval(async () => {
   if (!isBotStarted) {
     return;
@@ -81,7 +82,7 @@ setInterval(async () => {
 export class RegistryOverlayController extends Controller {
   /**
   * Retrieves the quick actions of an authenticated user.
-  */
+  *
   @Get()
   @Security('bearerAuth', [])
   public async getAll(): Promise<{ data: OverlayMappers[], paging: null}> {
@@ -221,4 +222,6 @@ export class RegistryOverlayController extends Controller {
     this.setStatus(404);
     return;
   }
+
 }
+*/
