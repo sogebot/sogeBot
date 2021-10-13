@@ -17,7 +17,7 @@ import Overlay from './_interface';
 class Alerts extends Overlay {
   @onStartup()
   onStartup() {
-    getApp()?.get('/api/v1/registry/alerts/media/:id', async (req, res) => {
+    getApp()?.get('/api/v2/registry/alerts/media/:id', async (req, res) => {
       try {
         const id = req.params.id;
         const media = await getRepository(AlertMedia).find({ id });

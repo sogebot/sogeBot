@@ -14,7 +14,7 @@ class Carousel extends Overlay {
       category: 'registry', name: 'carouseloverlay', id: 'registry.carousel', this: null,
     });
 
-    getApp()?.get('/api/v1/carousel/image/:id', async (req, res) => {
+    getApp()?.get('/api/v2/carousel/image/:id', async (req, res) => {
       try {
         const file = await getRepository(CarouselRepository).findOneOrFail({ id: req.params.id });
         const data = Buffer.from(file.base64, 'base64');
