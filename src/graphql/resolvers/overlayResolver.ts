@@ -1,9 +1,11 @@
 import {
-  Arg, Query, Resolver,
+  Arg, Authorized, Mutation, Query, Resolver,
 } from 'type-graphql';
 import { getRepository } from 'typeorm';
 
-import { OverlayMapper, OverlayMappers } from '../../database/entity/overlay';
+import {
+  OverlayMapper, OverlayMapperInterface, OverlayMappers, 
+} from '../../database/entity/overlay';
 import { OverlayObject } from '../schema/overlay/OverlayObject';
 
 @Resolver()
@@ -38,5 +40,25 @@ export class overlayResolver {
       group:           items.filter(o => o.value === 'group'),
     } as OverlayObject;
     return response;
+  }
+
+  @Authorized()
+  @Mutation(returns => String)
+  async overlaysSave(
+  @Arg('data') data_json: string,
+  ) {
+    const data: OverlayMapperInterface = JSON.parse(data_json);
+    const item = await getRepository(OverlayMapper).save(data);
+    return item.id;
+  }
+
+  @Authorized()
+  @Mutation(returns => Boolean)
+  async overlaysRemove(@Arg('id') id: string) {
+    const item = await getRepository(OverlayMapper).findOne({ id });
+    if (item) {
+      await getRepository(OverlayMapper).remove(item);
+    }
+    return true;
   }
 }
