@@ -35,6 +35,11 @@ let broadcasterTokenErrorSent = false;
 let lastBotTokenValidation = 0;
 let lastBroadcasterTokenValidation = 0;
 
+const urls = {
+  'Twitch Token Generator':  'https://twitchtokengenerator.com/api/refresh/',
+  'SogeBot Token Generator': 'https://twitch-token-generator.soge.workers.dev/refresh/',
+};
+
 class OAuth extends Core {
   private toWait = 10;
 
@@ -48,6 +53,9 @@ class OAuth extends Core {
   public botClientId = '';
   @persistent()
   public broadcasterClientId = '';
+
+  @settings('general')
+  public tokenService: keyof typeof urls = 'Twitch Token Generator';
 
   @settings('general')
   public generalChannel = '';
@@ -372,14 +380,14 @@ class OAuth extends Core {
     */
   public async refreshAccessToken(type: 'bot' | 'broadcaster') {
     warning('Refreshing access token of ' + type);
-    const url = 'https://twitchtokengenerator.com/api/refresh/';
+    const url = urls[this.tokenService];
     try {
       if ((type === 'bot' ? this.botRefreshToken : this.broadcasterRefreshToken) === '') {
         throw new Error('no refresh token for ' + type);
       }
 
       const request = await axios.post(url + encodeURIComponent(type === 'bot' ? this.botRefreshToken : this.broadcasterRefreshToken));
-      debug('oauth.validate', 'https://twitchtokengenerator.com/api/refresh/ =>');
+      debug('oauth.validate', urls[this.tokenService] + ' =>');
       debug('oauth.validate', JSON.stringify(request.data, null, 2));
       if (!request.data.success) {
         if (request.data.message.includes('Invalid refresh token received')) {
