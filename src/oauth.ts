@@ -2,9 +2,7 @@ import * as constants from '@sogebot/ui-helpers/constants';
 import axios from 'axios';
 
 import Core from './_interface';
-import {
-  areDecoratorsLoaded, persistent, settings,
-} from './decorators';
+import { areDecoratorsLoaded, settings } from './decorators';
 import {
   onChange, onLoad, onStartup,
 } from './decorators/on';
@@ -49,9 +47,9 @@ class OAuth extends Core {
   public profileImageUrl = '';
   public broadcaster = '';
   public bot = '';
-  @persistent()
+  @settings('bot')
   public botClientId = '';
-  @persistent()
+  @settings('broadcaster')
   public broadcasterClientId = '';
 
   @settings('general')
@@ -214,6 +212,7 @@ class OAuth extends Core {
   public async onChangeAccessToken(key: string, value: any) {
     switch (key) {
       case 'broadcasterAccessToken':
+        lastBroadcasterTokenValidation = 0;
         this.validateOAuth('broadcaster');
         if (value === '') {
           this.cache.broadcaster = 'force_reconnect';
@@ -222,6 +221,7 @@ class OAuth extends Core {
         }
         break;
       case 'botAccessToken':
+        lastBotTokenValidation = 0;
         this.validateOAuth('bot');
         if (value === '') {
           this.cache.bot = 'force_reconnect';
@@ -300,10 +300,8 @@ class OAuth extends Core {
       }
 
       if (type === 'bot') {
-        this.botClientId = request.data.client_id;
         botId.value = request.data.user_id;
       } else {
-        this.broadcasterClientId = request.data.client_id;
         broadcasterId.value = request.data.user_id;
       }
 
