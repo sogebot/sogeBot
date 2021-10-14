@@ -9,7 +9,7 @@ export interface OverlayMapperInterface {
 export interface OverlayMapperMarathon {
   id: string;
   value: 'marathon';
-  opts: null | {
+  opts: {
     disableWhenReachedZero: boolean;
     showProgressGraph: boolean;
     endTime: number;
@@ -66,7 +66,7 @@ export interface OverlayMapperMarathon {
 export interface OverlayMapperStopwatch {
   id: string;
   value: 'stopwatch';
-  opts: null | {
+  opts: {
     currentTime: number;
     isPersistent: boolean;
     isStartedOnSourceLoad: boolean;
@@ -92,7 +92,7 @@ export interface OverlayMapperStopwatch {
 export interface OverlayMapperCountdown {
   id: string;
   value: 'countdown';
-  opts: null | {
+  opts: {
     time: number;
     currentTime: number;
     isPersistent: boolean;
@@ -136,7 +136,7 @@ export interface OverlayMapperCountdown {
 export interface OverlayMapperCredits {
   id: string;
   value: 'credits';
-  opts: null | {
+  opts: {
     social: {
       type: string, text: string;
     }[],
@@ -185,7 +185,7 @@ export interface OverlayMapperCredits {
 export interface OverlayMapperEventlist {
   id: string;
   value: 'eventlist';
-  opts: null | {
+  opts: {
     count: number,
     ignore: string[]
     display: string[],
@@ -196,7 +196,7 @@ export interface OverlayMapperEventlist {
 export interface OverlayMapperClips {
   id: string;
   value: 'clips';
-  opts: null | {
+  opts: {
     volume: number,
     filter: 'none' | 'grayscale' | 'sepia' | 'tint' | 'washed',
     showLabel: boolean,
@@ -206,7 +206,7 @@ export interface OverlayMapperClips {
 export interface OverlayMapperAlerts {
   id: string;
   value: 'alerts';
-  opts: null | {
+  opts: {
     galleryCache: boolean,
     galleryCacheLimitInMb: number,
   },
@@ -215,7 +215,7 @@ export interface OverlayMapperAlerts {
 export interface OverlayMapperEmotes {
   id: string;
   value: 'emotes';
-  opts: null | {
+  opts: {
     emotesSize: 1 | 2 | 3,
     maxEmotesPerMessage: number,
     animation: 'fadeup' | 'fadezoom' | 'facebook',
@@ -226,7 +226,7 @@ export interface OverlayMapperEmotes {
 export interface OverlayMapperEmotesCombo {
   id: string;
   value: 'emotescombo';
-  opts: null | {
+  opts: {
     showEmoteInOverlayThreshold: number,
     hideEmoteInOverlayAfter: number,
   },
@@ -235,7 +235,7 @@ export interface OverlayMapperEmotesCombo {
 export interface OverlayMapperEmotesFireworks {
   id: string;
   value: 'emotesfireworks';
-  opts: null | {
+  opts: {
     emotesSize: 1 | 2 | 3,
     animationTime: number,
     numOfEmotesPerExplosion: number,
@@ -245,11 +245,16 @@ export interface OverlayMapperEmotesFireworks {
 export interface OverlayMapperEmotesExplode {
   id: string;
   value: 'emotesexplode';
-  opts: null | {
+  opts: {
     emotesSize: 1 | 2 | 3,
     animationTime: number,
     numOfEmotes: number,
   },
+}
+export interface OverlayMapperCarousel {
+  id: string;
+  value: 'carousel';
+  opts: null,
 }
 
 export interface OverlayMapperHypeTrain {
@@ -261,7 +266,7 @@ export interface OverlayMapperHypeTrain {
 export interface OverlayMapperClipsCarousel {
   id: string;
   value: 'clipscarousel';
-  opts: null | {
+  opts: {
     customPeriod: number,
     numOfClips: number,
     volume: number,
@@ -271,7 +276,7 @@ export interface OverlayMapperClipsCarousel {
 export interface OverlayMapperTTS {
   id: string;
   value: 'tts';
-  opts: null | {
+  opts: {
     voice: string,
     volume: number,
     rate: number,
@@ -283,7 +288,7 @@ export interface OverlayMapperTTS {
 export interface OverlayMapperPolls {
   id: string;
   value: 'polls';
-  opts: null | {
+  opts: {
     theme: 'light' | 'dark' | 'Soge\'s green',
     hideAfterInactivity: boolean,
     inactivityTime: number,
@@ -294,7 +299,7 @@ export interface OverlayMapperPolls {
 export interface OverlayMapperOBSWebsocket {
   id: string;
   value: 'obswebsocket';
-  opts: null | {
+  opts: {
     allowedIPs: string[],
   },
 }
@@ -314,12 +319,12 @@ export interface OverlayMapperGroup {
       alignX: number;
       alignY: number;
       type: string;
-      opts: any;
+      opts: string; // JSON.stringify
     }[],
   }
 }
 
-export type OverlayMappers = OverlayMapperMarathon | OverlayMapperStopwatch | OverlayMapperCountdown | OverlayMapperGroup | OverlayMapperEventlist | OverlayMapperEmotesCombo | OverlayMapperCredits | OverlayMapperClips | OverlayMapperAlerts | OverlayMapperEmotes | OverlayMapperEmotesExplode | OverlayMapperEmotesFireworks | OverlayMapperPolls | OverlayMapperTTS | OverlayMapperInterface | OverlayMapperOBSWebsocket | OverlayMapperClipsCarousel | OverlayMapperHypeTrain;
+export type OverlayMappers = OverlayMapperCarousel | OverlayMapperMarathon | OverlayMapperStopwatch | OverlayMapperCountdown | OverlayMapperGroup | OverlayMapperEventlist | OverlayMapperEmotesCombo | OverlayMapperCredits | OverlayMapperClips | OverlayMapperAlerts | OverlayMapperEmotes | OverlayMapperEmotesExplode | OverlayMapperEmotesFireworks | OverlayMapperPolls | OverlayMapperTTS | OverlayMapperInterface | OverlayMapperOBSWebsocket | OverlayMapperClipsCarousel | OverlayMapperHypeTrain;
 
 export const OverlayMapper = new EntitySchema<Readonly<Required<OverlayMappers>>>({
   name:    'overlay_mapper',

@@ -10,6 +10,7 @@ import {
   command, default_permission, parser, timer,
 } from '../decorators';
 import Expects from '../expects';
+import * as cache from '../helpers/cache/alias';
 import { incrementCountOfCommandUsage } from '../helpers/commands/count';
 import { prepare } from '../helpers/commons';
 import { executeVariablesInText } from '../helpers/customvariables';
@@ -20,17 +21,10 @@ import {
   addToViewersCache, get, getFromViewersCache,
 } from '../helpers/permissions';
 import { check, defaultPermissions } from '../helpers/permissions/';
-import { adminEndpoint, publicEndpoint } from '../helpers/socket';
 import Parser from '../parser';
 import { translate } from '../translate';
 import System from './_interface';
 import customcommands from './customcommands';
-
-const findCache: {
-  search: string;
-  alias: Readonly<Required<AliasInterface>>;
-}[] = [];
-let cacheValid = false;
 
 /*
  * !alias                                              - gets an info about alias usage
@@ -57,53 +51,7 @@ class Alias extends System {
     });
   }
 
-  invalidateCache() {
-    cacheValid = false;
-  }
-
-  sockets() {
-    publicEndpoint(this.nsp, 'generic::getAll', async (cb) => {
-      try {
-        cb(null, await getRepository(AliasEntity).find());
-      } catch (e: any) {
-        cb(e.stack, []);
-      }
-    });
-
-    adminEndpoint(this.nsp, 'generic::getOne', async (id, cb) => {
-      try {
-        cb(null, await getRepository(AliasEntity).findOne({ id: String(id) }));
-      } catch (e: any) {
-        cb(e.stack);
-      }
-    });
-
-    adminEndpoint(this.nsp, 'generic::setById', async (opts, cb) => {
-      try {
-        const item = await getRepository(AliasEntity).save({ ...(await getRepository(AliasEntity).findOne({ id: String(opts.id) })), ...opts.item });
-        this.invalidateCache();
-        cb(null, item);
-      } catch (e: any) {
-        cb(e.stack, null);
-      }
-    });
-
-    adminEndpoint(this.nsp, 'generic::deleteById', async (id, cb) => {
-      await getRepository(AliasEntity).delete({ id: String(id) });
-      this.invalidateCache();
-      cb(null);
-    });
-  }
-
   async search(opts: ParserOptions): Promise<[Readonly<Required<AliasInterface>> | null, string[]]> {
-    if (!cacheValid) {
-      // we need to purge findCache and make cacheValid again
-      while(findCache.length > 0) {
-        findCache.shift();
-      }
-      cacheValid = true;
-    }
-
     let alias: Readonly<Required<AliasInterface>> | undefined;
     let fromCache: Readonly<Required<AliasInterface>> | undefined;
     const cmdArray = opts.message.toLowerCase().split(' ');
@@ -115,14 +63,14 @@ class Alias extends System {
 
     const length = opts.message.toLowerCase().split(' ').length;
     for (let i = 0; i < length; i++) {
-      fromCache = findCache.find(o => o.search === cmdArray.join(' '))?.alias;
+      fromCache = cache.findCache.find(o => o.search === cmdArray.join(' '))?.alias;
       if (fromCache) {
         return [fromCache, cmdArray];
       }
 
       alias = await getRepository(AliasEntity).findOne({ alias: cmdArray.join(' '), enabled: true });
       if (alias) {
-        findCache.push({ search: cmdArray.join(' '), alias });
+        cache.findCache.push({ search: cmdArray.join(' '), alias });
         return [alias, cmdArray];
       }
       cmdArray.pop(); // remove last array item if not found
@@ -209,7 +157,7 @@ class Alias extends System {
   @command('!alias group')
   @default_permission(defaultPermissions.CASTERS)
   async group (opts: CommandOptions): Promise<CommandResponse[]> {
-    this.invalidateCache();
+    cache.invalidate();
     try {
       if (opts.parameters.includes('-set')) {
         const [alias, group] = new Expects(opts.parameters)
@@ -293,7 +241,7 @@ class Alias extends System {
   @command('!alias edit')
   @default_permission(defaultPermissions.CASTERS)
   async edit (opts: CommandOptions) {
-    this.invalidateCache();
+    cache.invalidate();
     try {
       const [perm, alias, cmd] = new Expects(opts.parameters)
         .permission({ optional: true, default: defaultPermissions.VIEWERS })
@@ -333,7 +281,7 @@ class Alias extends System {
   @command('!alias add')
   @default_permission(defaultPermissions.CASTERS)
   async add (opts: CommandOptions) {
-    this.invalidateCache();
+    cache.invalidate();
     try {
       const [perm, alias, cmd] = new Expects(opts.parameters)
         .permission({ optional: true, default: defaultPermissions.VIEWERS })
@@ -372,7 +320,7 @@ class Alias extends System {
   @command('!alias list')
   @default_permission(defaultPermissions.CASTERS)
   async list (opts: CommandOptions) {
-    this.invalidateCache();
+    cache.invalidate();
     const alias = await getRepository(AliasEntity).find({ visible: true, enabled: true });
     const response
       = (alias.length === 0
@@ -385,7 +333,7 @@ class Alias extends System {
   @command('!alias toggle')
   @default_permission(defaultPermissions.CASTERS)
   async toggle (opts: CommandOptions) {
-    this.invalidateCache();
+    cache.invalidate();
     try {
       const [alias] = new Expects(opts.parameters)
         .everything()
@@ -412,7 +360,7 @@ class Alias extends System {
   @command('!alias toggle-visibility')
   @default_permission(defaultPermissions.CASTERS)
   async toggleVisibility (opts: CommandOptions) {
-    this.invalidateCache();
+    cache.invalidate();
     try {
       const [alias] = new Expects(opts.parameters)
         .everything()
@@ -439,7 +387,7 @@ class Alias extends System {
   @command('!alias remove')
   @default_permission(defaultPermissions.CASTERS)
   async remove (opts: CommandOptions) {
-    this.invalidateCache();
+    cache.invalidate();
     try {
       const [alias] = new Expects(opts.parameters)
         .everything()

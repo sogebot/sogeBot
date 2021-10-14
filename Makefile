@@ -42,10 +42,6 @@ jsonlint:
 
 bot:
 	@rm -rf dest
-	@echo -ne "\n\t ----- Generating swagger.json \n"
-	@npx tsoa spec
-	@echo -ne "\n\t ----- Generating swagger routes \n"
-	@npx tsoa routes
 ifeq ($(ENV),production)
 	@echo -ne "\n\t ----- Building bot (strip comments)\n"
 	@npx tsc --removeComments true
@@ -53,6 +49,7 @@ else
 	@echo -ne "\n\t ----- Building bot\n"
 	@npx tsc --removeComments false
 endif
+	@npx tsc-alias
 
 pack:
 	@echo -ne "\n\t ----- Packing into sogeBot-$(VERSION).zip\n"

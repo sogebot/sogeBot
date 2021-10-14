@@ -26,6 +26,7 @@ async function retest() {
           'nyc',
           '--clean=false',
           'mocha',
+          '-r', 'tsconfig-paths/register',
           '-r', 'source-map-support/register',
           '--timeout', '120000',
           '--exit',

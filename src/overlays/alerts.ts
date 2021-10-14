@@ -1,16 +1,45 @@
+import FileType from 'file-type';
 import { isNil } from 'lodash';
 import { getRepository } from 'typeorm';
 
 import api from '../api';
+import { AlertMedia } from '../database/entity/alert';
 import { Gallery } from '../database/entity/gallery';
 import { command, default_permission } from '../decorators';
+import { onStartup } from '../decorators/on';
 import { debug } from '../helpers/log';
 import { defaultPermissions } from '../helpers/permissions/';
 import { publicEndpoint } from '../helpers/socket';
 import Message from '../message';
+import { getApp } from '../panel';
 import Overlay from './_interface';
 
 class Alerts extends Overlay {
+  @onStartup()
+  onStartup() {
+    getApp()?.get('/api/v2/registry/alerts/media/:id', async (req, res) => {
+      try {
+        const id = req.params.id;
+        const media = await getRepository(AlertMedia).find({ id });
+        const b64data = media.sort((a,b) => a.chunkNo - b.chunkNo).map(o => o.b64data).join('');
+        if (b64data.trim().length === 0) {
+          throw new Error();
+        } else {
+          const data = Buffer.from(b64data.replace(/(data:.*base64,)/g, ''), 'base64');
+          res.writeHead(200, {
+            'Access-Control-Allow-Origin': '*',
+            'Content-Type':                (await FileType.fromBuffer(data))?.mime,
+            'Content-Length':              data.length,
+          });
+          res.end(data);
+        }
+      } catch (e: any) {
+        res.sendStatus(404);
+      }
+      return;
+    });
+  }
+
   sockets() {
     publicEndpoint(this.nsp, 'cache', async (galleryCacheLimitInMb: number, cb: (err: string | null, ids: string[]) => void) => {
       const items = await getRepository(Gallery).find();

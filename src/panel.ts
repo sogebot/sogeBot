@@ -5,25 +5,23 @@ import path from 'path';
 
 import cors from 'cors';
 import express from 'express';
+import { graphqlHTTP } from 'express-graphql';
 import RateLimit from 'express-rate-limit';
 import gitCommitInfo from 'git-commit-info';
-import { JsonWebTokenError, TokenExpiredError } from 'jsonwebtoken';
+import jwt from 'jsonwebtoken';
 import _, { isEqual } from 'lodash';
 import sanitize from 'sanitize-filename';
-import swaggerUi from 'swagger-ui-express';
-import { ValidateError } from 'tsoa';
 import {
   getConnection, getManager, getRepository,
 } from 'typeorm';
 
-import { RegisterRoutes } from './.cache/routes';
-import * as swaggerJSON from './.cache/swagger.json';
 import Core from './_interface';
 import { CacheTitles } from './database/entity/cacheTitles';
 import { Translation } from './database/entity/translation';
 import { TwitchTag, TwitchTagInterface } from './database/entity/twitch';
 import { User } from './database/entity/user';
 import { onStartup } from './decorators/on';
+import { schema } from './graphql/schema';
 import {
   chatMessagesAtStart, currentStreamTags, isStreamOnline, rawStatus, stats, streamStatusChangeSince,
 } from './helpers/api';
@@ -32,7 +30,6 @@ import {
   getURL, getValueOf, isVariableSet, postURL,
 } from './helpers/customvariables';
 import { getIsBotStarted } from './helpers/database';
-import { UnauthorizedError } from './helpers/errors';
 import { flatten } from './helpers/flatten';
 import { setValue } from './helpers/general';
 import { getLang } from './helpers/locales';
@@ -106,41 +103,9 @@ class Panel extends Core {
         (req as any).rawBody = buf;
       },
     }));
+
     app?.use(express.urlencoded({ extended: true, limit: '500mb' }));
     app?.use(express.raw());
-    app?.use('/frame-api-explorer', swaggerUi.serve, swaggerUi.setup({
-      ...swaggerJSON,
-      info: {
-        ...swaggerJSON.info,
-        title:       'API Explorer',
-        description: {},
-        contact:     {},
-        license:     {},
-      },
-    }));
-    RegisterRoutes(app as any);
-    app?.use(function errorHandler(
-      err: UnauthorizedError | Error,
-      _req: any,
-      res: any,
-      next: () => void,
-    ): Express.Response | void {
-      if (err instanceof ValidateError) {
-        return res.status(400).json({
-          message: 'Validation Failed',
-          details: err.fields,
-        });
-      }
-      if (err instanceof UnauthorizedError || err instanceof TokenExpiredError || err instanceof JsonWebTokenError) {
-        return res.status(401).send(err.message);
-      }
-      if (err instanceof Error) {
-        error(err);
-        return res.status(500).send('Internal Server Error');
-      }
-
-      next();
-    });
 
     setServer();
 
@@ -156,6 +121,29 @@ class Panel extends Core {
         res.status(503).send('Not OK');
       }
     });
+
+    app?.use(
+      '/graphql',
+      function (req, _res, next) {
+        const token = req.headers.authorization as string | undefined;
+
+        try {
+          if (!token) {
+            throw new Error();
+          } else {
+            const data = jwt.verify(token.replace('Bearer', '').trim(), socketSystem.JWTKey);
+            (req as any).user = data;
+          }
+        } catch {
+          (req as any).user = null;
+        }
+        next();
+      },
+      graphqlHTTP({
+        schema,
+        graphiql: true,
+      }),
+    );
 
     // customvariables system
     app?.get('/customvariables/:id', (req, res) => {
@@ -263,7 +251,7 @@ class Panel extends Core {
       adminEndpoint('/', 'panel::resetStatsState', () => lastDataSent = null);
     }, 5000);
 
-    ioServer?.use(socketSystem.authorize);
+    ioServer?.use(socketSystem.authorize as any);
 
     ioServer?.on('connect', async (socket) => {
       socket.on('disconnect', () => {

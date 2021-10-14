@@ -1,15 +1,87 @@
+import {
+  Field, ID, ObjectType, 
+} from 'type-graphql';
 import { EntitySchema } from 'typeorm';
 
 import { ColumnNumericTransformer } from './_transformer';
 
-export interface VariableInterface {
+@ObjectType()
+export class VariableHistoryInterface {
+  @Field(type => ID)
   id?: string;
+  variable?: VariableInterface;
+  variableId: string | null;
+  @Field()
+  userId: string;
+  @Field()
+  username: string;
+  @Field()
+  currentValue: string;
+  @Field()
+  oldValue: string;
+  @Field()
+  changedAt: number;
+}
+
+@ObjectType()
+export class VariableURLInterface {
+  @Field(type => ID)
+  id: string;
+  @Field()
+  GET: boolean;
+  @Field()
+  POST: boolean;
+  @Field()
+  showResponse: boolean;
+  variable: VariableInterface;
+  variableId: string | null;
+}
+
+@ObjectType()
+export class VariableWatchInterface {
+  @Field(type => ID)
+  id: string;
+  variableId: string;
+  @Field()
+  order: number;
+}
+
+@ObjectType()
+export class VariableInterface {
+  @Field(type => ID)
+  id?: string;
+  @Field(type => [VariableHistoryInterface])
   history?: VariableHistoryInterface[];
+  @Field(type => [VariableURLInterface])
   urls?: VariableURLInterface[];
-  variableName: string; description?: string; type: 'eval' | 'number' | 'options' | 'text';
-  currentValue: string; evalValue: string; runEveryTypeValue?: number;
-  runEveryType?: 'isUsed' | string; runEvery?: number; responseType: number; responseText?: string;
-  permission: string; readOnly?: boolean; usableOptions: string[]; runAt?: number;
+  @Field()
+  variableName: string;
+  @Field()
+  description?: string;
+  @Field()
+  type: 'eval' | 'number' | 'options' | 'text';
+  @Field()
+  currentValue: string;
+  @Field()
+  evalValue: string;
+  @Field()
+  runEveryTypeValue?: number;
+  @Field()
+  runEveryType?: 'isUsed' | string;
+  @Field()
+  runEvery?: number;
+  @Field()
+  responseType: number;
+  @Field()
+  responseText?: string;
+  @Field()
+  permission: string;
+  @Field()
+  readOnly?: boolean;
+  @Field(type => [String])
+  usableOptions: string[];
+  @Field()
+  runAt?: number;
 }
 
 export const Variable = new EntitySchema<Readonly<Required<VariableInterface>>>({
@@ -74,12 +146,6 @@ export const Variable = new EntitySchema<Readonly<Required<VariableInterface>>>(
   },
 });
 
-export interface VariableHistoryInterface {
-  id?: string; variable?: VariableInterface; variableId: string | null;
-  userId: string; username: string;
-  currentValue: string; oldValue: any; changedAt: number;
-}
-
 export const VariableHistory = new EntitySchema<Readonly<VariableHistoryInterface>>({
   name:    'variable_history',
   columns: {
@@ -120,10 +186,6 @@ export const VariableHistory = new EntitySchema<Readonly<VariableHistoryInterfac
   },
 });
 
-export interface VariableURLInterface {
-  id: string; GET: boolean; POST: boolean; showResponse: boolean; variable: VariableInterface; variableId: string | null;
-}
-
 export const VariableURL = new EntitySchema<Readonly<VariableURLInterface>>({
   name:    'variable_url',
   columns: {
@@ -159,10 +221,6 @@ export const VariableURL = new EntitySchema<Readonly<VariableURLInterface>>({
     },
   },
 });
-
-export interface VariableWatchInterface {
-  id: string; variableId: string; order: number;
-}
 
 export const VariableWatch = new EntitySchema<Readonly<VariableWatchInterface>>({
   name:    'variable_watch',

@@ -19,8 +19,6 @@ import { adminEndpoint, endpoints } from './helpers/socket';
 import * as changelog from './helpers/user/changelog.js';
 import { isModerator } from './helpers/user/isModerator';
 
-let _self: any = null;
-
 enum Authorized {
   inProgress,
   NotAuthorized,
@@ -116,6 +114,7 @@ class Socket extends Core {
         setTimeout(() => init(retry++), 100);
       } else {
         debug('ui', 'Socket oauth validate endpoint OK.');
+
         app.get('/socket/validate', async (req, res) => {
           const accessTokenHeader = req.headers['x-twitch-token'] as string | undefined;
           const userId = req.headers['x-twitch-userid'] as string | undefined;
@@ -138,7 +137,7 @@ class Socket extends Core {
             });
 
             const accessToken = jwt.sign({
-              userId:     Number(userId),
+              userId,
               username,
               privileges: await getPrivileges(haveCasterPermission ? 'admin' : 'viewer', userId),
             }, this.JWTKey, { expiresIn: `${this.accessTokenExpirationTime}s` });
@@ -251,6 +250,6 @@ class Socket extends Core {
   }
 }
 
-_self = new Socket();
+const _self = new Socket();
 export default _self;
-export { Socket };
+export { Socket, getPrivileges };
