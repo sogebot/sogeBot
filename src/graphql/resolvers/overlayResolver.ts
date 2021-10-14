@@ -4,7 +4,7 @@ import {
 import { getRepository } from 'typeorm';
 
 import {
-  OverlayMapper, OverlayMapperInterface, OverlayMappers, 
+  OverlayMapper, OverlayMapperInterface, OverlayMappers,
 } from '../../database/entity/overlay';
 import { OverlayObject } from '../schema/overlay/OverlayObject';
 
@@ -34,6 +34,7 @@ export class overlayResolver {
       emotesexplode:   items.filter(o => o.value === 'emotesexplode'),
       hypetrain:       items.filter(o => o.value === 'hypetrain'),
       clipscarousel:   items.filter(o => o.value === 'clipscarousel'),
+      carousel:        items.filter(o => o.value === 'carousel'),
       tts:             items.filter(o => o.value === 'tts'),
       polls:           items.filter(o => o.value === 'polls'),
       obswebsocket:    items.filter(o => o.value === 'obswebsocket'),

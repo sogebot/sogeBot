@@ -1,5 +1,6 @@
 import {
   OverlayMapperAlerts,
+  OverlayMapperCarousel,
   OverlayMapperClips,
   OverlayMapperClipsCarousel,
   OverlayMapperCountdown, OverlayMapperCredits, OverlayMapperEmotes, OverlayMapperEmotesCombo, OverlayMapperEmotesExplode, OverlayMapperEmotesFireworks, OverlayMapperEventlist, OverlayMapperGroup, OverlayMapperHypeTrain, OverlayMapperMarathon, OverlayMapperOBSWebsocket, OverlayMapperPolls, OverlayMapperStopwatch, OverlayMapperTTS,
@@ -7,6 +8,7 @@ import {
 import { Field, ObjectType } from 'type-graphql';
 
 import { OverlayAlertsObject } from './OverlayAlertsObject';
+import { OverlayCarouselObject } from './OverlayCarouselObject';
 import { OverlayClipsCarouselObject } from './OverlayClipsCarouselObject';
 import { OverlayClipsObject } from './OverlayClipsObject';
 import { OverlayCountdownObject } from './OverlayCountdownObject';
@@ -60,4 +62,6 @@ export class OverlayObject {
   obswebsocket: OverlayMapperOBSWebsocket[];
   @Field(type => [OverlayGroupObject])
   group: OverlayMapperGroup[];
+  @Field(type => [OverlayCarouselObject])
+  carousel: OverlayMapperCarousel[];
 }
