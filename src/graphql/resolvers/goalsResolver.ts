@@ -20,8 +20,8 @@ export class goalsResolver {
       return getRepository(GoalGroup).find({ relations: ['goals'] });
     }
   }
-  
-  @Query(returns => [GoalsCurrent])
+
+  @Query(returns => GoalsCurrent)
   goalsCurrent() {
     return {
       subscribers: stats.value.currentSubscribers,
