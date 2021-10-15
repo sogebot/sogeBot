@@ -54,6 +54,10 @@ class OAuth extends Core {
 
   @settings('general')
   public tokenService: keyof typeof urls = 'Twitch Token Generator';
+  @settings('general')
+  public tokenServiceCustomClientId = '';
+  @settings('general')
+  public tokenServiceCustomClientSecret = '';
 
   @settings('general')
   public generalChannel = '';
@@ -384,43 +388,68 @@ class OAuth extends Core {
         throw new Error('no refresh token for ' + type);
       }
 
-      const request = await axios.post(url + encodeURIComponent(type === 'bot' ? this.botRefreshToken : this.broadcasterRefreshToken));
-      debug('oauth.validate', urls[this.tokenService] + ' =>');
-      debug('oauth.validate', JSON.stringify(request.data, null, 2));
-      if (!request.data.success) {
-        if (request.data.message.includes('Invalid refresh token received')) {
-          warning(`Invalid refresh token for ${type}. Please reset your token.`);
-          addUIError({ name: 'Token Error!', message: `Invalid refresh token for ${type}. Please reset your token.` });
-          if (type === 'broadcaster') {
-            this.broadcasterAccessToken = '';
-            this.broadcasterRefreshToken = '';
+      if (!url) {
+        // custom app is selected
+        const response = await fetch(`https://id.twitch.tv/oauth2/token?client_id=${this.tokenServiceCustomClientId}&client_secret=${this.tokenServiceCustomClientSecret}&refresh_token=${type === 'bot' ? this.botRefreshToken : this.broadcasterRefreshToken}&grant_type=refresh_token`, { method: 'POST' });
+        if (response.ok) {
+          const data = await response.json();
+
+          if (type === 'bot') {
+            this.botAccessToken = data.access_token;
+            this.botRefreshToken = data.refresh_token;
           } else {
-            this.botRefreshToken = '';
-            this.botAccessToken = '';
+            this.broadcasterAccessToken = data.access_token;
+            this.broadcasterRefreshToken = data.refresh_token;
           }
+
+          warning('Access token of ' + type + ' was refreshed.');
+          warning('New access token of ' + type + ': ' + data.access_token.replace(/(.{25})/, '*'.repeat(25)));
+          warning('New refresh token of ' + type + ': ' + data.refresh_token.replace(/(.{45})/, '*'.repeat(45)));
+          this.validateOAuth(type);
+
+          return data.access_token;
+        } else {
+          throw new Error('Custom token refresh failed');
         }
-        throw new Error(`Token refresh for ${type}: ${request.data.message}`);
-      }
-      if (typeof request.data.token !== 'string' || request.data.token.length === 0) {
-        throw new Error(`Access token for ${type} was not correctly fetched (not a string)`);
-      }
-      if (typeof request.data.refresh !== 'string' || request.data.refresh.length === 0) {
-        throw new Error(`Refresh token for ${type} was not correctly fetched (not a string)`);
-      }
-      if (type === 'bot') {
-        this.botAccessToken = request.data.token;
-        this.botRefreshToken = request.data.refresh;
       } else {
-        this.broadcasterAccessToken = request.data.token;
-        this.broadcasterRefreshToken = request.data.refresh;
+        const request = await axios.post(url + encodeURIComponent(type === 'bot' ? this.botRefreshToken : this.broadcasterRefreshToken));
+        debug('oauth.validate', urls[this.tokenService] + ' =>');
+        debug('oauth.validate', JSON.stringify(request.data, null, 2));
+        if (!request.data.success) {
+          if (request.data.message.includes('Invalid refresh token received')) {
+            warning(`Invalid refresh token for ${type}. Please reset your token.`);
+            addUIError({ name: 'Token Error!', message: `Invalid refresh token for ${type}. Please reset your token.` });
+            if (type === 'broadcaster') {
+              this.broadcasterAccessToken = '';
+              this.broadcasterRefreshToken = '';
+            } else {
+              this.botRefreshToken = '';
+              this.botAccessToken = '';
+            }
+          }
+          throw new Error(`Token refresh for ${type}: ${request.data.message}`);
+        }
+        if (typeof request.data.token !== 'string' || request.data.token.length === 0) {
+          throw new Error(`Access token for ${type} was not correctly fetched (not a string)`);
+        }
+        if (typeof request.data.refresh !== 'string' || request.data.refresh.length === 0) {
+          throw new Error(`Refresh token for ${type} was not correctly fetched (not a string)`);
+        }
+        if (type === 'bot') {
+          this.botAccessToken = request.data.token;
+          this.botRefreshToken = request.data.refresh;
+        } else {
+          this.broadcasterAccessToken = request.data.token;
+          this.broadcasterRefreshToken = request.data.refresh;
+        }
+
+        warning('Access token of ' + type + ' was refreshed.');
+        warning('New access token of ' + type + ': ' + request.data.token.replace(/(.{25})/, '*'.repeat(25)));
+        warning('New refresh token of ' + type + ': ' + request.data.refresh.replace(/(.{45})/, '*'.repeat(45)));
+        this.validateOAuth(type);
+
+        return request.data.token;
       }
-
-      warning('Access token of ' + type + ' was refreshed.');
-      warning('New access token of ' + type + ': ' + request.data.token.replace(/(.{25})/, '*'.repeat(25)));
-      warning('New refresh token of ' + type + ': ' + request.data.refresh.replace(/(.{45})/, '*'.repeat(45)));
-      this.validateOAuth(type);
-
-      return request.data.token;
     } catch (e: any) {
       error(e.stack);
       if (type === 'bot') {
