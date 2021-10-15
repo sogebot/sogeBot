@@ -59,28 +59,6 @@ async function setTitleAndGame (args: { title?: string | null; game?: string | n
 
     requestData = { game_id: await getGameIdFromName(game), title };
 
-    /* workaround for https://github.com/twitchdev/issues/issues/224
-      * Modify Channel Information is not propagated correctly on twitch #224
-      */
-    try {
-      await axios({
-        method: 'put',
-        url:    `https://api.twitch.tv/kraken/channels/${cid}`,
-        data:   {
-          channel: {
-            game:   game,
-            status: title,
-          },
-        },
-        headers: {
-          'Accept':        'application/vnd.twitchtv.v5+json',
-          'Authorization': 'OAuth ' + oauth.broadcasterAccessToken,
-        },
-      });
-    } catch (e: any) {
-      error(`API: https://api.twitch.tv/kraken/channels/${cid} - ${e.message}`);
-    }
-
     request = await axios({
       method:  'patch',
       url,
