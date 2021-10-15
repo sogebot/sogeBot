@@ -254,10 +254,10 @@ class OAuth extends Core {
       }
     */
   public async validateOAuth(type: 'bot' | 'broadcaster', retry = 0): Promise<boolean> {
-    if (type === 'bot' && Date.now() - lastBotTokenValidation < 10 * constants.MINUTE) {
+    if (type === 'bot' && Date.now() - lastBotTokenValidation < constants.MINUTE) {
       return true;
     }
-    if (type === 'broadcaster' && Date.now() - lastBroadcasterTokenValidation < 10 * constants.MINUTE) {
+    if (type === 'broadcaster' && Date.now() - lastBroadcasterTokenValidation < constants.MINUTE) {
       return true;
     }
 
@@ -287,6 +287,11 @@ class OAuth extends Core {
         debug('oauth.validate', `Checking ${type} - retry no. ${retry}`);
         request = await axios.get(url, { headers: { Authorization: 'OAuth ' + (type === 'bot' ? this.botAccessToken : this.broadcasterAccessToken) } });
         debug('oauth.validate', JSON.stringify(request.data));
+
+        if (request.data.expires_in < 300) {
+          await this.refreshAccessToken(type);
+          return this.validateOAuth(type);
+        }
       } catch (e: any) {
         if (e.isAxiosError) {
           if ((typeof e.response === 'undefined' || (e.response.status !== 401 && e.response.status !== 403)) && retry < 5) {
