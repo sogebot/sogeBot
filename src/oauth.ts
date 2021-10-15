@@ -296,6 +296,9 @@ class OAuth extends Core {
             });
             return this.validateOAuth(type, retry++);
           }
+          if (e.response.status === 401) {
+            await this.refreshAccessToken(type);
+          }
           throw new Error(`Error on validate ${type} OAuth token, error: ${e.response.status} - ${e.response.statusText} - ${e.response.data.message}`);
         } else {
           debug('oauth.validate', e.stack);
