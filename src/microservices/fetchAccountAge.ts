@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-import { getToken } from '../helpers/api';
+import { getClientId, getToken } from '../helpers/api';
 import { error } from '../helpers/log';
 import { ioServer } from '../helpers/panel';
 import * as changelog from '../helpers/user/changelog.js';
@@ -10,13 +10,14 @@ async function fetchAccountAge (id?: string | null) {
     return;
   }
 
-  const url = `https://api.twitch.tv/kraken/users/${id}`;
+  const url = `https://api.twitch.tv/helix/users?id=${id}`;
   let request;
   try {
     request = await axios.get(url, {
       headers: {
         'Accept':        'application/vnd.twitchtv.v5+json',
-        'Authorization': 'OAuth ' + await getToken('bot'),
+        'Authorization': 'Bearer ' + await getToken('bot'),
+        'Client-ID':     await getClientId('bot'),
       },
       timeout: 20000,
     });
