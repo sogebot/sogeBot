@@ -290,7 +290,7 @@ class OAuth extends Core {
 
         if (request.data.expires_in < 300) {
           await this.refreshAccessToken(type);
-          return this.validateOAuth(type);
+          return true;
         }
       } catch (e: any) {
         if (e.isAxiosError) {
@@ -303,6 +303,7 @@ class OAuth extends Core {
           }
           if (e.response.status === 401) {
             await this.refreshAccessToken(type);
+            return true;
           }
           throw new Error(`Error on validate ${type} OAuth token, error: ${e.response.status} - ${e.response.statusText} - ${e.response.data.message}`);
         } else {
