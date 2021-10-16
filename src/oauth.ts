@@ -119,9 +119,12 @@ class OAuth extends Core {
 
   @onStartup()
   onStartup() {
-    this.validateOAuth('bot');
-    this.validateOAuth('broadcaster');
+    this.validateTokens();
     this.getChannelId();
+  }
+
+  validateTokens() {
+    return [this.validateOAuth('bot'), this.validateOAuth('broadcaster')];
   }
 
   @onLoad('broadcasterAccessToken')

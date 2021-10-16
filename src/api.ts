@@ -198,7 +198,8 @@ class API extends Core {
           isBlocking = fnc;
 
           // run validation before any requests
-          if (!(await oauth.validateOAuth('bot') || await oauth.validateOAuth('broadcaster'))) {
+          const[ botValidation, broadcasterValidation ] = await Promise.all(oauth.validateTokens());
+          if (!botValidation || !broadcasterValidation) {
             continue;
           }
 
