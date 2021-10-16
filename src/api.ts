@@ -199,7 +199,7 @@ class API extends Core {
 
           // run validation before any requests
           const[ botValidation, broadcasterValidation ] = await Promise.all(oauth.validateTokens());
-          if (!botValidation || !broadcasterValidation) {
+          if (!botValidation || !broadcasterValidation || !oauth.initialValidation) {
             continue;
           }
 
