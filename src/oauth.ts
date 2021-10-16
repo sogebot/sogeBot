@@ -413,7 +413,6 @@ class OAuth extends Core {
           warning('Access token of ' + type + ' was refreshed.');
           warning('New access token of ' + type + ': ' + data.access_token.replace(/(.{25})/, '*'.repeat(25)));
           warning('New refresh token of ' + type + ': ' + data.refresh_token.replace(/(.{45})/, '*'.repeat(45)));
-          this.validateOAuth(type);
 
           return data.access_token;
         } else {
@@ -454,7 +453,6 @@ class OAuth extends Core {
         warning('Access token of ' + type + ' was refreshed.');
         warning('New access token of ' + type + ': ' + request.data.token.replace(/(.{25})/, '*'.repeat(25)));
         warning('New refresh token of ' + type + ': ' + request.data.refresh.replace(/(.{45})/, '*'.repeat(45)));
-        this.validateOAuth(type);
 
         return request.data.token;
       }
