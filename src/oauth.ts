@@ -40,6 +40,7 @@ const urls = {
 
 class OAuth extends Core {
   private toWait = 10;
+  initialValidation = false;
 
   public cache: { bot: string; broadcaster: string } = { bot: '', broadcaster: '' };
   public currentChannel = '';
@@ -119,7 +120,7 @@ class OAuth extends Core {
 
   @onStartup()
   onStartup() {
-    this.validateTokens();
+    Promise.all(this.validateTokens()).finally(() => this.initialValidation = true);
     this.getChannelId();
   }
 

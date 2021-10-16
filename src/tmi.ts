@@ -219,6 +219,13 @@ class TMI extends Core {
 
   async initClient (type: 'bot' | 'broadcaster') {
     clearTimeout(this.timeouts[`initClient.${type}`]);
+
+    // wait for initial validation
+    if (!oauth.initialValidation) {
+      setTimeout(() => this.initClient(type), constants.SECOND);
+      return;
+    }
+
     const token = type === 'bot' ? oauth.botAccessToken : oauth.broadcasterAccessToken;
     const username = type === 'bot' ? oauth.botUsername : oauth.broadcasterUsername;
     const channel = generalChannel.value;
