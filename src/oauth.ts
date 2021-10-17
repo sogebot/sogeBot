@@ -394,7 +394,7 @@ class OAuth extends Core {
       }
     */
   public async refreshAccessToken(type: 'bot' | 'broadcaster') {
-    warning('Refreshing access token of ' + type);
+    debug('oauth.validate', 'Refreshing access token of ' + type);
     const url = urls[this.tokenService];
     try {
       if ((type === 'bot' ? this.botRefreshToken : this.broadcasterRefreshToken) === '') {
@@ -415,9 +415,9 @@ class OAuth extends Core {
             this.broadcasterRefreshToken = data.refresh_token;
           }
 
-          warning('Access token of ' + type + ' was refreshed.');
-          warning('New access token of ' + type + ': ' + data.access_token.replace(/(.{25})/, '*'.repeat(25)));
-          warning('New refresh token of ' + type + ': ' + data.refresh_token.replace(/(.{45})/, '*'.repeat(45)));
+          debug('oauth.validate', 'Access token of ' + type + ' was refreshed.');
+          debug('oauth.validate', 'New access token of ' + type + ': ' + data.access_token.replace(/(.{25})/, '*'.repeat(25)));
+          debug('oauth.validate', 'New refresh token of ' + type + ': ' + data.refresh_token.replace(/(.{45})/, '*'.repeat(45)));
 
           return data.access_token;
         } else {
@@ -455,9 +455,9 @@ class OAuth extends Core {
           this.broadcasterRefreshToken = request.data.refresh;
         }
 
-        warning('Access token of ' + type + ' was refreshed.');
-        warning('New access token of ' + type + ': ' + request.data.token.replace(/(.{25})/, '*'.repeat(25)));
-        warning('New refresh token of ' + type + ': ' + request.data.refresh.replace(/(.{45})/, '*'.repeat(45)));
+        debug('oauth.validate', 'Access token of ' + type + ' was refreshed.');
+        debug('oauth.validate', 'New access token of ' + type + ': ' + request.data.token.replace(/(.{25})/, '*'.repeat(25)));
+        debug('oauth.validate', 'New refresh token of ' + type + ': ' + request.data.refresh.replace(/(.{45})/, '*'.repeat(45)));
 
         return request.data.token;
       }
