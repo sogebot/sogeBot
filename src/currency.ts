@@ -48,9 +48,7 @@ class Currency extends Core {
   }
 
   public exchange(value: number, from: currency, to: currency, rates?: { [key in currency]: number }): number {
-    if (!rates) {
-      rates = _.cloneDeep(this.rates);
-    }
+    rates ??= _.cloneDeep(this.rates);
     try {
       if (from.toLowerCase().trim() === to.toLowerCase().trim()) {
         return Number(value); // nothing to do
