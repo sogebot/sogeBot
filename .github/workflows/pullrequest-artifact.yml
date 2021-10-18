@@ -19,7 +19,7 @@ jobs:
       - name: Get short SHA
         id: slug
         run: echo "::set-output name=sha8::$(echo ${GITHUB_SHA} | cut -c1-8)"
-      - name: install node v14
+      - name: install node v16
         uses: actions/setup-node@v2
         with:
           node-version: 16
