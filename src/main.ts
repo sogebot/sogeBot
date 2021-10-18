@@ -38,13 +38,15 @@ const connect = async function () {
   if (type === 'mysql' || type === 'mariadb') {
     await createConnection({
       ...connectionOptions,
-      logging:       ['error'],
-      logger:        new TypeORMLogger(),
-      synchronize:   false,
-      migrationsRun: true,
-      charset:       'UTF8MB4_GENERAL_CI',
-      entities:      [ 'dest/database/entity/*.js' ],
-      migrations:    [ `dest/database/migration/${getMigrationType(connectionOptions.type)}/**/*.js` ],
+      connectTimeout: 60000,
+      acquireTimeout: 120000,
+      logging:        ['error'],
+      logger:         new TypeORMLogger(),
+      synchronize:    false,
+      migrationsRun:  true,
+      charset:        'UTF8MB4_GENERAL_CI',
+      entities:       [ 'dest/database/entity/*.js' ],
+      migrations:     [ `dest/database/migration/${getMigrationType(connectionOptions.type)}/**/*.js` ],
     } as MysqlConnectionOptions);
   } else {
     await createConnection({

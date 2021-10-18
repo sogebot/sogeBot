@@ -1,6 +1,6 @@
-FROM node:14-stretch-slim
+FROM node:16-stretch-slim
 
-ENV LAST_UPDATED 2020-11-05-1440
+ENV LAST_UPDATED 2021-10-18-1451
 
 ENV NODE_ENV production
 ENV ENV production

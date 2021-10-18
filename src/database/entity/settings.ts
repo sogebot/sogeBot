@@ -17,7 +17,7 @@ export const Settings = new EntitySchema<SettingsInterface>({
     },
     namespace: { type: String },
     name:      { type: String },
-    value:     { type: 'text' },
+    value:     { type: ['mysql', 'mariadb'].includes(process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') ? 'longtext' : 'text' },
   },
   indices: [
     {

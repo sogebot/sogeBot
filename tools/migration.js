@@ -20,7 +20,7 @@ try {
       fs.mkdirSync(logDir);
       console.log(chalk.green(`✓ created folder for logfiles`));
     } catch (error) {
-      console.error(`✕ No read or write permission in ${logDir}\n${err}`);
+      console.error(`✕ No read or write permission in ${logDir}\n${error}`);
       process.exit(1);
     }
   }
@@ -39,15 +39,9 @@ try {
 const repo = ['better-sqlite3', 'postgres', 'mysql'];
 
 async function runMigration() {
-  if (+process.versions.node.split('.')[0] === 15) {
-    fs.writeFileSync(logFile, '✕ Sorry, this app is not supported on Node.js 15.x', { flag: 'a' });
-    console.error('✕ Sorry, this app is not supported on Node.js 15.x');
-    console.error('\n!!! Node version check FAILED, please check your logs/migration.log for additional information !!! \n');
-    process.exit(1);
-  }
-  if (+process.versions.node.split('.')[0] < 14) {
-    fs.writeFileSync(logFile, '✕ Sorry, this app requires Node.js 14.x or later', { flag: 'a' });
-    console.error('✕ Sorry, this app requires Node.js 14.x or later');
+  if (+process.versions.node.split('.')[0] < 16) {
+    fs.writeFileSync(logFile, '✕ Sorry, this app requires Node.js 16.x or later', { flag: 'a' });
+    console.error('✕ Sorry, this app requires Node.js 16.x or later');
     console.error('\n!!! Node version check FAILED, please check your logs/migration.log for additional information !!! \n');
     process.exit(1);
   } else {
