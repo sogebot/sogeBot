@@ -299,6 +299,7 @@ class OAuth extends Core {
         debug('oauth.validate', JSON.stringify(request.data));
 
         if (request.data.expires_in < 300) {
+          debug('oauth.validate', `Refreshing token for ${type} as it is near expiration.`);
           await this.refreshAccessToken(type);
           return true;
         }
@@ -393,6 +394,7 @@ class OAuth extends Core {
         }
       }
     }
+    debug('oauth.validate', `Token for ${type} is ${status ? 'valid' : 'invalid'}.`);
     return status;
   }
 

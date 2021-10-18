@@ -195,8 +195,6 @@ class API extends Core {
           continue;
         }
         if (Date.now() - interval.lastRunAt >= interval.interval) {
-          isBlocking = fnc;
-
           // run validation before any requests
           if (!oauth.initialValidation) {
             continue;
@@ -206,6 +204,7 @@ class API extends Core {
             continue;
           }
 
+          isBlocking = fnc;
           debug('api.interval', chalk.yellow(fnc + '() ') + 'start');
           const time = process.hrtime();
           const time2 = Date.now();
