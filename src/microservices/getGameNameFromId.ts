@@ -24,7 +24,7 @@ async function getGameNameFromId (id: number) {
   }
 
   try {
-    request = await axios.get(url, {
+    request = await axios.get<any>(url, {
       headers: {
         'Authorization': 'Bearer ' + await getToken('bot'),
         'Client-ID':     await getClientId('bot'),
@@ -33,7 +33,7 @@ async function getGameNameFromId (id: number) {
     });
 
     // save remaining api calls
-    setRateLimit('bot', request.headers);
+    setRateLimit('bot', request.headers as any);
     ioServer?.emit('api.stats', {
       method: 'GET', data: request.data, timestamp: Date.now(), call: 'getGameNameFromId', api: 'helix', endpoint: url, code: request.status, remaining: calls.bot,
     });

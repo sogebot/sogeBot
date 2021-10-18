@@ -24,7 +24,7 @@ export class eventListUserId1601124530399 implements MigrationInterface {
     const uniqueUsernames = [...new Set([...evUsernamesFrom, ...events.filter((o: any) => /^[\x00-\x7F]*$/.test(o.username)).map((o: any) => o.username.split(' ')[0].trim())])];
 
     for (const batch of chunk(uniqueUsernames, 100)) {
-      const request = await axios.get(`https://api.twitch.tv/helix/users?login=${batch.join('&login=')}`, {
+      const request = await axios.get<any>(`https://api.twitch.tv/helix/users?login=${batch.join('&login=')}`, {
         headers: {
           'Authorization': 'Bearer ' + JSON.parse(accessToken),
           'Client-ID':     JSON.parse(clientId),

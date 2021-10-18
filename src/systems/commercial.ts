@@ -86,7 +86,7 @@ class Commercial extends System {
         });
 
         // save remaining api calls
-        setRateLimit('broadcaster', request.headers);
+        setRateLimit('broadcaster', request.headers as any);
 
         ioServer?.emit('api.stats', {
           method: 'POST', request: { data: { broadcaster_id: String(cid), length: commercial.duration } }, timestamp: Date.now(), call: 'commercial', api: 'helix', endpoint: url, code: request.status, data: request.data, remaining: calls.broadcaster,

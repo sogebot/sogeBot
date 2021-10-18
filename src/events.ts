@@ -388,7 +388,7 @@ class Events extends Core {
       });
 
       // save remaining api calls
-      setRateLimit('broadcaster', request.headers);
+      setRateLimit('broadcaster', request.headers as any);
 
       ioServer?.emit('api.stats', {
         method: 'POST', request: { data: { broadcaster_id: String(cid), length: Number(operation.durationOfCommercial) } }, timestamp: Date.now(), call: 'commercial', api: 'helix', endpoint: url, code: request.status, data: request.data, remaining: calls.broadcaster,

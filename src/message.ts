@@ -86,7 +86,7 @@ class Message {
     if (!_.isNil(rMessage) && !_.isNil(rMessage[1])) {
       this.message = this.message.replace(rMessage[0], '').trim(); // remove api command from message
       const url = rMessage[1].replace(/&amp;/g, '&');
-      const response = await axios.get(url);
+      const response = await axios.get<any>(url);
       if (response.status !== 200) {
         return translate('core.api.error');
       }

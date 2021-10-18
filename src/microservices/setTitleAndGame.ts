@@ -70,7 +70,7 @@ async function setTitleAndGame (args: { title?: string | null; game?: string | n
       },
     });
     // save remaining api calls
-    setRateLimit('bot', request.headers);
+    setRateLimit('bot', request.headers as any);
 
     ioServer?.emit('api.stats', {
       method: 'PATCH', request: requestData, timestamp: Date.now(), call: 'setTitleAndGame', api: 'helix', endpoint: url, code: request.status, remaining: calls.bot,

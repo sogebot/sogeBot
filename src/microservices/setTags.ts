@@ -40,7 +40,7 @@ async function setTags (tagsArg: string[]) {
       },
     });
     // save remaining api calls
-    setRateLimit('bot', request.headers);
+    setRateLimit('bot', (request.headers as any));
 
     await getRepository(TwitchTag).update({ is_auto: false }, { is_current: false });
     for (const tag_id of tag_ids) {

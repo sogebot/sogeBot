@@ -137,7 +137,7 @@ class Emotes extends Core {
             return;
           }
           info(`EMOTES: Fetching channel ${cid} emotes`);
-          const request = await axios.get('https://api.twitch.tv/helix/chat/emotes?broadcaster_id=' + cid, {
+          const request = await axios.get<any>('https://api.twitch.tv/helix/chat/emotes?broadcaster_id=' + cid, {
             headers: {
               'Authorization': 'Bearer ' + token,
               'Client-ID':     oauth.botClientId,
@@ -186,7 +186,7 @@ class Emotes extends Core {
           return;
         }
         info('EMOTES: Fetching global emotes');
-        const request = await axios.get('https://api.twitch.tv/helix/chat/emotes/global', {
+        const request = await axios.get<any>('https://api.twitch.tv/helix/chat/emotes/global', {
           headers: {
             'Authorization': 'Bearer ' + token,
             'Client-ID':     oauth.botClientId,
@@ -232,7 +232,7 @@ class Emotes extends Core {
       info('EMOTES: Fetching ffz emotes');
       this.lastFFZEmoteChk = Date.now();
       try {
-        const request = await axios.get('https://api.frankerfacez.com/v1/room/id/' + cid);
+        const request = await axios.get<any>('https://api.frankerfacez.com/v1/room/id/' + cid);
 
         const emoteSet = request.data.room.set;
         const emotes = request.data.sets[emoteSet].emoticons;
@@ -276,7 +276,7 @@ class Emotes extends Core {
       info('EMOTES: Fetching bttv emotes');
       this.lastBTTVEmoteChk = Date.now();
       try {
-        const request = await axios.get('https://api.betterttv.net/2/channels/' + channel);
+        const request = await axios.get<any>('https://api.betterttv.net/2/channels/' + channel);
 
         const urlTemplate = request.data.urlTemplate;
         const emotes = request.data.emotes;

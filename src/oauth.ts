@@ -119,12 +119,15 @@ class OAuth extends Core {
   public botCurrentScopes: string[] = [];
 
   @onStartup()
-  onStartup() {
-    Promise.all(this.validateTokens()).finally(() => this.initialValidation = true);
+  async onStartup() {
+    await Promise.all(this.validateTokens());
+    debug('oauth.validate', 'Initial validation finished');
+    this.initialValidation = true;
     this.getChannelId();
   }
 
   validateTokens() {
+    debug('oauth.validate', 'Triggering token validation');
     return [this.validateOAuth('bot'), this.validateOAuth('broadcaster')];
   }
 
@@ -258,10 +261,13 @@ class OAuth extends Core {
       }
     */
   public async validateOAuth(type: 'bot' | 'broadcaster', retry = 0): Promise<boolean> {
+    debug('oauth.validate', `Validation: ${type} - ${retry} retries`);
     if (type === 'bot' && Date.now() - lastBotTokenValidation < constants.MINUTE) {
+      debug('oauth.validate', `Validation: ${type} - ${retry} retries - Already validated`);
       return true;
     }
     if (type === 'broadcaster' && Date.now() - lastBroadcasterTokenValidation < constants.MINUTE) {
+      debug('oauth.validate', `Validation: ${type} - ${retry} retries - Already validated`);
       return true;
     }
 
@@ -289,7 +295,7 @@ class OAuth extends Core {
       let request;
       try {
         debug('oauth.validate', `Checking ${type} - retry no. ${retry}`);
-        request = await axios.get(url, { headers: { Authorization: 'OAuth ' + (type === 'bot' ? this.botAccessToken : this.broadcasterAccessToken) } });
+        request = await axios.get<any>(url, { headers: { Authorization: 'OAuth ' + (type === 'bot' ? this.botAccessToken : this.broadcasterAccessToken) } });
         debug('oauth.validate', JSON.stringify(request.data));
 
         if (request.data.expires_in < 300) {
@@ -297,6 +303,14 @@ class OAuth extends Core {
           return true;
         }
       } catch (e: any) {
+        if (type === 'bot') {
+          lastBotTokenValidation = 0;
+        }
+
+        if (type === 'broadcaster') {
+          lastBroadcasterTokenValidation = 0;
+        }
+
         if (e.isAxiosError) {
           if ((typeof e.response === 'undefined' || (e.response.status !== 401 && e.response.status !== 403)) && retry < 5) {
             // retry validation if error is different than 401 Invalid Access Token
@@ -424,7 +438,7 @@ class OAuth extends Core {
           throw new Error('Custom token refresh failed');
         }
       } else {
-        const request = await axios.post(url + encodeURIComponent(type === 'bot' ? this.botRefreshToken : this.broadcasterRefreshToken));
+        const request = await axios.post<any>(url + encodeURIComponent(type === 'bot' ? this.botRefreshToken : this.broadcasterRefreshToken));
         debug('oauth.validate', urls[this.tokenService] + ' =>');
         debug('oauth.validate', JSON.stringify(request.data, null, 2));
         if (!request.data.success) {

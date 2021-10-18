@@ -123,14 +123,14 @@ class Highlights extends System {
       }
 
       // we need to load video id
-      const request = await axios.get(url, {
+      const request = await axios.get<any>(url, {
         headers: {
           Authorization: 'Bearer ' + token,
           'Client-ID':   oauth.botClientId,
         },
       });
       // save remaining api calls
-      setRateLimit('bot', request.headers);
+      setRateLimit('bot', request.headers as any);
 
       const timestamp = timestampToObject(dayjs().valueOf() - dayjs(streamStatusChangeSince.value).valueOf());
       const highlight = {

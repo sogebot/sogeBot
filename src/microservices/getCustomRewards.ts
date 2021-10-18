@@ -105,7 +105,7 @@ export const getCustomRewards = async (): Promise<getCustomRewardReturn> => {
     });
 
     const toReturn = {
-      headers:  request.headers,
+      headers:  request.headers as any,
       method:   request.config.method?.toUpperCase() ?? 'GET',
       response: request.data,
       status:   request.status,

@@ -32,7 +32,7 @@ async function getIdFromTwitch (username: string, isChannelId = false): Promise<
   }
 
   try {
-    request = await axios.get(url, {
+    request = await axios.get<any>(url, {
       headers: {
         'Authorization': 'Bearer ' + await getToken('bot'),
         'Client-ID':     await getClientId('bot'),
@@ -41,10 +41,10 @@ async function getIdFromTwitch (username: string, isChannelId = false): Promise<
     });
 
     // save remaining api calls
-    calls.bot.limit = request.headers['ratelimit-limit'];
-    setRateLimit('bot', request.headers);
-    calls.bot.remaining = request.headers['ratelimit-remaining'];
-    calls.bot.refresh = request.headers['ratelimit-reset'];
+    calls.bot.limit = (request.headers as any)['ratelimit-limit'];
+    setRateLimit('bot', request.headers as any);
+    calls.bot.remaining = (request.headers as any)['ratelimit-remaining'];
+    calls.bot.refresh = (request.headers as any)['ratelimit-reset'];
 
     ioServer?.emit('api.stats', {
       method: 'GET', data: request.data, timestamp: Date.now(), call: 'getIdFromTwitch', api: 'helix', endpoint: url, code: request.status, remaining: calls.bot,

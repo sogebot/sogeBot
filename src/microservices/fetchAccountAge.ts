@@ -13,7 +13,7 @@ async function fetchAccountAge (id?: string | null) {
   const url = `https://api.twitch.tv/helix/users?id=${id}`;
   let request;
   try {
-    request = await axios.get(url, {
+    request = await axios.get<any>(url, {
       headers: {
         'Accept':        'application/vnd.twitchtv.v5+json',
         'Authorization': 'Bearer ' + await getToken('bot'),

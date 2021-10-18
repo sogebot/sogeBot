@@ -93,7 +93,7 @@ class Streamlabs extends Integration {
       const after = String(this.afterDonationId).length > 0 ? `&after=${this.afterDonationId}` : '';
       const url = 'https://streamlabs.com/api/v1.0/donations?access_token=' + this.accessToken + after;
       try {
-        const result = (await axios.get(url)).data;
+        const result = (await axios.get<any>(url)).data;
         debug('streamlabs', url);
         debug('streamlabs', result);
         ioServer?.emit('api.stats', {

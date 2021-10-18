@@ -30,7 +30,7 @@ const evaluate: ResponseFilter = {
       for (const match of toEvaluate.match(/url\(['"](.*?)['"]\)/g) as RegExpMatchArray ) {
         const id = 'url' + crypto.randomBytes(64).toString('hex').slice(0, 5);
         const url = match.replace(/url\(['"]|["']\)/g, '');
-        let response = await axios.get(url);
+        let response = await axios.get<any>(url);
         try {
           response.data = JSON.parse(response.data.toString());
         } catch (e: any) {

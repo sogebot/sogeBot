@@ -129,7 +129,7 @@ class EventSub extends Core {
       // validate
       try {
         const validateUrl = `https://id.twitch.tv/oauth2/validate`;
-        const response = await axios.get(validateUrl, { headers: { Authorization: `OAuth ${this.appToken}` } });
+        const response = await axios.get<any>(validateUrl, { headers: { Authorization: `OAuth ${this.appToken}` } });
         if (response.data.client_id !== this.clientId) {
           warning(`EVENTSUB: Client ID of token and set Client ID not match. Invalidating token.`);
           this.appToken = '';
@@ -144,8 +144,8 @@ class EventSub extends Core {
     if (this.clientId.length > 0 && this.clientSecret.length > 0) {
       try {
         const url = `https://id.twitch.tv/oauth2/token?client_id=${this.clientId}&client_secret=${this.clientSecret}&grant_type=client_credentials&scope=channel:read:hype_train`;
-        const request = axios.post(url);
-        this.appToken = (await request).data.access_token;
+        const request = await axios.post<any>(url);
+        this.appToken = request.data.access_token;
         return this.appToken;
       } catch (e: any) {
         if (e.response) {
@@ -196,7 +196,7 @@ class EventSub extends Core {
 
     try {
       // check if domain is available in https mode
-      await axios.get(`${this.useTunneling ? this.tunnelDomain : 'https://' + this.domain}/webhooks/callback`, { headers: { 'sogebot-test': 'true' } });
+      await axios.get<any>(`${this.useTunneling ? this.tunnelDomain : 'https://' + this.domain}/webhooks/callback`, { headers: { 'sogebot-test': 'true' } });
     } catch (e) {
       if (!isErrorEventsShown) {
         warning(`EVENTSUB: Bot not responding correctly on ${this.useTunneling ? this.tunnelDomain : 'https://' + this.domain}/webhooks/callback, eventsub will not work.`);
@@ -219,7 +219,7 @@ class EventSub extends Core {
         return;
       }
       const url = 'https://api.twitch.tv/helix/eventsub/subscriptions';
-      const request = await axios.get(url, {
+      const request = await axios.get<any>(url, {
         headers: {
           'Authorization': 'Bearer ' + token,
           'Client-ID':     this.clientId,

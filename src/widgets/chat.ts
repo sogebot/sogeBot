@@ -28,10 +28,10 @@ class Chat extends Widget {
     adminEndpoint(this.nsp, 'viewers', async (cb) => {
       try {
         const url = `https://tmi.twitch.tv/group/user/${generalChannel.value.toLowerCase()}/chatters`;
-        const response = await axios.get(url);
+        const response = await axios.get<{chatters: { viewers: string[] }}>(url);
 
         if (response.status === 200) {
-          const chatters = response.data.chatters as { viewers: string[] };
+          const chatters = response.data.chatters;
           chatters.viewers = chatters.viewers.filter((o) => !getIgnoreList().includes(o));
           cb(null, { chatters });
         }

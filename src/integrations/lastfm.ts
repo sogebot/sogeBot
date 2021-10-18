@@ -1,6 +1,4 @@
-// bot libraries
-import Axios from 'axios';
-
+import axios from 'axios';
 import { settings } from '../decorators';
 import { onChange, onStartup } from '../decorators/on';
 import {  error } from '../helpers/log';
@@ -33,7 +31,7 @@ class LastFM extends Integration {
   async fetchData() {
     if (this.enabled && canSendRequests) {
       try {
-        const response = await Axios.get(`http://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=${this.username}&api_key=${this.apiKey}&format=json`);
+        const response = await axios.get<any>(`http://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=${this.username}&api_key=${this.apiKey}&format=json`);
         const tracks = response.data.recenttracks.track;
 
         this.currentSong = null;

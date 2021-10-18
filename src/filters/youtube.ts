@@ -9,7 +9,7 @@ const youtube: ResponseFilter = {
       .replace(')', '')
       .trim();
     try {
-      const response = await axios.get('https://www.youtube.com/channel/'+channel+'/videos?view=0&sort=dd');
+      const response = await axios.get<any>('https://www.youtube.com/channel/'+channel+'/videos?view=0&sort=dd');
       const match = new RegExp('"videoId":"(.*?)",.*?title":{"runs":\\[{"text":"(.*?)"}]', 'gm').exec(response.data);
       if (match) {
         return `https://youtu.be/${match[1]}`;
@@ -17,7 +17,7 @@ const youtube: ResponseFilter = {
         return 'n/a';
       }
     } catch (e: any) {
-      const response = await axios.get('https://www.youtube.com/user/'+channel+'/videos?view=0&sort=dd');
+      const response = await axios.get<any>('https://www.youtube.com/user/'+channel+'/videos?view=0&sort=dd');
       const match = new RegExp('"videoId":"(.*?)",.*?title":{"runs":\\[{"text":"(.*?)"}]', 'gm').exec(response.data);
       if (match) {
         return `https://youtu.be/${match[1]}`;
@@ -32,7 +32,7 @@ const youtube: ResponseFilter = {
       .replace(')', '')
       .trim();
     try {
-      const response = await axios.get('https://www.youtube.com/channel/'+channel+'/videos?view=0&sort=dd');
+      const response = await axios.get<any>('https://www.youtube.com/channel/'+channel+'/videos?view=0&sort=dd');
       const match = new RegExp('"videoId":"(.*?)",.*?title":{"runs":\\[{"text":"(.*?)"}]', 'gm').exec(response.data);
       if (match) {
         return match[2];
@@ -40,7 +40,7 @@ const youtube: ResponseFilter = {
         return 'n/a';
       }
     } catch (e: any) {
-      const response = await axios.get('https://www.youtube.com/user/'+channel+'/videos?view=0&sort=dd');
+      const response = await axios.get<any>('https://www.youtube.com/user/'+channel+'/videos?view=0&sort=dd');
       const match = new RegExp('"videoId":"(.*?)",.*?title":{"runs":\\[{"text":"(.*?)"}]', 'gm').exec(response.data);
       if (match) {
         return match[2];

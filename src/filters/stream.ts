@@ -24,14 +24,14 @@ const stream: ResponseFilter = {
     }
 
     try {
-      let request = await axios.get(`https://api.twitch.tv/helix/users?login=${channel}`, {
+      let request = await axios.get<any>(`https://api.twitch.tv/helix/users?login=${channel}`, {
         headers: {
           'Authorization': 'Bearer ' + token,
           'Client-ID':     oauth.botClientId,
         },
       });
       const channelId = request.data.data[0].id;
-      request = await axios.get(`https://api.twitch.tv/helix/channels?broadcaster_id=${channelId}`, {
+      request = await axios.get<any>(`https://api.twitch.tv/helix/channels?broadcaster_id=${channelId}`, {
         headers: {
           'Authorization': 'Bearer ' + token,
           'Client-ID':     oauth.botClientId,
@@ -52,7 +52,7 @@ const stream: ResponseFilter = {
     }
 
     try {
-      let request = await axios.get(`https://api.twitch.tv/helix/users?login=${channel}`, {
+      let request = await axios.get<any>(`https://api.twitch.tv/helix/users?login=${channel}`, {
         headers: {
           'Authorization': 'Bearer ' + token,
           'Client-ID':     oauth.botClientId,
@@ -60,14 +60,14 @@ const stream: ResponseFilter = {
       });
 
       const channelId = request.data.data[0].id;
-      request = await axios.get(`https://api.twitch.tv/helix/channels?broadcaster_id=${channelId}`, {
+      request = await axios.get<any>(`https://api.twitch.tv/helix/channels?broadcaster_id=${channelId}`, {
         headers: {
           'Authorization': 'Bearer ' + token,
           'Client-ID':     oauth.botClientId,
         },
       });
       // save remaining api calls
-      setRateLimit('bot', request.headers);
+      setRateLimit('bot', request.headers as any);
       return `'${request.data.data[0].title}'`;
     } catch (e: any) {
       return 'n/a';
@@ -82,21 +82,21 @@ const stream: ResponseFilter = {
     }
 
     try {
-      let request = await axios.get(`https://api.twitch.tv/helix/users?login=${channel}`, {
+      let request = await axios.get<any>(`https://api.twitch.tv/helix/users?login=${channel}`, {
         headers: {
           'Authorization': 'Bearer ' + token,
           'Client-ID':     oauth.botClientId,
         },
       });
       const channelId = request.data.data[0].id;
-      request = await axios.get(`https://api.twitch.tv/helix/streams?user_id=${channelId}`, {
+      request = await axios.get<any>(`https://api.twitch.tv/helix/streams?user_id=${channelId}`, {
         headers: {
           'Authorization': 'Bearer ' + token,
           'Client-ID':     oauth.botClientId,
         },
       });
       // save remaining api calls
-      setRateLimit('bot', request.headers);
+      setRateLimit('bot', request.headers as any);
       return request.data.data[0].viewer_count;
     } catch (e: any) {
       return '0';

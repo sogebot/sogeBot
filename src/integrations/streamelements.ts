@@ -68,7 +68,7 @@ function getTips (offset: number, channel: string, jwtToken: string, beforeDate:
         Accept:        'application/json',
         Authorization: 'Bearer ' + jwtToken,
       },
-    }).then(response => {
+    }).then((response: any) => {
       const data = response.data;
       resolve([Number(data.total), data.docs]);
     });
@@ -132,7 +132,7 @@ class StreamElements extends Integration {
           Accept:        'application/json',
           Authorization: 'Bearer ' + this.jwtToken,
         },
-      });
+      }) as any;
       this.channel = request.data._id;
       info(chalk.yellow('STREAMELEMENTS:') + ` JWT token check OK. Using channel ${request.data.username}@${request.data._id}`);
     } catch (e: any) {

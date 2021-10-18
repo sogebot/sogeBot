@@ -186,7 +186,7 @@ class Donationalerts extends Integration {
     }
 
     try {
-      const request = await axios.get('https://www.donationalerts.com/api/v1/user/oauth', { headers: { 'Authorization': `Bearer ${this.access_token}` } });
+      const request = await axios.get<any>('https://www.donationalerts.com/api/v1/user/oauth', { headers: { 'Authorization': `Bearer ${this.access_token}` } });
       this.channel = request.data.data.name,
       info(chalk.yellow('DONATIONALERTS:') + ` Access token check OK. Using channel ${this.channel}`);
     } catch (e) {

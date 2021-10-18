@@ -39,7 +39,7 @@ export const fetchUser = async (id: string): Promise<{
   const clientId = await getClientId('bot');
 
   try {
-    request = await axios.get(url, {
+    request = await axios.get<any>(url, {
       headers: {
         'Authorization': 'Bearer ' + token,
         'Client-ID':     clientId,

@@ -35,7 +35,7 @@ export const getUsersFromTwitch = async (usernames: string[]): Promise<{
     }
   */
 
-  const request = await axios.get(url, {
+  const request = await axios.get<any>(url, {
     headers: {
       'Authorization': 'Bearer ' + await getToken('bot'),
       'Client-ID':     await getClientId('bot'),

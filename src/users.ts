@@ -468,7 +468,7 @@ class Users extends Core {
           cb(new Error('no token available'), null);
         }
 
-        const request = await axios.get(url, {
+        const request = await axios.get<any>(url, {
           headers: {
             'Accept':        'application/vnd.twitchtv.v5+json',
             'Authorization': 'Bearer ' + token,

@@ -198,8 +198,11 @@ class API extends Core {
           isBlocking = fnc;
 
           // run validation before any requests
+          if (!oauth.initialValidation) {
+            continue;
+          }
           const[ botValidation, broadcasterValidation ] = await Promise.all(oauth.validateTokens());
-          if (!botValidation || !broadcasterValidation || !oauth.initialValidation) {
+          if (!botValidation || !broadcasterValidation) {
             continue;
           }
 
@@ -302,7 +305,7 @@ class API extends Core {
       });
 
       // save remaining api calls
-      setRateLimit('broadcaster', request.headers);
+      setRateLimit('broadcaster', request.headers as any);
 
       const data = request.data.data;
       await changelog.flush();
@@ -366,7 +369,7 @@ class API extends Core {
     }
 
     try {
-      request = await axios.get(url, {
+      request = await axios.get<any>(url, {
         headers: {
           'Authorization': 'Bearer ' + token,
           'Client-ID':     oauth.botClientId,
@@ -375,7 +378,7 @@ class API extends Core {
       });
 
       // save remaining api calls
-      setRateLimit('bot', request.headers);
+      setRateLimit('bot', request.headers as any);
 
       ioServer?.emit('api.stats', {
         method: 'GET', data: request.data, timestamp: Date.now(), call: 'getUsernameFromTwitch', api: 'helix', endpoint: url, code: request.status, remaining: calls.bot,
@@ -446,7 +449,7 @@ class API extends Core {
 
     let request;
     try {
-      request = await axios.get(url, {
+      request = await axios.get<any>(url, {
         headers: {
           'Authorization': 'Bearer ' + token,
           'Client-ID':     oauth.botClientId,
@@ -488,7 +491,7 @@ class API extends Core {
       });
 
       // save remaining api calls
-      setRateLimit('bot', request.headers);
+      setRateLimit('bot', request.headers as any);
 
       if (request.data.pagination.cursor) {
         // move to next page
@@ -535,13 +538,13 @@ class API extends Core {
 
     let request;
     try {
-      request = await axios.get(url, {
+      request = await axios.get<SubscribersEndpoint>(url, {
         headers: {
           'Authorization': 'Bearer ' + token,
           'Client-ID':     oauth.botClientId,
         },
         timeout: 20000,
-      }) as AxiosResponse<SubscribersEndpoint>;
+      });
       const subscribers = request.data.data;
       if (opts.subscribers) {
         opts.subscribers = [...subscribers, ...opts.subscribers];
@@ -554,7 +557,7 @@ class API extends Core {
       });
 
       // save remaining api calls
-      setRateLimit('broadcaster', request.headers);
+      setRateLimit('broadcaster', request.headers as any);
 
       if (request.data.pagination.cursor) {
         // move to next page
@@ -638,7 +641,7 @@ class API extends Core {
 
     let request;
     try {
-      request = await axios.get(url, {
+      request = await axios.get<any>(url, {
         headers: {
           'Authorization': 'Bearer ' + token,
           'Client-ID':     oauth.botClientId,
@@ -646,7 +649,7 @@ class API extends Core {
         timeout: 20000,
       });
       // save remaining api calls
-      setRateLimit('bot', request.headers);
+      setRateLimit('bot', request.headers as any);
 
       ioServer?.emit('api.stats', {
         method: 'GET', data: request.data.data, timestamp: Date.now(), call: 'getChannelInformation', api: 'helix', endpoint: url, code: request.status, remaining: calls.bot,
@@ -722,7 +725,7 @@ class API extends Core {
 
     let request;
     try {
-      request = await axios.get(url, {
+      request = await axios.get<any>(url, {
         headers: {
           'Authorization': 'Bearer ' + token,
           'Client-ID':     oauth.botClientId,
@@ -731,7 +734,7 @@ class API extends Core {
       }) as AxiosResponse<FollowsEndpoint>;
 
       // save remaining api calls
-      setRateLimit('bot', request.headers);
+      setRateLimit('bot', request.headers as any);
 
       ioServer?.emit('api.stats', {
         method: 'GET', data: request.data, timestamp: Date.now(), call: 'getLatest100Followers', api: 'helix', endpoint: url, code: request.status, remaining: calls.bot,
@@ -790,7 +793,7 @@ class API extends Core {
     }
 
     try {
-      const request = await axios.get(url, {
+      const request = await axios.get<any>(url, {
         headers: {
           'Authorization': 'Bearer ' + token,
           'Client-ID':     oauth.botClientId,
@@ -799,7 +802,7 @@ class API extends Core {
       }) as AxiosResponse<FollowsEndpoint>;
 
       // save remaining api calls
-      setRateLimit('bot', request.headers);
+      setRateLimit('bot', request.headers as any);
 
       ioServer?.emit('api.stats', {
         method: 'GET', data: request.data, timestamp: Date.now(), call: 'getChannelFollowers', api: 'helix', endpoint: url, code: request.status, remaining: calls.bot,
@@ -860,7 +863,7 @@ class API extends Core {
 
     let request;
     try {
-      request = await axios.get(url, {
+      request = await axios.get<any>(url, {
         headers: {
           'Authorization': 'Bearer ' + token,
           'Client-ID':     oauth.botClientId,
@@ -869,7 +872,7 @@ class API extends Core {
       });
 
       // save remaining api calls
-      setRateLimit('bot', request.headers);
+      setRateLimit('bot', request.headers as any);
 
       ioServer?.emit('api.stats', {
         method: 'GET', data: request.data, timestamp: Date.now(), call: 'getCurrentStreamTags', api: 'helix', endpoint: url, code: request.status, remaining: calls.bot,
@@ -916,7 +919,7 @@ class API extends Core {
 
     let request;
     try {
-      request = await axios.get(url, {
+      request = await axios.get<any>(url, {
         headers: {
           'Authorization': 'Bearer ' + token,
           'Client-ID':     oauth.botClientId,
@@ -925,7 +928,7 @@ class API extends Core {
       }) as AxiosResponse<getBannedEventsEndpoint>;
 
       // save remaining api calls
-      setRateLimit('bot', request.headers);
+      setRateLimit('bot', request.headers as any);
 
       ioServer?.emit('api.stats', {
         method: 'GET', data: request.data, timestamp: Date.now(), call: 'getBannedEvents', api: 'helix', endpoint: url, code: request.status, remaining: calls.bot,
@@ -962,7 +965,7 @@ class API extends Core {
 
     let request;
     try {
-      request = await axios.get(url, {
+      request = await axios.get<any>(url, {
         headers: {
           'Authorization': 'Bearer ' + token,
           'Client-ID':     oauth.botClientId,
@@ -973,7 +976,7 @@ class API extends Core {
       setStatus('API', request.status === 200 ? constants.CONNECTED : constants.DISCONNECTED);
 
       // save remaining api calls
-      setRateLimit('bot', request.headers);
+      setRateLimit('bot', request.headers as any);
 
       ioServer?.emit('api.stats', {
         method: 'GET', data: request.data, timestamp: Date.now(), call: 'getCurrentStreamData', api: 'helix', endpoint: url, code: request.status, remaining: calls.bot,
@@ -1074,7 +1077,7 @@ class API extends Core {
 
     let request;
     try {
-      request = await axios.get(url, {
+      request = await axios.get<any>(url, {
         headers: {
           'Authorization': 'Bearer ' + token,
           'Client-ID':     oauth.botClientId,
@@ -1083,7 +1086,7 @@ class API extends Core {
       });
 
       // save remaining api calls
-      setRateLimit('bot', request.headers);
+      setRateLimit('bot', request.headers as any);
 
       ioServer?.emit('api.stats', {
         method: 'GET', data: request.data, timestamp: Date.now(), call: 'checkClips', api: 'helix', endpoint: url, code: request.status, remaining: calls.bot,
@@ -1156,10 +1159,10 @@ class API extends Core {
           'Authorization': 'Bearer ' + token,
           'Client-ID':     oauth.botClientId,
         },
-      });
+      }) as any;
 
       // save remaining api calls
-      setRateLimit('bot', request.headers);
+      setRateLimit('bot', request.headers as any);
 
       ioServer?.emit('api.stats', {
         method: 'POST', data: request.data, timestamp: Date.now(), call: 'createClip', api: 'helix', endpoint: url, code: request.status, remaining: calls.bot,
@@ -1210,7 +1213,7 @@ class API extends Core {
 
     let request;
     try {
-      request = await axios.get(url, {
+      request = await axios.get<any>(url, {
         headers: {
           'Authorization': 'Bearer ' + token,
           'Client-ID':     oauth.botClientId,
@@ -1219,7 +1222,7 @@ class API extends Core {
       });
 
       // save remaining api calls
-      setRateLimit('bot', request.headers);
+      setRateLimit('bot', request.headers as any);
 
       ioServer?.emit('api.stats', {
         method: 'GET', data: request.data, timestamp: Date.now(), call: 'isFollowerUpdate', api: 'helix', endpoint: url, code: request.status, remaining: calls.bot,
@@ -1293,7 +1296,7 @@ class API extends Core {
       });
 
       // save remaining api calls
-      setRateLimit('bot', request.headers);
+      setRateLimit('bot', request.headers as any);
 
       ioServer?.emit('api.stats', {
         method: 'POST', request: { data: { user_id: String(cid), description: 'Marked from sogeBot' } }, timestamp: Date.now(), call: 'createMarker', api: 'helix', endpoint: url, code: request.status, remaining: calls.bot, data: request,
@@ -1330,7 +1333,7 @@ class API extends Core {
 
     let request;
     try {
-      request = await axios.get(url, {
+      request = await axios.get<any>(url, {
         headers: {
           'Content-Type':  'application/json',
           'Authorization': 'Bearer ' + token,
@@ -1339,7 +1342,7 @@ class API extends Core {
         timeout: 20000,
       });
       // save remaining api calls
-      setRateLimit('bot', request.headers);
+      setRateLimit('bot', request.headers as any);
 
       ioServer?.emit('api.stats', {
         method: 'GET', data: request.data, timestamp: Date.now(), call: 'getClipById', api: 'helix', endpoint: url, code: request.status, remaining: calls.bot,
@@ -1380,7 +1383,7 @@ class API extends Core {
         if (token === '') {
           throw Error('No bot access token');
         }
-        const request = await axios.get(url + chunked.map(o => `id=${o}`).join('&'), {
+        const request = await axios.get<any>(url + chunked.map(o => `id=${o}`).join('&'), {
           headers: {
             'Content-Type':  'application/json',
             'Authorization': 'Bearer ' + token,
@@ -1390,7 +1393,7 @@ class API extends Core {
         });
 
         // save remaining api calls
-        setRateLimit('bot', request.headers);
+        setRateLimit('bot', request.headers as any);
 
         ioServer?.emit('api.stats', {
           method: 'GET', data: request.data, timestamp: Date.now(), call: 'getVideos', api: 'helix', endpoint: url, code: request.status, remaining: calls.bot,
@@ -1448,7 +1451,7 @@ class API extends Core {
         url += '&first=' + opts.first;
       }
 
-      const request = await axios.get(url, {
+      const request = await axios.get<any>(url, {
         headers: {
           'Content-Type':  'application/json',
           'Authorization': 'Bearer ' + token,
@@ -1458,7 +1461,7 @@ class API extends Core {
       });
 
       // save remaining api calls
-      setRateLimit('bot', request.headers);
+      setRateLimit('bot', request.headers as any);
 
       ioServer?.emit('api.stats', {
         method: 'GET', data: request.data, timestamp: Date.now(), call: 'getClipById', api: 'helix', endpoint: url, code: request.status, remaining: calls.bot,

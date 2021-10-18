@@ -1,7 +1,7 @@
 // bot libraries
 
 import { HOUR, MINUTE } from '@sogebot/ui-helpers/constants';
-import Axios from 'axios';
+import axios from 'axios';
 import { escapeRegExp } from 'lodash';
 
 import {
@@ -72,7 +72,7 @@ class PUBG extends Integration {
   async fetchSeasonId() {
     if (this.enabled && this.apiKey.length > 0) {
       this._lastSeasonIdFetch = Date.now();
-      const request = await Axios.get(
+      const request = await axios.get<any>(
         `https://api.pubg.com/shards/${this.platform}/seasons`,
         {
           headers: {
@@ -101,7 +101,7 @@ class PUBG extends Integration {
       } else {
         this._lastGameModeStats = Date.now();
       }
-      const request = await Axios.get(
+      const request = await axios.get<any>(
         ranked ? `https://api.pubg.com/shards/${this.platform}/players/${this.playerId}/seasons/${this.seasonId}/ranked` : `https://api.pubg.com/shards/${this.platform}/players/${this.playerId}/seasons/${this.seasonId}`,
         {
           headers: {
@@ -121,7 +121,7 @@ class PUBG extends Integration {
   sockets() {
     adminEndpoint(this.nsp, 'pubg::searchForseasonId', async ({ apiKey, platform }, cb) => {
       try {
-        const request = await Axios.get(
+        const request = await axios.get<any>(
           `https://api.pubg.com/shards/${platform}/seasons`,
           {
             headers: {
@@ -142,7 +142,7 @@ class PUBG extends Integration {
     });
     adminEndpoint(this.nsp, 'pubg::getUserStats', async ({ apiKey, platform, playerId, seasonId, ranked }, cb) => {
       try {
-        const request = await Axios.get(
+        const request = await axios.get<any>(
           ranked ? `https://api.pubg.com/shards/${platform}/players/${playerId}/seasons/${seasonId}/ranked` : `https://api.pubg.com/shards/${platform}/players/${playerId}/seasons/${seasonId}`,
           {
             headers: {
@@ -163,7 +163,7 @@ class PUBG extends Integration {
     });
     adminEndpoint(this.nsp, 'pubg::searchForPlayerId', async ({ apiKey, platform, playerName }, cb) => {
       try {
-        const request = await Axios.get(
+        const request = await axios.get<any>(
           `https://api.pubg.com/shards/${platform}/players?filter[playerNames]=${playerName}`,
           {
             headers: {

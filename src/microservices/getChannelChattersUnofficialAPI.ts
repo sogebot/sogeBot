@@ -122,7 +122,7 @@ export const getChannelChattersUnofficialAPI = async (): Promise<{ partedUsers: 
     }
 
     const url = `https://tmi.twitch.tv/group/user/${channel}/chatters`;
-    const request = await axios.get(url);
+    const request = await axios.get<any>(url);
 
     if (typeof request.data.chatters === 'undefined') {
       throw Error('chatters undefined');
