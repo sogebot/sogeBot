@@ -8,7 +8,8 @@
     "*.vue"
   ],
   "engines": {
-    "npm": ">=8.0.0"
+    "npm": ">=8.0.0",
+    "node": ">=16.11.1"
   },
   "simple-git-hooks": {
     "pre-commit": "npx simple-git-hooks && npx lint-staged",
