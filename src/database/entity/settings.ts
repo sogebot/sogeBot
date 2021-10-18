@@ -17,7 +17,7 @@ export const Settings = new EntitySchema<SettingsInterface>({
     },
     namespace: { type: String },
     name:      { type: String },
-    value:     { type: 'text' },
+    value:     { type: 'longtext' },
   },
   indices: [
     {
