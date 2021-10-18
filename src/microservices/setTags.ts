@@ -34,9 +34,9 @@ async function setTags (tagsArg: string[]) {
       url,
       data:    { tag_ids },
       headers: {
-        'Authorization': 'Bearer ' + await getToken('bot'),
+        'Authorization': 'Bearer ' + await getToken('broadcaster'),
         'Content-Type':  'application/json',
-        'Client-ID':     await getClientId('bot'),
+        'Client-ID':     await getClientId('broadcaster'),
       },
     });
     // save remaining api calls
