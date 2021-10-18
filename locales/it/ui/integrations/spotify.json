@@ -6,10 +6,10 @@
       "title": "Recupera il brano corrente quando la diretta è offline",
       "help": "Si consiglia di avere questo disabilitato per evitare di raggiungere i limiti delle API"
     },
-    "allowApprovedArtistsOnly": "Allow approved artists only",
+    "allowApprovedArtistsOnly": "Consenti solo artisti approvati",
     "approvedArtists": {
-      "title": "Approved artists",
-      "help": "Name or SpotifyURI of artist, one item per line"
+      "title": "Artisti approvati",
+      "help": "Nome o SpotifyURI dell'artista, un elemento per riga"
     },
     "queueWhenOffline": {
       "title": "Accoda i brani quando la diretta è offline",

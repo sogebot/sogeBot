@@ -11,7 +11,7 @@
     "songrequest": "Riproduci dalla richiesta del brano",
     "playlist": "Riproduci dalla scaletta",
     "onlyMusicCategory": "Permetti solo musica di categoria",
-    "allowRequestsOnlyFromPlaylist": "Allow song requests only from current playlist",
+    "allowRequestsOnlyFromPlaylist": "Consenti richieste di brani solo dalla scaletta corrente",
     "notify": "Invia messaggio al cambiamento del brano"
   },
   "error": {
