@@ -17,7 +17,7 @@ export async function message(type: 'say' | 'whisper' | 'me', username: string |
         tmi.client.bot?.say(username, `/me ${messageToSend}`);
       } else {
         if (tmi.sendAsReply) {
-          tmi.client.bot?.raw(`@reply-parent-msg-id=${messageId} PRIVMSG #soge :${messageToSend}`);
+          tmi.client.bot?.raw(`@reply-parent-msg-id=${messageId} PRIVMSG #${generalChannel.value} :${messageToSend}`);
         } else {
           tmi.client.bot?.[type](username, messageToSend);
         }
