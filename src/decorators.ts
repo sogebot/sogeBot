@@ -94,11 +94,7 @@ export function ui(opts: any, category?: string) {
 }
 
 export function settings(category?: string, isReadOnly = false) {
-  let { name, type } = getNameAndTypeFromStackTrace();
-
-  if (type === 'core' && name === 'chat') {
-    name = 'tmi'; // workaround for renaming file
-  }
+  const { name, type } = getNameAndTypeFromStackTrace();
 
   return (target: any, key: string) => {
     if (!isReadOnly) {
