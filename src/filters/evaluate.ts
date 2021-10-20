@@ -6,12 +6,12 @@ import _ from 'lodash';
 import safeEval from 'safe-eval';
 import { getRepository } from 'typeorm';
 
+import tmi from '../chat';
 import { User } from '../database/entity/user';
 import { UserInterface } from '../database/entity/user';
 import * as changelog from '../helpers/user/changelog.js';
 import { isIgnored } from '../helpers/user/isIgnored';
 import oauth from '../oauth';
-import tmi from '../tmi';
 import users from '../users';
 
 import type { ResponseFilter } from '.';

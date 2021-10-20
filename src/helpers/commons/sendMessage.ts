@@ -59,13 +59,13 @@ class HelpersCommons {
         }
         if (sender['message-type'] === 'whisper') {
           whisperOut(`${messageToSend} [${sender.username}]`);
-          message('whisper', sender.username, messageToSend);
+          message('whisper', sender.username, messageToSend, sender.id);
         } else {
           chatOut(`${messageToSend} [${sender.username}]`);
           if (sendWithMe.value && !messageToSend.startsWith('/')) {
-            message('me', null, messageToSend);
+            message('me', null, messageToSend, sender.id);
           } else {
-            message('say', null, messageToSend);
+            message('say', null, messageToSend, sender.id);
           }
         }
       }

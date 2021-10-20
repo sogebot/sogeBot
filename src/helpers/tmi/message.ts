@@ -1,8 +1,8 @@
-import tmi from '../../tmi';
+import tmi from '../../chat';
 import { error, isDebugEnabled } from '../log';
 import { generalChannel } from '../oauth/generalChannel';
 
-export async function message(type: 'say' | 'whisper' | 'me', username: string | undefined | null, messageToSend: string, retry = true) {
+export async function message(type: 'say' | 'whisper' | 'me', username: string | undefined | null, messageToSend: string, messageId: string, retry = true) {
   try {
     if (username === null || typeof username === 'undefined') {
       username = generalChannel.value;
@@ -14,14 +14,18 @@ export async function message(type: 'say' | 'whisper' | 'me', username: string |
         return;
       }
       if (type === 'me') {
-        tmi.client.bot?.chat.say(username, `/me ${messageToSend}`);
+        tmi.client.bot?.say(username, `/me ${messageToSend}`);
       } else {
-        tmi.client.bot?.chat[type](username, messageToSend);
+        if (tmi.sendAsReply) {
+          tmi.client.bot?.raw(`@reply-parent-msg-id=${messageId} PRIVMSG #soge :${messageToSend}`);
+        } else {
+          tmi.client.bot?.[type](username, messageToSend);
+        }
       }
     }
   } catch (e: any) {
     if (retry) {
-      setTimeout(() => message(type, username, messageToSend, false), 5000);
+      setTimeout(() => message(type, username, messageToSend, messageId, false), 5000);
     } else {
       error(e);
     }

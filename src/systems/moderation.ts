@@ -8,6 +8,7 @@ import tlds from 'tlds';
 import { getRepository, LessThan } from 'typeorm';
 import XRegExp from 'xregexp';
 
+import tmi from '../chat';
 import { parserReply } from '../commons';
 import { Alias } from '../database/entity/alias';
 import { ModerationPermit, ModerationWarning } from '../database/entity/moderation';
@@ -27,7 +28,6 @@ import { timeout } from '../helpers/tmi';
 import { isModerator } from '../helpers/user/isModerator';
 import spotify from '../integrations/spotify';
 import Message from '../message';
-import tmi from '../tmi';
 import { translate } from '../translate';
 import users from '../users';
 import System from './_interface';

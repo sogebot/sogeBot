@@ -1,5 +1,5 @@
+import tmi from '../chat';
 import { Events } from '../database/entity/event';
-import tmi from '../tmi';
 import { flatten } from './flatten';
 
 const attributesReplace = (attributes: Events.Attributes, replaceIn: string) => {

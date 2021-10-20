@@ -1,4 +1,4 @@
-import tmi from '../tmi';
+import tmi from '../chat';
 
 import type { ResponseFilter } from '.';
 

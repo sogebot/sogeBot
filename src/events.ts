@@ -12,6 +12,7 @@ import { getRepository } from 'typeorm';
 
 import Core from './_interface';
 import api from './api';
+import tmi from './chat';
 import { parserReply } from './commons';
 import {
   Event, EventInterface, Events as EventsEntity,
@@ -53,7 +54,6 @@ import Message from './message';
 import { getIdFromTwitch } from './microservices/getIdFromTwitch';
 import { setTitleAndGame } from './microservices/setTitleAndGame';
 import oauth from './oauth';
-import tmi from './tmi';
 import users from './users';
 
 const excludedUsers = new Set<string>();
@@ -349,7 +349,7 @@ class Events extends Core {
   }
 
   public async fireBotWillJoinChannel() {
-    tmi.client.bot?.chat.join('#' + oauth.broadcasterUsername);
+    tmi.client.bot?.join('#' + oauth.broadcasterUsername);
   }
 
   public async fireBotWillLeaveChannel() {
@@ -451,12 +451,10 @@ class Events extends Core {
       });
     } else {
       tmi.message({
-        message: {
-          tags:    { username, userId },
-          message: command,
-        },
-        skip:  true,
-        quiet: !!get(operation, 'isCommandQuiet', false),
+        userstate: { username, userId },
+        message:   command,
+        skip:      true,
+        quiet:     !!get(operation, 'isCommandQuiet', false),
       });
     }
   }

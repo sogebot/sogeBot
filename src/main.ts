@@ -124,7 +124,7 @@ async function main () {
         await autoLoad('./dest/games/');
         await autoLoad('./dest/integrations/');
 
-        const tmi = require('./tmi');
+        const tmi = require('./chat');
 
         if (process.env.HEAP) {
           warning(chalk.bgRed.bold('HEAP debugging is ENABLED'));

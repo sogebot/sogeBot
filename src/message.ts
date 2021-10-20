@@ -2,13 +2,13 @@ import axios from 'axios';
 import _ from 'lodash';
 import { v4 } from 'uuid';
 
+import tmi from './chat';
 import { timer } from './decorators.js';
 import {
   command, count, custom, evaluate, ifp, info, list, math, online, param, price, qs, random, ResponseFilter, stream, youtube,
 } from './filters';
 import { getGlobalVariables } from './helpers/checkFilter.js';
 import { getBotSender } from './helpers/commons/getBotSender';
-import tmi from './tmi';
 import { translate } from './translate';
 
 class Message {

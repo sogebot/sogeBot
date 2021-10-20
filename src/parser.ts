@@ -44,6 +44,9 @@ class Parser {
   constructor (opts: any = {}) {
     this.message = opts.message || '';
     this.sender = opts.sender || null;
+    if (this.sender) {
+      this.sender.userId = this.sender['user-id']; // recast to userId
+    }
     this.skip = opts.skip || false;
     this.quiet = opts.quiet || false;
     this.successfullParserRuns = [];

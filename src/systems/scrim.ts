@@ -2,6 +2,7 @@ import * as constants from '@sogebot/ui-helpers/constants';
 import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized';
 import { getRepository } from 'typeorm';
 
+import tmi from '../chat';
 import { ScrimMatchId } from '../database/entity/scrimMatchId';
 import {
   command, default_permission, settings,
@@ -14,7 +15,6 @@ import { prepare } from '../helpers/commons/prepare';
 import { round5 } from '../helpers/commons/round5';
 import { debug } from '../helpers/log';
 import { defaultPermissions } from '../helpers/permissions/';
-import tmi from '../tmi';
 import { translate } from '../translate';
 import System from './_interface';
 
