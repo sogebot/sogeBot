@@ -10,7 +10,7 @@ const message = require('../../general.js').message;
 const time = require('../../general.js').time;
 
 const { Price } = require('../../../dest/database/entity/price');
-const tmi = (require('../../../dest/tmi')).default;
+const tmi = (require('../../../dest/chat')).default;
 const customcommands = (require('../../../dest/systems/customcommands')).default;
 
 const { getRepository } = require('typeorm');

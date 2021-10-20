@@ -6,7 +6,7 @@ const { getRepository } = require('typeorm');
 
 const { User } = require('../../../dest/database/entity/user');
 const changelog = (require('../../../dest/helpers/user/changelog'));
-const tmi = (require('../../../dest/tmi')).default;
+const tmi = (require('../../../dest/chat')).default;
 const db = require('../../general.js').db;
 const time = require('../../general.js').time;
 const message = require('../../general.js').message;

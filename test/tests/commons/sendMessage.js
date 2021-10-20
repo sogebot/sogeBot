@@ -5,7 +5,7 @@ require('../../general.js');
 const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 
-const tmi = (require('../../../dest/tmi')).default;
+const tmi = (require('../../../dest/chat')).default;
 const assert = require('assert');
 
 const { sendMessage } = require('../../../dest/helpers/commons/sendMessage');

@@ -14,7 +14,7 @@ const user = { userId: String(Math.floor(Math.random() * 100000)), username: 'us
 const { getRepository } = require('typeorm');
 const { User } = require('../../../dest/database/entity/user');
 
-const tmi = (require('../../../dest/tmi')).default;
+const tmi = (require('../../../dest/chat')).default;
 
 async function setUsersOnline(users) {
   await getRepository(User).update({}, { isOnline: false });

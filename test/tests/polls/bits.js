@@ -10,7 +10,7 @@ const message = require('../../general.js').message;
 const time = require('../../general.js').time;
 
 const polls = (require('../../../dest/systems/polls')).default;
-const tmi = (require('../../../dest/tmi')).default;
+const tmi = (require('../../../dest/chat')).default;
 
 const { getRepository } = require('typeorm');
 const { Poll, PollVote } = require('../../../dest/database/entity/poll');

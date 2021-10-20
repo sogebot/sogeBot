@@ -12,7 +12,7 @@ const { User } = require('../../../dest/database/entity/user');
 const isStreamOnline = (require('../../../dest/helpers/api/isStreamOnline')).isStreamOnline;
 const changelog = (require('../../../dest/helpers/user/changelog'));
 // eslint-disable-next-line import/order
-const tmi = require('../../../dest/tmi').default;
+const tmi = require('../../../dest/chat').default;
 
 // users
 const owner = { username: '__broadcaster__' };
