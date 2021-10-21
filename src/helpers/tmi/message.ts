@@ -10,16 +10,16 @@ export async function message(type: 'say' | 'whisper' | 'me', username: string |
     if (username === '') {
       error('TMI: channel is not defined, message cannot be sent');
     } else {
-      if (isDebugEnabled('tmi.message')) {
+      if (isDebugEnabled('tmi.message') || !tmi.client.bot) {
         return;
       }
       if (type === 'me') {
-        tmi.client.bot?.say(username, `/me ${messageToSend}`);
+        tmi.client.bot.say(username, `/me ${messageToSend}`);
       } else {
         if (tmi.sendAsReply) {
-          tmi.client.bot?.raw(`@reply-parent-msg-id=${messageId} PRIVMSG #${generalChannel.value} :${messageToSend}`);
+          tmi.client.bot.raw(`@reply-parent-msg-id=${messageId} PRIVMSG #${generalChannel.value} :${messageToSend}`);
         } else {
-          tmi.client.bot?.[type](username, messageToSend);
+          tmi.client.bot[type](username, messageToSend);
         }
       }
     }

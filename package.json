@@ -20,7 +20,7 @@
   "author": "Michal Orlik <sogehige@gmail.com>",
   "license": "MIT",
   "dependencies": {
-    "@sogebot/ui-admin": "^23.2.8",
+    "@sogebot/ui-admin": "^23.3.0",
     "@sogebot/ui-helpers": "^2.7.2",
     "@sogebot/ui-oauth": "~2.1.1",
     "@sogebot/ui-overlay": "^9.0.1",
@@ -127,7 +127,7 @@
     "@types/mocha": "9.0.0",
     "@types/module-alias": "2.0.1",
     "@types/multer": "^1.4.7",
-    "@types/node": "16.11.1",
+    "@types/node": "16.11.2",
     "@types/node-fetch": "^2.5.12",
     "@types/node-hue-api": "2.3.2",
     "@types/page": "1.11.5",
