@@ -7,11 +7,11 @@ require('../../general.js');
 const { getRepository } = require('typeorm');
 const { v4: uuidv4 } = require('uuid');
 
+const tmi = (require('../../../dest/chat')).default;
 const { Event } = require('../../../dest/database/entity/event');
 const { User } = require('../../../dest/database/entity/user');
 const log = require('../../../dest/helpers/log');
 const changelog = (require('../../../dest/helpers/user/changelog'));
-const tmi = (require('../../../dest/chat')).default;
 const time = require('../../general.js').time;
 const db = require('../../general.js').db;
 const message = require('../../general.js').message;
@@ -47,13 +47,12 @@ describe('Events - cheer event - @func3', () => {
       describe(username + ' cheer event', () => {
         it('trigger cheer event for 1 bit - ' + username, async () => {
           await tmi.cheer({
-            tags: {
-              username,
-              userId,
-              bits: 1,
-            },
-            message: Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5),
-          });
+            username,
+            'user-id': userId,
+            bits:      1,
+          },
+          Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5),
+          );
         });
 
         it('wait 1s', async () => {
