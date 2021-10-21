@@ -27,7 +27,9 @@ export async function message(type: 'say' | 'whisper' | 'me', username: string |
     if (retry) {
       setTimeout(() => message(type, username, messageToSend, messageId, false), 5000);
     } else {
-      error(e);
+      error(JSON.stringify({
+        e: e.stack, type, username, messageToSend, messageId, retry
+      }, null, 2));
     }
   }
 }

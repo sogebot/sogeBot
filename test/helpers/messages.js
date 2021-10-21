@@ -24,7 +24,7 @@ module.exports = {
     tmi.client = {
       bot: {
         chat: {
-          say: function () { },
+          say: function (username, message) { console.log({username, message}) },
           color: function () {},
           timeout: function () {},
           on: function () {},
@@ -35,7 +35,7 @@ module.exports = {
       },
       broadcaster: {
         chat: {
-          say: function () { },
+          say: function (username, message) { console.log({username, message}) },
           color: function () {},
           timeout: function () {},
           on: function () {},
