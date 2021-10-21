@@ -12,7 +12,7 @@ const log = require('../../dest/helpers/log');
 module.exports = {
   prepare: function () {
     const eventEmitter = (require('../../dest/helpers/events/emitter')).eventEmitter;
-    const tmi = (require('../../dest/tmi')).default;
+    const tmi = (require('../../dest/chat')).default;
 
     log.debug('test', chalk.bgRed('*** Restoring all spies ***'));
 

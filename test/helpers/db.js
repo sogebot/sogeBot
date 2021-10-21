@@ -51,7 +51,7 @@ module.exports = {
       }
 
       const oauth = (require('../../dest/oauth')).default;
-      const tmi = (require('../../dest/tmi')).default;
+      const tmi = (require('../../dest/chat')).default;
       const permissions = (require('../../dest/permissions')).default;
       const changelog = (require('../../dest/helpers/user/changelog'));
 
