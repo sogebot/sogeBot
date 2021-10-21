@@ -23,26 +23,24 @@ module.exports = {
 
     tmi.client = {
       bot: {
-        chat: {
-          say: function (username, message) { console.log({username, message}) },
-          color: function () {},
-          timeout: function () {},
-          on: function () {},
-          connect: function () {},
-          join: function () {},
-          part: function () {},
-        },
+        say: function () {},
+        deletemessage: function() {},
+        color: function () {},
+        timeout: function () {},
+        on: function () {},
+        connect: function () {},
+        join: function () {},
+        part: function () {},
       },
       broadcaster: {
-        chat: {
-          say: function (username, message) { console.log({username, message}) },
-          color: function () {},
-          timeout: function () {},
-          on: function () {},
-          connect: function () {},
-          join: function () {},
-          part: function () {},
-        },
+        say: function () {},
+        deletemessage: function() {},
+        color: function () {},
+        timeout: function () {},
+        on: function () {},
+        connect: function () {},
+        join: function () {},
+        part: function () {},
       },
     };
 

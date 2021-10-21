@@ -30,7 +30,7 @@ import { eventEmitter } from './helpers/events';
 import {
   triggerInterfaceOnBit, triggerInterfaceOnMessage, triggerInterfaceOnSub,
 } from './helpers/interface/triggers';
-import { isDebugEnabled } from './helpers/log';
+import { isDebugEnabled, warning } from './helpers/log';
 import {
   chatIn, cheer, debug, error, host, info, raid, resub, sub, subcommunitygift, subgift, whisperIn,
 } from './helpers/log';
@@ -208,6 +208,11 @@ class TMI extends Core {
   }
 
   async initClient (type: 'bot' | 'broadcaster') {
+    if ((global as any).mocha) {
+      // do nothing if tests
+      warning('initClient disabled due to mocha test run.')
+      return;
+    }
     clearTimeout(this.timeouts[`initClient.${type}`]);
 
     // wait for initial validation
