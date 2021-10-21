@@ -4,6 +4,7 @@ import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized';
 import * as _ from 'lodash';
 import { getRepository } from 'typeorm';
 
+import tmi from '../chat';
 import {
   Raffle, RaffleParticipant, RaffleParticipantInterface, RaffleParticipantMessageInterface,
 } from '../database/entity/raffle';
@@ -22,7 +23,6 @@ import { linesParsed } from '../helpers/parser';
 import { defaultPermissions } from '../helpers/permissions/';
 import { adminEndpoint } from '../helpers/socket';
 import * as changelog from '../helpers/user/changelog.js';
-import tmi from '../tmi';
 import { translate } from '../translate';
 import System from './_interface';
 import points from './points';

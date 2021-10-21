@@ -14,7 +14,7 @@ export function isBot(user: string | CommandOptions['sender'] | UserInterface | 
   }
 }
 
-export function isBotId(userId: string) {
+export function isBotId(userId: string | undefined) {
   try {
     if (botUsername.value) {
       return botId.value === userId;

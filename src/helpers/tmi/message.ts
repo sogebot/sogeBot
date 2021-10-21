@@ -1,8 +1,8 @@
-import tmi from '../../tmi';
+import tmi from '../../chat';
 import { error, isDebugEnabled } from '../log';
 import { generalChannel } from '../oauth/generalChannel';
 
-export async function message(type: 'say' | 'whisper' | 'me', username: string | undefined | null, messageToSend: string, retry = true) {
+export async function message(type: 'say' | 'whisper' | 'me', username: string | undefined | null, messageToSend: string, messageId: string, retry = true) {
   try {
     if (username === null || typeof username === 'undefined') {
       username = generalChannel.value;
@@ -10,20 +10,26 @@ export async function message(type: 'say' | 'whisper' | 'me', username: string |
     if (username === '') {
       error('TMI: channel is not defined, message cannot be sent');
     } else {
-      if (isDebugEnabled('tmi.message')) {
+      if (isDebugEnabled('tmi.message') || !tmi.client.bot) {
         return;
       }
       if (type === 'me') {
-        tmi.client.bot?.chat.say(username, `/me ${messageToSend}`);
+        tmi.client.bot.say(username, `/me ${messageToSend}`);
       } else {
-        tmi.client.bot?.chat[type](username, messageToSend);
+        if (tmi.sendAsReply) {
+          tmi.client.bot.raw(`@reply-parent-msg-id=${messageId} PRIVMSG #${generalChannel.value} :${messageToSend}`);
+        } else {
+          tmi.client.bot[type](username, messageToSend);
+        }
       }
     }
   } catch (e: any) {
     if (retry) {
-      setTimeout(() => message(type, username, messageToSend, false), 5000);
+      setTimeout(() => message(type, username, messageToSend, messageId, false), 5000);
     } else {
-      error(e);
+      error(JSON.stringify({
+        e: e.stack, type, username, messageToSend, messageId, retry,
+      }, null, 2));
     }
   }
 }

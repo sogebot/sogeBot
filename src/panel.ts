@@ -16,6 +16,7 @@ import {
 } from 'typeorm';
 
 import Core from './_interface';
+import tmi from './chat';
 import { CacheTitles } from './database/entity/cacheTitles';
 import { Translation } from './database/entity/translation';
 import { TwitchTag, TwitchTagInterface } from './database/entity/twitch';
@@ -56,7 +57,6 @@ import Parser from './parser';
 import { default as socketSystem } from './socket';
 import highlights from './systems/highlights';
 import songs from './systems/songs';
-import tmi from './tmi';
 import translateLib, { translate } from './translate';
 
 const port = Number(process.env.PORT ?? 20000);

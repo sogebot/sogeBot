@@ -35,7 +35,6 @@ describe('Raffles - several raffle joins shouldnt go over max - @func3', () => {
     await getRepository(User).save({
       username: user.viewer2.username, userId: user.viewer2.userId, points: 200,
     });
-    await changelog.update();
   });
 
   it('Viewer bets max allowed points', async () => {

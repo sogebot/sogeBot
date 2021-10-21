@@ -51,7 +51,7 @@ module.exports = {
       }
 
       const oauth = (require('../../dest/oauth')).default;
-      const tmi = (require('../../dest/tmi')).default;
+      const tmi = (require('../../dest/chat')).default;
       const permissions = (require('../../dest/permissions')).default;
       const changelog = (require('../../dest/helpers/user/changelog'));
 
@@ -99,6 +99,7 @@ module.exports = {
 
       oauth.broadcasterId = '54321';
       tmi.ignorelist = [];
+      tmi.sendAsReply = false;
 
       invalidateParserCache();
       resolve();

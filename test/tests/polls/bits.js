@@ -1,21 +1,20 @@
 /* global describe it before */
 const commons = require('../../../dest/commons');
 
-
 require('../../general.js');
 
 const until = require('test-until');
+
+const { Poll, PollVote } = require('../../../dest/database/entity/poll');
+const translate = require('../../../dest/translate').translate;
 const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 const time = require('../../general.js').time;
-
 const polls = (require('../../../dest/systems/polls')).default;
-const tmi = (require('../../../dest/tmi')).default;
+const tmi = (require('../../../dest/chat')).default;
 
 const { getRepository } = require('typeorm');
-const { Poll, PollVote } = require('../../../dest/database/entity/poll');
 const { getLocalizedName } = require('@sogebot/ui-helpers/getLocalized');
-const translate = require('../../../dest/translate').translate;
 
 const assert = require('assert');
 
@@ -94,13 +93,12 @@ describe('Polls - bits - @func2', () => {
         for (let i = 0; i < 10; i++) {
           const user = 'user' + [o, i].join('');
           await tmi.cheer({
-            tags: {
-              username: user,
-              userId: String(Math.floor(Math.random() * 100000)),
-              bits: 10,
-            },
-            message: 'Cool I am voting for #vote' + o + ' enjoy!',
-          });
+            username:  user,
+            'user-id': String(Math.floor(Math.random() * 100000)),
+            bits:      10,
+          },
+          'Cool I am voting for #vote' + o + ' enjoy!',
+          );
 
           await until(async (setError) => {
             try {

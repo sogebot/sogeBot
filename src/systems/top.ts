@@ -5,6 +5,7 @@ import {
   getConnection, getManager, getRepository,
 } from 'typeorm';
 
+import tmi from '../chat';
 import { User } from '../database/entity/user';
 import { command, default_permission } from '../decorators';
 import general from '../general';
@@ -17,7 +18,6 @@ import { unserialize } from '../helpers/type';
 import * as changelog from '../helpers/user/changelog.js';
 import { getIgnoreList, isIgnored } from '../helpers/user/isIgnored';
 import oauth from '../oauth';
-import tmi from '../tmi';
 import { translate } from '../translate';
 import System from './_interface';
 import levels from './levels';

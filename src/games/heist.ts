@@ -2,6 +2,7 @@ import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized';
 import _ from 'lodash';
 import { getRepository } from 'typeorm';
 
+import tmi from '../chat';
 import { HeistUser } from '../database/entity/heist';
 import { command, settings } from '../decorators';
 import { onStartup } from '../decorators/on';
@@ -10,7 +11,6 @@ import { announce, prepare } from '../helpers/commons';
 import { debug, warning } from '../helpers/log.js';
 import * as changelog from '../helpers/user/changelog.js';
 import { default as pointsSystem } from '../systems/points';
-import tmi from '../tmi';
 import { translate } from '../translate';
 import Game from './_interface';
 

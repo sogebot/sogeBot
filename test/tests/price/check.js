@@ -12,7 +12,7 @@ const { User } = require('../../../dest/database/entity/user');
 const alias = (require('../../../dest/systems/alias')).default;
 const customcommands = (require('../../../dest/systems/customcommands')).default;
 const price = (require('../../../dest/systems/price')).default;
-const tmi = (require('../../../dest/tmi')).default;
+const tmi = (require('../../../dest/chat')).default;
 const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 const user = require('../../general.js').user;
@@ -108,13 +108,12 @@ describe('Price - check() - @func3', () => {
       command: '!a', price: 100, priceBits: 10,
     });
     tmi.cheer({
-      tags: {
-        username: user.viewer.username,
-        userId:   user.viewer.userId,
-        bits:     100,
-      },
-      message: '!a',
-    });
+      username:  user.viewer.username,
+      'user-id': user.viewer.userId,
+      bits:      100,
+    },
+    '!a',
+    );
     await message.isSentRaw('Usage => http://sogehige.github.io/sogeBot/#/_master/systems/alias', user.viewer.username, 20000);
   });
 
@@ -124,13 +123,12 @@ describe('Price - check() - @func3', () => {
       command: '!b', price: 100, priceBits: 10,
     });
     tmi.cheer({
-      tags: {
-        username: user.viewer.username,
-        userId:   user.viewer.userId,
-        bits:     100,
-      },
-      message: '!b',
-    });
+      username:  user.viewer.username,
+      'user-id': user.viewer.userId,
+      bits:      100,
+    },
+    '!b',
+    );
     await message.isSentRaw('Lorem Ipsum', user.viewer.username, 20000);
   });
 
@@ -139,13 +137,11 @@ describe('Price - check() - @func3', () => {
       command: '!me', price: 100, priceBits: 10,
     });
     tmi.cheer({
-      tags: {
-        username: user.viewer.username,
-        userId:   user.viewer.userId,
-        bits:     100,
-      },
-      message: '!me',
-    });
+      username:  user.viewer.username,
+      'user-id': user.viewer.userId,
+      bits:      100,
+    },
+    '!me');
     await message.isSentRaw('@__viewer__ | Level 0 | 0 hours | 0 points | 0 messages | €0.00 | 100 bits | 0 months', user.viewer.username, 20000);
   });
 });

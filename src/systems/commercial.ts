@@ -3,6 +3,7 @@
 import axios from 'axios';
 import * as _ from 'lodash';
 
+import tmi from '../chat';
 import {
   command, default_permission, helper,
 } from '../decorators';
@@ -16,7 +17,6 @@ import { addUIError } from '../helpers/panel/alerts';
 import { defaultPermissions } from '../helpers/permissions/';
 import { adminEndpoint } from '../helpers/socket';
 import oauth from '../oauth';
-import tmi from '../tmi';
 import System from './_interface';
 
 /*
@@ -28,11 +28,9 @@ class Commercial extends System {
   sockets() {
     adminEndpoint(this.nsp, 'commercial.run', (data) => {
       tmi.message({
-        message: {
-          tags:    { username: getOwner() },
-          message: '!commercial ' + data.seconds,
-        },
-        skip: true,
+        message:   '!commercial ' + data.seconds,
+        userstate: { username: getOwner() },
+        skip:      true,
       });
     });
   }

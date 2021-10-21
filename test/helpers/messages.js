@@ -12,7 +12,7 @@ const log = require('../../dest/helpers/log');
 module.exports = {
   prepare: function () {
     const eventEmitter = (require('../../dest/helpers/events/emitter')).eventEmitter;
-    const tmi = (require('../../dest/tmi')).default;
+    const tmi = (require('../../dest/chat')).default;
 
     log.debug('test', chalk.bgRed('*** Restoring all spies ***'));
 
@@ -23,26 +23,24 @@ module.exports = {
 
     tmi.client = {
       bot: {
-        chat: {
-          say: function () { },
-          color: function () {},
-          timeout: function () {},
-          on: function () {},
-          connect: function () {},
-          join: function () {},
-          part: function () {},
-        },
+        say: function () {},
+        deletemessage: function() {},
+        color: function () {},
+        timeout: function () {},
+        on: function () {},
+        connect: function () {},
+        join: function () {},
+        part: function () {},
       },
       broadcaster: {
-        chat: {
-          say: function () { },
-          color: function () {},
-          timeout: function () {},
-          on: function () {},
-          connect: function () {},
-          join: function () {},
-          part: function () {},
-        },
+        say: function () {},
+        deletemessage: function() {},
+        color: function () {},
+        timeout: function () {},
+        on: function () {},
+        connect: function () {},
+        join: function () {},
+        part: function () {},
       },
     };
 

@@ -1,5 +1,6 @@
 import { getRepository } from 'typeorm';
 
+import tmi from '../chat';
 import { Queue as QueueEntity, QueueInterface } from '../database/entity/queue';
 import {
   command, default_permission, settings,
@@ -8,7 +9,6 @@ import { getBotSender, prepare } from '../helpers/commons';
 import { defaultPermissions } from '../helpers/permissions/';
 import { adminEndpoint } from '../helpers/socket';
 import * as changelog from '../helpers/user/changelog.js';
-import tmi from '../tmi';
 import { translate } from '../translate';
 import System from './_interface';
 

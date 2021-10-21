@@ -1,26 +1,27 @@
 /* global describe it before */
-const {getBotSender} = require('../../../dest/helpers/commons/getBotSender');
-
+const { getBotSender } = require('../../../dest/helpers/commons/getBotSender');
 
 require('../../general.js');
 
 const until = require('test-until');
+
+const translate = require('../../../dest/translate').translate;
 const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 const time = require('../../general.js').time;
-
 const { Price } = require('../../../dest/database/entity/price');
-const tmi = (require('../../../dest/tmi')).default;
+const tmi = (require('../../../dest/chat')).default;
 const customcommands = (require('../../../dest/systems/customcommands')).default;
 
 const { getRepository } = require('typeorm');
+
 const { Poll, PollVote } = require('../../../dest/database/entity/poll');
+
 const { getLocalizedName } = require('@sogebot/ui-helpers/getLocalized');
-const translate = require('../../../dest/translate').translate;
 
 const assert = require('assert');
 
-const owner = { username: '__broadcaster__', userId: String(Math.floor(Math.random() * 10000)) };
+const owner = { username: '__broadcaster__', 'user-id': String(Math.floor(Math.random() * 10000)) };
 
 describe('TMI - redeem command - @func3', () => {
   before(async () => {
@@ -37,33 +38,35 @@ describe('TMI - redeem command - @func3', () => {
   });
 
   it(`Add price !test with emitRedeemEvent`, async () => {
-    await getRepository(Price).save({ command: '!test', price: 0, priceBits: 10, emitRedeemEvent: true });
+    await getRepository(Price).save({
+      command: '!test', price: 0, priceBits: 10, emitRedeemEvent: true,
+    });
   });
 
   it(`Add price !test2 without emitRedeemEvent`, async () => {
-    await getRepository(Price).save({ command: '!test2', price: 0, priceBits: 10, emitRedeemEvent: false });
+    await getRepository(Price).save({
+      command: '!test2', price: 0, priceBits: 10, emitRedeemEvent: false,
+    });
   });
 
   it(`User will cheer !test with 5 bits (not enough)`, async () => {
     await tmi.cheer({
-      tags: {
-        username: 'testuser',
-        userId: String(Math.floor(Math.random() * 100000)),
-        bits: 5,
-      },
-      message: '!test',
-    });
+      username:  'testuser',
+      'user-id': String(Math.floor(Math.random() * 100000)),
+      bits:      5,
+    },
+    '!test',
+    );
   });
 
   it(`User will cheer !test2 with 5 bits (not enough)`, async () => {
     await tmi.cheer({
-      tags: {
-        username: 'testuser',
-        userId: String(Math.floor(Math.random() * 100000)),
-        bits: 5,
-      },
-      message: '!test2',
-    });
+      username:  'testuser',
+      'user-id': String(Math.floor(Math.random() * 100000)),
+      bits:      5,
+    },
+    '!test2',
+    );
   });
 
   it(`Command !test was not redeemed`, async () => {
@@ -82,24 +85,22 @@ describe('TMI - redeem command - @func3', () => {
 
   it(`User will cheer !test with 10 bits (enough)`, async () => {
     await tmi.cheer({
-      tags: {
-        username: 'testuser',
-        userId: String(Math.floor(Math.random() * 100000)),
-        bits: 10,
-      },
-      message: '!test',
-    });
+      username:  'testuser',
+      'user-id': String(Math.floor(Math.random() * 100000)),
+      bits:      10,
+    },
+    '!test',
+    );
   });
 
   it(`User will cheer !test2 with 10 bits (enough)`, async () => {
     await tmi.cheer({
-      tags: {
-        username: 'testuser',
-        userId: String(Math.floor(Math.random() * 100000)),
-        bits: 10,
-      },
-      message: '!test2',
-    });
+      username:  'testuser',
+      'user-id': String(Math.floor(Math.random() * 100000)),
+      bits:      10,
+    },
+    '!test2',
+    );
   });
 
   it(`Command was !test redeemed`, async () => {

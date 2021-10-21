@@ -9,7 +9,7 @@ const { getOwner } = require('../../../dest/helpers/commons/getOwner');
 const { prepare } = require('../../../dest/helpers/commons/prepare');
 const dayjs = require('../../../dest/helpers/dayjs').dayjs;
 const top = (require('../../../dest/systems/top')).default;
-const tmi = (require('../../../dest/tmi')).default;
+const tmi = (require('../../../dest/chat')).default;
 const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 

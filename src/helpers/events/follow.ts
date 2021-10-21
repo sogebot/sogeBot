@@ -2,10 +2,10 @@ import { HOUR } from '@sogebot/ui-helpers/constants';
 import { dayjs } from '@sogebot/ui-helpers/dayjsHelper';
 import { getRepository } from 'typeorm';
 
+import tmi from '../../chat';
 import { EventList } from '../../database/entity/eventList';
 import eventlist from '../../overlays/eventlist';
 import alerts from '../../registries/alerts';
-import tmi from '../../tmi';
 import { triggerInterfaceOnFollow } from '../interface';
 import { debug, follow as followLog } from '../log';
 import {

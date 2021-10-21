@@ -47,9 +47,9 @@ function getNameAndTypeFromStackTrace() {
   Error.prepareStackTrace = _prepareStackTrace;
 
   const path = parse(stack[2].getFileName() || '');
-  const name = path.name;
   const _type = path.dir.split(separator)[path.dir.split(separator).length - 1];
   const type = _type === 'dest' ? 'core' : _type;
+  const name = type === 'core' && path.name === 'chat' ? 'tmi' : path.name;
 
   return { name, type };
 }

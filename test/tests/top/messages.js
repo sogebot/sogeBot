@@ -7,7 +7,7 @@ const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 
 const top = (require('../../../dest/systems/top')).default;
-const tmi = (require('../../../dest/tmi')).default;
+const tmi = (require('../../../dest/chat')).default;
 
 const { prepare } = require('../../../dest/helpers/commons/prepare');
 const { getRepository } = require('typeorm');
