@@ -108,9 +108,9 @@ describe('Price - check() - @func3', () => {
       command: '!a', price: 100, priceBits: 10,
     });
     tmi.cheer({
-      username: user.viewer.username,
-      userId:   user.viewer.userId,
-      bits:     100,
+      username:  user.viewer.username,
+      'user-id': user.viewer.userId,
+      bits:      100,
     },
     '!a',
     );
@@ -123,9 +123,9 @@ describe('Price - check() - @func3', () => {
       command: '!b', price: 100, priceBits: 10,
     });
     tmi.cheer({
-      username: user.viewer.username,
-      userId:   user.viewer.userId,
-      bits:     100,
+      username:  user.viewer.username,
+      'user-id': user.viewer.userId,
+      bits:      100,
     },
     '!b',
     );
@@ -137,9 +137,9 @@ describe('Price - check() - @func3', () => {
       command: '!me', price: 100, priceBits: 10,
     });
     tmi.cheer({
-      username: user.viewer.username,
-      userId:   user.viewer.userId,
-      bits:     100,
+      username:  user.viewer.username,
+      'user-id': user.viewer.userId,
+      bits:      100,
     },
     '!me');
     await message.isSentRaw('@__viewer__ | Level 0 | 0 hours | 0 points | 0 messages | €0.00 | 100 bits | 0 months', user.viewer.username, 20000);
