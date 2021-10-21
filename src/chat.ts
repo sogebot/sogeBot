@@ -210,7 +210,7 @@ class TMI extends Core {
   async initClient (type: 'bot' | 'broadcaster') {
     if ((global as any).mocha) {
       // do nothing if tests
-      warning('initClient disabled due to mocha test run.')
+      warning('initClient disabled due to mocha test run.');
       return;
     }
     clearTimeout(this.timeouts[`initClient.${type}`]);
@@ -766,7 +766,7 @@ class TMI extends Core {
   @timer()
   async subgift (username: string, streakMonths: number, recipient: string, methods: tmijs.SubMethods, userstate: tmijs.SubGiftUserstate) {
     try {
-      const userId = userstate.userId;
+      const userId = userstate['user-id'] ?? '0';
       const amount = streakMonths;
       const recipientId = userstate['msg-param-recipient-id'] ?? '';
       const tier = (methods.prime ? 1 : (Number(methods.plan ?? 1000) / 1000));

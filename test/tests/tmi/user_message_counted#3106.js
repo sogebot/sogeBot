@@ -16,8 +16,12 @@ const tmi = require('../../../dest/chat').default;
 
 // users
 const owner = { username: '__broadcaster__' };
-const testuser1 = { username: 'testuser1', userId: '1' };
-const testuser2 = { username: 'testuser2', userId: '2' };
+const testuser1 = {
+  username: 'testuser1', 'user-id': '1', userId: '1',
+};
+const testuser2 = {
+  username: 'testuser2', 'user-id': '2', userId: '2',
+};
 
 const { VariableWatcher } = require('../../../dest/watchers');
 const message = require('../../general.js').message;
@@ -41,23 +45,13 @@ describe('TMI - User should have counted messages - https://github.com/sogehige/
 
   it ('Send 10 messages as testuser1', async () => {
     for (let i = 0; i < 10; i++) {
-      await tmi.message({
-        message: {
-          tags:    testuser1,
-          message: 'a',
-        },
-      });
+      await tmi.message({ userstate: testuser1, message: 'a' });
     }
   });
 
   it ('Send 5 messages as testuser2', async () => {
     for (let i = 0; i < 5; i++) {
-      await tmi.message({
-        message: {
-          tags:    testuser2,
-          message: 'a',
-        },
-      });
+      await tmi.message({ userstate: testuser2, message: 'a' });
     }
   });
 
@@ -67,23 +61,13 @@ describe('TMI - User should have counted messages - https://github.com/sogehige/
 
   it ('Send 10 messages as testuser1', async () => {
     for (let i = 0; i < 10; i++) {
-      await tmi.message({
-        message: {
-          tags:    testuser1,
-          message: 'a',
-        },
-      });
+      await tmi.message({ userstate: testuser1, message: 'a' });
     }
   });
 
   it ('Send 5 messages as testuser2', async () => {
     for (let i = 0; i < 5; i++) {
-      await tmi.message({
-        message: {
-          tags:    testuser2,
-          message: 'a',
-        },
-      });
+      await tmi.message({ userstate: testuser2, message: 'a' });
     }
   });
 

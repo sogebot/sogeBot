@@ -28,7 +28,7 @@ export async function message(type: 'say' | 'whisper' | 'me', username: string |
       setTimeout(() => message(type, username, messageToSend, messageId, false), 5000);
     } else {
       error(JSON.stringify({
-        e: e.stack, type, username, messageToSend, messageId, retry, client: tmi.client
+        e: e.stack, type, username, messageToSend, messageId, retry,
       }, null, 2));
     }
   }
