@@ -99,6 +99,7 @@ module.exports = {
 
       oauth.broadcasterId = '54321';
       tmi.ignorelist = [];
+      tmi.sendAsReply = false;
 
       invalidateParserCache();
       resolve();
