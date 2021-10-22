@@ -221,11 +221,12 @@ class TMI extends Core {
       }
 
       const authProvider = new StaticAuthProvider(clientId, token);
-      this.client[type] = new ChatClient({ authProvider, channels: [channel] });
+      this.client[type] = new ChatClient({ authProvider });
       await this.client[type]?.connect();
       await this.join(type, channel);
       this.loadListeners(type);
     } catch (e: any) {
+      error(e.stack);
       if (type === 'broadcaster' && !this.broadcasterWarning) {
         error('Broadcaster oauth is not properly set - hosts will not be loaded');
         error('Broadcaster oauth is not properly set - subscribers will not be loaded');
@@ -234,8 +235,9 @@ class TMI extends Core {
         error('Bot oauth is not properly set');
         this.botWarning = true;
       }
-      oauth.refreshAccessToken(type);
-      this.timeouts[`initClient.${type}`] = setTimeout(() => this.initClient(type), 10000);
+      oauth.refreshAccessToken(type).then(() => {
+        this.initClient(type);
+      });
     }
   }
 
@@ -283,7 +285,15 @@ class TMI extends Core {
           setStatus('TMI', constants.DISCONNECTED);
         }
       } else {
-        await client.join(channel);
+        try {
+          await client.join(channel);
+        } catch (e: unknown) {
+          if (e instanceof Error) {
+            warning('TMI: ' + e.message + ' for ' + type);
+            setTimeout(() => this.join(type, channel), constants.SECOND * 5);
+            return;
+          }
+        }
         info(`TMI: ${type} joined channel ${channel}`);
         if (type ==='bot') {
           setStatus('TMI', constants.CONNECTED);
@@ -364,6 +374,10 @@ class TMI extends Core {
         linesParsedIncrement();
       });
 
+      client.onJoinFailure((channel, reason) => {
+        console.log({ channel, reason });
+      });
+
       // onCheer
       client.onMessage((channel, user, message, msg) => {
         if (msg.isCheer) {
@@ -394,7 +408,9 @@ class TMI extends Core {
         if (isBotId(userstate.userId)) {
           return;
         }
-        this.message({ userstate, message });
+        this.message({
+          userstate, message, id: msg.id,
+        });
         linesParsedIncrement();
         triggerInterfaceOnMessage({
           sender:    userstate,
@@ -876,7 +892,7 @@ class TMI extends Core {
   }
 
   @timer()
-  async message (data: { skip?: boolean, quiet?: boolean, message: string, userstate: ChatUser, isWhisper?: boolean }) {
+  async message (data: { skip?: boolean, quiet?: boolean, message: string, userstate: ChatUser, id?: string, isWhisper?: boolean }) {
     let userId = data.userstate.userId as string | undefined;
     const userstate = data.userstate;
     const message = data.message;
@@ -889,7 +905,7 @@ class TMI extends Core {
     }
 
     const parse = new Parser({
-      sender: userstate, message: message, skip: skip, quiet: quiet,
+      sender: userstate, message: message, skip: skip, quiet: quiet, id: data.id,
     });
 
     if (!skip
@@ -964,7 +980,7 @@ class TMI extends Core {
     }
     const responses = await parse.process();
     for (let i = 0; i < responses.length; i++) {
-      await sendMessage(responses[i].response, responses[i].sender, responses[i].attr);
+      await sendMessage(responses[i].response, responses[i].sender, responses[i].attr, parse.id);
     }
   }
 }

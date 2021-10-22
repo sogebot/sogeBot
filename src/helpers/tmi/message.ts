@@ -2,7 +2,7 @@ import tmi from '../../chat';
 import { error, isDebugEnabled } from '../log';
 import { generalChannel } from '../oauth/generalChannel';
 
-export async function message(type: 'say' | 'whisper' | 'me', username: string | undefined | null, messageToSend: string, messageId: string, retry = true) {
+export async function message(type: 'say' | 'whisper' | 'me', username: string | undefined | null, messageToSend: string, messageId?: string, retry = true) {
   try {
     if (username === null || typeof username === 'undefined') {
       username = generalChannel.value;

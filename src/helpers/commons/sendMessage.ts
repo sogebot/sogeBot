@@ -20,7 +20,7 @@ class HelpersCommons {
     skip?: boolean;
     force?: boolean;
     [x: string]: any;
-  }) {
+  }, id?: string) {
     messageToSend = await messageToSend as string; // await if messageToSend is promise (like prepare)
     attr = attr || {};
     sender = sender || null;
@@ -28,7 +28,7 @@ class HelpersCommons {
     if (messageToSend.length > 470) {
       // splitting message
       for (const msg of messageToSend.match(/.{1,470}/g) ?? []) {
-        await sendMessage(msg, sender, attr);
+        await sendMessage(msg, sender, attr, id);
       }
       return;
     }
@@ -67,13 +67,13 @@ class HelpersCommons {
         }
         if (sender['message-type'] === 'whisper') {
           whisperOut(`${messageToSend} [${sender.userName}]`);
-          message('whisper', sender.userName, messageToSend, sender.id);
+          message('whisper', sender.userName, messageToSend, id);
         } else {
           chatOut(`${messageToSend} [${sender.userName}]`);
           if (sendWithMe.value && !messageToSend.startsWith('/')) {
-            message('me', null, messageToSend, sender.id);
+            message('me', null, messageToSend, id);
           } else {
-            message('say', null, messageToSend, sender.id);
+            message('say', null, messageToSend, id);
           }
         }
       }
@@ -90,6 +90,6 @@ export async function sendMessage(messageToSend: string | Promise<string>, sende
   skip?: boolean;
   force?: boolean;
   [x: string]: any;
-}) {
-  return self.sendMessage(messageToSend, sender, attr);
+}, id?: string) {
+  return self.sendMessage(messageToSend, sender, attr, id);
 }

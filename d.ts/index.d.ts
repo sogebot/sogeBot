@@ -173,7 +173,7 @@ interface CommandResponse {
 }
 
 interface CommandOptions {
-  sender: ChatUser & {
+  sender: Omit<ChatUser, '_userData', '_userName'> & {
     discord?: { author: DiscordJsUser; channel: DiscordJsTextChannel };
   };
   command: string;

@@ -43,6 +43,7 @@ class Parser {
 
   constructor (opts: any = {}) {
     this.message = opts.message || '';
+    this.id = opts.id || '';
     this.sender = opts.sender || null;
     this.skip = opts.skip || false;
     this.quiet = opts.quiet || false;

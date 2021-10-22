@@ -54,8 +54,8 @@ class Message {
     if (!_.isNil(attr)) {
       for (let [key, value] of Object.entries(attr)) {
         if (key === 'sender') {
-          if (typeof value.username !== 'undefined') {
-            value = tmi.showWithAt && attr.forceWithoutAt !== true ? `@${value.username}` : value.username;
+          if (typeof value.userName !== 'undefined') {
+            value = tmi.showWithAt && attr.forceWithoutAt !== true ? `@${value.userName}` : value.userName;
           } else {
             value = tmi.showWithAt && attr.forceWithoutAt !== true ? `@${value}` : value;
           }
