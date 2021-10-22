@@ -99,7 +99,6 @@ declare namespace InterfaceSettings {
       [x: string]: string[];
     };
     partChannel?: () => void;
-    reconnectChannel?: () => void;
     joinChannel?: () => void;
   }
 

@@ -10,7 +10,6 @@ type onEvents = {
   message: onEvent[];
   joinChannel: onEvent[];
   partChannel: onEvent[];
-  reconnectChannel: onEvent[];
   sub: onEvent[];
   follow: onEvent[];
   bit: onEvent[];
@@ -26,7 +25,6 @@ const on: onEvents = {
   message:          [],
   joinChannel:      [],
   partChannel:      [],
-  reconnectChannel: [],
   sub:              [],
   follow:           [],
   bit:              [],
@@ -94,14 +92,6 @@ export function onJoinChannel() {
   return (target: any, fName: string) => {
     const path = type === 'core' ? name : `${type}.${name.toLowerCase()}`;
     on.joinChannel.push({ path, fName });
-  };
-}
-
-export function onReconnectChannel() {
-  const { name, type } = getNameAndTypeFromStackTrace();
-  return (target: any, fName: string) => {
-    const path = type === 'core' ? name : `${type}.${name.toLowerCase()}`;
-    on.reconnectChannel.push({ path, fName });
   };
 }
 

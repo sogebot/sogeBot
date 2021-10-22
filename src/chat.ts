@@ -4,7 +4,8 @@ import util from 'util';
 import * as constants from '@sogebot/ui-helpers/constants';
 import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized';
 import { isNil } from 'lodash';
-import tmijs from 'tmi.js';
+import { ChatClient, ChatUser } from '@twurple/chat';
+import { StaticAuthProvider } from '@twurple/auth';
 import { getRepository } from 'typeorm';
 
 import Core from './_interface';
@@ -69,11 +70,6 @@ const subCumulativeMonths = function(senderObj: tmijs.ChatUserstate) {
   return undefined; // undefined will not change any values
 };
 
-let intervalBroadcaster: NodeJS.Timeout;
-let intervalBot: NodeJS.Timeout;
-let intervalBroadcasterPONG = Date.now();
-let intervalBotPONG = Date.now();
-
 class TMI extends Core {
   shouldConnect = false;
 
@@ -101,8 +97,8 @@ class TMI extends Core {
   channel = '';
   timeouts: Record<string, any> = {};
   client: {
-    bot: tmijs.Client | null;
-    broadcaster: tmijs.Client | null;
+    bot: ChatClient | null;
+    broadcaster: ChatClient | null;
   } = {
     bot:         null,
     broadcaster: null,
@@ -222,33 +218,22 @@ class TMI extends Core {
     }
 
     const token = type === 'bot' ? oauth.botAccessToken : oauth.broadcasterAccessToken;
-    const username = type === 'bot' ? oauth.botUsername : oauth.broadcasterUsername;
+    const clientId = type === 'bot' ? oauth.botClientId : oauth.broadcasterClientId;
     const channel = generalChannel.value;
 
     try {
-      if (token === '' || username === '' || channel === '') {
-        throw Error(`${type} - token, username or channel expected`);
+      if (token === '' || channel === '') {
+        throw Error(`${type} - token and channel expected`);
       }
 
       const client = this.client[type];
       if (client) {
-        client.removeAllListeners();
+        client.removeListener();
         this.client[type] = null;
       }
 
-      this.client[type] = new tmijs.Client({
-        options: {
-          debug:                 isDebugEnabled('tmi.client'),
-          messagesLogLevel:      isDebugEnabled('tmi.client') ? 'debug' : 'info',
-          skipUpdatingEmotesets: true,
-        },
-        connection: {
-          reconnect: true,
-          secure:    true,
-          timeout:   60000,
-        },
-        identity: { username, password: token },
-      });
+      const authProvider = new StaticAuthProvider(clientId, token);
+      this.client[type] = new ChatClient({ authProvider, channels: [channel] });
       await this.client[type]?.connect();
       await this.join(type, channel);
       this.loadListeners(type);
@@ -287,18 +272,11 @@ class TMI extends Core {
       }
       const channel = generalChannel.value;
 
-      if (type === 'bot') {
-        clearInterval(intervalBot);
-      } else {
-        clearInterval(intervalBroadcaster);
-      }
-
       info(`TMI: ${type} is reconnecting`);
 
-      client.removeAllListeners();
+      client.removeListener();
       await client.part(this.channel);
       await client.connect();
-
       this.loadListeners(type);
       await this.join(type, channel);
     } catch (e: any) {
@@ -323,40 +301,6 @@ class TMI extends Core {
           setStatus('TMI', constants.CONNECTED);
         }
         this.channel = channel;
-
-        if (type === 'bot') {
-          intervalBotPONG = Date.now();
-          if (intervalBot) {
-            clearInterval(intervalBot);
-          }
-          intervalBot = setInterval(() => {
-            if (!this.client.bot || this.channel === '') {
-              return;
-            }
-            this.client.bot.raw('PING');
-
-            if (Date.now() - intervalBotPONG > 10 * constants.MINUTE) {
-              error(`TMI: bot PONG not returned in 10 minutes. Force reconnect.`);
-              this.reconnect('bot');
-            }
-          }, 10000);
-        } else if (type === 'broadcaster') {
-          intervalBroadcasterPONG = Date.now();
-          if (intervalBroadcaster) {
-            clearInterval(intervalBroadcaster);
-          }
-          intervalBroadcaster = setInterval(() => {
-            if (!this.client.broadcaster || this.channel === '') {
-              return;
-            }
-            this.client.broadcaster.raw('PING');
-
-            if (Date.now() - intervalBroadcasterPONG > 10 * constants.MINUTE) {
-              error(`TMI: broadcaster PONG not returned in 10 minutes. Force reconnect.`);
-              this.reconnect('broadcaster');
-            }
-          }, 10000);
-        }
       }
     }
   }
@@ -382,11 +326,6 @@ class TMI extends Core {
     } else {
       await client.part(this.channel);
       info(`TMI: ${type} parted channel ${this.channel}`);
-      if (type === 'bot') {
-        clearInterval(intervalBot);
-      } else if (type === 'broadcaster') {
-        clearInterval(intervalBroadcaster);
-      }
     }
   }
 
@@ -406,33 +345,18 @@ class TMI extends Core {
       error(new Error().stack || '');
       return;
     }
-    client.removeAllListeners();
+    client.removeListener();
 
     // common for bot and broadcaster
-    client.on('pong', async () => {
-      if (type === 'bot') {
-        intervalBotPONG = Date.now();
-      } else {
-        intervalBroadcasterPONG = Date.now();
-      }
-    });
-    client.on('disconnected', async (reason) => {
+    client.onDisconnect((_event, reason) => {
       info(`TMI: ${type} is disconnected, reason: ${reason}`);
       setStatus('TMI', constants.DISCONNECTED);
-      client.removeAllListeners();
+      client.removeListener();
       for (const event of getFunctionList('partChannel')) {
         (this as any)[event.fName]();
       }
     });
-    client.on('reconnect', async () => {
-      info(`TMI: ${type} is reconnecting`);
-      setStatus('TMI', constants.RECONNECTING);
-      this.loadListeners(type);
-      for (const event of getFunctionList('reconnectChannel')) {
-        (this as any)[event.fName]();
-      }
-    });
-    client.on('connected', async () => {
+    client.onConnect(async () => {
       info(`TMI: ${type} is connected`);
       setStatus('TMI', constants.CONNECTED);
       this.loadListeners(type);
@@ -442,12 +366,11 @@ class TMI extends Core {
     });
 
     if (type === 'bot') {
-      client.on('whisper', async (from, userstate, message, self) => {
-        if (isBotId(userstate['user-id']) || self) {
+      client.onWhisper((user, message, msg) => {
+        if (isBotId(msg.userInfo.userId) || self) {
           return;
         }
-        userstate['message-type'] = 'whisper';
-        this.message({ userstate, message });
+        this.message({ userstate: msg.userInfo, message, isWhisper: true });
         linesParsedIncrement();
       });
 
@@ -956,15 +879,15 @@ class TMI extends Core {
   }
 
   @timer()
-  async message (data: { skip?: boolean, quiet?: boolean, message: string, userstate: tmijs.ChatUserstate}) {
+  async message (data: { skip?: boolean, quiet?: boolean, message: string, userstate: ChatUser, isWhisper?: boolean }) {
     const userstate = data.userstate;
     const message = data.message;
     const skip = data.skip ?? false;
     const quiet = data.quiet;
 
-    if (!userstate['user-id'] && userstate.username) {
+    if (!userstate.userId && userstate.username) {
       // this can happen if we are sending commands from dashboards etc.
-      userstate['user-id'] = String(await users.getIdByName(userstate.username));
+      userstate.userId = String(await users.getIdByName(userstate.username));
     }
 
     if (typeof userstate.badges === 'undefined') {
@@ -976,7 +899,7 @@ class TMI extends Core {
     });
 
     if (!skip
-        && userstate['message-type'] === 'whisper'
+        && isWhisper
         && (this.whisperListener || isOwner(userstate))) {
       whisperIn(`${message} [${userstate.username}]`);
     } else if (!skip && !isBotId(userstate['user-id'])) {
