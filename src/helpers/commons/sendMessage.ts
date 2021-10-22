@@ -25,6 +25,14 @@ class HelpersCommons {
     attr = attr || {};
     sender = sender || null;
 
+    if (messageToSend.length > 470) {
+      // splitting message
+      for (const msg of messageToSend.match(/.{1,470}/g) ?? []) {
+        await sendMessage(msg, sender, attr);
+      }
+      return;
+    }
+
     if (sendWithMe.value) {
       // replace /me in message if we are already sending with /me
       messageToSend = messageToSend.replace(/^(\/me)/gi, '').trim();
