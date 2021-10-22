@@ -222,6 +222,7 @@ class TMI extends Core {
 
       const authProvider = new StaticAuthProvider(clientId, token);
       this.client[type] = new ChatClient({ authProvider });
+
       this.loadListeners(type);
       await this.client[type]?.connect();
       setTimeout(() => {
@@ -356,6 +357,11 @@ class TMI extends Core {
           (this as any)[event.fName]();
         }
       }
+    });
+
+    client.onAuthenticationFailure(message => {
+      info(`TMI: ${type} authentication failure, ${message}`);
+      oauth.validateOAuth(type).then(() => this.initClient(type));
     });
 
     client.onDisconnect((_manually, reason) => {
