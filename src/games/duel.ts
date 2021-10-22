@@ -168,7 +168,7 @@ class Duel extends Game {
           }
           await getRepository(DuelEntity).save({
             id:       opts.sender.userId,
-            username: opts.sender.username,
+            username: opts.sender.userName,
             tickets:  Number(bet),
           });
           await points.decrement({ userId: opts.sender.userId }, bet);

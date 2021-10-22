@@ -188,7 +188,7 @@ class OBSWebsocket extends Integration {
       const [ taskId ] = new Expects(opts.parameters).string().toArray();
       const task = await getRepository(OBSWebsocketEntity).findOneOrFail(taskId);
 
-      info(`OBSWEBSOCKETS: User ${opts.sender.username}#${opts.sender.userId} triggered task ${task.id}`);
+      info(`OBSWEBSOCKETS: User ${opts.sender.userName}#${opts.sender.userId} triggered task ${task.id}`);
       await this.triggerTask(task.advancedMode ? task.advancedModeCode : task.simpleModeTasks);
 
       return [];

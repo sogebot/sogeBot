@@ -436,27 +436,18 @@ class Events extends Core {
     }
     command = await new Message(command).parse({ username, sender: getUserSender(String(userId), username) });
 
-    if ((global as any).mocha) {
-      parserEmitter.emit('process', {
-        sender:  { username, userId: String(userId) },
-        message: command,
-        skip:    true,
-        quiet:   get(operation, 'isCommandQuiet', false) as boolean,
-      }, (responses) => {
-        for (let i = 0; i < responses.length; i++) {
-          setTimeout(async () => {
-            parserReply(await responses[i].response, { sender: responses[i].sender, attr: responses[i].attr });
-          }, 500 * i);
-        }
-      });
-    } else {
-      tmi.message({
-        userstate: { username, userId },
-        message:   command,
-        skip:      true,
-        quiet:     !!get(operation, 'isCommandQuiet', false),
-      });
-    }
+    parserEmitter.emit('process', {
+      sender:  { username, userId: String(userId) },
+      message: command,
+      skip:    true,
+      quiet:   get(operation, 'isCommandQuiet', false) as boolean,
+    }, (responses) => {
+      for (let i = 0; i < responses.length; i++) {
+        setTimeout(async () => {
+          parserReply(await responses[i].response, { sender: responses[i].sender, attr: responses[i].attr });
+        }, 500 * i);
+      }
+    });
   }
 
   public async fireSendChatMessageOrWhisper(operation: EventsEntity.OperationDefinitions, attributes: EventsEntity.Attributes, whisper: boolean): Promise<void> {

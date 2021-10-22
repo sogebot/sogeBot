@@ -61,7 +61,7 @@ class Media extends Overlay {
       for (const setting of string.match(/([\w-]+)=([\w-:/.%?=$_|@&]+|'[\S ]+')/g) || []) {
         const data = { key: setting.split(/=(.+)/)[0], value: setting.split(/=(.+)/)[1] };
         if (data.key === 'text') {
-          data.value = data.value.replace(/\$sender/g, opts.sender.username);
+          data.value = data.value.replace(/\$sender/g, opts.sender.userName);
           data.value = data.value.substr(1).slice(0, -1);
         }
         object[data.key] = data.value;

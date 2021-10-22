@@ -1,3 +1,5 @@
+type ChatUser = import('@twurple/chat').ChatUser;
+
 type Writeable<T> = { -readonly [P in keyof T]: T[P] };
 
 type UserStateTags = import('twitch-js').UserStateTags;
@@ -171,7 +173,7 @@ interface CommandResponse {
 }
 
 interface CommandOptions {
-  sender: UserStateTags & { userId: string; msgId?: KnownNoticeMessageIds } & {
+  sender: ChatUser & {
     discord?: { author: DiscordJsUser; channel: DiscordJsTextChannel };
   };
   command: string;

@@ -143,14 +143,14 @@ class Raffles extends System {
       return true;
     }
 
-    const isWinner = !_.isNil(raffle.winner) && raffle.winner === opts.sender.username;
+    const isWinner = !_.isNil(raffle.winner) && raffle.winner === opts.sender.userName;
     const isInFiveMinutesTreshold = Date.now() - raffle.timestamp <= 1000 * 60 * 5;
 
     if (isWinner && isInFiveMinutesTreshold) {
       const winner = await getRepository(RaffleParticipant).findOne({
         relations: ['messages'],
         where:     {
-          username: opts.sender.username,
+          username: opts.sender.userName,
           raffle,
         },
       });
@@ -390,7 +390,7 @@ class Raffles extends System {
   @parser({ fireAndForget: true })
   @timer()
   async participate (opts: ParserOptions): Promise<boolean> {
-    if (opts.sender === null || _.isNil(opts.sender.username) || !opts.message.match(/^(![\S]+)/)) {
+    if (opts.sender === null || _.isNil(opts.sender.userName) || !opts.message.match(/^(![\S]+)/)) {
       return true;
     }
 
@@ -405,7 +405,7 @@ class Raffles extends System {
 
     const user = await changelog.get(opts.sender.userId);
     if (!user) {
-      changelog.update(opts.sender.userId, { username: opts.sender.username });
+      changelog.update(opts.sender.userId, { username: opts.sender.userName });
       return this.participate(opts);
     }
 
@@ -454,7 +454,7 @@ class Raffles extends System {
       ...participant,
       raffle,
       isEligible:   participant?.isEligible ?? true,
-      username:     opts.sender.username,
+      username:     opts.sender.userName,
       tickets:      raffle.type === TYPE_NORMAL ? 1 : newTickets,
       messages:     [],
       isFollower:   user.isFollower,
@@ -485,7 +485,7 @@ class Raffles extends System {
       }
 
       debug('raffle', '------------------------------------------------------------------------------------------------');
-      debug('raffle', `Eligible user ${opts.sender.username}#${opts.sender.userId} for raffle ${raffle.id}`);
+      debug('raffle', `Eligible user ${opts.sender.userName}#${opts.sender.userId} for raffle ${raffle.id}`);
       debug('raffle', opts.sender);
       debug('raffle', selectedParticipant);
       debug('raffle', user);

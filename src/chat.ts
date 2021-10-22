@@ -1,11 +1,12 @@
-import { setInterval } from 'timers';
 import util from 'util';
 
 import * as constants from '@sogebot/ui-helpers/constants';
 import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized';
-import { isNil } from 'lodash';
-import { ChatClient, ChatUser } from '@twurple/chat';
 import { StaticAuthProvider } from '@twurple/auth';
+import {
+  ChatClient, ChatCommunitySubInfo, ChatSubGiftInfo, ChatSubInfo, ChatUser,
+} from '@twurple/chat';
+import { isNil } from 'lodash';
 import { getRepository } from 'typeorm';
 
 import Core from './_interface';
@@ -31,7 +32,7 @@ import { eventEmitter } from './helpers/events';
 import {
   triggerInterfaceOnBit, triggerInterfaceOnMessage, triggerInterfaceOnSub,
 } from './helpers/interface/triggers';
-import { isDebugEnabled, warning } from './helpers/log';
+import { warning } from './helpers/log';
 import {
   chatIn, cheer, debug, error, host, info, raid, resub, sub, subcommunitygift, subgift, whisperIn,
 } from './helpers/log';
@@ -57,19 +58,6 @@ import users from './users';
 import joinpart from './widgets/joinpart';
 
 const commandRegexp = new RegExp(/^!\w+$/);
-
-const userHaveSubscriberBadges = (badges: Readonly<UserStateTags['badges']>) => {
-  return typeof badges.subscriber !== 'undefined' || typeof badges.founder !== 'undefined';
-};
-
-const subCumulativeMonths = function(senderObj: tmijs.ChatUserstate) {
-  const badgeInfo = senderObj['badge-info'];
-  if (badgeInfo?.subscriber) {
-    return Number(badgeInfo.subscriber);
-  }
-  return undefined; // undefined will not change any values
-};
-
 class TMI extends Core {
   shouldConnect = false;
 
@@ -366,20 +354,26 @@ class TMI extends Core {
     });
 
     if (type === 'bot') {
-      client.onWhisper((user, message, msg) => {
+      client.onWhisper((_user, message, msg) => {
         if (isBotId(msg.userInfo.userId) || self) {
           return;
         }
-        this.message({ userstate: msg.userInfo, message, isWhisper: true });
+        this.message({
+          userstate: msg.userInfo, message, isWhisper: true,
+        });
         linesParsedIncrement();
       });
 
-      client.on('cheer', (_channel, userstate, message)  => {
-        this.cheer(userstate, message);
+      // onCheer
+      client.onMessage((channel, user, message, msg) => {
+        if (msg.isCheer) {
+          this.cheer(msg.userInfo, message, msg.bits);
+        }
       });
 
-      client.on('action', (_channel, userstate, message, self) => {
-        if (isBotId(userstate['user-id']) || self) {
+      client.onAction((channel, user, message, msg) => {
+        const userstate = msg.userInfo;
+        if (isBotId(userstate.userId)) {
           return;
         }
         // strip message from ACTION
@@ -392,11 +386,12 @@ class TMI extends Core {
           timestamp: Date.now(),
         });
 
-        eventEmitter.emit('action', { username: userstate.username?.toLowerCase() ?? '', source: 'twitch' });
+        eventEmitter.emit('action', { username: userstate.userName?.toLowerCase() ?? '', source: 'twitch' });
       });
 
-      client.on('message', (_channel, userstate, message, self) => {
-        if (isBotId(userstate['user-id']) || self) {
+      client.onMessage((_channel, user, message, msg) => {
+        const userstate = msg.userInfo;
+        if (isBotId(userstate.userId)) {
           return;
         }
         this.message({ userstate, message });
@@ -408,35 +403,36 @@ class TMI extends Core {
         });
       });
 
-      client.on('clearchat', () => {
+      client.onChatClear(() => {
         eventEmitter.emit('clearchat');
       });
     } else if (type === 'broadcaster') {
-      client.on('hosting', (_channel, target, viewers) => {
-        eventEmitter.emit('hosting', { target, viewers });
+      client.onHost((_channel, target, viewers) => {
+        eventEmitter.emit('hosting', { target, viewers: viewers ?? 0 });
       });
 
-      client.on('raided', (_channel, username, viewers) => {
-        this.raid(username, viewers);
+      client.onRaid((_channel, username, raidInfo) => {
+        this.raid(username, raidInfo.viewerCount);
       });
 
-      client.on('subscription', (_channel, username, methods, message, userstate) => {
-        this.subscription(username, methods, message, userstate);
+      client.onSub((_channel, username, subInfo, msg) => {
+        this.subscription(username, subInfo, msg.userInfo);
       });
 
-      client.on('resub', (_channel, username, months, message, userstate, methods) => {
-        this.resub(username, months, message, userstate, methods);
+      client.onResub((_channel, username, subInfo, msg) => {
+        this.resub(username, subInfo, msg.userInfo);
       });
 
-      client.on('subgift', (_channel, username, streakMonths, recipient, methods, userstate)  => {
-        this.subgift(username, streakMonths, recipient, methods, userstate);
+      client.onSubGift((_channel, username, subInfo, msg) => {
+        this.subgift(username, subInfo, msg.userInfo);
       });
 
-      client.on('submysterygift', (_channel, username, numOfSubs, methods, userstate) => {
-        this.subscriptionGiftCommunity(username, numOfSubs, methods, userstate);
+      client.onCommunitySub((_channel, username, subInfo, msg) => {
+        this.subscriptionGiftCommunity(username, subInfo, msg.userInfo);
       });
 
-      client.on('hosted', async (_channel, username, viewers) => {
+      client.onHosted(async (_channel, username, _auto, viewers) => {
+        viewers ??= 0;
         host(`${username}, viewers: ${viewers}`);
 
         const data = {
@@ -498,10 +494,10 @@ class TMI extends Core {
   }
 
   @timer()
-  async subscription (username: string , methods: tmijs.SubMethods, message: string, userstate: tmijs.SubUserstate) {
+  async subscription (username: string , subInfo: ChatSubInfo, userstate: ChatUser) {
     try {
-      const amount = Number(userstate['msg-param-cumulative-months'] ?? 1);
-      const tier = (methods.prime ? 'Prime' : String(Number(methods.plan ?? 1000) / 1000)) as EmitData['tier'];
+      const amount = subInfo.months;
+      const tier = (subInfo.isPrime ? 'Prime' : String(Number(subInfo.plan ?? 1000) / 1000)) as EmitData['tier'];
 
       if (isIgnored({ username, userId: userstate.userId })) {
         return;
@@ -510,7 +506,7 @@ class TMI extends Core {
       const user = await changelog.get(userstate.userId);
       if (!user) {
         changelog.update(userstate.userId, { username });
-        this.subscription(username, methods, message, userstate);
+        this.subscription(username, subInfo, userstate);
         return;
       }
 
@@ -538,12 +534,12 @@ class TMI extends Core {
         event:     'sub',
         tier:      String(tier),
         userId:    String(userstate.userId),
-        method:    (isNil(methods.prime) && methods.prime) ? 'Twitch Prime' : '' ,
+        method:    subInfo.isPrime ? 'Twitch Prime' : '' ,
         timestamp: Date.now(),
       });
       sub(`${username}#${userstate.userId}, tier: ${tier}`);
       eventEmitter.emit('subscription', {
-        username: username, method: (isNil(methods.prime) && methods.prime) ? 'Twitch Prime' : '', subCumulativeMonths: amount, tier: String(tier),
+        username: username, method: subInfo.isPrime ? 'Twitch Prime' : '', subCumulativeMonths: amount, tier: String(tier),
       });
       alerts.trigger({
         event:      'subs',
@@ -568,12 +564,13 @@ class TMI extends Core {
   }
 
   @timer()
-  async resub (username: string, months: number, message: string, userstate: tmijs.SubUserstate, methods: tmijs.SubMethods) {
+  async resub (username: string, subInfo: ChatSubInfo, userstate: ChatUser) {
     try {
-      const amount = months;
-      const subStreakShareEnabled = userstate['msg-param-should-share-streak'] ?? false;
-      const streakMonths = Number(userstate['msg-param-streak-months'] ?? 0);
-      const tier = (methods.prime ? 'Prime' : String(Number(methods.plan ?? 1000) / 1000)) as EmitData['tier'];
+      const amount = subInfo.months;
+      const subStreakShareEnabled = typeof subInfo.streak !== 'undefined';
+      const streakMonths = subInfo.streak ?? 0;
+      const tier = (subInfo.isPrime ? 'Prime' : String(Number(subInfo.plan ?? 1000) / 1000)) as EmitData['tier'];
+      const message = subInfo.message ?? '';
 
       if (isIgnored({ username, userId: userstate.userId })) {
         return;
@@ -584,7 +581,7 @@ class TMI extends Core {
       const user = await changelog.get(userstate.userId);
       if (!user) {
         changelog.update(userstate.userId, { username });
-        this.resub(username, months, message, userstate, methods);
+        this.resub(username, subInfo, userstate);
         return;
       }
 
@@ -620,7 +617,7 @@ class TMI extends Core {
         message,
         timestamp:               Date.now(),
       });
-      resub(`${username}#${userstate.userId}, streak share: ${subStreakShareEnabled}, streak: ${subStreak}, months: ${subCumulativeMonths}, message: ${message}, tier: ${tier}`);
+      resub(`${username}#${userstate.userId}, streak share: ${subStreakShareEnabled}, streak: ${subStreak}, months: ${amount}, message: ${message}, tier: ${tier}`);
       eventEmitter.emit('resub', {
         username,
         tier:                    String(tier),
@@ -648,10 +645,10 @@ class TMI extends Core {
   }
 
   @timer()
-  async subscriptionGiftCommunity (username: string, numOfSubs: number, methods: tmijs.SubMethods, userstate: tmijs.SubMysteryGiftUserstate) {
+  async subscriptionGiftCommunity (username: string, subInfo: ChatCommunitySubInfo, userstate: ChatUser) {
     try {
-      const userId = userstate['user-id'] ?? '';
-      const count = numOfSubs;
+      const userId = subInfo.gifterUserId ?? '';
+      const count = subInfo.count;
 
       changelog.increment(userId, { giftedSubscribes: Number(count) });
 
@@ -687,12 +684,13 @@ class TMI extends Core {
   }
 
   @timer()
-  async subgift (username: string, streakMonths: number, recipient: string, methods: tmijs.SubMethods, userstate: tmijs.SubGiftUserstate) {
+  async subgift (username: string, subInfo: ChatSubGiftInfo, userstate: ChatUser) {
     try {
-      const userId = userstate['user-id'] ?? '0';
-      const amount = streakMonths;
-      const recipientId = userstate['msg-param-recipient-id'] ?? '';
-      const tier = (methods.prime ? 1 : (Number(methods.plan ?? 1000) / 1000));
+      const userId = subInfo.gifterUserId ?? '0';
+      const amount = subInfo.months;
+      const recipientId = subInfo.userId;
+      const recipient = username;
+      const tier = (subInfo.isPrime ? 1 : (Number(subInfo.plan ?? 1000) / 1000));
 
       const ignoreGifts = (this.ignoreGiftsFromUser.get(username) ?? 0);
       let isGiftIgnored = false;
@@ -700,7 +698,7 @@ class TMI extends Core {
       const user = await changelog.get(recipientId);
       if (!user) {
         changelog.update(recipientId, { userId: recipientId, username });
-        this.subgift(username, streakMonths, recipient, methods, userstate);
+        this.subgift(username, subInfo, userstate);
         return;
       }
 
@@ -767,11 +765,10 @@ class TMI extends Core {
   }
 
   @timer()
-  async cheer (userstate: tmijs.ChatUserstate, message: string): Promise<void> {
+  async cheer (userstate: ChatUser, message: string, bits: number): Promise<void> {
     try {
-      const username = userstate.username;
-      const userId = userstate['user-id'];
-      const bits = Number(userstate.bits ?? 0);
+      const username = userstate.userName;
+      const userId = userstate.userId;
 
       // remove <string>X or <string>X from message, but exclude from remove #<string>X or !someCommand2
       const messageFromUser = message.replace(/(?<![#!])(\b\w+[\d]+\b)/g, '').trim();
@@ -783,7 +780,7 @@ class TMI extends Core {
       if (!user) {
         // if we still doesn't have user, we create new
         changelog.update(userId, { username });
-        return this.cheer(userstate, message);
+        return this.cheer(userstate, message, bits);
       }
 
       eventlist.add({
@@ -875,23 +872,20 @@ class TMI extends Core {
   }
 
   delete (client: 'broadcaster' | 'bot', msgId: string): void {
-    this.client[client]?.deletemessage(getOwner(), msgId);
+    this.client[client]?.deleteMessage(getOwner(), msgId);
   }
 
   @timer()
   async message (data: { skip?: boolean, quiet?: boolean, message: string, userstate: ChatUser, isWhisper?: boolean }) {
+    let userId = data.userstate.userId as string | undefined;
     const userstate = data.userstate;
     const message = data.message;
     const skip = data.skip ?? false;
     const quiet = data.quiet;
 
-    if (!userstate.userId && userstate.username) {
+    if (!userId && userstate.userName) {
       // this can happen if we are sending commands from dashboards etc.
-      userstate.userId = String(await users.getIdByName(userstate.username));
-    }
-
-    if (typeof userstate.badges === 'undefined') {
-      userstate.badges = {};
+      userId = String(await users.getIdByName(userstate.userName));
     }
 
     const parse = new Parser({
@@ -899,70 +893,70 @@ class TMI extends Core {
     });
 
     if (!skip
-        && isWhisper
+        && data.isWhisper
         && (this.whisperListener || isOwner(userstate))) {
-      whisperIn(`${message} [${userstate.username}]`);
-    } else if (!skip && !isBotId(userstate['user-id'])) {
-      chatIn(`${message} [${userstate.username}]`);
+      whisperIn(`${message} [${userstate.userName}]`);
+    } else if (!skip && !isBotId(userId)) {
+      chatIn(`${message} [${userstate.userName}]`);
     }
 
     if (commandRegexp.test(message)) {
       // check only if ignored if it is just simple command
-      if (await isIgnored({ username: userstate.username ?? '', userId: userstate['user-id'] })) {
+      if (await isIgnored({ username: userstate.userName ?? '', userId: userId })) {
         return;
       }
     } else {
       // we need to moderate ignored users as well
       const [isModerated, isIgnoredCheck] = await Promise.all(
-        [parse.isModerated(), isIgnored({ username: userstate.username ?? '', userId: userstate['user-id'] })],
+        [parse.isModerated(), isIgnored({ username: userstate.userName ?? '', userId: userId })],
       );
       if (isModerated || isIgnoredCheck) {
         return;
       }
     }
 
-    if (!skip && !isNil(userstate.username)) {
+    if (!skip && !isNil(userstate.userName)) {
       const user = await changelog.get(userstate.userId);
       if (user) {
         if (!user.isOnline) {
-          joinpart.send({ users: [userstate.username], type: 'join' });
-          eventEmitter.emit('user-joined-channel', { username: userstate.username });
+          joinpart.send({ users: [userstate.userName], type: 'join' });
+          eventEmitter.emit('user-joined-channel', { username: userstate.userName });
         }
+
+        userstate.badgeInfo.get('subscriber');
         changelog.update(user.userId, {
           ...user,
-          username:                  userstate.username,
-          userId:                    userstate.userId,
-          isOnline:                  true,
-          isVIP:                     typeof userstate.badges.vip !== 'undefined',
-          isModerator:               typeof userstate.badges.moderator !== 'undefined',
-          isSubscriber:              user.haveSubscriberLock ? user.isSubscriber : userHaveSubscriberBadges(userstate.badges),
-          messages:                  user.messages ?? 0,
-          subscribeTier:             String(userHaveSubscriberBadges(userstate.badges) ? 0 : user.subscribeTier),
-          subscribeCumulativeMonths: subCumulativeMonths(userstate) || user.subscribeCumulativeMonths,
-          seenAt:                    Date.now(),
-        });
-      } else {
-        joinpart.send({ users: [userstate.username], type: 'join' });
-        eventEmitter.emit('user-joined-channel', { username: userstate.username });
-        changelog.update(userstate.userId, {
-          username:     userstate.username,
+          username:     userstate.userName,
           userId:       userstate.userId,
           isOnline:     true,
-          isVIP:        typeof userstate.badges.vip !== 'undefined',
-          isModerator:  typeof userstate.badges.moderator !== 'undefined',
-          isSubscriber: userHaveSubscriberBadges(userstate.badges),
+          isVIP:        userstate.isVip,
+          isModerator:  userstate.isMod,
+          isSubscriber: user.haveSubscriberLock ? user.isSubscriber : userstate.isSubscriber || userstate.isFounder,
+          messages:     user.messages ?? 0,
+          seenAt:       Date.now(),
+        });
+      } else {
+        joinpart.send({ users: [userstate.userName], type: 'join' });
+        eventEmitter.emit('user-joined-channel', { username: userstate.userName });
+        changelog.update(userstate.userId, {
+          username:     userstate.userName,
+          userId:       userstate.userId,
+          isOnline:     true,
+          isVIP:        userstate.isVip,
+          isModerator:  userstate.isMod,
+          isSubscriber: userstate.isSubscriber || userstate.isFounder,
           seenAt:       Date.now(),
         });
       }
 
-      api.followerUpdatePreCheck(userstate.username);
+      api.followerUpdatePreCheck(userstate.userName);
 
       eventEmitter.emit('keyword-send-x-times', {
-        username: userstate.username, message: message, source: 'twitch',
+        username: userstate.userName, message: message, source: 'twitch',
       });
       if (message.startsWith('!')) {
         eventEmitter.emit('command-send-x-times', {
-          username: userstate.username, message: message, source: 'twitch',
+          username: userstate.userName, message: message, source: 'twitch',
         });
       } else if (!message.startsWith('!')) {
         changelog.increment(userstate.userId, { messages: 1 });

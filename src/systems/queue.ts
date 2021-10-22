@@ -147,7 +147,7 @@ class Queue extends System {
     if (!(this.locked)) {
       const user = await changelog.get(opts.sender.userId);
       if (!user) {
-        changelog.update(opts.sender.userId, { username: opts.sender.username });
+        changelog.update(opts.sender.userId, { username: opts.sender.userName });
         return this.join(opts);
       }
       const [all, followers, subscribers] = await Promise.all([this.eligibilityAll, this.eligibilityFollowers, this.eligibilitySubscribers]);
@@ -167,8 +167,8 @@ class Queue extends System {
 
       if (eligible) {
         await getRepository(QueueEntity).save({
-          ...(await getRepository(QueueEntity).findOne({ username: opts.sender.username })),
-          username:     opts.sender.username,
+          ...(await getRepository(QueueEntity).findOne({ username: opts.sender.userName })),
+          username:     opts.sender.userName,
           isFollower:   user.isFollower,
           isSubscriber: user.isSubscriber,
           isModerator:  user.isModerator,

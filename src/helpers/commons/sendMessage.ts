@@ -54,22 +54,22 @@ class HelpersCommons {
       return false;
     } // if message is empty, don't send anything
 
-    // if sender is null/undefined, we can assume, that username is from dashboard -> bot
+    // if sender is null/undefined, we can assume, that userName is from dashboard -> bot
     if (!sender && !attr.force) {
       return false;
     } // we don't want to reply on bot commands
 
     if (sender) {
-      messageToSend = !_.isNil(sender.username) ? messageToSend.replace(/\$sender/g, (showWithAt.value ? '@' : '') + sender.username) : messageToSend;
+      messageToSend = !_.isNil(sender.userName) ? messageToSend.replace(/\$sender/g, (showWithAt.value ? '@' : '') + sender.userName) : messageToSend;
       if (!getMuteStatus() || attr.force) {
         if ((!_.isNil(attr.quiet) && attr.quiet)) {
           return true;
         }
         if (sender['message-type'] === 'whisper') {
-          whisperOut(`${messageToSend} [${sender.username}]`);
-          message('whisper', sender.username, messageToSend, sender.id);
+          whisperOut(`${messageToSend} [${sender.userName}]`);
+          message('whisper', sender.userName, messageToSend, sender.id);
         } else {
-          chatOut(`${messageToSend} [${sender.username}]`);
+          chatOut(`${messageToSend} [${sender.userName}]`);
           if (sendWithMe.value && !messageToSend.startsWith('/')) {
             message('me', null, messageToSend, sender.id);
           } else {

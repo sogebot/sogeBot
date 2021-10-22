@@ -473,7 +473,7 @@ class Levels extends System {
   @command('!level')
   async main (opts: CommandOptions): Promise<CommandResponse[]> {
     try {
-      const [username] = new Expects(opts.parameters).username({ optional: true, default: opts.sender.username }).toArray();
+      const [username] = new Expects(opts.parameters).username({ optional: true, default: opts.sender.userName }).toArray();
       await changelog.flush();
       const user = await getRepository(User).findOneOrFail({ username });
 

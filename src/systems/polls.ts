@@ -306,14 +306,14 @@ class Polls extends System {
         if (cVote.options.length < Number(index) + 1 || index < 0) {
           throw new Error(String(ERROR.INVALID_VOTE));
         } else {
-          const vote = cVote.votes.find(o => o.votedBy === opts.sender.username);
+          const vote = cVote.votes.find(o => o.votedBy === opts.sender.userName);
           if (vote) {
             vote.option = index;
             await getRepository(Poll).save(cVote);
           } else {
             await getRepository(PollVote).save({
               poll:    cVote,
-              votedBy: opts.sender.username,
+              votedBy: opts.sender.userName,
               votes:   1,
               option:  index,
             });
@@ -343,7 +343,7 @@ class Polls extends System {
         if (!cVote) {
           return true; // do nothing if no vote in progress
         }
-        const vote = await getRepository(PollVote).findOne({ poll: cVote, votedBy: opts.sender.username });
+        const vote = await getRepository(PollVote).findOne({ poll: cVote, votedBy: opts.sender.userName });
         if (Number(opts.message) > 0 && Number(opts.message) <= cVote.options.length) {
           if (vote) {
             await getRepository(PollVote).save({
@@ -355,7 +355,7 @@ class Polls extends System {
               poll:    cVote,
               option:  Number(opts.message) - 1,
               votes:   1,
-              votedBy: opts.sender.username,
+              votedBy: opts.sender.userName,
             });
           }
         }

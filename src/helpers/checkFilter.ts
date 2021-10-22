@@ -33,7 +33,7 @@ class HelpersFilter {
     if (!$userObject) {
       changelog.update(opts.sender.userId, {
         userId:   opts.sender.userId,
-        username: opts.sender.username,
+        username: opts.sender.userName,
       });
       return checkFilter(opts, filter);
     }
@@ -47,15 +47,15 @@ class HelpersFilter {
       moderator:   isModerator($userObject),
       subscriber:  isSubscriber($userObject),
       vip:         isVIP($userObject),
-      broadcaster: isBroadcaster(opts.sender.username),
-      bot:         isBot(opts.sender.username),
-      owner:       isOwner(opts.sender.username),
+      broadcaster: isBroadcaster(opts.sender.userName),
+      bot:         isBot(opts.sender.userName),
+      owner:       isOwner(opts.sender.userName),
     };
 
     const customVariables = await getAll();
     const context = {
       $source:    typeof opts.sender.discord === 'undefined' ? 'twitch' : 'discord',
-      $sender:    opts.sender.username,
+      $sender:    opts.sender.userName,
       $is,
       $rank,
       $haveParam: opts.parameters?.length > 0,

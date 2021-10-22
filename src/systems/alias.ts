@@ -120,7 +120,7 @@ class Alias extends System {
             opts.message.replace(replace, alias.command), {
               sender: {
                 userId:   opts.sender.userId,
-                username: opts.sender.username,
+                username: opts.sender.userName,
                 source:   typeof opts.sender.discord === 'undefined' ? 'twitch' : 'discord',
               },
             });

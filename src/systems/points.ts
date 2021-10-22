@@ -354,7 +354,7 @@ class Points extends System {
   async give (opts: CommandOptions): Promise<CommandResponse[]> {
     try {
       const [username, points] = new Expects(opts.parameters).username().points({ all: true }).toArray();
-      if (opts.sender.username.toLowerCase() === username.toLowerCase()) {
+      if (opts.sender.userName.toLowerCase() === username.toLowerCase()) {
         return [];
       }
       await changelog.flush();
@@ -415,10 +415,10 @@ class Points extends System {
   @default_permission(defaultPermissions.CASTERS)
   async get (opts: CommandOptions): Promise<CommandResponse[]> {
     try {
-      const [username] = new Expects(opts.parameters).username({ optional: true, default: opts.sender.username }).toArray();
+      const [username] = new Expects(opts.parameters).username({ optional: true, default: opts.sender.userName }).toArray();
 
       let user: Readonly<Required<UserInterface>> | null;
-      if (opts.sender.username === username) {
+      if (opts.sender.userName === username) {
         user = await changelog.get(opts.sender.userId);
       } else {
         await changelog.flush();

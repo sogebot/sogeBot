@@ -607,7 +607,7 @@ class Songs extends System {
           addedAt:  Date.now(),
           loudness: Number(videoInfo.loudness ?? -15),
           length:   Number(videoInfo.videoDetails.lengthSeconds),
-          username: opts.sender.username,
+          username: opts.sender.userName,
         });
         this.getMeanLoudness();
         const response = prepare('songs.song-was-added-to-queue', { name: videoInfo.videoDetails.title });
@@ -630,7 +630,7 @@ class Songs extends System {
   @command('!wrongsong')
   async removeSongFromQueue (opts: CommandOptions): Promise<CommandResponse[]> {
     const sr = await getRepository(SongRequest).findOne({
-      where: { username: opts.sender.username },
+      where: { username: opts.sender.userName },
       order: { addedAt: 'DESC' },
     });
     if (sr) {

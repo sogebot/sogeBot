@@ -248,7 +248,7 @@ class Bets extends System {
 
         if (!_betOfUser) {
           currentBet.participations.push({
-            username:  opts.sender.username,
+            username:  opts.sender.userName,
             userId:    opts.sender.userId,
             optionIdx: index,
             points:    tickets,

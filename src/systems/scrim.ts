@@ -93,10 +93,10 @@ class Scrim extends System {
         return this.currentMatches(opts);
       } else {
         const [matchId] = new Expects(opts.parameters).everything({ name: 'matchId' }).toArray();
-        const scrimMatchId = await getRepository(ScrimMatchId).findOne({ username: opts.sender.username });
+        const scrimMatchId = await getRepository(ScrimMatchId).findOne({ username: opts.sender.userName });
         await getRepository(ScrimMatchId).save({
           ...scrimMatchId,
-          username: opts.sender.username,
+          username: opts.sender.userName,
           matchId,
         });
       }
