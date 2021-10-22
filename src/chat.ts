@@ -44,7 +44,7 @@ import {
 } from './helpers/tmi';
 import { isOwner } from './helpers/user';
 import * as changelog from './helpers/user/changelog.js';
-import { isBotId } from './helpers/user/isBot';
+import { isBot, isBotId } from './helpers/user/isBot';
 import { isIgnored } from './helpers/user/isIgnored';
 import { getUserFromTwitch } from './microservices/getUserFromTwitch';
 import oauth from './oauth';
@@ -222,9 +222,11 @@ class TMI extends Core {
 
       const authProvider = new StaticAuthProvider(clientId, token);
       this.client[type] = new ChatClient({ authProvider });
-      await this.client[type]?.connect();
-      await this.join(type, channel);
       this.loadListeners(type);
+      await this.client[type]?.connect();
+      setTimeout(() => {
+        this.join(type, channel);
+      }, 5 * constants.SECOND);
     } catch (e: any) {
       error(e.stack);
       if (type === 'broadcaster' && !this.broadcasterWarning) {
@@ -346,18 +348,28 @@ class TMI extends Core {
     client.removeListener();
 
     // common for bot and broadcaster
-    client.onDisconnect((_event, reason) => {
-      info(`TMI: ${type} is disconnected, reason: ${reason}`);
-      setStatus('TMI', constants.DISCONNECTED);
-      client.removeListener();
-      for (const event of getFunctionList('partChannel')) {
-        (this as any)[event.fName]();
+    client.onPart((channel, user) => {
+      if (isBot(user)) {
+        info(`TMI: ${type} is disconnected from channel`);
+        setStatus('TMI', constants.DISCONNECTED);
+        for (const event of getFunctionList('partChannel')) {
+          (this as any)[event.fName]();
+        }
       }
     });
-    client.onConnect(async () => {
-      info(`TMI: ${type} is connected`);
+
+    client.onDisconnect((_manually, reason) => {
+      setStatus('TMI', constants.DISCONNECTED);
+      info(`TMI: ${type} is disconnected, reason: ${reason}`);
+    });
+
+    client.onConnect(() => {
       setStatus('TMI', constants.CONNECTED);
-      this.loadListeners(type);
+      info(`TMI: ${type} is connected`);
+    });
+
+    client.onJoin(async () => {
+      setStatus('TMI', constants.CONNECTED);
       for (const event of getFunctionList('joinChannel')) {
         (this as any)[event.fName]();
       }
@@ -372,10 +384,6 @@ class TMI extends Core {
           userstate: msg.userInfo, message, isWhisper: true,
         });
         linesParsedIncrement();
-      });
-
-      client.onJoinFailure((channel, reason) => {
-        console.log({ channel, reason });
       });
 
       // onCheer
