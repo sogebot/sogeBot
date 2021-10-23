@@ -30,7 +30,7 @@ async function retest() {
           '-r', 'source-map-support/register',
           '--timeout', '120000',
           '--exit',
-          '--grep="' + suite.replace('(!#)', '') + '"',
+          '--fgrep="' + suite + '"',
           '--recursive',
           'test/',
         ], { shell: true });
