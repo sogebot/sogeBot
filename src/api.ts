@@ -119,7 +119,7 @@ const processFollowerState = async (users: { from_name: string; from_id: string;
     users
       .filter(user => !usersGotFromDb.find(db => db.userId === user.from_id))
       .map(user => {
-        return { userId: user.from_id, username: user.from_name };
+        return { userId: user.from_id, userName: user.from_name };
       }).forEach(user => {
         changelog.update(user.userId, user);
         usersSavedToDbPromise.push(changelog.get(user.userId) as Promise<Readonly<Required<UserInterface>>>);
