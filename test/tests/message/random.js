@@ -70,9 +70,9 @@ describe('Message - random filter - @func3', () => {
     });
 
     const users = ['ignoreduser', 'user1'];
-    for (const username of users) {
-      it('add user ' + username + ' to users list', async () => {
-        await getRepository(User).save({ userId: String(Math.floor(Math.random() * 100000)), username, isFollower: true });
+    for (const userName of users) {
+      it('add user ' + userName + ' to users list', async () => {
+        await getRepository(User).save({ userId: String(Math.floor(Math.random() * 100000)), userName, isFollower: true });
       });
     }
 
@@ -103,9 +103,9 @@ describe('Message - random filter - @func3', () => {
     });
 
     const users = ['ignoreduser', 'user1'];
-    for (const username of users) {
-      it('add user ' + username + ' to users list', async () => {
-        await getRepository(User).save({ userId: String(Math.floor(Math.random() * 100000)), username, isSubscriber: true });
+    for (const userName of users) {
+      it('add user ' + userName + ' to users list', async () => {
+        await getRepository(User).save({ userId: String(Math.floor(Math.random() * 100000)), userName, isSubscriber: true });
       });
     }
 
@@ -137,9 +137,9 @@ describe('Message - random filter - @func3', () => {
     });
 
     const users = ['ignoreduser', 'user1'];
-    for (const username of users) {
-      it('add user ' + username + ' to users list', async () => {
-        await getRepository(User).save({ userId: String(Math.floor(Math.random() * 100000)), username });
+    for (const userName of users) {
+      it('add user ' + userName + ' to users list', async () => {
+        await getRepository(User).save({ userId: String(Math.floor(Math.random() * 100000)), userName });
       });
     }
 
@@ -169,9 +169,9 @@ describe('Message - random filter - @func3', () => {
     });
 
     const users = ['ignoreduser', 'user1'];
-    for (const username of users) {
-      it('add user ' + username + ' to users list', async () => {
-        await getRepository(User).save({ userId: String(Math.floor(Math.random() * 100000)), username, isFollower: true });
+    for (const userName of users) {
+      it('add user ' + userName + ' to users list', async () => {
+        await getRepository(User).save({ userId: String(Math.floor(Math.random() * 100000)), userName, isFollower: true });
       });
     }
 
@@ -201,9 +201,9 @@ describe('Message - random filter - @func3', () => {
     });
 
     const users = ['ignoreduser', 'user1'];
-    for (const username of users) {
-      it('add user ' + username + ' to users list', async () => {
-        await getRepository(User).save({ userId: String(Math.floor(Math.random() * 100000)), username, isSubscriber: true });
+    for (const userName of users) {
+      it('add user ' + userName + ' to users list', async () => {
+        await getRepository(User).save({ userId: String(Math.floor(Math.random() * 100000)), userName, isSubscriber: true });
       });
     }
 

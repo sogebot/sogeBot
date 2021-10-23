@@ -146,7 +146,7 @@ class TMI extends Core {
 
   @command('!ignore add')
   @default_permission(defaultPermissions.CASTERS)
-  async ignoreAdd (opts: Record<string, any>) {
+  async ignoreAdd (opts: CommandOptions) {
     try {
       const username = new Expects(opts.parameters).username().toArray()[0].toLowerCase();
       this.ignorelist = [
@@ -166,7 +166,7 @@ class TMI extends Core {
 
   @command('!ignore remove')
   @default_permission(defaultPermissions.CASTERS)
-  async ignoreRm (opts: Record<string, any>) {
+  async ignoreRm (opts: CommandOptions) {
     try {
       const username = new Expects(opts.parameters).username().toArray()[0].toLowerCase();
       this.ignorelist = this.ignorelist.filter(o => o !== username);
@@ -180,7 +180,7 @@ class TMI extends Core {
 
   @command('!ignore check')
   @default_permission(defaultPermissions.CASTERS)
-  async ignoreCheck (opts: Record<string, any>) {
+  async ignoreCheck (opts: CommandOptions) {
     try {
       const username = new Expects(opts.parameters).username().toArray()[0].toLowerCase();
       const isUserIgnored = isIgnored({ userName: username });

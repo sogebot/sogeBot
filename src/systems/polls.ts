@@ -373,7 +373,7 @@ class Polls extends System {
   }
 
   @onBit()
-  protected async parseBit(opts: { username: string; amount: number; message: string }): Promise<void> {
+  protected async parseBit(opts: onEventBit): Promise<void> {
     const cVote = await getRepository(Poll).findOne({ isOpened: true });
 
     if (cVote && cVote.type === 'bits') {
@@ -385,7 +385,7 @@ class Polls extends System {
             poll:    cVote,
             option:  i - 1,
             votes:   opts.amount,
-            votedBy: opts.username,
+            votedBy: opts.userName,
           });
           break;
         }
@@ -394,7 +394,7 @@ class Polls extends System {
   }
 
   @onTip()
-  protected async parseTip(opts: { username: string; amount: number; message: string; currency: currency }): Promise<void> {
+  protected async parseTip(opts: onEventTip): Promise<void> {
     const cVote = await getRepository(Poll).findOne({ isOpened: true });
 
     if (cVote && cVote.type === 'tips') {
@@ -406,7 +406,7 @@ class Polls extends System {
             poll:    cVote,
             option:  i - 1,
             votes:   Number(currency.exchange(opts.amount, opts.currency, mainCurrency.value)),
-            votedBy: opts.username,
+            votedBy: opts.userName,
           });
           break;
         }
