@@ -361,7 +361,7 @@ class Users extends Core {
         let query;
         if (connection.options.type === 'postgres') {
           query = getRepository(User).createQueryBuilder('user')
-            .orderBy(opts.order?.orderBy ?? 'user.username' , opts.order?.sortOrder ?? 'ASC')
+            .orderBy(opts.order?.orderBy ?? 'user.userName' , opts.order?.sortOrder ?? 'ASC')
             .select('COALESCE("sumTips", 0)', 'sumTips')
             .addSelect('COALESCE("sumBits", 0)', 'sumBits')
             .addSelect('"user".*')
@@ -371,7 +371,7 @@ class Users extends Core {
             .leftJoin('(select "userId", sum("sortAmount") as "sumTips" from "user_tip" group by "userId")', 'user_tip', '"user_tip"."userId" = "user"."userId"');
         } else {
           query = getRepository(User).createQueryBuilder('user')
-            .orderBy(opts.order?.orderBy ?? 'user.username' , opts.order?.sortOrder ?? 'ASC')
+            .orderBy(opts.order?.orderBy ?? 'user.userName' , opts.order?.sortOrder ?? 'ASC')
             .select('JSON_EXTRACT(`user`.`extra`, \'$.levels.xp\')', 'levelXP')
             .addSelect('COALESCE(sumTips, 0)', 'sumTips')
             .addSelect('COALESCE(sumBits, 0)', 'sumBits')
@@ -421,10 +421,10 @@ class Users extends Core {
         if (typeof opts.search !== 'undefined') {
           query.andWhere(new Brackets(w => {
             if (connection.options.type === 'postgres') {
-              w.where('"user"."username" like :like', { like: `%${opts.search}%` });
+              w.where('"user"."userName" like :like', { like: `%${opts.search}%` });
               w.orWhere('CAST("user"."userId" AS TEXT) like :like', { like: `%${opts.search}%` });
             } else {
-              w.where('`user`.`username` like :like', { like: `%${opts.search}%` });
+              w.where('`user`.`userName` like :like', { like: `%${opts.search}%` });
               w.orWhere('CAST(`user`.`userId` AS CHAR) like :like', { like: `%${opts.search}%` });
             }
           }));
@@ -437,15 +437,16 @@ class Users extends Core {
           // add level to user
           viewer.extra = JSON.parse(viewer.extra);
           viewer.level = levels.getLevelOf(viewer);
+          viewer.username = viewer.userName;
         }
         let count = await query.getCount();
 
         if (opts.exactUsernameFromTwitch && opts.search) {
           // we need to check if viewers have already opts.search in list (we don't need to fetch twitch data)
-          if (!viewers.find(o => o.username === opts.search)) {
+          if (!viewers.find(o => o.userName === opts.search)) {
             try {
               const userId = await getIdFromTwitch(opts.search);
-              viewers.unshift({ userId, username: opts.search });
+              viewers.unshift({ userId, userName: opts.search });
               count++;
             } catch (e: any) {
               // we don't care if user is not found
