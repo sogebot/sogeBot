@@ -505,7 +505,7 @@ class Discord extends Integration {
         }
       });
 
-      this.client.on('message', async (msg) => {
+      this.client.on('messageCreate', async (msg) => {
         if (this.client && this.guild) {
 
           const isSelf = msg.author.tag === get(this.client, 'user.tag', null);
