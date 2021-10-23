@@ -108,11 +108,11 @@ describe('Price - check() - @func3', () => {
       command: '!a', price: 100, priceBits: 10,
     });
     tmi.cheer({
-      username:  user.viewer.username,
-      'user-id': user.viewer.userId,
-      bits:      100,
+      userName: user.viewer.username,
+      userId:   user.viewer.userId,
     },
     '!a',
+    100,
     );
     await message.isSentRaw('Usage => http://sogehige.github.io/sogeBot/#/_master/systems/alias', user.viewer.username, 20000);
   });
@@ -123,11 +123,11 @@ describe('Price - check() - @func3', () => {
       command: '!b', price: 100, priceBits: 10,
     });
     tmi.cheer({
-      username:  user.viewer.username,
-      'user-id': user.viewer.userId,
-      bits:      100,
+      userName: user.viewer.username,
+      userId:   user.viewer.userId,
     },
     '!b',
+    100,
     );
     await message.isSentRaw('Lorem Ipsum', user.viewer.username, 20000);
   });
@@ -137,11 +137,11 @@ describe('Price - check() - @func3', () => {
       command: '!me', price: 100, priceBits: 10,
     });
     tmi.cheer({
-      username:  user.viewer.username,
-      'user-id': user.viewer.userId,
-      bits:      100,
+      userName: user.viewer.username,
+      userId:   user.viewer.userId,
     },
-    '!me');
+    '!me',
+    100);
     await message.isSentRaw('@__viewer__ | Level 0 | 0 hours | 0 points | 0 messages | €0.00 | 100 bits | 0 months', user.viewer.username, 20000);
   });
 });

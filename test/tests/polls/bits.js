@@ -93,11 +93,11 @@ describe('Polls - bits - @func2', () => {
         for (let i = 0; i < 10; i++) {
           const user = 'user' + [o, i].join('');
           await tmi.cheer({
-            username:  user,
-            'user-id': String(Math.floor(Math.random() * 100000)),
-            bits:      10,
+            userName:  user,
+            userId: String(Math.floor(Math.random() * 100000)),
           },
           'Cool I am voting for #vote' + o + ' enjoy!',
+          10,
           );
 
           await until(async (setError) => {
