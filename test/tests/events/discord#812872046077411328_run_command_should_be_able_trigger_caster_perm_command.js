@@ -59,7 +59,7 @@ describe('Events - event run command should be able to run caster command and al
       await message.prepare();
     });
     it('trigger follow event', async () => {
-      await events.fire('follow', { userName: follower.userName, userId: follower.userId });
+      await events.fire('follow', { username: follower.userName, userId: follower.userId });
     });
 
     it('command should be triggered', async () => {

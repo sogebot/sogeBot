@@ -56,7 +56,6 @@ class Gamble extends Game {
   async main (opts: CommandOptions): Promise<CommandResponse[]> {
     let points, message;
 
-    opts.sender['message-type'] = 'chat'; // force responses to chat
     try {
       const parsed = opts.parameters.trim().match(/^([\d]+|all)$/);
       if (isNil(parsed)) {

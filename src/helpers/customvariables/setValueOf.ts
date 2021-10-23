@@ -42,7 +42,7 @@ async function setValueOf (variable: string | Readonly<VariableInterface>, curre
   } else {
     if (typeof opts.sender === 'string') {
       opts.sender = {
-        username: opts.sender,
+        userName: opts.sender,
         userId:   await users.getIdByName(opts.sender),
         source:   'twitch',
       };

@@ -311,7 +311,7 @@ class UserInfo extends System {
         return response;
       } else {
         return [{
-          response, sender: opts.sender, attr: opts.attr,
+          response, sender: opts.sender, attr: opts.attr, discord: opts.discord,
         }];
       }
     } catch (e: any) {
@@ -324,25 +324,25 @@ class UserInfo extends System {
   @default_permission(null)
   async showStats(opts: CommandOptions): Promise<CommandResponse[]> {
     try {
-      const username = new Expects(opts.parameters).username().toArray()[0].toLowerCase();
+      const userName = new Expects(opts.parameters).username().toArray()[0].toLowerCase();
       await changelog.flush();
-      const user = await getRepository(User).findOne({ where: { username: username.toLowerCase() } });
+      const user = await getRepository(User).findOne({ where: { userName: userName.toLowerCase() } });
 
       if (!user) {
-        throw Error(`User ${username} not found.`);
+        throw Error(`User ${userName} not found.`);
       }
 
       const response = await this.showMe({
         ...opts,
         sender: {
           ...opts.sender,
-          username,
+          userName,
           userId: String(user.userId),
         },
       }, true) as string;
       return [
         {
-          response: response.replace('$sender', '$touser'), sender: opts.sender, attr: { ...opts.attr, param: username },
+          response: response.replace('$sender', '$touser'), sender: opts.sender, attr: { ...opts.attr, param: userName }, discord: opts.discord,
         },
       ];
     } catch (e: any) {

@@ -387,7 +387,7 @@ class TMI extends Core {
           return;
         }
         this.message({
-          userstate: msg.userInfo, message, isWhisper: true,
+          userstate: msg.userInfo, message, isWhisper: true, emotesOffsets: msg.emoteOffsets, isAction: false,
         });
         linesParsedIncrement();
       });
@@ -406,7 +406,7 @@ class TMI extends Core {
         }
         // strip message from ACTION
         message = message.replace('\u0001ACTION ', '').replace('\u0001', '');
-        this.message({ userstate, message });
+        this.message({ userstate, message, emotesOffsets: msg.emoteOffsets, isAction: true });
         linesParsedIncrement();
         triggerInterfaceOnMessage({
           sender:    userstate,
@@ -423,7 +423,7 @@ class TMI extends Core {
           return;
         }
         this.message({
-          userstate, message, id: msg.id,
+          userstate, message, id: msg.id, emotesOffsets: msg.emoteOffsets, isAction: false,
         });
         linesParsedIncrement();
         triggerInterfaceOnMessage({
@@ -852,17 +852,17 @@ class TMI extends Core {
           if (price.priceBits <= bits) {
             if (customcommands.enabled) {
               await customcommands.run({
-                sender: getUserSender(userId, username), id: 'null', skip: true, quiet: false, message: messageFromUser.trim().toLowerCase(), parameters: '', parser: new Parser(),
+                sender: getUserSender(userId, username), id: 'null', skip: true, quiet: false, message: messageFromUser.trim().toLowerCase(), parameters: '', parser: new Parser(), isAction: false, emotesOffsets: new Map(), discord: undefined,
               });
             }
             if (alias.enabled) {
               await alias.run({
-                sender: getUserSender(userId, username), id: 'null', skip: true, message: messageFromUser.trim().toLowerCase(), parameters: '', parser: new Parser(),
+                sender: getUserSender(userId, username), id: 'null', skip: true, message: messageFromUser.trim().toLowerCase(), parameters: '', parser: new Parser(), isAction: false, emotesOffsets: new Map(), discord: undefined,
               });
             }
             const responses = await new Parser().command(getUserSender(userId, username), messageFromUser, true);
             for (let i = 0; i < responses.length; i++) {
-              await parserReply(responses[i].response, { sender: responses[i].sender, attr: responses[i].attr });
+              await parserReply(responses[i].response, { sender: responses[i].sender, discord: responses[i].discord, attr: responses[i].attr });
             }
             if (price.emitRedeemEvent) {
               redeemTriggered = true;
@@ -906,7 +906,10 @@ class TMI extends Core {
   }
 
   @timer()
-  async message (data: { skip?: boolean, quiet?: boolean, message: string, userstate: ChatUser, id?: string, isWhisper?: boolean }) {
+  async message (data: { skip?: boolean, quiet?: boolean, message: string, userstate: ChatUser, id?: string, isWhisper?: boolean, emotesOffsets?: Map<string, string[]>, isAction: boolean }) {
+    data.emotesOffsets ??= new Map();
+    data.isAction ??= false;
+
     let userId = data.userstate.userId as string | undefined;
     const userstate = data.userstate;
     const message = data.message;
@@ -919,7 +922,7 @@ class TMI extends Core {
     }
 
     const parse = new Parser({
-      sender: userstate, message: message, skip: skip, quiet: quiet, id: data.id,
+      sender: userstate, message: message, skip: skip, quiet: quiet, id: data.id, emotesOffsets: data.emotesOffsets, isAction: data.isAction,
     });
 
     if (!skip

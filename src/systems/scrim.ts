@@ -203,7 +203,7 @@ class Scrim extends System {
             return; // user restarted !snipe
           }
           const currentMatches = await this.currentMatches({
-            sender: getBotSender(), parameters: '', createdAt: Date.now(), command: '', attr: {},
+            sender: getBotSender(), parameters: '', createdAt: Date.now(), command: '', attr: {}, isAction: false, emotesOffsets: new Map(), discord: undefined,
           });
           for (const r of currentMatches) {
             announce(await r.response, 'scrim');

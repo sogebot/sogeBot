@@ -196,7 +196,7 @@ class Moderation extends System {
     }
   }
 
-  async timeoutUser (sender: CommandOptions['sender'], text: string, warning: string, msg: string, time: number, type: typeof timeoutType[number] ) {
+  async timeoutUser (sender: CommandOptions['sender'], text: string, warning: string, msg: string, time: number, type: typeof timeoutType[number], msgId: string ) {
     // cleanup warnings
     await getRepository(ModerationWarning).delete({ timestamp: LessThan(Date.now() - 1000 * 60 * 60) });
     const warnings = await getRepository(ModerationWarning).find({ userId: sender.userId });
@@ -205,31 +205,31 @@ class Moderation extends System {
     text = text.trim();
 
     if (this.cWarningsAllowedCount === 0) {
-      timeoutLog(`${sender.username} [${type}] ${time}s timeout | ${text}`);
-      timeout(sender.username, time, isModerator(sender));
+      timeoutLog(`${sender.userName} [${type}] ${time}s timeout | ${text}`);
+      timeout(sender.userName, time, isModerator(sender));
       return;
     }
 
     const isWarningCountAboveThreshold = warnings.length >= this.cWarningsAllowedCount;
     if (isWarningCountAboveThreshold) {
-      timeoutLog(`${sender.username} [${type}] ${time}s timeout | ${text}`);
-      timeout(sender.username, time, isModerator(sender));
+      timeoutLog(`${sender.userName} [${type}] ${time}s timeout | ${text}`);
+      timeout(sender.userName, time, isModerator(sender));
       await getRepository(ModerationWarning).delete({ userId: sender.userId });
     } else {
       await getRepository(ModerationWarning).insert({ userId: sender.userId, timestamp: Date.now() });
       const warningsLeft = this.cWarningsAllowedCount - warnings.length;
       warning = await new Message(warning.replace(/\$count/g, String(warningsLeft < 0 ? 0 : warningsLeft))).parse();
       if (this.cWarningsShouldClearChat) {
-        timeoutLog(`${sender.username} [${type}] 1s timeout, warnings left ${warningsLeft < 0 ? 0 : warningsLeft} | ${text}`);
-        timeout(sender.username, 1, isModerator(sender));
+        timeoutLog(`${sender.userName} [${type}] 1s timeout, warnings left ${warningsLeft < 0 ? 0 : warningsLeft} | ${text}`);
+        timeout(sender.userName, 1, isModerator(sender));
       }
 
       if (this.cWarningsAnnounceTimeouts) {
-        tmi.delete('bot', sender.id);
+        tmi.delete('bot', msgId);
         if (!silent) {
-          parserReply('$sender, ' + warning, { sender });
+          parserReply('$sender, ' + warning, { sender, discord: undefined });
         } else {
-          warningLog(`Moderation announce was not sent (another ${type} warning already sent in 60s): ${sender.username}, ${warning}`);
+          warningLog(`Moderation announce was not sent (another ${type} warning already sent in 60s): ${sender.userName}, ${warning}`);
         }
       }
     }
@@ -342,7 +342,7 @@ class Moderation extends System {
         this.timeoutUser(opts.sender, whitelisted,
           translate('moderation.user-is-warned-about-links'),
           translate('moderation.user-have-timeout-for-links'),
-          timeoutValues[permId], 'links');
+          timeoutValues[permId], 'links', opts.id);
         return false;
       }
     } else {
@@ -382,13 +382,13 @@ class Moderation extends System {
         this.timeoutUser(opts.sender, opts.message,
           translate('moderation.user-is-warned-about-symbols'),
           translate('moderation.user-have-timeout-for-symbols'),
-          timeoutValues[permId], 'symbols');
+          timeoutValues[permId], 'symbols', opts.id);
         return false;
       }
       symbolsLength = symbolsLength + symbols.length;
     }
     if (Math.ceil(symbolsLength / (msgLength / 100)) >= cSymbolsMaxSymbolsPercent[permId]) {
-      this.timeoutUser(opts.sender, opts.message, translate('moderation.user-is-warned-about-symbols'), translate('moderation.symbols'), timeoutValues[permId], 'symbols');
+      this.timeoutUser(opts.sender, opts.message, translate('moderation.user-is-warned-about-symbols'), translate('moderation.symbols'), timeoutValues[permId], 'symbols', opts.id);
       return false;
     }
     return true;
@@ -418,7 +418,7 @@ class Moderation extends System {
       this.timeoutUser(opts.sender, opts.message,
         translate('moderation.user-is-warned-about-long-message'),
         translate('moderation.user-have-timeout-for-long-message'),
-        timeoutValues[permId], 'longmessage');
+        timeoutValues[permId], 'longmessage', opts.id);
       return false;
     }
   }
@@ -441,11 +441,9 @@ class Moderation extends System {
     let whitelisted = await this.whitelist(opts.message, permId);
 
     const emotesCharList: number[] = [];
-    if (Symbol.iterator in Object(opts.sender.emotes)) {
-      for (const emote of opts.sender.emotes) {
-        for (const i of _.range(emote.start, emote.end + 1)) {
-          emotesCharList.push(i);
-        }
+    for (const emote of opts.emotesOffsets.values()) {
+      for (const i of _.range(Number(emote[0]), Number(emote[1]) + 1)) {
+        emotesCharList.push(i);
       }
     }
 
@@ -473,7 +471,7 @@ class Moderation extends System {
       this.timeoutUser(opts.sender, opts.message,
         translate('moderation.user-is-warned-about-caps'),
         translate('moderation.user-have-timeout-for-caps'),
-        timeoutValues[permId], 'caps');
+        timeoutValues[permId], 'caps', opts.id);
       return false;
     }
     return true;
@@ -507,7 +505,7 @@ class Moderation extends System {
         this.timeoutUser(opts.sender, opts.message,
           translate('moderation.user-have-timeout-for-spam'),
           translate('moderation.user-is-warned-about-spam'),
-          timeoutValues[permId], 'spam');
+          timeoutValues[permId], 'spam', opts.id);
         return false;
       }
     }
@@ -528,11 +526,11 @@ class Moderation extends System {
       return true;
     }
 
-    if (opts.sender['message-type'] === 'action') {
+    if (opts.isAction) {
       this.timeoutUser(opts.sender, opts.message,
         translate('moderation.user-is-warned-about-color'),
         translate('moderation.user-have-timeout-for-color'),
-        timeoutValues[permId], 'color');
+        timeoutValues[permId], 'color', opts.id);
       return false;
     } else {
       return true;
@@ -542,10 +540,6 @@ class Moderation extends System {
   @parser({ priority: constants.MODERATION })
   async emotes (opts: ParserOptions) {
     if (!opts.sender || immuneUsers.get('emotes')?.has(String(opts.sender.userId))) {
-      return true;
-    }
-
-    if (!(Symbol.iterator in Object(opts.sender.emotes))) {
       return true;
     }
 
@@ -559,7 +553,10 @@ class Moderation extends System {
       return true;
     }
 
-    let count = opts.sender.emotes.length;
+    let count = 0;
+    for (const offsets of opts.emotesOffsets.values()) {
+      count += offsets.length;
+    }
     if (cEmotesEmojisAreEmotes[permId]) {
       const regex = emojiRegex();
       while (regex.exec(opts.message)) {
@@ -571,7 +568,7 @@ class Moderation extends System {
       this.timeoutUser(opts.sender, opts.message,
         translate('moderation.user-is-warned-about-emotes'),
         translate('moderation.user-have-timeout-for-emotes'),
-        timeoutValues[permId], 'emotes');
+        timeoutValues[permId], 'emotes', opts.id);
       return false;
     } else {
       return true;
@@ -602,7 +599,7 @@ class Moderation extends System {
           this.timeoutUser(opts.sender, opts.message,
             translate('moderation.user-is-warned-about-forbidden-words'),
             translate('moderation.user-have-timeout-for-forbidden-words'),
-            timeoutValues[permId], 'blacklist');
+            timeoutValues[permId], 'blacklist', opts.id);
           break;
         }
       }

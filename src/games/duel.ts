@@ -130,7 +130,6 @@ class Duel extends Game {
     const responses: CommandResponse[] = [];
     let bet;
 
-    opts.sender['message-type'] = 'chat'; // force responses to chat
     try {
       const parsed = opts.parameters.trim().match(/^([\d]+|all)$/);
       if (_.isNil(parsed)) {

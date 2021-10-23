@@ -5,7 +5,7 @@ import { botUsername } from '../oauth/botUsername';
 export function isBot(user: string | CommandOptions['sender'] | UserInterface | UserStateTags) {
   try {
     if (botUsername.value) {
-      return botUsername.value.toLowerCase().trim() === (typeof user === 'string' ? user : user.username).toLowerCase().trim();
+      return botUsername.value.toLowerCase().trim() === (typeof user === 'string' ? user : user.userName).toLowerCase().trim();
     } else {
       return false;
     }

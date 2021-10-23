@@ -1,7 +1,9 @@
+import { isBroadcaster, isModerator } from '../user';
+
 export function getUserSender(userId: string, username: string): Omit<ChatUser, '_userName' | '_userData' | '_parseBadgesLike'> {
   return {
-    isMod:         false,
-    isBroadcaster: false,
+    isMod:         isModerator(username),
+    isBroadcaster: isBroadcaster(username),
     isFounder:     false,
     isSubscriber:  false,
     isVip:         false,

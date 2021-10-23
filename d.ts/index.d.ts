@@ -169,15 +169,17 @@ interface UIHighlightsUrlGenerator {
 interface CommandResponse {
   response: string | Promise<string>;
   sender: CommandOptions['sender'];
+  discord: CommandOptions['discord'];
   attr: CommandOptions['attr'];
 }
 
 interface CommandOptions {
-  sender: Omit<ChatUser, '_userData', '_userName'> & {
-    discord?: { author: DiscordJsUser; channel: DiscordJsTextChannel };
-  };
+  sender: Omit<ChatUser, '_userName' | '_userData' | '_parseBadgesLike'>
+  emotesOffsets: Map<string, string[]>
+  discord: { author: DiscordJsUser; channel: DiscordJsTextChannel } | undefined
   command: string;
   parameters: string;
+  isAction: boolean,
   createdAt: number;
   attr: {
     skip?: boolean;
@@ -188,7 +190,10 @@ interface CommandOptions {
 
 interface ParserOptions {
   id: string;
-  sender: CommandOptions['sender'] | null;
+  sender: Omit<ChatUser, '_userName' | '_userData' | '_parseBadgesLike'> | null;
+  emotesOffsets: Map<string, string[]>
+  discord: { author: DiscordJsUser; channel: DiscordJsTextChannel } | undefined
+  isAction: boolean,
   parameters: string;
   message: string;
   skip: boolean;

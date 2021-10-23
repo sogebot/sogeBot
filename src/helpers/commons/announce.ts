@@ -19,7 +19,7 @@ export async function announce(messageToAnnounce: string, type: typeof announceT
   const Message = (require('../../message') as typeof import('../../message')).Message;
   const sendMessage = (require('./sendMessage') as typeof import('./sendMessage')).sendMessage;
 
-  messageToAnnounce = await new Message(messageToAnnounce).parse({ sender: getBotSender(), replaceCustomVariables }) as string;
+  messageToAnnounce = await new Message(messageToAnnounce).parse({ sender: getBotSender(), replaceCustomVariables, discord: undefined }) as string;
   sendMessage(messageToAnnounce, getUserSender(botId.value, botUsername.value), { force: true, skip: true });
 
   if (Discord.sendAnnouncesToChannel[type].length > 0 && Discord.client) {

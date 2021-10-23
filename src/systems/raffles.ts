@@ -114,14 +114,14 @@ class Raffles extends System {
     });
     adminEndpoint(this.nsp, 'raffle::pick', async () => {
       this.pick({
-        attr: {}, command: '!raffle', createdAt: Date.now(), parameters: '', sender: getOwnerAsSender(),
+        attr: {}, command: '!raffle', createdAt: Date.now(), parameters: '', sender: getOwnerAsSender(), isAction: false, emotesOffsets: new Map(), discord: undefined,
       });
     });
     adminEndpoint(this.nsp, 'raffle::open', async (message) => {
       // force close raffles
       await getRepository(Raffle).update({}, { isClosed: true });
       this.open({
-        attr: {}, command: '!raffle open', createdAt: Date.now(), sender: getOwnerAsSender(), parameters: message,
+        attr: {}, command: '!raffle open', createdAt: Date.now(), sender: getOwnerAsSender(), parameters: message, isAction: false, emotesOffsets: new Map(), discord: undefined,
       });
     });
     adminEndpoint(this.nsp, 'raffle::close', async () => {
@@ -430,7 +430,7 @@ class Raffles extends System {
       tickets = 0;
     }
 
-    const participant = raffle.participants.find(o => o.username === opts.sender.userName);
+    const participant = raffle.participants.find(o => o.username === opts.sender?.userName);
     let curTickets = 0;
     if (participant) {
       curTickets = participant.tickets;

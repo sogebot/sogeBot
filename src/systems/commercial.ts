@@ -7,7 +7,7 @@ import {
   command, default_permission, helper,
 } from '../decorators';
 import { calls, setRateLimit } from '../helpers/api';
-import { getOwner } from '../helpers/commons';
+import { getOwnerAsSender } from '../helpers/commons';
 import { eventEmitter } from '../helpers/events';
 import { error, warning } from '../helpers/log';
 import { channelId } from '../helpers/oauth';
@@ -27,11 +27,14 @@ class Commercial extends System {
   sockets() {
     adminEndpoint(this.nsp, 'commercial.run', (data) => {
       commercial.main({
-        parameters: data.seconds,
-        command:    '!commercial',
-        sender:     { username: getOwner() },
-        attr:       {},
-        createdAt:  Date.now(),
+        parameters:    data.seconds,
+        command:       '!commercial',
+        sender:        getOwnerAsSender(),
+        attr:          {},
+        createdAt:     Date.now(),
+        emotesOffsets: new Map(),
+        isAction:      false,
+        discord: undefined,
       });
     });
   }

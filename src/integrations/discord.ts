@@ -26,7 +26,7 @@ import Expects from '../expects';
 import { isStreamOnline, stats } from '../helpers/api';
 import { attributesReplace } from '../helpers/attributesReplace';
 import {
-  announceTypes, getOwner, isUUID, prepare,
+  announceTypes, getOwner, getUserSender, isUUID, prepare,
 } from '../helpers/commons';
 import { isBotStarted, isDbConnected } from '../helpers/database';
 import { dayjs, timezone } from '../helpers/dayjs';
@@ -39,7 +39,6 @@ import { generalChannel } from '../helpers/oauth/generalChannel';
 import { check } from '../helpers/permissions/';
 import { get as getPermission } from '../helpers/permissions/get';
 import { adminEndpoint } from '../helpers/socket';
-import { isModerator } from '../helpers/user';
 import * as changelog from '../helpers/user/changelog.js';
 import { Message } from '../message';
 import { getIdFromTwitch } from '../microservices/getIdFromTwitch';
@@ -582,11 +581,8 @@ class Discord extends Integration {
         const user = await changelog.getOrFail(link.userId);
         const parser = new Parser();
         parser.started_at = (msg || { createdTimestamp: Date.now() }).createdTimestamp;
-        parser.sender = {
-          isModerator: isModerator(user),
-          badges:      {}, color:       '',  displayName: '', emoteSets:   [], emotes:      [], userId:      String(link.userId), username:    user.userName, userType:    'viewer',
-          mod:         'false', subscriber:  'false', turbo:       'false', discord:     { author, channel },
-        };
+        parser.discord = { author, channel };
+        parser.sender = getUserSender(user.userId, user.userName);
 
         eventEmitter.emit('keyword-send-x-times', {
           username: user.userName, message: content, source: 'discord',
@@ -606,7 +602,8 @@ class Discord extends Integration {
                   const messageToSend = await new Message(await responses[i].response).parse({
                     ...responses[i].attr,
                     forceWithoutAt: true, // we dont need @
-                    sender:         { ...responses[i].sender, discord: { author, channel } },
+                    sender:         { ...responses[i].sender },
+                    discord: { author, channel },
                   }) as string;
                   const reply = await channel.send(messageToSend);
                   chatOut(`#${channel.name}: ${messageToSend} [${author.tag}]`);

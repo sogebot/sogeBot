@@ -16,6 +16,7 @@ class HelpersCommons {
   @timer()
   async sendMessage(messageToSend: string | Promise<string>, sender: Omit<ChatUser, '_userName' | '_userData' | '_parseBadgesLike'> | null, attr?: {
     sender?: Partial<Omit<ChatUser, '_userName' | '_userData' | '_parseBadgesLike'>>;
+    discord?: CommandOptions['discord'];
     quiet?: boolean;
     skip?: boolean;
     force?: boolean;
@@ -48,7 +49,7 @@ class HelpersCommons {
     }
 
     if (!attr.skip) {
-      messageToSend = await new Message(messageToSend).parse({ ...attr, sender: attr.sender ? attr.sender as UserStateTagsWithId : getBotSender()  }) as string;
+      messageToSend = await new Message(messageToSend).parse({ ...attr, sender: attr.sender ? attr.sender as UserStateTagsWithId : getBotSender(), discord: attr.discord  }) as string;
     }
     if (messageToSend.length === 0) {
       return false;

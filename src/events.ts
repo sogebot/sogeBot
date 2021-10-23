@@ -434,7 +434,7 @@ class Events extends Core {
       const replace = new RegExp(`\\$${key}`, 'g');
       command = command.replace(replace, val);
     }
-    command = await new Message(command).parse({ username, sender: getUserSender(String(userId), username) });
+    command = await new Message(command).parse({ username, sender: getUserSender(String(userId), username), discord: undefined });
 
     parserEmitter.emit('process', {
       sender:  { username, userId: String(userId) },
@@ -444,7 +444,7 @@ class Events extends Core {
     }, (responses) => {
       for (let i = 0; i < responses.length; i++) {
         setTimeout(async () => {
-          parserReply(await responses[i].response, { sender: responses[i].sender, attr: responses[i].attr });
+          parserReply(await responses[i].response, { sender: responses[i].sender, discord: responses[i].discord, attr: responses[i].attr });
         }, 500 * i);
       }
     });
@@ -476,21 +476,9 @@ class Events extends Core {
 
     const message = attributesReplace(attributes, String(operation.messageToSend));
     parserReply(message, {
-      sender: {
-        badges:      {},
-        emotes:      [],
-        userId:      String(userId),
-        userName,
-        displayName: userObj?.displayname || userName,
-        color:       '',
-        emoteSets:   [],
-        userType:    'viewer',
-        isModerator: false,
-        mod:         '0',
-        subscriber:  '0',
-        turbo:       '0',
-      },
-    }, whisper ? 'whisper' : 'chat');
+      sender: getUserSender(userId ?? '0', userName),
+      discord: undefined,
+    });
   }
 
   public async fireSendWhisper(operation: EventsEntity.OperationDefinitions, attributes: EventsEntity.Attributes) {

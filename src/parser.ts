@@ -35,7 +35,10 @@ class Parser {
   id = uuid();
   started_at = Date.now();
   message = '';
+  isAction = false;
   sender: CommandOptions['sender'] | null = null;
+  discord: CommandOptions['discord'] = undefined;
+  emotesOffsets = new Map();
   skip = false;
   quiet = false;
   successfullParserRuns: any[] = [];
@@ -45,10 +48,10 @@ class Parser {
     this.message = opts.message || '';
     this.id = opts.id || '';
     this.sender = opts.sender || null;
-    if (this.sender && this.sender.userName) {
-      this.sender.username = this.sender.userName;
-    }
+    this.discord = opts.discord || undefined;
+    this.emotesOffsets = opts.emotesOffsets || new Map();
     this.skip = opts.skip || false;
+    this.isAction = opts.isAction || false;
     this.quiet = opts.quiet || false;
     this.successfullParserRuns = [];
   }
@@ -77,12 +80,15 @@ class Parser {
       debug('parser.process', 'Processing ' + parser.name);
       const text = this.message.trim().replace(/^(!\w+)/i, '');
       const opts: ParserOptions = {
-        id:         this.id,
-        sender:     this.sender,
-        message:    this.message.trim(),
-        parameters: text.trim(),
-        skip:       this.skip,
-        parser:     this,
+        id:            this.id,
+        emotesOffsets: this.emotesOffsets,
+        isAction:      this.isAction,
+        sender:        this.sender,
+        discord:       this.discord ?? undefined,
+        message:       this.message.trim(),
+        parameters:    text.trim(),
+        skip:          this.skip,
+        parser:        this,
       };
       const isOk = await parser.fnc.apply(parser.this, [opts]);
 
@@ -103,12 +109,15 @@ class Parser {
 
     const text = this.message.trim().replace(/^(!\w+)/i, '');
     const opts: ParserOptions = {
-      id:         this.id,
-      sender:     this.sender,
-      message:    this.message.trim(),
-      parameters: text.trim(),
-      skip:       this.skip,
-      parser:     this,
+      id:            this.id,
+      sender:        this.sender,
+      discord:       this.discord ?? undefined,
+      emotesOffsets: this.emotesOffsets,
+      isAction:      this.isAction,
+      message:       this.message.trim(),
+      parameters:    text.trim(),
+      skip:          this.skip,
+      parser:        this,
     };
 
     setTimeout(() => {
@@ -306,11 +315,14 @@ class Parser {
     ) {
       const text = message.trim().replace(new RegExp('^(' + command.command + ')', 'i'), '').trim();
       const opts: CommandOptions = {
-        sender:     sender || getBotSender(),
-        command:    command.command,
-        parameters: text.trim(),
-        createdAt:  this.started_at,
-        attr:       {
+        sender:        sender || getBotSender(),
+        discord:       this.discord ?? undefined,
+        emotesOffsets: this.emotesOffsets,
+        isAction:      this.isAction,
+        command:       command.command,
+        parameters:    text.trim(),
+        createdAt:     this.started_at,
+        attr:          {
           skip:  this.skip,
           quiet: this.quiet,
         },
@@ -348,9 +360,8 @@ class Parser {
 
       // user doesn't have permissions for command
       if (sender) {
-        sender['message-type'] = 'whisper';
         return[{
-          response: translate('permissions.without-permission').replace(/\$command/g, message), sender, attr: {},
+          response: translate('permissions.without-permission').replace(/\$command/g, message), sender, attr: {}, discord: this.discord,
         }];
       }
       return [];

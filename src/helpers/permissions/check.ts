@@ -104,8 +104,9 @@ async function check(userId: string, permId: string, partial = false): Promise<{
         shouldProceed = false; // we don't have any automation
         break;
     }
-    debug('permissions.check', JSON.stringify({ access: shouldProceed && filters(user, pItem.filters), permission: pItem }));
-    return { access: shouldProceed && await filters(user, pItem.filters), permission: pItem };
+    const access = shouldProceed && await filters(user, pItem.filters);
+    debug('permissions.check', JSON.stringify({ userId, access, permission: pItem }));
+    return { access, permission: pItem };
   } catch (e: any) {
     error(e.stack);
     return { access: false, permission: pItem };

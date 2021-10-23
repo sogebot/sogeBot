@@ -43,7 +43,6 @@ class FightMe extends Game {
 
   @command('!fightme')
   async main (opts: CommandOptions): Promise<CommandResponse[]> {
-    opts.sender['message-type'] = 'chat'; // force responses to chat
     let user: Readonly<Required<UserInterface>>;
     let challenger;
 
@@ -54,7 +53,7 @@ class FightMe extends Game {
       }
       const username = match[1].toLowerCase();
       await changelog.flush();
-      user = await getRepository(User).findOneOrFail({ where: { username: username.toLowerCase() } });
+      user = await getRepository(User).findOneOrFail({ where: { userName: username.toLowerCase() } });
       challenger = await changelog.getOrFail(opts.sender.userId);
     } catch (e: any) {
       return [{ response: translate('gambling.fightme.notEnoughOptions'), ...opts }];
