@@ -312,9 +312,9 @@ class Songs extends System {
       request.push(JSON.parse(this.currentSong).username);
     }
     await changelog.flush();
-    const users = await getRepository(User).find({ username: In(request) });
+    const users = await getRepository(User).find({ userName: In(request) });
     for (const username of request) {
-      const data = users.find(o => o.username === username);
+      const data = users.find(o => o.userName === username);
       timeout(username, 300, typeof data !== 'undefined' && isModerator(data));
     }
 

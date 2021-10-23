@@ -147,7 +147,7 @@ class Queue extends System {
     if (!(this.locked)) {
       const user = await changelog.get(opts.sender.userId);
       if (!user) {
-        changelog.update(opts.sender.userId, { username: opts.sender.userName });
+        changelog.update(opts.sender.userId, { userName: opts.sender.userName });
         return this.join(opts);
       }
       const [all, followers, subscribers] = await Promise.all([this.eligibilityAll, this.eligibilityFollowers, this.eligibilitySubscribers]);

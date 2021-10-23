@@ -240,12 +240,12 @@ class Events extends Core {
         await changelog.flush();
         const user = attributes.userId
           ? await getRepository(User).findOne({ userId: attributes.userId })
-          : await getRepository(User).findOne({ username: attributes.username });
+          : await getRepository(User).findOne({ userName: attributes.username });
 
         if (!user) {
           try {
             const userId = attributes.userId ? attributes.userId : await getIdFromTwitch(attributes.username);
-            changelog.update(userId, { username: attributes.username });
+            changelog.update(userId, { userName: attributes.username });
             return this.fire(eventId, attributes);
           } catch (e: any) {
             excludedUsers.add(attributes.username);
@@ -269,10 +269,10 @@ class Events extends Core {
     }
     if (!isNil(get(attributes, 'recipient', null))) {
       await changelog.flush();
-      const user = await getRepository(User).findOne({ username: attributes.recipient });
+      const user = await getRepository(User).findOne({ userName: attributes.recipient });
       if (!user) {
         const userId = await getIdFromTwitch(attributes.recipient);
-        changelog.update(userId, { username: attributes.recipient });
+        changelog.update(userId, { userName: attributes.recipient });
         this.fire(eventId, attributes);
         return;
       }
@@ -451,7 +451,7 @@ class Events extends Core {
   }
 
   public async fireSendChatMessageOrWhisper(operation: EventsEntity.OperationDefinitions, attributes: EventsEntity.Attributes, whisper: boolean): Promise<void> {
-    const username = isNil(attributes.username) ? getOwner() : attributes.username;
+    const userName = isNil(attributes.username) ? getOwner() : attributes.username;
     let userId = attributes.userId;
 
     let userObj;
@@ -459,14 +459,14 @@ class Events extends Core {
       userObj = await changelog.get(userId);
     } else {
       await changelog.flush();
-      userObj = await getRepository(User).findOne({ username });
+      userObj = await getRepository(User).findOne({ userName });
     }
     await changelog.flush();
     if (!userObj && !attributes.test) {
-      userId = await getIdFromTwitch(username);
-      changelog.update(userId, { username });
+      userId = await getIdFromTwitch(userName);
+      changelog.update(userId, { userName });
       return this.fireSendChatMessageOrWhisper(operation, {
-        ...attributes, userId, username,
+        ...attributes, userId, userName,
       }, whisper);
     } else if (attributes.test) {
       userId = attributes.userId;
@@ -480,8 +480,8 @@ class Events extends Core {
         badges:      {},
         emotes:      [],
         userId:      String(userId),
-        username,
-        displayName: userObj?.displayname || username,
+        userName,
+        displayName: userObj?.displayname || userName,
         color:       '',
         emoteSets:   [],
         userType:    'viewer',

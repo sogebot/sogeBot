@@ -54,7 +54,7 @@ class CustomVariables extends Core {
       try {
         returnedValue = await runScript(opts.evalValue, {
           isUI:     true, _current: opts.currentValue, sender:   {
-            username: 'testuser', userId: '0', source: 'twitch',
+            userName: 'testuser', userId: '0', source: 'twitch',
           },
         });
       } catch (e: any) {

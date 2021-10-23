@@ -455,12 +455,12 @@ class Discord extends Integration {
       if (self.client === null) {
         throw new Error('Discord integration is not connected');
       }
-      const username = attributes.username === null || typeof attributes.username === 'undefined' ? getOwner() : attributes.username;
+      const userName = attributes.username === null || typeof attributes.username === 'undefined' ? getOwner() : attributes.username;
       await changelog.flush();
-      const userObj = await getRepository(User).findOne({ username });
+      const userObj = await getRepository(User).findOne({ userName });
       if (!userObj && !attributes.test) {
-        changelog.update(await getIdFromTwitch(username), { username });
-        return self.fireSendDiscordMessage(operation, { ...attributes, username });
+        changelog.update(await getIdFromTwitch(userName), { userName });
+        return self.fireSendDiscordMessage(operation, { ...attributes, userName });
       } else if (!userObj) {
         return;
       }
@@ -584,16 +584,16 @@ class Discord extends Integration {
         parser.started_at = (msg || { createdTimestamp: Date.now() }).createdTimestamp;
         parser.sender = {
           isModerator: isModerator(user),
-          badges:      {}, color:       '',  displayName: '', emoteSets:   [], emotes:      [], userId:      String(link.userId), username:    user.username, userType:    'viewer',
+          badges:      {}, color:       '',  displayName: '', emoteSets:   [], emotes:      [], userId:      String(link.userId), username:    user.userName, userType:    'viewer',
           mod:         'false', subscriber:  'false', turbo:       'false', discord:     { author, channel },
         };
 
         eventEmitter.emit('keyword-send-x-times', {
-          username: user.username, message: content, source: 'discord',
+          username: user.userName, message: content, source: 'discord',
         });
         if (content.startsWith('!')) {
           eventEmitter.emit('command-send-x-times', {
-            username: user.username, message: content, source: 'discord',
+            username: user.userName, message: content, source: 'discord',
           });
         }
 

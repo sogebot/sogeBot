@@ -33,7 +33,7 @@ class HelpersFilter {
     if (!$userObject) {
       changelog.update(opts.sender.userId, {
         userId:   opts.sender.userId,
-        username: opts.sender.userName,
+        userName: opts.sender.userName,
       });
       return checkFilter(opts, filter);
     }

@@ -168,7 +168,7 @@ class Ranks extends System {
     }
 
     await changelog.flush();
-    await getRepository(User).update({ username: parsed[1] }, { haveCustomRank: true, rank: parsed[2].trim() });
+    await getRepository(User).update({ userName: parsed[1] }, { haveCustomRank: true, rank: parsed[2].trim() });
     const response = prepare('ranks.custom-rank-was-set-to-user', { rank: parsed[2].trim(), username: parsed[1] });
     return [{ response, ...opts }];
   }
@@ -183,7 +183,7 @@ class Ranks extends System {
       return [{ response, ...opts }];
     }
     await changelog.flush();
-    await getRepository(User).update({ username: parsed[1] }, { haveCustomRank: false, rank: '' });
+    await getRepository(User).update({ userName: parsed[1] }, { haveCustomRank: false, rank: '' });
     const response = prepare('ranks.custom-rank-was-unset-for-user', { username: parsed[1] });
     return [{ response, ...opts }];
   }

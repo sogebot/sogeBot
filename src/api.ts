@@ -81,7 +81,7 @@ const updateFollowerState = async(users: (Readonly<Required<UserInterface>>)[], 
       const apiUser = usersFromAPI.find(userFromAPI => userFromAPI.from_id === user.userId) as typeof usersFromAPI[0];
       if (new Date().getTime() - new Date(apiUser.followed_at).getTime() < 2 * constants.HOUR) {
         if (user.followedAt === 0 || new Date().getTime() - user.followedAt > 60000 * 60) {
-          follow(user.userId, user.username, user.followedAt);
+          follow(user.userId, user.userName, user.followedAt);
         }
       }
     }
@@ -328,10 +328,10 @@ class API extends Core {
     return { state: true };
   }
 
-  async followerUpdatePreCheck (username: string) {
-    const user = await getRepository(User).findOne({ username });
+  async followerUpdatePreCheck (userName: string) {
+    const user = await getRepository(User).findOne({ userName });
     if (user) {
-      const isSkipped = user.username === getBroadcaster() || user.username === oauth.botUsername;
+      const isSkipped = user.userName === getBroadcaster() || user.userName === oauth.botUsername;
       const userHaveId = !isNil(user.userId);
       if (new Date().getTime() - user.followCheckAt <= constants.DAY || isSkipped || !userHaveId) {
         return;
@@ -412,7 +412,7 @@ class API extends Core {
 
       joinpart.send({ users: partedUsers, type: 'part' });
       for (const username of partedUsers) {
-        if (!isIgnored({ username: username })) {
+        if (!isIgnored({ userName: username })) {
           await setImmediateAwait();
           eventEmitter.emit('user-parted-channel', { username });
         }
@@ -420,7 +420,7 @@ class API extends Core {
 
       joinpart.send({ users: joinedUsers, type: 'join' });
       for (const username of joinedUsers) {
-        if (isIgnored({ username }) || oauth.botUsername === username) {
+        if (isIgnored({ userName: username }) || oauth.botUsername === username) {
           continue;
         } else {
           await setImmediateAwait();
@@ -620,7 +620,7 @@ class API extends Core {
       const valuesNotMatch = current && (current.subscribeTier !== String(Number(user.tier) / 1000) || current.isSubscriber === false);
       if (isNotCurrentSubscriber || valuesNotMatch) {
         changelog.update(user.user_id, {
-          username:      user.user_name.toLowerCase(),
+          userName:      user.user_name.toLowerCase(),
           isSubscriber:  true,
           subscribeTier: String(Number(user.tier) / 1000),
         });
@@ -1248,8 +1248,8 @@ class API extends Core {
       // not a follower
       // if was follower, fire unfollow event
       if (user.isFollower) {
-        unfollow(user.username);
-        eventEmitter.emit('unfollow', { username: user.username });
+        unfollow(user.userName);
+        eventEmitter.emit('unfollow', { username: user.userName });
       }
       changelog.update(user.userId, {
         followedAt:    user.haveFollowedAtLock ? user.followedAt : 0,
@@ -1260,7 +1260,7 @@ class API extends Core {
     } else {
       // is follower
       if (!user.isFollower && new Date().getTime() - new Date(request.data.data[0].followed_at).getTime() < 60000 * 60) {
-        follow(user.userId, user.username, request.data.data[0].followed_at);
+        follow(user.userId, user.userName, request.data.data[0].followed_at);
       }
 
       return { isFollower: user.isFollower, followedAt: user.followedAt };

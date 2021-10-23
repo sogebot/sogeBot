@@ -61,22 +61,22 @@ class Users extends Core {
       }
       const viewers = await query.getRawMany();
       await Promise.all(viewers.map(async (duplicate) => {
-        const username = duplicate.user_username;
-        const duplicates = await getRepository(User).find({ username });
+        const userName = duplicate.user_username;
+        const duplicates = await getRepository(User).find({ userName });
         await Promise.all(duplicates.map(async (user) => {
           try {
             const newUsername = await api.getUsernameFromTwitch(user.userId);
             if (newUsername === null) {
               throw new Error('unknown');
             }
-            if (newUsername !== username) {
-              changelog.update(user.userId, { username: newUsername });
-              debug('users', `Duplicate username ${user.username}#${user.userId} changed to ${newUsername}#${user.userId}`);
+            if (newUsername !== userName) {
+              changelog.update(user.userId, { userName: newUsername });
+              debug('users', `Duplicate username ${user.userName}#${user.userId} changed to ${newUsername}#${user.userId}`);
             }
           } catch (e: any) {
             // we are tagging user as __AnonymousUser__, we don't want to get rid of all information
-            debug('users', `Duplicate username ${user.username}#${user.userId} not found on Twitch => __AnonymousUser__#${user.userId}`);
-            changelog.update(user.userId, { username: '__AnonymousUser__' });
+            debug('users', `Duplicate username ${user.userName}#${user.userId} not found on Twitch => __AnonymousUser__#${user.userId}`);
+            changelog.update(user.userId, { userName: '__AnonymousUser__' });
           }
         }));
       }));
@@ -135,7 +135,7 @@ class Users extends Core {
             const users = await getRepository(User).find({ isOnline: true });
             if (isDebugEnabled('tmi.watched')) {
               for (const user of users) {
-                debug('tmi.watched', `User ${user.username}#${user.userId} added watched time ${interval}`);
+                debug('tmi.watched', `User ${user.userName}#${user.userId} added watched time ${interval}`);
               }
             }
             stats.value.currentWatchedTime = stats.value.currentWatchedTime + users.length * interval;
@@ -187,7 +187,7 @@ class Users extends Core {
         .map(async (id) => {
           const user = await changelog.get(id);
           if (user) {
-            return { [id]: user.username };
+            return { [id]: user.userName };
           }
           return { [id]: 'n/a' };
         }),
@@ -202,26 +202,26 @@ class Users extends Core {
   async getNameById (userId: string): Promise<string> {
     const user = await await changelog.get(userId);
     if (!user) {
-      const username = await api.getUsernameFromTwitch(userId);
-      if (username) {
-        changelog.update(userId, { username });
-        return username;
+      const userName = await api.getUsernameFromTwitch(userId);
+      if (userName) {
+        changelog.update(userId, { userName });
+        return userName;
       } else {
         throw new Error('Cannot get username for userId ' + userId);
       }
     }
-    return user.username;
+    return user.userName;
   }
 
-  async getIdByName (username: string) {
-    if (username.startsWith('@')) {
-      username = username.substring(1);
+  async getIdByName (userName: string) {
+    if (userName.startsWith('@')) {
+      userName = userName.substring(1);
     }
     await changelog.flush();
-    const user = await getRepository(User).findOne({ where: { username }, select: ['userId'] });
+    const user = await getRepository(User).findOne({ where: { userName }, select: ['userId'] });
     if (!user) {
-      const userId = await getIdFromTwitch(username);
-      changelog.update(userId, { username });
+      const userId = await getIdFromTwitch(userName);
+      changelog.update(userId, { userName });
       return userId;
     }
     return user.userId;

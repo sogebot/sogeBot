@@ -78,12 +78,12 @@ class Raffles extends System {
   }
 
   sockets () {
-    adminEndpoint(this.nsp, 'raffle::getWinner', async (username: string, cb) => {
+    adminEndpoint(this.nsp, 'raffle::getWinner', async (userName: string, cb) => {
       try {
         await changelog.flush();
         cb(
           null,
-          await getRepository(User).findOne({ username }),
+          await getRepository(User).findOne({ userName }),
         );
       } catch (e: any) {
         cb(e.stack);
@@ -405,7 +405,7 @@ class Raffles extends System {
 
     const user = await changelog.get(opts.sender.userId);
     if (!user) {
-      changelog.update(opts.sender.userId, { username: opts.sender.userName });
+      changelog.update(opts.sender.userId, { userName: opts.sender.userName });
       return this.participate(opts);
     }
 

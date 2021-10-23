@@ -128,20 +128,20 @@ export const getChannelChattersUnofficialAPI = async (): Promise<{ partedUsers: 
       throw Error('chatters undefined');
     }
 
-    const chatters: string[] = flatMap<string>(request.data.chatters).filter(username => {
+    const chatters: string[] = flatMap<string>(request.data.chatters).filter(userName => {
       // exclude global ignore list
-      const shouldExclude = isIgnored({ username });
-      debug('microservice', `${username} - shouldExclude: ${shouldExclude}`);
+      const shouldExclude = isIgnored({ userName });
+      debug('microservice', `${userName} - shouldExclude: ${shouldExclude}`);
       return !shouldExclude;
     });
     const allOnlineUsers = await getAllOnlineUsernames();
 
     const partedUsers: string[] = [];
-    for (const username of allOnlineUsers) {
-      if (!includes(chatters, username) && username !== bot) {
+    for (const userName of allOnlineUsers) {
+      if (!includes(chatters, userName) && userName !== bot) {
         // user is no longer in channel
-        await getRepository(User).update({ username }, { isOnline: false });
-        partedUsers.push(username);
+        await getRepository(User).update({ userName }, { isOnline: false });
+        partedUsers.push(userName);
       }
     }
 
@@ -155,8 +155,8 @@ export const getChannelChattersUnofficialAPI = async (): Promise<{ partedUsers: 
     // insert joined online users
     const usersToFetch: string[] = [];
     if (joinedUsers.length > 0) {
-      for (const username of joinedUsers) {
-        const user = await getRepository(User).findOne({ where: { username } });
+      for (const userName of joinedUsers) {
+        const user = await getRepository(User).findOne({ where: { userName } });
         if (user) {
           await getRepository(User).save({ ...user, isOnline: true });
           if (user.createdAt === 0) {
@@ -164,7 +164,7 @@ export const getChannelChattersUnofficialAPI = async (): Promise<{ partedUsers: 
             await fetchAccountAge(user.userId);
           }
         } else {
-          usersToFetch.push(username);
+          usersToFetch.push(userName);
         }
       }
     }

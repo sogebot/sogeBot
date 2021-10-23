@@ -161,7 +161,7 @@ class Levels extends System {
     // get user max permission
     const permId = await getUserHighestPermission(userId);
     if (!permId) {
-      debug('levels.update', `User ${user.username}#${userId} permId not found`);
+      debug('levels.update', `User ${user.userName}#${userId} permId not found`);
       return; // skip without id
     }
 
@@ -173,7 +173,7 @@ class Levels extends System {
 
     // we need to save if extra.levels are not defined
     if (typeof user.extra?.levels === 'undefined') {
-      debug('levels.update', `${user.username}#${userId}[${permId}] -- initial data --`);
+      debug('levels.update', `${user.userName}#${userId}[${permId}] -- initial data --`);
       const levels: NonNullable<UserInterface['extra']>['levels'] = {
         xp:                serialize(BigInt(0)),
         xpOfflineGivenAt:  chatOffline,
@@ -194,7 +194,7 @@ class Levels extends System {
       const givenAt = opts.isOnline
         ? user.extra?.levels?.xpOnlineGivenAt ?? chat
         : user.extra?.levels?.xpOfflineGivenAt ?? chat;
-      debug('levels.update', `${user.username}#${userId}[${permId}] ${chat} | ${givenAt}`);
+      debug('levels.update', `${user.userName}#${userId}[${permId}] ${chat} | ${givenAt}`);
       let modifier = 0;
       let userTimeXP = givenAt + interval_calculated;
       for (; userTimeXP <= chat; userTimeXP += interval_calculated) {
@@ -202,7 +202,7 @@ class Levels extends System {
       }
 
       if (modifier > 0) {
-        debug('levels.update', `${user.username}#${userId}[${permId}] +${Math.floor(ptsPerInterval * modifier)}`);
+        debug('levels.update', `${user.userName}#${userId}[${permId}] +${Math.floor(ptsPerInterval * modifier)}`);
         const levels: NonNullable<UserInterface['extra']>['levels'] = {
           xp:                serialize(BigInt(Math.floor(ptsPerInterval * modifier)) + (unserialize<bigint>(user.extra?.levels?.xp) ?? BigInt(0))),
           xpOfflineGivenAt:  !opts.isOnline ? userTimeXP : user.extra?.levels?.xpOfflineGivenAt ?? chatOffline,
@@ -233,7 +233,7 @@ class Levels extends System {
             levels,
           },
         });
-      debug('levels.update', `${user.username}#${userId}[${permId}] levels disabled or interval is 0, settint levels time to chat`);
+      debug('levels.update', `${user.userName}#${userId}[${permId}] levels disabled or interval is 0, settint levels time to chat`);
     }
 
   }
@@ -439,9 +439,9 @@ class Levels extends System {
   @default_permission(defaultPermissions.CASTERS)
   async add (opts: CommandOptions): Promise<CommandResponse[]> {
     try {
-      const [username, xp] = new Expects(opts.parameters).username().number({ minus: true }).toArray();
+      const [userName, xp] = new Expects(opts.parameters).username().number({ minus: true }).toArray();
       await changelog.flush();
-      const user = await getRepository(User).findOneOrFail({ username });
+      const user = await getRepository(User).findOneOrFail({ userName });
       const chat = await users.getChatOf(user.userId, isStreamOnline.value);
 
       const levels: NonNullable<UserInterface['extra']>['levels'] = {
@@ -460,7 +460,7 @@ class Levels extends System {
         });
 
       const response = prepare('systems.levels.changeXP', {
-        username,
+        userName,
         amount: xp,
         xpName: this.xpName,
       });
@@ -473,9 +473,9 @@ class Levels extends System {
   @command('!level')
   async main (opts: CommandOptions): Promise<CommandResponse[]> {
     try {
-      const [username] = new Expects(opts.parameters).username({ optional: true, default: opts.sender.userName }).toArray();
+      const [userName] = new Expects(opts.parameters).username({ optional: true, default: opts.sender.userName }).toArray();
       await changelog.flush();
-      const user = await getRepository(User).findOneOrFail({ username });
+      const user = await getRepository(User).findOneOrFail({ userName });
 
       let currentLevel = this.firstLevelStartsAt === 0 ? 1 : 0;
       let nextXP = await this.getLevelXP(currentLevel + 1);
@@ -488,7 +488,7 @@ class Levels extends System {
       }
 
       const response = prepare('systems.levels.currentLevel', {
-        username,
+        userName,
         currentLevel,
         nextXP: bigIntMax(nextXP - currentXP, BigInt(0)),
         currentXP,

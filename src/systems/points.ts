@@ -157,7 +157,7 @@ class Points extends System {
     // get user max permission
     const permId = await getUserHighestPermission(userId);
     if (!permId) {
-      debug('points.update', `User ${user.username}#${userId} permId not found`);
+      debug('points.update', `User ${user.userName}#${userId} permId not found`);
       return; // skip without id
     }
 
@@ -168,7 +168,7 @@ class Points extends System {
     const userPointsKey = opts.isStreamOnline ? 'pointsOnlineGivenAt' : 'pointsOfflineGivenAt';
     if (interval_calculated !== 0 && ptsPerInterval[permId]  !== 0) {
       const givenAt = user[userPointsKey] + interval_calculated;
-      debug('points.update', `${user.username}#${userId}[${permId}] ${chat} | ${givenAt}`);
+      debug('points.update', `${user.userName}#${userId}[${permId}] ${chat} | ${givenAt}`);
 
       let modifier = 0;
       let userTimePoints = givenAt + interval_calculated;
@@ -177,7 +177,7 @@ class Points extends System {
       }
       if (modifier > 0) {
         // add points to user[userPointsKey] + interval to user to not overcalculate (this should ensure recursive add points in time)
-        debug('points.update', `${user.username}#${userId}[${permId}] +${Math.floor(ptsPerInterval * modifier)}`);
+        debug('points.update', `${user.userName}#${userId}[${permId}] +${Math.floor(ptsPerInterval * modifier)}`);
         changelog.update(userId, {
           ...user,
           points:          user.points + ptsPerInterval * modifier,
@@ -189,7 +189,7 @@ class Points extends System {
         ...user,
         [userPointsKey]: chat,
       });
-      debug('points.update', `${user.username}#${userId}[${permId}] points disabled or interval is 0, settint points time to chat`);
+      debug('points.update', `${user.userName}#${userId}[${permId}] points disabled or interval is 0, settint points time to chat`);
     }
   }
 
@@ -322,12 +322,12 @@ class Points extends System {
   @default_permission(defaultPermissions.CASTERS)
   async set (opts: CommandOptions): Promise<CommandResponse[]> {
     try {
-      const [username, points] = new Expects(opts.parameters).username().points({ all: false }).toArray();
+      const [userName, points] = new Expects(opts.parameters).username().points({ all: false }).toArray();
 
       await changelog.flush();
-      const originalUser = await getRepository(User).findOne({ username });
+      const originalUser = await getRepository(User).findOne({ userName });
       if (!originalUser) {
-        throw new Error(`User ${username} not found in database.`);
+        throw new Error(`User ${userName} not found in database.`);
       }
       changelog.update(originalUser.userId, { points });
       await getRepository(PointsChangelog).insert({
@@ -340,7 +340,7 @@ class Points extends System {
 
       const response = prepare('points.success.set', {
         amount:     format(general.numberFormat, 0)(points),
-        username,
+        username:   userName,
         pointsName: getPointsName(points),
       });
       return [{ response, ...opts }];
@@ -353,12 +353,12 @@ class Points extends System {
   @command('!points give')
   async give (opts: CommandOptions): Promise<CommandResponse[]> {
     try {
-      const [username, points] = new Expects(opts.parameters).username().points({ all: true }).toArray();
-      if (opts.sender.userName.toLowerCase() === username.toLowerCase()) {
+      const [userName, points] = new Expects(opts.parameters).username().points({ all: true }).toArray();
+      if (opts.sender.userName.toLowerCase() === userName.toLowerCase()) {
         return [];
       }
       await changelog.flush();
-      const guser = await getRepository(User).findOne({ username });
+      const guser = await getRepository(User).findOne({ userName });
       const sender = await changelog.get(opts.sender.userId);
 
       if (!sender) {
@@ -366,7 +366,7 @@ class Points extends System {
       }
 
       if (!guser) {
-        changelog.update(await getIdFromTwitch(username), { username });
+        changelog.update(await getIdFromTwitch(userName), { userName });
         return this.give(opts);
       }
 
@@ -374,7 +374,7 @@ class Points extends System {
       if (points === 0 || points === 'all' && availablePoints === 0) {
         const response = prepare('points.failed.cannotGiveZeroPoints'.replace('$command', opts.command), {
           amount:     0,
-          username,
+          username:   userName,
           pointsName: getPointsName(0),
         });
         return [{ response, ...opts }];
@@ -383,7 +383,7 @@ class Points extends System {
       if (points !== 'all' && availablePoints < points) {
         const response = prepare('points.failed.giveNotEnough'.replace('$command', opts.command), {
           amount:     format(general.numberFormat, 0)(points),
-          username,
+          username:   userName,
           pointsName: getPointsName(points),
         });
         return [{ response, ...opts }];
@@ -392,7 +392,7 @@ class Points extends System {
         changelog.update(sender.userId, { points: 0 });
         const response = prepare('points.success.give', {
           amount:     format(general.numberFormat, 0)(availablePoints),
-          username,
+          userName,
           pointsName: getPointsName(availablePoints),
         });
         return [{ response, ...opts }];
@@ -401,7 +401,7 @@ class Points extends System {
         changelog.increment(sender.userId, { points: -points });
         const response = prepare('points.success.give', {
           amount:     format(general.numberFormat, 0)(points),
-          username,
+          userName,
           pointsName: getPointsName(points),
         });
         return [{ response, ...opts }];
@@ -415,23 +415,23 @@ class Points extends System {
   @default_permission(defaultPermissions.CASTERS)
   async get (opts: CommandOptions): Promise<CommandResponse[]> {
     try {
-      const [username] = new Expects(opts.parameters).username({ optional: true, default: opts.sender.userName }).toArray();
+      const [userName] = new Expects(opts.parameters).username({ optional: true, default: opts.sender.userName }).toArray();
 
       let user: Readonly<Required<UserInterface>> | null;
-      if (opts.sender.userName === username) {
+      if (opts.sender.userName === userName) {
         user = await changelog.get(opts.sender.userId);
       } else {
         await changelog.flush();
-        user = await getRepository(User).findOne({ username }) ?? null;
+        user = await getRepository(User).findOne({ userName }) ?? null;
       }
 
       if (!user) {
-        const userId = await getIdFromTwitch(username);
+        const userId = await getIdFromTwitch(userName);
         if (userId) {
-          changelog.update(userId, { username });
+          changelog.update(userId, { userName });
           return this.get(opts);
         } else {
-          throw new Error(`User ${username} not found on twitch`);
+          throw new Error(`User ${userName} not found on twitch`);
         }
       }
 
@@ -457,13 +457,13 @@ class Points extends System {
         order = Number(orderQuery[0].order) + 1;
       }
 
-      if (user.username === oauth.broadcasterUsername) {
+      if (user.userName === oauth.broadcasterUsername) {
         order = '?'; // broadcaster is removed from ordering
       }
 
       const response = prepare('points.defaults.pointsResponse', {
         amount:     format(general.numberFormat, 0)(this.maxSafeInteger(user.points)),
-        username:   username,
+        username:   userName,
         pointsName: getPointsName(this.maxSafeInteger(user.points)),
         order, count,
       });
@@ -541,7 +541,7 @@ class Points extends System {
       await changelog.flush();
 
       for (const user of (await getRepository(User).find({ isOnline: true }))) {
-        if (isBot(user.username)) {
+        if (isBot(user.userName)) {
           continue;
         }
 
@@ -561,13 +561,13 @@ class Points extends System {
   @default_permission(defaultPermissions.CASTERS)
   async add (opts: CommandOptions): Promise<CommandResponse[]> {
     try {
-      const [username, points] = new Expects(opts.parameters).username().points({ all: false }).toArray();
+      const [userName, points] = new Expects(opts.parameters).username().points({ all: false }).toArray();
 
       await changelog.flush();
-      const user = await getRepository(User).findOne({ username });
+      const user = await getRepository(User).findOne({ userName });
 
       if (!user) {
-        changelog.update(await getIdFromTwitch(username), { username });
+        changelog.update(await getIdFromTwitch(userName), { userName });
         return this.add(opts);
       } else {
         changelog.increment(user.userId, { points });
@@ -583,7 +583,7 @@ class Points extends System {
 
       const response = prepare('points.success.add', {
         amount:     format(general.numberFormat, 0)(points),
-        username:   username,
+        username:   userName,
         pointsName: getPointsName(points),
       });
       return [{ response, ...opts }];
@@ -596,12 +596,12 @@ class Points extends System {
   @default_permission(defaultPermissions.CASTERS)
   async remove (opts: CommandOptions): Promise<CommandResponse[]> {
     try {
-      const [username, points] = new Expects(opts.parameters).username().points({ all: true }).toArray();
+      const [userName, points] = new Expects(opts.parameters).username().points({ all: true }).toArray();
 
       await changelog.flush();
-      const user = await getRepository(User).findOne({ username });
+      const user = await getRepository(User).findOne({ userName });
       if (!user) {
-        changelog.update(await getIdFromTwitch(username), { username });
+        changelog.update(await getIdFromTwitch(userName), { userName });
         return this.remove(opts);
       }
 
@@ -621,7 +621,7 @@ class Points extends System {
 
       const response = prepare('points.success.remove', {
         amount:     format(general.numberFormat, 0)(points),
-        username:   username,
+        username:   userName,
         pointsName: getPointsName(points === 'all' ? 0 : points),
       });
       return [{ response, ...opts }];

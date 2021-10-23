@@ -15,7 +15,7 @@ const lock = new Map<string, boolean>();
 
 const defaultData: Readonly<Required<UserInterface>> = {
   userId:                    '',
-  username:                  '',
+  userName:                  '',
   watchedTime:               0,
   points:                    0,
   messages:                  0,

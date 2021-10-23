@@ -127,23 +127,23 @@ class Socket extends Core {
             if (userId !== twitchValidation.data.user_id) {
               throw new Error('Not matching userId');
             }
-            const username = twitchValidation.data.login;
+            const userName = twitchValidation.data.login;
             const haveCasterPermission = (await check(userId, defaultPermissions.CASTERS, true)).access;
             const user = await changelog.get(userId);
             changelog.update(userId, {
               ...user,
               userId,
-              username,
+              userName,
             });
 
             const accessToken = jwt.sign({
               userId,
-              username,
+              userName,
               privileges: await getPrivileges(haveCasterPermission ? 'admin' : 'viewer', userId),
             }, this.JWTKey, { expiresIn: `${this.accessTokenExpirationTime}s` });
             const refreshToken = jwt.sign({
               userId,
-              username,
+              userName,
             }, this.JWTKey, { expiresIn: `${this.refreshTokenExpirationTime}s` });
             res.status(200).send({
               accessToken, refreshToken, userType: haveCasterPermission ? 'admin' : 'viewer',

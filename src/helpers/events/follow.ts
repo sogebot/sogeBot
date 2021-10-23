@@ -17,7 +17,7 @@ import { eventEmitter } from '.';
 
 const events = new Map<string, number>();
 
-export function follow(userId: string, username: string, followedAt: string | number) {
+export function follow(userId: string, userName: string, followedAt: string | number) {
   // cleanup
   events.forEach((value, key) => {
     if (value + HOUR <= Date.now()) {
@@ -25,11 +25,11 @@ export function follow(userId: string, username: string, followedAt: string | nu
     }
   });
 
-  if (isIgnored({ username, userId })) {
-    debug('events', `User ${username}#${userId} is in ignore list.`);
-    if (isInGlobalIgnoreList({ username, userId })) {
+  if (isIgnored({ userName, userId })) {
+    debug('events', `User ${userName}#${userId} is in ignore list.`);
+    if (isInGlobalIgnoreList({ userName, userId })) {
       // autoban + autoblock
-      tmi.ban(username);
+      tmi.ban(userName);
       // remove from eventslit
       getRepository(EventList).delete({ userId });
     }
@@ -37,7 +37,7 @@ export function follow(userId: string, username: string, followedAt: string | nu
   }
 
   if (events.has(userId)) {
-    debug('events', `User ${username}#${userId} already followed in hour.`);
+    debug('events', `User ${userName}#${userId} already followed in hour.`);
     return;
   }
 
@@ -46,12 +46,12 @@ export function follow(userId: string, username: string, followedAt: string | nu
     userId:    userId,
     timestamp: Date.now(),
   });
-  if (!isBot(username)) {
-    followLog(`${username}#${userId}`);
-    eventEmitter.emit('follow', { username: username, userId: userId });
+  if (!isBot(userName)) {
+    followLog(`${userName}#${userId}`);
+    eventEmitter.emit('follow', { username: userName, userId: userId });
     alerts.trigger({
       event:      'follows',
-      name:       username,
+      name:       userName,
       amount:     0,
       tier:       null,
       currency:   '',
@@ -60,7 +60,7 @@ export function follow(userId: string, username: string, followedAt: string | nu
     });
 
     triggerInterfaceOnFollow({
-      username: username,
+      username: userName,
       userId:   userId,
     });
 
@@ -74,7 +74,7 @@ export function follow(userId: string, username: string, followedAt: string | nu
       })
       .catch(() => {
         changelog.update(userId, {
-          username:      username,
+          userName:      userName,
           followedAt:    dayjs(followedAt).valueOf(),
           isFollower:    true,
           followCheckAt: Date.now(),

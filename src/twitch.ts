@@ -66,13 +66,13 @@ class Twitch extends Core {
       .getMany();
     await changelog.flush();
     const onlineFollowers = (await getRepository(User).createQueryBuilder('user')
-      .where('user.username != :botusername', { botusername: oauth.botUsername.toLowerCase() })
-      .andWhere('user.username != :broadcasterusername', { broadcasterusername: oauth.broadcasterUsername.toLowerCase() })
+      .where('user.userName != :botusername', { botusername: oauth.botUsername.toLowerCase() })
+      .andWhere('user.userName != :broadcasterusername', { broadcasterusername: oauth.broadcasterUsername.toLowerCase() })
       .andWhere('user.isFollower = :isFollower', { isFollower: true })
       .andWhere('user.isOnline = :isOnline', { isOnline: true })
       .getMany())
       .filter(o => {
-        return !isIgnored({ username: o.username, userId: o.userId });
+        return !isIgnored({ userName: o.userName, userId: o.userId });
       });
 
     let lastFollowAgo = '';
@@ -102,12 +102,12 @@ class Twitch extends Core {
       .getMany();
     await changelog.flush();
     const onlineSubscribers = (await getRepository(User).createQueryBuilder('user')
-      .where('user.username != :botusername', { botusername: oauth.botUsername.toLowerCase() })
-      .andWhere('user.username != :broadcasterusername', { broadcasterusername: oauth.broadcasterUsername.toLowerCase() })
+      .where('user.userName != :botusername', { botusername: oauth.botUsername.toLowerCase() })
+      .andWhere('user.userName != :broadcasterusername', { broadcasterusername: oauth.broadcasterUsername.toLowerCase() })
       .andWhere('user.isSubscriber = :isSubscriber', { isSubscriber: true })
       .andWhere('user.isOnline = :isOnline', { isOnline: true })
       .getMany()).filter(o => {
-      return !isIgnored({ username: o.username, userId: o.userId });
+      return !isIgnored({ userName: o.userName, userId: o.userId });
     });
 
     let lastSubAgo = '';

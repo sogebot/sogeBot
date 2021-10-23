@@ -183,7 +183,7 @@ class TMI extends Core {
   async ignoreCheck (opts: Record<string, any>) {
     try {
       const username = new Expects(opts.parameters).username().toArray()[0].toLowerCase();
-      const isUserIgnored = isIgnored({ username });
+      const isUserIgnored = isIgnored({ userName: username });
       return [{ response: prepare(isUserIgnored ? 'ignore.user.is.ignored' : 'ignore.user.is.not.ignored', { username }), ...opts }];
     } catch (e: any) {
       error(e.stack);
@@ -529,20 +529,20 @@ class TMI extends Core {
       const amount = subInfo.months;
       const tier = (subInfo.isPrime ? 'Prime' : String(Number(subInfo.plan ?? 1000) / 1000)) as EmitData['tier'];
 
-      if (isIgnored({ username, userId: userstate.userId })) {
+      if (isIgnored({ userName: username, userId: userstate.userId })) {
         return;
       }
 
       const user = await changelog.get(userstate.userId);
       if (!user) {
-        changelog.update(userstate.userId, { username });
+        changelog.update(userstate.userId, { userName: username });
         this.subscription(username, subInfo, userstate);
         return;
       }
 
       let profileImageUrl = null;
       if (user.profileImageUrl.length === 0) {
-        profileImageUrl = (await getUserFromTwitch(user.username)).profile_image_url;
+        profileImageUrl = (await getUserFromTwitch(user.userName)).profile_image_url;
       }
 
       changelog.update(user.userId, {
@@ -556,7 +556,7 @@ class TMI extends Core {
       });
 
       hypeTrain.addSub({
-        username:        user.username,
+        username:        user.userName,
         profileImageUrl: profileImageUrl ? profileImageUrl : user.profileImageUrl,
       });
 
@@ -602,7 +602,7 @@ class TMI extends Core {
       const tier = (subInfo.isPrime ? 'Prime' : String(Number(subInfo.plan ?? 1000) / 1000)) as EmitData['tier'];
       const message = subInfo.message ?? '';
 
-      if (isIgnored({ username, userId: userstate.userId })) {
+      if (isIgnored({ userName: username, userId: userstate.userId })) {
         return;
       }
 
@@ -610,14 +610,14 @@ class TMI extends Core {
 
       const user = await changelog.get(userstate.userId);
       if (!user) {
-        changelog.update(userstate.userId, { username });
+        changelog.update(userstate.userId, { userName: username });
         this.resub(username, subInfo, userstate);
         return;
       }
 
       let profileImageUrl = null;
       if (user.profileImageUrl.length === 0) {
-        profileImageUrl = (await getUserFromTwitch(user.username)).profile_image_url;
+        profileImageUrl = (await getUserFromTwitch(user.userName)).profile_image_url;
       }
 
       changelog.update(user.userId, {
@@ -631,7 +631,7 @@ class TMI extends Core {
       });
 
       hypeTrain.addSub({
-        username:        user.username,
+        username:        user.userName,
         profileImageUrl: profileImageUrl ? profileImageUrl : user.profileImageUrl,
       });
 
@@ -685,7 +685,7 @@ class TMI extends Core {
       const ignoreGifts = this.ignoreGiftsFromUser.get(username) ?? 0;
       this.ignoreGiftsFromUser.set(username, ignoreGifts + count);
 
-      if (isIgnored({ username, userId })) {
+      if (isIgnored({ userName: username, userId })) {
         return;
       }
 
@@ -727,7 +727,7 @@ class TMI extends Core {
 
       const user = await changelog.get(recipientId);
       if (!user) {
-        changelog.update(recipientId, { userId: recipientId, username });
+        changelog.update(recipientId, { userId: recipientId, userName: username });
         this.subgift(username, subInfo, userstate);
         return;
       }
@@ -760,7 +760,7 @@ class TMI extends Core {
       } else {
         debug('tmi.subgift', `Ignored: ${username}#${userId} -> ${recipient}#${recipientId}`);
       }
-      if (isIgnored({ username, userId: recipientId })) {
+      if (isIgnored({ userName: username, userId: recipientId })) {
         return;
       }
 
@@ -784,7 +784,7 @@ class TMI extends Core {
       subgift(`${recipient}#${recipientId}, from: ${username}#${userId}, months: ${amount}`);
 
       // also set subgift count to gifter
-      if (!(isIgnored({ username, userId })) && !isGiftIgnored) {
+      if (!(isIgnored({ userName: username, userId })) && !isGiftIgnored) {
         changelog.increment(userId, { giftedSubscribes: 1 });
       }
     } catch (e: any) {
@@ -802,14 +802,14 @@ class TMI extends Core {
 
       // remove <string>X or <string>X from message, but exclude from remove #<string>X or !someCommand2
       const messageFromUser = message.replace(/(?<![#!])(\b\w+[\d]+\b)/g, '').trim();
-      if (!username || !userId || isIgnored({ username, userId })) {
+      if (!username || !userId || isIgnored({ userName: username, userId })) {
         return;
       }
 
       const user = await changelog.get(userId);
       if (!user) {
         // if we still doesn't have user, we create new
-        changelog.update(userId, { username });
+        changelog.update(userId, { userName: username });
         return this.cheer(userstate, message, bits);
       }
 
@@ -932,13 +932,13 @@ class TMI extends Core {
 
     if (commandRegexp.test(message)) {
       // check only if ignored if it is just simple command
-      if (await isIgnored({ username: userstate.userName ?? '', userId: userId })) {
+      if (await isIgnored({ userName: userstate.userName ?? '', userId: userId })) {
         return;
       }
     } else {
       // we need to moderate ignored users as well
       const [isModerated, isIgnoredCheck] = await Promise.all(
-        [parse.isModerated(), isIgnored({ username: userstate.userName ?? '', userId: userId })],
+        [parse.isModerated(), isIgnored({ userName: userstate.userName ?? '', userId: userId })],
       );
       if (isModerated || isIgnoredCheck) {
         return;
@@ -956,7 +956,7 @@ class TMI extends Core {
         userstate.badgeInfo.get('subscriber');
         changelog.update(user.userId, {
           ...user,
-          username:     userstate.userName,
+          userName:     userstate.userName,
           userId:       userstate.userId,
           isOnline:     true,
           isVIP:        userstate.isVip,
@@ -969,7 +969,7 @@ class TMI extends Core {
         joinpart.send({ users: [userstate.userName], type: 'join' });
         eventEmitter.emit('user-joined-channel', { username: userstate.userName });
         changelog.update(userstate.userId, {
-          username:     userstate.userName,
+          userName:     userstate.userName,
           userId:       userstate.userId,
           isOnline:     true,
           isVIP:        userstate.isVip,
