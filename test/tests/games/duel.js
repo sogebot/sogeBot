@@ -34,7 +34,7 @@ describe('Gambling - duel - @func1', () => {
     it('Add 200 points to duel bank', async () => {
       for (let i = 0; i < 200; i++) {
         await getRepository(Duel).save({
-          tickets: 1, userName: 'user' + i, id: i,
+          tickets: 1, username: 'user' + i, id: i,
         });
       }
       const items = await getRepository(Duel).find();

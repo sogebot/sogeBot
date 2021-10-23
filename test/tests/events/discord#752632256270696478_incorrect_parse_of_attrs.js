@@ -16,7 +16,7 @@ const { User } = require('../../../dest/database/entity/user');
 const { Event } = require('../../../dest/database/entity/event');
 
 const events = (require('../../../dest/events')).default;
-const username = 'randomPerson';
+const userName = 'randomPerson';
 
 describe('discord#752632256270696478 - event attrs are not correctly parsed - @func3', () => {
   before(async () => {
@@ -33,19 +33,18 @@ describe('discord#752632256270696478 - event attrs are not correctly parsed - @f
       operations: [{
         name: 'send-chat-message',
         definitions: {
-          messageToSend: '$username ; $amount ; $currency ; $message ; $amountInBotCurrency ; $currencyInBot',
+          messageToSend: '$userName ; $amount ; $currency ; $message ; $amountInBotCurrency ; $currencyInBot',
         },
       }],
     });
 
-    await getRepository(User).save({ userName: username, userId: String(Math.floor(Math.random() * 100000)) });
+    await getRepository(User).save({ userName: userName, userId: String(Math.floor(Math.random() * 100000)) });
   });
 
-  it('trigger tip event for 10 EUR - ' + username, async () => {
-    log.tip(`${username}, amount: 10.00EUR, message: Ahoj jak je`);
+  it('trigger tip event for 10 EUR - ' + userName, async () => {
+    log.tip(`${userName}, amount: 10.00EUR, message: Ahoj jak je`);
     events.fire('tip', {
-      userId: String(Math.floor(Math.random * 100000)),
-      username,
+      userName,
       amount: 10.00,
       message: 'Ahoj jak je',
       currency: 'EUR',

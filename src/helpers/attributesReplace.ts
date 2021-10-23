@@ -6,8 +6,9 @@ const attributesReplace = (attributes: Events.Attributes, replaceIn: string) => 
   const atUsername = tmi.showWithAt;
   const flattenAttributes = flatten(attributes);
 
-  for (const key of Object.keys(flattenAttributes).sort((a, b) => b.length - a.length)) {
+  for (let key of Object.keys(flattenAttributes).sort((a, b) => b.length - a.length)) {
     let val = flattenAttributes[key];
+    key = key.toLowerCase();
     if (typeof val === 'object' && Object.keys(val).length === 0) {
       continue;
     } // skip empty object

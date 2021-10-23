@@ -466,7 +466,7 @@ class TMI extends Core {
         host(`${username}, viewers: ${viewers}`);
 
         const data = {
-          userName: username,
+          userName:  username,
           viewers,
           event:     'host',
           timestamp: Date.now(),
@@ -649,7 +649,7 @@ class TMI extends Core {
       });
       resub(`${username}#${userstate.userId}, streak share: ${subStreakShareEnabled}, streak: ${subStreak}, months: ${amount}, message: ${message}, tier: ${tier}`);
       eventEmitter.emit('resub', {
-        userName: username,
+        userName:                username,
         tier:                    String(tier),
         subStreakShareEnabled,
         subStreak,

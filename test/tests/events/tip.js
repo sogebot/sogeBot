@@ -66,7 +66,7 @@ describe('Events - tip event - @func3', () => {
 
         it('user should have 100 points', async () => {
           await changelog.flush();
-          const user = await getRepository(User).findOne({ username });
+          const user = await getRepository(User).findOne({ userName: username });
           assert.strict.equal(user.points, 100);
         });
       });

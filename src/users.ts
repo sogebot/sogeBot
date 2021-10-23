@@ -227,15 +227,15 @@ class Users extends Core {
     return user.userId;
   }
 
-  async getUserByUsername(username: string, select?: FindOneOptions<Readonly<Required<UserInterface>>>['select']) {
+  async getUserByUsername(userName: string, select?: FindOneOptions<Readonly<Required<UserInterface>>>['select']) {
     await changelog.flush();
-    const userByUsername = await getRepository(User).findOne({ where: { username }, select });
+    const userByUsername = await getRepository(User).findOne({ where: { userName }, select });
 
     if (userByUsername) {
       return userByUsername;
     }
 
-    const userId = await this.getIdByName(username);
+    const userId = await this.getIdByName(userName);
     await changelog.flush();
     const userById = await changelog.get(userId);
 
