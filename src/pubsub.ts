@@ -120,7 +120,7 @@ const connect = () => {
         });
         eventEmitter.emit('reward-redeemed', {
           userId:        dataMessage.data.redemption.user.id,
-          username:      dataMessage.data.redemption.user.login,
+          userName:      dataMessage.data.redemption.user.login,
           titleOfReward: dataMessage.data.redemption.reward.title,
           userInput:     dataMessage.data.redemption.user_input,
         });
@@ -128,16 +128,16 @@ const connect = () => {
         try {
           const createdBy = dataMessage.data.from_automod ? 'TwitchAutoMod' : `${dataMessage.data.created_by}#${dataMessage.data.created_by_user_id}`;
           if (dataMessage.data.moderation_action === 'ban') {
-            const [ username, reason ] = dataMessage.data.args;
-            ban(`${username}#${dataMessage.data.target_user_id} by ${createdBy}: ${reason ? reason : '<no reason>'}`);
-            eventEmitter.emit('ban', { username, reason: reason ? reason : '<no reason>' });
+            const [ userName, reason ] = dataMessage.data.args;
+            ban(`${userName}#${dataMessage.data.target_user_id} by ${createdBy}: ${reason ? reason : '<no reason>'}`);
+            eventEmitter.emit('ban', { userName, reason: reason ? reason : '<no reason>' });
           } else if (dataMessage.data.moderation_action === 'unban') {
-            const [ username ] = dataMessage.data.args;
-            unban(`${username}#${dataMessage.data.target_user_id} by ${createdBy}`);
+            const [ userName ] = dataMessage.data.args;
+            unban(`${userName}#${dataMessage.data.target_user_id} by ${createdBy}`);
           } else if (dataMessage.data.moderation_action === 'timeout') {
-            const [ username, reason ] = dataMessage.data.args;
-            timeout(`${username}#${dataMessage.data.target_user_id} by ${createdBy} for ${reason} seconds`);
-            eventEmitter.emit('timeout', { username, duration: reason });
+            const [ userName, reason ] = dataMessage.data.args;
+            timeout(`${userName}#${dataMessage.data.target_user_id} by ${createdBy} for ${reason} seconds`);
+            eventEmitter.emit('timeout', { userName, duration: reason });
           } else if (dataMessage.data.moderation_action === 'followersoff') {
             info(`${createdBy} disabled followers-only mode.`);
           } else if (dataMessage.data.moderation_action === 'followers') {

@@ -585,11 +585,11 @@ class Discord extends Integration {
         parser.sender = getUserSender(user.userId, user.userName);
 
         eventEmitter.emit('keyword-send-x-times', {
-          username: user.userName, message: content, source: 'discord',
+          userName: user.userName, message: content, source: 'discord',
         });
         if (content.startsWith('!')) {
           eventEmitter.emit('command-send-x-times', {
-            username: user.userName, message: content, source: 'discord',
+            userName: user.userName, message: content, source: 'discord',
           });
         }
 

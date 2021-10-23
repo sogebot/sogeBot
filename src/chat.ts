@@ -414,7 +414,7 @@ class TMI extends Core {
           timestamp: Date.now(),
         });
 
-        eventEmitter.emit('action', { username: userstate.userName?.toLowerCase() ?? '', source: 'twitch' });
+        eventEmitter.emit('action', { userName: userstate.userName?.toLowerCase() ?? '', source: 'twitch' });
       });
 
       client.onMessage((_channel, user, message, msg) => {
@@ -466,7 +466,7 @@ class TMI extends Core {
         host(`${username}, viewers: ${viewers}`);
 
         const data = {
-          username,
+          userName: username,
           viewers,
           event:     'host',
           timestamp: Date.now(),
@@ -499,7 +499,7 @@ class TMI extends Core {
     raid(`${username}, viewers: ${viewers}`);
 
     const data = {
-      username:  username,
+      userName:  username,
       viewers:   viewers,
       event:     'raid',
       timestamp: Date.now(),
@@ -569,7 +569,7 @@ class TMI extends Core {
       });
       sub(`${username}#${userstate.userId}, tier: ${tier}`);
       eventEmitter.emit('subscription', {
-        username: username, method: subInfo.isPrime ? 'Twitch Prime' : '', subCumulativeMonths: amount, tier: String(tier),
+        userName: username, method: subInfo.isPrime ? 'Twitch Prime' : '', subCumulativeMonths: amount, tier: String(tier),
       });
       alerts.trigger({
         event:      'subs',
@@ -582,7 +582,7 @@ class TMI extends Core {
       });
 
       triggerInterfaceOnSub({
-        username:            username,
+        userName:            username,
         userId:              userstate.userId,
         subCumulativeMonths: amount,
       });
@@ -649,7 +649,7 @@ class TMI extends Core {
       });
       resub(`${username}#${userstate.userId}, streak share: ${subStreakShareEnabled}, streak: ${subStreak}, months: ${amount}, message: ${message}, tier: ${tier}`);
       eventEmitter.emit('resub', {
-        username,
+        userName: username,
         tier:                    String(tier),
         subStreakShareEnabled,
         subStreak,
@@ -695,7 +695,7 @@ class TMI extends Core {
         count,
         timestamp: Date.now(),
       });
-      eventEmitter.emit('subcommunitygift', { username, count });
+      eventEmitter.emit('subcommunitygift', { userName: username, count });
       subcommunitygift(`${username}#${userId}, to ${count} viewers`);
       alerts.trigger({
         event:      'subcommunitygifts',
@@ -750,10 +750,10 @@ class TMI extends Core {
           message:    '',
         });
         eventEmitter.emit('subgift', {
-          username: username, recipient: recipient, tier,
+          userName: username, recipient: recipient, tier,
         });
         triggerInterfaceOnSub({
-          username:            recipient,
+          userName:            recipient,
           userId:              recipientId,
           subCumulativeMonths: 0,
         });
@@ -831,7 +831,7 @@ class TMI extends Core {
       getRepository(UserBit).save(newBits);
 
       eventEmitter.emit('cheer', {
-        username, bits: bits, message: messageFromUser,
+        userName: username, userId, bits: bits, message: messageFromUser,
       });
 
       if (isStreamOnline.value) {
@@ -839,7 +839,7 @@ class TMI extends Core {
       }
 
       triggerInterfaceOnBit({
-        username:  username,
+        userName:  username,
         amount:    bits,
         message:   messageFromUser,
         timestamp: Date.now(),
@@ -953,7 +953,7 @@ class TMI extends Core {
       if (user) {
         if (!user.isOnline) {
           joinpart.send({ users: [userstate.userName], type: 'join' });
-          eventEmitter.emit('user-joined-channel', { username: userstate.userName });
+          eventEmitter.emit('user-joined-channel', { userName: userstate.userName });
         }
 
         userstate.badgeInfo.get('subscriber');
@@ -970,7 +970,7 @@ class TMI extends Core {
         });
       } else {
         joinpart.send({ users: [userstate.userName], type: 'join' });
-        eventEmitter.emit('user-joined-channel', { username: userstate.userName });
+        eventEmitter.emit('user-joined-channel', { userName: userstate.userName });
         changelog.update(userstate.userId, {
           userName:     userstate.userName,
           userId:       userstate.userId,
@@ -985,11 +985,11 @@ class TMI extends Core {
       api.followerUpdatePreCheck(userstate.userName);
 
       eventEmitter.emit('keyword-send-x-times', {
-        username: userstate.userName, message: message, source: 'twitch',
+        userName: userstate.userName, message: message, source: 'twitch',
       });
       if (message.startsWith('!')) {
         eventEmitter.emit('command-send-x-times', {
-          username: userstate.userName, message: message, source: 'twitch',
+          userName: userstate.userName, message: message, source: 'twitch',
         });
       } else if (!message.startsWith('!')) {
         changelog.increment(userstate.userId, { messages: 1 });

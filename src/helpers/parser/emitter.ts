@@ -3,7 +3,7 @@ import { TypedEmitter } from 'tiny-typed-emitter';
 interface Events {
   'process': (
     opts: {
-      sender: { username: string; userId: string };
+      sender: { userName: string; userId: string };
       message: string,
       skip: boolean,
       quiet: boolean

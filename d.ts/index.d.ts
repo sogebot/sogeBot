@@ -47,18 +47,18 @@ interface Parser {
 }
 
 type onEventSub = {
-  username: string;
+  userName: string;
   userId: string;
   subCumulativeMonths: number;
 };
 
 type onEventFollow = {
-  username: string;
+  userName: string;
   userId: string;
 };
 
 type onEventTip = {
-  username: string;
+  userName: string;
   amount: number;
   message: string;
   currency: currency;
@@ -66,7 +66,7 @@ type onEventTip = {
 };
 
 type onEventBit = {
-  username: string;
+  userName: string;
   amount: number;
   message: string;
   timestamp: number;

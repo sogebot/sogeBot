@@ -1,8 +1,8 @@
 import type { UserInterface } from '../../database/entity/user';
 
-export function isModerator(user: UserInterface | UserStateTags): boolean {
-  if ('mod' in user) {
-    return user.mod === '1';
+export function isModerator(user: UserInterface | Omit<ChatUser, '_userName' | '_userData' | '_parseBadgesLike'>): boolean {
+  if ('isMod' in user) {
+    return user.isMod;
   }
   return user.isModerator ?? false;
 }

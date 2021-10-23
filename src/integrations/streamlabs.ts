@@ -232,7 +232,7 @@ class Streamlabs extends Integration {
         });
         eventEmitter.emit('tip', {
           isAnonymous:         false,
-          username:            event.from.toLowerCase(),
+          userName:            event.from.toLowerCase(),
           amount:              parseFloat(event.amount).toFixed(2),
           currency:            event.currency,
           amountInBotCurrency: Number(currency.exchange(Number(event.amount), event.currency, mainCurrency.value)).toFixed(2),
@@ -250,7 +250,7 @@ class Streamlabs extends Integration {
         });
 
         triggerInterfaceOnTip({
-          username: event.from.toLowerCase(),
+          userName: event.from.toLowerCase(),
           amount:   Number(event.amount),
           message:  event.message,
           currency: event.currency,

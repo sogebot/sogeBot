@@ -414,7 +414,7 @@ class API extends Core {
       for (const username of partedUsers) {
         if (!isIgnored({ userName: username })) {
           await setImmediateAwait();
-          eventEmitter.emit('user-parted-channel', { username });
+          eventEmitter.emit('user-parted-channel', { userName: username });
         }
       }
 
@@ -425,7 +425,7 @@ class API extends Core {
         } else {
           await setImmediateAwait();
           this.followerUpdatePreCheck(username);
-          eventEmitter.emit('user-joined-channel', { username });
+          eventEmitter.emit('user-joined-channel', { userName: username });
         }
       }
     }
@@ -1249,7 +1249,7 @@ class API extends Core {
       // if was follower, fire unfollow event
       if (user.isFollower) {
         unfollow(user.userName);
-        eventEmitter.emit('unfollow', { username: user.userName });
+        eventEmitter.emit('unfollow', { userName: user.userName });
       }
       changelog.update(user.userId, {
         followedAt:    user.haveFollowedAtLock ? user.followedAt : 0,
