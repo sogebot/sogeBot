@@ -90,6 +90,10 @@ module.exports = {
   viewer,
   viewer2,
   viewer3,
+  viewer4,
+  viewer5,
+  viewer6,
+  viewer7,
   owner,
   mod,
 };

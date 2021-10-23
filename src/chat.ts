@@ -708,18 +708,18 @@ class TMI extends Core {
       });
     } catch (e: any) {
       error('Error parsing subscriptionGiftCommunity event');
-      error(util.inspect(userstate));
+      error(util.inspect({ userstate, subInfo }));
       error(e.stack);
     }
   }
 
   @timer()
-  async subgift (username: string, subInfo: ChatSubGiftInfo, userstate: ChatUser) {
+  async subgift (recipient: string, subInfo: ChatSubGiftInfo, userstate: ChatUser) {
     try {
+      const username = subInfo.gifter ?? '';
       const userId = subInfo.gifterUserId ?? '0';
       const amount = subInfo.months;
       const recipientId = subInfo.userId;
-      const recipient = username;
       const tier = (subInfo.isPrime ? 1 : (Number(subInfo.plan ?? 1000) / 1000));
 
       const ignoreGifts = (this.ignoreGiftsFromUser.get(username) ?? 0);
@@ -728,7 +728,7 @@ class TMI extends Core {
       const user = await changelog.get(recipientId);
       if (!user) {
         changelog.update(recipientId, { userId: recipientId, userName: username });
-        this.subgift(username, subInfo, userstate);
+        this.subgift(recipient, subInfo, userstate);
         return;
       }
 
@@ -758,6 +758,7 @@ class TMI extends Core {
           subCumulativeMonths: 0,
         });
       } else {
+        console.log(`Ignored: ${username}#${userId} -> ${recipient}#${recipientId}`);
         debug('tmi.subgift', `Ignored: ${username}#${userId} -> ${recipient}#${recipientId}`);
       }
       if (isIgnored({ userName: username, userId: recipientId })) {
@@ -956,7 +957,6 @@ class TMI extends Core {
           eventEmitter.emit('user-joined-channel', { userName: userstate.userName });
         }
 
-        userstate.badgeInfo.get('subscriber');
         changelog.update(user.userId, {
           ...user,
           userName:     userstate.userName,

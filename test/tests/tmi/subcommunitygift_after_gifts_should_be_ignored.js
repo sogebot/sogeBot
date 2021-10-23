@@ -4,9 +4,9 @@ const assert = require('assert');
 require('../../general.js');
 const { getRepository } = require('typeorm');
 
+const tmi = (require('../../../dest/chat')).default;
 const { User } = require('../../../dest/database/entity/user');
 const changelog = (require('../../../dest/helpers/user/changelog'));
-const tmi = (require('../../../dest/chat')).default;
 const db = require('../../general.js').db;
 const time = require('../../general.js').time;
 const message = require('../../general.js').message;
@@ -20,39 +20,39 @@ describe('TMI - subcommunitygift after gifts should be ignored - @func3', () => 
   });
 
   it('Trigger subcommunitygift', async () => {
-    tmi.subscriptionGiftCommunity('__viewer__', 5, null, {
-        userId: '1',
-      },
-    );
+    tmi.subscriptionGiftCommunity(user.viewer.userName, {
+      gifterUserId: user.viewer.userId,
+      count:        5,
+    });
   });
 
   it('Trigger subgift 1', async () => {
-    tmi.subgift('__viewer__', 2, '__viewer2__', { prime: true }, { userId: '1', 'msg-param-recipient-id': '3' })
+    tmi.subgift(user.viewer2.userName, { gifter: user.viewer.userName, gifterUserId: user.viewer.userId, months: 1, userId: user.viewer2.userId, isPrime: true });
     await message.debug('tmi.subgift', 'Ignored: __viewer__#1 -> __viewer2__#3');
   });
 
   it('Trigger subgift 2', async () => {
-    tmi.subgift('__viewer__', 2, '__viewer3__', { prime: true }, { userId: '1', 'msg-param-recipient-id': '5' })
+    tmi.subgift(user.viewer3.userName, { gifter: user.viewer.userName, gifterUserId: user.viewer.userId, months: 1, userId: user.viewer3.userId, isPrime: true });
     await message.debug('tmi.subgift', 'Ignored: __viewer__#1 -> __viewer3__#5');
   });
 
   it('Trigger subgift 3', async () => {
-    tmi.subgift('__viewer__', 2, '__viewer4__', { prime: true }, { userId: '1', 'msg-param-recipient-id': '50' })
+    tmi.subgift(user.viewer4.userName, { gifter: user.viewer.userName, gifterUserId: user.viewer.userId, months: 1, userId: user.viewer4.userId, isPrime: true });
     await message.debug('tmi.subgift', 'Ignored: __viewer__#1 -> __viewer4__#50');
   });
 
   it('Trigger subgift 4', async () => {
-    tmi.subgift('__viewer__', 2, 'viewer5', { prime: true }, { userId: '1', 'msg-param-recipient-id': '55' })
-    await message.debug('tmi.subgift', 'Ignored: __viewer__#1 -> viewer5#55');
+    tmi.subgift(user.viewer5.userName, { gifter: user.viewer.userName, gifterUserId: user.viewer.userId, months: 1, userId: user.viewer5.userId, isPrime: true });
+    await message.debug('tmi.subgift', 'Ignored: __viewer__#1 -> __viewer5__#55');
   });
 
   it('Trigger subgift 5', async () => {
-    tmi.subgift('__viewer__', 2, 'viewer6', { prime: true }, { userId: '1', 'msg-param-recipient-id': '56' })
-    await message.debug('tmi.subgift', 'Ignored: __viewer__#1 -> viewer6#56');
+    tmi.subgift(user.viewer6.userName, { gifter: user.viewer.userName, gifterUserId: user.viewer.userId, months: 1, userId: user.viewer6.userId, isPrime: true });
+    await message.debug('tmi.subgift', 'Ignored: __viewer__#1 -> __viewer6__#56');
   });
 
   it('Trigger subgift 6 > should be triggered', async () => {
-    tmi.subgift('__viewer__', 2, '__viewer7__', { prime: true }, { userId: '1', 'msg-param-recipient-id': '57' })
+    tmi.subgift(user.viewer7.userName, { gifter: user.viewer.userName, gifterUserId: user.viewer.userId, months: 1, userId: user.viewer7.userId, isPrime: true });
     await message.debug('tmi.subgift', 'Triggered: __viewer__#1 -> __viewer7__#57');
   });
 
