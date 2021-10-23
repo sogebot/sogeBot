@@ -49,14 +49,14 @@ class Users extends Core {
       if (connection.options.type === 'postgres') {
         query = getRepository(User).createQueryBuilder('user')
           .select('COUNT(*)')
-          .addSelect('"user"."username"')
-          .groupBy('"user"."username"')
+          .addSelect('"user"."userName"')
+          .groupBy('"user"."userName"')
           .having('COUNT(*) > 1');
       } else {
         query = getRepository(User).createQueryBuilder('user')
           .select('COUNT(*)', 'count')
-          .addSelect('user.username')
-          .groupBy('user.username')
+          .addSelect('user.userName')
+          .groupBy('user.userName')
           .having('count > 1');
       }
       const viewers = await query.getRawMany();

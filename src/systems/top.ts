@@ -133,23 +133,23 @@ class Top extends System {
       case TYPE.LEVEL: {
         let rawSQL = '';
         if (connection.options.type === 'better-sqlite3') {
-          rawSQL = `SELECT JSON_EXTRACT("user"."extra", '$.levels.xp') AS "data", "userId", "username"
+          rawSQL = `SELECT JSON_EXTRACT("user"."extra", '$.levels.xp') AS "data", "userId", "userName"
             FROM "user" "user"
-            WHERE "user"."username" IS NOT '${oauth.botUsername.toLowerCase()}'
-              AND "user"."username" IS NOT '${oauth.broadcasterUsername.toLowerCase()}'
+            WHERE "user"."userName" IS NOT '${oauth.botUsername.toLowerCase()}'
+              AND "user"."userName" IS NOT '${oauth.broadcasterUsername.toLowerCase()}'
             ORDER BY length(data) DESC, data DESC LIMIT ${_total}`;
         } else if (connection.options.type === 'postgres') {
-          rawSQL = `SELECT "user"."userId", "user"."username", CAST("data" as text)
+          rawSQL = `SELECT "user"."userId", "user"."userName", CAST("data" as text)
             FROM "user", JSON_EXTRACT_PATH("extra"::json, 'levels') AS "data"
-            WHERE "user"."username" != '${oauth.botUsername.toLowerCase()}'
-              AND "user"."username" != '${oauth.broadcasterUsername.toLowerCase()}'
+            WHERE "user"."userName" != '${oauth.botUsername.toLowerCase()}'
+              AND "user"."userName" != '${oauth.broadcasterUsername.toLowerCase()}'
             ORDER BY length("data"::text) DESC, "data"::text DESC
             LIMIT ${_total}`;
         } else if (connection.options.type === 'mysql') {
-          rawSQL = `SELECT JSON_EXTRACT(\`user\`.\`extra\`, '$.levels.xp') AS \`data\`, \`userId\`, \`username\`
+          rawSQL = `SELECT JSON_EXTRACT(\`user\`.\`extra\`, '$.levels.xp') AS \`data\`, \`userId\`, \`userName\`
             FROM \`user\` \`user\`
-            WHERE \`user\`.\`username\` != '${oauth.botUsername.toLowerCase()}'
-              AND \`user\`.\`username\` != '${oauth.broadcasterUsername.toLowerCase()}'
+            WHERE \`user\`.\`userName\` != '${oauth.botUsername.toLowerCase()}'
+              AND \`user\`.\`userName\` != '${oauth.broadcasterUsername.toLowerCase()}'
             ORDER BY length(\`data\`) DESC, data DESC LIMIT ${_total}`;
         }
         const users = (await getManager().query(rawSQL)).filter((o: any) => !isIgnored({ userName: o.userName, userId: o.userId }));
