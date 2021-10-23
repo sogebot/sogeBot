@@ -1,9 +1,11 @@
 import { setImmediate } from 'timers';
 
+import { shuffle } from '@sogebot/ui-helpers/array';
 import * as constants from '@sogebot/ui-helpers/constants';
 import axios, { AxiosResponse } from 'axios';
 import { getManager, getRepository } from 'typeorm';
 import { v4 as uuid } from 'uuid';
+import XRegExp from 'xregexp';
 
 import Core from './_interface';
 import { CacheEmotes, CacheEmotesInterface } from './database/entity/cacheEmotes';
@@ -18,8 +20,6 @@ import { ioServer } from './helpers/panel';
 import { setImmediateAwait } from './helpers/setImmediateAwait';
 import { adminEndpoint, publicEndpoint } from './helpers/socket';
 import oauth from './oauth';
-import { shuffle } from '@sogebot/ui-helpers/array';
-import XRegExp from 'xregexp/types';
 
 interface EmotesCommons {
   id: string,
