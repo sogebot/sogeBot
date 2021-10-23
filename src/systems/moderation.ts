@@ -441,9 +441,11 @@ class Moderation extends System {
     let whitelisted = await this.whitelist(opts.message, permId);
 
     const emotesCharList: number[] = [];
-    for (const emote of opts.emotesOffsets.values()) {
-      for (const i of _.range(Number(emote[0]), Number(emote[1]) + 1)) {
-        emotesCharList.push(i);
+    for (const emoteList of opts.emotesOffsets.values()) {
+      for(const emote of emoteList) {
+        for (const i of _.range(Number(emote.split('-')[0]), Number(emote.split('-')[1]) + 1)) {
+          emotesCharList.push(i);
+        }
       }
     }
 
