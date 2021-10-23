@@ -17,18 +17,18 @@ type onEvents = {
 };
 
 const on: onEvents = {
-  streamStart:      [],
-  streamEnd:        [],
-  change:           [],
-  load:             [],
-  startup:          [],
-  message:          [],
-  joinChannel:      [],
-  partChannel:      [],
-  sub:              [],
-  follow:           [],
-  bit:              [],
-  tip:              [],
+  streamStart: [],
+  streamEnd:   [],
+  change:      [],
+  load:        [],
+  startup:     [],
+  message:     [],
+  joinChannel: [],
+  partChannel: [],
+  sub:         [],
+  follow:      [],
+  bit:         [],
+  tip:         [],
 };
 
 export function getFunctionList(type: keyof onEvents, path = ''): onEvent[] {
