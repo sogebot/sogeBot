@@ -24,7 +24,7 @@ module.exports = {
     tmi.client = {
       bot: {
         say: function () {},
-        deletemessage: function() {},
+        deleteMessage: function() {},
         color: function () {},
         timeout: function () {},
         on: function () {},
@@ -34,7 +34,7 @@ module.exports = {
       },
       broadcaster: {
         say: function () {},
-        deletemessage: function() {},
+        deleteMessage: function() {},
         color: function () {},
         timeout: function () {},
         on: function () {},

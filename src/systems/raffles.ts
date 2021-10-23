@@ -417,7 +417,7 @@ class Raffles extends System {
       return true;
     }
     if (this.deleteRaffleJoinCommands) {
-      tmi.delete('bot', opts.sender.id);
+      tmi.delete('bot', opts.id);
     }
 
     opts.message = opts.message.toString().replace(raffle.keyword, '');
@@ -430,7 +430,7 @@ class Raffles extends System {
       tickets = 0;
     }
 
-    const participant = raffle.participants.find(o => o.username === opts.sender?.username);
+    const participant = raffle.participants.find(o => o.username === opts.sender.userName);
     let curTickets = 0;
     if (participant) {
       curTickets = participant.tickets;

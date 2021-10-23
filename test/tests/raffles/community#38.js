@@ -67,7 +67,7 @@ describe('/t/raffle-everyone-can-join-even-raffle-runned-for-subscribers/38 - @f
         where:     { winner: null, isClosed: false },
       });
 
-      assert(typeof raffle.participants.find(o => o.userName === v) === 'undefined');
+      assert(typeof raffle.participants.find(o => o.username === v) === 'undefined');
     });
   }
 
@@ -90,7 +90,7 @@ describe('/t/raffle-everyone-can-join-even-raffle-runned-for-subscribers/38 - @f
         where:     { winner: null, isClosed: false },
       });
 
-      assert(typeof raffle.participants.find(o => o.userName === v) !== 'undefined');
+      assert(typeof raffle.participants.find(o => o.username === v) !== 'undefined');
     });
   }
 });
