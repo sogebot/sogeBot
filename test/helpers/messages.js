@@ -89,11 +89,11 @@ module.exports = {
       let expected = [];
       if (_.isArray(opts)) {
         for (const o of opts) {
-          o.sender = _.isNil(user.username) ? '' : user.username;
+          o.sender = _.isNil(user.userName) ? '' : user.userName;
           expected.push(prepare(entry, o));
         }
       } else {
-        opts.sender = _.isNil(user.username) ? '' : user.username;
+        opts.sender = _.isNil(user.userName) ? '' : user.userName;
         expected = [prepare(entry, opts)];
       }
       try {
@@ -117,7 +117,7 @@ module.exports = {
     const { prepare } = require('../../dest/helpers/commons/prepare');
     if (typeof user === 'string') {
       user = {
-        username: user,
+        userName: user,
       };
     }
     user = _.cloneDeep(user);
@@ -126,7 +126,7 @@ module.exports = {
       const expected = [];
       if (_.isArray(opts)) {
         for (const o of opts) {
-          o.sender = _.isNil(user.username) ? '' : user.username;
+          o.sender = _.isNil(user.userName) ? '' : user.userName;
           if (_.isArray(entry)) {
             for (const e of entry) {
               expected.push(prepare(e, o));
@@ -136,7 +136,7 @@ module.exports = {
           }
         }
       } else {
-        opts.sender = _.isNil(user.username) ? '' : user.username;
+        opts.sender = _.isNil(user.userName) ? '' : user.userName;
         if (_.isArray(entry)) {
           for (const e of entry) {
             expected.push(prepare(e, opts));
@@ -152,8 +152,8 @@ module.exports = {
             setError('Missing translations! ' + e);
             return false;
           }
-          if (user.username) {
-            e += ` [${user.username}]`;
+          if (user.userName) {
+            e += ` [${user.userName}]`;
           }
           /*
           console.dir(log.chatOut.args, { depth: null })
@@ -208,19 +208,19 @@ module.exports = {
     }
     if (typeof user === 'string') {
       user = {
-        username: user,
+        userName: user,
       };
     }
     if (!user) {
-      user = { username: 'bot' };
+      user = { userName: 'bot' };
     }
     user = _.cloneDeep(user);
     return until(setError => {
       try {
         let isOK = false;
         for (let e of expected) {
-          if (user.username) {
-            e += ` [${user.username}]`;
+          if (user.userName) {
+            e += ` [${user.userName}]`;
           }
           if (log.chatOut.calledWith(e)) {
             isOK = true;
@@ -231,7 +231,7 @@ module.exports = {
         return true;
       } catch (err) {
         return setError(
-          '\nExpected message:\t' + expected + ` [${user.username}]`
+          '\nExpected message:\t' + expected + ` [${user.userName}]`
           + '\nActual message:\t\t' + log.chatOut.args.join('\n\t\t\t')
         );
       }
@@ -240,7 +240,7 @@ module.exports = {
   isNotSent: async function (expected, user, wait) {
     if (typeof user === 'string') {
       user = {
-        username: user,
+        userName: user,
       };
     }
     user = _.cloneDeep(user);
@@ -255,7 +255,7 @@ module.exports = {
   isNotSentRaw: async function (expected, user, wait) {
     if (typeof user === 'string') {
       user = {
-        username: user,
+        userName: user,
       };
     }
     user = _.cloneDeep(user);

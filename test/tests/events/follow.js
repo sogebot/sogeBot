@@ -49,11 +49,11 @@ describe('Events - follow event - @func3', () => {
 
     for (const follower of [user.viewer, user.viewer2, user.viewer3]) {
       it('trigger follow event', async () => {
-        await events.fire('follow', { username: follower.username, userId: follower.userId });
+        await events.fire('follow', { userName: follower.userName, userId: follower.userId });
       });
 
       it('message should be send', async () => {
-        await message.isSentRaw(`Diky za follow, @${follower.username}!`, { username: follower.username });
+        await message.isSentRaw(`Diky za follow, @${follower.userName}!`, { userName: follower.userName });
       });
 
       it('wait 5s', async () => {

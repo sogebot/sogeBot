@@ -16,7 +16,7 @@ const points = (require('../../../dest/systems/points')).default;
 const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 
-const user1 = { username: 'user1', userId: String(_.random(999999, false)) };
+const user1 = { userName: 'user1', userId: String(_.random(999999, false)) };
 const command = '!gamble';
 
 describe('Gambling - gamble - @func3', () => {
@@ -24,7 +24,7 @@ describe('Gambling - gamble - @func3', () => {
     const changelog = (require('../../../dest/helpers/user/changelog'));
     await changelog.flush();
     await getRepository(User).save({
-      userId: user1.userId, username: user1.username, points: 100,
+      userId: user1.userId, userName: user1.userName, points: 100,
     });
   });
 

@@ -12,7 +12,7 @@ const points = (require('../../../dest/systems/points')).default;
 const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 
-const user = { username: 'oneuser', userId: String(_.random(999999, false)) };
+const user = { userName: 'oneuser', userId: String(_.random(999999, false)) };
 
 describe('Points - set() - @func1', () => {
   before(async () => {
@@ -22,7 +22,7 @@ describe('Points - set() - @func1', () => {
 
   describe('Points should be correctly set, not added', () => {
     it('create user', async () => {
-      await getRepository(User).save({ username: user.username, userId: user.userId });
+      await getRepository(User).save({ userName: user.userName, userId: user.userId });
     });
 
     it('!points get should return 0', async () => {
@@ -31,7 +31,7 @@ describe('Points - set() - @func1', () => {
     });
 
     it('!points set should correctly set value 5', async () => {
-      const r = await points.set({ sender: user, parameters: user.username + ' 5' });
+      const r = await points.set({ sender: user, parameters: user.userName + ' 5' });
       assert.strictEqual(r[0].response, `@oneuser was set to 5 points`);
     });
 
@@ -41,7 +41,7 @@ describe('Points - set() - @func1', () => {
     });
 
     it('!points set should correctly set value 10', async () => {
-      const r = await points.set({ sender: user, parameters: user.username + ' 10' });
+      const r = await points.set({ sender: user, parameters: user.userName + ' 10' });
       assert.strictEqual(r[0].response, `@oneuser was set to 10 points`);
     });
 

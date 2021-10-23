@@ -12,7 +12,7 @@ const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 
 // users
-const owner = { userId: String(Math.floor(Math.random() * 100000)), username: '__broadcaster__' };
+const owner = { userId: String(Math.floor(Math.random() * 100000)), userName: '__broadcaster__' };
 
 const vwrranks = [
   { hours: 0, rank: 'Zero' },
@@ -55,12 +55,12 @@ describe('Ranks - followers - @func2', () => {
   for (const [id, v] of Object.entries(users)) {
     it('Add user ' + v + ' to db', async () => {
       await getRepository(User).save({
-        username: v , userId: String('100' + id), isFollower: true, followedAt: new Date((new Date()).setMonth((new Date()).getMonth()-(id * 5))).getTime(), watchedTime: id * 1000 * 60 * 60,
+        userName: v , userId: String('100' + id), isFollower: true, followedAt: new Date((new Date()).setMonth((new Date()).getMonth()-(id * 5))).getTime(), watchedTime: id * 1000 * 60 * 60,
       });
     });
 
     it('Rank of user should be correct', async () => {
-      const r = await ranks.main({ sender: { userId: String('100' + id), username: v } });
+      const r = await ranks.main({ sender: { userId: String('100' + id), userName: v } });
       assert.strictEqual(r[0].response, expectedMessage[id]);
     });
   }

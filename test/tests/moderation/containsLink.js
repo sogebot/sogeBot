@@ -209,7 +209,7 @@ describe('systems/moderation - containsLink() - @func3', () => {
     });
 
     it(`add user immunity`, async () => {
-      const r = await moderation.immune({ parameters: `${user.viewer.username} links 5s` });
+      const r = await moderation.immune({ parameters: `${user.viewer.userName} links 5s` });
       assert(r[0].response === '$sender, user @__viewer__ have links immunity for 5 seconds');
     });
 

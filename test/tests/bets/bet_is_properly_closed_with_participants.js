@@ -19,7 +19,7 @@ describe('Bets - @func3 - bet should automatically be locked after given time wi
   before(async () => {
     await db.cleanup();
     await message.prepare();
-    await getRepository(User).save({ username: user.owner.username , userId: user.owner.userId, points: 100 });
+    await getRepository(User).save({ userName: user.owner.userName , userId: user.owner.userId, points: 100 });
   });
 
   it('Seed database with soon to be closed bet', async () => {

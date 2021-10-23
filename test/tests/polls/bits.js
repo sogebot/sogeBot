@@ -18,7 +18,7 @@ const { getLocalizedName } = require('@sogebot/ui-helpers/getLocalized');
 
 const assert = require('assert');
 
-const owner = { username: '__broadcaster__', userId: String(Math.floor(Math.random() * 10000)) };
+const owner = { userName: '__broadcaster__', userId: String(Math.floor(Math.random() * 10000)) };
 
 describe('Polls - bits - @func2', () => {
   before(async () => {
@@ -82,10 +82,10 @@ describe('Polls - bits - @func2', () => {
       assert.strictEqual(r[3].response, `#vote3 - Dolor Sit - 0 ${getLocalizedName(0, translate('systems.polls.votes'))}, 0.00%`);
     });
     for (const o of [0,1,2,3,4]) {
-      it(`User ${owner.username} will vote for option ${o} - should fail`, async () => {
+      it(`User ${owner.userName} will vote for option ${o} - should fail`, async () => {
         await polls.main({ sender: owner, parameters: String(o) });
-        const vote = await getRepository(PollVote).findOne({ votedBy: owner.username });
-        assert(typeof vote === 'undefined', 'Expected ' + JSON.stringify({ votedBy: owner.username, vid }) + ' to not be found in db');
+        const vote = await getRepository(PollVote).findOne({ votedBy: owner.userName });
+        assert(typeof vote === 'undefined', 'Expected ' + JSON.stringify({ votedBy: owner.userName, vid }) + ' to not be found in db');
       });
     }
     it(`10 users will vote through bits for option 1 and another 10 for option 2`, async () => {
@@ -149,7 +149,7 @@ describe('Polls - bits - @func2', () => {
       await message.prepare();
 
       const user = Math.random();
-      const r = await polls.main({ sender: { username: user }, parameters: '1' });
+      const r = await polls.main({ sender: { userName: user }, parameters: '1' });
       assert.strictEqual(r[0].response, '$sender, there is currently no poll in progress!');
     });
   });

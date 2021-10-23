@@ -25,7 +25,7 @@ describe('lib/twitch - followers() - @func1', () => {
   it('Set user.viewer, user.viewer2, user.viewer3 as followers', async () => {
     for (const u of [user.viewer, user.viewer2, user.viewer3]) {
       await getRepository(User).save({
-        userId: u.userId, username: u.username, isFollower: true,
+        userId: u.userId, userName: u.userName, isFollower: true,
       });
     }
   });
@@ -50,7 +50,7 @@ describe('lib/twitch - followers() - @func1', () => {
     const r = await twitch.followers({ sender: user.viewer });
     assert.strictEqual(r[0].response, prepare('followers', {
       lastFollowAgo:        'a few seconds ago',
-      lastFollowUsername:   user.viewer2.username,
+      lastFollowUsername:   user.viewer2.userName,
       onlineFollowersCount: 0,
     }));
   });
@@ -67,7 +67,7 @@ describe('lib/twitch - followers() - @func1', () => {
     const r = await twitch.followers({ sender: user.viewer });
     assert.strictEqual(r[0].response, prepare('followers', {
       lastFollowAgo:        'a few seconds ago',
-      lastFollowUsername:   user.viewer3.username,
+      lastFollowUsername:   user.viewer3.userName,
       onlineFollowersCount: 0,
     }));
   });
@@ -80,7 +80,7 @@ describe('lib/twitch - followers() - @func1', () => {
     const r = await twitch.followers({ sender: user.viewer });
     assert.strictEqual(r[0].response, prepare('followers', {
       lastFollowAgo:        'a few seconds ago',
-      lastFollowUsername:   user.viewer3.username,
+      lastFollowUsername:   user.viewer3.userName,
       onlineFollowersCount: 3,
     }));
   });

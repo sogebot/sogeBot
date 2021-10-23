@@ -12,7 +12,7 @@ const { Bets } = require('../../../dest/database/entity/bets');
 const assert = require('assert');
 
 // users
-const owner = { username: '__broadcaster__' };
+const owner = { userName: '__broadcaster__' };
 
 describe('Bets - @func3 - closed bet shows as opened | https://discord.com/channels/317348946144002050/317349069024395264/781585551005319199', () => {
   before(async () => {

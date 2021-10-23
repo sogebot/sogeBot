@@ -14,7 +14,7 @@ const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 
 // users
-const owner = { username: '__broadcaster__' };
+const owner = { userName: '__broadcaster__' };
 
 describe('Top - !top subage - @func1', () => {
   before(async () => {
@@ -26,7 +26,7 @@ describe('Top - !top subage - @func1', () => {
     for (let i = 0; i < 10; i++) {
       await getRepository(User).save({
         userId:       String(Math.floor(Math.random() * 100000)),
-        username:     'user' + i,
+        userName:     'user' + i,
         isSubscriber: true,
         subscribedAt: Date.now() - (constants.HOUR * i),
       });
@@ -36,14 +36,14 @@ describe('Top - !top subage - @func1', () => {
   it ('Add user with long subage but not subscriber', async () => {
     await getRepository(User).save({
       userId:       String(Math.floor(Math.random() * 100000)),
-      username:     'user11',
+      userName:     'user11',
       isSubscriber: false,
       subscribedAt: Date.now() - (constants.HOUR * 24 * 30),
     });
   });
 
   it('run !top subage and expect correct output', async () => {
-    const r = await top.subage({ sender: { username: getOwner() } });
+    const r = await top.subage({ sender: { userName: getOwner() } });
     const dates = [];
     for (let i = 0; i < 10; i++) {
       dates.push(`${dayjs.utc(Date.now() - (constants.HOUR * i)).format('L')} (${dayjs.utc(Date.now() - (constants.HOUR * i)).fromNow()})`);
@@ -53,11 +53,11 @@ describe('Top - !top subage - @func1', () => {
 
   it('add user0 to ignore list', async () => {
     const r = await tmi.ignoreAdd({ sender: owner, parameters: 'user0' });
-    assert.strictEqual(r[0].response, prepare('ignore.user.is.added' , { username: 'user0' }));
+    assert.strictEqual(r[0].response, prepare('ignore.user.is.added' , { userName: 'user0' }));
   });
 
   it('run !top subage and expect correct output', async () => {
-    const r = await top.subage({ sender: { username: getOwner() } });
+    const r = await top.subage({ sender: { userName: getOwner() } });
     const dates = [];
     for (let i = 0; i < 10; i++) {
       dates.push(`${dayjs.utc(Date.now() - (constants.HOUR * i)).format('L')} (${dayjs.utc(Date.now() - (constants.HOUR * i)).fromNow()})`);

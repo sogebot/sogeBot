@@ -86,7 +86,7 @@ describe('systems/moderation - Caps() - @func2', () => {
     });
 
     it(`add user immunity`, async () => {
-      const r = await moderation.immune({ parameters: `${user.viewer.username} caps 5s` });
+      const r = await moderation.immune({ parameters: `${user.viewer.userName} caps 5s` });
       assert(r[0].response === '$sender, user @__viewer__ have caps immunity for 5 seconds');
     });
 

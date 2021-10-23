@@ -19,7 +19,7 @@ const user = require('../../general.js').user;
 
 const tests = [
   {
-    user:     user.owner.username,
+    user:     user.owner.userName,
     userId:   user.owner.userId,
     points:   10,
     command:  '!me',
@@ -28,7 +28,7 @@ const tests = [
     expected: true,
   },
   {
-    user:     user.viewer.username,
+    user:     user.viewer.userName,
     userId:   user.viewer.userId,
     points:   15,
     command:  '!me',
@@ -37,7 +37,7 @@ const tests = [
     expected: true,
   },
   {
-    user:     user.viewer.username,
+    user:     user.viewer.userName,
     userId:   user.viewer.userId,
     points:   10,
     command:  '!me',
@@ -46,7 +46,7 @@ const tests = [
     expected: false,
   },
   {
-    user:     user.viewer.username,
+    user:     user.viewer.userName,
     userId:   user.viewer.userId,
     points:   20,
     command:  '!me',
@@ -62,14 +62,14 @@ describe('Price - check() - @func3', () => {
     await message.prepare();
     await user.prepare();
 
-    await getRepository(User).save({ username: user.viewer.username, userId: user.viewer.userId });
+    await getRepository(User).save({ userName: user.viewer.userName, userId: user.viewer.userId });
   });
 
   for (const test of tests) {
     it(`${test.user} with ${test.points} points calls ${test.command}, price on ${test.priceOn} set to ${test.price} and should ${test.expected ? 'pass' : 'fail'}`, async () => {
       await getRepository(User).update({ userId: user.viewer.userId }, { points: test.points });
       await getRepository(Price).save({ command: test.command, price: test.price });
-      const haveEnoughPoints = await price.check({ sender: { username: test.user, userId: test.userId }, message: test.command });
+      const haveEnoughPoints = await price.check({ sender: { userName: test.user, userId: test.userId }, message: test.command });
       assert(haveEnoughPoints === test.expected);
     });
   }
@@ -78,9 +78,9 @@ describe('Price - check() - @func3', () => {
     await getRepository(Price).save({
       command: '!me', price: 0, priceBits: 10,
     });
-    const haveEnoughPoints = await price.check({ sender: { username: user.viewer.username, userId: user.viewer.userId }, message: '!me' });
+    const haveEnoughPoints = await price.check({ sender: { userName: user.viewer.userName, userId: user.viewer.userId }, message: '!me' });
     assert(haveEnoughPoints === false);
-    await message.isSentRaw('Sorry, @__viewer__, but you need to redeem command by 10 bits to use !me', user.viewer.username, 20000);
+    await message.isSentRaw('Sorry, @__viewer__, but you need to redeem command by 10 bits to use !me', user.viewer.userName, 20000);
   });
 
   it(`Points and Bits price should return correct error response`, async () => {
@@ -88,9 +88,9 @@ describe('Price - check() - @func3', () => {
     await getRepository(Price).save({
       command: '!me', price: 100, priceBits: 10,
     });
-    const haveEnoughPoints = await price.check({ sender: { username: user.viewer.username, userId: user.viewer.userId }, message: '!me' });
+    const haveEnoughPoints = await price.check({ sender: { userName: user.viewer.userName, userId: user.viewer.userId }, message: '!me' });
     assert(haveEnoughPoints === false);
-    await message.isSentRaw('Sorry, @__viewer__, but you don\'t have 100 points or redeem command by 10 bits to use !me', user.viewer.username, 20000);
+    await message.isSentRaw('Sorry, @__viewer__, but you don\'t have 100 points or redeem command by 10 bits to use !me', user.viewer.userName, 20000);
   });
 
   it(`Points and Bits price should be OK if user have points`, async () => {
@@ -98,7 +98,7 @@ describe('Price - check() - @func3', () => {
     await getRepository(Price).save({
       command: '!me', price: 100, priceBits: 10,
     });
-    const haveEnoughPoints = await price.check({ sender: { username: user.viewer.username, userId: user.viewer.userId }, message: '!me' });
+    const haveEnoughPoints = await price.check({ sender: { userName: user.viewer.userName, userId: user.viewer.userId }, message: '!me' });
     assert(haveEnoughPoints === true);
   });
 
@@ -108,13 +108,13 @@ describe('Price - check() - @func3', () => {
       command: '!a', price: 100, priceBits: 10,
     });
     tmi.cheer({
-      userName: user.viewer.username,
+      userName: user.viewer.userName,
       userId:   user.viewer.userId,
     },
     '!a',
     100,
     );
-    await message.isSentRaw('Usage => http://sogehige.github.io/sogeBot/#/_master/systems/alias', user.viewer.username, 20000);
+    await message.isSentRaw('Usage => http://sogehige.github.io/sogeBot/#/_master/systems/alias', user.viewer.userName, 20000);
   });
 
   it(`Cheer should trigger custom command`, async () => {
@@ -123,13 +123,13 @@ describe('Price - check() - @func3', () => {
       command: '!b', price: 100, priceBits: 10,
     });
     tmi.cheer({
-      userName: user.viewer.username,
+      userName: user.viewer.userName,
       userId:   user.viewer.userId,
     },
     '!b',
     100,
     );
-    await message.isSentRaw('Lorem Ipsum', user.viewer.username, 20000);
+    await message.isSentRaw('Lorem Ipsum', user.viewer.userName, 20000);
   });
 
   it(`Cheer should trigger core command`, async () => {
@@ -137,11 +137,11 @@ describe('Price - check() - @func3', () => {
       command: '!me', price: 100, priceBits: 10,
     });
     tmi.cheer({
-      userName: user.viewer.username,
+      userName: user.viewer.userName,
       userId:   user.viewer.userId,
     },
     '!me',
     100);
-    await message.isSentRaw('@__viewer__ | Level 0 | 0 hours | 0 points | 0 messages | €0.00 | 100 bits | 0 months', user.viewer.username, 20000);
+    await message.isSentRaw('@__viewer__ | Level 0 | 0 hours | 0 points | 0 messages | €0.00 | 100 bits | 0 months', user.viewer.userName, 20000);
   });
 });

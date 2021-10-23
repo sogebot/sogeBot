@@ -14,7 +14,7 @@ const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 
 // users
-const owner = { username: '__broadcaster__' };
+const owner = { userName: '__broadcaster__' };
 
 describe('Top - !top tips - @func1', () => {
   before(async () => {
@@ -26,7 +26,7 @@ describe('Top - !top tips - @func1', () => {
     for (let i = 0; i < 10; i++) {
       const userId = String(Math.floor(Math.random() * 100000));
       const tips = [];
-      const user = { ...await getRepository(User).save({ userId, username: 'user' + i }) };
+      const user = { ...await getRepository(User).save({ userId, userName: 'user' + i }) };
 
       if (i === 0) {
         continue;
@@ -52,17 +52,17 @@ describe('Top - !top tips - @func1', () => {
   });
 
   it('run !top tips and expect correct output', async () => {
-    const r = await top.tips({ sender: { username: getOwner() } });
+    const r = await top.tips({ sender: { userName: getOwner() } });
     assert.strictEqual(r[0].response, 'Top 10 (tips): 1. @user9 - €45.00, 2. @user8 - €36.00, 3. @user7 - €28.00, 4. @user6 - €21.00, 5. @user5 - €15.00, 6. @user4 - €10.00, 7. @user3 - €6.00, 8. @user2 - €3.00, 9. @user1 - €1.00', owner);
   });
 
   it('add user1 to ignore list', async () => {
     const r = await tmi.ignoreAdd({ sender: owner, parameters: 'user1' });
-    assert.strictEqual(r[0].response, prepare('ignore.user.is.added' , { username: 'user1' }));
+    assert.strictEqual(r[0].response, prepare('ignore.user.is.added' , { userName: 'user1' }));
   });
 
   it('run !top tips and expect correct output', async () => {
-    const r = await top.tips({ sender: { username: getOwner() } });
+    const r = await top.tips({ sender: { userName: getOwner() } });
     assert.strictEqual(r[0].response, 'Top 10 (tips): 1. @user9 - €45.00, 2. @user8 - €36.00, 3. @user7 - €28.00, 4. @user6 - €21.00, 5. @user5 - €15.00, 6. @user4 - €10.00, 7. @user3 - €6.00, 8. @user2 - €3.00', owner);
   });
 });

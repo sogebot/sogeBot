@@ -13,16 +13,16 @@ const { User } = require('../../../dest/database/entity/user');
 const customcommands = (require('../../../dest/systems/customcommands')).default;
 
 // users
-const owner = { username: '__broadcaster__', userId: String(Math.floor(Math.random() * 100000)) };
-const user1 = { username: 'user1', userId: String(Math.floor(Math.random() * 100000)) };
+const owner = { userName: '__broadcaster__', userId: String(Math.floor(Math.random() * 100000)) };
+const user1 = { userName: 'user1', userId: String(Math.floor(Math.random() * 100000)) };
 
 describe('Custom Commands - @func1 - count filter', () => {
   before(async () => {
     await db.cleanup();
     await message.prepare();
 
-    await getRepository(User).save({ username: owner.username, userId: owner.userId });
-    await getRepository(User).save({ username: user1.username, userId: user1.userId });
+    await getRepository(User).save({ userName: owner.userName, userId: owner.userId });
+    await getRepository(User).save({ userName: user1.userName, userId: user1.userId });
   });
 
   describe('$count(\'!cmd2\') should be properly parsed', () => {

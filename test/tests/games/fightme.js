@@ -19,43 +19,43 @@ const command = '!fightme';
 
 const tests = [
   {
-    challenger: { userId: 3, username: 'user1' },
-    challenging: { username: '' },
+    challenger: { userId: 3, userName: 'user1' },
+    challenging: { userName: '' },
     expected: 'gambling.fightme.notEnoughOptions',
   },
   {
-    challenger: { userId: 3, username: 'user1' },
-    challenging: { userId: 3, username: 'user1' },
+    challenger: { userId: 3, userName: 'user1' },
+    challenging: { userId: 3, userName: 'user1' },
     expected: 'gambling.fightme.cannotFightWithYourself',
   },
   {
-    challenger: { userId: 3, username: 'user1' },
-    challenging: { userId: 4, username: 'user2' },
+    challenger: { userId: 3, userName: 'user1' },
+    challenging: { userId: 4, userName: 'user2' },
     expected: 'gambling.fightme.winner',
   },
   {
-    challenger: { userId: 5, username: 'broadcaster' },
-    challenging: { userId: 3, username: 'user1' },
+    challenger: { userId: 5, userName: 'broadcaster' },
+    challenging: { userId: 3, userName: 'user1' },
     expected: 'gambling.fightme.broadcaster',
   },
   {
-    challenger: { userId: 3, username: 'user1' },
-    challenging: { userId: 5, username: 'broadcaster' },
+    challenger: { userId: 3, userName: 'user1' },
+    challenging: { userId: 5, userName: 'broadcaster' },
     expected: 'gambling.fightme.broadcaster',
   },
   {
-    challenger: { userId: 1, username: 'usermod1' },
-    challenging: { userId: 4, username: 'user2' },
+    challenger: { userId: 1, userName: 'usermod1' },
+    challenging: { userId: 4, userName: 'user2' },
     expected: 'gambling.fightme.oneModerator',
   },
   {
-    challenger: { userId: 3, username: 'user1' },
-    challenging: { userId: 2, username: 'usermod2' },
+    challenger: { userId: 3, userName: 'user1' },
+    challenging: { userId: 2, userName: 'usermod2' },
     expected: 'gambling.fightme.oneModerator',
   },
   {
-    challenger: { userId: 1, username: 'usermod1' },
-    challenging: { userId: 2, username: 'usermod2' },
+    challenger: { userId: 1, userName: 'usermod1' },
+    challenging: { userId: 2, userName: 'usermod2' },
     expected: 'gambling.fightme.bothModerators',
   },
 ];
@@ -65,12 +65,12 @@ describe('game/fightme - !fightme - @func1', () => {
     before(async () => {
       await db.cleanup();
       await message.prepare();
-      await getRepository(User).save({ userId: 10, username: 'user10' });
-      await getRepository(User).save({ userId: 11, username: 'user11' });
+      await getRepository(User).save({ userId: 10, userName: 'user10' });
+      await getRepository(User).save({ userId: 11, userName: 'user11' });
     });
 
     it('Challenger is starting !fightme', async () => {
-      await fightme.main({ command, sender: { userId: 10, username: 'user10' }, parameters: 'user11' });
+      await fightme.main({ command, sender: { userId: 10, userName: 'user10' }, parameters: 'user11' });
     });
 
     it('Challenge should be saved', () => {
@@ -99,12 +99,12 @@ describe('game/fightme - !fightme - @func1', () => {
     before(async () => {
       await db.cleanup();
       await message.prepare();
-      await getRepository(User).save({ userId: 10, username: 'user10' });
-      await getRepository(User).save({ userId: 11, username: 'user11' });
+      await getRepository(User).save({ userId: 10, userName: 'user10' });
+      await getRepository(User).save({ userId: 11, userName: 'user11' });
     });
 
     it('Challenger is starting !fightme', async () => {
-      await fightme.main({ command, sender: { userId: 10, username: 'user10' }, parameters: 'user11' });
+      await fightme.main({ command, sender: { userId: 10, userName: 'user10' }, parameters: 'user11' });
     });
 
     it('Challenge should be saved', () => {
@@ -114,7 +114,7 @@ describe('game/fightme - !fightme - @func1', () => {
     });
 
     it('Challenger is starting !fightme again ', async () => {
-      await fightme.main({ command, sender: { userId: 10, username: 'user10' }, parameters: 'user11' });
+      await fightme.main({ command, sender: { userId: 10, userName: 'user10' }, parameters: 'user11' });
     });
 
     it('We are not expecting additional challenge', () => {
@@ -129,36 +129,36 @@ describe('game/fightme - !fightme - @func1', () => {
   });
 
   for (const test of tests) {
-    describe(`challenger: ${test.challenger.username} | challenging: ${test.challenging.username} => ${test.expected}`, async () => {
+    describe(`challenger: ${test.challenger.userName} | challenging: ${test.challenging.userName} => ${test.expected}`, async () => {
       let responses = [];
       before(async () => {
         await db.cleanup();
         await message.prepare();
 
-        await getRepository(User).save({ userId: 1, username: 'usermod1', isModerator: true });
-        await getRepository(User).save({ userId: 2, username: 'usermod2', isModerator: true });
-        await getRepository(User).save({ userId: 3, username: 'user1' });
-        await getRepository(User).save({ userId: 4, username: 'user2' });
-        await getRepository(User).save({ userId: 5, username: 'broadcaster' });
+        await getRepository(User).save({ userId: 1, userName: 'usermod1', isModerator: true });
+        await getRepository(User).save({ userId: 2, userName: 'usermod2', isModerator: true });
+        await getRepository(User).save({ userId: 3, userName: 'user1' });
+        await getRepository(User).save({ userId: 4, userName: 'user2' });
+        await getRepository(User).save({ userId: 5, userName: 'broadcaster' });
       });
 
       it('Challenger is starting !fightme', async () => {
-        responses = await fightme.main({ command, sender: test.challenger, parameters: test.challenging.username });
+        responses = await fightme.main({ command, sender: test.challenger, parameters: test.challenging.userName });
       });
-      if (test.challenging.username.length === 0 || test.challenging.username === test.challenger.username) {
+      if (test.challenging.userName.length === 0 || test.challenging.userName === test.challenger.userName) {
         it(`Expecting ${test.expected}`, async () => {
           assert.strictEqual(responses[0].response, translate(test.expected), JSON.stringify({responses}));
         });
       } else {
         it('Expecting gambling.fightme.challenge', async () => {
-          assert.strictEqual(responses[0].response, prepare('gambling.fightme.challenge', { username: test.challenging.username, command, sender: test.challenger.username }), JSON.stringify({responses}));
+          assert.strictEqual(responses[0].response, prepare('gambling.fightme.challenge', { userName: test.challenging.userName, command, sender: test.challenger.userName }), JSON.stringify({responses}));
         });
         it('Challenged user is responding !fightme', async () => {
-          responses = await fightme.main({ command, sender: test.challenging, parameters: test.challenger.username });
+          responses = await fightme.main({ command, sender: test.challenging, parameters: test.challenger.userName });
         });
         it(`Expecting ${test.expected}`, async () => {
-          const firstMessage = prepare(test.expected, { winner: test.challenging.username, loser: test.challenger.username, challenger: test.challenging.username });
-          const secondMessage = prepare(test.expected, { winner: test.challenger.username, loser: test.challenging.username, challenger: test.challenger.username });
+          const firstMessage = prepare(test.expected, { winner: test.challenging.userName, loser: test.challenger.userName, challenger: test.challenging.userName });
+          const secondMessage = prepare(test.expected, { winner: test.challenger.userName, loser: test.challenging.userName, challenger: test.challenger.userName });
           assert(responses[0].response === firstMessage || responses[0].response === secondMessage, JSON.stringify({responses}));
         });
       }
@@ -184,17 +184,17 @@ describe('game/fightme - !fightme - @func1', () => {
     });
 
     it('user 1 is challenging and should be OK', async () => {
-      const responses = await fightme.main({ command, sender: user.viewer, parameters: user.viewer2.username });
+      const responses = await fightme.main({ command, sender: user.viewer, parameters: user.viewer2.userName });
       assert(responses[0].response.includes('@__viewer__ wants to fight you @__viewer2__! If you accept, send !fightme @__viewer__'), JSON.stringify({responses}));
     });
 
     it('user 2 is challenging and should be on cooldown', async () => {
-      const responses = await fightme.main({ command, sender: user.viewer2, parameters: user.mod.username });
+      const responses = await fightme.main({ command, sender: user.viewer2, parameters: user.mod.userName });
       assert(responses[0].response === '$sender, you cannot use !fightme for 10 minutes.', JSON.stringify({responses}));
     });
 
     it('user 2 accepting user 1 fight me, should be OK', async () => {
-      const responses = await fightme.main({ command, sender: user.viewer2, parameters: user.viewer.username });
+      const responses = await fightme.main({ command, sender: user.viewer2, parameters: user.viewer.userName });
       assert(responses[0].response.includes('is proud winner'), JSON.stringify({responses}));
     });
   });
@@ -218,17 +218,17 @@ describe('game/fightme - !fightme - @func1', () => {
     });
 
     it('user 1 is challenging and should be on cooldown', async () => {
-      const responses = await fightme.main({ command, sender: user.viewer, parameters: user.viewer2.username });
+      const responses = await fightme.main({ command, sender: user.viewer, parameters: user.viewer2.userName });
       assert(responses[0].response === '$sender, you cannot use !fightme for 10 minutes.', JSON.stringify({responses}));
     });
 
     it('owner is challenging and should be on cooldown', async () => {
-      const responses = await fightme.main({ command, sender: user.owner, parameters: user.viewer2.username });
+      const responses = await fightme.main({ command, sender: user.owner, parameters: user.viewer2.userName });
       assert(responses[0].response === '$sender, you cannot use !fightme for 10 minutes.', JSON.stringify({responses}));
     });
 
     it('mod is challenging and should be on cooldown', async () => {
-      const responses = await fightme.main({ command, sender: user.mod, parameters: user.viewer2.username });
+      const responses = await fightme.main({ command, sender: user.mod, parameters: user.viewer2.userName });
       assert(responses[0].response === '$sender, you cannot use !fightme for 10 minutes.', JSON.stringify({responses}));
     });
   });
@@ -261,12 +261,12 @@ describe('game/fightme - !fightme - @func1', () => {
     });
 
     it('user 1 is challenging and should be on cooldown', async () => {
-      const responses = await fightme.main({ command, sender: user.viewer, parameters: user.viewer2.username });
+      const responses = await fightme.main({ command, sender: user.viewer, parameters: user.viewer2.userName });
       assert(responses[0].response === '$sender, you cannot use !fightme for 10 minutes.', JSON.stringify({responses}));
     });
 
     it('owner is challenging and should not be on cooldown', async () => {
-      const responses = await fightme.main({ command, sender: user.owner, parameters: user.viewer2.username });
+      const responses = await fightme.main({ command, sender: user.owner, parameters: user.viewer2.userName });
       assert(responses[0].response.includes('@__broadcaster__ wants to fight you @__viewer2__! If you accept, send !fightme @__broadcaster__'), JSON.stringify({responses}));
     });
 
@@ -276,7 +276,7 @@ describe('game/fightme - !fightme - @func1', () => {
     });
 
     it('mod is challenging and should not be on cooldown', async () => {
-      const responses = await fightme.main({ command, sender: user.mod, parameters: user.viewer2.username });
+      const responses = await fightme.main({ command, sender: user.mod, parameters: user.viewer2.userName });
       assert(responses[0].response.includes('@__mod__ wants to fight you @__viewer2__! If you accept, send !fightme @__mod__'), JSON.stringify({responses}));
     });
   });

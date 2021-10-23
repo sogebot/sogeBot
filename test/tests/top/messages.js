@@ -15,7 +15,7 @@ const { User } = require('../../../dest/database/entity/user');
 const assert = require('assert');
 
 // users
-const owner = { username: '__broadcaster__' };
+const owner = { userName: '__broadcaster__' };
 
 describe('Top - !top messages - @func2', () => {
   before(async () => {
@@ -27,24 +27,24 @@ describe('Top - !top messages - @func2', () => {
     for (let i = 0; i < 10; i++) {
       await getRepository(User).save({
         userId: String(Math.floor(Math.random() * 100000)),
-        username: 'user' + i,
+        userName: 'user' + i,
         messages: i,
       });
     }
   });
 
   it('run !top messages and expect correct output', async () => {
-    const r = await top.messages({ sender: { username: getOwner() } });
+    const r = await top.messages({ sender: { userName: getOwner() } });
     assert.strictEqual(r[0].response, 'Top 10 (messages): 1. @user9 - 9, 2. @user8 - 8, 3. @user7 - 7, 4. @user6 - 6, 5. @user5 - 5, 6. @user4 - 4, 7. @user3 - 3, 8. @user2 - 2, 9. @user1 - 1, 10. @user0 - 0', owner);
   });
 
   it('add user0 to ignore list', async () => {
     const r = await tmi.ignoreAdd({ sender: owner, parameters: 'user0' });
-    assert.strictEqual(r[0].response, prepare('ignore.user.is.added' , { username: 'user0' }));
+    assert.strictEqual(r[0].response, prepare('ignore.user.is.added' , { userName: 'user0' }));
   });
 
   it('run !top messages and expect correct output', async () => {
-    const r = await top.messages({ sender: { username: getOwner() } });
+    const r = await top.messages({ sender: { userName: getOwner() } });
     assert.strictEqual(r[0].response, 'Top 10 (messages): 1. @user9 - 9, 2. @user8 - 8, 3. @user7 - 7, 4. @user6 - 6, 5. @user5 - 5, 6. @user4 - 4, 7. @user3 - 3, 8. @user2 - 2, 9. @user1 - 1', owner);
   });
 });

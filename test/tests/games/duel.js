@@ -15,8 +15,8 @@ const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 const user = require('../../general.js').user;
 
-const user1 = { username: 'user1', userId: String(_.random(999999, false)) };
-const user2 = { username: 'user2', userId: String(_.random(999999, false)) };
+const user1 = { userName: 'user1', userId: String(_.random(999999, false)) };
+const user2 = { userName: 'user2', userId: String(_.random(999999, false)) };
 const command = '!duel';
 
 describe('Gambling - duel - @func1', () => {
@@ -34,7 +34,7 @@ describe('Gambling - duel - @func1', () => {
     it('Add 200 points to duel bank', async () => {
       for (let i = 0; i < 200; i++) {
         await getRepository(Duel).save({
-          tickets: 1, username: 'user' + i, id: i,
+          tickets: 1, userName: 'user' + i, id: i,
         });
       }
       const items = await getRepository(Duel).find();
@@ -59,10 +59,10 @@ describe('Gambling - duel - @func1', () => {
 
     it('add points for users', async () => {
       await getRepository(User).save({
-        userId: user1.userId, username: user1.username, points: 100,
+        userId: user1.userId, userName: user1.userName, points: 100,
       });
       await getRepository(User).save({
-        userId: user2.userId, username: user2.username, points: 100,
+        userId: user2.userId, userName: user2.userName, points: 100,
       });
     });
 
@@ -95,7 +95,7 @@ describe('Gambling - duel - @func1', () => {
       await message.isSentRaw([
         'Congratulations to @user1! He is last man standing and he won 200 points (50% with bet of 100 points)!',
         'Congratulations to @user2! He is last man standing and he won 200 points (50% with bet of 100 points)!',
-      ], { username: 'bot' });
+      ], { userName: 'bot' });
     });
   });
 
@@ -151,7 +151,7 @@ describe('Gambling - duel - @func1', () => {
 
     it('add points for users', async () => {
       await getRepository(User).save({
-        userId: user1.userId, username: user1.username, points: 4,
+        userId: user1.userId, userName: user1.userName, points: 4,
       });
     });
 
@@ -182,7 +182,7 @@ describe('Gambling - duel - @func1', () => {
 
     it('add points for users', async () => {
       await getRepository(User).save({
-        userId: user1.userId, username: user1.username, points: 100,
+        userId: user1.userId, userName: user1.userName, points: 100,
       });
     });
 
@@ -226,7 +226,7 @@ describe('User joins duel twice', () => {
 
   it('add points for users', async () => {
     await getRepository(User).save({
-      userId: user1.userId, username: user1.username, points: 100,
+      userId: user1.userId, userName: user1.userName, points: 100,
     });
   });
 
@@ -269,13 +269,13 @@ describe('Duel is on cooldown without bypass by mods', () => {
 
   it('add points for users', async () => {
     await getRepository(User).save({
-      userId: user1.userId, username: user1.username, points: 100,
+      userId: user1.userId, userName: user1.userName, points: 100,
     });
     await getRepository(User).save({
-      userId: user.owner.userId, username: user.owner.username, points: 100,
+      userId: user.owner.userId, userName: user.owner.userName, points: 100,
     });
     await getRepository(User).save({
-      userId: user.mod.userId, username: user.mod.username, points: 100,
+      userId: user.mod.userId, userName: user.mod.userName, points: 100,
     });
   });
 
@@ -330,13 +330,13 @@ describe('Duel is on cooldown with bypass by mods', () => {
 
   it('add points for users', async () => {
     await getRepository(User).save({
-      userId: user1.userId, username: user1.username, points: 100,
+      userId: user1.userId, userName: user1.userName, points: 100,
     });
     await getRepository(User).save({
-      userId: user.owner.userId, username: user.owner.username, points: 100,
+      userId: user.owner.userId, userName: user.owner.userName, points: 100,
     });
     await getRepository(User).save({
-      userId: user.mod.userId, username: user.mod.username, points: 100,
+      userId: user.mod.userId, userName: user.mod.userName, points: 100,
     });
   });
 

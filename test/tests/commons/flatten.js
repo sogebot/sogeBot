@@ -34,10 +34,10 @@ describe('lib/commons - @func2 - unflatten()', () => {
   });
 
   it('Array of object should be correctly unflatten', async () => {
-    const object = [ { username: 'test' }, { username: 'test2' }, { 'user.name': 'test3' } ];
+    const object = [ { userName: 'test' }, { userName: 'test2' }, { 'user.name': 'test3' } ];
     assert.deepEqual(unflatten(object), [
-      { username: 'test' },
-      { username: 'test2' },
+      { userName: 'test' },
+      { userName: 'test2' },
       { user: { name: 'test3' } },
     ]);
   });

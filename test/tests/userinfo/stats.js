@@ -24,7 +24,7 @@ describe('Userinfo - stats() - @func3', () => {
   const level = '0';
 
   it('!stats testuser should show testuser data', async () => {
-    const r = await userinfo.showStats({ parameters: user.viewer.username, sender: user.owner });
+    const r = await userinfo.showStats({ parameters: user.viewer.userName, sender: user.owner });
     assert.strictEqual(r[0].response, `$touser | Level ${level} | ${hours} hours | ${points} points | ${messages} messages | €${tips} | ${bits} bits | 0 months`, user.owner, 1000);
   });
 

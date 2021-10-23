@@ -10,7 +10,7 @@ const assert = require('assert');
 const { prepare } = (require('../../../dest/helpers/commons/prepare'));
 
 // users
-const owner = { username: '__broadcaster__' };
+const owner = { userName: '__broadcaster__' };
 
 describe('Alias - @func1 - discord#707718945515503748 - alias should parse response', () => {
   before(async () => {

@@ -7,7 +7,7 @@ require('../../general.js');
 const db = require('../../general.js').db;
 const Message = require('../../../dest/message').default;
 const assert = require('assert');
-const owner = { userId: String(Math.floor(Math.random() * 100000)), username: '__broadcaster__' };
+const owner = { userId: String(Math.floor(Math.random() * 100000)), userName: '__broadcaster__' };
 
 describe('Message - (random.number-#-to-#) filter - @func3', async () => {
   beforeEach(async () => {

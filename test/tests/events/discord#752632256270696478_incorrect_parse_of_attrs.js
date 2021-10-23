@@ -45,7 +45,7 @@ describe('discord#752632256270696478 - event attrs are not correctly parsed - @f
     log.tip(`${username}, amount: 10.00EUR, message: Ahoj jak je`);
     events.fire('tip', {
       userId: String(Math.floor(Math.random * 100000)),
-      username: username,
+      userName: username,
       amount: 10.00,
       message: 'Ahoj jak je',
       currency: 'EUR',

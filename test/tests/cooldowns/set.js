@@ -7,7 +7,7 @@ const message = require('../../general.js').message;
 const cooldown = (require('../../../dest/systems/cooldown')).default;
 const assert = require('assert');
 // users
-const owner = { username: '__broadcaster__' };
+const owner = { userName: '__broadcaster__' };
 
 describe('Cooldowns - set() - @func3', () => {
   beforeEach(async () => {

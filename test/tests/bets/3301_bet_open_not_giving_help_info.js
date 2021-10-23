@@ -10,7 +10,7 @@ const bets = (require('../../../dest/systems/bets')).default;
 const assert = require('assert');
 
 // users
-const owner = { username: '__broadcaster__' };
+const owner = { userName: '__broadcaster__' };
 
 describe('Bets - @func3 - bet open do not give infromation how to use | https://github.com/sogehige/sogeBot/issues/3301', () => {
   let r = [];

@@ -16,8 +16,8 @@ const { Permissions, PermissionCommands } = require('../../../dest/database/enti
 const { User } = require('../../../dest/database/entity/user');
 
 const users = [
-  { username: '__viewer__', userId: String(6), id: 6 },
-  { username: '__excluded_viewer__', userId: String(7), id: 7 },
+  { userName: '__viewer__', userId: String(6), id: 6 },
+  { userName: '__excluded_viewer__', userId: String(7), id: 7 },
 ];
 
 describe('Permissions - https://community.sogebot.xyz/t/spotify-user-banlist/192 - exclude user from permission - @func3', () => {
@@ -47,15 +47,15 @@ describe('Permissions - https://community.sogebot.xyz/t/spotify-user-banlist/192
   for (let j = 0; j < users.length; j++) {
     const user = users[j];
     const pHash = 'bbaac669-923f-4063-99e3-f8004b34dac3';
-    if (user.username === '__viewer__') {
+    if (user.userName === '__viewer__') {
       // have access
-      it(`+++ ${users[j].username} should have access to __permission_with_excluded_user__`, async () => {
+      it(`+++ ${users[j].userName} should have access to __permission_with_excluded_user__`, async () => {
         const _check = await check(user.userId, pHash);
         assert.strictEqual(_check.access, true);
       });
     } else {
       // no access
-      it(`--- ${users[j].username} should NOT have access to __permission_with_excluded_user__`, async () => {
+      it(`--- ${users[j].userName} should NOT have access to __permission_with_excluded_user__`, async () => {
         const _check = await check(user.userId, pHash);
         assert.strictEqual(_check.access, false);
       });

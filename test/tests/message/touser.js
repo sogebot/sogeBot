@@ -5,8 +5,8 @@ require('../../general.js');
 const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 
-const owner = { username: '__broadcaster__', userId: String(Math.floor(Math.random() * 100000)) };
-const someuser = { username: 'someuser', userId: String(Math.floor(Math.random() * 100000)) };
+const owner = { userName: '__broadcaster__', userId: String(Math.floor(Math.random() * 100000)) };
+const someuser = { userName: 'someuser', userId: String(Math.floor(Math.random() * 100000)) };
 
 const { getRepository } = require('typeorm');
 const { User } = require('../../../dest/database/entity/user');

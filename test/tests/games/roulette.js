@@ -17,14 +17,14 @@ const message = require('../../general.js').message;
 const user = require('../../general.js').user;
 
 const tests = [
-  { user: { username: 'user1', userId: String(_.random(999999, false)) } },
+  { user: { userName: 'user1', userId: String(_.random(999999, false)) } },
   { user: user.owner },
   { user: user.mod },
 ];
 
 describe('game/roulette - !roulette - @func3', () => {
   for (const test of tests) {
-    describe(`${test.user.username} uses !roulette`, async () => {
+    describe(`${test.user.userName} uses !roulette`, async () => {
       let r;
       before(async () => {
         await db.cleanup();
@@ -32,15 +32,15 @@ describe('game/roulette - !roulette - @func3', () => {
         await user.prepare();
       });
 
-      it(`${test.user.username} starts roulette`, async () => {
+      it(`${test.user.userName} starts roulette`, async () => {
         r = await roulette.main({ sender: test.user });
       });
 
-      if (user.mod.username === test.user.username) {
+      if (user.mod.userName === test.user.userName) {
         it('Expecting mod message', async () => {
           assert(r[1].response === '$sender is incompement and completely missed his head!', JSON.stringify({ r }, null, 2));
         });
-      } else if (user.owner.username === test.user.username) {
+      } else if (user.owner.userName === test.user.userName) {
         it('Expecting owner message', async () => {
           assert(r[1].response === '$sender is using blanks, boo!', JSON.stringify({ r }, null, 2));
         });
@@ -97,7 +97,7 @@ describe('game/roulette - !roulette - @func3', () => {
         roulette.winnerWillGet = 0;
       });
 
-      it(`${user.viewer.username} starts roulettes and we wait for win`, async () => {
+      it(`${user.viewer.userName} starts roulettes and we wait for win`, async () => {
         let r = '';
         while (r !== '$sender is alive! Nothing happened.') {
           const responses = await roulette.main({ sender: user.viewer });
@@ -117,14 +117,14 @@ describe('game/roulette - !roulette - @func3', () => {
         await user.prepare();
         roulette.loserWillLose = 100;
         await getRepository(User).save({
-          userId: user.viewer.userId, username: user.viewer.username, points: 100,
+          userId: user.viewer.userId, userName: user.viewer.userName, points: 100,
         });
       });
       after(() => {
         roulette.loserWillLose = 0;
       });
 
-      it(`${user.viewer.username} starts roulettes and we wait for lose`, async () => {
+      it(`${user.viewer.userName} starts roulettes and we wait for lose`, async () => {
         let r = '';
         while (r !== '$sender\'s brain was splashed on the wall!') {
           const responses = await roulette.main({ sender: user.viewer });

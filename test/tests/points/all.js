@@ -11,9 +11,9 @@ const { User } = require('../../../dest/database/entity/user');
 
 const points = (require('../../../dest/systems/points')).default;
 
-const owner = { userId: String(Math.floor(Math.random() * 100000)), username: '__broadcaster__' };
-const user1 = { userId: String(Math.floor(Math.random() * 100000)), username: 'user1', points: 100 };
-const user2 = { userId: String(Math.floor(Math.random() * 100000)), username: 'user2' };
+const owner = { userId: String(Math.floor(Math.random() * 100000)), userName: '__broadcaster__' };
+const user1 = { userId: String(Math.floor(Math.random() * 100000)), userName: 'user1', points: 100 };
+const user2 = { userId: String(Math.floor(Math.random() * 100000)), userName: 'user2' };
 
 describe('Points - all() - @func1', () => {
   before(async () => {

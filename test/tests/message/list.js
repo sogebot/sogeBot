@@ -14,13 +14,13 @@ const ranks = (require('../../../dest/systems/ranks')).default;
 const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 
-const owner = { username: '__broadcaster__', userId: String(Math.floor(Math.random() * 100000)) };
+const owner = { userName: '__broadcaster__', userId: String(Math.floor(Math.random() * 100000)) };
 
 describe('Message - list filter - @func3', () => {
   before(async () => {
     await db.cleanup();
     await message.prepare();
-    await getRepository(User).save({ username: owner.username, userId: owner.userId });
+    await getRepository(User).save({ userName: owner.userName, userId: owner.userId });
   });
 
   describe('(list.alias) should return proper message', () => {

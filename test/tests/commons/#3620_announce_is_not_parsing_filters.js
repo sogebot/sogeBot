@@ -9,7 +9,7 @@ const customcommands = (require('../../../dest/systems/customcommands')).default
 const { announce } = require('../../../dest/helpers/commons/announce');
 
 // users
-const owner = { username: '__broadcaster__' };
+const owner = { userName: '__broadcaster__' };
 
 describe('Commons - @func2 - #3620 - announce is not parsing message filters', () => {
   before(async () => {

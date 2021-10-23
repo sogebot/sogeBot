@@ -21,11 +21,11 @@ const customcommands = (require('../../../dest/systems/customcommands')).default
 const gamble = (require('../../../dest/games/gamble')).default;
 
 // users
-const owner = { userId: String(Math.floor(Math.random() * 100000)), username: '__broadcaster__', badges: {} };
-const usermod1 = { userId: String(Math.floor(Math.random() * 100000)), username: 'usermod1', badges: { moderator: 1 } };
-const subuser1 = { userId: String(Math.floor(Math.random() * 100000)), username: 'subuser1', badges: { subscriber: 1 } };
-const testUser = { userId: String(Math.floor(Math.random() * 100000)), username: 'test', badges: {} };
-const testUser2 = { userId: String(Math.floor(Math.random() * 100000)), username: 'test2', badges: {} };
+const owner = { userId: String(Math.floor(Math.random() * 100000)), userName: '__broadcaster__', badges: {} };
+const usermod1 = { userId: String(Math.floor(Math.random() * 100000)), userName: 'usermod1', badges: { moderator: 1 } };
+const subuser1 = { userId: String(Math.floor(Math.random() * 100000)), userName: 'subuser1', badges: { subscriber: 1 } };
+const testUser = { userId: String(Math.floor(Math.random() * 100000)), userName: 'test', badges: {} };
+const testUser2 = { userId: String(Math.floor(Math.random() * 100000)), userName: 'test2', badges: {} };
 
 
 describe('Cooldowns - @func3 - default check', () => {
@@ -37,11 +37,11 @@ describe('Cooldowns - @func3 - default check', () => {
       gamble.enabled = true;
       cooldown.__permission_based__defaultCooldownOfCommandsInSeconds[defaultPermissions.VIEWERS] = 5;
 
-      await getRepository(User).save({ username: usermod1.username, userId: usermod1.userId, isModerator: true });
-      await getRepository(User).save({ username: subuser1.username, userId: subuser1.userId, isSubscriber: true });
-      await getRepository(User).save({ username: testUser.username, userId: testUser.userId });
-      await getRepository(User).save({ username: testUser2.username, userId: testUser2.userId });
-      await getRepository(User).save({ username: owner.username, userId: owner.userId, isSubscriber: true });
+      await getRepository(User).save({ userName: usermod1.userName, userId: usermod1.userId, isModerator: true });
+      await getRepository(User).save({ userName: subuser1.userName, userId: subuser1.userId, isSubscriber: true });
+      await getRepository(User).save({ userName: testUser.userName, userId: testUser.userId });
+      await getRepository(User).save({ userName: testUser2.userName, userId: testUser2.userId });
+      await getRepository(User).save({ userName: owner.userName, userId: owner.userId, isSubscriber: true });
 
       await time.waitMs(5000);
     });
@@ -94,11 +94,11 @@ describe('Cooldowns - @func3 - default check', () => {
       gamble.enabled = true;
       cooldown.__permission_based__defaultCooldownOfKeywordsInSeconds[defaultPermissions.VIEWERS] = 5;
 
-      await getRepository(User).save({ username: usermod1.username, userId: usermod1.userId, isModerator: true });
-      await getRepository(User).save({ username: subuser1.username, userId: subuser1.userId, isSubscriber: true });
-      await getRepository(User).save({ username: testUser.username, userId: testUser.userId });
-      await getRepository(User).save({ username: testUser2.username, userId: testUser2.userId });
-      await getRepository(User).save({ username: owner.username, userId: owner.userId, isSubscriber: true });
+      await getRepository(User).save({ userName: usermod1.userName, userId: usermod1.userId, isModerator: true });
+      await getRepository(User).save({ userName: subuser1.userName, userId: subuser1.userId, isSubscriber: true });
+      await getRepository(User).save({ userName: testUser.userName, userId: testUser.userId });
+      await getRepository(User).save({ userName: testUser2.userName, userId: testUser2.userId });
+      await getRepository(User).save({ userName: owner.userName, userId: owner.userId, isSubscriber: true });
 
       await time.waitMs(5000);
     });

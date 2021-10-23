@@ -11,7 +11,7 @@ const Message = require('../../../dest/message').default;
 const alias = (require('../../../dest/systems/alias')).default;
 const customcommands = (require('../../../dest/systems/customcommands')).default;
 const price = (require('../../../dest/systems/price')).default;
-const owner = { username: '__broadcaster__', userId: String(Math.floor(Math.random() * 100000)) };
+const owner = { userName: '__broadcaster__', userId: String(Math.floor(Math.random() * 100000)) };
 
 const { getRepository } = require('typeorm');
 const { Price } = require('../../../dest/database/entity/price');

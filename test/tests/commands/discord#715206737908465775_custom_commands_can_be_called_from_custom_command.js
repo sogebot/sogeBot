@@ -12,14 +12,14 @@ const { User } = require('../../../dest/database/entity/user');
 const customcommands = (require('../../../dest/systems/customcommands')).default;
 
 // users
-const owner = { username: '__broadcaster__', userId: String(Math.floor(Math.random() * 100000)) };
+const owner = { userName: '__broadcaster__', userId: String(Math.floor(Math.random() * 100000)) };
 
 describe('Custom Commands - @func1 - https://discordapp.com/channels/317348946144002050/619437014001123338/715206737908465775 - Custom command can be called from custom command', () => {
   before(async () => {
     await db.cleanup();
     await message.prepare();
 
-    await getRepository(User).save({ username: owner.username, userId: owner.userId });
+    await getRepository(User).save({ userName: owner.userName, userId: owner.userId });
   });
 
   describe('Custom command should correctly run second custom command', () => {
