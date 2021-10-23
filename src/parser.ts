@@ -45,7 +45,7 @@ class Parser {
     this.message = opts.message || '';
     this.id = opts.id || '';
     this.sender = opts.sender || null;
-    if (this.sender.userName) {
+    if (this.sender && this.sender.userName) {
       this.sender.username = this.sender.userName;
     }
     this.skip = opts.skip || false;
