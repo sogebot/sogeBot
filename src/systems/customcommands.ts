@@ -311,7 +311,7 @@ class CustomCommands extends System {
 
       if (!opts.quiet) {
         this.sendResponse(_.cloneDeep(_responses), {
-          param, sender: opts.sender, command: cmd.command.command, processedCommands: opts.processedCommands, discord: opts.discord
+          param, sender: opts.sender, command: cmd.command.command, processedCommands: opts.processedCommands, discord: opts.discord,
         });
       }
     }

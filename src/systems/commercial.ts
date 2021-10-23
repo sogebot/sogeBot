@@ -34,7 +34,7 @@ class Commercial extends System {
         createdAt:     Date.now(),
         emotesOffsets: new Map(),
         isAction:      false,
-        discord: undefined,
+        discord:       undefined,
       });
     });
   }

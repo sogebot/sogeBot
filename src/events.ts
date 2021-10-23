@@ -476,7 +476,7 @@ class Events extends Core {
 
     const message = attributesReplace(attributes, String(operation.messageToSend));
     parserReply(message, {
-      sender: getUserSender(userId ?? '0', userName),
+      sender:  getUserSender(userId ?? '0', userName),
       discord: undefined,
     });
   }

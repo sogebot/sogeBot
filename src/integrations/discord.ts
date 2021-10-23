@@ -603,7 +603,7 @@ class Discord extends Integration {
                     ...responses[i].attr,
                     forceWithoutAt: true, // we dont need @
                     sender:         { ...responses[i].sender },
-                    discord: { author, channel },
+                    discord:        { author, channel },
                   }) as string;
                   const reply = await channel.send(messageToSend);
                   chatOut(`#${channel.name}: ${messageToSend} [${author.tag}]`);

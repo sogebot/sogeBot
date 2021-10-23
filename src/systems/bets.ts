@@ -118,7 +118,7 @@ class Bets extends System {
           attr:          {},
           isAction:      false,
           emotesOffsets: new Map(),
-          discord: undefined,
+          discord:       undefined,
         });
       } else {
         responses = await bets.close({
@@ -129,7 +129,7 @@ class Bets extends System {
           attr:          {},
           isAction:      false,
           emotesOffsets: new Map(),
-          discord: undefined,
+          discord:       undefined,
         });
       }
       for (let i = 0; i < responses.length; i++) {
