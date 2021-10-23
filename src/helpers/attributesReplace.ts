@@ -6,16 +6,15 @@ const attributesReplace = (attributes: Events.Attributes, replaceIn: string) => 
   const atUsername = tmi.showWithAt;
   const flattenAttributes = flatten(attributes);
 
-  for (let key of Object.keys(flattenAttributes).sort((a, b) => b.length - a.length)) {
+  for (const key of Object.keys(flattenAttributes).sort((a, b) => b.length - a.length)) {
     let val = flattenAttributes[key];
-    key = key.toLowerCase();
     if (typeof val === 'object' && Object.keys(val).length === 0) {
       continue;
     } // skip empty object
     if (key.includes('username') || key.includes('recipient')) {
       val = atUsername ? `@${val}` : val;
     }
-    const replace = new RegExp(`\\$${key}`, 'g');
+    const replace = new RegExp(`\\$${key}`, 'gi');
     replaceIn = replaceIn.replace(replace, val);
   }
   return replaceIn;
