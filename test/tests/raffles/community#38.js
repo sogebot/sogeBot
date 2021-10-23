@@ -14,7 +14,7 @@ const raffles = (require('../../../dest/systems/raffles')).default;
 const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 
-const owner = { username: '__broadcaster__', userId: String(_.random(999999, false)) };
+const owner = { userName: '__broadcaster__', userId: String(_.random(999999, false)) };
 
 describe('/t/raffle-everyone-can-join-even-raffle-runned-for-subscribers/38 - @func3', () => {
   before(async () => {
@@ -24,17 +24,17 @@ describe('/t/raffle-everyone-can-join-even-raffle-runned-for-subscribers/38 - @f
 
   it('Create subscribers raffle', async () => {
     raffles.open({ sender: owner, parameters: '!winme -for subscribers.' });
-    await message.isSentRaw('Raffle is running (0 entries). To enter type "!winme". Raffle is opened for subscribers.', { username: 'bot' });
+    await message.isSentRaw('Raffle is running (0 entries). To enter type "!winme". Raffle is opened for subscribers.', { userName: 'bot' });
   });
 
   const users = ['user1', 'user2'];
   for (const [id, v] of Object.entries(users)) {
     it('Add user ' + v + ' to db', async () => {
-      await getRepository(User).save({ username: v , userId: String('100' + id) });
+      await getRepository(User).save({ userName: v , userId: String('100' + id) });
     });
 
     it('Add user ' + v + ' to raffle should fail', async () => {
-      const a = await raffles.participate({ sender: { username: v, userId: String('100' + id) }, message: '!winme' });
+      const a = await raffles.participate({ sender: { userName: v, userId: String('100' + id) }, message: '!winme' });
       assert(!a);
     });
 
@@ -44,7 +44,7 @@ describe('/t/raffle-everyone-can-join-even-raffle-runned-for-subscribers/38 - @f
         where:     { winner: null, isClosed: false },
       });
 
-      assert(typeof raffle.participants.find(o => o.username === v) === 'undefined');
+      assert(typeof raffle.participants.find(o => o.userName === v) === 'undefined');
     });
   }
 
@@ -52,12 +52,12 @@ describe('/t/raffle-everyone-can-join-even-raffle-runned-for-subscribers/38 - @f
   for (const [id, v] of Object.entries(followers)) {
     it('Add user ' + v + ' to db', async () => {
       await getRepository(User).save({
-        username: v , userId: String('100' + id), isFollower: true,
+        userName: v , userId: String('100' + id), isFollower: true,
       });
     });
 
     it('Add user ' + v + ' to raffle should fail', async () => {
-      const a = await raffles.participate({ sender: { username: v, userId: String('100' + id) }, message: '!winme' });
+      const a = await raffles.participate({ sender: { userName: v, userId: String('100' + id) }, message: '!winme' });
       assert(!a);
     });
 
@@ -75,12 +75,12 @@ describe('/t/raffle-everyone-can-join-even-raffle-runned-for-subscribers/38 - @f
   for (const [id, v] of Object.entries(subs)) {
     it('Add user ' + v + ' to db', async () => {
       await getRepository(User).save({
-        username: v , userId: String('100' + id), isSubscriber: true,
+        userName: v , userId: String('100' + id), isSubscriber: true,
       });
     });
 
     it('Add user ' + v + ' to raffle', async () => {
-      const a = await raffles.participate({ sender: { username: v, userId: String('100' + id) }, message: '!winme' });
+      const a = await raffles.participate({ sender: { userName: v, userId: String('100' + id) }, message: '!winme' });
       assert(a);
     });
 

@@ -1,8 +1,8 @@
 import { setImmediate } from 'timers';
 
+import { shuffle } from '@sogebot/ui-helpers/array';
 import * as constants from '@sogebot/ui-helpers/constants';
 import axios, { AxiosResponse } from 'axios';
-import { shuffle } from 'lodash';
 import { getManager, getRepository } from 'typeorm';
 import { v4 as uuid } from 'uuid';
 import XRegExp from 'xregexp';
@@ -338,7 +338,7 @@ class Emotes extends Core {
 
   @parser({ priority: constants.LOW, fireAndForget: true })
   async containsEmotes (opts: ParserOptions) {
-    if (!opts.sender || !Array.isArray(opts.sender.emotes)) {
+    if (!opts.sender || opts.emotesOffsets.size === 0) {
       return true;
     }
 
@@ -348,20 +348,24 @@ class Emotes extends Core {
     const cache = await getRepository(CacheEmotes).find();
 
     // add emotes from twitch which are not maybe in cache (other partner emotes etc)
-    for (const emote of opts.sender.emotes) {
+    for (const emoteId of opts.emotesOffsets.keys()) {
       // if emote is already in cache, continue
-      const emoteCode = opts.message.slice(emote.start, emote.end+1);
+      const firstEmoteOffset = opts.emotesOffsets.get(emoteId)?.shift();
+      if (!firstEmoteOffset) {
+        continue;
+      }
+      const emoteCode = opts.message.slice(Number(firstEmoteOffset.split('-')[0]), Number(firstEmoteOffset.split('-')[1])+1);
       if (cache.find((o) => o.code === emoteCode)) {
         continue;
       }
       const data: Required<CacheEmotesInterface> = {
         id:   uuid(),
         type: 'twitch',
-        code: opts.message.slice(emote.start, emote.end+1),
+        code: emoteCode,
         urls: {
-          '1': 'https://static-cdn.jtvnw.net/emoticons/v1/' + emote.id + '/1.0',
-          '2': 'https://static-cdn.jtvnw.net/emoticons/v1/' + emote.id + '/2.0',
-          '3': 'https://static-cdn.jtvnw.net/emoticons/v1/' + emote.id + '/3.0',
+          '1': 'https://static-cdn.jtvnw.net/emoticons/v1/' + emoteId + '/1.0',
+          '2': 'https://static-cdn.jtvnw.net/emoticons/v1/' + emoteId + '/2.0',
+          '3': 'https://static-cdn.jtvnw.net/emoticons/v1/' + emoteId + '/3.0',
         },
       };
 

@@ -248,7 +248,7 @@ class Heist extends Game {
     await Promise.all([
       pointsSystem.decrement({ userId: opts.sender.userId }, Number(points)),
       getRepository(HeistUser).save({
-        userId: opts.sender.userId, username: opts.sender.username, points: Number(points),
+        userId: opts.sender.userId, username: opts.sender.userName, points: Number(points),
       }), // add user to heist list
     ]);
 

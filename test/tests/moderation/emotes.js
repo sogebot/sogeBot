@@ -23,7 +23,7 @@ describe('systems/moderation - Emotes() - @func2', () => {
     });
 
     it(`message '${cEmotesEmojisAreEmotes.message}' should not timeout`, async () => {
-      assert(await moderation.emotes({ sender: cEmotesEmojisAreEmotes.sender, message: cEmotesEmojisAreEmotes.message }));
+      assert(await moderation.emotes({ emotesOffsets: new Map(), sender: cEmotesEmojisAreEmotes.sender, message: cEmotesEmojisAreEmotes.message }));
     });
   });
 
@@ -36,7 +36,7 @@ describe('systems/moderation - Emotes() - @func2', () => {
     });
 
     it(`message '${cEmotesEmojisAreEmotes.message}' should timeout`, async () => {
-      assert(!(await moderation.emotes({ sender: cEmotesEmojisAreEmotes.sender, message: cEmotesEmojisAreEmotes.message })));
+      assert(!(await moderation.emotes({ emotesOffsets: new Map(), sender: cEmotesEmojisAreEmotes.sender, message: cEmotesEmojisAreEmotes.message })));
     });
   });
 
@@ -50,16 +50,16 @@ describe('systems/moderation - Emotes() - @func2', () => {
     });
 
     it(`'${cEmotesEmojisAreEmotes.message}' should timeout`, async () => {
-      assert(!(await moderation.emotes({ sender: user.viewer, message: cEmotesEmojisAreEmotes.message })));
+      assert(!(await moderation.emotes({ emotesOffsets: new Map(), sender: user.viewer, message: cEmotesEmojisAreEmotes.message })));
     });
 
     it(`add user immunity`, async () => {
-      const r = await moderation.immune({ parameters: `${user.viewer.username} emotes 5s` });
+      const r = await moderation.immune({ parameters: `${user.viewer.userName} emotes 5s` });
       assert(r[0].response === '$sender, user @__viewer__ have emotes immunity for 5 seconds');
     });
 
     it(`'${cEmotesEmojisAreEmotes.message}' should not timeout`, async () => {
-      assert((await moderation.emotes({ sender: user.viewer, message: cEmotesEmojisAreEmotes.message })));
+      assert((await moderation.emotes({ emotesOffsets: new Map(), sender: user.viewer, message: cEmotesEmojisAreEmotes.message })));
     });
 
     it(`wait 10 seconds`, async () => {
@@ -67,7 +67,7 @@ describe('systems/moderation - Emotes() - @func2', () => {
     });
 
     it(`'${cEmotesEmojisAreEmotes.message}' should timeout`, async () => {
-      assert(!(await moderation.emotes({ sender: user.viewer, message: cEmotesEmojisAreEmotes.message })));
+      assert(!(await moderation.emotes({ emotesOffsets: new Map(), sender: user.viewer, message: cEmotesEmojisAreEmotes.message })));
     });
   });
 });

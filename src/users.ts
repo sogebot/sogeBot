@@ -49,34 +49,34 @@ class Users extends Core {
       if (connection.options.type === 'postgres') {
         query = getRepository(User).createQueryBuilder('user')
           .select('COUNT(*)')
-          .addSelect('"user"."username"')
-          .groupBy('"user"."username"')
+          .addSelect('"user"."userName"')
+          .groupBy('"user"."userName"')
           .having('COUNT(*) > 1');
       } else {
         query = getRepository(User).createQueryBuilder('user')
           .select('COUNT(*)', 'count')
-          .addSelect('user.username')
-          .groupBy('user.username')
+          .addSelect('user.userName')
+          .groupBy('user.userName')
           .having('count > 1');
       }
       const viewers = await query.getRawMany();
       await Promise.all(viewers.map(async (duplicate) => {
-        const username = duplicate.user_username;
-        const duplicates = await getRepository(User).find({ username });
+        const userName = duplicate.user_username;
+        const duplicates = await getRepository(User).find({ userName });
         await Promise.all(duplicates.map(async (user) => {
           try {
             const newUsername = await api.getUsernameFromTwitch(user.userId);
             if (newUsername === null) {
               throw new Error('unknown');
             }
-            if (newUsername !== username) {
-              changelog.update(user.userId, { username: newUsername });
-              debug('users', `Duplicate username ${user.username}#${user.userId} changed to ${newUsername}#${user.userId}`);
+            if (newUsername !== userName) {
+              changelog.update(user.userId, { userName: newUsername });
+              debug('users', `Duplicate username ${user.userName}#${user.userId} changed to ${newUsername}#${user.userId}`);
             }
           } catch (e: any) {
             // we are tagging user as __AnonymousUser__, we don't want to get rid of all information
-            debug('users', `Duplicate username ${user.username}#${user.userId} not found on Twitch => __AnonymousUser__#${user.userId}`);
-            changelog.update(user.userId, { username: '__AnonymousUser__' });
+            debug('users', `Duplicate username ${user.userName}#${user.userId} not found on Twitch => __AnonymousUser__#${user.userId}`);
+            changelog.update(user.userId, { userName: '__AnonymousUser__' });
           }
         }));
       }));
@@ -135,7 +135,7 @@ class Users extends Core {
             const users = await getRepository(User).find({ isOnline: true });
             if (isDebugEnabled('tmi.watched')) {
               for (const user of users) {
-                debug('tmi.watched', `User ${user.username}#${user.userId} added watched time ${interval}`);
+                debug('tmi.watched', `User ${user.userName}#${user.userId} added watched time ${interval}`);
               }
             }
             stats.value.currentWatchedTime = stats.value.currentWatchedTime + users.length * interval;
@@ -187,7 +187,7 @@ class Users extends Core {
         .map(async (id) => {
           const user = await changelog.get(id);
           if (user) {
-            return { [id]: user.username };
+            return { [id]: user.userName };
           }
           return { [id]: 'n/a' };
         }),
@@ -202,40 +202,40 @@ class Users extends Core {
   async getNameById (userId: string): Promise<string> {
     const user = await await changelog.get(userId);
     if (!user) {
-      const username = await api.getUsernameFromTwitch(userId);
-      if (username) {
-        changelog.update(userId, { username });
-        return username;
+      const userName = await api.getUsernameFromTwitch(userId);
+      if (userName) {
+        changelog.update(userId, { userName });
+        return userName;
       } else {
         throw new Error('Cannot get username for userId ' + userId);
       }
     }
-    return user.username;
+    return user.userName;
   }
 
-  async getIdByName (username: string) {
-    if (username.startsWith('@')) {
-      username = username.substring(1);
+  async getIdByName (userName: string) {
+    if (userName.startsWith('@')) {
+      userName = userName.substring(1);
     }
     await changelog.flush();
-    const user = await getRepository(User).findOne({ where: { username }, select: ['userId'] });
+    const user = await getRepository(User).findOne({ where: { userName }, select: ['userId'] });
     if (!user) {
-      const userId = await getIdFromTwitch(username);
-      changelog.update(userId, { username });
+      const userId = await getIdFromTwitch(userName);
+      changelog.update(userId, { userName });
       return userId;
     }
     return user.userId;
   }
 
-  async getUserByUsername(username: string, select?: FindOneOptions<Readonly<Required<UserInterface>>>['select']) {
+  async getUserByUsername(userName: string, select?: FindOneOptions<Readonly<Required<UserInterface>>>['select']) {
     await changelog.flush();
-    const userByUsername = await getRepository(User).findOne({ where: { username }, select });
+    const userByUsername = await getRepository(User).findOne({ where: { userName }, select });
 
     if (userByUsername) {
       return userByUsername;
     }
 
-    const userId = await this.getIdByName(username);
+    const userId = await this.getIdByName(userName);
     await changelog.flush();
     const userById = await changelog.get(userId);
 
@@ -361,7 +361,7 @@ class Users extends Core {
         let query;
         if (connection.options.type === 'postgres') {
           query = getRepository(User).createQueryBuilder('user')
-            .orderBy(opts.order?.orderBy ?? 'user.username' , opts.order?.sortOrder ?? 'ASC')
+            .orderBy(opts.order?.orderBy ?? 'user.userName' , opts.order?.sortOrder ?? 'ASC')
             .select('COALESCE("sumTips", 0)', 'sumTips')
             .addSelect('COALESCE("sumBits", 0)', 'sumBits')
             .addSelect('"user".*')
@@ -371,7 +371,7 @@ class Users extends Core {
             .leftJoin('(select "userId", sum("sortAmount") as "sumTips" from "user_tip" group by "userId")', 'user_tip', '"user_tip"."userId" = "user"."userId"');
         } else {
           query = getRepository(User).createQueryBuilder('user')
-            .orderBy(opts.order?.orderBy ?? 'user.username' , opts.order?.sortOrder ?? 'ASC')
+            .orderBy(opts.order?.orderBy ?? 'user.userName' , opts.order?.sortOrder ?? 'ASC')
             .select('JSON_EXTRACT(`user`.`extra`, \'$.levels.xp\')', 'levelXP')
             .addSelect('COALESCE(sumTips, 0)', 'sumTips')
             .addSelect('COALESCE(sumBits, 0)', 'sumBits')
@@ -421,10 +421,10 @@ class Users extends Core {
         if (typeof opts.search !== 'undefined') {
           query.andWhere(new Brackets(w => {
             if (connection.options.type === 'postgres') {
-              w.where('"user"."username" like :like', { like: `%${opts.search}%` });
+              w.where('"user"."userName" like :like', { like: `%${opts.search}%` });
               w.orWhere('CAST("user"."userId" AS TEXT) like :like', { like: `%${opts.search}%` });
             } else {
-              w.where('`user`.`username` like :like', { like: `%${opts.search}%` });
+              w.where('`user`.`userName` like :like', { like: `%${opts.search}%` });
               w.orWhere('CAST(`user`.`userId` AS CHAR) like :like', { like: `%${opts.search}%` });
             }
           }));
@@ -437,15 +437,16 @@ class Users extends Core {
           // add level to user
           viewer.extra = JSON.parse(viewer.extra);
           viewer.level = levels.getLevelOf(viewer);
+          viewer.username = viewer.userName;
         }
         let count = await query.getCount();
 
         if (opts.exactUsernameFromTwitch && opts.search) {
           // we need to check if viewers have already opts.search in list (we don't need to fetch twitch data)
-          if (!viewers.find(o => o.username === opts.search)) {
+          if (!viewers.find(o => o.userName === opts.search)) {
             try {
               const userId = await getIdFromTwitch(opts.search);
-              viewers.unshift({ userId, username: opts.search });
+              viewers.unshift({ userId, userName: opts.search });
               count++;
             } catch (e: any) {
               // we don't care if user is not found

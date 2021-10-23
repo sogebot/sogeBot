@@ -15,7 +15,7 @@ const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 
 // users
-const owner = { username: '__broadcaster__' };
+const owner = { userName: '__broadcaster__' };
 
 const tests = {
   false: [
@@ -39,31 +39,31 @@ const tests = {
       ],
       bets: [
         {
-          username: Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5), userId: String(Math.floor(Math.random() * 100000)), tickets: 10, betOn: 0,
+          userName: Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5), userId: String(Math.floor(Math.random() * 100000)), tickets: 10, betOn: 0,
         },
         {
-          username: Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5), userId: String(Math.floor(Math.random() * 100000)), tickets: 20, betOn: 1,
+          userName: Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5), userId: String(Math.floor(Math.random() * 100000)), tickets: 20, betOn: 1,
         },
         {
-          username: Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5), userId: String(Math.floor(Math.random() * 100000)), tickets: 30, betOn: 1,
+          userName: Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5), userId: String(Math.floor(Math.random() * 100000)), tickets: 30, betOn: 1,
         },
         {
-          username: Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5), userId: String(Math.floor(Math.random() * 100000)), tickets: 40, betOn: 1,
+          userName: Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5), userId: String(Math.floor(Math.random() * 100000)), tickets: 40, betOn: 1,
         },
         {
-          username: Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5), userId: String(Math.floor(Math.random() * 100000)), tickets: 50, betOn: 1,
+          userName: Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5), userId: String(Math.floor(Math.random() * 100000)), tickets: 50, betOn: 1,
         },
         {
-          username: Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5), userId: String(Math.floor(Math.random() * 100000)), tickets: 60, betOn: 1,
+          userName: Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5), userId: String(Math.floor(Math.random() * 100000)), tickets: 60, betOn: 1,
         },
         {
-          username: Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5), userId: String(Math.floor(Math.random() * 100000)), tickets: 70, betOn: 1,
+          userName: Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5), userId: String(Math.floor(Math.random() * 100000)), tickets: 70, betOn: 1,
         },
         {
-          username: Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5), userId: String(Math.floor(Math.random() * 100000)), tickets: 80, betOn: 1,
+          userName: Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5), userId: String(Math.floor(Math.random() * 100000)), tickets: 80, betOn: 1,
         },
         {
-          username: Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5), userId: String(Math.floor(Math.random() * 100000)), tickets: 90, betOn: 2,
+          userName: Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5), userId: String(Math.floor(Math.random() * 100000)), tickets: 90, betOn: 2,
         },
       ],
       win:        0,
@@ -82,31 +82,31 @@ const tests = {
       ],
       bets: [
         {
-          username: Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5), userId: String(Math.floor(Math.random() * 100000)), tickets: 10, betOn: 0,
+          userName: Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5), userId: String(Math.floor(Math.random() * 100000)), tickets: 10, betOn: 0,
         },
         {
-          username: Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5), userId: String(Math.floor(Math.random() * 100000)), tickets: 20, betOn: 1,
+          userName: Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5), userId: String(Math.floor(Math.random() * 100000)), tickets: 20, betOn: 1,
         },
         {
-          username: Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5), userId: String(Math.floor(Math.random() * 100000)), tickets: 30, betOn: 1,
+          userName: Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5), userId: String(Math.floor(Math.random() * 100000)), tickets: 30, betOn: 1,
         },
         {
-          username: Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5), userId: String(Math.floor(Math.random() * 100000)), tickets: 40, betOn: 1,
+          userName: Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5), userId: String(Math.floor(Math.random() * 100000)), tickets: 40, betOn: 1,
         },
         {
-          username: Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5), userId: String(Math.floor(Math.random() * 100000)), tickets: 50, betOn: 1,
+          userName: Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5), userId: String(Math.floor(Math.random() * 100000)), tickets: 50, betOn: 1,
         },
         {
-          username: Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5), userId: String(Math.floor(Math.random() * 100000)), tickets: 60, betOn: 1,
+          userName: Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5), userId: String(Math.floor(Math.random() * 100000)), tickets: 60, betOn: 1,
         },
         {
-          username: Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5), userId: String(Math.floor(Math.random() * 100000)), tickets: 70, betOn: 1,
+          userName: Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5), userId: String(Math.floor(Math.random() * 100000)), tickets: 70, betOn: 1,
         },
         {
-          username: Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5), userId: String(Math.floor(Math.random() * 100000)), tickets: 80, betOn: 1,
+          userName: Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5), userId: String(Math.floor(Math.random() * 100000)), tickets: 80, betOn: 1,
         },
         {
-          username: Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5), userId: String(Math.floor(Math.random() * 100000)), tickets: 90, betOn: 0,
+          userName: Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5), userId: String(Math.floor(Math.random() * 100000)), tickets: 90, betOn: 0,
         },
       ],
       win:        1,
@@ -166,13 +166,13 @@ describe('Bets - @func3 - workflow()', () => {
           });
 
           for (const bet of t.bets) {
-            it(`user ${bet.username} will bet on ${bet.betOn + 1} ${bet.tickets} tickets`, async () => {
+            it(`user ${bet.userName} will bet on ${bet.betOn + 1} ${bet.tickets} tickets`, async () => {
               await getRepository(User).save({
-                username: bet.username , userId: bet.userId, points: 100,
+                userName: bet.userName , userId: bet.userId, points: 100,
               });
               await bets.participate({
                 parameters: `${bet.betOn + 1} ${bet.tickets}`,
-                sender:     { username: bet.username, userId: bet.userId },
+                sender:     { userName: bet.userName, userId: bet.userId },
                 command:    '!bet',
               });
             });
@@ -185,17 +185,17 @@ describe('Bets - @func3 - workflow()', () => {
 
           for (const bet of t.bets) {
             if (t.win !== bet.betOn) {
-              it(`LOST: user ${bet.username} should have ${100 - bet.tickets} tickets`, async () => {
+              it(`LOST: user ${bet.userName} should have ${100 - bet.tickets} tickets`, async () => {
                 await changelog.flush();
-                const user = await getRepository(User).findOne({ username: bet.username , userId: bet.userId });
+                const user = await getRepository(User).findOne({ userName: bet.userName , userId: bet.userId });
                 assert.strictEqual(user.points, 100 - bet.tickets);
               });
             } else {
               const percentGain = (t.options.length * 20) / 100;
               const expected = 100 + Math.round(bet.tickets * percentGain);
-              it(`WIN: user ${bet.username} should have ${expected} tickets`, async () => {
+              it(`WIN: user ${bet.userName} should have ${expected} tickets`, async () => {
                 await changelog.flush();
-                const user = await getRepository(User).findOne({ username: bet.username , userId: bet.userId });
+                const user = await getRepository(User).findOne({ userName: bet.userName , userId: bet.userId });
                 assert.strictEqual(user.points, expected);
               });
             }

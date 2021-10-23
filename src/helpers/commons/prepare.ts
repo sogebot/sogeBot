@@ -18,14 +18,14 @@ export function prepare(toTranslate: string, attr?: {[x: string]: any }, isTrans
   })();
   for (const key of Object.keys(attr).sort((a, b) => b.length - a.length)) {
     let value = attr[key];
-    if (['username', 'who', 'winner', 'sender', 'loser'].includes(key)) {
-      if (typeof value.username !== 'undefined') {
-        value = showWithAt.value ? `@${value.username}` : value.username;
+    if (['username', 'who', 'winner', 'sender', 'loser'].includes(key.toLowerCase())) {
+      if (typeof value.username !== 'undefined' || typeof value.userName !== 'undefined') {
+        value = showWithAt.value ? `@${value.username || value.userName}` : value.username || value.userName;
       } else {
         value = showWithAt.value ? `@${value}` : value;
       }
     }
-    msg = msg.replace(new RegExp('[$]' + key, 'g'), value);
+    msg = msg.replace(new RegExp('[$]' + key, 'gi'), value);
   }
   return msg;
 }

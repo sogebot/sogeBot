@@ -47,7 +47,7 @@ const evaluate: ResponseFilter = {
       await changelog.flush();
       allUsers = await getRepository(User).find();
     }
-    const user = await users.getUserByUsername(attr.sender.username);
+    const user = await users.getUserByUsername(attr.sender.userName);
 
     let onlineViewers: Readonly<Required<UserInterface>>[] = [];
     let onlineSubscribers: Readonly<Required<UserInterface>>[] = [];
@@ -56,11 +56,11 @@ const evaluate: ResponseFilter = {
     if (containOnline) {
       await changelog.flush();
       const viewers = (await getRepository(User).createQueryBuilder('user')
-        .where('user.username != :botusername', { botusername: oauth.botUsername.toLowerCase() })
-        .andWhere('user.username != :broadcasterusername', { broadcasterusername: oauth.broadcasterUsername.toLowerCase() })
+        .where('user.userName != :botusername', { botusername: oauth.botUsername.toLowerCase() })
+        .andWhere('user.userName != :broadcasterusername', { broadcasterusername: oauth.broadcasterUsername.toLowerCase() })
         .andWhere('user.isOnline = :isOnline', { isOnline: true })
         .getMany()).filter(o => {
-        return isIgnored({ username: o.username, userId: o.userId });
+        return isIgnored({ userName: o.userName, userId: o.userId });
       });
 
       onlineViewers = viewers;
@@ -70,13 +70,13 @@ const evaluate: ResponseFilter = {
 
     const randomVar = {
       online: {
-        viewer:     sample(onlineViewers.map(o => o.username)),
-        follower:   sample(onlineFollowers.map(o => o.username)),
-        subscriber: sample(onlineSubscribers.map(o => o.username)),
+        viewer:     sample(onlineViewers.map(o => o.userName)),
+        follower:   sample(onlineFollowers.map(o => o.userName)),
+        subscriber: sample(onlineSubscribers.map(o => o.userName)),
       },
-      viewer:     sample(allUsers.map(o => o.username)),
-      follower:   sample(allUsers.filter((o) => _.get(o, 'is.follower', false)).map(o => o.username)),
-      subscriber: sample(allUsers.filter((o) => _.get(o, 'is.subscriber', false)).map(o => o.username)),
+      viewer:     sample(allUsers.map(o => o.userName)),
+      follower:   sample(allUsers.filter((o) => _.get(o, 'is.follower', false)).map(o => o.userName)),
+      subscriber: sample(allUsers.filter((o) => _.get(o, 'is.subscriber', false)).map(o => o.userName)),
     };
     const is = {
       follower: user.isFollower, subscriber: user.isSubscriber, moderator: user.isModerator, vip: user.isVIP, online: user.isOnline,
@@ -98,7 +98,7 @@ const evaluate: ResponseFilter = {
       users:  allUsers,
       is:     is,
       random: randomVar,
-      sender: tmi.showWithAt ? `@${attr.sender.username}` : `${attr.sender.username}`,
+      sender: tmi.showWithAt ? `@${attr.sender.userName}` : `${attr.sender.userName}`,
       param:  typeof attr.param === 'undefined'  ? null : attr.param,
       url:    {},
     };

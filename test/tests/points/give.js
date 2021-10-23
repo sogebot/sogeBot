@@ -13,10 +13,10 @@ const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 
 const user1 = {
-  username: 'user1', points: 100, userId: String(_.random(999999, false)),
+  userName: 'user1', points: 100, userId: String(_.random(999999, false)),
 };
 const user2 = {
-  username: 'user2', points: 100, userId: String(_.random(999999, false)),
+  userName: 'user2', points: 100, userId: String(_.random(999999, false)),
 };
 
 describe('Points - give() - @func1', () => {
@@ -28,13 +28,13 @@ describe('Points - give() - @func1', () => {
 
     it('create user1', async () => {
       await getRepository(User).save({
-        username: user1.username, userId: user1.userId, points: user1.points,
+        userName: user1.userName, userId: user1.userId, points: user1.points,
       });
     });
 
     it('create user2', async () => {
       await getRepository(User).save({
-        username: user2.username, userId: user2.userId, points: user2.points,
+        userName: user2.userName, userId: user2.userId, points: user2.points,
       });
     });
 
@@ -68,13 +68,13 @@ describe('Points - give() - @func1', () => {
 
     it('create user1', async () => {
       await getRepository(User).save({
-        username: user1.username, userId: user1.userId, points: user1.points,
+        userName: user1.userName, userId: user1.userId, points: user1.points,
       });
     });
 
     it('create user2', async () => {
       await getRepository(User).save({
-        username: user2.username, userId: user2.userId, points: user2.points,
+        userName: user2.userName, userId: user2.userId, points: user2.points,
       });
     });
 
@@ -108,13 +108,13 @@ describe('Points - give() - @func1', () => {
 
     it('create user1', async () => {
       await getRepository(User).save({
-        username: user1.username, userId: user1.userId, points: user1.points,
+        userName: user1.userName, userId: user1.userId, points: user1.points,
       });
     });
 
     it('create user2', async () => {
       await getRepository(User).save({
-        username: user2.username, userId: user2.userId, points: user2.points,
+        userName: user2.userName, userId: user2.userId, points: user2.points,
       });
     });
 
@@ -148,13 +148,13 @@ describe('Points - give() - @func1', () => {
 
     it('create user1', async () => {
       await getRepository(User).save({
-        username: user1.username, userId: user1.userId, points: user1.points,
+        userName: user1.userName, userId: user1.userId, points: user1.points,
       });
     });
 
     it('create user2', async () => {
       await getRepository(User).save({
-        username: user2.username, userId: user2.userId, points: user2.points,
+        userName: user2.userName, userId: user2.userId, points: user2.points,
       });
     });
 
@@ -190,13 +190,13 @@ describe('Points - give() - @func1', () => {
 
     it('create user1', async () => {
       await getRepository(User).save({
-        username: user1.username, userId: user1.userId, points: user1.points,
+        userName: user1.userName, userId: user1.userId, points: user1.points,
       });
     });
 
     it('create user2', async () => {
       await getRepository(User).save({
-        username: user2.username, userId: user2.userId, points: user2.points,
+        userName: user2.userName, userId: user2.userId, points: user2.points,
       });
     });
 
@@ -232,13 +232,13 @@ describe('Points - give() - @func1', () => {
 
     it('create user1', async () => {
       await getRepository(User).save({
-        username: user1.username, userId: user1.userId, points: user1.points,
+        userName: user1.userName, userId: user1.userId, points: user1.points,
       });
     });
 
     it('create user2', async () => {
       await getRepository(User).save({
-        username: user2.username, userId: user2.userId, points: 0,
+        userName: user2.userName, userId: user2.userId, points: 0,
       });
     });
 

@@ -56,7 +56,6 @@ class Gamble extends Game {
   async main (opts: CommandOptions): Promise<CommandResponse[]> {
     let points, message;
 
-    opts.sender['message-type'] = 'chat'; // force responses to chat
     try {
       const parsed = opts.parameters.trim().match(/^([\d]+|all)$/);
       if (isNil(parsed)) {
@@ -87,7 +86,7 @@ class Gamble extends Game {
         const incrementPointsWithJackpot = (points * 2) + this.jackpotValue;
         changelog.increment(opts.sender.userId, { points: incrementPointsWithJackpot });
 
-        const user = await users.getUserByUsername(opts.sender.username);
+        const user = await users.getUserByUsername(opts.sender.userName);
         set(user, 'extra.jackpotWins', get(user, 'extra.jackpotWins', 0) + 1);
         changelog.update(user.userId, user);
 
@@ -171,7 +170,7 @@ class Gamble extends Game {
   @command('!gamble wins')
   async wins (opts: CommandOptions): Promise<CommandResponse[]> {
     let message: string;
-    const user = await users.getUserByUsername(opts.sender.username);
+    const user = await users.getUserByUsername(opts.sender.userName);
     if (this.enableJackpot) {
       message = prepare('gambling.gamble.winJackpotCount', {
         command: this.getCommand('!gamble wins'),

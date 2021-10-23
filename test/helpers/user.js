@@ -5,63 +5,63 @@ const { generalOwners } = require('../../dest/helpers/oauth/generalOwners');
 
 const viewer = {
   userId:   '1',
-  username: '__viewer__',
+  userName: '__viewer__',
   badges:   {},
   emotes:   [],
 };
 
 const viewer2 = {
   userId:   '3',
-  username: '__viewer2__',
+  userName: '__viewer2__',
   badges:   {},
   emotes:   [],
 };
 
 const viewer3 = {
   userId:   '5',
-  username: '__viewer3__',
+  userName: '__viewer3__',
   badges:   {},
   emotes:   [],
 };
 
 const viewer4 = {
   userId:   '50',
-  username: '__viewer4__',
+  userName: '__viewer4__',
   badges:   {},
   emotes:   [],
 };
 
 const viewer5 = {
   userId:   '55',
-  username: '__viewer5__',
+  userName: '__viewer5__',
   badges:   {},
   emotes:   [],
 };
 
 const viewer6 = {
   userId:   '56',
-  username: '__viewer6__',
+  userName: '__viewer6__',
   badges:   {},
   emotes:   [],
 };
 
 const viewer7 = {
   userId:   '57',
-  username: '__viewer7__',
+  userName: '__viewer7__',
   badges:   {},
   emotes:   [],
 };
 
 const owner = {
   userId:   '2',
-  username: '__broadcaster__',
+  userName: '__broadcaster__',
   badges:   {},
   emotes:   [],
 };
 
 const mod = {
   userId:      '4',
-  username:    '__mod__',
+  userName:    '__mod__',
   badges:      {},
   emotes:      [],
   isModerator: true,
@@ -82,14 +82,18 @@ module.exports = {
     await getRepository(User).save(owner);
     await getRepository(User).save(mod);
     // set owner as broadcaster
-    oauth.broadcasterUsername = owner.username;
-    generalOwners.value = [owner.username, '__owner__'];
+    oauth.broadcasterUsername = owner.userName;
+    generalOwners.value = [owner.userName, '__owner__'];
     // clean perm cache
     cleanViewersCache();
   },
   viewer,
   viewer2,
   viewer3,
+  viewer4,
+  viewer5,
+  viewer6,
+  viewer7,
   owner,
   mod,
 };

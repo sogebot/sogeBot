@@ -100,7 +100,7 @@ class Qiwi extends Integration {
 
       eventEmitter.emit('tip', {
         isAnonymous:         username ? false : true,
-        username:            username || 'Anonymous',
+        userName:            username || 'Anonymous',
         amount:              String(amount),
         currency:            DONATION_CURRENCY,
         amountInBotCurrency: Number(currency.exchange(amount, DONATION_CURRENCY, mainCurrency.value)).toFixed(2),
@@ -119,7 +119,7 @@ class Qiwi extends Integration {
       });
 
       triggerInterfaceOnTip({
-        username: username || 'Anonymous',
+        userName: username || 'Anonymous',
         amount,
         message,
         currency: DONATION_CURRENCY,

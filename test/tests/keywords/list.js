@@ -12,7 +12,7 @@ const { Keyword } = require('../../../dest/database/entity/keyword');
 const { User } = require('../../../dest/database/entity/user');
 
 // users
-const owner = { username: '__broadcaster__', userId: String(Math.floor(Math.random() * 100000)) };
+const owner = { userName: '__broadcaster__', userId: String(Math.floor(Math.random() * 100000)) };
 
 describe('Keywords - list() - @func2', () => {
   beforeEach(async () => {

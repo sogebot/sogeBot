@@ -223,7 +223,7 @@ class Donationalerts extends Integration {
 
       eventEmitter.emit('tip', {
         isAnonymous:         false,
-        username:            data.username.toLowerCase(),
+        userName:            data.username.toLowerCase(),
         amount:              data.amount.toFixed(2),
         currency:            data.currency,
         amountInBotCurrency: Number(currency.exchange(Number(data.amount), data.currency, mainCurrency.value)).toFixed(2),
@@ -272,7 +272,7 @@ class Donationalerts extends Integration {
       });
     }
     triggerInterfaceOnTip({
-      username: isAnonymous ? 'anonymous' : data.username.toLowerCase(),
+      userName: isAnonymous ? 'anonymous' : data.username.toLowerCase(),
       amount:   data.amount,
       message:  data.message,
       currency: data.currency,

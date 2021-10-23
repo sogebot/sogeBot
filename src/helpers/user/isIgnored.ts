@@ -15,8 +15,8 @@ let globalIgnoreList = JSON.parse(readFileSync('./assets/globalIgnoreList.json',
 
 class HelpersUserIsIgnored {
   @timer()
-  isIgnored(sender: { username: string | null; userId?: string }) {
-    if (sender.username === null) {
+  isIgnored(sender: { userName: string | null; userId?: string }) {
+    if (sender.userName === null) {
       return false; // null can be bot from dashboard or event
     }
 
@@ -24,29 +24,29 @@ class HelpersUserIsIgnored {
       return isIgnoredCache.get(sender.userId);
     }
 
-    if (isIgnoredCache.has(sender.username)) {
-      return isIgnoredCache.get(sender.username);
+    if (isIgnoredCache.has(sender.userName)) {
+      return isIgnoredCache.get(sender.userName);
     }
 
-    const isInIgnoreList = getIgnoreList().includes(sender.username) || getIgnoreList().includes(sender.userId);
+    const isInIgnoreList = getIgnoreList().includes(sender.userName) || getIgnoreList().includes(sender.userId);
     const isIgnoredCheck = (isInGlobalIgnoreList(sender) || isInIgnoreList) && !isBroadcaster(sender);
 
     if (sender.userId) {
       isIgnoredCache.set(sender.userId, isIgnoredCheck);
     }
-    isIgnoredCache.set(sender.username, isIgnoredCheck);
+    isIgnoredCache.set(sender.userName, isIgnoredCheck);
     return isIgnoredCheck;
   }
 }
 const cl = new HelpersUserIsIgnored();
 
-export function isInGlobalIgnoreList (sender: { username: string | null; userId?: string }) {
+export function isInGlobalIgnoreList (sender: { userName: string | null; userId?: string }) {
   return typeof getGlobalIgnoreList().find(data => {
-    return data.id === sender.userId || data.known_aliases.includes((sender.username || '').toLowerCase());
+    return data.id === sender.userId || data.known_aliases.includes((sender.userName || '').toLowerCase());
   }) !== 'undefined';
 }
 
-export function isIgnored(sender: { username: string | null; userId?: string }) {
+export function isIgnored(sender: { userName: string | null; userId?: string }) {
   return cl.isIgnored(sender);
 }
 

@@ -44,8 +44,8 @@ describe('API - @func2 - getLatest100Followers()', () => {
     });
 
     it('follow events should have correct usernames', async () => {
-      assert(eventEmitter.emit.calledWith('follow', { username: 'testfollow', userId: String(111) }));
-      assert(eventEmitter.emit.calledWith('follow', { username: 'testfollow2', userId: String(222) }));
+      assert(eventEmitter.emit.calledWith('follow', { userName: 'testfollow', userId: String(111) }));
+      assert(eventEmitter.emit.calledWith('follow', { userName: 'testfollow2', userId: String(222) }));
     });
 
     it('second call should be properly parsed', async () => {
@@ -59,8 +59,8 @@ describe('API - @func2 - getLatest100Followers()', () => {
     });
 
     it('follow events should have correct usernames', async () => {
-      assert(eventEmitter.emit.calledWith('follow', { username: 'testfollow', userId: String(111) }));
-      assert(eventEmitter.emit.calledWith('follow', { username: 'testfollow2', userId: String(222) }));
+      assert(eventEmitter.emit.calledWith('follow', { userName: 'testfollow', userId: String(111) }));
+      assert(eventEmitter.emit.calledWith('follow', { userName: 'testfollow2', userId: String(222) }));
     });
   });
 });

@@ -25,15 +25,15 @@ describe('Raffles - several raffle joins shouldnt go over max - @func3', () => {
 
   it('create ticket raffle', async () => {
     raffles.open({ sender: user.owner, parameters: '!winme -min 0 -max 100' });
-    await message.isSentRaw('Raffle is running (0 entries). To enter type "!winme <1-100>". Raffle is opened for everyone.', { username: 'bot' });
+    await message.isSentRaw('Raffle is running (0 entries). To enter type "!winme <1-100>". Raffle is opened for everyone.', { userName: 'bot' });
   });
 
   it('Update viewer and viewer2 to have 200 points', async () => {
     await getRepository(User).save({
-      username: user.viewer.username, userId: user.viewer.userId, points: 200,
+      userName: user.viewer.userName, userId: user.viewer.userId, points: 200,
     });
     await getRepository(User).save({
-      username: user.viewer2.username, userId: user.viewer2.userId, points: 200,
+      userName: user.viewer2.userName, userId: user.viewer2.userId, points: 200,
     });
   });
 
@@ -69,13 +69,13 @@ describe('Raffles - several raffle joins shouldnt go over max - @func3', () => {
 
   it('expecting viewer to have 100 points', async () => {
     await changelog.flush();
-    const userFromDb = await getRepository(User).findOne({ where: { username: user.viewer.username } });
+    const userFromDb = await getRepository(User).findOne({ where: { userName: user.viewer.userName } });
     assert.strictEqual(userFromDb.points, 100);
   });
 
   it('expecting viewer2 to have 150 points', async () => {
     await changelog.flush();
-    const userFromDb = await getRepository(User).findOne({ where: { username: user.viewer2.username } });
+    const userFromDb = await getRepository(User).findOne({ where: { userName: user.viewer2.userName } });
     assert.strictEqual(userFromDb.points, 150);
   });
 });

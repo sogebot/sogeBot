@@ -11,10 +11,10 @@ const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 
 // users
-const testuser = { username: 'testuser', userId: '1' };
-const testuser2 = { username: 'testuser2', userId: '2' };
-const testuser3 = { username: 'testuser3', userId: '3' };
-const nightbot = { username: 'nightbot', userId: '4' };
+const testuser = { userName: 'testuser', userId: '1' };
+const testuser2 = { userName: 'testuser2', userId: '2' };
+const testuser3 = { userName: 'testuser3', userId: '3' };
+const nightbot = { userName: 'nightbot', userId: '4' };
 
 let translatedIds;
 
@@ -39,8 +39,8 @@ describe('User - getUsernamesFromIds - @func1', () => {
     });
 
     for (const user of [testuser, testuser2, testuser3, nightbot]) {
-      it(`Expecting id ${user.userId} have correct username ${user.username}`, () => {
-        assert.strictEqual(translatedIds.get(user.userId), user.username);
+      it(`Expecting id ${user.userId} have correct username ${user.userName}`, () => {
+        assert.strictEqual(translatedIds.get(user.userId), user.userName);
       });
     }
   });

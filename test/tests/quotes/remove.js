@@ -14,7 +14,7 @@ const { Quotes } = require('../../../dest/database/entity/quotes');
 const quotes = (require('../../../dest/systems/quotes')).default;
 
 // users
-const owner = { username: '__broadcaster__', userId: 1 };
+const owner = { userName: '__broadcaster__', userId: 1 };
 
 
 const tests = [

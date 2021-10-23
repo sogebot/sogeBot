@@ -13,16 +13,16 @@ const message = require('../../general.js').message;
 
 // users
 const owner = {
-  userId: String(Math.floor(Math.random() * 100000)), badges: {}, username: '__broadcaster__',
+  userId: String(Math.floor(Math.random() * 100000)), badges: {}, userName: '__broadcaster__',
 };
 const follower = {
-  badges: {}, username: 'follower', userId: String(_.random(999999, false)), isFollower: true,
+  badges: {}, userName: 'follower', userId: String(_.random(999999, false)), isFollower: true,
 };
 const commonUser = {
-  badges: {}, username: 'user1', userId: String(_.random(999999, false)),
+  badges: {}, userName: 'user1', userId: String(_.random(999999, false)),
 };
 const commonUser2 = {
-  badges: {}, username: 'user2', userId: String(_.random(999999, false)),
+  badges: {}, userName: 'user2', userId: String(_.random(999999, false)),
 };
 
 describe('Cooldowns - toggleFollowers() - @func3', () => {

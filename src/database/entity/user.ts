@@ -3,7 +3,7 @@ import { EntitySchema } from 'typeorm';
 import { ColumnNumericTransformer, SafeNumberTransformer } from './_transformer';
 
 export interface UserInterface {
-  userId: string; username: string; displayname?: string; profileImageUrl?: string;
+  userId: string; userName: string; displayname?: string; profileImageUrl?: string;
   isOnline?: boolean; isVIP?: boolean; isFollower?: boolean; isModerator?: boolean; isSubscriber?: boolean;
   haveSubscriberLock?: boolean; haveFollowerLock?: boolean; haveSubscribedAtLock?: boolean; haveFollowedAtLock?: boolean; rank?: string; haveCustomRank?: boolean;
   followedAt?: number; followCheckAt?: number; subscribedAt?: number; seenAt?: number; createdAt?: number;
@@ -40,7 +40,7 @@ export const User = new EntitySchema<Readonly<Required<UserInterface>>>({
       type:    String,
       primary: true,
     },
-    username:    { type: String },
+    userName:    { type: String },
     displayname: {
       type:    String,
       default: '',
@@ -110,7 +110,7 @@ export const User = new EntitySchema<Readonly<Required<UserInterface>>>({
   indices: [
     {
       name:    'IDX_78a916df40e02a9deb1c4b75ed',
-      columns: [ 'username' ],
+      columns: [ 'userName' ],
     },
   ],
 });

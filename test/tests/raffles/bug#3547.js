@@ -25,12 +25,12 @@ describe('Raffles - over max limit points not adding to raffle #3547 - @func3', 
 
   it('create ticket raffle', async () => {
     raffles.open({ sender: user.owner, parameters: '!winme -min 0 -max 100' });
-    await message.isSentRaw('Raffle is running (0 entries). To enter type "!winme <1-100>". Raffle is opened for everyone.', { username: 'bot' });
+    await message.isSentRaw('Raffle is running (0 entries). To enter type "!winme <1-100>". Raffle is opened for everyone.', { userName: 'bot' });
   });
 
   it('Update viewer to have 1000 points', async () => {
     await getRepository(User).save({
-      username: user.viewer.username, userId: user.viewer.userId, points: 1000,
+      userName: user.viewer.userName, userId: user.viewer.userId, points: 1000,
     });
   });
 
@@ -50,7 +50,7 @@ describe('Raffles - over max limit points not adding to raffle #3547 - @func3', 
 
   it('User should have 900 points', async () => {
     await changelog.flush();
-    const result = await getRepository(User).findOne({ username: user.viewer.username, userId: user.viewer.userId });
+    const result = await getRepository(User).findOne({ userName: user.viewer.userName, userId: user.viewer.userId });
     assert(result.points === 900);
   });
 });

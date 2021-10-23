@@ -15,11 +15,11 @@ const db = require('../../general.js').db;
 
 const max = 100;
 
-const owner = { username: '__broadcaster__', userId: String(_.random(999999, false)) };
-const testuser = { username: 'testuser', userId: String(_.random(999999, false)) };
-const testuser2 = { username: 'testuser2', userId: String(_.random(999999, false)) };
-const testuser3 = { username: 'testuser3', userId: String(_.random(999999, false)) };
-const testuser4 = { username: 'testuser4', userId: String(_.random(999999, false)) };
+const owner = { userName: '__broadcaster__', userId: String(_.random(999999, false)) };
+const testuser = { userName: 'testuser', userId: String(_.random(999999, false)) };
+const testuser2 = { userName: 'testuser2', userId: String(_.random(999999, false)) };
+const testuser3 = { userName: 'testuser3', userId: String(_.random(999999, false)) };
+const testuser4 = { userName: 'testuser4', userId: String(_.random(999999, false)) };
 
 describe('Raffles - user should be able to compete within boundaries of tickets - @func1', () => {
   before(async () => {
@@ -30,25 +30,25 @@ describe('Raffles - user should be able to compete within boundaries of tickets 
 
   it('create ticket raffle', async () => {
     raffles.open({ sender: owner, parameters: '!winme -min 0 -max ' + max });
-    await message.isSentRaw('Raffle is running (0 entries). To enter type "!winme <1-100>". Raffle is opened for everyone.', { username: 'bot' });
+    await message.isSentRaw('Raffle is running (0 entries). To enter type "!winme <1-100>". Raffle is opened for everyone.', { userName: 'bot' });
   });
 
   it('create testuser/testuser2/testuser3 with max points', async () => {
-    await getRepository(User).delete({ username: testuser.username });
-    await getRepository(User).delete({ username: testuser2.username });
-    await getRepository(User).delete({ username: testuser3.username });
-    await getRepository(User).delete({ username: testuser4.username });
+    await getRepository(User).delete({ userName: testuser.userName });
+    await getRepository(User).delete({ userName: testuser2.userName });
+    await getRepository(User).delete({ userName: testuser3.userName });
+    await getRepository(User).delete({ userName: testuser4.userName });
     await getRepository(User).save({
-      username: testuser.username, userId: testuser.userId, points: max,
+      userName: testuser.userName, userId: testuser.userId, points: max,
     });
     await getRepository(User).save({
-      username: testuser2.username, userId: testuser2.userId, points: max,
+      userName: testuser2.userName, userId: testuser2.userId, points: max,
     });
     await getRepository(User).save({
-      username: testuser3.username, userId: testuser3.userId, points: max,
+      userName: testuser3.userName, userId: testuser3.userId, points: max,
     });
     await getRepository(User).save({
-      username: testuser4.username, userId: testuser4.userId, points: max,
+      userName: testuser4.userName, userId: testuser4.userId, points: max,
     });
   });
 
@@ -76,13 +76,13 @@ describe('Raffles - user should be able to compete within boundaries of tickets 
     assert.strictEqual(await getRepository(RaffleParticipant).count(), 2);
   });
 
-  for (const viewer of [testuser.username, testuser2.username]) {
+  for (const viewer of [testuser.userName, testuser2.userName]) {
     it(`user ${viewer} should be in raffle participants`, async () => {
       assert.strictEqual(await getRepository(RaffleParticipant).count({ username: viewer }), 1);
     });
   }
 
-  for (const viewer of [testuser3.username, testuser4.username]) {
+  for (const viewer of [testuser3.userName, testuser4.userName]) {
     it(`user ${viewer} should not be in raffle participants`, async () => {
       assert.strictEqual(await getRepository(RaffleParticipant).count({ username: viewer }), 0);
     });

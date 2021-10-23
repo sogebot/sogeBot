@@ -14,7 +14,7 @@ const { getRepository } = require('typeorm');
 const { User } = require('../../../dest/database/entity/user');
 
 // users
-const owner = { username: '__broadcaster__', userId: String(Math.floor(Math.random() * 100000)) };
+const owner = { userName: '__broadcaster__', userId: String(Math.floor(Math.random() * 100000)) };
 
 const parseFailedTests = [
   { permission: null, command: null, rid: null, response: null },
@@ -56,7 +56,7 @@ describe('Custom Commands - @func1 - edit()', () => {
     await db.cleanup();
     await message.prepare();
 
-    await getRepository(User).save({ username: owner.username, userId: owner.userId });
+    await getRepository(User).save({ userName: owner.userName, userId: owner.userId });
   });
 
   describe('Expected parsed fail', () => {

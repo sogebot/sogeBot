@@ -26,14 +26,14 @@ import * as changelog from '../user/changelog.js';
 import { isModerator } from '../user/isModerator';
 import { getAll } from './getAll';
 
-async function runScript (script: string, opts: { sender: { userId: string; username: string; source: 'twitch' | 'discord' } | string | null, isUI: boolean; param?: string | number, _current: any }) {
+async function runScript (script: string, opts: { sender: { userId: string; userName: string; source: 'twitch' | 'discord' } | string | null, isUI: boolean; param?: string | number, _current: any }) {
   debug('customvariables.eval', opts);
   let sender = !isNil(opts.sender) ? opts.sender : null;
   const isUI = !isNil(opts.isUI) ? opts.isUI : false;
   const param = !isNil(opts.param) ? opts.param : null;
   if (typeof sender === 'string') {
     sender = {
-      username: sender,
+      userName: sender,
       userId:   await users.getIdByName(sender),
       source:   'twitch',
     };
@@ -66,14 +66,14 @@ async function runScript (script: string, opts: { sender: { userId: string; user
         isSubscriber: true,
         isOnline:     true,
       },
-    })).map(o => o.username);
+    })).map(o => o.userName);
     await changelog.flush();
     onlineFollowers = (await getRepository(User).find({
       where: {
         isFollower: true,
         isOnline:   true,
       },
-    })).map(o => o.username);
+    })).map(o => o.userName);
   }
 
   const randomVar = {
@@ -82,9 +82,9 @@ async function runScript (script: string, opts: { sender: { userId: string; user
       follower:   sample(onlineFollowers),
       subscriber: sample(onlineSubscribers),
     },
-    viewer:     sample(map(usersList, 'username')),
-    follower:   sample(map(filter(usersList, (o) => get(o, 'isFollower', false)), 'username')),
-    subscriber: sample(map(filter(usersList, (o) => get(o, 'isSubscriber', false)), 'username')),
+    viewer:     sample(map(usersList, 'userName')),
+    follower:   sample(map(filter(usersList, (o) => get(o, 'isFollower', false)), 'userName')),
+    subscriber: sample(map(filter(usersList, (o) => get(o, 'isSubscriber', false)), 'userName')),
   };
 
   // get custom variables
@@ -146,12 +146,12 @@ async function runScript (script: string, opts: { sender: { userId: string; user
     warning:  warning,
     param:    param,
     _current: opts._current,
-    user:     async (username: string) => {
+    user:     async (userName: string) => {
       await changelog.flush();
-      const _user = await getRepository(User).findOne({ username });
+      const _user = await getRepository(User).findOne({ userName });
       if (_user) {
         const userObj = {
-          username,
+          userName,
           id:          String(_user.userId),
           displayname: _user.displayname,
           is:          {
@@ -166,16 +166,16 @@ async function runScript (script: string, opts: { sender: { userId: string; user
       } else {
         try {
           // we don't have data of user, we will try to get them
-          const userFromTwitch = await getUserFromTwitch(username);
+          const userFromTwitch = await getUserFromTwitch(userName);
           changelog.update(userFromTwitch.id, {
-            username,
+            userName,
             userId:          userFromTwitch.id,
             displayname:     userFromTwitch.display_name,
             profileImageUrl: userFromTwitch.profile_image_url,
           });
 
           const userObj = {
-            username,
+            userName,
             id:          userFromTwitch.id,
             displayname: userFromTwitch.display_name,
             is:          {

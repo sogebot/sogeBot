@@ -4,7 +4,7 @@ require('../../general.js');
 
 const assert = require('assert');
 
-const owner = { userId: String(Math.floor(Math.random() * 100000)), username: '__broadcaster__' };
+const owner = { userId: String(Math.floor(Math.random() * 100000)), userName: '__broadcaster__' };
 const constants = require('@sogebot/ui-helpers/constants');
 const { getRepository } = require('typeorm');
 

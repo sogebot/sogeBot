@@ -190,7 +190,7 @@ class StreamElements extends Integration {
         isAnonymous = true;
       }).finally(() => {
         eventEmitter.emit('tip', {
-          username:            username.toLowerCase(),
+          userName:            username.toLowerCase(),
           amount:              Number(amount).toFixed(2),
           currency:            DONATION_CURRENCY,
           amountInBotCurrency: Number(currency.exchange(amount, DONATION_CURRENCY, mainCurrency.value)).toFixed(2),
@@ -209,7 +209,7 @@ class StreamElements extends Integration {
         });
 
         triggerInterfaceOnTip({
-          username: username.toLowerCase(),
+          userName: username.toLowerCase(),
           amount,
           message,
           currency: DONATION_CURRENCY,

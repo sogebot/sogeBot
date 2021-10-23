@@ -120,7 +120,7 @@ class Top extends System {
   }
 
   private async showTop(opts: CommandOptions): Promise<CommandResponse[]> {
-    let sorted: {username: string; value: string | number}[] = [];
+    let sorted: {userName: string; value: string | number}[] = [];
     let message;
     let i = 0;
     const type = opts.parameters;
@@ -133,32 +133,32 @@ class Top extends System {
       case TYPE.LEVEL: {
         let rawSQL = '';
         if (connection.options.type === 'better-sqlite3') {
-          rawSQL = `SELECT JSON_EXTRACT("user"."extra", '$.levels.xp') AS "data", "userId", "username"
+          rawSQL = `SELECT JSON_EXTRACT("user"."extra", '$.levels.xp') AS "data", "userId", "userName"
             FROM "user" "user"
-            WHERE "user"."username" IS NOT '${oauth.botUsername.toLowerCase()}'
-              AND "user"."username" IS NOT '${oauth.broadcasterUsername.toLowerCase()}'
+            WHERE "user"."userName" IS NOT '${oauth.botUsername.toLowerCase()}'
+              AND "user"."userName" IS NOT '${oauth.broadcasterUsername.toLowerCase()}'
             ORDER BY length(data) DESC, data DESC LIMIT ${_total}`;
         } else if (connection.options.type === 'postgres') {
-          rawSQL = `SELECT "user"."userId", "user"."username", CAST("data" as text)
+          rawSQL = `SELECT "user"."userId", "user"."userName", CAST("data" as text)
             FROM "user", JSON_EXTRACT_PATH("extra"::json, 'levels') AS "data"
-            WHERE "user"."username" != '${oauth.botUsername.toLowerCase()}'
-              AND "user"."username" != '${oauth.broadcasterUsername.toLowerCase()}'
+            WHERE "user"."userName" != '${oauth.botUsername.toLowerCase()}'
+              AND "user"."userName" != '${oauth.broadcasterUsername.toLowerCase()}'
             ORDER BY length("data"::text) DESC, "data"::text DESC
             LIMIT ${_total}`;
         } else if (connection.options.type === 'mysql') {
-          rawSQL = `SELECT JSON_EXTRACT(\`user\`.\`extra\`, '$.levels.xp') AS \`data\`, \`userId\`, \`username\`
+          rawSQL = `SELECT JSON_EXTRACT(\`user\`.\`extra\`, '$.levels.xp') AS \`data\`, \`userId\`, \`userName\`
             FROM \`user\` \`user\`
-            WHERE \`user\`.\`username\` != '${oauth.botUsername.toLowerCase()}'
-              AND \`user\`.\`username\` != '${oauth.broadcasterUsername.toLowerCase()}'
+            WHERE \`user\`.\`userName\` != '${oauth.botUsername.toLowerCase()}'
+              AND \`user\`.\`userName\` != '${oauth.broadcasterUsername.toLowerCase()}'
             ORDER BY length(\`data\`) DESC, data DESC LIMIT ${_total}`;
         }
-        const users = (await getManager().query(rawSQL)).filter((o: any) => !isIgnored({ username: o.username, userId: o.userId }));
+        const users = (await getManager().query(rawSQL)).filter((o: any) => !isIgnored({ userName: o.userName, userId: o.userId }));
 
         for (const rawUser of users) {
           const user = await changelog.get(rawUser.userId);
           if (user) {
             const currentXP = unserialize<bigint>(user.extra?.levels?.xp) ?? BigInt(0);
-            sorted.push({ username: user.username, value: `${levels.getLevelOf(user)} (${currentXP}XP)` });
+            sorted.push({ userName: user.userName, value: `${levels.getLevelOf(user)} (${currentXP}XP)` });
           }
         }
         message = translate('systems.top.level').replace(/\$amount/g, 10);
@@ -167,14 +167,14 @@ class Top extends System {
       case TYPE.TIME:
         sorted
           = (await getRepository(User).createQueryBuilder('user')
-            .where('user.username != :botusername', { botusername: oauth.botUsername.toLowerCase() })
-            .andWhere('user.username != :broadcasterusername', { broadcasterusername: oauth.broadcasterUsername.toLowerCase() })
+            .where('user.userName != :botusername', { botusername: oauth.botUsername.toLowerCase() })
+            .andWhere('user.userName != :broadcasterusername', { broadcasterusername: oauth.broadcasterUsername.toLowerCase() })
             .orderBy('user.watchedTime', 'DESC')
             .limit(_total)
             .getMany())
-            .filter(o => !isIgnored({ username: o.username, userId: o.userId }))
+            .filter(o => !isIgnored({ userName: o.userName, userId: o.userId }))
             .map(o => {
-              return { username: o.username, value: o.watchedTime };
+              return { userName: o.userName, value: o.watchedTime };
             });
         message = translate('systems.top.time').replace(/\$amount/g, 10);
         break;
@@ -184,13 +184,13 @@ class Top extends System {
          = (await getRepository(User).createQueryBuilder('user')
             .orderBy('value', 'DESC')
             .addSelect('COALESCE(SUM(user_tip.sortAmount), 0)', 'value')
-            .addSelect('user.username')
+            .addSelect('user.userName')
             .limit(_total)
-            .where('user.username != :botusername', { botusername: oauth.botUsername.toLowerCase() })
+            .where('user.userName != :botusername', { botusername: oauth.botUsername.toLowerCase() })
             .innerJoin('user_tip', 'user_tip', joinTip)
             .groupBy('user.userId')
             .getRawMany()
-          ).filter(o => !isIgnored({ username: o.username, userId: o.userId }));
+          ).filter(o => !isIgnored({ userName: o.userName, userId: o.userId }));
         message = translate('systems.top.tips').replace(/\$amount/g, 10);
         break;
       }
@@ -200,60 +200,60 @@ class Top extends System {
         }
         sorted
          = (await getRepository(User).createQueryBuilder('user')
-            .where('user.username != :botusername', { botusername: oauth.botUsername.toLowerCase() })
-            .andWhere('user.username != :broadcasterusername', { broadcasterusername: oauth.broadcasterUsername.toLowerCase() })
+            .where('user.userName != :botusername', { botusername: oauth.botUsername.toLowerCase() })
+            .andWhere('user.userName != :broadcasterusername', { broadcasterusername: oauth.broadcasterUsername.toLowerCase() })
             .orderBy('user.points', 'DESC')
             .limit(_total)
             .getMany())
-            .filter(o => !isIgnored({ username: o.username, userId: o.userId }))
+            .filter(o => !isIgnored({ userName: o.userName, userId: o.userId }))
             .map(o => {
-              return { username: o.username, value: o.points };
+              return { userName: o.userName, value: o.points };
             });
         message = translate('systems.top.points').replace(/\$amount/g, 10);
         break;
       case TYPE.MESSAGES:
         sorted
           = (await getRepository(User).createQueryBuilder('user')
-            .where('user.username != :botusername', { botusername: oauth.botUsername.toLowerCase() })
-            .andWhere('user.username != :broadcasterusername', { broadcasterusername: oauth.broadcasterUsername.toLowerCase() })
+            .where('user.userName != :botusername', { botusername: oauth.botUsername.toLowerCase() })
+            .andWhere('user.userName != :broadcasterusername', { broadcasterusername: oauth.broadcasterUsername.toLowerCase() })
             .orderBy('user.messages', 'DESC')
             .limit(_total)
             .getMany())
-            .filter(o => !isIgnored({ username: o.username, userId: o.userId }))
+            .filter(o => !isIgnored({ userName: o.userName, userId: o.userId }))
             .map(o => {
-              return { username: o.username, value: o.messages };
+              return { userName: o.userName, value: o.messages };
             });
         message = translate('systems.top.messages').replace(/\$amount/g, 10);
         break;
       case TYPE.FOLLOWAGE:
         sorted
           = (await getRepository(User).createQueryBuilder('user')
-            .where('user.username != :botusername', { botusername: oauth.botUsername.toLowerCase() })
-            .andWhere('user.username != :broadcasterusername', { broadcasterusername: oauth.broadcasterUsername.toLowerCase() })
+            .where('user.userName != :botusername', { botusername: oauth.botUsername.toLowerCase() })
+            .andWhere('user.userName != :broadcasterusername', { broadcasterusername: oauth.broadcasterUsername.toLowerCase() })
             .andWhere('user.isFollower = :isFollower', { isFollower: true })
             .andWhere('user.followedAt > 0')
             .orderBy('user.followedAt', 'ASC')
             .limit(_total)
             .getMany())
-            .filter(o => !isIgnored({ username: o.username, userId: o.userId }))
+            .filter(o => !isIgnored({ userName: o.userName, userId: o.userId }))
             .map(o => {
-              return { username: o.username, value: o.followedAt };
+              return { userName: o.userName, value: o.followedAt };
             });
         message = translate('systems.top.followage').replace(/\$amount/g, 10);
         break;
       case TYPE.SUBAGE:
         sorted
           = (await getRepository(User).createQueryBuilder('user')
-            .where('user.username != :botusername', { botusername: oauth.botUsername.toLowerCase() })
-            .andWhere('user.username != :broadcasterusername', { broadcasterusername: oauth.broadcasterUsername.toLowerCase() })
+            .where('user.userName != :botusername', { botusername: oauth.botUsername.toLowerCase() })
+            .andWhere('user.userName != :broadcasterusername', { broadcasterusername: oauth.broadcasterUsername.toLowerCase() })
             .andWhere('user.isSubscriber = :isSubscriber', { isSubscriber: true })
             .andWhere('user.subscribedAt > 0')
             .orderBy('user.subscribedAt', 'ASC')
             .limit(_total)
             .getMany())
-            .filter(o => !isIgnored({ username: o.username, userId: o.userId }))
+            .filter(o => !isIgnored({ userName: o.userName, userId: o.userId }))
             .map(o => {
-              return { username: o.username, value: o.subscribedAt };
+              return { userName: o.userName, value: o.subscribedAt };
             });
         message = translate('systems.top.subage').replace(/\$amount/g, 10);
         break;
@@ -263,41 +263,41 @@ class Top extends System {
          = (await getRepository(User).createQueryBuilder('user')
             .orderBy('value', 'DESC')
             .addSelect('COALESCE(SUM(user_bit.amount), 0)', 'value')
-            .addSelect('user.username')
+            .addSelect('user.userName')
             .limit(_total)
-            .andWhere('user.username != :broadcasterusername', { broadcasterusername: oauth.broadcasterUsername.toLowerCase() })
+            .andWhere('user.userName != :broadcasterusername', { broadcasterusername: oauth.broadcasterUsername.toLowerCase() })
             .innerJoin('user_bit', 'user_bit', joinBit)
             .groupBy('user.userId')
             .getRawMany()
-          ).filter(o => !isIgnored({ username: o.username, userId: o.userId }));
+          ).filter(o => !isIgnored({ userName: o.userName, userId: o.userId }));
         message = translate('systems.top.bits').replace(/\$amount/g, 10);
         break;
       }
       case TYPE.GIFTS:
         sorted
           = (await getRepository(User).createQueryBuilder('user')
-            .where('user.username != :botusername', { botusername: oauth.botUsername.toLowerCase() })
-            .andWhere('user.username != :broadcasterusername', { broadcasterusername: oauth.broadcasterUsername.toLowerCase() })
+            .where('user.userName != :botusername', { botusername: oauth.botUsername.toLowerCase() })
+            .andWhere('user.userName != :broadcasterusername', { broadcasterusername: oauth.broadcasterUsername.toLowerCase() })
             .orderBy('user.giftedSubscribes', 'DESC')
             .limit(_total)
             .getMany())
-            .filter(o => !isIgnored({ username: o.username, userId: o.userId }))
+            .filter(o => !isIgnored({ userName: o.userName, userId: o.userId }))
             .map(o => {
-              return { username: o.username, value: o.giftedSubscribes };
+              return { userName: o.userName, value: o.giftedSubscribes };
             });
         message = translate('systems.top.gifts').replace(/\$amount/g, 10);
         break;
       case TYPE.SUBMONTHS:
         sorted
           = (await getRepository(User).createQueryBuilder('user')
-            .where('user.username != :botusername', { botusername: oauth.botUsername.toLowerCase() })
-            .andWhere('user.username != :broadcasterusername', { broadcasterusername: oauth.broadcasterUsername.toLowerCase() })
+            .where('user.userName != :botusername', { botusername: oauth.botUsername.toLowerCase() })
+            .andWhere('user.userName != :broadcasterusername', { broadcasterusername: oauth.broadcasterUsername.toLowerCase() })
             .orderBy('user.subscribeCumulativeMonths', 'DESC')
             .limit(_total)
             .getMany())
-            .filter(o => !isIgnored({ username: o.username, userId: o.userId }))
+            .filter(o => !isIgnored({ userName: o.userName, userId: o.userId }))
             .map(o => {
-              return { username: o.username, value: o.subscribeCumulativeMonths };
+              return { userName: o.userName, value: o.subscribeCumulativeMonths };
             });
         message = translate('systems.top.submonths').replace(/\$amount/g, 10);
         break;
@@ -308,7 +308,7 @@ class Top extends System {
       sorted = _.chunk(sorted, 10)[0];
 
       for (const user of sorted) {
-        message += (i + 1) + '. ' + (tmi.showWithAt ? '@' : '') + (user.username || 'unknown') + ' - ';
+        message += (i + 1) + '. ' + (tmi.showWithAt ? '@' : '') + (user.userName || 'unknown') + ' - ';
         switch (type) {
           case TYPE.TIME:
             message += Intl.NumberFormat(general.lang, {

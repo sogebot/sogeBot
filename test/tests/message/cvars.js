@@ -20,8 +20,8 @@ _.set(global, 'widgets.custom_variables.io.emit', function () {});
 
 describe('Message - cvars filter - @func3', async () => {
   const users = [
-    { username: '__owner__', userId: String(Math.floor(Math.random() * 100000)), permission: defaultPermissions.CASTERS },
-    { username: '__viewer__', userId: String(Math.floor(Math.random() * 100000)), permission: defaultPermissions.VIEWERS },
+    { userName: '__owner__', userId: String(Math.floor(Math.random() * 100000)), permission: defaultPermissions.CASTERS },
+    { userName: '__viewer__', userId: String(Math.floor(Math.random() * 100000)), permission: defaultPermissions.VIEWERS },
   ];
   const tests = [
     {
@@ -142,11 +142,11 @@ describe('Message - cvars filter - @func3', async () => {
   for (const p of ['CASTERS'] /*Object.keys(defaultPermissions)*/) {
     describe('Custom variable with ' + p + ' permission', async () => {
       for (const user of users) {
-        describe('Custom variable with ' + p + ' permission => Testing with ' + user.username, async () => {
+        describe('Custom variable with ' + p + ' permission => Testing with ' + user.userName, async () => {
           for (const test of tests) {
             let message = null;
             let testName = null;
-            if (user.username === '__owner__' || (user.username === '__viewer__' && p === 'VIEWERS')) {
+            if (user.userName === '__owner__' || (user.userName === '__viewer__' && p === 'VIEWERS')) {
               testName =`'${test.test}' expect '${test.command.replace(/\$_test|\$!_test/g, test.afterValue)}' with value after ${test.afterValue}`;
             } else {
               testName =`'${test.test}' expect '${test.command.replace(/\$_test|\$!_test/g, test.initialValue)}' with value after ${test.afterValue} because insufficient permissions`;
@@ -179,7 +179,7 @@ describe('Message - cvars filter - @func3', async () => {
                 });
               });
               it('message parsed correctly', async () => {
-                if (user.username === '__owner__' || (user.username === '__viewer__' && p === 'VIEWERS')) {
+                if (user.userName === '__owner__' || (user.userName === '__viewer__' && p === 'VIEWERS')) {
                   if (test.responseType === 2 ) {
                     assert.strictEqual(message, test.command.replace(/\$_test|\$!_test/g, test.afterValue));
                   } else {
@@ -191,15 +191,15 @@ describe('Message - cvars filter - @func3', async () => {
               });
 
               if (test.params.param) {
-                if (test.expectedSent && (user.username === '__owner__' || (user.username === '__viewer__' && p === 'VIEWERS'))) {
+                if (test.expectedSent && (user.userName === '__owner__' || (user.userName === '__viewer__' && p === 'VIEWERS'))) {
                   it('expecting set message', async () => {
-                    await msg.isSent('filters.setVariable', { username: user.username }, { sender: getOwner(), variable: '$_test', value: test.afterValue }, 1000);
+                    await msg.isSent('filters.setVariable', { userName: user.userName }, { sender: getOwner(), variable: '$_test', value: test.afterValue }, 1000);
                   });
                 } else {
                   it('not expecting set message', async () => {
                     let notSent = false;
                     try {
-                      await msg.isSent('filters.setVariable', { username: user.username }, { sender: getOwner(), variable: '$_test', value: test.afterValue }, 1000);
+                      await msg.isSent('filters.setVariable', { userName: user.userName }, { sender: getOwner(), variable: '$_test', value: test.afterValue }, 1000);
                     } catch (e) {
                       notSent = true;
                     }
@@ -208,7 +208,7 @@ describe('Message - cvars filter - @func3', async () => {
                 }
               }
 
-              if (user.username === '__owner__' || (user.username === '__viewer__' && p === 'VIEWERS')) {
+              if (user.userName === '__owner__' || (user.userName === '__viewer__' && p === 'VIEWERS')) {
                 it(`check if after value is ${test.afterValue}`, async () => {
                   const cvar = await getRepository(Variable).findOne({ variableName: test.variable });
                   assert.strictEqual(String(cvar.currentValue), String(test.afterValue));
@@ -229,7 +229,7 @@ describe('Message - cvars filter - @func3', async () => {
                 });
               });
               it('message parsed correctly', async () => {
-                if (user.username === '__owner__' || (user.username === '__viewer__' && p === 'VIEWERS')) {
+                if (user.userName === '__owner__' || (user.userName === '__viewer__' && p === 'VIEWERS')) {
                   assert.strictEqual(message, test.command.replace(/\$_test|\$!_test/g, test.afterValue));
                 } else {
                   assert.strictEqual(message, test.command.replace(/\$_test|\$!_test/g, test.initialValue));
@@ -276,7 +276,7 @@ describe('Message - cvars filter - @func3', async () => {
                 it('not expecting set message', async () => {
                   let notSent = false;
                   try {
-                    await msg.isSent('filters.setVariable', { username: user.username }, { sender: getOwner(), variable: '$_test', value: test.afterValue }, 1000);
+                    await msg.isSent('filters.setVariable', { userName: user.userName }, { sender: getOwner(), variable: '$_test', value: test.afterValue }, 1000);
                   } catch (e) {
                     notSent = true;
                   }

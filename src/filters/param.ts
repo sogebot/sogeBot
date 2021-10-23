@@ -13,7 +13,7 @@ const param: ResponseFilter = {
         return attr.param;
       }
     }
-    return (tmi.showWithAt ? '@' : '') + attr.sender.username;
+    return (tmi.showWithAt ? '@' : '') + attr.sender.userName;
   },
   '$param': async function (_variable, attr) {
     if (typeof attr.param !== 'undefined' && attr.param.length !== 0) {

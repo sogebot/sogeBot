@@ -9,7 +9,7 @@ const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 
 // users
-const owner = { username: '__broadcaster__' };
+const owner = { userName: '__broadcaster__' };
 
 let scrim;
 describe('Scrim - full workflow', () => {
@@ -89,7 +89,7 @@ describe('Scrim - full workflow', () => {
     });
 
     it('Check match list by command', async () => {
-      const r = await scrim.match({ sender: { username: 'test' }, parameters: '' });
+      const r = await scrim.match({ sender: { userName: 'test' }, parameters: '' });
       assert.strictEqual(r[0].response, 'Current Matches: <empty>');
     });
   });
@@ -169,7 +169,7 @@ describe('Scrim - full workflow', () => {
     });
 
     it('Check match list by command', async () => {
-      const r = await scrim.match({ sender: { username: 'test' }, parameters: '' });
+      const r = await scrim.match({ sender: { userName: 'test' }, parameters: '' });
       assert.strictEqual(r[0].response, 'Current Matches: <empty>');
     });
   });
@@ -255,7 +255,7 @@ describe('Scrim - full workflow', () => {
       it('Add ' + user + ' to match with id ' + matchId, async () => {
         scrim.match({
           parameters: matchId,
-          sender:     { username: user, userId: String(Math.floor(Math.random() * 100000)) },
+          sender:     { userName: user, userId: String(Math.floor(Math.random() * 100000)) },
         });
       });
     }
@@ -263,7 +263,7 @@ describe('Scrim - full workflow', () => {
     it('Add user4 to match with id ABD', async () => {
       scrim.match({
         parameters: 'ABD',
-        sender:     { username: 'user4' },
+        sender:     { userName: 'user4' },
       });
     });
 
@@ -273,7 +273,7 @@ describe('Scrim - full workflow', () => {
     });
 
     it('Check match list by command', async () => {
-      const r = await scrim.match({ sender: { username: 'test' }, parameters: '' });
+      const r = await scrim.match({ sender: { userName: 'test' }, parameters: '' });
       assert.strictEqual(r[0].response, 'Current Matches: ABC - @user1, @user2, @user3 | ABD - @user4');
     });
   });

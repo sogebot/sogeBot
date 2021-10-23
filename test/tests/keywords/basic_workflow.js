@@ -13,7 +13,7 @@ const { Keyword } = require('../../../dest/database/entity/keyword');
 const keywords = (require('../../../dest/systems/keywords')).default;
 
 // users
-const owner = { userId: String(Math.floor(Math.random() * 100000)), username: '__broadcaster__' };
+const owner = { userId: String(Math.floor(Math.random() * 100000)), userName: '__broadcaster__' };
 
 function randomString() {
   return Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5);

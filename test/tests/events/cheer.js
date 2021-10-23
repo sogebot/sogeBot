@@ -47,11 +47,11 @@ describe('Events - cheer event - @func3', () => {
       describe(username + ' cheer event', () => {
         it('trigger cheer event for 1 bit - ' + username, async () => {
           await tmi.cheer({
-            username,
-            'user-id': userId,
-            bits:      1,
+            userName: username,
+            userId: userId,
           },
           Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5),
+          1,
           );
         });
 

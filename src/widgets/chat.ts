@@ -1,24 +1,18 @@
 import axios from 'axios';
 
+import { getUserSender } from '../helpers/commons';
 import { sendMessage } from '../helpers/commons/sendMessage';
 import { botId } from '../helpers/oauth/botId';
+import { botUsername } from '../helpers/oauth/botUsername';
 import { generalChannel } from '../helpers/oauth/generalChannel';
 import { adminEndpoint, publicEndpoint } from '../helpers/socket';
 import { getIgnoreList } from '../helpers/user/isIgnored';
-import OAuth from '../oauth';
 import Widget from './_interface';
 
 class Chat extends Widget {
   public sockets() {
     adminEndpoint(this.nsp, 'chat.message.send', async (message) => {
-      sendMessage(message, {
-        username:       OAuth.botUsername,
-        displayName:    OAuth.botUsername,
-        userId:         botId.value,
-        emotes:         [],
-        badges:         {},
-        'message-type': 'chat',
-      }, { force: true });
+      sendMessage(message, getUserSender(botId.value, botUsername.value), { force: true });
     });
 
     publicEndpoint(this.nsp, 'room', async (cb: (error: null, data: string) => void) => {

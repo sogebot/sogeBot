@@ -17,8 +17,8 @@ const message = require('../../general.js').message;
 const cooldown = (require('../../../dest/systems/cooldown')).default;
 
 // users
-const owner = { userId: String(Math.floor(Math.random() * 100000)), username: '__broadcaster__', badges: {} };
-const testUser = { userId: String(Math.floor(Math.random() * 100000)), username: 'test', badges: {} };
+const owner = { userId: String(Math.floor(Math.random() * 100000)), userName: '__broadcaster__', badges: {} };
+const testUser = { userId: String(Math.floor(Math.random() * 100000)), userName: 'test', badges: {} };
 
 
 describe('cooldown - @func3 check should not endlessly loop', () => {
@@ -26,7 +26,7 @@ describe('cooldown - @func3 check should not endlessly loop', () => {
     await db.cleanup();
     await message.prepare();
 
-    await getRepository(User).save({ username: owner.username, userId: owner.userId, isSubscriber: true });
+    await getRepository(User).save({ userName: owner.userName, userId: owner.userId, isSubscriber: true });
 
   });
 

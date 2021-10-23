@@ -11,6 +11,9 @@ const message = require('../../general.js').message;
 const user = require('../../general.js').user;
 const time = require('../../general.js').time;
 
+const emotesOffsetsKAPOW = new Map();
+emotesOffsetsKAPOW.set('133537', ['7-11', '13-17']);
+
 const tests = {
   'timeout': [
     { message: 'AAAAAAAAAAAAAAAAAAAAAA', sender: user.viewer },
@@ -22,13 +25,7 @@ const tests = {
     { message: 'SomeMSG SomeMSg', sender: user.viewer },
     { message: '123123123213123123123123213123', sender: user.viewer },
     {
-      message: 'zdarec KAPOW KAPOW', sender:  {
-        ...user.viewer, emotes: [{
-          id: '133537', start: 7, end: 11,
-        }, {
-          id: '133537', start: 13, end: 17,
-        }],
-      },
+      message: 'zdarec KAPOW KAPOW', sender: user.viewer, emotesOffsets: emotesOffsetsKAPOW,
     },
     { message: '😀 😁 😂 🤣 😃 😄 😅 😆 😉 😊 😋 😎 😍 😘 😗 😙 😚 🙂 🤗 🤩 🤔 🤨 😐 😑 😶 🙄 😏 😣 😥 😮 🤐 😯 😪 😫 😴 😌 😛 😜 😝 🤤 😒 😓 😔 😕 🙃 🤑 😲 ☹️ 🙁 😖 😞 😟 😤 😢 😭 😦 😧 😨 😩 🤯 😬 😰 😱', sender: user.viewer },
   ],
@@ -45,13 +42,13 @@ describe('systems/moderation - Caps() - @func2', () => {
 
     for (const test of tests.timeout) {
       it(`message '${test.message}' should not timeout`, async () => {
-        assert(await moderation.caps({ sender: test.sender, message: test.message }));
+        assert(await moderation.caps({ emotesOffsets: test.emotesOffsets ? test.emotesOffsets : new Map(), sender: test.sender, message: test.message }));
       });
     }
 
     for (const test of tests.ok) {
       it(`message '${test.message}' should not timeout`, async () => {
-        assert(await moderation.caps({ sender: test.sender, message: test.message }));
+        assert(await moderation.caps({ emotesOffsets: test.emotesOffsets ? test.emotesOffsets : new Map(), sender: test.sender, message: test.message }));
       });
     }
   });
@@ -63,13 +60,13 @@ describe('systems/moderation - Caps() - @func2', () => {
 
     for (const test of tests.timeout) {
       it(`message '${test.message}' should timeout`, async () => {
-        assert(!(await moderation.caps({ sender: test.sender, message: test.message })));
+        assert(!(await moderation.caps({ emotesOffsets: test.emotesOffsets ? test.emotesOffsets : new Map(), sender: test.sender, message: test.message })));
       });
     }
 
     for (const test of tests.ok) {
       it(`message '${test.message}' should not timeout`, async () => {
-        assert(await moderation.caps({ sender: test.sender, message: test.message }));
+        assert(await moderation.caps({ emotesOffsets: test.emotesOffsets ? test.emotesOffsets : new Map(), sender: test.sender, message: test.message }));
       });
     }
   });
@@ -82,16 +79,16 @@ describe('systems/moderation - Caps() - @func2', () => {
     });
 
     it(`'AAAAAAAAAAAAAAAAAAAAAA' should timeout`, async () => {
-      assert(!(await moderation.caps({ sender: user.viewer, message: 'AAAAAAAAAAAAAAAAAAAAAA' })));
+      assert(!(await moderation.caps({ emotesOffsets: new Map(), sender: user.viewer, message: 'AAAAAAAAAAAAAAAAAAAAAA' })));
     });
 
     it(`add user immunity`, async () => {
-      const r = await moderation.immune({ parameters: `${user.viewer.username} caps 5s` });
+      const r = await moderation.immune({ parameters: `${user.viewer.userName} caps 5s` });
       assert(r[0].response === '$sender, user @__viewer__ have caps immunity for 5 seconds');
     });
 
     it(`'AAAAAAAAAAAAAAAAAAAAAA' should not timeout`, async () => {
-      assert((await moderation.caps({ sender: user.viewer, message: 'AAAAAAAAAAAAAAAAAAAAAA' })));
+      assert((await moderation.caps({ emotesOffsets: new Map(), sender: user.viewer, message: 'AAAAAAAAAAAAAAAAAAAAAA' })));
     });
 
     it(`wait 10 seconds`, async () => {
@@ -99,7 +96,7 @@ describe('systems/moderation - Caps() - @func2', () => {
     });
 
     it(`'AAAAAAAAAAAAAAAAAAAAAA' should timeout`, async () => {
-      assert(!(await moderation.caps({ sender: user.viewer, message: 'AAAAAAAAAAAAAAAAAAAAAA' })));
+      assert(!(await moderation.caps({ emotesOffsets: new Map(), sender: user.viewer, message: 'AAAAAAAAAAAAAAAAAAAAAA' })));
     });
   });
 });

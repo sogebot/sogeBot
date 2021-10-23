@@ -1,6 +1,7 @@
 import * as constants from '@sogebot/ui-helpers/constants';
 import { getRepository } from 'typeorm';
-import { v4 as uuid } from 'uuid';
+import { v4 } from 'uuid';
+//import { v4 as uuid } from 'uuid';
 import XRegExp from 'xregexp';
 
 import { parserReply } from '../commons';
@@ -47,7 +48,7 @@ class EmotesCombo extends System {
 
   @parser({ priority: constants.LOW, fireAndForget: true })
   async containsEmotes (opts: ParserOptions) {
-    if (!opts.sender || !Array.isArray(opts.sender.emotes) || !this.enabled) {
+    if (!opts.sender || opts.emotesOffsets.size === 0 || !this.enabled) {
       return true;
     }
 
@@ -57,20 +58,25 @@ class EmotesCombo extends System {
     const cache = await getRepository(CacheEmotes).find();
 
     // add emotes from twitch which are not maybe in cache (other partner emotes etc)
-    for (const emote of opts.sender.emotes) {
+    for (const emoteId of opts.emotesOffsets.keys()) {
       // if emote is already in cache, continue
-      const emoteCode = opts.message.slice(emote.start, emote.end+1);
+      const firstEmoteOffset = opts.emotesOffsets.get(emoteId)?.shift();
+      if (!firstEmoteOffset) {
+        continue;
+      }
+      const emoteCode = opts.message.slice(Number(firstEmoteOffset.split('-')[0]), Number(firstEmoteOffset.split('-')[1])+1);
+
       if (cache.find((o) => o.code === emoteCode)) {
         continue;
       }
       const data: Required<CacheEmotesInterface> = {
-        id:   uuid(),
+        id:   v4(),
         type: 'twitch',
-        code: opts.message.slice(emote.start, emote.end+1),
+        code: emoteCode,
         urls: {
-          '1': 'https://static-cdn.jtvnw.net/emoticons/v1/' + emote.id + '/1.0',
-          '2': 'https://static-cdn.jtvnw.net/emoticons/v1/' + emote.id + '/2.0',
-          '3': 'https://static-cdn.jtvnw.net/emoticons/v1/' + emote.id + '/3.0',
+          '1': 'https://static-cdn.jtvnw.net/emoticons/v1/' + emoteId + '/1.0',
+          '2': 'https://static-cdn.jtvnw.net/emoticons/v1/' + emoteId + '/2.0',
+          '3': 'https://static-cdn.jtvnw.net/emoticons/v1/' + emoteId + '/3.0',
         },
       };
 
@@ -78,6 +84,7 @@ class EmotesCombo extends System {
 
       // update emotes in cache
       await getRepository(CacheEmotes).save(data);
+
     }
 
     for (let j = 0, jl = cache.length; j < jl; j++) {

@@ -42,7 +42,7 @@ async function setValueOf (variable: string | Readonly<VariableInterface>, curre
   } else {
     if (typeof opts.sender === 'string') {
       opts.sender = {
-        username: opts.sender,
+        userName: opts.sender,
         userId:   await users.getIdByName(opts.sender),
         source:   'twitch',
       };
@@ -60,7 +60,7 @@ async function setValueOf (variable: string | Readonly<VariableInterface>, curre
         const userPermission = await get(highestPermission);
         const variablePermission = await get(item.permission);
         if (userPermission && variablePermission) {
-          warning(`User ${opts.sender.username}#${opts.sender.userId}(${userPermission.name}) doesn't have permission to change variable ${item.variableName}(${variablePermission.name})`);
+          warning(`User ${opts.sender.userName}#${opts.sender.userId}(${userPermission.name}) doesn't have permission to change variable ${item.variableName}(${variablePermission.name})`);
         }
       }
       isOk = false;

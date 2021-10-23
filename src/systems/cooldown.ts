@@ -156,7 +156,7 @@ class Cooldown extends System {
         }), ...opts,
       }];
     } catch (e: any) {
-      error(`${opts.command} ${opts.parameters} [${opts.sender.username}#${opts.sender.userId}]`);
+      error(`${opts.command} ${opts.parameters} [${opts.sender.userName}#${opts.sender.userId}]`);
       error(e.stack);
       if (e instanceof ParameterError) {
         return this.help(opts);
@@ -303,7 +303,7 @@ class Cooldown extends System {
         if (cooldown.type === 'default') {
           debug('cooldown.check', `Checking default cooldown ${cooldown.name} (${cooldown.permId}) ${cooldown.canBeRunAt}`);
           if (cooldown.canBeRunAt >= Date.now()) {
-            debug('cooldown.check', `${opts.sender.username}#${opts.sender.userId} have ${cooldown.name} on global default cooldown, remaining ${Math.ceil((cooldown.canBeRunAt - Date.now()) / 1000)}s`);
+            debug('cooldown.check', `${opts.sender.userName}#${opts.sender.userId} have ${cooldown.name} on global default cooldown, remaining ${Math.ceil((cooldown.canBeRunAt - Date.now()) / 1000)}s`);
             result = false;
           } else {
             const savedCooldown = defaultCooldowns.find(o =>
@@ -336,7 +336,7 @@ class Cooldown extends System {
             cooldown.viewers = cooldown.viewers?.filter(o => o.id !== item.id);
           }
         }
-        debug('cooldown.db', viewer ?? `${opts.sender.username}#${opts.sender.userId} not found in cooldown list`);
+        debug('cooldown.db', viewer ?? `${opts.sender.userName}#${opts.sender.userId} not found in cooldown list`);
         if (cooldown.type === 'global') {
           timestamp = cooldown.timestamp ?? 0;
         } else {
@@ -351,7 +351,7 @@ class Cooldown extends System {
               timestamp: now,
             });
           } else {
-            debug('cooldown.check', `${opts.sender.username}#${opts.sender.userId} added to cooldown list.`);
+            debug('cooldown.check', `${opts.sender.userName}#${opts.sender.userId} added to cooldown list.`);
             await getRepository(CooldownViewer).insert({
               cooldown, userId: opts.sender.userId, timestamp: now,
             });
@@ -373,7 +373,7 @@ class Cooldown extends System {
               parserReply(response, opts, 'chat');
             }
           }
-          debug('cooldown.check', `${opts.sender.username}#${opts.sender.userId} have ${cooldown.name} on cooldown, remaining ${Math.ceil((cooldown.miliseconds - now + timestamp) / 1000)}s`);
+          debug('cooldown.check', `${opts.sender.userName}#${opts.sender.userId} have ${cooldown.name} on cooldown, remaining ${Math.ceil((cooldown.miliseconds - now + timestamp) / 1000)}s`);
           result = false;
           break; // disable _.each and updateQueue with false
         }
@@ -467,7 +467,7 @@ class Cooldown extends System {
       return [{ response: prepare(`cooldowns.cooldown-was-${status}${path}`, { command: cooldown.name }), ...opts }];
     } catch (e: any) {
 
-      error(`${opts.command} ${opts.parameters} [${opts.sender.username}#${opts.sender.userId}]`);
+      error(`${opts.command} ${opts.parameters} [${opts.sender.userName}#${opts.sender.userId}]`);
       error(e.stack);
       if (e instanceof ParameterError) {
         return this.help(opts);

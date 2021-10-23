@@ -64,7 +64,7 @@ class Polls extends System {
 
   async sendResponse(responses: CommandResponse[]) {
     for (let i = 0; i < responses.length; i++) {
-      await parserReply(responses[i].response, { sender: responses[i].sender });
+      await parserReply(responses[i].response, { sender: responses[i].sender, discord: responses[i].discord });
     }
   }
 
@@ -87,11 +87,14 @@ class Polls extends System {
       try {
         const parameters = `-${vote.type} -title "${vote.title}" ${vote.options.filter((o) => o.trim().length > 0).join(' | ')}`;
         const response = await this.open({
-          command:   this.getCommand('!poll open'),
+          command:       this.getCommand('!poll open'),
           parameters,
-          createdAt: 0,
-          sender:    getOwnerAsSender(),
-          attr:      { skip: false, quiet: false },
+          createdAt:     0,
+          sender:        getOwnerAsSender(),
+          attr:          { skip: false, quiet: false },
+          isAction:      false,
+          emotesOffsets: new Map(),
+          discord:       undefined,
         });
         this.sendResponse(response);
         cb(null, null);
@@ -102,11 +105,14 @@ class Polls extends System {
     adminEndpoint(this.nsp, 'polls::close', async (vote, cb) => {
       try {
         const response = await this.close({
-          command:    this.getCommand('!poll close'),
-          parameters: '',
-          createdAt:  0,
-          sender:     getOwnerAsSender(),
-          attr:       { skip: false, quiet: false },
+          command:       this.getCommand('!poll close'),
+          parameters:    '',
+          createdAt:     0,
+          sender:        getOwnerAsSender(),
+          attr:          { skip: false, quiet: false },
+          isAction:      false,
+          emotesOffsets: new Map(),
+          discord:       undefined,
         });
         this.sendResponse(response);
         cb(null);
@@ -306,14 +312,14 @@ class Polls extends System {
         if (cVote.options.length < Number(index) + 1 || index < 0) {
           throw new Error(String(ERROR.INVALID_VOTE));
         } else {
-          const vote = cVote.votes.find(o => o.votedBy === opts.sender.username);
+          const vote = cVote.votes.find(o => o.votedBy === opts.sender.userName);
           if (vote) {
             vote.option = index;
             await getRepository(Poll).save(cVote);
           } else {
             await getRepository(PollVote).save({
               poll:    cVote,
-              votedBy: opts.sender.username,
+              votedBy: opts.sender.userName,
               votes:   1,
               option:  index,
             });
@@ -343,7 +349,7 @@ class Polls extends System {
         if (!cVote) {
           return true; // do nothing if no vote in progress
         }
-        const vote = await getRepository(PollVote).findOne({ poll: cVote, votedBy: opts.sender.username });
+        const vote = await getRepository(PollVote).findOne({ poll: cVote, votedBy: opts.sender.userName });
         if (Number(opts.message) > 0 && Number(opts.message) <= cVote.options.length) {
           if (vote) {
             await getRepository(PollVote).save({
@@ -355,7 +361,7 @@ class Polls extends System {
               poll:    cVote,
               option:  Number(opts.message) - 1,
               votes:   1,
-              votedBy: opts.sender.username,
+              votedBy: opts.sender.userName,
             });
           }
         }
@@ -367,7 +373,7 @@ class Polls extends System {
   }
 
   @onBit()
-  protected async parseBit(opts: { username: string; amount: number; message: string }): Promise<void> {
+  protected async parseBit(opts: onEventBit): Promise<void> {
     const cVote = await getRepository(Poll).findOne({ isOpened: true });
 
     if (cVote && cVote.type === 'bits') {
@@ -379,7 +385,7 @@ class Polls extends System {
             poll:    cVote,
             option:  i - 1,
             votes:   opts.amount,
-            votedBy: opts.username,
+            votedBy: opts.userName,
           });
           break;
         }
@@ -388,7 +394,7 @@ class Polls extends System {
   }
 
   @onTip()
-  protected async parseTip(opts: { username: string; amount: number; message: string; currency: currency }): Promise<void> {
+  protected async parseTip(opts: onEventTip): Promise<void> {
     const cVote = await getRepository(Poll).findOne({ isOpened: true });
 
     if (cVote && cVote.type === 'tips') {
@@ -400,7 +406,7 @@ class Polls extends System {
             poll:    cVote,
             option:  i - 1,
             votes:   Number(currency.exchange(opts.amount, opts.currency, mainCurrency.value)),
-            votedBy: opts.username,
+            votedBy: opts.userName,
           });
           break;
         }

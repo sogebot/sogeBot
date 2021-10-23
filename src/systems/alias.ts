@@ -120,15 +120,15 @@ class Alias extends System {
             opts.message.replace(replace, alias.command), {
               sender: {
                 userId:   opts.sender.userId,
-                username: opts.sender.username,
-                source:   typeof opts.sender.discord === 'undefined' ? 'twitch' : 'discord',
+                username: opts.sender.userName,
+                source:   typeof opts.discord === 'undefined' ? 'twitch' : 'discord',
               },
             });
           debug('alias.process', response);
           const responses = await (opts.parser || new Parser()).command(opts.sender, response, true);
           debug('alias.process', responses);
           for (let i = 0; i < responses.length; i++) {
-            await parserReply(responses[i].response, { sender: responses[i].sender, attr: responses[i].attr });
+            await parserReply(responses[i].response, { sender: responses[i].sender, discord: responses[i].discord, attr: responses[i].attr });
           }
           // go through custom commands
           if (response.startsWith('!')) {

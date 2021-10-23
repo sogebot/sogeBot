@@ -14,7 +14,7 @@ const { prepare } = require('../../../dest/helpers/commons/prepare');
 const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 
-const user1 = { username: 'user1', userId: String(_.random(999999, false)) };
+const user1 = { userName: 'user1', userId: String(_.random(999999, false)) };
 const command = '!gamble';
 
 describe('Gambling - gamble with Jackpot - @func1', () => {
@@ -37,7 +37,7 @@ describe('Gambling - gamble with Jackpot - @func1', () => {
 
     it('add points for user', async () => {
       await getRepository(User).save({
-        userId: user1.userId, username: user1.username, points: 1000,
+        userId: user1.userId, userName: user1.userName, points: 1000,
       });
     });
 

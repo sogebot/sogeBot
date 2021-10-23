@@ -17,7 +17,7 @@ const { Timer, TimerResponse } = require('../../../dest/database/entity/timer');
 const { linesParsed } = require('../../../dest/helpers/parser');
 
 // users
-const owner = { username: '__broadcaster__' };
+const owner = { userName: '__broadcaster__' };
 
 describe('Timers - https://github.com/sogehige/sogeBot/issues/4209 - custom command filter is not properly triggered - @func2', () => {
   before(async () => {

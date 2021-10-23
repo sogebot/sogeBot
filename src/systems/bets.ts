@@ -111,23 +111,29 @@ class Bets extends System {
       let responses: CommandResponse[];
       if (option === 'refund') {
         responses = await bets.refund({
-          sender:     getBotSender(),
-          createdAt:  Date.now(),
-          parameters: '',
-          command:    bets.getCommand('!bet refund'),
-          attr:       {},
+          sender:        getBotSender(),
+          createdAt:     Date.now(),
+          parameters:    '',
+          command:       bets.getCommand('!bet refund'),
+          attr:          {},
+          isAction:      false,
+          emotesOffsets: new Map(),
+          discord:       undefined,
         });
       } else {
         responses = await bets.close({
-          sender:     getBotSender(),
-          createdAt:  Date.now(),
-          parameters: `${option}`,
-          command:    bets.getCommand('!bet close'),
-          attr:       {},
+          sender:        getBotSender(),
+          createdAt:     Date.now(),
+          parameters:    `${option}`,
+          command:       bets.getCommand('!bet close'),
+          attr:          {},
+          isAction:      false,
+          emotesOffsets: new Map(),
+          discord:       undefined,
         });
       }
       for (let i = 0; i < responses.length; i++) {
-        await parserReply(responses[i].response, { sender: responses[i].sender });
+        await parserReply(responses[i].response, { sender: responses[i].sender, discord: responses[i].discord });
       }
     });
   }
@@ -248,7 +254,7 @@ class Bets extends System {
 
         if (!_betOfUser) {
           currentBet.participations.push({
-            username:  opts.sender.username,
+            username:  opts.sender.userName,
             userId:    opts.sender.userId,
             optionIdx: index,
             points:    tickets,

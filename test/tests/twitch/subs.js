@@ -25,7 +25,7 @@ describe('lib/twitch - subs() - @func2', () => {
   it('Set viewer, viewer2, viewer3 as subs', async () => {
     for (const u of [user.viewer, user.viewer2, user.viewer3]) {
       await getRepository(User).save({
-        userId: u.userId, username: u.username, isSubscriber: true,
+        userId: u.userId, userName: u.userName, isSubscriber: true,
       });
     }
   });
@@ -50,7 +50,7 @@ describe('lib/twitch - subs() - @func2', () => {
     const r = await twitch.subs({ sender: user.viewer });
     assert.strictEqual(r[0].response, prepare('subs', {
       lastSubAgo:      'a few seconds ago',
-      lastSubUsername: user.viewer2.username,
+      lastSubUsername: user.viewer2.userName,
       onlineSubCount:  0,
     }));
   });
@@ -67,7 +67,7 @@ describe('lib/twitch - subs() - @func2', () => {
     const r = await twitch.subs({ sender: user.viewer });
     assert.strictEqual(r[0].response, prepare('subs', {
       lastSubAgo:      'a few seconds ago',
-      lastSubUsername: user.viewer3.username,
+      lastSubUsername: user.viewer3.userName,
       onlineSubCount:  0,
     }));
   });
@@ -80,7 +80,7 @@ describe('lib/twitch - subs() - @func2', () => {
     const r = await twitch.subs({ sender: user.viewer });
     assert.strictEqual(r[0].response, prepare('subs', {
       lastSubAgo:      'a few seconds ago',
-      lastSubUsername: user.viewer3.username,
+      lastSubUsername: user.viewer3.userName,
       onlineSubCount:  3,
     }));
   });

@@ -13,8 +13,8 @@ const { isOwner } = require('../../../dest/helpers/user/isOwner');
 
 const assert = require('assert');
 
-const owner = { username: '__broadcaster__' };
-const notOwner = { username: 'testuser' };
+const owner = { userName: '__broadcaster__' };
+const notOwner = { userName: 'testuser' };
 
 describe('lib/commons - @func2 - isOwner()', () => {
   before(async () => {

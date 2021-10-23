@@ -134,7 +134,7 @@ class TipeeeStream extends Integration {
     try {
       const amount = data.parameters.amount;
       const message = data.parameters.message ?? '';
-      const username = data.parameters.username.toLowerCase();
+      const userName = data.parameters.username.toLowerCase();
       const donationCurrency = data.parameters.currency;
 
       if (isStreamOnline.value) {
@@ -143,7 +143,7 @@ class TipeeeStream extends Integration {
 
       let isAnonymous = false;
       const timestamp = Date.now();
-      users.getUserByUsername(username)
+      users.getUserByUsername(userName)
         .then(async(user) => {
           const newTip: UserTipInterface = {
             amount,
@@ -155,7 +155,7 @@ class TipeeeStream extends Integration {
             userId:        user.userId,
           };
           getRepository(UserTip).save(newTip);
-          tip(`${username.toLowerCase()}${user.userId ? '#' + user.userId : ''}, amount: ${Number(amount).toFixed(2)}${donationCurrency}, message: ${message}`);
+          tip(`${userName.toLowerCase()}${user.userId ? '#' + user.userId : ''}, amount: ${Number(amount).toFixed(2)}${donationCurrency}, message: ${message}`);
           eventlist.add({
             event:    'tip',
             amount,
@@ -167,19 +167,19 @@ class TipeeeStream extends Integration {
         })
         .catch(() => {
           // user not found on Twitch
-          tip(`${username.toLowerCase()}#__anonymous__, amount: ${Number(amount).toFixed(2)}${donationCurrency}, message: ${message}`);
+          tip(`${userName.toLowerCase()}#__anonymous__, amount: ${Number(amount).toFixed(2)}${donationCurrency}, message: ${message}`);
           eventlist.add({
             event:    'tip',
             amount,
             currency: donationCurrency,
-            userId:   `${username}#__anonymous__`,
+            userId:   `${userName}#__anonymous__`,
             message,
             timestamp,
           });
           isAnonymous = true;
         }).finally(() => {
           eventEmitter.emit('tip', {
-            username:            username.toLowerCase(),
+            userName:            userName.toLowerCase(),
             amount:              Number(amount).toFixed(2),
             currency:            donationCurrency,
             amountInBotCurrency: Number(currency.exchange(amount, donationCurrency, mainCurrency.value)).toFixed(2),
@@ -189,7 +189,7 @@ class TipeeeStream extends Integration {
           });
           alerts.trigger({
             event:      'tips',
-            name:       username.toLowerCase(),
+            name:       userName.toLowerCase(),
             amount:     Number(Number(amount).toFixed(2)),
             tier:       null,
             currency:   donationCurrency,
@@ -198,7 +198,7 @@ class TipeeeStream extends Integration {
           });
 
           triggerInterfaceOnTip({
-            username: username.toLowerCase(),
+            userName: userName.toLowerCase(),
             amount,
             message,
             currency: donationCurrency,

@@ -1,18 +1,19 @@
 import { getBot } from './getBot';
 import { getBotID } from './getBotID';
 
-export function getBotSender(): Readonly<CommandOptions['sender']> {
+export function getBotSender(): Omit<ChatUser, '_userName' | '_userData' | '_parseBadgesLike'> {
   return {
-    isModerator:    true,
-    username:       getBot(),
-    displayName:    getBot(),
-    userId:         getBotID(),
-    emotes:         [],
-    badges:         { admin: false },
-    'message-type': 'chat',
-    color:          '#000000',
-    userType:       'empty',
-    emoteSets:      [],
-    discord:        undefined,
+    isMod:         true,
+    isBroadcaster: false,
+    isFounder:     false,
+    isSubscriber:  false,
+    isVip:         false,
+    userName:      getBot(),
+    displayName:   getBot(),
+    userId:        getBotID(),
+    badges:        new Map(),
+    color:         '#000000',
+    userType:      'empty',
+    badgeInfo:     new Map(),
   };
 }

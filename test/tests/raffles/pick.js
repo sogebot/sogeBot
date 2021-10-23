@@ -15,9 +15,9 @@ const db = require('../../general.js').db;
 
 const max = Math.floor(Number.MAX_SAFE_INTEGER / 10000000);
 
-const owner = { username: '__broadcaster__', userId: String(_.random(999999, false)) };
-const testuser = { username: 'testuser', userId: String(_.random(999999, false)) };
-const testuser2 = { username: 'testuser2', userId: String(_.random(999999, false)) };
+const owner = { userName: '__broadcaster__', userId: String(_.random(999999, false)) };
+const testuser = { userName: 'testuser', userId: String(_.random(999999, false)) };
+const testuser2 = { userName: 'testuser2', userId: String(_.random(999999, false)) };
 
 describe('Raffles - pick() - @func2', () => {
   before(async () => {
@@ -28,7 +28,7 @@ describe('Raffles - pick() - @func2', () => {
   describe('Empty raffle with pick should be closed', () => {
     it('create ticket raffle', async () => {
       raffles.open({ sender: owner, parameters: '!winme -min 0 -max ' + max });
-      await message.isSentRaw('Raffle is running (0 entries). To enter type "!winme <1-' + max + '>". Raffle is opened for everyone.', { username: 'bot' });
+      await message.isSentRaw('Raffle is running (0 entries). To enter type "!winme <1-' + max + '>". Raffle is opened for everyone.', { userName: 'bot' });
     });
 
     it('pick a winner', async () => {
@@ -47,19 +47,19 @@ describe('Raffles - pick() - @func2', () => {
 
     it('Create subscribers raffle', async () => {
       raffles.open({ sender: owner, parameters: '!winme -for subscribers.' });
-      await message.isSentRaw('Raffle is running (0 entries). To enter type "!winme". Raffle is opened for subscribers.', { username: 'bot' });
+      await message.isSentRaw('Raffle is running (0 entries). To enter type "!winme". Raffle is opened for subscribers.', { userName: 'bot' });
     });
 
     const subs = ['sub1', 'sub2', 'sub3', 'sub4'];
     for (const [id, v] of Object.entries(subs)) {
       it('Add user ' + v + ' to db', async () => {
         await getRepository(User).save({
-          username: v , userId: String('100' + id), isSubscriber: true,
+          userName: v , userId: String('100' + id), isSubscriber: true,
         });
       });
 
       it('Add user ' + v + ' to raffle', async () => {
-        const a = await raffles.participate({ sender: { username: v, userId: String('100' + id) }, message: '!winme' });
+        const a = await raffles.participate({ sender: { userName: v, userId: String('100' + id) }, message: '!winme' });
         assert(a);
       });
     }
@@ -71,24 +71,24 @@ describe('Raffles - pick() - @func2', () => {
         'Winner of raffle !winme is @sub2! Win probability was 25%!',
         'Winner of raffle !winme is @sub3! Win probability was 25%!',
         'Winner of raffle !winme is @sub4! Win probability was 25%!',
-      ], { username: 'bot' });
+      ], { userName: 'bot' });
     });
   });
 
   describe('Raffle should return winner', () => {
     it('create ticket raffle', async () => {
       raffles.open({ sender: owner, parameters: '!winme -min 0 -max ' + max });
-      await message.isSentRaw('Raffle is running (0 entries). To enter type "!winme <1-'+max+'>". Raffle is opened for everyone.', { username: 'bot' });
+      await message.isSentRaw('Raffle is running (0 entries). To enter type "!winme <1-'+max+'>". Raffle is opened for everyone.', { userName: 'bot' });
     });
 
     it('Create testuser/testuser2 with max points', async () => {
-      await getRepository(User).delete({ username: testuser.username });
-      await getRepository(User).delete({ username: testuser2.username });
+      await getRepository(User).delete({ userName: testuser.userName });
+      await getRepository(User).delete({ userName: testuser2.userName });
       user1 = await getRepository(User).save({
-        username: testuser.username , userId: testuser.userId, points: max,
+        userName: testuser.userName , userId: testuser.userId, points: max,
       });
       user2 = await getRepository(User).save({
-        username: testuser2.username , userId: testuser2.userId, points: max,
+        userName: testuser2.userName , userId: testuser2.userId, points: max,
       });
     });
 
@@ -105,9 +105,9 @@ describe('Raffles - pick() - @func2', () => {
     it('pick a winner', async () => {
       await raffles.pick({ sender: owner });
       await message.isSentRaw([
-        'Winner of raffle !winme is @' + testuser.username + '! Win probability was 66.67%!',
-        'Winner of raffle !winme is @' + testuser2.username + '! Win probability was 33.33%!',
-      ], { username: 'bot' });
+        'Winner of raffle !winme is @' + testuser.userName + '! Win probability was 66.67%!',
+        'Winner of raffle !winme is @' + testuser2.userName + '! Win probability was 33.33%!',
+      ], { userName: 'bot' });
     });
   });
 
@@ -116,17 +116,17 @@ describe('Raffles - pick() - @func2', () => {
 
     it('create ticket raffle', async () => {
       raffles.open({ sender: owner, parameters: '!winme -min 0 -max ' + max });
-      await message.isSentRaw('Raffle is running (0 entries). To enter type "!winme <1-'+max+'>". Raffle is opened for everyone.', { username: 'bot' });
+      await message.isSentRaw('Raffle is running (0 entries). To enter type "!winme <1-'+max+'>". Raffle is opened for everyone.', { userName: 'bot' });
     });
 
     it('Create testuser/testuser2 with max points', async () => {
-      await getRepository(User).delete({ username: testuser.username });
-      await getRepository(User).delete({ username: testuser2.username });
+      await getRepository(User).delete({ userName: testuser.userName });
+      await getRepository(User).delete({ userName: testuser2.userName });
       user1 = await getRepository(User).save({
-        isFollower: true, username: testuser.username , userId: testuser.userId, points: max,
+        isFollower: true, userName: testuser.userName , userId: testuser.userId, points: max,
       });
       user2 = await getRepository(User).save({
-        username: testuser2.username , userId: testuser2.userId, points: max,
+        userName: testuser2.userName , userId: testuser2.userId, points: max,
       });
     });
 
@@ -143,26 +143,26 @@ describe('Raffles - pick() - @func2', () => {
     it('pick a winner', async () => {
       await raffles.pick({ sender: owner });
       await message.isSentRaw([
-        'Winner of raffle !winme is @' + testuser.username + '! Win probability was 54.55%!',
-        'Winner of raffle !winme is @' + testuser2.username + '! Win probability was 45.45%!',
-      ], { username: 'bot' });
+        'Winner of raffle !winme is @' + testuser.userName + '! Win probability was 54.55%!',
+        'Winner of raffle !winme is @' + testuser2.userName + '! Win probability was 45.45%!',
+      ], { userName: 'bot' });
     });
   });
 
   describe('Raffle with subscriber should return winner', () => {
     it('create ticket raffle', async () => {
       raffles.open({ sender: owner, parameters: '!winme -min 0 -max ' + max });
-      await message.isSentRaw('Raffle is running (0 entries). To enter type "!winme <1-'+max+'>". Raffle is opened for everyone.', { username: 'bot' });
+      await message.isSentRaw('Raffle is running (0 entries). To enter type "!winme <1-'+max+'>". Raffle is opened for everyone.', { userName: 'bot' });
     });
 
     it('Create testuser/testuser2 with max points', async () => {
-      await getRepository(User).delete({ username: testuser.username });
-      await getRepository(User).delete({ username: testuser2.username });
+      await getRepository(User).delete({ userName: testuser.userName });
+      await getRepository(User).delete({ userName: testuser2.userName });
       user1 = await getRepository(User).save({
-        isSubscriber: true, username: testuser.username , userId: testuser.userId, points: max,
+        isSubscriber: true, userName: testuser.userName , userId: testuser.userId, points: max,
       });
       user2 = await getRepository(User).save({
-        username: testuser2.username , userId: testuser2.userId, points: max,
+        userName: testuser2.userName , userId: testuser2.userId, points: max,
       });
     });
 
@@ -179,26 +179,26 @@ describe('Raffles - pick() - @func2', () => {
     it('pick a winner', async () => {
       await raffles.pick({ sender: owner });
       await message.isSentRaw([
-        'Winner of raffle !winme is @' + testuser.username + '! Win probability was 60%!',
-        'Winner of raffle !winme is @' + testuser2.username + '! Win probability was 40%!',
-      ], { username: 'bot' });
+        'Winner of raffle !winme is @' + testuser.userName + '! Win probability was 60%!',
+        'Winner of raffle !winme is @' + testuser2.userName + '! Win probability was 40%!',
+      ], { userName: 'bot' });
     });
   });
 
   describe('Raffle with subscriber and follower should return winner', () => {
     it('create ticket raffle', async () => {
       raffles.open({ sender: owner, parameters: '!winme -min 0 -max ' + max });
-      await message.isSentRaw('Raffle is running (0 entries). To enter type "!winme <1-'+max+'>". Raffle is opened for everyone.', { username: 'bot' });
+      await message.isSentRaw('Raffle is running (0 entries). To enter type "!winme <1-'+max+'>". Raffle is opened for everyone.', { userName: 'bot' });
     });
 
     it('Create testuser/testuser2 with max points', async () => {
-      await getRepository(User).delete({ username: testuser.username });
-      await getRepository(User).delete({ username: testuser2.username });
+      await getRepository(User).delete({ userName: testuser.userName });
+      await getRepository(User).delete({ userName: testuser2.userName });
       user1 = await getRepository(User).save({
-        isSubscriber: true, username: testuser.username , userId: testuser.userId, points: max,
+        isSubscriber: true, userName: testuser.userName , userId: testuser.userId, points: max,
       });
       user2 = await getRepository(User).save({
-        isFollower: true, username: testuser2.username , userId: testuser2.userId, points: max,
+        isFollower: true, userName: testuser2.userName , userId: testuser2.userId, points: max,
       });
     });
 
@@ -215,9 +215,9 @@ describe('Raffles - pick() - @func2', () => {
     it('pick a winner', async () => {
       await raffles.pick({ sender: owner });
       await message.isSentRaw([
-        'Winner of raffle !winme is @' + testuser.username + '! Win probability was 55.56%!',
-        'Winner of raffle !winme is @' + testuser2.username + '! Win probability was 44.44%!',
-      ], { username: 'bot' });
+        'Winner of raffle !winme is @' + testuser.userName + '! Win probability was 55.56%!',
+        'Winner of raffle !winme is @' + testuser2.userName + '! Win probability was 44.44%!',
+      ], { userName: 'bot' });
     });
   });
 });

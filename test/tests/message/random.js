@@ -7,9 +7,9 @@ const Message = require('../../../dest/message').default;
 const assert = require('assert');
 const { prepare } = require('../../../dest/helpers/commons/prepare');
 
-const owner = { userId: String(Math.floor(Math.random() * 100000)), username: '__broadcaster__' };
-const ignoredUser = { userId: String(Math.floor(Math.random() * 100000)), username: 'ignoreduser' };
-const user = { userId: String(Math.floor(Math.random() * 100000)), username: 'user1' };
+const owner = { userId: String(Math.floor(Math.random() * 100000)), userName: '__broadcaster__' };
+const ignoredUser = { userId: String(Math.floor(Math.random() * 100000)), userName: 'ignoreduser' };
+const user = { userId: String(Math.floor(Math.random() * 100000)), userName: 'user1' };
 
 const { getRepository } = require('typeorm');
 const { User } = require('../../../dest/database/entity/user');
@@ -18,8 +18,8 @@ const tmi = (require('../../../dest/chat')).default;
 
 async function setUsersOnline(users) {
   await getRepository(User).update({}, { isOnline: false });
-  for (const username of users) {
-    await getRepository(User).update({ username }, { isOnline: true });
+  for (const userName of users) {
+    await getRepository(User).update({ userName }, { isOnline: true });
   }
 }
 
@@ -34,12 +34,12 @@ describe('Message - random filter - @func3', () => {
       await getRepository(User).save(user);
 
       const r = await tmi.ignoreRm({ sender: owner, parameters: 'ignoreduser' });
-      assert.strictEqual(r[0].response, prepare('ignore.user.is.removed', { username: 'ignoreduser' }));
+      assert.strictEqual(r[0].response, prepare('ignore.user.is.removed', { userName: 'ignoreduser' }));
     });
 
     it('add user ignoreduser to ignore list', async () => {
       const r = await tmi.ignoreAdd({ sender: owner, parameters: 'ignoreduser' });
-      assert.strictEqual(r[0].response, prepare('ignore.user.is.added', { username: 'ignoreduser' }));
+      assert.strictEqual(r[0].response, prepare('ignore.user.is.added', { userName: 'ignoreduser' }));
     });
 
     it('From 100 randoms ignoreduser shouldn\'t be picked', async () => {
@@ -61,18 +61,18 @@ describe('Message - random filter - @func3', () => {
       await getRepository(User).save(user);
 
       const r = await tmi.ignoreRm({ sender: owner, parameters: 'ignoreduser' });
-      assert.strictEqual(r[0].response, prepare('ignore.user.is.removed', { username: 'ignoreduser' }));
+      assert.strictEqual(r[0].response, prepare('ignore.user.is.removed', { userName: 'ignoreduser' }));
     });
     it('add user ignoreduser to ignore list', async () => {
       const r = await tmi.ignoreAdd({ sender: owner, parameters: 'ignoreduser' });
-      assert.strictEqual(r[0].response, prepare('ignore.user.is.added', { username: 'ignoreduser' }));
+      assert.strictEqual(r[0].response, prepare('ignore.user.is.added', { userName: 'ignoreduser' }));
 
     });
 
     const users = ['ignoreduser', 'user1'];
-    for (const username of users) {
-      it('add user ' + username + ' to users list', async () => {
-        await getRepository(User).save({ userId: String(Math.floor(Math.random() * 100000)), username, isFollower: true });
+    for (const userName of users) {
+      it('add user ' + userName + ' to users list', async () => {
+        await getRepository(User).save({ userId: String(Math.floor(Math.random() * 100000)), userName, isFollower: true });
       });
     }
 
@@ -95,17 +95,17 @@ describe('Message - random filter - @func3', () => {
       await getRepository(User).save(user);
 
       const r = await tmi.ignoreRm({ sender: owner, parameters: 'ignoreduser' });
-      assert.strictEqual(r[0].response, prepare('ignore.user.is.removed', { username: 'ignoreduser' }));
+      assert.strictEqual(r[0].response, prepare('ignore.user.is.removed', { userName: 'ignoreduser' }));
     });
     it('add user ignoreduser to ignore list', async () => {
       const r = await tmi.ignoreAdd({ sender: owner, parameters: 'ignoreduser' });
-      assert.strictEqual(r[0].response, prepare('ignore.user.is.added', { username: 'ignoreduser' }));
+      assert.strictEqual(r[0].response, prepare('ignore.user.is.added', { userName: 'ignoreduser' }));
     });
 
     const users = ['ignoreduser', 'user1'];
-    for (const username of users) {
-      it('add user ' + username + ' to users list', async () => {
-        await getRepository(User).save({ userId: String(Math.floor(Math.random() * 100000)), username, isSubscriber: true });
+    for (const userName of users) {
+      it('add user ' + userName + ' to users list', async () => {
+        await getRepository(User).save({ userId: String(Math.floor(Math.random() * 100000)), userName, isSubscriber: true });
       });
     }
 
@@ -128,18 +128,18 @@ describe('Message - random filter - @func3', () => {
       await getRepository(User).save(user);
 
       const r = await tmi.ignoreRm({ sender: owner, parameters: 'ignoreduser' });
-      assert.strictEqual(r[0].response, prepare('ignore.user.is.removed', { username: 'ignoreduser' }));
+      assert.strictEqual(r[0].response, prepare('ignore.user.is.removed', { userName: 'ignoreduser' }));
     });
 
     it('add user ignoreduser to ignore list', async () => {
       const r = await tmi.ignoreAdd({ sender: owner, parameters: 'ignoreduser' });
-      assert.strictEqual(r[0].response, prepare('ignore.user.is.added', { username: 'ignoreduser' }));
+      assert.strictEqual(r[0].response, prepare('ignore.user.is.added', { userName: 'ignoreduser' }));
     });
 
     const users = ['ignoreduser', 'user1'];
-    for (const username of users) {
-      it('add user ' + username + ' to users list', async () => {
-        await getRepository(User).save({ userId: String(Math.floor(Math.random() * 100000)), username });
+    for (const userName of users) {
+      it('add user ' + userName + ' to users list', async () => {
+        await getRepository(User).save({ userId: String(Math.floor(Math.random() * 100000)), userName });
       });
     }
 
@@ -161,17 +161,17 @@ describe('Message - random filter - @func3', () => {
       await getRepository(User).save(user);
 
       const r = await tmi.ignoreRm({ sender: owner, parameters: 'ignoreduser' });
-      assert.strictEqual(r[0].response, prepare('ignore.user.is.removed', { username: 'ignoreduser' }));
+      assert.strictEqual(r[0].response, prepare('ignore.user.is.removed', { userName: 'ignoreduser' }));
     });
     it('add user ignoreduser to ignore list', async () => {
       const r = await tmi.ignoreAdd({ sender: owner, parameters: 'ignoreduser' });
-      assert.strictEqual(r[0].response, prepare('ignore.user.is.added', { username: 'ignoreduser' }));
+      assert.strictEqual(r[0].response, prepare('ignore.user.is.added', { userName: 'ignoreduser' }));
     });
 
     const users = ['ignoreduser', 'user1'];
-    for (const username of users) {
-      it('add user ' + username + ' to users list', async () => {
-        await getRepository(User).save({ userId: String(Math.floor(Math.random() * 100000)), username, isFollower: true });
+    for (const userName of users) {
+      it('add user ' + userName + ' to users list', async () => {
+        await getRepository(User).save({ userId: String(Math.floor(Math.random() * 100000)), userName, isFollower: true });
       });
     }
 
@@ -193,17 +193,17 @@ describe('Message - random filter - @func3', () => {
       await getRepository(User).save(user);
 
       const r = await tmi.ignoreRm({ sender: owner, parameters: 'ignoreduser' });
-      assert.strictEqual(r[0].response, prepare('ignore.user.is.removed', { username: 'ignoreduser' }));
+      assert.strictEqual(r[0].response, prepare('ignore.user.is.removed', { userName: 'ignoreduser' }));
     });
     it('add user ignoreduser to ignore list', async () => {
       const r = await tmi.ignoreAdd({ sender: owner, parameters: 'ignoreduser' });
-      assert.strictEqual(r[0].response, prepare('ignore.user.is.added', { username: 'ignoreduser' }));
+      assert.strictEqual(r[0].response, prepare('ignore.user.is.added', { userName: 'ignoreduser' }));
     });
 
     const users = ['ignoreduser', 'user1'];
-    for (const username of users) {
-      it('add user ' + username + ' to users list', async () => {
-        await getRepository(User).save({ userId: String(Math.floor(Math.random() * 100000)), username, isSubscriber: true });
+    for (const userName of users) {
+      it('add user ' + userName + ' to users list', async () => {
+        await getRepository(User).save({ userId: String(Math.floor(Math.random() * 100000)), userName, isSubscriber: true });
       });
     }
 

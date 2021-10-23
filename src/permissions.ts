@@ -53,7 +53,7 @@ class Permissions extends Core {
       }
       if (typeof opts.value === 'string') {
         await changelog.flush();
-        const userByName = await getRepository(User).findOne({ username: opts.value });
+        const userByName = await getRepository(User).findOne({ userName: opts.value });
         if (userByName) {
           const status = await check(userByName.userId, opts.pid);
           const partial = await check(userByName.userId, opts.pid, true);

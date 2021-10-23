@@ -13,7 +13,7 @@ const { getRepository } = require('typeorm');
 const { Timer } = require('../../../dest/database/entity/timer');
 
 // users
-const owner = { username: '__broadcaster__' };
+const owner = { userName: '__broadcaster__' };
 
 describe('Timers - set() - @func2', () => {
   beforeEach(async () => {

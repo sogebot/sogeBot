@@ -25,12 +25,12 @@ describe('Raffles - raffle with 1 point cannot over point #3546 - @func2', () =>
 
   it('create ticket raffle', async () => {
     raffles.open({ sender: user.owner, parameters: '!winme -min 0 -max 500' });
-    await message.isSentRaw('Raffle is running (0 entries). To enter type "!winme <1-500>". Raffle is opened for everyone.', { username: 'bot' });
+    await message.isSentRaw('Raffle is running (0 entries). To enter type "!winme <1-500>". Raffle is opened for everyone.', { userName: 'bot' });
   });
 
   it('Update viewer to have 1 point', async () => {
     await getRepository(User).save({
-      username: user.viewer.username, userId: user.viewer.userId, points: 1,
+      userName: user.viewer.userName, userId: user.viewer.userId, points: 1,
     });
   });
 
@@ -64,7 +64,7 @@ describe('Raffles - raffle with 1 point cannot over point #3546 - @func2', () =>
 
   it('User should have 0 points', async () => {
     await changelog.flush();
-    const result = await getRepository(User).findOne({ username: user.viewer.username, userId: user.viewer.userId });
+    const result = await getRepository(User).findOne({ userName: user.viewer.userName, userId: user.viewer.userId });
     assert(result.points === 0);
   });
 });

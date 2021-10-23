@@ -1,3 +1,5 @@
+type ChatUser = import('@twurple/chat').ChatUser;
+
 type Writeable<T> = { -readonly [P in keyof T]: T[P] };
 
 type UserStateTags = import('twitch-js').UserStateTags;
@@ -45,18 +47,18 @@ interface Parser {
 }
 
 type onEventSub = {
-  username: string;
+  userName: string;
   userId: string;
   subCumulativeMonths: number;
 };
 
 type onEventFollow = {
-  username: string;
+  userName: string;
   userId: string;
 };
 
 type onEventTip = {
-  username: string;
+  userName: string;
   amount: number;
   message: string;
   currency: currency;
@@ -64,7 +66,7 @@ type onEventTip = {
 };
 
 type onEventBit = {
-  username: string;
+  userName: string;
   amount: number;
   message: string;
   timestamp: number;
@@ -99,7 +101,6 @@ declare namespace InterfaceSettings {
       [x: string]: string[];
     };
     partChannel?: () => void;
-    reconnectChannel?: () => void;
     joinChannel?: () => void;
   }
 
@@ -168,15 +169,17 @@ interface UIHighlightsUrlGenerator {
 interface CommandResponse {
   response: string | Promise<string>;
   sender: CommandOptions['sender'];
+  discord: CommandOptions['discord'];
   attr: CommandOptions['attr'];
 }
 
 interface CommandOptions {
-  sender: UserStateTags & { userId: string; msgId?: KnownNoticeMessageIds } & {
-    discord?: { author: DiscordJsUser; channel: DiscordJsTextChannel };
-  };
+  sender: Omit<ChatUser, '_userName' | '_userData' | '_parseBadgesLike'>
+  emotesOffsets: Map<string, string[]>
+  discord: { author: DiscordJsUser; channel: DiscordJsTextChannel } | undefined
   command: string;
   parameters: string;
+  isAction: boolean,
   createdAt: number;
   attr: {
     skip?: boolean;
@@ -187,7 +190,10 @@ interface CommandOptions {
 
 interface ParserOptions {
   id: string;
-  sender: CommandOptions['sender'] | null;
+  sender: Omit<ChatUser, '_userName' | '_userData' | '_parseBadgesLike'> | null;
+  emotesOffsets: Map<string, string[]>
+  discord: { author: DiscordJsUser; channel: DiscordJsTextChannel } | undefined
+  isAction: boolean,
   parameters: string;
   message: string;
   skip: boolean;

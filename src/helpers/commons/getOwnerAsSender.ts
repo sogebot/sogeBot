@@ -1,17 +1,19 @@
 import { channelId } from '../oauth';
 import { getOwner } from './getOwner';
 
-export function getOwnerAsSender(): Readonly<UserStateTags & { userId: string }> {
+export function getOwnerAsSender(): Omit<ChatUser, '_userName' | '_userData' | '_parseBadgesLike'> {
   return {
-    isModerator:    true,
-    username:       getOwner(),
-    displayName:    getOwner(),
-    emotes:         [],
-    badges:         { subscriber: 1 },
-    'message-type': 'chat',
-    color:          '#000000',
-    userType:       'empty',
-    emoteSets:      [],
-    userId:         channelId.value,
+    isMod:         true,
+    isBroadcaster: true,
+    isFounder:     true,
+    isSubscriber:  true,
+    isVip:         true,
+    userName:      getOwner(),
+    displayName:   getOwner(),
+    userId:        channelId.value,
+    badges:        new Map(),
+    color:         '#000000',
+    userType:      'empty',
+    badgeInfo:     new Map(),
   };
 }

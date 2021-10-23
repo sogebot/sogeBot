@@ -43,7 +43,7 @@ describe('Events - tip event - @func3', () => {
       });
 
       for (const user of ['losslezos', 'rigneir', 'mikasa_hraje', 'foufhs']) {
-        await getRepository(User).save({ username: user, userId: String(Math.floor(Math.random() * 100000)) });
+        await getRepository(User).save({ userName: user, userId: String(Math.floor(Math.random() * 100000)) });
       }
     });
 
@@ -52,7 +52,7 @@ describe('Events - tip event - @func3', () => {
         it('trigger tip event for 10 EUR - ' + username, async () => {
           log.tip(`${username}, amount: 10.00EUR, message: Ahoj jak je`);
           events.fire('tip', {
-            userId: String(Math.floor(Math.random * 100000)), username: username, amount: 10.00, message: 'Ahoj jak je', currency: 'EUR',
+            userId: String(Math.floor(Math.random * 100000)), userName: username, amount: 10.00, message: 'Ahoj jak je', currency: 'EUR',
           });
         });
 
@@ -66,7 +66,7 @@ describe('Events - tip event - @func3', () => {
 
         it('user should have 100 points', async () => {
           await changelog.flush();
-          const user = await getRepository(User).findOne({ username });
+          const user = await getRepository(User).findOne({ userName: username });
           assert.strict.equal(user.points, 100);
         });
       });

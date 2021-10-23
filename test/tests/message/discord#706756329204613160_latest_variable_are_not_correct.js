@@ -14,14 +14,14 @@ const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 
 // users
-const owner = { username: '__broadcaster__' };
+const owner = { userName: '__broadcaster__' };
 
 describe('Message - https://discordapp.com/channels/317348946144002050/619437014001123338/706756329204613160 - latest global variables are not correct - @func3', () => {
   before(async () => {
     await db.cleanup();
     await message.prepare();
     for (let i = 10000000; i < 10000040; i++) {
-      await getRepository(User).save({ username: `user${i}`, userId: String(i) });
+      await getRepository(User).save({ userName: `user${i}`, userId: String(i) });
     }
 
   });

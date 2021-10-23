@@ -12,16 +12,16 @@ const { getRepository } = require('typeorm');
 const { User } = require('../../../dest/database/entity/user');
 
 // users
-const owner = { userId: String(Math.floor(Math.random() * 100000)), badges: {}, username: '__broadcaster__' };
-const mod = { userId: String(Math.floor(Math.random() * 100000)), badges: {}, username: 'mod' };
+const owner = { userId: String(Math.floor(Math.random() * 100000)), badges: {}, userName: '__broadcaster__' };
+const mod = { userId: String(Math.floor(Math.random() * 100000)), badges: {}, userName: 'mod' };
 
 describe('Cooldowns - toggleModerators() - @func3', () => {
   beforeEach(async () => {
     await db.cleanup();
     await message.prepare();
 
-    await getRepository(User).save({ username: owner.username, userId: owner.userId });
-    await getRepository(User).save({ username: mod.username, userId: mod.userId, isModerator: true });
+    await getRepository(User).save({ userName: owner.userName, userId: owner.userId });
+    await getRepository(User).save({ userName: mod.userName, userId: mod.userId, isModerator: true });
   });
 
   it('incorrect toggle', async () => {

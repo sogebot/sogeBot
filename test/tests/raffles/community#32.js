@@ -16,9 +16,9 @@ const message = require('../../general.js').message;
 
 const max = Math.floor(Number.MAX_SAFE_INTEGER / 10000000);
 
-const owner = { username: '__broadcaster__', userId: String(_.random(999999, false)) };
-const testuser = { username: 'testuser', userId: String(_.random(999999, false)) };
-const testuser2 = { username: 'testuser2', userId: String(_.random(999999, false)) };
+const owner = { userName: '__broadcaster__', userId: String(_.random(999999, false)) };
+const testuser = { userName: 'testuser', userId: String(_.random(999999, false)) };
+const testuser2 = { userName: 'testuser2', userId: String(_.random(999999, false)) };
 
 describe('/t/raffle-owner-can-join-raffle-more-then-1-time/32 - @func2', () => {
   before(async () => {
@@ -28,7 +28,7 @@ describe('/t/raffle-owner-can-join-raffle-more-then-1-time/32 - @func2', () => {
 
   it('create normal raffle', async () => {
     raffles.open({ sender: owner, parameters: '!winme' });
-    await message.isSentRaw('Raffle is running (0 entries). To enter type "!winme". Raffle is opened for everyone.', { username: 'bot' });
+    await message.isSentRaw('Raffle is running (0 entries). To enter type "!winme". Raffle is opened for everyone.', { userName: 'bot' });
   });
 
   it('loop through owner participations', async () => {

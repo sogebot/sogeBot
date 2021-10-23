@@ -1,15 +1,18 @@
-export function getUserSender(userId: string, username: string): Readonly<CommandOptions['sender']> {
+import { isBroadcaster } from '../user';
+
+export function getUserSender(userId: string, username: string): Omit<ChatUser, '_userName' | '_userData' | '_parseBadgesLike'> {
   return {
-    isModerator:    true,
-    username:       username,
-    displayName:    username,
-    userId:         userId,
-    emotes:         [],
-    badges:         { admin: false },
-    'message-type': 'chat',
-    color:          '#000000',
-    userType:       'empty',
-    emoteSets:      [],
-    discord:        undefined,
+    isMod:         false,
+    isBroadcaster: isBroadcaster(username),
+    isFounder:     false,
+    isSubscriber:  false,
+    isVip:         false,
+    userName:      username,
+    displayName:   username,
+    userId:        userId,
+    badges:        new Map(),
+    color:         '#000000',
+    userType:      'empty',
+    badgeInfo:     new Map(),
   };
 }

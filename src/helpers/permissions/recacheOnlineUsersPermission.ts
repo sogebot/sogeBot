@@ -22,13 +22,13 @@ export function recacheOnlineUsersPermission() {
         // we need to recache only users not recached in 30 minutes
         for (const user of users2) {
           if (!recacheIds.has(user.userId) || (Date.now() - (recacheIds.get(user.userId) ?? 0) > 30 * MINUTE)) {
-            debug('permissions.recache', `Recaching ${user.username}#${user.userId}`);
+            debug('permissions.recache', `Recaching ${user.userName}#${user.userId}`);
             cleanViewersCache(user.userId);
             await getUserHighestPermission(user.userId);
             await setImmediateAwait();
             recacheIds.set(user.userId, Date.now());
           } else {
-            debug('permissions.recache', `Recaching SKIPPED ${user.username}#${user.userId}`);
+            debug('permissions.recache', `Recaching SKIPPED ${user.userName}#${user.userId}`);
           }
         }
         isRecacheRunning = false;

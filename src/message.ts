@@ -20,7 +20,7 @@ class Message {
   }
 
   @timer()
-  async global (opts: { escape?: string, sender?: CommandOptions['sender'] }) {
+  async global (opts: { escape?: string, sender?: CommandOptions['sender'], discord?: CommandOptions['discord'] }) {
     if (!this.message.includes('$')) {
       // message doesn't have any variables
       return this.message;
@@ -36,10 +36,10 @@ class Message {
   }
 
   @timer()
-  async parse (attr: { [name: string]: any, sender: CommandOptions['sender'], 'message-type'?: string, forceWithoutAt?: boolean } = { sender: getBotSender() }) {
+  async parse (attr: { [name: string]: any, sender: CommandOptions['sender'], discord: CommandOptions['discord'], forceWithoutAt?: boolean } = { sender: getBotSender(), discord: undefined }) {
     this.message = await this.message; // if is promise
 
-    await this.global({ sender: attr.sender });
+    await this.global({ sender: attr.sender, discord: attr.discord  });
 
     await this.parseMessageEach(price, attr);
     await this.parseMessageEach(info, attr);
@@ -54,8 +54,8 @@ class Message {
     if (!_.isNil(attr)) {
       for (let [key, value] of Object.entries(attr)) {
         if (key === 'sender') {
-          if (typeof value.username !== 'undefined') {
-            value = tmi.showWithAt && attr.forceWithoutAt !== true ? `@${value.username}` : value.username;
+          if (typeof value.userName !== 'undefined') {
+            value = tmi.showWithAt && attr.forceWithoutAt !== true ? `@${value.userName}` : value.userName;
           } else {
             value = tmi.showWithAt && attr.forceWithoutAt !== true ? `@${value}` : value;
           }

@@ -3,12 +3,11 @@
 import axios from 'axios';
 import * as _ from 'lodash';
 
-import tmi from '../chat';
 import {
   command, default_permission, helper,
 } from '../decorators';
 import { calls, setRateLimit } from '../helpers/api';
-import { getOwner } from '../helpers/commons';
+import { getOwnerAsSender } from '../helpers/commons';
 import { eventEmitter } from '../helpers/events';
 import { error, warning } from '../helpers/log';
 import { channelId } from '../helpers/oauth';
@@ -27,10 +26,15 @@ import System from './_interface';
 class Commercial extends System {
   sockets() {
     adminEndpoint(this.nsp, 'commercial.run', (data) => {
-      tmi.message({
-        message:   '!commercial ' + data.seconds,
-        userstate: { username: getOwner() },
-        skip:      true,
+      commercial.main({
+        parameters:    data.seconds,
+        command:       '!commercial',
+        sender:        getOwnerAsSender(),
+        attr:          {},
+        createdAt:     Date.now(),
+        emotesOffsets: new Map(),
+        isAction:      false,
+        discord:       undefined,
       });
     });
   }
@@ -113,4 +117,5 @@ class Commercial extends System {
   }
 }
 
-export default new Commercial();
+const commercial = new Commercial();
+export default commercial;

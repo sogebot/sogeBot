@@ -11,7 +11,7 @@ const message = require('../../general.js').message;
 const db = require('../../general.js').db;
 
 // users
-const owner = { username: '__broadcaster__' };
+const owner = { userName: '__broadcaster__' };
 
 const tests = {
   'domain:prtzl.io': {

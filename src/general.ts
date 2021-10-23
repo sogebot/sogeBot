@@ -254,7 +254,7 @@ class General extends Core {
 
   @command('!ping')
   ping(opts: CommandOptions): CommandResponse[] {
-    if (opts.sender.discord) {
+    if (opts.discord) {
       const response = `$sender, Pong! \`${Date.now() - opts.createdAt}ms\``;
       return [{ response, ...opts }];
     } else {

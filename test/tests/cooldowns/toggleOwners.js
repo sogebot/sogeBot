@@ -12,14 +12,14 @@ const { getRepository } = require('typeorm');
 const { User } = require('../../../dest/database/entity/user');
 
 // users
-const owner = { userId: String(Math.floor(Math.random() * 100000)), username: '__broadcaster__', badges: {} };
+const owner = { userId: String(Math.floor(Math.random() * 100000)), userName: '__broadcaster__', badges: {} };
 
 describe('Cooldowns - toggleOwners() - @func3', () => {
   beforeEach(async () => {
     await db.cleanup();
     await message.prepare();
 
-    await getRepository(User).save({ username: owner.username, userId: owner.userId });
+    await getRepository(User).save({ userName: owner.userName, userId: owner.userId });
   });
 
   it('incorrect toggle', async () => {

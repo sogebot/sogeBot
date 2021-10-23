@@ -43,7 +43,6 @@ class FightMe extends Game {
 
   @command('!fightme')
   async main (opts: CommandOptions): Promise<CommandResponse[]> {
-    opts.sender['message-type'] = 'chat'; // force responses to chat
     let user: Readonly<Required<UserInterface>>;
     let challenger;
 
@@ -54,20 +53,20 @@ class FightMe extends Game {
       }
       const username = match[1].toLowerCase();
       await changelog.flush();
-      user = await getRepository(User).findOneOrFail({ where: { username: username.toLowerCase() } });
+      user = await getRepository(User).findOneOrFail({ where: { userName: username.toLowerCase() } });
       challenger = await changelog.getOrFail(opts.sender.userId);
     } catch (e: any) {
       return [{ response: translate('gambling.fightme.notEnoughOptions'), ...opts }];
     }
 
-    if (opts.sender.username === user.username) {
+    if (opts.sender.userName === user.userName) {
       return [{ response: translate('gambling.fightme.cannotFightWithYourself'), ...opts }];
     }
 
     // check if you are challenged by user
     const challenge = fightMeChallenges.find(ch => {
-      return ch.opponent === opts.sender.username
-        && ch.challenger === user.username;
+      return ch.opponent === opts.sender.userName
+        && ch.challenger === user.userName;
     });
     if (challenge) {
       const winner = _.random(0, 1, false);
@@ -77,19 +76,19 @@ class FightMe extends Game {
       };
 
       // vs broadcaster
-      if (isBroadcaster(opts.sender) || isBroadcaster(user.username)) {
+      if (isBroadcaster(opts.sender) || isBroadcaster(user.userName)) {
         const isBroadcasterModCheck = isBroadcaster(opts.sender) ? isMod.user : isMod.sender;
         if (!isBroadcasterModCheck) {
-          timeout(isBroadcaster(opts.sender) ? user.username : opts.sender.username, this.timeout, isBroadcaster(opts.sender) ? isMod.user : isMod.sender);
+          timeout(isBroadcaster(opts.sender) ? user.userName : opts.sender.userName, this.timeout, isBroadcaster(opts.sender) ? isMod.user : isMod.sender);
         }
         fightMeChallenges = fightMeChallenges.filter(ch => {
-          return !(ch.opponent === opts.sender.username
-            && ch.challenger === user.username);
+          return !(ch.opponent === opts.sender.userName
+            && ch.challenger === user.userName);
         });
         return [{
           response: prepare('gambling.fightme.broadcaster', {
-            winner: isBroadcaster(opts.sender) ? opts.sender.username : user.username,
-            loser:  isBroadcaster(opts.sender) ? user.username : opts.sender.username,
+            winner: isBroadcaster(opts.sender) ? opts.sender.userName : user.userName,
+            loser:  isBroadcaster(opts.sender) ? user.userName : opts.sender.userName,
           }), ...opts,
         }];
       }
@@ -97,23 +96,23 @@ class FightMe extends Game {
       // mod vs mod
       if (isMod.user && isMod.sender) {
         fightMeChallenges = fightMeChallenges.filter(ch => {
-          return !(ch.opponent === opts.sender.username
-            && ch.challenger === user.username);
+          return !(ch.opponent === opts.sender.userName
+            && ch.challenger === user.userName);
         });
-        return [{ response: prepare('gambling.fightme.bothModerators', { challenger: user.username }), ...opts }];
+        return [{ response: prepare('gambling.fightme.bothModerators', { challenger: user.userName }), ...opts }];
       }
 
       // vs mod
       if (isMod.user || isMod.sender) {
-        timeout(isMod.sender ? user.username : opts.sender.username, this.timeout, false);
+        timeout(isMod.sender ? user.userName : opts.sender.userName, this.timeout, false);
         fightMeChallenges = fightMeChallenges.filter(ch => {
-          return !(ch.opponent === opts.sender.username
-            && ch.challenger === user.username);
+          return !(ch.opponent === opts.sender.userName
+            && ch.challenger === user.userName);
         });
         return [{
           response: prepare('gambling.fightme.oneModerator', {
-            winner: isMod.sender ? opts.sender.username : user.username,
-            loser:  isMod.sender ? user.username : opts.sender.username,
+            winner: isMod.sender ? opts.sender.userName : user.userName,
+            loser:  isMod.sender ? user.userName : opts.sender.userName,
           }), ...opts,
         }];
       }
@@ -122,16 +121,16 @@ class FightMe extends Game {
       changelog.increment(winner ? opts.sender.userId : user.userId, { points: Math.abs(Number(winnerWillGet)) });
       await points.decrement({ userId: !winner ? opts.sender.userId : user.userId }, Math.abs(Number(loserWillLose)));
 
-      timeout(winner ? opts.sender.username : user.username, this.timeout, false);
+      timeout(winner ? opts.sender.userName : user.userName, this.timeout, false);
       fightMeChallenges = fightMeChallenges.filter(ch => {
-        return !(ch.opponent === opts.sender.username
-          && ch.challenger === user.username);
+        return !(ch.opponent === opts.sender.userName
+          && ch.challenger === user.userName);
       });
       return [{
         response: prepare('gambling.fightme.winner', {
-          username: user.username,
-          winner:   winner ? user.username : opts.sender.username,
-          loser:    winner ? opts.sender.username : user.username,
+          username: user.userName,
+          winner:   winner ? user.userName : opts.sender.userName,
+          loser:    winner ? opts.sender.userName : user.userName,
         }), ...opts,
       }];
     } else {
@@ -155,20 +154,20 @@ class FightMe extends Game {
       }
 
       const isAlreadyChallenged = fightMeChallenges.find(ch => {
-        return ch.challenger === opts.sender.username
-          && ch.opponent === user.username;
+        return ch.challenger === opts.sender.userName
+          && ch.opponent === user.userName;
       });
       if (!isAlreadyChallenged) {
         fightMeChallenges.push({
-          challenger: opts.sender.username,
-          opponent:   user.username,
+          challenger: opts.sender.userName,
+          opponent:   user.userName,
           removeAt:   Date.now() + (2 * MINUTE),
         });
       } else {
         isAlreadyChallenged.removeAt = Date.now() + (2 * MINUTE);
       }
       const response = prepare('gambling.fightme.challenge', {
-        username: user.username, sender: opts.sender.username, command: opts.command,
+        username: user.userName, sender: opts.sender.userName, command: opts.command,
       });
       return [{ response, ...opts }];
     }

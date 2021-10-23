@@ -33,7 +33,7 @@ class HelpersFilter {
     if (!$userObject) {
       changelog.update(opts.sender.userId, {
         userId:   opts.sender.userId,
-        username: opts.sender.username,
+        userName: opts.sender.userName,
       });
       return checkFilter(opts, filter);
     }
@@ -47,21 +47,21 @@ class HelpersFilter {
       moderator:   isModerator($userObject),
       subscriber:  isSubscriber($userObject),
       vip:         isVIP($userObject),
-      broadcaster: isBroadcaster(opts.sender.username),
-      bot:         isBot(opts.sender.username),
-      owner:       isOwner(opts.sender.username),
+      broadcaster: isBroadcaster(opts.sender.userName),
+      bot:         isBot(opts.sender.userName),
+      owner:       isOwner(opts.sender.userName),
     };
 
     const customVariables = await getAll();
     const context = {
-      $source:    typeof opts.sender.discord === 'undefined' ? 'twitch' : 'discord',
-      $sender:    opts.sender.username,
+      $source:    typeof opts.discord === 'undefined' ? 'twitch' : 'discord',
+      $sender:    opts.sender.userName,
       $is,
       $rank,
       $haveParam: opts.parameters?.length > 0,
       $param:     opts.parameters,
       // add global variables
-      ...await this.getGlobalVariables(filter, { sender: opts.sender }),
+      ...await this.getGlobalVariables(filter, { sender: opts.sender, discord: opts.discord }),
       ...customVariables,
     };
     let result =  false;
@@ -74,7 +74,7 @@ class HelpersFilter {
   }
 
   @timer()
-  async getGlobalVariables(message: string, opts: { escape?: string, sender?: CommandOptions['sender'] }) {
+  async getGlobalVariables(message: string, opts: { escape?: string, sender?: CommandOptions['sender'], discord?: CommandOptions['discord'] }) {
     if (!message.includes('$')) {
       // message doesn't have any variables
       return {};
@@ -88,7 +88,7 @@ class HelpersFilter {
       $subscribers:     stats.value.currentSubscribers,
       $bits:            isStreamOnline.value ? stats.value.currentBits : 0,
       $title:           stats.value.currentTitle,
-      $source:          opts.sender && typeof opts.sender.discord !== 'undefined' ? 'discord' : 'twitch',
+      $source:          opts.sender && typeof opts.discord !== 'undefined' ? 'discord' : 'twitch',
       $isBotSubscriber: isBotSubscriber(),
       $isStreamOnline:  isStreamOnline.value,
     };
@@ -171,6 +171,6 @@ export const checkFilter = async (opts: CommandOptions | ParserOptions, filter: 
   return cl.checkFilter(opts, filter);
 };
 
-export const getGlobalVariables = async (message: string, opts: { escape?: string, sender?: CommandOptions['sender'] }): Promise<Record<string, any>> => {
+export const getGlobalVariables = async (message: string, opts: { escape?: string, sender?: CommandOptions['sender'], discord?: CommandOptions['discord'] }): Promise<Record<string, any>> => {
   return cl.getGlobalVariables(message, opts);
 };

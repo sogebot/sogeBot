@@ -17,7 +17,7 @@ describe('Ranks - custom rank - @func2', () => {
   });
 
   it(`Set custom rank 'My amazing rank'`, async () => {
-    const r = await ranks.set({ sender: owner, parameters: `${viewer.username} My amazing rank` });
+    const r = await ranks.set({ sender: owner, parameters: `${viewer.userName} My amazing rank` });
     assert.strictEqual(r[0].response, `$sender, you set My amazing rank to @__viewer__`);
   });
 
@@ -27,7 +27,7 @@ describe('Ranks - custom rank - @func2', () => {
   });
 
   it(`Unset custom rank`, async () => {
-    const r = await ranks.unset({ sender: owner, parameters: `${viewer.username}` });
+    const r = await ranks.unset({ sender: owner, parameters: `${viewer.userName}` });
     assert.strictEqual(r[0].response, `$sender, custom rank for @__viewer__ was unset`);
   });
 

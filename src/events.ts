@@ -234,23 +234,23 @@ class Events extends Core {
     debug('events', JSON.stringify({ eventId, attributes }));
 
     if (!attributes.isAnonymous) {
-      if (attributes.username !== null && typeof attributes.username !== 'undefined' && (attributes.userId || !attributes.userId && !excludedUsers.has(attributes.username))) {
-        excludedUsers.delete(attributes.username); // remove from excluded users if passed first if
+      if (attributes.userName !== null && typeof attributes.userName !== 'undefined' && (attributes.userId || !attributes.userId && !excludedUsers.has(attributes.userName))) {
+        excludedUsers.delete(attributes.userName); // remove from excluded users if passed first if
 
         await changelog.flush();
         const user = attributes.userId
           ? await getRepository(User).findOne({ userId: attributes.userId })
-          : await getRepository(User).findOne({ username: attributes.username });
+          : await getRepository(User).findOne({ userName: attributes.userName });
 
         if (!user) {
           try {
-            const userId = attributes.userId ? attributes.userId : await getIdFromTwitch(attributes.username);
-            changelog.update(userId, { username: attributes.username });
+            const userId = attributes.userId ? attributes.userId : await getIdFromTwitch(attributes.userName);
+            changelog.update(userId, { userName: attributes.userName });
             return this.fire(eventId, attributes);
           } catch (e: any) {
-            excludedUsers.add(attributes.username);
-            warning(`User ${attributes.username} triggered event ${eventId} was not found on Twitch.`);
-            warning(`User ${attributes.username} will be excluded from events, until stream restarts or user writes in chat and his data will be saved.`);
+            excludedUsers.add(attributes.userName);
+            warning(`User ${attributes.userName} triggered event ${eventId} was not found on Twitch.`);
+            warning(`User ${attributes.userName} will be excluded from events, until stream restarts or user writes in chat and his data will be saved.`);
             warning(e);
             return;
           }
@@ -261,18 +261,18 @@ class Events extends Core {
           moderator:   isModerator(user),
           subscriber:  isSubscriber(user),
           vip:         isVIP(user),
-          broadcaster: isBroadcaster(attributes.username),
-          bot:         isBot(attributes.username),
-          owner:       isOwner(attributes.username),
+          broadcaster: isBroadcaster(attributes.userName),
+          bot:         isBot(attributes.userName),
+          owner:       isOwner(attributes.userName),
         };
       }
     }
     if (!isNil(get(attributes, 'recipient', null))) {
       await changelog.flush();
-      const user = await getRepository(User).findOne({ username: attributes.recipient });
+      const user = await getRepository(User).findOne({ userName: attributes.recipient });
       if (!user) {
         const userId = await getIdFromTwitch(attributes.recipient);
-        changelog.update(userId, { username: attributes.recipient });
+        changelog.update(userId, { userName: attributes.recipient });
         this.fire(eventId, attributes);
         return;
       }
@@ -422,7 +422,7 @@ class Events extends Core {
   }
 
   public async fireRunCommand(operation: EventsEntity.OperationDefinitions, attributes: EventsEntity.Attributes) {
-    const username = isNil(attributes.username) ? getOwner() : attributes.username;
+    const username = isNil(attributes.userName) ? getOwner() : attributes.userName;
     const userId = attributes.userId ? attributes.userId : await users.getIdByName(username);
 
     let command = String(operation.commandToRun);
@@ -431,36 +431,27 @@ class Events extends Core {
       if (_.isObject(val) && Object.keys(val).length === 0) {
         return;
       } // skip empty object
-      const replace = new RegExp(`\\$${key}`, 'g');
+      const replace = new RegExp(`\\$${key}`, 'gi');
       command = command.replace(replace, val);
     }
-    command = await new Message(command).parse({ username, sender: getUserSender(String(userId), username) });
+    command = await new Message(command).parse({ userName: username, sender: getUserSender(String(userId), username), discord: undefined });
 
-    if ((global as any).mocha) {
-      parserEmitter.emit('process', {
-        sender:  { username, userId: String(userId) },
-        message: command,
-        skip:    true,
-        quiet:   get(operation, 'isCommandQuiet', false) as boolean,
-      }, (responses) => {
-        for (let i = 0; i < responses.length; i++) {
-          setTimeout(async () => {
-            parserReply(await responses[i].response, { sender: responses[i].sender, attr: responses[i].attr });
-          }, 500 * i);
-        }
-      });
-    } else {
-      tmi.message({
-        userstate: { username, userId },
-        message:   command,
-        skip:      true,
-        quiet:     !!get(operation, 'isCommandQuiet', false),
-      });
-    }
+    parserEmitter.emit('process', {
+      sender:  { userName: username, userId: String(userId) },
+      message: command,
+      skip:    true,
+      quiet:   get(operation, 'isCommandQuiet', false) as boolean,
+    }, (responses) => {
+      for (let i = 0; i < responses.length; i++) {
+        setTimeout(async () => {
+          parserReply(await responses[i].response, { sender: responses[i].sender, discord: responses[i].discord, attr: responses[i].attr });
+        }, 500 * i);
+      }
+    });
   }
 
   public async fireSendChatMessageOrWhisper(operation: EventsEntity.OperationDefinitions, attributes: EventsEntity.Attributes, whisper: boolean): Promise<void> {
-    const username = isNil(attributes.username) ? getOwner() : attributes.username;
+    const userName = isNil(attributes.userName) ? getOwner() : attributes.userName;
     let userId = attributes.userId;
 
     let userObj;
@@ -468,14 +459,14 @@ class Events extends Core {
       userObj = await changelog.get(userId);
     } else {
       await changelog.flush();
-      userObj = await getRepository(User).findOne({ username });
+      userObj = await getRepository(User).findOne({ userName });
     }
     await changelog.flush();
     if (!userObj && !attributes.test) {
-      userId = await getIdFromTwitch(username);
-      changelog.update(userId, { username });
+      userId = await getIdFromTwitch(userName);
+      changelog.update(userId, { userName });
       return this.fireSendChatMessageOrWhisper(operation, {
-        ...attributes, userId, username,
+        ...attributes, userId, userName,
       }, whisper);
     } else if (attributes.test) {
       userId = attributes.userId;
@@ -485,21 +476,9 @@ class Events extends Core {
 
     const message = attributesReplace(attributes, String(operation.messageToSend));
     parserReply(message, {
-      sender: {
-        badges:      {},
-        emotes:      [],
-        userId:      String(userId),
-        username,
-        displayName: userObj?.displayname || username,
-        color:       '',
-        emoteSets:   [],
-        userType:    'viewer',
-        isModerator: false,
-        mod:         '0',
-        subscriber:  '0',
-        turbo:       '0',
-      },
-    }, whisper ? 'whisper' : 'chat');
+      sender:  getUserSender(userId ?? '0', userName),
+      discord: undefined,
+    });
   }
 
   public async fireSendWhisper(operation: EventsEntity.OperationDefinitions, attributes: EventsEntity.Attributes) {

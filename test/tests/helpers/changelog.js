@@ -24,7 +24,7 @@ describe('User changelog tests - @func1', () => {
   it('add if several data should return correct data', async () => {
     const expected = {
       userId:                    '999999',
-      username:                  'lorem',
+      userName:                  'lorem',
       watchedTime:               55555,
       points:                    9,
       messages:                  19,
@@ -67,11 +67,11 @@ describe('User changelog tests - @func1', () => {
       },
     };
     changelog.update('999999', {
-      username:    'aaaa',
+      userName:    'aaaa',
       watchedTime: 55555,
     });
     changelog.update('999999', {
-      username: 'lorem',
+      userName: 'lorem',
       points:   20,
       messages: 18,
     });
@@ -111,7 +111,7 @@ describe('User changelog tests - @func1', () => {
   it('after flush all data should be in database', async () => {
     const expected = {
       userId:                    '999999',
-      username:                  'lorem',
+      userName:                  'lorem',
       watchedTime:               55555,
       points:                    9,
       messages:                  19,

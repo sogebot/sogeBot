@@ -11,6 +11,12 @@ const user = require('../../general.js').user;
 
 let emotes;
 
+const emotesOffsetsKappa = new Map();
+emotesOffsetsKappa.set('25', ['0-4']);
+
+const emotesOffsetsHeyGuys = new Map();
+emotesOffsetsHeyGuys.set('30259', ['0-6']);
+
 describe('Emotes - combo - @func2', () => {
   describe('Emotes combo should send proper message after 3 emotes', () => {
     let comboLastBreak = 0;
@@ -30,30 +36,20 @@ describe('Emotes - combo - @func2', () => {
       for (let i = 0; i < 3; i++) {
         it('Send a message with Kappa emote', async () => {
           await emotes.containsEmotes({
-            sender: {
-              ...user.owner, emotes: [
-                {
-                  id:    '25',
-                  start: 0,
-                  end:   4,
-                },
-              ],
-            }, parameters: 'Kappa', message: 'Kappa',
+            emotesOffsets: emotesOffsetsKappa,
+            sender:        user.owner,
+            parameters:    'Kappa',
+            message:       'Kappa',
           });
         });
       }
 
       it ('Send a message with HeyGuys emote', async () => {
         await emotes.containsEmotes({
-          sender: {
-            ...user.owner, emotes: [
-              {
-                id:    '30259',
-                start: 0,
-                end:   6,
-              },
-            ],
-          }, parameters: 'HeyGuys', message: 'HeyGuys',
+          emotesOffsets: emotesOffsetsHeyGuys,
+          sender:        user.owner,
+          parameters:    'HeyGuys',
+          message:       'HeyGuys',
         });
       });
 
@@ -89,30 +85,20 @@ describe('Emotes - combo - @func2', () => {
       for (let i = 0; i < 3; i++) {
         it('Send a message with Kappa emote', async () => {
           await emotes.containsEmotes({
-            sender: {
-              ...user.owner, emotes: [
-                {
-                  id:    '25',
-                  start: 0,
-                  end:   4,
-                },
-              ],
-            }, parameters: 'Kappa', message: 'Kappa',
+            emotesOffsets: emotesOffsetsKappa,
+            sender:        user.owner,
+            parameters:    'Kappa',
+            message:       'Kappa',
           });
         });
       }
 
       it ('Send a message with HeyGuys emote', async () => {
         await emotes.containsEmotes({
-          sender: {
-            ...user.owner, emotes: [
-              {
-                id:    '30259',
-                start: 0,
-                end:   6,
-              },
-            ],
-          }, parameters: 'HeyGuys', message: 'HeyGuys',
+          emotesOffsets: emotesOffsetsHeyGuys,
+          sender:        user.owner,
+          parameters:    'HeyGuys',
+          message:       'HeyGuys',
         });
       });
 

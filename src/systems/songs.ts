@@ -205,7 +205,7 @@ class Songs extends System {
     adminEndpoint(this.nsp, 'import.ban', async (url, cb) => {
       try {
         cb(null, await this.banSong({
-          parameters: this.getIdFromURL(url), sender: getBotSender(), command: '', createdAt: Date.now(), attr: {},
+          isAction: false, emotesOffsets: new Map(), parameters: this.getIdFromURL(url), sender: getBotSender(), command: '', createdAt: Date.now(), attr: {}, discord: undefined,
         }));
       } catch (e: any) {
         cb(e.stack, []);
@@ -215,7 +215,7 @@ class Songs extends System {
       try {
         isCachedTagsValid = false;
         cb(null, await this.importPlaylist({
-          parameters: playlist, sender: getBotSender(), command: '', createdAt: Date.now(), attr: { forcedTag },
+          isAction: false, emotesOffsets: new Map(), parameters: playlist, sender: getBotSender(), command: '', createdAt: Date.now(), attr: { forcedTag }, discord: undefined,
         }));
       } catch (e: any) {
         cb(e.stack, null);
@@ -224,7 +224,7 @@ class Songs extends System {
     adminEndpoint(this.nsp, 'import.video', async ({ playlist, forcedTag }, cb) => {
       try {
         cb(null, await this.addSongToPlaylist({
-          parameters: playlist, sender: getBotSender(), command: '', createdAt: Date.now(), attr: { forcedTag },
+          isAction: false, emotesOffsets: new Map(), parameters: playlist, sender: getBotSender(), command: '', createdAt: Date.now(), attr: { forcedTag }, discord: undefined,
         }));
       } catch (e: any) {
         cb(e.stack, null);
@@ -312,9 +312,9 @@ class Songs extends System {
       request.push(JSON.parse(this.currentSong).username);
     }
     await changelog.flush();
-    const users = await getRepository(User).find({ username: In(request) });
+    const users = await getRepository(User).find({ userName: In(request) });
     for (const username of request) {
-      const data = users.find(o => o.username === username);
+      const data = users.find(o => o.userName === username);
       timeout(username, 300, typeof data !== 'undefined' && isModerator(data));
     }
 
@@ -489,7 +489,7 @@ class Songs extends System {
       }
 
       return this.addSongToPlaylist({
-        sender: getBotSender(), parameters: currentSong.videoId, attr: {}, createdAt: Date.now(), command: '',
+        ...opts, sender: getBotSender(), parameters: currentSong.videoId, attr: {}, createdAt: Date.now(), command: '',
       });
     } catch (err: any) {
       return [{ response: translate('songs.no-song-is-currently-playing'), ...opts }];
@@ -607,7 +607,7 @@ class Songs extends System {
           addedAt:  Date.now(),
           loudness: Number(videoInfo.loudness ?? -15),
           length:   Number(videoInfo.videoDetails.lengthSeconds),
-          username: opts.sender.username,
+          username: opts.sender.userName,
         });
         this.getMeanLoudness();
         const response = prepare('songs.song-was-added-to-queue', { name: videoInfo.videoDetails.title });
@@ -630,7 +630,7 @@ class Songs extends System {
   @command('!wrongsong')
   async removeSongFromQueue (opts: CommandOptions): Promise<CommandResponse[]> {
     const sr = await getRepository(SongRequest).findOne({
-      where: { username: opts.sender.username },
+      where: { username: opts.sender.userName },
       order: { addedAt: 'DESC' },
     });
     if (sr) {

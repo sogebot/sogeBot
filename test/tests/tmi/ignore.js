@@ -14,12 +14,12 @@ const { Settings } = require('../../../dest/database/entity/settings');
 const tmi = (require('../../../dest/chat')).default;
 
 // users
-const owner = { username: '__broadcaster__' };
-const testuser = { username: 'testuser', userId: String(1) };
-const testuser2 = { username: 'testuser2', userId: String(2) };
-const testuser3 = { username: 'testuser3', userId: String(3) };
-const nightbot = { username: 'nightbot', userId: String(4) };
-const botwithchangedname = { username: 'asdsadas', userId: String(24900234) };
+const owner = { userName: '__broadcaster__' };
+const testuser = { userName: 'testuser', userId: String(1) };
+const testuser2 = { userName: 'testuser2', userId: String(2) };
+const testuser3 = { userName: 'testuser3', userId: String(3) };
+const nightbot = { userName: 'nightbot', userId: String(4) };
+const botwithchangedname = { userName: 'asdsadas', userId: String(24900234) };
 
 const { isIgnored } = require('../../../dest/helpers/user/isIgnored');
 
@@ -61,12 +61,12 @@ describe('TMI - ignore - @func3', () => {
 
     it('add testuser to ignore list', async () => {
       const r = await tmi.ignoreAdd({ sender: owner, parameters: 'testuser' });
-      assert.strictEqual(r[0].response, prepare('ignore.user.is.added', { username: 'testuser' }));
+      assert.strictEqual(r[0].response, prepare('ignore.user.is.added', { userName: 'testuser' }));
     });
 
     it('add @testuser2 to ignore list', async () => {
       const r = await tmi.ignoreAdd({ sender: owner, parameters: '@testuser2' });
-      assert.strictEqual(r[0].response, prepare('ignore.user.is.added', { username: 'testuser2' }));
+      assert.strictEqual(r[0].response, prepare('ignore.user.is.added', { userName: 'testuser2' }));
     });
 
     it('testuser should be in ignore list', async () => {
@@ -79,7 +79,7 @@ describe('TMI - ignore - @func3', () => {
         },
       });
 
-      assert.strictEqual(r[0].response, prepare('ignore.user.is.ignored', { username: 'testuser' }));
+      assert.strictEqual(r[0].response, prepare('ignore.user.is.ignored', { userName: 'testuser' }));
       assert(await isIgnored(testuser));
       assert(typeof item !== 'undefined');
       assert(item.value.includes('testuser'));
@@ -94,7 +94,7 @@ describe('TMI - ignore - @func3', () => {
         },
       });
 
-      assert.strictEqual(r[0].response, prepare('ignore.user.is.ignored', { username: 'testuser2' }));
+      assert.strictEqual(r[0].response, prepare('ignore.user.is.ignored', { userName: 'testuser2' }));
       assert(await isIgnored(testuser2));
       assert(typeof item !== 'undefined');
       assert(item.value.includes('testuser2'));
@@ -109,7 +109,7 @@ describe('TMI - ignore - @func3', () => {
         },
       });
 
-      assert.strictEqual(r[0].response, prepare('ignore.user.is.not.ignored', { username: 'testuser3' }));
+      assert.strictEqual(r[0].response, prepare('ignore.user.is.not.ignored', { userName: 'testuser3' }));
       assert(!(await isIgnored(testuser3)));
       assert(typeof item !== 'undefined');
       assert(!item.value.includes('testuser3'));
@@ -118,12 +118,12 @@ describe('TMI - ignore - @func3', () => {
 
     it('remove testuser from ignore list', async () => {
       const r = await tmi.ignoreRm({ sender: owner, parameters: 'testuser' });
-      assert.strictEqual(r[0].response, prepare('ignore.user.is.removed', { username: 'testuser' }));
+      assert.strictEqual(r[0].response, prepare('ignore.user.is.removed', { userName: 'testuser' }));
     });
 
     it('testuser should not be in ignore list', async () => {
       const r = await tmi.ignoreCheck({ sender: owner, parameters: 'testuser' });
-      assert.strictEqual(r[0].response, prepare('ignore.user.is.not.ignored', { username: 'testuser' }));
+      assert.strictEqual(r[0].response, prepare('ignore.user.is.not.ignored', { userName: 'testuser' }));
       assert(!(await isIgnored(testuser)));
     });
 

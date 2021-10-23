@@ -379,13 +379,13 @@ class Keywords extends System {
         }
       }
 
-      this.sendResponse(_.cloneDeep(_responses), { sender: opts.sender });
+      this.sendResponse(_.cloneDeep(_responses), { sender: opts.sender, discord: opts.discord });
     }
 
     return atLeastOnePermissionOk;
   }
 
-  async sendResponse(responses: (KeywordsResponsesInterface)[], opts: { sender: CommandOptions['sender'] }) {
+  async sendResponse(responses: (KeywordsResponsesInterface)[], opts: { sender: CommandOptions['sender'], discord: CommandOptions['discord'] }) {
     for (let i = 0; i < responses.length; i++) {
       await parserReply(responses[i].response, opts);
     }

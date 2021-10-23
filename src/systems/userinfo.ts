@@ -54,15 +54,15 @@ class UserInfo extends System {
 
   @command('!followage')
   protected async followage(opts: CommandOptions): Promise<CommandResponse[]> {
-    const [username] = new Expects(opts.parameters).username({ optional: true, default: opts.sender.username }).toArray();
-    const id = await users.getIdByName(username);
+    const [userName] = new Expects(opts.parameters).username({ optional: true, default: opts.sender.userName }).toArray();
+    const id = await users.getIdByName(userName);
     const isFollowerUpdate = await api.isFollowerUpdate(await changelog.get(id));
     debug('userinfo.followage', JSON.stringify(isFollowerUpdate));
 
     await changelog.flush();
-    const user = await getRepository(User).findOne({ username });
+    const user = await getRepository(User).findOne({ userName });
     if (!user || !user.isFollower || user.followedAt === 0) {
-      return [{ response: prepare('followage.' + (opts.sender.username === username.toLowerCase() ? 'successSameUsername' : 'success') + '.never', { username }), ...opts }];
+      return [{ response: prepare('followage.' + (opts.sender.userName === userName.toLowerCase() ? 'successSameUsername' : 'success') + '.never', { username: userName }), ...opts }];
     } else {
       const units = ['years', 'months', 'days', 'hours', 'minutes'] as const;
       const diff = dateDiff(new Date(user.followedAt).getTime(), Date.now());
@@ -79,9 +79,9 @@ class UserInfo extends System {
       }
 
       return [{
-        response: prepare('followage.' + (opts.sender.username === username.toLowerCase() ? 'successSameUsername' : 'success') + '.time', {
-          username,
-          diff: output.join(', '),
+        response: prepare('followage.' + (opts.sender.userName === userName.toLowerCase() ? 'successSameUsername' : 'success') + '.time', {
+          username: userName,
+          diff:     output.join(', '),
         }), ...opts,
       }];
     }
@@ -89,17 +89,17 @@ class UserInfo extends System {
 
   @command('!subage')
   protected async subage(opts: CommandOptions): Promise<CommandResponse[]> {
-    const [username] = new Expects(opts.parameters).username({ optional: true, default: opts.sender.username }).toArray();
+    const [userName] = new Expects(opts.parameters).username({ optional: true, default: opts.sender.userName }).toArray();
     await changelog.flush();
-    const user = await getRepository(User).findOne({ username });
+    const user = await getRepository(User).findOne({ userName });
     const subCumulativeMonths = user?.subscribeCumulativeMonths;
     const subStreak = user?.subscribeStreak;
-    const localePath = 'subage.' + (opts.sender.username === username.toLowerCase() ? 'successSameUsername' : 'success') + '.';
+    const localePath = 'subage.' + (opts.sender.userName === userName.toLowerCase() ? 'successSameUsername' : 'success') + '.';
 
     if (!user || !user.isSubscriber || user.subscribedAt === 0) {
       return [{
         response: prepare(localePath + (subCumulativeMonths ? 'notNow' : 'never'), {
-          username,
+          username:                userName,
           subCumulativeMonths,
           subCumulativeMonthsName: getLocalizedName(subCumulativeMonths || 0, translate('core.months')),
         }), ...opts,
@@ -120,7 +120,7 @@ class UserInfo extends System {
 
       return [{
         response: prepare(localePath + (subStreak ? 'timeWithSubStreak' : 'time'), {
-          username,
+          username:                userName,
           subCumulativeMonths,
           subCumulativeMonthsName: getLocalizedName(subCumulativeMonths || 0, translate('core.months')),
           subStreak,
@@ -133,14 +133,14 @@ class UserInfo extends System {
 
   @command('!age')
   protected async age(opts: CommandOptions, retry = false): Promise<CommandResponse[]> {
-    const [username] = new Expects(opts.parameters).username({ optional: true, default: opts.sender.username }).toArray();
+    const [userName] = new Expects(opts.parameters).username({ optional: true, default: opts.sender.userName }).toArray();
     await changelog.flush();
-    const user = await getRepository(User).findOne({ username });
+    const user = await getRepository(User).findOne({ userName });
     if (!user || user.createdAt === 0) {
       try {
-        const { id: userId } = await getUserFromTwitch(username);
+        const { id: userId } = await getUserFromTwitch(userName);
         if (!user) {
-          changelog.update(userId, { username });
+          changelog.update(userId, { userName });
         }
         await fetchAccountAge(userId);
         if (!retry) {
@@ -152,7 +152,7 @@ class UserInfo extends System {
         if (e.message !== 'retry') {
           error(e);
         }
-        return [{ response: prepare('age.failed', { username }), ...opts }];
+        return [{ response: prepare('age.failed', { username: userName }), ...opts }];
       }
     } else {
       const units = ['years', 'months', 'days', 'hours', 'minutes'] as const;
@@ -168,9 +168,9 @@ class UserInfo extends System {
         output.push(0 + ' ' + getLocalizedName(0, translate('core.minutes')));
       }
       return [{
-        response: prepare('age.success.' + (opts.sender.username === username.toLowerCase() ? 'withoutUsername' : 'withUsername'), {
-          username,
-          diff: output.join(', '),
+        response: prepare('age.success.' + (opts.sender.userName === userName.toLowerCase() ? 'withoutUsername' : 'withUsername'), {
+          username: userName,
+          diff:     output.join(', '),
         }), ...opts,
       }];
     }
@@ -179,15 +179,15 @@ class UserInfo extends System {
   @command('!lastseen')
   protected async lastseen(opts: CommandOptions): Promise<CommandResponse[]> {
     try {
-      const [username] = new Expects(opts.parameters).username().toArray();
+      const [userName] = new Expects(opts.parameters).username().toArray();
       await changelog.flush();
-      const user = await getRepository(User).findOne({ username: username });
+      const user = await getRepository(User).findOne({ userName: userName });
       if (!user || user.seenAt === 0) {
-        return [{ response: translate('lastseen.success.never').replace(/\$username/g, username), ...opts }];
+        return [{ response: translate('lastseen.success.never').replace(/\$username/g, userName), ...opts }];
       } else {
         return [{
           response: translate('lastseen.success.time')
-            .replace(/\$username/g, username)
+            .replace(/\$username/g, userName)
             .replace(/\$when/g, dayjs(user.seenAt).tz(timezone).format(this.lastSeenFormat)), ...opts,
         }];
       }
@@ -199,10 +199,10 @@ class UserInfo extends System {
   @command('!watched')
   protected async watched(opts: CommandOptions): Promise<CommandResponse[]> {
     try {
-      const [username] = new Expects(opts.parameters).username({ optional: true, default: opts.sender.username }).toArray();
+      const [username] = new Expects(opts.parameters).username({ optional: true, default: opts.sender.userName }).toArray();
 
       let id;
-      if (opts.sender.username === username) {
+      if (opts.sender.userName === username) {
         id = opts.sender.userId;
       } else {
         id = await users.getIdByName(username);
@@ -225,7 +225,7 @@ class UserInfo extends System {
       ]);
 
       if (!user) {
-        throw Error(`User ${opts.sender.username}#${opts.sender.userId} not found.`);
+        throw Error(`User ${opts.sender.userName}#${opts.sender.userId} not found.`);
       }
 
       // build message
@@ -311,7 +311,7 @@ class UserInfo extends System {
         return response;
       } else {
         return [{
-          response, sender: opts.sender, attr: opts.attr,
+          response, sender: opts.sender, attr: opts.attr, discord: opts.discord,
         }];
       }
     } catch (e: any) {
@@ -324,25 +324,25 @@ class UserInfo extends System {
   @default_permission(null)
   async showStats(opts: CommandOptions): Promise<CommandResponse[]> {
     try {
-      const username = new Expects(opts.parameters).username().toArray()[0].toLowerCase();
+      const userName = new Expects(opts.parameters).username().toArray()[0].toLowerCase();
       await changelog.flush();
-      const user = await getRepository(User).findOne({ where: { username: username.toLowerCase() } });
+      const user = await getRepository(User).findOne({ where: { userName: userName.toLowerCase() } });
 
       if (!user) {
-        throw Error(`User ${username} not found.`);
+        throw Error(`User ${userName} not found.`);
       }
 
       const response = await this.showMe({
         ...opts,
         sender: {
           ...opts.sender,
-          username,
+          userName,
           userId: String(user.userId),
         },
       }, true) as string;
       return [
         {
-          response: response.replace('$sender', '$touser'), sender: opts.sender, attr: { ...opts.attr, param: username },
+          response: response.replace('$sender', '$touser'), sender: opts.sender, attr: { ...opts.attr, param: userName }, discord: opts.discord,
         },
       ];
     } catch (e: any) {
