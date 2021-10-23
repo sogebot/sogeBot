@@ -17,10 +17,10 @@ const tmi = require('../../../dest/chat').default;
 // users
 const owner = { userName: '__broadcaster__' };
 const testuser1 = {
-  userName: 'testuser1', userId: '1', userId: '1',
+  userName: 'testuser1', userId: '1',
 };
 const testuser2 = {
-  userName: 'testuser2', userId: '2', userId: '2',
+  userName: 'testuser2', userId: '2',
 };
 
 const { VariableWatcher } = require('../../../dest/watchers');
