@@ -3,7 +3,7 @@ import _ from 'lodash';
 import { timer } from '../../decorators.js';
 import { Message } from '../../message';
 import {
-  chatOut, debug, whisperOut,
+  chatOut, debug,
 } from '../log';
 import {
   getMuteStatus, message, sendWithMe, showWithAt,
@@ -14,8 +14,8 @@ import { getBotSender } from '.';
 // exposing functions to @timer decorator
 class HelpersCommons {
   @timer()
-  async sendMessage(messageToSend: string | Promise<string>, sender: Partial<UserStateTagsWithId> | null, attr?: {
-    sender?: Partial<UserStateTagsWithId>;
+  async sendMessage(messageToSend: string | Promise<string>, sender: Omit<ChatUser, '_userName' | '_userData' | '_parseBadgesLike'> | null, attr?: {
+    sender?: Partial<Omit<ChatUser, '_userName' | '_userData' | '_parseBadgesLike'>>;
     quiet?: boolean;
     skip?: boolean;
     force?: boolean;
@@ -65,16 +65,11 @@ class HelpersCommons {
         if ((!_.isNil(attr.quiet) && attr.quiet)) {
           return true;
         }
-        if (sender['message-type'] === 'whisper') {
-          whisperOut(`${messageToSend} [${sender.userName}]`);
-          message('whisper', sender.userName, messageToSend, id);
+        chatOut(`${messageToSend} [${sender.userName}]`);
+        if (sendWithMe.value && !messageToSend.startsWith('/')) {
+          message('me', null, messageToSend, id);
         } else {
-          chatOut(`${messageToSend} [${sender.userName}]`);
-          if (sendWithMe.value && !messageToSend.startsWith('/')) {
-            message('me', null, messageToSend, id);
-          } else {
-            message('say', null, messageToSend, id);
-          }
+          message('say', null, messageToSend, id);
         }
       }
       return true;
@@ -84,8 +79,8 @@ class HelpersCommons {
 }
 const self = new HelpersCommons();
 
-export async function sendMessage(messageToSend: string | Promise<string>, sender: Partial<UserStateTagsWithId> | null, attr?: {
-  sender?: Partial<UserStateTagsWithId>;
+export async function sendMessage(messageToSend: string | Promise<string>, sender: Omit<ChatUser, '_userName' | '_userData' | '_parseBadgesLike'> | null, attr?: {
+  sender?: Partial<Omit<ChatUser, '_userName' | '_userData' | '_parseBadgesLike'>>;
   quiet?: boolean;
   skip?: boolean;
   force?: boolean;

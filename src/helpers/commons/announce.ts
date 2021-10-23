@@ -4,6 +4,7 @@ import { chatOut } from '../log';
 import { botId } from '../oauth/botId';
 import { botUsername } from '../oauth/botUsername';
 import { getBotSender } from './getBotSender';
+import { getUserSender } from './getUserSender';
 
 /**
  * Announce in all channels (discord, twitch)
@@ -19,14 +20,7 @@ export async function announce(messageToAnnounce: string, type: typeof announceT
   const sendMessage = (require('./sendMessage') as typeof import('./sendMessage')).sendMessage;
 
   messageToAnnounce = await new Message(messageToAnnounce).parse({ sender: getBotSender(), replaceCustomVariables }) as string;
-  sendMessage(messageToAnnounce, {
-    username:       botUsername.value,
-    displayName:    botUsername.value,
-    userId:         botId.value,
-    emotes:         [],
-    badges:         {},
-    'message-type': 'chat',
-  }, { force: true, skip: true });
+  sendMessage(messageToAnnounce, getUserSender(botId.value, botUsername.value), { force: true, skip: true });
 
   if (Discord.sendAnnouncesToChannel[type].length > 0 && Discord.client) {
     // search discord channel by ID
