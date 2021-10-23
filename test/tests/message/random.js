@@ -18,8 +18,8 @@ const tmi = (require('../../../dest/chat')).default;
 
 async function setUsersOnline(users) {
   await getRepository(User).update({}, { isOnline: false });
-  for (const username of users) {
-    await getRepository(User).update({ username }, { isOnline: true });
+  for (const userName of users) {
+    await getRepository(User).update({ userName }, { isOnline: true });
   }
 }
 

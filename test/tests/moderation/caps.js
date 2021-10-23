@@ -45,13 +45,13 @@ describe('systems/moderation - Caps() - @func2', () => {
 
     for (const test of tests.timeout) {
       it(`message '${test.message}' should not timeout`, async () => {
-        assert(await moderation.caps({ sender: test.sender, message: test.message }));
+        assert(await moderation.caps({ emotesOffset: new Map(), sender: test.sender, message: test.message }));
       });
     }
 
     for (const test of tests.ok) {
       it(`message '${test.message}' should not timeout`, async () => {
-        assert(await moderation.caps({ sender: test.sender, message: test.message }));
+        assert(await moderation.caps({ emotesOffset: new Map(), sender: test.sender, message: test.message }));
       });
     }
   });
@@ -63,13 +63,13 @@ describe('systems/moderation - Caps() - @func2', () => {
 
     for (const test of tests.timeout) {
       it(`message '${test.message}' should timeout`, async () => {
-        assert(!(await moderation.caps({ sender: test.sender, message: test.message })));
+        assert(!(await moderation.caps({ emotesOffset: new Map(), sender: test.sender, message: test.message })));
       });
     }
 
     for (const test of tests.ok) {
       it(`message '${test.message}' should not timeout`, async () => {
-        assert(await moderation.caps({ sender: test.sender, message: test.message }));
+        assert(await moderation.caps({ emotesOffset: new Map(), sender: test.sender, message: test.message }));
       });
     }
   });
