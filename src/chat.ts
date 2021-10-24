@@ -221,7 +221,7 @@ class TMI extends Core {
       }
 
       const authProvider = new StaticAuthProvider(clientId, token);
-      this.client[type] = new ChatClient({ authProvider });
+      this.client[type] = new ChatClient({ authProvider, isAlwaysMod: true });
 
       this.loadListeners(type);
       await this.client[type]?.connect();
