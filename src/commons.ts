@@ -1,5 +1,4 @@
 import { TextChannel } from 'discord.js';
-import _ from 'lodash';
 
 import { timer } from './decorators.js';
 import { prepare } from './helpers/commons/prepare';
@@ -20,9 +19,9 @@ class Commons {
     const sender = opts.discord
       ? { ...senderObject, discord: { author: senderObject.discord.author, channel: senderObject.discord.channel } } : senderObject;
     if (isParserOpts(opts) ? opts.skip : opts.attr?.skip) {
-      return prepare(await response as string, { ...opts, sender }, false);
+      return prepare(await response as string, { ...opts, sender, forceWithoutAt: typeof opts.discord !== 'undefined' }, false);
     } else {
-      return new Message(await response as string).parse({ ...opts, sender });
+      return new Message(await response as string).parse({ ...opts, sender, forceWithoutAt: typeof opts.discord !== 'undefined' });
     }
   }
 
@@ -31,12 +30,7 @@ class Commons {
     if (!opts.sender) {
       return;
     }
-    const senderObject = {
-      ..._.cloneDeep(opts.sender),
-      'message-type': messageType,
-      forceWithoutAt: typeof opts.discord !== 'undefined', // we dont need @
-    };
-    const messageToSend = await this.messageToSend(senderObject, response, opts);
+    const messageToSend = await this.messageToSend(opts.sender, response, opts);
     if (opts.discord) {
       if (Discord.client) {
         if (messageType === 'chat') {
@@ -57,7 +51,7 @@ class Commons {
       }
     } else {
       // we skip as we are already parsing message
-      sendMessage(messageToSend, senderObject, { skip: true, ...(isParserOpts(opts) ? {} : opts.attr) });
+      sendMessage(messageToSend, opts.sender, { skip: true, ...(isParserOpts(opts) ? {} : opts.attr ) });
     }
   }
 }

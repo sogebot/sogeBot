@@ -19,6 +19,7 @@ class HelpersCommons {
     discord?: CommandOptions['discord'];
     quiet?: boolean;
     skip?: boolean;
+    forceWithoutAt?: boolean;
     force?: boolean;
     [x: string]: any;
   }, id?: string) {
@@ -85,6 +86,7 @@ export async function sendMessage(messageToSend: string | Promise<string>, sende
   quiet?: boolean;
   skip?: boolean;
   force?: boolean;
+  forceWithoutAt?: boolean;
   [x: string]: any;
 }, id?: string) {
   return self.sendMessage(messageToSend, sender, attr, id);
