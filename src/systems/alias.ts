@@ -5,12 +5,13 @@ import * as _ from 'lodash';
 import { getRepository } from 'typeorm';
 
 import { parserReply } from '../commons';
-import { Alias as AliasEntity, AliasInterface } from '../database/entity/alias';
+import { Alias as AliasEntity, AliasGroup, AliasInterface } from '../database/entity/alias';
 import {
   command, default_permission, parser, timer,
 } from '../decorators';
 import Expects from '../expects';
 import * as cache from '../helpers/cache/alias';
+import { checkFilter } from '../helpers/checkFilter';
 import { incrementCountOfCommandUsage } from '../helpers/commands/count';
 import { prepare } from '../helpers/commons';
 import { executeVariablesInText } from '../helpers/customvariables';
@@ -111,10 +112,30 @@ class Alias extends System {
         warning(`Cannot run alias ${alias.alias}, because it exec ${alias.command}`);
         return false;
       } else {
-        if (typeof getFromViewersCache(opts.sender.userId, alias.permission) === 'undefined') {
-          addToViewersCache(opts.sender.userId, alias.permission, (await check(opts.sender.userId, alias.permission, false)).access);
+        let permission = alias.permission;
+        // load alias group if any
+        if (alias.group) {
+          const group = await getRepository(AliasGroup).findOne({ name: alias.group });
+          if (group) {
+            if (group.options.filter && await checkFilter(opts, group.options.filter)) {
+              warning(`Alias ${alias.alias}#${alias.id} didn't pass group filter.`);
+            }
+            if (permission === null) {
+              permission = group.options.permission;
+            }
+          }
         }
-        if (opts.skip || getFromViewersCache(opts.sender.userId, alias.permission)) {
+
+        // show warning if null permission
+        if (!permission) {
+          permission = defaultPermissions.CASTERS;
+          warning(`Alias ${alias.alias}#${alias.id} doesn't have any permission set, treating as CASTERS permission.`);
+        }
+
+        if (typeof getFromViewersCache(opts.sender.userId, permission) === 'undefined') {
+          addToViewersCache(opts.sender.userId, permission, (await check(opts.sender.userId, permission, false)).access);
+        }
+        if (opts.skip || getFromViewersCache(opts.sender.userId, permission)) {
           // process custom variables
           const response = await executeVariablesInText(
             opts.message.replace(replace, alias.command), {

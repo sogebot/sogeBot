@@ -31,10 +31,17 @@ export class AliasInterface {
   enabled: boolean;
   @Field()
   visible: boolean;
-  @Field()
-  permission: string;
+  @Field(type => String, { nullable: true })
+  permission: string | null;
   @Field(type => String, { nullable: true })
   group: string | null;
+}
+export class AliasGroupInterface {
+  name: string;
+  options: {
+    filter: string | null;
+    permission: string | null;
+  };
 }
 
 export const Alias = new EntitySchema<Readonly<Required<AliasInterface>>>({
@@ -47,10 +54,23 @@ export const Alias = new EntitySchema<Readonly<Required<AliasInterface>>>({
     command:    { type: 'text' },
     enabled:    { type: Boolean },
     visible:    { type: Boolean },
-    permission: { type: String },
+    permission: { type: String, nullable: true },
     group:      { type: String, nullable: true },
   },
   indices: [
     { name: 'IDX_6a8a594f0a5546f8082b0c405c', columns: ['alias'] },
+  ],
+});
+
+export const AliasGroup = new EntitySchema<Readonly<Required<AliasGroupInterface>>>({
+  name:    'alias_group',
+  columns: {
+    name: {
+      type: String, primary: true,
+    },
+    options: { type: 'simple-json' },
+  },
+  indices: [
+    { name: 'IDX_alias_group_unique_name', columns: ['name'], unique: true },
   ],
 });
