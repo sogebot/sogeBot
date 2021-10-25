@@ -4,6 +4,7 @@
     "globalIgnoreListExclude": "Odebrat z globálního seznamu ignorovaných",
     "showWithAt": "Zobraz uzivatele s @",
     "sendWithMe": "Posílat zprávy s /me",
+    "sendAsReply": "Send bot messages as replies",
     "mute": "Bot je ztišen",
     "whisperListener": "Provádět příkazy pres whisper"
   }
