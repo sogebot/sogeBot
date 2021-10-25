@@ -7,23 +7,24 @@
 [![Patreon](https://img.shields.io/badge/dynamic/json?logo=patreon&style=for-the-badge&color=%23e85b46&label=Patreon&query=data.attributes.patron_count&suffix=%20patrons&url=https%3A%2F%2Fwww.patreon.com%2Fapi%2Fcampaigns%2F3198445)](https://www.patreon.com/soge__)
 [![Codecov](https://img.shields.io/codecov/c/github/sogehige/sogebot/master?logo=codecov&style=for-the-badge)](https://app.codecov.io/gh/sogehige/sogeBot/branch/master)
 
-
 Free Twitch Bot built on Node.js
 
 #### Important links
 
-- **DISCORD**: https://discordapp.com/invite/52KpmuH
-- **GITHUB**: https://github.com/sogehige/sogeBot
-- **DOCS**: http://sogehige.github.io/sogeBot/
-- **ISSUES**: https://github.com/sogehige/sogeBot/issues
-- **RELEASES**: https://github.com/sogehige/sogeBot/releases
-- **FORUM, IDEAS & SUGGESTIONS**: https://community.sogebot.xyz/
+- **DISCORD**: <https://discordapp.com/invite/52KpmuH>
+- **GITHUB**: <https://github.com/sogehige/sogeBot>
+- **DOCS**: <http://sogehige.github.io/sogeBot/>
+- **ISSUES**: <https://github.com/sogehige/sogeBot/issues>
+- **RELEASES**: <https://github.com/sogehige/sogeBot/releases>
+- **FORUM, IDEAS & SUGGESTIONS**: <https://community.sogebot.xyz/>
 
 #### Screenshots
+
 <img src="https://raw.githubusercontent.com/sogehige/sogeBot/master/docs/_images/screenshots/1.png" width="200"> <img src="https://raw.githubusercontent.com/sogehige/sogeBot/master/docs/_images/screenshots/2.png" width="200"> <img src="https://raw.githubusercontent.com/sogehige/sogeBot/master/docs/_images/screenshots/3.png" width="200"> <img src="https://raw.githubusercontent.com/sogehige/sogeBot/master/docs/_images/screenshots/4.png" width="200"> <img src="https://raw.githubusercontent.com/sogehige/sogeBot/master/docs/_images/screenshots/5.png" width="200"> <img src="https://raw.githubusercontent.com/sogehige/sogeBot/master/docs/_images/screenshots/6.png" width="200"> <img src="https://raw.githubusercontent.com/sogehige/sogeBot/master/docs/_images/screenshots/7.png" width="200">
 
 #### Issues
-If you found an issue with a bot, feel free to create issue at https://github.com/sogehige/SogeBot/issues.
+
+If you found an issue with a bot, feel free to create issue at <https://github.com/sogehige/SogeBot/issues>.
 You can also contact me on my email sogehige@gmail.com or get support on our [discord server](https://discordapp.com/invite/52KpmuH).
 
 | System             | Description                                                                                                                              |
@@ -79,14 +80,15 @@ You can also contact me on my email sogehige@gmail.com or get support on our [di
 
 #### Languages
 
-* Cestina
-* English
+List of languages available at <https://crowdin.com/project/sogebot/>
 
 #### Documentation
-http://sogehige.github.io/sogeBot/#/
+
+<http://sogehige.github.io/sogeBot/#/>
 
 #### FAQ
-http://sogehige.github.io/sogeBot/#/faq
+
+<http://sogehige.github.io/sogeBot/#/faq>
 
 #### License
 
@@ -94,7 +96,7 @@ See LICENSE file
 
 #### Special thanks
 
-Special thanks goes to team behing tmi.js (you can check it on https://www.tmijs.org/) and twitch-js (https://github.com/marcandrews/twitch-js). They did really awesome job.
+Special thanks goes to team behing tmi.js (you can check it on <https://www.tmijs.org/>) and twitch-js (<https://github.com/marcandrews/twitch-js>). They did really awesome job.
 
 #### Support [![Donate](https://img.shields.io/badge/paypal-donate-yellow.svg?style=flat-square)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=9ZTX5DS2XB5EN)
 
