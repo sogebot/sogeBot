@@ -437,7 +437,6 @@ class Users extends Core {
           // add level to user
           viewer.extra = JSON.parse(viewer.extra);
           viewer.level = levels.getLevelOf(viewer);
-          viewer.username = viewer.userName;
         }
         let count = await query.getCount();
 

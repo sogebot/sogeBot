@@ -11,14 +11,11 @@ import { AliasGroupObject } from '../schema/alias/AliasGroupObject';
 
 @Resolver()
 export class AliasResolver {
-  @Query(returns => AliasGroupObject)
-  aliasGroup(@Arg('name', type => String, { nullable: true }) name: string | null) {
-    if (name) {
-      return getRepository(AliasGroup).findOneOrFail({ name });
-    } else {
-      return getRepository(AliasGroup).findOneOrFail();
-    }
+  @Query(returns => [AliasGroupObject])
+  aliasGroup() {
+    return getRepository(AliasGroup).find();
   }
+
   @Mutation(returns => AliasGroupObject)
   @Authorized()
   setAliasGroup(

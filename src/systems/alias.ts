@@ -117,7 +117,7 @@ class Alias extends System {
         if (alias.group) {
           const group = await getRepository(AliasGroup).findOne({ name: alias.group });
           if (group) {
-            if (group.options.filter && await checkFilter(opts, group.options.filter)) {
+            if (group.options.filter && !(await checkFilter(opts, group.options.filter))) {
               warning(`Alias ${alias.alias}#${alias.id} didn't pass group filter.`);
             }
             if (permission === null) {
