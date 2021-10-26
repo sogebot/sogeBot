@@ -216,6 +216,7 @@ class TMI extends Core {
 
       const client = this.client[type];
       if (client) {
+        await this.client[type]?.quit();
         client.removeListener();
         this.client[type] = null;
       }
@@ -361,12 +362,17 @@ class TMI extends Core {
 
     client.onAuthenticationFailure(message => {
       info(`TMI: ${type} authentication failure, ${message}`);
-      oauth.validateOAuth(type).then(() => this.initClient(type));
+      oauth.refreshAccessToken(type).then(() => this.initClient(type));
     });
 
-    client.onDisconnect((_manually, reason) => {
+    client.onDisconnect((manually, reason) => {
       setStatus('TMI', constants.DISCONNECTED);
-      info(`TMI: ${type} is disconnected, reason: ${reason}`);
+      if (manually) {
+        reason = new Error('Disconnected manually by user');
+      }
+      if (reason) {
+        info(`TMI: ${type} is disconnected, reason: ${reason}`);
+      }
     });
 
     client.onConnect(() => {
