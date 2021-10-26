@@ -149,7 +149,7 @@ class Alias extends System {
           const responses = await (opts.parser || new Parser()).command(opts.sender, response, true);
           debug('alias.process', responses);
           for (let i = 0; i < responses.length; i++) {
-            await parserReply(responses[i].response, { sender: responses[i].sender, discord: responses[i].discord, attr: responses[i].attr });
+            await parserReply(responses[i].response, { sender: responses[i].sender, discord: responses[i].discord, attr: responses[i].attr, id: opts.id });
           }
           // go through custom commands
           if (response.startsWith('!')) {

@@ -197,6 +197,7 @@ interface ParserOptions {
   parameters: string;
   message: string;
   skip: boolean;
+  isParserOptions: boolean;
   parser?: import('../src/parser.js').default;
 }
 

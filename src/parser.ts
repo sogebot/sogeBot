@@ -80,15 +80,16 @@ class Parser {
       debug('parser.process', 'Processing ' + parser.name);
       const text = this.message.trim().replace(/^(!\w+)/i, '');
       const opts: ParserOptions = {
-        id:            this.id,
-        emotesOffsets: this.emotesOffsets,
-        isAction:      this.isAction,
-        sender:        this.sender,
-        discord:       this.discord ?? undefined,
-        message:       this.message.trim(),
-        parameters:    text.trim(),
-        skip:          this.skip,
-        parser:        this,
+        isParserOptions: true,
+        id:              this.id,
+        emotesOffsets:   this.emotesOffsets,
+        isAction:        this.isAction,
+        sender:          this.sender,
+        discord:         this.discord ?? undefined,
+        message:         this.message.trim(),
+        parameters:      text.trim(),
+        skip:            this.skip,
+        parser:          this,
       };
       const isOk = await parser.fnc.apply(parser.this, [opts]);
 
@@ -109,15 +110,16 @@ class Parser {
 
     const text = this.message.trim().replace(/^(!\w+)/i, '');
     const opts: ParserOptions = {
-      id:            this.id,
-      sender:        this.sender,
-      discord:       this.discord ?? undefined,
-      emotesOffsets: this.emotesOffsets,
-      isAction:      this.isAction,
-      message:       this.message.trim(),
-      parameters:    text.trim(),
-      skip:          this.skip,
-      parser:        this,
+      isParserOptions: true,
+      id:              this.id,
+      sender:          this.sender,
+      discord:         this.discord ?? undefined,
+      emotesOffsets:   this.emotesOffsets,
+      isAction:        this.isAction,
+      message:         this.message.trim(),
+      parameters:      text.trim(),
+      skip:            this.skip,
+      parser:          this,
     };
 
     setTimeout(() => {

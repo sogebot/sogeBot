@@ -74,7 +74,7 @@ const trigger = async (item: QuickActions.Item, user: { userId: string, username
       const parser = new (require('../../parser').default)();
       const responses = await parser.command(getUserSender(user.userId, user.username), item.options.command, true);
       for (let i = 0; i < responses.length; i++) {
-        await parserReply(responses[i].response, { sender: responses[i].sender, discord: responses[i].discord, attr: responses[i].attr });
+        await parserReply(responses[i].response, { sender: responses[i].sender, discord: responses[i].discord, attr: responses[i].attr, id: '' });
       }
 
       break;

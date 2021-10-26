@@ -227,7 +227,7 @@ class Moderation extends System {
       if (this.cWarningsAnnounceTimeouts) {
         tmi.delete('bot', msgId);
         if (!silent) {
-          parserReply('$sender, ' + warning, { sender, discord: undefined });
+          parserReply('$sender, ' + warning, { sender, discord: undefined, id: '' });
         } else {
           warningLog(`Moderation announce was not sent (another ${type} warning already sent in 60s): ${sender.userName}, ${warning}`);
         }

@@ -311,14 +311,14 @@ class CustomCommands extends System {
 
       if (!opts.quiet) {
         this.sendResponse(_.cloneDeep(_responses), {
-          param, sender: opts.sender, command: cmd.command.command, processedCommands: opts.processedCommands, discord: opts.discord,
+          param, sender: opts.sender, command: cmd.command.command, processedCommands: opts.processedCommands, discord: opts.discord, id: opts.id,
         });
       }
     }
     return atLeastOnePermissionOk;
   }
 
-  async sendResponse(responses: (CommandsResponsesInterface)[], opts: { param: string; sender: CommandOptions['sender'], discord: CommandOptions['discord'], command: string, processedCommands?: string[] }) {
+  async sendResponse(responses: (CommandsResponsesInterface)[], opts: { param: string; sender: CommandOptions['sender'], discord: CommandOptions['discord'], command: string, processedCommands?: string[], id: string, }) {
     for (let i = 0; i < responses.length; i++) {
       await parserReply(responses[i].response, opts);
     }

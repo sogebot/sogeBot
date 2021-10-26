@@ -133,7 +133,7 @@ class Bets extends System {
         });
       }
       for (let i = 0; i < responses.length; i++) {
-        await parserReply(responses[i].response, { sender: responses[i].sender, discord: responses[i].discord });
+        await parserReply(responses[i].response, { sender: responses[i].sender, discord: responses[i].discord, id: '' });
       }
     });
   }

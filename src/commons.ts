@@ -8,14 +8,14 @@ import { generalChannel } from './helpers/oauth/generalChannel';
 import Discord from './integrations/discord';
 import { Message } from './message';
 
-const isParserOpts = (opts: ParserOptions | { id?: undefined, sender: CommandOptions['sender']; attr?: CommandOptions['attr'] }): opts is ParserOptions => {
-  return typeof opts.id !== 'undefined';
+const isParserOpts = (opts: ParserOptions | { isParserOptions?: boolean, id: string, sender: CommandOptions['sender']; attr?: CommandOptions['attr'] }): opts is ParserOptions => {
+  return typeof opts.isParserOptions !== 'undefined';
 };
 
 // We need to add it to class to be able to use @timer decorator
 class Commons {
   @timer()
-  async messageToSend(senderObject: any, response: string | Promise<string>, opts: ParserOptions | { id?: undefined, discord: CommandOptions['discord']; sender: CommandOptions['sender']; attr?: CommandOptions['attr'] }): Promise<string> {
+  async messageToSend(senderObject: any, response: string | Promise<string>, opts: ParserOptions | { isParserOptions?: boolean, id: string, discord: CommandOptions['discord']; sender: CommandOptions['sender']; attr?: CommandOptions['attr'] }): Promise<string> {
     const sender = opts.discord
       ? { ...senderObject, discord: { author: senderObject.discord.author, channel: senderObject.discord.channel } } : senderObject;
     if (isParserOpts(opts) ? opts.skip : opts.attr?.skip) {
@@ -26,7 +26,7 @@ class Commons {
   }
 
   @timer()
-  async parserReply(response: string | Promise<string>, opts: ParserOptions | { id?: undefined, discord: CommandOptions['discord'], sender: CommandOptions['sender']; attr?: CommandOptions['attr'] }, messageType: 'chat' | 'whisper' = 'chat') {
+  async parserReply(response: string | Promise<string>, opts: ParserOptions | { isParserOptions?: boolean, id: string, discord: CommandOptions['discord'], sender: CommandOptions['sender']; attr?: CommandOptions['attr'] }, messageType: 'chat' | 'whisper' = 'chat') {
     if (!opts.sender) {
       return;
     }
@@ -51,13 +51,13 @@ class Commons {
       }
     } else {
       // we skip as we are already parsing message
-      sendMessage(messageToSend, opts.sender, { skip: true, ...(isParserOpts(opts) ? {} : opts.attr ) });
+      sendMessage(messageToSend, opts.sender, { skip: true, ...(isParserOpts(opts) ? {} : opts.attr ) }, opts.id);
     }
   }
 }
 const commons = new Commons();
 
-export async function parserReply(response: string | Promise<string>, opts: ParserOptions | { id?: undefined, sender: CommandOptions['sender'];  discord: CommandOptions['discord']; attr?: CommandOptions['attr'] }, messageType: 'chat' | 'whisper' = 'chat') {
+export async function parserReply(response: string | Promise<string>, opts: ParserOptions | { isParserOptions?: boolean, id: string, sender: CommandOptions['sender'];  discord: CommandOptions['discord']; attr?: CommandOptions['attr'] }, messageType: 'chat' | 'whisper' = 'chat') {
   commons.parserReply(response, opts, messageType);
 }
 

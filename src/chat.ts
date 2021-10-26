@@ -859,17 +859,17 @@ class TMI extends Core {
           if (price.priceBits <= bits) {
             if (customcommands.enabled) {
               await customcommands.run({
-                sender: getUserSender(userId, username), id: 'null', skip: true, quiet: false, message: messageFromUser.trim().toLowerCase(), parameters: '', parser: new Parser(), isAction: false, emotesOffsets: new Map(), discord: undefined,
+                sender: getUserSender(userId, username), id: 'null', skip: true, quiet: false, message: messageFromUser.trim().toLowerCase(), parameters: '', parser: new Parser(), isAction: false, emotesOffsets: new Map(), discord: undefined, isParserOptions: true,
               });
             }
             if (alias.enabled) {
               await alias.run({
-                sender: getUserSender(userId, username), id: 'null', skip: true, message: messageFromUser.trim().toLowerCase(), parameters: '', parser: new Parser(), isAction: false, emotesOffsets: new Map(), discord: undefined,
+                sender: getUserSender(userId, username), id: 'null', skip: true, message: messageFromUser.trim().toLowerCase(), parameters: '', parser: new Parser(), isAction: false, emotesOffsets: new Map(), discord: undefined, isParserOptions: true,
               });
             }
             const responses = await new Parser().command(getUserSender(userId, username), messageFromUser, true);
             for (let i = 0; i < responses.length; i++) {
-              await parserReply(responses[i].response, { sender: responses[i].sender, discord: responses[i].discord, attr: responses[i].attr });
+              await parserReply(responses[i].response, { sender: responses[i].sender, discord: responses[i].discord, attr: responses[i].attr, id: '' });
             }
             if (price.emitRedeemEvent) {
               redeemTriggered = true;

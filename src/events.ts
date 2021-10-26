@@ -444,7 +444,7 @@ class Events extends Core {
     }, (responses) => {
       for (let i = 0; i < responses.length; i++) {
         setTimeout(async () => {
-          parserReply(await responses[i].response, { sender: responses[i].sender, discord: responses[i].discord, attr: responses[i].attr });
+          parserReply(await responses[i].response, { sender: responses[i].sender, discord: responses[i].discord, attr: responses[i].attr, id: '' });
         }, 500 * i);
       }
     });
@@ -476,6 +476,7 @@ class Events extends Core {
 
     const message = attributesReplace(attributes, String(operation.messageToSend));
     parserReply(message, {
+      id:      '',
       sender:  getUserSender(userId ?? '0', userName),
       discord: undefined,
     });

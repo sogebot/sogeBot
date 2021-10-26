@@ -14,13 +14,13 @@ const custom: ResponseFilter = {
         // default
         if (state.isOk && !state.isEval) {
           const msg = prepare('filters.setVariable', { value: state.setValue, variable: variable });
-          parserReply(msg, { sender: attr.sender, discord: attr.discord, attr: { skip: true, quiet: get(attr, 'quiet', false) } });
+          parserReply(msg, { sender: attr.sender, discord: attr.discord, attr: { skip: true, quiet: get(attr, 'quiet', false) }, id: '' });
         }
         return state.updated.currentValue;
       } else if (state.updated.responseType === 1) {
         // custom
         if (state.updated.responseText) {
-          parserReply(state.updated.responseText.replace('$value', state.setValue), { sender: attr.sender,  discord: attr.discord, attr: { skip: true, quiet: get(attr, 'quiet', false) } });
+          parserReply(state.updated.responseText.replace('$value', state.setValue), { sender: attr.sender,  discord: attr.discord, attr: { skip: true, quiet: get(attr, 'quiet', false) }, id: '' });
         }
         return '';
       } else {
