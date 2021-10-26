@@ -37,7 +37,7 @@ import { getBroadcaster } from './helpers/getBroadcaster';
 import {
   debug, error, info, unfollow, warning,
 } from './helpers/log';
-import { channelId, loadedTokens } from './helpers/oauth';
+import { channelId } from './helpers/oauth';
 import { botId } from './helpers/oauth/botId';
 import { broadcasterId } from './helpers/oauth/broadcasterId';
 import { ioServer } from './helpers/panel';
@@ -181,8 +181,8 @@ class API extends Core {
       for (const fnc of intervals.keys()) {
         await setImmediateAwait();
         debug('api.interval', chalk.yellow(fnc + '() ') + 'check');
-        if (loadedTokens.value < 2) {
-          debug('api.interval', chalk.yellow(fnc + '() ') + 'tokens not loaded yet.');
+        if (!oauth.initialValidation) {
+          debug('api.interval', chalk.yellow(fnc + '() ') + 'tokens not validated yet.');
           return;
         }
         let interval = intervals.get(fnc);
@@ -196,9 +196,6 @@ class API extends Core {
         }
         if (Date.now() - interval.lastRunAt >= interval.interval) {
           // run validation before any requests
-          if (!oauth.initialValidation) {
-            continue;
-          }
           const[ botValidation, broadcasterValidation ] = await Promise.all(oauth.validateTokens());
           if (!botValidation || !broadcasterValidation) {
             continue;

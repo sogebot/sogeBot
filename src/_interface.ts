@@ -201,7 +201,7 @@ class Module {
 
     setTimeout(() => {
       for (const event of getFunctionList('load', `${path}.${key}` )) {
-        (this as any)[event.fName]();
+        (this as any)[event.fName](key, JSON.parse(variable?.value ?? '""'));
       }
     }, 1000);
 

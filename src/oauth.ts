@@ -11,7 +11,7 @@ import {
   debug,
   error, info, warning,
 } from './helpers/log';
-import { channelId, loadedTokens } from './helpers/oauth';
+import { channelId } from './helpers/oauth';
 import { botId } from './helpers/oauth/botId';
 import { botProfileUrl } from './helpers/oauth/botProfileUrl';
 import { botUsername } from './helpers/oauth/botUsername';
@@ -131,12 +131,6 @@ class OAuth extends Core {
     return [this.validateOAuth('bot'), this.validateOAuth('broadcaster')];
   }
 
-  @onLoad('broadcasterAccessToken')
-  @onLoad('botAccessToken')
-  setBotAccessTokenLoaded() {
-    loadedTokens.value++;
-  }
-
   @onChange('generalOwners')
   @onChange('broadcasterUsername')
   clearCache() {
@@ -220,6 +214,8 @@ class OAuth extends Core {
 
   @onChange('botAccessToken')
   @onChange('broadcasterAccessToken')
+  @onLoad('broadcasterAccessToken')
+  @onLoad('botAccessToken')
   public async onChangeAccessToken(key: string, value: any) {
     switch (key) {
       case 'broadcasterAccessToken':
@@ -364,7 +360,9 @@ class OAuth extends Core {
       setStatus('API', request.status === 200 ? constants.CONNECTED : constants.DISCONNECTED);
 
       this.toWait = 10;
-      this.getChannelId();
+      if (type === 'bot') {
+        this.getChannelId();
+      }
     } catch (e: any) {
       if (e.message.includes('no access token for')) {
         if ((type === 'bot' && !botTokenErrorSent) || (type === 'broadcaster' && !broadcasterTokenErrorSent)) {
