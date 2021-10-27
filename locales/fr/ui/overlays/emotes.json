@@ -1,39 +1,39 @@
 {
 	"settings": {
-		"btnRemoveCache": "Delete cache",
-		"hypeMessagesEnabled": "Show hype messages in chat",
-		"btnTestExplosion": "Test emote explosion",
-		"btnTestEmote": "Test emote",
-		"btnTestFirework": "Test emote firework",
-		"cEmotesSize": "Emotes size",
-		"cEmotesMaxEmotesPerMessage": "Maximum of emotes per messge",
+		"btnRemoveCache": "Vider le cache",
+		"hypeMessagesEnabled": "Afficher les messages hype dans le chat",
+		"btnTestExplosion": "Tester l'explosion des emotes",
+		"btnTestEmote": "Émote de test",
+		"btnTestFirework": "Tester le feu d'artifice d'emotes",
+		"cEmotesSize": "Taille des emotes",
+		"cEmotesMaxEmotesPerMessage": "Maximum d'emotes par message",
 		"cEmotesAnimation": "Animation",
-		"cEmotesAnimationTime": "Animation duration",
-		"cExplosionNumOfEmotes": "No. of emotes",
-		"cExplosionNumOfEmotesPerExplosion": "No. of emotes per explosion",
-		"cExplosionNumOfExplosions": "No. of explosions",
-		"enableEmotesCombo": "Enable emotes combo",
-		"comboBreakMessages": "Combo break messages",
-		"threshold": "Threshold",
-		"noMessagesFound": "No messages found.",
+		"cEmotesAnimationTime": "Durée de l'animation",
+		"cExplosionNumOfEmotes": "Nbre d'emotes",
+		"cExplosionNumOfEmotesPerExplosion": "Nbre d'emotes par explosion",
+		"cExplosionNumOfExplosions": "Nbre d'explosions",
+		"enableEmotesCombo": "Activer le combo d'emotes",
+		"comboBreakMessages": "Messages de rupture de combo",
+		"threshold": "Seuil",
+		"noMessagesFound": "Aucun message trouvé.",
 		"message": "Message ",
-		"showEmoteInOverlayThreshold": "Minimal message threshold to show emote in overlay",
+		"showEmoteInOverlayThreshold": "Seuil minimal de message pour afficher l'emote sur l'overlay",
 		"hideEmoteInOverlayAfter": {
-			"title": "Hide emote in overlay after inactivity",
-			"help": "Will hide emote in overlay after certain time in seconds"
+			"title": "Masquer l'emote sur l'overlay après inactivité",
+			"help": "Masquera l'emote sur l'overlay après un certain temps en secondes"
 		},
 		"comboCooldown": {
-			"title": "Combo cooldown",
-			"help": "Cooldown of combo in seconds"
+			"title": "Cooldown de combo",
+			"help": "Cooldown du combo en secondes"
 		},
 		"comboMessageMinThreshold": {
-			"title": "Minimal message threshold",
-			"help": "Minimal message threshold to count emotes as combo (until then won't trigger cooldown)"
+			"title": "Seuil minimal du message",
+			"help": "Seuil minimal de message pour compter les emotes comme un combo (jusqu'à ce que cela ne déclenche le cooldown)"
 		},
-		"comboMessages": "Combo messages"
+		"comboMessages": "Messages de combo"
 	},
 	"hype": {
-		"5": "Let's go! We got $amountx $emote combo so far! SeemsGood",
+		"5": "Let's go! Nous avons un combo de $amountx pour l'emote $emote jusqu'à présent ! SeemsGood",
 		"15": "Keep it going! Can we get more than $amountx $emote? TriHard"
 	},
 	"message": {
