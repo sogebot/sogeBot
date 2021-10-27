@@ -121,42 +121,42 @@
     "name": "Arrivée de l'animation"
   },
   "animationOut": {
-    "name": "Animation out"
+    "name": "Sortie de l'animation"
   },
   "alertDurationInMs": {
-    "name": "Alert duration"
+    "name": "Durée de l'alerte"
   },
   "alertTextDelayInMs": {
-    "name": "Alert text delay"
+    "name": "Délai du texte d'alerte"
   },
   "layoutPicker": {
-    "name": "Layout"
+    "name": "Mise en page"
   },
   "scale": {
-    "name": "Scale"
+    "name": "Echelle"
   },
   "translateY": {
-    "name": "Move -Up / +Down"
+    "name": "Déplacer -Haut / +Bas"
   },
   "translateX": {
-    "name": "Move -Left / +Right"
+    "name": "Déplacer -Gauche / +Droite"
   },
   "image": {
-    "name": "Image / Video(.webm)",
-    "setting": "Image / Video(.webm) settings"
+    "name": "Image / Vidéo (.webm)",
+    "setting": "Paramètres de l'image / Vidéo(.webm)"
   },
   "sound": {
-    "name": "Sound",
-    "setting": "Sound settings"
+    "name": "Son",
+    "setting": "Paramètres audio"
   },
   "soundVolume": {
-    "name": "Alert volume"
+    "name": "Volume d'alerte"
   },
-  "enableAdvancedMode": "Enable advanced mode",
+  "enableAdvancedMode": "Activer le mode avancé",
   "font": {
-    "setting": "Font settings",
-    "name": "Font family",
-    "overrideGlobal": "Override global font settings",
+    "setting": "Paramètres de la police",
+    "name": "Famille de polices",
+    "overrideGlobal": "Remplacer les paramètres globaux de police",
     "align": {
       "name": "Alignement",
       "left": "Gauche",
