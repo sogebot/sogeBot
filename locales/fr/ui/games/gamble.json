@@ -1,14 +1,14 @@
 {
   "settings": {
-    "enabled": "Status",
-    "minimalBet": "Minimal bet",
+    "enabled": "Statut",
+    "minimalBet": "Mise minimale",
     "chanceToWin": {
-      "title": "Chance to win",
-      "help": "Percent"
+      "title": "Chances de gagner",
+      "help": "Pourcentage"
     },
-    "enableJackpot": "Enable jackpot",
-    "chanceToTriggerJackpot": "Chance to trigger jackpot in %",
-    "maxJackpotValue": "Maximum value of jackpot",
-    "lostPointsAddedToJackpot": "How many lost points should be added to jackpot in %"
+    "enableJackpot": "Activer le jackpot",
+    "chanceToTriggerJackpot": "Chance de déclencher le jackpot en %",
+    "maxJackpotValue": "Valeur maximale du jackpot",
+    "lostPointsAddedToJackpot": "Combien de points perdus doivent être ajoutés au jackpot en %"
   }
 }
