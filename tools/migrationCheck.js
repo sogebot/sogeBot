@@ -1,4 +1,5 @@
 const exec = require('child_process').exec;
+const execSync = require('child_process').execSync;
 
 require('dotenv').config();
 
@@ -20,7 +21,7 @@ async function test() {
 
   let output = '';
   const expectedOutput = 'No changes in database schema were found - cannot generate a migration. To create a new empty migration use "typeorm migration:create" command\n';
-  await new Promise(async (resolve) => {
+  await new Promise((resolve) => {
     exec('npx typeorm migration:generate -n generatedMigration', {
       env: {
         ...process.env,
@@ -41,6 +42,11 @@ async function test() {
         resolve2();
       });
     });
+
+    if (process.argv[2] === '-d') {
+      console.log('Dry run removing generated file.');
+      execSync('rm ./*generatedMigration*');
+    }
   }
   process.exit(output === expectedOutput ? 0 : 1);
 }

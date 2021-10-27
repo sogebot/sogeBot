@@ -4,7 +4,7 @@ import { getRepository } from 'typeorm';
 
 import { parserReply } from '../commons';
 import {
-  Commands, CommandsInterface, CommandsResponsesInterface,
+  Commands, CommandsGroup, CommandsGroupInterface, CommandsInterface, CommandsResponsesInterface,
 } from '../database/entity/commands';
 import {
   command, default_permission, helper, timer,
@@ -294,12 +294,34 @@ class CustomCommands extends System {
       // remove found command from message to get param
       const param = opts.message.replace(new RegExp('^(' + cmd.cmdArray.join(' ') + ')', 'i'), '').trim();
       incrementCountOfCommandUsage(cmd.command.command);
+
+      // check group filter first
+      let group: Readonly<Required<CommandsGroupInterface>> | undefined;
+      let groupPermission: null | string = null;
+      if (cmd.command.group) {
+        group = await getRepository(CommandsGroup).findOne({ name: cmd.command.group });
+        if (group) {
+          if (group.options.filter && !(await checkFilter(opts, group.options.filter))) {
+            warning(`Custom command ${cmd.command.command}#${cmd.command.id} didn't pass group filter.`);
+            continue;
+          }
+          groupPermission = group.options.permission;
+        }
+      }
+
       for (const r of _.orderBy(cmd.command.responses, 'order', 'asc')) {
-        if (typeof getFromViewersCache(opts.sender.userId, r.permission) === 'undefined') {
-          addToViewersCache(opts.sender.userId, r.permission, (await check(opts.sender.userId, r.permission, false)).access);
+        let permission = r.permission ?? groupPermission;
+        // show warning if null permission
+        if (!permission) {
+          permission = defaultPermissions.CASTERS;
+          warning(`Custom command ${cmd.command.command}#${cmd.command.id} doesn't have any permission set, treating as CASTERS permission.`);
         }
 
-        if ((opts.skip || getFromViewersCache(opts.sender.userId, r.permission))
+        if (typeof getFromViewersCache(opts.sender.userId, permission) === 'undefined') {
+          addToViewersCache(opts.sender.userId, permission, (await check(opts.sender.userId, permission, false)).access);
+        }
+
+        if ((opts.skip || getFromViewersCache(opts.sender.userId, permission))
             && (r.filter.length === 0 || (r.filter.length > 0 && await checkFilter(opts, r.filter)))) {
           _responses.push(r);
           atLeastOnePermissionOk = true;
@@ -346,7 +368,7 @@ class CustomCommands extends System {
         return [{ response: prepare('customcmds.list-of-responses-is-empty', { command: cmd }), ...opts }];
       }
       return Promise.all(_.orderBy(command_with_responses.responses, 'order', 'asc').map(async(r) => {
-        const perm = await get(r.permission);
+        const perm = r.permission ? await get(r.permission) : { name: '-- unset --' };
         const response = prepare('customcmds.response', {
           command: cmd, index: ++r.order, response: r.response, after: r.stopIfExecuted ? '_' : 'v', permission: perm?.name ?? 'n/a',
         });

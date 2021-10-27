@@ -7,7 +7,15 @@ export interface CommandsInterface {
   command: string;
   enabled: boolean;
   visible: boolean;
+  group: string | null;
   responses?: CommandsResponsesInterface[];
+}
+export class CommandsGroupInterface {
+  name: string;
+  options: {
+    filter: string | null;
+    permission: string | null;
+  };
 }
 
 export interface CommandsResponsesInterface {
@@ -15,7 +23,7 @@ export interface CommandsResponsesInterface {
   command?: CommandsInterface;
   order: number;
   response: string;
-  permission: string;
+  permission: string | null;
   filter: string;
   stopIfExecuted: boolean;
 }
@@ -37,10 +45,11 @@ export const Commands = new EntitySchema<Readonly<Required<CommandsInterface>>>(
   name:    'commands',
   columns: {
     id: {
-      type: 'uuid', primary: true, generated: 'uuid', 
+      type: 'uuid', primary: true, generated: 'uuid',
     },
     command: { type: String },
     enabled: { type: Boolean },
+    group:   { type: String, nullable: true },
     visible: { type: Boolean },
   },
   relations: {
@@ -60,12 +69,12 @@ export const CommandsResponses = new EntitySchema<Readonly<Required<CommandsResp
   name:    'commands_responses',
   columns: {
     id: {
-      type: 'uuid', primary: true, generated: 'uuid', 
+      type: 'uuid', primary: true, generated: 'uuid',
     },
     order:          { type: Number },
     response:       { type: 'text' },
     stopIfExecuted: { type: Boolean },
-    permission:     { type: String },
+    permission:     { type: String, nullable: true },
     filter:         { type: String },
   },
   relations: {
@@ -83,7 +92,7 @@ export const CommandsCount = new EntitySchema<Readonly<Required<CommandsCountInt
   name:    'commands_count',
   columns: {
     id: {
-      type: 'uuid', primary: true, generated: 'uuid', 
+      type: 'uuid', primary: true, generated: 'uuid',
     },
     command:   { type: String },
     timestamp: { type: 'bigint', transformer: new ColumnNumericTransformer() },
@@ -97,10 +106,23 @@ export const CommandsBoard = new EntitySchema<Readonly<Required<CommandsBoardInt
   name:    'commands_board',
   columns: {
     id: {
-      type: 'uuid', primary: true, generated: 'uuid', 
+      type: 'uuid', primary: true, generated: 'uuid',
     },
     order:   { type: Number },
     text:    { type: String },
     command: { type: String },
   },
+});
+
+export const CommandsGroup = new EntitySchema<Readonly<Required<CommandsGroupInterface>>>({
+  name:    'commands_group',
+  columns: {
+    name: {
+      type: String, primary: true,
+    },
+    options: { type: 'simple-json' },
+  },
+  indices: [
+    { name: 'IDX_commands_group_unique_name', columns: ['name'], unique: true },
+  ],
 });
