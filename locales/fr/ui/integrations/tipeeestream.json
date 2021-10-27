@@ -1,9 +1,9 @@
 {
   "settings": {
-    "enabled": "Status",
+    "enabled": "Statut",
     "apiKey": {
-      "title": "Api key",
-      "help": "Get socket token from tipeeestream dashboard -> API -> Your API Key"
+      "title": "Clé d'Api",
+      "help": "Récupérer le socket token depuis le tableau de bord de tipeeestream -> API -> Votre clé d'API"
     }
   }
 }
