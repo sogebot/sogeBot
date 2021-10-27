@@ -73,52 +73,52 @@
     "value": "Valeur",
     "valueSplitByComma": "Valeurs séparées par virgules (ex : val1, val2)",
     "isEven": "est même",
-    "isOdd": "is odd",
-    "lessThan": "less than",
-    "lessThanOrEqual": "less than or equal",
-    "contain": "contains",
-    "equal": "equal",
-    "notEqual": "not equal",
-    "present": "is present",
-    "includes": "includes",
-    "greaterThan": "greater than",
-    "greaterThanOrEqual": "greater than or equal",
-    "noFilter": "no filter"
+    "isOdd": "est impair",
+    "lessThan": "plus petit que",
+    "lessThanOrEqual": "inférieur ou égal à",
+    "contain": "contient",
+    "equal": "égal",
+    "notEqual": "n'est pas égal à",
+    "present": "est présent",
+    "includes": "inclut",
+    "greaterThan": "est supérieur à",
+    "greaterThanOrEqual": "supérieur ou égal à",
+    "noFilter": "sans filtre"
   },
   "speed": {
-    "name": "Speed"
+    "name": "Vitesse"
   },
   "maxTimeToDecrypt": {
-    "name": "Max time to decrypt"
+    "name": "Temps maximum pour décrypter"
   },
   "characters": {
-    "name": "Characters"
+    "name": "Caractères"
   },
-  "random": "Random",
-  "exact-amount": "Exact amount",
-  "greater-than-or-equal-to-amount": "Greater than or equal to amount",
-  "tier-exact-amount": "Tier is exactly",
-  "tier-greater-than-or-equal-to-amount": "Tier is higher or equal to",
-  "months-exact-amount": "Months amount is exactly",
-  "months-greater-than-or-equal-to-amount": "Months amount is higher or equal to",
-  "gifts-exact-amount": "Gifts amount is exactly",
-  "gifts-greater-than-or-equal-to-amount": "Gifts amount is higher or equal to",
-  "very-rarely": "Very rarely",
-  "rarely": "Rarely",
-  "default": "Default",
-  "frequently": "Frequently",
-  "very-frequently": "Very frequently",
-  "exclusive": "Exclusive",
+  "random": "Aléatoire",
+  "exact-amount": "Montant exact",
+  "greater-than-or-equal-to-amount": "Supérieur ou égal au montant",
+  "tier-exact-amount": "Le niveau est exactement",
+  "tier-greater-than-or-equal-to-amount": "Le niveau est supérieur ou égal à",
+  "months-exact-amount": "Le montant des mois est exactement",
+  "months-greater-than-or-equal-to-amount": "Le montant des mois est supérieur ou égal à",
+  "gifts-exact-amount": "Le montant des gifts est exactement",
+  "gifts-greater-than-or-equal-to-amount": "Le montant des gifts est supérieur ou égal à",
+  "very-rarely": "Très rarement",
+  "rarely": "Rarement",
+  "default": "Par défaut",
+  "frequently": "Fréquemment",
+  "very-frequently": "Très fréquemment",
+  "exclusive": "Exclusif",
   "messageTemplate": {
-    "name": "Message template",
-    "placeholder": "Set your message template",
-    "help": "Available variables: {name}, {amount} (cheers, subs, tips, subgifts, sub community gifts, command redeems), {recipient} (subgifts, command redeems), {monthsName} (subs, subgifts), {currency} (tips)"
+    "name": "Modèle de message",
+    "placeholder": "Mettez votre modèle de message",
+    "help": "Variables possibles: {name}, {amount} (cheers, subs, dons, subgifts, sub gift a la communauté, demandes de commandes), {recipient} (subgifts, demandes de commandes), {monthsName} (subs, subgifts), {currency} (tips)"
   },
   "animationText": {
-    "name": "Animation text"
+    "name": "Animation du texte"
   },
   "animationIn": {
-    "name": "Animation in"
+    "name": "Arrivée de l'animation"
   },
   "animationOut": {
     "name": "Animation out"
@@ -159,49 +159,49 @@
     "overrideGlobal": "Override global font settings",
     "align": {
       "name": "Alignement",
-      "left": "Left",
-      "center": "Center",
-      "right": "Right"
+      "left": "Gauche",
+      "center": "Centre",
+      "right": "Droite"
     },
     "size": {
-      "name": "Font size"
+      "name": "Taille de la police"
     },
     "weight": {
-      "name": "Font weight"
+      "name": "Épaisseur de la police"
     },
     "borderPx": {
-      "name": "Font border"
+      "name": "Contour de la police"
     },
     "borderColor": {
-      "name": "Font border color"
+      "name": "Couleur de la bordure de la police"
     },
     "color": {
-      "name": "Font color"
+      "name": "Couleur de la police"
     },
     "highlightcolor": {
-      "name": "Font highlight color"
+      "name": "Couleur de surlignage du texte"
     }
   },
   "minAmountToShow": {
-    "name": "Minimal amount to show"
+    "name": "Montant minimum à afficher"
   },
   "minAmountToPlay": {
-    "name": "Minimal amount to play"
+    "name": "Montant minimum pour jouer"
   },
   "allowEmotes": {
-    "name": "Allow emotes"
+    "name": "Autoriser les emotes"
   },
   "message": {
-    "setting": "Message settings"
+    "setting": "Paramètres des messages"
   },
-  "voice": "Voice",
-  "keepAlertShown": "Alert keeps visible during TTS",
-  "skipUrls": "Skip URLs during TTS",
+  "voice": "Voix",
+  "keepAlertShown": "L'alerte reste visible pendant le TTS",
+  "skipUrls": "Ignorer les URL pendant les TTS",
   "volume": "Volume",
-  "rate": "Rate",
+  "rate": "Taux",
   "pitch": "Pitch",
   "test": "Test",
   "tts": {
-    "setting": "TTS settings"
+    "setting": "Paramètres TTS"
   }
 }
