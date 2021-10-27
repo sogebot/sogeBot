@@ -6,8 +6,8 @@
     "broadcasterAccessToken": "AccessToken",
     "botRefreshToken": "RefreshToken",
     "broadcasterRefreshToken": "RefreshToken",
-    "botUsername": "Username",
-    "broadcasterUsername": "Username",
+    "botUsername": "Nom d'utilisateur",
+    "broadcasterUsername": "Nom d'utilisateur",
     "botExpectedScopes": "Scopes",
     "broadcasterExpectedScopes": "Scopes"
   }
