@@ -34,13 +34,13 @@
 	},
 	"hype": {
 		"5": "Let's go! Nous avons un combo de $amountx pour l'emote $emote jusqu'à présent ! SeemsGood",
-		"15": "Keep it going! Can we get more than $amountx $emote? TriHard"
+		"15": "Continuez comme ça ! Est-ce qu'on peut obtenir plus que $amountx $emote? Trihard"
 	},
 	"message": {
-		"3": "$amountx $emote combo",
+		"3": "Combo $amountx $emote",
 		"5": "$amountx $emote combo SeemsGood",
 		"10": "$amountx $emote combo PogChamp",
 		"15": "$amountx $emote combo TriHard",
-		"20": "$sender ruined $amountx $emote combo! NotLikeThis"
+		"20": "$sender a ruiné le combo $emote qui était de $amountx ! NotLikeThis"
 	}
 }
