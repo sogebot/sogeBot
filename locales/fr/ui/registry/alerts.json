@@ -9,39 +9,39 @@
     "tier": "Niveau",
     "amountOfViewers": "Nombre de spectateurs",
     "amountOfBits": "Nombre de bits",
-    "amountOfGifts": "Amount of gifts",
-    "amountOfMonths": "Amount of months",
-    "amountOfTips": "Tip",
+    "amountOfGifts": "Nombre de gifts",
+    "amountOfMonths": "Nombre de mois",
+    "amountOfTips": "Don",
     "event": "Événement"
   },
-  "empty": "Alerts registry is empty, create new alerts.",
-  "emptyAfterSearch": "Alerts registry is empty in searching for \"<strong>$search</strong>\"",
-  "revertcode": "Revert code to defaults",
+  "empty": "Le registre des alertes est vide, créez de nouvelles alertes.",
+  "emptyAfterSearch": "Le registre des alertes est vide dans la recherche de \"<strong>$search</strong>\"",
+  "revertcode": "Revenir au code par défaut",
   "name": {
-    "name": "Name",
-    "placeholder": "Set name of your alerts"
+    "name": "Nom",
+    "placeholder": "Définir le nom de vos alertes"
   },
   "alertDelayInMs": {
-    "name": "Alert delay"
+    "name": "Délai d'alerte"
   },
   "parryEnabled": {
-    "name": "Alert parries"
+    "name": "Esquives d'alertes"
   },
   "parryDelay": {
-    "name": "Alert parry delay"
+    "name": "Délai d'esquive d'alerte"
   },
   "profanityFilterType": {
-    "name": "Profanity filter",
-    "disabled": "Disabled",
-    "replace-with-asterisk": "Replace with asterisk",
-    "replace-with-happy-words": "Replace with happy words",
-    "hide-messages": "Hide messages",
-    "disable-alerts": "Disable alerts"
+    "name": "Filtre de profanité",
+    "disabled": "Désactivé",
+    "replace-with-asterisk": "Remplacer par un astérisque",
+    "replace-with-happy-words": "Remplacer par des mots heureux",
+    "hide-messages": "Masquer les messages",
+    "disable-alerts": "Désactiver les alertes"
   },
-  "loadStandardProfanityList": "Load standard profanity list",
+  "loadStandardProfanityList": "Charger la liste de profanité standard",
   "customProfanityList": {
-    "name": "Custom profanity list",
-    "help": "Words should be separated with comma."
+    "name": "Liste de profanités personnalisée",
+    "help": "Les mots doivent être séparés par des virgules."
   },
   "event": {
     "follows": "Follows",
@@ -49,30 +49,30 @@
     "subs": "Subs",
     "resubs": "Resubs",
     "subgifts": "Subgifts",
-    "subcommunitygifts": "Subgifts to community",
-    "tips": "Tips",
+    "subcommunitygifts": "Subgifts à la communauté",
+    "tips": "Dons",
     "hosts": "Hosts",
     "raids": "Raids",
-    "cmdredeems": "Command Redeems",
-    "rewardredeems": "Reward Redeems"
+    "cmdredeems": "Commandes utilisées",
+    "rewardredeems": "Réclamations de récompense"
   },
   "title": {
-    "name": "Variant name",
-    "placeholder": "Set your variant name"
+    "name": "Nom de la variante",
+    "placeholder": "Définissez le nom de votre variante"
   },
   "variant": {
-    "name": "Variant occurence"
+    "name": "Occurence de variante"
   },
   "filter": {
-    "name": "Occurence filter",
-    "operator": "Operator",
+    "name": "Filtre d'occurrence",
+    "operator": "Opérateur",
     "rule": "Règle",
-    "addRule": "Add rule",
-    "addGroup": "Add group",
-    "comparator": "Comparator",
-    "value": "Value",
-    "valueSplitByComma": "Values split by comma (e.g. val1, val2)",
-    "isEven": "is even",
+    "addRule": "Ajouter une règle",
+    "addGroup": "Ajouter un groupe",
+    "comparator": "Comparateur",
+    "value": "Valeur",
+    "valueSplitByComma": "Valeurs séparées par virgules (ex : val1, val2)",
+    "isEven": "est même",
     "isOdd": "is odd",
     "lessThan": "less than",
     "lessThanOrEqual": "less than or equal",
@@ -158,7 +158,7 @@
     "name": "Font family",
     "overrideGlobal": "Override global font settings",
     "align": {
-      "name": "Alignment",
+      "name": "Alignement",
       "left": "Left",
       "center": "Center",
       "right": "Right"
