@@ -1,7 +1,7 @@
 {
   "runTask": {
     "EntityNotFound": "$sender, aucune action n'est définie pour l'id : $id !",
-    "ParameterError": "$sender, you need to specify id!",
+    "ParameterError": "$sender, vous devez spécifier l'id!",
     "UnknownError": "$sender, un problème est survenu. Consultez les journaux du bot pour obtenir des informations supplémentaires."
   }
 }
