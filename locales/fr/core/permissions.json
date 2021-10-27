@@ -1,8 +1,8 @@
 {
   "list": "Liste de vos permissions :",
-  "excludeAddSuccessful": "$sender, you added $username to exclude list for permission $permissionName",
-  "excludeRmSuccessful": "$sender, you removed $username from exclude list for permission $permissionName",
-  "userNotFound": "$sender, user $username was not found in database.",
-  "permissionNotFound": "$sender, permission $userlevel was not found in database.",
-  "cannotIgnoreForCorePermission": "$sender, you cannot manually exclude user for core permission $userlevel"
+  "excludeAddSuccessful": "$sender, vous avez ajouté $username à la liste d'exclusion pour la permission $permissionName",
+  "excludeRmSuccessful": "$sender, vous avez retiré $username de la liste d'exclusion pour la permission $permissionName",
+  "userNotFound": "$sender, $username n'a pas été trouvé dans la base de données.",
+  "permissionNotFound": "$sender, la permission $userlevel n'a pas été trouvée dans la base de données.",
+  "cannotIgnoreForCorePermission": "$sender, vous ne pouvez pas exclure manuellement cet utilisateur pour la permission de base $userlevel"
 }
