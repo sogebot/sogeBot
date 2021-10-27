@@ -1,40 +1,40 @@
 {
   "settings": {
-    "enabled": "Status",
-    "songRequests": "Song Requests",
+    "enabled": "Statut",
+    "songRequests": "Demandes de musiques",
     "fetchCurrentSongWhenOffline": {
-      "title": "Fetch current song when stream is offline",
-      "help": "It's advised to have this disabled to avoid reach API limits"
+      "title": "Récupérer la chanson en cours lorsque le flux est hors ligne",
+      "help": "Il est conseillé de désactiver ceci pour éviter d'atteindre les limites de l'API"
     },
-    "allowApprovedArtistsOnly": "Allow approved artists only",
+    "allowApprovedArtistsOnly": "Autoriser uniquement les artistes approuvés",
     "approvedArtists": {
-      "title": "Approved artists",
-      "help": "Name or SpotifyURI of artist, one item per line"
+      "title": "Artistes approuvés",
+      "help": "Nom ou SpotifyURI de l'artiste, un élément par ligne"
     },
     "queueWhenOffline": {
-      "title": "Queue songs when stream is offline",
-      "help": "It's advised to have this disabled to avoid queueing when you are just listening music"
+      "title": "Mettre en file d'attente lorsque le stream est hors ligne",
+      "help": "Il est conseillé de désactiver cette option pour éviter d'avoir des surprises en écoutant juste votre musique"
     },
     "clientId": "clientId",
     "clientSecret": "clientSecret",
     "manualDeviceId": {
-      "title": "Forced Device ID",
-      "help": "Empty = disabled, force spotify device ID to be used to queue songs. Check logs for current active device or use button when playing song for at least 10 seconds."
+      "title": "ID de l'appareil forcé",
+      "help": "Vide = désactivé, force spotify device ID à être utilisé pour mettre en file d'attente. Vérifiez les logs pour le périphérique actif actuel ou utilisez le bouton lors de la lecture de la chanson pendant au moins 10 secondes."
     },
     "redirectURI": "redirectURI",
     "format": {
       "title": "Format",
-      "help": "Available variables: $song, $artist, $artists"
+      "help": "Variables disponibles : $song, $artist, $artists"
     },
-    "username": "Authorized user",
-    "revokeBtn": "Revoke user authorization",
-    "authorizeBtn": "Authorize user",
+    "username": "Utilisateur autorisé",
+    "revokeBtn": "Révoquer l'autorisation de l'utilisateur",
+    "authorizeBtn": "Autoriser l'utilisateur",
     "scopes": "Scopes",
     "playlistToPlay": {
-      "title": "Spotify URI of main playlist",
-      "help": "If set, after request finished this playlist will continue"
+      "title": "URI Spotify de la playlist principale",
+      "help": "Si défini, après la fin de la requête, cette playlist continuera"
     },
-    "continueOnPlaylistAfterRequest": "Continue on playing of playlist after song request",
-    "notify": "Send message on song change"
+    "continueOnPlaylistAfterRequest": "Continuer à jouer de la playlist après demande de chanson",
+    "notify": "Envoyer un message en cas de changement de chanson"
   }
 }
