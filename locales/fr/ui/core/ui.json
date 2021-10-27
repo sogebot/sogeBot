@@ -2,10 +2,10 @@
   "settings": {
     "theme": "Thème par défaut",
     "domain": {
-      "title": "Domain",
-      "help": "Format without http/https: yourdomain.com or your.domain.com"
+      "title": "Domaine",
+      "help": "Format sans http/https: yourdomain.com ou votre.domain.com"
     },
-    "percentage": "Percentage difference for stats",
+    "percentage": "Différence de pourcentage pour les statistiques",
     "shortennumbers": "Short format of numbers",
     "showdiff": "Show difference"
   }
