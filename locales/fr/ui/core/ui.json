@@ -6,7 +6,7 @@
       "help": "Format sans http/https: yourdomain.com ou votre.domain.com"
     },
     "percentage": "Différence de pourcentage pour les statistiques",
-    "shortennumbers": "Short format of numbers",
-    "showdiff": "Show difference"
+    "shortennumbers": "Format court des nombres",
+    "showdiff": "Afficher la différence"
   }
 }
