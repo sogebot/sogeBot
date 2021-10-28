@@ -445,13 +445,6 @@ class OAuth extends Core {
           if (request.data.message.includes('Invalid refresh token received')) {
             warning(`Invalid refresh token for ${type}. Please reset your token.`);
             addUIError({ name: 'Token Error!', message: `Invalid refresh token for ${type}. Please reset your token.` });
-            if (type === 'broadcaster') {
-              this.broadcasterAccessToken = '';
-              this.broadcasterRefreshToken = '';
-            } else {
-              this.botRefreshToken = '';
-              this.botAccessToken = '';
-            }
           }
           throw new Error(`Token refresh for ${type}: ${request.data.message}`);
         }
