@@ -4,14 +4,22 @@ export interface KeywordInterface {
   id?: string;
   keyword: string;
   enabled: boolean;
+  group: string | null;
   responses?: KeywordsResponsesInterface[];
+}
+export class KeywordGroupInterface {
+  name: string;
+  options: {
+    filter: string | null;
+    permission: string | null;
+  };
 }
 export interface KeywordsResponsesInterface {
   id?: string;
   keyword?: KeywordInterface;
   order: number;
   response: string;
-  permission: string;
+  permission: string | null;
   filter: string;
   stopIfExecuted: boolean;
 }
@@ -20,9 +28,10 @@ export const Keyword = new EntitySchema<Readonly<Required<KeywordInterface>>>({
   name:    'keyword',
   columns: {
     id: {
-      type: 'uuid', primary: true, generated: 'uuid', 
+      type: 'uuid', primary: true, generated: 'uuid',
     },
     keyword: { type: String },
+    group:   { type: String, nullable: true },
     enabled: { type: Boolean },
   },
   indices: [
@@ -38,16 +47,16 @@ export const Keyword = new EntitySchema<Readonly<Required<KeywordInterface>>>({
   },
 });
 
-export const CommandsResponses = new EntitySchema<Readonly<Required<KeywordsResponsesInterface>>>({
+export const KeywordResponses = new EntitySchema<Readonly<Required<KeywordsResponsesInterface>>>({
   name:    'keyword_responses',
   columns: {
     id: {
-      type: 'uuid', primary: true, generated: 'uuid', 
+      type: 'uuid', primary: true, generated: 'uuid',
     },
     order:          { type: Number },
     response:       { type: 'text' },
     stopIfExecuted: { type: Boolean },
-    permission:     { type: String },
+    permission:     { type: String, nullable: true },
     filter:         { type: String },
   },
   relations: {
@@ -59,4 +68,17 @@ export const CommandsResponses = new EntitySchema<Readonly<Required<KeywordsResp
       onUpdate:    'CASCADE',
     },
   },
+});
+
+export const KeywordGroup = new EntitySchema<Readonly<Required<KeywordGroupInterface>>>({
+  name:    'keyword_group',
+  columns: {
+    name: {
+      type: String, primary: true,
+    },
+    options: { type: 'simple-json' },
+  },
+  indices: [
+    { name: 'IDX_keyword_group_unique_name', columns: ['name'], unique: true },
+  ],
 });
