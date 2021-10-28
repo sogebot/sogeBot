@@ -135,7 +135,7 @@ class Message {
       const rMessage = this.message.match((new RegExp('(' + regexp + ')', 'g')));
       if (rMessage !== null) {
         for (const bkey in rMessage) {
-          this.message = this.message.replace(rMessage[bkey], await fnc(rMessage[bkey], _.cloneDeep(attr))).trim();
+          this.message = this.message.replace(rMessage[bkey], await fnc(rMessage[bkey], { ..._.cloneDeep(attr), sender: attr.sender })).trim();
         }
       }
     }
@@ -155,7 +155,7 @@ class Message {
       const rMessage = this.message.match((new RegExp('(' + regexp + ')', 'g')));
       if (rMessage !== null) {
         for (const bkey in rMessage) {
-          if (!(await fnc(rMessage[bkey], _.cloneDeep(attr)))) {
+          if (!(await fnc(rMessage[bkey], { ..._.cloneDeep(attr), sender: attr.sender }))) {
             this.message = '';
           } else {
             this.message = this.message.replace(rMessage[bkey], '').trim();
@@ -179,7 +179,7 @@ class Message {
       const rMessage = this.message.match((new RegExp('(' + regexp + ')', 'g')));
       if (rMessage !== null) {
         for (const bkey in rMessage) {
-          const newString = await fnc(rMessage[bkey], _.cloneDeep(attr));
+          const newString = await fnc(rMessage[bkey], { ..._.cloneDeep(attr), sender: attr.sender });
           if (_.isUndefined(newString) || newString.length === 0) {
             this.message = '';
           }
@@ -202,7 +202,7 @@ class Message {
       const rMessage = this.message.match((new RegExp('(' + regexp + ')', 'g')));
       if (rMessage !== null) {
         for (const bkey in rMessage) {
-          const newString = await fnc(rMessage[bkey], _.cloneDeep(attr));
+          const newString = await fnc(rMessage[bkey], { ..._.cloneDeep(attr), sender: attr.sender });
           if ((_.isNil(newString) || newString.length === 0) && removeWhenEmpty) {
             this.message = '';
           }
@@ -229,7 +229,7 @@ class Message {
       const rMessage = this.message.match((new RegExp('(' + regexp + ')', 'g')));
       if (rMessage !== null) {
         for (const bkey in rMessage) {
-          const newString = await fnc(rMessage[bkey], _.cloneDeep(attr));
+          const newString = await fnc(rMessage[bkey], { ..._.cloneDeep(attr), sender: attr.sender });
           if ((_.isNil(newString) || newString.length === 0) && removeWhenEmpty) {
             this.message = '';
           }
