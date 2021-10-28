@@ -4,7 +4,7 @@ import XRegExp from 'xregexp';
 
 import { parserReply } from '../commons';
 import {
-  Keyword, KeywordInterface, KeywordsResponsesInterface,
+  Keyword, KeywordGroup, KeywordGroupInterface, KeywordInterface, KeywordsResponsesInterface,
 } from '../database/entity/keyword';
 import {
   command, default_permission, helper, parser, timer,
@@ -226,7 +226,7 @@ class Keywords extends System {
         return [{ response: prepare('keywords.list-of-responses-is-empty', { keyword: keyword_with_responses?.keyword || keyword }), ...opts }];
       }
       return Promise.all(_.orderBy(keyword_with_responses.responses, 'order', 'asc').map(async(r) => {
-        const perm = await get(r.permission);
+        const perm = r.permission ? await get(r.permission) : { name: '-- unset --' };
         const response = prepare('keywords.response', {
           keyword: keyword_with_responses.keyword, index: ++r.order, response: r.response, after: r.stopIfExecuted ? '_' : 'v', permission: perm?.name ?? 'n/a',
         });
@@ -364,12 +364,33 @@ class Keywords extends System {
     let atLeastOnePermissionOk = false;
     for (const k of keywords) {
       const _responses: KeywordsResponsesInterface[] = [];
+
+      // check group filter first
+      let group: Readonly<Required<KeywordGroupInterface>> | undefined;
+      let groupPermission: null | string = null;
+      if (k.group) {
+        group = await getRepository(KeywordGroup).findOne({ name: k.group });
+        if (group) {
+          if (group.options.filter && !(await checkFilter(opts, group.options.filter))) {
+            warning(`Keyword ${k.keyword}#${k.id} didn't pass group filter.`);
+            continue;
+          }
+          groupPermission = group.options.permission;
+        }
+      }
+
       for (const r of _.orderBy(k.responses, 'order', 'asc')) {
-        if (typeof getFromViewersCache(opts.sender.userId, r.permission) === 'undefined') {
-          addToViewersCache(opts.sender.userId, r.permission, (await check(opts.sender.userId, r.permission, false)).access);
+        let permission = r.permission ?? groupPermission;
+        // show warning if null permission
+        if (!permission) {
+          permission = defaultPermissions.CASTERS;
+          warning(`Keyword ${k.keyword}#${k.id}} doesn't have any permission set, treating as CASTERS permission.`);
+        }
+        if (typeof getFromViewersCache(opts.sender.userId, permission) === 'undefined') {
+          addToViewersCache(opts.sender.userId, permission, (await check(opts.sender.userId, permission, false)).access);
         }
 
-        if (getFromViewersCache(opts.sender.userId, r.permission)
+        if (getFromViewersCache(opts.sender.userId, permission)
           && (r.filter.length === 0 || (r.filter.length > 0 && await checkFilter(opts, r.filter)))) {
           _responses.push(r);
           atLeastOnePermissionOk = true;
