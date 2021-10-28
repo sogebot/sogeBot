@@ -1003,7 +1003,7 @@ class TMI extends Core {
     }
     const responses = await parse.process();
     for (let i = 0; i < responses.length; i++) {
-      await sendMessage(responses[i].response, responses[i].sender, responses[i].attr, parse.id);
+      await sendMessage(responses[i].response, responses[i].sender, { ...responses[i].attr }, parse.id);
     }
   }
 }

@@ -3,7 +3,7 @@ import _ from 'lodash';
 import { timer } from '../../decorators.js';
 import { Message } from '../../message';
 import {
-  chatOut, debug,
+  chatOut, debug, whisperOut,
 } from '../log';
 import {
   getMuteStatus, message, sendWithMe, showWithAt,
@@ -21,6 +21,7 @@ class HelpersCommons {
     skip?: boolean;
     forceWithoutAt?: boolean;
     force?: boolean;
+    isWhisper?: boolean;
     [x: string]: any;
   }, id?: string) {
     messageToSend = await messageToSend as string; // await if messageToSend is promise (like prepare)
@@ -67,11 +68,16 @@ class HelpersCommons {
         if ((!_.isNil(attr.quiet) && attr.quiet)) {
           return true;
         }
-        chatOut(`${messageToSend} [${sender.userName}]`);
-        if (sendWithMe.value && !messageToSend.startsWith('/')) {
-          message('me', null, messageToSend, id);
+        if (attr.isWhisper) {
+          whisperOut(`${messageToSend} [${sender.userName}]`);
+          message('whisper', sender.userName, messageToSend, id);
         } else {
-          message('say', null, messageToSend, id);
+          chatOut(`${messageToSend} [${sender.userName}]`);
+          if (sendWithMe.value && !messageToSend.startsWith('/')) {
+            message('me', null, messageToSend, id);
+          } else {
+            message('say', null, messageToSend, id);
+          }
         }
       }
       return true;
@@ -86,6 +92,7 @@ export async function sendMessage(messageToSend: string | Promise<string>, sende
   quiet?: boolean;
   skip?: boolean;
   force?: boolean;
+  isWhisper?: boolean;
   forceWithoutAt?: boolean;
   [x: string]: any;
 }, id?: string) {
