@@ -34,7 +34,6 @@ let lastBotTokenValidation = 0;
 let lastBroadcasterTokenValidation = 0;
 
 const urls = {
-  'Twitch Token Generator':  'https://twitchtokengenerator.com/api/refresh/',
   'SogeBot Token Generator': 'https://twitch-token-generator.soge.workers.dev/refresh/',
 };
 
@@ -54,7 +53,7 @@ class OAuth extends Core {
   public broadcasterClientId = '';
 
   @settings('general')
-  public tokenService: keyof typeof urls = 'Twitch Token Generator';
+  public tokenService: keyof typeof urls = 'SogeBot Token Generator';
   @settings('general')
   public tokenServiceCustomClientId = '';
   @settings('general')
@@ -397,7 +396,7 @@ class OAuth extends Core {
   }
 
   /*
-   * Refresh OAuth access tokens - we are using twitchtokengenerator for this
+   * Refresh OAuth access tokens
    * @param {string} type - bot or broadcaster
    *
    * Example output:
