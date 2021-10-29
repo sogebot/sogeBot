@@ -1,7 +1,7 @@
 {
-  "countdown": "Snipe match ($type) starting in $time $unit",
-  "go": "Starting now! Go!",
-  "putMatchIdInChat": "Please put your match ID in the chat => $command xxx",
-  "currentMatches": "Current Matches: $matches",
-  "stopped": "Snipe match was cancelled."
+  "countdown": "Correspondance de snipe ($type) commençant dans $time $unit",
+  "go": "Commence maintenant ! Go !",
+  "putMatchIdInChat": "Veuillez mettre l'ID de recherche dans le chat => $command xxx",
+  "currentMatches": "Correspondances actuelles: $matches",
+  "stopped": "La recherche a été annulée."
 }

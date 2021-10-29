@@ -2,11 +2,11 @@
   "settings": {
     "theme": "Thème par défaut",
     "domain": {
-      "title": "Domain",
-      "help": "Format without http/https: yourdomain.com or your.domain.com"
+      "title": "Domaine",
+      "help": "Format sans http/https: yourdomain.com ou votre.domain.com"
     },
-    "percentage": "Percentage difference for stats",
-    "shortennumbers": "Short format of numbers",
-    "showdiff": "Show difference"
+    "percentage": "Différence de pourcentage pour les statistiques",
+    "shortennumbers": "Format court des nombres",
+    "showdiff": "Afficher la différence"
   }
 }

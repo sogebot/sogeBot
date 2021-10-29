@@ -1,30 +1,30 @@
 {
-  "name": "Heist",
+  "name": "Braquage",
   "settings": {
-    "enabled": "Status",
-    "showMaxUsers": "Max users to show in payout",
+    "enabled": "Statut",
+    "showMaxUsers": "Nombre maximum d'utilisateurs à afficher dans le paiement",
     "copsCooldownInMinutes": {
-      "title": "Cooldown between heists",
+      "title": "Cooldown entre les braquages",
       "help": "Minutes"
     },
     "entryCooldownInSeconds": {
-      "title": "Time to entry heist",
-      "help": "Seconds"
+      "title": "Temps pour participer au braquage",
+      "help": "Secondes"
     },
-    "started": "Heist start message",
-    "nextLevelMessage": "Message when next level is reached",
-    "maxLevelMessage": "Message when max level is reached",
-    "copsOnPatrol": "Response of bot when heist is still on cooldown",
-    "copsCooldown": "Bot announcement when heist can be started",
-    "singleUserSuccess": "Success message for one user",
-    "singleUserFailed": "Fail message for one user",
-    "noUser": "Message if no user participated"
+    "started": "Message de début de braquage",
+    "nextLevelMessage": "Message lorsque le niveau suivant est atteint",
+    "maxLevelMessage": "Message lorsque le niveau max est atteint",
+    "copsOnPatrol": "Réponse du bot quand le braquage est toujours en cooldown",
+    "copsCooldown": "Annonce du bot quand le braquage peut être démarré",
+    "singleUserSuccess": "Message de succès pour un utilisateur",
+    "singleUserFailed": "Message d'échec pour un utilisateur",
+    "noUser": "Message si aucun utilisateur n'a participé"
   },
   "message": "Message ",
-  "winPercentage": "Win percentage",
-  "payoutMultiplier": "Payout multiplier",
-  "maxUsers": "Max users for level",
+  "winPercentage": "Pourcentage de victoire",
+  "payoutMultiplier": "Multiplicateur de gains",
+  "maxUsers": "Nombre maximum d'utilisateurs pour le niveau",
   "percentage": "Pourcentage",
-  "noResultsFound": "No results found. Click button below to add new result.",
-  "noLevelsFound": "No levels found. Click button below to add new level."
+  "noResultsFound": "Aucun résultat trouvé. Cliquez sur le bouton ci-dessous pour ajouter un nouveau résultat.",
+  "noLevelsFound": "Aucun niveau trouvé. Cliquez sur le bouton ci-dessous pour ajouter un nouveau niveau."
 }

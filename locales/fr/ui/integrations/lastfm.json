@@ -1,7 +1,7 @@
 {
   "settings": {
-    "enabled": "Status",
-    "apiKey": "API key",
-    "username": "Username"
+    "enabled": "Statut",
+    "apiKey": "Clé d'API",
+    "username": "Nom d'utilisateur"
   }
 }

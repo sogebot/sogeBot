@@ -4,6 +4,7 @@
     "globalIgnoreListExclude": "Excluir da lista global de ignorados",
     "showWithAt": "Mostrar usuários com @",
     "sendWithMe": "Enviar mensagens com /me",
+    "sendAsReply": "Send bot messages as replies",
     "mute": "Bot mutado",
     "whisperListener": "Aceitar comandos no privado"
   }

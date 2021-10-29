@@ -1,13 +1,13 @@
 {
   "settings": {
-    "enabled": "Status",
+    "enabled": "Statut",
     "cooldown": "Cooldown",
     "timeout": {
-      "title": "Timeout duration",
+      "title": "Durée d'expiration",
       "help": "Secondes"
     },
-    "bypassCooldownByOwnerAndMods": "Bypass cooldown by owner and mods",
-    "winnerWillGet": "How many points will be added on win",
-    "loserWillLose": "How many points will be lost on lose"
+    "bypassCooldownByOwnerAndMods": "Contourner le cooldown pour le propriétaire et les mods",
+    "winnerWillGet": "Combien de points seront ajoutés lors de la victoire",
+    "loserWillLose": "Combien de points seront perdus en cas de perte"
   }
 }

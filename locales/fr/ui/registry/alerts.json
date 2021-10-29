@@ -1,47 +1,47 @@
 {
-  "enabled": "Enabled",
+  "enabled": "Activé",
   "testDlg": {
-    "alertTester": "Alert tester",
-    "command": "Command",
-    "username": "Username",
-    "recipient": "Recipient",
+    "alertTester": "Testeur d'alerte",
+    "command": "Commande",
+    "username": "Nom d'utilisateur",
+    "recipient": "Destinataire",
     "message": "Message ",
-    "tier": "Tier",
-    "amountOfViewers": "Amount of viewers",
-    "amountOfBits": "Amount of bits",
-    "amountOfGifts": "Amount of gifts",
-    "amountOfMonths": "Amount of months",
-    "amountOfTips": "Tip",
+    "tier": "Niveau",
+    "amountOfViewers": "Nombre de spectateurs",
+    "amountOfBits": "Nombre de bits",
+    "amountOfGifts": "Nombre de gifts",
+    "amountOfMonths": "Nombre de mois",
+    "amountOfTips": "Don",
     "event": "Événement"
   },
-  "empty": "Alerts registry is empty, create new alerts.",
-  "emptyAfterSearch": "Alerts registry is empty in searching for \"<strong>$search</strong>\"",
-  "revertcode": "Revert code to defaults",
+  "empty": "Le registre des alertes est vide, créez de nouvelles alertes.",
+  "emptyAfterSearch": "Le registre des alertes est vide dans la recherche de \"<strong>$search</strong>\"",
+  "revertcode": "Revenir au code par défaut",
   "name": {
-    "name": "Name",
-    "placeholder": "Set name of your alerts"
+    "name": "Nom",
+    "placeholder": "Définir le nom de vos alertes"
   },
   "alertDelayInMs": {
-    "name": "Alert delay"
+    "name": "Délai d'alerte"
   },
   "parryEnabled": {
-    "name": "Alert parries"
+    "name": "Esquives d'alertes"
   },
   "parryDelay": {
-    "name": "Alert parry delay"
+    "name": "Délai d'esquive d'alerte"
   },
   "profanityFilterType": {
-    "name": "Profanity filter",
-    "disabled": "Disabled",
-    "replace-with-asterisk": "Replace with asterisk",
-    "replace-with-happy-words": "Replace with happy words",
-    "hide-messages": "Hide messages",
-    "disable-alerts": "Disable alerts"
+    "name": "Filtre de profanité",
+    "disabled": "Désactivé",
+    "replace-with-asterisk": "Remplacer par un astérisque",
+    "replace-with-happy-words": "Remplacer par des mots heureux",
+    "hide-messages": "Masquer les messages",
+    "disable-alerts": "Désactiver les alertes"
   },
-  "loadStandardProfanityList": "Load standard profanity list",
+  "loadStandardProfanityList": "Charger la liste de profanité standard",
   "customProfanityList": {
-    "name": "Custom profanity list",
-    "help": "Words should be separated with comma."
+    "name": "Liste de profanités personnalisée",
+    "help": "Les mots doivent être séparés par des virgules."
   },
   "event": {
     "follows": "Follows",
@@ -49,159 +49,159 @@
     "subs": "Subs",
     "resubs": "Resubs",
     "subgifts": "Subgifts",
-    "subcommunitygifts": "Subgifts to community",
-    "tips": "Tips",
+    "subcommunitygifts": "Subgifts à la communauté",
+    "tips": "Dons",
     "hosts": "Hosts",
     "raids": "Raids",
-    "cmdredeems": "Command Redeems",
-    "rewardredeems": "Reward Redeems"
+    "cmdredeems": "Commandes utilisées",
+    "rewardredeems": "Réclamations de récompense"
   },
   "title": {
-    "name": "Variant name",
-    "placeholder": "Set your variant name"
+    "name": "Nom de la variante",
+    "placeholder": "Définissez le nom de votre variante"
   },
   "variant": {
-    "name": "Variant occurence"
+    "name": "Occurence de variante"
   },
   "filter": {
-    "name": "Occurence filter",
-    "operator": "Operator",
+    "name": "Filtre d'occurrence",
+    "operator": "Opérateur",
     "rule": "Règle",
-    "addRule": "Add rule",
-    "addGroup": "Add group",
-    "comparator": "Comparator",
-    "value": "Value",
-    "valueSplitByComma": "Values split by comma (e.g. val1, val2)",
-    "isEven": "is even",
-    "isOdd": "is odd",
-    "lessThan": "less than",
-    "lessThanOrEqual": "less than or equal",
-    "contain": "contains",
-    "equal": "equal",
-    "notEqual": "not equal",
-    "present": "is present",
-    "includes": "includes",
-    "greaterThan": "greater than",
-    "greaterThanOrEqual": "greater than or equal",
-    "noFilter": "no filter"
+    "addRule": "Ajouter une règle",
+    "addGroup": "Ajouter un groupe",
+    "comparator": "Comparateur",
+    "value": "Valeur",
+    "valueSplitByComma": "Valeurs séparées par virgules (ex : val1, val2)",
+    "isEven": "est même",
+    "isOdd": "est impair",
+    "lessThan": "plus petit que",
+    "lessThanOrEqual": "inférieur ou égal à",
+    "contain": "contient",
+    "equal": "égal",
+    "notEqual": "n'est pas égal à",
+    "present": "est présent",
+    "includes": "inclut",
+    "greaterThan": "est supérieur à",
+    "greaterThanOrEqual": "supérieur ou égal à",
+    "noFilter": "sans filtre"
   },
   "speed": {
-    "name": "Speed"
+    "name": "Vitesse"
   },
   "maxTimeToDecrypt": {
-    "name": "Max time to decrypt"
+    "name": "Temps maximum pour décrypter"
   },
   "characters": {
-    "name": "Characters"
+    "name": "Caractères"
   },
-  "random": "Random",
-  "exact-amount": "Exact amount",
-  "greater-than-or-equal-to-amount": "Greater than or equal to amount",
-  "tier-exact-amount": "Tier is exactly",
-  "tier-greater-than-or-equal-to-amount": "Tier is higher or equal to",
-  "months-exact-amount": "Months amount is exactly",
-  "months-greater-than-or-equal-to-amount": "Months amount is higher or equal to",
-  "gifts-exact-amount": "Gifts amount is exactly",
-  "gifts-greater-than-or-equal-to-amount": "Gifts amount is higher or equal to",
-  "very-rarely": "Very rarely",
-  "rarely": "Rarely",
-  "default": "Default",
-  "frequently": "Frequently",
-  "very-frequently": "Very frequently",
-  "exclusive": "Exclusive",
+  "random": "Aléatoire",
+  "exact-amount": "Montant exact",
+  "greater-than-or-equal-to-amount": "Supérieur ou égal au montant",
+  "tier-exact-amount": "Le niveau est exactement",
+  "tier-greater-than-or-equal-to-amount": "Le niveau est supérieur ou égal à",
+  "months-exact-amount": "Le montant des mois est exactement",
+  "months-greater-than-or-equal-to-amount": "Le montant des mois est supérieur ou égal à",
+  "gifts-exact-amount": "Le montant des gifts est exactement",
+  "gifts-greater-than-or-equal-to-amount": "Le montant des gifts est supérieur ou égal à",
+  "very-rarely": "Très rarement",
+  "rarely": "Rarement",
+  "default": "Par défaut",
+  "frequently": "Fréquemment",
+  "very-frequently": "Très fréquemment",
+  "exclusive": "Exclusif",
   "messageTemplate": {
-    "name": "Message template",
-    "placeholder": "Set your message template",
-    "help": "Available variables: {name}, {amount} (cheers, subs, tips, subgifts, sub community gifts, command redeems), {recipient} (subgifts, command redeems), {monthsName} (subs, subgifts), {currency} (tips)"
+    "name": "Modèle de message",
+    "placeholder": "Mettez votre modèle de message",
+    "help": "Variables possibles: {name}, {amount} (cheers, subs, dons, subgifts, sub gift a la communauté, demandes de commandes), {recipient} (subgifts, demandes de commandes), {monthsName} (subs, subgifts), {currency} (tips)"
   },
   "animationText": {
-    "name": "Animation text"
+    "name": "Animation du texte"
   },
   "animationIn": {
-    "name": "Animation in"
+    "name": "Arrivée de l'animation"
   },
   "animationOut": {
-    "name": "Animation out"
+    "name": "Sortie de l'animation"
   },
   "alertDurationInMs": {
-    "name": "Alert duration"
+    "name": "Durée de l'alerte"
   },
   "alertTextDelayInMs": {
-    "name": "Alert text delay"
+    "name": "Délai du texte d'alerte"
   },
   "layoutPicker": {
-    "name": "Layout"
+    "name": "Mise en page"
   },
   "scale": {
-    "name": "Scale"
+    "name": "Echelle"
   },
   "translateY": {
-    "name": "Move -Up / +Down"
+    "name": "Déplacer -Haut / +Bas"
   },
   "translateX": {
-    "name": "Move -Left / +Right"
+    "name": "Déplacer -Gauche / +Droite"
   },
   "image": {
-    "name": "Image / Video(.webm)",
-    "setting": "Image / Video(.webm) settings"
+    "name": "Image / Vidéo (.webm)",
+    "setting": "Paramètres de l'image / Vidéo(.webm)"
   },
   "sound": {
-    "name": "Sound",
-    "setting": "Sound settings"
+    "name": "Son",
+    "setting": "Paramètres audio"
   },
   "soundVolume": {
-    "name": "Alert volume"
+    "name": "Volume d'alerte"
   },
-  "enableAdvancedMode": "Enable advanced mode",
+  "enableAdvancedMode": "Activer le mode avancé",
   "font": {
-    "setting": "Font settings",
-    "name": "Font family",
-    "overrideGlobal": "Override global font settings",
+    "setting": "Paramètres de la police",
+    "name": "Famille de polices",
+    "overrideGlobal": "Remplacer les paramètres globaux de police",
     "align": {
-      "name": "Alignment",
-      "left": "Left",
-      "center": "Center",
-      "right": "Right"
+      "name": "Alignement",
+      "left": "Gauche",
+      "center": "Centre",
+      "right": "Droite"
     },
     "size": {
-      "name": "Font size"
+      "name": "Taille de la police"
     },
     "weight": {
-      "name": "Font weight"
+      "name": "Épaisseur de la police"
     },
     "borderPx": {
-      "name": "Font border"
+      "name": "Contour de la police"
     },
     "borderColor": {
-      "name": "Font border color"
+      "name": "Couleur de la bordure de la police"
     },
     "color": {
-      "name": "Font color"
+      "name": "Couleur de la police"
     },
     "highlightcolor": {
-      "name": "Font highlight color"
+      "name": "Couleur de surlignage du texte"
     }
   },
   "minAmountToShow": {
-    "name": "Minimal amount to show"
+    "name": "Montant minimum à afficher"
   },
   "minAmountToPlay": {
-    "name": "Minimal amount to play"
+    "name": "Montant minimum pour jouer"
   },
   "allowEmotes": {
-    "name": "Allow emotes"
+    "name": "Autoriser les emotes"
   },
   "message": {
-    "setting": "Message settings"
+    "setting": "Paramètres des messages"
   },
-  "voice": "Voice",
-  "keepAlertShown": "Alert keeps visible during TTS",
-  "skipUrls": "Skip URLs during TTS",
+  "voice": "Voix",
+  "keepAlertShown": "L'alerte reste visible pendant le TTS",
+  "skipUrls": "Ignorer les URL pendant les TTS",
   "volume": "Volume",
-  "rate": "Rate",
+  "rate": "Taux",
   "pitch": "Pitch",
   "test": "Test",
   "tts": {
-    "setting": "TTS settings"
+    "setting": "Paramètres TTS"
   }
 }

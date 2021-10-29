@@ -1,15 +1,15 @@
 {
-  "song-not-found": "Désolé, $sender, la musique n'a pas été trouvée sur Spotify",
+  "song-not-found": "Désolé, $sender, la musique n'a pas été trouvée sur spotify",
   "song-requested": "$sender, vous avez demandé la musique $name de $artist",
-  "not-banned-song-not-playing": "$sender, no song is currently playing to ban.",
-  "song-banned": "$sender, song $name from $artist is banned.",
-  "song-unbanned": "$sender, song $name from $artist is unbanned.",
-  "song-not-found-in-banlist": "$sender, song by spotifyURI $uri was not found in ban list.",
-  "cannot-request-song-is-banned": "$sender, cannot request banned song $name from $artist.",
-  "cannot-request-song-from-unapproved-artist": "$sender, cannot request song from unapproved artist.",
-  "no-songs-found-in-history": "$sender, there is currently no song in history list.",
-  "return-one-song-from-history": "$sender, previous song was $name from $artist.",
-  "return-multiple-song-from-history": "$sender, $count previous songs were:",
-  "return-multiple-song-from-history-item": "$index - $name from $artist",
-  "song-notify": "Current playing song is $name by $artist."
+  "not-banned-song-not-playing": "$sender, aucune chanson n'est actuellement en cours de bannissement.",
+  "song-banned": "$sender, la chanson $name de $artist est bannie.",
+  "song-unbanned": "$sender, la chanson $name de $artist n'est plus bannie.",
+  "song-not-found-in-banlist": "$sender, chanson $uri n'a pas été trouvée dans la liste des bannissements.",
+  "cannot-request-song-is-banned": "$sender, impossible de demander le bannissement de la chanson $name de $artist.",
+  "cannot-request-song-from-unapproved-artist": "$sender, ne peut pas demander une chanson d'un artiste non approuvé.",
+  "no-songs-found-in-history": "$sender, il n'y a actuellement aucune musique dans l'historique .",
+  "return-one-song-from-history": "$sender, la chanson précédente était $name de $artist.",
+  "return-multiple-song-from-history": "$sender, $count chansons précédentes ont été :",
+  "return-multiple-song-from-history-item": "$index - $name de $artist",
+  "song-notify": "La chanson actuellement jouée est $name par $artist."
 }

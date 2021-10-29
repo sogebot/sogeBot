@@ -4,6 +4,7 @@
     "globalIgnoreListExclude": "Udeluk fra global ignoreringsliste",
     "showWithAt": "Vis brugere med @",
     "sendWithMe": "Send beskeder med /me",
+    "sendAsReply": "Send bot messages as replies",
     "mute": "Bot er lydløs",
     "whisperListener": "Lyt til kommandoer på Whisper"
   }
