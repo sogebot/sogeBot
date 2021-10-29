@@ -51,7 +51,7 @@ describe('Alias - @func1 - #4860 - alias group permissions and filter should be 
 
   it('create alias !testfilter with filterGroup', async () => {
     await getRepository(Alias).insert({
-      id:         '2584b3c1-d2da-4fae-bf9a-95048724acdf',
+      id:         '1a945d76-2d3c-4c7a-ae03-e0daf17142c5',
       alias:      '!testfilter',
       command:    '!me',
       enabled:    true,
@@ -75,7 +75,7 @@ describe('Alias - @func1 - #4860 - alias group permissions and filter should be 
 
   it('create alias !testpermnull2 with permGroup2', async () => {
     await getRepository(Alias).insert({
-      id:         '2584b3c1-d2da-4fae-bf9a-95048724acdj',
+      id:         'ed5f2925-ba73-4146-906b-3856d2583b6a',
       alias:      '!testpermnull2',
       command:    '!me',
       enabled:    true,
@@ -87,7 +87,7 @@ describe('Alias - @func1 - #4860 - alias group permissions and filter should be 
 
   it('create alias !testpermmods with permGroup', async () => {
     await getRepository(Alias).insert({
-      id:         '2584b3c1-d2da-4fae-bf9a-95048724acdg',
+      id:         '2d33f59d-4900-454e-9d3a-22472ae1d3a7',
       alias:      '!testpermmods',
       command:    '!me',
       enabled:    true,
@@ -112,14 +112,14 @@ describe('Alias - @func1 - #4860 - alias group permissions and filter should be 
   it('!testpermnull2 should be triggered by CASTER', async () => {
     message.prepare();
     alias.run({ sender: user.owner, message: '!testpermnull2' });
-    await message.isWarnedRaw('Alias !testpermnull2#2584b3c1-d2da-4fae-bf9a-95048724acdj doesn\'t have any permission set, treating as CASTERS permission.');
+    await message.isWarnedRaw('Alias !testpermnull2#ed5f2925-ba73-4146-906b-3856d2583b6a doesn\'t have any permission set, treating as CASTERS permission.');
     await message.isSentRaw('@__broadcaster__ | Level 0 | 0 hours | 0 points | 0 messages | €0.00 | 0 bits | 0 months', user.owner);
   });
 
   it('!testpermnull2 should not be triggered by VIEWER', async () => {
     message.prepare();
     alias.run({ sender: user.viewer, message: '!testpermnull2' });
-    await message.isWarnedRaw('Alias !testpermnull2#2584b3c1-d2da-4fae-bf9a-95048724acdj doesn\'t have any permission set, treating as CASTERS permission.');
+    await message.isWarnedRaw('Alias !testpermnull2#ed5f2925-ba73-4146-906b-3856d2583b6a doesn\'t have any permission set, treating as CASTERS permission.');
     await message.isNotSentRaw('@__viewer__ | Level 0 | 0 hours | 0 points | 0 messages | €0.00 | 0 bits | 0 months', user.viewer);
   });
 
@@ -145,7 +145,7 @@ describe('Alias - @func1 - #4860 - alias group permissions and filter should be 
     });
     it('!testfilter alias should not be triggered', async () => {
       alias.run({ sender: user.owner, message: '!testfilter' });
-      await message.isWarnedRaw('Alias !testfilter#2584b3c1-d2da-4fae-bf9a-95048724acdf didn\'t pass group filter.');
+      await message.isWarnedRaw('Alias !testfilter#1a945d76-2d3c-4c7a-ae03-e0daf17142c5 didn\'t pass group filter.');
     });
   });
 

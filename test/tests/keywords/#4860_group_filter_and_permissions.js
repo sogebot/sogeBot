@@ -51,7 +51,7 @@ describe('Keywords - @func3 - #4860 - keywords group permissions and filter shou
 
   it('create keyword testfilter with filterGroup', async () => {
     await getRepository(Keyword).save({
-      id:        '2584b3c1-d2da-4fae-bf9a-95048724acdf',
+      id:        '1a945d76-2d3c-4c7a-ae03-e0daf17142c5',
       keyword:   'testfilter',
       enabled:   true,
       visible:   true,
@@ -177,7 +177,7 @@ describe('Keywords - @func3 - #4860 - keywords group permissions and filter shou
     });
     it('!testfilter keywords should not be triggered', async () => {
       keywords.run({ sender: user.owner, message: 'testfilter' });
-      await message.isWarnedRaw('Keyword testfilter#2584b3c1-d2da-4fae-bf9a-95048724acdf didn\'t pass group filter.');
+      await message.isWarnedRaw('Keyword testfilter#1a945d76-2d3c-4c7a-ae03-e0daf17142c5 didn\'t pass group filter.');
     });
   });
 

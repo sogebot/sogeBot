@@ -51,7 +51,7 @@ describe('Custom Commands - @func2 - #4860 - customcommands group permissions an
 
   it('create command !testfilter with filterGroup', async () => {
     await getRepository(Commands).save({
-      id:        '2584b3c1-d2da-4fae-bf9a-95048724acdf',
+      id:        '1a945d76-2d3c-4c7a-ae03-e0daf17142c5',
       command:   '!testfilter',
       enabled:   true,
       visible:   true,
@@ -177,7 +177,7 @@ describe('Custom Commands - @func2 - #4860 - customcommands group permissions an
     });
     it('!testfilter customcommands should not be triggered', async () => {
       customcommands.run({ sender: user.owner, message: '!testfilter' });
-      await message.isWarnedRaw('Custom command !testfilter#2584b3c1-d2da-4fae-bf9a-95048724acdf didn\'t pass group filter.');
+      await message.isWarnedRaw('Custom command !testfilter#1a945d76-2d3c-4c7a-ae03-e0daf17142c5 didn\'t pass group filter.');
     });
   });
 
