@@ -314,7 +314,7 @@ class CustomCommands extends System {
         // show warning if null permission
         if (!permission) {
           permission = defaultPermissions.CASTERS;
-          warning(`Custom command ${cmd.command.command}#${cmd.command.id} doesn't have any permission set, treating as CASTERS permission.`);
+          warning(`Custom command ${cmd.command.command}#${cmd.command.id}|${r.order} doesn't have any permission set, treating as CASTERS permission.`);
         }
 
         if (typeof getFromViewersCache(opts.sender.userId, permission) === 'undefined') {

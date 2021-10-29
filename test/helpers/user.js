@@ -65,6 +65,7 @@ const mod = {
   badges:      {},
   emotes:      [],
   isModerator: true,
+  isMod:       true,
 };
 
 module.exports = {

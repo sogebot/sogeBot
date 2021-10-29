@@ -8,15 +8,15 @@ const waitMs = require('./time').waitMs;
 
 const { getManager, getRepository } = require('typeorm');
 
-const { Alias } = require('../../dest/database/entity/alias');
+const { Alias, AliasGroup } = require('../../dest/database/entity/alias');
 const { Bets, BetsParticipations } = require('../../dest/database/entity/bets');
-const { Commands, CommandsCount, CommandsResponses } = require('../../dest/database/entity/commands');
+const { Commands, CommandsCount, CommandsResponses, CommandsGroup } = require('../../dest/database/entity/commands');
 const { Cooldown, CooldownViewer } = require('../../dest/database/entity/cooldown');
 const { Duel } = require('../../dest/database/entity/duel');
 const { Event, EventOperation } = require('../../dest/database/entity/event');
 const { EventList } = require('../../dest/database/entity/eventList');
 const { HeistUser } = require('../../dest/database/entity/heist');
-const { Keyword } = require('../../dest/database/entity/keyword');
+const { Keyword, KeywordGroup } = require('../../dest/database/entity/keyword');
 const { ModerationPermit } = require('../../dest/database/entity/moderation');
 const { PermissionCommands } = require('../../dest/database/entity/permissions');
 const { PointsChangelog } = require('../../dest/database/entity/points');
@@ -59,7 +59,7 @@ module.exports = {
       await waitMs(400); // wait little bit for transactions to be done
       await changelog.flush();
 
-      const entities = [HeistUser, EventList, PointsChangelog, SongRequest, RaffleParticipant, Rank, PermissionCommands, Event, EventOperation, Variable, VariableHistory, VariableURL, Raffle, Duel, PollVote, Poll, TimerResponse, Timer, BetsParticipations, UserTip, UserBit, CommandsResponses, User, ModerationPermit, Alias, Bets, Commands, CommandsCount, Quotes, Cooldown, CooldownViewer, Keyword, Price];
+      const entities = [AliasGroup, CommandsGroup, KeywordGroup, HeistUser, EventList, PointsChangelog, SongRequest, RaffleParticipant, Rank, PermissionCommands, Event, EventOperation, Variable, VariableHistory, VariableURL, Raffle, Duel, PollVote, Poll, TimerResponse, Timer, BetsParticipations, UserTip, UserBit, CommandsResponses, User, ModerationPermit, Alias, Bets, Commands, CommandsCount, Quotes, Cooldown, CooldownViewer, Keyword, Price];
       if (['postgres', 'mysql'].includes((await getManager()).connection.options.type)) {
         const metadatas = [];
         for (const entity of entities) {

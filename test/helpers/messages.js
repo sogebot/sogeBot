@@ -81,6 +81,36 @@ module.exports = {
       );
     }, waitMs);
   },
+  isWarnedRaw: async function (entry, user, opts) {
+    const { prepare } = require('../../dest/helpers/commons/prepare');
+    user = _.cloneDeep(user);
+    opts = opts || {};
+    await until(async setError => {
+      let expected = [];
+      if (_.isArray(opts)) {
+        for (const o of opts) {
+          expected.push(entry);
+        }
+      } else {
+        expected = [entry];
+      }
+      try {
+        let isCorrectlyCalled = false;
+        for (const e of expected) {
+          if (log.warning.calledWith(e)) {
+            isCorrectlyCalled = true;
+            break;
+          }
+        }
+        assert(isCorrectlyCalled);
+        log.warning.reset();
+        return true;
+      } catch (err) {
+        return setError(
+          '\nExpected message:\t"' + JSON.stringify(expected) + '"\nActual message:\t"' + (!_.isNil(log.warning.lastCall) ? log.warning.lastCall.args[0] : '') + '"');
+      }
+    }, 5000);
+  },
   isWarned: async function (entry, user, opts) {
     const { prepare } = require('../../dest/helpers/commons/prepare');
     user = _.cloneDeep(user);

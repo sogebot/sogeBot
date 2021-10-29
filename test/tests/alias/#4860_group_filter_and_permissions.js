@@ -1,0 +1,165 @@
+/* global */
+const assert = require('assert');
+
+const { getRepository } = require('typeorm');
+
+require('../../general.js');
+const { Alias, AliasGroup } = require('../../../dest/database/entity/alias');
+const { prepare } = (require('../../../dest/helpers/commons/prepare'));
+const { defaultPermissions } = require('../../../dest/helpers/permissions/');
+const alias = (require('../../../dest/systems/alias')).default;
+const db = require('../../general.js').db;
+const message = require('../../general.js').message;
+const user = require('../../general.js').user;
+
+describe('Alias - @func1 - #4860 - alias group permissions and filter should be considered', () => {
+  before(async () => {
+    await db.cleanup();
+    await message.prepare();
+    await user.prepare();
+  });
+
+  it('create filterGroup with filter | $game === "Dota 2"', async () => {
+    await getRepository(AliasGroup).insert({
+      name:    'filterGroup',
+      options: {
+        filter:     '$game === "Dota 2"',
+        permission: null,
+      },
+    });
+  });
+
+  it('create permGroup with permission | CASTERS', async () => {
+    await getRepository(AliasGroup).insert({
+      name:    'permGroup',
+      options: {
+        filter:     null,
+        permission: defaultPermissions.CASTERS,
+      },
+    });
+  });
+
+  it('create permGroup2 without permission', async () => {
+    await getRepository(AliasGroup).insert({
+      name:    'permGroup2',
+      options: {
+        filter:     null,
+        permission: null,
+      },
+    });
+  });
+
+  it('create alias !testfilter with filterGroup', async () => {
+    await getRepository(Alias).insert({
+      id:         '2584b3c1-d2da-4fae-bf9a-95048724acdf',
+      alias:      '!testfilter',
+      command:    '!me',
+      enabled:    true,
+      visible:    true,
+      permission: defaultPermissions.VIEWERS,
+      group:      'filterGroup',
+    });
+  });
+
+  it('create alias !testpermnull with permGroup', async () => {
+    await getRepository(Alias).insert({
+      id:         '2584b3c1-d2da-4fae-bf9a-95048724acde',
+      alias:      '!testpermnull',
+      command:    '!me',
+      enabled:    true,
+      visible:    true,
+      permission: null,
+      group:      'permGroup',
+    });
+  });
+
+  it('create alias !testpermnull2 with permGroup2', async () => {
+    await getRepository(Alias).insert({
+      id:         '2584b3c1-d2da-4fae-bf9a-95048724acdj',
+      alias:      '!testpermnull2',
+      command:    '!me',
+      enabled:    true,
+      visible:    true,
+      permission: null,
+      group:      'permGroup2',
+    });
+  });
+
+  it('create alias !testpermmods with permGroup', async () => {
+    await getRepository(Alias).insert({
+      id:         '2584b3c1-d2da-4fae-bf9a-95048724acdg',
+      alias:      '!testpermmods',
+      command:    '!me',
+      enabled:    true,
+      visible:    true,
+      permission: defaultPermissions.MODERATORS,
+      group:      'permGroup',
+    });
+  });
+
+  it('!testpermnull should be triggered by CASTER', async () => {
+    message.prepare();
+    alias.run({ sender: user.owner, message: '!testpermnull' });
+    await message.isSentRaw('@__broadcaster__ | Level 0 | 0 hours | 0 points | 0 messages | €0.00 | 0 bits | 0 months', user.owner);
+  });
+
+  it('!testpermnull should not be triggered by VIEWER', async () => {
+    message.prepare();
+    alias.run({ sender: user.viewer, message: '!testpermnull' });
+    await message.isNotSentRaw('@__viewer__ | Level 0 | 0 hours | 0 points | 0 messages | €0.00 | 0 bits | 0 months', user.viewer);
+  });
+
+  it('!testpermnull2 should be triggered by CASTER', async () => {
+    message.prepare();
+    alias.run({ sender: user.owner, message: '!testpermnull2' });
+    await message.isWarnedRaw('Alias !testpermnull2#2584b3c1-d2da-4fae-bf9a-95048724acdj doesn\'t have any permission set, treating as CASTERS permission.');
+    await message.isSentRaw('@__broadcaster__ | Level 0 | 0 hours | 0 points | 0 messages | €0.00 | 0 bits | 0 months', user.owner);
+  });
+
+  it('!testpermnull2 should not be triggered by VIEWER', async () => {
+    message.prepare();
+    alias.run({ sender: user.viewer, message: '!testpermnull2' });
+    await message.isWarnedRaw('Alias !testpermnull2#2584b3c1-d2da-4fae-bf9a-95048724acdj doesn\'t have any permission set, treating as CASTERS permission.');
+    await message.isNotSentRaw('@__viewer__ | Level 0 | 0 hours | 0 points | 0 messages | €0.00 | 0 bits | 0 months', user.viewer);
+  });
+
+  it('!testpermmods should be triggered by MOD', async () => {
+    message.prepare();
+    alias.run({ sender: user.mod, message: '!testpermmods' });
+    await message.isSentRaw('@__mod__ | Level 0 | 0 hours | 0 points | 0 messages | €0.00 | 0 bits | 0 months', user.mod);
+  });
+
+  it('!testpermmods should not be triggered by VIEWER', async () => {
+    message.prepare();
+    alias.run({ sender: user.viewer, message: '!testpermmods' });
+    await message.isNotSentRaw('@__viewer__ | Level 0 | 0 hours | 0 points | 0 messages | €0.00 | 0 bits | 0 months', user.viewer);
+  });
+
+  describe('Test incorrect filter', () => {
+    before(() => {
+      message.prepare();
+    });
+    it('set $game to Test', () => {
+      const stats = require('../../../dest/helpers/api').stats;
+      stats.value.currentGame = 'Test';
+    });
+    it('!testfilter alias should not be triggered', async () => {
+      alias.run({ sender: user.owner, message: '!testfilter' });
+      await message.isWarnedRaw('Alias !testfilter#2584b3c1-d2da-4fae-bf9a-95048724acdf didn\'t pass group filter.');
+    });
+  });
+
+  describe('Test correct filter', () => {
+    before(() => {
+      message.prepare();
+    });
+    it('set $game to Dota 2', () => {
+      const stats = require('../../../dest/helpers/api').stats;
+      stats.value.currentGame = 'Dota 2';
+    });
+    it('!testfilter alias should be triggered', async () => {
+      alias.run({ sender: user.owner, message: '!testfilter' });
+      await message.isSentRaw('@__broadcaster__ | Level 0 | 0 hours | 0 points | 0 messages | €0.00 | 0 bits | 0 months', user.owner);
+    });
+  });
+});

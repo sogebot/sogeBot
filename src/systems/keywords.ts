@@ -384,7 +384,7 @@ class Keywords extends System {
         // show warning if null permission
         if (!permission) {
           permission = defaultPermissions.CASTERS;
-          warning(`Keyword ${k.keyword}#${k.id}} doesn't have any permission set, treating as CASTERS permission.`);
+          warning(`Keyword ${k.keyword}#${k.id}|${r.order} doesn't have any permission set, treating as CASTERS permission.`);
         }
         if (typeof getFromViewersCache(opts.sender.userId, permission) === 'undefined') {
           addToViewersCache(opts.sender.userId, permission, (await check(opts.sender.userId, permission, false)).access);
