@@ -437,7 +437,14 @@ class OAuth extends Core {
           throw new Error('Custom token refresh failed');
         }
       } else {
-        const request = await axios.post<any>(url + encodeURIComponent(type === 'bot' ? this.botRefreshToken : this.broadcasterRefreshToken));
+        const request = await axios(url + encodeURIComponent(type === 'bot' ? this.botRefreshToken.trim() : this.broadcasterRefreshToken.trim()),
+          {
+            method:  'POST',
+            headers: {
+              'SogeBot-Channel': this.generalChannel,
+              'SogeBot-Owners':  this.generalOwners.join(', '),
+            },
+          }) as any;
         debug('oauth.validate', urls[this.tokenService] + ' =>');
         debug('oauth.validate', JSON.stringify(request.data, null, 2));
         if (!request.data.success) {
