@@ -32,6 +32,10 @@ let broadcasterTokenErrorSent = false;
 
 let lastBotTokenValidation = 0;
 let lastBroadcasterTokenValidation = 0;
+const lastBotTokenRefresh = 0;
+const lastBroadcasterTokenRefresh = 0;
+let refreshTokenBotErrorCount = 0;
+let refreshTokenBroadcasterErrorCount = 0;
 
 const urls = {
   'SogeBot Token Generator': 'https://twitch-token-generator.soge.workers.dev/refresh/',
@@ -218,6 +222,7 @@ class OAuth extends Core {
   public async onChangeAccessToken(key: string, value: any) {
     switch (key) {
       case 'broadcasterAccessToken':
+        refreshTokenBroadcasterErrorCount = 0;
         lastBroadcasterTokenValidation = 0;
         this.validateOAuth('broadcaster');
         if (value === '') {
@@ -228,6 +233,7 @@ class OAuth extends Core {
         break;
       case 'botAccessToken':
         lastBotTokenValidation = 0;
+        refreshTokenBotErrorCount = 0;
         this.validateOAuth('bot');
         if (value === '') {
           this.cache.bot = 'force_reconnect';
@@ -407,6 +413,28 @@ class OAuth extends Core {
       }
     */
   public async refreshAccessToken(type: 'bot' | 'broadcaster') {
+    if(type ==='bot' && Date.now() < lastBotTokenValidation + constants.MINUTE * 5) {
+      addUIError({ name: 'Token Error!', message: `You can refresh token for ${type} once per 5 minutes.` });
+      warning(`You can refresh token for ${type} once per 5 minutes.`);
+      return undefined;
+    } else {
+      lastBotTokenValidation = Date.now();
+    }
+
+    if(type ==='bot' && Date.now() < lastBroadcasterTokenValidation + constants.MINUTE * 5) {
+      addUIError({ name: 'Token Error!', message: `You can refresh token for ${type} once per 5 minutes.` });
+      warning(`You can refresh token for ${type} once per 5 minutes.`);
+      return undefined;
+    } else {
+      lastBroadcasterTokenValidation = Date.now();
+    }
+
+    if (type === 'bot' && refreshTokenBotErrorCount  > 20
+      || type === 'broadcaster' && refreshTokenBroadcasterErrorCount > 20) {
+      warning(`Limit of token refresh for ${type} reached, please change your tokens!`);
+      addUIError({ name: 'Token Error!', message: `Limit of token refresh for ${type} reached, please change your tokens!` });
+      return undefined;
+    }
     debug('oauth.validate', 'Refreshing access token of ' + type);
     const url = urls[this.tokenService];
     try {
@@ -432,6 +460,11 @@ class OAuth extends Core {
           debug('oauth.validate', 'New access token of ' + type + ': ' + data.access_token.replace(/(.{25})/, '*'.repeat(25)));
           debug('oauth.validate', 'New refresh token of ' + type + ': ' + data.refresh_token.replace(/(.{45})/, '*'.repeat(45)));
 
+          if (type === 'bot') {
+            refreshTokenBotErrorCount = 0;
+          } else {
+            refreshTokenBroadcasterErrorCount = 0;
+          }
           return data.access_token;
         } else {
           throw new Error('Custom token refresh failed');
@@ -478,10 +511,12 @@ class OAuth extends Core {
       error(e.stack);
       if (type === 'bot') {
         botId.value = '';
+        refreshTokenBotErrorCount++;
         this.botUsername = '';
         this.botCurrentScopes = [];
       } else {
         broadcasterId.value = '';
+        refreshTokenBroadcasterErrorCount++;
         this.broadcasterUsername = '';
         this.broadcasterCurrentScopes = [];
       }
