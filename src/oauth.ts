@@ -413,27 +413,35 @@ class OAuth extends Core {
       }
     */
   public async refreshAccessToken(type: 'bot' | 'broadcaster') {
-    if(type ==='bot' && Date.now() < lastBotTokenRefresh + constants.MINUTE * 5) {
-      addUIError({ name: 'Token Error!', message: `You can refresh token for ${type} once per 5 minutes.` });
-      warning(`You can refresh token for ${type} once per 5 minutes.`);
-      return undefined;
-    } else {
-      lastBotTokenRefresh = Date.now();
+    if(type ==='bot') {
+      if (refreshTokenBotErrorCount  > 20) {
+        warning(`Limit of token refresh for ${type} reached, please change your tokens!`);
+        addUIError({ name: 'Token Error!', message: `Limit of token refresh for ${type} reached, please change your tokens!` });
+        return undefined;
+      }
+
+      if(Date.now() < lastBotTokenRefresh + constants.MINUTE * 5) {
+        addUIError({ name: 'Token Error!', message: `You can refresh token for ${type} once per 5 minutes.` });
+        warning(`You can refresh token for ${type} once per 5 minutes.`);
+        return undefined;
+      } else {
+        lastBotTokenRefresh = Date.now();
+      }
     }
 
-    if(type ==='bot' && Date.now() < lastBroadcasterTokenRefresh + constants.MINUTE * 5) {
-      addUIError({ name: 'Token Error!', message: `You can refresh token for ${type} once per 5 minutes.` });
-      warning(`You can refresh token for ${type} once per 5 minutes.`);
-      return undefined;
-    } else {
-      lastBroadcasterTokenRefresh = Date.now();
-    }
-
-    if (type === 'bot' && refreshTokenBotErrorCount  > 20
-      || type === 'broadcaster' && refreshTokenBroadcasterErrorCount > 20) {
-      warning(`Limit of token refresh for ${type} reached, please change your tokens!`);
-      addUIError({ name: 'Token Error!', message: `Limit of token refresh for ${type} reached, please change your tokens!` });
-      return undefined;
+    if(type ==='broadcaster') {
+      if (refreshTokenBroadcasterErrorCount  > 20) {
+        warning(`Limit of token refresh for ${type} reached, please change your tokens!`);
+        addUIError({ name: 'Token Error!', message: `Limit of token refresh for ${type} reached, please change your tokens!` });
+        return undefined;
+      }
+      if(Date.now() < lastBroadcasterTokenRefresh + constants.MINUTE * 5) {
+        addUIError({ name: 'Token Error!', message: `You can refresh token for ${type} once per 5 minutes.` });
+        warning(`You can refresh token for ${type} once per 5 minutes.`);
+        return undefined;
+      } else {
+        lastBroadcasterTokenRefresh = Date.now();
+      }
     }
     debug('oauth.validate', 'Refreshing access token of ' + type);
     const url = urls[this.tokenService];
