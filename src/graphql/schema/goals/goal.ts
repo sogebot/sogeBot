@@ -34,10 +34,10 @@ export class GoalObject implements GoalInterface {
   countBitsAsTips: boolean;
   @Field()
   display: 'simple' | 'full' | 'custom';
-  @Field(type => String)
+  @Field(type => Number)
   timestamp: number;
-  @Field(type => Int)
-  interval: number;
+  @Field(type => String)
+  interval: 'hour' | 'day' | 'week' | 'month' | 'year';
   @Field(type => Int)
   goalAmount: number;
   @Field(type => Float)
