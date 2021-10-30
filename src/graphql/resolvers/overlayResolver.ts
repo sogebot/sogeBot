@@ -92,6 +92,7 @@ export class overlayResolver {
       polls:           items.filter(o => o.value === 'polls'),
       obswebsocket:    items.filter(o => o.value === 'obswebsocket'),
       group:           items.filter(o => o.value === 'group'),
+      stats:           items.filter(o => o.value === 'stats'),
     } as OverlayObject;
     return response;
   }
