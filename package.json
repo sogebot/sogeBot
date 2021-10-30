@@ -103,9 +103,9 @@
     "test:config:mysql": "cp src/data/.env.mysql .env",
     "test:config:postgres": "cp src/data/.env.postgres .env",
     "test:config:sqlite": "cp src/data/.env.sqlite .env",
-    "start": "cross-env NODE_ENV=production node --experimental-report --report-on-fatalerror --report-directory=./logs/ --always_compact --optimize_for_size --gc_interval=100 -r source-map-support/register  ./dest/main || true",
-    "debug": "cross-env NODE_ENV=development node --experimental-report --report-on-fatalerror --report-directory=./logs/ --trace-warnings --always_compact --optimize_for_size --gc_interval=100 -r source-map-support/register --inspect=0.0.0.0:9229 --nolazy ./dest/main || true",
-    "gc": "cross-env NODE_ENV=development node --experimental-report --report-on-fatalerror --report-directory=./logs/ --trace-warnings --trace_gc --trace_gc_verbose --always_compact --optimize_for_size --gc_interval=100 -r source-map-support/register --inspect=0.0.0.0:9229 --nolazy ./dest/main || true"
+    "start": "cross-env NODE_ENV=production node --experimental-report --report-on-fatalerror --report-directory=./logs/ --always_compact --optimize_for_size --gc_interval=100 -r source-map-support/register  ./dest/main",
+    "debug": "cross-env NODE_ENV=development node --experimental-report --report-on-fatalerror --report-directory=./logs/ --trace-warnings --always_compact --optimize_for_size --gc_interval=100 -r source-map-support/register --inspect=0.0.0.0:9229 --nolazy ./dest/main",
+    "gc": "cross-env NODE_ENV=development node --experimental-report --report-on-fatalerror --report-directory=./logs/ --trace-warnings --trace_gc --trace_gc_verbose --always_compact --optimize_for_size --gc_interval=100 -r source-map-support/register --inspect=0.0.0.0:9229 --nolazy ./dest/main"
   },
   "devDependencies": {
     "@types/basic-auth": "1.1.3",
