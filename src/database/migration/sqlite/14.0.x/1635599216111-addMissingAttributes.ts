@@ -1,8 +1,6 @@
 import { defaultsDeep } from 'lodash';
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-const SECOND = 1000;
-
 export class addMissingAttributes1635599216111 implements MigrationInterface {
   name = 'addMissingAttributes1635599216111';
 
