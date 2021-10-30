@@ -30,7 +30,7 @@ export interface GoalInterface {
   countBitsAsTips: boolean;
   display: 'simple' | 'full' | 'custom';
   timestamp?: number;
-  interval?: number;
+  interval?: 'hour' | 'day' | 'week' | 'month' | 'year';
   goalAmount?: number;
   currentAmount?: number;
   endAfter: number;
@@ -98,9 +98,7 @@ export const Goal = new EntitySchema<Readonly<Required<GoalInterface>>>({
     timestamp:       {
       type: 'bigint', transformer: new ColumnNumericTransformer(), default: 0,
     },
-    interval: {
-      type: 'bigint', transformer: new ColumnNumericTransformer(), default: 0,
-    },
+    interval:   { type: String, default: 'hour' },
     goalAmount: {
       type: 'float', transformer: new ColumnNumericTransformer(), default: 0, precision: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') === 'mysql' ? 12 : undefined,
     },

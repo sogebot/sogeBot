@@ -1,4 +1,5 @@
 import { MINUTE } from '@sogebot/ui-helpers/constants';
+import * as constants from '@sogebot/ui-helpers/constants';
 import {
   getRepository, In, MoreThanOrEqual,
 } from 'typeorm';
@@ -12,6 +13,14 @@ import { isBotStarted } from '../database';
 
 export const types = ['bits', 'tips', 'followers', 'subscribers'] as const;
 
+const interval = {
+  'hour':  constants.HOUR,
+  'day':   constants.DAY,
+  'week':  7 * constants.DAY,
+  'month': 31 * constants.DAY,
+  'year':  365 * constants.DAY,
+} as const;
+
 export async function recountIntervals(type: typeof types[number]) {
   const items = (await getRepository(Goal).find({ type: 'interval' + type.charAt(0).toUpperCase() + type.slice(1) as GoalInterface['type'] }))
     .filter(item => {
@@ -20,7 +29,7 @@ export async function recountIntervals(type: typeof types[number]) {
 
   for (const item of items) {
     if (item.type === 'intervalBits') {
-      const events = await getRepository(UserBit).find({ cheeredAt: MoreThanOrEqual(Date.now() - item.interval) });
+      const events = await getRepository(UserBit).find({ cheeredAt: MoreThanOrEqual(Date.now() - interval[item.interval]) });
       await getRepository(Goal).save({
         ...item,
         currentAmount: events.reduce((prev, cur) => {
@@ -28,7 +37,7 @@ export async function recountIntervals(type: typeof types[number]) {
         }, 0),
       });
     } else if (item.type === 'intervalTips') {
-      const events = await getRepository(UserTip).find({ tippedAt: MoreThanOrEqual(Date.now() - item.interval) });
+      const events = await getRepository(UserTip).find({ tippedAt: MoreThanOrEqual(Date.now() - interval[item.interval]) });
       if (!item.countBitsAsTips) {
         await getRepository(Goal).save({
           ...item,
@@ -37,7 +46,7 @@ export async function recountIntervals(type: typeof types[number]) {
           }, 0),
         });
       } else {
-        const events2 = await getRepository(UserBit).find({ cheeredAt: MoreThanOrEqual(Date.now() - item.interval) });
+        const events2 = await getRepository(UserBit).find({ cheeredAt: MoreThanOrEqual(Date.now() - interval[item.interval]) });
         await getRepository(Goal).save({
           ...item,
           currentAmount: events.reduce((prev, cur) => {
@@ -51,7 +60,7 @@ export async function recountIntervals(type: typeof types[number]) {
       await getRepository(Goal).save({
         ...item,
         currentAmount: await getRepository(EventList).count({
-          timestamp: MoreThanOrEqual(Date.now() - item.interval),
+          timestamp: MoreThanOrEqual(Date.now() - interval[item.interval]),
           event:     'follow',
         }),
       });
@@ -59,7 +68,7 @@ export async function recountIntervals(type: typeof types[number]) {
       await getRepository(Goal).save({
         ...item,
         currentAmount: await getRepository(EventList).count({
-          timestamp: MoreThanOrEqual(Date.now() - item.interval),
+          timestamp: MoreThanOrEqual(Date.now() - interval[item.interval]),
           event:     In(['sub', 'resub']),
         }),
       });
