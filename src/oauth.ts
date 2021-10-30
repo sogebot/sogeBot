@@ -32,8 +32,8 @@ let broadcasterTokenErrorSent = false;
 
 let lastBotTokenValidation = 0;
 let lastBroadcasterTokenValidation = 0;
-const lastBotTokenRefresh = 0;
-const lastBroadcasterTokenRefresh = 0;
+let lastBotTokenRefresh = 0;
+let lastBroadcasterTokenRefresh = 0;
 let refreshTokenBotErrorCount = 0;
 let refreshTokenBroadcasterErrorCount = 0;
 
@@ -413,20 +413,20 @@ class OAuth extends Core {
       }
     */
   public async refreshAccessToken(type: 'bot' | 'broadcaster') {
-    if(type ==='bot' && Date.now() < lastBotTokenValidation + constants.MINUTE * 5) {
+    if(type ==='bot' && Date.now() < lastBotTokenRefresh + constants.MINUTE * 5) {
       addUIError({ name: 'Token Error!', message: `You can refresh token for ${type} once per 5 minutes.` });
       warning(`You can refresh token for ${type} once per 5 minutes.`);
       return undefined;
     } else {
-      lastBotTokenValidation = Date.now();
+      lastBotTokenRefresh = Date.now();
     }
 
-    if(type ==='bot' && Date.now() < lastBroadcasterTokenValidation + constants.MINUTE * 5) {
+    if(type ==='bot' && Date.now() < lastBroadcasterTokenRefresh + constants.MINUTE * 5) {
       addUIError({ name: 'Token Error!', message: `You can refresh token for ${type} once per 5 minutes.` });
       warning(`You can refresh token for ${type} once per 5 minutes.`);
       return undefined;
     } else {
-      lastBroadcasterTokenValidation = Date.now();
+      lastBroadcasterTokenRefresh = Date.now();
     }
 
     if (type === 'bot' && refreshTokenBotErrorCount  > 20
