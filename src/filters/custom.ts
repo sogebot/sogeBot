@@ -9,7 +9,7 @@ import type { ResponseFilter } from '.';
 const custom: ResponseFilter = {
   '$_#': async (variable, attr) => {
     if (typeof attr.param !== 'undefined' && attr.param.length !== 0) {
-      const state = await setValueOf(variable, attr.param, { sender: { ...attr.sender, source: typeof attr.discord === 'undefined' ? 'twitch' : 'discord' } });
+      const state = await setValueOf(variable, attr.param, { sender: { username: attr.sender.userName, userId: attr.sender.userId, source: typeof attr.discord === 'undefined' ? 'twitch' : 'discord' } });
       if (state.updated.responseType === 0) {
         // default
         if (state.isOk && !state.isEval) {
@@ -28,22 +28,22 @@ const custom: ResponseFilter = {
         return state.isOk && !state.isEval ? state.setValue : state.updated.currentValue;
       }
     }
-    return getValueOf(variable, { sender: { ...attr.sender, source: typeof attr.discord === 'undefined' ? 'twitch' : 'discord' } });
+    return getValueOf(variable, { sender: { username: attr.sender.userName, userId: attr.sender.userId, source: typeof attr.discord === 'undefined' ? 'twitch' : 'discord' } });
   },
   // force quiet variable set
   '$!_#': async (variable, attr) => {
     variable = variable.replace('$!_', '$_');
     if (typeof attr.param !== 'undefined' && attr.param.length !== 0) {
-      const state = await setValueOf(variable, attr.param, { sender: { ...attr.sender, source: typeof attr.discord === 'undefined' ? 'twitch' : 'discord' } });
+      const state = await setValueOf(variable, attr.param, { sender: { username: attr.sender.userName, userId: attr.sender.userId, source: typeof attr.discord === 'undefined' ? 'twitch' : 'discord' } });
       return state.updated.currentValue;
     }
-    return getValueOf(variable, { sender: { ...attr.sender, source: typeof attr.discord === 'undefined' ? 'twitch' : 'discord' } });
+    return getValueOf(variable, { sender: { username: attr.sender.userName, userId: attr.sender.userId, source: typeof attr.discord === 'undefined' ? 'twitch' : 'discord' } });
   },
   // force full quiet variable
   '$!!_#': async (variable, attr) => {
     variable = variable.replace('$!!_', '$_');
     if (typeof attr.param !== 'undefined' && attr.param.length !== 0) {
-      await setValueOf(variable, attr.param, { sender: { ...attr.sender, source: typeof attr.discord === 'undefined' ? 'twitch' : 'discord' } });
+      await setValueOf(variable, attr.param, { sender: { username: attr.sender.userName, userId: attr.sender.userId, source: typeof attr.discord === 'undefined' ? 'twitch' : 'discord' } });
     }
     return '';
   },
