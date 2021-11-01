@@ -1,22 +1,24 @@
+import { v4 } from 'uuid';
+
 import Core from './_interface';
 import { settings } from './decorators';
 
 class Dashboard extends Core {
   @settings()
-  miniWidgets = [
-    'twitch|status',
-    'twitch|uptime',
-    'twitch|viewers',
-    'twitch|maxViewers',
-    'twitch|newChatters',
-    'twitch|chatMessages',
-    'twitch|views',
-    'twitch|followers',
-    'twitch|subscribers',
-    'twitch|bits',
-    'general|tips',
-    'twitch|watchedTime',
-    'general|currentSong',
+  µWidgets = [
+    'twitch|status|' + v4(),
+    'twitch|uptime|' + v4(),
+    'twitch|viewers|' + v4(),
+    'twitch|maxViewers|' + v4(),
+    'twitch|newChatters|' + v4(),
+    'twitch|chatMessages|' + v4(),
+    'twitch|views|' + v4(),
+    'twitch|followers|' + v4(),
+    'twitch|subscribers|' + v4(),
+    'twitch|bits|' + v4(),
+    'general|tips|' + v4(),
+    'twitch|watchedTime|' + v4(),
+    'general|currentSong|' + v4(),
   ];
 }
 
