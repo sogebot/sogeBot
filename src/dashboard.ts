@@ -14,7 +14,7 @@ class Dashboard extends Core {
     'twitch|followers',
     'twitch|subscribers',
     'twitch|bits',
-    'twitch|tips',
+    'general|tips',
     'twitch|watchedTime',
     'general|currentSong',
   ];
