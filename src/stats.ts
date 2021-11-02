@@ -6,13 +6,13 @@ import { DAY, MINUTE } from '@sogebot/ui-helpers/constants';
 import { cloneDeep, isNil } from 'lodash';
 import { getRepository, LessThan } from 'typeorm';
 
-import Core from './_interface';
-import { TwitchStats, TwitchStatsInterface } from './database/entity/twitch';
-import { persistent } from './decorators';
-import { onStreamStart } from './decorators/on';
-import { stats } from './helpers/api';
-import { debug } from './helpers/log';
-import { adminEndpoint } from './helpers/socket';
+import Core from '~/_interface';
+import { TwitchStats, TwitchStatsInterface } from '~/database/entity/twitch';
+import { persistent } from '~/decorators';
+import { onStreamStart } from '~/decorators/on';
+import { stats } from '~/helpers/api';
+import { debug } from '~/helpers/log';
+import { adminEndpoint } from '~/helpers/socket';
 
 let validStatsUntil = Date.now();
 let cachedStats = {

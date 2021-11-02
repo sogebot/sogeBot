@@ -1,14 +1,15 @@
 'use strict';
 
-import { getRepository } from 'typeorm';
-
 import {
   Variable, VariableWatch, VariableWatchInterface,
-} from '../database/entity/variable';
-import { isVariableSetById, setValueOf } from '../helpers/customvariables';
-import { csEmitter } from '../helpers/customvariables/emitter';
-import { adminEndpoint } from '../helpers/socket';
+} from '@entity/variable';
+import { getRepository } from 'typeorm';
+
 import Widget from './_interface';
+
+import { isVariableSetById, setValueOf } from '~/helpers/customvariables';
+import { csEmitter } from '~/helpers/customvariables/emitter';
+import { adminEndpoint } from '~/helpers/socket';
 
 class CustomVariables extends Widget {
   constructor() {

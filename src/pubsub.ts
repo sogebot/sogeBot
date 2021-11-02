@@ -3,16 +3,16 @@ import { setInterval } from 'timers';
 import { MINUTE, SECOND } from '@sogebot/ui-helpers/constants';
 import WebSocket from 'ws';
 
-import { isStreamOnline } from './helpers/api';
-import { eventEmitter } from './helpers/events';
+import { isStreamOnline } from '~/helpers/api';
+import { eventEmitter } from '~/helpers/events';
 import {
   ban, debug, error, info, redeem, timeout, unban, warning,
-} from './helpers/log';
-import { broadcasterId } from './helpers/oauth/broadcasterId';
-import { addUIError } from './helpers/panel/alerts';
-import oauth from './oauth';
-import eventlist from './overlays/eventlist';
-import alerts from './registries/alerts';
+} from '~/helpers/log';
+import { broadcasterId } from '~/helpers/oauth/broadcasterId';
+import { addUIError } from '~/helpers/panel/alerts';
+import eventlist from '~/overlays/eventlist';
+import alerts from '~/registries/alerts';
+import oauth from '~/services/twitch/oauth';
 
 const pubsubEndpoint: Readonly<string> = 'wss://pubsub-edge.twitch.tv';
 const heartbeatInterval: Readonly<number> = 2 * 60 * SECOND;

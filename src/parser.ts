@@ -4,22 +4,22 @@ import * as constants from '@sogebot/ui-helpers/constants';
 import _ from 'lodash';
 import { v4 as uuid } from 'uuid';
 
-import { timer } from './decorators.js';
+import { timer } from '~/decorators.js';
 import {
   addToParserFindCache, cachedCommandsPermissions, parserFindCache,
-} from './helpers/cache';
-import { incrementCountOfCommandUsage } from './helpers/commands/count';
-import { getBotSender } from './helpers/commons';
+} from '~/helpers/cache';
+import { incrementCountOfCommandUsage } from '~/helpers/commands/count';
+import { getBotSender } from '~/helpers/commons';
 import {
   debug, error, warning,
-} from './helpers/log';
-import { parserEmitter } from './helpers/parser/';
-import { populatedList } from './helpers/parser/populatedList';
+} from '~/helpers/log';
+import { parserEmitter } from '~/helpers/parser/emitter';
+import { populatedList } from '~/helpers/parser/populatedList';
 import {
   addToViewersCache, getCommandPermission, getFromViewersCache,
-} from './helpers/permissions';
-import { check } from './helpers/permissions/';
-import { translate } from './translate';
+} from '~/helpers/permissions';
+import { check } from '~/helpers/permissions/';
+import { translate } from '~/translate';
 
 parserEmitter.on('process', async (opts, cb) => {
   cb(await (new Parser(opts)).process());

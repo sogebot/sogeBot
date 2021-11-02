@@ -1,9 +1,9 @@
+import { EventList } from '@entity/eventList';
 import gitCommitInfo from 'git-commit-info';
 import _ from 'lodash';
 import safeEval from 'safe-eval';
 import { getRepository, In } from 'typeorm';
 
-import { EventList } from '../database/entity/eventList';
 import { timer } from '../decorators.js';
 import lastfm from '../integrations/lastfm.js';
 import spotify from '../integrations/spotify.js';

@@ -6,10 +6,11 @@ import {
   command, default_permission, settings,
 } from '../decorators';
 import { onChange, onStartup } from '../decorators/on';
-import { error, info } from '../helpers/log';
-import { defaultPermissions } from '../helpers/permissions/';
-import { translate } from '../translate';
 import Integration from './_interface';
+
+import { error, info } from '~/helpers/log';
+import { defaultPermissions } from '~/helpers/permissions/';
+import { translate } from '~/translate';
 
 interface State {
   rgb: number[];

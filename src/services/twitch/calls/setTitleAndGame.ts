@@ -3,18 +3,19 @@ import { error } from 'console';
 import axios from 'axios';
 import { defaults, isNil } from 'lodash';
 
+import { getGameIdFromName } from './getGameIdFromName';
+
 import {
   calls, gameCache, gameOrTitleChangedManually, rawStatus, setRateLimit, stats,
-} from '../helpers/api';
-import { parseTitle } from '../helpers/api/parseTitle';
-import { eventEmitter } from '../helpers/events/emitter';
-import { warning } from '../helpers/log';
-import { channelId } from '../helpers/oauth';
-import { ioServer } from '../helpers/panel';
-import { addUIError } from '../helpers/panel/';
-import oauth from '../oauth';
-import { translate } from '../translate';
-import { getGameIdFromName } from './getGameIdFromName';
+} from '~/helpers/api';
+import { parseTitle } from '~/helpers/api/parseTitle';
+import { eventEmitter } from '~/helpers/events/emitter';
+import { warning } from '~/helpers/log';
+import { channelId } from '~/helpers/oauth';
+import { ioServer } from '~/helpers/panel';
+import { addUIError } from '~/helpers/panel/';
+import oauth from '~/services/twitch/oauth';
+import { translate } from '~/translate';
 
 async function setTitleAndGame (args: { title?: string | null; game?: string | null }): Promise<{ response: string; status: boolean } | null> {
   args = defaults(args, { title: null }, { game: null });

@@ -1,6 +1,5 @@
+import { Variable, VariableInterface } from '@entity/variable';
 import { getRepository } from 'typeorm';
-
-import { Variable, VariableInterface } from '../../database/entity/variable';
 
 async function addChangeToHistory(opts: { sender: any; item: VariableInterface; oldValue: any }) {
   const variable = await getRepository(Variable).findOne({

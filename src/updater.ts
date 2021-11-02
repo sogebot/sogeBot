@@ -4,11 +4,11 @@ import { HOUR } from '@sogebot/ui-helpers/constants';
 import axios from 'axios';
 import { clone } from 'lodash';
 
-import Core from './_interface';
-import { settings } from './decorators';
-import { onStartup } from './decorators/on';
-import { error as errorLog, info } from './helpers/log';
-import { adminEndpoint } from './helpers/socket';
+import Core from '~/_interface';
+import { settings } from '~/decorators';
+import { onStartup } from '~/decorators/on';
+import { error as errorLog, info } from '~/helpers/log';
+import { adminEndpoint } from '~/helpers/socket';
 
 const versions = {
   '@sogebot/ui-admin':   '',

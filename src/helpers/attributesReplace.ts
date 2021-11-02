@@ -1,9 +1,10 @@
-import tmi from '../chat';
-import { Events } from '../database/entity/event';
+import { Events } from '@entity/event';
+
+import twitch from '../services/twitch';
 import { flatten } from './flatten';
 
 const attributesReplace = (attributes: Events.Attributes, replaceIn: string) => {
-  const atUsername = tmi.showWithAt;
+  const atUsername = twitch.showWithAt;
   const flattenAttributes = flatten(attributes);
 
   for (const key of Object.keys(flattenAttributes).sort((a, b) => b.length - a.length)) {

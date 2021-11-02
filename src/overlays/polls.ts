@@ -1,8 +1,9 @@
+import { Poll } from '@entity/poll';
 import { getRepository } from 'typeorm';
 
-import { Poll } from '../database/entity/poll';
-import { publicEndpoint } from '../helpers/socket';
 import Overlay from './_interface';
+
+import { publicEndpoint } from '~/helpers/socket';
 
 class Polls extends Overlay {
   public sockets() {

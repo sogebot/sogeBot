@@ -4,16 +4,14 @@ import {
 } from 'lodash';
 import { getRepository } from 'typeorm';
 
-import { Settings } from './database/entity/settings';
-import { getFunctionList } from './decorators/on';
-import { isDbConnected } from './helpers/database';
-import { debug, error } from './helpers/log';
-import { logAvgTime } from './helpers/profiler';
-import { find } from './helpers/register';
+import { Settings } from '~/database/entity/settings';
+import { getFunctionList } from '~/decorators/on';
+import { isDbConnected } from '~/helpers/database';
+import { debug, error } from '~/helpers/log';
+import { logAvgTime } from '~/helpers/profiler';
+import { find } from '~/helpers/register';
 
-const variables: {
-  [x: string]: any;
-} = {};
+export const variables = new Map<string, any>();
 const readonly: {
   [x: string]: any;
 } = {};
@@ -55,7 +53,7 @@ export const check = async (forceCheck = false) => {
 
 export const startWatcher = () => {
   check();
-  setInterval(check, 10 * SECOND);
+  setInterval(check, SECOND);
 };
 
 export const VariableWatcher = {
@@ -63,7 +61,7 @@ export const VariableWatcher = {
     if (isReadOnly) {
       readonly[key] = cloneDeep(value);
     } else {
-      variables[key] = cloneDeep(value);
+      variables.set(key, cloneDeep(value));
     }
   },
   async check() {
@@ -80,9 +78,9 @@ export const VariableWatcher = {
           k, variable, value,
         }));
       }
-      if (!isEqual(value, variables[k])) {
-        const oldValue = variables[k];
-        variables[k] = value;
+      if (!isEqual(value, variables.get(k))) {
+        const oldValue = variables.get(k);
+        variables.set(k, value);
         const savedSetting = await getRepository(Settings).findOne({
           where: {
             name:      variable,

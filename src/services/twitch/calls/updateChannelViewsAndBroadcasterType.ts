@@ -2,12 +2,12 @@ import axios from 'axios';
 
 import {
   calls, emptyRateLimit, getClientId, getToken, setRateLimit, stats,
-} from '../helpers/api';
-import { apiEmitter } from '../helpers/api/emitter';
-import { error } from '../helpers/log';
-import { channelId } from '../helpers/oauth';
-import { ioServer } from '../helpers/panel';
-import oauth from '../oauth';
+} from '~/helpers/api';
+import { apiEmitter } from '~/helpers/api/emitter';
+import { error } from '~/helpers/log';
+import { channelId } from '~/helpers/oauth';
+import { ioServer } from '~/helpers/panel';
+import oauth from '~/services/twitch/oauth';
 
 apiEmitter.on('updateChannelViewsAndBroadcasterType', () => updateChannelViewsAndBroadcasterType());
 

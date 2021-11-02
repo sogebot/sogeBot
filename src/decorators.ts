@@ -4,14 +4,14 @@ import * as constants from '@sogebot/ui-helpers/constants';
 import * as _ from 'lodash';
 import { xor } from 'lodash';
 
-import type { Module } from './_interface';
-import { isDbConnected } from './helpers/database';
+import type { Module } from '~/_interface';
+import { isDbConnected } from '~/helpers/database';
 import {
   debug, error, performance,
-} from './helpers/log';
-import { defaultPermissions } from './helpers/permissions/defaultPermissions';
-import { find } from './helpers/register';
-import { VariableWatcher } from './watchers';
+} from '~/helpers/log';
+import { defaultPermissions } from '~/helpers/permissions/defaultPermissions';
+import { find } from '~/helpers/register';
+import { VariableWatcher } from '~/watchers';
 
 export let loadingInProgress: (string|symbol)[] = [];
 export let areDecoratorsLoaded = false;
@@ -49,7 +49,7 @@ function getNameAndTypeFromStackTrace() {
   const path = parse(stack[2].getFileName() || '');
   const _type = path.dir.split(separator)[path.dir.split(separator).length - 1];
   const type = _type === 'dest' ? 'core' : _type;
-  const name = type === 'core' && path.name === 'chat' ? 'tmi' : path.name;
+  const name = path.name;
 
   return { name, type };
 }
@@ -254,7 +254,7 @@ export function persistent() {
 
 export function parser(
   { skippable = false, fireAndForget = false, permission = defaultPermissions.VIEWERS, priority = constants.MEDIUM, dependsOn = [] }:
-  { skippable?: boolean; fireAndForget?: boolean; permission?: string; priority?: number; dependsOn?: import('./_interface').Module[] } = {}) {
+  { skippable?: boolean; fireAndForget?: boolean; permission?: string; priority?: number; dependsOn?: import('~/_interface').Module[] } = {}) {
   const { name, type } = getNameAndTypeFromStackTrace();
 
   return (target: any, key: string, descriptor: PropertyDescriptor) => {
@@ -384,8 +384,8 @@ export function timer() {
 
     if (method.constructor.name === 'AsyncFunction') {
       descriptor.value = async function (){
-        const Parser = require('./parser.js').Parser;
-        const Message = require('./message.js').Message;
+        const Parser = require('~/parser.js').Parser;
+        const Message = require('~/message.js').Message;
 
         const start = Date.now();
         // eslint-disable-next-line prefer-rest-params
@@ -403,8 +403,8 @@ export function timer() {
       };
     } else {
       descriptor.value = function (){
-        const Parser = require('./parser.js').Parser;
-        const Message = require('./message.js').Message;
+        const Parser = require('~/parser.js').Parser;
+        const Message = require('~/message.js').Message;
 
         const start = Date.now();
         // eslint-disable-next-line prefer-rest-params

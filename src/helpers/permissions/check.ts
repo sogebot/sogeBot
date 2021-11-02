@@ -1,7 +1,7 @@
+import { Permissions, PermissionsInterface } from '@entity/permissions';
 import _ from 'lodash';
 import { getRepository, LessThan } from 'typeorm';
 
-import { Permissions, PermissionsInterface } from '../../database/entity/permissions';
 import { areDecoratorsLoaded } from '../../decorators';
 import { getBroadcaster } from '../getBroadcaster';
 import {
@@ -16,7 +16,8 @@ import { isBot } from '../user/isBot';
 import { isBroadcaster } from '../user/isBroadcaster';
 import { isModerator } from '../user/isModerator';
 import { defaultPermissions } from './defaultPermissions';
-import { filters } from './filters';
+
+import { filters } from '~/helpers/permissions/filters';
 
 let isWarnedAboutCasters = false;
 

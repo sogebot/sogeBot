@@ -1,9 +1,9 @@
 import axios from 'axios';
 
-import { getClientId, getToken } from '../helpers/api';
-import { error } from '../helpers/log';
-import { ioServer } from '../helpers/panel';
-import * as changelog from '../helpers/user/changelog.js';
+import { getClientId, getToken } from '~/helpers/api';
+import { error } from '~/helpers/log';
+import { ioServer } from '~/helpers/panel';
+import * as changelog from '~/helpers/user/changelog.js';
 
 async function fetchAccountAge (id?: string | null) {
   if (id === '0' || id === null || typeof id === 'undefined') {

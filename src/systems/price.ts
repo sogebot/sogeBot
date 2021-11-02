@@ -1,28 +1,29 @@
 'use strict';
 
+import { Price as PriceEntity, PriceInterface } from '@entity/price';
 import * as constants from '@sogebot/ui-helpers/constants';
 import { format } from '@sogebot/ui-helpers/number';
 import * as _ from 'lodash';
 import { getRepository } from 'typeorm';
 
 import { parserReply } from '../commons';
-import { Price as PriceEntity, PriceInterface } from '../database/entity/price';
 import {
   command, default_permission, rollback,
 } from '../decorators';
 import { parser } from '../decorators';
 import general from '../general.js';
-import { prepare } from '../helpers/commons';
-import { error } from '../helpers/log';
-import { defaultPermissions } from '../helpers/permissions/';
-import { getPointsName } from '../helpers/points';
-import { adminEndpoint } from '../helpers/socket';
-import { isOwner } from '../helpers/user';
-import * as changelog from '../helpers/user/changelog.js';
 import Parser from '../parser';
-import { translate } from '../translate';
 import System from './_interface';
-import points from './points';
+
+import { prepare } from '~/helpers/commons';
+import { error } from '~/helpers/log';
+import { defaultPermissions } from '~/helpers/permissions/';
+import { getPointsName } from '~/helpers/points';
+import { adminEndpoint } from '~/helpers/socket';
+import { isOwner } from '~/helpers/user';
+import * as changelog from '~/helpers/user/changelog.js';
+import points from '~/systems/points';
+import { translate } from '~/translate';
 
 /*
  * !price                     - gets an info about price usage

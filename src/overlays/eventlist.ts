@@ -1,15 +1,16 @@
 import crypto from 'crypto';
 
+import { EventList as EventListEntity } from '@entity/eventList';
 import * as _ from 'lodash';
 import { Brackets, getRepository } from 'typeorm';
 
-import { EventList as EventListEntity } from '../database/entity/eventList';
-import { warning } from '../helpers/log';
-import { adminEndpoint, publicEndpoint } from '../helpers/socket';
-import { isBotId } from '../helpers/user/isBot';
 import users from '../users';
 import eventlist from '../widgets/eventlist';
 import Overlay from './_interface';
+
+import { warning } from '~/helpers/log';
+import { adminEndpoint, publicEndpoint } from '~/helpers/socket';
+import { isBotId } from '~/helpers/user/isBot';
 
 class EventList extends Overlay {
   showInUI = false;

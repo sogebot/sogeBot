@@ -1,24 +1,25 @@
+import { Duel as DuelEntity, DuelInterface } from '@entity/duel';
 import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized';
 import { format } from '@sogebot/ui-helpers/number';
 import _ from 'lodash';
 import { getRepository } from 'typeorm';
 
-import { Duel as DuelEntity, DuelInterface } from '../database/entity/duel';
 import {
   command, persistent, settings,
 } from '../decorators';
 import { onStartup } from '../decorators/on';
 import general from '../general.js';
-import { announce, prepare } from '../helpers/commons';
-import { isDbConnected } from '../helpers/database';
-import { error } from '../helpers/log';
-import { getPointsName } from '../helpers/points';
-import * as changelog from '../helpers/user/changelog.js';
-import { isBroadcaster } from '../helpers/user/isBroadcaster';
-import { isModerator } from '../helpers/user/isModerator';
 import points from '../systems/points';
-import { translate } from '../translate';
 import Game from './_interface';
+
+import { announce, prepare } from '~/helpers/commons';
+import { isDbConnected } from '~/helpers/database';
+import { error } from '~/helpers/log';
+import { getPointsName } from '~/helpers/points';
+import * as changelog from '~/helpers/user/changelog.js';
+import { isBroadcaster } from '~/helpers/user/isBroadcaster';
+import { isModerator } from '~/helpers/user/isModerator';
+import { translate } from '~/translate';
 
 const ERROR_NOT_ENOUGH_OPTIONS = '0';
 const ERROR_ZERO_BET = '1';

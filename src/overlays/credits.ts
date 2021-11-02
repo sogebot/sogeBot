@@ -1,17 +1,18 @@
+import { EventList, EventListInterface } from '@entity/eventList';
 import _ from 'lodash';
 import { getRepository, MoreThanOrEqual } from 'typeorm';
 
-import api from '../api';
 import currency from '../currency';
-import { EventList, EventListInterface } from '../database/entity/eventList';
-import {
-  isStreamOnline, stats, streamStatusChangeSince,
-} from '../helpers/api';
-import { mainCurrency } from '../helpers/currency';
-import { publicEndpoint } from '../helpers/socket';
-import oauth from '../oauth';
 import users from '../users';
 import Overlay from './_interface';
+
+import {
+  isStreamOnline, stats, streamStatusChangeSince,
+} from '~/helpers/api';
+import { mainCurrency } from '~/helpers/currency';
+import { publicEndpoint } from '~/helpers/socket';
+import api from '~/services/twitch/api';
+import oauth from '~/services/twitch/oauth';
 
 class Credits extends Overlay {
   sockets () {

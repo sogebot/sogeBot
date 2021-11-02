@@ -1,16 +1,17 @@
+import { Quotes as QuotesEntity, QuotesInterface } from '@entity/quotes';
 import { sample } from '@sogebot/ui-helpers/array';
 import * as _ from 'lodash';
 import { getManager, getRepository } from 'typeorm';
 
-import { Quotes as QuotesEntity, QuotesInterface } from '../database/entity/quotes';
 import { command, default_permission } from '../decorators';
 import Expects from '../expects';
-import { prepare } from '../helpers/commons';
-import { defaultPermissions } from '../helpers/permissions/';
-import { adminEndpoint, publicEndpoint } from '../helpers/socket';
-import { domain } from '../helpers/ui';
 import users from '../users';
 import System from './_interface';
+
+import { prepare } from '~/helpers/commons';
+import { defaultPermissions } from '~/helpers/permissions/';
+import { adminEndpoint, publicEndpoint } from '~/helpers/socket';
+import { domain } from '~/helpers/ui';
 
 class Quotes extends System {
   constructor () {

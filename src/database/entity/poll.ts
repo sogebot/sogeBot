@@ -25,15 +25,15 @@ export const Poll = new EntitySchema<Readonly<Required<PollInterface>>>({
   name:    'poll',
   columns: {
     id: {
-      type: 'uuid', primary: true, generated: 'uuid', 
+      type: 'uuid', primary: true, generated: 'uuid',
     },
     type:     { type: 'varchar', length: 7 },
     isOpened: { type: Boolean },
     openedAt: {
-      type: 'bigint', transformer: new ColumnNumericTransformer(), default: 0, 
+      type: 'bigint', transformer: new ColumnNumericTransformer(), default: 0,
     },
     closedAt: {
-      type: 'bigint', transformer: new ColumnNumericTransformer(), default: 0, 
+      type: 'bigint', transformer: new ColumnNumericTransformer(), default: 0,
     },
     options: { type: 'simple-array' },
     title:   { type: String },
@@ -55,7 +55,7 @@ export const PollVote = new EntitySchema<Readonly<Required<PollVoteInterface>>>(
   name:    'poll_vote',
   columns: {
     id: {
-      type: String, primary: true, generated: 'uuid', 
+      type: String, primary: true, generated: 'uuid',
     },
     option:  { type: Number },
     votes:   { type: Number },

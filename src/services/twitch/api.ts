@@ -1,6 +1,12 @@
 import querystring from 'querystring';
 import { setTimeout } from 'timers';
 
+import { BannedEventsInterface, BannedEventsTable } from '@entity/bannedEvents';
+import { ThreadEvent } from '@entity/threadEvent';
+import {
+  TwitchClips, TwitchTag, TwitchTagLocalizationDescription, TwitchTagLocalizationName,
+} from '@entity/twitch';
+import { User, UserInterface } from '@entity/user';
 import * as constants from '@sogebot/ui-helpers/constants';
 import axios, { AxiosResponse } from 'axios';
 import chalk from 'chalk';
@@ -11,53 +17,47 @@ import {
   getManager, getRepository, In, IsNull, Not,
 } from 'typeorm';
 
-import Core from './_interface';
-import { BannedEventsInterface, BannedEventsTable } from './database/entity/bannedEvents';
-import { ThreadEvent } from './database/entity/threadEvent';
-import {
-  TwitchClips, TwitchTag, TwitchTagLocalizationDescription, TwitchTagLocalizationName,
-} from './database/entity/twitch';
-import { User, UserInterface } from './database/entity/user';
-import { onStartup } from './decorators/on';
+import twitch from '../twitch';
+
+import { onStartup } from '~/decorators/on';
 import {
   stats as apiStats, calls, chatMessagesAtStart, currentStreamTags, emptyRateLimit, gameCache, gameOrTitleChangedManually, isStreamOnline, rawStatus, setRateLimit, streamStatusChangeSince,
-} from './helpers/api';
-import { parseTitle } from './helpers/api/parseTitle';
+} from '~/helpers/api';
+import { parseTitle } from '~/helpers/api/parseTitle';
 import {
   curRetries, maxRetries, retries, setCurrentRetries,
-} from './helpers/api/retries';
-import { streamId } from './helpers/api/streamId';
-import { streamType } from './helpers/api/streamType';
-import * as stream from './helpers/core/stream';
-import { isDbConnected } from './helpers/database';
-import { dayjs } from './helpers/dayjs';
-import { eventEmitter } from './helpers/events';
-import { follow } from './helpers/events/follow';
-import { getBroadcaster } from './helpers/getBroadcaster';
+} from '~/helpers/api/retries';
+import { streamId } from '~/helpers/api/streamId';
+import { streamType } from '~/helpers/api/streamType';
+import * as stream from '~/helpers/core/stream';
+import { isDbConnected } from '~/helpers/database';
+import { dayjs } from '~/helpers/dayjs';
+import { eventEmitter } from '~/helpers/events';
+import { follow } from '~/helpers/events/follow';
+import { getBroadcaster } from '~/helpers/getBroadcaster';
 import {
   debug, error, info, unfollow, warning,
-} from './helpers/log';
-import { channelId } from './helpers/oauth';
-import { botId } from './helpers/oauth/botId';
-import { broadcasterId } from './helpers/oauth/broadcasterId';
-import { ioServer } from './helpers/panel';
-import { addUIError } from './helpers/panel/';
-import { linesParsed, setStatus } from './helpers/parser';
-import { logAvgTime } from './helpers/profiler';
-import { setImmediateAwait } from './helpers/setImmediateAwait';
-import { SQLVariableLimit } from './helpers/sql';
-import * as changelog from './helpers/user/changelog.js';
-import { isBotId, isBotSubscriber } from './helpers/user/isBot';
-import { isIgnored } from './helpers/user/isIgnored';
-import { getChannelChattersUnofficialAPI } from './microservices/getChannelChattersUnofficialAPI';
-import { getCustomRewards } from './microservices/getCustomRewards';
-import { getGameNameFromId } from './microservices/getGameNameFromId';
-import { setTitleAndGame } from './microservices/setTitleAndGame';
-import { updateChannelViewsAndBroadcasterType } from './microservices/updateChannelViewsAndBroadcasterType';
-import oauth from './oauth';
-import stats from './stats';
-import twitch from './twitch';
-import joinpart from './widgets/joinpart';
+} from '~/helpers/log';
+import { channelId } from '~/helpers/oauth';
+import { botId } from '~/helpers/oauth/botId';
+import { broadcasterId } from '~/helpers/oauth/broadcasterId';
+import { addMenu, ioServer } from '~/helpers/panel';
+import { addUIError } from '~/helpers/panel/';
+import { linesParsed, setStatus } from '~/helpers/parser';
+import { logAvgTime } from '~/helpers/profiler';
+import { setImmediateAwait } from '~/helpers/setImmediateAwait';
+import { SQLVariableLimit } from '~/helpers/sql';
+import * as changelog from '~/helpers/user/changelog.js';
+import { isBotId, isBotSubscriber } from '~/helpers/user/isBot';
+import { isIgnored } from '~/helpers/user/isIgnored';
+import { getChannelChattersUnofficialAPI } from '~/services/twitch/calls/getChannelChattersUnofficialAPI';
+import { getCustomRewards } from '~/services/twitch/calls/getCustomRewards';
+import { getGameNameFromId } from '~/services/twitch/calls/getGameNameFromId';
+import { setTitleAndGame } from '~/services/twitch/calls/setTitleAndGame';
+import { updateChannelViewsAndBroadcasterType } from '~/services/twitch/calls/updateChannelViewsAndBroadcasterType';
+import oauth from '~/services/twitch/oauth';
+import stats from '~/stats';
+import joinpart from '~/widgets/joinpart';
 
 let latestFollowedAtTimestamp = 0;
 
@@ -132,16 +132,12 @@ const processFollowerState = async (users: { from_name: string; from_id: string;
   debug('api.followers', `Finished parsing ${users.length} followers in ${Date.now() - timer}ms`);
 };
 
-class API extends Core {
+class API {
+  timeouts: { [x: string]: NodeJS.Timeout } = {};
   constructor () {
-    super();
-    this.addMenu({
+    addMenu({
       category: 'stats', name: 'api', id: 'stats/api', this: null,
     });
-  }
-
-  @onStartup()
-  onStartup() {
     this.interval('getCurrentStreamData', constants.MINUTE);
     this.interval('getCurrentStreamTags', constants.MINUTE);
     this.interval('updateChannelViewsAndBroadcasterType', constants.HOUR);

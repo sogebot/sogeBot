@@ -1,6 +1,7 @@
-import api from '../api';
-import { ioServer } from '../helpers/panel';
 import Overlay from './_interface';
+
+import { ioServer } from '~/helpers/panel';
+import api from '~/services/twitch/api';
 
 class Clips extends Overlay {
   async showClip (clipId: string) {

@@ -1,3 +1,6 @@
+import {
+  QuickAction, QuickActionInput, QuickActions, SearchResultUnion,
+} from '@entity/dashboard';
 import { JwtPayload } from 'jsonwebtoken';
 import {
   Arg, Authorized, Ctx, Mutation, Query, Resolver,
@@ -5,9 +8,6 @@ import {
 import { getRepository } from 'typeorm';
 
 import { parserReply } from '../../commons';
-import {
-  QuickAction, QuickActionInput, QuickActions, SearchResultUnion,
-} from '../../database/entity/dashboard';
 import { getUserSender } from '../../helpers/commons';
 import { setValueOf } from '../../helpers/customvariables/setValueOf';
 import { info } from '../../helpers/log';

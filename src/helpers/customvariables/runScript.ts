@@ -1,3 +1,4 @@
+import { User, UserInterface } from '@entity/user';
 import { getTime } from '@sogebot/ui-helpers/getTime';
 import axios from 'axios';
 import { js as jsBeautify } from 'js-beautify';
@@ -9,9 +10,7 @@ import safeEval from 'safe-eval';
 import strip from 'strip-comments';
 import { getRepository } from 'typeorm';
 
-import { User, UserInterface } from '../../database/entity/user';
 import Message from '../../message';
-import { getUserFromTwitch } from '../../microservices/getUserFromTwitch';
 import users from '../../users';
 import {
   chatMessagesAtStart, isStreamOnline, stats, streamStatusChangeSince,
@@ -25,6 +24,8 @@ import { linesParsed } from '../parser';
 import * as changelog from '../user/changelog.js';
 import { isModerator } from '../user/isModerator';
 import { getAll } from './getAll';
+
+import { getUserFromTwitch } from '~/services/twitch/calls/getUserFromTwitch';
 
 async function runScript (script: string, opts: { sender: { userId: string; userName: string; source: 'twitch' | 'discord' } | string | null, isUI: boolean; param?: string | number, _current: any }) {
   debug('customvariables.eval', opts);

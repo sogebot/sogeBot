@@ -1,9 +1,10 @@
+import { UserTip } from '@entity/user';
 import { getRepository } from 'typeorm';
 
-import { UserTip } from '../database/entity/user';
-import { adminEndpoint } from '../helpers/socket';
 import users from '../users';
 import Stats from './_interface';
+
+import { adminEndpoint } from '~/helpers/socket';
 
 class Tips extends Stats {
   constructor() {

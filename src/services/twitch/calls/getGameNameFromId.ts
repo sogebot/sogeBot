@@ -1,12 +1,12 @@
+import { CacheGames } from '@entity/cacheGames';
 import axios from 'axios';
 import { getRepository } from 'typeorm';
 
-import { CacheGames } from '../database/entity/cacheGames';
 import {
   calls, emptyRateLimit, getClientId, getToken, setRateLimit, stats,
-} from '../helpers/api';
-import { error, warning } from '../helpers/log';
-import { ioServer } from '../helpers/panel';
+} from '~/helpers/api';
+import { error, warning } from '~/helpers/log';
+import { ioServer } from '~/helpers/panel';
 
 async function getGameNameFromId (id: number) {
   let request;

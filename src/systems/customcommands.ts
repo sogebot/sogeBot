@@ -1,29 +1,30 @@
+import {
+  Commands, CommandsGroup, CommandsGroupInterface, CommandsInterface, CommandsResponsesInterface,
+} from '@entity/commands';
 import * as constants from '@sogebot/ui-helpers/constants';
 import _ from 'lodash';
 import { getRepository } from 'typeorm';
 
 import { parserReply } from '../commons';
 import {
-  Commands, CommandsGroup, CommandsGroupInterface, CommandsInterface, CommandsResponsesInterface,
-} from '../database/entity/commands';
-import {
   command, default_permission, helper, timer,
 } from '../decorators';
 import { parser } from '../decorators';
 import Expects from '../expects';
-import { checkFilter } from '../helpers/checkFilter';
+import System from './_interface';
+
+import { checkFilter } from '~/helpers/checkFilter';
 import {
   getAllCountOfCommandUsage, getCountOfCommandUsage, incrementCountOfCommandUsage, resetCountOfCommandUsage,
-} from '../helpers/commands/count';
-import { prepare } from '../helpers/commons';
-import { warning } from '../helpers/log';
+} from '~/helpers/commands/count';
+import { prepare } from '~/helpers/commons';
+import { warning } from '~/helpers/log';
 import {
   addToViewersCache, get, getFromViewersCache,
-} from '../helpers/permissions';
-import { check, defaultPermissions } from '../helpers/permissions/';
-import { adminEndpoint } from '../helpers/socket';
-import { translate } from '../translate';
-import System from './_interface';
+} from '~/helpers/permissions';
+import { check, defaultPermissions } from '~/helpers/permissions/';
+import { adminEndpoint } from '~/helpers/socket';
+import { translate } from '~/translate';
 
 /*
  * !command                                                                            - gets an info about command usage

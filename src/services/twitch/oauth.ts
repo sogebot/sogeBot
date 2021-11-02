@@ -2,31 +2,30 @@ import * as constants from '@sogebot/ui-helpers/constants';
 import axios from 'axios';
 import fetch from 'node-fetch';
 
-import Core from './_interface';
-import { areDecoratorsLoaded, settings } from './decorators';
+import { areDecoratorsLoaded } from '~/decorators';
 import {
   onChange, onLoad, onStartup,
-} from './decorators/on';
-import { apiEmitter } from './helpers/api/emitter';
+} from '~/decorators/on';
+import { apiEmitter } from '~/helpers/api/emitter';
 import {
   debug,
   error, info, warning,
-} from './helpers/log';
-import { channelId } from './helpers/oauth';
-import { botId } from './helpers/oauth/botId';
-import { botProfileUrl } from './helpers/oauth/botProfileUrl';
-import { botUsername } from './helpers/oauth/botUsername';
-import { broadcasterId } from './helpers/oauth/broadcasterId';
-import { broadcasterUsername } from './helpers/oauth/broadcasterUsername';
-import { generalChannel } from './helpers/oauth/generalChannel';
-import { generalOwners } from './helpers/oauth/generalOwners';
-import { setOAuthStatus } from './helpers/OAuthStatus';
-import { addUIError } from './helpers/panel/';
-import { setStatus } from './helpers/parser';
-import { cleanViewersCache } from './helpers/permissions';
-import { tmiEmitter } from './helpers/tmi';
-import { getIdFromTwitch } from './microservices/getIdFromTwitch';
-import { getUserFromTwitch } from './microservices/getUserFromTwitch';
+} from '~/helpers/log';
+import { channelId } from '~/helpers/oauth';
+import { botId } from '~/helpers/oauth/botId';
+import { botProfileUrl } from '~/helpers/oauth/botProfileUrl';
+import { botUsername } from '~/helpers/oauth/botUsername';
+import { broadcasterId } from '~/helpers/oauth/broadcasterId';
+import { broadcasterUsername } from '~/helpers/oauth/broadcasterUsername';
+import { generalChannel } from '~/helpers/oauth/generalChannel';
+import { generalOwners } from '~/helpers/oauth/generalOwners';
+import { setOAuthStatus } from '~/helpers/OAuthStatus';
+import { addUIError } from '~/helpers/panel/';
+import { setStatus } from '~/helpers/parser';
+import { cleanViewersCache } from '~/helpers/permissions';
+import { tmiEmitter } from '~/helpers/tmi';
+import { getIdFromTwitch } from '~/services/twitch/calls/getIdFromTwitch';
+import { getUserFromTwitch } from '~/services/twitch/calls/getUserFromTwitch';
 
 let botTokenErrorSent = false;
 let broadcasterTokenErrorSent = false;
@@ -42,7 +41,9 @@ const urls = {
   'SogeBot Token Generator': 'https://twitch-token-generator.soge.workers.dev/refresh/',
 };
 
-class OAuth extends Core {
+class OAuth {
+  timeouts: any = {};
+
   private toWait = 10;
   initialValidation = false;
 
@@ -52,34 +53,34 @@ class OAuth extends Core {
   public profileImageUrl = '';
   public broadcaster = '';
   public bot = '';
-  @settings('bot')
+  /* @settings('bot') */
   public botClientId = '';
-  @settings('broadcaster')
+  /* @settings('broadcaster') */
   public broadcasterClientId = '';
 
-  @settings('general')
+  /* @settings('general') */
   public tokenService: keyof typeof urls = 'SogeBot Token Generator';
-  @settings('general')
+  /* @settings('general') */
   public tokenServiceCustomClientId = '';
-  @settings('general')
+  /* @settings('general') */
   public tokenServiceCustomClientSecret = '';
 
-  @settings('general')
+  /* @settings('general') */
   public generalChannel = '';
 
-  @settings('general')
+  /* @settings('general') */
   public generalOwners: string[] = [];
 
-  @settings('broadcaster')
+  /* @settings('broadcaster') */
   public broadcasterAccessToken = '';
 
-  @settings('broadcaster')
+  /* @settings('broadcaster') */
   public broadcasterRefreshToken = '';
 
-  @settings('broadcaster')
+  /* @settings('broadcaster') */
   public broadcasterUsername = '';
 
-  @settings('broadcaster', true)
+  /* @settings('broadcaster', true) */
   public broadcasterExpectedScopes: string[] = [
     'channel_editor',
     'chat:read',
@@ -94,19 +95,19 @@ class OAuth extends Core {
     'channel:read:hype_train',
   ];
 
-  @settings('broadcaster')
+  /* @settings('broadcaster') */
   public broadcasterCurrentScopes: string[] = [];
 
-  @settings('bot')
+  /* @settings('bot') */
   public botAccessToken = '';
 
-  @settings('bot')
+  /* @settings('bot') */
   public botRefreshToken = '';
 
-  @settings('bot')
+  /* @settings('bot') */
   public botUsername = '';
 
-  @settings('bot', true)
+  /* @settings('bot', true) */
   public botExpectedScopes: string[] = [
     'clips:edit',
     'user:edit:broadcast',
@@ -119,7 +120,7 @@ class OAuth extends Core {
     'channel:edit:commercial',
   ];
 
-  @settings('bot')
+  /* @settings('bot') */
   public botCurrentScopes: string[] = [];
 
   @onStartup()

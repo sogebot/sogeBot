@@ -1,4 +1,5 @@
-import { UserInterface } from '../../database/entity/user';
+import { UserInterface } from '@entity/user';
+
 import { generalOwners } from '../oauth/generalOwners';
 
 export function isOwner(user: string | CommandOptions['sender'] | UserInterface | UserStateTags) {

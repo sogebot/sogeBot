@@ -1,10 +1,10 @@
 import { createHash } from 'crypto';
 
+import { Events } from '@entity/event.js';
+import { OBSWebsocketInterface } from '@entity/obswebsocket';
 import type ObsWebSocket from 'obs-websocket-js';
 import safeEval from 'safe-eval';
 
-import { Events } from '../../database/entity/event.js';
-import { OBSWebsocketInterface } from '../../database/entity/obswebsocket';
 import { setImmediateAwait } from '../setImmediateAwait';
 import { availableActions } from './actions';
 

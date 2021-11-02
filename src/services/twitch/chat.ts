@@ -1,5 +1,8 @@
 import util from 'util';
 
+import type { EmitData } from '@entity/alert';
+import { Price } from '@entity/price';
+import { UserBit, UserBitInterface } from '@entity/user';
 import * as constants from '@sogebot/ui-helpers/constants';
 import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized';
 import { StaticAuthProvider } from '@twurple/auth';
@@ -9,78 +12,48 @@ import {
 import { isNil } from 'lodash';
 import { getRepository } from 'typeorm';
 
-import Core from './_interface';
-import api from './api';
-import { parserReply } from './commons';
-import type { EmitData } from './database/entity/alert';
-import { Price } from './database/entity/price';
-import { UserBit, UserBitInterface } from './database/entity/user';
-import { settings, timer } from './decorators';
-import { command, default_permission } from './decorators';
+import { parserReply } from '~/commons';
+import { timer } from '~/decorators';
 import {
-  getFunctionList, onChange, onLoad, onStreamStart,
-} from './decorators/on';
-import Expects from './expects';
-import { isStreamOnline, stats } from './helpers/api';
-import * as hypeTrain from './helpers/api/hypeTrain';
+  getFunctionList, onStreamStart,
+} from '~/decorators/on';
+import { isStreamOnline, stats } from '~/helpers/api';
+import * as hypeTrain from '~/helpers/api/hypeTrain';
 import {
-  getOwner, getUserSender, prepare,
-} from './helpers/commons';
-import { sendMessage } from './helpers/commons/sendMessage';
-import { dayjs } from './helpers/dayjs';
-import { eventEmitter } from './helpers/events';
+  getOwner, getUserSender,
+} from '~/helpers/commons';
+import { sendMessage } from '~/helpers/commons/sendMessage';
+import { dayjs } from '~/helpers/dayjs';
+import { eventEmitter } from '~/helpers/events';
 import {
   triggerInterfaceOnBit, triggerInterfaceOnMessage, triggerInterfaceOnSub,
-} from './helpers/interface/triggers';
-import { warning } from './helpers/log';
+} from '~/helpers/interface/triggers';
+import { warning } from '~/helpers/log';
 import {
   chatIn, cheer, debug, error, host, info, raid, resub, sub, subcommunitygift, subgift, whisperIn,
-} from './helpers/log';
-import { generalChannel } from './helpers/oauth/generalChannel';
-import { linesParsedIncrement, setStatus } from './helpers/parser';
-import { defaultPermissions } from './helpers/permissions';
-import {
-  globalIgnoreListExclude, ignorelist, sendWithMe, setMuteStatus, showWithAt, tmiEmitter,
-} from './helpers/tmi';
-import { isOwner } from './helpers/user';
-import * as changelog from './helpers/user/changelog.js';
-import { isBot, isBotId } from './helpers/user/isBot';
-import { isIgnored } from './helpers/user/isIgnored';
-import { getUserFromTwitch } from './microservices/getUserFromTwitch';
-import oauth from './oauth';
-import eventlist from './overlays/eventlist';
-import { Parser } from './parser';
-import alerts from './registries/alerts';
-import alias from './systems/alias';
-import customcommands from './systems/customcommands';
-import { translate } from './translate';
-import users from './users';
-import joinpart from './widgets/joinpart';
+} from '~/helpers/log';
+import { generalChannel } from '~/helpers/oauth/generalChannel';
+import { linesParsedIncrement, setStatus } from '~/helpers/parser';
+import { tmiEmitter } from '~/helpers/tmi';
+import { isOwner } from '~/helpers/user';
+import * as changelog from '~/helpers/user/changelog.js';
+import { isBot, isBotId } from '~/helpers/user/isBot';
+import { isIgnored } from '~/helpers/user/isIgnored';
+import eventlist from '~/overlays/eventlist';
+import { Parser } from '~/parser';
+import alerts from '~/registries/alerts';
+import api from '~/services/twitch/api';
+import { getUserFromTwitch } from '~/services/twitch/calls/getUserFromTwitch';
+import oauth from '~/services/twitch/oauth';
+import alias from '~/systems/alias';
+import customcommands from '~/systems/customcommands';
+import { translate } from '~/translate';
+import users from '~/users';
+import joinpart from '~/widgets/joinpart';
 
 const commandRegexp = new RegExp(/^!\w+$/);
-class TMI extends Core {
+class TMI {
   shouldConnect = false;
-
-  @settings('chat')
-  sendWithMe = false;
-
-  @settings('chat')
-  sendAsReply = true;
-
-  @settings('chat')
-  ignorelist: any[] = [];
-
-  @settings('chat')
-  globalIgnoreListExclude: any[] = [];
-
-  @settings('chat')
-  showWithAt = true;
-
-  @settings('chat')
-  mute = false;
-
-  @settings('chat')
-  whisperListener = false;
 
   channel = '';
   timeouts: Record<string, any> = {};
@@ -97,7 +70,6 @@ class TMI extends Core {
   ignoreGiftsFromUser = new Map<string, number>();
 
   constructor() {
-    super();
     this.emitter();
   }
 
@@ -112,83 +84,6 @@ class TMI extends Core {
     tmiEmitter.on('part', (type) => {
       this.part(type);
     });
-  }
-
-  @onChange('showWithAt')
-  @onLoad('showWithAt')
-  setShowWithAt() {
-    showWithAt.value = this.showWithAt;
-  }
-
-  @onChange('sendWithMe')
-  @onLoad('sendWithMe')
-  setSendWithMe() {
-    sendWithMe.value = this.sendWithMe;
-  }
-
-  @onChange('ignorelist')
-  @onLoad('ignorelist')
-  setIgnoreList() {
-    ignorelist.value = this.ignorelist;
-  }
-
-  @onChange('globalIgnoreListExclude')
-  @onLoad('globalIgnoreListExclude')
-  setGlobalIgnoreListExclude() {
-    globalIgnoreListExclude.value = this.globalIgnoreListExclude;
-  }
-
-  @onChange('mute')
-  @onLoad('mute')
-  setMuteStatus() {
-    setMuteStatus(this.mute);
-  }
-
-  @command('!ignore add')
-  @default_permission(defaultPermissions.CASTERS)
-  async ignoreAdd (opts: CommandOptions) {
-    try {
-      const username = new Expects(opts.parameters).username().toArray()[0].toLowerCase();
-      this.ignorelist = [
-        ...new Set([
-          ...this.ignorelist,
-          username,
-        ],
-        )];
-      // update ignore list
-
-      return [{ response: prepare('ignore.user.is.added', { username }), ...opts }];
-    } catch (e: any) {
-      error(e.stack);
-    }
-    return [];
-  }
-
-  @command('!ignore remove')
-  @default_permission(defaultPermissions.CASTERS)
-  async ignoreRm (opts: CommandOptions) {
-    try {
-      const username = new Expects(opts.parameters).username().toArray()[0].toLowerCase();
-      this.ignorelist = this.ignorelist.filter(o => o !== username);
-      // update ignore list
-      return [{ response: prepare('ignore.user.is.removed', { username }), ...opts }];
-    } catch (e: any) {
-      error(e.stack);
-    }
-    return [];
-  }
-
-  @command('!ignore check')
-  @default_permission(defaultPermissions.CASTERS)
-  async ignoreCheck (opts: CommandOptions) {
-    try {
-      const username = new Expects(opts.parameters).username().toArray()[0].toLowerCase();
-      const isUserIgnored = isIgnored({ userName: username });
-      return [{ response: prepare(isUserIgnored ? 'ignore.user.is.ignored' : 'ignore.user.is.not.ignored', { username }), ...opts }];
-    } catch (e: any) {
-      error(e.stack);
-    }
-    return [];
   }
 
   async initClient (type: 'bot' | 'broadcaster') {
@@ -932,9 +827,10 @@ class TMI extends Core {
       sender: userstate, message: message, skip: skip, quiet: quiet, id: data.id, emotesOffsets: data.emotesOffsets, isAction: data.isAction,
     });
 
+    const whisperListener = await new Promise<boolean>(resolve => tmiEmitter.emit('get::whisperListener', (value) => resolve(value)));
     if (!skip
         && data.isWhisper
-        && (this.whisperListener || isOwner(userstate))) {
+        && (whisperListener || isOwner(userstate))) {
       whisperIn(`${message} [${userstate.userName}]`);
     } else if (!skip && !isBotId(userId)) {
       chatIn(`${message} [${userstate.userName}]`);

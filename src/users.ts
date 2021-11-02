@@ -6,26 +6,26 @@ import {
   Brackets, FindOneOptions, getConnection, getRepository, IsNull,
 } from 'typeorm';
 
-import Core from './_interface';
-import api from './api';
-import currency from './currency';
-import { Permissions } from './database/entity/permissions';
+import Core from '~/_interface';
+import currency from '~/currency';
+import { Permissions } from '~/database/entity/permissions';
 import {
   User, UserBit, UserInterface, UserTip,
-} from './database/entity/user';
-import { onStartup } from './decorators/on';
-import { isStreamOnline, stats } from './helpers/api';
-import { mainCurrency } from './helpers/currency';
+} from '~/database/entity/user';
+import { onStartup } from '~/decorators/on';
+import { isStreamOnline, stats } from '~/helpers/api';
+import { getClientId } from '~/helpers/api/getClientId';
+import { getToken } from '~/helpers/api/getToken';
+import { mainCurrency } from '~/helpers/currency';
 import {
   debug, error, isDebugEnabled,
-} from './helpers/log';
-import { channelId } from './helpers/oauth';
-import { recacheOnlineUsersPermission } from './helpers/permissions';
-import { defaultPermissions, getUserHighestPermission } from './helpers/permissions/';
-import { adminEndpoint, viewerEndpoint } from './helpers/socket';
-import * as changelog from './helpers/user/changelog.js';
-import { getIdFromTwitch } from './microservices/getIdFromTwitch';
-import oauth from './oauth';
+} from '~/helpers/log';
+import { channelId } from '~/helpers/oauth';
+import { recacheOnlineUsersPermission } from '~/helpers/permissions';
+import { defaultPermissions, getUserHighestPermission } from '~/helpers/permissions/';
+import { adminEndpoint, viewerEndpoint } from '~/helpers/socket';
+import * as changelog from '~/helpers/user/changelog.js';
+import { getIdFromTwitch } from '~/services/twitch/calls/getIdFromTwitch';
 
 class Users extends Core {
   constructor () {
@@ -65,6 +65,7 @@ class Users extends Core {
         const duplicates = await getRepository(User).find({ userName });
         await Promise.all(duplicates.map(async (user) => {
           try {
+            const api = (await import('~/services/twitch/api')).default;
             const newUsername = await api.getUsernameFromTwitch(user.userId);
             if (newUsername === null) {
               throw new Error('unknown');
@@ -202,6 +203,7 @@ class Users extends Core {
   async getNameById (userId: string): Promise<string> {
     const user = await await changelog.get(userId);
     if (!user) {
+      const api = (await import('~/services/twitch/api')).default;
       const userName = await api.getUsernameFromTwitch(userId);
       if (userName) {
         changelog.update(userId, { userName });
@@ -432,7 +434,7 @@ class Users extends Core {
 
         const viewers = await query.getRawMany();
 
-        const levels = require('./systems/levels').default;
+        const levels = require('~/systems/levels').default;
         for (const viewer of viewers) {
           // add level to user
           viewer.extra = JSON.parse(viewer.extra);
@@ -463,7 +465,7 @@ class Users extends Core {
         const cid = channelId.value;
         const url = `https://api.twitch.tv/helix/users/follows?from_id=${id}&to_id=${cid}`;
 
-        const token = oauth.botAccessToken;
+        const token = await getToken('bot');
         if (token === '') {
           cb(new Error('no token available'), null);
         }
@@ -472,7 +474,7 @@ class Users extends Core {
           headers: {
             'Accept':        'application/vnd.twitchtv.v5+json',
             'Authorization': 'Bearer ' + token,
-            'Client-ID':     oauth.botClientId,
+            'Client-ID':     await getClientId('bot'),
           },
         });
         if (request.data.total === 0) {

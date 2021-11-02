@@ -1,31 +1,31 @@
+import {
+  Cooldown as CooldownEntity, CooldownInterface, CooldownViewer, CooldownViewerInterface,
+} from '@entity/cooldown';
+import { Keyword } from '@entity/keyword';
 import * as constants from '@sogebot/ui-helpers/constants';
 import _ from 'lodash';
 import { getRepository, In } from 'typeorm';
 
 import { parserReply } from '../commons';
 import {
-  Cooldown as CooldownEntity, CooldownInterface, CooldownViewer, CooldownViewerInterface,
-} from '../database/entity/cooldown';
-import { Keyword } from '../database/entity/keyword';
-import {
   command, default_permission, parser, permission_settings, rollback, settings,
 } from '../decorators';
 import { onChange } from '../decorators/on';
 import Expects from '../expects';
-import { prepare } from '../helpers/commons';
-import { debug, error } from '../helpers/log';
-import { ParameterError } from '../helpers/parameterError';
-import { getUserHighestPermission } from '../helpers/permissions/';
-import { defaultPermissions } from '../helpers/permissions/';
-import { adminEndpoint } from '../helpers/socket';
-import { isOwner } from '../helpers/user';
-import * as changelog from '../helpers/user/changelog.js';
 import Parser from '../parser';
-import { translate } from '../translate';
 import System from './_interface';
-import alias from './alias';
-import customCommands from './customcommands';
-import customcommands from './customcommands';
+
+import { prepare } from '~/helpers/commons';
+import { debug, error } from '~/helpers/log';
+import { ParameterError } from '~/helpers/parameterError';
+import { getUserHighestPermission } from '~/helpers/permissions/';
+import { defaultPermissions } from '~/helpers/permissions/';
+import { adminEndpoint } from '~/helpers/socket';
+import { isOwner } from '~/helpers/user';
+import * as changelog from '~/helpers/user/changelog.js';
+import alias from '~/systems/alias';
+import customCommands from '~/systems/customcommands';
+import { translate } from '~/translate';
 
 const cache: { id: string; cooldowns: CooldownInterface[] }[] = [];
 const defaultCooldowns: { name: string; lastRunAt: number, permId: string }[] = [];
@@ -226,7 +226,7 @@ class Cooldown extends System {
             debug('cooldown.check', `Will be searching for group '${parsedAlias.group}' as well.`);
             groupName.push(`g:${parsedAlias.group}`);
           } else {
-            const commands = await customcommands.find(opts.message);
+            const commands = await customCommands.find(opts.message);
             for (const item of commands) {
               if (item.command.group) {
                 debug('cooldown.check', `Will be searching for group '${item.command.group}' as well.`);

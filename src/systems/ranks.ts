@@ -1,20 +1,21 @@
 'use strict';
 
+import { Rank, RankInterface } from '@entity/rank';
+import { User, UserInterface } from '@entity/user';
 import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized';
 import * as _ from 'lodash';
 import { getRepository } from 'typeorm';
 
-import { Rank, RankInterface } from '../database/entity/rank';
-import { User, UserInterface } from '../database/entity/user';
 import { command, default_permission } from '../decorators';
-import { prepare } from '../helpers/commons';
-import { dayjs } from '../helpers/dayjs';
-import { defaultPermissions } from '../helpers/permissions/';
-import { adminEndpoint } from '../helpers/socket';
-import * as changelog from '../helpers/user/changelog.js';
-import { translate } from '../translate';
 import users from '../users';
 import System from './_interface';
+
+import { prepare } from '~/helpers/commons';
+import { dayjs } from '~/helpers/dayjs';
+import { defaultPermissions } from '~/helpers/permissions/';
+import { adminEndpoint } from '~/helpers/socket';
+import * as changelog from '~/helpers/user/changelog.js';
+import { translate } from '~/translate';
 
 /*
  * !rank                          - show user rank

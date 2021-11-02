@@ -2,6 +2,9 @@ import {
   isMainThread, parentPort, Worker,
 } from 'worker_threads';
 
+import { Settings } from '@entity/settings';
+import { ThreadEvent } from '@entity/threadEvent';
+import { User } from '@entity/user';
 import axios from 'axios';
 import {
   chunk, flatMap, includes,
@@ -15,18 +18,16 @@ import {
 } from 'typeorm';
 import { MysqlConnectionOptions } from 'typeorm/driver/mysql/MysqlConnectionOptions';
 
-import { Settings } from '../database/entity/settings';
-import { ThreadEvent } from '../database/entity/threadEvent';
-import { User } from '../database/entity/user';
-import { getAllOnlineUsernames } from '../helpers/getAllOnlineUsernames';
-import {
-  debug, error, setDEBUG, warning,
-} from '../helpers/log';
-import { TypeORMLogger } from '../helpers/logTypeorm.js';
-import { SQLVariableLimit } from '../helpers/sql';
-import { isIgnored } from '../helpers/user/isIgnored';
 import { fetchAccountAge } from './fetchAccountAge';
 import { getUsersFromTwitch } from './getUserFromTwitch';
+
+import { getAllOnlineUsernames } from '~/helpers/getAllOnlineUsernames';
+import {
+  debug, error, setDEBUG, warning,
+} from '~/helpers/log';
+import { TypeORMLogger } from '~/helpers/logTypeorm.js';
+import { SQLVariableLimit } from '~/helpers/sql';
+import { isIgnored } from '~/helpers/user/isIgnored';
 
 const isThreadingEnabled = process.env.THREAD !== '0';
 

@@ -1,6 +1,4 @@
-import type { StreamEndpoint } from '../../api';
 import { getFunctionList } from '../../decorators/on';
-import { getGameNameFromId } from '../../microservices/getGameNameFromId';
 import { chatMessagesAtStart, streamType } from '../api';
 import { isStreamOnline } from '../api/isStreamOnline';
 import { setCurrentRetries } from '../api/retries';
@@ -14,6 +12,9 @@ import {
 import { channelId } from '../oauth';
 import { linesParsed } from '../parser';
 import { find } from '../register';
+
+import type { StreamEndpoint } from '~/services/twitch/api';
+import { getGameNameFromId } from '~/services/twitch/calls/getGameNameFromId';
 
 async function start(data: StreamEndpoint['data'][number]) {
   startLog(

@@ -2,6 +2,10 @@
 
 // bot libraries
 
+import { DiscordLink } from '@entity/discord';
+import { Events } from '@entity/event';
+import { Permissions as PermissionsEntity } from '@entity/permissions';
+import { User } from '@entity/user';
 import { HOUR, MINUTE } from '@sogebot/ui-helpers/constants';
 import chalk from 'chalk';
 import * as DiscordJs from 'discord.js';
@@ -11,10 +15,6 @@ import {
 } from 'typeorm';
 import { v5 as uuidv5 } from 'uuid';
 
-import { DiscordLink } from '../database/entity/discord';
-import { Events } from '../database/entity/event';
-import { Permissions as PermissionsEntity } from '../database/entity/permissions';
-import { User } from '../database/entity/user';
 import {
   command, persistent, settings,
 } from '../decorators';
@@ -23,29 +23,30 @@ import {
 } from '../decorators/on';
 import events from '../events';
 import Expects from '../expects';
-import { isStreamOnline, stats } from '../helpers/api';
-import { attributesReplace } from '../helpers/attributesReplace';
-import {
-  announceTypes, getOwner, getUserSender, isUUID, prepare,
-} from '../helpers/commons';
-import { isBotStarted, isDbConnected } from '../helpers/database';
-import { dayjs, timezone } from '../helpers/dayjs';
-import { debounce } from '../helpers/debounce';
-import { eventEmitter } from '../helpers/events';
-import {
-  chatIn, chatOut, debug, error, info, warning, whisperOut,
-} from '../helpers/log';
-import { generalChannel } from '../helpers/oauth/generalChannel';
-import { check } from '../helpers/permissions/';
-import { get as getPermission } from '../helpers/permissions/get';
-import { adminEndpoint } from '../helpers/socket';
-import * as changelog from '../helpers/user/changelog.js';
 import { Message } from '../message';
-import { getIdFromTwitch } from '../microservices/getIdFromTwitch';
-import oauth from '../oauth';
 import Parser from '../parser';
 import users from '../users';
 import Integration from './_interface';
+
+import { isStreamOnline, stats } from '~/helpers/api';
+import { attributesReplace } from '~/helpers/attributesReplace';
+import {
+  announceTypes, getOwner, getUserSender, isUUID, prepare,
+} from '~/helpers/commons';
+import { isBotStarted, isDbConnected } from '~/helpers/database';
+import { dayjs, timezone } from '~/helpers/dayjs';
+import { debounce } from '~/helpers/debounce';
+import { eventEmitter } from '~/helpers/events';
+import {
+  chatIn, chatOut, debug, error, info, warning, whisperOut,
+} from '~/helpers/log';
+import { generalChannel } from '~/helpers/oauth/generalChannel';
+import { check } from '~/helpers/permissions/';
+import { get as getPermission } from '~/helpers/permissions/get';
+import { adminEndpoint } from '~/helpers/socket';
+import * as changelog from '~/helpers/user/changelog.js';
+import { getIdFromTwitch } from '~/services/twitch/calls/getIdFromTwitch';
+import oauth from '~/services/twitch/oauth';
 
 class Discord extends Integration {
   client: DiscordJs.Client | null = null;

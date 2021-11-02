@@ -15,49 +15,49 @@ import {
   getConnection, getManager, getRepository,
 } from 'typeorm';
 
-import Core from './_interface';
-import tmi from './chat';
-import { CacheTitles } from './database/entity/cacheTitles';
-import { Translation } from './database/entity/translation';
-import { TwitchTag, TwitchTagInterface } from './database/entity/twitch';
-import { User } from './database/entity/user';
-import { onStartup } from './decorators/on';
-import { schema } from './graphql/schema';
+import Core from '~/_interface';
+import { CacheTitles } from '~/database/entity/cacheTitles';
+import { Translation } from '~/database/entity/translation';
+import { TwitchTag, TwitchTagInterface } from '~/database/entity/twitch';
+import { User } from '~/database/entity/user';
+import { onStartup } from '~/decorators/on';
+import { schema } from '~/graphql/schema';
 import {
   chatMessagesAtStart, currentStreamTags, isStreamOnline, rawStatus, stats, streamStatusChangeSince,
-} from './helpers/api';
-import { getOwnerAsSender } from './helpers/commons/getOwnerAsSender';
+} from '~/helpers/api';
+import { getOwnerAsSender } from '~/helpers/commons/getOwnerAsSender';
 import {
   getURL, getValueOf, isVariableSet, postURL,
-} from './helpers/customvariables';
-import { getIsBotStarted } from './helpers/database';
-import { flatten } from './helpers/flatten';
-import { setValue } from './helpers/general';
-import { getLang } from './helpers/locales';
+} from '~/helpers/customvariables';
+import { getIsBotStarted } from '~/helpers/database';
+import { flatten } from '~/helpers/flatten';
+import { setValue } from '~/helpers/general';
+import { getLang } from '~/helpers/locales';
 import {
   error,
   getDEBUG, info, setDEBUG,
-} from './helpers/log';
+} from '~/helpers/log';
 import {
   app, ioServer, server, serverSecure, setApp, setServer,
-} from './helpers/panel';
-import { socketsConnectedDec, socketsConnectedInc } from './helpers/panel/';
-import { errors, warns } from './helpers/panel/alerts';
-import { linesParsed, status as statusObj } from './helpers/parser';
-import { list, systems } from './helpers/register';
-import { adminEndpoint } from './helpers/socket';
-import * as changelog from './helpers/user/changelog.js';
-import lastfm from './integrations/lastfm';
-import spotify from './integrations/spotify';
-import { sendGameFromTwitch } from './microservices/sendGameFromTwitch';
-import { setTags } from './microservices/setTags';
-import { setTitleAndGame } from './microservices/setTitleAndGame';
-import oauth from './oauth';
-import Parser from './parser';
-import { default as socketSystem } from './socket';
-import highlights from './systems/highlights';
-import songs from './systems/songs';
-import translateLib, { translate } from './translate';
+} from '~/helpers/panel';
+import { socketsConnectedDec, socketsConnectedInc } from '~/helpers/panel/';
+import { errors, warns } from '~/helpers/panel/alerts';
+import { linesParsed, status as statusObj } from '~/helpers/parser';
+import { list, systems } from '~/helpers/register';
+import { adminEndpoint } from '~/helpers/socket';
+import * as changelog from '~/helpers/user/changelog.js';
+import lastfm from '~/integrations/lastfm';
+import spotify from '~/integrations/spotify';
+import Parser from '~/parser';
+import { sendGameFromTwitch } from '~/services/twitch/calls/sendGameFromTwitch';
+import { setTags } from '~/services/twitch/calls/setTags';
+import { setTitleAndGame } from '~/services/twitch/calls/setTitleAndGame';
+import tmi from '~/services/twitch/chat';
+import oauth from '~/services/twitch/oauth';
+import { default as socketSystem } from '~/socket';
+import highlights from '~/systems/highlights';
+import songs from '~/systems/songs';
+import translateLib, { translate } from '~/translate';
 
 const port = Number(process.env.PORT ?? 20000);
 const secureport = Number(process.env.SECUREPORT ?? 20443);
@@ -209,7 +209,7 @@ class Panel extends Core {
       res.status(200).send('OK');
     });
     app?.post('/webhooks/callback', function (req, res) {
-      const eventsub = require('./eventsub').default;
+      const eventsub = require('~/eventsub').default;
       eventsub.handler(req, res);
     });
     app?.get('/popout/', function (req, res) {
@@ -476,7 +476,7 @@ class Panel extends Core {
     });
     socket.on('core', async (cb: (err: string | null, toEmit: { name: string; type: string; }[]) => void) => {
       const toEmit: { name: string; type: string; }[] = [];
-      for (const system of ['dashboard', 'oauth', 'tmi', 'currency', 'ui', 'general', 'twitch', 'socket', 'eventsub', 'updater']) {
+      for (const system of ['dashboard', 'currency', 'ui', 'general', 'twitch', 'socket', 'eventsub', 'updater']) {
         toEmit.push({ name: system.toLowerCase(), type: 'core' });
       }
       cb(null, toEmit);

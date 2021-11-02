@@ -1,10 +1,10 @@
+import { Poll, PollVote } from '@entity/poll';
 import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized';
 import _ from 'lodash';
 import { getRepository } from 'typeorm';
 
 import { parserReply } from '../commons';
 import currency from '../currency';
-import { Poll, PollVote } from '../database/entity/poll';
 import {
   command, default_permission, helper, parser, settings,
 } from '../decorators';
@@ -12,16 +12,17 @@ import {
   onBit, onMessage, onStartup, onTip,
 } from '../decorators/on';
 import Expects from '../expects.js';
-import { isStreamOnline } from '../helpers/api';
+import System from './_interface';
+
+import { isStreamOnline } from '~/helpers/api';
 import {
   announce, getOwnerAsSender, prepare,
-} from '../helpers/commons';
-import { mainCurrency } from '../helpers/currency';
-import { warning } from '../helpers/log.js';
-import { defaultPermissions } from '../helpers/permissions/';
-import { adminEndpoint } from '../helpers/socket';
-import { translate } from '../translate';
-import System from './_interface';
+} from '~/helpers/commons';
+import { mainCurrency } from '~/helpers/currency';
+import { warning } from '~/helpers/log.js';
+import { defaultPermissions } from '~/helpers/permissions/';
+import { adminEndpoint } from '~/helpers/socket';
+import { translate } from '~/translate';
 
 enum ERROR {
   NOT_ENOUGH_OPTIONS,

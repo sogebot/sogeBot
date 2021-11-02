@@ -1,7 +1,7 @@
 import { getManager } from 'typeorm';
 
-import { isDbConnected } from './database';
-import { debug } from './log';
+import { isDbConnected } from '~/helpers/database';
+import { debug } from '~/helpers/log';
 
 // TODO: dynamic way to determinate limit of SQL variables
 export let SQLVariableLimit = 999; // sqlite have default limit of 999

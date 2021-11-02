@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-import { getClientId, getToken } from '../helpers/api';
+import { getClientId, getToken } from '~/helpers/api';
 
 type Await<T> = T extends {
   then(onfulfilled?: (value: infer U) => unknown): unknown;

@@ -1,12 +1,12 @@
+import {
+  OverlayMapper, OverlayMapperInterface, OverlayMappers,
+} from '@entity/overlay';
 import { SECOND } from '@sogebot/ui-helpers/constants';
 import {
   Arg, Authorized,  Mutation, Query, Resolver,
 } from 'type-graphql';
 import { getRepository } from 'typeorm';
 
-import {
-  OverlayMapper, OverlayMapperInterface, OverlayMappers,
-} from '../../database/entity/overlay';
 import { isBotStarted } from '../../helpers/database';
 import { OverlayObject } from '../schema/overlay/OverlayObject';
 

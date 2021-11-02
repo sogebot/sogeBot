@@ -1,9 +1,8 @@
+import { WidgetSocial, WidgetSocialInterface } from '@entity/widget';
 import {
   Arg, Authorized, Query, Resolver,
 } from 'type-graphql';
 import { getRepository } from 'typeorm';
-
-import { WidgetSocial, WidgetSocialInterface } from '../../database/entity/widget';
 
 @Resolver()
 export class WidgetSocialResolver {

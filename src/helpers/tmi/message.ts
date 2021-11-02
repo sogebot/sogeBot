@@ -1,6 +1,8 @@
-import tmi from '../../chat';
 import { error, isDebugEnabled } from '../log';
 import { generalChannel } from '../oauth/generalChannel';
+
+import twitch from '~/services/twitch';
+import tmi from '~/services/twitch/chat';
 
 export async function message(type: 'say' | 'whisper' | 'me', username: string | undefined | null, messageToSend: string, messageId?: string, retry = true) {
   try {
@@ -16,7 +18,7 @@ export async function message(type: 'say' | 'whisper' | 'me', username: string |
       if (type === 'me') {
         tmi.client.bot.say(username, `/me ${messageToSend}`);
       } else {
-        if (tmi.sendAsReply) {
+        if (twitch.sendAsReply) {
           tmi.client.bot.say(username, messageToSend, { replyTo: messageId });
         } else {
           tmi.client.bot[type](username, messageToSend);

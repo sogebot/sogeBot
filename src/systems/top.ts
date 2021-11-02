@@ -1,3 +1,4 @@
+import { User } from '@entity/user';
 import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized';
 import { format } from '@sogebot/ui-helpers/number';
 import _ from 'lodash';
@@ -5,23 +6,23 @@ import {
   getConnection, getManager, getRepository,
 } from 'typeorm';
 
-import tmi from '../chat';
-import { User } from '../database/entity/user';
 import { command, default_permission } from '../decorators';
 import general from '../general';
-import { mainCurrency } from '../helpers/currency';
-import { dayjs } from '../helpers/dayjs';
-import { debug } from '../helpers/log';
-import { defaultPermissions } from '../helpers/permissions/';
-import { getPointsName } from '../helpers/points';
-import { unserialize } from '../helpers/type';
-import * as changelog from '../helpers/user/changelog.js';
-import { getIgnoreList, isIgnored } from '../helpers/user/isIgnored';
-import oauth from '../oauth';
-import { translate } from '../translate';
 import System from './_interface';
 import levels from './levels';
 import points from './points';
+
+import { mainCurrency } from '~/helpers/currency';
+import { dayjs } from '~/helpers/dayjs';
+import { debug } from '~/helpers/log';
+import { defaultPermissions } from '~/helpers/permissions/';
+import { getPointsName } from '~/helpers/points';
+import { unserialize } from '~/helpers/type';
+import * as changelog from '~/helpers/user/changelog.js';
+import { getIgnoreList, isIgnored } from '~/helpers/user/isIgnored';
+import twitch from '~/services/twitch';
+import oauth from '~/services/twitch/oauth';
+import { translate } from '~/translate';
 
 enum TYPE {
   TIME = '0',
@@ -308,7 +309,7 @@ class Top extends System {
       sorted = _.chunk(sorted, 10)[0];
 
       for (const user of sorted) {
-        message += (i + 1) + '. ' + (tmi.showWithAt ? '@' : '') + (user.userName || 'unknown') + ' - ';
+        message += (i + 1) + '. ' + (twitch.showWithAt ? '@' : '') + (user.userName || 'unknown') + ' - ';
         switch (type) {
           case TYPE.TIME:
             message += Intl.NumberFormat(general.lang, {

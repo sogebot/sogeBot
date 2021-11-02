@@ -1,5 +1,5 @@
 import {
-  Field, ID, ObjectType, 
+  Field, ID, ObjectType,
 } from 'type-graphql';
 import { EntitySchema } from 'typeorm';
 

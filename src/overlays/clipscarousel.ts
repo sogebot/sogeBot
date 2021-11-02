@@ -1,7 +1,9 @@
-import api from '../api';
-import type { OverlayMapperClipsCarousel } from '../database/entity/overlay';
-import { publicEndpoint } from '../helpers/socket';
+import type { OverlayMapperClipsCarousel } from '@entity/overlay';
+
 import Overlay from './_interface';
+
+import { publicEndpoint } from '~/helpers/socket';
+import api from '~/services/twitch/api';
 
 class ClipsCarousel extends Overlay {
   sockets () {

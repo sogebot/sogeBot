@@ -1,5 +1,7 @@
 // 3rdparty libraries
 
+import { Alias } from '@entity/alias';
+import { ModerationPermit, ModerationWarning } from '@entity/moderation';
 import * as constants from '@sogebot/ui-helpers/constants';
 import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized';
 import emojiRegex from 'emoji-regex';
@@ -8,31 +10,30 @@ import tlds from 'tlds';
 import { getRepository, LessThan } from 'typeorm';
 import XRegExp from 'xregexp';
 
-import tmi from '../chat';
 import { parserReply } from '../commons';
-import { Alias } from '../database/entity/alias';
-import { ModerationPermit, ModerationWarning } from '../database/entity/moderation';
 import {
   command, default_permission, parser, permission_settings, settings, ui,
 } from '../decorators';
 import Expects from '../expects';
-import { prepare } from '../helpers/commons';
-import {
-  error, timeout as timeoutLog, warning as warningLog,
-} from '../helpers/log';
-import { ParameterError } from '../helpers/parameterError';
-import { getUserHighestPermission } from '../helpers/permissions/';
-import { defaultPermissions } from '../helpers/permissions/';
-import { adminEndpoint } from '../helpers/socket';
-import { timeout } from '../helpers/tmi';
-import { isModerator } from '../helpers/user/isModerator';
 import spotify from '../integrations/spotify';
 import Message from '../message';
-import { translate } from '../translate';
 import users from '../users';
 import System from './_interface';
-import aliasSystem from './alias';
-import songs from './songs';
+
+import { prepare } from '~/helpers/commons';
+import {
+  error, timeout as timeoutLog, warning as warningLog,
+} from '~/helpers/log';
+import { ParameterError } from '~/helpers/parameterError';
+import { defaultPermissions } from '~/helpers/permissions/';
+import { getUserHighestPermission } from '~/helpers/permissions/';
+import { adminEndpoint } from '~/helpers/socket';
+import { timeout } from '~/helpers/tmi';
+import { isModerator } from '~/helpers/user/isModerator';
+import tmi from '~/services/twitch/chat';
+import aliasSystem from '~/systems/alias';
+import songs from '~/systems/songs';
+import { translate } from '~/translate';
 
 const urlRegex = [
   new RegExp(`(www)? ??\\.? ?[a-zA-Z0-9]+([a-zA-Z0-9-]+) ??\\. ?(${tlds.join('|')})(?=\\P{L}|$)`, 'igu'),

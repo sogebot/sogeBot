@@ -1,20 +1,21 @@
 import crypto from 'crypto';
 
+import { User } from '@entity/user';
+import { UserInterface } from '@entity/user';
 import axios, { AxiosResponse } from 'axios';
 import { isNil, sample } from 'lodash';
 import _ from 'lodash';
 import safeEval from 'safe-eval';
 import { getRepository } from 'typeorm';
 
-import tmi from '../chat';
-import { User } from '../database/entity/user';
-import { UserInterface } from '../database/entity/user';
-import * as changelog from '../helpers/user/changelog.js';
-import { isIgnored } from '../helpers/user/isIgnored';
-import oauth from '../oauth';
+import twitch from '../services/twitch';
 import users from '../users';
 
 import type { ResponseFilter } from '.';
+
+import * as changelog from '~/helpers/user/changelog.js';
+import { isIgnored } from '~/helpers/user/isIgnored';
+import oauth from '~/services/twitch/oauth';
 
 const evaluate: ResponseFilter = {
   '(eval#)': async function (filter, attr) {
@@ -98,7 +99,7 @@ const evaluate: ResponseFilter = {
       users:  allUsers,
       is:     is,
       random: randomVar,
-      sender: tmi.showWithAt ? `@${attr.sender.userName}` : `${attr.sender.userName}`,
+      sender: twitch.showWithAt ? `@${attr.sender.userName}` : `${attr.sender.userName}`,
       param:  typeof attr.param === 'undefined'  ? null : attr.param,
       url:    {},
     };

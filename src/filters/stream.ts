@@ -1,9 +1,9 @@
 import axios from 'axios';
 
-import { setRateLimit } from '../helpers/api';
-import oauth from '../oauth';
-
 import type { ResponseFilter } from '.';
+
+import { setRateLimit } from '~/helpers/api';
+import oauth from '~/services/twitch/oauth';
 
 const stream: ResponseFilter = {
   '(stream|#|link)': async function (filter: any) {

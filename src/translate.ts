@@ -6,13 +6,13 @@ import glob from 'glob';
 import _  from 'lodash';
 import { getRepository } from 'typeorm';
 
-import { Settings } from './database/entity/settings';
-import { Translation } from './database/entity/translation';
-import { areDecoratorsLoaded } from './decorators';
-import { flatten } from './helpers/flatten';
-import { getLang, setLang } from './helpers/locales';
-import { error, warning } from './helpers/log';
-import { addMenu } from './helpers/panel';
+import { Settings } from '~/database/entity/settings';
+import { Translation } from '~/database/entity/translation';
+import { areDecoratorsLoaded } from '~/decorators';
+import { flatten } from '~/helpers/flatten';
+import { getLang, setLang } from '~/helpers/locales';
+import { error, warning } from '~/helpers/log';
+import { addMenu } from '~/helpers/panel';
 
 class Translate {
   custom: any[] = [];

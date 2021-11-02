@@ -1,13 +1,14 @@
 import _ from 'lodash';
 
 import { command, settings } from '../decorators';
-import { timeout } from '../helpers/tmi';
-import * as changelog from '../helpers/user/changelog.js';
-import { isBroadcaster } from '../helpers/user/isBroadcaster';
-import { isModerator } from '../helpers/user/isModerator';
 import points from '../systems/points';
-import { translate } from '../translate';
 import Game from './_interface';
+
+import { timeout } from '~/helpers/tmi';
+import * as changelog from '~/helpers/user/changelog.js';
+import { isBroadcaster } from '~/helpers/user/isBroadcaster';
+import { isModerator } from '~/helpers/user/isModerator';
+import { translate } from '~/translate';
 
 /*
  * !roulette - 50/50 chance to timeout yourself

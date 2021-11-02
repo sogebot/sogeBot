@@ -1,22 +1,23 @@
+import { HowLongToBeatGame, HowLongToBeatGameItem } from '@entity/howLongToBeatGame';
 import * as constants from '@sogebot/ui-helpers/constants';
 import { HowLongToBeatService } from 'howlongtobeat';
 import { EntityNotFoundError } from 'typeorm';
 import { getRepository } from 'typeorm';
 
-import { HowLongToBeatGame, HowLongToBeatGameItem } from '../database/entity/howLongToBeatGame';
 import { command, default_permission } from '../decorators';
 import { onStartup, onStreamStart } from '../decorators/on';
 import Expects from '../expects';
+import System from './_interface';
+
 import {
   isStreamOnline, stats, streamStatusChangeSince,
-} from '../helpers/api';
-import { prepare } from '../helpers/commons';
+} from '~/helpers/api';
+import { prepare } from '~/helpers/commons';
 import {
   debug, error, info, warning,
-} from '../helpers/log';
-import { defaultPermissions } from '../helpers/permissions/';
-import { adminEndpoint } from '../helpers/socket';
-import System from './_interface';
+} from '~/helpers/log';
+import { defaultPermissions } from '~/helpers/permissions/';
+import { adminEndpoint } from '~/helpers/socket';
 
 const notFoundGames = [] as string[];
 

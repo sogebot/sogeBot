@@ -1,6 +1,5 @@
+import { Permissions, PermissionsInterface } from '@entity/permissions';
 import { getRepository } from 'typeorm';
-
-import { Permissions, PermissionsInterface } from '../../database/entity/permissions';
 
 async function get(identifier: string): Promise<PermissionsInterface | undefined> {
   const uuidRegex = /([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})/;

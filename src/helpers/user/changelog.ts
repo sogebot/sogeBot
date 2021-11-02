@@ -1,3 +1,4 @@
+import { User, UserInterface } from '@entity/user';
 import { MINUTE } from '@sogebot/ui-helpers/constants';
 import {
   get as _get, cloneDeep, merge, set,
@@ -5,7 +6,6 @@ import {
 import { getRepository } from 'typeorm';
 import { v4 } from 'uuid';
 
-import { User, UserInterface } from '../../database/entity/user';
 import { timer } from '../../decorators';
 import { flatten } from '../flatten.js';
 import { debug, error } from '../log';

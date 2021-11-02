@@ -1,16 +1,17 @@
+import { Queue as QueueEntity, QueueInterface } from '@entity/queue';
 import { getRepository } from 'typeorm';
 
-import tmi from '../chat';
-import { Queue as QueueEntity, QueueInterface } from '../database/entity/queue';
 import {
   command, default_permission, settings,
 } from '../decorators';
-import { getBotSender, prepare } from '../helpers/commons';
-import { defaultPermissions } from '../helpers/permissions/';
-import { adminEndpoint } from '../helpers/socket';
-import * as changelog from '../helpers/user/changelog.js';
-import { translate } from '../translate';
 import System from './_interface';
+
+import { getBotSender, prepare } from '~/helpers/commons';
+import { defaultPermissions } from '~/helpers/permissions/';
+import { adminEndpoint } from '~/helpers/socket';
+import * as changelog from '~/helpers/user/changelog.js';
+import twitch from '~/services/twitch';
+import { translate } from '~/translate';
 
 /*
  * !queue                            - gets an info whether queue is opened or closed
@@ -225,7 +226,7 @@ class Queue extends System {
       this.pickedUsers.push(user);
     }
 
-    const atUsername = tmi.showWithAt;
+    const atUsername = twitch.showWithAt;
 
     let msg;
     switch (users.length) {
@@ -250,7 +251,7 @@ class Queue extends System {
   @default_permission(defaultPermissions.CASTERS)
   async list (opts: CommandOptions): Promise<CommandResponse[]> {
     const [atUsername, users] = await Promise.all([
-      tmi.showWithAt,
+      twitch.showWithAt,
       getRepository(QueueEntity).find(),
     ]);
     const queueList = users.map(o => atUsername ? `@${o.username}` : o).join(', ');

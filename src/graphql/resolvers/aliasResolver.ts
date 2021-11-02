@@ -1,11 +1,11 @@
 import {
+  Alias, AliasGroup, AliasInput, AliasInterface,
+} from '@entity/alias';
+import {
   Arg, Authorized, Mutation, Query, Resolver,
 } from 'type-graphql';
 import { getRepository } from 'typeorm';
 
-import {
-  Alias, AliasGroup, AliasInput, AliasInterface,
-} from '../../database/entity/alias';
 import * as cache from '../../helpers/cache/alias.js';
 import { AliasGroupObject } from '../schema/alias/AliasGroupObject';
 

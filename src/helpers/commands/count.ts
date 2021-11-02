@@ -1,7 +1,6 @@
+import { CommandsCount } from '@entity/commands';
 import { MINUTE } from '@sogebot/ui-helpers/constants';
 import { getRepository } from 'typeorm';
-
-import { CommandsCount } from '../../database/entity/commands';
 
 const count: { command: string, timestamp: number }[] = [];
 

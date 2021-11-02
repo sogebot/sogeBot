@@ -36,5 +36,5 @@ const saveReplayBuffer = (obs: OBSWebSocket) => {
 };
 
 export {
-  startReplayBuffer, stopReplayBuffer, saveReplayBuffer, 
+  startReplayBuffer, stopReplayBuffer, saveReplayBuffer,
 };

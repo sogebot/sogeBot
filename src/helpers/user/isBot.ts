@@ -1,4 +1,5 @@
-import type { UserInterface } from '../../database/entity/user';
+import type { UserInterface } from '@entity/user';
+
 import { botId } from '../oauth/botId';
 import { botUsername } from '../oauth/botUsername';
 

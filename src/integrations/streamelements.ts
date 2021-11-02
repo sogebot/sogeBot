@@ -1,23 +1,24 @@
+import { UserTip, UserTipInterface } from '@entity/user';
 import * as constants from '@sogebot/ui-helpers/constants';
 import Axios from 'axios';
 import chalk from 'chalk';
 import { getRepository } from 'typeorm';
 
 import currency from '../currency';
-import { UserTip, UserTipInterface } from '../database/entity/user';
 import { persistent, settings } from '../decorators';
 import { onChange, onStartup } from '../decorators/on';
-import { isStreamOnline, stats } from '../helpers/api/index.js';
-import { mainCurrency } from '../helpers/currency';
-import { eventEmitter } from '../helpers/events';
-import { triggerInterfaceOnTip } from '../helpers/interface/triggers';
-import {
-  error, info, tip,
-} from '../helpers/log';
 import eventlist from '../overlays/eventlist';
 import alerts from '../registries/alerts';
 import users from '../users';
 import Integration from './_interface';
+
+import { isStreamOnline, stats } from '~/helpers/api/index.js';
+import { mainCurrency } from '~/helpers/currency';
+import { eventEmitter } from '~/helpers/events';
+import { triggerInterfaceOnTip } from '~/helpers/interface/triggers';
+import {
+  error, info, tip,
+} from '~/helpers/log';
 
 type StreamElementsEvent = {
   donation: {

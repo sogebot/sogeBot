@@ -6,8 +6,8 @@ import {
 } from 'lodash';
 import XRegExp from 'xregexp';
 
-import { debug } from './helpers/log';
-import { ParameterError } from './helpers/parameterError';
+import { debug } from '~/helpers/log';
+import { ParameterError } from '~/helpers/parameterError';
 
 declare global {
   interface RegExpExecArray extends Array<string> {
@@ -556,7 +556,7 @@ class Expects {
   string (opts?: any) {
     opts = opts || {};
     defaults(opts, {
-      exec: false, optional: false, additionalChars: '', withSpaces: false, 
+      exec: false, optional: false, additionalChars: '', withSpaces: false,
     });
     if (!opts.exec) {
       this.toExec.push({ fnc: 'string', opts });

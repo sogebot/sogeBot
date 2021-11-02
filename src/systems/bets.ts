@@ -1,26 +1,27 @@
+import { Bets as BetsEntity, BetsInterface } from '@entity/bets';
 import { format } from '@sogebot/ui-helpers/number';
 import _ from 'lodash';
 import { getRepository } from 'typeorm';
 
 import { parserReply } from '../commons';
-import { Bets as BetsEntity, BetsInterface } from '../database/entity/bets';
 import {
   command, default_permission, helper, settings, ui,
 } from '../decorators';
 import { onStartup } from '../decorators/on';
 import Expects from '../expects';
 import general from '../general.js';
+import System from './_interface';
+
 import {
   announce, getBotSender, getOwner, prepare,
-} from '../helpers/commons';
-import { isDbConnected } from '../helpers/database';
-import { error, warning } from '../helpers/log';
-import { defaultPermissions } from '../helpers/permissions/';
-import { getPointsName } from '../helpers/points';
-import { adminEndpoint } from '../helpers/socket';
-import * as changelog from '../helpers/user/changelog.js';
-import System from './_interface';
-import points from './points';
+} from '~/helpers/commons';
+import { isDbConnected } from '~/helpers/database';
+import { error, warning } from '~/helpers/log';
+import { defaultPermissions } from '~/helpers/permissions/';
+import { getPointsName } from '~/helpers/points';
+import { adminEndpoint } from '~/helpers/socket';
+import * as changelog from '~/helpers/user/changelog.js';
+import points from '~/systems/points';
 
 const ERROR_NOT_ENOUGH_OPTIONS = 'Expected more parameters';
 const ERROR_ALREADY_OPENED = '1';

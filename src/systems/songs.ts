@@ -1,5 +1,10 @@
 import { setInterval } from 'timers';
 
+import {
+  currentSongType,
+  SongBan, SongPlaylist, SongPlaylistInterface, SongRequest,
+} from '@entity/song';
+import { User } from '@entity/user';
 import * as _ from 'lodash';
 import io from 'socket.io';
 import {
@@ -10,25 +15,21 @@ import ytpl from 'ytpl';
 import ytsr from 'ytsr';
 
 import {
-  currentSongType,
-  SongBan, SongPlaylist, SongPlaylistInterface, SongRequest,
-} from '../database/entity/song';
-import { User } from '../database/entity/user';
-import {
   command, default_permission, persistent, settings, ui,
 } from '../decorators';
 import { onChange, onStartup } from '../decorators/on';
+import System from './_interface';
+
 import {
   announce, getBot, getBotSender, prepare,
-} from '../helpers/commons';
-import { error, info } from '../helpers/log';
-import { defaultPermissions } from '../helpers/permissions/';
-import { adminEndpoint, publicEndpoint } from '../helpers/socket';
-import { timeout } from '../helpers/tmi';
-import * as changelog from '../helpers/user/changelog.js';
-import { isModerator } from '../helpers/user/isModerator';
-import { translate } from '../translate';
-import System from './_interface';
+} from '~/helpers/commons';
+import { error, info } from '~/helpers/log';
+import { defaultPermissions } from '~/helpers/permissions/';
+import { adminEndpoint, publicEndpoint } from '~/helpers/socket';
+import { timeout } from '~/helpers/tmi';
+import * as changelog from '~/helpers/user/changelog.js';
+import { isModerator } from '~/helpers/user/isModerator';
+import { translate } from '~/translate';
 
 let importInProgress = false;
 const cachedTags = new Set<string>();

@@ -1,13 +1,14 @@
+import { Text as TextEntity } from '@entity/text';
 import { getRepository } from 'typeorm';
 
-import { Text as TextEntity } from '../database/entity/text';
 import { onStartup } from '../decorators/on';
-import { executeVariablesInText } from '../helpers/customvariables';
-import { csEmitter } from '../helpers/customvariables/emitter';
-import { ioServer } from '../helpers/panel';
-import { adminEndpoint, publicEndpoint } from '../helpers/socket';
 import Message from '../message';
 import Registry from './_interface';
+
+import { executeVariablesInText } from '~/helpers/customvariables';
+import { csEmitter } from '~/helpers/customvariables/emitter';
+import { ioServer } from '~/helpers/panel';
+import { adminEndpoint, publicEndpoint } from '~/helpers/socket';
 
 class Text extends Registry {
   constructor () {

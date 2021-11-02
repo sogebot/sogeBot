@@ -1,12 +1,13 @@
+import { Randomizer as RandomizerEntity } from '@entity/randomizer';
 import { LOW } from '@sogebot/ui-helpers/constants';
 import { getRepository } from 'typeorm';
 
-import { Randomizer as RandomizerEntity } from '../database/entity/randomizer';
 import { parser } from '../decorators';
-import { addToViewersCache, getFromViewersCache } from '../helpers/permissions';
-import { check } from '../helpers/permissions/';
-import { adminEndpoint, publicEndpoint } from '../helpers/socket';
 import Registry from './_interface';
+
+import { addToViewersCache, getFromViewersCache } from '~/helpers/permissions';
+import { check } from '~/helpers/permissions/';
+import { adminEndpoint, publicEndpoint } from '~/helpers/socket';
 
 class Randomizer extends Registry {
   constructor() {

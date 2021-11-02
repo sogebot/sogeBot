@@ -1,13 +1,14 @@
 import axios from 'axios';
 
-import { getUserSender } from '../helpers/commons';
-import { sendMessage } from '../helpers/commons/sendMessage';
-import { botId } from '../helpers/oauth/botId';
-import { botUsername } from '../helpers/oauth/botUsername';
-import { generalChannel } from '../helpers/oauth/generalChannel';
-import { adminEndpoint, publicEndpoint } from '../helpers/socket';
-import { getIgnoreList } from '../helpers/user/isIgnored';
 import Widget from './_interface';
+
+import { getUserSender } from '~/helpers/commons';
+import { sendMessage } from '~/helpers/commons/sendMessage';
+import { botId } from '~/helpers/oauth/botId';
+import { botUsername } from '~/helpers/oauth/botUsername';
+import { generalChannel } from '~/helpers/oauth/generalChannel';
+import { adminEndpoint, publicEndpoint } from '~/helpers/socket';
+import { getIgnoreList } from '~/helpers/user/isIgnored';
 
 class Chat extends Widget {
   public sockets() {

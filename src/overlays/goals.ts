@@ -1,15 +1,16 @@
 'use strict';
 
+import { Goal } from '@entity/goal';
 import { getRepository } from 'typeorm';
 
 import currency from '../currency';
-import { Goal } from '../database/entity/goal';
 import {
   onBit, onFollow, onStartup, onSub, onTip,
 } from '../decorators/on';
-import { mainCurrency } from '../helpers/currency';
-import { recountIntervals } from '../helpers/goals/recountIntervals';
 import Overlay from '../overlays/_interface';
+
+import { mainCurrency } from '~/helpers/currency';
+import { recountIntervals } from '~/helpers/goals/recountIntervals';
 
 class Goals extends Overlay {
   showInUI = false;

@@ -1,4 +1,4 @@
-import type { UserInterface } from '../../database/entity/user';
+import type { UserInterface } from '@entity/user';
 
 export function isModerator(user: UserInterface | Omit<ChatUser, '_userName' | '_userData' | '_parseBadgesLike'>): boolean {
   if ('isMod' in user) {

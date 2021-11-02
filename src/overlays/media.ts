@@ -1,18 +1,19 @@
+import { AlertMedia } from '@entity/alert';
+import { Gallery } from '@entity/gallery';
 import FileType from 'file-type';
 import { isNil } from 'lodash';
 import { getRepository } from 'typeorm';
 
-import api from '../api';
-import { AlertMedia } from '../database/entity/alert';
-import { Gallery } from '../database/entity/gallery';
 import { command, default_permission } from '../decorators';
 import { onStartup } from '../decorators/on';
-import { debug } from '../helpers/log';
-import { defaultPermissions } from '../helpers/permissions';
-import { publicEndpoint } from '../helpers/socket';
 import Message from '../message';
 import { getApp } from '../panel';
 import Overlay from './_interface';
+
+import { debug } from '~/helpers/log';
+import { defaultPermissions } from '~/helpers/permissions';
+import { publicEndpoint } from '~/helpers/socket';
+import api from '~/services/twitch/api';
 
 class Media extends Overlay {
   @onStartup()

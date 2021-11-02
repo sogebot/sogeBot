@@ -1,33 +1,34 @@
+import {
+  User, UserBit, UserTip,
+} from '@entity/user';
 import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized';
 import { format } from '@sogebot/ui-helpers/number';
 import { getRepository } from 'typeorm';
 
-import api from '../api';
 import { dateDiff } from '../commons';
 import currency from '../currency';
-import {
-  User, UserBit, UserTip,
-} from '../database/entity/user';
 import {
   command, default_permission, settings,
 } from '../decorators';
 import Expects from '../expects';
 import general from '../general';
-import { prepare } from '../helpers/commons/';
-import { mainCurrency } from '../helpers/currency';
-import { dayjs, timezone } from '../helpers/dayjs';
-import { debug, error } from '../helpers/log';
-import { get, getUserHighestPermission } from '../helpers/permissions/';
-import { getPointsName } from '../helpers/points';
-import * as changelog from '../helpers/user/changelog.js';
-import { fetchAccountAge } from '../microservices/fetchAccountAge';
-import { getUserFromTwitch } from '../microservices/getUserFromTwitch';
-import { translate } from '../translate';
 import users from '../users';
 import System from './_interface';
 import levels from './levels';
 import points from './points';
 import ranks from './ranks';
+
+import { prepare } from '~/helpers/commons/';
+import { mainCurrency } from '~/helpers/currency';
+import { dayjs, timezone } from '~/helpers/dayjs';
+import { debug, error } from '~/helpers/log';
+import { get, getUserHighestPermission } from '~/helpers/permissions/';
+import { getPointsName } from '~/helpers/points';
+import * as changelog from '~/helpers/user/changelog.js';
+import api from '~/services/twitch/api';
+import { fetchAccountAge } from '~/services/twitch/calls/fetchAccountAge';
+import { getUserFromTwitch } from '~/services/twitch/calls/getUserFromTwitch';
+import { translate } from '~/translate';
 
 /*
  * !me

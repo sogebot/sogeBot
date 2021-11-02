@@ -1,6 +1,7 @@
-import tmi from '../../chat';
 import { error, info } from '../log';
 import { generalChannel } from '../oauth/generalChannel';
+
+import tmi from '~/services/twitch/chat';
 
 export async function timeout(username: string, seconds: number, isMod: boolean) {
   if (isMod) {

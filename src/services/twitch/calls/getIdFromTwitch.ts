@@ -2,9 +2,9 @@ import axios from 'axios';
 
 import {
   calls, emptyRateLimit, getClientId, getToken, setRateLimit,
-} from '../helpers/api';
-import { error } from '../helpers/log';
-import { ioServer } from '../helpers/panel';
+} from '~/helpers/api';
+import { error } from '~/helpers/log';
+import { ioServer } from '~/helpers/panel';
 
 async function getIdFromTwitch (username: string, isChannelId = false): Promise<string> {
   const url = `https://api.twitch.tv/helix/users?login=${username}`;

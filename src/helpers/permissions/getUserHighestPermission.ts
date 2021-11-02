@@ -1,8 +1,9 @@
+import { Permissions } from '@entity/permissions';
 import { getRepository } from 'typeorm';
 
-import { Permissions } from '../../database/entity/permissions';
 import { addToCachedHighestPermission, getFromCachedHighestPermission } from './cache';
-import { check } from './check';
+
+import { check } from '~/helpers/permissions/check';
 
 async function getUserHighestPermission(userId: string): Promise<string> {
   const cachedPermission = getFromCachedHighestPermission(userId);

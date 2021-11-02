@@ -1,18 +1,19 @@
+import { User, UserInterface } from '@entity/user';
 import { MINUTE } from '@sogebot/ui-helpers/constants';
 import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized';
 import _ from 'lodash';
 import { getRepository } from 'typeorm';
 
-import { User, UserInterface } from '../database/entity/user';
 import { command, settings } from '../decorators';
-import { prepare } from '../helpers/commons';
-import { timeout } from '../helpers/tmi';
-import * as changelog from '../helpers/user/changelog.js';
-import { isBroadcaster } from '../helpers/user/isBroadcaster';
-import { isModerator } from '../helpers/user/isModerator';
 import points from '../systems/points';
-import { translate } from '../translate';
 import Game from './_interface';
+
+import { prepare } from '~/helpers/commons';
+import { timeout } from '~/helpers/tmi';
+import * as changelog from '~/helpers/user/changelog.js';
+import { isBroadcaster } from '~/helpers/user/isBroadcaster';
+import { isModerator } from '~/helpers/user/isModerator';
+import { translate } from '~/translate';
 
 /*
  * !fightme [user] - challenge [user] to fight

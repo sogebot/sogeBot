@@ -1,7 +1,7 @@
+import { Variable } from '@entity/variable';
 import { isNil } from 'lodash';
 import { getRepository } from 'typeorm';
 
-import { Variable } from '../../database/entity/variable';
 import { addToViewersCache, getFromViewersCache } from '../permissions';
 import { check } from '../permissions/';
 import { runScript } from './runScript';

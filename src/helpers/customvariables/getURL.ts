@@ -1,6 +1,6 @@
+import { Variable } from '@entity/variable';
 import { getRepository } from 'typeorm';
 
-import { Variable } from '../../database/entity/variable';
 import { getValueOf } from './getValueOf';
 
 async function getURL(req: any, res: any) {

@@ -6,17 +6,18 @@ import * as _ from 'lodash';
 import {
   command, default_permission, helper,
 } from '../decorators';
-import { calls, setRateLimit } from '../helpers/api';
-import { getOwnerAsSender } from '../helpers/commons';
-import { eventEmitter } from '../helpers/events';
-import { error, warning } from '../helpers/log';
-import { channelId } from '../helpers/oauth';
-import { ioServer } from '../helpers/panel';
-import { addUIError } from '../helpers/panel/alerts';
-import { defaultPermissions } from '../helpers/permissions/';
-import { adminEndpoint } from '../helpers/socket';
-import oauth from '../oauth';
 import System from './_interface';
+
+import { calls, setRateLimit } from '~/helpers/api';
+import { getOwnerAsSender } from '~/helpers/commons';
+import { eventEmitter } from '~/helpers/events';
+import { error, warning } from '~/helpers/log';
+import { channelId } from '~/helpers/oauth';
+import { ioServer } from '~/helpers/panel';
+import { addUIError } from '~/helpers/panel/alerts';
+import { defaultPermissions } from '~/helpers/permissions/';
+import { adminEndpoint } from '~/helpers/socket';
+import oauth from '~/services/twitch/oauth';
 
 /*
  * !commercial                        - gets an info about alias usage

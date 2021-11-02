@@ -1,7 +1,7 @@
+import { User } from '@entity/user';
 import { HOUR, MINUTE } from '@sogebot/ui-helpers/constants';
 import { getRepository } from 'typeorm';
 
-import { User } from '../../database/entity/user';
 import { debug } from '../log';
 import { logAvgTime } from '../profiler';
 import { setImmediateAwait } from '../setImmediateAwait';

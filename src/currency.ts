@@ -7,16 +7,16 @@ import chalk from 'chalk';
 import _ from 'lodash';
 import { getRepository } from 'typeorm';
 
-import Core from './_interface';
-import { UserTip } from './database/entity/user';
-import { settings, ui } from './decorators';
+import Core from '~/_interface';
+import { UserTip } from '~/database/entity/user';
+import { settings, ui } from '~/decorators';
 import {
   onChange, onLoad, onStartup,
-} from './decorators/on';
-import { mainCurrency } from './helpers/currency';
+} from '~/decorators/on';
+import { mainCurrency } from '~/helpers/currency';
 import {
   error, info, warning,
-} from './helpers/log';
+} from '~/helpers/log';
 
 class Currency extends Core {
   mainCurrencyLoaded = false;

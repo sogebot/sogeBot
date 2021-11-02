@@ -1,8 +1,8 @@
 import axios from 'axios';
 
-import { getClientId } from '../helpers/api/getClientId';
-import { getToken } from '../helpers/api/getToken';
-import { error } from '../helpers/log';
+import { getClientId } from '~/helpers/api/getClientId';
+import { getToken } from '~/helpers/api/getToken';
+import { error } from '~/helpers/log';
 
 export const fetchUser = async (id: string): Promise<{
   'id': string,

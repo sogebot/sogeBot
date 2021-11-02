@@ -1,27 +1,28 @@
+import { Highlight, HighlightInterface } from '@entity/highlight';
 import { timestampToObject } from '@sogebot/ui-helpers/getTime';
 import axios from 'axios';
 import { Request, Response } from 'express';
 import { isNil } from 'lodash';
 import { getRepository } from 'typeorm';
 
-import api from '../api';
-import { Highlight, HighlightInterface } from '../database/entity/highlight';
 import {
   command, default_permission, settings, ui,
 } from '../decorators';
+import System from './_interface';
+
 import {
   calls, isStreamOnline, setRateLimit, stats, streamStatusChangeSince,
-} from '../helpers/api';
-import { getBotSender } from '../helpers/commons';
-import { dayjs } from '../helpers/dayjs';
-import { error } from '../helpers/log';
-import { channelId } from '../helpers/oauth';
-import { ioServer } from '../helpers/panel';
-import { defaultPermissions } from '../helpers/permissions/';
-import { adminEndpoint } from '../helpers/socket';
-import oauth from '../oauth';
-import { translate } from '../translate';
-import System from './_interface';
+} from '~/helpers/api';
+import { getBotSender } from '~/helpers/commons';
+import { dayjs } from '~/helpers/dayjs';
+import { error } from '~/helpers/log';
+import { channelId } from '~/helpers/oauth';
+import { ioServer } from '~/helpers/panel';
+import { defaultPermissions } from '~/helpers/permissions/';
+import { adminEndpoint } from '~/helpers/socket';
+import api from '~/services/twitch/api';
+import oauth from '~/services/twitch/oauth';
+import { translate } from '~/translate';
 
 const ERROR_STREAM_NOT_ONLINE = '1';
 const ERROR_MISSING_TOKEN = '2';

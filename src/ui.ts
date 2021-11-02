@@ -2,16 +2,16 @@ import {
   filter, isString, set,
 } from 'lodash';
 
-import Core from './_interface';
-import { settings } from './decorators';
-import general from './general';
-import { mainCurrency, symbol } from './helpers/currency';
-import { timezone } from './helpers/dayjs';
-import { getBroadcaster } from './helpers/getBroadcaster';
-import { generalChannel } from './helpers/oauth/generalChannel';
-import { generalOwners } from './helpers/oauth/generalOwners';
-import { find, list } from './helpers/register';
-import { adminEndpoint, publicEndpoint } from './helpers/socket';
+import Core from '~/_interface';
+import { settings } from '~/decorators';
+import general from '~/general';
+import { mainCurrency, symbol } from '~/helpers/currency';
+import { timezone } from '~/helpers/dayjs';
+import { getBroadcaster } from '~/helpers/getBroadcaster';
+import { generalChannel } from '~/helpers/oauth/generalChannel';
+import { generalOwners } from '~/helpers/oauth/generalOwners';
+import { find, list } from '~/helpers/register';
+import { adminEndpoint, publicEndpoint } from '~/helpers/socket';
 
 import { onChange, onLoad } from '~/decorators/on';
 import { domain } from '~/helpers/ui';
@@ -40,7 +40,7 @@ class UI extends Core {
       try {
         const data: any = {};
 
-        for (const system of ['oauth', 'tmi', 'currency', 'ui', 'general', 'twitch', 'dashboard']) {
+        for (const system of ['currency', 'ui', 'general', 'twitch', 'dashboard']) {
           if (typeof data.core === 'undefined') {
             data.core = {};
           }

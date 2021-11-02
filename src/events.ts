@@ -10,51 +10,51 @@ import _, {
 import safeEval from 'safe-eval';
 import { getRepository } from 'typeorm';
 
-import Core from './_interface';
-import api from './api';
-import tmi from './chat';
-import { parserReply } from './commons';
+import Core from '~/_interface';
+import { parserReply } from '~/commons';
 import {
   Event, EventInterface, Events as EventsEntity,
-} from './database/entity/event';
-import { User } from './database/entity/user';
-import { onStreamEnd } from './decorators/on';
-import events from './events';
+} from '~/database/entity/event';
+import { User } from '~/database/entity/user';
+import { onStreamEnd } from '~/decorators/on';
+import events from '~/events';
 import {
   calls, isStreamOnline, rawStatus, setRateLimit, stats, streamStatusChangeSince,
-} from './helpers/api';
-import { attributesReplace } from './helpers/attributesReplace';
+} from '~/helpers/api';
+import { attributesReplace } from '~/helpers/attributesReplace';
 import {
   announce, getOwner, getUserSender, prepare,
-} from './helpers/commons';
-import { mainCurrency } from './helpers/currency';
+} from '~/helpers/commons';
+import { mainCurrency } from '~/helpers/currency';
 import {
   getAll, getValueOf, setValueOf,
-} from './helpers/customvariables';
-import { csEmitter } from './helpers/customvariables/emitter';
-import { isDbConnected } from './helpers/database';
-import { dayjs } from './helpers/dayjs';
-import { eventEmitter } from './helpers/events/emitter';
+} from '~/helpers/customvariables';
+import { csEmitter } from '~/helpers/customvariables/emitter';
+import { isDbConnected } from '~/helpers/database';
+import { dayjs } from '~/helpers/dayjs';
+import { eventEmitter } from '~/helpers/events/emitter';
 import {
   debug, error, info, warning,
-} from './helpers/log';
-import { channelId } from './helpers/oauth';
-import { ioServer } from './helpers/panel';
-import { addUIError } from './helpers/panel/';
-import { parserEmitter } from './helpers/parser/';
-import { adminEndpoint } from './helpers/socket';
+} from '~/helpers/log';
+import { channelId } from '~/helpers/oauth';
+import { ioServer } from '~/helpers/panel';
+import { addUIError } from '~/helpers/panel/';
+import { parserEmitter } from '~/helpers/parser/';
+import { adminEndpoint } from '~/helpers/socket';
 import {
   isOwner, isSubscriber, isVIP,
-} from './helpers/user';
-import * as changelog from './helpers/user/changelog.js';
-import { isBot, isBotSubscriber } from './helpers/user/isBot';
-import { isBroadcaster } from './helpers/user/isBroadcaster';
-import { isModerator } from './helpers/user/isModerator';
-import Message from './message';
-import { getIdFromTwitch } from './microservices/getIdFromTwitch';
-import { setTitleAndGame } from './microservices/setTitleAndGame';
-import oauth from './oauth';
-import users from './users';
+} from '~/helpers/user';
+import * as changelog from '~/helpers/user/changelog.js';
+import { isBot, isBotSubscriber } from '~/helpers/user/isBot';
+import { isBroadcaster } from '~/helpers/user/isBroadcaster';
+import { isModerator } from '~/helpers/user/isModerator';
+import Message from '~/message';
+import api from '~/services/twitch/api';
+import { getIdFromTwitch } from '~/services/twitch/calls/getIdFromTwitch';
+import { setTitleAndGame } from '~/services/twitch/calls/setTitleAndGame';
+import tmi from '~/services/twitch/chat';
+import oauth from '~/services/twitch/oauth';
+import users from '~/users';
 
 const excludedUsers = new Set<string>();
 
@@ -344,7 +344,7 @@ class Events extends Core {
   public async fireCreateAClipAndPlayReplay(operation: EventsEntity.OperationDefinitions, attributes: EventsEntity.Attributes) {
     const cid = await events.fireCreateAClip(operation);
     if (cid) { // clip created ok
-      require('./overlays/clips').default.showClip(cid);
+      require('~/overlays/clips').default.showClip(cid);
     }
   }
 
@@ -411,13 +411,13 @@ class Events extends Core {
 
   public async fireEmoteExplosion(operation: EventsEntity.OperationDefinitions) {
     // we must require emotes as it is triggering translations in mocha
-    const emotes: typeof import('./emotes') = require('./emotes');
+    const emotes: typeof import('~/emotes') = require('~/emotes');
     emotes.default.explode(String(operation.emotesToExplode).split(' '));
   }
 
   public async fireEmoteFirework(operation: EventsEntity.OperationDefinitions) {
     // we must require emotes as it is triggering translations in mocha
-    const emotes: typeof import('./emotes') = require('./emotes');
+    const emotes: typeof import('~/emotes') = require('~/emotes');
     emotes.default.firework(String(operation.emotesToFirework).split(' '));
   }
 

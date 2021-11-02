@@ -1,9 +1,10 @@
 import { command, settings } from '../decorators';
-import { timeout } from '../helpers/tmi';
-import { isBroadcaster } from '../helpers/user/isBroadcaster';
-import { isModerator } from '../helpers/user/isModerator';
-import { translate } from '../translate';
 import Game from './_interface';
+
+import { timeout } from '~/helpers/tmi';
+import { isBroadcaster } from '~/helpers/user/isBroadcaster';
+import { isModerator } from '~/helpers/user/isModerator';
+import { translate } from '~/translate';
 
 /*
  * !seppuku         - timeout yourself

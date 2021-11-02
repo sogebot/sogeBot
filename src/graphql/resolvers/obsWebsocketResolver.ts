@@ -1,11 +1,11 @@
 import {
+  OBSWebsocket as OBSWebsocketEntity, OBSWebsocketInterface, simpleModeTask,
+} from '@entity/obswebsocket';
+import {
   Arg, Authorized, createUnionType, Field, ID, Mutation, ObjectType, Query, Resolver,
 } from 'type-graphql';
 import { getRepository } from 'typeorm';
 
-import {
-  OBSWebsocket as OBSWebsocketEntity, OBSWebsocketInterface, simpleModeTask,
-} from '../../database/entity/obswebsocket';
 import { obs } from '../../helpers/obswebsocket/client.js';
 import { listScenes } from '../../helpers/obswebsocket/scenes.js';
 import { getSourcesList, getSourceTypesList } from '../../helpers/obswebsocket/sources.js';

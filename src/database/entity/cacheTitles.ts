@@ -13,7 +13,7 @@ export const CacheTitles = new EntitySchema<Readonly<Required<CacheTitlesInterfa
   name:    'cache_titles',
   columns: {
     id: {
-      type: Number, primary: true, generated: 'increment', 
+      type: Number, primary: true, generated: 'increment',
     },
     game:      { type: String },
     title:     { type: String },

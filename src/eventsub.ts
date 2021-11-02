@@ -7,18 +7,18 @@ import localtunnel from 'localtunnel';
 import type QueryString from 'qs';
 import { v4 } from 'uuid';
 
-import Core from './_interface';
-import { persistent, settings } from './decorators';
-import { onChange, onStartup } from './decorators/on';
-import * as hypeTrain from './helpers/api/hypeTrain';
-import { TokenError } from './helpers/errors';
-import { eventEmitter } from './helpers/events';
-import { follow } from './helpers/events/follow';
+import Core from '~/_interface';
+import { persistent, settings } from '~/decorators';
+import { onChange, onStartup } from '~/decorators/on';
+import * as hypeTrain from '~/helpers/api/hypeTrain';
+import { TokenError } from '~/helpers/errors';
+import { eventEmitter } from '~/helpers/events';
+import { follow } from '~/helpers/events/follow';
 import {
   error, info, warning,
-} from './helpers/log';
-import { channelId } from './helpers/oauth';
-import { ioServer } from './helpers/panel';
+} from '~/helpers/log';
+import { channelId } from '~/helpers/oauth';
+import { ioServer } from '~/helpers/panel';
 
 const messagesProcessed: string[] = [];
 let isErrorEventsShown = false;

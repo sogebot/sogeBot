@@ -1,22 +1,23 @@
+import { Alias } from '@entity/alias';
+import { Commands } from '@entity/commands';
+import { Cooldown } from '@entity/cooldown';
+import { Price } from '@entity/price';
+import { Rank } from '@entity/rank';
 import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized';
 import { format } from '@sogebot/ui-helpers/number';
 import _ from 'lodash';
 import { getRepository } from 'typeorm';
 
-import { Alias } from '../database/entity/alias';
-import { Commands } from '../database/entity/commands';
-import { Cooldown } from '../database/entity/cooldown';
-import { Price } from '../database/entity/price';
-import { Rank } from '../database/entity/rank';
 import general from '../general.js';
-import { enabled } from '../helpers/interface/enabled';
-import { error, warning } from '../helpers/log';
-import { get, getCommandPermission } from '../helpers/permissions';
-import { getPointsName } from '../helpers/points';
 import Parser from '../parser';
-import { translate } from '../translate';
 
 import type { ResponseFilter } from '.';
+
+import { enabled } from '~/helpers/interface/enabled';
+import { error, warning } from '~/helpers/log';
+import { get, getCommandPermission } from '~/helpers/permissions';
+import { getPointsName } from '~/helpers/points';
+import { translate } from '~/translate';
 
 const list: ResponseFilter = {
   '(list.#)': async function (filter: string) {
