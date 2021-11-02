@@ -31,7 +31,7 @@ class UI extends Core {
       try {
         const data: any = {};
 
-        for (const system of ['oauth', 'tmi', 'currency', 'ui', 'general', 'twitch']) {
+        for (const system of ['oauth', 'tmi', 'currency', 'ui', 'general', 'twitch', 'dashboard']) {
           if (typeof data.core === 'undefined') {
             data.core = {};
           }
