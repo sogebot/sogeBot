@@ -115,6 +115,7 @@ async function main () {
         require('./eventsub');
         require('./pubsub');
         require('./updater');
+        require('./dashboard');
         require('./panel');
         await autoLoad('./dest/stats/');
         await autoLoad('./dest/registries/');

@@ -20,7 +20,7 @@
   "author": "Michal Orlik <sogehige@gmail.com>",
   "license": "MIT",
   "dependencies": {
-    "@sogebot/ui-admin": "^25.0.0",
+    "@sogebot/ui-admin": "^26.0.0",
     "@sogebot/ui-helpers": "^2.7.2",
     "@sogebot/ui-oauth": "~2.1.1",
     "@sogebot/ui-overlay": "^10.0.0",
@@ -38,7 +38,7 @@
     "currency-symbol-map": "5.0.1",
     "dayjs": "1.10.7",
     "decode-html": "2.0.0",
-    "discord.js": "13.3.0",
+    "discord.js": "13.3.1",
     "dotenv": "10.0.0",
     "emoji-regex": "9.2.2",
     "express": "^4.17.1",
