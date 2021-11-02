@@ -93,6 +93,7 @@ export class overlayResolver {
       obswebsocket:    items.filter(o => o.value === 'obswebsocket'),
       group:           items.filter(o => o.value === 'group'),
       stats:           items.filter(o => o.value === 'stats'),
+      wordcloud:       items.filter(o => o.value === 'wordcloud'),
     } as OverlayObject;
     return response;
   }

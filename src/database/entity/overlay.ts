@@ -89,6 +89,20 @@ export interface OverlayMapperStopwatch {
   },
 }
 
+export interface OverlayMapperWordcloud {
+  id: string;
+  value: 'wordcloud';
+  opts: {
+    fadeOutInterval: number;
+    fadeOutIntervalType: 'seconds' | 'minutes' | 'hours';
+    wordFont: {
+      family: string;
+      weight: number;
+      color: string;
+    }
+  },
+}
+
 export interface OverlayMapperCountdown {
   id: string;
   value: 'countdown';

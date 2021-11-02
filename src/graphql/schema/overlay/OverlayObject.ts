@@ -26,6 +26,7 @@ import { OverlayPollsObject } from './OverlayPollsObject';
 import { OverlayStatsObject } from './OverlayStatsObject';
 import { OverlayStopwatchObject } from './OverlayStopwatchObject';
 import { OverlayTTSObject } from './OverlayTTSObject';
+import { OverlayWordcloudObject } from './OverlayWordcloudObject';
 
 @ObjectType()
 export class OverlayObject {
@@ -67,4 +68,6 @@ export class OverlayObject {
   carousel: OverlayMapperCarousel[];
   @Field(type => [OverlayStatsObject])
   stats: OverlayMapperInterface[];
+  @Field(type => [OverlayWordcloudObject])
+  wordcloud: OverlayMapperInterface[];
 }
