@@ -6,6 +6,8 @@ import {
   Brackets, FindOneOptions, getConnection, getRepository, IsNull,
 } from 'typeorm';
 
+import client from './services/twitch/api/client';
+
 import Core from '~/_interface';
 import currency from '~/currency';
 import { Permissions } from '~/database/entity/permissions';
@@ -17,10 +19,10 @@ import { isStreamOnline, stats } from '~/helpers/api';
 import { getClientId } from '~/helpers/api/getClientId';
 import { getToken } from '~/helpers/api/getToken';
 import { mainCurrency } from '~/helpers/currency';
+import { get } from '~/helpers/interfaceEmitter';
 import {
   debug, error, isDebugEnabled,
 } from '~/helpers/log';
-import { channelId } from '~/helpers/oauth';
 import { recacheOnlineUsersPermission } from '~/helpers/permissions';
 import { defaultPermissions, getUserHighestPermission } from '~/helpers/permissions/';
 import { adminEndpoint, viewerEndpoint } from '~/helpers/socket';
@@ -60,19 +62,19 @@ class Users extends Core {
           .having('count > 1');
       }
       const viewers = await query.getRawMany();
+      const clientBot = await client('bot');
       await Promise.all(viewers.map(async (duplicate) => {
         const userName = duplicate.user_username;
         const duplicates = await getRepository(User).find({ userName });
         await Promise.all(duplicates.map(async (user) => {
           try {
-            const api = (await import('~/services/twitch/api')).default;
-            const newUsername = await api.getUsernameFromTwitch(user.userId);
-            if (newUsername === null) {
+            const getUserById = await clientBot.users.getUserById(user.userId);
+            if (!getUserById) {
               throw new Error('unknown');
             }
-            if (newUsername !== userName) {
-              changelog.update(user.userId, { userName: newUsername });
-              debug('users', `Duplicate username ${user.userName}#${user.userId} changed to ${newUsername}#${user.userId}`);
+            if (getUserById.name !== userName) {
+              changelog.update(user.userId, { userName: getUserById.name });
+              debug('users', `Duplicate username ${user.userName}#${user.userId} changed to ${getUserById.name}#${user.userId}`);
             }
           } catch (e: any) {
             // we are tagging user as __AnonymousUser__, we don't want to get rid of all information
@@ -203,11 +205,11 @@ class Users extends Core {
   async getNameById (userId: string): Promise<string> {
     const user = await await changelog.get(userId);
     if (!user) {
-      const api = (await import('~/services/twitch/api')).default;
-      const userName = await api.getUsernameFromTwitch(userId);
-      if (userName) {
-        changelog.update(userId, { userName });
-        return userName;
+      const clientBot = await client('bot');
+      const getUserById = await clientBot.users.getUserById(userId);
+      if (getUserById) {
+        changelog.update(userId, { userName: getUserById.name });
+        return getUserById.name;
       } else {
         throw new Error('Cannot get username for userId ' + userId);
       }
@@ -462,7 +464,7 @@ class Users extends Core {
     });
     adminEndpoint(this.nsp, 'viewers::followedAt', async (id, cb) => {
       try {
-        const cid = channelId.value;
+        const cid = await get<string>('/services/twitch', 'channelId');
         const url = `https://api.twitch.tv/helix/users/follows?from_id=${id}&to_id=${cid}`;
 
         const token = await getToken('bot');

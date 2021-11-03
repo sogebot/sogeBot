@@ -11,6 +11,7 @@ import strip from 'strip-comments';
 import { getRepository } from 'typeorm';
 
 import Message from '../../message';
+import client from '../../services/twitch/api/client';
 import users from '../../users';
 import {
   chatMessagesAtStart, isStreamOnline, stats, streamStatusChangeSince,
@@ -24,8 +25,6 @@ import { linesParsed } from '../parser';
 import * as changelog from '../user/changelog.js';
 import { isModerator } from '../user/isModerator';
 import { getAll } from './getAll';
-
-import { getUserFromTwitch } from '~/services/twitch/calls/getUserFromTwitch';
 
 async function runScript (script: string, opts: { sender: { userId: string; userName: string; source: 'twitch' | 'discord' } | string | null, isUI: boolean; param?: string | number, _current: any }) {
   debug('customvariables.eval', opts);
@@ -167,27 +166,32 @@ async function runScript (script: string, opts: { sender: { userId: string; user
       } else {
         try {
           // we don't have data of user, we will try to get them
-          const userFromTwitch = await getUserFromTwitch(userName);
-          changelog.update(userFromTwitch.id, {
-            userName,
-            userId:          userFromTwitch.id,
-            displayname:     userFromTwitch.display_name,
-            profileImageUrl: userFromTwitch.profile_image_url,
-          });
+          const clientBot = await client('bot');
+          const getUserByName = await clientBot.users.getUserByName(userName);
+          if (!getUserByName) {
+            return null;
+          } else {
+            changelog.update(getUserByName.id, {
+              userName,
+              userId:          getUserByName.id,
+              displayname:     getUserByName.displayName,
+              profileImageUrl: getUserByName.profilePictureUrl,
+            });
 
-          const userObj = {
-            userName,
-            id:          userFromTwitch.id,
-            displayname: userFromTwitch.display_name,
-            is:          {
-              online:     false,
-              follower:   false,
-              vip:        false,
-              subscriber: false,
-              mod:        false,
-            },
-          };
-          return userObj;
+            const userObj = {
+              userName,
+              id:          getUserByName.id,
+              displayname: getUserByName.displayName,
+              is:          {
+                online:     false,
+                follower:   false,
+                vip:        false,
+                subscriber: false,
+                mod:        false,
+              },
+            };
+            return userObj;
+          }
         } catch (e: any) {
           error(e.stack);
           return null;

@@ -5,14 +5,12 @@ import {
 } from '~/helpers/api';
 import { apiEmitter } from '~/helpers/api/emitter';
 import { error } from '~/helpers/log';
-import { channelId } from '~/helpers/oauth';
 import { ioServer } from '~/helpers/panel';
-import oauth from '~/services/twitch/oauth';
 
 apiEmitter.on('updateChannelViewsAndBroadcasterType', () => updateChannelViewsAndBroadcasterType());
 
 async function updateChannelViewsAndBroadcasterType () {
-  const cid = channelId.value;
+  const cid = await get<string>('/services/twitch', 'channelId');
   const url = `https://api.twitch.tv/helix/users/?id=${cid}`;
 
   const notEnoughAPICalls = calls.bot.remaining <= 30 && calls.bot.refresh > Date.now() / 1000;

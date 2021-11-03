@@ -12,6 +12,10 @@ import {
 import { isNil } from 'lodash';
 import { getRepository } from 'typeorm';
 
+import emitter from '../../helpers/interfaceEmitter';
+import { default as apiClient } from './api/client';
+import { refresh } from './token/refresh';
+
 import { parserReply } from '~/commons';
 import { timer } from '~/decorators';
 import {
@@ -43,8 +47,6 @@ import eventlist from '~/overlays/eventlist';
 import { Parser } from '~/parser';
 import alerts from '~/registries/alerts';
 import api from '~/services/twitch/api';
-import { getUserFromTwitch } from '~/services/twitch/calls/getUserFromTwitch';
-import oauth from '~/services/twitch/oauth';
 import alias from '~/systems/alias';
 import customcommands from '~/systems/customcommands';
 import { translate } from '~/translate';
@@ -134,7 +136,7 @@ class TMI {
         error('Bot oauth is not properly set');
         this.botWarning = true;
       }
-      oauth.refreshAccessToken(type).then(() => {
+      refresh(type).then(() => {
         this.initClient(type);
       });
     }
@@ -443,7 +445,11 @@ class TMI {
 
       let profileImageUrl = null;
       if (user.profileImageUrl.length === 0) {
-        profileImageUrl = (await getUserFromTwitch(user.userName)).profile_image_url;
+        const clientBot = await apiClient('bot');
+        const getUserByName = await clientBot.users.getUserByName(user.userName);
+        if (getUserByName) {
+          profileImageUrl = getUserByName.profilePictureUrl;
+        }
       }
 
       changelog.update(user.userId, {
@@ -518,7 +524,11 @@ class TMI {
 
       let profileImageUrl = null;
       if (user.profileImageUrl.length === 0) {
-        profileImageUrl = (await getUserFromTwitch(user.userName)).profile_image_url;
+        const clientBot = await apiClient('bot');
+        const getUserByName = await clientBot.users.getUserByName(user.userName);
+        if (getUserByName) {
+          profileImageUrl = getUserByName.profilePictureUrl;
+        }
       }
 
       changelog.update(user.userId, {
@@ -827,7 +837,7 @@ class TMI {
       sender: userstate, message: message, skip: skip, quiet: quiet, id: data.id, emotesOffsets: data.emotesOffsets, isAction: data.isAction,
     });
 
-    const whisperListener = await new Promise<boolean>(resolve => tmiEmitter.emit('get::whisperListener', (value) => resolve(value)));
+    const whisperListener = await new Promise<boolean>(resolve => emitter.emit('get', '/services/twitch/', 'whisperListener', (value) => resolve(value)));
     if (!skip
         && data.isWhisper
         && (whisperListener || isOwner(userstate))) {

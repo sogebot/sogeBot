@@ -53,7 +53,6 @@ import { sendGameFromTwitch } from '~/services/twitch/calls/sendGameFromTwitch';
 import { setTags } from '~/services/twitch/calls/setTags';
 import { setTitleAndGame } from '~/services/twitch/calls/setTitleAndGame';
 import tmi from '~/services/twitch/chat';
-import oauth from '~/services/twitch/oauth';
 import { default as socketSystem } from '~/socket';
 import highlights from '~/systems/highlights';
 import songs from '~/systems/songs';

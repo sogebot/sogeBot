@@ -12,7 +12,6 @@ import { broadcasterId } from '~/helpers/oauth/broadcasterId';
 import { addUIError } from '~/helpers/panel/alerts';
 import eventlist from '~/overlays/eventlist';
 import alerts from '~/registries/alerts';
-import oauth from '~/services/twitch/oauth';
 
 const pubsubEndpoint: Readonly<string> = 'wss://pubsub-edge.twitch.tv';
 const heartbeatInterval: Readonly<number> = 2 * 60 * SECOND;

@@ -18,8 +18,8 @@ import {
 } from 'typeorm';
 import { MysqlConnectionOptions } from 'typeorm/driver/mysql/MysqlConnectionOptions';
 
+import client from '../api/client';
 import { fetchAccountAge } from './fetchAccountAge';
-import { getUsersFromTwitch } from './getUserFromTwitch';
 
 import { getAllOnlineUsernames } from '~/helpers/getAllOnlineUsernames';
 import {
@@ -170,16 +170,17 @@ export const getChannelChattersUnofficialAPI = async (): Promise<{ partedUsers: 
       }
     }
 
+    const clientBot = await client('bot');
     for (const usernameBatch of chunk(usersToFetch, 100)) {
-      getUsersFromTwitch(usernameBatch).then(users => {
+      clientBot.users.getUsersByNames(usernameBatch).then(users => {
         if (users) {
           getRepository(User).save(
             users.map(user => {
               return {
                 userId:          user.id,
-                userName:        user.login,
-                displayname:     user.display_name,
-                profileImageUrl: user.profile_image_url,
+                userName:        user.name,
+                displayname:     user.displayName,
+                profileImageUrl: user.profilePictureUrl,
               };
             }),
             { chunk: Math.floor(SQLVariableLimit / 4) },

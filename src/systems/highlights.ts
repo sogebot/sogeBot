@@ -1,6 +1,5 @@
 import { Highlight, HighlightInterface } from '@entity/highlight';
 import { timestampToObject } from '@sogebot/ui-helpers/getTime';
-import axios from 'axios';
 import { Request, Response } from 'express';
 import { isNil } from 'lodash';
 import { getRepository } from 'typeorm';
@@ -8,20 +7,21 @@ import { getRepository } from 'typeorm';
 import {
   command, default_permission, settings, ui,
 } from '../decorators';
+import client from '../services/twitch/api/client';
+import { createClip } from '../services/twitch/calls/createClip';
 import System from './_interface';
 
 import {
-  calls, isStreamOnline, setRateLimit, stats, streamStatusChangeSince,
+  calls, isStreamOnline, stats, streamStatusChangeSince,
 } from '~/helpers/api';
 import { getBotSender } from '~/helpers/commons';
 import { dayjs } from '~/helpers/dayjs';
+import { get } from '~/helpers/interfaceEmitter';
 import { error } from '~/helpers/log';
-import { channelId } from '~/helpers/oauth';
 import { ioServer } from '~/helpers/panel';
 import { defaultPermissions } from '~/helpers/permissions/';
 import { adminEndpoint } from '~/helpers/socket';
-import api from '~/services/twitch/api';
-import oauth from '~/services/twitch/oauth';
+import { createMarker } from '~/services/twitch/calls/createMarker';
 import { translate } from '~/translate';
 
 const ERROR_STREAM_NOT_ONLINE = '1';
@@ -53,10 +53,12 @@ class Highlights extends System {
     adminEndpoint(this.nsp, 'generic::getAll', async (cb) => {
       try {
         const highlightsToCheck = await getRepository(Highlight).find({ order: { createdAt: 'DESC' }, where: { expired: false } });
-        const availableVideos = await api.getVideos(highlightsToCheck.map(o => o.videoId));
+
+        const clientBot = await client('bot');
+        const availableVideos = await clientBot.videos.getVideosByIds(highlightsToCheck.map(o => o.videoId));
 
         for (const highlight of highlightsToCheck) {
-          if (!availableVideos.includes(highlight.videoId)) {
+          if (!availableVideos.find(o => o.id === highlight.videoId)) {
             await getRepository(Highlight).update(highlight.id, { expired: true });
           }
         }
@@ -90,8 +92,15 @@ class Highlights extends System {
           return res.status(412).send({ error: 'Stream is offline' });
         } else {
           if (url.clip) {
-            const cid = await api.createClip({ hasDelay: false });
-            if (!cid) { // Something went wrong
+            try {
+              const cid = await createClip({ createAfterDelay: false });
+              if (!cid) {
+                throw new Error('Clip was not created!');
+              }
+            } catch (e) {
+              if (e instanceof Error) {
+                error(e.stack ?? e.message);
+              }
               return res.status(403).send({ error: 'Clip was not created!' });
             }
           }
@@ -111,31 +120,19 @@ class Highlights extends System {
   @command('!highlight')
   @default_permission(defaultPermissions.CASTERS)
   public async main(opts: CommandOptions): Promise<CommandResponse[]> {
-    const token = oauth.botAccessToken;
-    const cid = channelId.value;
-    const url = `https://api.twitch.tv/helix/videos?user_id=${cid}&type=archive&first=1`;
+    const channelId = await get<string>('/services/twitch', 'channelId');
 
     try {
       if (!isStreamOnline.value) {
         throw Error(ERROR_STREAM_NOT_ONLINE);
       }
-      if (token === '' || cid === '') {
-        throw Error(ERROR_MISSING_TOKEN);
-      }
 
-      // we need to load video id
-      const request = await axios.get<any>(url, {
-        headers: {
-          Authorization: 'Bearer ' + token,
-          'Client-ID':   oauth.botClientId,
-        },
-      });
-      // save remaining api calls
-      setRateLimit('bot', request.headers as any);
+      const clientBot = await client('bot');
+      const videos = await clientBot.videos.getVideosByUser(channelId, { type: 'archive', limit: 1 });
 
       const timestamp = timestampToObject(dayjs().valueOf() - dayjs(streamStatusChangeSince.value).valueOf());
       const highlight = {
-        videoId:   request.data.data[0].id,
+        videoId:   videos.data[0].id,
         timestamp: {
           hours: timestamp.hours, minutes: timestamp.minutes, seconds: timestamp.seconds,
         },
@@ -144,10 +141,6 @@ class Highlights extends System {
         createdAt: Date.now(),
         expired:   false,
       };
-
-      ioServer?.emit('api.stats', {
-        method: 'GET', data: request.data, timestamp: Date.now(), call: 'highlights', api: 'helix', endpoint: url, code: request.status, remaining: calls.bot.remaining,
-      });
       return this.add(highlight, timestamp, opts);
     } catch (err: any) {
       ioServer?.emit('api.stats', {
@@ -168,7 +161,7 @@ class Highlights extends System {
   }
 
   public async add(highlight: HighlightInterface, timestamp: TimestampObject, opts: CommandOptions): Promise<CommandResponse[]> {
-    api.createMarker();
+    createMarker();
     getRepository(Highlight).insert(highlight);
     return [{
       response: translate('highlights.saved')

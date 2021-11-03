@@ -21,7 +21,6 @@ import { unserialize } from '~/helpers/type';
 import * as changelog from '~/helpers/user/changelog.js';
 import { getIgnoreList, isIgnored } from '~/helpers/user/isIgnored';
 import twitch from '~/services/twitch';
-import oauth from '~/services/twitch/oauth';
 import { translate } from '~/translate';
 
 enum TYPE {

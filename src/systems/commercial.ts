@@ -12,12 +12,10 @@ import { calls, setRateLimit } from '~/helpers/api';
 import { getOwnerAsSender } from '~/helpers/commons';
 import { eventEmitter } from '~/helpers/events';
 import { error, warning } from '~/helpers/log';
-import { channelId } from '~/helpers/oauth';
 import { ioServer } from '~/helpers/panel';
 import { addUIError } from '~/helpers/panel/alerts';
 import { defaultPermissions } from '~/helpers/permissions/';
 import { adminEndpoint } from '~/helpers/socket';
-import oauth from '~/services/twitch/oauth';
 
 /*
  * !commercial                        - gets an info about alias usage
@@ -59,7 +57,7 @@ class Commercial extends System {
       return [{ response: `Usage: ${opts.command} [duration] [optional-message]`, ...opts }];
     }
 
-    const cid = channelId.value;
+    const cid = await get<string>('/services/twitch', 'channelId');
     // check if duration is correct (30, 60, 90, 120, 150, 180)
     if ([30, 60, 90, 120, 150, 180].includes(commercial.duration)) {
       const url = `https://api.twitch.tv/helix/channels/commercial`;

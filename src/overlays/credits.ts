@@ -12,7 +12,6 @@ import {
 import { mainCurrency } from '~/helpers/currency';
 import { publicEndpoint } from '~/helpers/socket';
 import api from '~/services/twitch/api';
-import oauth from '~/services/twitch/oauth';
 
 class Credits extends Overlay {
   sockets () {

@@ -6,7 +6,6 @@ import type { ResponseFilter } from '.';
 
 import * as changelog from '~/helpers/user/changelog.js';
 import { isIgnored } from '~/helpers/user/isIgnored';
-import oauth from '~/services/twitch/oauth';
 
 const random: ResponseFilter = {
   '(random.online.viewer)': async function () {

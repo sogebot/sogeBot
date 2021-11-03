@@ -8,11 +8,10 @@ import {
   calls, getClientId, getToken, setRateLimit,
 } from '~/helpers/api';
 import { error } from '~/helpers/log';
-import { channelId } from '~/helpers/oauth';
 import { ioServer } from '~/helpers/panel';
 
 async function setTags (tagsArg: string[]) {
-  const cid = channelId.value;
+  const cid = await get<string>('/services/twitch', 'channelId');
   const url = `https://api.twitch.tv/helix/streams/tags?broadcaster_id=${cid}`;
 
   const tag_ids: string[] = [];

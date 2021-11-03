@@ -36,7 +36,6 @@ import { eventEmitter } from '~/helpers/events/emitter';
 import {
   debug, error, info, warning,
 } from '~/helpers/log';
-import { channelId } from '~/helpers/oauth';
 import { ioServer } from '~/helpers/panel';
 import { addUIError } from '~/helpers/panel/';
 import { parserEmitter } from '~/helpers/parser/';
@@ -53,7 +52,6 @@ import api from '~/services/twitch/api';
 import { getIdFromTwitch } from '~/services/twitch/calls/getIdFromTwitch';
 import { setTitleAndGame } from '~/services/twitch/calls/setTitleAndGame';
 import tmi from '~/services/twitch/chat';
-import oauth from '~/services/twitch/oauth';
 import users from '~/users';
 
 const excludedUsers = new Set<string>();
@@ -360,7 +358,7 @@ class Events extends Core {
   }
 
   public async fireStartCommercial(operation: EventsEntity.OperationDefinitions) {
-    const cid = channelId.value;
+    const cid = await get<string>('/services/twitch', 'channelId');
     const url = `https://api.twitch.tv/helix/channels/commercial`;
 
     const token = await oauth.broadcasterAccessToken;

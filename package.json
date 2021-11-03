@@ -25,6 +25,7 @@
     "@sogebot/ui-oauth": "~2.1.1",
     "@sogebot/ui-overlay": "^12.0.0",
     "@sogebot/ui-public": "^2.0.0",
+    "@twurple/api": "^5.0.8",
     "@twurple/chat": "^5.0.8",
     "axios": "0.23.0",
     "basic-auth": "2.0.1",

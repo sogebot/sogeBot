@@ -1,47 +1,26 @@
 import { setImmediate } from 'timers';
 
 import { shuffle } from '@sogebot/ui-helpers/array';
-import * as constants from '@sogebot/ui-helpers/constants';
-import axios, { AxiosResponse } from 'axios';
+import axios from 'axios';
 import { getManager, getRepository } from 'typeorm';
 import { v4 as uuid } from 'uuid';
 import XRegExp from 'xregexp';
 
-import Core from '~/_interface';
+import client from './api/client';
+import { validate } from './token/validate';
+
 import { CacheEmotes, CacheEmotesInterface } from '~/database/entity/cacheEmotes';
-import { parser } from '~/decorators';
-import { onStartup } from '~/decorators/on';
+import { get } from '~/helpers/interfaceEmitter';
 import {
   debug,
   error, info, warning,
 } from '~/helpers/log';
-import { channelId } from '~/helpers/oauth';
 import { ioServer } from '~/helpers/panel';
 import { setImmediateAwait } from '~/helpers/setImmediateAwait';
-import { adminEndpoint, publicEndpoint } from '~/helpers/socket';
-import oauth from '~/services/twitch/oauth';
-
-interface EmotesCommons {
-  id: string,
-  name: string,
-  images: {
-    url_1x: string,
-    url_2x: string,
-    url_4x: string,
-  },
-}
-
-interface GlobalEmotesEndpoint { data: EmotesCommons[]}
-
-interface ChannelEmotesEndpoint { data: (EmotesCommons & {
-  tier: string,
-  emote_type: 'subscriptions' | 'bitstier' | 'follower',
-  emote_set_id: string,
-})[]}
 
 let broadcasterWarning = false;
 
-class Emotes extends Core {
+class Emotes {
   fetch = {
     global:  false,
     channel: false,
@@ -55,8 +34,7 @@ class Emotes extends Core {
   lastFFZEmoteChk = 0;
   lastBTTVEmoteChk = 0;
 
-  @onStartup()
-  onStartup() {
+  constructor() {
     setInterval(() => {
       if (!this.fetch.global) {
         this.fetchEmotesGlobal();
@@ -71,28 +49,6 @@ class Emotes extends Core {
         this.fetchEmotesBTTV();
       }
     }, 1000);
-  }
-
-  sockets () {
-    publicEndpoint(this.nsp, 'getCache', async (cb) => {
-      try {
-        cb(null, await getRepository(CacheEmotes).find());
-      } catch (e: any) {
-        cb(e.stack, []);
-      }
-    });
-    adminEndpoint(this.nsp, 'testExplosion', (cb) => {
-      this._testExplosion();
-      cb(null, null);
-    });
-    adminEndpoint(this.nsp, 'testFireworks', (cb) => {
-      this._testFireworks();
-      cb(null, null);
-    });
-    adminEndpoint(this.nsp, 'test', (cb) => {
-      this._test();
-      cb(null, null);
-    });
   }
 
   async removeCache () {
@@ -117,11 +73,16 @@ class Emotes extends Core {
   }
 
   async fetchEmotesChannel () {
-    const cid = channelId.value;
+    const cid = await get<string>('/services/twitch', 'channelId');
     this.fetch.channel = true;
 
-    if (cid && oauth.broadcasterType !== null && (Date.now() - this.lastSubscriberEmoteChk > 1000 * 60 * 60 * 24 * 7 || this.lastChannelChk !== cid)) {
-      if (oauth.broadcasterType === '' && !broadcasterWarning) {
+    const [ broadcasterType, botAccessToken ] = await Promise.all([
+      get<string | null>('/services/twitch', 'broadcasterType'),
+      get<string>('/services/twitch', 'botAccessToken'),
+    ]);
+
+    if (cid && broadcasterType !== null && (Date.now() - this.lastSubscriberEmoteChk > 1000 * 60 * 60 * 24 * 7 || this.lastChannelChk !== cid)) {
+      if (broadcasterType === '' && !broadcasterWarning) {
         info(`EMOTES: Skipping fetching of ${cid} emotes - not subscriber/affiliate`);
         broadcasterWarning = true;
       } else {
@@ -129,31 +90,25 @@ class Emotes extends Core {
         this.lastSubscriberEmoteChk = Date.now();
         this.lastChannelChk = cid;
         try {
-          await oauth.validateOAuth('bot');
-          const token = oauth.botAccessToken;
-          if (!token) {
+          if (!botAccessToken) {
             this.lastSubscriberEmoteChk = 0; // recheck next tick
             this.fetch.channel = false;
             return;
           }
+
           info(`EMOTES: Fetching channel ${cid} emotes`);
-          const request = await axios.get<any>('https://api.twitch.tv/helix/chat/emotes?broadcaster_id=' + cid, {
-            headers: {
-              'Authorization': 'Bearer ' + token,
-              'Client-ID':     oauth.botClientId,
-            },
-            timeout: 20000,
-          }) as AxiosResponse<ChannelEmotesEndpoint>;
-          const emotes = request.data.data;
+          await validate('bot');
+          const clientBot = await client('bot');
+          const emotes = await clientBot.chat.getChannelEmotes(cid);
           for (const emote of emotes) {
             debug('emotes.channel', `Saving to cache ${emote.name}#${emote.id}`);
             await getRepository(CacheEmotes).save({
               code: emote.name,
               type: 'twitch',
               urls: {
-                '1': emote.images.url_1x,
-                '2': emote.images.url_2x,
-                '3': emote.images.url_4x,
+                '1': emote.getImageUrl(1),
+                '2': emote.getImageUrl(2),
+                '3': emote.getImageUrl(4),
               },
             });
           }
@@ -174,26 +129,23 @@ class Emotes extends Core {
   async fetchEmotesGlobal () {
     this.fetch.global = true;
 
+    const [ botAccessToken ] = await Promise.all([
+      get<string>('/services/twitch', 'botAccessToken'),
+    ]);
+
     // we want to update once every week
     if (Date.now() - this.lastGlobalEmoteChk > 1000 * 60 * 60 * 24 * 7) {
       this.lastGlobalEmoteChk = Date.now();
       try {
-        await oauth.validateOAuth('bot');
-        const token = oauth.botAccessToken;
-        if (!token) {
+        if (!botAccessToken) {
           this.lastGlobalEmoteChk = 0; // recheck next tick
           this.fetch.global = false;
           return;
         }
         info('EMOTES: Fetching global emotes');
-        const request = await axios.get<any>('https://api.twitch.tv/helix/chat/emotes/global', {
-          headers: {
-            'Authorization': 'Bearer ' + token,
-            'Client-ID':     oauth.botClientId,
-          },
-          timeout: 20000,
-        }) as AxiosResponse<GlobalEmotesEndpoint>;
-        const emotes = request.data.data;
+        await validate('bot');
+        const clientBot = await client('bot');
+        const emotes = await clientBot.chat.getGlobalEmotes();
         for (const emote of emotes) {
           await setImmediateAwait();
           debug('emotes.global', `Saving to cache ${emote.name}#${emote.id}`);
@@ -201,9 +153,9 @@ class Emotes extends Core {
             code: emote.name,
             type: 'twitch',
             urls: {
-              '1': emote.images.url_1x,
-              '2': emote.images.url_2x,
-              '3': emote.images.url_4x,
+              '1': emote.getImageUrl(1),
+              '2': emote.getImageUrl(2),
+              '3': emote.getImageUrl(4),
             },
           });
         }
@@ -218,8 +170,10 @@ class Emotes extends Core {
   }
 
   async fetchEmotesFFZ () {
-    const cid = channelId.value;
-    const channel = oauth.currentChannel;
+    const [ cid, channel ] = await Promise.all([
+      get<string>('/services/twitch', 'channelId'),
+      get<string>('/services/twitch', 'currentChannel'),
+    ]);
 
     if (channel.length === 0) {
       setImmediate(() => this.fetchEmotesFFZ());
@@ -262,7 +216,9 @@ class Emotes extends Core {
   }
 
   async fetchEmotesBTTV () {
-    const channel = oauth.currentChannel;
+    const [ channel ] = await Promise.all([
+      get<string>('/services/twitch', 'currentChannel'),
+    ]);
 
     if (channel.length === 0) {
       setImmediate(() => this.fetchEmotesFFZ());
@@ -336,7 +292,6 @@ class Emotes extends Core {
     ioServer?.of('/core/emotes').emit('emote.explode', { emotes });
   }
 
-  @parser({ priority: constants.LOW, fireAndForget: true })
   async containsEmotes (opts: ParserOptions) {
     if (!opts.sender || opts.emotesOffsets.size === 0) {
       return true;
@@ -411,4 +366,4 @@ class Emotes extends Core {
   }
 }
 
-export default new Emotes();
+export default Emotes;

@@ -34,7 +34,6 @@ import { adminEndpoint } from '~/helpers/socket';
 import * as changelog from '~/helpers/user/changelog.js';
 import { isBot, isBotId } from '~/helpers/user/isBot';
 import { getIdFromTwitch } from '~/services/twitch/calls/getIdFromTwitch';
-import oauth from '~/services/twitch/oauth';
 import { translate } from '~/translate';
 
 class Points extends System {

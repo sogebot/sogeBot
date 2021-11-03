@@ -46,7 +46,6 @@ import { get as getPermission } from '~/helpers/permissions/get';
 import { adminEndpoint } from '~/helpers/socket';
 import * as changelog from '~/helpers/user/changelog.js';
 import { getIdFromTwitch } from '~/services/twitch/calls/getIdFromTwitch';
-import oauth from '~/services/twitch/oauth';
 
 class Discord extends Integration {
   client: DiscordJs.Client | null = null;

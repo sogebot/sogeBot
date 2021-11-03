@@ -1,25 +1,32 @@
 import { EventList } from '@entity/eventList';
 import { User } from '@entity/user';
+import * as constants from '@sogebot/ui-helpers/constants';
 import { getTime } from '@sogebot/ui-helpers/getTime';
 import { getRepository } from 'typeorm';
 
+import { CacheEmotes } from '../database/entity/cacheEmotes';
 import {
-  command, default_permission, settings,
+  command, default_permission, parser, persistent, settings,
 } from '../decorators';
 import { onChange, onLoad, onStartup } from '../decorators/on';
 import Expects from '../expects';
-import { error } from '../helpers/log';
+import emitter from '../helpers/interfaceEmitter';
+import { debug, error } from '../helpers/log';
 import users from '../users';
 import Service from './_interface';
-import oauth from './twitch/oauth';
+import { getChannelId } from './twitch/calls/getChannelId';
+import Emotes from './twitch/emotes';
+import { cache, validate } from './twitch/token/validate';
 
 import {
   isStreamOnline, stats, streamStatusChangeSince,
 } from '~/helpers/api';
 import { prepare } from '~/helpers/commons/prepare';
 import { dayjs, timezone } from '~/helpers/dayjs';
+import { setOAuthStatus } from '~/helpers/OAuthStatus';
+import { cleanViewersCache } from '~/helpers/permissions';
 import { defaultPermissions } from '~/helpers/permissions/';
-import { adminEndpoint } from '~/helpers/socket';
+import { adminEndpoint, publicEndpoint } from '~/helpers/socket';
 import {
   globalIgnoreListExclude, ignorelist, sendWithMe, setMuteStatus, showWithAt,
 } from '~/helpers/tmi';
@@ -30,9 +37,20 @@ import { sendGameFromTwitch } from '~/services/twitch/calls/sendGameFromTwitch';
 import { setTitleAndGame } from '~/services/twitch/calls/setTitleAndGame';
 import { translate } from '~/translate';
 
+const urls = {
+  'SogeBot Token Generator': 'https://twitch-token-generator.soge.workers.dev/refresh/',
+};
+
 class Twitch extends Service {
-  oauth: typeof import('./twitch/oauth').default;
   tmi: typeof import('./twitch/chat').default;
+  api: typeof import('./twitch/api').default;
+  emotes: import('./twitch/emotes').default;
+
+  botTokenValid = false;
+  broadcasterTokenValid = false;
+
+  @persistent()
+  channelId = '';
 
   @settings('general')
   isTitleForced = false;
@@ -52,12 +70,136 @@ class Twitch extends Service {
   @settings('chat')
   whisperListener = false;
 
+  @settings('bot')
+  botClientId = '';
+  @settings('broadcaster')
+  broadcasterClientId = '';
+
+  @settings('general')
+  tokenService: keyof typeof urls = 'SogeBot Token Generator';
+  @settings('general')
+  tokenServiceCustomClientId = '';
+  @settings('general')
+  tokenServiceCustomClientSecret = '';
+
+  @settings('general')
+  generalChannel = '';
+
+  @settings('general')
+  generalOwners: string[] = [];
+
+  @settings('broadcaster')
+  broadcasterAccessToken = '';
+
+  @settings('broadcaster')
+  broadcasterRefreshToken = '';
+
+  @settings('broadcaster')
+  broadcasterUsername = '';
+
+  @settings('broadcaster', true)
+  broadcasterExpectedScopes: string[] = [
+    'channel_editor',
+    'chat:read',
+    'chat:edit',
+    'channel:moderate',
+    'channel:read:subscriptions',
+    'user:edit:broadcast',
+    'user:read:broadcast',
+    'channel:edit:commercial',
+    'channel:read:redemptions',
+    'moderation:read',
+    'channel:read:hype_train',
+  ];
+
+  @settings('broadcaster')
+  broadcasterCurrentScopes: string[] = [];
+
+  @settings('bot')
+  botAccessToken = '';
+
+  @settings('bot')
+  botRefreshToken = '';
+
+  @settings('bot')
+  botUsername = '';
+
+  @settings('bot', true)
+  botExpectedScopes: string[] = [
+    'clips:edit',
+    'user:edit:broadcast',
+    'user:read:broadcast',
+    'chat:read',
+    'chat:edit',
+    'channel:moderate',
+    'whispers:read',
+    'whispers:edit',
+    'channel:edit:commercial',
+  ];
+
+  @settings('bot')
+  botCurrentScopes: string[] = [];
+
+  @onChange('botAccessToken')
+  @onChange('broadcasterAccessToken')
+  @onLoad('broadcasterAccessToken')
+  @onLoad('botAccessToken')
+  public async onChangeAccessToken(key: string, value: any) {
+    switch (key) {
+      case 'broadcasterAccessToken':
+        if (value === '') {
+          cache.broadcaster = 'force_reconnect';
+          emitter.emit('set', '/services/twitch', 'broadcasterUsername', '');
+          tmiEmitter.emit('part', 'broadcaster');
+        } else {
+          validate('broadcaster', 0, true);
+        }
+        break;
+      case 'botAccessToken':
+        if (value === '') {
+          cache.bot = 'force_reconnect';
+          emitter.emit('set', '/services/twitch', 'botUsername', '');
+          tmiEmitter.emit('part', 'bot');
+        } else {
+          validate('bot');
+        }
+        break;
+    }
+  }
+
+  @onChange('generalOwners')
+  @onChange('broadcasterUsername')
+  clearCache() {
+    cleanViewersCache();
+  }
+
+  @onChange('broadcasterUsername')
+  @onChange('botUsername')
+  setOAuthStatus() {
+    setOAuthStatus('bot', this.botUsername === '');
+    setOAuthStatus('broadcaster', this.broadcasterUsername === '');
+  }
+
+  @onChange('broadcasterUsername')
+  public async onChangeBroadcasterUsername(key: string, value: any) {
+    if (!this.generalOwners.includes(value)) {
+      this.generalOwners.push(value);
+    }
+  }
+
   @onStartup()
   async onStartup() {
-    this.oauth = (await import('./twitch/oauth')).default;
-    this.tmi = (await import('./twitch/chat')).default;
+    this.emotes = new Emotes();
 
-    tmiEmitter.on('get::whisperListener', (cb) => cb(this.whisperListener));
+    this.addMenu({
+      category: 'stats', name: 'api', id: 'stats/api', this: null,
+    });
+    Promise.all(this.validateTokens()).then(() => getChannelId());
+  }
+
+  validateTokens() {
+    debug('oauth.validate', 'Triggering token validation');
+    return [validate('bot'), validate('broadcaster')];
   }
 
   @onChange('showWithAt')
@@ -90,13 +232,37 @@ class Twitch extends Service {
     setMuteStatus(this.mute);
   }
 
+  @parser({ priority: constants.LOW, fireAndForget: true })
+  async containsEmotes (opts: ParserOptions) {
+    return this.emotes.containsEmotes(opts);
+  }
+
   sockets() {
     adminEndpoint(this.nsp, 'broadcaster', (cb) => {
       try {
-        cb(null, (oauth.broadcasterUsername).toLowerCase());
+        cb(null, (this.broadcasterUsername).toLowerCase());
       } catch (e: any) {
         cb(e.stack, '');
       }
+    });
+    publicEndpoint(this.nsp, 'getCache', async (cb) => {
+      try {
+        cb(null, await getRepository(CacheEmotes).find());
+      } catch (e: any) {
+        cb(e.stack, []);
+      }
+    });
+    adminEndpoint(this.nsp, 'testExplosion', (cb) => {
+      this.emotes._testExplosion();
+      cb(null, null);
+    });
+    adminEndpoint(this.nsp, 'testFireworks', (cb) => {
+      this.emotes._testFireworks();
+      cb(null, null);
+    });
+    adminEndpoint(this.nsp, 'test', (cb) => {
+      this.emotes._test();
+      cb(null, null);
     });
   }
 
@@ -177,8 +343,8 @@ class Twitch extends Service {
       .getMany();
     await changelog.flush();
     const onlineFollowers = (await getRepository(User).createQueryBuilder('user')
-      .where('user.userName != :botusername', { botusername: oauth.botUsername.toLowerCase() })
-      .andWhere('user.userName != :broadcasterusername', { broadcasterusername: oauth.broadcasterUsername.toLowerCase() })
+      .where('user.userName != :botusername', { botusername: this.botUsername.toLowerCase() })
+      .andWhere('user.userName != :broadcasterusername', { broadcasterusername: this.broadcasterUsername.toLowerCase() })
       .andWhere('user.isFollower = :isFollower', { isFollower: true })
       .andWhere('user.isOnline = :isOnline', { isOnline: true })
       .getMany())
@@ -213,8 +379,8 @@ class Twitch extends Service {
       .getMany();
     await changelog.flush();
     const onlineSubscribers = (await getRepository(User).createQueryBuilder('user')
-      .where('user.userName != :botusername', { botusername: oauth.botUsername.toLowerCase() })
-      .andWhere('user.userName != :broadcasterusername', { broadcasterusername: oauth.broadcasterUsername.toLowerCase() })
+      .where('user.userName != :botusername', { botusername: this.botUsername.toLowerCase() })
+      .andWhere('user.userName != :broadcasterusername', { broadcasterusername: this.broadcasterUsername.toLowerCase() })
       .andWhere('user.isSubscriber = :isSubscriber', { isSubscriber: true })
       .andWhere('user.isOnline = :isOnline', { isOnline: true })
       .getMany()).filter(o => {

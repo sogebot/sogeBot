@@ -17,6 +17,7 @@ import { invalidateParserCache } from '~/helpers/cache';
 import { isBotStarted } from '~/helpers/database';
 import { flatten, unflatten } from '~/helpers/flatten';
 import { enabled } from '~/helpers/interface/enabled';
+import emitter from '~/helpers/interfaceEmitter';
 import {
   error, info, warning,
 } from '~/helpers/log';
@@ -139,6 +140,23 @@ class Module {
 
     // prepare proxies for variables
     this._sockets();
+
+    emitter.on('get', (nsp, variableName, cb) => {
+      if (nsp === this.nsp) {
+        cb((this as any)[variableName]);
+      } else {
+        cb(undefined);
+      }
+    });
+
+    emitter.on('set', (nsp, variableName, value, cb) => {
+      if (nsp === this.nsp) {
+        (this as any)[variableName] = value;
+      }
+      if (cb) {
+        cb();
+      }
+    });
 
     const load = () => {
       if (isBotStarted) {

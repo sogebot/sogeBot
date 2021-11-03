@@ -1,5 +1,4 @@
 import querystring from 'querystring';
-import { setTimeout } from 'timers';
 
 import { BannedEventsInterface, BannedEventsTable } from '@entity/bannedEvents';
 import { ThreadEvent } from '@entity/threadEvent';
@@ -9,17 +8,13 @@ import {
 import { User, UserInterface } from '@entity/user';
 import * as constants from '@sogebot/ui-helpers/constants';
 import axios, { AxiosResponse } from 'axios';
-import chalk from 'chalk';
 import {
-  chunk, defaults, filter, get, isNil,
+  chunk, filter, get, isNil,
 } from 'lodash';
-import {
-  getManager, getRepository, In, IsNull, Not,
-} from 'typeorm';
+import { getRepository, In, IsNull, Not } from 'typeorm';
 
 import twitch from '../twitch';
 
-import { onStartup } from '~/decorators/on';
 import {
   stats as apiStats, calls, chatMessagesAtStart, currentStreamTags, emptyRateLimit, gameCache, gameOrTitleChangedManually, isStreamOnline, rawStatus, setRateLimit, streamStatusChangeSince,
 } from '~/helpers/api';
@@ -36,15 +31,14 @@ import { eventEmitter } from '~/helpers/events';
 import { follow } from '~/helpers/events/follow';
 import { getBroadcaster } from '~/helpers/getBroadcaster';
 import {
-  debug, error, info, unfollow, warning,
+  debug, error, info, warning,
 } from '~/helpers/log';
 import { channelId } from '~/helpers/oauth';
 import { botId } from '~/helpers/oauth/botId';
 import { broadcasterId } from '~/helpers/oauth/broadcasterId';
-import { addMenu, ioServer } from '~/helpers/panel';
+import { ioServer } from '~/helpers/panel';
 import { addUIError } from '~/helpers/panel/';
 import { linesParsed, setStatus } from '~/helpers/parser';
-import { logAvgTime } from '~/helpers/profiler';
 import { setImmediateAwait } from '~/helpers/setImmediateAwait';
 import { SQLVariableLimit } from '~/helpers/sql';
 import * as changelog from '~/helpers/user/changelog.js';
@@ -54,19 +48,10 @@ import { getChannelChattersUnofficialAPI } from '~/services/twitch/calls/getChan
 import { getCustomRewards } from '~/services/twitch/calls/getCustomRewards';
 import { getGameNameFromId } from '~/services/twitch/calls/getGameNameFromId';
 import { setTitleAndGame } from '~/services/twitch/calls/setTitleAndGame';
-import { updateChannelViewsAndBroadcasterType } from '~/services/twitch/calls/updateChannelViewsAndBroadcasterType';
-import oauth from '~/services/twitch/oauth';
 import stats from '~/stats';
 import joinpart from '~/widgets/joinpart';
 
 let latestFollowedAtTimestamp = 0;
-
-const intervals = new Map<string, {
-  interval: number;
-  isDisabled: boolean;
-  lastRunAt: number;
-  opts: Record<string, any>;
-}>();
 
 type SubscribersEndpoint = { data: { broadcaster_id: string; broadcaster_name: string; is_gift: boolean; tier: string; plan_name: string; user_id: string; user_name: string; }[], pagination: { cursor: string } };
 type FollowsEndpoint = { total: number; data: { from_id: string; from_name: string; to_id: string; toname: string; followed_at: string; }[], pagination: { cursor: string } };
@@ -134,137 +119,6 @@ const processFollowerState = async (users: { from_name: string; from_id: string;
 
 class API {
   timeouts: { [x: string]: NodeJS.Timeout } = {};
-  constructor () {
-    addMenu({
-      category: 'stats', name: 'api', id: 'stats/api', this: null,
-    });
-    this.interval('getCurrentStreamData', constants.MINUTE);
-    this.interval('getCurrentStreamTags', constants.MINUTE);
-    this.interval('updateChannelViewsAndBroadcasterType', constants.HOUR);
-    this.interval('getLatest100Followers', constants.MINUTE);
-    this.interval('getChannelFollowers', constants.DAY);
-    this.interval('getChannelSubscribers', 2 * constants.MINUTE);
-    this.interval('getChannelChattersUnofficialAPI', 5 * constants.MINUTE);
-    this.interval('getChannelInformation', constants.MINUTE);
-    this.interval('checkClips', constants.MINUTE);
-    this.interval('getAllStreamTags', constants.DAY);
-    this.interval('getModerators', 10 * constants.MINUTE);
-    this.interval('getBannedEvents', 10 * constants.MINUTE);
-
-    // free thread_event
-    getManager()
-      .createQueryBuilder()
-      .delete()
-      .from(ThreadEvent)
-      .where('event = :event', { event: 'getChannelChattersUnofficialAPI' })
-      .execute();
-  }
-
-  interval(fnc: string, interval: number) {
-    intervals.set(fnc, {
-      interval, lastRunAt: 0, opts: {}, isDisabled: false,
-    });
-  }
-
-  @onStartup()
-  async intervalCheck () {
-    let isBlocking: boolean | string = false;
-    const check = async () => {
-      if (isBlocking) {
-        debug('api.interval', chalk.yellow(isBlocking + '() ') + 'still in progress.');
-        return;
-      }
-      for (const fnc of intervals.keys()) {
-        await setImmediateAwait();
-        debug('api.interval', chalk.yellow(fnc + '() ') + 'check');
-        if (!oauth.initialValidation) {
-          debug('api.interval', chalk.yellow(fnc + '() ') + 'tokens not validated yet.');
-          return;
-        }
-        let interval = intervals.get(fnc);
-        if (!interval) {
-          error(`Interval ${fnc} not found.`);
-          continue;
-        }
-        if (interval.isDisabled) {
-          debug('api.interval', chalk.yellow(fnc + '() ') + 'disabled');
-          continue;
-        }
-        if (Date.now() - interval.lastRunAt >= interval.interval) {
-          // run validation before any requests
-          const[ botValidation, broadcasterValidation ] = await Promise.all(oauth.validateTokens());
-          if (!botValidation || !broadcasterValidation) {
-            continue;
-          }
-
-          isBlocking = fnc;
-          debug('api.interval', chalk.yellow(fnc + '() ') + 'start');
-          const time = process.hrtime();
-          const time2 = Date.now();
-          try {
-            const value = await Promise.race<Promise<any>>([
-              new Promise((resolve, reject) => {
-                if (fnc === 'updateChannelViewsAndBroadcasterType') {
-                  updateChannelViewsAndBroadcasterType()
-                    .then((data: any) => resolve(data))
-                    .catch((e) => reject(e));
-                } else {
-                  (this as any)[fnc](interval?.opts)
-                    .then((data: any) => resolve(data))
-                    .catch((e: any) => reject(e));
-                }
-              }),
-              new Promise((_resolve, reject) => setTimeout(() => reject(), 10 * constants.MINUTE)),
-            ]);
-            logAvgTime(`api.${fnc}()`, process.hrtime(time));
-            debug('api.interval', chalk.yellow(fnc + '(time: ' + (Date.now() - time2 + ') ') + JSON.stringify(value)));
-            intervals.set(fnc, {
-              ...interval,
-              lastRunAt: Date.now(),
-            });
-            if (value.disable) {
-              intervals.set(fnc, {
-                ...interval,
-                isDisabled: true,
-              });
-              debug('api.interval', chalk.yellow(fnc + '() ') + 'disabled');
-              continue;
-            }
-            debug('api.interval', chalk.yellow(fnc + '() ') + 'done, value:' + JSON.stringify(value));
-
-            interval = intervals.get(fnc); // refresh data
-            if (!interval) {
-              error(`Interval ${fnc} not found.`);
-              continue;
-            }
-
-            if (value.state) { // if is ok, update opts and run unlock after a while
-              intervals.set(fnc, {
-                ...interval,
-                opts: value.opts ?? {},
-              });
-            } else { // else run next tick
-              intervals.set(fnc, {
-                ...interval,
-                opts:      value.opts ?? {},
-                lastRunAt: 0,
-              });
-            }
-          } catch (e: any) {
-            warning(`API call for ${fnc} is probably frozen (took more than 10minutes), forcefully unblocking`);
-            debug('api.interval', chalk.yellow(fnc + '() ') + e);
-            continue;
-          } finally {
-            debug('api.interval', chalk.yellow(fnc + '() ') + 'unblocked.');
-            isBlocking = false;
-          }
-        } else {
-          debug('api.interval', chalk.yellow(fnc + '() ') + `skip run, lastRunAt: ${interval.lastRunAt}`  );
-        }
-      }
-    };
-    setInterval(check, 10000);
-  }
 
   async getModerators(opts: { isWarned: boolean }) {
     const token = oauth.broadcasterAccessToken;
@@ -503,7 +357,7 @@ class API {
   async getChannelSubscribers<T extends { cursor?: string; noAffiliateOrPartnerWarningSent?: boolean; notCorrectOauthWarningSent?: boolean; subscribers?: SubscribersEndpoint['data'] }> (opts: T): Promise<{ state: boolean; opts: T }> {
     opts = opts || {};
 
-    const cid = channelId.value;
+    const cid = await get<string>('/services/twitch', 'channelId');
     let url = `https://api.twitch.tv/helix/subscriptions?broadcaster_id=${cid}&first=100`;
     if (opts.cursor) {
       url += '&after=' + opts.cursor;
@@ -622,7 +476,7 @@ class API {
   }
 
   async getChannelInformation (opts: any) {
-    const cid = channelId.value;
+    const cid = await get<string>('/services/twitch', 'channelId');
     const url = `https://api.twitch.tv/helix/channels?broadcaster_id=${cid}`;
 
     const token = oauth.botAccessToken;
@@ -705,7 +559,7 @@ class API {
   }
 
   async getLatest100Followers () {
-    const cid = channelId.value;
+    const cid = await get<string>('/services/twitch', 'channelId');
     const url = `https://api.twitch.tv/helix/users/follows?to_id=${cid}&first=100`;
     const token = oauth.botAccessToken;
     const needToWait = isNil(cid) || cid === '' || token === '';
@@ -767,7 +621,7 @@ class API {
   async getChannelFollowers (opts: { cursor?: string }) {
     opts = opts || {};
 
-    const cid = channelId.value;
+    const cid = await get<string>('/services/twitch', 'channelId');
 
     const token = oauth.botAccessToken;
     const needToWait = isNil(cid) || cid === '' || token === '';
@@ -843,7 +697,7 @@ class API {
   }
 
   async getCurrentStreamTags (opts: any) {
-    const cid = channelId.value;
+    const cid = await get<string>('/services/twitch', 'channelId');
     const url = `https://api.twitch.tv/helix/streams/tags?broadcaster_id=${cid}`;
 
     const token = oauth.botAccessToken;
@@ -890,7 +744,7 @@ class API {
   }
 
   async getBannedEvents (opts: any) {
-    const cid = channelId.value;
+    const cid = await get<string>('/services/twitch', 'channelId');
     const url = `https://api.twitch.tv/helix/moderation/banned/events?broadcaster_id=${cid}&first=100`;
 
     if (!oauth.broadcasterCurrentScopes.includes('moderation:read')) {
@@ -945,7 +799,7 @@ class API {
   }
 
   async getCurrentStreamData (opts: any) {
-    const cid = channelId.value;
+    const cid = await get<string>('/services/twitch', 'channelId');
     const url = `https://api.twitch.tv/helix/streams?user_id=${cid}`;
 
     const token = oauth.botAccessToken;
@@ -1107,214 +961,6 @@ class API {
     return { state: true };
   }
 
-  async createClip (opts: any) {
-    if (!(isStreamOnline.value)) {
-      return;
-    } // do nothing if stream is offline
-
-    const isClipChecked = async function (id: string) {
-      return new Promise((resolve: (value: boolean) => void) => {
-        const check = async () => {
-          const clip = await getRepository(TwitchClips).findOne({ clipId: id });
-          if (!clip) {
-            resolve(false);
-          } else if (clip.isChecked) {
-            resolve(true);
-          } else {
-            // not checked yet
-            setTimeout(() => check(), 100);
-          }
-        };
-        check();
-      });
-    };
-
-    defaults(opts, { hasDelay: true });
-
-    const cid = channelId.value;
-    const url = `https://api.twitch.tv/helix/clips?broadcaster_id=${cid}`;
-
-    const token = oauth.botAccessToken;
-    const needToWait = isNil(cid) || cid === '' || token === '';
-    const notEnoughAPICalls = calls.bot.remaining <= 30 && calls.bot.refresh > Date.now() / 1000;
-    if (needToWait || notEnoughAPICalls) {
-      setTimeout(() => this.createClip(opts), 1000);
-      return;
-    }
-
-    let request;
-    try {
-      request = await axios({
-        method:  'post',
-        url,
-        headers: {
-          'Authorization': 'Bearer ' + token,
-          'Client-ID':     oauth.botClientId,
-        },
-      }) as any;
-
-      // save remaining api calls
-      setRateLimit('bot', request.headers as any);
-
-      ioServer?.emit('api.stats', {
-        method: 'POST', data: request.data, timestamp: Date.now(), call: 'createClip', api: 'helix', endpoint: url, code: request.status, remaining: calls.bot,
-      });
-    } catch (e: any) {
-      if (typeof e.response !== 'undefined' && e.response.status === 429) {
-        emptyRateLimit('bot', e.response.headers);
-      }
-
-      if (e.isAxiosError) {
-        error(`API: ${e.config.method.toUpperCase()} ${e.config.url} - ${e.response?.status ?? 0}\n${JSON.stringify(e.response?.data ?? '--nodata--', null, 4)}\n\n${e.stack}`);
-        ioServer?.emit('api.stats', {
-          method: e.config.method.toUpperCase(), timestamp: Date.now(), call: 'createClip', api: 'helix', endpoint: e.config.url, code: e.response?.status ?? 'n/a', data: e.response?.data ?? 'n/a', remaining: calls.bot,
-        });
-      } else {
-        error(e.stack);
-        ioServer?.emit('api.stats', {
-          method: e.config.method.toUpperCase(), timestamp: Date.now(), call: 'createClip', api: 'helix', endpoint: e.config.url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: calls.bot,
-        });
-      }
-      return;
-    }
-    const clipId = request.data.data[0].id;
-    await getRepository(TwitchClips).save({
-      clipId: clipId, isChecked: false, shouldBeCheckedAt: Date.now() + 120 * 1000,
-    });
-    return (await isClipChecked(clipId)) ? clipId : null;
-  }
-
-  async isFollowerUpdate (user: UserInterface | null) {
-    if (!user || !user.userId) {
-      return;
-    }
-    const id = user.userId;
-
-    clearTimeout(this.timeouts['isFollowerUpdate-' + id]);
-
-    const cid = channelId.value;
-    const url = `https://api.twitch.tv/helix/users/follows?from_id=${id}&to_id=${cid}`;
-
-    const token = oauth.botAccessToken;
-    const needToWait = isNil(cid) || cid === '' || token === '';
-    const notEnoughAPICalls = calls.bot.remaining <= 40 && calls.bot.refresh > Date.now() / 1000;
-    if (needToWait || notEnoughAPICalls) {
-      this.timeouts['isFollowerUpdate-' + id] = setTimeout(() => this.isFollowerUpdate(user), 1000);
-      return null;
-    }
-
-    let request;
-    try {
-      request = await axios.get<any>(url, {
-        headers: {
-          'Authorization': 'Bearer ' + token,
-          'Client-ID':     oauth.botClientId,
-        },
-        timeout: 20000,
-      });
-
-      // save remaining api calls
-      setRateLimit('bot', request.headers as any);
-
-      ioServer?.emit('api.stats', {
-        method: 'GET', data: request.data, timestamp: Date.now(), call: 'isFollowerUpdate', api: 'helix', endpoint: url, code: request.status, remaining: calls.bot,
-      });
-    } catch (e: any) {
-      if (typeof e.response !== 'undefined' && e.response.status === 429) {
-        emptyRateLimit('bot', e.response.headers);
-      }
-      if (e.isAxiosError) {
-        error(`API: ${e.config.method.toUpperCase()} ${e.config.url} - ${e.response?.status ?? 0}\n${JSON.stringify(e.response?.data ?? '--nodata--', null, 4)}\n\n${e.stack}`);
-        ioServer?.emit('api.stats', {
-          method: e.config.method.toUpperCase(), timestamp: Date.now(), call: 'isFollowerUpdate', api: 'helix', endpoint: e.config.url, code: e.response?.status ?? 'n/a', data: e.response?.data ?? 'n/a', remaining: calls.bot,
-        });
-      } else {
-        error(e.stack);
-        ioServer?.emit('api.stats', {
-          method: e.config.method.toUpperCase(), timestamp: Date.now(), call: 'isFollowerUpdate', api: 'helix', endpoint: e.config.url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: calls.bot,
-        });
-      }
-      return null;
-    }
-
-    if (request.data.total === 0) {
-      // not a follower
-      // if was follower, fire unfollow event
-      if (user.isFollower) {
-        unfollow(user.userName);
-        eventEmitter.emit('unfollow', { userName: user.userName });
-      }
-      changelog.update(user.userId, {
-        followedAt:    user.haveFollowedAtLock ? user.followedAt : 0,
-        isFollower:    user.haveFollowerLock? user.isFollower : false,
-        followCheckAt: Date.now(),
-      });
-      return { isFollower: user.isFollower, followedAt: user.followedAt };
-    } else {
-      // is follower
-      if (!user.isFollower && new Date().getTime() - new Date(request.data.data[0].followed_at).getTime() < 60000 * 60) {
-        follow(user.userId, user.userName, request.data.data[0].followed_at);
-      }
-
-      return { isFollower: user.isFollower, followedAt: user.followedAt };
-    }
-  }
-
-  async createMarker () {
-    const token = oauth.botAccessToken;
-    const cid = channelId.value;
-
-    const url = 'https://api.twitch.tv/helix/streams/markers';
-    try {
-      if (token === '') {
-        throw Error('missing bot accessToken');
-      }
-      if (cid === '') {
-        throw Error('channel is not set');
-      }
-
-      const request = await axios({
-        method:  'post',
-        url,
-        headers: {
-          'Content-Type':  'application/json',
-          'Authorization': 'Bearer ' + token,
-          'Client-ID':     oauth.botClientId,
-        },
-        data: {
-          user_id:     String(cid),
-          description: 'Marked from sogeBot',
-        },
-      });
-
-      // save remaining api calls
-      setRateLimit('bot', request.headers as any);
-
-      ioServer?.emit('api.stats', {
-        method: 'POST', request: { data: { user_id: String(cid), description: 'Marked from sogeBot' } }, timestamp: Date.now(), call: 'createMarker', api: 'helix', endpoint: url, code: request.status, remaining: calls.bot, data: request,
-      });
-    } catch (e: any) {
-      if (e.errno === 'ECONNRESET' || e.errno === 'ECONNREFUSED' || e.errno === 'ETIMEDOUT') {
-        setTimeout(() => this.createMarker(), 1000);
-        return;
-      }
-      if (e.isAxiosError) {
-        error(`API: ${e.config.method.toUpperCase()} ${e.config.url} - ${e.response?.status ?? 0}\n${JSON.stringify(e.response?.data ?? '--nodata--', null, 4)}\n\n${e.stack}`);
-        ioServer?.emit('api.stats', {
-          method: e.config.method.toUpperCase(), timestamp: Date.now(), call: 'createMarker', api: 'helix', endpoint: e.config.url, code: e.response?.status ?? 'n/a', data: e.response?.data ?? 'n/a', remaining: calls.bot,
-        });
-      } else {
-        error(e.stack);
-        ioServer?.emit('api.stats', {
-          method: 'POST', timestamp: Date.now(), call: 'createMarker', api: 'helix', endpoint: url, code: 'n/a', data: e.stack, remaining: calls.bot,
-        });
-      }
-      ioServer?.emit('api.stats', {
-        method: 'POST', request: { data: { user_id: String(cid), description: 'Marked from sogeBot' } }, timestamp: Date.now(), call: 'createMarker', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: calls.bot,
-      });
-    }
-  }
-
   async getClipById (id: string) {
     const url = `https://api.twitch.tv/helix/clips/?id=${id}`;
 
@@ -1362,54 +1008,6 @@ class API {
       throw err;
     }
     return response;
-  }
-
-  async getVideos(ids: string[]) {
-    const url = 'https://api.twitch.tv/helix/videos?';
-    const token = oauth.botAccessToken;
-
-    const chunkIds = chunk(ids, 5);
-    const videos: string[] = [];
-    for (const chunked of chunkIds) {
-      try {
-        if (token === '') {
-          throw Error('No bot access token');
-        }
-        const request = await axios.get<any>(url + chunked.map(o => `id=${o}`).join('&'), {
-          headers: {
-            'Content-Type':  'application/json',
-            'Authorization': 'Bearer ' + token,
-            'Client-ID':     oauth.botClientId,
-          },
-          timeout: 20000,
-        });
-
-        // save remaining api calls
-        setRateLimit('bot', request.headers as any);
-
-        ioServer?.emit('api.stats', {
-          method: 'GET', data: request.data, timestamp: Date.now(), call: 'getVideos', api: 'helix', endpoint: url, code: request.status, remaining: calls.bot,
-        });
-        for (const item of request.data.data) {
-          videos.push(item.id);
-        }
-      } catch (e: any) {
-        if (e.isAxiosError) {
-          if (e.response?.status !== 404) {
-            error(`API: ${e.config.method.toUpperCase()} ${e.config.url} - ${e.response?.status ?? 0}\n${JSON.stringify(e.response?.data ?? '--nodata--', null, 4)}\n\n${e.stack}`);
-            ioServer?.emit('api.stats', {
-              method: e.config.method.toUpperCase(), timestamp: Date.now(), call: 'getVideos', api: 'helix', endpoint: e.config.url, code: e.response?.status ?? 'n/a', data: e.response?.data ?? 'n/a', remaining: calls.bot,
-            });
-          }
-        } else {
-          error(e.stack);
-          ioServer?.emit('api.stats', {
-            method: 'GET', timestamp: Date.now(), call: 'getVideos', api: 'helix', endpoint: 'n/a', code: e.response?.status ?? 'n/a', data: e.stack, remaining: calls.bot,
-          });
-        }
-      }
-    }
-    return videos;
   }
 
   async getTopClips (opts: any) {
@@ -1480,4 +1078,4 @@ class API {
   }
 }
 
-export default new API();
+export default API;

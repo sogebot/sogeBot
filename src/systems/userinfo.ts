@@ -12,6 +12,7 @@ import {
 } from '../decorators';
 import Expects from '../expects';
 import general from '../general';
+import client from '../services/twitch/api/client';
 import users from '../users';
 import System from './_interface';
 import levels from './levels';
@@ -26,8 +27,6 @@ import { get, getUserHighestPermission } from '~/helpers/permissions/';
 import { getPointsName } from '~/helpers/points';
 import * as changelog from '~/helpers/user/changelog.js';
 import api from '~/services/twitch/api';
-import { fetchAccountAge } from '~/services/twitch/calls/fetchAccountAge';
-import { getUserFromTwitch } from '~/services/twitch/calls/getUserFromTwitch';
 import { translate } from '~/translate';
 
 /*
@@ -139,11 +138,11 @@ class UserInfo extends System {
     const user = await getRepository(User).findOne({ userName });
     if (!user || user.createdAt === 0) {
       try {
-        const { id: userId } = await getUserFromTwitch(userName);
-        if (!user) {
-          changelog.update(userId, { userName });
+        const clientBot = await client('bot');
+        const getUserByName = await clientBot.users.getUserByName(userName);
+        if (getUserByName) {
+          changelog.update(getUserByName.id, { createdAt: new Date(getUserByName.creationDate).getTime() });
         }
-        await fetchAccountAge(userId);
         if (!retry) {
           return this.age(opts, true);
         } else {

@@ -7,7 +7,6 @@ import {
   calls, getClientId, getToken, setRateLimit,
 } from '~/helpers/api';
 import { ioServer } from '~/helpers/panel';
-import oauth from '~/services/twitch/oauth';
 
 async function sendGameFromTwitch (game: string) {
   const url = `https://api.twitch.tv/helix/search/categories?query=${encodeURIComponent(game)}`;

@@ -11,15 +11,13 @@ import {
 import { parseTitle } from '~/helpers/api/parseTitle';
 import { eventEmitter } from '~/helpers/events/emitter';
 import { warning } from '~/helpers/log';
-import { channelId } from '~/helpers/oauth';
 import { ioServer } from '~/helpers/panel';
 import { addUIError } from '~/helpers/panel/';
-import oauth from '~/services/twitch/oauth';
 import { translate } from '~/translate';
 
 async function setTitleAndGame (args: { title?: string | null; game?: string | null }): Promise<{ response: string; status: boolean } | null> {
   args = defaults(args, { title: null }, { game: null });
-  const cid = channelId.value;
+  const cid = await get<string>('/services/twitch', 'channelId');
   const url = `https://api.twitch.tv/helix/channels?broadcaster_id=${cid}`;
 
   const token = oauth.broadcasterAccessToken;
