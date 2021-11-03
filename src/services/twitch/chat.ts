@@ -12,7 +12,7 @@ import {
 import { isNil } from 'lodash';
 import { getRepository } from 'typeorm';
 
-import emitter from '../../helpers/interfaceEmitter';
+import emitter, { get } from '../../helpers/interfaceEmitter';
 import { default as apiClient } from './api/client';
 import { refresh } from './token/refresh';
 
@@ -96,15 +96,18 @@ class TMI {
     }
     clearTimeout(this.timeouts[`initClient.${type}`]);
 
+    const [ clientId, token, isValidToken, channel ] = await Promise.all([
+      get<string>('/services/twitch', 'clientId'),
+      get<string>('/services/twitch', type + 'AccessToken'),
+      get<string>('/services/twitch', type + 'TokenValid'),
+      get<string>('/services/twitch', 'generalChannel'),
+    ]);
+
     // wait for initial validation
-    if (!oauth.initialValidation) {
+    if (!isValidToken) {
       setTimeout(() => this.initClient(type), constants.SECOND);
       return;
     }
-
-    const token = type === 'bot' ? oauth.botAccessToken : oauth.broadcasterAccessToken;
-    const clientId = type === 'bot' ? oauth.botClientId : oauth.broadcasterClientId;
-    const channel = generalChannel.value;
 
     try {
       if (token === '' || channel === '') {

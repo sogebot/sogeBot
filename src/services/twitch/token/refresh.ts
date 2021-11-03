@@ -40,12 +40,14 @@ export const refresh = async (type: 'bot' | 'broadcaster', clear = false) => {
     errorCount[type] = 0;
     lastRefresh[type] = 0;
   }
-  const [ channel, tokenService, owners, botRefreshToken, broadcasterRefreshToken ] = await Promise.all([
+  const [ channel, tokenService, owners, botRefreshToken, broadcasterRefreshToken, tokenServiceCustomClientId, tokenServiceCustomClientSecret ] = await Promise.all([
     get<string>('/services/twitch', 'generalChannel'),
     get<keyof typeof urls>('/services/twitch', 'tokenService'),
     get<string[]>('/services/twitch', 'generalOwners'),
     get<string>('/services/twitch', 'botRefreshToken'),
     get<string>('/services/twitch', 'broadcasterRefreshToken'),
+    get<string>('/services/twitch', 'tokenServiceCustomClientId'),
+    get<string>('/services/twitch', 'tokenServiceCustomClientSecret'),
   ]);
 
   if (errorCount[type] > 20) {
@@ -77,7 +79,7 @@ export const refresh = async (type: 'bot' | 'broadcaster', clear = false) => {
 
     if (!url) {
       // custom app is selected
-      const response = await fetch(`https://id.twitch.tv/oauth2/token?client_id=${this.tokenServiceCustomClientId}&client_secret=${this.tokenServiceCustomClientSecret}&refresh_token=${type === 'bot' ? botRefreshToken : broadcasterRefreshToken}&grant_type=refresh_token`, {
+      const response = await fetch(`https://id.twitch.tv/oauth2/token?client_id=${tokenServiceCustomClientId}&client_secret=${tokenServiceCustomClientSecret}&refresh_token=${type === 'bot' ? botRefreshToken : broadcasterRefreshToken}&grant_type=refresh_token`, {
         method: 'POST',
       });
       if (response.ok) {

@@ -17,6 +17,7 @@ import {
 } from '../decorators/on';
 import Expects from '../expects';
 import general from '../general.js';
+import { get } from '../helpers/interfaceEmitter';
 import users from '../users';
 import System from './_interface';
 
@@ -436,15 +437,17 @@ class Points extends System {
       }
 
       const connection = await getConnection();
+
+      const broadcasterUsername = await get<string>('/services/twitch', 'broadcasterUsername');
       const query = (type: typeof connection.options.type) => {
         switch(type) {
           case 'postgres':
           case 'better-sqlite3':
-            return `SELECT COUNT(*) as "order" FROM "user" WHERE "points" > (SELECT "points" FROM "user" WHERE "userId"='${user?.userId}') AND "userName"!='${oauth.broadcasterUsername}'`;
+            return `SELECT COUNT(*) as "order" FROM "user" WHERE "points" > (SELECT "points" FROM "user" WHERE "userId"='${user?.userId}') AND "userName"!='${broadcasterUsername}'`;
           case 'mysql':
           case 'mariadb':
           default:
-            return `SELECT COUNT(*) as \`order\` FROM \`user\` WHERE \`points\` > (SELECT \`points\` FROM \`user\` WHERE \`userId\`='${user?.userId}') AND "userName"!='${oauth.broadcasterUsername}'`;
+            return `SELECT COUNT(*) as \`order\` FROM \`user\` WHERE \`points\` > (SELECT \`points\` FROM \`user\` WHERE \`userId\`='${user?.userId}') AND "userName"!='${broadcasterUsername}'`;
         }
       };
 
@@ -457,7 +460,7 @@ class Points extends System {
         order = Number(orderQuery[0].order) + 1;
       }
 
-      if (user.userName === oauth.broadcasterUsername) {
+      if (user.userName === broadcasterUsername) {
         order = '?'; // broadcaster is removed from ordering
       }
 

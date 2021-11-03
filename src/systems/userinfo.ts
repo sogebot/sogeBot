@@ -13,6 +13,7 @@ import {
 import Expects from '../expects';
 import general from '../general';
 import client from '../services/twitch/api/client';
+import { isFollowerUpdate } from '../services/twitch/calls/isFollowerUpdate';
 import users from '../users';
 import System from './_interface';
 import levels from './levels';
@@ -22,11 +23,10 @@ import ranks from './ranks';
 import { prepare } from '~/helpers/commons/';
 import { mainCurrency } from '~/helpers/currency';
 import { dayjs, timezone } from '~/helpers/dayjs';
-import { debug, error } from '~/helpers/log';
+import { error } from '~/helpers/log';
 import { get, getUserHighestPermission } from '~/helpers/permissions/';
 import { getPointsName } from '~/helpers/points';
 import * as changelog from '~/helpers/user/changelog.js';
-import api from '~/services/twitch/api';
 import { translate } from '~/translate';
 
 /*
@@ -56,8 +56,7 @@ class UserInfo extends System {
   protected async followage(opts: CommandOptions): Promise<CommandResponse[]> {
     const [userName] = new Expects(opts.parameters).username({ optional: true, default: opts.sender.userName }).toArray();
     const id = await users.getIdByName(userName);
-    const isFollowerUpdate = await api.isFollowerUpdate(await changelog.get(id));
-    debug('userinfo.followage', JSON.stringify(isFollowerUpdate));
+    await isFollowerUpdate(await changelog.get(id));
 
     await changelog.flush();
     const user = await getRepository(User).findOne({ userName });

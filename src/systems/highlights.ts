@@ -12,13 +12,12 @@ import { createClip } from '../services/twitch/calls/createClip';
 import System from './_interface';
 
 import {
-  calls, isStreamOnline, stats, streamStatusChangeSince,
+  isStreamOnline, stats, streamStatusChangeSince,
 } from '~/helpers/api';
 import { getBotSender } from '~/helpers/commons';
 import { dayjs } from '~/helpers/dayjs';
 import { get } from '~/helpers/interfaceEmitter';
 import { error } from '~/helpers/log';
-import { ioServer } from '~/helpers/panel';
 import { defaultPermissions } from '~/helpers/permissions/';
 import { adminEndpoint } from '~/helpers/socket';
 import { createMarker } from '~/services/twitch/calls/createMarker';
@@ -143,9 +142,6 @@ class Highlights extends System {
       };
       return this.add(highlight, timestamp, opts);
     } catch (err: any) {
-      ioServer?.emit('api.stats', {
-        method: 'GET', timestamp: Date.now(), call: 'highlights', api: 'helix', endpoint: url, code: err.stack, remaining: calls.bot.remaining,
-      });
       switch (err.message) {
         case ERROR_STREAM_NOT_ONLINE:
           error('Cannot highlight - stream offline');

@@ -2,14 +2,14 @@ import {
   filter, isString, set,
 } from 'lodash';
 
+import { get } from './helpers/interfaceEmitter';
+
 import Core from '~/_interface';
 import { settings } from '~/decorators';
 import general from '~/general';
 import { mainCurrency, symbol } from '~/helpers/currency';
 import { timezone } from '~/helpers/dayjs';
 import { getBroadcaster } from '~/helpers/getBroadcaster';
-import { generalChannel } from '~/helpers/oauth/generalChannel';
-import { generalOwners } from '~/helpers/oauth/generalOwners';
 import { find, list } from '~/helpers/register';
 import { adminEndpoint, publicEndpoint } from '~/helpers/socket';
 
@@ -65,8 +65,11 @@ class UI extends Core {
         // lang
         data.lang = general.lang;
 
-        data.isCastersSet = filter(generalOwners.value, (o) => isString(o) && o.trim().length > 0).length > 0 || getBroadcaster() !== '';
-        data.isChannelSet = filter(generalChannel.value, (o) => isString(o) && o.trim().length > 0).length > 0;
+        const generalChannel = await get<string>('/services/twitch', 'generalChannel');
+        const generalOwners = await get<string>('/services/twitch', 'generalOwners');
+
+        data.isCastersSet = filter(generalOwners, (o) => isString(o) && o.trim().length > 0).length > 0 || getBroadcaster() !== '';
+        data.isChannelSet = filter(generalChannel, (o) => isString(o) && o.trim().length > 0).length > 0;
 
         cb(null, data);
       } catch (e: any) {
