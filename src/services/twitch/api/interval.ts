@@ -1,9 +1,8 @@
-import { ThreadEvent } from '@entity/threadEvent';
 import * as constants from '@sogebot/ui-helpers/constants';
 import chalk from 'chalk';
-import {
-  getManager,
-} from 'typeorm';
+
+import { updateChannelViewsAndBroadcasterType } from '../calls/updateChannelViewsAndBroadcasterType';
+import { validate } from '../token/validate';
 
 import { get } from '~/helpers/interfaceEmitter';
 import {
@@ -25,26 +24,20 @@ const addInterval = (fnc: string, intervalId: number) => {
   });
 };
 
-addInterval('getCurrentStreamData', constants.MINUTE);
-addInterval('getCurrentStreamTags', constants.MINUTE);
-addInterval('updateChannelViewsAndBroadcasterType', constants.HOUR);
-addInterval('getLatest100Followers', constants.MINUTE);
-addInterval('getChannelFollowers', constants.DAY);
-addInterval('getChannelSubscribers', 2 * constants.MINUTE);
-addInterval('getChannelChattersUnofficialAPI', 5 * constants.MINUTE);
-addInterval('getChannelInformation', constants.MINUTE);
-addInterval('checkClips', constants.MINUTE);
-addInterval('getAllStreamTags', constants.DAY);
-addInterval('getModerators', 10 * constants.MINUTE);
-addInterval('getBannedEvents', 10 * constants.MINUTE);
-
-// free thread_event
-getManager()
-  .createQueryBuilder()
-  .delete()
-  .from(ThreadEvent)
-  .where('event = :event', { event: 'getChannelChattersUnofficialAPI' })
-  .execute();
+export const init = () => {
+  addInterval('getCurrentStreamData', constants.MINUTE);
+  addInterval('getCurrentStreamTags', constants.MINUTE);
+  addInterval('updateChannelViewsAndBroadcasterType', constants.HOUR);
+  addInterval('getLatest100Followers', constants.MINUTE);
+  addInterval('getChannelFollowers', constants.DAY);
+  addInterval('getChannelSubscribers', 2 * constants.MINUTE);
+  addInterval('getChannelChattersUnofficialAPI', 5 * constants.MINUTE);
+  addInterval('getChannelInformation', constants.MINUTE);
+  addInterval('checkClips', constants.MINUTE);
+  addInterval('getAllStreamTags', constants.DAY);
+  addInterval('getModerators', 10 * constants.MINUTE);
+  addInterval('getBannedEvents', 10 * constants.MINUTE);
+};
 
 let isBlocking: boolean | string = false;
 
@@ -74,7 +67,9 @@ const check = async () => {
     }
     if (Date.now() - interval.lastRunAt >= interval.interval) {
       // run validation before any requests
-      const[ botValidation, broadcasterValidation ] = await Promise.all(oauth.validateTokens());
+      const[ botValidation, broadcasterValidation ] = await Promise.all([
+        validate('bot'), validate('broadcaster'),
+      ]);
       if (!botValidation || !broadcasterValidation) {
         continue;
       }

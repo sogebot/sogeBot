@@ -7,6 +7,7 @@ import { getRepository } from 'typeorm';
 import { Settings } from '~/database/entity/settings';
 import { getFunctionList } from '~/decorators/on';
 import { isDbConnected } from '~/helpers/database';
+import emitter from '~/helpers/interfaceEmitter';
 import { debug, error } from '~/helpers/log';
 import { logAvgTime } from '~/helpers/profiler';
 import { find } from '~/helpers/register';
@@ -100,6 +101,7 @@ export const VariableWatcher = {
         debug('watcher', `watcher::change *** ${type}.${name}.${variable} changed from ${JSON.stringify(oldValue)} to ${JSON.stringify(value)}`);
         const events = getFunctionList('change', type === 'core' ? `${name}.${variable}` : `${type}.${name}.${variable}`);
         for (const event of events) {
+          emitter.emit('change', `${type}.${name}.${variable}`, cloneDeep(value));
           if (typeof (checkedModule as any)[event.fName] === 'function') {
             (checkedModule as any)[event.fName](variable, cloneDeep(value));
           } else {

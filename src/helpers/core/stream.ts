@@ -13,10 +13,10 @@ import { channelId } from '../oauth';
 import { linesParsed } from '../parser';
 import { find } from '../register';
 
-import type { StreamEndpoint } from '~/services/twitch/api';
+import { HelixStream } from '~/../node_modules/@twurple/api/lib';
 import { getGameNameFromId } from '~/services/twitch/calls/getGameNameFromId';
 
-async function start(data: StreamEndpoint['data'][number]) {
+async function start(data: HelixStream) {
   startLog(
     `id: ${data.id} | startedAt: ${data.started_at} | title: ${data.title} | game: ${await getGameNameFromId(Number(data.game_id))} | type: ${data.type} | channel ID: ${channelId.value}`,
   );

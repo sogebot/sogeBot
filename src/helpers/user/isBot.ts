@@ -1,12 +1,30 @@
 import type { UserInterface } from '@entity/user';
 
-import { botId } from '../oauth/botId';
-import { botUsername } from '../oauth/botUsername';
+import emitter from '../interfaceEmitter';
+
+let botId = '';
+let botUsername = '';
+
+emitter.on('change', (path, value) => {
+  if (path === 'services.twitch.botId') {
+    botId = value;
+  } else if (path === 'services.twitch.botUsername') {
+    botUsername = value;
+  }
+});
+
+emitter.on('load', (path, value) => {
+  if (path === 'services.twitch.botId') {
+    botId = value;
+  } else if (path === 'services.twitch.botUsername') {
+    botUsername = value;
+  }
+});
 
 export function isBot(user: string | CommandOptions['sender'] | UserInterface | UserStateTags) {
   try {
-    if (botUsername.value) {
-      return botUsername.value.toLowerCase().trim() === (typeof user === 'string' ? user : user.userName).toLowerCase().trim();
+    if (botUsername) {
+      return botUsername.toLowerCase().trim() === (typeof user === 'string' ? user : user.userName).toLowerCase().trim();
     } else {
       return false;
     }
@@ -17,8 +35,8 @@ export function isBot(user: string | CommandOptions['sender'] | UserInterface | 
 
 export function isBotId(userId: string | undefined) {
   try {
-    if (botUsername.value) {
-      return botId.value === userId;
+    if (botUsername.length > 0) {
+      return botId === userId;
     } else {
       return false;
     }

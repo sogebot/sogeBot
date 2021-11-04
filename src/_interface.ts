@@ -174,6 +174,7 @@ class Module {
             }
             this.status({ state: this._enabled });
             const path = this._name === 'core' ? this.__moduleName__.toLowerCase() : `${this._name}.${this.__moduleName__.toLowerCase()}`;
+
             for (const event of getFunctionList('startup', path)) {
               (this as any)[event.fName]('enabled', state);
             }
@@ -219,6 +220,7 @@ class Module {
 
     setTimeout(() => {
       for (const event of getFunctionList('load', `${path}.${key}` )) {
+        emitter.emit('load', `${path}.${key}`,  JSON.parse(variable?.value ?? '""'));
         (this as any)[event.fName](key, JSON.parse(variable?.value ?? '""'));
       }
     }, 1000);

@@ -1,6 +1,7 @@
 import {
   User, UserBit, UserTip,
 } from '@entity/user';
+import { dayjs, timezone } from '@sogebot/ui-helpers/dayjsHelper';
 import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized';
 import { format } from '@sogebot/ui-helpers/number';
 import { getRepository } from 'typeorm';
@@ -22,7 +23,6 @@ import ranks from './ranks';
 
 import { prepare } from '~/helpers/commons/';
 import { mainCurrency } from '~/helpers/currency';
-import { dayjs, timezone } from '~/helpers/dayjs';
 import { error } from '~/helpers/log';
 import { get, getUserHighestPermission } from '~/helpers/permissions/';
 import { getPointsName } from '~/helpers/points';

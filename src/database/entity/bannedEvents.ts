@@ -3,6 +3,8 @@ import {
 } from 'type-graphql';
 import { EntitySchema } from 'typeorm';
 
+import { HelixBanEventType } from '~/../node_modules/@twurple/api/lib';
+
 @ObjectType()
 class BannedEventsEventData {
   @Field()
@@ -32,12 +34,12 @@ class BannedEventsEventData {
 export class BannedEventsInterface {
   @Field(type => ID)
   'id': string;
-  @Field()
-  'event_type': 'moderation.user.ban' | 'moderation.user.unban';
+  @Field(type => String)
+  'event_type': HelixBanEventType;
   @Field()
   'event_timestamp': string;
   @Field()
-  'version': '1.0';
+  'version': string;
   @Field(type => BannedEventsEventData)
   'event_data': BannedEventsEventData;
 }

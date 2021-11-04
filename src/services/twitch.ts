@@ -1,6 +1,7 @@
 import { EventList } from '@entity/eventList';
 import { User } from '@entity/user';
 import * as constants from '@sogebot/ui-helpers/constants';
+import { dayjs, timezone } from '@sogebot/ui-helpers/dayjsHelper';
 import { getTime } from '@sogebot/ui-helpers/getTime';
 import { getRepository } from 'typeorm';
 
@@ -14,6 +15,7 @@ import emitter from '../helpers/interfaceEmitter';
 import { debug, error } from '../helpers/log';
 import users from '../users';
 import Service from './_interface';
+import { init as apiIntervalInit } from './twitch/api/interval';
 import { getChannelId } from './twitch/calls/getChannelId';
 import Emotes from './twitch/emotes';
 import { cache, validate } from './twitch/token/validate';
@@ -22,7 +24,6 @@ import {
   isStreamOnline, stats, streamStatusChangeSince,
 } from '~/helpers/api';
 import { prepare } from '~/helpers/commons/prepare';
-import { dayjs, timezone } from '~/helpers/dayjs';
 import { setOAuthStatus } from '~/helpers/OAuthStatus';
 import { cleanViewersCache } from '~/helpers/permissions';
 import { defaultPermissions } from '~/helpers/permissions/';
@@ -43,7 +44,6 @@ const urls = {
 
 class Twitch extends Service {
   tmi: typeof import('./twitch/chat').default;
-  api: typeof import('./twitch/api').default;
   emotes: import('./twitch/emotes').default;
 
   botTokenValid = false;
@@ -190,6 +190,7 @@ class Twitch extends Service {
   @onStartup()
   async onStartup() {
     this.emotes = new Emotes();
+    apiIntervalInit();
 
     this.addMenu({
       category: 'stats', name: 'api', id: 'stats/api', this: null,

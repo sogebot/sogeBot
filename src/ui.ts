@@ -1,3 +1,4 @@
+import { timezone } from '@sogebot/ui-helpers/dayjsHelper';
 import {
   filter, isString, set,
 } from 'lodash';
@@ -8,7 +9,6 @@ import Core from '~/_interface';
 import { settings } from '~/decorators';
 import general from '~/general';
 import { mainCurrency, symbol } from '~/helpers/currency';
-import { timezone } from '~/helpers/dayjs';
 import { find, list } from '~/helpers/register';
 import { adminEndpoint, publicEndpoint } from '~/helpers/socket';
 

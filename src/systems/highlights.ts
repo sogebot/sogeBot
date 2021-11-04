@@ -1,4 +1,5 @@
 import { Highlight, HighlightInterface } from '@entity/highlight';
+import { dayjs } from '@sogebot/ui-helpers/dayjsHelper';
 import { timestampToObject } from '@sogebot/ui-helpers/getTime';
 import { Request, Response } from 'express';
 import { isNil } from 'lodash';
@@ -15,7 +16,6 @@ import {
   isStreamOnline, stats, streamStatusChangeSince,
 } from '~/helpers/api';
 import { getBotSender } from '~/helpers/commons';
-import { dayjs } from '~/helpers/dayjs';
 import { get } from '~/helpers/interfaceEmitter';
 import { error } from '~/helpers/log';
 import { defaultPermissions } from '~/helpers/permissions/';

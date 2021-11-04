@@ -1,6 +1,7 @@
 import { setTimeout } from 'timers'; // tslint workaround
 
 import { sample } from '@sogebot/ui-helpers/array';
+import { dayjs } from '@sogebot/ui-helpers/dayjsHelper';
 import { generateUsername } from '@sogebot/ui-helpers/generateUsername';
 import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized';
 import axios from 'axios';
@@ -31,7 +32,6 @@ import {
 } from '~/helpers/customvariables';
 import { csEmitter } from '~/helpers/customvariables/emitter';
 import { isDbConnected } from '~/helpers/database';
-import { dayjs } from '~/helpers/dayjs';
 import { eventEmitter } from '~/helpers/events/emitter';
 import {
   debug, error, info, warning,

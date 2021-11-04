@@ -4,6 +4,7 @@ import type { EmitData } from '@entity/alert';
 import { Price } from '@entity/price';
 import { UserBit, UserBitInterface } from '@entity/user';
 import * as constants from '@sogebot/ui-helpers/constants';
+import { dayjs } from '@sogebot/ui-helpers/dayjsHelper';
 import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized';
 import { StaticAuthProvider } from '@twurple/auth';
 import {
@@ -28,7 +29,6 @@ import {
   getOwner, getUserSender,
 } from '~/helpers/commons';
 import { sendMessage } from '~/helpers/commons/sendMessage';
-import { dayjs } from '~/helpers/dayjs';
 import { eventEmitter } from '~/helpers/events';
 import {
   triggerInterfaceOnBit, triggerInterfaceOnMessage, triggerInterfaceOnSub,

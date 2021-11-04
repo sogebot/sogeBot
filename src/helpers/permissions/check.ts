@@ -3,11 +3,9 @@ import _ from 'lodash';
 import { getRepository, LessThan } from 'typeorm';
 
 import { areDecoratorsLoaded } from '../../decorators';
-import { getBroadcaster } from '../getBroadcaster';
 import {
   debug, error, warning,
 } from '../log';
-import { generalOwners } from '../oauth/generalOwners';
 import {
   isFollower, isOwner, isSubscriber, isVIP,
 } from '../user';
@@ -17,6 +15,7 @@ import { isBroadcaster } from '../user/isBroadcaster';
 import { isModerator } from '../user/isModerator';
 import { defaultPermissions } from './defaultPermissions';
 
+import { get } from '~/helpers/interfaceEmitter';
 import { filters } from '~/helpers/permissions/filters';
 
 let isWarnedAboutCasters = false;
@@ -36,7 +35,12 @@ async function check(userId: string, permId: string, partial = false): Promise<{
     });
   }
 
-  if (generalOwners.value.filter(o => typeof o === 'string' && o.trim().length > 0).length === 0 && getBroadcaster() === '' && !isWarnedAboutCasters) {
+  const [ broadcasterUsername, generalOwners ] = await Promise.all([
+    get<string>('/services/twitch', 'broadcasterUsername'),
+    get<string[]>('/services/twitch', 'generalOwners'),
+  ]);
+
+  if (generalOwners.filter(o => typeof o === 'string' && o.trim().length > 0).length === 0 && broadcasterUsername === '' && !isWarnedAboutCasters) {
     isWarnedAboutCasters = true;
     warning('Owners or broadcaster oauth is not set, all users are treated as CASTERS!!!');
     const pItem = await getRepository(Permissions).findOne({ id: defaultPermissions.CASTERS });
@@ -83,7 +87,7 @@ async function check(userId: string, permId: string, partial = false): Promise<{
         shouldProceed = true;
         break;
       case 'casters':
-        if (generalOwners.value.filter(o => typeof o === 'string').length === 0 && getBroadcaster() === '') {
+        if (generalOwners.filter(o => typeof o === 'string').length === 0 && broadcasterUsername === '') {
           shouldProceed = true;
         } else {
           shouldProceed = isBot(user) || isBroadcaster(user) || isOwner(user);

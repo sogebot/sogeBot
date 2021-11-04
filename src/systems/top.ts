@@ -1,4 +1,5 @@
 import { User } from '@entity/user';
+import { dayjs } from '@sogebot/ui-helpers/dayjsHelper';
 import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized';
 import { format } from '@sogebot/ui-helpers/number';
 import _ from 'lodash';
@@ -13,7 +14,6 @@ import levels from './levels';
 import points from './points';
 
 import { mainCurrency } from '~/helpers/currency';
-import { dayjs } from '~/helpers/dayjs';
 import { get } from '~/helpers/interfaceEmitter';
 import { debug } from '~/helpers/log';
 import { defaultPermissions } from '~/helpers/permissions/';
