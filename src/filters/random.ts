@@ -4,15 +4,20 @@ import { getRepository } from 'typeorm';
 
 import type { ResponseFilter } from '.';
 
+import { get } from '~/helpers/interfaceEmitter';
 import * as changelog from '~/helpers/user/changelog.js';
 import { isIgnored } from '~/helpers/user/isIgnored';
 
 const random: ResponseFilter = {
   '(random.online.viewer)': async function () {
     await changelog.flush();
+    const [ botUsername, broadcasterUsername ] = await Promise.all([
+      get<string>('/services/twitch', 'botUsername'),
+      get<string>('/services/twitch', 'broadcasterUsername'),
+    ]);
     const viewers = (await getRepository(User).createQueryBuilder('user')
-      .where('user.userName != :botusername', { botusername: oauth.botUsername.toLowerCase() })
-      .andWhere('user.userName != :broadcasterusername', { broadcasterusername: oauth.broadcasterUsername.toLowerCase() })
+      .where('user.userName != :botusername', { botusername: botUsername.toLowerCase() })
+      .andWhere('user.userName != :broadcasterusername', { broadcasterusername: broadcasterUsername.toLowerCase() })
       .andWhere('user.isOnline = :isOnline', { isOnline: true })
       .cache(true)
       .getMany())
@@ -26,9 +31,13 @@ const random: ResponseFilter = {
   },
   '(random.online.follower)': async function () {
     await changelog.flush();
+    const [ botUsername, broadcasterUsername ] = await Promise.all([
+      get<string>('/services/twitch', 'botUsername'),
+      get<string>('/services/twitch', 'broadcasterUsername'),
+    ]);
     const followers = (await getRepository(User).createQueryBuilder('user')
-      .where('user.userName != :botusername', { botusername: oauth.botUsername.toLowerCase() })
-      .andWhere('user.userName != :broadcasterusername', { broadcasterusername: oauth.broadcasterUsername.toLowerCase() })
+      .where('user.userName != :botusername', { botusername: botUsername.toLowerCase() })
+      .andWhere('user.userName != :broadcasterusername', { broadcasterusername: broadcasterUsername.toLowerCase() })
       .andWhere('user.isFollower = :isFollower', { isFollower: true })
       .andWhere('user.isOnline = :isOnline', { isOnline: true })
       .cache(true)
@@ -41,9 +50,14 @@ const random: ResponseFilter = {
     return sample(followers.map(o => o.userName ));
   },
   '(random.online.subscriber)': async function () {
+    await changelog.flush();
+    const [ botUsername, broadcasterUsername ] = await Promise.all([
+      get<string>('/services/twitch', 'botUsername'),
+      get<string>('/services/twitch', 'broadcasterUsername'),
+    ]);
     const subscribers = (await getRepository(User).createQueryBuilder('user')
-      .where('user.userName != :botusername', { botusername: oauth.botUsername.toLowerCase() })
-      .andWhere('user.userName != :broadcasterusername', { broadcasterusername: oauth.broadcasterUsername.toLowerCase() })
+      .where('user.userName != :botusername', { botusername: botUsername.toLowerCase() })
+      .andWhere('user.userName != :broadcasterusername', { broadcasterusername: broadcasterUsername.toLowerCase() })
       .andWhere('user.isSubscriber = :isSubscriber', { isSubscriber: true })
       .andWhere('user.isOnline = :isOnline', { isOnline: true })
       .cache(true)
@@ -57,9 +71,13 @@ const random: ResponseFilter = {
   },
   '(random.viewer)': async function () {
     await changelog.flush();
+    const [ botUsername, broadcasterUsername ] = await Promise.all([
+      get<string>('/services/twitch', 'botUsername'),
+      get<string>('/services/twitch', 'broadcasterUsername'),
+    ]);
     const viewers = (await getRepository(User).createQueryBuilder('user')
-      .where('user.userName != :botusername', { botusername: oauth.botUsername.toLowerCase() })
-      .andWhere('user.userName != :broadcasterusername', { broadcasterusername: oauth.broadcasterUsername.toLowerCase() })
+      .where('user.userName != :botusername', { botusername: botUsername.toLowerCase() })
+      .andWhere('user.userName != :broadcasterusername', { broadcasterusername: broadcasterUsername.toLowerCase() })
       .cache(true)
       .getMany()).filter(o => {
       return !isIgnored({ userName: o.userName, userId: o.userId });
@@ -71,9 +89,13 @@ const random: ResponseFilter = {
   },
   '(random.follower)': async function () {
     await changelog.flush();
+    const [ botUsername, broadcasterUsername ] = await Promise.all([
+      get<string>('/services/twitch', 'botUsername'),
+      get<string>('/services/twitch', 'broadcasterUsername'),
+    ]);
     const followers = (await getRepository(User).createQueryBuilder('user')
-      .where('user.userName != :botusername', { botusername: oauth.botUsername.toLowerCase() })
-      .andWhere('user.userName != :broadcasterusername', { broadcasterusername: oauth.broadcasterUsername.toLowerCase() })
+      .where('user.userName != :botusername', { botusername: botUsername.toLowerCase() })
+      .andWhere('user.userName != :broadcasterusername', { broadcasterusername: broadcasterUsername.toLowerCase() })
       .andWhere('user.isFollower = :isFollower', { isFollower: true })
       .cache(true)
       .getMany()).filter(o => {
@@ -86,9 +108,13 @@ const random: ResponseFilter = {
   },
   '(random.subscriber)': async function () {
     await changelog.flush();
+    const [ botUsername, broadcasterUsername ] = await Promise.all([
+      get<string>('/services/twitch', 'botUsername'),
+      get<string>('/services/twitch', 'broadcasterUsername'),
+    ]);
     const subscribers = (await getRepository(User).createQueryBuilder('user')
-      .where('user.userName != :botusername', { botusername: oauth.botUsername.toLowerCase() })
-      .andWhere('user.userName != :broadcasterusername', { broadcasterusername: oauth.broadcasterUsername.toLowerCase() })
+      .where('user.userName != :botusername', { botusername: botUsername.toLowerCase() })
+      .andWhere('user.userName != :broadcasterusername', { broadcasterusername: broadcasterUsername.toLowerCase() })
       .andWhere('user.isSubscriber = :isSubscriber', { isSubscriber: true })
       .cache(true)
       .getMany()).filter(o => {

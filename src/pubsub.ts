@@ -5,10 +5,10 @@ import WebSocket from 'ws';
 
 import { isStreamOnline } from '~/helpers/api';
 import { eventEmitter } from '~/helpers/events';
+import { get } from '~/helpers/interfaceEmitter';
 import {
   ban, debug, error, info, redeem, timeout, unban, warning,
 } from '~/helpers/log';
-import { broadcasterId } from '~/helpers/oauth/broadcasterId';
 import { addUIError } from '~/helpers/panel/alerts';
 import eventlist from '~/overlays/eventlist';
 import alerts from '~/registries/alerts';
@@ -32,14 +32,20 @@ setInterval(() => {
   }
 }, 10 * MINUTE);
 
-setInterval(() => {
+setInterval(async () => {
   try {
-    if (oauth.broadcasterAccessToken.length === 0) {
+    const [ broadcasterAccessToken, broadcasterClientId, broadcasterId ] = await Promise.all([
+      get<string>('/services/twitch', 'broadcasterAccessToken'),
+      get<string>('/services/twitch', 'broadcasterClientId'),
+      get<string>('/services/twitch', 'broadcasterId'),
+    ]);
+
+    if (broadcasterAccessToken.length === 0) {
       connectionHash = '';
     }
 
-    if (oauth.broadcasterAccessToken.length > 0 && oauth.broadcasterClientId.length > 0 && broadcasterId.value.length > 0) {
-      const newConnectionHash = oauth.broadcasterClientId.concat(broadcasterId.value);
+    if (broadcasterAccessToken.length > 0 && broadcasterClientId.length > 0 && broadcasterId.length > 0) {
+      const newConnectionHash = broadcasterClientId.concat(broadcasterId);
       if (connectionHash !== newConnectionHash) {
         debug('pubsub', `${connectionHash} != ${newConnectionHash}`);
         ws?.close();
@@ -68,13 +74,16 @@ const heartbeat = () => {
 
 const connect = () => {
   ws = new WebSocket(pubsubEndpoint);
-  ws.onopen = function() {
+  ws.onopen = async function() {
     info('PUBSUB: Socket Opened');
     heartbeat();
 
+    const [ broadcasterId ] = await Promise.all([
+      get<string>('/services/twitch', 'broadcasterId'),
+    ]);
     // listen to points redemption
-    listen('channel-points-channel-v1.' + broadcasterId.value);
-    listen('chat_moderator_actions.' + broadcasterId.value);
+    listen('channel-points-channel-v1.' + broadcasterId);
+    listen('chat_moderator_actions.' + broadcasterId);
     heartbeatHandle = setInterval(heartbeat, heartbeatInterval);
   };
 
@@ -192,13 +201,16 @@ const connect = () => {
   };
 };
 
-const listen = (topic: string) => {
+const listen = async (topic: string) => {
+  const [ broadcasterAccessToken ] = await Promise.all([
+    get<string>('/services/twitch', 'broadcasterAccessToken'),
+  ]);
   const message = {
     type:  'LISTEN',
     nonce: nonce(15),
     data:  {
       topics:     [topic],
-      auth_token: oauth.broadcasterAccessToken,
+      auth_token: broadcasterAccessToken,
     },
   };
   debug('pubsub', 'SENT: ' + JSON.stringify(message));

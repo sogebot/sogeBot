@@ -9,16 +9,17 @@ import { eventEmitter } from '../events/emitter';
 import {
   error, start as startLog, stop,
 } from '../log';
-import { channelId } from '../oauth';
 import { linesParsed } from '../parser';
 import { find } from '../register';
 
 import { HelixStream } from '~/../node_modules/@twurple/api/lib';
+import { get } from '~/helpers/interfaceEmitter';
 import { getGameNameFromId } from '~/services/twitch/calls/getGameNameFromId';
 
 async function start(data: HelixStream) {
+  const channelId = await get<string>('/services/twitch', 'channelId');
   startLog(
-    `id: ${data.id} | startedAt: ${data.started_at} | title: ${data.title} | game: ${await getGameNameFromId(Number(data.game_id))} | type: ${data.type} | channel ID: ${channelId.value}`,
+    `id: ${data.id} | startedAt: ${data.startDate.toISOString()} | title: ${data.title} | game: ${await getGameNameFromId(Number(data.gameId))} | type: ${data.type} | channel ID: ${channelId}`,
   );
 
   // reset quick stats on stream start
@@ -30,7 +31,7 @@ async function start(data: HelixStream) {
   stats.value.currentTips = 0;
   chatMessagesAtStart.value = linesParsed;
 
-  streamStatusChangeSince.value = new Date(data.started_at).getTime();
+  streamStatusChangeSince.value = new Date(data.startDate).getTime();
   streamId.value = data.id;
   streamType.value = data.type;
   isStreamOnline.value = true;
