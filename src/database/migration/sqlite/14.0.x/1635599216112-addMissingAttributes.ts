@@ -26,7 +26,7 @@ export class addMissingAttributes1635599216112 implements MigrationInterface {
       }
       const keys = Object.keys(item);
       item.opts = JSON.stringify(opts);
-      await queryRunner.query('DELETE FROM "overlay_mapper" WHERE id=?', [item.id]);
+      await queryRunner.query('DELETE FROM "overlay_mapper" WHERE "id"=?', [item.id]);
       await queryRunner.query(
         `INSERT INTO "overlay_mapper"(${keys.map(o => `"${o}"`).join(', ')}) values (${keys.map(o => `?`).join(', ')})`,
         [keys.map(key => item[key])],
