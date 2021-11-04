@@ -6,7 +6,7 @@ export class addMissingShowMilliseconds1635453652530 implements MigrationInterfa
   public async up(queryRunner: QueryRunner): Promise<void> {
     const items = await queryRunner.query('SELECT * FROM `overlay_mapper`', undefined);
     for (const item of items) {
-      if(['stopwatch', 'countdown', 'maraton'].includes(item.value)) {
+      if(['stopwatch', 'countdown', 'marathon'].includes(item.value)) {
         const opts: Record<string, any> = JSON.parse(item.opts);
         if (typeof opts.showMilliseconds === 'undefined') {
           opts.showMilliseconds = false;
