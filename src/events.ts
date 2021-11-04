@@ -4,7 +4,6 @@ import { sample } from '@sogebot/ui-helpers/array';
 import { dayjs } from '@sogebot/ui-helpers/dayjsHelper';
 import { generateUsername } from '@sogebot/ui-helpers/generateUsername';
 import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized';
-import axios from 'axios';
 import _, {
   clone, cloneDeep, get, isNil, random,
 } from 'lodash';
@@ -19,9 +18,7 @@ import {
 import { User } from '~/database/entity/user';
 import { onStreamEnd } from '~/decorators/on';
 import events from '~/events';
-import {
-  calls, isStreamOnline, rawStatus, setRateLimit, stats, streamStatusChangeSince,
-} from '~/helpers/api';
+import { isStreamOnline, rawStatus, stats, streamStatusChangeSince } from '~/helpers/api';
 import { attributesReplace } from '~/helpers/attributesReplace';
 import {
   announce, getOwner, getUserSender, prepare,
@@ -33,10 +30,11 @@ import {
 import { csEmitter } from '~/helpers/customvariables/emitter';
 import { isDbConnected } from '~/helpers/database';
 import { eventEmitter } from '~/helpers/events/emitter';
+import { get as emitterGet } from '~/helpers/interfaceEmitter';
+import emitter from '~/helpers/interfaceEmitter';
 import {
   debug, error, info, warning,
 } from '~/helpers/log';
-import { ioServer } from '~/helpers/panel';
 import { addUIError } from '~/helpers/panel/';
 import { parserEmitter } from '~/helpers/parser/';
 import { adminEndpoint } from '~/helpers/socket';
@@ -48,7 +46,9 @@ import { isBot, isBotSubscriber } from '~/helpers/user/isBot';
 import { isBroadcaster } from '~/helpers/user/isBroadcaster';
 import { isModerator } from '~/helpers/user/isModerator';
 import Message from '~/message';
-import api from '~/services/twitch/api';
+import client from '~/services/twitch/api/client';
+import { createClip } from '~/services/twitch/calls/createClip';
+import { getCustomRewards } from '~/services/twitch/calls/getCustomRewards';
 import { getIdFromTwitch } from '~/services/twitch/calls/getIdFromTwitch';
 import { setTitleAndGame } from '~/services/twitch/calls/setTitleAndGame';
 import tmi from '~/services/twitch/chat';
@@ -71,7 +71,7 @@ class Events extends Core {
     definitions?: {
       [x: string]: any;
     };
-    fire: (operation: EventsEntity.OperationDefinitions, attributes: EventsEntity.Attributes) => Promise<void>;
+    fire: (operation: EventsEntity.OperationDefinitions, attributes: EventsEntity.Attributes) => Promise<any>;
   }[];
 
   constructor() {
@@ -326,7 +326,7 @@ class Events extends Core {
   }
 
   public async fireCreateAClip(operation: EventsEntity.OperationDefinitions) {
-    const cid = await api.createClip({ hasDelay: operation.hasDelay });
+    const cid = await createClip({ createAfterDelay: !!operation.hasDelay });
     if (cid) { // OK
       if (Boolean(operation.announce) === true) {
         announce(prepare('api.clips.created', { link: `https://clips.twitch.tv/${cid}` }), 'general');
@@ -347,7 +347,8 @@ class Events extends Core {
   }
 
   public async fireBotWillJoinChannel() {
-    tmi.client.bot?.join('#' + oauth.broadcasterUsername);
+    const broadcasterUsername = await emitterGet<string>('/services/twitch', 'broadcasterUsername');
+    tmi.client.bot?.join('#' + broadcasterUsername);
   }
 
   public async fireBotWillLeaveChannel() {
@@ -358,65 +359,45 @@ class Events extends Core {
   }
 
   public async fireStartCommercial(operation: EventsEntity.OperationDefinitions) {
-    const cid = await get<string>('/services/twitch', 'channelId');
-    const url = `https://api.twitch.tv/helix/channels/commercial`;
-
-    const token = await oauth.broadcasterAccessToken;
-    if (!oauth.broadcasterCurrentScopes.includes('channel:edit:commercial')) {
-      warning('Missing Broadcaster oAuth scope channel:edit:commercial to start commercial');
-      addUIError({ name: 'OAUTH', message: 'Missing Broadcaster oAuth scope channel:edit:commercial to start commercial' });
-      return;
-    }
-    if (token === '') {
-      warning('Missing Broadcaster oAuth to change game or title');
-      addUIError({ name: 'OAUTH', message: 'Missing Broadcaster oAuth to change game or title' });
-      return;
-    }
-
     try {
-      const request = await axios({
-        method:  'post',
-        url,
-        data:    { broadcaster_id: String(cid), length: Number(operation.durationOfCommercial) },
-        headers: {
-          'Authorization': 'Bearer ' + token,
-          'Client-ID':     oauth.broadcasterClientId,
-          'Content-Type':  'application/json',
-        },
-      });
-
-      // save remaining api calls
-      setRateLimit('broadcaster', request.headers as any);
-
-      ioServer?.emit('api.stats', {
-        method: 'POST', request: { data: { broadcaster_id: String(cid), length: Number(operation.durationOfCommercial) } }, timestamp: Date.now(), call: 'commercial', api: 'helix', endpoint: url, code: request.status, data: request.data, remaining: calls.broadcaster,
-      });
-      eventEmitter.emit('commercial', { duration: Number(operation.durationOfCommercial) });
-    } catch (e: any) {
-      if (e.isAxiosError) {
-        error(`API: ${url} - ${e.response.data.message}`);
-        ioServer?.emit('api.stats', {
-          method: 'POST', request: { data: { broadcaster_id: String(cid), length: Number(operation.durationOfCommercial) } }, timestamp: Date.now(), call: 'commercial', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.response?.data ?? 'n/a',
-        });
+      const [ cid, broadcasterCurrentScopes] = await Promise.all([
+        emitterGet<string>('/services/twitch', 'channelId'),
+        emitterGet<string[]>('/services/twitch', 'broadcasterCurrentScopes'),
+      ]);
+      const duration = operation.durationOfCommercial
+        ? Number(operation.durationOfCommercial)
+        : 30;
+      // check if duration is correct (30, 60, 90, 120, 150, 180)
+      if ([30, 60, 90, 120, 150, 180].includes(duration)) {
+        if (!broadcasterCurrentScopes.includes('channel:edit:commercial')) {
+          warning('Missing Broadcaster oAuth scope channel:edit:commercial to start commercial');
+          addUIError({ name: 'OAUTH', message: 'Missing Broadcaster oAuth scope channel:edit:commercial to start commercial' });
+          return;
+        }
+        if (!broadcasterCurrentScopes.includes('channel:edit:commercial')) {
+          warning('Missing Broadcaster oAuth scope channel:edit:commercial to start commercial');
+          addUIError({ name: 'OAUTH', message: 'Missing Broadcaster oAuth scope channel:edit:commercial to start commercial' });
+          return;
+        }
+        const clientBroadcaster = await client('broadcaster');
+        await clientBroadcaster.channels.startChannelCommercial(cid, duration as 30 | 60 | 90 | 120 | 150 | 180);
+        eventEmitter.emit('commercial', { duration });
       } else {
-        error(`API: ${url} - ${e.stack}`);
-        ioServer?.emit('api.stats', {
-          method: 'POST', request: { data: { broadcaster_id: String(cid), length: Number(operation.durationOfCommercial) } }, timestamp: Date.now(), call: 'commercial', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack,
-        });
+        throw new Error('Incorrect duration set');
+      }
+    } catch (e) {
+      if (e instanceof Error) {
+        error(e.stack ?? e.message);
       }
     }
   }
 
   public async fireEmoteExplosion(operation: EventsEntity.OperationDefinitions) {
-    // we must require emotes as it is triggering translations in mocha
-    const emotes: typeof import('~/emotes') = require('~/emotes');
-    emotes.default.explode(String(operation.emotesToExplode).split(' '));
+    emitter.emit('services::twitch::emotes', 'explode', String(operation.emotesToExplode).split(' '));
   }
 
   public async fireEmoteFirework(operation: EventsEntity.OperationDefinitions) {
-    // we must require emotes as it is triggering translations in mocha
-    const emotes: typeof import('~/emotes') = require('~/emotes');
-    emotes.default.firework(String(operation.emotesToFirework).split(' '));
+    emitter.emit('services::twitch::emotes', 'firework', String(operation.emotesToExplode).split(' '));
   }
 
   public async fireRunCommand(operation: EventsEntity.OperationDefinitions, attributes: EventsEntity.Attributes) {
@@ -751,8 +732,8 @@ class Events extends Core {
   public sockets() {
     adminEndpoint(this.nsp, 'events::getRedeemedRewards', async (cb) => {
       try {
-        const rewards = await api.getCustomRewards();
-        cb(null, rewards?.data ? [...rewards?.data.map(o => o.title)] : []);
+        const rewards = await getCustomRewards() ?? [];
+        cb(null, [...rewards.map(o => o.title)]);
       } catch (e: any) {
         cb(e.stack, []);
       }

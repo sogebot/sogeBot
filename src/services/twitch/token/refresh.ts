@@ -131,12 +131,11 @@ export const refresh = async (type: 'bot' | 'broadcaster', clear = false) => {
       if (type === 'bot') {
         emitter.emit('set', '/services/twitch', 'botAccessToken', request.data.token);
         emitter.emit('set', '/services/twitch', 'botRefreshToken', request.data.refresh);
-        emitter.emit('twitch::api::init', 'bot');
       } else {
         emitter.emit('set', '/services/twitch', 'broadcasterAccessToken', request.data.token);
         emitter.emit('set', '/services/twitch', 'broadcasterRefreshToken', request.data.refresh);
-        emitter.emit('twitch::api::init', 'broadcaster');
       }
+      emitter.emit('services::twitch::api::init', type);
 
       debug('oauth.validate', 'Access token of ' + type + ' was refreshed.');
       debug('oauth.validate', 'New access token of ' + type + ': ' + request.data.token.replace(/(.{25})/, '*'.repeat(25)));

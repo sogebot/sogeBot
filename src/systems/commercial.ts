@@ -58,7 +58,7 @@ class Commercial extends System {
 
     const [ cid, broadcasterCurrentScopes] = await Promise.all([
       get<string>('/services/twitch', 'channelId'),
-      get<string>('/services/twitch', 'broadcasterCurrentScopes'),
+      get<string[]>('/services/twitch', 'broadcasterCurrentScopes'),
     ]);
     // check if duration is correct (30, 60, 90, 120, 150, 180)
     if ([30, 60, 90, 120, 150, 180].includes(commercial.duration ?? 0)) {

@@ -192,6 +192,15 @@ class Twitch extends Service {
     this.emotes = new Emotes();
     apiIntervalInit();
 
+    emitter.on('services::twitch::emotes', (type, value) => {
+      if (type === 'explode') {
+        this.emotes.explode(value);
+      }
+      if (type === 'firework') {
+        this.emotes.firework(value);
+      }
+    });
+
     this.addMenu({
       category: 'stats', name: 'api', id: 'stats/api', this: null,
     });

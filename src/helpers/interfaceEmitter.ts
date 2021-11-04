@@ -1,12 +1,14 @@
 import { TypedEmitter } from 'tiny-typed-emitter';
 
 interface Events {
+  'services::twitch::emotes': (type: 'explode' | 'firework', emotes: string[]) => void,
+  'services::twitch::api::init': (type: 'broadcaster' | 'bot') => void,
+
   'change': (path: string, value: any) => void,
   'load': (path: string, value: any) => void,
 
   'get': (nsp: string, variableName: string, cb: (value: any) => void) => void,
   'set': (nsp: string, variableName: string, value: unknown, cb?: () => void) => void,
-  'twitch::api::init': (type: 'broadcaster' | 'bot') => void,
 }
 
 class interfaceEmitter extends TypedEmitter<Events> {}
