@@ -9,7 +9,6 @@ import { settings } from '~/decorators';
 import general from '~/general';
 import { mainCurrency, symbol } from '~/helpers/currency';
 import { timezone } from '~/helpers/dayjs';
-import { getBroadcaster } from '~/helpers/getBroadcaster';
 import { find, list } from '~/helpers/register';
 import { adminEndpoint, publicEndpoint } from '~/helpers/socket';
 
@@ -65,10 +64,13 @@ class UI extends Core {
         // lang
         data.lang = general.lang;
 
-        const generalChannel = await get<string>('/services/twitch', 'generalChannel');
-        const generalOwners = await get<string>('/services/twitch', 'generalOwners');
+        const [ broadcasterUsername, generalChannel, generalOwners ] = await Promise.all([
+          get<string>('/services/twitch', 'broadcasterUsername'),
+          get<string>('/services/twitch', 'generalChannel'),
+          get<string>('/services/twitch', 'generalOwners'),
+        ]);
 
-        data.isCastersSet = filter(generalOwners, (o) => isString(o) && o.trim().length > 0).length > 0 || getBroadcaster() !== '';
+        data.isCastersSet = filter(generalOwners, (o) => isString(o) && o.trim().length > 0).length > 0 || broadcasterUsername !== '';
         data.isChannelSet = filter(generalChannel, (o) => isString(o) && o.trim().length > 0).length > 0;
 
         cb(null, data);

@@ -14,6 +14,7 @@ import {
 import { getRepository, In, IsNull, Not } from 'typeorm';
 
 import twitch from '../twitch';
+import { followerUpdatePreCheck } from './calls/isFollowerUpdate';
 
 import {
   stats as apiStats, calls, chatMessagesAtStart, currentStreamTags, emptyRateLimit, gameCache, gameOrTitleChangedManually, isStreamOnline, rawStatus, setRateLimit, streamStatusChangeSince,
@@ -29,7 +30,6 @@ import { isDbConnected } from '~/helpers/database';
 import { dayjs } from '~/helpers/dayjs';
 import { eventEmitter } from '~/helpers/events';
 import { follow } from '~/helpers/events/follow';
-import { getBroadcaster } from '~/helpers/getBroadcaster';
 import {
   debug, error, info, warning,
 } from '~/helpers/log';
@@ -175,18 +175,6 @@ class API {
     return { state: true };
   }
 
-  async followerUpdatePreCheck (userName: string) {
-    const user = await getRepository(User).findOne({ userName });
-    if (user) {
-      const isSkipped = user.userName === getBroadcaster() || user.userName === oauth.botUsername;
-      const userHaveId = !isNil(user.userId);
-      if (new Date().getTime() - user.followCheckAt <= constants.DAY || isSkipped || !userHaveId) {
-        return;
-      }
-      await this.isFollowerUpdate(user);
-    }
-  }
-
   async getUsernameFromTwitch (id: string) {
     const url = `https://api.twitch.tv/helix/users?id=${id}`;
     let request;
@@ -267,11 +255,11 @@ class API {
 
       joinpart.send({ users: joinedUsers, type: 'join' });
       for (const username of joinedUsers) {
-        if (isIgnored({ userName: username }) || oauth.botUsername === username) {
+        if (isIgnored({ userName: username })) {
           continue;
         } else {
           await setImmediateAwait();
-          this.followerUpdatePreCheck(username);
+          followerUpdatePreCheck(username);
           eventEmitter.emit('user-joined-channel', { userName: username });
         }
       }

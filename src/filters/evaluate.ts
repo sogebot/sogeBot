@@ -8,6 +8,7 @@ import _ from 'lodash';
 import safeEval from 'safe-eval';
 import { getRepository } from 'typeorm';
 
+import { get } from '../helpers/interfaceEmitter';
 import twitch from '../services/twitch';
 import users from '../users';
 
@@ -55,9 +56,13 @@ const evaluate: ResponseFilter = {
 
     if (containOnline) {
       await changelog.flush();
+      const [ botUsername, broadcasterUsername ] = await Promise.all([
+        get<string>('/services/twitch', 'botUsername'),
+        get<string>('/services/twitch', 'broadcasterUsername'),
+      ]);
       const viewers = (await getRepository(User).createQueryBuilder('user')
-        .where('user.userName != :botusername', { botusername: oauth.botUsername.toLowerCase() })
-        .andWhere('user.userName != :broadcasterusername', { broadcasterusername: oauth.broadcasterUsername.toLowerCase() })
+        .where('user.userName != :botusername', { botusername: botUsername.toLowerCase() })
+        .andWhere('user.userName != :broadcasterusername', { broadcasterusername: broadcasterUsername.toLowerCase() })
         .andWhere('user.isOnline = :isOnline', { isOnline: true })
         .getMany()).filter(o => {
         return isIgnored({ userName: o.userName, userId: o.userId });

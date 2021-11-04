@@ -1,52 +1,27 @@
-import axios from 'axios';
+import client from '../api/client';
 
-import {
-  calls, emptyRateLimit, getClientId, getToken, setRateLimit, stats,
-} from '~/helpers/api';
 import { apiEmitter } from '~/helpers/api/emitter';
+import emitter, { get } from '~/helpers/interfaceEmitter';
 import { error } from '~/helpers/log';
-import { ioServer } from '~/helpers/panel';
 
 apiEmitter.on('updateChannelViewsAndBroadcasterType', () => updateChannelViewsAndBroadcasterType());
 
 async function updateChannelViewsAndBroadcasterType () {
-  const cid = await get<string>('/services/twitch', 'channelId');
-  const url = `https://api.twitch.tv/helix/users/?id=${cid}`;
-
-  const notEnoughAPICalls = calls.bot.remaining <= 30 && calls.bot.refresh > Date.now() / 1000;
-  if (notEnoughAPICalls || cid === '') {
-    return { state: false };
-  }
-
-  let request;
   try {
-    request = await axios.get<any>(url, {
-      headers: {
-        'Authorization': 'Bearer ' + await getToken('bot'),
-        'Client-ID':     await getClientId('bot'),
-      },
-    });
-    // save remaining api calls
-    setRateLimit('bot', request.headers as any);
+    const [ cid, clientBot ] = await Promise.all([
+      get<string>('/services/twitch', 'channelId'),
+      client('bot'),
+    ]);
+    const getUserById = await clientBot.users.getUserById(cid);
 
-    ioServer?.emit('api.stats', {
-      method: 'GET', data: request.data, timestamp: Date.now(), call: 'updateChannelViewsAndBroadcasterType', api: 'helix', endpoint: url, code: request.status, remaining: calls.bot,
-    });
-
-    if (request.data.data.length > 0) {
-      oauth.profileImageUrl = request.data.data[0].profile_image_url;
-      oauth.broadcasterType = request.data.data[0].broadcaster_type;
-      stats.value.currentViews = request.data.data[0].view_count;
+    if (getUserById) {
+      emitter.emit('set', '/services/twitch', 'profileImageUrl', getUserById.profilePictureUrl);
+      emitter.emit('set', '/services/twitch', 'broadcasterType', getUserById.broadcasterType);
     }
-  } catch (e: any) {
-    if (typeof e.response !== 'undefined' && e.response.status === 429) {
-      emptyRateLimit('bot', e.response.headers);
+  } catch (e: unknown) {
+    if (e instanceof Error) {
+      error(e.stack ?? e.message);
     }
-
-    error(`${url} - ${e.message}`);
-    ioServer?.emit('api.stats', {
-      method: 'GET', timestamp: Date.now(), call: 'updateChannelViewsAndBroadcasterType', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: calls.bot,
-    });
   }
   return { state: true };
 }

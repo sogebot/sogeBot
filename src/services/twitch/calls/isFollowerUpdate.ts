@@ -1,4 +1,6 @@
-import { UserInterface } from '@entity/user';
+import { User, UserInterface } from '@entity/user';
+import * as constants from '@sogebot/ui-helpers/constants';
+import { getRepository } from 'typeorm';
 
 import { eventEmitter } from '../../../helpers/events';
 import { unfollow } from '../../../helpers/log';
@@ -7,6 +9,22 @@ import { follow } from '~/helpers/events/follow';
 import { get } from '~/helpers/interfaceEmitter';
 import * as changelog from '~/helpers/user/changelog.js';
 import client from '~/services/twitch/api/client';
+
+export async function followerUpdatePreCheck (userName: string) {
+  const user = await getRepository(User).findOne({ userName });
+  const [ broadcasterUsername, botUsername ] = await Promise.all([
+    get<string>('/services/twitch', 'broadcasterUsername'),
+    get<string>('/services/twitch', 'botUsername'),
+  ]);
+
+  if (user) {
+    const isSkipped = user.userName.toLowerCase() === broadcasterUsername.toLowerCase() || user.userName.toLowerCase() === botUsername.toLowerCase();
+    if (new Date().getTime() - user.followCheckAt <= constants.DAY || isSkipped) {
+      return;
+    }
+    isFollowerUpdate(user);
+  }
+}
 
 export async function isFollowerUpdate (user: UserInterface | null) {
   if (!user || !user.userId) {

@@ -14,6 +14,7 @@ import { getRepository } from 'typeorm';
 
 import emitter, { get } from '../../helpers/interfaceEmitter';
 import { default as apiClient } from './api/client';
+import { followerUpdatePreCheck } from './calls/isFollowerUpdate';
 import { refresh } from './token/refresh';
 
 import { parserReply } from '~/commons';
@@ -36,7 +37,6 @@ import { warning } from '~/helpers/log';
 import {
   chatIn, cheer, debug, error, host, info, raid, resub, sub, subcommunitygift, subgift, whisperIn,
 } from '~/helpers/log';
-import { generalChannel } from '~/helpers/oauth/generalChannel';
 import { linesParsedIncrement, setStatus } from '~/helpers/parser';
 import { tmiEmitter } from '~/helpers/tmi';
 import { isOwner } from '~/helpers/user';
@@ -46,7 +46,6 @@ import { isIgnored } from '~/helpers/user/isIgnored';
 import eventlist from '~/overlays/eventlist';
 import { Parser } from '~/parser';
 import alerts from '~/registries/alerts';
-import api from '~/services/twitch/api';
 import alias from '~/systems/alias';
 import customcommands from '~/systems/customcommands';
 import { translate } from '~/translate';
@@ -164,7 +163,8 @@ class TMI {
       if (!client) {
         throw Error('TMI: cannot reconnect, connection is not established');
       }
-      const channel = generalChannel.value;
+
+      const channel = await get<string>('/services/twitch', 'generalChannel');
 
       info(`TMI: ${type} is reconnecting`);
 
@@ -262,7 +262,7 @@ class TMI {
 
     client.onAuthenticationFailure(message => {
       info(`TMI: ${type} authentication failure, ${message}`);
-      oauth.refreshAccessToken(type).then(() => this.initClient(type));
+      refresh(type).then(() => this.initClient(type));
     });
 
     client.onDisconnect((manually, reason) => {
@@ -897,7 +897,7 @@ class TMI {
         });
       }
 
-      api.followerUpdatePreCheck(userstate.userName);
+      followerUpdatePreCheck(userstate.userName);
 
       eventEmitter.emit('keyword-send-x-times', {
         userName: userstate.userName, message: message, source: 'twitch',
