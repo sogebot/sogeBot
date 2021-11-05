@@ -13,7 +13,6 @@ import {
 import { isNil } from 'lodash';
 import { getRepository } from 'typeorm';
 
-import emitter, { get } from '../../helpers/interfaceEmitter';
 import { default as apiClient } from './api/client';
 import { followerUpdatePreCheck } from './calls/isFollowerUpdate';
 import { refresh } from './token/refresh';
@@ -21,7 +20,7 @@ import { refresh } from './token/refresh';
 import { parserReply } from '~/commons';
 import { timer } from '~/decorators';
 import {
-  getFunctionList, onStreamStart,
+  getFunctionList,
 } from '~/decorators/on';
 import { isStreamOnline, stats } from '~/helpers/api';
 import * as hypeTrain from '~/helpers/api/hypeTrain';
@@ -33,6 +32,7 @@ import { eventEmitter } from '~/helpers/events';
 import {
   triggerInterfaceOnBit, triggerInterfaceOnMessage, triggerInterfaceOnSub,
 } from '~/helpers/interface/triggers';
+import emitter from '~/helpers/interfaceEmitter';
 import { warning } from '~/helpers/log';
 import {
   chatIn, cheer, debug, error, host, info, raid, resub, sub, subcommunitygift, subgift, whisperIn,
@@ -43,6 +43,7 @@ import { isOwner } from '~/helpers/user';
 import * as changelog from '~/helpers/user/changelog.js';
 import { isBot, isBotId } from '~/helpers/user/isBot';
 import { isIgnored } from '~/helpers/user/isIgnored';
+import { variable } from '~/helpers/variables';
 import eventlist from '~/overlays/eventlist';
 import { Parser } from '~/parser';
 import alerts from '~/registries/alerts';
@@ -53,10 +54,9 @@ import users from '~/users';
 import joinpart from '~/widgets/joinpart';
 
 const commandRegexp = new RegExp(/^!\w+$/);
-class TMI {
+class Chat {
   shouldConnect = false;
 
-  channel = '';
   timeouts: Record<string, any> = {};
   client: {
     bot: ChatClient | null;
@@ -79,8 +79,41 @@ class TMI {
       setTimeout(() => this.emitter(), 10);
       return;
     }
+    tmiEmitter.on('timeout', (username, seconds, isMod) => {
+      const generalChannel = variable.get('services.twitch.generalChannel') as string;
+      if (isMod) {
+        if (this.client.broadcaster) {
+          this.client.broadcaster.timeout(generalChannel, username, seconds);
+          info(`Bot will set mod status for ${username} after ${seconds} seconds.`);
+          setTimeout(() => {
+            // we need to remod user
+            this.client.broadcaster?.mod(generalChannel, username);
+          }, (seconds * 1000) + 1000);
+        } else {
+          error('Cannot timeout mod user, as you don\'t have set broadcaster in chat');
+        }
+      } else {
+        this.client.bot?.timeout(generalChannel, username, seconds);
+      }
+    });
+    tmiEmitter.on('say', (username, message, opts) => {
+      this.client.bot?.say(username, message, opts);
+    });
+    tmiEmitter.on('whisper', (username, message) => {
+      this.client.bot?.whisper(username, message);
+    });
+    tmiEmitter.on('join', (type) => {
+      const broadcasterUsername = variable.get('services.twitch.broadcasterUsername') as string;
+      this.join(type, broadcasterUsername);
+    });
+    tmiEmitter.on('ban', (username) => {
+      this.ban(username);
+    });
     tmiEmitter.on('reconnect', (type) => {
       this.reconnect(type);
+    });
+    tmiEmitter.on('delete', (type, msgId) => {
+      this.delete(type, msgId);
     });
     tmiEmitter.on('part', (type) => {
       this.part(type);
@@ -95,12 +128,10 @@ class TMI {
     }
     clearTimeout(this.timeouts[`initClient.${type}`]);
 
-    const [ clientId, token, isValidToken, channel ] = await Promise.all([
-      get<string>('/services/twitch', 'clientId'),
-      get<string>('/services/twitch', type + 'AccessToken'),
-      get<string>('/services/twitch', type + 'TokenValid'),
-      get<string>('/services/twitch', 'generalChannel'),
-    ]);
+    const clientId = variable.get('services.twitch.clientId') as string;
+    const token = variable.get(`services.twitch.${type}AccessToken`) as string;
+    const isValidToken = variable.get(`services.twitch.${type}TokenValid`) as string;
+    const channel = variable.get('services.twitch.generalChannel') as string;
 
     // wait for initial validation
     if (!isValidToken) {
@@ -144,12 +175,6 @@ class TMI {
     }
   }
 
-  @onStreamStart()
-  reconnectOnStreamStart() {
-    this.part('bot').then(() => this.join('bot', this.channel));
-    this.part('broadcaster').then(() => this.join('broadcaster', this.channel));
-  }
-
   /* will connect/reconnect bot and broadcaster
    * this is called from oauth when channel is changed or initialized
    */
@@ -164,12 +189,12 @@ class TMI {
         throw Error('TMI: cannot reconnect, connection is not established');
       }
 
-      const channel = await get<string>('/services/twitch', 'generalChannel');
+      const channel = variable.get('services.twitch.generalChannel') as string;
 
       info(`TMI: ${type} is reconnecting`);
 
       client.removeListener();
-      await client.part(this.channel);
+      await client.part(channel);
       await client.connect();
       this.loadListeners(type);
       await this.join(type, channel);
@@ -202,32 +227,35 @@ class TMI {
         if (type ==='bot') {
           setStatus('TMI', constants.CONNECTED);
         }
-        this.channel = channel;
+
+        emitter.emit('set', '/services/twitch', 'currentChannel', channel);
       }
     }
   }
 
   async ban (username: string, type: 'bot' | 'broadcaster' = 'bot' ): Promise<void> {
+    const currentChannel = variable.get('services.twitch.currentChannel') as string;
     const client = this.client[type];
     if (!client && type === 'bot') {
       return this.ban(username, 'broadcaster');
     } else if (!client) {
       error(`TMI: Cannot ban user. Bot/Broadcaster is not connected to TMI.`);
     } else {
-      await client.ban(this.channel, username);
-      await client.say(this.channel, `/block ${username}`);
+      await client.ban(currentChannel, username);
+      await client.say(currentChannel, `/block ${username}`);
       info(`TMI: User ${username} was banned and blocked.`);
       return;
     }
   }
 
   async part (type: 'bot' | 'broadcaster') {
+    const currentChannel = variable.get('services.twitch.currentChannel') as string;
     const client = this.client[type];
     if (!client) {
       info(`TMI: ${type} is not connected in any channel`);
     } else {
-      await client.part(this.channel);
-      info(`TMI: ${type} parted channel ${this.channel}`);
+      await client.part(currentChannel);
+      info(`TMI: ${type} parted channel ${currentChannel}`);
     }
   }
 
@@ -840,7 +868,7 @@ class TMI {
       sender: userstate, message: message, skip: skip, quiet: quiet, id: data.id, emotesOffsets: data.emotesOffsets, isAction: data.isAction,
     });
 
-    const whisperListener = await new Promise<boolean>(resolve => emitter.emit('get', '/services/twitch/', 'whisperListener', (value) => resolve(value)));
+    const whisperListener = variable.get('services.twitch.whisperListener') as boolean;
     if (!skip
         && data.isWhisper
         && (whisperListener || isOwner(userstate))) {
@@ -917,4 +945,4 @@ class TMI {
   }
 }
 
-export default new TMI();
+export default Chat;

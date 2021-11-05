@@ -141,14 +141,6 @@ class Module {
     // prepare proxies for variables
     this._sockets();
 
-    emitter.on('get', (nsp, variableName, cb) => {
-      if (nsp === this.nsp) {
-        cb((this as any)[variableName]);
-      } else {
-        cb(undefined);
-      }
-    });
-
     emitter.on('set', (nsp, variableName, value, cb) => {
       if (nsp === this.nsp) {
         (this as any)[variableName] = value;
@@ -220,7 +212,6 @@ class Module {
 
     setTimeout(() => {
       for (const event of getFunctionList('load', `${path}.${key}` )) {
-        emitter.emit('load', `${path}.${key}`,  JSON.parse(variable?.value ?? '""'));
         (this as any)[event.fName](key, JSON.parse(variable?.value ?? '""'));
       }
     }, 1000);

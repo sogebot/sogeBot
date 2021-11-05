@@ -5,11 +5,11 @@ import WebSocket from 'ws';
 
 import { isStreamOnline } from '~/helpers/api';
 import { eventEmitter } from '~/helpers/events';
-import { get } from '~/helpers/interfaceEmitter';
 import {
   ban, debug, error, info, redeem, timeout, unban, warning,
 } from '~/helpers/log';
 import { addUIError } from '~/helpers/panel/alerts';
+import { variable } from '~/helpers/variables';
 import eventlist from '~/overlays/eventlist';
 import alerts from '~/registries/alerts';
 
@@ -34,13 +34,15 @@ setInterval(() => {
 
 setInterval(async () => {
   try {
-    const [ broadcasterAccessToken, broadcasterClientId, broadcasterId ] = await Promise.all([
-      get<string>('/services/twitch', 'broadcasterAccessToken'),
-      get<string>('/services/twitch', 'broadcasterClientId'),
-      get<string>('/services/twitch', 'broadcasterId'),
-    ]);
+    const broadcasterAccessToken = variable.get('services.twitch.broadcasterAccessToken') as string;
+    const broadcasterClientId = variable.get('services.twitch.broadcasterClientId') as string;
+    const broadcasterId = variable.get('services.twitch.broadcasterId') as string;
 
-    if (broadcasterAccessToken.length === 0) {
+    if (!broadcasterAccessToken) {
+      return;
+    }
+
+    if (broadcasterAccessToken && broadcasterAccessToken.length === 0) {
       connectionHash = '';
     }
 
@@ -78,9 +80,7 @@ const connect = () => {
     info('PUBSUB: Socket Opened');
     heartbeat();
 
-    const [ broadcasterId ] = await Promise.all([
-      get<string>('/services/twitch', 'broadcasterId'),
-    ]);
+    const broadcasterId = variable.get('services.twitch.broadcasterId') as string;
     // listen to points redemption
     listen('channel-points-channel-v1.' + broadcasterId);
     listen('chat_moderator_actions.' + broadcasterId);
@@ -202,9 +202,7 @@ const connect = () => {
 };
 
 const listen = async (topic: string) => {
-  const [ broadcasterAccessToken ] = await Promise.all([
-    get<string>('/services/twitch', 'broadcasterAccessToken'),
-  ]);
+  const broadcasterAccessToken = variable.get('services.twitch.broadcasterAccessToken') as string;
   const message = {
     type:  'LISTEN',
     nonce: nonce(15),

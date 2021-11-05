@@ -1,13 +1,14 @@
-import { apiEmitter } from '../../../helpers/api';
 import { tmiEmitter } from '../../../helpers/tmi';
 import client from '../api/client';
 
 import { areDecoratorsLoaded } from '~/decorators';
-import emitter, { get } from '~/helpers/interfaceEmitter';
+import emitter from '~/helpers/interfaceEmitter';
 import {
   error,
   info,
 } from '~/helpers/log';
+import { variable } from '~/helpers/variables';
+import { updateChannelViewsAndBroadcasterType } from '~/services/twitch/calls/updateChannelViewsAndBroadcasterType';
 
 let timeoutId: NodeJS.Timeout | null = null;
 let toWait = 10;
@@ -26,10 +27,8 @@ export const getChannelId = async () => {
   }
 
   let timeout = 1000;
-  const [ currentChannel, generalChannel ] = await Promise.all([
-    get<string>('/services/twitch', 'currentChannel'),
-    get<string>('/services/twitch', 'generalChannel'),
-  ]);
+  const currentChannel = variable.get('services.twitch.currentChannel') as string;
+  const generalChannel = variable.get('services.twitch.generalChannel') as string;
 
   if (currentChannel !== generalChannel && generalChannel !== '') {
     try {
@@ -41,7 +40,7 @@ export const getChannelId = async () => {
         info('Channel ID set to ' + userFromTwitch.id);
         tmiEmitter.emit('reconnect', 'bot');
         tmiEmitter.emit('reconnect', 'broadcaster');
-        apiEmitter.emit('updateChannelViewsAndBroadcasterType');
+        updateChannelViewsAndBroadcasterType();
         toWait = 10;
       } else {
         throw new Error('Channel not found on Twitch.');

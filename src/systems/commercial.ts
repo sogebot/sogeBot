@@ -5,7 +5,6 @@ import * as _ from 'lodash';
 import {
   command, default_permission, helper,
 } from '../decorators';
-import { get } from '../helpers/interfaceEmitter';
 import client from '../services/twitch/api/client';
 import System from './_interface';
 
@@ -15,6 +14,7 @@ import { error, warning } from '~/helpers/log';
 import { addUIError } from '~/helpers/panel/alerts';
 import { defaultPermissions } from '~/helpers/permissions/';
 import { adminEndpoint } from '~/helpers/socket';
+import { variable } from '~/helpers/variables';
 
 /*
  * !commercial                        - gets an info about alias usage
@@ -56,10 +56,8 @@ class Commercial extends System {
       return [{ response: `Usage: ${opts.command} [duration] [optional-message]`, ...opts }];
     }
 
-    const [ cid, broadcasterCurrentScopes] = await Promise.all([
-      get<string>('/services/twitch', 'channelId'),
-      get<string[]>('/services/twitch', 'broadcasterCurrentScopes'),
-    ]);
+    const channelId = variable.get('services.twitch.channelId') as string;
+    const broadcasterCurrentScopes = variable.get('services.twitch.broadcasterCurrentScopes') as string[];
     // check if duration is correct (30, 60, 90, 120, 150, 180)
     if ([30, 60, 90, 120, 150, 180].includes(commercial.duration ?? 0)) {
       if (!broadcasterCurrentScopes.includes('channel:edit:commercial')) {
@@ -70,7 +68,7 @@ class Commercial extends System {
 
       try {
         const clientBroadcaster = await client('broadcaster');
-        await clientBroadcaster.channels.startChannelCommercial(cid, commercial.duration as 30 | 60 | 90 | 120 | 150 | 180);
+        await clientBroadcaster.channels.startChannelCommercial(channelId, commercial.duration as 30 | 60 | 90 | 120 | 150 | 180);
         eventEmitter.emit('commercial', { duration: commercial.duration ?? 30 });
         if (!_.isNil(commercial.message)) {
           return [{ response: commercial.message, ...opts }];

@@ -10,13 +10,13 @@ import client from './api/client';
 import { validate } from './token/validate';
 
 import { CacheEmotes, CacheEmotesInterface } from '~/database/entity/cacheEmotes';
-import { get } from '~/helpers/interfaceEmitter';
 import {
   debug,
   error, info, warning,
 } from '~/helpers/log';
 import { ioServer } from '~/helpers/panel';
 import { setImmediateAwait } from '~/helpers/setImmediateAwait';
+import { variable } from '~/helpers/variables';
 
 let broadcasterWarning = false;
 
@@ -73,22 +73,20 @@ class Emotes {
   }
 
   async fetchEmotesChannel () {
-    const cid = await get<string>('/services/twitch', 'channelId');
     this.fetch.channel = true;
 
-    const [ broadcasterType, botAccessToken ] = await Promise.all([
-      get<string | null>('/services/twitch', 'broadcasterType'),
-      get<string>('/services/twitch', 'botAccessToken'),
-    ]);
+    const channelId = variable.get('services.twitch.channelId') as string;
+    const broadcasterType = variable.get('services.twitch.broadcasterType') as string;
+    const botAccessToken = variable.get('services.twitch.botAccessToken') as string;
 
-    if (cid && broadcasterType !== null && (Date.now() - this.lastSubscriberEmoteChk > 1000 * 60 * 60 * 24 * 7 || this.lastChannelChk !== cid)) {
+    if (channelId && broadcasterType !== null && (Date.now() - this.lastSubscriberEmoteChk > 1000 * 60 * 60 * 24 * 7 || this.lastChannelChk !== channelId)) {
       if (broadcasterType === '' && !broadcasterWarning) {
-        info(`EMOTES: Skipping fetching of ${cid} emotes - not subscriber/affiliate`);
+        info(`EMOTES: Skipping fetching of ${channelId} emotes - not subscriber/affiliate`);
         broadcasterWarning = true;
       } else {
         broadcasterWarning = false;
         this.lastSubscriberEmoteChk = Date.now();
-        this.lastChannelChk = cid;
+        this.lastChannelChk = channelId;
         try {
           if (!botAccessToken) {
             this.lastSubscriberEmoteChk = 0; // recheck next tick
@@ -96,10 +94,10 @@ class Emotes {
             return;
           }
 
-          info(`EMOTES: Fetching channel ${cid} emotes`);
+          info(`EMOTES: Fetching channel ${channelId} emotes`);
           await validate('bot');
           const clientBot = await client('bot');
-          const emotes = await clientBot.chat.getChannelEmotes(cid);
+          const emotes = await clientBot.chat.getChannelEmotes(channelId);
           for (const emote of emotes) {
             debug('emotes.channel', `Saving to cache ${emote.name}#${emote.id}`);
             await getRepository(CacheEmotes).save({
@@ -112,10 +110,10 @@ class Emotes {
               },
             });
           }
-          info(`EMOTES: Fetched channel ${cid} emotes`);
+          info(`EMOTES: Fetched channel ${channelId} emotes`);
         } catch (e: any) {
           if (String(e).includes('404')) {
-            error(`EMOTES: Error fetching channel ${cid} emotes. Your channel was not found on twitchemotes.com. Add your channel at https://twitchemotes.com/contact/tip`);
+            error(`EMOTES: Error fetching channel ${channelId} emotes. Your channel was not found on twitchemotes.com. Add your channel at https://twitchemotes.com/contact/tip`);
           } else {
             error(e);
             error(e.stack);
@@ -129,9 +127,7 @@ class Emotes {
   async fetchEmotesGlobal () {
     this.fetch.global = true;
 
-    const [ botAccessToken ] = await Promise.all([
-      get<string>('/services/twitch', 'botAccessToken'),
-    ]);
+    const botAccessToken = variable.get('services.twitch.botAccessToken') as string;
 
     // we want to update once every week
     if (Date.now() - this.lastGlobalEmoteChk > 1000 * 60 * 60 * 24 * 7) {
@@ -170,23 +166,21 @@ class Emotes {
   }
 
   async fetchEmotesFFZ () {
-    const [ cid, channel ] = await Promise.all([
-      get<string>('/services/twitch', 'channelId'),
-      get<string>('/services/twitch', 'currentChannel'),
-    ]);
+    const channelId = variable.get('services.twitch.channelId') as string;
+    const currentChannel = variable.get('services.twitch.currentChannel') as string;
 
-    if (channel.length === 0) {
+    if (currentChannel.length === 0) {
       setImmediate(() => this.fetchEmotesFFZ());
       return;
     }
     this.fetch.ffz = true;
 
     // fetch FFZ emotes
-    if (cid && Date.now() - this.lastFFZEmoteChk > 1000 * 60 * 60 * 24 * 7) {
+    if (channelId && Date.now() - this.lastFFZEmoteChk > 1000 * 60 * 60 * 24 * 7) {
       info('EMOTES: Fetching ffz emotes');
       this.lastFFZEmoteChk = Date.now();
       try {
-        const request = await axios.get<any>('https://api.frankerfacez.com/v1/room/id/' + cid);
+        const request = await axios.get<any>('https://api.frankerfacez.com/v1/room/id/' + channelId);
 
         const emoteSet = request.data.room.set;
         const emotes = request.data.sets[emoteSet].emoticons;
@@ -205,7 +199,7 @@ class Emotes {
         info('EMOTES: Fetched ffz emotes');
       } catch (e: any) {
         if (e.response.status === 404) {
-          warning(`EMOTES: Channel ${channel} not found in ffz`);
+          warning(`EMOTES: Channel ${currentChannel} not found in ffz`);
         } else {
           error(e);
         }
@@ -216,11 +210,9 @@ class Emotes {
   }
 
   async fetchEmotesBTTV () {
-    const [ channel ] = await Promise.all([
-      get<string>('/services/twitch', 'currentChannel'),
-    ]);
+    const currentChannel = variable.get('services.twitch.currentChannel') as string;
 
-    if (channel.length === 0) {
+    if (currentChannel.length === 0) {
       setImmediate(() => this.fetchEmotesFFZ());
       return;
     }
@@ -228,11 +220,11 @@ class Emotes {
     this.fetch.bttv = true;
 
     // fetch BTTV emotes
-    if (channel && Date.now() - this.lastBTTVEmoteChk > 1000 * 60 * 60 * 24 * 7) {
+    if (currentChannel && Date.now() - this.lastBTTVEmoteChk > 1000 * 60 * 60 * 24 * 7) {
       info('EMOTES: Fetching bttv emotes');
       this.lastBTTVEmoteChk = Date.now();
       try {
-        const request = await axios.get<any>('https://api.betterttv.net/2/channels/' + channel);
+        const request = await axios.get<any>('https://api.betterttv.net/2/channels/' + currentChannel);
 
         const urlTemplate = request.data.urlTemplate;
         const emotes = request.data.emotes;
@@ -253,7 +245,7 @@ class Emotes {
         info('EMOTES: Fetched bttv emotes');
       } catch (e: any) {
         if (e.response.status === 404) {
-          warning(`EMOTES: Channel ${channel} not found in bttv`);
+          warning(`EMOTES: Channel ${currentChannel} not found in bttv`);
         } else {
           error(e);
         }

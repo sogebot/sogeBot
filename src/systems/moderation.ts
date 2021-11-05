@@ -28,9 +28,8 @@ import { ParameterError } from '~/helpers/parameterError';
 import { defaultPermissions } from '~/helpers/permissions/';
 import { getUserHighestPermission } from '~/helpers/permissions/';
 import { adminEndpoint } from '~/helpers/socket';
-import { timeout } from '~/helpers/tmi';
+import { tmiEmitter } from '~/helpers/tmi';
 import { isModerator } from '~/helpers/user/isModerator';
-import tmi from '~/services/twitch/chat';
 import aliasSystem from '~/systems/alias';
 import songs from '~/systems/songs';
 import { translate } from '~/translate';
@@ -207,14 +206,14 @@ class Moderation extends System {
 
     if (this.cWarningsAllowedCount === 0) {
       timeoutLog(`${sender.userName} [${type}] ${time}s timeout | ${text}`);
-      timeout(sender.userName, time, isModerator(sender));
+      tmiEmitter.emit('timeout', sender.userName, time, isModerator(sender));
       return;
     }
 
     const isWarningCountAboveThreshold = warnings.length >= this.cWarningsAllowedCount;
     if (isWarningCountAboveThreshold) {
       timeoutLog(`${sender.userName} [${type}] ${time}s timeout | ${text}`);
-      timeout(sender.userName, time, isModerator(sender));
+      tmiEmitter.emit('timeout', sender.userName, time, isModerator(sender));
       await getRepository(ModerationWarning).delete({ userId: sender.userId });
     } else {
       await getRepository(ModerationWarning).insert({ userId: sender.userId, timestamp: Date.now() });
@@ -222,11 +221,11 @@ class Moderation extends System {
       warning = await new Message(warning.replace(/\$count/g, String(warningsLeft < 0 ? 0 : warningsLeft))).parse();
       if (this.cWarningsShouldClearChat) {
         timeoutLog(`${sender.userName} [${type}] 1s timeout, warnings left ${warningsLeft < 0 ? 0 : warningsLeft} | ${text}`);
-        timeout(sender.userName, 1, isModerator(sender));
+        tmiEmitter.emit('timeout', sender.userName, 1, isModerator(sender));
       }
 
       if (this.cWarningsAnnounceTimeouts) {
-        tmi.delete('bot', msgId);
+        tmiEmitter.emit('delete', 'bot', msgId);
         if (!silent) {
           parserReply('$sender, ' + warning, { sender, discord: undefined, id: '' });
         } else {

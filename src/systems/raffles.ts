@@ -23,8 +23,8 @@ import { debug, warning } from '~/helpers/log';
 import { linesParsed } from '~/helpers/parser';
 import { defaultPermissions } from '~/helpers/permissions/';
 import { adminEndpoint } from '~/helpers/socket';
+import { tmiEmitter } from '~/helpers/tmi';
 import * as changelog from '~/helpers/user/changelog.js';
-import tmi from '~/services/twitch/chat';
 import points from '~/systems/points';
 import { translate } from '~/translate';
 
@@ -418,7 +418,7 @@ class Raffles extends System {
       return true;
     }
     if (this.deleteRaffleJoinCommands) {
-      tmi.delete('bot', opts.id);
+      tmiEmitter.emit('delete', 'bot', opts.id);
     }
 
     opts.message = opts.message.toString().replace(raffle.keyword, '');

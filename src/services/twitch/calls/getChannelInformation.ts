@@ -5,19 +5,17 @@ import {
   stats as apiStats,
 } from '~/helpers/api';
 import { parseTitle } from '~/helpers/api/parseTitle';
-import { get } from '~/helpers/interfaceEmitter';
 import { error, info } from '~/helpers/log';
+import { variable } from '~/helpers/variables';
 import { setTitleAndGame } from '~/services/twitch/calls/setTitleAndGame';
 
 let retries = 0;
 
 export async function getChannelInformation (opts: any) {
   try {
-    const [ channelId, clientBot, isTitleForced ] = await Promise.all([
-      get<string>('/services/twitch', 'channelId'),
-      client('bot'),
-      get<string>('/services/twitch', 'isTitleForced'),
-    ]);
+    const channelId = variable.get('services.twitch.channelId') as string;
+    const isTitleForced = variable.get('services.twitch.isTitleForced') as string;
+    const clientBot = await client('bot');
     const getChannelInfo = await clientBot.channels.getChannelInfo(channelId);
 
     if (!getChannelInfo) {

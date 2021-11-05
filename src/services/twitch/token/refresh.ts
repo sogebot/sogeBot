@@ -1,7 +1,7 @@
 import * as constants from '@sogebot/ui-helpers/constants';
 import axios from 'axios';
 
-import emitter, { get } from '~/helpers/interfaceEmitter';
+import emitter from '~/helpers/interfaceEmitter';
 import {
   debug,
   error,
@@ -10,6 +10,7 @@ import {
 import {
   addUIError,
 } from '~/helpers/panel/';
+import { variable } from '~/helpers/variables';
 
 const errorCount = {
   'bot':         0,
@@ -40,15 +41,23 @@ export const refresh = async (type: 'bot' | 'broadcaster', clear = false) => {
     errorCount[type] = 0;
     lastRefresh[type] = 0;
   }
-  const [ channel, tokenService, owners, botRefreshToken, broadcasterRefreshToken, tokenServiceCustomClientId, tokenServiceCustomClientSecret ] = await Promise.all([
-    get<string>('/services/twitch', 'generalChannel'),
-    get<keyof typeof urls>('/services/twitch', 'tokenService'),
-    get<string[]>('/services/twitch', 'generalOwners'),
-    get<string>('/services/twitch', 'botRefreshToken'),
-    get<string>('/services/twitch', 'broadcasterRefreshToken'),
-    get<string>('/services/twitch', 'tokenServiceCustomClientId'),
-    get<string>('/services/twitch', 'tokenServiceCustomClientSecret'),
-  ]);
+  const channel = variable.get('services.twitch.generalChannel') as string;
+  const tokenService = variable.get('services.twitch.tokenService') as keyof typeof urls;
+  const generalOwners = variable.get('services.twitch.generalOwners') as string[];
+  const botRefreshToken = variable.get('services.twitch.botRefreshToken') as string;
+  const broadcasterRefreshToken = variable.get('services.twitch.broadcasterRefreshToken') as string;
+  const tokenServiceCustomClientId = variable.get('services.twitch.tokenServiceCustomClientId') as string;
+  const tokenServiceCustomClientSecret = variable.get('services.twitch.tokenServiceCustomClientSecret') as string;
+
+  if (type === 'bot') {
+    if (botRefreshToken.trim().length === 0) {
+      return undefined;
+    }
+  } else {
+    if (broadcasterRefreshToken.trim().length === 0) {
+      return undefined;
+    }
+  }
 
   if (errorCount[type] > 20) {
     warning(`Limit of token refresh for ${type} reached, please change your tokens!`);
@@ -107,7 +116,7 @@ export const refresh = async (type: 'bot' | 'broadcaster', clear = false) => {
         method:  'POST',
         headers: {
           'SogeBot-Channel': channel,
-          'SogeBot-Owners':  owners.join(', '),
+          'SogeBot-Owners':  generalOwners.join(', '),
         },
       }) as any;
       debug('oauth.validate', urls[tokenService] + ' =>');

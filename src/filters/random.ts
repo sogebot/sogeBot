@@ -4,17 +4,15 @@ import { getRepository } from 'typeorm';
 
 import type { ResponseFilter } from '.';
 
-import { get } from '~/helpers/interfaceEmitter';
 import * as changelog from '~/helpers/user/changelog.js';
 import { isIgnored } from '~/helpers/user/isIgnored';
+import { variable } from '~/helpers/variables';
 
 const random: ResponseFilter = {
   '(random.online.viewer)': async function () {
     await changelog.flush();
-    const [ botUsername, broadcasterUsername ] = await Promise.all([
-      get<string>('/services/twitch', 'botUsername'),
-      get<string>('/services/twitch', 'broadcasterUsername'),
-    ]);
+    const botUsername = variable.get('services.twitch.botUsername') as string;
+    const broadcasterUsername = variable.get('services.twitch.broadcasterUsername') as string;
     const viewers = (await getRepository(User).createQueryBuilder('user')
       .where('user.userName != :botusername', { botusername: botUsername.toLowerCase() })
       .andWhere('user.userName != :broadcasterusername', { broadcasterusername: broadcasterUsername.toLowerCase() })
@@ -31,10 +29,8 @@ const random: ResponseFilter = {
   },
   '(random.online.follower)': async function () {
     await changelog.flush();
-    const [ botUsername, broadcasterUsername ] = await Promise.all([
-      get<string>('/services/twitch', 'botUsername'),
-      get<string>('/services/twitch', 'broadcasterUsername'),
-    ]);
+    const botUsername = variable.get('services.twitch.botUsername') as string;
+    const broadcasterUsername = variable.get('services.twitch.broadcasterUsername') as string;
     const followers = (await getRepository(User).createQueryBuilder('user')
       .where('user.userName != :botusername', { botusername: botUsername.toLowerCase() })
       .andWhere('user.userName != :broadcasterusername', { broadcasterusername: broadcasterUsername.toLowerCase() })
@@ -51,10 +47,8 @@ const random: ResponseFilter = {
   },
   '(random.online.subscriber)': async function () {
     await changelog.flush();
-    const [ botUsername, broadcasterUsername ] = await Promise.all([
-      get<string>('/services/twitch', 'botUsername'),
-      get<string>('/services/twitch', 'broadcasterUsername'),
-    ]);
+    const botUsername = variable.get('services.twitch.botUsername') as string;
+    const broadcasterUsername = variable.get('services.twitch.broadcasterUsername') as string;
     const subscribers = (await getRepository(User).createQueryBuilder('user')
       .where('user.userName != :botusername', { botusername: botUsername.toLowerCase() })
       .andWhere('user.userName != :broadcasterusername', { broadcasterusername: broadcasterUsername.toLowerCase() })
@@ -71,10 +65,8 @@ const random: ResponseFilter = {
   },
   '(random.viewer)': async function () {
     await changelog.flush();
-    const [ botUsername, broadcasterUsername ] = await Promise.all([
-      get<string>('/services/twitch', 'botUsername'),
-      get<string>('/services/twitch', 'broadcasterUsername'),
-    ]);
+    const botUsername = variable.get('services.twitch.botUsername') as string;
+    const broadcasterUsername = variable.get('services.twitch.broadcasterUsername') as string;
     const viewers = (await getRepository(User).createQueryBuilder('user')
       .where('user.userName != :botusername', { botusername: botUsername.toLowerCase() })
       .andWhere('user.userName != :broadcasterusername', { broadcasterusername: broadcasterUsername.toLowerCase() })
@@ -89,10 +81,8 @@ const random: ResponseFilter = {
   },
   '(random.follower)': async function () {
     await changelog.flush();
-    const [ botUsername, broadcasterUsername ] = await Promise.all([
-      get<string>('/services/twitch', 'botUsername'),
-      get<string>('/services/twitch', 'broadcasterUsername'),
-    ]);
+    const botUsername = variable.get('services.twitch.botUsername') as string;
+    const broadcasterUsername = variable.get('services.twitch.broadcasterUsername') as string;
     const followers = (await getRepository(User).createQueryBuilder('user')
       .where('user.userName != :botusername', { botusername: botUsername.toLowerCase() })
       .andWhere('user.userName != :broadcasterusername', { broadcasterusername: broadcasterUsername.toLowerCase() })
@@ -108,10 +98,8 @@ const random: ResponseFilter = {
   },
   '(random.subscriber)': async function () {
     await changelog.flush();
-    const [ botUsername, broadcasterUsername ] = await Promise.all([
-      get<string>('/services/twitch', 'botUsername'),
-      get<string>('/services/twitch', 'broadcasterUsername'),
-    ]);
+    const botUsername = variable.get('services.twitch.botUsername') as string;
+    const broadcasterUsername = variable.get('services.twitch.broadcasterUsername') as string;
     const subscribers = (await getRepository(User).createQueryBuilder('user')
       .where('user.userName != :botusername', { botusername: botUsername.toLowerCase() })
       .andWhere('user.userName != :broadcasterusername', { broadcasterusername: broadcasterUsername.toLowerCase() })

@@ -1,14 +1,12 @@
 import { ApiClient } from '@twurple/api';
 import { StaticAuthProvider } from '@twurple/auth';
 
-import { get } from '~/helpers/interfaceEmitter';
+import { variable } from '~/helpers/variables';
 
 const client = async (account: 'broadcaster' | 'bot') => {
-  const [ clientId, accessToken, isValidToken ] = await Promise.all([
-    get<string>('/services/twitch', 'clientId'),
-    get<string>('/services/twitch', account + 'AccessToken'),
-    get<string>('/services/twitch', account + 'TokenValid'),
-  ]);
+  const clientId = variable.get('services.twitch.clientId') as string;
+  const accessToken = variable.get(`services.twitch.${account}AccessToken`) as string;
+  const isValidToken = variable.get(`services.twitch.${account}TokenValid`) as string;
 
   if (!isValidToken) {
     throw new Error(`Cannot initialize Twitch API, ${account} token invalid.`);

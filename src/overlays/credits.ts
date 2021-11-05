@@ -11,12 +11,13 @@ import {
 } from '~/helpers/api';
 import { mainCurrency } from '~/helpers/currency';
 import { publicEndpoint } from '~/helpers/socket';
-import api from '~/services/twitch/api';
+import { variable } from '~/helpers/variables';
+import { getTopClips } from '~/services/twitch/calls/getTopClips';
 
 class Credits extends Overlay {
   sockets () {
     publicEndpoint(this.nsp, 'getClips', async(opts, cb) => {
-      cb(opts.show ? await api.getTopClips({
+      cb(opts.show ? await getTopClips({
         period: opts.period, days: opts.periodValue, first: opts.numOfClips,
       }) : [],
       );
@@ -47,9 +48,10 @@ class Credits extends Overlay {
           }
         }
       }
+      const broadcasterUsername = variable.get('services.twitch.broadcasterUsername') as string;
 
       cb(null, {
-        streamer: oauth.broadcasterUsername,
+        streamer: broadcasterUsername,
         game:     stats.value.currentGame,
         title:    stats.value.currentTitle,
         events,

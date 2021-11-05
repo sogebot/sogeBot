@@ -45,14 +45,15 @@ import { errors, warns } from '~/helpers/panel/alerts';
 import { linesParsed, status as statusObj } from '~/helpers/parser';
 import { list, systems } from '~/helpers/register';
 import { adminEndpoint } from '~/helpers/socket';
+import { tmiEmitter } from '~/helpers/tmi';
 import * as changelog from '~/helpers/user/changelog.js';
+import { variable } from '~/helpers/variables';
 import lastfm from '~/integrations/lastfm';
 import spotify from '~/integrations/spotify';
 import Parser from '~/parser';
 import { sendGameFromTwitch } from '~/services/twitch/calls/sendGameFromTwitch';
 import { setTags } from '~/services/twitch/calls/setTags';
 import { setTitleAndGame } from '~/services/twitch/calls/setTitleAndGame';
-import tmi from '~/services/twitch/chat';
 import { default as socketSystem } from '~/socket';
 import highlights from '~/systems/highlights';
 import songs from '~/systems/songs';
@@ -355,21 +356,21 @@ class Panel extends Core {
         cb(null);
       });
       socket.on('joinBot', async () => {
-        tmi.join('bot', tmi.channel);
+        tmiEmitter.emit('join', 'bot');
       });
       socket.on('leaveBot', async () => {
-        tmi.part('bot');
+        tmiEmitter.emit('part', 'bot');
         // force all users offline
         await changelog.flush();
         await getRepository(User).update({}, { isOnline: false });
       });
 
       // custom var
-      socket.on('custom.variable.value', async (variable: string, cb: (error: string | null, value: string) => void) => {
+      socket.on('custom.variable.value', async (_variable: string, cb: (error: string | null, value: string) => void) => {
         let value = translate('webpanel.not-available');
-        const isVarSet = await isVariableSet(variable);
+        const isVarSet = await isVariableSet(_variable);
         if (isVarSet) {
-          value = await getValueOf(variable);
+          value = await getValueOf(_variable);
         }
         cb(null, value);
       });
@@ -524,10 +525,10 @@ class Panel extends Core {
     });
 
     socket.on('name', function (cb: (botUsername: string) => void) {
-      cb(oauth.botUsername);
+      cb(variable.get('services.twitch.botUsername') as string);
     });
     socket.on('channelName', function (cb: (currentChannel: string) => void) {
-      cb(oauth.currentChannel);
+      cb(variable.get('services.twitch.currentChannel') as string);
     });
     socket.on('version', function (cb: (version: string) => void) {
       const version = _.get(process, 'env.npm_package_version', 'x.y.z');
@@ -583,8 +584,9 @@ const sendStreamData = async () => {
       spotifyCurrentSong = null;
     }
 
+    const broadcasterType = variable.get('services.twitch.broadcasterType') as string;
     const data = {
-      broadcasterType:    oauth.broadcasterType,
+      broadcasterType:    broadcasterType,
       uptime:             isStreamOnline.value ? streamStatusChangeSince.value : null,
       currentViewers:     stats.value.currentViewers,
       currentSubscribers: stats.value.currentSubscribers,

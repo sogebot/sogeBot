@@ -1,17 +1,13 @@
 import client from '../api/client';
 
-import { apiEmitter } from '~/helpers/api/emitter';
-import emitter, { get } from '~/helpers/interfaceEmitter';
+import emitter from '~/helpers/interfaceEmitter';
 import { error } from '~/helpers/log';
-
-apiEmitter.on('updateChannelViewsAndBroadcasterType', () => updateChannelViewsAndBroadcasterType());
+import { variable } from '~/helpers/variables';
 
 async function updateChannelViewsAndBroadcasterType () {
   try {
-    const [ cid, clientBot ] = await Promise.all([
-      get<string>('/services/twitch', 'channelId'),
-      client('bot'),
-    ]);
+    const cid = variable.get('services.twitch.channelId') as string;
+    const clientBot = await client('bot');
     const getUserById = await clientBot.users.getUserById(cid);
 
     if (getUserById) {

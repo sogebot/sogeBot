@@ -26,7 +26,7 @@ import {
 import { error, info } from '~/helpers/log';
 import { defaultPermissions } from '~/helpers/permissions/';
 import { adminEndpoint, publicEndpoint } from '~/helpers/socket';
-import { timeout } from '~/helpers/tmi';
+import { tmiEmitter } from '~/helpers/tmi';
 import * as changelog from '~/helpers/user/changelog.js';
 import { isModerator } from '~/helpers/user/isModerator';
 import { translate } from '~/translate';
@@ -316,7 +316,7 @@ class Songs extends System {
     const users = await getRepository(User).find({ userName: In(request) });
     for (const username of request) {
       const data = users.find(o => o.userName === username);
-      timeout(username, 300, typeof data !== 'undefined' && isModerator(data));
+      tmiEmitter.emit('timeout', username, 300, typeof data !== 'undefined' && isModerator(data));
     }
 
     await Promise.all([

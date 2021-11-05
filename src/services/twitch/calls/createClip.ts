@@ -6,7 +6,7 @@ import { error } from '../../../helpers/log';
 import client from '../api/client';
 
 import { isStreamOnline } from '~/helpers/api';
-import { get } from '~/helpers/interfaceEmitter';
+import { variable } from '~/helpers/variables';
 
 export async function createClip (opts: { createAfterDelay: boolean }) {
   if (!(isStreamOnline.value)) {
@@ -32,7 +32,7 @@ export async function createClip (opts: { createAfterDelay: boolean }) {
 
   defaults(opts, { createAfterDelay: true });
 
-  const channelId = await get<string>('/services/twitch', 'channelId');
+  const channelId = variable.get('services.twitch.channelId') as string;
   try {
     const clientBot = await client('bot');
     const clipId = await clientBot.clips.createClip({ ...opts, channelId });

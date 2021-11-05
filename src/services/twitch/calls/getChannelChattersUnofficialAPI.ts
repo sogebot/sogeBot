@@ -10,7 +10,6 @@ import client from '../api/client';
 
 import { eventEmitter } from '~/helpers/events';
 import { getAllOnlineUsernames } from '~/helpers/getAllOnlineUsernames';
-import { get } from '~/helpers/interfaceEmitter';
 import {
   debug, error,
 } from '~/helpers/log';
@@ -18,16 +17,15 @@ import { setImmediateAwait } from '~/helpers/setImmediateAwait';
 import { SQLVariableLimit } from '~/helpers/sql';
 import * as changelog from '~/helpers/user/changelog.js';
 import { isIgnored } from '~/helpers/user/isIgnored';
+import { variable } from '~/helpers/variables';
 import { followerUpdatePreCheck } from '~/services/twitch/calls/isFollowerUpdate';
 import joinpart from '~/widgets/joinpart';
 
 export const getChannelChattersUnofficialAPI = async (opts: any) => {
   try {
-    const [generalChannel, botUsername, clientBot] = await Promise.all([
-      get<string>('/services/twitch', 'generalChannel'),
-      get<string>('/services/twitch', 'botUsername'),
-      client('bot'),
-    ]);
+    const generalChannel = variable.get('services.twitch.generalChannel') as string;
+    const botUsername = variable.get('services.twitch.botUsername') as string;
+    const clientBot = await client('bot');
 
     const getChatters = await clientBot.unsupported.getChatters(generalChannel);
     const chatters = getChatters.allChatters.filter(userName => {

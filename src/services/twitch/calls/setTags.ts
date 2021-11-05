@@ -5,16 +5,14 @@ import {
 
 import client from '../api/client';
 
-import { get } from '~/helpers/interfaceEmitter';
 import { error } from '~/helpers/log';
+import { variable } from '~/helpers/variables';
 
 async function setTags (tagsArg: string[]) {
   const tag_ids: string[] = [];
   try {
-    const [ cid, clientBroadcaster ] = await Promise.all([
-      get<string>('/services/twitch', 'channelId'),
-      client('broadcaster'),
-    ]);
+    const cid = variable.get('services.twitch.channelId') as string;
+    const clientBroadcaster = await client('broadcaster');
 
     for (const tag of tagsArg) {
       const name = await getRepository(TwitchTagLocalizationName).findOne({

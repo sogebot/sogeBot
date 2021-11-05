@@ -7,20 +7,18 @@ import { User } from '~/database/entity/user';
 import {
   stats as apiStats,
 } from '~/helpers/api';
-import { get } from '~/helpers/interfaceEmitter';
 import { error, warning } from '~/helpers/log';
 import { isBotId, isBotSubscriber } from '~/helpers/user';
 import * as changelog from '~/helpers/user/changelog.js';
+import { variable } from '~/helpers/variables';
 
 export async function getChannelSubscribers<T extends { noAffiliateOrPartnerWarningSent?: boolean; notCorrectOauthWarningSent?: boolean }> (opts: T): Promise<{ state: boolean; opts: T }> {
   opts = opts || {};
 
   try {
-    const [ channelId, broadcasterType, clientBot ] = await Promise.all([
-      get<string>('/services/twitch', 'channelId'),
-      get<string>('/services/twitch', 'broadcasterType'),
-      client('bot'),
-    ]);
+    const channelId = variable.get('services.twitch.channelId') as string;
+    const broadcasterType = variable.get('services.twitch.broadcasterType') as string;
+    const clientBot = await client('bot');
 
     const getSubscriptionsPaginated = await clientBot.subscriptions.getSubscriptionsPaginated(channelId).getAll();
     if (broadcasterType === '') {

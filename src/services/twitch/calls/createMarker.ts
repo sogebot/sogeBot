@@ -1,14 +1,14 @@
 import { error } from '../../../helpers/log';
 import client from '../api/client';
 
-import { get } from '~/helpers/interfaceEmitter';
+import { variable } from '~/helpers/variables';
 
 export async function createMarker () {
-  const cid = await get<string>('/services/twitch', 'channelId');
+  const channelId = variable.get('services.twitch.channelId') as string;
 
   try {
     const clientBot = await client('bot');
-    clientBot.streams.createStreamMarker(cid, 'Marked from sogeBot');
+    clientBot.streams.createStreamMarker(channelId, 'Marked from sogeBot');
   } catch (e: unknown) {
     if (e instanceof Error) {
       error(e.stack || e.message);

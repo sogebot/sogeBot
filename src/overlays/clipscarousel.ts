@@ -3,12 +3,12 @@ import type { OverlayMapperClipsCarousel } from '@entity/overlay';
 import Overlay from './_interface';
 
 import { publicEndpoint } from '~/helpers/socket';
-import api from '~/services/twitch/api';
+import { getTopClips } from '~/services/twitch/calls/getTopClips';
 
 class ClipsCarousel extends Overlay {
   sockets () {
     publicEndpoint(this.nsp, 'clips', async (data: NonNullable<OverlayMapperClipsCarousel['opts']>, cb) => {
-      const clips = await api.getTopClips({
+      const clips = await getTopClips({
         period: 'custom', days: data.customPeriod, first: data.numOfClips,
       });
       cb(null, { clips });

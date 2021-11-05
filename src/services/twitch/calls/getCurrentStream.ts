@@ -6,9 +6,9 @@ import {
 } from '~/helpers/api';
 import * as stream from '~/helpers/core/stream';
 import { eventEmitter } from '~/helpers/events';
-import { get } from '~/helpers/interfaceEmitter';
 import { debug, error } from '~/helpers/log';
 import { linesParsed } from '~/helpers/parser';
+import { variable } from '~/helpers/variables';
 import client from '~/services/twitch/api/client';
 import stats from '~/stats';
 
@@ -16,7 +16,7 @@ let curRetries = 0;
 const maxRetries = 3;
 
 export async function getCurrentStream (opts: any) {
-  const cid = await get<string>('/services/twitch', 'channelId');
+  const cid = variable.get('services.twitch.channelId') as string;
 
   try {
     const clientBot = await client('bot');

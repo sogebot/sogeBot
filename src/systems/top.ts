@@ -14,13 +14,13 @@ import levels from './levels';
 import points from './points';
 
 import { mainCurrency } from '~/helpers/currency';
-import { get } from '~/helpers/interfaceEmitter';
 import { debug } from '~/helpers/log';
 import { defaultPermissions } from '~/helpers/permissions/';
 import { getPointsName } from '~/helpers/points';
 import { unserialize } from '~/helpers/type';
 import * as changelog from '~/helpers/user/changelog.js';
 import { getIgnoreList, isIgnored } from '~/helpers/user/isIgnored';
+import { variable } from '~/helpers/variables';
 import twitch from '~/services/twitch';
 import { translate } from '~/translate';
 
@@ -130,10 +130,8 @@ class Top extends System {
     const _total = 10 + getIgnoreList().length;
     const connection = await getConnection();
 
-    const [ botUsername, broadcasterUsername ] = await Promise.all([
-      get<string>('/services/twitch', 'botUsername'),
-      get<string>('/services/twitch', 'broadcasterUsername'),
-    ]);
+    const botUsername = variable.get('services.twitch.botUsername') as string;
+    const broadcasterUsername = variable.get('services.twitch.broadcasterUsername') as string;
 
     await changelog.flush();
     switch (type) {

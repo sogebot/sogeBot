@@ -150,7 +150,7 @@ const viewerEndpoint = (nsp: string, on: string, callback: (opts: any, cb: (erro
   });
 };
 
-function publicEndpoint (nsp: string, on: string, callback: (opts: any, cb: (error: Error | string | null, ...response: any) => void) => void, socket?: Socket) {
+function publicEndpoint (nsp: string, on: string, callback: (opts: any, cb: (error: Error | string | null | unknown, ...response: any) => void) => void, socket?: Socket) {
   endpoints.push({
     nsp, on, callback, type: 'public',
   });

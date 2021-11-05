@@ -7,15 +7,13 @@ import client from '../api/client';
 import { getChannelId } from '../calls/getChannelId';
 import { refresh } from './refresh';
 
-import {
-  getToken,
-} from '~/helpers/api/getToken';
-import emitter, { get } from '~/helpers/interfaceEmitter';
+import emitter from '~/helpers/interfaceEmitter';
 import {
   debug,
   error,
   warning,
 } from '~/helpers/log';
+import { variable } from '~/helpers/variables';
 
 let botTokenErrorSent = false;
 let broadcasterTokenErrorSent = false;
@@ -42,6 +40,13 @@ export const cache: { bot: string; broadcaster: string } = { bot: '', broadcaste
       }
     */
 export const validate = async (type: 'bot' | 'broadcaster', retry = 0, clear = false): Promise < boolean > => {
+  let token: string;
+  if (type === 'bot') {
+    token = variable.get('services.twitch.botAccessToken') as string;
+  } else {
+    token = variable.get('services.twitch.broadcasterAccessToken') as string;
+  }
+
   debug('oauth.validate', `Validation: ${type} - ${retry} retries`);
   if (type === 'bot' && Date.now() - lastBotTokenValidation < constants.MINUTE) {
     debug('oauth.validate', `Validation: ${type} - ${retry} retries - Already validated`);
@@ -67,7 +72,6 @@ export const validate = async (type: 'bot' | 'broadcaster', retry = 0, clear = f
   const url = 'https://id.twitch.tv/oauth2/validate';
   let status = true;
   try {
-    const token = await getToken(type);
     if (token === '') {
       throw new Error('no access token for ' + type);
     } else if (!['bot', 'broadcaster'].includes(type)) {
@@ -123,10 +127,8 @@ export const validate = async (type: 'bot' | 'broadcaster', retry = 0, clear = f
       emitter.emit('set', '/services/twitch', 'broadcasterId', request.data.user_id);
     }
 
-    const [ botId, broadcasterId ] = await Promise.all([
-      get<string>('/services/twitch', 'botId'),
-      get<string>('/services/twitch', 'broadcasterId'),
-    ]);
+    const botId = variable.get('services.twitch.botId') as string;
+    const broadcasterId = variable.get('services.twitch.broadcasterId') as string;
 
     if (type === 'bot' && botId === broadcasterId) {
       warning('You shouldn\'t use same account for bot and broadcaster!');
@@ -178,10 +180,8 @@ export const validate = async (type: 'bot' | 'broadcaster', retry = 0, clear = f
       error(e.stack);
     }
     status = false;
-    const [ botRefreshToken, broadcasterRefreshToken ] = await Promise.all([
-      get<string>('/services/twitch', 'botRefreshToken'),
-      get<string>('/services/twitch', 'broadcasterRefreshToken'),
-    ]);
+    const botRefreshToken = variable.get('services.twitch.botRefreshToken') as string;
+    const broadcasterRefreshToken = variable.get('services.twitch.broadcasterRefreshToken') as string;
 
     if ((type === 'bot' ? botRefreshToken : broadcasterRefreshToken) !== '') {
       refresh(type, clear);

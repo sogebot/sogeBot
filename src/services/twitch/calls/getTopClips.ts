@@ -3,11 +3,11 @@ import client from '../api/client';
 import { getGameNameFromId } from './getGameNameFromId';
 
 import { streamStatusChangeSince } from '~/helpers/api';
-import { get } from '~/helpers/interfaceEmitter';
 import { error } from '~/helpers/log';
+import { variable } from '~/helpers/variables';
 
 export async function getTopClips (opts: any) {
-  const channelId = await get<string>('/services/twitch', 'channelId');
+  const channelId = variable.get('services.twitch.channelId') as string;
   try {
     const period = {
       startDate: opts.period === 'stream'
@@ -34,4 +34,5 @@ export async function getTopClips (opts: any) {
       error(e.stack ?? e.message);
     }
   }
+  return [];
 }

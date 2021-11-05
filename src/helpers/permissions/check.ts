@@ -15,8 +15,8 @@ import { isBroadcaster } from '../user/isBroadcaster';
 import { isModerator } from '../user/isModerator';
 import { defaultPermissions } from './defaultPermissions';
 
-import { get } from '~/helpers/interfaceEmitter';
 import { filters } from '~/helpers/permissions/filters';
+import { variable } from '~/helpers/variables';
 
 let isWarnedAboutCasters = false;
 
@@ -35,10 +35,8 @@ async function check(userId: string, permId: string, partial = false): Promise<{
     });
   }
 
-  const [ broadcasterUsername, generalOwners ] = await Promise.all([
-    get<string>('/services/twitch', 'broadcasterUsername'),
-    get<string[]>('/services/twitch', 'generalOwners'),
-  ]);
+  const broadcasterUsername = variable.get('services.twitch.broadcasterUsername') as string;
+  const generalOwners = variable.get('services.twitch.generalOwners') as string[];
 
   if (generalOwners.filter(o => typeof o === 'string' && o.trim().length > 0).length === 0 && broadcasterUsername === '' && !isWarnedAboutCasters) {
     isWarnedAboutCasters = true;

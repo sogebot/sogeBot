@@ -8,7 +8,6 @@ import _ from 'lodash';
 import safeEval from 'safe-eval';
 import { getRepository } from 'typeorm';
 
-import { get } from '../helpers/interfaceEmitter';
 import twitch from '../services/twitch';
 import users from '../users';
 
@@ -16,6 +15,7 @@ import type { ResponseFilter } from '.';
 
 import * as changelog from '~/helpers/user/changelog.js';
 import { isIgnored } from '~/helpers/user/isIgnored';
+import { variable } from '~/helpers/variables';
 
 const evaluate: ResponseFilter = {
   '(eval#)': async function (filter, attr) {
@@ -56,10 +56,8 @@ const evaluate: ResponseFilter = {
 
     if (containOnline) {
       await changelog.flush();
-      const [ botUsername, broadcasterUsername ] = await Promise.all([
-        get<string>('/services/twitch', 'botUsername'),
-        get<string>('/services/twitch', 'broadcasterUsername'),
-      ]);
+      const botUsername = variable.get('services.twitch.botUsername') as string;
+      const broadcasterUsername = variable.get('services.twitch.broadcasterUsername') as string;
       const viewers = (await getRepository(User).createQueryBuilder('user')
         .where('user.userName != :botusername', { botusername: botUsername.toLowerCase() })
         .andWhere('user.userName != :broadcasterusername', { broadcasterusername: broadcasterUsername.toLowerCase() })

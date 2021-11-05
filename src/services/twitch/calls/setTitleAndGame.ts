@@ -10,17 +10,15 @@ import {
 } from '~/helpers/api';
 import { parseTitle } from '~/helpers/api/parseTitle';
 import { eventEmitter } from '~/helpers/events/emitter';
-import { get } from '~/helpers/interfaceEmitter';
 import { warning } from '~/helpers/log';
 import { addUIError } from '~/helpers/panel/';
+import { variable } from '~/helpers/variables';
 import { translate } from '~/translate';
 
 async function setTitleAndGame (args: { title?: string | null; game?: string | null }): Promise<{ response: string; status: boolean } | null> {
   args = defaults(args, { title: null }, { game: null });
-  const [ cid, broadcasterCurrentScopes ] = await Promise.all([
-    get<string>('/services/twitch', 'channelId'),
-    get<string>('/services/twitch', 'broadcasterCurrentScopes'),
-  ]);
+  const cid = variable.get('services.twitch.channelId') as string;
+  const broadcasterCurrentScopes = variable.get('services.twitch.broadcasterCurrentScopes') as string[];
 
   if (!broadcasterCurrentScopes.includes('channel_editor')) {
     warning('Missing Broadcaster oAuth scope channel_editor to change game or title. This mean you can have inconsistent game set across Twitch: https://github.com/twitchdev/issues/issues/224');

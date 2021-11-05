@@ -17,7 +17,6 @@ import {
 } from '../decorators/on';
 import Expects from '../expects';
 import general from '../general.js';
-import { get } from '../helpers/interfaceEmitter';
 import users from '../users';
 import System from './_interface';
 
@@ -34,6 +33,7 @@ import { getPointsName, name } from '~/helpers/points/';
 import { adminEndpoint } from '~/helpers/socket';
 import * as changelog from '~/helpers/user/changelog.js';
 import { isBot, isBotId } from '~/helpers/user/isBot';
+import { variable } from '~/helpers/variables';
 import { getIdFromTwitch } from '~/services/twitch/calls/getIdFromTwitch';
 import { translate } from '~/translate';
 
@@ -438,7 +438,7 @@ class Points extends System {
 
       const connection = await getConnection();
 
-      const broadcasterUsername = await get<string>('/services/twitch', 'broadcasterUsername');
+      const broadcasterUsername = variable.get('services.twitch.broadcasterUsername') as string;
       const query = (type: typeof connection.options.type) => {
         switch(type) {
           case 'postgres':

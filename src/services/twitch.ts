@@ -9,14 +9,15 @@ import { CacheEmotes } from '../database/entity/cacheEmotes';
 import {
   command, default_permission, parser, persistent, settings,
 } from '../decorators';
-import { onChange, onLoad, onStartup } from '../decorators/on';
+import { onChange, onLoad, onStartup, onStreamStart } from '../decorators/on';
 import Expects from '../expects';
 import emitter from '../helpers/interfaceEmitter';
 import { debug, error } from '../helpers/log';
 import users from '../users';
 import Service from './_interface';
-import { init as apiIntervalInit } from './twitch/api/interval';
+import { init as apiIntervalInit , stop as apiIntervalStop } from './twitch/api/interval';
 import { getChannelId } from './twitch/calls/getChannelId';
+import Chat from './twitch/chat';
 import Emotes from './twitch/emotes';
 import { cache, validate } from './twitch/token/validate';
 
@@ -43,14 +44,16 @@ const urls = {
 };
 
 class Twitch extends Service {
-  tmi: typeof import('./twitch/chat').default;
-  emotes: import('./twitch/emotes').default;
+  tmi: import('./twitch/chat').default | null;
+  emotes: import('./twitch/emotes').default | null;
 
   botTokenValid = false;
   broadcasterTokenValid = false;
 
   @persistent()
   channelId = '';
+  @persistent()
+  currentChannel = '';
 
   @settings('general')
   isTitleForced = false;
@@ -145,6 +148,9 @@ class Twitch extends Service {
   @onLoad('broadcasterAccessToken')
   @onLoad('botAccessToken')
   public async onChangeAccessToken(key: string, value: any) {
+    if (!this.enabled) {
+      return;
+    }
     switch (key) {
       case 'broadcasterAccessToken':
         if (value === '') {
@@ -189,27 +195,54 @@ class Twitch extends Service {
 
   @onStartup()
   async onStartup() {
-    this.emotes = new Emotes();
-    apiIntervalInit();
-
     emitter.on('services::twitch::emotes', (type, value) => {
       if (type === 'explode') {
-        this.emotes.explode(value);
+        this.emotes?.explode(value);
       }
       if (type === 'firework') {
-        this.emotes.firework(value);
+        this.emotes?.firework(value);
       }
     });
 
     this.addMenu({
       category: 'stats', name: 'api', id: 'stats/api', this: null,
     });
-    Promise.all(this.validateTokens()).then(() => getChannelId());
+  }
+
+  @onChange('enabled')
+  @onLoad('enabled')
+  onStatusChange() {
+    if (this.enabled) {
+      Promise.all(this.validateTokens())
+        .then(getChannelId)
+        .then(() => {
+          this.tmi = new Chat();
+          this.tmi?.initClient('bot');
+          this.tmi?.initClient('broadcaster');
+        })
+        .catch((e) => {
+          error(e.stack ?? e.message);
+          this.enabled = false;
+        });
+      this.emotes = new Emotes();
+      apiIntervalInit();
+    } else {
+      apiIntervalStop();
+      this.emotes = null;
+    }
   }
 
   validateTokens() {
     debug('oauth.validate', 'Triggering token validation');
     return [validate('bot'), validate('broadcaster')];
+  }
+
+  @onStreamStart()
+  reconnectOnStreamStart() {
+    if (this.enabled) {
+      this.tmi?.part('bot').then(() => this.tmi?.join('bot', this.currentChannel));
+      this.tmi?.part('broadcaster').then(() => this.tmi?.join('broadcaster', this.currentChannel));
+    }
   }
 
   @onChange('showWithAt')
@@ -244,7 +277,7 @@ class Twitch extends Service {
 
   @parser({ priority: constants.LOW, fireAndForget: true })
   async containsEmotes (opts: ParserOptions) {
-    return this.emotes.containsEmotes(opts);
+    return this.emotes?.containsEmotes(opts);
   }
 
   sockets() {
@@ -263,15 +296,15 @@ class Twitch extends Service {
       }
     });
     adminEndpoint(this.nsp, 'testExplosion', (cb) => {
-      this.emotes._testExplosion();
+      this.emotes?._testExplosion();
       cb(null, null);
     });
     adminEndpoint(this.nsp, 'testFireworks', (cb) => {
-      this.emotes._testFireworks();
+      this.emotes?._testFireworks();
       cb(null, null);
     });
     adminEndpoint(this.nsp, 'test', (cb) => {
-      this.emotes._test();
+      this.emotes?._test();
       cb(null, null);
     });
   }

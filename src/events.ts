@@ -30,7 +30,6 @@ import {
 import { csEmitter } from '~/helpers/customvariables/emitter';
 import { isDbConnected } from '~/helpers/database';
 import { eventEmitter } from '~/helpers/events/emitter';
-import { get as emitterGet } from '~/helpers/interfaceEmitter';
 import emitter from '~/helpers/interfaceEmitter';
 import {
   debug, error, info, warning,
@@ -38,6 +37,7 @@ import {
 import { addUIError } from '~/helpers/panel/';
 import { parserEmitter } from '~/helpers/parser/';
 import { adminEndpoint } from '~/helpers/socket';
+import { tmiEmitter } from '~/helpers/tmi';
 import {
   isOwner, isSubscriber, isVIP,
 } from '~/helpers/user';
@@ -45,13 +45,13 @@ import * as changelog from '~/helpers/user/changelog.js';
 import { isBot, isBotSubscriber } from '~/helpers/user/isBot';
 import { isBroadcaster } from '~/helpers/user/isBroadcaster';
 import { isModerator } from '~/helpers/user/isModerator';
+import { variable } from '~/helpers/variables';
 import Message from '~/message';
 import client from '~/services/twitch/api/client';
 import { createClip } from '~/services/twitch/calls/createClip';
 import { getCustomRewards } from '~/services/twitch/calls/getCustomRewards';
 import { getIdFromTwitch } from '~/services/twitch/calls/getIdFromTwitch';
 import { setTitleAndGame } from '~/services/twitch/calls/setTitleAndGame';
-import tmi from '~/services/twitch/chat';
 import users from '~/users';
 
 const excludedUsers = new Set<string>();
@@ -347,12 +347,11 @@ class Events extends Core {
   }
 
   public async fireBotWillJoinChannel() {
-    const broadcasterUsername = await emitterGet<string>('/services/twitch', 'broadcasterUsername');
-    tmi.client.bot?.join('#' + broadcasterUsername);
+    tmiEmitter.emit('join', 'bot');
   }
 
   public async fireBotWillLeaveChannel() {
-    tmi.part('bot');
+    tmiEmitter.emit('part', 'bot');
     // force all users offline
     await changelog.flush();
     await getRepository(User).update({}, { isOnline: false });
@@ -360,10 +359,8 @@ class Events extends Core {
 
   public async fireStartCommercial(operation: EventsEntity.OperationDefinitions) {
     try {
-      const [ cid, broadcasterCurrentScopes] = await Promise.all([
-        emitterGet<string>('/services/twitch', 'channelId'),
-        emitterGet<string[]>('/services/twitch', 'broadcasterCurrentScopes'),
-      ]);
+      const cid = variable.get('services.twitch.channelId') as string;
+      const broadcasterCurrentScopes = variable.get('services.twitch.broadcasterCurrentScopes') as string[];
       const duration = operation.durationOfCommercial
         ? Number(operation.durationOfCommercial)
         : 30;
@@ -777,33 +774,33 @@ class Events extends Core {
           test:     true,
           userId:   '0',
           currency: sample(['CZK', 'USD', 'EUR']),
-          ...variables.map((variable, idx) => {
-            if (['username', 'recipient', 'target', 'topContributionsBitsUsername', 'topContributionsSubsUsername', 'lastContributionUsername'].includes(variable)) {
-              return { [variable]: randomized.includes(variable) ? generateUsername() : values[idx] };
-            } else if (['userInput', 'message', 'reason'].includes(variable)) {
-              return { [variable]: randomized.includes(variable) ? sample(['', 'Lorem Ipsum Dolor Sit Amet']) : values[idx] };
-            } else if (['source'].includes(variable)) {
-              return { [variable]: randomized.includes(variable) ? sample(['Twitch', 'Discord']) : values[idx] };
-            } else if (['tier'].includes(variable)) {
-              return { [variable]: randomized.includes(variable) ? random(0, 3, false) : (values[idx] === 'Prime' ? 0 : Number(values[idx]))  };
-            } else if (['lastContributionTotal', 'topContributionsSubsTotal', 'topContributionsBitsTotal', 'duration', 'viewers', 'bits', 'subCumulativeMonths', 'count', 'subStreak', 'amount', 'amountInBotCurrency'].includes(variable)) {
-              return { [variable]: randomized.includes(variable) ? random(10, 10000000000, false) : values[idx]  };
-            } else if (['game', 'oldGame'].includes(variable)) {
+          ...variables.map((variableMap, idx) => {
+            if (['username', 'recipient', 'target', 'topContributionsBitsUsername', 'topContributionsSubsUsername', 'lastContributionUsername'].includes(variableMap)) {
+              return { [variableMap]: randomized.includes(variableMap) ? generateUsername() : values[idx] };
+            } else if (['userInput', 'message', 'reason'].includes(variableMap)) {
+              return { [variableMap]: randomized.includes(variableMap) ? sample(['', 'Lorem Ipsum Dolor Sit Amet']) : values[idx] };
+            } else if (['source'].includes(variableMap)) {
+              return { [variableMap]: randomized.includes(variableMap) ? sample(['Twitch', 'Discord']) : values[idx] };
+            } else if (['tier'].includes(variableMap)) {
+              return { [variableMap]: randomized.includes(variableMap) ? random(0, 3, false) : (values[idx] === 'Prime' ? 0 : Number(values[idx]))  };
+            } else if (['lastContributionTotal', 'topContributionsSubsTotal', 'topContributionsBitsTotal', 'duration', 'viewers', 'bits', 'subCumulativeMonths', 'count', 'subStreak', 'amount', 'amountInBotCurrency'].includes(variableMap)) {
+              return { [variableMap]: randomized.includes(variableMap) ? random(10, 10000000000, false) : values[idx]  };
+            } else if (['game', 'oldGame'].includes(variableMap)) {
               return {
-                [variable]: randomized.includes(variable)
+                [variableMap]: randomized.includes(variableMap)
                   ? sample(['Dota 2', 'Escape From Tarkov', 'Star Citizen', 'Elite: Dangerous'])
                   : values[idx],
               };
-            } else if (['command'].includes(variable)) {
-              return { [variable]: randomized.includes(variable) ? sample(['!me', '!top', '!points']) : values[idx]  };
-            } else if (['subStreakShareEnabled'].includes(variable) || variable.startsWith('is.') || variable.startsWith('recipientis.')) {
-              return { [variable]: randomized.includes(variable) ? random(0, 1, false) === 0 : values[idx]  };
-            } else if (['level'].includes(variable)) {
-              return { [variable]: randomized.includes(variable) ? random(1, 5, false)  : values[idx]  };
-            } else if (['topContributionsSubsUserId', 'topContributionsBitsUserId', 'lastContributionUserId'].includes(variable)) {
-              return { [variable]: randomized.includes(variable) ? String(random(90000, 900000, false)) : values[idx]  };
-            } else if (['lastContributionType'].includes(variable)) {
-              return { [variable]: randomized.includes(variable) ? sample(['BITS', 'SUBS']) : values[idx]  };
+            } else if (['command'].includes(variableMap)) {
+              return { [variableMap]: randomized.includes(variableMap) ? sample(['!me', '!top', '!points']) : values[idx]  };
+            } else if (['subStreakShareEnabled'].includes(variableMap) || variableMap.startsWith('is.') || variableMap.startsWith('recipientis.')) {
+              return { [variableMap]: randomized.includes(variableMap) ? random(0, 1, false) === 0 : values[idx]  };
+            } else if (['level'].includes(variableMap)) {
+              return { [variableMap]: randomized.includes(variableMap) ? random(1, 5, false)  : values[idx]  };
+            } else if (['topContributionsSubsUserId', 'topContributionsBitsUserId', 'lastContributionUserId'].includes(variableMap)) {
+              return { [variableMap]: randomized.includes(variableMap) ? String(random(90000, 900000, false)) : values[idx]  };
+            } else if (['lastContributionType'].includes(variableMap)) {
+              return { [variableMap]: randomized.includes(variableMap) ? sample(['BITS', 'SUBS']) : values[idx]  };
             }
           }).reduce((prev, cur) => {
             return { ...prev, ...cur };

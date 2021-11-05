@@ -15,12 +15,12 @@ import Integration from './_interface';
 import { isStreamOnline, stats } from '~/helpers/api';
 import { mainCurrency } from '~/helpers/currency';
 import { eventEmitter } from '~/helpers/events';
-import { getBroadcaster } from '~/helpers/getBroadcaster';
 import { triggerInterfaceOnTip } from '~/helpers/interface/triggers';
 import {
   debug, error, info, tip,
 } from '~/helpers/log';
 import { ioServer } from '~/helpers/panel';
+import { variable } from '~/helpers/variables';
 
 namespace StreamlabsEvent {
   export type Donation = {
@@ -108,6 +108,7 @@ class Streamlabs extends Integration {
           }
 
           const { name, currency: currency2, amount, message, created_at } = item;
+          const broadcasterUsername = variable.get('services.twitch.broadcasterUsername') as string;
           this.parse({
             type:    'donation',
             message: [{
@@ -126,7 +127,7 @@ class Streamlabs extends Integration {
               iconClassName:    'user',
               id:               0,
               name,
-              to:               { name: getBroadcaster() },
+              to:               { name: broadcasterUsername },
             }],
             event_id: '',
           });

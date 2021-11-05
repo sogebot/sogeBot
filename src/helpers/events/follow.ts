@@ -14,7 +14,7 @@ import * as changelog from '../user/changelog.js';
 
 import { eventEmitter } from '.';
 
-import tmi from '~/services/twitch/chat';
+import { tmiEmitter } from '~/helpers/tmi';
 
 const events = new Map<string, number>();
 
@@ -30,7 +30,7 @@ export function follow(userId: string, userName: string, followedAt: string | nu
     debug('events', `User ${userName}#${userId} is in ignore list.`);
     if (isInGlobalIgnoreList({ userName, userId })) {
       // autoban + autoblock
-      tmi.ban(userName);
+      tmiEmitter.emit('ban', userName);
       // remove from eventslit
       getRepository(EventList).delete({ userId });
     }

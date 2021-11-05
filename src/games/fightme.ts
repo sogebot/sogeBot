@@ -9,7 +9,7 @@ import points from '../systems/points';
 import Game from './_interface';
 
 import { prepare } from '~/helpers/commons';
-import { timeout } from '~/helpers/tmi';
+import { tmiEmitter } from '~/helpers/tmi';
 import * as changelog from '~/helpers/user/changelog.js';
 import { isBroadcaster } from '~/helpers/user/isBroadcaster';
 import { isModerator } from '~/helpers/user/isModerator';
@@ -80,7 +80,7 @@ class FightMe extends Game {
       if (isBroadcaster(opts.sender) || isBroadcaster(user.userName)) {
         const isBroadcasterModCheck = isBroadcaster(opts.sender) ? isMod.user : isMod.sender;
         if (!isBroadcasterModCheck) {
-          timeout(isBroadcaster(opts.sender) ? user.userName : opts.sender.userName, this.timeout, isBroadcaster(opts.sender) ? isMod.user : isMod.sender);
+          tmiEmitter.emit('timeout', isBroadcaster(opts.sender) ? user.userName : opts.sender.userName, this.timeout, isBroadcaster(opts.sender) ? isMod.user : isMod.sender);
         }
         fightMeChallenges = fightMeChallenges.filter(ch => {
           return !(ch.opponent === opts.sender.userName
@@ -105,7 +105,7 @@ class FightMe extends Game {
 
       // vs mod
       if (isMod.user || isMod.sender) {
-        timeout(isMod.sender ? user.userName : opts.sender.userName, this.timeout, false);
+        tmiEmitter.emit('timeout', isMod.sender ? user.userName : opts.sender.userName, this.timeout, false);
         fightMeChallenges = fightMeChallenges.filter(ch => {
           return !(ch.opponent === opts.sender.userName
             && ch.challenger === user.userName);
@@ -122,7 +122,7 @@ class FightMe extends Game {
       changelog.increment(winner ? opts.sender.userId : user.userId, { points: Math.abs(Number(winnerWillGet)) });
       await points.decrement({ userId: !winner ? opts.sender.userId : user.userId }, Math.abs(Number(loserWillLose)));
 
-      timeout(winner ? opts.sender.userName : user.userName, this.timeout, false);
+      tmiEmitter.emit('timeout', winner ? opts.sender.userName : user.userName, this.timeout, false);
       fightMeChallenges = fightMeChallenges.filter(ch => {
         return !(ch.opponent === opts.sender.userName
           && ch.challenger === user.userName);

@@ -17,8 +17,8 @@ import { follow } from '~/helpers/events/follow';
 import {
   error, info, warning,
 } from '~/helpers/log';
-import { channelId } from '~/helpers/oauth';
 import { ioServer } from '~/helpers/panel';
+import { variable } from '~/helpers/variables';
 
 const messagesProcessed: string[] = [];
 let isErrorEventsShown = false;
@@ -170,6 +170,7 @@ class EventSub extends Core {
   @onChange('domain')
   @onChange('useTunneling')
   async onStartup() {
+    const channelId = variable.get('services.twitch.channelId') as string;
     if (this.useTunneling) {
       if (this.tunnelDomain.length === 0) {
         const tunnel = await localtunnel({ port: Number(process.env.PORT ?? 20000) });
@@ -240,7 +241,7 @@ class EventSub extends Core {
         const enabledOrPendingEvents = request.data.data.find((o: any) => {
           return o.type === event
             && ['webhook_callback_verification_pending', 'enabled'].includes(o.status)
-            && o.condition.broadcaster_user_id === channelId.value;
+            && o.condition.broadcaster_user_id === channelId;
         });
 
         if (enabledOrPendingEvents) {
@@ -276,6 +277,7 @@ class EventSub extends Core {
 
   async subscribe(event: string) {
     try {
+      const channelId = variable.get('services.twitch.channelId') as string;
       info('EVENTSUB: sending subscribe event for ' + event);
       const token = await this.generateAppToken();
       const url = 'https://api.twitch.tv/helix/eventsub/subscriptions';
@@ -289,7 +291,7 @@ class EventSub extends Core {
         data: {
           'type':      event,
           'version':   '1',
-          'condition': { 'broadcaster_user_id': channelId.value },
+          'condition': { 'broadcaster_user_id': channelId },
           'transport': {
             'method':   'webhook',
             'callback': `${this.useTunneling ? this.tunnelDomain : 'https://' + this.domain}/webhooks/callback`,

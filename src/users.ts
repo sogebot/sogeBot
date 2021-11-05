@@ -1,7 +1,6 @@
 import { setTimeout } from 'timers';
 
 import { HOUR } from '@sogebot/ui-helpers/constants';
-import axios from 'axios';
 import {
   Brackets, FindOneOptions, getConnection, getRepository, IsNull,
 } from 'typeorm';
@@ -16,10 +15,7 @@ import {
 } from '~/database/entity/user';
 import { onStartup } from '~/decorators/on';
 import { isStreamOnline, stats } from '~/helpers/api';
-import { getClientId } from '~/helpers/api/getClientId';
-import { getToken } from '~/helpers/api/getToken';
 import { mainCurrency } from '~/helpers/currency';
-import { get } from '~/helpers/interfaceEmitter';
 import {
   debug, error, isDebugEnabled,
 } from '~/helpers/log';
@@ -27,6 +23,7 @@ import { recacheOnlineUsersPermission } from '~/helpers/permissions';
 import { defaultPermissions, getUserHighestPermission } from '~/helpers/permissions/';
 import { adminEndpoint, viewerEndpoint } from '~/helpers/socket';
 import * as changelog from '~/helpers/user/changelog.js';
+import { variable } from '~/helpers/variables';
 import { getIdFromTwitch } from '~/services/twitch/calls/getIdFromTwitch';
 
 class Users extends Core {
@@ -83,8 +80,12 @@ class Users extends Core {
           }
         }));
       }));
-    } catch(e: any) {
-      error(e);
+    } catch(e) {
+      if (e instanceof Error) {
+        if (e.message !== 'Cannot initialize Twitch API, bot token invalid.') {
+          error(e.stack ?? e.message);
+        }
+      }
     } finally {
       setTimeout(() => this.checkDuplicateUsernames(), HOUR);
     }
@@ -464,25 +465,13 @@ class Users extends Core {
     });
     adminEndpoint(this.nsp, 'viewers::followedAt', async (id, cb) => {
       try {
-        const cid = await get<string>('/services/twitch', 'channelId');
-        const url = `https://api.twitch.tv/helix/users/follows?from_id=${id}&to_id=${cid}`;
-
-        const token = await getToken('bot');
-        if (token === '') {
-          cb(new Error('no token available'), null);
-        }
-
-        const request = await axios.get<any>(url, {
-          headers: {
-            'Accept':        'application/vnd.twitchtv.v5+json',
-            'Authorization': 'Bearer ' + token,
-            'Client-ID':     await getClientId('bot'),
-          },
-        });
-        if (request.data.total === 0) {
+        const clientBot = await client('bot');
+        const channelId = variable.get('services.twitch.channelId') as string;
+        const getFollows = await clientBot.users.getFollows({ followedUser: channelId, user: id });
+        if (getFollows.total === 0) {
           throw new Error('Not a follower');
         } else {
-          cb(null, new Date(request.data.data[0].followed_at).getTime());
+          cb(null, new Date(getFollows.data[0].followDate).getTime());
         }
       } catch (e: any) {
         cb(e.stack, null);

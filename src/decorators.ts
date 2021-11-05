@@ -6,6 +6,7 @@ import { xor } from 'lodash';
 
 import type { Module } from '~/_interface';
 import { isDbConnected } from '~/helpers/database';
+import emitter from '~/helpers/interfaceEmitter';
 import {
   debug, error, performance,
 } from '~/helpers/log';
@@ -111,7 +112,8 @@ export function settings(category?: string, isReadOnly = false) {
         return;
       }
       try {
-        VariableWatcher.add(`${type}.${name}.${key}`, (self as any)[key], isReadOnly);
+        const path = `${type}.${name}.${key}`;
+        VariableWatcher.add(path, (self as any)[key], isReadOnly);
 
         if (!isReadOnly) {
           // load variable from db
@@ -122,13 +124,18 @@ export function settings(category?: string, isReadOnly = false) {
             }
             self.loadVariableValue(key).then((value) => {
               if (typeof value !== 'undefined') {
-                VariableWatcher.add(`${type}.${name}.${key}`, value, isReadOnly); // rewrite value on var load
+                VariableWatcher.add(path, value, isReadOnly); // rewrite value on var load
                 _.set(self, key, value);
+                emitter.emit('load', path, _.cloneDeep(value));
+              } else {
+                emitter.emit('load', path, _.cloneDeep((self as any)[key]));
               }
-              loadingInProgress = loadingInProgress.filter(o => o !== `${type}.${name}.${key}`);
+              loadingInProgress = loadingInProgress.filter(o => o !== path);
             });
           };
           setTimeout(() => loadVariableValue(), 5000);
+        } else {
+          emitter.emit('load', path, _.cloneDeep((self as any)[key]));
         }
 
         // add variable to settingsList
@@ -219,7 +226,8 @@ export function persistent() {
   const { name, type } = getNameAndTypeFromStackTrace();
 
   return (target: any, key: string) => {
-    loadingInProgress.push(`${type}.${name}.${key}`);
+    const path = `${type}.${name}.${key}`;
+    loadingInProgress.push(path);
     const register = async () => {
       if (!isDbConnected) {
         setTimeout(() => register(), 1000);
@@ -231,14 +239,17 @@ export function persistent() {
           throw new Error(`${type}.${name} not found in list`);
         }
         const defaultValue = (self as any)[key];
-        VariableWatcher.add(`${type}.${name}.${key}`, defaultValue, false);
+        VariableWatcher.add(path, defaultValue, false);
         const loadVariableValue = () => {
           self.loadVariableValue(key).then((value) => {
             if (typeof value !== 'undefined') {
-              VariableWatcher.add(`${type}.${name}.${key}`, value, false); // rewrite value on var load
+              VariableWatcher.add(path, value, false); // rewrite value on var load
+              emitter.emit('load', path, _.cloneDeep(value));
               _.set(self, key, value);
+            } else {
+              emitter.emit('load', path, _.cloneDeep((self as any)[key]));
             }
-            loadingInProgress = loadingInProgress.filter(o => o !== `${type}.${name}.${key}`);
+            loadingInProgress = loadingInProgress.filter(o => o !== path);
           });
         };
         setTimeout(() => loadVariableValue(), 5000);

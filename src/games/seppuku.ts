@@ -1,7 +1,7 @@
 import { command, settings } from '../decorators';
 import Game from './_interface';
 
-import { timeout } from '~/helpers/tmi';
+import { tmiEmitter } from '~/helpers/tmi';
 import { isBroadcaster } from '~/helpers/user/isBroadcaster';
 import { isModerator } from '~/helpers/user/isModerator';
 import { translate } from '~/translate';
@@ -25,7 +25,7 @@ class Seppuku extends Game {
       return [{ response: translate('gambling.seppuku.mod'), ... opts }];
     }
 
-    timeout(opts.sender.userName, this.timeout, isModerator(opts.sender));
+    tmiEmitter.emit('timeout', opts.sender.userName, this.timeout, isModerator(opts.sender));
     return [{ response: translate('gambling.seppuku.text'), ... opts }];
   }
 }

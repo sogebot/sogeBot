@@ -1,31 +1,57 @@
 import * as constants from '@sogebot/ui-helpers/constants';
 import chalk from 'chalk';
 
-import { updateChannelViewsAndBroadcasterType } from '../calls/updateChannelViewsAndBroadcasterType';
 import { validate } from '../token/validate';
 
-import { get } from '~/helpers/interfaceEmitter';
 import {
   debug, error, warning,
 } from '~/helpers/log';
 import { logAvgTime } from '~/helpers/profiler';
 import { setImmediateAwait } from '~/helpers/setImmediateAwait';
+import { variable } from '~/helpers/variables';
+import { checkClips } from '~/services/twitch/calls/checkClips';
+import { getAllStreamTags } from '~/services/twitch/calls/getAllStreamTags';
+import { getBannedEvents } from '~/services/twitch/calls/getBannedEvents';
+import { getChannelChattersUnofficialAPI } from '~/services/twitch/calls/getChannelChattersUnofficialAPI';
+import { getChannelFollowers } from '~/services/twitch/calls/getChannelFollowers';
+import { getChannelInformation } from '~/services/twitch/calls/getChannelInformation';
+import { getChannelSubscribers } from '~/services/twitch/calls/getChannelSubscribers';
+import { getCurrentStream } from '~/services/twitch/calls/getCurrentStream';
+import { getCurrentStreamTags } from '~/services/twitch/calls/getCurrentStreamTags';
+import { getLatest100Followers } from '~/services/twitch/calls/getLatest100Followers';
+import { getModerators } from '~/services/twitch/calls/getModerators';
+import { updateChannelViewsAndBroadcasterType } from '~/services/twitch/calls/updateChannelViewsAndBroadcasterType';
 
-const intervals = new Map<string, {
+const intervals = new Map<keyof typeof functions, {
   interval: number;
   isDisabled: boolean;
   lastRunAt: number;
   opts: Record<string, any>;
 }>();
 
-const addInterval = (fnc: string, intervalId: number) => {
+const addInterval = (fnc: keyof typeof functions, intervalId: number) => {
   intervals.set(fnc, {
     interval: intervalId, lastRunAt: 0, opts: {}, isDisabled: false,
   });
 };
 
+const functions = {
+  getCurrentStream:                     getCurrentStream,
+  getCurrentStreamTags:                 getCurrentStreamTags,
+  updateChannelViewsAndBroadcasterType: updateChannelViewsAndBroadcasterType,
+  getLatest100Followers:                getLatest100Followers,
+  getChannelFollowers:                  getChannelFollowers,
+  getChannelSubscribers:                getChannelSubscribers,
+  getChannelChattersUnofficialAPI:      getChannelChattersUnofficialAPI,
+  getChannelInformation:                getChannelInformation,
+  checkClips:                           checkClips,
+  getAllStreamTags:                     getAllStreamTags,
+  getModerators:                        getModerators,
+  getBannedEvents:                      getBannedEvents,
+} as const;
+
 export const init = () => {
-  addInterval('getCurrentStreamData', constants.MINUTE);
+  addInterval('getCurrentStream', constants.MINUTE);
   addInterval('getCurrentStreamTags', constants.MINUTE);
   addInterval('updateChannelViewsAndBroadcasterType', constants.HOUR);
   addInterval('getLatest100Followers', constants.MINUTE);
@@ -39,13 +65,15 @@ export const init = () => {
   addInterval('getBannedEvents', 10 * constants.MINUTE);
 };
 
+export const stop = () => {
+  intervals.clear();
+};
+
 let isBlocking: boolean | string = false;
 
 const check = async () => {
-  const [ botTokenValid, broadcasterTokenValid ] = await Promise.all([
-    get<boolean>('/services/twitch', 'botTokenValid'),
-    get<boolean>('/services/twitch', 'broadcasterTokenValid'),
-  ]);
+  const botTokenValid = variable.get('services.twitch.botTokenValid') as string;
+  const broadcasterTokenValid = variable.get('services.twitch.broadcasterTokenValid') as string;
   if (!botTokenValid || broadcasterTokenValid) {
     debug('api.interval', 'Tokens not valid.');
   }
@@ -81,15 +109,9 @@ const check = async () => {
       try {
         const value = await Promise.race<Promise<any>>([
           new Promise((resolve, reject) => {
-            if (fnc === 'updateChannelViewsAndBroadcasterType') {
-              updateChannelViewsAndBroadcasterType()
-                .then((data: any) => resolve(data))
-                .catch((e) => reject(e));
-            } else {
-              (this as any)[fnc](interval?.opts)
-                .then((data: any) => resolve(data))
-                .catch((e: any) => reject(e));
-            }
+            functions[fnc](interval?.opts)
+              .then((data: any) => resolve(data))
+              .catch((e: any) => reject(e));
           }),
           new Promise((_resolve, reject) => setTimeout(() => reject(), 10 * constants.MINUTE)),
         ]);
@@ -127,7 +149,10 @@ const check = async () => {
             lastRunAt: 0,
           });
         }
-      } catch (e: any) {
+      } catch (e) {
+        if (e instanceof Error) {
+          error(e.stack ?? e.message);
+        }
         warning(`API call for ${fnc} is probably frozen (took more than 10minutes), forcefully unblocking`);
         debug('api.interval', chalk.yellow(fnc + '() ') + e);
         continue;

@@ -4,7 +4,6 @@ import { timer } from '~/decorators.js';
 import { prepare } from '~/helpers/commons/prepare';
 import { sendMessage } from '~/helpers/commons/sendMessage';
 import { chatOut, warning } from '~/helpers/log';
-import { generalChannel } from '~/helpers/oauth/generalChannel';
 import Discord from '~/integrations/discord';
 import { Message } from '~/message';
 
@@ -59,14 +58,6 @@ const commons = new Commons();
 
 export async function parserReply(response: string | Promise<string>, opts: ParserOptions | { isParserOptions?: boolean, id: string, sender: CommandOptions['sender'];  discord: CommandOptions['discord']; attr?: CommandOptions['attr'] }, messageType: 'chat' | 'whisper' = 'chat') {
   commons.parserReply(response, opts, messageType);
-}
-
-export function getChannel() {
-  try {
-    return generalChannel.value.toLowerCase().trim();
-  } catch (e: any) {
-    return '';
-  }
 }
 
 /**

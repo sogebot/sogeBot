@@ -6,16 +6,14 @@ import { eventEmitter } from '../../../helpers/events';
 import { unfollow } from '../../../helpers/log';
 
 import { follow } from '~/helpers/events/follow';
-import { get } from '~/helpers/interfaceEmitter';
 import * as changelog from '~/helpers/user/changelog.js';
+import { variable } from '~/helpers/variables';
 import client from '~/services/twitch/api/client';
 
 export async function followerUpdatePreCheck (userName: string) {
   const user = await getRepository(User).findOne({ userName });
-  const [ broadcasterUsername, botUsername ] = await Promise.all([
-    get<string>('/services/twitch', 'broadcasterUsername'),
-    get<string>('/services/twitch', 'botUsername'),
-  ]);
+  const broadcasterUsername = variable.get('services.twitch.broadcasterUsername') as string;
+  const botUsername = variable.get('services.twitch.botUsername') as string;
 
   if (user) {
     const isSkipped = user.userName.toLowerCase() === broadcasterUsername.toLowerCase() || user.userName.toLowerCase() === botUsername.toLowerCase();
@@ -31,11 +29,12 @@ export async function isFollowerUpdate (user: UserInterface | null) {
     return;
   }
   const id = user.userId;
-  const cid = await get<string>('/services/twitch', 'channelId');
+
+  const channelId = variable.get('services.twitch.channelId') as string;
 
   try {
     const clientBot = await client('bot');
-    const helixFollow = await clientBot.users.getFollowFromUserToBroadcaster(id, cid);
+    const helixFollow = await clientBot.users.getFollowFromUserToBroadcaster(id, channelId);
 
     if (!helixFollow) {
       if (user.isFollower) {

@@ -4,7 +4,7 @@ import { command, settings } from '../decorators';
 import points from '../systems/points';
 import Game from './_interface';
 
-import { timeout } from '~/helpers/tmi';
+import { tmiEmitter } from '~/helpers/tmi';
 import * as changelog from '~/helpers/user/changelog.js';
 import { isBroadcaster } from '~/helpers/user/isBroadcaster';
 import { isModerator } from '~/helpers/user/isModerator';
@@ -48,7 +48,7 @@ class Roulette extends Game {
 
     setTimeout(async () => {
       if (!isAlive) {
-        timeout(opts.sender.userName, this.timeout, isModerator(opts.sender));
+        tmiEmitter.emit('timeout', opts.sender.userName, this.timeout, isModerator(opts.sender));
       }
     }, 2000);
 

@@ -1,6 +1,7 @@
 import { readdirSync, writeFileSync } from 'fs';
 
 import { HOUR, MINUTE } from '@sogebot/ui-helpers/constants';
+import { setLocale } from '@sogebot/ui-helpers/dayjsHelper';
 import gitCommitInfo from 'git-commit-info';
 import {
   capitalize,
@@ -18,7 +19,6 @@ import {
 } from '~/decorators/on';
 import { isStreamOnline } from '~/helpers/api';
 import { refreshCachedCommandPermissions } from '~/helpers/cache';
-import { setLocale } from '~/helpers/dayjs';
 import { setValue } from '~/helpers/general';
 import { setLang } from '~/helpers/locales';
 import {

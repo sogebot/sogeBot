@@ -3,16 +3,14 @@ import { getRepository } from 'typeorm';
 
 import { rawDataSymbol } from '~/../node_modules/@twurple/common/lib';
 import { BannedEventsTable } from '~/database/entity/bannedEvents';
-import { get } from '~/helpers/interfaceEmitter';
 import { debug, error, warning } from '~/helpers/log';
 import { addUIError } from '~/helpers/panel/';
+import { variable } from '~/helpers/variables';
 import client from '~/services/twitch/api/client';
 
 export async function getBannedEvents (opts: any) {
-  const [ channelId, broadcasterCurrentScopes ] = await Promise.all([
-    get<string>('/services/twitch', 'channelId'),
-    get<string>('/services/twitch', 'broadcasterCurrentScopes'),
-  ]);
+  const channelId = variable.get('services.twitch.channelId') as string;
+  const broadcasterCurrentScopes = variable.get('services.twitch.broadcasterCurrentScopes') as string[];
 
   if (!broadcasterCurrentScopes.includes('moderation:read')) {
     if (!opts.isWarned) {

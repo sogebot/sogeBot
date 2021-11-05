@@ -2,15 +2,13 @@ import { rawDataSymbol } from '../../../../node_modules/@twurple/common/lib';
 import client from '../api/client';
 
 import { currentStreamTags } from '~/helpers/api';
-import { get } from '~/helpers/interfaceEmitter';
 import { error } from '~/helpers/log';
+import { variable } from '~/helpers/variables';
 
 export async function getCurrentStreamTags (opts: any) {
   try {
-    const [ channelId, clientBot ] = await Promise.all([
-      get<string>('/services/twitch', 'channelId'),
-      client('bot'),
-    ]);
+    const channelId = variable.get('services.twitch.channelId') as string;
+    const clientBot = await client('bot');
     const getStreamTags = await clientBot.streams.getStreamTags(channelId);
     while (currentStreamTags.length) {
       currentStreamTags.pop();
