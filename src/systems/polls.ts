@@ -20,7 +20,7 @@ import {
 } from '~/helpers/commons';
 import { mainCurrency } from '~/helpers/currency';
 import { warning } from '~/helpers/log.js';
-import { defaultPermissions } from '~/helpers/permissions/';
+import { defaultPermissions } from '~/helpers/permissions/index';
 import { adminEndpoint } from '~/helpers/socket';
 import { translate } from '~/translate';
 

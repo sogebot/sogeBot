@@ -4,7 +4,7 @@ import client from '../api/client';
 
 import { User } from '~/database/entity/user';
 import { error, warning } from '~/helpers/log';
-import { addUIError } from '~/helpers/panel/';
+import { addUIError } from '~/helpers/panel/index';
 import { setStatus } from '~/helpers/parser';
 import * as changelog from '~/helpers/user/changelog.js';
 import { variable } from '~/helpers/variables';

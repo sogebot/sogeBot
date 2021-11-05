@@ -22,7 +22,7 @@ import { warning } from '~/helpers/log';
 import {
   addToViewersCache, get, getFromViewersCache,
 } from '~/helpers/permissions';
-import { check, defaultPermissions } from '~/helpers/permissions/';
+import { check, defaultPermissions } from '~/helpers/permissions/index';
 import { adminEndpoint } from '~/helpers/socket';
 import { translate } from '~/translate';
 

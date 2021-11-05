@@ -21,7 +21,7 @@ import { CommandError } from '~/helpers/commandError';
 import { announce, prepare } from '~/helpers/commons';
 import { error, info } from '~/helpers/log';
 import { ioServer } from '~/helpers/panel';
-import { addUIError } from '~/helpers/panel/';
+import { addUIError } from '~/helpers/panel/index';
 import { adminEndpoint } from '~/helpers/socket';
 
 /*

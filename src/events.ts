@@ -34,8 +34,8 @@ import emitter from '~/helpers/interfaceEmitter';
 import {
   debug, error, info, warning,
 } from '~/helpers/log';
-import { addUIError } from '~/helpers/panel/';
-import { parserEmitter } from '~/helpers/parser/';
+import { addUIError } from '~/helpers/panel/index';
+import { parserEmitter } from '~/helpers/parser/index';
 import { adminEndpoint } from '~/helpers/socket';
 import { tmiEmitter } from '~/helpers/tmi';
 import {

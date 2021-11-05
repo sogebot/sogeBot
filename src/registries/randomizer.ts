@@ -6,7 +6,7 @@ import { parser } from '../decorators';
 import Registry from './_interface';
 
 import { addToViewersCache, getFromViewersCache } from '~/helpers/permissions';
-import { check } from '~/helpers/permissions/';
+import { check } from '~/helpers/permissions/index';
 import { adminEndpoint, publicEndpoint } from '~/helpers/socket';
 
 class Randomizer extends Registry {

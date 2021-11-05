@@ -40,8 +40,8 @@ import { eventEmitter } from '~/helpers/events';
 import {
   chatIn, chatOut, debug, error, info, warning, whisperOut,
 } from '~/helpers/log';
-import { check } from '~/helpers/permissions/';
 import { get as getPermission } from '~/helpers/permissions/get';
+import { check } from '~/helpers/permissions/index';
 import { adminEndpoint } from '~/helpers/socket';
 import * as changelog from '~/helpers/user/changelog.js';
 import { variable } from '~/helpers/variables';

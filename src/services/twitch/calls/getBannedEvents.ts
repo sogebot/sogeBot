@@ -4,7 +4,7 @@ import { getRepository } from 'typeorm';
 import { rawDataSymbol } from '~/../node_modules/@twurple/common/lib';
 import { BannedEventsTable } from '~/database/entity/bannedEvents';
 import { debug, error, warning } from '~/helpers/log';
-import { addUIError } from '~/helpers/panel/';
+import { addUIError } from '~/helpers/panel/index';
 import { variable } from '~/helpers/variables';
 import client from '~/services/twitch/api/client';
 

@@ -13,7 +13,7 @@ import Game from './_interface';
 
 import { prepare } from '~/helpers/commons';
 import { error } from '~/helpers/log';
-import { getUserHighestPermission } from '~/helpers/permissions/';
+import { getUserHighestPermission } from '~/helpers/permissions/index';
 import { getPointsName } from '~/helpers/points';
 import * as changelog from '~/helpers/user/changelog.js';
 import { translate } from '~/translate';

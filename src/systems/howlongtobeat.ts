@@ -16,7 +16,7 @@ import { prepare } from '~/helpers/commons';
 import {
   debug, error, info, warning,
 } from '~/helpers/log';
-import { defaultPermissions } from '~/helpers/permissions/';
+import { defaultPermissions } from '~/helpers/permissions/index';
 import { adminEndpoint } from '~/helpers/socket';
 
 const notFoundGames = [] as string[];

@@ -16,7 +16,7 @@ import { isStreamOnline } from '~/helpers/api';
 import { announce } from '~/helpers/commons';
 import { isDbConnected } from '~/helpers/database';
 import { linesParsed } from '~/helpers/parser';
-import { defaultPermissions } from '~/helpers/permissions/';
+import { defaultPermissions } from '~/helpers/permissions/index';
 import { adminEndpoint } from '~/helpers/socket';
 import { translate } from '~/translate';
 

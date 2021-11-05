@@ -9,7 +9,7 @@ import {
 } from '~/helpers/log';
 import {
   addUIError,
-} from '~/helpers/panel/';
+} from '~/helpers/panel/index';
 import { variable } from '~/helpers/variables';
 
 const errorCount = {

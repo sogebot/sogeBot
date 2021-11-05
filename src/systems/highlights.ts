@@ -17,7 +17,7 @@ import {
 } from '~/helpers/api';
 import { getBotSender } from '~/helpers/commons';
 import { error } from '~/helpers/log';
-import { defaultPermissions } from '~/helpers/permissions/';
+import { defaultPermissions } from '~/helpers/permissions/index';
 import { adminEndpoint } from '~/helpers/socket';
 import { variable } from '~/helpers/variables';
 import { createMarker } from '~/services/twitch/calls/createMarker';

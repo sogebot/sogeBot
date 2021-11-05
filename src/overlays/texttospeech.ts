@@ -3,7 +3,7 @@ import {
 } from '../decorators';
 import Overlay from './_interface';
 
-import { defaultPermissions } from '~/helpers/permissions/';
+import { defaultPermissions } from '~/helpers/permissions/index';
 
 class TextToSpeech extends Overlay {
   @command('!tts')

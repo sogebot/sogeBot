@@ -9,7 +9,7 @@ import { onChange, onStartup } from '../decorators/on';
 import Integration from './_interface';
 
 import { error, info } from '~/helpers/log';
-import { defaultPermissions } from '~/helpers/permissions/';
+import { defaultPermissions } from '~/helpers/permissions/index';
 import { translate } from '~/translate';
 
 interface State {

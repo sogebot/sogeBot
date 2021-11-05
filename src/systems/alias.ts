@@ -24,7 +24,7 @@ import {
 import {
   addToViewersCache, get, getFromViewersCache,
 } from '~/helpers/permissions';
-import { check, defaultPermissions } from '~/helpers/permissions/';
+import { check, defaultPermissions } from '~/helpers/permissions/index';
 import customCommands from '~/systems/customcommands';
 import { translate } from '~/translate';
 

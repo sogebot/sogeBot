@@ -18,7 +18,7 @@ import { populatedList } from '~/helpers/parser/populatedList';
 import {
   addToViewersCache, getCommandPermission, getFromViewersCache,
 } from '~/helpers/permissions';
-import { check } from '~/helpers/permissions/';
+import { check } from '~/helpers/permissions/index';
 import { translate } from '~/translate';
 
 parserEmitter.on('process', async (opts, cb) => {

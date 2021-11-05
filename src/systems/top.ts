@@ -15,7 +15,7 @@ import points from './points';
 
 import { mainCurrency } from '~/helpers/currency';
 import { debug } from '~/helpers/log';
-import { defaultPermissions } from '~/helpers/permissions/';
+import { defaultPermissions } from '~/helpers/permissions/index';
 import { getPointsName } from '~/helpers/points';
 import { unserialize } from '~/helpers/type';
 import * as changelog from '~/helpers/user/changelog.js';

@@ -17,7 +17,7 @@ import System from './_interface';
 
 import { prepare } from '~/helpers/commons';
 import { error } from '~/helpers/log';
-import { defaultPermissions } from '~/helpers/permissions/';
+import { defaultPermissions } from '~/helpers/permissions/index';
 import { getPointsName } from '~/helpers/points';
 import { adminEndpoint } from '~/helpers/socket';
 import { isOwner } from '~/helpers/user';

@@ -11,7 +11,7 @@ import {
 import { parseTitle } from '~/helpers/api/parseTitle';
 import { eventEmitter } from '~/helpers/events/emitter';
 import { warning } from '~/helpers/log';
-import { addUIError } from '~/helpers/panel/';
+import { addUIError } from '~/helpers/panel/index';
 import { variable } from '~/helpers/variables';
 import { translate } from '~/translate';
 

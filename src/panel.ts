@@ -40,8 +40,8 @@ import {
 import {
   app, ioServer, server, serverSecure, setApp, setServer,
 } from '~/helpers/panel';
-import { socketsConnectedDec, socketsConnectedInc } from '~/helpers/panel/';
 import { errors, warns } from '~/helpers/panel/alerts';
+import { socketsConnectedDec, socketsConnectedInc } from '~/helpers/panel/index';
 import { linesParsed, status as statusObj } from '~/helpers/parser';
 import { list, systems } from '~/helpers/register';
 import { adminEndpoint } from '~/helpers/socket';

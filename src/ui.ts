@@ -38,7 +38,7 @@ class UI extends Core {
       try {
         const data: any = {};
 
-        for (const system of ['currency', 'ui', 'general', 'twitch', 'dashboard']) {
+        for (const system of ['currency', 'ui', 'general', 'dashboard']) {
           if (typeof data.core === 'undefined') {
             data.core = {};
           }
@@ -48,7 +48,7 @@ class UI extends Core {
           }
           data.core[system] = await self.getAllSettings(true);
         }
-        for (const dir of ['systems', 'games', 'overlays', 'integrations']) {
+        for (const dir of ['systems', 'games', 'overlays', 'integrations', 'services']) {
           for (const system of list(dir)) {
             set(data, `${dir}.${system.__moduleName__}`, await system.getAllSettings(true));
           }

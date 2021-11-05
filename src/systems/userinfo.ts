@@ -21,10 +21,10 @@ import levels from './levels';
 import points from './points';
 import ranks from './ranks';
 
-import { prepare } from '~/helpers/commons/';
+import { prepare } from '~/helpers/commons/index';
 import { mainCurrency } from '~/helpers/currency';
 import { error } from '~/helpers/log';
-import { get, getUserHighestPermission } from '~/helpers/permissions/';
+import { get, getUserHighestPermission } from '~/helpers/permissions/index';
 import { getPointsName } from '~/helpers/points';
 import * as changelog from '~/helpers/user/changelog.js';
 import { translate } from '~/translate';

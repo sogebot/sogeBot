@@ -24,7 +24,7 @@ import {
 import {
   addMenu, addMenuPublic, ioServer, menu, menuPublic,
 } from '~/helpers/panel';
-import { defaultPermissions } from '~/helpers/permissions/';
+import { defaultPermissions } from '~/helpers/permissions/index';
 import { register } from '~/helpers/register';
 import { adminEndpoint, publicEndpoint } from '~/helpers/socket';
 import * as watchers from '~/watchers';

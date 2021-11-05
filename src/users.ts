@@ -20,7 +20,7 @@ import {
   debug, error, isDebugEnabled,
 } from '~/helpers/log';
 import { recacheOnlineUsersPermission } from '~/helpers/permissions';
-import { defaultPermissions, getUserHighestPermission } from '~/helpers/permissions/';
+import { defaultPermissions, getUserHighestPermission } from '~/helpers/permissions/index';
 import { adminEndpoint, viewerEndpoint } from '~/helpers/socket';
 import * as changelog from '~/helpers/user/changelog.js';
 import { variable } from '~/helpers/variables';

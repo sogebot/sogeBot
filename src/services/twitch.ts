@@ -27,7 +27,7 @@ import {
 import { prepare } from '~/helpers/commons/prepare';
 import { setOAuthStatus } from '~/helpers/OAuthStatus';
 import { cleanViewersCache } from '~/helpers/permissions';
-import { defaultPermissions } from '~/helpers/permissions/';
+import { defaultPermissions } from '~/helpers/permissions/index';
 import { adminEndpoint, publicEndpoint } from '~/helpers/socket';
 import {
   globalIgnoreListExclude, ignorelist, sendWithMe, setMuteStatus, showWithAt,

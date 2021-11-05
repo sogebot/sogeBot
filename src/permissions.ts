@@ -9,7 +9,7 @@ import Expects from '~/expects';
 import { prepare } from '~/helpers/commons';
 import { error } from '~/helpers/log';
 import { cleanViewersCache, get } from '~/helpers/permissions';
-import { check, defaultPermissions } from '~/helpers/permissions/';
+import { check, defaultPermissions } from '~/helpers/permissions/index';
 import { adminEndpoint } from '~/helpers/socket';
 import * as changelog from '~/helpers/user/changelog.js';
 import users from '~/users';

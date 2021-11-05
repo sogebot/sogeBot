@@ -25,9 +25,9 @@ import {
   debug, error, warning,
 } from '~/helpers/log';
 import { getOAuthStatus } from '~/helpers/OAuthStatus';
-import { socketsConnected } from '~/helpers/panel/';
-import { addUIWarn } from '~/helpers/panel/';
-import { defaultPermissions } from '~/helpers/permissions/';
+import { socketsConnected } from '~/helpers/panel/index';
+import { addUIWarn } from '~/helpers/panel/index';
+import { defaultPermissions } from '~/helpers/permissions/index';
 import { list } from '~/helpers/register';
 import { adminEndpoint } from '~/helpers/socket';
 import { getMuteStatus } from '~/helpers/tmi/muteStatus';

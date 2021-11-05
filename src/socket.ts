@@ -14,7 +14,7 @@ import { debug, error } from '~/helpers/log';
 import { app, ioServer } from '~/helpers/panel';
 import {
   check, defaultPermissions, getUserHighestPermission,
-} from '~/helpers/permissions/';
+} from '~/helpers/permissions/index';
 import { adminEndpoint, endpoints } from '~/helpers/socket';
 import * as changelog from '~/helpers/user/changelog.js';
 import { isModerator } from '~/helpers/user/isModerator';
