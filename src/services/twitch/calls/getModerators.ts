@@ -24,8 +24,8 @@ export async function getModerators(opts: { isWarned: boolean }) {
       return { state: false, opts };
     }
 
-    const clientBot = await client('bot');
-    const getModeratorsPaginated = await clientBot.moderation.getModeratorsPaginated(channelId).getAll();
+    const clientBroadcaster = await client('broadcaster');
+    const getModeratorsPaginated = await clientBroadcaster.moderation.getModeratorsPaginated(channelId).getAll();
 
     await changelog.flush();
     await getRepository(User).update({ userId: Not(In(getModeratorsPaginated.map(o => o.userId))) }, { isModerator: false });
