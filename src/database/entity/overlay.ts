@@ -219,7 +219,7 @@ export interface OverlayMapperClips {
 
 export interface OverlayMapperAlerts {
   id: string;
-  value: 'alerts';
+  value: 'media';
   opts: {
     galleryCache: boolean,
     galleryCacheLimitInMb: number,

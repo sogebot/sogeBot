@@ -43,7 +43,7 @@ export class OverlayObject {
   @Field(type => [OverlayClipsObject])
   clips: OverlayMapperClips[];
   @Field(type => [OverlayAlertsObject])
-  alerts: OverlayMapperAlerts[];
+  media: OverlayMapperAlerts[];
   @Field(type => [OverlayEmotesObject])
   emotes: OverlayMapperEmotes[];
   @Field(type => [OverlayEmotesComboObject])

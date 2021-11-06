@@ -80,7 +80,7 @@ export class overlayResolver {
       credits:         items.filter(o => o.value === 'credits'),
       eventlist:       items.filter(o => o.value === 'eventlist'),
       clips:           items.filter(o => o.value === 'clips'),
-      alerts:          items.filter(o => o.value === 'alerts'),
+      media:           items.filter(o => o.value === 'media'),
       emotes:          items.filter(o => o.value === 'emotes'),
       emotescombo:     items.filter(o => o.value === 'emotescombo'),
       emotesfireworks: items.filter(o => o.value === 'emotesfireworks'),

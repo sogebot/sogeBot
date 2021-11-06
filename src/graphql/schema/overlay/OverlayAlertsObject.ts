@@ -10,7 +10,7 @@ export class OverlayAlertsObject implements OverlayMapperAlerts {
   @Field(type => ID)
   id: string;
   @Field()
-  value: 'alerts';
+  value: 'media';
   @Field(type => OverlayAlertsOptionsObject, { nullable: true })
   opts: OverlayMapperAlerts['opts'];
 }
