@@ -38,7 +38,7 @@ setInterval(async () => {
     const broadcasterClientId = variable.get('services.twitch.broadcasterClientId') as string;
     const broadcasterId = variable.get('services.twitch.broadcasterId') as string;
 
-    if (!broadcasterAccessToken) {
+    if (!broadcasterAccessToken || !broadcasterClientId || !broadcasterId) {
       return;
     }
 

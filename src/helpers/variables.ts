@@ -1,7 +1,6 @@
 import emitter from './interfaceEmitter';
 
 emitter.on('change', (path, value) => {
-  console.log({ type: 'change', path, value });
   variable.set(path, value);
 });
 

@@ -4,7 +4,7 @@ import { StaticAuthProvider } from '@twurple/auth';
 import { variable } from '~/helpers/variables';
 
 const client = async (account: 'broadcaster' | 'bot') => {
-  const clientId = variable.get('services.twitch.clientId') as string;
+  const clientId = variable.get(`services.twitch.${account}ClientId`) as string;
   const accessToken = variable.get(`services.twitch.${account}AccessToken`) as string;
   const isValidToken = variable.get(`services.twitch.${account}TokenValid`) as string;
 

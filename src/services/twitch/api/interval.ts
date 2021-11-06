@@ -74,8 +74,9 @@ let isBlocking: boolean | string = false;
 const check = async () => {
   const botTokenValid = variable.get('services.twitch.botTokenValid') as string;
   const broadcasterTokenValid = variable.get('services.twitch.broadcasterTokenValid') as string;
-  if (!botTokenValid || broadcasterTokenValid) {
+  if (!botTokenValid || !broadcasterTokenValid) {
     debug('api.interval', 'Tokens not valid.');
+    return;
   }
   if (isBlocking) {
     debug('api.interval', chalk.yellow(isBlocking + '() ') + 'still in progress.');

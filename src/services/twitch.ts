@@ -47,7 +47,9 @@ class Twitch extends Service {
   tmi: import('./twitch/chat').default | null;
   emotes: import('./twitch/emotes').default | null;
 
+  @persistent()
   botTokenValid = false;
+  @persistent()
   broadcasterTokenValid = false;
 
   @persistent()
@@ -142,6 +144,12 @@ class Twitch extends Service {
 
   @settings('bot')
   botCurrentScopes: string[] = [];
+
+  constructor() {
+    super();
+    this.botTokenValid = false;
+    this.broadcasterTokenValid = false;
+  }
 
   @onChange('botAccessToken')
   @onChange('broadcasterAccessToken')

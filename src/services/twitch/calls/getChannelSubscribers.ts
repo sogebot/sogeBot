@@ -18,9 +18,9 @@ export async function getChannelSubscribers<T extends { noAffiliateOrPartnerWarn
   try {
     const channelId = variable.get('services.twitch.channelId') as string;
     const broadcasterType = variable.get('services.twitch.broadcasterType') as string;
-    const clientBot = await client('bot');
+    const clientBroadcaster = await client('broadcaster');
 
-    const getSubscriptionsPaginated = await clientBot.subscriptions.getSubscriptionsPaginated(channelId).getAll();
+    const getSubscriptionsPaginated = await clientBroadcaster.subscriptions.getSubscriptionsPaginated(channelId).getAll();
     if (broadcasterType === '') {
       if (!opts.noAffiliateOrPartnerWarningSent) {
         warning('Broadcaster is not affiliate/partner, will not check subs');

@@ -144,6 +144,7 @@ class Module {
     emitter.on('set', (nsp, variableName, value, cb) => {
       if (nsp === this.nsp) {
         (this as any)[variableName] = value;
+        emitter.emit('change', `${this._name.toLowerCase()}.${this.__moduleName__.toLowerCase()}.${variableName}`, value);
       }
       if (cb) {
         cb();
