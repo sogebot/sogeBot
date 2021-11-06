@@ -27,6 +27,7 @@
     "@sogebot/ui-public": "^2.0.0",
     "@twurple/api": "^5.0.8",
     "@twurple/chat": "^5.0.8",
+    "@twurple/pubsub": "^5.0.8",
     "axios": "0.23.0",
     "basic-auth": "2.0.1",
     "better-sqlite3": "^7.4.4",

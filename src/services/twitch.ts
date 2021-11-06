@@ -19,12 +19,14 @@ import { init as apiIntervalInit , stop as apiIntervalStop } from './twitch/api/
 import { getChannelId } from './twitch/calls/getChannelId';
 import Chat from './twitch/chat';
 import Emotes from './twitch/emotes';
+import PubSub from './twitch/pubsub';
 import { cache, validate } from './twitch/token/validate';
 
 import {
   isStreamOnline, stats, streamStatusChangeSince,
 } from '~/helpers/api';
 import { prepare } from '~/helpers/commons/prepare';
+import { isBotStarted } from '~/helpers/database';
 import { setOAuthStatus } from '~/helpers/OAuthStatus';
 import { cleanViewersCache } from '~/helpers/permissions';
 import { defaultPermissions } from '~/helpers/permissions/index';
@@ -46,6 +48,7 @@ const urls = {
 class Twitch extends Service {
   tmi: import('./twitch/chat').default | null;
   emotes: import('./twitch/emotes').default | null;
+  pubsub: import('./twitch/pubsub').default | null;
 
   @persistent()
   botTokenValid = false;
@@ -215,28 +218,47 @@ class Twitch extends Service {
     this.addMenu({
       category: 'stats', name: 'api', id: 'stats/api', this: null,
     });
+
+    this.onStatusChange();
   }
 
-  @onChange('enabled')
-  @onLoad('enabled')
-  onStatusChange() {
-    if (this.enabled) {
-      Promise.all(this.validateTokens())
-        .then(getChannelId)
-        .then(() => {
-          this.tmi = new Chat();
-          this.tmi?.initClient('bot');
-          this.tmi?.initClient('broadcaster');
-        })
-        .catch((e) => {
-          error(e.stack ?? e.message);
-          this.enabled = false;
-        });
+  init() {
+    if (this.botTokenValid && this.broadcasterTokenValid) {
+      getChannelId();
+
+      this.tmi = new Chat();
+      this.tmi?.initClient('bot');
+      this.tmi?.initClient('broadcaster');
+
+      this.pubsub = new PubSub();
       this.emotes = new Emotes();
       apiIntervalInit();
     } else {
+      console.log('a');
+      setTimeout(() => this.init(), 1000);
+    }
+  }
+
+  @onChange('enabled')
+  onStatusChange() {
+    if (!isBotStarted) {
+      return;
+    }
+    if (this.enabled) {
+      // trigger validation
+      this.validateTokens();
+      this.init();
+    } else {
       apiIntervalStop();
+      if (this.emotes) {
+        clearInterval(this.emotes.interval);
+      }
+      this.pubsub?.stop();
+      this.tmi?.part('bot');
+      this.tmi?.part('broadcaster');
+
       this.emotes = null;
+      this.pubsub = null;
     }
   }
 

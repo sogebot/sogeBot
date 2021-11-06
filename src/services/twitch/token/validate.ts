@@ -4,7 +4,6 @@ import axios from 'axios';
 import { setStatus } from '../../../helpers/parser';
 import { tmiEmitter } from '../../../helpers/tmi';
 import client from '../api/client';
-import { getChannelId } from '../calls/getChannelId';
 import { refresh } from './refresh';
 
 import emitter from '~/helpers/interfaceEmitter';
@@ -18,8 +17,14 @@ import { variable } from '~/helpers/variables';
 let botTokenErrorSent = false;
 let broadcasterTokenErrorSent = false;
 
-let lastBotTokenValidation = 0;
-let lastBroadcasterTokenValidation = 0;
+const expirationDate = {
+  bot:         -1,
+  broadcaster: -1,
+};
+const isValidating = {
+  bot:         false,
+  broadcaster: false,
+};
 
 export const cache: { bot: string; broadcaster: string } = { bot: '', broadcaster: '' };
 /*
@@ -40,101 +45,58 @@ export const cache: { bot: string; broadcaster: string } = { bot: '', broadcaste
       }
     */
 export const validate = async (type: 'bot' | 'broadcaster', retry = 0, clear = false): Promise < boolean > => {
-  let token: string;
-  if (type === 'bot') {
-    token = variable.get('services.twitch.botAccessToken') as string;
-  } else {
-    token = variable.get('services.twitch.broadcasterAccessToken') as string;
-  }
-
-  debug('oauth.validate', `Validation: ${type} - ${retry} retries`);
-  if (type === 'bot' && Date.now() - lastBotTokenValidation < constants.MINUTE) {
-    debug('oauth.validate', `Validation: ${type} - ${retry} retries - Already validated`);
-    return true;
-  }
-  if (type === 'broadcaster' && Date.now() - lastBroadcasterTokenValidation < constants.MINUTE) {
-    debug('oauth.validate', `Validation: ${type} - ${retry} retries - Already validated`);
-    return true;
-  }
-
-  if (type === 'bot') {
-    lastBotTokenValidation = Date.now();
-  }
-
-  if (type === 'broadcaster') {
-    lastBroadcasterTokenValidation = Date.now();
-  }
-
-  if ((global as any).mocha) {
-    return true;
-  }
-
-  const url = 'https://id.twitch.tv/oauth2/validate';
-  let status = true;
   try {
-    if (token === '') {
-      throw new Error('no access token for ' + type);
+    debug('oauth.validate', `Validation: ${type} - ${retry} retries`);
+    if (isValidating[type]) {
+      debug('oauth.validate', `Validation in progress.`);
+      return false;
+    } else {
+      isValidating[type] = true;
+    }
+
+    const refreshToken = variable.get('services.twitch.' + type + 'refreshToken') as string;
+
+    if (refreshToken === '') {
+      throw new Error('no refresh token for ' + type);
     } else if (!['bot', 'broadcaster'].includes(type)) {
       throw new Error(`Type ${type} is not supported`);
     }
 
-    let request;
-    try {
-      debug('oauth.validate', `Checking ${type} - retry no. ${retry}`);
-      request = await axios.get < any > (url, {
-        headers: {
-          Authorization: 'OAuth ' + token,
-        },
-      });
-      debug('oauth.validate', JSON.stringify(request.data));
-
-      if (request.data.expires_in < 300) {
-        debug('oauth.validate', `Refreshing token for ${type} as it is near expiration.`);
-        await refresh(type, clear);
-        return true;
-      }
-    } catch (e: any) {
-      if (type === 'bot') {
-        lastBotTokenValidation = 0;
-      }
-
-      if (type === 'broadcaster') {
-        lastBroadcasterTokenValidation = 0;
-      }
-
-      if (e.isAxiosError) {
-        if ((typeof e.response === 'undefined' || (e.response.status !== 401 && e.response.status !== 403)) && retry < 5) {
-          // retry validation if error is different than 401 Invalid Access Token
-          await new Promise < void > ((resolve) => {
-            setTimeout(() => resolve(), 1000 + (retry ** 2));
-          });
-          return validate(type, retry++);
-        }
-        if (e.response.status === 401) {
-          await refresh(type, clear);
-          return true;
-        }
-        throw new Error(`Error on validate ${type} OAuth token, error: ${e.response.status} - ${e.response.statusText} - ${e.response.data.message}`);
-      } else {
-        debug('oauth.validate', e.stack);
-        throw new Error(e);
-      }
+    let token: string;
+    if (expirationDate[type] - Date.now() > 5 * constants.MINUTE && expirationDate[type] !== -1) {
+      debug('oauth.validate', `Skipping refresh token for ${type}, expiration time: ${new Date(expirationDate[type]).toISOString()}`);
+      return true;
+    } else {
+      debug('oauth.validate', `Refreshing token for ${type}`);
+      token = await refresh(type, true);
     }
+
+    if ((global as any).mocha) {
+      return true;
+    }
+
+    const url = 'https://id.twitch.tv/oauth2/validate';
+
+    debug('oauth.validate', `Checking ${type} - retry no. ${retry}`);
+    const request = await axios.get < any > (url, {
+      headers: {
+        Authorization: 'OAuth ' + token,
+      },
+    });
+    debug('oauth.validate', JSON.stringify(request.data));
+    expirationDate[type] = Date.now() + request.data.expires_in * 1000;
+
+    setTimeout(() => {
+      const botId = variable.get('services.twitch.botId') as string;
+      const broadcasterId = variable.get('services.twitch.broadcasterId') as string;
+
+      if (type === 'bot' && botId === broadcasterId) {
+        warning('You shouldn\'t use same account for bot and broadcaster!');
+      }
+    }, 10000);
 
     if (type === 'bot') {
       emitter.emit('set', '/services/twitch', 'botId', request.data.user_id);
-    } else {
-      emitter.emit('set', '/services/twitch', 'broadcasterId', request.data.user_id);
-    }
-
-    const botId = variable.get('services.twitch.botId') as string;
-    const broadcasterId = variable.get('services.twitch.broadcasterId') as string;
-
-    if (type === 'bot' && botId === broadcasterId) {
-      warning('You shouldn\'t use same account for bot and broadcaster!');
-    }
-
-    if (type === 'bot') {
       emitter.emit('set', '/services/twitch', 'botUsername', request.data.login);
       emitter.emit('set', '/services/twitch', 'botCurrentScopes', request.data.scopes);
       emitter.emit('set', '/services/twitch', 'botTokenValid', true);
@@ -149,6 +111,7 @@ export const validate = async (type: 'bot' | 'broadcaster', retry = 0, clear = f
         throw new Error(`User ${request.data.login} not found on Twitch.`);
       }
     } else {
+      emitter.emit('set', '/services/twitch', 'broadcasterId', request.data.user_id);
       emitter.emit('set', '/services/twitch', 'broadcasterUsername', request.data.login);
       emitter.emit('set', '/services/twitch', 'broadcasterCurrentScopes', request.data.scopes);
       emitter.emit('set', '/services/twitch', 'broadcasterTokenValid', true);
@@ -162,43 +125,59 @@ export const validate = async (type: 'bot' | 'broadcaster', retry = 0, clear = f
 
     setStatus('API', request.status === 200 ? constants.CONNECTED : constants.DISCONNECTED);
 
-    if (type === 'bot') {
-      getChannelId();
-    }
+    return true;
   } catch (e: any) {
-    if (e.message.includes('no access token for')) {
-      if ((type === 'bot' && !botTokenErrorSent) || (type === 'broadcaster' && !broadcasterTokenErrorSent)) {
-        warning(`Access token ${type} account not found. Please set it in UI.`);
-        if (type === 'broadcaster') {
-          broadcasterTokenErrorSent = true;
+    expirationDate[type] = -1;
+
+    if (e.isAxiosError) {
+      if ((typeof e.response === 'undefined' || (e.response.status !== 401 && e.response.status !== 403)) && retry < 5) {
+        // retry validation if error is different than 401 Invalid Access Token
+        await new Promise < void > ((resolve) => {
+          setTimeout(() => resolve(), 1000 + (retry ** 2));
+        });
+        return validate(type, retry++);
+      }
+      if (await refresh(type)) {
+        return true;
+      }
+      throw new Error(`Error on validate ${type} OAuth token, error: ${e.response.status} - ${e.response.statusText} - ${e.response.data.message}`);
+    } else {
+      debug('oauth.validate', e.stack);
+      if (e.message.includes('no refresh token for')) {
+        if ((type === 'bot' && !botTokenErrorSent) || (type === 'broadcaster' && !broadcasterTokenErrorSent)) {
+          warning(`Rerfresh token ${type} account not found. Please set it in UI.`);
+          if (type === 'broadcaster') {
+            broadcasterTokenErrorSent = true;
+          } else {
+            botTokenErrorSent = true;
+          }
+        }
+      } else {
+        error(e);
+        error(e.stack);
+      }
+      const botRefreshToken = variable.get('services.twitch.botRefreshToken') as string;
+      const broadcasterRefreshToken = variable.get('services.twitch.broadcasterRefreshToken') as string;
+
+      if ((type === 'bot' ? botRefreshToken : broadcasterRefreshToken) !== '') {
+        refresh(type, clear);
+      } else {
+        if (type === 'bot') {
+          emitter.emit('set', '/services/twitch', 'botTokenValid', false);
+          emitter.emit('set', '/services/twitch', 'botId', '');
+          emitter.emit('set', '/services/twitch', 'botUsername', '');
+          emitter.emit('set', '/services/twitch', 'botCurrentScopes', []);
         } else {
-          botTokenErrorSent = true;
+          emitter.emit('set', '/services/twitch', 'broadcasterTokenValid', false);
+          emitter.emit('set', '/services/twitch', 'broadcasterId', '');
+          emitter.emit('set', '/services/twitch', 'broadcasterUsername', '');
+          emitter.emit('set', '/services/twitch', 'broadcasterCurrentScopes', []);
         }
       }
-    } else {
-      error(e);
-      error(e.stack);
     }
-    status = false;
-    const botRefreshToken = variable.get('services.twitch.botRefreshToken') as string;
-    const broadcasterRefreshToken = variable.get('services.twitch.broadcasterRefreshToken') as string;
-
-    if ((type === 'bot' ? botRefreshToken : broadcasterRefreshToken) !== '') {
-      refresh(type, clear);
-    } else {
-      if (type === 'bot') {
-        emitter.emit('set', '/services/twitch', 'botTokenValid', false);
-        emitter.emit('set', '/services/twitch', 'botId', '');
-        emitter.emit('set', '/services/twitch', 'botUsername', '');
-        emitter.emit('set', '/services/twitch', 'botCurrentScopes', []);
-      } else {
-        emitter.emit('set', '/services/twitch', 'broadcasterTokenValid', false);
-        emitter.emit('set', '/services/twitch', 'broadcasterId', '');
-        emitter.emit('set', '/services/twitch', 'broadcasterUsername', '');
-        emitter.emit('set', '/services/twitch', 'broadcasterCurrentScopes', []);
-      }
-    }
+    debug('oauth.validate', `Token for ${type} is ${status ? 'valid' : 'invalid'}.`);
+    throw new Error(e);
+  } finally {
+    isValidating[type] = false;
   }
-  debug('oauth.validate', `Token for ${type} is ${status ? 'valid' : 'invalid'}.`);
-  return status;
 };

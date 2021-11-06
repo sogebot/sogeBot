@@ -108,8 +108,6 @@ async function main () {
         require('./events');
         require('./customvariables');
         require('./permissions');
-        require('./eventsub');
-        require('./pubsub');
         require('./updater');
         require('./dashboard');
         require('./panel');

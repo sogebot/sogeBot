@@ -135,7 +135,7 @@ class Chat {
 
     // wait for initial validation
     if (!isValidToken) {
-      setTimeout(() => this.initClient(type), constants.SECOND);
+      setTimeout(() => this.initClient(type), 10 * constants.SECOND);
       return;
     }
 

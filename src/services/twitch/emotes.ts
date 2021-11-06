@@ -34,8 +34,10 @@ class Emotes {
   lastFFZEmoteChk = 0;
   lastBTTVEmoteChk = 0;
 
+  interval: NodeJS.Timer;
+
   constructor() {
-    setInterval(() => {
+    this.interval = setInterval(() => {
       if (!this.fetch.global) {
         this.fetchEmotesGlobal();
       }
@@ -77,7 +79,6 @@ class Emotes {
 
     const channelId = variable.get('services.twitch.channelId') as string;
     const broadcasterType = variable.get('services.twitch.broadcasterType') as string;
-    const botAccessToken = variable.get('services.twitch.botAccessToken') as string;
 
     if (channelId && broadcasterType !== null && (Date.now() - this.lastSubscriberEmoteChk > 1000 * 60 * 60 * 24 * 7 || this.lastChannelChk !== channelId)) {
       if (broadcasterType === '' && !broadcasterWarning) {
@@ -88,14 +89,8 @@ class Emotes {
         this.lastSubscriberEmoteChk = Date.now();
         this.lastChannelChk = channelId;
         try {
-          if (!botAccessToken) {
-            this.lastSubscriberEmoteChk = 0; // recheck next tick
-            this.fetch.channel = false;
-            return;
-          }
-
-          info(`EMOTES: Fetching channel ${channelId} emotes`);
           await validate('bot');
+          info(`EMOTES: Fetching channel ${channelId} emotes`);
           const clientBot = await client('bot');
           const emotes = await clientBot.chat.getChannelEmotes(channelId);
           for (const emote of emotes) {
@@ -111,12 +106,14 @@ class Emotes {
             });
           }
           info(`EMOTES: Fetched channel ${channelId} emotes`);
-        } catch (e: any) {
-          if (String(e).includes('404')) {
-            error(`EMOTES: Error fetching channel ${channelId} emotes. Your channel was not found on twitchemotes.com. Add your channel at https://twitchemotes.com/contact/tip`);
-          } else {
-            error(e);
-            error(e.stack);
+        } catch (e) {
+          if (e instanceof Error) {
+            if (e.message.includes('Cannot initialize Twitch API')) {
+              this.lastSubscriberEmoteChk = 0; // recheck next tick
+              this.fetch.channel = false;
+            } else {
+              error (e.stack ?? e.message);
+            }
           }
         }
       }
@@ -127,19 +124,12 @@ class Emotes {
   async fetchEmotesGlobal () {
     this.fetch.global = true;
 
-    const botAccessToken = variable.get('services.twitch.botAccessToken') as string;
-
     // we want to update once every week
     if (Date.now() - this.lastGlobalEmoteChk > 1000 * 60 * 60 * 24 * 7) {
       this.lastGlobalEmoteChk = Date.now();
       try {
-        if (!botAccessToken) {
-          this.lastGlobalEmoteChk = 0; // recheck next tick
-          this.fetch.global = false;
-          return;
-        }
-        info('EMOTES: Fetching global emotes');
         await validate('bot');
+        info('EMOTES: Fetching global emotes');
         const clientBot = await client('bot');
         const emotes = await clientBot.chat.getGlobalEmotes();
         for (const emote of emotes) {
@@ -156,9 +146,15 @@ class Emotes {
           });
         }
         info('EMOTES: Fetched global emotes');
-      } catch (e: any) {
-        error(e);
-        error(e.stack);
+      } catch (e) {
+        if (e instanceof Error) {
+          if (e.message.includes('Cannot initialize Twitch API')) {
+            this.lastGlobalEmoteChk = 0; // recheck next tick
+            this.fetch.global = false;
+          } else {
+            error (e.stack ?? e.message);
+          }
+        }
       }
     }
 
