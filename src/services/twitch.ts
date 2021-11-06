@@ -234,7 +234,6 @@ class Twitch extends Service {
       this.emotes = new Emotes();
       apiIntervalInit();
     } else {
-      console.log('a');
       setTimeout(() => this.init(), 1000);
     }
   }
