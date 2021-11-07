@@ -5,7 +5,7 @@
     "importHelpers": true,
     "target": "es2020",
     "strict": true,
-    "module": "commonjs",
+    "module": "esnext",
     "incremental": true,
     "removeComments": true,
     "noImplicitAny": true,

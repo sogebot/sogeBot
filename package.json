@@ -3,6 +3,7 @@
   "version": "14.2.0-SNAPSHOT",
   "description": "Free Twitch Bot built on Node.js",
   "private": true,
+  "type": "module",
   "sideEffects": [
     "*.css",
     "*.vue"

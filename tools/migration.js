@@ -1,6 +1,8 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 
-require('dotenv').config();
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const spawn = require('child_process').spawn;
 const fs = require('fs');

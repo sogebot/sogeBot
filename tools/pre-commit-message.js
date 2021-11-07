@@ -1,4 +1,4 @@
-const fs = require('fs');
+import fs from 'fs';
 
 const COMMIT_EDITMSG = process.argv[2];
 
