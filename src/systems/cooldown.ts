@@ -1,6 +1,6 @@
 import * as constants from '@sogebot/ui-helpers/constants';
 import _ from 'lodash';
-import { getRepository } from 'typeorm';
+import { getRepository, In } from 'typeorm';
 
 import { parserReply } from '../commons';
 import {
@@ -25,6 +25,7 @@ import { translate } from '../translate';
 import System from './_interface';
 import alias from './alias';
 import customCommands from './customcommands';
+import customcommands from './customcommands';
 
 const cache: { id: string; cooldowns: CooldownInterface[] }[] = [];
 const defaultCooldowns: { name: string; lastRunAt: number, permId: string }[] = [];
@@ -218,16 +219,24 @@ class Cooldown extends System {
         }
 
         // get alias group
-        let groupName = name;
+        const groupName = [];
         if (opts.message.startsWith('!')) {
           const [parsedAlias] = await alias.search(opts);
           if (parsedAlias && parsedAlias.group) {
             debug('cooldown.check', `Will be searching for group '${parsedAlias.group}' as well.`);
-            groupName = `g:${parsedAlias.group}`;
+            groupName.push(`g:${parsedAlias.group}`);
+          } else {
+            const commands = await customcommands.find(opts.message);
+            for (const item of commands) {
+              if (item.command.group) {
+                debug('cooldown.check', `Will be searching for group '${item.command.group}' as well.`);
+                groupName.push(`g:${item.command.group}`);
+              }
+            }
           }
         }
 
-        const cooldown = await getRepository(CooldownEntity).findOne({ where: [{ name }, { name: groupName }], relations: ['viewers'] });
+        const cooldown = await getRepository(CooldownEntity).findOne({ where: [{ name }, { name: In(groupName) }], relations: ['viewers'] });
         if (!cooldown) {
           const defaultValue = await this.getPermissionBasedSettingsValue('defaultCooldownOfCommandsInSeconds');
           const permId = await getUserHighestPermission(opts.sender.userId);
