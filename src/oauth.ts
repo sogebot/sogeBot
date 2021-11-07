@@ -516,7 +516,6 @@ class OAuth extends Core {
         return request.data.token;
       }
     } catch (e: any) {
-      error(e.stack);
       if (type === 'bot') {
         botId.value = '';
         refreshTokenBotErrorCount++;
