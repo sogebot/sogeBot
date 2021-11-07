@@ -19,6 +19,7 @@ import { init as apiIntervalInit , stop as apiIntervalStop } from './twitch/api/
 import { getChannelId } from './twitch/calls/getChannelId';
 import Chat from './twitch/chat';
 import Emotes from './twitch/emotes';
+import EventSub from './twitch/eventsub';
 import PubSub from './twitch/pubsub';
 import { cache, validate } from './twitch/token/validate';
 
@@ -49,6 +50,7 @@ class Twitch extends Service {
   tmi: import('./twitch/chat').default | null;
   emotes: import('./twitch/emotes').default | null;
   pubsub: import('./twitch/pubsub').default | null;
+  eventsub: import('./twitch/eventsub').default | null;
 
   @persistent()
   botTokenValid = false;
@@ -89,22 +91,17 @@ class Twitch extends Service {
   tokenServiceCustomClientId = '';
   @settings('general')
   tokenServiceCustomClientSecret = '';
-
   @settings('general')
   generalChannel = '';
-
   @settings('general')
   generalOwners: string[] = [];
 
   @settings('broadcaster')
   broadcasterAccessToken = '';
-
   @settings('broadcaster')
   broadcasterRefreshToken = '';
-
   @settings('broadcaster')
   broadcasterUsername = '';
-
   @settings('broadcaster', true)
   broadcasterExpectedScopes: string[] = [
     'channel_editor',
@@ -119,19 +116,15 @@ class Twitch extends Service {
     'moderation:read',
     'channel:read:hype_train',
   ];
-
   @settings('broadcaster')
   broadcasterCurrentScopes: string[] = [];
 
   @settings('bot')
   botAccessToken = '';
-
   @settings('bot')
   botRefreshToken = '';
-
   @settings('bot')
   botUsername = '';
-
   @settings('bot', true)
   botExpectedScopes: string[] = [
     'clips:edit',
@@ -144,9 +137,23 @@ class Twitch extends Service {
     'whispers:edit',
     'channel:edit:commercial',
   ];
-
   @settings('bot')
   botCurrentScopes: string[] = [];
+
+  @settings('eventsub')
+  useTunneling = false;
+  @settings('eventsub')
+  domain = '';
+  @settings('eventsub')
+  eventSubClientId = '';
+  @settings('eventsub')
+  eventSubClientSecret = '';
+  @settings('eventsub')
+  eventSubEnabledSubscriptions: string[] = [];
+  @persistent()
+  appToken = '';
+  @persistent()
+  secret = '';
 
   constructor() {
     super();
@@ -232,6 +239,7 @@ class Twitch extends Service {
 
       this.pubsub = new PubSub();
       this.emotes = new Emotes();
+      this.eventsub = new EventSub();
       apiIntervalInit();
     } else {
       setTimeout(() => this.init(), 1000);
@@ -258,6 +266,7 @@ class Twitch extends Service {
 
       this.emotes = null;
       this.pubsub = null;
+      this.eventsub = null;
     }
   }
 

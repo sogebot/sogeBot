@@ -15,6 +15,8 @@ import {
   getConnection, getManager, getRepository,
 } from 'typeorm';
 
+import emitter from './helpers/interfaceEmitter.js';
+
 import Core from '~/_interface';
 import { CacheTitles } from '~/database/entity/cacheTitles';
 import { Translation } from '~/database/entity/translation';
@@ -209,8 +211,7 @@ class Panel extends Core {
       res.status(200).send('OK');
     });
     app?.post('/webhooks/callback', function (req, res) {
-      const eventsub = require('~/eventsub').default;
-      eventsub.handler(req, res);
+      emitter.emit('services::twitch::eventsub', req, res);
     });
     app?.get('/popout/', function (req, res) {
       res.sendFile(path.join(__dirname, '..', 'public', 'popout.html'));

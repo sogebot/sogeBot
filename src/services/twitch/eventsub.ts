@@ -7,9 +7,8 @@ import localtunnel from 'localtunnel';
 import type QueryString from 'qs';
 import { v4 } from 'uuid';
 
-import Core from '~/_interface';
-import { persistent, settings } from '~/decorators';
-import { onChange, onStartup } from '~/decorators/on';
+import emitter from '../../helpers/interfaceEmitter.js';
+
 import * as hypeTrain from '~/helpers/api/hypeTrain';
 import { TokenError } from '~/helpers/errors';
 import { eventEmitter } from '~/helpers/events';
@@ -24,24 +23,11 @@ const messagesProcessed: string[] = [];
 let isErrorEventsShown = false;
 let isErrorSetupShown = false;
 
-class EventSub extends Core {
-  @settings()
-  useTunneling = false;
+class EventSub {
   tunnelDomain = '';
-  @settings()
-  domain = '';
-  @settings()
-  clientId = '';
-  @settings()
-  clientSecret = '';
-  @settings()
-  enabledSubscriptions: string[] = [];
-  @persistent()
-  appToken = '';
-  @persistent()
-  secret = '';
 
   async handler(req: Request<Record<string, any>, any, any, QueryString.ParsedQs, Record<string, any>>, res: Response<any, Record<string, any>>) {
+    const secret = variable.get('services.twitch.secret') as string;
     if (req.headers['sogebot-test'] || messagesProcessed.includes(String(req.header('twitch-eventsub-message-id')))) {
       // testing for UI and if message is already processed
       return res.status(200).send('OK');
@@ -52,7 +38,7 @@ class EventSub extends Core {
     // check if its from twitch
     const hmac_message = String(req.headers['twitch-eventsub-message-id'])
       + String(req.headers['twitch-eventsub-message-timestamp']) + (req as any).rawBody;
-    const signature = crypto.createHmac('SHA256', this.secret).update(hmac_message).digest('hex');
+    const signature = crypto.createHmac('SHA256', secret).update(hmac_message).digest('hex');
     const expected_signature_header = 'sha256=' + signature;
 
     if (req.headers['twitch-eventsub-message-signature'] !== expected_signature_header) {
@@ -60,8 +46,9 @@ class EventSub extends Core {
     } else {
       if (req.header('twitch-eventsub-message-type') === 'webhook_callback_verification') {
         info(`EVENTSUB: ${req.header('twitch-eventsub-subscription-type')} is verified.`);
-        if (!this.enabledSubscriptions.includes(String(req.header('twitch-eventsub-subscription-type')))) {
-          this.enabledSubscriptions.push(String(req.header('twitch-eventsub-subscription-type')));
+        const enabledSubscriptions = variable.get('services.twitch.eventSubEnabledSubscriptions') as string[];
+        if (!enabledSubscriptions.includes(String(req.header('twitch-eventsub-subscription-type')))) {
+          enabledSubscriptions.push(String(req.header('twitch-eventsub-subscription-type')));
         }
         res.status(200).send(req.body.challenge); // lgtm [js/reflected-xss]
       } else if (req.header('twitch-eventsub-message-type') === 'notification') {
@@ -125,28 +112,31 @@ class EventSub extends Core {
   }
 
   async generateAppToken() {
-    if (this.appToken.length > 0) {
+    const appToken = variable.get('services.twitch.appToken') as string;
+    const clientId = variable.get('services.twitch.eventSubClientId') as string;
+    const clientSecret = variable.get('services.twitch.eventSubClientSecret') as string;
+    if (appToken.length > 0) {
       // validate
       try {
         const validateUrl = `https://id.twitch.tv/oauth2/validate`;
-        const response = await axios.get<any>(validateUrl, { headers: { Authorization: `OAuth ${this.appToken}` } });
-        if (response.data.client_id !== this.clientId) {
+        const response = await axios.get<any>(validateUrl, { headers: { Authorization: `OAuth ${appToken}` } });
+        if (response.data.client_id !== clientId) {
           warning(`EVENTSUB: Client ID of token and set Client ID not match. Invalidating token.`);
-          this.appToken = '';
+          emitter.emit('set', '/services/twitch', 'appToken', '');
         } else {
-          return this.appToken;
+          return appToken;
         }
       } catch (e: any) {
         error(e.stack);
       }
     }
 
-    if (this.clientId.length > 0 && this.clientSecret.length > 0) {
+    if (clientId.length > 0 && clientSecret.length > 0) {
       try {
-        const url = `https://id.twitch.tv/oauth2/token?client_id=${this.clientId}&client_secret=${this.clientSecret}&grant_type=client_credentials&scope=channel:read:hype_train`;
+        const url = `https://id.twitch.tv/oauth2/token?client_id=${clientId}&client_secret=${clientSecret}&grant_type=client_credentials&scope=channel:read:hype_train`;
         const request = await axios.post<any>(url);
-        this.appToken = request.data.access_token;
-        return this.appToken;
+        emitter.emit('set', '/services/twitch', 'appToken', request.data.access_token);
+        return request.data.access_token;
       } catch (e: any) {
         if (e.response) {
           // Request made and server responded
@@ -159,19 +149,34 @@ class EventSub extends Core {
     }
   }
 
-  @onStartup()
-  interval() {
-    setInterval(() => this.onStartup(), MINUTE);
+  constructor() {
+    setInterval(() => this.onStartup(), MINUTE / 2);
+
+    emitter.on('services::twitch::eventsub', (req, res) => {
+      this.handler(req,res);
+    });
+
+    emitter.on('change', (path, value) => {
+      if (path.includes('services') && path.includes('twitch')) {
+        if (path.includes('useTunneling')
+        || path.includes('domain')
+        || path.includes('eventSubClientId')
+        || path.includes('eventSubClientSecret')) {
+          this.onStartup();
+        }
+      }
+    });
   }
 
-  @onStartup()
-  @onChange('clientId')
-  @onChange('clientSecret')
-  @onChange('domain')
-  @onChange('useTunneling')
   async onStartup() {
     const channelId = variable.get('services.twitch.channelId') as string;
-    if (this.useTunneling) {
+    const clientId = variable.get('services.twitch.eventSubClientId') as string;
+    const useTunneling = variable.get('services.twitch.useTunneling') as string;
+    const domain = variable.get('services.twitch.domain') as string;
+    let enabledSubscriptions = variable.get('services.twitch.eventSubEnabledSubscriptions') as string[];
+    let secret = variable.get('services.twitch.secret') as string;
+
+    if (useTunneling) {
       if (this.tunnelDomain.length === 0) {
         const tunnel = await localtunnel({ port: Number(process.env.PORT ?? 20000) });
         this.tunnelDomain = tunnel.url;
@@ -182,31 +187,32 @@ class EventSub extends Core {
         });
         info(`EVENTSUB: (Unreliable) Tunneling through ${this.tunnelDomain}`);
       }
-    } else if(this.domain.length === 0) {
+    } else if(domain.length === 0) {
       if (!isErrorSetupShown) {
         info(`EVENTSUB: Domain or unreliable tunneling not set, please set it in UI.`);
         isErrorSetupShown = true;
       }
-      this.enabledSubscriptions = [];
+      emitter.emit('set', '/services/twitch', 'eventSubEnabledSubscriptions', []);
       return;
     }
 
-    if (this.secret.length === 0) {
-      this.secret = v4();
+    if (secret.length === 0) {
+      secret = v4();
+      emitter.emit('set', '/services/twitch', 'secret', secret);
     }
 
     try {
       // check if domain is available in https mode
-      await axios.get<any>(`${this.useTunneling ? this.tunnelDomain : 'https://' + this.domain}/webhooks/callback`, { headers: { 'sogebot-test': 'true' } });
+      await axios.get<any>(`${useTunneling ? this.tunnelDomain : 'https://' + domain}/webhooks/callback`, { headers: { 'sogebot-test': 'true' } });
     } catch (e) {
       if (!isErrorEventsShown) {
-        warning(`EVENTSUB: Bot not responding correctly on ${this.useTunneling ? this.tunnelDomain : 'https://' + this.domain}/webhooks/callback, eventsub will not work.`);
+        warning(`EVENTSUB: Bot not responding correctly on ${useTunneling ? this.tunnelDomain : 'https://' + domain}/webhooks/callback, eventsub will not work.`);
         if (e instanceof Error) {
           warning(e.stack);
         }
         isErrorEventsShown = true;
       }
-      this.enabledSubscriptions = [];
+      emitter.emit('set', '/services/twitch', 'eventSubEnabledSubscriptions', []);
       return;
     }
 
@@ -216,14 +222,14 @@ class EventSub extends Core {
       const token = await this.generateAppToken();
 
       if (!token) {
-        this.enabledSubscriptions = [];
+        emitter.emit('set', '/services/twitch', 'eventSubEnabledSubscriptions', []);
         return;
       }
       const url = 'https://api.twitch.tv/helix/eventsub/subscriptions';
       const request = await axios.get<any>(url, {
         headers: {
           'Authorization': 'Bearer ' + token,
-          'Client-ID':     this.clientId,
+          'Client-ID':     clientId,
         },
         timeout: 20000,
       });
@@ -235,7 +241,8 @@ class EventSub extends Core {
         'channel.hype_train.end',
       ];
 
-      this.enabledSubscriptions = [];
+      emitter.emit('set', '/services/twitch', 'eventSubEnabledSubscriptions', []);
+      enabledSubscriptions = [];
 
       for (const event of events) {
         const enabledOrPendingEvents = request.data.data.find((o: any) => {
@@ -246,12 +253,12 @@ class EventSub extends Core {
 
         if (enabledOrPendingEvents) {
           // check if domain is same
-          if (enabledOrPendingEvents.transport.callback !== `${this.useTunneling ? this.tunnelDomain : 'https://' + this.domain}/webhooks/callback`) {
+          if (enabledOrPendingEvents.transport.callback !== `${useTunneling ? this.tunnelDomain : 'https://' + domain}/webhooks/callback`) {
             info(`EVENTSUB: ${event} callback endpoint doesn't match domain, revoking.`);
             await axios.delete(`${url}?id=${enabledOrPendingEvents.id}`, {
               headers: {
                 'Authorization': 'Bearer ' + token,
-                'Client-ID':     this.clientId,
+                'Client-ID':     clientId,
               },
               timeout: 20000,
             });
@@ -260,8 +267,8 @@ class EventSub extends Core {
             }, 5000);
             return;
           } else {
-            if (!this.enabledSubscriptions.includes(event)) {
-              this.enabledSubscriptions.push(event);
+            if (!enabledSubscriptions.includes(event)) {
+              enabledSubscriptions.push(event);
             }
           }
         }
@@ -276,6 +283,10 @@ class EventSub extends Core {
   }
 
   async subscribe(event: string) {
+    const clientId = variable.get('services.twitch.eventSubClientId') as string;
+    const useTunneling = variable.get('services.twitch.useTunneling') as string;
+    const secret = variable.get('services.twitch.secret') as string;
+    const domain = variable.get('services.twitch.domain') as string;
     try {
       const channelId = variable.get('services.twitch.channelId') as string;
       info('EVENTSUB: sending subscribe event for ' + event);
@@ -286,7 +297,7 @@ class EventSub extends Core {
         method:  'POST',
         headers: {
           'Authorization': 'Bearer ' + token,
-          'Client-ID':     this.clientId,
+          'Client-ID':     clientId,
         },
         data: {
           'type':      event,
@@ -294,8 +305,8 @@ class EventSub extends Core {
           'condition': { 'broadcaster_user_id': channelId },
           'transport': {
             'method':   'webhook',
-            'callback': `${this.useTunneling ? this.tunnelDomain : 'https://' + this.domain}/webhooks/callback`,
-            'secret':   this.secret,
+            'callback': `${useTunneling ? this.tunnelDomain : 'https://' + domain}/webhooks/callback`,
+            'secret':   secret,
           },
         },
         timeout: 20000,
@@ -306,8 +317,8 @@ class EventSub extends Core {
       } else {
         error('EVENTSUB: Something went wrong during event subscription, please authorize yourself on this url and try again.');
         error(`=> https://id.twitch.tv/oauth2/authorize
-        ?client_id=${this.clientId}
-        &redirect_uri=${this.useTunneling ? this.tunnelDomain : 'https://' + this.domain}
+        ?client_id=${clientId}
+        &redirect_uri=${useTunneling ? this.tunnelDomain : 'https://' + domain}
         &response_type=token
         &force_verify=true
         &scope=channel:read:hype_train`);
@@ -316,6 +327,4 @@ class EventSub extends Core {
   }
 }
 
-const eventsub = new EventSub();
-
-export default eventsub;
+export default EventSub;
