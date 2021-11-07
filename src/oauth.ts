@@ -1,5 +1,6 @@
 import * as constants from '@sogebot/ui-helpers/constants';
 import axios from 'axios';
+import fetch from 'node-fetch';
 
 import Core from './_interface';
 import { areDecoratorsLoaded, settings } from './decorators';
@@ -454,7 +455,7 @@ class OAuth extends Core {
         // custom app is selected
         const response = await fetch(`https://id.twitch.tv/oauth2/token?client_id=${this.tokenServiceCustomClientId}&client_secret=${this.tokenServiceCustomClientSecret}&refresh_token=${type === 'bot' ? this.botRefreshToken : this.broadcasterRefreshToken}&grant_type=refresh_token`, { method: 'POST' });
         if (response.ok) {
-          const data = await response.json();
+          const data = await response.json() as {access_token: string, refresh_token: string};
 
           if (type === 'bot') {
             this.botAccessToken = data.access_token;
