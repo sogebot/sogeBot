@@ -122,21 +122,6 @@ class Parser {
       parser:          this,
     };
 
-    setTimeout(() => {
-      // run fire and forget first
-      for (const parser of parsers.filter(o => o.fireAndForget)) {
-        if (this.skip && parser.skippable) {
-          debug('parser.process', 'Skipped ' + parser.name);
-        } else {
-          parserEmitter.emit('fireAndForget', {
-            this: parser.this,
-            fnc:  parser.fnc,
-            opts,
-          });
-        }
-      }
-    }, 0);
-
     for (const parser of parsers.filter(o => !o.fireAndForget && o.priority !== constants.MODERATION)) {
       if (this.sender) {
         const permissionCheckTime = Date.now();
@@ -183,6 +168,21 @@ class Parser {
         debug('parser.process', 'Skipped ' + parser.name);
       }
     }
+
+    setTimeout(() => {
+      // run fire and forget after regular parsers
+      for (const parser of parsers.filter(o => o.fireAndForget)) {
+        if (this.skip && parser.skippable) {
+          debug('parser.process', 'Skipped ' + parser.name);
+        } else {
+          parserEmitter.emit('fireAndForget', {
+            this: parser.this,
+            fnc:  parser.fnc,
+            opts,
+          });
+        }
+      }
+    }, 0);
 
     if (this.isCommand) {
       const output = this.command(this.sender, this.message.trim());
