@@ -153,7 +153,6 @@ export const refresh = async (type: 'bot' | 'broadcaster', clear = false) => {
       return request.data.token;
     }
   } catch (e: any) {
-    error(e.stack);
     errorCount[type]++;
     if (type === 'bot') {
       emitter.emit('set', '/services/twitch', 'botTokenValid', false);
