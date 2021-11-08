@@ -13,7 +13,6 @@ const { User } = require('../../../dest/database/entity/user');
 const { Raffle } = require('../../../dest/database/entity/raffle');
 
 const raffles = (require('../../../dest/systems/raffles')).default;
-const api = (require('../../../dest/api')).default;
 
 const assert = require('assert');
 
