@@ -101,6 +101,8 @@ class Twitch extends Service {
   @settings('broadcaster')
   broadcasterRefreshToken = '';
   @settings('broadcaster')
+  broadcasterId = '';
+  @settings('broadcaster')
   broadcasterUsername = '';
   @settings('broadcaster', true)
   broadcasterExpectedScopes: string[] = [
@@ -123,6 +125,8 @@ class Twitch extends Service {
   botAccessToken = '';
   @settings('bot')
   botRefreshToken = '';
+  @settings('bot')
+  botId = '';
   @settings('bot')
   botUsername = '';
   @settings('bot', true)
