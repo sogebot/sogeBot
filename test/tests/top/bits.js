@@ -6,6 +6,7 @@ require('../../general.js');
 const { getRepository } = require('typeorm');
 
 const currency = require('../../../dest/currency').default;
+const twitch = require('../../../dest/services/twitch').default;
 const { User, UserBit } = require('../../../dest/database/entity/user');
 const { getOwner } = require('../../../dest/helpers/commons/getOwner');
 const { prepare } = require('../../../dest/helpers/commons/prepare');
@@ -15,10 +16,6 @@ const message = require('../../general.js').message;
 
 // users
 const owner = { userName: '__broadcaster__' };
-
-
-const TMI = require('../../../dest/services/twitch/chat').default;
-const tmi = new TMI();
 
 describe('Top - !top bits - @func1', () => {
   before(async () => {
@@ -54,7 +51,7 @@ describe('Top - !top bits - @func1', () => {
   });
 
   it('add user1 to ignore list', async () => {
-    const r = await tmi.ignoreAdd({ sender: owner, parameters: 'user1' });
+    const r = await twitch.ignoreAdd({ sender: owner, parameters: 'user1' });
     assert.strictEqual(r[0].response, prepare('ignore.user.is.added' , { userName: 'user1' }));
   });
 

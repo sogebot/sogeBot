@@ -86,7 +86,7 @@ describe('Custom Variable - helpers/customvariables/postURL - @func1', () => {
     assert.strictEqual(res._toSend.value, '100');
     assert.strictEqual(res._toSend.code, undefined);
     assert.strictEqual(res._status, 200);
-    await message.isNotSentRaw('@bot, $_variable2 was set to 101.', '__bot__');
+    await message.isNotSentRaw('@__bot__, $_variable2 was set to 101.', '__bot__');
     await message.isNotSentRaw('This is custom update text: 101', '__bot__');
   });
 
@@ -115,7 +115,7 @@ describe('Custom Variable - helpers/customvariables/postURL - @func1', () => {
     assert.strictEqual(res._toSend.value, '101');
     assert.strictEqual(res._toSend.code, undefined);
     assert.strictEqual(res._status, 200);
-    await message.isSentRaw('@bot, $_variable2 was set to 101.', '__bot__');
+    await message.isSentRaw('@__bot__, $_variable2 was set to 101.', '__bot__');
   });
 
   it ('with enabled POST and response type 1 - correct value', async () => {

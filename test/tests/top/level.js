@@ -13,18 +13,18 @@ const {
 } = require('../../../dest/helpers/type');
 const db = require('../../general.js').db;
 const message = require('../../general.js').message;
+const twitch = require('../../../dest/services/twitch').default;
 
 require('../../general.js');
 
 // users
 const owner = { userName: '__broadcaster__' };
 
-let top, tmi;
+let top;
 
 describe('Top - !top level - @func1', () => {
   before(async () => {
     top = (require('../../../dest/systems/top')).default;
-    tmi = (require('../../../dest/chat')).default;
     await db.cleanup();
     await message.prepare();
   });
@@ -46,7 +46,7 @@ describe('Top - !top level - @func1', () => {
   });
 
   it('add user9 to ignore list', async () => {
-    const r = await tmi.ignoreAdd({ sender: owner, parameters: 'user9' });
+    const r = await twitch.ignoreAdd({ sender: owner, parameters: 'user9' });
     assert.strictEqual(r[0].response, prepare('ignore.user.is.added' , { userName: 'user9' }));
   });
 

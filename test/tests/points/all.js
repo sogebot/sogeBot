@@ -28,7 +28,7 @@ describe('Points - all() - @func1', () => {
   describe('Points should be correctly given', () => {
     it('!points get should return 0 for owner', async () => {
       const r = await points.get({ sender: owner, parameters: '' });
-      assert.strictEqual(r[0].response, '@__broadcaster__ has currently 0 points. Your position is 2/3.');
+      assert.strictEqual(r[0].response, '@__broadcaster__ has currently 0 points. Your position is ?/3.');
     });
 
     it('!points get should return 100 for user1', async () => {
@@ -48,7 +48,7 @@ describe('Points - all() - @func1', () => {
 
     it('!points get should return 100 for owner', async () => {
       const r = await points.get({ sender: owner, parameters: '' });
-      assert.strictEqual(r[0].response, '@__broadcaster__ has currently 100 points. Your position is 2/3.');
+      assert.strictEqual(r[0].response, '@__broadcaster__ has currently 100 points. Your position is ?/3.');
     });
 
     it('!points get should return 200 for user1', async () => {
@@ -68,7 +68,7 @@ describe('Points - all() - @func1', () => {
 
     it('!points get should return 0 for owner', async () => {
       const r = await points.get({ sender: owner, parameters: '' });
-      assert.strictEqual(r[0].response, '@__broadcaster__ has currently 0 points. Your position is 2/3.');
+      assert.strictEqual(r[0].response, '@__broadcaster__ has currently 0 points. Your position is ?/3.');
     });
 
     it('!points get should return 50 for user1', async () => {
