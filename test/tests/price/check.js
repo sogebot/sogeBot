@@ -12,7 +12,6 @@ const { User } = require('../../../dest/database/entity/user');
 const alias = (require('../../../dest/systems/alias')).default;
 const customcommands = (require('../../../dest/systems/customcommands')).default;
 const price = (require('../../../dest/systems/price')).default;
-const tmi = (require('../../../dest/chat')).default;
 const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 const user = require('../../general.js').user;
@@ -107,6 +106,8 @@ describe('Price - check() - @func3', () => {
     await getRepository(Price).save({
       command: '!a', price: 100, priceBits: 10,
     });
+    const TMI = require('../../../dest/services/twitch/chat').default;
+    const tmi = new TMI();
     tmi.cheer({
       userName: user.viewer.userName,
       userId:   user.viewer.userId,
@@ -122,6 +123,8 @@ describe('Price - check() - @func3', () => {
     await getRepository(Price).save({
       command: '!b', price: 100, priceBits: 10,
     });
+    const TMI = require('../../../dest/services/twitch/chat').default;
+    const tmi = new TMI();
     tmi.cheer({
       userName: user.viewer.userName,
       userId:   user.viewer.userId,
@@ -136,6 +139,8 @@ describe('Price - check() - @func3', () => {
     await getRepository(Price).save({
       command: '!me', price: 100, priceBits: 10,
     });
+    const TMI = require('../../../dest/services/twitch/chat').default;
+    const tmi = new TMI();
     tmi.cheer({
       userName: user.viewer.userName,
       userId:   user.viewer.userId,
