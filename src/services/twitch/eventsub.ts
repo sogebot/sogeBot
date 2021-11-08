@@ -173,7 +173,6 @@ class EventSub {
     const clientId = variable.get('services.twitch.eventSubClientId') as string;
     const useTunneling = variable.get('services.twitch.useTunneling') as string;
     const domain = variable.get('services.twitch.domain') as string;
-    let enabledSubscriptions = variable.get('services.twitch.eventSubEnabledSubscriptions') as string[];
     let secret = variable.get('services.twitch.secret') as string;
 
     if (useTunneling) {
@@ -242,7 +241,6 @@ class EventSub {
       ];
 
       emitter.emit('set', '/services/twitch', 'eventSubEnabledSubscriptions', []);
-      enabledSubscriptions = [];
 
       for (const event of events) {
         const enabledOrPendingEvents = request.data.data.find((o: any) => {
@@ -267,6 +265,7 @@ class EventSub {
             }, 5000);
             return;
           } else {
+            const enabledSubscriptions = variable.get('services.twitch.eventSubEnabledSubscriptions') as string[];
             if (!enabledSubscriptions.includes(event)) {
               enabledSubscriptions.push(event);
             }

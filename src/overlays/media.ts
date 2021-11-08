@@ -82,13 +82,13 @@ class Media extends Overlay {
           if (!clip) {
             continue;
           }
-          object.url = clip?.thumbnailUrl.replace('-preview-480x272.jpg', '.mp4');
+          object.url = clip.thumbnailUrl.replace('-preview-480x272.jpg', '.mp4');
         } else if (!isNil(object.url)) {
           const clip = await  clientBot.clips.getClipById(object.url.split('/').pop() as string);
           if (!clip) {
             continue;
           }
-          object.url = clip?.thumbnailUrl.replace('-preview-480x272.jpg', '.mp4');
+          object.url = clip.thumbnailUrl.replace('-preview-480x272.jpg', '.mp4');
         }
       }
     }
