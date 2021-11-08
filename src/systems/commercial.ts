@@ -14,7 +14,7 @@ import { error, warning } from '~/helpers/log';
 import { addUIError } from '~/helpers/panel/alerts';
 import { defaultPermissions } from '~/helpers/permissions/index';
 import { adminEndpoint } from '~/helpers/socket';
-import { variable } from '~/helpers/variables';
+import { variables } from '~/watchers';
 
 /*
  * !commercial                        - gets an info about alias usage
@@ -56,8 +56,8 @@ class Commercial extends System {
       return [{ response: `Usage: ${opts.command} [duration] [optional-message]`, ...opts }];
     }
 
-    const channelId = variable.get('services.twitch.channelId') as string;
-    const broadcasterCurrentScopes = variable.get('services.twitch.broadcasterCurrentScopes') as string[];
+    const channelId = variables.get('services.twitch.channelId') as string;
+    const broadcasterCurrentScopes = variables.get('services.twitch.broadcasterCurrentScopes') as string[];
     // check if duration is correct (30, 60, 90, 120, 150, 180)
     if ([30, 60, 90, 120, 150, 180].includes(commercial.duration ?? 0)) {
       if (!broadcasterCurrentScopes.includes('channel:edit:commercial')) {

@@ -17,7 +17,7 @@ import {
   error, info, warning,
 } from '~/helpers/log';
 import { ioServer } from '~/helpers/panel';
-import { variable } from '~/helpers/variables';
+import { variables } from '~/watchers';
 
 const messagesProcessed: string[] = [];
 let isErrorEventsShown = false;
@@ -27,7 +27,7 @@ class EventSub {
   tunnelDomain = '';
 
   async handler(req: Request<Record<string, any>, any, any, QueryString.ParsedQs, Record<string, any>>, res: Response<any, Record<string, any>>) {
-    const secret = variable.get('services.twitch.secret') as string;
+    const secret = variables.get('services.twitch.secret') as string;
     if (req.headers['sogebot-test'] || messagesProcessed.includes(String(req.header('twitch-eventsub-message-id')))) {
       // testing for UI and if message is already processed
       return res.status(200).send('OK');
@@ -46,7 +46,7 @@ class EventSub {
     } else {
       if (req.header('twitch-eventsub-message-type') === 'webhook_callback_verification') {
         info(`EVENTSUB: ${req.header('twitch-eventsub-subscription-type')} is verified.`);
-        const enabledSubscriptions = variable.get('services.twitch.eventSubEnabledSubscriptions') as string[];
+        const enabledSubscriptions = variables.get('services.twitch.eventSubEnabledSubscriptions') as string[];
         if (!enabledSubscriptions.includes(String(req.header('twitch-eventsub-subscription-type')))) {
           enabledSubscriptions.push(String(req.header('twitch-eventsub-subscription-type')));
         }
@@ -112,9 +112,9 @@ class EventSub {
   }
 
   async generateAppToken() {
-    const appToken = variable.get('services.twitch.appToken') as string;
-    const clientId = variable.get('services.twitch.eventSubClientId') as string;
-    const clientSecret = variable.get('services.twitch.eventSubClientSecret') as string;
+    const appToken = variables.get('services.twitch.appToken') as string;
+    const clientId = variables.get('services.twitch.eventSubClientId') as string;
+    const clientSecret = variables.get('services.twitch.eventSubClientSecret') as string;
     if (appToken.length > 0) {
       // validate
       try {
@@ -169,11 +169,11 @@ class EventSub {
   }
 
   async onStartup() {
-    const channelId = variable.get('services.twitch.channelId') as string;
-    const clientId = variable.get('services.twitch.eventSubClientId') as string;
-    const useTunneling = variable.get('services.twitch.useTunneling') as string;
-    const domain = variable.get('services.twitch.domain') as string;
-    let secret = variable.get('services.twitch.secret') as string;
+    const channelId = variables.get('services.twitch.channelId') as string;
+    const clientId = variables.get('services.twitch.eventSubClientId') as string;
+    const useTunneling = variables.get('services.twitch.useTunneling') as string;
+    const domain = variables.get('services.twitch.domain') as string;
+    let secret = variables.get('services.twitch.secret') as string;
 
     if (useTunneling) {
       if (this.tunnelDomain.length === 0) {
@@ -265,7 +265,7 @@ class EventSub {
             }, 5000);
             return;
           } else {
-            const enabledSubscriptions = variable.get('services.twitch.eventSubEnabledSubscriptions') as string[];
+            const enabledSubscriptions = variables.get('services.twitch.eventSubEnabledSubscriptions') as string[];
             if (!enabledSubscriptions.includes(event)) {
               enabledSubscriptions.push(event);
             }
@@ -282,12 +282,12 @@ class EventSub {
   }
 
   async subscribe(event: string) {
-    const clientId = variable.get('services.twitch.eventSubClientId') as string;
-    const useTunneling = variable.get('services.twitch.useTunneling') as string;
-    const secret = variable.get('services.twitch.secret') as string;
-    const domain = variable.get('services.twitch.domain') as string;
+    const clientId = variables.get('services.twitch.eventSubClientId') as string;
+    const useTunneling = variables.get('services.twitch.useTunneling') as string;
+    const secret = variables.get('services.twitch.secret') as string;
+    const domain = variables.get('services.twitch.domain') as string;
     try {
-      const channelId = variable.get('services.twitch.channelId') as string;
+      const channelId = variables.get('services.twitch.channelId') as string;
       info('EVENTSUB: sending subscribe event for ' + event);
       const token = await this.generateAppToken();
       const url = 'https://api.twitch.tv/helix/eventsub/subscriptions';

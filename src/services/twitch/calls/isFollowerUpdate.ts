@@ -7,13 +7,13 @@ import { unfollow } from '../../../helpers/log';
 
 import { follow } from '~/helpers/events/follow';
 import * as changelog from '~/helpers/user/changelog.js';
-import { variable } from '~/helpers/variables';
 import client from '~/services/twitch/api/client';
+import { variables } from '~/watchers';
 
 export async function followerUpdatePreCheck (userName: string) {
   const user = await getRepository(User).findOne({ userName });
-  const broadcasterUsername = variable.get('services.twitch.broadcasterUsername') as string;
-  const botUsername = variable.get('services.twitch.botUsername') as string;
+  const broadcasterUsername = variables.get('services.twitch.broadcasterUsername') as string;
+  const botUsername = variables.get('services.twitch.botUsername') as string;
 
   if (user) {
     const isSkipped = user.userName.toLowerCase() === broadcasterUsername.toLowerCase() || user.userName.toLowerCase() === botUsername.toLowerCase();
@@ -30,7 +30,7 @@ export async function isFollowerUpdate (user: UserInterface | null) {
   }
   const id = user.userId;
 
-  const channelId = variable.get('services.twitch.channelId') as string;
+  const channelId = variables.get('services.twitch.channelId') as string;
 
   try {
     const clientBot = await client('bot');

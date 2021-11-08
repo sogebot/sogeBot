@@ -2,11 +2,11 @@ import client from '../api/client';
 
 import emitter from '~/helpers/interfaceEmitter';
 import { error } from '~/helpers/log';
-import { variable } from '~/helpers/variables';
+import { variables } from '~/watchers';
 
 async function updateChannelViewsAndBroadcasterType () {
   try {
-    const cid = variable.get('services.twitch.channelId') as string;
+    const cid = variables.get('services.twitch.channelId') as string;
     const clientBot = await client('bot');
     const getUserById = await clientBot.users.getUserById(cid);
 

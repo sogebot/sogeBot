@@ -1,9 +1,9 @@
 import { getOwner } from './getOwner';
 
-import { variable } from '~/helpers/variables';
+import { variables } from '~/watchers';
 
 export function getOwnerAsSender(): Omit<ChatUser, '_userName' | '_userData' | '_parseBadgesLike'> {
-  const channelId = variable.get('services.twitch.channelId') as string;
+  const channelId = variables.get('services.twitch.channelId') as string;
   return {
     isMod:         true,
     isBroadcaster: true,

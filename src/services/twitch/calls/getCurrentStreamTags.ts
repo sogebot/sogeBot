@@ -3,11 +3,11 @@ import client from '../api/client';
 
 import { currentStreamTags } from '~/helpers/api';
 import { error } from '~/helpers/log';
-import { variable } from '~/helpers/variables';
+import { variables } from '~/watchers';
 
 export async function getCurrentStreamTags (opts: any) {
   try {
-    const channelId = variable.get('services.twitch.channelId') as string;
+    const channelId = variables.get('services.twitch.channelId') as string;
     const clientBot = await client('bot');
     const getStreamTags = await clientBot.streams.getStreamTags(channelId);
     while (currentStreamTags.length) {

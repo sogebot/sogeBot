@@ -1,11 +1,11 @@
 import { error, isDebugEnabled } from '../log';
 
 import { tmiEmitter } from '~/helpers/tmi';
-import { variable } from '~/helpers/variables';
 import twitch from '~/services/twitch';
+import { variables } from '~/watchers';
 
 export async function message(type: 'say' | 'whisper' | 'me', username: string | undefined | null, messageToSend: string, messageId?: string, retry = true) {
-  const generalChannel = variable.get('services.twitch.generalChannel') as string;
+  const generalChannel = variables.get('services.twitch.generalChannel') as string;
   try {
     if (username === null || typeof username === 'undefined') {
       username = generalChannel;

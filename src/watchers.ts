@@ -66,7 +66,7 @@ export const VariableWatcher = {
     }
   },
   async check() {
-    for (const k of Object.keys(variables)) {
+    for (const k of variables.keys()) {
       const [ type, name, ...variableArr ] = k.split('.');
       let variable = variableArr.join('.');
       const checkedModule = find(type, name);
@@ -79,6 +79,7 @@ export const VariableWatcher = {
           k, variable, value,
         }));
       }
+      debug('watcher', JSON.stringify({ value, value2: variables.get(k), variable }));
       if (!isEqual(value, variables.get(k))) {
         const oldValue = variables.get(k);
         variables.set(k, value);

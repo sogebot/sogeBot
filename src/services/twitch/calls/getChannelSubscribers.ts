@@ -10,14 +10,14 @@ import {
 import { error, warning } from '~/helpers/log';
 import { isBotId, isBotSubscriber } from '~/helpers/user';
 import * as changelog from '~/helpers/user/changelog.js';
-import { variable } from '~/helpers/variables';
+import { variables } from '~/watchers';
 
 export async function getChannelSubscribers<T extends { noAffiliateOrPartnerWarningSent?: boolean; notCorrectOauthWarningSent?: boolean }> (opts: T): Promise<{ state: boolean; opts: T }> {
   opts = opts || {};
 
   try {
-    const channelId = variable.get('services.twitch.channelId') as string;
-    const broadcasterType = variable.get('services.twitch.broadcasterType') as string;
+    const channelId = variables.get('services.twitch.channelId') as string;
+    const broadcasterType = variables.get('services.twitch.broadcasterType') as string;
     const clientBroadcaster = await client('broadcaster');
 
     const getSubscriptionsPaginated = await clientBroadcaster.subscriptions.getSubscriptionsPaginated(channelId).getAll();

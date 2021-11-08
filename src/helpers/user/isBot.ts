@@ -1,10 +1,10 @@
 import type { UserInterface } from '@entity/user';
 
-import { variable } from '~/helpers/variables';
+import { variables } from '~/watchers';
 
 export function isBot(user: string | CommandOptions['sender'] | UserInterface | UserStateTags) {
   try {
-    const botUsername = variable.get('services.twitch.botUsername') as string;
+    const botUsername = variables.get('services.twitch.botUsername') as string;
     if (botUsername) {
       return botUsername.toLowerCase().trim() === (typeof user === 'string' ? user : user.userName).toLowerCase().trim();
     } else {
@@ -17,7 +17,7 @@ export function isBot(user: string | CommandOptions['sender'] | UserInterface | 
 
 export function isBotId(userId: string | undefined) {
   try {
-    const botId = variable.get('services.twitch.botId') as string;
+    const botId = variables.get('services.twitch.botId') as string;
     if (botId.length > 0) {
       return botId === userId;
     } else {

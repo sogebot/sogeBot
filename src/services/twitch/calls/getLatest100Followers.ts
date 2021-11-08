@@ -4,14 +4,14 @@ import {
   stats as apiStats,
 } from '~/helpers/api';
 import { debug, error } from '~/helpers/log';
-import { variable } from '~/helpers/variables';
 import { processFollowerState } from '~/services/twitch/api/processFollowerState';
+import { variables } from '~/watchers';
 
 let latestFollowedAtTimestamp = 0;
 
 export async function getLatest100Followers () {
   try {
-    const channelId = variable.get('services.twitch.channelId') as string;
+    const channelId = variables.get('services.twitch.channelId') as string;
     const clientBot = await client('bot');
 
     const getFollows = await clientBot.users.getFollows({ followedUser: channelId, limit: 100 });

@@ -10,9 +10,9 @@ import { eventEmitter } from '~/helpers/events';
 import {
   ban, error, info, redeem, timeout, unban, warning,
 } from '~/helpers/log';
-import { variable } from '~/helpers/variables';
 import eventlist from '~/overlays/eventlist';
 import alerts from '~/registries/alerts';
+import { variables } from '~/watchers';
 
 const rewardsRedeemed = new Set();
 
@@ -32,11 +32,11 @@ class PubSub {
         if (this.pubSubClient) {
           return;
         }
-        const clientId = variable.get(`services.twitch.broadcasterClientId`) as string;
-        const accessToken = variable.get(`services.twitch.broadcasterAccessToken`) as string;
-        const broadcasterId = variable.get(`services.twitch.broadcasterId`) as string;
-        const generalChannel = variable.get(`services.twitch.generalChannel`) as string;
-        const isValidToken = variable.get(`services.twitch.broadcasterTokenValid`) as string;
+        const clientId = variables.get(`services.twitch.broadcasterClientId`) as string;
+        const accessToken = variables.get(`services.twitch.broadcasterAccessToken`) as string;
+        const broadcasterId = variables.get(`services.twitch.broadcasterId`) as string;
+        const generalChannel = variables.get(`services.twitch.generalChannel`) as string;
+        const isValidToken = variables.get(`services.twitch.broadcasterTokenValid`) as string;
 
         if (!isValidToken) {
           throw new Error(`Cannot initialize Twitch PubSub, broadcaster token invalid.`);

@@ -6,15 +6,15 @@ import {
 } from '~/helpers/api';
 import { parseTitle } from '~/helpers/api/parseTitle';
 import { error, info } from '~/helpers/log';
-import { variable } from '~/helpers/variables';
 import { setTitleAndGame } from '~/services/twitch/calls/setTitleAndGame';
+import { variables } from '~/watchers';
 
 let retries = 0;
 
 export async function getChannelInformation (opts: any) {
   try {
-    const channelId = variable.get('services.twitch.channelId') as string;
-    const isTitleForced = variable.get('services.twitch.isTitleForced') as string;
+    const channelId = variables.get('services.twitch.channelId') as string;
+    const isTitleForced = variables.get('services.twitch.isTitleForced') as string;
     const clientBot = await client('bot');
     const getChannelInfo = await clientBot.channels.getChannelInfo(channelId);
 

@@ -1,14 +1,14 @@
 import client from '../api/client';
 
 import { debug, error } from '~/helpers/log';
-import { variable } from '~/helpers/variables';
 import { processFollowerState } from '~/services/twitch/api/processFollowerState';
+import { variables } from '~/watchers';
 
 export async function getChannelFollowers (opts: any) {
   opts = opts || {};
 
   try {
-    const channelId = variable.get('services.twitch.channelId') as string;
+    const channelId = variables.get('services.twitch.channelId') as string;
     const clientBot = await client('bot');
 
     debug('api.getChannelFollowers', 'started');

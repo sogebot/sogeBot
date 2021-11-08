@@ -45,7 +45,6 @@ import * as changelog from '~/helpers/user/changelog.js';
 import { isBot, isBotSubscriber } from '~/helpers/user/isBot';
 import { isBroadcaster } from '~/helpers/user/isBroadcaster';
 import { isModerator } from '~/helpers/user/isModerator';
-import { variable } from '~/helpers/variables';
 import Message from '~/message';
 import client from '~/services/twitch/api/client';
 import { createClip } from '~/services/twitch/calls/createClip';
@@ -53,6 +52,7 @@ import { getCustomRewards } from '~/services/twitch/calls/getCustomRewards';
 import { getIdFromTwitch } from '~/services/twitch/calls/getIdFromTwitch';
 import { setTitleAndGame } from '~/services/twitch/calls/setTitleAndGame';
 import users from '~/users';
+import { variables } from '~/watchers';
 
 const excludedUsers = new Set<string>();
 
@@ -359,8 +359,8 @@ class Events extends Core {
 
   public async fireStartCommercial(operation: EventsEntity.OperationDefinitions) {
     try {
-      const cid = variable.get('services.twitch.channelId') as string;
-      const broadcasterCurrentScopes = variable.get('services.twitch.broadcasterCurrentScopes') as string[];
+      const cid = variables.get('services.twitch.channelId') as string;
+      const broadcasterCurrentScopes = variables.get('services.twitch.broadcasterCurrentScopes') as string[];
       const duration = operation.durationOfCommercial
         ? Number(operation.durationOfCommercial)
         : 30;
@@ -768,13 +768,13 @@ class Events extends Core {
       }
     });
 
-    adminEndpoint(this.nsp, 'test.event', async ({ id, randomized, values, variables }, cb) => {
+    adminEndpoint(this.nsp, 'test.event', async ({ id, randomized, values, variables: variablesArg }, cb) => {
       try {
         const attributes: Record<string, any> = {
           test:     true,
           userId:   '0',
           currency: sample(['CZK', 'USD', 'EUR']),
-          ...variables.map((variableMap, idx) => {
+          ...variablesArg.map((variableMap, idx) => {
             if (['username', 'recipient', 'target', 'topContributionsBitsUsername', 'topContributionsSubsUsername', 'lastContributionUsername'].includes(variableMap)) {
               return { [variableMap]: randomized.includes(variableMap) ? generateUsername() : values[idx] };
             } else if (['userInput', 'message', 'reason'].includes(variableMap)) {

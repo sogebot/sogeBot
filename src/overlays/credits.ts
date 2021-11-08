@@ -11,8 +11,8 @@ import {
 } from '~/helpers/api';
 import { mainCurrency } from '~/helpers/currency';
 import { publicEndpoint } from '~/helpers/socket';
-import { variable } from '~/helpers/variables';
 import { getTopClips } from '~/services/twitch/calls/getTopClips';
+import { variables } from '~/watchers';
 
 class Credits extends Overlay {
   sockets () {
@@ -48,7 +48,7 @@ class Credits extends Overlay {
           }
         }
       }
-      const broadcasterUsername = variable.get('services.twitch.broadcasterUsername') as string;
+      const broadcasterUsername = variables.get('services.twitch.broadcasterUsername') as string;
 
       cb(null, {
         streamer: broadcasterUsername,

@@ -11,7 +11,7 @@ import {
 import {
   addUIError,
 } from '~/helpers/panel/index';
-import { variable } from '~/helpers/variables';
+import { variables } from '~/watchers';
 
 const errorCount = {
   'bot':         0,
@@ -42,13 +42,13 @@ export const refresh = async (type: 'bot' | 'broadcaster', clear = false) => {
     errorCount[type] = 0;
     lastRefresh[type] = 0;
   }
-  const channel = variable.get('services.twitch.generalChannel') as string;
-  const tokenService = variable.get('services.twitch.tokenService') as keyof typeof urls;
-  const generalOwners = variable.get('services.twitch.generalOwners') as string[];
-  const botRefreshToken = variable.get('services.twitch.botRefreshToken') as string;
-  const broadcasterRefreshToken = variable.get('services.twitch.broadcasterRefreshToken') as string;
-  const tokenServiceCustomClientId = variable.get('services.twitch.tokenServiceCustomClientId') as string;
-  const tokenServiceCustomClientSecret = variable.get('services.twitch.tokenServiceCustomClientSecret') as string;
+  const channel = variables.get('services.twitch.generalChannel') as string;
+  const tokenService = variables.get('services.twitch.tokenService') as keyof typeof urls;
+  const generalOwners = variables.get('services.twitch.generalOwners') as string[];
+  const botRefreshToken = variables.get('services.twitch.botRefreshToken') as string;
+  const broadcasterRefreshToken = variables.get('services.twitch.broadcasterRefreshToken') as string;
+  const tokenServiceCustomClientId = variables.get('services.twitch.tokenServiceCustomClientId') as string;
+  const tokenServiceCustomClientSecret = variables.get('services.twitch.tokenServiceCustomClientSecret') as string;
 
   if (type === 'bot') {
     if (botRefreshToken.trim().length === 0) {

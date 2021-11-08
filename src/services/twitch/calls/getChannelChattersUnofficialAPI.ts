@@ -17,14 +17,14 @@ import { setImmediateAwait } from '~/helpers/setImmediateAwait';
 import { SQLVariableLimit } from '~/helpers/sql';
 import * as changelog from '~/helpers/user/changelog.js';
 import { isIgnored } from '~/helpers/user/isIgnored';
-import { variable } from '~/helpers/variables';
 import { followerUpdatePreCheck } from '~/services/twitch/calls/isFollowerUpdate';
+import { variables } from '~/watchers';
 import joinpart from '~/widgets/joinpart';
 
 export const getChannelChattersUnofficialAPI = async (opts: any) => {
   try {
-    const generalChannel = variable.get('services.twitch.generalChannel') as string;
-    const botUsername = variable.get('services.twitch.botUsername') as string;
+    const generalChannel = variables.get('services.twitch.generalChannel') as string;
+    const botUsername = variables.get('services.twitch.botUsername') as string;
     const clientBot = await client('bot');
 
     const getChatters = await clientBot.unsupported.getChatters(generalChannel);

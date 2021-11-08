@@ -1,7 +1,7 @@
-import { variable } from '~/helpers/variables';
+import { variables } from '~/watchers';
 
 export function getOwner() {
-  const generalOwners = variable.get('services.twitch.generalOwners') as string[];
+  const generalOwners = variables.get('services.twitch.generalOwners') as string[];
 
   try {
     return generalOwners[0].trim();
@@ -10,6 +10,6 @@ export function getOwner() {
   }
 }
 export function getOwners() {
-  const generalOwners = variable.get('services.twitch.generalOwners') as string[];
+  const generalOwners = variables.get('services.twitch.generalOwners') as string[];
   return generalOwners;
 }

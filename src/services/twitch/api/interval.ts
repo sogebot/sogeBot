@@ -8,7 +8,6 @@ import {
 } from '~/helpers/log';
 import { logAvgTime } from '~/helpers/profiler';
 import { setImmediateAwait } from '~/helpers/setImmediateAwait';
-import { variable } from '~/helpers/variables';
 import { checkClips } from '~/services/twitch/calls/checkClips';
 import { getAllStreamTags } from '~/services/twitch/calls/getAllStreamTags';
 import { getBannedEvents } from '~/services/twitch/calls/getBannedEvents';
@@ -21,6 +20,7 @@ import { getCurrentStreamTags } from '~/services/twitch/calls/getCurrentStreamTa
 import { getLatest100Followers } from '~/services/twitch/calls/getLatest100Followers';
 import { getModerators } from '~/services/twitch/calls/getModerators';
 import { updateChannelViewsAndBroadcasterType } from '~/services/twitch/calls/updateChannelViewsAndBroadcasterType';
+import { variables } from '~/watchers';
 
 const intervals = new Map<keyof typeof functions, {
   interval: number;
@@ -72,8 +72,8 @@ export const stop = () => {
 let isBlocking: boolean | string = false;
 
 const check = async () => {
-  const botTokenValid = variable.get('services.twitch.botTokenValid') as string;
-  const broadcasterTokenValid = variable.get('services.twitch.broadcasterTokenValid') as string;
+  const botTokenValid = variables.get('services.twitch.botTokenValid') as string;
+  const broadcasterTokenValid = variables.get('services.twitch.broadcasterTokenValid') as string;
   if (!botTokenValid || !broadcasterTokenValid) {
     debug('api.interval', 'Tokens not valid.');
     return;

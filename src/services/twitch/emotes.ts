@@ -16,7 +16,7 @@ import {
 } from '~/helpers/log';
 import { ioServer } from '~/helpers/panel';
 import { setImmediateAwait } from '~/helpers/setImmediateAwait';
-import { variable } from '~/helpers/variables';
+import { variables } from '~/watchers';
 
 let broadcasterWarning = false;
 
@@ -77,8 +77,8 @@ class Emotes {
   async fetchEmotesChannel () {
     this.fetch.channel = true;
 
-    const channelId = variable.get('services.twitch.channelId') as string;
-    const broadcasterType = variable.get('services.twitch.broadcasterType') as string;
+    const channelId = variables.get('services.twitch.channelId') as string;
+    const broadcasterType = variables.get('services.twitch.broadcasterType') as string;
 
     if (channelId && broadcasterType !== null && (Date.now() - this.lastSubscriberEmoteChk > 1000 * 60 * 60 * 24 * 7 || this.lastChannelChk !== channelId)) {
       if (broadcasterType === '' && !broadcasterWarning) {
@@ -162,8 +162,8 @@ class Emotes {
   }
 
   async fetchEmotesFFZ () {
-    const channelId = variable.get('services.twitch.channelId') as string;
-    const currentChannel = variable.get('services.twitch.currentChannel') as string;
+    const channelId = variables.get('services.twitch.channelId') as string;
+    const currentChannel = variables.get('services.twitch.currentChannel') as string;
 
     if (currentChannel.length === 0) {
       setImmediate(() => this.fetchEmotesFFZ());
@@ -206,7 +206,7 @@ class Emotes {
   }
 
   async fetchEmotesBTTV () {
-    const currentChannel = variable.get('services.twitch.currentChannel') as string;
+    const currentChannel = variables.get('services.twitch.currentChannel') as string;
 
     if (currentChannel.length === 0) {
       setImmediate(() => this.fetchEmotesFFZ());

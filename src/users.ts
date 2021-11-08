@@ -23,8 +23,8 @@ import { recacheOnlineUsersPermission } from '~/helpers/permissions';
 import { defaultPermissions, getUserHighestPermission } from '~/helpers/permissions/index';
 import { adminEndpoint, viewerEndpoint } from '~/helpers/socket';
 import * as changelog from '~/helpers/user/changelog.js';
-import { variable } from '~/helpers/variables';
 import { getIdFromTwitch } from '~/services/twitch/calls/getIdFromTwitch';
+import { variables } from '~/watchers';
 
 class Users extends Core {
   constructor () {
@@ -466,7 +466,7 @@ class Users extends Core {
     adminEndpoint(this.nsp, 'viewers::followedAt', async (id, cb) => {
       try {
         const clientBot = await client('bot');
-        const channelId = variable.get('services.twitch.channelId') as string;
+        const channelId = variables.get('services.twitch.channelId') as string;
         const getFollows = await clientBot.users.getFollows({ followedUser: channelId, user: id });
         if (getFollows.total === 0) {
           throw new Error('Not a follower');

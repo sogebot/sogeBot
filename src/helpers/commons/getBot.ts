@@ -1,7 +1,7 @@
-import { variable } from '~/helpers/variables';
+import { variables } from '~/watchers';
 
 export function getBot() {
-  const botUsername = variable.get('services.twitch.botUsername') as string;
+  const botUsername = variables.get('services.twitch.botUsername') as string;
   try {
     return botUsername.toLowerCase().trim();
   } catch (e: any) {

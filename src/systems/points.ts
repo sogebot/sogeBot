@@ -33,9 +33,9 @@ import { getPointsName, name } from '~/helpers/points/index';
 import { adminEndpoint } from '~/helpers/socket';
 import * as changelog from '~/helpers/user/changelog.js';
 import { isBot, isBotId } from '~/helpers/user/isBot';
-import { variable } from '~/helpers/variables';
 import { getIdFromTwitch } from '~/services/twitch/calls/getIdFromTwitch';
 import { translate } from '~/translate';
+import { variables } from '~/watchers';
 
 class Points extends System {
   cronTask: any = null;
@@ -438,7 +438,7 @@ class Points extends System {
 
       const connection = await getConnection();
 
-      const broadcasterUsername = variable.get('services.twitch.broadcasterUsername') as string;
+      const broadcasterUsername = variables.get('services.twitch.broadcasterUsername') as string;
       const query = (type: typeof connection.options.type) => {
         switch(type) {
           case 'postgres':

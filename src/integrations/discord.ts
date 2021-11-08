@@ -44,8 +44,8 @@ import { get as getPermission } from '~/helpers/permissions/get';
 import { check } from '~/helpers/permissions/index';
 import { adminEndpoint } from '~/helpers/socket';
 import * as changelog from '~/helpers/user/changelog.js';
-import { variable } from '~/helpers/variables';
 import { getIdFromTwitch } from '~/services/twitch/calls/getIdFromTwitch';
+import { variables } from '~/watchers';
 
 class Discord extends Integration {
   client: DiscordJs.Client | null = null;
@@ -117,7 +117,7 @@ class Discord extends Integration {
           const message = await (channel as DiscordJs.TextChannel).messages.fetch(this.embedMessageId);
           const embed = message?.embeds[0];
           if (message && embed) {
-            const generalChannel = variable.get('services.twitch.generalChannel') as string;
+            const generalChannel = variables.get('services.twitch.generalChannel') as string;
             embed.spliceFields(0, embed.fields.length);
             embed.addFields([
               { name: prepare('webpanel.responses.variable.game'), value: stats.value.currentGame ?? '' },
@@ -137,7 +137,7 @@ class Discord extends Integration {
             ]);
             embed.setImage(`https://static-cdn.jtvnw.net/previews-ttv/live_user_${generalChannel}-1920x1080.jpg?${Date.now()}`);
 
-            const broadcasterType = variable.get('services.twitch.broadcasterType') as string;
+            const broadcasterType = variables.get('services.twitch.broadcasterType') as string;
             if (broadcasterType !== '') {
               embed.addField(prepare('webpanel.subscribers'), String(stats.value.currentSubscribers), true);
             }
@@ -313,7 +313,7 @@ class Discord extends Integration {
         const message = await (channel as DiscordJs.TextChannel).messages.fetch(this.embedMessageId);
         const embed = message?.embeds[0];
         if (message && embed) {
-          const generalChannel = variable.get('services.twitch.generalChannel') as string;
+          const generalChannel = variables.get('services.twitch.generalChannel') as string;
           embed.setColor(0xff0000);
           embed.setDescription(`${generalChannel.charAt(0).toUpperCase() + generalChannel.slice(1)} is not streaming anymore! Check it next time!`);
           embed.spliceFields(0, embed.fields.length);
@@ -332,7 +332,7 @@ class Discord extends Integration {
           ]);
           embed.setImage(`https://static-cdn.jtvnw.net/ttv-static/404_preview-1920x1080.jpg?${Date.now()}`);
 
-          const broadcasterType = variable.get('services.twitch.broadcasterType') as string;
+          const broadcasterType = variables.get('services.twitch.broadcasterType') as string;
           if (broadcasterType !== '') {
             embed.addField(prepare('webpanel.subscribers'), String(stats.value.currentSubscribers), true);
           }
@@ -350,8 +350,8 @@ class Discord extends Integration {
     this.changeClientOnlinePresence();
     try {
       if (this.client && this.sendOnlineAnnounceToChannel.length > 0 && this.guild.length > 0) {
-        const generalChannel = variable.get('services.twitch.generalChannel') as string;
-        const profileImageUrl = variable.get('services.twitch.profileImageUrl') as string;
+        const generalChannel = variables.get('services.twitch.generalChannel') as string;
+        const profileImageUrl = variables.get('services.twitch.profileImageUrl') as string;
         const channel = this.client.guilds.cache.get(this.guild)?.channels.cache.get(this.sendOnlineAnnounceToChannel);
         if (!channel) {
           throw new Error(`Channel ${this.sendOnlineAnnounceToChannel} not found on your discord server`);
@@ -383,7 +383,7 @@ class Discord extends Integration {
           .setThumbnail(profileImageUrl)
           .setFooter('Announced by sogeBot - https://www.sogebot.xyz');
 
-        const broadcasterType = variable.get('services.twitch.broadcasterType') as string;
+        const broadcasterType = variables.get('services.twitch.broadcasterType') as string;
         if (broadcasterType !== '') {
           embed.addField(prepare('webpanel.subscribers'), String(stats.value.currentSubscribers), true);
         }
@@ -409,7 +409,7 @@ class Discord extends Integration {
       return;
     }
     try {
-      const generalChannel = variable.get('services.twitch.generalChannel') as string;
+      const generalChannel = variables.get('services.twitch.generalChannel') as string;
       if (isStreamOnline.value) {
         const activityString = await new Message(this.onlinePresenceStatusOnStreamName).parse();
         if (this.onlinePresenceStatusOnStream === 'streaming') {
@@ -543,7 +543,7 @@ class Discord extends Integration {
   async message(content: string, channel: DiscordJsTextChannel, author: DiscordJsUser, msg?: DiscordJs.Message) {
     chatIn(`#${channel.name}: ${content} [${author.tag}]`);
     if (msg) {
-      const generalChannel = variable.get('services.twitch.generalChannel') as string;
+      const generalChannel = variables.get('services.twitch.generalChannel') as string;
       if (content === this.getCommand('!link')) {
         this.removeExpiredLinks();
         const link = await getRepository(DiscordLink).save({

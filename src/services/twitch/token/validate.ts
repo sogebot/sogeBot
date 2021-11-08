@@ -12,7 +12,7 @@ import {
   error,
   warning,
 } from '~/helpers/log';
-import { variable } from '~/helpers/variables';
+import { variables } from '~/watchers';
 
 let botTokenErrorSent = false;
 let broadcasterTokenErrorSent = false;
@@ -54,7 +54,7 @@ export const validate = async (type: 'bot' | 'broadcaster', retry = 0, clear = f
       isValidating[type] = true;
     }
 
-    const refreshToken = variable.get('services.twitch.' + type + 'refreshToken') as string;
+    const refreshToken = variables.get('services.twitch.' + type + 'refreshToken') as string;
 
     if (refreshToken === '') {
       throw new Error('no refresh token for ' + type);
@@ -87,8 +87,8 @@ export const validate = async (type: 'bot' | 'broadcaster', retry = 0, clear = f
     expirationDate[type] = Date.now() + request.data.expires_in * 1000;
 
     setTimeout(() => {
-      const botId = variable.get('services.twitch.botId') as string;
-      const broadcasterId = variable.get('services.twitch.broadcasterId') as string;
+      const botId = variables.get('services.twitch.botId') as string;
+      const broadcasterId = variables.get('services.twitch.broadcasterId') as string;
 
       if (type === 'bot' && botId === broadcasterId) {
         warning('You shouldn\'t use same account for bot and broadcaster!');
@@ -156,8 +156,8 @@ export const validate = async (type: 'bot' | 'broadcaster', retry = 0, clear = f
         error(e);
         error(e.stack);
       }
-      const botRefreshToken = variable.get('services.twitch.botRefreshToken') as string;
-      const broadcasterRefreshToken = variable.get('services.twitch.broadcasterRefreshToken') as string;
+      const botRefreshToken = variables.get('services.twitch.botRefreshToken') as string;
+      const broadcasterRefreshToken = variables.get('services.twitch.broadcasterRefreshToken') as string;
 
       if ((type === 'bot' ? botRefreshToken : broadcasterRefreshToken) !== '') {
         refresh(type, clear);

@@ -7,8 +7,8 @@ import {
   error,
   info,
 } from '~/helpers/log';
-import { variable } from '~/helpers/variables';
 import { updateChannelViewsAndBroadcasterType } from '~/services/twitch/calls/updateChannelViewsAndBroadcasterType';
+import { variables } from '~/watchers';
 
 let timeoutId: NodeJS.Timeout | null = null;
 let toWait = 10;
@@ -27,8 +27,8 @@ export const getChannelId = async () => {
   }
 
   let timeout = 1000;
-  const currentChannel = variable.get('services.twitch.currentChannel') as string;
-  const generalChannel = variable.get('services.twitch.generalChannel') as string;
+  const currentChannel = variables.get('services.twitch.currentChannel') as string;
+  const generalChannel = variables.get('services.twitch.generalChannel') as string;
 
   if (currentChannel !== generalChannel && generalChannel !== '') {
     try {

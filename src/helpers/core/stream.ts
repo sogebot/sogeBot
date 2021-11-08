@@ -13,11 +13,11 @@ import { linesParsed } from '../parser';
 import { find } from '../register';
 
 import { HelixStream } from '~/../node_modules/@twurple/api/lib';
-import { variable } from '~/helpers/variables';
 import { getGameNameFromId } from '~/services/twitch/calls/getGameNameFromId';
+import { variables } from '~/watchers';
 
 async function start(data: HelixStream) {
-  const channelId = variable.get('services.twitch.channelId') as string;
+  const channelId = variables.get('services.twitch.channelId') as string;
   startLog(
     `id: ${data.id} | startedAt: ${data.startDate.toISOString()} | title: ${data.title} | game: ${await getGameNameFromId(Number(data.gameId))} | type: ${data.type} | channel ID: ${channelId}`,
   );

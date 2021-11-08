@@ -19,9 +19,9 @@ import { getBotSender } from '~/helpers/commons';
 import { error } from '~/helpers/log';
 import { defaultPermissions } from '~/helpers/permissions/index';
 import { adminEndpoint } from '~/helpers/socket';
-import { variable } from '~/helpers/variables';
 import { createMarker } from '~/services/twitch/calls/createMarker';
 import { translate } from '~/translate';
+import { variables } from '~/watchers';
 
 const ERROR_STREAM_NOT_ONLINE = '1';
 const ERROR_MISSING_TOKEN = '2';
@@ -119,7 +119,7 @@ class Highlights extends System {
   @command('!highlight')
   @default_permission(defaultPermissions.CASTERS)
   public async main(opts: CommandOptions): Promise<CommandResponse[]> {
-    const channelId = variable.get('services.twitch.channelId') as string;
+    const channelId = variables.get('services.twitch.channelId') as string;
 
     try {
       if (!isStreamOnline.value) {

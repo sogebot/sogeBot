@@ -20,7 +20,7 @@ import {
   debug, error, info, tip,
 } from '~/helpers/log';
 import { ioServer } from '~/helpers/panel';
-import { variable } from '~/helpers/variables';
+import { variables } from '~/watchers';
 
 namespace StreamlabsEvent {
   export type Donation = {
@@ -108,7 +108,7 @@ class Streamlabs extends Integration {
           }
 
           const { name, currency: currency2, amount, message, created_at } = item;
-          const broadcasterUsername = variable.get('services.twitch.broadcasterUsername') as string;
+          const broadcasterUsername = variables.get('services.twitch.broadcasterUsername') as string;
           this.parse({
             type:    'donation',
             message: [{

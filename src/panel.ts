@@ -49,7 +49,6 @@ import { list, systems } from '~/helpers/register';
 import { adminEndpoint } from '~/helpers/socket';
 import { tmiEmitter } from '~/helpers/tmi';
 import * as changelog from '~/helpers/user/changelog.js';
-import { variable } from '~/helpers/variables';
 import lastfm from '~/integrations/lastfm';
 import spotify from '~/integrations/spotify';
 import Parser from '~/parser';
@@ -60,6 +59,7 @@ import { default as socketSystem } from '~/socket';
 import highlights from '~/systems/highlights';
 import songs from '~/systems/songs';
 import translateLib, { translate } from '~/translate';
+import { variables } from '~/watchers';
 
 const port = Number(process.env.PORT ?? 20000);
 const secureport = Number(process.env.SECUREPORT ?? 20443);
@@ -536,10 +536,10 @@ class Panel extends Core {
     });
 
     socket.on('name', function (cb: (botUsername: string) => void) {
-      cb(variable.get('services.twitch.botUsername') as string);
+      cb(variables.get('services.twitch.botUsername') as string);
     });
     socket.on('channelName', function (cb: (currentChannel: string) => void) {
-      cb(variable.get('services.twitch.currentChannel') as string);
+      cb(variables.get('services.twitch.currentChannel') as string);
     });
     socket.on('version', function (cb: (version: string) => void) {
       const version = _.get(process, 'env.npm_package_version', 'x.y.z');
@@ -595,7 +595,7 @@ const sendStreamData = async () => {
       spotifyCurrentSong = null;
     }
 
-    const broadcasterType = variable.get('services.twitch.broadcasterType') as string;
+    const broadcasterType = variables.get('services.twitch.broadcasterType') as string;
     const data = {
       broadcasterType:    broadcasterType,
       uptime:             isStreamOnline.value ? streamStatusChangeSince.value : null,

@@ -4,10 +4,10 @@ import { getGameNameFromId } from './getGameNameFromId';
 
 import { streamStatusChangeSince } from '~/helpers/api';
 import { error } from '~/helpers/log';
-import { variable } from '~/helpers/variables';
+import { variables } from '~/watchers';
 
 export async function getTopClips (opts: any) {
-  const channelId = variable.get('services.twitch.channelId') as string;
+  const channelId = variables.get('services.twitch.channelId') as string;
   try {
     const period = {
       startDate: opts.period === 'stream'

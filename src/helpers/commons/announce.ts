@@ -4,7 +4,7 @@ import { chatOut } from '../log';
 import { getBotSender } from './getBotSender';
 import { getUserSender } from './getUserSender';
 
-import { variable } from '~/helpers/variables';
+import { variables } from '~/watchers';
 
 /**
  * Announce in all channels (discord, twitch)
@@ -14,8 +14,8 @@ import { variable } from '~/helpers/variables';
  */
 export const announceTypes = ['bets', 'duel', 'heist', 'timers', 'songs', 'scrim', 'raffles', 'polls', 'general'] as const;
 export async function announce(messageToAnnounce: string, type: typeof announceTypes[number], replaceCustomVariables = true) {
-  const botUsername = variable.get('services.twitch.botUsername') as string;
-  const botId = variable.get('services.twitch.botId') as string;
+  const botUsername = variables.get('services.twitch.botUsername') as string;
+  const botId = variables.get('services.twitch.botId') as string;
 
   // importing here as we want to get rid of import loops
   const Discord = (require('../../integrations/discord') as typeof import('../../integrations/discord')).default;

@@ -43,7 +43,6 @@ import { isOwner } from '~/helpers/user';
 import * as changelog from '~/helpers/user/changelog.js';
 import { isBot, isBotId } from '~/helpers/user/isBot';
 import { isIgnored } from '~/helpers/user/isIgnored';
-import { variable } from '~/helpers/variables';
 import eventlist from '~/overlays/eventlist';
 import { Parser } from '~/parser';
 import alerts from '~/registries/alerts';
@@ -51,6 +50,7 @@ import alias from '~/systems/alias';
 import customcommands from '~/systems/customcommands';
 import { translate } from '~/translate';
 import users from '~/users';
+import { variables } from '~/watchers';
 import joinpart from '~/widgets/joinpart';
 
 const commandRegexp = new RegExp(/^!\w+$/);
@@ -80,7 +80,7 @@ class Chat {
       return;
     }
     tmiEmitter.on('timeout', (username, seconds, isMod) => {
-      const generalChannel = variable.get('services.twitch.generalChannel') as string;
+      const generalChannel = variables.get('services.twitch.generalChannel') as string;
       if (isMod) {
         if (this.client.broadcaster) {
           this.client.broadcaster.timeout(generalChannel, username, seconds);
@@ -103,7 +103,7 @@ class Chat {
       this.client.bot?.whisper(username, message);
     });
     tmiEmitter.on('join', (type) => {
-      const broadcasterUsername = variable.get('services.twitch.broadcasterUsername') as string;
+      const broadcasterUsername = variables.get('services.twitch.broadcasterUsername') as string;
       this.join(type, broadcasterUsername);
     });
     tmiEmitter.on('ban', (username) => {
@@ -128,10 +128,10 @@ class Chat {
     }
     clearTimeout(this.timeouts[`initClient.${type}`]);
 
-    const clientId = variable.get('services.twitch.clientId') as string;
-    const token = variable.get(`services.twitch.${type}AccessToken`) as string;
-    const isValidToken = variable.get(`services.twitch.${type}TokenValid`) as string;
-    const channel = variable.get('services.twitch.generalChannel') as string;
+    const clientId = variables.get('services.twitch.clientId') as string;
+    const token = variables.get(`services.twitch.${type}AccessToken`) as string;
+    const isValidToken = variables.get(`services.twitch.${type}TokenValid`) as string;
+    const channel = variables.get('services.twitch.generalChannel') as string;
 
     // wait for initial validation
     if (!isValidToken) {
@@ -189,7 +189,7 @@ class Chat {
         throw Error('TMI: cannot reconnect, connection is not established');
       }
 
-      const channel = variable.get('services.twitch.generalChannel') as string;
+      const channel = variables.get('services.twitch.generalChannel') as string;
 
       info(`TMI: ${type} is reconnecting`);
 
@@ -234,7 +234,7 @@ class Chat {
   }
 
   async ban (username: string, type: 'bot' | 'broadcaster' = 'bot' ): Promise<void> {
-    const currentChannel = variable.get('services.twitch.currentChannel') as string;
+    const currentChannel = variables.get('services.twitch.currentChannel') as string;
     const client = this.client[type];
     if (!client && type === 'bot') {
       return this.ban(username, 'broadcaster');
@@ -249,7 +249,7 @@ class Chat {
   }
 
   async part (type: 'bot' | 'broadcaster') {
-    const currentChannel = variable.get('services.twitch.currentChannel') as string;
+    const currentChannel = variables.get('services.twitch.currentChannel') as string;
     const client = this.client[type];
     if (!client) {
       info(`TMI: ${type} is not connected in any channel`);
@@ -700,7 +700,6 @@ class Chat {
           subCumulativeMonths: 0,
         });
       } else {
-        console.log(`Ignored: ${username}#${userId} -> ${recipient}#${recipientId}`);
         debug('tmi.subgift', `Ignored: ${username}#${userId} -> ${recipient}#${recipientId}`);
       }
       if (isIgnored({ userName: username, userId: recipientId })) {
@@ -868,7 +867,7 @@ class Chat {
       sender: userstate, message: message, skip: skip, quiet: quiet, id: data.id, emotesOffsets: data.emotesOffsets, isAction: data.isAction,
     });
 
-    const whisperListener = variable.get('services.twitch.whisperListener') as boolean;
+    const whisperListener = variables.get('services.twitch.whisperListener') as boolean;
     if (!skip
         && data.isWhisper
         && (whisperListener || isOwner(userstate))) {

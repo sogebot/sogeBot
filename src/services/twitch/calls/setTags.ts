@@ -6,12 +6,12 @@ import {
 import client from '../api/client';
 
 import { error } from '~/helpers/log';
-import { variable } from '~/helpers/variables';
+import { variables } from '~/watchers';
 
 async function setTags (tagsArg: string[]) {
   const tag_ids: string[] = [];
   try {
-    const cid = variable.get('services.twitch.channelId') as string;
+    const cid = variables.get('services.twitch.channelId') as string;
     const clientBroadcaster = await client('broadcaster');
 
     for (const tag of tagsArg) {

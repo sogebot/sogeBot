@@ -7,13 +7,13 @@ import { error, warning } from '~/helpers/log';
 import { addUIError } from '~/helpers/panel/index';
 import { setStatus } from '~/helpers/parser';
 import * as changelog from '~/helpers/user/changelog.js';
-import { variable } from '~/helpers/variables';
+import { variables } from '~/watchers';
 
 export async function getModerators(opts: { isWarned: boolean }) {
   try {
-    const channelId = variable.get('services.twitch.channelId') as string;
-    const botId = variable.get('services.twitch.botId') as string;
-    const broadcasterCurrentScopes = variable.get('services.twitch.broadcasterCurrentScopes') as string[];
+    const channelId = variables.get('services.twitch.channelId') as string;
+    const botId = variables.get('services.twitch.botId') as string;
+    const broadcasterCurrentScopes = variables.get('services.twitch.broadcasterCurrentScopes') as string[];
 
     if (!broadcasterCurrentScopes.includes('moderation:read')) {
       if (!opts.isWarned) {

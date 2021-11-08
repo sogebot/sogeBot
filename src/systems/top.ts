@@ -20,9 +20,9 @@ import { getPointsName } from '~/helpers/points';
 import { unserialize } from '~/helpers/type';
 import * as changelog from '~/helpers/user/changelog.js';
 import { getIgnoreList, isIgnored } from '~/helpers/user/isIgnored';
-import { variable } from '~/helpers/variables';
 import twitch from '~/services/twitch';
 import { translate } from '~/translate';
+import { variables } from '~/watchers';
 
 enum TYPE {
   TIME = '0',
@@ -130,8 +130,8 @@ class Top extends System {
     const _total = 10 + getIgnoreList().length;
     const connection = await getConnection();
 
-    const botUsername = variable.get('services.twitch.botUsername') as string;
-    const broadcasterUsername = variable.get('services.twitch.broadcasterUsername') as string;
+    const botUsername = variables.get('services.twitch.botUsername') as string;
+    const broadcasterUsername = variables.get('services.twitch.broadcasterUsername') as string;
 
     await changelog.flush();
     switch (type) {
