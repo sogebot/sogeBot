@@ -108,7 +108,7 @@ export const VariableWatcher = {
         }
       }
     }
-    for (const k of readonly.keys) {
+    for (const k of readonly.keys()) {
       const [ type, name, ...variableArr ] = k.split('.');
       const variable = variableArr.join('.');
       const checkedModule = find(type, name);
