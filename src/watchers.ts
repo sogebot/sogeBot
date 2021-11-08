@@ -13,9 +13,7 @@ import { logAvgTime } from '~/helpers/profiler';
 import { find } from '~/helpers/register';
 
 export const variables = new Map<string, any>();
-const readonly: {
-  [x: string]: any;
-} = {};
+export const readonly = new Map<string, any>();
 let checkInProgress = false;
 
 export const check = async (forceCheck = false) => {
@@ -60,7 +58,7 @@ export const startWatcher = () => {
 export const VariableWatcher = {
   add(key: string, value: any, isReadOnly: boolean) {
     if (isReadOnly) {
-      readonly[key] = cloneDeep(value);
+      readonly.set(key, cloneDeep(value));
     } else {
       variables.set(key, cloneDeep(value));
     }
@@ -79,7 +77,6 @@ export const VariableWatcher = {
           k, variable, value,
         }));
       }
-      debug('watcher', JSON.stringify({ value, value2: variables.get(k), variable }));
       if (!isEqual(value, variables.get(k))) {
         const oldValue = variables.get(k);
         variables.set(k, value);
@@ -111,7 +108,7 @@ export const VariableWatcher = {
         }
       }
     }
-    for (const k of Object.keys(readonly)) {
+    for (const k of readonly.keys) {
       const [ type, name, ...variableArr ] = k.split('.');
       const variable = variableArr.join('.');
       const checkedModule = find(type, name);
@@ -120,9 +117,9 @@ export const VariableWatcher = {
       }
       const value = cloneDeep(get(checkedModule, variable, undefined));
 
-      if (!isEqual(value, readonly[k])) {
+      if (!isEqual(value, readonly.get(k))) {
         error(`Cannot change read-only variable, forcing initial value for ${type}.${name}.${variable}`);
-        set(checkedModule, variable, readonly[k]);
+        set(checkedModule, variable, readonly.get(k));
       }
     }
   },
