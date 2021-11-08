@@ -24,7 +24,7 @@ describe('/t/raffle-everyone-can-join-even-raffle-runned-for-subscribers/38 - @f
 
   it('Create subscribers raffle', async () => {
     raffles.open({ sender: owner, parameters: '!winme -for subscribers.' });
-    await message.isSentRaw('Raffle is running (0 entries). To enter type "!winme". Raffle is opened for subscribers.', { userName: 'bot' });
+    await message.isSentRaw('Raffle is running (0 entries). To enter type "!winme". Raffle is opened for subscribers.', { userName: '__bot__' });
   });
 
   const users = ['user1', 'user2'];

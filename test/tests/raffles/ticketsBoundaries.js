@@ -30,7 +30,7 @@ describe('Raffles - user should be able to compete within boundaries of tickets 
 
   it('create ticket raffle', async () => {
     raffles.open({ sender: owner, parameters: '!winme -min 0 -max ' + max });
-    await message.isSentRaw('Raffle is running (0 entries). To enter type "!winme <1-100>". Raffle is opened for everyone.', { userName: 'bot' });
+    await message.isSentRaw('Raffle is running (0 entries). To enter type "!winme <1-100>". Raffle is opened for everyone.', { userName: '__bot__' });
   });
 
   it('create testuser/testuser2/testuser3 with max points', async () => {

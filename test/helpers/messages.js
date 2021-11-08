@@ -244,7 +244,7 @@ module.exports = {
       };
     }
     if (!user) {
-      user = { userName: 'bot' };
+      user = { userName: '__bot__' };
     }
     user = _.cloneDeep(user);
     return until(setError => {

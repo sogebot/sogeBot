@@ -39,7 +39,7 @@ describe('Bets - @func3 - bet should automatically be locked after given time wi
   });
 
   it('Bet should properly announce lock', async () => {
-    await message.isSentRaw('Betting time is up! No more bets.', 'bot', 20000);
+    await message.isSentRaw('Betting time is up! No more bets.', '__bot__', 20000);
   });
 
   it('Bet should be locked in db', async () => {

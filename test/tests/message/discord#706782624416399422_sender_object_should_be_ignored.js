@@ -47,6 +47,6 @@ describe('Message - https://discordapp.com/channels/317348946144002050/619437014
   });
 
   it('!top time should be properly triggered', async () => {
-    await message.isSentRaw('Top 10 (watch time): no data available', 'bot', 20000);
+    await message.isSentRaw('Top 10 (watch time): no data available', '__bot__', 20000);
   });
 });
