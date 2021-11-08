@@ -121,7 +121,7 @@
     "@types/jquery": "3.5.8",
     "@types/jsonwebtoken": "8.5.5",
     "@types/localtunnel": "^2.0.1",
-    "@types/lodash": "4.14.2.0-SNAPSHOT",
+    "@types/lodash": "4.14.176",
     "@types/mathjs": "9.4.1",
     "@types/minimist": "1.2.2",
     "@types/mocha": "9.0.0",
