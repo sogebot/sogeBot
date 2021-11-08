@@ -5,14 +5,13 @@ import {
 
 import Core from '~/_interface';
 import { settings } from '~/decorators';
+import { onChange, onLoad } from '~/decorators/on';
 import general from '~/general';
 import { mainCurrency, symbol } from '~/helpers/currency';
 import { find, list } from '~/helpers/register';
 import { adminEndpoint, publicEndpoint } from '~/helpers/socket';
-import { variable } from '~/helpers/variables';
-
-import { onChange, onLoad } from '~/decorators/on';
 import { domain } from '~/helpers/ui';
+import { variable } from '~/helpers/variables';
 
 class UI extends Core {
   @settings()
