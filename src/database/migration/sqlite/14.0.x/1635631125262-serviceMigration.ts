@@ -19,7 +19,6 @@ export class serviceMigration1635631125262 implements MigrationInterface {
     });
 
     for (const item of items2) {
-      console.log(item.name);
       if (item.name === 'useTunneling' || item.name === 'domain' || item.name === 'appToken' || item.name === 'secret') {
         await queryRunner.query(`UPDATE "settings" SET "namespace"='/services/twitch' WHERE "id"='${item.id}'`);
       } else {
