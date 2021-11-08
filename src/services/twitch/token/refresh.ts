@@ -1,5 +1,6 @@
 import * as constants from '@sogebot/ui-helpers/constants';
 import axios from 'axios';
+import fetch from 'node-fetch';
 
 import emitter from '~/helpers/interfaceEmitter';
 import {
