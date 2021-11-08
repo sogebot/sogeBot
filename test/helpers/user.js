@@ -1,7 +1,6 @@
 const { getRepository } = require('typeorm');
 
 const { User } = require('../../dest/database/entity/user');
-const emitter = require('../../dest/helpers/interfaceEmitter').default;
 
 const viewer = {
   userId:   '1',
@@ -81,15 +80,6 @@ module.exports = {
     await getRepository(User).save(viewer7);
     await getRepository(User).save(owner);
     await getRepository(User).save(mod);
-    // set owner as broadcaster
-    emitter.emit('set', '/services/twitch', 'broadcasterUsername', owner.userName);
-    emitter.emit('set', '/services/twitch', 'botUsername', '__bot__');
-    emitter.emit('set', '/services/twitch', 'botId', '12345');
-    emitter.emit('set', '/services/twitch', 'broadcasterId', '54321');
-    emitter.emit('set', '/services/twitch', 'generalOwners', [owner.userName, '__owner__']);
-    emitter.emit('set', '/services/twitch', 'generalChannel', [owner.userName]);
-    emitter.emit('set', '/services/twitch', 'ignorelist', []);
-    emitter.emit('set', '/services/twitch', 'sendAsReply', true);
     // clean perm cache
     cleanViewersCache();
   },

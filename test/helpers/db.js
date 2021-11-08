@@ -31,6 +31,7 @@ const { User, UserTip, UserBit } = require('../../dest/database/entity/user');
 const { Variable, VariableHistory, VariableURL } = require('../../dest/database/entity/variable');
 const { invalidateParserCache } = require('../../dest/helpers/cache');
 const { getIsDbConnected, getIsBotStarted } = require('../../dest/helpers/database');
+const emitter = require('../../dest/helpers/interfaceEmitter').default;
 const translation = (require('../../dest/translate')).default;
 
 let initialCleanup = true;
@@ -90,6 +91,17 @@ module.exports = {
       await permissions.ensurePreservedPermissionsInDb(); // re-do core permissions
 
       invalidateParserCache();
+
+      // set owner as broadcaster
+      emitter.emit('set', '/services/twitch', 'broadcasterUsername', '__broadcaster__');
+      emitter.emit('set', '/services/twitch', 'botUsername', '__bot__');
+      emitter.emit('set', '/services/twitch', 'botId', '12345');
+      emitter.emit('set', '/services/twitch', 'broadcasterId', '54321');
+      emitter.emit('set', '/services/twitch', 'generalOwners', ['__broadcaster__', '__owner__']);
+      emitter.emit('set', '/services/twitch', 'generalChannel', ['__broadcaster__']);
+      emitter.emit('set', '/services/twitch', 'ignorelist', []);
+      emitter.emit('set', '/services/twitch', 'sendAsReply', true);
+
       resolve();
     };
     return new Promise((resolve, reject) => {
