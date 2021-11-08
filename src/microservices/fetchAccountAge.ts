@@ -53,8 +53,8 @@ async function fetchAccountAge (id?: string | null) {
     return;
   }
 
-  if (request.data.length > 0) {
-    changelog.update(id, { createdAt: new Date(request.data[0].created_at).getTime() });
+  if (request.data.data.length > 0) {
+    changelog.update(id, { createdAt: new Date(request.data.data[0].created_at).getTime() });
   }
 }
 
