@@ -5,6 +5,10 @@ file=./package.json
 echo Building bot
 make
 
+echo Current Snapshot: $currentSnapshot
+echo Next tag: $nextTag
+echo
+
 echo Switching to master branch
 git checkout master
 
