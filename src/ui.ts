@@ -13,6 +13,9 @@ import { generalOwners } from './helpers/oauth/generalOwners';
 import { find, list } from './helpers/register';
 import { adminEndpoint, publicEndpoint } from './helpers/socket';
 
+import { onChange, onLoad } from '~/decorators/on';
+import { domain } from '~/helpers/ui';
+
 class UI extends Core {
   @settings()
   public domain = 'localhost';
@@ -25,6 +28,12 @@ class UI extends Core {
 
   @settings()
   public showdiff = true;
+
+  @onChange('domain')
+  @onLoad('domain')
+  setDomain() {
+    domain.value = this.domain;
+  }
 
   sockets() {
     adminEndpoint(this.nsp, 'configuration', async (cb) => {
