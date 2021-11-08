@@ -53,6 +53,7 @@ import users from '~/users';
 import { variables } from '~/watchers';
 import joinpart from '~/widgets/joinpart';
 
+const ignoreGiftsFromUser = new Map<string, number>();
 const commandRegexp = new RegExp(/^!\w+$/);
 class Chat {
   shouldConnect = false;
@@ -67,8 +68,6 @@ class Chat {
   };
   broadcasterWarning = false;
   botWarning = false;
-
-  ignoreGiftsFromUser = new Map<string, number>();
 
   constructor() {
     this.emitter();
@@ -624,8 +623,8 @@ class Chat {
 
       changelog.increment(userId, { giftedSubscribes: Number(count) });
 
-      const ignoreGifts = this.ignoreGiftsFromUser.get(username) ?? 0;
-      this.ignoreGiftsFromUser.set(username, ignoreGifts + count);
+      const ignoreGifts = ignoreGiftsFromUser.get(userId) ?? 0;
+      ignoreGiftsFromUser.set(userId, ignoreGifts + count);
 
       if (isIgnored({ userName: username, userId })) {
         return;
@@ -664,7 +663,7 @@ class Chat {
       const recipientId = subInfo.userId;
       const tier = (subInfo.isPrime ? 1 : (Number(subInfo.plan ?? 1000) / 1000));
 
-      const ignoreGifts = (this.ignoreGiftsFromUser.get(username) ?? 0);
+      const ignoreGifts = (ignoreGiftsFromUser.get(userId) ?? 0);
       let isGiftIgnored = false;
 
       const user = await changelog.get(recipientId);
@@ -676,7 +675,7 @@ class Chat {
 
       if (ignoreGifts > 0) {
         isGiftIgnored = true;
-        this.ignoreGiftsFromUser.set(username, ignoreGifts - 1);
+        ignoreGiftsFromUser.set(userId, ignoreGifts - 1);
       }
 
       if (!isGiftIgnored) {

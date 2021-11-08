@@ -74,7 +74,7 @@ describe('TMI - ignore - @func3', () => {
 
       const item = await getRepository(Settings).findOne({
         where: {
-          namespace: '/core/tmi',
+          namespace: '/services/twitch',
           name: 'ignorelist',
         },
       });
@@ -89,7 +89,7 @@ describe('TMI - ignore - @func3', () => {
       const r = await twitch.ignoreCheck({ sender: owner, parameters: '@testuser2' });
       const item = await getRepository(Settings).findOne({
         where: {
-          namespace: '/core/tmi',
+          namespace: '/services/twitch',
           name: 'ignorelist',
         },
       });
@@ -104,7 +104,7 @@ describe('TMI - ignore - @func3', () => {
       const r = await twitch.ignoreCheck({ sender: owner, parameters: 'testuser3' });
       const item = await getRepository(Settings).findOne({
         where: {
-          namespace: '/core/tmi',
+          namespace: '/services/twitch',
           name: 'ignorelist',
         },
       });
