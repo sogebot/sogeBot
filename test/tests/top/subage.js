@@ -7,11 +7,11 @@ const { getRepository } = require('typeorm');
 const { User } = require('../../../dest/database/entity/user');
 const { getOwner } = require('../../../dest/helpers/commons/getOwner');
 const { prepare } = require('../../../dest/helpers/commons/prepare');
-const dayjs = require('../../../dest/helpers/dayjs').dayjs;
+const { dayjs } = require('@sogebot/ui-helpers/dayjsHelper');
 const top = (require('../../../dest/systems/top')).default;
-const tmi = (require('../../../dest/chat')).default;
 const db = require('../../general.js').db;
 const message = require('../../general.js').message;
+const twitch = require('../../../dest/services/twitch.js').default;
 
 // users
 const owner = { userName: '__broadcaster__' };
@@ -52,7 +52,7 @@ describe('Top - !top subage - @func1', () => {
   });
 
   it('add user0 to ignore list', async () => {
-    const r = await tmi.ignoreAdd({ sender: owner, parameters: 'user0' });
+    const r = await twitch.ignoreAdd({ sender: owner, parameters: 'user0' });
     assert.strictEqual(r[0].response, prepare('ignore.user.is.added' , { userName: 'user0' }));
   });
 

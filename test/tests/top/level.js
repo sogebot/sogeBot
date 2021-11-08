@@ -7,7 +7,7 @@ const { getRepository } = require('typeorm');
 const { User } = require('../../../dest/database/entity/user');
 const { getOwner } = require('../../../dest/helpers/commons/getOwner');
 const { prepare } = require('../../../dest/helpers/commons/prepare');
-const dayjs = require('../../../dest/helpers/dayjs').dayjs;
+const { dayjs } = require('@sogebot/ui-helpers/dayjsHelper');
 const {
   serialize,
 } = require('../../../dest/helpers/type');

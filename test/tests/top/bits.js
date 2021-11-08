@@ -10,12 +10,15 @@ const { User, UserBit } = require('../../../dest/database/entity/user');
 const { getOwner } = require('../../../dest/helpers/commons/getOwner');
 const { prepare } = require('../../../dest/helpers/commons/prepare');
 const top = (require('../../../dest/systems/top')).default;
-const tmi = (require('../../../dest/chat')).default;
 const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 
 // users
 const owner = { userName: '__broadcaster__' };
+
+
+const TMI = require('../../../dest/services/twitch/chat').default;
+const tmi = new TMI();
 
 describe('Top - !top bits - @func1', () => {
   before(async () => {

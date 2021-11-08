@@ -10,9 +10,9 @@ const { getRepository } = require('typeorm');
 const { User } = require('../../../dest/database/entity/user');
 
 const { prepare } = require('../../../dest/helpers/commons/prepare');
-const tmi = (require('../../../dest/chat')).default;
 const top = (require('../../../dest/systems/top')).default;
 const assert = require('assert');
+const twitch = require('../../../dest/services/twitch.js').default;
 
 // users
 const owner = { userName: '__broadcaster__' };
@@ -39,7 +39,7 @@ describe('Top - !top points - @func3', () => {
   });
 
   it('add user0 to ignore list', async () => {
-    const r = await tmi.ignoreAdd({ sender: owner, parameters: 'user0' });
+    const r = await twitch.ignoreAdd({ sender: owner, parameters: 'user0' });
     assert.strictEqual(r[0].response, prepare('ignore.user.is.added' , { userName: 'user0' }));
   });
 
