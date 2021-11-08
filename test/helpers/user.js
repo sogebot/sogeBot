@@ -1,7 +1,7 @@
 const { getRepository } = require('typeorm');
 
 const { User } = require('../../dest/database/entity/user');
-const { generalOwners } = require('../../dest/helpers/oauth/generalOwners');
+const emitter = require('../../dest/helpers/interfaceEmitter').default;
 
 const viewer = {
   userId:   '1',
@@ -70,7 +70,6 @@ const mod = {
 
 module.exports = {
   prepare: async () => {
-    const { default: oauth } = require('../../dest/oauth');
     const { cleanViewersCache } = require('../../dest/helpers/permissions/cache');
 
     await getRepository(User).save(viewer);
@@ -83,8 +82,14 @@ module.exports = {
     await getRepository(User).save(owner);
     await getRepository(User).save(mod);
     // set owner as broadcaster
-    oauth.broadcasterUsername = owner.userName;
-    generalOwners.value = [owner.userName, '__owner__'];
+    emitter.emit('set', '/services/twitch', 'broadcasterUsername', owner.userName);
+    emitter.emit('set', '/services/twitch', 'botUsername', '__bot__');
+    emitter.emit('set', '/services/twitch', 'botId', '12345');
+    emitter.emit('set', '/services/twitch', 'broadcasterId', '54321');
+    emitter.emit('set', '/services/twitch', 'generalOwners', [owner.userName, '__owner__']);
+    emitter.emit('set', '/services/twitch', 'generalChannel', [owner.userName]);
+    emitter.emit('set', '/services/twitch', 'ignorelist', []);
+    emitter.emit('set', '/services/twitch', 'sendAsReply', true);
     // clean perm cache
     cleanViewersCache();
   },

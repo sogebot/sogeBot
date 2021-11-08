@@ -50,8 +50,6 @@ module.exports = {
         }
       }
 
-      const oauth = (require('../../dest/oauth')).default;
-      const tmi = (require('../../dest/chat')).default;
       const permissions = (require('../../dest/permissions')).default;
       const changelog = (require('../../dest/helpers/user/changelog'));
 
@@ -90,16 +88,6 @@ module.exports = {
       debug('test', chalk.bgRed('*** Cleaned successfully ***'));
 
       await permissions.ensurePreservedPermissionsInDb(); // re-do core permissions
-
-      oauth.generalChannel = '__broadcaster__';
-      oauth.generalOwners = ['__broadcaster__', '__owner__'];
-      oauth.broadcasterUsername = 'broadcaster';
-      oauth.botUsername = 'bot';
-      oauth.botId = '12345';
-
-      oauth.broadcasterId = '54321';
-      tmi.ignorelist = [];
-      tmi.sendAsReply = false;
 
       invalidateParserCache();
       resolve();
