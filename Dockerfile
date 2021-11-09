@@ -14,7 +14,7 @@ RUN tar xf Python-3.6.5.tar.xz
 WORKDIR /Python-3.6.5
 RUN ./configure
 RUN make
-RUN sudo make altinstall
+RUN make altinstall
 
 WORKDIR /
 
