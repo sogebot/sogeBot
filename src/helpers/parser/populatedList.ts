@@ -8,7 +8,7 @@ function load () {
     setImmediate(() => load());
     return;
   }
-  for (const dir of ['core', 'systems', 'games', 'overlays', 'integrations', 'registries']) {
+  for (const dir of ['core', 'systems', 'games', 'overlays', 'integrations', 'registries', 'services']) {
     for (const system of list(dir)) {
       populatedList.push(system);
     }
