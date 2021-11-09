@@ -1,4 +1,4 @@
-FROM node:16-stretch-slim
+FROM node:16-bullseye-slim
 
 ENV LAST_UPDATED 2021-10-18-1451
 
@@ -6,17 +6,7 @@ ENV NODE_ENV production
 ENV ENV production
 
 RUN apt-get update
-RUN apt-get install -y build-essential nasm libtool make bash git autoconf wget zlib1g-dev
-
-# Building python manually as it is not in linux/arm/v7
-RUN wget https://www.python.org/ftp/python/3.6.5/Python-3.6.5.tar.xz
-RUN tar xf Python-3.6.5.tar.xz
-WORKDIR /Python-3.6.5
-RUN ./configure
-RUN make
-RUN make altinstall
-
-WORKDIR /
+RUN apt-get install -y build-essential nasm libtool make bash git autoconf wget zlib1g-dev python
 
 # Copy source code
 COPY . /app
