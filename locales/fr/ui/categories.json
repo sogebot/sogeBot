@@ -52,5 +52,8 @@
   "luck": "Luck",
   "lists": "Lists",
   "me": "Me",
-  "emotes_combo": "Emotes combo"
+  "emotes_combo": "Emotes combo",
+  "tmi": "tmi",
+  "oauth": "oauth",
+  "eventsub": "eventsub"
 }
