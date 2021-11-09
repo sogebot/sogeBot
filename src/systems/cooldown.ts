@@ -42,15 +42,15 @@ const defaultCooldowns: { name: string; lastRunAt: number, permId: string }[] = 
 
 class Cooldown extends System {
   @permission_settings('default', [ defaultPermissions.CASTERS ])
-  defaultCooldownOfCommandsInSeconds = 0;
+    defaultCooldownOfCommandsInSeconds = 0;
   @permission_settings('default', [ defaultPermissions.CASTERS ])
-  defaultCooldownOfKeywordsInSeconds = 0;
+    defaultCooldownOfKeywordsInSeconds = 0;
 
   @settings()
-  cooldownNotifyAsWhisper = false;
+    cooldownNotifyAsWhisper = false;
 
   @settings()
-  cooldownNotifyAsChat = true;
+    cooldownNotifyAsChat = true;
 
   @onChange('defaultCooldownOfKeywordsInSeconds')
   resetDefaultCooldownsKeyword() {

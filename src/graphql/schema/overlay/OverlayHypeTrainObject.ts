@@ -6,8 +6,8 @@ import {
 @ObjectType()
 export class OverlayHypeTrainObject implements OverlayMapperHypeTrain {
   @Field(type => ID)
-  id: string;
+    id: string;
   @Field()
-  value: 'hypetrain';
+    value: 'hypetrain';
   opts: null;
 }

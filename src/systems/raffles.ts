@@ -50,23 +50,23 @@ class Raffles extends System {
   lastAnnounceMessageCount = 0;
 
   @settings('luck')
-  subscribersPercent = 150;
+    subscribersPercent = 150;
   @settings('luck')
-  followersPercent = 120;
+    followersPercent = 120;
 
   @settings()
-  raffleAnnounceInterval = 10;
+    raffleAnnounceInterval = 10;
   @settings()
-  raffleAnnounceMessageInterval = 20;
+    raffleAnnounceMessageInterval = 20;
   @settings()
-  allowOverTicketing = false;
+    allowOverTicketing = false;
 
   @settings('join')
-  deleteRaffleJoinCommands = false;
+    deleteRaffleJoinCommands = false;
   @settings('join')
-  announceNewEntries = true;
+    announceNewEntries = true;
   @settings('join')
-  announceNewEntriesBatchTime = 15;
+    announceNewEntriesBatchTime = 15;
 
   @onStartup()
   onStartup() {

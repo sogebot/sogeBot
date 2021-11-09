@@ -8,52 +8,52 @@ import { CustomizationFontObject } from '../customization';
 @ObjectType()
 export class GoalCustomizationBarObject {
   @Field()
-  color: string;
+    color: string;
   @Field()
-  backgroundColor: string;
+    backgroundColor: string;
   @Field()
-  borderColor: string;
+    borderColor: string;
   @Field(type => Int)
-  borderPx: number;
+    borderPx: number;
   @Field(type => Int)
-  height: number;
+    height: number;
 }
 
 @ObjectType()
 export class GoalObject implements GoalInterface {
   @Field(type => ID)
-  id?: string;
+    id?: string;
   @Field()
-  name: string;
+    name: string;
   @Field()
-  type:
+    type:
   'followers' | 'currentFollowers' | 'currentSubscribers'
   | 'subscribers' | 'tips' | 'bits' | 'intervalSubscribers'
   | 'intervalFollowers' | 'intervalTips' | 'intervalBits';
   @Field()
-  countBitsAsTips: boolean;
+    countBitsAsTips: boolean;
   @Field()
-  display: 'simple' | 'full' | 'custom';
+    display: 'simple' | 'full' | 'custom';
   @Field(type => Number)
-  timestamp: number;
+    timestamp: number;
   @Field(type => String)
-  interval: 'hour' | 'day' | 'week' | 'month' | 'year';
+    interval: 'hour' | 'day' | 'week' | 'month' | 'year';
   @Field(type => Int)
-  goalAmount: number;
+    goalAmount: number;
   @Field(type => Float)
-  currentAmount: number;
+    currentAmount: number;
   @Field(type => String)
-  endAfter: number;
+    endAfter: number;
   @Field()
-  endAfterIgnore: boolean;
+    endAfterIgnore: boolean;
   @Field(type => GoalCustomizationBarObject)
-  customizationBar: GoalCustomizationBarObject;
+    customizationBar: GoalCustomizationBarObject;
   @Field(type => CustomizationFontObject)
-  customizationFont: GoalInterface['customizationFont'];
+    customizationFont: GoalInterface['customizationFont'];
   @Field()
-  customizationHtml: string;
+    customizationHtml: string;
   @Field()
-  customizationJs: string;
+    customizationJs: string;
   @Field()
-  customizationCss: string;
+    customizationCss: string;
 }

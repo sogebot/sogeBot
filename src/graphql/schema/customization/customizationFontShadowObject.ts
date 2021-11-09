@@ -5,13 +5,13 @@ import {
 @ObjectType()
 export class CustomizationFontShadowObject {
   @Field(type => Int)
-  shiftRight: number;
+    shiftRight: number;
   @Field(type => Int)
-  shiftDown: number;
+    shiftDown: number;
   @Field(type => Int)
-  blur: number;
+    blur: number;
   @Field(type => Int)
-  opacity: number;
+    opacity: number;
   @Field()
-  color: string;
+    color: string;
 }

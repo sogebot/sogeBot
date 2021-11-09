@@ -48,15 +48,15 @@ export const OBSWebsocketUnion = createUnionType({
 @ObjectType()
 class OBSWebsocket implements OBSWebsocketInterface {
   @Field(type => ID)
-  id: string;
+    id: string;
   @Field()
-  name: string;
+    name: string;
   @Field()
-  advancedMode: boolean;
+    advancedMode: boolean;
   @Field()
-  advancedModeCode: string;
+    advancedModeCode: string;
   @Field(type => [OBSWebsocketUnion])
-  simpleModeTasks: simpleModeTask[];
+    simpleModeTasks: simpleModeTask[];
 }
 
 @Resolver()

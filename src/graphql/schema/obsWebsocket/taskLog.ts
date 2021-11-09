@@ -6,14 +6,14 @@ import {
 @ObjectType()
 class TaskLogArgs {
   @Field()
-  logMessage: string;
+    logMessage: string;
 }
 @ObjectType()
 export class TaskLog implements simpleModeTasks.TaskLog {
   @Field(type => ID)
-  id: string;
+    id: string;
   @Field(type => String)
-  event: 'Log';
+    event: 'Log';
   @Field()
-  args: TaskLogArgs;
+    args: TaskLogArgs;
 }

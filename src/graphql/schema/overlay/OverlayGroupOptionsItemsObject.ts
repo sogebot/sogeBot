@@ -8,17 +8,17 @@ type Impl = NonNullable<OverlayMapperGroup['opts']>['canvas'];
 @ObjectType()
 export class OverlayGroupOptionsItemsObject implements Impl {
   @Field(type => ID)
-  id: string;
+    id: string;
   @Field(type => Float)
-  width: number;
+    width: number;
   @Field(type => Float)
-  height: number;
+    height: number;
   @Field(type => Float)
-  alignX: number;
+    alignX: number;
   @Field(type => Float)
-  alignY: number;
+    alignY: number;
   @Field()
-  type: string;
+    type: string;
   @Field()
-  opts: string; // JSON.stringify
+    opts: string; // JSON.stringify
 }

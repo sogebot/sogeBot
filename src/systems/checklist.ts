@@ -10,7 +10,7 @@ import { adminEndpoint } from '~/helpers/socket';
 class Checklist extends System {
   @settings('customization')
   @ui({ type: 'configurable-list' })
-  itemsArray: any[] = [];
+    itemsArray: any[] = [];
 
   sockets() {
     adminEndpoint(this.nsp, 'generic::getAll', async (cb) => {

@@ -6,14 +6,14 @@ import {
 @ObjectType()
 class SetCurrentSceneArgs {
   @Field()
-  sceneName: string;
+    sceneName: string;
 }
 @ObjectType()
 export class SetCurrentScene implements simpleModeTasks.SetCurrentScene {
   @Field(type => ID)
-  id: string;
+    id: string;
   @Field(type => String)
-  event: 'SetCurrentScene';
+    event: 'SetCurrentScene';
   @Field()
-  args: SetCurrentSceneArgs;
+    args: SetCurrentSceneArgs;
 }

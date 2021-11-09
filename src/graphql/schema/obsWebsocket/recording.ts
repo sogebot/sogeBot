@@ -6,7 +6,7 @@ import {
 @ObjectType()
 export class Recording implements simpleModeTasks.Recording {
   @Field(type => ID)
-  id: string;
+    id: string;
   @Field(type => String)
-  event: 'StartRecording' | 'StopRecording' | 'PauseRecording' | 'ResumeRecording';
+    event: 'StartRecording' | 'StopRecording' | 'PauseRecording' | 'ResumeRecording';
 }

@@ -8,8 +8,8 @@ import { AliasGroupOptionsObject } from './AliasGroupOptionsObject';
 @ObjectType()
 export class AliasGroupObject implements AliasGroupInterface {
   @Field(type => ID)
-  name: string;
+    name: string;
   @Field(type => AliasGroupOptionsObject)
-  options: AliasGroupInterface['options'];
+    options: AliasGroupInterface['options'];
 
 }

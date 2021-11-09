@@ -7,31 +7,31 @@ import { Type as SourceType, TypeCaps as TypeCaps2 } from '~/helpers/obswebsocke
 @ObjectType()
 class TypeCaps implements TypeCaps2 {
   @Field()
-  canInteract: boolean;
+    canInteract: boolean;
   @Field()
-  doNotDuplicate: boolean;
+    doNotDuplicate: boolean;
   @Field()
-  doNotSelfMonitor: boolean;
+    doNotSelfMonitor: boolean;
   @Field()
-  hasAudio: boolean;
+    hasAudio: boolean;
   @Field()
-  hasVideo: boolean;
+    hasVideo: boolean;
   @Field()
-  isAsync: boolean;
+    isAsync: boolean;
   @Field()
-  isComposite: boolean;
+    isComposite: boolean;
   @Field()
-  isDeprecated: boolean;
+    isDeprecated: boolean;
 }
 
 @ObjectType()
 export class Type implements SourceType {
   @Field(type => ID)
-  typeId: string;
+    typeId: string;
   @Field()
-  type: string;
+    type: string;
   @Field()
-  displayName: string;
+    displayName: string;
   @Field(type => TypeCaps)
-  caps: TypeCaps;
+    caps: TypeCaps;
 }

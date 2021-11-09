@@ -80,10 +80,10 @@ class StreamElements extends Integration {
   channel = '';
 
   @persistent()
-  afterDate = Date.now();
+    afterDate = Date.now();
 
   @settings()
-  jwtToken = '';
+    jwtToken = '';
 
   @onStartup()
   interval() {

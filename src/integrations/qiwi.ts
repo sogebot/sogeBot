@@ -20,7 +20,7 @@ class Qiwi extends Integration {
   interval: any = null;
 
   @settings()
-  secretToken = '';
+    secretToken = '';
 
   @onStartup()
   @onChange('enabled')

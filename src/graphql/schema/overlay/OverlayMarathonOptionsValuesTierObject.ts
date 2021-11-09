@@ -5,9 +5,9 @@ import {
 @ObjectType()
 export class OverlayMarathonOptionsValuesTierObject {
   @Field(type => Int)
-  tier1: number;
+    tier1: number;
   @Field(type => Int)
-  tier2: number;
+    tier2: number;
   @Field(type => Int)
-  tier3: number;
+    tier3: number;
 }

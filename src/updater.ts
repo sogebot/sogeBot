@@ -26,16 +26,16 @@ const links = {
 
 class Updater extends Core {
   @settings()
-  isAutomaticUpdateEnabled = true;
+    isAutomaticUpdateEnabled = true;
 
   @settings()
-  versions = versions;
+    versions = versions;
 
   @settings()
-  versionsAvailable = clone(versions);
+    versionsAvailable = clone(versions);
 
   @settings()
-  changelogs = clone(versions);
+    changelogs = clone(versions);
 
   @onStartup()
   onStartup() {

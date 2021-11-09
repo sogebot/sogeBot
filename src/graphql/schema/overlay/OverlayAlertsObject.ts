@@ -8,9 +8,9 @@ import { OverlayAlertsOptionsObject } from './OverlayAlertsOptionsObject';
 @ObjectType()
 export class OverlayAlertsObject implements OverlayMapperAlerts {
   @Field(type => ID)
-  id: string;
+    id: string;
   @Field()
-  value: 'media';
+    value: 'media';
   @Field(type => OverlayAlertsOptionsObject, { nullable: true })
-  opts: OverlayMapperAlerts['opts'];
+    opts: OverlayMapperAlerts['opts'];
 }

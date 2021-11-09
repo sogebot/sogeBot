@@ -6,16 +6,16 @@ import {
 @ObjectType()
 class SetMuteArgs {
   @Field()
-  source: string;
+    source: string;
   @Field()
-  mute: boolean;
+    mute: boolean;
 }
 @ObjectType()
 export class SetMute implements simpleModeTasks.SetMute {
   @Field(type => ID)
-  id: string;
+    id: string;
   @Field(type => String)
-  event: 'SetMute';
+    event: 'SetMute';
   @Field()
-  args: SetMuteArgs;
+    args: SetMuteArgs;
 }

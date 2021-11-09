@@ -3,6 +3,7 @@
   "reject": [
     "node-hue-api",
     "strip-ansi",
-    "node-fetch"
+    "node-fetch",
+    "graphql"
   ]
 }

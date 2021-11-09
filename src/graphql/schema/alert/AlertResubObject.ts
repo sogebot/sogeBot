@@ -7,5 +7,5 @@ import { MessageResubObject } from './MessageObject';
 @ObjectType()
 export class AlertResubObject extends CommonSettingsObject implements AlertResubInterface{
   @Field(type => MessageResubObject)
-  message: MessageResubObject;
+    message: MessageResubObject;
 }

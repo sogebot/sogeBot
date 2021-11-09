@@ -22,33 +22,33 @@ export const GoalGroupDisplayObjects = createUnionType({
 @ObjectType()
 export class GoalGroupDisplayFadeObject {
   @Field()
-  type: 'fade';
+    type: 'fade';
   @Field(type => Int)
-  durationMs: number;
+    durationMs: number;
   @Field(type => Int)
-  animationInMs: number;
+    animationInMs: number;
   @Field(type => Int)
-  animationOutMs: number;
+    animationOutMs: number;
 }
 
 @ObjectType()
 export class GoalGroupDisplayMultiObject {
   @Field()
-  type: 'multi';
+    type: 'multi';
   @Field(type => Int)
-  spaceBetweenGoalsInPx: number;
+    spaceBetweenGoalsInPx: number;
 }
 
 @ObjectType()
 export class GoalGroupObject {
   @Field(type => ID)
-  id?: string;
+    id?: string;
   @Field(type => [GoalObject])
-  goals: GoalObject[];
+    goals: GoalObject[];
   @Field(type => String)
-  createdAt?: number;
+    createdAt?: number;
   @Field()
-  name: string;
+    name: string;
   @Field(type => GoalGroupDisplayObjects)
-  display: GoalGroupDisplayFadeObject | GoalGroupDisplayMultiObject;
+    display: GoalGroupDisplayFadeObject | GoalGroupDisplayMultiObject;
 }

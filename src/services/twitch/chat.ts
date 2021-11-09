@@ -63,9 +63,9 @@ class Chat {
     bot: ChatClient | null;
     broadcaster: ChatClient | null;
   } = {
-    bot:         null,
-    broadcaster: null,
-  };
+      bot:         null,
+      broadcaster: null,
+    };
   broadcasterWarning = false;
   botWarning = false;
 

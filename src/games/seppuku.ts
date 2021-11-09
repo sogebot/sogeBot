@@ -12,7 +12,7 @@ import { translate } from '~/translate';
 
 class Seppuku extends Game {
   @settings()
-  timeout = 10;
+    timeout = 10;
 
   @command('!seppuku')
   async main (opts: CommandOptions) {

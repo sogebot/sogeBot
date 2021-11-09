@@ -10,11 +10,11 @@ type OverlayMapperMarathonOptionsValues = NonNullable<OverlayMapperMarathon['opt
 @ObjectType()
 export class OverlayMarathonOptionsValuesObject implements OverlayMapperMarathonOptionsValues {
   @Field(type => OverlayMarathonOptionsValuesTierObject)
-  sub: OverlayMarathonOptionsValuesTierObject;
+    sub: OverlayMarathonOptionsValuesTierObject;
   @Field(type => OverlayMarathonOptionsValuesTierObject)
-  resub: OverlayMarathonOptionsValuesTierObject;
+    resub: OverlayMarathonOptionsValuesTierObject;
   @Field(type => OverlayMarathonOptionsValuesBitsObject)
-  bits: OverlayMarathonOptionsValuesBitsObject;
+    bits: OverlayMarathonOptionsValuesBitsObject;
   @Field(type => OverlayMarathonOptionsValuesTipsObject)
-  tips: OverlayMarathonOptionsValuesTipsObject;
+    tips: OverlayMarathonOptionsValuesTipsObject;
 }

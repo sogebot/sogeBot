@@ -29,71 +29,71 @@ class Heist extends Game {
   lastAnnouncedStart = 0;
 
   @settings('options')
-  showMaxUsers = 20;
+    showMaxUsers = 20;
   @settings('options')
-  copsCooldownInMinutes = 10;
+    copsCooldownInMinutes = 10;
   @settings('options')
-  entryCooldownInSeconds = 120;
+    entryCooldownInSeconds = 120;
 
   @settings('notifications')
-  started: string = translate('games.heist.started');
+    started: string = translate('games.heist.started');
   @settings('notifications')
-  nextLevelMessage: string = translate('games.heist.levelMessage');
+    nextLevelMessage: string = translate('games.heist.levelMessage');
   @settings('notifications')
-  maxLevelMessage: string = translate('games.heist.maxLevelMessage');
+    maxLevelMessage: string = translate('games.heist.maxLevelMessage');
   @settings('notifications')
-  copsOnPatrol: string = translate('games.heist.copsOnPatrol');
+    copsOnPatrol: string = translate('games.heist.copsOnPatrol');
   @settings('notifications')
-  copsCooldown: string = translate('games.heist.copsCooldownMessage');
+    copsCooldown: string = translate('games.heist.copsCooldownMessage');
 
   @settings('results')
-  singleUserSuccess: string = translate('games.heist.singleUserSuccess');
+    singleUserSuccess: string = translate('games.heist.singleUserSuccess');
   @settings('results')
-  singleUserFailed: string = translate('games.heist.singleUserFailed');
+    singleUserFailed: string = translate('games.heist.singleUserFailed');
   @settings('results')
-  noUser: string = translate('games.heist.noUser');
+    noUser: string = translate('games.heist.noUser');
   @settings('results')
-  resultsValues: Result[] = [
-    { percentage: 0, message: translate('games.heist.result.0') },
-    { percentage: 33, message: translate('games.heist.result.33') },
-    { percentage: 50, message: translate('games.heist.result.50') },
-    { percentage: 99, message: translate('games.heist.result.99') },
-    { percentage: 100, message: translate('games.heist.result.100') },
-  ];
+    resultsValues: Result[] = [
+      { percentage: 0, message: translate('games.heist.result.0') },
+      { percentage: 33, message: translate('games.heist.result.33') },
+      { percentage: 50, message: translate('games.heist.result.50') },
+      { percentage: 99, message: translate('games.heist.result.99') },
+      { percentage: 100, message: translate('games.heist.result.100') },
+    ];
 
   @settings('levels')
-  levelsValues: Level[] = [
-    {
-      'name':             translate('games.heist.levels.bankVan'),
-      'winPercentage':    60,
-      'payoutMultiplier': 1.5,
-      'maxUsers':         5,
-    },
-    {
-      'name':             translate('games.heist.levels.cityBank'),
-      'winPercentage':    46,
-      'payoutMultiplier': 1.7,
-      'maxUsers':         10,
-    },
-    {
-      'name':             translate('games.heist.levels.stateBank'),
-      'winPercentage':    40,
-      'payoutMultiplier': 1.9,
-      'maxUsers':         20,
-    },
-    {
-      'name':             translate('games.heist.levels.nationalReserve'),
-      'winPercentage':    35,
-      'payoutMultiplier': 2.1,
-      'maxUsers':         30,
-    },
-    {
-      'name':             translate('games.heist.levels.federalReserve'),
-      'winPercentage':    31,
-      'payoutMultiplier': 2.5,
-      'maxUsers':         1000,
-    },
-  ];
+    levelsValues: Level[] = [
+      {
+        'name':             translate('games.heist.levels.bankVan'),
+        'winPercentage':    60,
+        'payoutMultiplier': 1.5,
+        'maxUsers':         5,
+      },
+      {
+        'name':             translate('games.heist.levels.cityBank'),
+        'winPercentage':    46,
+        'payoutMultiplier': 1.7,
+        'maxUsers':         10,
+      },
+      {
+        'name':             translate('games.heist.levels.stateBank'),
+        'winPercentage':    40,
+        'payoutMultiplier': 1.9,
+        'maxUsers':         20,
+      },
+      {
+        'name':             translate('games.heist.levels.nationalReserve'),
+        'winPercentage':    35,
+        'payoutMultiplier': 2.1,
+        'maxUsers':         30,
+      },
+      {
+        'name':             translate('games.heist.levels.federalReserve'),
+        'winPercentage':    31,
+        'payoutMultiplier': 2.5,
+        'maxUsers':         1000,
+      },
+    ];
 
   @onStartup()
   onStartup() {

@@ -7,21 +7,21 @@ import { menu, menuPublic } from '../../helpers/panel';
 @ObjectType()
 export class MenuPublic {
   @Field()
-  name: string;
+    name: string;
   @Field()
-  id: string;
+    id: string;
 }
 
 @ObjectType()
 export class MenuPrivate {
   @Field()
-  name: string;
+    name: string;
   @Field({ nullable: true })
-  category?: string;
+    category?: string;
   @Field()
-  id: string;
+    id: string;
   @Field()
-  enabled: boolean;
+    enabled: boolean;
 }
 
 @Resolver()

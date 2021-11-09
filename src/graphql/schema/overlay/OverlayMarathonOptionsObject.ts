@@ -9,17 +9,17 @@ type OverlayMapperMarathonOptions = NonNullable<OverlayMapperMarathon['opts']>;
 @ObjectType()
 export class OverlayMarathonOptionsObject implements OverlayMapperMarathonOptions {
   @Field()
-  disableWhenReachedZero: boolean;
+    disableWhenReachedZero: boolean;
   @Field()
-  showProgressGraph: boolean;
+    showProgressGraph: boolean;
   @Field(type => String)
-  endTime: number;
+    endTime: number;
   @Field(type => String, { nullable: true })
-  maxEndTime: number | null;
+    maxEndTime: number | null;
   @Field()
-  showMilliseconds: boolean;
+    showMilliseconds: boolean;
   @Field(type => OverlayMarathonOptionsValuesObject)
-  values: OverlayMarathonOptionsValuesObject;
+    values: OverlayMarathonOptionsValuesObject;
   @Field(type => CustomizationFontObject)
-  marathonFont: CustomizationFontObject<undefined, string>;
+    marathonFont: CustomizationFontObject<undefined, string>;
 }

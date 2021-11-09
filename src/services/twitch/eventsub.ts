@@ -202,7 +202,6 @@ class EventSub {
 
     try {
       // check if domain is available in https mode
-      info(`EVENTSUB: Checking initial bot responding on ${useTunneling ? this.tunnelDomain : 'https://' + domain}/webhooks/callback`);
       await axios.get<any>(`${useTunneling ? this.tunnelDomain : 'https://' + domain}/webhooks/callback`, { headers: { 'sogebot-test': 'true' } });
     } catch (e) {
       if (!isErrorEventsShown) {

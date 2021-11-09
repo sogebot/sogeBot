@@ -13,11 +13,11 @@ import { translate } from '~/translate';
 
 class Alerts extends Registry {
   @persistent()
-  areAlertsMuted = false;
+    areAlertsMuted = false;
   @persistent()
-  isTTSMuted = false;
+    isTTSMuted = false;
   @persistent()
-  isSoundMuted = false;
+    isSoundMuted = false;
 
   constructor() {
     super();

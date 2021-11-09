@@ -11,21 +11,21 @@ export class CustomizationFontObject<
   HIGHLIGHTCOLOR = undefined,
 > {
   @Field()
-  family: string;
+    family: string;
   @Field(type => String, { nullable: true }) // optional in some cases
-  align: ALIGN;
+    align: ALIGN;
   @Field(type => String, { nullable: true }) // optional in some cases
-  color: COLOR;
+    color: COLOR;
   @Field(type => String, { nullable: true }) // optional in some cases
-  highlightcolor: HIGHLIGHTCOLOR;
+    highlightcolor: HIGHLIGHTCOLOR;
   @Field(type => Int)
-  size: number;
+    size: number;
   @Field(type => Int)
-  weight: number;
+    weight: number;
   @Field()
-  borderColor: string;
+    borderColor: string;
   @Field(type => Int)
-  borderPx: number;
+    borderPx: number;
   @Field(type => [CustomizationFontShadowObject])
-  shadow: CustomizationFontShadowObject[];
+    shadow: CustomizationFontShadowObject[];
 }

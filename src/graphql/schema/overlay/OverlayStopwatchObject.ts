@@ -8,9 +8,9 @@ import { OverlayStopwatchOptionsObject } from './OverlayStopwatchOptionsObject';
 @ObjectType()
 export class OverlayStopwatchObject implements OverlayMapperStopwatch {
   @Field(type => ID)
-  id: string;
+    id: string;
   @Field()
-  value: 'stopwatch';
+    value: 'stopwatch';
   @Field(type => OverlayStopwatchOptionsObject, { nullable: true })
-  opts: OverlayMapperStopwatch['opts'];
+    opts: OverlayMapperStopwatch['opts'];
 }

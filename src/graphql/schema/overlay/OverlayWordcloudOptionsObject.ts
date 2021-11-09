@@ -8,9 +8,9 @@ type OverlayMapperWordcloudOptions = NonNullable<OverlayMapperWordcloud['opts']>
 @ObjectType()
 export class OverlayWordcloudOptionsObject implements OverlayMapperWordcloudOptions {
   @Field(type => Float)
-  fadeOutInterval: number;
+    fadeOutInterval: number;
   @Field(type => String)
-  fadeOutIntervalType: 'seconds' | 'minutes' | 'hours';
+    fadeOutIntervalType: 'seconds' | 'minutes' | 'hours';
   @Field(type => OverlayWordcloudOptionsFontObject)
-  wordFont: OverlayWordcloudOptionsFontObject;
+    wordFont: OverlayWordcloudOptionsFontObject;
 }

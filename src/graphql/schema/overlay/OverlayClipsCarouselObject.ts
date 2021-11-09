@@ -8,9 +8,9 @@ import { OverlayClipsCarouselOptionsObject } from './OverlayClipsCarouselOptions
 @ObjectType()
 export class OverlayClipsCarouselObject implements OverlayMapperClipsCarousel {
   @Field(type => ID)
-  id: string;
+    id: string;
   @Field()
-  value: 'clipscarousel';
+    value: 'clipscarousel';
   @Field(type => OverlayClipsCarouselOptionsObject, { nullable: true })
-  opts: OverlayMapperClipsCarousel['opts'];
+    opts: OverlayMapperClipsCarousel['opts'];
 }

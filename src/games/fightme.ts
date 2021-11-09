@@ -31,16 +31,16 @@ class FightMe extends Game {
   _cooldown = Date.now();
 
   @settings()
-  timeout = 10;
+    timeout = 10;
   @settings()
-  cooldown = 0;
+    cooldown = 0;
   @settings()
-  bypassCooldownByOwnerAndMods = false;
+    bypassCooldownByOwnerAndMods = false;
 
   @settings('rewards')
-  winnerWillGet = 0;
+    winnerWillGet = 0;
   @settings('rewards')
-  loserWillLose = 0;
+    loserWillLose = 0;
 
   @command('!fightme')
   async main (opts: CommandOptions): Promise<CommandResponse[]> {

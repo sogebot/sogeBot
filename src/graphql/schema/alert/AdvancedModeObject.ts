@@ -3,9 +3,9 @@ import { Field, ObjectType } from 'type-graphql';
 @ObjectType()
 export class AdvancedModeObject {
   @Field(type => String, { nullable: true })
-  html: null | string;
+    html: null | string;
   @Field()
-  css: string;
+    css: string;
   @Field(type => String, { nullable: true })
-  js: null | string;
+    js: null | string;
 }

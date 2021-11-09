@@ -7,9 +7,9 @@ import { Source as SourceType } from '~/helpers/obswebsocket/sources';
 @ObjectType()
 export class Source implements SourceType {
   @Field(type => ID)
-  typeId: string;
+    typeId: string;
   @Field()
-  name: string;
+    name: string;
   @Field()
-  type: string;
+    type: string;
 }

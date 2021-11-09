@@ -8,9 +8,9 @@ import { OverlayTTSOptionsObject } from './OverlayTTSOptionsObject';
 @ObjectType()
 export class OverlayTTSObject implements OverlayMapperTTS {
   @Field(type => ID)
-  id: string;
+    id: string;
   @Field()
-  value: 'tts';
+    value: 'tts';
   @Field(type => OverlayTTSOptionsObject, { nullable: true })
-  opts: OverlayMapperTTS['opts'];
+    opts: OverlayMapperTTS['opts'];
 }

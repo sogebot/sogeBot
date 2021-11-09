@@ -8,9 +8,9 @@ import { OverlayOBSWebsocketOptionsObject } from './OverlayOBSWebsocketOptionsOb
 @ObjectType()
 export class OverlayOBSWebsocketObject implements OverlayMapperOBSWebsocket {
   @Field(type => ID)
-  id: string;
+    id: string;
   @Field()
-  value: 'obswebsocket';
+    value: 'obswebsocket';
   @Field(type => OverlayOBSWebsocketOptionsObject, { nullable: true })
-  opts: OverlayMapperOBSWebsocket['opts'];
+    opts: OverlayMapperOBSWebsocket['opts'];
 }

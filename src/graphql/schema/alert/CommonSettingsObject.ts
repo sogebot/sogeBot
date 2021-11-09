@@ -12,23 +12,23 @@ import { ImageOptionsObject } from './ImageOptionsObject';
 @ObjectType()
 export class CommonSettingsObject implements CommonSettingsInterface {
   @Field(type => ID)
-  id: string;
+    id: string;
   @Field()
-  enabled: boolean;
+    enabled: boolean;
   @Field()
-  title: string;
+    title: string;
   @Field(type => Int)
-  variantAmount: number;
+    variantAmount: number;
   @Field()
-  messageTemplate: string;
+    messageTemplate: string;
   @Field()
-  layout: '1' | '2' | '3' | '4' | '5';
+    layout: '1' | '2' | '3' | '4' | '5';
   @Field(type => String, { nullable: true })
-  filter: string | null;
+    filter: string | null;
   @Field(type => Int)
-  animationInDuration: number;
+    animationInDuration: number;
   @Field()
-  animationIn: 'none' | 'fadeIn' | 'fadeInDown' | 'fadeInLeft' | 'fadeInRight'
+    animationIn: 'none' | 'fadeIn' | 'fadeInDown' | 'fadeInLeft' | 'fadeInRight'
   | 'fadeInUp' | 'fadeInDownBig' | 'fadeInLeftBig' | 'fadeInRightBig'
   | 'fadeInUpBig' | 'bounceIn' | 'bounceInDown' | 'bounceInLeft'
   | 'bounceInRight' | 'bounceInUp' | 'flipInX' | 'flipInY' | 'lightSpeedIn'
@@ -37,9 +37,9 @@ export class CommonSettingsObject implements CommonSettingsInterface {
   | 'slideInUp' | 'zoomIn' | 'zoomInDown' | 'zoomInLeft' | 'zoomInRight'
   | 'zoomInUp' | 'rollIn' | 'jackInTheBox';
   @Field(type => Int)
-  animationOutDuration: number;
+    animationOutDuration: number;
   @Field()
-  animationOut: 'none' | 'fadeOut' | 'fadeOutDown' | 'fadeOutLeft' | 'fadeOutRight' | 'fadeOutUp'
+    animationOut: 'none' | 'fadeOut' | 'fadeOutDown' | 'fadeOutLeft' | 'fadeOutRight' | 'fadeOutUp'
   | 'fadeOutDownBig' | 'fadeOutLeftBig' | 'fadeOutRightBig' | 'fadeOutUpBig'
   | 'bounceOut' | 'bounceOutDown' | 'bounceOutLeft' | 'bounceOutRight'
   | 'bounceOutUp' | 'flipOutX' | 'flipOutY' | 'lightSpeedOut' | 'rotateOut'
@@ -48,28 +48,28 @@ export class CommonSettingsObject implements CommonSettingsInterface {
   | 'slideOutUp' | 'zoomOut' | 'zoomOutDown' | 'zoomOutLeft' | 'zoomOutRight'
   | 'zoomOutUp' | 'rollOut';
   @Field()
-  animationText: 'none' | 'baffle' | 'bounce' | 'bounce2' | 'flip' | 'flash' | 'pulse2' | 'rubberBand'
+    animationText: 'none' | 'baffle' | 'bounce' | 'bounce2' | 'flip' | 'flash' | 'pulse2' | 'rubberBand'
   | 'shake2' | 'swing' | 'tada' | 'wave' | 'wobble' | 'wiggle' | 'wiggle2' | 'jello';
   @Field(type => AnimationTextOptionsObject)
-  animationTextOptions: AnimationTextOptionsObject;
+    animationTextOptions: AnimationTextOptionsObject;
   @Field()
-  imageId: string;
+    imageId: string;
   @Field(type => ImageOptionsObject)
-  imageOptions: ImageOptionsObject;
+    imageOptions: ImageOptionsObject;
   @Field()
-  soundId: string;
+    soundId: string;
   @Field(type => Float)
-  soundVolume: number;
+    soundVolume: number;
   @Field(type => CommonSettingsTTSObject)
-  tts: CommonSettingsTTSObject;
+    tts: CommonSettingsTTSObject;
   @Field(type => Int)
-  alertDurationInMs: number;
+    alertDurationInMs: number;
   @Field(type => Int)
-  alertTextDelayInMs: number;
+    alertTextDelayInMs: number;
   @Field()
-  enableAdvancedMode: boolean;
+    enableAdvancedMode: boolean;
   @Field(type => AdvancedModeObject)
-  advancedMode: AdvancedModeObject;
+    advancedMode: AdvancedModeObject;
   @Field(type => CustomizationFontObject, { nullable: true })
-  font: CustomizationFontObject<'left' | 'center' | 'right', string, string> | null;
+    font: CustomizationFontObject<'left' | 'center' | 'right', string, string> | null;
 }

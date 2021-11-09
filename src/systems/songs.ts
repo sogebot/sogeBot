@@ -45,7 +45,7 @@ class Songs extends System {
   currentSong = JSON.stringify(emptyCurrentSong as currentSongType);
   isPlaying: {[socketId: string]: boolean } = {};
   @persistent()
-  currentTag = 'general';
+    currentTag = 'general';
 
   @settings()
   @ui({
@@ -54,23 +54,23 @@ class Songs extends System {
     min:  '0',
     max:  '100',
   })
-  volume = 25;
+    volume = 25;
   @settings()
-  duration = 10;
+    duration = 10;
   @settings()
-  shuffle = true;
+    shuffle = true;
   @settings()
-  songrequest = true;
+    songrequest = true;
   @settings()
-  allowRequestsOnlyFromPlaylist = false;
+    allowRequestsOnlyFromPlaylist = false;
   @settings()
-  playlist = true;
+    playlist = true;
   @settings()
-  notify = false;
+    notify = false;
   @settings()
-  onlyMusicCategory = false;
+    onlyMusicCategory = false;
   @settings()
-  calculateVolumeByLoudness = true;
+    calculateVolumeByLoudness = true;
 
   @onStartup()
   startup() {

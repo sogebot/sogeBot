@@ -31,13 +31,13 @@ class Twitter extends Integration {
   public client: TwitterApi | null = null;
 
   @settings('token')
-  consumerKey = '';
+    consumerKey = '';
   @settings('token')
-  consumerSecret = '';
+    consumerSecret = '';
   @settings('token')
-  accessToken = '';
+    accessToken = '';
   @settings('token')
-  secretToken = '';
+    secretToken = '';
 
   @onStartup()
   onStartup() {

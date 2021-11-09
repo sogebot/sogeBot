@@ -8,13 +8,13 @@ type OverlayMapperStopwatchOptions = NonNullable<OverlayMapperStopwatch['opts']>
 @ObjectType()
 export class OverlayStopwatchOptionsObject implements OverlayMapperStopwatchOptions {
   @Field(type => String)
-  currentTime: number;
+    currentTime: number;
   @Field()
-  isPersistent: boolean;
+    isPersistent: boolean;
   @Field()
-  isStartedOnSourceLoad: boolean;
+    isStartedOnSourceLoad: boolean;
   @Field()
-  showMilliseconds: boolean;
+    showMilliseconds: boolean;
   @Field(type => CustomizationFontObject)
-  stopwatchFont: CustomizationFontObject<undefined, string>;
+    stopwatchFont: CustomizationFontObject<undefined, string>;
 }

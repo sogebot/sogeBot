@@ -33,126 +33,126 @@ export const SearchResultUnion = createUnionType({
 @InputType('QuickActionsDefaultAttributesInput')
 class QuickActionsDefaultAttributes {
   @Field(type => ID)
-  id: string;
+    id: string;
   @Field()
-  userId: string;
+    userId: string;
   @Field()
-  order: number;
+    order: number;
 }
 
 @ObjectType()
 @InputType('QuickActionsDefaultOptionsInput')
 class QuickActionsDefaultOptions {
   @Field()
-  label: string;
+    label: string;
   @Field()
-  color: string;
+    color: string;
 }
 
 @ObjectType()
 @InputType('CommandItemOptionsInput')
 class CommandItemOptions extends QuickActionsDefaultOptions {
   @Field()
-  command: string;
+    command: string;
 }
 @ObjectType()
 @InputType('CommandItemInput')
 export class CommandItem extends QuickActionsDefaultAttributes {
   @Field()
-  type: 'command';
+    type: 'command';
   @Field()
-  options: CommandItemOptions;
+    options: CommandItemOptions;
 }
 
 @ObjectType()
 @InputType('CustomVariableItemOptionsInput')
 class CustomVariableItemOptions extends QuickActionsDefaultOptions {
   @Field()
-  customvariable: string;
+    customvariable: string;
 }
 @ObjectType()
 @InputType('CustomVariableItemInput')
 export class CustomVariableItem extends QuickActionsDefaultAttributes {
   @Field()
-  type: 'customvariable';
+    type: 'customvariable';
   @Field()
-  options: CustomVariableItemOptions;
+    options: CustomVariableItemOptions;
 }
 
 @ObjectType()
 @InputType('RandomizerItemOptionsInput')
 class RandomizerItemOptions extends QuickActionsDefaultOptions {
   @Field()
-  randomizerId: string;
+    randomizerId: string;
 }
 @ObjectType()
 @InputType('RandomizerItemInput')
 export class RandomizerItem extends QuickActionsDefaultAttributes {
   @Field()
-  type: 'randomizer';
+    type: 'randomizer';
   @Field()
-  options: RandomizerItemOptions;
+    options: RandomizerItemOptions;
 }
 
 @ObjectType()
 @InputType('OverlayCountdownItemOptionsInput')
 class OverlayCountdownItemOptions extends QuickActionsDefaultOptions {
   @Field()
-  countdownId: string;
+    countdownId: string;
 }
 @ObjectType()
 @InputType('OverlayCountdownItemInput')
 export class OverlayCountdownItem extends QuickActionsDefaultAttributes {
   @Field()
-  type: 'overlayCountdown';
+    type: 'overlayCountdown';
   @Field()
-  options: OverlayCountdownItemOptions;
+    options: OverlayCountdownItemOptions;
 }
 
 @ObjectType()
 @InputType('OverlayMarathonItemOptionsInput')
 class OverlayMarathonItemOptions extends QuickActionsDefaultOptions {
   @Field()
-  marathonId: string;
+    marathonId: string;
 }
 @ObjectType()
 @InputType('OverlayMarathonItemInput')
 export class OverlayMarathonItem extends QuickActionsDefaultAttributes {
   @Field()
-  type: 'overlayMarathon';
+    type: 'overlayMarathon';
   @Field()
-  options: OverlayMarathonItemOptions;
+    options: OverlayMarathonItemOptions;
 }
 
 @ObjectType()
 @InputType('OverlayStopwatchItemOptionsInput')
 class OverlayStopwatchItemOptions extends QuickActionsDefaultOptions {
   @Field()
-  stopwatchId: string;
+    stopwatchId: string;
 }
 @ObjectType()
 @InputType('OverlayStopwatchItemInput')
 export class OverlayStopwatchItem extends QuickActionsDefaultAttributes {
   @Field()
-  type: 'overlayStopwatch';
+    type: 'overlayStopwatch';
   @Field()
-  options: OverlayStopwatchItemOptions;
+    options: OverlayStopwatchItemOptions;
 }
 
 @InputType()
 export class QuickActionInput {
   @Field(type => [CommandItem],{ nullable: true })
-  command?: CommandItem[];
+    command?: CommandItem[];
   @Field(type => [CustomVariableItem],{ nullable: true })
-  customvariable?: CustomVariableItem[];
+    customvariable?: CustomVariableItem[];
   @Field(type => [RandomizerItem],{ nullable: true })
-  randomizer?: RandomizerItem[];
+    randomizer?: RandomizerItem[];
   @Field(type => [OverlayCountdownItem],{ nullable: true })
-  overlayCountdown?: OverlayCountdownItem[];
+    overlayCountdown?: OverlayCountdownItem[];
   @Field(type => [OverlayMarathonItem],{ nullable: true })
-  overlayMarathon?: OverlayMarathonItem[];
+    overlayMarathon?: OverlayMarathonItem[];
   @Field(type => [OverlayStopwatchItem],{ nullable: true })
-  overlayStopwatch?: OverlayStopwatchItem[];
+    overlayStopwatch?: OverlayStopwatchItem[];
 }
 
 export declare namespace QuickActions {

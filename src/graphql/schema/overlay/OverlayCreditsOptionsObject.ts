@@ -12,15 +12,15 @@ type OverlayMapperCreditsOptions = NonNullable<OverlayMapperCredits['opts']>;
 @ObjectType()
 export class OverlayCreditsOptionsObject implements OverlayMapperCreditsOptions {
   @Field(type => [OverlayCreditsOptionsSocialObject])
-  social: OverlayCreditsOptionsSocialObject[];
+    social: OverlayCreditsOptionsSocialObject[];
   @Field()
-  speed: 'slow' | 'fast' | 'very slow' | 'medium' | 'very fast';
+    speed: 'slow' | 'fast' | 'very slow' | 'medium' | 'very fast';
   @Field(type => [OverlayCreditsOptionsCustomTextsObject])
-  customTexts: OverlayCreditsOptionsCustomTextsObject[];
+    customTexts: OverlayCreditsOptionsCustomTextsObject[];
   @Field(type => OverlayCreditsOptionsClipsObject)
-  clips: OverlayCreditsOptionsClipsObject;
+    clips: OverlayCreditsOptionsClipsObject;
   @Field(type => OverlayCreditsOptionsTextObject)
-  text: OverlayCreditsOptionsTextObject;
+    text: OverlayCreditsOptionsTextObject;
   @Field(type => OverlayCreditsOptionsShowObject)
-  show: OverlayCreditsOptionsShowObject;
+    show: OverlayCreditsOptionsShowObject;
 }

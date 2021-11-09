@@ -27,11 +27,11 @@ let cachedStats = {
 
 class Stats extends Core {
   @persistent()
-  currentFollowers = 0;
+    currentFollowers = 0;
   @persistent()
-  currentViews = 0;
+    currentViews = 0;
   @persistent()
-  currentSubscribers = 0;
+    currentSubscribers = 0;
 
   showInUI = false;
   latestTimestamp = 0;

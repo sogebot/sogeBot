@@ -37,13 +37,13 @@ class PhillipsHue extends Integration {
   states: State[] = [];
 
   @settings('connection')
-  host = '';
+    host = '';
   @settings('connection')
-  user = '';
+    user = '';
   @settings('connection')
-  port = 0;
+    port = 0;
   @settings('connection')
-  timeout = 30000;
+    timeout = 30000;
 
   @onStartup()
   onStartup() {

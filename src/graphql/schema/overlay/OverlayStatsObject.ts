@@ -6,8 +6,8 @@ import {
 @ObjectType()
 export class OverlayStatsObject implements OverlayMapperInterface {
   @Field(type => ID)
-  id: string;
+    id: string;
   @Field()
-  value: 'stats';
+    value: 'stats';
   opts: null;
 }

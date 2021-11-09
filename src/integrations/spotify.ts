@@ -44,44 +44,44 @@ class Spotify extends Integration {
   userId: string | null = null;
 
   @persistent()
-  lastActiveDeviceId = '';
+    lastActiveDeviceId = '';
   @settings('connection')
-  manualDeviceId = '';
+    manualDeviceId = '';
 
   @persistent()
-  songsHistory: string[] = [];
+    songsHistory: string[] = [];
   currentSong = JSON.stringify(null as null | {
     started_at: number; song: string; artist: string; artists: string, uri: string; is_playing: boolean; is_enabled: boolean;
   });
 
   @settings()
-  _accessToken: string | null = null;
+    _accessToken: string | null = null;
   @settings()
-  _refreshToken: string | null = null;
+    _refreshToken: string | null = null;
   @settings()
-  songRequests = true;
+    songRequests = true;
   @settings()
-  fetchCurrentSongWhenOffline = false;
+    fetchCurrentSongWhenOffline = false;
   @settings()
-  queueWhenOffline = false;
+    queueWhenOffline = false;
   @settings()
-  notify = false;
+    notify = false;
   @settings()
-  allowApprovedArtistsOnly = false;
+    allowApprovedArtistsOnly = false;
   @settings()
-  approvedArtists = []; // uris or names
+    approvedArtists = []; // uris or names
 
   @settings('customization')
-  format = '$song - $artist';
+    format = '$song - $artist';
 
   @settings('connection')
-  clientId = '';
+    clientId = '';
   @settings('connection')
-  clientSecret = '';
+    clientSecret = '';
   @settings('connection')
-  redirectURI = 'http://localhost:20000/credentials/oauth/spotify';
+    redirectURI = 'http://localhost:20000/credentials/oauth/spotify';
   @settings('connection')
-  username = '';
+    username = '';
 
   scopes: string[] = [
     'user-read-currently-playing',

@@ -8,31 +8,31 @@ import { ColumnNumericTransformer } from './_transformer';
 @ObjectType()
 export class VariableHistoryInterface {
   @Field(type => ID)
-  id?: string;
+    id?: string;
   variable?: VariableInterface;
   variableId: string | null;
   @Field()
-  userId: string;
+    userId: string;
   @Field()
-  username: string;
+    username: string;
   @Field()
-  currentValue: string;
+    currentValue: string;
   @Field()
-  oldValue: string;
+    oldValue: string;
   @Field()
-  changedAt: number;
+    changedAt: number;
 }
 
 @ObjectType()
 export class VariableURLInterface {
   @Field(type => ID)
-  id: string;
+    id: string;
   @Field()
-  GET: boolean;
+    GET: boolean;
   @Field()
-  POST: boolean;
+    POST: boolean;
   @Field()
-  showResponse: boolean;
+    showResponse: boolean;
   variable: VariableInterface;
   variableId: string | null;
 }
@@ -40,48 +40,48 @@ export class VariableURLInterface {
 @ObjectType()
 export class VariableWatchInterface {
   @Field(type => ID)
-  id: string;
+    id: string;
   variableId: string;
   @Field()
-  order: number;
+    order: number;
 }
 
 @ObjectType()
 export class VariableInterface {
   @Field(type => ID)
-  id?: string;
+    id?: string;
   @Field(type => [VariableHistoryInterface])
-  history?: VariableHistoryInterface[];
+    history?: VariableHistoryInterface[];
   @Field(type => [VariableURLInterface])
-  urls?: VariableURLInterface[];
+    urls?: VariableURLInterface[];
   @Field()
-  variableName: string;
+    variableName: string;
   @Field()
-  description?: string;
+    description?: string;
   @Field()
-  type: 'eval' | 'number' | 'options' | 'text';
+    type: 'eval' | 'number' | 'options' | 'text';
   @Field()
-  currentValue: string;
+    currentValue: string;
   @Field()
-  evalValue: string;
+    evalValue: string;
   @Field()
-  runEveryTypeValue?: number;
+    runEveryTypeValue?: number;
   @Field()
-  runEveryType?: 'isUsed' | string;
+    runEveryType?: 'isUsed' | string;
   @Field()
-  runEvery?: number;
+    runEvery?: number;
   @Field()
-  responseType: number;
+    responseType: number;
   @Field()
-  responseText?: string;
+    responseText?: string;
   @Field()
-  permission: string;
+    permission: string;
   @Field()
-  readOnly?: boolean;
+    readOnly?: boolean;
   @Field(type => [String])
-  usableOptions: string[];
+    usableOptions: string[];
   @Field()
-  runAt?: number;
+    runAt?: number;
 }
 
 export const Variable = new EntitySchema<Readonly<Required<VariableInterface>>>({

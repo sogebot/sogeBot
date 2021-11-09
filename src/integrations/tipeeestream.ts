@@ -87,10 +87,10 @@ type TipeeestreamEvent = {
 
 class TipeeeStream extends Integration {
   @persistent()
-  afterDate = 0;
+    afterDate = 0;
 
   @settings()
-  apiKey = '';
+    apiKey = '';
 
   @onStartup()
   interval() {

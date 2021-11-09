@@ -14,47 +14,47 @@ import { ParryObject } from './ParryObject';
 @ObjectType()
 export class AlertObject implements AlertInterface {
   @Field(type => ID)
-  id: string;
+    id: string;
   @Field(type => String)
-  updatedAt: number;
+    updatedAt: number;
   @Field()
-  name: string;
+    name: string;
   @Field(type => Int)
-  alertDelayInMs: number;
+    alertDelayInMs: number;
   @Field()
-  profanityFilterType: 'disabled' | 'replace-with-asterisk' | 'replace-with-happy-words' | 'hide-messages' | 'disable-alerts';
+    profanityFilterType: 'disabled' | 'replace-with-asterisk' | 'replace-with-happy-words' | 'hide-messages' | 'disable-alerts';
   @Field(type => LoadStandardProfanityListObject)
-  loadStandardProfanityList: LoadStandardProfanityListObject;
+    loadStandardProfanityList: LoadStandardProfanityListObject;
   @Field(type => ParryObject)
-  parry: ParryObject;
+    parry: ParryObject;
   @Field(type => CustomizationTTSObject, { nullable: true })
-  tts: CustomizationTTSObject;
+    tts: CustomizationTTSObject;
   @Field(type => CustomizationFontObject)
-  fontMessage: CustomizationFontObject<'left' | 'center' | 'right', string>;
+    fontMessage: CustomizationFontObject<'left' | 'center' | 'right', string>;
   @Field(type => CustomizationFontObject)
-  font: CustomizationFontObject<'left' | 'center' | 'right', string, string>;
+    font: CustomizationFontObject<'left' | 'center' | 'right', string, string>;
   @Field()
-  customProfanityList: string;
+    customProfanityList: string;
   @Field(type => [CommonSettingsObject])
-  follows: CommonSettingsObject[];
+    follows: CommonSettingsObject[];
   @Field(type => [CommonSettingsObject])
-  subs: CommonSettingsObject[];
+    subs: CommonSettingsObject[];
   @Field(type => [CommonSettingsObject])
-  subgifts: CommonSettingsObject[];
+    subgifts: CommonSettingsObject[];
   @Field(type => [CommonSettingsObject])
-  subcommunitygifts: CommonSettingsObject[];
+    subcommunitygifts: CommonSettingsObject[];
   @Field(type => [CommonSettingsObject])
-  hosts: CommonSettingsObject[];
+    hosts: CommonSettingsObject[];
   @Field(type => [CommonSettingsObject])
-  raids: CommonSettingsObject[];
+    raids: CommonSettingsObject[];
   @Field(type => [AlertTipObject])
-  tips: AlertTipObject[];
+    tips: AlertTipObject[];
   @Field(type => [AlertTipObject])
-  cheers: AlertTipObject[];
+    cheers: AlertTipObject[];
   @Field(type => [AlertResubObject])
-  resubs: AlertResubObject[];
+    resubs: AlertResubObject[];
   @Field(type => [CommonSettingsObject])
-  cmdredeems: CommonSettingsObject[];
+    cmdredeems: CommonSettingsObject[];
   @Field(type => [AlertRewardRedeemObject])
-  rewardredeems: AlertRewardRedeemObject[];
+    rewardredeems: AlertRewardRedeemObject[];
 }

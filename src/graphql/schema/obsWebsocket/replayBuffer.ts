@@ -6,7 +6,7 @@ import {
 @ObjectType()
 export class ReplayBuffer implements simpleModeTasks.ReplayBuffer {
   @Field(type => ID)
-  id: string;
+    id: string;
   @Field(type => String)
-  event: 'StartReplayBuffer' | 'StopReplayBuffer' | 'SaveReplayBuffer';
+    event: 'StartReplayBuffer' | 'StopReplayBuffer' | 'SaveReplayBuffer';
 }

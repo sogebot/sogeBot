@@ -5,9 +5,9 @@ import {
 @ObjectType()
 export class AnimationTextOptionsObject {
   @Field(type => String)
-  speed: number | 'slower' | 'slow' | 'fast' | 'faster';
+    speed: number | 'slower' | 'slow' | 'fast' | 'faster';
   @Field(type => Int)
-  maxTimeToDecrypt: number;
+    maxTimeToDecrypt: number;
   @Field()
-  characters: string;
+    characters: string;
 }

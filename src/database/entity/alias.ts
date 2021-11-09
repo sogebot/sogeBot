@@ -6,35 +6,35 @@ import { EntitySchema } from 'typeorm';
 @InputType()
 export class AliasInput {
   @Field({ nullable: true })
-  alias?: string;
+    alias?: string;
   @Field({ nullable: true })
-  command?: string;
+    command?: string;
   @Field({ nullable: true })
-  enabled?: boolean;
+    enabled?: boolean;
   @Field({ nullable: true })
-  visible?: boolean;
+    visible?: boolean;
   @Field({ nullable: true })
-  permission?: string;
+    permission?: string;
   @Field(type => String, { nullable: true })
-  group?: string;
+    group?: string;
 }
 @ObjectType()
 @InputType('AliasCreateInput')
 export class AliasInterface {
   @Field(type => ID)
-  id?: string;
+    id?: string;
   @Field()
-  alias: string;
+    alias: string;
   @Field()
-  command: string;
+    command: string;
   @Field()
-  enabled: boolean;
+    enabled: boolean;
   @Field()
-  visible: boolean;
+    visible: boolean;
   @Field(type => String, { nullable: true })
-  permission: string | null;
+    permission: string | null;
   @Field(type => String, { nullable: true })
-  group: string | null;
+    group: string | null;
 }
 export class AliasGroupInterface {
   name: string;

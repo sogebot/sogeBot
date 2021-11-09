@@ -33,11 +33,11 @@ class OBSWebsocket extends Integration {
 
   @settings('connection')
   @ui({ type: 'selector', values: ['direct', 'overlay'] })
-  accessBy: 'direct' | 'overlay' = 'overlay';
+    accessBy: 'direct' | 'overlay' = 'overlay';
   @settings('connection')
-  address = 'localhost:4444';
+    address = 'localhost:4444';
   @settings('connection')
-  password = '';
+    password = '';
 
   @onStartup()
   @onChange('accessBy')

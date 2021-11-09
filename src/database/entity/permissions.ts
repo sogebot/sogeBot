@@ -6,66 +6,66 @@ import { EntitySchema } from 'typeorm';
 @InputType()
 export class PermissionFiltersInput {
   @Field()
-  comparator: '<' | '>' | '==' | '<=' | '>=';
+    comparator: '<' | '>' | '==' | '<=' | '>=';
   @Field()
-  type: 'level' | 'ranks' | 'points' | 'watched' | 'tips' | 'bits' | 'messages' | 'subtier' | 'subcumulativemonths' | 'substreakmonths' | 'followtime';
+    type: 'level' | 'ranks' | 'points' | 'watched' | 'tips' | 'bits' | 'messages' | 'subtier' | 'subcumulativemonths' | 'substreakmonths' | 'followtime';
   @Field()
-  value: string;
+    value: string;
 }
 
 @InputType()
 export class PermissionInput {
   @Field({ nullable: true })
-  name?: string;
+    name?: string;
   @Field({ nullable: true })
-  order?: number;
+    order?: number;
   @Field({ nullable: true })
-  isCorePermission?: boolean;
+    isCorePermission?: boolean;
   @Field({ nullable: true })
-  isWaterfallAllowed?: boolean;
+    isWaterfallAllowed?: boolean;
   @Field({ nullable: true })
-  automation?: 'none' | 'casters' | 'moderators' | 'subscribers' | 'viewers' | 'followers' | 'vip';
+    automation?: 'none' | 'casters' | 'moderators' | 'subscribers' | 'viewers' | 'followers' | 'vip';
   @Field(type => [String], { nullable: true })
-  userIds?: string[];
+    userIds?: string[];
   @Field(type => [String], { nullable: true })
-  excludeUserIds?: string[];
+    excludeUserIds?: string[];
   @Field(type => [PermissionFiltersInput], { nullable: true })
-  filters?: PermissionFiltersInput[];
+    filters?: PermissionFiltersInput[];
 }
 
 @ObjectType()
 export class PermissionFiltersInterface {
   @Field(type => ID)
-  id?: string;
+    id?: string;
   @Field()
-  comparator: '<' | '>' | '==' | '<=' | '>=';
+    comparator: '<' | '>' | '==' | '<=' | '>=';
   @Field()
-  type: 'level' | 'ranks' | 'points' | 'watched' | 'tips' | 'bits' | 'messages' | 'subtier' | 'subcumulativemonths' | 'substreakmonths' | 'followtime';
+    type: 'level' | 'ranks' | 'points' | 'watched' | 'tips' | 'bits' | 'messages' | 'subtier' | 'subcumulativemonths' | 'substreakmonths' | 'followtime';
   @Field()
-  value: string;
+    value: string;
   permission: PermissionsInterface;
 }
 
 @ObjectType()
 export class PermissionsInterface {
   @Field(type => ID)
-  id?: string;
+    id?: string;
   @Field()
-  name: string;
+    name: string;
   @Field()
-  order: number;
+    order: number;
   @Field()
-  isCorePermission: boolean;
+    isCorePermission: boolean;
   @Field()
-  isWaterfallAllowed: boolean;
+    isWaterfallAllowed: boolean;
   @Field()
-  automation: 'none' | 'casters' | 'moderators' | 'subscribers' | 'viewers' | 'followers' | 'vip';
+    automation: 'none' | 'casters' | 'moderators' | 'subscribers' | 'viewers' | 'followers' | 'vip';
   @Field(type => [String])
-  userIds: string[];
+    userIds: string[];
   @Field(type => [String])
-  excludeUserIds: string[];
+    excludeUserIds: string[];
   @Field(type => [PermissionFiltersInterface])
-  filters: PermissionFiltersInterface[];
+    filters: PermissionFiltersInterface[];
 }
 
 export interface PermissionCommandsInterface {

@@ -46,9 +46,9 @@ class Polls extends System {
   private lastTimeRemind = 0;
 
   @settings('reminder')
-  everyXMessages = 0;
+    everyXMessages = 0;
   @settings('reminder')
-  everyXSeconds = 0;
+    everyXSeconds = 0;
 
   @onStartup()
   onStartup() {

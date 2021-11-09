@@ -51,58 +51,58 @@ class Discord extends Integration {
   client: DiscordJs.Client | null = null;
 
   @persistent()
-  embedStartedAt = '';
+    embedStartedAt = '';
   @persistent()
-  embedMessageId = '';
+    embedMessageId = '';
 
   @settings('general')
-  clientId = '';
+    clientId = '';
 
   @settings('general')
-  token = '';
+    token = '';
 
   @settings('bot')
-  guild = '';
+    guild = '';
 
   @settings('bot')
-  listenAtChannels: string | string[] = '';
+    listenAtChannels: string | string[] = '';
 
   @settings('bot')
-  sendOnlineAnnounceToChannel = '';
+    sendOnlineAnnounceToChannel = '';
 
   @settings('bot')
-  sendAnnouncesToChannel: { [key in typeof announceTypes[number]]: string } = {
-    bets:    '',
-    duel:    '',
-    general: '',
-    heist:   '',
-    polls:   '',
-    raffles: '',
-    scrim:   '',
-    songs:   '',
-    timers:  '',
-  };
+    sendAnnouncesToChannel: { [key in typeof announceTypes[number]]: string } = {
+      bets:    '',
+      duel:    '',
+      general: '',
+      heist:   '',
+      polls:   '',
+      raffles: '',
+      scrim:   '',
+      songs:   '',
+      timers:  '',
+    };
 
   @settings('bot')
-  ignorelist: string[] = [];
+    ignorelist: string[] = [];
 
   @settings('status')
-  onlinePresenceStatusDefault: 'online' | 'idle' | 'invisible' | 'dnd' = 'online';
+    onlinePresenceStatusDefault: 'online' | 'idle' | 'invisible' | 'dnd' = 'online';
 
   @settings('status')
-  onlinePresenceStatusDefaultName = '';
+    onlinePresenceStatusDefaultName = '';
 
   @settings('status')
-  onlinePresenceStatusOnStream: 'streaming' | 'online' | 'idle' | 'invisible' | 'dnd' = 'online';
+    onlinePresenceStatusOnStream: 'streaming' | 'online' | 'idle' | 'invisible' | 'dnd' = 'online';
 
   @settings('status')
-  onlinePresenceStatusOnStreamName = '$title';
+    onlinePresenceStatusOnStreamName = '$title';
 
   @settings('mapping')
-  rolesMapping: { [permissionId: string]: string } = {};
+    rolesMapping: { [permissionId: string]: string } = {};
 
   @settings('bot')
-  deleteMessagesAfterWhile = false;
+    deleteMessagesAfterWhile = false;
 
   @onStartup()
   onStartup() {

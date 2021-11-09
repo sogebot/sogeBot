@@ -7,5 +7,5 @@ import { MessageObject } from './MessageObject';
 @ObjectType()
 export class AlertTipObject extends CommonSettingsObject implements AlertTipInterface {
   @Field(type => MessageObject)
-  message: MessageObject;
+    message: MessageObject;
 }

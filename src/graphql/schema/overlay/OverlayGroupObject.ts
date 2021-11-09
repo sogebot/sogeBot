@@ -8,9 +8,9 @@ import { OverlayGroupOptionsObject } from './OverlayGroupOptionsObject';
 @ObjectType()
 export class OverlayGroupObject implements OverlayMapperGroup {
   @Field(type => ID)
-  id: string;
+    id: string;
   @Field()
-  value: 'group';
+    value: 'group';
   @Field(type => OverlayGroupOptionsObject, { nullable: true })
-  opts: OverlayMapperGroup['opts'];
+    opts: OverlayMapperGroup['opts'];
 }

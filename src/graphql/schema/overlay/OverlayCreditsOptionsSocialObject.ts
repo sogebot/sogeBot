@@ -6,7 +6,7 @@ type Implementation = NonNullable<OverlayMapperCredits['opts']>['social'][number
 @ObjectType()
 export class OverlayCreditsOptionsSocialObject implements Implementation {
   @Field()
-  type: string;
+    type: string;
   @Field()
-  text: string;
+    text: string;
 }

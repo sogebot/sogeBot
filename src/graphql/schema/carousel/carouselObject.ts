@@ -6,29 +6,29 @@ import {
 @ObjectType()
 export class CarouselObject implements CarouselInterface {
   @Field(type => ID)
-  id: string;
+    id: string;
   @Field(type => Int)
-  order: number;
+    order: number;
   @Field()
-  type: string;
+    type: string;
   @Field(type => Int)
-  waitBefore: number;
+    waitBefore: number;
   @Field(type => Int)
-  waitAfter: number;
+    waitAfter: number;
   @Field(type => Int)
-  duration: number;
+    duration: number;
   @Field(type => Int)
-  animationInDuration: number;
+    animationInDuration: number;
   @Field()
-  animationIn: string;
+    animationIn: string;
   @Field(type => Int)
-  animationOutDuration: number;
+    animationOutDuration: number;
   @Field()
-  animationOut: string;
+    animationOut: string;
   @Field()
-  showOnlyOncePerStream: boolean;
+    showOnlyOncePerStream: boolean;
   @Field()
-  imageUrl: boolean;
+    imageUrl: boolean;
   base64: string; // we are not returning base64
 
 }

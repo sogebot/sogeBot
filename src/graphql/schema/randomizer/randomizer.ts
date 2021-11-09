@@ -11,31 +11,31 @@ import { RandomizerItemObject } from './randomizerItem';
 @ObjectType()
 export class RandomizerObject implements RandomizerInterface {
   @Field(type => ID)
-  id?: string;
+    id?: string;
   @Field(type => [RandomizerItemObject])
-  items: RandomizerItemInterface[];
+    items: RandomizerItemInterface[];
   @Field(type => String)
-  createdAt: number;
+    createdAt: number;
   @Field()
-  command: string;
+    command: string;
   @Field()
-  permissionId: string;
+    permissionId: string;
   @Field()
-  name: string;
+    name: string;
   @Field()
-  isShown: boolean;
+    isShown: boolean;
   @Field()
-  shouldPlayTick: boolean;
+    shouldPlayTick: boolean;
   @Field(type => Float)
-  tickVolume: number;
+    tickVolume: number;
   @Field(type => Int)
-  widgetOrder: number;
+    widgetOrder: number;
   @Field(type => String)
-  type: 'simple' | 'wheelOfFortune';
+    type: 'simple' | 'wheelOfFortune';
   @Field(type => CustomizationPositionObject)
-  position: CustomizationPositionObject;
+    position: CustomizationPositionObject;
   @Field(type => CustomizationFontObject)
-  customizationFont: CustomizationFontObject;
+    customizationFont: CustomizationFontObject;
   @Field(type => CustomizationTTSObject)
-  tts: CustomizationTTSObject;
+    tts: CustomizationTTSObject;
 }

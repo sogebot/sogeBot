@@ -6,14 +6,14 @@ import {
 @ObjectType()
 class WaitMsArgs {
   @Field()
-  miliseconds: number;
+    miliseconds: number;
 }
 @ObjectType()
 export class WaitMS implements simpleModeTasks.WaitMS {
   @Field(type => ID)
-  id: string;
+    id: string;
   @Field(type => String)
-  event: 'WaitMs';
+    event: 'WaitMs';
   @Field()
-  args: WaitMsArgs;
+    args: WaitMsArgs;
 }

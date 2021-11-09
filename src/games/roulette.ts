@@ -18,12 +18,12 @@ class Roulette extends Game {
   dependsOn = [ points ];
 
   @settings()
-  timeout = 10;
+    timeout = 10;
 
   @settings('rewards')
-  winnerWillGet = 0;
+    winnerWillGet = 0;
   @settings('rewards')
-  loserWillLose = 0;
+    loserWillLose = 0;
 
   @command('!roulette')
   async main (opts: CommandOptions): Promise<(CommandResponse & { isAlive?: boolean })[]> {

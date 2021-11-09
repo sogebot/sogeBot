@@ -5,7 +5,7 @@ import {
 @ObjectType()
 export class ParryObject {
   @Field()
-  enabled: boolean;
+    enabled: boolean;
   @Field(type => Int)
-  delay: number;
+    delay: number;
 }

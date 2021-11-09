@@ -5,5 +5,5 @@ import { AlertTipObject } from './AlertTipObject';
 @ObjectType()
 export class AlertRewardRedeemObject extends AlertTipObject {
   @Field(type => String, { nullable: true })
-  rewardId: null | string;
+    rewardId: null | string;
 }

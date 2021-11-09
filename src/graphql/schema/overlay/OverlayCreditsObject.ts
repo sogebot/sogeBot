@@ -8,9 +8,9 @@ import { OverlayCreditsOptionsObject } from './OverlayCreditsOptionsObject';
 @ObjectType()
 export class OverlayCreditsObject implements OverlayMapperCredits {
   @Field(type => ID)
-  id: string;
+    id: string;
   @Field()
-  value: 'credits';
+    value: 'credits';
   @Field(type => OverlayCreditsOptionsObject, { nullable: true })
-  opts: OverlayMapperCredits['opts'];
+    opts: OverlayMapperCredits['opts'];
 }

@@ -8,9 +8,9 @@ import { OverlayMarathonOptionsObject } from './OverlayMarathonOptionsObject';
 @ObjectType()
 export class OverlayMarathonObject implements OverlayMapperMarathon {
   @Field(type => ID)
-  id: string;
+    id: string;
   @Field()
-  value: 'marathon';
+    value: 'marathon';
   @Field(type => OverlayMarathonOptionsObject, { nullable: true })
-  opts: OverlayMapperMarathon['opts'];
+    opts: OverlayMapperMarathon['opts'];
 }

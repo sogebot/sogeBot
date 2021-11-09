@@ -8,9 +8,9 @@ import { OverlayClipsOptionsObject } from './OverlayClipsOptionsObject';
 @ObjectType()
 export class OverlayClipsObject implements OverlayMapperClips {
   @Field(type => ID)
-  id: string;
+    id: string;
   @Field()
-  value: 'clips';
+    value: 'clips';
   @Field(type => OverlayClipsOptionsObject, { nullable: true })
-  opts: OverlayMapperClips['opts'];
+    opts: OverlayMapperClips['opts'];
 }

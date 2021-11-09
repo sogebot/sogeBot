@@ -6,11 +6,11 @@ type Implementation = NonNullable<OverlayMapperCredits['opts']>['customTexts'][n
 @ObjectType()
 export class OverlayCreditsOptionsCustomTextsObject implements Implementation {
   @Field()
-  type: 'bigHeader' | 'header' | 'text' | 'smallText' | 'separator';
+    type: 'bigHeader' | 'header' | 'text' | 'smallText' | 'separator';
   @Field()
-  left: string;
+    left: string;
   @Field()
-  middle: string;
+    middle: string;
   @Field()
-  right: string;
+    right: string;
 }

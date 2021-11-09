@@ -69,83 +69,83 @@ setInterval(() => {
 
 class Moderation extends System {
   @settings('lists')
-  cListsWhitelist: string[] = [];
+    cListsWhitelist: string[] = [];
   @settings('lists')
   @ui({
     type:   'textarea-from-array',
     secret: true,
   })
-  cListsBlacklist: string[] = [];
+    cListsBlacklist: string[] = [];
   @permission_settings('lists', [ defaultPermissions.CASTERS ], { [defaultPermissions.MODERATORS]: false })
-  cListsEnabled = true;
+    cListsEnabled = true;
   @permission_settings('lists', [ defaultPermissions.CASTERS ])
-  cListsTimeout = 120;
+    cListsTimeout = 120;
 
   @permission_settings('links_filter', [ defaultPermissions.CASTERS ], { [defaultPermissions.MODERATORS]: false })
-  cLinksEnabled = true;
+    cLinksEnabled = true;
   @permission_settings('links_filter', [ defaultPermissions.CASTERS ])
-  cLinksIncludeSpaces = false;
+    cLinksIncludeSpaces = false;
   @permission_settings('links_filter', [ defaultPermissions.CASTERS ])
-  cLinksIncludeClips = true;
+    cLinksIncludeClips = true;
   @permission_settings('links_filter', [ defaultPermissions.CASTERS ])
-  cLinksTimeout = 120;
+    cLinksTimeout = 120;
 
   @permission_settings('symbols_filter', [ defaultPermissions.CASTERS ], { [defaultPermissions.MODERATORS]: false })
-  cSymbolsEnabled = true;
+    cSymbolsEnabled = true;
   @permission_settings('symbols_filter', [ defaultPermissions.CASTERS ])
-  cSymbolsTriggerLength = 15;
+    cSymbolsTriggerLength = 15;
   @permission_settings('symbols_filter', [ defaultPermissions.CASTERS ])
-  cSymbolsMaxSymbolsConsecutively = 10;
+    cSymbolsMaxSymbolsConsecutively = 10;
   @permission_settings('symbols_filter', [ defaultPermissions.CASTERS ])
-  cSymbolsMaxSymbolsPercent = 50;
+    cSymbolsMaxSymbolsPercent = 50;
   @permission_settings('symbols_filter', [ defaultPermissions.CASTERS ])
-  cSymbolsTimeout = 120;
+    cSymbolsTimeout = 120;
 
   @permission_settings('longMessage_filter', [ defaultPermissions.CASTERS ], { [defaultPermissions.MODERATORS]: false })
-  cLongMessageEnabled = true;
+    cLongMessageEnabled = true;
   @permission_settings('longMessage_filter', [ defaultPermissions.CASTERS ])
-  cLongMessageTriggerLength = 300;
+    cLongMessageTriggerLength = 300;
   @permission_settings('longMessage_filter', [ defaultPermissions.CASTERS ])
-  cLongMessageTimeout = 120;
+    cLongMessageTimeout = 120;
 
   @permission_settings('caps_filter', [ defaultPermissions.CASTERS ], { [defaultPermissions.MODERATORS]: false })
-  cCapsEnabled = true;
+    cCapsEnabled = true;
   @permission_settings('caps_filter', [ defaultPermissions.CASTERS ])
-  cCapsTriggerLength = 15;
+    cCapsTriggerLength = 15;
   @permission_settings('caps_filter', [ defaultPermissions.CASTERS ])
-  cCapsMaxCapsPercent = 50;
+    cCapsMaxCapsPercent = 50;
   @permission_settings('caps_filter', [ defaultPermissions.CASTERS ])
-  cCapsTimeout = 120;
+    cCapsTimeout = 120;
 
   @permission_settings('spam_filter', [ defaultPermissions.CASTERS ], { [defaultPermissions.MODERATORS]: false })
-  cSpamEnabled = true;
+    cSpamEnabled = true;
   @permission_settings('spam_filter', [ defaultPermissions.CASTERS ])
-  cSpamTriggerLength = 15;
+    cSpamTriggerLength = 15;
   @permission_settings('spam_filter', [ defaultPermissions.CASTERS ])
-  cSpamMaxLength = 50;
+    cSpamMaxLength = 50;
   @permission_settings('spam_filter', [ defaultPermissions.CASTERS ])
-  cSpamTimeout = 300;
+    cSpamTimeout = 300;
 
   @permission_settings('color_filter', [ defaultPermissions.CASTERS ], { [defaultPermissions.MODERATORS]: false })
-  cColorEnabled = true;
+    cColorEnabled = true;
   @permission_settings('color_filter', [ defaultPermissions.CASTERS ])
-  cColorTimeout = 300;
+    cColorTimeout = 300;
 
   @permission_settings('emotes_filter', [ defaultPermissions.CASTERS ], { [defaultPermissions.MODERATORS]: false })
-  cEmotesEnabled = true;
+    cEmotesEnabled = true;
   @permission_settings('emotes_filter', [ defaultPermissions.CASTERS ])
-  cEmotesEmojisAreEmotes = true;
+    cEmotesEmojisAreEmotes = true;
   @permission_settings('emotes_filter', [ defaultPermissions.CASTERS ])
-  cEmotesMaxCount = 15;
+    cEmotesMaxCount = 15;
   @permission_settings('emotes_filter', [ defaultPermissions.CASTERS ])
-  cEmotesTimeout = 120;
+    cEmotesTimeout = 120;
 
   @settings('warnings')
-  cWarningsAllowedCount = 3;
+    cWarningsAllowedCount = 3;
   @settings('warnings')
-  cWarningsAnnounceTimeouts = true;
+    cWarningsAnnounceTimeouts = true;
   @settings('warnings')
-  cWarningsShouldClearChat = true;
+    cWarningsShouldClearChat = true;
 
   sockets () {
     adminEndpoint(this.nsp, 'lists.get', async (cb) => {

@@ -10,10 +10,10 @@ let canSendRequests = true;
 
 class LastFM extends Integration {
   @settings()
-  apiKey = '';
+    apiKey = '';
 
   @settings()
-  username = '';
+    username = '';
 
   currentSong: null | string = null;
 

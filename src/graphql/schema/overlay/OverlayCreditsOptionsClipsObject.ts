@@ -8,13 +8,13 @@ type Implementation = NonNullable<OverlayMapperCredits['opts']>['clips'];
 @ObjectType()
 export class OverlayCreditsOptionsClipsObject implements Implementation {
   @Field()
-  play: boolean;
+    play: boolean;
   @Field()
-  period: 'custom' | 'stream';
+    period: 'custom' | 'stream';
   @Field(type => Int)
-  periodValue: number;
+    periodValue: number;
   @Field(type => Int)
-  numOfClips: number;
+    numOfClips: number;
   @Field(type => Float)
-  volume: number;
+    volume: number;
 }

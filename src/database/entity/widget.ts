@@ -8,20 +8,20 @@ import { ColumnNumericTransformer } from './_transformer';
 @ObjectType()
 export class WidgetCustomInterface {
   @Field(type => ID)
-  id: string;
+    id: string;
   @Field()
-  userId: string;
+    userId: string;
   @Field()
-  url: string;
+    url: string;
   @Field()
-  name: string;
+    name: string;
 }
 @InputType()
 export class WidgetCustomInput {
   @Field()
-  url: string;
+    url: string;
   @Field()
-  name: string;
+    name: string;
 }
 
 export const WidgetCustom = new EntitySchema<Readonly<Required<WidgetCustomInterface>>>({
@@ -40,21 +40,21 @@ export const WidgetCustom = new EntitySchema<Readonly<Required<WidgetCustomInter
 @ObjectType()
 export class WidgetSocialInterface {
   @Field(type => ID)
-  id: string;
+    id: string;
   @Field()
-  type: string;
+    type: string;
   @Field()
-  hashtag: string;
+    hashtag: string;
   @Field()
-  text: string;
+    text: string;
   @Field()
-  username: string;
+    username: string;
   @Field()
-  displayname: string;
+    displayname: string;
   @Field()
-  url: string;
+    url: string;
   @Field()
-  timestamp: number;
+    timestamp: number;
 }
 
 export const WidgetSocial = new EntitySchema<Readonly<Required<WidgetSocialInterface>>>({

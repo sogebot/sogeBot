@@ -8,40 +8,40 @@ import { HelixBanEventType } from '~/../node_modules/@twurple/api/lib';
 @ObjectType()
 class BannedEventsEventData {
   @Field()
-  'broadcaster_id': string;
+    'broadcaster_id': string;
   @Field()
-  'broadcaster_login': string;
+    'broadcaster_login': string;
   @Field()
-  'broadcaster_name': string;
+    'broadcaster_name': string;
   @Field()
-  'user_id': string;
+    'user_id': string;
   @Field()
-  'user_login': string;
+    'user_login': string;
   @Field()
-  'user_name': string;
+    'user_name': string;
   @Field()
-  'expires_at': string;
+    'expires_at': string;
   @Field()
-  'reason': string;
+    'reason': string;
   @Field()
-  'moderator_id': string;
+    'moderator_id': string;
   @Field()
-  'moderator_login': string;
+    'moderator_login': string;
   @Field()
-  'moderator_name': string;
+    'moderator_name': string;
 }
 @ObjectType()
 export class BannedEventsInterface {
   @Field(type => ID)
-  'id': string;
+    'id': string;
   @Field(type => String)
-  'event_type': HelixBanEventType;
+    'event_type': HelixBanEventType;
   @Field()
-  'event_timestamp': string;
+    'event_timestamp': string;
   @Field()
-  'version': string;
+    'version': string;
   @Field(type => BannedEventsEventData)
-  'event_data': BannedEventsEventData;
+    'event_data': BannedEventsEventData;
 }
 
 export const BannedEventsTable = new EntitySchema<BannedEventsInterface>({

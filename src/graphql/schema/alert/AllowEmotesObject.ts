@@ -3,9 +3,9 @@ import { Field, ObjectType } from 'type-graphql';
 @ObjectType()
 export class AllowEmotesObject {
   @Field()
-  twitch: boolean;
+    twitch: boolean;
   @Field()
-  ffz: boolean;
+    ffz: boolean;
   @Field()
-  bttv: boolean;
+    bttv: boolean;
 }

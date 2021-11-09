@@ -6,16 +6,16 @@ import {
 @ObjectType()
 class SetVolumeArgs {
   @Field()
-  source: string;
+    source: string;
   @Field()
-  volume: number;
+    volume: number;
 }
 @ObjectType()
 export class SetVolume implements simpleModeTasks.SetVolume {
   @Field(type => ID)
-  id: string;
+    id: string;
   @Field(type => String)
-  event: 'SetVolume';
+    event: 'SetVolume';
   @Field()
-  args: SetVolumeArgs;
+    args: SetVolumeArgs;
 }

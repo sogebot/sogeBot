@@ -5,9 +5,9 @@ import {
 @ObjectType()
 export class ImageOptionsObject {
   @Field(type => Float)
-  translateX: number;
+    translateX: number;
   @Field(type => Float)
-  translateY: number;
+    translateY: number;
   @Field(type => Float)
-  scale: number;
+    scale: number;
 }

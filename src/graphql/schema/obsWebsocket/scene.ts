@@ -6,45 +6,45 @@ import {
 @ObjectType()
 export class SceneItem implements OBSWebsocket.SceneItem {
   @Field(type => ID)
-  id: number;
+    id: number;
   @Field(type => Int)
-  cx: number;
+    cx: number;
   @Field(type => Int)
-  cy: number;
+    cy: number;
   @Field(type => Int)
-  alignment: number;
+    alignment: number;
   @Field()
-  name: string;
+    name: string;
   @Field()
-  render: boolean;
+    render: boolean;
   @Field()
-  muted: boolean;
+    muted: boolean;
   @Field()
-  locked: boolean;
+    locked: boolean;
   @Field(type => Int)
-  source_cx: number;
+    source_cx: number;
   @Field(type => Int)
-  source_cy: number;
+    source_cy: number;
   @Field()
-  type: string;
+    type: string;
   @Field(type => Int)
-  volume: number;
+    volume: number;
   @Field(type => Int)
-  x: number;
+    x: number;
   @Field(type => Int)
-  y: number;
+    y: number;
   @Field({ nullable: true })
-  parentGroupName?: string;
+    parentGroupName?: string;
   @Field(type => [SceneItem])
-  groupChildren?: OBSWebsocket.SceneItem[];
+    groupChildren?: OBSWebsocket.SceneItem[];
 }
 
 @ObjectType()
 export class Scene implements OBSWebsocket.Scene {
   @Field(type => ID)
-  id: string;
+    id: string;
   @Field()
-  name: string;
+    name: string;
   @Field(type => [SceneItem])
-  sources: OBSWebsocket.SceneItem[];
+    sources: OBSWebsocket.SceneItem[];
 }

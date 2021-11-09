@@ -8,9 +8,9 @@ import { OverlayEmotesFireworksOptionsObject } from './OverlayEmotesFireworksOpt
 @ObjectType()
 export class OverlayEmotesFireworksObject implements OverlayMapperEmotesFireworks {
   @Field(type => ID)
-  id: string;
+    id: string;
   @Field()
-  value: 'emotesfireworks';
+    value: 'emotesfireworks';
   @Field(type => OverlayEmotesFireworksOptionsObject, { nullable: true })
-  opts: OverlayMapperEmotesFireworks['opts'];
+    opts: OverlayMapperEmotesFireworks['opts'];
 }

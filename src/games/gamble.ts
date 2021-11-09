@@ -38,20 +38,20 @@ class Gamble extends Game {
   dependsOn = [ pointsSystem ];
 
   @permission_settings('settings')
-  minimalBet = 0;
+    minimalBet = 0;
   @permission_settings('settings')
-  chanceToWin = 50;
+    chanceToWin = 50;
   @permission_settings('settings')
-  chanceToTriggerJackpot = 5;
+    chanceToTriggerJackpot = 5;
 
   @settings()
-  enableJackpot = false;
+    enableJackpot = false;
   @settings()
-  maxJackpotValue = 10000;
+    maxJackpotValue = 10000;
   @settings()
-  lostPointsAddedToJackpot = 20;
+    lostPointsAddedToJackpot = 20;
   @persistent()
-  jackpotValue = 0;
+    jackpotValue = 0;
 
   @command('!gamble')
   async main (opts: CommandOptions): Promise<CommandResponse[]> {

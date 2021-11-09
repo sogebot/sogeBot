@@ -5,7 +5,7 @@ import {
 @ObjectType()
 export class GoalsCurrent {
   @Field(type => Int)
-  subscribers: number;
+    subscribers: number;
   @Field(type => Int)
-  followers: number;
+    followers: number;
 }

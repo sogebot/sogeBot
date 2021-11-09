@@ -5,13 +5,13 @@ import {
 @ObjectType()
 export class CustomizationTTSObject {
   @Field({ nullable: true })
-  enabled: boolean;
+    enabled: boolean;
   @Field()
-  voice: string;
+    voice: string;
   @Field(type => Float)
-  pitch: number;
+    pitch: number;
   @Field(type => Float)
-  volume: number;
+    volume: number;
   @Field(type => Float)
-  rate: number;
+    rate: number;
 }

@@ -5,9 +5,9 @@ import {
 @ObjectType()
 export class OverlayMarathonOptionsValuesBitsObject {
   @Field()
-  addFraction: boolean;
+    addFraction: boolean;
   @Field(type => Int)
-  bits: number;
+    bits: number;
   @Field(type => String)
-  time: number;
+    time: number;
 }

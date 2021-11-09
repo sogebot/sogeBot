@@ -74,16 +74,16 @@ function getTips (page: number, jwtToken: string, afterDate: number): Promise<[l
 
 class Donationalerts extends Integration {
   @persistent()
-  afterDate = 0;
+    afterDate = 0;
 
   channel = '';
   isRefreshing = false;
 
   @settings()
-  access_token = '';
+    access_token = '';
 
   @settings()
-  refresh_token = '';
+    refresh_token = '';
 
   @onStartup()
   interval() {

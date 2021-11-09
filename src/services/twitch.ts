@@ -53,111 +53,111 @@ class Twitch extends Service {
   eventsub: import('./twitch/eventsub').default | null;
 
   @persistent()
-  botTokenValid = false;
+    botTokenValid = false;
   @persistent()
-  broadcasterTokenValid = false;
+    broadcasterTokenValid = false;
 
   @persistent()
-  channelId = '';
+    channelId = '';
   @persistent()
-  currentChannel = '';
+    currentChannel = '';
 
   @settings('general')
-  isTitleForced = false;
+    isTitleForced = false;
 
   @settings('chat')
-  sendWithMe = false;
+    sendWithMe = false;
   @settings('chat')
-  sendAsReply = true;
+    sendAsReply = true;
   @settings('chat')
-  ignorelist: any[] = [];
+    ignorelist: any[] = [];
   @settings('chat')
-  globalIgnoreListExclude: any[] = [];
+    globalIgnoreListExclude: any[] = [];
   @settings('chat')
-  showWithAt = true;
+    showWithAt = true;
   @settings('chat')
-  mute = false;
+    mute = false;
   @settings('chat')
-  whisperListener = false;
+    whisperListener = false;
 
   @settings('bot')
-  botClientId = '';
+    botClientId = '';
   @settings('broadcaster')
-  broadcasterClientId = '';
+    broadcasterClientId = '';
 
   @settings('general')
-  tokenService: keyof typeof urls = 'SogeBot Token Generator';
+    tokenService: keyof typeof urls = 'SogeBot Token Generator';
   @settings('general')
-  tokenServiceCustomClientId = '';
+    tokenServiceCustomClientId = '';
   @settings('general')
-  tokenServiceCustomClientSecret = '';
+    tokenServiceCustomClientSecret = '';
   @settings('general')
-  generalChannel = '';
+    generalChannel = '';
   @settings('general')
-  generalOwners: string[] = [];
+    generalOwners: string[] = [];
 
   @settings('broadcaster')
-  broadcasterAccessToken = '';
+    broadcasterAccessToken = '';
   @settings('broadcaster')
-  broadcasterRefreshToken = '';
+    broadcasterRefreshToken = '';
   @settings('broadcaster')
-  broadcasterId = '';
+    broadcasterId = '';
   @settings('broadcaster')
-  broadcasterUsername = '';
+    broadcasterUsername = '';
   @settings('broadcaster', true)
-  broadcasterExpectedScopes: string[] = [
-    'channel_editor',
-    'chat:read',
-    'chat:edit',
-    'channel:moderate',
-    'channel:read:subscriptions',
-    'user:edit:broadcast',
-    'user:read:broadcast',
-    'channel:edit:commercial',
-    'channel:read:redemptions',
-    'moderation:read',
-    'channel:read:hype_train',
-  ];
+    broadcasterExpectedScopes: string[] = [
+      'channel_editor',
+      'chat:read',
+      'chat:edit',
+      'channel:moderate',
+      'channel:read:subscriptions',
+      'user:edit:broadcast',
+      'user:read:broadcast',
+      'channel:edit:commercial',
+      'channel:read:redemptions',
+      'moderation:read',
+      'channel:read:hype_train',
+    ];
   @settings('broadcaster')
-  broadcasterCurrentScopes: string[] = [];
+    broadcasterCurrentScopes: string[] = [];
 
   @settings('bot')
-  botAccessToken = '';
+    botAccessToken = '';
   @settings('bot')
-  botRefreshToken = '';
+    botRefreshToken = '';
   @settings('bot')
-  botId = '';
+    botId = '';
   @settings('bot')
-  botUsername = '';
+    botUsername = '';
   @settings('bot', true)
-  botExpectedScopes: string[] = [
-    'clips:edit',
-    'user:edit:broadcast',
-    'user:read:broadcast',
-    'chat:read',
-    'chat:edit',
-    'channel:moderate',
-    'whispers:read',
-    'whispers:edit',
-    'channel:edit:commercial',
-  ];
+    botExpectedScopes: string[] = [
+      'clips:edit',
+      'user:edit:broadcast',
+      'user:read:broadcast',
+      'chat:read',
+      'chat:edit',
+      'channel:moderate',
+      'whispers:read',
+      'whispers:edit',
+      'channel:edit:commercial',
+    ];
   @settings('bot')
-  botCurrentScopes: string[] = [];
+    botCurrentScopes: string[] = [];
 
   @settings('eventsub')
-  useTunneling = false;
+    useTunneling = false;
   @settings('eventsub')
-  domain = '';
+    domain = '';
   @settings('eventsub')
-  eventSubClientId = '';
+    eventSubClientId = '';
   @settings('eventsub')
-  eventSubClientSecret = '';
+    eventSubClientSecret = '';
   @settings('eventsub')
-  eventSubEnabledSubscriptions: string[] = [];
+    eventSubEnabledSubscriptions: string[] = [];
   @persistent()
-  appToken = '';
+    appToken = '';
   @persistent()
-  secret = '';
+    secret = '';
 
   constructor() {
     super();

@@ -3,9 +3,9 @@ import { Field, ObjectType } from 'type-graphql';
 @ObjectType()
 export class LoadStandardProfanityListObject {
   @Field()
-  cs: boolean;
+    cs: boolean;
   @Field()
-  en: boolean;
+    en: boolean;
   @Field()
-  ru: boolean;
+    ru: boolean;
 }

@@ -5,11 +5,11 @@ import {
 @ObjectType()
 export class CustomizationPositionObject {
   @Field(type => Float)
-  x: number;
+    x: number;
   @Field(type => Float)
-  y: number;
+    y: number;
   @Field(type => String)
-  anchorX: 'left' | 'middle' | 'right';
+    anchorX: 'left' | 'middle' | 'right';
   @Field(type => String)
-  anchorY: 'top' | 'middle' | 'bottom';
+    anchorY: 'top' | 'middle' | 'bottom';
 }

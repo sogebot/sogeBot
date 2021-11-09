@@ -5,9 +5,9 @@ import {
 @ObjectType()
 export class OverlayWordcloudOptionsFontObject {
   @Field()
-  family: string;
+    family: string;
   @Field(type => String)
-  color: string;
+    color: string;
   @Field(type => Int)
-  weight: number;
+    weight: number;
 }

@@ -6,7 +6,7 @@ class ResponsiveVoice extends Integration {
   _enabled = null; // cannot be enabled / disabled
 
   @settings('api')
-  key = '';
+    key = '';
 }
 
 export default new ResponsiveVoice();

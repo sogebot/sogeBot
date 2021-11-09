@@ -8,21 +8,21 @@ type OverlayMapperCountdownOptions = NonNullable<OverlayMapperCountdown['opts']>
 @ObjectType()
 export class OverlayCountdownOptionsObject implements OverlayMapperCountdownOptions {
   @Field(type => String)
-  time: number;
+    time: number;
   @Field(type => String)
-  currentTime: number;
+    currentTime: number;
   @Field()
-  isPersistent: boolean;
+    isPersistent: boolean;
   @Field()
-  isStartedOnSourceLoad: boolean;
+    isStartedOnSourceLoad: boolean;
   @Field()
-  messageWhenReachedZero: string;
+    messageWhenReachedZero: string;
   @Field()
-  showMessageWhenReachedZero: boolean;
+    showMessageWhenReachedZero: boolean;
   @Field()
-  showMilliseconds: boolean;
+    showMilliseconds: boolean;
   @Field(type => CustomizationFontObject)
-  countdownFont: CustomizationFontObject<undefined, string>;
+    countdownFont: CustomizationFontObject<undefined, string>;
   @Field(type => CustomizationFontObject)
-  messageFont: CustomizationFontObject<undefined, string>;
+    messageFont: CustomizationFontObject<undefined, string>;
 }

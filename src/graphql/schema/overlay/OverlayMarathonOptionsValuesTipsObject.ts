@@ -5,9 +5,9 @@ import {
 @ObjectType()
 export class OverlayMarathonOptionsValuesTipsObject {
   @Field()
-  addFraction: boolean;
+    addFraction: boolean;
   @Field(type => Int)
-  tips: number;
+    tips: number;
   @Field(type => String)
-  time: number;
+    time: number;
 }
