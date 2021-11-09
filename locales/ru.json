@@ -5,7 +5,7 @@
     "disabled": "выключено",
     "usage": "Использование",
     "lang-selected": "Язык бота в настоящее время установлен на русский",
-    "refresh-panel": "You will need to refresh UI to see changes.",
+    "refresh-panel": "Вам нужно обновить пользовательский интерфейс, чтобы увидеть изменения.",
     "command-parse": "Извините, $sender, но эта команда не верна, используйте",
     "error": "Извините, $sender, но что-то пошло не так!",
     "no-response": "",
@@ -30,7 +30,7 @@
     "messages": "сообщение|4:сообщения|сообщений",
     "bits": "бит|битсов",
     "links": "ссылка|ссылки",
-    "entries": "entry|entries",
+    "entries": "запись|записи",
     "empty": "пусто",
     "isRegistered": "$sender, вы не можете использовать !$keyword, потому что уже используется для другого действия!"
   },
@@ -43,14 +43,14 @@
     "loading": "Загрузка",
     "this-may-take-a-while": "Это <strong>может</strong> занять некоторое время",
     "display-as": "Отображать как",
-    "go-to-admin": "Go to Admin",
-    "go-to-public": "Go to Public",
-    "logout": "Logout",
-    "popout": "Popout",
-    "not-logged-in": "Not logged in",
-    "remove-widget": "Remove <strong>$name</strong> widget",
-    "join-channel": "Join bot to channel",
-    "leave-channel": "Leave bot from channel",
+    "go-to-admin": "Перейти к администратору",
+    "go-to-public": "Перейти к публичному",
+    "logout": "Выйти",
+    "popout": "Открыть в новом окне",
+    "not-logged-in": "Вход не выполнен",
+    "remove-widget": "Удалить <strong>$name</strong> виджет",
+    "join-channel": "Присоединиться к боту на канал",
+    "leave-channel": "Покинуть бота из канала",
     "set-default": "Установить по умолчанию",
     "add": "Добавить",
     "placeholders": {
@@ -86,7 +86,7 @@
       "dialog": {
         "timer": "Таймер",
         "name": "Название",
-        "tickOffline": "Should tick if stream offline",
+        "tickOffline": "Отметить если трансляция оффлайн",
         "interval": "Интервал",
         "responses": "Ответы",
         "messages": "Срабатывать каждое X сообщение",
@@ -170,14 +170,14 @@
       },
       "definitions": {
         "taskId": {
-          "label": "Task ID"
+          "label": "ID задачи"
         },
         "filter": {
-          "label": "Filter"
+          "label": "Фильтр"
         },
         "linkFilter": {
           "label": "Link Overlay Filter",
-          "placeholder": "If using overlay, add link or id of your overlay"
+          "placeholder": "При использовании наложения, добавить ссылку или идентификатор наложения"
         },
         "hashtag": {
           "label": "Хэштег или Ключевое слово",
@@ -237,8 +237,8 @@
           "placeholder": "Установите ваше сообщение"
         },
         "channel": {
-          "label": "Channel",
-          "placeholder": "Channelname or ID"
+          "label": "Канал",
+          "placeholder": "Название или ID канала"
         },
         "commandToRun": {
           "label": "Команда для запуска",
@@ -284,7 +284,7 @@
           "placeholder": ""
         },
         "value": {
-          "label": "Value",
+          "label": "Значение",
           "placeholder": ""
         },
         "numberToDecrement": {
@@ -313,13 +313,13 @@
     },
     "responses": {
       "variable": {
-        "goal": "Goal",
-        "total": "Total",
-        "lastContributionTotal": "Last Contribution - Total",
+        "goal": "Цель",
+        "total": "Всего",
+        "lastContributionTotal": "Последний взнос - Всего",
         "lastContributionType": "Last Contribution - Type",
-        "lastContributionUserId": "Last Contribution - User ID",
-        "lastContributionUsername": "Last Contribution - Username",
-        "level": "Level",
+        "lastContributionUserId": "Последний вклад - ID пользователя",
+        "lastContributionUsername": "Последний вклад - ID пользователя",
+        "level": "Уровень",
         "topContributionsBitsTotal": "Top Bits Contribution - Total",
         "topContributionsBitsUserId": "Top Bits Contribution - User ID",
         "topContributionsBitsUsername": "Top Bits Contribution - Username",
@@ -438,8 +438,8 @@
         "haveParam": "Есть параметр команды? (bool)",
         "source": "Current source (twitch or discord)",
         "userInput": "User input during reward redeem",
-        "isBotSubscriber": "Is bot subscriber (bool)",
-        "isStreamOnline": "Is stream online (bool)",
+        "isBotSubscriber": "Является подписчиком бота (bool)",
+        "isStreamOnline": "Трансляция онлайн (бул)",
         "is": {
           "moderator": "Пользователь модератор? (bool)",
           "subscriber": "Пользователь сабскрайбер? (bool)",
@@ -490,7 +490,7 @@
         "messages": "Сообщения",
         "follows": "Подписки",
         "subs": "Сабы & Ресабы",
-        "cheers": "Bits",
+        "cheers": "Битсы",
         "responses": "Ответы бота",
         "whispers": "Висперсы",
         "bans": "Баны",
@@ -655,7 +655,7 @@
     "roll-a-winner": "Выбрать победителя",
     "send-message": "Отправить сообщение",
     "messages": "Сообщения",
-    "level": "Level",
+    "level": "Уровень",
     "announce-every": "Объявить каждые",
     "create": "Создать",
     "cooldown": "Кулдаун",
@@ -734,7 +734,7 @@
     "create-and-use-a-new-game": "Создать и использовать новую игру",
     "create-and-use-a-new-title": "Создать и использовать новый заголовок",
     "search-tags": "Поиск доступных тегов (некоторые теги игры могут отсутствовать / твитч политика)",
-    "no-options-found-for-this-search": "No options found for this search.",
+    "no-options-found-for-this-search": "По запросу ничего не найдено.",
     "followers-show-number": "Показать",
     "followers-show": "подписчики",
     "eventlist-overflow-height": "Макс. высота виджета",

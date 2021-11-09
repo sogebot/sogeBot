@@ -52,5 +52,8 @@
   "luck": "Štěstí",
   "lists": "Seznamy",
   "me": "!me",
-  "emotes_combo": "Kombo emotů"
+  "emotes_combo": "Kombo emotů",
+  "tmi": "tmi",
+  "oauth": "oauth",
+  "eventsub": "eventsub"
 }
