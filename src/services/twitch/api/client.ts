@@ -5,6 +5,17 @@ import { warning } from '../../../helpers/log.js';
 
 import { variables } from '~/watchers';
 
+const clients = {
+  bot: {
+    client: null as null | ApiClient,
+    token:  '',
+  },
+  broadcaster: {
+    client: null as null | ApiClient,
+    token:  '',
+  },
+};
+
 const client = async (account: 'broadcaster' | 'bot') => {
   const clientId = variables.get(`services.twitch.${account}ClientId`) as string;
   const accessToken = variables.get(`services.twitch.${account}AccessToken`) as string;
@@ -24,8 +35,18 @@ const client = async (account: 'broadcaster' | 'bot') => {
   if (!isValidToken) {
     throw new Error(`Cannot initialize Twitch API, ${account} token invalid.`);
   }
-  const authProvider = new StaticAuthProvider(clientId, accessToken);
-  return new ApiClient({ authProvider });
+
+  if (clients[account].token !== accessToken) {
+    clients[account].token = accessToken;
+    const authProvider = new StaticAuthProvider(clientId, accessToken);
+    clients[account].client = new ApiClient({ authProvider });
+  }
+
+  if(clients[account].client) {
+    return clients[account].client as ApiClient;
+  } else {
+    throw new Error('Client for ' + account + ' is not initialized.');
+  }
 };
 
 export default client;
