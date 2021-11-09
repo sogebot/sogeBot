@@ -6,7 +6,7 @@ ENV NODE_ENV production
 ENV ENV production
 
 RUN apt-get update
-RUN apt-get install -y build-essential nasm libtool make bash git python autoconf
+RUN apt-get install -y build-essential nasm libtool make bash git python autoconf python3
 
 # cwebp error while loading shared libraries: libGL.so.1: cannot open shared object file: No such file or directory
 RUN apt-get install -y libglu1 libxi6
