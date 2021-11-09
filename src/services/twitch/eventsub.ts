@@ -202,6 +202,7 @@ class EventSub {
 
     try {
       // check if domain is available in https mode
+      info(`EVENTSUB: Checking initial bot responding on ${useTunneling ? this.tunnelDomain : 'https://' + domain}/webhooks/callback`);
       await axios.get<any>(`${useTunneling ? this.tunnelDomain : 'https://' + domain}/webhooks/callback`, { headers: { 'sogebot-test': 'true' } });
     } catch (e) {
       if (!isErrorEventsShown) {
@@ -267,8 +268,10 @@ class EventSub {
           } else {
             const enabledSubscriptions = variables.get('services.twitch.eventSubEnabledSubscriptions') as string[];
             if (!enabledSubscriptions.includes(event)) {
+              info(`EVENTSUB: Subscribed to ${event}.`);
               enabledSubscriptions.push(event);
             }
+            emitter.emit('set', '/services/twitch', 'eventSubEnabledSubscriptions', enabledSubscriptions);
           }
         }
 
