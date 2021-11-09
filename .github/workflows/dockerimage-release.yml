@@ -95,3 +95,5 @@ jobs:
           tags: |
             sogebot/release:latest
             sogebot/release:${{ steps.get_version.outputs.VERSION }}
+            ghcr.io/sogehige/sogebot/nightly:latest
+            ghcr.io/sogehige/sogebot/nightly:${{ github.sha }} 

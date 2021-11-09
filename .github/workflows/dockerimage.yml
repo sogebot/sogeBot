@@ -71,3 +71,5 @@ jobs:
           tags: |
             sogebot/nightly:latest
             sogebot/nightly:${{ github.sha }}
+            ghcr.io/sogehige/sogebot/nightly:latest
+            ghcr.io/sogehige/sogebot/nightly:${{ github.sha }}
