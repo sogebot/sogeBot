@@ -6,7 +6,7 @@ ENV NODE_ENV production
 ENV ENV production
 
 RUN apt-get update
-RUN apt-get install -y build-essential nasm libtool make bash git autoconf wget zlib1g-dev python
+RUN apt-get install -y build-essential nasm libtool make bash git autoconf wget zlib1g-dev python3
 
 # Copy source code
 COPY . /app
