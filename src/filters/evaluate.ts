@@ -1,20 +1,21 @@
 import crypto from 'crypto';
 
+import { User } from '@entity/user';
+import { UserInterface } from '@entity/user';
 import axios, { AxiosResponse } from 'axios';
 import { isNil, sample } from 'lodash';
 import _ from 'lodash';
 import safeEval from 'safe-eval';
 import { getRepository } from 'typeorm';
 
-import tmi from '../chat';
-import { User } from '../database/entity/user';
-import { UserInterface } from '../database/entity/user';
-import * as changelog from '../helpers/user/changelog.js';
-import { isIgnored } from '../helpers/user/isIgnored';
-import oauth from '../oauth';
+import twitch from '../services/twitch';
 import users from '../users';
 
 import type { ResponseFilter } from '.';
+
+import * as changelog from '~/helpers/user/changelog.js';
+import { isIgnored } from '~/helpers/user/isIgnored';
+import { variables } from '~/watchers';
 
 const evaluate: ResponseFilter = {
   '(eval#)': async function (filter, attr) {
@@ -55,9 +56,11 @@ const evaluate: ResponseFilter = {
 
     if (containOnline) {
       await changelog.flush();
+      const botUsername = variables.get('services.twitch.botUsername') as string;
+      const broadcasterUsername = variables.get('services.twitch.broadcasterUsername') as string;
       const viewers = (await getRepository(User).createQueryBuilder('user')
-        .where('user.userName != :botusername', { botusername: oauth.botUsername.toLowerCase() })
-        .andWhere('user.userName != :broadcasterusername', { broadcasterusername: oauth.broadcasterUsername.toLowerCase() })
+        .where('user.userName != :botusername', { botusername: botUsername.toLowerCase() })
+        .andWhere('user.userName != :broadcasterusername', { broadcasterusername: broadcasterUsername.toLowerCase() })
         .andWhere('user.isOnline = :isOnline', { isOnline: true })
         .getMany()).filter(o => {
         return isIgnored({ userName: o.userName, userId: o.userId });
@@ -98,7 +101,7 @@ const evaluate: ResponseFilter = {
       users:  allUsers,
       is:     is,
       random: randomVar,
-      sender: tmi.showWithAt ? `@${attr.sender.userName}` : `${attr.sender.userName}`,
+      sender: twitch.showWithAt ? `@${attr.sender.userName}` : `${attr.sender.userName}`,
       param:  typeof attr.param === 'undefined'  ? null : attr.param,
       url:    {},
     };

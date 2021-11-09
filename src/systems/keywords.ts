@@ -1,27 +1,28 @@
+import {
+  Keyword, KeywordGroup, KeywordGroupInterface, KeywordInterface, KeywordsResponsesInterface,
+} from '@entity/keyword';
 import _ from 'lodash';
 import { getRepository } from 'typeorm';
 import XRegExp from 'xregexp';
 
 import { parserReply } from '../commons';
 import {
-  Keyword, KeywordGroup, KeywordGroupInterface, KeywordInterface, KeywordsResponsesInterface,
-} from '../database/entity/keyword';
-import {
   command, default_permission, helper, parser, timer,
 } from '../decorators';
 import Expects from '../expects';
-import { checkFilter } from '../helpers/checkFilter';
-import { isUUID, prepare } from '../helpers/commons';
+import System from './_interface';
+
+import { checkFilter } from '~/helpers/checkFilter';
+import { isUUID, prepare } from '~/helpers/commons';
 import {
   debug, error, warning,
-} from '../helpers/log';
+} from '~/helpers/log';
 import {
   addToViewersCache, get, getFromViewersCache,
-} from '../helpers/permissions';
-import { check, defaultPermissions } from '../helpers/permissions/';
-import { adminEndpoint } from '../helpers/socket';
-import { translate } from '../translate';
-import System from './_interface';
+} from '~/helpers/permissions';
+import { check, defaultPermissions } from '~/helpers/permissions/index';
+import { adminEndpoint } from '~/helpers/socket';
+import { translate } from '~/translate';
 
 class Keywords extends System {
   constructor() {

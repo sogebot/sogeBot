@@ -17,7 +17,7 @@ describe('Message - https://discordapp.com/channels/317348946144002050/619437014
   });
 
   it('call !media directly with regular viewer should send permission error', async () => {
-    const parse = new Parser({ sender: user.owner, message: '!media type=video', skip: false, quiet: false });
+    const parse = new Parser({ sender: user.viewer, message: '!media type=video', skip: false, quiet: false });
     const r = await parse.process();
     assert.strictEqual(r[0].response, 'You don\'t have enough permissions for \'!media type=video\'');
   });
@@ -37,7 +37,7 @@ describe('Message - https://discordapp.com/channels/317348946144002050/619437014
   });
 
   it('call !media directly with regular viewer should send permission error', async () => {
-    const parse = new Parser({ sender: user.owner, message: '!media type=video2', skip: false, quiet: false });
+    const parse = new Parser({ sender: user.viewer, message: '!media type=video2', skip: false, quiet: false });
     const r = await parse.process();
     assert.strictEqual(r[0].response, 'You don\'t have enough permissions for \'!media type=video2\'');
   });

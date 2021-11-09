@@ -1,31 +1,30 @@
 import { setTimeout } from 'timers';
 
 import { HOUR } from '@sogebot/ui-helpers/constants';
-import axios from 'axios';
 import {
   Brackets, FindOneOptions, getConnection, getRepository, IsNull,
 } from 'typeorm';
 
-import Core from './_interface';
-import api from './api';
-import currency from './currency';
-import { Permissions } from './database/entity/permissions';
+import client from './services/twitch/api/client';
+
+import Core from '~/_interface';
+import currency from '~/currency';
+import { Permissions } from '~/database/entity/permissions';
 import {
   User, UserBit, UserInterface, UserTip,
-} from './database/entity/user';
-import { onStartup } from './decorators/on';
-import { isStreamOnline, stats } from './helpers/api';
-import { mainCurrency } from './helpers/currency';
+} from '~/database/entity/user';
+import { onStartup } from '~/decorators/on';
+import { isStreamOnline, stats } from '~/helpers/api';
+import { mainCurrency } from '~/helpers/currency';
 import {
   debug, error, isDebugEnabled,
-} from './helpers/log';
-import { channelId } from './helpers/oauth';
-import { recacheOnlineUsersPermission } from './helpers/permissions';
-import { defaultPermissions, getUserHighestPermission } from './helpers/permissions/';
-import { adminEndpoint, viewerEndpoint } from './helpers/socket';
-import * as changelog from './helpers/user/changelog.js';
-import { getIdFromTwitch } from './microservices/getIdFromTwitch';
-import oauth from './oauth';
+} from '~/helpers/log';
+import { recacheOnlineUsersPermission } from '~/helpers/permissions';
+import { defaultPermissions, getUserHighestPermission } from '~/helpers/permissions/index';
+import { adminEndpoint, viewerEndpoint } from '~/helpers/socket';
+import * as changelog from '~/helpers/user/changelog.js';
+import { getIdFromTwitch } from '~/services/twitch/calls/getIdFromTwitch';
+import { variables } from '~/watchers';
 
 class Users extends Core {
   constructor () {
@@ -60,18 +59,19 @@ class Users extends Core {
           .having('count > 1');
       }
       const viewers = await query.getRawMany();
+      const clientBot = await client('bot');
       await Promise.all(viewers.map(async (duplicate) => {
         const userName = duplicate.user_username;
         const duplicates = await getRepository(User).find({ userName });
         await Promise.all(duplicates.map(async (user) => {
           try {
-            const newUsername = await api.getUsernameFromTwitch(user.userId);
-            if (newUsername === null) {
+            const getUserById = await clientBot.users.getUserById(user.userId);
+            if (!getUserById) {
               throw new Error('unknown');
             }
-            if (newUsername !== userName) {
-              changelog.update(user.userId, { userName: newUsername });
-              debug('users', `Duplicate username ${user.userName}#${user.userId} changed to ${newUsername}#${user.userId}`);
+            if (getUserById.name !== userName) {
+              changelog.update(user.userId, { userName: getUserById.name });
+              debug('users', `Duplicate username ${user.userName}#${user.userId} changed to ${getUserById.name}#${user.userId}`);
             }
           } catch (e: any) {
             // we are tagging user as __AnonymousUser__, we don't want to get rid of all information
@@ -80,8 +80,12 @@ class Users extends Core {
           }
         }));
       }));
-    } catch(e: any) {
-      error(e);
+    } catch(e) {
+      if (e instanceof Error) {
+        if (e.message !== 'Cannot initialize Twitch API, bot token invalid.') {
+          error(e.stack ?? e.message);
+        }
+      }
     } finally {
       setTimeout(() => this.checkDuplicateUsernames(), HOUR);
     }
@@ -202,10 +206,11 @@ class Users extends Core {
   async getNameById (userId: string): Promise<string> {
     const user = await await changelog.get(userId);
     if (!user) {
-      const userName = await api.getUsernameFromTwitch(userId);
-      if (userName) {
-        changelog.update(userId, { userName });
-        return userName;
+      const clientBot = await client('bot');
+      const getUserById = await clientBot.users.getUserById(userId);
+      if (getUserById) {
+        changelog.update(userId, { userName: getUserById.name });
+        return getUserById.name;
       } else {
         throw new Error('Cannot get username for userId ' + userId);
       }
@@ -432,7 +437,7 @@ class Users extends Core {
 
         const viewers = await query.getRawMany();
 
-        const levels = require('./systems/levels').default;
+        const levels = require('~/systems/levels').default;
         for (const viewer of viewers) {
           // add level to user
           viewer.extra = JSON.parse(viewer.extra);
@@ -460,25 +465,13 @@ class Users extends Core {
     });
     adminEndpoint(this.nsp, 'viewers::followedAt', async (id, cb) => {
       try {
-        const cid = channelId.value;
-        const url = `https://api.twitch.tv/helix/users/follows?from_id=${id}&to_id=${cid}`;
-
-        const token = oauth.botAccessToken;
-        if (token === '') {
-          cb(new Error('no token available'), null);
-        }
-
-        const request = await axios.get<any>(url, {
-          headers: {
-            'Accept':        'application/vnd.twitchtv.v5+json',
-            'Authorization': 'Bearer ' + token,
-            'Client-ID':     oauth.botClientId,
-          },
-        });
-        if (request.data.total === 0) {
+        const clientBot = await client('bot');
+        const channelId = variables.get('services.twitch.channelId') as string;
+        const getFollows = await clientBot.users.getFollows({ followedUser: channelId, user: id });
+        if (getFollows.total === 0) {
           throw new Error('Not a follower');
         } else {
-          cb(null, new Date(request.data.data[0].followed_at).getTime());
+          cb(null, new Date(getFollows.data[0].followDate).getTime());
         }
       } catch (e: any) {
         cb(e.stack, null);

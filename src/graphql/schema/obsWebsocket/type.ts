@@ -2,7 +2,7 @@ import {
   Field, ID, ObjectType,
 } from 'type-graphql';
 
-import { Type as SourceType, TypeCaps as TypeCaps2 } from '../../../helpers/obswebsocket/sources';
+import { Type as SourceType, TypeCaps as TypeCaps2 } from '~/helpers/obswebsocket/sources';
 
 @ObjectType()
 class TypeCaps implements TypeCaps2 {

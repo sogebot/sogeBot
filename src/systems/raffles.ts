@@ -1,31 +1,32 @@
 'use strict';
 
+import {
+  Raffle, RaffleParticipant, RaffleParticipantInterface, RaffleParticipantMessageInterface,
+} from '@entity/raffle';
+import { User } from '@entity/user';
 import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized';
 import * as _ from 'lodash';
 import { getRepository } from 'typeorm';
 
-import tmi from '../chat';
-import {
-  Raffle, RaffleParticipant, RaffleParticipantInterface, RaffleParticipantMessageInterface,
-} from '../database/entity/raffle';
-import { User } from '../database/entity/user';
 import {
   command, default_permission, parser, settings, timer,
 } from '../decorators';
 import { onStartup } from '../decorators/on';
-import { isStreamOnline } from '../helpers/api';
+import System from './_interface';
+
+import { isStreamOnline } from '~/helpers/api';
 import {
   announce, getOwnerAsSender, prepare,
-} from '../helpers/commons';
-import { isDbConnected } from '../helpers/database';
-import { debug, warning } from '../helpers/log';
-import { linesParsed } from '../helpers/parser';
-import { defaultPermissions } from '../helpers/permissions/';
-import { adminEndpoint } from '../helpers/socket';
-import * as changelog from '../helpers/user/changelog.js';
-import { translate } from '../translate';
-import System from './_interface';
-import points from './points';
+} from '~/helpers/commons';
+import { isDbConnected } from '~/helpers/database';
+import { debug, warning } from '~/helpers/log';
+import { linesParsed } from '~/helpers/parser';
+import { defaultPermissions } from '~/helpers/permissions/index';
+import { adminEndpoint } from '~/helpers/socket';
+import { tmiEmitter } from '~/helpers/tmi';
+import * as changelog from '~/helpers/user/changelog.js';
+import points from '~/systems/points';
+import { translate } from '~/translate';
 
 const TYPE_NORMAL = 0;
 const TYPE_TICKETS = 1;
@@ -417,7 +418,7 @@ class Raffles extends System {
       return true;
     }
     if (this.deleteRaffleJoinCommands) {
-      tmi.delete('bot', opts.id);
+      tmiEmitter.emit('delete', 'bot', opts.id);
     }
 
     opts.message = opts.message.toString().replace(raffle.keyword, '');

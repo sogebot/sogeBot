@@ -11,7 +11,6 @@ const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 const time = require('../../general.js').time;
 const polls = (require('../../../dest/systems/polls')).default;
-const tmi = (require('../../../dest/chat')).default;
 
 const { getRepository } = require('typeorm');
 const { getLocalizedName } = require('@sogebot/ui-helpers/getLocalized');
@@ -92,6 +91,8 @@ describe('Polls - bits - @func2', () => {
       for (const o of [1,2]) {
         for (let i = 0; i < 10; i++) {
           const user = 'user' + [o, i].join('');
+          const TMI = require('../../../dest/services/twitch/chat').default;
+          const tmi = new TMI();
           await tmi.cheer({
             userName:  user,
             userId: String(Math.floor(Math.random() * 100000)),

@@ -1,8 +1,8 @@
+import { Settings } from '@entity/settings';
 import DeepProxy from 'proxy-deep';
 import { EntityNotFoundError } from 'typeorm';
 import { getRepository } from 'typeorm';
 
-import { Settings } from '../../database/entity/settings';
 import { IsLoadingInProgress, toggleLoadingInProgress } from '../../decorators';
 import { isDbConnected } from '../database';
 import { debug } from '../log';

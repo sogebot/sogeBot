@@ -1,8 +1,9 @@
 import {
   command, default_permission,
 } from '../decorators';
-import { defaultPermissions } from '../helpers/permissions/';
 import Overlay from './_interface';
+
+import { defaultPermissions } from '~/helpers/permissions/index';
 
 class TextToSpeech extends Overlay {
   @command('!tts')

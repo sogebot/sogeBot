@@ -1,6 +1,4 @@
-import type { StreamEndpoint } from '../../api';
 import { getFunctionList } from '../../decorators/on';
-import { getGameNameFromId } from '../../microservices/getGameNameFromId';
 import { chatMessagesAtStart, streamType } from '../api';
 import { isStreamOnline } from '../api/isStreamOnline';
 import { setCurrentRetries } from '../api/retries';
@@ -11,13 +9,17 @@ import { eventEmitter } from '../events/emitter';
 import {
   error, start as startLog, stop,
 } from '../log';
-import { channelId } from '../oauth';
 import { linesParsed } from '../parser';
 import { find } from '../register';
 
-async function start(data: StreamEndpoint['data'][number]) {
+import { HelixStream } from '~/../node_modules/@twurple/api/lib';
+import { getGameNameFromId } from '~/services/twitch/calls/getGameNameFromId';
+import { variables } from '~/watchers';
+
+async function start(data: HelixStream) {
+  const channelId = variables.get('services.twitch.channelId') as string;
   startLog(
-    `id: ${data.id} | startedAt: ${data.started_at} | title: ${data.title} | game: ${await getGameNameFromId(Number(data.game_id))} | type: ${data.type} | channel ID: ${channelId.value}`,
+    `id: ${data.id} | startedAt: ${data.startDate.toISOString()} | title: ${data.title} | game: ${await getGameNameFromId(Number(data.gameId))} | type: ${data.type} | channel ID: ${channelId}`,
   );
 
   // reset quick stats on stream start
@@ -29,7 +31,7 @@ async function start(data: StreamEndpoint['data'][number]) {
   stats.value.currentTips = 0;
   chatMessagesAtStart.value = linesParsed;
 
-  streamStatusChangeSince.value = new Date(data.started_at).getTime();
+  streamStatusChangeSince.value = new Date(data.startDate).getTime();
   streamId.value = data.id;
   streamType.value = data.type;
   isStreamOnline.value = true;

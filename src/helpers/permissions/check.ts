@@ -1,13 +1,11 @@
+import { Permissions, PermissionsInterface } from '@entity/permissions';
 import _ from 'lodash';
 import { getRepository, LessThan } from 'typeorm';
 
-import { Permissions, PermissionsInterface } from '../../database/entity/permissions';
 import { areDecoratorsLoaded } from '../../decorators';
-import { getBroadcaster } from '../getBroadcaster';
 import {
   debug, error, warning,
 } from '../log';
-import { generalOwners } from '../oauth/generalOwners';
 import {
   isFollower, isOwner, isSubscriber, isVIP,
 } from '../user';
@@ -16,7 +14,9 @@ import { isBot } from '../user/isBot';
 import { isBroadcaster } from '../user/isBroadcaster';
 import { isModerator } from '../user/isModerator';
 import { defaultPermissions } from './defaultPermissions';
-import { filters } from './filters';
+
+import { filters } from '~/helpers/permissions/filters';
+import { variables } from '~/watchers';
 
 let isWarnedAboutCasters = false;
 
@@ -35,7 +35,10 @@ async function check(userId: string, permId: string, partial = false): Promise<{
     });
   }
 
-  if (generalOwners.value.filter(o => typeof o === 'string' && o.trim().length > 0).length === 0 && getBroadcaster() === '' && !isWarnedAboutCasters) {
+  const broadcasterUsername = variables.get('services.twitch.broadcasterUsername') as string;
+  const generalOwners = variables.get('services.twitch.generalOwners') as string[];
+
+  if (generalOwners.filter(o => typeof o === 'string' && o.trim().length > 0).length === 0 && broadcasterUsername === '' && !isWarnedAboutCasters) {
     isWarnedAboutCasters = true;
     warning('Owners or broadcaster oauth is not set, all users are treated as CASTERS!!!');
     const pItem = await getRepository(Permissions).findOne({ id: defaultPermissions.CASTERS });
@@ -82,7 +85,7 @@ async function check(userId: string, permId: string, partial = false): Promise<{
         shouldProceed = true;
         break;
       case 'casters':
-        if (generalOwners.value.filter(o => typeof o === 'string').length === 0 && getBroadcaster() === '') {
+        if (generalOwners.filter(o => typeof o === 'string').length === 0 && broadcasterUsername === '') {
           shouldProceed = true;
         } else {
           shouldProceed = isBot(user) || isBroadcaster(user) || isOwner(user);

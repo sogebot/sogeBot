@@ -21,7 +21,7 @@ describe('Commons - @func2 - #3620 - announce is not parsing message filters', (
 
   it('Announce() should have propery parsed filters', async () => {
     announce('Prikazy bota: !klip, !me, !heist, (list.!command), (list.!alias)', 'general');
-    await message.isSentRaw('Prikazy bota: !klip, !me, !heist, !testCmd, !testAlias', 'bot', 20000);
+    await message.isSentRaw('Prikazy bota: !klip, !me, !heist, !testCmd, !testAlias', '__bot__', 20000);
 
   });
 });

@@ -11,7 +11,7 @@ const { getRepository } = require('typeorm');
 const { User } = require('../../../dest/database/entity/user');
 const { Settings } = require('../../../dest/database/entity/settings');
 
-const tmi = (require('../../../dest/chat')).default;
+const twitch = (require('../../../dest/services/twitch')).default;
 
 // users
 const owner = { userName: '__broadcaster__' };
@@ -28,8 +28,8 @@ describe('TMI - ignore - @func3', () => {
     await db.cleanup();
     await message.prepare();
 
-    tmi.globalIgnoreListExclude = [];
-    tmi.ignorelist = [];
+    twitch.globalIgnoreListExclude = [];
+    twitch.ignorelist = [];
 
     await getRepository(User).save(testuser);
     await getRepository(User).save(testuser2);
@@ -46,7 +46,7 @@ describe('TMI - ignore - @func3', () => {
     });
 
     it ('exclude botwithchangedname from ignore list', async () => {
-      tmi.globalIgnoreListExclude = [botwithchangedname.userId];
+      twitch.globalIgnoreListExclude = [botwithchangedname.userId];
     });
 
     it ('botwithchangedname should not be ignored anymore', async () => {
@@ -60,21 +60,21 @@ describe('TMI - ignore - @func3', () => {
     });
 
     it('add testuser to ignore list', async () => {
-      const r = await tmi.ignoreAdd({ sender: owner, parameters: 'testuser' });
+      const r = await twitch.ignoreAdd({ sender: owner, parameters: 'testuser' });
       assert.strictEqual(r[0].response, prepare('ignore.user.is.added', { userName: 'testuser' }));
     });
 
     it('add @testuser2 to ignore list', async () => {
-      const r = await tmi.ignoreAdd({ sender: owner, parameters: '@testuser2' });
+      const r = await twitch.ignoreAdd({ sender: owner, parameters: '@testuser2' });
       assert.strictEqual(r[0].response, prepare('ignore.user.is.added', { userName: 'testuser2' }));
     });
 
     it('testuser should be in ignore list', async () => {
-      const r = await tmi.ignoreCheck({ sender: owner, parameters: 'testuser' });
+      const r = await twitch.ignoreCheck({ sender: owner, parameters: 'testuser' });
 
       const item = await getRepository(Settings).findOne({
         where: {
-          namespace: '/core/tmi',
+          namespace: '/services/twitch',
           name: 'ignorelist',
         },
       });
@@ -86,10 +86,10 @@ describe('TMI - ignore - @func3', () => {
     });
 
     it('@testuser2 should be in ignore list', async () => {
-      const r = await tmi.ignoreCheck({ sender: owner, parameters: '@testuser2' });
+      const r = await twitch.ignoreCheck({ sender: owner, parameters: '@testuser2' });
       const item = await getRepository(Settings).findOne({
         where: {
-          namespace: '/core/tmi',
+          namespace: '/services/twitch',
           name: 'ignorelist',
         },
       });
@@ -101,10 +101,10 @@ describe('TMI - ignore - @func3', () => {
     });
 
     it('testuser3 should not be in ignore list', async () => {
-      const r = await tmi.ignoreCheck({ sender: owner, parameters: 'testuser3' });
+      const r = await twitch.ignoreCheck({ sender: owner, parameters: 'testuser3' });
       const item = await getRepository(Settings).findOne({
         where: {
-          namespace: '/core/tmi',
+          namespace: '/services/twitch',
           name: 'ignorelist',
         },
       });
@@ -117,18 +117,18 @@ describe('TMI - ignore - @func3', () => {
     });
 
     it('remove testuser from ignore list', async () => {
-      const r = await tmi.ignoreRm({ sender: owner, parameters: 'testuser' });
+      const r = await twitch.ignoreRm({ sender: owner, parameters: 'testuser' });
       assert.strictEqual(r[0].response, prepare('ignore.user.is.removed', { userName: 'testuser' }));
     });
 
     it('testuser should not be in ignore list', async () => {
-      const r = await tmi.ignoreCheck({ sender: owner, parameters: 'testuser' });
+      const r = await twitch.ignoreCheck({ sender: owner, parameters: 'testuser' });
       assert.strictEqual(r[0].response, prepare('ignore.user.is.not.ignored', { userName: 'testuser' }));
       assert(!(await isIgnored(testuser)));
     });
 
     it('add testuser by id to ignore list', async () => {
-      tmi.ignorelist = [ testuser.userId ];
+      twitch.ignorelist = [ testuser.userId ];
     });
 
     it('user should be ignored by id', async () => {

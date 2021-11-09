@@ -1,7 +1,6 @@
+import { Goal } from '@entity/goal';
+import { Randomizer } from '@entity/randomizer';
 import { MigrationInterface, QueryRunner } from 'typeorm';
-
-import { Goal } from '../../../entity/goal';
-import { Randomizer } from '../../../entity/randomizer';
 
 export class fontMissingShadow1592557005214 implements MigrationInterface {
 

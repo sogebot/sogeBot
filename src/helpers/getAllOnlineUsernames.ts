@@ -1,7 +1,7 @@
+import { User } from '@entity/user';
 import { getRepository } from 'typeorm';
 
-import { User } from '../database/entity/user';
-import * as changelog from '../helpers/user/changelog.js';
+import * as changelog from '~/helpers/user/changelog.js';
 
 export const getAllOnlineUsernames = async () => {
   await changelog.flush();

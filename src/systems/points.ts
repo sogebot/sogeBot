@@ -1,5 +1,7 @@
 'use strict';
 
+import { PointsChangelog } from '@entity/points';
+import { User, UserInterface } from '@entity/user';
 import { MINUTE } from '@sogebot/ui-helpers/constants';
 import { format } from '@sogebot/ui-helpers/number';
 import * as cronparser from 'cron-parser';
@@ -7,8 +9,6 @@ import {
   FindConditions, getConnection, getRepository, LessThanOrEqual,
 } from 'typeorm';
 
-import { PointsChangelog } from '../database/entity/points';
-import { User, UserInterface } from '../database/entity/user';
 import {
   command, default_permission, parser, permission_settings, persistent, settings,
 } from '../decorators';
@@ -17,24 +17,25 @@ import {
 } from '../decorators/on';
 import Expects from '../expects';
 import general from '../general.js';
-import { isStreamOnline } from '../helpers/api';
-import { prepare } from '../helpers/commons';
-import { getAllOnlineIds } from '../helpers/getAllOnlineUsernames';
-import {
-  debug, error, warning,
-} from '../helpers/log';
-import { ParameterError } from '../helpers/parameterError';
-import { getUserHighestPermission } from '../helpers/permissions/';
-import { defaultPermissions } from '../helpers/permissions/';
-import { getPointsName, name } from '../helpers/points/';
-import { adminEndpoint } from '../helpers/socket';
-import * as changelog from '../helpers/user/changelog.js';
-import { isBot, isBotId } from '../helpers/user/isBot';
-import { getIdFromTwitch } from '../microservices/getIdFromTwitch';
-import oauth from '../oauth';
-import { translate } from '../translate';
 import users from '../users';
 import System from './_interface';
+
+import { isStreamOnline } from '~/helpers/api';
+import { prepare } from '~/helpers/commons';
+import { getAllOnlineIds } from '~/helpers/getAllOnlineUsernames';
+import {
+  debug, error, warning,
+} from '~/helpers/log';
+import { ParameterError } from '~/helpers/parameterError';
+import { getUserHighestPermission } from '~/helpers/permissions/index';
+import { defaultPermissions } from '~/helpers/permissions/index';
+import { getPointsName, name } from '~/helpers/points/index';
+import { adminEndpoint } from '~/helpers/socket';
+import * as changelog from '~/helpers/user/changelog.js';
+import { isBot, isBotId } from '~/helpers/user/isBot';
+import { getIdFromTwitch } from '~/services/twitch/calls/getIdFromTwitch';
+import { translate } from '~/translate';
+import { variables } from '~/watchers';
 
 class Points extends System {
   cronTask: any = null;
@@ -436,15 +437,17 @@ class Points extends System {
       }
 
       const connection = await getConnection();
+
+      const broadcasterUsername = variables.get('services.twitch.broadcasterUsername') as string;
       const query = (type: typeof connection.options.type) => {
         switch(type) {
           case 'postgres':
           case 'better-sqlite3':
-            return `SELECT COUNT(*) as "order" FROM "user" WHERE "points" > (SELECT "points" FROM "user" WHERE "userId"='${user?.userId}') AND "userName"!='${oauth.broadcasterUsername}'`;
+            return `SELECT COUNT(*) as "order" FROM "user" WHERE "points" > (SELECT "points" FROM "user" WHERE "userId"='${user?.userId}') AND "userName"!='${broadcasterUsername}'`;
           case 'mysql':
           case 'mariadb':
           default:
-            return `SELECT COUNT(*) as \`order\` FROM \`user\` WHERE \`points\` > (SELECT \`points\` FROM \`user\` WHERE \`userId\`='${user?.userId}') AND "userName"!='${oauth.broadcasterUsername}'`;
+            return `SELECT COUNT(*) as \`order\` FROM \`user\` WHERE \`points\` > (SELECT \`points\` FROM \`user\` WHERE \`userId\`='${user?.userId}') AND "userName"!='${broadcasterUsername}'`;
         }
       };
 
@@ -457,7 +460,7 @@ class Points extends System {
         order = Number(orderQuery[0].order) + 1;
       }
 
-      if (user.userName === oauth.broadcasterUsername) {
+      if (user.userName === broadcasterUsername) {
         order = '?'; // broadcaster is removed from ordering
       }
 

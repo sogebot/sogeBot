@@ -1,9 +1,11 @@
+/* eslint-disable @typescript-eslint/no-empty-function */
 const assert = require('assert');
-const until = require('test-until');
-const chalk = require('chalk');
 const util = require('util');
-const sinon = require('sinon');
+
+const chalk = require('chalk');
 const _ = require('lodash');
+const sinon = require('sinon');
+const until = require('test-until');
 
 let eventSpy;
 
@@ -12,7 +14,7 @@ const log = require('../../dest/helpers/log');
 module.exports = {
   prepare: function () {
     const eventEmitter = (require('../../dest/helpers/events/emitter')).eventEmitter;
-    const tmi = (require('../../dest/chat')).default;
+    const tmi = (require('../../dest/services/twitch/chat')).default;
 
     log.debug('test', chalk.bgRed('*** Restoring all spies ***'));
 
@@ -23,24 +25,24 @@ module.exports = {
 
     tmi.client = {
       bot: {
-        say: function () {},
+        say:           function () {},
         deleteMessage: function() {},
-        color: function () {},
-        timeout: function () {},
-        on: function () {},
-        connect: function () {},
-        join: function () {},
-        part: function () {},
+        color:         function () {},
+        timeout:       function () {},
+        on:            function () {},
+        connect:       function () {},
+        join:          function () {},
+        part:          function () {},
       },
       broadcaster: {
-        say: function () {},
+        say:           function () {},
         deleteMessage: function() {},
-        color: function () {},
-        timeout: function () {},
-        on: function () {},
-        connect: function () {},
-        join: function () {},
-        part: function () {},
+        color:         function () {},
+        timeout:       function () {},
+        on:            function () {},
+        connect:       function () {},
+        join:          function () {},
+        part:          function () {},
       },
     };
 
@@ -77,7 +79,7 @@ module.exports = {
       }
       return setError(
         '\n+\t"' + expected + '"'
-        + '\n-\t\t"' + log.debug.args.join('\n\t\t\t') + '"'
+        + '\n-\t\t"' + log.debug.args.join('\n\t\t\t') + '"',
       );
     }, waitMs);
   },
@@ -199,7 +201,7 @@ module.exports = {
       } catch (err) {
         return setError(
           '\nExpected message:\t"' + expected + '"'
-          + '\nActual message:\t\t"' + log.chatOut.args.join('\n\t\t\t') + '"'
+          + '\nActual message:\t\t"' + log.chatOut.args.join('\n\t\t\t') + '"',
         );
       }
     }, wait || 5000);
@@ -227,7 +229,7 @@ module.exports = {
       } catch (err) {
         return setError(
           '\nExpected message to contain:\t' + expected
-          + '\nActual message:\t\t' + log.chatOut.args.join('\n\t\t\t')
+          + '\nActual message:\t\t' + log.chatOut.args.join('\n\t\t\t'),
         );
       }
     }, wait || 5000);
@@ -242,7 +244,7 @@ module.exports = {
       };
     }
     if (!user) {
-      user = { userName: 'bot' };
+      user = { userName: '__bot__' };
     }
     user = _.cloneDeep(user);
     return until(setError => {
@@ -262,7 +264,7 @@ module.exports = {
       } catch (err) {
         return setError(
           '\nExpected message:\t' + expected + ` [${user.userName}]`
-          + '\nActual message:\t\t' + log.chatOut.args.join('\n\t\t\t')
+          + '\nActual message:\t\t' + log.chatOut.args.join('\n\t\t\t'),
         );
       }
     }, wait || 5000);

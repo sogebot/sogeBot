@@ -1,9 +1,8 @@
+import { Variable, VariableInterface } from '@entity/variable';
 import {
   Arg, Authorized, Query, Resolver,
 } from 'type-graphql';
 import { getRepository } from 'typeorm';
-
-import { Variable, VariableInterface } from '../../database/entity/variable';
 
 @Resolver()
 export class customVariableResolver {

@@ -1,8 +1,7 @@
+import { simpleModeTasks } from '@entity/obswebsocket';
 import {
   Field, ID, ObjectType,
 } from 'type-graphql';
-
-import { simpleModeTasks } from '../../../database/entity/obswebsocket';
 
 @ObjectType()
 export class Recording implements simpleModeTasks.Recording {

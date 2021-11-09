@@ -7,7 +7,8 @@ import express from 'express';
 import { Server as io } from 'socket.io';
 
 import type { Module } from '../_interface';
-import { info } from './log';
+
+import { info } from '~/helpers/log';
 
 export const menu: { category?: string; name: string; id: string; this: Module | null }[] = [];
 export const menuPublic: { name: string; id: string }[] = [];

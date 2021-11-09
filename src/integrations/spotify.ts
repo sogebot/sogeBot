@@ -1,12 +1,12 @@
 import crypto from 'crypto';
 
+import { SpotifySongBan } from '@entity/spotify';
 import { HOUR, SECOND } from '@sogebot/ui-helpers/constants';
 import chalk from 'chalk';
 import _ from 'lodash';
 import SpotifyWebApi from 'spotify-web-api-node';
 import { getRepository } from 'typeorm';
 
-import { SpotifySongBan } from '../database/entity/spotify';
 import {
   command, default_permission, persistent, settings,
 } from '../decorators';
@@ -14,14 +14,15 @@ import {
   onChange, onLoad, onStartup,
 } from '../decorators/on';
 import Expects from '../expects';
-import { isStreamOnline } from '../helpers/api';
-import { CommandError } from '../helpers/commandError';
-import { announce, prepare } from '../helpers/commons';
-import { error, info } from '../helpers/log';
-import { ioServer } from '../helpers/panel';
-import { addUIError } from '../helpers/panel/';
-import { adminEndpoint } from '../helpers/socket';
 import Integration from './_interface';
+
+import { isStreamOnline } from '~/helpers/api';
+import { CommandError } from '~/helpers/commandError';
+import { announce, prepare } from '~/helpers/commons';
+import { error, info } from '~/helpers/log';
+import { ioServer } from '~/helpers/panel';
+import { addUIError } from '~/helpers/panel/index';
+import { adminEndpoint } from '~/helpers/socket';
 
 /*
  * How to integrate:

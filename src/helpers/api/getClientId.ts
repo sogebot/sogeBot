@@ -1,6 +1,5 @@
+import { Settings } from '@entity/settings';
 import { getRepository } from 'typeorm';
-
-import { Settings } from '../../database/entity/settings';
 
 async function getClientId(type: 'bot' | 'broadcaster'){
   const clientId = await getRepository(Settings).findOne({

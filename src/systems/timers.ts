@@ -1,23 +1,24 @@
 'use strict';
 
+import {
+  Timer, TimerResponse, TimerResponseInterface,
+} from '@entity/timer';
 import { SECOND } from '@sogebot/ui-helpers/constants';
 import * as _ from 'lodash';
 import { sortBy } from 'lodash';
 import { getRepository } from 'typeorm';
 
-import {
-  Timer, TimerResponse, TimerResponseInterface,
-} from '../database/entity/timer';
 import { command, default_permission } from '../decorators';
 import Expects from '../expects';
-import { isStreamOnline } from '../helpers/api';
-import { announce } from '../helpers/commons';
-import { isDbConnected } from '../helpers/database';
-import { linesParsed } from '../helpers/parser';
-import { defaultPermissions } from '../helpers/permissions/';
-import { adminEndpoint } from '../helpers/socket';
-import { translate } from '../translate';
 import System from './_interface';
+
+import { isStreamOnline } from '~/helpers/api';
+import { announce } from '~/helpers/commons';
+import { isDbConnected } from '~/helpers/database';
+import { linesParsed } from '~/helpers/parser';
+import { defaultPermissions } from '~/helpers/permissions/index';
+import { adminEndpoint } from '~/helpers/socket';
+import { translate } from '~/translate';
 
 /*
  * !timers                                                                                                                                 - gets an info about timers usage

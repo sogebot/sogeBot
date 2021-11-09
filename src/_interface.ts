@@ -7,28 +7,29 @@ import type { Namespace } from 'socket.io/dist/namespace';
 import { getRepository } from 'typeorm';
 import { v4 as uuid } from 'uuid';
 
-import { PermissionCommands, Permissions as PermissionsEntity } from './database/entity/permissions';
-import { Settings } from './database/entity/settings';
+import { PermissionCommands, Permissions as PermissionsEntity } from '~/database/entity/permissions';
+import { Settings } from '~/database/entity/settings';
 import {
   commandsToRegister, loadingInProgress, permissions as permissionsList,
-} from './decorators';
-import { getFunctionList } from './decorators/on';
-import { invalidateParserCache } from './helpers/cache';
-import { isBotStarted } from './helpers/database';
-import { flatten, unflatten } from './helpers/flatten';
-import { enabled } from './helpers/interface/enabled';
+} from '~/decorators';
+import { getFunctionList } from '~/decorators/on';
+import { invalidateParserCache } from '~/helpers/cache';
+import { isBotStarted } from '~/helpers/database';
+import { flatten, unflatten } from '~/helpers/flatten';
+import { enabled } from '~/helpers/interface/enabled';
+import emitter from '~/helpers/interfaceEmitter';
 import {
   error, info, warning,
-} from './helpers/log';
+} from '~/helpers/log';
 import {
   addMenu, addMenuPublic, ioServer, menu, menuPublic,
-} from './helpers/panel';
-import { defaultPermissions } from './helpers/permissions/';
-import { register } from './helpers/register';
-import { adminEndpoint, publicEndpoint } from './helpers/socket';
-import * as watchers from './watchers';
+} from '~/helpers/panel';
+import { defaultPermissions } from '~/helpers/permissions/index';
+import { register } from '~/helpers/register';
+import { adminEndpoint, publicEndpoint } from '~/helpers/socket';
+import * as watchers from '~/watchers';
 
-let socket: import('./socket').Socket | any = null;
+let socket: import('~/socket').Socket | any = null;
 
 class Module {
   public dependsOn: Module[] = [];
@@ -140,6 +141,16 @@ class Module {
     // prepare proxies for variables
     this._sockets();
 
+    emitter.on('set', (nsp, variableName, value, cb) => {
+      if (nsp === this.nsp) {
+        (this as any)[variableName] = value;
+        emitter.emit('change', `${this._name.toLowerCase()}.${this.__moduleName__.toLowerCase()}.${variableName}`, value);
+      }
+      if (cb) {
+        cb();
+      }
+    });
+
     const load = () => {
       if (isBotStarted) {
         setTimeout(async () => {
@@ -156,6 +167,7 @@ class Module {
             }
             this.status({ state: this._enabled });
             const path = this._name === 'core' ? this.__moduleName__.toLowerCase() : `${this._name}.${this.__moduleName__.toLowerCase()}`;
+
             for (const event of getFunctionList('startup', path)) {
               (this as any)[event.fName]('enabled', state);
             }
@@ -164,7 +176,7 @@ class Module {
           onStartup();
 
           // require panel/socket
-          socket = (require('./socket')).default;
+          socket = (require('~/socket')).default;
 
           this.registerCommands();
         }, 5000); // slow down little bit to have everything preloaded or in progress of loading
@@ -410,7 +422,7 @@ class Module {
     const isMasterAndStatusOnly = _.isNil(opts.state);
     const isStatusChanged = !_.isNil(opts.state) && this.enabled !== opts.state;
 
-    if (existsSync('./restart.pid') // force quiet if we have restart.pid
+    if (existsSync('~/restart.pid') // force quiet if we have restart.pid
       || (this.enabled === opts.state && this.firstStatusSent) // force quiet if we actually don't change anything
     ) {
       opts.quiet = true;

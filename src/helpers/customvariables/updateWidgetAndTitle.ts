@@ -1,8 +1,9 @@
 import { isNil } from 'lodash';
 
-import { setTitleAndGame } from '../../microservices/setTitleAndGame';
 import { default as custom_variables } from '../../widgets/customvariables';
 import { rawStatus } from '../api';
+
+import { setTitleAndGame } from '~/services/twitch/calls/setTitleAndGame';
 
 async function updateWidgetAndTitle (variable: string | null = null) {
   if (custom_variables.socket) {

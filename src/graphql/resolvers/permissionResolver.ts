@@ -1,12 +1,12 @@
 import {
+  PermissionInput, Permissions, PermissionsInterface,
+} from '@entity/permissions';
+import {
   Arg,
   Authorized, Mutation, Query, Resolver,
 } from 'type-graphql';
 import { getRepository } from 'typeorm';
 
-import {
-  PermissionInput, Permissions, PermissionsInterface, 
-} from '../../database/entity/permissions';
 import { cleanViewersCache } from '../../helpers/permissions';
 
 @Resolver()

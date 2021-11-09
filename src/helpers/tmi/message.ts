@@ -1,25 +1,28 @@
-import tmi from '../../chat';
 import { error, isDebugEnabled } from '../log';
-import { generalChannel } from '../oauth/generalChannel';
+
+import { tmiEmitter } from '~/helpers/tmi';
+import twitch from '~/services/twitch';
+import { variables } from '~/watchers';
 
 export async function message(type: 'say' | 'whisper' | 'me', username: string | undefined | null, messageToSend: string, messageId?: string, retry = true) {
+  const generalChannel = variables.get('services.twitch.generalChannel') as string;
   try {
     if (username === null || typeof username === 'undefined') {
-      username = generalChannel.value;
+      username = generalChannel;
     }
     if (username === '') {
       error('TMI: channel is not defined, message cannot be sent');
     } else {
-      if (isDebugEnabled('tmi.message') || !tmi.client.bot) {
+      if (isDebugEnabled('tmi.message')) {
         return;
       }
       if (type === 'me') {
-        tmi.client.bot.say(username, `/me ${messageToSend}`);
+        tmiEmitter.emit('say', username, `/me ${messageToSend}`);
       } else {
-        if (tmi.sendAsReply) {
-          tmi.client.bot.say(username, messageToSend, { replyTo: messageId });
+        if (twitch.sendAsReply) {
+          tmiEmitter.emit('say', username, `/me ${messageToSend}`, { replyTo: messageId });
         } else {
-          tmi.client.bot[type](username, messageToSend);
+          tmiEmitter.emit('whisper', username, `/me ${messageToSend}`);
         }
       }
     }

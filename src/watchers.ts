@@ -4,19 +4,16 @@ import {
 } from 'lodash';
 import { getRepository } from 'typeorm';
 
-import { Settings } from './database/entity/settings';
-import { getFunctionList } from './decorators/on';
-import { isDbConnected } from './helpers/database';
-import { debug, error } from './helpers/log';
-import { logAvgTime } from './helpers/profiler';
-import { find } from './helpers/register';
+import { Settings } from '~/database/entity/settings';
+import { getFunctionList } from '~/decorators/on';
+import { isDbConnected } from '~/helpers/database';
+import emitter from '~/helpers/interfaceEmitter';
+import { debug, error } from '~/helpers/log';
+import { logAvgTime } from '~/helpers/profiler';
+import { find } from '~/helpers/register';
 
-const variables: {
-  [x: string]: any;
-} = {};
-const readonly: {
-  [x: string]: any;
-} = {};
+export const variables = new Map<string, any>();
+export const readonly = new Map<string, any>();
 let checkInProgress = false;
 
 export const check = async (forceCheck = false) => {
@@ -55,19 +52,19 @@ export const check = async (forceCheck = false) => {
 
 export const startWatcher = () => {
   check();
-  setInterval(check, 10 * SECOND);
+  setInterval(check, SECOND);
 };
 
 export const VariableWatcher = {
   add(key: string, value: any, isReadOnly: boolean) {
     if (isReadOnly) {
-      readonly[key] = cloneDeep(value);
+      readonly.set(key, cloneDeep(value));
     } else {
-      variables[key] = cloneDeep(value);
+      variables.set(key, cloneDeep(value));
     }
   },
   async check() {
-    for (const k of Object.keys(variables)) {
+    for (const k of variables.keys()) {
       const [ type, name, ...variableArr ] = k.split('.');
       let variable = variableArr.join('.');
       const checkedModule = find(type, name);
@@ -80,9 +77,9 @@ export const VariableWatcher = {
           k, variable, value,
         }));
       }
-      if (!isEqual(value, variables[k])) {
-        const oldValue = variables[k];
-        variables[k] = value;
+      if (!isEqual(value, variables.get(k))) {
+        const oldValue = variables.get(k);
+        variables.set(k, value);
         const savedSetting = await getRepository(Settings).findOne({
           where: {
             name:      variable,
@@ -102,6 +99,7 @@ export const VariableWatcher = {
         debug('watcher', `watcher::change *** ${type}.${name}.${variable} changed from ${JSON.stringify(oldValue)} to ${JSON.stringify(value)}`);
         const events = getFunctionList('change', type === 'core' ? `${name}.${variable}` : `${type}.${name}.${variable}`);
         for (const event of events) {
+          emitter.emit('change', `${type}.${name}.${variable}`, cloneDeep(value));
           if (typeof (checkedModule as any)[event.fName] === 'function') {
             (checkedModule as any)[event.fName](variable, cloneDeep(value));
           } else {
@@ -110,7 +108,7 @@ export const VariableWatcher = {
         }
       }
     }
-    for (const k of Object.keys(readonly)) {
+    for (const k of readonly.keys()) {
       const [ type, name, ...variableArr ] = k.split('.');
       const variable = variableArr.join('.');
       const checkedModule = find(type, name);
@@ -119,9 +117,9 @@ export const VariableWatcher = {
       }
       const value = cloneDeep(get(checkedModule, variable, undefined));
 
-      if (!isEqual(value, readonly[k])) {
+      if (!isEqual(value, readonly.get(k))) {
         error(`Cannot change read-only variable, forcing initial value for ${type}.${name}.${variable}`);
-        set(checkedModule, variable, readonly[k]);
+        set(checkedModule, variable, readonly.get(k));
       }
     }
   },

@@ -1,28 +1,29 @@
+import { Events } from '@entity/event';
+import { OBSWebsocket as OBSWebsocketEntity, OBSWebsocketInterface } from '@entity/obswebsocket';
 import { SECOND } from '@sogebot/ui-helpers/constants';
 import { EntityNotFoundError } from 'typeorm';
 import { getRepository } from 'typeorm';
 
-import { Events } from '../database/entity/event';
-import { OBSWebsocket as OBSWebsocketEntity, OBSWebsocketInterface } from '../database/entity/obswebsocket';
 import {
   command, default_permission, settings, ui,
 } from '../decorators';
 import { onChange, onStartup } from '../decorators/on';
 import events from '../events';
 import Expects from '../expects';
-import { eventEmitter } from '../helpers/events';
+import Integration from './_interface';
+
+import { eventEmitter } from '~/helpers/events';
 import {
   error, info, warning,
-} from '../helpers/log';
-import { obs } from '../helpers/obswebsocket/client';
-import { switchScenes } from '../helpers/obswebsocket/listeners';
-import { taskRunner } from '../helpers/obswebsocket/taskrunner';
-import { ioServer } from '../helpers/panel';
-import { ParameterError } from '../helpers/parameterError';
-import { defaultPermissions } from '../helpers/permissions';
-import { publicEndpoint } from '../helpers/socket';
-import { translate } from '../translate';
-import Integration from './_interface';
+} from '~/helpers/log';
+import { obs } from '~/helpers/obswebsocket/client';
+import { switchScenes } from '~/helpers/obswebsocket/listeners';
+import { taskRunner } from '~/helpers/obswebsocket/taskrunner';
+import { ioServer } from '~/helpers/panel';
+import { ParameterError } from '~/helpers/parameterError';
+import { defaultPermissions } from '~/helpers/permissions';
+import { publicEndpoint } from '~/helpers/socket';
+import { translate } from '~/translate';
 
 let reconnectingTimeout: null | NodeJS.Timeout = null;
 

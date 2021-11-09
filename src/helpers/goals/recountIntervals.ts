@@ -1,3 +1,6 @@
+import { EventList } from '@entity/eventList';
+import { Goal, GoalInterface } from '@entity/goal';
+import { UserBit, UserTip } from '@entity/user';
 import { MINUTE } from '@sogebot/ui-helpers/constants';
 import * as constants from '@sogebot/ui-helpers/constants';
 import {
@@ -5,9 +8,6 @@ import {
 } from 'typeorm';
 
 import currency from '../../currency';
-import { EventList } from '../../database/entity/eventList';
-import { Goal, GoalInterface } from '../../database/entity/goal';
-import { UserBit, UserTip } from '../../database/entity/user';
 import { mainCurrency } from '../currency';
 import { isBotStarted } from '../database';
 

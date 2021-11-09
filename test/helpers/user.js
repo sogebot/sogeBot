@@ -1,7 +1,6 @@
 const { getRepository } = require('typeorm');
 
 const { User } = require('../../dest/database/entity/user');
-const { generalOwners } = require('../../dest/helpers/oauth/generalOwners');
 
 const viewer = {
   userId:   '1',
@@ -70,7 +69,6 @@ const mod = {
 
 module.exports = {
   prepare: async () => {
-    const { default: oauth } = require('../../dest/oauth');
     const { cleanViewersCache } = require('../../dest/helpers/permissions/cache');
 
     await getRepository(User).save(viewer);
@@ -82,9 +80,6 @@ module.exports = {
     await getRepository(User).save(viewer7);
     await getRepository(User).save(owner);
     await getRepository(User).save(mod);
-    // set owner as broadcaster
-    oauth.broadcasterUsername = owner.userName;
-    generalOwners.value = [owner.userName, '__owner__'];
     // clean perm cache
     cleanViewersCache();
   },

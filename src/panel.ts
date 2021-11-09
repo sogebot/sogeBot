@@ -15,49 +15,51 @@ import {
   getConnection, getManager, getRepository,
 } from 'typeorm';
 
-import Core from './_interface';
-import tmi from './chat';
-import { CacheTitles } from './database/entity/cacheTitles';
-import { Translation } from './database/entity/translation';
-import { TwitchTag, TwitchTagInterface } from './database/entity/twitch';
-import { User } from './database/entity/user';
-import { onStartup } from './decorators/on';
-import { schema } from './graphql/schema';
+import emitter from './helpers/interfaceEmitter.js';
+
+import Core from '~/_interface';
+import { CacheTitles } from '~/database/entity/cacheTitles';
+import { Translation } from '~/database/entity/translation';
+import { TwitchTag, TwitchTagInterface } from '~/database/entity/twitch';
+import { User } from '~/database/entity/user';
+import { onStartup } from '~/decorators/on';
+import { schema } from '~/graphql/schema';
 import {
   chatMessagesAtStart, currentStreamTags, isStreamOnline, rawStatus, stats, streamStatusChangeSince,
-} from './helpers/api';
-import { getOwnerAsSender } from './helpers/commons/getOwnerAsSender';
+} from '~/helpers/api';
+import { getOwnerAsSender } from '~/helpers/commons/getOwnerAsSender';
 import {
   getURL, getValueOf, isVariableSet, postURL,
-} from './helpers/customvariables';
-import { getIsBotStarted } from './helpers/database';
-import { flatten } from './helpers/flatten';
-import { setValue } from './helpers/general';
-import { getLang } from './helpers/locales';
+} from '~/helpers/customvariables';
+import { getIsBotStarted } from '~/helpers/database';
+import { flatten } from '~/helpers/flatten';
+import { setValue } from '~/helpers/general';
+import { getLang } from '~/helpers/locales';
 import {
   error,
   getDEBUG, info, setDEBUG,
-} from './helpers/log';
+} from '~/helpers/log';
 import {
   app, ioServer, server, serverSecure, setApp, setServer,
-} from './helpers/panel';
-import { socketsConnectedDec, socketsConnectedInc } from './helpers/panel/';
-import { errors, warns } from './helpers/panel/alerts';
-import { linesParsed, status as statusObj } from './helpers/parser';
-import { list, systems } from './helpers/register';
-import { adminEndpoint } from './helpers/socket';
-import * as changelog from './helpers/user/changelog.js';
-import lastfm from './integrations/lastfm';
-import spotify from './integrations/spotify';
-import { sendGameFromTwitch } from './microservices/sendGameFromTwitch';
-import { setTags } from './microservices/setTags';
-import { setTitleAndGame } from './microservices/setTitleAndGame';
-import oauth from './oauth';
-import Parser from './parser';
-import { default as socketSystem } from './socket';
-import highlights from './systems/highlights';
-import songs from './systems/songs';
-import translateLib, { translate } from './translate';
+} from '~/helpers/panel';
+import { errors, warns } from '~/helpers/panel/alerts';
+import { socketsConnectedDec, socketsConnectedInc } from '~/helpers/panel/index';
+import { linesParsed, status as statusObj } from '~/helpers/parser';
+import { list, systems } from '~/helpers/register';
+import { adminEndpoint } from '~/helpers/socket';
+import { tmiEmitter } from '~/helpers/tmi';
+import * as changelog from '~/helpers/user/changelog.js';
+import lastfm from '~/integrations/lastfm';
+import spotify from '~/integrations/spotify';
+import Parser from '~/parser';
+import { sendGameFromTwitch } from '~/services/twitch/calls/sendGameFromTwitch';
+import { setTags } from '~/services/twitch/calls/setTags';
+import { setTitleAndGame } from '~/services/twitch/calls/setTitleAndGame';
+import { default as socketSystem } from '~/socket';
+import highlights from '~/systems/highlights';
+import songs from '~/systems/songs';
+import translateLib, { translate } from '~/translate';
+import { variables } from '~/watchers';
 
 const port = Number(process.env.PORT ?? 20000);
 const secureport = Number(process.env.SECUREPORT ?? 20443);
@@ -209,8 +211,7 @@ class Panel extends Core {
       res.status(200).send('OK');
     });
     app?.post('/webhooks/callback', function (req, res) {
-      const eventsub = require('./eventsub').default;
-      eventsub.handler(req, res);
+      emitter.emit('services::twitch::eventsub', req, res);
     });
     app?.get('/popout/', function (req, res) {
       res.sendFile(path.join(__dirname, '..', 'public', 'popout.html'));
@@ -356,21 +357,21 @@ class Panel extends Core {
         cb(null);
       });
       socket.on('joinBot', async () => {
-        tmi.join('bot', tmi.channel);
+        tmiEmitter.emit('join', 'bot');
       });
       socket.on('leaveBot', async () => {
-        tmi.part('bot');
+        tmiEmitter.emit('part', 'bot');
         // force all users offline
         await changelog.flush();
         await getRepository(User).update({}, { isOnline: false });
       });
 
       // custom var
-      socket.on('custom.variable.value', async (variable: string, cb: (error: string | null, value: string) => void) => {
+      socket.on('custom.variable.value', async (_variable: string, cb: (error: string | null, value: string) => void) => {
         let value = translate('webpanel.not-available');
-        const isVarSet = await isVariableSet(variable);
+        const isVarSet = await isVariableSet(_variable);
         if (isVarSet) {
-          value = await getValueOf(variable);
+          value = await getValueOf(_variable);
         }
         cb(null, value);
       });
@@ -474,9 +475,19 @@ class Panel extends Core {
       }
       cb(null, toEmit);
     });
+    socket.on('services', async (cb: (err: string | null, toEmit: { name: string; type: string; }[]) => void) => {
+      const toEmit: { name: string; type: string; }[] = [];
+      for (const system of list('services')) {
+        toEmit.push({
+          name: system.__moduleName__.toLowerCase(),
+          type: 'services',
+        });
+      }
+      cb(null, toEmit);
+    });
     socket.on('core', async (cb: (err: string | null, toEmit: { name: string; type: string; }[]) => void) => {
       const toEmit: { name: string; type: string; }[] = [];
-      for (const system of ['dashboard', 'oauth', 'tmi', 'currency', 'ui', 'general', 'twitch', 'socket', 'eventsub', 'updater']) {
+      for (const system of ['dashboard', 'currency', 'ui', 'general', 'twitch', 'socket', 'eventsub', 'updater']) {
         toEmit.push({ name: system.toLowerCase(), type: 'core' });
       }
       cb(null, toEmit);
@@ -525,10 +536,10 @@ class Panel extends Core {
     });
 
     socket.on('name', function (cb: (botUsername: string) => void) {
-      cb(oauth.botUsername);
+      cb(variables.get('services.twitch.botUsername') as string);
     });
     socket.on('channelName', function (cb: (currentChannel: string) => void) {
-      cb(oauth.currentChannel);
+      cb(variables.get('services.twitch.currentChannel') as string);
     });
     socket.on('version', function (cb: (version: string) => void) {
       const version = _.get(process, 'env.npm_package_version', 'x.y.z');
@@ -584,8 +595,9 @@ const sendStreamData = async () => {
       spotifyCurrentSong = null;
     }
 
+    const broadcasterType = variables.get('services.twitch.broadcasterType') as string;
     const data = {
-      broadcasterType:    oauth.broadcasterType,
+      broadcasterType:    broadcasterType,
       uptime:             isStreamOnline.value ? streamStatusChangeSince.value : null,
       currentViewers:     stats.value.currentViewers,
       currentSubscribers: stats.value.currentSubscribers,

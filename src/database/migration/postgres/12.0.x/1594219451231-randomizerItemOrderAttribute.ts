@@ -1,6 +1,5 @@
+import type { RandomizerItemInterface } from '@entity/randomizer';
 import { MigrationInterface, QueryRunner } from 'typeorm';
-
-import type { RandomizerItemInterface } from '../../../entity/randomizer';
 
 export class randomizerItemOrderAttribute1594219451231 implements MigrationInterface {
 

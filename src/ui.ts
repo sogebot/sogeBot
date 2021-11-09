@@ -1,20 +1,17 @@
+import { timezone } from '@sogebot/ui-helpers/dayjsHelper';
 import {
   filter, isString, set,
 } from 'lodash';
 
-import Core from './_interface';
-import { settings } from './decorators';
-import general from './general';
-import { mainCurrency, symbol } from './helpers/currency';
-import { timezone } from './helpers/dayjs';
-import { getBroadcaster } from './helpers/getBroadcaster';
-import { generalChannel } from './helpers/oauth/generalChannel';
-import { generalOwners } from './helpers/oauth/generalOwners';
-import { find, list } from './helpers/register';
-import { adminEndpoint, publicEndpoint } from './helpers/socket';
-
+import Core from '~/_interface';
+import { settings } from '~/decorators';
 import { onChange, onLoad } from '~/decorators/on';
+import general from '~/general';
+import { mainCurrency, symbol } from '~/helpers/currency';
+import { find, list } from '~/helpers/register';
+import { adminEndpoint, publicEndpoint } from '~/helpers/socket';
 import { domain } from '~/helpers/ui';
+import { variables } from '~/watchers';
 
 class UI extends Core {
   @settings()
@@ -40,7 +37,7 @@ class UI extends Core {
       try {
         const data: any = {};
 
-        for (const system of ['oauth', 'tmi', 'currency', 'ui', 'general', 'twitch', 'dashboard']) {
+        for (const system of ['currency', 'ui', 'general', 'dashboard']) {
           if (typeof data.core === 'undefined') {
             data.core = {};
           }
@@ -50,7 +47,7 @@ class UI extends Core {
           }
           data.core[system] = await self.getAllSettings(true);
         }
-        for (const dir of ['systems', 'games', 'overlays', 'integrations']) {
+        for (const dir of ['systems', 'games', 'overlays', 'integrations', 'services']) {
           for (const system of list(dir)) {
             set(data, `${dir}.${system.__moduleName__}`, await system.getAllSettings(true));
           }
@@ -65,8 +62,12 @@ class UI extends Core {
         // lang
         data.lang = general.lang;
 
-        data.isCastersSet = filter(generalOwners.value, (o) => isString(o) && o.trim().length > 0).length > 0 || getBroadcaster() !== '';
-        data.isChannelSet = filter(generalChannel.value, (o) => isString(o) && o.trim().length > 0).length > 0;
+        const generalChannel = variables.get('services.twitch.generalChannel') as string;
+        const broadcasterUsername = variables.get('services.twitch.broadcasterUsername') as string;
+        const generalOwners = variables.get('services.twitch.generalOwners') as string[];
+
+        data.isCastersSet = filter(generalOwners, (o) => isString(o) && o.trim().length > 0).length > 0 || broadcasterUsername !== '';
+        data.isChannelSet = filter(generalChannel, (o) => isString(o) && o.trim().length > 0).length > 0;
 
         cb(null, data);
       } catch (e: any) {

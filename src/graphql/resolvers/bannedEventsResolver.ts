@@ -1,9 +1,8 @@
+import { BannedEventsInterface, BannedEventsTable } from '@entity/bannedEvents';
 import {
   Arg, Authorized, Query,
 } from 'type-graphql';
 import { getRepository } from 'typeorm';
-
-import { BannedEventsInterface, BannedEventsTable } from '../../database/entity/bannedEvents';
 
 export class bannedEventsResolver {
   @Authorized()

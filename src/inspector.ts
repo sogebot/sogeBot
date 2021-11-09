@@ -6,7 +6,7 @@ import { MINUTE, SECOND } from '@sogebot/ui-helpers/constants';
 
 import {
   error, getDEBUG, isDebugEnabled, setDEBUG, warning,
-} from './helpers/log';
+} from '~/helpers/log';
 
 let isProfilerRunning = false;
 

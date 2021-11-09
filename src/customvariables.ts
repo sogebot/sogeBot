@@ -3,16 +3,16 @@ import { setTimeout } from 'timers';
 import { isNil } from 'lodash';
 import { getRepository, IsNull } from 'typeorm';
 
-import Core from './_interface';
+import Core from '~/_interface';
 import {
   Variable, VariableHistory, VariableInterface, VariableURL, VariableWatch,
-} from './database/entity/variable';
-import { onStartup } from './decorators/on';
-import { getBot } from './helpers/commons';
-import { runScript, updateWidgetAndTitle } from './helpers/customvariables';
-import { csEmitter } from './helpers/customvariables/emitter';
-import { isDbConnected } from './helpers/database';
-import { adminEndpoint } from './helpers/socket';
+} from '~/database/entity/variable';
+import { onStartup } from '~/decorators/on';
+import { getBot } from '~/helpers/commons';
+import { runScript, updateWidgetAndTitle } from '~/helpers/customvariables';
+import { csEmitter } from '~/helpers/customvariables/emitter';
+import { isDbConnected } from '~/helpers/database';
+import { adminEndpoint } from '~/helpers/socket';
 
 class CustomVariables extends Core {
   timeouts: {

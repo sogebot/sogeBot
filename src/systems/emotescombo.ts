@@ -1,3 +1,4 @@
+import { CacheEmotes, CacheEmotesInterface } from '@entity/cacheEmotes';
 import * as constants from '@sogebot/ui-helpers/constants';
 import { getRepository } from 'typeorm';
 import { v4 } from 'uuid';
@@ -5,12 +6,12 @@ import { v4 } from 'uuid';
 import XRegExp from 'xregexp';
 
 import { parserReply } from '../commons';
-import { CacheEmotes, CacheEmotesInterface } from '../database/entity/cacheEmotes';
 import { parser, settings } from '../decorators';
-import { prepare } from '../helpers/commons';
-import { ioServer } from '../helpers/panel';
-import { translate } from '../translate';
 import System from './_interface';
+
+import { prepare } from '~/helpers/commons';
+import { ioServer } from '~/helpers/panel';
+import { translate } from '~/translate';
 
 interface EmotesCombo {
   id: string,

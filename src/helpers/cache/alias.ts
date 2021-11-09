@@ -1,4 +1,4 @@
-import type { AliasInterface } from '../../database/entity/alias';
+import type { AliasInterface } from '@entity/alias';
 
 const findCache: {
   search: string;

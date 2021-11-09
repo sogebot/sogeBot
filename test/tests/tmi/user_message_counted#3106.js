@@ -11,9 +11,7 @@ const { Settings } = require('../../../dest/database/entity/settings');
 const { User } = require('../../../dest/database/entity/user');
 const isStreamOnline = (require('../../../dest/helpers/api/isStreamOnline')).isStreamOnline;
 const changelog = (require('../../../dest/helpers/user/changelog'));
-// eslint-disable-next-line import/order
-const tmi = require('../../../dest/chat').default;
-
+const twitch = require('../../../dest/services/twitch.js').default;
 // users
 const owner = { userName: '__broadcaster__' };
 const testuser1 = {
@@ -27,13 +25,16 @@ const { VariableWatcher } = require('../../../dest/watchers');
 const message = require('../../general.js').message;
 const db = require('../../general.js').db;
 
+const TMI = require('../../../dest/services/twitch/chat').default;
+const tmi = new TMI();
+
 describe('TMI - User should have counted messages - https://github.com/sogehige/sogeBot/issues/3106 - @func3', () => {
   before(async () => {
     await db.cleanup();
     await message.prepare();
 
-    tmi.globalIgnoreListExclude = [];
-    tmi.ignorelist = [];
+    twitch.globalIgnoreListExclude = [];
+    twitch.ignorelist = [];
 
     await getRepository(User).save(testuser1);
     await getRepository(User).save(testuser2);

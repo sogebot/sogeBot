@@ -1,10 +1,9 @@
+import { EventList } from '@entity/eventList';
+import { UserBit, UserTip } from '@entity/user';
 import { DAY, HOUR } from '@sogebot/ui-helpers/constants';
 import {
   getRepository, In, MoreThanOrEqual,
 } from 'typeorm';
-
-import { EventList } from '../database/entity/eventList';
-import { UserBit, UserTip } from '../database/entity/user';
 
 import type { ResponseFilter } from '.';
 

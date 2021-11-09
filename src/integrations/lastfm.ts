@@ -2,8 +2,9 @@ import axios from 'axios';
 
 import { settings } from '../decorators';
 import { onChange, onStartup } from '../decorators/on';
-import {  error } from '../helpers/log';
 import Integration from './_interface';
+
+import {  error } from '~/helpers/log';
 
 let canSendRequests = true;
 

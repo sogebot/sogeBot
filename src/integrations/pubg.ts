@@ -9,12 +9,13 @@ import {
 } from '../decorators';
 import { onChange, onStartup } from '../decorators/on';
 import Expects from '../expects';
-import { prepare } from '../helpers/commons';
-import { flatten } from '../helpers/flatten';
-import { error, info } from '../helpers/log';
-import { adminEndpoint } from '../helpers/socket';
 import Message from '../message';
 import Integration from './_interface';
+
+import { prepare } from '~/helpers/commons';
+import { flatten } from '~/helpers/flatten';
+import { error, info } from '~/helpers/log';
+import { adminEndpoint } from '~/helpers/socket';
 
 class PUBG extends Integration {
   @settings()

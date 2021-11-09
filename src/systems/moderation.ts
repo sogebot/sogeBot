@@ -1,5 +1,7 @@
 // 3rdparty libraries
 
+import { Alias } from '@entity/alias';
+import { ModerationPermit, ModerationWarning } from '@entity/moderation';
 import * as constants from '@sogebot/ui-helpers/constants';
 import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized';
 import emojiRegex from 'emoji-regex';
@@ -8,31 +10,29 @@ import tlds from 'tlds';
 import { getRepository, LessThan } from 'typeorm';
 import XRegExp from 'xregexp';
 
-import tmi from '../chat';
 import { parserReply } from '../commons';
-import { Alias } from '../database/entity/alias';
-import { ModerationPermit, ModerationWarning } from '../database/entity/moderation';
 import {
   command, default_permission, parser, permission_settings, settings, ui,
 } from '../decorators';
 import Expects from '../expects';
-import { prepare } from '../helpers/commons';
-import {
-  error, timeout as timeoutLog, warning as warningLog,
-} from '../helpers/log';
-import { ParameterError } from '../helpers/parameterError';
-import { getUserHighestPermission } from '../helpers/permissions/';
-import { defaultPermissions } from '../helpers/permissions/';
-import { adminEndpoint } from '../helpers/socket';
-import { timeout } from '../helpers/tmi';
-import { isModerator } from '../helpers/user/isModerator';
 import spotify from '../integrations/spotify';
 import Message from '../message';
-import { translate } from '../translate';
 import users from '../users';
 import System from './_interface';
-import aliasSystem from './alias';
-import songs from './songs';
+
+import { prepare } from '~/helpers/commons';
+import {
+  error, timeout as timeoutLog, warning as warningLog,
+} from '~/helpers/log';
+import { ParameterError } from '~/helpers/parameterError';
+import { defaultPermissions } from '~/helpers/permissions/index';
+import { getUserHighestPermission } from '~/helpers/permissions/index';
+import { adminEndpoint } from '~/helpers/socket';
+import { tmiEmitter } from '~/helpers/tmi';
+import { isModerator } from '~/helpers/user/isModerator';
+import aliasSystem from '~/systems/alias';
+import songs from '~/systems/songs';
+import { translate } from '~/translate';
 
 const urlRegex = [
   new RegExp(`(www)? ??\\.? ?[a-zA-Z0-9]+([a-zA-Z0-9-]+) ??\\. ?(${tlds.join('|')})(?=\\P{L}|$)`, 'igu'),
@@ -206,14 +206,14 @@ class Moderation extends System {
 
     if (this.cWarningsAllowedCount === 0) {
       timeoutLog(`${sender.userName} [${type}] ${time}s timeout | ${text}`);
-      timeout(sender.userName, time, isModerator(sender));
+      tmiEmitter.emit('timeout', sender.userName, time, isModerator(sender));
       return;
     }
 
     const isWarningCountAboveThreshold = warnings.length >= this.cWarningsAllowedCount;
     if (isWarningCountAboveThreshold) {
       timeoutLog(`${sender.userName} [${type}] ${time}s timeout | ${text}`);
-      timeout(sender.userName, time, isModerator(sender));
+      tmiEmitter.emit('timeout', sender.userName, time, isModerator(sender));
       await getRepository(ModerationWarning).delete({ userId: sender.userId });
     } else {
       await getRepository(ModerationWarning).insert({ userId: sender.userId, timestamp: Date.now() });
@@ -221,11 +221,11 @@ class Moderation extends System {
       warning = await new Message(warning.replace(/\$count/g, String(warningsLeft < 0 ? 0 : warningsLeft))).parse();
       if (this.cWarningsShouldClearChat) {
         timeoutLog(`${sender.userName} [${type}] 1s timeout, warnings left ${warningsLeft < 0 ? 0 : warningsLeft} | ${text}`);
-        timeout(sender.userName, 1, isModerator(sender));
+        tmiEmitter.emit('timeout', sender.userName, 1, isModerator(sender));
       }
 
       if (this.cWarningsAnnounceTimeouts) {
-        tmi.delete('bot', msgId);
+        tmiEmitter.emit('delete', 'bot', msgId);
         if (!silent) {
           parserReply('$sender, ' + warning, { sender, discord: undefined, id: '' });
         } else {

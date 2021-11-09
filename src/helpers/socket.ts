@@ -1,25 +1,25 @@
+import type { AlertInterface, AlertMediaInterface } from '@entity/alert';
+import type { CommandsBoardInterface } from '@entity/commands';
+import type { CooldownInterface } from '@entity/cooldown';
+import type { EventInterface } from '@entity/event';
+import type { GoalGroupInterface } from '@entity/goal';
+import type { HowLongToBeatGameInterface, HowLongToBeatGameItemInterface } from '@entity/howLongToBeatGame';
+import type { KeywordInterface } from '@entity/keyword';
+import { OBSWebsocketInterface } from '@entity/obswebsocket';
+import type { PermissionsInterface } from '@entity/permissions';
+import type { PriceInterface } from '@entity/price';
+import type { RandomizerInterface } from '@entity/randomizer';
+import type { RankInterface } from '@entity/rank';
+import type { SongPlaylistInterface } from '@entity/song';
+import type { TextInterface } from '@entity/text';
+import type { TimerInterface } from '@entity/timer';
+import type {
+  UserBitInterface, UserInterface, UserTipInterface,
+} from '@entity/user';
+import type { VariableInterface, VariableWatchInterface } from '@entity/variable';
 import type ObsWebSocket from 'obs-websocket-js';
 import { Socket } from 'socket.io';
 
-import type { AlertInterface, AlertMediaInterface } from '../database/entity/alert';
-import type { CommandsBoardInterface } from '../database/entity/commands';
-import type { CooldownInterface } from '../database/entity/cooldown';
-import type { EventInterface } from '../database/entity/event';
-import type { GoalGroupInterface } from '../database/entity/goal';
-import type { HowLongToBeatGameInterface, HowLongToBeatGameItemInterface } from '../database/entity/howLongToBeatGame';
-import type { KeywordInterface } from '../database/entity/keyword';
-import { OBSWebsocketInterface } from '../database/entity/obswebsocket';
-import type { PermissionsInterface } from '../database/entity/permissions';
-import type { PriceInterface } from '../database/entity/price';
-import type { RandomizerInterface } from '../database/entity/randomizer';
-import type { RankInterface } from '../database/entity/rank';
-import type { SongPlaylistInterface } from '../database/entity/song';
-import type { TextInterface } from '../database/entity/text';
-import type { TimerInterface } from '../database/entity/timer';
-import type {
-  UserBitInterface, UserInterface, UserTipInterface,
-} from '../database/entity/user';
-import type { VariableInterface, VariableWatchInterface } from '../database/entity/variable';
 import type PUBG from '../integrations/pubg';
 
 const endpoints: {
@@ -150,7 +150,7 @@ const viewerEndpoint = (nsp: string, on: string, callback: (opts: any, cb: (erro
   });
 };
 
-function publicEndpoint (nsp: string, on: string, callback: (opts: any, cb: (error: Error | string | null, ...response: any) => void) => void, socket?: Socket) {
+function publicEndpoint (nsp: string, on: string, callback: (opts: any, cb: (error: Error | string | null | unknown, ...response: any) => void) => void, socket?: Socket) {
   endpoints.push({
     nsp, on, callback, type: 'public',
   });

@@ -5,19 +5,19 @@ import jwt, { JsonWebTokenError } from 'jsonwebtoken';
 import { Socket as SocketIO } from 'socket.io';
 import { v4 as uuid } from 'uuid';
 
-import Core from './_interface';
+import Core from '~/_interface';
 import {
   persistent, settings, ui,
-} from './decorators';
-import { onLoad } from './decorators/on';
-import { debug, error } from './helpers/log';
-import { app, ioServer } from './helpers/panel';
+} from '~/decorators';
+import { onLoad } from '~/decorators/on';
+import { debug, error } from '~/helpers/log';
+import { app, ioServer } from '~/helpers/panel';
 import {
   check, defaultPermissions, getUserHighestPermission,
-} from './helpers/permissions/';
-import { adminEndpoint, endpoints } from './helpers/socket';
-import * as changelog from './helpers/user/changelog.js';
-import { isModerator } from './helpers/user/isModerator';
+} from '~/helpers/permissions/index';
+import { adminEndpoint, endpoints } from '~/helpers/socket';
+import * as changelog from '~/helpers/user/changelog.js';
+import { isModerator } from '~/helpers/user/isModerator';
 
 enum Authorized {
   inProgress,

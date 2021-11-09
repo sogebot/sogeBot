@@ -1,7 +1,7 @@
+import { Variable, VariableInterface } from '@entity/variable';
 import { isNil } from 'lodash';
 import { getRepository } from 'typeorm';
 
-import { Variable, VariableInterface } from '../../database/entity/variable';
 import users from '../../users';
 import { warning } from '../log';
 import {

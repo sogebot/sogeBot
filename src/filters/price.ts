@@ -1,10 +1,10 @@
+import { Price } from '@entity/price';
 import { format } from '@sogebot/ui-helpers/number';
 import { getRepository } from 'typeorm';
 
-import { Price } from '../database/entity/price';
-import { getPointsName } from '../helpers/points';
-
 import type { ResponseFilter } from '.';
+
+import { getPointsName } from '~/helpers/points';
 
 const price: ResponseFilter = {
   '(price)': async function (_variable, attr) {

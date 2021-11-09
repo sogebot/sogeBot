@@ -1,10 +1,11 @@
+import type { PermissionCommandsInterface } from '@entity/permissions';
+import { PermissionCommands } from '@entity/permissions';
 import { getRepository } from 'typeorm';
 
-import type { PermissionCommandsInterface } from '../database/entity/permissions';
-import { PermissionCommands } from '../database/entity/permissions';
-import { isDbConnected } from './database';
-import { debug } from './log';
 import { cleanViewersCache } from './permissions';
+
+import { isDbConnected } from '~/helpers/database';
+import { debug } from '~/helpers/log';
 
 const cachedCommandsPermissions: PermissionCommandsInterface[] = [];
 const refreshCachedCommandPermissions = () => {

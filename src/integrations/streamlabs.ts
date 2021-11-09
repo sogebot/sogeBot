@@ -1,25 +1,26 @@
+import { UserTip, UserTipInterface } from '@entity/user';
 import axios from 'axios';
 import chalk from 'chalk';
 import { io, Socket } from 'socket.io-client';
 import { getRepository } from 'typeorm';
 
 import currency from '../currency';
-import { UserTip, UserTipInterface } from '../database/entity/user';
 import { persistent, settings } from '../decorators';
 import { onChange, onStartup } from '../decorators/on';
-import { isStreamOnline, stats } from '../helpers/api';
-import { mainCurrency } from '../helpers/currency';
-import { eventEmitter } from '../helpers/events';
-import { getBroadcaster } from '../helpers/getBroadcaster';
-import { triggerInterfaceOnTip } from '../helpers/interface/triggers';
-import {
-  debug, error, info, tip,
-} from '../helpers/log';
-import { ioServer } from '../helpers/panel';
 import eventlist from '../overlays/eventlist';
 import alerts from '../registries/alerts';
 import users from '../users';
 import Integration from './_interface';
+
+import { isStreamOnline, stats } from '~/helpers/api';
+import { mainCurrency } from '~/helpers/currency';
+import { eventEmitter } from '~/helpers/events';
+import { triggerInterfaceOnTip } from '~/helpers/interface/triggers';
+import {
+  debug, error, info, tip,
+} from '~/helpers/log';
+import { ioServer } from '~/helpers/panel';
+import { variables } from '~/watchers';
 
 namespace StreamlabsEvent {
   export type Donation = {
@@ -107,6 +108,7 @@ class Streamlabs extends Integration {
           }
 
           const { name, currency: currency2, amount, message, created_at } = item;
+          const broadcasterUsername = variables.get('services.twitch.broadcasterUsername') as string;
           this.parse({
             type:    'donation',
             message: [{
@@ -125,7 +127,7 @@ class Streamlabs extends Integration {
               iconClassName:    'user',
               id:               0,
               name,
-              to:               { name: getBroadcaster() },
+              to:               { name: broadcasterUsername },
             }],
             event_id: '',
           });

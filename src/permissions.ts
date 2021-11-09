@@ -1,18 +1,18 @@
 import { getRepository } from 'typeorm';
 
-import Core from './_interface';
-import { Permissions as PermissionsEntity, PermissionsInterface } from './database/entity/permissions';
-import { User } from './database/entity/user';
-import { command, default_permission } from './decorators';
-import { onStartup } from './decorators/on';
-import Expects from './expects';
-import { prepare } from './helpers/commons';
-import { error } from './helpers/log';
-import { cleanViewersCache, get } from './helpers/permissions';
-import { check, defaultPermissions } from './helpers/permissions/';
-import { adminEndpoint } from './helpers/socket';
-import * as changelog from './helpers/user/changelog.js';
-import users from './users';
+import Core from '~/_interface';
+import { Permissions as PermissionsEntity, PermissionsInterface } from '~/database/entity/permissions';
+import { User } from '~/database/entity/user';
+import { command, default_permission } from '~/decorators';
+import { onStartup } from '~/decorators/on';
+import Expects from '~/expects';
+import { prepare } from '~/helpers/commons';
+import { error } from '~/helpers/log';
+import { cleanViewersCache, get } from '~/helpers/permissions';
+import { check, defaultPermissions } from '~/helpers/permissions/index';
+import { adminEndpoint } from '~/helpers/socket';
+import * as changelog from '~/helpers/user/changelog.js';
+import users from '~/users';
 
 class Permissions extends Core {
   @onStartup()

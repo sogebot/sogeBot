@@ -1,31 +1,32 @@
 'use strict';
 
+import { Alias as AliasEntity, AliasGroup, AliasInterface } from '@entity/alias';
 import * as constants from '@sogebot/ui-helpers/constants';
 import * as _ from 'lodash';
 import { getRepository } from 'typeorm';
 
 import { parserReply } from '../commons';
-import { Alias as AliasEntity, AliasGroup, AliasInterface } from '../database/entity/alias';
 import {
   command, default_permission, parser, timer,
 } from '../decorators';
 import Expects from '../expects';
-import * as cache from '../helpers/cache/alias';
-import { checkFilter } from '../helpers/checkFilter';
-import { incrementCountOfCommandUsage } from '../helpers/commands/count';
-import { prepare } from '../helpers/commons';
-import { executeVariablesInText } from '../helpers/customvariables';
+import Parser from '../parser';
+import System from './_interface';
+
+import * as cache from '~/helpers/cache/alias';
+import { checkFilter } from '~/helpers/checkFilter';
+import { incrementCountOfCommandUsage } from '~/helpers/commands/count';
+import { prepare } from '~/helpers/commons';
+import { executeVariablesInText } from '~/helpers/customvariables';
 import {
   debug, error, warning,
-} from '../helpers/log';
+} from '~/helpers/log';
 import {
   addToViewersCache, get, getFromViewersCache,
-} from '../helpers/permissions';
-import { check, defaultPermissions } from '../helpers/permissions/';
-import Parser from '../parser';
-import { translate } from '../translate';
-import System from './_interface';
-import customcommands from './customcommands';
+} from '~/helpers/permissions';
+import { check, defaultPermissions } from '~/helpers/permissions/index';
+import customCommands from '~/systems/customcommands';
+import { translate } from '~/translate';
 
 /*
  * !alias                                              - gets an info about alias usage
@@ -154,7 +155,7 @@ class Alias extends System {
           }
           // go through custom commands
           if (response.startsWith('!')) {
-            customcommands.run({ ...opts, message: response });
+            customCommands.run({ ...opts, message: response });
           }
 
           incrementCountOfCommandUsage(alias.alias);

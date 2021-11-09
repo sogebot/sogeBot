@@ -2,14 +2,15 @@ import axios from 'axios';
 import _ from 'lodash';
 import { v4 } from 'uuid';
 
-import tmi from './chat';
-import { timer } from './decorators.js';
 import {
   command, count, custom, evaluate, ifp, info, list, math, online, param, price, qs, random, ResponseFilter, stream, youtube,
 } from './filters';
-import { getGlobalVariables } from './helpers/checkFilter.js';
-import { getBotSender } from './helpers/commons/getBotSender';
-import { translate } from './translate';
+
+import { timer } from '~/decorators.js';
+import { getGlobalVariables } from '~/helpers/checkFilter.js';
+import { getBotSender } from '~/helpers/commons/getBotSender';
+import twitch from '~/services/twitch';
+import { translate } from '~/translate';
 
 class Message {
   message = '';
@@ -55,9 +56,9 @@ class Message {
       for (let [key, value] of Object.entries(attr)) {
         if (key === 'sender') {
           if (typeof value.userName !== 'undefined') {
-            value = tmi.showWithAt && attr.forceWithoutAt !== true ? `@${value.userName}` : value.userName;
+            value = twitch.showWithAt && attr.forceWithoutAt !== true ? `@${value.userName}` : value.userName;
           } else {
-            value = tmi.showWithAt && attr.forceWithoutAt !== true ? `@${value}` : value;
+            value = twitch.showWithAt && attr.forceWithoutAt !== true ? `@${value}` : value;
           }
         }
         this.message = this.message.replace(new RegExp('[$]' + key, 'g'), value);

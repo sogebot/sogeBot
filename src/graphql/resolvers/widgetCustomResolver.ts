@@ -1,12 +1,11 @@
+import {
+  WidgetCustom, WidgetCustomInput, WidgetCustomInterface,
+} from '@entity/widget';
 import { JwtPayload } from 'jsonwebtoken';
 import {
   Arg, Authorized, Ctx, Mutation, Query, Resolver,
 } from 'type-graphql';
 import { getRepository } from 'typeorm';
-
-import {
-  WidgetCustom, WidgetCustomInput, WidgetCustomInterface, 
-} from '../../database/entity/widget';
 
 @Resolver()
 export class WidgetCustomResolver {

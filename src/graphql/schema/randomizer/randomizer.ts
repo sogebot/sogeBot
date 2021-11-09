@@ -4,7 +4,7 @@ import {
 } from 'type-graphql';
 
 import {
-  CustomizationFontObject, CustomizationPositionObject, CustomizationTTSObject, 
+  CustomizationFontObject, CustomizationPositionObject, CustomizationTTSObject,
 } from '../customization';
 import { RandomizerItemObject } from './randomizerItem';
 

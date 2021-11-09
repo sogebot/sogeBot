@@ -1,11 +1,12 @@
-import type { UserInterface } from '../../database/entity/user';
-import { botId } from '../oauth/botId';
-import { botUsername } from '../oauth/botUsername';
+import type { UserInterface } from '@entity/user';
+
+import { variables } from '~/watchers';
 
 export function isBot(user: string | CommandOptions['sender'] | UserInterface | UserStateTags) {
   try {
-    if (botUsername.value) {
-      return botUsername.value.toLowerCase().trim() === (typeof user === 'string' ? user : user.userName).toLowerCase().trim();
+    const botUsername = variables.get('services.twitch.botUsername') as string;
+    if (botUsername) {
+      return botUsername.toLowerCase().trim() === (typeof user === 'string' ? user : user.userName).toLowerCase().trim();
     } else {
       return false;
     }
@@ -16,8 +17,9 @@ export function isBot(user: string | CommandOptions['sender'] | UserInterface | 
 
 export function isBotId(userId: string | undefined) {
   try {
-    if (botUsername.value) {
-      return botId.value === userId;
+    const botId = variables.get('services.twitch.botId') as string;
+    if (botId.length > 0) {
+      return botId === userId;
     } else {
       return false;
     }

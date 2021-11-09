@@ -1,8 +1,9 @@
-import { botId } from '../oauth/botId';
+import { variables } from '~/watchers';
 
 export function getBotID() {
+  const botId = variables.get('services.twitch.botId') as string;
   try {
-    return botId.value;
+    return botId;
   } catch (e: any) {
     return '0';
   }

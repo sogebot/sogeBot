@@ -1,18 +1,19 @@
+import { AlertMedia } from '@entity/alert';
+import { Gallery } from '@entity/gallery';
 import FileType from 'file-type';
 import { isNil } from 'lodash';
 import { getRepository } from 'typeorm';
 
-import api from '../api';
-import { AlertMedia } from '../database/entity/alert';
-import { Gallery } from '../database/entity/gallery';
 import { command, default_permission } from '../decorators';
 import { onStartup } from '../decorators/on';
-import { debug } from '../helpers/log';
-import { defaultPermissions } from '../helpers/permissions';
-import { publicEndpoint } from '../helpers/socket';
 import Message from '../message';
 import { getApp } from '../panel';
 import Overlay from './_interface';
+
+import { debug } from '~/helpers/log';
+import { defaultPermissions } from '~/helpers/permissions';
+import { publicEndpoint } from '~/helpers/socket';
+import client from '~/services/twitch/api/client';
 
 class Media extends Overlay {
   @onStartup()
@@ -72,17 +73,22 @@ class Media extends Overlay {
     // remove clips without url or id
     send = send.filter((o) => (o.type === 'clip' && (isNil(o.id) || isNil(o.url))) || o.type !== 'clip');
 
+    const clientBot = await client('bot');
     for (const object of send) {
       if (object.type === 'clip') {
       // load clip from api
-        let clip: { data: any } = { data: [] };
         if (!isNil(object.id)) {
-          clip = await api.getClipById(object.id);
+          const clip = await  clientBot.clips.getClipById(object.id);
+          if (!clip) {
+            continue;
+          }
+          object.url = clip.thumbnailUrl.replace('-preview-480x272.jpg', '.mp4');
         } else if (!isNil(object.url)) {
-          clip = await api.getClipById(object.url.split('/').pop() as string);
-        }
-        for (const c of clip.data) {
-          object.url = c.thumbnail_url.replace('-preview-480x272.jpg', '.mp4');
+          const clip = await  clientBot.clips.getClipById(object.url.split('/').pop() as string);
+          if (!clip) {
+            continue;
+          }
+          object.url = clip.thumbnailUrl.replace('-preview-480x272.jpg', '.mp4');
         }
       }
     }

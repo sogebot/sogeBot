@@ -16,14 +16,14 @@ import _ from 'lodash';
 import { createConnection, getConnectionOptions } from 'typeorm';
 import { MysqlConnectionOptions } from 'typeorm/driver/mysql/MysqlConnectionOptions';
 
-import { autoLoad } from './helpers/autoLoad';
-import { setIsBotStarted } from './helpers/database';
-import { getMigrationType } from './helpers/getMigrationType';
+import { autoLoad } from '~/helpers/autoLoad';
+import { setIsBotStarted } from '~/helpers/database';
+import { getMigrationType } from '~/helpers/getMigrationType';
 import {
   debug, error, info, isDebugEnabled, setDEBUG, warning,
-} from './helpers/log';
-import { TypeORMLogger } from './helpers/logTypeorm';
-import { startWatcher } from './watchers';
+} from '~/helpers/log';
+import { TypeORMLogger } from '~/helpers/logTypeorm';
+import { startWatcher } from '~/watchers';
 
 const connect = async function () {
   const connectionOptions = await getConnectionOptions();
@@ -72,7 +72,7 @@ const connect = async function () {
 async function main () {
   try {
     const version = _.get(process, 'env.npm_package_version', 'x.y.z');
-    if (!existsSync('./restart.pid')) {
+    if (!existsSync('~/restart.pid')) {
       const versionString = version.replace('SNAPSHOT', gitCommitInfo().shortHash || 'SNAPSHOT');
       process.stdout.write(figlet.textSync('sogeBot ' + versionString, {
         font:             'ANSI Shadow',
@@ -105,15 +105,9 @@ async function main () {
         require('./currency');
         require('./stats');
         require('./users');
-        require('./emotes');
         require('./events');
         require('./customvariables');
-        require('./twitch');
         require('./permissions');
-        require('./oauth');
-        require('./api');
-        require('./eventsub');
-        require('./pubsub');
         require('./updater');
         require('./dashboard');
         require('./panel');
@@ -124,19 +118,17 @@ async function main () {
         await autoLoad('./dest/overlays/');
         await autoLoad('./dest/games/');
         await autoLoad('./dest/integrations/');
-
-        const tmi = require('./chat');
+        await autoLoad('./dest/services/');
 
         if (process.env.HEAP) {
           warning(chalk.bgRed.bold('HEAP debugging is ENABLED'));
-          setTimeout(() => require('./heapdump.js').init('heap/'), 120000);
+          setTimeout(() => require('~/heapdump.js').init('heap/'), 120000);
         }
 
         setTimeout(() => {
-          if (existsSync('./restart.pid')) {
-            unlinkSync('./restart.pid');
+          if (existsSync('~/restart.pid')) {
+            unlinkSync('~/restart.pid');
           }
-          tmi.default.shouldConnect = true;
           setIsBotStarted();
           startWatcher();
 
@@ -148,7 +140,7 @@ async function main () {
             }, { threshold: 1000 });
           }
 
-          require('./inspector');
+          require('~/inspector');
         }, 30000);
       });
     }, 5000);

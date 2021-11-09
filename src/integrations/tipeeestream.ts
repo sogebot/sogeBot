@@ -1,21 +1,22 @@
+import { UserTip, UserTipInterface } from '@entity/user';
 import * as constants from '@sogebot/ui-helpers/constants';
 import fetch from 'node-fetch';
 import { getRepository } from 'typeorm';
 
 import currency from '../currency';
-import { UserTip, UserTipInterface } from '../database/entity/user';
 import { persistent, settings } from '../decorators';
 import { onStartup } from '../decorators/on';
-import { isStreamOnline } from '../helpers/api/index';
-import { stats } from '../helpers/api/stats';
-import { mainCurrency } from '../helpers/currency/index';
-import { eventEmitter } from '../helpers/events/index';
-import { triggerInterfaceOnTip } from '../helpers/interface/triggers';
-import { error, tip } from '../helpers/log';
 import eventlist from '../overlays/eventlist';
 import alerts from '../registries/alerts';
 import users from '../users';
 import Integration from './_interface';
+
+import { isStreamOnline } from '~/helpers/api/index';
+import { stats } from '~/helpers/api/stats';
+import { mainCurrency } from '~/helpers/currency/index';
+import { eventEmitter } from '~/helpers/events/index';
+import { triggerInterfaceOnTip } from '~/helpers/interface/triggers';
+import { error, tip } from '~/helpers/log';
 
 type TipeeestreamEvent = {
   message: string,

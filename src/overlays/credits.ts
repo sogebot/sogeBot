@@ -1,22 +1,23 @@
+import { EventList, EventListInterface } from '@entity/eventList';
 import _ from 'lodash';
 import { getRepository, MoreThanOrEqual } from 'typeorm';
 
-import api from '../api';
 import currency from '../currency';
-import { EventList, EventListInterface } from '../database/entity/eventList';
-import {
-  isStreamOnline, stats, streamStatusChangeSince,
-} from '../helpers/api';
-import { mainCurrency } from '../helpers/currency';
-import { publicEndpoint } from '../helpers/socket';
-import oauth from '../oauth';
 import users from '../users';
 import Overlay from './_interface';
+
+import {
+  isStreamOnline, stats, streamStatusChangeSince,
+} from '~/helpers/api';
+import { mainCurrency } from '~/helpers/currency';
+import { publicEndpoint } from '~/helpers/socket';
+import { getTopClips } from '~/services/twitch/calls/getTopClips';
+import { variables } from '~/watchers';
 
 class Credits extends Overlay {
   sockets () {
     publicEndpoint(this.nsp, 'getClips', async(opts, cb) => {
-      cb(opts.show ? await api.getTopClips({
+      cb(opts.show ? await getTopClips({
         period: opts.period, days: opts.periodValue, first: opts.numOfClips,
       }) : [],
       );
@@ -47,9 +48,10 @@ class Credits extends Overlay {
           }
         }
       }
+      const broadcasterUsername = variables.get('services.twitch.broadcasterUsername') as string;
 
       cb(null, {
-        streamer: oauth.broadcasterUsername,
+        streamer: broadcasterUsername,
         game:     stats.value.currentGame,
         title:    stats.value.currentTitle,
         events,

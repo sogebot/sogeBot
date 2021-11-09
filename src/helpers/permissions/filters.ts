@@ -1,15 +1,15 @@
+import { PermissionFiltersInterface } from '@entity/permissions';
+import {
+  UserBit, UserInterface, UserTip,
+} from '@entity/user';
 import { getRepository } from 'typeorm';
 
 import type { default as currencyType } from '../../currency';
-import { PermissionFiltersInterface } from '../../database/entity/permissions';
-import {
-  UserBit, UserInterface, UserTip,
-} from '../../database/entity/user';
 import type { default as levelType } from '../../systems/levels';
 import type { default as ranksType } from '../../systems/ranks';
 import { mainCurrency } from '../currency';
 
-let levels: typeof levelType; 
+let levels: typeof levelType;
 let ranks: typeof ranksType;
 let currency: typeof currencyType;
 

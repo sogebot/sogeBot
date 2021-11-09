@@ -1,9 +1,10 @@
+import { UserBit } from '@entity/user';
 import { getRepository } from 'typeorm';
 
-import { UserBit } from '../database/entity/user';
-import { adminEndpoint } from '../helpers/socket';
 import users from '../users';
 import Stats from './_interface';
+
+import { adminEndpoint } from '~/helpers/socket';
 
 class Bits extends Stats {
   constructor() {

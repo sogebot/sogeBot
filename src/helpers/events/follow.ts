@@ -1,9 +1,8 @@
+import { EventList } from '@entity/eventList';
 import { HOUR } from '@sogebot/ui-helpers/constants';
 import { dayjs } from '@sogebot/ui-helpers/dayjsHelper';
 import { getRepository } from 'typeorm';
 
-import tmi from '../../chat';
-import { EventList } from '../../database/entity/eventList';
 import eventlist from '../../overlays/eventlist';
 import alerts from '../../registries/alerts';
 import { triggerInterfaceOnFollow } from '../interface';
@@ -14,6 +13,8 @@ import {
 import * as changelog from '../user/changelog.js';
 
 import { eventEmitter } from '.';
+
+import { tmiEmitter } from '~/helpers/tmi';
 
 const events = new Map<string, number>();
 
@@ -29,7 +30,7 @@ export function follow(userId: string, userName: string, followedAt: string | nu
     debug('events', `User ${userName}#${userId} is in ignore list.`);
     if (isInGlobalIgnoreList({ userName, userId })) {
       // autoban + autoblock
-      tmi.ban(userName);
+      tmiEmitter.emit('ban', userName);
       // remove from eventslit
       getRepository(EventList).delete({ userId });
     }

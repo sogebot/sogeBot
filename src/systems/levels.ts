@@ -1,36 +1,37 @@
 'use strict';
 
+import { User, UserInterface } from '@entity/user';
 import { MINUTE, SECOND } from '@sogebot/ui-helpers/constants';
 import { format } from '@sogebot/ui-helpers/number';
 import { evaluate as mathJsEvaluate, round } from 'mathjs';
 import { getRepository } from 'typeorm';
 
-import { User, UserInterface } from '../database/entity/user';
 import {
   command, default_permission, parser, permission_settings, settings, ui,
 } from '../decorators';
 import { onStartup } from '../decorators/on';
 import Expects from '../expects';
 import general from '../general';
-import { isStreamOnline } from '../helpers/api';
-import { ResponseError } from '../helpers/commandError';
-import { prepare } from '../helpers/commons';
-import { getAllOnlineIds } from '../helpers/getAllOnlineUsernames';
-import { debug, error } from '../helpers/log';
-import { getUserHighestPermission } from '../helpers/permissions/';
-import { defaultPermissions } from '../helpers/permissions/';
-import { getPointsName } from '../helpers/points';
-import { setImmediateAwait } from '../helpers/setImmediateAwait';
-import { adminEndpoint } from '../helpers/socket';
-import {
-  bigIntMax, serialize, unserialize,
-} from '../helpers/type';
-import * as changelog from '../helpers/user/changelog.js';
-import { isBotId } from '../helpers/user/isBot';
-import { translate } from '../translate';
 import users from '../users';
 import System from './_interface';
-import points from './points';
+
+import { isStreamOnline } from '~/helpers/api';
+import { ResponseError } from '~/helpers/commandError';
+import { prepare } from '~/helpers/commons';
+import { getAllOnlineIds } from '~/helpers/getAllOnlineUsernames';
+import { debug, error } from '~/helpers/log';
+import { getUserHighestPermission } from '~/helpers/permissions/index';
+import { defaultPermissions } from '~/helpers/permissions/index';
+import { getPointsName } from '~/helpers/points';
+import { setImmediateAwait } from '~/helpers/setImmediateAwait';
+import { adminEndpoint } from '~/helpers/socket';
+import {
+  bigIntMax, serialize, unserialize,
+} from '~/helpers/type';
+import * as changelog from '~/helpers/user/changelog.js';
+import { isBotId } from '~/helpers/user/isBot';
+import points from '~/systems/points';
+import { translate } from '~/translate';
 
 let cachedLevelsHash = '';
 const cachedLevels: bigint[] = [];

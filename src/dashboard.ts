@@ -1,7 +1,7 @@
 import { v4 } from 'uuid';
 
-import Core from './_interface';
-import { settings } from './decorators';
+import Core from '~/_interface';
+import { settings } from '~/decorators';
 
 class Dashboard extends Core {
   @settings()

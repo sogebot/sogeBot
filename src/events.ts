@@ -1,60 +1,58 @@
 import { setTimeout } from 'timers'; // tslint workaround
 
 import { sample } from '@sogebot/ui-helpers/array';
+import { dayjs } from '@sogebot/ui-helpers/dayjsHelper';
 import { generateUsername } from '@sogebot/ui-helpers/generateUsername';
 import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized';
-import axios from 'axios';
 import _, {
   clone, cloneDeep, get, isNil, random,
 } from 'lodash';
 import safeEval from 'safe-eval';
 import { getRepository } from 'typeorm';
 
-import Core from './_interface';
-import api from './api';
-import tmi from './chat';
-import { parserReply } from './commons';
+import Core from '~/_interface';
+import { parserReply } from '~/commons';
 import {
   Event, EventInterface, Events as EventsEntity,
-} from './database/entity/event';
-import { User } from './database/entity/user';
-import { onStreamEnd } from './decorators/on';
-import events from './events';
-import {
-  calls, isStreamOnline, rawStatus, setRateLimit, stats, streamStatusChangeSince,
-} from './helpers/api';
-import { attributesReplace } from './helpers/attributesReplace';
+} from '~/database/entity/event';
+import { User } from '~/database/entity/user';
+import { onStreamEnd } from '~/decorators/on';
+import events from '~/events';
+import { isStreamOnline, rawStatus, stats, streamStatusChangeSince } from '~/helpers/api';
+import { attributesReplace } from '~/helpers/attributesReplace';
 import {
   announce, getOwner, getUserSender, prepare,
-} from './helpers/commons';
-import { mainCurrency } from './helpers/currency';
+} from '~/helpers/commons';
+import { mainCurrency } from '~/helpers/currency';
 import {
   getAll, getValueOf, setValueOf,
-} from './helpers/customvariables';
-import { csEmitter } from './helpers/customvariables/emitter';
-import { isDbConnected } from './helpers/database';
-import { dayjs } from './helpers/dayjs';
-import { eventEmitter } from './helpers/events/emitter';
+} from '~/helpers/customvariables';
+import { csEmitter } from '~/helpers/customvariables/emitter';
+import { isDbConnected } from '~/helpers/database';
+import { eventEmitter } from '~/helpers/events/emitter';
+import emitter from '~/helpers/interfaceEmitter';
 import {
   debug, error, info, warning,
-} from './helpers/log';
-import { channelId } from './helpers/oauth';
-import { ioServer } from './helpers/panel';
-import { addUIError } from './helpers/panel/';
-import { parserEmitter } from './helpers/parser/';
-import { adminEndpoint } from './helpers/socket';
+} from '~/helpers/log';
+import { addUIError } from '~/helpers/panel/index';
+import { parserEmitter } from '~/helpers/parser/index';
+import { adminEndpoint } from '~/helpers/socket';
+import { tmiEmitter } from '~/helpers/tmi';
 import {
   isOwner, isSubscriber, isVIP,
-} from './helpers/user';
-import * as changelog from './helpers/user/changelog.js';
-import { isBot, isBotSubscriber } from './helpers/user/isBot';
-import { isBroadcaster } from './helpers/user/isBroadcaster';
-import { isModerator } from './helpers/user/isModerator';
-import Message from './message';
-import { getIdFromTwitch } from './microservices/getIdFromTwitch';
-import { setTitleAndGame } from './microservices/setTitleAndGame';
-import oauth from './oauth';
-import users from './users';
+} from '~/helpers/user';
+import * as changelog from '~/helpers/user/changelog.js';
+import { isBot, isBotSubscriber } from '~/helpers/user/isBot';
+import { isBroadcaster } from '~/helpers/user/isBroadcaster';
+import { isModerator } from '~/helpers/user/isModerator';
+import Message from '~/message';
+import client from '~/services/twitch/api/client';
+import { createClip } from '~/services/twitch/calls/createClip';
+import { getCustomRewards } from '~/services/twitch/calls/getCustomRewards';
+import { getIdFromTwitch } from '~/services/twitch/calls/getIdFromTwitch';
+import { setTitleAndGame } from '~/services/twitch/calls/setTitleAndGame';
+import users from '~/users';
+import { variables } from '~/watchers';
 
 const excludedUsers = new Set<string>();
 
@@ -73,7 +71,7 @@ class Events extends Core {
     definitions?: {
       [x: string]: any;
     };
-    fire: (operation: EventsEntity.OperationDefinitions, attributes: EventsEntity.Attributes) => Promise<void>;
+    fire: (operation: EventsEntity.OperationDefinitions, attributes: EventsEntity.Attributes) => Promise<any>;
   }[];
 
   constructor() {
@@ -328,7 +326,7 @@ class Events extends Core {
   }
 
   public async fireCreateAClip(operation: EventsEntity.OperationDefinitions) {
-    const cid = await api.createClip({ hasDelay: operation.hasDelay });
+    const cid = await createClip({ createAfterDelay: !!operation.hasDelay });
     if (cid) { // OK
       if (Boolean(operation.announce) === true) {
         announce(prepare('api.clips.created', { link: `https://clips.twitch.tv/${cid}` }), 'general');
@@ -344,81 +342,59 @@ class Events extends Core {
   public async fireCreateAClipAndPlayReplay(operation: EventsEntity.OperationDefinitions, attributes: EventsEntity.Attributes) {
     const cid = await events.fireCreateAClip(operation);
     if (cid) { // clip created ok
-      require('./overlays/clips').default.showClip(cid);
+      require('~/overlays/clips').default.showClip(cid);
     }
   }
 
   public async fireBotWillJoinChannel() {
-    tmi.client.bot?.join('#' + oauth.broadcasterUsername);
+    tmiEmitter.emit('join', 'bot');
   }
 
   public async fireBotWillLeaveChannel() {
-    tmi.part('bot');
+    tmiEmitter.emit('part', 'bot');
     // force all users offline
     await changelog.flush();
     await getRepository(User).update({}, { isOnline: false });
   }
 
   public async fireStartCommercial(operation: EventsEntity.OperationDefinitions) {
-    const cid = channelId.value;
-    const url = `https://api.twitch.tv/helix/channels/commercial`;
-
-    const token = await oauth.broadcasterAccessToken;
-    if (!oauth.broadcasterCurrentScopes.includes('channel:edit:commercial')) {
-      warning('Missing Broadcaster oAuth scope channel:edit:commercial to start commercial');
-      addUIError({ name: 'OAUTH', message: 'Missing Broadcaster oAuth scope channel:edit:commercial to start commercial' });
-      return;
-    }
-    if (token === '') {
-      warning('Missing Broadcaster oAuth to change game or title');
-      addUIError({ name: 'OAUTH', message: 'Missing Broadcaster oAuth to change game or title' });
-      return;
-    }
-
     try {
-      const request = await axios({
-        method:  'post',
-        url,
-        data:    { broadcaster_id: String(cid), length: Number(operation.durationOfCommercial) },
-        headers: {
-          'Authorization': 'Bearer ' + token,
-          'Client-ID':     oauth.broadcasterClientId,
-          'Content-Type':  'application/json',
-        },
-      });
-
-      // save remaining api calls
-      setRateLimit('broadcaster', request.headers as any);
-
-      ioServer?.emit('api.stats', {
-        method: 'POST', request: { data: { broadcaster_id: String(cid), length: Number(operation.durationOfCommercial) } }, timestamp: Date.now(), call: 'commercial', api: 'helix', endpoint: url, code: request.status, data: request.data, remaining: calls.broadcaster,
-      });
-      eventEmitter.emit('commercial', { duration: Number(operation.durationOfCommercial) });
-    } catch (e: any) {
-      if (e.isAxiosError) {
-        error(`API: ${url} - ${e.response.data.message}`);
-        ioServer?.emit('api.stats', {
-          method: 'POST', request: { data: { broadcaster_id: String(cid), length: Number(operation.durationOfCommercial) } }, timestamp: Date.now(), call: 'commercial', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.response?.data ?? 'n/a',
-        });
+      const cid = variables.get('services.twitch.channelId') as string;
+      const broadcasterCurrentScopes = variables.get('services.twitch.broadcasterCurrentScopes') as string[];
+      const duration = operation.durationOfCommercial
+        ? Number(operation.durationOfCommercial)
+        : 30;
+      // check if duration is correct (30, 60, 90, 120, 150, 180)
+      if ([30, 60, 90, 120, 150, 180].includes(duration)) {
+        if (!broadcasterCurrentScopes.includes('channel:edit:commercial')) {
+          warning('Missing Broadcaster oAuth scope channel:edit:commercial to start commercial');
+          addUIError({ name: 'OAUTH', message: 'Missing Broadcaster oAuth scope channel:edit:commercial to start commercial' });
+          return;
+        }
+        if (!broadcasterCurrentScopes.includes('channel:edit:commercial')) {
+          warning('Missing Broadcaster oAuth scope channel:edit:commercial to start commercial');
+          addUIError({ name: 'OAUTH', message: 'Missing Broadcaster oAuth scope channel:edit:commercial to start commercial' });
+          return;
+        }
+        const clientBroadcaster = await client('broadcaster');
+        await clientBroadcaster.channels.startChannelCommercial(cid, duration as 30 | 60 | 90 | 120 | 150 | 180);
+        eventEmitter.emit('commercial', { duration });
       } else {
-        error(`API: ${url} - ${e.stack}`);
-        ioServer?.emit('api.stats', {
-          method: 'POST', request: { data: { broadcaster_id: String(cid), length: Number(operation.durationOfCommercial) } }, timestamp: Date.now(), call: 'commercial', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack,
-        });
+        throw new Error('Incorrect duration set');
+      }
+    } catch (e) {
+      if (e instanceof Error) {
+        error(e.stack ?? e.message);
       }
     }
   }
 
   public async fireEmoteExplosion(operation: EventsEntity.OperationDefinitions) {
-    // we must require emotes as it is triggering translations in mocha
-    const emotes: typeof import('./emotes') = require('./emotes');
-    emotes.default.explode(String(operation.emotesToExplode).split(' '));
+    emitter.emit('services::twitch::emotes', 'explode', String(operation.emotesToExplode).split(' '));
   }
 
   public async fireEmoteFirework(operation: EventsEntity.OperationDefinitions) {
-    // we must require emotes as it is triggering translations in mocha
-    const emotes: typeof import('./emotes') = require('./emotes');
-    emotes.default.firework(String(operation.emotesToFirework).split(' '));
+    emitter.emit('services::twitch::emotes', 'firework', String(operation.emotesToExplode).split(' '));
   }
 
   public async fireRunCommand(operation: EventsEntity.OperationDefinitions, attributes: EventsEntity.Attributes) {
@@ -753,8 +729,8 @@ class Events extends Core {
   public sockets() {
     adminEndpoint(this.nsp, 'events::getRedeemedRewards', async (cb) => {
       try {
-        const rewards = await api.getCustomRewards();
-        cb(null, rewards?.data ? [...rewards?.data.map(o => o.title)] : []);
+        const rewards = await getCustomRewards() ?? [];
+        cb(null, [...rewards.map(o => o.title)]);
       } catch (e: any) {
         cb(e.stack, []);
       }
@@ -792,39 +768,39 @@ class Events extends Core {
       }
     });
 
-    adminEndpoint(this.nsp, 'test.event', async ({ id, randomized, values, variables }, cb) => {
+    adminEndpoint(this.nsp, 'test.event', async ({ id, randomized, values, variables: variablesArg }, cb) => {
       try {
         const attributes: Record<string, any> = {
           test:     true,
           userId:   '0',
           currency: sample(['CZK', 'USD', 'EUR']),
-          ...variables.map((variable, idx) => {
-            if (['username', 'recipient', 'target', 'topContributionsBitsUsername', 'topContributionsSubsUsername', 'lastContributionUsername'].includes(variable)) {
-              return { [variable]: randomized.includes(variable) ? generateUsername() : values[idx] };
-            } else if (['userInput', 'message', 'reason'].includes(variable)) {
-              return { [variable]: randomized.includes(variable) ? sample(['', 'Lorem Ipsum Dolor Sit Amet']) : values[idx] };
-            } else if (['source'].includes(variable)) {
-              return { [variable]: randomized.includes(variable) ? sample(['Twitch', 'Discord']) : values[idx] };
-            } else if (['tier'].includes(variable)) {
-              return { [variable]: randomized.includes(variable) ? random(0, 3, false) : (values[idx] === 'Prime' ? 0 : Number(values[idx]))  };
-            } else if (['lastContributionTotal', 'topContributionsSubsTotal', 'topContributionsBitsTotal', 'duration', 'viewers', 'bits', 'subCumulativeMonths', 'count', 'subStreak', 'amount', 'amountInBotCurrency'].includes(variable)) {
-              return { [variable]: randomized.includes(variable) ? random(10, 10000000000, false) : values[idx]  };
-            } else if (['game', 'oldGame'].includes(variable)) {
+          ...variablesArg.map((variableMap, idx) => {
+            if (['username', 'recipient', 'target', 'topContributionsBitsUsername', 'topContributionsSubsUsername', 'lastContributionUsername'].includes(variableMap)) {
+              return { [variableMap]: randomized.includes(variableMap) ? generateUsername() : values[idx] };
+            } else if (['userInput', 'message', 'reason'].includes(variableMap)) {
+              return { [variableMap]: randomized.includes(variableMap) ? sample(['', 'Lorem Ipsum Dolor Sit Amet']) : values[idx] };
+            } else if (['source'].includes(variableMap)) {
+              return { [variableMap]: randomized.includes(variableMap) ? sample(['Twitch', 'Discord']) : values[idx] };
+            } else if (['tier'].includes(variableMap)) {
+              return { [variableMap]: randomized.includes(variableMap) ? random(0, 3, false) : (values[idx] === 'Prime' ? 0 : Number(values[idx]))  };
+            } else if (['lastContributionTotal', 'topContributionsSubsTotal', 'topContributionsBitsTotal', 'duration', 'viewers', 'bits', 'subCumulativeMonths', 'count', 'subStreak', 'amount', 'amountInBotCurrency'].includes(variableMap)) {
+              return { [variableMap]: randomized.includes(variableMap) ? random(10, 10000000000, false) : values[idx]  };
+            } else if (['game', 'oldGame'].includes(variableMap)) {
               return {
-                [variable]: randomized.includes(variable)
+                [variableMap]: randomized.includes(variableMap)
                   ? sample(['Dota 2', 'Escape From Tarkov', 'Star Citizen', 'Elite: Dangerous'])
                   : values[idx],
               };
-            } else if (['command'].includes(variable)) {
-              return { [variable]: randomized.includes(variable) ? sample(['!me', '!top', '!points']) : values[idx]  };
-            } else if (['subStreakShareEnabled'].includes(variable) || variable.startsWith('is.') || variable.startsWith('recipientis.')) {
-              return { [variable]: randomized.includes(variable) ? random(0, 1, false) === 0 : values[idx]  };
-            } else if (['level'].includes(variable)) {
-              return { [variable]: randomized.includes(variable) ? random(1, 5, false)  : values[idx]  };
-            } else if (['topContributionsSubsUserId', 'topContributionsBitsUserId', 'lastContributionUserId'].includes(variable)) {
-              return { [variable]: randomized.includes(variable) ? String(random(90000, 900000, false)) : values[idx]  };
-            } else if (['lastContributionType'].includes(variable)) {
-              return { [variable]: randomized.includes(variable) ? sample(['BITS', 'SUBS']) : values[idx]  };
+            } else if (['command'].includes(variableMap)) {
+              return { [variableMap]: randomized.includes(variableMap) ? sample(['!me', '!top', '!points']) : values[idx]  };
+            } else if (['subStreakShareEnabled'].includes(variableMap) || variableMap.startsWith('is.') || variableMap.startsWith('recipientis.')) {
+              return { [variableMap]: randomized.includes(variableMap) ? random(0, 1, false) === 0 : values[idx]  };
+            } else if (['level'].includes(variableMap)) {
+              return { [variableMap]: randomized.includes(variableMap) ? random(1, 5, false)  : values[idx]  };
+            } else if (['topContributionsSubsUserId', 'topContributionsBitsUserId', 'lastContributionUserId'].includes(variableMap)) {
+              return { [variableMap]: randomized.includes(variableMap) ? String(random(90000, 900000, false)) : values[idx]  };
+            } else if (['lastContributionType'].includes(variableMap)) {
+              return { [variableMap]: randomized.includes(variableMap) ? sample(['BITS', 'SUBS']) : values[idx]  };
             }
           }).reduce((prev, cur) => {
             return { ...prev, ...cur };

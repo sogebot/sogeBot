@@ -1,18 +1,19 @@
+import { HeistUser } from '@entity/heist';
 import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized';
 import _ from 'lodash';
 import { getRepository } from 'typeorm';
 
-import tmi from '../chat';
-import { HeistUser } from '../database/entity/heist';
 import { command, settings } from '../decorators';
 import { onStartup } from '../decorators/on';
 import Expects from '../expects.js';
-import { announce, prepare } from '../helpers/commons';
-import { debug, warning } from '../helpers/log.js';
-import * as changelog from '../helpers/user/changelog.js';
+import twitch from '../services/twitch';
 import { default as pointsSystem } from '../systems/points';
-import { translate } from '../translate';
 import Game from './_interface';
+
+import { announce, prepare } from '~/helpers/commons';
+import { debug, warning } from '~/helpers/log.js';
+import * as changelog from '~/helpers/user/changelog.js';
+import { translate } from '~/translate';
 
 export type Level = { name: string; winPercentage: number; payoutMultiplier: number; maxUsers: number };
 export type Result = { percentage: number; message: string };
@@ -135,7 +136,7 @@ class Heist extends Game {
         const user = users[0];
         const outcome = isSurvivor ? this.singleUserSuccess : this.singleUserFailed;
         global.setTimeout(async () => {
-          announce(outcome.replace('$user', (tmi.showWithAt ? '@' : '') + user.username), 'heist');
+          announce(outcome.replace('$user', (twitch.showWithAt ? '@' : '') + user.username), 'heist');
         }, 5000);
 
         if (isSurvivor) {
@@ -168,7 +169,7 @@ class Heist extends Game {
             const andXMore = winners.length - this.showMaxUsers;
 
             let message = await translate('games.heist.results');
-            message = message.replace('$users', winnersList.map((o) => (tmi.showWithAt ? '@' : '') + o).join(', '));
+            message = message.replace('$users', winnersList.map((o) => (twitch.showWithAt ? '@' : '') + o).join(', '));
             if (andXMore > 0) {
               message = message + ' ' + (await translate('games.heist.andXMore')).replace('$count', andXMore);
             }

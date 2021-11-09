@@ -48,7 +48,7 @@ describe('Heist - !bankheist - @func2', () => {
     });
 
     it('Heist should be announced', async () => {
-      await message.isSentRaw('@__viewer__ has started planning a bank heist! Looking for a bigger crew for a bigger score. Join in! Type !bankheist <points> to enter.', { userName: 'bot' });
+      await message.isSentRaw('@__viewer__ has started planning a bank heist! Looking for a bigger crew for a bigger score. Join in! Type !bankheist <points> to enter.', { userName: '__bot__' });
     });
 
     it('Already started bankheist should show entryInstruction with !bankheist without points', async () => {
@@ -79,7 +79,7 @@ describe('Heist - !bankheist - @func2', () => {
     });
 
     it('Heist should be finished - nobody joined', async () => {
-      await message.isSentRaw('Nobody joins a crew to heist.', { userName: 'bot' });
+      await message.isSentRaw('Nobody joins a crew to heist.', { userName: '__bot__' });
     });
   });
 
@@ -125,7 +125,7 @@ describe('Heist - !bankheist - @func2', () => {
     });
 
     it('Heist should be announced', async () => {
-      await message.isSentRaw('@__viewer__ has started planning a bank heist! Looking for a bigger crew for a bigger score. Join in! Type !bankheist <points> to enter.', { userName: 'bot' });
+      await message.isSentRaw('@__viewer__ has started planning a bank heist! Looking for a bigger crew for a bigger score. Join in! Type !bankheist <points> to enter.', { userName: '__bot__' });
     });
 
     it('Another viewer joins with all points', async () => {
@@ -181,7 +181,7 @@ describe('Heist - !bankheist - @func2', () => {
     });
 
     it('Heist should be finished - start message', async () => {
-      await message.isSentRaw('Alright guys, check your equipment, this is what we trained for. This is not a game, this is real life. We will get money from Federal reserve!', { userName: 'bot' });
+      await message.isSentRaw('Alright guys, check your equipment, this is what we trained for. This is not a game, this is real life. We will get money from Federal reserve!', { userName: '__bot__' });
     });
     it('Heist should be finished - result message', async () => {
       await message.isSentRaw([
@@ -190,7 +190,7 @@ describe('Heist - !bankheist - @func2', () => {
         'Half of heist team was killed or catched by police.',
         'Some loses of heist team is nothing of what remaining crew have in theirs pockets.',
         'God divinity, nobody is dead, everyone won!',
-      ], { userName: 'bot' });
+      ], { userName: '__bot__' });
     });
     it('We need to wait at least 7 seconds', async() =>{
       const steps = 7;
@@ -233,7 +233,7 @@ describe('Heist - !bankheist - @func2', () => {
     });
 
     it('Heist should be announced', async () => {
-      await message.isSentRaw('@__viewer__ has started planning a bank heist! Looking for a bigger crew for a bigger score. Join in! Type !bankheist <points> to enter.', { userName: 'bot' });
+      await message.isSentRaw('@__viewer__ has started planning a bank heist! Looking for a bigger crew for a bigger score. Join in! Type !bankheist <points> to enter.', { userName: '__bot__' });
     });
 
     it('Force heist to end', async () => {
@@ -242,13 +242,13 @@ describe('Heist - !bankheist - @func2', () => {
     });
 
     it('Heist should be finished - start message', async () => {
-      await message.isSentRaw('Alright guys, check your equipment, this is what we trained for. This is not a game, this is real life. We will get money from Bank van!', { userName: 'bot' });
+      await message.isSentRaw('Alright guys, check your equipment, this is what we trained for. This is not a game, this is real life. We will get money from Bank van!', { userName: '__bot__' });
     });
     it('Heist should be finished - result message', async () => {
       await message.isSentRaw([
         '@__viewer__ was like a ninja. Nobody noticed missing money.',
         '@__viewer__ failed to get rid of police and will be spending his time in jail.',
-      ], { userName: 'bot' });
+      ], { userName: '__bot__' });
     });
   });
 
@@ -286,7 +286,7 @@ describe('Heist - !bankheist - @func2', () => {
     });
 
     it('Heist should be announced', async () => {
-      await message.isSentRaw('@__viewer__ has started planning a bank heist! Looking for a bigger crew for a bigger score. Join in! Type !bankheist <points> to enter.', { userName: 'bot' });
+      await message.isSentRaw('@__viewer__ has started planning a bank heist! Looking for a bigger crew for a bigger score. Join in! Type !bankheist <points> to enter.', { userName: '__bot__' });
     });
     it('We need to wait at least 20 seconds', async() =>{
       const steps = 10;
@@ -298,13 +298,13 @@ describe('Heist - !bankheist - @func2', () => {
     });
 
     it('Heist should be finished - start message', async () => {
-      await message.isSentRaw('Alright guys, check your equipment, this is what we trained for. This is not a game, this is real life. We will get money from Bank van!', { userName: 'bot' });
+      await message.isSentRaw('Alright guys, check your equipment, this is what we trained for. This is not a game, this is real life. We will get money from Bank van!', { userName: '__bot__' });
     });
     it('Heist should be finished - result message', async () => {
       await message.isSentRaw([
         '@__viewer__ was like a ninja. Nobody noticed missing money.',
         '@__viewer__ failed to get rid of police and will be spending his time in jail.',
-      ], { userName: 'bot' });
+      ], { userName: '__bot__' });
     });
 
     it('User start new bankheist with !bankheist 100, but cops are patrolling', async () => {
@@ -340,7 +340,7 @@ describe('Heist - !bankheist - @func2', () => {
       }
     }).timeout(60000 * 3);
     it('We should get announce that cops are not on cooldown', async () => {
-      await message.isSentRaw('Alright guys, looks like police forces are eating donuts and we can get that sweet money!', { userName: 'bot' });
+      await message.isSentRaw('Alright guys, looks like police forces are eating donuts and we can get that sweet money!', { userName: '__bot__' });
     });
   });
 
@@ -383,7 +383,7 @@ describe('Heist - !bankheist - @func2', () => {
     it('bankVan level should be announced', async () => {
       const current = 'Bank van';
       const next = 'City bank';
-      await message.isSentRaw(`With this crew, we can heist ${current}! Let's see if we can get enough crew to heist ${next}`, { userName: 'bot' });
+      await message.isSentRaw(`With this crew, we can heist ${current}! Let's see if we can get enough crew to heist ${next}`, { userName: '__bot__' });
     });
 
     it(`5 users joins bankheist`, async () => {
@@ -397,7 +397,7 @@ describe('Heist - !bankheist - @func2', () => {
     it('cityBank level should be announced', async () => {
       const current = 'City bank';
       const next = 'State bank';
-      await message.isSentRaw(`With this crew, we can heist ${current}! Let's see if we can get enough crew to heist ${next}`, { userName: 'bot' });
+      await message.isSentRaw(`With this crew, we can heist ${current}! Let's see if we can get enough crew to heist ${next}`, { userName: '__bot__' });
     });
 
     it(`10 users joins bankheist`, async () => {
@@ -411,7 +411,7 @@ describe('Heist - !bankheist - @func2', () => {
     it('stateBank level should be announced', async () => {
       const current = 'State bank';
       const next = 'National reserve';
-      await message.isSentRaw(`With this crew, we can heist ${current}! Let's see if we can get enough crew to heist ${next}`, { userName: 'bot' });
+      await message.isSentRaw(`With this crew, we can heist ${current}! Let's see if we can get enough crew to heist ${next}`, { userName: '__bot__' });
     });
 
     it(`10 users joins bankheist`, async () => {
@@ -425,7 +425,7 @@ describe('Heist - !bankheist - @func2', () => {
     it('nationalReserve level should be announced', async () => {
       const current = 'National reserve';
       const next = 'Federal reserve';
-      await message.isSentRaw(`With this crew, we can heist ${current}! Let's see if we can get enough crew to heist ${next}`, { userName: 'bot' });
+      await message.isSentRaw(`With this crew, we can heist ${current}! Let's see if we can get enough crew to heist ${next}`, { userName: '__bot__' });
     });
 
     it(`30 users joins bankheist`, async () => {
@@ -438,7 +438,7 @@ describe('Heist - !bankheist - @func2', () => {
 
     it('maxLevelMessage level should be announced', async () => {
       const current = 'Federal reserve';
-      await message.isSentRaw(`With this crew, we can heist ${current}! It cannot be any better!`, { userName: 'bot' });
+      await message.isSentRaw(`With this crew, we can heist ${current}! It cannot be any better!`, { userName: '__bot__' });
     });
   });
 

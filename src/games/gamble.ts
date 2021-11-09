@@ -7,15 +7,16 @@ import {
   command, permission_settings, persistent, settings,
 } from '../decorators';
 import general from '../general.js';
-import { prepare } from '../helpers/commons';
-import { error } from '../helpers/log';
-import { getUserHighestPermission } from '../helpers/permissions/';
-import { getPointsName } from '../helpers/points';
-import * as changelog from '../helpers/user/changelog.js';
 import pointsSystem from '../systems/points';
-import { translate } from '../translate';
 import users from '../users';
 import Game from './_interface';
+
+import { prepare } from '~/helpers/commons';
+import { error } from '~/helpers/log';
+import { getUserHighestPermission } from '~/helpers/permissions/index';
+import { getPointsName } from '~/helpers/points';
+import * as changelog from '~/helpers/user/changelog.js';
+import { translate } from '~/translate';
 
 const ERROR_NOT_ENOUGH_OPTIONS = '0';
 const ERROR_ZERO_BET = '1';

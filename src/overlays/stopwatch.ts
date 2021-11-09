@@ -1,9 +1,10 @@
+import { OverlayMapper, OverlayMapperGroup } from '@entity/overlay.js';
 import { MINUTE, SECOND } from '@sogebot/ui-helpers/constants';
 import { getRepository } from 'typeorm';
 
-import { OverlayMapper, OverlayMapperGroup } from '../database/entity/overlay.js';
-import { adminEndpoint, publicEndpoint } from '../helpers/socket';
 import Overlay from './_interface';
+
+import { adminEndpoint, publicEndpoint } from '~/helpers/socket';
 
 const checks = new Map<string, { timestamp: number; isEnabled: boolean; time: number; }>();
 const statusUpdate = new Map<string, { timestamp: number; isEnabled: boolean | null; time: number | null; }>();

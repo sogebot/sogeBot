@@ -11,8 +11,8 @@ import { writeHeapSnapshot } from 'v8';
 
 import chalk from 'chalk';
 
-import { isStreamOnline } from './helpers/api';
-import { info } from './helpers/log';
+import { isStreamOnline } from '~/helpers/api';
+import { info } from '~/helpers/log';
 
 let _datadir: string;
 let memMBlast = 0;

@@ -1,24 +1,25 @@
+import { UserTip, UserTipInterface } from '@entity/user';
 import * as constants from '@sogebot/ui-helpers/constants';
 import axios from 'axios';
 import chalk from 'chalk';
 import { getRepository } from 'typeorm';
 
 import currency from '../currency';
-import { UserTip, UserTipInterface } from '../database/entity/user';
 import { persistent, settings } from '../decorators';
 import { onChange, onStartup } from '../decorators/on.js';
-import { isStreamOnline, stats } from '../helpers/api/index.js';
-import { mainCurrency } from '../helpers/currency';
-import { eventEmitter } from '../helpers/events';
-import { triggerInterfaceOnTip } from '../helpers/interface/triggers.js';
-import {
-  error, info, tip,
-} from '../helpers/log.js';
-import { adminEndpoint } from '../helpers/socket.js';
 import eventlist from '../overlays/eventlist.js';
 import alerts from '../registries/alerts.js';
 import users from '../users.js';
 import Integration from './_interface';
+
+import { isStreamOnline, stats } from '~/helpers/api/index.js';
+import { mainCurrency } from '~/helpers/currency';
+import { eventEmitter } from '~/helpers/events';
+import { triggerInterfaceOnTip } from '~/helpers/interface/triggers.js';
+import {
+  error, info, tip,
+} from '~/helpers/log.js';
+import { adminEndpoint } from '~/helpers/socket.js';
 
 const parsedTips: number[] = [];
 

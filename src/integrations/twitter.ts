@@ -2,6 +2,8 @@
 
 // bot libraries
 
+import { Event, Events } from '@entity/event';
+import { WidgetSocial } from '@entity/widget';
 import chalk from 'chalk';
 import _ from 'lodash';
 import {
@@ -10,17 +12,16 @@ import {
 } from 'twitter-api-v2';
 import { getRepository } from 'typeorm';
 
-import { Event, Events } from '../database/entity/event';
-import { WidgetSocial } from '../database/entity/widget';
 import { settings } from '../decorators';
 import { onChange, onStartup } from '../decorators/on';
 import events from '../events';
-import { attributesReplace } from '../helpers/attributesReplace';
-import { getOwner } from '../helpers/commons';
-import { eventEmitter } from '../helpers/events';
-import { error, info } from '../helpers/log';
 import Message from '../message';
 import Integration from './_interface';
+
+import { attributesReplace } from '~/helpers/attributesReplace';
+import { getOwner } from '~/helpers/commons';
+import { eventEmitter } from '~/helpers/events';
+import { error, info } from '~/helpers/log';
 
 class Twitter extends Integration {
   public watchedStreams: {

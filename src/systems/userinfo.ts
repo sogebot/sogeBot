@@ -1,33 +1,33 @@
+import {
+  User, UserBit, UserTip,
+} from '@entity/user';
+import { dayjs, timezone } from '@sogebot/ui-helpers/dayjsHelper';
 import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized';
 import { format } from '@sogebot/ui-helpers/number';
 import { getRepository } from 'typeorm';
 
-import api from '../api';
 import { dateDiff } from '../commons';
 import currency from '../currency';
-import {
-  User, UserBit, UserTip,
-} from '../database/entity/user';
 import {
   command, default_permission, settings,
 } from '../decorators';
 import Expects from '../expects';
 import general from '../general';
-import { prepare } from '../helpers/commons/';
-import { mainCurrency } from '../helpers/currency';
-import { dayjs, timezone } from '../helpers/dayjs';
-import { debug, error } from '../helpers/log';
-import { get, getUserHighestPermission } from '../helpers/permissions/';
-import { getPointsName } from '../helpers/points';
-import * as changelog from '../helpers/user/changelog.js';
-import { fetchAccountAge } from '../microservices/fetchAccountAge';
-import { getUserFromTwitch } from '../microservices/getUserFromTwitch';
-import { translate } from '../translate';
+import client from '../services/twitch/api/client';
+import { isFollowerUpdate } from '../services/twitch/calls/isFollowerUpdate';
 import users from '../users';
 import System from './_interface';
 import levels from './levels';
 import points from './points';
 import ranks from './ranks';
+
+import { prepare } from '~/helpers/commons/index';
+import { mainCurrency } from '~/helpers/currency';
+import { error } from '~/helpers/log';
+import { get, getUserHighestPermission } from '~/helpers/permissions/index';
+import { getPointsName } from '~/helpers/points';
+import * as changelog from '~/helpers/user/changelog.js';
+import { translate } from '~/translate';
 
 /*
  * !me
@@ -56,8 +56,7 @@ class UserInfo extends System {
   protected async followage(opts: CommandOptions): Promise<CommandResponse[]> {
     const [userName] = new Expects(opts.parameters).username({ optional: true, default: opts.sender.userName }).toArray();
     const id = await users.getIdByName(userName);
-    const isFollowerUpdate = await api.isFollowerUpdate(await changelog.get(id));
-    debug('userinfo.followage', JSON.stringify(isFollowerUpdate));
+    await isFollowerUpdate(await changelog.get(id));
 
     await changelog.flush();
     const user = await getRepository(User).findOne({ userName });
@@ -138,11 +137,11 @@ class UserInfo extends System {
     const user = await getRepository(User).findOne({ userName });
     if (!user || user.createdAt === 0) {
       try {
-        const { id: userId } = await getUserFromTwitch(userName);
-        if (!user) {
-          changelog.update(userId, { userName });
+        const clientBot = await client('bot');
+        const getUserByName = await clientBot.users.getUserByName(userName);
+        if (getUserByName) {
+          changelog.update(getUserByName.id, { createdAt: new Date(getUserByName.creationDate).getTime() });
         }
-        await fetchAccountAge(userId);
         if (!retry) {
           return this.age(opts, true);
         } else {

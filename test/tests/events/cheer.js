@@ -7,7 +7,6 @@ require('../../general.js');
 const { getRepository } = require('typeorm');
 const { v4: uuidv4 } = require('uuid');
 
-const tmi = (require('../../../dest/chat')).default;
 const { Event } = require('../../../dest/database/entity/event');
 const { User } = require('../../../dest/database/entity/user');
 const log = require('../../../dest/helpers/log');
@@ -46,9 +45,11 @@ describe('Events - cheer event - @func3', () => {
       const userId = String(Math.floor(Math.random() * 10000));
       describe(username + ' cheer event', () => {
         it('trigger cheer event for 1 bit - ' + username, async () => {
+          const TMI = require('../../../dest/services/twitch/chat').default;
+          const tmi = new TMI();
           await tmi.cheer({
             userName: username,
-            userId: userId,
+            userId:   userId,
           },
           Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5),
           1,

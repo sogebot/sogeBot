@@ -59,6 +59,6 @@ describe('Timers - https://github.com/sogehige/sogeBot/issues/4209 - custom comm
   });
 
   it('We should have correct response in chat in a while', async () => {
-    await message.isSentRaw('Lorem Ipsum Dolor Sit Amet', 'bot', 5000);
+    await message.isSentRaw('Lorem Ipsum Dolor Sit Amet', '__bot__', 5000);
   });
 });

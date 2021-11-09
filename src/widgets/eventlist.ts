@@ -1,16 +1,17 @@
+import type { EmitData } from '@entity/alert';
+import { EventList as EventListDB } from '@entity/eventList';
+import { UserTip } from '@entity/user';
 import { SECOND } from '@sogebot/ui-helpers/constants';
 import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized';
 import { Between, getRepository } from 'typeorm';
 
-import type { EmitData } from '../database/entity/alert';
-import { EventList as EventListDB } from '../database/entity/eventList';
-import { UserTip } from '../database/entity/user';
-import { error } from '../helpers/log';
-import { adminEndpoint } from '../helpers/socket';
 import alerts from '../registries/alerts';
-import { translate } from '../translate';
 import users from '../users';
 import Widget from './_interface';
+
+import { error } from '~/helpers/log';
+import { adminEndpoint } from '~/helpers/socket';
+import { translate } from '~/translate';
 
 class EventList extends Widget {
   public sockets() {

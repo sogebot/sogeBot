@@ -1,22 +1,23 @@
+import { ScrimMatchId } from '@entity/scrimMatchId';
 import * as constants from '@sogebot/ui-helpers/constants';
 import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized';
 import { getRepository } from 'typeorm';
 
-import tmi from '../chat';
-import { ScrimMatchId } from '../database/entity/scrimMatchId';
 import {
   command, default_permission, settings,
 } from '../decorators';
 import { onStartup } from '../decorators/on';
 import Expects from '../expects.js';
-import { announce } from '../helpers/commons/announce';
-import { getBotSender } from '../helpers/commons/getBotSender';
-import { prepare } from '../helpers/commons/prepare';
-import { round5 } from '../helpers/commons/round5';
-import { debug } from '../helpers/log';
-import { defaultPermissions } from '../helpers/permissions/';
-import { translate } from '../translate';
 import System from './_interface';
+
+import { announce } from '~/helpers/commons/announce';
+import { getBotSender } from '~/helpers/commons/getBotSender';
+import { prepare } from '~/helpers/commons/prepare';
+import { round5 } from '~/helpers/commons/round5';
+import { debug } from '~/helpers/log';
+import { defaultPermissions } from '~/helpers/permissions/index';
+import twitch from '~/services/twitch';
+import { translate } from '~/translate';
 
 enum ERROR {
   ALREADY_OPENED,
@@ -154,7 +155,7 @@ class Scrim extends System {
   }
 
   private async currentMatches(opts: CommandOptions): Promise<CommandResponse[]> {
-    const atUsername = tmi.showWithAt;
+    const atUsername = twitch.showWithAt;
     const matches: {
       [x: string]: string[];
     } = {};

@@ -34,13 +34,13 @@ const tests = [
     expected: 'gambling.fightme.winner',
   },
   {
-    challenger: { userId: 5, userName: 'broadcaster' },
+    challenger: { userId: 5, userName: '__broadcaster__' },
     challenging: { userId: 3, userName: 'user1' },
     expected: 'gambling.fightme.broadcaster',
   },
   {
     challenger: { userId: 3, userName: 'user1' },
-    challenging: { userId: 5, userName: 'broadcaster' },
+    challenging: { userId: 5, userName: '__broadcaster__' },
     expected: 'gambling.fightme.broadcaster',
   },
   {
@@ -139,7 +139,7 @@ describe('game/fightme - !fightme - @func1', () => {
         await getRepository(User).save({ userId: 2, userName: 'usermod2', isModerator: true });
         await getRepository(User).save({ userId: 3, userName: 'user1' });
         await getRepository(User).save({ userId: 4, userName: 'user2' });
-        await getRepository(User).save({ userId: 5, userName: 'broadcaster' });
+        await getRepository(User).save({ userId: 5, userName: '__broadcaster__' });
       });
 
       it('Challenger is starting !fightme', async () => {

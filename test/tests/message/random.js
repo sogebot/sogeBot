@@ -1,20 +1,19 @@
-/* global describe it */
+/* global */
 require('../../general.js');
 
-const db = require('../../general.js').db;
-const msg = require('../../general.js').message;
-const Message = require('../../../dest/message').default;
 const assert = require('assert');
-const { prepare } = require('../../../dest/helpers/commons/prepare');
 
 const owner = { userId: String(Math.floor(Math.random() * 100000)), userName: '__broadcaster__' };
 const ignoredUser = { userId: String(Math.floor(Math.random() * 100000)), userName: 'ignoreduser' };
 const user = { userId: String(Math.floor(Math.random() * 100000)), userName: 'user1' };
 
 const { getRepository } = require('typeorm');
-const { User } = require('../../../dest/database/entity/user');
 
-const tmi = (require('../../../dest/chat')).default;
+const { User } = require('../../../dest/database/entity/user');
+const { prepare } = require('../../../dest/helpers/commons/prepare');
+const Message = require('../../../dest/message').default;
+const db = require('../../general.js').db;
+const msg = require('../../general.js').message;
 
 async function setUsersOnline(users) {
   await getRepository(User).update({}, { isOnline: false });
@@ -23,7 +22,11 @@ async function setUsersOnline(users) {
   }
 }
 
+let twitch;
 describe('Message - random filter - @func3', () => {
+  before(() => {
+    twitch = require('../../../dest/services/twitch.js').default;
+  });
   describe('(random.online.viewer) should exclude ignored user', () => {
     before(async () => {
       await db.cleanup();
@@ -33,12 +36,12 @@ describe('Message - random filter - @func3', () => {
       await getRepository(User).save(ignoredUser);
       await getRepository(User).save(user);
 
-      const r = await tmi.ignoreRm({ sender: owner, parameters: 'ignoreduser' });
+      const r = await twitch.ignoreRm({ sender: owner, parameters: 'ignoreduser' });
       assert.strictEqual(r[0].response, prepare('ignore.user.is.removed', { userName: 'ignoreduser' }));
     });
 
     it('add user ignoreduser to ignore list', async () => {
-      const r = await tmi.ignoreAdd({ sender: owner, parameters: 'ignoreduser' });
+      const r = await twitch.ignoreAdd({ sender: owner, parameters: 'ignoreduser' });
       assert.strictEqual(r[0].response, prepare('ignore.user.is.added', { userName: 'ignoreduser' }));
     });
 
@@ -60,11 +63,11 @@ describe('Message - random filter - @func3', () => {
       await getRepository(User).save(ignoredUser);
       await getRepository(User).save(user);
 
-      const r = await tmi.ignoreRm({ sender: owner, parameters: 'ignoreduser' });
+      const r = await twitch.ignoreRm({ sender: owner, parameters: 'ignoreduser' });
       assert.strictEqual(r[0].response, prepare('ignore.user.is.removed', { userName: 'ignoreduser' }));
     });
     it('add user ignoreduser to ignore list', async () => {
-      const r = await tmi.ignoreAdd({ sender: owner, parameters: 'ignoreduser' });
+      const r = await twitch.ignoreAdd({ sender: owner, parameters: 'ignoreduser' });
       assert.strictEqual(r[0].response, prepare('ignore.user.is.added', { userName: 'ignoreduser' }));
 
     });
@@ -94,11 +97,11 @@ describe('Message - random filter - @func3', () => {
       await getRepository(User).save(ignoredUser);
       await getRepository(User).save(user);
 
-      const r = await tmi.ignoreRm({ sender: owner, parameters: 'ignoreduser' });
+      const r = await twitch.ignoreRm({ sender: owner, parameters: 'ignoreduser' });
       assert.strictEqual(r[0].response, prepare('ignore.user.is.removed', { userName: 'ignoreduser' }));
     });
     it('add user ignoreduser to ignore list', async () => {
-      const r = await tmi.ignoreAdd({ sender: owner, parameters: 'ignoreduser' });
+      const r = await twitch.ignoreAdd({ sender: owner, parameters: 'ignoreduser' });
       assert.strictEqual(r[0].response, prepare('ignore.user.is.added', { userName: 'ignoreduser' }));
     });
 
@@ -127,12 +130,12 @@ describe('Message - random filter - @func3', () => {
       await getRepository(User).save(ignoredUser);
       await getRepository(User).save(user);
 
-      const r = await tmi.ignoreRm({ sender: owner, parameters: 'ignoreduser' });
+      const r = await twitch.ignoreRm({ sender: owner, parameters: 'ignoreduser' });
       assert.strictEqual(r[0].response, prepare('ignore.user.is.removed', { userName: 'ignoreduser' }));
     });
 
     it('add user ignoreduser to ignore list', async () => {
-      const r = await tmi.ignoreAdd({ sender: owner, parameters: 'ignoreduser' });
+      const r = await twitch.ignoreAdd({ sender: owner, parameters: 'ignoreduser' });
       assert.strictEqual(r[0].response, prepare('ignore.user.is.added', { userName: 'ignoreduser' }));
     });
 
@@ -160,11 +163,11 @@ describe('Message - random filter - @func3', () => {
       await getRepository(User).save(ignoredUser);
       await getRepository(User).save(user);
 
-      const r = await tmi.ignoreRm({ sender: owner, parameters: 'ignoreduser' });
+      const r = await twitch.ignoreRm({ sender: owner, parameters: 'ignoreduser' });
       assert.strictEqual(r[0].response, prepare('ignore.user.is.removed', { userName: 'ignoreduser' }));
     });
     it('add user ignoreduser to ignore list', async () => {
-      const r = await tmi.ignoreAdd({ sender: owner, parameters: 'ignoreduser' });
+      const r = await twitch.ignoreAdd({ sender: owner, parameters: 'ignoreduser' });
       assert.strictEqual(r[0].response, prepare('ignore.user.is.added', { userName: 'ignoreduser' }));
     });
 
@@ -192,11 +195,11 @@ describe('Message - random filter - @func3', () => {
       await getRepository(User).save(ignoredUser);
       await getRepository(User).save(user);
 
-      const r = await tmi.ignoreRm({ sender: owner, parameters: 'ignoreduser' });
+      const r = await twitch.ignoreRm({ sender: owner, parameters: 'ignoreduser' });
       assert.strictEqual(r[0].response, prepare('ignore.user.is.removed', { userName: 'ignoreduser' }));
     });
     it('add user ignoreduser to ignore list', async () => {
-      const r = await tmi.ignoreAdd({ sender: owner, parameters: 'ignoreduser' });
+      const r = await twitch.ignoreAdd({ sender: owner, parameters: 'ignoreduser' });
       assert.strictEqual(r[0].response, prepare('ignore.user.is.added', { userName: 'ignoreduser' }));
     });
 

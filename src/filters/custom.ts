@@ -1,10 +1,11 @@
 import { get } from 'lodash';
 
 import { parserReply } from '../commons';
-import { prepare } from '../helpers/commons';
-import { getValueOf, setValueOf } from '../helpers/customvariables';
 
 import type { ResponseFilter } from '.';
+
+import { prepare } from '~/helpers/commons';
+import { getValueOf, setValueOf } from '~/helpers/customvariables';
 
 const custom: ResponseFilter = {
   '$_#': async (variable, attr) => {

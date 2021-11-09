@@ -9,9 +9,9 @@ const { User, UserTip } = require('../../../dest/database/entity/user');
 const { getOwner } = require('../../../dest/helpers/commons/getOwner');
 const { prepare } = require('../../../dest/helpers/commons/prepare');
 const top = (require('../../../dest/systems/top')).default;
-const tmi = (require('../../../dest/chat')).default;
 const db = require('../../general.js').db;
 const message = require('../../general.js').message;
+const twitch = require('../../../dest/services/twitch.js').default;
 
 // users
 const owner = { userName: '__broadcaster__' };
@@ -57,7 +57,7 @@ describe('Top - !top tips - @func1', () => {
   });
 
   it('add user1 to ignore list', async () => {
-    const r = await tmi.ignoreAdd({ sender: owner, parameters: 'user1' });
+    const r = await twitch.ignoreAdd({ sender: owner, parameters: 'user1' });
     assert.strictEqual(r[0].response, prepare('ignore.user.is.added' , { userName: 'user1' }));
   });
 
