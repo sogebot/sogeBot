@@ -16,7 +16,7 @@ class Commons {
   @timer()
   async messageToSend(senderObject: any, response: string | Promise<string>, opts: ParserOptions | { isParserOptions?: boolean, id: string, discord: CommandOptions['discord']; sender: CommandOptions['sender']; attr?: CommandOptions['attr'] }): Promise<string> {
     const sender = opts.discord
-      ? { ...senderObject, discord: { author: senderObject.discord.author, channel: senderObject.discord.channel } } : senderObject;
+      ? { ...senderObject, discord: { author: opts.discord.author, channel: opts.discord.channel } } : senderObject;
     if (isParserOpts(opts) ? opts.skip : opts.attr?.skip) {
       return prepare(await response as string, { ...opts, sender, forceWithoutAt: typeof opts.discord !== 'undefined' }, false);
     } else {
