@@ -6,7 +6,7 @@ ENV NODE_ENV production
 ENV ENV production
 
 RUN apt-get update
-RUN apt-get install -y build-essential nasm libtool make bash git autoconf
+RUN apt-get install -y build-essential nasm libtool make bash git autoconf wget
 
 # Building python manually as it is not in linux/arm/v7
 RUN wget https://www.python.org/ftp/python/3.6.5/Python-3.6.5.tar.xz
