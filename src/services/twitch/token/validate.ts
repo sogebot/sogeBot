@@ -102,14 +102,16 @@ export const validate = async (type: 'bot' | 'broadcaster', retry = 0, clear = f
       emitter.emit('set', '/services/twitch', 'botTokenValid', true);
       botTokenErrorSent = false;
 
-      // load profile image of a bot
-      const clientBot = await client('bot');
-      const userFromTwitch = await clientBot.users.getUserByName(request.data.login);
-      if (userFromTwitch) {
-        emitter.emit('set', '/services/twitch', 'botProfileImageUrl', userFromTwitch.profilePictureUrl);
-      } else {
-        throw new Error(`User ${request.data.login} not found on Twitch.`);
-      }
+      setTimeout(async () => {
+        // load profile image of a bot
+        const clientBot = await client('bot');
+        const userFromTwitch = await clientBot.users.getUserByName(request.data.login);
+        if (userFromTwitch) {
+          emitter.emit('set', '/services/twitch', 'botProfileImageUrl', userFromTwitch.profilePictureUrl);
+        } else {
+          throw new Error(`User ${request.data.login} not found on Twitch.`);
+        }
+      }, constants.MINUTE);
     } else {
       emitter.emit('set', '/services/twitch', 'broadcasterId', request.data.user_id);
       emitter.emit('set', '/services/twitch', 'broadcasterUsername', request.data.login);
