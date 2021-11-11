@@ -1,7 +1,7 @@
 import { ApiClient } from '@twurple/api';
 import { StaticAuthProvider } from '@twurple/auth';
 
-import { warning } from '../../../helpers/log.js';
+import { warning, debug } from '../../../helpers/log.js';
 
 import { variables } from '~/watchers';
 
@@ -37,9 +37,12 @@ const client = async (account: 'broadcaster' | 'bot') => {
   }
 
   if (clients[account].token !== accessToken) {
+    debug('oauth.client', 'New client for access token ' + accessToken.replace(/(.{25})/, '*'.repeat(25)));
     clients[account].token = accessToken;
     const authProvider = new StaticAuthProvider(clientId, accessToken);
     clients[account].client = new ApiClient({ authProvider });
+  } else {
+    debug('oauth.client', 'Reusing client for access token ' + accessToken.replace(/(.{25})/, '*'.repeat(25)));
   }
 
   if(clients[account].client) {
