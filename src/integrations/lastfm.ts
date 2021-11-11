@@ -4,6 +4,7 @@ import { settings } from '../decorators';
 import { onChange, onStartup } from '../decorators/on';
 import Integration from './_interface';
 
+import { announce, prepare } from '~/helpers/commons';
 import {  error } from '~/helpers/log';
 
 let canSendRequests = true;
@@ -14,6 +15,9 @@ class LastFM extends Integration {
 
   @settings()
     username = '';
+
+  @settings()
+    notify = false;
 
   currentSong: null | string = null;
 
@@ -30,6 +34,10 @@ class LastFM extends Integration {
     canSendRequests = true;
   }
 
+  async notifySong (song: string) {
+    announce(prepare('lastfm.current-song-changed', { name: song }), 'songs');
+  }
+
   async fetchData() {
     if (this.enabled && canSendRequests) {
       try {
@@ -39,7 +47,11 @@ class LastFM extends Integration {
         this.currentSong = null;
         for (const track of tracks) {
           if (track['@attr'] && track['@attr'].nowplaying === 'true') {
-            this.currentSong = `${track.name} - ${track.artist['#text']}`;
+            const song = `${track.name} - ${track.artist['#text']}`;
+            if (this.currentSong !== song && this.notify) {
+              this.notifySong(song);
+            }
+            this.currentSong = song;
           }
         }
 
