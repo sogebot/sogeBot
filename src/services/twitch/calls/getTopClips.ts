@@ -1,3 +1,5 @@
+import { DAY } from '@sogebot/ui-helpers/constants';
+
 import { HelixClip } from '../../../../node_modules/@twurple/api/lib';
 import client from '../api/client';
 import { getGameNameFromId } from './getGameNameFromId';
@@ -12,7 +14,7 @@ export async function getTopClips (opts: any) {
     const period = {
       startDate: opts.period === 'stream'
         ? (new Date(streamStatusChangeSince.value)).toISOString()
-        : (new Date((new Date()).setDate(-Math.min(opts.days, 0)))).toISOString(),
+        : new Date(Date.now() - opts.days * DAY).toISOString(),
       endDate: (new Date()).toISOString(),
     };
 
