@@ -218,7 +218,7 @@ class Chat {
         } catch (e: unknown) {
           if (e instanceof Error) {
             warning('TMI: ' + e.message + ' for ' + type);
-            setTimeout(() => this.join(type, channel), constants.SECOND * 5);
+            setTimeout(() => this.initClient(type), constants.SECOND * 5);
             return;
           }
         }
