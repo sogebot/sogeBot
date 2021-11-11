@@ -31,7 +31,7 @@ export async function getLatest100Followers () {
     } else {
       debug('api.followers', 'No new followers found.');
     }
-    apiStats.value.currentFollowers = getFollows.data.length;
+    apiStats.value.currentFollowers = getFollows.total;
   } catch (e) {
     if (e instanceof Error) {
       error(e.stack ?? e.message);
