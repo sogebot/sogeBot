@@ -35,7 +35,7 @@ class LastFM extends Integration {
   }
 
   async notifySong (song: string) {
-    announce(prepare('lastfm.current-song-changed', { name: song }), 'songs');
+    announce(prepare('integrations.lastfm.current-song-changed', { name: song }), 'songs');
   }
 
   async fetchData() {
