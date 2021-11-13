@@ -68,7 +68,7 @@ class Twitch extends Service {
   @settings('chat')
     sendWithMe = false;
   @settings('chat')
-    sendAsReply = true;
+    sendAsReply = false;
   @settings('chat')
     ignorelist: any[] = [];
   @settings('chat')
