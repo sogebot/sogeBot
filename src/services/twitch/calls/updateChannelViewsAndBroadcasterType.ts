@@ -1,3 +1,4 @@
+import { stats } from '../../../helpers/api/stats.js';
 import client from '../api/client';
 
 import emitter from '~/helpers/interfaceEmitter';
@@ -13,6 +14,7 @@ async function updateChannelViewsAndBroadcasterType () {
     if (getUserById) {
       emitter.emit('set', '/services/twitch', 'profileImageUrl', getUserById.profilePictureUrl);
       emitter.emit('set', '/services/twitch', 'broadcasterType', getUserById.broadcasterType);
+      stats.value.currentViews = getUserById.views;
     }
   } catch (e: unknown) {
     if (e instanceof Error) {
