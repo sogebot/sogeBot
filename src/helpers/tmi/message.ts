@@ -20,9 +20,9 @@ export async function message(type: 'say' | 'whisper' | 'me', username: string |
         tmiEmitter.emit('say', username, `/me ${messageToSend}`);
       } else {
         if (twitch.sendAsReply) {
-          tmiEmitter.emit('say', username, `/me ${messageToSend}`, { replyTo: messageId });
+          tmiEmitter.emit('say', username, `${messageToSend}`, { replyTo: messageId });
         } else {
-          tmiEmitter.emit('whisper', username, `/me ${messageToSend}`);
+          tmiEmitter.emit(type as any, username, `${messageToSend}`);
         }
       }
     }
