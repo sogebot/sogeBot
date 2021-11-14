@@ -44,7 +44,6 @@ class LastFM extends Integration {
         const response = await axios.get<any>(`http://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=${this.username}&api_key=${this.apiKey}&format=json`);
         const tracks = response.data.recenttracks.track;
 
-        this.currentSong = null;
         for (const track of tracks) {
           if (track['@attr'] && track['@attr'].nowplaying === 'true') {
             const song = `${track.name} - ${track.artist['#text']}`;
@@ -54,7 +53,6 @@ class LastFM extends Integration {
             this.currentSong = song;
           }
         }
-
       } catch(e: any) {
         if (e.isAxiosError) {
           if (e.response.data.error === 8) {
