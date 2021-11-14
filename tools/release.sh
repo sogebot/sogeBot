@@ -1,5 +1,5 @@
 echo Building bot
-make
+#make
 
 currentSnapshot=$(node tools/changelog.js nextSnapshot)
 nextTag=$(node tools/changelog.js nextTag)
@@ -20,7 +20,7 @@ echo Updating package.json version from $currentSnapshot to $nextTag
 currentSnapshotEscaped=$( echo ${currentSnapshot} | tr '.' '\.' )
 nextTagEscaped=$( echo ${nextTag} | tr '.' '\.' )
 
-sed -i "s/\"version\": \"$currentSnapshotEscaped\"/\"version\": \"$nextTagEscaped\"/" "$file"
+sed -i "s/\"version\": \".*\"/\"version\": \"$nextTagEscaped\"/" "$file"
 git add $file
 git commit -m "build: $nextTag"
 echo Pushing build commit $nextTag
