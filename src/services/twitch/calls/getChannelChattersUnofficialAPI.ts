@@ -111,10 +111,11 @@ export const getChannelChattersUnofficialAPI = async (opts: any) => {
         eventEmitter.emit('user-joined-channel', { userName: username });
       }
     }
-    return { state: true, opts };
   } catch (e) {
     if (e instanceof Error) {
       error(e.stack ?? e.message);
     }
+    return { state: false, opts };
   }
+  return { state: true, opts };
 };
