@@ -20,6 +20,10 @@ export async function message(type: 'say' | 'whisper' | 'me', username: string |
         tmiEmitter.emit('say', username, `/me ${messageToSend}`);
       } else {
         if (twitch.sendAsReply) {
+          if (messageToSend.startsWith(username) || messageToSend.startsWith('@' + username)) {
+            const regexp = new RegExp(`^@?${username}\\s?\\W?`);
+            messageToSend = messageToSend.replace(regexp, '').trim();
+          }
           tmiEmitter.emit('say', username, `${messageToSend}`, { replyTo: messageId });
         } else {
           tmiEmitter.emit(type as any, username, `${messageToSend}`);
