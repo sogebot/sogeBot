@@ -1,3 +1,4 @@
+import { shuffle } from '@sogebot/ui-helpers/array';
 import { DAY } from '@sogebot/ui-helpers/constants';
 
 import { HelixClip } from '../../../../node_modules/@twurple/api/lib';
@@ -30,7 +31,7 @@ export async function getTopClips (opts: any) {
         game: await getGameNameFromId(Number(c.gameId)),
       });
     }
-    return clips;
+    return shuffle(clips).slice(0, opts.first);
   } catch (e) {
     if (e instanceof Error) {
       error(e.stack ?? e.message);
