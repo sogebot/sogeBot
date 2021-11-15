@@ -1,3 +1,4 @@
+import { MINUTE } from '@sogebot/ui-helpers/constants';
 import axios from 'axios';
 
 import { settings } from '../decorators';
@@ -55,12 +56,19 @@ class LastFM extends Integration {
         }
       } catch(e: any) {
         if (e.isAxiosError) {
-          if (e.response.data.error === 8) {
-            error('LAST.FM: Your username is probably invalid. ' + e.response.data.message);
+          if (e.response.data.error === 10) {
+            error('LAST.FM: Invalid API key - You must be granted a valid key by last.fm');
+            canSendRequests = false;
+          } else if (e.response.data.error === 26) {
+            error('LAST.FM: Suspended API key - Access for your account has been suspended, please contact Last.fm');
+            canSendRequests = false;
+          } else if (e.response.data.error === 29) {
+            error('LAST.FM: Rate limit exceeded, waiting 5 minutes');
+            canSendRequests = false;
+            setTimeout(() => canSendRequests = true, 5 * MINUTE);
           } else {
-            error('LAST.FM: ' + e.response.data.message);
+            error('LAST.FM: ' + e.response.data.message + ' | Error no. ' + e.response.data.error);
           }
-          canSendRequests = false;
         } else {
           error('LAST.FM: ' + e.stack);
         }
