@@ -78,6 +78,8 @@ class Events extends Core {
     super();
 
     this.supportedEventsList = [
+      { id: 'poll-started', variables: [ 'titleOfPoll', 'choices', 'bitVotingEnabled', 'bitAmountPerVote', 'channelPointsVotingEnabled', 'channelPointsAmountPerVote' ] },
+      { id: 'poll-ended', variables: [ 'titleOfPoll', 'choices', 'votes', 'winnerVotes', 'winnerPercentage', 'winnerChoice' ] },
       { id: 'hypetrain-started', variables: [ ] },
       { id: 'hypetrain-ended', variables: [ 'level', 'total', 'goal', 'topContributionsBitsUserId', 'topContributionsBitsUsername', 'topContributionsBitsTotal', 'topContributionsSubsUserId', 'topContributionsSubsUsername', 'topContributionsSubsTotal', 'lastContributionType', 'lastContributionUserId', 'lastContributionUsername', 'lastContributionTotal' ] },
       { id: 'hypetrain-level-reached', variables: [ 'level', 'total', 'goal', 'topContributionsBitsUserId', 'topContributionsBitsUsername', 'topContributionsBitsTotal', 'topContributionsSubsUserId', 'topContributionsSubsUsername', 'topContributionsSubsTotal', 'lastContributionType', 'lastContributionUserId', 'lastContributionUsername', 'lastContributionTotal' ] },
@@ -180,6 +182,8 @@ class Events extends Core {
 
     // emitter .on listeners
     for (const event of [
+      'poll-started',
+      'poll-ended',
       'hypetrain-started',
       'hypetrain-ended',
       'hypetrain-level-reached',

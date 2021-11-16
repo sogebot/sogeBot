@@ -9,6 +9,7 @@ import { v4 } from 'uuid';
 
 import emitter from '../../helpers/interfaceEmitter.js';
 
+import * as channelPoll from '~/helpers/api/channelPoll';
 import * as hypeTrain from '~/helpers/api/hypeTrain';
 import { TokenError } from '~/helpers/errors';
 import { eventEmitter } from '~/helpers/events';
@@ -18,6 +19,8 @@ import {
 } from '~/helpers/log';
 import { ioServer } from '~/helpers/panel';
 import { variables } from '~/watchers';
+
+export const eventErrorShown = new Set<string>();
 
 const messagesProcessed: string[] = [];
 let isErrorEventsShown = false;
@@ -98,6 +101,17 @@ class EventSub {
           } */
 
           follow(data.event.user_id, data.event.user_name, data.event.followed_at);
+          res.status(200).send('OK');
+        }  else if (data.subscription.type === 'channel.poll.begin') {
+          channelPoll.setData(data.event);
+          await channelPoll.triggerPollStart();
+          res.status(200).send('OK');
+        } else if (data.subscription.type === 'channel.poll.progress') {
+          channelPoll.setData(data.event);
+          res.status(200).send('OK');
+        } else if (data.subscription.type === 'channel.poll.end') {
+          channelPoll.setData(data.event);
+          await channelPoll.triggerPollEnd();
           res.status(200).send('OK');
         } else {
           error(`EVENTSUB: ${data.subscription.type} not implemented`);
@@ -238,6 +252,9 @@ class EventSub {
         'channel.hype_train.begin',
         'channel.hype_train.progress',
         'channel.hype_train.end',
+        'channel.poll.begin',
+        'channel.poll.progress',
+        'channel.poll.end',
       ];
 
       emitter.emit('set', '/services/twitch', 'eventSubEnabledSubscriptions', []);
@@ -288,6 +305,10 @@ class EventSub {
     const useTunneling = variables.get('services.twitch.useTunneling') as string;
     const secret = variables.get('services.twitch.secret') as string;
     const domain = variables.get('services.twitch.domain') as string;
+    if (eventErrorShown.has(event)) {
+      return;
+    }
+
     try {
       const channelId = variables.get('services.twitch.channelId') as string;
       info('EVENTSUB: sending subscribe event for ' + event);
@@ -312,17 +333,15 @@ class EventSub {
         },
         timeout: 20000,
       });
+      eventErrorShown.delete(event);
     } catch (e: any) {
       if (e instanceof TokenError) {
         error(`EVENTSUB: ${e.stack}`);
       } else {
-        error('EVENTSUB: Something went wrong during event subscription, please authorize yourself on this url and try again.');
-        error(`=> https://id.twitch.tv/oauth2/authorize
-        ?client_id=${clientId}
-        &redirect_uri=${useTunneling ? this.tunnelDomain : 'https://' + domain}
-        &response_type=token
-        &force_verify=true
-        &scope=channel:read:hype_train`);
+        if (!eventErrorShown.has(event)) {
+          error(`EVENTSUB: Something went wrong during event ${event} subscription, please authorize yourself in UI.`);
+          eventErrorShown.add(event);
+        }
       }
     }
   }

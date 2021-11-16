@@ -1,6 +1,22 @@
 import { TypedEmitter } from 'tiny-typed-emitter';
 
 interface Events {
+  'poll-started': (opts: {
+    titleOfPoll: string,
+    choices: string,
+    bitVotingEnabled: boolean,
+    bitAmountPerVote: number,
+    channelPointsVotingEnabled: boolean,
+    channelPointsAmountPerVote: number,
+  }) => void;
+  'poll-ended': (opts: {
+    titleOfPoll: string,
+    choices: string,
+    votes: number;
+    winnerVotes: number;
+    winnerPercentage: number;
+    winnerChoice: string;
+  }) => void;
   'hypetrain-started': () => void;
   'hypetrain-ended': (opts: {
     level: 1 | 2 | 3 | 4 | 5, total: number, goal: number,

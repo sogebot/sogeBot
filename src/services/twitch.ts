@@ -12,7 +12,7 @@ import {
 import { onChange, onLoad, onStartup, onStreamStart } from '../decorators/on';
 import Expects from '../expects';
 import emitter from '../helpers/interfaceEmitter';
-import { debug, error } from '../helpers/log';
+import { debug, error, info } from '../helpers/log';
 import users from '../users';
 import Service from './_interface';
 import { init as apiIntervalInit , stop as apiIntervalStop } from './twitch/api/interval';
@@ -20,6 +20,7 @@ import { getChannelId } from './twitch/calls/getChannelId';
 import Chat from './twitch/chat';
 import Emotes from './twitch/emotes';
 import EventSub from './twitch/eventsub';
+import { eventErrorShown } from './twitch/eventsub';
 import PubSub from './twitch/pubsub';
 import { cache, validate } from './twitch/token/validate';
 
@@ -323,6 +324,10 @@ class Twitch extends Service {
   }
 
   sockets() {
+    adminEndpoint(this.nsp, 'eventsub::reset', () => {
+      info('EVENTSUB: user authorized, resetting state of eventsub subscriptions.');
+      eventErrorShown.clear();
+    });
     adminEndpoint(this.nsp, 'broadcaster', (cb) => {
       try {
         cb(null, (this.broadcasterUsername).toLowerCase());
