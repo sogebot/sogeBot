@@ -32,11 +32,15 @@ const evaluate: ResponseFilter = {
         const id = 'url' + crypto.randomBytes(64).toString('hex').slice(0, 5);
         const url = match.replace(/url\(['"]|["']\)/g, '');
         let response = await axios.get<any>(url);
-        try {
-          response.data = JSON.parse(response.data.toString());
-        } catch (e: any) {
-          // JSON failed, treat like string
-          response = response.data.toString();
+
+        // do not parse JSON if axios already parsed it
+        if (typeof(response.data) !== 'object') {
+          try {
+            response.data = JSON.parse(response.data.toString());
+          } catch (e: any) {
+            // JSON failed, treat like string
+            response = response.data.toString();
+          }
         }
         urls.push({ id, response });
         toEvaluate = toEvaluate.replace(match, `url.${id}`);
