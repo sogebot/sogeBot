@@ -26,7 +26,7 @@ export class setIntervalAsString1635631125261 implements MigrationInterface {
       const keys = Object.keys(item);
       await queryRunner.query(
         `INSERT INTO \`goal\`(${keys.map(o => `\`${o}\``).join(', ')}) values (${keys.map(o => `?`).join(', ')})`,
-        [keys.map(key => item[key])],
+        keys.map(key => item[key]),
       );
     }
   }

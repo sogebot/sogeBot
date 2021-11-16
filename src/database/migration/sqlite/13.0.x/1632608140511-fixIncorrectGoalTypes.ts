@@ -20,7 +20,7 @@ export class fixIncorrectGoalTypes1632608140511 implements MigrationInterface {
       // resave reparsed
       await queryRunner.query(
         `INSERT INTO "goal"(${keys.map(o => `"${o}"`).join(', ')}) values (${keys.map(o => `?`).join(', ')})`,
-        [keys.map(key => item[key])],
+        keys.map(key => item[key]),
       );
     }
   }

@@ -16,7 +16,7 @@ export class addMissingShowMilliseconds1635453652530 implements MigrationInterfa
         await queryRunner.query('DELETE FROM `overlay_mapper` WHERE `id`=?', [item.id]);
         await queryRunner.query(
           `INSERT INTO \`overlay_mapper\`(${keys.map(o => `\`${o}\``).join(', ')}) values (${keys.map(o => `?`).join(', ')})`,
-          [keys.map(key => item[key])],
+          keys.map(key => item[key]),
         );
 
       }
