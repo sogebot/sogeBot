@@ -1,5 +1,5 @@
 {
-  "services": "Services",
+  "services": "Služby",
   "updater": "Updater",
   "index": "Nástěnka",
   "core": "Bot",
@@ -89,7 +89,7 @@
   "responsivevoice": "ResponsiveVoice",
   "randomizer": "Náhodný výběr",
   "tips": "Spropitné",
-  "bannedevents": "Banned Events",
+  "bannedevents": "Zabanované události",
   "bits": "Bity",
   "discord": "Discord",
   "texttospeech": "Text na řeč",

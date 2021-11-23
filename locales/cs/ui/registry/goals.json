@@ -74,7 +74,7 @@
       "placeholder": "Nastavte dobu trvání výstupní animace"
     },
     "interval": {
-      "title": "What interval to count"
+      "title": "Jaký interval se má počítat"
     },
     "spaceBetweenGoalsInPx": {
       "title": "Prostor mezi cíly",

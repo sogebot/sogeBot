@@ -1,7 +1,7 @@
 {
   "settings": {
     "lang": "Jazyk bota",
-    "numberFormat": "Format of numbers in chat",
+    "numberFormat": "Formát čísel v chatu",
     "gracefulExitEachXHours": {
       "title": "Automatické vypnutí každých X hodin",
       "help": "0 - vypnuto"

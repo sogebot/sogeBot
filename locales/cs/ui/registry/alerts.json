@@ -25,10 +25,10 @@
     "name": "Zpoždění alertů"
   },
   "parryEnabled": {
-    "name": "Alert parries"
+    "name": "Parírování alertů"
   },
   "parryDelay": {
-    "name": "Alert parry delay"
+    "name": "Zpoždění parírování alertu"
   },
   "profanityFilterType": {
     "name": "Filtr vulgarit",
