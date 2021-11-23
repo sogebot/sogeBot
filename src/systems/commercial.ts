@@ -25,14 +25,15 @@ class Commercial extends System {
   sockets() {
     adminEndpoint(this.nsp, 'commercial.run', (data) => {
       commercial.main({
-        parameters:    data.seconds,
-        command:       '!commercial',
-        sender:        getOwnerAsSender(),
-        attr:          {},
-        createdAt:     Date.now(),
-        emotesOffsets: new Map(),
-        isAction:      false,
-        discord:       undefined,
+        parameters:         data.seconds,
+        command:            '!commercial',
+        sender:             getOwnerAsSender(),
+        attr:               {},
+        createdAt:          Date.now(),
+        emotesOffsets:      new Map(),
+        isAction:           false,
+        isFirstTimeMessage: false,
+        discord:            undefined,
       });
     });
   }

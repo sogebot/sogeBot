@@ -88,14 +88,15 @@ class Polls extends System {
       try {
         const parameters = `-${vote.type} -title "${vote.title}" ${vote.options.filter((o) => o.trim().length > 0).join(' | ')}`;
         const response = await this.open({
-          command:       this.getCommand('!poll open'),
+          command:            this.getCommand('!poll open'),
           parameters,
-          createdAt:     0,
-          sender:        getOwnerAsSender(),
-          attr:          { skip: false, quiet: false },
-          isAction:      false,
-          emotesOffsets: new Map(),
-          discord:       undefined,
+          createdAt:          0,
+          sender:             getOwnerAsSender(),
+          attr:               { skip: false, quiet: false },
+          isAction:           false,
+          isFirstTimeMessage: false,
+          emotesOffsets:      new Map(),
+          discord:            undefined,
         });
         this.sendResponse(response);
         cb(null, null);
@@ -106,14 +107,15 @@ class Polls extends System {
     adminEndpoint(this.nsp, 'polls::close', async (vote, cb) => {
       try {
         const response = await this.close({
-          command:       this.getCommand('!poll close'),
-          parameters:    '',
-          createdAt:     0,
-          sender:        getOwnerAsSender(),
-          attr:          { skip: false, quiet: false },
-          isAction:      false,
-          emotesOffsets: new Map(),
-          discord:       undefined,
+          command:            this.getCommand('!poll close'),
+          parameters:         '',
+          createdAt:          0,
+          sender:             getOwnerAsSender(),
+          attr:               { skip: false, quiet: false },
+          isAction:           false,
+          isFirstTimeMessage: false,
+          emotesOffsets:      new Map(),
+          discord:            undefined,
         });
         this.sendResponse(response);
         cb(null);

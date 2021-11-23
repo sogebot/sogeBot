@@ -36,6 +36,7 @@ class Parser {
   started_at = Date.now();
   message = '';
   isAction = false;
+  isFirstTimeMessage = false;
   sender: CommandOptions['sender'] | null = null;
   discord: CommandOptions['discord'] = undefined;
   emotesOffsets = new Map();
@@ -52,6 +53,7 @@ class Parser {
     this.emotesOffsets = opts.emotesOffsets || new Map();
     this.skip = opts.skip || false;
     this.isAction = opts.isAction || false;
+    this.isFirstTimeMessage = opts.isFirstTimeMessage || false;
     this.quiet = opts.quiet || false;
     this.successfullParserRuns = [];
   }
@@ -80,16 +82,17 @@ class Parser {
       debug('parser.process', 'Processing ' + parser.name);
       const text = this.message.trim().replace(/^(!\w+)/i, '');
       const opts: ParserOptions = {
-        isParserOptions: true,
-        id:              this.id,
-        emotesOffsets:   this.emotesOffsets,
-        isAction:        this.isAction,
-        sender:          this.sender,
-        discord:         this.discord ?? undefined,
-        message:         this.message.trim(),
-        parameters:      text.trim(),
-        skip:            this.skip,
-        parser:          this,
+        isParserOptions:    true,
+        id:                 this.id,
+        emotesOffsets:      this.emotesOffsets,
+        isAction:           this.isAction,
+        isFirstTimeMessage: this.isFirstTimeMessage,
+        sender:             this.sender,
+        discord:            this.discord ?? undefined,
+        message:            this.message.trim(),
+        parameters:         text.trim(),
+        skip:               this.skip,
+        parser:             this,
       };
       const isOk = await parser.fnc.apply(parser.this, [opts]);
 
@@ -110,16 +113,17 @@ class Parser {
 
     const text = this.message.trim().replace(/^(!\w+)/i, '');
     const opts: ParserOptions = {
-      isParserOptions: true,
-      id:              this.id,
-      sender:          this.sender,
-      discord:         this.discord ?? undefined,
-      emotesOffsets:   this.emotesOffsets,
-      isAction:        this.isAction,
-      message:         this.message.trim(),
-      parameters:      text.trim(),
-      skip:            this.skip,
-      parser:          this,
+      isParserOptions:    true,
+      id:                 this.id,
+      sender:             this.sender,
+      discord:            this.discord ?? undefined,
+      emotesOffsets:      this.emotesOffsets,
+      isAction:           this.isAction,
+      isFirstTimeMessage: this.isFirstTimeMessage,
+      message:            this.message.trim(),
+      parameters:         text.trim(),
+      skip:               this.skip,
+      parser:             this,
     };
 
     for (const parser of parsers.filter(o => !o.fireAndForget && o.priority !== constants.MODERATION)) {
@@ -317,14 +321,15 @@ class Parser {
     ) {
       const text = message.trim().replace(new RegExp('^(' + command.command + ')', 'i'), '').trim();
       const opts: CommandOptions = {
-        sender:        sender || getBotSender(),
-        discord:       this.discord ?? undefined,
-        emotesOffsets: this.emotesOffsets,
-        isAction:      this.isAction,
-        command:       command.command,
-        parameters:    text.trim(),
-        createdAt:     this.started_at,
-        attr:          {
+        sender:             sender || getBotSender(),
+        discord:            this.discord ?? undefined,
+        emotesOffsets:      this.emotesOffsets,
+        isAction:           this.isAction,
+        isFirstTimeMessage: this.isFirstTimeMessage,
+        command:            command.command,
+        parameters:         text.trim(),
+        createdAt:          this.started_at,
+        attr:               {
           skip:  this.skip,
           quiet: this.quiet,
         },

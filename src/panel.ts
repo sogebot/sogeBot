@@ -455,7 +455,7 @@ class Panel extends Core {
             return true;
           }
           setValue({
-            sender: getOwnerAsSender(), createdAt: 0, command: '', parameters: value + ' ' + index, attr: { quiet: data._quiet }, isAction: false, emotesOffsets: new Map(), discord: undefined,
+            sender: getOwnerAsSender(), createdAt: 0, command: '', parameters: value + ' ' + index, attr: { quiet: data._quiet }, isAction: false, emotesOffsets: new Map(), isFirstTimeMessage: false, discord: undefined,
           });
         });
       });

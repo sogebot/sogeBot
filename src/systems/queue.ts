@@ -76,13 +76,13 @@ class Queue extends System {
           }
           if (cb) {
             cb(null, (await this.pickUsers({
-              sender: getBotSender(), users, attr: {}, createdAt: Date.now(), command: '', parameters: '', isAction: false, emotesOffsets: new Map(), discord: undefined,
+              sender: getBotSender(), users, attr: {}, createdAt: Date.now(), command: '', parameters: '', isAction: false, emotesOffsets: new Map(), isFirstTimeMessage: false, discord: undefined,
             }, data.random)).users);
           }
         } else {
           if (cb) {
             cb(null, (await this.pickUsers({
-              sender: getBotSender(), attr: {}, createdAt: Date.now(), command: '', parameters: String(data.count), isAction: false, emotesOffsets: new Map(), discord: undefined,
+              sender: getBotSender(), attr: {}, createdAt: Date.now(), command: '', parameters: String(data.count), isAction: false, emotesOffsets: new Map(), isFirstTimeMessage: false, discord: undefined,
             }, data.random)).users);
           }
         }

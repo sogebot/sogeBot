@@ -52,6 +52,7 @@ interface Events {
   'clearchat': () => void;
   'command-send-x-times': (opts: { reset: boolean } | { userName: string, message: string, source: 'discord' | 'twitch' }) => void;
   'keyword-send-x-times': (opts: { reset: boolean } | { userName: string, message: string, source: 'discord' | 'twitch' }) => void;
+  'chatter-first-message': (opts: { userName: string, message: string, source: 'twitch' }) => void;
   'every-x-minutes-of-stream': (opts: { reset: boolean }) => void;
   'stream-is-running-x-minutes': (opts: { reset: boolean }) => void;
   'subgift': (opts: { userName: string; recipient: string; tier: number; }) => void;

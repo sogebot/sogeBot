@@ -180,6 +180,7 @@ interface CommandOptions {
   command: string;
   parameters: string;
   isAction: boolean,
+  isFirstTimeMessage: boolean,
   createdAt: number;
   attr: {
     skip?: boolean;
@@ -194,6 +195,7 @@ interface ParserOptions {
   emotesOffsets: Map<string, string[]>
   discord: { author: DiscordJsUser; channel: DiscordJsTextChannel } | undefined
   isAction: boolean,
+  isFirstTimeMessage: boolean,
   parameters: string;
   message: string;
   skip: boolean;

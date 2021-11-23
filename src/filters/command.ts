@@ -45,13 +45,13 @@ const command: ResponseFilter = {
     // run custom commands
     if (customcommands.enabled) {
       await customcommands.run({
-        sender: (attr.sender as ParserOptions['sender']), id: 'null', skip: false, message: cmd, parameters: attr.param ?? '', processedCommands: attr.processedCommands, parser: new Parser(), isAction: false,  emotesOffsets: new Map(), discord: undefined, isParserOptions: true,
+        sender: (attr.sender as ParserOptions['sender']), id: 'null', skip: false, message: cmd, parameters: attr.param ?? '', processedCommands: attr.processedCommands, parser: new Parser(), isAction: false,  emotesOffsets: new Map(), discord: undefined, isParserOptions: true, isFirstTimeMessage: false,
       });
     }
     // run alias
     if (alias.enabled) {
       await alias.run({
-        sender: (attr.sender as ParserOptions['sender']), id: 'null', skip: false, message: cmd, parameters: attr.param ?? '', parser: new Parser(), isAction: false,  emotesOffsets: new Map(), discord: undefined, isParserOptions: true,
+        sender: (attr.sender as ParserOptions['sender']), id: 'null', skip: false, message: cmd, parameters: attr.param ?? '', parser: new Parser(), isAction: false,  emotesOffsets: new Map(), discord: undefined, isParserOptions: true, isFirstTimeMessage: false,
       });
     }
     await new Parser().command(attr.sender, cmd, true);
@@ -79,13 +79,13 @@ const command: ResponseFilter = {
     // run custom commands
     if (customcommands.enabled) {
       await customcommands.run({
-        sender: (attr.sender as ParserOptions['sender']), id: 'null', skip: false, message: cmd, parameters: attr.param ?? '', processedCommands: attr.processedCommands, parser: new Parser(), isAction: false,  emotesOffsets: new Map(), discord: undefined, isParserOptions: true,
+        sender: (attr.sender as ParserOptions['sender']), id: 'null', skip: false, message: cmd, parameters: attr.param ?? '', processedCommands: attr.processedCommands, parser: new Parser(), isAction: false,  emotesOffsets: new Map(), discord: undefined, isParserOptions: true, isFirstTimeMessage: false,
       });
     }
     // run alias
     if (alias.enabled) {
       await alias.run({
-        sender: (attr.sender as ParserOptions['sender']), id: 'null', skip: false, message: cmd, parameters: attr.param ?? '', parser: new Parser(), isAction: false, emotesOffsets: new Map(), discord: undefined, isParserOptions: true,
+        sender: (attr.sender as ParserOptions['sender']), id: 'null', skip: false, message: cmd, parameters: attr.param ?? '', parser: new Parser(), isAction: false, emotesOffsets: new Map(), isFirstTimeMessage: false, discord: undefined, isParserOptions: true,
       });
     }
     const responses = await new Parser().command(attr.sender, cmd, true);

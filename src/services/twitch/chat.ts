@@ -356,7 +356,7 @@ class Chat {
           return;
         }
         this.message({
-          userstate, message, id: msg.id, emotesOffsets: msg.emoteOffsets, isAction: false,
+          userstate, message, id: msg.id, emotesOffsets: msg.emoteOffsets, isAction: false, isFirstTimeMessage: msg.tags.get('first-msg') === '1',
         });
         linesParsedIncrement();
         triggerInterfaceOnMessage({
@@ -793,12 +793,12 @@ class Chat {
           if (price.priceBits <= bits) {
             if (customcommands.enabled) {
               await customcommands.run({
-                sender: getUserSender(userId, username), id: 'null', skip: true, quiet: false, message: messageFromUser.trim().toLowerCase(), parameters: '', parser: new Parser(), isAction: false, emotesOffsets: new Map(), discord: undefined, isParserOptions: true,
+                sender: getUserSender(userId, username), id: 'null', skip: true, quiet: false, message: messageFromUser.trim().toLowerCase(), parameters: '', parser: new Parser(), isAction: false, emotesOffsets: new Map(), isFirstTimeMessage: false, discord: undefined, isParserOptions: true,
               });
             }
             if (alias.enabled) {
               await alias.run({
-                sender: getUserSender(userId, username), id: 'null', skip: true, message: messageFromUser.trim().toLowerCase(), parameters: '', parser: new Parser(), isAction: false, emotesOffsets: new Map(), discord: undefined, isParserOptions: true,
+                sender: getUserSender(userId, username), id: 'null', skip: true, message: messageFromUser.trim().toLowerCase(), parameters: '', parser: new Parser(), isAction: false, emotesOffsets: new Map(), isFirstTimeMessage: false, discord: undefined, isParserOptions: true,
               });
             }
             const responses = await new Parser().command(getUserSender(userId, username), messageFromUser, true);
@@ -847,9 +847,10 @@ class Chat {
   }
 
   @timer()
-  async message (data: { skip?: boolean, quiet?: boolean, message: string, userstate: ChatUser, id?: string, isWhisper?: boolean, emotesOffsets?: Map<string, string[]>, isAction: boolean }) {
+  async message (data: { skip?: boolean, quiet?: boolean, message: string, userstate: ChatUser, id?: string, isWhisper?: boolean, emotesOffsets?: Map<string, string[]>, isAction: boolean, isFirstTimeMessage?: boolean }) {
     data.emotesOffsets ??= new Map();
     data.isAction ??= false;
+    data.isFirstTimeMessage ??= false;
 
     let userId = data.userstate.userId as string | undefined;
     const userstate = data.userstate;
@@ -863,7 +864,7 @@ class Chat {
     }
 
     const parse = new Parser({
-      sender: userstate, message: message, skip: skip, quiet: quiet, id: data.id, emotesOffsets: data.emotesOffsets, isAction: data.isAction,
+      sender: userstate, message: message, skip: skip, quiet: quiet, id: data.id, emotesOffsets: data.emotesOffsets, isAction: data.isAction, isFirstTimeMessage: data.isFirstTimeMessage,
     });
 
     const whisperListener = variables.get('services.twitch.whisperListener') as boolean;
@@ -935,6 +936,12 @@ class Chat {
       } else if (!message.startsWith('!')) {
         changelog.increment(userstate.userId, { messages: 1 });
       }
+    }
+
+    if (data.isFirstTimeMessage) {
+      eventEmitter.emit('chatter-first-message', {
+        userName: userstate.userName, message: message, source: 'twitch',
+      });
     }
     const responses = await parse.process();
     for (let i = 0; i < responses.length; i++) {

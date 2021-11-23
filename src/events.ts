@@ -97,6 +97,7 @@ class Events extends Core {
           fadeOutXCommands: 0, fadeOutInterval: 0, runEveryXCommands: 10, commandToWatch: '', runInterval: 0,
         }, check: this.checkCommandSendXTimes,
       }, // runInterval 0 or null - disabled; > 0 every x seconds
+      { id: 'chatter-first-message', variables: [ 'username', 'is.moderator', 'is.subscriber', 'is.vip', 'is.follower', 'is.broadcaster', 'is.bot', 'is.owner', 'source' ] },
       {
         id:          'keyword-send-x-times', variables:   [ 'username', 'is.moderator', 'is.subscriber', 'is.vip', 'is.follower', 'is.broadcaster', 'is.bot', 'is.owner', 'command', 'count', 'source' ], definitions: {
           fadeOutXKeywords: 0, fadeOutInterval: 0, runEveryXKeywords: 10, keywordToWatch: '', runInterval: 0, resetCountEachMessage: false,
@@ -208,6 +209,7 @@ class Events extends Core {
       'resub',
       'clearchat',
       'command-send-x-times',
+      'chatter-first-message',
       'keyword-send-x-times',
       'every-x-minutes-of-stream',
       'stream-is-running-x-minutes',

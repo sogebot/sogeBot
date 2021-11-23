@@ -206,7 +206,7 @@ class Songs extends System {
     adminEndpoint(this.nsp, 'import.ban', async (url, cb) => {
       try {
         cb(null, await this.banSong({
-          isAction: false, emotesOffsets: new Map(), parameters: this.getIdFromURL(url), sender: getBotSender(), command: '', createdAt: Date.now(), attr: {}, discord: undefined,
+          isAction: false, emotesOffsets: new Map(), isFirstTimeMessage: false, parameters: this.getIdFromURL(url), sender: getBotSender(), command: '', createdAt: Date.now(), attr: {}, discord: undefined,
         }));
       } catch (e: any) {
         cb(e.stack, []);
@@ -216,7 +216,7 @@ class Songs extends System {
       try {
         isCachedTagsValid = false;
         cb(null, await this.importPlaylist({
-          isAction: false, emotesOffsets: new Map(), parameters: playlist, sender: getBotSender(), command: '', createdAt: Date.now(), attr: { forcedTag }, discord: undefined,
+          isAction: false, emotesOffsets: new Map(), isFirstTimeMessage: false, parameters: playlist, sender: getBotSender(), command: '', createdAt: Date.now(), attr: { forcedTag }, discord: undefined,
         }));
       } catch (e: any) {
         cb(e.stack, null);
@@ -225,7 +225,7 @@ class Songs extends System {
     adminEndpoint(this.nsp, 'import.video', async ({ playlist, forcedTag }, cb) => {
       try {
         cb(null, await this.addSongToPlaylist({
-          isAction: false, emotesOffsets: new Map(), parameters: playlist, sender: getBotSender(), command: '', createdAt: Date.now(), attr: { forcedTag }, discord: undefined,
+          isAction: false, emotesOffsets: new Map(), isFirstTimeMessage: false, parameters: playlist, sender: getBotSender(), command: '', createdAt: Date.now(), attr: { forcedTag }, discord: undefined,
         }));
       } catch (e: any) {
         cb(e.stack, null);

@@ -50,6 +50,7 @@ class HelpersFilter {
       broadcaster: isBroadcaster(opts.sender.userName),
       bot:         isBot(opts.sender.userName),
       owner:       isOwner(opts.sender.userName),
+      newchatter:  opts.isFirstTimeMessage,
     };
 
     const customVariables = await getAll();
