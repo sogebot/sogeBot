@@ -5,10 +5,10 @@ import twitch from '~/services/twitch';
 import { variables } from '~/watchers';
 
 export async function message(type: 'say' | 'whisper' | 'me', username: string | undefined | null, messageToSend: string, messageId?: string, retry = true) {
-  const generalChannel = variables.get('services.twitch.generalChannel') as string;
+  const botUsername = variables.get('services.twitch.botUsername') as string;
   try {
     if (username === null || typeof username === 'undefined') {
-      username = generalChannel;
+      username = botUsername;
     }
     if (username === '') {
       error('TMI: channel is not defined, message cannot be sent');
@@ -19,7 +19,8 @@ export async function message(type: 'say' | 'whisper' | 'me', username: string |
       if (type === 'me') {
         tmiEmitter.emit('say', username, `/me ${messageToSend}`);
       } else {
-        if (twitch.sendAsReply) {
+        // strip username if username is bot or is reply
+        if ((twitch.sendAsReply && messageId) || username === botUsername) {
           if (messageToSend.startsWith(username) || messageToSend.startsWith('@' + username)) {
             const regexp = new RegExp(`^@?${username}\\s?\\W?`);
             messageToSend = messageToSend.replace(regexp, '').trim();
