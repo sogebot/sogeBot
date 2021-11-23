@@ -6,10 +6,10 @@
       "title": "Načíst aktuální skladbu, i když je stream offline",
       "help": "Doporučuje se, aby byla tato funkce vypnuta, aby nedošlo k dosažení limitů API"
     },
-    "allowApprovedArtistsOnly": "Allow approved artists only",
+    "allowApprovedArtistsOnly": "Povolit pouze schválené umělce",
     "approvedArtists": {
-      "title": "Approved artists",
-      "help": "Name or SpotifyURI of artist, one item per line"
+      "title": "Schválení umělci",
+      "help": "Jméno nebo SpotifyURI umělce, jedna položka na řádek"
     },
     "queueWhenOffline": {
       "title": "Zařadit skladbu do fronty, i když je stream offline",
