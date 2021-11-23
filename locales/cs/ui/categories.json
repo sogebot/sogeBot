@@ -54,6 +54,6 @@
   "me": "!me",
   "emotes_combo": "Kombo emotů",
   "tmi": "tmi",
-  "oauth": "oauth",
-  "eventsub": "eventsub"
+  "oauth": "oAuth",
+  "eventsub": "eventSub"
 }
