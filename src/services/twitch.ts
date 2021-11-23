@@ -121,6 +121,8 @@ class Twitch extends Service {
     ];
   @settings('broadcaster')
     broadcasterCurrentScopes: string[] = [];
+  @persistent()
+    broadcasterType = '';
 
   @settings('bot')
     botAccessToken = '';
