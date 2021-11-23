@@ -40,7 +40,7 @@ export async function getBannedEvents (opts: any) {
               user_id:           item.userId,
               user_login:        item.userDisplayName,
               user_name:         item.userName,
-              expires_at:        item.expiryDate ? item.expiryDate.toISOString() : '',
+              expires_at:        item.eventType === 'moderation.user.ban' ? '' : item.expiryDate?.toISOString(),
               reason:            (item[rawDataSymbol].event_data as any).reason,
               moderator_id:      (item[rawDataSymbol].event_data as any).moderator_id,
               moderator_login:   (item[rawDataSymbol].event_data as any).moderator_login,
