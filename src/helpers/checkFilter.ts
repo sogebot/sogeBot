@@ -1,8 +1,8 @@
 import { EventList } from '@entity/eventList';
 import gitCommitInfo from 'git-commit-info';
 import _ from 'lodash';
-import safeEval from 'safe-eval';
 import { getRepository, In } from 'typeorm';
+import { VM } from 'vm2';
 
 import { timer } from '../decorators.js';
 import lastfm from '../integrations/lastfm.js';
@@ -27,7 +27,7 @@ class HelpersFilter {
     if (!opts.sender) {
       return true;
     }
-    const toEval = `(function evaluation () { return ${filter} })()`;
+    const toEval = `(function () { return ${filter} })`;
 
     const $userObject = await changelog.get(opts.sender.userId);
     if (!$userObject) {
@@ -54,7 +54,7 @@ class HelpersFilter {
     };
 
     const customVariables = await getAll();
-    const context = {
+    const sandbox = {
       $source:    typeof opts.discord === 'undefined' ? 'twitch' : 'discord',
       $sender:    opts.sender.userName,
       $is,
@@ -67,7 +67,8 @@ class HelpersFilter {
     };
     let result =  false;
     try {
-      result = safeEval(toEval, { ...context, _ });
+      const vm = new VM({ sandbox });
+      result = vm.run(toEval)();
     } catch (e: any) {
       // do nothing
     }

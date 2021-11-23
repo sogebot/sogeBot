@@ -6,9 +6,9 @@ import _ from 'lodash';
 import {
   filter, get, isNil, map, sample,
 } from 'lodash';
-import safeEval from 'safe-eval';
 import strip from 'strip-comments';
 import { getRepository } from 'typeorm';
+import { VM } from 'vm2';
 
 import Message from '../../message';
 import client from '../../services/twitch/api/client';
@@ -93,7 +93,7 @@ async function runScript (script: string, opts: { sender: { userId: string; user
   // update globals and replace theirs values
   script = (await new Message(script).global({ escape: '\'' }));
 
-  const context = {
+  const sandbox = {
     waitMs: (ms: number) => {
       return new Promise((resolve) => setTimeout(resolve, ms, null));
     },
@@ -203,9 +203,10 @@ async function runScript (script: string, opts: { sender: { userId: string; user
     // we need to add operation counter function
   const opCounterFnc = 'let __opCount__ = 0; function __opCounter__() { if (__opCount__ > 100000) { throw new Error("Running script seems to be in infinite loop."); } else { __opCount__++; }};';
   // add __opCounter__() after each ;
-  const toEval = `(async function evaluation () { ${opCounterFnc} ${jsBeautify(script).split(';\n').map(line => '__opCounter__();' + line).join(';\n')} })()`;
+  const toEval = `(async function () { ${opCounterFnc} ${jsBeautify(script).split(';\n').map(line => '__opCounter__();' + line).join(';')} })`.replace(/\n/g, '');
   try {
-    const value = await safeEval(toEval, context);
+    const vm = new VM({ sandbox });
+    const value = await vm.run(toEval)();
     debug('customvariables.eval', value);
     return value;
   } catch (e: any) {

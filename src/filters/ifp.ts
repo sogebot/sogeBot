@@ -1,7 +1,9 @@
 import { isNil } from 'lodash';
-import safeEval from 'safe-eval';
+import { VM } from 'vm2';
 
 import type { ResponseFilter } from '.';
+
+const vm = new VM();
 
 const ifp: ResponseFilter = {
   '(if#)': async function (filter: string, attr) {
@@ -16,7 +18,8 @@ const ifp: ResponseFilter = {
       if (isNil(ifTrue)) {
         return;
       }
-      if (safeEval(check)) {
+
+      if (vm.run(check)) {
         return ifTrue;
       }
       return isNil(ifFalse) ? '' : ifFalse;

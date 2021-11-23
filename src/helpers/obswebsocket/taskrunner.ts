@@ -3,7 +3,7 @@ import { createHash } from 'crypto';
 import { Events } from '@entity/event.js';
 import { OBSWebsocketInterface } from '@entity/obswebsocket';
 import type ObsWebSocket from 'obs-websocket-js';
-import safeEval from 'safe-eval';
+import { VM } from 'vm2';
 
 import { setImmediateAwait } from '../setImmediateAwait';
 import { availableActions } from './actions';
@@ -24,8 +24,8 @@ const taskRunner = async (obs: ObsWebSocket, opts: { tasks: OBSWebsocketInterfac
   try {
     if (typeof tasks === 'string') {
       // advanced mode
-      const toEval = `(async function evaluation () { ${tasks} })()`;
-      await safeEval(toEval, {
+      const toEval = `(async function () { ${tasks} })`;
+      const sandbox = {
         event:  opts.attributes,
         obs,
         waitMs: (ms: number) => {
@@ -33,7 +33,9 @@ const taskRunner = async (obs: ObsWebSocket, opts: { tasks: OBSWebsocketInterfac
         },
         // we are using error on code so it will be seen in OBS Log Viewer
         log: (process.env.BUILD === 'web') ? console.error : require('../log').info,
-      });
+      };
+      const vm = new VM({ sandbox });
+      await vm.run(toEval)();
     } else {
       for (const task of tasks) {
         switch(task.event) {

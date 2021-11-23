@@ -7,8 +7,8 @@ import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized';
 import _, {
   clone, cloneDeep, get, isNil, random,
 } from 'lodash';
-import safeEval from 'safe-eval';
 import { getRepository } from 'typeorm';
+import { VM }  from 'vm2';
 
 import Core from '~/_interface';
 import { parserReply } from '~/commons';
@@ -666,8 +666,8 @@ class Events extends Core {
     }
 
     const customVariables = await getAll();
-    const toEval = `(function evaluation () { return ${event.filter} })()`;
-    const context = {
+    const toEval = `(function () { return ${event.filter} })`;
+    const sandbox = {
       $username: get(attributes, 'username', null),
       $source:   get(attributes, 'source', null),
       $is:       {
@@ -725,7 +725,8 @@ class Events extends Core {
     };
     let result = false;
     try {
-      result = safeEval(toEval, { ...context, _ });
+      const vm = new VM({ sandbox });
+      result = vm.run(toEval)();
     } catch (e: any) {
       // do nothing
     }

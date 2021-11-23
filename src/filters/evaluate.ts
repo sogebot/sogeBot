@@ -5,8 +5,8 @@ import { UserInterface } from '@entity/user';
 import axios, { AxiosResponse } from 'axios';
 import { isNil, sample } from 'lodash';
 import _ from 'lodash';
-import safeEval from 'safe-eval';
 import { getRepository } from 'typeorm';
+import { VM } from 'vm2';
 
 import twitch from '../services/twitch';
 import users from '../users';
@@ -89,8 +89,8 @@ const evaluate: ResponseFilter = {
       follower: user.isFollower, subscriber: user.isSubscriber, moderator: user.isModerator, vip: user.isVIP, online: user.isOnline,
     };
 
-    const toEval = `(function evaluation () {  ${toEvaluate} })()`;
-    const context: {
+    const toEval = `(function () {  ${toEvaluate} })(`;
+    const sandbox: {
       _: typeof _;
       users: typeof allUsers;
       is: typeof is;
@@ -113,11 +113,12 @@ const evaluate: ResponseFilter = {
     if (containUrl) {
       // add urls to context
       for (const url of urls) {
-        context.url[url.id] = url.response;
+        sandbox.url[url.id] = url.response;
       }
     }
 
-    return (safeEval(toEval, context));
+    const vm = new VM({ sandbox });
+    return vm.run(toEval)();
   },
 };
 
