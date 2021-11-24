@@ -95,8 +95,8 @@ class Chat {
         this.client.bot?.timeout(generalChannel, username, seconds);
       }
     });
-    tmiEmitter.on('say', (username, message, opts) => {
-      this.client.bot?.say(username, message, opts);
+    tmiEmitter.on('say', (channel, message, opts) => {
+      this.client.bot?.say(channel, message, opts);
     });
     tmiEmitter.on('whisper', (username, message) => {
       this.client.bot?.whisper(username, message);

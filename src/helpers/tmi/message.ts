@@ -5,6 +5,7 @@ import twitch from '~/services/twitch';
 import { variables } from '~/watchers';
 
 export async function message(type: 'say' | 'whisper' | 'me', username: string | undefined | null, messageToSend: string, messageId?: string, retry = true) {
+  const generalChannel = variables.get('services.twitch.generalChannel') as string;
   const botUsername = variables.get('services.twitch.botUsername') as string;
   try {
     if (username === null || typeof username === 'undefined') {
@@ -25,9 +26,9 @@ export async function message(type: 'say' | 'whisper' | 'me', username: string |
             const regexp = new RegExp(`^@?${username}\\s?\\W?`);
             messageToSend = messageToSend.replace(regexp, '').trim();
           }
-          tmiEmitter.emit('say', username, `${messageToSend}`, { replyTo: messageId });
+          tmiEmitter.emit('say', generalChannel, `${messageToSend}`, { replyTo: messageId });
         } else {
-          tmiEmitter.emit(type as any, username, `${messageToSend}`);
+          tmiEmitter.emit(type as any, generalChannel, `${messageToSend}`);
         }
       }
     }

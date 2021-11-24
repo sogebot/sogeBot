@@ -1,7 +1,7 @@
 import { TypedEmitter } from 'tiny-typed-emitter';
 
 interface Events {
-  'say': (username: string, message: string, opts?: { replyTo: string | undefined }) => void,
+  'say': (channel: string, message: string, opts?: { replyTo: string | undefined }) => void,
   'whisper': (username: string, message: string, opts?: { replyTo: string | undefined }) => void,
   'ban': (username: string) => void,
   'timeout': (username: string, seconds: number, isMod: boolean) => void,
