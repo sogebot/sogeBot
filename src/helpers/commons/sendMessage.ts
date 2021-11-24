@@ -74,9 +74,9 @@ class HelpersCommons {
         } else {
           chatOut(`${messageToSend} [${sender.userName}]`);
           if (sendWithMe.value && !messageToSend.startsWith('/')) {
-            message('me', null, messageToSend, id);
+            message('me', sender.userName, messageToSend, id);
           } else {
-            message('say', null, messageToSend, id);
+            message('say', sender.userName, messageToSend, id);
           }
         }
       }

@@ -1,12 +1,12 @@
 import { error, isDebugEnabled } from '../log';
 
 import { tmiEmitter } from '~/helpers/tmi';
-import twitch from '~/services/twitch';
 import { variables } from '~/watchers';
 
 export async function message(type: 'say' | 'whisper' | 'me', username: string | undefined | null, messageToSend: string, messageId?: string, retry = true) {
   const generalChannel = variables.get('services.twitch.generalChannel') as string;
   const botUsername = variables.get('services.twitch.botUsername') as string;
+  const sendAsReply = variables.get('services.twitch.sendAsReply') as string;
   try {
     if (username === null || typeof username === 'undefined') {
       username = botUsername;
@@ -21,7 +21,7 @@ export async function message(type: 'say' | 'whisper' | 'me', username: string |
         tmiEmitter.emit('say', username, `/me ${messageToSend}`);
       } else {
         // strip username if username is bot or is reply
-        if ((twitch.sendAsReply && messageId) || username === botUsername) {
+        if ((sendAsReply && messageId) || username === botUsername) {
           if (messageToSend.startsWith(username) || messageToSend.startsWith('@' + username)) {
             const regexp = new RegExp(`^@?${username}\\s?\\W?`);
             messageToSend = messageToSend.replace(regexp, '').trim();
