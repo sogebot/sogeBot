@@ -300,16 +300,15 @@
     },
     "eventlist-events": {
       "follow": "<strong>ti ha seguito</strong>",
-      "host": "<strong>hai ospitato</strong> con $viewers spettatori",
-      "raid": "<strong> ha fatto il raid a </strong> con $viewers spettatori",
-      "sub": "<strong>si è abbonato a</strong> <unk> $tier",
-      "subgift": "ha <strong>regalato</strong> abbonamenti da $username",
-      "subcommunitygift": "hanno <strong>regalato</strong> abbonamenti per $count spettatori",
-      "resub": "<strong>si è riabbonato a</strong> per $subStreak $subStreakName | $tier",
-      "resubWithoutStreak": "<strong>ti ha riabbonato</strong> <unk> $tier <unk> in totale di $subCumulativeMonths $subCumulativeMonthsName",
-      "cheer": "<strong>ti ha rallegrato</strong> per $bits bit",
-      "tip": "<strong>ti ha dato una mancia</strong> per $formatted_amount",
-      "rewardredeem": "ha appena <strong>riscattato</strong> la ricompensa $titleOfReward"
+      "host": "<strong>hosted</strong>",
+      "raid": "<strong>raided</strong>",
+      "sub": "<strong>subbed</strong> you",
+      "subgift": "has been <strong>gifted</strong> sub",
+      "subcommunitygift": "<strong>gifted</strong> subs for community",
+      "resub": "<strong>resubbed</strong>",
+      "cheer": "<strong>cheered</strong> you",
+      "tip": "<strong>tipped</strong> you",
+      "rewardredeem": "just <strong>redeemed</strong> reward"
     },
     "responses": {
       "variable": {
