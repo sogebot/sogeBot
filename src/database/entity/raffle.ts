@@ -38,7 +38,7 @@ export const Raffle = new EntitySchema<Readonly<Required<RaffleInterface>>>({
   name:    'raffle',
   columns: {
     id: {
-      type: 'uuid', primary: true, generated: 'uuid',
+      type: 'varchar', primary: true, generated: 'uuid', length: 36,
     },
     winner:    { type: 'text', nullable: true },
     timestamp: {
@@ -74,7 +74,7 @@ export const RaffleParticipant = new EntitySchema<Readonly<Required<RafflePartic
   name:    'raffle_participant',
   columns: {
     id: {
-      type: 'uuid', primary: true, generated: 'uuid',
+      type: 'varchar', primary: true, generated: 'uuid', length: 36,
     },
     username:     { type: String },
     tickets:      { type: Number },
@@ -103,7 +103,7 @@ export const RaffleParticipantMessage = new EntitySchema<Readonly<Required<Raffl
   name:    'raffle_participant_message',
   columns: {
     id: {
-      type: 'uuid', primary: true, generated: 'uuid',
+      type: 'varchar', primary: true, generated: 'uuid', length: 36,
     },
     timestamp: {
       type: 'bigint', transformer: new ColumnNumericTransformer(), default: 0,

@@ -25,7 +25,7 @@ export const Poll = new EntitySchema<Readonly<Required<PollInterface>>>({
   name:    'poll',
   columns: {
     id: {
-      type: 'uuid', primary: true, generated: 'uuid',
+      type: 'varchar', primary: true, generated: 'uuid', length: 36,
     },
     type:     { type: 'varchar', length: 7 },
     isOpened: { type: Boolean },

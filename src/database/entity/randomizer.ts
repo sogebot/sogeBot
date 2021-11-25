@@ -54,7 +54,7 @@ export const Randomizer = new EntitySchema<Readonly<Required<RandomizerInterface
   name:    'randomizer',
   columns: {
     id: {
-      type: 'uuid', primary: true, generated: 'uuid',
+      type: 'varchar', primary: true, generated: 'uuid', length: 36,
     },
     createdAt: {
       type: 'bigint', transformer: new ColumnNumericTransformer(), default: 0,

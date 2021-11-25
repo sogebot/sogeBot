@@ -18,7 +18,7 @@ export const Highlight = new EntitySchema<Readonly<Required<HighlightInterface>>
   name:    'highlight',
   columns: {
     id: {
-      type: 'uuid', primary: true, generated: 'uuid',
+      type: 'varchar', primary: true, generated: 'uuid', length: 36,
     },
     videoId:   { type: String },
     game:      { type: String },

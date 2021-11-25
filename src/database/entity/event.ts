@@ -65,7 +65,7 @@ export const Event = new EntitySchema<Readonly<Required<EventInterface>>>({
   name:    'event',
   columns: {
     id: {
-      type: 'uuid', primary: true, generated: 'uuid',
+      type: 'varchar', primary: true, generated: 'uuid', length: 36,
     },
     name:        { type: String },
     isEnabled:   { type: Boolean },
@@ -90,7 +90,7 @@ export const EventOperation = new EntitySchema<Readonly<Required<EventOperationI
   name:    'event_operation',
   columns: {
     id: {
-      type: 'uuid', primary: true, generated: 'uuid',
+      type: 'varchar', primary: true, generated: 'uuid', length: 36,
     },
     name:        { type: String },
     definitions: { type: 'simple-json' },

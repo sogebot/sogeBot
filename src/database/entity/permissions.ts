@@ -78,7 +78,7 @@ export const Permissions = new EntitySchema<Readonly<Required<PermissionsInterfa
   name:    'permissions',
   columns: {
     id: {
-      type: 'uuid', primary: true, generated: 'uuid',
+      type: 'varchar', primary: true, generated: 'uuid', length: 36,
     },
     name:               { type: String },
     order:              { type: Number },
@@ -102,7 +102,7 @@ export const PermissionFilters = new EntitySchema<Readonly<Required<PermissionFi
   name:    'permission_filters',
   columns: {
     id: {
-      type: 'uuid', primary: true, generated: 'uuid',
+      type: 'varchar', primary: true, generated: 'uuid', length: 36,
     },
     comparator: { type: 'varchar', length: 3 },
     type:       { type: 'varchar' },
@@ -123,7 +123,7 @@ export const PermissionCommands = new EntitySchema<Readonly<Required<PermissionC
   name:    'permission_commands',
   columns: {
     id: {
-      type: 'uuid', primary: true, generated: 'uuid',
+      type: 'varchar', primary: true, generated: 'uuid', length: 36,
     },
     name:       { type: String },
     permission: {

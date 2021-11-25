@@ -236,7 +236,7 @@ export interface AlertResubInterface extends CommonSettingsInterface {
 
 export const CommonSettingsSchema = {
   id: {
-    type: 'uuid', primary: true, generated: 'uuid',
+    type: 'varchar', primary: true, generated: 'uuid', length: 36,
   } as EntitySchemaColumnOptions,
   alertId: {
     nullable: true, name: 'alertId', type: String,
@@ -269,7 +269,7 @@ export const Alert = new EntitySchema<Readonly<Required<AlertInterface>>>({
   name:    'alert',
   columns: {
     id: {
-      type: 'uuid', primary: true, generated: 'uuid',
+      type: 'varchar', primary: true, generated: 'uuid', length: 36,
     },
     updatedAt: {
       type: 'bigint', transformer: new ColumnNumericTransformer(), default: 0,

@@ -5,9 +5,9 @@ export class varcharUUID1635631125263 implements MigrationInterface {
 
   public async up(queryRunner: QueryRunner): Promise<any> {
     await queryRunner.query('SET FOREIGN_KEY_CHECKS=0;', undefined);
-    await queryRunner.query('ALTER TABLE `alert` MODIFY `id` varchar(255)', undefined);
-    await queryRunner.query('ALTER TABLE `alert_follow` MODIFY `id` varchar(255)', undefined);
-    await queryRunner.query('ALTER TABLE `alert_follow` MODIFY `alertId` varchar(255)', undefined);
+    await queryRunner.query('ALTER TABLE `alert` MODIFY `id` varchar(36)', undefined);
+    await queryRunner.query('ALTER TABLE `alert_follow` MODIFY `id` varchar(36)', undefined);
+    await queryRunner.query('ALTER TABLE `alert_follow` MODIFY `alertId` varchar(36)', undefined);
     await queryRunner.query('ALTER TABLE `alert_sub` MODIFY `id` varchar(36)', undefined);
     await queryRunner.query('ALTER TABLE `alert_sub` MODIFY `alertId` varchar(36)', undefined);
     await queryRunner.query('ALTER TABLE `alert_subcommunitygift` MODIFY `id` varchar(36)', undefined);

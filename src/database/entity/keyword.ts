@@ -28,7 +28,7 @@ export const Keyword = new EntitySchema<Readonly<Required<KeywordInterface>>>({
   name:    'keyword',
   columns: {
     id: {
-      type: 'uuid', primary: true, generated: 'uuid',
+      type: 'varchar', primary: true, generated: 'uuid', length: 36,
     },
     keyword: { type: String },
     group:   { type: String, nullable: true },
@@ -51,7 +51,7 @@ export const KeywordResponses = new EntitySchema<Readonly<Required<KeywordsRespo
   name:    'keyword_responses',
   columns: {
     id: {
-      type: 'uuid', primary: true, generated: 'uuid',
+      type: 'varchar', primary: true, generated: 'uuid', length: 36,
     },
     order:          { type: Number },
     response:       { type: 'text' },
