@@ -8,7 +8,7 @@ export const ThreadEvent = new EntitySchema<Readonly<Required<ThreadEventInterfa
   name:    'thread_event',
   columns: {
     id: {
-      type: 'uuid', primary: true, generated: 'uuid', 
+      type: 'uuid', primary: true, generated: 'uuid',
     },
     event: { type: String },
   },
