@@ -28,14 +28,14 @@ export const getChannelId = async () => {
 
   let timeout = 1000;
   const currentChannel = variables.get('services.twitch.currentChannel') as string;
-  const generalChannel = variables.get('services.twitch.generalChannel') as string;
+  const broadcasterUsername = variables.get('services.twitch.broadcasterUsername') as string;
 
-  if (currentChannel !== generalChannel && generalChannel !== '') {
+  if (currentChannel !== broadcasterUsername && broadcasterUsername !== '') {
     try {
       const clientBot = await client('bot');
-      const userFromTwitch = await clientBot.users.getUserByName(generalChannel);
+      const userFromTwitch = await clientBot.users.getUserByName(broadcasterUsername);
       if (userFromTwitch) {
-        emitter.emit('set', '/services/twitch', 'currentChannel', generalChannel);
+        emitter.emit('set', '/services/twitch', 'currentChannel', broadcasterUsername);
         emitter.emit('set', '/services/twitch', 'channelId', userFromTwitch.id);
         info('Channel ID set to ' + userFromTwitch.id);
         tmiEmitter.emit('reconnect', 'bot');
@@ -47,7 +47,7 @@ export const getChannelId = async () => {
       }
     } catch (e: any) {
       error(e.stack);
-      error(`Cannot get channel ID of ${generalChannel} - waiting ${toWait.toFixed()}s`);
+      error(`Cannot get channel ID of ${broadcasterUsername} - waiting ${toWait.toFixed()}s`);
       timeout = toWait * 1000;
       toWait = toWait * 2;
     }

@@ -79,20 +79,20 @@ class Chat {
       return;
     }
     tmiEmitter.on('timeout', (username, seconds, isMod) => {
-      const generalChannel = variables.get('services.twitch.generalChannel') as string;
+      const broadcasterUsername = variables.get('services.twitch.broadcasterUsername') as string;
       if (isMod) {
         if (this.client.broadcaster) {
-          this.client.broadcaster.timeout(generalChannel, username, seconds);
+          this.client.broadcaster.timeout(broadcasterUsername, username, seconds);
           info(`Bot will set mod status for ${username} after ${seconds} seconds.`);
           setTimeout(() => {
             // we need to remod user
-            this.client.broadcaster?.mod(generalChannel, username);
+            this.client.broadcaster?.mod(broadcasterUsername, username);
           }, (seconds * 1000) + 1000);
         } else {
           error('Cannot timeout mod user, as you don\'t have set broadcaster in chat');
         }
       } else {
-        this.client.bot?.timeout(generalChannel, username, seconds);
+        this.client.bot?.timeout(broadcasterUsername, username, seconds);
       }
     });
     tmiEmitter.on('say', (channel, message, opts) => {
@@ -130,7 +130,7 @@ class Chat {
     const clientId = variables.get('services.twitch.clientId') as string;
     const token = variables.get(`services.twitch.${type}AccessToken`) as string;
     const isValidToken = variables.get(`services.twitch.${type}TokenValid`) as string;
-    const channel = variables.get('services.twitch.generalChannel') as string;
+    const channel = variables.get('services.twitch.broadcasterUsername') as string;
 
     // wait for initial validation
     if (!isValidToken) {
@@ -188,7 +188,7 @@ class Chat {
         throw Error('TMI: cannot reconnect, connection is not established');
       }
 
-      const channel = variables.get('services.twitch.generalChannel') as string;
+      const channel = variables.get('services.twitch.broadcasterUsername') as string;
 
       info(`TMI: ${type} is reconnecting`);
 

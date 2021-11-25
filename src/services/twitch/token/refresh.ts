@@ -42,7 +42,7 @@ export const refresh = async (type: 'bot' | 'broadcaster', clear = false) => {
     errorCount[type] = 0;
     lastRefresh[type] = 0;
   }
-  const channel = variables.get('services.twitch.generalChannel') as string;
+  const channel = variables.get('services.twitch.broadcasterUsername') as string;
   const tokenService = variables.get('services.twitch.tokenService') as keyof typeof urls;
   const generalOwners = variables.get('services.twitch.generalOwners') as string[];
   const botRefreshToken = variables.get('services.twitch.botRefreshToken') as string;

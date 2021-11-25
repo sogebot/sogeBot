@@ -17,14 +17,14 @@ class Chat extends Widget {
     });
 
     publicEndpoint(this.nsp, 'room', async (cb: (error: null, data: string) => void) => {
-      const generalChannel = variables.get('services.twitch.generalChannel') as string;
-      cb(null, generalChannel.toLowerCase());
+      const broadcasterUsername = variables.get('services.twitch.broadcasterUsername') as string;
+      cb(null, broadcasterUsername.toLowerCase());
     });
 
     adminEndpoint(this.nsp, 'viewers', async (cb) => {
       try {
-        const generalChannel = variables.get('services.twitch.generalChannel') as string;
-        const url = `https://tmi.twitch.tv/group/user/${generalChannel.toLowerCase()}/chatters`;
+        const broadcasterUsername = variables.get('services.twitch.broadcasterUsername') as string;
+        const url = `https://tmi.twitch.tv/group/user/${broadcasterUsername.toLowerCase()}/chatters`;
         const response = await axios.get<{chatters: { viewers: string[] }}>(url);
 
         if (response.status === 200) {

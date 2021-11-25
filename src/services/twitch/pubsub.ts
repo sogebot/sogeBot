@@ -35,7 +35,7 @@ class PubSub {
         const clientId = variables.get(`services.twitch.broadcasterClientId`) as string;
         const accessToken = variables.get(`services.twitch.broadcasterAccessToken`) as string;
         const broadcasterId = variables.get(`services.twitch.broadcasterId`) as string;
-        const generalChannel = variables.get(`services.twitch.generalChannel`) as string;
+        const broadcasterUsername = variables.get(`services.twitch.broadcasterUsername`) as string;
         const isValidToken = variables.get(`services.twitch.broadcasterTokenValid`) as string;
 
         if (!isValidToken) {
@@ -45,7 +45,7 @@ class PubSub {
         this.pubSubClient = new PubSubClient();
         await this.pubSubClient.registerUserListener(authProvider);
 
-        this.listeners.push(await this.pubSubClient.onModAction(broadcasterId, generalChannel, (message) => {
+        this.listeners.push(await this.pubSubClient.onModAction(broadcasterId, broadcasterUsername, (message) => {
           try {
             const createdBy = `${message.userName}#${message.userId}`;
             if (message[rawDataSymbol].data.moderation_action === 'ban') {

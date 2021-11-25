@@ -93,8 +93,6 @@ class Twitch extends Service {
   @settings('general')
     tokenServiceCustomClientSecret = '';
   @settings('general')
-    generalChannel = '';
-  @settings('general')
     generalOwners: string[] = [];
 
   @settings('broadcaster')

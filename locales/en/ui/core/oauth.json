@@ -1,6 +1,5 @@
 {
   "settings": {
-    "generalChannel": "Channel",
     "generalOwners": "Owners",
     "botAccessToken": "AccessToken",
     "broadcasterAccessToken": "AccessToken",

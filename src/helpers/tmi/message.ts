@@ -4,7 +4,7 @@ import { tmiEmitter } from '~/helpers/tmi';
 import { variables } from '~/watchers';
 
 export async function message(type: 'say' | 'whisper' | 'me', username: string | undefined | null, messageToSend: string, messageId?: string, retry = true) {
-  const generalChannel = variables.get('services.twitch.generalChannel') as string;
+  const broadcasterUsername = variables.get('services.twitch.broadcasterUsername') as string;
   const botUsername = variables.get('services.twitch.botUsername') as string;
   const sendAsReply = variables.get('services.twitch.sendAsReply') as string;
   try {
@@ -26,9 +26,9 @@ export async function message(type: 'say' | 'whisper' | 'me', username: string |
             const regexp = new RegExp(`^@?${username}\\s?\\W?`);
             messageToSend = messageToSend.replace(regexp, '').trim();
           }
-          tmiEmitter.emit('say', generalChannel, `${messageToSend}`, { replyTo: messageId });
+          tmiEmitter.emit('say', broadcasterUsername, `${messageToSend}`, { replyTo: messageId });
         } else {
-          tmiEmitter.emit(type as any, generalChannel, `${messageToSend}`);
+          tmiEmitter.emit(type as any, broadcasterUsername, `${messageToSend}`);
         }
       }
     }

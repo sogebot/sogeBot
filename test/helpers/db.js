@@ -98,7 +98,6 @@ module.exports = {
       emitter.emit('set', '/services/twitch', 'botId', '12345');
       emitter.emit('set', '/services/twitch', 'broadcasterId', '54321');
       emitter.emit('set', '/services/twitch', 'generalOwners', ['__broadcaster__', '__owner__']);
-      emitter.emit('set', '/services/twitch', 'generalChannel', ['__broadcaster__']);
       emitter.emit('set', '/services/twitch', 'ignorelist', []);
       emitter.emit('set', '/services/twitch', 'sendAsReply', true);
 

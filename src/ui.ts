@@ -62,12 +62,10 @@ class UI extends Core {
         // lang
         data.lang = general.lang;
 
-        const generalChannel = variables.get('services.twitch.generalChannel') as string;
         const broadcasterUsername = variables.get('services.twitch.broadcasterUsername') as string;
         const generalOwners = variables.get('services.twitch.generalOwners') as string[];
 
         data.isCastersSet = filter(generalOwners, (o) => isString(o) && o.trim().length > 0).length > 0 || broadcasterUsername !== '';
-        data.isChannelSet = filter(generalChannel, (o) => isString(o) && o.trim().length > 0).length > 0;
 
         cb(null, data);
       } catch (e: any) {

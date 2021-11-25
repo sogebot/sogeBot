@@ -117,7 +117,7 @@ class Discord extends Integration {
           const message = await (channel as DiscordJs.TextChannel).messages.fetch(this.embedMessageId);
           const embed = message?.embeds[0];
           if (message && embed) {
-            const generalChannel = variables.get('services.twitch.generalChannel') as string;
+            const broadcasterUsername = variables.get('services.twitch.broadcasterUsername') as string;
             embed.spliceFields(0, embed.fields.length);
             embed.addFields([
               { name: prepare('webpanel.responses.variable.game'), value: stats.value.currentGame ?? '' },
@@ -135,7 +135,7 @@ class Discord extends Integration {
                 name: prepare('webpanel.followers'), value: String(stats.value.currentFollowers), inline: true,
               },
             ]);
-            embed.setImage(`https://static-cdn.jtvnw.net/previews-ttv/live_user_${generalChannel}-1920x1080.jpg?${Date.now()}`);
+            embed.setImage(`https://static-cdn.jtvnw.net/previews-ttv/live_user_${broadcasterUsername}-1920x1080.jpg?${Date.now()}`);
 
             const broadcasterType = variables.get('services.twitch.broadcasterType') as string;
             if (broadcasterType !== '') {
@@ -313,9 +313,9 @@ class Discord extends Integration {
         const message = await (channel as DiscordJs.TextChannel).messages.fetch(this.embedMessageId);
         const embed = message?.embeds[0];
         if (message && embed) {
-          const generalChannel = variables.get('services.twitch.generalChannel') as string;
+          const broadcasterUsername = variables.get('services.twitch.broadcasterUsername') as string;
           embed.setColor(0xff0000);
-          embed.setDescription(`${generalChannel.charAt(0).toUpperCase() + generalChannel.slice(1)} is not streaming anymore! Check it next time!`);
+          embed.setDescription(`${broadcasterUsername.charAt(0).toUpperCase() + broadcasterUsername.slice(1)} is not streaming anymore! Check it next time!`);
           embed.spliceFields(0, embed.fields.length);
           embed.addFields([
             { name: prepare('webpanel.responses.variable.game'), value: stats.value.currentGame ?? '' },
@@ -350,7 +350,7 @@ class Discord extends Integration {
     this.changeClientOnlinePresence();
     try {
       if (this.client && this.sendOnlineAnnounceToChannel.length > 0 && this.guild.length > 0) {
-        const generalChannel = variables.get('services.twitch.generalChannel') as string;
+        const broadcasterUsername = variables.get('services.twitch.broadcasterUsername') as string;
         const profileImageUrl = variables.get('services.twitch.profileImageUrl') as string;
         const channel = this.client.guilds.cache.get(this.guild)?.channels.cache.get(this.sendOnlineAnnounceToChannel);
         if (!channel) {
@@ -359,7 +359,7 @@ class Discord extends Integration {
 
         this.embedStartedAt = dayjs().tz(timezone).format('LLL');
         const embed = new DiscordJs.MessageEmbed()
-          .setURL('https://twitch.tv/' + generalChannel)
+          .setURL('https://twitch.tv/' + broadcasterUsername)
           .addFields([
             { name: prepare('webpanel.responses.variable.game'), value: stats.value.currentGame ?? '' },
             { name: prepare('webpanel.responses.variable.title'), value: stats.value.currentTitle ?? '' },
@@ -374,12 +374,12 @@ class Discord extends Integration {
             },
           ])
           // Set the title of the field
-          .setTitle('https://twitch.tv/' + generalChannel)
+          .setTitle('https://twitch.tv/' + broadcasterUsername)
           // Set the color of the embed
           .setColor(0x00ff00)
           // Set the main content of the embed
-          .setDescription(`${generalChannel.charAt(0).toUpperCase() + generalChannel.slice(1)} started stream! Check it out!`)
-          .setImage(`https://static-cdn.jtvnw.net/previews-ttv/live_user_${generalChannel}-1920x1080.jpg?${Date.now()}`)
+          .setDescription(`${broadcasterUsername.charAt(0).toUpperCase() + broadcasterUsername.slice(1)} started stream! Check it out!`)
+          .setImage(`https://static-cdn.jtvnw.net/previews-ttv/live_user_${broadcasterUsername}-1920x1080.jpg?${Date.now()}`)
           .setThumbnail(profileImageUrl)
           .setFooter('Announced by sogeBot - https://www.sogebot.xyz');
 
@@ -409,7 +409,7 @@ class Discord extends Integration {
       return;
     }
     try {
-      const generalChannel = variables.get('services.twitch.generalChannel') as string;
+      const broadcasterUsername = variables.get('services.twitch.broadcasterUsername') as string;
       if (isStreamOnline.value) {
         const activityString = await new Message(this.onlinePresenceStatusOnStreamName).parse();
         if (this.onlinePresenceStatusOnStream === 'streaming') {
@@ -417,7 +417,7 @@ class Discord extends Integration {
           this.client?.user?.setPresence({
             status:     'online',
             activities: [{
-              name: activityString, type: 'STREAMING', url: `https://twitch.tv/${generalChannel}`,
+              name: activityString, type: 'STREAMING', url: `https://twitch.tv/${broadcasterUsername}`,
             }],
           });
         } else {
@@ -543,7 +543,7 @@ class Discord extends Integration {
   async message(content: string, channel: DiscordJsTextChannel, author: DiscordJsUser, msg?: DiscordJs.Message) {
     chatIn(`#${channel.name}: ${content} [${author.tag}]`);
     if (msg) {
-      const generalChannel = variables.get('services.twitch.generalChannel') as string;
+      const broadcasterUsername = variables.get('services.twitch.broadcasterUsername') as string;
       if (content === this.getCommand('!link')) {
         this.removeExpiredLinks();
         const link = await getRepository(DiscordLink).save({
@@ -554,7 +554,7 @@ class Discord extends Integration {
         });
         const message = prepare('integrations.discord.link-whisper', {
           tag:         msg.author.tag,
-          broadcaster: generalChannel,
+          broadcaster: broadcasterUsername,
           id:          link.id,
           command:     this.getCommand('!link'),
         });

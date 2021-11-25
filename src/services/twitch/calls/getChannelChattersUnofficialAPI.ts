@@ -23,11 +23,11 @@ import joinpart from '~/widgets/joinpart';
 
 export const getChannelChattersUnofficialAPI = async (opts: any) => {
   try {
-    const generalChannel = variables.get('services.twitch.generalChannel') as string;
+    const broadcasterUsername = variables.get('services.twitch.broadcasterUsername') as string;
     const botUsername = variables.get('services.twitch.botUsername') as string;
     const clientBot = await client('bot');
 
-    const getChatters = await clientBot.unsupported.getChatters(generalChannel);
+    const getChatters = await clientBot.unsupported.getChatters(broadcasterUsername);
     const chatters = getChatters.allChatters.filter(userName => {
       // exclude global ignore list
       const shouldExclude = isIgnored({ userName });
