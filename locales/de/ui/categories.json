@@ -5,7 +5,7 @@
   "settings": "Einstellung",
   "commands": "Befehle",
   "bot": "Bot",
-  "broadcaster": "Streamer",
+  "channel": "Channel",
   "connection": "Verbindung",
   "chat": "Chat",
   "graceful_exit": "Anmutiger Ausgang",
