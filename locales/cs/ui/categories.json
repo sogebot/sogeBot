@@ -5,7 +5,7 @@
   "settings": "Nastavení",
   "commands": "Příkazy",
   "bot": "Bot",
-  "broadcaster": "Vysílající",
+  "channel": "Channel",
   "connection": "Připojení",
   "chat": "Chat",
   "graceful_exit": "Plánované vypnutí",
