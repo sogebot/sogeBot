@@ -26,7 +26,7 @@ export const Timer = new EntitySchema<Readonly<Required<TimerInterface>>>({
   name:    'timer',
   columns: {
     id: {
-      type: 'varchar', primary: true, generated: 'uuid', length: 36,
+      type: 'char', primary: true, generated: 'uuid', length: 36,
     },
     name:                 { type: String },
     isEnabled:            { type: Boolean },

@@ -14,7 +14,7 @@ export const DiscordLink = new EntitySchema<Readonly<Required<DiscordLinkInterfa
   name:    'discord_link',
   columns: {
     id: {
-      type: 'varchar', primary: true, generated: 'uuid', length: 36,
+      type: 'char', primary: true, generated: 'uuid', length: 36,
     },
     tag:       { type: String },
     discordId: { type: String },

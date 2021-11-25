@@ -28,7 +28,7 @@ export const HowLongToBeatGame = new EntitySchema<Readonly<Required<HowLongToBea
   name:    'how_long_to_beat_game',
   columns: {
     id: {
-      type: 'varchar', primary: true, generated: 'uuid', length: 36,
+      type: 'char', primary: true, generated: 'uuid', length: 36,
     },
     game:      { type: String },
     imageUrl:  { type: String },
@@ -57,7 +57,7 @@ export const HowLongToBeatGameItem = new EntitySchema<Readonly<Required<HowLongT
   name:    'how_long_to_beat_game_item',
   columns: {
     id: {
-      type: 'varchar', primary: true, generated: 'uuid', length: 36,
+      type: 'char', primary: true, generated: 'uuid', length: 36,
     },
     hltb_id:   { type: 'uuid' },
     createdAt: { type: 'bigint', transformer: new ColumnNumericTransformer() },

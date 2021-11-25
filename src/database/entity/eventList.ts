@@ -16,7 +16,7 @@ export const EventList = new EntitySchema<Readonly<Required<EventListInterface>>
   name:    'event_list',
   columns: {
     id: {
-      type: 'varchar', primary: true, generated: 'uuid', length: 36,
+      type: 'char', primary: true, generated: 'uuid', length: 36,
     },
     event:       { type: String },
     userId:      { type: String },

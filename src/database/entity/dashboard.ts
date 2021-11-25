@@ -163,7 +163,7 @@ export const QuickAction = new EntitySchema<Readonly<Required<QuickActions.Item>
   name:    'quickaction',
   columns: {
     id: {
-      type: 'varchar', primary: true, generated: 'uuid', length: 36,
+      type: 'char', primary: true, generated: 'uuid', length: 36,
     },
     userId:  { type: String },
     order:   { type: Number },

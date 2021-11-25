@@ -28,7 +28,7 @@ export const Cooldown = new EntitySchema<Readonly<Required<CooldownInterface>>>(
   name:    'cooldown',
   columns: {
     id: {
-      type: 'varchar', primary: true, generated: 'uuid', length: 36,
+      type: 'char', primary: true, generated: 'uuid', length: 36,
     },
     name:        { type: String },
     miliseconds: { type: Number },
@@ -62,7 +62,7 @@ export const CooldownViewer = new EntitySchema<Readonly<Required<CooldownViewerI
   name:    'cooldown_viewer',
   columns: {
     id: {
-      type: 'varchar', primary: true, generated: 'uuid', length: 36,
+      type: 'char', primary: true, generated: 'uuid', length: 36,
     },
     userId:    { type: String },
     timestamp: { type: 'bigint', transformer: new ColumnNumericTransformer() },

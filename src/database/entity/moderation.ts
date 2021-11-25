@@ -23,7 +23,7 @@ export const ModerationWarning = new EntitySchema<Readonly<Required<ModerationWa
   name:    'moderation_warning',
   columns: {
     id: {
-      type: 'varchar', primary: true, generated: 'uuid', length: 36,
+      type: 'char', primary: true, generated: 'uuid', length: 36,
     },
     userId:    { type: String },
     timestamp: {
@@ -39,7 +39,7 @@ export const ModerationPermit = new EntitySchema<Readonly<Required<ModerationPer
   name:    'moderation_permit',
   columns: {
     id: {
-      type: 'varchar', primary: true, generated: 'uuid', length: 36,
+      type: 'char', primary: true, generated: 'uuid', length: 36,
     },
     userId: { type: String },
   },
