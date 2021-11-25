@@ -26,7 +26,7 @@ export const Timer = new EntitySchema<Readonly<Required<TimerInterface>>>({
   name:    'timer',
   columns: {
     id: {
-      type: 'char', primary: true, generated: 'uuid', length: 36,
+      type: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') === 'mysql' ? 'char' : 'uuid', primary: true, generated: 'uuid', length: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') === 'mysql' ? 36 : undefined,
     },
     name:                 { type: String },
     isEnabled:            { type: Boolean },

@@ -109,7 +109,7 @@ export const TwitchTagLocalizationName = new EntitySchema<Readonly<Required<Twit
   name:    'twitch_tag_localization_name',
   columns: {
     id: {
-      type: 'char', primary: true, generated: 'uuid', length: 36,
+      type: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') === 'mysql' ? 'char' : 'uuid', primary: true, generated: 'uuid', length: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') === 'mysql' ? 36 : undefined,
     },
     locale: { type: String },
     value:  { type: String },
@@ -140,7 +140,7 @@ export const TwitchTagLocalizationDescription = new EntitySchema<Readonly<Requir
   name:    'twitch_tag_localization_description',
   columns: {
     id: {
-      type: 'char', primary: true, generated: 'uuid', length: 36,
+      type: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') === 'mysql' ? 'char' : 'uuid', primary: true, generated: 'uuid', length: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') === 'mysql' ? 36 : undefined,
     },
     locale: { type: String },
     value:  { type: 'text' },

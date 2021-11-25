@@ -15,6 +15,7 @@ async function test() {
       },
     }, (error, stdout, stderr) => {
       process.stdout.write(stdout);
+      process.stderr.write(stderr);
       resolve();
     });
   });
