@@ -10,7 +10,7 @@ export const ScrimMatchId = new EntitySchema<Readonly<Required<ScrimMatchIdInter
   name:    'scrim_match_id',
   columns: {
     id: {
-      type: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') === 'mysql' ? 'char' : 'uuid', primary: true, generated: 'uuid', length: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') === 'mysql' ? 36 : undefined,
+      type: 'uuid', primary: true, generated: 'uuid',
     },
     username: { type: String },
     matchId:  { type: String },

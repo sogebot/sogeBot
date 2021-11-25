@@ -236,7 +236,7 @@ export interface AlertResubInterface extends CommonSettingsInterface {
 
 export const CommonSettingsSchema = {
   id: {
-    type: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') === 'mysql' ? 'char' : 'uuid', primary: true, generated: 'uuid', length: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') === 'mysql' ? 36 : undefined,
+    type: 'uuid', primary: true, generated: 'uuid',
   } as EntitySchemaColumnOptions,
   alertId: {
     nullable: true, name: 'alertId', type: String,
@@ -269,7 +269,7 @@ export const Alert = new EntitySchema<Readonly<Required<AlertInterface>>>({
   name:    'alert',
   columns: {
     id: {
-      type: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') === 'mysql' ? 'char' : 'uuid', primary: true, generated: 'uuid', length: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') === 'mysql' ? 36 : undefined,
+      type: 'uuid', primary: true, generated: 'uuid',
     },
     updatedAt: {
       type: 'bigint', transformer: new ColumnNumericTransformer(), default: 0,

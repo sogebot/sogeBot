@@ -23,7 +23,7 @@ export const ModerationWarning = new EntitySchema<Readonly<Required<ModerationWa
   name:    'moderation_warning',
   columns: {
     id: {
-      type: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') === 'mysql' ? 'char' : 'uuid', primary: true, generated: 'uuid', length: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') === 'mysql' ? 36 : undefined,
+      type: 'uuid', primary: true, generated: 'uuid',
     },
     userId:    { type: String },
     timestamp: {
@@ -39,7 +39,7 @@ export const ModerationPermit = new EntitySchema<Readonly<Required<ModerationPer
   name:    'moderation_permit',
   columns: {
     id: {
-      type: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') === 'mysql' ? 'char' : 'uuid', primary: true, generated: 'uuid', length: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') === 'mysql' ? 36 : undefined,
+      type: 'uuid', primary: true, generated: 'uuid',
     },
     userId: { type: String },
   },

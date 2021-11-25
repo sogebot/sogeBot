@@ -16,7 +16,7 @@ export const EventList = new EntitySchema<Readonly<Required<EventListInterface>>
   name:    'event_list',
   columns: {
     id: {
-      type: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') === 'mysql' ? 'char' : 'uuid', primary: true, generated: 'uuid', length: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') === 'mysql' ? 36 : undefined,
+      type: 'uuid', primary: true, generated: 'uuid',
     },
     event:       { type: String },
     userId:      { type: String },

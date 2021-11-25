@@ -163,7 +163,7 @@ export const QuickAction = new EntitySchema<Readonly<Required<QuickActions.Item>
   name:    'quickaction',
   columns: {
     id: {
-      type: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') === 'mysql' ? 'char' : 'uuid', primary: true, generated: 'uuid', length: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') === 'mysql' ? 36 : undefined,
+      type: 'uuid', primary: true, generated: 'uuid',
     },
     userId:  { type: String },
     order:   { type: Number },

@@ -66,7 +66,7 @@ export const GoalGroup = new EntitySchema<Readonly<Required<GoalGroupInterface>>
   name:    'goal_group',
   columns: {
     id: {
-      type: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') === 'mysql' ? 'char' : 'uuid', primary: true, generated: 'uuid', length: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') === 'mysql' ? 36 : undefined,
+      type: 'uuid', primary: true, generated: 'uuid',
     },
     createdAt: {
       type: 'bigint', transformer: new ColumnNumericTransformer(), default: 0,
@@ -88,7 +88,7 @@ export const Goal = new EntitySchema<Readonly<Required<GoalInterface>>>({
   name:    'goal',
   columns: {
     id: {
-      type: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') === 'mysql' ? 'char' : 'uuid', primary: true, generated: 'uuid', length: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') === 'mysql' ? 36 : undefined,
+      type: 'uuid', primary: true, generated: 'uuid',
     },
     name:            { type: String },
     groupId:         { type: String, nullable: true },

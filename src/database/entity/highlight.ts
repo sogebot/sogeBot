@@ -18,7 +18,7 @@ export const Highlight = new EntitySchema<Readonly<Required<HighlightInterface>>
   name:    'highlight',
   columns: {
     id: {
-      type: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') === 'mysql' ? 'char' : 'uuid', primary: true, generated: 'uuid', length: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') === 'mysql' ? 36 : undefined,
+      type: 'uuid', primary: true, generated: 'uuid',
     },
     videoId:   { type: String },
     game:      { type: String },

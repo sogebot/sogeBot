@@ -28,7 +28,7 @@ export const Cooldown = new EntitySchema<Readonly<Required<CooldownInterface>>>(
   name:    'cooldown',
   columns: {
     id: {
-      type: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') === 'mysql' ? 'char' : 'uuid', primary: true, generated: 'uuid', length: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') === 'mysql' ? 36 : undefined,
+      type: 'uuid', primary: true, generated: 'uuid',
     },
     name:        { type: String },
     miliseconds: { type: Number },
@@ -62,7 +62,7 @@ export const CooldownViewer = new EntitySchema<Readonly<Required<CooldownViewerI
   name:    'cooldown_viewer',
   columns: {
     id: {
-      type: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') === 'mysql' ? 'char' : 'uuid', primary: true, generated: 'uuid', length: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') === 'mysql' ? 36 : undefined,
+      type: 'uuid', primary: true, generated: 'uuid',
     },
     userId:    { type: String },
     timestamp: { type: 'bigint', transformer: new ColumnNumericTransformer() },

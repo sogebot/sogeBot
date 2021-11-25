@@ -14,7 +14,7 @@ export const DiscordLink = new EntitySchema<Readonly<Required<DiscordLinkInterfa
   name:    'discord_link',
   columns: {
     id: {
-      type: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') === 'mysql' ? 'char' : 'uuid', primary: true, generated: 'uuid', length: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') === 'mysql' ? 36 : undefined,
+      type: 'uuid', primary: true, generated: 'uuid',
     },
     tag:       { type: String },
     discordId: { type: String },

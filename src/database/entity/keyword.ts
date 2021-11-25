@@ -28,7 +28,7 @@ export const Keyword = new EntitySchema<Readonly<Required<KeywordInterface>>>({
   name:    'keyword',
   columns: {
     id: {
-      type: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') === 'mysql' ? 'char' : 'uuid', primary: true, generated: 'uuid', length: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') === 'mysql' ? 36 : undefined,
+      type: 'uuid', primary: true, generated: 'uuid',
     },
     keyword: { type: String },
     group:   { type: String, nullable: true },
@@ -51,7 +51,7 @@ export const KeywordResponses = new EntitySchema<Readonly<Required<KeywordsRespo
   name:    'keyword_responses',
   columns: {
     id: {
-      type: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') === 'mysql' ? 'char' : 'uuid', primary: true, generated: 'uuid', length: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') === 'mysql' ? 36 : undefined,
+      type: 'uuid', primary: true, generated: 'uuid',
     },
     order:          { type: Number },
     response:       { type: 'text' },

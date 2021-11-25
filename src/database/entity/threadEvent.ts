@@ -8,7 +8,7 @@ export const ThreadEvent = new EntitySchema<Readonly<Required<ThreadEventInterfa
   name:    'thread_event',
   columns: {
     id: {
-      type: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') === 'mysql' ? 'char' : 'uuid', primary: true, generated: 'uuid', length: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') === 'mysql' ? 36 : undefined,
+      type: 'uuid', primary: true, generated: 'uuid',
     },
     event: { type: String },
   },

@@ -28,7 +28,7 @@ export const HowLongToBeatGame = new EntitySchema<Readonly<Required<HowLongToBea
   name:    'how_long_to_beat_game',
   columns: {
     id: {
-      type: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') === 'mysql' ? 'char' : 'uuid', primary: true, generated: 'uuid', length: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') === 'mysql' ? 36 : undefined,
+      type: 'uuid', primary: true, generated: 'uuid',
     },
     game:      { type: String },
     imageUrl:  { type: String },
@@ -57,7 +57,7 @@ export const HowLongToBeatGameItem = new EntitySchema<Readonly<Required<HowLongT
   name:    'how_long_to_beat_game_item',
   columns: {
     id: {
-      type: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') === 'mysql' ? 'char' : 'uuid', primary: true, generated: 'uuid', length: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') === 'mysql' ? 36 : undefined,
+      type: 'uuid', primary: true, generated: 'uuid',
     },
     hltb_id:   { type: 'uuid' },
     createdAt: { type: 'bigint', transformer: new ColumnNumericTransformer() },

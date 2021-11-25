@@ -65,7 +65,7 @@ export const Event = new EntitySchema<Readonly<Required<EventInterface>>>({
   name:    'event',
   columns: {
     id: {
-      type: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') === 'mysql' ? 'char' : 'uuid', primary: true, generated: 'uuid', length: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') === 'mysql' ? 36 : undefined,
+      type: 'uuid', primary: true, generated: 'uuid',
     },
     name:        { type: String },
     isEnabled:   { type: Boolean },
@@ -90,7 +90,7 @@ export const EventOperation = new EntitySchema<Readonly<Required<EventOperationI
   name:    'event_operation',
   columns: {
     id: {
-      type: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') === 'mysql' ? 'char' : 'uuid', primary: true, generated: 'uuid', length: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') === 'mysql' ? 36 : undefined,
+      type: 'uuid', primary: true, generated: 'uuid',
     },
     name:        { type: String },
     definitions: { type: 'simple-json' },
