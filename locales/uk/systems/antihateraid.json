@@ -1,0 +1,8 @@
+{
+  "announce": "This chat was set to $mode by $username to get rid of hate raid. Sorry for inconvenience!",
+  "mode": {
+    "0": "subs-only",
+    "1": "follow-only",
+    "2": "emotes-only"
+  }
+}

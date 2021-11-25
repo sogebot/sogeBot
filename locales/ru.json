@@ -300,16 +300,15 @@
     },
     "eventlist-events": {
       "follow": "<strong>подписался</strong> на вас",
-      "host": "<strong>захостил</strong> вас с $viewers зрителями",
-      "raid": "<strong>зарейдил</strong> вас с $viewers зрителями",
-      "sub": "<strong>засабился</strong> на вас | $tier",
-      "subgift": "<strong>получил</strong> саб от $username",
-      "subcommunitygift": "<strong>получил</strong> саб для $count зрителей",
-      "resub": "<strong>переподписался</strong> на вас с $subStreak $subStreakName | $tier",
-      "resubWithoutStreak": "<strong>переподписался</strong> | $tier |  в общей сложности $subCumulativeMonths $subCumulativeMonthsName",
-      "cheer": "<strong>поощерил</strong> вас $bits битсами",
-      "tip": "<strong>задоннатил</strong> вам $formatted_amount",
-      "rewardredeem": "just <strong>redeemed</strong> reward $titleOfReward"
+      "host": "<strong>hosted</strong>",
+      "raid": "<strong>raided</strong>",
+      "sub": "<strong>subbed</strong> you",
+      "subgift": "has been <strong>gifted</strong> sub",
+      "subcommunitygift": "<strong>gifted</strong> subs for community",
+      "resub": "<strong>resubbed</strong>",
+      "cheer": "<strong>cheered</strong> you",
+      "tip": "<strong>tipped</strong> you",
+      "rewardredeem": "just <strong>redeemed</strong> reward"
     },
     "responses": {
       "variable": {

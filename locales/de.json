@@ -300,16 +300,15 @@
     },
     "eventlist-events": {
       "follow": "<strong>folgt</strong> Dir",
-      "host": "<strong>hosted</strong> dich jetzt mit $viewers Zuschauern",
-      "raid": "<strong>raided</strong> dich mit $viewers Zuschauern",
-      "sub": "<strong>subd</strong> dir | $tier",
-      "subgift": "<strong>verschenkte</strong> sub von $username",
-      "subcommunitygift": "<strong>verschenkte</strong> subs für $count Zuschauer",
-      "resub": "<strong>resubbed</strong> für $subStreak $subStreakName | $tier eingereicht",
-      "resubWithoutStreak": "<strong>resubbed</strong> | $tier | insgesamt $subCumulativeMonths $subCumulativeMonthsName",
-      "cheer": "<strong>cheered</strong> dir $bits bits",
-      "tip": "<strong>spendet</strong> dir $formatted_amount",
-      "rewardredeem": "just <strong>redeemed</strong> reward $titleOfReward"
+      "host": "<strong>hosted</strong>",
+      "raid": "<strong>raided</strong>",
+      "sub": "<strong>subbed</strong> you",
+      "subgift": "has been <strong>gifted</strong> sub",
+      "subcommunitygift": "<strong>gifted</strong> subs for community",
+      "resub": "<strong>resubbed</strong>",
+      "cheer": "<strong>cheered</strong> you",
+      "tip": "<strong>tipped</strong> you",
+      "rewardredeem": "just <strong>redeemed</strong> reward"
     },
     "responses": {
       "variable": {

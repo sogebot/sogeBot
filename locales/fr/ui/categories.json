@@ -5,7 +5,7 @@
   "settings": "Paramètres",
   "commands": "Commandes",
   "bot": "Bot",
-  "broadcaster": "Broadcaster",
+  "channel": "Channel",
   "connection": "Connection",
   "chat": "Chat",
   "graceful_exit": "Graceful exit",

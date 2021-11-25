@@ -1,14 +1,13 @@
 {
   "settings": {
-    "generalChannel": "Canale",
     "generalOwners": "Proprietari",
     "botAccessToken": "AccessToken",
-    "broadcasterAccessToken": "AccessToken",
+    "channelAccessToken": "AccessToken",
     "botRefreshToken": "RefreshToken",
-    "broadcasterRefreshToken": "RefreshToken",
+    "channelRefreshToken": "RefreshToken",
     "botUsername": "Nome Utente",
-    "broadcasterUsername": "Nome Utente",
+    "channelUsername": "Username",
     "botExpectedScopes": "Ambiti",
-    "broadcasterExpectedScopes": "Ambiti"
+    "channelExpectedScopes": "Scopes"
   }
 }
