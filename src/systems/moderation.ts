@@ -362,8 +362,10 @@ class Moderation extends System {
       if (opts.sender) {
         twitch.tmi?.ban(opts.sender.userName);
       }
+      return false;
     }
     messages.push(`${opts.sender?.userName}|${opts.message}`);
+    return true;
   }
 
   @parser({ priority: constants.MODERATION })
