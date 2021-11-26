@@ -30,6 +30,7 @@ import { getUserHighestPermission } from '~/helpers/permissions/index';
 import { adminEndpoint } from '~/helpers/socket';
 import { tmiEmitter } from '~/helpers/tmi';
 import { isModerator } from '~/helpers/user/isModerator';
+import twitch from '~/services/twitch';
 import aliasSystem from '~/systems/alias';
 import songs from '~/systems/songs';
 import { translate } from '~/translate';
@@ -52,6 +53,14 @@ const immuneUsers = new Map<typeof timeoutType[number], Map<string, number>>([
   ['blacklist', new Map()],
 ]);
 
+const messages: string[] = [];
+messages.push = function (...args) {
+  if (this.length >= 2000) {
+    this.shift();
+  }
+  return Array.prototype.push.apply(this,args);
+};
+
 setInterval(() => {
   // cleanup map
   for (const type of timeoutType) {
@@ -68,6 +77,8 @@ setInterval(() => {
 }, 1000);
 
 class Moderation extends System {
+  @settings('lists')
+    autobanMessages: string[] = [];
   @settings('lists')
     cListsWhitelist: string[] = [];
   @settings('lists')
@@ -315,6 +326,44 @@ class Moderation extends System {
     } catch (e: any) {
       return [{ response: translate('moderation.permit-parse-failed'), ...opts }];
     }
+  }
+
+  @command('!autoban')
+  @default_permission(defaultPermissions.MODERATORS)
+  async autoban(opts: CommandOptions) {
+    const username = new Expects(opts.parameters).username().toArray()[0].toLowerCase();
+    // find last message of user
+    const message = messages.find(o => o.startsWith(`${username}|`))?.replace(`${username}|`, '').trim();
+    if (message) {
+      warningLog(`AUTOBAN: Adding '${message}' to autoban message list.`);
+      this.autobanMessages.push(message);
+    } else {
+      warningLog('AUTOBAN: No message of user found, user will be just banned.');
+    }
+    twitch.tmi?.ban(username);
+    return [];
+  }
+
+  @parser({ priority: constants.MODERATION })
+  async saveMessageAndCheckAutoban(opts: ParserOptions) {
+    // remove all messages from user as we want to keep only last one
+    const idxs = messages.reduce(function(a, e, i) {
+      if (e.startsWith(opts.sender?.userName + '|')) {
+        a.push(i);
+      }
+      return a;
+    }, [] as number[]);
+    for (const idx of idxs.reverse()){
+      messages.splice(idx, 1);
+    }
+    if (this.autobanMessages.includes(opts.message.trim())) {
+      warningLog('AUTOBAN: Message of user found in message list. Banning user.');
+
+      if (opts.sender) {
+        twitch.tmi?.ban(opts.sender.userName);
+      }
+    }
+    messages.push(`${opts.sender?.userName}|${opts.message}`);
   }
 
   @parser({ priority: constants.MODERATION })
