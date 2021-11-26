@@ -13,6 +13,7 @@
       "title": "Allowed words",
       "help": "To allow domains use \"domain:prtzl.io\""
     },
+    "autobanMessages": "Autoban Messages",
     "cListsBlacklist": "Forbidden words",
     "cListsTimeout": "Timeout duration",
     "cLinksTimeout": "Timeout duration",
