@@ -13,6 +13,7 @@
       "title": "Parole consentite",
       "help": "Per consentire l'uso dei domini \"dominio:prtzl.io\""
     },
+    "autobanMessages": "Autoban Messages",
     "cListsBlacklist": "Parole vietate",
     "cListsTimeout": "Durata del timeout",
     "cLinksTimeout": "Durata del timeout",
