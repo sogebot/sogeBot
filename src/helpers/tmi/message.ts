@@ -18,7 +18,7 @@ export async function message(type: 'say' | 'whisper' | 'me', username: string |
         return;
       }
       if (type === 'me') {
-        tmiEmitter.emit('say', username, `/me ${messageToSend}`);
+        tmiEmitter.emit('say', broadcasterUsername, `/me ${messageToSend}`);
       } else {
         // strip username if username is bot or is reply
         if ((sendAsReply && messageId) || username === botUsername) {
