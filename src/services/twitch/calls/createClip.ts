@@ -36,6 +36,9 @@ export async function createClip (opts: { createAfterDelay: boolean }) {
   try {
     const clientBot = await client('bot');
     const clipId = await clientBot.clips.createClip({ ...opts, channelId });
+    await getRepository(TwitchClips).save({
+      clipId: clipId, isChecked: false, shouldBeCheckedAt: Date.now() + 120 * 1000,
+    });
     return (await isClipChecked(clipId)) ? clipId : null;
   } catch (e: unknown) {
     if (e instanceof Error) {
