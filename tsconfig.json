@@ -14,7 +14,7 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "moduleResolution": "node",
-    "lib": ["es2020", "dom"],
+    "lib": ["es2020"],
     "resolveJsonModule": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
@@ -36,7 +36,7 @@
   "include": [
     "./",
     "../d.ts/types.d.ts",
-    "../d.ts/*",
+    "../d.ts/*"
   ],
   "exclude": [
     "test",
