@@ -316,7 +316,7 @@ class Chat {
 
     if (type === 'bot') {
       client.onWhisper((_user, message, msg) => {
-        if (isBotId(msg.userInfo.userId) || self) {
+        if (isBotId(msg.userInfo.userId)) {
           return;
         }
         this.message({
