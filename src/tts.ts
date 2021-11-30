@@ -38,6 +38,40 @@ class TTS extends Core {
     adminEndpoint(this.nsp, 'settings.refresh', async () => {
       this.onStartup(); // reset settings
     });
+
+    adminEndpoint(this.nsp, 'google::speak', async (opts, cb) => {
+      if (!jwtClient) {
+        throw new Error('JWT Client is not set');
+      }
+
+      const texttospeech = google.texttospeech({
+        auth:    jwtClient,
+        version: 'v1',
+      });
+
+      const volumeGainDb = -6 + (12 * opts.volume);
+      const synthesize = await texttospeech.text.synthesize({
+        requestBody: {
+          audioConfig: {
+            audioEncoding: 'MP3',
+            pitch:         opts.pitch,
+            speakingRate:  opts.rate,
+            volumeGainDb:  volumeGainDb,
+          },
+          input: {
+            text: opts.text,
+          },
+          voice: {
+            languageCode: `${opts.voice.split('-')[0]}-${opts.voice.split('-')[1]}`,
+            name:         opts.voice,
+          },
+        },
+      });
+
+      if (cb) {
+        cb(null, synthesize.data.audioContent);
+      }
+    });
   }
 
   @onStartup()
@@ -88,33 +122,8 @@ class TTS extends Core {
 
             // get voices list
             const list = await texttospeech.voices.list();
-            this.googleVoices = list.data.voices?.map(o => String(o.name)) ?? [];
+            this.googleVoices = list.data.voices?.map(o => String(o.name)).sort() ?? [];
             info(`TTS: Cached ${this.googleVoices.length} Google Service voices.`);
-            //const list = await texttospeech.voices.list()
-            // console.log({ list })
-            /*const synthesize = await texttospeech.text.synthesize({
-              requestBody: {
-                'audioConfig': {
-                  'audioEncoding': 'MP3',
-                  'pitch':         0,
-                  'speakingRate':  1.00,
-                },
-                'input': {
-                  'text': 'Some text input here',
-                },
-                'voice': {
-                  'languageCode': 'en-US',
-                  'name':         'en-US-Wavenet-F',
-                },
-              },
-            });
-
-            if (synthesize.data.audioContent) {
-              // Write the binary audio content to a local file
-              writeFile('output_b64.mp3', synthesize.data.audioContent, 'binary', () => {
-                console.log('Content written');
-              });
-            }*/
           }
         });
         break;
