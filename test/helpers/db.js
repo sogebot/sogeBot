@@ -55,8 +55,9 @@ module.exports = {
       const changelog = (require('../../dest/helpers/user/changelog'));
 
       debug('test', chalk.bgRed('*** Cleaning up collections ***'));
-      await waitMs(400); // wait little bit for transactions to be done
+      await waitMs(1000); // wait little bit for transactions to be done
       await changelog.flush();
+      await waitMs(1000); // wait little bit for transactions to be done
 
       const entities = [AliasGroup, CommandsGroup, KeywordGroup, HeistUser, EventList, PointsChangelog, SongRequest, RaffleParticipant, Rank, PermissionCommands, Event, EventOperation, Variable, VariableHistory, VariableURL, Raffle, Duel, PollVote, Poll, TimerResponse, Timer, BetsParticipations, UserTip, UserBit, CommandsResponses, User, ModerationPermit, Alias, Bets, Commands, CommandsCount, Quotes, Cooldown, CooldownViewer, Keyword, Price];
       if (['postgres', 'mysql'].includes((await getManager()).connection.options.type)) {
