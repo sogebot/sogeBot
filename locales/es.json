@@ -86,10 +86,10 @@
       "dialog": {
         "timer": "Temporizador",
         "name": "Nombre",
-        "tickOffline": "Should tick if stream offline",
-        "interval": "Interval",
-        "responses": "Responses",
-        "messages": "Trigger every X Messages",
+        "tickOffline": "Debería marcar si se transmite sin conexión",
+        "interval": "Intervalo",
+        "responses": "Respuestas",
+        "messages": "Activa cada X Mensajes",
         "seconds": "Trigger every X Seconds",
         "title": {
           "new": "New timer",
