@@ -53,7 +53,7 @@ class TextToSpeech extends Overlay {
         secureKeys.add(key);
         setTimeout(() => {
           secureKeys.delete(key);
-        }, MINUTE);
+        }, 10 * MINUTE);
       }
 
       this.emit('speak', {

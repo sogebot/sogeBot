@@ -1,8 +1,10 @@
 import {
   Alert, AlertCheer, AlertCommandRedeem, AlertFollow, AlertHost, AlertInterface, AlertRaid, AlertResub, AlertSub, AlertSubcommunitygift, AlertSubgift, AlertTip, EmitData,
 } from '@entity/alert';
+import { MINUTE } from '@sogebot/ui-helpers/constants';
 import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized';
 import { getRepository, IsNull } from 'typeorm';
+import { v4 } from 'uuid';
 
 import { persistent } from '../decorators';
 import Registry from './_interface';
@@ -10,6 +12,9 @@ import Registry from './_interface';
 import { ioServer } from '~/helpers/panel';
 import { adminEndpoint, publicEndpoint } from '~/helpers/socket';
 import { translate } from '~/translate';
+
+/* secureKeys are used to authenticate use of public overlay endpoint */
+const secureKeys = new Set<string>();
 
 class Alerts extends Registry {
   @persistent()
@@ -27,6 +32,28 @@ class Alerts extends Registry {
   }
 
   sockets () {
+    publicEndpoint(this.nsp, 'speak', async (opts, cb) => {
+      if (secureKeys.has(opts.key)) {
+        secureKeys.delete(opts.key);
+
+        const { default: tts, services } = await import ('../tts');
+        if (!tts.ready) {
+          cb(new Error('TTS is not properly set and ready.'));
+          return;
+        }
+
+        if (tts.service === services.GOOGLE) {
+          try {
+            const audioContent = await tts.googleSpeak(opts);
+            cb(null, audioContent);
+          } catch (e) {
+            cb(e);
+          }
+        }
+      } else {
+        cb(new Error('Invalid auth.'));
+      }
+    });
     publicEndpoint(this.nsp, 'isAlertUpdated', async ({ updatedAt, id }: { updatedAt: number; id: string }, cb: (err: Error | null, isUpdated: boolean, updatedAt: number) => void) => {
       try {
         const alert = await getRepository(Alert).findOne({ id });
@@ -75,12 +102,49 @@ class Alerts extends Registry {
         monthsName: getLocalizedName(data.amount, translate('core.months')),
       });
     });
+
+    publicEndpoint(this.nsp, 'speak', async (opts, cb) => {
+      if (secureKeys.has(opts.key)) {
+        secureKeys.delete(opts.key);
+
+        const { default: tts, services } = await import ('../tts');
+        if (!tts.ready) {
+          cb(new Error('TTS is not properly set and ready.'));
+          return;
+        }
+
+        if (tts.service === services.GOOGLE) {
+          try {
+            const audioContent = await tts.googleSpeak(opts);
+            cb(null, audioContent);
+          } catch (e) {
+            cb(e);
+          }
+        }
+      } else {
+        cb(new Error('Invalid auth.'));
+      }
+    });
   }
 
-  trigger(opts: EmitData) {
+  async   trigger(opts: EmitData) {
+    const { default: tts, services } = await import ('../tts');
     if (!this.areAlertsMuted) {
+      let key = v4();
+      if (tts.service === services.RESPONSIVEVOICE) {
+        key = tts.responsiveVoiceKey;
+      }
+      if (tts.service === services.GOOGLE) {
+        // add secureKey
+        secureKeys.add(key);
+        setTimeout(() => {
+          secureKeys.delete(key);
+        }, 10 * MINUTE);
+      }
+
+      secureKeys.add(key);
       ioServer?.of('/registries/alerts').emit('alert', {
-        ...opts, isTTSMuted: this.isTTSMuted, isSoundMuted: this.isSoundMuted,
+        ...opts, isTTSMuted: !tts.ready || this.isTTSMuted, isSoundMuted: this.isSoundMuted, TTSService: tts.service, TTSKey: key,
       });
     }
   }

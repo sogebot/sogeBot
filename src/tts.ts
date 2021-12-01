@@ -30,7 +30,8 @@ class TTS extends Core {
 
   @settings()
     googlePrivateKey = '';
-  googleVoices: string[] = [];
+  @settings()
+    googleVoices: string[] = [];
 
   sockets() {
     adminEndpoint(this.nsp, 'settings.refresh', async () => {
