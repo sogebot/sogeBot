@@ -12,7 +12,7 @@ import {
 import { error, info, warning } from '~/helpers/log';
 import { adminEndpoint } from '~/helpers/socket';
 
-enum services {
+export enum services {
   'NONE' = -1,
   'RESPONSIVEVOICE',
   'GOOGLE'
@@ -40,36 +40,9 @@ class TTS extends Core {
     });
 
     adminEndpoint(this.nsp, 'google::speak', async (opts, cb) => {
-      if (!jwtClient) {
-        throw new Error('JWT Client is not set');
-      }
-
-      const texttospeech = google.texttospeech({
-        auth:    jwtClient,
-        version: 'v1',
-      });
-
-      const volumeGainDb = -6 + (12 * opts.volume);
-      const synthesize = await texttospeech.text.synthesize({
-        requestBody: {
-          audioConfig: {
-            audioEncoding: 'MP3',
-            pitch:         opts.pitch,
-            speakingRate:  opts.rate,
-            volumeGainDb:  volumeGainDb,
-          },
-          input: {
-            text: opts.text,
-          },
-          voice: {
-            languageCode: `${opts.voice.split('-')[0]}-${opts.voice.split('-')[1]}`,
-            name:         opts.voice,
-          },
-        },
-      });
-
+      const audioContent = await this.googleSpeak(opts as any);
       if (cb) {
-        cb(null, synthesize.data.audioContent);
+        cb(null, audioContent);
       }
     });
   }
@@ -135,6 +108,56 @@ class TTS extends Core {
         }
         break;
     }
+  }
+
+  get ready() {
+    if (this.service === services.NONE) {
+      return false;
+    }
+
+    if (this.service === services.RESPONSIVEVOICE) {
+      return this.responsiveVoiceKey.length > 0;
+    }
+
+    if (this.service === services.GOOGLE) {
+      return this.googleClientEmail.length > 0 && this.googlePrivateKey.length > 0;
+    }
+  }
+
+  async googleSpeak(opts: {
+    volume: number;
+    pitch: number;
+    rate: number;
+    text: string;
+    voice: string;
+  }) {
+    if (!jwtClient) {
+      throw new Error('JWT Client is not set');
+    }
+    const texttospeech = google.texttospeech({
+      auth:    jwtClient,
+      version: 'v1',
+    });
+
+    const volumeGainDb = -6 + (12 * opts.volume);
+    const synthesize = await texttospeech.text.synthesize({
+      requestBody: {
+        audioConfig: {
+          audioEncoding: 'MP3',
+          pitch:         opts.pitch,
+          speakingRate:  opts.rate,
+          volumeGainDb:  volumeGainDb,
+        },
+        input: {
+          text: opts.text,
+        },
+        voice: {
+          languageCode: `${opts.voice.split('-')[0]}-${opts.voice.split('-')[1]}`,
+          name:         opts.voice,
+        },
+      },
+    });
+    return synthesize.data.audioContent;
   }
 }
 
