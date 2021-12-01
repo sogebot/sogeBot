@@ -3,8 +3,10 @@
 import { JWT } from 'google-auth-library';
 import { google } from 'googleapis';
 import _ from 'lodash';
+import { getRepository } from 'typeorm';
 
 import Core from '~/_interface';
+import { GooglePrivateKeys } from '~/database/entity/google';
 import { settings } from '~/decorators';
 import {
   onStartup,
@@ -29,10 +31,7 @@ class TTS extends Core {
 
   @settings()
     googlePrivateKey = '';
-  @settings()
-    googleClientEmail = '';
-  @settings()
-    googleVoices: string[] = [];
+  googleVoices: string[] = [];
 
   sockets() {
     adminEndpoint(this.nsp, 'settings.refresh', async () => {
@@ -48,24 +47,25 @@ class TTS extends Core {
   }
 
   @onStartup()
-  onStartup() {
+  async onStartup() {
     switch(this.service) {
       case services.NONE:
         warning('TTS: no selected service has been configured.');
         break;
       case services.GOOGLE:
         try {
-          if (this.googleClientEmail.length === 0) {
-            throw new Error('Missing client email');
-          }
           if (this.googlePrivateKey.length === 0) {
             throw new Error('Missing private key');
           }
+
+          // get private key
+          const privateKey = await getRepository(GooglePrivateKeys).findOneOrFail({ id: this.googlePrivateKey });
+
           // configure a JWT auth client
           jwtClient = new google.auth.JWT(
-            this.googleClientEmail,
+            privateKey.clientEmail,
             undefined,
-            this.googlePrivateKey,
+            privateKey.privateKey,
             ['https://www.googleapis.com/auth/cloud-platform']);
         } catch (err) {
           error('TTS: Something went wrong with authentication to Google Service.');
@@ -120,7 +120,7 @@ class TTS extends Core {
     }
 
     if (this.service === services.GOOGLE) {
-      return this.googleClientEmail.length > 0 && this.googlePrivateKey.length > 0;
+      return this.googlePrivateKey.length > 0;
     }
   }
 
