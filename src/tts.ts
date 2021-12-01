@@ -2,7 +2,6 @@
 
 import { JWT } from 'google-auth-library';
 import { google } from 'googleapis';
-import _ from 'lodash';
 import { getRepository } from 'typeorm';
 
 import Core from '~/_interface';
