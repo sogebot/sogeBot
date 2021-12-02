@@ -306,9 +306,9 @@
       "subgift": "<strong>darované</strong> předplatné",
       "subcommunitygift": "<strong>darované</strong> předplatné komunitě",
       "resub": "<strong>předplatitel</strong>",
-      "cheer": "<strong>cheered</strong> you",
-      "tip": "<strong>tipped</strong> you",
-      "rewardredeem": "just <strong>redeemed</strong> reward"
+      "cheer": "<strong>bity</strong>",
+      "tip": "<strong>spropitné</strong>",
+      "rewardredeem": "žádost o <strong>odměnu</strong>"
     },
     "responses": {
       "variable": {
