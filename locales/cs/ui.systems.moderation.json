@@ -13,7 +13,7 @@
       "title": "Povolená slova",
       "help": "Pro povolení domén použijte \"domain:prtzl.io\""
     },
-    "autobanMessages": "Autoban Messages",
+    "autobanMessages": "Autoban zprávy",
     "cListsBlacklist": "Zakázaná slova",
     "cListsTimeout": "Čas trvání timeoutu",
     "cLinksTimeout": "Čas trvání timeoutu",
