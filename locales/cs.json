@@ -300,12 +300,12 @@
     },
     "eventlist-events": {
       "follow": "ti dal <strong>follow</strong>",
-      "host": "<strong>hosted</strong>",
-      "raid": "<strong>raided</strong>",
-      "sub": "<strong>subbed</strong> you",
-      "subgift": "has been <strong>gifted</strong> sub",
-      "subcommunitygift": "<strong>gifted</strong> subs for community",
-      "resub": "<strong>resubbed</strong>",
+      "host": "<strong>hostitel</strong>",
+      "raid": "<strong>nájezd</strong>",
+      "sub": "<strong>předplatitel</strong>",
+      "subgift": "<strong>darované</strong> předplatné",
+      "subcommunitygift": "<strong>darované</strong> předplatné komunitě",
+      "resub": "<strong>předplatitel</strong>",
       "cheer": "<strong>cheered</strong> you",
       "tip": "<strong>tipped</strong> you",
       "rewardredeem": "just <strong>redeemed</strong> reward"
