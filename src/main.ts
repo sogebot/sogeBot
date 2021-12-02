@@ -110,6 +110,7 @@ async function main () {
         require('./permissions');
         require('./updater');
         require('./dashboard');
+        require('./tts');
         require('./panel');
         await autoLoad('./dest/stats/');
         await autoLoad('./dest/registries/');
