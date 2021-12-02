@@ -72,7 +72,7 @@ class EventSub {
           hypeTrain.setCurrentLevel(data.event.level);
 
           // update overlay
-          ioServer?.of('/core/eventsub').emit('hypetrain-update', {
+          ioServer?.of('/services/twitch').emit('hypetrain-update', {
             total: data.event.total, goal: data.event.goal, level: data.event.level, subs: Object.fromEntries(hypeTrain.subs),
           });
 
@@ -85,7 +85,7 @@ class EventSub {
           hypeTrain.setTopContributions('bits', 0, null, null);
           hypeTrain.setTopContributions('subs', 0, null, null);
           hypeTrain.setCurrentLevel(1);
-          ioServer?.of('/core/eventsub').emit('hypetrain-end');
+          ioServer?.of('/services/twitch').emit('hypetrain-end');
           res.status(200).send('OK');
         } else if (data.subscription.type === 'channel.follow') {
           /* {
