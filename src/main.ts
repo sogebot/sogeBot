@@ -162,12 +162,12 @@ process.on('uncaughtException', (err: Error) => {
   process.report?.writeReport(`uncaughtException-${date}`, err);
   error(util.inspect(err));
   if (err.message.includes('[TwitchJS] Parse error encountered [Chat]')) {
-    // workaround for https://github.com/sogehige/sogeBot/issues/3762
+    // workaround for https://github.com/sogebot/sogeBot/issues/3762
     return;
   }
   error('');
   error('BOT HAS UNEXPECTEDLY CRASHED');
-  error('PLEASE CHECK https://github.com/sogehige/SogeBot/wiki/How-to-report-an-issue');
+  error('PLEASE CHECK https://github.com/sogebot/sogeBot/wiki/How-to-report-an-issue');
   error(`AND ADD ${process.cwd()}/logs/uncaughtException-${date}.json file to your report`);
   error('');
   process.exit(1);

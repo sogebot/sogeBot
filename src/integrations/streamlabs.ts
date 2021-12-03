@@ -191,7 +191,7 @@ class Streamlabs extends Integration {
           const user = await users.getUserByUsername(event.from.toLowerCase());
           const tips = await getRepository(UserTip).find({ where: { userId: user.userId } });
 
-          // workaround for https://github.com/sogehige/sogeBot/issues/3338
+          // workaround for https://github.com/sogebot/sogeBot/issues/3338
           // incorrect currency on event rerun
           const parsedCurrency = (event.formatted_amount as string).match(/(?<currency>[A-Z$]{3}|\$)/);
           if (parsedCurrency && parsedCurrency.groups) {

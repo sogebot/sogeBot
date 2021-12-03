@@ -5,7 +5,7 @@ Quick Links for Contributing
 ----------------------------
 
 - Our bug tracker:
-  https://github.com/sogehige/sogeBot/issues
+  https://github.com/sogebot/sogeBot/issues
 
 - Development Discord.gg channel:
   https://discordapp.com/invite/52KpmuH
@@ -68,7 +68,7 @@ Commit Guidelines
     72 characters or so. That way, `git log` will show things
     nicely even when it is indented.
 
-    Fixes: https://github.com/sogehige/sogeBot/issues/1406
+    Fixes: https://github.com/sogebot/sogeBot/issues/1406
     ```
 
 - If you are updating locales, docs and doesn't fix bugs or add feature, you can

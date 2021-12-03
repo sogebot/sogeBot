@@ -27,7 +27,7 @@
     - From GIT: `git clone git@github.com:sogehige/sogeBot-docker.git`
     - Without GIT as [ZIP](https://github.com/sogehige/sogeBot-docker/archive/master.zip)
 2. Configure properly .env file in `root` directory
-    - You can find examples at [our GitHub repository](https://github.com/sogehige/sogeBot/tree/master/src/bot/data)
+    - You can find examples at [our GitHub repository](https://github.com/sogebot/sogeBot/tree/master/src/bot/data)
 3. Download bot images with `docker compose`
     - Release version: `docker-compose pull`
     - Nightly version: `docker-compose -f docker-compose-nightly.yml pull`
@@ -45,12 +45,12 @@
 ### Stable
 
 - Download latest release from
-  [GitHub sogeBot release page](https://github.com/sogehige/sogeBot/releases)
+  [GitHub sogeBot release page](https://github.com/sogebot/sogeBot/releases)
 - Continue at [ZIP Installation](#zip-installation)
 
 ### Nightlies
 
-- Download desired nightly version from [GitHub sogeBot nightlies page](https://github.com/sogehige/sogeBot/actions?query=workflow%3ANightlies)
+- Download desired nightly version from [GitHub sogeBot nightlies page](https://github.com/sogebot/sogeBot/actions?query=workflow%3ANightlies)
 - Select run, you want to use (newest first)
 
 ![create-new-app](./_images/install/nightlies.png)
@@ -97,7 +97,7 @@
 
 ### GIT Installation
 
-- Download [latest master zip](https://github.com/sogehige/sogeBot/archive/master.zip)
+- Download [latest master zip](https://github.com/sogebot/sogeBot/archive/master.zip)
   or clone repository `git clone https://github.com/sogehige/sogeBot.git`
 - Set your [database environment](configuration/database)
 - Add bot as channel editor

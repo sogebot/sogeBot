@@ -1,11 +1,11 @@
 # SogeBot
 
 [![Discord](https://img.shields.io/discord/317348946144002050.svg?style=for-the-badge&logo=discord)](https://discordapp.com/invite/52KpmuH)
-[![GitHub release](https://img.shields.io/github/release/sogehige/sogebot.svg?style=for-the-badge)](https://github.com/sogehige/sogeBot/releases)
-[![Downloads](https://img.shields.io/github/downloads/sogehige/sogebot/total.svg?style=for-the-badge)](https://github.com/sogehige/sogeBot/releases)
+[![GitHub release](https://img.shields.io/github/release/sogehige/sogebot.svg?style=for-the-badge)](https://github.com/sogebot/sogeBot/releases)
+[![Downloads](https://img.shields.io/github/downloads/sogehige/sogebot/total.svg?style=for-the-badge)](https://github.com/sogebot/sogeBot/releases)
 [![Donate](https://img.shields.io/badge/paypal-donate-yellow.svg?style=for-the-badge&logo=paypal)](https://www.paypal.me/sogetwitch/5eur)
 [![Patreon](https://img.shields.io/badge/dynamic/json?logo=patreon&style=for-the-badge&color=%23e85b46&label=Patreon&query=data.attributes.patron_count&suffix=%20patrons&url=https%3A%2F%2Fwww.patreon.com%2Fapi%2Fcampaigns%2F3198445)](https://www.patreon.com/soge__)
-[![Codecov](https://img.shields.io/codecov/c/github/sogehige/sogebot/master?logo=codecov&style=for-the-badge)](https://app.codecov.io/gh/sogehige/sogeBot/branch/master)
+[![Codecov](https://img.shields.io/codecov/c/github/sogebot/sogebot/master?logo=codecov&style=for-the-badge)](https://app.codecov.io/gh/sogehige/sogeBot/branch/master)
 
 Free Twitch Bot built on Node.js
 
@@ -14,8 +14,8 @@ Free Twitch Bot built on Node.js
 - **DISCORD**: <https://discordapp.com/invite/52KpmuH>
 - **GITHUB**: <https://github.com/sogehige/sogeBot>
 - **DOCS**: <http://sogehige.github.io/sogeBot/>
-- **ISSUES**: <https://github.com/sogehige/sogeBot/issues>
-- **RELEASES**: <https://github.com/sogehige/sogeBot/releases>
+- **ISSUES**: <https://github.com/sogebot/sogeBot/issues>
+- **RELEASES**: <https://github.com/sogebot/sogeBot/releases>
 - **FORUM, IDEAS & SUGGESTIONS**: <https://community.sogebot.xyz/>
 
 #### Screenshots
@@ -24,7 +24,7 @@ Free Twitch Bot built on Node.js
 
 #### Issues
 
-If you found an issue with a bot, feel free to create issue at <https://github.com/sogehige/SogeBot/issues>.
+If you found an issue with a bot, feel free to create issue at <https://github.com/sogebot/sogeBot/issues>.
 You can also contact me on my email sogehige@gmail.com or get support on our [discord server](https://discordapp.com/invite/52KpmuH).
 
 | System             | Description                                                                                                                              |

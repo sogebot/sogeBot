@@ -1,4 +1,4 @@
-?> If you have a theme of your own and want to share, don't be afraid to [contribute](https://github.com/sogehige/SogeBot/issues/new?title=Theme:%20your%20theme%20name%20here)!
+?> If you have a theme of your own and want to share, don't be afraid to [contribute](https://github.com/sogebot/sogeBot/issues/new?title=Theme:%20your%20theme%20name%20here)!
 
 # Stats
 **Note:** To hide unwanted stat, add this to your style (where \<stat> is viewers, uptime, followers, bits, subscribers)

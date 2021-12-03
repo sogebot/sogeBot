@@ -6,7 +6,7 @@
 
 **Question:** Can you add this super new feature to a bot?
 
-**Answer:** Please [create new issue/feature request](https://github.com/sogehige/SogeBot/issues/new?labels=feature+request) and I'll look at it!
+**Answer:** Please [create new issue/feature request](https://github.com/sogebot/sogeBot/issues/new?labels=feature+request) and I'll look at it!
 
 ***
 
