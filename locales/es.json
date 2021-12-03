@@ -86,44 +86,44 @@
       "dialog": {
         "timer": "Temporizador",
         "name": "Nombre",
-        "tickOffline": "Should tick if stream offline",
-        "interval": "Interval",
-        "responses": "Responses",
-        "messages": "Trigger every X Messages",
-        "seconds": "Trigger every X Seconds",
+        "tickOffline": "Debería marcar si se transmite sin conexión",
+        "interval": "Intervalo",
+        "responses": "Respuestas",
+        "messages": "Activar cada X Mensajes",
+        "seconds": "Activar cada X Segundos",
         "title": {
-          "new": "New timer",
-          "edit": "Edit timer"
+          "new": "Nuevo temporizador",
+          "edit": "Editar temporizador"
         },
         "placeholders": {
-          "name": "Set name of your timer, can contain only these characters a-zA-Z0-9_",
-          "messages": "Trigger timer each X messages",
-          "seconds": "Trigger timer each X seconds"
+          "name": "Configure el nombre de su temporizador, solo puede contener estos caracteres a-zA-Z0-9_",
+          "messages": "Activar temporizador cada X mensajes",
+          "seconds": "Activar temporizador cada X segundos"
         },
         "alerts": {
-          "success": "Timer was <strong>successfully</strong> saved.",
-          "fail": "Something went <strong>wrong</strong>."
+          "success": "El temporizador se guardó <strong> correctamente </strong>.",
+          "fail": "Algo salió <strong> mal </strong>."
         }
       },
       "buttons": {
-        "close": "Close",
-        "save-changes": "Save changes",
-        "disable": "Disable",
-        "enable": "Enable",
-        "edit": "Edit",
-        "delete": "Delete",
-        "yes": "Yes",
+        "close": "Cerrar",
+        "save-changes": "Guardar cambios",
+        "disable": "Desactivar",
+        "enable": "Activar",
+        "edit": "Editar",
+        "delete": "Borrar",
+        "yes": "Si",
         "no": "No"
       },
       "popovers": {
-        "are_you_sure_you_want_to_delete_timer": "Are you sure you want to <strong class='text-danger'>delete</strong> timer"
+        "are_you_sure_you_want_to_delete_timer": "Estás seguro de que deseas <strong class = 'text-danger'> eliminar </strong> el temporizador"
       }
     },
     "events": {
-      "event": "Event",
-      "noEvents": "No events found in database.",
-      "whatsthis": "what's this?",
-      "myRewardIsNotListed": "My reward is not listed!",
+      "event": "Evento",
+      "noEvents": "No se encontraron eventos en la base de datos.",
+      "whatsthis": "¿Qué es esto?",
+      "myRewardIsNotListed": "¡Mi recompensa no está en la lista!",
       "redeemAndClickRefreshToSeeReward": "If you are missing your created reward in a list, refresh by clicking on refresh icon.",
       "badges": {
         "enabled": "Enabled",

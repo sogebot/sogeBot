@@ -1,11 +1,12 @@
 {
   "announcements": "Oznámení",
+  "keys": "Klíče",
   "currency": "Měna",
   "general": "Obecné",
   "settings": "Nastavení",
   "commands": "Příkazy",
   "bot": "Bot",
-  "channel": "Channel",
+  "channel": "Kanál",
   "connection": "Připojení",
   "chat": "Chat",
   "graceful_exit": "Plánované vypnutí",

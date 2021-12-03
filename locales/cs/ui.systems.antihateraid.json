@@ -1,8 +1,8 @@
 {
   "settings": {
-    "clearChat": "Clear Chat",
-    "mode": "Mode",
-    "minFollowTime": "Minimum follow time",
-    "customAnnounce": "Customize announcement on anti hate raid enable"
+    "clearChat": "Vyčistit chat",
+    "mode": "Režim",
+    "minFollowTime": "Minimální čas sledování",
+    "customAnnounce": "Přizpůsobit oznámení při zapnutí anti hate raid"
   }
 }

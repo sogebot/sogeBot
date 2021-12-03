@@ -6,7 +6,7 @@
     "botRefreshToken": "RefreshToken",
     "channelRefreshToken": "RefreshToken",
     "botUsername": "Uživatelské jméno",
-    "channelUsername": "Username",
+    "channelUsername": "Uživatelské jméno",
     "botExpectedScopes": "Scopes",
     "channelExpectedScopes": "Scopes"
   }
