@@ -115,7 +115,7 @@ describe('Price - check() - @func3', () => {
     '!a',
     100,
     );
-    await message.isSentRaw('Usage => http://sogehige.github.io/sogeBot/#/_master/systems/alias', user.viewer.userName, 20000);
+    await message.isSentRaw('Usage => http://sogebot.github.io/sogeBot/#/_master/systems/alias', user.viewer.userName, 20000);
   });
 
   it(`Cheer should trigger custom command`, async () => {

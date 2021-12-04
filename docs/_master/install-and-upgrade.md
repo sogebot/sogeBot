@@ -13,7 +13,7 @@
 
 ### Docker prerequisites
 
-- **Docker**, Any of the [supported repositories](http://sogehige.github.io/sogeBot/#/configuration/database)
+- **Docker**, Any of the [supported repositories](http://sogebot.github.io/sogeBot/#/configuration/database)
 
 ### Docker installation
 

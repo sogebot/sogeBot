@@ -67,7 +67,7 @@ describe('Events - event run command should be able to run caster command and al
     });
 
     it('alias should be triggered', async () => {
-      await message.isSentRaw(`Usage => http://sogehige.github.io/sogeBot/#/_master/systems/custom-commands`, follower);
+      await message.isSentRaw(`Usage => http://sogebot.github.io/sogeBot/#/_master/systems/custom-commands`, follower);
     });
 
     it('wait 5s', async () => {

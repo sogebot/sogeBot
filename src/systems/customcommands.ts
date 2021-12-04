@@ -115,9 +115,9 @@ class CustomCommands extends System {
   @default_permission(defaultPermissions.CASTERS)
   @helper()
   main (opts: CommandOptions) {
-    let url = 'http://sogehige.github.io/sogeBot/#/systems/custom-commands';
+    let url = 'http://sogebot.github.io/sogeBot/#/systems/custom-commands';
     if ((process.env?.npm_package_version ?? 'x.y.z-SNAPSHOT').includes('SNAPSHOT')) {
-      url = 'http://sogehige.github.io/sogeBot/#/_master/systems/custom-commands';
+      url = 'http://sogebot.github.io/sogeBot/#/_master/systems/custom-commands';
     }
     return [{ response: translate('core.usage') + ' => ' + url, ...opts }];
   }

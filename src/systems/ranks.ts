@@ -192,9 +192,9 @@ class Ranks extends System {
   @command('!rank help')
   @default_permission(defaultPermissions.CASTERS)
   help (opts: CommandOptions): CommandResponse[] {
-    let url = 'http://sogehige.github.io/sogeBot/#/systems/ranks';
+    let url = 'http://sogebot.github.io/sogeBot/#/systems/ranks';
     if ((process.env?.npm_package_version ?? 'x.y.z-SNAPSHOT').includes('SNAPSHOT')) {
-      url = 'http://sogehige.github.io/sogeBot/#/_master/systems/ranks';
+      url = 'http://sogebot.github.io/sogeBot/#/_master/systems/ranks';
     }
     return [{ response: translate('core.usage') + ' => ' + url, ...opts }];
   }

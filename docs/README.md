@@ -13,7 +13,7 @@ Free Twitch Bot built on Node.js
 
 - **DISCORD**: <https://discordapp.com/invite/52KpmuH>
 - **GITHUB**: <https://github.com/sogehige/sogeBot>
-- **DOCS**: <http://sogehige.github.io/sogeBot/>
+- **DOCS**: <http://sogebot.github.io/sogeBot/>
 - **ISSUES**: <https://github.com/sogebot/sogeBot/issues>
 - **RELEASES**: <https://github.com/sogebot/sogeBot/releases>
 - **FORUM, IDEAS & SUGGESTIONS**: <https://community.sogebot.xyz/>
@@ -84,11 +84,11 @@ List of languages available at <https://crowdin.com/project/sogebot/>
 
 #### Documentation
 
-<http://sogehige.github.io/sogeBot/#/>
+<http://sogebot.github.io/sogeBot/#/>
 
 #### FAQ
 
-<http://sogehige.github.io/sogeBot/#/faq>
+<http://sogebot.github.io/sogeBot/#/faq>
 
 #### License
 

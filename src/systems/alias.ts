@@ -170,9 +170,9 @@ class Alias extends System {
   @command('!alias')
   @default_permission(defaultPermissions.CASTERS)
   main (opts: CommandOptions): CommandResponse[] {
-    let url = 'http://sogehige.github.io/sogeBot/#/systems/alias';
+    let url = 'http://sogebot.github.io/sogeBot/#/systems/alias';
     if ((process.env?.npm_package_version ?? 'x.y.z-SNAPSHOT').includes('SNAPSHOT')) {
-      url = 'http://sogehige.github.io/sogeBot/#/_master/systems/alias';
+      url = 'http://sogebot.github.io/sogeBot/#/_master/systems/alias';
     }
     return [{ response: translate('core.usage') + ' => ' + url, ...opts }];
   }

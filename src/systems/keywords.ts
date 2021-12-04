@@ -72,9 +72,9 @@ class Keywords extends System {
   @default_permission(defaultPermissions.CASTERS)
   @helper()
   public main(opts: CommandOptions): CommandResponse[] {
-    let url = 'http://sogehige.github.io/sogeBot/#/systems/keywords';
+    let url = 'http://sogebot.github.io/sogeBot/#/systems/keywords';
     if ((process.env?.npm_package_version ?? 'x.y.z-SNAPSHOT').includes('SNAPSHOT')) {
-      url = 'http://sogehige.github.io/sogeBot/#/_master/systems/keywords';
+      url = 'http://sogebot.github.io/sogeBot/#/_master/systems/keywords';
     }
     return [{ response: translate('core.usage') + ' => ' + url, ...opts }];
   }
