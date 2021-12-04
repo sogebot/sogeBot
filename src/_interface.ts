@@ -415,7 +415,7 @@ class Module {
   }
 
   public async status(opts: any = {}) {
-    if (['core', 'overlays', 'widgets', 'stats', 'registries'].includes(this._name) || (opts.state === null && typeof opts.state !== 'undefined')) {
+    if (['core', 'overlays', 'widgets', 'stats', 'registries', 'services'].includes(this._name) || (opts.state === null && typeof opts.state !== 'undefined')) {
       return true;
     }
 
