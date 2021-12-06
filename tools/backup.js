@@ -96,9 +96,13 @@ async function main() {
         await connection.getRepository(entity.tableName).query(`DELETE FROM "${relation}" WHERE 1=1`);
       }
     }
+    process.stdout.write('Processing');
     for (const ch of _.chunk(backupData, 100)) {
+      process.stdout.write('.');
       await connection.getRepository(entity.tableName).save(ch);
     }
+    console.log('DONE!');
   }
+  process.exit();
 }
 main();
