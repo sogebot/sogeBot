@@ -62,19 +62,33 @@ export class QuickActionResolver {
   @Mutation(returns => Boolean)
   async quickActionTrigger(@Ctx('user') user: JwtPayload, @Arg('id') id: string, @Arg('value', { nullable: true }) value: string) {
     const item = await getRepository(QuickAction).findOneOrFail({ where: { id, userId: user.userId } });
-    trigger(item, { userId: user.userId, username: user.username }, value);
+    trigger(item, { userId: user.userId, userName: user.userName }, value);
     return true;
   }
 }
 
-const trigger = async (item: QuickActions.Item, user: { userId: string, username: string }, value?: string) => {
-  info(`Quick Action ${item.id} triggered by ${user.username}#${user.userId}`);
+const trigger = async (item: QuickActions.Item, user: { userId: string, userName: string }, value?: string) => {
+  info(`Quick Action ${item.id} triggered by ${user.userName}#${user.userId}`);
   switch (item.type) {
     case 'command': {
       const parser = new (require('../../parser').default)();
-      const responses = await parser.command(getUserSender(user.userId, user.username), item.options.command, true);
+      const alias = require('../../systems/alias').default as typeof import('../../systems/alias').default;
+      const customcommands = require('../../systems/customcommands').default as typeof import('../../systems/customcommands').default;
+
+      const responses = await parser.command(getUserSender(user.userId, user.userName), item.options.command, true);
       for (let i = 0; i < responses.length; i++) {
         await parserReply(responses[i].response, { sender: responses[i].sender, discord: responses[i].discord, attr: responses[i].attr, id: '' });
+      }
+
+      if (customcommands.enabled) {
+        await customcommands.run({
+          sender: getUserSender(user.userId, user.userName), id: 'null', skip: true, quiet: false, message: item.options.command, parameters: item.options.command.trim().replace(/^(!\w+)/i, ''), parser: parser, isAction: false, emotesOffsets: new Map(), isFirstTimeMessage: false, discord: undefined, isParserOptions: true,
+        });
+      }
+      if (alias.enabled) {
+        await alias.run({
+          sender: getUserSender(user.userId, user.userName), id: 'null', skip: true, message: item.options.command, parameters: item.options.command.trim().replace(/^(!\w+)/i, ''), parser: parser, isAction: false, emotesOffsets: new Map(), isFirstTimeMessage: false, discord: undefined, isParserOptions: true,
+        });
       }
 
       break;
