@@ -17,14 +17,12 @@ git pull -r origin master
 
 echo Updating package.json version from $currentSnapshot to $nextTag
 
-currentSnapshotEscaped=$( echo ${currentSnapshot} | tr '.' '\.' )
-nextTagEscaped=$( echo ${nextTag} | tr '.' '\.' )
-
+node ./tools/changePackageVersion.js $nextTag
 sed -i "s/\"version\": \".*\"/\"version\": \"$nextTagEscaped\"/" "$file"
 git add $file
 git commit -m "build: $nextTag"
 echo Pushing build commit $nextTag
-git push origin master
+git push origin master#
 
 echo Creating tag $nextTag
 git tag $nextTag
@@ -34,7 +32,7 @@ echo Released $nextTag
 
 nextSnapshot=$(node tools/changelog.js nextSnapshot)
 echo Updating package.json version from with $nextTag to $nextSnapshot
-sed -i "s/\"version\": \"$nextTagEscaped\"/\"version\": \"$currentSnapshotEscaped\"/" "$file"
+node ./tools/changePackageVersion.js $nextSnapshot
 git add $file
 git commit -m "build: $nextSnapshot"
 echo Pushing snapshot commit $nextSnapshot
