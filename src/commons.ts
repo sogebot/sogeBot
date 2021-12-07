@@ -50,7 +50,7 @@ class Commons {
       }
     } else {
       // we skip as we are already parsing message
-      sendMessage(messageToSend, opts.sender, { skip: true, ...(isParserOpts(opts) ? {} : opts.attr ) }, opts.id);
+      sendMessage(messageToSend, opts.sender, { skip: true, ...(isParserOpts(opts) ? {} : opts.attr ) }, isParserOpts(opts) && opts.forbidReply ? undefined : opts.id);
     }
   }
 }

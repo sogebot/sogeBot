@@ -112,13 +112,13 @@ class EmotesCombo extends System {
               .filter(o => o.messagesCount <= this.comboEmoteCount)
               .pop();
             if (message) {
-            // send message about combo break
+              // send message about combo break
               parserReply(
                 prepare(message.message, {
                   emote:  this.comboEmote,
                   amount: this.comboEmoteCount,
                 }, false),
-                opts,
+                { ...opts, forbidReply: true },
               );
             }
           }
