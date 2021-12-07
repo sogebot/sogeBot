@@ -66,11 +66,24 @@ async function main() {
 
   if (argv._[0] === 'list') {
     console.log('Available tables:\n');
-    const entities = await getManager().connection.entityMetadatas;
-    const tables = entities
-      .map(o => o.tableName);
-
-    console.log(tables.join('\n'));
+    const metadatas = await getManager().connection.entityMetadatas;
+    const relationTable = [];
+    const tables = metadatas
+      .map((table) => {
+        const relations = table.ownRelations.filter(o => {
+          return o.relationType === 'many-to-one';
+        }).map(o => o.target);
+        for (const rel of relations) {
+          if (!relationTable.includes(rel)) {
+            relationTable.push(rel);
+          }
+        }
+        return table.tableName;
+      });
+    // main tables
+    console.log(tables
+      .filter(table => !relationTable.includes(table))
+      .join('\n'));
   }
 
   if (argv._[0] === 'save') {
