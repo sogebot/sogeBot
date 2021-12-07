@@ -4,6 +4,9 @@
 * Configuration
   * [Database](_master/configuration/database.md)
   * [Environment variables](_master/configuration/env.md)
+* Services
+  * [Twitch](_master/services/twitch.md)
+  * [Google](_master/services/google.md)
 * Systems
   * [Alias](_master/systems/alias.md)
   * [Commercial](_master/systems/commercial.md)
