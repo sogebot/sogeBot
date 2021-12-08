@@ -1,7 +1,6 @@
 import { exec, execSync } from 'child_process';
 
 import { HOUR } from '@sogebot/ui-helpers/constants';
-import axios from 'axios';
 import { clone } from 'lodash';
 
 import Core from '~/_interface';
@@ -18,12 +17,6 @@ const versions = {
   '@sogebot/ui-public':  '',
 };
 
-const links = {
-  '@sogebot/ui-admin':   'https://raw.githubusercontent.com/sogebot/ui-admin/main/CHANGELOG.md',
-  '@sogebot/ui-overlay': 'https://raw.githubusercontent.com/sogebot/ui-overlay/main/CHANGELOG.md',
-  '@sogebot/ui-public':  'https://raw.githubusercontent.com/sogebot/ui-public/main/CHANGELOG.md',
-};
-
 class Updater extends Core {
   @settings()
     isAutomaticUpdateEnabled = true;
@@ -33,9 +26,6 @@ class Updater extends Core {
 
   @settings()
     versionsAvailable = clone(versions);
-
-  @settings()
-    changelogs = clone(versions);
 
   @onStartup()
   onStartup() {
@@ -76,17 +66,7 @@ class Updater extends Core {
     });
   }
 
-  async getChangelog(pkg: keyof typeof versions) {
-    if (Object.keys(links).includes(pkg)) {
-      this.changelogs[pkg] = (await axios.get<string>(links[pkg as keyof typeof links])).data;
-    }
-  }
-
   async checkUpdate() {
-    for (const pkg of Object.keys(this.versions) as Array<keyof typeof versions>) {
-      this.getChangelog(pkg);
-    }
-
     for (const pkg of Object.keys(this.versions) as Array<keyof typeof versions> ) {
       const versionsList = JSON.parse(execSync(`npm view ${pkg} versions --json`).toString());
       const [actualMajor, actualMinor, actualPatch] = execSync(`node -p "require('${pkg}/package.json').version"`).toString().replace('\n', '').split('.');
