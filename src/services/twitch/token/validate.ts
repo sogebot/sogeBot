@@ -54,7 +54,7 @@ export const validate = async (type: 'bot' | 'broadcaster', retry = 0, clear = f
       isValidating[type] = true;
     }
 
-    const refreshToken = variables.get('services.twitch.' + type + 'refreshToken') as string;
+    const refreshToken = variables.get('services.twitch.' + type + 'RefreshToken') as string;
 
     if (refreshToken === '') {
       throw new Error('no refresh token for ' + type);
@@ -126,7 +126,7 @@ export const validate = async (type: 'bot' | 'broadcaster', retry = 0, clear = f
     }
 
     setStatus('API', request.status === 200 ? constants.CONNECTED : constants.DISCONNECTED);
-
+    debug('oauth.validate', `Token for ${type} is ${request.status ? 'valid' : 'invalid'}.`);
     return true;
   } catch (e: any) {
     expirationDate[type] = -1;
@@ -147,13 +147,14 @@ export const validate = async (type: 'bot' | 'broadcaster', retry = 0, clear = f
       debug('oauth.validate', e.stack);
       if (e.message.includes('no refresh token for')) {
         if ((type === 'bot' && !botTokenErrorSent) || (type === 'broadcaster' && !broadcasterTokenErrorSent)) {
-          warning(`Rerfresh token ${type} account not found. Please set it in UI.`);
+          warning(`Refresh token ${type} account not found. Please set it in UI.`);
           if (type === 'broadcaster') {
             broadcasterTokenErrorSent = true;
           } else {
             botTokenErrorSent = true;
           }
         }
+        return false;
       } else {
         error(e);
         error(e.stack);
@@ -177,7 +178,6 @@ export const validate = async (type: 'bot' | 'broadcaster', retry = 0, clear = f
         }
       }
     }
-    debug('oauth.validate', `Token for ${type} is ${status ? 'valid' : 'invalid'}.`);
     throw new Error(e);
   } finally {
     isValidating[type] = false;
