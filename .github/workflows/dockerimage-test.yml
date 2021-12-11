@@ -46,8 +46,7 @@ jobs:
           push: false
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache-new
-          tags: |
-            sogebot/nightly:pr4909
+          tags: ${{ steps.prep.outputs.tagged_image }}
       - 
         name: Move cache
         run: |
