@@ -18,7 +18,6 @@ git pull -r origin master
 echo Updating package.json version from $currentSnapshot to $nextTag
 
 node ./tools/changePackageVersion.js $nextTag
-sed -i "s/\"version\": \".*\"/\"version\": \"$nextTagEscaped\"/" "$file"
 git add $file
 git commit -m "build: $nextTag"
 echo Pushing build commit $nextTag
