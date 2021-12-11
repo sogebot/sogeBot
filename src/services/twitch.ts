@@ -181,7 +181,9 @@ class Twitch extends Service {
           emitter.emit('set', '/services/twitch', 'broadcasterUsername', '');
           tmiEmitter.emit('part', 'broadcaster');
         } else {
-          validate('broadcaster', 0, true);
+          setTimeout(() => {
+            validate('broadcaster', 0, true);
+          }, 5000);
         }
         break;
       case 'botAccessToken':
@@ -190,7 +192,9 @@ class Twitch extends Service {
           emitter.emit('set', '/services/twitch', 'botUsername', '');
           tmiEmitter.emit('part', 'bot');
         } else {
-          validate('bot');
+          setTimeout(() => {
+            validate('bot', 0, true);
+          }, 5000);
         }
         break;
     }

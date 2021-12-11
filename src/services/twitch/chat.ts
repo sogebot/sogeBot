@@ -169,7 +169,9 @@ class Chat {
         this.botWarning = true;
       }
       refresh(type).then(() => {
-        this.initClient(type);
+        setTimeout(() => {
+          this.initClient(type);
+        }, 10000);
       });
     }
   }

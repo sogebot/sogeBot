@@ -40,7 +40,9 @@ export const getChannelId = async () => {
         info('Channel ID set to ' + userFromTwitch.id);
         tmiEmitter.emit('reconnect', 'bot');
         tmiEmitter.emit('reconnect', 'broadcaster');
-        updateChannelViewsAndBroadcasterType();
+        setTimeout(() => {
+          updateChannelViewsAndBroadcasterType();
+        }, 10000);
         toWait = 10;
       } else {
         throw new Error('Channel not found on Twitch.');
