@@ -37,9 +37,7 @@ async function runScript (script: string, opts: { sender: { userId: string; user
       userId:   await users.getIdByName(sender),
       source:   'twitch',
     };
-  }
-
-  const strippedScript = strip(script);
+  }let strippedScript = strip(script);
   // we need to check +1 variables, as they are part of commentary
   const containUsers = strippedScript.match(/users/g) !== null;
   const containRandom = strippedScript.replace(/Math\.random|_\.random/g, '').match(/random/g) !== null;
@@ -91,7 +89,7 @@ async function runScript (script: string, opts: { sender: { userId: string; user
   const customVariables = await getAll();
 
   // update globals and replace theirs values
-  script = (await new Message(script).global({ escape: '\'' }));
+  strippedScript = (await new Message(strippedScript).global({ escape: '\'' }));
 
   const sandbox = {
     waitMs: (ms: number) => {
@@ -203,7 +201,7 @@ async function runScript (script: string, opts: { sender: { userId: string; user
     // we need to add operation counter function
   const opCounterFnc = 'let __opCount__ = 0; function __opCounter__() { if (__opCount__ > 100000) { throw new Error("Running script seems to be in infinite loop."); } else { __opCount__++; }};';
   // add __opCounter__() after each ;
-  const toEval = `(async function () { ${opCounterFnc} ${jsBeautify(script).split(';\n').map(line => '__opCounter__();' + line).join(';')} })`.replace(/\n/g, '');
+  const toEval = `(async function () { ${opCounterFnc} ${jsBeautify(strippedScript).split(';\n').map(line => '__opCounter__();' + line).join(';')} })`.replace(/\n/g, '');
   try {
     const vm = new VM({ sandbox });
     const value = await vm.run(toEval)();
@@ -212,7 +210,7 @@ async function runScript (script: string, opts: { sender: { userId: string; user
   } catch (e: any) {
     debug('customvariables.eval', 'Running script seems to be in infinite loop.');
     error(`Script is causing error:`);
-    error(`${jsBeautify(script)}`);
+    error(`${jsBeautify(strippedScript)}`);
     error(e.stack);
     if (isUI) {
       // if we have UI, rethrow error to show in UI
