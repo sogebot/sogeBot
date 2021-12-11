@@ -212,7 +212,7 @@ class Socket extends Core {
           initEndpoints(socket, token.privileges);
         } catch (e: any) {
           if (e instanceof JsonWebTokenError) {
-            error('Used token for authorization is malformed');
+            error('Used token for authorization is malformed or invalid: ' + e.message);
             debug('socket', e.stack);
           } else if (e instanceof Error) {
             debug('socket', e.stack);
