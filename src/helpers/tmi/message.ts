@@ -11,7 +11,7 @@ export async function message(type: 'say' | 'whisper' | 'me', username: string |
     if (username === null || typeof username === 'undefined') {
       username = botUsername;
     }
-    if (username === '') {
+    if (broadcasterUsername === '') {
       error('TMI: channel is not defined, message cannot be sent');
     } else {
       if (isDebugEnabled('tmi.message')) {
