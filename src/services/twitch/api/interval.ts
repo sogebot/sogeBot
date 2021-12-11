@@ -12,7 +12,6 @@ import { checkClips } from '~/services/twitch/calls/checkClips';
 import { getAllStreamTags } from '~/services/twitch/calls/getAllStreamTags';
 import { getBannedEvents } from '~/services/twitch/calls/getBannedEvents';
 import { getChannelChattersUnofficialAPI } from '~/services/twitch/calls/getChannelChattersUnofficialAPI';
-import { getChannelFollowers } from '~/services/twitch/calls/getChannelFollowers';
 import { getChannelInformation } from '~/services/twitch/calls/getChannelInformation';
 import { getChannelSubscribers } from '~/services/twitch/calls/getChannelSubscribers';
 import { getCurrentStream } from '~/services/twitch/calls/getCurrentStream';
@@ -40,7 +39,6 @@ const functions = {
   getCurrentStreamTags:                 getCurrentStreamTags,
   updateChannelViewsAndBroadcasterType: updateChannelViewsAndBroadcasterType,
   getLatest100Followers:                getLatest100Followers,
-  getChannelFollowers:                  getChannelFollowers,
   getChannelSubscribers:                getChannelSubscribers,
   getChannelChattersUnofficialAPI:      getChannelChattersUnofficialAPI,
   getChannelInformation:                getChannelInformation,
@@ -55,7 +53,6 @@ export const init = () => {
   addInterval('getCurrentStreamTags', constants.MINUTE);
   addInterval('updateChannelViewsAndBroadcasterType', constants.HOUR);
   addInterval('getLatest100Followers', constants.MINUTE);
-  addInterval('getChannelFollowers', constants.DAY);
   addInterval('getChannelSubscribers', 2 * constants.MINUTE);
   addInterval('getChannelChattersUnofficialAPI', 5 * constants.MINUTE);
   addInterval('getChannelInformation', constants.MINUTE);
