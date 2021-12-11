@@ -37,7 +37,9 @@ async function runScript (script: string, opts: { sender: { userId: string; user
       userId:   await users.getIdByName(sender),
       source:   'twitch',
     };
-  }let strippedScript = strip(script);
+  }
+
+  let strippedScript = strip(script);
   // we need to check +1 variables, as they are part of commentary
   const containUsers = strippedScript.match(/users/g) !== null;
   const containRandom = strippedScript.replace(/Math\.random|_\.random/g, '').match(/random/g) !== null;
