@@ -47,8 +47,7 @@ jobs:
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache-new
           tags: |
-            sogebot/nightly:latest
-            sogebot/nightly:${{ steps.get_version.outputs.VERSION }}
+            sogebot/nightly:pr4909
       - 
         name: Move cache
         run: |
