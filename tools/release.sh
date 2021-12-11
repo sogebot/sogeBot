@@ -21,7 +21,7 @@ node ./tools/changePackageVersion.js $nextTag
 git add $file
 git commit -m "build: $nextTag"
 echo Pushing build commit $nextTag
-git push origin master#
+git push origin master
 
 echo Creating tag $nextTag
 git tag $nextTag
