@@ -16,10 +16,19 @@ describe('Custom Variable - Return random user - @func1', () => {
   });
 
   it ('Run infinite loop script', async () => {
-    result = await runScript('return (await randomViewer()).username;', {});
+    result = await runScript('return (await randomViewer()).userName;', {});
   });
 
   it ('We should have some result', async () => {
-    assert.strictEqual(result, '');
+    assert.strictEqual([
+      '__viewer__',
+      '__viewer__2',
+      '__viewer__3',
+      '__viewer__4',
+      '__viewer__5',
+      '__viewer__6',
+      '__viewer__7',
+      '__mod__',
+    ].includes(result), true);
   });
 });
