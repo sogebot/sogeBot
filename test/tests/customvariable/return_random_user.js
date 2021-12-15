@@ -22,12 +22,12 @@ describe('Custom Variable - Return random user - @func1', () => {
   it ('We should have some result', async () => {
     assert.strictEqual([
       '__viewer__',
-      '__viewer__2',
-      '__viewer__3',
-      '__viewer__4',
-      '__viewer__5',
-      '__viewer__6',
-      '__viewer__7',
+      '__viewer2__',
+      '__viewer3__',
+      '__viewer4__',
+      '__viewer5__',
+      '__viewer6__',
+      '__viewer7__',
       '__mod__',
     ].includes(result), true);
   });
