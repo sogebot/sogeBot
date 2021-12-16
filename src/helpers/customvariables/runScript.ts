@@ -1,10 +1,10 @@
-import { User, UserInterface } from '@entity/user';
+import { User } from '@entity/user';
 import { getTime } from '@sogebot/ui-helpers/getTime';
 import axios from 'axios';
 import { js as jsBeautify } from 'js-beautify';
 import _ from 'lodash';
 import {
-  filter, get, isNil, map, sample,
+  get, isNil,
 } from 'lodash';
 import strip from 'strip-comments';
 import { getRepository } from 'typeorm';
@@ -17,13 +17,13 @@ import {
   chatMessagesAtStart, isStreamOnline, stats, streamStatusChangeSince,
 } from '../api';
 import { mainCurrency, symbol } from '../currency';
-import { getAllOnlineUsernames } from '../getAllOnlineUsernames';
 import {
   debug, error, info, warning,
 } from '../log';
 import { linesParsed } from '../parser';
 import * as changelog from '../user/changelog.js';
 import { isModerator } from '../user/isModerator';
+import { getRandomFollower, getRandomOnlineFollower, getRandomOnlineSubscriber, getRandomOnlineViewer, getRandomSubscriber, getRandomViewer } from '../user/random.js';
 import { getAll } from './getAll';
 
 async function runScript (script: string, opts: { sender: { userId: string; userName: string; source: 'twitch' | 'discord' } | string | null, isUI: boolean; param?: string | number, _current: any }) {
@@ -40,52 +40,24 @@ async function runScript (script: string, opts: { sender: { userId: string; user
   }
 
   let strippedScript = strip(script);
-  // we need to check +1 variables, as they are part of commentary
-  const containUsers = strippedScript.match(/users/g) !== null;
   const containRandom = strippedScript.replace(/Math\.random|_\.random/g, '').match(/random/g) !== null;
-  const containOnline = strippedScript.match(/online/g) !== null;
   debug('customvariables.eval', {
-    strippedScript, containOnline, containRandom, containUsers,
+    strippedScript, containRandom,
   });
 
-  let usersList: UserInterface[] = [];
-  if (containUsers || containRandom) {
-    await changelog.flush();
-    usersList = await getRepository(User).find();
-  }
-
-  let onlineViewers: string[] = [];
-  let onlineSubscribers: string[] = [];
-  let onlineFollowers: string[] = [];
-
-  if (containOnline) {
-    await changelog.flush();
-    onlineViewers = await getAllOnlineUsernames();
-    onlineSubscribers = (await getRepository(User).find({
-      where: {
-        isSubscriber: true,
-        isOnline:     true,
+  let randomVar = null;
+  if (containRandom) {
+    randomVar = {
+      online: {
+        viewer:     await getRandomOnlineViewer(),
+        follower:   await getRandomOnlineFollower(),
+        subscriber: await getRandomOnlineSubscriber(),
       },
-    })).map(o => o.userName);
-    await changelog.flush();
-    onlineFollowers = (await getRepository(User).find({
-      where: {
-        isFollower: true,
-        isOnline:   true,
-      },
-    })).map(o => o.userName);
+      viewer:     await getRandomViewer(),
+      follower:   await getRandomFollower(),
+      subscriber: await getRandomSubscriber(),
+    };
   }
-
-  const randomVar = {
-    online: {
-      viewer:     sample(onlineViewers),
-      follower:   sample(onlineFollowers),
-      subscriber: sample(onlineSubscribers),
-    },
-    viewer:     sample(map(usersList, 'userName')),
-    follower:   sample(map(filter(usersList, (o) => get(o, 'isFollower', false)), 'userName')),
-    subscriber: sample(map(filter(usersList, (o) => get(o, 'isSubscriber', false)), 'userName')),
-  };
 
   // get custom variables
   const customVariables = await getAll();
@@ -123,7 +95,6 @@ async function runScript (script: string, opts: { sender: { userId: string; user
       };
     },
     _:      _,
-    users:  users,
     random: randomVar,
     stream: {
       uptime:             getTime(isStreamOnline.value ? streamStatusChangeSince.value : null, false),
@@ -142,11 +113,17 @@ async function runScript (script: string, opts: { sender: { userId: string; user
       currentWatched:     stats.value.currentWatchedTime,
     },
     sender,
-    info:     info,
-    warning:  warning,
-    param:    param,
-    _current: opts._current,
-    user:     async (userName: string) => {
+    info:                   info,
+    warning:                warning,
+    param:                  param,
+    _current:               opts._current,
+    randomOnlineFollower:   async () => getRandomOnlineFollower(),
+    randomOnlineSubscriber: async () => getRandomOnlineSubscriber(),
+    randomOnlineViewer:     async () => getRandomOnlineViewer(),
+    randomFollower:         async () => getRandomFollower(),
+    randomSubscriber:       async () => getRandomSubscriber(),
+    randomViewer:           async () => getRandomViewer(),
+    user:                   async (userName: string) => {
       await changelog.flush();
       const _user = await getRepository(User).findOne({ userName });
       if (_user) {
