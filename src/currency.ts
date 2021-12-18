@@ -18,6 +18,8 @@ import {
   error, info, warning,
 } from '~/helpers/log';
 
+let retries = 1;
+
 class Currency extends Core {
   mainCurrencyLoaded = false;
 
@@ -112,9 +114,11 @@ class Currency extends Core {
         this.rates[code as currency] = Number((Number(rate.replace(',', '.')) / Number(count)).toFixed(3));
       }
       info(chalk.yellow('CURRENCY:') + ' fetched rates');
+      retries = 1;
     } catch (e: any) {
       error(e.stack);
-      refresh = constants.SECOND;
+      refresh = constants.MINUTE * retries;
+      retries++;
     }
 
     this.timeouts.updateRates = setTimeout(() => this.updateRates(), refresh);
