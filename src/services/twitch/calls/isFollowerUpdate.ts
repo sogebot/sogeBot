@@ -47,7 +47,9 @@ export async function isFollowerUpdate (user: UserInterface | null) {
         followCheckAt: Date.now(),
       });
     } else {
-      follow(user.userId, user.userName, new Date(helixFollow.followDate).getTime());
+      if (!user.isFollower) {
+        follow(user.userId, user.userName, new Date(helixFollow.followDate).getTime());
+      }
       return { isFollower: true, followedAt: user.followedAt };
     }
   } catch (e: any) {
