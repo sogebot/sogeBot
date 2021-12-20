@@ -19,7 +19,7 @@ import Integration from './_interface';
 import { isStreamOnline } from '~/helpers/api';
 import { CommandError } from '~/helpers/commandError';
 import { announce, prepare } from '~/helpers/commons';
-import { error, info } from '~/helpers/log';
+import { debug, error, info } from '~/helpers/log';
 import { ioServer } from '~/helpers/panel';
 import { addUIError } from '~/helpers/panel/index';
 import { adminEndpoint } from '~/helpers/socket';
@@ -663,7 +663,9 @@ class Spotify extends Integration {
             throw Error('ID was not found in ' + spotifyId);
           }
         }
+        debug('spotify', `Searching song with id ${id}`);
         const response = await this.client.getTrack(id);
+        debug('spotify', `Response => ${JSON.stringify({ response }, null, 2)}`);
         ioServer?.emit('api.stats', {
           method: 'GET', data: response.body, timestamp: Date.now(), call: 'spotify::search', api: 'other', endpoint: 'n/a', code: response.statusCode,
         });
@@ -713,6 +715,7 @@ class Spotify extends Integration {
         }
       }
     } catch (e: any) {
+      debug('spotify', e.stack);
       if (e.message === 'PREMIUM_REQUIRED') {
         error('Spotify Premium is required to request a song.');
       } else if (e.message !== 'Song not found') {
