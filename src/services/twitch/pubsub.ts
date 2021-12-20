@@ -26,8 +26,9 @@ class PubSub {
       // check if tokens match
       const token = variables.get(`services.twitch.broadcasterAccessToken`) as string;
       if (token !== connectedAccessToken) {
+        const isFirstConnection = connectedAccessToken.length === 0;
         this.stop();
-        this.init();
+        this.init(isFirstConnection);
         connectedAccessToken = token;
       }
     }, 5000);
@@ -38,7 +39,7 @@ class PubSub {
     }, 10 * MINUTE);
   }
 
-  async init() {
+  async init(shouldBeLogged = true) {
     try {
       this.pubSubClient = null;
       const clientId = variables.get(`services.twitch.broadcasterClientId`) as string;
@@ -97,7 +98,9 @@ class PubSub {
           warning(`${JSON.stringify(message, null, 2)}`);
         }
       }));
-      info('PUBSUB: listening to onModAction');
+      if (shouldBeLogged) {
+        info('PUBSUB: listening to onModAction');
+      }
 
       this.listeners.push(await this.pubSubClient?.onRedemption(broadcasterId, (message) => {
         if (rewardsRedeemed.has(message.id)) {
@@ -136,7 +139,9 @@ class PubSub {
           userInput:     message.message,
         });
       }));
-      info('PUBSUB: listening to onRedemption');
+      if (shouldBeLogged) {
+        info('PUBSUB: listening to onRedemption');
+      }
     } catch (e) {
       if (e instanceof Error) {
         error(e.stack ?? e.message);
@@ -148,7 +153,6 @@ class PubSub {
     for (const listener of this.listeners) {
       listener.remove();
     }
-    info('PUBSUB: removing listeners');
   }
 }
 
