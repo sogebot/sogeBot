@@ -1,5 +1,6 @@
 'use strict';
 
+import { MINUTE } from '@sogebot/ui-helpers/constants';
 import { JWT } from 'google-auth-library';
 import { google } from 'googleapis';
 import { getRepository } from 'typeorm';
@@ -11,7 +12,10 @@ import {
   onStartup,
 } from '~/decorators/on';
 import { error, info, warning } from '~/helpers/log';
-import { adminEndpoint } from '~/helpers/socket';
+import { adminEndpoint, publicEndpoint } from '~/helpers/socket';
+
+/* secureKeys are used to authenticate use of public overlay endpoint */
+const secureKeys = new Set<string>();
 
 export enum services {
   'NONE' = -1,
@@ -33,6 +37,13 @@ class TTS extends Core {
   @settings()
     googleVoices: string[] = [];
 
+  addSecureKey(key: string) {
+    secureKeys.add(key);
+    setTimeout(() => {
+      secureKeys.delete(key);
+    }, 10 * MINUTE);
+  }
+
   sockets() {
     adminEndpoint(this.nsp, 'settings.refresh', async () => {
       this.onStartup(); // reset settings
@@ -42,6 +53,28 @@ class TTS extends Core {
       const audioContent = await this.googleSpeak(opts as any);
       if (cb) {
         cb(null, audioContent);
+      }
+    });
+
+    publicEndpoint(this.nsp, 'speak', async (opts, cb) => {
+      if (secureKeys.has(opts.key)) {
+        secureKeys.delete(opts.key);
+
+        if (!this.ready) {
+          cb(new Error('TTS is not properly set and ready.'));
+          return;
+        }
+
+        if (this.service === services.GOOGLE) {
+          try {
+            const audioContent = await this.googleSpeak(opts);
+            cb(null, audioContent);
+          } catch (e) {
+            cb(e);
+          }
+        }
+      } else {
+        cb(new Error('Invalid auth.'));
       }
     });
   }

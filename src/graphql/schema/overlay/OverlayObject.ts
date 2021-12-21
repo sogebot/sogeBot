@@ -68,6 +68,8 @@ export class OverlayObject {
     carousel: OverlayMapperCarousel[];
   @Field(type => [OverlayStatsObject])
     stats: OverlayMapperInterface[];
+  @Field(type => [OverlayStatsObject])
+    randomizer: OverlayMapperInterface[];
   @Field(type => [OverlayWordcloudObject])
     wordcloud: OverlayMapperInterface[];
 }

@@ -94,6 +94,7 @@ export class overlayResolver {
       group:           items.filter(o => o.value === 'group'),
       stats:           items.filter(o => o.value === 'stats'),
       wordcloud:       items.filter(o => o.value === 'wordcloud'),
+      randomizer:      items.filter(o => o.value === 'randomizer'),
     } as OverlayObject;
     return response;
   }

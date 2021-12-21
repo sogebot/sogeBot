@@ -1,6 +1,7 @@
 import { Randomizer as RandomizerEntity } from '@entity/randomizer';
 import { LOW } from '@sogebot/ui-helpers/constants';
 import { getRepository } from 'typeorm';
+import { v4 } from 'uuid';
 
 import { parser } from '../decorators';
 import Registry from './_interface';
@@ -19,10 +20,26 @@ class Randomizer extends Registry {
 
   sockets () {
     publicEndpoint(this.nsp, 'randomizer::getVisible', async (cb) => {
-      cb(null, await getRepository(RandomizerEntity).findOne({ where: { isShown: true }, relations: [ 'items'] }));
+      cb(
+        null,
+        await getRepository(RandomizerEntity).findOne({ where: { isShown: true }, relations: [ 'items'] })
+      );
     });
     adminEndpoint(this.nsp, 'randomizer::startSpin', async () => {
-      this.socket?.emit('spin');
+      const { default: tts, services } = await import ('../tts');
+      let key = v4();
+      if (tts.ready) {
+        if (tts.service === services.RESPONSIVEVOICE) {
+          key = tts.responsiveVoiceKey;
+        }
+        if (tts.service === services.GOOGLE) {
+          tts.addSecureKey(key);
+        }
+      }
+      this.socket?.emit('spin', {
+        service: tts.service,
+        key,
+      });
     });
     adminEndpoint(this.nsp, 'randomizer::showById', async (id, cb) => {
       try {
