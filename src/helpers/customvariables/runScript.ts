@@ -5,8 +5,8 @@ import _ from 'lodash';
 import {
   get, isNil,
 } from 'lodash';
+import { minify } from 'terser';
 import { getRepository } from 'typeorm';
-import { minify } from 'uglify-js';
 import { VM } from 'vm2';
 
 import Message from '../../message';
@@ -38,8 +38,9 @@ async function runScript (script: string, opts: { sender: { userId: string; user
     };
   }
 
-  const minified = minify(script, {
-    parse: {
+  const minified = await minify(script, {
+    module: true,
+    parse:  {
       bare_returns: true, // allows top-level return
     },
     compress: {
@@ -47,8 +48,8 @@ async function runScript (script: string, opts: { sender: { userId: string; user
     },
   });
 
-  if (minified.error) {
-    throw minified.error;
+  if (!minified.code) {
+    throw new Error('Error during minify');
   }
 
   let strippedScript = minified.code;
