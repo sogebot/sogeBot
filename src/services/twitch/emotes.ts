@@ -260,7 +260,7 @@ class Emotes {
   }
 
   async _test () {
-    ioServer?.of('/core/emotes').emit('emote', {
+    ioServer?.of('/services/twitch').emit('emote', {
       id:  uuid(),
       url: {
         1: 'https://static-cdn.jtvnw.net/emoticons/v1/9/1.0',
@@ -272,12 +272,12 @@ class Emotes {
 
   async firework (data: string[]) {
     const emotes = await this.parseEmotes(data);
-    ioServer?.of('/core/emotes').emit('emote.firework', { emotes });
+    ioServer?.of('/services/twitch').emit('emote.firework', { emotes });
   }
 
   async explode (data: string[]) {
     const emotes = await this.parseEmotes(data);
-    ioServer?.of('/core/emotes').emit('emote.explode', { emotes });
+    ioServer?.of('/services/twitch').emit('emote.explode', { emotes });
   }
 
   async containsEmotes (opts: ParserOptions) {
@@ -332,7 +332,7 @@ class Emotes {
     const emotes = shuffle(parsed);
     const id = uuid();
     for (let i = 0; i < emotes.length; i++) {
-      ioServer?.of('/core/emotes').emit('emote', { id, url: usedEmotes[emotes[i]].urls });
+      ioServer?.of('/services/twitch').emit('emote', { id, url: usedEmotes[emotes[i]].urls });
     }
     return true;
   }
