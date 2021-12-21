@@ -1,13 +1,12 @@
 import { User } from '@entity/user';
 import { getTime } from '@sogebot/ui-helpers/getTime';
 import axios from 'axios';
-import { js as jsBeautify } from 'js-beautify';
 import _ from 'lodash';
 import {
   get, isNil,
 } from 'lodash';
-import strip from 'strip-comments';
 import { getRepository } from 'typeorm';
+import { minify } from 'uglify-js';
 import { VM } from 'vm2';
 
 import Message from '../../message';
@@ -39,7 +38,20 @@ async function runScript (script: string, opts: { sender: { userId: string; user
     };
   }
 
-  let strippedScript = strip(script);
+  const minified = minify(script, {
+    parse: {
+      bare_returns: true, // allows top-level return
+    },
+    compress: {
+      sequences: false, // disable chaining with commas
+    },
+  });
+
+  if (minified.error) {
+    throw minified.error;
+  }
+
+  let strippedScript = minified.code;
   const containRandom = strippedScript.replace(/Math\.random|_\.random/g, '').match(/random/g) !== null;
   debug('customvariables.eval', {
     strippedScript, containRandom,
@@ -180,7 +192,7 @@ async function runScript (script: string, opts: { sender: { userId: string; user
     // we need to add operation counter function
   const opCounterFnc = 'let __opCount__ = 0; function __opCounter__() { if (__opCount__ > 100000) { throw new Error("Running script seems to be in infinite loop."); } else { __opCount__++; }};';
   // add __opCounter__() after each ;
-  const toEval = `(async function () { ${opCounterFnc} ${jsBeautify(strippedScript).split(';\n').map(line => '__opCounter__();' + line).join(';')} })`.replace(/\n/g, '');
+  const toEval = `(async function () { ${opCounterFnc} ${strippedScript.split(';').map(line => '__opCounter__();' + line).join(';')} })`.replace(/\n/g, '');
   try {
     const vm = new VM({ sandbox });
     const value = await vm.run(toEval)();
@@ -189,7 +201,7 @@ async function runScript (script: string, opts: { sender: { userId: string; user
   } catch (e: any) {
     debug('customvariables.eval', 'Running script seems to be in infinite loop.');
     error(`Script is causing error:`);
-    error(`${jsBeautify(strippedScript)}`);
+    error(`${script}`);
     error(e.stack);
     if (isUI) {
       // if we have UI, rethrow error to show in UI
