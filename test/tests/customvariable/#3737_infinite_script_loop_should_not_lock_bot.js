@@ -1,12 +1,9 @@
-/* global describe it before */
-
-
 require('../../general.js');
+const assert = require('assert');
 
+const runScript = (require('../../../dest/helpers/customvariables/runScript')).runScript;
 const db = require('../../general.js').db;
 const message = require('../../general.js').message;
-const runScript = (require('../../../dest/helpers/customvariables/runScript')).runScript;
-const assert = require('assert');
 
 describe('Custom Variable - #3737 - Infinite script loop should not lock bot - @func1', () => {
   let result = '';

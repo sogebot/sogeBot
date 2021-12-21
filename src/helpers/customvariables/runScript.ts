@@ -1,6 +1,7 @@
 import { User } from '@entity/user';
 import { getTime } from '@sogebot/ui-helpers/getTime';
 import axios from 'axios';
+import { js as jsBeautify } from 'js-beautify';
 import _ from 'lodash';
 import {
   get, isNil,
@@ -193,7 +194,7 @@ async function runScript (script: string, opts: { sender: { userId: string; user
     // we need to add operation counter function
   const opCounterFnc = 'let __opCount__ = 0; function __opCounter__() { if (__opCount__ > 100000) { throw new Error("Running script seems to be in infinite loop."); } else { __opCount__++; }};';
   // add __opCounter__() after each ;
-  const toEval = `(async function () { ${opCounterFnc} ${strippedScript.split(';').map(line => '__opCounter__();' + line).join(';')} })`.replace(/\n/g, '');
+  const toEval = `(async function () { ${opCounterFnc} ${jsBeautify(strippedScript).split(';\n').map(line => '__opCounter__();' + line).join(';')} })`.replace(/\n/g, '');
   try {
     const vm = new VM({ sandbox });
     const value = await vm.run(toEval)();
