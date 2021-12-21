@@ -1,4 +1,5 @@
 import client from '../api/client';
+import { refresh } from '../token/refresh.js';
 
 import { error } from '~/helpers/log';
 
@@ -9,7 +10,11 @@ async function sendGameFromTwitch (game: string) {
     return searchCategories.map(o => o.name);
   } catch (e: unknown) {
     if (e instanceof Error) {
-      error(e.stack ?? e.message);
+      if (e.message === 'Invalid OAuth token') {
+        await refresh('bot');
+      } else {
+        error(e.stack ?? e.message);
+      }
     }
     return;
   }

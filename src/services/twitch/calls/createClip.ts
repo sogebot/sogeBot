@@ -4,6 +4,7 @@ import { getRepository } from 'typeorm';
 import { TwitchClips } from '../../../database/entity/twitch';
 import { error } from '../../../helpers/log';
 import client from '../api/client';
+import { refresh } from '../token/refresh.js';
 
 import { isStreamOnline } from '~/helpers/api';
 import { variables } from '~/watchers';
@@ -42,7 +43,11 @@ export async function createClip (opts: { createAfterDelay: boolean }) {
     return (await isClipChecked(clipId)) ? clipId : null;
   } catch (e: unknown) {
     if (e instanceof Error) {
-      error(e.stack ?? e.message);
+      if (e.message === 'Invalid OAuth token') {
+        await refresh('bot');
+      } else {
+        error(e.stack ?? e.message);
+      }
     }
   }
   return null;

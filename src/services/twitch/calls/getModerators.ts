@@ -1,6 +1,7 @@
 import { getRepository, In, Not } from 'typeorm';
 
 import client from '../api/client';
+import { refresh } from '../token/refresh.js';
 
 import { User } from '~/database/entity/user';
 import { error, warning } from '~/helpers/log';
@@ -34,7 +35,11 @@ export async function getModerators(opts: { isWarned: boolean }) {
     setStatus('MOD', getModeratorsPaginated.map(o => o.userId).includes(botId));
   } catch (e) {
     if (e instanceof Error) {
-      error(e.stack ?? e.message);
+      if (e.message === 'Invalid OAuth token') {
+        await refresh('broadcaster');
+      } else {
+        error(e.stack ?? e.message);
+      }
     }
   }
   return { state: true };

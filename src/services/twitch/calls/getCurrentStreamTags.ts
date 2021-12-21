@@ -1,5 +1,6 @@
 import { rawDataSymbol } from '../../../../node_modules/@twurple/common/lib';
 import client from '../api/client';
+import { refresh } from '../token/refresh.js';
 
 import { currentStreamTags } from '~/helpers/api';
 import { error } from '~/helpers/log';
@@ -18,7 +19,11 @@ export async function getCurrentStreamTags (opts: any) {
     }
   } catch (e) {
     if (e instanceof Error) {
-      error(e.stack ?? e.message);
+      if (e.message === 'Invalid OAuth token') {
+        await refresh('bot');
+      } else {
+        error(e.stack ?? e.message);
+      }
     }
     return { state: false, opts };
   }

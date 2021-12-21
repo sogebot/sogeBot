@@ -1,4 +1,5 @@
 import client from '../api/client';
+import { refresh } from '../token/refresh.js';
 
 import { gameCache, gameOrTitleChangedManually, rawStatus } from '~/helpers/api';
 import {
@@ -69,7 +70,11 @@ export async function getChannelInformation (opts: any) {
     }
   } catch (e) {
     if (e instanceof Error) {
-      error(e.stack ?? e.message);
+      if (e.message === 'Invalid OAuth token') {
+        await refresh('bot');
+      } else {
+        error(e.stack ?? e.message);
+      }
     }
     return { state: false, opts };
   }

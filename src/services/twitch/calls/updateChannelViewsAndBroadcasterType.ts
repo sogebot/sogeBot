@@ -1,5 +1,6 @@
 import { stats } from '../../../helpers/api/stats.js';
 import client from '../api/client';
+import { refresh } from '../token/refresh.js';
 
 import emitter from '~/helpers/interfaceEmitter';
 import { error } from '~/helpers/log';
@@ -18,7 +19,11 @@ async function updateChannelViewsAndBroadcasterType () {
     }
   } catch (e: unknown) {
     if (e instanceof Error) {
-      error(e.stack ?? e.message);
+      if (e.message === 'Invalid OAuth token') {
+        await refresh('bot');
+      } else {
+        error(e.stack ?? e.message);
+      }
     }
   }
   return { state: true };

@@ -1,6 +1,7 @@
 import { getRepository, IsNull } from 'typeorm';
 
 import client from '../api/client';
+import { refresh } from '../token/refresh.js';
 
 import { rawDataSymbol } from '~/../node_modules/@twurple/common/lib';
 import { TwitchTag, TwitchTagLocalizationDescription, TwitchTagLocalizationName } from '~/database/entity/twitch';
@@ -39,7 +40,11 @@ export async function getAllStreamTags(opts: any) {
     await getRepository(TwitchTagLocalizationName).delete({ tagId: IsNull() });
   } catch (e) {
     if (e instanceof Error) {
-      error(e.stack ?? e.message);
+      if (e.message === 'Invalid OAuth token') {
+        await refresh('bot');
+      } else {
+        error(e.stack ?? e.message);
+      }
     }
   }
   return { state: true, opts };

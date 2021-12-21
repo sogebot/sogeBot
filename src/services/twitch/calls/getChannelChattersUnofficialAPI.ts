@@ -7,6 +7,7 @@ import {
 } from 'typeorm';
 
 import client from '../api/client';
+import { refresh } from '../token/refresh.js';
 
 import { eventEmitter } from '~/helpers/events';
 import { getAllOnlineUsernames } from '~/helpers/getAllOnlineUsernames';
@@ -113,7 +114,11 @@ export const getChannelChattersUnofficialAPI = async (opts: any) => {
     }
   } catch (e) {
     if (e instanceof Error) {
-      error(e.stack ?? e.message);
+      if (e.message === 'Invalid OAuth token') {
+        await refresh('bot');
+      } else {
+        error(e.stack ?? e.message);
+      }
     }
     return { state: false, opts };
   }

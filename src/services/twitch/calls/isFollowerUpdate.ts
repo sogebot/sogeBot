@@ -3,7 +3,8 @@ import * as constants from '@sogebot/ui-helpers/constants';
 import { getRepository } from 'typeorm';
 
 import { eventEmitter } from '../../../helpers/events';
-import { unfollow } from '../../../helpers/log';
+import { error, unfollow } from '../../../helpers/log';
+import { refresh } from '../token/refresh.js';
 
 import { follow } from '~/helpers/events/follow';
 import * as changelog from '~/helpers/user/changelog.js';
@@ -53,6 +54,13 @@ export async function isFollowerUpdate (user: UserInterface | null) {
       return { isFollower: true, followedAt: user.followedAt };
     }
   } catch (e: any) {
+    if (e instanceof Error) {
+      if (e.message === 'Invalid OAuth token') {
+        await refresh('bot');
+      } else {
+        error(e.stack ?? e.message);
+      }
+    }
     return null;
   }
 }

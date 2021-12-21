@@ -1,4 +1,5 @@
 import client from '../api/client';
+import { refresh } from '../token/refresh.js';
 
 import {
   stats as apiStats,
@@ -34,7 +35,11 @@ export async function getLatest100Followers () {
     apiStats.value.currentFollowers = getFollows.total;
   } catch (e) {
     if (e instanceof Error) {
-      error(e.stack ?? e.message);
+      if (e.message === 'Invalid OAuth token') {
+        await refresh('bot');
+      } else {
+        error(e.stack ?? e.message);
+      }
     }
     return { state: false };
   }

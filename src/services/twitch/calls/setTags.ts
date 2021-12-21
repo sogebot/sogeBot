@@ -4,6 +4,7 @@ import {
 } from 'typeorm';
 
 import client from '../api/client';
+import { refresh } from '../token/refresh.js';
 
 import { error } from '~/helpers/log';
 import { variables } from '~/watchers';
@@ -33,7 +34,11 @@ async function setTags (tagsArg: string[]) {
     }
   } catch (e: unknown) {
     if (e instanceof Error) {
-      error(e.stack ?? e.message);
+      if (e.message === 'Invalid OAuth token') {
+        await refresh('broadcaster');
+      } else {
+        error(e.stack ?? e.message);
+      }
     }
     return false;
   }

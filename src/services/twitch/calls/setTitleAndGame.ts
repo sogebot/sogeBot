@@ -3,6 +3,7 @@ import { error } from 'console';
 import { defaults, isNil } from 'lodash';
 
 import client from '../api/client';
+import { refresh } from '../token/refresh.js';
 import { getGameIdFromName } from './getGameIdFromName';
 
 import {
@@ -52,7 +53,11 @@ async function setTitleAndGame (args: { title?: string | null; game?: string | n
     });
   } catch (e: unknown) {
     if (e instanceof Error) {
-      error(e.stack ?? e.message);
+      if (e.message === 'Invalid OAuth token') {
+        await refresh('bot');
+      } else {
+        error(e.stack ?? e.message);
+      }
     }
     return { response: '', status: false };
   }

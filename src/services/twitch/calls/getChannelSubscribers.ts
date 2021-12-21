@@ -1,6 +1,7 @@
 import { getRepository } from 'typeorm';
 
 import client from '../api/client';
+import { refresh } from '../token/refresh.js';
 
 import { HelixSubscription } from '~/../node_modules/@twurple/api/lib';
 import { User } from '~/database/entity/user';
@@ -41,7 +42,11 @@ export async function getChannelSubscribers<T extends { noAffiliateOrPartnerWarn
     opts.notCorrectOauthWarningSent = false;
   } catch (e) {
     if (e instanceof Error) {
-      error(e.stack ?? e.message);
+      if (e.message === 'Invalid OAuth token') {
+        await refresh('broadcaster');
+      } else {
+        error(e.stack ?? e.message);
+      }
     }
   }
   return { state: true, opts };

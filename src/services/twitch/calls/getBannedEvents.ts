@@ -1,6 +1,8 @@
 import { chunk } from 'lodash';
 import { getRepository } from 'typeorm';
 
+import { refresh } from '../token/refresh.js';
+
 import { rawDataSymbol } from '~/../node_modules/@twurple/common/lib';
 import { BannedEventsTable } from '~/database/entity/bannedEvents';
 import { debug, error, warning } from '~/helpers/log';
@@ -53,7 +55,11 @@ export async function getBannedEvents (opts: any) {
     debug('api.stream', 'API: ' + JSON.stringify(getBanEvents));
   } catch (e) {
     if (e instanceof Error) {
-      error(e.stack ?? e.message);
+      if (e.message === 'Invalid OAuth token') {
+        await refresh('broadcaster');
+      } else {
+        error(e.stack ?? e.message);
+      }
     }
   }
 

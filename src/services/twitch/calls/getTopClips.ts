@@ -3,6 +3,7 @@ import { DAY } from '@sogebot/ui-helpers/constants';
 
 import { HelixClip } from '../../../../node_modules/@twurple/api/lib';
 import client from '../api/client';
+import { refresh } from '../token/refresh.js';
 import { getGameNameFromId } from './getGameNameFromId';
 
 import { streamStatusChangeSince } from '~/helpers/api';
@@ -34,7 +35,11 @@ export async function getTopClips (opts: any) {
     return shuffle(clips).slice(0, opts.first);
   } catch (e) {
     if (e instanceof Error) {
-      error(e.stack ?? e.message);
+      if (e.message === 'Invalid OAuth token') {
+        await refresh('bot');
+      } else {
+        error(e.stack ?? e.message);
+      }
     }
   }
   return [];

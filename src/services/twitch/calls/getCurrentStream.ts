@@ -1,5 +1,7 @@
 import { dayjs } from '@sogebot/ui-helpers/dayjsHelper';
 
+import { refresh } from '../token/refresh.js';
+
 import { isStreamOnline, setCurrentRetries, streamId, streamStatusChangeSince, streamType } from '~/helpers/api';
 import {
   stats as apiStats, chatMessagesAtStart,
@@ -70,7 +72,11 @@ export async function getCurrentStream (opts: any) {
     }
   } catch (e) {
     if (e instanceof Error) {
-      error(e.stack ?? e.message);
+      if (e.message === 'Invalid OAuth token') {
+        await refresh('bot');
+      } else {
+        error(e.stack ?? e.message);
+      }
     }
     return { state: false, opts };
   }
