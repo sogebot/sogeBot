@@ -73,7 +73,7 @@ export async function getChannelInformation (opts: any) {
       if (e.message === 'Invalid OAuth token') {
         await refresh('bot');
       } else {
-        error(e.stack ?? e.message);
+        error('getChannelInformation => ' + e.stack ?? e.message);
       }
     }
     return { state: false, opts };

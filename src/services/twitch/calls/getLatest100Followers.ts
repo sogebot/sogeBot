@@ -38,7 +38,7 @@ export async function getLatest100Followers () {
       if (e.message === 'Invalid OAuth token') {
         await refresh('bot');
       } else {
-        error(e.stack ?? e.message);
+        error('getLatest100Followers => ' + e.stack ?? e.message);
       }
     }
     return { state: false };

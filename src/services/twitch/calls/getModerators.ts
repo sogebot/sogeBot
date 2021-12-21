@@ -38,7 +38,7 @@ export async function getModerators(opts: { isWarned: boolean }) {
       if (e.message === 'Invalid OAuth token') {
         await refresh('broadcaster');
       } else {
-        error(e.stack ?? e.message);
+        error('getModerators => ' + e.stack ?? e.message);
       }
     }
   }

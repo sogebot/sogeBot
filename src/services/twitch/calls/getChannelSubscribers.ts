@@ -45,7 +45,7 @@ export async function getChannelSubscribers<T extends { noAffiliateOrPartnerWarn
       if (e.message === 'Invalid OAuth token') {
         await refresh('broadcaster');
       } else {
-        error(e.stack ?? e.message);
+        error('getChannelSubscribers => ' + e.stack ?? e.message);
       }
     }
   }

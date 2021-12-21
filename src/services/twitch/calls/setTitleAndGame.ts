@@ -56,7 +56,7 @@ async function setTitleAndGame (args: { title?: string | null; game?: string | n
       if (e.message === 'Invalid OAuth token') {
         await refresh('bot');
       } else {
-        error(e.stack ?? e.message);
+        error('setTitleAndGame => ' + e.stack ?? e.message);
       }
     }
     return { response: '', status: false };

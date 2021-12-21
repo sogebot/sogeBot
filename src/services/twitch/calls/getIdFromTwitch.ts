@@ -17,7 +17,7 @@ async function getIdFromTwitch (userName: string): Promise<string> {
       if (e.message === 'Invalid OAuth token') {
         await refresh('bot');
       } else {
-        error(e.stack ?? e.message);
+        error('getIdFromTwitch => ' + e.stack ?? e.message);
       }
     }
     throw(e);

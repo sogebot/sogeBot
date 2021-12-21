@@ -117,7 +117,7 @@ export const getChannelChattersUnofficialAPI = async (opts: any) => {
       if (e.message === 'Invalid OAuth token') {
         await refresh('bot');
       } else {
-        error(e.stack ?? e.message);
+        error('getChannelChattersUnofficialAPI => ' + e.stack ?? e.message);
       }
     }
     return { state: false, opts };

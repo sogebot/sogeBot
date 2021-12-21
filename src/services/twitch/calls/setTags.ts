@@ -37,7 +37,7 @@ async function setTags (tagsArg: string[]) {
       if (e.message === 'Invalid OAuth token') {
         await refresh('broadcaster');
       } else {
-        error(e.stack ?? e.message);
+        error('setTags => ' + e.stack ?? e.message);
       }
     }
     return false;

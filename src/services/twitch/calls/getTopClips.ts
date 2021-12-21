@@ -38,7 +38,7 @@ export async function getTopClips (opts: any) {
       if (e.message === 'Invalid OAuth token') {
         await refresh('bot');
       } else {
-        error(e.stack ?? e.message);
+        error('getTopClips => ' + e.stack ?? e.message);
       }
     }
   }

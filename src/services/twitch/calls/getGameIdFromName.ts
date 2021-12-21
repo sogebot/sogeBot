@@ -25,7 +25,7 @@ async function getGameIdFromName (name: string): Promise<string | undefined> {
     return String(id);
   } catch (e: unknown) {
     if (e instanceof Error) {
-      warning(e.stack ?? e.message);
+      warning('getGameIdFromName => ' + e.stack ?? e.message);
     }
     return undefined;
   }

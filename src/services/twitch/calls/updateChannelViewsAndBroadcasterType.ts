@@ -22,7 +22,7 @@ async function updateChannelViewsAndBroadcasterType () {
       if (e.message === 'Invalid OAuth token') {
         await refresh('bot');
       } else {
-        error(e.stack ?? e.message);
+        error('updateChannelViewsAndBroadcasterType => ' + e.stack ?? e.message);
       }
     }
   }

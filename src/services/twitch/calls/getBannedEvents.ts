@@ -58,7 +58,7 @@ export async function getBannedEvents (opts: any) {
       if (e.message === 'Invalid OAuth token') {
         await refresh('broadcaster');
       } else {
-        error(e.stack ?? e.message);
+        error('getBannedEvents => ' + e.stack ?? e.message);
       }
     }
   }

@@ -14,7 +14,7 @@ export const getCustomRewards = async () => {
       if (e.message === 'Invalid OAuth token') {
         await refresh('broadcaster');
       } else {
-        error(e.stack ?? e.message);
+        error('getCustomRewards => ' + e.stack ?? e.message);
       }
     }
   }

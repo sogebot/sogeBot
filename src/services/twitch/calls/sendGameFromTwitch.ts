@@ -13,7 +13,7 @@ async function sendGameFromTwitch (game: string) {
       if (e.message === 'Invalid OAuth token') {
         await refresh('bot');
       } else {
-        error(e.stack ?? e.message);
+        error('sendGameFromTwitch => ' + e.stack ?? e.message);
       }
     }
     return;

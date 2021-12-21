@@ -22,7 +22,7 @@ export async function getCurrentStreamTags (opts: any) {
       if (e.message === 'Invalid OAuth token') {
         await refresh('bot');
       } else {
-        error(e.stack ?? e.message);
+        error('getCurrentStreamTags => ' + e.stack ?? e.message);
       }
     }
     return { state: false, opts };

@@ -15,7 +15,7 @@ export async function createMarker () {
       if (e.message === 'Invalid OAuth token') {
         await refresh('bot');
       } else {
-        error(e.stack ?? e.message);
+        error('createMarker => ' + e.stack ?? e.message);
       }
     }
   }

@@ -29,7 +29,7 @@ export async function checkClips () {
       if (e.message === 'Invalid OAuth token') {
         await refresh('bot');
       } else {
-        error(e.stack ?? e.message);
+        error('checkClips => ' + e.stack ?? e.message);
       }
     }
   }

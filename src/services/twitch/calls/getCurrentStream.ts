@@ -75,7 +75,7 @@ export async function getCurrentStream (opts: any) {
       if (e.message === 'Invalid OAuth token') {
         await refresh('bot');
       } else {
-        error(e.stack ?? e.message);
+        error('getCurrentStream => ' + e.stack ?? e.message);
       }
     }
     return { state: false, opts };

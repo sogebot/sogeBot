@@ -46,7 +46,7 @@ export async function createClip (opts: { createAfterDelay: boolean }) {
       if (e.message === 'Invalid OAuth token') {
         await refresh('bot');
       } else {
-        error(e.stack ?? e.message);
+        error('createClip => ' + e.stack ?? e.message);
       }
     }
   }

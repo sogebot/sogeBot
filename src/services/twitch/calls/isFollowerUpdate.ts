@@ -58,7 +58,7 @@ export async function isFollowerUpdate (user: UserInterface | null) {
       if (e.message === 'Invalid OAuth token') {
         await refresh('bot');
       } else {
-        error(e.stack ?? e.message);
+        error('isFollowerUpdate => ' + e.stack ?? e.message);
       }
     }
     return null;
