@@ -37,6 +37,23 @@ export function follow(userId: string, userName: string, followedAt: string | nu
     return;
   }
 
+  changelog.getOrFail(userId)
+    .then(user => {
+      changelog.update(userId, {
+        followedAt:    user.haveFollowedAtLock ? user.followedAt : dayjs(followedAt).valueOf(),
+        isFollower:    user.haveFollowerLock? user.isFollower : true,
+        followCheckAt: Date.now(),
+      });
+    })
+    .catch(() => {
+      changelog.update(userId, {
+        userName:      userName,
+        followedAt:    dayjs(followedAt).valueOf(),
+        isFollower:    true,
+        followCheckAt: Date.now(),
+      });
+    });
+
   if (events.has(userId)) {
     debug('events', `User ${userName}#${userId} already followed in hour.`);
     return;
@@ -63,23 +80,6 @@ export function follow(userId: string, userName: string, followedAt: string | nu
     triggerInterfaceOnFollow({
       userName, userId,
     });
-
-    changelog.getOrFail(userId)
-      .then(user => {
-        changelog.update(userId, {
-          followedAt:    user.haveFollowedAtLock ? user.followedAt : dayjs(followedAt).valueOf(),
-          isFollower:    user.haveFollowerLock? user.isFollower : true,
-          followCheckAt: Date.now(),
-        });
-      })
-      .catch(() => {
-        changelog.update(userId, {
-          userName:      userName,
-          followedAt:    dayjs(followedAt).valueOf(),
-          isFollower:    true,
-          followCheckAt: Date.now(),
-        });
-      });
 
     events.set(userId, Date.now());
   }

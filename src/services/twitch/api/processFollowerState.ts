@@ -5,7 +5,6 @@ import { getRepository } from 'typeorm';
 import { User, UserInterface } from '~/database/entity/user';
 import { follow } from '~/helpers/events/follow';
 import { debug } from '~/helpers/log';
-import { setImmediateAwait } from '~/helpers/setImmediateAwait';
 import { SQLVariableLimit } from '~/helpers/sql';
 import * as changelog from '~/helpers/user/changelog.js';
 
@@ -26,19 +25,16 @@ export const processFollowerState = async (users: { from_name: string; from_id: 
   if (users.length > usersGotFromDb.length) {
     const usersSavedToDbPromise: Promise<Readonly<Required<UserInterface>>>[] = [];
     const usersSavedToDb = [];
-    for (const userChunk of chunk(users, 100)) {
-      userChunk
-        .filter(user => !usersGotFromDb.find(db => db.userId === user.from_id))
-        .map(user => {
-          return { userId: user.from_id, userName: user.from_name };
-        }).forEach(user => {
-          changelog.update(user.userId, user);
-          usersSavedToDbPromise.push(changelog.get(user.userId) as Promise<Readonly<Required<UserInterface>>>);
-        });
-      usersSavedToDb.push(...await Promise.all(usersSavedToDbPromise));
-      await setImmediateAwait();
-      debug('api.followers', `Processed ${usersSavedToDb.length} followers`);
-    }
+    users
+      .filter(user => !usersGotFromDb.find(db => db.userId === user.from_id))
+      .map(user => {
+        return { userId: user.from_id, userName: user.from_name };
+      }).forEach(user => {
+        changelog.update(user.userId, user);
+        usersSavedToDbPromise.push(changelog.get(user.userId) as Promise<Readonly<Required<UserInterface>>>);
+      });
+    usersSavedToDb.push(...await Promise.all(usersSavedToDbPromise));
+    debug('api.followers', `Processed ${usersSavedToDb.length} followers`);
     await updateFollowerState([...usersSavedToDb, ...usersGotFromDb], users);
   } else {
     await updateFollowerState(usersGotFromDb, users);
