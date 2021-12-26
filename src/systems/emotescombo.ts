@@ -2,8 +2,6 @@ import { CacheEmotes, CacheEmotesInterface } from '@entity/cacheEmotes';
 import * as constants from '@sogebot/ui-helpers/constants';
 import { getRepository } from 'typeorm';
 import { v4 } from 'uuid';
-//import { v4 as uuid } from 'uuid';
-import XRegExp from 'xregexp';
 
 import { parserReply } from '../commons';
 import { parser, settings } from '../decorators';
@@ -49,58 +47,57 @@ class EmotesCombo extends System {
 
   @parser({ priority: constants.LOW, fireAndForget: true })
   async containsEmotes (opts: ParserOptions) {
-    if (!opts.sender || opts.emotesOffsets.size === 0 || !this.enabled) {
+    if (!opts.sender || !this.enabled) {
       return true;
     }
 
     const parsed: string[] = [];
     const usedEmotes: { [code: string]: Readonly<Required<CacheEmotesInterface>>} = {};
 
-    const cache = await getRepository(CacheEmotes).find();
+    if (opts.emotesOffsets) {
+      // add emotes from twitch which are not maybe in cache (other partner emotes etc)
+      for (const emoteId of opts.emotesOffsets.keys()) {
+        // if emote is already in cache, continue
+        const firstEmoteOffset = opts.emotesOffsets.get(emoteId)?.shift();
+        if (!firstEmoteOffset) {
+          continue;
+        }
+        const emoteCode = opts.message.slice(Number(firstEmoteOffset.split('-')[0]), Number(firstEmoteOffset.split('-')[1])+1);
+        const emoteFromCache = await getRepository(CacheEmotes).findOne({ code: emoteCode });
+        if (!emoteFromCache) {
+          const data: Required<CacheEmotesInterface> = {
+            id:   v4(),
+            type: 'twitch',
+            code: emoteCode,
+            urls: {
+              '1': 'https://static-cdn.jtvnw.net/emoticons/v1/' + emoteId + '/1.0',
+              '2': 'https://static-cdn.jtvnw.net/emoticons/v1/' + emoteId + '/2.0',
+              '3': 'https://static-cdn.jtvnw.net/emoticons/v1/' + emoteId + '/3.0',
+            },
+          };
 
-    // add emotes from twitch which are not maybe in cache (other partner emotes etc)
-    for (const emoteId of opts.emotesOffsets.keys()) {
-      // if emote is already in cache, continue
-      const firstEmoteOffset = opts.emotesOffsets.get(emoteId)?.shift();
-      if (!firstEmoteOffset) {
-        continue;
+          // update emotes in cache
+          await getRepository(CacheEmotes).save(data);
+        }
       }
-      const emoteCode = opts.message.slice(Number(firstEmoteOffset.split('-')[0]), Number(firstEmoteOffset.split('-')[1])+1);
-
-      if (cache.find((o) => o.code === emoteCode)) {
-        continue;
-      }
-      const data: Required<CacheEmotesInterface> = {
-        id:   v4(),
-        type: 'twitch',
-        code: emoteCode,
-        urls: {
-          '1': 'https://static-cdn.jtvnw.net/emoticons/v1/' + emoteId + '/1.0',
-          '2': 'https://static-cdn.jtvnw.net/emoticons/v1/' + emoteId + '/2.0',
-          '3': 'https://static-cdn.jtvnw.net/emoticons/v1/' + emoteId + '/3.0',
-        },
-      };
-
-      cache.push(data);
-
-      // update emotes in cache
-      await getRepository(CacheEmotes).save(data);
-
     }
 
-    for (let j = 0, jl = cache.length; j < jl; j++) {
-      const emote = cache[j];
-      if (parsed.includes(emote.code)) {
+    for (const potentialEmoteCode of opts.message.split(' ')) {
+      if (parsed.includes(potentialEmoteCode)) {
         continue;
       } // this emote was already parsed
-      for (let i = 0, length = (` ${opts.message} `.match(new RegExp('\\s*' + XRegExp.escape(emote.code) + '(\\s|\\b)', 'g')) || []).length; i < length; i++) {
-        usedEmotes[emote.code] = emote;
-        parsed.push(emote.code);
+      parsed.push(potentialEmoteCode);
+
+      const emoteFromCache = await getRepository(CacheEmotes).findOne({ code: potentialEmoteCode });
+      if (emoteFromCache) {
+        for (let i = 0; i < opts.message.split(' ').filter(word => word === potentialEmoteCode).length; i++) {
+          usedEmotes[potentialEmoteCode] = emoteFromCache;
+        }
       }
     }
 
     if (Date.now() - this.comboLastBreak > this.comboCooldown * constants.SECOND) {
-      const uniqueEmotes = [...new Set(parsed)];
+      const uniqueEmotes = Object.keys(usedEmotes);
       // we want to count only messages with emotes (skip text only)
       if (uniqueEmotes.length !== 0) {
         if (uniqueEmotes.length > 1 || (uniqueEmotes[0] !== this.comboEmote && this.comboEmote !== '')) {
