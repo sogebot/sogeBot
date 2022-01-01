@@ -595,6 +595,7 @@
     "permission": "Permission",
     "viewers": "Viewers",
     "systems": "Systems",
+    "hostViewers": "Host/Raid viewers count",
     "overlays": "Overlays",
     "gallery": "Media gallery",
     "aliases": "Aliases",

@@ -372,8 +372,8 @@ class Chat {
         eventEmitter.emit('clearchat');
       });
     } else if (type === 'broadcaster') {
-      client.onHost((_channel, target, viewers) => {
-        eventEmitter.emit('hosting', { target, viewers: viewers ?? 0 });
+      client.onHost((_channel, target, hostViewers) => {
+        eventEmitter.emit('hosting', { target, hostViewers: hostViewers ?? 0 });
       });
 
       client.onRaid((_channel, username, raidInfo) => {
@@ -396,20 +396,20 @@ class Chat {
         this.subscriptionGiftCommunity(username, subInfo, msg.userInfo);
       });
 
-      client.onHosted(async (_channel, username, _auto, viewers) => {
-        viewers ??= 0;
-        host(`${username}, viewers: ${viewers}`);
+      client.onHosted(async (_channel, username, _auto, hostViewers) => {
+        hostViewers ??= 0;
+        host(`${username}, viewers: ${hostViewers}`);
 
         const data = {
           userName:  username,
-          viewers,
+          hostViewers,
           event:     'host',
           timestamp: Date.now(),
         };
 
         eventlist.add({
           userId:    String(await users.getIdByName(username) ?? '0'),
-          viewers:   viewers,
+          viewers:   hostViewers,
           event:     'host',
           timestamp: Date.now(),
         });
@@ -417,7 +417,7 @@ class Chat {
         alerts.trigger({
           event:      'hosts',
           name:       username,
-          amount:     Number(viewers),
+          amount:     Number(hostViewers),
           tier:       null,
           currency:   '',
           monthsName: '',
@@ -430,19 +430,19 @@ class Chat {
   }
 
   @timer()
-  async raid(username: string, viewers: number) {
-    raid(`${username}, viewers: ${viewers}`);
+  async raid(username: string, hostViewers: number) {
+    raid(`${username}, viewers: ${hostViewers}`);
 
     const data = {
       userName:  username,
-      viewers:   viewers,
+      hostViewers,
       event:     'raid',
       timestamp: Date.now(),
     };
 
     eventlist.add({
       userId:    String(await users.getIdByName(username) ?? '0'),
-      viewers:   viewers,
+      viewers:   hostViewers,
       event:     'raid',
       timestamp: Date.now(),
     });
@@ -450,7 +450,7 @@ class Chat {
     alerts.trigger({
       event:      'raids',
       name:       username,
-      amount:     viewers,
+      amount:     hostViewers,
       tier:       null,
       currency:   '',
       monthsName: '',

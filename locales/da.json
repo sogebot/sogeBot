@@ -339,6 +339,7 @@
         "game": "Nuværende spil",
         "language": "Current stream language",
         "viewers": "Antal aktuelle seere",
+        "hostViewers": "Host/Raid viewers count",
         "views": "Antal aktuelle visninger",
         "followers": "Current followers count",
         "subscribers": "Antal nuværende abonnenter",

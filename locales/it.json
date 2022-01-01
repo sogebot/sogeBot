@@ -339,6 +339,7 @@
         "game": "Gioco attuale",
         "language": "Lingua della diretta attuale",
         "viewers": "Conteggio spettatori attuali",
+        "hostViewers": "Host/Raid viewers count",
         "views": "Conteggio visualizzazioni attuali",
         "followers": "Numero di follower attuali",
         "subscribers": "Conteggio abbonati attuali",

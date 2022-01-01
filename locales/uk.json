@@ -339,6 +339,7 @@
         "game": "Current game",
         "language": "Current stream language",
         "viewers": "Current viewers count",
+        "hostViewers": "Host/Raid viewers count",
         "views": "Current views count",
         "followers": "Current followers count",
         "subscribers": "Current subscribers count",

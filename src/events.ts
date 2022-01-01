@@ -115,12 +115,12 @@ class Events extends Core {
       { id: 'clearchat' },
       { id: 'action', variables: [ 'username', 'is.moderator', 'is.subscriber', 'is.vip', 'is.follower', 'is.broadcaster', 'is.bot', 'is.owner' ] },
       { id: 'ban', variables: [ 'username', 'is.moderator', 'is.subscriber', 'is.vip', 'is.follower', 'is.broadcaster', 'is.bot', 'is.owner', 'reason' ] },
-      { id: 'hosting', variables: [ 'target', 'viewers' ] },
+      { id: 'hosting', variables: [ 'target', 'hostViewers' ] },
       {
-        id: 'hosted', variables: [ 'username', 'is.moderator', 'is.subscriber', 'is.vip', 'is.follower', 'is.broadcaster', 'is.bot', 'is.owner', 'viewers' ], definitions: { viewersAtLeast: 1 }, check: this.checkHosted,
+        id: 'hosted', variables: [ 'username', 'is.moderator', 'is.subscriber', 'is.vip', 'is.follower', 'is.broadcaster', 'is.bot', 'is.owner', 'hostViewers' ], definitions: { viewersAtLeast: 1 }, check: this.checkHosted,
       },
       {
-        id: 'raid', variables: [ 'username', 'is.moderator', 'is.subscriber', 'is.vip', 'is.follower', 'is.broadcaster', 'is.bot', 'is.owner', 'viewers' ], definitions: { viewersAtLeast: 1 }, check: this.checkRaid,
+        id: 'raid', variables: [ 'username', 'is.moderator', 'is.subscriber', 'is.vip', 'is.follower', 'is.broadcaster', 'is.bot', 'is.owner', 'hostViewers' ], definitions: { viewersAtLeast: 1 }, check: this.checkRaid,
       },
       { id: 'mod', variables: [ 'username', 'is.moderator', 'is.subscriber', 'is.vip', 'is.follower', 'is.broadcaster', 'is.bot', 'is.owner' ] },
       { id: 'commercial', variables: [ 'duration' ] },
@@ -687,9 +687,10 @@ class Events extends Core {
       $bits:                         get(attributes, 'bits', null),
       $reason:                       get(attributes, 'reason', null),
       $target:                       get(attributes, 'target', null),
-      $viewers:                      get(attributes, 'viewers', null),
       $duration:                     get(attributes, 'duration', null),
+      $hostViewers:                  get(attributes, 'hostViewers', null),
       // add global variables
+      $viewers:                      stats.value.currentViewers,
       $game:                         stats.value.currentGame,
       $title:                        stats.value.currentTitle,
       $views:                        stats.value.currentViews,
