@@ -16,7 +16,6 @@ import { debug, error, info } from '../helpers/log';
 import users from '../users';
 import Service from './_interface';
 import { init as apiIntervalInit , stop as apiIntervalStop } from './twitch/api/interval';
-import { getChannelId } from './twitch/calls/getChannelId';
 import Chat from './twitch/chat';
 import Emotes from './twitch/emotes';
 import EventSub from './twitch/eventsub';
@@ -29,7 +28,6 @@ import {
 } from '~/helpers/api';
 import { prepare } from '~/helpers/commons/prepare';
 import { isBotStarted } from '~/helpers/database';
-import { setOAuthStatus } from '~/helpers/OAuthStatus';
 import { cleanViewersCache } from '~/helpers/permissions';
 import { defaultPermissions } from '~/helpers/permissions/index';
 import { adminEndpoint, publicEndpoint } from '~/helpers/socket';
@@ -57,9 +55,6 @@ class Twitch extends Service {
     botTokenValid = false;
   @persistent()
     broadcasterTokenValid = false;
-
-  @persistent()
-    channelId = '';
   @persistent()
     currentChannel = '';
 
@@ -207,13 +202,6 @@ class Twitch extends Service {
   }
 
   @onChange('broadcasterUsername')
-  @onChange('botUsername')
-  setOAuthStatus() {
-    setOAuthStatus('bot', this.botUsername === '');
-    setOAuthStatus('broadcaster', this.broadcasterUsername === '');
-  }
-
-  @onChange('broadcasterUsername')
   public async onChangeBroadcasterUsername(key: string, value: any) {
     if (!this.generalOwners.includes(value)) {
       this.generalOwners.push(value);
@@ -240,8 +228,6 @@ class Twitch extends Service {
 
   init() {
     if (this.botTokenValid && this.broadcasterTokenValid) {
-      getChannelId();
-
       this.tmi = new Chat();
       this.tmi?.initClient('bot');
       this.tmi?.initClient('broadcaster');

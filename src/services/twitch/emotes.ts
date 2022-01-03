@@ -76,22 +76,22 @@ class Emotes {
   async fetchEmotesChannel () {
     this.fetch.channel = true;
 
-    const channelId = variables.get('services.twitch.channelId') as string;
+    const broadcasterId = variables.get('services.twitch.broadcasterId') as string;
     const broadcasterType = variables.get('services.twitch.broadcasterType') as string;
 
-    if (channelId && broadcasterType !== null && (Date.now() - this.lastSubscriberEmoteChk > 1000 * 60 * 60 * 24 * 7 || this.lastChannelChk !== channelId)) {
+    if (broadcasterId && broadcasterType !== null && (Date.now() - this.lastSubscriberEmoteChk > 1000 * 60 * 60 * 24 * 7 || this.lastChannelChk !== broadcasterId)) {
       if (broadcasterType === '' && !broadcasterWarning) {
-        info(`EMOTES: Skipping fetching of ${channelId} emotes - not subscriber/affiliate`);
+        info(`EMOTES: Skipping fetching of ${broadcasterId} emotes - not subscriber/affiliate`);
         broadcasterWarning = true;
       } else {
         broadcasterWarning = false;
         this.lastSubscriberEmoteChk = Date.now();
-        this.lastChannelChk = channelId;
+        this.lastChannelChk = broadcasterId;
         try {
           await validate('bot');
-          info(`EMOTES: Fetching channel ${channelId} emotes`);
+          info(`EMOTES: Fetching channel ${broadcasterId} emotes`);
           const clientBot = await client('bot');
-          const emotes = await clientBot.chat.getChannelEmotes(channelId);
+          const emotes = await clientBot.chat.getChannelEmotes(broadcasterId);
           for (const emote of emotes) {
             debug('emotes.channel', `Saving to cache ${emote.name}#${emote.id}`);
             await getRepository(CacheEmotes).save({
@@ -104,7 +104,7 @@ class Emotes {
               },
             });
           }
-          info(`EMOTES: Fetched channel ${channelId} emotes`);
+          info(`EMOTES: Fetched channel ${broadcasterId} emotes`);
         } catch (e) {
           if (e instanceof Error) {
             if (e.message.includes('Cannot initialize Twitch API')) {
@@ -161,7 +161,7 @@ class Emotes {
   }
 
   async fetchEmotesFFZ () {
-    const channelId = variables.get('services.twitch.channelId') as string;
+    const broadcasterId = variables.get('services.twitch.broadcasterId') as string;
     const currentChannel = variables.get('services.twitch.currentChannel') as string;
 
     if (currentChannel.length === 0) {
@@ -171,11 +171,11 @@ class Emotes {
     this.fetch.ffz = true;
 
     // fetch FFZ emotes
-    if (channelId && Date.now() - this.lastFFZEmoteChk > 1000 * 60 * 60 * 24 * 7) {
+    if (broadcasterId && Date.now() - this.lastFFZEmoteChk > 1000 * 60 * 60 * 24 * 7) {
       info('EMOTES: Fetching ffz emotes');
       this.lastFFZEmoteChk = Date.now();
       try {
-        const request = await axios.get<any>('https://api.frankerfacez.com/v1/room/id/' + channelId);
+        const request = await axios.get<any>('https://api.frankerfacez.com/v1/room/id/' + broadcasterId);
 
         const emoteSet = request.data.room.set;
         const emotes = request.data.sets[emoteSet].emoticons;

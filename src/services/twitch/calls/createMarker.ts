@@ -4,12 +4,12 @@ import { refresh } from '../token/refresh.js';
 
 import { variables } from '~/watchers';
 
-export async function createMarker () {
-  const channelId = variables.get('services.twitch.channelId') as string;
+export async function createMarker (description = 'Marked from sogeBot') {
+  const broadcasterId = variables.get('services.twitch.broadcasterId') as string;
 
   try {
     const clientBot = await client('bot');
-    clientBot.streams.createStreamMarker(channelId, 'Marked from sogeBot');
+    clientBot.streams.createStreamMarker(broadcasterId, description);
   } catch (e: unknown) {
     if (e instanceof Error) {
       if (e.message === 'Invalid OAuth token') {

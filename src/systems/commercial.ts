@@ -57,7 +57,7 @@ class Commercial extends System {
       return [{ response: `Usage: ${opts.command} [duration] [optional-message]`, ...opts }];
     }
 
-    const channelId = variables.get('services.twitch.channelId') as string;
+    const broadcasterId = variables.get('services.twitch.broadcasterId') as string;
     const broadcasterCurrentScopes = variables.get('services.twitch.broadcasterCurrentScopes') as string[];
     // check if duration is correct (30, 60, 90, 120, 150, 180)
     if ([30, 60, 90, 120, 150, 180].includes(commercial.duration ?? 0)) {
@@ -69,7 +69,7 @@ class Commercial extends System {
 
       try {
         const clientBroadcaster = await client('broadcaster');
-        await clientBroadcaster.channels.startChannelCommercial(channelId, commercial.duration as 30 | 60 | 90 | 120 | 150 | 180);
+        await clientBroadcaster.channels.startChannelCommercial(broadcasterId, commercial.duration as 30 | 60 | 90 | 120 | 150 | 180);
         eventEmitter.emit('commercial', { duration: commercial.duration ?? 30 });
         if (!_.isNil(commercial.message)) {
           return [{ response: commercial.message, ...opts }];

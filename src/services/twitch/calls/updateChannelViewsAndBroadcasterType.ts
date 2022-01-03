@@ -8,7 +8,7 @@ import { variables } from '~/watchers';
 
 async function updateChannelViewsAndBroadcasterType () {
   try {
-    const cid = variables.get('services.twitch.channelId') as string;
+    const cid = variables.get('services.twitch.broadcasterId') as string;
     const clientBot = await client('bot');
     const getUserById = await clientBot.users.getUserById(cid);
 

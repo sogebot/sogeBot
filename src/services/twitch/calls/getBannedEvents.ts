@@ -11,7 +11,7 @@ import client from '~/services/twitch/api/client';
 import { variables } from '~/watchers';
 
 export async function getBannedEvents (opts: any) {
-  const channelId = variables.get('services.twitch.channelId') as string;
+  const broadcasterId = variables.get('services.twitch.broadcasterId') as string;
   const broadcasterCurrentScopes = variables.get('services.twitch.broadcasterCurrentScopes') as string[];
 
   if (!broadcasterCurrentScopes.includes('moderation:read')) {
@@ -24,7 +24,7 @@ export async function getBannedEvents (opts: any) {
   }
   try {
     const clientBroadcaster = await client('broadcaster');
-    const getBanEvents = await clientBroadcaster.moderation.getBanEventsPaginated(channelId).getAll();
+    const getBanEvents = await clientBroadcaster.moderation.getBanEventsPaginated(broadcasterId).getAll();
 
     // save to db
     for (const data of chunk(getBanEvents, 50)) {

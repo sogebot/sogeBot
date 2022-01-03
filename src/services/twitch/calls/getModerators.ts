@@ -12,7 +12,7 @@ import { variables } from '~/watchers';
 
 export async function getModerators(opts: { isWarned: boolean }) {
   try {
-    const channelId = variables.get('services.twitch.channelId') as string;
+    const broadcasterId = variables.get('services.twitch.broadcasterId') as string;
     const botId = variables.get('services.twitch.botId') as string;
     const broadcasterCurrentScopes = variables.get('services.twitch.broadcasterCurrentScopes') as string[];
 
@@ -26,7 +26,7 @@ export async function getModerators(opts: { isWarned: boolean }) {
     }
 
     const clientBroadcaster = await client('broadcaster');
-    const getModeratorsPaginated = await clientBroadcaster.moderation.getModeratorsPaginated(channelId).getAll();
+    const getModeratorsPaginated = await clientBroadcaster.moderation.getModeratorsPaginated(broadcasterId).getAll();
 
     await changelog.flush();
     await getRepository(User).update({ userId: Not(In(getModeratorsPaginated.map(o => o.userId))) }, { isModerator: false });

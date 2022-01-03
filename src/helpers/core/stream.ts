@@ -17,9 +17,9 @@ import { getGameNameFromId } from '~/services/twitch/calls/getGameNameFromId';
 import { variables } from '~/watchers';
 
 async function start(data: HelixStream) {
-  const channelId = variables.get('services.twitch.channelId') as string;
+  const broadcasterId = variables.get('services.twitch.broadcasterId') as string;
   startLog(
-    `id: ${data.id} | startedAt: ${data.startDate.toISOString()} | title: ${data.title} | game: ${await getGameNameFromId(Number(data.gameId))} | type: ${data.type} | channel ID: ${channelId}`,
+    `id: ${data.id} | startedAt: ${data.startDate.toISOString()} | title: ${data.title} | game: ${await getGameNameFromId(Number(data.gameId))} | type: ${data.type} | channel ID: ${broadcasterId}`,
   );
 
   // reset quick stats on stream start

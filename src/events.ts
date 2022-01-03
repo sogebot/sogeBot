@@ -365,7 +365,7 @@ class Events extends Core {
 
   public async fireStartCommercial(operation: EventsEntity.OperationDefinitions) {
     try {
-      const cid = variables.get('services.twitch.channelId') as string;
+      const cid = variables.get('services.twitch.broadcasterId') as string;
       const broadcasterCurrentScopes = variables.get('services.twitch.broadcasterCurrentScopes') as string[];
       const duration = operation.durationOfCommercial
         ? Number(operation.durationOfCommercial)

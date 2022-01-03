@@ -18,7 +18,7 @@ import { variables } from '~/watchers';
 
 async function setTitleAndGame (args: { title?: string | null; game?: string | null }): Promise<{ response: string; status: boolean } | null> {
   args = defaults(args, { title: null }, { game: null });
-  const cid = variables.get('services.twitch.channelId') as string;
+  const cid = variables.get('services.twitch.broadcasterId') as string;
   const broadcasterCurrentScopes = variables.get('services.twitch.broadcasterCurrentScopes') as string[];
 
   if (!broadcasterCurrentScopes.includes('channel_editor')) {

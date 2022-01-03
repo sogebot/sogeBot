@@ -31,11 +31,11 @@ export async function isFollowerUpdate (user: UserInterface | null) {
   }
   const id = user.userId;
 
-  const channelId = variables.get('services.twitch.channelId') as string;
+  const broadcasterId = variables.get('services.twitch.broadcasterId') as string;
 
   try {
     const clientBot = await client('bot');
-    const helixFollow = await clientBot.users.getFollowFromUserToBroadcaster(id, channelId);
+    const helixFollow = await clientBot.users.getFollowFromUserToBroadcaster(id, broadcasterId);
 
     if (!helixFollow) {
       if (user.isFollower) {

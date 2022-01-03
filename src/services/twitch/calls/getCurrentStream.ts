@@ -18,7 +18,7 @@ let curRetries = 0;
 const maxRetries = 3;
 
 export async function getCurrentStream (opts: any) {
-  const cid = variables.get('services.twitch.channelId') as string;
+  const cid = variables.get('services.twitch.broadcasterId') as string;
 
   try {
     const clientBot = await client('bot');

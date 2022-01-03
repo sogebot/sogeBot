@@ -14,13 +14,13 @@ let retries = 0;
 
 export async function getChannelInformation (opts: any) {
   try {
-    const channelId = variables.get('services.twitch.channelId') as string;
+    const broadcasterId = variables.get('services.twitch.broadcasterId') as string;
     const isTitleForced = variables.get('services.twitch.isTitleForced') as string;
     const clientBot = await client('bot');
-    const getChannelInfo = await clientBot.channels.getChannelInfo(channelId);
+    const getChannelInfo = await clientBot.channels.getChannelInfo(broadcasterId);
 
     if (!getChannelInfo) {
-      throw new Error(`Channel ${channelId} not found on Twitch`);
+      throw new Error(`Channel ${broadcasterId} not found on Twitch`);
     }
 
     if (!gameOrTitleChangedManually.value) {

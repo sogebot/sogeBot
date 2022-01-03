@@ -11,7 +11,7 @@ import { error } from '~/helpers/log';
 import { variables } from '~/watchers';
 
 export async function getTopClips (opts: any) {
-  const channelId = variables.get('services.twitch.channelId') as string;
+  const broadcasterId = variables.get('services.twitch.broadcasterId') as string;
   try {
     const period = {
       startDate: opts.period === 'stream'
@@ -21,7 +21,7 @@ export async function getTopClips (opts: any) {
     };
 
     const clientBot = await client('bot');
-    const getClipsForBroadcaster = await clientBot.clips.getClipsForBroadcasterPaginated(channelId, { ...period }).getAll();
+    const getClipsForBroadcaster = await clientBot.clips.getClipsForBroadcasterPaginated(broadcasterId, { ...period }).getAll();
 
     // get mp4 from thumbnail
     const clips: (Partial<HelixClip> & { mp4: string; game: string | null })[] = [];

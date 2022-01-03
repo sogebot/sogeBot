@@ -8,9 +8,9 @@ import { variables } from '~/watchers';
 
 export async function getCurrentStreamTags (opts: any) {
   try {
-    const channelId = variables.get('services.twitch.channelId') as string;
+    const broadcasterId = variables.get('services.twitch.broadcasterId') as string;
     const clientBot = await client('bot');
-    const getStreamTags = await clientBot.streams.getStreamTags(channelId);
+    const getStreamTags = await clientBot.streams.getStreamTags(broadcasterId);
     while (currentStreamTags.length) {
       currentStreamTags.pop();
     }

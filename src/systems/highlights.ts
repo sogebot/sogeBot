@@ -119,7 +119,7 @@ class Highlights extends System {
   @command('!highlight')
   @default_permission(defaultPermissions.CASTERS)
   public async main(opts: CommandOptions): Promise<CommandResponse[]> {
-    const channelId = variables.get('services.twitch.channelId') as string;
+    const broadcasterId = variables.get('services.twitch.broadcasterId') as string;
 
     try {
       if (!isStreamOnline.value) {
@@ -127,7 +127,7 @@ class Highlights extends System {
       }
 
       const clientBot = await client('bot');
-      const videos = await clientBot.videos.getVideosByUser(channelId, { type: 'archive', limit: 1 });
+      const videos = await clientBot.videos.getVideosByUser(broadcasterId, { type: 'archive', limit: 1 });
 
       const timestamp = timestampToObject(dayjs().valueOf() - dayjs(streamStatusChangeSince.value).valueOf());
       const highlight = {

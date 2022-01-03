@@ -183,7 +183,7 @@ class EventSub {
   }
 
   async onStartup() {
-    const channelId = variables.get('services.twitch.channelId') as string;
+    const broadcasterId = variables.get('services.twitch.broadcasterId') as string;
     const clientId = variables.get('services.twitch.eventSubClientId') as string;
     const useTunneling = variables.get('services.twitch.useTunneling') as string;
     const domain = variables.get('services.twitch.domain') as string;
@@ -263,7 +263,7 @@ class EventSub {
         const enabledOrPendingEvents = request.data.data.find((o: any) => {
           return o.type === event
             && ['webhook_callback_verification_pending', 'enabled'].includes(o.status)
-            && o.condition.broadcaster_user_id === channelId;
+            && o.condition.broadcaster_user_id === broadcasterId;
         });
 
         if (enabledOrPendingEvents) {
@@ -310,7 +310,7 @@ class EventSub {
     }
 
     try {
-      const channelId = variables.get('services.twitch.channelId') as string;
+      const broadcasterId = variables.get('services.twitch.broadcasterId') as string;
       info('EVENTSUB: sending subscribe event for ' + event);
       const token = await this.generateAppToken();
       const url = 'https://api.twitch.tv/helix/eventsub/subscriptions';
@@ -324,7 +324,7 @@ class EventSub {
         data: {
           'type':      event,
           'version':   '1',
-          'condition': { 'broadcaster_user_id': channelId },
+          'condition': { 'broadcaster_user_id': broadcasterId },
           'transport': {
             'method':   'webhook',
             'callback': `${useTunneling ? this.tunnelDomain : 'https://' + domain}/webhooks/callback`,

@@ -10,10 +10,10 @@ import { variables } from '~/watchers';
 
 export async function getLatest100Followers () {
   try {
-    const channelId = variables.get('services.twitch.channelId') as string;
+    const broadcasterId = variables.get('services.twitch.broadcasterId') as string;
     const clientBot = await client('bot');
 
-    const getFollows = await clientBot.users.getFollows({ followedUser: channelId, limit: 100 });
+    const getFollows = await clientBot.users.getFollows({ followedUser: broadcasterId, limit: 100 });
 
     // we will go through only new users
     if (getFollows.data.length > 0) {

@@ -466,8 +466,8 @@ class Users extends Core {
     adminEndpoint(this.nsp, 'viewers::followedAt', async (id, cb) => {
       try {
         const clientBot = await client('bot');
-        const channelId = variables.get('services.twitch.channelId') as string;
-        const getFollows = await clientBot.users.getFollows({ followedUser: channelId, user: id });
+        const broadcasterId = variables.get('services.twitch.broadcasterId') as string;
+        const getFollows = await clientBot.users.getFollows({ followedUser: broadcasterId, user: id });
         if (getFollows.total === 0) {
           throw new Error('Not a follower');
         } else {

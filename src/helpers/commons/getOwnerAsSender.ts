@@ -3,7 +3,7 @@ import { getOwner } from './getOwner';
 import { variables } from '~/watchers';
 
 export function getOwnerAsSender(): Omit<ChatUser, '_userName' | '_userData' | '_parseBadgesLike'> {
-  const channelId = variables.get('services.twitch.channelId') as string;
+  const broadcasterId = variables.get('services.twitch.broadcasterId') as string;
   return {
     isMod:         true,
     isBroadcaster: true,
@@ -12,7 +12,7 @@ export function getOwnerAsSender(): Omit<ChatUser, '_userName' | '_userData' | '
     isVip:         true,
     userName:      getOwner(),
     displayName:   getOwner(),
-    userId:        channelId,
+    userId:        broadcasterId,
     badges:        new Map(),
     color:         '#000000',
     userType:      'empty',
