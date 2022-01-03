@@ -15,6 +15,7 @@ const price = (require('../../../dest/systems/price')).default;
 const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 const user = require('../../general.js').user;
+const url = require('../../general.js').url;
 
 const tests = [
   {
@@ -115,7 +116,7 @@ describe('Price - check() - @func3', () => {
     '!a',
     100,
     );
-    await message.isSentRaw('Usage => http://sogebot.github.io/sogeBot/#/_master/systems/alias', user.viewer.userName, 20000);
+    await message.isSentRaw('Usage => ' + url + '/systems/alias', user.viewer.userName, 20000);
   });
 
   it(`Cheer should trigger custom command`, async () => {

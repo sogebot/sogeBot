@@ -5,6 +5,7 @@ const assert = require('assert');
 
 const db = require('../../general.js').db;
 const message = require('../../general.js').message;
+const url = require('../../general.js').url;
 
 const cooldown = (require('../../../dest/systems/cooldown')).default;
 
@@ -28,7 +29,7 @@ describe('Cooldowns - toggleOwners() - @func3', () => {
     const r2 = await cooldown.toggleOwners({ sender: owner, parameters: command });
 
     assert.strictEqual(r[0].response, '$sender, user cooldown for !me was set to 60s');
-    assert.strictEqual(r2[0].response, 'Usage => http://sogebot.github.io/sogeBot/#/_master/systems/cooldowns');
+    assert.strictEqual(r2[0].response, 'Usage => ' + url + '/systems/cooldowns');
   });
 
   it('correct toggle', async () => {

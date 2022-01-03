@@ -10,6 +10,7 @@ const { User } = require('../../../dest/database/entity/user');
 const cooldown = (require('../../../dest/systems/cooldown')).default;
 const db = require('../../general.js').db;
 const message = require('../../general.js').message;
+const url = require('../../general.js').url;
 
 // users
 const owner = {
@@ -40,7 +41,7 @@ describe('Cooldowns - toggleFollowers() - @func3', () => {
     const r2 = await cooldown.toggleFollowers({ sender: owner, parameters: command });
 
     assert.strictEqual(r[0].response, '$sender, user cooldown for !me was set to 60s');
-    assert.strictEqual(r2[0].response, 'Usage => http://sogebot.github.io/sogeBot/#/_master/systems/cooldowns');
+    assert.strictEqual(r2[0].response, 'Usage => ' + url + '/systems/cooldowns');
   });
 
   it('correct toggle - follower user', async () => {

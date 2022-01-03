@@ -14,6 +14,7 @@ const alias = (require('../../../dest/systems/alias')).default;
 const commercial = (require('../../../dest/systems/commercial')).default;
 const db = require('../../general.js').db;
 const message = require('../../general.js').message;
+const url = require('../../general.js').url;
 const time = require('../../general.js').time;
 const user = require('../../general.js').user;
 
@@ -67,7 +68,7 @@ describe('Events - event run command should be able to run caster command and al
     });
 
     it('alias should be triggered', async () => {
-      await message.isSentRaw(`Usage => http://sogebot.github.io/sogeBot/#/_master/systems/custom-commands`, follower);
+      await message.isSentRaw(`Usage => ${url}/systems/custom-commands`, follower);
     });
 
     it('wait 5s', async () => {
