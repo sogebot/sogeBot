@@ -24,7 +24,6 @@ import { setLang } from '~/helpers/locales';
 import {
   debug, error, warning,
 } from '~/helpers/log';
-import { getOAuthStatus } from '~/helpers/OAuthStatus';
 import { socketsConnected } from '~/helpers/panel/index';
 import { addUIWarn } from '~/helpers/panel/index';
 import { defaultPermissions } from '~/helpers/permissions/index';
@@ -32,6 +31,7 @@ import { list } from '~/helpers/register';
 import { adminEndpoint } from '~/helpers/socket';
 import { getMuteStatus } from '~/helpers/tmi/muteStatus';
 import translateLib, { translate } from '~/translate';
+import { variables } from '~/watchers';
 
 let threadStartTimestamp = Date.now();
 let isInitialLangSet = true;
@@ -235,6 +235,11 @@ class General extends Core {
       }
     }
 
+    const botUsername = variables.get('services.twitch.botUsername') as string;
+    const broadcasterUsername = variables.get('services.twitch.broadcasterUsername') as string;
+    const botId = variables.get('services.twitch.botId') as string;
+    const broadcasterId = variables.get('services.twitch.broadcasterId') as string;
+
     const version = get(process, 'env.npm_package_version', 'x.y.z');
     debug('*', '======= COPY DEBUG MESSAGE FROM HERE =======');
     debug('*', `GENERAL      | OS: ${process.env.npm_config_user_agent}`);
@@ -247,7 +252,7 @@ class General extends Core {
     debug('*', `SYSTEMS      | ${enabledSystems.systems.join(', ')}`);
     debug('*', `GAMES        | ${enabledSystems.games.join(', ')}`);
     debug('*', `INTEGRATIONS | ${enabledSystems.integrations.join(', ')}`);
-    debug('*', `OAUTH        | BOT ${getOAuthStatus('bot')} | BROADCASTER ${getOAuthStatus('broadcaster')}`);
+    debug('*', `OAUTH        | BOT ${botUsername}#${botId} | BROADCASTER ${broadcasterUsername}#${broadcasterId}`);
     debug('*', '======= END OF DEBUG MESSAGE =======');
     return [];
   }
