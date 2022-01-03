@@ -544,6 +544,25 @@ class Discord extends Integration {
     chatIn(`#${channel.name}: ${content} [${author.tag}]`);
     if (msg) {
       const broadcasterUsername = variables.get('services.twitch.broadcasterUsername') as string;
+      if (content === this.getCommand('!_debug')) {
+        debug('*', '======= COPY DISCORD DEBUG MESSAGE FROM HERE =======');
+        console.log('Content: ');
+        console.log(content);
+        console.log('Author: ');
+        console.log(JSON.stringify(author, null, 2));
+        console.log('Message: ');
+        console.log(JSON.stringify(msg, null, 2));
+        console.log('Channel: ');
+        console.log(JSON.stringify(channel, null, 2));
+        debug('*', '======= END OF DISCORD DEBUG MESSAGE =======');
+
+        if (this.deleteMessagesAfterWhile) {
+          setTimeout(() => {
+            msg.delete();
+          }, 10000);
+        }
+        return;
+      }
       if (content === this.getCommand('!link')) {
         this.removeExpiredLinks();
         const link = await getRepository(DiscordLink).save({
@@ -553,7 +572,7 @@ class Discord extends Integration {
           createdAt: Date.now(),
         });
         const message = prepare('integrations.discord.link-whisper', {
-          tag:         msg.author.tag,
+          tag:         author.tag,
           broadcaster: broadcasterUsername,
           id:          link.id,
           command:     this.getCommand('!link'),
@@ -562,7 +581,7 @@ class Discord extends Integration {
         whisperOut(`${author.tag}: ${message}`);
 
         const reply = await msg.reply(prepare('integrations.discord.check-your-dm'));
-        chatOut(`#${channel.name}: @${author.tag}, ${prepare('integrations.discord.link-whisper')} [${msg.author.tag}]`);
+        chatOut(`#${channel.name}: @${author.tag}, ${prepare('integrations.discord.check-your-dm')} [${msg.author.tag}]`);
         if (this.deleteMessagesAfterWhile) {
           setTimeout(() => {
             msg.delete();
