@@ -21,14 +21,14 @@ export async function getChannelSubscribers<T extends { noAffiliateOrPartnerWarn
     const broadcasterType = variables.get('services.twitch.broadcasterType') as string;
     const clientBroadcaster = await client('broadcaster');
 
-    const getSubscriptionsPaginated = await clientBroadcaster.subscriptions.getSubscriptionsPaginated(broadcasterId).getAll();
-    if (broadcasterType === '') {
+    if (broadcasterType !== 'partner' && broadcasterType !== 'affiliate') {
       if (!opts.noAffiliateOrPartnerWarningSent) {
         warning('Broadcaster is not affiliate/partner, will not check subs');
         apiStats.value.currentSubscribers = 0;
       }
       return { state: false, opts: { ...opts, noAffiliateOrPartnerWarningSent: true } };
     }
+    const getSubscriptionsPaginated = await clientBroadcaster.subscriptions.getSubscriptionsPaginated(broadcasterId).getAll();
     apiStats.value.currentSubscribers = getSubscriptionsPaginated.length - 1; // exclude owner
     setSubscribers(getSubscriptionsPaginated.filter(o => !isBotId(o.userId)));
     if (getSubscriptionsPaginated.find(o => isBotId(o.userId))) {
