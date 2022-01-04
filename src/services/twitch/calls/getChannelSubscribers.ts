@@ -8,6 +8,7 @@ import { User } from '~/database/entity/user';
 import {
   stats as apiStats,
 } from '~/helpers/api';
+import { getFunctionName } from '~/helpers/getFunctionName';
 import { error, warning } from '~/helpers/log';
 import { isBotId, isBotSubscriber } from '~/helpers/user';
 import * as changelog from '~/helpers/user/changelog.js';
@@ -42,10 +43,11 @@ export async function getChannelSubscribers<T extends { noAffiliateOrPartnerWarn
     opts.notCorrectOauthWarningSent = false;
   } catch (e) {
     if (e instanceof Error) {
-      if (e.message === 'Invalid OAuth token') {
-        await refresh('broadcaster');
+      if (e.message.includes('Invalid OAuth token')) {
+        warning(`${getFunctionName()} => Invalid OAuth token - attempting to refresh token`);
+        await refresh('bot');
       } else {
-        error('getChannelSubscribers => ' + e.stack ?? e.message);
+        error(`${getFunctionName()} => ${e.stack ?? e.message}`);
       }
     }
   }

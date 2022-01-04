@@ -11,8 +11,9 @@ import { refresh } from '../token/refresh.js';
 
 import { eventEmitter } from '~/helpers/events';
 import { getAllOnlineUsernames } from '~/helpers/getAllOnlineUsernames';
+import { getFunctionName } from '~/helpers/getFunctionName';
 import {
-  debug, error,
+  debug, error, warning,
 } from '~/helpers/log';
 import { setImmediateAwait } from '~/helpers/setImmediateAwait';
 import { SQLVariableLimit } from '~/helpers/sql';
@@ -114,10 +115,11 @@ export const getChannelChattersUnofficialAPI = async (opts: any) => {
     }
   } catch (e) {
     if (e instanceof Error) {
-      if (e.message === 'Invalid OAuth token') {
+      if (e.message.includes('Invalid OAuth token')) {
+        warning(`${getFunctionName()} => Invalid OAuth token - attempting to refresh token`);
         await refresh('bot');
       } else {
-        error('getChannelChattersUnofficialAPI => ' + e.stack ?? e.message);
+        error(`${getFunctionName()} => ${e.stack ?? e.message}`);
       }
     }
     return { state: false, opts };

@@ -5,6 +5,7 @@ import { refresh } from '../token/refresh.js';
 
 import { rawDataSymbol } from '~/../node_modules/@twurple/common/lib';
 import { BannedEventsTable } from '~/database/entity/bannedEvents';
+import { getFunctionName } from '~/helpers/getFunctionName.js';
 import { debug, error, warning } from '~/helpers/log';
 import { addUIError } from '~/helpers/panel/index';
 import client from '~/services/twitch/api/client';
@@ -55,10 +56,11 @@ export async function getBannedEvents (opts: any) {
     debug('api.stream', 'API: ' + JSON.stringify(getBanEvents));
   } catch (e) {
     if (e instanceof Error) {
-      if (e.message === 'Invalid OAuth token') {
-        await refresh('broadcaster');
+      if (e.message.includes('Invalid OAuth token')) {
+        warning(`${getFunctionName()} => Invalid OAuth token - attempting to refresh token`);
+        await refresh('bot');
       } else {
-        error('getBannedEvents => ' + e.stack ?? e.message);
+        error(`${getFunctionName()} => ${e.stack ?? e.message}`);
       }
     }
   }

@@ -6,7 +6,8 @@ import {
 import client from '../api/client';
 import { refresh } from '../token/refresh.js';
 
-import { error } from '~/helpers/log';
+import { getFunctionName } from '~/helpers/getFunctionName';
+import { error, warning } from '~/helpers/log';
 import { variables } from '~/watchers';
 
 async function setTags (tagsArg: string[]) {
@@ -32,12 +33,13 @@ async function setTags (tagsArg: string[]) {
     for (const tag_id of tag_ids) {
       await getRepository(TwitchTag).update({ tag_id }, { is_current: true });
     }
-  } catch (e: unknown) {
+  } catch (e) {
     if (e instanceof Error) {
-      if (e.message === 'Invalid OAuth token') {
-        await refresh('broadcaster');
+      if (e.message.includes('Invalid OAuth token')) {
+        warning(`${getFunctionName()} => Invalid OAuth token - attempting to refresh token`);
+        await refresh('bot');
       } else {
-        error('setTags => ' + e.stack ?? e.message);
+        error(`${getFunctionName()} => ${e.stack ?? e.message}`);
       }
     }
     return false;

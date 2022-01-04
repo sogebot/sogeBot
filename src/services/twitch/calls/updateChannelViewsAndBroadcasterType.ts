@@ -2,8 +2,9 @@ import { stats } from '../../../helpers/api/stats.js';
 import client from '../api/client';
 import { refresh } from '../token/refresh.js';
 
+import { getFunctionName } from '~/helpers/getFunctionName.js';
 import emitter from '~/helpers/interfaceEmitter';
-import { error } from '~/helpers/log';
+import { error, warning } from '~/helpers/log';
 import { variables } from '~/watchers';
 
 async function updateChannelViewsAndBroadcasterType () {
@@ -17,12 +18,13 @@ async function updateChannelViewsAndBroadcasterType () {
       emitter.emit('set', '/services/twitch', 'broadcasterType', getUserById.broadcasterType);
       stats.value.currentViews = getUserById.views;
     }
-  } catch (e: unknown) {
+  } catch (e) {
     if (e instanceof Error) {
-      if (e.message === 'Invalid OAuth token') {
+      if (e.message.includes('Invalid OAuth token')) {
+        warning(`${getFunctionName()} => Invalid OAuth token - attempting to refresh token`);
         await refresh('bot');
       } else {
-        error('updateChannelViewsAndBroadcasterType => ' + e.stack ?? e.message);
+        error(`${getFunctionName()} => ${e.stack ?? e.message}`);
       }
     }
   }

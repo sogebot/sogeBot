@@ -8,7 +8,8 @@ import {
 } from '~/helpers/api';
 import * as stream from '~/helpers/core/stream';
 import { eventEmitter } from '~/helpers/events';
-import { debug, error } from '~/helpers/log';
+import { getFunctionName } from '~/helpers/getFunctionName.js';
+import { debug, error, warning } from '~/helpers/log';
 import { linesParsed } from '~/helpers/parser';
 import client from '~/services/twitch/api/client';
 import stats from '~/stats';
@@ -72,10 +73,11 @@ export async function getCurrentStream (opts: any) {
     }
   } catch (e) {
     if (e instanceof Error) {
-      if (e.message === 'Invalid OAuth token') {
+      if (e.message.includes('Invalid OAuth token')) {
+        warning(`${getFunctionName()} => Invalid OAuth token - attempting to refresh token`);
         await refresh('bot');
       } else {
-        error('getCurrentStream => ' + e.stack ?? e.message);
+        error(`${getFunctionName()} => ${e.stack ?? e.message}`);
       }
     }
     return { state: false, opts };

@@ -5,7 +5,8 @@ import { refresh } from '../token/refresh.js';
 
 import { rawDataSymbol } from '~/../node_modules/@twurple/common/lib';
 import { TwitchTag, TwitchTagLocalizationDescription, TwitchTagLocalizationName } from '~/database/entity/twitch';
-import { error } from '~/helpers/log';
+import { getFunctionName } from '~/helpers/getFunctionName';
+import { error, warning } from '~/helpers/log';
 import { setImmediateAwait } from '~/helpers/setImmediateAwait';
 
 export async function getAllStreamTags(opts: any) {
@@ -40,10 +41,11 @@ export async function getAllStreamTags(opts: any) {
     await getRepository(TwitchTagLocalizationName).delete({ tagId: IsNull() });
   } catch (e) {
     if (e instanceof Error) {
-      if (e.message === 'Invalid OAuth token') {
+      if (e.message.includes('Invalid OAuth token')) {
+        warning(`${getFunctionName()} => Invalid OAuth token - attempting to refresh token`);
         await refresh('bot');
       } else {
-        error('getAllStreamTags => ' + e.stack ?? e.message);
+        error(`${getFunctionName()} => ${e.stack ?? e.message}`);
       }
     }
   }

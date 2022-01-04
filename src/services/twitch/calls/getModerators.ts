@@ -4,6 +4,7 @@ import client from '../api/client';
 import { refresh } from '../token/refresh.js';
 
 import { User } from '~/database/entity/user';
+import { getFunctionName } from '~/helpers/getFunctionName';
 import { error, warning } from '~/helpers/log';
 import { addUIError } from '~/helpers/panel/index';
 import { setStatus } from '~/helpers/parser';
@@ -35,10 +36,11 @@ export async function getModerators(opts: { isWarned: boolean }) {
     setStatus('MOD', getModeratorsPaginated.map(o => o.userId).includes(botId));
   } catch (e) {
     if (e instanceof Error) {
-      if (e.message === 'Invalid OAuth token') {
-        await refresh('broadcaster');
+      if (e.message.includes('Invalid OAuth token')) {
+        warning(`${getFunctionName()} => Invalid OAuth token - attempting to refresh token`);
+        await refresh('bot');
       } else {
-        error('getModerators => ' + e.stack ?? e.message);
+        error(`${getFunctionName()} => ${e.stack ?? e.message}`);
       }
     }
   }

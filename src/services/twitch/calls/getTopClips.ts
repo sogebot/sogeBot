@@ -7,7 +7,8 @@ import { refresh } from '../token/refresh.js';
 import { getGameNameFromId } from './getGameNameFromId';
 
 import { streamStatusChangeSince } from '~/helpers/api';
-import { error } from '~/helpers/log';
+import { getFunctionName } from '~/helpers/getFunctionName';
+import { error, warning } from '~/helpers/log';
 import { variables } from '~/watchers';
 
 export async function getTopClips (opts: any) {
@@ -35,10 +36,11 @@ export async function getTopClips (opts: any) {
     return shuffle(clips).slice(0, opts.first);
   } catch (e) {
     if (e instanceof Error) {
-      if (e.message === 'Invalid OAuth token') {
+      if (e.message.includes('Invalid OAuth token')) {
+        warning(`${getFunctionName()} => Invalid OAuth token - attempting to refresh token`);
         await refresh('bot');
       } else {
-        error('getTopClips => ' + e.stack ?? e.message);
+        error(`${getFunctionName()} => ${e.stack ?? e.message}`);
       }
     }
   }

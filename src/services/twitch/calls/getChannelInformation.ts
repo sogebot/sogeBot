@@ -6,7 +6,8 @@ import {
   stats as apiStats,
 } from '~/helpers/api';
 import { parseTitle } from '~/helpers/api/parseTitle';
-import { error, info } from '~/helpers/log';
+import { getFunctionName } from '~/helpers/getFunctionName';
+import { error, info, warning } from '~/helpers/log';
 import { setTitleAndGame } from '~/services/twitch/calls/setTitleAndGame';
 import { variables } from '~/watchers';
 
@@ -70,10 +71,11 @@ export async function getChannelInformation (opts: any) {
     }
   } catch (e) {
     if (e instanceof Error) {
-      if (e.message === 'Invalid OAuth token') {
+      if (e.message.includes('Invalid OAuth token')) {
+        warning(`${getFunctionName()} => Invalid OAuth token - attempting to refresh token`);
         await refresh('bot');
       } else {
-        error('getChannelInformation => ' + e.stack ?? e.message);
+        error(`${getFunctionName()} => ${e.stack ?? e.message}`);
       }
     }
     return { state: false, opts };

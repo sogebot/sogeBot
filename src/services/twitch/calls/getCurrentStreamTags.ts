@@ -3,7 +3,8 @@ import client from '../api/client';
 import { refresh } from '../token/refresh.js';
 
 import { currentStreamTags } from '~/helpers/api';
-import { error } from '~/helpers/log';
+import { getFunctionName } from '~/helpers/getFunctionName';
+import { error, warning } from '~/helpers/log';
 import { variables } from '~/watchers';
 
 export async function getCurrentStreamTags (opts: any) {
@@ -19,10 +20,11 @@ export async function getCurrentStreamTags (opts: any) {
     }
   } catch (e) {
     if (e instanceof Error) {
-      if (e.message === 'Invalid OAuth token') {
+      if (e.message.includes('Invalid OAuth token')) {
+        warning(`${getFunctionName()} => Invalid OAuth token - attempting to refresh token`);
         await refresh('bot');
       } else {
-        error('getCurrentStreamTags => ' + e.stack ?? e.message);
+        error(`${getFunctionName()} => ${e.stack ?? e.message}`);
       }
     }
     return { state: false, opts };

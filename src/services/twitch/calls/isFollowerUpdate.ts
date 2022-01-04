@@ -3,10 +3,11 @@ import * as constants from '@sogebot/ui-helpers/constants';
 import { getRepository } from 'typeorm';
 
 import { eventEmitter } from '../../../helpers/events';
-import { error, unfollow } from '../../../helpers/log';
+import { error, unfollow, warning } from '../../../helpers/log';
 import { refresh } from '../token/refresh.js';
 
 import { follow } from '~/helpers/events/follow';
+import { getFunctionName } from '~/helpers/getFunctionName';
 import * as changelog from '~/helpers/user/changelog.js';
 import client from '~/services/twitch/api/client';
 import { variables } from '~/watchers';
@@ -55,10 +56,11 @@ export async function isFollowerUpdate (user: UserInterface | null) {
     }
   } catch (e: any) {
     if (e instanceof Error) {
-      if (e.message === 'Invalid OAuth token') {
+      if (e.message.includes('Invalid OAuth token')) {
+        warning(`${getFunctionName()} => Invalid OAuth token - attempting to refresh token`);
         await refresh('bot');
       } else {
-        error('isFollowerUpdate => ' + e.stack ?? e.message);
+        error(`${getFunctionName()} => ${e.stack ?? e.message}`);
       }
     }
     return null;

@@ -1,7 +1,8 @@
-import { error } from '../../../helpers/log';
+import { error, warning } from '../../../helpers/log';
 import client from '../api/client';
 import { refresh } from '../token/refresh.js';
 
+import { getFunctionName } from '~/helpers/getFunctionName';
 import { variables } from '~/watchers';
 
 export async function createMarker (description = 'Marked from sogeBot') {
@@ -12,10 +13,11 @@ export async function createMarker (description = 'Marked from sogeBot') {
     clientBot.streams.createStreamMarker(broadcasterId, description);
   } catch (e: unknown) {
     if (e instanceof Error) {
-      if (e.message === 'Invalid OAuth token') {
+      if (e.message.includes('Invalid OAuth token')) {
+        warning(`${getFunctionName()} => Invalid OAuth token - attempting to refresh token`);
         await refresh('bot');
       } else {
-        error('createMarker => ' + e.stack ?? e.message);
+        error(`${getFunctionName()} => ${e.stack ?? e.message}`);
       }
     }
   }

@@ -4,7 +4,8 @@ import { refresh } from '../token/refresh.js';
 import {
   stats as apiStats,
 } from '~/helpers/api';
-import { debug, error } from '~/helpers/log';
+import { getFunctionName } from '~/helpers/getFunctionName';
+import { debug, error, warning } from '~/helpers/log';
 import { processFollowerState } from '~/services/twitch/api/processFollowerState';
 import { variables } from '~/watchers';
 
@@ -31,10 +32,11 @@ export async function getLatest100Followers () {
     apiStats.value.currentFollowers = getFollows.total;
   } catch (e) {
     if (e instanceof Error) {
-      if (e.message === 'Invalid OAuth token') {
+      if (e.message.includes('Invalid OAuth token')) {
+        warning(`${getFunctionName()} => Invalid OAuth token - attempting to refresh token`);
         await refresh('bot');
       } else {
-        error('getLatest100Followers => ' + e.stack ?? e.message);
+        error(`${getFunctionName()} => ${e.stack ?? e.message}`);
       }
     }
     return { state: false };

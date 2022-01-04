@@ -11,6 +11,7 @@ import {
 } from '~/helpers/api';
 import { parseTitle } from '~/helpers/api/parseTitle';
 import { eventEmitter } from '~/helpers/events/emitter';
+import { getFunctionName } from '~/helpers/getFunctionName';
 import { warning } from '~/helpers/log';
 import { addUIError } from '~/helpers/panel/index';
 import { translate } from '~/translate';
@@ -51,12 +52,13 @@ async function setTitleAndGame (args: { title?: string | null; game?: string | n
     clientBroadcaster.channels.updateChannelInfo(cid, {
       title, gameId: await getGameIdFromName(game),
     });
-  } catch (e: unknown) {
+  } catch (e) {
     if (e instanceof Error) {
-      if (e.message === 'Invalid OAuth token') {
+      if (e.message.includes('Invalid OAuth token')) {
+        warning(`${getFunctionName()} => Invalid OAuth token - attempting to refresh token`);
         await refresh('bot');
       } else {
-        error('setTitleAndGame => ' + e.stack ?? e.message);
+        error(`${getFunctionName()} => ${e.stack ?? e.message}`);
       }
     }
     return { response: '', status: false };
