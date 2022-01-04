@@ -1,24 +1,20 @@
 import { ApiClient } from '@twurple/api';
-import { StaticAuthProvider } from '@twurple/auth';
 
-import { warning, debug } from '../../../helpers/log.js';
+import { warning } from '../../../helpers/log.js';
+import { CustomAuthProvider } from '../token/CustomAuthProvider.js';
 
 import { variables } from '~/watchers';
 
 const clients = {
   bot: {
     client: null as null | ApiClient,
-    token:  '',
   },
   broadcaster: {
     client: null as null | ApiClient,
-    token:  '',
   },
 };
 
 const client = async (account: 'broadcaster' | 'bot') => {
-  const clientId = variables.get(`services.twitch.${account}ClientId`) as string;
-  const accessToken = variables.get(`services.twitch.${account}AccessToken`) as string;
   const isValidToken = variables.get(`services.twitch.${account}TokenValid`) as string;
 
   if ((global as any).mocha) {
@@ -36,13 +32,9 @@ const client = async (account: 'broadcaster' | 'bot') => {
     throw new Error(`Cannot initialize Twitch API, ${account} token invalid.`);
   }
 
-  if (clients[account].token !== accessToken) {
-    debug('oauth.client', 'New client for access token ' + accessToken.replace(/(.{25})/, '*'.repeat(25)));
-    clients[account].token = accessToken;
-    const authProvider = new StaticAuthProvider(clientId, accessToken);
+  if (clients[account].client === null) {
+    const authProvider = new CustomAuthProvider(account);
     clients[account].client = new ApiClient({ authProvider });
-  } else {
-    debug('oauth.client', 'Reusing client for access token ' + accessToken.replace(/(.{25})/, '*'.repeat(25)));
   }
 
   if(clients[account].client) {

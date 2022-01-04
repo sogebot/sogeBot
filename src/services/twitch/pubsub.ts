@@ -1,8 +1,9 @@
 import { setInterval } from 'timers';
 
 import { MINUTE } from '@sogebot/ui-helpers/constants';
-import { StaticAuthProvider } from '@twurple/auth';
 import { PubSubClient } from '@twurple/pubsub';
+
+import { CustomAuthProvider } from './token/CustomAuthProvider.js';
 
 import { rawDataSymbol } from '~/../node_modules/@twurple/common/lib';
 import { isStreamOnline } from '~/helpers/api';
@@ -25,10 +26,14 @@ class PubSub {
     setInterval(() => {
       // check if tokens match
       const token = variables.get(`services.twitch.broadcasterAccessToken`) as string;
-      if (token !== connectedAccessToken) {
-        const isFirstConnection = connectedAccessToken.length === 0;
+      if (token === '') {
         this.stop();
-        this.init(isFirstConnection);
+        connectedAccessToken = '';
+      } else {
+        const isFirstConnection = connectedAccessToken.length === 0;
+        if(isFirstConnection) {
+          this.init();
+        }
         connectedAccessToken = token;
       }
     }, 5000);
@@ -39,11 +44,9 @@ class PubSub {
     }, 10 * MINUTE);
   }
 
-  async init(shouldBeLogged = true) {
+  async init() {
     try {
       this.pubSubClient = null;
-      const clientId = variables.get(`services.twitch.broadcasterClientId`) as string;
-      const accessToken = variables.get(`services.twitch.broadcasterAccessToken`) as string;
       const broadcasterId = variables.get(`services.twitch.broadcasterId`) as string;
       const broadcasterUsername = variables.get(`services.twitch.broadcasterUsername`) as string;
       const isValidToken = variables.get(`services.twitch.broadcasterTokenValid`) as string;
@@ -51,7 +54,7 @@ class PubSub {
       if (!isValidToken) {
         throw new Error(`Cannot initialize Twitch PubSub, broadcaster token invalid.`);
       }
-      const authProvider = new StaticAuthProvider(clientId, accessToken);
+      const authProvider = new CustomAuthProvider('broadcaster');
       this.pubSubClient = new PubSubClient();
       await this.pubSubClient.registerUserListener(authProvider);
 
@@ -98,9 +101,7 @@ class PubSub {
           warning(`${JSON.stringify(message, null, 2)}`);
         }
       }));
-      if (shouldBeLogged) {
-        info('PUBSUB: listening to onModAction');
-      }
+      info('PUBSUB: listening to onModAction');
 
       this.listeners.push(await this.pubSubClient?.onRedemption(broadcasterId, (message) => {
         if (rewardsRedeemed.has(message.id)) {
@@ -139,9 +140,7 @@ class PubSub {
           userInput:     message.message,
         });
       }));
-      if (shouldBeLogged) {
-        info('PUBSUB: listening to onRedemption');
-      }
+      info('PUBSUB: listening to onRedemption');
     } catch (e) {
       if (e instanceof Error) {
         error(e.stack ?? e.message);

@@ -6,7 +6,6 @@ import { UserBit, UserBitInterface } from '@entity/user';
 import * as constants from '@sogebot/ui-helpers/constants';
 import { dayjs } from '@sogebot/ui-helpers/dayjsHelper';
 import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized';
-import { StaticAuthProvider } from '@twurple/auth';
 import {
   ChatClient, ChatCommunitySubInfo, ChatSubGiftInfo, ChatSubInfo, ChatUser,
 } from '@twurple/chat';
@@ -15,6 +14,7 @@ import { getRepository } from 'typeorm';
 
 import { default as apiClient } from './api/client';
 import { followerUpdatePreCheck } from './calls/isFollowerUpdate';
+import { CustomAuthProvider } from './token/CustomAuthProvider.js';
 import { refresh } from './token/refresh';
 
 import { parserReply } from '~/commons';
@@ -127,7 +127,6 @@ class Chat {
     }
     clearTimeout(this.timeouts[`initClient.${type}`]);
 
-    const clientId = variables.get('services.twitch.clientId') as string;
     const token = variables.get(`services.twitch.${type}AccessToken`) as string;
     const isValidToken = variables.get(`services.twitch.${type}TokenValid`) as string;
     const channel = variables.get('services.twitch.broadcasterUsername') as string;
@@ -150,7 +149,7 @@ class Chat {
         this.client[type] = null;
       }
 
-      const authProvider = new StaticAuthProvider(clientId, token);
+      const authProvider = new CustomAuthProvider(type);
       this.client[type] = new ChatClient({ authProvider, isAlwaysMod: true });
 
       this.loadListeners(type);

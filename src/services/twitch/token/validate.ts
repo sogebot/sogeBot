@@ -17,7 +17,7 @@ import { variables } from '~/watchers';
 let botTokenErrorSent = false;
 let broadcasterTokenErrorSent = false;
 
-const expirationDate = {
+export const expirationDate = {
   bot:         -1,
   broadcaster: -1,
 };
