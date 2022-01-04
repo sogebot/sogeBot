@@ -1,6 +1,6 @@
 declare namespace EventList {
   export interface Event {
-    event: string;
+    event: 'follow' | 'rewardredeem' | 'cheer' | 'subgift' | 'subcommunitygift' |  'resub' | 'sub' | 'raid' | 'host' | 'tip';
     timestamp: number;
     userId: string;
     fromId?: string;

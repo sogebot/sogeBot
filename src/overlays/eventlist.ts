@@ -11,6 +11,7 @@ import Overlay from './_interface';
 import { warning } from '~/helpers/log';
 import { adminEndpoint, publicEndpoint } from '~/helpers/socket';
 import { isBotId } from '~/helpers/user/isBot';
+import twitch from '~/services/twitch';
 
 class EventList extends Overlay {
   showInUI = false;
@@ -100,6 +101,14 @@ class EventList extends Overlay {
       warning(`Event ${data.event} won't be saved in eventlist, coming from bot account.`);
       return;
     } // don't save event from a bot
+
+    users.getNameById(data.userId).then((username) => {
+      let description = username;
+      if (data.event === 'tip') {
+        description = `${data.amount} ${data.currency}`;
+      }
+      twitch.addEventToMarker(data.event, description);
+    });
 
     await getRepository(EventListEntity).save({
       event:       data.event,

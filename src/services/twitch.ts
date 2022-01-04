@@ -1,6 +1,7 @@
 import { EventList } from '@entity/eventList';
 import { User } from '@entity/user';
 import * as constants from '@sogebot/ui-helpers/constants';
+import { SECOND } from '@sogebot/ui-helpers/constants';
 import { dayjs, timezone } from '@sogebot/ui-helpers/dayjsHelper';
 import { getTime } from '@sogebot/ui-helpers/getTime';
 import { getRepository } from 'typeorm';
@@ -16,6 +17,7 @@ import { debug, error, info } from '../helpers/log';
 import users from '../users';
 import Service from './_interface';
 import { init as apiIntervalInit , stop as apiIntervalStop } from './twitch/api/interval';
+import { createMarker } from './twitch/calls/createMarker';
 import Chat from './twitch/chat';
 import Emotes from './twitch/emotes';
 import EventSub from './twitch/eventsub';
@@ -44,6 +46,7 @@ import { translate } from '~/translate';
 const urls = {
   'SogeBot Token Generator': 'https://twitch-token-generator.soge.workers.dev/refresh/',
 };
+const markerEvents = new Set<string>();
 
 class Twitch extends Service {
   tmi: import('./twitch/chat').default | null;
@@ -89,6 +92,8 @@ class Twitch extends Service {
     tokenServiceCustomClientSecret = '';
   @settings('general')
     generalOwners: string[] = [];
+  @settings('general')
+    createMarkerOnEvent = true;
 
   @settings('broadcaster')
     broadcasterAccessToken = '';
@@ -159,6 +164,44 @@ class Twitch extends Service {
     super();
     this.botTokenValid = false;
     this.broadcasterTokenValid = false;
+
+    setInterval(() => {
+      if (markerEvents.size > 0) {
+        const description: string[] = [];
+        const events = Array.from(markerEvents.values());
+
+        // group events if there are more then five in second
+        if (events.length > 5) {
+          // we need to group everything, as description can be max of 140 chars
+          for (const event of ['follow', 'subs/resubs/gifts', 'tip', 'rewardredeem', 'hosts/raids', 'cheer']) {
+            const length = events.filter(o => {
+              if (event === 'subs/resubs/gifts') {
+                return o.startsWith('subgift') || o.startsWith('resub') || o.startsWith('sub') || o.startsWith('subcommunitygift');
+              }
+              if (event === 'hosts/raids') {
+                return o.startsWith('raid') || o.startsWith('host');
+              }
+              return o.startsWith(event);
+            }).length;
+            if (length > 0) {
+              description.push(`${event}: ${length}`);
+            }
+          }
+          createMarker(description.join(', '));
+        } else {
+          for (const event of events) {
+            createMarker(event);
+          }
+        }
+        markerEvents.clear();
+      }
+    }, SECOND);
+  }
+
+  addEventToMarker(event: EventList.Event['event'], username: string) {
+    if (this.createMarkerOnEvent) {
+      markerEvents.add(`${event} ${username}`);
+    }
   }
 
   @onChange('botAccessToken')
