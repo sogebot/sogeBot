@@ -190,8 +190,6 @@ export const validate = async (type: 'bot' | 'broadcaster', retry = 0, clear = f
     }
     throw new Error(e);
   } finally {
-    console.log('validating false');
-    console.log({ expirationDate });
     isValidating[type] = false;
   }
 };
