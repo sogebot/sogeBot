@@ -6,6 +6,7 @@ import emitter from '~/helpers/interfaceEmitter';
 import {
   debug,
   error,
+  isDebugEnabled,
   warning,
 } from '~/helpers/log';
 import {
@@ -38,6 +39,11 @@ const urls = {
       }
     */
 export const refresh = async (type: 'bot' | 'broadcaster', clear = false) => {
+
+  if (isDebugEnabled('oauth.refresh')) {
+    debug('oauth.refresh', `Refresh stacktrace: ${new Error().stack}`);
+  }
+
   if (clear) {
     errorCount[type] = 0;
     lastRefresh[type] = 0;

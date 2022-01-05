@@ -2,7 +2,7 @@ import { Enumerable } from '@d-fischer/shared-utils';
 import type { AuthProvider, AccessToken } from '@twurple/auth';
 
 import { variables } from '../../../watchers.js';
-import { expirationDate } from './validate.js';
+import { expirationDate, validate } from './validate.js';
 
 export class CustomAuthProvider implements AuthProvider {
   @Enumerable(false) private _clientId: string;
@@ -23,6 +23,8 @@ export class CustomAuthProvider implements AuthProvider {
     if (variables.get(`services.twitch.${this.typeOfToken}AccessToken`) === '') {
       return null;
     }
+
+    await validate(this.typeOfToken);
 
     this._accessToken = {
       accessToken:         variables.get(`services.twitch.${this.typeOfToken}AccessToken`),

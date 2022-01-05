@@ -12,6 +12,7 @@ import {
   error,
   warning,
 } from '~/helpers/log';
+import { setImmediateAwait } from '~/helpers/setImmediateAwait';
 import { variables } from '~/watchers';
 
 let botTokenErrorSent = false;
@@ -27,35 +28,45 @@ const isValidating = {
 };
 
 export const cache: { bot: string; broadcaster: string } = { bot: '', broadcaster: '' };
-/*
-   * Validates OAuth access tokens
-   * and sets this[type + 'Username']
-   * and sets this[type + 'CurrentScopes']
-   * if invalid refresh()
-   * @param {string} type - bot or broadcaster
-   *
-   * Example output:
-      {
-        "client_id": "<your client ID>",
-        "login": "<authorized user login>",
-        "scopes": [
-          "<requested scopes>"
-        ],
-        "user_id": "<authorized user ID>"
+
+const waitUntilValidationDone = async (type: 'bot' | 'broadcaster') => {
+  return new Promise((resolve) => {
+    debug('oauth.validate', `Checking validation status of ${type}.`);
+    const check = async () => {
+      while(isValidating[type]) {
+        await setImmediateAwait();
       }
-    */
+    };
+    debug('oauth.validate', `Validation of ${type} free.`);
+    check().then(resolve);
+  });
+};
+
+/*
+  * Validates OAuth access tokens
+  * and sets this[type + 'Username']
+  * and sets this[type + 'CurrentScopes']
+  * if invalid refresh()
+  * @param {string} type - bot or broadcaster
+  *
+  * Example output:
+    {
+      "client_id": "<your client ID>",
+      "login": "<authorized user login>",
+      "scopes": [
+        "<requested scopes>"
+      ],
+      "user_id": "<authorized user ID>"
+    }
+  */
 export const validate = async (type: 'bot' | 'broadcaster', retry = 0, clear = false): Promise < boolean > => {
   try {
     debug('oauth.validate', `Validation: ${type} - ${retry} retries`);
-    if (isValidating[type]) {
-      debug('oauth.validate', `Validation in progress.`);
-      return false;
-    } else {
-      isValidating[type] = true;
-    }
+
+    await waitUntilValidationDone(type);
+    isValidating[type] = true;
 
     const refreshToken = variables.get('services.twitch.' + type + 'RefreshToken') as string;
-
     if (refreshToken === '') {
       throw new Error('no refresh token for ' + type);
     } else if (!['bot', 'broadcaster'].includes(type)) {
@@ -83,7 +94,6 @@ export const validate = async (type: 'bot' | 'broadcaster', retry = 0, clear = f
         Authorization: 'OAuth ' + token,
       },
     });
-    debug('oauth.validate', JSON.stringify(request.data));
     expirationDate[type] = Date.now() + request.data.expires_in * 1000;
 
     setTimeout(() => {
@@ -180,6 +190,8 @@ export const validate = async (type: 'bot' | 'broadcaster', retry = 0, clear = f
     }
     throw new Error(e);
   } finally {
+    console.log('validating false');
+    console.log({ expirationDate });
     isValidating[type] = false;
   }
 };

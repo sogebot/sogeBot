@@ -1,8 +1,6 @@
 import * as constants from '@sogebot/ui-helpers/constants';
 import chalk from 'chalk';
 
-import { validate } from '../token/validate';
-
 import {
   debug, error, warning,
 } from '~/helpers/log';
@@ -92,14 +90,6 @@ const check = async () => {
       continue;
     }
     if (Date.now() - interval.lastRunAt >= interval.interval) {
-      // run validation before any requests
-      const[ botValidation, broadcasterValidation ] = await Promise.all([
-        validate('bot'), validate('broadcaster'),
-      ]);
-      if (!botValidation || !broadcasterValidation) {
-        continue;
-      }
-
       isBlocking = fnc;
       debug('api.interval', chalk.yellow(fnc + '() ') + 'start');
       const time = process.hrtime();

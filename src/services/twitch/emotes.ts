@@ -6,7 +6,6 @@ import { getManager, getRepository } from 'typeorm';
 import { v4 as uuid } from 'uuid';
 
 import client from './api/client';
-import { validate } from './token/validate';
 
 import { CacheEmotes, CacheEmotesInterface } from '~/database/entity/cacheEmotes';
 import {
@@ -88,7 +87,6 @@ class Emotes {
         this.lastSubscriberEmoteChk = Date.now();
         this.lastChannelChk = broadcasterId;
         try {
-          await validate('bot');
           info(`EMOTES: Fetching channel ${broadcasterId} emotes`);
           const clientBot = await client('bot');
           const emotes = await clientBot.chat.getChannelEmotes(broadcasterId);
@@ -127,7 +125,6 @@ class Emotes {
     if (Date.now() - this.lastGlobalEmoteChk > 1000 * 60 * 60 * 24 * 7) {
       this.lastGlobalEmoteChk = Date.now();
       try {
-        await validate('bot');
         info('EMOTES: Fetching global emotes');
         const clientBot = await client('bot');
         const emotes = await clientBot.chat.getGlobalEmotes();
