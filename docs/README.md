@@ -12,7 +12,7 @@ Free Twitch Bot built on Node.js
 #### Important links
 
 - **DISCORD**: <https://discordapp.com/invite/52KpmuH>
-- **GITHUB**: <https://github.com/sogehige/sogeBot>
+- **GITHUB**: <https://github.com/sogebot/sogeBot>
 - **DOCS**: <http://sogebot.github.io/sogeBot/>
 - **ISSUES**: <https://github.com/sogebot/sogeBot/issues>
 - **RELEASES**: <https://github.com/sogebot/sogeBot/releases>

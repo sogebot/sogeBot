@@ -98,7 +98,7 @@
 ### GIT Installation
 
 - Download [latest master zip](https://github.com/sogebot/sogeBot/archive/master.zip)
-  or clone repository `git clone https://github.com/sogehige/sogeBot.git`
+  or clone repository `git clone https://github.com/sogebot/sogeBot.git`
 - Set your [database environment](configuration/database)
 - Add bot as channel editor
   in [Permissions settings](http://twitch.tv/dashboard/permissions) on Twitch
