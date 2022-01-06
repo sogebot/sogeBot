@@ -59,27 +59,30 @@ export function follow(userId: string, userName: string, followedAt: string | nu
     return;
   }
 
-  eventlist.add({
-    event:     'follow',
-    userId:    userId,
-    timestamp: Date.now(),
-  });
-  if (!isBot(userName)) {
-    followLog(`${userName}#${userId}`);
-    eventEmitter.emit('follow', { userName, userId: userId });
-    alerts.trigger({
-      event:      'follows',
-      name:       userName,
-      amount:     0,
-      tier:       null,
-      currency:   '',
-      monthsName: '',
-      message:    '',
+  // trigger events only if follow was in hour
+  if (Date.now() - dayjs(followedAt).valueOf() < HOUR) {
+    eventlist.add({
+      event:     'follow',
+      userId:    userId,
+      timestamp: Date.now(),
     });
+    if (!isBot(userName)) {
+      followLog(`${userName}#${userId}`);
+      eventEmitter.emit('follow', { userName, userId: userId });
+      alerts.trigger({
+        event:      'follows',
+        name:       userName,
+        amount:     0,
+        tier:       null,
+        currency:   '',
+        monthsName: '',
+        message:    '',
+      });
 
-    triggerInterfaceOnFollow({
-      userName, userId,
-    });
+      triggerInterfaceOnFollow({
+        userName, userId,
+      });
+    }
 
     events.set(userId, Date.now());
   }
