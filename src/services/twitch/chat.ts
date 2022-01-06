@@ -127,8 +127,7 @@ class Chat {
     }
     clearTimeout(this.timeouts[`initClient.${type}`]);
 
-    const token = variables.get(`services.twitch.${type}AccessToken`) as string;
-    const isValidToken = variables.get(`services.twitch.${type}TokenValid`) as string;
+    const isValidToken = variables.get(`services.twitch.botTokenValid`) && variables.get(`services.twitch.broadcasterTokenValid`);
     const channel = variables.get('services.twitch.broadcasterUsername') as string;
 
     // wait for initial validation
@@ -138,10 +137,6 @@ class Chat {
     }
 
     try {
-      if (token === '' || channel === '') {
-        throw Error(`${type} - token and channel expected`);
-      }
-
       const client = this.client[type];
       if (client) {
         await this.client[type]?.quit();
