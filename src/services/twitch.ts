@@ -187,10 +187,14 @@ class Twitch extends Service {
               description.push(`${event}: ${length}`);
             }
           }
-          createMarker(description.join(', '));
+          if (isStreamOnline.value) {
+            createMarker(description.join(', '));
+          }
         } else {
-          for (const event of events) {
-            createMarker(event);
+          if (isStreamOnline.value) {
+            for (const event of events) {
+              createMarker(event);
+            }
           }
         }
         markerEvents.clear();
