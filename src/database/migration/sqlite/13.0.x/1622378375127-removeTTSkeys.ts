@@ -11,7 +11,7 @@ export class removeTTSkeys1622378375127 implements MigrationInterface {
       'subgift', 'host', 'raid', 'tip', 'cheer',
       'resub', 'command_redeem', 'reward_redeem',
     ]) {
-      alerts[type]  = await queryRunner.manager.getRepository(`alert_${type}`).find();
+      alerts[type]  = await queryRunner.query(`SELECT * FROM "alert_${type}"`);
     }
 
     // resave all alerts

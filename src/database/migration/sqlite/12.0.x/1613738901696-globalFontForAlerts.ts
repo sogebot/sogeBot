@@ -19,7 +19,7 @@ export class globalFontForAlerts1613738901696 implements MigrationInterface {
       'subgift', 'host', 'raid', 'tip', 'cheer',
       'resub', 'command_redeem', 'reward_redeem',
     ]) {
-      alerts[type]  = await queryRunner.manager.getRepository(`alert_${type}`).find();
+      alerts[type]  = await queryRunner.query(`SELECT * FROM "alert_${type}"`);
     }
     alerts.global = await queryRunner.query('SELECT * FROM alert');
     await queryRunner.query(`CREATE TABLE "temporary_alert_follow" ("id" varchar PRIMARY KEY NOT NULL, "alertId" varchar, "enabled" boolean NOT NULL, "title" varchar NOT NULL, "filter" text, "variantAmount" integer NOT NULL, "messageTemplate" varchar NOT NULL, "layout" varchar NOT NULL, "animationIn" varchar NOT NULL, "animationOut" varchar NOT NULL, "animationText" varchar NOT NULL, "animationTextOptions" text NOT NULL, "imageId" varchar NOT NULL, "soundId" varchar NOT NULL, "soundVolume" integer NOT NULL, "alertDurationInMs" integer NOT NULL, "alertTextDelayInMs" integer NOT NULL, "enableAdvancedMode" boolean NOT NULL, "advancedMode" text NOT NULL, "tts" text NOT NULL, "font" text NOT NULL, "animationInDuration" integer NOT NULL DEFAULT (2000), "animationOutDuration" integer NOT NULL DEFAULT (2000), "imageOptions" text NOT NULL, CONSTRAINT "FK_6e7a73361ade12e7e69040a7c07" FOREIGN KEY ("alertId") REFERENCES "alert" ("id") ON DELETE CASCADE ON UPDATE CASCADE)`);
@@ -148,9 +148,11 @@ export class globalFontForAlerts1613738901696 implements MigrationInterface {
       'subgift', 'host', 'raid', 'tip', 'cheer',
       'resub', 'command_redeem', 'reward_redeem',
     ]) {
-      await queryRunner.manager.getRepository(`alert_${type}`).clear();
-      for (const alert of alerts[type]) {
-        await queryRunner.manager.getRepository(`alert_${type}`).insert(alert);
+      await queryRunner.query(`DELETE FROM "alert_${type}" WHERE 1=1`);
+      for (const item of alerts[type]) {
+        const keys = Object.keys(item);
+        await queryRunner.query(`INSERT INTO "alert_${type}" (${keys.map(o => `${o}`).join(', ')}) values (${keys.map(o => `?`).join(', ')})`,
+          keys.map(o => item[o]));
       }
     }
   }
@@ -163,7 +165,7 @@ export class globalFontForAlerts1613738901696 implements MigrationInterface {
       'subgift', 'host', 'raid', 'tip', 'cheer',
       'resub', 'command_redeem', 'reward_redeem',
     ]) {
-      alerts[type]  = await queryRunner.manager.getRepository(`alert_${type}`).find();
+      alerts[type]  = await queryRunner.query(`SELECT * FROM "alert_${type}"`);
     }
 
     await queryRunner.query(`ALTER TABLE "alert_reward_redeem" RENAME TO "temporary_alert_reward_redeem"`);
@@ -265,9 +267,11 @@ export class globalFontForAlerts1613738901696 implements MigrationInterface {
       'subgift', 'host', 'raid', 'tip', 'cheer',
       'resub', 'command_redeem', 'reward_redeem',
     ]) {
-      await queryRunner.manager.getRepository(`alert_${type}`).clear();
-      for (const alert of alerts[type]) {
-        await queryRunner.manager.getRepository(`alert_${type}`).insert(alert);
+      await queryRunner.query(`DELETE FROM "alert_${type}" WHERE 1=1`);
+      for (const item of alerts[type]) {
+        const keys = Object.keys(item);
+        await queryRunner.query(`INSERT INTO "alert_${type}" (${keys.map(o => `${o}`).join(', ')}) values (${keys.map(o => `?`).join(', ')})`,
+          keys.map(o => item[o]));
       }
     }
   }

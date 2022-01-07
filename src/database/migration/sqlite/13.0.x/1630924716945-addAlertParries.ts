@@ -36,7 +36,7 @@ export class addAlertParries1630924716945 implements MigrationInterface {
       'subgift', 'host', 'raid', 'tip', 'cheer',
       'resub', 'command_redeem', 'reward_redeem',
     ]) {
-      await queryRunner.manager.getRepository(`alert_${type}`).clear();
+      await queryRunner.query(`DELETE FROM "alert_${type}" WHERE 1=1`);
       for (const alert of alerts[type]) {
         const keys = Object.keys(alert);
         await queryRunner.query(
