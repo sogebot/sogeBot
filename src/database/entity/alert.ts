@@ -180,9 +180,11 @@ export interface AlertMediaInterface {
 
 export interface AlertRewardRedeemInterface extends AlertTipInterface {
   rewardId: null | string;
+  ttsTemplate: string;
 }
 
 export interface AlertTipInterface extends CommonSettingsInterface {
+  ttsTemplate: string;
   message: {
     minAmountToShow: number;
     allowEmotes: {
@@ -209,6 +211,7 @@ export interface AlertTipInterface extends CommonSettingsInterface {
   };
 }
 export interface AlertResubInterface extends CommonSettingsInterface {
+  ttsTemplate: string;
   message: {
     allowEmotes: {
       twitch: boolean;
@@ -463,7 +466,8 @@ export const AlertTip = new EntitySchema<Readonly<Required<AlertTipInterface>>>(
   name:    'alert_tip',
   columns: {
     ...CommonSettingsSchema,
-    message: { type: 'simple-json' },
+    message:     { type: 'simple-json' },
+    ttsTemplate: { type: String, default: '{message}' },
   },
   relations: {
     alert: {
@@ -481,7 +485,8 @@ export const AlertCheer = new EntitySchema<Readonly<Required<AlertTipInterface>>
   name:    'alert_cheer',
   columns: {
     ...CommonSettingsSchema,
-    message: { type: 'simple-json' },
+    message:     { type: 'simple-json' },
+    ttsTemplate: { type: String, default: '{message}' },
   },
   relations: {
     alert: {
@@ -499,7 +504,8 @@ export const AlertResub = new EntitySchema<Readonly<Required<AlertResubInterface
   name:    'alert_resub',
   columns: {
     ...CommonSettingsSchema,
-    message: { type: 'simple-json' },
+    message:     { type: 'simple-json' },
+    ttsTemplate: { type: String, default: '{message}' },
   },
   relations: {
     alert: {
@@ -532,8 +538,9 @@ export const AlertRewardRedeem = new EntitySchema<Readonly<Required<AlertRewardR
   name:    'alert_reward_redeem',
   columns: {
     ...CommonSettingsSchema,
-    message:  { type: 'simple-json' },
-    rewardId: { type: String }, // even when rewardId type can be null, we don't want it to be saved in database
+    message:     { type: 'simple-json' },
+    rewardId:    { type: String }, // even when rewardId type can be null, we don't want it to be saved in database
+    ttsTemplate: { type: String, default: '{message}' },
   },
   relations: {
     alert: {
