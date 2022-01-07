@@ -11,7 +11,7 @@ export class globalTTSForAlerts1613659461852 implements MigrationInterface {
       'subgift', 'host', 'raid', 'tip', 'cheer',
       'resub', 'command_redeem', 'reward_redeem',
     ]) {
-      alerts[type]  = await queryRunner.manager.getRepository(`alert_${type}`).find();
+      alerts[type]  = await queryRunner.query(`SELECT * FROM "alert_${type}"`);
     }
     await queryRunner.query(`CREATE TABLE "temporary_alert" ("id" varchar PRIMARY KEY NOT NULL, "updatedAt" bigint NOT NULL DEFAULT (0), "name" varchar NOT NULL, "alertDelayInMs" integer NOT NULL, "profanityFilterType" varchar NOT NULL, "loadStandardProfanityList" text NOT NULL, "customProfanityList" text NOT NULL, "tts" text)`);
     await queryRunner.query(`INSERT INTO "temporary_alert"("id", "updatedAt", "name", "alertDelayInMs", "profanityFilterType", "loadStandardProfanityList", "customProfanityList") SELECT "id", "updatedAt", "name", "alertDelayInMs", "profanityFilterType", "loadStandardProfanityList", "customProfanityList" FROM "alert"`);
@@ -24,12 +24,11 @@ export class globalTTSForAlerts1613659461852 implements MigrationInterface {
       'subgift', 'host', 'raid', 'tip', 'cheer',
       'resub', 'command_redeem', 'reward_redeem',
     ]) {
-      for (const alert of alerts[type]) {
-        // check if alert exist
-        const alertFromDb = await queryRunner.manager.getRepository(`alert_${type}`).findOne({ id: alert.id });
-        if (!alertFromDb) {
-          await queryRunner.manager.getRepository(`alert_${type}`).insert(alert);
-        }
+      await queryRunner.query(`DELETE FROM "alert_${type}" WHERE 1=1`);
+      for (const item of alerts[type]) {
+        const keys = Object.keys(item);
+        await queryRunner.query(`INSERT INTO "alert_${type}" (${keys.map(o => `${o}`).join(', ')}) values (${keys.map(o => `?`).join(', ')})`,
+          keys.map(o => item[o]));
       }
     }
   }
@@ -42,7 +41,7 @@ export class globalTTSForAlerts1613659461852 implements MigrationInterface {
       'subgift', 'host', 'raid', 'tip', 'cheer',
       'resub', 'command_redeem', 'reward_redeem',
     ]) {
-      alerts[type]  = await queryRunner.manager.getRepository(`alert_${type}`).find();
+      alerts[type]  = await queryRunner.query(`SELECT * FROM "alert_${type}"`);
     }
 
     await queryRunner.query(`ALTER TABLE "alert" RENAME TO "temporary_alert"`);
@@ -56,12 +55,11 @@ export class globalTTSForAlerts1613659461852 implements MigrationInterface {
       'subgift', 'host', 'raid', 'tip', 'cheer',
       'resub', 'command_redeem', 'reward_redeem',
     ]) {
-      for (const alert of alerts[type]) {
-        // check if alert exist
-        const alertFromDb = await queryRunner.manager.getRepository(`alert_${type}`).findOne({ id: alert.id });
-        if (!alertFromDb) {
-          await queryRunner.manager.getRepository(`alert_${type}`).insert(alert);
-        }
+      await queryRunner.query(`DELETE FROM "alert_${type}" WHERE 1=1`);
+      for (const item of alerts[type]) {
+        const keys = Object.keys(item);
+        await queryRunner.query(`INSERT INTO "alert_${type}" (${keys.map(o => `${o}`).join(', ')}) values (${keys.map(o => `?`).join(', ')})`,
+          keys.map(o => item[o]));
       }
     }
   }
