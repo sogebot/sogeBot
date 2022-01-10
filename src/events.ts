@@ -160,10 +160,7 @@ class Events extends Core {
         id: 'bot-will-leave-channel', definitions: {}, fire: this.fireBotWillLeaveChannel,
       },
       {
-        id: 'create-a-clip', definitions: { announce: false, hasDelay: true }, fire: this.fireCreateAClip,
-      },
-      {
-        id: 'create-a-clip-and-play-replay', definitions: { announce: false, hasDelay: true }, fire: this.fireCreateAClipAndPlayReplay,
+        id: 'create-a-clip', definitions: { announce: false, hasDelay: true, replay: false }, fire: this.fireCreateAClip,
       },
       {
         id: 'increment-custom-variable', definitions: { customVariable: '', numberToIncrement: '1' }, fire: this.fireIncrementCustomVariable,
@@ -337,18 +334,15 @@ class Events extends Core {
       if (Boolean(operation.announce) === true) {
         announce(prepare('api.clips.created', { link: `https://clips.twitch.tv/${cid}` }), 'general');
       }
+
+      if (operation.replay) {
+        require('~/overlays/clips').default.showClip(cid);
+      }
       info('Clip was created successfully');
       return cid;
     } else { // NG
       warning('Clip was not created successfully');
       return null;
-    }
-  }
-
-  public async fireCreateAClipAndPlayReplay(operation: EventsEntity.OperationDefinitions, attributes: EventsEntity.Attributes) {
-    const cid = await events.fireCreateAClip(operation);
-    if (cid) { // clip created ok
-      require('~/overlays/clips').default.showClip(cid);
     }
   }
 
