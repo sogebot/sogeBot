@@ -1,9 +1,10 @@
 name: Crowdin Action
 
 on:
-  pull_request:
-  #push:
-  #  branches: [ master ]
+  push:
+    branches: [ master ]
+  schedule:
+    - cron: "* */1 * * *" # run every hour
 
 jobs:
   synchronize-with-crowdin:
@@ -18,7 +19,6 @@ jobs:
       uses: crowdin/github-action@1.4.5
       with:
         upload_translations: true
-        download_translations: true
 
         # This is the name of the git branch that Crowdin will create when opening a pull request.
         # This branch does NOT need to be manually created. It will be created automatically by the action.
