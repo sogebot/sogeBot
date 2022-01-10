@@ -1,3 +1,5 @@
+preserve_hierarchy: true
+
 commit_message: '[skip-tests]'
 
 files:
