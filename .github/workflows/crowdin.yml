@@ -1,7 +1,6 @@
 name: Crowdin Action
 
 on:
-  pull_request:
   push:
     branches: [ master ]
   schedule:
