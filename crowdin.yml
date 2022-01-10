@@ -1,4 +1,5 @@
 commit_message: '[skip-tests]'
+preserve_hierarchy: true
 
 files:
   - source: /locales/en.json
