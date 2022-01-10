@@ -19,15 +19,15 @@ jobs:
     - name: crowdin action
       uses: crowdin/github-action@1.4.5
       with:
-        upload_translations: true
-        upload_translations_args: '-b test'
+        upload_sources: true
+        upload_sources_args: '-b test'
 
         upload_language: 'en'
 
         # This is the name of the git branch that Crowdin will create when opening a pull request.
         # This branch does NOT need to be manually created. It will be created automatically by the action.
         localization_branch_name: l10n_crowdin_action
-        download_translations: true
+        # download_translations: true
         create_pull_request: true
         pull_request_title: 'chore(locales): crowdin update'
         pull_request_body: '[skip-tests]'
