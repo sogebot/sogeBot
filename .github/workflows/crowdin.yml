@@ -21,7 +21,7 @@ jobs:
       with:
         upload_sources: true
         upload_sources_args: '--verbose'
-        crowdin_branch_name: \[sogehige.sogeBot] master
+        crowdin_branch_name: l10n_branch
 
         upload_language: 'en'
 
