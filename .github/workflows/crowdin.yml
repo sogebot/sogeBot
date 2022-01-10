@@ -22,8 +22,10 @@ jobs:
         upload_sources: true
         upload_sources_args: '--verbose'
         crowdin_branch_name: l10n_branch
-
-        upload_language: 'en'
+        
+        upload_translations: true
+        auto_approve_imported: true
+        import_eq_suggestions: true
 
         # This is the name of the git branch that Crowdin will create when opening a pull request.
         # This branch does NOT need to be manually created. It will be created automatically by the action.
