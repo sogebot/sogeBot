@@ -335,7 +335,7 @@ class Chat {
         }
         // strip message from ACTION
         message = message.replace('\u0001ACTION ', '').replace('\u0001', '');
-        this.message({ userstate, message, emotesOffsets: msg.emoteOffsets, isAction: true });
+        this.message({ userstate, message, id: msg.id, emotesOffsets: msg.emoteOffsets, isAction: true });
         linesParsedIncrement();
         triggerInterfaceOnMessage({
           sender:    userstate,
