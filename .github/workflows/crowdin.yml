@@ -20,7 +20,7 @@ jobs:
       uses: crowdin/github-action@1.4.5
       with:
         upload_sources: true
-        upload_sources_args: '--branch=\'[sogehige.sogeBot] master\' --verbose'
+        upload_sources_args: '--branch="\[sogehige.sogeBot\]\ master" --verbose'
 
         upload_language: 'en'
 
