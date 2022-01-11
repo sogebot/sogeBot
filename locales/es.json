@@ -124,27 +124,27 @@
       "noEvents": "No se encontraron eventos en la base de datos.",
       "whatsthis": "¿Qué es esto?",
       "myRewardIsNotListed": "¡Mi recompensa no está en la lista!",
-      "redeemAndClickRefreshToSeeReward": "If you are missing your created reward in a list, refresh by clicking on refresh icon.",
+      "redeemAndClickRefreshToSeeReward": "Si le falta la recompensa creada en una lista, actualice haciendo clic en el icono de actualización.",
       "badges": {
-        "enabled": "Enabled",
-        "disabled": "Disabled"
+        "enabled": "Activado",
+        "disabled": "Deshabilitado"
       },
       "buttons": {
-        "test": "Test",
-        "enable": "Enable",
-        "disable": "Disable",
-        "edit": "Edit",
-        "delete": "Delete",
-        "yes": "Yes",
+        "test": "Probar",
+        "enable": "Activar",
+        "disable": "Inhabilitar",
+        "edit": "Editar",
+        "delete": "Borrar",
+        "yes": "Si",
         "no": "No"
       },
       "popovers": {
-        "are_you_sure_you_want_to_delete_event": "Are you sure you want to <strong class='text-danger'>delete</strong> event",
-        "example_of_user_object_data": "Example of user object data"
+        "are_you_sure_you_want_to_delete_event": "Estás seguro de que deseas <strong class = 'text-danger'> eliminar </strong> el evento",
+        "example_of_user_object_data": "Ejemplo de datos de objetos de usuario"
       },
       "errors": {
-        "command_must_start_with_!": "Command must start with !",
-        "this_value_must_be_a_positive_number_or_0": "This value must be a positive number or 0",
+        "command_must_start_with_!": "El comando debe comenzar con !",
+        "this_value_must_be_a_positive_number_or_0": "El valor debe ser un número positivo o 0",
         "value_cannot_be_empty": "El valor no puede estar vacío"
       },
       "dialog": {
@@ -157,72 +157,72 @@
         },
         "alerts": {
           "success": "El evento se ha guardado <strong>con éxito.</strong>",
-          "fail": "Something went <strong>wrong</strong>."
+          "fail": "Algo salió <strong> mal </strong>."
         },
-        "close": "Close",
-        "save-changes": "Save changes",
-        "event": "Event",
-        "name": "Name",
-        "usable-events-variables": "Usable events variables",
-        "settings": "Settings",
-        "filters": "Filters",
-        "operations": "Operations"
+        "close": "Cerrar",
+        "save-changes": "Guardar cambios",
+        "event": "Evento",
+        "name": "Nombre",
+        "usable-events-variables": "Variables de eventos utilizables",
+        "settings": "Configuración",
+        "filters": "Filtros",
+        "operations": "Operaciones"
       },
       "definitions": {
         "taskId": {
-          "label": "Task ID"
+          "label": "Id de tarea"
         },
         "filter": {
-          "label": "Filter"
+          "label": "Filtro"
         },
         "linkFilter": {
-          "label": "Link Overlay Filter",
-          "placeholder": "If using overlay, add link or id of your overlay"
+          "label": "Filtro de superposición de enlaces",
+          "placeholder": "Si usa superposición, agregue el enlace o la identificación de su superposición"
         },
         "hashtag": {
-          "label": "Hashtag or Keyword",
-          "placeholder": "#yourHashtagHere or Keyword"
+          "label": "Hashtag o Palabra Clave",
+          "placeholder": "#TuHashtagAquí o palabra clave"
         },
         "fadeOutXCommands": {
-          "label": "Fade Out X Commands",
-          "placeholder": "Number of commands subtracted every fade out interval"
+          "label": "Desaparecer X Comandos",
+          "placeholder": "Número de comandos restados a cada intervalo de desvanecimiento"
         },
         "fadeOutXKeywords": {
-          "label": "Fade Out X Keywords",
-          "placeholder": "Number of keywords subtracted every fade out interval"
+          "label": "Desvanecimiento X Palabras clave",
+          "placeholder": "Número de palabras clave restadas en cada intervalo de atenuación"
         },
         "fadeOutInterval": {
-          "label": "Fade Out Interval (seconds)",
-          "placeholder": "Fade out interval subtracting"
+          "label": "Intervalo de desvanecimiento (segundos)",
+          "placeholder": "Restar intervalo de desvanecimiento"
         },
         "runEveryXCommands": {
-          "label": "Run Every X Commands",
-          "placeholder": "Number of commands before event is triggered"
+          "label": "Ejecutar cada X comandos",
+          "placeholder": "Número de comandos antes de que se active el evento"
         },
         "runEveryXKeywords": {
-          "label": "Run Every X Keywords",
-          "placeholder": "Number of keywords before event is triggered"
+          "label": "Ejecutar cada X palabras clave",
+          "placeholder": "Número de palabras clave antes de que se active el evento Número de palabras clave antes de que se active el evento"
         },
         "commandToWatch": {
-          "label": "Command To Watch",
-          "placeholder": "Set your !commandToWatch"
+          "label": "Comando a ver",
+          "placeholder": "Establecer su !ComandoParaMirar"
         },
         "keywordToWatch": {
-          "label": "Keyword To Watch",
-          "placeholder": "Set your keywordToWatch"
+          "label": "Palabra clave para ver",
+          "placeholder": "Establecer su PalabraClaveParaMirar"
         },
         "resetCountEachMessage": {
-          "label": "Reset count each message",
-          "true": "Reset count",
-          "false": "Keep count"
+          "label": "Restablecer el recuento de cada mensaje",
+          "true": "Reiniciar contador",
+          "false": "Mantener contador"
         },
         "viewersAtLeast": {
-          "label": "Viewers At Least",
-          "placeholder": "How many viewers at least to trigger event"
+          "label": "Espectadores al menos",
+          "placeholder": "Cuántos espectadores como mínimo para activar el evento"
         },
         "runInterval": {
-          "label": "Run Interval (0 = run once per stream)",
-          "placeholder": "Trigger event every x seconds"
+          "label": "Ejecutar Intervalo (0 = ejecutar una vez por stream)",
+          "placeholder": "Activar evento cada x segundos"
         },
         "runAfterXMinutes": {
           "label": "Run After X Minutes",
@@ -260,6 +260,11 @@
         "emotesToFirework": {
           "label": "Emotes To Firework",
           "placeholder": "List of emotes to firework, e.g. Kappa PurpleHeart"
+        },
+        "replay": {
+          "label": "Replay clip in overlay",
+          "true": "Will play in as replay in overlay/alerts",
+          "false": "Replay won't be played"
         },
         "announce": {
           "label": "Announce in chat",
@@ -319,11 +324,11 @@
         "channelPointsVotingEnabled": "Twitch Poll - Is channel points voting enabled (boolean)",
         "votes": "Twitch Poll - votes count",
         "winnerChoice": "Twitch Poll - Winner choice",
-        "winnerPercentage": "Twitch Poll - Winner choice percentage",
-        "winnerVotes": "Twitch Poll - Winner choice votes",
-        "goal": "Goal",
+        "winnerPercentage": "Encuesta de Twitch - Porcentaje de elección del ganador",
+        "winnerVotes": "Encuesta de Twitch - Votos de elección del ganador",
+        "goal": "Objetivo",
         "total": "Total",
-        "lastContributionTotal": "Last Contribution - Total",
+        "lastContributionTotal": "Última contribución - Total",
         "lastContributionType": "Last Contribution - Type",
         "lastContributionUserId": "Last Contribution - User ID",
         "lastContributionUsername": "Last Contribution - Username",
@@ -836,7 +841,6 @@
     "bot-will-join-channel": "bot will join channel",
     "bot-will-leave-channel": "bot will leave channel",
     "create-a-clip": "create a clip",
-    "create-a-clip-and-play-replay": "create a clip and play as replay (overlay/alerts)",
     "increment-custom-variable": "increment a custom variable",
     "set-custom-variable": "set a custom variable",
     "decrement-custom-variable": "decrement a custom variable",

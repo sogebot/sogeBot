@@ -114,6 +114,11 @@
     "placeholder": "Установить шаблон сообщения",
     "help": "Available variables: {name}, {amount} (cheers, subs, tips, subgifts, sub community gifts, command redeems), {recipient} (subgifts, command redeems), {monthsName} (subs, subgifts), {currency} (tips)"
   },
+  "ttsTemplate": {
+    "name": "TTS template",
+    "placeholder": "Set your TTS template",
+    "help": "Available variables: {name}, {amount} {monthsName} {currency} {message}"
+  },
   "animationText": {
     "name": "Текст анимации"
   },

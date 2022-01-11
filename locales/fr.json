@@ -261,6 +261,11 @@
           "label": "Emotes To Firework",
           "placeholder": "List of emotes to firework, e.g. Kappa PurpleHeart"
         },
+        "replay": {
+          "label": "Replay clip in overlay",
+          "true": "Will play in as replay in overlay/alerts",
+          "false": "Replay won't be played"
+        },
         "announce": {
           "label": "Announce in chat",
           "true": "Will be announced",
@@ -836,7 +841,6 @@
     "bot-will-join-channel": "bot will join channel",
     "bot-will-leave-channel": "bot will leave channel",
     "create-a-clip": "create a clip",
-    "create-a-clip-and-play-replay": "create a clip and play as replay (overlay/alerts)",
     "increment-custom-variable": "increment a custom variable",
     "set-custom-variable": "set a custom variable",
     "decrement-custom-variable": "decrement a custom variable",

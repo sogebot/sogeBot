@@ -261,6 +261,11 @@
           "label": "Emote-Feuerwerk",
           "placeholder": "Liste der Emotes, z.B. Kappa PurpleHeart"
         },
+        "replay": {
+          "label": "Replay clip in overlay",
+          "true": "Will play in as replay in overlay/alerts",
+          "false": "Replay won't be played"
+        },
         "announce": {
           "label": "Im Chat ankündigen",
           "true": "Wird angekündigt",
@@ -836,7 +841,6 @@
     "bot-will-join-channel": "Bot tritt dem Kanal bei",
     "bot-will-leave-channel": "Bot wird den Kanal verlassen",
     "create-a-clip": "Clip erstellen",
-    "create-a-clip-and-play-replay": "einen Clip erstellen und als Wiedergabe abspielen (Overlay/Alers)",
     "increment-custom-variable": "Erhöhen Sie eine benutzerdefinierte Variable",
     "set-custom-variable": "eine eigene Variable setzen",
     "decrement-custom-variable": "Verringern Sie eine benutzerdefinierte Variable",

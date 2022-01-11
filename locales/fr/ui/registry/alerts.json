@@ -114,6 +114,11 @@
     "placeholder": "Mettez votre modèle de message",
     "help": "Variables possibles: {name}, {amount} (cheers, subs, dons, subgifts, sub gift a la communauté, demandes de commandes), {recipient} (subgifts, demandes de commandes), {monthsName} (subs, subgifts), {currency} (tips)"
   },
+  "ttsTemplate": {
+    "name": "TTS template",
+    "placeholder": "Set your TTS template",
+    "help": "Available variables: {name}, {amount} {monthsName} {currency} {message}"
+  },
   "animationText": {
     "name": "Animation du texte"
   },

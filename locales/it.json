@@ -261,6 +261,11 @@
           "label": "Emotes per Fuochi D'Artificio",
           "placeholder": "Elenco delle emotes per fuoco d'artificio, ad esempio Kappa PurpleHeart"
         },
+        "replay": {
+          "label": "Replay clip in overlay",
+          "true": "Will play in as replay in overlay/alerts",
+          "false": "Replay won't be played"
+        },
         "announce": {
           "label": "Annuncio in chat",
           "true": "Sarà annunciato",
@@ -836,7 +841,6 @@
     "bot-will-join-channel": "il bot entrerà nel canale",
     "bot-will-leave-channel": "il bot uscirà dal canale",
     "create-a-clip": "crea una clip",
-    "create-a-clip-and-play-replay": "crea una clip e riproduci come replay (overlay/alerts)",
     "increment-custom-variable": "incrementa una variabile personalizzata",
     "set-custom-variable": "imposta una variabile personalizzata",
     "decrement-custom-variable": "diminuisci una variabile personalizzata",
