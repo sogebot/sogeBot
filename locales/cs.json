@@ -262,9 +262,9 @@
           "placeholder": "Seznam emotes k ohňostroji, např. Kappa PurpleHeart"
         },
         "replay": {
-          "label": "Replay clip in overlay",
-          "true": "Will play in as replay in overlay/alerts",
-          "false": "Replay won't be played"
+          "label": "Přehrát klip v overlayi",
+          "true": "Přehraje záznam v overlay/alerts",
+          "false": "Záznam se nepřehraje"
         },
         "announce": {
           "label": "Oznámit v chatu",
