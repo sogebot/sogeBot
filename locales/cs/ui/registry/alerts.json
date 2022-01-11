@@ -115,9 +115,9 @@
     "help": "Dostupné proměnné: {name}, {amount} (bits, subs, tips, subgifts, sub community gifts, command redeems), {recipient} (subgifts, command redeems), {monthsName} (subs, subgifts), {currency} (tips)"
   },
   "ttsTemplate": {
-    "name": "TTS template",
-    "placeholder": "Set your TTS template",
-    "help": "Available variables: {name}, {amount} {monthsName} {currency} {message}"
+    "name": "TTS šablona",
+    "placeholder": "Nastavte si šablonu TTS",
+    "help": "Dostupné proměnné: {name}, {amount} {monthsName} {currency} {message}"
   },
   "animationText": {
     "name": "Animace textu"
