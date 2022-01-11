@@ -27,6 +27,7 @@ jobs:
         localization_branch_name: l10n_crowdin_action
         download_translations: true
         create_pull_request: true
+        commit_message: 'chore(locales): crowdin update'
         pull_request_title: 'chore(locales): crowdin update'
         pull_request_body: '[skip-tests]'
 
