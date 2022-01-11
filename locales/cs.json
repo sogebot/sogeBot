@@ -261,6 +261,11 @@
           "label": "Emotes k ohňostroji",
           "placeholder": "Seznam emotes k ohňostroji, např. Kappa PurpleHeart"
         },
+        "replay": {
+          "label": "Replay clip in overlay",
+          "true": "Will play in as replay in overlay/alerts",
+          "false": "Replay won't be played"
+        },
         "announce": {
           "label": "Oznámit v chatu",
           "true": "Bude oznámeno",
@@ -339,6 +344,7 @@
         "game": "Aktuální hra",
         "language": "Aktuální jazyk vysílání",
         "viewers": "Aktuální počet diváků",
+        "hostViewers": "Počet diváků z hostováni/nájezdu",
         "views": "Aktuální počet zobrazení",
         "followers": "Aktuální počet followerů",
         "subscribers": "Aktuální počet subscriberů",
@@ -594,7 +600,6 @@
     "permissions": "Oprávnění",
     "permission": "Oprávnění",
     "viewers": "Diváci",
-    "hostViewers": "Host/Raid viewers count",
     "systems": "Moduly",
     "overlays": "Overlaye",
     "gallery": "Galerie médií",
@@ -836,7 +841,6 @@
     "bot-will-join-channel": "bot se připojí k kanálu",
     "bot-will-leave-channel": "bot opustí kanál",
     "create-a-clip": "vytvořit klip",
-    "create-a-clip-and-play-replay": "vytvořit klip a přehrát (overlay/alerts)",
     "increment-custom-variable": "přičíst do vlastní proměnné",
     "set-custom-variable": "nastavit vlastní proměnnou",
     "decrement-custom-variable": "odečíst z vlastní proměnné",

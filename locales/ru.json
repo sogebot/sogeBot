@@ -261,6 +261,11 @@
           "label": "Смайлы для фейерверка",
           "placeholder": "Список смайлов для фейерверка, например, Kappa PurpleHeart"
         },
+        "replay": {
+          "label": "Replay clip in overlay",
+          "true": "Will play in as replay in overlay/alerts",
+          "false": "Replay won't be played"
+        },
         "announce": {
           "label": "Объявить в чате",
           "true": "Будет объявлено",
@@ -836,7 +841,6 @@
     "bot-will-join-channel": "бот присоединится к каналу",
     "bot-will-leave-channel": "бот покинет канал",
     "create-a-clip": "создать клип",
-    "create-a-clip-and-play-replay": "создать клип и воспроизвести как повтор (overlay/alerts)",
     "increment-custom-variable": "увеличенить переменную",
     "set-custom-variable": "set a custom variable",
     "decrement-custom-variable": "уменьшить переменную",

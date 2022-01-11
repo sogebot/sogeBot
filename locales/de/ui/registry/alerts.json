@@ -114,6 +114,11 @@
     "placeholder": "Nachrichtenvorlage festlegen",
     "help": "Verfügbare Variablen: {name}, {amount} (Grüße, Subs, Tipps, Subgeschenke, Sub Community Geschenke, Befehlseinlöse), {recipient} (Subgeschenke, Befehlseinlöse), {monthsName} (Subgeschenke, Subgeschenke), {currency} (Tipps)"
   },
+  "ttsTemplate": {
+    "name": "TTS template",
+    "placeholder": "Set your TTS template",
+    "help": "Available variables: {name}, {amount} {monthsName} {currency} {message}"
+  },
   "animationText": {
     "name": "Animationstext"
   },
