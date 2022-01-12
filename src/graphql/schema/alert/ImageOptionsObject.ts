@@ -1,5 +1,5 @@
 import {
-  Field, Float, ObjectType, 
+  Field, Float, ObjectType,
 } from 'type-graphql';
 
 @ObjectType()
@@ -10,4 +10,6 @@ export class ImageOptionsObject {
     translateY: number;
   @Field(type => Float)
     scale: number;
+  @Field()
+    loop: boolean;
 }

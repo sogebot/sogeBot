@@ -66,6 +66,7 @@ export interface CommonSettingsInterface {
     translateX: number;
     translateY: number;
     scale: number;
+    loop: boolean;
   };
   soundId: string;
   soundVolume: number;
