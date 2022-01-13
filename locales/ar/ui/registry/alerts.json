@@ -137,6 +137,9 @@
   "layoutPicker": {
     "name": "Layout"
   },
+  "loop": {
+    "name": "Play on loop"
+  },
   "scale": {
     "name": "Scale"
   },

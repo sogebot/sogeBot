@@ -34,6 +34,10 @@
     "empty": "пусто",
     "isRegistered": "$sender, вы не можете использовать !$keyword, потому что уже используется для другого действия!"
   },
+  "clip": {
+    "notCreated": "Something went wrong and clip was not created.",
+    "offline": "Stream is currently offline and clip cannot be created."
+  },
   "uptime": {
     "online": "Стрим идёт (if $days>0|$daysд )(if $hours>0|$hoursч )(if $minutes>0|$minutesм )(if $seconds>0|$secondsс)",
     "offline": "Стрим оффлайн (if $days>0|$daysд )(if $hours>0|$hoursч )(if $minutes>0|$minutesм )(if $seconds>0|$secondsс)"
@@ -454,6 +458,7 @@
         "userInput": "User input during reward redeem",
         "isBotSubscriber": "Является подписчиком бота (bool)",
         "isStreamOnline": "Трансляция онлайн (бул)",
+        "uptime": "Uptime of stream",
         "is": {
           "moderator": "Пользователь модератор? (bool)",
           "subscriber": "Пользователь сабскрайбер? (bool)",

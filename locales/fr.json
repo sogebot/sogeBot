@@ -34,6 +34,10 @@
     "empty": "vide",
     "isRegistered": "$sender, vous ne pouvez pas utiliser !$keyword, car il est déjà utilisé pour une autre action !"
   },
+  "clip": {
+    "notCreated": "Something went wrong and clip was not created.",
+    "offline": "Stream is currently offline and clip cannot be created."
+  },
   "uptime": {
     "online": "Le stream est en ligne pour (if $days>0|$daysd )(if $hours>0|$hoursh )(if $minutes>0|$minutesm )(if $seconds>0|$secondss)",
     "offline": "Le stream est actuellement hors ligne pour (if $days>0|$daysd )(if $hours>0|$hoursh )(if $minutes>0|$minutesm )(if $seconds>0|$secondss)"
@@ -454,6 +458,7 @@
         "userInput": "User input during reward redeem",
         "isBotSubscriber": "Is bot subscriber (bool)",
         "isStreamOnline": "Is stream online (bool)",
+        "uptime": "Uptime of stream",
         "is": {
           "moderator": "Is user mod? (bool)",
           "subscriber": "Is user sub? (bool)",
