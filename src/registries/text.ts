@@ -1,6 +1,8 @@
 import { Text as TextEntity } from '@entity/text';
 import { getRepository } from 'typeorm';
 
+import { readdirSync } from 'fs';
+
 import { onStartup } from '../decorators/on';
 import Message from '../message';
 import Registry from './_interface';
@@ -46,6 +48,21 @@ class Text extends Registry {
         );
       } catch (e: any) {
         cb(e.stack);
+      }
+    });
+    adminEndpoint(this.nsp, 'text::presets', async(_, cb) => {
+      try {
+        const folders = readdirSync('./assets/presets/textOverlay/');
+        if (cb) {
+          cb(
+            null,
+            folders,
+          );
+        }
+      } catch (e: any) {
+        if (cb) {
+          cb(e.stack, null);
+        }
       }
     });
     adminEndpoint(this.nsp, 'text::save', async(item, cb) => {
