@@ -1,8 +1,6 @@
 name: Crowdin Action
 
 on:
-  push:
-    branches: [ master ]
   schedule:
     - cron: "* */1 * * *" # run every hour
 
