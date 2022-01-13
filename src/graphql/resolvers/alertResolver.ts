@@ -194,8 +194,8 @@ export class alertResolver {
   @Arg('data') data_json: string,
   ) {
     const data: AlertInterface = JSON.parse(data_json);
-    const alert = await getRepository(Alert).save({ ...data, updatedAt: Date.now() })
-    await clearMedia()
+    const alert = await getRepository(Alert).save({ ...data, updatedAt: Date.now() });
+    await clearMedia();
     return alert;
   }
 

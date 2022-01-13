@@ -17,6 +17,7 @@ import { debug, error, info } from '../helpers/log';
 import users from '../users';
 import Service from './_interface';
 import { init as apiIntervalInit , stop as apiIntervalStop } from './twitch/api/interval';
+import { createClip } from './twitch/calls/createClip';
 import { createMarker } from './twitch/calls/createMarker';
 import Chat from './twitch/chat';
 import Emotes from './twitch/emotes';
@@ -42,7 +43,6 @@ import { isIgnored } from '~/helpers/user/isIgnored';
 import { sendGameFromTwitch } from '~/services/twitch/calls/sendGameFromTwitch';
 import { setTitleAndGame } from '~/services/twitch/calls/setTitleAndGame';
 import { translate } from '~/translate';
-import { createClip } from './twitch/calls/createClip';
 
 const urls = {
   'SogeBot Token Generator': 'https://twitch-token-generator.soge.workers.dev/refresh/',
