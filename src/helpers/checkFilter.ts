@@ -1,4 +1,5 @@
 import { EventList } from '@entity/eventList';
+import { getTime } from '@sogebot/ui-helpers/getTime';
 import gitCommitInfo from 'git-commit-info';
 import _ from 'lodash';
 import { getRepository, In } from 'typeorm';
@@ -20,6 +21,8 @@ import * as changelog from './user/changelog.js';
 import { isBot, isBotSubscriber } from './user/isBot';
 import { isBroadcaster } from './user/isBroadcaster';
 import { isModerator } from './user/isModerator';
+
+import { variables as vars } from '~/watchers';
 
 class HelpersFilter {
   @timer()
@@ -81,6 +84,9 @@ class HelpersFilter {
       // message doesn't have any variables
       return {};
     }
+
+    const uptime = vars.get('services.twitch.uptime') as number;
+
     const variables: Record<string, any> = {
       $game:            stats.value.currentGame,
       $language:        stats.value.language,
@@ -93,6 +99,7 @@ class HelpersFilter {
       $source:          opts.sender && typeof opts.discord !== 'undefined' ? 'discord' : 'twitch',
       $isBotSubscriber: isBotSubscriber(),
       $isStreamOnline:  isStreamOnline.value,
+      $uptime:          getTime(Date.now() - uptime, false),
     };
 
     if (message.includes('$version')) {

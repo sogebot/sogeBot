@@ -75,6 +75,8 @@ bot it is twitch by default
 
 `$isStreamOnline` - return true/false (boolean) if stream is online
 
+`$uptime` - return uptime of the stream
+
 ## Count subs / follows/ bits / tips in date interval
 
 - `(count|subs|<interval>)` - return subs+resubs count in interval

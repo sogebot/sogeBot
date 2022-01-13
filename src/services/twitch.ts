@@ -55,6 +55,9 @@ class Twitch extends Service {
   eventsub: import('./twitch/eventsub').default | null;
 
   @persistent()
+    uptime = 0;
+
+  @persistent()
     botTokenValid = false;
   @persistent()
     broadcasterTokenValid = false;
@@ -199,6 +202,10 @@ class Twitch extends Service {
         }
         markerEvents.clear();
       }
+
+      if (isStreamOnline.value) {
+        this.uptime += SECOND;
+      }
     }, SECOND);
   }
 
@@ -319,6 +326,7 @@ class Twitch extends Service {
 
   @onStreamStart()
   reconnectOnStreamStart() {
+    this.uptime = 0;
     if (this.enabled) {
       this.tmi?.part('bot').then(() => this.tmi?.join('bot', this.currentChannel));
       this.tmi?.part('broadcaster').then(() => this.tmi?.join('broadcaster', this.currentChannel));
@@ -394,7 +402,7 @@ class Twitch extends Service {
   }
 
   @command('!uptime')
-  async uptime (opts: CommandOptions) {
+  async uptimeCmd (opts: CommandOptions) {
     const time = getTime(streamStatusChangeSince.value, true) as any;
     return [
       {
