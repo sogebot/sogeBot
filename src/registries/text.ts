@@ -1,7 +1,7 @@
+import { readdirSync } from 'fs';
+
 import { Text as TextEntity } from '@entity/text';
 import { getRepository } from 'typeorm';
-
-import { readdirSync } from 'fs';
 
 import { onStartup } from '../decorators/on';
 import Message from '../message';
