@@ -7,11 +7,6 @@
     "npm": ">=8.0.0",
     "node": ">=16.11.1"
   },
-  "simple-git-hooks": {
-    "pre-commit": "npx simple-git-hooks && npx lint-staged",
-    "commit-msg": "node ./tools/pre-commit-message.js $1 $2 $3",
-    "preserveUnused": true
-  },
   "main": "main.js",
   "author": "Michal Orlik <sogehige@gmail.com>",
   "license": "MIT",
@@ -156,6 +151,7 @@
     "eslint": "8.6.0",
     "eslint-plugin-import": "2.25.4",
     "git-semver-tags": "4.1.1",
+    "husky": "^7.0.4",
     "jsonlint-mod": "1.7.6",
     "lint-staged": "12.1.7",
     "minimist": "1.2.5",

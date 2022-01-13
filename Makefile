@@ -23,9 +23,8 @@ else
 	npm install --also=dev
 	sed -i 's/git+ssh/git+https/g' package-lock.json
 endif
-	@echo -ne "\n\t ----- Installation of simple-git-hooks\n"
-	git config core.hooksPath .git/hooks/
-	npx simple-git-hooks
+	@echo -ne "\n\t ----- Installation of husky\n"
+	npx husky install
 	@echo -ne "\n\t ----- Going through node_modules patches\n"
 	# How to create node_modules patch: https://opensource.christmas/2019/4
 	patch --forward node_modules/obs-websocket-js/types/index.d.ts < patches/obswebsocketTypeExpose.patch
