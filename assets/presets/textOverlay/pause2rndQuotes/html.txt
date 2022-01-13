@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<title></title>
+		<meta charset="utf-8">
+		<meta name="robots" content="index, follow">
+		<meta name="viewport" content="width=device-width,initial-scale=1,shrink-to-fit=no">
+	</head>
+	<body class="w3-black">
+		<div class="center">
+			<div class="content">
+    	    
+				<div class="w3-row">
+					<div class="w3-container">
+						<div class="w3-card-4 w3-border w3-round-large w3-black" style="width:100%;">
+							<header class="w3-center w3-text-white">
+								<div style="font-size: 3em; font-weight: bold;">SHORT BREAK</div>
+							</header>
+							<div id="showPauseQuotes" style="font-size: 3em;" class="w3-container w3-col w3-center w3-text-white">I'm taking a shower...pics avalible soon</div>
+						</div>
+					</div>
+					<div class="w3-container w3-center">
+						<img id="rndimg" class="w3-round" style="max-width:100%; max-height: 480px;">
+					</div>
+				</div>
+
+			</div>
+		</div>
+
+	</body>
+</html>
