@@ -42,6 +42,7 @@ import { isIgnored } from '~/helpers/user/isIgnored';
 import { sendGameFromTwitch } from '~/services/twitch/calls/sendGameFromTwitch';
 import { setTitleAndGame } from '~/services/twitch/calls/setTitleAndGame';
 import { translate } from '~/translate';
+import { createClip } from './twitch/calls/createClip';
 
 const urls = {
   'SogeBot Token Generator': 'https://twitch-token-generator.soge.workers.dev/refresh/',
@@ -399,6 +400,23 @@ class Twitch extends Service {
       this.emotes?._test();
       cb(null, null);
     });
+  }
+
+  @command('!clip')
+  @default_permission(defaultPermissions.CASTERS)
+  async clip (opts: CommandOptions) {
+    const cid = await createClip({ createAfterDelay: false });
+    if (cid) {
+      return [{
+        response: prepare('api.clips.created', { link: `https://clips.twitch.tv/${cid}` }),
+        ...opts,
+      }];
+    } else {
+      return [{
+        response: await translate(isStreamOnline.value ? 'clip.notCreated' : 'clip.offline'),
+        ...opts,
+      }];
+    }
   }
 
   @command('!uptime')
