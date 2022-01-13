@@ -40,8 +40,8 @@ import { tmiEmitter } from '~/helpers/tmi';
 import * as changelog from '~/helpers/user/changelog.js';
 import { isIgnored } from '~/helpers/user/isIgnored';
 import { sendGameFromTwitch } from '~/services/twitch/calls/sendGameFromTwitch';
-import { setTitleAndGame } from '~/services/twitch/calls/setTitleAndGame';
 import { translate } from '~/translate';
+import { setTitleAndGame } from '~/services/twitch/calls/setTitleAndGame';
 import { createClip } from './twitch/calls/createClip';
 
 const urls = {
