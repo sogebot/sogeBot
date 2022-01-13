@@ -137,6 +137,9 @@
   "layoutPicker": {
     "name": "Шар"
   },
+  "loop": {
+    "name": "Play on loop"
+  },
   "scale": {
     "name": "Scale"
   },

@@ -137,6 +137,9 @@
   "layoutPicker": {
     "name": "Rozvržení"
   },
+  "loop": {
+    "name": "Play on loop"
+  },
   "scale": {
     "name": "Měřítko"
   },
