@@ -545,13 +545,13 @@ class Events extends Core {
 
   public async checkRaid(event: EventInterface, attributes: EventsEntity.Attributes) {
     event.definitions.viewersAtLeast = Number(event.definitions.viewersAtLeast); // force Integer
-    const shouldTrigger = (attributes.viewers >= event.definitions.viewersAtLeast);
+    const shouldTrigger = (attributes.hostViewers >= event.definitions.viewersAtLeast);
     return shouldTrigger;
   }
 
   public async checkHosted(event: EventInterface, attributes: EventsEntity.Attributes) {
     event.definitions.viewersAtLeast = Number(event.definitions.viewersAtLeast); // force Integer
-    const shouldTrigger = (attributes.viewers >= event.definitions.viewersAtLeast);
+    const shouldTrigger = (attributes.hostViewers >= event.definitions.viewersAtLeast);
     return shouldTrigger;
   }
 
