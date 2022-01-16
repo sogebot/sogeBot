@@ -47,10 +47,8 @@ const updateFollowerState = async(users: (Readonly<Required<UserInterface>>)[], 
   // handle users currently not following
   for (const user of users.filter(o => !o.isFollower)) {
     const apiUser = usersFromAPI.find(userFromAPI => userFromAPI.from_id === user.userId) as typeof usersFromAPI[0];
-    if (new Date().getTime() - new Date(apiUser.followed_at).getTime() < 2 * constants.HOUR) {
-      if (user.followedAt === 0 || new Date().getTime() - user.followedAt > 60000 * 60) {
-        follow(user.userId, user.userName, user.followedAt);
-      }
+    if (Date.now() - new Date(apiUser.followed_at).getTime() < 2 * constants.HOUR) {
+      follow(user.userId, user.userName, user.followedAt);
     }
   }
 
