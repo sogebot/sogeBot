@@ -100,7 +100,7 @@ class EventSub {
             }
           } */
 
-          follow(data.event.user_id, data.event.user_name, data.event.followed_at);
+          follow(data.event.user_id, data.event.user_login, data.event.followed_at);
           res.status(200).send('OK');
         }  else if (data.subscription.type === 'channel.poll.begin') {
           channelPoll.setData(data.event);
