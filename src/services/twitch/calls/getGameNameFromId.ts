@@ -28,7 +28,7 @@ async function getGameNameFromId (id: number) {
     return getGameById.name;
   } catch (e: unknown) {
     if (e instanceof Error) {
-      warning('getGameNameFromId => ' + e.stack ?? e.message);
+      warning(`getGameNameFromId => ${e.stack ?? e.message}`);
     }
     return stats.value.currentGame;
   }
