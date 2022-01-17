@@ -136,7 +136,7 @@ class EmotesCombo extends System {
                   emote:  this.comboEmote,
                   amount: this.comboEmoteCount,
                 }, false),
-                opts,
+                { ...opts, forbidReply: true },
               );
             }
           }
