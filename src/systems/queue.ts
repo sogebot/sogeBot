@@ -6,6 +6,7 @@ import {
 } from '../decorators';
 import System from './_interface';
 
+import { parserReply } from '~/commons';
 import { getBotSender, prepare } from '~/helpers/commons';
 import { defaultPermissions } from '~/helpers/permissions/index';
 import { adminEndpoint } from '~/helpers/socket';
@@ -19,7 +20,7 @@ import { translate } from '~/translate';
  * !queue close                      - close a queue
  * !queue pick [amount]              - pick [amount] (optional) of users from queue
  * !queue random [amount]            - random [amount] (optional) of users from queue
- * !queue join                       - join a queue
+ * !queue join [optional-message]    - join a queue
  * !queue clear                      - clear a queue
  * !queue list                       - current list of queue
  */
@@ -75,15 +76,25 @@ class Queue extends System {
             users.push(user);
           }
           if (cb) {
-            cb(null, (await this.pickUsers({
+            const opts = {
               sender: getBotSender(), users, attr: {}, createdAt: Date.now(), command: '', parameters: '', isAction: false, emotesOffsets: new Map(), isFirstTimeMessage: false, discord: undefined,
-            }, data.random)).users);
+            };
+            const picked = await this.pickUsers(opts, data.random);
+            for (let i = 0; i < picked.responses.length; i++) {
+              await parserReply(picked.responses[i].response, { sender: picked.responses[i].sender, discord: picked.responses[i].discord, attr: picked.responses[i].attr, id: '' });
+            }
+            cb(null, picked.users);
           }
         } else {
           if (cb) {
-            cb(null, (await this.pickUsers({
+            const opts = {
               sender: getBotSender(), attr: {}, createdAt: Date.now(), command: '', parameters: String(data.count), isAction: false, emotesOffsets: new Map(), isFirstTimeMessage: false, discord: undefined,
-            }, data.random)).users);
+            };
+            const picked = await this.pickUsers(opts, data.random);
+            for (let i = 0; i < picked.responses.length; i++) {
+              await parserReply(picked.responses[i].response, { sender: picked.responses[i].sender, discord: picked.responses[i].discord, attr: picked.responses[i].attr, id: '' });
+            }
+            cb(null, picked.users);
           }
         }
       } catch (e: any) {
@@ -153,6 +164,9 @@ class Queue extends System {
       }
       const [all, followers, subscribers] = await Promise.all([this.eligibilityAll, this.eligibilityFollowers, this.eligibilitySubscribers]);
 
+      // get message
+      const message = opts.parameters.length > 0 ? opts.parameters : null;
+
       let eligible = false;
       if (!all) {
         if ((followers && subscribers) && (user.isFollower || user.isSubscriber)) {
@@ -174,6 +188,7 @@ class Queue extends System {
           isSubscriber: user.isSubscriber,
           isModerator:  user.isModerator,
           createdAt:    Date.now(),
+          message,
 
         });
         return [{ response: translate('queue.join.opened'), ...opts }];
@@ -240,7 +255,10 @@ class Queue extends System {
         msg = translate('queue.picked.multi');
     }
 
-    const response = msg.replace(/\$users/g, users.map(o => atUsername ? `@${o.username}` : o.username).join(', '));
+    const response = msg.replace(/\$users/g, users.map(o => {
+      const user = o.message ? `${o.username} - ${o.message}` : o.username;
+      return atUsername ? `@${user}` : user;
+    }).join(', '));
     return {
       users,
       responses: [{ response, ...opts }],
