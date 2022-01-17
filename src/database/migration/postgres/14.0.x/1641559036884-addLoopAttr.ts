@@ -28,7 +28,7 @@ export class addLoopAttr1641559036884 implements MigrationInterface {
           loop: false,
         });
         await queryRunner.query(
-          `INSERT INTO "alert_${type}"(${keys.map(o => `"${o}"`).join(', ')}) values (${keys.map(o => `?`).join(', ')})`,
+          `INSERT INTO "alert_${type}"(${keys.map(o => `"${o}"`).join(', ')}) values (${keys.map((o, idx) => `$${idx+1}`).join(', ')})`,
           keys.map(key => alert[key]),
         );
       }

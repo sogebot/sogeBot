@@ -8,25 +8,25 @@ export class mergeClipEvents1641559036883 implements MigrationInterface {
 
     for (const operation of operations) {
       if (operation.name === 'create-a-clip') {
-        await queryRunner.query(`DELETE FROM "event_operation" WHERE "id"=?`, [operation.id]);
+        await queryRunner.query(`DELETE FROM "event_operation" WHERE "id"=$1`, [operation.id]);
         const keys = Object.keys(operation);
         operation.definitions = JSON.stringify({
           ...(JSON.parse(operation.definitions) as Record<string, any>),
           replay: false,
         });
-        await queryRunner.query(`INSERT INTO "event_operation" (${keys.map(o => `${o}`).join(', ')}) values (${keys.map(o => `?`).join(', ')})`,
+        await queryRunner.query(`INSERT INTO "event_operation" (${keys.map(o => `${o}`).join(', ')}) values (${keys.map((o, idx) => `$${idx+1}`).join(', ')})`,
           keys.map(o => operation[o]));
       }
 
       if (operation.name === 'create-a-clip-and-play-replay') {
-        await queryRunner.query(`DELETE FROM "event_operation" WHERE "id"=?`, [operation.id]);
+        await queryRunner.query(`DELETE FROM "event_operation" WHERE "id"=$1`, [operation.id]);
         const keys = Object.keys(operation);
         operation.name = 'create-a-clip';
         operation.definitions = JSON.stringify({
           ...(JSON.parse(operation.definitions) as Record<string, any>),
           replay: true,
         });
-        await queryRunner.query(`INSERT INTO "event_operation" (${keys.map(o => `${o}`).join(', ')}) values (${keys.map(o => `?`).join(', ')})`,
+        await queryRunner.query(`INSERT INTO "event_operation" (${keys.map(o => `${o}`).join(', ')}) values (${keys.map((o, idx) => `$${idx+1}`).join(', ')})`,
           keys.map(o => operation[o]));
       }
     }

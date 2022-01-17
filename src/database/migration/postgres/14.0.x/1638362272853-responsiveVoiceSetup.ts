@@ -8,9 +8,9 @@ export class responsiveVoiceSetup1638362272853 implements MigrationInterface {
       return o.namespace === '/integrations/responsivevoice';
     });
     if(responsiveVoiceKey) {
-      await queryRunner.query(`DELETE from "settings" WHERE "id"=?`, [responsiveVoiceKey.id]);
-      await queryRunner.query(`INSERT INTO "settings"("namespace", "name", "value") VALUES(?, ?, ?)`, ['/core/tts', 'responsiveVoiceKey', responsiveVoiceKey.value]);
-      await queryRunner.query(`INSERT INTO "settings"("namespace", "name", "value") VALUES(?, ?, ?)`, ['/core/tts', 'service', JSON.stringify(0)]);
+      await queryRunner.query(`DELETE from "settings" WHERE "id"=$1`, [responsiveVoiceKey.id]);
+      await queryRunner.query(`INSERT INTO "settings"("namespace", "name", "value") VALUES($1, $2, $3)`, ['/core/tts', 'responsiveVoiceKey', responsiveVoiceKey.value]);
+      await queryRunner.query(`INSERT INTO "settings"("namespace", "name", "value") VALUES($1, $2, $3)`, ['/core/tts', 'service', JSON.stringify(0)]);
     }
   }
 
