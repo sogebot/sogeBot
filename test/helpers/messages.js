@@ -84,13 +84,11 @@ module.exports = {
     }, waitMs);
   },
   isWarnedRaw: async function (entry, user, opts) {
-    const { prepare } = require('../../dest/helpers/commons/prepare');
-    user = _.cloneDeep(user);
     opts = opts || {};
     await until(async setError => {
       let expected = [];
       if (_.isArray(opts)) {
-        for (const o of opts) {
+        for (let i = 0; i < opts.length; i++) {
           expected.push(entry);
         }
       } else {

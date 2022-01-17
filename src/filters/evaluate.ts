@@ -1,5 +1,3 @@
-import _ from 'lodash';
-
 import { runScript } from '../helpers/customvariables/runScript.js';
 
 import type { ResponseFilter } from '.';
