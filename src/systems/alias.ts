@@ -19,7 +19,7 @@ import { incrementCountOfCommandUsage } from '~/helpers/commands/count';
 import { prepare } from '~/helpers/commons';
 import { executeVariablesInText } from '~/helpers/customvariables';
 import {
-  debug, error, warning,
+  debug, error, info, warning,
 } from '~/helpers/log';
 import {
   addToViewersCache, get, getFromViewersCache,
@@ -160,6 +160,7 @@ class Alias extends System {
 
           incrementCountOfCommandUsage(alias.alias);
         } else {
+          info(`User ${opts.sender.userName}#${opts.sender.userId} doesn't have permissions to use ${alias.alias}`);
           return false;
         }
       }

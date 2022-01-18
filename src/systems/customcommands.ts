@@ -18,7 +18,7 @@ import {
   getAllCountOfCommandUsage, getCountOfCommandUsage, incrementCountOfCommandUsage, resetCountOfCommandUsage,
 } from '~/helpers/commands/count';
 import { prepare } from '~/helpers/commons';
-import { warning } from '~/helpers/log';
+import { info, warning } from '~/helpers/log';
 import {
   addToViewersCache, get, getFromViewersCache,
 } from '~/helpers/permissions';
@@ -329,6 +329,8 @@ class CustomCommands extends System {
           if (r.stopIfExecuted) {
             break;
           }
+        } else {
+          info(`User ${opts.sender.userName}#${opts.sender.userId} doesn't have permissions to use ${cmd.command.command}#${cmd.command.id}|${r.order}`);
         }
       }
 

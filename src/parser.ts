@@ -11,7 +11,7 @@ import {
 import { incrementCountOfCommandUsage } from '~/helpers/commands/count';
 import { getBotSender } from '~/helpers/commons';
 import {
-  debug, error, warning,
+  debug, error, info, warning,
 } from '~/helpers/log';
 import { parserEmitter } from '~/helpers/parser/emitter';
 import { populatedList } from '~/helpers/parser/populatedList';
@@ -349,6 +349,7 @@ class Parser {
         return [];
       }
     } else {
+      info(`User ${this.sender.userName}#${this.sender.userId} doesn't have permissions to use ${command.command}`);
       // do all rollbacks when permission failed
       const rollbacks = await this.rollbacks();
       for (const r of rollbacks) {
