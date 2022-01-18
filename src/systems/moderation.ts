@@ -251,7 +251,7 @@ class Moderation extends System {
 
     // check if spotify -or- alias of spotify contain open.spotify.com link
     if (spotify.enabled) {
-      const cmd = (await spotify.commands()).find(o => o._fncName === 'main')?.command ?? '!spotify';
+      const cmd = spotify.getCommand('!spotify');
       const alias = await getRepository(Alias).findOne({ where: { command: cmd } });
       if (alias && alias.enabled && aliasSystem.enabled) {
         spotifyRegex = new RegExp('^(' + cmd + '|' + alias.alias + ') \\S+open\\.spotify\\.com\\/track\\/(\\w+)(.*)?', 'gi');
