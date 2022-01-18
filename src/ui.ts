@@ -15,6 +15,9 @@ import { variables } from '~/watchers';
 
 class UI extends Core {
   @settings()
+  public enablePublicPage = false;
+
+  @settings()
   public domain = 'localhost';
 
   @settings()

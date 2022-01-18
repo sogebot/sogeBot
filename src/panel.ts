@@ -220,7 +220,14 @@ class Panel extends Core {
       res.sendFile(path.join(__dirname, '..', 'node_modules', '@sogebot', 'ui-overlay', 'dist', 'index.html'));
     });
     app?.get('/public/', function (req, res) {
-      res.sendFile(path.join(__dirname, '..', 'node_modules', '@sogebot', 'ui-public', 'dist', 'index.html'));
+      if (variables.get('core.ui.enablePublicPage')) {
+        res.sendFile(path.join(__dirname, '..', 'node_modules', '@sogebot', 'ui-public', 'dist', 'index.html'));
+      } else {
+        if (req.originalUrl !== '/public/?check=true') {
+          info('Public page has been disabled, enable in Admin UI -> settings -> ui');
+        }
+        res.status(404).send();
+      }
     });
     app?.get('/credentials/oauth/:page?', function (req, res) {
       res.sendFile(path.join(__dirname, '..', 'node_modules', '@sogebot', 'ui-oauth', 'dist', 'oauth', 'index.html'));
