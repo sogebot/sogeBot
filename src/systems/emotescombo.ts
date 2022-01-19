@@ -7,6 +7,7 @@ import { parserReply } from '../commons';
 import { parser, settings } from '../decorators';
 import System from './_interface';
 
+import { onStreamStart } from '~/decorators/on';
 import { prepare } from '~/helpers/commons';
 import { ioServer } from '~/helpers/panel';
 import { translate } from '~/translate';
@@ -44,6 +45,13 @@ class EmotesCombo extends System {
   comboEmote = '';
   comboEmoteCount = 0;
   comboLastBreak = 0;
+
+  @onStreamStart()
+  reset() {
+    this.comboEmote = '';
+    this.comboEmoteCount = 0;
+    this.comboLastBreak = 0;
+  }
 
   @parser({ priority: constants.LOW, fireAndForget: true })
   async containsEmotes (opts: ParserOptions) {
