@@ -7,6 +7,7 @@
     },
     "percentage": "Differenza percentuale per le statistiche",
     "shortennumbers": "Breve formato dei numeri",
-    "showdiff": "Mostra differenza"
+    "showdiff": "Mostra differenza",
+    "enablePublicPage": "Enable public page"
   }
 }
