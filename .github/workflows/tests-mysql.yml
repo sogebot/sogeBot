@@ -1,7 +1,7 @@
 name: MySQL/MariaDB tests
 
 concurrency:
-  group: ${{ github.head_ref || github.ref }}
+  group: mysql-${{ github.head_ref || github.ref }}
   cancel-in-progress: true
 
 on:
