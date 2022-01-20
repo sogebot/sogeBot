@@ -18,6 +18,11 @@ import { variables } from '~/watchers';
 let botTokenErrorSent = false;
 let broadcasterTokenErrorSent = false;
 
+export const invalidDataErrorSent = {
+  bot:         false,
+  broadcaster: false,
+};
+
 export const expirationDate = {
   bot:         -1,
   broadcaster: -1,
@@ -105,11 +110,19 @@ export const validate = async (type: 'bot' | 'broadcaster', retry = 0, clear = f
       }
     }, 10000);
 
+    if (request.data.user_id && request.data.user_id.length > 0
+      && request.data.login && request.data.login.length > 0) {
+      emitter.emit('set', '/services/twitch', `${type}TokenValid`, true);
+      invalidDataErrorSent[type] = false;
+    } else {
+      emitter.emit('set', '/services/twitch', `${type}TokenValid`, false);
+      throw new Error(`No valid data from Twitch for ${type}.\n${JSON.stringify(request.data, null, 2)}`);
+    }
+
     if (type === 'bot') {
       emitter.emit('set', '/services/twitch', 'botId', request.data.user_id);
       emitter.emit('set', '/services/twitch', 'botUsername', request.data.login);
       emitter.emit('set', '/services/twitch', 'botCurrentScopes', request.data.scopes);
-      emitter.emit('set', '/services/twitch', 'botTokenValid', true);
       botTokenErrorSent = false;
 
       setTimeout(async () => {
@@ -126,7 +139,6 @@ export const validate = async (type: 'bot' | 'broadcaster', retry = 0, clear = f
       emitter.emit('set', '/services/twitch', 'broadcasterId', request.data.user_id);
       emitter.emit('set', '/services/twitch', 'broadcasterUsername', request.data.login);
       emitter.emit('set', '/services/twitch', 'broadcasterCurrentScopes', request.data.scopes);
-      emitter.emit('set', '/services/twitch', 'broadcasterTokenValid', true);
       broadcasterTokenErrorSent = false;
     }
 
@@ -155,6 +167,17 @@ export const validate = async (type: 'bot' | 'broadcaster', retry = 0, clear = f
       throw new Error(`Error on validate ${type} OAuth token, error: ${e.response.status} - ${e.response.statusText} - ${e.response.data.message}`);
     } else {
       debug('oauth.validate', e.stack);
+      if (e.message.includes('No valid data from Twitch')) {
+        if (!invalidDataErrorSent[type]) {
+          warning(e.message);
+        }
+        invalidDataErrorSent[type] = true;
+        // retry validation if error is different than 401 Invalid Access Token
+        await new Promise < void > ((resolve) => {
+          setTimeout(() => resolve(), 1000 + (retry ** 2));
+        });
+        return validate(type, retry++);
+      }
       if (e.message.includes('no refresh token for')) {
         if ((type === 'bot' && !botTokenErrorSent) || (type === 'broadcaster' && !broadcasterTokenErrorSent)) {
           warning(`Refresh token ${type} account not found. Please set it in UI.`);
