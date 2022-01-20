@@ -223,7 +223,7 @@ function prepareMessage(change) {
   try {
     return `* **${match.groups.type}** - ${match.groups.message}${change.fixes.length > 0 ? ', ' + change.fixes.join(', ') : ''} ([${change.commit}](https://github.com/sogehige/sogeBot/commit/${change.commit}))\n`;
   } catch (e) {
-    return `* ${change.message} [${change.commit}](https://github.com/sogehige/sogeBot/commit/${change.commit}))\n`;
+    return `* ${change.message.replace('fix:', '').replace('feat:', '').trim()} [${change.commit}](https://github.com/sogehige/sogeBot/commit/${change.commit}))\n`;
   }
 }
 
