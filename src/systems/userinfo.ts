@@ -140,7 +140,7 @@ class UserInfo extends System {
         const clientBot = await client('bot');
         const getUserByName = await clientBot.users.getUserByName(userName);
         if (getUserByName) {
-          changelog.update(getUserByName.id, { createdAt: new Date(getUserByName.creationDate).getTime() });
+          changelog.update(getUserByName.id, { userName, createdAt: new Date(getUserByName.creationDate).getTime() });
         }
         if (!retry) {
           return this.age(opts, true);
