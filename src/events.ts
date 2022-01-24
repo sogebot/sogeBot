@@ -394,7 +394,7 @@ class Events extends Core {
   }
 
   public async fireEmoteFirework(operation: EventsEntity.OperationDefinitions) {
-    emitter.emit('services::twitch::emotes', 'firework', String(operation.emotesToExplode).split(' '));
+    emitter.emit('services::twitch::emotes', 'firework', String(operation.emotesToFirework).split(' '));
   }
 
   public async fireRunCommand(operation: EventsEntity.OperationDefinitions, attributes: EventsEntity.Attributes) {
