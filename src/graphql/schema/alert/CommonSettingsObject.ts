@@ -52,12 +52,12 @@ export class CommonSettingsObject implements CommonSettingsInterface {
   | 'shake2' | 'swing' | 'tada' | 'wave' | 'wobble' | 'wiggle' | 'wiggle2' | 'jello';
   @Field(type => AnimationTextOptionsObject)
     animationTextOptions: AnimationTextOptionsObject;
-  @Field()
-    imageId: string;
+  @Field(type => String, { nullable: true })
+    imageId: string | null;
   @Field(type => ImageOptionsObject)
     imageOptions: ImageOptionsObject;
-  @Field()
-    soundId: string;
+  @Field(type => String, { nullable: true })
+    soundId: string | null;
   @Field(type => Float)
     soundVolume: number;
   @Field(type => CommonSettingsTTSObject)

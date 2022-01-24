@@ -30,8 +30,13 @@ async function clearMedia(): Promise<void> {
         ...alert.cmdredeems,
         ...alert.rewardredeems,
       ]) {
-        mediaIds.push(event.imageId);
-        mediaIds.push(event.soundId);
+        if (event.imageId) {
+          mediaIds.push(event.imageId);
+        }
+
+        if (event.soundId) {
+          mediaIds.push(event.soundId);
+        }
       }
     }
     if (mediaIds.length > 0) {
@@ -90,101 +95,67 @@ export class alertResolver {
   @Mutation(returns => AlertObject)
   async alertClone(@Arg('id') id: string) {
     const item = await getRepository(Alert).findOneOrFail({ where: { id }, relations });
-    const mediaMap = new Map() as Map<string, string>;
     const clonedItem = {
       ...item,
       id:        v4(),
       updatedAt: Date.now(),
       name:      item.name + ' (clone)',
       follows:   item.follows.map((o) => {
-        mediaMap.set(o.soundId, v4());
-        mediaMap.set(o.imageId, v4());
         return {
-          ...o, id: v4(), imageId: mediaMap.get(o.imageId), soundId: mediaMap.get(o.soundId),
+          ...o, id: v4(), imageId: o.imageId, soundId: o.soundId,
         };
       }),
       subs: item.subs.map((o) => {
-        mediaMap.set(o.soundId, v4());
-        mediaMap.set(o.imageId, v4());
         return {
-          ...o, id: v4(), imageId: mediaMap.get(o.imageId), soundId: mediaMap.get(o.soundId),
+          ...o, id: v4(), imageId: o.imageId, soundId: o.soundId,
         };
       }),
       subgifts: item.subgifts.map((o) => {
-        mediaMap.set(o.soundId, v4());
-        mediaMap.set(o.imageId, v4());
         return {
-          ...o, id: v4(), imageId: mediaMap.get(o.imageId), soundId: mediaMap.get(o.soundId),
+          ...o, id: v4(), imageId: o.imageId, soundId: o.soundId,
         };
       }),
       subcommunitygifts: item.subcommunitygifts.map((o) => {
-        mediaMap.set(o.soundId, v4());
-        mediaMap.set(o.imageId, v4());
         return {
-          ...o, id: v4(), imageId: mediaMap.get(o.imageId), soundId: mediaMap.get(o.soundId),
+          ...o, id: v4(), imageId: o.imageId, soundId: o.soundId,
         };
       }),
       hosts: item.hosts.map((o) => {
-        mediaMap.set(o.soundId, v4());
-        mediaMap.set(o.imageId, v4());
         return {
-          ...o, id: v4(), imageId: mediaMap.get(o.imageId), soundId: mediaMap.get(o.soundId),
+          ...o, id: v4(), imageId: o.imageId, soundId: o.soundId,
         };
       }),
       raids: item.raids.map((o) => {
-        mediaMap.set(o.soundId, v4());
-        mediaMap.set(o.imageId, v4());
         return {
-          ...o, id: v4(), imageId: mediaMap.get(o.imageId), soundId: mediaMap.get(o.soundId),
+          ...o, id: v4(), imageId: o.imageId, soundId: o.soundId,
         };
       }),
       tips: item.tips.map((o) => {
-        mediaMap.set(o.soundId, v4());
-        mediaMap.set(o.imageId, v4());
         return {
-          ...o, id: v4(), imageId: mediaMap.get(o.imageId), soundId: mediaMap.get(o.soundId),
+          ...o, id: v4(), imageId: o.imageId, soundId: o.soundId,
         };
       }),
       cheers: item.cheers.map((o) => {
-        mediaMap.set(o.soundId, v4());
-        mediaMap.set(o.imageId, v4());
         return {
-          ...o, id: v4(), imageId: mediaMap.get(o.imageId), soundId: mediaMap.get(o.soundId),
+          ...o, id: v4(), imageId: o.imageId, soundId: o.soundId,
         };
       }),
       resubs: item.resubs.map((o) => {
-        mediaMap.set(o.soundId, v4());
-        mediaMap.set(o.imageId, v4());
         return {
-          ...o, id: v4(), imageId: mediaMap.get(o.imageId), soundId: mediaMap.get(o.soundId),
+          ...o, id: v4(), imageId: o.imageId, soundId: o.soundId,
         };
       }),
       cmdredeems: item.cmdredeems.map((o) => {
-        mediaMap.set(o.soundId, v4());
-        mediaMap.set(o.imageId, v4());
         return {
-          ...o, id: v4(), imageId: mediaMap.get(o.imageId), soundId: mediaMap.get(o.soundId),
+          ...o, id: v4(), imageId: o.imageId, soundId: o.soundId,
         };
       }),
       rewardredeems: item.rewardredeems.map((o) => {
-        mediaMap.set(o.soundId, v4());
-        mediaMap.set(o.imageId, v4());
         return {
-          ...o, id: v4(), imageId: mediaMap.get(o.imageId), soundId: mediaMap.get(o.soundId),
+          ...o, id: v4(), imageId: o.imageId, soundId: o.soundId,
         };
       }),
     };
-
-    // save media
-    for (const mediaId of mediaMap.keys()) {
-      const media = await getRepository(AlertMedia).findOne({ id: mediaId });
-      if (media) {
-        await getRepository(AlertMedia).save({
-          ...media,
-          id: mediaMap.get(mediaId),
-        });
-      }
-    }
     return getRepository(Alert).save(clonedItem);
   }
 

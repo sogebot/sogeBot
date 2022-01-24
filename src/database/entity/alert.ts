@@ -61,14 +61,14 @@ export interface CommonSettingsInterface {
     maxTimeToDecrypt: number;
     characters: string;
   };
-  imageId: string;
+  imageId: string | null;
   imageOptions: {
     translateX: number;
     translateY: number;
     scale: number;
     loop: boolean;
   };
-  soundId: string;
+  soundId: string | null;
   soundVolume: number;
   tts: {
     enabled: boolean;
@@ -256,10 +256,10 @@ export const CommonSettingsSchema = {
   animationOutDuration: { type: Number, default: 2000 } as EntitySchemaColumnOptions,
   animationText:        { type: 'varchar' } as EntitySchemaColumnOptions,
   animationTextOptions: { type: 'simple-json' } as EntitySchemaColumnOptions,
-  imageId:              { type: String } as EntitySchemaColumnOptions,
+  imageId:              { type: String, nullable: true } as EntitySchemaColumnOptions,
   imageOptions:         { type: 'simple-json' } as EntitySchemaColumnOptions,
   filter:               { type: 'text', nullable: true } as EntitySchemaColumnOptions,
-  soundId:              { type: String } as EntitySchemaColumnOptions,
+  soundId:              { type: String, nullable: true } as EntitySchemaColumnOptions,
   soundVolume:          { type: Number } as EntitySchemaColumnOptions,
   alertDurationInMs:    { type: Number } as EntitySchemaColumnOptions,
   alertTextDelayInMs:   { type: Number } as EntitySchemaColumnOptions,
