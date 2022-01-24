@@ -247,7 +247,7 @@ export const CommonSettingsSchema = {
   title:                { type: String } as EntitySchemaColumnOptions,
   variantAmount:        { type: Number } as EntitySchemaColumnOptions,
   messageTemplate:      { type: String } as EntitySchemaColumnOptions,
-  ttsTemplate:          { type: String, default: '{message}' },
+  ttsTemplate:          { type: String, default: '' },
   layout:               { type: 'varchar' } as EntitySchemaColumnOptions,
   animationIn:          { type: 'varchar' } as EntitySchemaColumnOptions,
   animationInDuration:  { type: Number, default: 2000 } as EntitySchemaColumnOptions,
