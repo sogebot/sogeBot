@@ -50,22 +50,29 @@ class Highlights extends System {
       });
     });
     adminEndpoint(this.nsp, 'generic::getAll', async (cb) => {
-      try {
+      (async function getAll(callback): Promise<void> {
         const highlightsToCheck = await getRepository(Highlight).find({ order: { createdAt: 'DESC' }, where: { expired: false } });
+        try {
+          const clientBot = await client('bot');
+          const availableVideos = await clientBot.videos.getVideosByIds(highlightsToCheck.map(o => o.videoId));
 
-        const clientBot = await client('bot');
-        const availableVideos = await clientBot.videos.getVideosByIds(highlightsToCheck.map(o => o.videoId));
-
-        for (const highlight of highlightsToCheck) {
-          if (!availableVideos.find(o => o.id === highlight.videoId)) {
-            await getRepository(Highlight).update(highlight.id, { expired: true });
+          for (const highlight of highlightsToCheck) {
+            if (!availableVideos.find(o => o.id === highlight.videoId)) {
+              await getRepository(Highlight).update(highlight.id, { expired: true });
+            }
           }
+          const highlights = await getRepository(Highlight).find({ order: { createdAt: 'DESC' } });
+          callback(null, highlights, availableVideos);
+        } catch (err: any) {
+          if (err._statusCode === 404) {
+            for (const highlight of highlightsToCheck) {
+              await getRepository(Highlight).update(highlight.id, { expired: true });
+            }
+            return getAll(callback);
+          }
+          callback(err.stack);
         }
-        const highlights = await getRepository(Highlight).find({ order: { createdAt: 'DESC' } });
-        cb(null, highlights, availableVideos);
-      } catch (err: any) {
-        cb(err.stack);
-      }
+      })(cb);
     });
     adminEndpoint(this.nsp, 'generic::deleteById', async (id, cb) => {
       try {
