@@ -22,6 +22,8 @@ export class CommonSettingsObject implements CommonSettingsInterface {
   @Field()
     messageTemplate: string;
   @Field()
+    ttsTemplate: string;
+  @Field()
     layout: '1' | '2' | '3' | '4' | '5';
   @Field(type => String, { nullable: true })
     filter: string | null;

@@ -6,10 +6,10 @@ import {
 export class CommonSettingsTTSObject {
   @Field()
     enabled: boolean;
-  @Field()
-    skipUrls: boolean;
+  @Field(type => Boolean, { nullable: true })
+    skipUrls: boolean | null;
   @Field()
     keepAlertShown: boolean;
-  @Field(type => Int)
-    minAmountToPlay: number;
+  @Field(type => Int, { nullable: true })
+    minAmountToPlay: number | null;
 }
