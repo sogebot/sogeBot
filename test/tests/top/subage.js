@@ -15,7 +15,7 @@ const message = require('../../general.js').message;
 // users
 const owner = { userName: '__broadcaster__' };
 
-describe.only('Top - !top subage - @func1', () => {
+describe('Top - !top subage - @func1', () => {
   before(async () => {
     await db.cleanup();
     await message.prepare();
