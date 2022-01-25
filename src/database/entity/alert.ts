@@ -173,13 +173,6 @@ export interface AlertInterface {
   rewardredeems: AlertRewardRedeemInterface[];
 }
 
-export interface AlertMediaInterface {
-  primaryId: number;
-  id: string;
-  b64data: string;
-  chunkNo: number;
-}
-
 export interface AlertRewardRedeemInterface extends AlertTipInterface {
   rewardId: null | string;
 }
@@ -355,21 +348,6 @@ export const Alert = new EntitySchema<Readonly<Required<AlertInterface>>>({
       cascade:     true,
     },
   },
-});
-
-export const AlertMedia = new EntitySchema<Readonly<Required<AlertMediaInterface>>>({
-  name:    'alert_media',
-  columns: {
-    primaryId: {
-      type: Number, primary: true, generated: true,
-    },
-    id:      { type: String },
-    b64data: { type: ['mysql', 'mariadb'].includes(process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') ? 'longtext' : 'text' },
-    chunkNo: { type: Number },
-  },
-  indices: [
-    { name: 'IDX_b0f12c32653ed88fd576d3520c', columns: ['id'] },
-  ],
 });
 
 export const AlertFollow = new EntitySchema<Readonly<Required<CommonSettingsInterface>>>({
