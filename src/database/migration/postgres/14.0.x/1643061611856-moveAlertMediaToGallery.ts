@@ -36,11 +36,11 @@ export class moveAlertMediaToGallery1643061611856 implements MigrationInterface 
     }
 
     for (const type of ['cheer', 'command_redeem', 'follow', 'host', 'raid', 'resub', 'reward_redeem', 'sub', 'subcommunitygift', 'subgift', 'tip']) {
-      const alerts = await queryRunner.query(`SELECT * from \`alert_${type}\``, undefined);
+      const alerts = await queryRunner.query(`SELECT * from "alert_${type}"`, undefined);
       for (const alert of alerts) {
         const imageId = mapper.get(alert.imageId) || null;
         const soundId = mapper.get(alert.soundId) || null;
-        await queryRunner.query(`UPDATE \`alert_${type}\` SET \`imageId\`=$1, \`soundId\`=$2 WHERE \`id\`=$3`, [ imageId, soundId, alert.id ]);
+        await queryRunner.query(`UPDATE "alert_${type}" SET "imageId"=$1, "soundId"=$2 WHERE "id"=$3`, [ imageId, soundId, alert.id ]);
       }
     }
     await queryRunner.query(`DROP TABLE alert_media`);
