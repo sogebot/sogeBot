@@ -1,3 +1,5 @@
+import path from 'path';
+
 import { Gallery as GalleryEntity } from '@entity/gallery';
 import { getRepository } from 'typeorm';
 
@@ -24,6 +26,15 @@ class Gallery extends Overlay {
       } else {
         debug('ui', 'Gallery endpoint OK.');
         app.get('/gallery/:id', async (req, res) => {
+          if (req.params.id === '_default_image') {
+            res.sendFile(path.join(__dirname, '..', '..', 'assets', 'alerts', 'default.gif'));
+            return;
+          }
+          if (req.params.id === '_default_audio') {
+            res.sendFile(path.join(__dirname, '..', '..', 'assets', 'alerts', 'default.mp3'));
+            return;
+          }
+
           const request = await getRepository(GalleryEntity).createQueryBuilder('gallery').select('sum(length(data))', 'size').where('id=:id', { id: req.params.id }).getRawOne();
           if (!request) {
             res.sendStatus(404);
@@ -93,22 +104,23 @@ class Gallery extends Overlay {
     adminEndpoint(this.nsp, 'gallery::upload', async (data, cb) => {
       try {
         const filename = data[0];
-        const filedata = data[1] as { id: string, b64data: string };
+        const filedata = data[1] as { id: string, b64data: string, folder: string };
         const matches = filedata.b64data.match(/^data:([0-9A-Za-z-+/]+);base64,(.+)$/);
         if (!matches) {
           // update entity
           const item = await getRepository(GalleryEntity).findOneOrFail({ id: filedata.id });
           await getRepository(GalleryEntity).save({
-            id:   item.id,
-            type: item.type,
-            data: item.data + filedata.b64data,
-            name: item.name,
+            id:     item.id,
+            type:   item.type,
+            data:   item.data + filedata.b64data,
+            folder: filedata.folder,
+            name:   item.name,
           });
         } else {
           // new entity
           const type = matches[1];
           await getRepository(GalleryEntity).save({
-            id: filedata.id, type, data: filedata.b64data, name: filename,
+            id: filedata.id, type, data: filedata.b64data, name: filename, folder: filedata.folder,
           });
         }
         if (cb) {

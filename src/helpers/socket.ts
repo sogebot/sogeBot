@@ -1,4 +1,4 @@
-import type { AlertInterface, AlertMediaInterface } from '@entity/alert';
+import type { AlertInterface } from '@entity/alert';
 import type { CommandsBoardInterface } from '@entity/commands';
 import type { CooldownInterface } from '@entity/cooldown';
 import type { EventInterface } from '@entity/event';
@@ -93,8 +93,6 @@ function adminEndpoint (nsp: string, on: 'events::getRedeemedRewards', callback:
 function adminEndpoint (nsp: string, on: 'carousel::save', callback: (items: Readonly<Required<EventInterface>>[], cb: (error: Error | string | null, ...response: any) => void) => void): void;
 function adminEndpoint (nsp: string, on: 'carousel::insert', callback: (data: string, cb: (error: Error | string | null, ...response: any) => void) => void): void;
 function adminEndpoint (nsp: string, on: 'goals::remove' | 'goals::save', callback: (item: Readonly<Required<GoalGroupInterface>>, cb: (error: Error | string | null, ...response: any) => void) => void): void;
-function adminEndpoint (nsp: string, on: 'alerts::saveMedia', callback: (item: Readonly<Required<AlertMediaInterface>>, cb: (error: Error | string | null, ...response: any) => void) => void): void;
-function adminEndpoint (nsp: string, on: 'alerts::cloneMedia', callback: (toClone: [string, string], cb: (error: Error | string | null, ...response: any) => void) => void): void;
 function adminEndpoint (nsp: string, on: 'alerts::save' | 'alerts::delete', callback: (item: Readonly<Required<AlertInterface>>, cb: (error: Error | string | null, ...response: any) => void) => void): void;
 function adminEndpoint (nsp: string, on: 'randomizer::save' | 'randomizer::remove', callback: (item: Readonly<Required<RandomizerInterface>> & Readonly<Required<RandomizerInterface>>[], cb: (error: Error | string | null, ...response: any) => void) => void): void;
 function adminEndpoint (nsp: string, on: 'cooldown::save', callback: (item: Readonly<Required<CooldownInterface>> & Readonly<Required<CooldownInterface>>[], cb: (error: Error | string | null, ...response: any) => void) => void): void;

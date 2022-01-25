@@ -1,52 +1,15 @@
 import {
-  Alert, AlertInterface, AlertMedia,
+  Alert, AlertInterface,
 } from '@entity/alert';
-import shortid from 'shortid';
 import {
   Arg, Authorized, Mutation, Query, Resolver,
 } from 'type-graphql';
 import {
-  getRepository, In, Not,
+  getRepository,
 } from 'typeorm';
 import { v4 } from 'uuid';
 
 import { AlertObject } from '../schema/alert/AlertObject';
-
-async function clearMedia(): Promise<void> {
-  try {
-    const alerts = await getRepository(Alert).find({ relations: ['rewardredeems', 'cmdredeems', 'cheers', 'follows', 'hosts', 'raids', 'resubs', 'subcommunitygifts', 'subgifts', 'subs', 'tips'] });
-    const mediaIds: string[] = [];
-    for (const alert of alerts) {
-      for (const event of [
-        ...alert.cheers,
-        ...alert.follows,
-        ...alert.hosts,
-        ...alert.raids,
-        ...alert.resubs,
-        ...alert.subgifts,
-        ...alert.subcommunitygifts,
-        ...alert.subs,
-        ...alert.tips,
-        ...alert.cmdredeems,
-        ...alert.rewardredeems,
-      ]) {
-        if (event.imageId) {
-          mediaIds.push(event.imageId);
-        }
-
-        if (event.soundId) {
-          mediaIds.push(event.soundId);
-        }
-      }
-    }
-    if (mediaIds.length > 0) {
-      await getRepository(AlertMedia).delete({ id: Not(In(mediaIds)) });
-    }
-  } catch (e: any) {
-    console.error(e);
-  }
-  return;
-}
 
 const relations = ['rewardredeems', 'cmdredeems', 'cheers', 'follows', 'hosts', 'raids', 'resubs', 'subcommunitygifts', 'subgifts', 'subs', 'tips'];
 
@@ -166,7 +129,6 @@ export class alertResolver {
   ) {
     const data: AlertInterface = JSON.parse(data_json);
     const alert = await getRepository(Alert).save({ ...data, updatedAt: Date.now() });
-    await clearMedia();
     return alert;
   }
 
@@ -176,27 +138,7 @@ export class alertResolver {
     const item = await getRepository(Alert).findOne({ id });
     if (item) {
       await getRepository(Alert).remove(item);
-      await clearMedia();
     }
     return true;
-  }
-
-  @Authorized()
-  @Mutation(returns => Boolean)
-  async alertMediaRemove(@Arg('id') id: string) {
-    await getRepository(AlertMedia).delete({ id });
-    return true;
-  }
-
-  @Authorized()
-  @Mutation(returns => String)
-  async alertMediaUpload(
-  @Arg('data') b64data: string, @Arg('id', { nullable: true }) inputId?: string,
-  ) {
-    const id = inputId ? inputId : shortid();
-    const item = await getRepository(AlertMedia).save({
-      id, b64data, chunkNo: 0,
-    });
-    return item.id;
   }
 }
