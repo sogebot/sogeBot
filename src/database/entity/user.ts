@@ -6,10 +6,11 @@ export interface UserInterface {
   userId: string; userName: string; displayname?: string; profileImageUrl?: string;
   isOnline?: boolean; isVIP?: boolean; isFollower?: boolean; isModerator?: boolean; isSubscriber?: boolean;
   haveSubscriberLock?: boolean; haveFollowerLock?: boolean; haveSubscribedAtLock?: boolean; haveFollowedAtLock?: boolean; rank?: string; haveCustomRank?: boolean;
-  followedAt?: number; followCheckAt?: number; subscribedAt?: number; seenAt?: number; createdAt?: number;
+  followedAt?: string | null; subscribedAt?: string | null; seenAt?: string | null; createdAt?: string | null;
   watchedTime?: number; chatTimeOnline?: number; chatTimeOffline?: number;
   points?: number; pointsOnlineGivenAt?: number; pointsOfflineGivenAt?: number; pointsByMessageGivenAt?: number;
   subscribeTier?: string; subscribeCumulativeMonths?: number; subscribeStreak?: number; giftedSubscribes?: number;
+  followCheckAt?: number;
   messages?: number;
   extra: {
     jackpotWins?: number;
@@ -61,19 +62,19 @@ export const User = new EntitySchema<Readonly<Required<UserInterface>>>({
     rank:                 { type: String, default: '' },
     haveCustomRank:       { type: Boolean, default: false },
     followedAt:           {
-      type: 'bigint', default: 0, transformer: new ColumnNumericTransformer(),
+      type: 'varchar', length: '2022-01-25T20:14:53.308Z'.length, nullable: true,
     },
     followCheckAt: {
       type: 'bigint', default: 0, transformer: new ColumnNumericTransformer(),
     },
     subscribedAt: {
-      type: 'bigint', default: 0, transformer: new ColumnNumericTransformer(),
+      type: 'varchar', length: '2022-01-25T20:14:53.308Z'.length, nullable: true,
     },
     seenAt: {
-      type: 'bigint', default: 0, transformer: new ColumnNumericTransformer(),
+      type: 'varchar', length: '2022-01-25T20:14:53.308Z'.length, nullable: true,
     },
     createdAt: {
-      type: 'bigint', default: 0, transformer: new ColumnNumericTransformer(),
+      type: 'varchar', length: '2022-01-25T20:14:53.308Z'.length, nullable: true,
     },
     watchedTime: {
       type: 'bigint', default: 0, transformer: new ColumnNumericTransformer(),

@@ -60,7 +60,7 @@ class UserInfo extends System {
 
     await changelog.flush();
     const user = await getRepository(User).findOne({ userName });
-    if (!user || !user.isFollower || user.followedAt === 0) {
+    if (!user || !user.isFollower || !user.followedAt) {
       return [{ response: prepare('followage.' + (opts.sender.userName === userName.toLowerCase() ? 'successSameUsername' : 'success') + '.never', { username: userName }), ...opts }];
     } else {
       const units = ['years', 'months', 'days', 'hours', 'minutes'] as const;
@@ -95,7 +95,7 @@ class UserInfo extends System {
     const subStreak = user?.subscribeStreak;
     const localePath = 'subage.' + (opts.sender.userName === userName.toLowerCase() ? 'successSameUsername' : 'success') + '.';
 
-    if (!user || !user.isSubscriber || user.subscribedAt === 0) {
+    if (!user || !user.isSubscriber || !user.subscribedAt) {
       return [{
         response: prepare(localePath + (subCumulativeMonths ? 'notNow' : 'never'), {
           username:                userName,
@@ -135,12 +135,12 @@ class UserInfo extends System {
     const [userName] = new Expects(opts.parameters).username({ optional: true, default: opts.sender.userName }).toArray();
     await changelog.flush();
     const user = await getRepository(User).findOne({ userName });
-    if (!user || user.createdAt === 0) {
+    if (!user || !user.createdAt) {
       try {
         const clientBot = await client('bot');
         const getUserByName = await clientBot.users.getUserByName(userName);
         if (getUserByName) {
-          changelog.update(getUserByName.id, { userName, createdAt: new Date(getUserByName.creationDate).getTime() });
+          changelog.update(getUserByName.id, { userName, createdAt: new Date(getUserByName.creationDate).toISOString() });
         }
         if (!retry) {
           return this.age(opts, true);
@@ -181,7 +181,7 @@ class UserInfo extends System {
       const [userName] = new Expects(opts.parameters).username().toArray();
       await changelog.flush();
       const user = await getRepository(User).findOne({ userName: userName });
-      if (!user || user.seenAt === 0) {
+      if (!user || !user.seenAt) {
         return [{ response: translate('lastseen.success.never').replace(/\$username/g, userName), ...opts }];
       } else {
         return [{

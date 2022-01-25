@@ -44,13 +44,13 @@ export async function isFollowerUpdate (user: UserInterface | null) {
         eventEmitter.emit('unfollow', { userName: user.userName });
       }
       changelog.update(user.userId, {
-        followedAt:    user.haveFollowedAtLock ? user.followedAt : 0,
+        followedAt:    user.haveFollowedAtLock ? user.followedAt : null,
         isFollower:    user.haveFollowerLock? user.isFollower : false,
         followCheckAt: Date.now(),
       });
     } else {
       if (!user.isFollower) {
-        follow(user.userId, user.userName, new Date(helixFollow.followDate).getTime());
+        follow(user.userId, user.userName, new Date(helixFollow.followDate).toISOString());
       }
       return { isFollower: true, followedAt: user.followedAt };
     }

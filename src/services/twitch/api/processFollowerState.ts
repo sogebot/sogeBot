@@ -48,7 +48,7 @@ const updateFollowerState = async(users: (Readonly<Required<UserInterface>>)[], 
   for (const user of users.filter(o => !o.isFollower)) {
     const apiUser = usersFromAPI.find(userFromAPI => userFromAPI.from_id === user.userId) as typeof usersFromAPI[0];
     if (Date.now() - new Date(apiUser.followed_at).getTime() < 2 * constants.HOUR) {
-      follow(user.userId, user.userName, user.followedAt);
+      follow(user.userId, user.userName, new Date(apiUser.followed_at).toISOString());
     }
   }
 
@@ -56,7 +56,7 @@ const updateFollowerState = async(users: (Readonly<Required<UserInterface>>)[], 
     const apiUser = usersFromAPI.find(userFromAPI => userFromAPI.from_id === user.userId) as typeof usersFromAPI[0];
     return {
       ...user,
-      followedAt:    user.haveFollowedAtLock ? user.followedAt : new Date(apiUser.followed_at).getTime(),
+      followedAt:    user.haveFollowedAtLock ? user.followedAt : new Date(apiUser.followed_at).toISOString(),
       isFollower:    user.haveFollowerLock? user.isFollower : true,
       followCheckAt: Date.now(),
     };
