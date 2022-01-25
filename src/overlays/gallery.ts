@@ -34,9 +34,8 @@ class Gallery extends Overlay {
             res.sendFile(path.join(__dirname, '..', '..', 'assets', 'alerts', 'default.mp3'));
             return;
           }
-
-          const request = await getRepository(GalleryEntity).createQueryBuilder('gallery').select('sum(length(data))', 'size').where('id=:id', { id: req.params.id }).getRawOne();
-          if (!request) {
+          const request = await getRepository(GalleryEntity).createQueryBuilder('gallery').select('sum(length(gallery.data))', 'size').where('id=:id', { id: req.params.id }).getRawOne();
+          if (!request.size) {
             res.sendStatus(404);
             return;
           }
