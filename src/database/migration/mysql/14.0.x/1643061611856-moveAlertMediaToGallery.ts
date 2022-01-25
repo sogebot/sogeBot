@@ -40,7 +40,7 @@ export class moveAlertMediaToGallery1643061611856 implements MigrationInterface 
       for (const alert of alerts) {
         const imageId = mapper.get(alert.imageId) || null;
         const soundId = mapper.get(alert.soundId) || null;
-        await queryRunner.query(`UPDATE \`alert_${type}\` SET \`imageId\`=?, \`soundId\`=? WHERE \`id\`='${alert.id}'`, [ imageId, soundId ]);
+        await queryRunner.query(`UPDATE \`alert_${type}\` SET \`imageId\`=?, \`soundId\`=? WHERE \`id\`=?`, [ imageId, soundId, alert.id ]);
       }
     }
     await queryRunner.query(`DROP TABLE \`alert_media\``);
