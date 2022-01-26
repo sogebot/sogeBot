@@ -329,8 +329,10 @@ class CustomCommands extends System {
           if (r.stopIfExecuted) {
             break;
           }
-        } else {
-          info(`User ${opts.sender.userName}#${opts.sender.userId} doesn't have permissions to use ${cmd.command.command}#${cmd.command.id}|${r.order}`);
+        }
+
+        if (!atLeastOnePermissionOk) {
+          info(`User ${opts.sender.userName}#${opts.sender.userId} doesn't have permissions or filter to use custom command ${cmd.command.command}#${cmd.command.id}`);
         }
       }
 
