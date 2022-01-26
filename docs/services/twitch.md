@@ -1,5 +1,3 @@
-## Twitch
-
 You can find the settings for that Service in Settings => Modules
 
 ### oAuth
