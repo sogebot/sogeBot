@@ -236,13 +236,13 @@ class Top extends System {
             .where('user.userName != :botusername', { botusername: botUsername.toLowerCase() })
             .andWhere('user.userName != :broadcasterusername', { broadcasterusername: broadcasterUsername.toLowerCase() })
             .andWhere('user.isFollower = :isFollower', { isFollower: true })
-            .andWhere('user.followedAt > 0')
+            .andWhere('user.followedAt IS NOT NULL')
             .orderBy('user.followedAt', 'ASC')
             .limit(_total)
             .getMany())
             .filter(o => !isIgnored({ userName: o.userName, userId: o.userId }))
             .map(o => {
-              return { userName: o.userName, value: o.followedAt };
+              return { userName: o.userName, value: o.followedAt as string };
             });
         message = translate('systems.top.followage').replace(/\$amount/g, 10);
         break;
@@ -252,13 +252,13 @@ class Top extends System {
             .where('user.userName != :botusername', { botusername: botUsername.toLowerCase() })
             .andWhere('user.userName != :broadcasterusername', { broadcasterusername: broadcasterUsername.toLowerCase() })
             .andWhere('user.isSubscriber = :isSubscriber', { isSubscriber: true })
-            .andWhere('user.subscribedAt > 0')
+            .andWhere('user.subscribedAt IS NOT NULL')
             .orderBy('user.subscribedAt', 'ASC')
             .limit(_total)
             .getMany())
             .filter(o => !isIgnored({ userName: o.userName, userId: o.userId }))
             .map(o => {
-              return { userName: o.userName, value: o.subscribedAt };
+              return { userName: o.userName, value: o.subscribedAt as string };
             });
         message = translate('systems.top.subage').replace(/\$amount/g, 10);
         break;

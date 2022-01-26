@@ -1,6 +1,5 @@
 import { EventList } from '@entity/eventList';
 import { HOUR } from '@sogebot/ui-helpers/constants';
-import { dayjs } from '@sogebot/ui-helpers/dayjsHelper';
 import { getRepository } from 'typeorm';
 
 import eventlist from '../../overlays/eventlist';
@@ -18,7 +17,7 @@ import { tmiEmitter } from '~/helpers/tmi';
 
 const events = new Map<string, number>();
 
-export function follow(userId: string, userName: string, followedAt: string | number) {
+export function follow(userId: string, userName: string, followedAt: string) {
   // cleanup
   events.forEach((value, key) => {
     if (value + HOUR <= Date.now()) {
@@ -40,7 +39,7 @@ export function follow(userId: string, userName: string, followedAt: string | nu
   changelog.getOrFail(userId)
     .then(user => {
       changelog.update(userId, {
-        followedAt:    user.haveFollowedAtLock ? user.followedAt : dayjs(followedAt).valueOf(),
+        followedAt:    user.haveFollowedAtLock ? user.followedAt : followedAt,
         isFollower:    user.haveFollowerLock? user.isFollower : true,
         followCheckAt: Date.now(),
       });
@@ -48,7 +47,7 @@ export function follow(userId: string, userName: string, followedAt: string | nu
     .catch(() => {
       changelog.update(userId, {
         userName:      userName,
-        followedAt:    dayjs(followedAt).valueOf(),
+        followedAt:    followedAt,
         isFollower:    true,
         followCheckAt: Date.now(),
       });
@@ -60,7 +59,7 @@ export function follow(userId: string, userName: string, followedAt: string | nu
   }
 
   // trigger events only if follow was in hour
-  if (Date.now() - dayjs(followedAt).valueOf() < HOUR) {
+  if (Date.now() - new Date(followedAt).getTime() < HOUR) {
     eventlist.add({
       event:     'follow',
       userId:    userId,

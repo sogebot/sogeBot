@@ -6,7 +6,7 @@ export class moveAlertMediaToGallery1643061611856 implements MigrationInterface 
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     const mapper = new Map<string, string | null>();
-    const items = await queryRunner.query(`SELECT * FROM \`alert_media\` GROUP BY \`b64data\``);
+    const items = await queryRunner.query(`SELECT \`b64data\` FROM \`alert_media\` GROUP BY \`b64data\``);
     for (const item of items) {
       const ids = (await queryRunner.query(`SELECT \`id\` FROM \`alert_media\` WHERE \`b64data\`=$1`, [item.b64data])).map((o: any) => o.id);
 

@@ -1,17 +1,16 @@
-/* global describe it before */
 const assert = require('assert');
 
 const constants = require('@sogebot/ui-helpers/constants');
+const { dayjs } = require('@sogebot/ui-helpers/dayjsHelper');
 const { getRepository } = require('typeorm');
 
 const { User } = require('../../../dest/database/entity/user');
 const { getOwner } = require('../../../dest/helpers/commons/getOwner');
 const { prepare } = require('../../../dest/helpers/commons/prepare');
-const { dayjs } = require('@sogebot/ui-helpers/dayjsHelper');
+const twitch = require('../../../dest/services/twitch.js').default;
 const top = (require('../../../dest/systems/top')).default;
 const db = require('../../general.js').db;
 const message = require('../../general.js').message;
-const twitch = require('../../../dest/services/twitch.js').default;
 
 // users
 const owner = { userName: '__broadcaster__' };
@@ -28,7 +27,7 @@ describe('Top - !top subage - @func1', () => {
         userId:       String(Math.floor(Math.random() * 100000)),
         userName:     'user' + i,
         isSubscriber: true,
-        subscribedAt: Date.now() - (constants.HOUR * i),
+        subscribedAt: new Date(Date.now() - (constants.HOUR * i)).toISOString(),
       });
     }
   });
@@ -38,7 +37,7 @@ describe('Top - !top subage - @func1', () => {
       userId:       String(Math.floor(Math.random() * 100000)),
       userName:     'user11',
       isSubscriber: false,
-      subscribedAt: Date.now() - (constants.HOUR * 24 * 30),
+      subscribedAt: new Date(Date.now() - (constants.HOUR * 24 * 30)).toISOString(),
     });
   });
 

@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
-/* global describe it */
 require('../../general.js');
 
 const assert = require('assert');
@@ -55,7 +54,7 @@ describe('Ranks - followers - @func2', () => {
   for (const [id, v] of Object.entries(users)) {
     it('Add user ' + v + ' to db', async () => {
       await getRepository(User).save({
-        userName: v , userId: String('100' + id), isFollower: true, followedAt: new Date((new Date()).setMonth((new Date()).getMonth()-(id * 5))).getTime(), watchedTime: id * 1000 * 60 * 60,
+        userName: v , userId: String('100' + id), isFollower: true, followedAt: new Date((new Date()).setMonth((new Date()).getMonth()-(id * 5))).toISOString(), watchedTime: id * 1000 * 60 * 60,
       });
     });
 

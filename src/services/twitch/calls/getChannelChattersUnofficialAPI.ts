@@ -61,11 +61,11 @@ export const getChannelChattersUnofficialAPI = async (opts: any) => {
         const user = await getRepository(User).findOne({ where: { userName } });
         if (user) {
           await getRepository(User).save({ ...user, isOnline: true });
-          if (user.createdAt === 0) {
+          if (!user.createdAt) {
             // run this after we save new user
             const getUserByName = await clientBot.users.getUserByName(userName);
             if (getUserByName) {
-              changelog.update(getUserByName.id, { createdAt: new Date(getUserByName.creationDate).getTime() });
+              changelog.update(getUserByName.id, { createdAt: new Date(getUserByName.creationDate).toISOString() });
             }
           }
         } else {

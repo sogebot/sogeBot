@@ -481,7 +481,7 @@ class Chat {
       changelog.update(user.userId, {
         ...user,
         isSubscriber:              user.haveSubscriberLock ? user.isSubscriber : true,
-        subscribedAt:              user.haveSubscribedAtLock ? user.subscribedAt : Date.now(),
+        subscribedAt:              user.haveSubscribedAtLock ? user.subscribedAt : new Date().toISOString(),
         subscribeTier:             String(tier),
         subscribeCumulativeMonths: amount,
         subscribeStreak:           0,
@@ -560,7 +560,7 @@ class Chat {
       changelog.update(user.userId, {
         ...user,
         isSubscriber:              true,
-        subscribedAt:              Number(dayjs().subtract(streakMonths, 'month').unix()) * 1000,
+        subscribedAt:              new Date(Number(dayjs().subtract(streakMonths, 'month').unix()) * 1000).toISOString(),
         subscribeTier:             String(tier),
         subscribeCumulativeMonths: amount,
         subscribeStreak:           subStreak,
@@ -704,7 +704,7 @@ class Chat {
       changelog.update(user.userId, {
         ...user,
         isSubscriber:              true,
-        subscribedAt:              Date.now(),
+        subscribedAt:              new Date().toISOString(),
         subscribeTier:             String(tier),
         subscribeCumulativeMonths: amount,
         subscribeStreak:           user.subscribeStreak + 1,
@@ -904,7 +904,7 @@ class Chat {
           isModerator:  userstate.isMod,
           isSubscriber: user.haveSubscriberLock ? user.isSubscriber : userstate.isSubscriber || userstate.isFounder,
           messages:     user.messages ?? 0,
-          seenAt:       Date.now(),
+          seenAt:       new Date().toISOString(),
         });
       } else {
         joinpart.send({ users: [userstate.userName], type: 'join' });
@@ -916,7 +916,7 @@ class Chat {
           isVIP:        userstate.isVip,
           isModerator:  userstate.isMod,
           isSubscriber: userstate.isSubscriber || userstate.isFounder,
-          seenAt:       Date.now(),
+          seenAt:       new Date().toISOString(),
         });
       }
 

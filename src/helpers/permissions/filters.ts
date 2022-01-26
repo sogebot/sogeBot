@@ -63,7 +63,7 @@ async function _filters(
         break;
       }
       case 'followtime':
-        amount = (Date.now() - user.followedAt) / (31 * 24 * 60 * 60 * 1000 /*months*/);
+        amount = (Date.now() - new Date(user.followedAt || Date.now()).getTime()) / (31 * 24 * 60 * 60 * 1000 /*months*/);
         break;
       case 'watched':
         amount = user.watchedTime / (60 * 60 * 1000 /*hours*/);
