@@ -11,4 +11,6 @@ export class OverlayEmotesOptionsObject implements OverlayMapperEmotesOptions {
   @Field(type => Int) maxEmotesPerMessage: number;
   @Field() animation: 'fadeup' | 'fadezoom' | 'facebook';
   @Field(type => Int) animationTime: number;
+  @Field(type => Int, { nullable: true }) maxRotation: number;
+  @Field(type => Int, { nullable: true }) offsetX: number;
 }

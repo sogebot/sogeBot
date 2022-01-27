@@ -234,6 +234,8 @@ export interface OverlayMapperEmotes {
     maxEmotesPerMessage: number,
     animation: 'fadeup' | 'fadezoom' | 'facebook',
     animationTime: number,
+    maxRotation: number,
+    offsetX: number,
   },
 }
 
