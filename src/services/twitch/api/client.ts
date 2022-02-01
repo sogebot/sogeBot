@@ -19,13 +19,7 @@ const client = async (account: 'broadcaster' | 'bot') => {
 
   if ((global as any).mocha) {
     warning('Mocking client for ' + account);
-    return {
-      clips: {
-        getClipById: () => {
-          warning('Mocking call clips.getClipById for ' + account);
-        },
-      },
-    } as unknown as ApiClient;
+    return (global as any).mockClient(account) as unknown as ApiClient;
   }
 
   if (!isValidToken) {

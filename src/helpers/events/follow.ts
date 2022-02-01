@@ -60,6 +60,7 @@ export function follow(userId: string, userName: string, followedAt: string) {
 
   // trigger events only if follow was in hour
   if (Date.now() - new Date(followedAt).getTime() < HOUR) {
+    debug('events', `User ${userName}#${userId} triggered follow event.`);
     eventlist.add({
       event:     'follow',
       userId:    userId,
