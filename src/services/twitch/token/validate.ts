@@ -78,7 +78,7 @@ export const validate = async (type: 'bot' | 'broadcaster', retry = 0, clear = f
       throw new Error(`Type ${type} is not supported`);
     }
 
-    let token: string;
+    let token: string | null;
     if (expirationDate[type] - Date.now() > 5 * constants.MINUTE && expirationDate[type] !== -1) {
       debug('oauth.validate', `Skipping refresh token for ${type}, expiration time: ${new Date(expirationDate[type]).toISOString()}`);
       return true;

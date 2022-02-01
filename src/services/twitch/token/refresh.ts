@@ -38,7 +38,7 @@ const urls = {
         "scope": "viewing_activity_read"
       }
     */
-export const refresh = async (type: 'bot' | 'broadcaster', clear = false) => {
+export const refresh = async (type: 'bot' | 'broadcaster', clear = false): Promise<string | null> => {
 
   if (isDebugEnabled('oauth.refresh')) {
     debug('oauth.refresh', `Refresh stacktrace: ${new Error().stack}`);
@@ -58,11 +58,11 @@ export const refresh = async (type: 'bot' | 'broadcaster', clear = false) => {
 
   if (type === 'bot') {
     if (botRefreshToken.trim().length === 0) {
-      return undefined;
+      return null;
     }
   } else {
     if (broadcasterRefreshToken.trim().length === 0) {
-      return undefined;
+      return null;
     }
   }
 
@@ -72,7 +72,7 @@ export const refresh = async (type: 'bot' | 'broadcaster', clear = false) => {
       name:    'Token Error!',
       message: `Limit of token refresh for ${type} reached, please change your tokens!`,
     });
-    return undefined;
+    return null;
   }
 
   if (Date.now() < lastRefresh[type] + constants.MINUTE * 5) {
@@ -81,7 +81,7 @@ export const refresh = async (type: 'bot' | 'broadcaster', clear = false) => {
       message: `You can refresh token for ${type} once per 5 minutes.`,
     });
     warning(`You can refresh token for ${type} once per 5 minutes.`);
-    return undefined;
+    return null;
   } else {
     lastRefresh[type] = Date.now();
   }
@@ -159,7 +159,15 @@ export const refresh = async (type: 'bot' | 'broadcaster', clear = false) => {
 
       return request.data.token;
     }
-  } catch (e: any) {
+  } catch (e) {
+    if (e instanceof Error) {
+      if (e.message.includes('ETIMEDOUT')) {
+        warning(`Refresh operation for ${type} access token failed. Caused by network timeout, retrying in 10 seconds.`);
+        lastRefresh[type] = 0; // reset last refresh so we are able to actually refresh token several times
+        await new Promise(resolve => setTimeout(resolve, 10000));
+        return refresh(type);
+      }
+    }
     errorCount[type]++;
     if (type === 'bot') {
       emitter.emit('set', '/services/twitch', 'botTokenValid', false);
@@ -174,6 +182,6 @@ export const refresh = async (type: 'bot' | 'broadcaster', clear = false) => {
     }
 
     error('Access token of ' + type + ' was not refreshed.');
-    error(e.stack);
+    throw e;
   }
 };
