@@ -99,7 +99,9 @@ class Currency extends Core {
 
     let refresh = constants.DAY;
     try {
-      info(chalk.yellow('CURRENCY:') + ' fetching rates');
+      if (retries === 1) {
+        info(chalk.yellow('CURRENCY:') + ' fetching rates');
+      }
       // base is always CZK
       // using IP because dns may fail occasionally, 193.85.3.250 => cnb.cz
       const result = await axios.get<any>('https://193.85.3.250/cs/financni_trhy/devizovy_trh/kurzy_devizoveho_trhu/denni_kurz.txt', { httpsAgent: new https.Agent({ rejectUnauthorized: false }) }); // lgtm[js/disabling-certificate-validation]
@@ -116,7 +118,9 @@ class Currency extends Core {
       info(chalk.yellow('CURRENCY:') + ' fetched rates');
       retries = 1;
     } catch (e: any) {
-      error(e.stack);
+      if (!e.message.includes('ECONNRESET')) {
+        error(e.stack);
+      }
       refresh = constants.MINUTE * retries;
       retries++;
     }
