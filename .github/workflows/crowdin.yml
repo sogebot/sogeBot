@@ -1,8 +1,11 @@
 name: Crowdin Action
 
 on:
+  push:
+    branches:
+      - master
   schedule:
-    - cron: "0 */1 * * *" # run every hour
+    - cron: "0 */12 * * *" # run every 12 hours
 
 jobs:
   synchronize-with-crowdin:
