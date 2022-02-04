@@ -161,8 +161,8 @@ export const refresh = async (type: 'bot' | 'broadcaster', clear = false): Promi
     }
   } catch (e) {
     if (e instanceof Error) {
-      if (e.message.includes('ETIMEDOUT')) {
-        warning(`Refresh operation for ${type} access token failed. Caused by network timeout, retrying in 10 seconds.`);
+      if (e.message.includes('ETIMEDOUT') || e.message.includes('EHOSTUNREACH')) {
+        warning(`Refresh operation for ${type} access token failed. Caused by ETIMEDOUT or EHOSTUNREACH, retrying in 10 seconds.`);
         lastRefresh[type] = 0; // reset last refresh so we are able to actually refresh token several times
         await new Promise(resolve => setTimeout(resolve, 10000));
         return refresh(type);
