@@ -6,9 +6,11 @@ const spawn = require('child_process').spawn;
 const fs = require('fs');
 const os = require('os');
 
+const { dayjs, timezone } = require('@sogebot/ui-helpers/dayjsHelper');
 const chalk = require('chalk');
 
 const getMigrationType = require('../dest/helpers/getMigrationType').getMigrationType;
+const { migrationFile } = require('../dest/helpers/log');
 
 const logDir = './logs';
 
@@ -29,24 +31,23 @@ try {
   process.exit(1);
 }
 
-const logFile = './logs/migration.log';
-try {
-  fs.unlinkSync(logFile);
-} catch (e) {
-  // pass
+if (!fs.existsSync(logDir)) {
+  fs.mkdirSync(logDir);
 }
 
 const repo = ['better-sqlite3', 'postgres', 'mysql'];
 
+migrationFile.write(`====================== ${dayjs().tz(timezone).format('YYYY-MM-DD[T]HH:mm:ss.SSS')} ======================\n`);
+
 async function runMigration() {
   if (+process.versions.node.split('.')[0] < 16) {
-    fs.writeFileSync(logFile, '✕ Sorry, this app requires Node.js 16.x or later', { flag: 'a' });
+    migrationFile.write('✕ Sorry, this app requires Node.js 16.x or later');
     console.error('✕ Sorry, this app requires Node.js 16.x or later');
     console.error('\n!!! Node version check FAILED, please check your logs/migration.log for additional information !!! \n');
     process.exit(1);
   } else {
     console.log(chalk.green('✓ Node version check OK.'));
-    fs.writeFileSync(logFile, '✓ Node version check OK.' + os.EOL + os.EOL, { flag: 'a' });
+    migrationFile.write('✓ Node version check OK.' + os.EOL + os.EOL);
   }
 
   // check if TYPEORM_CONNECTION is better-sqlite3, mysql or postgres
@@ -60,10 +61,10 @@ async function runMigration() {
     }
 
     console.log(chalk.green('✓ TYPEORM_CONNECTION check OK.'));
-    fs.writeFileSync(logFile, '✓ TYPEORM_CONNECTION check OK.' + os.EOL + os.EOL, { flag: 'a' });
+    migrationFile.write('✓ TYPEORM_CONNECTION check OK.' + os.EOL + os.EOL);
   } catch (e) {
     console.error(chalk.red(`✕ Incompatible TYPEORM_CONNECTION=${e.message} found. Available options: ${repo.join(', ')} \n[!] Lookup the Documentation about Configuration Database`));
-    fs.writeFileSync(logFile, `✕ Incompatible TYPEORM_CONNECTION=${e.message} found. Available options: ${repo.join(', ')} \n[!] Lookup the Documentation about Configuration Database` + os.EOL + os.EOL, { flag: 'a' });
+    migrationFile.write(`✕ Incompatible TYPEORM_CONNECTION=${e.message} found. Available options: ${repo.join(', ')} \n[!] Lookup the Documentation about Configuration Database` + os.EOL + os.EOL);
     console.error('\n!!! TYPEORM_CONNECTION version check FAILED, please check your logs/migration.log for additional information !!! \n');
     process.exit(1);
   }
@@ -82,11 +83,11 @@ async function runMigration() {
       throw err;
     });
     migration.stdout.on('data', (data) => {
-      fs.writeFileSync(logFile, data, { flag: 'a' });
+      migrationFile.write(data);
     });
 
     migration.stderr.on('data', (data) => {
-      fs.writeFileSync(logFile, data, { flag: 'a' });
+      migrationFile.write(data);
     });
 
     migration.on('close', (code) => {

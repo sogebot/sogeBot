@@ -17,7 +17,12 @@ if (!fs.existsSync(logDir)) {
 }
 
 const logLevel = process.env.LOGLEVEL ? process.env.LOGLEVEL.toLowerCase().trim() : 'info';
-
+const migrationFileName: Generator = (time: Date | number, index?: number) => {
+  if (!time) {
+    return './logs/migration.log';
+  }
+  return `./logs/migration.log.${(index ?? 1)-1}.gz`;
+};
 const logFileName: Generator = (time: Date | number, index?: number) => {
   if (!time) {
     return './logs/sogebot.log';
@@ -30,6 +35,11 @@ const perfFileName: Generator = (time: Date | number, index?: number) => {
   }
   return `./logs/performance.log.${(index ?? 1)-1}.gz`;
 };
+const migrationFile = createStream(migrationFileName, {
+  size:     '5M',
+  compress: 'gzip',
+  maxFiles: 5,
+});
 const logFile = createStream(logFileName, {
   size:     '5M',
   compress: 'gzip',
@@ -243,3 +253,7 @@ const logTimezone = async () => {
   }
 };
 logTimezone();
+
+export {
+  migrationFile,
+};
