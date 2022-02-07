@@ -24,7 +24,7 @@
     "help": "Name der Variable muss eindeutig sein, z.B. $_wins, $_loses, $_top3",
     "placeholder": "Gebe einen eindeutigen Variablennamen ein",
     "error": {
-      "isNotUnique": "Variable must have unique name.",
+      "isNotUnique": "Variable muss einen eindeutigen Namen haben.",
       "isEmpty": "Variablenname darf nicht leer sein."
     }
   },

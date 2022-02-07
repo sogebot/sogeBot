@@ -13,7 +13,7 @@
       "title": "Erlaubte Wörter",
       "help": "Um Domains zu erlauben, verwenden Sie \"domain:prtzl.io\""
     },
-    "autobanMessages": "Autoban Messages",
+    "autobanMessages": "Autoban-Nachrichten",
     "cListsBlacklist": "Verbotene Wörter",
     "cListsTimeout": "Dauer der Zeitüberschreitung",
     "cLinksTimeout": "Dauer der Zeitüberschreitung",

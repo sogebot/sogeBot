@@ -7,7 +7,7 @@
     },
     "isPointResetIntervalEnabled": "Automatisches Punkte zurücksetzen",
     "resetIntervalCron": {
-      "name": "Cron interval",
+      "name": "Cron-Intervall",
       "help": "<a href='https://crontab.guru/'>CronTab generator</a>"
     },
     "interval": "Intervall in Minuten, in denen Zuschauer Punkte erhalten, während der Stream läuft",
