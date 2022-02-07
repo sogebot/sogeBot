@@ -115,9 +115,9 @@
     "help": "Verfügbare Variablen: {name}, {amount} (Grüße, Subs, Tipps, Subgeschenke, Sub Community Geschenke, Befehlseinlöse), {recipient} (Subgeschenke, Befehlseinlöse), {monthsName} (Subgeschenke, Subgeschenke), {currency} (Tipps)"
   },
   "ttsTemplate": {
-    "name": "TTS template",
-    "placeholder": "Set your TTS template",
-    "help": "Available variables: {name}, {amount} {monthsName} {currency} {message}"
+    "name": "TTS Vorlage",
+    "placeholder": "TTS-Vorlage festlegen",
+    "help": "Verfügbare Variablen: {name}, {amount} {monthsName} {currency} {message}"
   },
   "animationText": {
     "name": "Animationstext"
@@ -138,7 +138,7 @@
     "name": "Layout"
   },
   "loop": {
-    "name": "Play on loop"
+    "name": "In Schleife abspielen"
   },
   "scale": {
     "name": "Skalieren"

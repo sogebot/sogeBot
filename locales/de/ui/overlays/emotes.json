@@ -1,14 +1,14 @@
 {
 	"settings": {
 		"btnRemoveCache": "Cache leeren",
-		"hypeMessagesEnabled": "Show hype messages in chat",
-		"btnTestExplosion": "Test emote explosion",
-		"btnTestEmote": "Test emote",
-		"btnTestFirework": "Test emote firework",
+		"hypeMessagesEnabled": "Hype Nachrichten im Chat anzeigen",
+		"btnTestExplosion": "Emote-Explosion testen",
+		"btnTestEmote": "Emote testen",
+		"btnTestFirework": "Teste Emote-Feuerwerk",
 		"cEmotesSize": "Größe der Emotes",
-		"cEmotesMaxEmotesPerMessage": "Maximum of emotes per message",
-		"cEmotesMaxRotation": "Maximal rotation of emote",
-		"cEmotesOffsetX": "Maximal offset on X-axis",
+		"cEmotesMaxEmotesPerMessage": "Maximale Anzahl von Emotes pro Nachricht",
+		"cEmotesMaxRotation": "Maximale Rotation des Emotes",
+		"cEmotesOffsetX": "Maximaler Offset auf X-Achse",
 		"cEmotesAnimation": "Animation",
 		"cEmotesAnimationTime": "Dauer der Animation",
 		"cExplosionNumOfEmotes": "Anzahl von Emotes",
@@ -35,7 +35,7 @@
 		"comboMessages": "Combo Nachrichten"
 	},
 	"hype": {
-		"5": "Let's go! We got $amountx $emote combo so far! SeemsGood",
+		"5": "Los geht's! Wir haben bisher $amountx $emote Combo bekommen! Sieh gut aus",
 		"15": "Keep it going! Can we get more than $amountx $emote? TriHard"
 	},
 	"message": {

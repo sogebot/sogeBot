@@ -1258,7 +1258,7 @@
   "phillipsHue": {
     "list": "$sender, список подсоединенных огней Phillips Hue: "
   },
-  "time": "Текущее время стримера в его часовом поясе $time",
+  "time": "Current time in streamer's timezone is $time",
   "subs": "$sender, сейчас $onlineSubCount онлайн сабскрайберов. Последний sub/resub был $lastSubUsername $lastSubAgo",
   "followers": "$sender, сейчас $onlineFollowersCount онлайн фоловеров. Последний фолоу был $lastFollowUsername $lastFollowAgo",
   "ignore": {

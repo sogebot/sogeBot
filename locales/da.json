@@ -1258,7 +1258,7 @@
   "phillipsHue": {
     "list": "$sender, Liste over Phillips Hue tilsluttede lys: "
   },
-  "time": "Streamerens tid i dennes tidszone er $time",
+  "time": "Current time in streamer's timezone is $time",
   "subs": "$sender, der er i øjeblikket $onlineSubCount abonnenter online. Sidste abonnerende var $lastSubUsername $lastSubAgo",
   "followers": "$sender, der er i øjeblikket $onlineFollowersCount følgere online. Sidste følger var $lastFollowUsername $lastFollowAgo",
   "ignore": {
