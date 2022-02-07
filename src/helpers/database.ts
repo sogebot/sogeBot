@@ -7,7 +7,8 @@ async function setIsDbConnected () {
   try {
     isDbConnected = (await getManager()).connection.isConnected;
   } catch (e: any) {
-    require('~/log').debug('database', 'Database not yet connected.');
+    const { debug } = await import('./log');
+    debug('database', 'Database not yet connected.');
   }
   if (!isDbConnected) {
     setTimeout(() => setIsDbConnected(), 1000);
