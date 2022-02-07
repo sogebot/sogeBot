@@ -26,11 +26,11 @@ class Emotes {
     bttv:    false,
   };
 
-  lastGlobalEmoteChk = 0;
-  lastSubscriberEmoteChk = 0;
+  lastGlobalEmoteChk = 1;
+  lastSubscriberEmoteChk = 1;
   lastChannelChk: string | null = null;
-  lastFFZEmoteChk = 0;
-  lastBTTVEmoteChk = 0;
+  lastFFZEmoteChk = 1;
+  lastBTTVEmoteChk = 1;
 
   interval: NodeJS.Timer;
 
@@ -84,12 +84,14 @@ class Emotes {
         broadcasterWarning = true;
       } else {
         broadcasterWarning = false;
-        this.lastSubscriberEmoteChk = Date.now();
         this.lastChannelChk = broadcasterId;
         try {
-          info(`EMOTES: Fetching channel ${broadcasterId} emotes`);
+          if (this.lastGlobalEmoteChk !== 0) {
+            info(`EMOTES: Fetching channel ${broadcasterId} emotes`);
+          }
           const clientBot = await client('bot');
           const emotes = await clientBot.chat.getChannelEmotes(broadcasterId);
+          this.lastSubscriberEmoteChk = Date.now();
           for (const emote of emotes) {
             debug('emotes.channel', `Saving to cache ${emote.name}#${emote.id}`);
             await getRepository(CacheEmotes).save({
@@ -123,11 +125,14 @@ class Emotes {
 
     // we want to update once every week
     if (Date.now() - this.lastGlobalEmoteChk > 1000 * 60 * 60 * 24 * 7) {
-      this.lastGlobalEmoteChk = Date.now();
       try {
-        info('EMOTES: Fetching global emotes');
+        if (this.lastGlobalEmoteChk !== 0) {
+          info('EMOTES: Fetching global emotes');
+        }
         const clientBot = await client('bot');
         const emotes = await clientBot.chat.getGlobalEmotes();
+
+        this.lastGlobalEmoteChk = Date.now();
         for (const emote of emotes) {
           await setImmediateAwait();
           debug('emotes.global', `Saving to cache ${emote.name}#${emote.id}`);
