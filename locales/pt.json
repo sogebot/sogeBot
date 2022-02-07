@@ -1258,7 +1258,7 @@
   "phillipsHue": {
     "list": "$sender, List of Phillips Hue connected lights: "
   },
-  "time": "Current streamers time in his timezone is $time",
+  "time": "Current time in streamer's timezone is $time",
   "subs": "$sender, there is currently $onlineSubCount online subscribers. Last sub/resub was $lastSubUsername $lastSubAgo",
   "followers": "$sender, there is currently $onlineFollowersCount online followers. Last follow was $lastFollowUsername $lastFollowAgo",
   "ignore": {

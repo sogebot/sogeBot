@@ -1,5 +1,5 @@
 {
-  "services": "Services",
+  "services": "Dienste",
   "updater": "Updater",
   "index": "Dashboard",
   "core": "Bot",
@@ -89,7 +89,7 @@
   "responsivevoice": "ResponsiveVoice",
   "randomizer": "Zufallsgenerator",
   "tips": "Spenden",
-  "bannedevents": "Banned Events",
+  "bannedevents": "Gesperrte Ereignisse",
   "bits": "Bits",
   "discord": "Discord",
   "texttospeech": "Text zu Sprache",
