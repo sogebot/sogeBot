@@ -33,7 +33,6 @@ import { adminEndpoint } from '~/helpers/socket';
  */
 
 let currentSongHash = '';
-let firstAuthorizationDone = false;
 
 class Spotify extends Integration {
   client: null | SpotifyWebApi = null;
@@ -43,8 +42,7 @@ class Spotify extends Integration {
   isUnauthorized = true;
   userId: string | null = null;
 
-  @persistent()
-    lastActiveDeviceId = '';
+  lastActiveDeviceId = '';
   @settings('connection')
     manualDeviceId = '';
 
@@ -102,12 +100,12 @@ class Spotify extends Integration {
       category: 'manage', name: 'spotifybannedsongs', id: 'manage/spotify/bannedsongs', this: this,
     });
 
-    this.timeouts.IRefreshToken = global.setTimeout(() => this.IRefreshToken(), 60000);
-    this.timeouts.ICurrentSong = global.setTimeout(() => {
+    setInterval(() => this.IRefreshToken(), HOUR);
+    setInterval(() => this.ICurrentSong(), 10000);
+    setInterval(() => {
+      this.getMe();
       this.getActiveDevice();
-      this.ICurrentSong();
-    }, 10000);
-    this.timeouts.getMe = global.setTimeout(() => this.getMe(), 10000);
+    }, 30000);
   }
 
   @onLoad('songsHistory')
@@ -251,27 +249,24 @@ class Spotify extends Integration {
   async getActiveDevice() {
     try {
       if (this.enabled && !this.isUnauthorized) {
-        this.client?.getMyDevices()
-          .then((data) => {
-            const activeDevice = data.body.devices.find(o => o.is_active);
-            if (activeDevice && this.lastActiveDeviceId !== activeDevice.id) {
-              info(`SPOTIFY: new active device found, set to ${activeDevice.id}`);
-              this.lastActiveDeviceId = activeDevice.id ?? 'n/a';
-            }
-          }, function(err) {
-            error('SPOTIFY: cannot get active device, please reauthenticate to include scope user-read-playback-state');
-          });
+        const request = await this.client?.getMyDevices();
+        if (request) {
+          const activeDevice = request.body.devices.find(o => o.is_active);
+          if (activeDevice && this.lastActiveDeviceId !== activeDevice.id) {
+            info(`SPOTIFY: new active device found, set to ${activeDevice.id}`);
+            this.lastActiveDeviceId = activeDevice.id ?? 'n/a';
+          }
+        }
       }
     } catch (e: any) {
+      error('SPOTIFY: cannot get active device, please reauthenticate to include scope user-read-playback-state');
       error(e);
     }
   }
 
   async getMe () {
-    clearTimeout(this.timeouts.getMe);
-
     try {
-      if ((this.enabled) && !_.isNil(this.client)) {
+      if ((this.enabled) && !_.isNil(this.client) && !this.isUnauthorized) {
         const data = await this.client.getMe();
 
         this.username = data.body.display_name ? data.body.display_name : data.body.id;
@@ -279,15 +274,11 @@ class Spotify extends Integration {
           info(chalk.yellow('SPOTIFY: ') + `Logged in as ${this.username}#${data.body.id}`);
         }
         this.userId = data.body.id;
-        this.isUnauthorized = false;
       }
     } catch (e: any) {
-      if (e.message.includes('The access token expired.')) {
-        if (firstAuthorizationDone) {
-          info(chalk.yellow('SPOTIFY: ') + 'Get of user failed, incorrect access token. Refreshing token and retrying.');
-        }
-        await this.IRefreshToken();
-        firstAuthorizationDone = true;
+      if (e.message.includes('The access token expired.') || e.message.includes('No token provided.')) {
+        debug('spotify', 'Get of user failed, incorrect or missing access token. Refreshing token and retrying.');
+        this.IRefreshToken();
       } else if (e.message !== 'Unauthorized') {
         if (!this.isUnauthorized) {
           this.isUnauthorized = true;
@@ -297,12 +288,9 @@ class Spotify extends Integration {
       this.username = '';
       this.userId = null;
     }
-    this.timeouts.getMe = global.setTimeout(() => this.getMe(), 30000);
   }
 
   async ICurrentSong () {
-    clearTimeout(this.timeouts.ICurrentSong);
-
     try {
       if (!this.fetchCurrentSongWhenOffline && !(isStreamOnline.value)) {
         throw Error('Stream is offline');
@@ -333,17 +321,16 @@ class Spotify extends Integration {
     } catch (e: any) {
       this.currentSong = JSON.stringify(null);
     }
-    this.timeouts.ICurrentSong = global.setTimeout(() => this.ICurrentSong(), 5000);
   }
 
   async IRefreshToken () {
-    clearTimeout(this.timeouts.IRefreshToken);
-
     if (this.retry.IRefreshToken < 5) {
       try {
         if (!_.isNil(this.client) && this._refreshToken) {
           const data = await this.client.refreshAccessToken();
           this.client.setAccessToken(data.body.access_token);
+          this.isUnauthorized = false;
+
           this.retry.IRefreshToken = 0;
           ioServer?.emit('api.stats', {
             method: 'GET', data: data.body, timestamp: Date.now(), call: 'spotify::refreshToken', api: 'other', endpoint: 'n/a', code: 200,
@@ -355,6 +342,8 @@ class Spotify extends Integration {
           method: 'GET', data: e.message, timestamp: Date.now(), call: 'spotify::refreshToken', api: 'other', endpoint: 'n/a', code: 500,
         });
         info(chalk.yellow('SPOTIFY: ') + 'Refreshing access token failed ' + (this.retry.IRefreshToken > 0 ? 'retrying #' + this.retry.IRefreshToken : ''));
+        info(e.stack);
+        setTimeout(() => this.IRefreshToken(), 10000);
       }
     }
 
@@ -366,7 +355,6 @@ class Spotify extends Integration {
       this.username = '';
       this.currentSong = JSON.stringify(null);
     }
-    this.timeouts.IRefreshToken = global.setTimeout(() => this.IRefreshToken(), HOUR);
   }
 
   sockets () {
@@ -535,9 +523,9 @@ class Spotify extends Integration {
         redirectUri:  this.redirectURI,
       });
 
-      if (this._accessToken && this._refreshToken) {
-        this.client.setAccessToken(this._accessToken);
+      if (this._refreshToken) {
         this.client.setRefreshToken(this._refreshToken);
+        this.IRefreshToken();
         this.retry.IRefreshToken = 0;
       }
 
