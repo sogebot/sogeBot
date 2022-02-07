@@ -58,8 +58,10 @@ class Twitch extends Service {
   @persistent()
     uptime = 0;
 
-  botTokenValid = false;
-  broadcasterTokenValid = false;
+  @persistent() // needs to be persistent as we are using it with variables.get
+    botTokenValid = false;
+  @persistent() // needs to be persistent as we are using it with variables.get
+    broadcasterTokenValid = false;
 
   @persistent()
     currentChannel = '';
