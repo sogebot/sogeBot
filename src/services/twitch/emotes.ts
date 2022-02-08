@@ -210,7 +210,7 @@ class Emotes {
     const currentChannel = variables.get('services.twitch.currentChannel') as string;
 
     if (currentChannel.length === 0) {
-      setImmediate(() => this.fetchEmotesFFZ());
+      setImmediate(() => this.fetchEmotesBTTV());
       return;
     }
 
