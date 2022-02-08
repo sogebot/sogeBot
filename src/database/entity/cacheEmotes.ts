@@ -3,7 +3,7 @@ import { EntitySchema } from 'typeorm';
 export interface CacheEmotesInterface {
   id?: string;
   code: string;
-  type: 'twitch' | 'ffz' | 'bttv';
+  type: 'twitch' | 'ffz' | 'bttv' | '7tv';
   urls: { '1': string; '2': string; '3': string };
 }
 
@@ -11,7 +11,7 @@ export const CacheEmotes = new EntitySchema<Readonly<Required<CacheEmotesInterfa
   name:    'cache_emotes',
   columns: {
     id: {
-      type: String, primary: true, generated: 'uuid', 
+      type: String, primary: true, generated: 'uuid',
     },
     code: { type: String },
     type: { type: 'varchar', length: 6 },

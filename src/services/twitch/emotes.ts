@@ -24,6 +24,7 @@ class Emotes {
     channel: false,
     ffz:     false,
     bttv:    false,
+    '7tv':   false,
   };
 
   lastGlobalEmoteChk = 1;
@@ -31,6 +32,7 @@ class Emotes {
   lastChannelChk: string | null = null;
   lastFFZEmoteChk = 1;
   lastBTTVEmoteChk = 1;
+  last7TVEmoteChk = 1;
 
   interval: NodeJS.Timer;
 
@@ -47,6 +49,9 @@ class Emotes {
       }
       if (!this.fetch.bttv) {
         this.fetchEmotesBTTV();
+      }
+      if (!this.fetch['7tv']) {
+        this.fetchEmotes7TV();
       }
     }, 1000);
   }
@@ -69,6 +74,9 @@ class Emotes {
     }
     if (!this.fetch.bttv) {
       this.fetchEmotesBTTV();
+    }
+    if (!this.fetch.bttv) {
+      this.fetchEmotes7TV();
     }
   }
 
@@ -203,6 +211,98 @@ class Emotes {
       }
 
       this.fetch.ffz = false;
+    }
+  }
+
+  async fetchEmotes7TV () {
+    const currentChannel = variables.get('services.twitch.currentChannel') as string;
+
+    const getAllGlobalEmotes = async (query: string, page = 1, emotes: any[] = []): Promise<any[]> => {
+      const request = await axios.post<any>('https://api.7tv.app/v2/gql', {
+        query,
+        variables: {
+          'query':        '',
+          'page':         page,
+          'pageSize':     16,
+          'limit':        16,
+          'globalState':  'only',
+          'sortBy':       'popularity',
+          'sortOrder':    0,
+          'channel':      '',
+          'submitted_by': null,
+        },
+      });
+      if (request.data.data.search_emotes.length > 0) {
+        emotes = [...emotes, ...request.data.data.search_emotes];
+      }
+
+      if (request.data.data.search_emotes.length === 16) {
+        return await getAllGlobalEmotes(query, page + 1, emotes);
+      }
+      return emotes;
+    };
+
+    const getAllChannelEmotes = async (query: string, channel: string, page = 1, emotes: any[] = []): Promise<any[]> => {
+      const request = await axios.post<any>('https://api.7tv.app/v2/gql', {
+        query,
+        variables: {
+          'query':        '',
+          'page':         page,
+          'pageSize':     16,
+          'limit':        16,
+          'globalState':  'include',
+          'sortBy':       'popularity',
+          'sortOrder':    0,
+          'channel':      channel,
+          'submitted_by': null,
+        },
+      });
+      if (request.data.data.search_emotes.length > 0) {
+        emotes = [...emotes, ...request.data.data.search_emotes];
+      }
+
+      if (request.data.data.search_emotes.length === 16) {
+        return await getAllChannelEmotes(query, channel, page + 1, emotes);
+      }
+      return emotes;
+    };
+
+    if (currentChannel.length === 0) {
+      setImmediate(() => this.fetchEmotes7TV());
+      return;
+    }
+
+    this.fetch.bttv = true;
+
+    if (currentChannel && Date.now() - this.last7TVEmoteChk > 1000 * 60 * 60 * 24 * 7) {
+      info('EMOTES: Fetching 7tv emotes');
+      this.last7TVEmoteChk = Date.now();
+      try {
+        const urlTemplate = `https://cdn.7tv.app/emote/{{id}}/{{image}}`;
+
+        const query = `query($query: String!,$page: Int,$pageSize: Int,$globalState: String,$sortBy: String,$sortOrder: Int,$channel: String,$submitted_by: String,$filter: EmoteFilter) {search_emotes(query: $query,limit: $pageSize,page: $page,pageSize: $pageSize,globalState: $globalState,sortBy: $sortBy,sortOrder: $sortOrder,channel: $channel,submitted_by: $submitted_by,filter: $filter) {id,visibility,owner {id,display_name,role {id,name,color},banned}name,tags}}`;
+        const emotes: { id: string; name: string }[] = [
+          ...await getAllGlobalEmotes(query),
+          ...await getAllChannelEmotes(query, currentChannel),
+        ];
+
+        for (let i = 0, length = emotes.length; i < length; i++) {
+          const cachedEmote = (await getRepository(CacheEmotes).findOne({ code: emotes[i].name, type: '7tv' }));
+          await getRepository(CacheEmotes).save({
+            ...cachedEmote,
+            code: emotes[i].name,
+            type: '7tv',
+            urls: {
+              '1': urlTemplate.replace('{{id}}', emotes[i].id).replace('{{image}}', '1x'),
+              '2': urlTemplate.replace('{{id}}', emotes[i].id).replace('{{image}}', '2x'),
+              '3': urlTemplate.replace('{{id}}', emotes[i].id).replace('{{image}}', '3x'),
+            },
+          });
+        }
+        info('EMOTES: Fetched 7tv emotes');
+      } catch (e: any) {
+        error(e);
+      }
     }
   }
 
