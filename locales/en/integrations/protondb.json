@@ -1,5 +1,5 @@
 {
-  "responseOk": "$game | $rating | Native on $native | Details: $url",
+  "responseOk": "$game | $rating rated | Native on $native | Details: $url",
   "responseNg": "Rating for game $game was not found on ProtonDB.",
   "responseNotFound": "Game $game was not found on ProtonDB."
 }
