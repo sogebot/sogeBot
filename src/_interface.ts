@@ -430,6 +430,7 @@ class Module {
 
     if (isStatusChanged) {
       this.enabled = opts.state;
+      invalidateParserCache();
     } else {
       opts.state = this.enabled;
     }
