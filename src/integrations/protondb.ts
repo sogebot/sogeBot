@@ -83,20 +83,6 @@ class ProtonDB extends System {
         ...opts,
       }];
     }
-
-    await browser.close();
-    return [];
-
-    /*const response = await fetch(`https://www.protondb.com/search?q=${encodeURIComponent(gameInput)}`);
-    if (response.ok && response.status === 200) {
-      const text = await response.text();
-      console.log({ text });
-
-      // we are searching for <a href="/app/570">Dota 2</a>
-    } else {
-      error('Response from protondb.com returned unexpected data.');
-      return [];
-    }*/
   }
 }
 
