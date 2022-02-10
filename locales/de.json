@@ -62,17 +62,6 @@
       "text-decode-base64": "Fügen deinen Base64 ein, um URL und Text oben zu generieren",
       "creditsSpeed": "Setze die Roll-Geschwindigkeit der Credits. niedriger = schneller"
     },
-    "custom-variables": {
-      "set-your-variables-to-watch-here": "Lege die zu beobachtenden Variablen hier fest",
-      "type": "Typ",
-      "unwatch": "Nicht mehr beobachten",
-      "watch": "Beobachten",
-      "options": "Optionen",
-      "number": "Nummer",
-      "text": "Text",
-      "options-placeholder": "Option1, Option2, Option3, hier ist Option 4",
-      "no-options-set": "Du hast noch keine Optionen festgelegt"
-    },
     "timers": {
       "title": "Timers",
       "timer": "Timer",
@@ -364,7 +353,7 @@
         "type": "Typ",
         "days": "Tage",
         "hours": "Stunden",
-        "minutesName": "Singular oder Plurale des Wortes Minuten",
+        "minutesName": "Singular or Plural of the word minute",
         "minutes": "Minuten",
         "seconds": "Sekunden",
         "description": "Beschreibung",

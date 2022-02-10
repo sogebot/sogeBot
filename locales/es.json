@@ -62,17 +62,6 @@
       "text-decode-base64": "Pega tu base64 para generar URL y texto arriba",
       "creditsSpeed": "Define la velocidad de desplazamiento de créditos, más baja = más rápido"
     },
-    "custom-variables": {
-      "set-your-variables-to-watch-here": "Configura tus variables para ver aquí",
-      "type": "tipo",
-      "unwatch": "Dejar de ver",
-      "watch": "Verlo",
-      "options": "opciones",
-      "number": "número",
-      "text": "texto",
-      "options-placeholder": "opción1, opción2, opción3, aquí está la opción 4",
-      "no-options-set": "Aún no has establecido tus opciones"
-    },
     "timers": {
       "title": "Temporizadores",
       "timer": "Temporizador",
@@ -364,7 +353,7 @@
         "type": "Type",
         "days": "Days",
         "hours": "Hours",
-        "minutesName": "Singular or Plural of word minute",
+        "minutesName": "Singular or Plural of the word minute",
         "minutes": "Minutes",
         "seconds": "Seconds",
         "description": "Description",

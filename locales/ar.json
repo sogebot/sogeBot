@@ -62,17 +62,6 @@
       "text-decode-base64": "Paste your base64 to generate URL and text above",
       "creditsSpeed": "Set speed of credits rolling, lower = faster"
     },
-    "custom-variables": {
-      "set-your-variables-to-watch-here": "Set your variables to watch here",
-      "type": "type",
-      "unwatch": "Unwatch",
-      "watch": "Watch",
-      "options": "options",
-      "number": "number",
-      "text": "text",
-      "options-placeholder": "option1, option2, option3, here is option 4",
-      "no-options-set": "You didn't set your options yet"
-    },
     "timers": {
       "title": "Timers",
       "timer": "Timer",
@@ -364,7 +353,7 @@
         "type": "Type",
         "days": "Days",
         "hours": "Hours",
-        "minutesName": "Singular or Plural of word minute",
+        "minutesName": "Singular or Plural of the word minute",
         "minutes": "Minutes",
         "seconds": "Seconds",
         "description": "Description",

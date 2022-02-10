@@ -62,17 +62,6 @@
       "text-decode-base64": "Collez votre base64 pour générer l'URL et le texte ci-dessus",
       "creditsSpeed": "Définir la vitesse de roulement des crédits, inférieur = plus rapide"
     },
-    "custom-variables": {
-      "set-your-variables-to-watch-here": "Définissez vos variables à regarder ici",
-      "type": "type",
-      "unwatch": "Ne plus suivre",
-      "watch": "Voir",
-      "options": "options",
-      "number": "numéro",
-      "text": "texte",
-      "options-placeholder": "option1, option2, option3, voici l'option 4",
-      "no-options-set": "Vous n'avez pas encore défini vos options"
-    },
     "timers": {
       "title": "Timers",
       "timer": "Timer",
@@ -364,7 +353,7 @@
         "type": "Type",
         "days": "Jours",
         "hours": "Heures",
-        "minutesName": "Singular or Plural of word minute",
+        "minutesName": "Singular or Plural of the word minute",
         "minutes": "Minutes",
         "seconds": "Secondes",
         "description": "Description",

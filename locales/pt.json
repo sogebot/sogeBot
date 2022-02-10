@@ -30,17 +30,17 @@
     "messages": "mensagem|mensagens",
     "bits": "bit|bits",
     "links": "link|links",
-    "entries": "entry|entries",
+    "entries": "entrada|entradas",
     "empty": "vazio",
-    "isRegistered": "$sender, you cannot use !$keyword, because is already in use for another action!"
+    "isRegistered": "$sender, você não pode usar !$keyword, porque já está em uso para outra ação!"
   },
   "clip": {
-    "notCreated": "Something went wrong and clip was not created.",
-    "offline": "Stream is currently offline and clip cannot be created."
+    "notCreated": "Algo deu errado e o clipe não foi criado.",
+    "offline": "A transmissão está offline no momento e não é possível criar um clipe."
   },
   "uptime": {
-    "online": "Stream is online for (if $days>0|$daysd )(if $hours>0|$hoursh )(if $minutes>0|$minutesm )(if $seconds>0|$secondss)",
-    "offline": "Stream is currently offline for (if $days>0|$daysd )(if $hours>0|$hoursh )(if $minutes>0|$minutesm )(if $seconds>0|$secondss)"
+    "online": "Transmitindo a (if $days>0|$daysd )(if $hours>0|$hoursh )(if $minutes>0|$minutesm )(if $seconds>0|$secondss)",
+    "offline": "Transmitindo a (if $days>0|$daysd )(if $hours>0|$hoursh )(if $minutes>0|$minutesm )(if $seconds>0|$secondss)"
   },
   "webpanel": {
     "this-system-is-disabled": "Este sistema está desativado",
@@ -50,11 +50,11 @@
     "go-to-admin": "Painel do administrador",
     "go-to-public": "Painel do usuario",
     "logout": "Finalizar sessão",
-    "popout": "Popout",
+    "popout": "Desanexar",
     "not-logged-in": "Desconectado",
     "remove-widget": "Remover o widget <strong>$name</strong>",
-    "join-channel": "Join bot to channel",
-    "leave-channel": "Leave bot from channel",
+    "join-channel": "Associar ‘bot’ ao canal",
+    "leave-channel": "Desassociar ‘bot’ do canal",
     "set-default": "Definir como padrão",
     "add": "Adicionar",
     "placeholders": {
@@ -62,80 +62,69 @@
       "text-decode-base64": "Cole seu base64 para gerar o URL e o texto acima",
       "creditsSpeed": "Definir velocidade de execução de créditos, mais baixo = mais rápido"
     },
-    "custom-variables": {
-      "set-your-variables-to-watch-here": "Defina suas variáveis para acompanhar aqui",
-      "type": "tipo",
-      "unwatch": "Unwatch",
-      "watch": "Acompanhar",
-      "options": "opções",
-      "number": "número",
-      "text": "texto",
-      "options-placeholder": "option1, option2, option3, here is option 4",
-      "no-options-set": "Você ainda não definiu suas opções"
-    },
     "timers": {
-      "title": "Timers",
-      "timer": "Timer",
-      "messages": "messages",
-      "seconds": "seconds",
+      "title": "Temporizadores",
+      "timer": "Temporizador",
+      "messages": "mensagens",
+      "seconds": "segundos",
       "badges": {
-        "enabled": "Enabled",
-        "disabled": "Disabled"
+        "enabled": "Ativado",
+        "disabled": "Desativado"
       },
       "errors": {
-        "timer_name_must_be_compliant": "This value can contain only a-zA-Z09_",
-        "this_value_must_be_a_positive_number_or_0": "This value must be a positive number or 0",
-        "value_cannot_be_empty": "Value cannot be empty"
+        "timer_name_must_be_compliant": "Este valor pode conter apenas a-zA-Z09_",
+        "this_value_must_be_a_positive_number_or_0": "Este valor deve ser um número positivo ou 0",
+        "value_cannot_be_empty": "O valor não pode ficar vazio"
       },
       "dialog": {
-        "timer": "Timer",
+        "timer": "Temporizador",
         "name": "Name",
-        "tickOffline": "Should tick if stream offline",
-        "interval": "Interval",
-        "responses": "Responses",
-        "messages": "Trigger every X Messages",
-        "seconds": "Trigger every X Seconds",
+        "tickOffline": "Deve marcar se a transmissão estiver offline",
+        "interval": "Intervalo",
+        "responses": "Respostas",
+        "messages": "Acionar a cada X mensagens",
+        "seconds": "Acionar a cada X segundos",
         "title": {
-          "new": "New timer",
-          "edit": "Edit timer"
+          "new": "Novo temporizador",
+          "edit": "Editar Temporizador"
         },
         "placeholders": {
-          "name": "Set name of your timer, can contain only these characters a-zA-Z0-9_",
-          "messages": "Trigger timer each X messages",
-          "seconds": "Trigger timer each X seconds"
+          "name": "Defina o nome do seu temporizador, pode conter apenas estes caracteres a-zA-Z0-9_",
+          "messages": "Acionar o temporizador a cada X mensagens",
+          "seconds": "Acionar o temporizador a cada X mensagens"
         },
         "alerts": {
-          "success": "Timer was <strong>successfully</strong> saved.",
-          "fail": "Something went <strong>wrong</strong>."
+          "success": "Timer foi <strong>salvo com sucesso</strong>.",
+          "fail": "Algo está <strong>errado</strong>."
         }
       },
       "buttons": {
-        "close": "Close",
-        "save-changes": "Save changes",
-        "disable": "Disable",
-        "enable": "Enable",
-        "edit": "Edit",
-        "delete": "Delete",
-        "yes": "Yes",
-        "no": "No"
+        "close": "Fechar",
+        "save-changes": "Salvar alterações",
+        "disable": "Desativar",
+        "enable": "Ativar",
+        "edit": "Editar",
+        "delete": "Deletar",
+        "yes": "Sim",
+        "no": "Não"
       },
       "popovers": {
-        "are_you_sure_you_want_to_delete_timer": "Are you sure you want to <strong class='text-danger'>delete</strong> timer"
+        "are_you_sure_you_want_to_delete_timer": "Tem certeza que deseja <strong class='text-danger'>excluir</strong> timer"
       }
     },
     "events": {
-      "event": "Event",
-      "noEvents": "No events found in database.",
-      "whatsthis": "what's this?",
-      "myRewardIsNotListed": "My reward is not listed!",
-      "redeemAndClickRefreshToSeeReward": "If you are missing your created reward in a list, refresh by clicking on refresh icon.",
+      "event": "Evento",
+      "noEvents": "Nenhum evento encontrado na base de dados.",
+      "whatsthis": "o que é isto?",
+      "myRewardIsNotListed": "Minha recompensa não está listada!",
+      "redeemAndClickRefreshToSeeReward": "Se sua recompensa criada estiver faltando em uma lista, atualize clicando no ícone de atualização.",
       "badges": {
-        "enabled": "Enabled",
-        "disabled": "Disabled"
+        "enabled": "Ativado",
+        "disabled": "Desativado"
       },
       "buttons": {
-        "test": "Test",
-        "enable": "Enable",
+        "test": "Teste",
+        "enable": "Ativar",
         "disable": "Desativar",
         "edit": "Editar",
         "delete": "Deletar",
@@ -143,8 +132,8 @@
         "no": "Não"
       },
       "popovers": {
-        "are_you_sure_you_want_to_delete_event": "Are you sure you want to <strong class='text-danger'>delete</strong> event",
-        "example_of_user_object_data": "Example of user object data"
+        "are_you_sure_you_want_to_delete_event": "Tem certeza que deseja <strong class='text-danger'>excluir</strong> evento",
+        "example_of_user_object_data": "Exemplo de dados do objeto de usuário"
       },
       "errors": {
         "command_must_start_with_!": "O comando deve começar com !",
@@ -153,100 +142,100 @@
       },
       "dialog": {
         "title": {
-          "new": "New event listener",
-          "edit": "Edit event listener"
+          "new": "Novo ouvinte de evento",
+          "edit": "Editar ouvinte de evento"
         },
         "placeholders": {
-          "name": "Set name of your event listener (if empty, name will be generated)"
+          "name": "Defina o nome do ouvinte do seu evento (se vazio, o nome será gerado)"
         },
         "alerts": {
-          "success": "Event was <strong>successfully</strong> saved.",
+          "success": "Evento foi <strong>salvo com sucesso</strong>.",
           "fail": "Alguma coisa deu <strong>errada</strong>."
         },
         "close": "Fechar",
         "save-changes": "Salvar alterações",
-        "event": "Event",
+        "event": "Evento",
         "name": "Nome",
-        "usable-events-variables": "Usable events variables",
-        "settings": "Settings",
+        "usable-events-variables": "Variáveis de eventos utilizáveis",
+        "settings": "Configurações",
         "filters": "Filtros",
         "operations": "Operações"
       },
       "definitions": {
         "taskId": {
-          "label": "Task ID"
+          "label": "ID de Tarefa"
         },
         "filter": {
-          "label": "Filter"
+          "label": "Filtro"
         },
         "linkFilter": {
           "label": "Link Overlay Filter",
-          "placeholder": "If using overlay, add link or id of your overlay"
+          "placeholder": "Se estiver usando overlay, adicione o link ou id da sua overlay"
         },
         "hashtag": {
-          "label": "Hashtag or Keyword",
-          "placeholder": "#yourHashtagHere or Keyword"
+          "label": "Hashtag ou Palavra-chave",
+          "placeholder": "#suaHashtagAqui ou Palavra-chave"
         },
         "fadeOutXCommands": {
-          "label": "Fade Out X Commands",
-          "placeholder": "Number of commands subtracted every fade out interval"
+          "label": "Esmaecer X Comandos",
+          "placeholder": "Número de comandos subtraídos a cada intervalo de esmaecimento"
         },
         "fadeOutXKeywords": {
-          "label": "Fade Out X Keywords",
-          "placeholder": "Number of keywords subtracted every fade out interval"
+          "label": "Esmaecer X Palavras-chave",
+          "placeholder": "Número de palavras-chave subtraídos a cada intervalo de esmaecimento"
         },
         "fadeOutInterval": {
-          "label": "Fade Out Interval (seconds)",
-          "placeholder": "Fade out interval subtracting"
+          "label": "Intervalo de Esmaecimento (segundos)",
+          "placeholder": "Subtração de Intervalo de esmaecimento"
         },
         "runEveryXCommands": {
-          "label": "Run Every X Commands",
-          "placeholder": "Number of commands before event is triggered"
+          "label": "Executar a Cada X Comandos",
+          "placeholder": "Número de comandos antes do evento ser acionado"
         },
         "runEveryXKeywords": {
-          "label": "Run Every X Keywords",
-          "placeholder": "Number of keywords before event is triggered"
+          "label": "Executar a cada X palavras-chave",
+          "placeholder": "Número de palavras-chave antes do evento ser acionado"
         },
         "commandToWatch": {
-          "label": "Command To Watch",
-          "placeholder": "Set your !commandToWatch"
+          "label": "Comando para Observar",
+          "placeholder": "Defina seu !commandToWatch"
         },
         "keywordToWatch": {
-          "label": "Keyword To Watch",
-          "placeholder": "Set your keywordToWatch"
+          "label": "Palavra-chave para Observar",
+          "placeholder": "Defina sua keywordToWatch para Observar"
         },
         "resetCountEachMessage": {
-          "label": "Reset count each message",
-          "true": "Reset count",
-          "false": "Keep count"
+          "label": "Redefinir a contagem a cada mensagem",
+          "true": "Redefinir contagem",
+          "false": "Manter contagem"
         },
         "viewersAtLeast": {
-          "label": "Viewers At Least",
-          "placeholder": "How many viewers at least to trigger event"
+          "label": "'Viewers' pelo menos",
+          "placeholder": "Quantos espectadores pelo menos para acionar o evento"
         },
         "runInterval": {
-          "label": "Run Interval (0 = run once per stream)",
-          "placeholder": "Trigger event every x seconds"
+          "label": "Executar Intervalo (0 = executar uma vez por stream)",
+          "placeholder": "Acionar a cada x segundos"
         },
         "runAfterXMinutes": {
-          "label": "Run After X Minutes",
-          "placeholder": "Trigger event after x minutes"
+          "label": "Executar Após X Minutos",
+          "placeholder": "Disparar evento após x minutos"
         },
         "runEveryXMinutes": {
-          "label": "Run Every X Minutes",
-          "placeholder": "Trigger event every x minutes"
+          "label": "Executar A Cada X Minutos",
+          "placeholder": "Acionar a cada x minutos"
         },
         "messageToSend": {
-          "label": "Message To Send",
-          "placeholder": "Set your message"
+          "label": "Mensagem a enviar",
+          "placeholder": "Defina sua mensagem"
         },
         "channel": {
-          "label": "Channel",
-          "placeholder": "Channelname or ID"
+          "label": "Canal",
+          "placeholder": "Nome ou ID do canal"
         },
         "commandToRun": {
           "label": "Command To Run",
-          "placeholder": "Set your !commandToRun"
+          "placeholder": "Defina seu !commandToRun"
         },
         "isCommandQuiet": {
           "label": "Should be command quiet",
@@ -332,55 +321,55 @@
         "winnerVotes": "Twitch Poll - Winner choice votes",
         "goal": "Goal",
         "total": "Total",
-        "lastContributionTotal": "Last Contribution - Total",
-        "lastContributionType": "Last Contribution - Type",
-        "lastContributionUserId": "Last Contribution - User ID",
-        "lastContributionUsername": "Last Contribution - Username",
-        "level": "Level",
-        "topContributionsBitsTotal": "Top Bits Contribution - Total",
-        "topContributionsBitsUserId": "Top Bits Contribution - User ID",
-        "topContributionsBitsUsername": "Top Bits Contribution - Username",
-        "topContributionsSubsTotal": "Top Subs Contribution - Total",
-        "topContributionsSubsUserId": "Top Subs Contribution - User ID",
-        "topContributionsSubsUsername": "Top Subs Contribution - Username",
-        "sender": "User who initiated",
-        "title": "Current title",
-        "game": "Current game",
-        "language": "Current stream language",
-        "viewers": "Current viewers count",
-        "hostViewers": "Host/Raid viewers count",
-        "views": "Current views count",
-        "followers": "Current followers count",
-        "subscribers": "Current subscribers count",
-        "arg": "Argument",
-        "param": "Parameter (required)",
-        "touser": "Username parameter",
-        "!param": "Parameter (not required)",
-        "alias": "Alias",
-        "command": "Command",
-        "keyword": "Keyword",
-        "response": "Response",
-        "list": "Populated list",
-        "type": "Type",
-        "days": "Days",
-        "hours": "Hours",
-        "minutesName": "Singular or Plural of word minute",
-        "minutes": "Minutes",
-        "seconds": "Seconds",
-        "description": "Description",
-        "quiet": "Quiet (bool)",
+        "lastContributionTotal": "Última Contribuição - Total",
+        "lastContributionType": "Última contribuição - Tipo",
+        "lastContributionUserId": "Última contribuição - ID de usuário",
+        "lastContributionUsername": "Última Contribuição - Nome de Usuário",
+        "level": "Nível",
+        "topContributionsBitsTotal": "Contribuição dos Top Bits - Total",
+        "topContributionsBitsUserId": "Contribuição dos Top Bits - ID de Usuário",
+        "topContributionsBitsUsername": "Contribuição do Top Bits - Nome de usuário",
+        "topContributionsSubsTotal": "Contribuição Top Subs - Total",
+        "topContributionsSubsUserId": "Contribuição Top Subs - ID de Usuário",
+        "topContributionsSubsUsername": "Contribuição Top Subs - Nome de usuário",
+        "sender": "Usuário que iniciou",
+        "title": "Título atual",
+        "game": "Jogo atual",
+        "language": "Idioma atual da transmissão",
+        "viewers": "Contagem atual de 'viewers'",
+        "hostViewers": "Contagem de 'viewers' de host/raid",
+        "views": "Contagem autal de visualizações",
+        "followers": "Contagem autal de seguidores",
+        "subscribers": "Contagem atual de assinantes",
+        "arg": "Argumento",
+        "param": "Parâmetro (requerido)",
+        "touser": "Parâmetro do usuário",
+        "!param": "Parâmetro (não requerido)",
+        "alias": "Apelido",
+        "command": "Comando",
+        "keyword": "Palavra-chave",
+        "response": "Resposta",
+        "list": "Lista preenchida",
+        "type": "Tipo",
+        "days": "Dias",
+        "hours": "Horas",
+        "minutesName": "Singular or Plural of the word minute",
+        "minutes": "Minutos",
+        "seconds": "Segundos",
+        "description": "Descrição",
+        "quiet": "Silêncioso (booleano)",
         "id": "ID",
-        "name": "Name",
-        "messages": "Messages",
-        "amount": "Amount",
-        "amountInBotCurrency": "Amount in bot currency",
-        "currency": "Currency",
-        "currencyInBot": "Currency in bot",
-        "pointsName": "Points name",
-        "points": "Points",
-        "rank": "Rank",
-        "nextrank": "Next rank",
-        "username": "Username",
+        "name": "Nome",
+        "messages": "Mensagens",
+        "amount": "Quantia",
+        "amountInBotCurrency": "Quantia em moeda do bot",
+        "currency": "Moeda",
+        "currencyInBot": "Moeda do bot",
+        "pointsName": "Nome dos Pontos",
+        "points": "Pontos",
+        "rank": "Colocação",
+        "nextrank": "Próxima colocação",
+        "username": "Nome de usuário",
         "value": "Value",
         "variable": "Variable",
         "count": "Count",
@@ -431,31 +420,31 @@
         "latestSubscriber": "Latest Subscriber",
         "latestSubscriberMonths": "Latest Subscriber cumulative months",
         "latestSubscriberStreak": "Latest Subscriber months streak",
-        "latestTipAmount": "Latest Tip (amount)",
-        "latestTipCurrency": "Latest Tip (currency)",
-        "latestTipMessage": "Latest Tip (message)",
-        "latestTip": "Latest Tip (username)",
+        "latestTipAmount": "Última Gorjeta (quantia)",
+        "latestTipCurrency": "Última Gorjeta (moeda)",
+        "latestTipMessage": "Última Gorjeta (mensagem)",
+        "latestTip": "Última Gorjeta (nome de usuário)",
         "toptip": {
           "overall": {
-            "username": "Top Tip - overall (username)",
-            "amount": "Top Tip - overall (amount)",
-            "currency": "Top Tip - overall (currency)",
-            "message": "Top Tip - overall (message)"
+            "username": "Melhor Gorjeta - geral (nome de usuário)",
+            "amount": "Melhor Gorjeta - geral (quantia)",
+            "currency": "Melhor Gorjeta - geral (moeda)",
+            "message": "Melhor Gorjeta - geral (mensagem)"
           },
           "stream": {
-            "username": "Top Tip - during stream (username)",
-            "amount": "Top Tip - during stream (amount)",
-            "currency": "Top Tip - during stream (currency)",
-            "message": "Top Tip - during stream (message)"
+            "username": "Melhor Gorjeta - durante a 'stream' (nome de usuário)",
+            "amount": "Melhor Gorjeta - durante a 'stream' (quantia)",
+            "currency": "Melhor Gorjeta - durante a 'stream' (moeda)",
+            "message": "Melhor Gorjeta - durante a 'stream' (mensagem)"
           }
         },
-        "latestCheerAmount": "Latest Bits (amount)",
-        "latestCheerMessage": "Latest Bits (message)",
-        "latestCheer": "Latest Bits (username)",
-        "version": "Bot version",
-        "haveParam": "Have command parameter? (bool)",
-        "source": "Current source (twitch or discord)",
-        "userInput": "User input during reward redeem",
+        "latestCheerAmount": "Bits mais recentes (quantia)",
+        "latestCheerMessage": "Bits mais recentes (mensagem)",
+        "latestCheer": "Bits mais recentes (nome de usuário)",
+        "version": "Versão do bot",
+        "haveParam": "Há algum parâmetro para o bot? (booleano)",
+        "source": "Fonte atual (twitch ou discord)",
+        "userInput": "Entrada do usuário durante o 'redeem' de recompensa",
         "isBotSubscriber": "Is bot subscriber (bool)",
         "isStreamOnline": "Is stream online (bool)",
         "uptime": "Uptime of stream",

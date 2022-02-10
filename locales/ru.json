@@ -62,17 +62,6 @@
       "text-decode-base64": "Вставьте свой base64 для создания URL и текста выше",
       "creditsSpeed": "Установите скорость прокрутки, меньше = быстрее"
     },
-    "custom-variables": {
-      "set-your-variables-to-watch-here": "Установите ваши переменные для отслеживания",
-      "type": "тип",
-      "unwatch": "Перестать отслеживать",
-      "watch": "Следить",
-      "options": "параметры",
-      "number": "число",
-      "text": "текст",
-      "options-placeholder": "option1, option2, option3, здесь option 4",
-      "no-options-set": "Вы еще не установили параметры"
-    },
     "timers": {
       "title": "Таймеры",
       "timer": "Таймер",
@@ -364,7 +353,7 @@
         "type": "Тип",
         "days": "Дни",
         "hours": "Часы",
-        "minutesName": "Единственной или множественное число минут",
+        "minutesName": "Singular or Plural of the word minute",
         "minutes": "Минуты",
         "seconds": "Секунды",
         "description": "Описание",

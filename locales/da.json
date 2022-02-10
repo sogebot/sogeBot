@@ -62,17 +62,6 @@
       "text-decode-base64": "Indsæt din base64 for at generere URL og tekst ovenfor",
       "creditsSpeed": "Set speed of credits rolling, lower = faster"
     },
-    "custom-variables": {
-      "set-your-variables-to-watch-here": "Set your variables to watch here",
-      "type": "type",
-      "unwatch": "Stop overvågning",
-      "watch": "Overvåg",
-      "options": "valgmuligheder",
-      "number": "number",
-      "text": "tekst",
-      "options-placeholder": "valgmulighed1, valgmulighed, 2, valgmulighed, 3, her er mulighed 4",
-      "no-options-set": "Du har endnu ikke angivet dine valgmuligheder"
-    },
     "timers": {
       "title": "Tidsur",
       "timer": "Timer",
@@ -364,7 +353,7 @@
         "type": "Type",
         "days": "Dage",
         "hours": "Timer",
-        "minutesName": "Singular or Plural of word minute",
+        "minutesName": "Singular or Plural of the word minute",
         "minutes": "Minutter",
         "seconds": "Sekunder",
         "description": "Beskrivelse",

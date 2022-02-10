@@ -62,17 +62,6 @@
       "text-decode-base64": "Incolla il tuo base64 per generare URL ed il testo qui sopra",
       "creditsSpeed": "Imposta la velocità di scorrimento dei titoli di coda, lentissimo ---> velocissimo"
     },
-    "custom-variables": {
-      "set-your-variables-to-watch-here": "Imposta qui le variabili da tenere presente",
-      "type": "tipo",
-      "unwatch": "Smetti di Osservare",
-      "watch": "Osserva",
-      "options": "opzioni",
-      "number": "numero",
-      "text": "testo",
-      "options-placeholder": "opzione1, opzione2, opzione3, ed infine l'opzione 4",
-      "no-options-set": "Non hai ancora impostato le opzioni"
-    },
     "timers": {
       "title": "Timers",
       "timer": "Timer",
@@ -364,7 +353,7 @@
         "type": "Tipo",
         "days": "Giorni",
         "hours": "Ore",
-        "minutesName": "Singolare o plurale della parola minuto",
+        "minutesName": "Singular or Plural of the word minute",
         "minutes": "Minuti",
         "seconds": "Secondi",
         "description": "Descrizione",
