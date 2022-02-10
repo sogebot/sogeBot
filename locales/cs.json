@@ -62,17 +62,6 @@
       "text-decode-base64": "Vložte base64 a vygenerujte URL a text výše",
       "creditsSpeed": "Nastavte rychlost titulek, nižší = rychlejší"
     },
-    "custom-variables": {
-      "set-your-variables-to-watch-here": "Zde nastavte proměnné",
-      "type": "typ",
-      "unwatch": "Přestat sledovat",
-      "watch": "Sledovat",
-      "options": "možnosti",
-      "number": "číslo",
-      "text": "text",
-      "options-placeholder": "možnost1, možnost2, možnost3, zde je možnost 4",
-      "no-options-set": "Zatím jste nenastavili své možnosti"
-    },
     "timers": {
       "title": "Časovače",
       "timer": "Časovač",
