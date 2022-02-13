@@ -135,6 +135,8 @@ export const refresh = async (type: 'bot' | 'broadcaster', clear = false): Promi
             name:    'Token Error!',
             message: `Invalid refresh token for ${type}. Please reset your token.`,
           });
+          errorCount[type] = 1000;
+          return null;
         }
         throw new Error(`Token refresh for ${type}: ${request.data.message}`);
       }
@@ -160,6 +162,7 @@ export const refresh = async (type: 'bot' | 'broadcaster', clear = false): Promi
       return request.data.token;
     }
   } catch (e) {
+    errorCount[type]++;
     if (e instanceof Error) {
       if (e.message.includes('ETIMEDOUT') || e.message.includes('EHOSTUNREACH')) {
         warning(`Refresh operation for ${type} access token failed. Caused by ETIMEDOUT or EHOSTUNREACH, retrying in 10 seconds.`);
@@ -168,7 +171,6 @@ export const refresh = async (type: 'bot' | 'broadcaster', clear = false): Promi
         return refresh(type);
       }
     }
-    errorCount[type]++;
     if (type === 'bot') {
       emitter.emit('set', '/services/twitch', 'botTokenValid', false);
       emitter.emit('set', '/services/twitch', 'botId', '');
