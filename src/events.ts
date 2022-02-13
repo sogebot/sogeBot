@@ -785,7 +785,7 @@ class Events extends Core {
               return { [variableMap]: randomized.includes(variableMap) ? sample(['Twitch', 'Discord']) : values[idx] };
             } else if (['tier'].includes(variableMap)) {
               return { [variableMap]: randomized.includes(variableMap) ? random(0, 3, false) : (values[idx] === 'Prime' ? 0 : Number(values[idx]))  };
-            } else if (['lastContributionTotal', 'topContributionsSubsTotal', 'topContributionsBitsTotal', 'duration', 'viewers', 'bits', 'subCumulativeMonths', 'count', 'subStreak', 'amount', 'amountInBotCurrency'].includes(variableMap)) {
+            } else if (['hostViewers', 'lastContributionTotal', 'topContributionsSubsTotal', 'topContributionsBitsTotal', 'duration', 'viewers', 'bits', 'subCumulativeMonths', 'count', 'subStreak', 'amount', 'amountInBotCurrency'].includes(variableMap)) {
               return { [variableMap]: randomized.includes(variableMap) ? random(10, 10000000000, false) : values[idx]  };
             } else if (['game', 'oldGame'].includes(variableMap)) {
               return {
