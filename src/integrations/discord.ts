@@ -465,11 +465,11 @@ class Discord extends Integration {
       const userName = attributes.username === null || typeof attributes.username === 'undefined' ? getOwner() : attributes.username;
       await changelog.flush();
       const userObj = await getRepository(User).findOne({ userName });
-      if (!userObj && !attributes.test) {
-        changelog.update(await getIdFromTwitch(userName), { userName });
-        return self.fireSendDiscordMessage(operation, { ...attributes, userName });
-      } else if (!userObj) {
-        return;
+      if (!attributes.test) {
+        if (!userObj) {
+          changelog.update(await getIdFromTwitch(userName), { userName });
+          return self.fireSendDiscordMessage(operation, { ...attributes, userName });
+        }
       }
 
       const message = attributesReplace(attributes, String(operation.messageToSend));
