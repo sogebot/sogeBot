@@ -11,6 +11,7 @@ declare module 'strip-comments';
 declare module 'vue-plyr';
 declare module 'blocked-at';
 declare module 'twitter-api-v2/src';
+declare module 'safe-eval';
 
 declare module 'js-beautify' {
   export function js(code: string): string;

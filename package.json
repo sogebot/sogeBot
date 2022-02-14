@@ -64,6 +64,7 @@
     "reflect-metadata": "0.1.13",
     "request": "2.88.2",
     "rotating-file-stream": "3.0.2",
+    "safe-eval": "^0.4.1",
     "sanitize-filename": "1.6.3",
     "shortid": "^2.2.16",
     "socket.io": "4.4.1",
