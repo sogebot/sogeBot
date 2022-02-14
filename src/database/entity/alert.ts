@@ -56,7 +56,7 @@ export interface CommonSettingsInterface {
   | 'slideOutUp' | 'zoomOut' | 'zoomOutDown' | 'zoomOutLeft' | 'zoomOutRight'
   | 'zoomOutUp' | 'rollOut';
   animationText: 'none' | 'baffle' | 'bounce' | 'bounce2' | 'flip' | 'flash' | 'pulse2' | 'rubberBand'
-  | 'shake2' | 'swing' | 'tada' | 'wave' | 'wobble' | 'wiggle' | 'wiggle2' | 'jello';
+  | 'shake2' | 'swing' | 'tada' | 'wave' | 'wobble' | 'wiggle' | 'wiggle2' | 'jello' | 'typewriter';
   animationTextOptions: {
     speed: number | 'slower' | 'slow' | 'fast' | 'faster';
     maxTimeToDecrypt: number;
