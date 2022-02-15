@@ -17,6 +17,8 @@ const versions = {
   '@sogebot/ui-public':  '',
 };
 
+const updating = new Set();
+
 class Updater extends Core {
   @settings()
     isAutomaticUpdateEnabled = true;
@@ -48,6 +50,13 @@ class Updater extends Core {
       cb(null, '');
     });
     adminEndpoint(this.nsp, 'updater::trigger', async (opts, cb) => {
+      if (updating.has(opts.pkg)) {
+        info(`Update for ${opts.pkg} in progress. Please wait until completed.`);
+        if (cb) {
+          cb(`Update for ${opts.pkg} in progress. Please wait until completed.`, '');
+        }
+      }
+      updating.add(opts.pkg);
       info(`Update for ${opts.pkg}@${opts.version} manually triggered. Update processing.`);
       exec(`npm install ${opts.pkg}@${opts.version}`, (error, _, stderr) => {
         if (!error) {
@@ -62,6 +71,7 @@ class Updater extends Core {
             cb(stderr, '');
           }
         }
+        updating.delete(opts.pkg);
       });
     });
   }
@@ -90,6 +100,11 @@ class Updater extends Core {
           && [actualMajor, actualMinor, actualPatch].join('.') !== this.versionsAvailable[pkg]) {
         if (this.isAutomaticUpdateEnabled
           && ((process.env.NODE_ENV || 'development') === 'production' && !(global as any).mocha)) {
+          if (updating.has(pkg)) {
+            continue; // skip if update in progress
+          }
+          updating.add(pkg);
+
           info(`New version of ${pkg}@${applicableVersion} package found. Automatic update processing.`);
           await new Promise((resolve) => {
             exec(`npm install ${pkg}@${applicableVersion}`, (error, _, stderr) => {
@@ -99,6 +114,7 @@ class Updater extends Core {
               } else {
                 errorLog(stderr);
               }
+              updating.delete(pkg);
               resolve(true);
             });
           });
