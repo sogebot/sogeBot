@@ -471,7 +471,7 @@ class Users extends Core {
         if (getFollows.total === 0) {
           throw new Error('Not a follower');
         } else {
-          cb(null, new Date(getFollows.data[0].followDate).getTime());
+          cb(null, new Date(getFollows.data[0].followDate).toISOString());
         }
       } catch (e: any) {
         cb(e.stack, null);
