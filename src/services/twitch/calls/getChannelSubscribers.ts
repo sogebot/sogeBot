@@ -1,9 +1,9 @@
+import { HelixSubscription } from '@twurple/api/lib';
 import { getRepository } from 'typeorm';
 
 import client from '../api/client';
 import { refresh } from '../token/refresh.js';
 
-import { HelixSubscription } from '~/../node_modules/@twurple/api/lib';
 import { User } from '~/database/entity/user';
 import {
   stats as apiStats,

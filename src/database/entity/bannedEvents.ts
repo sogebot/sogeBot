@@ -1,9 +1,8 @@
+import { HelixBanEventType } from '@twurple/api/lib';
 import {
   Field, ID, ObjectType,
 } from 'type-graphql';
 import { EntitySchema } from 'typeorm';
-
-import { HelixBanEventType } from '~/../node_modules/@twurple/api/lib';
 
 @ObjectType()
 class BannedEventsEventData {

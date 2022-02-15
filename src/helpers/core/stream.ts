@@ -1,3 +1,5 @@
+import { HelixStream } from '@twurple/api/lib';
+
 import { getFunctionList } from '../../decorators/on';
 import { chatMessagesAtStart, streamType } from '../api';
 import { isStreamOnline } from '../api/isStreamOnline';
@@ -12,7 +14,6 @@ import {
 import { linesParsed } from '../parser';
 import { find } from '../register';
 
-import { HelixStream } from '~/../node_modules/@twurple/api/lib';
 import { getGameNameFromId } from '~/services/twitch/calls/getGameNameFromId';
 import { variables } from '~/watchers';
 
