@@ -260,7 +260,12 @@ class Panel extends Core {
       res.sendFile(path.join(__dirname, '..', 'favicon.ico'));
     });
     app?.get('/:page?', function (req, res) {
-      res.sendFile(path.join(__dirname, '..', 'node_modules', '@sogebot', 'ui-admin', 'dist', 'index.html'));
+      const indexPath = path.join(__dirname, '..', 'node_modules', '@sogebot', 'ui-admin', 'dist', 'index.html');
+      if (fs.existsSync(indexPath)) {
+        res.sendFile(path.join(__dirname, '..', 'node_modules', '@sogebot', 'ui-admin', 'dist', 'index.html'));
+      } else {
+        res.sendFile(path.join(__dirname, '..', 'assets', 'updating.html'));
+      }
     });
 
     setTimeout(() => {
