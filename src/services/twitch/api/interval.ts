@@ -1,6 +1,8 @@
 import * as constants from '@sogebot/ui-helpers/constants';
 import chalk from 'chalk';
 
+import emitter from '../../../helpers/interfaceEmitter.js';
+
 import {
   debug, error, warning,
 } from '~/helpers/log';
@@ -67,18 +69,20 @@ export const stop = () => {
 let isBlocking: boolean | string = false;
 
 const check = async () => {
-  const botTokenValid = variables.get('services.twitch.botTokenValid') as string;
-  const broadcasterTokenValid = variables.get('services.twitch.broadcasterTokenValid') as string;
-  if (!botTokenValid || !broadcasterTokenValid) {
-    debug('api.interval', 'Tokens not valid.');
-    return;
-  }
   if (isBlocking) {
     debug('api.interval', chalk.yellow(isBlocking + '() ') + 'still in progress.');
     return;
   }
   for (const fnc of intervals.keys()) {
     await setImmediateAwait();
+
+    const botTokenValid = variables.get('services.twitch.botTokenValid') as string;
+    const broadcasterTokenValid = variables.get('services.twitch.broadcasterTokenValid') as string;
+    if (!botTokenValid || !broadcasterTokenValid) {
+      debug('api.interval', 'Tokens not valid.');
+      return;
+    }
+
     debug('api.interval', chalk.yellow(fnc + '() ') + 'check');
     let interval = intervals.get(fnc);
     if (!interval) {
