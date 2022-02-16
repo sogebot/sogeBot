@@ -38,7 +38,7 @@ describe('game/roulette - !roulette - @func3', () => {
 
       if (user.mod.userName === test.user.userName) {
         it('Expecting mod message', async () => {
-          assert(r[1].response === '$sender is incompement and completely missed his head!', JSON.stringify({ r }, null, 2));
+          assert(r[1].response === '$sender is incompetent and completely missed his head!', JSON.stringify({ r }, null, 2));
         });
       } else if (user.owner.userName === test.user.userName) {
         it('Expecting owner message', async () => {

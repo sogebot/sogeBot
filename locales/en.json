@@ -1136,7 +1136,7 @@
       "trigger": "$sender is trying his luck and pulled a trigger",
       "alive": "$sender is alive! Nothing happened.",
       "dead": "$sender's brain was splashed on the wall!",
-      "mod": "$sender is incompement and completely missed his head!",
+      "mod": "$sender is incompetent and completely missed his head!",
       "broadcaster": "$sender is using blanks, boo!",
       "timeout": "Roulette timeout set to $values"
     },
