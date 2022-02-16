@@ -1,8 +1,6 @@
 import * as constants from '@sogebot/ui-helpers/constants';
 import chalk from 'chalk';
 
-import emitter from '../../../helpers/interfaceEmitter.js';
-
 import {
   debug, error, warning,
 } from '~/helpers/log';
