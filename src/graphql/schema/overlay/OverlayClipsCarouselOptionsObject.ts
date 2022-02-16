@@ -7,6 +7,7 @@ type OverlayMapperClipsCarouselOptions = NonNullable<OverlayMapperClipsCarousel[
 
 @ObjectType()
 export class OverlayClipsCarouselOptionsObject implements OverlayMapperClipsCarouselOptions {
+  @Field() animation: string;
   @Field(type => Int) customPeriod: number;
   @Field(type => Int) numOfClips: number;
   @Field(type => Float) volume: number;

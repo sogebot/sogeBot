@@ -286,6 +286,7 @@ export interface OverlayMapperClipsCarousel {
     customPeriod: number,
     numOfClips: number,
     volume: number,
+    animation: string,
   },
 }
 

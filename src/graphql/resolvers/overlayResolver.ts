@@ -1,7 +1,8 @@
 import {
-  OverlayMapper, OverlayMapperInterface, OverlayMappers,
+  OverlayMapper, OverlayMapperClipsCarousel, OverlayMapperInterface, OverlayMappers,
 } from '@entity/overlay';
 import { SECOND } from '@sogebot/ui-helpers/constants';
+import { defaults, pick } from 'lodash';
 import {
   Arg, Authorized,  Mutation, Query, Resolver,
 } from 'type-graphql';
@@ -86,15 +87,26 @@ export class overlayResolver {
       emotesfireworks: items.filter(o => o.value === 'emotesfireworks'),
       emotesexplode:   items.filter(o => o.value === 'emotesexplode'),
       hypetrain:       items.filter(o => o.value === 'hypetrain'),
-      clipscarousel:   items.filter(o => o.value === 'clipscarousel'),
-      carousel:        items.filter(o => o.value === 'carousel'),
-      tts:             items.filter(o => o.value === 'tts'),
-      polls:           items.filter(o => o.value === 'polls'),
-      obswebsocket:    items.filter(o => o.value === 'obswebsocket'),
-      group:           items.filter(o => o.value === 'group'),
-      stats:           items.filter(o => o.value === 'stats'),
-      wordcloud:       items.filter(o => o.value === 'wordcloud'),
-      randomizer:      items.filter(o => o.value === 'randomizer'),
+      clipscarousel:   (items.filter(o => o.value === 'clipscarousel') as OverlayMapperClipsCarousel[]).map((value) => {
+        value.opts = pick(
+          defaults(value.opts, {
+            volume:       0,
+            customPeriod: 31,
+            numOfClips:   20,
+            animation:    'slide',
+          }),
+          ['volume', 'customPeriod', 'numOfClips', 'animation'],
+        );
+        return value;
+      }),
+      carousel:     items.filter(o => o.value === 'carousel'),
+      tts:          items.filter(o => o.value === 'tts'),
+      polls:        items.filter(o => o.value === 'polls'),
+      obswebsocket: items.filter(o => o.value === 'obswebsocket'),
+      group:        items.filter(o => o.value === 'group'),
+      stats:        items.filter(o => o.value === 'stats'),
+      wordcloud:    items.filter(o => o.value === 'wordcloud'),
+      randomizer:   items.filter(o => o.value === 'randomizer'),
     } as OverlayObject;
     return response;
   }
