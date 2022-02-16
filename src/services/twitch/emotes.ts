@@ -217,7 +217,7 @@ class Emotes {
   async fetchEmotes7TV () {
     const currentChannel = variables.get('services.twitch.currentChannel') as string;
 
-    const getAllGlobalEmotes = async (query: string, page = 1, emotes: any[] = []): Promise<any[]> => {
+    const getAllGlobalEmotes = async (query: string, urlTemplate: string, page = 1): Promise<void> => {
       const request = await axios.post<any>('https://api.7tv.app/v2/gql', {
         query,
         variables: {
@@ -232,17 +232,28 @@ class Emotes {
           'submitted_by': null,
         },
       });
-      if (request.data.data.search_emotes.length > 0) {
-        emotes = [...emotes, ...request.data.data.search_emotes];
+
+      for (let i = 0, length = request.data.data.search_emotes.length; i < length; i++) {
+        await setImmediateAwait();
+        const cachedEmote = (await getRepository(CacheEmotes).findOne({ code: request.data.data.search_emotes[i].name, type: '7tv' }));
+        await getRepository(CacheEmotes).save({
+          ...cachedEmote,
+          code: request.data.data.search_emotes[i].name,
+          type: '7tv',
+          urls: {
+            '1': urlTemplate.replace('{{id}}', request.data.data.search_emotes[i].id).replace('{{image}}', '1x'),
+            '2': urlTemplate.replace('{{id}}', request.data.data.search_emotes[i].id).replace('{{image}}', '2x'),
+            '3': urlTemplate.replace('{{id}}', request.data.data.search_emotes[i].id).replace('{{image}}', '3x'),
+          },
+        });
       }
 
       if (request.data.data.search_emotes.length === 16) {
-        return await getAllGlobalEmotes(query, page + 1, emotes);
+        return await getAllGlobalEmotes(query, urlTemplate, page + 1);
       }
-      return emotes;
     };
 
-    const getAllChannelEmotes = async (query: string, channel: string, page = 1, emotes: any[] = []): Promise<any[]> => {
+    const getAllChannelEmotes = async (query: string, urlTemplate: string, channel: string, page = 1, emotes: any[] = []): Promise<void> => {
       const request = await axios.post<any>('https://api.7tv.app/v2/gql', {
         query,
         variables: {
@@ -257,14 +268,25 @@ class Emotes {
           'submitted_by': null,
         },
       });
-      if (request.data.data.search_emotes.length > 0) {
-        emotes = [...emotes, ...request.data.data.search_emotes];
+
+      for (let i = 0, length = request.data.data.search_emotes.length; i < length; i++) {
+        await setImmediateAwait();
+        const cachedEmote = (await getRepository(CacheEmotes).findOne({ code: request.data.data.search_emotes[i].name, type: '7tv' }));
+        await getRepository(CacheEmotes).save({
+          ...cachedEmote,
+          code: request.data.data.search_emotes[i].name,
+          type: '7tv',
+          urls: {
+            '1': urlTemplate.replace('{{id}}', request.data.data.search_emotes[i].id).replace('{{image}}', '1x'),
+            '2': urlTemplate.replace('{{id}}', request.data.data.search_emotes[i].id).replace('{{image}}', '2x'),
+            '3': urlTemplate.replace('{{id}}', request.data.data.search_emotes[i].id).replace('{{image}}', '3x'),
+          },
+        });
       }
 
       if (request.data.data.search_emotes.length === 16) {
-        return await getAllChannelEmotes(query, channel, page + 1, emotes);
+        return await getAllChannelEmotes(query, channel, urlTemplate, page + 1, emotes);
       }
-      return emotes;
     };
 
     if (currentChannel.length === 0) {
@@ -281,24 +303,8 @@ class Emotes {
         const urlTemplate = `https://cdn.7tv.app/emote/{{id}}/{{image}}`;
 
         const query = `query($query: String!,$page: Int,$pageSize: Int,$globalState: String,$sortBy: String,$sortOrder: Int,$channel: String,$submitted_by: String,$filter: EmoteFilter) {search_emotes(query: $query,limit: $pageSize,page: $page,pageSize: $pageSize,globalState: $globalState,sortBy: $sortBy,sortOrder: $sortOrder,channel: $channel,submitted_by: $submitted_by,filter: $filter) {id,visibility,owner {id,display_name,role {id,name,color},banned}name,tags}}`;
-        const emotes: { id: string; name: string }[] = [
-          ...await getAllGlobalEmotes(query),
-          ...await getAllChannelEmotes(query, currentChannel),
-        ];
-
-        for (let i = 0, length = emotes.length; i < length; i++) {
-          const cachedEmote = (await getRepository(CacheEmotes).findOne({ code: emotes[i].name, type: '7tv' }));
-          await getRepository(CacheEmotes).save({
-            ...cachedEmote,
-            code: emotes[i].name,
-            type: '7tv',
-            urls: {
-              '1': urlTemplate.replace('{{id}}', emotes[i].id).replace('{{image}}', '1x'),
-              '2': urlTemplate.replace('{{id}}', emotes[i].id).replace('{{image}}', '2x'),
-              '3': urlTemplate.replace('{{id}}', emotes[i].id).replace('{{image}}', '3x'),
-            },
-          });
-        }
+        await getAllGlobalEmotes(query, urlTemplate);
+        await getAllChannelEmotes(query, urlTemplate, currentChannel),
         info('EMOTES: Fetched 7tv emotes');
       } catch (e: any) {
         error(e);
