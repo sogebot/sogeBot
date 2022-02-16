@@ -1,4 +1,4 @@
-import { OverlayMapper, OverlayMapperGroup } from '@entity/overlay.js';
+import { OverlayMapper } from '@entity/overlay.js';
 import { MINUTE, SECOND } from '@sogebot/ui-helpers/constants';
 import { getRepository } from 'typeorm';
 
@@ -76,27 +76,14 @@ class Countdown extends Overlay {
               },
             });
           }
-        } else {
-          // we need to check in groups
-          for (let group of await getRepository(OverlayMapper).find({ value: 'group' })) {
-            group = group as OverlayMapperGroup;
-            const idx = group.opts.items.findIndex(o => o.id === data.id && o.type === 'countdown');
-            if (idx && JSON.parse(group.opts.items[idx].opts).isPersistent) {
-              const opts = JSON.parse(group.opts.items[idx].opts);
-              opts.currentTime = data.time;
-              group.opts.items[idx].opts = JSON.stringify(opts);
-              await getRepository(OverlayMapper).save(group);
-            }
-          }
-
         }
-      }
 
-      statusUpdate.set(data.id, {
-        isEnabled: data.isEnabled,
-        time:      data.time,
-        timestamp: Date.now(),
-      });
+        statusUpdate.set(data.id, {
+          isEnabled: data.isEnabled,
+          time:      data.time,
+          timestamp: Date.now(),
+        });
+      }
     });
   }
 }

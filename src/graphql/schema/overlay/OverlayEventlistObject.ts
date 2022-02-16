@@ -9,6 +9,8 @@ import { OverlayEventlistOptionsObject } from './OverlayEventlistOptionsObject';
 export class OverlayEventlistObject implements OverlayMapperEventlist {
   @Field(type => ID)
     id: string;
+  @Field(type => String, { nullable: true })
+    groupId: string | null;
   @Field()
     value: 'eventlist';
   @Field(type => OverlayEventlistOptionsObject, { nullable: true })

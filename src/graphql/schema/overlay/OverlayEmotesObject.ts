@@ -9,6 +9,8 @@ import { OverlayEmotesOptionsObject } from './OverlayEmotesOptionsObject';
 export class OverlayEmotesObject implements OverlayMapperEmotes {
   @Field(type => ID)
     id: string;
+  @Field(type => String, { nullable: true })
+    groupId: string | null;
   @Field()
     value: 'emotes';
   @Field(type => OverlayEmotesOptionsObject, { nullable: true })

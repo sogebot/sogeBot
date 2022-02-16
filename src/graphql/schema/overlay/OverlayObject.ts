@@ -1,5 +1,6 @@
 import {
   OverlayMapperAlerts,
+  OverlayMapperAlertsRegistry,
   OverlayMapperCarousel,
   OverlayMapperClips,
   OverlayMapperClipsCarousel,
@@ -8,6 +9,7 @@ import {
 import { Field, ObjectType } from 'type-graphql';
 
 import { OverlayAlertsObject } from './OverlayAlertsObject';
+import { OverlayAlertsRegistryObject } from './OverlayAlertsRegistryObject';
 import { OverlayCarouselObject } from './OverlayCarouselObject';
 import { OverlayClipsCarouselObject } from './OverlayClipsCarouselObject';
 import { OverlayClipsObject } from './OverlayClipsObject';
@@ -30,6 +32,10 @@ import { OverlayWordcloudObject } from './OverlayWordcloudObject';
 
 @ObjectType()
 export class OverlayObject {
+  @Field(type => [OverlayAlertsRegistryObject])
+    alertsRegistry: OverlayMapperAlertsRegistry[];
+  @Field(type => [OverlayAlertsRegistryObject])
+    textRegistry: OverlayMapperAlertsRegistry[];
   @Field(type => [OverlayMarathonObject])
     marathon: OverlayMapperMarathon[];
   @Field(type => [OverlayStopwatchObject])

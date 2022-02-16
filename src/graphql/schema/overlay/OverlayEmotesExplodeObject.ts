@@ -9,6 +9,8 @@ import { OverlayEmotesExplodeOptionsObject } from './OverlayEmotesExplodeOptions
 export class OverlayEmotesExplodeObject implements OverlayMapperEmotesExplode {
   @Field(type => ID)
     id: string;
+  @Field(type => String, { nullable: true })
+    groupId: string | null;
   @Field()
     value: 'emotesexplode';
   @Field(type => OverlayEmotesExplodeOptionsObject, { nullable: true })

@@ -42,22 +42,6 @@ setInterval(async () => {
           },
         });
       }
-    } else {
-      // go through groups and find id
-      for(const group of await getRepository(OverlayMapper).find({ value: 'group' })) {
-        if (group.value === 'group' && group.opts?.items) {
-          group.opts.items.forEach((groupItem, index) => {
-            if (groupItem.id === id && groupItem.type === 'countdown' || groupItem.type === 'stopwatch') {
-              const opts = JSON.parse(group.opts.items[index].opts);
-              opts.currentTime = Number(time);
-              group.opts.items[index].opts = JSON.stringify(opts);
-            }
-          });
-        }
-
-        // resave
-        await getRepository(OverlayMapper).save(group);
-      }
     }
   }
 }, SECOND * 1);
@@ -65,16 +49,28 @@ setInterval(async () => {
 @Resolver()
 export class overlayResolver {
   @Query(returns => OverlayObject)
-  async overlays(@Arg('id', { nullable: true }) id: string) {
+  async overlays(
+  @Arg('id', { nullable: true }) id: string,
+    @Arg('groupId', { nullable: true }) groupId: string,
+    @Arg('allowGroups', { nullable: true }) allowGroups: boolean
+  ) {
     let items: Readonly<Required<OverlayMappers>>[];
     if (id) {
       items = await getRepository(OverlayMapper).find({ where: { id } });
+    } else if (groupId) {
+      items = await getRepository(OverlayMapper).find({ where: { groupId } });
     } else {
-      items = await getRepository(OverlayMapper).find();
+      if (!allowGroups) {
+        items = await getRepository(OverlayMapper).find({ where: { groupId: null } });
+      } else {
+        items = await getRepository(OverlayMapper).find();
+      }
     }
 
     // we need to send it as OverlayObject
     const response = {
+      alertsRegistry:  items.filter(o => o.value === 'alertsRegistry'),
+      textRegistry:    items.filter(o => o.value === 'textRegistry'),
       marathon:        items.filter(o => o.value === 'marathon'),
       stopwatch:       items.filter(o => o.value === 'stopwatch'),
       countdown:       items.filter(o => o.value === 'countdown'),
