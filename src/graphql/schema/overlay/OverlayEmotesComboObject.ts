@@ -9,6 +9,8 @@ import { OverlayEmotesComboOptionsObject } from './OverlayEmotesComboOptionsObje
 export class OverlayEmotesComboObject implements OverlayMapperEmotesCombo {
   @Field(type => ID)
     id: string;
+  @Field(type => String, { nullable: true })
+    groupId: string | null;
   @Field()
     value: 'emotescombo';
   @Field(type => OverlayEmotesComboOptionsObject, { nullable: true })

@@ -9,6 +9,8 @@ import { OverlayAlertsOptionsObject } from './OverlayAlertsOptionsObject';
 export class OverlayAlertsObject implements OverlayMapperAlerts {
   @Field(type => ID)
     id: string;
+  @Field(type => String, { nullable: true })
+    groupId: string | null;
   @Field()
     value: 'media';
   @Field(type => OverlayAlertsOptionsObject, { nullable: true })

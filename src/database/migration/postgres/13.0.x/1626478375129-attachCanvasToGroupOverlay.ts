@@ -7,7 +7,8 @@ export class attachCanvasToGroupOverlay1626478375129 implements MigrationInterfa
   name = 'attachCanvasToGroupOverlay1626478375129';
 
   public async up(queryRunner: QueryRunner): Promise < void > {
-    const mapper = await queryRunner.manager.getRepository(`overlay_mapper`).find({ value: 'group' });
+
+    const mapper = await queryRunner.manager.getRepository(`overlay_mapper`).find({ value: 'group', select: ['id', 'value', 'opts'] });
 
     for (const item of mapper) {
       await queryRunner.manager.getRepository(`overlay_mapper`).save({

@@ -9,6 +9,8 @@ import { OverlayClipsOptionsObject } from './OverlayClipsOptionsObject';
 export class OverlayClipsObject implements OverlayMapperClips {
   @Field(type => ID)
     id: string;
+  @Field(type => String, { nullable: true })
+    groupId: string | null;
   @Field()
     value: 'clips';
   @Field(type => OverlayClipsOptionsObject, { nullable: true })

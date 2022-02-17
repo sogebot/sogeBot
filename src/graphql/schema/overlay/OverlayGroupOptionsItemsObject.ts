@@ -9,6 +9,8 @@ type Impl = NonNullable<OverlayMapperGroup['opts']>['canvas'];
 export class OverlayGroupOptionsItemsObject implements Impl {
   @Field(type => ID)
     id: string;
+  @Field(type => String, { nullable: true })
+    groupId: string | null;
   @Field(type => Float)
     width: number;
   @Field(type => Float)

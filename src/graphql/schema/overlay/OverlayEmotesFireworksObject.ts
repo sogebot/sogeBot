@@ -9,6 +9,8 @@ import { OverlayEmotesFireworksOptionsObject } from './OverlayEmotesFireworksOpt
 export class OverlayEmotesFireworksObject implements OverlayMapperEmotesFireworks {
   @Field(type => ID)
     id: string;
+  @Field(type => String, { nullable: true })
+    groupId: string | null;
   @Field()
     value: 'emotesfireworks';
   @Field(type => OverlayEmotesFireworksOptionsObject, { nullable: true })

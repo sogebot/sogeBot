@@ -9,6 +9,8 @@ import { OverlayWordcloudOptionsObject } from './OverlayWordcloudOptionsObject';
 export class OverlayWordcloudObject implements OverlayMapperWordcloud {
   @Field(type => ID)
     id: string;
+  @Field(type => String, { nullable: true })
+    groupId: string | null;
   @Field()
     value: 'wordcloud';
   @Field(type => OverlayWordcloudOptionsObject, { nullable: true })

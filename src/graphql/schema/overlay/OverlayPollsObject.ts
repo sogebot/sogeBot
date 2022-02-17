@@ -9,6 +9,8 @@ import { OverlayPollsOptionsObject } from './OverlayPollsOptionsObject';
 export class OverlayPollsObject implements OverlayMapperPolls {
   @Field(type => ID)
     id: string;
+  @Field(type => String, { nullable: true })
+    groupId: string | null;
   @Field()
     value: 'polls';
   @Field(type => OverlayPollsOptionsObject, { nullable: true })
