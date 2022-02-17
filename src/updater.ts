@@ -1,6 +1,6 @@
 import { exec, execSync } from 'child_process';
 
-import { HOUR } from '@sogebot/ui-helpers/constants';
+import { HOUR, MINUTE } from '@sogebot/ui-helpers/constants';
 import { clone } from 'lodash';
 
 import Core from '~/_interface';
@@ -31,16 +31,21 @@ class Updater extends Core {
 
   @onStartup()
   onStartup() {
-    // get current versions
-    for (const pkg of Object.keys(this.versions) as Array<keyof typeof versions> ) {
-      const actualVersion = execSync(`node -p "require('${pkg}/package.json').version"`).toString().replace('\n', '');
-      this.versions[pkg] = actualVersion;
+    if ((process.env.NODE_ENV || 'development') === 'development') {
+      return;
     }
+    setTimeout(() => {
+      // get current versions
+      for (const pkg of Object.keys(this.versions) as Array<keyof typeof versions> ) {
+        const actualVersion = execSync(`node -p "require('${pkg}/package.json').version"`).toString().replace('\n', '');
+        this.versions[pkg] = actualVersion;
+      }
 
-    this.checkUpdate();
-    setInterval(() => {
       this.checkUpdate();
-    }, HOUR);
+      setInterval(() => {
+        this.checkUpdate();
+      }, HOUR);
+    }, MINUTE * 10);
   }
 
   sockets() {
