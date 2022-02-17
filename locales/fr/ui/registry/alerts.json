@@ -122,6 +122,9 @@
   "animationText": {
     "name": "Animation du texte"
   },
+  "animationType": {
+    "name": "Type of animation"
+  },
   "animationIn": {
     "name": "Arrivée de l'animation"
   },

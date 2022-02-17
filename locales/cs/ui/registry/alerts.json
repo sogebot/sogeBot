@@ -122,6 +122,9 @@
   "animationText": {
     "name": "Animace textu"
   },
+  "animationType": {
+    "name": "Type of animation"
+  },
   "animationIn": {
     "name": "Vstupní animace"
   },

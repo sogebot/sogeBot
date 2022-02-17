@@ -3,7 +3,7 @@
     "lang": "Bot-Sprache",
     "numberFormat": "Format der Nummern im Chat",
     "gracefulExitEachXHours": {
-      "title": "Geplantes Beenden alle X Stunden",
+      "title": "Geplantes beenden alle X Stunden",
       "help": "0 - Deaktiviert"
     },
     "shouldGracefulExitHelp": "Die Aktivierung von geplantem Beenden wird <strong>empfohlen</strong>, wenn der Bot ununterbrochen auf einem Server läuft. Der Bot sollte auf pm2 (oder einem ähnlichen Service) oder im Docker laufen, um einen automatischen Neustart des Bots zu gewährleisten. Der Bot <strong>wird nicht</strong> beendet, wenn der Stream online ist."
