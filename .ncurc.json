@@ -4,6 +4,7 @@
     "node-hue-api",
     "strip-ansi",
     "node-fetch",
-    "graphql"
+    "graphql",
+    "typeorm"
   ]
 }

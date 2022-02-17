@@ -77,7 +77,7 @@
     "tlds": "1.229.0",
     "twitter-api-v2": "1.11.0",
     "type-graphql": "^1.1.1",
-    "typeorm": "0.2.42",
+    "typeorm": "0.2.38",
     "url-join": "4.0.1",
     "uuid": "8.3.2",
     "velocity-animate": "1.5.2",
