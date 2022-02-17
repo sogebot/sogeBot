@@ -338,7 +338,7 @@ export const OverlayMapper = new EntitySchema<Readonly<Required<OverlayMappers>>
     id: {
       type: String, primary: true, generated: 'uuid',
     },
-    groupId: { type: String, nullable: true, default: null },
+    groupId: { type: String, nullable: true },
     value:   { type: String, nullable: true },
     opts:    { type: 'simple-json', nullable: true },
   },
