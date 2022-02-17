@@ -1,4 +1,5 @@
-import puppeteer from 'puppeteer';
+import { capitalize, noop } from 'lodash';
+import fetch from 'node-fetch';
 
 import { command, default_permission } from '../decorators';
 import Expects from '../expects';
@@ -9,6 +10,8 @@ import {
 } from '~/helpers/api';
 import { prepare } from '~/helpers/commons';
 import { defaultPermissions } from '~/helpers/permissions/index';
+
+const cache = new Map<string, string>();
 
 class ProtonDB extends System {
   @command('!pdb')
@@ -26,58 +29,82 @@ class ProtonDB extends System {
       }
     }
 
-    const browser = await puppeteer.launch({ headless: true });
-    const page = await browser.newPage();
-    await page.goto(`https://www.protondb.com/search?q=${encodeURIComponent(gameInput)}`, { waitUntil: 'networkidle0' });
-
-    const [link] = await page.$x(`//a[contains(translate(.,
-                                      'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
-                                      'abcdefghijklmnopqrstuvwxyz'), '${gameInput.toLowerCase()}')]`);
-    if (link) {
-      const ratingXPath = `//*[@id="root"]/div[1]/main/div/div/div[2]/div/div[3]/span`;
-      await link.click();
-      await page.waitForXPath(ratingXPath);
-      const [rating] = await page.$x(ratingXPath);
-
-      const natively = await page.$x(`//*[@id="root"]/div[1]/main/div/div/div[4]/div/i`);
-      if (rating && natively.length > 0) {
-        const ratingText = await rating.evaluate(element => element.textContent) || '❓';
-
-        const native: string[] = [];
-        if (await natively[0].evaluate(element => (element as HTMLElement).style.opacity === '1')) {
-          native.push('Linux');
-        }
-        if (await natively[1].evaluate(element => (element as HTMLElement).style.opacity === '1')) {
-          native.push('Mac');
-        }
-        if (await natively[2].evaluate(element => (element as HTMLElement).style.opacity === '1')) {
-          native.push('Windows');
-        }
-
-        await browser.close();
-        return [{
-          response: prepare('integrations.protondb.responseOk', {
-            game:   gameInput.toUpperCase(),
-            rating: ratingText,
-            native: native.join(', '),
-            url:    page.url(),
-          }),
-          ...opts,
-        }];
-      } else {
-        await browser.close();
-        return [{
-          response: prepare('integrations.protondb.responseNg', {
-            game: gameInput.toUpperCase(),
-          }),
-          ...opts,
-        }];
-      }
-
+    let id: string | null = null;
+    if (cache.has(gameInput.toLowerCase())) {
+      id = cache.get(gameInput.toLowerCase()) as string;
     } else {
-      await browser.close();
+      const request = await new Promise((resolve, reject) => {
+        fetch('http://api.steampowered.com/ISteamApps/GetAppList/v0002/')
+          .then(response => response.json())
+          .then(json => resolve(json))
+          .catch(e => reject(e));
+      });
+
+      const app = (request as any).applist.apps.find((o: any) => {
+        // search lower-cased without spaces (to have consistent results)
+        return o.name.toLowerCase().replace(/ /g, '') === gameInput.toLowerCase().replace(/ /g, '');
+      });
+      if (app) {
+        id = app.appid as string;
+        cache.set(gameInput.toLowerCase(), id);
+      }
+    }
+
+    if (!id) {
       return [{
         response: prepare('integrations.protondb.responseNotFound', {
+          game: gameInput.toUpperCase(),
+        }),
+        ...opts,
+      }];
+    }
+
+    try {
+      const reqProtonSummary = await new Promise<{
+        bestReportedTier: string;
+        tier: string;
+        score: number;
+        confidence: string;
+        total: number;
+        trendingTier: string;
+      }>((resolve, reject) => {
+        fetch(`https://www.protondb.com/api/v1/reports/summaries/${id}.json`)
+          .then(response => response.json())
+          .then(json => resolve(json))
+          .catch(e => reject(e));
+      });
+
+      // to get platforms
+      const reqProtonDetail = await new Promise<any>((resolve, reject) => {
+        fetch(`https://www.protondb.com/proxy/steam/api/appdetails/?appids=${id}`)
+          .then(response => response.json())
+          .then(json => resolve(json))
+          .catch(e => reject(e));
+      });
+
+      let rating = capitalize(reqProtonSummary.tier);
+      const native: string[] = [];
+
+      reqProtonDetail[id].data.platforms.linux ? native.push('Linux') : noop();
+      reqProtonDetail[id].data.platforms.mac ? native.push('Mac') : noop();
+      reqProtonDetail[id].data.platforms.windows ? native.push('Windows') : noop();
+
+      if (native.length === 3) {
+        rating = 'Native';
+      }
+
+      return [{
+        response: prepare('integrations.protondb.responseOk', {
+          game:   gameInput.toUpperCase(),
+          rating,
+          native: native.join(', '),
+          url:    `https://www.protondb.com/app/${id}`,
+        }),
+        ...opts,
+      }];
+    } catch (e) {
+      return [{
+        response: prepare('integrations.protondb.responseNg', {
           game: gameInput.toUpperCase(),
         }),
         ...opts,
