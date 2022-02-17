@@ -12,7 +12,7 @@ export const Gallery = new EntitySchema<Readonly<Required<GalleryInterface>>>({
   name:    'gallery',
   columns: {
     id: {
-      type: String, primary: true, generated: 'uuid',
+      type: String, primary: true,
     },
     type:   { type: String },
     data:   { type: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') === 'mysql' ? 'longtext' : 'text' },
