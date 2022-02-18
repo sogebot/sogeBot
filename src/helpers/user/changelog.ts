@@ -7,7 +7,7 @@ import { getRepository } from 'typeorm';
 import { v4 } from 'uuid';
 
 import { timer } from '../../decorators';
-import { flatten } from '../flatten.js';
+import { flatten } from '../flatten';
 import { debug, error } from '../log';
 
 const changelog: (Partial<UserInterface> & { userId: string, changelogType: 'set' | 'increment' })[] = [];

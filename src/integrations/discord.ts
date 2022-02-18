@@ -43,7 +43,7 @@ import {
 import { get as getPermission } from '~/helpers/permissions/get';
 import { check } from '~/helpers/permissions/index';
 import { adminEndpoint } from '~/helpers/socket';
-import * as changelog from '~/helpers/user/changelog.js';
+import * as changelog from '~/helpers/user/changelog';
 import { getIdFromTwitch } from '~/services/twitch/calls/getIdFromTwitch';
 import { variables } from '~/watchers';
 

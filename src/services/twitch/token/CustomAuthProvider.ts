@@ -1,8 +1,8 @@
 import { Enumerable } from '@d-fischer/shared-utils';
 import type { AuthProvider, AccessToken } from '@twurple/auth';
 
-import { variables } from '../../../watchers.js';
-import { expirationDate, validate } from './validate.js';
+import { variables } from '../../../watchers';
+import { expirationDate, validate } from './validate';
 
 export class CustomAuthProvider implements AuthProvider {
   @Enumerable(false) private _clientId: string;

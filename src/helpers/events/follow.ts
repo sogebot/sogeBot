@@ -9,7 +9,7 @@ import { debug, follow as followLog } from '../log';
 import {
   isBot, isIgnored, isInGlobalIgnoreList,
 } from '../user';
-import * as changelog from '../user/changelog.js';
+import * as changelog from '../user/changelog';
 
 import { eventEmitter } from '.';
 

@@ -4,7 +4,7 @@ import * as constants from '@sogebot/ui-helpers/constants';
 import _ from 'lodash';
 import { v4 as uuid } from 'uuid';
 
-import { timer } from '~/decorators.js';
+import { timer } from '~/decorators';
 import {
   addToParserFindCache, cachedCommandsPermissions, parserFindCache,
 } from '~/helpers/cache';

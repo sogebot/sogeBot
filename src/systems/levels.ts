@@ -28,7 +28,7 @@ import { adminEndpoint } from '~/helpers/socket';
 import {
   bigIntMax, serialize, unserialize,
 } from '~/helpers/type';
-import * as changelog from '~/helpers/user/changelog.js';
+import * as changelog from '~/helpers/user/changelog';
 import { isBotId } from '~/helpers/user/isBot';
 import points from '~/systems/points';
 import { translate } from '~/translate';

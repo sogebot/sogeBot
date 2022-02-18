@@ -143,7 +143,7 @@ function getNameAndTypeFromStackTrace() {
 
   const path = parse(stack[2].getFileName() || '');
   const _type = path.dir.split(separator)[path.dir.split(separator).length - 1];
-  const type = _type === 'dest' ? 'core' : _type;
+  const type = _type === 'src' ? 'core' : _type;
   const name = path.name;
 
   return { name, type };

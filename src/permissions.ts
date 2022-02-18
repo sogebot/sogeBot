@@ -11,7 +11,7 @@ import { error } from '~/helpers/log';
 import { cleanViewersCache, get } from '~/helpers/permissions';
 import { check, defaultPermissions } from '~/helpers/permissions/index';
 import { adminEndpoint } from '~/helpers/socket';
-import * as changelog from '~/helpers/user/changelog.js';
+import * as changelog from '~/helpers/user/changelog';
 import users from '~/users';
 
 class Permissions extends Core {

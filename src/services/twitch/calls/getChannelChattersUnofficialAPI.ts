@@ -7,7 +7,7 @@ import {
 } from 'typeorm';
 
 import client from '../api/client';
-import { refresh } from '../token/refresh.js';
+import { refresh } from '../token/refresh';
 
 import { eventEmitter } from '~/helpers/events';
 import { getAllOnlineUsernames } from '~/helpers/getAllOnlineUsernames';
@@ -17,7 +17,7 @@ import {
 } from '~/helpers/log';
 import { setImmediateAwait } from '~/helpers/setImmediateAwait';
 import { SQLVariableLimit } from '~/helpers/sql';
-import * as changelog from '~/helpers/user/changelog.js';
+import * as changelog from '~/helpers/user/changelog';
 import { isIgnored } from '~/helpers/user/isIgnored';
 import { followerUpdatePreCheck } from '~/services/twitch/calls/isFollowerUpdate';
 import { variables } from '~/watchers';

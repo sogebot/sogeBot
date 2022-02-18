@@ -1,6 +1,6 @@
 import { createHash } from 'crypto';
 
-import { Events } from '@entity/event.js';
+import { Events } from '@entity/event';
 import { OBSWebsocketInterface } from '@entity/obswebsocket';
 import type ObsWebSocket from 'obs-websocket-js';
 import safeEval from 'safe-eval';

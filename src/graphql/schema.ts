@@ -1,6 +1,6 @@
 import { buildSchemaSync }  from 'type-graphql';
 
-import { customAuthChecker } from './auth.js';
+import { customAuthChecker } from './auth';
 import * as resolvers from './resolvers';
 
 const schema = buildSchemaSync({

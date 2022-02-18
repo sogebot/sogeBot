@@ -2,7 +2,7 @@ import { HelixSubscription } from '@twurple/api/lib';
 import { getRepository } from 'typeorm';
 
 import client from '../api/client';
-import { refresh } from '../token/refresh.js';
+import { refresh } from '../token/refresh';
 
 import { User } from '~/database/entity/user';
 import {
@@ -11,7 +11,7 @@ import {
 import { getFunctionName } from '~/helpers/getFunctionName';
 import { error, warning } from '~/helpers/log';
 import { isBotId, isBotSubscriber } from '~/helpers/user';
-import * as changelog from '~/helpers/user/changelog.js';
+import * as changelog from '~/helpers/user/changelog';
 import { variables } from '~/watchers';
 
 export async function getChannelSubscribers<T extends { noAffiliateOrPartnerWarningSent?: boolean; notCorrectOauthWarningSent?: boolean }> (opts: T): Promise<{ state: boolean; opts: T }> {

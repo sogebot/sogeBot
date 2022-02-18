@@ -29,7 +29,6 @@
         "./database/entity/*"
       ]
     },
-    "outDir": "./dest",
     "inlineSourceMap": true,
     "typeRoots": ["./node_modules/@types"]
   },
@@ -41,5 +40,5 @@
   "exclude": [
     "test",
     "node_modules"
-  ]
+  ],"ts-node": {  "files": true }
 }

@@ -3,7 +3,7 @@ import { error } from 'console';
 import { defaults, isNil } from 'lodash';
 
 import client from '../api/client';
-import { refresh } from '../token/refresh.js';
+import { refresh } from '../token/refresh';
 import { getGameIdFromName } from './getGameIdFromName';
 
 import {

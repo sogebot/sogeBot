@@ -6,10 +6,10 @@ import {
 } from 'type-graphql';
 import { getRepository } from 'typeorm';
 
-import { obs } from '../../helpers/obswebsocket/client.js';
-import { listScenes } from '../../helpers/obswebsocket/scenes.js';
-import { getSourcesList, getSourceTypesList } from '../../helpers/obswebsocket/sources.js';
-import { ioServer } from '../../helpers/panel.js';
+import { obs } from '../../helpers/obswebsocket/client';
+import { listScenes } from '../../helpers/obswebsocket/scenes';
+import { getSourcesList, getSourceTypesList } from '../../helpers/obswebsocket/sources';
+import { ioServer } from '../../helpers/panel';
 import {
   Recording, ReplayBuffer, Scene, SetCurrentScene,
   SetMute, SetVolume, Source, TaskLog, Type, WaitMS,

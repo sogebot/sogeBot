@@ -20,9 +20,9 @@ import {
   debug, error, info, warning,
 } from '../log';
 import { linesParsed } from '../parser';
-import * as changelog from '../user/changelog.js';
+import * as changelog from '../user/changelog';
 import { isModerator } from '../user/isModerator';
-import { getRandomFollower, getRandomOnlineFollower, getRandomOnlineSubscriber, getRandomOnlineViewer, getRandomSubscriber, getRandomViewer } from '../user/random.js';
+import { getRandomFollower, getRandomOnlineFollower, getRandomOnlineSubscriber, getRandomOnlineViewer, getRandomSubscriber, getRandomViewer } from '../user/random';
 import { getAll } from './getAll';
 
 async function runScript (script: string, opts: { sender: { userId: string; userName: string; source: 'twitch' | 'discord' } | string | null, isUI: boolean; param?: string | number, _current: any }) {

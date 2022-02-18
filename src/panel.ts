@@ -15,7 +15,7 @@ import {
   getConnection, getManager, getRepository,
 } from 'typeorm';
 
-import emitter from './helpers/interfaceEmitter.js';
+import emitter from './helpers/interfaceEmitter';
 
 import Core from '~/_interface';
 import { CacheTitles } from '~/database/entity/cacheTitles';
@@ -48,7 +48,7 @@ import { linesParsed, status as statusObj } from '~/helpers/parser';
 import { list, systems } from '~/helpers/register';
 import { adminEndpoint } from '~/helpers/socket';
 import { tmiEmitter } from '~/helpers/tmi';
-import * as changelog from '~/helpers/user/changelog.js';
+import * as changelog from '~/helpers/user/changelog';
 import lastfm from '~/integrations/lastfm';
 import spotify from '~/integrations/spotify';
 import Parser from '~/parser';

@@ -4,11 +4,11 @@ import { getRepository } from 'typeorm';
 
 import { eventEmitter } from '../../../helpers/events';
 import { error, unfollow, warning } from '../../../helpers/log';
-import { refresh } from '../token/refresh.js';
+import { refresh } from '../token/refresh';
 
 import { follow } from '~/helpers/events/follow';
 import { getFunctionName } from '~/helpers/getFunctionName';
-import * as changelog from '~/helpers/user/changelog.js';
+import * as changelog from '~/helpers/user/changelog';
 import client from '~/services/twitch/api/client';
 import { variables } from '~/watchers';
 

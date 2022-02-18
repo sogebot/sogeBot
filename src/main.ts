@@ -45,8 +45,8 @@ const connect = async function () {
       synchronize:    false,
       migrationsRun:  true,
       charset:        'UTF8MB4_GENERAL_CI',
-      entities:       [ 'dest/database/entity/*.js' ],
-      migrations:     [ `dest/database/migration/${getMigrationType(connectionOptions.type)}/**/*.js` ],
+      entities:       [ 'src/database/entity/*.ts' ],
+      migrations:     [ `src/database/migration/${getMigrationType(connectionOptions.type)}/**/*.ts` ],
     } as MysqlConnectionOptions);
   } else {
     await createConnection({
@@ -55,8 +55,8 @@ const connect = async function () {
       logger:        new TypeORMLogger(),
       synchronize:   false,
       migrationsRun: true,
-      entities:      [ 'dest/database/entity/*.js' ],
-      migrations:    [ `dest/database/migration/${getMigrationType(connectionOptions.type)}/**/*.js` ],
+      entities:      [ 'src/database/entity/*.ts' ],
+      migrations:    [ `src/database/migration/${getMigrationType(connectionOptions.type)}/**/*.ts` ],
     });
   }
   const typeToLog = {
@@ -112,18 +112,18 @@ async function main () {
         require('./dashboard');
         require('./tts');
         require('./panel');
-        await autoLoad('./dest/stats/');
-        await autoLoad('./dest/registries/');
-        await autoLoad('./dest/systems/');
-        await autoLoad('./dest/widgets/');
-        await autoLoad('./dest/overlays/');
-        await autoLoad('./dest/games/');
-        await autoLoad('./dest/integrations/');
-        await autoLoad('./dest/services/');
+        await autoLoad('./src/stats/');
+        await autoLoad('./src/registries/');
+        await autoLoad('./src/systems/');
+        await autoLoad('./src/widgets/');
+        await autoLoad('./src/overlays/');
+        await autoLoad('./src/games/');
+        await autoLoad('./src/integrations/');
+        await autoLoad('./src/services/');
 
         if (process.env.HEAP) {
           warning(chalk.bgRed.bold('HEAP debugging is ENABLED'));
-          setTimeout(() => require('~/heapdump.js').init('heap/'), 120000);
+          setTimeout(() => require('~/heapdump').init('heap/'), 120000);
         }
 
         setTimeout(() => {

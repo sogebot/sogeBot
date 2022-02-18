@@ -199,7 +199,7 @@ interface ParserOptions {
   skip: boolean;
   isParserOptions: boolean;
   forbidReply?: boolean;
-  parser?: import('../src/parser.js').default;
+  parser?: import('../src/parser').default;
 }
 
 interface Vote {

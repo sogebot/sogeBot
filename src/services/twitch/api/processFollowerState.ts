@@ -6,7 +6,7 @@ import { User, UserInterface } from '~/database/entity/user';
 import { follow } from '~/helpers/events/follow';
 import { debug } from '~/helpers/log';
 import { SQLVariableLimit } from '~/helpers/sql';
-import * as changelog from '~/helpers/user/changelog.js';
+import * as changelog from '~/helpers/user/changelog';
 
 export const processFollowerState = async (users: { from_name: string; from_id: string; followed_at: string }[]) => {
   const timer = Date.now();

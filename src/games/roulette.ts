@@ -5,7 +5,7 @@ import points from '../systems/points';
 import Game from './_interface';
 
 import { tmiEmitter } from '~/helpers/tmi';
-import * as changelog from '~/helpers/user/changelog.js';
+import * as changelog from '~/helpers/user/changelog';
 import { isBroadcaster } from '~/helpers/user/isBroadcaster';
 import { isModerator } from '~/helpers/user/isModerator';
 import { translate } from '~/translate';

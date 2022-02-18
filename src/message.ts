@@ -6,8 +6,8 @@ import {
   command, count, custom, evaluate, ifp, info, list, math, online, param, price, qs, random, ResponseFilter, stream, youtube,
 } from './filters';
 
-import { timer } from '~/decorators.js';
-import { getGlobalVariables } from '~/helpers/checkFilter.js';
+import { timer } from '~/decorators';
+import { getGlobalVariables } from '~/helpers/checkFilter';
 import { getBotSender } from '~/helpers/commons/getBotSender';
 import twitch from '~/services/twitch';
 import { translate } from '~/translate';

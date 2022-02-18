@@ -1,14 +1,14 @@
 import {
   OverlayMapper, OverlayMapperMarathon,
-} from '@entity/overlay.js';
+} from '@entity/overlay';
 import { getRepository } from 'typeorm';
 
-import { onStartup } from '../decorators/on.js';
+import { onStartup } from '../decorators/on';
 import Overlay from './_interface';
 
-import { eventEmitter } from '~/helpers/events/emitter.js';
-import { error } from '~/helpers/log.js';
-import { addUIError } from '~/helpers/panel/alerts.js';
+import { eventEmitter } from '~/helpers/events/emitter';
+import { error } from '~/helpers/log';
+import { addUIError } from '~/helpers/panel/alerts';
 import { adminEndpoint, publicEndpoint } from '~/helpers/socket';
 
 const cachedOverlays = new Map<string, Required<OverlayMapperMarathon>>();

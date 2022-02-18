@@ -49,7 +49,7 @@ function getNameAndTypeFromStackTrace() {
 
   const path = parse(stack[2].getFileName() || '');
   const _type = path.dir.split(separator)[path.dir.split(separator).length - 1];
-  const type = _type === 'dest' ? 'core' : _type;
+  const type = _type === 'src' ? 'core' : _type;
   const name = path.name;
 
   return { name, type };
@@ -395,8 +395,8 @@ export function timer() {
 
     if (method.constructor.name === 'AsyncFunction') {
       descriptor.value = async function (){
-        const Parser = require('~/parser.js').Parser;
-        const Message = require('~/message.js').Message;
+        const Parser = require('~/parser').Parser;
+        const Message = require('~/message').Message;
 
         const start = Date.now();
         // eslint-disable-next-line prefer-rest-params
@@ -414,8 +414,8 @@ export function timer() {
       };
     } else {
       descriptor.value = function (){
-        const Parser = require('~/parser.js').Parser;
-        const Message = require('~/message.js').Message;
+        const Parser = require('~/parser').Parser;
+        const Message = require('~/message').Message;
 
         const start = Date.now();
         // eslint-disable-next-line prefer-rest-params

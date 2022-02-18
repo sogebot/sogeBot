@@ -1,5 +1,5 @@
 import client from '../api/client';
-import { refresh } from '../token/refresh.js';
+import { refresh } from '../token/refresh';
 
 import { gameCache, gameOrTitleChangedManually, rawStatus } from '~/helpers/api';
 import {

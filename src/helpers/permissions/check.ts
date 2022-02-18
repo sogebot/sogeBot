@@ -9,7 +9,7 @@ import {
 import {
   isFollower, isOwner, isSubscriber, isVIP,
 } from '../user';
-import * as changelog from '../user/changelog.js';
+import * as changelog from '../user/changelog';
 import { isBot } from '../user/isBot';
 import { isBroadcaster } from '../user/isBroadcaster';
 import { isModerator } from '../user/isModerator';

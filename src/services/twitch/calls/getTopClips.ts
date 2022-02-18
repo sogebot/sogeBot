@@ -3,7 +3,7 @@ import { DAY } from '@sogebot/ui-helpers/constants';
 
 import { HelixClip } from '../../../../node_modules/@twurple/api/lib';
 import client from '../api/client';
-import { refresh } from '../token/refresh.js';
+import { refresh } from '../token/refresh';
 import { getGameNameFromId } from './getGameNameFromId';
 
 import { streamStatusChangeSince } from '~/helpers/api';

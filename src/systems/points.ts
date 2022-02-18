@@ -16,7 +16,7 @@ import {
   onChange, onLoad, onStartup,
 } from '../decorators/on';
 import Expects from '../expects';
-import general from '../general.js';
+import general from '../general';
 import users from '../users';
 import System from './_interface';
 
@@ -31,7 +31,7 @@ import { getUserHighestPermission } from '~/helpers/permissions/index';
 import { defaultPermissions } from '~/helpers/permissions/index';
 import { getPointsName, name } from '~/helpers/points/index';
 import { adminEndpoint } from '~/helpers/socket';
-import * as changelog from '~/helpers/user/changelog.js';
+import * as changelog from '~/helpers/user/changelog';
 import { isBot, isBotId } from '~/helpers/user/isBot';
 import { getIdFromTwitch } from '~/services/twitch/calls/getIdFromTwitch';
 import { translate } from '~/translate';

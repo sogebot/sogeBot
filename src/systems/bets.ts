@@ -9,7 +9,7 @@ import {
 } from '../decorators';
 import { onStartup } from '../decorators/on';
 import Expects from '../expects';
-import general from '../general.js';
+import general from '../general';
 import System from './_interface';
 
 import {
@@ -20,7 +20,7 @@ import { error, warning } from '~/helpers/log';
 import { defaultPermissions } from '~/helpers/permissions/index';
 import { getPointsName } from '~/helpers/points';
 import { adminEndpoint } from '~/helpers/socket';
-import * as changelog from '~/helpers/user/changelog.js';
+import * as changelog from '~/helpers/user/changelog';
 import points from '~/systems/points';
 
 const ERROR_NOT_ENOUGH_OPTIONS = 'Expected more parameters';

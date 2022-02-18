@@ -26,7 +26,7 @@ import { mainCurrency } from '~/helpers/currency';
 import { error } from '~/helpers/log';
 import { get, getUserHighestPermission } from '~/helpers/permissions/index';
 import { getPointsName } from '~/helpers/points';
-import * as changelog from '~/helpers/user/changelog.js';
+import * as changelog from '~/helpers/user/changelog';
 import { translate } from '~/translate';
 
 /*

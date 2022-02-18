@@ -1,6 +1,6 @@
 import { error, warning } from '../../../helpers/log';
 import client from '../api/client';
-import { refresh } from '../token/refresh.js';
+import { refresh } from '../token/refresh';
 
 import { getFunctionName } from '~/helpers/getFunctionName';
 import { variables } from '~/watchers';

@@ -5,7 +5,7 @@ import { getRepository } from 'typeorm';
 import { debug } from '../log';
 import { logAvgTime } from '../profiler';
 import { setImmediateAwait } from '../setImmediateAwait';
-import * as changelog from '../user/changelog.js';
+import * as changelog from '../user/changelog';
 import { cleanViewersCache } from './cache';
 import { getUserHighestPermission } from './getUserHighestPermission';
 

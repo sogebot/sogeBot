@@ -1,6 +1,6 @@
 import { TextChannel } from 'discord.js';
 
-import { timer } from '~/decorators.js';
+import { timer } from '~/decorators';
 import { prepare } from '~/helpers/commons/prepare';
 import { sendMessage } from '~/helpers/commons/sendMessage';
 import { chatOut, warning } from '~/helpers/log';

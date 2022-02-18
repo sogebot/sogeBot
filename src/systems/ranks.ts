@@ -14,7 +14,7 @@ import System from './_interface';
 import { prepare } from '~/helpers/commons';
 import { defaultPermissions } from '~/helpers/permissions/index';
 import { adminEndpoint } from '~/helpers/socket';
-import * as changelog from '~/helpers/user/changelog.js';
+import * as changelog from '~/helpers/user/changelog';
 import { translate } from '~/translate';
 
 /*

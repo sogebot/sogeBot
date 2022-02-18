@@ -8,7 +8,7 @@ import { format } from '@sogebot/ui-helpers/number';
 import _ from 'lodash';
 import { getRepository } from 'typeorm';
 
-import general from '../general.js';
+import general from '../general';
 import Parser from '../parser';
 
 import type { ResponseFilter } from '.';

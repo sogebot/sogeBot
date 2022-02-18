@@ -7,7 +7,7 @@ import localtunnel from 'localtunnel';
 import type QueryString from 'qs';
 import { v4 } from 'uuid';
 
-import emitter from '../../helpers/interfaceEmitter.js';
+import emitter from '../../helpers/interfaceEmitter';
 
 import * as channelPoll from '~/helpers/api/channelPoll';
 import * as hypeTrain from '~/helpers/api/hypeTrain';

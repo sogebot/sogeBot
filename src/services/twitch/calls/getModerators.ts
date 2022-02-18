@@ -1,14 +1,14 @@
 import { getRepository, In, Not } from 'typeorm';
 
 import client from '../api/client';
-import { refresh } from '../token/refresh.js';
+import { refresh } from '../token/refresh';
 
 import { User } from '~/database/entity/user';
 import { getFunctionName } from '~/helpers/getFunctionName';
 import { error, warning } from '~/helpers/log';
 import { addUIError } from '~/helpers/panel/index';
 import { setStatus } from '~/helpers/parser';
-import * as changelog from '~/helpers/user/changelog.js';
+import * as changelog from '~/helpers/user/changelog';
 import { variables } from '~/watchers';
 
 export async function getModerators(opts: { isWarned: boolean }) {

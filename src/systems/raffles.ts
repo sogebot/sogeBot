@@ -24,7 +24,7 @@ import { linesParsed } from '~/helpers/parser';
 import { defaultPermissions } from '~/helpers/permissions/index';
 import { adminEndpoint } from '~/helpers/socket';
 import { tmiEmitter } from '~/helpers/tmi';
-import * as changelog from '~/helpers/user/changelog.js';
+import * as changelog from '~/helpers/user/changelog';
 import points from '~/systems/points';
 import { translate } from '~/translate';
 

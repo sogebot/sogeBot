@@ -4,7 +4,7 @@ import { HOUR } from '@sogebot/ui-helpers/constants';
 import { cloneDeep, isEqual } from 'lodash';
 import fetch from 'node-fetch';
 
-import { timer } from '../../decorators.js';
+import { timer } from '../../decorators';
 import { info } from '../log';
 import {
   globalIgnoreListExclude, ignorelist, isIgnoredCache,

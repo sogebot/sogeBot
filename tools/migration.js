@@ -9,8 +9,8 @@ const os = require('os');
 const { dayjs, timezone } = require('@sogebot/ui-helpers/dayjsHelper');
 const chalk = require('chalk');
 
-const getMigrationType = require('../dest/helpers/getMigrationType').getMigrationType;
-const { migrationFile } = require('../dest/helpers/log');
+const getMigrationType = require('../src/helpers/getMigrationType').getMigrationType;
+const { migrationFile } = require('../src/helpers/log');
 
 const logDir = './logs';
 
@@ -76,8 +76,8 @@ async function runMigration() {
       shell: true,
       env:   {
         ...process.env,
-        'TYPEORM_ENTITIES':   'dest/database/entity/*.js',
-        'TYPEORM_MIGRATIONS': `dest/database/migration/${getMigrationType(process.env.TYPEORM_CONNECTION)}/**/*.js`,
+        'TYPEORM_ENTITIES':   'src/database/entity/*.js',
+        'TYPEORM_MIGRATIONS': `src/database/migration/${getMigrationType(process.env.TYPEORM_CONNECTION)}/**/*.js`,
       },
     }).on('error', function( err ){
       throw err;

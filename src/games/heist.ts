@@ -5,14 +5,14 @@ import { getRepository } from 'typeorm';
 
 import { command, settings } from '../decorators';
 import { onStartup } from '../decorators/on';
-import Expects from '../expects.js';
+import Expects from '../expects';
 import twitch from '../services/twitch';
 import { default as pointsSystem } from '../systems/points';
 import Game from './_interface';
 
 import { announce, prepare } from '~/helpers/commons';
-import { debug, warning } from '~/helpers/log.js';
-import * as changelog from '~/helpers/user/changelog.js';
+import { debug, warning } from '~/helpers/log';
+import * as changelog from '~/helpers/user/changelog';
 import { translate } from '~/translate';
 
 export type Level = { name: string; winPercentage: number; payoutMultiplier: number; maxUsers: number };

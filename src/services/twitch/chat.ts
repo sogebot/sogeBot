@@ -14,7 +14,7 @@ import { getRepository } from 'typeorm';
 
 import { default as apiClient } from './api/client';
 import { followerUpdatePreCheck } from './calls/isFollowerUpdate';
-import { CustomAuthProvider } from './token/CustomAuthProvider.js';
+import { CustomAuthProvider } from './token/CustomAuthProvider';
 import { refresh } from './token/refresh';
 
 import { parserReply } from '~/commons';
@@ -40,7 +40,7 @@ import {
 import { linesParsedIncrement, setStatus } from '~/helpers/parser';
 import { tmiEmitter } from '~/helpers/tmi';
 import { isOwner } from '~/helpers/user';
-import * as changelog from '~/helpers/user/changelog.js';
+import * as changelog from '~/helpers/user/changelog';
 import { isBot, isBotId } from '~/helpers/user/isBot';
 import { isIgnored } from '~/helpers/user/isIgnored';
 import eventlist from '~/overlays/eventlist';

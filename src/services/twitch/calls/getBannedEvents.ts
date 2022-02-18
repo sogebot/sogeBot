@@ -1,11 +1,11 @@
 import { chunk } from 'lodash';
 import { getRepository } from 'typeorm';
 
-import { refresh } from '../token/refresh.js';
+import { refresh } from '../token/refresh';
 
 import { rawDataSymbol } from '~/../node_modules/@twurple/common/lib';
 import { BannedEventsTable } from '~/database/entity/bannedEvents';
-import { getFunctionName } from '~/helpers/getFunctionName.js';
+import { getFunctionName } from '~/helpers/getFunctionName';
 import { debug, error, warning } from '~/helpers/log';
 import { addUIError } from '~/helpers/panel/index';
 import client from '~/services/twitch/api/client';

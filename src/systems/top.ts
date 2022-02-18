@@ -18,7 +18,7 @@ import { debug } from '~/helpers/log';
 import { defaultPermissions } from '~/helpers/permissions/index';
 import { getPointsName } from '~/helpers/points';
 import { unserialize } from '~/helpers/type';
-import * as changelog from '~/helpers/user/changelog.js';
+import * as changelog from '~/helpers/user/changelog';
 import { getIgnoreList, isIgnored } from '~/helpers/user/isIgnored';
 import twitch from '~/services/twitch';
 import { translate } from '~/translate';

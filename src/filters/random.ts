@@ -4,7 +4,7 @@ import { getRepository } from 'typeorm';
 
 import type { ResponseFilter } from '.';
 
-import * as changelog from '~/helpers/user/changelog.js';
+import * as changelog from '~/helpers/user/changelog';
 import { isIgnored } from '~/helpers/user/isIgnored';
 import { variables } from '~/watchers';
 

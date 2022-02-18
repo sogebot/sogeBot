@@ -3,7 +3,7 @@ SHELL        := /bin/bash
 VERSION      := `node -pe "require('./package.json').version"`
 ENV          ?= production
 
-all : info clean dependencies bot
+all : info dependencies bot
 .PHONY : all
 
 info:
@@ -37,28 +37,12 @@ jsonlint:
 	@echo -ne "\n\t ----- Checking jsonlint\n"
 	for a in $$(find ./locales -type f -iname "*.json" -print); do /bin/false; jsonlint $$a -q; done
 
-bot:
-	@rm -rf dest
-ifeq ($(ENV),production)
-	@echo -ne "\n\t ----- Building bot (strip comments)\n"
-	@npx tsc --removeComments true
-else
-	@echo -ne "\n\t ----- Building bot\n"
-	@npx tsc --removeComments false
-endif
-	@npx tsc-alias
-
 pack:
 	@echo -ne "\n\t ----- Packing into sogeBot-$(VERSION).zip\n"
 	@cp ./src/data/.env* ./
 	@cp ./src/data/.env.sqlite ./.env
-	@npx bestzip sogeBot-$(VERSION).zip .npmrc .env* package-lock.json patches/ dest/ locales/ LICENSE package.json docs/ AUTHORS tools/ bin/ bat/ fonts.json assets/ favicon.ico
+	@npx bestzip sogeBot-$(VERSION).zip .npmrc .env* package-lock.json patches/ src/ locales/ LICENSE package.json docs/ AUTHORS tools/ bin/ bat/ fonts.json assets/ favicon.ico
 
 prepare:
 	@echo -ne "\n\t ----- Cleaning up node_modules\n"
 	@rm -rf node_modules
-
-clean:
-	@echo -ne "\n\t ----- Cleaning up compiled files\n"
-	@rm -rf public/dist/bootstrap* public/dist/carousel/* public/dist/gallery/* public/dist/jquery public/dist/lodash public/dist/velocity-animate public/dist/popper.js public/dist/flv.js
-	@rm -rf dest

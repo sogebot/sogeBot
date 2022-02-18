@@ -10,7 +10,7 @@ import { parserReply } from '~/commons';
 import { getBotSender, prepare } from '~/helpers/commons';
 import { defaultPermissions } from '~/helpers/permissions/index';
 import { adminEndpoint } from '~/helpers/socket';
-import * as changelog from '~/helpers/user/changelog.js';
+import * as changelog from '~/helpers/user/changelog';
 import twitch from '~/services/twitch';
 import { translate } from '~/translate';
 

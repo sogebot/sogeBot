@@ -12,7 +12,7 @@ import alerts from '../registries/alerts';
 import users from '../users';
 import Integration from './_interface';
 
-import { isStreamOnline, stats } from '~/helpers/api/index.js';
+import { isStreamOnline, stats } from '~/helpers/api/index';
 import { mainCurrency } from '~/helpers/currency';
 import { eventEmitter } from '~/helpers/events';
 import { triggerInterfaceOnTip } from '~/helpers/interface/triggers';

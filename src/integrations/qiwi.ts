@@ -4,13 +4,13 @@ import { getRepository } from 'typeorm';
 
 import currency from '../currency';
 import { settings } from '../decorators';
-import { onChange, onStartup } from '../decorators/on.js';
-import eventlist from '../overlays/eventlist.js';
-import alerts from '../registries/alerts.js';
-import users from '../users.js';
+import { onChange, onStartup } from '../decorators/on';
+import eventlist from '../overlays/eventlist';
+import alerts from '../registries/alerts';
+import users from '../users';
 import Integration from './_interface';
 
-import { isStreamOnline, stats } from '~/helpers/api/index.js';
+import { isStreamOnline, stats } from '~/helpers/api/index';
 import { mainCurrency } from '~/helpers/currency';
 import { eventEmitter } from '~/helpers/events';
 import { triggerInterfaceOnTip } from '~/helpers/interface/triggers';

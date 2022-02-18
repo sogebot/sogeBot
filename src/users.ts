@@ -22,7 +22,7 @@ import {
 import { recacheOnlineUsersPermission } from '~/helpers/permissions';
 import { defaultPermissions, getUserHighestPermission } from '~/helpers/permissions/index';
 import { adminEndpoint, viewerEndpoint } from '~/helpers/socket';
-import * as changelog from '~/helpers/user/changelog.js';
+import * as changelog from '~/helpers/user/changelog';
 import { getIdFromTwitch } from '~/services/twitch/calls/getIdFromTwitch';
 import { variables } from '~/watchers';
 

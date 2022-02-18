@@ -1,5 +1,5 @@
 global.mocha = true;
-require('../dest/main.js');
+require('../dest/main');
 const { VariableWatcher } = require('../dest/watchers');
 
 beforeEach(async () => {

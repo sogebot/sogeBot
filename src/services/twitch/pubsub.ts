@@ -3,7 +3,7 @@ import { setInterval } from 'timers';
 import { MINUTE } from '@sogebot/ui-helpers/constants';
 import { PubSubClient } from '@twurple/pubsub';
 
-import { CustomAuthProvider } from './token/CustomAuthProvider.js';
+import { CustomAuthProvider } from './token/CustomAuthProvider';
 
 import { rawDataSymbol } from '~/../node_modules/@twurple/common/lib';
 import { isStreamOnline } from '~/helpers/api';

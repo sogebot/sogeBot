@@ -1,6 +1,6 @@
 import _ from 'lodash';
 
-import { timer } from '../../decorators.js';
+import { timer } from '../../decorators';
 import { Message } from '../../message';
 import {
   chatOut, debug, whisperOut,

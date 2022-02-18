@@ -27,7 +27,7 @@ import { error, info } from '~/helpers/log';
 import { defaultPermissions } from '~/helpers/permissions/index';
 import { adminEndpoint, publicEndpoint } from '~/helpers/socket';
 import { tmiEmitter } from '~/helpers/tmi';
-import * as changelog from '~/helpers/user/changelog.js';
+import * as changelog from '~/helpers/user/changelog';
 import { isModerator } from '~/helpers/user/isModerator';
 import { translate } from '~/translate';
 

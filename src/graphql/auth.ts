@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken';
 import { AuthChecker } from 'type-graphql';
 
-import socket, { getPrivileges } from '../socket.js';
+import socket, { getPrivileges } from '../socket';
 
 type Unpacked<T> =
   T extends (infer U)[] ? U :

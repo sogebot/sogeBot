@@ -1,4 +1,4 @@
-import { OverlayMapper } from '@entity/overlay.js';
+import { OverlayMapper } from '@entity/overlay';
 import { MINUTE, SECOND } from '@sogebot/ui-helpers/constants';
 import { getRepository } from 'typeorm';
 

@@ -11,7 +11,7 @@ import {
 import {
   onBit, onMessage, onStartup, onTip,
 } from '../decorators/on';
-import Expects from '../expects.js';
+import Expects from '../expects';
 import System from './_interface';
 
 import { isStreamOnline } from '~/helpers/api';
@@ -19,7 +19,7 @@ import {
   announce, getOwnerAsSender, prepare,
 } from '~/helpers/commons';
 import { mainCurrency } from '~/helpers/currency';
-import { warning } from '~/helpers/log.js';
+import { warning } from '~/helpers/log';
 import { defaultPermissions } from '~/helpers/permissions/index';
 import { adminEndpoint } from '~/helpers/socket';
 import { translate } from '~/translate';

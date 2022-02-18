@@ -8,7 +8,7 @@ import {
   command, persistent, settings,
 } from '../decorators';
 import { onStartup } from '../decorators/on';
-import general from '../general.js';
+import general from '../general';
 import points from '../systems/points';
 import Game from './_interface';
 
@@ -16,7 +16,7 @@ import { announce, prepare } from '~/helpers/commons';
 import { isDbConnected } from '~/helpers/database';
 import { error } from '~/helpers/log';
 import { getPointsName } from '~/helpers/points';
-import * as changelog from '~/helpers/user/changelog.js';
+import * as changelog from '~/helpers/user/changelog';
 import { isBroadcaster } from '~/helpers/user/isBroadcaster';
 import { isModerator } from '~/helpers/user/isModerator';
 import { translate } from '~/translate';

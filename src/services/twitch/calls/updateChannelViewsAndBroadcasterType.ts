@@ -1,8 +1,8 @@
-import { stats } from '../../../helpers/api/stats.js';
+import { stats } from '../../../helpers/api/stats';
 import client from '../api/client';
-import { refresh } from '../token/refresh.js';
+import { refresh } from '../token/refresh';
 
-import { getFunctionName } from '~/helpers/getFunctionName.js';
+import { getFunctionName } from '~/helpers/getFunctionName';
 import emitter from '~/helpers/interfaceEmitter';
 import { error, warning } from '~/helpers/log';
 import { variables } from '~/watchers';

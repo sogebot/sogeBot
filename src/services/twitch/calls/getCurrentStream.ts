@@ -1,6 +1,6 @@
 import { dayjs } from '@sogebot/ui-helpers/dayjsHelper';
 
-import { refresh } from '../token/refresh.js';
+import { refresh } from '../token/refresh';
 
 import { isStreamOnline, setCurrentRetries, streamId, streamStatusChangeSince, streamType } from '~/helpers/api';
 import {
@@ -8,7 +8,7 @@ import {
 } from '~/helpers/api';
 import * as stream from '~/helpers/core/stream';
 import { eventEmitter } from '~/helpers/events';
-import { getFunctionName } from '~/helpers/getFunctionName.js';
+import { getFunctionName } from '~/helpers/getFunctionName';
 import { debug, error, warning } from '~/helpers/log';
 import { linesParsed } from '~/helpers/parser';
 import client from '~/services/twitch/api/client';

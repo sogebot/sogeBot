@@ -1,7 +1,7 @@
 import { User } from '@entity/user';
 import { getConnection, getRepository } from 'typeorm';
 
-import * as changelog from '~/helpers/user/changelog.js';
+import * as changelog from '~/helpers/user/changelog';
 import { variables } from '~/watchers';
 
 async function getRandOrder() {

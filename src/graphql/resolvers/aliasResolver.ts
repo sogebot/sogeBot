@@ -6,7 +6,7 @@ import {
 } from 'type-graphql';
 import { getRepository } from 'typeorm';
 
-import * as cache from '../../helpers/cache/alias.js';
+import * as cache from '../../helpers/cache/alias';
 import { AliasGroupObject } from '../schema/alias/AliasGroupObject';
 
 @Resolver()

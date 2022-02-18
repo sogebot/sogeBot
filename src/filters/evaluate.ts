@@ -1,4 +1,4 @@
-import { runScript } from '../helpers/customvariables/runScript.js';
+import { runScript } from '../helpers/customvariables/runScript';
 
 import type { ResponseFilter } from '.';
 

@@ -41,7 +41,7 @@ import { tmiEmitter } from '~/helpers/tmi';
 import {
   isOwner, isSubscriber, isVIP,
 } from '~/helpers/user';
-import * as changelog from '~/helpers/user/changelog.js';
+import * as changelog from '~/helpers/user/changelog';
 import { isBot, isBotSubscriber } from '~/helpers/user/isBot';
 import { isBroadcaster } from '~/helpers/user/isBroadcaster';
 import { isModerator } from '~/helpers/user/isModerator';

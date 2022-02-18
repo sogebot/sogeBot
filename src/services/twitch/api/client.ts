@@ -1,7 +1,7 @@
 import { ApiClient } from '@twurple/api';
 
-import { warning } from '../../../helpers/log.js';
-import { CustomAuthProvider } from '../token/CustomAuthProvider.js';
+import { warning } from '../../../helpers/log';
+import { CustomAuthProvider } from '../token/CustomAuthProvider';
 
 import { variables } from '~/watchers';
 

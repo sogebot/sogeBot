@@ -16,7 +16,7 @@ import {
   check, defaultPermissions, getUserHighestPermission,
 } from '~/helpers/permissions/index';
 import { adminEndpoint, endpoints } from '~/helpers/socket';
-import * as changelog from '~/helpers/user/changelog.js';
+import * as changelog from '~/helpers/user/changelog';
 import { isModerator } from '~/helpers/user/isModerator';
 
 enum Authorized {

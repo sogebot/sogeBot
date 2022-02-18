@@ -5,19 +5,19 @@ import _ from 'lodash';
 import { getRepository, In } from 'typeorm';
 import { VM } from 'vm2';
 
-import { timer } from '../decorators.js';
-import lastfm from '../integrations/lastfm.js';
-import spotify from '../integrations/spotify.js';
+import { timer } from '../decorators';
+import lastfm from '../integrations/lastfm';
+import spotify from '../integrations/spotify';
 import ranks from '../systems/ranks';
-import songs from '../systems/songs.js';
-import { translate } from '../translate.js';
-import users from '../users.js';
+import songs from '../systems/songs';
+import { translate } from '../translate';
+import users from '../users';
 import { isStreamOnline, stats } from './api';
 import { getAll } from './customvariables';
 import {
   isOwner, isSubscriber, isVIP,
 } from './user';
-import * as changelog from './user/changelog.js';
+import * as changelog from './user/changelog';
 import { isBot, isBotSubscriber } from './user/isBot';
 import { isBroadcaster } from './user/isBroadcaster';
 import { isModerator } from './user/isModerator';

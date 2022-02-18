@@ -38,7 +38,7 @@ import {
   globalIgnoreListExclude, ignorelist, sendWithMe, setMuteStatus, showWithAt,
 } from '~/helpers/tmi';
 import { tmiEmitter } from '~/helpers/tmi';
-import * as changelog from '~/helpers/user/changelog.js';
+import * as changelog from '~/helpers/user/changelog';
 import { isIgnored } from '~/helpers/user/isIgnored';
 import { sendGameFromTwitch } from '~/services/twitch/calls/sendGameFromTwitch';
 import { setTitleAndGame } from '~/services/twitch/calls/setTitleAndGame';
