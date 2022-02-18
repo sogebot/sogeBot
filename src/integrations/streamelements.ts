@@ -1,4 +1,4 @@
-import { UserTip, UserTipInterface } from '@entity/user';
+import { Currency, UserTip, UserTipInterface } from '@entity/user';
 import * as constants from '@sogebot/ui-helpers/constants';
 import Axios from 'axios';
 import chalk from 'chalk';
@@ -29,7 +29,7 @@ type StreamElementsEvent = {
     },
     message: string,
     amount: number,
-    currency: currency
+    currency: Currency
   },
   provider: string,
   status: string,

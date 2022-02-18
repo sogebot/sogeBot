@@ -9,9 +9,12 @@ import { v4 } from 'uuid';
 import { persistent } from '../decorators';
 import Registry from './_interface';
 
+import { User } from '~/database/entity/user';
 import { ioServer } from '~/helpers/panel';
 import { adminEndpoint, publicEndpoint } from '~/helpers/socket';
+import client from '~/services/twitch/api/client';
 import { translate } from '~/translate';
+import { variables } from '~/watchers';
 
 /* secureKeys are used to authenticate use of public overlay endpoint */
 const secureKeys = new Set<string>();
@@ -127,7 +130,7 @@ class Alerts extends Registry {
     });
   }
 
-  async   trigger(opts: EmitData) {
+  async trigger(opts: EmitData) {
     const { default: tts, services } = await import ('../tts');
     if (!this.areAlertsMuted) {
       let key = v4();
@@ -143,9 +146,43 @@ class Alerts extends Registry {
       }
 
       secureKeys.add(key);
-      ioServer?.of('/registries/alerts').emit('alert', {
-        ...opts, isTTSMuted: !tts.ready || this.isTTSMuted, isSoundMuted: this.isSoundMuted, TTSService: tts.service, TTSKey: key,
-      });
+
+      // search for user triggering alert
+      const user = await getRepository(User).findOne({ userName: opts.name });
+
+      let recipient = null;
+      if (opts.recipient) {
+        // search for user triggering alert
+        recipient = await getRepository(User).findOne({ userName: opts.recipient }) ?? null;
+      }
+
+      // search for user triggering alert
+      const broadcasterId = variables.get('services.twitch.broadcasterId') as string;
+      const caster = await getRepository(User).findOne({ userId: broadcasterId }) ?? null;
+
+      const data = {
+        ...opts, isTTSMuted: !tts.ready || this.isTTSMuted, isSoundMuted: this.isSoundMuted, TTSService: tts.service, TTSKey: key, user: null, caster, recipientUser: recipient,
+      };
+
+      if (user || (!user && opts.event !== 'tips')) {
+        const clientBot = await client('bot');
+        const response = await clientBot.users.getUserByName(opts.name);
+        if (response) {
+          const responseUser = {
+            userId:          response.id,
+            userName:        response.name,
+            displayname:     response.displayName,
+            profileImageUrl: response.profilePictureUrl,
+          };
+          await getRepository(User).save(responseUser);
+
+          ioServer?.of('/registries/alerts').emit('alert', {
+            ...data, user: { ...user, ...responseUser },
+          });
+        }
+      } else {
+        ioServer?.of('/registries/alerts').emit('alert', data);
+      }
     }
   }
 

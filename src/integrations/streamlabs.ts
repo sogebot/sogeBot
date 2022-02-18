@@ -1,4 +1,4 @@
-import { UserTip, UserTipInterface } from '@entity/user';
+import { Currency, UserTip, UserTipInterface } from '@entity/user';
 import axios from 'axios';
 import chalk from 'chalk';
 import { io, Socket } from 'socket.io-client';
@@ -32,7 +32,7 @@ namespace StreamlabsEvent {
       formatted_amount: string;
       formattedAmount: string;
       message: string;
-      currency: currency;
+      currency: Currency;
       emotes: null;
       iconClassName: string;
       to: {
@@ -195,7 +195,7 @@ class Streamlabs extends Integration {
           // incorrect currency on event rerun
           const parsedCurrency = (event.formatted_amount as string).match(/(?<currency>[A-Z$]{3}|\$)/);
           if (parsedCurrency && parsedCurrency.groups) {
-            event.currency = (parsedCurrency.groups.currency === '$' ? 'USD' : parsedCurrency.groups.currency) as currency;
+            event.currency = (parsedCurrency.groups.currency === '$' ? 'USD' : parsedCurrency.groups.currency) as Currency;
           }
 
           // check if it is new tip (by message and by tippedAt time interval)

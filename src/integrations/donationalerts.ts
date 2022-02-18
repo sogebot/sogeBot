@@ -1,4 +1,4 @@
-import { UserTip, UserTipInterface } from '@entity/user';
+import { Currency, UserTip, UserTipInterface } from '@entity/user';
 import * as constants from '@sogebot/ui-helpers/constants';
 import axios from 'axios';
 import chalk from 'chalk';
@@ -30,7 +30,7 @@ type DonationAlertsResponse = {
     'username': string,
     'message': string,
     'amount': number,
-    'currency': currency,
+    'currency': Currency,
     'is_shown': number,
     'created_at': string /* 2019-09-29 09:00:00 */,
     'shown_at': null

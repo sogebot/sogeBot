@@ -1,7 +1,9 @@
-let _mainCurrency: currency = 'EUR';
+import { Currency } from '~/database/entity/user';
+
+let _mainCurrency: Currency = 'EUR';
 
 const mainCurrency = {
-  set value(value: currency) {
+  set value(value: Currency) {
     _mainCurrency = value;
   },
   get value() {

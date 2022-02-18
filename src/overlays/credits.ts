@@ -6,6 +6,7 @@ import currency from '../currency';
 import users from '../users';
 import Overlay from './_interface';
 
+import type { Currency } from '~/database/entity/user';
 import {
   isStreamOnline, stats, streamStatusChangeSince,
 } from '~/helpers/api';
@@ -26,7 +27,7 @@ class Credits extends Overlay {
       const when = isStreamOnline.value ? streamStatusChangeSince.value : Date.now() - 50000000000;
       const timestamp = new Date(when).getTime();
       const events: (EventListInterface & { username?: string, values?: {
-        currency: currency; amount: number;
+        currency: Currency; amount: number;
       };})[] = await getRepository(EventList).find({
         order: { timestamp: 'DESC' },
         where: { timestamp: MoreThanOrEqual(timestamp) },

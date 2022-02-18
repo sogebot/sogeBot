@@ -1,4 +1,4 @@
-import { UserTip, UserTipInterface } from '@entity/user';
+import { Currency, UserTip, UserTipInterface } from '@entity/user';
 import * as constants from '@sogebot/ui-helpers/constants';
 import fetch from 'node-fetch';
 import { getRepository } from 'typeorm';
@@ -35,7 +35,7 @@ type TipeeestreamEvent = {
           },
           hasPayment: string,
           currency: {
-            code: currency,
+            code: Currency,
             symbol: string,
             label: string,
             available: boolean
@@ -70,7 +70,7 @@ type TipeeestreamEvent = {
         parameters: {
           amount: number,
           campaignId: number,
-          currency: currency,
+          currency: Currency,
           fees: number,
           identifier: string,
           formattedMessage: string,

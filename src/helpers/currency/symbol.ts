@@ -1,7 +1,9 @@
 import getSymbolFromCurrency from 'currency-symbol-map';
 
-function symbol(code: string): currency {
-  return getSymbolFromCurrency(code) as currency;
+import { Currency } from '~/database/entity/user';
+
+function symbol(code: string): Currency {
+  return getSymbolFromCurrency(code) as Currency;
 }
 
 export { symbol };
