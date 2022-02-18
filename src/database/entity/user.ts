@@ -2,6 +2,8 @@ import { EntitySchema } from 'typeorm';
 
 import { ColumnNumericTransformer, SafeNumberTransformer } from './_transformer';
 
+export type Currency = 'USD' | 'AUD' | 'BGN' | 'BRL' | 'CAD' | 'CHF' | 'CNY' | 'CZK' | 'DKK' | 'EUR' | 'GBP' | 'HKD' | 'HRK' | 'HUF' | 'IDR' | 'ILS' | 'INR' | 'ISK' | 'JPY' | 'KRW' | 'MXN' | 'MYR' | 'NOK' | 'NZD' | 'PHP' | 'PLN' | 'RON' | 'RUB' | 'SEK' | 'SGD' | 'THB' | 'TRY' | 'ZAR';
+
 export interface UserInterface {
   userId: string; userName: string; displayname?: string; profileImageUrl?: string;
   isOnline?: boolean; isVIP?: boolean; isFollower?: boolean; isModerator?: boolean; isSubscriber?: boolean;
@@ -25,8 +27,8 @@ export interface UserInterface {
 }
 
 export interface UserTipInterface {
-  id?: string; amount: number; currency: currency; message: string; tippedAt?: number; sortAmount: number;
-  exchangeRates: { [key in currency]: number }; userId: string;
+  id?: string; amount: number; currency: Currency; message: string; tippedAt?: number; sortAmount: number;
+  exchangeRates: { [key in Currency]: number }; userId: string;
 }
 
 export interface UserBitInterface {

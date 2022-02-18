@@ -8,7 +8,7 @@ import _ from 'lodash';
 import { getRepository } from 'typeorm';
 
 import Core from '~/_interface';
-import { UserTip } from '~/database/entity/user';
+import { Currency as CurrencyType, UserTip } from '~/database/entity/user';
 import { settings, ui } from '~/decorators';
 import {
   onChange, onLoad, onStartup,
@@ -28,9 +28,9 @@ class Currency extends Core {
     type:   'selector',
     values: ['USD', 'AUD', 'BGN', 'BRL', 'CAD', 'CHF', 'CNY', 'CZK', 'DKK', 'EUR', 'GBP', 'HKD', 'HRK', 'HUF', 'IDR', 'ILS', 'INR', 'ISK', 'JPY', 'KRW', 'MXN', 'MYR', 'NOK', 'NZD', 'PHP', 'PLN', 'RON', 'RUB', 'SEK', 'SGD', 'THB', 'TRY', 'ZAR'],
   })
-  public mainCurrency: currency = 'EUR';
+  public mainCurrency: CurrencyType = 'EUR';
 
-  public rates: { [key in currency]: number } = {
+  public rates: { [key in CurrencyType]: number } = {
     AUD: 0, BGN: 0, BRL: 0, CAD: 0, CHF: 0, CNY: 0, CZK: 1 /* CZK:CZK 1:1 */,
     DKK: 0, EUR: 0, GBP: 0, HKD: 0, HRK: 0, HUF: 0, IDR: 0, ILS: 0, INR: 0,
     ISK: 0, JPY: 0, KRW: 0, MXN: 0, MYR: 0, NOK: 0, NZD: 0, PHP: 0, PLN: 0,
@@ -45,11 +45,11 @@ class Currency extends Core {
     this.updateRates();
   }
 
-  public isCodeSupported(code: currency) {
+  public isCodeSupported(code: CurrencyType) {
     return code === this.base || !_.isNil(this.rates[code]);
   }
 
-  public exchange(value: number, from: currency, to: currency, rates?: { [key in currency]: number }): number {
+  public exchange(value: number, from: CurrencyType, to: CurrencyType, rates?: { [key in CurrencyType]: number }): number {
     rates ??= _.cloneDeep(this.rates);
     try {
       if (from.toLowerCase().trim() === to.toLowerCase().trim()) {
@@ -88,7 +88,7 @@ class Currency extends Core {
     for (const tip of result) {
       await getRepository(UserTip).save({
         ...tip,
-        sortAmount: this.exchange(tip.amount, tip.currency as currency, this.mainCurrency, tip.exchangeRates),
+        sortAmount: this.exchange(tip.amount, tip.currency as CurrencyType, this.mainCurrency, tip.exchangeRates),
       });
     }
     info(chalk.yellow('CURRENCY:') + ' Recalculating tips (completed).');
@@ -113,7 +113,7 @@ class Currency extends Core {
           continue;
         }
         const [,, count, code, rate] = line.split('|');
-        this.rates[code as currency] = Number((Number(rate.replace(',', '.')) / Number(count)).toFixed(3));
+        this.rates[code as CurrencyType] = Number((Number(rate.replace(',', '.')) / Number(count)).toFixed(3));
       }
       info(chalk.yellow('CURRENCY:') + ' fetched rates');
       retries = 1;
