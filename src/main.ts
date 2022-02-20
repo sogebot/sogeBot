@@ -67,6 +67,10 @@ const connect = async function () {
   };
   await new Promise( resolve => setTimeout(resolve, 3000, null) );
   info(`Initialized ${typeToLog[type as keyof typeof typeToLog]} database (${normalize(String(connectionOptions.database))})`);
+
+  if (type === 'better-sqlite3') {
+    warning('SQLite should be used only for EVALUATION process and should be replaced with PostgreSQL or MySQL/MariaDB.');
+  }
 };
 
 async function main () {
