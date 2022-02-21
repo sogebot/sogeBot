@@ -17,8 +17,8 @@ export const processFollowerState = async (users: { from_name: string; from_id: 
   debug('api.followers', `Processing ${users.length} followers`);
   await changelog.flush();
   const usersGotFromDb = (await Promise.all(
-    chunk(users, SQLVariableLimit).map(async (bulk) => {
-      return await getRepository(User).findByIds(bulk.map(user => user.from_id));
+    chunk(users.map(o => o.from_id), SQLVariableLimit).map(async (bulkIds) => {
+      return await getRepository(User).findByIds(bulkIds);
     }),
   )).flat();
   debug('api.followers', `Found ${usersGotFromDb.length} followers in database`);

@@ -747,6 +747,7 @@ class Chat {
       if (!user) {
         // if we still doesn't have user, we create new
         changelog.update(userId, { userName: username });
+        await changelog.flush();
         return this.cheer(userstate, message, bits);
       }
 
@@ -765,7 +766,7 @@ class Chat {
         message:   messageFromUser,
         userId:    String(userId),
       };
-      getRepository(UserBit).save(newBits);
+      await getRepository(UserBit).save(newBits);
 
       eventEmitter.emit('cheer', {
         userName: username, userId, bits: bits, message: messageFromUser,

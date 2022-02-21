@@ -1,5 +1,3 @@
-/* global  */
-
 const assert = require('assert');
 
 require('../../general.js');
@@ -34,7 +32,7 @@ describe('Events - cheer event - @func3', () => {
         operations:  [{
           name:        'run-command',
           definitions: {
-            isCommandQuiet: true,
+            isCommandQuiet: false,
             commandToRun:   '!points add $username (math.$bits*10)',
           },
         }],
@@ -56,18 +54,13 @@ describe('Events - cheer event - @func3', () => {
           );
         });
 
-        it('wait 1s', async () => {
-          await time.waitMs(1000);
-        });
-
-        it('we are not expecting any messages to be sent - quiet mode', async () => {
-          assert.strict.equal(log.chatOut.callCount, 0);
+        it('we are expecting message to be sent', async () => {
+          await message.isSentRaw(`@${username} just received 10 points!`, username);
         });
 
         it('user should have 10 points', async () => {
-          await changelog.flush();
-          const user = await getRepository(User).findOne({ userId });
-          assert.strict.equal(user.points, 10);
+          const points = (require('../../../dest/systems/points')).default;
+          assert.strict.equal(await points.getPointsOf(userId), 10);
         });
       });
     }

@@ -16,6 +16,8 @@ import _ from 'lodash';
 import { createConnection, getConnectionOptions } from 'typeorm';
 import { MysqlConnectionOptions } from 'typeorm/driver/mysql/MysqlConnectionOptions';
 
+import { monkeypatch } from './database/sqlite-transaction-monkeypatch';
+
 import { autoLoad } from '~/helpers/autoLoad';
 import { setIsBotStarted } from '~/helpers/database';
 import { getMigrationType } from '~/helpers/getMigrationType';
@@ -49,6 +51,7 @@ const connect = async function () {
       migrations:     [ `dest/database/migration/${getMigrationType(connectionOptions.type)}/**/*.js` ],
     } as MysqlConnectionOptions);
   } else {
+    monkeypatch();
     await createConnection({
       ...connectionOptions,
       logging:       ['error'],
