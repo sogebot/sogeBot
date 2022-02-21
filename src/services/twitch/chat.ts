@@ -765,7 +765,7 @@ class Chat {
         message:   messageFromUser,
         userId:    String(userId),
       };
-      getRepository(UserBit).save(newBits);
+      await getRepository(UserBit).save(newBits);
 
       eventEmitter.emit('cheer', {
         userName: username, userId, bits: bits, message: messageFromUser,

@@ -2,6 +2,8 @@ const axios = require('axios');
 const MockAdapter = require('axios-mock-adapter');
 const { v4 } = require('uuid');
 
+const users = require('./helpers/user');
+
 const getLatest100FollowersMockData = () => {
   const data = [];
   for (let i = 0; i < 100; i++) {
@@ -22,6 +24,20 @@ global.mockClient = (account) => {
       getChannelEmotes: () => ([]),
     },
     users: {
+      getUserByName: (userName) => {
+        let id = String(Math.floor(Math.random() * 100000));
+        for (const key of Object.keys(users)) {
+          if (users[key].userName === userName) {
+            id = users[key].userId;
+          }
+        }
+        return {
+          id,
+          name:              userName,
+          displayName:       userName,
+          profilePictureUrl: '',
+        };
+      },
       getFollows: () => {
         console.log('Mocking call users.getFollows for ' + account);
         return {

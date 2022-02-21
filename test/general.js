@@ -1,4 +1,5 @@
 global.mocha = true;
+require('./mocks');
 require('../dest/main.js');
 const { VariableWatcher } = require('../dest/watchers');
 
