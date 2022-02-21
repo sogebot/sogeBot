@@ -12,7 +12,7 @@ for (let i = 0; i < 100; i++) {
   getLatest100FollowersMockData.push({
     'userId':     String(Math.floor(Math.random() * 10000000)),
     'userName':   v4(),
-    'followDate': new Date(Date.now() - (i * 60000)),
+    'followDate': null, // we are refreshing on each call
   });
 }
 
@@ -49,6 +49,10 @@ global.mockClient = (account) => {
       },
       getFollows: () => {
         console.log('Mocking call users.getFollows for ' + account);
+        // update follow time
+        for (let i = 0; i < 100; i++) {
+          getLatest100FollowersMockData[i].followDate = new Date(Date.now() - (i * 60000));
+        }
         return {
           data: getLatest100FollowersMockData,
         };

@@ -12,13 +12,11 @@ const changelog = (require('../../../dest/helpers/user/changelog'));
 const time = require('../../general.js').time;
 const db = require('../../general.js').db;
 const message = require('../../general.js').message;
-const user = require('../../general.js').user;
 
 describe('Events - cheer event - @func3', () => {
   before(async () => {
     await db.cleanup();
     await message.prepare();
-    await user.prepare();
   });
 
   describe('#1699 - Cheer event is not waiting for user to save id', function () {
@@ -41,7 +39,7 @@ describe('Events - cheer event - @func3', () => {
       });
     });
 
-    for (const username of [user.viewer.userName, user.viewer2.userName, user.mod.userName, user.owner.userName]) {
+    for (const username of ['losslezos', 'rigneir', 'mikasa_hraje', 'foufhs']) {
       const userId = String(Math.floor(Math.random() * 10000));
       describe(username + ' cheer event', () => {
         it('trigger cheer event for 1 bit - ' + username, async () => {
@@ -66,8 +64,8 @@ describe('Events - cheer event - @func3', () => {
 
         it('user should have 10 points', async () => {
           await changelog.flush();
-          const userDb = await getRepository(User).findOne({ userId });
-          assert.strict.equal(userDb.points, 10);
+          const user = await getRepository(User).findOne({ userId });
+          assert.strict.equal(user.points, 10);
         });
       });
     }
