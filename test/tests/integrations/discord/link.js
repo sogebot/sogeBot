@@ -47,7 +47,7 @@ describe('integrations/discord - !link - @func2', () => {
     });
   });
 
-  describe.only('!link on discord should properly create DiscordLink and !unlink should delete', async () => {
+  describe('!link on discord should properly create DiscordLink and !unlink should delete', async () => {
     let link;
     before(async () => {
       await db.cleanup();
@@ -70,15 +70,15 @@ describe('integrations/discord - !link - @func2', () => {
         id:   '12345',
         tag:  'test#1234',
         send: () => {
-          return; 
+          return;
         },
       },
       {
         reply: () => {
-          return; 
+          return;
         },
         delete: () => {
-          return; 
+          return;
         },
       });
     });
