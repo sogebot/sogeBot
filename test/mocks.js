@@ -17,6 +17,10 @@ const getLatest100FollowersMockData = () => {
 
 global.mockClient = (account) => {
   return {
+    chat: {
+      getGlobalEmotes:  () => ([]),
+      getChannelEmotes: () => ([]),
+    },
     users: {
       getFollows: () => {
         console.log('Mocking call users.getFollows for ' + account);
