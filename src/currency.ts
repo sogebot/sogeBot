@@ -100,7 +100,7 @@ class Currency extends Core {
     let refresh = constants.DAY;
     try {
       if (retries === 1) {
-        info(chalk.yellow('CURRENCY:') + ' fetching rates');
+        info(chalk.yellow('CURRENCY:') + ' Fetching rates');
       }
       // base is always CZK
       // using IP because dns may fail occasionally, 193.85.3.250 => cnb.cz
@@ -115,7 +115,7 @@ class Currency extends Core {
         const [,, count, code, rate] = line.split('|');
         this.rates[code as CurrencyType] = Number((Number(rate.replace(',', '.')) / Number(count)).toFixed(3));
       }
-      info(chalk.yellow('CURRENCY:') + ' fetched rates');
+      info(chalk.yellow('CURRENCY:') + ' Fetched rates');
       retries = 1;
     } catch (e: any) {
       if (!e.message.includes('ECONNRESET')) {

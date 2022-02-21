@@ -263,16 +263,16 @@ class Discord extends Integration {
     }
   }
 
-  removeExpiredLinks() {
+  async removeExpiredLinks() {
     // remove expired links
-    getRepository(DiscordLink).delete({ userId: IsNull(), createdAt: LessThan(Date.now() - (MINUTE * 10)) });
+    await getRepository(DiscordLink).delete({ userId: IsNull(), createdAt: LessThan(Date.now() - (MINUTE * 10)) });
   }
 
   @command('!unlink')
   async unlinkAccounts(opts: CommandOptions) {
     this.removeExpiredLinks();
     await getRepository(DiscordLink).delete({ userId: opts.sender.userId });
-    return [{ response: prepare('integrations.discord.all-your-links-were-deleted', { sender: opts.sender }), ...opts }];
+    return [{ response: prepare('integrations.discord.all-your-links-were-deleted-with-sender', { sender: opts.sender }), ...opts }];
   }
 
   @command('!link')
@@ -286,7 +286,7 @@ class Discord extends Integration {
         throw new Error(String(errors.NOT_UUID));
       }
 
-      const link = await getRepository(DiscordLink).findOneOrFail({ id: uuid });
+      const link = await getRepository(DiscordLink).findOneOrFail({ id: uuid, userId: IsNull() });
       // link user
       await getRepository(DiscordLink).save({ ...link, userId: opts.sender.userId });
       return [{ response: prepare('integrations.discord.this-account-was-linked-with', { sender: opts.sender, discordTag: link.tag }), ...opts }];
@@ -545,16 +545,16 @@ class Discord extends Integration {
     if (msg) {
       const broadcasterUsername = variables.get('services.twitch.broadcasterUsername') as string;
       if (content === this.getCommand('!_debug')) {
-        debug('*', '======= COPY DISCORD DEBUG MESSAGE FROM HERE =======');
-        console.log('Content: ');
-        console.log(content);
-        console.log('Author: ');
-        console.log(JSON.stringify(author, null, 2));
-        console.log('Message: ');
-        console.log(JSON.stringify(msg, null, 2));
-        console.log('Channel: ');
-        console.log(JSON.stringify(channel, null, 2));
-        debug('*', '======= END OF DISCORD DEBUG MESSAGE =======');
+        info('======= COPY DISCORD DEBUG MESSAGE FROM HERE =======');
+        info('Content: ');
+        info(content);
+        info('Author: ');
+        info(JSON.stringify(author, null, 2));
+        info('Message: ');
+        info(JSON.stringify(msg, null, 2));
+        info('Channel: ');
+        info(JSON.stringify(channel, null, 2));
+        info('======= END OF DISCORD DEBUG MESSAGE =======');
 
         if (this.deleteMessagesAfterWhile) {
           setTimeout(() => {
@@ -581,7 +581,7 @@ class Discord extends Integration {
         whisperOut(`${author.tag}: ${message}`);
 
         const reply = await msg.reply(prepare('integrations.discord.check-your-dm'));
-        chatOut(`#${channel.name}: @${author.tag}, ${prepare('integrations.discord.check-your-dm')} [${msg.author.tag}]`);
+        chatOut(`#${channel.name}: @${author.tag}, ${prepare('integrations.discord.check-your-dm')} [${author.tag}]`);
         if (this.deleteMessagesAfterWhile) {
           setTimeout(() => {
             msg.delete();
@@ -590,9 +590,9 @@ class Discord extends Integration {
         }
         return;
       } else if (content === this.getCommand('!unlink')) {
-        await getRepository(DiscordLink).delete({ tag: author.tag });
+        await getRepository(DiscordLink).delete({ discordId: author.id });
         const reply = await msg.reply(prepare('integrations.discord.all-your-links-were-deleted'));
-        chatOut(`#${channel.name}: @${author.tag}, ${prepare('integrations.discord.all-your-links-were-deleted')} [${msg.author.tag}]`);
+        chatOut(`#${channel.name}: @${author.tag}, ${prepare('integrations.discord.all-your-links-were-deleted')} [${author.tag}]`);
         if (this.deleteMessagesAfterWhile) {
           setTimeout(() => {
             msg.delete();
@@ -604,7 +604,7 @@ class Discord extends Integration {
     }
     try {
       // get linked account
-      const link = await getRepository(DiscordLink).findOneOrFail({ tag: author.tag, userId: Not(IsNull()) });
+      const link = await getRepository(DiscordLink).findOneOrFail({ discordId: author.id, userId: Not(IsNull()) });
       if (link.userId) {
         const user = await changelog.getOrFail(link.userId);
         const parser = new Parser();
