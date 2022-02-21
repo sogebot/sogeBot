@@ -124,8 +124,9 @@ class Spotify extends Integration {
 
         if (currentSongHash !== currentSongWithoutAttributes) {
           currentSongHash = currentSongWithoutAttributes;
+          const message = prepare('integrations.spotify.song-notify', { name: currentSong.song, artist: currentSong.artist });
+          debug('spotify', message);
           if (this.notify) {
-            const message = prepare('integrations.spotify.song-notify', { name: currentSong.song, artist: currentSong.artist });
             announce(message, 'songs');
           }
         }
@@ -299,7 +300,7 @@ class Spotify extends Integration {
         throw Error('Spotify Web Api not connected');
       }
       const data = await this.client.getMyCurrentPlayingTrack();
-      if (data.body.item === null || data.body.item.type === 'episode') {
+      if (!data.body.item || data.body.item.type === 'episode') {
         throw Error('No song was received from spotify');
       }
 
@@ -319,6 +320,9 @@ class Spotify extends Integration {
       currentSong.is_enabled = this.enabled;
       this.currentSong = JSON.stringify(currentSong);
     } catch (e: any) {
+      if (e instanceof Error) {
+        debug('spotify', e.stack || e.message);
+      }
       this.currentSong = JSON.stringify(null);
     }
   }
