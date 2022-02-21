@@ -747,6 +747,7 @@ class Chat {
       if (!user) {
         // if we still doesn't have user, we create new
         changelog.update(userId, { userName: username });
+        await changelog.flush();
         return this.cheer(userstate, message, bits);
       }
 

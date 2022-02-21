@@ -168,16 +168,19 @@ class Alerts extends Registry {
         const clientBot = await client('bot');
         const response = await clientBot.users.getUserByName(opts.name);
         if (response) {
-          const responseUser = {
+          const responseUser = await getRepository(User).save({
             userId:          response.id,
             userName:        response.name,
             displayname:     response.displayName,
             profileImageUrl: response.profilePictureUrl,
-          };
-          await getRepository(User).save(responseUser);
+          });
 
           ioServer?.of('/registries/alerts').emit('alert', {
             ...data, user: { ...user, ...responseUser },
+          });
+        } else {
+          ioServer?.of('/registries/alerts').emit('alert', {
+            ...data, user,
           });
         }
       } else {
