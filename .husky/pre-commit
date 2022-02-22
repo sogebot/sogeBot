@@ -1,4 +1,6 @@
 #!/bin/sh
 . "$(dirname "$0")/_/husky.sh"
 
-npx lint-staged
+echo $1
+
+npx lint-staged && sh tools/pre-commit-tests.sh && node tools/pre-commit-message.js $0 $1 $2
