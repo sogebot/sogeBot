@@ -1,6 +1,4 @@
 #!/bin/sh
 . "$(dirname "$0")/_/husky.sh"
 
-echo $1
-
 npx lint-staged && sh tools/pre-commit-tests.sh
