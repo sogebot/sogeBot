@@ -1,13 +1,13 @@
-/* global describe it */
 require('../../general.js');
 
+const assert = require('assert');
+
+const { prepare } = (require('../../../dest/helpers/commons/prepare'));
+const Parser = require('../../../dest/parser').default;
+const alias = (require('../../../dest/systems/alias')).default;
 const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 const user = require('../../general.js').user;
-const alias = (require('../../../dest/systems/alias')).default;
-const assert = require('assert');
-const { prepare } = (require('../../../dest/helpers/commons/prepare'));
-const Parser = require('../../../dest/parser').default;
 
 // users
 const owner = { userName: '__broadcaster__' };
