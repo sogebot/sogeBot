@@ -284,6 +284,7 @@ class Spotify extends Integration {
         if (!this.isUnauthorized) {
           this.isUnauthorized = true;
           info(chalk.yellow('SPOTIFY: ') + 'Get of user failed, check your credentials');
+          debug('spotify', e.stack);
         }
       }
       this.username = '';
