@@ -9,15 +9,62 @@ import { v4 } from 'uuid';
 import { persistent } from '../decorators';
 import Registry from './_interface';
 
-import { User } from '~/database/entity/user';
+import { User, UserInterface } from '~/database/entity/user';
+import { error } from '~/helpers/log';
 import { ioServer } from '~/helpers/panel';
 import { adminEndpoint, publicEndpoint } from '~/helpers/socket';
+import * as changelog from '~/helpers/user/changelog.js';
 import client from '~/services/twitch/api/client';
 import { translate } from '~/translate';
 import { variables } from '~/watchers';
 
 /* secureKeys are used to authenticate use of public overlay endpoint */
 const secureKeys = new Set<string>();
+
+const fetchUserForAlert = (opts: EmitData, type: 'recipient' | 'name'): Promise<Readonly<Required<UserInterface>> | null> => {
+  return new Promise<Readonly<Required<UserInterface>> | null>((resolve) => {
+    if (opts.event === 'rewardredeems' && type === 'name') {
+      return resolve(null); // we don't have user on reward redeems
+    }
+
+    const value = opts[type];
+    if (value && value.length > 0) {
+      client('bot').then(clientBot => {
+        Promise.all([
+          getRepository(User).findOne({ userName: value }),
+          clientBot.users.getUserByName(value),
+        ]).then(([user_db, response]) => {
+          if (response) {
+            changelog.update(response.id, {
+              userId:          response.id,
+              userName:        response.name,
+              displayname:     response.displayName,
+              profileImageUrl: response.profilePictureUrl,
+            });
+          }
+          const id = user_db?.userId || response?.id;
+          if (id) {
+            resolve(changelog.get(id));
+          } else {
+            resolve(null);
+          }
+        }).catch((e) => {
+          if (e instanceof Error) {
+            error(e.stack || e.message);
+          }
+          resolve(null);
+        });
+      }).catch((e) => {
+        if (e instanceof Error) {
+          error(e.stack || e.message);
+        }
+        resolve(null);
+      });
+    } else {
+      resolve(null);
+    }
+  });
+};
 
 class Alerts extends Registry {
   @persistent()
@@ -147,45 +194,20 @@ class Alerts extends Registry {
 
       secureKeys.add(key);
 
-      // search for user triggering alert
-      const user = await getRepository(User).findOne({ userName: opts.name });
-
-      let recipient = null;
-      if (opts.recipient) {
-        // search for user triggering alert
-        recipient = await getRepository(User).findOne({ userName: opts.recipient }) ?? null;
-      }
+      const [ user, recipient ] = await Promise.all([
+        fetchUserForAlert(opts, 'name'),
+        fetchUserForAlert(opts, 'recipient'),
+      ]);
 
       // search for user triggering alert
       const broadcasterId = variables.get('services.twitch.broadcasterId') as string;
       const caster = await getRepository(User).findOne({ userId: broadcasterId }) ?? null;
 
       const data = {
-        ...opts, isTTSMuted: !tts.ready || this.isTTSMuted, isSoundMuted: this.isSoundMuted, TTSService: tts.service, TTSKey: key, user: null, caster, recipientUser: recipient,
+        ...opts, isTTSMuted: !tts.ready || this.isTTSMuted, isSoundMuted: this.isSoundMuted, TTSService: tts.service, TTSKey: key, user, caster, recipientUser: recipient,
       };
 
-      if (user || (!user && opts.event !== 'tips')) {
-        const clientBot = await client('bot');
-        const response = await clientBot.users.getUserByName(opts.name);
-        if (response) {
-          const responseUser = await getRepository(User).save({
-            userId:          response.id,
-            userName:        response.name,
-            displayname:     response.displayName,
-            profileImageUrl: response.profilePictureUrl,
-          });
-
-          ioServer?.of('/registries/alerts').emit('alert', {
-            ...data, user: { ...user, ...responseUser },
-          });
-        } else {
-          ioServer?.of('/registries/alerts').emit('alert', {
-            ...data, user,
-          });
-        }
-      } else {
-        ioServer?.of('/registries/alerts').emit('alert', data);
-      }
+      ioServer?.of('/registries/alerts').emit('alert', data);
     }
   }
 
