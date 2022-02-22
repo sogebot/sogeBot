@@ -3,4 +3,4 @@
 
 echo $1
 
-npx lint-staged && sh tools/pre-commit-tests.sh && node tools/pre-commit-message.js $0 $1 $2
+npx lint-staged && sh tools/pre-commit-tests.sh
