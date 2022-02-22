@@ -11,6 +11,7 @@ import { eventEmitter } from '~/helpers/events';
 import {
   ban, error, info, redeem, timeout, unban, warning,
 } from '~/helpers/log';
+import * as changelog from '~/helpers/user/changelog.js';
 import eventlist from '~/overlays/eventlist';
 import alerts from '~/registries/alerts';
 import { variables } from '~/watchers';
@@ -115,6 +116,10 @@ class PubSub {
         } else {
           redeem(`${message.userName}#${message.userId} redeemed ${message.rewardTitle}`);
         }
+
+        changelog.update(message.userId, {
+          userId: message.userId, userName: message.userName, displayname: message.userDisplayName,
+        });
 
         eventlist.add({
           event:         'rewardredeem',
