@@ -1,30 +1,30 @@
 {
   "add": {
-    "ok": "$sender, quote $id '$quote' was added. (tags: $tags)",
-    "error": "$sender, $command is not correct or missing -quote parameter"
+    "ok": "$sender, citação $id '$quote' foi adicionada. (tags: $tags)",
+    "error": "$sender, $command não é correto ou falta o parâmetro -quote"
   },
   "remove": {
-    "ok": "$sender, quote $id was successfully deleted.",
-    "error": "$sender, quote ID is missing.",
-    "not-found": "$sender, quote $id was not found."
+    "ok": "$sender, citação $id foi excluída com sucesso.",
+    "error": "$sender, ID da citação está faltando.",
+    "not-found": "$sender, citação $id não foi encontrada."
   },
   "show": {
-    "ok": "Quote $id by $quotedBy '$quote'",
+    "ok": "Cotação $id por $quotedBy '$quote'",
     "error": {
-      "no-parameters": "$sender, $command is missing -id or -tag.",
-      "not-found-by-id": "$sender, quote $id was not found.",
-      "not-found-by-tag": "$sender, no quotes with tag $tag was not found."
+      "no-parameters": "$sender, $command está faltando -id ou -tag.",
+      "not-found-by-id": "$sender, citação $id não foi encontrada.",
+      "not-found-by-tag": "$sender, não foram encontradas citações com a tag $tag."
     }
   },
   "set": {
-    "ok": "$sender, quote $id tags were set. (tags: $tags)",
+    "ok": "$sender, citação $id teve suas tags definidas. (tags: $tags)",
     "error": {
-      "no-parameters": "$sender, $command is missing -id or -tag.",
-      "not-found-by-id": "$sender, quote $id was not found."
+      "no-parameters": "$sender, $command está faltando -id ou -tag.",
+      "not-found-by-id": "$sender, citação $id não foi encontrada."
     }
   },
   "list": {
-    "ok": "$sender, You can find quote list at http://$urlBase/public/#/quotes",
-    "is-localhost": "$sender, quote list url is not properly specified."
+    "ok": "$sender, Você pode encontrar a lista de citações em http://$urlBase/public/#/quotes",
+    "is-localhost": "$sender, a URL da lista de citação não foi especificada corretamente."
   }
 }

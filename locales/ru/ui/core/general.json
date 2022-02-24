@@ -1,7 +1,7 @@
 {
   "settings": {
     "lang": "Язык бота",
-    "numberFormat": "Format of numbers in chat",
+    "numberFormat": "Формат чисел в чате",
     "gracefulExitEachXHours": {
       "title": "Плавный рестарт каждые X часов",
       "help": "0 - отключено"

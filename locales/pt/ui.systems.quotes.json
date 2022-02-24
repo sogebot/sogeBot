@@ -1,8 +1,8 @@
 {
-  "no-quotes-found": "We're sorry, no quotes were found in database.",
-  "new": "Add new quote",
-  "empty": "List of quotes is empty, create new quote.",
-  "emptyAfterSearch": "List of quotes is empty in searching for \"<strong>$search</strong>\"",
+  "no-quotes-found": "Desculpe, nenhuma citação foi encontrada no banco de dados.",
+  "new": "Adicionar nova citação",
+  "empty": "A lista de citações está vazia, crie uma nova citação.",
+  "emptyAfterSearch": "Lista de citações está vazia na busca por \"<strong>$search</strong>\"",
   "quote": {
     "name": "Quote",
     "placeholder": "Set your quote here"

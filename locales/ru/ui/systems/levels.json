@@ -8,7 +8,7 @@
       "help": "Available variables: $prevLevel, $prevLevelXP"
     },
     "levelShowcaseHelp": "Levels example will be refreshed on save",
-    "xpName": "Name",
+    "xpName": "Название",
     "interval": "Minutes interval to add xp to online users when stream online",
     "offlineInterval": "Minutes interval to add xp to online users when stream offline",
     "messageInterval": "How many messages to add xp",

@@ -1032,32 +1032,32 @@
     "user-is-warned-about-links": "Links não são permitidos, peça !permit [$count avisos restantes]",
     "user-is-warned-about-symbols": "Não use símbolos excessivamente [$count warnings left]",
     "user-is-warned-about-long-message": "Mensagens longas não são permitidas [$count warnings left]",
-    "user-is-warned-about-caps": "No excessive caps usage [$count warnings left]",
-    "user-is-warned-about-spam": "Spamming is not allowed [$count warnings left]",
-    "user-is-warned-about-color": "Italic and /me is not allowed [$count warnings left]",
-    "user-is-warned-about-emotes": "No emotes spamming [$count warnings left]",
-    "user-is-warned-about-forbidden-words": "No forbidden words [$count warnings left]",
-    "user-have-timeout-for-links": "No links allowed, ask for !permit",
-    "user-have-timeout-for-symbols": "No excessive symbols usage",
-    "user-have-timeout-for-long-message": "Long message are not allowed",
-    "user-have-timeout-for-caps": "No excessive caps usage",
-    "user-have-timeout-for-spam": "Spamming is not allowed",
-    "user-have-timeout-for-color": "Italic and /me is not allowed",
-    "user-have-timeout-for-emotes": "No emotes spamming",
-    "user-have-timeout-for-forbidden-words": "No forbidden words"
+    "user-is-warned-about-caps": "Não use caps excessivos [$count advertências restantes]",
+    "user-is-warned-about-spam": "Spamming não é permitido [$count advertências restantes]",
+    "user-is-warned-about-color": "Itálico e /me não é permitido [$count advertências restantes]",
+    "user-is-warned-about-emotes": "Sem spam de emote [$count advertências restantes]",
+    "user-is-warned-about-forbidden-words": "Sem palavras proibidas [$count advertências restantes]",
+    "user-have-timeout-for-links": "Links não são permitidos, peça antes !permit",
+    "user-have-timeout-for-symbols": "Sem uso excessivo de símbolos",
+    "user-have-timeout-for-long-message": "Mensagens longas não são permitidas",
+    "user-have-timeout-for-caps": "Sem uso excessivo de caps",
+    "user-have-timeout-for-spam": "Não é permitido spam",
+    "user-have-timeout-for-color": "Itálico e /me não são permitidos",
+    "user-have-timeout-for-emotes": "Sem spamming de emotes",
+    "user-have-timeout-for-forbidden-words": "Sem palavras proibidas"
   },
   "queue": {
-    "list": "$sender, current queue pool: $users",
+    "list": "$sender, banco de fila atual: $users",
     "info": {
       "closed": "$sender, {queue.close}",
       "opened": "$sender, {queue.open}"
     },
     "join": {
-      "closed": "Sorry $sender, queue is currently closed",
-      "opened": "$sender were added into queue"
+      "closed": "Desculpe $sender, a fila está fechada no momento",
+      "opened": "$sender foi adicionado na fila"
     },
-    "open": "Queue is currently OPENED! Join to queue with !queue join",
-    "close": "Queue is currently closed!",
+    "open": "A fila está liberada! Junte à fila com !queue join",
+    "close": "A fila está atualmente fechada!",
     "clear": "Filas foram completamente limpa",
     "picked": {
       "single": "Este usuário foi escolhido da fila: $users",
@@ -1131,8 +1131,8 @@
       "trigger": "$sender está tentando sua sorte e puxou um gatilho",
       "alive": "$sender está vivo! Nada aconteceu.",
       "dead": "O cérebro de $sender foi espirrado na parede!",
-      "mod": "$sender is incompetent and completely missed his head!",
-      "broadcaster": "$sender is using blanks, boo!",
+      "mod": "$sender é incompetente e perdeu completamente sua cabeça!",
+      "broadcaster": "$sender está usando festim, boo!",
       "timeout": "Tempo limite da roleta definido para $values"
     },
     "seppuku": {
@@ -1148,64 +1148,64 @@
       "winner": "٩(^ᴗ^)۶ $winner é um vencedor orgulhoso e $loser é um mal perdedor! Quem é o próximo?",
       "notEnoughOptions": "$sender, você precisa selecionar um usuário para lutar.",
       "broadcaster": "ψ(｀∇´)ψ $winner é um deus entre vocês. Cuidado $loser! Essa luta foi decidida mesmo antes do começo.",
-      "bothModerators": "$challenger (*-`ω´- )人(*-`ω´- ) $sender, this fight will take milleniums to decide!",
-      "oneModerator": "¯\\_(ツ)_/¯ $winner is under divine protection. Sorry, $loser."
+      "bothModerators": "$challenger (*-`ω´- )人(*-`ω´- ) $sender, esta luta levará milênios para ser decidida!",
+      "oneModerator": "¯\\_(ツ)_/¯ $winner está sob proteção divina. Lamento, $loser."
     },
     "gamble": {
-      "chanceToWin": "$sender, chance to win !gamble set to $value%",
-      "zeroBet": "$sender, you cannot gamble 0 $pointsName",
-      "minimalBet": "$sender, minimal bet for !gamble is set to $value",
-      "lowerThanMinimalBet": "$sender, minimal bet for !gamble is $points $pointsName",
-      "notEnoughOptions": "$sender, you need to specify points to gamble",
-      "notEnoughPoints": "$sender, you don't have $points $pointsName to gamble",
-      "win": "$sender, you WON! You now have $points $pointsName",
-      "winJackpot": "$sender, you hit JACKPOT! You won $jackpot $jackpotName in addition to your bet. You now have $points $pointsName",
-      "loseWithJackpot": "$sender, you LOST! You now have $points $pointsName. Jackpot increased to $jackpot $jackpotName",
-      "lose": "$sender, you LOST! You now have $points $pointsName",
-      "currentJackpot": "$sender, current jackpot for $command is $points $pointsName",
-      "winJackpotCount": "$sender, you won $count jackpots",
-      "jackpotIsDisabled": "$sender, jackpot is disabled for $command."
+      "chanceToWin": "$sender, a chance de ganhar !gamble definido para $value%",
+      "zeroBet": "$sender, você não pode apostar 0 $pointsName",
+      "minimalBet": "$sender, aposta mínima para !gamble está definida como $value",
+      "lowerThanMinimalBet": "$sender, aposta mínima para !gamble é $points $pointsName",
+      "notEnoughOptions": "$sender, você precisa especificar os pontos de aposta",
+      "notEnoughPoints": "$sender, você não tem $points $pointsName para apostar",
+      "win": "$sender, você VENCEU! Você agora tem $points $pointsName",
+      "winJackpot": "$sender, você atingiu o JACKPOT! Você ganhou $jackpot $jackpotName além da sua aposta. Agora você tem $points $pointsName",
+      "loseWithJackpot": "$sender, você PERDEU! Agora você tem $points $pointsName. Jackpot aumentou para $jackpot $jackpotName",
+      "lose": "$sender, você PERDEU! Você agora tem $points $pointsName",
+      "currentJackpot": "$sender, jackpot atual para $command é $points $pointsName",
+      "winJackpotCount": "$sender, você ganhou $count jackpots",
+      "jackpotIsDisabled": "$sender, jackpot está desativado para $command."
     }
   },
   "highlights": {
-    "saved": "$sender, highlight was saved for $hoursh$minutesm$secondss",
+    "saved": "$sender, o destaque foi salvo em $hoursh$minutos$secondss",
     "list": {
-      "items": "$sender, list of saved highlights for latest stream: $items",
-      "empty": "$sender, no highlights were saved"
+      "items": "$sender, lista de destaques salvos para a streaming mais recente: $items",
+      "empty": "$sender, nenhum destaque foi salvo"
     },
-    "offline": "$sender, cannot save highlight, stream is offline"
+    "offline": "$sender, não pode salvar destaque, transmissão está offline"
   },
   "whisper": {
     "settings": {
       "disablePermissionWhispers": {
-        "true": "Bot won't send permissions insufficient errors",
-        "false": "Bot will send permissions insufficient errors through whispers"
+        "true": "O bot não enviará permissões erros insuficientes",
+        "false": "O Bot enviará permissões de erros insuficientes através de sussurros"
       },
       "disableCooldownWhispers": {
-        "true": "Bot won't send cooldown notifications",
-        "false": "Bot will send cooldown notifications through whispers"
+        "true": "O Bot não enviará notificações de 'cooldown'",
+        "false": "O bot irá enviar notificações de 'cooldown' via sussurros"
       }
     }
   },
   "phillipsHue": {
-    "list": "$sender, List of Phillips Hue connected lights: "
+    "list": "$sender, lista de luzes conectadas com Phillips Hue: "
   },
-  "time": "Current time in streamer's timezone is $time",
-  "subs": "$sender, there is currently $onlineSubCount online subscribers. Last sub/resub was $lastSubUsername $lastSubAgo",
-  "followers": "$sender, there is currently $onlineFollowersCount online followers. Last follow was $lastFollowUsername $lastFollowAgo",
+  "time": "Hora atual no fuso horário da/do streamer é $time",
+  "subs": "$sender, atualmente há $onlineSubCount assinantes online. Último sub/resub foi $lastSubUsername $lastSubAgo",
+  "followers": "$sender, atualmente há $onlineFollowersCount seguidores online. A última seguida foi $lastFollowUsername $lastFollowAgo",
   "ignore": {
     "user": {
       "is": {
         "not": {
-          "ignored": "$sender, user $username is not ignored by bot"
+          "ignored": "$sender, o usuário $username não é ignorado pelo bot"
         },
-        "added": "$sender, user $username is added to bot ignorelist",
-        "removed": "$sender, user $username is removed from bot ignorelist",
-        "ignored": "$sender, user $username is ignored by bot"
+        "added": "$sender, usuário $username foi adicionado à lista-para-ignorar do bot",
+        "removed": "$sender, o usuário $username foi removido da lista-para-ignorar do bo",
+        "ignored": "$sender, o usuário $username é ignorado pelo bot"
       }
     }
   },
   "filters": {
-    "setVariable": "$sender, $variable was set to $value."
+    "setVariable": "$sender, $variable foi definido para $value."
   }
 }

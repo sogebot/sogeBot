@@ -1,7 +1,7 @@
 {
   "your-account-is-not-linked": "váš účet není propojen, použijte `$command`",
   "all-your-links-were-deleted": "všechna vaše propojení byla odstraněna",
-  "all-your-links-were-deleted-with-sender": "$sender, {integrations.discord.all-your-links-were-deleted-discord}",
+  "all-your-links-were-deleted-with-sender": "$sender, {integrations.discord.all-your-links-were-deleted}",
   "this-account-was-linked-with": "$sender, tento účet byl propojen s $discordTag.",
   "invalid-or-expired-token": "$sender, neplatný nebo prošlý token.",
   "help-message": "$sender, pro propojení účtu na Discordu: 1. Jděte na Discord server a pošlete $command v kanálu pro příkazy bota. | 2. Počkejte na SZ na Discordu od bota | 3. Pošlete příkaz z SZ na Discordu zde v Twitch chatu.",

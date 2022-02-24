@@ -6,10 +6,10 @@
       "title": "Получить текущую песню, когда стрим не в сети",
       "help": "Рекомендуется отключить это во избежание достижения лимитов API"
     },
-    "allowApprovedArtistsOnly": "Allow approved artists only",
+    "allowApprovedArtistsOnly": "Разрешить только одобренные исполнители",
     "approvedArtists": {
-      "title": "Approved artists",
-      "help": "Name or SpotifyURI of artist, one item per line"
+      "title": "Одобренные исполнители",
+      "help": "Имя или SpotifyURI исполнителя, по одному элементу в строке"
     },
     "queueWhenOffline": {
       "title": "Очередь треков, когда стрим оффлайн",
@@ -18,7 +18,7 @@
     "clientId": "clientId",
     "clientSecret": "clientSecret",
     "manualDeviceId": {
-      "title": "Forced Device ID",
+      "title": "Идентификатор принудительного устройства",
       "help": "Empty = disabled, force spotify device ID to be used to queue songs. Check logs for current active device or use button when playing song for at least 10 seconds."
     },
     "redirectURI": "redirectURI",
