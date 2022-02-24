@@ -1,18 +1,18 @@
 {
   "enabled": "Включено",
   "testDlg": {
-    "alertTester": "Alert tester",
-    "command": "Command",
-    "username": "Username",
-    "recipient": "Recipient",
-    "message": "Message",
+    "alertTester": "Тестер оповещений",
+    "command": "Команды",
+    "username": "Имя пользователя",
+    "recipient": "Получатели",
+    "message": "Сообщение",
     "tier": "Tier",
     "amountOfViewers": "Amount of viewers",
     "amountOfBits": "Amount of bits",
     "amountOfGifts": "Amount of gifts",
     "amountOfMonths": "Amount of months",
-    "amountOfTips": "Tip",
-    "event": "Event"
+    "amountOfTips": "Донаты",
+    "event": "Событие"
   },
   "empty": "Список оповещений пуст, создайте новые оповещения.",
   "emptyAfterSearch": "Реестр оповещений пуст при поиске \"<strong>$search</strong>\"",
@@ -25,10 +25,10 @@
     "name": "Задержка оповещения"
   },
   "parryEnabled": {
-    "name": "Alert parries"
+    "name": "Оповещения"
   },
   "parryDelay": {
-    "name": "Alert parry delay"
+    "name": "Задержка оповещения"
   },
   "profanityFilterType": {
     "name": "Фильтр ненормативной лексики",
@@ -45,7 +45,7 @@
   },
   "event": {
     "follows": "Подписки",
-    "cheers": "Cheers",
+    "cheers": "Чирсы",
     "subs": "Сабы",
     "resubs": "Ресабы",
     "subgifts": "Сабгифты",
@@ -65,25 +65,25 @@
   },
   "filter": {
     "name": "Occurence filter",
-    "operator": "Operator",
-    "rule": "Rule",
-    "addRule": "Add rule",
-    "addGroup": "Add group",
+    "operator": "Оператор",
+    "rule": "Правила",
+    "addRule": "Добавить правило",
+    "addGroup": "Добавить группу",
     "comparator": "Comparator",
-    "value": "Value",
-    "valueSplitByComma": "Values split by comma (e.g. val1, val2)",
+    "value": "Значение",
+    "valueSplitByComma": "Значения, разделенные запятыми (например, val1, val2)",
     "isEven": "is even",
     "isOdd": "is odd",
     "lessThan": "less than",
-    "lessThanOrEqual": "less than or equal",
-    "contain": "contains",
+    "lessThanOrEqual": "Меньше чем или равно",
+    "contain": "содержит",
     "equal": "equal",
     "notEqual": "not equal",
     "present": "is present",
-    "includes": "includes",
+    "includes": "Включает",
     "greaterThan": "greater than",
-    "greaterThanOrEqual": "greater than or equal",
-    "noFilter": "no filter"
+    "greaterThanOrEqual": "Больше или равно",
+    "noFilter": "без фильтра"
   },
   "speed": {
     "name": "Скорость"
@@ -115,15 +115,15 @@
     "help": "Available variables: {name}, {amount} (cheers, subs, tips, subgifts, sub community gifts, command redeems), {recipient} (subgifts, command redeems), {monthsName} (subs, subgifts), {currency} (tips)"
   },
   "ttsTemplate": {
-    "name": "TTS template",
-    "placeholder": "Set your TTS template",
-    "help": "Available variables: {name}, {amount} {monthsName} {currency} {message}"
+    "name": "Шаблон TTS",
+    "placeholder": "Установить шаблон TTS",
+    "help": "Доступные переменные: {name}, {amount} {monthsName} {currency} {message}"
   },
   "animationText": {
     "name": "Текст анимации"
   },
   "animationType": {
-    "name": "Type of animation"
+    "name": "Тип анимации"
   },
   "animationIn": {
     "name": "Анимация в"
@@ -141,33 +141,33 @@
     "name": "Размещение"
   },
   "loop": {
-    "name": "Play on loop"
+    "name": "Играть на цикле"
   },
   "scale": {
-    "name": "Scale"
+    "name": "Масштаб"
   },
   "translateY": {
-    "name": "Move -Up / +Down"
+    "name": "Переместить -вверх / +вниз"
   },
   "translateX": {
-    "name": "Move -Left / +Right"
+    "name": "Переместить -влево / +вправо"
   },
   "image": {
-    "name": "Image / Video(.webm)",
-    "setting": "Image / Video(.webm) settings"
+    "name": "Изображение / Видео (.webm)",
+    "setting": "Настройки изображения / видео (.webm)"
   },
   "sound": {
     "name": "Звук",
-    "setting": "Sound settings"
+    "setting": "Настройки звука"
   },
   "soundVolume": {
-    "name": "Alert volume"
+    "name": "Громкость оповещений"
   },
   "enableAdvancedMode": "Включить расширенный режим",
   "font": {
     "setting": "Настройки шрифта",
     "name": "Семейство шрифтов",
-    "overrideGlobal": "Override global font settings",
+    "overrideGlobal": "Переопределить общие настройки шрифта",
     "align": {
       "name": "Расположение",
       "left": "Слева",

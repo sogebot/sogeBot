@@ -1,51 +1,51 @@
 {
   "urls": "URLs",
-  "generateurl": "Generate new URL",
-  "show-examples": "show CURL examples",
+  "generateurl": "Gerar uma nova URL",
+  "show-examples": "mostra exemplos CURL",
   "response": {
-    "show": "Show response after POST",
-    "name": "Response after variable set",
-    "default": "Default",
-    "default-placeholder": "Set your bot response",
-    "default-help": "Use $value to get new variable value",
-    "custom": "Custom",
-    "command": "Command"
+    "show": "Exibir resposta após POST",
+    "name": "Resposta após definir variável",
+    "default": "Padrão",
+    "default-placeholder": "Definir resposta do seu bot",
+    "default-help": "Use $value para obter novo valor da variável",
+    "custom": "Personalizado",
+    "command": "Comando"
   },
-  "useIfInCommand": "Use if you use variable in command. Will return only updated variable without response.",
-  "permissionToChange": "Permission to change",
-  "isReadOnly": "read-only in chat",
-  "isNotReadOnly": "can be changed through chat",
-  "no-variables-found": "No variables found",
-  "additional-info": "Additional info",
-  "run-script": "Run script",
-  "last-run": "Last run at",
+  "useIfInCommand": "Use se você usar a variável no comando. Retornará somente a variável atualizada sem resposta.",
+  "permissionToChange": "Permissão para modicar",
+  "isReadOnly": "somente leitura no chat",
+  "isNotReadOnly": "pode ser alterado através do bate-papo",
+  "no-variables-found": "Nenhuma variável encontrada",
+  "additional-info": "Informação adicional",
+  "run-script": "Executar o script",
+  "last-run": "Última data de execução",
   "variable": {
-    "name": "Variable name",
-    "help": "Variable name must be unique, e.g. $_wins, $_loses, $_top3",
-    "placeholder": "Enter your unique variable name",
+    "name": "Nome da variável",
+    "help": "O nome da variável deve ser único, por exemplo, $_wins, $_loses, $_top3",
+    "placeholder": "Digite o nome único da variável",
     "error": {
-      "isNotUnique": "Variable must have unique name.",
-      "isEmpty": "Variable name must not be empty."
+      "isNotUnique": "A variável precisa ter um nome único.",
+      "isEmpty": "O nome da variável não pode estar vazio."
     }
   },
   "description": {
-    "name": "Description",
-    "help": "Optional description",
-    "placeholder": "Enter your optional description"
+    "name": "Descrição",
+    "help": "Descrição opcional",
+    "placeholder": "Digite sua descrição opcional"
   },
   "type": {
-    "name": "Type",
+    "name": "Tipo",
     "error": {
-      "isNotSelected": "Please choose a variable type."
+      "isNotSelected": "Por favor, escolha um tipo variável."
     }
   },
   "currentValue": {
-    "name": "Current value",
-    "help": "If type is set to <strong>Evaluated script</strong>, value cannot be manually changed"
+    "name": "Valor atual",
+    "help": "Se o tipo é definido como <strong>script Avaliado</strong>, o valor não pode ser alterado manualmente"
   },
   "usableOptions": {
-    "name": "Usable options",
-    "placeholder": "Enter, your, options, here",
+    "name": "Opções utilizáveis",
+    "placeholder": "Entrada, sua, opções, aqui",
     "help": "Options, which can be used with this variable, example: <strong>SOLO, DUO, 3-SQ, SQUAD</strong>",
     "error": {
       "atLeastOneValue": "You need to set at least 1 value."

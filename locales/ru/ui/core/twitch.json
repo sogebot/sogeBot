@@ -1,6 +1,6 @@
 {
   "settings": {
     "isTitleForced": "Название/Игра принудительно (бот перезапишет изменения с других мест)",
-    "createMarkerOnEvent": "Create stream marker on event"
+    "createMarkerOnEvent": "Создать маркер потока на событии"
   }
 }

@@ -11,7 +11,7 @@
     "songrequest": "Воспроизвести из запросов песен",
     "playlist": "Воспроизвести из плейлиста",
     "onlyMusicCategory": "Разрешить только категории музыки",
-    "allowRequestsOnlyFromPlaylist": "Allow song requests only from current playlist",
+    "allowRequestsOnlyFromPlaylist": "Разрешить запросы треков только из текущего плейлиста",
     "notify": "Отправить сообщение при смене песни"
   },
   "error": {
@@ -26,8 +26,8 @@
   "seconds": "Секунды",
   "calculated": "Рассчитано",
   "set_manually": "Настроить вручную",
-  "bannedSongsEmptyAfterSearch": "No banned songs were found by your search for <strong>\"$search\"</strong>.",
-  "emptyAfterSearch": "No songs were found by your search for <strong>\"$search\"</strong>.",
-  "empty": "No songs were added yet.",
-  "bannedSongsEmpty": "No songs were added to banlist yet."
+  "bannedSongsEmptyAfterSearch": "Забаненные песни не были найдены по вашему запросу <strong>\"$search\"</strong>.",
+  "emptyAfterSearch": "Не найдено песен по вашему запросу <strong>\"$search\"</strong>.",
+  "empty": "Треки не были добавлены.",
+  "bannedSongsEmpty": "Треки еще не были добавлены в банлист."
 }

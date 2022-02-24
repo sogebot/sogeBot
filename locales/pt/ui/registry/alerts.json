@@ -1,28 +1,28 @@
 {
-  "enabled": "Enabled",
+  "enabled": "Ativado",
   "testDlg": {
-    "alertTester": "Alert tester",
-    "command": "Command",
-    "username": "Username",
-    "recipient": "Recipient",
-    "message": "Message",
-    "tier": "Tier",
-    "amountOfViewers": "Amount of viewers",
-    "amountOfBits": "Amount of bits",
-    "amountOfGifts": "Amount of gifts",
-    "amountOfMonths": "Amount of months",
-    "amountOfTips": "Tip",
-    "event": "Event"
+    "alertTester": "Teste de alerta",
+    "command": "Comando",
+    "username": "Nome de Usuário",
+    "recipient": "Destinatário",
+    "message": "Mensagem",
+    "tier": "Nível",
+    "amountOfViewers": "Quantidade de espectadores",
+    "amountOfBits": "Quantidade de bits",
+    "amountOfGifts": "Quantidade de presentes",
+    "amountOfMonths": "Quantidade de meses",
+    "amountOfTips": "Gorjetas",
+    "event": "Evento"
   },
-  "empty": "Alerts registry is empty, create new alerts.",
-  "emptyAfterSearch": "Alerts registry is empty in searching for \"<strong>$search</strong>\"",
+  "empty": "Registro de alertas está vazio, crie novos alertas.",
+  "emptyAfterSearch": "Registro de alertas está vazio em busca de \"<strong>$search</strong>\"",
   "revertcode": "Revert code to defaults",
   "name": {
-    "name": "Name",
-    "placeholder": "Set name of your alerts"
+    "name": "Nome",
+    "placeholder": "Definir nome dos seus alertas"
   },
   "alertDelayInMs": {
-    "name": "Alert delay"
+    "name": "Atraso do alerta"
   },
   "parryEnabled": {
     "name": "Alert parries"
@@ -31,45 +31,45 @@
     "name": "Alert parry delay"
   },
   "profanityFilterType": {
-    "name": "Profanity filter",
-    "disabled": "Disabled",
-    "replace-with-asterisk": "Replace with asterisk",
-    "replace-with-happy-words": "Replace with happy words",
-    "hide-messages": "Hide messages",
-    "disable-alerts": "Disable alerts"
+    "name": "Filtro de Palavrões",
+    "disabled": "Desativado",
+    "replace-with-asterisk": "Substituir por asterisco",
+    "replace-with-happy-words": "Substituir com palavras felizes",
+    "hide-messages": "Ocultar mensagens",
+    "disable-alerts": "Desativar alertas"
   },
-  "loadStandardProfanityList": "Load standard profanity list",
+  "loadStandardProfanityList": "Carregar lista de palavrãos padrão",
   "customProfanityList": {
-    "name": "Custom profanity list",
-    "help": "Words should be separated with comma."
+    "name": "Lista de palavrãos personalizada",
+    "help": "As palavras devem ser separadas por vírgulas."
   },
   "event": {
-    "follows": "Follows",
+    "follows": "Seguidas",
     "cheers": "Cheers",
-    "subs": "Subs",
+    "subs": "Inscritos",
     "resubs": "Resubs",
-    "subgifts": "Subgifts",
-    "subcommunitygifts": "Subgifts to community",
-    "tips": "Tips",
-    "hosts": "Hosts",
+    "subgifts": "Inscrições de presente",
+    "subcommunitygifts": "Subpresentes para a comunidade",
+    "tips": "Gorjetas",
+    "hosts": "Anfitriões",
     "raids": "Raids",
-    "cmdredeems": "Command Redeems",
-    "rewardredeems": "Reward Redeems"
+    "cmdredeems": "Resgates de Comando",
+    "rewardredeems": "Resgates de Recompensas"
   },
   "title": {
-    "name": "Variant name",
-    "placeholder": "Set your variant name"
+    "name": "Nome da variante",
+    "placeholder": "Defina o nome da variante"
   },
   "variant": {
-    "name": "Variant occurence"
+    "name": "Ocorrência de variante"
   },
   "filter": {
-    "name": "Occurence filter",
-    "operator": "Operator",
-    "rule": "Rule",
-    "addRule": "Add rule",
-    "addGroup": "Add group",
-    "comparator": "Comparator",
+    "name": "Filtro de ocorrências",
+    "operator": "Operador",
+    "rule": "Regra",
+    "addRule": "Adicionar regra",
+    "addGroup": "Adicionar Grupo",
+    "comparator": "Comparador",
     "value": "Value",
     "valueSplitByComma": "Values split by comma (e.g. val1, val2)",
     "isEven": "is even",

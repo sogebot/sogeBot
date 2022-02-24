@@ -1,7 +1,7 @@
 {
   "your-account-is-not-linked": "il tuo account non è collegato, usa `$command`",
   "all-your-links-were-deleted": "tutti i tuoi link sono stati eliminati",
-  "all-your-links-were-deleted-with-sender": "$sender, {integrations.discord.all-your-links-were-deleted-discord}",
+  "all-your-links-were-deleted-with-sender": "$sender, {integrations.discord.all-your-links-were-deleted}",
   "this-account-was-linked-with": "$sender, questo account è stato collegato a $discordTag.",
   "invalid-or-expired-token": "$sender, token non valido o scaduto.",
   "help-message": "$sender, per collegare il tuo account su Discord: 1. Vai sul server Discord e invia $command nel canale del bot. | 2. Aspetta il messaggio privato dal bot | 3. Invia il comando dal vostro Discord PM qui in chat twitch.",

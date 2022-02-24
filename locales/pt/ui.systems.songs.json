@@ -11,21 +11,21 @@
     "songrequest": "Play from song request",
     "playlist": "Play from playlist",
     "onlyMusicCategory": "Allow only category music",
-    "allowRequestsOnlyFromPlaylist": "Allow song requests only from current playlist",
-    "notify": "Send message on song change"
+    "allowRequestsOnlyFromPlaylist": "Permitir solicitações de música somente da lista atual",
+    "notify": "Enviar mensagem ao mudar a música"
   },
   "error": {
-    "isEmpty": "This value cannot be empty"
+    "isEmpty": "Este valor não pode ficar vazio"
   },
-  "startTime": "Start song at",
-  "endTime": "End song at",
-  "add_song": "Add song",
-  "add_or_import": "Add song or import from playlist",
-  "importing": "Importing",
-  "importing_done": "Importing Done",
-  "seconds": "Seconds",
-  "calculated": "Calculated",
-  "set_manually": "Set manually",
+  "startTime": "Comece a música em",
+  "endTime": "Finalizar música em",
+  "add_song": "Adicionar música",
+  "add_or_import": "Adicionar música ou importar da playlist",
+  "importing": "Importando",
+  "importing_done": "Importação Concluída",
+  "seconds": "Segundos",
+  "calculated": "Calculado",
+  "set_manually": "Definir manualmente",
   "bannedSongsEmptyAfterSearch": "No banned songs were found by your search for <strong>\"$search\"</strong>.",
   "emptyAfterSearch": "No songs were found by your search for <strong>\"$search\"</strong>.",
   "empty": "No songs were added yet.",

@@ -5,7 +5,7 @@
     "disabled": "désactivé",
     "usage": "Utilisation",
     "lang-selected": "La langue du bot est actuellement définie en français",
-    "refresh-panel": "You will need to refresh UI to see changes.",
+    "refresh-panel": "Vous devrez actualiser l'interface utilisateur pour voir les changements.",
     "command-parse": "Désolé, $sender, mais cette commande n'est pas correcte, utilisez",
     "error": "Désolé, $sender, mais une erreur s'est produite !",
     "no-response": "",
@@ -30,13 +30,13 @@
     "messages": "message|messages",
     "bits": "bit|bits",
     "links": "lien|liens",
-    "entries": "entry|entries",
+    "entries": "entrée|entrées",
     "empty": "vide",
     "isRegistered": "$sender, vous ne pouvez pas utiliser !$keyword, car il est déjà utilisé pour une autre action !"
   },
   "clip": {
-    "notCreated": "Something went wrong and clip was not created.",
-    "offline": "Stream is currently offline and clip cannot be created."
+    "notCreated": "Une erreur s'est produite et le clip n'a pas été créé.",
+    "offline": "Le stream est actuellement hors ligne et le clip ne peut pas être créé."
   },
   "uptime": {
     "online": "Le stream est en ligne pour (if $days>0|$daysd )(if $hours>0|$hoursh )(if $minutes>0|$minutesm )(if $seconds>0|$secondss)",
@@ -47,14 +47,14 @@
     "loading": "Chargement",
     "this-may-take-a-while": "Ceci <strong>peut</strong> prendre un certain temps",
     "display-as": "Afficher en tant que",
-    "go-to-admin": "Go to Admin",
-    "go-to-public": "Go to Public",
-    "logout": "Logout",
+    "go-to-admin": "Accéder à l'administration",
+    "go-to-public": "Accéder à la page public",
+    "logout": "Se déconnecter",
     "popout": "Popout",
-    "not-logged-in": "Not logged in",
-    "remove-widget": "Remove <strong>$name</strong> widget",
-    "join-channel": "Join bot to channel",
-    "leave-channel": "Leave bot from channel",
+    "not-logged-in": "Non connecté",
+    "remove-widget": "Retirer le widget <strong>$name</strong>",
+    "join-channel": "Faire rejoindre le bot sur la chaîne",
+    "leave-channel": "Faire quitter le bot de la chaîne",
     "set-default": "Définir par défaut",
     "add": "Ajouter",
     "placeholders": {
@@ -74,37 +74,37 @@
       "errors": {
         "timer_name_must_be_compliant": "Cette valeur ne peut contenir que a-zA-Z09_",
         "this_value_must_be_a_positive_number_or_0": "Cette valeur doit être un nombre positif ou 0",
-        "value_cannot_be_empty": "Value cannot be empty"
+        "value_cannot_be_empty": "La valeur ne peut pas être vide"
       },
       "dialog": {
         "timer": "Timer",
         "name": "Nom",
-        "tickOffline": "Should tick if stream offline",
+        "tickOffline": "Effectué si le stream est arrêté",
         "interval": "Intervalle",
         "responses": "Réponses",
         "messages": "Déclencher tous les X Messages",
         "seconds": "Déclencher toutes les X Secondes",
         "title": {
-          "new": "New timer",
-          "edit": "Edit timer"
+          "new": "Nouveau minuteur",
+          "edit": "Editer le minuteurs"
         },
         "placeholders": {
-          "name": "Set name of your timer, can contain only these characters a-zA-Z0-9_",
-          "messages": "Trigger timer each X messages",
-          "seconds": "Trigger timer each X seconds"
+          "name": "Nom de votre minuteur, ne peut contenir que ces caractères a-zA-Z0-9_",
+          "messages": "Déclencher la minuterie tous les X messages",
+          "seconds": "Déclencher la minuterie toutes les X secondes"
         },
         "alerts": {
-          "success": "Timer was <strong>successfully</strong> saved.",
-          "fail": "Something went <strong>wrong</strong>."
+          "success": "Le minuteur a été <strong>enregistré</strong> avec succès.",
+          "fail": "Une <strong>erreur</strong> s'est produite."
         }
       },
       "buttons": {
         "close": "Fermer",
-        "save-changes": "Save changes",
+        "save-changes": "Enregistrer les modifications",
         "disable": "Désactiver",
         "enable": "Activer",
-        "edit": "Edit",
-        "delete": "Delete",
+        "edit": "Éditer",
+        "delete": "Supprimer",
         "yes": "Oui",
         "no": "Non"
       },
@@ -115,9 +115,9 @@
     "events": {
       "event": "Événement",
       "noEvents": "Aucun événement trouvé dans la base de données.",
-      "whatsthis": "what's this?",
+      "whatsthis": "qu'est-ce que c'est ?",
       "myRewardIsNotListed": "Ma récompense n'est pas répertoriée !",
-      "redeemAndClickRefreshToSeeReward": "If you are missing your created reward in a list, refresh by clicking on refresh icon.",
+      "redeemAndClickRefreshToSeeReward": "Si votre récompense créée est manquante dans une liste, actualisez-la en cliquant sur l’icône de rafraîchissement.",
       "badges": {
         "enabled": "Activé",
         "disabled": "Désactivé"
@@ -132,52 +132,52 @@
         "no": "Non"
       },
       "popovers": {
-        "are_you_sure_you_want_to_delete_event": "Are you sure you want to <strong class='text-danger'>delete</strong> event",
-        "example_of_user_object_data": "Example of user object data"
+        "are_you_sure_you_want_to_delete_event": "Êtes-vous sûr de vouloir <strong class='text-danger'>supprimer</strong> le minuteur",
+        "example_of_user_object_data": "Exemple de données objet utilisateur"
       },
       "errors": {
-        "command_must_start_with_!": "Command must start with !",
-        "this_value_must_be_a_positive_number_or_0": "This value must be a positive number or 0",
-        "value_cannot_be_empty": "Value cannot be empty"
+        "command_must_start_with_!": "La commande doit commencer par !",
+        "this_value_must_be_a_positive_number_or_0": "Cette valeur doit être un nombre positif ou égal à 0",
+        "value_cannot_be_empty": "La valeur ne peut pas être vide"
       },
       "dialog": {
         "title": {
-          "new": "New event listener",
-          "edit": "Edit event listener"
+          "new": "Nouveau event listener",
+          "edit": "Modifier l'event listener"
         },
         "placeholders": {
-          "name": "Set name of your event listener (if empty, name will be generated)"
+          "name": "Définir le nom de votre event listener (si vide, le nom sera généré)"
         },
         "alerts": {
-          "success": "Event was <strong>successfully</strong> saved.",
-          "fail": "Something went <strong>wrong</strong>."
+          "success": "L'événement a été <strong>enregistré</strong> avec succès.",
+          "fail": "Une <strong>erreur</strong> s'est produite."
         },
-        "close": "Close",
-        "save-changes": "Save changes",
+        "close": "Fermer",
+        "save-changes": "Enregistrer les modifications",
         "event": "Event",
         "name": "Nom",
-        "usable-events-variables": "Usable events variables",
-        "settings": "Settings",
-        "filters": "Filters",
-        "operations": "Operations"
+        "usable-events-variables": "Variables d'événements utilisables",
+        "settings": "Paramètres",
+        "filters": "Filtres",
+        "operations": "Opérations"
       },
       "definitions": {
         "taskId": {
-          "label": "Task ID"
+          "label": "ID de tâche"
         },
         "filter": {
-          "label": "Filter"
+          "label": "Filtrer"
         },
         "linkFilter": {
-          "label": "Link Overlay Filter",
-          "placeholder": "If using overlay, add link or id of your overlay"
+          "label": "Lier le Filtre d'overlay",
+          "placeholder": "Si vous utilisez l'overlay, ajoutez un lien ou un id de votre overlay"
         },
         "hashtag": {
-          "label": "Hashtag or Keyword",
-          "placeholder": "#yourHashtagHere or Keyword"
+          "label": "Hashtag ou mot-clé",
+          "placeholder": "#VotreHashtagIci ou mot-clé"
         },
         "fadeOutXCommands": {
-          "label": "Fade Out X Commands",
+          "label": "Fondu X commandes",
           "placeholder": "Number of commands subtracted every fade out interval"
         },
         "fadeOutXKeywords": {

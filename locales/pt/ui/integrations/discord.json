@@ -14,13 +14,13 @@
     "noRoleSelected": "nenhuma função selecionada",
     "noGuildSelected": "nenhum servidor selecionado",
     "noGuildSelectedBox": "Selecione o servidor que o bot irá funcionar, e você conseguirá ver mais opções",
-    "onlinePresenceStatusDefault": "Default Status",
-    "onlinePresenceStatusDefaultName": "Default Status Message",
-    "onlinePresenceStatusOnStream": "Status when Streaming",
-    "onlinePresenceStatusOnStreamName": "Status Message when Streaming",
+    "onlinePresenceStatusDefault": "Situação Padrão",
+    "onlinePresenceStatusDefaultName": "Mensagem de status padrão",
+    "onlinePresenceStatusOnStream": "Status ao transmitir",
+    "onlinePresenceStatusOnStreamName": "Mensagem de status ao transmitir",
     "ignorelist": {
-      "title": "Ignore list",
-      "help": "username, username#0000 or userID"
+      "title": "Lista de ignorados",
+      "help": "nome-de-usuario#0000 ou userID"
     }
   }
 }

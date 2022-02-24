@@ -8,7 +8,7 @@
     },
     "allowApprovedArtistsOnly": "Allow approved artists only",
     "approvedArtists": {
-      "title": "Approved artists",
+      "title": "Artistas aprovados",
       "help": "Name or SpotifyURI of artist, one item per line"
     },
     "queueWhenOffline": {

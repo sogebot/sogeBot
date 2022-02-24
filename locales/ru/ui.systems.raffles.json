@@ -23,7 +23,7 @@
     },
     "raffleAnnounceInterval": {
       "title": "Интервал объявления",
-      "help": "Minutes"
+      "help": "Минуты"
     },
     "raffleAnnounceMessageInterval": {
       "title": "Announce message interval",

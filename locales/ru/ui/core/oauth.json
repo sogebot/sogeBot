@@ -6,8 +6,8 @@
     "botRefreshToken": "RefreshToken",
     "channelRefreshToken": "RefreshToken",
     "botUsername": "Имя пользователя",
-    "channelUsername": "Username",
+    "channelUsername": "Имя пользователя",
     "botExpectedScopes": "Разрешения",
-    "channelExpectedScopes": "Scopes"
+    "channelExpectedScopes": "Разрешения"
   }
 }

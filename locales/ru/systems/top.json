@@ -1,7 +1,7 @@
 {
   "time": "Топ $amount (время просмотра): ",
   "tips": "Топ $amount (донат): ",
-  "level": "Top $amount (level): ",
+  "level": "Топ $amount (уровень): ",
   "points": "Топ $amount (поинты): ",
   "messages": "Топ $amount (сообщения): ",
   "followage": "Топ $amount (время подписки): ",
