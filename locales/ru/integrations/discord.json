@@ -1,7 +1,7 @@
 {
   "your-account-is-not-linked": "ваш аккаунт не привязан, используйте `$command`",
   "all-your-links-were-deleted": "привязанные аккаунты были удалены",
-  "all-your-links-were-deleted-with-sender": "$sender привязанные аккаунты были удалены",
+  "all-your-links-were-deleted-with-sender": "$sender, {integrations.discord.all-your-links-were-deleted}",
   "this-account-was-linked-with": "$sender, к вашему аккаунту привязан $discordTag.",
   "invalid-or-expired-token": "$sender, неверный или устаревший токен.",
   "help-message": "$sender, для привязки вашей учётной записи Discord'а: 1. Перейдите на сервер Discord и отправьте $command в канале бота | 2. Дождитесь личного сообщения от бота | 3. Отправьте сгенерированную ботом команду в twitch чат.",

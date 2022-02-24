@@ -6,7 +6,7 @@
       "help": "Obtenha seu token de acesso em https://www.sogebot.xyz/integrations/#DonationAlerts"
     },
     "refresh_token": {
-      "title": "Refresh token"
+      "title": "Atualizar token"
     },
     "accessTokenBtn": "DonationAlerts access and refresh token generator"
   }

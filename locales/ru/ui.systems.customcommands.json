@@ -2,8 +2,8 @@
   "no-responses-set": "Нет ответов",
   "addResponse": "Добавить ответ",
   "response": {
-    "name": "Response",
-    "placeholder": "Set your response here."
+    "name": "Ответ",
+    "placeholder": "Установите здесь свой ответ."
   },
   "filter": {
     "name": "фильтр",

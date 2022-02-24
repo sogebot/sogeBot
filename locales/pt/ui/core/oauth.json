@@ -2,12 +2,12 @@
   "settings": {
     "generalOwners": "Proprietários",
     "botAccessToken": "Token de Acesso",
-    "channelAccessToken": "AccessToken",
+    "channelAccessToken": "Token de Acesso",
     "botRefreshToken": "Token de Atualização",
-    "channelRefreshToken": "RefreshToken",
+    "channelRefreshToken": "Token de Atualização",
     "botUsername": "Nome de usuário",
-    "channelUsername": "Username",
+    "channelUsername": "Nome de usuário",
     "botExpectedScopes": "Escopos",
-    "channelExpectedScopes": "Scopes"
+    "channelExpectedScopes": "Escopos"
   }
 }

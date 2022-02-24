@@ -2,7 +2,7 @@
   "opened_normal": "Опрос открыт для \"$title\"! Вы можете проголосовать $command X",
   "opened_numbers": "Опрос по номерам, открыт для $title\"! Вы можете проголосовать, набрав номер в чате.",
   "opened_tips": "Опрос по донатам открыт для $title\"! Вы можете проголосовать, добавив в сообщение хэштег #voteX",
-  "opened_bits": "Poll by cheers opened for \"$title\"! You can vote by adding hashtag #voteX into bit message",
+  "opened_bits": "Ошибка! Опрос битсами уже открыт для \"$title\"! Вы можете проголосовать, добавив хэштег #voteX в битное сообщение",
   "alreadyOpened_normal": "Ошибка! Опрос уже открыт для \"$title\"! Вы можете проголосовать $command X",
   "alreadyOpened_numbers": "Ошибка! Опрос уже открыт для \"$title\"! Вы можете проголосовать, набрав номер в чате.",
   "alreadyOpened_tips": "Ошибка! Опрос донатами уже открыт для \"$title\"! Вы можете проголосовать, добавив хэштег #voteX в сообщение чата",

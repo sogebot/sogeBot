@@ -8,6 +8,6 @@
     "refresh_token": {
       "title": "Refresh token"
     },
-    "accessTokenBtn": "DonationAlerts access and refresh token generator"
+    "accessTokenBtn": "Доступ к DonationAlerts и генератору токена"
   }
 }

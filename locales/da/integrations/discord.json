@@ -1,7 +1,7 @@
 {
   "your-account-is-not-linked": "din konto er ikke forbundet, brug `$command`",
   "all-your-links-were-deleted": "alle dine links blev slettet",
-  "all-your-links-were-deleted-with-sender": "$sender, {integrations.discord.all-your-links-were-deleted-discord}",
+  "all-your-links-were-deleted-with-sender": "$sender, {integrations.discord.all-your-links-were-deleted}",
   "this-account-was-linked-with": "$sender, denne konto blev forbundet med $discordTag.",
   "invalid-or-expired-token": "$sender, ugyldig eller udløbet token.",
   "help-message": "$sender, for at forbinde din konto på Discord: 1. Gå til Discord serveren og send $command i bot-kanalen. | 2. Vent på PM fra bot | 3. Send kommando fra din Discord PM her i twitch chatten.",

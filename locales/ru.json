@@ -35,8 +35,8 @@
     "isRegistered": "$sender, вы не можете использовать !$keyword, потому что уже используется для другого действия!"
   },
   "clip": {
-    "notCreated": "Something went wrong and clip was not created.",
-    "offline": "Stream is currently offline and clip cannot be created."
+    "notCreated": "Что-то пошло не так и клип не был создан.",
+    "offline": "Поток в настоящее время оффлайн и клип не может быть создан."
   },
   "uptime": {
     "online": "Стрим идёт (if $days>0|$daysд )(if $hours>0|$hoursч )(if $minutes>0|$minutesм )(if $seconds>0|$secondsс)",
@@ -116,8 +116,8 @@
       "event": "Событие",
       "noEvents": "События не найдены в базе данных.",
       "whatsthis": "что это?",
-      "myRewardIsNotListed": "My reward is not listed!",
-      "redeemAndClickRefreshToSeeReward": "If you are missing your created reward in a list, refresh by clicking on refresh icon.",
+      "myRewardIsNotListed": "Моя награда не указанна!",
+      "redeemAndClickRefreshToSeeReward": "Если в списке отсутствует созданная награда, обновите, нажав на значок обновления.",
       "badges": {
         "enabled": "Включено",
         "disabled": "Выключено"
@@ -238,7 +238,7 @@
           "placeholder": "Установите вашу !commandToRun"
         },
         "isCommandQuiet": {
-          "label": "Mute command output"
+          "label": "Отключить вывод команды"
         },
         "urlOfSoundFile": {
           "label": "Ссылка на звуковой файл",
@@ -253,9 +253,9 @@
           "placeholder": "Список смайлов для фейерверка, например, Kappa PurpleHeart"
         },
         "replay": {
-          "label": "Replay clip in overlay",
-          "true": "Will play in as replay in overlay/alerts",
-          "false": "Replay won't be played"
+          "label": "Повторить клип в наслоении",
+          "true": "Воспроизвести повтор в наслоениях/оповещениях",
+          "false": "Повтор не будет воспроизводиться"
         },
         "announce": {
           "label": "Объявить в чате",
@@ -289,31 +289,31 @@
         },
         "": "",
         "titleOfReward": {
-          "label": "Title of redeemed reward",
+          "label": "Название выкупленной награды",
           "placeholder": ""
         }
       }
     },
     "eventlist-events": {
       "follow": "<strong>подписался</strong> на вас",
-      "host": "<strong>hosted</strong>",
-      "raid": "<strong>raided</strong>",
-      "sub": "<strong>subbed</strong> you",
+      "host": "<strong>захостил</strong>",
+      "raid": "<strong>рейд</strong>",
+      "sub": "<strong>подписался</strong> на вас",
       "subgift": "has been <strong>gifted</strong> sub",
-      "subcommunitygift": "<strong>gifted</strong> subs for community",
+      "subcommunitygift": "<strong>подарил</strong> подписки для сообщества",
       "resub": "<strong>resubbed</strong>",
       "cheer": "<strong>cheered</strong> you",
-      "tip": "<strong>tipped</strong> you",
+      "tip": "<strong>задоннатил</strong> вам",
       "rewardredeem": "just <strong>redeemed</strong> reward"
     },
     "responses": {
       "variable": {
-        "titleOfPoll": "Twitch Poll - Title",
-        "bitAmountPerVote": "Twitch Poll - Amount of bits to count as 1 vote",
+        "titleOfPoll": "Twitch опрос - Заголовок",
+        "bitAmountPerVote": "Twitch опрос - Количество битов для подсчета как 1 голос",
         "bitVotingEnabled": "Twitch Poll - Is bit voting enabled (boolean)",
         "channelPointsAmountPerVote": "Twitch Poll - Amount of channel points to count as 1 vote",
         "channelPointsVotingEnabled": "Twitch Poll - Is channel points voting enabled (boolean)",
-        "votes": "Twitch Poll - votes count",
+        "votes": "Twitch опрос - количество голосов",
         "winnerChoice": "Twitch Poll - Winner choice",
         "winnerPercentage": "Twitch Poll - Winner choice percentage",
         "winnerVotes": "Twitch Poll - Winner choice votes",
@@ -328,14 +328,14 @@
         "topContributionsBitsUserId": "Top Bits Contribution - User ID",
         "topContributionsBitsUsername": "Top Bits Contribution - Username",
         "topContributionsSubsTotal": "Top Subs Contribution - Total",
-        "topContributionsSubsUserId": "Top Subs Contribution - User ID",
+        "topContributionsSubsUserId": "Топ подписчик - ID пользователя",
         "topContributionsSubsUsername": "Top Subs Contribution - Username",
         "sender": "Инициатор",
         "title": "Текущее звание",
         "game": "Текущая игра",
         "language": "Текущий язык стрима",
         "viewers": "Текущее количество зрителей",
-        "hostViewers": "Host/Raid viewers count",
+        "hostViewers": "Количество просмотров Хост/Рейда",
         "views": "Текущее количество просмотров",
         "followers": "Текущее количество подписчиков",
         "subscribers": "Текущее количество сабскрайберов",
@@ -435,16 +435,16 @@
             "message": "Топ донат - за стрим (сообщение)"
           }
         },
-        "latestCheerAmount": "Latest Bits (amount)",
-        "latestCheerMessage": "Latest Bits (message)",
-        "latestCheer": "Latest Bits (username)",
+        "latestCheerAmount": "Последние биты (сумма)",
+        "latestCheerMessage": "Последние биты (сообщение)",
+        "latestCheer": "Последние биты (имя пользователя)",
         "version": "Версия бота",
         "haveParam": "Есть параметр команды? (bool)",
-        "source": "Current source (twitch or discord)",
+        "source": "Текущий источник (twitch или discord)",
         "userInput": "User input during reward redeem",
         "isBotSubscriber": "Является подписчиком бота (bool)",
         "isStreamOnline": "Трансляция онлайн (бул)",
-        "uptime": "Uptime of stream",
+        "uptime": "Время работы трансляций",
         "is": {
           "moderator": "Пользователь модератор? (bool)",
           "subscriber": "Пользователь сабскрайбер? (bool)",
@@ -470,7 +470,7 @@
           "displayname": "Отображаемое имя в твиттере",
           "url": "Ссылка твита"
         },
-        "sceneName": "Name of scene"
+        "sceneName": "Имя сцены"
       }
     },
     "page-settings": {
@@ -699,14 +699,14 @@
     "on": "вкл.",
     "off": "выкл.",
     "search-by-username": "Поиск по имени пользователя",
-    "widget-title-custom": "CUSTOM",
+    "widget-title-custom": "Пользовательский",
     "widget-title-eventlist": "СПИСОК СОБЫТИЙ",
     "widget-title-chat": "ЧАТ",
     "widget-title-queue": "ОЧЕРЕДЬ",
     "widget-title-raffles": "РОЗЫГРЫШИ",
     "widget-title-social": "СОЦИАЛЬНЫЕ ССЫЛКИ",
-    "widget-title-ytplayer": "MUSIC PLAYER",
-    "widget-title-monitor": "MONITOR",
+    "widget-title-ytplayer": "Музыкальный плеер",
+    "widget-title-monitor": "Монитор",
     "event": "событие",
     "operation": "операция",
     "tweet-post-with-hashtag": "Тви запосчен с хэштегом",
@@ -714,12 +714,12 @@
     "user-parted-channel": "пользователь вышел с канала",
     "follow": "новый подписчик",
     "tip": "новый донат",
-    "obs-scene-changed": "OBS scene changed",
+    "obs-scene-changed": "Сцена OBS изменена",
     "unfollow": "отписка",
     "hypetrain-started": "Hype Train started",
     "hypetrain-ended": "Hype Train ended",
-    "poll-started": "Twitch Poll started",
-    "poll-ended": "Twitch Poll ended",
+    "poll-started": "Twitch опрос начался",
+    "poll-ended": "Голосование Twitch завершено",
     "hypetrain-level-reached": "Hype Train new level reached",
     "subscription": "новый сарскрайбер",
     "subgift": "новый подаренный саб",
@@ -732,7 +732,7 @@
     "reward-redeemed": "reward redeemed",
     "stream-stopped": "стрим выключен",
     "stream-is-running-x-minutes": "стрим идёт Х минут",
-    "chatter-first-message": "first message of chatter",
+    "chatter-first-message": "первое сообщение в чате",
     "every-x-minutes-of-stream": "каждую Х минуту стрима",
     "game-changed": "игра стрима изменилась",
     "cheer": "received bits",
@@ -746,11 +746,11 @@
     "timeout": "пользователь получил таймаут",
     "create-a-new-event-listener": "Создать новый обработчик событий",
     "send-twitter-message": "запостить сообщение в твиттер",
-    "send-discord-message": "send a discord message",
-    "send-chat-message": "send a twitch chat message",
+    "send-discord-message": "Отправить сообщение в discord",
+    "send-chat-message": "Отправить сообщение в чат (twitch)",
     "send-whisper": "отправить сообщение в висперсы",
     "run-command": "запустить команду",
-    "run-obswebsocket-command": "run an OBS Websocket command",
+    "run-obswebsocket-command": "Выполнить команду OBS Websocket",
     "do-nothing": "--- ничего не делать ----",
     "count": "количество",
     "timestamp": "отметка времени",
@@ -779,7 +779,7 @@
     "bot-will-leave-channel": "бот покинет канал",
     "create-a-clip": "создать клип",
     "increment-custom-variable": "увеличенить переменную",
-    "set-custom-variable": "set a custom variable",
+    "set-custom-variable": "задать пользовательскую переменную",
     "decrement-custom-variable": "уменьшить переменную",
     "omit": "пропустить",
     "comply": "соблюдать",
@@ -795,12 +795,12 @@
     "eligibility-followers-item": "подписчики",
     "eligibility-subscribers-item": "сабскрайберов",
     "eligibility-everyone-item": "все",
-    "raffle-is-running": "Raffle is running ($count $l10n_entries).",
-    "to-enter-raffle": "To enter type \"$keyword\". Raffle is opened for $eligibility.",
+    "raffle-is-running": "Raffle запущен ($count $l10n_entries).",
+    "to-enter-raffle": "Розыгрыш запущен. Для входа введите $keyword. Розыгрыш открыт для $eligibility.",
     "to-enter-ticket-raffle": "To enter type \"$keyword <$min-$max>\". Raffle is opened for $eligibility.",
     "added-entries": "Added $count $l10n_entries to raffle ($countTotal total). {raffles.to-enter-raffle}",
     "added-ticket-entries": "Added $count $l10n_entries to raffle ($countTotal total). {raffles.to-enter-ticket-raffle}",
-    "join-messages-will-be-deleted": "Your raffle messages will be deleted on join.",
+    "join-messages-will-be-deleted": "Сообщения с розыгрышем будут удалены при присоединении.",
     "announce-raffle": "{raffles.raffle-is-running} {raffles.to-enter-raffle}",
     "announce-ticket-raffle": "{raffles.raffle-is-running} {raffles.to-enter-ticket-raffle}",
     "announce-new-entries": "{raffles.added-entries} {raffles.to-enter-raffle}",
@@ -848,8 +848,8 @@
     "alias-group-unset": "$sender, псевдоним $alias удалён из группы",
     "alias-group-list": "$sender, список групп псевдонимов: $list",
     "alias-group-list-aliases": "$sender, список псевдонимов в $group: $list",
-    "alias-group-list-enabled": "$sender, aliases in $group are enabled.",
-    "alias-group-list-disabled": "$sender, aliases in $group are disabled."
+    "alias-group-list-enabled": "$sender, алиасы в $group включены.",
+    "alias-group-list-disabled": "$sender, алиасы в $group отключены."
   },
   "customcmds": {
     "commands-parse-failed": "{core.command-parse} $command",
@@ -872,15 +872,15 @@
     "keyword-parse-failed": "{core.command-parse} !keyword",
     "keyword-is-ambiguous": "$sender, ключевое слово $keyword неоднозначно, используйте ID ключевого слова",
     "keyword-was-not-found": "$sender, ключевое слово $keyword не найдено в базе данных",
-    "response-was-not-found": "$sender, response #$response of keyword $keyword was not found in database",
+    "response-was-not-found": "$sender, ответ #$response ключевого слова $keyword не найден в базе данных",
     "keyword-was-edited": "$sender, ключевое слово $keyword изменено на '$response'",
     "keyword-was-added": "$sender, ключевое слово $keyword ($id) было добавлено",
-    "list-is-not-empty": "$sender, list of keywords: $list",
+    "list-is-not-empty": "$sender, список ключевых слов: $list",
     "list-is-empty": "$sender, список ключевых слов пуст",
     "keyword-was-enabled": "$sender, ключевое слово $keyword было включено",
     "keyword-was-disabled": "$sender, ключевое слово $keyword отключено",
     "keyword-was-removed": "$sender, ключевое слово $keyword удалено",
-    "list-of-responses-is-empty": "$sender, $keyword have no responses or doesn't exists",
+    "list-of-responses-is-empty": "$sender, $keyword не содержат ответов или не существует",
     "response": "$keyword#$index ($permission) $after| $response"
   },
   "points": {
@@ -905,7 +905,7 @@
       "set": "{core.command-parse} $command [username] [amount]",
       "give": "{core.command-parse} $command [username] [amount]",
       "giveNotEnough": "Извините, $sender, у вас нет $amount $pointsName, чтобы дать $username",
-      "cannotGiveZeroPoints": "Sorry, $sender, you cannot give $amount $pointsName to $username",
+      "cannotGiveZeroPoints": "Извините, $sender, у вас нет $amount $pointsName, чтобы дать $username",
       "get": "{core.command-parse} $command [username]",
       "online": "{core.command-parse} $command [amount]",
       "all": "{core.command-parse} $command [amount]",
@@ -919,7 +919,7 @@
   },
   "songs": {
     "playlist-is-empty": "$sender, список воспроизведения для импорта пуст",
-    "playlist-imported": "$sender, imported $imported and skipped $skipped to playlist",
+    "playlist-imported": "$sender, импортировано $imported и пропущено $skipped в плейлист",
     "not-playing": "Не играет",
     "song-was-banned": "Песня $name была забанена и никогда не будет играть снова!",
     "song-was-banned-timeout-message": "Вы получили тайм-аут за размещение забаненной песни",
@@ -928,22 +928,22 @@
     "no-song-is-currently-playing": "Сейчас ничего не проигрывается",
     "current-song-from-playlist": "Текущая песня $name из плейлиста",
     "current-song-from-songrequest": "Текущая песня $name заказана $username",
-    "songrequest-disabled": "Sorry, $sender, song requests are disabled",
+    "songrequest-disabled": "Извините, $sender , запросы на песню отключены",
     "song-is-banned": "Извините, $sender, но эта песня забанена",
-    "youtube-is-not-responding-correctly": "Sorry, $sender, but YouTube is sending unexpected responses, please try again later.",
+    "youtube-is-not-responding-correctly": "К сожалению, $sender, но YouTube отправляет неожиданные ответы, пожалуйста, повторите попытку позже.",
     "song-was-not-found": "Извините, $sender, но эта песня не найдена",
     "song-is-too-long": "Извините, $sender, но эта песня слишком длинная",
-    "this-song-is-not-in-playlist": "Sorry, $sender, but this song is not in current playlist",
+    "this-song-is-not-in-playlist": "Извините, $sender, но эта песня нет в текущем плейлисте",
     "incorrect-category": "Извините, $sender, но эта песня должна быть в категории музыка",
     "song-was-added-to-queue": "$sender, песня $name была добавлена в очередь",
     "song-was-added-to-playlist": "$sender, песня $name добавлена в плейлист",
     "song-is-already-in-playlist": "$sender, песня $name уже в плейлисте",
     "song-was-removed-from-playlist": "$sender, песня $name удалена из плейлиста",
     "song-was-removed-from-queue": "$sender, ваша песня $name была удалена из очереди",
-    "playlist-current": "$sender, current playlist is $playlist.",
-    "playlist-list": "$sender, available playlists: $list.",
-    "playlist-not-exist": "$sender, your requested playlist $playlist doesn't exist.",
-    "playlist-set": "$sender, you changed playlist to $playlist."
+    "playlist-current": "$sender, текущий плейлист $playlist.",
+    "playlist-list": "$sender, доступные плейлисты: $list.",
+    "playlist-not-exist": "$sender, ваш запрошенный список воспроизведения $playlist не существует.",
+    "playlist-set": "$sender, вы изменили плейлист на $playlist."
   },
   "price": {
     "price-parse-failed": "{core.command-parse} !price",
@@ -953,8 +953,8 @@
     "price-was-enabled": "$sender, цена для $command включена",
     "price-was-disabled": "$sender, цена для $command отключена",
     "user-have-not-enough-points": "Извините, $sender, но у вас нет $amount $pointsName для использования $command",
-    "user-have-not-enough-points-or-bits": "Sorry, $sender, but you don't have $amount $pointsName or redeem command by $bitsAmount bits to use $command",
-    "user-have-not-enough-bits": "Sorry, $sender, but you need to redeem command by $bitsAmount bits to use $command",
+    "user-have-not-enough-points-or-bits": "Извините, $sender, но у вас нет $amount $pointsName или вы можете использовать команду $bitsAmount бит, чтобы использовать $command",
+    "user-have-not-enough-bits": "Извините, $sender, но вы должны активировать команду $bitsAmount бит, чтобы использовать $command",
     "list-is-empty": "$sender, список цен пуст",
     "list-is-not-empty": "$sender, список цен: $list"
   },
@@ -1025,8 +1025,8 @@
     "without-permission": "У вас недостаточно прав для '$command'"
   },
   "moderation": {
-    "user-have-immunity": "$sender, user $username have $type immunity for $time seconds",
-    "user-have-immunity-parameterError": "$sender, parameter error. $command <username> <type> <duration>",
+    "user-have-immunity": "$sender, пользователь $username имеет иммунитет $type на $time секунд",
+    "user-have-immunity-parameterError": "$sender, ошибка параметра. $command <username> <type> <duration>",
     "user-have-link-permit": "Пользователь $username может отправить $count $link в чат",
     "permit-parse-failed": "{core.command-parse} !permit [username]",
     "user-is-warned-about-links": "Ссылки запрещены, запросите !permit [$count предупреждений осталось]",
@@ -1034,17 +1034,17 @@
     "user-is-warned-about-long-message": "Длинные сообщения недопустимы [$count предупреждений]",
     "user-is-warned-about-caps": "Капс запрещён [$count предупреждений]",
     "user-is-warned-about-spam": "Спам запрещён [ осталось предупреждений$count]",
-    "user-is-warned-about-color": "Italic and /me is not allowed [$count warnings left]",
+    "user-is-warned-about-color": "Курсив и /me недопустимы [$count предупреждений осталось]",
     "user-is-warned-about-emotes": "Спам смайликами запрещён [$count предупреждений осталось]",
-    "user-is-warned-about-forbidden-words": "No forbidden words [$count warnings left]",
+    "user-is-warned-about-forbidden-words": "Слово в чёрном списке [$count предупреждений осталось]",
     "user-have-timeout-for-links": "Ссылки запрещены, попросите !permit",
     "user-have-timeout-for-symbols": "Чрезмерное кол-во символов",
     "user-have-timeout-for-long-message": "Длинные сообщения запрещены",
     "user-have-timeout-for-caps": "Чрезмерное использование капса",
     "user-have-timeout-for-spam": "Спам запрещён",
-    "user-have-timeout-for-color": "Italic and /me is not allowed",
+    "user-have-timeout-for-color": "Курсив и /me не допускаются",
     "user-have-timeout-for-emotes": "Спам смайликами запрещён",
-    "user-have-timeout-for-forbidden-words": "No forbidden words"
+    "user-have-timeout-for-forbidden-words": "Запрещенные слова"
   },
   "queue": {
     "list": "$sender, текущий пул очереди: $users",
@@ -1079,8 +1079,8 @@
   },
   "cooldowns": {
     "cooldown-was-set": "$sender, $type кулдаун $command установлен на $secondss",
-    "cooldown-was-unset": "$sender, cooldown for $command was unset",
-    "cooldown-triggered": "$sender, '$command' is on cooldown, remaining $secondss",
+    "cooldown-was-unset": "$sender, $type перезарядка $command была убрана",
+    "cooldown-triggered": "$sender, '$command' перезаряжается, осталось $secondss",
     "cooldown-not-found": "$sender, кулдаун $command не найден",
     "cooldown-was-enabled": "$sender, кулдаун $command включён",
     "cooldown-was-disabled": "$sender, кулдаун $command выключен",
@@ -1100,7 +1100,7 @@
     "response-must-be-defined": "$sender, ответ таймера должен быть определен.",
     "cannot-set-messages-and-seconds-0": "$sender, вы не можете установить сообщения и секунды в 0.",
     "timer-was-set": "$sender, таймер $name был установлен с $messages сообщениями и $seconds секунд для срабатывания",
-    "timer-was-set-with-offline-flag": "$sender, timer $name was set with $messages messages and $seconds seconds to trigger even when stream is offline",
+    "timer-was-set-with-offline-flag": "$sender, таймер $name был установлен с $messages сообщениями и $seconds секунд, чтобы срабатывать даже когда поток не в сети",
     "timer-not-found": "$sender, таймер (имя: $name) не найден в базе данных. Проверьте таймеры с помощью списка !timers list",
     "timer-deleted": "$sender, таймер $name и его ответы были удалены.",
     "timer-enabled": "$sender, таймер (имя: $name) включен",
@@ -1131,7 +1131,7 @@
       "trigger": "$sender играет с удачей и ему не везёт",
       "alive": "$sender жив! Ничего не произошло.",
       "dead": "Мозги $sender был размазан по стене!",
-      "mod": "$sender is incompetent and completely missed his head!",
+      "mod": "$sender просто напросто не может попасть в свой голову!",
       "broadcaster": "$sender стреляет себе в ногу!",
       "timeout": "Таймаут рулетки установлен на $values"
     },
@@ -1162,9 +1162,9 @@
       "winJackpot": "$sender, вы получили JACKPOT! Вы выиграли $jackpot $jackpotName помимо вашей ставки. Теперь у вас $points $pointsName",
       "loseWithJackpot": "$sender, вы ПРОИГРАЛИ! Теперь у вас $points $pointsName. Джекпот увеличился до $jackpot $jackpotName",
       "lose": "$sender, вы проиграли! Теперь у вас $points $pointsName",
-      "currentJackpot": "$sender, current jackpot for $command is $points $pointsName",
-      "winJackpotCount": "$sender, you won $count jackpots",
-      "jackpotIsDisabled": "$sender, jackpot is disabled for $command."
+      "currentJackpot": "$sender, текущий джекпот для $command равен $points $pointsName",
+      "winJackpotCount": "$sender, вы выиграли $count джекпотов",
+      "jackpotIsDisabled": "$sender, джекпот отключен для $command."
     }
   },
   "highlights": {
@@ -1190,7 +1190,7 @@
   "phillipsHue": {
     "list": "$sender, список подсоединенных огней Phillips Hue: "
   },
-  "time": "Current time in streamer's timezone is $time",
+  "time": "Текущее время в часовом поясе стримера: $time",
   "subs": "$sender, сейчас $onlineSubCount онлайн сабскрайберов. Последний sub/resub был $lastSubUsername $lastSubAgo",
   "followers": "$sender, сейчас $onlineFollowersCount онлайн фоловеров. Последний фолоу был $lastFollowUsername $lastFollowAgo",
   "ignore": {
