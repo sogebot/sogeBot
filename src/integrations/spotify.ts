@@ -125,7 +125,7 @@ class Spotify extends Integration {
         if (currentSongHash !== currentSongWithoutAttributes) {
           currentSongHash = currentSongWithoutAttributes;
           const message = prepare('integrations.spotify.song-notify', { name: currentSong.song, artist: currentSong.artist });
-          debug('spotify', message);
+          debug('spotify.song', message);
           if (this.notify) {
             announce(message, 'songs');
           }
@@ -278,13 +278,13 @@ class Spotify extends Integration {
       }
     } catch (e: any) {
       if (e.message.includes('The access token expired.') || e.message.includes('No token provided.')) {
-        debug('spotify', 'Get of user failed, incorrect or missing access token. Refreshing token and retrying.');
+        debug('spotify.user', 'Get of user failed, incorrect or missing access token. Refreshing token and retrying.');
         this.IRefreshToken();
       } else if (e.message !== 'Unauthorized') {
         if (!this.isUnauthorized) {
           this.isUnauthorized = true;
           info(chalk.yellow('SPOTIFY: ') + 'Get of user failed, check your credentials');
-          debug('spotify', e.stack);
+          debug('spotify.user', e.stack);
         }
       }
       this.username = '';
@@ -322,7 +322,7 @@ class Spotify extends Integration {
       this.currentSong = JSON.stringify(currentSong);
     } catch (e: any) {
       if (e instanceof Error) {
-        debug('spotify', e.stack || e.message);
+        debug('spotify.song', e.stack || e.message);
       }
       this.currentSong = JSON.stringify(null);
     }
@@ -655,9 +655,9 @@ class Spotify extends Integration {
             throw Error('ID was not found in ' + spotifyId);
           }
         }
-        debug('spotify', `Searching song with id ${id}`);
+        debug('spotify.request', `Searching song with id ${id}`);
         const response = await this.client.getTrack(id);
-        debug('spotify', `Response => ${JSON.stringify({ response }, null, 2)}`);
+        debug('spotify.request', `Response => ${JSON.stringify({ response }, null, 2)}`);
         ioServer?.emit('api.stats', {
           method: 'GET', data: response.body, timestamp: Date.now(), call: 'spotify::search', api: 'other', endpoint: 'n/a', code: response.statusCode,
         });
@@ -707,7 +707,7 @@ class Spotify extends Integration {
         }
       }
     } catch (e: any) {
-      debug('spotify', e.stack);
+      debug('spotify.request', e.stack);
       if (e.message === 'PREMIUM_REQUIRED') {
         error('Spotify Premium is required to request a song.');
       } else if (e.message !== 'Song not found') {
