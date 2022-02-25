@@ -17,7 +17,7 @@ jobs:
       uses: actions/checkout@v2
 
     - name: crowdin action
-      uses: crowdin/github-action@1.4.6
+      uses: crowdin/github-action@1.4.7
       with:
         upload_sources: true
         upload_sources_args: '--verbose'
@@ -30,7 +30,7 @@ jobs:
         create_pull_request: true
         commit_message: 'chore(locales): crowdin update'
         pull_request_title: 'chore(locales): crowdin update'
-        pull_request_body: '[skip-tests]'
+        pull_request_base_branch_name: master
 
         # dry run to test
         # dryrun_action: true
