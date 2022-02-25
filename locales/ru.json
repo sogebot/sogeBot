@@ -1178,8 +1178,8 @@
   "whisper": {
     "settings": {
       "disablePermissionWhispers": {
-        "true": "Бот не будет отсылать сообщения о недостатке прав",
-        "false": "Бот будет отсылать сообщения о недостатке прав в висперсы"
+        "true": "Bot won't send errors on insufficient permissions",
+        "false": "Bot won't send errors on insufficient permissions through whispers"
       },
       "disableCooldownWhispers": {
         "true": "Бот не будет отправлять уведомления о кулдауне",

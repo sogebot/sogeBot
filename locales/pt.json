@@ -1178,8 +1178,8 @@
   "whisper": {
     "settings": {
       "disablePermissionWhispers": {
-        "true": "O bot não enviará permissões erros insuficientes",
-        "false": "O Bot enviará permissões de erros insuficientes através de sussurros"
+        "true": "Bot won't send errors on insufficient permissions",
+        "false": "Bot won't send errors on insufficient permissions through whispers"
       },
       "disableCooldownWhispers": {
         "true": "O Bot não enviará notificações de 'cooldown'",
