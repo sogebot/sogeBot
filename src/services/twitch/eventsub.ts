@@ -10,11 +10,13 @@ import { v4 } from 'uuid';
 import emitter from '../../helpers/interfaceEmitter.js';
 
 import * as channelPoll from '~/helpers/api/channelPoll';
+import * as channelPrediction from '~/helpers/api/channelPrediction';
 import * as hypeTrain from '~/helpers/api/hypeTrain';
 import { TokenError } from '~/helpers/errors';
 import { eventEmitter } from '~/helpers/events';
 import { follow } from '~/helpers/events/follow';
 import {
+  debug,
   error, info, warning,
 } from '~/helpers/log';
 import { ioServer } from '~/helpers/panel';
@@ -25,6 +27,81 @@ export const eventErrorShown = new Set<string>();
 const messagesProcessed: string[] = [];
 let isErrorEventsShown = false;
 let isErrorSetupShown = false;
+
+const events = {
+  'channel.hype_train.begin': (res: Response<any, Record<string, any>>) => {
+    hypeTrain.setIsStarted(true);
+    hypeTrain.setCurrentLevel(1);
+    eventEmitter.emit('hypetrain-started');
+    res.status(200).send('OK');
+  },
+  'channel.hype_train.progress': (res: Response<any, Record<string, any>>, data: any) => {
+    hypeTrain.setIsStarted(true);
+    hypeTrain.setTotal(data.event.total);
+    hypeTrain.setGoal(data.event.goal);
+    for (const top of data.event.top_contributions) {
+      hypeTrain.setTopContributions(top.type, top.total, top.user_id, top.user_login);
+    }
+    hypeTrain.setLastContribution(data.event.last_contribution.total, data.event.last_contribution.type, data.event.last_contribution.user_id, data.event.last_contribution.user_login);
+    hypeTrain.setCurrentLevel(data.event.level);
+
+    // update overlay
+    ioServer?.of('/services/twitch').emit('hypetrain-update', {
+      total: data.event.total, goal: data.event.goal, level: data.event.level, subs: Object.fromEntries(hypeTrain.subs),
+    });
+
+    res.status(200).send('OK');
+  },
+  'channel.hype_train.end': (res: Response<any, Record<string, any>>, data: any) => {
+    hypeTrain.triggerHypetrainEnd().then(() => {
+      hypeTrain.setTotal(0);
+      hypeTrain.setGoal(0);
+      hypeTrain.setLastContribution(0, 'bits', null, null);
+      hypeTrain.setTopContributions('bits', 0, null, null);
+      hypeTrain.setTopContributions('subs', 0, null, null);
+      hypeTrain.setCurrentLevel(1);
+      ioServer?.of('/services/twitch').emit('hypetrain-end');
+      res.status(200).send('OK');
+    });
+  },
+  'channel.follow': (res: Response<any, Record<string, any>>, data: any) => {
+    follow(data.event.user_id, data.event.user_login, data.event.followed_at);
+    res.status(200).send('OK');
+  },
+  'channel.poll.begin': (res: Response<any, Record<string, any>>, data: any) => {
+    channelPoll.setData(data.event);
+    channelPoll.triggerPollStart().then(() => {
+      res.status(200).send('OK');
+    });
+  },
+  'channel.poll.progress': (res: Response<any, Record<string, any>>, data: any) => {
+    channelPoll.setData(data.event);
+    res.status(200).send('OK');
+  },
+  'channel.poll.end': (res: Response<any, Record<string, any>>, data: any) => {
+    channelPoll.setData(data.event);
+    channelPoll.triggerPollEnd().then(() => {
+      res.status(200).send('OK');
+    });
+  },
+  'channel.prediction.begin': (res: Response<any, Record<string, any>>, data: any) => {
+    channelPrediction.set(data.event);
+    channelPrediction.start();
+    res.status(200).send('OK');
+  },
+  'channel.prediction.progress': (res: Response<any, Record<string, any>>, data: any) => {
+    channelPrediction.set(data.event);
+    res.status(200).send('OK');
+  },
+  'channel.prediction.lock': (res: Response<any, Record<string, any>>, data: any) => {
+    channelPrediction.lock();
+    res.status(200).send('OK');
+  },
+  'channel.prediction.end': (res: Response<any, Record<string, any>>, data: any) => {
+    channelPrediction.end(data.event.winning_outcome_id);
+    res.status(200).send('OK');
+  },
+};
 
 class EventSub {
   tunnelDomain = '';
@@ -56,63 +133,9 @@ class EventSub {
         res.status(200).send(req.body.challenge); // lgtm [js/reflected-xss]
       } else if (req.header('twitch-eventsub-message-type') === 'notification') {
         const data = req.body;
-        if (data.subscription.type === 'channel.hype_train.begin') {
-          hypeTrain.setIsStarted(true);
-          hypeTrain.setCurrentLevel(1);
-          eventEmitter.emit('hypetrain-started');
-          res.status(200).send('OK');
-        } else if (data.subscription.type === 'channel.hype_train.progress') {
-          hypeTrain.setIsStarted(true);
-          hypeTrain.setTotal(data.event.total);
-          hypeTrain.setGoal(data.event.goal);
-          for (const top of data.event.top_contributions) {
-            hypeTrain.setTopContributions(top.type, top.total, top.user_id, top.user_login);
-          }
-          hypeTrain.setLastContribution(data.event.last_contribution.total, data.event.last_contribution.type, data.event.last_contribution.user_id, data.event.last_contribution.user_login);
-          hypeTrain.setCurrentLevel(data.event.level);
 
-          // update overlay
-          ioServer?.of('/services/twitch').emit('hypetrain-update', {
-            total: data.event.total, goal: data.event.goal, level: data.event.level, subs: Object.fromEntries(hypeTrain.subs),
-          });
-
-          res.status(200).send('OK');
-        } else if (data.subscription.type === 'channel.hype_train.end') {
-          await hypeTrain.triggerHypetrainEnd();
-          hypeTrain.setTotal(0);
-          hypeTrain.setGoal(0);
-          hypeTrain.setLastContribution(0, 'bits', null, null);
-          hypeTrain.setTopContributions('bits', 0, null, null);
-          hypeTrain.setTopContributions('subs', 0, null, null);
-          hypeTrain.setCurrentLevel(1);
-          ioServer?.of('/services/twitch').emit('hypetrain-end');
-          res.status(200).send('OK');
-        } else if (data.subscription.type === 'channel.follow') {
-          /* {
-            event: {
-              user_id: '95143085',
-              user_login: 'testFromUser',
-              user_name: 'testFromUser',
-              broadcaster_user_id: '17369638',
-              broadcaster_user_login: '17369638',
-              broadcaster_user_name: 'testBroadcaster',
-              followed_at: '2021-08-30T08:30:52.278418443Z'
-            }
-          } */
-
-          follow(data.event.user_id, data.event.user_login, data.event.followed_at);
-          res.status(200).send('OK');
-        }  else if (data.subscription.type === 'channel.poll.begin') {
-          channelPoll.setData(data.event);
-          await channelPoll.triggerPollStart();
-          res.status(200).send('OK');
-        } else if (data.subscription.type === 'channel.poll.progress') {
-          channelPoll.setData(data.event);
-          res.status(200).send('OK');
-        } else if (data.subscription.type === 'channel.poll.end') {
-          channelPoll.setData(data.event);
-          await channelPoll.triggerPollEnd();
-          res.status(200).send('OK');
+        if ((events as any)[data.subscription.type]) {
+          (events as any)[data.subscription.type](res, data);
         } else {
           error(`EVENTSUB: ${data.subscription.type} not implemented`);
           res.status(400).send('not implemented');
@@ -247,7 +270,7 @@ class EventSub {
         timeout: 20000,
       });
 
-      const events = [
+      const eventsList = [
         'channel.follow',
         'channel.hype_train.begin',
         'channel.hype_train.progress',
@@ -255,11 +278,15 @@ class EventSub {
         'channel.poll.begin',
         'channel.poll.progress',
         'channel.poll.end',
+        'channel.prediction.begin',
+        'channel.prediction.progress',
+        'channel.prediction.lock',
+        'channel.prediction.end',
       ];
 
       emitter.emit('set', '/services/twitch', 'eventSubEnabledSubscriptions', []);
 
-      for (const event of events) {
+      for (const event of eventsList) {
         const enabledOrPendingEvents = request.data.data.find((o: any) => {
           return o.type === event
             && ['webhook_callback_verification_pending', 'enabled'].includes(o.status)
@@ -270,13 +297,19 @@ class EventSub {
           // check if domain is same
           if (enabledOrPendingEvents.transport.callback !== `${useTunneling ? this.tunnelDomain : 'https://' + domain}/webhooks/callback`) {
             info(`EVENTSUB: ${event} callback endpoint doesn't match domain, revoking.`);
-            await axios.delete(`${url}?id=${enabledOrPendingEvents.id}`, {
-              headers: {
-                'Authorization': 'Bearer ' + token,
-                'Client-ID':     clientId,
-              },
-              timeout: 20000,
-            });
+            try {
+              await axios.delete(`${url}?id=${enabledOrPendingEvents.id}`, {
+                headers: {
+                  'Authorization': 'Bearer ' + token,
+                  'Client-ID':     clientId,
+                },
+                timeout: 20000,
+              });
+            } catch (e) {
+              if (e instanceof Error) {
+                debug('eventsub', e.stack);
+              }
+            }
             setTimeout(() => {
               this.onStartup();
             }, 5000);
@@ -339,7 +372,12 @@ class EventSub {
         error(`EVENTSUB: ${e.stack}`);
       } else {
         if (!eventErrorShown.has(event)) {
-          error(`EVENTSUB: Something went wrong during event ${event} subscription, please authorize yourself in UI.`);
+          if (e.response.status === 403) {
+            error(`EVENTSUB: ${event} subscription is not properly authorized, please authorize yourself in UI.`);
+          } else {
+            error(`EVENTSUB: Something went wrong during event ${event} subscription, please authorize yourself in UI.`);
+            error(e.message);
+          }
           eventErrorShown.add(event);
         }
       }

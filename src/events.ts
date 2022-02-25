@@ -78,6 +78,9 @@ class Events extends Core {
     super();
 
     this.supportedEventsList = [
+      { id: 'prediction-started', variables: [ 'titleOfPrediction', 'outcomes', 'locksAt' ] },
+      { id: 'prediction-locked', variables: [ 'titleOfPrediction', 'outcomes', 'locksAt' ] },
+      { id: 'prediction-ended', variables: [ 'titleOfPrediction', 'outcomes', 'locksAt', 'winningOutcomeTitle', 'winningOutcomeTotalPoints', 'winningOutcomePercentage' ] },
       { id: 'poll-started', variables: [ 'titleOfPoll', 'choices', 'bitVotingEnabled', 'bitAmountPerVote', 'channelPointsVotingEnabled', 'channelPointsAmountPerVote' ] },
       { id: 'poll-ended', variables: [ 'titleOfPoll', 'choices', 'votes', 'winnerVotes', 'winnerPercentage', 'winnerChoice' ] },
       { id: 'hypetrain-started', variables: [ ] },
@@ -180,6 +183,9 @@ class Events extends Core {
 
     // emitter .on listeners
     for (const event of [
+      'prediction-started',
+      'prediction-locked',
+      'prediction-ended',
       'poll-started',
       'poll-ended',
       'hypetrain-started',

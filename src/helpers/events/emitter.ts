@@ -1,6 +1,24 @@
 import { TypedEmitter } from 'tiny-typed-emitter';
 
 interface Events {
+  'prediction-started': (opts: {
+    titleOfPrediction: string,
+    outcomes: string,
+    locksAt: string,
+  }) => void;
+  'prediction-locked': (opts: {
+    titleOfPrediction: string,
+    outcomes: string,
+    locksAt: string,
+  }) => void;
+  'prediction-ended': (opts: {
+    titleOfPrediction: string,
+    outcomes: string,
+    locksAt: string,
+    winningOutcomeTitle: string;
+    winningOutcomeTotalPoints: number;
+    winningOutcomePercentage: number;
+  }) => void;
   'poll-started': (opts: {
     titleOfPoll: string,
     choices: string,
