@@ -238,7 +238,7 @@
           "placeholder": "Nastav si !prikazKeSpusteni"
         },
         "isCommandQuiet": {
-          "label": "Mute command output"
+          "label": "Neposílat odpověď příkazu do chatu"
         },
         "urlOfSoundFile": {
           "label": "Adresa URL vašeho zvukového souboru",
@@ -1131,7 +1131,7 @@
       "trigger": "$sender pokouší svůj osud a stiskl spoušt",
       "alive": "$sender je naživu! Vůbec nic se nestalo.",
       "dead": "$sender, tvůj mozek se shledal s kulkou, která ho rozmáznula po zdi!",
-      "mod": "$sender is incompetent and completely missed his head!",
+      "mod": "$sender je nešika, vůbec svou hlavu netrefil!",
       "broadcaster": "$sender použil slepé náboje, buu!",
       "timeout": "Roulette timeout nastaven na $values"
     },
@@ -1178,8 +1178,8 @@
   "whisper": {
     "settings": {
       "disablePermissionWhispers": {
-        "true": "Bot nebude posílat chyby oprávnění",
-        "false": "Bot bude posílat chyby oprávnění přes whisper"
+        "true": "Bot nebude odesílat chyby při nedostatečném oprávnění",
+        "false": "Bot nebude šeptat chyby při nedostatečném oprávnění"
       },
       "disableCooldownWhispers": {
         "true": "Bot nebude posílat oznámení o cooldownu",
