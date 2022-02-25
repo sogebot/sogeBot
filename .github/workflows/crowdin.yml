@@ -16,6 +16,12 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v2
 
+    - name: Delete branch
+      uses: dawidd6/action-delete-branch@v3
+      with:
+        github_token: ${{github.token}}
+        branches: l10n_crowdin_action
+
     - name: crowdin action
       uses: crowdin/github-action@1.4.7
       with:
