@@ -308,6 +308,12 @@
     },
     "responses": {
       "variable": {
+        "titleOfPrediction": "Twitch Predikce - Název",
+        "outcomes": "Twitch Predikce - Výsledky",
+        "locksAt": "Twitch predikce - Uzamknutí k datu",
+        "winningOutcomeTitle": "Twitch Predikce - Název vítězného výsledku",
+        "winningOutcomeTotalPoints": "Twitch Predikce - Celkový počet bodů vítězného výsledku",
+        "winningOutcomePercentage": "Twitch Predikce - Procentuální podíl vítězného výsledku",
         "titleOfPoll": "Twitch anketa - název",
         "bitAmountPerVote": "Twitch anketa - množství bitů, které se mají počítat jako 1 hlas",
         "bitVotingEnabled": "Twitch anketa - je hlasování pomocí bitů povoleno (boolean)",
@@ -718,6 +724,9 @@
     "unfollow": "ztráta followera",
     "hypetrain-started": "Hype Train spuštěn",
     "hypetrain-ended": "Konec Hype Train",
+    "prediction-started": "Twitch predikce byla spuštěna",
+    "prediction-locked": "Twitch predikce byla uzamčena",
+    "prediction-ended": "Twitch predikce byla ukončena",
     "poll-started": "Twitch anketa spuštěna",
     "poll-ended": "Twitch anketa ukončena",
     "hypetrain-level-reached": "Dosažení nové úrovně Hype Train",
