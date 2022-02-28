@@ -507,7 +507,7 @@ class Panel extends Core {
     });
     socket.on('core', async (cb: (err: string | null, toEmit: { name: string; type: string; }[]) => void) => {
       const toEmit: { name: string; type: string; }[] = [];
-      for (const system of ['dashboard', 'currency', 'ui', 'general', 'twitch', 'socket', 'eventsub', 'updater', 'tts']) {
+      for (const system of ['dashboard', 'currency', 'ui', 'general', 'twitch', 'socket', 'eventsub', 'updater', 'tts', 'emotes']) {
         toEmit.push({ name: system.toLowerCase(), type: 'core' });
       }
       cb(null, toEmit);

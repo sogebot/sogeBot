@@ -97,12 +97,6 @@ class General extends Core {
       permission: string | null,
     };
 
-    adminEndpoint(this.nsp, 'removeCache', (cb) => {
-      const emotes = require('~/emotes').default;
-      emotes.removeCache();
-      cb(null, null);
-    });
-
     adminEndpoint(this.nsp, 'generic::getCoreCommands', async (cb: any) => {
       try {
         const commands: Command[] = [];

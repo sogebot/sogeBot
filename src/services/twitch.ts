@@ -1,14 +1,12 @@
 import { EventList } from '@entity/eventList';
 import { User } from '@entity/user';
-import * as constants from '@sogebot/ui-helpers/constants';
 import { SECOND } from '@sogebot/ui-helpers/constants';
 import { dayjs, timezone } from '@sogebot/ui-helpers/dayjsHelper';
 import { getTime } from '@sogebot/ui-helpers/getTime';
 import { getRepository } from 'typeorm';
 
-import { CacheEmotes } from '../database/entity/cacheEmotes';
 import {
-  command, default_permission, parser, persistent, settings,
+  command, default_permission, persistent, settings,
 } from '../decorators';
 import { onChange, onLoad, onStartup, onStreamStart } from '../decorators/on';
 import Expects from '../expects';
@@ -20,7 +18,6 @@ import { init as apiIntervalInit , stop as apiIntervalStop } from './twitch/api/
 import { createClip } from './twitch/calls/createClip';
 import { createMarker } from './twitch/calls/createMarker';
 import Chat from './twitch/chat';
-import Emotes from './twitch/emotes';
 import EventSub from './twitch/eventsub';
 import { eventErrorShown } from './twitch/eventsub';
 import PubSub from './twitch/pubsub';
@@ -33,7 +30,7 @@ import { prepare } from '~/helpers/commons/prepare';
 import { isBotStarted } from '~/helpers/database';
 import { cleanViewersCache } from '~/helpers/permissions';
 import { defaultPermissions } from '~/helpers/permissions/index';
-import { adminEndpoint, publicEndpoint } from '~/helpers/socket';
+import { adminEndpoint } from '~/helpers/socket';
 import {
   globalIgnoreListExclude, ignorelist, sendWithMe, setMuteStatus, showWithAt,
 } from '~/helpers/tmi';
@@ -51,7 +48,6 @@ const markerEvents = new Set<string>();
 
 class Twitch extends Service {
   tmi: import('./twitch/chat').default | null;
-  emotes: import('./twitch/emotes').default | null;
   pubsub: import('./twitch/pubsub').default | null;
   eventsub: import('./twitch/eventsub').default | null;
 
@@ -266,15 +262,6 @@ class Twitch extends Service {
 
   @onStartup()
   async onStartup() {
-    emitter.on('services::twitch::emotes', (type, value) => {
-      if (type === 'explode') {
-        this.emotes?.explode(value);
-      }
-      if (type === 'firework') {
-        this.emotes?.firework(value);
-      }
-    });
-
     this.addMenu({
       category: 'stats', name: 'api', id: 'stats/api', this: null,
     });
@@ -289,7 +276,6 @@ class Twitch extends Service {
       this.tmi?.initClient('broadcaster');
 
       this.pubsub = new PubSub();
-      this.emotes = new Emotes();
       this.eventsub = new EventSub();
       apiIntervalInit();
     } else {
@@ -308,14 +294,10 @@ class Twitch extends Service {
       this.init();
     } else {
       apiIntervalStop();
-      if (this.emotes) {
-        clearInterval(this.emotes.interval);
-      }
       this.pubsub?.stop();
       this.tmi?.part('bot');
       this.tmi?.part('broadcaster');
 
-      this.emotes = null;
       this.pubsub = null;
       this.eventsub = null;
     }
@@ -365,11 +347,6 @@ class Twitch extends Service {
     setMuteStatus(this.mute);
   }
 
-  @parser({ priority: constants.LOW, fireAndForget: true })
-  async containsEmotes (opts: ParserOptions) {
-    return this.emotes?.containsEmotes(opts);
-  }
-
   sockets() {
     adminEndpoint(this.nsp, 'eventsub::reset', () => {
       info('EVENTSUB: user authorized, resetting state of eventsub subscriptions.');
@@ -381,25 +358,6 @@ class Twitch extends Service {
       } catch (e: any) {
         cb(e.stack, '');
       }
-    });
-    publicEndpoint(this.nsp, 'getCache', async (cb) => {
-      try {
-        cb(null, await getRepository(CacheEmotes).find());
-      } catch (e: any) {
-        cb(e.stack, []);
-      }
-    });
-    adminEndpoint(this.nsp, 'testExplosion', (cb) => {
-      this.emotes?._testExplosion();
-      cb(null, null);
-    });
-    adminEndpoint(this.nsp, 'testFireworks', (cb) => {
-      this.emotes?._testFireworks();
-      cb(null, null);
-    });
-    adminEndpoint(this.nsp, 'test', (cb) => {
-      this.emotes?._test();
-      cb(null, null);
     });
   }
 

@@ -3,7 +3,7 @@ import { EntitySchema } from 'typeorm';
 export interface CacheEmotesInterface {
   id?: string;
   code: string;
-  type: 'twitch' | 'ffz' | 'bttv' | '7tv';
+  type: 'twitch' | 'twitch-sub' | 'ffz' | 'bttv' | '7tv';
   urls: { '1': string; '2': string; '3': string };
 }
 

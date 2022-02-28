@@ -114,6 +114,7 @@ async function main () {
         require('./updater');
         require('./dashboard');
         require('./tts');
+        require('./emotes');
         require('./panel');
         await autoLoad('./dest/stats/');
         await autoLoad('./dest/registries/');

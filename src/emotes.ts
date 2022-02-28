@@ -1,13 +1,19 @@
 import { setImmediate } from 'timers';
 
 import { shuffle } from '@sogebot/ui-helpers/array';
+import * as constants from '@sogebot/ui-helpers/constants';
 import axios from 'axios';
-import { getManager, getRepository } from 'typeorm';
+import { getManager, getRepository, In } from 'typeorm';
 import { v4 as uuid } from 'uuid';
 
-import client from './api/client';
+import { onStartup } from './decorators/on';
+import emitter from './helpers/interfaceEmitter';
+import { adminEndpoint, publicEndpoint } from './helpers/socket';
+import client from './services/twitch/api/client';
 
+import Core from '~/_interface';
 import { CacheEmotes, CacheEmotesInterface } from '~/database/entity/cacheEmotes';
+import { parser, settings } from '~/decorators';
 import {
   debug,
   error, info, warning,
@@ -18,7 +24,14 @@ import { variables } from '~/watchers';
 
 let broadcasterWarning = false;
 
-class Emotes {
+class Emotes extends Core {
+  @settings()
+    '7tv' = true;
+  @settings()
+    ffz = true;
+  @settings()
+    bttv = true;
+
   fetch = {
     global:  false,
     channel: false,
@@ -36,7 +49,56 @@ class Emotes {
 
   interval: NodeJS.Timer;
 
-  constructor() {
+  get types() {
+    const types: CacheEmotesInterface['type'][] = ['twitch', 'twitch-sub'];
+    if (this['7tv']) {
+      types.push('7tv');
+    }
+    if (this.bttv) {
+      types.push('bttv');
+    }
+    if (this.ffz) {
+      types.push('ffz');
+    }
+    return types;
+  }
+
+  @onStartup()
+  onStartup() {
+    publicEndpoint(this.nsp, 'getCache', async (cb) => {
+      try {
+        cb(null, await getRepository(CacheEmotes).find({ type: In(this.types) }));
+      } catch (e: any) {
+        cb(e.stack, []);
+      }
+    });
+
+    adminEndpoint(this.nsp, 'testExplosion', (cb) => {
+      this._testExplosion();
+      cb(null, null);
+    });
+    adminEndpoint(this.nsp, 'testFireworks', (cb) => {
+      this._testFireworks();
+      cb(null, null);
+    });
+    adminEndpoint(this.nsp, 'test', (cb) => {
+      this._test();
+      cb(null, null);
+    });
+    adminEndpoint(this.nsp, 'removeCache', (cb) => {
+      this.removeCache();
+      cb(null, null);
+    });
+
+    emitter.on('services::twitch::emotes', (type, value) => {
+      if (type === 'explode') {
+        this.explode(value);
+      }
+      if (type === 'firework') {
+        this.firework(value);
+      }
+    });
+
     this.interval = setInterval(() => {
       if (!this.fetch.global) {
         this.fetchEmotesGlobal();
@@ -60,6 +122,7 @@ class Emotes {
     this.lastGlobalEmoteChk = 0;
     this.lastSubscriberEmoteChk = 0;
     this.lastFFZEmoteChk = 0;
+    this.last7TVEmoteChk = 0;
     this.lastBTTVEmoteChk = 0;
     await getManager().clear(CacheEmotes);
 
@@ -75,7 +138,7 @@ class Emotes {
     if (!this.fetch.bttv) {
       this.fetchEmotesBTTV();
     }
-    if (!this.fetch.bttv) {
+    if (!this.fetch['7tv']) {
       this.fetchEmotes7TV();
     }
   }
@@ -100,6 +163,7 @@ class Emotes {
           const clientBot = await client('bot');
           const emotes = await clientBot.chat.getChannelEmotes(broadcasterId);
           this.lastSubscriberEmoteChk = Date.now();
+          await getRepository(CacheEmotes).delete({ type: 'twitch-sub' });
           for (const emote of emotes) {
             debug('emotes.channel', `Saving to cache ${emote.name}#${emote.id}`);
             await getRepository(CacheEmotes).save({
@@ -139,8 +203,8 @@ class Emotes {
         }
         const clientBot = await client('bot');
         const emotes = await clientBot.chat.getGlobalEmotes();
-
         this.lastGlobalEmoteChk = Date.now();
+        await getRepository(CacheEmotes).delete({ type: 'twitch' });
         for (const emote of emotes) {
           await setImmediateAwait();
           debug('emotes.global', `Saving to cache ${emote.name}#${emote.id}`);
@@ -294,11 +358,12 @@ class Emotes {
       return;
     }
 
-    this.fetch.bttv = true;
+    this.fetch['7tv'] = true;
 
     if (currentChannel && Date.now() - this.last7TVEmoteChk > 1000 * 60 * 60 * 24 * 7) {
       info('EMOTES: Fetching 7tv emotes');
       this.last7TVEmoteChk = Date.now();
+      await getRepository(CacheEmotes).delete({ type: '7tv' });
       try {
         const urlTemplate = `https://cdn.7tv.app/emote/{{id}}/{{image}}`;
 
@@ -310,6 +375,8 @@ class Emotes {
         error(e);
       }
     }
+
+    this.fetch['7tv'] = false;
   }
 
   async fetchEmotesBTTV () {
@@ -326,6 +393,7 @@ class Emotes {
     if (currentChannel && Date.now() - this.lastBTTVEmoteChk > 1000 * 60 * 60 * 24 * 7) {
       info('EMOTES: Fetching bttv emotes');
       this.lastBTTVEmoteChk = Date.now();
+      await getRepository(CacheEmotes).delete({ type: 'bttv' });
       try {
         const request = await axios.get<any>('https://api.betterttv.net/2/channels/' + currentChannel);
 
@@ -387,7 +455,7 @@ class Emotes {
     ioServer?.of('/services/twitch').emit('emote.explode', { emotes });
   }
 
-  // this is called from twitch service as parser
+  @parser({ priority: constants.LOW, fireAndForget: true })
   async containsEmotes (opts: ParserOptions) {
     if (!opts.sender) {
       return true;
@@ -424,13 +492,13 @@ class Emotes {
       }
     }
 
-    for (const potentialEmoteCode of opts.message.split(' ')) {
+    for (const potentialEmoteCode of opts.message.split(' ').filter(Boolean)) {
       if (parsed.includes(potentialEmoteCode)) {
         continue;
       } // this emote was already parsed
       parsed.push(potentialEmoteCode);
 
-      const emoteFromCache = await getRepository(CacheEmotes).findOne({ code: potentialEmoteCode });
+      const emoteFromCache = await getRepository(CacheEmotes).findOne({ code: potentialEmoteCode, type: In(this.types) });
       if (emoteFromCache) {
         for (let i = 0; i < opts.message.split(' ').filter(word => word === potentialEmoteCode).length; i++) {
           usedEmotes[potentialEmoteCode + `${i}`] = emoteFromCache;
@@ -463,4 +531,4 @@ class Emotes {
   }
 }
 
-export default Emotes;
+export default new Emotes();
