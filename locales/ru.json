@@ -308,6 +308,12 @@
     },
     "responses": {
       "variable": {
+        "titleOfPrediction": "Twitch Prediction - Title",
+        "outcomes": "Twitch Prediction - Outcomes",
+        "locksAt": "Twitch Prediction - Locks At Date",
+        "winningOutcomeTitle": "Twitch Prediction - Winning outcome title",
+        "winningOutcomeTotalPoints": "Twitch Prediction - Winning outcome total points",
+        "winningOutcomePercentage": "Twitch Prediction - Winning outcome percentage",
         "titleOfPoll": "Twitch опрос - Заголовок",
         "bitAmountPerVote": "Twitch опрос - Количество битов для подсчета как 1 голос",
         "bitVotingEnabled": "Twitch Poll - Is bit voting enabled (boolean)",
@@ -718,6 +724,9 @@
     "unfollow": "отписка",
     "hypetrain-started": "Hype Train started",
     "hypetrain-ended": "Hype Train ended",
+    "prediction-started": "Twitch Prediction started",
+    "prediction-locked": "Twitch Prediction locked",
+    "prediction-ended": "Twitch Prediction ended",
     "poll-started": "Twitch опрос начался",
     "poll-ended": "Голосование Twitch завершено",
     "hypetrain-level-reached": "Hype Train new level reached",
