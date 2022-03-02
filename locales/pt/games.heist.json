@@ -24,6 +24,6 @@
     "nationalReserve": "Reserva nacional",
     "federalReserve": "Reserva Federal"
   },
-  "results": "As jogadas de assalto são: $users",
+  "results": "Aqueles recebendo sua parte no assalto são: $users",
   "andXMore": "e $count mais..."
 }
