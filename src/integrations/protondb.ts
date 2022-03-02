@@ -1,5 +1,6 @@
 import { capitalize, noop } from 'lodash';
 import fetch from 'node-fetch';
+import trigramSimilarity from 'trigram-similarity';
 
 import { command, default_permission } from '../decorators';
 import Expects from '../expects';
@@ -40,10 +41,18 @@ class ProtonDB extends System {
           .catch(e => reject(e));
       });
 
-      const app = (request as any).applist.apps.find((o: any) => {
-        // search lower-cased without spaces (to have consistent results)
-        return o.name.toLowerCase().replace(/ /g, '') === gameInput.toLowerCase().replace(/ /g, '');
+      const apps = new Map<number, any>();
+      (request as any).applist.apps.forEach((o: any) => {
+        const similarity = trigramSimilarity(o.name.toLowerCase(), gameInput.toLowerCase());
+        if (similarity >= 0.75) {
+          apps.set(similarity, o);
+        }
       });
+
+      // select most similar game
+      const key = [...apps.keys()].sort().reverse()[0];
+      const app = apps.get(key);
+
       if (app) {
         id = app.appid as string;
         cache.set(gameInput.toLowerCase(), id);
@@ -95,7 +104,7 @@ class ProtonDB extends System {
 
       return [{
         response: prepare('integrations.protondb.responseOk', {
-          game:   gameInput.toUpperCase(),
+          game:   reqProtonDetail[id].data.name.toUpperCase(),
           rating,
           native: native.join(', '),
           url:    `https://www.protondb.com/app/${id}`,
