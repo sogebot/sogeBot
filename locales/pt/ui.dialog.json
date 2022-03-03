@@ -1,17 +1,17 @@
 {
   "title": {
-    "edit": "Edit",
-    "add": "Add"
+    "edit": "Editar",
+    "add": "Adicionar"
   },
   "position": {
-    "settings": "Position settings",
-    "anchorX": "Anchor X position",
-    "anchorY": "Anchor Y position",
-    "left": "Left",
-    "right": "Right",
-    "middle": "Middle",
-    "top": "Top",
-    "bottom": "Bottom",
+    "settings": "Configurações de posição",
+    "anchorX": "Posição X da Âncora",
+    "anchorY": "Posição Y da âncora",
+    "left": "Esquerda",
+    "right": "Direita",
+    "middle": "Meio",
+    "top": "Superior",
+    "bottom": "Inferior",
     "x": "X",
     "y": "Y"
   },
