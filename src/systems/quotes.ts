@@ -49,7 +49,7 @@ class Quotes extends System {
 
     adminEndpoint(this.nsp, 'generic::setById', async (opts, cb) => {
       try {
-        if (opts.id === '0') {
+        if (!opts.id) {
           cb(null, await getRepository(QuotesEntity).save(opts.item));
         } else {
           cb(null, await getRepository(QuotesEntity).save({ ...(await getRepository(QuotesEntity).findOne({ id: Number(opts.id) })), ...opts.item }));
