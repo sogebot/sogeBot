@@ -43,6 +43,7 @@
   },
   "webpanel": {
     "this-system-is-disabled": "This system is disabled",
+    "or": "or",
     "loading": "Loading",
     "this-may-take-a-while": "This <strong>may</strong> take a while",
     "display-as": "Display as",
