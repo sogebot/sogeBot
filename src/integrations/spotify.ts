@@ -260,8 +260,12 @@ class Spotify extends Integration {
         }
       }
     } catch (e: any) {
+      if (String(e.statusCode).startsWith('5')) {
+        // skip all 5xx errors
+        return;
+      }
       error('SPOTIFY: cannot get active device, please reauthenticate to include scope user-read-playback-state');
-      error(e);
+      error(e.stack);
     }
   }
 
@@ -277,6 +281,10 @@ class Spotify extends Integration {
         this.userId = data.body.id;
       }
     } catch (e: any) {
+      if (String(e.statusCode).startsWith('5')) {
+        // skip all 5xx errors
+        return;
+      }
       if (e.message.includes('The access token expired.') || e.message.includes('No token provided.')) {
         debug('spotify.user', 'Get of user failed, incorrect or missing access token. Refreshing token and retrying.');
         this.IRefreshToken();
