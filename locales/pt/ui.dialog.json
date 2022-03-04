@@ -1,42 +1,42 @@
 {
   "title": {
-    "edit": "Edit",
-    "add": "Add"
+    "edit": "Editar",
+    "add": "Adicionar"
   },
   "position": {
-    "settings": "Position settings",
-    "anchorX": "Anchor X position",
-    "anchorY": "Anchor Y position",
-    "left": "Left",
-    "right": "Right",
-    "middle": "Middle",
-    "top": "Top",
-    "bottom": "Bottom",
+    "settings": "Configurações de posição",
+    "anchorX": "Posição X da Âncora",
+    "anchorY": "Posição Y da âncora",
+    "left": "Esquerda",
+    "right": "Direita",
+    "middle": "Meio",
+    "top": "Superior",
+    "bottom": "Inferior",
     "x": "X",
     "y": "Y"
   },
   "font": {
     "shadowShiftRight": "Shift Right",
     "shadowShiftDown": "Shift Down",
-    "shadowBlur": "Blur",
-    "shadowOpacity": "Opacity",
-    "color": "Color"
+    "shadowBlur": "Desfoque",
+    "shadowOpacity": "Opacidade",
+    "color": "Cor"
   },
   "errors": {
-    "required": "This input cannot be empty.",
-    "minValue": "Lowest value of this input is $value."
+    "required": "Este campo não pode ficar vazio.",
+    "minValue": "O menor valor desta entrada é $value."
   },
   "buttons": {
-    "reorder": "Reorder",
+    "reorder": "Reordenar",
     "upload": {
-      "idle": "Upload",
-      "progress": "Uploading",
-      "done": "Uploaded"
+      "idle": "Enviar",
+      "progress": "Enviando",
+      "done": "Enviado"
     },
-    "cancel": "Cancel",
-    "close": "Close",
+    "cancel": "Cancelar",
+    "close": "Fechar",
     "test": {
-      "idle": "Test",
+      "idle": "Teste",
       "progress": "Testing in progress",
       "done": "Testing done"
     },

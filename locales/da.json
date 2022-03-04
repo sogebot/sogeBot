@@ -44,6 +44,7 @@
   },
   "webpanel": {
     "this-system-is-disabled": "Dette system er deaktiveret",
+    "or": "or",
     "loading": "Indlæser",
     "this-may-take-a-while": "Dette <strong>kan</strong> tage et stykke tid",
     "display-as": "Vis som",
