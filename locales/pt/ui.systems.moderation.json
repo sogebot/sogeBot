@@ -1,20 +1,20 @@
 {
   "settings": {
-    "enabled": "Status",
-    "cListsEnabled": "Enforce the rule",
-    "cLinksEnabled": "Enforce the rule",
-    "cSymbolsEnabled": "Enforce the rule",
-    "cLongMessageEnabled": "Enforce the rule",
-    "cCapsEnabled": "Enforce the rule",
-    "cSpamEnabled": "Enforce the rule",
-    "cColorEnabled": "Enforce the rule",
-    "cEmotesEnabled": "Enforce the rule",
+    "enabled": "Situação",
+    "cListsEnabled": "Impor a regra",
+    "cLinksEnabled": "Impor a regra",
+    "cSymbolsEnabled": "Impor a regra",
+    "cLongMessageEnabled": "Impor a regra",
+    "cCapsEnabled": "Impor a regra",
+    "cSpamEnabled": "Impor a regra",
+    "cColorEnabled": "Impor a regra",
+    "cEmotesEnabled": "Impor a regra",
     "cListsWhitelist": {
-      "title": "Allowed words",
-      "help": "To allow domains use \"domain:prtzl.io\""
+      "title": "Palavras permitidas",
+      "help": "Para permitir domínios, use \"domain:prtzl.io\""
     },
-    "autobanMessages": "Autoban Messages",
-    "cListsBlacklist": "Forbidden words",
+    "autobanMessages": "Mensagens de Autoban",
+    "cListsBlacklist": "Palavras proibidas",
     "cListsTimeout": "Duração do tempo limite",
     "cLinksTimeout": "Duração do tempo limite",
     "cSymbolsTimeout": "Duração do tempo limite",
