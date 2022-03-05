@@ -1,8 +1,8 @@
 {
-  "newMapping": "Create new overlay link mapping",
-  "emptyMapping": "No overlay link mapping were created yet.",
+  "newMapping": "Criar nova overlay de mapeamento de links",
+  "emptyMapping": "Nenhum mapeamento de link de overlay foi criado ainda.",
   "allowedIPs": {
-    "name": "Allowed IPs",
-    "help": "Allow access from set IPs separated by new line"
+    "name": "IPs Permitidos",
+    "help": "Permitir acesso dos IPs definidos separados por nova linha"
   }
 }

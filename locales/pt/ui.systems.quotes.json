@@ -4,31 +4,31 @@
   "empty": "A lista de citações está vazia, crie uma nova citação.",
   "emptyAfterSearch": "Lista de citações está vazia na busca por \"<strong>$search</strong>\"",
   "quote": {
-    "name": "Quote",
-    "placeholder": "Set your quote here"
+    "name": "Citação",
+    "placeholder": "Defina sua citação aqui"
   },
   "by": {
-    "name": "Quoted by"
+    "name": "Citação por"
   },
   "tags": {
     "name": "Tags",
-    "placeholder": "Set your tags here",
-    "help": "Comma-separated tags. Example: tag 1, tag 2, tag 3"
+    "placeholder": "Defina suas tags aqui",
+    "help": "Tags separadas por vírgula. Exemplo: tag 1, tag 2, tag 3"
   },
   "date": {
-    "name": "Date"
+    "name": "Data"
   },
   "error": {
-    "isEmpty": "This value cannot be empty",
-    "atLeastOneTag": "You need to set at least one tag"
+    "isEmpty": "Este valor não pode ficar vazio",
+    "atLeastOneTag": "É preciso definir pelo menos uma tag"
   },
-  "tag-filter": "Filtering by tag",
-  "warning": "This action cannot be reverted!",
+  "tag-filter": "Filtrando por tag",
+  "warning": "Não é possível reverter esta ação!",
   "settings": {
-    "enabled": "Status",
+    "enabled": "Situação",
     "urlBase": {
-      "title": "URL base",
-      "help": "You should use public endpoint for quotes, to be accessible by <strong>everyone</strong>"
+      "title": "Base de URL",
+      "help": "Você deve usar um endpoint público para citações, para ser acessível por <strong>todos</strong>"
     }
   }
 }

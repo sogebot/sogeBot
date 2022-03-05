@@ -1,16 +1,16 @@
 {
   "settings": {
-    "enabled": "Status",
+    "enabled": "Situação",
     "volume": "Volume",
-    "calculateVolumeByLoudness": "Dynamic volume by loudness",
+    "calculateVolumeByLoudness": "Volume dinâmico por ruído",
     "duration": {
-      "title": "Max song duration",
-      "help": "In minutes"
+      "title": "Duração da música",
+      "help": "Em minutos"
     },
-    "shuffle": "Shuffle",
-    "songrequest": "Play from song request",
-    "playlist": "Play from playlist",
-    "onlyMusicCategory": "Allow only category music",
+    "shuffle": "Embaralhar",
+    "songrequest": "Reproduzir de solicitação de música",
+    "playlist": "Reproduzir da playlist",
+    "onlyMusicCategory": "Permitir apenas música de categoria",
     "allowRequestsOnlyFromPlaylist": "Permitir solicitações de música somente da lista atual",
     "notify": "Enviar mensagem ao mudar a música"
   },
@@ -26,8 +26,8 @@
   "seconds": "Segundos",
   "calculated": "Calculado",
   "set_manually": "Definir manualmente",
-  "bannedSongsEmptyAfterSearch": "No banned songs were found by your search for <strong>\"$search\"</strong>.",
-  "emptyAfterSearch": "No songs were found by your search for <strong>\"$search\"</strong>.",
-  "empty": "No songs were added yet.",
-  "bannedSongsEmpty": "No songs were added to banlist yet."
+  "bannedSongsEmptyAfterSearch": "Nenhuma música banida foi encontrada para sua pesquisa por <strong>\"$search\"</strong>.",
+  "emptyAfterSearch": "Nenhuma música foi encontrada para sua pesquisa por <strong>\"$search\"</strong>.",
+  "empty": "Nenhuma música foi adicionada ainda.",
+  "bannedSongsEmpty": "Nenhuma música foi adicionada a lista de banimento ainda."
 }
