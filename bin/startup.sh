@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+
 declare DIR
 declare npm_exec
 
