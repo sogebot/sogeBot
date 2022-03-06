@@ -1,41 +1,41 @@
 {
   "widget": {
-    "subscribers-luck": "Subscribers luck",
-    "followers-luck": "Followers luck"
+    "subscribers-luck": "Sorte dos assinantes",
+    "followers-luck": "Sorte dos seguidores"
   },
   "settings": {
-    "enabled": "Status",
+    "enabled": "Situação",
     "announceNewEntries": {
-      "title": "Announce new entries",
-      "help": "If users joins raffle, announce message will be send to chat after while."
+      "title": "Anunciar novas entradas",
+      "help": "Se usuários se juntarem ao sorteio, a mensagem de anúncio será enviada para o chat após um tempo."
     },
     "announceNewEntriesBatchTime": {
-      "title": "How long to wait before announce new entries (in seconds)",
-      "help": "Longer time will keep chat cleaner, entries will be aggregated together."
+      "title": "Quanto tempo esperar para anunciar novas entradas (em segundos)",
+      "help": "O tempo mais longo manterá o chat limpo, as entradas serão agregadas."
     },
     "deleteRaffleJoinCommands": {
-      "title": "Delete user raffle join command",
-      "help": "This will delete user message if they use !yourraffle command. Should keep chat cleaner."
+      "title": "Excluir comando de juntar para o usuário juntar-se ao sorteio",
+      "help": "Isto excluirá a mensagem do usuário se eles usarem o comando !yourraffle. Deve manter o chat limpo."
     },
     "allowOverTicketing": {
-      "title": "Allow over ticketing",
-      "help": "Allow user join raffle with over ticket of his points. E.g. user have 10 points but can join with !raffle 100 which will use all of his points."
+      "title": "Permitir tickets a mais",
+      "help": "Permitir que o usuário se junte ao sorteio com ticket de excesso de seus pontos. Por exemplo, o usuário tem 10 pontos, mas pode juntar-se ao !raffle 100, que usará todos os seus pontos."
     },
     "raffleAnnounceInterval": {
-      "title": "Announce interval",
-      "help": "Minutes"
+      "title": "Intervalo do anúncio",
+      "help": "Minutos"
     },
     "raffleAnnounceMessageInterval": {
-      "title": "Announce message interval",
-      "help": "How many messages must be sent to chat until announce can be posted."
+      "title": "Anunciar intervalo de mensagem",
+      "help": "Quantas mensagens devem ser enviadas no chat até que o anúncio possa ser publicado."
     },
     "subscribersPercent": {
-      "title": "Additional subscribers luck",
-      "help": "in percents"
+      "title": "Sorte de assinantes adicionais",
+      "help": "em percentagens"
     },
     "followersPercent": {
-      "title": "Additional followers luck",
-      "help": "in percents"
+      "title": "Sorte dos seguidores adicionais",
+      "help": "em percentagens"
     }
   }
 }
