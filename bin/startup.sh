@@ -1,5 +1,12 @@
-#!/bin/bash
+#!/usr/bin/env bash
+
+declare DIR
+declare npm_exec
+
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-cd $DIR/..
-npm start
+npm_exec="$(command -v npm | tee /dev/null 2>&1)"
+
+cd "${DIR}" || exit
+"${npm_exec}" start
+
 exit
