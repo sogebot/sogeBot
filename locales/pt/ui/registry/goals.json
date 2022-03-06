@@ -1,86 +1,86 @@
 {
-  "addGoalGroup": "Add Goal Group",
-  "addGoal": "Add Goal",
-  "newGoal": "new Goal",
-  "newGoalGroup": "new Goal Group",
-  "goals": "Goals",
-  "general": "General",
-  "display": "Display",
-  "fontSettings": "Font Settings",
-  "barSettings": "Bar Settings",
-  "selectGoalOnLeftSide": "Select or add goal on left side",
+  "addGoalGroup": "Adicionar Grupo de Metas",
+  "addGoal": "Adicionar meta",
+  "newGoal": "nova Meta",
+  "newGoalGroup": "novo Grupo de Meta",
+  "goals": "Objetivos",
+  "general": "Geral",
+  "display": "Visualização",
+  "fontSettings": "Configurações de Fonte",
+  "barSettings": "Configurações da Barra",
+  "selectGoalOnLeftSide": "Selecione ou adicione meta ao lado esquerdo",
   "input": {
     "description": {
-      "title": "Description"
+      "title": "Descrição"
     },
     "goalAmount": {
-      "title": "Goal Amount"
+      "title": "Valor da Meta"
     },
     "countBitsAsTips": {
-      "title": "Count Bits as Tips"
+      "title": "Contar bits como Gorjetas"
     },
     "currentAmount": {
-      "title": "Current Amount"
+      "title": "Montante Atual"
     },
     "endAfter": {
-      "title": "End After"
+      "title": "Finalizar após"
     },
     "endAfterIgnore": {
-      "title": "Goal will not expire"
+      "title": "O objetivo não expirará"
     },
     "borderPx": {
-      "title": "Border",
-      "help": "Border size is in pixels"
+      "title": "Borda",
+      "help": "Tamanho da borda está em pixels"
     },
     "barHeight": {
-      "title": "Bar Height",
-      "help": "Bar height is in pixels"
+      "title": "Altura da barra",
+      "help": "Altura da barra em pixels"
     },
     "color": {
-      "title": "Color"
+      "title": "Cor"
     },
     "borderColor": {
-      "title": "Border Color"
+      "title": "Cor da Borda"
     },
     "backgroundColor": {
-      "title": "Background Color"
+      "title": "Cor do Fundo"
     },
     "type": {
-      "title": "Type"
+      "title": "Tipo"
     },
     "nameGroup": {
-      "title": "Name of this goal group"
+      "title": "Nome deste grupo de objetivos"
     },
     "name": {
-      "title": "Name of this goal"
+      "title": "Nome deste objetivo"
     },
     "displayAs": {
-      "title": "Display as",
-      "help": "Sets how goal group will be shown"
+      "title": "Exibir como",
+      "help": "Define como o grupo de metas será mostrado"
     },
     "durationMs": {
-      "title": "Duration",
+      "title": "Duração",
       "help": "This value is in milliseconds",
-      "placeholder": "How long goal should be shown"
+      "placeholder": "Quanto tempo o objetivo deve ser mostrado"
     },
     "animationInMs": {
-      "title": "Animation In duration",
-      "help": "This value is in milliseconds",
-      "placeholder": "Set your animation In duration"
+      "title": "Animação em duração",
+      "help": "Este valor está em milissegundos",
+      "placeholder": "Definir sua animação em duração"
     },
     "animationOutMs": {
-      "title": "Animation Out duration",
-      "help": "This value is in milliseconds",
-      "placeholder": "Set your animation Out duration"
+      "title": "Duração da saída da animação",
+      "help": "Este valor está em milissegundos",
+      "placeholder": "Definir a duração da animação de saída"
     },
     "interval": {
-      "title": "What interval to count"
+      "title": "Que intervalo contar"
     },
     "spaceBetweenGoalsInPx": {
-      "title": "Space between goals",
-      "help": "This value is in pixels",
-      "placeholder": "Set your space between goals"
+      "title": "Espaço entre metas",
+      "help": "Este valor está em pixels",
+      "placeholder": "Defina seu espaço entre as metas"
     }
   },
-  "groupSettings": "Group Settings"
+  "groupSettings": "Configurações do Grupo"
 }
