@@ -1,32 +1,32 @@
 {
   "settings": {
-    "enabled": "Status",
+    "enabled": "Situação",
     "everyXMessages": {
-      "title": "Remind every X messages",
-      "help": "0 = disabled; both remind conditions must be true to bot print remind"
+      "title": "Lembrar cada X mensagens",
+      "help": "0 = desativado; ambas as condições de lembrete devem ser verdadeiras para o bot mostrar lembrete"
     },
     "everyXSeconds": {
-      "title": "Remind every X seconds",
-      "help": "0 = disabled; both remind conditions must be true to bot print remind"
+      "title": "Lembrar a cada X segundos",
+      "help": "0 = desativado; ambas as condições de lembrete devem ser verdadeiras para o bot lembrar"
     }
   },
   "overlay": {
-    "type": "Type",
-    "add": "Add",
-    "inChatToVote": "... in the chat to vote",
-    "tips": "tip",
-    "bits": "cheer",
-    "toYourMessage": "... in your <strong>$type</strong> message"
+    "type": "Tipo",
+    "add": "Adicionar",
+    "inChatToVote": "... no chat para votar",
+    "tips": "gorjeta",
+    "bits": "torcer",
+    "toYourMessage": "... na sua mensagem de <strong>$type</strong>"
   },
-  "title": "Title",
-  "totalVotes": "Total votes",
-  "copy": "Copy",
-  "cannotCopyIfInProgress": "Cannot copy, if another poll is in progress",
-  "closedAt": "Closed at",
-  "activeFor": "Active for",
-  "votingBy": "Voting by",
-  "tips": "tips",
-  "numbers": "numbers",
+  "title": "Título",
+  "totalVotes": "Votos totais",
+  "copy": "Copiar",
+  "cannotCopyIfInProgress": "Não é possível copiar, se outra enquete estiver em andamento",
+  "closedAt": "Fechado em",
+  "activeFor": "Ativo por",
+  "votingBy": "Votando por",
+  "tips": "gorjetas",
+  "numbers": "números",
   "bits": "bits",
   "normal": "!vote"
 }

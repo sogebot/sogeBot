@@ -1,8 +1,8 @@
 {
   "viewers": {
-    "eventHistory": "User event history",
+    "eventHistory": "Histórico de eventos de usuário",
     "hostAndRaidViewersCount": "Viewers: $value",
-    "receivedSubscribeFrom": "Received subscribe from <strong>$value</strong>",
-    "giftedSubscribeTo": "Gifted subscribe to <strong>$value</strong>"
+    "receivedSubscribeFrom": "Inscrição recebida de <strong>$value</strong>",
+    "giftedSubscribeTo": "Inscrição presente para <strong>$value</strong>"
   }
 }

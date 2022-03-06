@@ -3,7 +3,7 @@
     "enabled": "Статус",
     "jwtToken": {
       "title": "Токен JWT",
-      "help": "Получить JWT токен в панели StreamElements настройки->нажмите показать секретный токен"
+      "help": "Get JWT token at <a href=\"https://streamelements.com/dashboard/account/channels\" target=\"_blank\">StreamElements Channels setting</a> and toggle Show secrets"
     }
   }
 }
