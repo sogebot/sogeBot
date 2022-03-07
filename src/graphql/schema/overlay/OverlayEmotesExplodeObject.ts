@@ -11,6 +11,8 @@ export class OverlayEmotesExplodeObject implements OverlayMapperEmotesExplode {
     id: string;
   @Field(type => String, { nullable: true })
     groupId: string | null;
+  @Field(type => String, { nullable: true })
+    name: string | null;
   @Field()
     value: 'emotesexplode';
   @Field(type => OverlayEmotesExplodeOptionsObject, { nullable: true })

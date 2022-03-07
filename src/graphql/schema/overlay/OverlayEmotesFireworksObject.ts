@@ -11,6 +11,8 @@ export class OverlayEmotesFireworksObject implements OverlayMapperEmotesFirework
     id: string;
   @Field(type => String, { nullable: true })
     groupId: string | null;
+  @Field(type => String, { nullable: true })
+    name: string | null;
   @Field()
     value: 'emotesfireworks';
   @Field(type => OverlayEmotesFireworksOptionsObject, { nullable: true })

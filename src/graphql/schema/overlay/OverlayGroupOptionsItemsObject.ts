@@ -11,6 +11,8 @@ export class OverlayGroupOptionsItemsObject implements Impl {
     id: string;
   @Field(type => String, { nullable: true })
     groupId: string | null;
+  @Field(type => String, { nullable: true })
+    name: string | null;
   @Field(type => Float)
     width: number;
   @Field(type => Float)

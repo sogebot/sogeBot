@@ -11,6 +11,8 @@ export class OverlayAlertsObject implements OverlayMapperAlertsRegistry {
     id: string;
   @Field(type => String, { nullable: true })
     groupId: string | null;
+  @Field(type => String, { nullable: true })
+    name: string | null;
   @Field()
     value: 'textRegistry';
   @Field(type => OverlayAlertsRegistryOptionsObject, { nullable: true })

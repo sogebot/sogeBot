@@ -11,6 +11,8 @@ export class OverlayCountdownObject implements OverlayMapperCountdown {
     id: string;
   @Field(type => String, { nullable: true })
     groupId: string | null;
+  @Field(type => String, { nullable: true })
+    name: string | null;
   @Field()
     value: 'countdown';
   @Field(type => OverlayCountdownOptionsObject, { nullable: true })

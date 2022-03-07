@@ -11,6 +11,8 @@ export class OverlayOBSWebsocketObject implements OverlayMapperOBSWebsocket {
     id: string;
   @Field(type => String, { nullable: true })
     groupId: string | null;
+  @Field(type => String, { nullable: true })
+    name: string | null;
   @Field()
     value: 'obswebsocket';
   @Field(type => OverlayOBSWebsocketOptionsObject, { nullable: true })

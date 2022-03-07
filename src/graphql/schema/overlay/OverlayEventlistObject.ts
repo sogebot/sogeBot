@@ -11,6 +11,8 @@ export class OverlayEventlistObject implements OverlayMapperEventlist {
     id: string;
   @Field(type => String, { nullable: true })
     groupId: string | null;
+  @Field(type => String, { nullable: true })
+    name: string | null;
   @Field()
     value: 'eventlist';
   @Field(type => OverlayEventlistOptionsObject, { nullable: true })

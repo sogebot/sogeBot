@@ -11,6 +11,8 @@ export class OverlayEmotesComboObject implements OverlayMapperEmotesCombo {
     id: string;
   @Field(type => String, { nullable: true })
     groupId: string | null;
+  @Field(type => String, { nullable: true })
+    name: string | null;
   @Field()
     value: 'emotescombo';
   @Field(type => OverlayEmotesComboOptionsObject, { nullable: true })
