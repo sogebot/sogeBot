@@ -1,7 +1,7 @@
 import { EntitySchema } from 'typeorm';
 
 export interface OverlayMapperInterfaceCommon {
-  id: string; groupId: string | null;
+  id: string; groupId: string | null; name: string | null;
 }
 
 export interface OverlayMapperInterface extends OverlayMapperInterfaceCommon {
@@ -338,6 +338,7 @@ export const OverlayMapper = new EntitySchema<Readonly<Required<OverlayMappers>>
     id: {
       type: String, primary: true, generated: 'uuid',
     },
+    name:    { type: String, nullable: true },
     groupId: { type: String, nullable: true },
     value:   { type: String, nullable: true },
     opts:    { type: 'simple-json', nullable: true },

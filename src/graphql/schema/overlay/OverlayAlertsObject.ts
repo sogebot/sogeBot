@@ -11,6 +11,8 @@ export class OverlayAlertsObject implements OverlayMapperAlerts {
     id: string;
   @Field(type => String, { nullable: true })
     groupId: string | null;
+  @Field(type => String, { nullable: true })
+    name: string | null;
   @Field()
     value: 'media';
   @Field(type => OverlayAlertsOptionsObject, { nullable: true })

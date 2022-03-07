@@ -11,6 +11,8 @@ export class OverlayTTSObject implements OverlayMapperTTS {
     id: string;
   @Field(type => String, { nullable: true })
     groupId: string | null;
+  @Field(type => String, { nullable: true })
+    name: string | null;
   @Field()
     value: 'tts';
   @Field(type => OverlayTTSOptionsObject, { nullable: true })

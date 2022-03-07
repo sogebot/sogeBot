@@ -11,6 +11,8 @@ export class OverlayCreditsObject implements OverlayMapperCredits {
     id: string;
   @Field(type => String, { nullable: true })
     groupId: string | null;
+  @Field(type => String, { nullable: true })
+    name: string | null;
   @Field()
     value: 'credits';
   @Field(type => OverlayCreditsOptionsObject, { nullable: true })

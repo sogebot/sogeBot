@@ -9,6 +9,8 @@ export class OverlayCarouselObject implements OverlayMapperCarousel {
     id: string;
   @Field(type => String, { nullable: true })
     groupId: string | null;
+  @Field(type => String, { nullable: true })
+    name: string | null;
   @Field()
     value: 'carousel';
   opts: null;

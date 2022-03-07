@@ -11,6 +11,8 @@ export class OverlayClipsObject implements OverlayMapperClips {
     id: string;
   @Field(type => String, { nullable: true })
     groupId: string | null;
+  @Field(type => String, { nullable: true })
+    name: string | null;
   @Field()
     value: 'clips';
   @Field(type => OverlayClipsOptionsObject, { nullable: true })

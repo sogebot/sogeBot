@@ -11,6 +11,8 @@ export class OverlayGroupObject implements OverlayMapperGroup {
     id: string;
   @Field(type => String, { nullable: true })
     groupId: string | null;
+  @Field(type => String, { nullable: true })
+    name: string | null;
   @Field()
     value: 'group';
   @Field(type => OverlayGroupOptionsObject, { nullable: true })

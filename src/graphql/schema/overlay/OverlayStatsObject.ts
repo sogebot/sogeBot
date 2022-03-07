@@ -9,6 +9,8 @@ export class OverlayStatsObject implements OverlayMapperInterface {
     id: string;
   @Field(type => String, { nullable: true })
     groupId: string | null;
+  @Field(type => String, { nullable: true })
+    name: string | null;
   @Field()
     value: 'stats';
   opts: null;

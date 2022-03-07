@@ -11,6 +11,8 @@ export class OverlayClipsCarouselObject implements OverlayMapperClipsCarousel {
     id: string;
   @Field(type => String, { nullable: true })
     groupId: string | null;
+  @Field(type => String, { nullable: true })
+    name: string | null;
   @Field()
     value: 'clipscarousel';
   @Field(type => OverlayClipsCarouselOptionsObject, { nullable: true })
