@@ -1,10 +1,10 @@
 {
-  "notify-as-whisper": "Notify as whisper",
+  "notify-as-whisper": "Notificar como sussurro",
   "settings": {
-    "enabled": "Status",
-    "cooldownNotifyAsWhisper": "Whisper cooldown informations",
-    "cooldownNotifyAsChat": "Chat message cooldown informations",
-    "defaultCooldownOfCommandsInSeconds": "Default cooldown for commands (in seconds)",
-    "defaultCooldownOfKeywordsInSeconds": "Default cooldown for keywords (in seconds)"
+    "enabled": "Situação",
+    "cooldownNotifyAsWhisper": "Informações de intervalo do sussurro",
+    "cooldownNotifyAsChat": "Informações de interfalo de mensagens",
+    "defaultCooldownOfCommandsInSeconds": "Tempo de espera padrão para comandos (em segundos)",
+    "defaultCooldownOfKeywordsInSeconds": "Tempo de espera padrão para palavras-chave (em segundos)"
   }
 }
