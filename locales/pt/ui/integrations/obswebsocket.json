@@ -1,25 +1,25 @@
 {
   "settings": {
-    "enabled": "Status",
+    "enabled": "Situação",
     "accessBy": {
-      "title": "Access by",
-      "help": "Direct - connect directly from a bot | Overlay - connect via overlay browser source"
+      "title": "Acesso por",
+      "help": "Direto - conectar diretamente de um bot | Overlay - conectar através da overlay vi fonte do navegador"
     },
-    "address": "Address",
-    "password": "Password"
+    "address": "Endereço",
+    "password": "Senha"
   },
-  "noSourceSelected": "No source selected",
-  "noSceneSelected": "No scene selected",
-  "empty": "No action sets were created yet.",
-  "emptyAfterSearch": "No action sets were found by your search for <strong>\"$search\"</strong>.",
-  "command": "Command",
-  "new": "Create new OBS Websocket action set",
-  "actions": "Actions",
+  "noSourceSelected": "Sem fonte selecionada",
+  "noSceneSelected": "Nenhuma cena selecionada",
+  "empty": "Nenhum grupo de ações foi criado ainda.",
+  "emptyAfterSearch": "Nenhum conjunto de ações foram encontradas para sua pesquisa por <strong>\"$search\"</strong>.",
+  "command": "Comando",
+  "new": "Criar nova ação do OBS Websocket",
+  "actions": "Ações",
   "name": {
-    "name": "Name"
+    "name": "Nome"
   },
-  "mute": "Mute",
-  "unmute": "Unmute",
+  "mute": "Mutar",
+  "unmute": "Desmutar",
   "SetCurrentScene": {
     "name": "SetCurrentScene"
   },
@@ -33,10 +33,10 @@
     "name": "SaveReplayBuffer"
   },
   "WaitMs": {
-    "name": "Wait X miliseconds"
+    "name": "Aguardar X milissegundos"
   },
   "Log": {
-    "name": "Log message"
+    "name": "Mensagens de log"
   },
   "StartRecording": {
     "name": "StartRecording"

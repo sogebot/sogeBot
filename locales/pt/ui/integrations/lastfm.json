@@ -1,7 +1,7 @@
 {
   "settings": {
-    "enabled": "Status",
+    "enabled": "Situação",
     "apiKey": "API key",
-    "username": "Username"
+    "username": "Nome de usuário"
   }
 }
