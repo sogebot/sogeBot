@@ -1,12 +1,12 @@
 {
-  "no-responses-set": "No responses",
-  "addResponse": "Add response",
+  "no-responses-set": "Sem resposta",
+  "addResponse": "Adicionar Resposta",
   "response": {
-    "name": "Response",
-    "placeholder": "Set your response here."
+    "name": "Resposta",
+    "placeholder": "Defina sua resposta aqui."
   },
   "filter": {
-    "name": "filter",
-    "placeholder": "Add filter for this response"
+    "name": "filtrar",
+    "placeholder": "Adicionar filtro para esta resposta"
   }
 }
