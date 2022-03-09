@@ -44,6 +44,7 @@
   },
   "webpanel": {
     "this-system-is-disabled": "Ce système est désactivé",
+    "or": "or",
     "loading": "Chargement",
     "this-may-take-a-while": "Ceci <strong>peut</strong> prendre un certain temps",
     "display-as": "Afficher en tant que",
