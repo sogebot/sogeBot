@@ -1,18 +1,18 @@
 {
   "settings": {
-    "enabled": "Status"
+    "enabled": "Situação"
   },
-  "empty": "No games were tracked yet.",
-  "emptyAfterSearch": "No tracked games were found by your search for <strong>\"$search\"</strong>.",
-  "when": "When streamed",
-  "time": "Tracked time",
-  "offset": "Offset of tracked time",
-  "main": "Main",
-  "extra": "Main+Extra",
-  "completionist": "Completionist",
-  "game": "Tracked game",
-  "startedAt": "Tracking started at",
-  "showHistory": "Show history ($count)",
-  "hideHistory": "Hide history ($count)",
-  "searchToAddNewGame": "Search to add new game to track"
+  "empty": "Nenhum jogo foi rastreado ainda.",
+  "emptyAfterSearch": "Nenhum jogo monitorado foi encontrado na sua pesquisa por <strong>\"$search\"</strong>.",
+  "when": "Quando transmitido",
+  "time": "Tempo registrado",
+  "offset": "Deslocamento de tempo rastreado",
+  "main": "Principal",
+  "extra": "Principal + extra",
+  "completionist": "Complecionista",
+  "game": "Jogo rastreado",
+  "startedAt": "Rastreamento começou em",
+  "showHistory": "Mostrar histórico ($count)",
+  "hideHistory": "Ocultar histórico ($count)",
+  "searchToAddNewGame": "Pesquise para adicionar um novo jogo para gravar"
 }
