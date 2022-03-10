@@ -103,6 +103,7 @@ export class overlayResolver {
       stats:        items.filter(o => o.value === 'stats'),
       wordcloud:    items.filter(o => o.value === 'wordcloud'),
       randomizer:   items.filter(o => o.value === 'randomizer'),
+      reference:    items.filter(o => o.value === 'reference'),
     } as OverlayObject;
     return response;
   }
