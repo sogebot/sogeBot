@@ -46,38 +46,38 @@
   "usableOptions": {
     "name": "Opções utilizáveis",
     "placeholder": "Entrada, sua, opções, aqui",
-    "help": "Options, which can be used with this variable, example: <strong>SOLO, DUO, 3-SQ, SQUAD</strong>",
+    "help": "Opções que podem ser usadas com esta variável, exemplo: <strong>SOLO, DUO, 3-SQ, SQUAD</strong>",
     "error": {
-      "atLeastOneValue": "You need to set at least 1 value."
+      "atLeastOneValue": "Você precisa definir ao menos 1 valor."
     }
   },
-  "scriptToEvaluate": "Script to evaluate",
+  "scriptToEvaluate": "Script para avaliar",
   "runScript": {
-    "name": "Run script",
+    "name": "Executar script",
     "error": {
-      "isNotSelected": "Please choose an option."
+      "isNotSelected": "Por favor, selecione uma opção."
     }
   },
   "testCurrentScript": {
-    "name": "Test current script",
-    "help": "Click <strong>Test current script</strong> to see value in <strong>Current value</strong> input"
+    "name": "Testar script atual",
+    "help": "Clique em <strong>Testar o script atual</strong> para ver o valor na entrada <strong>Atual</strong>"
   },
-  "history": "History",
-  "historyIsEmpty": "History for this variable is empty!",
-  "warning": "<strong>Warning:</strong> All data of this variable will be discarded!",
-  "choose": "Choose...",
+  "history": "Histórico",
+  "historyIsEmpty": "Histórico para esta variável está vazio!",
+  "warning": "<strong>Aviso:</strong> Todos os dados desta variável serão descartados!",
+  "choose": "Escolha...",
   "types": {
-    "number": "Number",
-    "text": "Text",
-    "options": "Options",
+    "number": "Número",
+    "text": "Texto",
+    "options": "Opções",
     "eval": "Script"
   },
   "runEvery": {
-    "isUsed": "When variable is used",
-    "seconds": "Seconds",
-    "minutes": "Minutes",
-    "hours": "Hours",
-    "days": "Days"
+    "isUsed": "Quando a variável é usada",
+    "seconds": "Segundos",
+    "minutes": "Minutos",
+    "hours": "Horas",
+    "days": "Dias"
   }
 }
 
