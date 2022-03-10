@@ -1,27 +1,27 @@
 {
-  "new": "New Keyword",
-  "empty": "No keywords were created yet.",
-  "emptyAfterSearch": "No keywords were found by your search for <strong>\"$search\"</strong>.",
+  "new": "Nova Palavra-chave",
+  "empty": "Nenhuma palavra-chave foi criada ainda.",
+  "emptyAfterSearch": "Nenhuma palavra-chave foi encontrada em sua busca por <strong>\"$search\"</strong>.",
   "keyword": {
-    "name": "Keyword / Regular Expression",
-    "placeholder": "Set your keyword or regular expression to trigger keyword.",
-    "help": "You can use regexp (case insensitive) to use keywords, e.g. <strong>hello.*|hi</strong>"
+    "name": "Palavra-chave / Expressão regular",
+    "placeholder": "Defina sua palavra-chave ou expressão regular para ativar a palavra-chave.",
+    "help": "Você pode usar regexp (diferencia maiúsculas de minúsculas) para usar palavras-chave, por exemplo, <strong>hello.*➲ hi</strong>"
   },
   "response": {
-    "name": "Response",
-    "placeholder": "Set your response here."
+    "name": "Resposta",
+    "placeholder": "Defina sua resposta aqui."
   },
   "error": {
-    "isEmpty": "This value cannot be empty"
+    "isEmpty": "Este valor não pode ficar vazio"
   },
-  "no-responses-set": "No responses",
-  "addResponse": "Add response",
+  "no-responses-set": "Não há respostas",
+  "addResponse": "Adicione resposta",
   "filter": {
-    "name": "filter",
-    "placeholder": "Add filter for this response"
+    "name": "filtrar",
+    "placeholder": "Adicionar filtro para esta resposta"
   },
-  "warning": "This action cannot be reverted!",
+  "warning": "Esta ação não pode ser revertida!",
   "settings": {
-    "enabled": "Status"
+    "enabled": "Situação"
   }
 }
