@@ -4,7 +4,7 @@ import {
   OverlayMapperCarousel,
   OverlayMapperClips,
   OverlayMapperClipsCarousel,
-  OverlayMapperCountdown, OverlayMapperCredits, OverlayMapperEmotes, OverlayMapperEmotesCombo, OverlayMapperEmotesExplode, OverlayMapperEmotesFireworks, OverlayMapperEventlist, OverlayMapperGroup, OverlayMapperHypeTrain, OverlayMapperInterface, OverlayMapperMarathon, OverlayMapperOBSWebsocket, OverlayMapperPolls, OverlayMapperStopwatch, OverlayMapperTTS,
+  OverlayMapperCountdown, OverlayMapperCredits, OverlayMapperEmotes, OverlayMapperEmotesCombo, OverlayMapperEmotesExplode, OverlayMapperEmotesFireworks, OverlayMapperEventlist, OverlayMapperGroup, OverlayMapperHypeTrain, OverlayMapperInterface, OverlayMapperReference, OverlayMapperMarathon, OverlayMapperOBSWebsocket, OverlayMapperPolls, OverlayMapperStopwatch, OverlayMapperTTS,
 } from '@entity/overlay';
 import { Field, ObjectType } from 'type-graphql';
 
@@ -25,6 +25,7 @@ import { OverlayHypeTrainObject } from './OverlayHypeTrainObject';
 import { OverlayMarathonObject } from './OverlayMarathonObject';
 import { OverlayOBSWebsocketObject } from './OverlayOBSWebsocketObject';
 import { OverlayPollsObject } from './OverlayPollsObject';
+import { OverlayReferenceObject } from './OverlayReferenceObject';
 import { OverlayStatsObject } from './OverlayStatsObject';
 import { OverlayStopwatchObject } from './OverlayStopwatchObject';
 import { OverlayTTSObject } from './OverlayTTSObject';
@@ -78,4 +79,6 @@ export class OverlayObject {
     randomizer: OverlayMapperInterface[];
   @Field(type => [OverlayWordcloudObject])
     wordcloud: OverlayMapperInterface[];
+  @Field(type => [OverlayReferenceObject])
+    reference: OverlayMapperReference[];
 }
