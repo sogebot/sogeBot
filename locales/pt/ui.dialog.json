@@ -1,56 +1,56 @@
 {
   "title": {
-    "edit": "Edit",
-    "add": "Add"
+    "edit": "Editar",
+    "add": "Adicionar"
   },
   "position": {
-    "settings": "Position settings",
-    "anchorX": "Anchor X position",
-    "anchorY": "Anchor Y position",
-    "left": "Left",
-    "right": "Right",
-    "middle": "Middle",
-    "top": "Top",
-    "bottom": "Bottom",
+    "settings": "Configurações de posição",
+    "anchorX": "Posição X da Âncora",
+    "anchorY": "Posição Y da âncora",
+    "left": "Esquerda",
+    "right": "Direita",
+    "middle": "Meio",
+    "top": "Superior",
+    "bottom": "Inferior",
     "x": "X",
     "y": "Y"
   },
   "font": {
-    "shadowShiftRight": "Shift Right",
-    "shadowShiftDown": "Shift Down",
-    "shadowBlur": "Blur",
-    "shadowOpacity": "Opacity",
-    "color": "Color"
+    "shadowShiftRight": "Deslocar à direita",
+    "shadowShiftDown": "Mover para Baixo",
+    "shadowBlur": "Desfoque",
+    "shadowOpacity": "Opacidade",
+    "color": "Cor"
   },
   "errors": {
-    "required": "This input cannot be empty.",
-    "minValue": "Lowest value of this input is $value."
+    "required": "Este campo não pode ficar vazio.",
+    "minValue": "O menor valor desta entrada é $value."
   },
   "buttons": {
-    "reorder": "Reorder",
+    "reorder": "Reordenar",
     "upload": {
-      "idle": "Upload",
-      "progress": "Uploading",
-      "done": "Uploaded"
+      "idle": "Enviar",
+      "progress": "Enviando",
+      "done": "Enviado"
     },
-    "cancel": "Cancel",
-    "close": "Close",
+    "cancel": "Cancelar",
+    "close": "Fechar",
     "test": {
-      "idle": "Test",
-      "progress": "Testing in progress",
-      "done": "Testing done"
+      "idle": "Teste",
+      "progress": "Teste em andamento",
+      "done": "Testando concluído"
     },
     "saveChanges": {
-      "idle": "Save changes",
-      "invalid": "Cannot save changes",
-      "progress": "Saving changes",
-      "done": "Changes saved"
+      "idle": "Salvar alterações",
+      "invalid": "Não é possível salvar alterações",
+      "progress": "Salvando alterações",
+      "done": "Alterações salvas"
     },
-    "something-went-wrong": "Something went wrong",
-    "mark-to-delete": "Mark to delete",
-    "disable": "Disable",
-    "enable": "Enable",
-    "disabled": "Disabled",
+    "something-went-wrong": "Alguma coisa deu errado",
+    "mark-to-delete": "Marcar para apagar",
+    "disable": "Desativar",
+    "enable": "Ativar",
+    "disabled": "Desativado",
     "enabled": "Ativado",
     "edit": "Editar",
     "delete": "Deletar",

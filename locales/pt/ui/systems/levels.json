@@ -1,21 +1,21 @@
 {
   "settings": {
-    "enabled": "Status",
-    "conversionRate": "Conversion rate 1 XP for x Points",
-    "firstLevelStartsAt": "First level starts at XP",
+    "enabled": "Situação",
+    "conversionRate": "Conversão taxa 1 XP para x Pontos",
+    "firstLevelStartsAt": "O primeiro nível começa na XP",
     "nextLevelFormula": {
-      "title": "Next level calculation formula",
-      "help": "Available variables: $prevLevel, $prevLevelXP"
+      "title": "Fórmula do cálculo do próximo nível",
+      "help": "Variáveis disponíveis: $prevLevel, $prevLevelXP"
     },
-    "levelShowcaseHelp": "Levels example will be refreshed on save",
-    "xpName": "Name",
-    "interval": "Minutes interval to add xp to online users when stream online",
-    "offlineInterval": "Minutes interval to add xp to online users when stream offline",
-    "messageInterval": "How many messages to add xp",
-    "messageOfflineInterval": "How many messages to add xp when stream offline",
-    "perInterval": "How many xp to add per online interval",
-    "perOfflineInterval": "How many xp to add per offline interval",
-    "perMessageInterval": "How many xp to add per message interval",
-    "perMessageOfflineInterval": "How many xp to add per message offline interval"
+    "levelShowcaseHelp": "O exemplo de níveis será atualizado ao salvar",
+    "xpName": "Nome",
+    "interval": "Intervalo de minutos para adicionar Xp para os usuários online quando a stream estiver online",
+    "offlineInterval": "Intervalo de minutos para adicionar Xp aos usuários online quando a stream estiver offline",
+    "messageInterval": "Quantas mensagens adicionarão pontos",
+    "messageOfflineInterval": "Quantas mensagens para adicionar xp quando o stream está offline",
+    "perInterval": "Quantos Xp adicionar por intervalo online",
+    "perOfflineInterval": "Quantos Xp adicionar por intervalo offline",
+    "perMessageInterval": "Quantos xp adicionar por intervalo de mensagem",
+    "perMessageOfflineInterval": "Quantos Xp adicionar por intervalo de mensagens offline"
   }
 }
