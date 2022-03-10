@@ -44,6 +44,7 @@
   },
   "webpanel": {
     "this-system-is-disabled": "Эта система отключена",
+    "or": "or",
     "loading": "Загрузка",
     "this-may-take-a-while": "Это <strong>может</strong> занять некоторое время",
     "display-as": "Отображать как",

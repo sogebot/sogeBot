@@ -44,6 +44,7 @@
   },
   "webpanel": {
     "this-system-is-disabled": "Tento systém je vypnutý",
+    "or": "nebo",
     "loading": "Načítám",
     "this-may-take-a-while": "Může to <strong>chvíli</strong> trvat",
     "display-as": "Zobrazit jako",

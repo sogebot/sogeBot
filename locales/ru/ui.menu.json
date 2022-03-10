@@ -98,5 +98,6 @@
   "levels": "Уровень",
   "obswebsocket": "OBS Websocket",
   "api-explorer": "Проводник API",
-  "emotescombo": "Комбо эмоций"
+  "emotescombo": "Комбо эмоций",
+  "notifications": "Notifications"
 }

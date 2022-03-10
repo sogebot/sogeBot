@@ -15,6 +15,6 @@
   "channel_is_not_set": "Канал не задан",
   "please_set_your_broadcaster_oauth_or_owners": "Пожалуйста, установите ваш канал <a href=\"#/settings/modules/services/twitch\">или владельцев</a>, или все пользователи <strong>будут иметь доступ</strong> к этой панели управления и будут рассматриваться как <strong>ведущий</strong>.",
   "new_update_available": "Доступно новое обновление",
-  "new_bot_version_available_at": "Новая версия бота $version доступна по адресу <a href=\"https://github.com/sogebot/sogeBot/releases/tag/$version\">GitHub</a>.",
+  "new_bot_version_available_at": "New bot version {version} available at <a href=\"https://github.com/sogebot/sogeBot/releases/tag/{version}\">GitHub</a>.",
   "one_of_inputs_must_be_set": "Один из входов должен быть указан"
 }
