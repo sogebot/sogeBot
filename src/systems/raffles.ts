@@ -79,7 +79,7 @@ class Raffles extends System {
   }
 
   sockets () {
-    adminEndpoint(this.nsp, 'raffle::getWinner', async (userName: string, cb) => {
+    adminEndpoint('/systems/raffles', 'raffle::getWinner', async (userName: string, cb) => {
       try {
         await changelog.flush();
         cb(
@@ -90,17 +90,15 @@ class Raffles extends System {
         cb(e.stack);
       }
     });
-    adminEndpoint(this.nsp, 'raffle::setEligibility', async ({ id, isEligible }, cb) => {
+    adminEndpoint('/systems/raffles', 'raffle::setEligibility', async ({ id, isEligible }, cb) => {
       try {
-        cb(
-          null,
-          await getRepository(RaffleParticipant).update({ id }, { isEligible }),
-        );
+        await getRepository(RaffleParticipant).update({ id }, { isEligible });
+        cb(null);
       } catch (e: any) {
         cb(e.stack);
       }
     });
-    adminEndpoint(this.nsp, 'raffle:getLatest', async (cb) => {
+    adminEndpoint('/systems/raffles', 'raffle:getLatest', async (cb) => {
       try {
         cb(
           null,
@@ -113,19 +111,19 @@ class Raffles extends System {
         cb (e);
       }
     });
-    adminEndpoint(this.nsp, 'raffle::pick', async () => {
+    adminEndpoint('/systems/raffles', 'raffle::pick', async () => {
       this.pick({
         attr: {}, command: '!raffle', createdAt: Date.now(), parameters: '', sender: getOwnerAsSender(), isAction: false, emotesOffsets: new Map(), isFirstTimeMessage: false, discord: undefined,
       });
     });
-    adminEndpoint(this.nsp, 'raffle::open', async (message) => {
+    adminEndpoint('/systems/raffles', 'raffle::open', async (message) => {
       // force close raffles
       await getRepository(Raffle).update({}, { isClosed: true });
       this.open({
         attr: {}, command: '!raffle open', createdAt: Date.now(), sender: getOwnerAsSender(), parameters: message, isAction: false, emotesOffsets: new Map(), isFirstTimeMessage: false, discord: undefined,
       });
     });
-    adminEndpoint(this.nsp, 'raffle::close', async () => {
+    adminEndpoint('/systems/raffles', 'raffle::close', async () => {
       await getRepository(Raffle).update({ isClosed: false }, { isClosed: true });
     });
   }

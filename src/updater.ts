@@ -49,16 +49,16 @@ class Updater extends Core {
   }
 
   sockets() {
-    adminEndpoint(this.nsp, 'updater::check', async (cb) => {
+    adminEndpoint('/core/updater', 'updater::check', async (cb) => {
       info(`Manually triggered check for updater.`);
       await this.checkUpdate();
-      cb(null, '');
+      cb(null);
     });
-    adminEndpoint(this.nsp, 'updater::trigger', async (opts, cb) => {
+    adminEndpoint('/core/updater', 'updater::trigger', async (opts, cb) => {
       if (updating.has(opts.pkg)) {
         info(`Update for ${opts.pkg} in progress. Please wait until completed.`);
         if (cb) {
-          cb(`Update for ${opts.pkg} in progress. Please wait until completed.`, '');
+          cb(`Update for ${opts.pkg} in progress. Please wait until completed.`);
         }
       }
       updating.add(opts.pkg);
@@ -68,12 +68,12 @@ class Updater extends Core {
           this.versions[opts.pkg as keyof typeof versions] = opts.version;
           info(`${opts.pkg}@${opts.version} updated succesfully!`);
           if (cb) {
-            cb(null, '');
+            cb(null);
           }
         } else {
           errorLog(stderr);
           if (cb) {
-            cb(stderr, '');
+            cb(stderr);
           }
         }
         updating.delete(opts.pkg);

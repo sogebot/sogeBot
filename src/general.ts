@@ -36,6 +36,15 @@ import { variables } from '~/watchers';
 let threadStartTimestamp = Date.now();
 let isInitialLangSet = true;
 
+export type Command = {
+  id: string,
+  defaultValue: string,
+  type: string,
+  name: string,
+  command: string,
+  permission: string | null,
+};
+
 const gracefulExit = () => {
   if (general.gracefulExitEachXHours > 0) {
     debug('thread', 'gracefulExit::check');
@@ -88,16 +97,7 @@ class General extends Core {
   }
 
   sockets() {
-    type Command = {
-      id: string,
-      defaultValue: string,
-      type: string,
-      name: string,
-      command: string,
-      permission: string | null,
-    };
-
-    adminEndpoint(this.nsp, 'generic::getCoreCommands', async (cb: any) => {
+    adminEndpoint('/core/general', 'generic::getCoreCommands', async (cb) => {
       try {
         const commands: Command[] = [];
 
@@ -130,7 +130,7 @@ class General extends Core {
       }
     });
 
-    adminEndpoint(this.nsp, 'generic::setCoreCommand', async (commandToSet: Command, cb: any) => {
+    adminEndpoint('/core/general', 'generic::setCoreCommand', async (commandToSet, cb) => {
       // get module
       const module = list(commandToSet.type.toLowerCase()).find(item => item.__moduleName__ === commandToSet.name);
       if (!module) {
@@ -156,7 +156,7 @@ class General extends Core {
       // handle new command value
       module.setCommand(commandToSet.defaultValue, commandToSet.command);
       refreshCachedCommandPermissions();
-      cb();
+      cb(null);
     });
   }
 

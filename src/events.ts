@@ -735,7 +735,7 @@ class Events extends Core {
   }
 
   public sockets() {
-    adminEndpoint(this.nsp, 'events::getRedeemedRewards', async (cb) => {
+    adminEndpoint('/core/events', 'events::getRedeemedRewards', async (cb) => {
       try {
         const rewards = await getCustomRewards() ?? [];
         cb(null, [...rewards.map(o => o.title)]);
@@ -743,14 +743,14 @@ class Events extends Core {
         cb(e.stack, []);
       }
     });
-    adminEndpoint(this.nsp, 'generic::getAll', async (cb) => {
+    adminEndpoint('/core/events', 'generic::getAll', async (cb) => {
       try {
         cb(null, await getRepository(Event).find({ relations: ['operations'] }));
       } catch (e: any) {
         cb(e.stack, []);
       }
     });
-    adminEndpoint(this.nsp, 'generic::getOne', async (id, cb) => {
+    adminEndpoint('/core/events', 'generic::getOne', async (id, cb) => {
       try {
         const event = await getRepository(Event).findOne({
           relations: ['operations'],
@@ -761,14 +761,14 @@ class Events extends Core {
         cb(e.stack, undefined);
       }
     });
-    adminEndpoint(this.nsp, 'list.supported.events', (cb) => {
+    adminEndpoint('/core/events', 'list.supported.events', (cb) => {
       try {
         cb(null, this.supportedEventsList);
       } catch (e: any) {
         cb(e.stack, []);
       }
     });
-    adminEndpoint(this.nsp, 'list.supported.operations', (cb) => {
+    adminEndpoint('/core/events', 'list.supported.operations', (cb) => {
       try {
         cb(null, this.supportedOperationsList);
       } catch (e: any) {
@@ -776,7 +776,7 @@ class Events extends Core {
       }
     });
 
-    adminEndpoint(this.nsp, 'test.event', async ({ id, randomized, values, variables: variablesArg }, cb) => {
+    adminEndpoint('/core/events', 'test.event', async ({ id, randomized, values, variables: variablesArg }, cb) => {
       try {
         const attributes: Record<string, any> = {
           test:     true,
@@ -857,7 +857,7 @@ class Events extends Core {
       }
     });
 
-    adminEndpoint(this.nsp, 'events::save', async (event, cb) => {
+    adminEndpoint('/core/events', 'events::save', async (event, cb) => {
       try {
         cb(null, await getRepository(Event).save({ ...event, operations: event.operations.filter(o => o.name !== 'do-nothing') }));
       } catch (e: any) {
@@ -865,7 +865,7 @@ class Events extends Core {
       }
     });
 
-    adminEndpoint(this.nsp, 'events::remove', async (event, cb) => {
+    adminEndpoint('/core/events', 'events::remove', async (event, cb) => {
       await getRepository(Event).remove(event);
       cb(null);
     });

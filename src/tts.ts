@@ -45,18 +45,18 @@ class TTS extends Core {
   }
 
   sockets() {
-    adminEndpoint(this.nsp, 'settings.refresh', async () => {
+    adminEndpoint('/core/tts', 'settings.refresh', async () => {
       this.onStartup(); // reset settings
     });
 
-    adminEndpoint(this.nsp, 'google::speak', async (opts, cb) => {
-      const audioContent = await this.googleSpeak(opts as any);
+    adminEndpoint('/core/tts', 'google::speak', async (opts, cb) => {
+      const audioContent = await this.googleSpeak(opts);
       if (cb) {
         cb(null, audioContent);
       }
     });
 
-    publicEndpoint(this.nsp, 'speak', async (opts, cb) => {
+    publicEndpoint('/core/tts', 'speak', async (opts, cb) => {
       if (secureKeys.has(opts.key)) {
         secureKeys.delete(opts.key);
 

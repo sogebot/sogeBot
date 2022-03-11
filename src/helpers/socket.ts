@@ -8,9 +8,12 @@ import type { KeywordInterface } from '@entity/keyword';
 import { OBSWebsocketInterface } from '@entity/obswebsocket';
 import type { PermissionsInterface } from '@entity/permissions';
 import type { PriceInterface } from '@entity/price';
+import { QueueInterface } from '@entity/queue';
+import { QuotesInterface } from '@entity/quotes';
+import { RaffleInterface } from '@entity/raffle';
 import type { RandomizerInterface } from '@entity/randomizer';
 import type { RankInterface } from '@entity/rank';
-import type { SongPlaylistInterface } from '@entity/song';
+import type { currentSongType, SongBanInterface, SongPlaylistInterface } from '@entity/song';
 import type { TextInterface } from '@entity/text';
 import type { TimerInterface } from '@entity/timer';
 import type {
@@ -22,121 +25,147 @@ import { Socket } from 'socket.io';
 
 import type PUBG from '../integrations/pubg';
 
+interface GenericEvents {
+  'settings': (cb: (error: Error | string | null, settings: Record<string, any> | null, ui: Record<string, any> | null) => Promise<void>) => void,
+  'settings.update': (opts: Record<string,any>, cb: (error: Error | string | null) => Promise<void>) => void,
+  'set.value': (opts: { variable: string, value: any }, cb: (error: Error | string | null, opts: { variable: string, value: any } | null) => Promise<void>) => void,
+}
+
+type generic<T> = {
+  getAll: (cb: (error: Error | string | null, items: Readonly<Required<T>>[]) => Promise<void>) => void,
+  getOne: (id: string, cb: (error: Error | string | null, item?: Readonly<Required<T>>) => Promise<void>) => void,
+  setById: (opts: { id: string, item: Required<T> }, cb: (error: Error | string | null, timer?: Readonly<Required<T>> | null) => Promise<void>) => void,
+  deleteById: (id: string, cb: (error: Error | string | null) => Promise<void>) => void;
+};
+
+export type ClientToServerEventsWithNamespace = {
+  '/systems/queue': GenericEvents & {
+    'queue::getAllPicked': (cb: (error: Error | string | null, items: QueueInterface[]) => Promise<void>) => void,
+    'queue::pick': (data: { username: string | string[], random: boolean, count: number; }, cb: (error: Error | string | null, items?: QueueInterface[]) => Promise<void>) => void,
+    'queue::clear': (cb: (error: Error | string | null) => Promise<void>) => void,
+    'generic::getAll': generic<QueueInterface>['getAll'],
+  },
+  '/systems/quotes': GenericEvents & {
+    'generic::getOne': generic<QuotesInterface>['getOne'],
+    'generic::setById': generic<QuotesInterface>['setById'],
+    'generic::deleteById': generic<QuotesInterface>['deleteById'],
+  },
+  '/systems/raffles': GenericEvents & {
+    'raffle::getWinner': (name: string, cb: (error: Error | string | null, item?: UserInterface) => Promise<void>) => void,
+    'raffle::setEligibility': (opts: {id: string, isEligible: boolean}, cb: (error: Error | string | null) => Promise<void>) => void,
+    'raffle:getLatest': (cb: (error: Error | string | null, item?: RaffleInterface) => Promise<void>) => void,
+    'raffle::pick': () => void,
+    'raffle::close': () => void,
+    'raffle::open': (message: string) => void,
+  },
+  '/systems/ranks': GenericEvents & {
+    'generic::getAll': generic<RankInterface>['getAll'],
+    'generic::getOne': generic<RankInterface>['getOne'],
+    'ranks::remove': (id: string, cb?: (error: Error | string | null) => Promise<void>) => void,
+    'ranks::save': (item: RankInterface, cb: (error: Error | string | null, item: RankInterface) => Promise<void>) => void,
+  },
+  '/systems/songs': GenericEvents & {
+    'songs::currentSong': (cb: (error: Error | string | null, song: currentSongType) => Promise<void>) => void,
+    'set.playlist.tag': (tag: string) => void,
+    'get.playlist.tags': (cb: (error: Error | string | null, tags: string[]) => Promise<void>) => void,
+    'songs::save': (item: SongPlaylistInterface, cb: (error: Error | string | null, item: SongPlaylistInterface) => Promise<void>) => void,
+    'songs::getAllBanned': (where: Record<string, any> | null | undefined, cb: (error: Error | string | null, item: SongBanInterface[]) => Promise<void>) => void,
+    'songs::removeRequest': (id: string, cb: (error: Error | string | null) => Promise<void>) => void,
+    'delete.playlist': (id: string, cb: (error: Error | string | null) => Promise<void>) => void,
+    'delete.ban': (id: string, cb: (error: Error | string | null) => Promise<void>) => void,
+    'import.ban': (url: string, cb: (error: Error | string | null, result: CommandResponse[]) => Promise<void>) => void,
+    'import.playlist': (opts: { playlist: string, forcedTag: string }, cb: (error: Error | string | null, result: CommandResponse[] | null) => Promise<void>) => void,
+    'import.video': (opts: { playlist: string, forcedTag: string }, cb: (error: Error | string | null, result: CommandResponse[] | null) => Promise<void>) => void,
+    'stop.import': () => void,
+    'next': () => void,
+  },
+  '/systems/timers': GenericEvents & {
+    'generic::getAll': (cb: (error: Error | string | null, timers: Readonly<Required<TimerInterface>>[]) => Promise<void>) => void,
+    'generic::getOne': (id: string, cb: (error: Error | string | null, timer?: Readonly<Required<TimerInterface>>) => Promise<void>) => void,
+    'generic::setById': generic<TimerInterface>['setById'],
+    'generic::deleteById': generic<TimerInterface>['deleteById'],
+  },
+  '/widgets/chat': GenericEvents & {
+    'chat.message.send': (message: string) => void,
+    'viewers': (cb: (error: Error | string | null, data: { chatters: any }) => void) => void,
+  },
+  '/widgets/customvariables': GenericEvents & {
+    'watched::save': (items: VariableWatchInterface[], cb: (error: Error | string | null, variables: VariableWatchInterface[]) => void) => void,
+    'customvariables::list': (cb: (error: Error | string | null, variables: VariableInterface[]) => void) => void,
+    'list.watch': (cb: (error: Error | string | null, variables: VariableWatchInterface[]) => void) => void,
+    'watched::setValue': (opts: { id: string, value: string | number }, cb: (error: Error | string | null) => void) => void,
+  },
+  '/widgets/eventlist': GenericEvents & {
+    'eventlist::removeById': (idList: string[] | string, cb: (error: Error | string | null) => void) => void,
+    'eventlist::get': (count: number) => void,
+    'skip': () => void,
+    'cleanup': () => void,
+    'eventlist::resend': (id: string) => void,
+  },
+  '/core/events': GenericEvents & {
+    'events::getRedeemedRewards': (cb: (error: Error | string | null, rewards: string[]) => Promise<void>) => void,
+    'generic::getAll': (cb: (error: Error | string | null, data: EventInterface[]) => Promise<void>) => void,
+    'generic::getOne': (id: string, cb: (error: Error | string | null, data?: EventInterface) => Promise<void>) => void,
+    'list.supported.events': (cb: (error: Error | string | null, data: any[] /* TODO: missing type */) => Promise<void>) => void,
+    'list.supported.operations': (cb: (error: Error | string | null, data: any[] /* TODO: missing type */) => Promise<void>) => void,
+    'test.event': (opts: { id: string; randomized: string[], variables: string[], values: any[] }, cb: (error: Error | string | null) => Promise<void>) => void,
+    'events::save': (event: EventInterface, cb: (error: Error | string | null, data: EventInterface) => Promise<void>) => void,
+    'events::remove': (event: Required<EventInterface>, cb: (error: Error | string | null) => Promise<void>) => void,
+  },
+  '/core/tts': GenericEvents & {
+    'settings.refresh': () => void,
+    'google::speak': (opts: { volume: number; pitch: number; rate: number; text: string; voice: string; }, cb: (error: Error | string | null, audioContent?: string | null) => Promise<void>) => void,
+  },
+  '/core/ui': GenericEvents & {
+    'configuration': (cb: (error: Error | string | null, data?: any /* TODO: missing type */) => Promise<void>) => void,
+  },
+  '/core/updater': GenericEvents & {
+    'updater::check': (cb: (error: Error | string | null) => Promise<void>) => void,
+    'updater::trigger': (opts: { pkg: string, version: string }, cb?: (error: Error | string | null) => Promise<void>) => void,
+  },
+  '/core/users': GenericEvents & {
+    'viewers::resetPointsAll': (cb?: (error: Error | string | null) => Promise<void>) => void,
+    'viewers::resetMessagesAll': (cb?: (error: Error | string | null) => Promise<void>) => void,
+    'viewers::resetWatchedTimeAll': (cb?: (error: Error | string | null) => Promise<void>) => void,
+    'viewers::resetSubgiftsAll': (cb?: (error: Error | string | null) => Promise<void>) => void,
+    'viewers::resetBitsAll': (cb?: (error: Error | string | null) => Promise<void>) => void,
+    'viewers::resetTipsAll': (cb?: (error: Error | string | null) => Promise<void>) => void,
+    'viewers::update': (data: [userId: string, update: Partial<UserInterface> & { tips: UserTipInterface[], bits: UserBitInterface[] }], cb: (error: Error | string | null) => Promise<void>) => void,
+    'viewers::remove': (viewer: Required<UserInterface>, cb: (error: Error | string | null, removed?: Required<UserInterface>) => Promise<void>) => void,
+    'getNameById': (id: string, cb: (error: Error | string | null, user: string | null) => Promise<void>) => void,
+    'viewers::followedAt': (id: string, cb: (error: Error | string | null, followedAtDate: string | null) => Promise<void>) => void,
+    'find.viewers': (opts: { state: string, page?: number; perPage?: number; order?: { orderBy: string, sortOrder: 'ASC' | 'DESC' }, filter?: { vips: boolean; subscribers: boolean; followers: boolean; active: boolean; }, search?: string, exactUsernameFromTwitch?: string }, cb: (error: Error | string | null, viewers: any[], count: number | null, state: string | null) => Promise<void>) => void,
+  },
+  '/core/general': GenericEvents & {
+    'generic::getCoreCommands': (cb: (error: Error | string | null, commands: import('../general').Command[]) => Promise<void>) => void,
+    'generic::setCoreCommand': (commands: import('../general').Command, cb: (error: Error | string | null) => Promise<void>) => void,
+    'settings': (cb: (error: Error | string | null, settings: Record<string, any> | null, ui: Record<string, any> | null) => Promise<void>) => void,
+  },
+  '/core/customvariables': GenericEvents & {
+    'customvariables::list': (cb: (error: Error | string | null, items: VariableInterface[]) => Promise<void>) => void,
+    'customvariables::runScript': (id: string, cb: (error: Error | string | null, items: VariableInterface | null) => Promise<void>) => void,
+    'customvariables::testScript': (opts: { evalValue: string, currentValue: string }, cb: (error: Error | string | null, returnedValue: any) => Promise<void>) => void,
+    'customvariables::isUnique': (opts: { variable: string, id: string }, cb: (error: Error | string | null, isUnique: boolean) => Promise<void>) => void,
+    'customvariables::delete': (id: string, cb?: (error: Error | string | null) => Promise<void>) => void,
+    'customvariables::save': (item: Required<VariableInterface>, cb: (error: Error | string | null, itemId: string) => Promise<void>) => void,
+  }
+  [x: string]: GenericEvents,
+};
+export type NSPNames = keyof ClientToServerEventsWithNamespace;
+export type EventNames<K extends NSPNames> = keyof ClientToServerEventsWithNamespace[K];
+export type EventParams<
+  namespace extends keyof ClientToServerEventsWithNamespace,
+  event extends keyof ClientToServerEventsWithNamespace[namespace]
+> = Parameters<ClientToServerEventsWithNamespace[namespace][event]>;
+
 const endpoints: {
   type: 'admin' | 'viewer' | 'public';
-  on: string;
-  nsp: string;
+  on: any;
+  nsp: any;
   callback: any;
 }[] = [];
 
-// cb only
-function adminEndpoint (
-  nsp: string,
-  on: 'generic::getAll' | 'list.supported.events' | 'list.supported.operations'
-  | 'randomizer::hideAll' | 'randomizer::getVisible' | 'queue::getAllPicked' | 'queue::clear'
-  | 'spotify::revoke' | 'spotify::skip' | 'spotify::state' | 'spotify::authorize'
-  | 'getSoundBoardSounds'  | 'viewers' | 'viewers::resetPointsAll' | 'viewers::resetMessagesAll'
-  | 'viewers::resetWatchedTimeAll' | 'viewers::resetBitsAll' | 'viewers::resetTipsAll'
-  | 'viewers::resetSubgiftsAll' | 'list.watch' | 'broadcaster' | 'configuration' | 'raffle:getLatest'
-  | 'lists.get' | 'bets::getCurrentBet' | 'commands::count' | 'getLatestStats' | 'menu' | 'panel::errors'
-  | 'removeCache' | 'testExplosion' | 'testFireworks' | 'test' | 'discord::authorize'
-  | 'discord::getChannels' | 'discord::getRoles' | 'discord::getGuilds' | 'settings'
-  | 'debug::get' | 'getLevelsExample' | 'profiler::load' | 'integration::obswebsocket::getCommand'
-  | 'songs::currentSong' | 'updater::check',
-  callback: (cb: (error: Error | string | null, ...response: any) => void) => void | Promise<void>): void;
-
-// id + cb
-function adminEndpoint (
-  nsp: string,
-  on: 'generic::getOne' | 'generic::deleteById' | 'customvariables::runScript' | 'customvariables::delete'
-  | 'test.event' | 'alerts::deleteMedia' | 'alerts::getOneMedia' | 'randomizer::showById'
-  | 'eventlist::resend' | 'viewers::followedAt' | 'quickactions::getAll' | 'marathon::check'
-  | 'countdown::check' | 'stopwatch::check' | 'donationalerts::validate',
-  callback: (id: string, cb: (error: Error | string | null, ...response: any) => void) => void): void;
-
-// string + cb
-function adminEndpoint (
-  nsp: string,
-  on: 'chat.message.send' | 'import.ban' | 'songs::removeRequest' | 'delete.playlist' | 'delete.ban'
-  | 'raffle::getWinner' | 'raffle::open' | 'parseCron' | 'debug::set' | 'getNameById'
-  | 'commands::resetCountByCommand' | 'bets::close' | 'spotify::code',
-  callback: (string: string, cb: (error: Error | string | null, ...response: any) => void) => void): void;
-
-// number + cb
-function adminEndpoint (
-  nsp: string,
-  on: 'generic::setById',
-  callback: (opts: {id: string | number; item: any}, cb: (error: Error | string | null, ...response: any) => void) => void): void;
-
-// any + cb
-function adminEndpoint (
-  nsp: string,
-  on: 'generic::getAll::filter',
-  callback: (opts: any, cb: (error: Error | string | null, ...response: any) => void) => void): void;
-
-// non generic
-function adminEndpoint (nsp: string, on: 'marathon::update::set', callback: any) : void;
-function adminEndpoint (nsp: string, on: 'countdown::update::set', callback: any) : void;
-function adminEndpoint (nsp: string, on: 'stopwatch::update::set', callback: any) : void;
-function adminEndpoint (nsp: string, on: 'eventlist::getUserEvents', callback: (username: string, cb: (error: Error | string | null, ...response: any) => void) => void): void;
-function adminEndpoint (nsp: string, on: 'eventlist::get', callback: (count: number, cb: (error: Error | string | null, ...response: any) => void) => void): void;
-function adminEndpoint (nsp: string, on: 'customvariables::list', callback: (cb: (error: Error | string | null, ...response: any) => void) => void): void;
-function adminEndpoint (nsp: string, on: 'customvariables::testScript', callback: (opts: { currentValue: any; evalValue: any }, cb: (error: Error | string | null, ...response: any) => void) => void): void;
-function adminEndpoint (nsp: string, on: 'customvariables::isUnique', callback: (opts: { variable: any; id: any }, cb: (error: Error | string | null, ...response: any) => void) => void): void;
-function adminEndpoint (nsp: string, on: 'customvariables::save', callback: (item: Readonly<Required<VariableInterface>>, cb: (error: Error | string | null, ...response: any) => void) => void): void;
-function adminEndpoint (nsp: string, on: 'permission::save', callback: (data: Readonly<Required<PermissionsInterface>>[], cb: (error: Error | string | null, ...response: any) => void) => void): void;
-function adminEndpoint (nsp: string, on: 'permissions', callback: (cb: (error: Error | string | null, ...response: any) => void) => void): void;
-function adminEndpoint (nsp: string, on: 'test.user', callback: (opts: { value: string | number; pid: string; state: any }, cb: (error: Error | string | null, ...response: any) => void) => void): void;
-function adminEndpoint (nsp: string, on: 'text::remove' | 'text::save', callback: (item: Readonly<Required<TextInterface>>, cb: (error: Error | string | null, ...response: any) => void) => void): void;
-function adminEndpoint (nsp: string, on: 'events::remove' | 'events::save', callback: (item: Readonly<Required<EventInterface>>, cb: (error: Error | string | null, ...response: any) => void) => void): void;
-function adminEndpoint (nsp: string, on: 'events::getRedeemedRewards', callback: (cb: (error: Error | string | null, response: string[]) => void) => void): void;
-function adminEndpoint (nsp: string, on: 'carousel::save', callback: (items: Readonly<Required<EventInterface>>[], cb: (error: Error | string | null, ...response: any) => void) => void): void;
-function adminEndpoint (nsp: string, on: 'carousel::insert', callback: (data: string, cb: (error: Error | string | null, ...response: any) => void) => void): void;
-function adminEndpoint (nsp: string, on: 'goals::remove' | 'goals::save', callback: (item: Readonly<Required<GoalGroupInterface>>, cb: (error: Error | string | null, ...response: any) => void) => void): void;
-function adminEndpoint (nsp: string, on: 'alerts::save' | 'alerts::delete', callback: (item: Readonly<Required<AlertInterface>>, cb: (error: Error | string | null, ...response: any) => void) => void): void;
-function adminEndpoint (nsp: string, on: 'randomizer::save' | 'randomizer::remove', callback: (item: Readonly<Required<RandomizerInterface>> & Readonly<Required<RandomizerInterface>>[], cb: (error: Error | string | null, ...response: any) => void) => void): void;
-function adminEndpoint (nsp: string, on: 'cooldown::save', callback: (item: Readonly<Required<CooldownInterface>> & Readonly<Required<CooldownInterface>>[], cb: (error: Error | string | null, ...response: any) => void) => void): void;
-function adminEndpoint (nsp: string, on: 'hltb::save', callback: (item: Readonly<Required<HowLongToBeatGameInterface>> & Readonly<Required<HowLongToBeatGameInterface>>[], cb: (error: Error | string | null, ...response: any) => void) => void): void;
-function adminEndpoint (nsp: string, on: 'hltb::saveStreamChange', callback: (stream: Readonly<Required<HowLongToBeatGameItemInterface>> & Readonly<Required<HowLongToBeatGameItemInterface>>[], cb: (error: Error | string | null, ...response: any) => void) => void): void;
-function adminEndpoint (nsp: string, on: 'hltb::getGamesFromHLTB', callback: (game: string, cb: (error: Error | string | null, ...response: any) => void) => void): void;
-function adminEndpoint (nsp: string, on: 'hltb::addNewGame', callback: (game: string, cb: (error: Error | string | null, ...response: any) => void) => void): void;
-function adminEndpoint (nsp: string, on: 'keywords::save', callback: (item: Readonly<Required<KeywordInterface>> & Readonly<Required<RandomizerInterface>>[], cb: (error: Error | string | null, ...response: any) => void) => void): void;
-function adminEndpoint (nsp: string, on: 'polls::save' | 'polls::close', callback: (item: Readonly<Required<Poll>> & Readonly<Required<RandomizerInterface>>[], cb: (error: Error | string | null, ...response: any) => void) => void): void;
-function adminEndpoint (nsp: string, on: 'ranks::save', callback: (item: Readonly<Required<RankInterface>> & Readonly<Required<RandomizerInterface>>[], cb: (error: Error | string | null, ...response: any) => void) => void): void;
-function adminEndpoint (nsp: string, on: 'timers::save', callback: (item: Readonly<Required<TimerInterface>> & Readonly<Required<RandomizerInterface>>[], cb: (error: Error | string | null, ...response: any) => void) => void): void;
-function adminEndpoint (nsp: string, on: 'cmdboard::save' | 'cmdboard::remove', callback: (items: Readonly<Required<CommandsBoardInterface>> & Readonly<Required<CommandsBoardInterface>>[], cb: (error: Error | string | null, ...response: any) => void) => void): void;
-function adminEndpoint (nsp: string, on: 'eventlist::removeById', callback: (id: string | string[], cb: (error: Error | string | null, ...response: any) => void) => void): void;
-function adminEndpoint (nsp: string, on: 'viewers::remove', callback: (item: Readonly<Required<UserInterface>> & Readonly<Required<RandomizerInterface>>[], cb: (error: Error | string | null, ...response: any) => void) => void): void;
-function adminEndpoint (nsp: string, on: 'viewers::update', callback: (data: [userId: string, update: Partial<UserInterface & { tips: UserTipInterface[], bits: UserBitInterface[] }>], cb: (error: Error | string | null, ...response: any) => void) => void): void;
-function adminEndpoint (nsp: string, on: 'find.viewers', callback: (opts:  { exactUsernameFromTwitch?: boolean, state?: any; search?: string; filter?: { subscribers: null | boolean; followers: null | boolean; active: null | boolean; vips: null | boolean }; perPage: number; page: number; order?: { orderBy: string; sortOrder: 'ASC' | 'DESC' } }, cb: (error: Error | string | null, ...response: any) => void) => void): void;
-function adminEndpoint (nsp: string, on: 'watched::save', callback: (item: Readonly<Required<VariableWatchInterface>> & Readonly<Required<VariableWatchInterface>>[], cb: (error: Error | string | null, ...response: any) => void) => void): void;
-function adminEndpoint (nsp: string, on: 'songs::save', callback: (item: Readonly<Required<SongPlaylistInterface>> & Readonly<Required<SongPlaylistInterface>>[], cb: (error: Error | string | null, ...response: any) => void) => void): void;
-function adminEndpoint (nsp: string, on: 'raffle::setEligibility', callback: (opts: {id: string, isEligible: boolean}, cb: (error: Error | string | null, ...response: any) => void) => void): void;
-function adminEndpoint (nsp: string, on: 'price::save', callback: (item: Readonly<Required<PriceInterface>> & Readonly<Required<PriceInterface>>[], cb: (error: Error | string | null, ...response: any) => void) => void): void;
-function adminEndpoint (nsp: string, on: 'panel::alerts', callback: (cb: (error: Error | string | null, ...response: any) => void) => void): void;
-function adminEndpoint (nsp: string, on: 'lists.set', callback: (opts: { blacklist: string[]; whitelist: string[] }, cb: (error: Error | string | null, ...response: any) => void) => void): void;
-function adminEndpoint (nsp: string, on: 'purgeAllConnections', callback: (cb: (error: Error | string | null) => void, socket: Socket) => void): void;
-function adminEndpoint (nsp: string, on: 'pubg::searchForPlayerId', callback: (opts: { apiKey: string, platform: typeof PUBG.platform, playerName: string }, cb: (error: Error | string | null, data: any) => void, socket: Socket) => void): void;
-function adminEndpoint (nsp: string, on: 'pubg::searchForseasonId', callback: (opts: { apiKey: string, platform: typeof PUBG.platform, playerName: string }, cb: (error: Error | string | null, data: any) => void, socket: Socket) => void): void;
-function adminEndpoint (nsp: string, on: 'pubg::getUserStats', callback: (opts: { apiKey: string, platform: typeof PUBG.platform, playerId: string, seasonId: string, ranked: boolean }, cb: (error: Error | string | null, data: any) => void, socket: Socket) => void): void;
-function adminEndpoint (nsp: string, on: 'pubg::exampleParse', callback: (opts: { text: string }, cb: (error: Error | string | null, data: any) => void, socket: Socket) => void): void;
-function adminEndpoint (nsp: string, on: 'alerts::areAlertsMuted', callback: (areAlertsMuted: boolean, cb: (error: Error | string | null, data: any) => void, socket: Socket) => void): void;
-function adminEndpoint (nsp: string, on: 'alerts::isTTSMuted', callback: (isTTSMuted: boolean, cb: (error: Error | string | null, data: any) => void, socket: Socket) => void): void;
-function adminEndpoint (nsp: string, on: 'alerts::isSoundMuted', callback: (isSoundMuted: boolean, cb: (error: Error | string | null, data: any) => void, socket: Socket) => void): void;
-function adminEndpoint (nsp: string, on: 'import.playlist', callback: (opts: {playlist: string, forcedTag: string}, cb: (error: Error | string | null, data: any) => void, socket: Socket) => void): void;
-function adminEndpoint (nsp: string, on: 'import.video', callback: (opts: {playlist: string, forcedTag: string}, cb: (error: Error | string | null, data: any) => void, socket: Socket) => void): void;
-function adminEndpoint (nsp: string, on: 'get.playlist.tags', callback: (cb: (error: Error | string | null, data: string[]) => void, socket: Socket) => void): void;
-function adminEndpoint (nsp: string, on: 'set.playlist.tag', callback: (tag:string, socket: Socket) => void): void;
-function adminEndpoint (nsp: string, on: 'integration::obswebsocket::listScene', callback: (cb: (error: Error | string | null, data: ObsWebSocket.Scene[]) => void, socket: Socket) => void): void;
-function adminEndpoint (nsp: string, on: 'integration::obswebsocket::listSources', callback: (cb: (error: Error | string | null, scenes: any, types: any) => void, socket: Socket) => void): void;
-function adminEndpoint (nsp: string, on: 'integration::obswebsocket::test', callback: (item: OBSWebsocketInterface['simpleModeTasks'] | string, cb: (error: Error | string | null) => void, socket: Socket) => void): void;
-function adminEndpoint (nsp: string, on: 'generic::setCoreCommand', callback: (commands: any, cb: (error: Error | string | null) => void, socket: Socket) => void): void;
-function adminEndpoint (nsp: string, on: 'test.event', callback: (opts: { id: string, randomized: string[], values: any[], variables: string[] }, cb: (error: Error | string | null) => void, socket: Socket) => void): void;
-
-// generic functions
-function adminEndpoint (nsp: string, on: string, callback: (opts: { [x: string]: any }, cb?: (error: Error | string | null, ...response: any) => void) => void, socket?: Socket): void;
-function adminEndpoint (nsp: string, on: string, callback: (cb?: (error: Error | string | null, ...response: any) => void) => void, socket?: Socket): void;
-function adminEndpoint (nsp: any, on: any, callback: any): void{
+function adminEndpoint<K extends NSPNames, T extends EventNames<K>>(nsp: K, on: T, callback: (...args: EventParams<K, T>) => void): void {
   endpoints.push({
     nsp, on, callback, type: 'admin',
   });

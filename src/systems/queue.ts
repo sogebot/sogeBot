@@ -37,14 +37,14 @@ class Queue extends System {
   pickedUsers: QueueInterface[] = [];
 
   sockets () {
-    adminEndpoint(this.nsp, 'queue::getAllPicked', async(cb) => {
+    adminEndpoint('/systems/queue', 'queue::getAllPicked', async(cb) => {
       try {
         cb(null, this.pickedUsers);
       } catch (e: any) {
         cb(e.stack, []);
       }
     });
-    adminEndpoint(this.nsp, 'generic::getAll', async(cb) => {
+    adminEndpoint('/systems/queue', 'generic::getAll', async(cb) => {
       try {
         cb(
           null,
@@ -54,26 +54,26 @@ class Queue extends System {
         cb(e.stack, []);
       }
     });
-    adminEndpoint(this.nsp, 'queue::clear', async(cb) => {
+    adminEndpoint('/systems/queue', 'queue::clear', async(cb) => {
       try {
-        cb(
-          null,
-          await getRepository(QueueEntity).clear(),
-        );
+        await getRepository(QueueEntity).clear(),
+        cb(null);
       } catch (e: any) {
         cb(e.stack);
       }
     });
-    adminEndpoint(this.nsp, 'queue::pick', async (data, cb) => {
+    adminEndpoint('/systems/queue', 'queue::pick', async (data, cb) => {
       try {
         if (data.username) {
           const users: any[] = [];
           if (typeof data.username === 'string') {
             data.username = [data.username];
           }
-          for (let user of data.username) {
-            user = await getRepository(QueueEntity).findOne({ username: user });
-            users.push(user);
+          for (const user of data.username) {
+            const entity = await getRepository(QueueEntity).findOne({ username: user });
+            if (entity) {
+              users.push(entity);
+            }
           }
           if (cb) {
             const opts = {

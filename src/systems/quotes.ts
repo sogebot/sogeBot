@@ -24,7 +24,7 @@ class Quotes extends System {
   }
 
   sockets() {
-    publicEndpoint(this.nsp, 'quotes:getAll', async (_opts, cb) => {
+    publicEndpoint('/systems/quotes', 'quotes:getAll', async (_opts, cb) => {
       try {
         const items = await getRepository(QuotesEntity).find();
         cb(null, await Promise.all(items.map(async (item) => {
@@ -38,7 +38,7 @@ class Quotes extends System {
       }
     });
 
-    adminEndpoint(this.nsp, 'generic::getOne', async (id, cb) => {
+    adminEndpoint('/systems/quotes', 'generic::getOne', async (id, cb) => {
       try {
         const item = await getRepository(QuotesEntity).findOne({ id: Number(id) });
         cb(null, item);
@@ -47,7 +47,7 @@ class Quotes extends System {
       }
     });
 
-    adminEndpoint(this.nsp, 'generic::setById', async (opts, cb) => {
+    adminEndpoint('/systems/quotes', 'generic::setById', async (opts, cb) => {
       try {
         if (!opts.id) {
           cb(null, await getRepository(QuotesEntity).save(opts.item));
@@ -59,7 +59,7 @@ class Quotes extends System {
       }
     });
 
-    adminEndpoint(this.nsp, 'generic::deleteById', async (id, cb) => {
+    adminEndpoint('/systems/quotes', 'generic::deleteById', async (id, cb) => {
       try {
         if (typeof id === 'number') {
           await getRepository(QuotesEntity).delete({ id });

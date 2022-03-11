@@ -15,7 +15,7 @@ import { translate } from '~/translate';
 
 class EventList extends Widget {
   public sockets() {
-    adminEndpoint(this.nsp, 'eventlist::removeById', async (idList, cb) => {
+    adminEndpoint('/widgets/eventlist', 'eventlist::removeById', async (idList, cb) => {
       const ids = Array.isArray(idList) ? [...idList] : [idList];
       for (const id of ids) {
         await getRepository(EventListDB).update(id, { isHidden: true });
@@ -24,19 +24,19 @@ class EventList extends Widget {
         cb(null);
       }
     });
-    adminEndpoint(this.nsp, 'eventlist::get', async (count: number) => {
+    adminEndpoint('/widgets/eventlist', 'eventlist::get', async (count) => {
       this.update(count);
     });
 
-    adminEndpoint(this.nsp, 'skip', () => {
+    adminEndpoint('/widgets/eventlist', 'skip', () => {
       alerts.skip();
     });
 
-    adminEndpoint(this.nsp, 'cleanup', () => {
+    adminEndpoint('/widgets/eventlist', 'cleanup', () => {
       getRepository(EventListDB).update({ isHidden: false }, { isHidden: true });
     });
 
-    adminEndpoint(this.nsp, 'eventlist::resend', async (id) => {
+    adminEndpoint('/widgets/eventlist', 'eventlist::resend', async (id) => {
       const event = await getRepository(EventListDB).findOne({ id: String(id) });
       if (event) {
         const values = JSON.parse(event.values_json);

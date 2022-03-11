@@ -248,48 +248,48 @@ class Users extends Core {
   }
 
   sockets () {
-    adminEndpoint(this.nsp, 'viewers::resetPointsAll', async (cb) => {
+    adminEndpoint('/core/users', 'viewers::resetPointsAll', async (cb) => {
       await changelog.flush();
       await getRepository(User).update({}, { points: 0 });
       if (cb) {
         cb(null);
       }
     });
-    adminEndpoint(this.nsp, 'viewers::resetMessagesAll', async (cb) => {
+    adminEndpoint('/core/users', 'viewers::resetMessagesAll', async (cb) => {
       await changelog.flush();
       await getRepository(User).update({}, { messages: 0, pointsByMessageGivenAt: 0 });
       if (cb) {
         cb(null);
       }
     });
-    adminEndpoint(this.nsp, 'viewers::resetWatchedTimeAll', async (cb) => {
+    adminEndpoint('/core/users', 'viewers::resetWatchedTimeAll', async (cb) => {
       await changelog.flush();
       await getRepository(User).update({}, { watchedTime: 0 });
       if (cb) {
         cb(null);
       }
     });
-    adminEndpoint(this.nsp, 'viewers::resetSubgiftsAll', async (cb) => {
+    adminEndpoint('/core/users', 'viewers::resetSubgiftsAll', async (cb) => {
       await changelog.flush();
       await getRepository(User).update({}, { giftedSubscribes: 0 });
       if (cb) {
         cb(null);
       }
     });
-    adminEndpoint(this.nsp, 'viewers::resetBitsAll', async (cb) => {
+    adminEndpoint('/core/users', 'viewers::resetBitsAll', async (cb) => {
       await getRepository(UserBit).clear();
       if (cb) {
         cb(null);
       }
     });
-    adminEndpoint(this.nsp, 'viewers::resetTipsAll', async (cb) => {
+    adminEndpoint('/core/users', 'viewers::resetTipsAll', async (cb) => {
       await getRepository(UserTip).clear();
       if (cb) {
         cb(null);
       }
     });
 
-    adminEndpoint(this.nsp, 'viewers::update', async ([userId, update], cb) => {
+    adminEndpoint('/core/users', 'viewers::update', async ([userId, update], cb) => {
       try {
         if (typeof update.tips !== 'undefined') {
           for (const tip of update.tips) {
@@ -330,7 +330,7 @@ class Users extends Core {
         cb(e.stack);
       }
     });
-    adminEndpoint(this.nsp, 'viewers::remove', async (viewer: Required<UserInterface>, cb) => {
+    adminEndpoint('/core/users', 'viewers::remove', async (viewer: Required<UserInterface>, cb) => {
       try {
         await changelog.flush();
         cb(null, await getRepository(User).remove(viewer));
@@ -339,14 +339,14 @@ class Users extends Core {
         cb(e.stack);
       }
     });
-    adminEndpoint(this.nsp, 'getNameById', async (id, cb) => {
+    adminEndpoint('/core/users', 'getNameById', async (id, cb) => {
       try {
         cb(null, await this.getNameById(id));
       } catch (e: any) {
         cb(e.stack, null);
       }
     });
-    adminEndpoint(this.nsp, 'find.viewers', async (opts, cb) => {
+    adminEndpoint('/core/users', 'find.viewers', async (opts, cb) => {
       try {
         const connection = await getConnection();
         opts.page = opts.page ?? 0;
@@ -463,7 +463,7 @@ class Users extends Core {
         cb(e.stack, [], null, null);
       }
     });
-    adminEndpoint(this.nsp, 'viewers::followedAt', async (id, cb) => {
+    adminEndpoint('/core/users', 'viewers::followedAt', async (id, cb) => {
       try {
         const clientBot = await client('bot');
         const broadcasterId = variables.get('services.twitch.broadcasterId') as string;
@@ -477,7 +477,7 @@ class Users extends Core {
         cb(e.stack, null);
       }
     });
-    viewerEndpoint(this.nsp, 'viewers::findOne', async (userId, cb) => {
+    viewerEndpoint('/core/users', 'viewers::findOne', async (userId, cb) => {
       try {
         const viewer = await changelog.get(userId);
         const tips =  await getRepository(UserTip).find({ where: { userId } });
