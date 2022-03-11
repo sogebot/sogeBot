@@ -18,7 +18,12 @@ export const customAuthChecker: AuthChecker<any> = (
   // that comes from the `@Authorized` decorator, eg. ["ADMIN", "MODERATOR"]
 
   try {
-    jwt.verify(context.headers.authorization.replace('Bearer ', ''), socket.JWTKey) as {
+    const token = context.headers.authorization.replace('Bearer ', '');
+    if (socket.socketToken === token) {
+      return true;
+    }
+
+    jwt.verify(token, socket.JWTKey) as {
       userId: string; username: string; privileges: Unpacked<ReturnType<typeof getPrivileges>>;
     };
     return true; // or false if access is denied
