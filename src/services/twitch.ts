@@ -21,6 +21,7 @@ import Chat from './twitch/chat';
 import EventSub from './twitch/eventsub';
 import { eventErrorShown } from './twitch/eventsub';
 import PubSub from './twitch/pubsub';
+import { cleanErrors } from './twitch/token/refresh';
 import { cache, validate } from './twitch/token/validate';
 
 import {
@@ -213,6 +214,15 @@ class Twitch extends Service {
     }
   }
 
+  @onChange('botRefreshToken')
+  onChangeBotRefreshToken() {
+    cleanErrors('bot');
+  }
+  @onChange('broadcasterRefreshToken')
+  onChangeBroadcasterRefreshToken() {
+    cleanErrors('broadcaster');
+  }
+
   @onChange('botAccessToken')
   @onChange('broadcasterAccessToken')
   @onLoad('broadcasterAccessToken')
@@ -229,7 +239,7 @@ class Twitch extends Service {
           tmiEmitter.emit('part', 'broadcaster');
         } else {
           setTimeout(() => {
-            validate('broadcaster', 0, true);
+            validate('broadcaster', 0);
           }, 5000);
         }
         break;
@@ -240,7 +250,7 @@ class Twitch extends Service {
           tmiEmitter.emit('part', 'bot');
         } else {
           setTimeout(() => {
-            validate('bot', 0, true);
+            validate('bot', 0);
           }, 5000);
         }
         break;

@@ -1,4 +1,3 @@
-import * as constants from '@sogebot/ui-helpers/constants';
 import axios from 'axios';
 import fetch from 'node-fetch';
 
@@ -18,10 +17,9 @@ const errorCount = {
   'bot':         0,
   'broadcaster': 0,
 };
-const lastRefresh = {
-  'bot':         0,
-  'broadcaster': 0,
-};
+export function cleanErrors(type: keyof typeof errorCount) {
+  errorCount[type] = 0;
+}
 
 const urls = {
   'SogeBot Token Generator': 'https://twitch-token-generator.soge.workers.dev/refresh/',
@@ -38,15 +36,9 @@ const urls = {
         "scope": "viewing_activity_read"
       }
     */
-export const refresh = async (type: 'bot' | 'broadcaster', clear = false): Promise<string | null> => {
-
+export const refresh = async (type: 'bot' | 'broadcaster'): Promise<string | null> => {
   if (isDebugEnabled('oauth.refresh')) {
     debug('oauth.refresh', `Refresh stacktrace: ${new Error().stack}`);
-  }
-
-  if (clear) {
-    errorCount[type] = 0;
-    lastRefresh[type] = 0;
   }
   const channel = variables.get('services.twitch.broadcasterUsername') as string;
   const tokenService = variables.get('services.twitch.tokenService') as keyof typeof urls;
@@ -75,23 +67,12 @@ export const refresh = async (type: 'bot' | 'broadcaster', clear = false): Promi
     return null;
   }
 
-  if (Date.now() < lastRefresh[type] + constants.MINUTE * 5) {
-    addUIError({
-      name:    'Token Error!',
-      message: `You can refresh token for ${type} once per 5 minutes.`,
-    });
-    warning(`You can refresh token for ${type} once per 5 minutes.`);
-    return null;
-  } else {
-    lastRefresh[type] = Date.now();
-  }
-
   debug('oauth.validate', 'Refreshing access token of ' + type);
   const url = urls[tokenService];
   try {
-    if ((type === 'bot' ? botRefreshToken : broadcasterRefreshToken) === '') {
+    /* if ((type === 'bot' ? botRefreshToken : broadcasterRefreshToken) === '') {
       throw new Error('no refresh token for ' + type);
-    }
+    }*/
 
     if (!url) {
       // custom app is selected
@@ -159,14 +140,19 @@ export const refresh = async (type: 'bot' | 'broadcaster', clear = false): Promi
       debug('oauth.validate', 'New access token of ' + type + ': ' + request.data.token.replace(/(.{25})/, '*'.repeat(25)));
       debug('oauth.validate', 'New refresh token of ' + type + ': ' + request.data.refresh.replace(/(.{45})/, '*'.repeat(45)));
 
+      errorCount[type] = 0;
       return request.data.token;
     }
   } catch (e) {
     errorCount[type]++;
     if (e instanceof Error) {
+      if ((e as any).isAxiosError && (e as any).response.data.message === 'Invalid refresh token received') {
+        error(`Invalid refresh token used for ${type}.`);
+        errorCount[type] = 1000;
+        return null;
+      }
       if (e.message.includes('ETIMEDOUT') || e.message.includes('EHOSTUNREACH')) {
         warning(`Refresh operation for ${type} access token failed. Caused by ETIMEDOUT or EHOSTUNREACH, retrying in 10 seconds.`);
-        lastRefresh[type] = 0; // reset last refresh so we are able to actually refresh token several times
         await new Promise(resolve => setTimeout(resolve, 10000));
         return refresh(type);
       }

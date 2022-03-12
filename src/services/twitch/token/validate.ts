@@ -64,7 +64,7 @@ const waitUntilValidationDone = async (type: 'bot' | 'broadcaster') => {
       "user_id": "<authorized user ID>"
     }
   */
-export const validate = async (type: 'bot' | 'broadcaster', retry = 0, clear = false): Promise < boolean > => {
+export const validate = async (type: 'bot' | 'broadcaster', retry = 0): Promise < boolean > => {
   try {
     debug('oauth.validate', `Validation: ${type} - ${retry} retries`);
 
@@ -84,7 +84,7 @@ export const validate = async (type: 'bot' | 'broadcaster', retry = 0, clear = f
       return true;
     } else {
       debug('oauth.validate', `Refreshing token for ${type}`);
-      token = await refresh(type, true);
+      token = await refresh(type);
     }
 
     if ((global as any).mocha) {
@@ -196,7 +196,7 @@ export const validate = async (type: 'bot' | 'broadcaster', retry = 0, clear = f
       const broadcasterRefreshToken = variables.get('services.twitch.broadcasterRefreshToken') as string;
 
       if ((type === 'bot' ? botRefreshToken : broadcasterRefreshToken) !== '') {
-        refresh(type, clear);
+        refresh(type);
       } else {
         if (type === 'bot') {
           emitter.emit('set', '/services/twitch', 'botTokenValid', false);
