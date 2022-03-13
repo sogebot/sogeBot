@@ -94,7 +94,12 @@ export const validate = async (type: 'bot' | 'broadcaster', retry = 0): Promise 
     const url = 'https://id.twitch.tv/oauth2/validate';
 
     debug('oauth.validate', `Checking ${type} - retry no. ${retry}`);
-    const request = await axios.get < any > (url, {
+    const request = await axios.get<{
+      expires_in: number,
+      user_id: string,
+      login: string,
+      scopes: string[]
+    }>(url, {
       headers: {
         Authorization: 'OAuth ' + token,
       },
@@ -119,10 +124,10 @@ export const validate = async (type: 'bot' | 'broadcaster', retry = 0): Promise 
       throw new Error(`No valid data from Twitch for ${type}.\n${JSON.stringify(request.data, null, 2)}`);
     }
 
+    emitter.emit('set', '/services/twitch', `${type}Id`, request.data.user_id);
+    emitter.emit('set', '/services/twitch', `${type}Username`, request.data.login);
+    emitter.emit('set', '/services/twitch', `${type}CurrentScopes`, request.data.scopes);
     if (type === 'bot') {
-      emitter.emit('set', '/services/twitch', 'botId', request.data.user_id);
-      emitter.emit('set', '/services/twitch', 'botUsername', request.data.login);
-      emitter.emit('set', '/services/twitch', 'botCurrentScopes', request.data.scopes);
       botTokenErrorSent = false;
 
       setTimeout(async () => {
@@ -136,9 +141,6 @@ export const validate = async (type: 'bot' | 'broadcaster', retry = 0): Promise 
         }
       }, constants.MINUTE);
     } else {
-      emitter.emit('set', '/services/twitch', 'broadcasterId', request.data.user_id);
-      emitter.emit('set', '/services/twitch', 'broadcasterUsername', request.data.login);
-      emitter.emit('set', '/services/twitch', 'broadcasterCurrentScopes', request.data.scopes);
       broadcasterTokenErrorSent = false;
     }
 
@@ -153,7 +155,7 @@ export const validate = async (type: 'bot' | 'broadcaster', retry = 0): Promise 
   } catch (e: any) {
     expirationDate[type] = -1;
 
-    if (e.isAxiosError) {
+    if (axios.isAxiosError(e)) {
       if ((typeof e.response === 'undefined' || (e.response.status !== 401 && e.response.status !== 403)) && retry < 5) {
         // retry validation if error is different than 401 Invalid Access Token
         await new Promise < void > ((resolve) => {
@@ -164,7 +166,10 @@ export const validate = async (type: 'bot' | 'broadcaster', retry = 0): Promise 
       if (await refresh(type)) {
         return true;
       }
-      throw new Error(`Error on validate ${type} OAuth token, error: ${e.response.status} - ${e.response.statusText} - ${e.response.data.message}`);
+
+      if (e.response) {
+        throw new Error(`Error on validate ${type} OAuth token, error: ${e.response.status} - ${e.response.statusText} - ${e.response.data.message}`);
+      }
     } else {
       debug('oauth.validate', e.stack);
       if (e.message.includes('No valid data from Twitch')) {
@@ -192,23 +197,16 @@ export const validate = async (type: 'bot' | 'broadcaster', retry = 0): Promise 
         error(e);
         error(e.stack);
       }
-      const botRefreshToken = variables.get('services.twitch.botRefreshToken') as string;
-      const broadcasterRefreshToken = variables.get('services.twitch.broadcasterRefreshToken') as string;
 
-      if ((type === 'bot' ? botRefreshToken : broadcasterRefreshToken) !== '') {
+      const refreshToken = variables.get(`services.twitch.${type}RefreshToken`) as string;
+
+      if (refreshToken !== '') {
         refresh(type);
       } else {
-        if (type === 'bot') {
-          emitter.emit('set', '/services/twitch', 'botTokenValid', false);
-          emitter.emit('set', '/services/twitch', 'botId', '');
-          emitter.emit('set', '/services/twitch', 'botUsername', '');
-          emitter.emit('set', '/services/twitch', 'botCurrentScopes', []);
-        } else {
-          emitter.emit('set', '/services/twitch', 'broadcasterTokenValid', false);
-          emitter.emit('set', '/services/twitch', 'broadcasterId', '');
-          emitter.emit('set', '/services/twitch', 'broadcasterUsername', '');
-          emitter.emit('set', '/services/twitch', 'broadcasterCurrentScopes', []);
-        }
+        emitter.emit('set', '/services/twitch', `${type}TokenValid`, false);
+        emitter.emit('set', '/services/twitch', `${type}Id`, '');
+        emitter.emit('set', '/services/twitch', `${type}Username`, '');
+        emitter.emit('set', '/services/twitch', `${type}CurrentScopes`, []);
       }
     }
     throw new Error(e);
