@@ -69,7 +69,7 @@ export const refresh = async (type: 'bot' | 'broadcaster'): Promise<string | nul
 
     if (!url) {
       // custom app is selected
-      const response = await fetch(`https://id.twitch.tv/oauth2/token?client_id=${tokenServiceCustomClientId}&client_secret=${tokenServiceCustomClientSecret}&refresh_token=${type}RefreshToken&grant_type=refresh_token`, {
+      const response = await fetch(`https://id.twitch.tv/oauth2/token?client_id=${tokenServiceCustomClientId}&client_secret=${tokenServiceCustomClientSecret}&refresh_token=${refreshToken}&grant_type=refresh_token`, {
         method: 'POST',
       });
       if (response.ok) {
