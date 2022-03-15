@@ -6,6 +6,7 @@
   "invalid-or-expired-token": "$sender, ugyldig eller udløbet token.",
   "help-message": "$sender, for at forbinde din konto på Discord: 1. Gå til Discord serveren og send $command i bot-kanalen. | 2. Vent på PM fra bot | 3. Send kommando fra din Discord PM her i twitch chatten.",
   "started-at": "Startede den",
+  "announced-by": "Announced by",
   "streamed-at": "Streamed Den",
   "link-whisper": "Hej $tag, for at forbinde denne Discord konto med din Twitch konto på $broadcaster kanal, gå til <https://twitch.tv/$broadcaster>, log ind på din konto og send denne kommando i chatten \n\n\t\t- `$command $id`\n\nBEMÆRK: Denne udløber om 10 minutter.",
   "check-your-dm": "tjek dine DMs for vejledning til at linke din konto."

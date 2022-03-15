@@ -6,6 +6,7 @@
   "invalid-or-expired-token": "$sender, jeton invalide ou expiré.",
   "help-message": "$sender, pour lier votre compte sur Discord: 1. Allez sur le serveur discord et envoyez $command dans le salon bot. | 2. Attendez le MP du bot | 3. Envoyez la commande que vous avez reçue dans vos MPs ici dans le chat twitch.",
   "started-at": "Démarré à",
+  "announced-by": "Announced by",
   "streamed-at": "Diffusé à",
   "link-whisper": "Bonjour $tag, pour lier ce compte Discord à votre compte Twitch sur la chaîne de $broadcaster , allez sur <https://twitch.tv/$broadcaster>, connectez-vous à votre compte et envoyez cette commande dans le chat \n\n\t\t`$command $id`\n\nNOTE: Ceci expire dans 10 minutes.",
   "check-your-dm": "vérifiez vos DMs pour les étapes à suivre afin de lier votre compte."

@@ -6,6 +6,7 @@
   "invalid-or-expired-token": "$sender, token non valido o scaduto.",
   "help-message": "$sender, per collegare il tuo account su Discord: 1. Vai sul server Discord e invia $command nel canale del bot. | 2. Aspetta il messaggio privato dal bot | 3. Invia il comando dal vostro Discord PM qui in chat twitch.",
   "started-at": "Iniziato alle",
+  "announced-by": "Announced by",
   "streamed-at": "Streammato alle",
   "link-whisper": "Ciao $tag, per collegare questo account Discord al tuo account Twitch sul canale $broadcaster , vai su <https://twitch.tv/$broadcaster> , accedi al tuo account e invia questo comando in chat \n\n\t\t `$command $id`\n\nNOTA: Questo comando scadrà tra 10 minuti.",
   "check-your-dm": "verifica i tuoi messaggi privati per continuare la procedura per collegare il tuo account."
