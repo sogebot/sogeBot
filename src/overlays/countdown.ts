@@ -77,13 +77,13 @@ class Countdown extends Overlay {
             });
           }
         }
-
-        statusUpdate.set(data.id, {
-          isEnabled: data.isEnabled,
-          time:      data.time,
-          timestamp: Date.now(),
-        });
       }
+
+      statusUpdate.set(data.id, {
+        isEnabled: data.isEnabled,
+        time:      data.time,
+        timestamp: Date.now(),
+      });
     });
   }
 }
