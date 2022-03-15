@@ -381,7 +381,7 @@ class Discord extends Integration {
           .setDescription(`${broadcasterUsername.charAt(0).toUpperCase() + broadcasterUsername.slice(1)} started stream! Check it out!`)
           .setImage(`https://static-cdn.jtvnw.net/previews-ttv/live_user_${broadcasterUsername}-1920x1080.jpg?${Date.now()}`)
           .setThumbnail(profileImageUrl)
-          .setFooter('Announced by sogeBot - https://www.sogebot.xyz');
+          .setFooter(prepare('integrations.discord.announced-by') + ' - https://www.sogebot.xyz');
 
         const broadcasterType = variables.get('services.twitch.broadcasterType') as string;
         if (broadcasterType !== '') {
