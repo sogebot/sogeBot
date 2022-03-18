@@ -1,5 +1,5 @@
 import type { AlertInterface } from '@entity/alert';
-import type { CommandsBoardInterface, CommandsInterface } from '@entity/commands';
+import type { CommandsBoardInterface, CommandsCountInterface, CommandsInterface } from '@entity/commands';
 import type { CooldownInterface } from '@entity/cooldown';
 import type { EventInterface } from '@entity/event';
 import type { GoalGroupInterface } from '@entity/goal';
@@ -27,6 +27,7 @@ import { Socket } from 'socket.io';
 
 import type PUBG from '../integrations/pubg';
 
+import { BetsInterface } from '~/database/entity/bets';
 import { ChecklistInterface } from '~/database/entity/checklist';
 import { HighlightInterface } from '~/database/entity/highlight';
 import { PollInterface } from '~/database/entity/poll';
@@ -45,6 +46,25 @@ type generic<T> = {
 };
 
 export type ClientToServerEventsWithNamespace = {
+  '/': GenericEvents & {
+    'getLatestStats': (cb: (error: Error | string | null, stats: Record<string, any>) => void) => void,
+  },
+  '/stats/commandcount': GenericEvents & {
+    'commands::count': (cb: (error: Error | string | null, items: CommandsCountInterface[]) => void) => void,
+  },
+  '/stats/profiler': GenericEvents & {
+    'profiler::load': (cb: (error: Error | string | null, items: [string, number[]][]) => void) => void,
+  },
+  '/stats/bits': GenericEvents & {
+    'generic::getAll': generic<UserBitInterface>['getAll'],
+  },
+  '/stats/tips': GenericEvents & {
+    'generic::getAll': generic<UserTipInterface>['getAll'],
+  },
+  '/systems/bets': GenericEvents & {
+    'bets::getCurrentBet': (cb: (error: Error | string | null, item?: BetsInterface) => void) => void,
+    'bets::close': (option: 'refund' | string) => void,
+  },
   '/systems/commercial': GenericEvents & {
     'commercial.run': (data: { seconds: string }) => void,
   },

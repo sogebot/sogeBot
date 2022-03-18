@@ -11,7 +11,7 @@ class Profiler extends Stats {
     });
   }
   public sockets() {
-    adminEndpoint(this.nsp, 'profiler::load', async (cb) => {
+    adminEndpoint('/stats/profiler', 'profiler::load', async (cb) => {
       cb(null, Array.from(avgTime.entries()));
     });
   }
