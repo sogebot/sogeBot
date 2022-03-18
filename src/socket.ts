@@ -232,7 +232,7 @@ class Socket extends Core {
   }
 
   sockets () {
-    adminEndpoint(this.nsp, 'purgeAllConnections', (cb, socket) => {
+    adminEndpoint('/core/socket', 'purgeAllConnections', (cb, socket) => {
       this.JWTKey = uuid();
       ioServer?.emit('forceDisconnect');
       initEndpoints(socket, {

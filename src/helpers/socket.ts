@@ -46,6 +46,9 @@ type generic<T> = {
 };
 
 export type ClientToServerEventsWithNamespace = {
+  '/core/socket': GenericEvents & {
+    'purgeAllConnections': (cb: (error: Error | string | null) => void, socket: Socket) => void,
+  },
   '/': GenericEvents & {
     'getLatestStats': (cb: (error: Error | string | null, stats: Record<string, any>) => void) => void,
   },
