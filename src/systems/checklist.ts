@@ -13,7 +13,7 @@ class Checklist extends System {
     itemsArray: any[] = [];
 
   sockets() {
-    adminEndpoint(this.nsp, 'generic::getAll', async (cb) => {
+    adminEndpoint('/systems/checklist', 'generic::getAll', async (cb) => {
       try {
         const checkedItems = await getRepository(ChecklistEntity).find();
         cb(null, this.itemsArray, checkedItems);
@@ -21,7 +21,7 @@ class Checklist extends System {
         cb(e.stack, [], []);
       }
     });
-    adminEndpoint(this.nsp, 'checklist::save', async (checklistItem, cb) => {
+    adminEndpoint('/systems/checklist', 'checklist::save', async (checklistItem, cb) => {
       await getRepository(ChecklistEntity).save(checklistItem);
       if (cb) {
         cb(null);

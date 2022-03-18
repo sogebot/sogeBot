@@ -1,5 +1,5 @@
 import type { AlertInterface } from '@entity/alert';
-import type { CommandsBoardInterface } from '@entity/commands';
+import type { CommandsBoardInterface, CommandsInterface } from '@entity/commands';
 import type { CooldownInterface } from '@entity/cooldown';
 import type { EventInterface } from '@entity/event';
 import type { GoalGroupInterface } from '@entity/goal';
@@ -20,10 +20,16 @@ import type {
   UserBitInterface, UserInterface, UserTipInterface,
 } from '@entity/user';
 import type { VariableInterface, VariableWatchInterface } from '@entity/variable';
+import { HelixVideo } from '@twurple/api/lib';
+import { HowLongToBeatEntry } from 'howlongtobeat';
 import type ObsWebSocket from 'obs-websocket-js';
 import { Socket } from 'socket.io';
 
 import type PUBG from '../integrations/pubg';
+
+import { ChecklistInterface } from '~/database/entity/checklist';
+import { HighlightInterface } from '~/database/entity/highlight';
+import { PollInterface } from '~/database/entity/poll';
 
 interface GenericEvents {
   'settings': (cb: (error: Error | string | null, settings: Record<string, any> | null, ui: Record<string, any> | null) => Promise<void>) => void,
@@ -39,6 +45,56 @@ type generic<T> = {
 };
 
 export type ClientToServerEventsWithNamespace = {
+  '/systems/commercial': GenericEvents & {
+    'commercial.run': (data: { seconds: string }) => void,
+  },
+  '/systems/highlights': GenericEvents & {
+    'highlight': () => void,
+    'generic::getAll': (cb: (error: Error | string | null, highlights?: Readonly<Required<HighlightInterface>>[], videos?: HelixVideo[]) => Promise<void>) => void,
+    'generic::deleteById': generic<HighlightInterface>['deleteById'],
+  },
+  '/systems/howlongtobeat': GenericEvents & {
+    'generic::getAll': (cb: (error: Error | string | null, item: Readonly<Required<HowLongToBeatGameInterface>>[], gameItem: Readonly<Required<HowLongToBeatGameItemInterface>>[]) => Promise<void>) => void,
+    'hltb::save': (item: HowLongToBeatGameInterface, cb: (error: Error | string | null, item?: HowLongToBeatGameInterface) => Promise<void>) => void,
+    'hltb::addNewGame': (game: string, cb: (error: Error | string | null) => Promise<void>) => void,
+    'hltb::getGamesFromHLTB': (game: string, cb: (error: Error | string | null, games: HowLongToBeatEntry[]) => Promise<void>) => void,
+    'hltb::saveStreamChange': (stream: HowLongToBeatGameItemInterface, cb: (error: Error | string | null, stream?: HowLongToBeatGameItemInterface) => Promise<void>) => void,
+    'generic::deleteById': generic<HowLongToBeatGameInterface>['deleteById'],
+  },
+  '/systems/checklist': GenericEvents & {
+    'generic::getAll': (cb: (error: Error | string | null, array: any[], items: Readonly<Required<ChecklistInterface>>[]) => Promise<void>) => void,
+    'checklist::save': (item: ChecklistInterface, cb: (error: Error | string | null) => Promise<void>) => void,
+  },
+  '/systems/cooldown': GenericEvents & {
+    'generic::getAll': generic<CooldownInterface>['getAll'],
+    'generic::getOne': (id: string, cb: (error: Error | string | null, item?: Readonly<Required<CooldownInterface>> | null, count?: number) => Promise<void>) => void,
+    'generic::deleteById': generic<CooldownInterface>['deleteById'],
+    'cooldown::save': (item: CooldownInterface, cb: (error: Error | string | null, item?: CooldownInterface) => Promise<void>) => void,
+  },
+  '/systems/customcommands': GenericEvents & {
+    'commands::resetCountByCommand': (command: string, cb: (error: Error | string | null) => void) => void,
+    'generic::getAll': (cb: (error: Error | string | null, items: Readonly<Required<CommandsInterface>>[], count: { command: string; count: number; }[] | null) => Promise<void>) => void,
+    'generic::getOne': (id: string, cb: (error: Error | string | null, item?: Readonly<Required<CommandsInterface>> | null, count?: number) => Promise<void>) => void,
+    'generic::deleteById': generic<CommandsInterface>['deleteById'],
+    'generic::setById': generic<CommandsInterface>['setById'],
+  },
+  '/systems/keywords': GenericEvents & {
+    'generic::getAll': generic<KeywordInterface>['getAll'],
+    'generic::getOne': generic<KeywordInterface>['getOne'],
+    'generic::deleteById': generic<KeywordInterface>['deleteById'],
+    'generic::setById': generic<KeywordInterface>['setById'],
+  },
+  '/systems/levels': GenericEvents & {
+    'getLevelsExample': (cb: (error: Error | string | null, levels: string[]) => Promise<void>) => void,
+  },
+  '/systems/moderation': GenericEvents & {
+    'lists.get': (cb: (error: Error | string | null, lists: { blacklist: string[], whitelist: string[] }) => Promise<void>) => void,
+    'lists.set': (lists: { blacklist: string[], whitelist: string[] }) => void,
+  },
+  '/systems/points': GenericEvents & {
+    'parseCron': (cron: string, cb: (error: Error | string | null, intervals: number[]) => Promise<void>) => void,
+    'reset': () => void,
+  },
   '/systems/queue': GenericEvents & {
     'queue::getAllPicked': (cb: (error: Error | string | null, items: QueueInterface[]) => Promise<void>) => void,
     'queue::pick': (data: { username: string | string[], random: boolean, count: number; }, cb: (error: Error | string | null, items?: QueueInterface[]) => Promise<void>) => void,
@@ -57,6 +113,19 @@ export type ClientToServerEventsWithNamespace = {
     'raffle::pick': () => void,
     'raffle::close': () => void,
     'raffle::open': (message: string) => void,
+  },
+  '/systems/polls': GenericEvents & {
+    'generic::getAll': generic<PollInterface>['getAll'],
+    'generic::getOne': generic<PollInterface>['getOne'],
+    'generic::deleteById': generic<PollInterface>['deleteById'],
+    'polls::save': (item: PollInterface, cb: (error: Error | string | null) => Promise<void>) => void,
+    'polls::close': (item: PollInterface, cb: (error: Error | string | null) => Promise<void>) => void,
+  },
+  '/systems/price': GenericEvents & {
+    'generic::getAll': generic<PriceInterface>['getAll'],
+    'generic::getOne': generic<PriceInterface>['getOne'],
+    'generic::deleteById': generic<PriceInterface>['deleteById'],
+    'price::save': (item: PriceInterface, cb: (error: Error | string | null) => Promise<void>) => void,
   },
   '/systems/ranks': GenericEvents & {
     'generic::getAll': generic<RankInterface>['getAll'],

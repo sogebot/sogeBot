@@ -56,11 +56,11 @@ class CustomCommands extends System {
   }
 
   sockets () {
-    adminEndpoint(this.nsp, 'commands::resetCountByCommand', async (cmd: string, cb) => {
+    adminEndpoint('/systems/customcommands', 'commands::resetCountByCommand', async (cmd: string, cb) => {
       await resetCountOfCommandUsage(cmd);
       cb(null);
     });
-    adminEndpoint(this.nsp, 'generic::setById', async (opts, cb) => {
+    adminEndpoint('/systems/customcommands', 'generic::setById', async (opts, cb) => {
       try {
         const item = await getRepository(Commands).findOne({ id: String(opts.id) });
         await getRepository(Commands).save({ ...item, ...opts.item });
@@ -74,14 +74,14 @@ class CustomCommands extends System {
         }
       }
     });
-    adminEndpoint(this.nsp, 'generic::deleteById', async (id, cb) => {
+    adminEndpoint('/systems/customcommands', 'generic::deleteById', async (id, cb) => {
       await getRepository(Commands).delete({ id: String(id) });
       this.invalidateCache();
       if (cb) {
         cb(null);
       }
     });
-    adminEndpoint(this.nsp, 'generic::getAll', async (cb) => {
+    adminEndpoint('/systems/customcommands', 'generic::getAll', async (cb) => {
       try {
         const commands = await getRepository(Commands).find({
           relations: ['responses'],
@@ -93,7 +93,7 @@ class CustomCommands extends System {
         cb(e.stack, [], null);
       }
     });
-    adminEndpoint(this.nsp, 'generic::getOne', async (id, cb) => {
+    adminEndpoint('/systems/customcommands', 'generic::getOne', async (id, cb) => {
       try {
         const cmd = await getRepository(Commands).findOne({
           where:     { id },

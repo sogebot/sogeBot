@@ -236,7 +236,7 @@ class Points extends System {
   }
 
   sockets () {
-    adminEndpoint(this.nsp, 'parseCron', (cron, cb) => {
+    adminEndpoint('/systems/points', 'parseCron', (cron, cb) => {
       try {
         const interval = cronparser.parseExpression(cron);
         // get 5 dates
@@ -250,7 +250,7 @@ class Points extends System {
       }
     });
 
-    adminEndpoint(this.nsp, 'reset', async () => {
+    adminEndpoint('/systems/points', 'reset', async () => {
       changelog.flush().then(() => {
         getRepository(PointsChangelog).clear();
         getRepository(User).update({}, { points: 0 });

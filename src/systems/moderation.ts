@@ -159,13 +159,13 @@ class Moderation extends System {
     cWarningsShouldClearChat = true;
 
   sockets () {
-    adminEndpoint(this.nsp, 'lists.get', async (cb) => {
+    adminEndpoint('/systems/moderation', 'lists.get', async (cb) => {
       cb(null, {
         blacklist: this.cListsBlacklist,
         whitelist: this.cListsWhitelist,
       });
     });
-    adminEndpoint(this.nsp, 'lists.set', (data) => {
+    adminEndpoint('/systems/moderation', 'lists.set', (data) => {
       this.cListsBlacklist = data.blacklist.filter(entry => entry.trim() !== '');
       this.cListsWhitelist = data.whitelist.filter(entry => entry.trim() !== '');
     });

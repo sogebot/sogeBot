@@ -53,21 +53,21 @@ class HowLongToBeat extends System {
   }
 
   sockets() {
-    adminEndpoint(this.nsp, 'generic::getAll', async (cb) => {
+    adminEndpoint('/systems/howlongtobeat', 'generic::getAll', async (cb) => {
       try {
         cb(null, await getRepository(HowLongToBeatGame).find(), await getRepository(HowLongToBeatGameItem).find());
       } catch (e: any) {
-        cb(e.stack, []);
+        cb(e.stack, [], []);
       }
     });
-    adminEndpoint(this.nsp, 'hltb::save', async (item, cb) => {
+    adminEndpoint('/systems/howlongtobeat', 'hltb::save', async (item, cb) => {
       try {
         cb(null, await getRepository(HowLongToBeatGame).save(item));
       } catch (e: any) {
         cb(e.stack);
       }
     });
-    adminEndpoint(this.nsp, 'hltb::addNewGame', async (game, cb) => {
+    adminEndpoint('/systems/howlongtobeat', 'hltb::addNewGame', async (game, cb) => {
       try {
         const gameFromHltb = (await this.hltbService.search(game))[0];
         if (gameFromHltb) {
@@ -87,7 +87,7 @@ class HowLongToBeat extends System {
         cb(e.stack);
       }
     });
-    adminEndpoint(this.nsp, 'hltb::getGamesFromHLTB', async (game, cb) => {
+    adminEndpoint('/systems/howlongtobeat', 'hltb::getGamesFromHLTB', async (game, cb) => {
       try {
         const search = await this.hltbService.search(game);
         const games = await getRepository(HowLongToBeatGame).find();
@@ -101,14 +101,14 @@ class HowLongToBeat extends System {
         cb(e.stack, []);
       }
     });
-    adminEndpoint(this.nsp, 'generic::deleteById', async (id, cb) => {
+    adminEndpoint('/systems/howlongtobeat', 'generic::deleteById', async (id, cb) => {
       await getRepository(HowLongToBeatGame).delete({ id: String(id) });
       await getRepository(HowLongToBeatGameItem).delete({ hltb_id: String(id) });
       if (cb) {
         cb(null);
       }
     });
-    adminEndpoint(this.nsp, 'hltb::saveStreamChange', async (stream, cb) => {
+    adminEndpoint('/systems/howlongtobeat', 'hltb::saveStreamChange', async (stream, cb) => {
       try {
         cb(null, await getRepository(HowLongToBeatGameItem).save(stream));
       } catch (e: any) {
