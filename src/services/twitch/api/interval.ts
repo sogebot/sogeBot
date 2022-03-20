@@ -8,7 +8,6 @@ import { logAvgTime } from '~/helpers/profiler';
 import { setImmediateAwait } from '~/helpers/setImmediateAwait';
 import { checkClips } from '~/services/twitch/calls/checkClips';
 import { getAllStreamTags } from '~/services/twitch/calls/getAllStreamTags';
-import { getBannedEvents } from '~/services/twitch/calls/getBannedEvents';
 import { getChannelChattersUnofficialAPI } from '~/services/twitch/calls/getChannelChattersUnofficialAPI';
 import { getChannelInformation } from '~/services/twitch/calls/getChannelInformation';
 import { getChannelSubscribers } from '~/services/twitch/calls/getChannelSubscribers';
@@ -43,7 +42,6 @@ const functions = {
   checkClips:                           checkClips,
   getAllStreamTags:                     getAllStreamTags,
   getModerators:                        getModerators,
-  getBannedEvents:                      getBannedEvents,
 } as const;
 
 export const init = () => {
@@ -57,7 +55,6 @@ export const init = () => {
   addInterval('checkClips', constants.MINUTE);
   addInterval('getAllStreamTags', constants.DAY);
   addInterval('getModerators', 10 * constants.MINUTE);
-  addInterval('getBannedEvents', 10 * constants.MINUTE);
 };
 
 export const stop = () => {
