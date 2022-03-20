@@ -12,9 +12,6 @@ class Bits extends Stats {
     this.addMenu({
       category: 'stats', name: 'bits', id: 'stats/bits', this: null,
     });
-    this.addMenu({
-      category: 'stats', name: 'bannedevents', id: 'stats/bannedevents', this: null,
-    });
   }
 
   sockets() {
