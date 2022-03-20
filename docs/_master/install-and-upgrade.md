@@ -136,13 +136,3 @@
 
 This will also keep your Bot updated (check on every start)
 for issues or problems please open a [issue](https://github.com/liadala/sogeToGo/issues) at this repository
-
-## Oauth generation
-
-Generate your oauth tokens in `ui->settings->general->oauth` and paste your
-`accessToken` and `refreshToken` from [Twitch Token Generator](https://twitchtokengenerator.com)
-to your bot.
-
-!> Make sure you login into correct accounts. Anonymous/Privacy modes can help
-   you with login into correct accounts (Right click on generate button -> Open
-  link in incognito window)
