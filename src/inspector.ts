@@ -1,25 +1,26 @@
 import fs from 'fs';
-import inspector from 'inspector';
+import { Session } from 'inspector';
 import { gzip } from 'zlib';
 
 import { MINUTE, SECOND } from '@sogebot/ui-helpers/constants';
 
 import {
-  error, getDEBUG, isDebugEnabled, setDEBUG, warning,
+  error, getDEBUG, setDEBUG, warning,
 } from '~/helpers/log';
 
 let isProfilerRunning = false;
 
 // to enable profiler, set debug profiler.<minutes>
-setInterval(() => {
+setInterval(async () => {
   const debug = getDEBUG();
   const match = debug.match(/profiler\.?(\d+)?/);
   const minutes = Number(match ?  match[1] : 30);
   const fullMatch = match ?  match[0] : '';
+  const isProfilerEnabled = fullMatch.length > 0;
 
-  if (isDebugEnabled('profiler') && !isProfilerRunning) {
+  if (isProfilerEnabled && !isProfilerRunning) {
     isProfilerRunning = true;
-    const session = new inspector.Session();
+    const session = new Session();
 
     session.connect();
     session.post('Profiler.enable', () => {
