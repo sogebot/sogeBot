@@ -46,6 +46,16 @@ type generic<T> = {
 };
 
 export type ClientToServerEventsWithNamespace = {
+  '/registries/text': GenericEvents & {
+    'text::save': (item: Readonly<Required<TextInterface>>, cb: (error: Error | string | null, item: TextInterface | null) => void) => void,
+    'text::remove': (item: Readonly<Required<TextInterface>>, cb: (error: Error | string | null) => void) => void,
+    'text::presets': (_: unknown, cb: (error: Error | string | null, folders: string[] | null) => void) => void,
+    'generic::getAll': generic<TextInterface>['getAll'],
+  },
+  '/services/twitch': GenericEvents & {
+    'eventsub::reset': () => void,
+    'broadcaster': (cb: (error: Error | string | null, username: string) => void) => void,
+  },
   '/core/socket': GenericEvents & {
     'purgeAllConnections': (cb: (error: Error | string | null) => void, socket: Socket) => void,
   },
