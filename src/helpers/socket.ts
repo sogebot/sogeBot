@@ -46,6 +46,15 @@ type generic<T> = {
 };
 
 export type ClientToServerEventsWithNamespace = {
+  '/registries/alerts': GenericEvents & {
+    'isAlertUpdated': (data: { updatedAt: number; id: string }, cb: (err: Error | null, isUpdated: boolean, updatedAt: number) => void) => void,
+    'alerts::save': (item: Required<AlertInterface>, cb: (error: Error | string | null, item: null | Required<AlertInterface>) => void) => void,
+    'alerts::delete': (item: Required<AlertInterface>, cb: (error: Error | string | null) => void) => void,
+  },
+  '/registries/randomizer': GenericEvents & {
+    'randomizer::startSpin': () => void,
+    'randomizer::showById': (id: string, cb: (error: Error | string | null) => void) => void,
+  },
   '/core/permissions': GenericEvents & {
     'generic::deleteById': generic<PermissionsInterface>['deleteById'],
     'permission::save': (data: Required<PermissionsInterface>[], cb?: (error: Error | string | null) => void) => void,
@@ -65,6 +74,10 @@ export type ClientToServerEventsWithNamespace = {
     'purgeAllConnections': (cb: (error: Error | string | null) => void, socket: Socket) => void,
   },
   '/': GenericEvents & {
+    'panel::resetStatsState': () => void,
+    'debug::get': (cb: (error: Error | string | null, debug: string) => void) => void,
+    'debug::set': (debug: string, cb: (error: Error | string | null) => void) => void,
+    'panel::alerts': (cb: (error: Error | string | null, data: { errors: import('./panel/alerts').UIError[], warns: import('./panel/alerts').UIError[] }) => void) => void,
     'getLatestStats': (cb: (error: Error | string | null, stats: Record<string, any>) => void) => void,
   },
   '/stats/commandcount': GenericEvents & {

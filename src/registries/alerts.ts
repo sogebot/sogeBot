@@ -82,7 +82,7 @@ class Alerts extends Registry {
   }
 
   sockets () {
-    publicEndpoint(this.nsp, 'speak', async (opts, cb) => {
+    publicEndpoint('/registries/alerts', 'speak', async (opts, cb) => {
       if (secureKeys.has(opts.key)) {
         secureKeys.delete(opts.key);
 
@@ -104,7 +104,7 @@ class Alerts extends Registry {
         cb(new Error('Invalid auth.'));
       }
     });
-    publicEndpoint(this.nsp, 'isAlertUpdated', async ({ updatedAt, id }: { updatedAt: number; id: string }, cb: (err: Error | null, isUpdated: boolean, updatedAt: number) => void) => {
+    publicEndpoint('/registries/alerts', 'isAlertUpdated', async ({ updatedAt, id }, cb) => {
       try {
         const alert = await getRepository(Alert).findOne({ id });
         if (alert) {
@@ -116,7 +116,7 @@ class Alerts extends Registry {
         cb(e.stack, false, 0);
       }
     });
-    adminEndpoint(this.nsp, 'alerts::save', async (item, cb) => {
+    adminEndpoint('/registries/alerts', 'alerts::save', async (item, cb) => {
       try {
         cb(
           null,
@@ -126,7 +126,7 @@ class Alerts extends Registry {
         cb(e.stack, null);
       }
     });
-    adminEndpoint(this.nsp, 'alerts::delete', async (item: Required<AlertInterface>, cb) => {
+    adminEndpoint('/registries/alerts', 'alerts::delete', async (item: Required<AlertInterface>, cb) => {
       try {
         await getRepository(Alert).remove(item);
         await getRepository(AlertFollow).delete({ alertId: IsNull() });
@@ -146,14 +146,14 @@ class Alerts extends Registry {
         cb(e.stack);
       }
     });
-    publicEndpoint(this.nsp, 'test', async (data: EmitData) => {
+    publicEndpoint('/registries/alerts', 'test', async (data: EmitData) => {
       this.trigger({
         ...data,
         monthsName: getLocalizedName(data.amount, translate('core.months')),
       });
     });
 
-    publicEndpoint(this.nsp, 'speak', async (opts, cb) => {
+    publicEndpoint('/registries/alerts', 'speak', async (opts, cb) => {
       if (secureKeys.has(opts.key)) {
         secureKeys.delete(opts.key);
 

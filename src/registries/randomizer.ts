@@ -19,13 +19,13 @@ class Randomizer extends Registry {
   }
 
   sockets () {
-    publicEndpoint(this.nsp, 'randomizer::getVisible', async (cb) => {
+    publicEndpoint('/registries/randomizer', 'randomizer::getVisible', async (cb) => {
       cb(
         null,
         await getRepository(RandomizerEntity).findOne({ where: { isShown: true }, relations: [ 'items'] })
       );
     });
-    adminEndpoint(this.nsp, 'randomizer::startSpin', async () => {
+    adminEndpoint('/registries/randomizer', 'randomizer::startSpin', async () => {
       const { default: tts, services } = await import ('../tts');
       let key = v4();
       if (tts.ready) {
@@ -41,7 +41,7 @@ class Randomizer extends Registry {
         key,
       });
     });
-    adminEndpoint(this.nsp, 'randomizer::showById', async (id, cb) => {
+    adminEndpoint('/registries/randomizer', 'randomizer::showById', async (id, cb) => {
       try {
         await getRepository(RandomizerEntity).update({}, { isShown: false });
         await getRepository(RandomizerEntity).update({ id: String(id) }, { isShown: true });
