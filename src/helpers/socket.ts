@@ -46,6 +46,11 @@ type generic<T> = {
 };
 
 export type ClientToServerEventsWithNamespace = {
+  '/core/permissions': GenericEvents & {
+    'generic::deleteById': generic<PermissionsInterface>['deleteById'],
+    'permission::save': (data: Required<PermissionsInterface>[], cb?: (error: Error | string | null) => void) => void,
+    'test.user': (opts: { pid: string, value: string, state: string }, cb: (error: Error | string | null, response?: { status: import('../helpers/permissions/check').checkReturnType | { access: 2 }, partial: import('../helpers/permissions/check').checkReturnType | { access: 2 }, state: string }) => void) => void,
+  },
   '/registries/text': GenericEvents & {
     'text::save': (item: Readonly<Required<TextInterface>>, cb: (error: Error | string | null, item: TextInterface | null) => void) => void,
     'text::remove': (item: Readonly<Required<TextInterface>>, cb: (error: Error | string | null) => void) => void,

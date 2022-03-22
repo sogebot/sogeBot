@@ -12,8 +12,6 @@ import { csEmitter } from '~/helpers/customvariables/emitter';
 import { ioServer } from '~/helpers/panel';
 import { adminEndpoint, publicEndpoint } from '~/helpers/socket';
 
-const a = 'a';
-
 class Text extends Registry {
   constructor () {
     super();
