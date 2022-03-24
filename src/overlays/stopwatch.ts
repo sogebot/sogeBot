@@ -25,7 +25,7 @@ setInterval(() => {
 
 class Stopwatch extends Overlay {
   sockets () {
-    publicEndpoint(this.nsp, 'stopwatch::update', async (data: { id: string, isEnabled: boolean, time: number }, cb) => {
+    publicEndpoint('/overlays/stopwatch', 'stopwatch::update', async (data: { id: string, isEnabled: boolean, time: number }, cb) => {
       const update = {
         timestamp: Date.now(),
         isEnabled: data.isEnabled,
@@ -46,7 +46,7 @@ class Stopwatch extends Overlay {
       cb(null, statusUpdate.get(data.id));
       statusUpdate.delete(data.id);
     });
-    adminEndpoint(this.nsp, 'stopwatch::check', async (stopwatchId: string, cb) => {
+    adminEndpoint('/overlays/stopwatch', 'stopwatch::check', async (stopwatchId: string, cb) => {
       const update = checks.get(stopwatchId);
       if (update) {
         const update2 = statusUpdate.get(stopwatchId);
@@ -63,7 +63,7 @@ class Stopwatch extends Overlay {
         cb(null, undefined);
       }
     });
-    adminEndpoint(this.nsp, 'stopwatch::update::set', async (data: { id: string, isEnabled: boolean | null, time: number | null }) => {
+    adminEndpoint('/overlays/stopwatch', 'stopwatch::update::set', async (data: { id: string, isEnabled: boolean | null, time: number | null }) => {
       if (data.time) {
         // we need to check if persistent
         const overlay = await getRepository(OverlayMapper).findOne(data.id);

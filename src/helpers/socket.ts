@@ -29,7 +29,9 @@ import type PUBG from '../integrations/pubg';
 
 import { BetsInterface } from '~/database/entity/bets';
 import { ChecklistInterface } from '~/database/entity/checklist';
+import { GalleryInterface } from '~/database/entity/gallery';
 import { HighlightInterface } from '~/database/entity/highlight';
+import { OverlayMapperMarathon } from '~/database/entity/overlay';
 import { PollInterface } from '~/database/entity/poll';
 
 interface GenericEvents {
@@ -46,6 +48,25 @@ type generic<T> = {
 };
 
 export type ClientToServerEventsWithNamespace = {
+  '/overlays/gallery': GenericEvents & {
+    'generic::getOne': generic<GalleryInterface>['getOne'],
+    'generic::getAll': generic<GalleryInterface>['getAll'],
+    'generic::deleteById': generic<GalleryInterface>['deleteById'],
+    'generic::setById': generic<GalleryInterface>['setById'],
+    'gallery::upload': (data: [filename: string, data: { id: string, b64data: string, folder: string }], cb: (err: Error | string | null, item?: OverlayMapperMarathon) => void) => void,
+  },
+  '/overlays/marathon': GenericEvents & {
+    'marathon::check': (id: string, cb: (err: Error | string | null, item?: OverlayMapperMarathon) => void) => void,
+    'marathon::update::set': (data: { time: number, id: string }) => void,
+  },
+  '/overlays/stopwatch': GenericEvents & {
+    'stopwatch::check': (id: string, cb: (err: Error | string | null, update?: {
+      timestamp: number;
+      isEnabled: boolean;
+      time: number;
+    }) => void) => void,
+    'stopwatch::update::set': (data: { id: string, isEnabled: boolean | null, time: number | null }) => void,
+  },
   '/registries/alerts': GenericEvents & {
     'isAlertUpdated': (data: { updatedAt: number; id: string }, cb: (err: Error | null, isUpdated: boolean, updatedAt: number) => void) => void,
     'alerts::save': (item: Required<AlertInterface>, cb: (error: Error | string | null, item: null | Required<AlertInterface>) => void) => void,
