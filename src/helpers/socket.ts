@@ -24,15 +24,18 @@ import { HelixVideo } from '@twurple/api/lib';
 import { HowLongToBeatEntry } from 'howlongtobeat';
 import type ObsWebSocket from 'obs-websocket-js';
 import { Socket } from 'socket.io';
+import { FindConditions } from 'typeorm';
 
 import type PUBG from '../integrations/pubg';
 
 import { BetsInterface } from '~/database/entity/bets';
 import { ChecklistInterface } from '~/database/entity/checklist';
+import { EventListInterface } from '~/database/entity/eventList';
 import { GalleryInterface } from '~/database/entity/gallery';
 import { HighlightInterface } from '~/database/entity/highlight';
 import { OverlayMapperMarathon } from '~/database/entity/overlay';
 import { PollInterface } from '~/database/entity/poll';
+import { SpotifySongBanInterface } from '~/database/entity/spotify';
 
 interface GenericEvents {
   'settings': (cb: (error: Error | string | null, settings: Record<string, any> | null, ui: Record<string, any> | null) => Promise<void>) => void,
@@ -48,6 +51,19 @@ type generic<T> = {
 };
 
 export type ClientToServerEventsWithNamespace = {
+  '/integrations/spotify': GenericEvents & {
+    'spotify::revoke': (cb: (err: Error | string | null, opts?: { do: 'refresh' }) => void) => void,
+    'spotify::authorize': (cb: (err: Error | string | null, action?: null | { do: 'redirect', opts: any[] }) => void) => void,
+    'spotify::state': (cb: (err: Error | string | null, state: string) => void) => void,
+    'spotify::code': (token: string, cb: (err: Error | string | null, state: boolean) => void) => void,
+    'spotify::skip': (cb: (err: Error | string | null) => void) => void,
+    'spotify::addBan': (spotifyUri: string, cb?: (err: Error | string | null) => void) => void,
+    'spotify::deleteBan': (where: FindConditions<SpotifySongBanInterface>, cb?: (err: Error | string | null) => void) => void,
+    'spotify::getAllBanned': (where: FindConditions<SpotifySongBanInterface>, cb?: (err: Error | string | null, items: SpotifySongBanInterface[]) => void) => void,
+  },
+  '/overlays/eventlist': GenericEvents & {
+    'eventlist::getUserEvents': (userId: string, cb: (err: Error | string | null, events: EventListInterface[]) => void) => void,
+  },
   '/overlays/gallery': GenericEvents & {
     'generic::getOne': generic<GalleryInterface>['getOne'],
     'generic::getAll': generic<GalleryInterface>['getAll'],
@@ -58,6 +74,14 @@ export type ClientToServerEventsWithNamespace = {
   '/overlays/marathon': GenericEvents & {
     'marathon::check': (id: string, cb: (err: Error | string | null, item?: OverlayMapperMarathon) => void) => void,
     'marathon::update::set': (data: { time: number, id: string }) => void,
+  },
+  '/overlays/countdown': GenericEvents & {
+    'countdown::check': (id: string, cb: (err: Error | string | null, update?: {
+      timestamp: number;
+      isEnabled: boolean;
+      time: number;
+    }) => void) => void,
+    'countdown::update::set': (data: { id: string, isEnabled: boolean | null, time: number | null }) => void,
   },
   '/overlays/stopwatch': GenericEvents & {
     'stopwatch::check': (id: string, cb: (err: Error | string | null, update?: {
