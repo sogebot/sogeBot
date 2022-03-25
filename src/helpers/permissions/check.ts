@@ -15,12 +15,11 @@ import { isBroadcaster } from '../user/isBroadcaster';
 import { isModerator } from '../user/isModerator';
 import { defaultPermissions } from './defaultPermissions';
 
+import type { checkReturnType } from '~/../d.ts/src/helpers/permissions/check';
 import { filters } from '~/helpers/permissions/filters';
 import { variables } from '~/watchers';
 
 let isWarnedAboutCasters = false;
-
-export type checkReturnType = {access: boolean; permission?: PermissionsInterface};
 
 async function check(userId: string, permId: string, partial = false): Promise<checkReturnType> {
   if (!areDecoratorsLoaded) {

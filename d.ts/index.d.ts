@@ -164,29 +164,8 @@ interface UIHighlightsUrlGenerator {
   if?: () => boolean;
 }
 
-interface CommandResponse {
-  response: string | Promise<string>;
-  sender: CommandOptions['sender'];
-  discord: CommandOptions['discord'];
-  attr: CommandOptions['attr'];
-}
-
-interface CommandOptions {
-  sender: Omit<ChatUser, '_userName' | '_userData' | '_parseBadgesLike'>
-  emotesOffsets: Map<string, string[]>
-  discord: { author: DiscordJsUser; channel: DiscordJsTextChannel } | undefined
-  command: string;
-  parameters: string;
-  isAction: boolean,
-  isFirstTimeMessage: boolean,
-  createdAt: number;
-  attr: {
-    skip?: boolean;
-    quiet?: boolean;
-    [attr: string]: any;
-  };
-}
-
+type CommandResponse = import('./src/parser').CommandResponse;
+type CommandOptions = import('./src/parser').CommandOptions;
 interface ParserOptions {
   id: string;
   sender: Omit<ChatUser, '_userName' | '_userData' | '_parseBadgesLike'> | null;

@@ -9,6 +9,8 @@ import {
 } from 'lodash';
 import { getConnection, getRepository } from 'typeorm';
 
+import type { Command } from '../d.ts/src/general';
+
 import Core from '~/_interface';
 import { PermissionCommands } from '~/database/entity/permissions';
 import {
@@ -35,15 +37,6 @@ import { variables } from '~/watchers';
 
 let threadStartTimestamp = Date.now();
 let isInitialLangSet = true;
-
-export type Command = {
-  id: string,
-  defaultValue: string,
-  type: string,
-  name: string,
-  command: string,
-  permission: string | null,
-};
 
 const gracefulExit = () => {
   if (general.gracefulExitEachXHours > 0) {

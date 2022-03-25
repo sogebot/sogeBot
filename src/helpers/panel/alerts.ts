@@ -1,4 +1,4 @@
-export type UIError = { name: string; message: string };
+import type { UIError } from '~/../d.ts/src/helpers/panel/alerts';
 
 const warns: UIError[] = [];
 const errors: UIError[] = [];
@@ -12,5 +12,5 @@ function addUIError (error: UIError) {
 }
 
 export {
-  warns, addUIWarn, errors, addUIError, 
+  warns, addUIWarn, errors, addUIError,
 };
