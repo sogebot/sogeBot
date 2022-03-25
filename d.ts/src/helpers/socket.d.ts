@@ -53,7 +53,7 @@ export interface getListOfReturn {
 }
 
 type GenericEvents = {
-  'settings': (cb: (error: Error | string | null, settings: Record<string, any> | null, ui: Record<string, any> | null) => void) => void,
+  'settings': (cb: (error: Error | string | null, settings: Record<string, any>, ui: Record<string, any>) => void) => void,
   'settings.update': (opts: Record<string,any>, cb: (error: Error | string | null) => void) => void,
   'set.value': (opts: { variable: string, value: any }, cb: (error: Error | string | null, opts: { variable: string, value: any } | null) => void) => void,
 };
@@ -155,6 +155,12 @@ export type ClientToServerEventsWithNamespace = {
     'purgeAllConnections': (cb: (error: Error | string | null) => void, socket: Socket) => void,
   },
   '/': GenericEvents & {
+    'leaveBot': () => void,
+    'joinBot': () => void,
+    'responses.get': (_: null, cb: (data: { default: string; current: string }) => void) => void,
+    'responses.set': (data: { name: string, value: string }) => void,
+    'responses.revert': (data: { name: string }, cb: () => void) => void,
+    'api.stats': (data: { code: number, remaining: number | string, data: string}) => void,
     'translations': (cb: (lang: Record<string, any>) => void) => void,
     'panel::resetStatsState': () => void,
     'version': (cb: (version: string) => void) => void,
@@ -201,6 +207,18 @@ export type ClientToServerEventsWithNamespace = {
     'checklist::save': (item: ChecklistInterface, cb: (error: Error | string | null) => void) => void,
   },
   '/systems/userinfo': GenericEvents,
+  '/systems/scrim': GenericEvents,
+  '/systems/emotescombo': GenericEvents,
+  '/systems/antihateraid': GenericEvents,
+  '/services/google': GenericEvents,
+  '/integrations/twitter': GenericEvents,
+  '/integrations/tipeeestream': GenericEvents,
+  '/integrations/streamlabs': GenericEvents,
+  '/integrations/streamelements': GenericEvents,
+  '/integrations/qiwi': GenericEvents,
+  '/integrations/obswebsocket': GenericEvents,
+  '/integrations/lastfm': GenericEvents,
+  '/integrations/phillipshue': GenericEvents,
   '/systems/cooldown': GenericEvents & {
     'generic::getAll': generic<CooldownInterface>['getAll'],
     'generic::getOne': (id: string, cb: (error: Error | string | null, item?: Readonly<Required<CooldownInterface>> | null, count?: number) => void) => void,
@@ -344,7 +362,6 @@ export type ClientToServerEventsWithNamespace = {
   '/core/general': GenericEvents & {
     'generic::getCoreCommands': (cb: (error: Error | string | null, commands: import('../general').Command[]) => void) => void,
     'generic::setCoreCommand': (commands: import('../general').Command, cb: (error: Error | string | null) => void) => void,
-    'settings': (cb: (error: Error | string | null, settings: Record<string, any> | null, ui: Record<string, any> | null) => void) => void,
   },
   '/core/customvariables': GenericEvents & {
     'customvariables::list': (cb: (error: Error | string | null, items: VariableInterface[]) => void) => void,
