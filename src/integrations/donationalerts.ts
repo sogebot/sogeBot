@@ -207,7 +207,7 @@ class Donationalerts extends Integration {
     }
 
     const timestamp = Date.now();
-    const isAnonymous = data.username === '';
+    const isAnonymous = data.username === '' || data.username === null ;
 
     if (!isAnonymous) {
       const user = await users.getUserByUsername(data.username);
