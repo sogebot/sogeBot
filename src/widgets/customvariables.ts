@@ -1,7 +1,7 @@
 'use strict';
 
 import {
-  Variable, VariableWatch, VariableWatchInterface,
+  Variable, VariableWatch,
 } from '@entity/variable';
 import { getRepository } from 'typeorm';
 
@@ -20,7 +20,7 @@ class CustomVariables extends Widget {
   }
 
   public sockets() {
-    adminEndpoint(this.nsp, 'watched::save', async (items: VariableWatchInterface[], cb) => {
+    adminEndpoint('/widgets/customvariables', 'watched::save', async (items, cb) => {
       try {
         await getRepository(VariableWatch).delete({});
         const variables = await getRepository(VariableWatch).save(items);
@@ -29,7 +29,7 @@ class CustomVariables extends Widget {
         cb(e.stack, []);
       }
     });
-    adminEndpoint(this.nsp, 'customvariables::list', async (cb) => {
+    adminEndpoint('/widgets/customvariables', 'customvariables::list', async (cb) => {
       try {
         const variables = await getRepository(Variable).find();
         cb(null, variables);
@@ -37,7 +37,7 @@ class CustomVariables extends Widget {
         cb(e.stack, []);
       }
     });
-    adminEndpoint(this.nsp, 'list.watch', async (cb) => {
+    adminEndpoint('/widgets/customvariables', 'list.watch', async (cb) => {
       try {
         const variables = await getRepository(VariableWatch).find({ order: { order: 'ASC' } });
         cb(null, variables);
@@ -45,7 +45,7 @@ class CustomVariables extends Widget {
         cb(e.stack, []);
       }
     });
-    adminEndpoint(this.nsp, 'watched::setValue', async (opts, cb) => {
+    adminEndpoint('/widgets/customvariables', 'watched::setValue', async (opts, cb) => {
       try {
         const variable = await isVariableSetById(opts.id);
         if (variable) {

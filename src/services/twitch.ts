@@ -358,11 +358,11 @@ class Twitch extends Service {
   }
 
   sockets() {
-    adminEndpoint(this.nsp, 'eventsub::reset', () => {
+    adminEndpoint('/services/twitch', 'eventsub::reset', () => {
       info('EVENTSUB: user authorized, resetting state of eventsub subscriptions.');
       eventErrorShown.clear();
     });
-    adminEndpoint(this.nsp, 'broadcaster', (cb) => {
+    adminEndpoint('/services/twitch', 'broadcaster', (cb) => {
       try {
         cb(null, (this.broadcasterUsername).toLowerCase());
       } catch (e: any) {

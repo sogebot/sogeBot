@@ -14,7 +14,7 @@ class CommandCount extends Stats {
   }
 
   sockets() {
-    adminEndpoint(this.nsp, 'commands::count', async (cb) => {
+    adminEndpoint('/stats/commandcount', 'commands::count', async (cb) => {
       try {
         cb(null, await getRepository(CommandsCount).find());
       } catch (e: any) {

@@ -79,7 +79,7 @@ class Levels extends System {
     perMessageOfflineInterval = 0;
 
   sockets () {
-    adminEndpoint(this.nsp, 'getLevelsExample', (cb) => {
+    adminEndpoint('/systems/levels', 'getLevelsExample', (cb) => {
       try {
         this.getLevelFromCache(21);
         cb(null, cachedLevels.map(xp => `${Intl.NumberFormat(general.lang).format(xp)} ${this.xpName}`));

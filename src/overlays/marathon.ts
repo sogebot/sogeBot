@@ -160,17 +160,17 @@ class Marathon extends Overlay {
   }
 
   sockets () {
-    publicEndpoint(this.nsp, 'marathon::public', async (marathonId: string, cb) => {
+    publicEndpoint('/overlays/marathon', 'marathon::public', async (marathonId: string, cb) => {
       // no updateCache
       const key = Array.from(cachedOverlays.keys()).find(id => id.includes(marathonId));
       cb(null, cachedOverlays.get(key ?? ''));
     });
-    adminEndpoint(this.nsp, 'marathon::check', async (marathonId: string, cb) => {
+    adminEndpoint('/overlays/marathon', 'marathon::check', async (marathonId: string, cb) => {
       await this.updateCache();
       const key = Array.from(cachedOverlays.keys()).find(id => id.includes(marathonId));
       cb(null, cachedOverlays.get(key ?? ''));
     });
-    adminEndpoint(this.nsp, 'marathon::update::set', async (data: { time: number, id: string }) => {
+    adminEndpoint('/overlays/marathon', 'marathon::update::set', async (data: { time: number, id: string }) => {
       await this.updateCache();
       const key = Array.from(cachedOverlays.keys()).find(id => id.includes(data.id));
       const item = cachedOverlays.get(key ?? '');

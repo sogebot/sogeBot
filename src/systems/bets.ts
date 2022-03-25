@@ -96,7 +96,7 @@ class Bets extends System {
   }
 
   sockets() {
-    adminEndpoint(this.nsp, 'bets::getCurrentBet', async (cb) => {
+    adminEndpoint('/systems/bets', 'bets::getCurrentBet', async (cb) => {
       try {
         const currentBet = await getRepository(BetsEntity).findOne({
           relations: ['participations'],
@@ -108,7 +108,7 @@ class Bets extends System {
       }
     });
 
-    adminEndpoint(this.nsp, 'bets::close', async (option) => {
+    adminEndpoint('/systems/bets', 'bets::close', async (option) => {
       let responses: CommandResponse[];
       if (option === 'refund') {
         responses = await bets.refund({

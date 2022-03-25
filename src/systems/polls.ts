@@ -70,11 +70,11 @@ class Polls extends System {
   }
 
   public async sockets() {
-    adminEndpoint(this.nsp, 'generic::deleteById', async (id, cb) => {
+    adminEndpoint('/systems/polls', 'generic::deleteById', async (id, cb) => {
       await getRepository(Poll).delete({ id: String(id) });
       cb(null);
     });
-    adminEndpoint(this.nsp, 'generic::getAll', async (cb) => {
+    adminEndpoint('/systems/polls', 'generic::getAll', async (cb) => {
       try {
         cb(null, await getRepository(Poll).find({
           relations: ['votes'],
@@ -84,7 +84,7 @@ class Polls extends System {
         cb(e.stack, []);
       }
     });
-    adminEndpoint(this.nsp, 'polls::save', async (vote, cb) => {
+    adminEndpoint('/systems/polls', 'polls::save', async (vote, cb) => {
       try {
         const parameters = `-${vote.type} -title "${vote.title}" ${vote.options.filter((o) => o.trim().length > 0).join(' | ')}`;
         const response = await this.open({
@@ -99,12 +99,12 @@ class Polls extends System {
           discord:            undefined,
         });
         this.sendResponse(response);
-        cb(null, null);
+        cb(null);
       } catch (e: any) {
-        cb(e.stack, null);
+        cb(e.stack);
       }
     });
-    adminEndpoint(this.nsp, 'polls::close', async (vote, cb) => {
+    adminEndpoint('/systems/polls', 'polls::close', async (vote, cb) => {
       try {
         const response = await this.close({
           command:            this.getCommand('!poll close'),

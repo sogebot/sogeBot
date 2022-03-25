@@ -76,7 +76,7 @@ class Module {
     });
   }
 
-  get nsp(): string {
+  get nsp() {
     return '/' + this._name + '/' + this.__moduleName__.toLowerCase();
   }
 

@@ -24,7 +24,7 @@ class Text extends Registry {
   onStartup() {
     csEmitter.on('variable-changed', (variableName) => {
       if(ioServer) {
-        for (const socket of ioServer.of(this.nsp).sockets.values()) {
+        for (const socket of ioServer.of('/registries/text').sockets.values()) {
           socket.emit('variable-changed', variableName);
         }
       }
@@ -32,7 +32,7 @@ class Text extends Registry {
   }
 
   sockets () {
-    adminEndpoint(this.nsp, 'text::remove', async(item, cb) => {
+    adminEndpoint('/registries/text', 'text::remove', async(item, cb) => {
       try {
         await getRepository(TextEntity).remove(item);
         cb(null);
@@ -40,17 +40,17 @@ class Text extends Registry {
         cb(e.stack);
       }
     });
-    adminEndpoint(this.nsp, 'generic::getAll', async(cb) => {
+    adminEndpoint('/registries/text', 'generic::getAll', async(cb) => {
       try {
         cb(
           null,
           await getRepository(TextEntity).find(),
         );
       } catch (e: any) {
-        cb(e.stack);
+        cb(e.stack, []);
       }
     });
-    adminEndpoint(this.nsp, 'text::presets', async(_, cb) => {
+    adminEndpoint('/registries/text', 'text::presets', async(_, cb) => {
       try {
         const folders = readdirSync('./assets/presets/textOverlay/');
         if (cb) {
@@ -65,7 +65,7 @@ class Text extends Registry {
         }
       }
     });
-    adminEndpoint(this.nsp, 'text::save', async(item, cb) => {
+    adminEndpoint('/registries/text', 'text::save', async(item, cb) => {
       try {
         cb(
           null,
@@ -75,7 +75,7 @@ class Text extends Registry {
         cb(e.stack, null);
       }
     });
-    publicEndpoint(this.nsp, 'generic::getOne', async (opts: { id: any; parseText: boolean }, callback) => {
+    publicEndpoint('/registries/text', 'generic::getOne', async (opts: { id: any; parseText: boolean }, callback) => {
       try {
         const item = await getRepository(TextEntity).findOneOrFail({ id: opts.id });
 

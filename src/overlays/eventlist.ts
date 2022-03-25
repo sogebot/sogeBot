@@ -17,7 +17,7 @@ class EventList extends Overlay {
   showInUI = false;
 
   sockets () {
-    adminEndpoint(this.nsp, 'eventlist::getUserEvents', async (userId, cb) => {
+    adminEndpoint('/overlays/eventlist', 'eventlist::getUserEvents', async (userId, cb) => {
       const eventsByUserId = await getRepository(EventListEntity).find({ userId: userId });
       // we also need subgifts by giver
       const eventsByRecipientId
@@ -49,7 +49,7 @@ class EventList extends Overlay {
         };
       }));
     });
-    publicEndpoint(this.nsp, 'getEvents', async (opts: { ignore: string[]; limit: number }, cb) => {
+    publicEndpoint('/overlays/eventlist', 'getEvents', async (opts: { ignore: string[]; limit: number }, cb) => {
       let events = await getRepository(EventListEntity)
         .createQueryBuilder('events')
         .select('events')

@@ -36,7 +36,7 @@ class UI extends Core {
   }
 
   sockets() {
-    adminEndpoint(this.nsp, 'configuration', async (cb) => {
+    adminEndpoint('/core/ui', 'configuration', async (cb) => {
       try {
         const data: any = {};
 
@@ -76,7 +76,7 @@ class UI extends Core {
       }
     });
 
-    publicEndpoint(this.nsp, 'configuration', async (cb) => {
+    publicEndpoint('/core/ui', 'configuration', async (cb) => {
       try {
         const data: any = {};
 

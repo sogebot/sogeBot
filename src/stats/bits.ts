@@ -15,7 +15,7 @@ class Bits extends Stats {
   }
 
   sockets() {
-    adminEndpoint(this.nsp, 'generic::getAll', async (cb) => {
+    adminEndpoint('/stats/bits', 'generic::getAll', async (cb) => {
       try {
         const items = await getRepository(UserBit).find();
         cb(null, await Promise.all(items.map(async (item) => {

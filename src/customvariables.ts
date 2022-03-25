@@ -28,11 +28,11 @@ class CustomVariables extends Core {
   }
 
   sockets () {
-    adminEndpoint(this.nsp, 'customvariables::list', async (cb) => {
+    adminEndpoint('/core/customvariables', 'customvariables::list', async (cb) => {
       const variables = await getRepository(Variable).find({ relations: ['history', 'urls'] });
       cb(null, variables);
     });
-    adminEndpoint(this.nsp, 'customvariables::runScript', async (id, cb) => {
+    adminEndpoint('/core/customvariables', 'customvariables::runScript', async (id, cb) => {
       try {
         const item = await getRepository(Variable).findOne({ id: String(id) });
         if (!item) {
@@ -49,7 +49,7 @@ class CustomVariables extends Core {
         cb(e.stack, null);
       }
     });
-    adminEndpoint(this.nsp, 'customvariables::testScript', async (opts, cb) => {
+    adminEndpoint('/core/customvariables', 'customvariables::testScript', async (opts, cb) => {
       let returnedValue;
       try {
         returnedValue = await runScript(opts.evalValue, {
@@ -62,10 +62,10 @@ class CustomVariables extends Core {
       }
       cb(null, returnedValue);
     });
-    adminEndpoint(this.nsp, 'customvariables::isUnique', async ({ variable, id }, cb) => {
+    adminEndpoint('/core/customvariables', 'customvariables::isUnique', async ({ variable, id }, cb) => {
       cb(null, (await getRepository(Variable).find({ variableName: String(variable) })).filter(o => o.id !== id).length === 0);
     });
-    adminEndpoint(this.nsp, 'customvariables::delete', async (id, cb) => {
+    adminEndpoint('/core/customvariables', 'customvariables::delete', async (id, cb) => {
       const item = await getRepository(Variable).findOne({ id: String(id) });
       if (item) {
         await getRepository(Variable).remove(item);
@@ -76,7 +76,7 @@ class CustomVariables extends Core {
         cb(null);
       }
     });
-    adminEndpoint(this.nsp, 'customvariables::save', async (item, cb) => {
+    adminEndpoint('/core/customvariables', 'customvariables::save', async (item, cb) => {
       try {
         await getRepository(Variable).save(item);
         // somehow this is not populated by save on sqlite

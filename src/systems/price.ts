@@ -1,5 +1,3 @@
-'use strict';
-
 import { Price as PriceEntity, PriceInterface } from '@entity/price';
 import * as constants from '@sogebot/ui-helpers/constants';
 import { format } from '@sogebot/ui-helpers/number';
@@ -44,16 +42,16 @@ class Price extends System {
   }
 
   sockets() {
-    adminEndpoint(this.nsp, 'generic::getAll', async (cb) => {
+    adminEndpoint('/systems/price', 'generic::getAll', async (cb) => {
       cb(null,
         await getRepository(PriceEntity).find({ order: { price: 'ASC' } }));
     });
 
-    adminEndpoint(this.nsp, 'generic::getOne', async (id, cb) => {
+    adminEndpoint('/systems/price', 'generic::getOne', async (id, cb) => {
       cb(null, await getRepository(PriceEntity).findOne({ id: String(id) }));
     });
 
-    adminEndpoint(this.nsp, 'price::save', async (price: PriceInterface, cb) => {
+    adminEndpoint('/systems/price', 'price::save', async (price: PriceInterface, cb) => {
       try {
         await getRepository(PriceEntity).save(price);
         cb(null);
@@ -63,7 +61,7 @@ class Price extends System {
       }
     });
 
-    adminEndpoint(this.nsp, 'generic::deleteById', async (id, cb) => {
+    adminEndpoint('/systems/price', 'generic::deleteById', async (id, cb) => {
       try {
         await getRepository(PriceEntity).delete({ id: String(id) });
         cb(null);

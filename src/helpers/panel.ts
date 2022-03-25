@@ -5,8 +5,10 @@ import { normalize } from 'path';
 
 import express from 'express';
 import { Server as io } from 'socket.io';
+import { DefaultEventsMap } from 'socket.io/dist/typed-events';
 
 import type { Module } from '../_interface';
+import { ClientToServerEventsWithNamespace } from './socket';
 
 import { info } from '~/helpers/log';
 
@@ -25,6 +27,19 @@ export let ioServer: io | null = null;
 export let app: express.Application | null = null;
 export let server: Server;
 export let serverSecure: Server;
+
+/*export interface ClientToServerEvents {
+  'eventlist::removeById': (idList: string[] | string, cb: (error: Error | string | null) => void) => void,
+  'eventlist::get': (count: number) => void,
+  'skip': () => void,
+  'cleanup': () => void,
+  'eventlist::resend': (id: string) => void,
+
+  'generic::getCoreCommands': (cb: (error: Error | string | null, commands: import('../general').Command[]) => Promise<void>) => void,
+  'generic::setCoreCommand': (commands: import('../general').Command, cb: (error: Error | string | null) => Promise<void>) => void,
+};
+// export type EventNames = keyof ClientToServerEvents & (string | symbol);
+*/
 
 export const addMenu = (menuArg: typeof menu[number]) => {
   if (!menu.find(o => o.id === menuArg.id)) {
@@ -46,7 +61,7 @@ export const setServer = () => {
   if (app) {
     server = http.createServer(app);
     if (process.env.CORS) {
-      ioServer = new io(server, {
+      ioServer = new io<DefaultEventsMap, ClientToServerEventsWithNamespace>(server, {
         cors: {
           origin:  process.env.CORS,
           methods: ['GET', 'POST'],

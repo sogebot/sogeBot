@@ -371,14 +371,14 @@ class Spotify extends Integration {
   }
 
   sockets () {
-    adminEndpoint(this.nsp, 'spotify::state', async (callback) => {
+    adminEndpoint('/integrations/spotify', 'spotify::state', async (callback) => {
       callback(null, this.state);
     });
-    adminEndpoint(this.nsp, 'spotify::skip', async (callback) => {
+    adminEndpoint('/integrations/spotify', 'spotify::skip', async (callback) => {
       this.cSkipSong();
       callback(null);
     });
-    adminEndpoint(this.nsp, 'spotify::addBan', async (spotifyUri, cb) => {
+    adminEndpoint('/integrations/spotify', 'spotify::addBan', async (spotifyUri, cb) => {
       try {
         if (!this.client) {
           addUIError({ name: 'Spotify Ban Import', message: 'You are not connected to spotify API, authorize your user' });
@@ -410,7 +410,7 @@ class Spotify extends Integration {
       } catch (e: any) {
         if (e.message !== 'client') {
           if (cb) {
-            cb(e, null);
+            cb(e);
           }
           addUIError({ name: 'Spotify Ban Import', message: 'Something went wrong with banning song. Check your spotifyURI.' });
         }
@@ -418,26 +418,27 @@ class Spotify extends Integration {
           method: 'GET', data: e.response, timestamp: Date.now(), call: 'spotify::addBan', api: 'other', endpoint: 'n/a', code: 'n/a',
         });
         if (cb) {
-          cb(e, null);
+          cb(e);
         }
       }
       if (cb) {
-        cb(null, null);
+        cb(null);
       }
     });
-    adminEndpoint(this.nsp, 'spotify::deleteBan', async (where, cb) => {
+    adminEndpoint('/integrations/spotify', 'spotify::deleteBan', async (where, cb) => {
       where = where || {};
       if (cb) {
-        cb(null, await getRepository(SpotifySongBan).delete(where));
+        await getRepository(SpotifySongBan).delete(where);
+        cb(null);
       }
     });
-    adminEndpoint(this.nsp, 'spotify::getAllBanned', async (where, cb) => {
+    adminEndpoint('/integrations/spotify', 'spotify::getAllBanned', async (where, cb) => {
       where = where || {};
       if (cb) {
         cb(null, await getRepository(SpotifySongBan).find(where));
       }
     });
-    adminEndpoint(this.nsp, 'spotify::code', async (token, cb) => {
+    adminEndpoint('/integrations/spotify', 'spotify::code', async (token, cb) => {
       const waitForUsername = () => {
         return new Promise((resolve) => {
           const check = async () => {
@@ -466,7 +467,7 @@ class Spotify extends Integration {
       setTimeout(() => this.isUnauthorized = false, 10000);
       cb(null, true);
     });
-    adminEndpoint(this.nsp, 'spotify::revoke', async (cb) => {
+    adminEndpoint('/integrations/spotify', 'spotify::revoke', async (cb) => {
       clearTimeout(this.timeouts.IRefreshToken);
       try {
         if (this.client !== null) {
@@ -490,7 +491,7 @@ class Spotify extends Integration {
         this.timeouts.IRefreshToken = global.setTimeout(() => this.IRefreshToken(), 60000);
       }
     });
-    adminEndpoint(this.nsp, 'spotify::authorize', async (cb) => {
+    adminEndpoint('/integrations/spotify', 'spotify::authorize', async (cb) => {
       if (
         this.clientId === ''
         || this.clientSecret === ''

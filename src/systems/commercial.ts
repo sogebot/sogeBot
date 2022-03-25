@@ -23,7 +23,7 @@ import { variables } from '~/watchers';
 
 class Commercial extends System {
   sockets() {
-    adminEndpoint(this.nsp, 'commercial.run', (data) => {
+    adminEndpoint('/systems/commercial', 'commercial.run', (data) => {
       commercial.main({
         parameters:         data.seconds,
         command:            '!commercial',

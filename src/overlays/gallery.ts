@@ -62,7 +62,7 @@ class Gallery extends Overlay {
   }
 
   sockets () {
-    adminEndpoint(this.nsp, 'generic::getOne', async (id, cb) => {
+    adminEndpoint('/overlays/gallery', 'generic::getOne', async (id, cb) => {
       try {
         const item = await getRepository(GalleryEntity).findOne({
           where:  { id },
@@ -70,10 +70,10 @@ class Gallery extends Overlay {
         });
         cb(null, item);
       } catch (e: any) {
-        cb(e.stack, null);
+        cb(e.stack);
       }
     });
-    adminEndpoint(this.nsp, 'generic::getAll', async (cb) => {
+    adminEndpoint('/overlays/gallery', 'generic::getAll', async (cb) => {
       try {
         const items = await getRepository(GalleryEntity).find({ select: ['id', 'name', 'type', 'folder'] });
         cb(null, items);
@@ -81,7 +81,7 @@ class Gallery extends Overlay {
         cb(e.stack, []);
       }
     });
-    adminEndpoint(this.nsp, 'generic::deleteById', async (id, cb) => {
+    adminEndpoint('/overlays/gallery', 'generic::deleteById', async (id, cb) => {
       try {
         await getRepository(GalleryEntity).delete({ id: String(id) });
         cb(null);
@@ -89,7 +89,7 @@ class Gallery extends Overlay {
         cb(e.stack);
       }
     });
-    adminEndpoint(this.nsp, 'generic::setById', async (opts, cb) => {
+    adminEndpoint('/overlays/gallery', 'generic::setById', async (opts, cb) => {
       try {
         cb(null, await getRepository(GalleryEntity).save({
           ...(await getRepository(GalleryEntity).findOne({ id: String(opts.id) })),
@@ -100,7 +100,7 @@ class Gallery extends Overlay {
         cb(e.stack);
       }
     });
-    adminEndpoint(this.nsp, 'gallery::upload', async (data, cb) => {
+    adminEndpoint('/overlays/gallery', 'gallery::upload', async (data, cb) => {
       try {
         const filename = data[0];
         const filedata = data[1] as { id: string, b64data: string, folder: string };

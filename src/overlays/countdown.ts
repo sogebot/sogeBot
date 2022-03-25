@@ -25,7 +25,7 @@ setInterval(() => {
 
 class Countdown extends Overlay {
   sockets () {
-    publicEndpoint(this.nsp, 'countdown::update', async (data: { id: string, isEnabled: boolean, time: number }, cb) => {
+    publicEndpoint('/overlays/countdown', 'countdown::update', async (data: { id: string, isEnabled: boolean, time: number }, cb) => {
       const update = {
         timestamp: Date.now(),
         isEnabled: data.isEnabled,
@@ -46,7 +46,7 @@ class Countdown extends Overlay {
       cb(null, statusUpdate.get(data.id));
       statusUpdate.delete(data.id);
     });
-    adminEndpoint(this.nsp, 'countdown::check', async (countdownId: string, cb) => {
+    adminEndpoint('/overlays/countdown', 'countdown::check', async (countdownId: string, cb) => {
       const update = checks.get(countdownId);
       if (update) {
         const update2 = statusUpdate.get(countdownId);
@@ -63,7 +63,7 @@ class Countdown extends Overlay {
         cb(null, undefined);
       }
     });
-    adminEndpoint(this.nsp, 'countdown::update::set', async (data: { id: string, isEnabled: boolean | null, time: number | null }) => {
+    adminEndpoint('/overlays/countdown', 'countdown::update::set', async (data: { id: string, isEnabled: boolean | null, time: number | null }) => {
       if (data.time) {
         // we need to check if persistent
         const overlay = await getRepository(OverlayMapper).findOne(data.id);

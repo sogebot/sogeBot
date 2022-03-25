@@ -20,7 +20,9 @@ import { variables } from '~/watchers';
 
 let isWarnedAboutCasters = false;
 
-async function check(userId: string, permId: string, partial = false): Promise<{access: boolean; permission: PermissionsInterface | undefined}> {
+export type checkReturnType = {access: boolean; permission?: PermissionsInterface};
+
+async function check(userId: string, permId: string, partial = false): Promise<checkReturnType> {
   if (!areDecoratorsLoaded) {
     await new Promise<void>((resolve) => {
       const _check = () => {

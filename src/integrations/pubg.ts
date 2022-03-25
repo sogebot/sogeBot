@@ -120,7 +120,7 @@ class PUBG extends Integration {
   }
 
   sockets() {
-    adminEndpoint(this.nsp, 'pubg::searchForseasonId', async ({ apiKey, platform }, cb) => {
+    adminEndpoint('/integrations/pubg', 'pubg::searchForseasonId', async ({ apiKey, platform }, cb) => {
       try {
         const request = await axios.get<any>(
           `https://api.pubg.com/shards/${platform}/seasons`,
@@ -141,7 +141,7 @@ class PUBG extends Integration {
         cb(e.message, null);
       }
     });
-    adminEndpoint(this.nsp, 'pubg::getUserStats', async ({ apiKey, platform, playerId, seasonId, ranked }, cb) => {
+    adminEndpoint('/integrations/pubg', 'pubg::getUserStats', async ({ apiKey, platform, playerId, seasonId, ranked }, cb) => {
       try {
         const request = await axios.get<any>(
           ranked ? `https://api.pubg.com/shards/${platform}/players/${playerId}/seasons/${seasonId}/ranked` : `https://api.pubg.com/shards/${platform}/players/${playerId}/seasons/${seasonId}`,
@@ -162,7 +162,7 @@ class PUBG extends Integration {
         cb(e.message, null);
       }
     });
-    adminEndpoint(this.nsp, 'pubg::searchForPlayerId', async ({ apiKey, platform, playerName }, cb) => {
+    adminEndpoint('/integrations/pubg', 'pubg::searchForPlayerId', async ({ apiKey, platform, playerName }, cb) => {
       try {
         const request = await axios.get<any>(
           `https://api.pubg.com/shards/${platform}/players?filter[playerNames]=${playerName}`,
@@ -178,7 +178,7 @@ class PUBG extends Integration {
         cb(e.message, null);
       }
     });
-    adminEndpoint(this.nsp, 'pubg::exampleParse', async ({ text }, cb) => {
+    adminEndpoint('/integrations/pubg', 'pubg::exampleParse', async ({ text }, cb) => {
       try {
         const messageToSend = await new Message(text).parse() as string;
         cb(null, messageToSend);

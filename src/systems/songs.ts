@@ -105,26 +105,26 @@ class Songs extends System {
       setTimeout(() => this.sockets(), 100);
       return;
     }
-    adminEndpoint(this.nsp, 'songs::currentSong', async (cb) => {
+    adminEndpoint('/systems/songs', 'songs::currentSong', async (cb) => {
       cb(null, JSON.parse(this.currentSong));
     });
-    adminEndpoint(this.nsp, 'set.playlist.tag', async (tag) => {
+    adminEndpoint('/systems/songs', 'set.playlist.tag', async (tag) => {
       if (this.currentTag !== tag) {
         info(`SONGS: Playlist changed to ${tag}`);
       }
       this.currentTag = tag;
     });
-    publicEndpoint(this.nsp, 'current.playlist.tag', async (cb) => {
+    publicEndpoint('/systems/songs', 'current.playlist.tag', async (cb) => {
       cb(null, this.currentTag);
     });
-    adminEndpoint(this.nsp, 'get.playlist.tags', async (cb) => {
+    adminEndpoint('/systems/songs', 'get.playlist.tags', async (cb) => {
       try {
         cb(null, await this.getTags());
       } catch (e: any) {
         cb(e, []);
       }
     });
-    publicEndpoint(this.nsp, 'find.playlist', async (opts: { perPage?: number, page?: number; search?: string, tag?: string }, cb) => {
+    publicEndpoint('/systems/songs', 'find.playlist', async (opts: { perPage?: number, page?: number; search?: string, tag?: string }, cb) => {
       const connection = await getConnection();
       opts.page = opts.page ?? 0;
       opts.perPage = opts.perPage ?? 25;
@@ -167,43 +167,44 @@ class Songs extends System {
         };
       })), count);
     });
-    adminEndpoint(this.nsp, 'songs::save', async (item: SongPlaylistInterface, cb) => {
+    adminEndpoint('/systems/songs', 'songs::save', async (item: SongPlaylistInterface, cb) => {
       isCachedTagsValid = false;
       cb(null, await getRepository(SongPlaylist).save(item));
     });
-    adminEndpoint(this.nsp, 'songs::getAllBanned', async (where, cb) => {
-      where = where || {};
+    adminEndpoint('/systems/songs', 'songs::getAllBanned', async (where, cb) => {
+      where ??= {};
       if (cb) {
         cb(null, await getRepository(SongBan).find(where));
       }
     });
-    adminEndpoint(this.nsp, 'songs::removeRequest', async (id: string, cb) => {
-      cb(null, await getRepository(SongRequest).delete({ id }));
+    adminEndpoint('/systems/songs', 'songs::removeRequest', async (id: string, cb) => {
+      await getRepository(SongRequest).delete({ id });
+      cb(null);
     });
-    publicEndpoint(this.nsp, 'songs::getAllRequests', async (where, cb) => {
+    publicEndpoint('/systems/songs', 'songs::getAllRequests', async (where, cb) => {
       where = where || {};
       cb(null, await getRepository(SongRequest).find({
         ...where,
         order: { addedAt: 'ASC' },
       }));
     });
-    adminEndpoint(this.nsp, 'delete.playlist', async (videoId, cb) => {
+    adminEndpoint('/systems/songs', 'delete.playlist', async (videoId, cb) => {
       isCachedTagsValid = false;
       await getRepository(SongPlaylist).delete({ videoId });
       if (cb) {
         cb(null);
       }
     });
-    adminEndpoint(this.nsp, 'delete.ban', async (videoId, cb) => {
+    adminEndpoint('/systems/songs', 'delete.ban', async (videoId, cb) => {
       await getRepository(SongBan).delete({ videoId });
       if (cb) {
         cb(null);
       }
     });
-    adminEndpoint(this.nsp, 'stop.import', () => {
+    adminEndpoint('/systems/songs', 'stop.import', () => {
       importInProgress = false;
     });
-    adminEndpoint(this.nsp, 'import.ban', async (url, cb) => {
+    adminEndpoint('/systems/songs', 'import.ban', async (url, cb) => {
       try {
         cb(null, await this.banSong({
           isAction: false, emotesOffsets: new Map(), isFirstTimeMessage: false, parameters: this.getIdFromURL(url), sender: getBotSender(), command: '', createdAt: Date.now(), attr: {}, discord: undefined,
@@ -212,7 +213,7 @@ class Songs extends System {
         cb(e.stack, []);
       }
     });
-    adminEndpoint(this.nsp, 'import.playlist', async ({ playlist, forcedTag }, cb) => {
+    adminEndpoint('/systems/songs', 'import.playlist', async ({ playlist, forcedTag }, cb) => {
       try {
         isCachedTagsValid = false;
         cb(null, await this.importPlaylist({
@@ -222,7 +223,7 @@ class Songs extends System {
         cb(e.stack, null);
       }
     });
-    adminEndpoint(this.nsp, 'import.video', async ({ playlist, forcedTag }, cb) => {
+    adminEndpoint('/systems/songs', 'import.video', async ({ playlist, forcedTag }, cb) => {
       try {
         cb(null, await this.addSongToPlaylist({
           isAction: false, emotesOffsets: new Map(), isFirstTimeMessage: false, parameters: playlist, sender: getBotSender(), command: '', createdAt: Date.now(), attr: { forcedTag }, discord: undefined,
@@ -231,7 +232,7 @@ class Songs extends System {
         cb(e.stack, null);
       }
     });
-    adminEndpoint(this.nsp, 'next', async () => {
+    adminEndpoint('/systems/songs', 'next', async () => {
       this.sendNextSongID();
     });
 

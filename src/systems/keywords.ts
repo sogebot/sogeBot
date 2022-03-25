@@ -33,7 +33,7 @@ class Keywords extends System {
   }
 
   sockets () {
-    adminEndpoint(this.nsp, 'generic::setById', async (opts, cb) => {
+    adminEndpoint('/systems/keywords', 'generic::setById', async (opts, cb) => {
       try {
         const item = await getRepository(Keyword).findOne({ id: String(opts.id) });
         await getRepository(Keyword).save({ ...item, ...opts.item });
@@ -46,13 +46,13 @@ class Keywords extends System {
         }
       }
     });
-    adminEndpoint(this.nsp, 'generic::deleteById', async (id, cb) => {
+    adminEndpoint('/systems/keywords', 'generic::deleteById', async (id, cb) => {
       if (typeof id === 'string') {
         await getRepository(Keyword).delete({ id });
       }
       cb(null);
     });
-    adminEndpoint(this.nsp, 'generic::getAll', async (cb) => {
+    adminEndpoint('/systems/keywords', 'generic::getAll', async (cb) => {
       try {
         const items = await getRepository(Keyword).find({
           relations: ['responses'],
@@ -63,7 +63,7 @@ class Keywords extends System {
         cb(e.stack, []);
       }
     });
-    adminEndpoint(this.nsp, 'generic::getOne', async (id, cb) => {
+    adminEndpoint('/systems/keywords', 'generic::getOne', async (id, cb) => {
       cb(null, await getRepository(Keyword).findOne({ where: { id: String(id) }, relations: ['responses'] }));
     });
   }

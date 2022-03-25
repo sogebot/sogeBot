@@ -76,7 +76,7 @@ class Cooldown extends System {
   }
 
   sockets () {
-    adminEndpoint(this.nsp, 'cooldown::save', async (dataset: CooldownInterface, cb) => {
+    adminEndpoint('/systems/cooldown', 'cooldown::save', async (dataset: CooldownInterface, cb) => {
       try {
         const item = await getRepository(CooldownEntity).save(dataset);
         cb(null, item);
@@ -84,21 +84,21 @@ class Cooldown extends System {
         cb(e.stack);
       }
     });
-    adminEndpoint(this.nsp, 'generic::deleteById', async (id, cb) => {
+    adminEndpoint('/systems/cooldown', 'generic::deleteById', async (id, cb) => {
       await getRepository(CooldownEntity).delete({ id: String(id) });
       if (cb) {
         cb(null);
       }
     });
-    adminEndpoint(this.nsp, 'generic::getAll', async (cb) => {
+    adminEndpoint('/systems/cooldown', 'generic::getAll', async (cb) => {
       try {
         const cooldown = await getRepository(CooldownEntity).find({ order: { name: 'ASC' } });
         cb(null, cooldown);
       } catch (e: any) {
-        cb(e.stack);
+        cb(e.stack, []);
       }
     });
-    adminEndpoint(this.nsp, 'generic::getOne', async (id, cb) => {
+    adminEndpoint('/systems/cooldown', 'generic::getOne', async (id, cb) => {
       try {
         const cooldown = await getRepository(CooldownEntity).findOne({ where: { id } });
         cb(null, cooldown);

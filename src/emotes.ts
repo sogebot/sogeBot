@@ -65,7 +65,7 @@ class Emotes extends Core {
 
   @onStartup()
   onStartup() {
-    publicEndpoint(this.nsp, 'getCache', async (cb) => {
+    publicEndpoint('/core/emotes', 'getCache', async (cb) => {
       try {
         cb(null, await getRepository(CacheEmotes).find({ type: In(this.types) }));
       } catch (e: any) {
@@ -73,19 +73,19 @@ class Emotes extends Core {
       }
     });
 
-    adminEndpoint(this.nsp, 'testExplosion', (cb) => {
+    adminEndpoint('/core/emotes', 'testExplosion', (cb) => {
       this._testExplosion();
       cb(null, null);
     });
-    adminEndpoint(this.nsp, 'testFireworks', (cb) => {
+    adminEndpoint('/core/emotes', 'testFireworks', (cb) => {
       this._testFireworks();
       cb(null, null);
     });
-    adminEndpoint(this.nsp, 'test', (cb) => {
+    adminEndpoint('/core/emotes', 'test', (cb) => {
       this._test();
       cb(null, null);
     });
-    adminEndpoint(this.nsp, 'removeCache', (cb) => {
+    adminEndpoint('/core/emotes', 'removeCache', (cb) => {
       this.removeCache();
       cb(null, null);
     });

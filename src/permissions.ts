@@ -1,7 +1,7 @@
 import { getRepository } from 'typeorm';
 
 import Core from '~/_interface';
-import { Permissions as PermissionsEntity, PermissionsInterface } from '~/database/entity/permissions';
+import { Permissions as PermissionsEntity } from '~/database/entity/permissions';
 import { User } from '~/database/entity/user';
 import { command, default_permission } from '~/decorators';
 import { onStartup } from '~/decorators/on';
@@ -24,7 +24,7 @@ class Permissions extends Core {
   }
 
   public sockets() {
-    adminEndpoint(this.nsp, 'permission::save', async (data: Required<PermissionsInterface>[], cb) => {
+    adminEndpoint('/core/permissions', 'permission::save', async (data, cb) => {
       cleanViewersCache();
       // we need to remove missing permissions
       const permissionsFromDB = await getRepository(PermissionsEntity).find();
@@ -39,14 +39,14 @@ class Permissions extends Core {
         cb(null);
       }
     });
-    adminEndpoint(this.nsp, 'generic::deleteById', async (id, cb) => {
+    adminEndpoint('/core/permissions', 'generic::deleteById', async (id, cb) => {
       cleanViewersCache();
       await getRepository(PermissionsEntity).delete({ id: String(id) });
       if (cb) {
         cb(null);
       }
     });
-    adminEndpoint(this.nsp, 'test.user', async (opts, cb) => {
+    adminEndpoint('/core/permissions', 'test.user', async (opts, cb) => {
       if (!(await getRepository(PermissionsEntity).findOne({ id: String(opts.pid) }))) {
         cb('permissionNotFoundInDatabase');
         return;

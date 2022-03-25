@@ -44,12 +44,12 @@ class Highlights extends System {
   }
 
   public sockets() {
-    adminEndpoint(this.nsp, 'highlight', () => {
+    adminEndpoint('/systems/highlights', 'highlight', () => {
       this.main({
         parameters: '', sender: getBotSender(), attr: {}, command: '!highlight', createdAt: Date.now(), isAction: false, emotesOffsets: new Map(), isFirstTimeMessage: false, discord: undefined,
       });
     });
-    adminEndpoint(this.nsp, 'generic::getAll', async (cb) => {
+    adminEndpoint('/systems/highlights', 'generic::getAll', async (cb) => {
       (async function getAll(callback): Promise<void> {
         const highlightsToCheck = await getRepository(Highlight).find({ order: { createdAt: 'DESC' }, where: { expired: false } });
         try {
@@ -74,7 +74,7 @@ class Highlights extends System {
         }
       })(cb);
     });
-    adminEndpoint(this.nsp, 'generic::deleteById', async (id, cb) => {
+    adminEndpoint('/systems/highlights', 'generic::deleteById', async (id, cb) => {
       try {
         await getRepository(Highlight).delete({ id });
         cb(null);

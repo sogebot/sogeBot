@@ -15,7 +15,7 @@ class Tips extends Stats {
   }
 
   sockets() {
-    adminEndpoint(this.nsp, 'generic::getAll', async (cb) => {
+    adminEndpoint('/stats/tips', 'generic::getAll', async (cb) => {
       try {
         const items = await getRepository(UserTip).find();
         cb(null, await Promise.all(items.map(async (item) => {

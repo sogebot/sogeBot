@@ -10,18 +10,18 @@ import { variables } from '~/watchers';
 
 class Chat extends Widget {
   public sockets() {
-    adminEndpoint(this.nsp, 'chat.message.send', async (message) => {
+    adminEndpoint('/widgets/chat', 'chat.message.send', async (message) => {
       const botUsername = variables.get('services.twitch.botUsername') as string;
       const botId = variables.get('services.twitch.botId') as string;
       sendMessage(message, getUserSender(botId, botUsername), { force: true });
     });
 
-    publicEndpoint(this.nsp, 'room', async (cb: (error: null, data: string) => void) => {
+    publicEndpoint('/widgets/chat', 'room', async (cb: (error: null, data: string) => void) => {
       const broadcasterUsername = variables.get('services.twitch.broadcasterUsername') as string;
       cb(null, broadcasterUsername.toLowerCase());
     });
 
-    adminEndpoint(this.nsp, 'viewers', async (cb) => {
+    adminEndpoint('/widgets/chat', 'viewers', async (cb) => {
       try {
         const broadcasterUsername = variables.get('services.twitch.broadcasterUsername') as string;
         const url = `https://tmi.twitch.tv/group/user/${broadcasterUsername.toLowerCase()}/chatters`;
@@ -33,7 +33,7 @@ class Chat extends Widget {
           cb(null, { chatters });
         }
       } catch (e: any) {
-        cb(e.message, {});
+        cb(e.message, { chatters: [] });
       }
     });
   }
