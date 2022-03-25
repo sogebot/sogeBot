@@ -55,7 +55,9 @@ export interface getListOfReturn {
 type GenericEvents = {
   'settings': (cb: (error: Error | string | null, settings: Record<string, any>, ui: Record<string, any>) => void) => void,
   'settings.update': (opts: Record<string,any>, cb: (error: Error | string | null) => void) => void,
+  'settings.refresh': () => void,
   'set.value': (opts: { variable: string, value: any }, cb: (error: Error | string | null, opts: { variable: string, value: any } | null) => void) => void,
+  'get.value': (variable: string, cb: (error: Error | string | null, value: any) => void) => void,
 };
 
 type generic<T> = {
@@ -206,6 +208,14 @@ export type ClientToServerEventsWithNamespace = {
     'generic::getAll': (cb: (error: Error | string | null, array: any[], items: Readonly<Required<ChecklistInterface>>[]) => void) => void,
     'checklist::save': (item: ChecklistInterface, cb: (error: Error | string | null) => void) => void,
   },
+  '/games/seppuku': GenericEvents,
+  '/games/heist': GenericEvents,
+  '/games/fightme': GenericEvents,
+  '/games/duel': GenericEvents,
+  '/games/roulette': GenericEvents,
+  '/games/gamble': GenericEvents,
+  '/core/dashboard': GenericEvents,
+  '/core/currency': GenericEvents,
   '/systems/userinfo': GenericEvents,
   '/systems/scrim': GenericEvents,
   '/systems/emotescombo': GenericEvents,
@@ -251,7 +261,7 @@ export type ClientToServerEventsWithNamespace = {
   },
   '/systems/queue': GenericEvents & {
     'queue::getAllPicked': (cb: (error: Error | string | null, items: QueueInterface[]) => void) => void,
-    'queue::pick': (data: { username: string | string[], random: boolean, count: number; }, cb: (error: Error | string | null, items?: QueueInterface[]) => void) => void,
+    'queue::pick': (data: { username?: string | string[], random: boolean, count: number; }, cb: (error: Error | string | null, items?: QueueInterface[]) => void) => void,
     'queue::clear': (cb: (error: Error | string | null) => void) => void,
     'generic::getAll': generic<QueueInterface>['getAll'],
   },
@@ -336,7 +346,6 @@ export type ClientToServerEventsWithNamespace = {
     'events::remove': (event: Required<EventInterface>, cb: (error: Error | string | null) => void) => void,
   },
   '/core/tts': GenericEvents & {
-    'settings.refresh': () => void,
     'google::speak': (opts: { volume: number; pitch: number; rate: number; text: string; voice: string; }, cb: (error: Error | string | null, audioContent?: string | null) => void) => void,
   },
   '/core/ui': GenericEvents & {
