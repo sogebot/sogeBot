@@ -156,7 +156,7 @@ class Donationalerts extends Integration {
   }
 
   sockets() {
-    adminEndpoint(this.nsp, 'donationalerts::validate', (token, cb) => {
+    adminEndpoint('/integrations/donationalerts', 'donationalerts::validate', (token, cb) => {
       axios('https://www.donationalerts.com/api/v1/alerts/donations', {
         method:  'GET',
         headers: {

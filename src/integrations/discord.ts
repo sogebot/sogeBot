@@ -669,7 +669,7 @@ class Discord extends Integration {
   }
 
   sockets() {
-    adminEndpoint(this.nsp, 'discord::getRoles', async (cb) => {
+    adminEndpoint('/integrations/discord', 'discord::getRoles', async (cb) => {
       try {
         if (this.client && this.guild) {
           return cb(null, this.client.guilds.cache.get(this.guild)?.roles.cache
@@ -685,7 +685,7 @@ class Discord extends Integration {
               // names must be equal
               return 0;
             })
-            .map(o => ({ text: `<strong>${o.name}</strong> <small class="font-italic">${o.id}</small>`, value: o.id })),
+            .map(o => ({ text: `<strong>${o.name}</strong> <small class="font-italic">${o.id}</small>`, value: o.id })) || [],
           );
         } else {
           cb(null, []);
@@ -694,7 +694,7 @@ class Discord extends Integration {
         cb(e.message, []);
       }
     });
-    adminEndpoint(this.nsp, 'discord::getGuilds', async (cb) => {
+    adminEndpoint('/integrations/discord', 'discord::getGuilds', async (cb) => {
       try {
         if (this.client) {
           return cb(null, this.client.guilds.cache
@@ -718,7 +718,7 @@ class Discord extends Integration {
         cb(e.message, []);
       }
     });
-    adminEndpoint(this.nsp, 'discord::getChannels', async (cb) => {
+    adminEndpoint('/integrations/discord', 'discord::getChannels', async (cb) => {
       try {
         if (this.client && this.guild) {
           cb(null, this.client.guilds.cache.get(this.guild)?.channels.cache
@@ -735,7 +735,7 @@ class Discord extends Integration {
               // names must be equal
               return 0;
             })
-            .map(o => ({ text: `<strong>#${(o as DiscordJs.TextChannel).name}</strong> <small class="font-italic">${o.id}</small>`, value: o.id })),
+            .map(o => ({ text: `<strong>#${(o as DiscordJs.TextChannel).name}</strong> <small class="font-italic">${o.id}</small>`, value: o.id })) || [],
           );
         } else {
           cb(null, []);
@@ -744,7 +744,7 @@ class Discord extends Integration {
         cb(e.stack, []);
       }
     });
-    adminEndpoint(this.nsp, 'discord::authorize', async (cb) => {
+    adminEndpoint('/integrations/discord', 'discord::authorize', async (cb) => {
       if (this.token === '' || this.clientId === '') {
         cb('Cannot authorize! Missing clientId or token. Please save changes before authorizing.', null);
       } else {

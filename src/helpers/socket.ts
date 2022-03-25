@@ -1,17 +1,14 @@
 import type { AlertInterface } from '@entity/alert';
-import type { CommandsBoardInterface, CommandsCountInterface, CommandsInterface } from '@entity/commands';
+import type { CommandsCountInterface, CommandsInterface } from '@entity/commands';
 import type { CooldownInterface } from '@entity/cooldown';
 import type { EventInterface } from '@entity/event';
-import type { GoalGroupInterface } from '@entity/goal';
 import type { HowLongToBeatGameInterface, HowLongToBeatGameItemInterface } from '@entity/howLongToBeatGame';
 import type { KeywordInterface } from '@entity/keyword';
-import { OBSWebsocketInterface } from '@entity/obswebsocket';
 import type { PermissionsInterface } from '@entity/permissions';
 import type { PriceInterface } from '@entity/price';
 import { QueueInterface } from '@entity/queue';
 import { QuotesInterface } from '@entity/quotes';
 import { RaffleInterface } from '@entity/raffle';
-import type { RandomizerInterface } from '@entity/randomizer';
 import type { RankInterface } from '@entity/rank';
 import type { currentSongType, SongBanInterface, SongPlaylistInterface } from '@entity/song';
 import type { TextInterface } from '@entity/text';
@@ -22,11 +19,8 @@ import type {
 import type { VariableInterface, VariableWatchInterface } from '@entity/variable';
 import { HelixVideo } from '@twurple/api/lib';
 import { HowLongToBeatEntry } from 'howlongtobeat';
-import type ObsWebSocket from 'obs-websocket-js';
 import { Socket } from 'socket.io';
 import { FindConditions } from 'typeorm';
-
-import type PUBG from '../integrations/pubg';
 
 import { BetsInterface } from '~/database/entity/bets';
 import { ChecklistInterface } from '~/database/entity/checklist';
@@ -37,11 +31,11 @@ import { OverlayMapperMarathon } from '~/database/entity/overlay';
 import { PollInterface } from '~/database/entity/poll';
 import { SpotifySongBanInterface } from '~/database/entity/spotify';
 
-interface GenericEvents {
+type GenericEvents = {
   'settings': (cb: (error: Error | string | null, settings: Record<string, any> | null, ui: Record<string, any> | null) => Promise<void>) => void,
   'settings.update': (opts: Record<string,any>, cb: (error: Error | string | null) => Promise<void>) => void,
   'set.value': (opts: { variable: string, value: any }, cb: (error: Error | string | null, opts: { variable: string, value: any } | null) => Promise<void>) => void,
-}
+};
 
 type generic<T> = {
   getAll: (cb: (error: Error | string | null, items: Readonly<Required<T>>[]) => Promise<void>) => void,
@@ -51,6 +45,27 @@ type generic<T> = {
 };
 
 export type ClientToServerEventsWithNamespace = {
+  '/core/emotes': GenericEvents & {
+    'testExplosion': (cb: (err: Error | string | null, data: null ) => void) => void,
+    'testFireworks': (cb: (err: Error | string | null, data: null ) => void) => void,
+    'test': (cb: (err: Error | string | null, data: null ) => void) => void,
+    'removeCache': (cb: (err: Error | string | null, data: null ) => void) => void,
+  },
+  '/integrations/discord': GenericEvents & {
+    'discord::getRoles': (cb: (err: Error | string | null, data: { text: string, value: string}[] ) => void) => void,
+    'discord::getGuilds': (cb: (err: Error | string | null, data: { text: string, value: string}[] ) => void) => void,
+    'discord::getChannels': (cb: (err: Error | string | null, data: { text: string, value: string}[] ) => void) => void,
+    'discord::authorize': (cb: (err: Error | string | null, action?: null | { do: 'redirect', opts: any[] } ) => void) => void,
+  },
+  '/integrations/donationalerts': GenericEvents & {
+    'donationalerts::validate': (token: string, cb: (err: Error | string | null) => void) => void,
+  },
+  '/integrations/pubg': GenericEvents & {
+    'pubg::searchForseasonId': (data: { apiKey: string, platform: string }, cb: (err: Error | string | null, data: null | { data: any[] }) => void) => void,
+    'pubg::searchForPlayerId': (data: { apiKey: string, platform: string, playerName: string }, cb: (err: Error | string | null, data: null | any) => void) => void,
+    'pubg::getUserStats': (data: { apiKey: string, platform: string, playerId: string, seasonId: string, ranked: boolean}, cb: (err: Error | string | null, data: null | any) => void) => void,
+    'pubg::exampleParse': (data: { text: string}, cb: (err: Error | string | null, data: string | null) => void) => void,
+  },
   '/integrations/spotify': GenericEvents & {
     'spotify::revoke': (cb: (err: Error | string | null, opts?: { do: 'refresh' }) => void) => void,
     'spotify::authorize': (cb: (err: Error | string | null, action?: null | { do: 'redirect', opts: any[] }) => void) => void,
@@ -316,12 +331,15 @@ export type ClientToServerEventsWithNamespace = {
   }
   [x: string]: GenericEvents,
 };
-export type NSPNames = keyof ClientToServerEventsWithNamespace;
-export type EventNames<K extends NSPNames> = keyof ClientToServerEventsWithNamespace[K];
-export type EventParams<
-  namespace extends keyof ClientToServerEventsWithNamespace,
-  event extends keyof ClientToServerEventsWithNamespace[namespace]
-> = Parameters<ClientToServerEventsWithNamespace[namespace][event]>;
+
+type Fn<Params extends readonly any[] = readonly any[], Result = any> =
+  (...params: Params) => Result;
+
+type NestedFnParams<
+  O extends Record<PropertyKey, Record<PropertyKey, Fn>>,
+  K0 extends keyof O,
+  K1 extends keyof O[K0],
+> = Parameters<O[K0][K1]>;
 
 const endpoints: {
   type: 'admin' | 'viewer' | 'public';
@@ -330,7 +348,7 @@ const endpoints: {
   callback: any;
 }[] = [];
 
-function adminEndpoint<K extends NSPNames, T extends EventNames<K>>(nsp: K, on: T, callback: (...args: EventParams<K, T>) => void): void {
+function adminEndpoint<K0 extends keyof O, K1 extends keyof O[K0], O extends Record<PropertyKey, Record<PropertyKey, Fn>> = ClientToServerEventsWithNamespace>(nsp: K0, on: K1, callback: (...args: NestedFnParams<O, K0, K1>) => void): void {
   endpoints.push({
     nsp, on, callback, type: 'admin',
   });
