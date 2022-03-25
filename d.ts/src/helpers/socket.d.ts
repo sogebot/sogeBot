@@ -157,6 +157,7 @@ export type ClientToServerEventsWithNamespace = {
   '/': GenericEvents & {
     'translations': (cb: (lang: Record<string, any>) => void) => void,
     'panel::resetStatsState': () => void,
+    'version': (cb: (version: string) => void) => void,
     'debug::get': (cb: (error: Error | string | null, debug: string) => void) => void,
     'debug::set': (debug: string, cb: (error: Error | string | null) => void) => void,
     'panel::alerts': (cb: (error: Error | string | null, data: { errors: import('./panel/alerts').UIError[], warns: import('./panel/alerts').UIError[] }) => void) => void,
@@ -170,10 +171,10 @@ export type ClientToServerEventsWithNamespace = {
     'profiler::load': (cb: (error: Error | string | null, items: [string, number[]][]) => void) => void,
   },
   '/stats/bits': GenericEvents & {
-    'generic::getAll': generic<UserBitInterface>['getAll'],
+    'generic::getAll': generic<UserBitInterface & { username: string }>['getAll'],
   },
   '/stats/tips': GenericEvents & {
-    'generic::getAll': generic<UserTipInterface>['getAll'],
+    'generic::getAll': generic<UserTipInterface & { username: string }>['getAll'],
   },
   '/systems/bets': GenericEvents & {
     'bets::getCurrentBet': (cb: (error: Error | string | null, item?: BetsInterface) => void) => void,
@@ -199,6 +200,7 @@ export type ClientToServerEventsWithNamespace = {
     'generic::getAll': (cb: (error: Error | string | null, array: any[], items: Readonly<Required<ChecklistInterface>>[]) => void) => void,
     'checklist::save': (item: ChecklistInterface, cb: (error: Error | string | null) => void) => void,
   },
+  '/systems/userinfo': GenericEvents,
   '/systems/cooldown': GenericEvents & {
     'generic::getAll': generic<CooldownInterface>['getAll'],
     'generic::getOne': (id: string, cb: (error: Error | string | null, item?: Readonly<Required<CooldownInterface>> | null, count?: number) => void) => void,

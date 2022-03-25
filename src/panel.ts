@@ -481,104 +481,102 @@ class Panel extends Core {
         });
       });
 
-    type toEmit = { name: string; enabled: boolean; areDependenciesEnabled: boolean; isDisabledByEnv: boolean; type: string; }[];
-
-    socket.on('populateListOf', async (type: possibleLists, cb: (err: string | null, toEmit: any) => void) => {
-      let toEmit: any;
-      if (type === 'systems') {
-        for (const system of systems) {
-          toEmit.push({
-            name:                   system.__moduleName__.toLowerCase(),
-            enabled:                system.enabled,
-            areDependenciesEnabled: await system.areDependenciesEnabled,
-            isDisabledByEnv:        system.isDisabledByEnv,
-            type:                   'systems',
-          });
-        }
-      } else if (type === 'services') {
-        for (const system of list('services')) {
-          toEmit.push({
-            name: system.__moduleName__.toLowerCase(),
-            type: 'services',
-          });
-        }
-      } else if (type === 'core') {
-        for (const system of ['dashboard', 'currency', 'ui', 'general', 'twitch', 'socket', 'eventsub', 'updater', 'tts', 'emotes']) {
-          toEmit.push({ name: system.toLowerCase(), type: 'core' });
-        }
-      } else if (type === 'integrations') {
-        for (const system of list('integrations')) {
-          if (!system.showInUI) {
-            continue;
+      socket.on('populateListOf', async (type: possibleLists, cb: (err: string | null, toEmit: any) => void) => {
+        let toEmit: any;
+        if (type === 'systems') {
+          for (const system of systems) {
+            toEmit.push({
+              name:                   system.__moduleName__.toLowerCase(),
+              enabled:                system.enabled,
+              areDependenciesEnabled: await system.areDependenciesEnabled,
+              isDisabledByEnv:        system.isDisabledByEnv,
+              type:                   'systems',
+            });
           }
-          toEmit.push({
-            name:                   system.__moduleName__.toLowerCase(),
-            enabled:                system.enabled,
-            areDependenciesEnabled: await system.areDependenciesEnabled,
-            isDisabledByEnv:        system.isDisabledByEnv,
-            type:                   'integrations',
-          });
-        }
-      } else if (type === 'overlays') {
-        for (const system of list('overlays')) {
-          if (!system.showInUI) {
-            continue;
+        } else if (type === 'services') {
+          for (const system of list('services')) {
+            toEmit.push({
+              name: system.__moduleName__.toLowerCase(),
+              type: 'services',
+            });
           }
-          toEmit.push({ name: system.__moduleName__.toLowerCase(), type: 'overlays' });
-        }
-      } else if (type === 'games') {
-        for (const system of list('games')) {
-          if (!system.showInUI) {
-            continue;
+        } else if (type === 'core') {
+          for (const system of ['dashboard', 'currency', 'ui', 'general', 'twitch', 'socket', 'eventsub', 'updater', 'tts', 'emotes']) {
+            toEmit.push({ name: system.toLowerCase(), type: 'core' });
           }
-          toEmit.push({
-            name:                   system.__moduleName__.toLowerCase(),
-            enabled:                system.enabled,
-            areDependenciesEnabled: await system.areDependenciesEnabled,
-            isDisabledByEnv:        system.isDisabledByEnv,
-            type:                   'games',
-          });
+        } else if (type === 'integrations') {
+          for (const system of list('integrations')) {
+            if (!system.showInUI) {
+              continue;
+            }
+            toEmit.push({
+              name:                   system.__moduleName__.toLowerCase(),
+              enabled:                system.enabled,
+              areDependenciesEnabled: await system.areDependenciesEnabled,
+              isDisabledByEnv:        system.isDisabledByEnv,
+              type:                   'integrations',
+            });
+          }
+        } else if (type === 'overlays') {
+          for (const system of list('overlays')) {
+            if (!system.showInUI) {
+              continue;
+            }
+            toEmit.push({ name: system.__moduleName__.toLowerCase(), type: 'overlays' });
+          }
+        } else if (type === 'games') {
+          for (const system of list('games')) {
+            if (!system.showInUI) {
+              continue;
+            }
+            toEmit.push({
+              name:                   system.__moduleName__.toLowerCase(),
+              enabled:                system.enabled,
+              areDependenciesEnabled: await system.areDependenciesEnabled,
+              isDisabledByEnv:        system.isDisabledByEnv,
+              type:                   'games',
+            });
+          }
         }
-      }
 
-      cb(null, toEmit);
-    });
+        cb(null, toEmit);
+      });
 
-    socket.on('name', function (cb: (botUsername: string) => void) {
-      cb(variables.get('services.twitch.botUsername') as string);
-    });
-    socket.on('channelName', function (cb: (currentChannel: string) => void) {
-      cb(variables.get('services.twitch.currentChannel') as string);
-    });
-    socket.on('version', function (cb: (version: string) => void) {
-      const version = _.get(process, 'env.npm_package_version', 'x.y.z');
-      cb(version.replace('SNAPSHOT', gitCommitInfo().shortHash || 'SNAPSHOT'));
-    });
+      socket.on('name', function (cb: (botUsername: string) => void) {
+        cb(variables.get('services.twitch.botUsername') as string);
+      });
+      socket.on('channelName', function (cb: (currentChannel: string) => void) {
+        cb(variables.get('services.twitch.currentChannel') as string);
+      });
+      socket.on('version', function (cb: (version: string) => void) {
+        const version = _.get(process, 'env.npm_package_version', 'x.y.z');
+        cb(version.replace('SNAPSHOT', gitCommitInfo().shortHash || 'SNAPSHOT'));
+      });
 
-    socket.on('parser.isRegistered', function (data: { emit: string, command: string }) {
-      socket.emit(data.emit, { isRegistered: new Parser().find(data.command) });
-    });
+      socket.on('parser.isRegistered', function (data: { emit: string, command: string }) {
+        socket.emit(data.emit, { isRegistered: new Parser().find(data.command) });
+      });
 
-    socket.on('translations', (cb: (lang: Record<string, any>) => void) => {
+      socket.on('translations', (cb: (lang: Record<string, any>) => void) => {
+        const lang = {};
+        _.merge(
+          lang,
+          translate({ root: 'webpanel' }),
+          translate({ root: 'ui' }), // add ui root -> slowly refactoring to new name
+          { bot: translate({ root: 'core' }) },
+        );
+        cb(lang);
+      });
+
+      // send webpanel translations
       const lang = {};
       _.merge(
         lang,
         translate({ root: 'webpanel' }),
-        translate({ root: 'ui' }), // add ui root -> slowly refactoring to new name
+        translate({ root: 'ui' }), // add ui root -> slowly refactoring to new name,
         { bot: translate({ root: 'core' }) },
       );
-      cb(lang);
-    });
-
-    // send webpanel translations
-    const lang = {};
-    _.merge(
-      lang,
-      translate({ root: 'webpanel' }),
-      translate({ root: 'ui' }), // add ui root -> slowly refactoring to new name,
-      { bot: translate({ root: 'core' }) },
-    );
-    socket.emit('lang', lang);
+      socket.emit('lang', lang);
     });
   }
 }
