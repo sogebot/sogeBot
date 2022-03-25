@@ -1,16 +1,24 @@
 import type { AlertInterface } from '@entity/alert';
+import type { BetsInterface } from '@entity/bets';
+import type { ChecklistInterface } from '@entity/checklist';
 import type { CommandsCountInterface, CommandsInterface } from '@entity/commands';
 import type { CooldownInterface } from '@entity/cooldown';
 import type { EventInterface } from '@entity/event';
+import type { EventListInterface } from '@entity/eventList';
+import type { GalleryInterface } from '@entity/gallery';
+import type { HighlightInterface } from '@entity/highlight';
 import type { HowLongToBeatGameInterface, HowLongToBeatGameItemInterface } from '@entity/howLongToBeatGame';
 import type { KeywordInterface } from '@entity/keyword';
+import type { OverlayMapperMarathon } from '@entity/overlay';
 import type { PermissionsInterface } from '@entity/permissions';
+import type { PollInterface } from '@entity/poll';
 import type { PriceInterface } from '@entity/price';
-import { QueueInterface } from '@entity/queue';
-import { QuotesInterface } from '@entity/quotes';
-import { RaffleInterface } from '@entity/raffle';
+import type { QueueInterface } from '@entity/queue';
+import type { QuotesInterface } from '@entity/quotes';
+import type { RaffleInterface } from '@entity/raffle';
 import type { RankInterface } from '@entity/rank';
 import type { currentSongType, SongBanInterface, SongPlaylistInterface } from '@entity/song';
+import type { SpotifySongBanInterface } from '@entity/spotify';
 import type { TextInterface } from '@entity/text';
 import type { TimerInterface } from '@entity/timer';
 import type {
@@ -21,15 +29,6 @@ import { HelixVideo } from '@twurple/api/lib';
 import { HowLongToBeatEntry } from 'howlongtobeat';
 import { Socket } from 'socket.io';
 import { FindConditions } from 'typeorm';
-
-import { BetsInterface } from '~/database/entity/bets';
-import { ChecklistInterface } from '~/database/entity/checklist';
-import { EventListInterface } from '~/database/entity/eventList';
-import { GalleryInterface } from '~/database/entity/gallery';
-import { HighlightInterface } from '~/database/entity/highlight';
-import { OverlayMapperMarathon } from '~/database/entity/overlay';
-import { PollInterface } from '~/database/entity/poll';
-import { SpotifySongBanInterface } from '~/database/entity/spotify';
 
 type GenericEvents = {
   'settings': (cb: (error: Error | string | null, settings: Record<string, any> | null, ui: Record<string, any> | null) => Promise<void>) => void,
