@@ -312,7 +312,7 @@ class Module {
         try {
           cb(null, await this.getAllSettings(), await this.getUI());
         } catch (e: any) {
-          cb(e.stack, null, null);
+          cb(e.stack, {}, {});
         }
       });
       adminEndpoint(this.nsp, 'settings.update', async (opts, cb) => {
