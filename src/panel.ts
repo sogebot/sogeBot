@@ -15,6 +15,7 @@ import {
   getConnection, getManager, getRepository,
 } from 'typeorm';
 
+import { possibleLists } from '../d.ts/src/helpers/socket.js';
 import emitter from './helpers/interfaceEmitter.js';
 
 import Core from '~/_interface';
@@ -481,77 +482,65 @@ class Panel extends Core {
       });
 
     type toEmit = { name: string; enabled: boolean; areDependenciesEnabled: boolean; isDisabledByEnv: boolean; type: string; }[];
-    // send enabled systems
-    socket.on('systems', async (cb: (err: string | null, toEmit: toEmit) => void) => {
-      const toEmit: toEmit = [];
-      for (const system of systems) {
-        toEmit.push({
-          name:                   system.__moduleName__.toLowerCase(),
-          enabled:                system.enabled,
-          areDependenciesEnabled: await system.areDependenciesEnabled,
-          isDisabledByEnv:        system.isDisabledByEnv,
-          type:                   'systems',
-        });
-      }
-      cb(null, toEmit);
-    });
-    socket.on('services', async (cb: (err: string | null, toEmit: { name: string; type: string; }[]) => void) => {
-      const toEmit: { name: string; type: string; }[] = [];
-      for (const system of list('services')) {
-        toEmit.push({
-          name: system.__moduleName__.toLowerCase(),
-          type: 'services',
-        });
-      }
-      cb(null, toEmit);
-    });
-    socket.on('core', async (cb: (err: string | null, toEmit: { name: string; type: string; }[]) => void) => {
-      const toEmit: { name: string; type: string; }[] = [];
-      for (const system of ['dashboard', 'currency', 'ui', 'general', 'twitch', 'socket', 'eventsub', 'updater', 'tts', 'emotes']) {
-        toEmit.push({ name: system.toLowerCase(), type: 'core' });
-      }
-      cb(null, toEmit);
-    });
-    socket.on('integrations', async (cb: (err: string | null, toEmit: toEmit) => void) => {
-      const toEmit: toEmit = [];
-      for (const system of list('integrations')) {
-        if (!system.showInUI) {
-          continue;
+
+    socket.on('populateListOf', async (type: possibleLists, cb: (err: string | null, toEmit: any) => void) => {
+      let toEmit: any;
+      if (type === 'systems') {
+        for (const system of systems) {
+          toEmit.push({
+            name:                   system.__moduleName__.toLowerCase(),
+            enabled:                system.enabled,
+            areDependenciesEnabled: await system.areDependenciesEnabled,
+            isDisabledByEnv:        system.isDisabledByEnv,
+            type:                   'systems',
+          });
         }
-        toEmit.push({
-          name:                   system.__moduleName__.toLowerCase(),
-          enabled:                system.enabled,
-          areDependenciesEnabled: await system.areDependenciesEnabled,
-          isDisabledByEnv:        system.isDisabledByEnv,
-          type:                   'integrations',
-        });
-      }
-      cb(null, toEmit);
-    });
-    socket.on('overlays', async (cb: (err: string | null, toEmit: { name: string; type: string; }[]) => void) => {
-      const toEmit: { name: string; type: string; }[] = [];
-      for (const system of list('overlays')) {
-        if (!system.showInUI) {
-          continue;
+      } else if (type === 'services') {
+        for (const system of list('services')) {
+          toEmit.push({
+            name: system.__moduleName__.toLowerCase(),
+            type: 'services',
+          });
         }
-        toEmit.push({ name: system.__moduleName__.toLowerCase(), type: 'overlays' });
-      }
-      cb(null, toEmit);
-    });
-    socket.on('games', async (cb: (err: string | null, toEmit: toEmit) => void) => {
-      const toEmit: toEmit = [];
-      for (const system of list('games')) {
-        if (!system.showInUI) {
-          continue;
+      } else if (type === 'core') {
+        for (const system of ['dashboard', 'currency', 'ui', 'general', 'twitch', 'socket', 'eventsub', 'updater', 'tts', 'emotes']) {
+          toEmit.push({ name: system.toLowerCase(), type: 'core' });
         }
-        toEmit.push({
-          name:                   system.__moduleName__.toLowerCase(),
-          enabled:                system.enabled,
-          areDependenciesEnabled: await system.areDependenciesEnabled,
-          isDisabledByEnv:        system.isDisabledByEnv,
-          type:                   'games',
-        });
+      } else if (type === 'integrations') {
+        for (const system of list('integrations')) {
+          if (!system.showInUI) {
+            continue;
+          }
+          toEmit.push({
+            name:                   system.__moduleName__.toLowerCase(),
+            enabled:                system.enabled,
+            areDependenciesEnabled: await system.areDependenciesEnabled,
+            isDisabledByEnv:        system.isDisabledByEnv,
+            type:                   'integrations',
+          });
+        }
+      } else if (type === 'overlays') {
+        for (const system of list('overlays')) {
+          if (!system.showInUI) {
+            continue;
+          }
+          toEmit.push({ name: system.__moduleName__.toLowerCase(), type: 'overlays' });
+        }
+      } else if (type === 'games') {
+        for (const system of list('games')) {
+          if (!system.showInUI) {
+            continue;
+          }
+          toEmit.push({
+            name:                   system.__moduleName__.toLowerCase(),
+            enabled:                system.enabled,
+            areDependenciesEnabled: await system.areDependenciesEnabled,
+            isDisabledByEnv:        system.isDisabledByEnv,
+            type:                   'games',
+          });
+        }
       }
+
       cb(null, toEmit);
     });
 
