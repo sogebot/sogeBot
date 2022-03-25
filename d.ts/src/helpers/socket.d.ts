@@ -328,7 +328,6 @@ export type ClientToServerEventsWithNamespace = {
     'customvariables::delete': (id: string, cb?: (error: Error | string | null) => Promise<void>) => void,
     'customvariables::save': (item: Required<VariableInterface>, cb: (error: Error | string | null, itemId: string) => Promise<void>) => void,
   }
-  [x: string]: GenericEvents,
 };
 
 type Fn<Params extends readonly any[] = readonly any[], Result = any> =

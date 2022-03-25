@@ -7,6 +7,8 @@ import type { Namespace } from 'socket.io/dist/namespace';
 import { getRepository } from 'typeorm';
 import { v4 as uuid } from 'uuid';
 
+import { ClientToServerEventsWithNamespace } from '../d.ts/src/helpers/socket';
+
 import { PermissionCommands, Permissions as PermissionsEntity } from '~/database/entity/permissions';
 import { Settings } from '~/database/entity/settings';
 import {
@@ -77,7 +79,7 @@ class Module {
   }
 
   get nsp() {
-    return '/' + this._name + '/' + this.__moduleName__.toLowerCase();
+    return '/' + this._name + '/' + this.__moduleName__.toLowerCase() as keyof ClientToServerEventsWithNamespace;
   }
 
   get enabled(): boolean {
