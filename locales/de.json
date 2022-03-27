@@ -44,7 +44,7 @@
   },
   "webpanel": {
     "this-system-is-disabled": "Dieses System ist deaktiviert",
-    "or": "or",
+    "or": "oder",
     "loading": "Wird geladen",
     "this-may-take-a-while": "Das <strong>könnte</strong> ein wenig dauern",
     "display-as": "Anzeigen als",
@@ -239,7 +239,7 @@
           "placeholder": "Setze deinen !commandToRun"
         },
         "isCommandQuiet": {
-          "label": "Mute command output"
+          "label": "Stummschaltung der Befehlsausgabe"
         },
         "urlOfSoundFile": {
           "label": "Url der Sounddatei",
@@ -296,30 +296,30 @@
       }
     },
     "eventlist-events": {
-      "follow": "<strong>folgt</strong> Dir",
+      "follow": "<strong>folgt</strong> dir",
       "host": "<strong>gehostet</strong>",
       "raid": "<strong>raided</strong>",
       "sub": "<strong>subbed</strong> you",
-      "subgift": "has been <strong>gifted</strong> sub",
-      "subcommunitygift": "<strong>gifted</strong> subs for community",
+      "subgift": "<strong> hat </strong> sub's verschenkt",
+      "subcommunitygift": "<strong>verschenkte</strong> sub's für Zuschauer",
       "resub": "<strong>resubbed</strong>",
-      "cheer": "<strong>cheered</strong> you",
-      "tip": "<strong>tipped</strong> you",
-      "rewardredeem": "just <strong>redeemed</strong> reward"
+      "cheer": "<strong>cheered</strong> dir",
+      "tip": "<strong>Spendet</strong> dir",
+      "rewardredeem": "hat eine <strong>Belohnung</strong> eingelöst"
     },
     "responses": {
       "variable": {
-        "titleOfPrediction": "Twitch Prediction - Title",
-        "outcomes": "Twitch Prediction - Outcomes",
-        "locksAt": "Twitch Prediction - Locks At Date",
-        "winningOutcomeTitle": "Twitch Prediction - Winning outcome title",
-        "winningOutcomeTotalPoints": "Twitch Prediction - Winning outcome total points",
-        "winningOutcomePercentage": "Twitch Prediction - Winning outcome percentage",
+        "titleOfPrediction": "Twitter Vorhersage - Titel",
+        "outcomes": "Twitch Vorhersage - Ergebnisse",
+        "locksAt": "Twitch Vorhersage - Datum der Sperre",
+        "winningOutcomeTitle": "Twitch Vorhersage - Gewinnergebnis Titel",
+        "winningOutcomeTotalPoints": "Twitch Vorhersage - Gewinnergebnis Gesamtzahlpunkte",
+        "winningOutcomePercentage": "Twitch Vorhersage - Gewinnergebnis Prozentsatz",
         "titleOfPoll": "Twitch Umfrage - Titel",
-        "bitAmountPerVote": "Twitch Poll - Amount of bits to count as 1 vote",
-        "bitVotingEnabled": "Twitch Poll - Is bit voting enabled (boolean)",
-        "channelPointsAmountPerVote": "Twitch Poll - Amount of channel points to count as 1 vote",
-        "channelPointsVotingEnabled": "Twitch Poll - Is channel points voting enabled (boolean)",
+        "bitAmountPerVote": "Twitch-Umfrage - Anzahl der Bits, die als 1 Stimme zählen",
+        "bitVotingEnabled": "Twitch Umfrage - Ist Bit-Voting aktiviert (boolesch)",
+        "channelPointsAmountPerVote": "Twitch-Umfrage - Anzahl der Kanalpunkte, die als 1 Stimme zählen",
+        "channelPointsVotingEnabled": "Twitch-Umfrage - Ist die Abstimmung über Kanalpunkte aktiviert (boolesch)",
         "votes": "Twitch-Umfrage - Stimmenanzahl",
         "winnerChoice": "Twitch-Umfrage - Wahl des Siegers",
         "winnerPercentage": "Twitch Umfrage - Prozentsatz der Wahl des Siegers",
@@ -336,13 +336,13 @@
         "topContributionsBitsUsername": "Top-Bits Beitrag - Benutzername",
         "topContributionsSubsTotal": "Top-Subs - Gesamt",
         "topContributionsSubsUserId": "Top-Subs - Benutzer-ID",
-        "topContributionsSubsUsername": "Top Subs Contribution - Username",
+        "topContributionsSubsUsername": "Top Subs Beitrag - Benutzername",
         "sender": "Benutzer der initiiert hat",
         "title": "Aktueller Titel",
         "game": "Aktuelles Spiel",
         "language": "Aktuelle Sprache des Stream",
         "viewers": "Anzahl der aktuellen Zuschauer",
-        "hostViewers": "Host/Raid viewers count",
+        "hostViewers": "Host/Raid-Zuschauerzahl",
         "views": "Aktuelle Zuschaueranzahl",
         "followers": "Aktuelle Follower Anzahl",
         "subscribers": "Anzahl aktueller Abonnenten",
@@ -450,7 +450,7 @@
         "source": "Aktuelle Quelle (twitch oder discord)",
         "userInput": "Benutzereingabe beim Einlösen der Belohnung",
         "isBotSubscriber": "Ist Bot Abonnent (bool)",
-        "isStreamOnline": "Is stream online (bool)",
+        "isStreamOnline": "Ist der Stream online (bool)",
         "uptime": "Laufzeit des Stream",
         "is": {
           "moderator": "Ist Benutzer Mod? (Bool)",
@@ -706,7 +706,7 @@
     "on": "an",
     "off": "aus",
     "search-by-username": "Nach Benutzernamen suchen",
-    "widget-title-custom": "CUSTOM",
+    "widget-title-custom": "Benutzerdefiniert",
     "widget-title-eventlist": "EVENTLISTE",
     "widget-title-chat": "CHAT",
     "widget-title-queue": "WARTESCHLANGE",
@@ -725,9 +725,9 @@
     "unfollow": "Entfolgen",
     "hypetrain-started": "Hype Zug gestartet",
     "hypetrain-ended": "Hype Zug beendet",
-    "prediction-started": "Twitch Prediction started",
-    "prediction-locked": "Twitch Prediction locked",
-    "prediction-ended": "Twitch Prediction ended",
+    "prediction-started": "Twitch Vorhersage gestartet",
+    "prediction-locked": "Twitch-Vorhersage gesperrt",
+    "prediction-ended": "Twitch Vorhersage beendet",
     "poll-started": "Twitch-Umfrage gestartet",
     "poll-ended": "Twitch-Umfrage beendet",
     "hypetrain-level-reached": "Hype Zug hat ein neues Level erreicht",
@@ -1141,7 +1141,7 @@
       "trigger": "$sender versucht sein Glück und drückte den Abzug",
       "alive": "$sender ist am Leben! Nichts ist passiert.",
       "dead": "Das Gehirn von $sender wurde auf der Wand verteilt!",
-      "mod": "$sender is incompetent and completely missed his head!",
+      "mod": "$sender ist inkompetent und hat seinen Kopf völlig verfehlt!",
       "broadcaster": "$sender benutzt eine leere Waffe, Boo!",
       "timeout": "Roulette Timeout auf $values gesetzt"
     },
@@ -1173,7 +1173,7 @@
       "loseWithJackpot": "$sender, du hast verloren! Du hast jetzt $points $pointsName. Der Jackpot wurde auf $jackpot $jackpotName erhöht",
       "lose": "$sender, du hast verloren! Du hast jetzt $points $pointsName",
       "currentJackpot": "$sender, aktueller Jackpot für $command ist $points $pointsName",
-      "winJackpotCount": "$sender, you won $count jackpots",
+      "winJackpotCount": "$sender, du hast $count Jackpots gewonnen",
       "jackpotIsDisabled": "$sender, Jackpot ist für $command deaktiviert."
     }
   },
@@ -1188,8 +1188,8 @@
   "whisper": {
     "settings": {
       "disablePermissionWhispers": {
-        "true": "Bot won't send errors on insufficient permissions",
-        "false": "Bot won't send errors on insufficient permissions through whispers"
+        "true": "Der Bot sendet keine Fehler bei unzureichenden Berechtigungen",
+        "false": "Der Bot sendet keine Fehler bei unzureichenden Berechtigungen über Whispers"
       },
       "disableCooldownWhispers": {
         "true": "Bot sendet keine Cooldown-Benachrichtigungen",
