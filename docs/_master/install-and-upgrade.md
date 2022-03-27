@@ -27,7 +27,7 @@
     - From GIT: `git clone git@github.com:sogehige/sogeBot-docker.git`
     - Without GIT as [ZIP](https://github.com/sogehige/sogeBot-docker/archive/master.zip)
 2. Configure properly .env file in `root` directory
-    - You can find examples at [our GitHub repository](https://github.com/sogebot/sogeBot/tree/master/src/bot/data)
+    - You can find examples at [our GitHub repository](https://github.com/sogebot/sogeBot/tree/master/src/data)
 3. Download bot images with `docker compose`
     - Release version: `docker-compose pull`
     - Nightly version: `docker-compose -f docker-compose-nightly.yml pull`
