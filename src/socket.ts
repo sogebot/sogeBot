@@ -235,9 +235,11 @@ class Socket extends Core {
     adminEndpoint('/core/socket', 'purgeAllConnections', (cb, socket) => {
       this.JWTKey = uuid();
       ioServer?.emit('forceDisconnect');
-      initEndpoints(socket, {
-        haveAdminPrivileges: Authorized.NotAuthorized, haveModPrivileges: Authorized.NotAuthorized, haveViewerPrivileges: Authorized.NotAuthorized,
-      });
+      if (socket) {
+        initEndpoints(socket, {
+          haveAdminPrivileges: Authorized.NotAuthorized, haveModPrivileges: Authorized.NotAuthorized, haveViewerPrivileges: Authorized.NotAuthorized,
+        });
+      }
       cb(null);
     });
   }

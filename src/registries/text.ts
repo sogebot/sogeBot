@@ -34,7 +34,11 @@ class Text extends Registry {
   sockets () {
     adminEndpoint('/registries/text', 'text::remove', async(item, cb) => {
       try {
-        await getRepository(TextEntity).remove(item);
+        if (item.id) {
+          await getRepository(TextEntity).delete({ id: item.id });
+        } else {
+          throw new Error('Missing item id');
+        }
         cb(null);
       } catch (e: any) {
         cb(e.stack);

@@ -78,33 +78,33 @@ class CustomVariables extends Core {
     });
     adminEndpoint('/core/customvariables', 'customvariables::save', async (item, cb) => {
       try {
-        await getRepository(Variable).save(item);
+        const savedItem = await getRepository(Variable).save(item);
         // somehow this is not populated by save on sqlite
-        if (item.urls) {
-          for (const url of item.urls) {
+        if (savedItem.urls) {
+          for (const url of savedItem.urls) {
             await getRepository(VariableURL).save({
               ...url,
-              variable: item,
+              variable: savedItem,
             });
           }
         }
         // somehow this is not populated by save on sqlite
-        if (item.history) {
-          for (const history of item.history) {
+        if (savedItem.history) {
+          for (const history of savedItem.history) {
             await getRepository(VariableHistory).save({
               ...history,
-              variable: item,
+              variable: savedItem,
             });
           }
         }
         await getRepository(VariableHistory).delete({ variableId: IsNull() });
         await getRepository(VariableURL).delete({ variableId: IsNull() });
 
-        updateWidgetAndTitle(item.variableName);
-        csEmitter.emit('variable-changed', item.variableName);
-        cb(null, item.id);
+        updateWidgetAndTitle(savedItem.variableName);
+        csEmitter.emit('variable-changed', savedItem.variableName);
+        cb(null, savedItem.id);
       } catch (e: any) {
-        cb(e.stack, item.id);
+        cb(e.stack, null);
       }
     });
   }

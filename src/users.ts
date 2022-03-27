@@ -330,10 +330,13 @@ class Users extends Core {
         cb(e.stack);
       }
     });
-    adminEndpoint('/core/users', 'viewers::remove', async (viewer: Required<UserInterface>, cb) => {
+    adminEndpoint('/core/users', 'viewers::remove', async (userId, cb) => {
       try {
         await changelog.flush();
-        cb(null, await getRepository(User).remove(viewer));
+        await getRepository(UserTip).delete({ userId });
+        await getRepository(UserBit).delete({ userId });
+        await getRepository(User).delete({ userId });
+        cb(null);
       } catch (e: any) {
         error(e);
         cb(e.stack);
@@ -460,7 +463,7 @@ class Users extends Core {
 
         cb(null, viewers, count, opts.state);
       } catch (e: any) {
-        cb(e.stack, [], null, null);
+        cb(e.stack, [], 0, null);
       }
     });
     adminEndpoint('/core/users', 'viewers::followedAt', async (id, cb) => {

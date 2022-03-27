@@ -63,7 +63,7 @@ type GenericEvents = {
 type generic<T> = {
   getAll: (cb: (error: Error | string | null, items: Readonly<Required<T>>[]) => void) => void,
   getOne: (id: string, cb: (error: Error | string | null, item?: Readonly<Required<T>>) => void) => void,
-  setById: (opts: { id: string, item: Required<T> }, cb: (error: Error | string | null, timer?: Readonly<Required<T>> | null) => void) => void,
+  setById: (opts: { id: string, item: Partial<T> }, cb: (error: Error | string | null, item?: Readonly<Required<T>> | null) => void) => void,
   deleteById: (id: string, cb: (error: Error | string | null) => void) => void;
 };
 
@@ -107,7 +107,7 @@ export type ClientToServerEventsWithNamespace = {
     'generic::getAll': generic<GalleryInterface>['getAll'],
     'generic::deleteById': generic<GalleryInterface>['deleteById'],
     'generic::setById': generic<GalleryInterface>['setById'],
-    'gallery::upload': (data: [filename: string, data: { id: string, b64data: string, folder: string }], cb: (err: Error | string | null, item?: OverlayMapperMarathon) => void) => void,
+    'gallery::upload': (data: [filename: string, data: { id: string, b64data: string, folder?: string }], cb: (err: Error | string | null, item?: OverlayMapperMarathon) => void) => void,
   },
   '/overlays/marathon': GenericEvents & {
     'marathon::check': (id: string, cb: (err: Error | string | null, item?: OverlayMapperMarathon) => void) => void,
@@ -144,17 +144,18 @@ export type ClientToServerEventsWithNamespace = {
     'test.user': (opts: { pid: string, value: string, state: string }, cb: (error: Error | string | null, response?: { status: import('../helpers/permissions/check').checkReturnType | { access: 2 }, partial: import('../helpers/permissions/check').checkReturnType | { access: 2 }, state: string }) => void) => void,
   },
   '/registries/text': GenericEvents & {
-    'text::save': (item: Readonly<Required<TextInterface>>, cb: (error: Error | string | null, item: TextInterface | null) => void) => void,
-    'text::remove': (item: Readonly<Required<TextInterface>>, cb: (error: Error | string | null) => void) => void,
+    'text::save': (item: TextInterface, cb: (error: Error | string | null, item: TextInterface | null) => void) => void,
+    'text::remove': (item: TextInterface, cb: (error: Error | string | null) => void) => void,
     'text::presets': (_: unknown, cb: (error: Error | string | null, folders: string[] | null) => void) => void,
     'generic::getAll': generic<TextInterface>['getAll'],
+    'generic::getOne': (opts: { id: string, parseText: boolean }, cb: (error: Error | string | null, item: TextInterface) => void) => void,
   },
   '/services/twitch': GenericEvents & {
     'eventsub::reset': () => void,
     'broadcaster': (cb: (error: Error | string | null, username: string) => void) => void,
   },
   '/core/socket': GenericEvents & {
-    'purgeAllConnections': (cb: (error: Error | string | null) => void, socket: Socket) => void,
+    'purgeAllConnections': (cb: (error: Error | string | null) => void, socket?: Socket) => void,
   },
   '/': GenericEvents & {
     'leaveBot': () => void,
@@ -362,11 +363,11 @@ export type ClientToServerEventsWithNamespace = {
     'viewers::resetSubgiftsAll': (cb?: (error: Error | string | null) => void) => void,
     'viewers::resetBitsAll': (cb?: (error: Error | string | null) => void) => void,
     'viewers::resetTipsAll': (cb?: (error: Error | string | null) => void) => void,
-    'viewers::update': (data: [userId: string, update: Partial<UserInterface> & { tips: UserTipInterface[], bits: UserBitInterface[] }], cb: (error: Error | string | null) => void) => void,
-    'viewers::remove': (viewer: Required<UserInterface>, cb: (error: Error | string | null, removed?: Required<UserInterface>) => void) => void,
+    'viewers::update': (data: [userId: string, update: Partial<UserInterface> & { tips?: UserTipInterface[], bits?: UserBitInterface[] }], cb: (error: Error | string | null) => void) => void,
+    'viewers::remove': (userId: string, cb: (error: Error | string | null) => void) => void,
     'getNameById': (id: string, cb: (error: Error | string | null, user: string | null) => void) => void,
     'viewers::followedAt': (id: string, cb: (error: Error | string | null, followedAtDate: string | null) => void) => void,
-    'find.viewers': (opts: { state: string, page?: number; perPage?: number; order?: { orderBy: string, sortOrder: 'ASC' | 'DESC' }, filter?: { vips: boolean; subscribers: boolean; followers: boolean; active: boolean; }, search?: string, exactUsernameFromTwitch?: string }, cb: (error: Error | string | null, viewers: any[], count: number | null, state: string | null) => void) => void,
+    'find.viewers': (opts: { state: string, page?: number; perPage?: number; order?: { orderBy: string, sortOrder: 'ASC' | 'DESC' }, filter?: { vips: boolean | null; subscribers: boolean | null; followers: boolean | null; active: boolean | null; }, search?: string, exactUsernameFromTwitch?: string }, cb: (error: Error | string | null, viewers: any[], count: number, state: string | null) => void) => void,
   },
   '/core/general': GenericEvents & {
     'generic::getCoreCommands': (cb: (error: Error | string | null, commands: import('../general').Command[]) => void) => void,
@@ -378,7 +379,7 @@ export type ClientToServerEventsWithNamespace = {
     'customvariables::testScript': (opts: { evalValue: string, currentValue: string }, cb: (error: Error | string | null, returnedValue: any) => void) => void,
     'customvariables::isUnique': (opts: { variable: string, id: string }, cb: (error: Error | string | null, isUnique: boolean) => void) => void,
     'customvariables::delete': (id: string, cb?: (error: Error | string | null) => void) => void,
-    'customvariables::save': (item: Required<VariableInterface>, cb: (error: Error | string | null, itemId: string) => void) => void,
+    'customvariables::save': (item: VariableInterface, cb: (error: Error | string | null, itemId: string | null) => void) => void,
   }
 };
 
