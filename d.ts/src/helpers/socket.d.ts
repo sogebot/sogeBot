@@ -299,6 +299,8 @@ export type ClientToServerEventsWithNamespace = {
     'ranks::save': (item: RankInterface, cb: (error: Error | string | null, item: RankInterface) => void) => void,
   },
   '/systems/songs': GenericEvents & {
+    'isPlaying': (cb: (isPlaying: boolean) => void) => void,
+    'songs::getAllRequests': (_: any, cb: (error: Error | string | null, requests: SongRequestInterface[]) => void) => void,
     'current.playlist.tag': (cb: (error: Error | string | null, tag: string) => void) => void,
     'find.playlist': (opts: { page: number, search: string, tag: string | null, perPage: number}, cb: (error: Error | string | null, songs: SongPlaylistInterface[], count: number) => void) => void,
     'songs::currentSong': (cb: (error: Error | string | null, song: currentSongType) => void) => void,
