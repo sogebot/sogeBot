@@ -26,7 +26,6 @@ import type {
 } from '@entity/user';
 import type { VariableInterface, VariableWatchInterface } from '@entity/variable';
 import { HelixVideo } from '@twurple/api/lib';
-import { HowLongToBeatEntry } from 'howlongtobeat';
 import { Socket } from 'socket.io';
 import { FindConditions } from 'typeorm';
 
@@ -62,9 +61,9 @@ type GenericEvents = {
 
 type generic<T> = {
   getAll: (cb: (error: Error | string | null, items: Readonly<Required<T>>[]) => void) => void,
-  getOne: (id: string, cb: (error: Error | string | null, item?: Readonly<Required<T>>) => void) => void,
-  setById: (opts: { id: string, item: Partial<T> }, cb: (error: Error | string | null, item?: Readonly<Required<T>> | null) => void) => void,
-  deleteById: (id: string, cb: (error: Error | string | null) => void) => void;
+  getOne: (id: Required<T['id']>, cb: (error: Error | string | null, item?: Readonly<Required<T>>) => void) => void,
+  setById: (opts: { id: Required<T['id']>, item: Partial<T> }, cb: (error: Error | string | null, item?: Readonly<Required<T>> | null) => void) => void,
+  deleteById: (id: Required<T['id']>, cb: (error: Error | string | null) => void) => void;
 };
 
 export type ClientToServerEventsWithNamespace = {
@@ -194,14 +193,14 @@ export type ClientToServerEventsWithNamespace = {
   },
   '/systems/highlights': GenericEvents & {
     'highlight': () => void,
-    'generic::getAll': (cb: (error: Error | string | null, highlights?: Readonly<Required<HighlightInterface>>[], videos?: HelixVideo[]) => void) => void,
+    'generic::getAll': (cb: (error: Error | string | null, highlights: Readonly<Required<HighlightInterface>>[], videos: HelixVideo[]) => void) => void,
     'generic::deleteById': generic<HighlightInterface>['deleteById'],
   },
   '/systems/howlongtobeat': GenericEvents & {
     'generic::getAll': (cb: (error: Error | string | null, item: Readonly<Required<HowLongToBeatGameInterface>>[], gameItem: Readonly<Required<HowLongToBeatGameItemInterface>>[]) => void) => void,
     'hltb::save': (item: HowLongToBeatGameInterface, cb: (error: Error | string | null, item?: HowLongToBeatGameInterface) => void) => void,
     'hltb::addNewGame': (game: string, cb: (error: Error | string | null) => void) => void,
-    'hltb::getGamesFromHLTB': (game: string, cb: (error: Error | string | null, games: HowLongToBeatEntry[]) => void) => void,
+    'hltb::getGamesFromHLTB': (game: string, cb: (error: Error | string | null, games: string[]) => void) => void,
     'hltb::saveStreamChange': (stream: HowLongToBeatGameItemInterface, cb: (error: Error | string | null, stream?: HowLongToBeatGameItemInterface) => void) => void,
     'generic::deleteById': generic<HowLongToBeatGameInterface>['deleteById'],
   },
@@ -270,6 +269,7 @@ export type ClientToServerEventsWithNamespace = {
     'generic::getOne': generic<QuotesInterface>['getOne'],
     'generic::setById': generic<QuotesInterface>['setById'],
     'generic::deleteById': generic<QuotesInterface>['deleteById'],
+    'quotes:getAll': (_: unknown, cb: (error: Error | string | null, items: QuotesInterface[]) => void) => void,
   },
   '/systems/raffles': GenericEvents & {
     'raffle::getWinner': (name: string, cb: (error: Error | string | null, item?: UserInterface) => void) => void,
@@ -299,6 +299,8 @@ export type ClientToServerEventsWithNamespace = {
     'ranks::save': (item: RankInterface, cb: (error: Error | string | null, item: RankInterface) => void) => void,
   },
   '/systems/songs': GenericEvents & {
+    'current.playlist.tag': (cb: (error: Error | string | null, tag: string) => void) => void,
+    'find.playlist': (opts: { page: number, search: string, tag: string | null, perPage: number}, cb: (error: Error | string | null, songs: SongPlaylistInterface[], count: number) => void) => void,
     'songs::currentSong': (cb: (error: Error | string | null, song: currentSongType) => void) => void,
     'set.playlist.tag': (tag: string) => void,
     'get.playlist.tags': (cb: (error: Error | string | null, tags: string[]) => void) => void,
@@ -308,8 +310,8 @@ export type ClientToServerEventsWithNamespace = {
     'delete.playlist': (id: string, cb: (error: Error | string | null) => void) => void,
     'delete.ban': (id: string, cb: (error: Error | string | null) => void) => void,
     'import.ban': (url: string, cb: (error: Error | string | null, result: import('../parser').CommandResponse[]) => void) => void,
-    'import.playlist': (opts: { playlist: string, forcedTag: string }, cb: (error: Error | string | null, result: import('../parser').CommandResponse[] | null) => void) => void,
-    'import.video': (opts: { playlist: string, forcedTag: string }, cb: (error: Error | string | null, result: import('../parser').CommandResponse[] | null) => void) => void,
+    'import.playlist': (opts: { playlist: string, forcedTag: string | null }, cb: (error: Error | string | null, result: import('../parser').CommandResponse[] | null) => void) => void,
+    'import.video': (opts: { playlist: string, forcedTag: string | null }, cb: (error: Error | string | null, result: import('../parser').CommandResponse[] | null) => void) => void,
     'stop.import': () => void,
     'next': () => void,
   },

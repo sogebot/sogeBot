@@ -70,7 +70,7 @@ class Highlights extends System {
             }
             return getAll(callback);
           }
-          callback(err.stack);
+          callback(err.stack, [], []);
         }
       })(cb);
     });
