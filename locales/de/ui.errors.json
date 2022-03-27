@@ -15,6 +15,6 @@
   "channel_is_not_set": "Kanal ist nicht festgelegt",
   "please_set_your_broadcaster_oauth_or_owners": "Bitte stellen Sie Ihre <a href=\"#/settings/modules/services/twitch\">Streamer oauth oder Eigentümer ein</a>, oder alle Nutzer <strong>werden Zugriff</strong> zu diesem Dashboard haben und werden als <strong>Brodecaster</strong> gesehen.",
   "new_update_available": "Neue Aktualisierung verfügbar",
-  "new_bot_version_available_at": "New bot version {version} available at <a href=\"https://github.com/sogebot/sogeBot/releases/tag/{version}\">GitHub</a>.",
+  "new_bot_version_available_at": "Neue Bot-Version {version} verfügbar unter <a href=\"https://github.com/sogebot/sogeBot/releases/tag/{version}\">GitHub</a>.",
   "one_of_inputs_must_be_set": "Eine der Eingaben muss gesetzt werden"
 }

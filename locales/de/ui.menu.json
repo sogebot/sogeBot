@@ -89,7 +89,6 @@
   "responsivevoice": "ResponsiveVoice",
   "randomizer": "Zufallsgenerator",
   "tips": "Spenden",
-  "bannedevents": "Gesperrte Ereignisse",
   "bits": "Bits",
   "discord": "Discord",
   "texttospeech": "Text zu Sprache",
@@ -99,5 +98,5 @@
   "obswebsocket": "OBS Websocket",
   "api-explorer": "API-Explorer",
   "emotescombo": "Emotes Combo",
-  "notifications": "Notifications"
+  "notifications": "Benachrichtigung"
 }
