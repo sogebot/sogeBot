@@ -865,8 +865,11 @@ class Events extends Core {
       }
     });
 
-    adminEndpoint('/core/events', 'events::remove', async (event, cb) => {
-      await getRepository(Event).remove(event);
+    adminEndpoint('/core/events', 'events::remove', async (eventId, cb) => {
+      const event = await getRepository(Event).findOne({ id: eventId });
+      if (event) {
+        await getRepository(Event).remove(event);
+      }
       cb(null);
     });
   }
