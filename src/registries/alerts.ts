@@ -10,7 +10,7 @@ import { persistent } from '../decorators';
 import Registry from './_interface';
 
 import { User, UserInterface } from '~/database/entity/user';
-import { error } from '~/helpers/log';
+import { error, debug } from '~/helpers/log';
 import { ioServer } from '~/helpers/panel';
 import { adminEndpoint, publicEndpoint } from '~/helpers/socket';
 import * as changelog from '~/helpers/user/changelog.js';
@@ -23,7 +23,7 @@ const secureKeys = new Set<string>();
 
 const fetchUserForAlert = (opts: EmitData, type: 'recipient' | 'name'): Promise<Readonly<Required<UserInterface>> | null> => {
   return new Promise<Readonly<Required<UserInterface>> | null>((resolve) => {
-    if (opts.event === 'rewardredeems' && type === 'name') {
+    if ((opts.event === 'rewardredeems' || opts.event === 'cmdredeems') && type === 'name') {
       return resolve(null); // we don't have user on reward redeems
     }
 
@@ -178,6 +178,7 @@ class Alerts extends Registry {
   }
 
   async trigger(opts: EmitData) {
+    debug('alerts.trigger', JSON.stringify(opts, null, 2));
     const { default: tts, services } = await import ('../tts');
     if (!this.areAlertsMuted) {
       let key = v4();

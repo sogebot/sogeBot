@@ -241,6 +241,10 @@
           "label": "Type of timeout",
           "placeholder": "Set type of timeout"
         },
+        "command": {
+          "label": "Command",
+          "placeholder": "Set your !command"
+        },
         "commandToRun": {
           "label": "Command To Run",
           "placeholder": "Set your !commandToRun"
@@ -767,6 +771,7 @@
     "send-chat-message": "send a twitch chat message",
     "send-whisper": "send a whisper",
     "run-command": "run a command",
+    "command-redeem": "trigger command redeem event",
     "run-obswebsocket-command": "run an OBS Websocket command",
     "do-nothing": "--- do nothing ---",
     "count": "count",
