@@ -1,4 +1,5 @@
 import crypto from 'crypto';
+import { setTimeout } from 'timers/promises';
 
 import { SpotifySongBan } from '@entity/spotify';
 import { HOUR, SECOND } from '@sogebot/ui-helpers/constants';
@@ -19,7 +20,7 @@ import Integration from './_interface';
 import { isStreamOnline } from '~/helpers/api';
 import { CommandError } from '~/helpers/commandError';
 import { announce, prepare } from '~/helpers/commons';
-import { debug, error, info } from '~/helpers/log';
+import { debug, error, info, warning } from '~/helpers/log';
 import { ioServer } from '~/helpers/panel';
 import { addUIError } from '~/helpers/panel/index';
 import { adminEndpoint } from '~/helpers/socket';
@@ -356,7 +357,9 @@ class Spotify extends Integration {
         });
         info(chalk.yellow('SPOTIFY: ') + 'Refreshing access token failed ' + (this.retry.IRefreshToken > 0 ? 'retrying #' + this.retry.IRefreshToken : ''));
         info(e.stack);
-        setTimeout(() => this.IRefreshToken(), 10000);
+        setTimeout(10000).then(() => {
+          this.IRefreshToken();
+        });
       }
     }
 
@@ -449,9 +452,9 @@ class Spotify extends Integration {
                   resolve(true);
                 })
                 .catch(() => {
-                  global.setTimeout(() => {
+                  setTimeout(10000).then(() => {
                     check();
-                  }, 10000);
+                  });
                 });
             } else {
               resolve(true);
@@ -464,7 +467,7 @@ class Spotify extends Integration {
       this.currentSong = JSON.stringify(null);
       this.connect({ token });
       await waitForUsername();
-      setTimeout(() => this.isUnauthorized = false, 10000);
+      setTimeout(10000).then(() => this.isUnauthorized = false);
       cb(null, true);
     });
     adminEndpoint('/integrations/spotify', 'spotify::revoke', async (cb) => {
@@ -665,7 +668,24 @@ class Spotify extends Integration {
           }
         }
         debug('spotify.request', `Searching song with id ${id}`);
-        const response = await this.client.getTrack(id);
+
+        const response = await Promise.race([
+          new Promise<Awaited<ReturnType<typeof this.client.getTrack>>>((resolve) => {
+            if (this.client) {
+              this.client.getTrack(id).then(data => resolve(data));
+            }
+          }),
+          new Promise<null>((resolve) => {
+            setTimeout(10 * SECOND).then(() => resolve(null));
+          }),
+        ]);
+
+        if (response === null) {
+          warning('Spotify didn\'t get track in time. Reconnecting client and retrying request.');
+          await this.connect();
+          return this.main(opts);
+        }
+
         debug('spotify.request', `Response => ${JSON.stringify({ response }, null, 2)}`);
         ioServer?.emit('api.stats', {
           method: 'GET', data: response.body, timestamp: Date.now(), call: 'spotify::search', api: 'other', endpoint: 'n/a', code: response.statusCode,
@@ -693,7 +713,22 @@ class Spotify extends Integration {
           }];
         }
       } else {
-        const response = await this.client.searchTracks(spotifyId);
+        const response = await Promise.race([
+          new Promise<Awaited<ReturnType<typeof this.client.searchTracks>>>((resolve) => {
+            if (this.client) {
+              this.client.searchTracks(spotifyId).then(data => resolve(data));
+            }
+          }),
+          new Promise<null>((resolve) => {
+            setTimeout(10 * SECOND).then(() => resolve(null));
+          }),
+        ]);
+
+        if (response === null) {
+          warning('Spotify didn\'t get track in time. Reconnecting client and retrying request.');
+          await this.connect();
+          return this.main(opts);
+        }
         ioServer?.emit('api.stats', {
           method: 'GET', data: response.body, timestamp: Date.now(), call: 'spotify::search', api: 'other', endpoint: 'n/a', code: response.statusCode,
         });
