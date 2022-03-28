@@ -234,6 +234,18 @@
           "label": "Canal",
           "placeholder": "Nome ou ID do canal"
         },
+        "timeout": {
+          "label": "Timeout",
+          "placeholder": "Set timeout in milliseconds"
+        },
+        "timeoutType": {
+          "label": "Type of timeout",
+          "placeholder": "Set type of timeout"
+        },
+        "command": {
+          "label": "Command",
+          "placeholder": "Set your !command"
+        },
         "commandToRun": {
           "label": "Comando para Rodar",
           "placeholder": "Defina seu !commandToRun"
@@ -760,6 +772,7 @@
     "send-chat-message": "enviar uma mensagem de chat da twitch",
     "send-whisper": "envie um sussurro",
     "run-command": "executar o comando",
+    "command-redeem": "trigger command redeem event",
     "run-obswebsocket-command": "executar um comando de Websocket OBS",
     "do-nothing": "--- fazer nada ---",
     "count": "contar",

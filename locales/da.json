@@ -234,6 +234,18 @@
           "label": "Kanal",
           "placeholder": "Kanalnavn eller ID"
         },
+        "timeout": {
+          "label": "Timeout",
+          "placeholder": "Set timeout in milliseconds"
+        },
+        "timeoutType": {
+          "label": "Type of timeout",
+          "placeholder": "Set type of timeout"
+        },
+        "command": {
+          "label": "Command",
+          "placeholder": "Set your !command"
+        },
         "commandToRun": {
           "label": "Kommando at kører",
           "placeholder": "Sæt din !KommandoTilKørsel"
@@ -760,6 +772,7 @@
     "send-chat-message": "send en Twitch-chatbesked",
     "send-whisper": "send en whisper",
     "run-command": "kør en kommando",
+    "command-redeem": "trigger command redeem event",
     "run-obswebsocket-command": "run an OBS Websocket command",
     "do-nothing": "--- gør intet ---",
     "count": "tæller",
