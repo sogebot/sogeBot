@@ -25,10 +25,10 @@
     "name": "Alert Verzögerung"
   },
   "parryEnabled": {
-    "name": "Alert parries"
+    "name": "Alert pariert"
   },
   "parryDelay": {
-    "name": "Alert parry delay"
+    "name": "Verzögerung des Alert Textes"
   },
   "profanityFilterType": {
     "name": "Schimpfwort-Filter",
@@ -123,7 +123,7 @@
     "name": "Animationstext"
   },
   "animationType": {
-    "name": "Type of animation"
+    "name": "Typ der Animation"
   },
   "animationIn": {
     "name": "Eingehende Animation"
