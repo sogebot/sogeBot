@@ -1,5 +1,3 @@
-import { debug } from 'console';
-
 import { isNil, isObject } from 'lodash';
 import _ from 'lodash';
 import { v4 } from 'uuid';
@@ -10,6 +8,7 @@ import { parserReply } from '~/commons';
 import {
   Events as EventsEntity,
 } from '~/database/entity/event';
+import { debug } from '~/helpers/log';
 import { parserEmitter } from '~/helpers/parser/index';
 import Message from '~/message';
 import users from '~/users';
