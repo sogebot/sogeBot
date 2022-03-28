@@ -234,6 +234,14 @@
           "label": "Канал",
           "placeholder": "Название или ID канала"
         },
+        "timeout": {
+          "label": "Timeout",
+          "placeholder": "Set timeout in milliseconds"
+        },
+        "timeoutType": {
+          "label": "Type of timeout",
+          "placeholder": "Set type of timeout"
+        },
         "commandToRun": {
           "label": "Команда для запуска",
           "placeholder": "Установите вашу !commandToRun"
