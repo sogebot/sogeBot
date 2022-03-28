@@ -99,7 +99,7 @@ class Queue extends System {
         }
       } catch (e: any) {
         if (cb) {
-          cb(e.stack);
+          cb(e.stack, []);
         }
       }
     });

@@ -261,7 +261,7 @@ export type ClientToServerEventsWithNamespace = {
   },
   '/systems/queue': GenericEvents & {
     'queue::getAllPicked': (cb: (error: Error | string | null, items: QueueInterface[]) => void) => void,
-    'queue::pick': (data: { username?: string | string[], random: boolean, count: number; }, cb: (error: Error | string | null, items?: QueueInterface[]) => void) => void,
+    'queue::pick': (data: { username?: string | string[], random: boolean, count: number; }, cb: (error: Error | string | null, items: QueueInterface[]) => void) => void,
     'queue::clear': (cb: (error: Error | string | null) => void) => void,
     'generic::getAll': generic<QueueInterface>['getAll'],
   },
@@ -323,7 +323,12 @@ export type ClientToServerEventsWithNamespace = {
     'generic::setById': generic<TimerInterface>['setById'],
     'generic::deleteById': generic<TimerInterface>['deleteById'],
   },
+  '/widgets/joinpart': GenericEvents & {
+    'joinpart': (data: { users: string[], type: 'join' | 'part' }) => void,
+    'viewers': (cb: (error: Error | string | null, data: { chatters: any }) => void) => void,
+  },
   '/widgets/chat': GenericEvents & {
+    'room': (cb: (error: Error | string | null, room: string) => void) => void,
     'chat.message.send': (message: string) => void,
     'viewers': (cb: (error: Error | string | null, data: { chatters: any }) => void) => void,
   },
@@ -338,6 +343,8 @@ export type ClientToServerEventsWithNamespace = {
     'eventlist::get': (count: number) => void,
     'skip': () => void,
     'cleanup': () => void,
+    'askForGet': (cb: () => void) => void,
+    'update': (cb: (values: any) => void) => void,
     'eventlist::resend': (id: string) => void,
   },
   '/core/events': GenericEvents & {
@@ -368,6 +375,7 @@ export type ClientToServerEventsWithNamespace = {
     'viewers::resetBitsAll': (cb?: (error: Error | string | null) => void) => void,
     'viewers::resetTipsAll': (cb?: (error: Error | string | null) => void) => void,
     'viewers::update': (data: [userId: string, update: Partial<UserInterface> & { tips?: UserTipInterface[], bits?: UserBitInterface[] }], cb: (error: Error | string | null) => void) => void,
+    'viewers::findOne': (userId: string, cb: (error: Error | string | null, viewer: UserInterface & { tips: UserTipInterface[], bits: UserBitInterface[], aggregatedTips: number; aggregatedBits: number; permission: PermissionsInterface }) => void) => void,
     'viewers::remove': (userId: string, cb: (error: Error | string | null) => void) => void,
     'getNameById': (id: string, cb: (error: Error | string | null, user: string | null) => void) => void,
     'viewers::followedAt': (id: string, cb: (error: Error | string | null, followedAtDate: string | null) => void) => void,
