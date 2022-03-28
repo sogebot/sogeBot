@@ -30,12 +30,12 @@ import {
 import { csEmitter } from '~/helpers/customvariables/emitter';
 import { isDbConnected } from '~/helpers/database';
 import { eventEmitter } from '~/helpers/events/emitter';
+import { fireRunCommand } from '~/helpers/events/run-command';
 import emitter from '~/helpers/interfaceEmitter';
 import {
   debug, error, info, warning,
 } from '~/helpers/log';
 import { addUIError } from '~/helpers/panel/index';
-import { parserEmitter } from '~/helpers/parser/index';
 import { adminEndpoint } from '~/helpers/socket';
 import { tmiEmitter } from '~/helpers/tmi';
 import {
@@ -45,13 +45,11 @@ import * as changelog from '~/helpers/user/changelog.js';
 import { isBot, isBotSubscriber } from '~/helpers/user/isBot';
 import { isBroadcaster } from '~/helpers/user/isBroadcaster';
 import { isModerator } from '~/helpers/user/isModerator';
-import Message from '~/message';
 import client from '~/services/twitch/api/client';
 import { createClip } from '~/services/twitch/calls/createClip';
 import { getCustomRewards } from '~/services/twitch/calls/getCustomRewards';
 import { getIdFromTwitch } from '~/services/twitch/calls/getIdFromTwitch';
 import { setTitleAndGame } from '~/services/twitch/calls/setTitleAndGame';
-import users from '~/users';
 import { variables } from '~/watchers';
 
 const excludedUsers = new Set<string>();
@@ -145,7 +143,7 @@ class Events extends Core {
         id: 'send-whisper', definitions: { messageToSend: '' }, fire: this.fireSendWhisper,
       },
       {
-        id: 'run-command', definitions: { commandToRun: '', isCommandQuiet: false }, fire: this.fireRunCommand,
+        id: 'run-command', definitions: { commandToRun: '', isCommandQuiet: false, timeout: 0, timeoutType: ['normal', 'add', 'reset'] }, fire: fireRunCommand,
       },
       {
         id: 'emote-explosion', definitions: { emotesToExplode: '' }, fire: this.fireEmoteExplosion,
@@ -263,6 +261,8 @@ class Events extends Core {
           }
         }
 
+        attributes.eventId = eventId;
+
         // add is object
         attributes.is = {
           moderator:   isModerator(user),
@@ -320,7 +320,7 @@ class Events extends Core {
         if (isOperationSupported) {
           const foundOp = this.supportedOperationsList.find((o) =>  o.id === operation.name);
           if (foundOp) {
-            foundOp.fire(operation.definitions, cloneDeep(attributes));
+            foundOp.fire(operation.definitions, cloneDeep({ ...attributes, eventId: event.id }));
           }
         }
       }
@@ -401,35 +401,6 @@ class Events extends Core {
 
   public async fireEmoteFirework(operation: EventsEntity.OperationDefinitions) {
     emitter.emit('services::twitch::emotes', 'firework', String(operation.emotesToFirework).split(' '));
-  }
-
-  public async fireRunCommand(operation: EventsEntity.OperationDefinitions, attributes: EventsEntity.Attributes) {
-    const username = isNil(attributes.userName) ? getOwner() : attributes.userName;
-    const userId = attributes.userId ? attributes.userId : await users.getIdByName(username);
-
-    let command = String(operation.commandToRun);
-    for (const key of Object.keys(attributes).sort((a, b) => a.length - b.length)) {
-      const val = attributes[key];
-      if (_.isObject(val) && Object.keys(val).length === 0) {
-        return;
-      } // skip empty object
-      const replace = new RegExp(`\\$${key}`, 'gi');
-      command = command.replace(replace, val);
-    }
-    command = await new Message(command).parse({ userName: username, sender: getUserSender(String(userId), username), discord: undefined });
-
-    parserEmitter.emit('process', {
-      sender:  { userName: username, userId: String(userId) },
-      message: command,
-      skip:    true,
-      quiet:   get(operation, 'isCommandQuiet', false) as boolean,
-    }, (responses) => {
-      for (let i = 0; i < responses.length; i++) {
-        setTimeout(async () => {
-          parserReply(await responses[i].response, { sender: responses[i].sender, discord: responses[i].discord, attr: responses[i].attr, id: '' });
-        }, 500 * i);
-      }
-    });
   }
 
   public async fireSendChatMessageOrWhisper(operation: EventsEntity.OperationDefinitions, attributes: EventsEntity.Attributes, whisper: boolean): Promise<void> {
