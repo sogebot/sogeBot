@@ -482,7 +482,7 @@ class Panel extends Core {
       });
 
       socket.on('populateListOf', async (type: possibleLists, cb: (err: string | null, toEmit: any) => void) => {
-        let toEmit: any;
+        const toEmit: any[] = [];
         if (type === 'systems') {
           for (const system of systems) {
             toEmit.push({

@@ -1,4 +1,4 @@
-import type { AlertInterface } from '@entity/alert';
+import type { AlertInterface, EmitData } from '@entity/alert';
 import type { BetsInterface } from '@entity/bets';
 import type { ChecklistInterface } from '@entity/checklist';
 import type { CommandsCountInterface, CommandsInterface } from '@entity/commands';
@@ -33,6 +33,7 @@ type Configuration = {
   [x:string]: Configuration | string;
 };
 
+export type ViewerReturnType = UserInterface & {aggregatedBits: number, aggregatedTips: number, permission: PermissionsInterface, tips: UserTipInterface[], bits: UserBitInterface[] };
 export type possibleLists = 'systems' | 'core' | 'integrations' | 'overlays' | 'games' | 'services';
 export interface getListOfReturn {
   systems: {
@@ -132,6 +133,7 @@ export type ClientToServerEventsWithNamespace = {
     'isAlertUpdated': (data: { updatedAt: number; id: string }, cb: (err: Error | null, isUpdated: boolean, updatedAt: number) => void) => void,
     'alerts::save': (item: Required<AlertInterface>, cb: (error: Error | string | null, item: null | Required<AlertInterface>) => void) => void,
     'alerts::delete': (item: Required<AlertInterface>, cb: (error: Error | string | null) => void) => void,
+    'test': (emit: EmitData) => void,
   },
   '/registries/randomizer': GenericEvents & {
     'randomizer::startSpin': () => void,
@@ -159,11 +161,14 @@ export type ClientToServerEventsWithNamespace = {
   '/': GenericEvents & {
     'leaveBot': () => void,
     'joinBot': () => void,
+    'channelName': (cb: (name: string) => void) => void,
+    'name': (cb: (name: string) => void) => void,
     'responses.get': (_: null, cb: (data: { default: string; current: string }) => void) => void,
     'responses.set': (data: { name: string, value: string }) => void,
     'responses.revert': (data: { name: string }, cb: () => void) => void,
     'api.stats': (data: { code: number, remaining: number | string, data: string}) => void,
     'translations': (cb: (lang: Record<string, any>) => void) => void,
+    'panel::stats': (cb: (data: Record<string, any>) => void) => void,
     'panel::resetStatsState': () => void,
     'version': (cb: (version: string) => void) => void,
     'debug::get': (cb: (error: Error | string | null, debug: string) => void) => void,
@@ -171,6 +176,11 @@ export type ClientToServerEventsWithNamespace = {
     'panel::alerts': (cb: (error: Error | string | null, data: { errors: import('./panel/alerts').UIError[], warns: import('./panel/alerts').UIError[] }) => void) => void,
     'getLatestStats': (cb: (error: Error | string | null, stats: Record<string, any>) => void) => void,
     'populateListOf':<list extends possibleLists> (type: list, cb: (error: Error | string | null, data: getListOfReturn[list]) => void) => void,
+    'custom.variable.value': (variableName: string, cb: (error: Error | string | null, value: string) => void) => void,
+    'updateGameAndTitle': (emit: { game: string; title: string; tags: never[]; }, cb: (error: Error | string | null) => void) => void,
+    'cleanupGameAndTitle': () => void,
+    'getGameFromTwitch': (value: string, cb: (values: string[]) => void) => void,
+    'getUserTwitchGames': (cb: (values: CacheTitlesInterface[]) => void) => void,
   },
   '/stats/commandcount': GenericEvents & {
     'commands::count': (cb: (error: Error | string | null, items: CommandsCountInterface[]) => void) => void,
@@ -330,6 +340,7 @@ export type ClientToServerEventsWithNamespace = {
   '/widgets/chat': GenericEvents & {
     'room': (cb: (error: Error | string | null, room: string) => void) => void,
     'chat.message.send': (message: string) => void,
+    'room': (cb: (error: Error | string | null, room: string) => void) => void,
     'viewers': (cb: (error: Error | string | null, data: { chatters: any }) => void) => void,
   },
   '/widgets/customvariables': GenericEvents & {
@@ -337,6 +348,9 @@ export type ClientToServerEventsWithNamespace = {
     'customvariables::list': (cb: (error: Error | string | null, variables: VariableInterface[]) => void) => void,
     'list.watch': (cb: (error: Error | string | null, variables: VariableWatchInterface[]) => void) => void,
     'watched::setValue': (opts: { id: string, value: string | number }, cb: (error: Error | string | null) => void) => void,
+  },
+  '/widgets/joinpart': GenericEvents & {
+    'joinpart': (data: { users: string[], type: 'join' | 'part' }) => void,
   },
   '/widgets/eventlist': GenericEvents & {
     'eventlist::removeById': (idList: string[] | string, cb: (error: Error | string | null) => void) => void,
@@ -346,6 +360,8 @@ export type ClientToServerEventsWithNamespace = {
     'askForGet': (cb: () => void) => void,
     'update': (cb: (values: any) => void) => void,
     'eventlist::resend': (id: string) => void,
+    'update': (cb: (values: any) => void) => void,
+    'askForGet': (cb: () => void) => void,
   },
   '/core/events': GenericEvents & {
     'events::getRedeemedRewards': (cb: (error: Error | string | null, rewards: string[]) => void) => void,
@@ -379,7 +395,9 @@ export type ClientToServerEventsWithNamespace = {
     'viewers::remove': (userId: string, cb: (error: Error | string | null) => void) => void,
     'getNameById': (id: string, cb: (error: Error | string | null, user: string | null) => void) => void,
     'viewers::followedAt': (id: string, cb: (error: Error | string | null, followedAtDate: string | null) => void) => void,
-    'find.viewers': (opts: { state: string, page?: number; perPage?: number; order?: { orderBy: string, sortOrder: 'ASC' | 'DESC' }, filter?: { vips: boolean | null; subscribers: boolean | null; followers: boolean | null; active: boolean | null; }, search?: string, exactUsernameFromTwitch?: string }, cb: (error: Error | string | null, viewers: any[], count: number, state: string | null) => void) => void,
+    'viewers::findOne': (id: string, cb: (error: Error | string | null, viewer: ViewerReturnType) => void) => void
+    'find.viewers': (opts: { exactUsernameFromTwitch?: boolean, state: string, page?: number; perPage?: number; order?: { orderBy: string, sortOrder: 'ASC' | 'DESC' }, filter?: { vips: boolean | null; subscribers: boolean | null; followers: boolean | null; active: boolean | null; }, search?: string }, cb: (error: Error | string | null, viewers: any[], count: number, state: string | null) => void) => void,
+    'logout': (data: { accessToken: string | null, refreshToken: string | null }) => void
   },
   '/core/general': GenericEvents & {
     'generic::getCoreCommands': (cb: (error: Error | string | null, commands: import('../general').Command[]) => void) => void,
