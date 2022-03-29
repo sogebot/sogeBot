@@ -11,8 +11,8 @@
   "author": "Michal Orlik <sogehige@gmail.com>",
   "license": "MIT",
   "dependencies": {
-    "@sogebot/ui-admin": "^42.0.0",
-    "@sogebot/ui-helpers": "^3.0.5",
+    "@sogebot/ui-admin": "^42.1.0",
+    "@sogebot/ui-helpers": "^3.0.6",
     "@sogebot/ui-oauth": "~3.0.2",
     "@sogebot/ui-overlay": "^22.0.0",
     "@sogebot/ui-public": "^2.0.0",
