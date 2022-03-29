@@ -6,6 +6,7 @@
   "invalid-or-expired-token": "$sender, neplatný nebo prošlý token.",
   "help-message": "$sender, pro propojení účtu na Discordu: 1. Jděte na Discord server a pošlete $command v kanálu pro příkazy bota. | 2. Počkejte na SZ na Discordu od bota | 3. Pošlete příkaz z SZ na Discordu zde v Twitch chatu.",
   "started-at": "Zahájeno v",
+  "announced-by": "Oznámení od sogeBot",
   "streamed-at": "Streamováno v",
   "link-whisper": "Ahoj $tag, pro propojení tohoto Discord účtu s tvým Twitch účtem na kanálu $broadcaster, přejdi na <https://twitch.tv/$broadcaster>, přihlaste se do svého účtu a pošlete tento příkaz do chatu \n\n\t\t`$command $id`\n\nPOZNÁMKA: Platnost vyprší za 10 minut.",
   "check-your-dm": "zkontrolujte své SZ pro kroky k propojení účtů."
