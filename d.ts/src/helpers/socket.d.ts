@@ -1,14 +1,16 @@
 import type { AlertInterface, EmitData } from '@entity/alert';
 import type { BetsInterface } from '@entity/bets';
+import type { CacheTitlesInterface } from '@entity/cacheTitles';
 import type { ChecklistInterface } from '@entity/checklist';
 import type { CommandsCountInterface, CommandsInterface } from '@entity/commands';
 import type { CooldownInterface } from '@entity/cooldown';
-import type { EventInterface } from '@entity/event';
+import type { EventInterface, Events } from '@entity/event';
 import type { EventListInterface } from '@entity/eventList';
 import type { GalleryInterface } from '@entity/gallery';
 import type { HighlightInterface } from '@entity/highlight';
 import type { HowLongToBeatGameInterface, HowLongToBeatGameItemInterface } from '@entity/howLongToBeatGame';
 import type { KeywordInterface } from '@entity/keyword';
+import type { OBSWebsocketInterface } from '@entity/obswebsocket';
 import type { OverlayMapperMarathon } from '@entity/overlay';
 import type { PermissionsInterface } from '@entity/permissions';
 import type { PollInterface } from '@entity/poll';
@@ -16,7 +18,9 @@ import type { PriceInterface } from '@entity/price';
 import type { QueueInterface } from '@entity/queue';
 import type { QuotesInterface } from '@entity/quotes';
 import type { RaffleInterface } from '@entity/raffle';
+import type { RandomizerInterface } from '@entity/randomizer';
 import type { RankInterface } from '@entity/rank';
+import type { SongRequestInterface } from '@entity/song';
 import type { currentSongType, SongBanInterface, SongPlaylistInterface } from '@entity/song';
 import type { SpotifySongBanInterface } from '@entity/spotify';
 import type { TextInterface } from '@entity/text';
@@ -60,7 +64,7 @@ type GenericEvents = {
   'get.value': (variable: string, cb: (error: Error | string | null, value: any) => void) => void,
 };
 
-type generic<T> = {
+type generic<T extends Record<string, any>> = {
   getAll: (cb: (error: Error | string | null, items: Readonly<Required<T>>[]) => void) => void,
   getOne: (id: Required<T['id']>, cb: (error: Error | string | null, item?: Readonly<Required<T>>) => void) => void,
   setById: (opts: { id: Required<T['id']>, item: Partial<T> }, cb: (error: Error | string | null, item?: Readonly<Required<T>> | null) => void) => void,
@@ -399,7 +403,6 @@ export type ClientToServerEventsWithNamespace = {
   '/widgets/chat': GenericEvents & {
     'room': (cb: (error: Error | string | null, room: string) => void) => void,
     'chat.message.send': (message: string) => void,
-    'room': (cb: (error: Error | string | null, room: string) => void) => void,
     'viewers': (cb: (error: Error | string | null, data: { chatters: any }) => void) => void,
   },
   '/widgets/customvariables': GenericEvents & {
@@ -408,16 +411,11 @@ export type ClientToServerEventsWithNamespace = {
     'list.watch': (cb: (error: Error | string | null, variables: VariableWatchInterface[]) => void) => void,
     'watched::setValue': (opts: { id: string, value: string | number }, cb: (error: Error | string | null) => void) => void,
   },
-  '/widgets/joinpart': GenericEvents & {
-    'joinpart': (data: { users: string[], type: 'join' | 'part' }) => void,
-  },
   '/widgets/eventlist': GenericEvents & {
     'eventlist::removeById': (idList: string[] | string, cb: (error: Error | string | null) => void) => void,
     'eventlist::get': (count: number) => void,
     'skip': () => void,
     'cleanup': () => void,
-    'askForGet': (cb: () => void) => void,
-    'update': (cb: (values: any) => void) => void,
     'eventlist::resend': (id: string) => void,
     'update': (cb: (values: any) => void) => void,
     'askForGet': (cb: () => void) => void,
@@ -451,7 +449,6 @@ export type ClientToServerEventsWithNamespace = {
     'viewers::resetBitsAll': (cb?: (error: Error | string | null) => void) => void,
     'viewers::resetTipsAll': (cb?: (error: Error | string | null) => void) => void,
     'viewers::update': (data: [userId: string, update: Partial<UserInterface> & { tips?: UserTipInterface[], bits?: UserBitInterface[] }], cb: (error: Error | string | null) => void) => void,
-    'viewers::findOne': (userId: string, cb: (error: Error | string | null, viewer: UserInterface & { tips: UserTipInterface[], bits: UserBitInterface[], aggregatedTips: number; aggregatedBits: number; permission: PermissionsInterface }) => void) => void,
     'viewers::remove': (userId: string, cb: (error: Error | string | null) => void) => void,
     'getNameById': (id: string, cb: (error: Error | string | null, user: string | null) => void) => void,
     'viewers::followedAt': (id: string, cb: (error: Error | string | null, followedAtDate: string | null) => void) => void,
