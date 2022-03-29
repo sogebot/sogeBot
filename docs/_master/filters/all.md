@@ -300,7 +300,7 @@ e.g. `(api|https://httpbin.org/get?test=a\\nb) Lorem (api.args.test)`
 
 `(list.!alias|<group>)` - will return list of your visible !aliases for group
 
-`(list.!alias|<group>)` - will return list of your visible !aliases without any group
+`(list.!alias|)` - will return list of your visible !aliases without any group
 
 `(list.price)` - will return list of your set prices
 
@@ -308,7 +308,15 @@ e.g. `(api|https://httpbin.org/get?test=a\\nb) Lorem (api.args.test)`
 
 `(list.command.<permissionName>)` - will return list of your visible custom commands for permission
 
+`(list.command|<group>)` - will return list of your visible !commands for group
+
+`(list.command|)` - will return list of your visible !commands without any group
+
 `(list.!command)` - will return list of your visible custom !commands
+
+`(list.!command|<group>)` - will return list of your visible !commands for group
+
+`(list.!command|)` - will return list of your visible !commands without any group
 
 `(list.!command.<permissionName>)` - will return list of your visible custom !commands for permission
 
