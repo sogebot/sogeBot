@@ -123,7 +123,7 @@ class Socket extends Core {
             if (!accessTokenHeader || !userId) {
               throw new Error('Insufficient data');
             }
-            const twitchValidation = await axios.get<any>(`https://id.twitch.tv/oauth2/validate`, { headers: { 'Authorization': 'OAuth ' + accessTokenHeader } });
+            const twitchValidation = await axios.get<any>(`https://id.twitch.tv/oauth2/validate`, { headers: { 'Authorization': 'Bearer ' + accessTokenHeader } });
             if (userId !== twitchValidation.data.user_id) {
               throw new Error('Not matching userId');
             }

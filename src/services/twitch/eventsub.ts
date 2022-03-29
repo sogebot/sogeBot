@@ -156,7 +156,7 @@ class EventSub {
       // validate
       try {
         const validateUrl = `https://id.twitch.tv/oauth2/validate`;
-        const response = await axios.get<any>(validateUrl, { headers: { Authorization: `OAuth ${appToken}` } });
+        const response = await axios.get<any>(validateUrl, { headers: { Authorization: `Bearer ${appToken}` } });
         if (response.data.client_id !== clientId) {
           warning(`EVENTSUB: Client ID of token and set Client ID not match. Invalidating token.`);
           emitter.emit('set', '/services/twitch', 'appToken', '');
