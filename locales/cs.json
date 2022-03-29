@@ -234,6 +234,18 @@
           "label": "Kanál",
           "placeholder": "Název kanálu nebo ID"
         },
+        "timeout": {
+          "label": "Časový limit",
+          "placeholder": "Nastavit časový limit v milisekundách"
+        },
+        "timeoutType": {
+          "label": "Typ časového limitu",
+          "placeholder": "Nastavte typ časového limitu"
+        },
+        "command": {
+          "label": "Příkaz",
+          "placeholder": "Nastav si !prikaz"
+        },
         "commandToRun": {
           "label": "Příkaz ke spuštění",
           "placeholder": "Nastav si !prikazKeSpusteni"
@@ -760,6 +772,7 @@
     "send-chat-message": "odeslat zprávu na twitch chat",
     "send-whisper": "poslat whisper",
     "run-command": "spusť příkaz",
+    "command-redeem": "spustit událost pro koupení příkazu",
     "run-obswebsocket-command": "spustit příkaz OBS Websocketu",
     "do-nothing": "--- nedělat nic ---",
     "count": "počet",

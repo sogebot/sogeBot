@@ -1,6 +1,6 @@
 {
   "settings": {
     "isTitleForced": "Title/Game is forced (bot will rewrite changes from elsewhere)",
-    "createMarkerOnEvent": "Create stream marker on event"
+    "createMarkerOnEvent": "Створити маркер трансляції на подію"
   }
 }
