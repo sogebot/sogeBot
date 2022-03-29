@@ -73,6 +73,7 @@ export type ClientToServerEventsWithNamespace = {
     'testFireworks': (cb: (err: Error | string | null, data: null ) => void) => void,
     'test': (cb: (err: Error | string | null, data: null ) => void) => void,
     'removeCache': (cb: (err: Error | string | null, data: null ) => void) => void,
+    'getCache': (cb: (err: Error | string | null, data: any ) => void) => void,
   },
   '/integrations/discord': GenericEvents & {
     'discord::getRoles': (cb: (err: Error | string | null, data: { text: string, value: string}[] ) => void) => void,
@@ -100,6 +101,7 @@ export type ClientToServerEventsWithNamespace = {
     'spotify::getAllBanned': (where: FindConditions<SpotifySongBanInterface>, cb?: (err: Error | string | null, items: SpotifySongBanInterface[]) => void) => void,
   },
   '/overlays/eventlist': GenericEvents & {
+    'getEvents': (opts: { ignore: any[], limit: number }, cb: (err: Error | string | null, data: EventListInterface[]) => void) => void,
     'eventlist::getUserEvents': (userId: string, cb: (err: Error | string | null, events: EventListInterface[]) => void) => void,
   },
   '/overlays/gallery': GenericEvents & {
@@ -109,7 +111,38 @@ export type ClientToServerEventsWithNamespace = {
     'generic::setById': generic<GalleryInterface>['setById'],
     'gallery::upload': (data: [filename: string, data: { id: string, b64data: string, folder?: string }], cb: (err: Error | string | null, item?: OverlayMapperMarathon) => void) => void,
   },
+  '/overlays/media': GenericEvents & {
+    'alert': (data: any) => void,
+    'cache': (cacheLimit: number, cb: (err: Error | string | null, data: any) => void) => void,
+  },
+  '/overlays/texttospeech': GenericEvents & {
+    'speak': (data: { text: string; highlight: boolean, service: 0 | 1, key: string }) => void,
+  },
+  '/overlays/wordcloud': GenericEvents & {
+    'wordcloud:word': (words: string[]) => void,
+  },
+  '/overlays/stats': GenericEvents & {
+    'get': (cb: (data: any) => void) => void,
+  },
+  '/overlays/bets': GenericEvents & {
+    'data': (cb: (data: Required<BetsInterface>) => void) => void,
+  },
+  '/overlays/clips': GenericEvents & {
+    'clips': (data: any) => void
+  },
+  '/overlays/clipscarousel': GenericEvents & {
+    'clips': (opts: { customPeriod: number, numOfClips: number }, cb: (error: Error | string | null,data: { clips: any, settings: any }) => void) => void
+  },
+  '/overlays/credits': GenericEvents & {
+    'load': (cb: (error: Error | string | null, opts: any) => void) => void,
+    'getClips': (opts: Record<string, any>, cb: (data: any[]) => void) => void,
+  },
+  '/overlays/polls': GenericEvents & {
+    'data': (cb: (item: PollInterface, votes: any[]) => void) => void,
+    'getVoteCommand': (cb: (command: string) => void) => void,
+  },
   '/overlays/marathon': GenericEvents & {
+    'marathon::public': (id: string, cb: (err: Error | string | null, item?: OverlayMapperMarathon) => void) => void,
     'marathon::check': (id: string, cb: (err: Error | string | null, item?: OverlayMapperMarathon) => void) => void,
     'marathon::update::set': (data: { time: number, id: string }) => void,
   },
@@ -119,6 +152,7 @@ export type ClientToServerEventsWithNamespace = {
       isEnabled: boolean;
       time: number;
     }) => void) => void,
+    'countdown::update': (data: { id: string, isEnabled: boolean | null, time: number | null }, cb: (_err: null, data?: { isEnabled: boolean | null, time :string | null }) => void) => void,
     'countdown::update::set': (data: { id: string, isEnabled: boolean | null, time: number | null }) => void,
   },
   '/overlays/stopwatch': GenericEvents & {
@@ -128,16 +162,30 @@ export type ClientToServerEventsWithNamespace = {
       time: number;
     }) => void) => void,
     'stopwatch::update::set': (data: { id: string, isEnabled: boolean | null, time: number | null }) => void,
+    'stopwatch::update': (data: { id: string, isEnabled: boolean | null, time: number | null }, cb: (_err: null, data?: { isEnabled: boolean | null, time :string | null }) => void) => void,
   },
   '/registries/alerts': GenericEvents & {
     'isAlertUpdated': (data: { updatedAt: number; id: string }, cb: (err: Error | null, isUpdated: boolean, updatedAt: number) => void) => void,
     'alerts::save': (item: Required<AlertInterface>, cb: (error: Error | string | null, item: null | Required<AlertInterface>) => void) => void,
     'alerts::delete': (item: Required<AlertInterface>, cb: (error: Error | string | null) => void) => void,
     'test': (emit: EmitData) => void,
+    'speak': (opts: { text: string, key: string, voice: string; volume: number; rate: number; pitch: number }, cb: (error: Error | string | null, b64mp3: string) => void) => void,
+    'alert': (data: (EmitData & {
+      isTTSMuted: boolean;
+      isSoundMuted: boolean;
+      TTSService: number;
+      TTSKey: string;
+      caster: UserInterface | null;
+      user: UserInterface | null;
+      recipientUser: UserInterface | null;
+    })) => void,
+    'skip': () => void,
   },
   '/registries/randomizer': GenericEvents & {
+    'spin': (data: { service: 0 | 1, key: string }) => void,
     'randomizer::startSpin': () => void,
     'randomizer::showById': (id: string, cb: (error: Error | string | null) => void) => void,
+    'randomizer::getVisible': (cb: (error: Error | string | null, item: RandomizerInterface) => void) => void,
   },
   '/core/permissions': GenericEvents & {
     'generic::deleteById': generic<PermissionsInterface>['deleteById'],
@@ -149,9 +197,15 @@ export type ClientToServerEventsWithNamespace = {
     'text::remove': (item: TextInterface, cb: (error: Error | string | null) => void) => void,
     'text::presets': (_: unknown, cb: (error: Error | string | null, folders: string[] | null) => void) => void,
     'generic::getAll': generic<TextInterface>['getAll'],
-    'generic::getOne': (opts: { id: string, parseText: boolean }, cb: (error: Error | string | null, item: TextInterface) => void) => void,
+    'generic::getOne': (opts: { id: string, parseText: boolean }, cb: (error: Error | string | null, item: TextInterface & { parsedText: string }) => void) => void,
+    'variable-changed': (variableName: string) => void,
   },
   '/services/twitch': GenericEvents & {
+    'emote': (opts: any) => void,
+    'emote.firework': (opts: any) => void,
+    'emote.explode': (opts: any) => void,
+    'hypetrain-end': () => void,
+    'hypetrain-update': (data: { level: number, goal: number, total: number, subs: Record<string, string>}) => void,
     'eventsub::reset': () => void,
     'broadcaster': (cb: (error: Error | string | null, username: string) => void) => void,
   },
@@ -228,7 +282,9 @@ export type ClientToServerEventsWithNamespace = {
   '/core/currency': GenericEvents,
   '/systems/userinfo': GenericEvents,
   '/systems/scrim': GenericEvents,
-  '/systems/emotescombo': GenericEvents,
+  '/systems/emotescombo': GenericEvents & {
+    'combo': (opts: { count: number; url: string }) => void,
+  },
   '/systems/antihateraid': GenericEvents,
   '/services/google': GenericEvents,
   '/integrations/twitter': GenericEvents,
@@ -236,7 +292,10 @@ export type ClientToServerEventsWithNamespace = {
   '/integrations/streamlabs': GenericEvents,
   '/integrations/streamelements': GenericEvents,
   '/integrations/qiwi': GenericEvents,
-  '/integrations/obswebsocket': GenericEvents,
+  '/integrations/obswebsocket': GenericEvents & {
+    'integration::obswebsocket::trigger': (opts: { tasks: OBSWebsocketInterface['simpleModeTasks'] | string, attributes?: Events.Attributes }, cb: any) => void,
+    'integration::obswebsocket::function': (fnc: any, cb: any) => void,
+  },
   '/integrations/lastfm': GenericEvents,
   '/integrations/phillipshue': GenericEvents,
   '/systems/cooldown': GenericEvents & {
@@ -375,6 +434,7 @@ export type ClientToServerEventsWithNamespace = {
   },
   '/core/tts': GenericEvents & {
     'google::speak': (opts: { volume: number; pitch: number; rate: number; text: string; voice: string; }, cb: (error: Error | string | null, audioContent?: string | null) => void) => void,
+    'speak': (opts: { text: string, key: string, voice: string; volume: number; rate: number; pitch: number; triggerTTSByHighlightedMessage?: boolean; }, cb: (error: Error | string | null, b64mp3: string) => void) => void,
   },
   '/core/ui': GenericEvents & {
     'configuration': (cb: (error: Error | string | null, data?: Configuration) => void) => void,
