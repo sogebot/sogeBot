@@ -21,6 +21,11 @@ export function cleanErrors(type: keyof typeof errorCount) {
   errorCount[type] = 0;
 }
 
+const errorSent = {
+  bot:         false,
+  broadcaster: false,
+};
+
 const urls = {
   'SogeBot Token Generator': 'https://twitch-token-generator.soge.workers.dev/refresh/',
 };
@@ -52,13 +57,17 @@ export const refresh = async (type: 'bot' | 'broadcaster'): Promise<string | nul
   }
 
   if (errorCount[type] > 20) {
-    warning(`Limit of token refresh for ${type} reached, please change your tokens!`);
-    addUIError({
-      name:    'Token Error!',
-      message: `Limit of token refresh for ${type} reached, please change your tokens!`,
-    });
+    if (!errorSent[type]) {
+      warning(`Limit of token refresh for ${type} reached, please change your tokens!`);
+      addUIError({
+        name:    'Token Error!',
+        message: `Limit of token refresh for ${type} reached, please change your tokens!`,
+      });
+    }
+    errorSent[type] = true;
     return null;
   }
+  errorSent[type] = false;
 
   debug('oauth.validate', 'Refreshing access token of ' + type);
   const url = urls[tokenService];

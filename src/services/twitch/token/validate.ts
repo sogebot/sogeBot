@@ -101,7 +101,7 @@ export const validate = async (type: 'bot' | 'broadcaster', retry = 0): Promise 
       scopes: string[]
     }>(url, {
       headers: {
-        Authorization: 'OAuth ' + token,
+        Authorization: 'Bearer ' + token,
       },
     });
     expirationDate[type] = Date.now() + request.data.expires_in * 1000;
