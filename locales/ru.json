@@ -234,6 +234,18 @@
           "label": "Канал",
           "placeholder": "Название или ID канала"
         },
+        "timeout": {
+          "label": "Timeout",
+          "placeholder": "Set timeout in milliseconds"
+        },
+        "timeoutType": {
+          "label": "Type of timeout",
+          "placeholder": "Set type of timeout"
+        },
+        "command": {
+          "label": "Command",
+          "placeholder": "Set your !command"
+        },
         "commandToRun": {
           "label": "Команда для запуска",
           "placeholder": "Установите вашу !commandToRun"
@@ -760,6 +772,7 @@
     "send-chat-message": "Отправить сообщение в чат (twitch)",
     "send-whisper": "отправить сообщение в висперсы",
     "run-command": "запустить команду",
+    "command-redeem": "trigger command redeem event",
     "run-obswebsocket-command": "Выполнить команду OBS Websocket",
     "do-nothing": "--- ничего не делать ----",
     "count": "количество",
