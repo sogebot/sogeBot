@@ -13,6 +13,7 @@ export * from './qs';
 export * from './random';
 export * from './stream';
 export * from './youtube';
+export * from './operation';
 
 declare function filter (
   message: string,

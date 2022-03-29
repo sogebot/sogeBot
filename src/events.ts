@@ -303,28 +303,42 @@ class Events extends Core {
       return;
     }
 
-    for (const event of (await getRepository(Event).find({
-      relations: ['operations'],
-      where:     {
-        name:      eventId,
-        isEnabled: true,
-      },
-    }))) {
+    const eventsFromRepository = await Promise.all([
+      getRepository(Event).find({
+        relations: ['operations'],
+        where:     {
+          name:      eventId,
+          isEnabled: true,
+        },
+      }),
+      getRepository(Event).find({
+        relations: ['operations'],
+        where:     {
+          id:        eventId,
+          isEnabled: true,
+        },
+      }),
+    ]);
+
+    for (const event of eventsFromRepository.flat()) {
       const [shouldRunByFilter, shouldRunByDefinition] = await Promise.all([
         this.checkFilter(event, cloneDeep(attributes)),
         this.checkDefinition(clone(event), cloneDeep(attributes)),
       ]);
-      if ((!shouldRunByFilter || !shouldRunByDefinition)) {
+      if ((!shouldRunByFilter || !shouldRunByDefinition) && !attributes.isTriggeredByCommand) {
         continue;
       }
       info(`Event ${eventId} with attributes ${JSON.stringify(attributes)} is triggered and running of operations.`);
-
       for (const operation of event.operations) {
         const isOperationSupported = typeof this.supportedOperationsList.find((o) => o.id === operation.name) !== 'undefined';
         if (isOperationSupported) {
           const foundOp = this.supportedOperationsList.find((o) =>  o.id === operation.name);
           if (foundOp) {
-            foundOp.fire(operation.definitions, cloneDeep({ ...attributes, eventId: event.id }));
+            if (attributes.isTriggeredByCommand && operation.name === 'run-command' && String(operation.definitions.commandToRun).startsWith(attributes.isTriggeredByCommand)) {
+              warning(`Cannot trigger operation run-command ${operation.definitions.command}, because it would cause infinite loop.`);
+            } else {
+              foundOp.fire(operation.definitions, cloneDeep({ ...attributes, eventId: event.id }));
+            }
           }
         }
       }

@@ -3,7 +3,7 @@ import _ from 'lodash';
 import { v4 } from 'uuid';
 
 import {
-  command, count, custom, evaluate, ifp, info, list, math, online, param, price, qs, random, ResponseFilter, stream, youtube,
+  operation, command, count, custom, evaluate, ifp, info, list, math, online, param, price, qs, random, ResponseFilter, stream, youtube,
 } from './filters';
 
 import { timer } from '~/decorators.js';
@@ -71,6 +71,7 @@ class Message {
     await this.parseMessageEach(list, attr);
     await this.parseMessageEach(stream, attr);
     await this.parseMessageEach(count, attr);
+    await this.parseMessageEach(operation, attr, false);
     await this.parseMessageEval(evaluate, attr);
     await this.parseMessageApi();
 
