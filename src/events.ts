@@ -21,7 +21,7 @@ import events from '~/events';
 import { isStreamOnline, rawStatus, stats, streamStatusChangeSince } from '~/helpers/api';
 import { attributesReplace } from '~/helpers/attributesReplace';
 import {
-  announce, getOwner, getUserSender, prepare,
+  announce, getOwner, getUserSender, isUUID, prepare,
 } from '~/helpers/commons';
 import { mainCurrency } from '~/helpers/currency';
 import {
@@ -303,24 +303,14 @@ class Events extends Core {
       return;
     }
 
-    const eventsFromRepository = await Promise.all([
-      getRepository(Event).find({
-        relations: ['operations'],
-        where:     {
-          name:      eventId,
-          isEnabled: true,
-        },
-      }),
-      getRepository(Event).find({
-        relations: ['operations'],
-        where:     {
-          id:        eventId,
-          isEnabled: true,
-        },
-      }),
-    ]);
+    const eventsFromRepository = await getRepository(Event).find({
+      relations: ['operations'],
+      where:     isUUID(eventId)
+        ? { id: eventId, isEnabled: true }
+        : { name: eventId, isEnabled: true },
+    });
 
-    for (const event of eventsFromRepository.flat()) {
+    for (const event of eventsFromRepository) {
       const [shouldRunByFilter, shouldRunByDefinition] = await Promise.all([
         this.checkFilter(event, cloneDeep(attributes)),
         this.checkDefinition(clone(event), cloneDeep(attributes)),
