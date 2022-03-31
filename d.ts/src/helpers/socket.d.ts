@@ -85,6 +85,7 @@ export type ClientToServerEventsWithNamespace = {
     'discord::getChannels': (cb: (err: Error | string | null, data: { text: string, value: string}[] ) => void) => void,
     'discord::authorize': (cb: (err: Error | string | null, action?: null | { do: 'redirect', opts: any[] } ) => void) => void,
   },
+  '/integrations/kofi': GenericEvents,
   '/integrations/donationalerts': GenericEvents & {
     'donationalerts::validate': (token: string, cb: (err: Error | string | null) => void) => void,
   },

@@ -102,13 +102,15 @@ class EventList extends Overlay {
       return;
     } // don't save event from a bot
 
-    users.getNameById(data.userId).then((username) => {
-      let description = username;
-      if (data.event === 'tip') {
-        description = `${data.amount} ${data.currency}`;
-      }
-      twitch.addEventToMarker(data.event, description);
-    });
+    if (!data.userId.includes('__anonymous__')) {
+      users.getNameById(data.userId).then((username) => {
+        let description = username;
+        if (data.event === 'tip') {
+          description = `${data.amount} ${data.currency}`;
+        }
+        twitch.addEventToMarker(data.event, description);
+      });
+    }
 
     await getRepository(EventListEntity).save({
       event:       data.event,
@@ -117,7 +119,7 @@ class EventList extends Overlay {
       isTest:      data.isTest ?? false,
       values_json: JSON.stringify(
         Object.keys(data)
-          .filter(key => !['event', 'username', 'timestamp', 'isTest'].includes(key))
+          .filter(key => !['event', 'userId', 'timestamp', 'isTest'].includes(key))
           .reduce((obj, key) => {
             return {
               ...obj,
