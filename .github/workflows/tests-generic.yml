@@ -15,7 +15,7 @@ jobs:
     name: ESLint check
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: All test should be run - tests are not containing describe.only
       run: |
           if ! grep -r -l 'describe.only' ./test/; then
