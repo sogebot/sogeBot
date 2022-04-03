@@ -150,7 +150,7 @@ class Alerts extends Registry {
       this.trigger({
         ...data,
         monthsName: getLocalizedName(data.amount, translate('core.months')),
-      });
+      }, true);
     });
 
     publicEndpoint('/registries/alerts', 'speak', async (opts, cb) => {
@@ -177,10 +177,10 @@ class Alerts extends Registry {
     });
   }
 
-  async trigger(opts: EmitData) {
+  async trigger(opts: EmitData, isTest = false) {
     debug('alerts.trigger', JSON.stringify(opts, null, 2));
     const { default: tts, services } = await import ('../tts');
-    if (!this.areAlertsMuted) {
+    if (!this.areAlertsMuted || isTest) {
       let key = v4();
       if (tts.service === services.RESPONSIVEVOICE) {
         key = tts.responsiveVoiceKey;
