@@ -119,6 +119,8 @@ class Socket extends Core {
           const accessTokenHeader = req.headers['x-twitch-token'] as string | undefined;
           const userId = req.headers['x-twitch-userid'] as string | undefined;
 
+          debug('socket', 'Validation started');
+          debug('socket', JSON.stringify({ accessTokenHeader, userId }, null, 2));
           try {
             if (!accessTokenHeader || !userId) {
               throw new Error('Insufficient data');
@@ -149,7 +151,7 @@ class Socket extends Core {
               accessToken, refreshToken, userType: haveCasterPermission ? 'admin' : 'viewer',
             });
           } catch(e: any) {
-            debug('socket', e.stack);
+            error(e.stack);
             res.status(400).send('You don\'t have access to this server.');
           }
         });
