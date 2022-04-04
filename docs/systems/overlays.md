@@ -117,38 +117,38 @@
   - **EXAMPLE:** `!media type=video`
 - **url**
   - URL of video to be shown in alert, only **mp4** videos are supported
-  - **EXAMPLE:** `!media type=video url=http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4`
+  - **EXAMPLE:** `!media type=video url=https://test-videos.co.uk/vids/bigbuckbunny/mp4/h264/720/Big_Buck_Bunny_720_10s_5MB.mp4`
 
 ### Optional parameters
 
 - **size**
   - Set size of your video in px or %
   - **Default value**: 100%
-  - **EXAMPLE:** `!media type=video url=http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4 size=100px`
+  - **EXAMPLE:** `!media type=video url=https://test-videos.co.uk/vids/bigbuckbunny/mp4/h264/720/Big_Buck_Bunny_720_10s_5MB.mp4 size=100px`
 - **duration**
   - How long will be fadeIn and fadeOut animation
   - **Default value**: 1000
-  - **EXAMPLE:** `!media type=video url=http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4 duration=5000`
+  - **EXAMPLE:** `!media type=video url=https://test-videos.co.uk/vids/bigbuckbunny/mp4/h264/720/Big_Buck_Bunny_720_10s_5MB.mp4 duration=5000`
 - **delay**
   - How long will alert wait to be played
   - **Default value**: 0
-  - **EXAMPLE:** `!media type=video url=http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4 delay=5000`
+  - **EXAMPLE:** `!media type=video url=https://test-videos.co.uk/vids/bigbuckbunny/mp4/h264/720/Big_Buck_Bunny_720_10s_5MB.mp4 delay=5000`
 - **class**
   - Set custom class for styling in OBS, XSplit, etc.
   - **Default value**: *empty*
-  - **EXAMPLE:** `!media type=video url=http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4 class=myFancyClass`
+  - **EXAMPLE:** `!media type=video url=https://test-videos.co.uk/vids/bigbuckbunny/mp4/h264/720/Big_Buck_Bunny_720_10s_5MB.mp4 class=myFancyClass`
 - **x-offset**
   - Set X offset of video in pixels
   - **Default value**: *not set*
-  - **EXAMPLE:** `!media type=video url=http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4 x-offset=100`
+  - **EXAMPLE:** `!media type=video url=https://test-videos.co.uk/vids/bigbuckbunny/mp4/h264/720/Big_Buck_Bunny_720_10s_5MB.mp4 x-offset=100`
 - **y-offset**
   - Set Y offset of video in pixels
   - **Default value**: *not set*
-  - **EXAMPLE:** `!media type=video url=http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4 y-offset=100`
+  - **EXAMPLE:** `!media type=video url=https://test-videos.co.uk/vids/bigbuckbunny/mp4/h264/720/Big_Buck_Bunny_720_10s_5MB.mp4 y-offset=100`
 - **volume**
   - Set volume of video in percent
   - **Default value**: *not set*
-  - **EXAMPLE:** `!media type=video url=http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4 volume=50`
+  - **EXAMPLE:** `!media type=video url=https://test-videos.co.uk/vids/bigbuckbunny/mp4/h264/720/Big_Buck_Bunny_720_10s_5MB.mp4 volume=50`
 
 ## Clip
 
