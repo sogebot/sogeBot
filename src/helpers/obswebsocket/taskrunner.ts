@@ -2,6 +2,7 @@ import { createHash } from 'crypto';
 
 import { Events } from '@entity/event.js';
 import { OBSWebsocketInterface } from '@entity/obswebsocket';
+import axios from 'axios';
 import type ObsWebSocket from 'obs-websocket-js';
 import safeEval from 'safe-eval';
 
@@ -32,7 +33,10 @@ const taskRunner = async (obs: ObsWebSocket, opts: { tasks: OBSWebsocketInterfac
           return new Promise((resolve) => setTimeout(resolve, ms, null));
         },
         // we are using error on code so it will be seen in OBS Log Viewer
-        log: (process.env.BUILD === 'web') ? console.error : require('../log').info,
+        log: (logMessage: string) => {
+          axios.post((process.env.isNuxtDev ? 'http://localhost:20000' : '') + '/integrations/obswebsocket/log', { message: logMessage });
+          (process.env.BUILD === 'web') ? console.error(logMessage) : require('../log').info(logMessage);
+        },
       });
     } else {
       for (const task of tasks) {

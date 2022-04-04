@@ -19,7 +19,7 @@ import {
 import { obs } from '~/helpers/obswebsocket/client';
 import { switchScenes } from '~/helpers/obswebsocket/listeners';
 import { taskRunner } from '~/helpers/obswebsocket/taskrunner';
-import { ioServer } from '~/helpers/panel';
+import { app, ioServer } from '~/helpers/panel';
 import { ParameterError } from '~/helpers/parameterError';
 import { defaultPermissions } from '~/helpers/permissions';
 import { publicEndpoint } from '~/helpers/socket';
@@ -153,6 +153,23 @@ class OBSWebsocket extends Integration {
     } finally {
       setTimeout(() => this.heartBeat(), 10 * SECOND);
     }
+  }
+
+  @onStartup()
+  initEndpoint() {
+    if (!app) {
+      setTimeout(() => this.initEndpoint(), 1000);
+      return;
+    }
+
+    app.post('/integrations/obswebsocket/log', (req, res) => {
+      let message = req.body.message;
+      if (typeof req.body.message !== 'string') {
+        message = JSON.stringify(req.body.message, null, 2);
+      }
+      ioServer?.of('/integrations/obswebsocket').emit('log', message || '');
+      res.status(200).send();
+    });
   }
 
   sockets() {

@@ -300,6 +300,7 @@ export type ClientToServerEventsWithNamespace = {
   '/integrations/obswebsocket': GenericEvents & {
     'integration::obswebsocket::trigger': (opts: { tasks: OBSWebsocketInterface['simpleModeTasks'] | string, attributes?: Events.Attributes }, cb: any) => void,
     'integration::obswebsocket::function': (fnc: any, cb: any) => void,
+    'log': (toLog: string) => void,
   },
   '/integrations/lastfm': GenericEvents,
   '/integrations/phillipshue': GenericEvents,

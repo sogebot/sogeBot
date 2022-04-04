@@ -1,3 +1,4 @@
+import axios from 'axios';
 import type ObsWebSocket from 'obs-websocket-js';
 
 import { setMute, setVolume } from './audio';
@@ -16,6 +17,7 @@ const availableActions = {
   'SaveReplayBuffer':  saveReplayBuffer,
   'WaitMs':            (obs: ObsWebSocket, miliseconds: number) => new Promise(resolve => setTimeout(resolve, miliseconds, null)),
   'Log':               (obs: ObsWebSocket, logMessage: string) => {
+    axios.post((process.env.isNuxtDev ? 'http://localhost:20000' : '') + '/integrations/obswebsocket/log', { message: logMessage });
     (process.env.BUILD === 'web') ? console.error(logMessage) : require('../log').info(logMessage);
   },
   'StartRecording':  startRecording,
