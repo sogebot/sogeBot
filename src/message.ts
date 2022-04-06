@@ -69,7 +69,7 @@ class Message {
     await this.parseMessageCommand(command, attr);
     await this.parseMessageEach(qs, attr, false);
     await this.parseMessageEach(list, attr);
-    await this.parseMessageEach(stream, attr);
+    await this.parseMessageEach(stream, attr, true, 'w');
     await this.parseMessageEach(count, attr);
     await this.parseMessageEach(operation, attr, false);
     await this.parseMessageEval(evaluate, attr);
@@ -215,7 +215,7 @@ class Message {
   }
 
   @timer()
-  async parseMessageEach (filters: ResponseFilter, attr: Parameters<ResponseFilter[string]>[1], removeWhenEmpty = true) {
+  async parseMessageEach (filters: ResponseFilter, attr: Parameters<ResponseFilter[string]>[1], removeWhenEmpty = true, regexpChar = 'S') {
     if (this.message.trim().length === 0) {
       return;
     }
@@ -226,7 +226,7 @@ class Message {
       if (key.startsWith('$')) {
         regexp = regexp.replace(/#/g, '(\\b.+?\\b)');
       } else {
-        regexp = regexp.replace(/#/g, '([\\S ]+?)'); // default behavior for if
+        regexp = regexp.replace(/#/g, '([\\' + regexpChar + ' ]+?)'); // default behavior for if
       }
       const rMessage = this.message.match((new RegExp('(' + regexp + ')', 'g')));
       if (rMessage !== null) {
