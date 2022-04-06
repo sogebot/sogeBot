@@ -226,7 +226,7 @@ class Message {
       if (key.startsWith('$')) {
         regexp = regexp.replace(/#/g, '(\\b.+?\\b)');
       } else {
-        regexp = regexp.replace(/#/g, '([\\S ]+?)'); // default behavior for if
+        regexp = regexp.replace(/#/g, '([\\w ]+?)'); // default behavior for if
       }
       const rMessage = this.message.match((new RegExp('(' + regexp + ')', 'g')));
       if (rMessage !== null) {
