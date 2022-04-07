@@ -280,6 +280,8 @@ e.g. `(api|https://httpbin.org/get?test=a\\nb) Lorem (api.args.test)`
 
 `(stream|#name|link)` - returns link to twitch `#name` channel -> 'twitch.tv/#name'
 
+`(stream|#name|status)` - returns status of twitch `#name` channel -> 'live' | 'offline'
+
 ## YouTube filters
 
 `$youtube(url, <channel-or-user>)` - returns latest video link e.g.

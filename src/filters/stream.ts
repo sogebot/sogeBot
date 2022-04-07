@@ -61,6 +61,19 @@ const stream: ResponseFilter = {
       return '0';
     }
   },
+  '(stream|#|status)': async function (filter: string) {
+    const channel = filter.replace('(stream|', '').replace('|status)', '');
+    try {
+      const clientBot = await client('bot');
+      const getStreams = await clientBot.streams.getStreams({ userName: channel });
+      if (getStreams.data.length === 0) {
+        throw new Error();
+      }
+      return `live`;
+    } catch (e) {
+      return 'offline';
+    }
+  },
 };
 
 export { stream };
