@@ -22,6 +22,7 @@ import { isBot, isBotSubscriber } from './user/isBot';
 import { isBroadcaster } from './user/isBroadcaster';
 import { isModerator } from './user/isModerator';
 
+import Message from '~/message.js';
 import { variables as vars } from '~/watchers';
 
 class HelpersFilter {
@@ -30,7 +31,6 @@ class HelpersFilter {
     if (!opts.sender) {
       return true;
     }
-    const toEval = `(function () { return ${filter} })`;
 
     const $userObject = await changelog.get(opts.sender.userId);
     if (!$userObject) {
@@ -40,6 +40,9 @@ class HelpersFilter {
       });
       return checkFilter(opts, filter);
     }
+
+    const processedFilter = await new Message(await filter as string).parse({ ...opts, sender: opts.sender, forceWithoutAt: true });
+    const toEval = `(function () { return ${processedFilter} })`;
     let $rank: string | null = null;
     if (ranks.enabled) {
       const rank = await ranks.get($userObject);
