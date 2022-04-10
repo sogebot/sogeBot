@@ -14,7 +14,7 @@ export const GooglePrivateKeys = new EntitySchema<Readonly<Required<GooglePrivat
       type: 'uuid', primary: true, generated: 'uuid',
     },
     clientEmail: { type: String },
-    privateKey:  { type: String },
+    privateKey:  { type: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') === 'mysql' ? 'longtext' : 'text' },
     createdAt:   { type: String },
   },
 });
