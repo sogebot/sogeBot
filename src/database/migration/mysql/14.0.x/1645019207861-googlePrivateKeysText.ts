@@ -7,4 +7,8 @@ export class googlePrivateKeysText1645019207861 implements MigrationInterface {
     await queryRunner.query(`ALTER TABLE \`google_private_keys\` MODIFY \`privateKey\` text NOT NULL`);
   }
 
+  public async down() {
+    return true;
+  }
+
 }
