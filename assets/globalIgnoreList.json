@@ -730,12 +730,14 @@
   },
   "1564983": {
     "reason": "bot account",
+    "safe": true,
     "known_aliases": [
       "moobot"
     ]
   },
   "19264788": {
     "reason": "bot account",
+    "safe": true,
     "known_aliases": [
       "nightbot"
     ]
@@ -760,6 +762,7 @@
   },
   "29201680": {
     "reason": "bot account",
+    "safe": true,
     "known_aliases": [
       "xanbot"
     ]
@@ -772,6 +775,7 @@
   },
   "52268235": {
     "reason": "bot account",
+    "safe": true,
     "known_aliases": [
       "wizebot"
     ]
@@ -808,6 +812,7 @@
   },
   "70576998": {
     "reason": "bot account",
+    "safe": true,
     "known_aliases": [
       "vivbot"
     ]
@@ -844,12 +849,14 @@
   },
   "81577067": {
     "reason": "bot account",
+    "safe": true,
     "known_aliases": [
       "branebot"
     ]
   },
   "88020958": {
     "reason": "bot account",
+    "safe": true,
     "known_aliases": [
       "muxybot"
     ]
@@ -874,6 +881,7 @@
   },
   "100135110": {
     "reason": "bot account",
+    "safe": true,
     "known_aliases": [
       "streamelements"
     ]
@@ -922,6 +930,7 @@
   },
   "135204446": {
     "reason": "bot account",
+    "safe": true,
     "known_aliases": [
       "pretzelrocks"
     ]

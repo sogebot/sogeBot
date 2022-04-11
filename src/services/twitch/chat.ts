@@ -42,7 +42,7 @@ import { tmiEmitter } from '~/helpers/tmi';
 import { isOwner } from '~/helpers/user';
 import * as changelog from '~/helpers/user/changelog.js';
 import { isBot, isBotId } from '~/helpers/user/isBot';
-import { isIgnored } from '~/helpers/user/isIgnored';
+import { isIgnored, isIgnoredSafe } from '~/helpers/user/isIgnored';
 import eventlist from '~/overlays/eventlist';
 import { Parser } from '~/parser';
 import alerts from '~/registries/alerts';
@@ -850,14 +850,17 @@ class Chat {
     data.isFirstTimeMessage ??= false;
 
     let userId = data.userstate.userId as string | undefined;
+    let userName = data.userstate.userName as string | undefined;
     const userstate = data.userstate;
     const message = data.message;
     const skip = data.skip ?? false;
     const quiet = data.quiet;
 
-    if (!userId && userstate.userName) {
+    userName = 'streamelements';
+
+    if (!userId && userName) {
       // this can happen if we are sending commands from dashboards etc.
-      userId = String(await users.getIdByName(userstate.userName));
+      userId = String(await users.getIdByName(userName));
     }
 
     const parse = new Parser({
@@ -868,37 +871,41 @@ class Chat {
     if (!skip
         && data.isWhisper
         && (whisperListener || isOwner(userstate))) {
-      whisperIn(`${message} [${userstate.userName}]`);
+      whisperIn(`${message} [${userName}]`);
     } else if (!skip && !isBotId(userId)) {
-      chatIn(`${message} [${userstate.userName}]`);
+      chatIn(`${message} [${userName}]`);
     }
 
     if (commandRegexp.test(message)) {
       // check only if ignored if it is just simple command
-      if (await isIgnored({ userName: userstate.userName ?? '', userId: userId })) {
+      if (await isIgnored({ userName: userName ?? '', userId: userId })) {
         return;
       }
     } else {
+      const isIgnoredSafeCheck = await isIgnoredSafe({ userName: userName ?? '', userId: userId });
+      if (isIgnoredSafeCheck) {
+        return;
+      }
       // we need to moderate ignored users as well
       const [isModerated, isIgnoredCheck] = await Promise.all(
-        [parse.isModerated(), isIgnored({ userName: userstate.userName ?? '', userId: userId })],
+        [parse.isModerated(), isIgnored({ userName: userName ?? '', userId: userId })],
       );
       if (isModerated || isIgnoredCheck) {
         return;
       }
     }
 
-    if (!skip && !isNil(userstate.userName)) {
+    if (!skip && !isNil(userName)) {
       const user = await changelog.get(userstate.userId);
       if (user) {
         if (!user.isOnline) {
-          joinpart.send({ users: [userstate.userName], type: 'join' });
-          eventEmitter.emit('user-joined-channel', { userName: userstate.userName });
+          joinpart.send({ users: [userName], type: 'join' });
+          eventEmitter.emit('user-joined-channel', { userName: userName });
         }
 
         changelog.update(user.userId, {
           ...user,
-          userName:     userstate.userName,
+          userName:     userName,
           userId:       userstate.userId,
           isOnline:     true,
           isVIP:        userstate.isVip,
@@ -908,10 +915,10 @@ class Chat {
           seenAt:       new Date().toISOString(),
         });
       } else {
-        joinpart.send({ users: [userstate.userName], type: 'join' });
-        eventEmitter.emit('user-joined-channel', { userName: userstate.userName });
+        joinpart.send({ users: [userName], type: 'join' });
+        eventEmitter.emit('user-joined-channel', { userName: userName });
         changelog.update(userstate.userId, {
-          userName:     userstate.userName,
+          userName:     userName,
           userId:       userstate.userId,
           isOnline:     true,
           isVIP:        userstate.isVip,
@@ -921,14 +928,14 @@ class Chat {
         });
       }
 
-      followerUpdatePreCheck(userstate.userName);
+      followerUpdatePreCheck(userName);
 
       eventEmitter.emit('keyword-send-x-times', {
-        userName: userstate.userName, message: message, source: 'twitch',
+        userName: userName, message: message, source: 'twitch',
       });
       if (message.startsWith('!')) {
         eventEmitter.emit('command-send-x-times', {
-          userName: userstate.userName, message: message, source: 'twitch',
+          userName: userName, message: message, source: 'twitch',
         });
       } else if (!message.startsWith('!')) {
         changelog.increment(userstate.userId, { messages: 1 });
@@ -937,7 +944,7 @@ class Chat {
 
     if (data.isFirstTimeMessage) {
       eventEmitter.emit('chatter-first-message', {
-        userName: userstate.userName, message: message, source: 'twitch',
+        userName: userName, message: message, source: 'twitch',
       });
     }
     const responses = await parse.process();

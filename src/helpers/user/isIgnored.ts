@@ -46,6 +46,14 @@ export function isInGlobalIgnoreList (sender: { userName: string | null; userId?
   }) !== 'undefined';
 }
 
+export function isIgnoredSafe(sender: { userName: string | null; userId?: string }) {
+  const found = getGlobalIgnoreList().find(data => {
+    return data.id === sender.userId || data.known_aliases.includes((sender.userName || '').toLowerCase());
+  });
+
+  return found ? !!found.safe : false;
+}
+
 export function isIgnored(sender: { userName: string | null; userId?: string }) {
   return cl.isIgnored(sender);
 }
