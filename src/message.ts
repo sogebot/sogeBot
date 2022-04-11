@@ -37,10 +37,10 @@ class Message {
   }
 
   @timer()
-  async parse (attr: { [name: string]: any, skipGlobal?: boolean, sender: CommandOptions['sender'], discord: CommandOptions['discord'], forceWithoutAt?: boolean } = { sender: getBotSender(), discord: undefined, skipGlobal: false }) {
+  async parse (attr: { [name: string]: any, isFilter?: boolean, sender: CommandOptions['sender'], discord: CommandOptions['discord'], forceWithoutAt?: boolean } = { sender: getBotSender(), discord: undefined, isFilter: false }) {
     this.message = await this.message; // if is promise
 
-    if (!attr.skipGlobal) {
+    if (!attr.isFilter) {
       await this.global({ sender: attr.sender, discord: attr.discord  });
       // local replaces
       if (!_.isNil(attr)) {
@@ -55,6 +55,7 @@ class Message {
           this.message = this.message.replace(new RegExp('[$]' + key, 'g'), value);
         }
       }
+      await this.parseMessageEach(param, attr, true);
     }
 
     await this.parseMessageEach(price, attr);
@@ -65,7 +66,6 @@ class Message {
     if (attr.replaceCustomVariables || typeof attr.replaceCustomVariables === 'undefined') {
       await this.parseMessageVariables(custom, attr);
     }
-    await this.parseMessageEach(param, attr, true);
     await this.parseMessageEach(math, attr);
     await this.parseMessageOnline(online, attr);
     await this.parseMessageCommand(command, attr);
