@@ -37,10 +37,26 @@ class Message {
   }
 
   @timer()
-  async parse (attr: { [name: string]: any, sender: CommandOptions['sender'], discord: CommandOptions['discord'], forceWithoutAt?: boolean } = { sender: getBotSender(), discord: undefined }) {
+  async parse (attr: { [name: string]: any, isFilter?: boolean, sender: CommandOptions['sender'], discord: CommandOptions['discord'], forceWithoutAt?: boolean } = { sender: getBotSender(), discord: undefined, isFilter: false }) {
     this.message = await this.message; // if is promise
 
-    await this.global({ sender: attr.sender, discord: attr.discord  });
+    if (!attr.isFilter) {
+      await this.global({ sender: attr.sender, discord: attr.discord  });
+      // local replaces
+      if (!_.isNil(attr)) {
+        for (let [key, value] of Object.entries(attr)) {
+          if (key === 'sender') {
+            if (typeof value.userName !== 'undefined') {
+              value = twitch.showWithAt && attr.forceWithoutAt !== true ? `@${value.userName}` : value.userName;
+            } else {
+              value = twitch.showWithAt && attr.forceWithoutAt !== true ? `@${value}` : value;
+            }
+          }
+          this.message = this.message.replace(new RegExp('[$]' + key, 'g'), value);
+        }
+      }
+      await this.parseMessageEach(param, attr, true);
+    }
 
     await this.parseMessageEach(price, attr);
     await this.parseMessageEach(info, attr);
@@ -49,20 +65,6 @@ class Message {
     await this.parseMessageEach(ifp, attr, false);
     if (attr.replaceCustomVariables || typeof attr.replaceCustomVariables === 'undefined') {
       await this.parseMessageVariables(custom, attr);
-    }
-    await this.parseMessageEach(param, attr, true);
-    // local replaces
-    if (!_.isNil(attr)) {
-      for (let [key, value] of Object.entries(attr)) {
-        if (key === 'sender') {
-          if (typeof value.userName !== 'undefined') {
-            value = twitch.showWithAt && attr.forceWithoutAt !== true ? `@${value.userName}` : value.userName;
-          } else {
-            value = twitch.showWithAt && attr.forceWithoutAt !== true ? `@${value}` : value;
-          }
-        }
-        this.message = this.message.replace(new RegExp('[$]' + key, 'g'), value);
-      }
     }
     await this.parseMessageEach(math, attr);
     await this.parseMessageOnline(online, attr);
