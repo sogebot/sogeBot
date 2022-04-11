@@ -42,6 +42,19 @@ class Message {
 
     if (!attr.skipGlobal) {
       await this.global({ sender: attr.sender, discord: attr.discord  });
+      // local replaces
+      if (!_.isNil(attr)) {
+        for (let [key, value] of Object.entries(attr)) {
+          if (key === 'sender') {
+            if (typeof value.userName !== 'undefined') {
+              value = twitch.showWithAt && attr.forceWithoutAt !== true ? `@${value.userName}` : value.userName;
+            } else {
+              value = twitch.showWithAt && attr.forceWithoutAt !== true ? `@${value}` : value;
+            }
+          }
+          this.message = this.message.replace(new RegExp('[$]' + key, 'g'), value);
+        }
+      }
     }
 
     await this.parseMessageEach(price, attr);
@@ -53,19 +66,6 @@ class Message {
       await this.parseMessageVariables(custom, attr);
     }
     await this.parseMessageEach(param, attr, true);
-    // local replaces
-    if (!_.isNil(attr)) {
-      for (let [key, value] of Object.entries(attr)) {
-        if (key === 'sender') {
-          if (typeof value.userName !== 'undefined') {
-            value = twitch.showWithAt && attr.forceWithoutAt !== true ? `@${value.userName}` : value.userName;
-          } else {
-            value = twitch.showWithAt && attr.forceWithoutAt !== true ? `@${value}` : value;
-          }
-        }
-        this.message = this.message.replace(new RegExp('[$]' + key, 'g'), value);
-      }
-    }
     await this.parseMessageEach(math, attr);
     await this.parseMessageOnline(online, attr);
     await this.parseMessageCommand(command, attr);
