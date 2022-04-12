@@ -942,7 +942,7 @@ class Chat {
 
     if (data.isFirstTimeMessage) {
       eventEmitter.emit('chatter-first-message', {
-        userName: userName, message: message, source: 'twitch',
+        userName: userName ?? '', message: message, source: 'twitch',
       });
     }
     const responses = await parse.process();
