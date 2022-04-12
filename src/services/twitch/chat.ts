@@ -850,13 +850,11 @@ class Chat {
     data.isFirstTimeMessage ??= false;
 
     let userId = data.userstate.userId as string | undefined;
-    let userName = data.userstate.userName as string | undefined;
+    const userName = data.userstate.userName as string | undefined;
     const userstate = data.userstate;
     const message = data.message;
     const skip = data.skip ?? false;
     const quiet = data.quiet;
-
-    userName = 'streamelements';
 
     if (!userId && userName) {
       // this can happen if we are sending commands from dashboards etc.
