@@ -41,7 +41,7 @@ class HelpersFilter {
       return checkFilter(opts, filter);
     }
 
-    const processedFilter = await new Message(await filter as string).parse({ ...opts, sender: opts.sender, forceWithoutAt: true, isFilter: true });
+    const processedFilter = await new Message(await filter as string).parse({ ...opts, sender: opts.sender, forceWithoutAt: true, isFilter: true, param: opts.parameters });
     const toEval = `(function () { return ${processedFilter} })`;
     let $rank: string | null = null;
     if (ranks.enabled) {
@@ -68,7 +68,7 @@ class HelpersFilter {
       $haveParam: opts.parameters?.length > 0,
       $param:     opts.parameters,
       // add global variables
-      ...await this.getGlobalVariables(filter, { sender: opts.sender, discord: opts.discord }),
+      ...await this.getGlobalVariables(processedFilter, { sender: opts.sender, discord: opts.discord }),
       ...customVariables,
     };
     let result =  false;

@@ -1,19 +1,29 @@
 import client from '../services/twitch/api/client';
+import { param } from './param';
 
 import type { ResponseFilter } from '.';
 
 const stream: ResponseFilter = {
-  '(stream|#|link)': async function (filter: string) {
-    const channel = filter.replace('(stream|', '').replace('|link)', '').replace('@', '');
+  '(stream|#|link)': async function (filter, attr) {
+    let channel = filter.replace('(stream|', '').replace('|link)', '').replace('@', '');
+
+    // handle edge case when channel is parameter in checkFilter
+    if (channel === '$param' || channel === '$touser') {
+      channel = await param.$param('', attr);
+    }
 
     if (channel.trim().length === 0) {
       return '';
     }
-
     return `twitch.tv/${channel}`;
   },
-  '(stream|#|game)': async function (filter: string) {
-    const channel = filter.replace('(stream|', '').replace('|game)', '').replace('@', '');
+  '(stream|#|game)': async function (filter, attr) {
+    let channel = filter.replace('(stream|', '').replace('|game)', '').replace('@', '');
+
+    // handle edge case when channel is parameter in checkFilter
+    if (channel === '$param' || channel === '$touser') {
+      channel = await param.$param('', attr);
+    }
     try {
       const clientBot = await client('bot');
       const getUserByName = await clientBot.users.getUserByName(channel);
@@ -30,8 +40,13 @@ const stream: ResponseFilter = {
       return 'n/a';
     }
   },
-  '(stream|#|title)': async function (filter: string) {
-    const channel = filter.replace('(stream|', '').replace('|title)', '').replace('@', '');
+  '(stream|#|title)': async function (filter, attr) {
+    let channel = filter.replace('(stream|', '').replace('|title)', '').replace('@', '');
+
+    // handle edge case when channel is parameter in checkFilter
+    if (channel === '$param' || channel === '$touser') {
+      channel = await param.$param('', attr);
+    }
     try {
       const clientBot = await client('bot');
       const getUserByName = await clientBot.users.getUserByName(channel);
@@ -48,8 +63,13 @@ const stream: ResponseFilter = {
       return 'n/a';
     }
   },
-  '(stream|#|viewers)': async function (filter: string) {
-    const channel = filter.replace('(stream|', '').replace('|viewers)', '');
+  '(stream|#|viewers)': async function (filter, attr) {
+    let channel = filter.replace('(stream|', '').replace('|viewers)', '');
+
+    // handle edge case when channel is parameter in checkFilter
+    if (channel === '$param' || channel === '$touser') {
+      channel = await param.$param('', attr);
+    }
     try {
       const clientBot = await client('bot');
       const getStreams = await clientBot.streams.getStreams({ userName: channel });
@@ -61,8 +81,13 @@ const stream: ResponseFilter = {
       return '0';
     }
   },
-  '(stream|#|status)': async function (filter: string) {
-    const channel = filter.replace('(stream|', '').replace('|status)', '');
+  '(stream|#|status)': async function (filter, attr) {
+    let channel = filter.replace('(stream|', '').replace('|status)', '');
+
+    // handle edge case when channel is parameter in checkFilter
+    if (channel === '$param' || channel === '$touser') {
+      channel = await param.$param('', attr);
+    }
     try {
       const clientBot = await client('bot');
       const getStreams = await clientBot.streams.getStreams({ userName: channel });
