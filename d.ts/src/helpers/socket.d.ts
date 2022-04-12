@@ -74,6 +74,9 @@ type generic<T extends Record<string, any>> = {
 };
 
 export type ClientToServerEventsWithNamespace = {
+  '/core/plugins': GenericEvents & {
+    'listeners': (cb: (listeners: string[]) => void) => void,
+  },
   '/core/emotes': GenericEvents & {
     'testExplosion': (cb: (err: Error | string | null, data: null ) => void) => void,
     'testFireworks': (cb: (err: Error | string | null, data: null ) => void) => void,

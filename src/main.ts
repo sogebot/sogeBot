@@ -109,6 +109,7 @@ async function main () {
         require('./stats');
         require('./users');
         require('./events');
+        require('./plugins');
         require('./customvariables');
         require('./permissions');
         require('./updater');
