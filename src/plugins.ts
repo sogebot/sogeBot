@@ -5,15 +5,23 @@ import { onStartup } from '~/decorators/on';
 
 const twitchChatMessage = {
   sender: {
-    username: String,
-    userId:   String,
+    username: 'String',
+    userId:   'String',
   },
-  message: String,
+  message: 'String',
+};
+const test = {
+  message: 'String',
+};
+const nothingInCommon = {
+  test: 'String',
 };
 
 class Plugins extends Core {
   listeners = {
     twitchChatMessage,
+    test,
+    nothingInCommon,
   } as const;
 
   @onStartup()
@@ -25,7 +33,7 @@ class Plugins extends Core {
 
   public sockets() {
     adminEndpoint('/core/plugins', 'listeners', async (cb) => {
-      cb(Object.keys(this.listeners));
+      cb(this.listeners);
     });
   }
 }
