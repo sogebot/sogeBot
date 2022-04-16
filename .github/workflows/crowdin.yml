@@ -28,10 +28,6 @@ jobs:
         # This branch does NOT need to be manually created. It will be created automatically by the action.
         localization_branch_name: l10n_crowdin_action_test
         download_translations: true
-        create_pull_request: true
-        commit_message: 'chore(locales): crowdin update'
-        pull_request_title: 'chore(locales): crowdin update'
-        pull_request_base_branch_name: master
 
         push_translations: true
         skip_untranslated_strings: false
@@ -41,6 +37,10 @@ jobs:
 
         # dry run to test
         # dryrun_action: true
+
+      - name: git shenanigans
+        run: |
+          ls -sh locales/
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         CROWDIN_PROJECT_ID: ${{ secrets.CROWDIN_PROJECT_ID }}
