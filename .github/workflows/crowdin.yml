@@ -23,11 +23,8 @@ jobs:
         github_token: ${{github.token}}
         branches: l10n_crowdin_action
 
-    - name: workaround for security fix for CVE-2022-24765
-      run: git config --global --add safe.directory /github/workspace
-
     - name: crowdin action
-      uses: crowdin/github-action@1.4.7
+      uses: crowdin/github-action@1.4.8
       with:
         upload_sources: true
         upload_sources_args: '--verbose'
