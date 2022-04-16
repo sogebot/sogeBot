@@ -35,10 +35,15 @@ jobs:
         localization_branch_name: l10n_crowdin_action
         download_translations: true
         create_pull_request: true
-        push_translations: true
         commit_message: 'chore(locales): crowdin update'
         pull_request_title: 'chore(locales): crowdin update'
         pull_request_base_branch_name: master
+
+        push_translations: true
+        skip_untranslated_strings: false
+        skip_untranslated_files: false
+        # this can be used to pass down any supported argument of the `download translations` cli command, e.g.
+        download_translations_args: '--all'
 
         # dry run to test
         # dryrun_action: true
