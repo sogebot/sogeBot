@@ -1210,9 +1210,6 @@
       }
     }
   },
-  "phillipsHue": {
-    "list": "$sender, список подсоединенных огней Phillips Hue: "
-  },
   "time": "Текущее время в часовом поясе стримера: $time",
   "subs": "$sender, сейчас $onlineSubCount онлайн сабскрайберов. Последний sub/resub был $lastSubUsername $lastSubAgo",
   "followers": "$sender, сейчас $onlineFollowersCount онлайн фоловеров. Последний фолоу был $lastFollowUsername $lastFollowAgo",
