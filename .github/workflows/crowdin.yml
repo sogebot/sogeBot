@@ -24,7 +24,7 @@ jobs:
         branches: l10n_crowdin_action
 
     - name: crowdin action
-      uses: crowdin/github-action@1.4.8
+      uses: crowdin/github-action@1.4.7
       with:
         upload_sources: true
         upload_sources_args: '--verbose'
