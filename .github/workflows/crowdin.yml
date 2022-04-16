@@ -24,23 +24,13 @@ jobs:
         upload_sources_args: '--verbose'
         crowdin_branch_name: master
 
-        # This is the name of the git branch that Crowdin will create when opening a pull request.
-        # This branch does NOT need to be manually created. It will be created automatically by the action.
-        localization_branch_name: l10n_crowdin_action_test
         download_translations: true
-
-        push_translations: true
-        skip_untranslated_strings: false
-        skip_untranslated_files: false
-        # this can be used to pass down any supported argument of the `download translations` cli command, e.g.
         download_translations_args: '--all'
 
-        # dry run to test
-        # dryrun_action: true
+    - name: git shenanigans
+      run: |
+        ls -sh locales/
 
-      - name: git shenanigans
-        run: |
-          ls -sh locales/
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         CROWDIN_PROJECT_ID: ${{ secrets.CROWDIN_PROJECT_ID }}
