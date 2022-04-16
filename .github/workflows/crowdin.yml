@@ -3,7 +3,7 @@ name: Crowdin Action
 on:
   push:
     branches:
-      - master
+      - crowdinTesrt
   schedule:
     - cron: "0 */12 * * *" # run every 12 hours
 
@@ -35,12 +35,13 @@ jobs:
         localization_branch_name: l10n_crowdin_action
         download_translations: true
         create_pull_request: true
+        push_translations: true
         commit_message: 'chore(locales): crowdin update'
         pull_request_title: 'chore(locales): crowdin update'
         pull_request_base_branch_name: master
 
         # dry run to test
-        # dryrun_action: true
+        dryrun_action: true
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         CROWDIN_PROJECT_ID: ${{ secrets.CROWDIN_PROJECT_ID }}
