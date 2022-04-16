@@ -3,9 +3,10 @@ name: Crowdin Action
 on:
   push:
     branches:
-      - crowdinTesrt
+      - master
   schedule:
     - cron: "0 */12 * * *" # run every 12 hours
+  pull_request:
 
 jobs:
   synchronize-with-crowdin:
