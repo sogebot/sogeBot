@@ -51,7 +51,6 @@ You can also contact me on my email sogehige@gmail.com or get support on our [di
 |                    | Many widgets for your dashboard: customizable soundboard (/public/dist/soundboard/), follower list, twitch monitor, bets, songs and more |
 |                    | Be able to set your !title and !game from dashboard and **save** them for further use! Use custom variables in titles                    |
 | Overlay            | Use various overlays in your OBS or XSplit                                                                                               |
-| PhillipsHue        | Blink your lights on follower or any other event                                                                                         |
 | Events             | On numerous events run commands, send messages, do whatever!                                                                             |
 | Chat Games         | bets, heists, duels, wheel of fortune                                                                                                    |
 | Integrations       | **Streamlabs**, DonationAlerts.ru, Twitter                                                                                               |

@@ -303,7 +303,6 @@ export type ClientToServerEventsWithNamespace = {
     'log': (toLog: string) => void,
   },
   '/integrations/lastfm': GenericEvents,
-  '/integrations/phillipshue': GenericEvents,
   '/systems/cooldown': GenericEvents & {
     'generic::getAll': generic<CooldownInterface>['getAll'],
     'generic::getOne': (id: string, cb: (error: Error | string | null, item?: Readonly<Required<CooldownInterface>> | null, count?: number) => void) => void,

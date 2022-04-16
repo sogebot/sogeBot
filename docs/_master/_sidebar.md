@@ -47,7 +47,6 @@
   * [Eventlist](_master/overlays/eventlist.md)
 * How To
   * [Connection to socket](_master/howto/connection-to-socket.md)
-  * [Phillips Hue](_master/howto/phillipshue.md)
   * [Eval snippets](_master/howto/eval.md)
   * [Run random command](_master/howto/run-random-command.md)
   * [Write own system](_master/howto/write-own-system.md)
