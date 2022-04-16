@@ -17,13 +17,6 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v2
 
-    - name: Delete branch
-      continue-on-error: true
-      uses: dawidd6/action-delete-branch@v3
-      with:
-        github_token: ${{github.token}}
-        branches: l10n_crowdin_action
-
     - name: crowdin action
       uses: crowdin/github-action@1.4.8
       with:
@@ -33,7 +26,7 @@ jobs:
 
         # This is the name of the git branch that Crowdin will create when opening a pull request.
         # This branch does NOT need to be manually created. It will be created automatically by the action.
-        localization_branch_name: l10n_crowdin_action
+        localization_branch_name: l10n_crowdin_action_test
         download_translations: true
         create_pull_request: true
         commit_message: 'chore(locales): crowdin update'
