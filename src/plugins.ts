@@ -10,18 +10,18 @@ const twitchChatMessage = {
   },
   message: 'String',
 };
-const test = {
+const twitchCommand = {
+  sender: {
+    username: 'String',
+    userId:   'String',
+  },
   message: 'String',
-};
-const nothingInCommon = {
-  test: 'String',
 };
 
 class Plugins extends Core {
   listeners = {
     twitchChatMessage,
-    test,
-    nothingInCommon,
+    twitchCommand,
   } as const;
 
   @onStartup()
