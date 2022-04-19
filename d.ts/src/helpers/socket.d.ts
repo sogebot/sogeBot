@@ -402,6 +402,7 @@ export type ClientToServerEventsWithNamespace = {
     'viewers': (cb: (error: Error | string | null, data: { chatters: any }) => void) => void,
   },
   '/widgets/chat': GenericEvents & {
+    'message': (cb: (error: Error | string | null, message: { timestamp: string, message: string, username: string }) => void) => void,
     'room': (cb: (error: Error | string | null, room: string) => void) => void,
     'chat.message.send': (message: string) => void,
     'viewers': (cb: (error: Error | string | null, data: { chatters: any }) => void) => void,
