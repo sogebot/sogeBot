@@ -1,0 +1,13 @@
+{
+  "settings": {
+    "responsiveVoiceKeyNotSet": "<a href='#/settings/integrations/responsivevoice'>ResponsiveVoice キー</a>が正しく設定されていません",
+    "voice": {
+      "title": "Voice",
+      "help": "ResponsiveVoiceキーの更新後にボイスが正しく読み込まれない場合は、ブラウザを更新してみてください"
+    },
+    "volume": "Volume",
+    "rate": "Rate",
+    "pitch": "Pitch",
+    "triggerTTSByHighlightedMessage": "Text to Speech will be triggered by highlighted message"
+  }
+}

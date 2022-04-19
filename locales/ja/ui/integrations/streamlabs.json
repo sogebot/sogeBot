@@ -1,0 +1,14 @@
+{
+  "settings": {
+    "enabled": "Status",
+    "socketToken": {
+      "title": "Socket token",
+      "help": "streamlabsダッシュボードのAPI設定からソケットトークンを取得->APIトークン->あなたのソケットAPIトークン"
+    },
+    "accessToken": {
+      "title": "Access token",
+      "help": "アクセストークンは https://www.sogebot.xyz/integrations/#StreamLabs で入手してください"
+    },
+    "accessTokenBtn": "StreamLabs アクセストークンジェネレーター"
+  }
+}

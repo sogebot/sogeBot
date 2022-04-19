@@ -1,27 +1,27 @@
 {
-  "new": "New Keyword",
-  "empty": "No keywords were created yet.",
-  "emptyAfterSearch": "No keywords were found by your search for <strong>\"$search\"</strong>.",
+  "new": "Нове ключове слово",
+  "empty": "Жодного ключового слова ще не було створено.",
+  "emptyAfterSearch": "По вашому запиту не знайдено жодних ключових слів для пошуку <strong>\"$search.</strong>.",
   "keyword": {
-    "name": "Keyword / Regular Expression",
-    "placeholder": "Set your keyword or regular expression to trigger keyword.",
-    "help": "You can use regexp (case insensitive) to use keywords, e.g. <strong>hello.*|hi</strong>"
+    "name": "Ключове слово / Регулярний вираз",
+    "placeholder": "Встановіть своє ключове слово або регулярне вираз, аби викликати ключове слово.",
+    "help": "Можна використовувати regexp (чутливе до регістру) для використання ключових слів, наприклад <strong>hello.*|hi</strong>"
   },
   "response": {
-    "name": "Response",
-    "placeholder": "Set your response here."
+    "name": "Відповідь",
+    "placeholder": "Встановіть свою відповідь тут."
   },
   "error": {
-    "isEmpty": "This value cannot be empty"
+    "isEmpty": "Це параметр не може бути пустим"
   },
-  "no-responses-set": "No responses",
-  "addResponse": "Add response",
+  "no-responses-set": "Немає відповіді",
+  "addResponse": "Добавити відповідь",
   "filter": {
-    "name": "filter",
-    "placeholder": "Add filter for this response"
+    "name": "фільтри",
+    "placeholder": "Додати фільтр для цієї відповіді"
   },
-  "warning": "This action cannot be reverted!",
+  "warning": "Цю дію не можна скасувати!",
   "settings": {
-    "enabled": "Status"
+    "enabled": "Стан"
   }
 }

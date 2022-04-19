@@ -3,9 +3,9 @@
     "theme": "Тема за замовчуванням",
     "domain": {
       "title": "Домен",
-      "help": "Format without http/https: yourdomain.com or your.domain.com"
+      "help": "Форматувати без http/https: yourdomain.com або your.domain.com"
     },
-    "percentage": "Percentage difference for stats",
+    "percentage": "Відсоток різниці для статистики",
     "shortennumbers": "Короткий формат чисел",
     "showdiff": "Показати різницю",
     "enablePublicPage": "Увімкнути публічну сторінку"

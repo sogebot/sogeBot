@@ -1,14 +1,14 @@
 {
   "settings": {
-    "enabled": "Status",
-    "conversionRate": "Conversion rate 1 XP for x Points",
-    "firstLevelStartsAt": "First level starts at XP",
+    "enabled": "Стан",
+    "conversionRate": "Курс обміну 1 XP для x точок",
+    "firstLevelStartsAt": "Перший рівень починається з XP",
     "nextLevelFormula": {
-      "title": "Next level calculation formula",
-      "help": "Available variables: $prevLevel, $prevLevelXP"
+      "title": "Формула наступного рівня розрахунку",
+      "help": "Доступні змінні: $prevLevel, $prevLevelXP"
     },
     "levelShowcaseHelp": "Levels example will be refreshed on save",
-    "xpName": "Name",
+    "xpName": "Ім’я",
     "interval": "Minutes interval to add xp to online users when stream online",
     "offlineInterval": "Minutes interval to add xp to online users when stream offline",
     "messageInterval": "How many messages to add xp",

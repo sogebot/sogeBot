@@ -1,0 +1,70 @@
+{
+  "title": {
+    "edit": "編集",
+    "add": "追加"
+  },
+  "position": {
+    "settings": "位置の設定",
+    "anchorX": "アンカーのX座標",
+    "anchorY": "アンカーのY座標",
+    "left": "左",
+    "right": "右",
+    "middle": "中央",
+    "top": "上部",
+    "bottom": "下部",
+    "x": "X",
+    "y": "Y"
+  },
+  "font": {
+    "shadowShiftRight": "右移動",
+    "shadowShiftDown": "下移動",
+    "shadowBlur": "ぼかし",
+    "shadowOpacity": "透明度",
+    "color": "カラー"
+  },
+  "errors": {
+    "required": "この入力は空にできません。",
+    "minValue": "この入力の最小値は $value です。"
+  },
+  "buttons": {
+    "reorder": "並べ替え",
+    "upload": {
+      "idle": "アップロード",
+      "progress": "アップロード中",
+      "done": "アップロード済"
+    },
+    "cancel": "キャンセル",
+    "close": "閉じる",
+    "test": {
+      "idle": "テスト",
+      "progress": "テスト中",
+      "done": "テスト完了"
+    },
+    "saveChanges": {
+      "idle": "変更を保存",
+      "invalid": "変更を保存できません",
+      "progress": "変更を保存します",
+      "done": "変更を保存しました"
+    },
+    "something-went-wrong": "エラーが発生しました",
+    "mark-to-delete": "Mark to delete",
+    "disable": "無効",
+    "enable": "有効",
+    "disabled": "無効",
+    "enabled": "有効",
+    "edit": "編集",
+    "delete": "削除",
+    "play": "再生",
+    "stop": "停止",
+    "hold-to-delete": "長押しで削除",
+    "yes": "Yes",
+    "no": "No",
+    "permission": "Permission",
+    "group": "Group",
+    "visibility": "Visibility",
+    "reset": "Reset "
+  },
+  "changesPending": "Your changes was not saved.",
+  "formNotValid": "Form is invalid.",
+  "nothingToShow": "Nothing to show here."
+}

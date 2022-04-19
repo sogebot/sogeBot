@@ -6,8 +6,8 @@
     "botRefreshToken": "RefreshToken",
     "channelRefreshToken": "RefreshToken",
     "botUsername": "Ім'я користувача",
-    "channelUsername": "Username",
+    "channelUsername": "Ім'я користувача",
     "botExpectedScopes": "Дозволи",
-    "channelExpectedScopes": "Scopes"
+    "channelExpectedScopes": "Дозволи"
   }
 }

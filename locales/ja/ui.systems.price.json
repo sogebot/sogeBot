@@ -1,0 +1,14 @@
+{
+  "emitRedeemEvent": "Emit redeem event if bits are used",
+  "price": {
+    "name": "価格",
+    "placeholder": ""
+  },
+  "error": {
+    "isEmpty": "この値は空にできません"
+  },
+  "warning": "この操作は取り消せません！",
+  "settings": {
+    "enabled": "状態"
+  }
+}

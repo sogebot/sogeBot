@@ -1,6 +1,6 @@
 {
   "settings": {
-    "enabled": "Status",
+    "enabled": "Стан",
     "jwtToken": {
       "title": "JWT token",
       "help": "Get JWT token at <a href=\"https://streamelements.com/dashboard/account/channels\" target=\"_blank\">StreamElements Channels setting</a> and toggle Show secrets"

@@ -1,0 +1,13 @@
+{
+  "your-account-is-not-linked": "あなたのアカウントはリンクされていません。`$command ` を使用してください",
+  "all-your-links-were-deleted": "すべてのリンクが削除されました",
+  "all-your-links-were-deleted-with-sender": "$sender, {integrations.discord.all-your-links-were-deleted}",
+  "this-account-was-linked-with": "$sender、このアカウントは $discordTag とリンクされました。",
+  "invalid-or-expired-token": "$sender, 無効または期限切れのトークン.",
+  "help-message": "$sender、Discordであなたのアカウントをリンクするには: 1. Discordサーバーに行き、ボットチャンネルで $command を送信してください。 | 2. ボットからDMを待つ | 3. DiscordのDMから、twitchチャットでコマンドを送信してください。",
+  "started-at": "開始日時",
+  "announced-by": "sogeBotによる通知",
+  "streamed-at": "ストリーム日時",
+  "link-whisper": "こんにちは $tag, Discordアカウントと $broadcaster チャンネルのTwichアカウントをリンクさせるには、<https://twitch.tv/$broadcaster>に行って、自分のアカウントにログインしてこのコマンドをチャットに送信してください。 \n\n\t\t`$command $id`\n\nNOTE: 有効期限は10分です。",
+  "check-your-dm": "アカウントをリンクする手順についてはDMを確認してください。"
+}

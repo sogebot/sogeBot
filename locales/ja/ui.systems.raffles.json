@@ -1,0 +1,41 @@
+{
+  "widget": {
+    "subscribers-luck": "Subscribers luck",
+    "followers-luck": "Followers luck"
+  },
+  "settings": {
+    "enabled": "Status",
+    "announceNewEntries": {
+      "title": "Announce new entries",
+      "help": "If users joins raffle, announce message will be send to chat after while."
+    },
+    "announceNewEntriesBatchTime": {
+      "title": "How long to wait before announce new entries (in seconds)",
+      "help": "Longer time will keep chat cleaner, entries will be aggregated together."
+    },
+    "deleteRaffleJoinCommands": {
+      "title": "Delete user raffle join command",
+      "help": "これにより、ユーザが !yourraffle コマンドを使用した場合、ユーザメッセージが削除されます。チャットをすっきりさせることができます。"
+    },
+    "allowOverTicketing": {
+      "title": "Allow over ticketing",
+      "help": "ユーザーが自分のポイントのチケット以上のくじに参加できるようにする。例えば、ユーザーは10ポイントを持っていますが、彼のすべてのポイントを使用する100の !raffle に参加することができます。"
+    },
+    "raffleAnnounceInterval": {
+      "title": "Announce interval",
+      "help": "Minutes"
+    },
+    "raffleAnnounceMessageInterval": {
+      "title": "Announce message interval",
+      "help": "How many messages must be sent to chat until announce can be posted."
+    },
+    "subscribersPercent": {
+      "title": "Additional subscribers luck",
+      "help": "in percents"
+    },
+    "followersPercent": {
+      "title": "Additional followers luck",
+      "help": "in percents"
+    }
+  }
+}
