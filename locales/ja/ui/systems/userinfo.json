@@ -1,0 +1,11 @@
+{
+  "settings": {
+    "enabled": "Status",
+    "formatSeparator": "Format separator",
+    "order": "Format",
+    "lastSeenFormat": {
+      "title": "Time format",
+      "help": "Possible formats at https://momentjs.com/docs/#/displaying/format/"
+    }
+  }
+}

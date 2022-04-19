@@ -1,0 +1,5 @@
+{
+  "responseOk": "$game | Рейтинг $rating | Родитель на $native | Подробности: $url",
+  "responseNg": "Рейтинг для игры $game не найден в ProtonDB.",
+  "responseNotFound": "Игра $game не найдена в ProtonDB."
+}

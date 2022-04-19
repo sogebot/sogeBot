@@ -2,7 +2,7 @@
   "list": "Перелік ваших дозволів:",
   "excludeAddSuccessful": "$sender, you added $username to exclude list for permission $permissionName",
   "excludeRmSuccessful": "$sender, you removed $username from exclude list for permission $permissionName",
-  "userNotFound": "$sender, user $username was not found in database.",
-  "permissionNotFound": "$sender, permission $userlevel was not found in database.",
+  "userNotFound": "$sender, користувач $username не був знайдений в базі даних.",
+  "permissionNotFound": "$sender, дозвіл $userlevel не знайдено в базі даних.",
   "cannotIgnoreForCorePermission": "$sender, you cannot manually exclude user for core permission $userlevel"
 }

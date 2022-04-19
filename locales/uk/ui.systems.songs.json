@@ -1,31 +1,31 @@
 {
   "settings": {
-    "enabled": "Status",
-    "volume": "Volume",
-    "calculateVolumeByLoudness": "Dynamic volume by loudness",
+    "enabled": "Стан",
+    "volume": "Гучність",
+    "calculateVolumeByLoudness": "Динамічна гучність за гучністю",
     "duration": {
-      "title": "Max song duration",
-      "help": "In minutes"
+      "title": "Макс. тривалість",
+      "help": "Хвилини"
     },
-    "shuffle": "Shuffle",
-    "songrequest": "Play from song request",
-    "playlist": "Play from playlist",
-    "onlyMusicCategory": "Allow only category music",
-    "allowRequestsOnlyFromPlaylist": "Allow song requests only from current playlist",
-    "notify": "Send message on song change"
+    "shuffle": "Перемішати",
+    "songrequest": "Грати з запита пісні",
+    "playlist": "Грати зі списку відтворення",
+    "onlyMusicCategory": "Дозволити тільки музичної категорії",
+    "allowRequestsOnlyFromPlaylist": "Дозволити запити на пісні тільки з поточного списку відтворення",
+    "notify": "Надсилати повідомлення про зміну пісні"
   },
   "error": {
-    "isEmpty": "This value cannot be empty"
+    "isEmpty": "Це параметр не може бути пустим"
   },
-  "startTime": "Start song at",
-  "endTime": "End song at",
-  "add_song": "Add song",
-  "add_or_import": "Add song or import from playlist",
-  "importing": "Importing",
-  "importing_done": "Importing Done",
-  "seconds": "Seconds",
-  "calculated": "Calculated",
-  "set_manually": "Set manually",
+  "startTime": "Починаючи з",
+  "endTime": "Завершити пісню о",
+  "add_song": "Додати пісню",
+  "add_or_import": "Додати пісню або імпортувати з списку відтворення",
+  "importing": "Імпортування",
+  "importing_done": "Імпортування завершено",
+  "seconds": "Секунди",
+  "calculated": "Розрахувати",
+  "set_manually": "Встановити вручну",
   "bannedSongsEmptyAfterSearch": "No banned songs were found by your search for <strong>\"$search\"</strong>.",
   "emptyAfterSearch": "No songs were found by your search for <strong>\"$search\"</strong>.",
   "empty": "No songs were added yet.",

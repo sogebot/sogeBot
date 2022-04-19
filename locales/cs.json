@@ -1210,9 +1210,6 @@
       }
     }
   },
-  "phillipsHue": {
-    "list": "$sender, seznam připojených světel Phillips Hue: "
-  },
   "time": "Aktuální čas v časovém pásmu streamu je $time",
   "subs": "$sender, je zde právě $onlineSubCount online subscriberů. Poslední sub/resub byl $lastSubUsername $lastSubAgo",
   "followers": "$sender, je zde právě $onlineFollowersCount online followerů. Poslední follow byl $lastFollowUsername $lastFollowAgo",

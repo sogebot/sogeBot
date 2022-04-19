@@ -1,0 +1,8 @@
+{
+  "settings": {
+    "enabled": "状態",
+    "eligibilityAll": "すべて",
+    "eligibilityFollowers": "フォロワー",
+    "eligibilitySubscribers": "サブスクライバー"
+  }
+}

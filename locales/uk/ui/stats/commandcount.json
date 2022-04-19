@@ -1,9 +1,9 @@
 {
-  "command": "Command",
-  "hour": "Hour",
-  "day": "Day",
-  "week": "Week",
-  "month": "Month",
-  "year": "Year",
-  "total": "Total"
+  "command": "Команда",
+  "hour": "Година",
+  "day": "День",
+  "week": "Тиждень",
+  "month": "Місяць",
+  "year": "Рік",
+  "total": "Разом"
 }

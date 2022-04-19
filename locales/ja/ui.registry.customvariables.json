@@ -1,0 +1,83 @@
+{
+  "urls": "URLs",
+  "generateurl": "新しいURLを生成する",
+  "show-examples": "CURLの例を表示",
+  "response": {
+    "show": "POST の後に応答を表示",
+    "name": "変数が設定された後の応答",
+    "default": "デフォルト",
+    "default-placeholder": "ボットの応答を設定",
+    "default-help": "$value を使用して新しい変数値を取得する",
+    "custom": "カスタム",
+    "command": "コマンド"
+  },
+  "useIfInCommand": "コマンドで変数を使用する場合に使用します。応答はなく、更新された変数のみが返されます。",
+  "permissionToChange": "変更の権限",
+  "isReadOnly": "チャットで読み取り専用",
+  "isNotReadOnly": "チャットで変更できます",
+  "no-variables-found": "変数が見つかりません",
+  "additional-info": "追加情報",
+  "run-script": "スクリプトを実行",
+  "last-run": "最後の実行:",
+  "variable": {
+    "name": "変数名",
+    "help": "変数名は一意でなければなりません。例: $_wins, $_loses, $_top3",
+    "placeholder": "一意の変数名を入力してください",
+    "error": {
+      "isNotUnique": "変数には一意の名前が必要です。",
+      "isEmpty": "変数名は空にできません。"
+    }
+  },
+  "description": {
+    "name": "説明",
+    "help": "説明 (任意)",
+    "placeholder": "任意の説明を入力してください"
+  },
+  "type": {
+    "name": "型",
+    "error": {
+      "isNotSelected": "変数型を選択してください。"
+    }
+  },
+  "currentValue": {
+    "name": "現在の値",
+    "help": "型が <strong>評価されたスクリプト</strong>に設定されている場合、値は手動で変更できません"
+  },
+  "usableOptions": {
+    "name": "利用可能なオプション",
+    "placeholder": "ここに、あなたの、オプションを、入力してください",
+    "help": "この変数で使用できるオプションの例: <strong>SOLO、DUO、3-SQ、SQUAD</strong>",
+    "error": {
+      "atLeastOneValue": "You need to set at least 1 value."
+    }
+  },
+  "scriptToEvaluate": "Script to evaluate",
+  "runScript": {
+    "name": "Run script",
+    "error": {
+      "isNotSelected": "Please choose an option."
+    }
+  },
+  "testCurrentScript": {
+    "name": "Test current script",
+    "help": "Click <strong>Test current script</strong> to see value in <strong>Current value</strong> input"
+  },
+  "history": "History",
+  "historyIsEmpty": "この変数の履歴は空です！",
+  "warning": "<strong>警告:</strong> この変数のすべてのデータは破棄されます!",
+  "choose": "選択...",
+  "types": {
+    "number": "数値",
+    "text": "テキスト",
+    "options": "オプション",
+    "eval": "スクリプト"
+  },
+  "runEvery": {
+    "isUsed": "変数が使用されたとき",
+    "seconds": "秒",
+    "minutes": "分",
+    "hours": "時間",
+    "days": "日"
+  }
+}
+

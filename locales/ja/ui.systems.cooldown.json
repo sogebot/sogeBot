@@ -1,0 +1,10 @@
+{
+  "notify-as-whisper": "ウィスパーとして通知する",
+  "settings": {
+    "enabled": "状態",
+    "cooldownNotifyAsWhisper": "Whisper cooldown informations",
+    "cooldownNotifyAsChat": "Chat message cooldown informations",
+    "defaultCooldownOfCommandsInSeconds": "Default cooldown for commands (in seconds)",
+    "defaultCooldownOfKeywordsInSeconds": "Default cooldown for keywords (in seconds)"
+  }
+}

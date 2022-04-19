@@ -1,7 +1,7 @@
 {
   "settings": {
-    "enabled": "Status",
-    "itemsArray": "List"
+    "enabled": "Стан",
+    "itemsArray": "Список"
   },
-  "check": "Checklist"
+  "check": "Контрольний список"
 }

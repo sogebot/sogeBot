@@ -1,0 +1,11 @@
+{
+  "settings": {
+    "purgeAllConnections": "Purge All Authenticated Connection (yours as well)",
+    "accessTokenExpirationTime": "Access Token Expiration Time (seconds)",
+    "refreshTokenExpirationTime": "Refresh Token Expiration Time (seconds)",
+    "socketToken": {
+      "title": "Socket token",
+      "help": "このトークンはソケットを通じて完全な管理者アクセスを提供します。共有しないでください！"
+    }
+  }
+}

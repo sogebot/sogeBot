@@ -1,0 +1,5 @@
+{
+  "responseOk": "$game | Hodnocení: $rating | Nativní na $native | Detaily: $url",
+  "responseNg": "Hodnocení hry $game nebylo v ProtonDB nalezeno.",
+  "responseNotFound": "Hra $game nebyla v ProtonDB nalezena."
+}

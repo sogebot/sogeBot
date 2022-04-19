@@ -1,0 +1,22 @@
+{
+  "settings": {
+    "enabled": "Status",
+    "name": {
+      "title": "名前",
+      "help": "<strong>Possible formats:</strong><br> point|points <br> bod|4:body|bodu"
+    },
+    "isPointResetIntervalEnabled": "Interval of points reset",
+    "resetIntervalCron": {
+      "name": "Cron interval",
+      "help": "<a href='https://crontab.guru/'>CronTab generator</a>"
+    },
+    "interval": "ストリームがオンラインの時に、オンラインユーザーへのポイント付与を分単位で行う。",
+    "offlineInterval": "ストリームがオフラインの時に、オンラインユーザーへのポイント付与を分単位で行う。",
+    "messageInterval": "How many messages to add points",
+    "messageOfflineInterval": "ストリームがオフラインのときにポイントを追加するメッセージ数",
+    "perInterval": "How many points to add per online interval",
+    "perOfflineInterval": "How many points to add per offline interval",
+    "perMessageInterval": "How many points to add per message interval",
+    "perMessageOfflineInterval": "How many points to add per message offline interval"
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "settings": {
+    "generalOwners": "所有者",
+    "botAccessToken": "AccessToken",
+    "channelAccessToken": "AccessToken",
+    "botRefreshToken": "RefreshToken",
+    "channelRefreshToken": "RefreshToken",
+    "botUsername": "ユーザー名",
+    "channelUsername": "ユーザー名",
+    "botExpectedScopes": "範囲",
+    "channelExpectedScopes": "範囲"
+  }
+}

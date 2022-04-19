@@ -1,0 +1,13 @@
+{
+  "settings": {
+    "theme": "Default theme",
+    "domain": {
+      "title": "Domain",
+      "help": "Format without http/https: yourdomain.com or your.domain.com"
+    },
+    "percentage": "統計の割合の差",
+    "shortennumbers": "Short format of numbers",
+    "showdiff": "Show difference",
+    "enablePublicPage": "Enable public page"
+  }
+}

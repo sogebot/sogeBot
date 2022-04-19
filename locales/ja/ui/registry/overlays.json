@@ -1,0 +1,8 @@
+{
+  "newMapping": "新しいオーバーレイリンクのマッピングを作成",
+  "emptyMapping": "オーバーレイリンクのマッピングはまだ作成されていません。",
+  "allowedIPs": {
+    "name": "Allowed IPs",
+    "help": "Allow access from set IPs separated by new line"
+  }
+}

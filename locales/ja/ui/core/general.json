@@ -1,0 +1,11 @@
+{
+  "settings": {
+    "lang": "Botの言語",
+    "numberFormat": "チャットでの数値のフォーマット",
+    "gracefulExitEachXHours": {
+      "title": "X時間ごとに正常に終了する",
+      "help": "0 - 無効"
+    },
+    "shouldGracefulExitHelp": "サーバー上でボットが延々と動作している場合は、正常な終了を有効にすることを<strong>推奨します。</strong> botをpm2（または同様のサービス）上で動作させるか、docker化することで、botの自動再起動を保証する必要があります。ストリームがオンラインになると、botが正常な終了を<strong>しない。</strong>"
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "addRandomizer": "Add Randomizer",
+  "form": {
+    "name": "Name",
+    "command": "コマンド",
+    "permission": "コマンドの権限",
+    "simple": "Simple",
+    "tape": "Tape",
+    "wheelOfFortune": "Wheel of Fortune",
+    "type": "Type",
+    "options": "Options",
+    "optionsAreEmpty": "Options are empty.",
+    "color": "Color",
+    "numOfDuplicates": "No. of duplicates",
+    "minimalSpacing": "Minimal spacing",
+    "groupUp": "Group Up",
+    "ungroup": "Ungroup",
+    "groupedWithOptionAbove": "Grouped with option above",
+    "generatedOptionsPreview": "Preview of generated options",
+    "probability": "Probability",
+    "tick": "Tick sound during spin"
+  }
+}

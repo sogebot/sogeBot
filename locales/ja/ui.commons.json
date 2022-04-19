@@ -1,0 +1,18 @@
+{
+  "additional-settings": "Additional settings",
+  "never": "never",
+  "reset": "reset",
+  "moveUp": "move up",
+  "moveDown": "move down",
+  "stop-if-executed": "stop, if executed",
+  "continue-if-executed": "continue, if executed",
+  "generate": "生成",
+  "thumbnail": "サムネイル",
+  "yes": "Yes",
+  "no": "No",
+  "show-more": "詳細を表示",
+  "show-less": "詳細を閉じる",
+  "allowed": "許可",
+  "disallowed": "許可しない",
+  "back": "戻る"
+}

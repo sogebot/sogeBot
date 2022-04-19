@@ -1,0 +1,15 @@
+{
+  "song-not-found": "申し訳ありませんが、 $sender、トラックがSpotifyで見つかりませんでした",
+  "song-requested": "$sender、 $name から $artist の曲をリクエストしました",
+  "not-banned-song-not-playing": "$sender, 禁止されている曲はありません。",
+  "song-banned": "$sender, $artist の曲 $name は禁止されています。",
+  "song-unbanned": "$sender, $artist の曲 $name は禁止されていません。",
+  "song-not-found-in-banlist": "$sender, sotifyURI $uri の曲がBANリストに見つかりませんでした。",
+  "cannot-request-song-is-banned": "$sender, $artistの曲$nameは禁止されているのでリクエストできません。",
+  "cannot-request-song-from-unapproved-artist": "$sender、未承認のアーティストから曲をリクエストできません。",
+  "no-songs-found-in-history": "$sender, 現在履歴リストに曲がありません.",
+  "return-one-song-from-history": "$sender, 以前の曲は $artist の $name でした.",
+  "return-multiple-song-from-history": "$sender, 以前の $count 曲は以下の通りです:",
+  "return-multiple-song-from-history-item": "$index - $artist の $name",
+  "song-notify": "現在再生中の曲は$artistの$nameです。"
+}

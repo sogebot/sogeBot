@@ -1,0 +1,1231 @@
+{
+  "core": {
+    "loaded": "が読み込まれ、",
+    "enabled": "有効です",
+    "disabled": "無効です",
+    "usage": "使い方",
+    "lang-selected": "Bot言語は現在日本語に設定されています",
+    "refresh-panel": "変更を確認するには UI を更新する必要があります。",
+    "command-parse": "申し訳ありませんが、$sender このコマンドは正しくありません。",
+    "error": "申し訳ありませんが、$senderで何か問題が発生しました",
+    "no-response": "",
+    "no-response-bool": {
+      "true": "",
+      "false": ""
+    },
+    "api": {
+      "error": "$sender、API が正しく応答していません！",
+      "not-available": "利用できません"
+    },
+    "percentage": {
+      "true": "",
+      "false": ""
+    },
+    "years": "年|年",
+    "months": "ヶ月|ヶ月",
+    "days": "日|日",
+    "hours": "時間|時間",
+    "minutes": "分|分",
+    "seconds": "秒|秒",
+    "messages": "メッセージ|メッセージ",
+    "bits": "ビッツ|ビッツ",
+    "links": "リンク|リンク",
+    "entries": "エントリー|エントリー",
+    "empty": "empty",
+    "isRegistered": "$sender, あなたは !$keywordを使用することはできません。なぜなら、既に他のアクションに使用されているからです！"
+  },
+  "clip": {
+    "notCreated": "問題が発生し、クリップが作成されませんでした。",
+    "offline": "ストリームは現在オフラインで、クリップを作成できません。"
+  },
+  "uptime": {
+    "online": "ストリームは (if $days>0|$daysd )(if $hours>0|$hoursh )(if $minutes>0|$minutesm )(if $seconds>0|$secondss) オフラインです",
+    "offline": "ストリームは 現在(if $days>0|$daysd )(if $hours>0|$hoursh )(if $minutes>0|$minutesm )(if $seconds>0|$secondss) オンラインです"
+  },
+  "webpanel": {
+    "this-system-is-disabled": "このシステムは無効になっています",
+    "or": "または",
+    "loading": "読み込み中",
+    "this-may-take-a-while": "しばらく時間がかかる<strong>かも</strong>しれません",
+    "display-as": "として表示",
+    "go-to-admin": "管理画面へ移動",
+    "go-to-public": "公開ページへ移動",
+    "logout": "ログアウト",
+    "popout": "ポップアウト",
+    "not-logged-in": "ログインしていません",
+    "remove-widget": "<strong>$name</strong> ウィジェットを削除する",
+    "join-channel": "Botをチャンネルに追加",
+    "leave-channel": "Botをチャンネルから退出する",
+    "set-default": "デフォルトに設定",
+    "add": "追加",
+    "placeholders": {
+      "text-url-generator": "テキストまたはhtmlを貼り付けて、下にBase64と上にURLを生成します。",
+      "text-decode-base64": "URLとテキストを生成するためにbase64を貼り付けます",
+      "creditsSpeed": "クレジットの回転速度を設定します。より低い=より速い"
+    },
+    "timers": {
+      "title": "タイマー",
+      "timer": "タイマー",
+      "messages": "メッセージ",
+      "seconds": "秒",
+      "badges": {
+        "enabled": "有効",
+        "disabled": "無効"
+      },
+      "errors": {
+        "timer_name_must_be_compliant": "この値は a-zA-Z09_ のみを含めることができます",
+        "this_value_must_be_a_positive_number_or_0": "この値は正の数または0でなければなりません",
+        "value_cannot_be_empty": "値を空にすることはできません。"
+      },
+      "dialog": {
+        "timer": "タイマー",
+        "name": "名前",
+        "tickOffline": "ストリームがオフラインの場合チェック",
+        "interval": "間隔",
+        "responses": "応答",
+        "messages": "Xメッセージごとにトリガーする",
+        "seconds": "X秒ごとにトリガーする",
+        "title": {
+          "new": "新規タイマー",
+          "edit": "タイマーを編集"
+        },
+        "placeholders": {
+          "name": "タイマーの名前を設定します。 a-zA-Z0-9_のみを含めることができます",
+          "messages": "Xメッセージごとにタイマーをトリガーする",
+          "seconds": "X秒ごとにタイマーをトリガーする"
+        },
+        "alerts": {
+          "success": "タイマーを <strong>正常に</strong> 保存しました。",
+          "fail": "何かが<strong>うまくいかなかった</strong>"
+        }
+      },
+      "buttons": {
+        "close": "終了",
+        "save-changes": "変更を保存",
+        "disable": "無効",
+        "enable": "有効",
+        "edit": "編集",
+        "delete": "削除",
+        "yes": "はい",
+        "no": "いいえ"
+      },
+      "popovers": {
+        "are_you_sure_you_want_to_delete_timer": "タイマーを<strong class='text-danger'>削除</strong>しますか？"
+      }
+    },
+    "events": {
+      "event": "イベント",
+      "noEvents": "データベースにイベントが見つかりません。",
+      "whatsthis": "これは何ですか?",
+      "myRewardIsNotListed": "私の報酬はリストされていません！",
+      "redeemAndClickRefreshToSeeReward": "リストに作成した報酬がない場合は、更新アイコンをクリックして更新してください。",
+      "badges": {
+        "enabled": "有効",
+        "disabled": "無効"
+      },
+      "buttons": {
+        "test": "テスト",
+        "enable": "有効",
+        "disable": "無効",
+        "edit": "編集",
+        "delete": "削除",
+        "yes": "はい",
+        "no": "いいえ"
+      },
+      "popovers": {
+        "are_you_sure_you_want_to_delete_event": "イベントを<strong class='text-danger'>削除</strong>しますか？",
+        "example_of_user_object_data": "ユーザーオブジェクトデータの例"
+      },
+      "errors": {
+        "command_must_start_with_!": "コマンドは ! で開始する必要があります。",
+        "this_value_must_be_a_positive_number_or_0": "この値は正の数または0でなければなりません",
+        "value_cannot_be_empty": "値を空にすることはできません。"
+      },
+      "dialog": {
+        "title": {
+          "new": "新しいイベントリスナー",
+          "edit": "イベントリスナーを編集"
+        },
+        "placeholders": {
+          "name": "イベントリスナーの名前を設定します（空の場合は名前が生成されます）"
+        },
+        "alerts": {
+          "success": "イベントを <strong>正常に</strong> 保存しました。",
+          "fail": "何かが<strong>うまくいかなかった</strong>"
+        },
+        "close": "終了",
+        "save-changes": "変更を保存",
+        "event": "イベント",
+        "name": "名前",
+        "usable-events-variables": "使用可能なイベント変数",
+        "settings": "設定",
+        "filters": "フィルター",
+        "operations": "オペレーション"
+      },
+      "definitions": {
+        "taskId": {
+          "label": "タスクID"
+        },
+        "filter": {
+          "label": "フィルター"
+        },
+        "linkFilter": {
+          "label": "Link Overlay Filter",
+          "placeholder": "オーバーレイを使用する場合は、オーバーレイのリンクまたは id を追加してください"
+        },
+        "hashtag": {
+          "label": "ハッシュタグまたはキーワード",
+          "placeholder": "#あなたのハッシュタグ か キーワード"
+        },
+        "fadeOutXCommands": {
+          "label": "X コマンドをフェードアウト",
+          "placeholder": "フェードアウト間隔ごとに減算されるコマンドの数"
+        },
+        "fadeOutXKeywords": {
+          "label": "Xキーワードをフェードアウト",
+          "placeholder": "フェードアウト間隔ごとに減算されるキーワードの数"
+        },
+        "fadeOutInterval": {
+          "label": "フェードアウトの間隔 (秒)",
+          "placeholder": "減算間隔をフェードアウトする"
+        },
+        "runEveryXCommands": {
+          "label": "すべての X コマンドを実行",
+          "placeholder": "イベントが発生する前のコマンドの数"
+        },
+        "runEveryXKeywords": {
+          "label": "すべてのXキーワードを実行",
+          "placeholder": "イベントが発生する前のキーワードの数"
+        },
+        "commandToWatch": {
+          "label": "監視するコマンド",
+          "placeholder": "あなたの !監視するコマンド を設定"
+        },
+        "keywordToWatch": {
+          "label": "ウォッチするキーワード",
+          "placeholder": "あなたの 監視するキーワード を設定"
+        },
+        "resetCountEachMessage": {
+          "label": "各メッセージ数をリセット",
+          "true": "カウントをリセット",
+          "false": "カウントを維持"
+        },
+        "viewersAtLeast": {
+          "label": "視聴者は最低でも",
+          "placeholder": "イベントを発生させるのに必要な最低限の視聴者数"
+        },
+        "runInterval": {
+          "label": "実行間隔 (0 = ストリームごとに1回実行)",
+          "placeholder": "x秒ごとにイベントをトリガーする"
+        },
+        "runAfterXMinutes": {
+          "label": "X分後に実行",
+          "placeholder": "x分後にイベントをトリガーする"
+        },
+        "runEveryXMinutes": {
+          "label": "X分ごとに実行",
+          "placeholder": "x分ごとにイベントをトリガーする"
+        },
+        "messageToSend": {
+          "label": "送信するメッセージ",
+          "placeholder": "メッセージを設定"
+        },
+        "channel": {
+          "label": "チャンネル",
+          "placeholder": "チャンネル名または ID"
+        },
+        "timeout": {
+          "label": "タイムアウト",
+          "placeholder": "ミリ秒単位でタイムアウトを設定します"
+        },
+        "timeoutType": {
+          "label": "タイムアウトのタイプ",
+          "placeholder": "タイムアウトの種類を設定"
+        },
+        "command": {
+          "label": "コマンド",
+          "placeholder": "!commandを設定"
+        },
+        "commandToRun": {
+          "label": "実行するコマンド",
+          "placeholder": "!実行するコマンドを設定する"
+        },
+        "isCommandQuiet": {
+          "label": "コマンドの出力をミュート"
+        },
+        "urlOfSoundFile": {
+          "label": "サウンドファイルの Url",
+          "placeholder": "http://www.pathToYour.url/where/is/file.mp3"
+        },
+        "emotesToExplode": {
+          "label": "爆発するエモート",
+          "placeholder": "爆発するエモートのリスト、例：Kappa PurpleHeart"
+        },
+        "emotesToFirework": {
+          "label": "打ち上げるエモート",
+          "placeholder": "打ち上げるのエモートのリスト、例えばKappa PurpleHeart"
+        },
+        "replay": {
+          "label": "オーバーレイでクリップを再生",
+          "true": "オーバーレイ/アラートでリプレイとして再生する",
+          "false": "リプレイは再生されません"
+        },
+        "announce": {
+          "label": "チャットでアナウンスする",
+          "true": "アナウンスされます",
+          "false": "アナウンスされません"
+        },
+        "hasDelay": {
+          "label": "クリップは少し遅延する必要があります（視聴者が見てるものに近づけるために）",
+          "true": "遅延が発生します",
+          "false": "遅延はありません"
+        },
+        "durationOfCommercial": {
+          "label": "CMの放映時間",
+          "placeholder": "利用可能な時間：30、60、90、120、150、180"
+        },
+        "customVariable": {
+          "label": "$_",
+          "placeholder": "更新するカスタム変数"
+        },
+        "numberToIncrement": {
+          "label": "増加する数値",
+          "placeholder": ""
+        },
+        "value": {
+          "label": "値",
+          "placeholder": ""
+        },
+        "numberToDecrement": {
+          "label": "減少する数",
+          "placeholder": ""
+        },
+        "": "",
+        "titleOfReward": {
+          "label": "償還報酬のタイトル",
+          "placeholder": ""
+        }
+      }
+    },
+    "eventlist-events": {
+      "follow": "<strong>フォローされました</strong>",
+      "host": "<strong>ホストされました</strong>",
+      "raid": "<strong>レイドされました</strong>",
+      "sub": "<strong>サブスクライブされました</strong>",
+      "subgift": "<strong>サブスクギフトされました</strong>",
+      "subcommunitygift": "コミュニティに<strong>サブスクギフトが贈られました</strong>",
+      "resub": "<strong>再サブスクライブ</strong>",
+      "cheer": "<strong>チアーが送られました</strong>",
+      "tip": "<strong>Tipが送られました</strong>",
+      "rewardredeem": "報酬を<strong>引き換えました</strong>"
+    },
+    "responses": {
+      "variable": {
+        "titleOfPrediction": "Twitch チャンネルポイント予測 - タイトル",
+        "outcomes": "Twitch チャンネルポイント予測 - 結果",
+        "locksAt": "Twitch チャンネルポイント予測 - 日付でロック",
+        "winningOutcomeTitle": "Twitch チャンネルポイント予測 - 勝利結果タイトル",
+        "winningOutcomeTotalPoints": "Twitch チャンネルポイント予測 - 勝利結果総ポイント数",
+        "winningOutcomePercentage": "Twitch チャンネルポイント予測 - 勝利結果割合",
+        "titleOfPoll": "Twitch アンケート- タイトル",
+        "bitAmountPerVote": "Twitch アンケート- 1票としてカウントするビッツの量",
+        "bitVotingEnabled": "Twitch アンケート- ビッツ投票を有効にする (ブール値)",
+        "channelPointsAmountPerVote": "Twitch アンケート- 1票としてカウントするチャンネルポイントの量",
+        "channelPointsVotingEnabled": "Twitch アンケート- チャンネルポイント投票を有効にする (ブール値)",
+        "votes": "Twitch アンケート- 投票数",
+        "winnerChoice": "Twitch アンケート- 投票結果",
+        "winnerPercentage": "Twitch アンケート - 投票結果の選択率",
+        "winnerVotes": "Twitch アンケート - 投票結果の投票数",
+        "goal": "目標",
+        "total": "合計",
+        "lastContributionTotal": "最後の貢献 - 合計",
+        "lastContributionType": "最後の貢献 - タイプ",
+        "lastContributionUserId": "最後の貢献 - ユーザーID",
+        "lastContributionUsername": "最後の貢献 - ユーザー名",
+        "level": "レベル",
+        "topContributionsBitsTotal": "上位ビッツ貢献 - 合計",
+        "topContributionsBitsUserId": "上位ビッツ貢献 - ユーザーID",
+        "topContributionsBitsUsername": "上位ビッツ貢献 - ユーザー名",
+        "topContributionsSubsTotal": "上位サブスクライブ貢献 - 合計",
+        "topContributionsSubsUserId": "上位サブスクライブ貢献 - ユーザーID",
+        "topContributionsSubsUsername": "上位サブスクライブ貢献 - ユーザー名",
+        "sender": "開始したユーザー",
+        "title": "現在のタイトル",
+        "game": "現在のゲーム",
+        "language": "現在のストリームの言語",
+        "viewers": "現在の視聴者数",
+        "hostViewers": "ホスト/レイドの視聴者数",
+        "views": "現在の視聴数",
+        "followers": "現在のフォロワー数",
+        "subscribers": "現在のサブスクライバー数",
+        "arg": "引数",
+        "param": "パラメーター (必須)",
+        "touser": "ユーザー名のパラメーター",
+        "!param": "パラメータ (必須ではありません)",
+        "alias": "エイリアス",
+        "command": "コマンド",
+        "keyword": "キーワード",
+        "response": "応答",
+        "list": "入力済みリスト",
+        "type": "タイプ",
+        "days": "日",
+        "hours": "時間",
+        "minutes": "分",
+        "seconds": "秒",
+        "description": "説明",
+        "quiet": "サイレント（ブール）",
+        "id": "ID",
+        "name": "Name",
+        "messages": "メッセージ",
+        "amount": "金額",
+        "amountInBotCurrency": "金額と通貨",
+        "currency": "通貨",
+        "currencyInBot": "ボット内の通貨",
+        "pointsName": "ポイント名",
+        "points": "ポイント",
+        "rank": "ランク",
+        "nextrank": "次のランク",
+        "username": "ユーザー名",
+        "value": "値",
+        "variable": "変数",
+        "count": "カウント",
+        "link": "リンク (翻訳済み)",
+        "winner": "勝者",
+        "loser": "敗者",
+        "challenger": "チャレンジャー",
+        "min": "最小",
+        "max": "最大",
+        "eligibility": "参加資格",
+        "probability": "確率",
+        "time": "時間",
+        "options": "オプション",
+        "option": "オプション",
+        "when": "いつ",
+        "diff": "違い",
+        "users": "ユーザー",
+        "user": "ユーザー",
+        "bank": "銀行",
+        "nextBank": "次の銀行",
+        "cooldown": "クールダウン",
+        "tickets": "チケット",
+        "ticketsName": "チケット名",
+        "fromUsername": "ユーザー名から",
+        "toUsername": "ユーザー名に",
+        "items": "アイテム",
+        "bits": "ビッツ",
+        "subgifts": "サブギフト",
+        "subStreakShareEnabled": "サブストリーク共有が有効になっています (true/false)",
+        "subStreak": "現在のサブ連続数",
+        "subStreakName": "現在のサブ継続の月の名(1ヶ月、2ヶ月)",
+        "subCumulativeMonths": "累積サブスクリプション月数",
+        "subCumulativeMonthsName": "現在の累計サブスクライブの名(1ヶ月、2ヶ月)",
+        "message": "メッセージ",
+        "reason": "理由",
+        "target": "対象",
+        "duration": "期間",
+        "method": "方法",
+        "tier": "ティア",
+        "months": "月",
+        "monthsName": "ローカライズされた月の名前 (1ヶ月、2ヶ月)",
+        "oldGame": "変更前のゲーム",
+        "recipientObject": "受信者（オブジェクト全体）",
+        "recipient": "宛先",
+        "ytSong": "YouTubeの現在の曲",
+        "spotifySong": "Spotifyで現在の曲",
+        "latestFollower": "最新のフォロワー",
+        "latestSubscriber": "最新のサブスクライバー",
+        "latestSubscriberMonths": "最新のサブスクライバーの累積月",
+        "latestSubscriberStreak": "最新のサブスクライバーの連続月数",
+        "latestTipAmount": "最新のTip（金額）",
+        "latestTipCurrency": "最新のTip（通貨）",
+        "latestTipMessage": "最新のTip (メッセージ)",
+        "latestTip": "最新のTip(ユーザー名)",
+        "toptip": {
+          "overall": {
+            "username": "トップ Tip - 全体 (ユーザー名)",
+            "amount": "トップ Tip - 全体（金額）",
+            "currency": "トップ Tip - 全体(通貨)",
+            "message": "トップ Tip - 全体（メッセージ）"
+          },
+          "stream": {
+            "username": "トップ Tip - ストリーム中(ユーザー名)",
+            "amount": "トップ Tip - ストリーム中（金額）",
+            "currency": "トップ Tip - ストリーム中（通貨）",
+            "message": "トップ Tip - ストリーム中（メッセージ）"
+          }
+        },
+        "latestCheerAmount": "最新のビッツ（金額）",
+        "latestCheerMessage": "最新ビッツ(メッセージ)",
+        "latestCheer": "最新のビッツ(ユーザー名)",
+        "version": "Botバージョン",
+        "haveParam": "コマンドパラメータを持っていますか？(bool)",
+        "source": "現在のソース (twitchまたはdiscord)",
+        "userInput": "報酬引き換え時にユーザーが入力する",
+        "isBotSubscriber": "Botはサブスクライバーですか？(bool)",
+        "isStreamOnline": "ストリームはオンラインです (bool)",
+        "uptime": "ストリームの稼働時間",
+        "is": {
+          "moderator": "ユーザーはモデレーターですか? (bool)",
+          "subscriber": "ユーザーはサブスクライバーですか? (bool)",
+          "vip": "ユーザーはVIPですか? (bool)",
+          "newchatter": "ユーザーの最初のメッセージはありますか？(bool)",
+          "follower": "ユーザーはフォロワーですか? (bool)",
+          "broadcaster": "ユーザーは配信者ですか? (bool)",
+          "bot": "ユーザーボットとは? (bool)",
+          "owner": "ユーザーボットの所有者ですか? (bool)"
+        },
+        "recipientis": {
+          "moderator": "受信者はモデレーターですか? (bool)",
+          "subscriber": "受信者はサブスクライバーですか? (bool)",
+          "vip": "受信者はVIPですか? (bool)",
+          "follower": "受信者はフォロワーですか？(bool)",
+          "broadcaster": "受信者は配信者ですか? (bool)",
+          "bot": "受信者のボットとは？ (bool)",
+          "owner": "受信者のボットの所有者ですか? (bool)"
+        },
+        "tweet": {
+          "text": "ツイートのテキスト",
+          "username": "Twitterのユーザー名",
+          "displayname": "Twitterでのスクリーン名",
+          "url": "ツイートリンク"
+        },
+        "sceneName": "シーン名"
+      }
+    },
+    "page-settings": {
+      "systems": {
+        "others": {
+          "title": "その他",
+          "currency": "通貨"
+        },
+        "whispers": {
+          "title": "ウィスパー",
+          "toggle": {
+            "listener": "ウィスパーに関するコマンドを聞く",
+            "settings": "設定の変更時のウィスパー",
+            "raffle": "抽選参加時のウィスパー",
+            "permissions": "権限が不足している場合のウィスパー",
+            "cooldowns": "クールダウン時のウィスパー（通知として設定されている場合）"
+          }
+        }
+      }
+    },
+    "page-logger": {
+      "buttons": {
+        "messages": "メッセージ",
+        "follows": "フォロー",
+        "subs": "サブ & 再サブ",
+        "cheers": "ビッツ",
+        "responses": "ボット応答",
+        "whispers": "ウィスパー",
+        "bans": "禁止",
+        "timeouts": "タイムアウト"
+      },
+      "range": {
+        "day": "1日",
+        "week": "1週間",
+        "month": "1ヶ月",
+        "year": "1 年",
+        "all": "全期間"
+      },
+      "order": {
+        "asc": "昇順",
+        "desc": "降順"
+      },
+      "labels": {
+        "order": "オーダー",
+        "range": "範囲",
+        "filters": "フィルター"
+      }
+    },
+    "stats-panel": {
+      "show": "スタッツを表示",
+      "hide": "スタッツを非表示"
+    },
+    "translations": "カスタム翻訳",
+    "bot-responses": "Bot応答",
+    "duration": "期間",
+    "viewers-reset-attributes": "属性のリセット",
+    "viewers-points-of-all-users": "全てのユーザーのポイント",
+    "viewers-watchtime-of-all-users": "全てのユーザーの視聴時間",
+    "viewers-messages-of-all-users": "すべてのユーザのメッセージ",
+    "events-game-after-change": "変更後のゲーム",
+    "events-game-before-change": "変更前のゲーム",
+    "events-user-triggered-event": "ユーザーがトリガーしたイベント",
+    "events-method-used-to-subscribe": "サブスクライブに使用される方法",
+    "events-months-of-subscription": "サブスクリプションの月",
+    "events-monthsName-of-subscription": "数字で「月」（1ヶ月、2ヶ月）",
+    "events-user-message": "ユーザーメッセージ",
+    "events-bits-user-sent": "ユーザーが送信したビッツ",
+    "events-reason-for-ban-timeout": "BAN/タイムアウトの理由",
+    "events-duration-of-timeout": "タイムアウトの長さ",
+    "events-duration-of-commercial": "CMの放映時間",
+    "events-target-of-your-hosting": "あなたのホストのターゲット",
+    "events-viewers-of-hosting": "ホスティングの視聴者",
+    "overlays-eventlist-resub": "再サブスクライブ",
+    "overlays-eventlist-subgift": "サブスクギフト",
+    "overlays-eventlist-subcommunitygift": "コミュニティギフト",
+    "overlays-eventlist-host": "ホスト",
+    "overlays-eventlist-sub": "サブ",
+    "overlays-eventlist-follow": "フォロー",
+    "overlays-eventlist-cheer": "ビッツ",
+    "overlays-eventlist-tip": "Tip",
+    "overlays-eventlist-raid": "レイド",
+    "requested-by": "リクエスト者",
+    "description": "説明",
+    "raffle-type": "抽選タイプ",
+    "raffle-type-keywords": "キーワードのみ",
+    "raffle-type-tickets": "チケットあり",
+    "raffle-tickets-range": "チケットの範囲",
+    "video_id": "ビデオ ID",
+    "highlights": "ハイライト",
+    "cooldown-quiet-header": "クールダウンメッセージを表示",
+    "cooldown-quiet-toggle-no": "通知する",
+    "cooldown-quiet-toggle-yes": "通知しない",
+    "cooldown-moderators": "モデレーター",
+    "cooldown-owners": "所有者",
+    "cooldown-subscribers": "サブスクライバー",
+    "cooldown-followers": "フォロワー",
+    "in-seconds": "秒で",
+    "songs": "曲",
+    "show-usernames-with-at": "@ でユーザー名を表示",
+    "twitter-send-message": "ツイート",
+    "send-message-as-a-bot": "ボットとしてメッセージを送信する",
+    "chat-as-bot": "チャット (ボットとして)",
+    "product": "商品",
+    "optional": "任意",
+    "placeholder-search": "検索",
+    "placeholder-enter-product": "商品を入力",
+    "placeholder-enter-keyword": "キーワードを入力",
+    "credits": "クレジット",
+    "fade-out-top": "フェードアップ",
+    "fade-out-zoom": "フェードズーム",
+    "global": "グローバル",
+    "user": "ユーザー",
+    "alerts": "通知",
+    "eventlist": "イベントリスト",
+    "dashboard": "ダッシュボード",
+    "carousel": "イメージカルーセル",
+    "text": "テキスト",
+    "permissions": "権限",
+    "permission": "権限",
+    "viewers": "視聴者数",
+    "systems": "システム",
+    "overlays": "オーバーレイ",
+    "gallery": "メディアギャラリー",
+    "aliases": "エイリアス",
+    "alias": "エイリアス",
+    "command": "コマンド",
+    "cooldowns": "クールダウン",
+    "title-template": "タイトルテンプレート",
+    "keyword": "キーワード",
+    "moderation": "モデレーション",
+    "timer": "タイマー",
+    "price": "価格",
+    "rank": "ランク",
+    "previous": "戻る",
+    "next": "次へ",
+    "close": "終了",
+    "save-changes": "変更を保存",
+    "saving": "保存中...",
+    "deleting": "削除中...",
+    "done": "完了",
+    "error": "エラー",
+    "title": "タイトル",
+    "change-title": "タイトルを変更",
+    "game": "ゲーム",
+    "tags": "タグ",
+    "change-game": "ゲームを変更",
+    "click-to-change": "クリックして変更",
+    "uptime": "稼働時間",
+    "not-affiliate-or-partner": "アフィリエイト/パートナーではありません",
+    "not-available": "利用できません",
+    "max-viewers": "最大視聴者数",
+    "new-chatters": "新規チャット",
+    "chat-messages": "チャットメッセージ",
+    "views": "視聴数",
+    "followers": "フォロワー",
+    "subscribers": "サブスクライバー",
+    "bits": "ビッツ",
+    "subgifts": "サブスクギフト",
+    "subStreak": "現在の連続サブスク数",
+    "subCumulativeMonths": "累積サブスク月数",
+    "tips": "Tip",
+    "tier": "ティア",
+    "status": "状態",
+    "add-widget": "ウィジェットを追加",
+    "remove-dashboard": "ダッシュボードを削除",
+    "close-bet-after": "ベット終了までの時間",
+    "refund": "払い戻し",
+    "roll-again": "もう一度回転",
+    "no-eligible-participants": "対象となる参加者がいません",
+    "follower": "フォロワー",
+    "subscriber": "サブスクライバー",
+    "minutes": "分",
+    "seconds": "秒",
+    "hours": "時間",
+    "months": "月",
+    "eligible-to-enter": "参加可能",
+    "everyone": "全員",
+    "roll-a-winner": "勝者を回転",
+    "send-message": "メッセージを送信",
+    "messages": "メッセージ",
+    "level": "レベル",
+    "create": "作成",
+    "cooldown": "クールダウン",
+    "confirm": "確認",
+    "delete": "削除",
+    "enabled": "有効",
+    "disabled": "無効",
+    "enable": "有効",
+    "disable": "無効",
+    "slug": "Slug",
+    "posted-by": "投稿者",
+    "time": "時間",
+    "type": "タイプ",
+    "response": "応答",
+    "cost": "コスト",
+    "name": "名前",
+    "playlist": "プレイリスト",
+    "length": "長さ",
+    "volume": "音量",
+    "start-time": "開始時刻",
+    "end-time": "終了時刻",
+    "watched-time": "視聴時間",
+    "currentsong": "現在の曲",
+    "group": "グループ",
+    "followed-since": "フォローしてから",
+    "subscribed-since": "サブスクライブしてから",
+    "username": "ユーザー名",
+    "hashtag": "ハッシュタグ",
+    "accessToken": "AccessToken",
+    "refreshToken": "RefreshToken",
+    "scopes": "範囲",
+    "last-seen": "最終閲覧",
+    "date": "日付",
+    "points": "ポイント",
+    "calendar": "カレンダー",
+    "string": "文字列",
+    "interval": "間隔",
+    "number": "数値",
+    "minimal-messages-required": "最低限のメッセージが必要",
+    "max-duration": "最大期間",
+    "shuffle": "シャッフル",
+    "song-request": "ソングリクエスト",
+    "format": "フォーマット",
+    "available": "有効にする",
+    "one-record-per-line": "1行に1つのレコード",
+    "on": "オン",
+    "off": "オフ",
+    "search-by-username": "ユーザー名で検索",
+    "widget-title-custom": "カスタム",
+    "widget-title-eventlist": "イベントリスト",
+    "widget-title-chat": "チャット",
+    "widget-title-queue": "キュー",
+    "widget-title-raffles": "抽選",
+    "widget-title-social": "ソーシャル",
+    "widget-title-ytplayer": "音楽プレーヤー",
+    "widget-title-monitor": "モニター",
+    "event": "イベント",
+    "operation": "操作",
+    "tweet-post-with-hashtag": "ハッシュタグ付きのツイートを投稿",
+    "user-joined-channel": "ユーザーがチャンネルに参加しました",
+    "user-parted-channel": "ユーザーがチャンネルを離脱しました",
+    "follow": "新しいフォロー",
+    "tip": "新しいチップ",
+    "obs-scene-changed": "OBSのシーンが変更されました",
+    "unfollow": "フォロー解除",
+    "hypetrain-started": "ハイプトレイン開始",
+    "hypetrain-ended": "ハイプトレイン終了",
+    "prediction-started": "Twitch予測開始",
+    "prediction-locked": "Twitch予測はロックされました",
+    "prediction-ended": "Twitch 予測が終了しました",
+    "poll-started": "Twitchアンケートを開始",
+    "poll-ended": "Twitchアンケート終了",
+    "hypetrain-level-reached": "ハイプトレインの次のレベルに達しました",
+    "subscription": "新規サブスク",
+    "subgift": "新しいサブギフト",
+    "subcommunitygift": "新しいコミュニティサブスクギフト",
+    "resub": "ユーザーが再購読しました",
+    "command-send-x-times": "コマンドはx回送信されました",
+    "keyword-send-x-times": "キーワードはx回送信されました",
+    "number-of-viewers-is-at-least-x": "視聴者数は少なくともxです",
+    "stream-started": "ストリーム開始",
+    "reward-redeemed": "報酬引き替え",
+    "stream-stopped": "ストリームが停止しました",
+    "stream-is-running-x-minutes": "ストリームが x 分実行中です",
+    "chatter-first-message": "チャットの最初のメッセージ",
+    "every-x-minutes-of-stream": "ストリームのx分ごとに",
+    "game-changed": "ゲームが変更されました",
+    "cheer": "受け取ったビッツ",
+    "clearchat": "チャットをクリアしました",
+    "action": "ユーザーが/me を送信しました",
+    "ban": "ユーザーはBANされました",
+    "hosting": "あなたのチャンネルはホスティングを始めました",
+    "hosted": "あなたのチャンネルはホストされています",
+    "raid": "あなたのチャンネルはレイドされました",
+    "mod": "ユーザーは新しいモデレーターです",
+    "timeout": "ユーザーはタイムアウトされました",
+    "create-a-new-event-listener": "新しいイベントリスナーを作成する",
+    "send-twitter-message": "twitterメッセージを投稿する",
+    "send-discord-message": "discordメッセージを送る",
+    "send-chat-message": "twitchチャットメッセージを送信",
+    "send-whisper": "ウィスパーを送る",
+    "run-command": "コマンドの実行",
+    "command-redeem": "trigger command redeem event",
+    "run-obswebsocket-command": "OBS Websocket コマンドの実行",
+    "do-nothing": "--- 何もしない ---",
+    "count": "カウント",
+    "timestamp": "タイムスタンプ",
+    "message": "メッセージ",
+    "sound": "サウンド",
+    "emote-explosion": "エモート爆発",
+    "emote-firework": "エモート花火",
+    "quiet": "静かな",
+    "noisy": "うるさい",
+    "true": "true",
+    "false": "false",
+    "light": "ライトテーマ",
+    "dark": "ダークテーマ",
+    "gambling": "ギャンブル",
+    "seppukuTimeout": "!sepuku のタイムアウト",
+    "rouletteTimeout": "!roulette のタイムアウト",
+    "fightmeTimeout": "!fightme のタイムアウト",
+    "duelCooldown": "!duelのクールダウン",
+    "fightmeCooldown": "!fightmeのクールダウン",
+    "gamblingCooldownBypass": "Mods/casterのギャンブルのクールダウンを回避する",
+    "click-to-highlight": "ハイライト",
+    "click-to-toggle-display": "表示の切り替え",
+    "commercial": "コマーシャル開始",
+    "start-commercial": "コマーシャルを流す",
+    "bot-will-join-channel": "ボットがチャンネルに参加します",
+    "bot-will-leave-channel": "ボットがチャンネルを離れます",
+    "create-a-clip": "クリップを作成",
+    "increment-custom-variable": "カスタム変数を増加",
+    "set-custom-variable": "変数の設定",
+    "decrement-custom-variable": "カスタム変数を減少",
+    "omit": "省略",
+    "comply": "準拠",
+    "visible": "表示",
+    "hidden": "非表示",
+    "gamblingChanceToWin": "当選のチャンス !gamble",
+    "gamblingMinimalBet": "!gamble の最小ベット数",
+    "duelDuration": "!duel の間隔",
+    "duelMinimalBet": "!duel の最小ベット数"
+  },
+  "raffles": {
+    "announceInterval": "抽選は $value 分ごとに発表されます",
+    "eligibility-followers-item": "フォロワー",
+    "eligibility-subscribers-item": "サブスクライバー",
+    "eligibility-everyone-item": "全員",
+    "raffle-is-running": "抽選が実行されています ($count $l10n_entries)",
+    "to-enter-raffle": "”$keyword”と入力して、抽選は$eligibilityで開きます",
+    "to-enter-ticket-raffle": "”$keyword <$min-$max>”と入力して、抽選は$eligibilityで開きます",
+    "added-entries": "$count $l10n_entries を抽選に追加しました(合計 $countTotal){raffles.to-enter-raffle}",
+    "added-ticket-entries": "$count $l10n_entries を抽選に追加しました(合計 $countTotal){raffles.to-enter-ticket-raffle}",
+    "join-messages-will-be-deleted": "抽選メッセージは参加時に削除されます。",
+    "announce-raffle": "{raffles.raffle-is-running} {raffles.to-enter-raffle}",
+    "announce-ticket-raffle": "{raffles.raffle-is-running} {raffles.to-enter-ticket-raffle}",
+    "announce-new-entries": "{raffles.added-entries} {raffles.to-enter-raffle}",
+    "announce-new-ticket-entries": "{raffles.added-entries} {raffles.to-enter-ticket-raffle}",
+    "cannot-create-raffle-without-keyword": "申し訳ありません、 $sender 、キーワードなしで抽選を作成することはできません",
+    "raffle-is-already-running": "申し訳ありません、 $sender、抽選はすでにキーワード $keyword で実行されています",
+    "no-raffle-is-currently-running": "$sender, 当選者のいない抽選は現在行われていません",
+    "no-participants-to-pick-winner": "$sender, 誰も抽選に参加しませんでした",
+    "raffle-winner-is": "抽選 $keyword の商社は $username ！勝率は$probability%！"
+  },
+  "bets": {
+    "running": "$sender, ベットは既に開いています！ベットオプション: $options. $command close 1-$maxIndex を使用",
+    "notRunning": "現在開かれているベットはありません。モデレーターに開いてもらってください！",
+    "opened": "新しいベット'$title' が開かれました！ベットオプション: $options. $command 1-$maxIndex <amount> を使用して勝とう！ ベットできる時間は$minutesmin だけです！",
+    "closeNotEnoughOptions": "$sender、ベット終了のために勝利オプションを選択する必要があります。",
+    "notEnoughOptions": "$sender、新しいベットには少なくとも2つのオプションが必要です！",
+    "info": "ベット'$title' はまだ開かれています！ベットオプション: $options. $command 1-$maxIndex <amount> を使用して勝とう！ ベットできる時間は$minutesmin だけです！",
+    "diffBet": "$sender、あなたはすでに $option にベットしました。他のオプションに賭けることはできません！",
+    "undefinedBet": "申し訳ありません、 $senderですが、このベットオプションは存在しません。 $command を使用して利用方法を確認してください",
+    "betPercentGain": "Bet percent gain per option was set to $value%",
+    "betCloseTimer": "$valuemin 後にベットは自動的に終了します",
+    "refund": "ベットは勝利せずに終了しました。全てのユーザーは返金されます！",
+    "notOption": "$sender、このオプションは存在しません！ベットはクローズされていません。 $command を確認してください",
+    "closed": "Bets was closed and winning option was $option! $amount users won in total $points $pointsName!",
+    "timeUpBet": "I guess you are too late, $sender, your time for betting is up!",
+    "locked": "Betting time is up! No more bets.",
+    "zeroBet": "Oh boy, $sender, you cannot bet 0 $pointsName",
+    "lockedInfo": "Bet '$title' is still opened, but time for betting is up!",
+    "removed": "Betting time is up! No bets were sent -> automatically closing",
+    "error": "Sorry, $sender, this command is not correct! Use $command 1-$maxIndex <amount>. E.g. $command 0 100 will bet 100 points to item 0."
+  },
+  "alias": {
+    "alias-parse-failed": "{core.command-parse} !alias",
+    "alias-was-not-found": "$sender, エイリアス $alias はデータベースに見つかりませんでした。",
+    "alias-was-edited": "$sender, エイリアス $alias は $command に変更されます",
+    "alias-was-added": "$sender, alias $alias for $command was added",
+    "list-is-not-empty": "$sender, エイリアスのリスト: $list",
+    "list-is-empty": "$sender、エイリアスのリストは空です",
+    "alias-was-enabled": "$sender, エイリアス $alias は有効になりました",
+    "alias-was-disabled": "$sender, エイリアス $alias は無効になりました",
+    "alias-was-concealed": "$sender, エイリアス $alias が隠されました",
+    "alias-was-exposed": "$sender, エイリアス $alias が公開されました",
+    "alias-was-removed": "$sender, エイリアス $alias が削除されました",
+    "alias-group-set": "$sender, alias $alias was set to group $group",
+    "alias-group-unset": "$sender, alias $alias group was unset",
+    "alias-group-list": "$sender, list of aliases groups: $list",
+    "alias-group-list-aliases": "$sender, list of aliases in $group: $list",
+    "alias-group-list-enabled": "$sender, aliases in $group are enabled.",
+    "alias-group-list-disabled": "$sender, aliases in $group are disabled."
+  },
+  "customcmds": {
+    "commands-parse-failed": "{core.command-parse} $command",
+    "command-was-not-found": "$sender, command $command was not found in database",
+    "response-was-not-found": "$sender, response #$response of command $command was not found in database",
+    "command-was-edited": "$sender, command $command is changed to '$response'",
+    "command-was-added": "$sender, command $command was added",
+    "list-is-not-empty": "$sender, list of commands: $list",
+    "list-is-empty": "$sender, list of commands is empty",
+    "command-was-enabled": "$sender, command $command was enabled",
+    "command-was-disabled": "$sender, command $command was disabled",
+    "command-was-concealed": "$sender, command $command was concealed",
+    "command-was-exposed": "$sender, command $command was exposed",
+    "command-was-removed": "$sender, command $command was removed",
+    "response-was-removed": "$sender, response #$response of $command was removed",
+    "list-of-responses-is-empty": "$sender, $command have no responses or doesn't exists",
+    "response": "$command#$index ($permission) $after| $response"
+  },
+  "keywords": {
+    "keyword-parse-failed": "{core.command-parse} !keyword",
+    "keyword-is-ambiguous": "$sender, keyword $keyword is ambiguous, use ID of keyword",
+    "keyword-was-not-found": "$sender, keyword $keyword was not found in database",
+    "response-was-not-found": "$sender, response #$response of keyword $keyword was not found in database",
+    "keyword-was-edited": "$sender, keyword $keyword is changed to '$response'",
+    "keyword-was-added": "$sender, keyword $keyword ($id) was added",
+    "list-is-not-empty": "$sender, list of keywords: $list",
+    "list-is-empty": "$sender, list of keywords is empty",
+    "keyword-was-enabled": "$sender, keyword $keyword was enabled",
+    "keyword-was-disabled": "$sender, keyword $keyword was disabled",
+    "keyword-was-removed": "$sender, keyword $keyword was removed",
+    "list-of-responses-is-empty": "$sender, $keyword have no responses or doesn't exists",
+    "response": "$keyword#$index ($permission) $after| $response"
+  },
+  "points": {
+    "success": {
+      "undo": "$sender, points '$command' for $username was reverted ($updatedValue $updatedValuePointsLocale to $originalValue $originalValuePointsLocale).",
+      "set": "$username was set to $amount $pointsName",
+      "give": "$sender は $username に $amount $pointsName を与えました",
+      "online": {
+        "positive": "All online users just received $amount $pointsName!",
+        "negative": "All online users just lost $amount $pointsName!"
+      },
+      "all": {
+        "positive": "All users just received $amount $pointsName!",
+        "negative": "All users just lost $amount $pointsName!"
+      },
+      "rain": "Make it rain! All online users just received up to $amount $pointsName!",
+      "add": "$username just received $amount $pointsName!",
+      "remove": "Ouch, $amount $pointsName was removed from $username!"
+    },
+    "failed": {
+      "undo": "$sender, username wasn't found in database or user have no undo operations",
+      "set": "{core.command-parse} $command [username] [amount]",
+      "give": "{core.command-parse} $command [username] [amount]",
+      "giveNotEnough": "Sorry, $sender, you don't have $amount $pointsName to give it to $username",
+      "cannotGiveZeroPoints": "Sorry, $sender, you cannot give $amount $pointsName to $username",
+      "get": "{core.command-parse} $command [username]",
+      "online": "{core.command-parse} $command [amount]",
+      "all": "{core.command-parse} $command [amount]",
+      "rain": "{core.command-parse} $command [amount]",
+      "add": "{core.command-parse} $command [username] [amount]",
+      "remove": "{core.command-parse} $command [username] [amount]"
+    },
+    "defaults": {
+      "pointsResponse": "$username は現在 $amount $pointsName を持っています、あなたのポジションは $order/$count です"
+    }
+  },
+  "songs": {
+    "playlist-is-empty": "$sender, playlist to import is empty",
+    "playlist-imported": "$sender, imported $imported and skipped $skipped to playlist",
+    "not-playing": "Not Playing",
+    "song-was-banned": "Song $name was banned and will never play again!",
+    "song-was-banned-timeout-message": "You've got timeout for posting banned song",
+    "song-was-unbanned": "Song was succesfully unbanned",
+    "song-was-not-banned": "This song was not banned",
+    "no-song-is-currently-playing": "No song is currently playing",
+    "current-song-from-playlist": "Current song is $name from playlist",
+    "current-song-from-songrequest": "現在の曲は $username がリクエストした $name です",
+    "songrequest-disabled": "Sorry, $sender, song requests are disabled",
+    "song-is-banned": "Sorry, $sender, but this song is banned",
+    "youtube-is-not-responding-correctly": "Sorry, $sender, but YouTube is sending unexpected responses, please try again later.",
+    "song-was-not-found": "Sorry, $sender, but this song was not found",
+    "song-is-too-long": "Sorry, $sender, but this song is too long",
+    "this-song-is-not-in-playlist": "Sorry, $sender, but this song is not in current playlist",
+    "incorrect-category": "Sorry, $sender, but this song must be music category",
+    "song-was-added-to-queue": "$sender, song $name was added to queue",
+    "song-was-added-to-playlist": "$sender, song $name was added to playlist",
+    "song-is-already-in-playlist": "$sender, song $name is already in playlist",
+    "song-was-removed-from-playlist": "$sender, song $name was removed from playlist",
+    "song-was-removed-from-queue": "$sender, your song $name was removed from queue",
+    "playlist-current": "$sender, current playlist is $playlist.",
+    "playlist-list": "$sender, available playlists: $list.",
+    "playlist-not-exist": "$sender, your requested playlist $playlist doesn't exist.",
+    "playlist-set": "$sender, you changed playlist to $playlist."
+  },
+  "price": {
+    "price-parse-failed": "{core.command-parse} !price",
+    "price-was-set": "$sender, price for $command was set to $amount $pointsName",
+    "price-was-unset": "$sender, price for $command was unset",
+    "price-was-not-found": "$sender, price for $command was not found",
+    "price-was-enabled": "$sender, price for $command was enabled",
+    "price-was-disabled": "$sender, price for $command was disabled",
+    "user-have-not-enough-points": "Sorry, $sender, but you don't have $amount $pointsName to use $command",
+    "user-have-not-enough-points-or-bits": "Sorry, $sender, but you don't have $amount $pointsName or redeem command by $bitsAmount bits to use $command",
+    "user-have-not-enough-bits": "Sorry, $sender, but you need to redeem command by $bitsAmount bits to use $command",
+    "list-is-empty": "$sender, list of prices is empty",
+    "list-is-not-empty": "$sender, list of prices: $list"
+  },
+  "ranks": {
+    "rank-parse-failed": "{core.command-parse} !rank help",
+    "rank-was-added": "$sender, new rank $type $rank($hours$hlocale) was added",
+    "rank-was-edited": "$sender, rank for $type $hours$hlocale was changed to $rank",
+    "rank-was-removed": "$sender, rank for $type $hours$hlocale was removed",
+    "rank-already-exist": "$sender, there is already a rank for $type $hours$hlocale",
+    "rank-was-not-found": "$sender, rank for $type $hours$hlocale was not found",
+    "custom-rank-was-set-to-user": "$sender, you set $rank to $username",
+    "custom-rank-was-unset-for-user": "$sender, custom rank for $username was unset",
+    "list-is-empty": "$sender, no ranks was found",
+    "list-is-not-empty": "$sender, ranks list: $list",
+    "show-rank-without-next-rank": "$sender, you have $rank rank",
+    "show-rank-with-next-rank": "$sender, you have $rank rank. Next rank - $nextrank",
+    "user-dont-have-rank": "$sender、あなたはまだランクを持っていません"
+  },
+  "followage": {
+    "success": {
+      "never": "$sender, $username はチャンネルフォロワーではありません",
+      "time": "$sender, $username は $diff をフォローしています"
+    },
+    "successSameUsername": {
+      "never": "$sender、あなたはこのチャンネルをフォローしていません",
+      "time": "$sender, あなたはこのチャンネルを $diff でフォローしています"
+    }
+  },
+  "subage": {
+    "success": {
+      "never": "$sender, $username はチャンネルサブスクライバーではありません.",
+      "notNow": "$sender, $username は現在チャンネルサブスクライバーではありません。合計で $subCumulativeMonths $subCumulativeMonthsName.",
+      "timeWithSubStreak": "$sender, $username はチャネルのサブスクライバーです。現在のサブストリークは $diff ($subStreak $subStreakMonthsName) で、合計で $subCumulativeMonths $subCumulativeMonthsName です。",
+      "time": "$sender, $username はチャンネルサブスクライバーです。合計で $subCumulativeMonths $subCumulativeMonthsName."
+    },
+    "successSameUsername": {
+      "never": "$sender, you are not a channel subscriber.",
+      "notNow": "$sender, you are currently not a channel subscriber. In total of $subCumulativeMonths $subCumulativeMonthsName.",
+      "timeWithSubStreak": "$sender, you are subscriber of channel. Current sub streak for $diff ($subStreak $subStreakMonthsName) and in total of $subCumulativeMonths $subCumulativeMonthsName.",
+      "time": "$sender, you are subscriber of channel. In total of $subCumulativeMonths $subCumulativeMonthsName."
+    }
+  },
+  "age": {
+    "failed": "$sender, I don't have data for $username account age",
+    "success": {
+      "withUsername": "$sender, $username のアカウントの年齢は $diff です",
+      "withoutUsername": "$sender、あなたのアカウントの年齢は $diff です。"
+    }
+  },
+  "lastseen": {
+    "success": {
+      "never": "$username はこのチャンネルに参加しませんでした！",
+      "time": "$username は $when でこのチャンネルで最後に見られました"
+    },
+    "failed": {
+      "parse": "{core.command-parse} !lastseen [username]"
+    }
+  },
+  "watched": {
+    "success": {
+      "time": "$username がこのチャンネルを $time 時間視聴しました"
+    },
+    "failed": {
+      "parse": "{core.command-parse} !watched or !watched [username]"
+    }
+  },
+  "permissions": {
+    "without-permission": "You don't have enough permissions for '$command'"
+  },
+  "moderation": {
+    "user-have-immunity": "$sender, user $username have $type immunity for $time seconds",
+    "user-have-immunity-parameterError": "$sender, parameter error. $command <username> <type> <duration>",
+    "user-have-link-permit": "User $username can post a $count $link to chat",
+    "permit-parse-failed": "{core.command-parse} !permit [username]",
+    "user-is-warned-about-links": "リンクは許可されていません。許可を求めてください [$count 警告残り]",
+    "user-is-warned-about-symbols": "過剰なシンボル使用しない [$count 警告残り]",
+    "user-is-warned-about-long-message": "長いメッセージは許可されていません [$count 警告残り]",
+    "user-is-warned-about-caps": "過剰なキャップ使用なし [$count 警告残り]",
+    "user-is-warned-about-spam": "スパムは許可されていません [$count 警告残り]",
+    "user-is-warned-about-color": "斜体と/meは許可されていません [$count 警告残り]",
+    "user-is-warned-about-emotes": "エモートスパムの禁止[ $count 警告残り]",
+    "user-is-warned-about-forbidden-words": "禁止された単語はありません [$count 警告残り]",
+    "user-have-timeout-for-links": "No links allowed, ask for !permit",
+    "user-have-timeout-for-symbols": "No excessive symbols usage",
+    "user-have-timeout-for-long-message": "Long message are not allowed",
+    "user-have-timeout-for-caps": "No excessive caps usage",
+    "user-have-timeout-for-spam": "スパムは許可されていません",
+    "user-have-timeout-for-color": "斜体と/meは許可されていません",
+    "user-have-timeout-for-emotes": "No emotes spamming",
+    "user-have-timeout-for-forbidden-words": "No forbidden words"
+  },
+  "queue": {
+    "list": "$sender, 現在のキュープール: $users",
+    "info": {
+      "closed": "$sender, {queue.close}",
+      "opened": "$sender, {queue.open}"
+    },
+    "join": {
+      "closed": "Sorry $sender, queue is currently closed",
+      "opened": "$sender were added into queue"
+    },
+    "open": "Queue is currently OPENED! Join to queue with !queue join",
+    "close": "Queue is currently closed!",
+    "clear": "Queue were completely cleared",
+    "picked": {
+      "single": "このユーザーは、キューから選ばれました: $users",
+      "multi": "These users were picked from queue: $users",
+      "none": "No users were found in queue"
+    }
+  },
+  "title": {
+    "current": "$sender, ストリームのタイトルは '$title ' です",
+    "change": {
+      "success": "$sender, title was set to: $title"
+    }
+  },
+  "game": {
+    "current": "$sender, ストリーマーは $game をプレイしています",
+    "change": {
+      "success": "$sender, game was set to: $game"
+    }
+  },
+  "cooldowns": {
+    "cooldown-was-set": "$sender, $type cooldown for $command was set to $secondss",
+    "cooldown-was-unset": "$sender, cooldown for $command was unset",
+    "cooldown-triggered": "$sender, '$command' is on cooldown, remaining $secondss",
+    "cooldown-not-found": "$sender, cooldown for $command was not found",
+    "cooldown-was-enabled": "$sender, cooldown for $command was enabled",
+    "cooldown-was-disabled": "$sender, cooldown for $command was disabled",
+    "cooldown-was-enabled-for-moderators": "$sender, cooldown for $command was enabled for moderators",
+    "cooldown-was-disabled-for-moderators": "$sender, cooldown for $command was disabled for moderators",
+    "cooldown-was-enabled-for-owners": "$sender, cooldown for $command was enabled for owners",
+    "cooldown-was-disabled-for-owners": "$sender, cooldown for $command was disabled for owners",
+    "cooldown-was-enabled-for-subscribers": "$sender, cooldown for $command was enabled for subscribers",
+    "cooldown-was-disabled-for-subscribers": "$sender, cooldown for $command was disabled for subscribers",
+    "cooldown-was-enabled-for-followers": "$sender, cooldown for $command was enabled for followers",
+    "cooldown-was-disabled-for-followers": "$sender, cooldown for $command was disabled for followers"
+  },
+  "timers": {
+    "id-must-be-defined": "$sender, response id must be defined.",
+    "id-or-name-must-be-defined": "$sender, response id or timer name must be defined.",
+    "name-must-be-defined": "$sender, timer name must be defined.",
+    "response-must-be-defined": "$sender, timer response must be defined.",
+    "cannot-set-messages-and-seconds-0": "$sender, メッセージと秒の両方を 0 に設定することはできません。",
+    "timer-was-set": "$sender, timer $name was set with $messages messages and $seconds seconds to trigger",
+    "timer-was-set-with-offline-flag": "$sender, タイマー$name は$messages 個のメッセージと$seconds 秒で設定されていてストリームがオフラインでもトリガーされます",
+    "timer-not-found": "$sender, timer (name: $name) was not found in database. Check timers with !timers list",
+    "timer-deleted": "$sender, timer $name and its responses was deleted.",
+    "timer-enabled": "$sender, timer (name: $name) was enabled",
+    "timer-disabled": "$sender, timer (name: $name) was disabled",
+    "timers-list": "$sender, timers list: $list",
+    "responses-list": "$sender, timer (name: $name) list",
+    "response-deleted": "$sender, response (id: $id) was deleted.",
+    "response-was-added": "$sender, response (id: $id) for timer (name: $name) was added - '$response'",
+    "response-not-found": "$sender, response (id: $id) was not found in database",
+    "response-enabled": "$sender, response (id: $id) was enabled",
+    "response-disabled": "$sender, response (id: $id) was disabled"
+  },
+  "gambling": {
+    "duel": {
+      "bank": "$sender, current bank for $command is $points $pointsName",
+      "lowerThanMinimalBet": "$sender, minimal bet for $command is $points $pointsName",
+      "cooldown": "$sender, you cannot use $command for $cooldown $minutesName.",
+      "joined": "$sender, good luck with your dueling skills. You bet on yourself $points $pointsName!",
+      "added": "$sender really thinks he is better than others raising his bet to $points $pointsName!",
+      "new": "$sender is your new duel challenger! To participate use $command [points], you have $minutes $minutesName left to join.",
+      "zeroBet": "$sender, you cannot duel 0 $pointsName",
+      "notEnoughOptions": "$sender, you need to specify points to dueling",
+      "notEnoughPoints": "$sender, you don't have $points $pointsName to duel!",
+      "noContestant": "Only $winner have courage to join duel! Your bet of $points $pointsName are returned to you.",
+      "winner": "Congratulations to $winner! He is last man standing and he won $points $pointsName ($probability% with bet of $tickets $ticketsName)!"
+    },
+    "roulette": {
+      "trigger": "$sender is trying his luck and pulled a trigger",
+      "alive": "$sender is alive! Nothing happened.",
+      "dead": "$sender's brain was splashed on the wall!",
+      "mod": "$sender is incompetent and completely missed his head!",
+      "broadcaster": "$sender is using blanks, boo!",
+      "timeout": "Roulette timeout set to $values"
+    },
+    "seppuku": {
+      "text": "$sender has committed seppuku.",
+      "mod": "$sender tried to commit seppuku, but broke a sword.",
+      "broadcaster": "$sender tried to commit seppuku, but lost a sword.",
+      "timeout": "Seppuku timeout set to $values"
+    },
+    "fightme": {
+      "cannotFightWithYourself": "$sender, you cannot fight with yourself!",
+      "cooldown": "$sender, you cannot use $command for $cooldown $minutesName.",
+      "challenge": "(ง'̀-'́)ง $sender wants to fight you $username! If you accept, send $command $sender",
+      "winner": "٩(^ᴗ^)۶ $winner is proud winner and $loser is sore loser! Who's next?",
+      "notEnoughOptions": "$sender, you need to select user to fight.",
+      "broadcaster": "ψ(｀∇´)ψ $winner is a god among you. Beware $loser! This fight was decided even before it started.",
+      "bothModerators": "$challenger (*-`ω´- )人(*-`ω´- ) $sender, この戦いは千年かかっても決着がつかない！？",
+      "oneModerator": "¯\\_(ツ)_/¯ $winner is under divine protection. Sorry, $loser."
+    },
+    "gamble": {
+      "chanceToWin": "$sender, chance to win !gamble set to $value%",
+      "zeroBet": "$sender, you cannot gamble 0 $pointsName",
+      "minimalBet": "$sender, minimal bet for !gamble is set to $value",
+      "lowerThanMinimalBet": "$sender, minimal bet for !gamble is $points $pointsName",
+      "notEnoughOptions": "$sender, you need to specify points to gamble",
+      "notEnoughPoints": "$sender, you don't have $points $pointsName to gamble",
+      "win": "$sender, you WON! You now have $points $pointsName",
+      "winJackpot": "$sender, you hit JACKPOT! You won $jackpot $jackpotName in addition to your bet. You now have $points $pointsName",
+      "loseWithJackpot": "$sender, you LOST! You now have $points $pointsName. Jackpot increased to $jackpot $jackpotName",
+      "lose": "$sender, you LOST! You now have $points $pointsName",
+      "currentJackpot": "$sender, current jackpot for $command is $points $pointsName",
+      "winJackpotCount": "$sender, you won $count jackpots",
+      "jackpotIsDisabled": "$sender, jackpot is disabled for $command."
+    }
+  },
+  "highlights": {
+    "saved": "$sender, highlight was saved for $hoursh$minutesm$secondss",
+    "list": {
+      "items": "$sender, 最新ストリームの保存されたハイライトリスト: $items",
+      "empty": "$sender, no highlights were saved"
+    },
+    "offline": "$sender、ハイライトを保存できません。ストリームはオフラインです。"
+  },
+  "whisper": {
+    "settings": {
+      "disablePermissionWhispers": {
+        "true": "ボットは権限不足のエラーを送信しない",
+        "false": "ボットがウィスパーで権限不足のエラーを送らない"
+      },
+      "disableCooldownWhispers": {
+        "true": "ボットはクールダウン通知を送信しない",
+        "false": "ボットはウィスパーでクールダウン通知を送信します"
+      }
+    }
+  },
+  "time": "ストリーマーのタイムゾーンの現在の時刻は $time です",
+  "subs": "$sender, 現在 $onlineSubCount 人のオンラインサブスクライバーがいます. 最後のサブ/再サブは $lastSubUsername $lastSubAgo でした",
+  "followers": "$sender, 現在 $onlineFollowersCount 人のオンラインフォロワーがいます. 最終フォローは $lastFollowUsername $lastFollowAgo",
+  "ignore": {
+    "user": {
+      "is": {
+        "not": {
+          "ignored": "$sender, ユーザー $username はボットによって無視されていません"
+        },
+        "added": "$sender, ユーザー $username がボットの無視リストに追加されました",
+        "removed": "$sender, ユーザー $username がボットの無視リストから削除されました",
+        "ignored": "$sender, ユーザー $username はボットによって無視されます"
+      }
+    }
+  },
+  "filters": {
+    "setVariable": "$sender, $variable was set to $value."
+  }
+}
