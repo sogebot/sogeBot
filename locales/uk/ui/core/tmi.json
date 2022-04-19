@@ -1,11 +1,11 @@
 {
   "settings": {
-    "ignorelist": "Ignore list (ID or username)",
-    "globalIgnoreListExclude": "Exclude from global ignore list",
-    "showWithAt": "Show users with @",
-    "sendWithMe": "Send messages with /me",
-    "sendAsReply": "Send bot messages as replies",
-    "mute": "Bot is muted",
-    "whisperListener": "Listen on commands on whispers"
+    "ignorelist": "Чорний список (ID або ім'я користувача)",
+    "globalIgnoreListExclude": "Виключити з глобального списку ігнорування",
+    "showWithAt": "Показати користувачів з @",
+    "sendWithMe": "Надсилати повідомлення з /me",
+    "sendAsReply": "Відправляти повідомлення бота в якості відповіді",
+    "mute": "Бот приглушений",
+    "whisperListener": "Слухати команди на віспері"
   }
 }

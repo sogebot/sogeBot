@@ -1,0 +1,12 @@
+{
+  "time": "Top $amount (watch time): ",
+  "tips": "Top $amount (Tip): ",
+  "level": "Top $amount (レベル): ",
+  "points": "Top $amount (ポイント): ",
+  "messages": "Top $amount (メッセージ): ",
+  "followage": "Top $amount (followage): ",
+  "subage": "Top $amount (サブ期間): ",
+  "submonths": "Top $amount (サブ月数): ",
+  "bits": "Top $amount (ビッツ): ",
+  "gifts": "Top $amount (サブギフ): "
+}

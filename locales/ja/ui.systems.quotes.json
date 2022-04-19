@@ -1,0 +1,34 @@
+{
+  "no-quotes-found": "申し訳ありませんが、データベースに引用が見つかりませんでした。",
+  "new": "新しい引用の追加",
+  "empty": "引用の一覧が空です。新しい引用を作成します。",
+  "emptyAfterSearch": "\"<strong>$search</strong>\"を検索すると、引用の一覧が空です。",
+  "quote": {
+    "name": "引用",
+    "placeholder": "ここに引用を設定してください"
+  },
+  "by": {
+    "name": "引用者:"
+  },
+  "tags": {
+    "name": "タグ",
+    "placeholder": "ここにタグを設定してください",
+    "help": "カンマ区切りのタグ。例: tag 1, tag 2, tag 3"
+  },
+  "date": {
+    "name": "Date"
+  },
+  "error": {
+    "isEmpty": "This value cannot be empty",
+    "atLeastOneTag": "少なくとも 1 つのタグを設定する必要があります。"
+  },
+  "tag-filter": "タグでフィルタリング",
+  "warning": "この操作は取り消せません！",
+  "settings": {
+    "enabled": "Status",
+    "urlBase": {
+      "title": "URL base",
+      "help": "<strong>誰でも</strong>アクセスできるように、引用にはパブリックエンドポイントを使用する必要があります。　"
+    }
+  }
+}

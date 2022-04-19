@@ -1,0 +1,30 @@
+{
+  "add": {
+    "ok": "$sender, 引用 $id '$quote' が追加されました. (タグ: $tags)",
+    "error": "$sender, $command は正しくないか、-quoteパラメーターがありません"
+  },
+  "remove": {
+    "ok": "$sender, 引用 $id は正常に削除されました。",
+    "error": "$sender, 引用IDがありません。",
+    "not-found": "$sender、引用 $id が見つかりませんでした。"
+  },
+  "show": {
+    "ok": "$quotedBy '$quote' の引用 $id",
+    "error": {
+      "no-parameters": "$sender, $command には -id または -tag がありません。",
+      "not-found-by-id": "$sender、引用 $id が見つかりませんでした。",
+      "not-found-by-tag": "$sender、タグ $tag の引用が見つかりませんでした。"
+    }
+  },
+  "set": {
+    "ok": "$sender, 引用 $id タグが設定されました. (tags: $tags)",
+    "error": {
+      "no-parameters": "$sender, $command には -id または -tag がありません。",
+      "not-found-by-id": "$sender、引用 $id が見つかりませんでした。"
+    }
+  },
+  "list": {
+    "ok": "$sender, http://$urlBase/public/#/quotes で引用リストを見つけることができます",
+    "is-localhost": "$sender, 引用一覧URLが正しく指定されていません。"
+  }
+}

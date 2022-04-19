@@ -1,0 +1,8 @@
+{
+  "list": "権限の一覧:",
+  "excludeAddSuccessful": "$sender 、 $username を権限 $permissionName の除外リストに追加しました",
+  "excludeRmSuccessful": "$sender 、 $username を権限 $permissionName の除外リストから削除しました",
+  "userNotFound": "$sender, ユーザー $username はデータベースに見つかりませんでした。",
+  "permissionNotFound": "$sender, 権限 $userlevel がデータベースに見つかりませんでした。",
+  "cannotIgnoreForCorePermission": "$sender, コア権限 $userlevel のユーザーを手動で除外することはできません"
+}

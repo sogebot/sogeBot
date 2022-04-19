@@ -1,0 +1,48 @@
+{
+	"settings": {
+		"btnRemoveCache": "Delete cache",
+		"hypeMessagesEnabled": "Show hype messages in chat",
+		"btnTestExplosion": "Test emote explosion",
+		"btnTestEmote": "Test emote",
+		"btnTestFirework": "Test emote firework",
+		"cEmotesSize": "Emotes size",
+		"cEmotesMaxEmotesPerMessage": "Maximum of emotes per message",
+		"cEmotesMaxRotation": "Maximal rotation of emote",
+		"cEmotesOffsetX": "Maximal offset on X-axis",
+		"cEmotesAnimation": "Animation",
+		"cEmotesAnimationTime": "Animation duration",
+		"cExplosionNumOfEmotes": "No. of emotes",
+		"cExplosionNumOfEmotesPerExplosion": "No. of emotes per explosion",
+		"cExplosionNumOfExplosions": "No. of explosions",
+		"enableEmotesCombo": "Enable emotes combo",
+		"comboBreakMessages": "Combo break messages",
+		"threshold": "Threshold",
+		"noMessagesFound": "No messages found.",
+		"message": "Message",
+		"showEmoteInOverlayThreshold": "オーバーレイでエモートを表示する最小メッセージ閾値です。",
+		"hideEmoteInOverlayAfter": {
+			"title": "非アクティブの後にオーバーレイでエモートを非表示",
+			"help": "一定時間(秒) 経過後にオーバーレイでエモートを非表示にする"
+		},
+		"comboCooldown": {
+			"title": "Combo cooldown",
+			"help": "Cooldown of combo in seconds"
+		},
+		"comboMessageMinThreshold": {
+			"title": "Minimal message threshold",
+			"help": "Minimal message threshold to count emotes as combo (until then won't trigger cooldown)"
+		},
+		"comboMessages": "Combo messages"
+	},
+	"hype": {
+		"5": "Let's go！ $amountx $emote コンボを獲得しました！SeemsGood",
+		"15": "そのまま続けてください！ $amountx $emoteを超えることはできますか？ TriHard"
+	},
+	"message": {
+		"3": "$amountx $emote combo",
+		"5": "$amountx $emote combo SeemsGood",
+		"10": "$amountx $emote combo PogChamp",
+		"15": "$amountx $emote combo TriHard",
+		"20": "$sender が $amountx $emote コンボを台無しにしました！ NotLikeThis"
+	}
+}

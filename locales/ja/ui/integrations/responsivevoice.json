@@ -1,0 +1,8 @@
+{
+  "settings": {
+    "key": {
+      "title": "Key",
+      "help": "http://responsvevoice.org でキーを取得してください"
+    }
+  }
+}

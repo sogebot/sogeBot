@@ -1,0 +1,24 @@
+{
+  "options": "オプション",
+  "popover": {
+    "are_you_sure_you_want_to_delete_this_image": "この画像を<strong class='text-danger'>削除</strong>しますか？"
+  },
+  "button": {
+    "update": "アップデート",
+    "fix_your_errors_first": "保存する前にエラーを修正します"
+  },
+  "errors": {
+    "number_greater_or_equal_than_0": "値は0以上の数値でなければなりません",
+    "value_must_not_be_empty": "値は空白にできません"
+  },
+  "titles": {
+    "waitBefore": "画像が表示されるまで待機（ミリ秒）",
+    "waitAfter": "画像が消えるまで待機（ミリ秒）",
+    "duration": "画像を表示する時間(ミリ秒)",
+    "animationIn": "アニメーションイン",
+    "animationOut": "アニメーションアウト",
+    "animationInDuration": "アニメーションイン時間 (ミリ秒)",
+    "animationOutDuration": "アニメーションアウト時間（ミリ秒）",
+    "showOnlyOncePerStream": "ストリームごとに1回だけ表示"
+  }
+}

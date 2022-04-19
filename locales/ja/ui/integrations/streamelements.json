@@ -1,0 +1,9 @@
+{
+  "settings": {
+    "enabled": "Status",
+    "jwtToken": {
+      "title": "JWT token",
+      "help": "<a href=\"https://streamelements.com/dashboard/account/channels\" target=\"_blank\">StreamElements Channels 設定</a> で JWT トークンを取得し、シークレットを表示する"
+    }
+  }
+}

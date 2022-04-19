@@ -1,0 +1,5 @@
+{
+  "responseOk": "$game | $rating de avaliação | Nativo no $native | Detalhes: $url",
+  "responseNg": "A avaliação para o jogo $game não foi encontrada no ProtonDB.",
+  "responseNotFound": "O jogo $game não foi encontrado no ProtonDB."
+}

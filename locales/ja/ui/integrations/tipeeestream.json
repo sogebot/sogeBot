@@ -1,0 +1,9 @@
+{
+  "settings": {
+    "enabled": "Status",
+    "apiKey": {
+      "title": "Api key",
+      "help": "tipeeestream ダッシュボードからソケットトークンを取得-> API -> API キー"
+    }
+  }
+}

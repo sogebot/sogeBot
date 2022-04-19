@@ -1,13 +1,13 @@
 {
-  "your-account-is-not-linked": "your account is not linked, use `$command`",
-  "all-your-links-were-deleted": "all your links were deleted",
+  "your-account-is-not-linked": "ваш обліковий запис не підключено, використовуйте `$command`",
+  "all-your-links-were-deleted": "всі ваші посилання були видалені",
   "all-your-links-were-deleted-with-sender": "$sender, {integrations.discord.all-your-links-were-deleted}",
-  "this-account-was-linked-with": "$sender, this account was linked with $discordTag.",
-  "invalid-or-expired-token": "$sender, invalid or expired token.",
-  "help-message": "$sender, to link your account on Discord: 1. Go to Discord server and send $command in bot channel. | 2. Wait for PM from bot | 3. Send command from your Discord PM here in twitch chat.",
-  "started-at": "Started At",
-  "announced-by": "Announced by sogeBot",
-  "streamed-at": "Streamed At",
-  "link-whisper": "Hello $tag, to link this Discord account with your Twitch account on $broadcaster channel, go to <https://twitch.tv/$broadcaster>, login to your account and send this command to chat \n\n\t\t`$command $id`\n\nNOTE: This expires in 10 minutes.",
-  "check-your-dm": "check your DMs for steps to link your account."
+  "this-account-was-linked-with": "$sender, цей обліковий запис був пов'язаний з $discordTag.",
+  "invalid-or-expired-token": "$sender, неприпустимий або прострочений Токен.",
+  "help-message": "$sender, щоб прив'язати ваш обліковий запис у Discord: 1. Перейдіть до серверу Discord та надішліть $command у каналі ботів. | 2. Зачекайте на ПП від бота | 3. Надішліть команду з Discord ПП в чаті Twitch.",
+  "started-at": "Розпочато о",
+  "announced-by": "Оголошення від sogebot",
+  "streamed-at": "Стрімить в",
+  "link-whisper": "Вітаємо, $tag, щоб прив'язати цей обліковий запис Discord до вашого облікового запису Twitch на каналі $broadcaster, перейдіть на <https://twitch.tv/$broadcaster>увійдіть у свій обліковий запис і надішліть цю команду у чат \n\n\t\t`$command $id`\n\nПРИМІТКА: Це закінчується через 10 хвилин.",
+  "check-your-dm": "перевірте особисті повідомлення для прив'язки до облікового запису."
 }
