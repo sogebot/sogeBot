@@ -14,6 +14,7 @@ export interface UserInterface {
   subscribeTier?: string; subscribeCumulativeMonths?: number; subscribeStreak?: number; giftedSubscribes?: number;
   followCheckAt?: number;
   messages?: number;
+  type: 'twitch' | 'youtube';
   extra: {
     jackpotWins?: number;
     levels?: {
@@ -66,6 +67,9 @@ export const User = new EntitySchema<Readonly<Required<UserInterface>>>({
     followedAt:           {
       type: 'varchar', length: '2022-01-25T20:14:53.308Z'.length, nullable: true,
     },
+    type: {
+      type: 'varchar', default: 'twitch',
+    },
     followCheckAt: {
       type: 'bigint', default: 0, transformer: new ColumnNumericTransformer(),
     },
@@ -114,6 +118,10 @@ export const User = new EntitySchema<Readonly<Required<UserInterface>>>({
     {
       name:    'IDX_78a916df40e02a9deb1c4b75ed',
       columns: [ 'userName' ],
+    },
+    {
+      name:    'IDX_user_type',
+      columns: [ 'type' ],
     },
   ],
 });
