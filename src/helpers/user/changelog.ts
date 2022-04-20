@@ -47,6 +47,7 @@ const defaultData: Readonly<Required<UserInterface>> = {
   chatTimeOnline:            0,
   displayname:               '',
   extra:                     {},
+  type:                      'twitch',
 };
 
 export function update(userId: string,  data: Partial<UserInterface>) {
