@@ -162,6 +162,7 @@
     "process": "0.11.10",
     "sinon": "12.0.1",
     "test-until": "1.1.1",
+    "tiltify": "^0.3.0",
     "tsc-alias": "^1.6.6",
     "tsconfig-paths": "^3.14.1",
     "typescript": "4.6.3",

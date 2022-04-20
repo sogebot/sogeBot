@@ -95,6 +95,10 @@ export type ClientToServerEventsWithNamespace = {
     'pubg::getUserStats': (data: { apiKey: string, platform: string, playerId: string, seasonId: string, ranked: boolean}, cb: (err: Error | string | null, data: null | any) => void) => void,
     'pubg::exampleParse': (data: { text: string}, cb: (err: Error | string | null, data: string | null) => void) => void,
   },
+  '/integrations/tiltify': GenericEvents & {
+    'tiltify::code': (token: string, cb: (err: Error | string | null) => void) => void,
+    'tiltify::revoke': (cb: (err: Error | string | null) => void) => void,
+  },
   '/integrations/spotify': GenericEvents & {
     'spotify::revoke': (cb: (err: Error | string | null, opts?: { do: 'refresh' }) => void) => void,
     'spotify::authorize': (cb: (err: Error | string | null, action?: null | { do: 'redirect', opts: any[] }) => void) => void,
