@@ -13,7 +13,6 @@ declare module 'blocked-at';
 declare module 'twitter-api-v2/src';
 declare module 'safe-eval';
 declare module 'trigram-similarity';
-declare module 'tiltify';
 
 declare module 'js-beautify' {
   export function js(code: string): string;
