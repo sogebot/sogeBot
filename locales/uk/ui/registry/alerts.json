@@ -12,7 +12,8 @@
     "amountOfGifts": "Amount of gifts",
     "amountOfMonths": "Amount of months",
     "amountOfTips": "Tip",
-    "event": "Event"
+    "event": "Event",
+    "service": "Service"
   },
   "empty": "Alerts registry is empty, create new alerts.",
   "emptyAfterSearch": "Alerts registry is empty in searching for \"<strong>$search</strong>\"",

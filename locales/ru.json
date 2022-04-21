@@ -317,6 +317,7 @@
       "resub": "<strong>resubbed</strong>",
       "cheer": "<strong>cheered</strong> you",
       "tip": "<strong>задоннатил</strong> вам",
+      "tipToCharity": "<strong>donated</strong> to $campaignName",
       "rewardredeem": "just <strong>redeemed</strong> reward"
     },
     "responses": {

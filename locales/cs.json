@@ -317,6 +317,7 @@
       "resub": "<strong>předplatitel</strong>",
       "cheer": "<strong>bity</strong>",
       "tip": "<strong>spropitné</strong>",
+      "tipToCharity": "<strong>donated</strong> to $campaignName",
       "rewardredeem": "žádost o <strong>odměnu</strong>"
     },
     "responses": {

@@ -1,6 +1,6 @@
 {
   "settings": {
-    "enabled": "Status",
+    "enabled": "Стан",
     "consumerKey": "Consumer Key (API Key)",
     "consumerSecret": "Consumer Secret (API Secret)",
     "accessToken": "Access Token",

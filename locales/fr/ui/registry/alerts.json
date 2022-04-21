@@ -12,7 +12,8 @@
     "amountOfGifts": "Nombre de gifts",
     "amountOfMonths": "Nombre de mois",
     "amountOfTips": "Don",
-    "event": "Événement"
+    "event": "Événement",
+    "service": "Service"
   },
   "empty": "Le registre des alertes est vide, créez de nouvelles alertes.",
   "emptyAfterSearch": "Le registre des alertes est vide dans la recherche de \"<strong>$search</strong>\"",

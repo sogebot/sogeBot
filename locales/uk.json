@@ -44,7 +44,7 @@
   },
   "webpanel": {
     "this-system-is-disabled": "Ця система вимкнена",
-    "or": "or",
+    "or": "або",
     "loading": "Завантаження",
     "this-may-take-a-while": "Це <strong>може</strong> зайняти деякий час",
     "display-as": "Відображати як",
@@ -170,7 +170,7 @@
           "label": "Фільтр"
         },
         "linkFilter": {
-          "label": "Link Overlay Filter",
+          "label": "Посилання на фільтр оверлею",
           "placeholder": "Якщо використовується оверлей, додайте посилання або ідентифікатор вашого оверлея"
         },
         "hashtag": {
@@ -178,15 +178,15 @@
           "placeholder": "#ВашеХештегТут або ключове слово"
         },
         "fadeOutXCommands": {
-          "label": "Fade Out X Commands",
-          "placeholder": "Number of commands subtracted every fade out interval"
+          "label": "Затухання X команд",
+          "placeholder": "Кількість команд, віднімаючи кожен інтервал згасання"
         },
         "fadeOutXKeywords": {
-          "label": "Fade Out X Keywords",
-          "placeholder": "Number of keywords subtracted every fade out interval"
+          "label": "Згасання Х ключових слів",
+          "placeholder": "Кількість ключових слів, які віднімають кожний інтервал згасання"
         },
         "fadeOutInterval": {
-          "label": "Fade Out Interval (seconds)",
+          "label": "Інтервал зникнення (сек)",
           "placeholder": "Fade out interval subtracting"
         },
         "runEveryXCommands": {
@@ -236,11 +236,11 @@
         },
         "timeout": {
           "label": "Тайм-аут",
-          "placeholder": "Set timeout in milliseconds"
+          "placeholder": "Встановити тайм-аут в мілісекунд"
         },
         "timeoutType": {
-          "label": "Type of timeout",
-          "placeholder": "Set type of timeout"
+          "label": "Тип таймаута",
+          "placeholder": "Встановити тип тайм-ауту"
         },
         "command": {
           "label": "Команда",
@@ -317,6 +317,7 @@
       "resub": "<strong>resubbed</strong>",
       "cheer": "<strong>cheered</strong> you",
       "tip": "<strong>задоннатив</strong> вам",
+      "tipToCharity": "<strong>donated</strong> to $campaignName",
       "rewardredeem": "just <strong>redeemed</strong> reward"
     },
     "responses": {
@@ -395,7 +396,7 @@
         "challenger": "Челленджер",
         "min": "Мінімальний",
         "max": "Максимальний",
-        "eligibility": "Eligibility",
+        "eligibility": "Право на участь",
         "probability": "Ймовірність",
         "time": "Час",
         "options": "Параметри",
@@ -505,7 +506,7 @@
             "settings": "Оповіщувати в вісперс при зміні налаштування",
             "raffle": "Вісперс при приєднанні до розіграшу",
             "permissions": "Whispers on insufficient permissions",
-            "cooldowns": "Whispers on cooldown (if set as notify)"
+            "cooldowns": "Вісперс при кулдауні "
           }
         }
       }
@@ -593,13 +594,13 @@
     "send-message-as-a-bot": "Надіслати повідомлення як бота",
     "chat-as-bot": "Чат (як бот)",
     "product": "Продукт",
-    "optional": "optional",
+    "optional": "опціонально",
     "placeholder-search": "Пошук",
     "placeholder-enter-product": "Введіть ім’я продукту",
     "placeholder-enter-keyword": "Введіть ключове слово",
     "credits": "Подяка",
-    "fade-out-top": "fade up",
-    "fade-out-zoom": "fade zoom",
+    "fade-out-top": "згасання",
+    "fade-out-zoom": "маштаб згасаггя ",
     "global": "Загальні",
     "user": "Користувач",
     "alerts": "Сповіщення",
@@ -735,8 +736,8 @@
     "tip": "новий донат",
     "obs-scene-changed": "Сцена OBS змінена",
     "unfollow": "відписка",
-    "hypetrain-started": "Hype Train started",
-    "hypetrain-ended": "Hype Train ended",
+    "hypetrain-started": "Hype Train запущено",
+    "hypetrain-ended": "Hype Train закінчився",
     "prediction-started": "Twitch Prediction started",
     "prediction-locked": "Twitch Prediction locked",
     "prediction-ended": "Twitch Prediction ended",
@@ -746,10 +747,10 @@
     "subscription": "новий сарскрайбер",
     "subgift": "новий подарований саб",
     "subcommunitygift": "new sub given to community",
-    "resub": "user resubscribed",
-    "command-send-x-times": "command was send x times",
-    "keyword-send-x-times": "keyword was send x times",
-    "number-of-viewers-is-at-least-x": "number of viewers is at least x",
+    "resub": "користувач ресабнувся",
+    "command-send-x-times": "команда була надіслана х раз",
+    "keyword-send-x-times": "ключове слово було відправлено x разів",
+    "number-of-viewers-is-at-least-x": "кількість глядачів мінімум х",
     "stream-started": "трансляція розпочата",
     "reward-redeemed": "reward redeemed",
     "stream-stopped": "трансляцію зупинено",
@@ -896,7 +897,7 @@
     "keyword-is-ambiguous": "$sender, keyword $keyword is ambiguous, use ID of keyword",
     "keyword-was-not-found": "$sender, keyword $keyword was not found in database",
     "response-was-not-found": "$sender, response #$response of keyword $keyword was not found in database",
-    "keyword-was-edited": "$sender, keyword $keyword is changed to '$response'",
+    "keyword-was-edited": "$sender, ключове слово $keyword змінено на '$response'",
     "keyword-was-added": "$sender, ключове слово $keyword ($id) було додано",
     "list-is-not-empty": "$sender, перелік ключових слів: $list",
     "list-is-empty": "$sender, список ключових слів порожній",
@@ -919,15 +920,15 @@
         "positive": "Всі користувачі щойно отримали $amount $pointsName!",
         "negative": "Всі користувачі просто втратили $amount $pointsName!"
       },
-      "rain": "Make it rain! All online users just received up to $amount $pointsName!",
-      "add": "$username just received $amount $pointsName!",
-      "remove": "Ouch, $amount $pointsName was removed from $username!"
+      "rain": "Дощ! Всі онлайн-користувачі можуть отримати до $amount $pointsName!",
+      "add": "$username щойно отримав(-ла) $amount $pointsName!",
+      "remove": "Отакої, $amount $pointsName було видалено з $username!"
     },
     "failed": {
-      "undo": "$sender, username wasn't found in database or user have no undo operations",
+      "undo": "$sender, ім'я користувача не знайдено в базі даних або користувач не має записів скасування операцій",
       "set": "{core.command-parse} $command [username] [amount]",
       "give": "{core.command-parse} $command [username] [amount]",
-      "giveNotEnough": "Sorry, $sender, you don't have $amount $pointsName to give it to $username",
+      "giveNotEnough": "Вибачте, $sender, у вас немає $amount $pointsName щоб дати це $username",
       "cannotGiveZeroPoints": "Sorry, $sender, you cannot give $amount $pointsName to $username",
       "get": "{core.command-parse} $command [username]",
       "online": "{core.command-parse} $command [amount]",
@@ -1104,10 +1105,10 @@
     "cooldown-was-set": "$sender, $type кулдаун для $command було встановлено на $secondss",
     "cooldown-was-unset": "$sender, cooldown for $command was unset",
     "cooldown-triggered": "$sender, '$command' is on cooldown, remaining $secondss",
-    "cooldown-not-found": "$sender, cooldown for $command was not found",
-    "cooldown-was-enabled": "$sender, cooldown for $command was enabled",
-    "cooldown-was-disabled": "$sender, cooldown for $command was disabled",
-    "cooldown-was-enabled-for-moderators": "$sender, cooldown for $command was enabled for moderators",
+    "cooldown-not-found": "$sender, час очікування для $command не знайдений",
+    "cooldown-was-enabled": "$sender, час очікування для $command був включений",
+    "cooldown-was-disabled": "$sender, час очікування для $command відключений",
+    "cooldown-was-enabled-for-moderators": "$sender, час очікування для $command увімкнено для модераторів",
     "cooldown-was-disabled-for-moderators": "$sender, cooldown for $command was disabled for moderators",
     "cooldown-was-enabled-for-owners": "$sender, cooldown for $command was enabled for owners",
     "cooldown-was-disabled-for-owners": "$sender, cooldown for $command was disabled for owners",
@@ -1126,10 +1127,10 @@
     "timer-was-set-with-offline-flag": "$sender, timer $name was set with $messages messages and $seconds seconds to trigger even when stream is offline",
     "timer-not-found": "$sender, timer (name: $name) was not found in database. Check timers with !timers list",
     "timer-deleted": "$sender, timer $name and its responses was deleted.",
-    "timer-enabled": "$sender, timer (name: $name) was enabled",
-    "timer-disabled": "$sender, timer (name: $name) was disabled",
+    "timer-enabled": "$sender, таймер (ім'я: $name) було увімкнено",
+    "timer-disabled": "$sender, таймер (назва: $name) було вимкнено",
     "timers-list": "$sender, список таймерів: $list",
-    "responses-list": "$sender, timer (name: $name) list",
+    "responses-list": "$sender, таймер (назва: $name) список",
     "response-deleted": "$sender, відповідь (id: $id) була видалена.",
     "response-was-added": "$sender, відповідь (id: $id) для таймера (ім'я: $name) було додано - '$response",
     "response-not-found": "$sender, відповідь (id: $id) не знайдено в базі даних",
