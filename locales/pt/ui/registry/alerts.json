@@ -12,7 +12,8 @@
     "amountOfGifts": "Quantidade de presentes",
     "amountOfMonths": "Quantidade de meses",
     "amountOfTips": "Gorjetas",
-    "event": "Evento"
+    "event": "Evento",
+    "service": "Service"
   },
   "empty": "Registro de alertas está vazio, crie novos alertas.",
   "emptyAfterSearch": "Registro de alertas está vazio em busca de \"<strong>$search</strong>\"",

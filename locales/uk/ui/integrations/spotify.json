@@ -4,16 +4,16 @@
     "songRequests": "Запити на пісню",
     "fetchCurrentSongWhenOffline": {
       "title": "Завантажити поточну пісню, коли потік не в мережі",
-      "help": "It's advised to have this disabled to avoid reach API limits"
+      "help": "Рекомендуємо відключити дану функцію для уникнення ліміту API"
     },
     "allowApprovedArtistsOnly": "Дозволити тільки затверджених виконавців",
     "approvedArtists": {
-      "title": "Approved artists",
+      "title": "Схвалені артисти",
       "help": "Ім'я або SpotifyURI виконавця, один елемент у рядку"
     },
     "queueWhenOffline": {
-      "title": "Queue songs when stream is offline",
-      "help": "It's advised to have this disabled to avoid queueing when you are just listening music"
+      "title": "Черга пісень, коли трансляція не в мережі",
+      "help": "Рекомендується відключити цю функцію, щоб уникнути черги, коли ви просто слухаєте музику"
     },
     "clientId": "clientId",
     "clientSecret": "clientSecret",
@@ -29,10 +29,10 @@
     "username": "Авторизований користувач",
     "revokeBtn": "Відкликати авторизацію користувача",
     "authorizeBtn": "Авторизація користувача",
-    "scopes": "Scopes",
+    "scopes": "Дозвіл",
     "playlistToPlay": {
       "title": "URI Spotify з основного плейлісту",
-      "help": "If set, after request finished this playlist will continue"
+      "help": "Якщо призначено, то по завершенню замовлених пісень цей плейлист буде продовжено"
     },
     "continueOnPlaylistAfterRequest": "Продовжити відтворення пісні після запиту пісні",
     "notify": "Надсилати повідомлення про зміну пісні"

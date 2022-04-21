@@ -12,7 +12,8 @@
     "amountOfGifts": "Amount of gifts",
     "amountOfMonths": "Amount of months",
     "amountOfTips": "Донаты",
-    "event": "Событие"
+    "event": "Событие",
+    "service": "Service"
   },
   "empty": "Список оповещений пуст, создайте новые оповещения.",
   "emptyAfterSearch": "Реестр оповещений пуст при поиске \"<strong>$search</strong>\"",

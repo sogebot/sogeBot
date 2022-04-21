@@ -12,7 +12,8 @@
     "amountOfGifts": "Anzahl der Geschenke",
     "amountOfMonths": "Anzahl der Monate",
     "amountOfTips": "Trinkgeld",
-    "event": "Ereignis"
+    "event": "Ereignis",
+    "service": "Service"
   },
   "empty": "Die Alert-Registry ist leer, erstelle einen neuen Alert.",
   "emptyAfterSearch": "Alert Registry leer! Bei der Suche nach \"<strong>$search</strong>\" wurden keine Alerts gefunden",

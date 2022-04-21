@@ -12,7 +12,8 @@
     "amountOfGifts": "Počet obdarovaných",
     "amountOfMonths": "Počet měsíců",
     "amountOfTips": "Spropitné",
-    "event": "Událost"
+    "event": "Událost",
+    "service": "Service"
   },
   "empty": "Registr alertů je prázdný, vytvořte nový.",
   "emptyAfterSearch": "Registr alertů je prázdný při hledání \"<strong>$search</strong>\"",

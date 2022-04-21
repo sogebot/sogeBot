@@ -12,7 +12,8 @@
     "amountOfGifts": "Quantità di doni",
     "amountOfMonths": "Ammontare mesi",
     "amountOfTips": "Tip",
-    "event": "Evento"
+    "event": "Evento",
+    "service": "Service"
   },
   "empty": "Il registro degli avvisi è vuoto, crea nuovi avvisi.",
   "emptyAfterSearch": "Il registro degli avvisi è vuoto nella ricerca di \"<strong>$search</strong>\"",
