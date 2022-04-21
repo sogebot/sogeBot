@@ -8,6 +8,7 @@ export interface EmitData {
   amount: number;
   tier: null | 'Prime' | '1' | '2' | '3';
   recipient?: string;
+  service?: string;
   currency: string;
   monthsName: string;
   event: keyof Omit<AlertInterface, 'id' | 'updatedAt' | 'name' |'alertDelayInMs' | 'profanityFilterType' | 'loadStandardProfanityList' | 'customProfanityList' | 'tts' | 'font' | 'fontMessage' | 'parry'>;

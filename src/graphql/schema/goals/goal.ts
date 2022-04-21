@@ -32,6 +32,8 @@ export class GoalObject implements GoalInterface {
   | 'intervalFollowers' | 'intervalTips' | 'intervalBits';
   @Field()
     countBitsAsTips: boolean;
+  @Field(type => Number, { nullable: true })
+    tiltifyCampaign?: number | null | undefined;
   @Field()
     display: 'simple' | 'full' | 'custom';
   @Field(type => Number)

@@ -9,7 +9,7 @@ import { prepare } from '~/helpers/commons';
 import { triggerInterfaceOnTip } from '~/helpers/interface';
 import { getLang } from '~/helpers/locales';
 import { error, info, tip } from '~/helpers/log';
-import { adminEndpoint } from '~/helpers/socket';
+import { adminEndpoint, publicEndpoint } from '~/helpers/socket';
 import eventlist from '~/overlays/eventlist';
 import alerts from '~/registries/alerts';
 
@@ -131,6 +131,7 @@ class Tiltify extends Integration {
           tip(`${donate.name} for ${campaign.name}, amount: ${Number(donate.amount).toFixed(2)}${campaign.causeCurrency}, message: ${donate.comment}`);
           alerts.trigger({
             event:      'tips',
+            service:    'tiltify',
             name:       donate.name,
             amount:     Number(donate.amount.toFixed(2)),
             tier:       null,
@@ -160,6 +161,9 @@ class Tiltify extends Integration {
   }
 
   sockets () {
+    publicEndpoint('/integrations/tiltify', 'tiltify::campaigns', async (cb) => {
+      cb(this.enabled ? this.campaigns : []);
+    });
     adminEndpoint('/integrations/tiltify', 'tiltify::revoke', async (cb) => {
       self.access_token = '';
       self.userName = '';

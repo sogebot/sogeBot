@@ -244,6 +244,7 @@ class Streamlabs extends Integration {
         alerts.trigger({
           event:      'tips',
           name:       event.from.toLowerCase(),
+          service:    'streamlabs',
           tier:       null,
           amount:     Number(parseFloat(event.amount).toFixed(2)),
           currency:   event.currency,

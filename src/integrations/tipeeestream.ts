@@ -190,6 +190,7 @@ class TipeeeStream extends Integration {
           });
           alerts.trigger({
             event:      'tips',
+            service:    'tipeeestream',
             name:       userName.toLowerCase(),
             amount:     Number(Number(amount).toFixed(2)),
             tier:       null,

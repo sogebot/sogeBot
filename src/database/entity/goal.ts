@@ -26,10 +26,11 @@ export interface GoalInterface {
   type:
   'followers' | 'currentFollowers' | 'currentSubscribers'
   | 'subscribers' | 'tips' | 'bits' | 'intervalSubscribers'
-  | 'intervalFollowers' | 'intervalTips' | 'intervalBits';
+  | 'intervalFollowers' | 'intervalTips' | 'intervalBits' | 'tiltifyCampaign';
   countBitsAsTips: boolean;
   display: 'simple' | 'full' | 'custom';
   timestamp?: number;
+  tiltifyCampaign?: number | null,
   interval?: 'hour' | 'day' | 'week' | 'month' | 'year';
   goalAmount?: number;
   currentAmount?: number;
@@ -98,8 +99,9 @@ export const Goal = new EntitySchema<Readonly<Required<GoalInterface>>>({
     timestamp:       {
       type: 'bigint', transformer: new ColumnNumericTransformer(), default: 0,
     },
-    interval:   { type: String, default: 'hour' },
-    goalAmount: {
+    interval:        { type: String, default: 'hour' },
+    tiltifyCampaign: { type: Number, default: null, nullable: true },
+    goalAmount:      {
       type: 'float', transformer: new ColumnNumericTransformer(), default: 0, precision: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') === 'mysql' ? 12 : undefined,
     },
     currentAmount: {
