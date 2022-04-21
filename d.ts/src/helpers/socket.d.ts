@@ -39,6 +39,8 @@ type Configuration = {
 
 export type ViewerReturnType = UserInterface & {aggregatedBits: number, aggregatedTips: number, permission: PermissionsInterface, tips: UserTipInterface[], bits: UserBitInterface[] };
 export type possibleLists = 'systems' | 'core' | 'integrations' | 'overlays' | 'games' | 'services';
+export type tiltifyCampaign = { id: number, name: string, slug: string, startsAt: number, endsAt: null | number, description: string, causeId: number, originalFundraiserGoal: number, fundraiserGoalAmount: number, supportingAmountRaised: number, amountRaised: number, supportable: boolean, status: 'published', type: 'Event', avatar: {   src: string,   alt: string,   width: number,   height: number, }, livestream: {   type: 'twitch',   channel: string, } | null, causeCurrency: 'USD', totalAmountRaised: 0, user: {   id: number,   username: string,   slug: string,   url: string,   avatar: {     src: string,     alt: string,     width: number,     height: number,   }, }, regionId: null, metadata: Record<string, unknown>};
+
 export interface getListOfReturn {
   systems: {
     name: string; enabled: boolean; areDependenciesEnabled: boolean; isDisabledByEnv: boolean;
@@ -96,6 +98,7 @@ export type ClientToServerEventsWithNamespace = {
     'pubg::exampleParse': (data: { text: string}, cb: (err: Error | string | null, data: string | null) => void) => void,
   },
   '/integrations/tiltify': GenericEvents & {
+    'tiltify::campaigns': (cb: (campaigns: tiltifyCampaign[]) => void) => void,
     'tiltify::code': (token: string, cb: (err: Error | string | null) => void) => void,
     'tiltify::revoke': (cb: (err: Error | string | null) => void) => void,
   },

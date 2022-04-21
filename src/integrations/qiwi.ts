@@ -112,6 +112,7 @@ class Qiwi extends Integration {
       alerts.trigger({
         event:      'tips',
         name:       username || 'Anonymous',
+        service:    'qiwi',
         amount,
         tier:       null,
         currency:   DONATION_CURRENCY,

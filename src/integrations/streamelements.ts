@@ -201,6 +201,7 @@ class StreamElements extends Integration {
         });
         alerts.trigger({
           event:      'tips',
+          service:    'streamelements',
           name:       username.toLowerCase(),
           amount:     Number(Number(amount).toFixed(2)),
           tier:       null,

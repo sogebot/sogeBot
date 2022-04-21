@@ -234,6 +234,7 @@ class Donationalerts extends Integration {
 
       alerts.trigger({
         event:      'tips',
+        service:    'donationalerts',
         name:       data.username.toLowerCase(),
         amount:     Number(data.amount.toFixed(2)),
         tier:       null,
