@@ -9,7 +9,7 @@ import { prepare } from '~/helpers/commons';
 import { triggerInterfaceOnTip } from '~/helpers/interface';
 import { getLang } from '~/helpers/locales';
 import { error, info, tip } from '~/helpers/log';
-import { adminEndpoint } from '~/helpers/socket';
+import { adminEndpoint, publicEndpoint } from '~/helpers/socket';
 import eventlist from '~/overlays/eventlist';
 import alerts from '~/registries/alerts';
 
