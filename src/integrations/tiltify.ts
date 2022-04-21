@@ -1,11 +1,13 @@
 import { Mutex } from 'async-mutex';
 import fetch from 'node-fetch';
 
-import { persistent, settings } from '../decorators';
+import { command, persistent, settings } from '../decorators';
 import Integration from './_interface';
 
 import { onStartup } from '~/decorators/on';
+import { prepare } from '~/helpers/commons';
 import { triggerInterfaceOnTip } from '~/helpers/interface';
+import { getLang } from '~/helpers/locales';
 import { error, info, tip } from '~/helpers/log';
 import { adminEndpoint } from '~/helpers/socket';
 import eventlist from '~/overlays/eventlist';
@@ -25,29 +27,46 @@ class Tiltify extends Integration {
     lastCheckAt = Date.now();
 
   campaigns: {
-    id: number;
+    id: number,
     name: string,
     slug: string,
-    url: string,
+    startsAt: number,
+    endsAt: null | number,
     description: string,
-    thumbnail: {
+    causeId: number,
+    originalFundraiserGoal: number,
+    fundraiserGoalAmount: number,
+    supportingAmountRaised: number,
+    amountRaised: number,
+    supportable: boolean,
+    status: 'published',
+    type: 'Event',
+    avatar: {
       src: string,
       alt: string,
       width: number,
-      height: number
+      height: number,
     },
-    causeId: number,
-    userId: number,
-    teamId: null | number,
-    fundraisingEventId: number,
-    currency: string,
-    goal: number,
-    supportingCampaignId: number,
-    originalGoal: number,
-    amountRaised: number,
-    totalAmountRaised: number,
-    startsOn: string,
-    endsOn: string | null
+    livestream: {
+      type: 'twitch',
+      channel: string,
+    } | null,
+    causeCurrency: 'USD',
+    totalAmountRaised: 0,
+    user: {
+      id: number,
+      username: string,
+      slug: string,
+      url: string,
+      avatar: {
+        src: string,
+        alt: string,
+        width: number,
+        height: number,
+      },
+    },
+    regionId: null,
+    metadata: Record<string, unknown>,
   }[] = [];
   donations: Record<number,
   {
@@ -70,8 +89,12 @@ class Tiltify extends Integration {
       if (this.enabled) {
         if (this.access_token.length > 0 && this.userName.length > 0 && String(this.userId).length > 0) {
           const release = await mutex.acquire();
-          await this.getCampaigns();
-          await this.getDonations();
+          try {
+            await this.getCampaigns();
+            await this.getDonations();
+          } catch(e) {
+            error(e);
+          }
           release();
         }
       }
@@ -89,7 +112,7 @@ class Tiltify extends Integration {
 
   async getDonations() {
     for (const campaign of this.campaigns) {
-      const response = await fetch(`https://tiltify.com/api/v3/campaign/${campaign.id}/donations`, {
+      const response = await fetch(`https://tiltify.com/api/v3/campaigns/${campaign.id}/donations`, {
         headers: {
           'Authorization': `Bearer ${this.access_token}`,
         },
@@ -105,29 +128,30 @@ class Tiltify extends Integration {
 
       for (const donate of data) {
         if (this.lastCheckAt < donate.completedAt) {
-          tip(`${donate.name}#tiltify, amount: ${Number(donate.amount).toFixed(2)}${campaign.currency}, message: ${donate.comment}`);
+          tip(`${donate.name} for ${campaign.name}, amount: ${Number(donate.amount).toFixed(2)}${campaign.causeCurrency}, message: ${donate.comment}`);
           alerts.trigger({
             event:      'tips',
             name:       donate.name,
             amount:     Number(donate.amount.toFixed(2)),
             tier:       null,
-            currency:   campaign.currency,
+            currency:   campaign.causeCurrency,
             monthsName: '',
             message:    donate.comment,
           });
           eventlist.add({
-            event:     'tip',
-            amount:    donate.amount,
-            currency:  campaign.currency,
-            userId:    `${donate.name}#__anonymous__`,
-            message:   donate.comment,
-            timestamp: donate.completedAt,
+            event:               'tip',
+            amount:              donate.amount,
+            currency:            campaign.causeCurrency,
+            userId:              `${donate.name}#__anonymous__`,
+            message:             donate.comment,
+            timestamp:           donate.completedAt,
+            charityCampaignName: campaign.name,
           });
           triggerInterfaceOnTip({
             userName:  donate.name,
             amount:    donate.amount,
             message:   donate.comment,
-            currency:  campaign.currency,
+            currency:  campaign.causeCurrency,
             timestamp: donate.completedAt,
           });
         }
@@ -163,6 +187,23 @@ class Tiltify extends Integration {
 
       cb(null);
     });
+  }
+
+  @command('!charity')
+  commandCharity(opts: CommandOptions) {
+    const responses: string[] = [];
+    for (const campaign of this.campaigns) {
+      responses.push(`${responses.length+1}. ${campaign.name} - ${campaign.amountRaised.toLocaleString(getLang(), { style: 'currency', currency: campaign.causeCurrency })} of ${campaign.fundraiserGoalAmount.toLocaleString(getLang(), { style: 'currency', currency: campaign.causeCurrency })} => ${campaign.user.url}/${campaign.slug}`);
+    }
+    if (responses.length > 0) {
+      return [prepare('integrations.tiltify.active_campaigns'), ...responses].map(response => ({
+        response, ...opts,
+      }));
+    } else {
+      return [
+        { response: prepare('integrations.tiltify.no_active_campaigns'), ...opts },
+      ];
+    }
   }
 }
 

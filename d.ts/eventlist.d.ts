@@ -23,5 +23,6 @@ declare namespace EventList {
     subCumulativeMonthsName?: string;
     count?: number;
     monthsName?: string;
+    charityCampaignName?: string;
   }
 }
