@@ -1,3 +1,4 @@
+import { MINUTE } from '@sogebot/ui-helpers/constants';
 import axios from 'axios';
 import { getRepository } from 'typeorm';
 
@@ -16,7 +17,7 @@ import { variables } from '~/watchers';
 class Chat extends Widget {
   @timer()
   async withEmotes (text: string | undefined) {
-    const emotes = await getRepository(CacheEmotes).find();
+    const emotes = await getRepository(CacheEmotes).find({ cache: 60 * MINUTE });
     if (typeof text === 'undefined' || text.length === 0) {
       return '';
     }
