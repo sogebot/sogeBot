@@ -1,11 +1,8 @@
-import { MINUTE } from '@sogebot/ui-helpers/constants';
 import axios from 'axios';
-import { getRepository } from 'typeorm';
 
 import { timer } from '../decorators';
 import Widget from './_interface';
 
-import { CacheEmotes } from '~/database/entity/cacheEmotes';
 import { onMessage } from '~/decorators/on';
 import { getUserSender } from '~/helpers/commons';
 import { sendMessage } from '~/helpers/commons/sendMessage';
@@ -17,12 +14,13 @@ import { variables } from '~/watchers';
 class Chat extends Widget {
   @timer()
   async withEmotes (text: string | undefined) {
-    const emotes = await getRepository(CacheEmotes).find({ cache: 60 * MINUTE });
+    const Emotes = (await import('../emotes')).default;
     if (typeof text === 'undefined' || text.length === 0) {
       return '';
     }
+
     // checking emotes
-    for (const emote of emotes) {
+    for (const emote of Emotes.cache) {
       const split: string[] = (text as string).split(' ');
       for (let i = 0; i < split.length; i++) {
         if (split[i] === emote.code) {

@@ -3,7 +3,6 @@ import { setImmediate } from 'timers';
 import { shuffle } from '@sogebot/ui-helpers/array';
 import * as constants from '@sogebot/ui-helpers/constants';
 import axios from 'axios';
-import { getManager, getRepository, In } from 'typeorm';
 import { v4 as uuid } from 'uuid';
 
 import { onStartup } from './decorators/on';
@@ -12,7 +11,6 @@ import { adminEndpoint, publicEndpoint } from './helpers/socket';
 import client from './services/twitch/api/client';
 
 import Core from '~/_interface';
-import { CacheEmotes, CacheEmotesInterface } from '~/database/entity/cacheEmotes';
 import { parser, settings } from '~/decorators';
 import {
   debug,
@@ -25,6 +23,12 @@ import { variables } from '~/watchers';
 let broadcasterWarning = false;
 
 class Emotes extends Core {
+  cache: {
+    code: string;
+    type: 'twitch' | 'twitch-sub' | 'ffz' | 'bttv' | '7tv';
+    urls: { '1': string; '2': string; '3': string };
+  }[] = [];
+
   @settings()
     '7tv' = true;
   @settings()
@@ -50,7 +54,7 @@ class Emotes extends Core {
   interval: NodeJS.Timer;
 
   get types() {
-    const types: CacheEmotesInterface['type'][] = ['twitch', 'twitch-sub'];
+    const types: Emotes['cache'][number]['type'][] = ['twitch', 'twitch-sub'];
     if (this['7tv']) {
       types.push('7tv');
     }
@@ -67,7 +71,7 @@ class Emotes extends Core {
   onStartup() {
     publicEndpoint('/core/emotes', 'getCache', async (cb) => {
       try {
-        cb(null, await getRepository(CacheEmotes).find({ type: In(this.types) }));
+        cb(null, this.cache.filter(o => this.types.includes(o.type)));
       } catch (e: any) {
         cb(e.stack, []);
       }
@@ -124,7 +128,7 @@ class Emotes extends Core {
     this.lastFFZEmoteChk = 0;
     this.last7TVEmoteChk = 0;
     this.lastBTTVEmoteChk = 0;
-    await getManager().clear(CacheEmotes);
+    this.cache = [];
 
     if (!this.fetch.global) {
       this.fetchEmotesGlobal();
@@ -163,10 +167,10 @@ class Emotes extends Core {
           const clientBot = await client('bot');
           const emotes = await clientBot.chat.getChannelEmotes(broadcasterId);
           this.lastSubscriberEmoteChk = Date.now();
-          await getRepository(CacheEmotes).delete({ type: 'twitch-sub' });
+          this.cache = this.cache.filter(o => o.type !== 'twitch-sub');
           for (const emote of emotes) {
             debug('emotes.channel', `Saving to cache ${emote.name}#${emote.id}`);
-            await getRepository(CacheEmotes).save({
+            this.cache.push({
               code: emote.name,
               type: 'twitch',
               urls: {
@@ -204,11 +208,11 @@ class Emotes extends Core {
         const clientBot = await client('bot');
         const emotes = await clientBot.chat.getGlobalEmotes();
         this.lastGlobalEmoteChk = Date.now();
-        await getRepository(CacheEmotes).delete({ type: 'twitch' });
+        this.cache = this.cache.filter(o => o.type !== 'twitch');
         for (const emote of emotes) {
           await setImmediateAwait();
           debug('emotes.global', `Saving to cache ${emote.name}#${emote.id}`);
-          await getRepository(CacheEmotes).save({
+          this.cache.push({
             code: emote.name,
             type: 'twitch',
             urls: {
@@ -257,8 +261,8 @@ class Emotes extends Core {
         for (let i = 0, length = emotes.length; i < length; i++) {
           // change 4x to 3x, to be same as Twitch and BTTV
           emotes[i].urls['3'] = emotes[i].urls['4']; delete emotes[i].urls['4'];
-          const cachedEmote = (await getRepository(CacheEmotes).findOne({ code: emotes[i].code, type: 'ffz' }));
-          await getRepository(CacheEmotes).save({
+          const cachedEmote = this.cache.find(o => o.code === emotes[i].code && o.type === 'ffz');
+          this.cache.push({
             ...cachedEmote,
             code: emotes[i].name,
             type: 'ffz',
@@ -299,8 +303,8 @@ class Emotes extends Core {
 
       for (let i = 0, length = request.data.data.search_emotes.length; i < length; i++) {
         await setImmediateAwait();
-        const cachedEmote = (await getRepository(CacheEmotes).findOne({ code: request.data.data.search_emotes[i].name, type: '7tv' }));
-        await getRepository(CacheEmotes).save({
+        const cachedEmote = this.cache.find(o => o.code === request.data.data.search_emotes[i].name && o.type === '7tv');
+        this.cache.push({
           ...cachedEmote,
           code: request.data.data.search_emotes[i].name,
           type: '7tv',
@@ -335,8 +339,8 @@ class Emotes extends Core {
 
       for (let i = 0, length = request.data.data.search_emotes.length; i < length; i++) {
         await setImmediateAwait();
-        const cachedEmote = (await getRepository(CacheEmotes).findOne({ code: request.data.data.search_emotes[i].name, type: '7tv' }));
-        await getRepository(CacheEmotes).save({
+        const cachedEmote = this.cache.find(o => o.code === request.data.data.search_emotes[i].name && o.type === '7tv');
+        this.cache.push({
           ...cachedEmote,
           code: request.data.data.search_emotes[i].name,
           type: '7tv',
@@ -363,7 +367,7 @@ class Emotes extends Core {
     if (currentChannel && Date.now() - this.last7TVEmoteChk > 1000 * 60 * 60 * 24 * 7) {
       info('EMOTES: Fetching 7tv emotes');
       this.last7TVEmoteChk = Date.now();
-      await getRepository(CacheEmotes).delete({ type: '7tv' });
+      this.cache = this.cache.filter(o => o.type !== '7tv');
       try {
         const urlTemplate = `https://cdn.7tv.app/emote/{{id}}/{{image}}`;
 
@@ -393,7 +397,7 @@ class Emotes extends Core {
     if (currentChannel && Date.now() - this.lastBTTVEmoteChk > 1000 * 60 * 60 * 24 * 7) {
       info('EMOTES: Fetching bttv emotes');
       this.lastBTTVEmoteChk = Date.now();
-      await getRepository(CacheEmotes).delete({ type: 'bttv' });
+      this.cache = this.cache.filter(o => o.type !== 'bttv');
       try {
         const request = await axios.get<any>('https://api.betterttv.net/2/channels/' + currentChannel);
 
@@ -401,8 +405,8 @@ class Emotes extends Core {
         const emotes = request.data.emotes;
 
         for (let i = 0, length = emotes.length; i < length; i++) {
-          const cachedEmote = (await getRepository(CacheEmotes).findOne({ code: emotes[i].code, type: 'bttv' }));
-          await getRepository(CacheEmotes).save({
+          const cachedEmote = this.cache.find(o => o.code === emotes[i].code && o.type === 'bttv');
+          this.cache.push({
             ...cachedEmote,
             code: emotes[i].code,
             type: 'bttv',
@@ -462,7 +466,7 @@ class Emotes extends Core {
     }
 
     const parsed: string[] = [];
-    const usedEmotes: { [code: string]: Readonly<Required<CacheEmotesInterface>>} = {};
+    const usedEmotes: { [code: string]: Emotes['cache'][number]} = {};
 
     if (opts.emotesOffsets) {
     // add emotes from twitch which are not maybe in cache (other partner emotes etc)
@@ -473,10 +477,9 @@ class Emotes extends Core {
           continue;
         }
         const emoteCode = opts.message.slice(Number(firstEmoteOffset.split('-')[0]), Number(firstEmoteOffset.split('-')[1])+1);
-        const emoteFromCache = await getRepository(CacheEmotes).findOne({ code: emoteCode });
-        if (!emoteFromCache) {
-          const data: Required<CacheEmotesInterface> = {
-            id:   uuid(),
+        const idx = this.cache.findIndex(o => o.code === emoteCode);
+        if (idx === -1) {
+          const data = {
             type: 'twitch',
             code: emoteCode,
             urls: {
@@ -484,10 +487,10 @@ class Emotes extends Core {
               '2': 'https://static-cdn.jtvnw.net/emoticons/v1/' + emoteId + '/2.0',
               '3': 'https://static-cdn.jtvnw.net/emoticons/v1/' + emoteId + '/3.0',
             },
-          };
+          } as const;
 
           // update emotes in cache
-          await getRepository(CacheEmotes).save(data);
+          this.cache.push(data);
         }
       }
     }
@@ -497,8 +500,7 @@ class Emotes extends Core {
         continue;
       } // this emote was already parsed
       parsed.push(potentialEmoteCode);
-
-      const emoteFromCache = await getRepository(CacheEmotes).findOne({ code: potentialEmoteCode, type: In(this.types) });
+      const emoteFromCache = this.cache.find(o => o.code === potentialEmoteCode && this.types.includes(o.type));
       if (emoteFromCache) {
         for (let i = 0; i < opts.message.split(' ').filter(word => word === potentialEmoteCode).length; i++) {
           usedEmotes[potentialEmoteCode + `${i}`] = emoteFromCache;
@@ -519,7 +521,7 @@ class Emotes extends Core {
 
     for (let i = 0, length = emotes.length; i < length; i++) {
       try {
-        const items = await getRepository(CacheEmotes).find({ code: emotes[i] });
+        const items = this.cache.filter(o => o.code === emotes[i]);
         if (items.length > 0) {
           emotesArray.push(items[0].urls);
         }
