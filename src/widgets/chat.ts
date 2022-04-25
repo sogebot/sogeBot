@@ -24,7 +24,7 @@ class Chat extends Widget {
       const split: string[] = (text as string).split(' ');
       for (let i = 0; i < split.length; i++) {
         if (split[i] === emote.code) {
-          split[i] = `<span class="simpleChatImage"><img src='${emote.urls[1]}' class="emote"/></span>`;
+          split[i] = `<span class="simpleChatImage"><img src='${emote.urls[1]}' class="emote" alt="${emote.code}" title="${emote.code}"/></span>`;
         }
       }
       text = split.join(' ');
@@ -37,7 +37,7 @@ class Chat extends Widget {
     this.withEmotes(message.message).then(data => {
       ioServer?.of('/widgets/chat').emit('message', {
         timestamp: message.timestamp,
-        username:  message.sender.userName,
+        username:  message.sender.displayName.toLowerCase() === message.sender.userName ? message.sender.displayName : `${message.sender.displayName} (${message.sender.userName})`,
         message:   data,
       });
     });
