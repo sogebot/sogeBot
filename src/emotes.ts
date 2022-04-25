@@ -459,7 +459,7 @@ class Emotes extends Core {
     ioServer?.of('/services/twitch').emit('emote.explode', { emotes });
   }
 
-  @parser({ priority: constants.LOW, fireAndForget: true })
+  @parser({ priority: constants.LOW })
   async containsEmotes (opts: ParserOptions) {
     if (!opts.sender) {
       return true;
