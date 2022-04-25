@@ -1,7 +1,4 @@
-import { CacheEmotes, CacheEmotesInterface } from '@entity/cacheEmotes';
 import * as constants from '@sogebot/ui-helpers/constants';
-import { getRepository } from 'typeorm';
-import { v4 } from 'uuid';
 
 import { parserReply } from '../commons';
 import { parser, settings } from '../decorators';
@@ -11,16 +8,6 @@ import { onStreamStart } from '~/decorators/on';
 import { prepare } from '~/helpers/commons';
 import { ioServer } from '~/helpers/panel';
 import { translate } from '~/translate';
-
-interface EmotesCombo {
-  id: string,
-  name: string,
-  images: {
-    url_1x: string,
-    url_2x: string,
-    url_4x: string,
-  },
-}
 
 class EmotesCombo extends System {
   @settings()
@@ -59,8 +46,10 @@ class EmotesCombo extends System {
       return true;
     }
 
+    const Emotes = (await import('../emotes')).default;
+
     const parsed: string[] = [];
-    const usedEmotes: { [code: string]: Readonly<Required<CacheEmotesInterface>>} = {};
+    const usedEmotes: { [code: string]: typeof Emotes.cache[number]} = {};
 
     if (opts.emotesOffsets) {
       // add emotes from twitch which are not maybe in cache (other partner emotes etc)
@@ -71,10 +60,9 @@ class EmotesCombo extends System {
           continue;
         }
         const emoteCode = opts.message.slice(Number(firstEmoteOffset.split('-')[0]), Number(firstEmoteOffset.split('-')[1])+1);
-        const emoteFromCache = await getRepository(CacheEmotes).findOne({ code: emoteCode });
+        const emoteFromCache = Emotes.cache.find(o => o.code === emoteCode);
         if (!emoteFromCache) {
-          const data: Required<CacheEmotesInterface> = {
-            id:   v4(),
+          const data = {
             type: 'twitch',
             code: emoteCode,
             urls: {
@@ -82,10 +70,10 @@ class EmotesCombo extends System {
               '2': 'https://static-cdn.jtvnw.net/emoticons/v1/' + emoteId + '/2.0',
               '3': 'https://static-cdn.jtvnw.net/emoticons/v1/' + emoteId + '/3.0',
             },
-          };
+          } as const;
 
           // update emotes in cache
-          await getRepository(CacheEmotes).save(data);
+          Emotes.cache.push(data);
         }
       }
     }
@@ -96,7 +84,7 @@ class EmotesCombo extends System {
       } // this emote was already parsed
       parsed.push(potentialEmoteCode);
 
-      const emoteFromCache = await getRepository(CacheEmotes).findOne({ code: potentialEmoteCode });
+      const emoteFromCache = Emotes.cache.find(o => o.code === potentialEmoteCode);
       if (emoteFromCache) {
         for (let i = 0; i < opts.message.split(' ').filter(word => word === potentialEmoteCode).length; i++) {
           usedEmotes[potentialEmoteCode] = emoteFromCache;
