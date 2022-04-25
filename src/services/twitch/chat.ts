@@ -335,13 +335,15 @@ class Chat {
         }
         // strip message from ACTION
         message = message.replace('\u0001ACTION ', '').replace('\u0001', '');
-        this.message({ userstate, message, id: msg.id, emotesOffsets: msg.emoteOffsets, isAction: true });
-        linesParsedIncrement();
-        triggerInterfaceOnMessage({
-          sender:    userstate,
-          message,
-          timestamp: Date.now(),
-        });
+        this.message({ userstate, message, id: msg.id, emotesOffsets: msg.emoteOffsets, isAction: true })
+          .then(() => {
+            linesParsedIncrement();
+            triggerInterfaceOnMessage({
+              sender:    userstate,
+              message,
+              timestamp: Date.now(),
+            });
+          });
 
         eventEmitter.emit('action', { userName: userstate.userName?.toLowerCase() ?? '', source: 'twitch' });
       });
@@ -353,12 +355,13 @@ class Chat {
         }
         this.message({
           userstate, message, id: msg.id, emotesOffsets: msg.emoteOffsets, isAction: false, isFirstTimeMessage: msg.tags.get('first-msg') === '1',
-        });
-        linesParsedIncrement();
-        triggerInterfaceOnMessage({
-          sender:    userstate,
-          message,
-          timestamp: Date.now(),
+        }).then(() => {
+          linesParsedIncrement();
+          triggerInterfaceOnMessage({
+            sender:    userstate,
+            message,
+            timestamp: Date.now(),
+          });
         });
       });
 
