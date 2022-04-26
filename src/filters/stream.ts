@@ -5,12 +5,14 @@ import type { ResponseFilter } from '.';
 
 const stream: ResponseFilter = {
   '(stream|#|link)': async function (filter, attr) {
-    let channel = filter.replace('(stream|', '').replace('|link)', '').replace('@', '');
+    let channel = filter.replace('(stream|', '').replace('|link)', '');
 
     // handle edge case when channel is parameter in checkFilter
     if (channel === '$param' || channel === '$touser') {
       channel = await param.$param('', attr);
     }
+
+    channel = channel.replace('@', '');
 
     if (channel.trim().length === 0) {
       return '';
@@ -18,12 +20,15 @@ const stream: ResponseFilter = {
     return `twitch.tv/${channel}`;
   },
   '(stream|#|game)': async function (filter, attr) {
-    let channel = filter.replace('(stream|', '').replace('|game)', '').replace('@', '');
+    let channel = filter.replace('(stream|', '').replace('|game)', '');
 
     // handle edge case when channel is parameter in checkFilter
     if (channel === '$param' || channel === '$touser') {
       channel = await param.$param('', attr);
     }
+
+    channel = channel.replace('@', '');
+
     try {
       const clientBot = await client('bot');
       const getUserByName = await clientBot.users.getUserByName(channel);
@@ -41,12 +46,15 @@ const stream: ResponseFilter = {
     }
   },
   '(stream|#|title)': async function (filter, attr) {
-    let channel = filter.replace('(stream|', '').replace('|title)', '').replace('@', '');
+    let channel = filter.replace('(stream|', '').replace('|title)', '');
 
     // handle edge case when channel is parameter in checkFilter
     if (channel === '$param' || channel === '$touser') {
       channel = await param.$param('', attr);
     }
+
+    channel = channel.replace('@', '');
+
     try {
       const clientBot = await client('bot');
       const getUserByName = await clientBot.users.getUserByName(channel);
@@ -70,6 +78,9 @@ const stream: ResponseFilter = {
     if (channel === '$param' || channel === '$touser') {
       channel = await param.$param('', attr);
     }
+
+    channel = channel.replace('@', '');
+
     try {
       const clientBot = await client('bot');
       const getStreams = await clientBot.streams.getStreams({ userName: channel });
@@ -88,6 +99,9 @@ const stream: ResponseFilter = {
     if (channel === '$param' || channel === '$touser') {
       channel = await param.$param('', attr);
     }
+
+    channel = channel.replace('@', '');
+
     try {
       const clientBot = await client('bot');
       const getStreams = await clientBot.streams.getStreams({ userName: channel });

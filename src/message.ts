@@ -71,7 +71,7 @@ class Message {
     await this.parseMessageCommand(command, attr);
     await this.parseMessageEach(qs, attr, false);
     await this.parseMessageEach(list, attr);
-    await this.parseMessageEach(stream, attr, true, '$\\w0-9');
+    await this.parseMessageEach(stream, attr, true, '$\\@\\w0-9');
     await this.parseMessageEach(count, attr);
     await this.parseMessageEach(operation, attr, false);
     await this.parseMessageEval(evaluate, attr);
