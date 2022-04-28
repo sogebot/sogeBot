@@ -1,6 +1,6 @@
 import { setTimeout } from 'timers/promises';
 
-import { Plugin } from './database/entity/plugins';
+import { Plugin, PluginVariable } from './database/entity/plugins';
 import { flatten } from './helpers/flatten';
 import { info, warning } from './helpers/log';
 import { adminEndpoint } from './helpers/socket';
@@ -126,7 +126,9 @@ class Plugins extends Core {
             // TODO: we fake loading from db for now
             const variableName = node.data.value;
             const defaultValue = (JSON.parse(node.data.data) as any).value;
-            variables[variableName] = defaultValue;
+
+            const variable = await PluginVariable.findOne({ variableName, pluginId });
+            variables[variableName] = variable ? JSON.parse(variable.value) : defaultValue;
             break;
           }
         }
