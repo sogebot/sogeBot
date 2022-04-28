@@ -1,8 +1,26 @@
+import { setTimeout } from 'timers/promises';
+
 import { Plugin } from './database/entity/plugins';
+import { flatten } from './helpers/flatten';
+import { info, warning } from './helpers/log';
 import { adminEndpoint } from './helpers/socket';
 
 import Core from '~/_interface';
 import { onStartup } from '~/decorators/on';
+
+type Node = {
+  id: number,
+  name: string,
+  data: { value: string, data: string },
+  class: string,
+  html: string,
+  inputs: { input_1: { connections: {
+    node: string,
+  }[] }} | Record<string, never>,
+  outputs: { output_1: { connections: {
+    node: string,
+  }[] }},
+};
 
 const twitchChatMessage = {
   sender: {
@@ -85,6 +103,70 @@ class Plugins extends Core {
     });
   }
 
+  template(message: string, params: Record<string, any>) {
+    params = flatten(params);
+    const regexp = new RegExp(`{ *?(?<variable>[a-zA-Z0-9.]+) *?}`, 'g');
+    const match = message.matchAll(regexp);
+    for (const item of match) {
+      message = message.replace(item[0], params[item[1]]);
+    }
+    return message;
+  }
+
+  async processPath(pluginId: string, workflow: Node[], currentNode: Node, parameters: Record<string, any>, variables: Record<string, any>, userstate: ChatUser ) {
+    // we need to check inputs first (currently just for load variable)
+    if (currentNode.inputs.input_1) {
+      const inputs = currentNode.inputs.input_1.connections.map((item) => workflow.find(wItem => wItem.id === Number(item.node)));
+      for(const node of inputs) {
+        if (!node) {
+          continue;
+        }
+        switch(node.name) {
+          case 'variableLoadFromDatabase': {
+            // TODO: we fake loading from db for now
+            const variableName = node.data.value;
+            const defaultValue = (JSON.parse(node.data.data) as any).value;
+            variables[variableName] = defaultValue;
+            break;
+          }
+        }
+      }
+    }
+
+    // process node
+    switch(currentNode.name) {
+      case 'listener': {
+        // do nothing with listener and continue
+        break;
+      }
+      case 'othersIdle': {
+        let miliseconds = await this.template(currentNode.data.value, { parameters, ...variables });
+        if (isNaN(Number(miliseconds))) {
+          warning(`PLUGINS#${pluginId}: Idling value is not a number! Got: ${miliseconds}, defaulting to 1000`);
+          miliseconds = '1000';
+        }
+        await setTimeout(Number(miliseconds));
+        break;
+      }
+      case 'outputLog': {
+        info(`PLUGINS#${pluginId}: ${await this.template(currentNode.data.value, { parameters, ...variables })}`);
+        break;
+      }
+      default:
+        warning(`PLUGINS: no idea what should I do with ${currentNode.name}, stopping`);
+        console.log({ currentNode, parameters, variables });
+        return;
+    }
+
+    const nodes = currentNode.outputs.output_1.connections.map((item) => workflow.find(wItem => wItem.id === Number(item.node)));
+    for (const node of nodes) {
+      if (!node) {
+        continue;
+      }
+      this.processPath(pluginId, workflow, node, parameters, variables, userstate);
+    }
+  }
+
   async process(type: keyof typeof this.listeners, message: string, userstate: ChatUser) {
     const plugins = await Plugin.find();
     const pluginsWithListener: Plugin[] = [];
@@ -92,7 +174,7 @@ class Plugins extends Core {
       // explore drawflow
       const workflow = Object.values(
         JSON.parse(plugin.workflow).drawflow.Home.data
-      );
+      ) as Node[];
 
       const listeners = workflow.filter((o: any) => {
         let params: Record<string, any> = {};
@@ -130,12 +212,12 @@ class Plugins extends Core {
               };
 
               if (isExactCommand && doesParametersMatch()) {
-                console.log('Starting this listener', { o, params });
+                this.processPath(plugin.id, workflow, o, params, {}, userstate);
               }
               break;
             }
             default:
-              console.log('Starting this listener', { o, params });
+              this.processPath(plugin.id, workflow, o, params, {}, userstate);
               return true;
           }
         }
