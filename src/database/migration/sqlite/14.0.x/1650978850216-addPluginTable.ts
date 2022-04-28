@@ -5,7 +5,7 @@ export class addPluginTable1650978850216 implements MigrationInterface {
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`CREATE TABLE "plugin" ("id" varchar PRIMARY KEY NOT NULL, "name" varchar NOT NULL, "workflow" text NOT NULL)`);
-    await queryRunner.query(`CREATE TABLE "plugin_variable" ("variableName" varchar PRIMARY KEY NOT NULL, "pluginId" varchar PRIMARY KEY NOT NULL, "value" text NOT NULL)`);
+    await queryRunner.query(`CREATE TABLE "plugin_variable" ("variableName" varchar NOT NULL, "pluginId" varchar NOT NULL, "value" text NOT NULL, PRIMARY KEY ("variableName", "pluginId"))`);
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
