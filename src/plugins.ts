@@ -1,5 +1,8 @@
 import { setTimeout } from 'timers/promises';
 
+import { cloneDeep } from 'lodash';
+import { VM } from 'vm2';
+
 import { Plugin, PluginVariable } from './database/entity/plugins';
 import { flatten } from './helpers/flatten';
 import { info, warning } from './helpers/log';
@@ -114,6 +117,9 @@ class Plugins extends Core {
   }
 
   async processPath(pluginId: string, workflow: Node[], currentNode: Node, parameters: Record<string, any>, variables: Record<string, any>, userstate: ChatUser ) {
+    parameters = cloneDeep(parameters);
+    variables = cloneDeep(variables);
+
     // we need to check inputs first (currently just for load variable)
     if (currentNode.inputs.input_1) {
       const inputs = currentNode.inputs.input_1.connections.map((item) => workflow.find(wItem => wItem.id === Number(item.node)));
@@ -123,7 +129,6 @@ class Plugins extends Core {
         }
         switch(node.name) {
           case 'variableLoadFromDatabase': {
-            // TODO: we fake loading from db for now
             const variableName = node.data.value;
             const defaultValue = (JSON.parse(node.data.data) as any).value;
 
@@ -139,6 +144,29 @@ class Plugins extends Core {
     switch(currentNode.name) {
       case 'listener': {
         // do nothing with listener and continue
+        break;
+      }
+      case 'variableSetVariable': {
+        const variableName = currentNode.data.value;
+        const toEval = JSON.parse(currentNode.data.data).value.trim();
+
+        const vm = new VM({
+          sandbox: {
+            parameters, ...variables,
+          },
+        });
+        const value = await vm.run(`(function () { return ${toEval} })`)();
+
+        variables[variableName] = value;
+        break;
+      }
+      case 'variableSaveToDatabase': {
+        const variableName = currentNode.data.value;
+        const variable = new PluginVariable();
+        variable.variableName = variableName;
+        variable.pluginId = pluginId;
+        variable.value = JSON.stringify(variables[variableName]);
+        await variable.save();
         break;
       }
       case 'othersIdle': {
