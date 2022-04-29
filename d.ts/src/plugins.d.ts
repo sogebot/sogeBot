@@ -1,7 +1,7 @@
-export type Node = {
+export type Node<T = string> = {
   id: number,
   name: string,
-  data: { value: string, data: string },
+  data: { value: T, data: string },
   class: string,
   html: string,
   inputs: { input_1: { connections: {

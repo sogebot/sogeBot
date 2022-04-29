@@ -1,4 +1,5 @@
 import type { Node } from '../../d.ts/src/plugins';
+import filterPermission from './nodes/filterPermission';
 import listener from './nodes/listener';
 import othersIdle from './nodes/othersIdle';
 import outputLog from './nodes/outputLog';
@@ -14,6 +15,7 @@ export const processes = {
   listener,
   othersIdle,
   outputLog,
+  filterPermission,
   variableSaveToDatabase,
   variableSetVariable,
   twitchTimeoutUser,
@@ -26,7 +28,7 @@ export const processes = {
 };
 
 function processNode (type: keyof typeof processes, pluginId: string, currentNode: Node, parameters: Record<string, any>, variables: Record<string, any>, userstate: ChatUser): Promise<boolean> | boolean {
-  return (processes[processes[type] ? type : 'default'](pluginId, currentNode, parameters, variables, userstate));
+  return (processes[processes[type] ? type : 'default'](pluginId, currentNode as any, parameters, variables, userstate));
 }
 
 export {

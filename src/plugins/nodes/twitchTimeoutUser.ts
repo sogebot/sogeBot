@@ -1,7 +1,7 @@
 import { template } from '../template';
 
 import type { Node } from '~/../d.ts/src/plugins';
-import { info, timeout as timeoutLog, warning } from '~/helpers/log';
+import { info, warning } from '~/helpers/log';
 import { tmiEmitter } from '~/helpers/tmi';
 import { isModerator } from '~/helpers/user';
 
