@@ -1,3 +1,5 @@
+import XRegExp from 'xregexp';
+
 import { error, isDebugEnabled } from '../log';
 
 import { tmiEmitter } from '~/helpers/tmi';
@@ -23,7 +25,7 @@ export async function message(type: 'say' | 'whisper' | 'me', username: string |
         // strip username if username is bot or is reply
         if ((sendAsReply && messageId) || username === botUsername) {
           if (messageToSend.startsWith(username) || messageToSend.startsWith('@' + username)) {
-            const regexp = new RegExp(`^@?${username}\\s?\\W?`);
+            const regexp = XRegExp(`^@?${username}\\s?\\P{L}?`);
             messageToSend = messageToSend.replace(regexp, '').trim();
           }
           tmiEmitter.emit('say', broadcasterUsername, `${messageToSend}`, { replyTo: messageId });
