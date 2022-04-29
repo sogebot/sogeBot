@@ -1,29 +1,12 @@
-import { setTimeout } from 'timers/promises';
-
 import { cloneDeep } from 'lodash';
-import { VM } from 'vm2';
 
+import type { Node } from '../d.ts/src/plugins';
 import { Plugin, PluginVariable } from './database/entity/plugins';
-import { flatten } from './helpers/flatten';
-import { info, warning } from './helpers/log';
 import { adminEndpoint } from './helpers/socket';
+import { processes, processNode } from './plugins/index';
 
 import Core from '~/_interface';
 import { onStartup } from '~/decorators/on';
-
-type Node = {
-  id: number,
-  name: string,
-  data: { value: string, data: string },
-  class: string,
-  html: string,
-  inputs: { input_1: { connections: {
-    node: string,
-  }[] }} | Record<string, never>,
-  outputs: { output_1: { connections: {
-    node: string,
-  }[] }},
-};
 
 const twitchChatMessage = {
   sender: {
@@ -106,16 +89,6 @@ class Plugins extends Core {
     });
   }
 
-  template(message: string, params: Record<string, any>) {
-    params = flatten(params);
-    const regexp = new RegExp(`{ *?(?<variable>[a-zA-Z0-9.]+) *?}`, 'g');
-    const match = message.matchAll(regexp);
-    for (const item of match) {
-      message = message.replace(item[0], params[item[1]]);
-    }
-    return message;
-  }
-
   async processPath(pluginId: string, workflow: Node[], currentNode: Node, parameters: Record<string, any>, variables: Record<string, any>, userstate: ChatUser ) {
     parameters = cloneDeep(parameters);
     variables = cloneDeep(variables);
@@ -140,60 +113,17 @@ class Plugins extends Core {
       }
     }
 
-    // process node
-    switch(currentNode.name) {
-      case 'listener': {
-        // do nothing with listener and continue
-        break;
-      }
-      case 'variableSetVariable': {
-        const variableName = currentNode.data.value;
-        const toEval = JSON.parse(currentNode.data.data).value.trim();
+    const result = await processNode(currentNode.name as keyof typeof processes, pluginId, currentNode, parameters, variables, userstate);
+    const output = result ? 'output_1' : 'output_2';
 
-        const vm = new VM({
-          sandbox: {
-            parameters, ...variables,
-          },
-        });
-        const value = await vm.run(`(function () { return ${toEval} })`)();
-
-        variables[variableName] = value;
-        break;
-      }
-      case 'variableSaveToDatabase': {
-        const variableName = currentNode.data.value;
-        const variable = new PluginVariable();
-        variable.variableName = variableName;
-        variable.pluginId = pluginId;
-        variable.value = JSON.stringify(variables[variableName]);
-        await variable.save();
-        break;
-      }
-      case 'othersIdle': {
-        let miliseconds = await this.template(currentNode.data.value, { parameters, ...variables });
-        if (isNaN(Number(miliseconds))) {
-          warning(`PLUGINS#${pluginId}: Idling value is not a number! Got: ${miliseconds}, defaulting to 1000`);
-          miliseconds = '1000';
+    if (currentNode.outputs[output]) {
+      const nodes = currentNode.outputs[output].connections.map((item) => workflow.find(wItem => wItem.id === Number(item.node)));
+      for (const node of nodes) {
+        if (!node) {
+          continue;
         }
-        await setTimeout(Number(miliseconds));
-        break;
+        this.processPath(pluginId, workflow, node, parameters, variables, userstate);
       }
-      case 'outputLog': {
-        info(`PLUGINS#${pluginId}: ${await this.template(currentNode.data.value, { parameters, ...variables })}`);
-        break;
-      }
-      default:
-        warning(`PLUGINS: no idea what should I do with ${currentNode.name}, stopping`);
-        console.log({ currentNode, parameters, variables });
-        return;
-    }
-
-    const nodes = currentNode.outputs.output_1.connections.map((item) => workflow.find(wItem => wItem.id === Number(item.node)));
-    for (const node of nodes) {
-      if (!node) {
-        continue;
-      }
-      this.processPath(pluginId, workflow, node, parameters, variables, userstate);
     }
   }
 
@@ -216,7 +146,9 @@ class Plugins extends Core {
             case 'twitchCommand': {
               const { command, parameters } = JSON.parse(o.data.data);
 
-              const isExactCommand = message.startsWith(`!${command}`);
+              const haveSubCommandOrParameters = message.split(' ').length > 1;
+
+              const isStartingWithCommand = message.startsWith(`!${command}`);
               const doesParametersMatch = () => {
                 try {
                   if (parameters.length === 0) {
@@ -237,11 +169,14 @@ class Plugins extends Core {
                   return false;
                 } catch {
                   // not valid regex or not expecting params
+                  if (haveSubCommandOrParameters && message !== `!${command}`) {
+                    return false;
+                  }
                   return true;
                 }
               };
 
-              if (isExactCommand && doesParametersMatch()) {
+              if (isStartingWithCommand && doesParametersMatch()) {
                 this.processPath(plugin.id, workflow, o, params, {}, userstate);
               }
               break;
