@@ -1,4 +1,5 @@
 import type { Node } from '../../d.ts/src/plugins';
+import filter from './nodes/filter';
 import filterPermission from './nodes/filterPermission';
 import listener from './nodes/listener';
 import othersIdle from './nodes/othersIdle';
@@ -16,6 +17,7 @@ export const processes = {
   othersIdle,
   outputLog,
   filterPermission,
+  filter,
   variableSaveToDatabase,
   variableSetVariable,
   twitchTimeoutUser,

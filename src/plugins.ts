@@ -2,6 +2,7 @@ import { cloneDeep } from 'lodash';
 
 import type { Node } from '../d.ts/src/plugins';
 import { Plugin, PluginVariable } from './database/entity/plugins';
+import { error } from './helpers/log';
 import { adminEndpoint } from './helpers/socket';
 import { processes, processNode } from './plugins/index';
 
@@ -10,24 +11,24 @@ import { onStartup } from '~/decorators/on';
 
 const twitchChatMessage = {
   sender: {
-    username: 'String',
-    userId:   'String',
+    userName: 'string',
+    userId:   'string',
   },
-  message: 'String',
+  message: 'string',
 };
 const twitchCommand = {
   sender: {
-    username: 'String',
-    userId:   'String',
+    userName: 'string',
+    userId:   'string',
   },
-  message: 'String',
+  message: 'string',
 };
 
 const generateRegex = (parameters: { name: string; type: 'number' | 'word' | 'sentence'; }[]) => {
   const matcher = {
     'number':   '[0-9]+',
-    'word':     '[a-Z]+',
-    'sentence': '\'[a-Z ]+\'',
+    'word':     '[a-zA-Z]+',
+    'sentence': '\'[a-zA-Z ]+\'',
   } as const;
 
   const regex = [];
@@ -141,6 +142,8 @@ class Plugins extends Core {
         const isListener = o.name === 'listener';
         const isType = o.data.value === type;
 
+        params.message = message;
+
         if (isListener && isType) {
           switch(type) {
             case 'twitchCommand': {
@@ -167,7 +170,7 @@ class Plugins extends Core {
                     return true;
                   }
                   return false;
-                } catch {
+                } catch (e) {
                   // not valid regex or not expecting params
                   if (haveSubCommandOrParameters && message !== `!${command}`) {
                     return false;
