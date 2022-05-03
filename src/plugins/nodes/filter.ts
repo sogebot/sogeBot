@@ -16,10 +16,8 @@ export default async function(pluginId: string, currentNode: Node<string>, param
       ...variables,
     };
     const vm = new VM({ sandbox });
-    const result = vm.run(script)();
+    const result = vm.run(`(function () {  return ${script} })`)();
     return !!result;
-  } else {
-    return true;
   }
   return true;
 }

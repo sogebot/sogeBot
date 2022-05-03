@@ -2,7 +2,6 @@ import { cloneDeep } from 'lodash';
 
 import type { Node } from '../d.ts/src/plugins';
 import { Plugin, PluginVariable } from './database/entity/plugins';
-import { error } from './helpers/log';
 import { adminEndpoint } from './helpers/socket';
 import { processes, processNode } from './plugins/index';
 
