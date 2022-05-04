@@ -46,7 +46,7 @@ export class GoalGroupObject {
   @Field(type => [GoalObject])
     goals: GoalObject[];
   @Field(type => String)
-    createdAt?: number;
+    createdAt?: string;
   @Field()
     name: string;
   @Field(type => GoalGroupDisplayObjects)

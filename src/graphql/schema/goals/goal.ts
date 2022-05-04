@@ -36,8 +36,8 @@ export class GoalObject implements GoalInterface {
     tiltifyCampaign?: number | null | undefined;
   @Field()
     display: 'simple' | 'full' | 'custom';
-  @Field(type => Number)
-    timestamp: number;
+  @Field(type => String)
+    timestamp: string;
   @Field(type => String)
     interval: 'hour' | 'day' | 'week' | 'month' | 'year';
   @Field(type => Int)
@@ -45,7 +45,7 @@ export class GoalObject implements GoalInterface {
   @Field(type => Float)
     currentAmount: number;
   @Field(type => String)
-    endAfter: number;
+    endAfter: string;
   @Field()
     endAfterIgnore: boolean;
   @Field(type => GoalCustomizationBarObject)
