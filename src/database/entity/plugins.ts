@@ -9,6 +9,9 @@ export class Plugin extends BaseEntity {
   @Column()
     name: string;
 
+  @Column()
+    enabled: boolean;
+
   @Column({ type: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') === 'mysql' ? 'longtext' : 'text' })
     workflow: string;
 }

@@ -128,7 +128,7 @@ class Plugins extends Core {
   }
 
   async process(type: keyof typeof this.listeners, message: string, userstate: ChatUser) {
-    const plugins = await Plugin.find();
+    const plugins = await Plugin.find({ enabled: true });
     const pluginsWithListener: Plugin[] = [];
     for (const plugin of plugins) {
       // explore drawflow
