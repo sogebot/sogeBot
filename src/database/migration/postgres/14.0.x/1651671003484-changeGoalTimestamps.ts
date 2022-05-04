@@ -8,7 +8,7 @@ export class changeGoalTimestamps1651671003484 implements MigrationInterface {
     const goal = await queryRunner.query(`SELECT * from "goal"`);
 
     await queryRunner.query(`DELETE FROM "goal_group" WHERE 1=1`);
-    await queryRunner.query(`DELETE FROM "group" WHERE 1=1`);
+    await queryRunner.query(`DELETE FROM "goal" WHERE 1=1`);
 
     await queryRunner.query(`ALTER TABLE "goal_group" DROP COLUMN "createdAt"`);
     await queryRunner.query(`ALTER TABLE "goal_group" ADD "createdAt" character varying NOT NULL`);
