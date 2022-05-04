@@ -71,16 +71,17 @@ class Plugins extends Core {
         if (!item.name) {
           throw new Error('Name cannot be undefined');
         }
-        itemToSave.name = item.name;
-        if (!item.workflow) {
-          throw new Error('Workflow cannot be undefined');
+        itemToSave.name = item.name;  
+        itemToSave.workflow = item.workflow ?? JSON.stringify({});
+        if (!item.enabled) {
+          throw new Error('Enabled cannot be undefined');
         }
-        itemToSave.workflow = item.workflow;
+        itemToSave.enabled = item.enabled;
         await itemToSave.save();
         cb(null, itemToSave);
       } catch (e) {
         if (e instanceof Error) {
-          cb(e, undefined);
+          cb(e.message, undefined);
         }
       }
     });
