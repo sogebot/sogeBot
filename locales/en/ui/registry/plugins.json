@@ -8,6 +8,11 @@
     }
   },
   "listener": {
+    "name": "Event listener",
+    "type": {
+      "twitchChatMessage": "Twitch chat message",
+      "twitchCommand": "Twitch command"
+    },
     "command": {
       "add-parameter": "Add parameter",
       "parameters": "Parameters",
