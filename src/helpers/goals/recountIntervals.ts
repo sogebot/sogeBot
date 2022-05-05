@@ -24,7 +24,7 @@ const interval = {
 export async function recountIntervals(type: typeof types[number]) {
   const items = (await getRepository(Goal).find({ type: 'interval' + type.charAt(0).toUpperCase() + type.slice(1) as GoalInterface['type'] }))
     .filter(item => {
-      return item.endAfterIgnore || item.endAfter > Date.now();
+      return item.endAfterIgnore || new Date(item.endAfter).getTime() > Date.now();
     });
 
   for (const item of items) {
