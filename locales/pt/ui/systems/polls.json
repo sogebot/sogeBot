@@ -14,7 +14,7 @@
     "type": "Tipo",
     "add": "Adicionar",
     "inChatToVote": "... no chat para votar",
-    "tips": "gorjeta",
+    "tips": "doação",
     "bits": "torcer",
     "toYourMessage": "... na sua mensagem de <strong>$type</strong>"
   },
@@ -25,7 +25,7 @@
   "closedAt": "Fechado em",
   "activeFor": "Ativo por",
   "votingBy": "Votando por",
-  "tips": "gorjetas",
+  "tips": "doações",
   "numbers": "números",
   "bits": "bits",
   "normal": "!vote"
