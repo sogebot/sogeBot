@@ -11,7 +11,7 @@
     "amountOfBits": "Quantidade de bits",
     "amountOfGifts": "Quantidade de presentes",
     "amountOfMonths": "Quantidade de meses",
-    "amountOfTips": "Gorjetas",
+    "amountOfTips": "Doações",
     "event": "Evento",
     "service": "Service"
   },
@@ -51,7 +51,7 @@
     "resubs": "Resubs",
     "subgifts": "Inscrições de presente",
     "subcommunitygifts": "Subpresentes para a comunidade",
-    "tips": "Gorjetas",
+    "tips": "Doações",
     "hosts": "Anfitriões",
     "raids": "Raids",
     "cmdredeems": "Resgates de Comando",
@@ -113,7 +113,7 @@
   "messageTemplate": {
     "name": "Modelo de mensagem",
     "placeholder": "Defina o seu modelo de mensagem",
-    "help": "Variáveis disponíveis: {name}, {amount} (torres, subs, dicas, subgifts, sub presentes da comunidade, resgatar comandos), {recipient} (subgifts, resgatar comandos), {monthsName} (subs, subgifts), {currency} (dicas)"
+    "help": "Variáveis disponíveis: {name}, {amount} (torres, subs, doações, subgifts, subgifts da comunidade, resgatar comandos), {recipient} (subgifts, resgatar comandos), {monthsName} (subs, subgifts), {currency} (doações)"
   },
   "ttsTemplate": {
     "name": "Modelos TTS",
