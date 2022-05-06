@@ -4,6 +4,7 @@
     "guild": "Discord Server",
     "listenAtChannels": "Diese Kanäle überwachen",
     "sendOnlineAnnounceToChannel": "Stream online Benachrichtigung in folgendem Channel",
+    "onlineAnnounceMessage": "Message in online announcement (can include mentions)",
     "sendAnnouncesToChannel": "Senden von Ankündigungen an Kanäle einrichten",
     "deleteMessagesAfterWhile": "Nach einiger Zeit, Nachrichten löschen",
     "clientId": "Client ID",

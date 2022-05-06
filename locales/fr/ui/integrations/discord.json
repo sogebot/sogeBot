@@ -4,6 +4,7 @@
     "guild": "Serveur",
     "listenAtChannels": "Activer les commandes sur ce salon",
     "sendOnlineAnnounceToChannel": "Envoyer une annonce en ligne pour ce salon",
+    "onlineAnnounceMessage": "Message in online announcement (can include mentions)",
     "sendAnnouncesToChannel": "Configurer l'envoi d'annonces aux salons",
     "deleteMessagesAfterWhile": "Supprimer le message après un moment",
     "clientId": "ClientId",
