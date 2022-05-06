@@ -1,3 +1,4 @@
+import { capitalize } from 'lodash';
 import XRegExp from 'xregexp';
 
 import { error, isDebugEnabled } from '../log';
@@ -26,7 +27,7 @@ export async function message(type: 'say' | 'whisper' | 'me', username: string |
         if ((sendAsReply && messageId) || username === botUsername) {
           if (messageToSend.startsWith(username) || messageToSend.startsWith('@' + username)) {
             const regexp = XRegExp(`^@?${username}\\s?\\P{L}?`);
-            messageToSend = messageToSend.replace(regexp, '').trim();
+            messageToSend = capitalize(messageToSend.replace(regexp, '').trim());
           }
           tmiEmitter.emit('say', broadcasterUsername, `${messageToSend}`, { replyTo: messageId });
         } else {
