@@ -23,6 +23,10 @@ jobs:
         github_token: ${{github.token}}
         branches: l10n_crowdin_action
 
+    - name: Remove translations
+      run: |
+        find locales/ -type f ! -name 'en*' -delete
+
     - name: crowdin action
       uses: crowdin/github-action@1.4.8
       with:
