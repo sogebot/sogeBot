@@ -301,8 +301,8 @@
           "placeholder": ""
         },
         "": "",
-        "titleOfReward": {
-          "label": "償還報酬のタイトル",
+        "reward": {
+          "label": "Reward",
           "placeholder": ""
         }
       }

@@ -301,8 +301,8 @@
           "placeholder": ""
         },
         "": "",
-        "titleOfReward": {
-          "label": "Titel der eingelösten Belohnung",
+        "reward": {
+          "label": "Reward",
           "placeholder": ""
         }
       }

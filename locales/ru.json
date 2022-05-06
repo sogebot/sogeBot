@@ -301,8 +301,8 @@
           "placeholder": ""
         },
         "": "",
-        "titleOfReward": {
-          "label": "Название выкупленной награды",
+        "reward": {
+          "label": "Reward",
           "placeholder": ""
         }
       }

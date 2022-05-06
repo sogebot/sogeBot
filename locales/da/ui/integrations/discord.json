@@ -4,6 +4,7 @@
     "guild": "Guild",
     "listenAtChannels": "Listen for commands on this channel",
     "sendOnlineAnnounceToChannel": "Send online announcement to this channel",
+    "onlineAnnounceMessage": "Message in online announcement (can include mentions)",
     "sendAnnouncesToChannel": "Setup sending of announcements to channels",
     "deleteMessagesAfterWhile": "Delete message after while",
     "clientId": "ClientId",

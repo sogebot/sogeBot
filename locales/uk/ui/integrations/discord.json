@@ -4,6 +4,7 @@
     "guild": "Сервер",
     "listenAtChannels": "Слухати команди на цьому каналі",
     "sendOnlineAnnounceToChannel": "Надіслати онлайн оголошення на цей канал",
+    "onlineAnnounceMessage": "Message in online announcement (can include mentions)",
     "sendAnnouncesToChannel": "Налаштування відправки повідомлень каналам",
     "deleteMessagesAfterWhile": "Видалити повідомлення через деякий час",
     "clientId": "ClientId",

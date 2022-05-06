@@ -4,6 +4,7 @@
     "guild": "Server",
     "listenAtChannels": "Poslouchat příkazy na tomto kanálu",
     "sendOnlineAnnounceToChannel": "Posílat online oznámení do tohoto kanálu",
+    "onlineAnnounceMessage": "Message in online announcement (can include mentions)",
     "sendAnnouncesToChannel": "Nastavení odesílání oznámení do kanálů",
     "deleteMessagesAfterWhile": "Po chvíli smazat zprávy",
     "clientId": "ClientId",

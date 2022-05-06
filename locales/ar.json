@@ -301,8 +301,8 @@
           "placeholder": ""
         },
         "": "",
-        "titleOfReward": {
-          "label": "Title of redeemed reward",
+        "reward": {
+          "label": "Reward",
           "placeholder": ""
         }
       }

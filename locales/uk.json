@@ -301,8 +301,8 @@
           "placeholder": ""
         },
         "": "",
-        "titleOfReward": {
-          "label": "Назва викупленої винагороди",
+        "reward": {
+          "label": "Reward",
           "placeholder": ""
         }
       }
