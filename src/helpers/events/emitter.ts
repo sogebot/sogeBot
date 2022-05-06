@@ -57,7 +57,7 @@ interface Events {
   'user-joined-channel': (opts: {userName: string}) => void;
   'user-parted-channel': (opts: {userName: string}) => void;
   'subcommunitygift': (opts: {userName: string; count: number}) => void;
-  'reward-redeemed': (opts: {userId: string; userName: string; titleOfReward: string; userInput: string;}) => void;
+  'reward-redeemed': (opts: {userId: string; userName: string; rewardId: string; userInput: string;}) => void;
   'timeout': (opts: {userName: string; duration: number}) => void;
   'ban': (opts: {userName: string; reason: string}) => void;
   'hosting': (opts: {target: string, hostViewers: number}) => void;

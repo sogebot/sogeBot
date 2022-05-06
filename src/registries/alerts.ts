@@ -146,7 +146,7 @@ class Alerts extends Registry {
         cb(e.stack);
       }
     });
-    publicEndpoint('/registries/alerts', 'test', async (data: EmitData) => {
+    adminEndpoint('/registries/alerts', 'test', async (data: EmitData) => {
       this.trigger({
         ...data,
         monthsName: getLocalizedName(data.amount, translate('core.months')),

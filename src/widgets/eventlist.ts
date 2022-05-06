@@ -114,6 +114,7 @@ class EventList extends Widget {
             alerts.trigger({
               event:      eventType,
               name:       values.titleOfReward,
+              rewardId:   values.rewardId,
               amount:     0,
               tier:       null,
               currency:   '',

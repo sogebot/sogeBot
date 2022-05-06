@@ -8,6 +8,7 @@ declare namespace EventList {
     message?: string;
     amount?: number;
     titleOfReward?: string;
+    rewardId?: string;
     currency?: string;
     months?: number;
     bits?: number;
