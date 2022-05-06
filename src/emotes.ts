@@ -321,7 +321,7 @@ class Emotes extends Core {
       }
     };
 
-    const getAllChannelEmotes = async (query: string, urlTemplate: string, channel: string, page = 1, emotes: any[] = []): Promise<void> => {
+    const getAllChannelEmotes = async (query: string, urlTemplate: string, channel: string): Promise<void> => {
       const request = await axios.post<any>('https://api.7tv.app/v2/gql', {
         query,
         variables: {
@@ -343,10 +343,6 @@ class Emotes extends Core {
               '3': urlTemplate.replace('{{id}}', request.data.data.user.emotes[i].id).replace('{{image}}', '3x'),
             },
           });
-        }
-
-        if (request.data.data.user.emotes.length === 16) {
-          return await getAllChannelEmotes(query, channel, urlTemplate, page + 1, emotes);
         }
       }
     };
