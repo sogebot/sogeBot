@@ -301,8 +301,8 @@
           "placeholder": ""
         },
         "": "",
-        "titleOfReward": {
-          "label": "償還報酬のタイトル",
+        "reward": {
+          "label": "Reward",
           "placeholder": ""
         }
       }
@@ -356,7 +356,6 @@
         "language": "現在のストリームの言語",
         "viewers": "現在の視聴者数",
         "hostViewers": "ホスト/レイドの視聴者数",
-        "views": "現在の視聴数",
         "followers": "現在のフォロワー数",
         "subscribers": "現在のサブスクライバー数",
         "arg": "引数",
@@ -644,7 +643,6 @@
     "max-viewers": "最大視聴者数",
     "new-chatters": "新規チャット",
     "chat-messages": "チャットメッセージ",
-    "views": "視聴数",
     "followers": "フォロワー",
     "subscribers": "サブスクライバー",
     "bits": "ビッツ",

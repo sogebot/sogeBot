@@ -1,4 +1,4 @@
 {
-  "no_active_campaigns": "$sender, there are currently no active campaigns.",
-  "active_campaigns": "$sender, list of currently active campaigns:"
+  "no_active_campaigns": "$sender, momentálně nejsou žádné aktivní kampaně.",
+  "active_campaigns": "$sender, seznam aktuálně aktivních kampaní:"
 }
