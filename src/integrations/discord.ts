@@ -71,6 +71,9 @@ class Discord extends Integration {
     sendOnlineAnnounceToChannel = '';
 
   @settings('bot')
+    onlineAnnounceMessage = '';
+
+  @settings('bot')
     sendAnnouncesToChannel: { [key in typeof announceTypes[number]]: string } = {
       bets:    '',
       duel:    '',
@@ -381,14 +384,17 @@ class Discord extends Integration {
           .setDescription(`${broadcasterUsername.charAt(0).toUpperCase() + broadcasterUsername.slice(1)} started stream! Check it out!`)
           .setImage(`https://static-cdn.jtvnw.net/previews-ttv/live_user_${broadcasterUsername}-1920x1080.jpg?${Date.now()}`)
           .setThumbnail(profileImageUrl)
-          .setFooter(prepare('integrations.discord.announced-by') + ' - https://www.sogebot.xyz');
+          .setFooter({ text: prepare('integrations.discord.announced-by') + ' - https://www.sogebot.xyz' });
 
         const broadcasterType = variables.get('services.twitch.broadcasterType') as string;
         if (broadcasterType !== '') {
           embed.addField(prepare('webpanel.subscribers'), String(stats.value.currentSubscribers), true);
         }
         // Send the embed to the same channel as the message
-        const message = await (channel as DiscordJs.TextChannel).send({ embeds: [embed] });
+        const message = await (channel as DiscordJs.TextChannel).send({
+          content: this.onlineAnnounceMessage,
+          embeds:  [embed],
+        });
         this.embedMessageId = message.id;
         chatOut(`#${(channel as DiscordJs.TextChannel).name}: [[online announce embed]] [${this.client.user?.tag}]`);
       }
