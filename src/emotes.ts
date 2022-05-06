@@ -325,35 +325,29 @@ class Emotes extends Core {
       const request = await axios.post<any>('https://api.7tv.app/v2/gql', {
         query,
         variables: {
-          'query':        '',
-          'page':         page,
-          'pageSize':     16,
-          'limit':        16,
-          'globalState':  'include',
-          'sortBy':       'popularity',
-          'sortOrder':    0,
-          'channel':      channel,
-          'submitted_by': null,
+          'id': channel,
         },
       });
 
-      for (let i = 0, length = request.data.data.search_emotes.length; i < length; i++) {
-        await setImmediateAwait();
-        const cachedEmote = this.cache.find(o => o.code === request.data.data.search_emotes[i].name && o.type === '7tv');
-        this.cache.push({
-          ...cachedEmote,
-          code: request.data.data.search_emotes[i].name,
-          type: '7tv',
-          urls: {
-            '1': urlTemplate.replace('{{id}}', request.data.data.search_emotes[i].id).replace('{{image}}', '1x'),
-            '2': urlTemplate.replace('{{id}}', request.data.data.search_emotes[i].id).replace('{{image}}', '2x'),
-            '3': urlTemplate.replace('{{id}}', request.data.data.search_emotes[i].id).replace('{{image}}', '3x'),
-          },
-        });
-      }
+      if (request.data.data.user?.emotes) {
+        for (let i = 0, length = request.data.data.user.emotes.length; i < length; i++) {
+          await setImmediateAwait();
+          const cachedEmote = this.cache.find(o => o.code === request.data.data.user.emotes[i].name && o.type === '7tv');
+          this.cache.push({
+            ...cachedEmote,
+            code: request.data.data.user.emotes[i].name,
+            type: '7tv',
+            urls: {
+              '1': urlTemplate.replace('{{id}}', request.data.data.user.emotes[i].id).replace('{{image}}', '1x'),
+              '2': urlTemplate.replace('{{id}}', request.data.data.user.emotes[i].id).replace('{{image}}', '2x'),
+              '3': urlTemplate.replace('{{id}}', request.data.data.user.emotes[i].id).replace('{{image}}', '3x'),
+            },
+          });
+        }
 
-      if (request.data.data.search_emotes.length === 16) {
-        return await getAllChannelEmotes(query, channel, urlTemplate, page + 1, emotes);
+        if (request.data.data.user.emotes.length === 16) {
+          return await getAllChannelEmotes(query, channel, urlTemplate, page + 1, emotes);
+        }
       }
     };
 
@@ -373,7 +367,9 @@ class Emotes extends Core {
 
         const query = `query($query: String!,$page: Int,$pageSize: Int,$globalState: String,$sortBy: String,$sortOrder: Int,$channel: String,$submitted_by: String,$filter: EmoteFilter) {search_emotes(query: $query,limit: $pageSize,page: $page,pageSize: $pageSize,globalState: $globalState,sortBy: $sortBy,sortOrder: $sortOrder,channel: $channel,submitted_by: $submitted_by,filter: $filter) {id,visibility,owner {id,display_name,role {id,name,color},banned}name,tags}}`;
         await getAllGlobalEmotes(query, urlTemplate);
-        await getAllChannelEmotes(query, urlTemplate, currentChannel),
+
+        const query2 = `query user ($id: String!) { user(id:$id) { emotes { id name owner_id visibility tags height width } } }`;
+        await getAllChannelEmotes(query2, urlTemplate, currentChannel),
         info('EMOTES: Fetched 7tv emotes');
       } catch (e: any) {
         error(e);
