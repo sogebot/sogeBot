@@ -301,8 +301,8 @@
           "placeholder": ""
         },
         "": "",
-        "titleOfReward": {
-          "label": "Titolo del premio riscattato",
+        "reward": {
+          "label": "Reward",
           "placeholder": ""
         }
       }

@@ -301,8 +301,8 @@
           "placeholder": ""
         },
         "": "",
-        "titleOfReward": {
-          "label": "Título da recompensa do resgate",
+        "reward": {
+          "label": "Reward",
           "placeholder": ""
         }
       }

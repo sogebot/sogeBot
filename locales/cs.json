@@ -301,8 +301,8 @@
           "placeholder": ""
         },
         "": "",
-        "titleOfReward": {
-          "label": "Název vyplacené odměny",
+        "reward": {
+          "label": "Reward",
           "placeholder": ""
         }
       }
