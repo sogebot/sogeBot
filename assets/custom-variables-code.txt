@@ -24,7 +24,6 @@
     currentBits: number,
     currentFollowers: number,
     currentHosts: number,
-    currentViews: number,
     currentTips: number,
     currentWatched: number,
     currency: string,

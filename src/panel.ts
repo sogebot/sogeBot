@@ -612,7 +612,6 @@ const sendStreamData = async () => {
       currentTips:        stats.value.currentTips,
       chatMessages:       isStreamOnline.value ? linesParsed - chatMessagesAtStart.value : 0,
       currentFollowers:   stats.value.currentFollowers,
-      currentViews:       stats.value.currentViews,
       maxViewers:         stats.value.maxViewers,
       newChatters:        stats.value.newChatters,
       game:               stats.value.currentGame,

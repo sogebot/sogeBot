@@ -72,7 +72,6 @@ export interface TwitchStatsInterface {
   currentTips: number;
   chatMessages: number;
   currentFollowers?: number;
-  currentViews?: number;
   maxViewers?: number;
   newChatters?: number;
   currentWatched: number;
@@ -177,7 +176,6 @@ export const TwitchStats = new EntitySchema<Readonly<Required<TwitchStatsInterfa
     currentSubscribers: { type: Number, default: 0 },
     chatMessages:       { type: 'bigint' },
     currentFollowers:   { type: Number, default: 0 },
-    currentViews:       { type: Number, default: 0 },
     maxViewers:         { type: Number, default: 0 },
     newChatters:        { type: Number, default: 0 },
     currentBits:        { type: 'bigint', transformer: new ColumnNumericTransformer() },

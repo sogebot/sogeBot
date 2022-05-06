@@ -12,7 +12,6 @@ class Dashboard extends Core {
       'twitch|maxViewers|' + v4(),
       'twitch|newChatters|' + v4(),
       'twitch|chatMessages|' + v4(),
-      'twitch|views|' + v4(),
       'twitch|followers|' + v4(),
       'twitch|subscribers|' + v4(),
       'twitch|bits|' + v4(),
