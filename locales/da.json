@@ -301,8 +301,8 @@
           "placeholder": ""
         },
         "": "",
-        "titleOfReward": {
-          "label": "Title of redeemed reward",
+        "reward": {
+          "label": "Reward",
           "placeholder": ""
         }
       }
@@ -356,7 +356,6 @@
         "language": "Current stream language",
         "viewers": "Antal aktuelle seere",
         "hostViewers": "Host/Raid viewers count",
-        "views": "Antal aktuelle visninger",
         "followers": "Current followers count",
         "subscribers": "Antal nuværende abonnenter",
         "arg": "Argument",
@@ -644,7 +643,6 @@
     "max-viewers": "Max seere",
     "new-chatters": "Nye Chattere",
     "chat-messages": "Chatbeskeder",
-    "views": "Visninger",
     "followers": "Følgere",
     "subscribers": "Abonnenter",
     "bits": "Bits",

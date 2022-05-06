@@ -301,8 +301,8 @@
           "placeholder": ""
         },
         "": "",
-        "titleOfReward": {
-          "label": "Název vyplacené odměny",
+        "reward": {
+          "label": "Odměna",
           "placeholder": ""
         }
       }
@@ -317,7 +317,7 @@
       "resub": "<strong>předplatitel</strong>",
       "cheer": "<strong>bity</strong>",
       "tip": "<strong>spropitné</strong>",
-      "tipToCharity": "<strong>donated</strong> to $campaignName",
+      "tipToCharity": "<strong>přispěl</strong> pro $campaignName",
       "rewardredeem": "žádost o <strong>odměnu</strong>"
     },
     "responses": {
@@ -356,7 +356,6 @@
         "language": "Aktuální jazyk vysílání",
         "viewers": "Aktuální počet diváků",
         "hostViewers": "Počet diváků z hostováni/nájezdu",
-        "views": "Aktuální počet zobrazení",
         "followers": "Aktuální počet followerů",
         "subscribers": "Aktuální počet subscriberů",
         "arg": "Parametr",
@@ -644,7 +643,6 @@
     "max-viewers": "Nejvíce diváků",
     "new-chatters": "Nových diváků",
     "chat-messages": "Zpráv v chatu",
-    "views": "Shlédnutí",
     "followers": "Followeři",
     "subscribers": "Subscribeři",
     "bits": "Bity",

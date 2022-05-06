@@ -4,6 +4,7 @@
     "guild": "Gilda",
     "listenAtChannels": "Ascolta i comandi su questo canale",
     "sendOnlineAnnounceToChannel": "Invia un annuncio online a questo canale",
+    "onlineAnnounceMessage": "Message in online announcement (can include mentions)",
     "sendAnnouncesToChannel": "Imposta l'invio di annunci ai canali",
     "deleteMessagesAfterWhile": "Elimina il messaggio dopo un po di tempo",
     "clientId": "ClientId",

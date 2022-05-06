@@ -301,8 +301,8 @@
           "placeholder": ""
         },
         "": "",
-        "titleOfReward": {
-          "label": "Titel der eingelösten Belohnung",
+        "reward": {
+          "label": "Reward",
           "placeholder": ""
         }
       }
@@ -356,7 +356,6 @@
         "language": "Aktuelle Sprache des Stream",
         "viewers": "Anzahl der aktuellen Zuschauer",
         "hostViewers": "Host/Raid-Zuschauerzahl",
-        "views": "Aktuelle Zuschaueranzahl",
         "followers": "Aktuelle Follower Anzahl",
         "subscribers": "Anzahl aktueller Abonnenten",
         "arg": "Argument",
@@ -644,7 +643,6 @@
     "max-viewers": "Max. Zuschauer",
     "new-chatters": "Neue Chatter",
     "chat-messages": "Chat-Nachrichten",
-    "views": "Ansichten",
     "followers": "Followers",
     "subscribers": "Abonnenten",
     "bits": "Bits",

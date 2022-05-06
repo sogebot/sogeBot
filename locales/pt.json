@@ -301,8 +301,8 @@
           "placeholder": ""
         },
         "": "",
-        "titleOfReward": {
-          "label": "Título da recompensa do resgate",
+        "reward": {
+          "label": "Reward",
           "placeholder": ""
         }
       }
@@ -356,7 +356,6 @@
         "language": "Idioma atual da transmissão",
         "viewers": "Contagem atual de 'viewers'",
         "hostViewers": "Contagem de 'viewers' de 'host'/'raid'",
-        "views": "Contagem autal de visualizações",
         "followers": "Contagem autal de seguidores",
         "subscribers": "Contagem atual de assinantes",
         "arg": "Argumento",
@@ -644,7 +643,6 @@
     "max-viewers": "Máx. espectadores",
     "new-chatters": "Novos no bate-papo",
     "chat-messages": "Mensagens de chat",
-    "views": "Visualizações",
     "followers": "Seguidores",
     "subscribers": "Inscritos",
     "bits": "Bits",
