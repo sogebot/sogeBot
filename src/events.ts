@@ -132,7 +132,7 @@ class Events extends Core {
       },
       { id: 'game-changed', variables: [ 'oldGame', 'game' ] },
       {
-        id: 'reward-redeemed', definitions: { titleOfReward: '' }, variables: [ 'username', 'is.moderator', 'is.subscriber', 'is.vip', 'is.follower', 'is.broadcaster', 'is.bot', 'is.owner', 'userInput' ], check: this.isCorrectReward,
+        id: 'reward-redeemed', definitions: { rewardId: '' }, variables: [ 'username', 'is.moderator', 'is.subscriber', 'is.vip', 'is.follower', 'is.broadcaster', 'is.bot', 'is.owner', 'userInput' ], check: this.isCorrectReward,
       },
     ];
 
@@ -524,7 +524,7 @@ class Events extends Core {
   }
 
   public async isCorrectReward(event: EventInterface, attributes: EventsEntity.Attributes) {
-    const shouldTrigger = (attributes.titleOfReward === event.definitions.titleOfReward);
+    const shouldTrigger = (attributes.rewardId === event.definitions.rewardId);
     return shouldTrigger;
   }
 
@@ -717,7 +717,7 @@ class Events extends Core {
     adminEndpoint('/core/events', 'events::getRedeemedRewards', async (cb) => {
       try {
         const rewards = await getCustomRewards() ?? [];
-        cb(null, [...rewards.map(o => o.title)]);
+        cb(null, [...rewards.map(o => ({ name: o.title, id: o.id }))]);
       } catch (e: any) {
         cb(e.stack, []);
       }

@@ -127,10 +127,12 @@ class PubSub {
           message:       message.message,
           timestamp:     Date.now(),
           titleOfReward: message.rewardTitle,
+          rewardId:      message.rewardId,
         });
         alerts.trigger({
           event:      'rewardredeems',
           name:       message.rewardTitle,
+          rewardId:   message.rewardId,
           amount:     0,
           tier:       null,
           currency:   '',
@@ -139,10 +141,10 @@ class PubSub {
           recipient:  message.userName,
         });
         eventEmitter.emit('reward-redeemed', {
-          userId:        message.userId,
-          userName:      message.userName,
-          titleOfReward: message.rewardTitle,
-          userInput:     message.message,
+          userId:    message.userId,
+          userName:  message.userName,
+          rewardId:  message.rewardId,
+          userInput: message.message,
         });
       }));
       info('PUBSUB: listening to onRedemption');

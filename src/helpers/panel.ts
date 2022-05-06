@@ -28,19 +28,6 @@ export let app: express.Application | null = null;
 export let server: Server;
 export let serverSecure: Server;
 
-/*export interface ClientToServerEvents {
-  'eventlist::removeById': (idList: string[] | string, cb: (error: Error | string | null) => void) => void,
-  'eventlist::get': (count: number) => void,
-  'skip': () => void,
-  'cleanup': () => void,
-  'eventlist::resend': (id: string) => void,
-
-  'generic::getCoreCommands': (cb: (error: Error | string | null, commands: import('../general').Command[]) => Promise<void>) => void,
-  'generic::setCoreCommand': (commands: import('../general').Command, cb: (error: Error | string | null) => Promise<void>) => void,
-};
-// export type EventNames = keyof ClientToServerEvents & (string | symbol);
-*/
-
 export const addMenu = (menuArg: typeof menu[number]) => {
   if (!menu.find(o => o.id === menuArg.id)) {
     menu.push(menuArg);

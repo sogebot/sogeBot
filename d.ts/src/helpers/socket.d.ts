@@ -430,7 +430,7 @@ export type ClientToServerEventsWithNamespace = {
     'askForGet': (cb: () => void) => void,
   },
   '/core/events': GenericEvents & {
-    'events::getRedeemedRewards': (cb: (error: Error | string | null, rewards: string[]) => void) => void,
+    'events::getRedeemedRewards': (cb: (error: Error | string | null, rewards: { id: string, name: string }[]) => void) => void,
     'generic::getAll': (cb: (error: Error | string | null, data: EventInterface[]) => void) => void,
     'generic::getOne': (id: string, cb: (error: Error | string | null, data?: EventInterface) => void) => void,
     'list.supported.events': (cb: (error: Error | string | null, data: any[] /* TODO: missing type */) => void) => void,
