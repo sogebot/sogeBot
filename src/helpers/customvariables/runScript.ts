@@ -123,7 +123,6 @@ async function runScript (script: string, opts: { sender: { userId: string; user
       currency:           symbol(mainCurrency.value),
       chatMessages:       (isStreamOnline.value) ? linesParsed - chatMessagesAtStart.value : 0,
       currentFollowers:   stats.value.currentFollowers,
-      currentViews:       stats.value.currentViews,
       maxViewers:         stats.value.maxViewers,
       newChatters:        stats.value.newChatters,
       game:               stats.value.currentGame,

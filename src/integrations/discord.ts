@@ -132,9 +132,6 @@ class Discord extends Integration {
                 name: prepare('webpanel.viewers'), value: String(stats.value.currentViewers), inline: true,
               },
               {
-                name: prepare('webpanel.views'), value: String(stats.value.currentViews), inline: true,
-              },
-              {
                 name: prepare('webpanel.followers'), value: String(stats.value.currentFollowers), inline: true,
               },
             ]);
@@ -327,9 +324,6 @@ class Discord extends Integration {
               name: prepare('integrations.discord.streamed-at'), value: `${this.embedStartedAt} - ${dayjs().tz(timezone).format('LLL')}`, inline: true,
             },
             {
-              name: prepare('webpanel.views'), value: String(stats.value.currentViews), inline: true,
-            },
-            {
               name: prepare('webpanel.followers'), value: String(stats.value.currentFollowers), inline: true,
             },
           ]);
@@ -368,9 +362,6 @@ class Discord extends Integration {
             { name: prepare('webpanel.responses.variable.title'), value: stats.value.currentTitle ?? '' },
             {
               name: prepare('integrations.discord.started-at'), value: this.embedStartedAt, inline: true,
-            },
-            {
-              name: prepare('webpanel.views'), value: String(stats.value.currentViews), inline: true,
             },
             {
               name: prepare('webpanel.followers'), value: String(stats.value.currentFollowers), inline: true,

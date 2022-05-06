@@ -15,7 +15,7 @@ import { getCurrentStream } from '~/services/twitch/calls/getCurrentStream';
 import { getCurrentStreamTags } from '~/services/twitch/calls/getCurrentStreamTags';
 import { getLatest100Followers } from '~/services/twitch/calls/getLatest100Followers';
 import { getModerators } from '~/services/twitch/calls/getModerators';
-import { updateChannelViewsAndBroadcasterType } from '~/services/twitch/calls/updateChannelViewsAndBroadcasterType';
+import { updateBroadcasterType } from '~/services/twitch/calls/updateBroadcasterType';
 import { variables } from '~/watchers';
 
 const intervals = new Map<keyof typeof functions, {
@@ -32,22 +32,22 @@ const addInterval = (fnc: keyof typeof functions, intervalId: number) => {
 };
 
 const functions = {
-  getCurrentStream:                     getCurrentStream,
-  getCurrentStreamTags:                 getCurrentStreamTags,
-  updateChannelViewsAndBroadcasterType: updateChannelViewsAndBroadcasterType,
-  getLatest100Followers:                getLatest100Followers,
-  getChannelSubscribers:                getChannelSubscribers,
-  getChannelChattersUnofficialAPI:      getChannelChattersUnofficialAPI,
-  getChannelInformation:                getChannelInformation,
-  checkClips:                           checkClips,
-  getAllStreamTags:                     getAllStreamTags,
-  getModerators:                        getModerators,
+  getCurrentStream:                getCurrentStream,
+  getCurrentStreamTags:            getCurrentStreamTags,
+  updateBroadcasterType:           updateBroadcasterType,
+  getLatest100Followers:           getLatest100Followers,
+  getChannelSubscribers:           getChannelSubscribers,
+  getChannelChattersUnofficialAPI: getChannelChattersUnofficialAPI,
+  getChannelInformation:           getChannelInformation,
+  checkClips:                      checkClips,
+  getAllStreamTags:                getAllStreamTags,
+  getModerators:                   getModerators,
 } as const;
 
 export const init = () => {
   addInterval('getCurrentStream', constants.MINUTE);
   addInterval('getCurrentStreamTags', constants.MINUTE);
-  addInterval('updateChannelViewsAndBroadcasterType', constants.HOUR);
+  addInterval('updateBroadcasterType', constants.HOUR);
   addInterval('getLatest100Followers', constants.MINUTE);
   addInterval('getChannelSubscribers', 2 * constants.MINUTE);
   addInterval('getChannelChattersUnofficialAPI', 5 * constants.MINUTE);

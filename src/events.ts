@@ -672,7 +672,6 @@ class Events extends Core {
       $viewers:                      stats.value.currentViewers,
       $game:                         stats.value.currentGame,
       $title:                        stats.value.currentTitle,
-      $views:                        stats.value.currentViews,
       $followers:                    stats.value.currentFollowers,
       $subscribers:                  stats.value.currentSubscribers,
       $isBotSubscriber:              isBotSubscriber(),

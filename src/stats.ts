@@ -29,8 +29,6 @@ class Stats extends Core {
   @persistent()
     currentFollowers = 0;
   @persistent()
-    currentViews = 0;
-  @persistent()
     currentSubscribers = 0;
 
   showInUI = false;
@@ -39,10 +37,9 @@ class Stats extends Core {
   @onStreamStart()
   async setInitialValues() {
     this.currentFollowers = stats.value.currentFollowers;
-    this.currentViews = stats.value.currentViews;
     this.currentSubscribers = stats.value.currentSubscribers;
     debug('stats', JSON.stringify({
-      currentFollowers: this.currentFollowers, currentViews: this.currentViews, currentSubscribers: this.currentSubscribers,
+      currentFollowers: this.currentFollowers, currentSubscribers: this.currentSubscribers,
     }));
   }
 
@@ -69,7 +66,6 @@ class Stats extends Core {
             currentTips:        0,
             chatMessages:       0,
             currentFollowers:   0,
-            currentViews:       0,
             maxViewers:         0,
             newChatters:        0,
             currentWatched:     0,
@@ -93,14 +89,14 @@ class Stats extends Core {
             statsToReturn.currentWatched = Number(Number(statsToReturn.currentWatched / statsFromDb.length).toFixed(0));
             cachedStats = cloneDeep(statsToReturn);
             cb(null, {
-              ...statsToReturn, currentFollowers: _self.currentFollowers, currentViews: _self.currentViews, currentSubscribers: _self.currentSubscribers,
+              ...statsToReturn, currentFollowers: _self.currentFollowers, currentSubscribers: _self.currentSubscribers,
             });
           } else {
             cb(null, {});
           }
         } else {
           cb(null, {
-            ...cachedStats, currentFollowers: _self.currentFollowers, currentViews: _self.currentViews, currentSubscribers: _self.currentSubscribers,
+            ...cachedStats, currentFollowers: _self.currentFollowers, currentSubscribers: _self.currentSubscribers,
           });
         }
       } catch (e: any) {
@@ -122,7 +118,6 @@ class Stats extends Core {
         currentTips:        data.currentTips,
         chatMessages:       data.chatMessages,
         currentFollowers:   data.currentFollowers,
-        currentViews:       data.currentViews,
         maxViewers:         data.maxViewers,
         newChatters:        data.newChatters,
         currentWatched:     data.currentWatched,

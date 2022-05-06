@@ -94,7 +94,6 @@ class HelpersFilter {
       $game:            stats.value.currentGame,
       $language:        stats.value.language,
       $viewers:         isStreamOnline.value ? stats.value.currentViewers : 0,
-      $views:           stats.value.currentViews,
       $followers:       stats.value.currentFollowers,
       $subscribers:     stats.value.currentSubscribers,
       $bits:            isStreamOnline.value ? stats.value.currentBits : 0,

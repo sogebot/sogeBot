@@ -58,7 +58,6 @@ export async function getCurrentStream (opts: any) {
         currentBits:        apiStats.value.currentBits,
         currentTips:        apiStats.value.currentTips,
         chatMessages:       linesParsed - chatMessagesAtStart.value,
-        currentViews:       apiStats.value.currentViews,
         maxViewers:         apiStats.value.maxViewers,
         newChatters:        apiStats.value.newChatters,
         currentWatched:     apiStats.value.currentWatchedTime,

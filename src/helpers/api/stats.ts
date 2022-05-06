@@ -12,7 +12,6 @@ const stats = persistent({
     currentBits:        0,
     currentTips:        0,
     currentFollowers:   0,
-    currentViews:       0,
     currentGame:        null,
     currentTitle:       null,
     newChatters:        0,
@@ -25,7 +24,6 @@ const stats = persistent({
     currentBits: number;
     currentTips: number;
     currentFollowers: number;
-    currentViews: number;
     currentGame: string | null;
     currentTitle: string | null;
     newChatters: number;
@@ -37,7 +35,6 @@ const stats = persistent({
       ['currentGame', 'game'],
       ['language', 'language'],
       ['currentViewers', 'viewers'],
-      ['currentViews', 'views'],
       ['currentFollowers', 'followers'],
       ['currentSubscribers', 'subscribers'],
       ['currentBits', 'bits'],
