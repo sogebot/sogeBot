@@ -48,7 +48,10 @@ export class updateRewardsToIds1651671003485 implements MigrationInterface {
           }
         }
       }
-    } catch (e) {
+    } catch (e: any) {
+      if (e.stack.includes('channel points are not available for the broadcaster')) {
+        return;
+      }
       console.log('If migration failed due to invalid token, please start up previous version (wait for full startup) and then proceed to upgrade again.');
       throw e;
     }
