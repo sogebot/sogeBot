@@ -333,7 +333,7 @@ class Discord extends Integration {
           if (broadcasterType !== '') {
             embed.addField(prepare('webpanel.subscribers'), String(stats.value.currentSubscribers), true);
           }
-          message.edit({ embeds: [embed] });
+          message.edit({ embeds: [embed], content: null });
         }
       } catch (e: any) {
         warning(`Discord embed couldn't be changed to offline - ${e.message}`);
@@ -383,7 +383,7 @@ class Discord extends Integration {
         }
         // Send the embed to the same channel as the message
         const message = await (channel as DiscordJs.TextChannel).send({
-          content: this.onlineAnnounceMessage,
+          content: this.onlineAnnounceMessage.length > 0 ? this.onlineAnnounceMessage : null,
           embeds:  [embed],
         });
         this.embedMessageId = message.id;
