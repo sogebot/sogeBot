@@ -12,7 +12,7 @@ export class removeCurrentViews1651843397005 implements MigrationInterface {
 
     if (µWidgets) {
       µWidgets = JSON.parse<string[]>(µWidgets).filter((o: any) => !o.includes('|views|'));
-      await queryRunner.query(`UPDATE \`settings\` SET \`value\`="${JSON.stringify(µWidgets)}" WHERE \`name\`="µWidgets"`);
+      await queryRunner.query(`UPDATE \`settings\` SET \`value\`='${JSON.stringify(µWidgets)}' WHERE \`name\`="µWidgets"`);
     }
   }
 
