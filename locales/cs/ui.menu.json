@@ -97,5 +97,6 @@
   "obswebsocket": "OBS Websocket",
   "api-explorer": "Průzkumník API",
   "emotescombo": "Kombo emotů",
-  "notifications": "Oznámení"
+  "notifications": "Oznámení",
+  "plugins": "Plugins"
 }
