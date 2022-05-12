@@ -1,7 +1,10 @@
+import { validateOrReject } from 'class-validator';
 import { cloneDeep } from 'lodash';
+import merge from 'lodash/merge';
 
 import type { Node } from '../d.ts/src/plugins';
 import { Plugin, PluginVariable } from './database/entity/plugins';
+import { isValidationError } from './helpers/errors';
 import { adminEndpoint } from './helpers/socket';
 import { processes, processNode } from './plugins/index';
 
@@ -61,27 +64,34 @@ class Plugins extends Core {
       await Plugin.delete({ id });
       cb(null);
     });
+    adminEndpoint('/core/plugins', 'generic::validate', async (data, cb) => {
+      try {
+        const item = new Plugin();
+        merge(item, data);
+        await validateOrReject(item);
+        cb(null);
+      } catch (e) {
+        if (e instanceof Error) {
+          cb(e.message);
+        }
+        if (isValidationError(e)) {
+          cb(e);
+        }
+      }
+    });
     adminEndpoint('/core/plugins', 'generic::save', async (item, cb) => {
       try {
         const itemToSave = new Plugin();
-        if (!item.id) {
-          throw new Error('ID cannot be undefined');
-        }
-        itemToSave.id = item.id;
-        if (!item.name) {
-          throw new Error('Name cannot be undefined');
-        }
-        itemToSave.name = item.name;  
-        itemToSave.workflow = item.workflow ?? JSON.stringify({});
-        if (!item.enabled) {
-          throw new Error('Enabled cannot be undefined');
-        }
-        itemToSave.enabled = item.enabled;
+        merge(itemToSave, item);
+        await validateOrReject(itemToSave);
         await itemToSave.save();
         cb(null, itemToSave);
       } catch (e) {
         if (e instanceof Error) {
           cb(e.message, undefined);
+        }
+        if (isValidationError(e)) {
+          cb(e, undefined);
         }
       }
     });

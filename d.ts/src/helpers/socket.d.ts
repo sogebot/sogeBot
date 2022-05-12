@@ -30,6 +30,7 @@ import type {
 } from '@entity/user';
 import type { VariableInterface, VariableWatchInterface } from '@entity/variable';
 import { HelixVideo } from '@twurple/api/lib';
+import { ValidationError } from 'class-validator';
 import { Socket } from 'socket.io';
 import { FindConditions } from 'typeorm';
 
@@ -71,9 +72,10 @@ type GenericEvents = {
 type generic<T extends Record<string, any>> = {
   getAll: (cb: (error: Error | string | null, items: Readonly<Required<T>>[]) => void) => void,
   getOne: (id: Required<T['id']>, cb: (error: Error | string | null, item?: Readonly<Required<T>>) => void) => void,
-  setById: (opts: { id: Required<T['id']>, item: Partial<T> }, cb: (error: Error | string | null, item?: Readonly<Required<T>> | null) => void) => void,
-  save: (item: Partial<T>, cb: (error: Error | string | null, item?: Readonly<Required<T>> | null) => void) => void,
+  setById: (opts: { id: Required<T['id']>, item: Partial<T> }, cb: (error: ValidationError[] | Error | string | null, item?: Readonly<Required<T>> | null) => void) => void,
+  save: (item: Partial<T>, cb: (error: ValidationError[] | Error | string | null, item?: Readonly<Required<T>> | null) => void) => void,
   deleteById: (id: Required<T['id']>, cb: (error: Error | string | null) => void) => void;
+  validate: (item: Partial<T>, cb: (error: ValidationError[] | Error | string | null) => void) => void,
 };
 
 export type ClientToServerEventsWithNamespace = {
@@ -83,6 +85,7 @@ export type ClientToServerEventsWithNamespace = {
     'generic::getAll': generic<Plugin>['getAll'],
     'generic::save': generic<Plugin>['save'],
     'generic::deleteById': generic<Plugin>['deleteById'],
+    'generic::validate': generic<Plugin>['validate'],
 
   },
   '/core/emotes': GenericEvents & {

@@ -1,4 +1,7 @@
+import { IsDefined, IsNotEmpty } from 'class-validator';
 import { Entity, PrimaryColumn, Column, BaseEntity } from 'typeorm';
+
+import { translate } from '../../translate';
 
 @Entity()
 export class Plugin extends BaseEntity {
@@ -7,6 +10,7 @@ export class Plugin extends BaseEntity {
     id: string;
 
   @Column()
+  @IsNotEmpty({ message: () => translate('ui.errors.isNotEmpty') })
     name: string;
 
   @Column()
