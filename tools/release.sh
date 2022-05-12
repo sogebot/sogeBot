@@ -1,9 +1,13 @@
-echo Building bot
-#make
-
 currentSnapshot=$(node tools/changelog.js nextSnapshot)
-nextTag=$(node tools/changelog.js nextTag)
 file=./package.json
+
+if [ "$1" = "major" ]
+  then
+    nextTag=$(node tools/changelog.js nextTagMajor)
+  else
+    nextTag=$(node tools/changelog.js nextTag)
+fi
+
 
 echo Current Snapshot: $currentSnapshot
 echo Next tag: $nextTag

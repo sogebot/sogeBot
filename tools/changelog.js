@@ -9,6 +9,7 @@ const argv = require('yargs') // eslint-disable-line
   })
   .command('generate', 'generate changelog')
   .command('nextTag', 'get next tag')
+  .command('nextTagMajor', 'get next major tag')
   .command('cli [commit]', 'create changelog between commits/tags', (yargs) => {
     yargs.demandOption(['commit'], 'Please provide commit or tag argument to work with this tool');
     yargs.positional('commit', {
@@ -38,6 +39,19 @@ if (argv._[0] === 'nextTag') {
     } else {
       process.stdout.write(`${latestMajorVersion}.${latestMinorVersion}.${Number(latestPatchVersion)+1}`);
     }
+  });
+}
+
+if (argv._[0] === 'nextTagMajor') {
+  gitSemverTags(function(err, tags) {
+    const latestTag = tags[0];
+
+    const changesList = [];
+    const changesSpawn = spawnSync('git', ['log', `${latestTag}...HEAD`, '--oneline']);
+    changesList.push(...changes(changesSpawn.stdout.toString().split('\n')));
+
+    const [ latestMajorVersion, latestMinorVersion, latestPatchVersion ] = tags[0].split('.');
+    process.stdout.write(`${Number(latestMajorVersion)+1}.0.0`);
   });
 }
 
