@@ -65,7 +65,7 @@
     "name": "Occurence de variante"
   },
   "filter": {
-    "name": "Filtre d'occurrence",
+    "name": "Filter",
     "operator": "Opérateur",
     "rule": "Règle",
     "addRule": "Ajouter une règle",
