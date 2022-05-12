@@ -896,6 +896,9 @@ class Chat {
       }
     }
 
+    // trigger plugins
+    (await import('../../plugins')).default.trigger('message', message, userstate);
+
     if (!skip && !isNil(userName)) {
       const user = await changelog.get(userstate.userId);
       if (user) {
