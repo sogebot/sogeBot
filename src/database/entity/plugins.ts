@@ -1,4 +1,4 @@
-import { IsDefined, IsNotEmpty } from 'class-validator';
+import { IsNotEmpty } from 'class-validator';
 import { Entity, PrimaryColumn, Column, BaseEntity } from 'typeorm';
 
 import { translate } from '../../translate';
