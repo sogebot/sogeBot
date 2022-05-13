@@ -119,7 +119,7 @@ class Emotes extends Core {
       if (!this.fetch['7tv']) {
         this.fetchEmotes7TV();
       }
-    }, 1000);
+    }, 10000);
   }
 
   async removeCache () {
@@ -158,14 +158,13 @@ class Emotes extends Core {
         info(`EMOTES: Skipping fetching of ${broadcasterId} emotes - not subscriber/affiliate`);
         broadcasterWarning = true;
       } else {
-        broadcasterWarning = false;
         this.lastChannelChk = broadcasterId;
         try {
           if (this.lastGlobalEmoteChk !== 0) {
             info(`EMOTES: Fetching channel ${broadcasterId} emotes`);
           }
-          const clientBot = await client('bot');
-          const emotes = await clientBot.chat.getChannelEmotes(broadcasterId);
+          const apiClient = await client('broadcaster');
+          const emotes = await apiClient.chat.getChannelEmotes(broadcasterId);
           this.lastSubscriberEmoteChk = Date.now();
           this.cache = this.cache.filter(o => o.type !== 'twitch-sub');
           for (const emote of emotes) {
@@ -181,6 +180,7 @@ class Emotes extends Core {
             });
           }
           info(`EMOTES: Fetched channel ${broadcasterId} emotes`);
+          broadcasterWarning = false;
         } catch (e) {
           if (e instanceof Error) {
             if (e.message.includes('Cannot initialize Twitch API')) {
