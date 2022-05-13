@@ -7,7 +7,6 @@ import { command, settings } from '../decorators';
 import { onStartup } from '../decorators/on';
 import Expects from '../expects.js';
 import twitch from '../services/twitch';
-import { default as pointsSystem } from '../systems/points';
 import Game from './_interface';
 
 import { announce, prepare } from '~/helpers/commons';
@@ -19,7 +18,7 @@ export type Level = { name: string; winPercentage: number; payoutMultiplier: num
 export type Result = { percentage: number; message: string };
 
 class Heist extends Game {
-  dependsOn = [ pointsSystem ];
+  dependsOn = [ 'systems.points' ];
 
   startedAt: null | number = null;
   lastAnnouncedLevel = '';
@@ -194,6 +193,7 @@ class Heist extends Game {
 
   @command('!bankheist')
   async main (opts: CommandOptions): Promise<CommandResponse[]> {
+    const pointsSystem = (await import('../systems/points')).default;
     const [entryCooldown, lastHeistTimestamp, copsCooldown] = await Promise.all([
       this.entryCooldownInSeconds,
       this.lastHeistTimestamp,

@@ -21,7 +21,6 @@ import { defaultPermissions } from '~/helpers/permissions/index';
 import { getPointsName } from '~/helpers/points';
 import { adminEndpoint } from '~/helpers/socket';
 import * as changelog from '~/helpers/user/changelog.js';
-import points from '~/systems/points';
 
 const ERROR_NOT_ENOUGH_OPTIONS = 'Expected more parameters';
 const ERROR_ALREADY_OPENED = '1';
@@ -46,7 +45,7 @@ const ERROR_NOT_OPTION = '7';
 let isEndAnnounced = false;
 
 class Bets extends System {
-  public dependsOn = [ points ];
+  public dependsOn = [ 'systems.points' ];
 
   @settings()
   @ui({
@@ -222,6 +221,7 @@ class Bets extends System {
   }
 
   public async participate(opts: CommandOptions): Promise<CommandResponse[]> {
+    const points = (await import('../systems/points')).default;
     const currentBet = await getRepository(BetsEntity).findOne({
       relations: ['participations'],
       order:     { createdAt: 'DESC' },

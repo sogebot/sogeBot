@@ -33,8 +33,10 @@ import * as watchers from '~/watchers';
 
 let socket: import('~/socket').Socket | any = null;
 
+const modules = new Map<string, Module>();
+
 class Module {
-  public dependsOn: Module[] = [];
+  public dependsOn: string[] = [];
   public showInUI = true;
   public timeouts: { [x: string]: NodeJS.Timeout } = {};
   public settingsList: { category?: string; key: string; defaultValue: any }[] = [];
@@ -61,7 +63,8 @@ class Module {
       const check = async (retry: number) => {
         const status: any[] = [];
         for (const dependency of this.dependsOn) {
-          if (!dependency || !_.isFunction(dependency.status)) {
+          const module = modules.get(dependency);
+          if (!module || !_.isFunction(module.status)) {
             if (retry > 0) {
               setTimeout(() => check(--retry), 10);
             } else {
@@ -69,12 +72,12 @@ class Module {
             }
             return;
           } else {
-            status.push(await dependency.status({ quiet: true }));
+            status.push(await module.status({ quiet: true }));
           }
         }
         resolve(status.length === 0 || _.every(status));
       };
-      check(1000);
+      check(10000);
     });
   }
 
@@ -153,44 +156,43 @@ class Module {
       }
     });
 
-    const load = () => {
+    const load = async () => {
       if (isBotStarted) {
-        setTimeout(async () => {
-          const state = this._name === 'core' ? true : await this.loadVariableValue('enabled');
-          const onStartup = async () => {
-            if (loadingInProgress.length > 0) {
-              // wait until all settings are loaded
-              setTimeout(() => onStartup(), 100);
-              return;
-            }
-            if (this._enabled !== null) {
-              // change only if we can enable/disable
-              this._enabled = typeof state === 'undefined' ? this._enabled : state;
-            }
-            this.status({ state: this._enabled });
-            const path = this._name === 'core' ? this.__moduleName__.toLowerCase() : `${this._name}.${this.__moduleName__.toLowerCase()}`;
+        this.areDependenciesEnabled = await this._areDependenciesEnabled;
+        setInterval(async () => {
+          this.areDependenciesEnabled = await this._areDependenciesEnabled;
+        }, 1000);
 
-            for (const event of getFunctionList('startup', path)) {
-              (this as any)[event.fName]('enabled', state);
-            }
-            this.onStartupTriggered = true;
-          };
-          onStartup();
+        const state = this._name === 'core' ? true : await this.loadVariableValue('enabled');
+        const onStartup = async () => {
+          if (loadingInProgress.length > 0) {
+            // wait until all settings are loaded
+            setTimeout(() => onStartup(), 100);
+            return;
+          }
+          if (this._enabled !== null) {
+            // change only if we can enable/disable
+            this._enabled = typeof state === 'undefined' ? this._enabled : state;
+          }
+          this.status({ state: this._enabled });
+          const path = this._name === 'core' ? this.__moduleName__.toLowerCase() : `${this._name}.${this.__moduleName__.toLowerCase()}`;
 
-          // require panel/socket
-          socket = (require('~/socket')).default;
+          for (const event of getFunctionList('startup', path)) {
+            (this as any)[event.fName]('enabled', state);
+          }
+          this.onStartupTriggered = true;
+        };
+        onStartup();
 
-          this.registerCommands();
-        }, 5000); // slow down little bit to have everything preloaded or in progress of loading
+        // require panel/socket
+        socket = (require('~/socket')).default;
+
+        this.registerCommands();
       } else {
         setImmediate(() => load());
       }
     };
     load();
-
-    setInterval(async () => {
-      this.areDependenciesEnabled = await this._areDependenciesEnabled;
-    }, 1000);
   }
 
   public sockets() {
@@ -464,6 +466,7 @@ class Module {
     }
 
     this.firstStatusSent = true;
+    modules.set(`${this._name.toLowerCase()}.${this.__moduleName__.toLowerCase()}`, this);
 
     return opts.state;
   }

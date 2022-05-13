@@ -9,7 +9,6 @@ import {
 } from '../decorators';
 import { onStartup } from '../decorators/on';
 import general from '../general.js';
-import points from '../systems/points';
 import Game from './_interface';
 
 import { announce, prepare } from '~/helpers/commons';
@@ -31,7 +30,7 @@ const ERROR_MINIMAL_BET = '3';
  */
 
 class Duel extends Game {
-  dependsOn = [ points ];
+  dependsOn = ['systems.points'];
 
   @persistent()
     _timestamp = 0;
@@ -128,6 +127,7 @@ class Duel extends Game {
 
   @command('!duel')
   async main (opts: CommandOptions) {
+    const points = (await import('../systems/points')).default;
     const responses: CommandResponse[] = [];
     let bet;
 

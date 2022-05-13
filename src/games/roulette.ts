@@ -1,7 +1,6 @@
 import _ from 'lodash';
 
 import { command, settings } from '../decorators';
-import points from '../systems/points';
 import Game from './_interface';
 
 import { tmiEmitter } from '~/helpers/tmi';
@@ -15,7 +14,7 @@ import { translate } from '~/translate';
  */
 
 class Roulette extends Game {
-  dependsOn = [ points ];
+  dependsOn = [ 'systems.points' ];
 
   @settings()
     timeout = 10;

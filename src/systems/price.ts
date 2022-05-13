@@ -20,7 +20,6 @@ import { getPointsName } from '~/helpers/points';
 import { adminEndpoint } from '~/helpers/socket';
 import { isOwner } from '~/helpers/user';
 import * as changelog from '~/helpers/user/changelog.js';
-import points from '~/systems/points';
 import { translate } from '~/translate';
 
 /*
@@ -32,7 +31,7 @@ import { translate } from '~/translate';
  */
 
 class Price extends System {
-  public dependsOn = [ points ];
+  public dependsOn = [ 'systems.points' ];
 
   constructor () {
     super();
@@ -153,6 +152,7 @@ class Price extends System {
 
   @parser({ priority: constants.HIGH, skippable: true })
   async check (opts: ParserOptions): Promise<boolean> {
+    const points = (await import('../systems/points')).default;
     const parsed = opts.message.match(/^(![\S]+)/);
     if (!opts.sender || !parsed || isOwner(opts.sender)) {
       return true; // skip if not command or user is owner

@@ -30,7 +30,6 @@ import {
 } from '~/helpers/type';
 import * as changelog from '~/helpers/user/changelog.js';
 import { isBotId } from '~/helpers/user/isBot';
-import points from '~/systems/points';
 import { translate } from '~/translate';
 
 let cachedLevelsHash = '';
@@ -375,6 +374,7 @@ class Levels extends System {
 
   @command('!level buy')
   async buy (opts: CommandOptions): Promise<CommandResponse[]> {
+    const points = (await import('../systems/points')).default;
     try {
       if (!points.enabled) {
         throw new Error('Point system disabled.');

@@ -7,7 +7,6 @@ import {
   command, permission_settings, persistent, settings,
 } from '../decorators';
 import general from '../general.js';
-import pointsSystem from '../systems/points';
 import users from '../users';
 import Game from './_interface';
 
@@ -35,7 +34,7 @@ class MinimalBetError extends Error {
  */
 
 class Gamble extends Game {
-  dependsOn = [ pointsSystem ];
+  dependsOn = [ 'systems.points' ];
 
   @permission_settings('settings')
     minimalBet = 0;
@@ -55,6 +54,8 @@ class Gamble extends Game {
 
   @command('!gamble')
   async main (opts: CommandOptions): Promise<CommandResponse[]> {
+    const pointsSystem = (await import('../systems/points')).default;
+
     let points, message;
 
     try {
