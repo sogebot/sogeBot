@@ -65,7 +65,7 @@
     "name": "Variantenvorkommen"
   },
   "filter": {
-    "name": "Auftretender Filter",
+    "name": "Filter",
     "operator": "Operator",
     "rule": "Regel",
     "addRule": "Neue Regel",
