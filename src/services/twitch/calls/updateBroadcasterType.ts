@@ -9,8 +9,8 @@ import { variables } from '~/watchers';
 async function updateBroadcasterType () {
   try {
     const cid = variables.get('services.twitch.broadcasterId') as string;
-    const clientBot = await client('bot');
-    const getUserById = await clientBot.users.getUserById(cid);
+    const clientBroadcaster = await client('broadcaster');
+    const getUserById = await clientBroadcaster.users.getUserById(cid);
 
     if (getUserById) {
       emitter.emit('set', '/services/twitch', 'profileImageUrl', getUserById.profilePictureUrl);
@@ -20,7 +20,7 @@ async function updateBroadcasterType () {
     if (e instanceof Error) {
       if (e.message.includes('Invalid OAuth token')) {
         warning(`${getFunctionName()} => Invalid OAuth token - attempting to refresh token`);
-        await refresh('bot');
+        await refresh('broadcaster');
       } else {
         error(`${getFunctionName()} => ${e.stack ?? e.message}`);
       }
