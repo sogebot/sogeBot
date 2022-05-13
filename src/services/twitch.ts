@@ -122,7 +122,7 @@ class Twitch extends Service {
   @settings('broadcaster')
     broadcasterCurrentScopes: string[] = [];
   @persistent()
-    broadcasterType = '';
+    broadcasterType: string | null = null;
 
   @settings('bot')
     botAccessToken = '';
@@ -236,6 +236,7 @@ class Twitch extends Service {
         if (value === '') {
           cache.broadcaster = 'force_reconnect';
           emitter.emit('set', '/services/twitch', 'broadcasterUsername', '');
+          emitter.emit('set', '/services/twitch', 'broadcasterType', null);
           tmiEmitter.emit('part', 'broadcaster');
         } else {
           setTimeout(() => {
