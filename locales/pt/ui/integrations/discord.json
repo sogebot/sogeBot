@@ -4,7 +4,7 @@
     "guild": "Servidor",
     "listenAtChannels": "Escutar comandos neste canal",
     "sendOnlineAnnounceToChannel": "Enviar anúncio online para este canal",
-    "onlineAnnounceMessage": "Message in online announcement (can include mentions)",
+    "onlineAnnounceMessage": "Mensagem em anúncio de online (pode incluir menções)",
     "sendAnnouncesToChannel": "Configuração de envio de avisos para canais",
     "deleteMessagesAfterWhile": "Excluir mensagem após um tempo",
     "clientId": "ClientId",
