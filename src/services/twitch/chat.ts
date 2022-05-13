@@ -223,34 +223,34 @@ class Chat {
           setStatus('TMI', constants.CONNECTED);
         }
 
-        emitter.emit('set', '/services/twitch', 'currentChannel', channel);
+        emitter.emit('set', '/services/twitch', 'broadcasterUsername', channel);
       }
     }
   }
 
   async ban (username: string, type: 'bot' | 'broadcaster' = 'bot' ): Promise<void> {
-    const currentChannel = variables.get('services.twitch.currentChannel') as string;
+    const broadcasterUsername = variables.get('services.twitch.broadcasterUsername') as string;
     const client = this.client[type];
     if (!client && type === 'bot') {
       return this.ban(username, 'broadcaster');
     } else if (!client) {
       error(`TMI: Cannot ban user. Bot/Broadcaster is not connected to TMI.`);
     } else {
-      await client.ban(currentChannel, username);
-      await client.say(currentChannel, `/block ${username}`);
+      await client.ban(broadcasterUsername, username);
+      await client.say(broadcasterUsername, `/block ${username}`);
       info(`TMI: User ${username} was banned and blocked.`);
       return;
     }
   }
 
   async part (type: 'bot' | 'broadcaster') {
-    const currentChannel = variables.get('services.twitch.currentChannel') as string;
+    const broadcasterUsername = variables.get('services.twitch.broadcasterUsername') as string;
     const client = this.client[type];
     if (!client) {
       info(`TMI: ${type} is not connected in any channel`);
     } else {
-      await client.part(currentChannel);
-      info(`TMI: ${type} parted channel ${currentChannel}`);
+      await client.part(broadcasterUsername);
+      info(`TMI: ${type} parted channel ${broadcasterUsername}`);
     }
   }
 

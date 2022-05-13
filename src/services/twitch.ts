@@ -60,9 +60,6 @@ class Twitch extends Service {
   @persistent() // needs to be persistent as we are using it with variables.get
     broadcasterTokenValid = false;
 
-  @persistent()
-    currentChannel = '';
-
   @settings('general')
     isTitleForced = false;
 
@@ -323,8 +320,8 @@ class Twitch extends Service {
   reconnectOnStreamStart() {
     this.uptime = 0;
     if (this.enabled) {
-      this.tmi?.part('bot').then(() => this.tmi?.join('bot', this.currentChannel));
-      this.tmi?.part('broadcaster').then(() => this.tmi?.join('broadcaster', this.currentChannel));
+      this.tmi?.part('bot').then(() => this.tmi?.join('bot', this.broadcasterUsername));
+      this.tmi?.part('broadcaster').then(() => this.tmi?.join('broadcaster', this.broadcasterUsername));
     }
   }
 

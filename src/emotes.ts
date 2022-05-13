@@ -240,10 +240,9 @@ class Emotes extends Core {
 
   async fetchEmotesFFZ () {
     const broadcasterId = variables.get('services.twitch.broadcasterId') as string;
-    const currentChannel = variables.get('services.twitch.currentChannel') as string;
+    const broadcasterUsername = variables.get('services.twitch.broadcasterUsername') as string;
 
-    if (currentChannel.length === 0) {
-      setImmediate(() => this.fetchEmotesFFZ());
+    if (broadcasterUsername.length === 0) {
       return;
     }
     this.fetch.ffz = true;
@@ -272,7 +271,7 @@ class Emotes extends Core {
         info('EMOTES: Fetched ffz emotes');
       } catch (e: any) {
         if (e.response.status === 404) {
-          warning(`EMOTES: Channel ${currentChannel} not found in ffz`);
+          warning(`EMOTES: Channel ${broadcasterUsername} not found in ffz`);
         } else {
           error(e);
         }
@@ -283,7 +282,11 @@ class Emotes extends Core {
   }
 
   async fetchEmotes7TV () {
-    const currentChannel = variables.get('services.twitch.currentChannel') as string;
+    const broadcasterUsername = variables.get('services.twitch.broadcasterUsername') as string;
+
+    if (broadcasterUsername.length === 0) {
+      return;
+    }
 
     const getAllGlobalEmotes = async (query: string, urlTemplate: string, page = 1): Promise<void> => {
       const request = await axios.post<any>('https://api.7tv.app/v2/gql', {
@@ -347,14 +350,9 @@ class Emotes extends Core {
       }
     };
 
-    if (currentChannel.length === 0) {
-      setImmediate(() => this.fetchEmotes7TV());
-      return;
-    }
-
     this.fetch['7tv'] = true;
 
-    if (currentChannel && Date.now() - this.last7TVEmoteChk > 1000 * 60 * 60 * 24 * 7) {
+    if (Date.now() - this.last7TVEmoteChk > 1000 * 60 * 60 * 24 * 7) {
       info('EMOTES: Fetching 7tv emotes');
       this.last7TVEmoteChk = Date.now();
       this.cache = this.cache.filter(o => o.type !== '7tv');
@@ -365,7 +363,7 @@ class Emotes extends Core {
         await getAllGlobalEmotes(query, urlTemplate);
 
         const query2 = `query user ($id: String!) { user(id:$id) { emotes { id name owner_id visibility tags height width } } }`;
-        await getAllChannelEmotes(query2, urlTemplate, currentChannel),
+        await getAllChannelEmotes(query2, urlTemplate, broadcasterUsername),
         info('EMOTES: Fetched 7tv emotes');
       } catch (e: any) {
         error(e);
@@ -376,9 +374,9 @@ class Emotes extends Core {
   }
 
   async fetchEmotesBTTV () {
-    const currentChannel = variables.get('services.twitch.currentChannel') as string;
+    const broadcasterUsername = variables.get('services.twitch.broadcasterUsername') as string;
 
-    if (currentChannel.length === 0) {
+    if (broadcasterUsername.length === 0) {
       setImmediate(() => this.fetchEmotesBTTV());
       return;
     }
@@ -386,12 +384,12 @@ class Emotes extends Core {
     this.fetch.bttv = true;
 
     // fetch BTTV emotes
-    if (currentChannel && Date.now() - this.lastBTTVEmoteChk > 1000 * 60 * 60 * 24 * 7) {
+    if (Date.now() - this.lastBTTVEmoteChk > 1000 * 60 * 60 * 24 * 7) {
       info('EMOTES: Fetching bttv emotes');
       this.lastBTTVEmoteChk = Date.now();
       this.cache = this.cache.filter(o => o.type !== 'bttv');
       try {
-        const request = await axios.get<any>('https://api.betterttv.net/2/channels/' + currentChannel);
+        const request = await axios.get<any>('https://api.betterttv.net/2/channels/' + broadcasterUsername);
 
         const urlTemplate = request.data.urlTemplate;
         const emotes = request.data.emotes;
@@ -412,7 +410,7 @@ class Emotes extends Core {
         info('EMOTES: Fetched bttv emotes');
       } catch (e: any) {
         if (e.response.status === 404) {
-          warning(`EMOTES: Channel ${currentChannel} not found in bttv`);
+          warning(`EMOTES: Channel ${broadcasterUsername} not found in bttv`);
         } else {
           error(e);
         }

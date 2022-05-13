@@ -545,8 +545,8 @@ class Panel extends Core {
       socket.on('name', function (cb: (botUsername: string) => void) {
         cb(variables.get('services.twitch.botUsername') as string);
       });
-      socket.on('channelName', function (cb: (currentChannel: string) => void) {
-        cb(variables.get('services.twitch.currentChannel') as string);
+      socket.on('channelName', function (cb: (broadcasterUsername: string) => void) {
+        cb(variables.get('services.twitch.broadcasterUsername') as string);
       });
       socket.on('version', function (cb: (version: string) => void) {
         const version = _.get(process, 'env.npm_package_version', 'x.y.z');
