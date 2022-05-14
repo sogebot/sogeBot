@@ -62,6 +62,7 @@ class Plugins extends Core {
     });
     adminEndpoint('/core/plugins', 'generic::deleteById', async (id, cb) => {
       await Plugin.delete({ id });
+      await PluginVariable.delete({ pluginId: id });
       cb(null);
     });
     adminEndpoint('/core/plugins', 'generic::validate', async (data, cb) => {
