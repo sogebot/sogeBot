@@ -2,15 +2,14 @@ import { ApiClient } from '@twurple/api';
 import { StaticAuthProvider } from '@twurple/auth';
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
+import { getAccessTokenInMigration } from '../../../getAccessTokenInMigration';
+
 let rewardsList: null | any[] = null;
 
 export class updateRewardsToIds1651671003485 implements MigrationInterface {
   name = 'updateRewardsToIds1651671003485';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
-    const accessToken = (await queryRunner.query(`SELECT * from \`settings\` `)).find((o: any) => {
-      return o.namespace === '/services/twitch' && o.name === 'broadcasterAccessToken';
-    })?.value;
     const broadcasterId = (await queryRunner.query(`SELECT * from \`settings\` `)).find((o: any) => {
       return o.namespace === '/services/twitch' && o.name === 'broadcasterId';
     })?.value;
@@ -18,7 +17,7 @@ export class updateRewardsToIds1651671003485 implements MigrationInterface {
       return o.namespace === '/services/twitch' && o.name === 'broadcasterClientId';
     })?.value;
 
-    if (!accessToken || !clientId || !broadcasterId) {
+    if (!clientId || !broadcasterId) {
       return;
     }
 
@@ -26,7 +25,7 @@ export class updateRewardsToIds1651671003485 implements MigrationInterface {
       const rewardAlerts = await queryRunner.query(`SELECT * from \`alert_reward_redeem\``);
       for (const alert of rewardAlerts) {
         if (!rewardsList) {
-          const authProvider = new StaticAuthProvider(JSON.parse<string>(clientId), JSON.parse<string>(accessToken));
+          const authProvider = new StaticAuthProvider(JSON.parse<string>(clientId), await getAccessTokenInMigration(queryRunner, 'broadcaster'));
           const client = new ApiClient({ authProvider });
           rewardsList = await client.channelPoints.getCustomRewards(JSON.parse<string>(broadcasterId));
         }
@@ -41,7 +40,7 @@ export class updateRewardsToIds1651671003485 implements MigrationInterface {
       for (const event of events) {
         if (event.name === 'reward-redeemed') {
           if (!rewardsList) {
-            const authProvider = new StaticAuthProvider(JSON.parse<string>(clientId), JSON.parse<string>(accessToken));
+            const authProvider = new StaticAuthProvider(JSON.parse<string>(clientId), await getAccessTokenInMigration(queryRunner, 'broadcaster'));
             const client = new ApiClient({ authProvider });
             rewardsList = await client.channelPoints.getCustomRewards(JSON.parse<string>(broadcasterId));
           }
