@@ -24,7 +24,7 @@
    IP address for your database connections.
 
 1. Download `Docker Compose` files
-    - From GIT: `git clone git@github.com:sogehige/sogeBot-docker.git`
+    - From GIT: `git clone git@github.com:sogebot/sogeBot-docker.git`
     - Without GIT as [ZIP](https://github.com/sogehige/sogeBot-docker/archive/master.zip)
 2. Configure properly .env file in `root` directory
     - You can find examples at [our GitHub repository](https://github.com/sogebot/sogeBot/tree/master/src/data)
