@@ -25,7 +25,7 @@ import { isModerator } from '../user/isModerator';
 import { getRandomFollower, getRandomOnlineFollower, getRandomOnlineSubscriber, getRandomOnlineViewer, getRandomSubscriber, getRandomViewer } from '../user/random.js';
 import { getAll } from './getAll';
 
-async function runScript (script: string, opts: { sender: { userId: string; userName: string; source: 'twitch' | 'discord' } | string | null, isUI: boolean; param?: string | number, _current: any }) {
+async function runScript (script: string, opts: { sender: { userId: string; userName: string; source: 'twitch' | 'discord' } | string | null, isUI: boolean; param?: string | number, _current: any, parameters?: { [x: string]: any }, variables?: { [x: string]: any } }) {
   debug('customvariables.eval', opts);
   let sender = !isNil(opts.sender) ? opts.sender : null;
   const isUI = !isNil(opts.isUI) ? opts.isUI : false;
@@ -58,24 +58,9 @@ async function runScript (script: string, opts: { sender: { userId: string; user
   }
 
   let strippedScript = minified.code;
-  const containRandom = strippedScript.replace(/Math\.random|_\.random/g, '').match(/random/g) !== null;
   debug('customvariables.eval', {
-    strippedScript, containRandom,
+    strippedScript,
   });
-
-  let randomVar = null;
-  if (containRandom) {
-    randomVar = {
-      online: {
-        viewer:     await getRandomOnlineViewer(),
-        follower:   await getRandomOnlineFollower(),
-        subscriber: await getRandomOnlineSubscriber(),
-      },
-      viewer:     await getRandomViewer(),
-      follower:   await getRandomFollower(),
-      subscriber: await getRandomSubscriber(),
-    };
-  }
 
   // get custom variables
   const customVariables = await getAll();
@@ -113,7 +98,6 @@ async function runScript (script: string, opts: { sender: { userId: string; user
       };
     },
     _:      _,
-    random: randomVar,
     stream: {
       uptime:             getTime(isStreamOnline.value ? streamStatusChangeSince.value : null, false),
       currentViewers:     stats.value.currentViewers,
@@ -133,6 +117,7 @@ async function runScript (script: string, opts: { sender: { userId: string; user
     info:                   info,
     warning:                warning,
     param:                  param,
+    parameters:             opts.parameters,
     _current:               opts._current,
     randomOnlineFollower:   async () => getRandomOnlineFollower(),
     randomOnlineSubscriber: async () => getRandomOnlineSubscriber(),
@@ -193,6 +178,7 @@ async function runScript (script: string, opts: { sender: { userId: string; user
       }
     },
     ...customVariables,
+    ...opts.variables,
   };
     // we need to add operation counter function
   const opCounterFnc = 'let __opCount__ = 0; function __opCounter__() { if (__opCount__ > 100000) { throw new Error("Running script seems to be in infinite loop."); } else { __opCount__++; }};';
