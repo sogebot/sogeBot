@@ -65,7 +65,7 @@
     "name": "Variante di occorrenza"
   },
   "filter": {
-    "name": "Filtro occorrenza",
+    "name": "Filter",
     "operator": "Operatore",
     "rule": "Regola",
     "addRule": "Aggiungi regola",
