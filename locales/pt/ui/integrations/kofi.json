@@ -1,15 +1,15 @@
 {
   "settings": {
     "verification_token": {
-      "title": "Verification token",
-      "help": "Get your verification token at <a href='https://ko-fi.com/manage/webhooks' target='_blank'>https://ko-fi.com/manage/webhooks</a>"
+      "title": "Token de verifição",
+      "help": "Obtenha o seu token de verificação em <a href='https://ko-fi.com/manage/webhooks' target='_blank'>https://ko-fi.com/manage/webhooks</a>"
     },
     "webhook_url": {
-      "title": "Webhook URL",
-      "help": "Set Webhook URL at <a href='https://ko-fi.com/manage/webhooks' target='_blank'>https://ko-fi.com/manage/webhooks</a>",
+      "title": "URL do Webhook",
+      "help": "Defina a URL de Webhook em <a href='https://ko-fi.com/manage/webhooks' target='_blank'>https://ko-fi.com/manage/webhooks</a>",
       "errors": {
-        "https": "URL must have HTTPS",
-        "origin": "You cannot use localhost for webhooks"
+        "https": "A URL precisa ter HTTPS",
+        "origin": "Você não pode usar localhost para webhooks"
       }
     }
   }
