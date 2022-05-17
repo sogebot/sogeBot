@@ -104,6 +104,7 @@ export class overlayResolver {
       wordcloud:    items.filter(o => o.value === 'wordcloud'),
       randomizer:   items.filter(o => o.value === 'randomizer'),
       reference:    items.filter(o => o.value === 'reference'),
+      chat:         items.filter(o => o.value === 'chat'),
     } as OverlayObject;
     return response;
   }

@@ -13,6 +13,7 @@ async function updateBroadcasterType () {
     const getUserById = await clientBroadcaster.users.getUserById(cid);
 
     if (getUserById) {
+      console.log(getUserById.broadcasterType);
       emitter.emit('set', '/services/twitch', 'profileImageUrl', getUserById.profilePictureUrl);
       emitter.emit('set', '/services/twitch', 'broadcasterType', getUserById.broadcasterType);
     }

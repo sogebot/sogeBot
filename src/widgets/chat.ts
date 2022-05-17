@@ -7,6 +7,7 @@ import { onMessage } from '~/decorators/on';
 import { getUserSender } from '~/helpers/commons';
 import { sendMessage } from '~/helpers/commons/sendMessage';
 import { ioServer } from '~/helpers/panel';
+import { parseTextWithEmotes } from '~/helpers/parseTextWithEmotes';
 import { adminEndpoint, publicEndpoint } from '~/helpers/socket';
 import { getIgnoreList } from '~/helpers/user/isIgnored';
 import { variables } from '~/watchers';
@@ -14,22 +15,7 @@ import { variables } from '~/watchers';
 class Chat extends Widget {
   @timer()
   async withEmotes (text: string | undefined) {
-    const Emotes = (await import('../emotes')).default;
-    if (typeof text === 'undefined' || text.length === 0) {
-      return '';
-    }
-
-    // checking emotes
-    for (const emote of Emotes.cache) {
-      const split: string[] = (text as string).split(' ');
-      for (let i = 0; i < split.length; i++) {
-        if (split[i] === emote.code) {
-          split[i] = `<span class="simpleChatImage"><img src='${emote.urls[1]}' class="emote" alt="${emote.code}" title="${emote.code}"/></span>`;
-        }
-      }
-      text = split.join(' ');
-    }
-    return text;
+    return parseTextWithEmotes(text);
   }
 
   @onMessage()

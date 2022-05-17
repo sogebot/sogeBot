@@ -86,7 +86,6 @@ export type ClientToServerEventsWithNamespace = {
     'generic::save': generic<Plugin>['save'],
     'generic::deleteById': generic<Plugin>['deleteById'],
     'generic::validate': generic<Plugin>['validate'],
-
   },
   '/core/emotes': GenericEvents & {
     'testExplosion': (cb: (err: Error | string | null, data: null ) => void) => void,
@@ -140,6 +139,10 @@ export type ClientToServerEventsWithNamespace = {
   '/overlays/media': GenericEvents & {
     'alert': (data: any) => void,
     'cache': (cacheLimit: number, cb: (err: Error | string | null, data: any) => void) => void,
+  },
+  '/overlays/chat': GenericEvents & {
+    'test': (data: { message: string; username: string }) => void,
+    'message': (data: { id: string, show: boolean; message: string; username: string }) => void,
   },
   '/overlays/texttospeech': GenericEvents & {
     'speak': (data: { text: string; highlight: boolean, service: 0 | 1, key: string }) => void,
