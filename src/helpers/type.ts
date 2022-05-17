@@ -7,7 +7,7 @@ export const bigIntMin = (...args: bigint[]): bigint => args.reduce((m, e) => e 
 // Courtesy of https://stackoverflow.com/users/696535/pawel
 // https://stackoverflow.com/a/56150320
 
-export const serialize = (toSerialize: BigInt | Map<any, any>): string => {
+export const serialize = (toSerialize: bigint | Map<any, any>): string => {
   return JSON.stringify(toSerialize, function (key, value) {
     const originalObject = this[key];
     if(originalObject instanceof Map) {

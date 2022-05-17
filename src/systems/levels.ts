@@ -353,7 +353,7 @@ class Levels extends System {
       return 0;
     }
 
-    let levelXP: BigInt = BigInt(this.firstLevelStartsAt);
+    let levelXP = BigInt(this.firstLevelStartsAt);
     let level = 1;
     for (; currentXP > 0; level++) {
       if (level > 1) {
