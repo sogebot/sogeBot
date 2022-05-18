@@ -11,7 +11,7 @@ import type { HighlightInterface } from '@entity/highlight';
 import type { HowLongToBeatGameInterface, HowLongToBeatGameItemInterface } from '@entity/howLongToBeatGame';
 import type { KeywordInterface } from '@entity/keyword';
 import type { OBSWebsocketInterface } from '@entity/obswebsocket';
-import type { OverlayMapperMarathon } from '@entity/overlay';
+import type { OverlayMapperMarathon, OverlayMappers } from '@entity/overlay';
 import type { PermissionsInterface } from '@entity/permissions';
 import type { PollInterface } from '@entity/poll';
 import type { PriceInterface } from '@entity/price';
@@ -128,6 +128,13 @@ export type ClientToServerEventsWithNamespace = {
   '/overlays/eventlist': GenericEvents & {
     'getEvents': (opts: { ignore: any[], limit: number }, cb: (err: Error | string | null, data: EventListInterface[]) => void) => void,
     'eventlist::getUserEvents': (userId: string, cb: (err: Error | string | null, events: EventListInterface[]) => void) => void,
+  },
+  '/registries/overlays': GenericEvents & {
+    'generic::getOne': generic<OverlayMappers>['getOne'],
+    'generic::getAll': generic<OverlayMappers>['getAll'],
+    'generic::deleteById': generic<OverlayMappers>['deleteById'],
+    'generic::save': generic<OverlayMappers>['save'],
+    'overlays::tick': (opts: {id: string, millis: number}) => void,
   },
   '/overlays/gallery': GenericEvents & {
     'generic::getOne': generic<GalleryInterface>['getOne'],

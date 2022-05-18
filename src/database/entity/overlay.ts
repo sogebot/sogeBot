@@ -20,7 +20,7 @@ export interface OverlayMapperReference extends OverlayMapperInterfaceCommon {
 export interface OverlayMapperChat extends OverlayMapperInterfaceCommon {
   value: 'chat';
   opts: {
-    isHorizontal: boolean;
+    type: 'vertical' | 'horizontal' | 'niconico';
     hideMessageAfter: number;
     showTimestamp: boolean;
     font: {
