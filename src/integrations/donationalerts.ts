@@ -87,6 +87,18 @@ class Donationalerts extends Integration {
 
   @onStartup()
   interval() {
+    setInterval(() => {
+
+      eventEmitter.emit('tip', {
+        isAnonymous:         false,
+        userName:            'soge__',
+        amount:              '10',
+        currency:            'CZK',
+        amountInBotCurrency: '10',
+        currencyInBot:       'CZK',
+        message:             'Hey its me!',
+      });
+    }, 10000);
     setInterval(async () => {
       if (this.channel.length === 0) {
         return;

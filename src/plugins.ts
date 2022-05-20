@@ -5,6 +5,7 @@ import merge from 'lodash/merge';
 import type { Node } from '../d.ts/src/plugins';
 import { Plugin, PluginVariable } from './database/entity/plugins';
 import { isValidationError } from './helpers/errors';
+import { eventEmitter } from './helpers/events';
 import { adminEndpoint } from './helpers/socket';
 import { processes, processNode } from './plugins/index';
 
@@ -16,14 +17,32 @@ const twitchChatMessage = {
     userName: 'string',
     userId:   'string',
   },
-  message: 'string',
+  parameters: {
+    message: 'string',
+  },
 };
 const twitchCommand = {
   sender: {
     userName: 'string',
     userId:   'string',
   },
-  message: 'string',
+  parameters: {
+    message: 'string',
+  },
+};
+const tip = {
+  sender: {
+    userName: 'string',
+    userId:   'string',
+  },
+  parameters: {
+    isAnonymous: 'boolean',
+    message:     'string',
+    amount:      'number',
+    currency:    'string',
+    botAmount:   'number',
+    botCurrency: 'string',
+  },
 };
 
 const generateRegex = (parameters: { name: string; type: 'number' | 'word' | 'sentence'; }[]) => {
@@ -44,12 +63,28 @@ class Plugins extends Core {
   listeners = {
     twitchChatMessage,
     twitchCommand,
+    tip,
   } as const;
 
   @onStartup()
   onStartup() {
     this.addMenu({
       category: 'registry', name: 'plugins', id: 'registry/plugins', this: null,
+    });
+
+    eventEmitter.on('tip', async (data) => {
+      const users = (await import('./users')).default;
+      const user = {
+        userName: data.userName,
+        userId:   !data.isAnonymous ? await users.getIdByName(data.userName) : '0',
+      };
+      this.process('tip', data.message, user, {
+        isAnonymous: data.isAnonymous,
+        amount:      data.amount + 120,
+        botAmount:   data.amountInBotCurrency,
+        currency:    data.currency,
+        botCurrency: data.currencyInBot,
+      });
     });
   }
 
@@ -101,7 +136,7 @@ class Plugins extends Core {
     });
   }
 
-  async processPath(pluginId: string, workflow: Node[], currentNode: Node, parameters: Record<string, any>, variables: Record<string, any>, userstate: ChatUser ) {
+  async processPath(pluginId: string, workflow: Node[], currentNode: Node, parameters: Record<string, any>, variables: Record<string, any>, userstate: { userName: string; userId: string } ) {
     parameters = cloneDeep(parameters);
     variables = cloneDeep(variables);
 
@@ -139,7 +174,7 @@ class Plugins extends Core {
     }
   }
 
-  async process(type: keyof typeof this.listeners, message: string, userstate: ChatUser) {
+  async process(type: keyof typeof this.listeners, message: string, userstate: { userName: string, userId: string }, params?: Record<string, any>) {
     const plugins = await Plugin.find({ enabled: true });
     const pluginsWithListener: Plugin[] = [];
     for (const plugin of plugins) {
@@ -149,7 +184,7 @@ class Plugins extends Core {
       ) as Node[];
 
       const listeners = workflow.filter((o: any) => {
-        let params: Record<string, any> = {};
+        params ??= {};
         const isListener = o.name === 'listener';
         const isType = o.data.value === type;
 
@@ -210,10 +245,20 @@ class Plugins extends Core {
     return pluginsWithListener;
   }
 
-  async trigger(type: 'message', message: string, userstate: ChatUser) {
+  async trigger(type: 'tip', message: string, userstate: { userName: string, userId: string }, data: {
+    currency: string, amount: number,
+    botCurrency: string, botAmount: number,
+  }): Promise<void>;
+  async trigger(type: 'message', message: string, userstate: { userName: string, userId: string }): Promise<void>;
+
+  async trigger(type: string, message: string, userstate: { userName: string, userId: string }, data?: Record<string, any>) {
     switch(type) {
       case 'message': {
         this.process(message.startsWith('!') ? 'twitchCommand' : 'twitchChatMessage', message, userstate);
+        break;
+      }
+      case 'tip': {
+        this.process(type, message, userstate, data);
         break;
       }
       default:

@@ -2,8 +2,14 @@ import { getGlobalVariables } from '~/helpers/checkFilter';
 import { flatten } from '~/helpers/flatten';
 import { showWithAt } from '~/helpers/tmi';
 
-export async function template(message: string, params: Record<string, any>, userstate?: ChatUser) {
-  params = flatten(params);
+export async function template(message: string, params: Record<string, any>, userstate?: { userName: string; userId: string }) {
+  params = flatten({
+    ...params,
+    sender: {
+      userName: userstate?.userName,
+      userId:   userstate?.userId,
+    },
+  });
   const regexp = new RegExp(`{ *?(?<variable>[a-zA-Z0-9.]+) *?}`, 'g');
   const match = message.matchAll(regexp);
   for (const item of match) {

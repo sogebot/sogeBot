@@ -1,7 +1,7 @@
 import type { Node } from '~/../d.ts/src/plugins';
 import { PluginVariable } from '~/database/entity/plugins';
 
-export default async function(pluginId: string, currentNode: Node, parameters: Record<string, any>, variables: Record<string, any>, userstate: ChatUser) {
+export default async function(pluginId: string, currentNode: Node, parameters: Record<string, any>, variables: Record<string, any>, userstate: { userName: string; userId: string; }) {
   const variableName = currentNode.data.value;
   const variable = new PluginVariable();
   variable.variableName = variableName;

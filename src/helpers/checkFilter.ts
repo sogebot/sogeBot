@@ -82,7 +82,7 @@ class HelpersFilter {
   }
 
   @timer()
-  async getGlobalVariables(message: string, opts: { escape?: string, sender?: CommandOptions['sender'], discord?: CommandOptions['discord'] }) {
+  async getGlobalVariables(message: string, opts: { escape?: string, sender?: CommandOptions['sender'] | { userName: string; userId: string }, discord?: CommandOptions['discord'] }) {
     if (!message.includes('$')) {
       // message doesn't have any variables
       return {};
@@ -182,6 +182,6 @@ export const checkFilter = async (opts: CommandOptions | ParserOptions, filter: 
   return cl.checkFilter(opts, filter);
 };
 
-export const getGlobalVariables = async (message: string, opts: { escape?: string, sender?: CommandOptions['sender'], discord?: CommandOptions['discord'] }): Promise<Record<string, any>> => {
+export const getGlobalVariables = async (message: string, opts: { escape?: string, sender?: CommandOptions['sender'] | { userName: string; userId: string }, discord?: CommandOptions['discord'] }): Promise<Record<string, any>> => {
   return cl.getGlobalVariables(message, opts);
 };

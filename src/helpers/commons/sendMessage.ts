@@ -14,7 +14,7 @@ import { getBotSender } from '.';
 // exposing functions to @timer decorator
 class HelpersCommons {
   @timer()
-  async sendMessage(messageToSend: string | Promise<string>, sender: Omit<ChatUser, '_userName' | '_userData' | '_parseBadgesLike'> | null, attr?: {
+  async sendMessage(messageToSend: string | Promise<string>, sender: Omit<ChatUser, '_userName' | '_userData' | '_parseBadgesLike'> | null | { userName: string; userId: string }, attr?: {
     sender?: Partial<Omit<ChatUser, '_userName' | '_userData' | '_parseBadgesLike'>>;
     discord?: CommandOptions['discord'];
     quiet?: boolean;
@@ -87,7 +87,7 @@ class HelpersCommons {
 }
 const self = new HelpersCommons();
 
-export async function sendMessage(messageToSend: string | Promise<string>, sender: Omit<ChatUser, '_userName' | '_userData' | '_parseBadgesLike'> | null, attr?: {
+export async function sendMessage(messageToSend: string | Promise<string>, sender: Omit<ChatUser, '_userName' | '_userData' | '_parseBadgesLike'> | null | { userName: string; userId: string }, attr?: {
   sender?: Partial<Omit<ChatUser, '_userName' | '_userData' | '_parseBadgesLike'>>;
   quiet?: boolean;
   skip?: boolean;
