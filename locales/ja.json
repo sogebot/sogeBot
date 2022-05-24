@@ -302,7 +302,7 @@
         },
         "": "",
         "reward": {
-          "label": "Reward",
+          "label": "リワード",
           "placeholder": ""
         }
       }
@@ -317,7 +317,7 @@
       "resub": "<strong>再サブスクライブ</strong>",
       "cheer": "<strong>チアーが送られました</strong>",
       "tip": "<strong>Tipが送られました</strong>",
-      "tipToCharity": "<strong>donated</strong> to $campaignName",
+      "tipToCharity": "$campaignName に <strong>寄付しました</strong>",
       "rewardredeem": "報酬を<strong>引き換えました</strong>"
     },
     "responses": {
