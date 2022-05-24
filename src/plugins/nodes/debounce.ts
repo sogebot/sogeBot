@@ -1,5 +1,3 @@
-import { DAY } from '@sogebot/ui-helpers/constants';
-
 import { template } from '../template';
 
 import type { Node } from '~/../d.ts/src/plugins';

@@ -33,7 +33,7 @@ class HowLongToBeat extends System {
 
     let lastDbgMessage = '';
     setInterval(async () => {
-      const dbgMessage = `streamOnline: ${isStreamOnline.value}, enabled: ${this.enabled}, currentGame: ${ stats.value.currentGame}, isGameInNotFoundList: ${isGameInNotFoundList}`;
+      const dbgMessage = `streamOnline: ${isStreamOnline.value}, enabled: ${this.enabled}, currentGame: ${ stats.value.currentGame}`;
       if (lastDbgMessage !== dbgMessage) {
         lastDbgMessage = dbgMessage;
         debug('hltb', dbgMessage);
