@@ -5,7 +5,7 @@ import { EntityNotFoundError } from 'typeorm';
 import { getRepository } from 'typeorm';
 
 import { command, default_permission } from '../decorators';
-import { onStartup, onStreamStart } from '../decorators/on';
+import { onStartup } from '../decorators/on';
 import Expects from '../expects';
 import System from './_interface';
 
@@ -14,12 +14,10 @@ import {
 } from '~/helpers/api';
 import { prepare } from '~/helpers/commons';
 import {
-  debug, error, info, warning,
+  debug, error,
 } from '~/helpers/log';
 import { defaultPermissions } from '~/helpers/permissions/index';
 import { adminEndpoint } from '~/helpers/socket';
-
-const notFoundGames = [] as string[];
 
 class HowLongToBeat extends System {
   interval: number = constants.SECOND * 15;
@@ -31,25 +29,46 @@ class HowLongToBeat extends System {
       category: 'manage', name: 'howlongtobeat', id: 'manage/howlongtobeat', this: this,
     });
 
-    this.refreshImageThumbnail();
+    this.checkZeroGameplayGames();
 
     let lastDbgMessage = '';
     setInterval(async () => {
-      const isGameInNotFoundList = stats.value.currentGame && notFoundGames.includes(stats.value.currentGame);
       const dbgMessage = `streamOnline: ${isStreamOnline.value}, enabled: ${this.enabled}, currentGame: ${ stats.value.currentGame}, isGameInNotFoundList: ${isGameInNotFoundList}`;
       if (lastDbgMessage !== dbgMessage) {
         lastDbgMessage = dbgMessage;
         debug('hltb', dbgMessage);
       }
-      if (isStreamOnline.value && this.enabled && !isGameInNotFoundList) {
+      if (isStreamOnline.value && this.enabled) {
         this.addToGameTimestamp();
       }
     }, this.interval);
   }
 
-  @onStreamStart()
-  resetNotFoundGames() {
-    notFoundGames.length = 0;
+  async checkZeroGameplayGames() {
+    const games = await getRepository(HowLongToBeatGame).find({ where: {
+      gameplayMain: 0,
+    } });
+
+    for (const game of games) {
+      try {
+        if (['irl', 'always on', 'software and game development'].includes(game.game.toLowerCase())) {
+          throw new Error('Ignored game');
+        }
+        const gameFromHltb = (await this.hltbService.search(game.game))[0];
+        if (!gameFromHltb) {
+          throw new Error('Game not found');
+        }
+        await getRepository(HowLongToBeatGame).save({
+          ...game,
+          imageUrl:              `https://static-cdn.jtvnw.net/ttv-boxart/${encodeURIComponent(game.game)}-600x840.jpg`,
+          gameplayMain:          gameFromHltb.gameplayMain,
+          gameplayMainExtra:     gameFromHltb.gameplayMainExtra,
+          gameplayCompletionist: gameFromHltb.gameplayCompletionist,
+        });
+      } catch (e) {
+        continue;
+      }
+    }
   }
 
   sockets() {
@@ -117,31 +136,14 @@ class HowLongToBeat extends System {
     });
   }
 
-  async refreshImageThumbnail() {
-    try {
-      const games = await getRepository(HowLongToBeatGame).find();
-      for (const game of games) {
-        const gamesFromHltb = await this.hltbService.search(game.game);
-        const gameFromHltb = gamesFromHltb.length > 0 ? gamesFromHltb[0] : null;
-        if (gameFromHltb && gameFromHltb.imageUrl !== game.imageUrl) {
-          info(`HowLongToBeat | Thumbnail for ${game.game} is updated.`);
-          getRepository(HowLongToBeatGame).update({ id: game.id }, { imageUrl: gameFromHltb.imageUrl });
-        }
-      }
-    } catch (e: any) {
-      error(e);
-    }
-    setTimeout(() => this.refreshImageThumbnail(), constants.HOUR);
-  }
-
   async addToGameTimestamp() {
     if (!stats.value.currentGame) {
       debug('hltb', 'No game being played on stream.');
       return; // skip if we don't have game
     }
 
-    if (stats.value.currentGame.trim().length === 0 || stats.value.currentGame.trim() === 'IRL') {
-      debug('hltb', 'IRL or empty game is being played on stream');
+    if (stats.value.currentGame.trim().length === 0) {
+      debug('hltb', 'Empty game is being played on stream');
       return; // skip if we have empty game
     }
 
@@ -161,34 +163,33 @@ class HowLongToBeat extends System {
       }
     } catch (e: any) {
       if (e instanceof EntityNotFoundError) {
-        const gameFromHltb = (await this.hltbService.search(stats.value.currentGame))[0];
-        if (gameFromHltb) {
-          debug('hltb', `Game ${stats.value.currentGame} found on HLTB service`);
+        try {
+          if (['irl', 'always on', 'software and game development'].includes(stats.value.currentGame.toLowerCase())) {
+            throw new Error('Ignored game');
+          }
+
+          const gameFromHltb = (await this.hltbService.search(stats.value.currentGame))[0];
+          if (!gameFromHltb) {
+            throw new Error('Game not found');
+          }
           // we don't care if MP game or not (user might want to track his gameplay time)
           await getRepository(HowLongToBeatGame).save({
             game:                  stats.value.currentGame,
-            imageUrl:              gameFromHltb.imageUrl,
+            imageUrl:              `https://static-cdn.jtvnw.net/ttv-boxart/${encodeURIComponent(stats.value.currentGame)}-600x840.jpg`,
             startedAt:             Date.now(),
             gameplayMain:          gameFromHltb.gameplayMain,
             gameplayMainExtra:     gameFromHltb.gameplayMainExtra,
             gameplayCompletionist: gameFromHltb.gameplayCompletionist,
           });
-          notFoundGames.splice(notFoundGames.indexOf(stats.value.currentGame), 1);
-          debug('hltb', `Game ${stats.value.currentGame} found on HLTB service`);
-          debug('hltb', `notFoundGames: ${notFoundGames.join(', ')}`);
-        } else {
-          if (!notFoundGames.includes(stats.value.currentGame)) {
-            warning(`HLTB: game '${stats.value.currentGame}' was not found on HLTB service ... retrying in a while`);
-            debug('hltb', `Adding game '${stats.value.currentGame}' to not found games.`);
-            notFoundGames.push(stats.value.currentGame);
-            // do one retry in a minute (we need to call it manually as game is already in notFoundGames)
-            setTimeout(() => {
-              this.addToGameTimestamp();
-            }, constants.MINUTE);
-          } else {
-            // already retried
-            warning(`HLTB: game '${stats.value.currentGame}' was not found on HLTB service ... skipping tracking this stream`);
-          }
+        } catch {
+          await getRepository(HowLongToBeatGame).save({
+            game:                  stats.value.currentGame,
+            imageUrl:              `https://static-cdn.jtvnw.net/ttv-boxart/${encodeURIComponent(stats.value.currentGame)}-600x840.jpg`,
+            startedAt:             Date.now(),
+            gameplayMain:          0,
+            gameplayMainExtra:     0,
+            gameplayCompletionist: 0,
+          });
         }
       } else {
         error(e.stack);
