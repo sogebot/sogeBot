@@ -65,7 +65,7 @@
     "name": "Вариант применения"
   },
   "filter": {
-    "name": "Occurence filter",
+    "name": "Filter",
     "operator": "Оператор",
     "rule": "Правила",
     "addRule": "Добавить правило",
