@@ -1,4 +1,5 @@
 import type { Node } from '../../d.ts/src/plugins';
+import debounce from './nodes/debounce';
 import filter from './nodes/filter';
 import filterPermission from './nodes/filterPermission';
 import listener from './nodes/listener';
@@ -17,6 +18,7 @@ export const processes = {
   othersIdle,
   outputLog,
   filterPermission,
+  debounce,
   filter,
   variableSaveToDatabase,
   variableSetVariable,
@@ -25,7 +27,7 @@ export const processes = {
   twitchSendMessage,
   default: (pluginId: string, currentNode: Node, parameters: Record<string, any>, variables: Record<string, any>, userstate: { userName: string; userId: string; }) => {
     warning(`PLUGINS: no idea what should I do with ${currentNode.name}, stopping`);
-    return true;
+    return false;
   },
 };
 
