@@ -97,5 +97,6 @@
   "obswebsocket": "OBS Websocket",
   "api-explorer": "API エクスプローラー",
   "emotescombo": "エモートコンボ",
-  "notifications": "通知"
+  "notifications": "通知",
+  "plugins": "Plugins"
 }
