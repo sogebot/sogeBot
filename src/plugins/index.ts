@@ -1,7 +1,9 @@
 import type { Node } from '../../d.ts/src/plugins';
+import clearCounter from './nodes/clearCounter';
 import debounce from './nodes/debounce';
 import filter from './nodes/filter';
 import filterPermission from './nodes/filterPermission';
+import gateCounter from './nodes/gateCounter';
 import listener from './nodes/listener';
 import othersIdle from './nodes/othersIdle';
 import outputLog from './nodes/outputLog';
@@ -17,6 +19,8 @@ export const processes = {
   listener,
   othersIdle,
   outputLog,
+  gateCounter,
+  clearCounter,
   filterPermission,
   debounce,
   filter,
