@@ -1,4 +1,5 @@
 const exec = require('child_process').exec;
+const spawn = require('child_process').spawn;
 const execSync = require('child_process').execSync;
 
 require('dotenv').config();
@@ -28,22 +29,29 @@ async function test() {
     }
   });
 
-  let output = '';
   const expectedOutput = 'No changes in database schema were found - cannot generate a migration. To create a new empty migration use "typeorm migration:create" command\n';
-  await new Promise((resolve) => {
-    exec('npx typeorm migration:generate -n generatedMigration', {
-      env: {
-        ...process.env,
-        'TYPEORM_ENTITIES':   'dest/database/entity/*.js',
-        'TYPEORM_MIGRATIONS': `dest/database/migration/${getMigrationType(process.env.TYPEORM_CONNECTION)}/**/*.js`,
-      },
-    }, (error, stdout, stderr) => {
-      output += stdout;
-      resolve();
+  try {
+    await new Promise((resolve, reject) => {
+      const out2 = spawn('npx.cmd', 'typeorm migration:generate -n generatedMigration'.split(' '), {
+        env: {
+          ...process.env,
+          'TYPEORM_ENTITIES':   'dest/database/entity/*.js',
+          'TYPEORM_MIGRATIONS': `dest/database/migration/${getMigrationType(process.env.TYPEORM_CONNECTION)}/**/*.js`,
+        },
+      });
+
+      out2.stdout.on('data', function(msg){
+        const value = msg.toString();
+        if (value === expectedOutput) {
+          resolve();
+        }
+        if (value.includes('generated successfully')) {
+          reject();
+        }
+      });
     });
-  });
-  console.log(output);
-  if (output !== expectedOutput) {
+    process.exit(0);
+  } catch {
     await new Promise((resolve2) => {
       exec('cat ./*generatedMigration*', (error, stdout, stderr) => {
         console.log('\n =================================== generated migration file  =================================== \n');
@@ -56,8 +64,8 @@ async function test() {
       console.log('Dry run removing generated file.');
       execSync('rm ./*generatedMigration*');
     }
+    process.exit(1);
   }
-  process.exit(output === expectedOutput ? 0 : 1);
 }
 
 test();
