@@ -32,7 +32,8 @@ async function test() {
   const expectedOutput = 'No changes in database schema were found - cannot generate a migration. To create a new empty migration use "typeorm migration:create" command\n';
   try {
     await new Promise((resolve, reject) => {
-      const out2 = spawn('npx.cmd', 'typeorm migration:generate -n generatedMigration'.split(' '), {
+
+      const out2 = spawn(process.platform === 'win32' ? 'npx.cmd' : 'npx', 'typeorm migration:generate -n generatedMigration'.split(' '), {
         env: {
           ...process.env,
           'TYPEORM_ENTITIES':   'dest/database/entity/*.js',
