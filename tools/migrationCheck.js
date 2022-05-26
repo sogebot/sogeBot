@@ -6,18 +6,26 @@ require('dotenv').config();
 const getMigrationType = require('../dest/helpers/getMigrationType').getMigrationType;
 
 async function test() {
-  await new Promise((resolve) => {
-    exec('npx typeorm migration:run', {
-      env: {
-        ...process.env,
-        'TYPEORM_ENTITIES':   'dest/database/entity/*.js',
-        'TYPEORM_MIGRATIONS': `dest/database/migration/${getMigrationType(process.env.TYPEORM_CONNECTION)}/**/*.js`,
-      },
-    }, (error, stdout, stderr) => {
-      process.stdout.write(stdout);
-      process.stderr.write(stderr);
-      resolve();
-    });
+  await new Promise((resolve, reject) => {
+    try {
+      exec('npx typeorm migration:run', {
+        env: {
+          ...process.env,
+          'TYPEORM_ENTITIES':   'dest/database/entity/*.js',
+          'TYPEORM_MIGRATIONS': `dest/database/migration/${getMigrationType(process.env.TYPEORM_CONNECTION)}/**/*.js`,
+        },
+      }, (error, stdout, stderr) => {
+        process.stdout.write(stdout);
+        process.stderr.write(stderr);
+        if (error) {
+          reject(error);
+          process.exit(1);
+        }
+        resolve();
+      });
+    } catch(e) {
+      reject();
+    }
   });
 
   let output = '';
