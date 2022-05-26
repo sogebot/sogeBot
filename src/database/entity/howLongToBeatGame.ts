@@ -5,8 +5,8 @@ import { ColumnNumericTransformer } from './_transformer';
 export interface HowLongToBeatGameInterface {
   id?: string;
   game: string;
-  startedAt?: number;
-  imageUrl: string;
+  startedAt?: string;
+  updatedAt?: string;
   gameplayMain: number;
   gameplayMainExtra: number;
   gameplayCompletionist: number;
@@ -16,7 +16,7 @@ export interface HowLongToBeatGameInterface {
 export interface HowLongToBeatGameItemInterface {
   id?: string;
   hltb_id: string;
-  createdAt: number;
+  createdAt: string;
   timestamp: number;
   offset: number;
   isMainCounted: boolean;
@@ -31,8 +31,8 @@ export const HowLongToBeatGame = new EntitySchema<Readonly<Required<HowLongToBea
       type: 'uuid', primary: true, generated: 'uuid',
     },
     game:      { type: String },
-    imageUrl:  { type: String },
-    startedAt: { type: 'bigint', transformer: new ColumnNumericTransformer() },
+    startedAt: { type: String },
+    updatedAt: { type: String },
     offset:    {
       type: 'bigint', transformer: new ColumnNumericTransformer(), default: 0,
     },
@@ -60,7 +60,7 @@ export const HowLongToBeatGameItem = new EntitySchema<Readonly<Required<HowLongT
       type: 'uuid', primary: true, generated: 'uuid',
     },
     hltb_id:   { type: 'uuid' },
-    createdAt: { type: 'bigint', transformer: new ColumnNumericTransformer() },
+    createdAt: { type: String },
     timestamp: {
       type: 'bigint', transformer: new ColumnNumericTransformer(), default: 0,
     },
