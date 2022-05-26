@@ -1,6 +1,6 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-import { insertItemIntoTable } from '~/database/insertItemIntoTable';
+// import { insertItemIntoTable } from '~/database/insertItemIntoTable';
 
 export class changeHLTBTimestamps1651843397006 implements MigrationInterface {
   name = 'changeHLTBTimestamps1651843397006';
