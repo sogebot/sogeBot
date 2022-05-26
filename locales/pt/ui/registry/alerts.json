@@ -13,7 +13,7 @@
     "amountOfMonths": "Quantidade de meses",
     "amountOfTips": "Doações",
     "event": "Evento",
-    "service": "Service"
+    "service": "Serviço"
   },
   "empty": "Registro de alertas está vazio, crie novos alertas.",
   "emptyAfterSearch": "Registro de alertas está vazio em busca de \"<strong>$search</strong>\"",
@@ -65,7 +65,7 @@
     "name": "Ocorrência de variante"
   },
   "filter": {
-    "name": "Filtro de ocorrências",
+    "name": "Filtro",
     "operator": "Operador",
     "rule": "Regra",
     "addRule": "Adicionar regra",
