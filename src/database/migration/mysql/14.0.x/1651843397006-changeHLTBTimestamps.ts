@@ -11,7 +11,7 @@ export class changeHLTBTimestamps1651843397006 implements MigrationInterface {
     const items = await queryRunner.query(`SELECT * from \`how_long_to_beat_game_item\``);
     */
 
-    await queryRunner.query(`DROP INDEX \`IDX_hltb_id\``);
+    /* await queryRunner.query(`DROP INDEX \`IDX_hltb_id\``); */
     await queryRunner.query(`DROP TABLE \`how_long_to_beat_game\``);
     await queryRunner.query(`DROP TABLE \`how_long_to_beat_game_item\``);
 
