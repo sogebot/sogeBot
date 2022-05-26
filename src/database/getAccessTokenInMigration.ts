@@ -1,4 +1,5 @@
 import axios from 'axios';
+import fetch from 'node-fetch';
 import { QueryRunner } from 'typeorm';
 
 const urls = {
@@ -11,9 +12,9 @@ export const getAccessTokenInMigration = async (queryRunner: QueryRunner, type: 
     return accessToken;
   }
 
-  const tokenService = (await queryRunner.query(`SELECT * from settings `)).find((o: any) => {
+  const tokenService = JSON.parse((await queryRunner.query(`SELECT * from settings `)).find((o: any) => {
     return o.namespace === '/services/twitch' && o.name === 'tokenService';
-  })?.value ?? 'SogeBot Token Generator';
+  })?.value ?? '"SogeBot Token Generator"');
   const url = urls[tokenService as keyof typeof urls];
   const refreshToken = JSON.parse<string>((await queryRunner.query(`SELECT * from settings `)).find((o: any) => {
     return o.namespace === '/services/twitch' && o.name === type + 'RefreshToken';
