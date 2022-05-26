@@ -29,7 +29,9 @@ class HowLongToBeat extends System {
       category: 'manage', name: 'howlongtobeat', id: 'manage/howlongtobeat', this: this,
     });
 
-    this.checkZeroGameplayGames();
+    setInterval(() => {
+      this.updateGameplayTimes();
+    }, constants.HOUR);
 
     let lastDbgMessage = '';
     setInterval(async () => {
@@ -44,23 +46,27 @@ class HowLongToBeat extends System {
     }, this.interval);
   }
 
-  async checkZeroGameplayGames() {
-    const games = await getRepository(HowLongToBeatGame).find({ where: {
-      gameplayMain: 0,
-    } });
+  async updateGameplayTimes() {
+    const games = await getRepository(HowLongToBeatGame).find();
 
     for (const game of games) {
       try {
+        if (Date.now() - new Date(game.updatedAt).getTime() < constants.DAY) {
+          throw new Error('Updated recently');
+        }
+
         if (['irl', 'always on', 'software and game development'].includes(game.game.toLowerCase())) {
           throw new Error('Ignored game');
         }
+
         const gameFromHltb = (await this.hltbService.search(game.game))[0];
         if (!gameFromHltb) {
           throw new Error('Game not found');
         }
+
         await getRepository(HowLongToBeatGame).save({
           ...game,
-          imageUrl:              `https://static-cdn.jtvnw.net/ttv-boxart/${encodeURIComponent(game.game)}-600x840.jpg`,
+          updatedAt:             new Date().toISOString(),
           gameplayMain:          gameFromHltb.gameplayMain,
           gameplayMainExtra:     gameFromHltb.gameplayMainExtra,
           gameplayCompletionist: gameFromHltb.gameplayCompletionist,
@@ -92,8 +98,8 @@ class HowLongToBeat extends System {
         if (gameFromHltb) {
           await getRepository(HowLongToBeatGame).save({
             game:                  game,
-            imageUrl:              gameFromHltb.imageUrl,
-            startedAt:             Date.now(),
+            startedAt:             new Date().toISOString(),
+            updatedAt:             new Date().toISOString(),
             gameplayMain:          gameFromHltb.gameplayMain,
             gameplayMainExtra:     gameFromHltb.gameplayMainExtra,
             gameplayCompletionist: gameFromHltb.gameplayCompletionist,
@@ -156,7 +162,7 @@ class HowLongToBeat extends System {
       } else {
         debug('hltb', 'First entry of this stream for ' + stats.value.currentGame);
         await getRepository(HowLongToBeatGameItem).save({
-          createdAt: streamStatusChangeSince.value,
+          createdAt: new Date(streamStatusChangeSince.value).toISOString(),
           hltb_id:   game.id,
           timestamp: this.interval,
         });
@@ -175,8 +181,8 @@ class HowLongToBeat extends System {
           // we don't care if MP game or not (user might want to track his gameplay time)
           await getRepository(HowLongToBeatGame).save({
             game:                  stats.value.currentGame,
-            imageUrl:              `https://static-cdn.jtvnw.net/ttv-boxart/${encodeURIComponent(stats.value.currentGame)}-600x840.jpg`,
-            startedAt:             Date.now(),
+            startedAt:             new Date().toISOString(),
+            updatedAt:             new Date().toISOString(),
             gameplayMain:          gameFromHltb.gameplayMain,
             gameplayMainExtra:     gameFromHltb.gameplayMainExtra,
             gameplayCompletionist: gameFromHltb.gameplayCompletionist,
@@ -184,8 +190,8 @@ class HowLongToBeat extends System {
         } catch {
           await getRepository(HowLongToBeatGame).save({
             game:                  stats.value.currentGame,
-            imageUrl:              `https://static-cdn.jtvnw.net/ttv-boxart/${encodeURIComponent(stats.value.currentGame)}-600x840.jpg`,
-            startedAt:             Date.now(),
+            startedAt:             new Date().toISOString(),
+            updatedAt:             new Date().toISOString(),
             gameplayMain:          0,
             gameplayMainExtra:     0,
             gameplayCompletionist: 0,
