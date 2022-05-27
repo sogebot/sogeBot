@@ -18,37 +18,20 @@ import { onStartup } from '~/decorators/on';
 const cronTriggers = new Map<string, Node>();
 const plugins: Plugin[] = [];
 
-const twitchChatMessage = {
-  sender: {
-    userName: 'string',
-    userId:   'string',
-  },
-  parameters: {
-    message: 'string',
-  },
-};
-const twitchCommand = {
-  sender: {
-    userName: 'string',
-    userId:   'string',
-  },
-  parameters: {
-    message: 'string',
-  },
-};
-const tip = {
-  sender: {
-    userName: 'string',
-    userId:   'string',
-  },
-  parameters: {
-    isAnonymous: 'boolean',
-    message:     'string',
-    amount:      'number',
-    currency:    'string',
-    botAmount:   'number',
-    botCurrency: 'string',
-  },
+const generateListener = (parameters = {}, containSender = true) => {
+  const values: Record<string, any> = {};
+  if (containSender) {
+    values.sender = {
+      userName: 'string',
+      userId:   'string',
+    };
+  }
+
+  if (Object.keys(parameters).length > 0) {
+    values.parameters = parameters;
+  }
+
+  return values;
 };
 
 const generateRegex = (parameters: { name: string; type: 'number' | 'word' | 'sentence'; }[]) => {
@@ -67,9 +50,26 @@ const generateRegex = (parameters: { name: string; type: 'number' | 'word' | 'se
 
 class Plugins extends Core {
   listeners = {
-    twitchChatMessage,
-    twitchCommand,
-    tip,
+    tip: generateListener({
+      isAnonymous: 'boolean',
+      message:     'string',
+      amount:      'number',
+      currency:    'string',
+      botAmount:   'number',
+      botCurrency: 'string',
+    }),
+    twitchStreamStarted:    generateListener({}, false),
+    twitchStreamStopped:    generateListener({}, false),
+    twitchRaid:             generateListener({ hostViewers: 'number' }, true),
+    twitchHosted:           generateListener({ hostViewers: 'number' }, true),
+    twitchHosting:          generateListener({ hostViewers: 'number' }, true),
+    twitchChatMessage:      generateListener({ message: 'string' }),
+    twitchCommand:          generateListener({ message: 'string' }),
+    twitchFollow:           generateListener(),
+    twitchSubscription:     generateListener({ method: 'string', subCumulativeMonths: 'number', tier: 'tier' }),
+    twitchSubgift:          generateListener({ recipient: 'string', tier: 'tier' }),
+    twitchSubcommunitygift: generateListener({ count: 'number' }),
+    twitchResub:            generateListener({ method: 'string', subCumulativeMonths: 'number', subStreak: 'number', subStreakShareEnabled: 'boolean', tier: 'string' }),
   } as const;
 
   @onStartup()
@@ -99,6 +99,70 @@ class Plugins extends Core {
         currency:    data.currency,
         botCurrency: data.currencyInBot,
       });
+    });
+
+    eventEmitter.on('stream-started', async () => {
+      this.process('twitchStreamStarted');
+    });
+
+    eventEmitter.on('stream-stopped', async () => {
+      this.process('twitchStreamStopped');
+    });
+
+    const commonHandler = async <T extends { [x:string]: any, userName: string }>(event: keyof typeof this.listeners, data: T) => {
+      const users = (await import('./users')).default;
+      const { userName, ...parameters } = data;
+      const user = {
+        userName,
+        userId: await users.getIdByName(userName),
+      };
+
+      this.process(event, '', user, parameters);
+
+    };
+
+    eventEmitter.on('subscription', async (data) => {
+      commonHandler('twitchSubscription', data);
+    });
+
+    eventEmitter.on('subgift', async (data) => {
+      commonHandler('twitchSubgift', data);
+    });
+
+    eventEmitter.on('subcommunitygift', async (data) => {
+      commonHandler('twitchSubcommunitygift', data);
+    });
+
+    eventEmitter.on('resub', async (data) => {
+      commonHandler('twitchResub', data);
+    });
+
+    eventEmitter.on('stream-stopped', async () => {
+      this.process('twitchStreamStopped');
+    });
+
+    eventEmitter.on('stream-stopped', async () => {
+      this.process('twitchStreamStopped');
+    });
+
+    eventEmitter.on('stream-stopped', async () => {
+      this.process('twitchStreamStopped');
+    });
+
+    eventEmitter.on('follow', async (data) => {
+      this.process('twitchFollow', '', data);
+    });
+
+    eventEmitter.on('raid', async (data) => {
+      commonHandler('twitchRaid', data);
+    });
+
+    eventEmitter.on('hosted', async (data) => {
+      commonHandler('twitchHosted', data);
+    });
+
+    eventEmitter.on('hosting', async (data) => {
+      this.process('twitchHosting', '', null, data);
     });
   }
 
@@ -248,7 +312,7 @@ class Plugins extends Core {
     }
   }
 
-  async process(type: keyof typeof this.listeners | 'cron', message: string, userstate: { userName: string, userId: string } | null, params?: Record<string, any>) {
+  async process(type: keyof typeof this.listeners | 'cron', message = '', userstate: { userName: string, userId: string } | null = null, params?: Record<string, any>) {
     const pluginsEnabled = plugins.filter(o => o.enabled);
     const pluginsWithListener: { plugin: Plugin, listeners: Node[] }[] = [];
     for (const plugin of pluginsEnabled) {
@@ -329,6 +393,7 @@ class Plugins extends Core {
     botCurrency: string, botAmount: number,
   }): Promise<void>;
   async trigger(type: 'message', message: string, userstate: { userName: string, userId: string }): Promise<void>;
+  async trigger(type: keyof typeof this.listeners, message: string, userstate: { userName: string, userId: string }): Promise<void>;
 
   async trigger(type: string, message: string, userstate: { userName: string, userId: string }, data?: Record<string, any>) {
     switch(type) {
@@ -336,6 +401,7 @@ class Plugins extends Core {
         this.process(message.startsWith('!') ? 'twitchCommand' : 'twitchChatMessage', message, userstate);
         break;
       }
+      case 'twitchFollow':
       case 'tip': {
         this.process(type, message, userstate, data);
         break;

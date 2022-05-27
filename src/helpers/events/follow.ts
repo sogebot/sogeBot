@@ -68,7 +68,7 @@ export function follow(userId: string, userName: string, followedAt: string) {
     });
     if (!isBot(userName)) {
       followLog(`${userName}#${userId}`);
-      eventEmitter.emit('follow', { userName, userId: userId });
+      eventEmitter.emit('follow', { userName, userId });
       alerts.trigger({
         event:      'follows',
         name:       userName,
