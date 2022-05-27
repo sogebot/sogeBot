@@ -13,7 +13,7 @@ export const clearCounter = (uuid: string) => {
   }
 };
 
-export default async function(pluginId: string, currentNode: Node<string>, parameters: Record<string, any>, variables: Record<string, any>, userstate: { userName: string; userId: string; }) {
+export default async function(pluginId: string, currentNode: Node<string>, parameters: Record<string, any>, variables: Record<string, any>, userstate: { userName: string; userId: string; } | null) {
   const perUser = JSON.parse(currentNode.data.data).perUser ?? false;
   const resetAfterTrigger = JSON.parse(currentNode.data.data).resetAfterTrigger ?? false;
   const uuid = JSON.parse(currentNode.data.data).uuid;
@@ -29,7 +29,7 @@ export default async function(pluginId: string, currentNode: Node<string>, param
       expectedCount = 10;
     }
 
-    const key = perUser ? `${userstate.userId}|${uuid}` : uuid;
+    const key = perUser ? `${userstate!.userId}|${uuid}` : uuid;
 
     const count = (counter.get(key) ?? 0) + 1;
     counter.set(key, count);

@@ -2,7 +2,11 @@ import { getGlobalVariables } from '~/helpers/checkFilter';
 import { flatten } from '~/helpers/flatten';
 import { showWithAt } from '~/helpers/tmi';
 
-export async function template(message: string, params: Record<string, any>, userstate?: { userName: string; userId: string }) {
+export async function template(message: string, params: Record<string, any>, userstate?: { userName: string; userId: string } | null) {
+  if (userstate === null) {
+    userstate = undefined;
+  }
+
   params = flatten({
     ...params,
     sender: {

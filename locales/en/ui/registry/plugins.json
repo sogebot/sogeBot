@@ -7,6 +7,9 @@
       "name": "Permission filter"
     }
   },
+  "cron": {
+    "name": "Cron"
+  },
   "listener": {
     "name": "Event listener",
     "type": {

@@ -1,4 +1,6 @@
+import { MINUTE, SECOND } from '@sogebot/ui-helpers/constants';
 import { validateOrReject } from 'class-validator';
+import * as cronparser from 'cron-parser';
 import { cloneDeep } from 'lodash';
 import merge from 'lodash/merge';
 
@@ -6,11 +8,15 @@ import type { Node } from '../d.ts/src/plugins';
 import { Plugin, PluginVariable } from './database/entity/plugins';
 import { isValidationError } from './helpers/errors';
 import { eventEmitter } from './helpers/events';
+import { error } from './helpers/log';
 import { adminEndpoint } from './helpers/socket';
 import { processes, processNode } from './plugins/index';
 
 import Core from '~/_interface';
 import { onStartup } from '~/decorators/on';
+
+const cronTriggers = new Map<string, Node>();
+const plugins: Plugin[] = [];
 
 const twitchChatMessage = {
   sender: {
@@ -72,6 +78,14 @@ class Plugins extends Core {
       category: 'registry', name: 'plugins', id: 'registry/plugins', this: null,
     });
 
+    this.updateCache();
+    setInterval(() => {
+      this.updateAllCrons();
+    }, MINUTE);
+    setInterval(() => {
+      this.triggerCrons();
+    }, SECOND);
+
     eventEmitter.on('tip', async (data) => {
       const users = (await import('./users')).default;
       const user = {
@@ -88,16 +102,75 @@ class Plugins extends Core {
     });
   }
 
+  async updateCache () {
+    const _plugins = await Plugin.find();
+    while (plugins.length > 0) {
+      plugins.shift();
+    }
+    for (const plugin of _plugins) {
+      plugins.push(plugin);
+    }
+    await this.updateAllCrons();
+  }
+
+  async updateAllCrons() {
+    // we will generate at least 2 minutes of span of crons
+    // e.g. if we have cron every 1s -> 120 crons
+    //                           10s -> 12  crons
+    //                           10m -> 1   cron
+    const cron = await this.process('cron', '', null, {});
+
+    cronTriggers.clear();
+    for (const { plugin, listeners } of cron) {
+      for (const node of listeners) {
+        try {
+          const cronParsed = cronparser.parseExpression(node.data.value);
+
+          const currentTime = Date.now();
+          let lastTime = new Date().toISOString();
+          const intervals: string[] = [];
+          while (currentTime + (2 * MINUTE) > new Date(lastTime).getTime()) {
+            lastTime = cronParsed.next().toISOString();
+            intervals.push(lastTime);
+          }
+
+          for (const interval of intervals) {
+            cronTriggers.set(`${plugin.id}|${interval}`, node);
+          }
+        } catch (e) {
+          error(e);
+        }
+      }
+    }
+  }
+
+  async triggerCrons() {
+    for (const [pluginId, timestamp] of [...cronTriggers.keys()].map(o => o.split('|'))) {
+      if (new Date(timestamp).getTime() < Date.now()) {
+        const plugin = plugins.find(o => o.id === pluginId);
+        const node = cronTriggers.get(`${pluginId}|${timestamp}`);
+        if (plugin && node) {
+          const workflow = Object.values(
+            JSON.parse(plugin.workflow).drawflow.Home.data
+          ) as Node[];
+          this.processPath(pluginId, workflow, node, {}, {}, null);
+        }
+        cronTriggers.delete(`${pluginId}|${timestamp}`);
+      }
+    }
+  }
+
   sockets() {
     adminEndpoint('/core/plugins', 'generic::getAll', async (cb) => {
-      cb(null, await Plugin.find());
+      cb(null, plugins);
     });
     adminEndpoint('/core/plugins', 'generic::getOne', async (id, cb) => {
-      cb(null, await Plugin.findOne(id));
+      cb(null, plugins.find(o => o.id === id));
     });
     adminEndpoint('/core/plugins', 'generic::deleteById', async (id, cb) => {
       await Plugin.delete({ id });
       await PluginVariable.delete({ pluginId: id });
+      await this.updateCache();
       cb(null);
     });
     adminEndpoint('/core/plugins', 'generic::validate', async (data, cb) => {
@@ -121,6 +194,7 @@ class Plugins extends Core {
         merge(itemToSave, item);
         await validateOrReject(itemToSave);
         await itemToSave.save();
+        await this.updateCache();
         cb(null, itemToSave);
       } catch (e) {
         if (e instanceof Error) {
@@ -136,7 +210,7 @@ class Plugins extends Core {
     });
   }
 
-  async processPath(pluginId: string, workflow: Node[], currentNode: Node, parameters: Record<string, any>, variables: Record<string, any>, userstate: { userName: string; userId: string } ) {
+  async processPath(pluginId: string, workflow: Node[], currentNode: Node, parameters: Record<string, any>, variables: Record<string, any>, userstate: { userName: string; userId: string } | null ) {
     parameters = cloneDeep(parameters);
     variables = cloneDeep(variables);
 
@@ -174,21 +248,26 @@ class Plugins extends Core {
     }
   }
 
-  async process(type: keyof typeof this.listeners, message: string, userstate: { userName: string, userId: string }, params?: Record<string, any>) {
-    const plugins = await Plugin.find({ enabled: true });
-    const pluginsWithListener: Plugin[] = [];
-    for (const plugin of plugins) {
+  async process(type: keyof typeof this.listeners | 'cron', message: string, userstate: { userName: string, userId: string } | null, params?: Record<string, any>) {
+    const pluginsEnabled = plugins.filter(o => o.enabled);
+    const pluginsWithListener: { plugin: Plugin, listeners: Node[] }[] = [];
+    for (const plugin of pluginsEnabled) {
       // explore drawflow
       const workflow = Object.values(
         JSON.parse(plugin.workflow).drawflow.Home.data
       ) as Node[];
 
-      const listeners = workflow.filter((o: any) => {
+      const listeners = workflow.filter((o: Node) => {
         params ??= {};
         const isListener = o.name === 'listener';
+        const isCron = o.name === 'cron' && type === 'cron';
         const isType = o.data.value === type;
 
         params.message = message;
+
+        if (isCron) {
+          return true;
+        }
 
         if (isListener && isType) {
           switch(type) {
@@ -239,7 +318,7 @@ class Plugins extends Core {
       });
 
       if (listeners.length > 0) {
-        pluginsWithListener.push(plugin);
+        pluginsWithListener.push({ plugin, listeners });
       }
     }
     return pluginsWithListener;

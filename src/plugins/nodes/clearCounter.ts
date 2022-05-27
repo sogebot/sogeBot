@@ -3,7 +3,7 @@ import { clearCounter } from './gateCounter';
 import type { Node } from '~/../d.ts/src/plugins';
 import { Plugin } from '~/database/entity/plugins';
 
-export default async function(pluginId: string, currentNode: Node<string>, parameters: Record<string, any>, variables: Record<string, any>, userstate: { userName: string; userId: string; }) {
+export default async function(pluginId: string, currentNode: Node<string>, parameters: Record<string, any>, variables: Record<string, any>, userstate: { userName: string; userId: string; } | null) {
   try {
     const plugin = await Plugin.findOneOrFail({ id: pluginId });
     const workflow = Object.values(

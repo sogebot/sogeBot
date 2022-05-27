@@ -17,6 +17,7 @@ import { warning } from '~/helpers/log';
 
 export const processes = {
   listener,
+  cron:    listener, // no-op
   othersIdle,
   outputLog,
   gateCounter,
@@ -29,13 +30,13 @@ export const processes = {
   twitchTimeoutUser,
   twitchBanUser,
   twitchSendMessage,
-  default: (pluginId: string, currentNode: Node, parameters: Record<string, any>, variables: Record<string, any>, userstate: { userName: string; userId: string; }) => {
+  default: (pluginId: string, currentNode: Node, parameters: Record<string, any>, variables: Record<string, any>, userstate: { userName: string; userId: string; } | null) => {
     warning(`PLUGINS: no idea what should I do with ${currentNode.name}, stopping`);
     return false;
   },
 };
 
-function processNode (type: keyof typeof processes, pluginId: string, currentNode: Node, parameters: Record<string, any>, variables: Record<string, any>, userstate: { userName: string; userId: string; }): Promise<boolean> | boolean {
+function processNode (type: keyof typeof processes, pluginId: string, currentNode: Node, parameters: Record<string, any>, variables: Record<string, any>, userstate: { userName: string; userId: string; } | null): Promise<boolean> | boolean {
   return (processes[processes[type] ? type : 'default'](pluginId, currentNode as any, parameters, variables, userstate));
 }
 
