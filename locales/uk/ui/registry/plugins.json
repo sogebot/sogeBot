@@ -1,0 +1,42 @@
+{
+  "common-errors": {
+    "missing-sender-attributes": "This node needs to be linked with listeners with sender attributes"
+  },
+  "filter": {
+    "permission": {
+      "name": "Permission filter"
+    }
+  },
+  "listener": {
+    "name": "Event listener",
+    "type": {
+      "twitchChatMessage": "Twitch chat message",
+      "twitchCommand": "Twitch command",
+      "tip": "Tipped by user"
+    },
+    "command": {
+      "add-parameter": "Add parameter",
+      "parameters": "Parameters",
+      "order-is-important": "order is important"
+    }
+  },
+  "others": {
+    "idle": {
+      "name": "Idle"
+    }
+  },
+  "output": {
+    "log": {
+      "name": "Log message"
+    },
+    "timeout-user": {
+      "name": "Timeout user"
+    },
+    "ban-user": {
+      "name": "Ban user"
+    },
+    "send-twitch-message": {
+      "name": "Send Twitch Message"
+    }
+  }
+}
