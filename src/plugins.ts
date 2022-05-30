@@ -34,7 +34,7 @@ const generateListener = (parameters = {}, containSender = true) => {
   return values;
 };
 
-const generateRegex = (parameters: { name: string; type: 'number' | 'word' | 'sentence'; }[]) => {
+const generateRegex = (parameters: { name: string; type: 'number' | 'word' | 'sentence' | 'custom'; regexp?: string; }[]) => {
   const matcher = {
     'number':   '[0-9]+',
     'word':     '[a-zA-Z]+',
@@ -43,7 +43,12 @@ const generateRegex = (parameters: { name: string; type: 'number' | 'word' | 'se
 
   const regex = [];
   for (const param of parameters) {
-    regex.push(`(?<${param.name}>${matcher[param.type]})`);
+    if (param.type === 'custom') {
+      regex.push(`(?<${param.name}>${param.regexp})`);
+
+    } else {
+      regex.push(`(?<${param.name}>${matcher[param.type]})`);
+    }
   }
   return `^${regex.join(' ')}$`;
 };
