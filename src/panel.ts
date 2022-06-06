@@ -184,12 +184,33 @@ class Panel extends Core {
         res.sendStatus(404);
       }
     });
+    app?.get(['/public/_next/*'], (req, res) => {
+      if (!nuxtCache.get(req.url)) {
+      // search through node_modules to find correct nuxt file
+        const paths = [
+          path.join(__dirname, '..', 'node_modules', '@sogebot', 'ui-public', 'out', '_next'),
+        ];
+        for (const dir of paths) {
+          const url = req.url.replace('public', '').replace('_next', '');
+          const pathToFile = path.join(dir, url);
+          if (fs.existsSync(pathToFile)) { // lgtm [js/path-injection]
+            nuxtCache.set(req.url, pathToFile);
+          }
+        }
+      }
+      const filepath = path.join(nuxtCache.get(req.url) ?? '');
+      if (fs.existsSync(filepath) && nuxtCache.has(req.url)) { // lgtm [js/path-injection]
+        res.sendFile(filepath);
+      } else {
+        nuxtCache.delete(req.url);
+        res.sendStatus(404);
+      }
+    });
     app?.get(['/_nuxt/*', '/credentials/_nuxt/*', '/overlays/_nuxt/*'], (req, res) => {
       if (!nuxtCache.get(req.url)) {
       // search through node_modules to find correct nuxt file
         const paths = [
           path.join(__dirname, '..', 'node_modules', '@sogebot', 'ui-oauth', 'dist', '_nuxt'),
-          path.join(__dirname, '..', 'node_modules', '@sogebot', 'ui-public', 'dist', '_nuxt'),
           path.join(__dirname, '..', 'node_modules', '@sogebot', 'ui-admin', 'dist', '_nuxt'),
           path.join(__dirname, '..', 'node_modules', '@sogebot', 'ui-overlay', 'dist', '_nuxt'),
         ];
@@ -220,9 +241,9 @@ class Panel extends Core {
     app?.get(['/overlays/:id', '/overlays/text/:id', '/overlays/alerts/:id', '/overlays/goals/:id'], function (req, res) {
       res.sendFile(path.join(__dirname, '..', 'node_modules', '@sogebot', 'ui-overlay', 'dist', 'index.html'));
     });
-    app?.get('/public/', function (req, res) {
+    app?.get('/public/:page?', function (req, res) {
       if (variables.get('core.ui.enablePublicPage')) {
-        res.sendFile(path.join(__dirname, '..', 'node_modules', '@sogebot', 'ui-public', 'dist', 'index.html'));
+        res.sendFile(path.join(__dirname, '..', 'node_modules', '@sogebot', 'ui-public', 'out', `${req.params.page ?? 'index'}.html`));
       } else {
         if (req.originalUrl !== '/public/?check=true') {
           info('Public page has been disabled, enable in Admin UI -> settings -> ui');
