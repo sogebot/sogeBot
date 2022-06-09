@@ -10,6 +10,7 @@ import {
 import { getConnection, getRepository } from 'typeorm';
 
 import type { Command } from '../d.ts/src/general';
+import { menu } from './helpers/panel';
 
 import Core from '~/_interface';
 import { PermissionCommands } from '~/database/entity/permissions';
@@ -90,6 +91,12 @@ class General extends Core {
   }
 
   sockets() {
+    adminEndpoint('/core/general', 'menu::private', async (cb) => {
+      cb(menu.map((o) => ({
+        category: o.category, name: o.name, id: o.id, enabled: o.this ? o.this.enabled : true,
+      })));
+    });
+
     adminEndpoint('/core/general', 'generic::getCoreCommands', async (cb) => {
       try {
         const commands: Command[] = [];

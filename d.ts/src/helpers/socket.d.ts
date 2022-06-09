@@ -35,6 +35,7 @@ import { Socket } from 'socket.io';
 import { FindConditions } from 'typeorm';
 
 import { Plugin } from '~/database/entity/plugins';
+import { MenuItem } from '~/helpers/panel';
 
 type Configuration = {
   [x:string]: Configuration | string;
@@ -490,6 +491,7 @@ export type ClientToServerEventsWithNamespace = {
     'logout': (data: { accessToken: string | null, refreshToken: string | null }) => void
   },
   '/core/general': GenericEvents & {
+    'menu::private': (cb: (items: (MenuItem & { enabled: boolean })[]) => void) => void,
     'generic::getCoreCommands': (cb: (error: Error | string | null, commands: import('../general').Command[]) => void) => void,
     'generic::setCoreCommand': (commands: import('../general').Command, cb: (error: Error | string | null) => void) => void,
   },

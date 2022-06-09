@@ -12,7 +12,13 @@ import type { Module } from '../_interface';
 import type { ClientToServerEventsWithNamespace } from '~/../d.ts/src/helpers/socket';
 import { info } from '~/helpers/log';
 
-export const menu: { category?: string; name: string; id: string; this: Module | null }[] = [];
+export type MenuItem = {
+  id: string;
+  category?: string;
+  name: string;
+};
+
+export const menu: (MenuItem & { this: Module | null })[] = [];
 export const menuPublic: { name: string; id: string }[] = [];
 
 menu.push({
