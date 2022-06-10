@@ -44,7 +44,7 @@
   },
   "webpanel": {
     "this-system-is-disabled": "Esta configuración está desactivada",
-    "or": "or",
+    "or": "o",
     "loading": "Cargando",
     "this-may-take-a-while": "Este <strong>puede tardar</strong> un poco",
     "display-as": "Mostrar como",
@@ -236,14 +236,14 @@
         },
         "timeout": {
           "label": "Timeout",
-          "placeholder": "Set timeout in milliseconds"
+          "placeholder": "Establecer timeout en milisegundos"
         },
         "timeoutType": {
           "label": "Type of timeout",
           "placeholder": "Set type of timeout"
         },
         "command": {
-          "label": "Command",
+          "label": "Comando",
           "placeholder": "Set your !command"
         },
         "commandToRun": {
@@ -271,7 +271,7 @@
           "false": "Replay won't be played"
         },
         "announce": {
-          "label": "Announce in chat",
+          "label": "Anuncio en el chat",
           "true": "Will be announced",
           "false": "Will not be announced"
         },
