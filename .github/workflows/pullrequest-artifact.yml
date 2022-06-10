@@ -24,9 +24,9 @@ jobs:
         with:
           node-version: 16
           check-latest: true
-      - name: Install latest npm
+      - name: Install latest yarn
         run: |
-          npm install -g npm@latest
+          npm install -g yarn
 
       - name: Build a bot
         run: make

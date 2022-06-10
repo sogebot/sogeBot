@@ -24,6 +24,12 @@ class Permissions extends Core {
   }
 
   public sockets() {
+    adminEndpoint('/core/permissions', 'generic::getAll', async (cb) => {
+      cb(null, await getRepository(PermissionsEntity).find({
+        relations: ['filters'],
+        order:     { order: 'ASC' },
+      }));
+    });
     adminEndpoint('/core/permissions', 'permission::save', async (data, cb) => {
       cleanViewersCache();
       // we need to remove missing permissions
