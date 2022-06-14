@@ -1,55 +1,56 @@
 {
   "common-errors": {
-    "missing-sender-attributes": "This node needs to be linked with listeners with sender attributes"
+    "missing-sender-attributes": "Este nó precisa ser ligado aos 'listeners' com atributos do remetente"
   },
   "filter": {
     "permission": {
-      "name": "Permission filter"
+      "name": "Filtro de permissão"
     }
   },
   "cron": {
     "name": "Cron"
   },
   "listener": {
-    "name": "Event listener",
+    "name": "Ouvinte de evento",
     "type": {
-      "twitchChatMessage": "Twitch chat message",
-      "twitchCommand": "Twitch command",
-      "twitchFollow": "New Twitch follower",
-      "twitchSubscription": "New Twitch subscription",
-      "twitchSubgift": "New Twitch subscription gift",
-      "twitchSubcommunitygift": "New Twitch subscription community gift",
-      "twitchResub": "New Twitch recurring subscription",
-      "twitchStreamStarted": "Twitch stream started",
-      "twitchStreamStopped": "Twitch stream stopped",
-      "twitchRaid": "Twitch raid incoming",
-      "twitchHosted": "Twitch host incoming",
-      "twitchHosting": "Twitch host outgoing",
-      "tip": "Tipped by user"
+      "twitchChatMessage": "Mensagem de chat Twitch",
+      "twitchCommand": "Comando Twitch",
+      "twitchFollow": "Novo seguidor Twitch",
+      "twitchSubscription": "Nova assinatura Twitch",
+      "twitchSubgift": "Nova inscrição de presente Twitch",
+      "twitchSubcommunitygift": "Nova inscrição de presente da comunidade Twitch",
+      "twitchResub": "Nova assinatura recorrente Twitch",
+      "twitchStreamStarted": "Transmissão da Twitch iniciada",
+      "twitchStreamStopped": "Transmissão da Twitch parada",
+      "twitchRaid": "'Raid' da Twitch chegando",
+      "twitchHosted": "Recebendo host da Twitch",
+      "twitchHosting": "Host realizado da Twitch",
+      "tip": "Doado pelo usuário",
+      "botStarted": "Bot started"
     },
     "command": {
-      "add-parameter": "Add parameter",
-      "parameters": "Parameters",
-      "order-is-important": "order is important"
+      "add-parameter": "Adicionar parâmetro",
+      "parameters": "Parâmetros",
+      "order-is-important": "ordem é importante"
     }
   },
   "others": {
     "idle": {
-      "name": "Idle"
+      "name": "Ocioso"
     }
   },
   "output": {
     "log": {
-      "name": "Log message"
+      "name": "Mensagens de log"
     },
     "timeout-user": {
-      "name": "Timeout user"
+      "name": "Suspender usuário"
     },
     "ban-user": {
-      "name": "Ban user"
+      "name": "Banir usuário"
     },
     "send-twitch-message": {
-      "name": "Send Twitch Message"
+      "name": "Enviar Mensagem da Twitch"
     }
   }
 }
