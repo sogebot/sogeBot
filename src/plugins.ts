@@ -64,6 +64,7 @@ class Plugins extends Core {
       botCurrency: 'string',
     }),
     twitchStreamStarted:    generateListener({}, false),
+    botStarted:             generateListener({}, false),
     twitchStreamStopped:    generateListener({}, false),
     twitchRaid:             generateListener({ hostViewers: 'number' }, true),
     twitchHosted:           generateListener({ hostViewers: 'number' }, true),
@@ -83,7 +84,9 @@ class Plugins extends Core {
       category: 'registry', name: 'plugins', id: 'registry/plugins', this: null,
     });
 
-    this.updateCache();
+    this.updateCache().then(() => {
+      this.process('botStarted');
+    });
     setInterval(() => {
       this.updateAllCrons();
     }, MINUTE);
@@ -329,12 +332,14 @@ class Plugins extends Core {
       const listeners = workflow.filter((o: Node) => {
         params ??= {};
         const isListener = o.name === 'listener';
-        const isCron = o.name === 'cron' && type === 'cron';
+        const isWithoutFiltering
+          = (o.name === 'cron' && type === 'cron')
+          || (o.name === 'botStarted');
         const isType = o.data.value === type;
 
         params.message = message;
 
-        if (isCron) {
+        if (isWithoutFiltering) {
           return true;
         }
 
