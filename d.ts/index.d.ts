@@ -71,7 +71,7 @@ type onEventBit = {
 };
 
 type onEventMessage = {
-  sender: Partial<UserStateTags> | null;
+  sender: ChatUser | null;
   message: string;
   timestamp: number;
 };
