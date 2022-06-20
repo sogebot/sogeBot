@@ -1,7 +1,7 @@
 import { shuffle } from '@sogebot/ui-helpers/array';
 import { DAY } from '@sogebot/ui-helpers/constants';
+import { HelixClip } from '@twurple/api';
 
-import { HelixClip } from '../../../../node_modules/@twurple/api/lib';
 import client from '../api/client';
 import { refresh } from '../token/refresh.js';
 import { getGameNameFromId } from './getGameNameFromId';

@@ -1,4 +1,5 @@
-import { rawDataSymbol } from '../../../../node_modules/@twurple/common/lib';
+import { rawDataSymbol } from '@twurple/common';
+
 import client from '../api/client';
 import { refresh } from '../token/refresh.js';
 

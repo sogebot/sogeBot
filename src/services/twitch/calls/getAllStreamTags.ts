@@ -1,9 +1,9 @@
+import { rawDataSymbol } from '@twurple/common';
 import { getRepository, IsNull } from 'typeorm';
 
 import client from '../api/client';
 import { refresh } from '../token/refresh.js';
 
-import { rawDataSymbol } from '~/../node_modules/@twurple/common/lib';
 import { TwitchTag, TwitchTagLocalizationDescription, TwitchTagLocalizationName } from '~/database/entity/twitch';
 import { getFunctionName } from '~/helpers/getFunctionName';
 import { error, warning } from '~/helpers/log';

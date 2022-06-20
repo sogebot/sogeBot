@@ -1,11 +1,11 @@
 import { setInterval } from 'timers';
 
 import { MINUTE } from '@sogebot/ui-helpers/constants';
+import { rawDataSymbol } from '@twurple/common';
 import { PubSubClient } from '@twurple/pubsub';
 
 import { CustomAuthProvider } from './token/CustomAuthProvider.js';
 
-import { rawDataSymbol } from '~/../node_modules/@twurple/common/lib';
 import { isStreamOnline } from '~/helpers/api';
 import { eventEmitter } from '~/helpers/events';
 import {

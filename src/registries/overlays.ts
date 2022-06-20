@@ -237,6 +237,7 @@ const values = {
     type:             'vertical',
     hideMessageAfter: 600000,
     showTimestamp:    true,
+    showBadges:       true,
     font:             {
       family:      'PT Sans',
       size:        20,
