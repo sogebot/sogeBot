@@ -20,6 +20,7 @@
       "twitchSubgift": "New Twitch subscription gift",
       "twitchSubcommunitygift": "New Twitch subscription community gift",
       "twitchResub": "New Twitch recurring subscription",
+      "twitchGameChanged": "Twitch game changed",
       "twitchStreamStarted": "Twitch stream started",
       "twitchStreamStopped": "Twitch stream stopped",
       "twitchRaid": "Twitch raid incoming",
