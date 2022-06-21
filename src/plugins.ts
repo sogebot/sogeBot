@@ -64,6 +64,7 @@ class Plugins extends Core {
       botCurrency: 'string',
     }),
     twitchStreamStarted:    generateListener({}, false),
+    twitchGameChanged:      generateListener({}, false),
     botStarted:             generateListener({}, false),
     twitchStreamStopped:    generateListener({}, false),
     twitchRaid:             generateListener({ hostViewers: 'number' }, true),
@@ -107,6 +108,10 @@ class Plugins extends Core {
         currency:    data.currency,
         botCurrency: data.currencyInBot,
       });
+    });
+
+    eventEmitter.on('game-changed', async () => {
+      this.process('twitchGameChanged');
     });
 
     eventEmitter.on('stream-started', async () => {
