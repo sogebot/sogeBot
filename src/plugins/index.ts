@@ -11,6 +11,7 @@ import twitchBanUser from './nodes/twitchBanUser';
 import twitchSendMessage from './nodes/twitchSendMessage';
 import twitchTimeoutUser from './nodes/twitchTimeoutUser';
 import variableSaveToDatabase from './nodes/variableSaveToDatabase';
+import variableSetCustomVariable from './nodes/variableSetCustomVariable';
 import variableSetVariable from './nodes/variableSetVariable';
 
 import { warning } from '~/helpers/log';
@@ -27,6 +28,7 @@ export const processes = {
   filter,
   variableSaveToDatabase,
   variableSetVariable,
+  variableSetCustomVariable,
   twitchTimeoutUser,
   twitchBanUser,
   twitchSendMessage,

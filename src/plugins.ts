@@ -348,15 +348,20 @@ class Plugins extends Core {
             case 'twitchCommand': {
               const { command, parameters } = JSON.parse(o.data.data);
 
-              const haveSubCommandOrParameters = message.split(' ').length > 1;
-
-              const isStartingWithCommand = message.startsWith(`!${command}`);
+              const haveSubCommandOrParameters = message.replace(`!${command.replace('!', '')}`, '').split(' ').length > 1;
+              const isStartingWithCommand = message.startsWith(`!${command.replace('!', '')}`);
               const doesParametersMatch = () => {
                 try {
                   if (parameters.length === 0) {
+                    if (haveSubCommandOrParameters) {
+                      return false;
+                    }
                     throw new Error(); // not expecting params
                   }
-                  const messageWithoutCommand = message.replace(`!${command}`, '').trim();
+                  const messageWithoutCommandArray = message.split(' ');
+                  messageWithoutCommandArray.shift();
+                  const messageWithoutCommand = messageWithoutCommandArray.join(' ').trim();
+
                   const paramMatch = messageWithoutCommand.match(generateRegex(parameters as any));
                   if (paramMatch && paramMatch.groups) {
                     const groups: { [key: string]: string | number; } = paramMatch.groups;
@@ -370,11 +375,7 @@ class Plugins extends Core {
                   }
                   return false;
                 } catch (e) {
-                  // not valid regex or not expecting params
-                  if (haveSubCommandOrParameters && message !== `!${command}`) {
-                    return false;
-                  }
-                  return true;
+                  return message === `!${command.replace('!', '')}`;
                 }
               };
 

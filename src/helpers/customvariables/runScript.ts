@@ -118,6 +118,7 @@ async function runScript (script: string, opts: { sender: { userId: string; user
     warning:                warning,
     param:                  param,
     parameters:             opts.parameters,
+    variables:              opts.variables,
     _current:               opts._current,
     randomOnlineFollower:   async () => getRandomOnlineFollower(),
     randomOnlineSubscriber: async () => getRandomOnlineSubscriber(),
