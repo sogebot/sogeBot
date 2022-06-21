@@ -1,7 +1,3 @@
-// 3rdparty libraries
-
-// bot libraries
-
 import { DiscordLink } from '@entity/discord';
 import { Events } from '@entity/event';
 import { Permissions as PermissionsEntity } from '@entity/permissions';
@@ -87,6 +83,12 @@ class Discord extends Integration {
     };
 
   @settings('bot')
+    fields: string[] = ['$game', '$title', '$startedAt', '$viewers', '$followers', '$subscribers'];
+
+  @settings('bot')
+    fieldsDisabled: string[] = [''];
+
+  @settings('bot')
     ignorelist: string[] = [];
 
   @settings('status')
@@ -122,19 +124,11 @@ class Discord extends Integration {
           if (message && embed) {
             const broadcasterUsername = variables.get('services.twitch.broadcasterUsername') as string;
             embed.spliceFields(0, embed.fields.length);
-            embed.addFields([
-              { name: prepare('webpanel.responses.variable.game'), value: stats.value.currentGame ?? '' },
-              { name: prepare('webpanel.responses.variable.title'), value: stats.value.currentTitle ?? '' },
-              {
-                name: prepare('integrations.discord.started-at'), value: this.embedStartedAt, inline: true,
-              },
-              {
-                name: prepare('webpanel.viewers'), value: String(stats.value.currentViewers), inline: true,
-              },
-              {
-                name: prepare('webpanel.followers'), value: String(stats.value.currentFollowers), inline: true,
-              },
-            ]);
+            embed.addFields(
+              this.fields
+                .filter((o) => this.filterFields(o))
+                .map((o) => this.prepareFields(o))
+            );
             embed.setImage(`https://static-cdn.jtvnw.net/previews-ttv/live_user_${broadcasterUsername}-1920x1080.jpg?${Date.now()}`);
 
             const broadcasterType = variables.get('services.twitch.broadcasterType') as string;
@@ -317,22 +311,11 @@ class Discord extends Integration {
           embed.setColor(0xff0000);
           embed.setDescription(`${broadcasterUsername.charAt(0).toUpperCase() + broadcasterUsername.slice(1)} is not streaming anymore! Check it next time!`);
           embed.spliceFields(0, embed.fields.length);
-          embed.addFields([
-            { name: prepare('webpanel.responses.variable.game'), value: stats.value.currentGame ?? '' },
-            { name: prepare('webpanel.responses.variable.title'), value: stats.value.currentTitle ?? '' },
-            {
-              name: prepare('integrations.discord.streamed-at'), value: `${this.embedStartedAt} - ${dayjs().tz(timezone).format('LLL')}`, inline: true,
-            },
-            {
-              name: prepare('webpanel.followers'), value: String(stats.value.currentFollowers), inline: true,
-            },
-          ]);
+          embed.addFields(
+            this.fields
+              .filter((o) => this.filterFields(o))
+              .map((o) => this.prepareFields(o)));
           embed.setImage(`https://static-cdn.jtvnw.net/ttv-static/404_preview-1920x1080.jpg?${Date.now()}`);
-
-          const broadcasterType = variables.get('services.twitch.broadcasterType') as string;
-          if (broadcasterType !== '') {
-            embed.addField(prepare('webpanel.subscribers'), String(stats.value.currentSubscribers), true);
-          }
           message.edit({ embeds: [embed], content: null });
         }
       } catch (e: any) {
@@ -340,6 +323,41 @@ class Discord extends Integration {
       }
     }
     this.embedMessageId = '';
+  }
+
+  filterFields(o: string) {
+    const broadcasterType = variables.get('services.twitch.broadcasterType') as string;
+
+    if (this.fieldsDisabled.includes(o)) {
+      return false;
+    }
+
+    if (o === '$subscribers' && broadcasterType !== '') {
+      return false;
+    }
+    return true;
+  }
+
+  prepareFields(o: string) {
+    if (o === '$game') {
+      return { name: prepare('webpanel.responses.variable.game'), value: stats.value.currentGame ?? '' };
+    }
+    if (o === '$title') {
+      return { name: prepare('webpanel.responses.variable.title'), value: stats.value.currentTitle ?? '' };
+    }
+    if (o === '$startedAt') {
+      return { name: prepare('integrations.discord.started-at'), value: this.embedStartedAt, inline: true };
+    }
+    if (o === '$viewers') {
+      return { name: prepare('webpanel.viewers'), value: String(stats.value.currentViewers), inline: true };
+    }
+    if (o === '$followers') {
+      return { name: prepare('webpanel.followers'), value: String(stats.value.currentFollowers), inline: true };
+    }
+    if (o === '$subscribers') {
+      return { name: prepare('webpanel.subscribers'), value: String(stats.value.currentSubscribers), inline: true };
+    }
+    return { name: o, value: 'unknown field' };
   }
 
   @onStreamStart()
@@ -357,16 +375,10 @@ class Discord extends Integration {
         this.embedStartedAt = dayjs().tz(timezone).format('LLL');
         const embed = new DiscordJs.MessageEmbed()
           .setURL('https://twitch.tv/' + broadcasterUsername)
-          .addFields([
-            { name: prepare('webpanel.responses.variable.game'), value: stats.value.currentGame ?? '' },
-            { name: prepare('webpanel.responses.variable.title'), value: stats.value.currentTitle ?? '' },
-            {
-              name: prepare('integrations.discord.started-at'), value: this.embedStartedAt, inline: true,
-            },
-            {
-              name: prepare('webpanel.followers'), value: String(stats.value.currentFollowers), inline: true,
-            },
-          ])
+          .addFields(
+            this.fields
+              .filter((o) => this.filterFields(o))
+              .map((o) => this.prepareFields(o)))
           // Set the title of the field
           .setTitle('https://twitch.tv/' + broadcasterUsername)
           // Set the color of the embed
@@ -377,10 +389,6 @@ class Discord extends Integration {
           .setThumbnail(profileImageUrl)
           .setFooter({ text: prepare('integrations.discord.announced-by') + ' - https://www.sogebot.xyz' });
 
-        const broadcasterType = variables.get('services.twitch.broadcasterType') as string;
-        if (broadcasterType !== '') {
-          embed.addField(prepare('webpanel.subscribers'), String(stats.value.currentSubscribers), true);
-        }
         // Send the embed to the same channel as the message
         const message = await (channel as DiscordJs.TextChannel).send({
           content: this.onlineAnnounceMessage.length > 0 ? this.onlineAnnounceMessage : null,
