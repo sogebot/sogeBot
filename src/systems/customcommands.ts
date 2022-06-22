@@ -56,6 +56,39 @@ class CustomCommands extends System {
   }
 
   sockets () {
+    adminEndpoint('/systems/customcommands', 'generic::groups::save', async (item, cb) => {
+      try {
+        cb(null, await getRepository(CommandsGroup).save(item));
+      } catch (e) {
+        if (e instanceof Error) {
+          cb(e.message, undefined);
+        }
+      }
+
+    });
+    adminEndpoint('/systems/customcommands', 'generic::groups::getAll', async (cb) => {
+      let [ commandsGroup, commands ] = await Promise.all([
+        getRepository(CommandsGroup).find(), getRepository(Commands).find(),
+      ]);
+
+      for (const item of commands) {
+        if (item.group && !commandsGroup.find(o => o.name === item.group)) {
+          // we dont have any group options -> create temporary group
+          const group: CommandsGroupInterface = {
+            name:    item.group,
+            options: {
+              filter:     null,
+              permission: null,
+            },
+          };
+          commandsGroup = [
+            ...commandsGroup,
+            group,
+          ];
+        }
+      }
+      cb(null, commandsGroup);
+    });
     adminEndpoint('/systems/customcommands', 'commands::resetCountByCommand', async (cmd: string, cb) => {
       await resetCountOfCommandUsage(cmd);
       cb(null);

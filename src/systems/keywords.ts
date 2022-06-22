@@ -33,6 +33,39 @@ class Keywords extends System {
   }
 
   sockets () {
+    adminEndpoint('/systems/keywords', 'generic::groups::save', async (item, cb) => {
+      try {
+        cb(null, await getRepository(KeywordGroup).save(item));
+      } catch (e) {
+        if (e instanceof Error) {
+          cb(e.message, undefined);
+        }
+      }
+
+    });
+    adminEndpoint('/systems/keywords', 'generic::groups::getAll', async (cb) => {
+      let [ keywordGroup, keyword ] = await Promise.all([
+        getRepository(KeywordGroup).find(), getRepository(Keyword).find(),
+      ]);
+
+      for (const item of keyword) {
+        if (item.group && !keywordGroup.find(o => o.name === item.group)) {
+          // we dont have any group options -> create temporary group
+          const group: KeywordGroupInterface = {
+            name:    item.group,
+            options: {
+              filter:     null,
+              permission: null,
+            },
+          };
+          keywordGroup = [
+            ...keywordGroup,
+            group,
+          ];
+        }
+      }
+      cb(null, keywordGroup);
+    });
     adminEndpoint('/systems/keywords', 'generic::setById', async (opts, cb) => {
       try {
         const item = await getRepository(Keyword).findOne({ id: String(opts.id) });

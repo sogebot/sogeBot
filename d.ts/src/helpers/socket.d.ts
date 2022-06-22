@@ -2,14 +2,14 @@ import type { AlertInterface, EmitData } from '@entity/alert';
 import type { BetsInterface } from '@entity/bets';
 import type { CacheTitlesInterface } from '@entity/cacheTitles';
 import type { ChecklistInterface } from '@entity/checklist';
-import type { CommandsCountInterface, CommandsInterface } from '@entity/commands';
+import type { CommandsCountInterface, CommandsGroupInterface, CommandsInterface } from '@entity/commands';
 import type { CooldownInterface } from '@entity/cooldown';
 import type { EventInterface, Events } from '@entity/event';
 import type { EventListInterface } from '@entity/eventList';
 import type { GalleryInterface } from '@entity/gallery';
 import type { HighlightInterface } from '@entity/highlight';
 import type { HowLongToBeatGameInterface, HowLongToBeatGameItemInterface } from '@entity/howLongToBeatGame';
-import type { KeywordInterface } from '@entity/keyword';
+import type { KeywordGroupInterface, KeywordInterface } from '@entity/keyword';
 import type { OBSWebsocketInterface } from '@entity/obswebsocket';
 import type { OverlayMapperMarathon, OverlayMappers } from '@entity/overlay';
 import type { PermissionsInterface } from '@entity/permissions';
@@ -293,6 +293,7 @@ export type ClientToServerEventsWithNamespace = {
   '/systems/alias': GenericEvents & {
     'generic::getOne': generic<Alias>['getOne'],
     'generic::groups::getAll': generic<AliasGroup>['getAll'],
+    'generic::groups::save': generic<AliasGroup>['save'],
     'generic::getAll': generic<Alias>['getAll'],
     'generic::save': generic<Alias>['save'],
     'generic::validate': generic<Alias>['validate'],
@@ -360,12 +361,16 @@ export type ClientToServerEventsWithNamespace = {
     'generic::getOne': (id: string, cb: (error: Error | string | null, item?: Readonly<Required<CommandsInterface>> | null, count?: number) => void) => void,
     'generic::deleteById': generic<CommandsInterface>['deleteById'],
     'generic::setById': generic<CommandsInterface>['setById'],
+    'generic::groups::getAll': generic<CommandsGroupInterface>['getAll'],
+    'generic::groups::save': generic<CommandsGroupInterface>['save'],
   },
   '/systems/keywords': GenericEvents & {
     'generic::getAll': generic<KeywordInterface>['getAll'],
     'generic::getOne': generic<KeywordInterface>['getOne'],
     'generic::deleteById': generic<KeywordInterface>['deleteById'],
     'generic::setById': generic<KeywordInterface>['setById'],
+    'generic::groups::getAll': generic<KeywordGroupInterface>['getAll'],
+    'generic::groups::save': generic<KeywordGroupInterface>['save'],
   },
   '/systems/levels': GenericEvents & {
     'getLevelsExample': (cb: (error: Error | string | null, levels: string[]) => void) => void,

@@ -58,6 +58,19 @@ class Alias extends System {
   }
 
   sockets() {
+    adminEndpoint('/systems/alias', 'generic::groups::save', async (item, cb) => {
+      try {
+        const itemToSave = new AliasGroup();
+        merge(itemToSave, item);
+        await itemToSave.save();
+        cb(null, itemToSave);
+      } catch (e) {
+        if (e instanceof Error) {
+          cb(e.message, undefined);
+        }
+      }
+
+    });
     adminEndpoint('/systems/alias', 'generic::groups::getAll', async (cb) => {
       let [ aliasGroup, aliasEntity ] = await Promise.all([
         AliasGroup.find(), AliasEntity.find(),

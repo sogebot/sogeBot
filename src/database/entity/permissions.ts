@@ -1,71 +1,23 @@
-import {
-  Field, ID, InputType, ObjectType,
-} from 'type-graphql';
 import { EntitySchema } from 'typeorm';
 
-@InputType()
-export class PermissionFiltersInput {
-  @Field()
-    comparator: '<' | '>' | '==' | '<=' | '>=';
-  @Field()
-    type: 'level' | 'ranks' | 'points' | 'watched' | 'tips' | 'bits' | 'messages' | 'subtier' | 'subcumulativemonths' | 'substreakmonths' | 'followtime';
-  @Field()
-    value: string;
-}
-
-@InputType()
-export class PermissionInput {
-  @Field({ nullable: true })
-    name?: string;
-  @Field({ nullable: true })
-    order?: number;
-  @Field({ nullable: true })
-    isCorePermission?: boolean;
-  @Field({ nullable: true })
-    isWaterfallAllowed?: boolean;
-  @Field({ nullable: true })
-    automation?: 'none' | 'casters' | 'moderators' | 'subscribers' | 'viewers' | 'followers' | 'vip';
-  @Field(type => [String], { nullable: true })
-    userIds?: string[];
-  @Field(type => [String], { nullable: true })
-    excludeUserIds?: string[];
-  @Field(type => [PermissionFiltersInput], { nullable: true })
-    filters?: PermissionFiltersInput[];
-}
-
-@ObjectType()
 export class PermissionFiltersInterface {
-  @Field(type => ID)
-    id?: string;
-  @Field()
-    comparator: '<' | '>' | '==' | '<=' | '>=';
-  @Field()
-    type: 'level' | 'ranks' | 'points' | 'watched' | 'tips' | 'bits' | 'messages' | 'subtier' | 'subcumulativemonths' | 'substreakmonths' | 'followtime';
-  @Field()
-    value: string;
+  id?: string;
+  comparator: '<' | '>' | '==' | '<=' | '>=';
+  type: 'level' | 'ranks' | 'points' | 'watched' | 'tips' | 'bits' | 'messages' | 'subtier' | 'subcumulativemonths' | 'substreakmonths' | 'followtime';
+  value: string;
   permission: PermissionsInterface;
 }
 
-@ObjectType()
 export class PermissionsInterface {
-  @Field(type => ID)
-    id?: string;
-  @Field()
-    name: string;
-  @Field()
-    order: number;
-  @Field()
-    isCorePermission: boolean;
-  @Field()
-    isWaterfallAllowed: boolean;
-  @Field()
-    automation: 'none' | 'casters' | 'moderators' | 'subscribers' | 'viewers' | 'followers' | 'vip';
-  @Field(type => [String])
-    userIds: string[];
-  @Field(type => [String])
-    excludeUserIds: string[];
-  @Field(type => [PermissionFiltersInterface])
-    filters: PermissionFiltersInterface[];
+  id?: string;
+  name: string;
+  order: number;
+  isCorePermission: boolean;
+  isWaterfallAllowed: boolean;
+  automation: 'none' | 'casters' | 'moderators' | 'subscribers' | 'viewers' | 'followers' | 'vip';
+  userIds: string[];
+  excludeUserIds: string[];
+  filters: PermissionFiltersInterface[];
 }
 
 export interface PermissionCommandsInterface {
