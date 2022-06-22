@@ -33,7 +33,7 @@ jobs:
         npm install --location=global yarn
     - name: Install eslint and dependencies
       run: |
-        make dependencies
+        NODE_MODULES_DIR=./node_modules make dependencies
     - name: Run eslint
       run: ENV=development make eslint
     - name: Run jsonlint
