@@ -25,7 +25,7 @@ jobs:
           npm install --location=global yarn
 
       - name: Build a bot
-        run: make
+        run: NODE_MODULES_DIR=./node_modules make
 
       - name: Zip a bot
         run: make pack

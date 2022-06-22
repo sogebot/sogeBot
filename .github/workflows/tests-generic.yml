@@ -33,7 +33,7 @@ jobs:
         npm install --location=global yarn
     - name: Install eslint and dependencies
       run: |
-        make dependencies
+        NODE_MODULES_DIR=./node_modules make dependencies
     - name: Run eslint
       run: ENV=development make eslint
     - name: Run jsonlint
@@ -60,4 +60,4 @@ jobs:
         npm install --location=global yarn
     - name: Install all dependencies and build everything
       if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
-      run: ENV=development make
+      run: ENV=development NODE_MODULES_DIR=./node_modules make
