@@ -15,7 +15,7 @@ COPY . /app
 WORKDIR /app
 
 # Install yarn
-RUN npm install -g yarn
+RUN npm install --location=global yarn
 
 # Install dependencies
 RUN make

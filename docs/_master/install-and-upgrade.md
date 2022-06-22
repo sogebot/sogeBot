@@ -67,17 +67,14 @@
 - Set your [database environment](configuration/database)
 - Add bot as channel editor
   in [Permissions settings](http://twitch.tv/dashboard/permissions) on Twitch
-- be sure that you have latest yarn installed
-
-    `npm install -g yarn`
 
 - before starting a bot, you need to install npm dependencies
 
-    `npm ci`
+    `npx yarn install`
 
 - start bot
 
-    `yarn start`
+    `npx yarn start`
 
 - To access webpanel, go to `http://localhost:<port>` where port is configured
   as PORT env variable, e.g. `PORT=20001 yarn start`
@@ -104,7 +101,7 @@
   in [Permissions settings](http://twitch.tv/dashboard/permissions) on Twitch
 - be sure that you have latest yarn installed
 
-    `npm install -g yarn`
+    `npm install --location=global yarn`
 
 - before starting a bot, you need to build a bot
 
@@ -121,7 +118,7 @@
 
 1. Backup your database
 2. Update bot with `git pull -r origin master`
-3. Run `npm install -g yarn`
+3. Run `npm install --location=global yarn`
 4. Run `make`
 5. Start bot `yarn start`
 

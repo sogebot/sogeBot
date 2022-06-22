@@ -27,7 +27,7 @@ jobs:
           check-latest: true
       - name: Install latest yarn
         run: |
-          npm install -g yarn
+          npm install --location=global yarn
 
       - name: Build a bot
         run: make

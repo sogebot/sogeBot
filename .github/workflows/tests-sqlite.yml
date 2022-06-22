@@ -30,7 +30,7 @@ jobs:
     - name: Install latest yarn
       if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
       run: |
-        npm install -g yarn
+        npm install --location=global yarn
     - name: Install all dependencies and build just a bot
       if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
       run: ENV=development make info clean dependencies bot
@@ -59,7 +59,7 @@ jobs:
     - name: Install latest yarn
       if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
       run: |
-        npm install -g yarn
+        npm install --location=global yarn
     - name: Install all dependencies and build just a bot
       if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
       run: ENV=development make info clean dependencies bot
@@ -94,7 +94,7 @@ jobs:
     - name: Install latest yarn
       if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
       run: |
-        npm install -g yarn
+        npm install --location=global yarn
     - name: Install all dependencies and build just a bot
       if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
       run: ENV=development make info clean dependencies bot
@@ -129,7 +129,7 @@ jobs:
     - name: Install latest yarn
       if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
       run: |
-        npm install -g yarn
+        npm install --location=global yarn
     - name: Install all dependencies and build just a bot
       if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
       run: ENV=development make info clean dependencies bot

@@ -30,7 +30,7 @@ jobs:
         check-latest: true
     - name: Install latest yarn
       run: |
-        npm install -g yarn
+        npm install --location=global yarn
     - name: Install eslint and dependencies
       run: |
         make dependencies
@@ -57,7 +57,7 @@ jobs:
     - name: Install latest yarn
       if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
       run: |
-        npm install -g yarn
+        npm install --location=global yarn
     - name: Install all dependencies and build everything
       if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
       run: ENV=development make
