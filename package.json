@@ -16,6 +16,7 @@
     "@sogebot/ui-oauth": "~3.1.1",
     "@sogebot/ui-overlay": "^26.0.0",
     "@sogebot/ui-public": "^3.0.1",
+    "@twurple/auth": "^5.1.6",
     "@twurple/api": "^5.1.6",
     "@twurple/chat": "^5.1.6",
     "@twurple/pubsub": "^5.1.6",
@@ -92,7 +93,7 @@
     "ytsr": "3.8.0"
   },
   "scripts": {
-    "postinstall": "patch-package",
+    "postinstall": "(patch-package || (exit 0))",
     "prestart": "node ./tools/migration.js",
     "build": "cross-env ENV=development make bot",
     "test": "node tools/runTests.js",

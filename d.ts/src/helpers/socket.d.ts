@@ -20,8 +20,7 @@ import type { QuotesInterface } from '@entity/quotes';
 import type { RaffleInterface } from '@entity/raffle';
 import type { RandomizerInterface } from '@entity/randomizer';
 import type { RankInterface } from '@entity/rank';
-import type { SongRequestInterface } from '@entity/song';
-import type { currentSongType, SongBanInterface, SongPlaylistInterface } from '@entity/song';
+import type { currentSongType, SongBanInterface, SongPlaylistInterface, SongRequestInterface } from '@entity/song';
 import type { SpotifySongBanInterface } from '@entity/spotify';
 import type { TextInterface } from '@entity/text';
 import type { TimerInterface } from '@entity/timer';
@@ -34,6 +33,10 @@ import { ValidationError } from 'class-validator';
 import { Socket } from 'socket.io';
 import { FindConditions } from 'typeorm';
 
+import { QuickActions } from '../../../src/database/entity/dashboard';
+import { WidgetCustomInterface, WidgetSocialInterface } from '../../../src/database/entity/widget';
+
+import { AliasGroup, Alias } from '~/database/entity/alias';
 import { Plugin } from '~/database/entity/plugins';
 import { MenuItem } from '~/helpers/panel';
 
@@ -203,6 +206,7 @@ export type ClientToServerEventsWithNamespace = {
   },
   '/registries/alerts': GenericEvents & {
     'isAlertUpdated': (data: { updatedAt: number; id: string }, cb: (err: Error | null, isUpdated: boolean, updatedAt: number) => void) => void,
+    'alerts::settings': (data: null | { areAlertsMuted: boolean; isSoundMuted: boolean; isTTSMuted: boolean; }, cb: (item: { areAlertsMuted: boolean; isSoundMuted: boolean; isTTSMuted: boolean; }) => void) => void,
     'alerts::save': (item: Required<AlertInterface>, cb: (error: Error | string | null, item: null | Required<AlertInterface>) => void) => void,
     'alerts::delete': (item: Required<AlertInterface>, cb: (error: Error | string | null) => void) => void,
     'test': (emit: EmitData) => void,
@@ -226,6 +230,7 @@ export type ClientToServerEventsWithNamespace = {
   },
   '/core/permissions': GenericEvents & {
     'generic::deleteById': generic<PermissionsInterface>['deleteById'],
+    'generic::getAll': generic<PermissionsInterface>['getAll'],
     'permission::save': (data: Required<PermissionsInterface>[], cb?: (error: Error | string | null) => void) => void,
     'test.user': (opts: { pid: string, value: string, state: string }, cb: (error: Error | string | null, response?: { status: import('../helpers/permissions/check').checkReturnType | { access: 2 }, partial: import('../helpers/permissions/check').checkReturnType | { access: 2 }, state: string }) => void) => void,
   },
@@ -284,6 +289,14 @@ export type ClientToServerEventsWithNamespace = {
   },
   '/stats/tips': GenericEvents & {
     'generic::getAll': generic<UserTipInterface & { username: string }>['getAll'],
+  },
+  '/systems/alias': GenericEvents & {
+    'generic::getOne': generic<Alias>['getOne'],
+    'generic::groups::getAll': generic<AliasGroup>['getAll'],
+    'generic::getAll': generic<Alias>['getAll'],
+    'generic::save': generic<Alias>['save'],
+    'generic::validate': generic<Alias>['validate'],
+    'generic::deleteById': generic<Alias>['deleteById'],
   },
   '/systems/bets': GenericEvents & {
     'bets::getCurrentBet': (cb: (error: Error | string | null, item?: BetsInterface) => void) => void,
@@ -453,6 +466,18 @@ export type ClientToServerEventsWithNamespace = {
     'eventlist::resend': (id: string) => void,
     'update': (cb: (values: any) => void) => void,
     'askForGet': (cb: () => void) => void,
+  },
+  '/widgets/custom': GenericEvents & {
+    'generic::getAll': (userId: string, cb: (error: Error | string | null, items: Readonly<Required<WidgetCustomInterface>>[]) => void) => void,
+    'generic::save': generic<WidgetCustomInterface>['save'];
+    'generic::deleteById': generic<WidgetCustomInterface>['deleteById'];
+  },
+  '/widgets/quickaction': GenericEvents & {
+    'generic::getAll': (userId: string, cb: (error: Error | string | null, items: Readonly<Required<QuickActions>>[]) => void) => void,
+    'trigger': (data: { user: { userId: string, userName: string }, id: string, value?: any}) => void,
+  },
+  '/widgets/social': GenericEvents & {
+    'generic::getAll': generic<WidgetSocialInterface>['getAll'];
   },
   '/core/events': GenericEvents & {
     'events::getRedeemedRewards': (cb: (error: Error | string | null, rewards: { id: string, name: string }[]) => void) => void,

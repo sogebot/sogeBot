@@ -1,8 +1,10 @@
 'use strict';
 
-import { Alias as AliasEntity, AliasGroup, AliasInterface } from '@entity/alias';
+import { Alias as AliasEntity, AliasGroup } from '@entity/alias';
 import * as constants from '@sogebot/ui-helpers/constants';
+import { validateOrReject } from 'class-validator';
 import * as _ from 'lodash';
+import { merge } from 'lodash';
 import { getRepository } from 'typeorm';
 
 import { parserReply } from '../commons';
@@ -10,6 +12,7 @@ import {
   command, default_permission, parser, timer,
 } from '../decorators';
 import Expects from '../expects';
+import { isValidationError } from '../helpers/errors';
 import Parser from '../parser';
 import System from './_interface';
 
@@ -25,6 +28,7 @@ import {
   addToViewersCache, get, getFromViewersCache,
 } from '~/helpers/permissions';
 import { check, defaultPermissions } from '~/helpers/permissions/index';
+import { adminEndpoint } from '~/helpers/socket';
 import customCommands from '~/systems/customcommands';
 import { translate } from '~/translate';
 
@@ -53,9 +57,80 @@ class Alias extends System {
     });
   }
 
-  async search(opts: ParserOptions): Promise<[Readonly<Required<AliasInterface>> | null, string[]]> {
-    let alias: Readonly<Required<AliasInterface>> | undefined;
-    let fromCache: Readonly<Required<AliasInterface>> | undefined;
+  sockets() {
+    adminEndpoint('/systems/alias', 'generic::groups::getAll', async (cb) => {
+      let [ aliasGroup, aliasEntity ] = await Promise.all([
+        AliasGroup.find(), AliasEntity.find(),
+      ]);
+
+      for (const item of aliasEntity) {
+        if (item.group && !aliasGroup.find(o => o.name === item.group)) {
+          // we dont have any group options -> create temporary group
+          const group = new AliasGroup();
+          group.name = item.group;
+          group.options = {
+            filter:     null,
+            permission: null,
+          };
+          aliasGroup = [
+            ...aliasGroup,
+            group,
+          ];
+        }
+      }
+      cb(null, aliasGroup);
+    });
+    adminEndpoint('/systems/alias', 'generic::getAll', async (cb) => {
+      cb(null, await AliasEntity.find());
+    });
+    adminEndpoint('/systems/alias', 'generic::getOne', async (id, cb) => {
+      cb(null, await AliasEntity.findOne({ id }));
+    });
+    adminEndpoint('/systems/alias', 'generic::deleteById', async (id, cb) => {
+      try {
+        const alias = await AliasEntity.findOneOrFail({ id });
+        await alias.remove();
+        cb(null);
+      } catch (e) {
+        cb(e as Error);
+      }
+    });
+    adminEndpoint('/systems/alias', 'generic::validate', async (data, cb) => {
+      try {
+        const item = new AliasEntity();
+        merge(item, data);
+        await validateOrReject(item);
+        cb(null);
+      } catch (e) {
+        if (e instanceof Error) {
+          cb(e.message);
+        }
+        if (isValidationError(e)) {
+          cb(e);
+        }
+      }
+    });
+    adminEndpoint('/systems/alias', 'generic::save', async (item, cb) => {
+      try {
+        const itemToSave = new AliasEntity();
+        merge(itemToSave, item);
+        await validateOrReject(itemToSave);
+        await itemToSave.save();
+        cb(null, itemToSave);
+      } catch (e) {
+        if (e instanceof Error) {
+          cb(e.message, undefined);
+        }
+        if (isValidationError(e)) {
+          cb(e, undefined);
+        }
+      }
+    });
+  }
+
+  async search(opts: ParserOptions): Promise<[Readonly<Required<AliasEntity>> | null, string[]]> {
+    let alias: Readonly<Required<AliasEntity>> | undefined;
+    let fromCache: Readonly<Required<AliasEntity>> | undefined;
     const cmdArray = opts.message.toLowerCase().split(' ');
 
     // is it an command?

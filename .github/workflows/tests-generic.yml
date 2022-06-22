@@ -28,9 +28,9 @@ jobs:
       with:
         node-version: 16
         check-latest: true
-    - name: Install latest npm
+    - name: Install latest yarn
       run: |
-        npm install -g npm@latest
+        npm install -g yarn
     - name: Install eslint and dependencies
       run: |
         make dependencies
@@ -54,10 +54,10 @@ jobs:
       with:
         node-version: 16
         check-latest: true
-    - name: Install latest npm
+    - name: Install latest yarn
       if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
       run: |
-        npm install -g npm@latest
+        npm install -g yarn
     - name: Install all dependencies and build everything
       if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
       run: ENV=development make

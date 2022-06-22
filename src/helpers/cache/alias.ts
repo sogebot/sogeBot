@@ -1,8 +1,8 @@
-import type { AliasInterface } from '@entity/alias';
+import type { Alias } from '@entity/alias';
 
 const findCache: {
   search: string;
-  alias: Readonly<Required<AliasInterface>>;
+  alias: Readonly<Required<Alias>>;
 }[] = [];
 
 function invalidate() {

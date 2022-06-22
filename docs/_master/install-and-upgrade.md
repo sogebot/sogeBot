@@ -67,9 +67,9 @@
 - Set your [database environment](configuration/database)
 - Add bot as channel editor
   in [Permissions settings](http://twitch.tv/dashboard/permissions) on Twitch
-- be sure that you have latest npm installed
+- be sure that you have latest yarn installed
 
-    `npm install -g npm@latest`
+    `npm install -g yarn`
 
 - before starting a bot, you need to install npm dependencies
 
@@ -77,17 +77,17 @@
 
 - start bot
 
-    `npm start`
+    `yarn start`
 
 - To access webpanel, go to `http://localhost:<port>` where port is configured
-  as PORT env variable, e.g. `PORT=20001 npm start`
+  as PORT env variable, e.g. `PORT=20001 yarn start`
 
 ### Upgrade bot from ZIP
 
 1. Backup your `.env` and, if using sqlite3, `sogebot.db` file
 2. Remove your sogeBot directory
 3. Go through Installation steps
-4. Before `npm start` recopy your backup back to bot folder
+4. Before `yarn start` recopy your backup back to bot folder
 
 ## From GIT
 
@@ -102,9 +102,9 @@
 - Set your [database environment](configuration/database)
 - Add bot as channel editor
   in [Permissions settings](http://twitch.tv/dashboard/permissions) on Twitch
-- be sure that you have latest npm installed
+- be sure that you have latest yarn installed
 
-    `npm install -g npm@latest`
+    `npm install -g yarn`
 
 - before starting a bot, you need to build a bot
 
@@ -112,7 +112,7 @@
 
 - start bot
 
-    `npm start`
+    `yarn start`
 
 - To access webpanel, go to `http://localhost:<port>` where port is configured
   in config.json (default: 20000)
@@ -121,9 +121,9 @@
 
 1. Backup your database
 2. Update bot with `git pull -r origin master`
-3. Run `npm install -g npm@latest`
+3. Run `npm install -g yarn`
 4. Run `make`
-5. Start bot `npm start`
+5. Start bot `yarn start`
 
 ## Unofficial Installer
 

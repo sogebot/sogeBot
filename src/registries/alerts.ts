@@ -116,6 +116,19 @@ class Alerts extends Registry {
         cb(e.stack, false, 0);
       }
     });
+    adminEndpoint('/registries/alerts', 'alerts::settings', async (data, cb) => {
+      if (data) {
+        this.areAlertsMuted = data.areAlertsMuted;
+        this.isSoundMuted = data.isSoundMuted;
+        this.isTTSMuted = data.isTTSMuted;
+      }
+
+      cb({
+        areAlertsMuted: this.areAlertsMuted,
+        isSoundMuted:   this.isSoundMuted,
+        isTTSMuted:     this.isTTSMuted,
+      });
+    });
     adminEndpoint('/registries/alerts', 'alerts::save', async (item, cb) => {
       try {
         cb(

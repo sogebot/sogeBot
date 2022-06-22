@@ -14,15 +14,15 @@ COPY . /app
 # Change working directory
 WORKDIR /app
 
-# Install latest npm
-RUN npm install -g npm@latest
+# Install yarn
+RUN npm install -g yarn
 
 # Install dependencies
 RUN make
 # Remove dev dependencies (not needed anymore)
-RUN npm prune --production
+RUN yarn install --production --ignore-scripts --prefer-offline
 # Get latest ui dependencies in time of build
-RUN npm update @sogebot/ui-admin @sogebot/ui-overlay @sogebot/ui-helpers @sogebot/ui-oauth @sogebot/ui-public
+RUN yarn update @sogebot/ui-admin @sogebot/ui-overlay @sogebot/ui-helpers @sogebot/ui-oauth @sogebot/ui-public
 
 # Expose API port to the outside
 EXPOSE 20000

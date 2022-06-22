@@ -5,6 +5,6 @@ const defaultPermissions = {
   VIP:         'e8490e6e-81ea-400a-b93f-57f55aad8e31',
   FOLLOWERS:   'c168a63b-aded-4a90-978f-ed357e95b0d2',
   VIEWERS:     '0efd7b1c-e460-4167-8e06-8aaf2c170311',
-} as const;
+};
 
 export { defaultPermissions };

@@ -307,17 +307,16 @@
       }
     },
     "eventlist-events": {
-      "follow": "<strong>followed</strong> you",
-      "host": "<strong>hosted</strong>",
-      "raid": "<strong>raided</strong>",
-      "sub": "<strong>subbed</strong> you",
-      "subgift": "has been <strong>gifted</strong> sub",
-      "subcommunitygift": "<strong>gifted</strong> subs for community",
-      "resub": "<strong>resubbed</strong>",
-      "cheer": "<strong>cheered</strong> you",
-      "tip": "<strong>tipped</strong> you",
-      "tipToCharity": "<strong>donated</strong> to $campaignName",
-      "rewardredeem": "just <strong>redeemed</strong> reward"
+      "follow": "<strong>Followed</strong> you",
+      "host": "<strong>Hosted</strong> you with <strong>$viewers</strong> viewers.",
+      "raid": "<strong>Raided</strong> you with <strong>$viewers</strong> raiders.",
+      "sub": "<strong>Subscribed</strong> to you with <strong>$subType</strong>. They've been subscribed for $subCumulativeMonths $subCumulativeMonthsName.",
+      "subgift": "has been <strong>gifted</strong> subscription from <strong>$username</strong>",
+      "subcommunitygift": "<strong>Gifted</strong> subscriptions for community",
+      "resub": "<strong>Resubscribed</strong> with <strong>$subType</strong>. They've been subscribed for $subCumulativeMonths $subCumulativeMonthsName.",
+      "cheer": "<strong>Cheered</strong> you",
+      "tip": "<strong>Tipped</strong> you",
+      "tipToCharity": "<strong>donated</strong> to <strong>$campaignName</strong>"
     },
     "responses": {
       "variable": {
