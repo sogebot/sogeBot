@@ -1,6 +1,6 @@
-FROM node:16-bullseye-slim
+FROM node:18-bullseye-slim
 
-ENV LAST_UPDATED 2022-02-09-1815
+ENV LAST_UPDATED 2022-06-22-1555
 
 ENV NODE_ENV production
 ENV ENV production
@@ -8,18 +8,24 @@ ENV ENV production
 RUN apt-get update
 RUN apt-get install -y build-essential nasm libtool make bash git autoconf wget zlib1g-dev python3
 
-# Copy source code
-COPY . /app
+# Clone the dev files into the docker container
+# RUN git clone --recurse-submodules https://github.com/sogebot/sogebot.dev.git app
+RUN git clone https://github.com/sogebot/sogebot.dev.git _dev
+
+# Copy source code over backend
+COPY . /_dev/backend
 
 # Change working directory
-WORKDIR /app
+WORKDIR /_dev/backend
 
 # Install dependencies
 RUN make
 # Remove dev dependencies (not needed anymore)
 RUN yarn install --production --ignore-scripts --prefer-offline
 # Get latest ui dependencies in time of build
-RUN yarn update @sogebot/ui-admin @sogebot/ui-overlay @sogebot/ui-helpers @sogebot/ui-oauth @sogebot/ui-public
+RUN yarn upgrade @sogebot/ui-admin @sogebot/ui-overlay @sogebot/ui-helpers @sogebot/ui-oauth @sogebot/ui-public
+
+COPY /_dev/backend /app
 
 # Expose API port to the outside
 EXPOSE 20000
