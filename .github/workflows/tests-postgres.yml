@@ -42,7 +42,7 @@ jobs:
         npm install --location=global yarn
     - name: Install all dependencies and build just a bot
       if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
-      run: ENV=development make info clean dependencies bot
+      run: ENV=development NODE_MODULES_DIR=./node_modules make info clean dependencies bot
     - name: Set proper db to use
       if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
       run: yarn run test:config:postgres
@@ -80,7 +80,7 @@ jobs:
         npm install --location=global yarn
     - name: Install all dependencies and build just a bot
       if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
-      run: ENV=development make info clean dependencies bot
+      run: ENV=development NODE_MODULES_DIR=./node_modules make info clean dependencies bot
     - name: Set proper db to use
       if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
       run: yarn run test:config:postgres
@@ -124,7 +124,7 @@ jobs:
         npm install --location=global yarn
     - name: Install all dependencies and build just a bot
       if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
-      run: ENV=development make info clean dependencies bot
+      run: ENV=development NODE_MODULES_DIR=./node_modules make info clean dependencies bot
     - name: Set proper db to use
       if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
       run: yarn run test:config:postgres
@@ -168,7 +168,7 @@ jobs:
         npm install --location=global yarn
     - name: Install all dependencies and build just a bot
       if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
-      run: ENV=development make info clean dependencies bot
+      run: ENV=development NODE_MODULES_DIR=./node_modules make info clean dependencies bot
     - name: Set proper db to use
       if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
       run: yarn run test:config:postgres
