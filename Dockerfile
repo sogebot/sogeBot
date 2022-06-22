@@ -25,7 +25,7 @@ RUN yarn install --production --ignore-scripts --prefer-offline
 # Get latest ui dependencies in time of build
 RUN yarn upgrade @sogebot/ui-admin @sogebot/ui-overlay @sogebot/ui-helpers @sogebot/ui-oauth @sogebot/ui-public
 
-COPY /_dev/backend /app
+COPY . ../..//app
 
 # Expose API port to the outside
 EXPOSE 20000
