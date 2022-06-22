@@ -1,9 +1,9 @@
-PATH         := node_modules/.bin:$(PATH)
-SHELL        := /bin/bash
-VERSION      := `node -pe "require('./package.json').version"`
-ENV          ?= production
+PATH             := node_modules/.bin:$(PATH)
+SHELL            := /bin/bash
+VERSION          := `node -pe "require('./package.json').version"`
+ENV              ?= production
+NODE_MODULES_DIR ?= ../node_modules
 
-NODE_MODULES_DIR=../node_modules
 
 all : info clean dependencies bot
 .PHONY : all
