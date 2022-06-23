@@ -1,6 +1,6 @@
 FROM node:18-bullseye-slim
 
-ENV LAST_UPDATED 2022-06-22-1555
+ENV LAST_UPDATED 2022-06-22-1557
 
 ENV NODE_ENV production
 ENV ENV production
@@ -20,12 +20,20 @@ WORKDIR /_dev/backend
 
 # Install dependencies
 RUN make
+
 # Remove dev dependencies (not needed anymore)
-RUN yarn install --production --ignore-scripts --prefer-offline
+ RUN yarn install --production --ignore-scripts --prefer-offline
+
 # Get latest ui dependencies in time of build
 RUN yarn upgrade @sogebot/ui-admin @sogebot/ui-overlay @sogebot/ui-helpers @sogebot/ui-oauth @sogebot/ui-public
 
-COPY . ../../app
+WORKDIR /_dev/backend
+COPY . /app
+
+RUN cp -r /_dev/node_modules /app/
+
+# Change working directory
+WORKDIR /app
 
 # Expose API port to the outside
 EXPOSE 20000
