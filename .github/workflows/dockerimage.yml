@@ -29,6 +29,8 @@ jobs:
         run: |
           npm install -g yarn
 
+      - run: yarn config set network-timeout 600000 -g
+
       - name: Build a bot
         run: NODE_MODULES_DIR=./node_modules make
 
