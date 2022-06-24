@@ -478,6 +478,7 @@ export type ClientToServerEventsWithNamespace = {
     'generic::deleteById': generic<WidgetCustomInterface>['deleteById'];
   },
   '/widgets/quickaction': GenericEvents & {
+    'generic::save': generic<QuickActions>['save'],
     'generic::getAll': (userId: string, cb: (error: Error | string | null, items: Readonly<Required<QuickActions>>[]) => void) => void,
     'trigger': (data: { user: { userId: string, userName: string }, id: string, value?: any}) => void,
   },
