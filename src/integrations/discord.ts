@@ -130,11 +130,6 @@ class Discord extends Integration {
                 .map((o) => this.prepareFields(o))
             );
             embed.setImage(`https://static-cdn.jtvnw.net/previews-ttv/live_user_${broadcasterUsername}-1920x1080.jpg?${Date.now()}`);
-
-            const broadcasterType = variables.get('services.twitch.broadcasterType') as string;
-            if (broadcasterType !== '') {
-              embed.addField(prepare('webpanel.subscribers'), String(stats.value.currentSubscribers), true);
-            }
             message.edit({ embeds: [embed] });
           }
         }
