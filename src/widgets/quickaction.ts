@@ -44,6 +44,15 @@ const trigger = async (item: QuickActions.Item, user: { userId: string, userName
 
 class QuickAction extends Widget {
   public sockets() {
+    adminEndpoint('/widgets/quickaction', 'generic::deleteById', async (id, cb) => {
+      try {
+        const item = await getRepository(QuickActionEntity).findOneOrFail({ id });
+        await getRepository(QuickActionEntity).remove(item);
+        cb(null);
+      } catch (e) {
+        cb(e as Error);
+      }
+    });
     adminEndpoint('/widgets/quickaction', 'generic::save', async (item, cb) => {
       cb(null, await getRepository(QuickActionEntity).save(item));
     });
