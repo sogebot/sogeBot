@@ -227,6 +227,7 @@ export type ClientToServerEventsWithNamespace = {
     'randomizer::startSpin': () => void,
     'randomizer::showById': (id: string, cb: (error: Error | string | null) => void) => void,
     'randomizer::getVisible': (cb: (error: Error | string | null, item: RandomizerInterface) => void) => void,
+    'generic::getAll': generic<RandomizerInterface>['getAll'],
   },
   '/core/permissions': GenericEvents & {
     'generic::deleteById': generic<PermissionsInterface>['deleteById'],

@@ -19,6 +19,9 @@ class Randomizer extends Registry {
   }
 
   sockets () {
+    adminEndpoint('/registries/randomizer', 'generic::getAll', async (cb) => {
+      cb(null, await getRepository(RandomizerEntity).find());
+    });
     publicEndpoint('/registries/randomizer', 'randomizer::getVisible', async (cb) => {
       cb(
         null,
