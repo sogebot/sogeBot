@@ -43,14 +43,14 @@ else
 	@npx tsc --removeComments false
 endif
 	@npx tsc-alias
+ifeq ($(NODE_MODULES_DIR),../node_modules)
+	@npx --yes generate-lockfile --lockfile ../yarn.lock --package package.json --write yarn.lock --force
+endif
 
 pack:
 	@echo -ne "\n\t ----- Packing into sogeBot-$(VERSION).zip\n"
 	@cp ./src/data/.env* ./
 	@cp ./src/data/.env.sqlite ./.env
-ifeq ($(NODE_MODULES_DIR),../node_modules)
-	@npx --yes generate-lockfile --lockfile ../yarn.lock --package package.json --write yarn.lock --force
-endif
 	@npx --yes bestzip sogeBot-$(VERSION).zip .env* yarn.lock patches/ dest/ locales/ LICENSE package.json docs/ AUTHORS tools/ bin/ bat/ fonts.json assets/ favicon.ico
 
 prepare:
