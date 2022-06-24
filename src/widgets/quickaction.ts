@@ -2,6 +2,7 @@ import { getRepository } from 'typeorm';
 
 import { parserReply } from '../commons';
 import { QuickAction as QuickActionEntity, QuickActions } from '../database/entity/dashboard';
+import { Randomizer } from '../database/entity/randomizer';
 import { getUserSender } from '../helpers/commons';
 import { setValueOf } from '../helpers/customvariables';
 import { info } from '../helpers/log';
@@ -12,6 +13,10 @@ import { adminEndpoint } from '~/helpers/socket';
 const trigger = async (item: QuickActions.Item, user: { userId: string, userName: string }, value?: string) => {
   info(`Quick Action ${item.id} triggered by ${user.userName}#${user.userId}`);
   switch (item.type) {
+    case 'randomizer': {
+      getRepository(Randomizer).update({ id: item.options.randomizerId }, { isShown: Boolean(value) ?? false });
+      break;
+    }
     case 'command': {
       const parser = new (require('../parser').default)();
       const alias = require('../systems/alias').default as typeof import('../systems/alias').default;
