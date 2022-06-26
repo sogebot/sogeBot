@@ -1,3 +1,3 @@
 @echo off
 cd ..
-npm start
+npx --yes yarn start

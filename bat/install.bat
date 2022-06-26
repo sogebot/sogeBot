@@ -5,4 +5,4 @@ echo Purging old dependencies
 rd /s /q node_modules
 
 echo Installing dependencies
-npm install
+npx --yes yarn install
