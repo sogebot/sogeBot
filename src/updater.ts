@@ -63,7 +63,7 @@ class Updater extends Core {
       }
       updating.add(opts.pkg);
       info(`Update for ${opts.pkg}@${opts.version} manually triggered. Update processing.`);
-      exec(`npm install -s ${opts.pkg}@${opts.version}`, (error, _, stderr) => {
+      exec(`npx --yes yarn install ${opts.pkg}@${opts.version}`, (error, _, stderr) => {
         if (!error) {
           this.versions[opts.pkg as keyof typeof versions] = opts.version;
           info(`${opts.pkg}@${opts.version} updated succesfully!`);
@@ -112,7 +112,7 @@ class Updater extends Core {
 
           info(`New version of ${pkg}@${applicableVersion} package found. Automatic update processing.`);
           await new Promise((resolve) => {
-            exec(`npm install -s ${pkg}@${applicableVersion}`, (error, _, stderr) => {
+            exec(`npx --yes yarn install ${pkg}@${applicableVersion}`, (error, _, stderr) => {
               if (!error) {
                 this.versions[pkg as keyof typeof versions] = applicableVersion;
                 info(`${pkg}@${applicableVersion} updated succesfully!`);
