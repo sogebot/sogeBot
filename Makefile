@@ -17,10 +17,10 @@ dependencies:
 	@echo -ne "\n\t ----- Cleaning up dependencies\n"
 	@rm -rf node_modules
 	@echo -ne "\n\t ----- Installation of dependencies\n"
-	@npx yarn config set network-timeout 600000 -g
-	NODE_ENV=development npx yarn install
+	@npx --yes yarn config set network-timeout 600000 -g
+	NODE_ENV=development npx --yes yarn install
 	@echo -ne "\n\t ----- Installation of husky\n"
-	npx husky install
+	npx --yes husky install
 	@echo -ne "\n\t ----- Going through node_modules patches\n"
 	# How to create node_modules patch: https://opensource.christmas/2019/4
 	patch --forward ${NODE_MODULES_DIR}/obs-websocket-js/types/index.d.ts < patches/obswebsocketTypeExpose.patch
