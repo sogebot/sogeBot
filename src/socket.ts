@@ -165,7 +165,7 @@ class Socket extends Core {
             const data = jwt.verify(refreshTokenHeader, this.JWTKey) as {
               userId: string; username: string;
             };
-            const userPermission = await getUserHighestPermission(data.userId);
+            const userPermission = await getUserHighestPermission(data.userId, true);
             const user = await changelog.get(data.userId);
             changelog.update(data.userId, {
               ...user,

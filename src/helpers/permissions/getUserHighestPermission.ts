@@ -5,11 +5,10 @@ import { addToCachedHighestPermission, getFromCachedHighestPermission } from './
 
 import { check } from '~/helpers/permissions/check';
 
-async function getUserHighestPermission(userId: string): Promise<string> {
-  const cachedPermission = getFromCachedHighestPermission(userId);
+async function getUserHighestPermission(userId: string, noCache = false): Promise<string> {
+  const cachedPermission = noCache ? null : getFromCachedHighestPermission(userId);
   if (!cachedPermission) {
     const permissions = await getRepository(Permissions).find({
-      cache: true,
       order: { order: 'ASC' },
     });
     for (const p of permissions) {
