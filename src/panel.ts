@@ -290,10 +290,6 @@ class Panel extends Core {
       }
     });
 
-    setTimeout(() => {
-      adminEndpoint('/', 'panel::resetStatsState', () => lastDataSent = null);
-    }, 5000);
-
     ioServer?.use(socketSystem.authorize as any);
 
     ioServer?.on('connect', async (socket) => {
@@ -610,7 +606,6 @@ export const getApp = function () {
   return app;
 };
 
-let lastDataSent: null | Record<string, unknown> = null;
 const sendStreamData = async () => {
   try {
     if (!translateLib.isLoaded) {
@@ -642,10 +637,7 @@ const sendStreamData = async () => {
       currentWatched:     stats.value.currentWatchedTime,
       tags:               currentStreamTags.value,
     };
-    if (!isEqual(data, lastDataSent)) {
-      ioServer?.emit('panel::stats', data);
-    }
-    lastDataSent = data;
+    ioServer?.emit('panel::stats', data);
   } catch (e: any) {
     if (e instanceof Error) {
       if (e.message !== 'Translation not yet loaded') {
@@ -653,7 +645,7 @@ const sendStreamData = async () => {
       }
     }
   }
-  setTimeout(async () => await sendStreamData(), 5000);
+  setTimeout(async () => await sendStreamData(), 1000);
 };
 
 export default new Panel();
