@@ -9,7 +9,7 @@ import { graphqlHTTP } from 'express-graphql';
 import RateLimit from 'express-rate-limit';
 import gitCommitInfo from 'git-commit-info';
 import jwt from 'jsonwebtoken';
-import _, { isEqual } from 'lodash';
+import _ from 'lodash';
 import sanitize from 'sanitize-filename';
 import {
   getConnection, getManager, getRepository,
