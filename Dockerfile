@@ -16,10 +16,11 @@ WORKDIR /app
 
 # Install dependencies
 RUN NODE_MODULES_DIR=./node_modules make
+# Remove node modules manually
 # Remove dev dependencies (not needed anymore)
 RUN yarn install --production --ignore-scripts --prefer-offline
 # Get latest ui dependencies in time of build
-RUN yarn upgrade @sogebot/ui-admin @sogebot/ui-overlay @sogebot/ui-helpers @sogebot/ui-oauth @sogebot/ui-public
+RUN yarn upgrade --production @sogebot/ui-admin @sogebot/ui-overlay @sogebot/ui-helpers @sogebot/ui-oauth @sogebot/ui-public
 
 # Expose API port to the outside
 EXPOSE 20000
