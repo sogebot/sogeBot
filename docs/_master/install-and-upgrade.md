@@ -121,15 +121,3 @@
 3. Run `npm install --location=global yarn`
 4. Run `make`
 5. Start bot `yarn start`
-
-## Unofficial Installer
-
-- Download the binary (linux) or exe (windows) from https://github.com/liadala/sogeToGo/releases
-- Execute the Binary/Exe
-- Add bot as channel editor
-  in [Permissions settings](http://twitch.tv/dashboard/permissions) on Twitch
-
-- To access webpanel, go to `http://localhost:20000`
-
-This will also keep your Bot updated (check on every start)
-for issues or problems please open a [issue](https://github.com/liadala/sogeToGo/issues) at this repository
