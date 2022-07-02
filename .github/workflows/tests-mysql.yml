@@ -38,19 +38,19 @@ jobs:
       with:
         node-version: 16
         check-latest: true
-    - name: Install latest yarn
+    - name: Install latest npm
       if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
       run: |
-        npm install --location=global yarn
+        npm install --location=global npm
     - name: Install all dependencies and build just a bot
       if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
       run: ENV=development NODE_MODULES_DIR=./node_modules make info clean dependencies bot
     - name: Set proper db to use
       if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
-      run: yarn run test:config:mysql
+      run: npm run test:config:mysql
     - name: Run migration test
       if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
-      run: yarn run test:migration
+      run: npm run test:migration
   postgres:
     name: MySQL/MariaDB tests - part 1
     runs-on: ubuntu-latest
@@ -78,16 +78,16 @@ jobs:
       with:
         node-version: 16
         check-latest: true
-    - name: Install latest yarn
+    - name: Install latest npm
       if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
       run: |
-        npm install --location=global yarn
+        npm install --location=global npm
     - name: Install all dependencies and build just a bot
       if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
       run: ENV=development NODE_MODULES_DIR=./node_modules make info clean dependencies bot
     - name: Set proper db to use
       if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
-      run: yarn run test:config:mysql
+      run: npm run test:config:mysql
     - name: Run mocha
       if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
       run: TESTS=@func1 npm test
@@ -124,16 +124,16 @@ jobs:
       with:
         node-version: 16
         check-latest: true
-    - name: Install latest yarn
+    - name: Install latest npm
       if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
       run: |
-        npm install --location=global yarn
+        npm install --location=global npm
     - name: Install all dependencies and build just a bot
       if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
       run: ENV=development NODE_MODULES_DIR=./node_modules make info clean dependencies bot
     - name: Set proper db to use
       if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
-      run: yarn run test:config:mysql
+      run: npm run test:config:mysql
     - name: Run mocha
       if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
       run: TESTS=@func2 npm test
@@ -170,16 +170,16 @@ jobs:
       with:
         node-version: 16
         check-latest: true
-    - name: Install latest yarn
+    - name: Install latest npm
       if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
       run: |
-        npm install --location=global yarn
+        npm install --location=global npm
     - name: Install all dependencies and build just a bot
       if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
       run: ENV=development NODE_MODULES_DIR=./node_modules make info clean dependencies bot
     - name: Set proper db to use
       if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
-      run: yarn run test:config:mysql
+      run: npm run test:config:mysql
     - name: Run mocha
       if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
       run: TESTS=@func3 npm test

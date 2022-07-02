@@ -1,6 +1,6 @@
-FROM node:18-bullseye-slim
+FROM node:16-bullseye-slim
 
-ENV LAST_UPDATED 2022-06-23-1446
+ENV LAST_UPDATED 2022-02-09-1815
 
 ENV NODE_ENV production
 ENV ENV production
@@ -14,13 +14,15 @@ COPY . /app
 # Change working directory
 WORKDIR /app
 
+# Install latest npm
+RUN npm install -g npm@latest
+
 # Install dependencies
 RUN NODE_MODULES_DIR=./node_modules make
-# Remove node modules manually
 # Remove dev dependencies (not needed anymore)
-RUN yarn install --production --ignore-scripts --prefer-offline
+RUN npm prune --production
 # Get latest ui dependencies in time of build
-RUN yarn upgrade --production @sogebot/ui-admin @sogebot/ui-overlay @sogebot/ui-helpers @sogebot/ui-oauth @sogebot/ui-public
+RUN npm update @sogebot/ui-admin @sogebot/ui-overlay @sogebot/ui-helpers @sogebot/ui-oauth @sogebot/ui-public
 
 # Expose API port to the outside
 EXPOSE 20000

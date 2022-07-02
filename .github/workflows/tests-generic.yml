@@ -28,9 +28,9 @@ jobs:
       with:
         node-version: 16
         check-latest: true
-    - name: Install latest yarn
+    - name: Install latest npm
       run: |
-        npm install --location=global yarn
+        npm install --location=global npm
     - name: Install eslint and dependencies
       run: |
         NODE_MODULES_DIR=./node_modules make dependencies
@@ -54,10 +54,10 @@ jobs:
       with:
         node-version: 16
         check-latest: true
-    - name: Install latest yarn
+    - name: Install latest npm
       if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
       run: |
-        npm install --location=global yarn
+        npm install --location=global npm
     - name: Install all dependencies and build everything
       if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
       run: ENV=development NODE_MODULES_DIR=./node_modules make
