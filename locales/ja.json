@@ -308,17 +308,16 @@
       }
     },
     "eventlist-events": {
-      "follow": "<strong>フォローされました</strong>",
-      "host": "<strong>ホストされました</strong>",
-      "raid": "<strong>レイドされました</strong>",
-      "sub": "<strong>サブスクライブされました</strong>",
-      "subgift": "<strong>サブスクギフトされました</strong>",
-      "subcommunitygift": "コミュニティに<strong>サブスクギフトが贈られました</strong>",
-      "resub": "<strong>再サブスクライブ</strong>",
-      "cheer": "<strong>チアーが送られました</strong>",
-      "tip": "<strong>Tipが送られました</strong>",
-      "tipToCharity": "$campaignName に <strong>寄付しました</strong>",
-      "rewardredeem": "報酬を<strong>引き換えました</strong>"
+      "follow": "<strong>Followed</strong> you",
+      "host": "<strong>Hosted</strong> you with <strong>$viewers</strong> viewers.",
+      "raid": "<strong>Raided</strong> you with <strong>$viewers</strong> raiders.",
+      "sub": "<strong>Subscribed</strong> to you with <strong>$subType</strong>. They've been subscribed for $subCumulativeMonths $subCumulativeMonthsName.",
+      "subgift": "has been <strong>gifted</strong> subscription from <strong>$username</strong>",
+      "subcommunitygift": "<strong>Gifted</strong> subscriptions for community",
+      "resub": "<strong>Resubscribed</strong> with <strong>$subType</strong>. They've been subscribed for $subCumulativeMonths $subCumulativeMonthsName.",
+      "cheer": "<strong>Cheered</strong> you",
+      "tip": "<strong>Tipped</strong> you",
+      "tipToCharity": "<strong>donated</strong> to <strong>$campaignName</strong>"
     },
     "responses": {
       "variable": {
