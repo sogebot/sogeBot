@@ -17,8 +17,7 @@ dependencies:
 	@echo -ne "\n\t ----- Cleaning up dependencies\n"
 	@rm -rf node_modules
 	@echo -ne "\n\t ----- Installation of dependencies\n"
-	@npx --yes yarn config set network-timeout 600000 -g
-	NODE_ENV=development npx --yes yarn install
+	NODE_ENV=development npm install
 	@echo -ne "\n\t ----- Installation of husky\n"
 	npx --yes husky install
 	@echo -ne "\n\t ----- Going through node_modules patches\n"
@@ -43,15 +42,12 @@ else
 	@npx tsc --removeComments false
 endif
 	@npx tsc-alias
-ifeq ($(NODE_MODULES_DIR),../node_modules)
-	@npx --yes generate-lockfile --lockfile ../yarn.lock --package package.json --write yarn.lock --force
-endif
 
 pack:
 	@echo -ne "\n\t ----- Packing into sogeBot-$(VERSION).zip\n"
 	@cp ./src/data/.env* ./
 	@cp ./src/data/.env.sqlite ./.env
-	@npx --yes bestzip sogeBot-$(VERSION).zip .env* yarn.lock patches/ dest/ locales/ LICENSE package.json docs/ AUTHORS tools/ bin/ bat/ fonts.json assets/ favicon.ico
+	@npx --yes bestzip sogeBot-$(VERSION).zip .env* package-lock.json patches/ dest/ locales/ LICENSE package.json docs/ AUTHORS tools/ bin/ bat/ fonts.json assets/ favicon.ico
 
 prepare:
 	@echo -ne "\n\t ----- Cleaning up node_modules\n"

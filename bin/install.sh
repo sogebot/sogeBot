@@ -16,7 +16,7 @@ done
 echo '.DONE'
 
 echo -n 'Installing dependencies'
-npx --yes yarn install > /dev/null 2>&1 &
+npm install > /dev/null 2>&1 &
 while kill -0 $! 2> /dev/null; do
     echo -n '.'
     sleep 1
