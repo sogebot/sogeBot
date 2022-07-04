@@ -4,6 +4,7 @@ import { defaultsDeep, pick } from 'lodash';
 import { OverlayMappers } from '~/database/entity/overlay';
 
 const values = {
+  url:            { url: '' },
   alertsRegistry: { id: '' },
   textRegistry:   { id: '' },
   countdown:      {

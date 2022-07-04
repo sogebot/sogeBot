@@ -345,6 +345,13 @@ export interface OverlayMapperAlertsRegistry extends OverlayMapperInterfaceCommo
   },
 }
 
+export interface OverlayMapperURL extends OverlayMapperInterfaceCommon {
+  value: 'url';
+  opts: {
+    url: string,
+  },
+}
+
 export interface OverlayMapperGroup extends OverlayMapperInterfaceCommon {
   value: 'group';
   opts: {
@@ -362,7 +369,7 @@ export interface OverlayMapperGroup extends OverlayMapperInterfaceCommon {
   }
 }
 
-export type OverlayMappers = OverlayMapperChat | OverlayMapperReference | OverlayMapperAlertsRegistry | OverlayMapperCarousel | OverlayMapperMarathon | OverlayMapperStopwatch | OverlayMapperCountdown | OverlayMapperGroup | OverlayMapperEventlist | OverlayMapperEmotesCombo | OverlayMapperCredits | OverlayMapperClips | OverlayMapperAlerts | OverlayMapperEmotes | OverlayMapperEmotesExplode | OverlayMapperEmotesFireworks | OverlayMapperPolls | OverlayMapperTTS | OverlayMapperInterface | OverlayMapperOBSWebsocket | OverlayMapperClipsCarousel | OverlayMapperHypeTrain;
+export type OverlayMappers = OverlayMapperURL | OverlayMapperChat | OverlayMapperReference | OverlayMapperAlertsRegistry | OverlayMapperCarousel | OverlayMapperMarathon | OverlayMapperStopwatch | OverlayMapperCountdown | OverlayMapperGroup | OverlayMapperEventlist | OverlayMapperEmotesCombo | OverlayMapperCredits | OverlayMapperClips | OverlayMapperAlerts | OverlayMapperEmotes | OverlayMapperEmotesExplode | OverlayMapperEmotesFireworks | OverlayMapperPolls | OverlayMapperTTS | OverlayMapperInterface | OverlayMapperOBSWebsocket | OverlayMapperClipsCarousel | OverlayMapperHypeTrain;
 
 export const OverlayMapper = new EntitySchema<Readonly<Required<OverlayMappers>>>({
   name:    'overlay_mapper',
