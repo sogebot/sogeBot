@@ -53,31 +53,32 @@ const generateRegex = (parameters: { name: string; type: 'number' | 'word' | 'se
   return `^${regex.join(' ')}$`;
 };
 
+const listeners = {
+  tip: generateListener({
+    isAnonymous: 'boolean',
+    message:     'string',
+    amount:      'number',
+    currency:    'string',
+    botAmount:   'number',
+    botCurrency: 'string',
+  }),
+  twitchStreamStarted:    generateListener({}, false),
+  twitchGameChanged:      generateListener({}, false),
+  botStarted:             generateListener({}, false),
+  twitchStreamStopped:    generateListener({}, false),
+  twitchRaid:             generateListener({ hostViewers: 'number' }, true),
+  twitchHosted:           generateListener({ hostViewers: 'number' }, true),
+  twitchHosting:          generateListener({ hostViewers: 'number' }, true),
+  twitchChatMessage:      generateListener({ message: 'string' }),
+  twitchCommand:          generateListener({ message: 'string' }),
+  twitchFollow:           generateListener(),
+  twitchSubscription:     generateListener({ method: 'string', subCumulativeMonths: 'number', tier: 'tier' }),
+  twitchSubgift:          generateListener({ recipient: 'string', tier: 'tier' }),
+  twitchSubcommunitygift: generateListener({ count: 'number' }),
+  twitchResub:            generateListener({ method: 'string', subCumulativeMonths: 'number', subStreak: 'number', subStreakShareEnabled: 'boolean', tier: 'string' }),
+} as const;
+
 class Plugins extends Core {
-  listeners = {
-    tip: generateListener({
-      isAnonymous: 'boolean',
-      message:     'string',
-      amount:      'number',
-      currency:    'string',
-      botAmount:   'number',
-      botCurrency: 'string',
-    }),
-    twitchStreamStarted:    generateListener({}, false),
-    twitchGameChanged:      generateListener({}, false),
-    botStarted:             generateListener({}, false),
-    twitchStreamStopped:    generateListener({}, false),
-    twitchRaid:             generateListener({ hostViewers: 'number' }, true),
-    twitchHosted:           generateListener({ hostViewers: 'number' }, true),
-    twitchHosting:          generateListener({ hostViewers: 'number' }, true),
-    twitchChatMessage:      generateListener({ message: 'string' }),
-    twitchCommand:          generateListener({ message: 'string' }),
-    twitchFollow:           generateListener(),
-    twitchSubscription:     generateListener({ method: 'string', subCumulativeMonths: 'number', tier: 'tier' }),
-    twitchSubgift:          generateListener({ recipient: 'string', tier: 'tier' }),
-    twitchSubcommunitygift: generateListener({ count: 'number' }),
-    twitchResub:            generateListener({ method: 'string', subCumulativeMonths: 'number', subStreak: 'number', subStreakShareEnabled: 'boolean', tier: 'string' }),
-  } as const;
 
   @onStartup()
   onStartup() {
@@ -122,7 +123,7 @@ class Plugins extends Core {
       this.process('twitchStreamStopped');
     });
 
-    const commonHandler = async <T extends { [x:string]: any, userName: string }>(event: keyof typeof this.listeners, data: T) => {
+    const commonHandler = async <T extends { [x:string]: any, userName: string }>(event: keyof typeof listeners, data: T) => {
       const users = (await import('./users')).default;
       const { userName, ...parameters } = data;
       const user = {
@@ -198,8 +199,8 @@ class Plugins extends Core {
     const cron = await this.process('cron', '', null, {});
 
     cronTriggers.clear();
-    for (const { plugin, listeners } of cron) {
-      for (const node of listeners) {
+    for (const { plugin, listeners: workflowListeners } of cron) {
+      for (const node of workflowListeners) {
         try {
           const cronParsed = cronparser.parseExpression(node.data.value);
 
@@ -283,7 +284,7 @@ class Plugins extends Core {
       }
     });
     adminEndpoint('/core/plugins', 'listeners', async (cb) => {
-      cb(this.listeners);
+      cb(listeners);
     });
   }
 
@@ -325,7 +326,7 @@ class Plugins extends Core {
     }
   }
 
-  async process(type: keyof typeof this.listeners | 'cron', message = '', userstate: { userName: string, userId: string } | null = null, params?: Record<string, any>) {
+  async process(type: keyof typeof listeners | 'cron', message = '', userstate: { userName: string, userId: string } | null = null, params?: Record<string, any>) {
     const pluginsEnabled = plugins.filter(o => o.enabled);
     const pluginsWithListener: { plugin: Plugin, listeners: Node[] }[] = [];
     for (const plugin of pluginsEnabled) {
@@ -334,7 +335,7 @@ class Plugins extends Core {
         JSON.parse(plugin.workflow).drawflow.Home.data
       ) as Node[];
 
-      const listeners = workflow.filter((o: Node) => {
+      const workflowListeners = workflow.filter((o: Node) => {
         params ??= {};
         const isListener = o.name === 'listener';
         const isWithoutFiltering
@@ -397,8 +398,8 @@ class Plugins extends Core {
         return false;
       });
 
-      if (listeners.length > 0) {
-        pluginsWithListener.push({ plugin, listeners });
+      if (workflowListeners.length > 0) {
+        pluginsWithListener.push({ plugin, listeners: workflowListeners });
       }
     }
     return pluginsWithListener;
@@ -409,7 +410,7 @@ class Plugins extends Core {
     botCurrency: string, botAmount: number,
   }): Promise<void>;
   async trigger(type: 'message', message: string, userstate: { userName: string, userId: string }): Promise<void>;
-  async trigger(type: keyof typeof this.listeners, message: string, userstate: { userName: string, userId: string }): Promise<void>;
+  async trigger(type: keyof typeof listeners, message: string, userstate: { userName: string, userId: string }): Promise<void>;
 
   async trigger(type: string, message: string, userstate: { userName: string, userId: string }, data?: Record<string, any>) {
     switch(type) {
