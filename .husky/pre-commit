@@ -1,4 +1,4 @@
 #!/bin/sh
 . "$(dirname "$0")/_/husky.sh"
 
-npx lint-staged && sh tools/pre-commit-tests.sh
+FORCE_COLOR=1 npx lint-staged -q && sh tools/pre-commit-tests.sh

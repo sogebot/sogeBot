@@ -1,5 +1,8 @@
-import { IsNotEmpty } from 'class-validator';
+import { IsNotEmpty, MinLength } from 'class-validator';
 import { BaseEntity, Column, Entity, Index, PrimaryColumn } from 'typeorm';
+
+import { IsCommand } from '~/database/validators/IsCommand';
+import { IsCommandOrCustomVariable } from '~/database/validators/IsCommandOrCustomVariable';
 
 @Entity()
 export class Alias extends BaseEntity {
@@ -9,10 +12,14 @@ export class Alias extends BaseEntity {
 
   @Column()
   @IsNotEmpty()
+  @MinLength(2)
+  @IsCommand()
   @Index('IDX_6a8a594f0a5546f8082b0c405c')
     alias: string;
 
   @Column({ type: 'text' })
+  @IsCommandOrCustomVariable()
+  @MinLength(2)
   @IsNotEmpty()
     command: string;
 
