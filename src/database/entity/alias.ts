@@ -1,8 +1,8 @@
 import { IsNotEmpty, MinLength } from 'class-validator';
 import { BaseEntity, Column, Entity, Index, PrimaryColumn } from 'typeorm';
 
-import { IsCommand } from '~/database/validators/IsCommand';
-import { IsCommandOrCustomVariable } from '~/database/validators/IsCommandOrCustomVariable';
+import { IsCommand } from '../validators/IsCommand';
+import { IsCommandOrCustomVariable } from '../validators/IsCommandOrCustomVariable';
 
 @Entity()
 export class Alias extends BaseEntity {
