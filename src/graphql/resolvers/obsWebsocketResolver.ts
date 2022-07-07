@@ -1,6 +1,7 @@
 import {
   OBSWebsocket as OBSWebsocketEntity, OBSWebsocketInterface, simpleModeTask,
 } from '@entity/obswebsocket';
+import type OBSWebSocket from 'obs-websocket-js';
 import {
   Arg, Authorized, createUnionType, Field, ID, Mutation, ObjectType, Query, Resolver,
 } from 'type-graphql';
@@ -73,7 +74,7 @@ export class OBSWebsocketResolver {
 
   @Authorized()
   @Query(returns => [Scene])
-  async OBSWebsocketGetScenes() {
+  async OBSWebsocketGetScenes(): Promise<OBSWebSocket.Scene[]>  {
     const integration = (await import('../../integrations/obswebsocket')).default;
     try {
       const availableScenes = integration.accessBy === 'direct'

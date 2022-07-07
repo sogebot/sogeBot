@@ -16,6 +16,7 @@ info:
 dependencies:
 	@echo -ne "\n\t ----- Cleaning up dependencies\n"
 	@rm -rf node_modules
+	@rm -rf ${NODE_MODULES_DIR}
 	@echo -ne "\n\t ----- Installation of dependencies\n"
 	NODE_ENV=development npm install
 	@echo -ne "\n\t ----- Installation of husky\n"
