@@ -247,24 +247,29 @@ const values = {
   hypetrain:  null,
   randomizer: null,
   stats:      null,
-} as { [x: NonNullable<OverlayMappers['value']>]: any };
+} as const;
 
-function setDefaultOpts(opts: any, type: any) {
-  return pick(
-    defaultsDeep(opts, values[type]),
-    Object.keys(values[type]),
-  );
+function setDefaultOpts(opts: any, type: keyof typeof values) {
+  if (values[type]) {
+    return pick(
+      defaultsDeep(opts, values[type]),
+      Object.keys(values[type] || {}),
+    );
+  } else {
+    return null;
+  }
 }
 
 function defaultValues(item: OverlayMappers) {
-  if (item.value && Object.keys(values).includes(item.value)) {
-    if (values[item.value]) {
-      (item.opts as any) = setDefaultOpts(item.opts, item.value);
+  const value = item.value as keyof typeof values | null;
+  if (value && Object.keys(values).includes(value)) {
+    if (values[value]) {
+      (item.opts as any) = setDefaultOpts(item.opts, value as any);
     } else {
       item.opts = null;
     }
   } else {
-    console.log('Missing default values for overlay ' + item.value);
+    console.log('Missing default values for overlay ' + value);
   }
   return item;
 }
