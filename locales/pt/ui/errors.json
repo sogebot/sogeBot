@@ -1,3 +1,5 @@
 {
-  "isNotEmpty": "Este campo é obrigatório."
+  "isNotEmpty": "Este campo é obrigatório.",
+  "isCommand": "$property deve iniciar com !",
+  "isCommandOrCustomVariable": "$property deve iniciar com ! ou $_"
 }

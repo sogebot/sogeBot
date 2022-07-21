@@ -308,17 +308,16 @@
       }
     },
     "eventlist-events": {
-      "follow": "<strong>seguiu</strong> você",
-      "host": "<strong>hospedado (hosted)</strong>",
-      "raid": "<strong>Invadido</strong>",
-      "sub": "<strong>inscreveu no</strong> canal",
-      "subgift": "foi <strong>presenteado</strong> com uma inscrição",
-      "subcommunitygift": "<strong>presenteou</strong> incrições para comunidades",
-      "resub": "<strong>reincreveu</strong>",
-      "cheer": "<strong>torceu</strong> por você",
-      "tip": "deu uma <strong>doação</strong> para você",
-      "tipToCharity": "<strong>doou </strong> $campaignName",
-      "rewardredeem": "acabou de <strong>resgatar</strong> uma recompensa"
+      "follow": "<strong>Seguiu</strong> você",
+      "host": "<strong>Hospedou</strong> você com <strong>$viewers</strong> pessoas.",
+      "raid": "<strong>Invadiu</strong> você com <strong>$viewers</strong> invasores.",
+      "sub": "<strong>Inscreveu-se</strong> com <strong>$subType</strong>. Inscrição pelo já pelo período de $subCumulativeMonths $subCumulativeMonthsName.",
+      "subgift": "<strong>presenteada(o)</strong> com uma inscrição por <strong>$username</strong>",
+      "subcommunitygift": "<strong>Presenteou</strong> a comunidade com inscrições",
+      "resub": "<strong>Re-inscreveu-se</strong> com <strong>$subType</strong>. Inscrição pelo período $subCumulativeMonths $subCumulativeMonthsName.",
+      "cheer": "Deu um <strong>Cheered</strong> em você",
+      "tip": "<strong>Doou </strong> para você",
+      "tipToCharity": "<strong>doou</strong> para <strong>$campaignName</strong>"
     },
     "responses": {
       "variable": {
@@ -436,22 +435,22 @@
         "latestSubscriber": "Último inscrito",
         "latestSubscriberMonths": "Último inscrito meses acumulados",
         "latestSubscriberStreak": "Último inscrito sequência de meses",
-        "latestTipAmount": "Última Gorjeta (quantia)",
-        "latestTipCurrency": "Última Gorjeta (moeda)",
-        "latestTipMessage": "Última Gorjeta (mensagem)",
-        "latestTip": "Última Gorjeta (nome de usuário)",
+        "latestTipAmount": "Última Doação (quantia)",
+        "latestTipCurrency": "Última Doação (moeda)",
+        "latestTipMessage": "Última Doação (mensagem)",
+        "latestTip": "Última Doação (nome de usuário)",
         "toptip": {
           "overall": {
-            "username": "Melhor Gorjeta - geral (nome de usuário)",
-            "amount": "Melhor Gorjeta - geral (quantia)",
-            "currency": "Melhor Gorjeta - geral (moeda)",
-            "message": "Melhor Gorjeta - geral (mensagem)"
+            "username": "Melhor Doação - geral (nome de usuário)",
+            "amount": "Melhor Doação - geral (quantia)",
+            "currency": "Melhor Doação - geral (moeda)",
+            "message": "Melhor Doação - geral (mensagem)"
           },
           "stream": {
-            "username": "Melhor Gorjeta - durante a 'stream' (nome de usuário)",
-            "amount": "Melhor Gorjeta - durante a 'stream' (quantia)",
-            "currency": "Melhor Gorjeta - durante a 'stream' (moeda)",
-            "message": "Melhor Gorjeta - durante a 'stream' (mensagem)"
+            "username": "Melhor Doação - durante a 'stream' (nome de usuário)",
+            "amount": "Melhor Doação - durante a 'stream' (quantia)",
+            "currency": "Melhor Doação - durante a 'stream' (moeda)",
+            "message": "Melhor Doação - durante a 'stream' (mensagem)"
           }
         },
         "latestCheerAmount": "Bits mais recentes (quantia)",
