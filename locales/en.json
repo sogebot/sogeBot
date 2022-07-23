@@ -350,7 +350,7 @@
         "topContributionsSubsUsername": "Top Subs Contribution - Username",
         "sender": "User who initiated",
         "title": "Current title",
-        "game": "Current game",
+        "game": "Current category",
         "language": "Current stream language",
         "viewers": "Current viewers count",
         "hostViewers": "Host/Raid viewers count",
@@ -425,7 +425,7 @@
         "tier": "Tier",
         "months": "Months",
         "monthsName": "localized name of month (1 month, 2 months)",
-        "oldGame": "Game before change",
+        "oldGame": "Category before change",
         "recipientObject": "Full recipient object",
         "recipient": "Recipient",
         "ytSong": "Current song on YouTube",
@@ -547,8 +547,8 @@
     "viewers-points-of-all-users": "Points of all users",
     "viewers-watchtime-of-all-users": "Watch time of all users",
     "viewers-messages-of-all-users": "Messages of all users",
-    "events-game-after-change": "game after change",
-    "events-game-before-change": "game before change",
+    "events-game-after-change": "category after change",
+    "events-game-before-change": "category before change",
     "events-user-triggered-event": "user triggered event",
     "events-method-used-to-subscribe": "method used to subscribe",
     "events-months-of-subscription": "months of subscription",
@@ -631,9 +631,9 @@
     "error": "Error",
     "title": "Title",
     "change-title": "Change title",
-    "game": "game",
+    "game": "category",
     "tags": "Tags",
-    "change-game": "Change game",
+    "change-game": "Change category",
     "click-to-change": "click to change",
     "uptime": "uptime",
     "not-affiliate-or-partner": "Not affiliate/partner",
@@ -753,7 +753,7 @@
     "stream-is-running-x-minutes": "stream is running x minutes",
     "chatter-first-message": "first message of chatter",
     "every-x-minutes-of-stream": "every x minutes of stream",
-    "game-changed": "game changed",
+    "game-changed": "category changed",
     "cheer": "received bits",
     "clearchat": "chat was cleared",
     "action": "user sent /me",
@@ -1100,7 +1100,7 @@
   "game": {
     "current": "$sender, streamer is currently playing $game.",
     "change": {
-      "success": "$sender, game was set to: $game"
+      "success": "$sender, category was set to: $game"
     }
   },
   "cooldowns": {
