@@ -41,9 +41,9 @@ export async function getChannelInformation (opts: any) {
           if (isTitleForced) {
             const game = gameCache.value;
             if ((process.env.NODE_ENV || 'development') !== 'production') {
-              info(`Title/game force enabled (but disabled in debug mode) => ${game} | ${_rawStatus}`);
+              info(`Title/category force enabled (but disabled in debug mode) => ${game} | ${_rawStatus}`);
             } else {
-              info(`Title/game force enabled => ${game} | ${_rawStatus}`);
+              info(`Title/category force enabled => ${game} | ${_rawStatus}`);
               setTitleAndGame({});
             }
             return { state: true, opts };
