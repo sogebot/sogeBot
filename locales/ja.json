@@ -308,17 +308,16 @@
       }
     },
     "eventlist-events": {
-      "follow": "<strong>フォローされました</strong>",
-      "host": "<strong>ホストされました</strong>",
-      "raid": "<strong>レイドされました</strong>",
-      "sub": "<strong>サブスクライブされました</strong>",
-      "subgift": "<strong>サブスクギフトされました</strong>",
-      "subcommunitygift": "コミュニティに<strong>サブスクギフトが贈られました</strong>",
-      "resub": "<strong>再サブスクライブ</strong>",
-      "cheer": "<strong>チアーが送られました</strong>",
-      "tip": "<strong>Tipが送られました</strong>",
-      "tipToCharity": "$campaignName に <strong>寄付しました</strong>",
-      "rewardredeem": "報酬を<strong>引き換えました</strong>"
+      "follow": "<strong>Followed</strong> you",
+      "host": "<strong>Hosted</strong> you with <strong>$viewers</strong> viewers.",
+      "raid": "<strong>Raided</strong> you with <strong>$viewers</strong> raiders.",
+      "sub": "<strong>Subscribed</strong> to you with <strong>$subType</strong>. They've been subscribed for $subCumulativeMonths $subCumulativeMonthsName.",
+      "subgift": "has been <strong>gifted</strong> subscription from <strong>$username</strong>",
+      "subcommunitygift": "<strong>Gifted</strong> subscriptions for community",
+      "resub": "<strong>Resubscribed</strong> with <strong>$subType</strong>. They've been subscribed for $subCumulativeMonths $subCumulativeMonthsName.",
+      "cheer": "<strong>Cheered</strong> you",
+      "tip": "<strong>Tipped</strong> you",
+      "tipToCharity": "<strong>donated</strong> to <strong>$campaignName</strong>"
     },
     "responses": {
       "variable": {
@@ -352,7 +351,7 @@
         "topContributionsSubsUsername": "上位サブスクライブ貢献 - ユーザー名",
         "sender": "開始したユーザー",
         "title": "現在のタイトル",
-        "game": "現在のゲーム",
+        "game": "Current category",
         "language": "現在のストリームの言語",
         "viewers": "現在の視聴者数",
         "hostViewers": "ホスト/レイドの視聴者数",
@@ -427,7 +426,7 @@
         "tier": "ティア",
         "months": "月",
         "monthsName": "ローカライズされた月の名前 (1ヶ月、2ヶ月)",
-        "oldGame": "変更前のゲーム",
+        "oldGame": "Category before change",
         "recipientObject": "受信者（オブジェクト全体）",
         "recipient": "宛先",
         "ytSong": "YouTubeの現在の曲",
@@ -549,8 +548,8 @@
     "viewers-points-of-all-users": "全てのユーザーのポイント",
     "viewers-watchtime-of-all-users": "全てのユーザーの視聴時間",
     "viewers-messages-of-all-users": "すべてのユーザのメッセージ",
-    "events-game-after-change": "変更後のゲーム",
-    "events-game-before-change": "変更前のゲーム",
+    "events-game-after-change": "category after change",
+    "events-game-before-change": "category before change",
     "events-user-triggered-event": "ユーザーがトリガーしたイベント",
     "events-method-used-to-subscribe": "サブスクライブに使用される方法",
     "events-months-of-subscription": "サブスクリプションの月",
@@ -633,9 +632,9 @@
     "error": "エラー",
     "title": "タイトル",
     "change-title": "タイトルを変更",
-    "game": "ゲーム",
+    "game": "category",
     "tags": "タグ",
-    "change-game": "ゲームを変更",
+    "change-game": "Change category",
     "click-to-change": "クリックして変更",
     "uptime": "稼働時間",
     "not-affiliate-or-partner": "アフィリエイト/パートナーではありません",
@@ -755,7 +754,7 @@
     "stream-is-running-x-minutes": "ストリームが x 分実行中です",
     "chatter-first-message": "チャットの最初のメッセージ",
     "every-x-minutes-of-stream": "ストリームのx分ごとに",
-    "game-changed": "ゲームが変更されました",
+    "game-changed": "category changed",
     "cheer": "受け取ったビッツ",
     "clearchat": "チャットをクリアしました",
     "action": "ユーザーが/me を送信しました",
@@ -1096,7 +1095,7 @@
   "game": {
     "current": "$sender, ストリーマーは $game をプレイしています",
     "change": {
-      "success": "$sender, game was set to: $game"
+      "success": "$sender, category was set to: $game"
     }
   },
   "cooldowns": {
