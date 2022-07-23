@@ -1,6 +1,6 @@
 {
   "settings": {
-    "isTitleForced": "タイトル/ゲームは強制されています（ボットは他の場所から変更を書き換えます）",
+    "isTitleForced": "Title/Category is forced (bot will rewrite changes from elsewhere)",
     "createMarkerOnEvent": "イベントにストリームマーカーを作成"
   }
 }
