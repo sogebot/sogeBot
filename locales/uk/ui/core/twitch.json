@@ -1,6 +1,6 @@
 {
   "settings": {
-    "isTitleForced": "Назва/гра вимушена (бот перемістить зміни з іншого місця)",
+    "isTitleForced": "Title/Category is forced (bot will rewrite changes from elsewhere)",
     "createMarkerOnEvent": "Створити маркер трансляції на подію"
   }
 }
