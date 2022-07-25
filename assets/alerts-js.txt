@@ -4,12 +4,15 @@
  *    recipient: null | UserInterface
  *    caster: null | UserInterface
  * UserInterface attributes can be seen at https://github.com/sogebot/sogeBot/blob/master/src/database/entity/user.ts#L5
+ *
+ * Available functions
+ *   waitMs(miliseconds: number): Promise<undefined>
  */
 
-function onStarted() {
+async function onStarted() {
   // triggered on animationIn
 }
 
-function onEnded() {
+async function onEnded() {
   // triggered on animationOut
 }
