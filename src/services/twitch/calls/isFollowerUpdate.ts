@@ -12,7 +12,7 @@ import * as changelog from '~/helpers/user/changelog.js';
 import client from '~/services/twitch/api/client';
 import { variables } from '~/watchers';
 
-const usersToFollowCheck: UserInterface[];
+const usersToFollowCheck: UserInterface[] = [];
 
 export async function followerUpdatePreCheck (userName: string) {
   const user = await getRepository(User).findOne({ userName });
@@ -24,19 +24,27 @@ export async function followerUpdatePreCheck (userName: string) {
     if (new Date().getTime() - user.followCheckAt <= constants.DAY || isSkipped) {
       return;
     }
-    isFollowerUpdate(user);
+    usersToFollowCheck.push(user);
+    changelog.update(user.userId, {
+      followCheckAt: Date.now(),
+    });
   }
 }
 
-export async function isFollowerUpdate (user: UserInterface | null) {
+// slowdown isFollowerUpdate to twice per second
+setInterval(() => {
+  const user = usersToFollowCheck.shift();
+  if(user) {
+    isFollowerUpdate(user);
+  }
+}, 500);
+
+export async function isFollowerUpdate (user: UserInterface) {
   if (isDebugEnabled('api.calls')) {
     debug('api.calls', new Error().stack);
   }
-  if (!user || !user.userId) {
-    return;
-  }
-  const id = user.userId;
 
+  const id = user.userId;
   const broadcasterId = variables.get('services.twitch.broadcasterId') as string;
 
   try {

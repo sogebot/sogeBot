@@ -56,7 +56,11 @@ class UserInfo extends System {
   protected async followage(opts: CommandOptions): Promise<CommandResponse[]> {
     const [userName] = new Expects(opts.parameters).username({ optional: true, default: opts.sender.userName }).toArray();
     const id = await users.getIdByName(userName);
-    await isFollowerUpdate(await changelog.get(id));
+
+    const changelogUser = await changelog.get(id);
+    if (changelogUser) {
+      await isFollowerUpdate(changelogUser);
+    }
 
     await changelog.flush();
     const user = await getRepository(User).findOne({ userName });
