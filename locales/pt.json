@@ -308,17 +308,16 @@
       }
     },
     "eventlist-events": {
-      "follow": "<strong>seguiu</strong> você",
-      "host": "<strong>hospedado (hosted)</strong>",
-      "raid": "<strong>Invadido</strong>",
-      "sub": "<strong>inscreveu no</strong> canal",
-      "subgift": "foi <strong>presenteado</strong> com uma inscrição",
-      "subcommunitygift": "<strong>presenteou</strong> incrições para comunidades",
-      "resub": "<strong>reincreveu</strong>",
-      "cheer": "<strong>torceu</strong> por você",
-      "tip": "deu uma <strong>doação</strong> para você",
-      "tipToCharity": "<strong>doou </strong> $campaignName",
-      "rewardredeem": "acabou de <strong>resgatar</strong> uma recompensa"
+      "follow": "<strong>Seguiu</strong> você",
+      "host": "<strong>Hospedou</strong> você com <strong>$viewers</strong> pessoas.",
+      "raid": "<strong>Invadiu</strong> você com <strong>$viewers</strong> invasores.",
+      "sub": "<strong>Inscreveu-se</strong> com <strong>$subType</strong>. Inscrição pelo já pelo período de $subCumulativeMonths $subCumulativeMonthsName.",
+      "subgift": "<strong>presenteada(o)</strong> com uma inscrição por <strong>$username</strong>",
+      "subcommunitygift": "<strong>Presenteou</strong> a comunidade com inscrições",
+      "resub": "<strong>Re-inscreveu-se</strong> com <strong>$subType</strong>. Inscrição pelo período $subCumulativeMonths $subCumulativeMonthsName.",
+      "cheer": "Deu um <strong>Cheered</strong> em você",
+      "tip": "<strong>Doou </strong> para você",
+      "tipToCharity": "<strong>doou</strong> para <strong>$campaignName</strong>"
     },
     "responses": {
       "variable": {
@@ -352,7 +351,7 @@
         "topContributionsSubsUsername": "Contribuição Top Subs - Nome de usuário",
         "sender": "Usuário que iniciou",
         "title": "Título atual",
-        "game": "Jogo atual",
+        "game": "Categoria atual",
         "language": "Idioma atual da transmissão",
         "viewers": "Contagem atual de 'viewers'",
         "hostViewers": "Contagem de 'viewers' de 'host'/'raid'",
@@ -427,7 +426,7 @@
         "tier": "Nível",
         "months": "Meses",
         "monthsName": "nome do mês localizado (1 mês, 2 meses)",
-        "oldGame": "Jogo antes de mudar",
+        "oldGame": "Categoria antes da alteração",
         "recipientObject": "Objeto destinatário completo",
         "recipient": "Destinatário",
         "ytSong": "Música atual no YouTube",
@@ -436,22 +435,22 @@
         "latestSubscriber": "Último inscrito",
         "latestSubscriberMonths": "Último inscrito meses acumulados",
         "latestSubscriberStreak": "Último inscrito sequência de meses",
-        "latestTipAmount": "Última Gorjeta (quantia)",
-        "latestTipCurrency": "Última Gorjeta (moeda)",
-        "latestTipMessage": "Última Gorjeta (mensagem)",
-        "latestTip": "Última Gorjeta (nome de usuário)",
+        "latestTipAmount": "Última Doação (quantia)",
+        "latestTipCurrency": "Última Doação (moeda)",
+        "latestTipMessage": "Última Doação (mensagem)",
+        "latestTip": "Última Doação (nome de usuário)",
         "toptip": {
           "overall": {
-            "username": "Melhor Gorjeta - geral (nome de usuário)",
-            "amount": "Melhor Gorjeta - geral (quantia)",
-            "currency": "Melhor Gorjeta - geral (moeda)",
-            "message": "Melhor Gorjeta - geral (mensagem)"
+            "username": "Melhor Doação - geral (nome de usuário)",
+            "amount": "Melhor Doação - geral (quantia)",
+            "currency": "Melhor Doação - geral (moeda)",
+            "message": "Melhor Doação - geral (mensagem)"
           },
           "stream": {
-            "username": "Melhor Gorjeta - durante a 'stream' (nome de usuário)",
-            "amount": "Melhor Gorjeta - durante a 'stream' (quantia)",
-            "currency": "Melhor Gorjeta - durante a 'stream' (moeda)",
-            "message": "Melhor Gorjeta - durante a 'stream' (mensagem)"
+            "username": "Melhor Doação - durante a 'stream' (nome de usuário)",
+            "amount": "Melhor Doação - durante a 'stream' (quantia)",
+            "currency": "Melhor Doação - durante a 'stream' (moeda)",
+            "message": "Melhor Doação - durante a 'stream' (mensagem)"
           }
         },
         "latestCheerAmount": "Bits mais recentes (quantia)",
@@ -549,8 +548,8 @@
     "viewers-points-of-all-users": "Pontos para todos usuários",
     "viewers-watchtime-of-all-users": "Tempo de espectador de todos usuários",
     "viewers-messages-of-all-users": "Mensagens de todos usuários",
-    "events-game-after-change": "jogo depois de mudar",
-    "events-game-before-change": "jogo antes de mudar",
+    "events-game-after-change": "categoria após alteração",
+    "events-game-before-change": "categoria antes da alteração",
     "events-user-triggered-event": "evento acionado por usuário",
     "events-method-used-to-subscribe": "método utilizado para inscrição",
     "events-months-of-subscription": "meses de assinatura",
@@ -633,9 +632,9 @@
     "error": "Erro",
     "title": "Título",
     "change-title": "Alterar o título",
-    "game": "jogo",
+    "game": "categoria",
     "tags": "Tags",
-    "change-game": "Mudar de jogo",
+    "change-game": "Alterar categoria",
     "click-to-change": "clique para mudar",
     "uptime": "uptime",
     "not-affiliate-or-partner": "Não afiliado/parceiro",
@@ -755,7 +754,7 @@
     "stream-is-running-x-minutes": "transmissão está rodando a x minutos",
     "chatter-first-message": "primeira mensagem no bate-papo",
     "every-x-minutes-of-stream": "a cada x minutos de transmissão",
-    "game-changed": "jogo mudado",
+    "game-changed": "categoria alterada",
     "cheer": "bits recebidos",
     "clearchat": "bate-papo foi limpo",
     "action": "usuário enviou /me",
@@ -1096,7 +1095,7 @@
   "game": {
     "current": "$sender, streamer está atualemtne jogando $game.",
     "change": {
-      "success": "$sender, o jogo foi definido para: $game"
+      "success": "$sender, categoria foi alterada para: $game"
     }
   },
   "cooldowns": {
