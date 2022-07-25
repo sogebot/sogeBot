@@ -2,7 +2,7 @@ import { defaults } from 'lodash';
 import { getRepository } from 'typeorm';
 
 import { TwitchClips } from '../../../database/entity/twitch';
-import { error, warning } from '../../../helpers/log';
+import { debug, error, isDebugEnabled, warning } from '../../../helpers/log';
 import client from '../api/client';
 import { refresh } from '../token/refresh.js';
 
@@ -11,6 +11,9 @@ import { getFunctionName } from '~/helpers/getFunctionName';
 import { variables } from '~/watchers';
 
 export async function createClip (opts: { createAfterDelay: boolean }) {
+  if (isDebugEnabled('api.calls')) {
+    debug('api.calls', new Error().stack);
+  }
   if (!(isStreamOnline.value)) {
     return;
   } // do nothing if stream is offline

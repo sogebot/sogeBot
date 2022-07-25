@@ -9,7 +9,7 @@ import {
 import * as stream from '~/helpers/core/stream';
 import { eventEmitter } from '~/helpers/events';
 import { getFunctionName } from '~/helpers/getFunctionName.js';
-import { debug, error, warning } from '~/helpers/log';
+import { debug, error, isDebugEnabled, warning } from '~/helpers/log';
 import { linesParsed } from '~/helpers/parser';
 import client from '~/services/twitch/api/client';
 import stats from '~/stats';
@@ -19,6 +19,9 @@ let curRetries = 0;
 const maxRetries = 3;
 
 export async function getCurrentStream (opts: any) {
+  if (isDebugEnabled('api.calls')) {
+    debug('api.calls', new Error().stack);
+  }
   const cid = variables.get('services.twitch.broadcasterId') as string;
 
   try {

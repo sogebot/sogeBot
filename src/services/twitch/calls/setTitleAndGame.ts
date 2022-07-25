@@ -12,12 +12,15 @@ import {
 import { parseTitle } from '~/helpers/api/parseTitle';
 import { eventEmitter } from '~/helpers/events/emitter';
 import { getFunctionName } from '~/helpers/getFunctionName';
-import { warning } from '~/helpers/log';
+import { debug, isDebugEnabled, warning } from '~/helpers/log';
 import { addUIError } from '~/helpers/panel/index';
 import { translate } from '~/translate';
 import { variables } from '~/watchers';
 
 async function setTitleAndGame (args: { title?: string | null; game?: string | null }): Promise<{ response: string; status: boolean } | null> {
+  if (isDebugEnabled('api.calls')) {
+    debug('api.calls', new Error().stack);
+  }
   args = defaults(args, { title: null }, { game: null });
   const cid = variables.get('services.twitch.broadcasterId') as string;
   const broadcasterCurrentScopes = variables.get('services.twitch.broadcasterCurrentScopes') as string[];

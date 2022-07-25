@@ -1,4 +1,4 @@
-import { error, warning } from '../../../helpers/log';
+import { debug, error, isDebugEnabled, warning } from '../../../helpers/log';
 import client from '../api/client';
 import { refresh } from '../token/refresh.js';
 
@@ -6,6 +6,9 @@ import { getFunctionName } from '~/helpers/getFunctionName';
 import { variables } from '~/watchers';
 
 export async function createMarker (description = 'Marked from sogeBot') {
+  if (isDebugEnabled('api.calls')) {
+    debug('api.calls', new Error().stack);
+  }
   const broadcasterId = variables.get('services.twitch.broadcasterId') as string;
 
   try {

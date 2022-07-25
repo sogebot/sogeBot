@@ -5,11 +5,14 @@ import {
   stats as apiStats,
 } from '~/helpers/api';
 import { getFunctionName } from '~/helpers/getFunctionName';
-import { debug, error, warning } from '~/helpers/log';
+import { debug, error, isDebugEnabled, warning } from '~/helpers/log';
 import { processFollowerState } from '~/services/twitch/api/processFollowerState';
 import { variables } from '~/watchers';
 
 export async function getLatest100Followers () {
+  if (isDebugEnabled('api.calls')) {
+    debug('api.calls', new Error().stack);
+  }
   try {
     const broadcasterId = variables.get('services.twitch.broadcasterId') as string;
     const clientBot = await client('bot');

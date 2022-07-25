@@ -2,9 +2,12 @@ import client from '../api/client';
 import { refresh } from '../token/refresh.js';
 
 import { getFunctionName } from '~/helpers/getFunctionName';
-import { error, warning } from '~/helpers/log';
+import { debug, error, isDebugEnabled, warning } from '~/helpers/log';
 
 async function sendGameFromTwitch (game: string) {
+  if (isDebugEnabled('api.calls')) {
+    debug('api.calls', new Error().stack);
+  }
   try {
     const clientBot = await client('bot');
     const searchCategories = await clientBot.search.searchCategoriesPaginated(game).getAll();

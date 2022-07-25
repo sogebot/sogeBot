@@ -5,13 +5,16 @@ import { refresh } from '../token/refresh.js';
 
 import { User } from '~/database/entity/user';
 import { getFunctionName } from '~/helpers/getFunctionName';
-import { error, warning } from '~/helpers/log';
+import { debug, error, isDebugEnabled, warning } from '~/helpers/log';
 import { addUIError } from '~/helpers/panel/index';
 import { setStatus } from '~/helpers/parser';
 import * as changelog from '~/helpers/user/changelog.js';
 import { variables } from '~/watchers';
 
 export async function getModerators(opts: { isWarned: boolean }) {
+  if (isDebugEnabled('api.calls')) {
+    debug('api.calls', new Error().stack);
+  }
   try {
     const broadcasterId = variables.get('services.twitch.broadcasterId') as string;
     const botId = variables.get('services.twitch.botId') as string;

@@ -4,9 +4,12 @@ import { getRepository } from 'typeorm';
 import client from '../api/client';
 
 import { stats } from '~/helpers/api';
-import { warning } from '~/helpers/log';
+import { debug, isDebugEnabled, warning } from '~/helpers/log';
 
 async function getGameNameFromId (id: number) {
+  if (isDebugEnabled('api.calls')) {
+    debug('api.calls', new Error().stack);
+  }
   if (id.toString().trim().length === 0 || id === 0) {
     return '';
   } // return empty game if gid is empty

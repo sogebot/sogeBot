@@ -4,9 +4,12 @@ import { getRepository } from 'typeorm';
 import client from '../api/client';
 
 import { stats } from '~/helpers/api';
-import { warning } from '~/helpers/log';
+import { debug, isDebugEnabled, warning } from '~/helpers/log';
 
 async function getGameIdFromName (name: string): Promise<string | undefined> {
+  if (isDebugEnabled('api.calls')) {
+    debug('api.calls', new Error().stack);
+  }
   const gameFromDb = await getRepository(CacheGames).findOne({ name });
   // check if name is cached
   if (gameFromDb) {

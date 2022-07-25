@@ -4,12 +4,15 @@ import client from '../api/client';
 import { refresh } from '../token/refresh.js';
 
 import { getFunctionName } from '~/helpers/getFunctionName';
-import { error, warning } from '~/helpers/log';
+import { debug, error, isDebugEnabled, warning } from '~/helpers/log';
 import { variables } from '~/watchers';
 
 export let badgesCache: HelixChatBadgeSet[] = [];
 
 export async function getChannelChatBadges() {
+  if (isDebugEnabled('api.calls')) {
+    debug('api.calls', new Error().stack);
+  }
   try {
     const broadcasterId = variables.get('services.twitch.broadcasterId') as string;
     const clientBroadcaster = await client('broadcaster');

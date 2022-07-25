@@ -9,12 +9,15 @@ import {
   stats as apiStats,
 } from '~/helpers/api';
 import { getFunctionName } from '~/helpers/getFunctionName';
-import { error, warning } from '~/helpers/log';
+import { debug, error, isDebugEnabled, warning } from '~/helpers/log';
 import { isBotId, isBotSubscriber } from '~/helpers/user';
 import * as changelog from '~/helpers/user/changelog.js';
 import { variables } from '~/watchers';
 
 export async function getChannelSubscribers<T extends { noAffiliateOrPartnerWarningSent?: boolean; notCorrectOauthWarningSent?: boolean }> (opts: T): Promise<{ state: boolean; opts: T }> {
+  if (isDebugEnabled('api.calls')) {
+    debug('api.calls', new Error().stack);
+  }
   opts = opts || {};
 
   try {

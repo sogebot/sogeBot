@@ -6,10 +6,13 @@ import { refresh } from '../token/refresh.js';
 
 import { TwitchTag, TwitchTagLocalizationDescription, TwitchTagLocalizationName } from '~/database/entity/twitch';
 import { getFunctionName } from '~/helpers/getFunctionName';
-import { error, warning } from '~/helpers/log';
+import { debug, error, isDebugEnabled, warning } from '~/helpers/log';
 import { setImmediateAwait } from '~/helpers/setImmediateAwait';
 
 export async function getAllStreamTags(opts: any) {
+  if (isDebugEnabled('api.calls')) {
+    debug('api.calls', new Error().stack);
+  }
   opts = opts || {};
   try {
     const clientBot = await client('bot');

@@ -5,10 +5,13 @@ import { refresh } from '../token/refresh.js';
 
 import { currentStreamTags } from '~/helpers/api';
 import { getFunctionName } from '~/helpers/getFunctionName';
-import { error, warning } from '~/helpers/log';
+import { debug, error, isDebugEnabled, warning } from '~/helpers/log';
 import { variables } from '~/watchers';
 
 export async function getCurrentStreamTags (opts: any) {
+  if (isDebugEnabled('api.calls')) {
+    debug('api.calls', new Error().stack);
+  }
   try {
     const broadcasterId = variables.get('services.twitch.broadcasterId') as string;
     const clientBot = await client('bot');

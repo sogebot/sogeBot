@@ -3,7 +3,7 @@ import * as constants from '@sogebot/ui-helpers/constants';
 import { getRepository } from 'typeorm';
 
 import { eventEmitter } from '../../../helpers/events';
-import { error, unfollow, warning } from '../../../helpers/log';
+import { debug, error, isDebugEnabled, unfollow, warning } from '../../../helpers/log';
 import { refresh } from '../token/refresh.js';
 
 import { follow } from '~/helpers/events/follow';
@@ -11,6 +11,8 @@ import { getFunctionName } from '~/helpers/getFunctionName';
 import * as changelog from '~/helpers/user/changelog.js';
 import client from '~/services/twitch/api/client';
 import { variables } from '~/watchers';
+
+const usersToFollowCheck: UserInterface[];
 
 export async function followerUpdatePreCheck (userName: string) {
   const user = await getRepository(User).findOne({ userName });
@@ -27,6 +29,9 @@ export async function followerUpdatePreCheck (userName: string) {
 }
 
 export async function isFollowerUpdate (user: UserInterface | null) {
+  if (isDebugEnabled('api.calls')) {
+    debug('api.calls', new Error().stack);
+  }
   if (!user || !user.userId) {
     return;
   }

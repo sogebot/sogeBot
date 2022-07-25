@@ -1,9 +1,12 @@
 import client from '../api/client';
 import { refresh } from '../token/refresh.js';
 
-import { error, warning } from '~/helpers/log';
+import { debug, error, isDebugEnabled, warning } from '~/helpers/log';
 
 async function getIdFromTwitch (userName: string): Promise<string> {
+  if (isDebugEnabled('api.calls')) {
+    debug('api.calls', new Error().stack);
+  }
   try {
     const clientBot = await client('bot');
     const getUserByName = await clientBot.users.getUserByName(userName);

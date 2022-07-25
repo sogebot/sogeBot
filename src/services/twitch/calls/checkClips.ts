@@ -1,13 +1,18 @@
+import { debug } from 'console';
+
 import { getRepository } from 'typeorm';
 
 import { TwitchClips } from '../../../database/entity/twitch';
-import { error, warning } from '../../../helpers/log';
+import { error, isDebugEnabled, warning } from '../../../helpers/log';
 import client from '../api/client';
 import { refresh } from '../token/refresh.js';
 
 import { getFunctionName } from '~/helpers/getFunctionName';
 
 export async function checkClips () {
+  if (isDebugEnabled('api.calls')) {
+    debug('api.calls', new Error().stack);
+  }
   try {
     const clientBot = await client('bot');
     let notCheckedClips = (await getRepository(TwitchClips).find({ isChecked: false }));

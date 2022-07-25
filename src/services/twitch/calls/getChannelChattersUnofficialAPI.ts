@@ -13,7 +13,7 @@ import { eventEmitter } from '~/helpers/events';
 import { getAllOnlineUsernames } from '~/helpers/getAllOnlineUsernames';
 import { getFunctionName } from '~/helpers/getFunctionName';
 import {
-  debug, error, warning,
+  debug, error, isDebugEnabled, warning,
 } from '~/helpers/log';
 import { setImmediateAwait } from '~/helpers/setImmediateAwait';
 import { SQLVariableLimit } from '~/helpers/sql';
@@ -24,6 +24,9 @@ import { variables } from '~/watchers';
 import joinpart from '~/widgets/joinpart';
 
 export const getChannelChattersUnofficialAPI = async (opts: any) => {
+  if (isDebugEnabled('api.calls')) {
+    debug('api.calls', new Error().stack);
+  }
   try {
     const broadcasterUsername = variables.get('services.twitch.broadcasterUsername') as string;
     const botUsername = variables.get('services.twitch.botUsername') as string;
