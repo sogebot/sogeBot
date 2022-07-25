@@ -1,6 +1,6 @@
 {
   "settings": {
-    "isTitleForced": "Status/Hra je vynucena (bot přepíše jakékoliv změny odjinud)",
+    "isTitleForced": "Title/Category is forced (bot will rewrite changes from elsewhere)",
     "createMarkerOnEvent": "Vytvořit stream značku na událost"
   }
 }

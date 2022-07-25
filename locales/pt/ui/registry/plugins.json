@@ -20,14 +20,14 @@
       "twitchSubgift": "Nova inscrição de presente Twitch",
       "twitchSubcommunitygift": "Nova inscrição de presente da comunidade Twitch",
       "twitchResub": "Nova assinatura recorrente Twitch",
-      "twitchGameChanged": "Twitch game changed",
+      "twitchGameChanged": "Categoria Twitch alterada",
       "twitchStreamStarted": "Transmissão da Twitch iniciada",
       "twitchStreamStopped": "Transmissão da Twitch parada",
       "twitchRaid": "'Raid' da Twitch chegando",
       "twitchHosted": "Recebendo host da Twitch",
       "twitchHosting": "Host realizado da Twitch",
       "tip": "Doado pelo usuário",
-      "botStarted": "Bot started"
+      "botStarted": "Bot iniciado"
     },
     "command": {
       "add-parameter": "Adicionar parâmetro",

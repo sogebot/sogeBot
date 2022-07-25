@@ -308,17 +308,16 @@
       }
     },
     "eventlist-events": {
-      "follow": "<strong>folgt</strong> dir",
-      "host": "<strong>gehostet</strong>",
-      "raid": "<strong>raided</strong>",
-      "sub": "<strong>subbed</strong> you",
-      "subgift": "<strong> hat </strong> sub's verschenkt",
-      "subcommunitygift": "<strong>verschenkte</strong> sub's für Zuschauer",
-      "resub": "<strong>resubbed</strong>",
-      "cheer": "<strong>cheered</strong> dir",
-      "tip": "<strong>Spendet</strong> dir",
-      "tipToCharity": "<strong>donated</strong> to $campaignName",
-      "rewardredeem": "hat eine <strong>Belohnung</strong> eingelöst"
+      "follow": "<strong>Followed</strong> you",
+      "host": "<strong>Hosted</strong> you with <strong>$viewers</strong> viewers.",
+      "raid": "<strong>Raided</strong> you with <strong>$viewers</strong> raiders.",
+      "sub": "<strong>Subscribed</strong> to you with <strong>$subType</strong>. They've been subscribed for $subCumulativeMonths $subCumulativeMonthsName.",
+      "subgift": "has been <strong>gifted</strong> subscription from <strong>$username</strong>",
+      "subcommunitygift": "<strong>Gifted</strong> subscriptions for community",
+      "resub": "<strong>Resubscribed</strong> with <strong>$subType</strong>. They've been subscribed for $subCumulativeMonths $subCumulativeMonthsName.",
+      "cheer": "<strong>Cheered</strong> you",
+      "tip": "<strong>Tipped</strong> you",
+      "tipToCharity": "<strong>donated</strong> to <strong>$campaignName</strong>"
     },
     "responses": {
       "variable": {
@@ -352,7 +351,7 @@
         "topContributionsSubsUsername": "Top Subs Beitrag - Benutzername",
         "sender": "Benutzer der initiiert hat",
         "title": "Aktueller Titel",
-        "game": "Aktuelles Spiel",
+        "game": "Current category",
         "language": "Aktuelle Sprache des Stream",
         "viewers": "Anzahl der aktuellen Zuschauer",
         "hostViewers": "Host/Raid-Zuschauerzahl",
@@ -427,7 +426,7 @@
         "tier": "Stufe",
         "months": "Monate",
         "monthsName": "Lokalisierter Name des Monats (1 Monat, 2 Monate)",
-        "oldGame": "Spiel vor Änderung",
+        "oldGame": "Category before change",
         "recipientObject": "Vollständiges Empfängerobjekt",
         "recipient": "Empfänger",
         "ytSong": "Aktueller Song auf YouTube",
@@ -549,8 +548,8 @@
     "viewers-points-of-all-users": "Punkte aller Benutzer",
     "viewers-watchtime-of-all-users": "Zugeschaute Zeit aller Benutzer ansehen",
     "viewers-messages-of-all-users": "Nachrichten von allen Benutzern",
-    "events-game-after-change": "Spiel nach Änderung",
-    "events-game-before-change": "Spiel vor Änderung",
+    "events-game-after-change": "category after change",
+    "events-game-before-change": "category before change",
     "events-user-triggered-event": "vom Benutzer ausgelöstes Ereignis",
     "events-method-used-to-subscribe": "zum Abonnieren verwendete Methode",
     "events-months-of-subscription": "Monate des Abonnements",
@@ -633,9 +632,9 @@
     "error": "Fehler",
     "title": "Titel",
     "change-title": "Titel ändern",
-    "game": "Spiel",
+    "game": "category",
     "tags": "Tags",
-    "change-game": "Spiel wechseln",
+    "change-game": "Change category",
     "click-to-change": "Zum Ändern anklicken",
     "uptime": "Uptime",
     "not-affiliate-or-partner": "Kein Affiliate/Partner",
@@ -755,7 +754,7 @@
     "stream-is-running-x-minutes": "Stream läuft seit x Minuten",
     "chatter-first-message": "erste Nachricht des Chatters",
     "every-x-minutes-of-stream": "alle X Minuten des Streams",
-    "game-changed": "Spiel geändert",
+    "game-changed": "category changed",
     "cheer": "empfangene Bits",
     "clearchat": "Chat wurde geleert",
     "action": "Benutzer verwendete /me",
@@ -1096,7 +1095,7 @@
   "game": {
     "current": "$sender, Streamer spielt derzeit $game.",
     "change": {
-      "success": "$sender, Spiel wurde auf $game gesetzt"
+      "success": "$sender, category was set to: $game"
     }
   },
   "cooldowns": {
