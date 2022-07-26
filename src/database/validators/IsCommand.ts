@@ -1,8 +1,7 @@
 import { registerDecorator, ValidationOptions } from 'class-validator';
-import { BaseEntity } from 'typeorm';
 
 export function IsCommand(validationOptions?: ValidationOptions) {
-  return function (object: BaseEntity, propertyName: string) {
+  return function (object: any, propertyName: string) {
     registerDecorator({
       name:         'isCommand',
       target:       object.constructor,
