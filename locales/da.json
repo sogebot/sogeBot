@@ -308,17 +308,16 @@
       }
     },
     "eventlist-events": {
-      "follow": "<strong>followed</strong> you",
-      "host": "<strong>hosted</strong>",
-      "raid": "<strong>raided</strong>",
-      "sub": "<strong>subbed</strong> you",
-      "subgift": "has been <strong>gifted</strong> sub",
-      "subcommunitygift": "<strong>gifted</strong> subs for community",
-      "resub": "<strong>resubbed</strong>",
-      "cheer": "<strong>cheered</strong> you",
-      "tip": "<strong>tipped</strong> you",
-      "tipToCharity": "<strong>donated</strong> to $campaignName",
-      "rewardredeem": "just <strong>redeemed</strong> reward"
+      "follow": "<strong>Followed</strong> you",
+      "host": "<strong>Hosted</strong> you with <strong>$viewers</strong> viewers.",
+      "raid": "<strong>Raided</strong> you with <strong>$viewers</strong> raiders.",
+      "sub": "<strong>Subscribed</strong> to you with <strong>$subType</strong>. They've been subscribed for $subCumulativeMonths $subCumulativeMonthsName.",
+      "subgift": "has been <strong>gifted</strong> subscription from <strong>$username</strong>",
+      "subcommunitygift": "<strong>Gifted</strong> subscriptions for community",
+      "resub": "<strong>Resubscribed</strong> with <strong>$subType</strong>. They've been subscribed for $subCumulativeMonths $subCumulativeMonthsName.",
+      "cheer": "<strong>Cheered</strong> you",
+      "tip": "<strong>Tipped</strong> you",
+      "tipToCharity": "<strong>donated</strong> to <strong>$campaignName</strong>"
     },
     "responses": {
       "variable": {
@@ -352,7 +351,7 @@
         "topContributionsSubsUsername": "Top Subs Contribution - Username",
         "sender": "User who initiated",
         "title": "Nuværende titel",
-        "game": "Nuværende spil",
+        "game": "Current category",
         "language": "Current stream language",
         "viewers": "Antal aktuelle seere",
         "hostViewers": "Host/Raid viewers count",
@@ -427,7 +426,7 @@
         "tier": "Niveau",
         "months": "Måneder",
         "monthsName": "lokalt navn på måneden (1 måned, 2 måneder)",
-        "oldGame": "Spil før ændring",
+        "oldGame": "Category before change",
         "recipientObject": "Full recipient object",
         "recipient": "Modtager",
         "ytSong": "Nuværende sang på YouTube",
@@ -549,8 +548,8 @@
     "viewers-points-of-all-users": "Points of all users",
     "viewers-watchtime-of-all-users": "Watch time of all users",
     "viewers-messages-of-all-users": "Messages of all users",
-    "events-game-after-change": "game after change",
-    "events-game-before-change": "game before change",
+    "events-game-after-change": "category after change",
+    "events-game-before-change": "category before change",
     "events-user-triggered-event": "user triggered event",
     "events-method-used-to-subscribe": "method used to subscribe",
     "events-months-of-subscription": "måneder som abonnent",
@@ -633,9 +632,9 @@
     "error": "Fejl",
     "title": "Titel",
     "change-title": "Skift titel",
-    "game": "spil",
+    "game": "category",
     "tags": "Tags",
-    "change-game": "Skift spil",
+    "change-game": "Change category",
     "click-to-change": "klik for at ændre",
     "uptime": "uptime",
     "not-affiliate-or-partner": "Ikke affiliate/partner",
@@ -755,7 +754,7 @@
     "stream-is-running-x-minutes": "stream kører x minutter",
     "chatter-first-message": "first message of chatter",
     "every-x-minutes-of-stream": "hvert x minutter af stream",
-    "game-changed": "spil ændret",
+    "game-changed": "category changed",
     "cheer": "bit modtaget",
     "clearchat": "chatten blev ryddet",
     "action": "bruger brugte /me",
@@ -1096,7 +1095,7 @@
   "game": {
     "current": "$sender, streamer spiller i øjeblikket $game.",
     "change": {
-      "success": "$sender, spil er nu ændret til: $game"
+      "success": "$sender, category was set to: $game"
     }
   },
   "cooldowns": {

@@ -1,3 +1,5 @@
 {
-  "isNotEmpty": "This field is required."
+  "isNotEmpty": "Tento údaj je povinný.",
+  "isCommand": "$property musí začínat s !",
+  "isCommandOrCustomVariable": "$property musí začínat s ! nebo $_"
 }

@@ -308,17 +308,16 @@
       }
     },
     "eventlist-events": {
-      "follow": "<strong>подписался</strong> на вас",
-      "host": "<strong>захостил</strong>",
-      "raid": "<strong>рейд</strong>",
-      "sub": "<strong>подписался</strong> на вас",
-      "subgift": "has been <strong>gifted</strong> sub",
-      "subcommunitygift": "<strong>подарил</strong> подписки для сообщества",
-      "resub": "<strong>resubbed</strong>",
-      "cheer": "<strong>cheered</strong> you",
-      "tip": "<strong>задоннатил</strong> вам",
-      "tipToCharity": "<strong>donated</strong> to $campaignName",
-      "rewardredeem": "just <strong>redeemed</strong> reward"
+      "follow": "<strong>Followed</strong> you",
+      "host": "<strong>Hosted</strong> you with <strong>$viewers</strong> viewers.",
+      "raid": "<strong>Raided</strong> you with <strong>$viewers</strong> raiders.",
+      "sub": "<strong>Subscribed</strong> to you with <strong>$subType</strong>. They've been subscribed for $subCumulativeMonths $subCumulativeMonthsName.",
+      "subgift": "has been <strong>gifted</strong> subscription from <strong>$username</strong>",
+      "subcommunitygift": "<strong>Gifted</strong> subscriptions for community",
+      "resub": "<strong>Resubscribed</strong> with <strong>$subType</strong>. They've been subscribed for $subCumulativeMonths $subCumulativeMonthsName.",
+      "cheer": "<strong>Cheered</strong> you",
+      "tip": "<strong>Tipped</strong> you",
+      "tipToCharity": "<strong>donated</strong> to <strong>$campaignName</strong>"
     },
     "responses": {
       "variable": {
@@ -352,7 +351,7 @@
         "topContributionsSubsUsername": "Top Subs Contribution - Username",
         "sender": "Инициатор",
         "title": "Текущее звание",
-        "game": "Текущая игра",
+        "game": "Current category",
         "language": "Текущий язык стрима",
         "viewers": "Текущее количество зрителей",
         "hostViewers": "Количество просмотров Хост/Рейда",
@@ -427,7 +426,7 @@
         "tier": "Тир",
         "months": "Месяцы",
         "monthsName": "локализованное название месяца (1 месяц, 2 месяца)",
-        "oldGame": "Игра перед изменением",
+        "oldGame": "Category before change",
         "recipientObject": "Полный объект получателя",
         "recipient": "Получатель",
         "ytSong": "Текущая песня с YouTube",
@@ -549,8 +548,8 @@
     "viewers-points-of-all-users": "Поинты всех пользователей",
     "viewers-watchtime-of-all-users": "Время просмотра всех пользователей",
     "viewers-messages-of-all-users": "Сообщения всех пользователей",
-    "events-game-after-change": "игра после изменения",
-    "events-game-before-change": "игра перед изменением",
+    "events-game-after-change": "category after change",
+    "events-game-before-change": "category before change",
     "events-user-triggered-event": "пользователь вызвавший событие",
     "events-method-used-to-subscribe": "способ сабскрайба",
     "events-months-of-subscription": "продолжительность сабскрайба",
@@ -633,9 +632,9 @@
     "error": "Ошибка",
     "title": "Название",
     "change-title": "Изменить заголовок",
-    "game": "игра",
+    "game": "category",
     "tags": "Теги",
-    "change-game": "Сменить игру",
+    "change-game": "Change category",
     "click-to-change": "нажмите, чтобы изменить",
     "uptime": "uptime",
     "not-affiliate-or-partner": "Не компаньон/партнер",
@@ -755,7 +754,7 @@
     "stream-is-running-x-minutes": "стрим идёт Х минут",
     "chatter-first-message": "первое сообщение в чате",
     "every-x-minutes-of-stream": "каждую Х минуту стрима",
-    "game-changed": "игра стрима изменилась",
+    "game-changed": "category changed",
     "cheer": "received bits",
     "clearchat": "чат был очищен",
     "action": "пользователь использовал /me",
@@ -1096,7 +1095,7 @@
   "game": {
     "current": "$sender, стример сейчас играет в $game.",
     "change": {
-      "success": "$sender, игра установлена на: $game"
+      "success": "$sender, category was set to: $game"
     }
   },
   "cooldowns": {
