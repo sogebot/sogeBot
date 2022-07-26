@@ -1,6 +1,6 @@
 {
   "settings": {
-    "isTitleForced": "Titel/Game er påtvunget (bot vil omskrive ændringer fra andre steder)",
+    "isTitleForced": "Title/Category is forced (bot will rewrite changes from elsewhere)",
     "createMarkerOnEvent": "Create stream marker on event"
   }
 }
