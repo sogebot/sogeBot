@@ -296,7 +296,6 @@ export type ClientToServerEventsWithNamespace = {
     'generic::groups::save': generic<AliasGroup>['save'],
     'generic::getAll': generic<Alias>['getAll'],
     'generic::save': generic<Alias>['save'],
-    'generic::validate': generic<Alias>['validate'],
     'generic::deleteById': generic<Alias>['deleteById'],
   },
   '/systems/bets': GenericEvents & {

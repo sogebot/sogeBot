@@ -108,21 +108,6 @@ class Alias extends System {
         cb(e as Error);
       }
     });
-    adminEndpoint('/systems/alias', 'generic::validate', async (data, cb) => {
-      try {
-        const item = new AliasEntity();
-        merge(item, data);
-        await validateOrReject(item);
-        cb(null);
-      } catch (e) {
-        if (e instanceof Error) {
-          cb(e.message);
-        }
-        if (isValidationError(e)) {
-          cb(e);
-        }
-      }
-    });
     adminEndpoint('/systems/alias', 'generic::save', async (item, cb) => {
       try {
         const itemToSave = new AliasEntity();
