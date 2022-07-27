@@ -308,17 +308,16 @@
       }
     },
     "eventlist-events": {
-      "follow": "ti dal <strong>follow</strong>",
-      "host": "<strong>hostitel</strong>",
-      "raid": "<strong>nájezd</strong>",
-      "sub": "<strong>předplatitel</strong>",
-      "subgift": "<strong>darované</strong> předplatné",
-      "subcommunitygift": "<strong>darované</strong> předplatné komunitě",
-      "resub": "<strong>předplatitel</strong>",
-      "cheer": "<strong>bity</strong>",
-      "tip": "<strong>spropitné</strong>",
-      "tipToCharity": "<strong>přispěl</strong> pro $campaignName",
-      "rewardredeem": "žádost o <strong>odměnu</strong>"
+      "follow": "Tě <strong>sleduje</strong>",
+      "host": "Tě <strong>hostuje</strong> s <strong>$viewers</strong> diváky.",
+      "raid": "<strong>Nájezd</strong> s <strong>$viewers</strong> diváky.",
+      "sub": "Nový <strong>odběratel</strong> s <strong>$subType</strong>. Byli přihlášeni k odběru $subCumulativeMonths $subCumulativeMonthsName.",
+      "subgift": "bylo <strong>darováno</strong> předplatné od <strong>$username</strong>",
+      "subcommunitygift": "<strong>Darované</strong> předplatné komunitě",
+      "resub": "Obnoven <strong>odběr</strong> s <strong>$subType</strong>. Byli přihlášeni k odběru $subCumulativeMonths $subCumulativeMonthsName.",
+      "cheer": "<strong>Bity</strong>",
+      "tip": "<strong>Spropitné</strong>",
+      "tipToCharity": "<strong>přispěl</strong> pro <strong>$campaignName</strong>"
     },
     "responses": {
       "variable": {
@@ -352,7 +351,7 @@
         "topContributionsSubsUsername": "Nejlepší příspěvek v Subech - Uživatelské jméno",
         "sender": "Uživatel, který inicioval",
         "title": "Aktuální název",
-        "game": "Aktuální hra",
+        "game": "Současná kategorie",
         "language": "Aktuální jazyk vysílání",
         "viewers": "Aktuální počet diváků",
         "hostViewers": "Počet diváků z hostováni/nájezdu",
@@ -427,7 +426,7 @@
         "tier": "Tier",
         "months": "Počet měsíců",
         "monthsName": "Název měsíce (1 měsíc, 2 měsíce)",
-        "oldGame": "Hra před změnou",
+        "oldGame": "Kategorie před změnou",
         "recipientObject": "Příjemce (celý objekt)",
         "recipient": "Příjemce",
         "ytSong": "Aktuální skladba na YouTube",
@@ -549,8 +548,8 @@
     "viewers-points-of-all-users": "Body všech uživatelů",
     "viewers-watchtime-of-all-users": "Čas sledování všech uživatelů",
     "viewers-messages-of-all-users": "Zprávy všech uživatelů",
-    "events-game-after-change": "hra po změně",
-    "events-game-before-change": "hra před změnou",
+    "events-game-after-change": "kategorie po změně",
+    "events-game-before-change": "kategorie před změnou",
     "events-user-triggered-event": "uživatel, který spustil event",
     "events-method-used-to-subscribe": "metoda použita pro subscribe",
     "events-months-of-subscription": "počet měsíců",
@@ -633,9 +632,9 @@
     "error": "Chyba",
     "title": "Název",
     "change-title": "Změnit název",
-    "game": "hra",
+    "game": "kategorie",
     "tags": "Tagy",
-    "change-game": "Změnit hru",
+    "change-game": "Změnit kategorii",
     "click-to-change": "kliknutím změňte",
     "uptime": "uptime",
     "not-affiliate-or-partner": "Nejsi affiliate/partner",
@@ -755,7 +754,7 @@
     "stream-is-running-x-minutes": "vysílání běží x minut",
     "chatter-first-message": "první zpráva chattera",
     "every-x-minutes-of-stream": "každých x minut vysílání",
-    "game-changed": "hra změněna",
+    "game-changed": "kategorie změněna",
     "cheer": "přijaté bity",
     "clearchat": "chat byl vymazán",
     "action": "uživatel poslal /me",
@@ -1096,7 +1095,7 @@
   "game": {
     "current": "$sender, streamer právě hraje $game.",
     "change": {
-      "success": "$sender, hra byl nastavena na: $game"
+      "success": "$sender, kategorie byla nastavena na: $game"
     }
   },
   "cooldowns": {
