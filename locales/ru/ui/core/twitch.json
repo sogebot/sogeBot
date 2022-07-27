@@ -1,6 +1,6 @@
 {
   "settings": {
-    "isTitleForced": "Название/Игра принудительно (бот перезапишет изменения с других мест)",
+    "isTitleForced": "Title/Category is forced (bot will rewrite changes from elsewhere)",
     "createMarkerOnEvent": "Создать маркер потока на событии"
   }
 }

@@ -65,7 +65,7 @@
     "name": "Výskyt varianty"
   },
   "filter": {
-    "name": "Filter",
+    "name": "Filtr",
     "operator": "Operátor",
     "rule": "Pravidlo",
     "addRule": "Přidat pravidlo",
