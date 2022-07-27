@@ -64,19 +64,19 @@ export const User = new EntitySchema<Readonly<Required<UserInterface>>>({
     rank:                 { type: String, default: '' },
     haveCustomRank:       { type: Boolean, default: false },
     followedAt:           {
-      type: 'varchar', length: '2022-01-25T20:14:53.308Z'.length, nullable: true,
+      type: 'varchar', length: '2022-07-27T00:30:34.569259834Z'.length, nullable: true,
     },
     followCheckAt: {
       type: 'bigint', default: 0, transformer: new ColumnNumericTransformer(),
     },
     subscribedAt: {
-      type: 'varchar', length: '2022-01-25T20:14:53.308Z'.length, nullable: true,
+      type: 'varchar', length: '2022-07-27T00:30:34.569259834Z'.length, nullable: true,
     },
     seenAt: {
-      type: 'varchar', length: '2022-01-25T20:14:53.308Z'.length, nullable: true,
+      type: 'varchar', length: '2022-07-27T00:30:34.569259834Z'.length, nullable: true,
     },
     createdAt: {
-      type: 'varchar', length: '2022-01-25T20:14:53.308Z'.length, nullable: true,
+      type: 'varchar', length: '2022-07-27T00:30:34.569259834Z'.length, nullable: true,
     },
     watchedTime: {
       type: 'bigint', default: 0, transformer: new ColumnNumericTransformer(),
