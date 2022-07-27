@@ -1,57 +1,57 @@
 {
   "common-errors": {
-    "missing-sender-attributes": "This node needs to be linked with listeners with sender attributes"
+    "missing-sender-attributes": "Tento uzel musí být propojen s posluchači s atributy odesílatele"
   },
   "filter": {
     "permission": {
-      "name": "Permission filter"
+      "name": "Filtr oprávnění"
     }
   },
   "cron": {
     "name": "Cron"
   },
   "listener": {
-    "name": "Event listener",
+    "name": "Posluchač událostí",
     "type": {
-      "twitchChatMessage": "Twitch chat message",
-      "twitchCommand": "Twitch command",
-      "twitchFollow": "New Twitch follower",
-      "twitchSubscription": "New Twitch subscription",
-      "twitchSubgift": "New Twitch subscription gift",
-      "twitchSubcommunitygift": "New Twitch subscription community gift",
-      "twitchResub": "New Twitch recurring subscription",
-      "twitchGameChanged": "Twitch game changed",
-      "twitchStreamStarted": "Twitch stream started",
-      "twitchStreamStopped": "Twitch stream stopped",
-      "twitchRaid": "Twitch raid incoming",
-      "twitchHosted": "Twitch host incoming",
-      "twitchHosting": "Twitch host outgoing",
-      "tip": "Tipped by user",
-      "botStarted": "Bot started"
+      "twitchChatMessage": "Twitch zpráva chatu",
+      "twitchCommand": "Příkaz na Twitch",
+      "twitchFollow": "Nový Twitch sledující",
+      "twitchSubscription": "Nový Twitch odběr",
+      "twitchSubgift": "Nový dárek odběru na Twitch",
+      "twitchSubcommunitygift": "Nový komunitní dárek odběrů na Twitch",
+      "twitchResub": "Nové opakující se předplatné Twitch",
+      "twitchGameChanged": "Změna kategorie kanálu",
+      "twitchStreamStarted": "Twitch stream byl spuštěn",
+      "twitchStreamStopped": "Twitch stream byl zastaven",
+      "twitchRaid": "Příchozí Twitch nájezd",
+      "twitchHosted": "Příchozí Twitch host",
+      "twitchHosting": "Odchozí Twitch host",
+      "tip": "Spropitné od uživatele",
+      "botStarted": "Bot spuštěn"
     },
     "command": {
-      "add-parameter": "Add parameter",
-      "parameters": "Parameters",
-      "order-is-important": "order is important"
+      "add-parameter": "Přidat parametr",
+      "parameters": "Parametry",
+      "order-is-important": "pořadí je důležité"
     }
   },
   "others": {
     "idle": {
-      "name": "Idle"
+      "name": "Nečinný"
     }
   },
   "output": {
     "log": {
-      "name": "Log message"
+      "name": "Zaznamenat zprávu"
     },
     "timeout-user": {
-      "name": "Timeout user"
+      "name": "Vykopnout uživatele"
     },
     "ban-user": {
-      "name": "Ban user"
+      "name": "Zabanovat uživatele"
     },
     "send-twitch-message": {
-      "name": "Send Twitch Message"
+      "name": "Odeslat Twitch zprávu"
     }
   }
 }
