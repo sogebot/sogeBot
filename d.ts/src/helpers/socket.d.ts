@@ -73,12 +73,12 @@ type GenericEvents = {
   'get.value': (variable: string, cb: (error: Error | string | null, value: any) => void) => void,
 };
 
-type generic<T extends Record<string, any>> = {
+type generic<T extends Record<string, any>, K = 'id'> = {
   getAll: (cb: (error: Error | string | null, items: Readonly<Required<T>>[]) => void) => void,
-  getOne: (id: Required<T['id']>, cb: (error: Error | string | null, item?: Readonly<Required<T>>) => void) => void,
-  setById: (opts: { id: Required<T['id']>, item: Partial<T> }, cb: (error: ValidationError[] | Error | string | null, item?: Readonly<Required<T>> | null) => void) => void,
+  getOne: (id: Required<T[K]>, cb: (error: Error | string | null, item?: Readonly<Required<T>>) => void) => void,
+  setById: (opts: { id: Required<T[K]>, item: Partial<T> }, cb: (error: ValidationError[] | Error | string | null, item?: Readonly<Required<T>> | null) => void) => void,
   save: (item: Partial<T>, cb: (error: ValidationError[] | Error | string | null, item?: Readonly<Required<T>> | null) => void) => void,
-  deleteById: (id: Required<T['id']>, cb: (error: Error | string | null) => void) => void;
+  deleteById: (id: Required<T[K]>, cb: (error: Error | string | null) => void) => void;
   validate: (item: Partial<T>, cb: (error: ValidationError[] | Error | string | null) => void) => void,
 };
 
@@ -293,6 +293,7 @@ export type ClientToServerEventsWithNamespace = {
   '/systems/alias': GenericEvents & {
     'generic::getOne': generic<Alias>['getOne'],
     'generic::groups::getAll': generic<AliasGroup>['getAll'],
+    'generic::groups::deleteById': generic<AliasGroup, 'name'>['deleteById'],
     'generic::groups::save': generic<AliasGroup>['save'],
     'generic::getAll': generic<Alias>['getAll'],
     'generic::save': generic<Alias>['save'],

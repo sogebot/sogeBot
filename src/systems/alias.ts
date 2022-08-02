@@ -58,6 +58,15 @@ class Alias extends System {
   }
 
   sockets() {
+    adminEndpoint('/systems/alias', 'generic::groups::deleteById', async (name, cb) => {
+      try {
+        const group = await AliasGroup.findOneOrFail({ name });
+        await group.remove();
+        cb(null);
+      } catch (e) {
+        cb(e as Error);
+      }
+    });
     adminEndpoint('/systems/alias', 'generic::groups::save', async (item, cb) => {
       try {
         const itemToSave = new AliasGroup();
@@ -69,7 +78,6 @@ class Alias extends System {
           cb(e.message, undefined);
         }
       }
-
     });
     adminEndpoint('/systems/alias', 'generic::groups::getAll', async (cb) => {
       let [ aliasGroup, aliasEntity ] = await Promise.all([
