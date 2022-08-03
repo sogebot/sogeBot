@@ -165,7 +165,7 @@ class OBSWebsocket extends Integration {
       return;
     }
 
-    app.post('/log', (req, res) => {
+    app.post('/integrations/obswebsocket/log', (req, res) => {
       let message = req.body.message;
       if (typeof req.body.message !== 'string') {
         message = JSON.stringify(req.body.message, null, 2);
