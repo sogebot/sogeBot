@@ -4,7 +4,6 @@ export * from './customVariableResolver';
 export * from './goalsResolver';
 export * from './googleResolver';
 export * from './menuResolver';
-export * from './obsWebsocketResolver';
 export * from './quickActionsResolver';
 export * from './randomizerResolver';
 export * from './widgetCustomResolver';

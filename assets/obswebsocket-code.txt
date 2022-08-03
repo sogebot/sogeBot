@@ -1,6 +1,8 @@
 /*
 To properly wait function to complete, please use await for async functions.
 
+Supported OBSWebsocket version 5.x, OBS at least 28.0.0
+
 Functions exposed to eval:
   (async) obs - see details at https://github.com/haganbmj/obs-websocket-js
   (async) waitMs(miliseconds: number) - wait in script
@@ -10,11 +12,11 @@ If triggered through event-listener, variable event is accessible
   event - contains all attributes from event like event.username etc.
 
 Example:
-  await obs.send('SetCurrentScene', {
-    'scene-name': 'My Amazing Scene'
+  await obs.call('SetCurrentProgramScene', {
+    'sceneName': 'My Amazing Scene'
   });
   await waitMs(5000) // wait 5 seconds
-  await obs.send('SetCurrentScene', {
-    'scene-name': 'This is another scene'
+  await obs.send('SetCurrentProgramScene', {
+    'sceneName': 'This is another scene'
   });
 */

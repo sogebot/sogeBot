@@ -7,25 +7,24 @@ declare const window: any;
 
 const switchScenes = (obs: ObsWebSocket, socket?: Socket) => {
   const listener = (data: {
-    'scene-name': string;
-    sources: ObsWebSocket.SceneItem[];
+    sceneName: string;
   }) => {
     if (process.env.BUILD === 'web') {
-      console.debug(`obs::websocket::on:switchscenes ${data['scene-name']}`);
+      console.debug(`obs::websocket::on:switchscenes ${data.sceneName}`);
       socket?.emit('integration::obswebsocket::event', {
         type:      'obs-scene-changed',
-        sceneName: data['scene-name'],
+        sceneName: data.sceneName,
         location:  window.location.href,
       });
     } else {
       eventEmitter.emit('obs-scene-changed', {
-        sceneName:  data['scene-name'],
+        sceneName:  data.sceneName,
         isDirect:   true,
         linkFilter: '',
       });
     }
   };
-  obs.off('SwitchScenes', listener).on('SwitchScenes', listener);
+  obs.off('CurrentProgramSceneChanged', listener).on('CurrentProgramSceneChanged', listener);
 };
 
 export { switchScenes };

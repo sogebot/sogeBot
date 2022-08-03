@@ -1,8 +1,9 @@
 import { Events } from '@entity/event';
-import { OBSWebsocket as OBSWebsocketEntity, OBSWebsocketInterface } from '@entity/obswebsocket';
+import { OBSWebsocket as OBSWebsocketEntity } from '@entity/obswebsocket';
 import { SECOND } from '@sogebot/ui-helpers/constants';
 import { EntityNotFoundError } from 'typeorm';
 import { getRepository } from 'typeorm';
+import { v4 } from 'uuid';
 
 import {
   command, default_permission, settings, ui,
@@ -22,7 +23,7 @@ import { taskRunner } from '~/helpers/obswebsocket/taskrunner';
 import { app, ioServer } from '~/helpers/panel';
 import { ParameterError } from '~/helpers/parameterError';
 import { defaultPermissions } from '~/helpers/permissions';
-import { publicEndpoint } from '~/helpers/socket';
+import { adminEndpoint, publicEndpoint } from '~/helpers/socket';
 import { translate } from '~/translate';
 
 let reconnectingTimeout: null | NodeJS.Timeout = null;
@@ -31,11 +32,13 @@ class OBSWebsocket extends Integration {
   reconnecting = false;
   enableHeartBeat = false;
 
+  endpoint = v4();
+
   @settings('connection')
   @ui({ type: 'selector', values: ['direct', 'overlay'] })
     accessBy: 'direct' | 'overlay' = 'overlay';
   @settings('connection')
-    address = 'localhost:4444';
+    address = 'ws://localhost:4455';
   @settings('connection')
     password = '';
 
@@ -69,7 +72,7 @@ class OBSWebsocket extends Integration {
     const task = await getRepository(OBSWebsocketEntity).findOneOrFail({ id: String(operation.taskId) });
 
     info(`OBSWEBSOCKETS: Task ${task.id} triggered by operation`);
-    await obsws.triggerTask(task.advancedMode ? task.advancedModeCode : task.simpleModeTasks, attributes);
+    await obsws.triggerTask(task.code, attributes);
   }
 
   protected async eventIsProperlyFiltered(event: any, attributes: Events.Attributes): Promise<boolean> {
@@ -95,9 +98,9 @@ class OBSWebsocket extends Integration {
         isHeartBeat || this.reconnecting ? null : info('OBSWEBSOCKET: Connecting using direct access from bot.');
         try {
           if (this.password === '') {
-            await obs.connect({ address: this.address });
+            await obs.connect(this.address);
           } else {
-            await obs.connect({ address: this.address, password: this.password });
+            await obs.connect(this.address, this.password);
           }
           info(isHeartBeat ? 'OBSWEBSOCKET: Reconnected OK!' : 'OBSWEBSOCKET: Connected OK!');
 
@@ -142,7 +145,7 @@ class OBSWebsocket extends Integration {
     try {
       if (this.enabled && this.accessBy === 'direct' && !this.reconnecting && this.enableHeartBeat) {
         // getting just stream status to check connection
-        await obs.send('GetStreamingStatus');
+        await obs.call('GetStreamStatus');
       }
     } catch {
       // try to reconnect on error (connection lost, OBS is not running)
@@ -167,12 +170,42 @@ class OBSWebsocket extends Integration {
       if (typeof req.body.message !== 'string') {
         message = JSON.stringify(req.body.message, null, 2);
       }
-      ioServer?.of('/integrations/obswebsocket').emit('log', message || '');
+      ioServer?.of('/').emit('integration::obswebsocket::log', message || '');
       res.status(200).send();
     });
   }
 
   sockets() {
+    publicEndpoint('/', 'integration::obswebsocket::values', (cb) => {
+      cb({
+        address:  this.address,
+        password: this.password,
+      });
+    });
+    adminEndpoint('/', 'integration::obswebsocket::trigger', (data, cb) => {
+      this.triggerTask(data.code, data.attributes)
+        .then(() => cb(null))
+        .catch(e => cb(e));
+    });
+    adminEndpoint('/', 'integration::obswebsocket::generic::save', async (item, cb) => {
+      try {
+        cb(null, await getRepository(OBSWebsocketEntity).save(item));
+      } catch (e) {
+        if (e instanceof Error) {
+          cb(e.message, undefined);
+        }
+      }
+    });
+    adminEndpoint('/', 'integration::obswebsocket::generic::getOne', async (id, cb) => {
+      cb(null, await getRepository(OBSWebsocketEntity).findOne({ id }));
+    });
+    adminEndpoint('/', 'integration::obswebsocket::generic::deleteById', async (id, cb) => {
+      await getRepository(OBSWebsocketEntity).delete({ id });
+      cb(null);
+    });
+    adminEndpoint('/', 'integration::obswebsocket::generic::getAll', async (cb) => {
+      cb(null, await getRepository(OBSWebsocketEntity).find());
+    });
     publicEndpoint(this.nsp, 'integration::obswebsocket::event', (opts) => {
       eventEmitter.emit(opts.type, {
         sceneName:  opts.sceneName,
@@ -182,16 +215,16 @@ class OBSWebsocket extends Integration {
     });
   }
 
-  async triggerTask(tasks: OBSWebsocketInterface['simpleModeTasks'] | string, attributes?: Events.Attributes) {
+  async triggerTask(code: string, attributes?: Events.Attributes) {
     if (this.accessBy === 'direct') {
-      await taskRunner(obs, { tasks, attributes });
+      await taskRunner(obs, { code, attributes });
     } else {
       await new Promise((resolve, reject) => {
-        // we need to send on all sockets on /integrations/obswebsocket
-        const sockets = ioServer?.of('/integrations/obswebsocket').sockets;
+        // we need to send on all sockets on /
+        const sockets = ioServer?.of('/').sockets;
         if (sockets) {
           for (const socket of sockets.values()) {
-            socket.emit('integration::obswebsocket::trigger', { tasks, attributes }, () => resolve(true));
+            socket.emit('integration::obswebsocket::trigger', { code, attributes }, () => resolve(true));
           }
         }
         setTimeout(() => reject('Test timed out. Please check if your overlay is opened.'), 10000);
@@ -207,7 +240,7 @@ class OBSWebsocket extends Integration {
       const task = await getRepository(OBSWebsocketEntity).findOneOrFail(taskId);
 
       info(`OBSWEBSOCKETS: User ${opts.sender.userName}#${opts.sender.userId} triggered task ${task.id}`);
-      await this.triggerTask(task.advancedMode ? task.advancedModeCode : task.simpleModeTasks);
+      await this.triggerTask(task.code);
 
       return [];
     } catch (err: any) {

@@ -21,9 +21,6 @@ dependencies:
 	NODE_ENV=development npm install
 	@echo -ne "\n\t ----- Installation of husky\n"
 	npx --yes husky install
-	@echo -ne "\n\t ----- Going through node_modules patches\n"
-	# How to create node_modules patch: https://opensource.christmas/2019/4
-	patch --forward ${NODE_MODULES_DIR}/obs-websocket-js/types/index.d.ts < patches/obswebsocketTypeExpose.patch
 
 eslint:
 	@echo -ne "\n\t ----- Checking eslint\n"
