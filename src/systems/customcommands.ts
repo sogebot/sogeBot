@@ -64,7 +64,6 @@ class CustomCommands extends System {
           cb(e.message, undefined);
         }
       }
-
     });
     adminEndpoint('/systems/customcommands', 'generic::groups::getAll', async (cb) => {
       let [ commandsGroup, commands ] = await Promise.all([
