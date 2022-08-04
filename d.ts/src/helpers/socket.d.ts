@@ -413,12 +413,6 @@ export type ClientToServerEventsWithNamespace = {
     'polls::save': (item: PollInterface, cb: (error: Error | string | null) => void) => void,
     'polls::close': (item: PollInterface, cb: (error: Error | string | null) => void) => void,
   },
-  '/systems/price': GenericEvents & {
-    'generic::getAll': generic<PriceInterface>['getAll'],
-    'generic::getOne': generic<PriceInterface>['getOne'],
-    'generic::deleteById': generic<PriceInterface>['deleteById'],
-    'price::save': (item: PriceInterface, cb: (error: Error | string | null) => void) => void,
-  },
   '/systems/ranks': GenericEvents & {
     'generic::getAll': generic<RankInterface>['getAll'],
     'generic::getOne': generic<RankInterface>['getOne'],

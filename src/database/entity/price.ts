@@ -1,29 +1,33 @@
-import { EntitySchema } from 'typeorm';
+import { IsNotEmpty, IsPositive, MinLength, ValidateIf } from 'class-validator';
+import { BaseEntity, Column, Entity, Index, PrimaryColumn } from 'typeorm';
 
-export interface PriceInterface {
-  id?: string;
-  command: string;
-  enabled?: boolean;
-  price: number;
-  priceBits: number;
-  emitRedeemEvent: boolean;
+import { IsCommand } from '../validators/IsCommand';
+
+@Entity()
+export class Price extends BaseEntity {
+  @PrimaryColumn({ generated: 'uuid' })
+    id: string;
+
+  @Column()
+  @IsNotEmpty()
+  @MinLength(2)
+  @IsCommand()
+  @Index('IDX_d12db23d28020784096bcb41a3', { unique: true })
+    command: string;
+
+  @Column({ default: true })
+    enabled: boolean;
+
+  @Column({ default: false })
+    emitRedeemEvent: boolean;
+
+  @Column()
+  @IsPositive()
+  @ValidateIf(o => o.priceBits <= 0)
+    price: number;
+
+  @Column({ default: 0 })
+  @ValidateIf(o => o.price <= 0)
+  @IsPositive()
+    priceBits: number;
 }
-
-export const Price = new EntitySchema<Readonly<Required<PriceInterface>>>({
-  name:    'price',
-  columns: {
-    id: {
-      type: String, primary: true, generated: 'uuid',
-    },
-    command:         { type: String },
-    enabled:         { type: Boolean, default: true },
-    price:           { type: Number },
-    priceBits:       { type: Number, default: 0 },
-    emitRedeemEvent: { type: Boolean, default: false },
-  },
-  indices: [
-    {
-      name: 'IDX_d12db23d28020784096bcb41a3', unique: true, columns: ['command'],
-    },
-  ],
-});

@@ -1,7 +1,9 @@
-import { Price as PriceEntity, PriceInterface } from '@entity/price';
+import { Price as PriceEntity } from '@entity/price';
 import * as constants from '@sogebot/ui-helpers/constants';
 import { format } from '@sogebot/ui-helpers/number';
+import { validateOrReject } from 'class-validator';
 import * as _ from 'lodash';
+import { merge } from 'lodash';
 import { getRepository } from 'typeorm';
 
 import { parserReply } from '../commons';
@@ -14,12 +16,12 @@ import Parser from '../parser';
 import System from './_interface';
 
 import { prepare } from '~/helpers/commons';
-import { error } from '~/helpers/log';
+import { app } from '~/helpers/panel';
 import { defaultPermissions } from '~/helpers/permissions/index';
 import { getPointsName } from '~/helpers/points';
-import { adminEndpoint } from '~/helpers/socket';
 import { isOwner } from '~/helpers/user';
 import * as changelog from '~/helpers/user/changelog.js';
+import { adminMiddleware } from '~/socket';
 import { translate } from '~/translate';
 
 /*
@@ -41,32 +43,34 @@ class Price extends System {
   }
 
   sockets() {
-    adminEndpoint('/systems/price', 'generic::getAll', async (cb) => {
-      cb(null,
-        await getRepository(PriceEntity).find({ order: { price: 'ASC' } }));
-    });
+    if (!app) {
+      setTimeout(() => this.sockets(), 100);
+      return;
+    }
 
-    adminEndpoint('/systems/price', 'generic::getOne', async (id, cb) => {
-      cb(null, await getRepository(PriceEntity).findOne({ id: String(id) }));
+    app.get('/api/systems/price', adminMiddleware, async (req, res) => {
+      res.send({
+        data: await PriceEntity.find({ order: { price: 'ASC' } }),
+      });
     });
-
-    adminEndpoint('/systems/price', 'price::save', async (price: PriceInterface, cb) => {
+    app.get('/api/systems/price/:id', adminMiddleware, async (req, res) => {
+      res.send({
+        data: await PriceEntity.findOne({ id: req.params.id }),
+      });
+    });
+    app.delete('/api/systems/price/:id', adminMiddleware, async (req, res) => {
+      await PriceEntity.delete({ id: req.params.id });
+      res.status(404).send();
+    });
+    app.post('/api/systems/price', adminMiddleware, async (req, res) => {
       try {
-        await getRepository(PriceEntity).save(price);
-        cb(null);
-      } catch (e: any) {
-        error(e);
-        cb(e.stack);
-      }
-    });
-
-    adminEndpoint('/systems/price', 'generic::deleteById', async (id, cb) => {
-      try {
-        await getRepository(PriceEntity).delete({ id: String(id) });
-        cb(null);
-      } catch (e: any) {
-        error(e);
-        cb(e.stack);
+        const itemToSave = new PriceEntity();
+        merge(itemToSave, req.body);
+        await validateOrReject(itemToSave);
+        await itemToSave.save();
+        res.send({ data: itemToSave });
+      } catch (e) {
+        res.status(400).send({ errors: e });
       }
     });
   }
