@@ -12,6 +12,7 @@ export class removeFollowersPermissionOBS1659523865500 implements MigrationInter
     let order = 0;
     for (const item of items) {
       if (item.automation !== 'followers') {
+        item.order = order;
         await insertItemIntoTable('permissions', item, queryRunner);
         order++;
       } else {

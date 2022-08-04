@@ -1,5 +1,3 @@
-/* global describe it beforeEach */
-
 const assert = require('assert');
 
 const { getRepository } = require('typeorm');
@@ -27,9 +25,6 @@ const users = [
   },
   {
     userName: '__vip__', userId: String(4), id: 4, isVIP: true, badges: { vip: true },
-  },
-  {
-    userName: '__follower__', userId: String(5), id: 5, isFollower: true,
   },
   {
     userName: '__viewer__', userId: String(6), id: 6,

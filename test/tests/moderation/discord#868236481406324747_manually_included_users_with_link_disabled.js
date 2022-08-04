@@ -66,23 +66,12 @@ describe('discord#868236481406324747 - Manually included users with link disable
       filters:            [],
     });
     await getRepository(Permissions).insert({
-      id:                 defaultPermissions.FOLLOWERS,
-      name:               'Followers',
-      automation:         'followers',
-      isCorePermission:   true,
-      isWaterfallAllowed: true,
-      order:              4,
-      userIds:            [],
-      excludeUserIds:     [],
-      filters:            [],
-    });
-    await getRepository(Permissions).insert({
       id:                 defaultPermissions.VIEWERS,
       name:               'Viewers',
       automation:         'viewers',
       isCorePermission:   true,
       isWaterfallAllowed: true,
-      order:              5,
+      order:              4,
       userIds:            [],
       excludeUserIds:     [],
       filters:            [],
@@ -163,25 +152,12 @@ describe('discord#868236481406324747 - Manually included users with link disable
     moderation.__permission_based__cLinksEnabled[defaultPermissions.VIP] = true;
 
     await getRepository(Permissions).insert({
-      id:                 defaultPermissions.FOLLOWERS,
-      name:               'Followers',
-      automation:         'followers',
-      isCorePermission:   true,
-      isWaterfallAllowed: true,
-      order:              5,
-      userIds:            [],
-      excludeUserIds:     [],
-      filters:            [],
-    });
-    moderation.__permission_based__cLinksEnabled[defaultPermissions.FOLLOWERS] = true;
-
-    await getRepository(Permissions).insert({
       id:                 defaultPermissions.VIEWERS,
       name:               'Viewers',
       automation:         'viewers',
       isCorePermission:   true,
       isWaterfallAllowed: true,
-      order:              6,
+      order:              5,
       userIds:            [],
       excludeUserIds:     [],
       filters:            [],

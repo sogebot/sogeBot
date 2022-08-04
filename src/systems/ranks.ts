@@ -2,7 +2,6 @@
 
 import { Rank, RankInterface } from '@entity/rank';
 import { User, UserInterface } from '@entity/user';
-import { dayjs } from '@sogebot/ui-helpers/dayjsHelper';
 import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized';
 import * as _ from 'lodash';
 import { getRepository } from 'typeorm';
