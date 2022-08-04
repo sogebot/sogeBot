@@ -101,9 +101,6 @@ async function check(userId: string, permId: string, partial = false): Promise<c
       case 'vip':
         shouldProceed = isVIP(user);
         break;
-      case 'followers':
-        shouldProceed = isFollower(user);
-        break;
       default:
         shouldProceed = false; // we don't have any automation
         break;

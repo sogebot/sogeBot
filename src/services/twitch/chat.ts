@@ -13,7 +13,6 @@ import { isNil } from 'lodash';
 import { getRepository } from 'typeorm';
 
 import { default as apiClient } from './api/client';
-import { followerUpdatePreCheck } from './calls/isFollowerUpdate';
 import { CustomAuthProvider } from './token/CustomAuthProvider.js';
 import { refresh } from './token/refresh';
 
@@ -931,8 +930,6 @@ class Chat {
           seenAt:       new Date().toISOString(),
         });
       }
-
-      followerUpdatePreCheck(userName);
 
       eventEmitter.emit('keyword-send-x-times', {
         userName: userName, message: message, source: 'twitch',

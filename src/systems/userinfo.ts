@@ -56,19 +56,13 @@ class UserInfo extends System {
   protected async followage(opts: CommandOptions): Promise<CommandResponse[]> {
     const [userName] = new Expects(opts.parameters).username({ optional: true, default: opts.sender.userName }).toArray();
     const id = await users.getIdByName(userName);
+    const followedAt = await isFollowerUpdate(id);
 
-    const changelogUser = await changelog.get(id);
-    if (changelogUser) {
-      await isFollowerUpdate(changelogUser);
-    }
-
-    await changelog.flush();
-    const user = await getRepository(User).findOne({ userName });
-    if (!user || !user.isFollower || !user.followedAt) {
+    if (!followedAt) {
       return [{ response: prepare('followage.' + (opts.sender.userName === userName.toLowerCase() ? 'successSameUsername' : 'success') + '.never', { username: userName }), ...opts }];
     } else {
       const units = ['years', 'months', 'days', 'hours', 'minutes'] as const;
-      const diff = dateDiff(new Date(user.followedAt).getTime(), Date.now());
+      const diff = dateDiff(new Date(followedAt).getTime(), Date.now());
 
       const output: string[] = [];
       for (const unit of units) {

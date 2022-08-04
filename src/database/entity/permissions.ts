@@ -14,7 +14,7 @@ export class PermissionsInterface {
   order: number;
   isCorePermission: boolean;
   isWaterfallAllowed: boolean;
-  automation: 'none' | 'casters' | 'moderators' | 'subscribers' | 'viewers' | 'followers' | 'vip';
+  automation: 'none' | 'casters' | 'moderators' | 'subscribers' | 'viewers' | 'vip';
   userIds: string[];
   excludeUserIds: string[];
   filters: PermissionFiltersInterface[];

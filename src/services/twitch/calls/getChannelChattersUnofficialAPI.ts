@@ -19,7 +19,6 @@ import { setImmediateAwait } from '~/helpers/setImmediateAwait';
 import { SQLVariableLimit } from '~/helpers/sql';
 import * as changelog from '~/helpers/user/changelog.js';
 import { isIgnored } from '~/helpers/user/isIgnored';
-import { followerUpdatePreCheck } from '~/services/twitch/calls/isFollowerUpdate';
 import { variables } from '~/watchers';
 import joinpart from '~/widgets/joinpart';
 
@@ -112,7 +111,6 @@ export const getChannelChattersUnofficialAPI = async (opts: any) => {
         continue;
       } else {
         await setImmediateAwait();
-        followerUpdatePreCheck(username);
         eventEmitter.emit('user-joined-channel', { userName: username });
       }
     }
