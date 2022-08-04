@@ -1,6 +1,6 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-import { insertItemIntoTable } from '~/database/insertItemIntoTable';
+import { insertItemIntoTable } from '../../../insertItemIntoTable';
 
 export class removeFollowersPermissionOBS1659523865500 implements MigrationInterface {
   name = 'removeFollowersPermissionOBS1659523865500';
