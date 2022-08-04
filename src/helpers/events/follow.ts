@@ -9,7 +9,6 @@ import { debug, follow as followLog } from '../log';
 import {
   isBot, isIgnored, isInGlobalIgnoreList,
 } from '../user';
-import * as changelog from '../user/changelog.js';
 
 import { eventEmitter } from '.';
 
@@ -35,23 +34,6 @@ export function follow(userId: string, userName: string, followedAt: string) {
     }
     return;
   }
-
-  changelog.getOrFail(userId)
-    .then(user => {
-      changelog.update(userId, {
-        followedAt:    user.haveFollowedAtLock ? user.followedAt : followedAt,
-        isFollower:    user.haveFollowerLock? user.isFollower : true,
-        followCheckAt: Date.now(),
-      });
-    })
-    .catch(() => {
-      changelog.update(userId, {
-        userName:      userName,
-        followedAt:    followedAt,
-        isFollower:    true,
-        followCheckAt: Date.now(),
-      });
-    });
 
   if (events.has(userId)) {
     debug('events', `User ${userName}#${userId} already followed in hour.`);

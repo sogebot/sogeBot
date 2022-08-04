@@ -36,7 +36,6 @@ const defaultCooldowns: { name: string; lastRunAt: number, permId: string }[] = 
  * !cooldown toggle moderators [keyword|!command|g:group] [global|user]      - enable/disable specified keyword or !command cooldown for moderators
  * !cooldown toggle owners [keyword|!command|g:group] [global|user]          - enable/disable specified keyword or !command cooldown for owners
  * !cooldown toggle subscribers [keyword|!command|g:group] [global|user]     - enable/disable specified keyword or !command cooldown for owners
- * !cooldown toggle followers [keyword|!command|g:group] [global|user]       - enable/disable specified keyword or !command cooldown for owners
  * !cooldown toggle enabled [keyword|!command|g:group] [global|user]         - enable/disable specified keyword or !command cooldown
  */
 
@@ -149,7 +148,6 @@ class Cooldown extends System {
         isOwnerAffected:      false,
         isModeratorAffected:  false,
         isSubscriberAffected: true,
-        isFollowerAffected:   true,
       });
       return [{
         response: prepare('cooldowns.cooldown-was-set', {
@@ -332,7 +330,7 @@ class Cooldown extends System {
           }
           continue;
         }
-        if ((isOwner(opts.sender) && !cooldown.isOwnerAffected) || (user.isModerator && !cooldown.isModeratorAffected) || (user.isSubscriber && !cooldown.isSubscriberAffected) || (user.isFollower && !cooldown.isFollowerAffected)) {
+        if ((isOwner(opts.sender) && !cooldown.isOwnerAffected) || (user.isModerator && !cooldown.isModeratorAffected) || (user.isSubscriber && !cooldown.isSubscriberAffected)) {
           result = true;
           continue;
         }
@@ -424,7 +422,7 @@ class Cooldown extends System {
     return true;
   }
 
-  async toggle (opts: CommandOptions, type: 'isEnabled' | 'isModeratorAffected' | 'isOwnerAffected' | 'isSubscriberAffected' | 'isFollowerAffected' | 'isErrorMsgQuiet' | 'type'): Promise<CommandResponse[]> {
+  async toggle (opts: CommandOptions, type: 'isEnabled' | 'isModeratorAffected' | 'isOwnerAffected' | 'isSubscriberAffected' | 'isErrorMsgQuiet' | 'type'): Promise<CommandResponse[]> {
     try {
       const [name, typeParameter] = new Expects(opts.parameters)
         .string({ additionalChars: ':!' })
@@ -466,9 +464,6 @@ class Cooldown extends System {
       if (type === 'isSubscriberAffected') {
         path = '-for-subscribers';
       }
-      if (type === 'isFollowerAffected') {
-        path = '-for-followers';
-      }
       if (type === 'isErrorMsgQuiet' || type === 'type') {
         return [];
       } // those two are setable only from dashboard
@@ -508,12 +503,6 @@ class Cooldown extends System {
   @default_permission(defaultPermissions.CASTERS)
   async toggleSubscribers (opts: CommandOptions) {
     return this.toggle(opts, 'isSubscriberAffected');
-  }
-
-  @command('!cooldown toggle followers')
-  @default_permission(defaultPermissions.CASTERS)
-  async toggleFollowers (opts: CommandOptions) {
-    return this.toggle(opts, 'isFollowerAffected');
   }
 
   async toggleNotify (opts: CommandOptions) {

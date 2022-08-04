@@ -130,13 +130,9 @@ bot it is twitch by default
 ## Random filters
 `(random.online.viewer)` - returns random online viewer
 
-`(random.online.follower)` - returns random online follower
-
 `(random.online.subscriber)` - returns random online subscriber
 
 `(random.viewer)` - returns random viewer (offline included)
-
-`(random.follower)` - returns random follower (offline included)
 
 `(random.subscriber)` - returns random subscriber (offline included)
 
@@ -327,8 +323,6 @@ e.g. `(api|https://httpbin.org/get?test=a\\nb) Lorem (api.args.test)`
 `(list.cooldown)` - will return list of your cooldowns (keywords and !commands)
 
 `(list.ranks)` - list of your ranks
-
-`(list.ranks.follow)` - list of your ranks
 
 `(list.ranks.sub)` - list of your ranks
 

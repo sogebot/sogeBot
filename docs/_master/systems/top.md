@@ -22,12 +22,6 @@
 
 !> Default permission is **OWNER**
 
-## Top 10 by followage
-
-`!top followage`
-
-!> Default permission is **OWNER**
-
 ## Top 10 by subage
 
 `!top subage`

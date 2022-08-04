@@ -6,13 +6,12 @@ export type Currency = 'USD' | 'AUD' | 'BGN' | 'BRL' | 'CAD' | 'CHF' | 'CNY' | '
 
 export interface UserInterface {
   userId: string; userName: string; displayname?: string; profileImageUrl?: string;
-  isOnline?: boolean; isVIP?: boolean; isFollower?: boolean; isModerator?: boolean; isSubscriber?: boolean;
-  haveSubscriberLock?: boolean; haveFollowerLock?: boolean; haveSubscribedAtLock?: boolean; haveFollowedAtLock?: boolean; rank?: string; haveCustomRank?: boolean;
-  followedAt?: string | null; subscribedAt?: string | null; seenAt?: string | null; createdAt?: string | null;
+  isOnline?: boolean; isVIP?: boolean; isModerator?: boolean; isSubscriber?: boolean;
+  haveSubscriberLock?: boolean; haveSubscribedAtLock?: boolean; rank?: string; haveCustomRank?: boolean;
+  subscribedAt?: string | null; seenAt?: string | null; createdAt?: string | null;
   watchedTime?: number; chatTimeOnline?: number; chatTimeOffline?: number;
   points?: number; pointsOnlineGivenAt?: number; pointsOfflineGivenAt?: number; pointsByMessageGivenAt?: number;
   subscribeTier?: string; subscribeCumulativeMonths?: number; subscribeStreak?: number; giftedSubscribes?: number;
-  followCheckAt?: number;
   messages?: number;
   extra: {
     jackpotWins?: number;
@@ -54,22 +53,13 @@ export const User = new EntitySchema<Readonly<Required<UserInterface>>>({
     },
     isOnline:             { type: Boolean, default: false },
     isVIP:                { type: Boolean, default: false },
-    isFollower:           { type: Boolean, default: false },
     isModerator:          { type: Boolean, default: false },
     isSubscriber:         { type: Boolean, default: false },
     haveSubscriberLock:   { type: Boolean, default: false },
-    haveFollowerLock:     { type: Boolean, default: false },
     haveSubscribedAtLock: { type: Boolean, default: false },
-    haveFollowedAtLock:   { type: Boolean, default: false },
     rank:                 { type: String, default: '' },
     haveCustomRank:       { type: Boolean, default: false },
-    followedAt:           {
-      type: 'varchar', length: '2022-07-27T00:30:34.569259834Z'.length, nullable: true,
-    },
-    followCheckAt: {
-      type: 'bigint', default: 0, transformer: new ColumnNumericTransformer(),
-    },
-    subscribedAt: {
+    subscribedAt:         {
       type: 'varchar', length: '2022-07-27T00:30:34.569259834Z'.length, nullable: true,
     },
     seenAt: {

@@ -7,7 +7,7 @@ import {
   debug, error, warning,
 } from '../log';
 import {
-  isFollower, isOwner, isSubscriber, isVIP,
+  isOwner, isSubscriber, isVIP,
 } from '../user';
 import * as changelog from '../user/changelog.js';
 import { isBot } from '../user/isBot';

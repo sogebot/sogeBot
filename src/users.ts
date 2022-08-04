@@ -415,9 +415,6 @@ class Users extends Core {
           if (opts.filter.subscribers !== null) {
             query.andWhere('user.isSubscriber = :isSubscriber', { isSubscriber: opts.filter.subscribers });
           }
-          if (opts.filter.followers !== null) {
-            query.andWhere('user.isFollower = :isFollower', { isFollower: opts.filter.followers });
-          }
           if (opts.filter.vips !== null) {
             query.andWhere('user.isVIP = :isVIP', { isVIP: opts.filter.vips });
           }

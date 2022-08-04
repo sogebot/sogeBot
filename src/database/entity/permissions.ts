@@ -3,7 +3,7 @@ import { EntitySchema } from 'typeorm';
 export class PermissionFiltersInterface {
   id?: string;
   comparator: '<' | '>' | '==' | '<=' | '>=';
-  type: 'level' | 'ranks' | 'points' | 'watched' | 'tips' | 'bits' | 'messages' | 'subtier' | 'subcumulativemonths' | 'substreakmonths' | 'followtime';
+  type: 'level' | 'ranks' | 'points' | 'watched' | 'tips' | 'bits' | 'messages' | 'subtier' | 'subcumulativemonths' | 'substreakmonths';
   value: string;
   permission: PermissionsInterface;
 }

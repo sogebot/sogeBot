@@ -8,7 +8,6 @@ export interface QueueInterface {
   username: string;
   isModerator: boolean;
   isSubscriber: boolean;
-  isFollower: boolean;
   message: string | null;
 }
 
@@ -22,7 +21,6 @@ export const Queue = new EntitySchema<Readonly<Required<QueueInterface>>>({
     username:     { type: String },
     isModerator:  { type: Boolean },
     isSubscriber: { type: Boolean },
-    isFollower:   { type: Boolean },
     message:      { type: String, nullable: true },
   },
   indices: [

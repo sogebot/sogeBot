@@ -62,9 +62,6 @@ async function _filters(
         amount = tips.reduce((a, b) => (a + currency.exchange(b.amount, b.currency, mainCurrency.value)), 0);
         break;
       }
-      case 'followtime':
-        amount = (Date.now() - new Date(user.followedAt || Date.now()).getTime()) / (31 * 24 * 60 * 60 * 1000 /*months*/);
-        break;
       case 'watched':
         amount = user.watchedTime / (60 * 60 * 1000 /*hours*/);
     }

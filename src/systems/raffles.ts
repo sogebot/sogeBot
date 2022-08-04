@@ -33,10 +33,10 @@ const TYPE_TICKETS = 1;
 
 /*
  * !raffle                               - gets an info about raffle
- * !raffle open ![raffle-keyword] [-min #?] [-max #?] [-for followers,subscribers?]
+ * !raffle open ![raffle-keyword] [-min #?] [-max #?] [-for subscribers?]
  *                                       - open a new raffle with selected keyword,
  *                                       - -min # - minimal of tickets to join, -max # - max of tickets to join -> ticket raffle
- *                                       - -for followers,subscribers - who can join raffle, if empty -> everyone
+ *                                       - -for subscribers - who can join raffle, if empty -> everyone
  * !raffle remove                        - remove raffle without winner
  * !raffle pick                          - pick or repick a winner of raffle
  * ![raffle-keyword]                     - join a raffle
@@ -51,8 +51,6 @@ class Raffles extends System {
 
   @settings('luck')
     subscribersPercent = 150;
-  @settings('luck')
-    followersPercent = 120;
 
   @settings()
     raffleAnnounceInterval = 10;
@@ -169,9 +167,6 @@ class Raffles extends System {
     try {
       const raffle = await getRepository(Raffle).findOneOrFail({ where: { winner: null, isClosed: false }, relations: ['participants'] });
       const eligibility: string[] = [];
-      if (raffle.forFollowers === true) {
-        eligibility.push(prepare('raffles.eligibility-followers-item'));
-      }
       if (raffle.forSubscribers === true) {
         eligibility.push(prepare('raffles.eligibility-subscribers-item'));
       }
@@ -223,9 +218,6 @@ class Raffles extends System {
     }
 
     const eligibility: string[] = [];
-    if (raffle.forFollowers === true) {
-      eligibility.push(prepare('raffles.eligibility-followers-item'));
-    }
     if (raffle.forSubscribers === true) {
       eligibility.push(prepare('raffles.eligibility-subscribers-item'));
     }
@@ -265,7 +257,7 @@ class Raffles extends System {
   @command('!raffle open')
   @default_permission(defaultPermissions.CASTERS)
   async open (opts: CommandOptions): Promise<CommandResponse[]> {
-    const [followers, subscribers] = [opts.parameters.indexOf('followers') >= 0, opts.parameters.indexOf('subscribers') >= 0];
+    const [subscribers] = [opts.parameters.indexOf('subscribers') >= 0];
     let type = (opts.parameters.indexOf('-min') >= 0 || opts.parameters.indexOf('-max') >= 0) ? TYPE_TICKETS : TYPE_NORMAL;
     if (!points.enabled) {
       type = TYPE_NORMAL;
@@ -302,7 +294,6 @@ class Raffles extends System {
 
     await getRepository(Raffle).save({
       keyword:        keyword,
-      forFollowers:   followers,
       forSubscribers: subscribers,
       minTickets,
       maxTickets,
@@ -316,9 +307,6 @@ class Raffles extends System {
     announceNewEntriesTime = 0;
 
     const eligibility: string[] = [];
-    if (followers) {
-      eligibility.push(prepare('raffles.eligibility-followers-item'));
-    }
     if (subscribers) {
       eligibility.push(prepare('raffles.eligibility-subscribers-item'));
     }
@@ -358,9 +346,6 @@ class Raffles extends System {
     }
 
     const eligibility: string[] = [];
-    if (raffle.forFollowers === true) {
-      eligibility.push(prepare('raffles.eligibility-followers-item'));
-    }
     if (raffle.forSubscribers === true) {
       eligibility.push(prepare('raffles.eligibility-subscribers-item'));
     }
@@ -456,15 +441,10 @@ class Raffles extends System {
       username:     opts.sender.userName,
       tickets:      raffle.type === TYPE_NORMAL ? 1 : newTickets,
       messages:     [],
-      isFollower:   user.isFollower,
       isSubscriber: user.isSubscriber,
     };
 
-    if (raffle.forFollowers && raffle.forSubscribers && selectedParticipant.isEligible) {
-      selectedParticipant.isEligible = user.isFollower || user.isSubscriber;
-    } else if (raffle.forFollowers && selectedParticipant.isEligible) {
-      selectedParticipant.isEligible = user.isFollower;
-    } else if (raffle.forSubscribers && selectedParticipant.isEligible) {
+    if (raffle.forSubscribers && selectedParticipant.isEligible) {
       selectedParticipant.isEligible = user.isSubscriber;
     }
 
@@ -517,14 +497,10 @@ class Raffles extends System {
     }
 
     let _total = 0;
-    const [fLuck, sLuck] = await Promise.all([this.followersPercent, this.subscribersPercent]);
+    const [sLuck] = await Promise.all([this.subscribersPercent]);
     for (const participant of raffle.participants.filter((o) => o.isEligible)) {
-      if (participant.isFollower || participant.isSubscriber) {
-        if (participant.isSubscriber) {
-          _total = _total + ((participant.tickets / 100) * sLuck);
-        } else if (participant.isFollower) {
-          _total = _total + ((participant.tickets / 100) * fLuck);
-        }
+      if (participant.isSubscriber) {
+        _total = _total + ((participant.tickets / 100) * sLuck);
       } else {
         _total = _total + participant.tickets;
       }
@@ -537,8 +513,6 @@ class Raffles extends System {
 
       if (participant.isSubscriber) {
         tickets = ((participant.tickets / 100) * sLuck);
-      } else if (participant.isFollower) {
-        tickets = ((participant.tickets / 100) * fLuck);
       }
 
       winNumber = winNumber - tickets;
@@ -553,9 +527,7 @@ class Raffles extends System {
       tickets = winner.tickets;
       if (winner.isSubscriber) {
         tickets = ((winner.tickets / 100) * sLuck);
-      } else if (winner.isFollower) {
-        tickets = ((winner.tickets / 100) * fLuck);
-      }
+      } 
     }
 
     const probability = (tickets / _total * 100);

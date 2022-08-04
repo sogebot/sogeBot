@@ -461,16 +461,6 @@ class Twitch extends Service {
       .orderBy('events.timestamp', 'DESC')
       .where('events.event = :event', { event: 'follow' })
       .getMany();
-    await changelog.flush();
-    const onlineFollowers = (await getRepository(User).createQueryBuilder('user')
-      .where('user.userName != :botusername', { botusername: this.botUsername.toLowerCase() })
-      .andWhere('user.userName != :broadcasterusername', { broadcasterusername: this.broadcasterUsername.toLowerCase() })
-      .andWhere('user.isFollower = :isFollower', { isFollower: true })
-      .andWhere('user.isOnline = :isOnline', { isOnline: true })
-      .getMany())
-      .filter(o => {
-        return !isIgnored({ userName: o.userName, userId: o.userId });
-      });
 
     let lastFollowAgo = '';
     let lastFollowUsername = 'n/a';
@@ -480,9 +470,8 @@ class Twitch extends Service {
     }
 
     const response = prepare('followers', {
-      lastFollowAgo:        lastFollowAgo,
-      lastFollowUsername:   lastFollowUsername,
-      onlineFollowersCount: onlineFollowers.length,
+      lastFollowAgo:      lastFollowAgo,
+      lastFollowUsername: lastFollowUsername,
     });
     return [ { response, ...opts }];
   }

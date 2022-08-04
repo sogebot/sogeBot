@@ -159,11 +159,6 @@ const list: ResponseFilter = {
           return `${o.rank} (${o.value}h)`;
         }).join(', ');
         return listOutput.length > 0 ? listOutput : ' ';
-      case 'ranks.follow':
-        listOutput = _.orderBy(ranks.filter((o: { type: string; }) => o.type === 'follower'), 'value', 'asc').map((o) => {
-          return `${o.rank} (${o.value} ${getLocalizedName(o.value, translate('core.months'))})`;
-        }).join(', ');
-        return listOutput.length > 0 ? listOutput : ' ';
       case 'ranks.sub':
         listOutput = _.orderBy(ranks.filter((o: { type: string; }) => o.type === 'subscriber'), 'value', 'asc').map((o) => {
           return `${o.rank} (${o.value} ${getLocalizedName(o.value, translate('core.months'))})`;
