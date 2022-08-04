@@ -1,0 +1,7 @@
+{
+  "alias": "Alias",
+  "command": "Command",
+  "price": "Price (points)",
+  "priceBits": "Price (bits)",
+  "thisvalue": "This value"
+}
