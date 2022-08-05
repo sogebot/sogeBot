@@ -24,7 +24,6 @@ import { defaultPermissions, getUserHighestPermission } from '~/helpers/permissi
 import { adminEndpoint, viewerEndpoint } from '~/helpers/socket';
 import * as changelog from '~/helpers/user/changelog.js';
 import { getIdFromTwitch } from '~/services/twitch/calls/getIdFromTwitch';
-import { variables } from '~/watchers';
 
 class Users extends Core {
   constructor () {
