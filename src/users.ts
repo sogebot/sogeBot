@@ -463,20 +463,6 @@ class Users extends Core {
         cb(e.stack, [], 0, null);
       }
     });
-    adminEndpoint('/core/users', 'viewers::followedAt', async (id, cb) => {
-      try {
-        const clientBot = await client('bot');
-        const broadcasterId = variables.get('services.twitch.broadcasterId') as string;
-        const getFollows = await clientBot.users.getFollows({ followedUser: broadcasterId, user: id });
-        if (getFollows.total === 0) {
-          throw new Error('Not a follower');
-        } else {
-          cb(null, new Date(getFollows.data[0].followDate).toISOString());
-        }
-      } catch (e: any) {
-        cb(e.stack, null);
-      }
-    });
     viewerEndpoint('/core/users', 'viewers::findOne', async (userId, cb) => {
       try {
         const viewer = await changelog.get(userId);
