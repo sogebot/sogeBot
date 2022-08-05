@@ -22,7 +22,7 @@ import {
 import { linesParsed } from '../parser';
 import * as changelog from '../user/changelog.js';
 import { isModerator } from '../user/isModerator';
-import { getRandomFollower, getRandomOnlineFollower, getRandomOnlineSubscriber, getRandomOnlineViewer, getRandomSubscriber, getRandomViewer } from '../user/random.js';
+import { getRandomOnlineSubscriber, getRandomOnlineViewer, getRandomSubscriber, getRandomViewer } from '../user/random.js';
 import { getAll } from './getAll';
 
 async function runScript (script: string, opts: { sender: { userId: string; userName: string; source: 'twitch' | 'discord' } | string | null, isUI: boolean; param?: string | number, _current: any, parameters?: { [x: string]: any }, variables?: { [x: string]: any } }) {
@@ -120,10 +120,8 @@ async function runScript (script: string, opts: { sender: { userId: string; user
     parameters:             opts.parameters,
     variables:              opts.variables,
     _current:               opts._current,
-    randomOnlineFollower:   async () => getRandomOnlineFollower(),
     randomOnlineSubscriber: async () => getRandomOnlineSubscriber(),
     randomOnlineViewer:     async () => getRandomOnlineViewer(),
-    randomFollower:         async () => getRandomFollower(),
     randomSubscriber:       async () => getRandomSubscriber(),
     randomViewer:           async () => getRandomViewer(),
     user:                   async (userName: string) => {
@@ -136,7 +134,6 @@ async function runScript (script: string, opts: { sender: { userId: string; user
           displayname: _user.displayname,
           is:          {
             online:     _user.isOnline ?? false,
-            follower:   get(_user, 'is.follower', false),
             vip:        get(_user, 'is.vip', false),
             subscriber: get(_user, 'is.subscriber', false),
             mod:        isModerator(_user),
@@ -164,7 +161,6 @@ async function runScript (script: string, opts: { sender: { userId: string; user
               displayname: getUserByName.displayName,
               is:          {
                 online:     false,
-                follower:   false,
                 vip:        false,
                 subscriber: false,
                 mod:        false,

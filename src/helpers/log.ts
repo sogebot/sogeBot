@@ -65,7 +65,6 @@ enum Levels {
   host,
   raid,
   follow,
-  unfollow,
   cheer,
   tip,
   sub,
@@ -99,7 +98,6 @@ const levelFormat = {
   host:             '+host',
   raid:             '+raid',
   redeem:           '+++ redeem:',
-  unfollow:         '-follow',
   cheer:            '+cheer',
   tip:              '+tip',
   sub:              '+sub',
@@ -212,9 +210,6 @@ export function host(message: any) {
   log(message);
 }
 export function raid(message: any) {
-  log(message);
-}
-export function unfollow(message: any) {
   log(message);
 }
 export function cheer(message: any) {

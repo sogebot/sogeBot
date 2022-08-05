@@ -85,23 +85,22 @@ class Events extends Core {
       { id: 'hypetrain-started', variables: [ ] },
       { id: 'hypetrain-ended', variables: [ 'level', 'total', 'goal', 'topContributionsBitsUserId', 'topContributionsBitsUsername', 'topContributionsBitsTotal', 'topContributionsSubsUserId', 'topContributionsSubsUsername', 'topContributionsSubsTotal', 'lastContributionType', 'lastContributionUserId', 'lastContributionUsername', 'lastContributionTotal' ] },
       { id: 'hypetrain-level-reached', variables: [ 'level', 'total', 'goal', 'topContributionsBitsUserId', 'topContributionsBitsUsername', 'topContributionsBitsTotal', 'topContributionsSubsUserId', 'topContributionsSubsUsername', 'topContributionsSubsTotal', 'lastContributionType', 'lastContributionUserId', 'lastContributionUsername', 'lastContributionTotal' ] },
-      { id: 'user-joined-channel', variables: [ 'username', 'is.moderator', 'is.subscriber', 'is.vip', 'is.follower', 'is.broadcaster', 'is.bot', 'is.owner' ] },
-      { id: 'user-parted-channel', variables: [ 'username', 'is.moderator', 'is.subscriber', 'is.vip', 'is.follower', 'is.broadcaster', 'is.bot', 'is.owner' ] },
-      { id: 'follow', variables: [ 'username', 'is.moderator', 'is.subscriber', 'is.vip', 'is.follower', 'is.broadcaster', 'is.bot', 'is.owner' ] },
-      { id: 'unfollow', variables: [ 'username', 'is.moderator', 'is.subscriber', 'is.vip', 'is.follower', 'is.broadcaster', 'is.bot', 'is.owner' ] },
-      { id: 'subscription', variables: [ 'username', 'is.moderator', 'is.subscriber', 'is.vip', 'is.follower', 'is.broadcaster', 'is.bot', 'is.owner', 'method', 'subCumulativeMonths', 'tier' ] },
-      { id: 'subgift', variables: [ 'username', 'is.moderator', 'is.subscriber', 'is.vip', 'is.follower', 'is.broadcaster', 'is.bot', 'is.owner', 'recipient', 'recipientis.moderator', 'recipientis.subscriber', 'recipientis.vip', 'recipientis.follower', 'recipientis.broadcaster', 'recipientis.bot', 'recipientis.owner', 'tier' ] },
+      { id: 'user-joined-channel', variables: [ 'username', 'is.moderator', 'is.subscriber', 'is.vip', 'is.broadcaster', 'is.bot', 'is.owner' ] },
+      { id: 'user-parted-channel', variables: [ 'username', 'is.moderator', 'is.subscriber', 'is.vip', 'is.broadcaster', 'is.bot', 'is.owner' ] },
+      { id: 'follow', variables: [ 'username', 'is.moderator', 'is.subscriber', 'is.vip', 'is.broadcaster', 'is.bot', 'is.owner' ] },
+      { id: 'subscription', variables: [ 'username', 'is.moderator', 'is.subscriber', 'is.vip', 'is.broadcaster', 'is.bot', 'is.owner', 'method', 'subCumulativeMonths', 'tier' ] },
+      { id: 'subgift', variables: [ 'username', 'is.moderator', 'is.subscriber', 'is.vip', 'is.broadcaster', 'is.bot', 'is.owner', 'recipient', 'recipientis.moderator', 'recipientis.subscriber', 'recipientis.vip', 'recipientis.broadcaster', 'recipientis.bot', 'recipientis.owner', 'tier' ] },
       { id: 'subcommunitygift', variables: [ 'username', 'count' ] },
-      { id: 'resub', variables: [ 'username', 'is.moderator', 'is.subscriber', 'is.vip', 'is.follower', 'is.broadcaster', 'is.bot', 'is.owner', 'subStreakShareEnabled', 'subStreak', 'subStreakName', 'subCumulativeMonths', 'subCumulativeMonthsName', 'tier' ] },
+      { id: 'resub', variables: [ 'username', 'is.moderator', 'is.subscriber', 'is.vip', 'is.broadcaster', 'is.bot', 'is.owner', 'subStreakShareEnabled', 'subStreak', 'subStreakName', 'subCumulativeMonths', 'subCumulativeMonthsName', 'tier' ] },
       { id: 'tip', variables: [ 'username', 'amount', 'currency', 'message', 'amountInBotCurrency', 'currencyInBot' ] },
       {
-        id:          'command-send-x-times', variables:   [ 'username', 'is.moderator', 'is.subscriber', 'is.vip', 'is.follower', 'is.broadcaster', 'is.bot', 'is.owner', 'command', 'count', 'source' ], definitions: {
+        id:          'command-send-x-times', variables:   [ 'username', 'is.moderator', 'is.subscriber', 'is.vip', 'is.broadcaster', 'is.bot', 'is.owner', 'command', 'count', 'source' ], definitions: {
           fadeOutXCommands: 0, fadeOutInterval: 0, runEveryXCommands: 10, commandToWatch: '', runInterval: 0,
         }, check: this.checkCommandSendXTimes,
       }, // runInterval 0 or null - disabled; > 0 every x seconds
-      { id: 'chatter-first-message', variables: [ 'username', 'is.moderator', 'is.subscriber', 'is.vip', 'is.follower', 'is.broadcaster', 'is.bot', 'is.owner', 'source' ] },
+      { id: 'chatter-first-message', variables: [ 'username', 'is.moderator', 'is.subscriber', 'is.vip', 'is.broadcaster', 'is.bot', 'is.owner', 'source' ] },
       {
-        id:          'keyword-send-x-times', variables:   [ 'username', 'is.moderator', 'is.subscriber', 'is.vip', 'is.follower', 'is.broadcaster', 'is.bot', 'is.owner', 'command', 'count', 'source' ], definitions: {
+        id:          'keyword-send-x-times', variables:   [ 'username', 'is.moderator', 'is.subscriber', 'is.vip', 'is.broadcaster', 'is.bot', 'is.owner', 'command', 'count', 'source' ], definitions: {
           fadeOutXKeywords: 0, fadeOutInterval: 0, runEveryXKeywords: 10, keywordToWatch: '', runInterval: 0, resetCountEachMessage: false,
         }, check: this.checkKeywordSendXTimes,
       }, // runInterval 0 or null - disabled; > 0 every x seconds
@@ -113,26 +112,26 @@ class Events extends Core {
       {
         id: 'stream-is-running-x-minutes', definitions: { runAfterXMinutes: 100 }, check: this.checkStreamIsRunningXMinutes,
       },
-      { id: 'cheer', variables: [ 'username', 'is.moderator', 'is.subscriber', 'is.vip', 'is.follower', 'is.broadcaster', 'is.bot', 'is.owner', 'bits', 'message' ] },
+      { id: 'cheer', variables: [ 'username', 'is.moderator', 'is.subscriber', 'is.vip', 'is.broadcaster', 'is.bot', 'is.owner', 'bits', 'message' ] },
       { id: 'clearchat' },
-      { id: 'action', variables: [ 'username', 'is.moderator', 'is.subscriber', 'is.vip', 'is.follower', 'is.broadcaster', 'is.bot', 'is.owner' ] },
-      { id: 'ban', variables: [ 'username', 'is.moderator', 'is.subscriber', 'is.vip', 'is.follower', 'is.broadcaster', 'is.bot', 'is.owner', 'reason' ] },
+      { id: 'action', variables: [ 'username', 'is.moderator', 'is.subscriber', 'is.vip', 'is.broadcaster', 'is.bot', 'is.owner' ] },
+      { id: 'ban', variables: [ 'username', 'is.moderator', 'is.subscriber', 'is.vip', 'is.broadcaster', 'is.bot', 'is.owner', 'reason' ] },
       { id: 'hosting', variables: [ 'target', 'hostViewers' ] },
       {
-        id: 'hosted', variables: [ 'username', 'is.moderator', 'is.subscriber', 'is.vip', 'is.follower', 'is.broadcaster', 'is.bot', 'is.owner', 'hostViewers' ], definitions: { viewersAtLeast: 1 }, check: this.checkHosted,
+        id: 'hosted', variables: [ 'username', 'is.moderator', 'is.subscriber', 'is.vip', 'is.broadcaster', 'is.bot', 'is.owner', 'hostViewers' ], definitions: { viewersAtLeast: 1 }, check: this.checkHosted,
       },
       {
-        id: 'raid', variables: [ 'username', 'is.moderator', 'is.subscriber', 'is.vip', 'is.follower', 'is.broadcaster', 'is.bot', 'is.owner', 'hostViewers' ], definitions: { viewersAtLeast: 1 }, check: this.checkRaid,
+        id: 'raid', variables: [ 'username', 'is.moderator', 'is.subscriber', 'is.vip', 'is.broadcaster', 'is.bot', 'is.owner', 'hostViewers' ], definitions: { viewersAtLeast: 1 }, check: this.checkRaid,
       },
-      { id: 'mod', variables: [ 'username', 'is.moderator', 'is.subscriber', 'is.vip', 'is.follower', 'is.broadcaster', 'is.bot', 'is.owner' ] },
+      { id: 'mod', variables: [ 'username', 'is.moderator', 'is.subscriber', 'is.vip', 'is.broadcaster', 'is.bot', 'is.owner' ] },
       { id: 'commercial', variables: [ 'duration' ] },
-      { id: 'timeout', variables: [ 'username', 'is.moderator', 'is.subscriber', 'is.vip', 'is.follower', 'is.broadcaster', 'is.bot', 'is.owner', 'duration' ] },
+      { id: 'timeout', variables: [ 'username', 'is.moderator', 'is.subscriber', 'is.vip', 'is.broadcaster', 'is.bot', 'is.owner', 'duration' ] },
       {
         id: 'every-x-minutes-of-stream', definitions: { runEveryXMinutes: 100 }, check: this.everyXMinutesOfStream,
       },
       { id: 'game-changed', variables: [ 'oldGame', 'game' ] },
       {
-        id: 'reward-redeemed', definitions: { rewardId: '' }, variables: [ 'username', 'is.moderator', 'is.subscriber', 'is.vip', 'is.follower', 'is.broadcaster', 'is.bot', 'is.owner', 'userInput' ], check: this.isCorrectReward,
+        id: 'reward-redeemed', definitions: { rewardId: '' }, variables: [ 'username', 'is.moderator', 'is.subscriber', 'is.vip', 'is.broadcaster', 'is.bot', 'is.owner', 'userInput' ], check: this.isCorrectReward,
       },
     ];
 
@@ -198,7 +197,6 @@ class Events extends Core {
       'game-changed',
       'follow',
       'cheer',
-      'unfollow',
       'user-joined-channel',
       'user-parted-channel',
       'subcommunitygift',
@@ -653,7 +651,6 @@ class Events extends Core {
         moderator:   get(attributes, 'is.moderator', false),
         subscriber:  get(attributes, 'is.subscriber', false),
         vip:         get(attributes, 'is.vip', false),
-        follower:    get(attributes, 'is.follower', false),
         broadcaster: get(attributes, 'is.broadcaster', false),
         bot:         get(attributes, 'is.bot', false),
         owner:       get(attributes, 'is.owner', false),

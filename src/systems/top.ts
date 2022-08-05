@@ -29,7 +29,6 @@ enum TYPE {
   TIPS = '1',
   POINTS = '2',
   MESSAGES = '3',
-  FOLLOWAGE = '4',
   SUBAGE = '5',
   BITS = '6',
   GIFTS = '7',
@@ -42,7 +41,6 @@ enum TYPE {
  * !top tips
  * !top points
  * !top messages
- * !top followage
  * !top subage
  * !top submonths
  * !top bits
@@ -75,13 +73,6 @@ class Top extends System {
   @default_permission(defaultPermissions.CASTERS)
   async messages(opts: CommandOptions) {
     opts.parameters = TYPE.MESSAGES;
-    return this.showTop(opts);
-  }
-
-  @command('!top followage')
-  @default_permission(defaultPermissions.CASTERS)
-  async followage(opts: CommandOptions) {
-    opts.parameters = TYPE.FOLLOWAGE;
     return this.showTop(opts);
   }
 
@@ -230,22 +221,6 @@ class Top extends System {
             });
         message = translate('systems.top.messages').replace(/\$amount/g, 10);
         break;
-      case TYPE.FOLLOWAGE:
-        sorted
-          = (await getRepository(User).createQueryBuilder('user')
-            .where('user.userName != :botusername', { botusername: botUsername.toLowerCase() })
-            .andWhere('user.userName != :broadcasterusername', { broadcasterusername: broadcasterUsername.toLowerCase() })
-            .andWhere('user.isFollower = :isFollower', { isFollower: true })
-            .andWhere('user.followedAt IS NOT NULL')
-            .orderBy('user.followedAt', 'ASC')
-            .limit(_total)
-            .getMany())
-            .filter(o => !isIgnored({ userName: o.userName, userId: o.userId }))
-            .map(o => {
-              return { userName: o.userName, value: o.followedAt as string };
-            });
-        message = translate('systems.top.followage').replace(/\$amount/g, 10);
-        break;
       case TYPE.SUBAGE:
         sorted
           = (await getRepository(User).createQueryBuilder('user')
@@ -335,7 +310,6 @@ class Top extends System {
           case TYPE.LEVEL:
             message += String(user.value);
             break;
-          case TYPE.FOLLOWAGE:
           case TYPE.SUBAGE:
             message += `${dayjs.utc(user.value).format('L')} (${dayjs.utc(user.value).fromNow()})`;
             break;

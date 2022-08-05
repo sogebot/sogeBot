@@ -10,7 +10,6 @@ export interface RaffleInterface {
   minTickets?: number;
   maxTickets?: number;
   type: number;
-  forFollowers: boolean;
   forSubscribers: boolean;
   isClosed?: boolean;
   participants: RaffleParticipantInterface[];
@@ -22,7 +21,6 @@ export interface RaffleParticipantInterface {
   username: string;
   tickets: number;
   isEligible: boolean;
-  isFollower: boolean;
   isSubscriber: boolean;
   messages: RaffleParticipantMessageInterface[];
 }
@@ -52,7 +50,6 @@ export const Raffle = new EntitySchema<Readonly<Required<RaffleInterface>>>({
       type: 'bigint', transformer: new ColumnNumericTransformer(), default: 0,
     },
     type:           { type: Number },
-    forFollowers:   { type: Boolean },
     forSubscribers: { type: Boolean },
     isClosed:       { type: Boolean, default: false },
   },
@@ -79,7 +76,6 @@ export const RaffleParticipant = new EntitySchema<Readonly<Required<RafflePartic
     username:     { type: String },
     tickets:      { type: Number },
     isEligible:   { type: Boolean },
-    isFollower:   { type: Boolean },
     isSubscriber: { type: Boolean },
   },
   relations: {

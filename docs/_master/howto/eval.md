@@ -3,7 +3,7 @@ These `eval` snippets are working with custom commands responses
 #### Available eval variables
 **_**: lodash - see https://lodash.com/docs/
 
-**is**: sender informations - is.subscriber, is.follower, is.mod, is.online
+**is**: sender informations - is.subscriber, is.mod, is.online
 
 **random**: same values as random filter - random.viewer, random.online.viewer....if no user is selected -> null
 

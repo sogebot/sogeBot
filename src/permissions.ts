@@ -252,21 +252,6 @@ class Permissions extends Core {
       addedCount++;
     }
 
-    if (!p.find((o) => o.isCorePermission && o.automation === 'followers')) {
-      await getRepository(PermissionsEntity).insert({
-        id:                 defaultPermissions.FOLLOWERS,
-        name:               'Followers',
-        automation:         'followers',
-        isCorePermission:   true,
-        isWaterfallAllowed: true,
-        order:              p.length + addedCount,
-        userIds:            [],
-        excludeUserIds:     [],
-        filters:            [],
-      });
-      addedCount++;
-    }
-
     if (!p.find((o) => o.isCorePermission && o.automation === 'viewers')) {
       await getRepository(PermissionsEntity).insert({
         id:                 defaultPermissions.VIEWERS,

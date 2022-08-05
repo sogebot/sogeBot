@@ -2,7 +2,6 @@
 
 import { Rank, RankInterface } from '@entity/rank';
 import { User, UserInterface } from '@entity/user';
-import { dayjs } from '@sogebot/ui-helpers/dayjsHelper';
 import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized';
 import * as _ from 'lodash';
 import { getRepository } from 'typeorm';
@@ -23,13 +22,10 @@ import { translate } from '~/translate';
  * !rank add-flw <months> <rank>  - add <rank> for selected <hours>
  * !rank add-sub <months> <rank>  - add <rank> for selected <hours>
  * !rank rm <hours>               - remove rank for selected <hours>
- * !rank rm-flw <months>          - remove rank for selected <months> of followers
  * !rank rm-sub <months>          - remove rank for selected <months> of subscribers
  * !rank list                     - show rank list
- * !rank list-flw                 - show rank list for followers
  * !rank list-sub                 - show rank list for subcribers
  * !rank edit <hours> <rank>      - edit rank
- * !rank edit-flw <months> <rank> - edit rank for followers
  * !rank edit-sub <months> <rank> - edit rank for subcribers
  * !rank set <username> <rank>    - set custom <rank> for <username>
  * !rank unset <username>         - unset custom rank for <username>
@@ -104,12 +100,6 @@ class Ranks extends System {
     return [{ response, ...opts }];
   }
 
-  @command('!rank add-flw')
-  @default_permission(defaultPermissions.CASTERS)
-  async addflw (opts: CommandOptions): Promise<CommandResponse[]> {
-    return this.add(opts, 'follower');
-  }
-
   @command('!rank add-sub')
   @default_permission(defaultPermissions.CASTERS)
   async addsub (opts: CommandOptions): Promise<CommandResponse[]> {
@@ -144,12 +134,6 @@ class Ranks extends System {
         hlocale: getLocalizedName(value, translate(type === 'viewer' ? 'core.hours' : 'core.months')),
       });
     return [{ response, ...opts }];
-  }
-
-  @command('!rank edit-flw')
-  @default_permission(defaultPermissions.CASTERS)
-  async editflw (opts: CommandOptions) {
-    return this.edit(opts, 'follower');
   }
 
   @command('!rank edit-sub')
@@ -211,12 +195,6 @@ class Ranks extends System {
     return [{ response, ...opts }];
   }
 
-  @command('!rank list-flw')
-  @default_permission(defaultPermissions.CASTERS)
-  async listflw (opts: CommandOptions) {
-    return this.list(opts, 'follower');
-  }
-
   @command('!rank list-sub')
   @default_permission(defaultPermissions.CASTERS)
   async listsub (opts: CommandOptions) {
@@ -244,12 +222,6 @@ class Ranks extends System {
     return [{ response, ...opts }];
   }
 
-  @command('!rank rm-flw')
-  @default_permission(defaultPermissions.CASTERS)
-  async rmflw (opts: CommandOptions) {
-    return this.rm(opts, 'follower');
-  }
-
   @command('!rank rm-sub')
   @default_permission(defaultPermissions.CASTERS)
   async rmsub (opts: CommandOptions) {
@@ -274,14 +246,6 @@ class Ranks extends System {
         const toWatch = (toNextRank - toNextRankWatched);
         const percentage = 100 - (((toWatch) / toNextRank) * 100);
         const response = prepare('ranks.show-rank-with-next-rank', { rank: rank.current.rank, nextrank: `${rank.next.rank} ${percentage.toFixed(1)}% (${toWatch.toFixed(1)} ${getLocalizedName(toWatch.toFixed(1), translate('core.hours'))})` });
-        return [{ response, ...opts }];
-      }
-      if (rank.next.type === 'follower') {
-        const toNextRank = rank.next.value - (rank.current.type === 'follower' ? rank.current.value : 0);
-        const toNextRankFollow = dayjs(Date.now()).diff(dayjs(user?.followedAt || 0), 'month', true);
-        const toWatch = (toNextRank - toNextRankFollow);
-        const percentage = 100 - (((toWatch) / toNextRank) * 100);
-        const response = prepare('ranks.show-rank-with-next-rank', { rank: rank.current.rank, nextrank: `${rank.next.rank} ${percentage.toFixed(1)}% (${toWatch.toFixed(1)} ${getLocalizedName(toWatch.toFixed(1), translate('core.months'))})` });
         return [{ response, ...opts }];
       }
       if (rank.next.type === 'subscriber') {
@@ -311,7 +275,7 @@ class Ranks extends System {
 
     let rankToReturn: null | Required<RankInterface> = null;
     let subNextRank: null | Required<RankInterface> = null;
-    let flwNextRank: null | Required<RankInterface> = null;
+    const flwNextRank: null | Required<RankInterface> = null;
     let nextRank: null | Required<RankInterface> = null;
 
     if (user.isSubscriber) {
@@ -328,24 +292,6 @@ class Ranks extends System {
 
       if (rankToReturn) {
         return { current: rankToReturn, next: subNextRank };
-      }
-    }
-
-    if (user.isFollower) {
-      // search for follower rank
-      const flwRank = ranks.filter(o => o.type === 'follower');
-      for (const rank of flwRank) {
-        const followedAtDiff = dayjs(Date.now()).diff(dayjs(user.followedAt), 'month', true);
-        if (followedAtDiff >= rank.value) {
-          rankToReturn = rank;
-          break;
-        } else {
-          flwNextRank = rank;
-        }
-      }
-
-      if (rankToReturn) {
-        return { current: rankToReturn, next: subNextRank || flwNextRank };
       }
     }
 

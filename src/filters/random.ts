@@ -27,24 +27,6 @@ const random: ResponseFilter = {
     }
     return sample(viewers.map(o => o.userName ));
   },
-  '(random.online.follower)': async function () {
-    await changelog.flush();
-    const botUsername = variables.get('services.twitch.botUsername') as string;
-    const broadcasterUsername = variables.get('services.twitch.broadcasterUsername') as string;
-    const followers = (await getRepository(User).createQueryBuilder('user')
-      .where('user.userName != :botusername', { botusername: botUsername.toLowerCase() })
-      .andWhere('user.userName != :broadcasterusername', { broadcasterusername: broadcasterUsername.toLowerCase() })
-      .andWhere('user.isFollower = :isFollower', { isFollower: true })
-      .andWhere('user.isOnline = :isOnline', { isOnline: true })
-      .cache(true)
-      .getMany()).filter(o => {
-      return !isIgnored({ userName: o.userName, userId: o.userId });
-    });
-    if (followers.length === 0) {
-      return 'unknown';
-    }
-    return sample(followers.map(o => o.userName ));
-  },
   '(random.online.subscriber)': async function () {
     await changelog.flush();
     const botUsername = variables.get('services.twitch.botUsername') as string;
@@ -78,23 +60,6 @@ const random: ResponseFilter = {
       return 'unknown';
     }
     return sample(viewers.map(o => o.userName ));
-  },
-  '(random.follower)': async function () {
-    await changelog.flush();
-    const botUsername = variables.get('services.twitch.botUsername') as string;
-    const broadcasterUsername = variables.get('services.twitch.broadcasterUsername') as string;
-    const followers = (await getRepository(User).createQueryBuilder('user')
-      .where('user.userName != :botusername', { botusername: botUsername.toLowerCase() })
-      .andWhere('user.userName != :broadcasterusername', { broadcasterusername: broadcasterUsername.toLowerCase() })
-      .andWhere('user.isFollower = :isFollower', { isFollower: true })
-      .cache(true)
-      .getMany()).filter(o => {
-      return !isIgnored({ userName: o.userName, userId: o.userId });
-    });
-    if (followers.length === 0) {
-      return 'unknown';
-    }
-    return sample(followers.map(o => o.userName ));
   },
   '(random.subscriber)': async function () {
     await changelog.flush();

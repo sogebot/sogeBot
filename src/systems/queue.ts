@@ -30,8 +30,6 @@ class Queue extends System {
   @settings('eligibility')
     eligibilityAll = true;
   @settings('eligibility')
-    eligibilityFollowers = true;
-  @settings('eligibility')
     eligibilitySubscribers = true;
 
   pickedUsers: QueueInterface[] = [];
@@ -118,9 +116,8 @@ class Queue extends System {
     const toReturn: QueueInterface[] = [];
     let i = 0;
     for (const user of users) {
-      const isNotFollowerEligible = !user.isFollower && (this.eligibilityFollowers);
       const isNotSubscriberEligible = !user.isSubscriber && (this.eligibilitySubscribers);
-      if (isNotFollowerEligible && isNotSubscriberEligible) {
+      if (isNotSubscriberEligible) {
         continue;
       }
 
@@ -162,18 +159,14 @@ class Queue extends System {
         changelog.update(opts.sender.userId, { userName: opts.sender.userName });
         return this.join(opts);
       }
-      const [all, followers, subscribers] = await Promise.all([this.eligibilityAll, this.eligibilityFollowers, this.eligibilitySubscribers]);
+      const [all, subscribers] = await Promise.all([this.eligibilityAll, this.eligibilitySubscribers]);
 
       // get message
       const message = opts.parameters.length > 0 ? opts.parameters : null;
 
       let eligible = false;
       if (!all) {
-        if ((followers && subscribers) && (user.isFollower || user.isSubscriber)) {
-          eligible = true;
-        } else if (followers && user.isFollower) {
-          eligible = true;
-        } else if (subscribers && user.isSubscriber) {
+        if (subscribers && user.isSubscriber) {
           eligible = true;
         }
       } else {
@@ -184,7 +177,6 @@ class Queue extends System {
         await getRepository(QueueEntity).save({
           ...(await getRepository(QueueEntity).findOne({ username: opts.sender.userName })),
           username:     opts.sender.userName,
-          isFollower:   user.isFollower,
           isSubscriber: user.isSubscriber,
           isModerator:  user.isModerator,
           createdAt:    Date.now(),

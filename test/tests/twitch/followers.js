@@ -1,5 +1,3 @@
-/* global describe it before */
-
 const assert = require('assert');
 
 const { getRepository } = require('typeorm');
@@ -25,7 +23,7 @@ describe('lib/twitch - followers() - @func1', () => {
   it('Set user.viewer, user.viewer2, user.viewer3 as followers', async () => {
     for (const u of [user.viewer, user.viewer2, user.viewer3]) {
       await getRepository(User).save({
-        userId: u.userId, userName: u.userName, isFollower: true,
+        userId: u.userId, userName: u.userName,
       });
     }
   });
@@ -49,9 +47,8 @@ describe('lib/twitch - followers() - @func1', () => {
   it('!followers should return user.viewer2', async () => {
     const r = await twitch.followers({ sender: user.viewer });
     assert.strictEqual(r[0].response, prepare('followers', {
-      lastFollowAgo:        'a few seconds ago',
-      lastFollowUsername:   user.viewer2.userName,
-      onlineFollowersCount: 0,
+      lastFollowAgo:      'a few seconds ago',
+      lastFollowUsername: user.viewer2.userName,
     }));
   });
 
@@ -66,22 +63,8 @@ describe('lib/twitch - followers() - @func1', () => {
   it('!followers should return user.viewer3', async () => {
     const r = await twitch.followers({ sender: user.viewer });
     assert.strictEqual(r[0].response, prepare('followers', {
-      lastFollowAgo:        'a few seconds ago',
-      lastFollowUsername:   user.viewer3.userName,
-      onlineFollowersCount: 0,
-    }));
-  });
-
-  it('Add user.viewer, user.viewer2, user.viewer3 to online users', async () => {
-    await getRepository(User).update({}, { isOnline: true });
-  });
-
-  it('!followers should return user.viewer3 and 3 online followers', async () => {
-    const r = await twitch.followers({ sender: user.viewer });
-    assert.strictEqual(r[0].response, prepare('followers', {
-      lastFollowAgo:        'a few seconds ago',
-      lastFollowUsername:   user.viewer3.userName,
-      onlineFollowersCount: 3,
+      lastFollowAgo:      'a few seconds ago',
+      lastFollowUsername: user.viewer3.userName,
     }));
   });
 });

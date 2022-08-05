@@ -25,19 +25,6 @@ async function getRandomViewer() {
     .getOne();
 }
 
-async function getRandomFollower() {
-  await changelog.flush();
-  const botUsername = variables.get('services.twitch.botUsername') as string;
-  const broadcasterUsername = variables.get('services.twitch.broadcasterUsername') as string;
-  return getRepository(User).createQueryBuilder('user')
-    .where('user.userName != :botusername', { botusername: botUsername.toLowerCase() })
-    .andWhere('user.userName != :broadcasterusername', { broadcasterusername: broadcasterUsername.toLowerCase() })
-    .andWhere('user.isFollower = :isFollower', { isFollower: true })
-    .orderBy(await getRandOrder())
-    .limit(1)
-    .getOne();
-}
-
 async function getRandomSubscriber() {
   await changelog.flush();
   const botUsername = variables.get('services.twitch.botUsername') as string;
@@ -64,20 +51,6 @@ async function getRandomOnlineViewer() {
     .getOne();
 }
 
-async function getRandomOnlineFollower() {
-  await changelog.flush();
-  const botUsername = variables.get('services.twitch.botUsername') as string;
-  const broadcasterUsername = variables.get('services.twitch.broadcasterUsername') as string;
-  return getRepository(User).createQueryBuilder('user')
-    .where('user.userName != :botusername', { botusername: botUsername.toLowerCase() })
-    .andWhere('user.userName != :broadcasterusername', { broadcasterusername: broadcasterUsername.toLowerCase() })
-    .andWhere('user.isOnline = :isOnline', { isOnline: true })
-    .andWhere('user.isFollower = :isFollower', { isFollower: true })
-    .orderBy(await getRandOrder())
-    .limit(1)
-    .getOne();
-}
-
 async function getRandomOnlineSubscriber() {
   await changelog.flush();
   const botUsername = variables.get('services.twitch.botUsername') as string;
@@ -93,7 +66,6 @@ async function getRandomOnlineSubscriber() {
 }
 
 export {
-  getRandomFollower, getRandomOnlineFollower,
   getRandomViewer, getRandomOnlineViewer,
   getRandomSubscriber, getRandomOnlineSubscriber,
 };

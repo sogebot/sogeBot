@@ -3,7 +3,7 @@ import { EntitySchema } from 'typeorm';
 export class PermissionFiltersInterface {
   id?: string;
   comparator: '<' | '>' | '==' | '<=' | '>=';
-  type: 'level' | 'ranks' | 'points' | 'watched' | 'tips' | 'bits' | 'messages' | 'subtier' | 'subcumulativemonths' | 'substreakmonths' | 'followtime';
+  type: 'level' | 'ranks' | 'points' | 'watched' | 'tips' | 'bits' | 'messages' | 'subtier' | 'subcumulativemonths' | 'substreakmonths';
   value: string;
   permission: PermissionsInterface;
 }
@@ -14,7 +14,7 @@ export class PermissionsInterface {
   order: number;
   isCorePermission: boolean;
   isWaterfallAllowed: boolean;
-  automation: 'none' | 'casters' | 'moderators' | 'subscribers' | 'viewers' | 'followers' | 'vip';
+  automation: 'none' | 'casters' | 'moderators' | 'subscribers' | 'viewers' | 'vip';
   userIds: string[];
   excludeUserIds: string[];
   filters: PermissionFiltersInterface[];

@@ -7,7 +7,7 @@ import {
   debug, error, warning,
 } from '../log';
 import {
-  isFollower, isOwner, isSubscriber, isVIP,
+  isOwner, isSubscriber, isVIP,
 } from '../user';
 import * as changelog from '../user/changelog.js';
 import { isBot } from '../user/isBot';
@@ -100,9 +100,6 @@ async function check(userId: string, permId: string, partial = false): Promise<c
         break;
       case 'vip':
         shouldProceed = isVIP(user);
-        break;
-      case 'followers':
-        shouldProceed = isFollower(user);
         break;
       default:
         shouldProceed = false; // we don't have any automation

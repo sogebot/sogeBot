@@ -1,5 +1,3 @@
-/* global describe it before */
-
 require('../../general.js');
 
 const assert = require('assert');
@@ -20,6 +18,7 @@ const testuser = { userName: 'testuser', userId: String(_.random(999999, false))
 const testuser2 = { userName: 'testuser2', userId: String(_.random(999999, false)) };
 
 describe('Raffles - pick() - @func2', () => {
+  let user1, user2;
   before(async () => {
     await db.cleanup();
     await message.prepare();
@@ -111,44 +110,6 @@ describe('Raffles - pick() - @func2', () => {
     });
   });
 
-  describe('Raffle with follower should return winner', () => {
-    let user1, user2;
-
-    it('create ticket raffle', async () => {
-      raffles.open({ sender: owner, parameters: '!winme -min 0 -max ' + max });
-      await message.isSentRaw('Raffle is running (0 entries). To enter type "!winme <1-'+max+'>". Raffle is opened for everyone.', { userName: '__bot__' });
-    });
-
-    it('Create testuser/testuser2 with max points', async () => {
-      await getRepository(User).delete({ userName: testuser.userName });
-      await getRepository(User).delete({ userName: testuser2.userName });
-      user1 = await getRepository(User).save({
-        isFollower: true, userName: testuser.userName , userId: testuser.userId, points: max,
-      });
-      user2 = await getRepository(User).save({
-        userName: testuser2.userName , userId: testuser2.userId, points: max,
-      });
-    });
-
-    it('testuser bets 100', async () => {
-      const a = await raffles.participate({ sender: testuser, message: '!winme 100' });
-      assert(a);
-    });
-
-    it('testuser2 bets 100', async () => {
-      const a = await raffles.participate({ sender: testuser2, message: '!winme 100' });
-      assert(a);
-    });
-
-    it('pick a winner', async () => {
-      await raffles.pick({ sender: owner });
-      await message.isSentRaw([
-        'Winner of raffle !winme is @' + testuser.userName + '! Win probability was 54.55%!',
-        'Winner of raffle !winme is @' + testuser2.userName + '! Win probability was 45.45%!',
-      ], { userName: '__bot__' });
-    });
-  });
-
   describe('Raffle with subscriber should return winner', () => {
     it('create ticket raffle', async () => {
       raffles.open({ sender: owner, parameters: '!winme -min 0 -max ' + max });
@@ -181,42 +142,6 @@ describe('Raffles - pick() - @func2', () => {
       await message.isSentRaw([
         'Winner of raffle !winme is @' + testuser.userName + '! Win probability was 60%!',
         'Winner of raffle !winme is @' + testuser2.userName + '! Win probability was 40%!',
-      ], { userName: '__bot__' });
-    });
-  });
-
-  describe('Raffle with subscriber and follower should return winner', () => {
-    it('create ticket raffle', async () => {
-      raffles.open({ sender: owner, parameters: '!winme -min 0 -max ' + max });
-      await message.isSentRaw('Raffle is running (0 entries). To enter type "!winme <1-'+max+'>". Raffle is opened for everyone.', { userName: '__bot__' });
-    });
-
-    it('Create testuser/testuser2 with max points', async () => {
-      await getRepository(User).delete({ userName: testuser.userName });
-      await getRepository(User).delete({ userName: testuser2.userName });
-      user1 = await getRepository(User).save({
-        isSubscriber: true, userName: testuser.userName , userId: testuser.userId, points: max,
-      });
-      user2 = await getRepository(User).save({
-        isFollower: true, userName: testuser2.userName , userId: testuser2.userId, points: max,
-      });
-    });
-
-    it('testuser bets 100', async () => {
-      const a = await raffles.participate({ sender: testuser, message: '!winme 100' });
-      assert(a);
-    });
-
-    it('testuser2 bets 100', async () => {
-      const a = await raffles.participate({ sender: testuser2, message: '!winme 100' });
-      assert(a);
-    });
-
-    it('pick a winner', async () => {
-      await raffles.pick({ sender: owner });
-      await message.isSentRaw([
-        'Winner of raffle !winme is @' + testuser.userName + '! Win probability was 55.56%!',
-        'Winner of raffle !winme is @' + testuser2.userName + '! Win probability was 44.44%!',
       ], { userName: '__bot__' });
     });
   });

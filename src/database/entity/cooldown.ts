@@ -13,7 +13,6 @@ export interface CooldownInterface {
   isOwnerAffected: boolean;
   isModeratorAffected: boolean;
   isSubscriberAffected: boolean;
-  isFollowerAffected: boolean;
   viewers?: CooldownViewerInterface[];
 }
 
@@ -41,7 +40,6 @@ export const Cooldown = new EntitySchema<Readonly<Required<CooldownInterface>>>(
     isOwnerAffected:      { type: Boolean },
     isModeratorAffected:  { type: Boolean },
     isSubscriberAffected: { type: Boolean },
-    isFollowerAffected:   { type: Boolean },
   },
   relations: {
     viewers: {

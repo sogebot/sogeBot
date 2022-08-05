@@ -24,7 +24,6 @@ import { defaultPermissions, getUserHighestPermission } from '~/helpers/permissi
 import { adminEndpoint, viewerEndpoint } from '~/helpers/socket';
 import * as changelog from '~/helpers/user/changelog.js';
 import { getIdFromTwitch } from '~/services/twitch/calls/getIdFromTwitch';
-import { variables } from '~/watchers';
 
 class Users extends Core {
   constructor () {
@@ -415,9 +414,6 @@ class Users extends Core {
           if (opts.filter.subscribers !== null) {
             query.andWhere('user.isSubscriber = :isSubscriber', { isSubscriber: opts.filter.subscribers });
           }
-          if (opts.filter.followers !== null) {
-            query.andWhere('user.isFollower = :isFollower', { isFollower: opts.filter.followers });
-          }
           if (opts.filter.vips !== null) {
             query.andWhere('user.isVIP = :isVIP', { isVIP: opts.filter.vips });
           }
@@ -464,20 +460,6 @@ class Users extends Core {
         cb(null, viewers, count, opts.state);
       } catch (e: any) {
         cb(e.stack, [], 0, null);
-      }
-    });
-    adminEndpoint('/core/users', 'viewers::followedAt', async (id, cb) => {
-      try {
-        const clientBot = await client('bot');
-        const broadcasterId = variables.get('services.twitch.broadcasterId') as string;
-        const getFollows = await clientBot.users.getFollows({ followedUser: broadcasterId, user: id });
-        if (getFollows.total === 0) {
-          throw new Error('Not a follower');
-        } else {
-          cb(null, new Date(getFollows.data[0].followDate).toISOString());
-        }
-      } catch (e: any) {
-        cb(e.stack, null);
       }
     });
     viewerEndpoint('/core/users', 'viewers::findOne', async (userId, cb) => {

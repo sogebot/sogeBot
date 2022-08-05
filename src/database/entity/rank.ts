@@ -1,6 +1,6 @@
 import { EntitySchema } from 'typeorm';
 
-export interface RankInterface<T = 'viewer' | 'follower' | 'subscriber'> {
+export interface RankInterface<T = 'viewer' | 'subscriber'> {
   id?: string;
   value: number;
   rank: string;

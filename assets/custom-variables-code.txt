@@ -3,10 +3,8 @@
   user(username?: string): Promise<{ username: string, displayname: string, id: string, is: { follower: boolean, mod: boolean, online: boolean, subscriber: boolean, vip: boolean }}> - returns user object (if null -> sender)
   url(url: string, opts?: { method: 'POST' | 'GET', headers: object, data: object}): Promise<{ data: object, status: number, statusText: string}>
   waitMs(miliseconds: number): Promise<undefined>
-  randomOnlineFollower(): Promise<UserObject>
   randomOnlineSubscriber(): Promise<UserObject>
   randomOnlineViewer(): Promise<UserObject>
-  randomFollower(): Promise<UserObject>
   randomSubscriber(): Promise<UserObject>
   randomViewer(): Promise<UserObject>
 *

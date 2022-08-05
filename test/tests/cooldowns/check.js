@@ -119,7 +119,6 @@ describe('Cooldowns - @func3 - check()', () => {
         isOwnerAffected:      true,
         isModeratorAffected:  true,
         isSubscriberAffected: true,
-        isFollowerAffected:   true,
       });
     });
 
@@ -170,7 +169,6 @@ describe('Cooldowns - @func3 - check()', () => {
         isOwnerAffected:      true,
         isModeratorAffected:  true,
         isSubscriberAffected: true,
-        isFollowerAffected:   true,
       });
     });
 
@@ -231,7 +229,6 @@ describe('Cooldowns - @func3 - check()', () => {
         isOwnerAffected:      false,
         isModeratorAffected:  false,
         isSubscriberAffected: true,
-        isFollowerAffected:   true,
       });
     });
 
@@ -276,7 +273,6 @@ describe('Cooldowns - @func3 - check()', () => {
         isOwnerAffected:      true,
         isModeratorAffected:  true,
         isSubscriberAffected: true,
-        isFollowerAffected:   true,
       });
       await getRepository(CooldownViewer).insert({
         ...c, userId: testUser.userId, timestamp: 10000, lastTimestamp: 0,

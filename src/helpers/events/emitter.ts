@@ -53,7 +53,6 @@ interface Events {
   'game-changed': (opts: {oldGame: string, game: string}) => void;
   'follow': (opts: {userName: string, userId: string}) => void;
   'cheer': (opts: {userName: string, userId: string, bits: number, message: string}) => void;
-  'unfollow': (opts: {userName: string}) => void;
   'user-joined-channel': (opts: {userName: string}) => void;
   'user-parted-channel': (opts: {userName: string}) => void;
   'subcommunitygift': (opts: {userName: string; count: number}) => void;
