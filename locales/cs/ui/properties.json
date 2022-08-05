@@ -1,7 +1,7 @@
 {
   "alias": "Alias",
-  "command": "Command",
-  "price": "Price (points)",
-  "priceBits": "Price (bits)",
-  "thisvalue": "This value"
+  "command": "Příkaz",
+  "price": "Cena (body)",
+  "priceBits": "Cena (bity)",
+  "thisvalue": "Tato hodnota"
 }
