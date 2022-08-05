@@ -1,7 +1,6 @@
 {
   "widget": {
-    "subscribers-luck": "Subscribers luck",
-    "followers-luck": "Followers luck"
+    "subscribers-luck": "Subscribers luck"
   },
   "settings": {
     "enabled": "Status",
@@ -31,10 +30,6 @@
     },
     "subscribersPercent": {
       "title": "Additional subscribers luck",
-      "help": "in percents"
-    },
-    "followersPercent": {
-      "title": "Additional followers luck",
       "help": "in percents"
     }
   }

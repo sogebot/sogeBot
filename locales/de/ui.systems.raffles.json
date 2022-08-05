@@ -1,7 +1,6 @@
 {
   "widget": {
-    "subscribers-luck": "Glück der Abonnenten",
-    "followers-luck": "Glück der Follower"
+    "subscribers-luck": "Glück der Abonnenten"
   },
   "settings": {
     "enabled": "Status",
@@ -31,10 +30,6 @@
     },
     "subscribersPercent": {
       "title": "Zusätzliches Glück der Abonnenten",
-      "help": "in Prozent"
-    },
-    "followersPercent": {
-      "title": "Zusätzliches Glück der Follower",
       "help": "in Prozent"
     }
   }

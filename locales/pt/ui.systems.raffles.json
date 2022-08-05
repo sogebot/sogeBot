@@ -1,7 +1,6 @@
 {
   "widget": {
-    "subscribers-luck": "Sorte dos assinantes",
-    "followers-luck": "Sorte dos seguidores"
+    "subscribers-luck": "Sorte dos assinantes"
   },
   "settings": {
     "enabled": "Situação",
@@ -31,10 +30,6 @@
     },
     "subscribersPercent": {
       "title": "Sorte de assinantes adicionais",
-      "help": "em percentagens"
-    },
-    "followersPercent": {
-      "title": "Sorte dos seguidores adicionais",
       "help": "em percentagens"
     }
   }

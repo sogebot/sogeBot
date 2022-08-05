@@ -1213,7 +1213,7 @@
   },
   "time": "ストリーマーのタイムゾーンの現在の時刻は $time です",
   "subs": "$sender, 現在 $onlineSubCount 人のオンラインサブスクライバーがいます. 最後のサブ/再サブは $lastSubUsername $lastSubAgo でした",
-  "followers": "$sender, 現在 $onlineFollowersCount 人のオンラインフォロワーがいます. 最終フォローは $lastFollowUsername $lastFollowAgo",
+  "followers": "$sender, last follow was $lastFollowUsername $lastFollowAgo",
   "ignore": {
     "user": {
       "is": {
