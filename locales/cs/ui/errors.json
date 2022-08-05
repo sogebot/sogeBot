@@ -1,6 +1,6 @@
 {
-  "isNotEmpty": "Tento údaj je povinný.",
-  "isPositive": "$property must be a positive number or greater then 0",
+  "isNotEmpty": "$property je povinný údaj.",
+  "isPositive": "$property musí být větší než 0",
   "isCommand": "$property musí začínat s !",
   "isCommandOrCustomVariable": "$property musí začínat s ! nebo $_",
   "this_value_must_be_a_positive_number_and_greater_then_0": "Tato hodnota musí být kladné číslo nebo větší než 0",
