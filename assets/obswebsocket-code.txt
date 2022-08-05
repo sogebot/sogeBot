@@ -16,7 +16,7 @@ Example:
     'sceneName': 'My Amazing Scene'
   });
   await waitMs(5000) // wait 5 seconds
-  await obs.send('SetCurrentProgramScene', {
+  await obs.call('SetCurrentProgramScene', {
     'sceneName': 'This is another scene'
   });
 */
