@@ -1,7 +1,6 @@
 {
   "widget": {
-    "subscribers-luck": "Abbonati fortunati",
-    "followers-luck": "Fortuna dei seguaci"
+    "subscribers-luck": "Abbonati fortunati"
   },
   "settings": {
     "enabled": "Status",
@@ -31,10 +30,6 @@
     },
     "subscribersPercent": {
       "title": "Fortuna abbonati aggiuntiva",
-      "help": "in percentuale"
-    },
-    "followersPercent": {
-      "title": "Fortuna followers aggiuntiva",
       "help": "in percentuale"
     }
   }

@@ -1,7 +1,6 @@
 {
   "widget": {
-    "subscribers-luck": "Удача сабскрайберам",
-    "followers-luck": "Удача подписчикам"
+    "subscribers-luck": "Удача сабскрайберам"
   },
   "settings": {
     "enabled": "Статус",
@@ -31,10 +30,6 @@
     },
     "subscribersPercent": {
       "title": "Дополнительная удача для сабскрайберов",
-      "help": "в процентах"
-    },
-    "followersPercent": {
-      "title": "Дополнительная удача для фоловеров",
       "help": "в процентах"
     }
   }

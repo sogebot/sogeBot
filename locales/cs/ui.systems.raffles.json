@@ -1,7 +1,6 @@
 {
   "widget": {
-    "subscribers-luck": "Štěstí Subscribera",
-    "followers-luck": "Štěstí Followera"
+    "subscribers-luck": "Štěstí Subscribera"
   },
   "settings": {
     "enabled": "Status",
@@ -31,10 +30,6 @@
     },
     "subscribersPercent": {
       "title": "Dodatečné štěstí subscribera",
-      "help": "v procentech"
-    },
-    "followersPercent": {
-      "title": "Dodatečné štěstí followera",
       "help": "v procentech"
     }
   }

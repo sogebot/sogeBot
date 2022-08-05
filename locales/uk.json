@@ -1213,7 +1213,7 @@
   },
   "time": "Поточний час в часовому поясі стрімера: $time",
   "subs": "$sender, there is currently $onlineSubCount online subscribers. Last sub/resub was $lastSubUsername $lastSubAgo",
-  "followers": "$sender, there is currently $onlineFollowersCount online followers. Last follow was $lastFollowUsername $lastFollowAgo",
+  "followers": "$sender, last follow was $lastFollowUsername $lastFollowAgo",
   "ignore": {
     "user": {
       "is": {

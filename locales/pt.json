@@ -1213,7 +1213,7 @@
   },
   "time": "Hora atual no fuso horário da/do streamer é $time",
   "subs": "$sender, atualmente há $onlineSubCount assinantes online. Último sub/resub foi $lastSubUsername $lastSubAgo",
-  "followers": "$sender, atualmente há $onlineFollowersCount seguidores online. A última seguida foi $lastFollowUsername $lastFollowAgo",
+  "followers": "$sender, last follow was $lastFollowUsername $lastFollowAgo",
   "ignore": {
     "user": {
       "is": {
