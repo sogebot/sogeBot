@@ -14,8 +14,6 @@ export class retypeTimestampAttribute1659639416172 implements MigrationInterface
     await queryRunner.query(`ALTER TABLE \`cooldown\` ADD \`timestamp\` varchar(30) NOT NULL`);
     await queryRunner.query(`ALTER TABLE \`cooldown_viewer\` DROP COLUMN \`timestamp\``);
     await queryRunner.query(`ALTER TABLE \`cooldown_viewer\` ADD \`timestamp\` varchar(30) NOT NULL`);
-    await queryRunner.query(`ALTER TABLE \`cooldown_viewer\` DROP COLUMN \`cooldownId\``);
-    await queryRunner.query(`ALTER TABLE \`cooldown_viewer\` ADD \`cooldownId\` varchar(255) NULL`);
     await queryRunner.query(`ALTER TABLE \`cooldown_viewer\` ADD CONSTRAINT \`FK_5ba6ccf5a51426111e322c80445\` FOREIGN KEY (\`cooldownId\`) REFERENCES \`cooldown\`(\`id\`) ON DELETE NO ACTION ON UPDATE NO ACTION`);
 
     for (const item of items) {

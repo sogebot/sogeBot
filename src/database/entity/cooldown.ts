@@ -3,7 +3,7 @@ import { BaseEntity, Column, Entity, Index, ManyToOne, OneToMany, PrimaryColumn 
 
 @Entity()
 export class Cooldown extends BaseEntity {
-  @PrimaryColumn({ generated: 'uuid' })
+  @PrimaryColumn({ generated: 'uuid', type: 'uuid' })
     id: string;
 
   @Column()
@@ -42,7 +42,7 @@ export class Cooldown extends BaseEntity {
 
 @Entity()
 export class CooldownViewer extends BaseEntity {
-  @PrimaryColumn({ generated: 'uuid' })
+  @PrimaryColumn({ generated: 'uuid', type: 'uuid' })
     id: string;
 
   @ManyToOne(() => Cooldown, (item) => item.viewers)
