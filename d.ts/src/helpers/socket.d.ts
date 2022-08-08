@@ -351,12 +351,6 @@ export type ClientToServerEventsWithNamespace = {
   '/integrations/streamelements': GenericEvents,
   '/integrations/qiwi': GenericEvents,
   '/integrations/lastfm': GenericEvents,
-  '/systems/cooldown': GenericEvents & {
-    'generic::getAll': generic<CooldownInterface>['getAll'],
-    'generic::getOne': (id: string, cb: (error: Error | string | null, item?: Readonly<Required<CooldownInterface>> | null, count?: number) => void) => void,
-    'generic::deleteById': generic<CooldownInterface>['deleteById'],
-    'cooldown::save': (item: CooldownInterface, cb: (error: Error | string | null, item?: CooldownInterface) => void) => void,
-  },
   '/systems/customcommands': GenericEvents & {
     'commands::resetCountByCommand': (command: string, cb: (error: Error | string | null) => void) => void,
     'generic::getAll': (cb: (error: Error | string | null, items: Readonly<Required<CommandsInterface>>[], count: { command: string; count: number; }[] | null) => void) => void,
