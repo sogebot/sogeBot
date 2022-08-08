@@ -1,6 +1,6 @@
 import { exec, execSync } from 'child_process';
 
-import { HOUR, MINUTE } from '@sogebot/ui-helpers/constants';
+import { MINUTE } from '@sogebot/ui-helpers/constants';
 import { clone } from 'lodash';
 
 import Core from '~/_interface';
@@ -34,18 +34,19 @@ class Updater extends Core {
     if ((process.env.NODE_ENV || 'development') === 'development') {
       return;
     }
-    setTimeout(() => {
+    setTimeout(async () => {
       // get current versions
       for (const pkg of Object.keys(this.versions) as Array<keyof typeof versions> ) {
-        const actualVersion = execSync(`node -p "require('${pkg}/package.json').version"`).toString().replace('\n', '');
+        const json = await import(`${pkg}/package.json`);
+        const actualVersion = json.default.version;
         this.versions[pkg] = actualVersion;
       }
 
       this.checkUpdate();
       setInterval(() => {
         this.checkUpdate();
-      }, HOUR);
-    }, MINUTE * 10);
+      }, MINUTE);
+    }, MINUTE / 10);
   }
 
   sockets() {
@@ -85,8 +86,9 @@ class Updater extends Core {
     for (const pkg of Object.keys(this.versions) as Array<keyof typeof versions> ) {
       try {
         const versionsList = JSON.parse(execSync(`npm view ${pkg} versions --json`).toString());
-        const [actualMajor, actualMinor, actualPatch] = execSync(`node -p "require('${pkg}/package.json').version"`).toString().replace('\n', '').split('.');
-        execSync(`node -p "delete require.cache[require.resolve('${pkg}/package.json')]"`);
+
+        delete require.cache[require.resolve(`${pkg}/package.json`)];
+        const [actualMajor, actualMinor, actualPatch] = (await import(`${pkg}/package.json`)).default.version.split('.');
 
         let applicableVersion = [actualMajor, actualMinor, actualPatch].join('.');
         // we are assuming that except first number, we can update
@@ -105,7 +107,7 @@ class Updater extends Core {
         if ([actualMajor, actualMinor, actualPatch].join('.') !== applicableVersion
             && [actualMajor, actualMinor, actualPatch].join('.') !== this.versionsAvailable[pkg]) {
           if (this.isAutomaticUpdateEnabled
-            && ((process.env.NODE_ENV || 'development') === 'production' && !(global as any).mocha)) {
+            && (!(global as any).mocha)) {
             if (updating.has(pkg)) {
               continue; // skip if update in progress
             }
