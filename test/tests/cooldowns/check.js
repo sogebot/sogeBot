@@ -7,7 +7,7 @@ const assert = require('assert');
 
 const { getRepository } = require('typeorm');
 
-const { Cooldown, CooldownViewer } = require('../../../dest/database/entity/cooldown');
+const { Cooldown } = require('../../../dest/database/entity/cooldown');
 const { Keyword } = require('../../../dest/database/entity/keyword');
 const { User } = require('../../../dest/database/entity/user');
 const gamble = (require('../../../dest/games/gamble')).default;
@@ -271,13 +271,6 @@ describe('Cooldowns - @func3 - check()', () => {
       c.isModeratorAffected =  true;
       c.isSubscriberAffected = true;
       await c.save();
-
-      const viewer = new CooldownViewer();
-      viewer.cooldown = c;
-      viewer.userId = testUser.userId;
-      viewer.timestamp = new Date(0).toISOString();
-      viewer.lastTimestamp = 0,
-      await viewer.save();
 
       await getRepository(User).save({
         userName: usermod1.userName, userId: usermod1.userId, isModerator: true,

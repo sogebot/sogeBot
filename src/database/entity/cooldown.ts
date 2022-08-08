@@ -1,5 +1,5 @@
 import { IsNotEmpty, MinLength } from 'class-validator';
-import { BaseEntity, Column, Entity, Index, ManyToOne, OneToMany, PrimaryColumn } from 'typeorm';
+import { BaseEntity, Column, Entity, Index, PrimaryColumn } from 'typeorm';
 
 @Entity()
 export class Cooldown extends BaseEntity {
@@ -35,22 +35,4 @@ export class Cooldown extends BaseEntity {
 
   @Column()
     isSubscriberAffected: boolean;
-
-  @OneToMany(() => CooldownViewer, (item) => item.cooldown)
-    viewers: CooldownViewer[];
-}
-
-@Entity()
-export class CooldownViewer extends BaseEntity {
-  @PrimaryColumn({ generated: 'uuid', type: 'uuid' })
-    id: string;
-
-  @ManyToOne(() => Cooldown, (item) => item.viewers)
-    cooldown: Cooldown;
-
-  @Column()
-    userId: string;
-
-  @Column({ type: 'varchar', length: '2022-07-27T00:30:34.569259834Z'.length })
-    timestamp: string;
 }

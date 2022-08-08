@@ -1,5 +1,5 @@
 import {
-  Cooldown as CooldownEntity, CooldownViewer,
+  Cooldown as CooldownEntity,
 } from '@entity/cooldown';
 import { Keyword } from '@entity/keyword';
 import * as constants from '@sogebot/ui-helpers/constants';
@@ -31,6 +31,13 @@ import { translate } from '~/translate';
 
 const cache: { id: string; cooldowns: CooldownEntity[] }[] = [];
 const defaultCooldowns: { name: string; lastRunAt: number, permId: string }[] = [];
+let viewers: {userId: string, timestamp: number, cooldownId: string}[] = [];
+
+setInterval(async () => {
+  for (const cooldown of await CooldownEntity.find()) {
+    viewers = viewers.filter(o => (Date.now() + o.timestamp < cooldown.miliseconds && o.cooldownId === cooldown.id) || o.cooldownId !== cooldown.id);
+  }
+}, constants.HOUR);
 
 /*
  * !cooldown set [keyword|!command|g:group] [global|user] [seconds] [true/false] - set cooldown for keyword or !command, true/false set quiet mode
@@ -186,7 +193,6 @@ class Cooldown extends System {
         return true;
       }
       let data: (CooldownEntity | { type: 'default'; canBeRunAt: number; isEnabled: true; name: string; permId: string })[] = [];
-      let viewer: CooldownViewer | undefined;
       let timestamp, now;
       const [cmd, subcommand] = new Expects(opts.message)
         .command({ optional: true })
@@ -236,7 +242,7 @@ class Cooldown extends System {
           }
         }
 
-        const cooldown = await getRepository(CooldownEntity).findOne({ where: [{ name }, { name: In(groupName) }], relations: ['viewers'] });
+        const cooldown = await getRepository(CooldownEntity).findOne({ where: [{ name }, { name: In(groupName) }] });
         if (!cooldown) {
           const defaultValue = await this.getPermissionBasedSettingsValue('defaultCooldownOfCommandsInSeconds');
           const permId = await getUserHighestPermission(opts.sender.userId);
@@ -263,7 +269,7 @@ class Cooldown extends System {
       } else { // text
         let [keywords, cooldowns] = await Promise.all([
           getRepository(Keyword).find(),
-          getRepository(CooldownEntity).find({ relations: ['viewers'] }),
+          getRepository(CooldownEntity).find(),
         ]);
 
         keywords = keywords.filter(o => {
@@ -337,20 +343,12 @@ class Cooldown extends System {
           continue;
         }
 
-        for (const item of cooldown.viewers?.filter(o => o.userId === opts.sender?.userId) ?? []) {
-          if (!viewer || new Date(viewer.timestamp).getTime < new Date(item.timestamp).getTime) {
-            viewer = new CooldownViewer();
-            merge(viewer, { ...item });
-          } else {
-            // remove duplicate
-            cooldown.viewers = cooldown.viewers?.filter(o => o.id !== item.id);
-          }
-        }
+        const viewer = viewers.find(o => o.cooldownId === cooldown.id && o.userId === opts.sender?.userId);
         debug('cooldown.db', viewer ?? `${opts.sender.userName}#${opts.sender.userId} not found in cooldown list`);
         if (cooldown.type === 'global') {
           timestamp = cooldown.timestamp ?? new Date(0).toISOString();
         } else {
-          timestamp = viewer?.timestamp ?? new Date(0).toISOString();
+          timestamp = new Date(viewer?.timestamp || 0).toISOString();
         }
         now = Date.now();
 
@@ -360,9 +358,11 @@ class Cooldown extends System {
             await cooldown.save();
           } else {
             debug('cooldown.check', `${opts.sender.userName}#${opts.sender.userId} added to cooldown list.`);
-            const v = new CooldownViewer();
-            merge(v, { cooldown, userId: opts.sender.userId, timestamp: new Date().toISOString() });
-            v.save();
+            viewers = [...viewers.filter(o => !(o.cooldownId === cooldown.id && o.userId === opts.sender?.userId)), {
+              timestamp:  Date.now(),
+              cooldownId: cooldown.id,
+              userId:     opts.sender.userId,
+            }];
           }
 
           merge(cooldown, { timestamp: new Date().toISOString() });
@@ -408,12 +408,7 @@ class Cooldown extends System {
         if (cooldown.type === 'global') {
           cooldown.timestamp = new Date(0).toISOString(); // we just revert to 0 as user were able to run it
         } else {
-          cooldown.viewers?.push(
-            merge(cooldown.viewers.find(o => o.userId === opts.sender?.userId) || new CooldownViewer(), {
-              timestamp: new Date(0).toISOString(),
-              userId:    opts.sender.userId,
-            })
-          );
+          viewers = viewers.filter(o => o.userId !== opts.sender?.userId && o.cooldownId !== cooldown.id);
         }
         // rollback timestamp
         await getRepository(CooldownEntity).save(cooldown);
@@ -431,8 +426,7 @@ class Cooldown extends System {
         .toArray();
 
       const cooldown = await getRepository(CooldownEntity).findOne({
-        relations: ['viewers'],
-        where:     {
+        where: {
           name,
           type: typeParameter,
         },
