@@ -156,7 +156,7 @@ class Cooldown extends System {
           type,
         },
       }));
-      cooldownToSave.save();
+      await cooldownToSave.save();
 
       return [{
         response: prepare('cooldowns.cooldown-was-set', {
