@@ -1,13 +1,13 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-import { insertItemIntoTable } from '~/database/insertItemIntoTable';
+// import { insertItemIntoTable } from '~/database/insertItemIntoTable';
 
 export class retypeTimestampAttribute1659639416172 implements MigrationInterface {
   name = 'retypeTimestampAttribute1659639416172';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
-    const items = await queryRunner.query(`SELECT * from "cooldown"`);
-    const items2 = await queryRunner.query(`SELECT * from "cooldown_viewer"`);
+    /*const items = await queryRunner.query(`SELECT * from "cooldown"`);
+    const items2 = await queryRunner.query(`SELECT * from "cooldown_viewer"`);*/
     await queryRunner.query(`DROP TABLE "cooldown"`);
     await queryRunner.query(`DROP TABLE "cooldown_viewer"`);
     /*
