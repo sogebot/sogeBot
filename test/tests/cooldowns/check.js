@@ -7,7 +7,7 @@ const assert = require('assert');
 
 const { getRepository } = require('typeorm');
 
-const { Cooldown, CooldownViewer } = require('../../../dest/database/entity/cooldown');
+const { Cooldown } = require('../../../dest/database/entity/cooldown');
 const { Keyword } = require('../../../dest/database/entity/keyword');
 const { User } = require('../../../dest/database/entity/user');
 const gamble = (require('../../../dest/games/gamble')).default;
@@ -108,18 +108,17 @@ describe('Cooldowns - @func3 - check()', () => {
     });
 
     it('Add !cmd to cooldown', async () => {
-      await getRepository(Cooldown).save({
-        name:                 '!cmd',
-        miliseconds:          60000,
-        type:                 'global',
-        timestamp:            0,
-        lastTimestamp:        0,
-        isErrorMsgQuiet:      true,
-        isEnabled:            true,
-        isOwnerAffected:      true,
-        isModeratorAffected:  true,
-        isSubscriberAffected: true,
-      });
+      const c = new Cooldown();
+      c.name =                 '!cmd';
+      c.miliseconds =          60000;
+      c.type =                 'global';
+      c.timestamp =            new Date(0).toISOString();
+      c.isErrorMsgQuiet =      true;
+      c.isEnabled =            true;
+      c.isOwnerAffected =      true;
+      c.isModeratorAffected =  true;
+      c.isSubscriberAffected = true;
+      await c.save();
     });
 
     it('First user should PASS', async () => {
@@ -158,18 +157,17 @@ describe('Cooldowns - @func3 - check()', () => {
     });
 
     it('Add global KonCha to cooldown', async () => {
-      await getRepository(Cooldown).save({
-        name:                 'KonCha',
-        miliseconds:          60000,
-        type:                 'global',
-        timestamp:            0,
-        lastTimestamp:        0,
-        isErrorMsgQuiet:      true,
-        isEnabled:            true,
-        isOwnerAffected:      true,
-        isModeratorAffected:  true,
-        isSubscriberAffected: true,
-      });
+      const c = new Cooldown();
+      c.name =                  'KonCha';
+      c.miliseconds =           60000;
+      c.type =                  'global';
+      c.timestamp =             new Date(0).toISOString();
+      c.isErrorMsgQuiet =       true;
+      c.isEnabled =             true;
+      c.isOwnerAffected =       true;
+      c.isModeratorAffected =   true;
+      c.isSubscriberAffected =  true;
+      await c.save();
     });
 
     it('Add koncha to keywords', async () => {
@@ -218,18 +216,17 @@ describe('Cooldowns - @func3 - check()', () => {
     });
 
     it('Add global !followage to cooldown', async () => {
-      await getRepository(Cooldown).save({
-        name:                 '!followage',
-        miliseconds:          30000,
-        type:                 'global',
-        timestamp:            1544713598872,
-        lastTimestamp:        0,
-        isErrorMsgQuiet:      true,
-        isEnabled:            true,
-        isOwnerAffected:      false,
-        isModeratorAffected:  false,
-        isSubscriberAffected: true,
-      });
+      const c = new Cooldown();
+      c.name =                 '!followage';
+      c.miliseconds =          30000;
+      c.type =                 'global';
+      c.timestamp =            new Date(1544713598872).toISOString();
+      c.isErrorMsgQuiet =      true;
+      c.isEnabled =            true;
+      c.isOwnerAffected =      false;
+      c.isModeratorAffected =  false;
+      c.isSubscriberAffected = true;
+      await c.save();
     });
 
     it('First user should PASS', async () => {
@@ -262,21 +259,18 @@ describe('Cooldowns - @func3 - check()', () => {
 
       gamble.enabled = true;
       gamble.setCommand('!gamble', '!фортуна');
-      const c = await getRepository(Cooldown).save({
-        name:                 '!фортуна',
-        miliseconds:          200000,
-        type:                 'user',
-        timestamp:            1569490204420,
-        lastTimestamp:        0,
-        isErrorMsgQuiet:      false,
-        isEnabled:            true,
-        isOwnerAffected:      true,
-        isModeratorAffected:  true,
-        isSubscriberAffected: true,
-      });
-      await getRepository(CooldownViewer).insert({
-        ...c, userId: testUser.userId, timestamp: 10000, lastTimestamp: 0,
-      });
+
+      const c = new Cooldown();
+      c.name =                 '!фортуна';
+      c.miliseconds =          200000;
+      c.type =                 'user';
+      c.timestamp =            new Date(1569490204420).toISOString();
+      c.isErrorMsgQuiet =      false;
+      c.isEnabled =            true;
+      c.isOwnerAffected =      true;
+      c.isModeratorAffected =  true;
+      c.isSubscriberAffected = true;
+      await c.save();
 
       await getRepository(User).save({
         userName: usermod1.userName, userId: usermod1.userId, isModerator: true,
@@ -468,52 +462,6 @@ describe('Cooldowns - @func3 - check()', () => {
     it('owner should not be affected by cooldown second time', async () => {
       const isOk = await cooldown.check({ sender: owner, message: '!play 25' });
       assert(isOk);
-    });
-  });
-
-  describe('#1406 - cooldown not working on gamble', async () => {
-    before(async () => {
-      await db.cleanup();
-      await message.prepare();
-
-      gamble.enabled = true;
-
-      await getRepository(User).save({
-        userName: usermod1.userName, userId: usermod1.userId, isModerator: true,
-      });
-      await getRepository(User).save({
-        userName: subuser1.userName, userId: subuser1.userId, isSubscriber: true,
-      });
-      await getRepository(User).save({ userName: testUser.userName, userId: testUser.userId });
-      await getRepository(User).save({ userName: testUser2.userName, userId: testUser2.userId });
-      await getRepository(User).save({
-        userName: owner.userName, userId: owner.userId, isSubscriber: true,
-      });
-    });
-
-    after(() => {
-      gamble.enabled = false;
-    });
-
-    it('test', async () => {
-      const [command, type, seconds, quiet] = ['!gamble', 'user', '300', true];
-      const r = await cooldown.main({ sender: owner, parameters: `${command} ${type} ${seconds} ${quiet}` });
-      assert.strictEqual(r[0].response, '$sender, user cooldown for !gamble was set to 300s');
-
-      const item = await getRepository(Cooldown).findOne({ where: { name: '!gamble' } });
-      assert(item.length !== 0);
-
-      let isOk = await cooldown.check({ sender: testUser, message: '!gamble 10' });
-      assert(isOk);
-
-      isOk = await cooldown.check({ sender: testUser, message: '!gamble 15' });
-      assert(!isOk); // second should fail
-
-      isOk = await cooldown.check({ sender: testUser2, message: '!gamble 20' });
-      assert(isOk);
-
-      isOk = await cooldown.check({ sender: testUser2, message: '!gamble 25' });
-      assert(!isOk); // second should fail
     });
   });
 

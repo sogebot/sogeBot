@@ -20,6 +20,7 @@ async function test() {
         process.stderr.write(stderr);
         if (error) {
           reject(error);
+          process.stderr.write(error);
           process.exit(1);
         }
         resolve();

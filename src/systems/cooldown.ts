@@ -1,9 +1,10 @@
 import {
-  Cooldown as CooldownEntity, CooldownInterface, CooldownViewer, CooldownViewerInterface,
+  Cooldown as CooldownEntity,
 } from '@entity/cooldown';
 import { Keyword } from '@entity/keyword';
 import * as constants from '@sogebot/ui-helpers/constants';
-import _ from 'lodash';
+import { validateOrReject } from 'class-validator';
+import _, { merge } from 'lodash';
 import { getRepository, In } from 'typeorm';
 
 import { parserReply } from '../commons';
@@ -17,18 +18,26 @@ import System from './_interface';
 
 import { prepare } from '~/helpers/commons';
 import { debug, error } from '~/helpers/log';
+import { app } from '~/helpers/panel';
 import { ParameterError } from '~/helpers/parameterError';
 import { getUserHighestPermission } from '~/helpers/permissions/index';
 import { defaultPermissions } from '~/helpers/permissions/index';
-import { adminEndpoint } from '~/helpers/socket';
 import { isOwner } from '~/helpers/user';
 import * as changelog from '~/helpers/user/changelog.js';
+import { adminMiddleware } from '~/socket';
 import alias from '~/systems/alias';
 import customCommands from '~/systems/customcommands';
 import { translate } from '~/translate';
 
-const cache: { id: string; cooldowns: CooldownInterface[] }[] = [];
+const cache: { id: string; cooldowns: CooldownEntity[] }[] = [];
 const defaultCooldowns: { name: string; lastRunAt: number, permId: string }[] = [];
+let viewers: {userId: string, timestamp: number, cooldownId: string}[] = [];
+
+setInterval(async () => {
+  for (const cooldown of await CooldownEntity.find()) {
+    viewers = viewers.filter(o => (Date.now() + o.timestamp < cooldown.miliseconds && o.cooldownId === cooldown.id) || o.cooldownId !== cooldown.id);
+  }
+}, constants.HOUR);
 
 /*
  * !cooldown set [keyword|!command|g:group] [global|user] [seconds] [true/false] - set cooldown for keyword or !command, true/false set quiet mode
@@ -74,35 +83,35 @@ class Cooldown extends System {
     });
   }
 
-  sockets () {
-    adminEndpoint('/systems/cooldown', 'cooldown::save', async (dataset: CooldownInterface, cb) => {
-      try {
-        const item = await getRepository(CooldownEntity).save(dataset);
-        cb(null, item);
-      } catch (e: any) {
-        cb(e.stack);
-      }
+  sockets() {
+    if (!app) {
+      setTimeout(() => this.sockets(), 100);
+      return;
+    }
+
+    app.get('/api/systems/cooldown', adminMiddleware, async (req, res) => {
+      res.send({
+        data: await CooldownEntity.find(),
+      });
     });
-    adminEndpoint('/systems/cooldown', 'generic::deleteById', async (id, cb) => {
-      await getRepository(CooldownEntity).delete({ id: String(id) });
-      if (cb) {
-        cb(null);
-      }
+    app.get('/api/systems/cooldown/:id', adminMiddleware, async (req, res) => {
+      res.send({
+        data: await CooldownEntity.findOne({ id: req.params.id }),
+      });
     });
-    adminEndpoint('/systems/cooldown', 'generic::getAll', async (cb) => {
-      try {
-        const cooldown = await getRepository(CooldownEntity).find({ order: { name: 'ASC' } });
-        cb(null, cooldown);
-      } catch (e: any) {
-        cb(e.stack, []);
-      }
+    app.delete('/api/systems/cooldown/:id', adminMiddleware, async (req, res) => {
+      await CooldownEntity.delete({ id: req.params.id });
+      res.status(404).send();
     });
-    adminEndpoint('/systems/cooldown', 'generic::getOne', async (id, cb) => {
+    app.post('/api/systems/cooldown', adminMiddleware, async (req, res) => {
       try {
-        const cooldown = await getRepository(CooldownEntity).findOne({ where: { id } });
-        cb(null, cooldown);
-      } catch (e: any) {
-        cb(e.stack);
+        const itemToSave = new CooldownEntity();
+        merge(itemToSave, req.body);
+        await validateOrReject(itemToSave);
+        await itemToSave.save();
+        res.send({ data: itemToSave });
+      } catch (e) {
+        res.status(400).send({ errors: e });
       }
     });
   }
@@ -130,25 +139,25 @@ class Cooldown extends System {
         name = name.replace(/'/g, '');
       }
 
-      const cooldown = await getRepository(CooldownEntity).findOne({
-        where: {
-          name,
-          type,
-        },
-      });
-
-      await getRepository(CooldownEntity).save({
-        ...cooldown,
+      const cooldownToSave = new CooldownEntity();
+      merge(cooldownToSave, {
         name,
         miliseconds:          parseInt(seconds, 10) * 1000,
         type,
-        timestamp:            0,
+        timestamp:            new Date(0).toISOString(),
         isErrorMsgQuiet:      quiet !== null,
         isEnabled:            true,
         isOwnerAffected:      false,
         isModeratorAffected:  false,
         isSubscriberAffected: true,
-      });
+      }, await CooldownEntity.findOne({
+        where: {
+          name,
+          type,
+        },
+      }));
+      await cooldownToSave.save();
+
       return [{
         response: prepare('cooldowns.cooldown-was-set', {
           seconds, type, command: name,
@@ -183,8 +192,7 @@ class Cooldown extends System {
       if (!opts.sender) {
         return true;
       }
-      let data: (CooldownInterface | { type: 'default'; canBeRunAt: number; isEnabled: true; name: string; permId: string })[] = [];
-      let viewer: CooldownViewerInterface | undefined;
+      let data: (CooldownEntity | { type: 'default'; canBeRunAt: number; isEnabled: true; name: string; permId: string })[] = [];
       let timestamp, now;
       const [cmd, subcommand] = new Expects(opts.message)
         .command({ optional: true })
@@ -234,7 +242,7 @@ class Cooldown extends System {
           }
         }
 
-        const cooldown = await getRepository(CooldownEntity).findOne({ where: [{ name }, { name: In(groupName) }], relations: ['viewers'] });
+        const cooldown = await getRepository(CooldownEntity).findOne({ where: [{ name }, { name: In(groupName) }] });
         if (!cooldown) {
           const defaultValue = await this.getPermissionBasedSettingsValue('defaultCooldownOfCommandsInSeconds');
           const permId = await getUserHighestPermission(opts.sender.userId);
@@ -261,7 +269,7 @@ class Cooldown extends System {
       } else { // text
         let [keywords, cooldowns] = await Promise.all([
           getRepository(Keyword).find(),
-          getRepository(CooldownEntity).find({ relations: ['viewers'] }),
+          getRepository(CooldownEntity).find(),
         ]);
 
         keywords = keywords.filter(o => {
@@ -305,7 +313,7 @@ class Cooldown extends System {
       }
       let result = false;
 
-      const affectedCooldowns: CooldownInterface[] = [];
+      const affectedCooldowns: CooldownEntity[] = [];
       for (const cooldown of data) {
         if (cooldown.type === 'default') {
           debug('cooldown.check', `Checking default cooldown ${cooldown.name} (${cooldown.permId}) ${cooldown.canBeRunAt}`);
@@ -335,52 +343,44 @@ class Cooldown extends System {
           continue;
         }
 
-        for (const item of cooldown.viewers?.filter(o => o.userId === opts.sender?.userId) ?? []) {
-          if (!viewer || viewer.timestamp < item.timestamp) {
-            viewer = { ...item };
-          } else {
-            // remove duplicate
-            cooldown.viewers = cooldown.viewers?.filter(o => o.id !== item.id);
-          }
-        }
+        const viewer = viewers.find(o => o.cooldownId === cooldown.id && o.userId === opts.sender?.userId);
         debug('cooldown.db', viewer ?? `${opts.sender.userName}#${opts.sender.userId} not found in cooldown list`);
         if (cooldown.type === 'global') {
-          timestamp = cooldown.timestamp ?? 0;
+          timestamp = cooldown.timestamp ?? new Date(0).toISOString();
         } else {
-          timestamp = viewer?.timestamp ?? 0;
+          timestamp = new Date(viewer?.timestamp || 0).toISOString();
         }
         now = Date.now();
 
-        if (now - timestamp >= cooldown.miliseconds) {
+        if (now - new Date(timestamp).getTime() >= cooldown.miliseconds) {
           if (cooldown.type === 'global') {
-            await getRepository(CooldownEntity).save({
-              ...cooldown,
-              timestamp: now,
-            });
+            cooldown.timestamp = new Date().toISOString();
+            await cooldown.save();
           } else {
             debug('cooldown.check', `${opts.sender.userName}#${opts.sender.userId} added to cooldown list.`);
-            await getRepository(CooldownViewer).insert({
-              cooldown, userId: opts.sender.userId, timestamp: now,
-            });
+            viewers = [...viewers.filter(o => !(o.cooldownId === cooldown.id && o.userId === opts.sender?.userId)), {
+              timestamp:  Date.now(),
+              cooldownId: cooldown.id,
+              userId:     opts.sender.userId,
+            }];
           }
-          affectedCooldowns.push({
-            ...cooldown,
-            timestamp: now,
-          });
+
+          merge(cooldown, { timestamp: new Date().toISOString() });
+          affectedCooldowns.push(cooldown);
           result = true;
           continue;
         } else {
           if (!cooldown.isErrorMsgQuiet) {
             if (this.cooldownNotifyAsWhisper) {
-              const response = prepare('cooldowns.cooldown-triggered', { command: opts.message, seconds: Math.ceil((cooldown.miliseconds - now + timestamp) / 1000) });
+              const response = prepare('cooldowns.cooldown-triggered', { command: opts.message, seconds: Math.ceil((cooldown.miliseconds - now + new Date(timestamp).getTime()) / 1000) });
               parserReply(response, opts, 'whisper'); // we want to whisp cooldown message
             }
             if (this.cooldownNotifyAsChat) {
-              const response = prepare('cooldowns.cooldown-triggered', { command: opts.message, seconds: Math.ceil((cooldown.miliseconds - now + timestamp) / 1000) });
+              const response = prepare('cooldowns.cooldown-triggered', { command: opts.message, seconds: Math.ceil((cooldown.miliseconds - now + new Date(timestamp).getTime()) / 1000) });
               parserReply(response, opts, 'chat');
             }
           }
-          debug('cooldown.check', `${opts.sender.userName}#${opts.sender.userId} have ${cooldown.name} on cooldown, remaining ${Math.ceil((cooldown.miliseconds - now + timestamp) / 1000)}s`);
+          debug('cooldown.check', `${opts.sender.userName}#${opts.sender.userId} have ${cooldown.name} on cooldown, remaining ${Math.ceil((cooldown.miliseconds - now + new Date(timestamp).getTime()) / 1000)}s`);
           result = false;
           break; // disable _.each and updateQueue with false
         }
@@ -406,13 +406,9 @@ class Cooldown extends System {
     if (cached) {
       for (const cooldown of cached.cooldowns) {
         if (cooldown.type === 'global') {
-          cooldown.timestamp = 0; // we just revert to 0 as user were able to run it
+          cooldown.timestamp = new Date(0).toISOString(); // we just revert to 0 as user were able to run it
         } else {
-          cooldown.viewers?.push({
-            timestamp: 0,
-            userId:    opts.sender.userId,
-            ...cooldown.viewers.find(o => o.userId === opts.sender?.userId),
-          });
+          viewers = viewers.filter(o => o.userId !== opts.sender?.userId && o.cooldownId !== cooldown.id);
         }
         // rollback timestamp
         await getRepository(CooldownEntity).save(cooldown);
@@ -430,8 +426,7 @@ class Cooldown extends System {
         .toArray();
 
       const cooldown = await getRepository(CooldownEntity).findOne({
-        relations: ['viewers'],
-        where:     {
+        where: {
           name,
           type: typeParameter,
         },

@@ -1,23 +1,18 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
-/* global describe it before */
-
-
 require('../../general.js');
-
-const { getRepository } = require('typeorm');
-const { User } = require('../../../dest/database/entity/user');
-const { Cooldown } = require('../../../dest/database/entity/cooldown');
-const Parser = require('../../../dest/parser').default;
-const { Price } = require('../../../dest/database/entity/price');
 
 const assert = require('assert');
 
+const { getRepository } = require('typeorm');
+
+const { Cooldown } = require('../../../dest/database/entity/cooldown');
+const { Price } = require('../../../dest/database/entity/price');
+const { User } = require('../../../dest/database/entity/user');
+const Parser = require('../../../dest/parser').default;
+const cooldown = (require('../../../dest/systems/cooldown')).default;
 const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 const user = require('../../general.js').user;
 const time = require('../../general.js').time;
-
-const cooldown = (require('../../../dest/systems/cooldown')).default;
 
 describe('Cooldowns - @func3 - #3720 - global cooldown should be properly reverted', () => {
   before(async () => {
@@ -25,7 +20,7 @@ describe('Cooldowns - @func3 - #3720 - global cooldown should be properly revert
     await message.prepare();
     await user.prepare();
 
-    await getRepository(User).save({...user.viewer2, points: 100});
+    await getRepository(User).save({ ...user.viewer2, points: 100 });
   });
 
   it('create cooldown on !me [global 60]', async () => {
@@ -66,7 +61,7 @@ describe('Cooldowns - @func3 - #3720 - global cooldown should be properly revert
 
   it('cooldown should be reverted', async () => {
     const item = await getRepository(Cooldown).findOne({ where: { name: '!me' } });
-    assert.strictEqual(item.timestamp, 0);
+    assert.strictEqual(item.timestamp, new Date(0).toISOString());
   });
 
   it('testuser2 should have enough points', async () => {
@@ -78,7 +73,7 @@ describe('Cooldowns - @func3 - #3720 - global cooldown should be properly revert
   it('cooldown should be changed', async () => {
     const item = await getRepository(Cooldown).findOne({ where: { name: '!me' } });
     timestamp = item.timestamp;
-    assert(item.timestamp > 0);
+    assert(new Date(item.timestamp).getTime() > 0);
   });
 
   it('testuser2 should not have enough points', async () => {
@@ -102,6 +97,6 @@ describe('Cooldowns - @func3 - #3720 - global cooldown should be properly revert
 
   it('cooldown should be reverted', async () => {
     const item = await getRepository(Cooldown).findOne({ where: { name: '!me' } });
-    assert.strictEqual(item.timestamp, 0);
+    assert.strictEqual(item.timestamp, new Date(0).toISOString());
   });
 });
