@@ -19,10 +19,10 @@ dependencies:
 	@rm -rf ${NODE_MODULES_DIR}
 	@echo -ne "\n\t ----- Installation of dependencies\n"
 ifeq ($(ENV),production)
-	npm ci --also=dev
+	npm ci --include=dev
 else
 	npm cache clean --force
-	npm install --also=dev
+	npm install --include=dev
 endif
 	@echo -ne "\n\t ----- Installation of husky\n"
 	npx --yes husky install
