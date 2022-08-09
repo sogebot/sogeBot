@@ -9,7 +9,7 @@
 
 `!subs` - show online subs count, last sub and how long ago
 
-`!followers` - show online followers count, last follow and how long ago
+`!followers` - show last follow and how long ago
 
 `!lastseen <username>` - when user send a message on your channel
 
