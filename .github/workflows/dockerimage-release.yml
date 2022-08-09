@@ -34,6 +34,11 @@ jobs:
         id: log
         run: echo ::set-output name=MESSAGE::$(node tools/changelog.js --escape generate)
 
+      - uses: actions/upload-artifact@v2
+        with:
+          name: sogeBot-${{ github.ref }}
+          path: ${{ github.workspace }}/*.zip
+
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
