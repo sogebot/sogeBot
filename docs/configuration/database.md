@@ -5,7 +5,8 @@
 
 ## SQLite3
 
-?> SQLite is **default** db (if installed by zipfile), if you didn't set MySQL/MariaDB or PostgreSQL, you don't need to do anything
+?> SQLite is **default** db (if installed by zipfile), if you didn't set MySQL/MariaDB or PostgreSQL,
+you don't need to do anything
 
 1. Rename `/path/to/sogebot/.env.sqlite` or in case of GIT install `/path/to/sogebot/src/data/.env.sqlite` to `/path/to/sogebot/.env`
 2. **DON'T UPDATE ANY OTHER INFORMATIONS (LIKE MIGRATION, ENTITIES),
