@@ -138,7 +138,7 @@ export const refresh = async (type: 'bot' | 'broadcaster'): Promise<string | nul
     }
   } catch (e) {
     errorCount[type]++;
-    if (axios.isAxiosError(e) && e.response?.data?.message === 'Invalid refresh token received') {
+    if (axios.isAxiosError(e) && (e.response?.data as any)?.message === 'Invalid refresh token received') {
       error(`Invalid refresh token used for ${type}.`);
       errorCount[type] = 1000;
       return null;

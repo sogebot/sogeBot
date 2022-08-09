@@ -18,12 +18,7 @@ dependencies:
 	@rm -rf node_modules
 	@rm -rf ${NODE_MODULES_DIR}
 	@echo -ne "\n\t ----- Installation of dependencies\n"
-ifeq ($(ENV),production)
-	npm ci --include=dev
-else
-	npm cache clean --force
 	npm install --include=dev
-endif
 	@echo -ne "\n\t ----- Installation of husky\n"
 	npx --yes husky install
 

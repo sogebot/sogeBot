@@ -168,7 +168,7 @@ export const validate = async (type: 'bot' | 'broadcaster', retry = 0): Promise 
       }
 
       if (e.response) {
-        throw new Error(`Error on validate ${type} OAuth token, error: ${e.response.status} - ${e.response.statusText} - ${e.response.data.message}`);
+        throw new Error(`Error on validate ${type} OAuth token, error: ${e.response.status} - ${e.response.statusText} - ${(e.response.data as any).message}`);
       }
     } else {
       debug('oauth.validate', e.stack);

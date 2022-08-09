@@ -6,6 +6,7 @@ import { HOUR, MINUTE } from '@sogebot/ui-helpers/constants';
 import { dayjs, timezone } from '@sogebot/ui-helpers/dayjsHelper';
 import chalk from 'chalk';
 import * as DiscordJs from 'discord.js';
+import { ChannelType, GatewayIntentBits } from 'discord.js';
 import { get } from 'lodash';
 import {
   getRepository, IsNull, LessThan, Not,
@@ -120,16 +121,16 @@ class Discord extends Integration {
         const channel = this.client.guilds.cache.get(this.guild)?.channels.cache.get(this.sendOnlineAnnounceToChannel);
         if (channel) {
           const message = await (channel as DiscordJs.TextChannel).messages.fetch(this.embedMessageId);
-          const embed = message?.embeds[0];
-          if (message && embed) {
+          const receivedEmbed = message?.embeds[0];
+          if (message && receivedEmbed) {
             const broadcasterUsername = variables.get('services.twitch.broadcasterUsername') as string;
-            embed.spliceFields(0, embed.fields.length);
-            embed.addFields(
-              this.fields
-                .filter((o) => this.filterFields(o))
-                .map((o) => this.prepareFields(o))
-            );
-            embed.setImage(`https://static-cdn.jtvnw.net/previews-ttv/live_user_${broadcasterUsername}-1920x1080.jpg?${Date.now()}`);
+            const embed = DiscordJs.EmbedBuilder.from(receivedEmbed)
+              .setFields(
+                this.fields
+                  .filter((o) => this.filterFields(o))
+                  .map((o) => this.prepareFields(o))
+              )
+              .setImage(`https://static-cdn.jtvnw.net/previews-ttv/live_user_${broadcasterUsername}-1920x1080.jpg?${Date.now()}`);
             message.edit({ embeds: [embed] });
           }
         }
@@ -300,17 +301,17 @@ class Discord extends Integration {
     if (channel && this.embedMessageId !== '') {
       try {
         const message = await (channel as DiscordJs.TextChannel).messages.fetch(this.embedMessageId);
-        const embed = message?.embeds[0];
-        if (message && embed) {
+        const receivedEmbed = message?.embeds[0];
+        if (message && receivedEmbed) {
           const broadcasterUsername = variables.get('services.twitch.broadcasterUsername') as string;
-          embed.setColor(0xff0000);
-          embed.setDescription(`${broadcasterUsername.charAt(0).toUpperCase() + broadcasterUsername.slice(1)} is not streaming anymore! Check it next time!`);
-          embed.spliceFields(0, embed.fields.length);
-          embed.addFields(
-            this.fields
-              .filter((o) => this.filterFields(o))
-              .map((o) => this.prepareFields(o)));
-          embed.setImage(`https://static-cdn.jtvnw.net/ttv-static/404_preview-1920x1080.jpg?${Date.now()}`);
+          const embed = DiscordJs.EmbedBuilder.from(receivedEmbed)
+            .setColor(0xff0000)
+            .setDescription(`${broadcasterUsername.charAt(0).toUpperCase() + broadcasterUsername.slice(1)} is not streaming anymore! Check it next time!`)
+            .setFields(
+              this.fields
+                .filter((o) => this.filterFields(o))
+                .map((o) => this.prepareFields(o)))
+            .setImage(`https://static-cdn.jtvnw.net/ttv-static/404_preview-1920x1080.jpg?${Date.now()}`);
           message.edit({ embeds: [embed], content: null });
         }
       } catch (e: any) {
@@ -368,7 +369,7 @@ class Discord extends Integration {
         }
 
         this.embedStartedAt = dayjs().tz(timezone).format('LLL');
-        const embed = new DiscordJs.MessageEmbed()
+        const embed = new DiscordJs.EmbedBuilder()
           .setURL('https://twitch.tv/' + broadcasterUsername)
           .addFields(
             this.fields
@@ -417,7 +418,7 @@ class Discord extends Integration {
           this.client?.user?.setPresence({
             status:     'online',
             activities: [{
-              name: activityString, type: 'STREAMING', url: `https://twitch.tv/${broadcasterUsername}`,
+              name: activityString, type: DiscordJs.ActivityType.Streaming, url: `https://twitch.tv/${broadcasterUsername}`,
             }],
           });
         } else {
@@ -502,8 +503,14 @@ class Discord extends Integration {
   initClient() {
     if (!this.client) {
       this.client = new DiscordJs.Client({
-        intents:  [DiscordJs.Intents.FLAGS.GUILDS,DiscordJs.Intents.FLAGS.GUILD_MESSAGES],
-        partials: ['REACTION', 'MESSAGE', 'CHANNEL'],
+        intents: [
+          GatewayIntentBits.GuildMessages,
+        ],
+        partials: [
+          DiscordJs.Partials.Reaction,
+          DiscordJs.Partials.Message,
+          DiscordJs.Partials.Channel,
+        ],
       });
       this.client.on('ready', () => {
         if (this.client) {
@@ -517,7 +524,7 @@ class Discord extends Integration {
         if (this.client && this.guild) {
 
           const isSelf = msg.author.tag === get(this.client, 'user.tag', null);
-          const isDM = msg.channel.type === 'DM';
+          const isDM = msg.channel.type === ChannelType.DM;
           const isDifferentGuild = msg.guild?.id !== this.guild;
           const isInIgnoreList
              = this.ignorelist.includes(msg.author.tag)
@@ -527,7 +534,7 @@ class Discord extends Integration {
             return;
           }
 
-          if (msg.channel.type === 'GUILD_TEXT') {
+          if (msg.channel.type === ChannelType.GuildText) {
             const listenAtChannels = [
               ...Array.isArray(this.listenAtChannels) ? this.listenAtChannels : [this.listenAtChannels],
             ].filter(o => o !== '');
@@ -626,7 +633,7 @@ class Discord extends Integration {
           if (responses) {
             for (let i = 0; i < responses.length; i++) {
               setTimeout(async () => {
-                if (channel.type === 'GUILD_TEXT') {
+                if (channel.type === ChannelType.GuildText) {
                   const messageToSend = await new Message(await responses[i].response).parse({
                     ...responses[i].attr,
                     forceWithoutAt: true, // we dont need @
@@ -722,7 +729,7 @@ class Discord extends Integration {
       try {
         if (this.client && this.guild) {
           cb(null, this.client.guilds.cache.get(this.guild)?.channels.cache
-            .filter(o => o.type === 'GUILD_TEXT')
+            .filter(o => o.type === ChannelType.GuildText)
             .sort((a, b) => {
               const nameA = (a as DiscordJs.TextChannel).name.toUpperCase(); // ignore upper and lowercase
               const nameB = (b as DiscordJs.TextChannel).name.toUpperCase(); // ignore upper and lowercase
