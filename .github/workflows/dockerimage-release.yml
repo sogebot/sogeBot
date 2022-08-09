@@ -36,7 +36,7 @@ jobs:
 
       - uses: actions/upload-artifact@v2
         with:
-          name: sogeBot-${{ github.ref }}
+          name: sogeBot
           path: ${{ github.workspace }}/*.zip
 
       - name: Create Release
