@@ -2,6 +2,7 @@
   "upgrade": true,
   "reject": [
     "strip-ansi",
+    "mocha",
     "node-fetch",
     "graphql",
     "typeorm"
