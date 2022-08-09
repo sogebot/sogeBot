@@ -1,6 +1,7 @@
 {
   "upgrade": true,
   "reject": [
+    "strip-ansi",
     "node-fetch",
     "graphql",
     "typeorm"
