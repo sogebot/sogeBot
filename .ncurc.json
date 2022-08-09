@@ -1,8 +1,9 @@
 {
   "upgrade": true,
   "reject": [
-    "node-hue-api",
     "strip-ansi",
+    "mocha",
+    "chalk",
     "node-fetch",
     "graphql",
     "typeorm"
