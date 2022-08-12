@@ -19,7 +19,7 @@ export class Keyword extends BaseEntity {
   @Column({ nullable: true, type: String })
     group: string | null;
 
-  @OneToMany(() => KeywordResponses, (item) => item.keywordId)
+  @OneToMany(() => KeywordResponses, (item) => item.keyword)
     responses: KeywordResponses[];
 }
 
@@ -44,7 +44,7 @@ export class KeywordResponses extends BaseEntity {
     filter: string;
 
   @ManyToOne(() => Keyword, (item) => item.responses, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
-    keywordId: Keyword;
+    keyword: Keyword;
 }
 
 @Entity()
