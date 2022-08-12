@@ -19,7 +19,7 @@ export class Keyword extends BaseEntity {
   @Column({ nullable: true, type: String })
     group: string | null;
 
-  @OneToMany(() => KeywordResponses, (item) => item.keyword)
+  @OneToMany(() => KeywordResponses, (item) => item.keywordId)
     responses: KeywordResponses[];
 }
 
@@ -37,14 +37,14 @@ export class KeywordResponses extends BaseEntity {
   @Column()
     stopIfExecuted: boolean;
 
-  @Column()
-    permission: string;
+  @Column({ nullable: true })
+    permission: string | null;
 
   @Column()
     filter: string;
 
-  @ManyToOne(() => Keyword, (item) => item.responses)
-    keyword: Keyword;
+  @ManyToOne(() => Keyword, (item) => item.responses, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
+    keywordId: Keyword;
 }
 
 @Entity()
