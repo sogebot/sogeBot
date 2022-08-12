@@ -37,7 +37,7 @@ export class KeywordResponses extends BaseEntity {
   @Column()
     stopIfExecuted: boolean;
 
-  @Column({ type: 'string', nullable: true })
+    @Column({ nullable: true, type: String })
     permission: string | null;
 
   @Column()
