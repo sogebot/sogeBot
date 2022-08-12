@@ -3,7 +3,6 @@ import {
 } from '@entity/keyword';
 import { validateOrReject } from 'class-validator';
 import _, { merge } from 'lodash';
-import { getRepository } from 'typeorm';
 import XRegExp from 'xregexp';
 
 import { parserReply } from '../commons';
@@ -42,7 +41,7 @@ class Keywords extends System {
 
     app.get('/api/systems/keywords', adminMiddleware, async (req, res) => {
       res.send({
-        data: await Keyword.find(),
+        data: await Keyword.find({ relations: ['responses'] }),
       });
     });
     app.get('/api/systems/keywords/groups/', adminMiddleware, async (req, res) => {
@@ -71,7 +70,7 @@ class Keywords extends System {
     });
     app.get('/api/systems/keywords/:id', adminMiddleware, async (req, res) => {
       res.send({
-        data: await Keyword.findOne({ id: req.params.id }),
+        data: await Keyword.findOne({ where: { id: req.params.id }, relations: ['responses'] }),
       });
     });
     app.delete('/api/systems/keywords/groups/:name', adminMiddleware, async (req, res) => {
@@ -159,14 +158,13 @@ class Keywords extends System {
       }
 
       const newResponse = new KeywordResponses();
-      newResponse.order =          kDb.responses.length;
-      newResponse.permission =     pItem.id ?? defaultPermissions.VIEWERS;
+      newResponse.keyword = kDb;
+      newResponse.order = kDb.responses.length;
+      newResponse.permission = pItem.id ?? defaultPermissions.VIEWERS;
       newResponse.stopIfExecuted = stopIfExecuted;
-      newResponse.response =       response;
-      newResponse.filter =         '';
-      kDb.responses = [...kDb.responses, newResponse];
-
-      await kDb.save();
+      newResponse.response = response;
+      newResponse.filter = '';
+      await newResponse.save();
       return [{
         response: prepare('keywords.keyword-was-added', kDb), ...opts, id: kDb.id,
       }];
@@ -231,7 +229,7 @@ class Keywords extends System {
         if (stopIfExecuted) {
           responseDb.stopIfExecuted = stopIfExecuted;
         }
-        await Keyword.save(keyword);
+        await responseDb.save();
         return [{ response: prepare('keywords.keyword-was-edited', { keyword: keyword.keyword, response }), ...opts }];
       }
     } catch (e: any) {
@@ -316,16 +314,17 @@ class Keywords extends System {
             return [{ response: prepare('keywords.response-was-not-found'), ...opts }];
           }
           // remove and reorder
-          const responses: KeywordResponses[] = [];
+          let count = 0;
           for (let i = 0; i < keyword.responses.length; i++) {
-            if (responseDb.id !== _.orderBy(keyword.responses, 'order', 'asc')[i].id) {
-              const newResponse = new KeywordResponses();
-              merge(newResponse, _.orderBy(keyword.responses, 'order', 'asc')[i]);
-              newResponse.order = responses.length;
-              responses.push(newResponse);
+            const response = _.orderBy(keyword.responses, 'order', 'asc')[i];
+            if (responseDb.id !== response.id) {
+              response.order = count;
+              count++;
+              await response.save();
+            } else {
+              await response.remove();
             }
           }
-          await Keyword.save({ ...keyword, responses });
           return [{ response: prepare('keywords.response-was-removed', keyword), ...opts }];
         } else {
           await Keyword.remove(keyword);
@@ -369,7 +368,7 @@ class Keywords extends System {
         return [{ response: prepare('keywords.keyword-is-ambiguous'), ...opts }];
       } else {
         keywords[0].enabled = !keywords[0].enabled;
-        await Keyword.save(keywords);
+        await keywords[0].save(); // we have only one keyword
         return [{ response: prepare(keywords[0].enabled ? 'keywords.keyword-was-enabled' : 'keywords.keyword-was-disabled', keywords[0]), ...opts }];
       }
     } catch (e: any) {
@@ -404,13 +403,15 @@ class Keywords extends System {
 
     let atLeastOnePermissionOk = false;
     for (const k of keywords) {
+      debug('keywords.run', JSON.stringify({ k }));
       const _responses: KeywordResponses[] = [];
 
       // check group filter first
       let group: Readonly<Required<KeywordGroup>> | undefined;
       let groupPermission: null | string = null;
       if (k.group) {
-        group = await getRepository(KeywordGroup).findOne({ name: k.group });
+        group = await KeywordGroup.findOne({ name: k.group });
+        debug('keywords.run', JSON.stringify({ group }));
         if (group) {
           if (group.options.filter && !(await checkFilter(opts, group.options.filter))) {
             warning(`Keyword ${k.keyword}#${k.id} didn't pass group filter.`);
@@ -440,6 +441,8 @@ class Keywords extends System {
           }
         }
       }
+
+      debug('keywords.run', JSON.stringify({ _responses }));
 
       this.sendResponse(_.cloneDeep(_responses), { sender: opts.sender, discord: opts.discord, id: opts.id });
     }

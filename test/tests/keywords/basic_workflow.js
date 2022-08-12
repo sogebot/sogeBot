@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
-/* global describe it beforeEach */
 require('../../general.js');
 
 const db = require('../../general.js').db;
@@ -100,7 +99,7 @@ const successTests = [
 ];
 
 
-describe('Keywords - basic worflow (add, run, edit) - @func2', () => {
+describe('Keywords - basic workflow (add, run, edit) - @func2', () => {
   describe('Expected parsed fail', () => {
     before(async () => {
       await db.cleanup();
@@ -129,13 +128,13 @@ describe('Keywords - basic worflow (add, run, edit) - @func2', () => {
             case 'add':
               it ('add()', async () => {
                 const r = await keywords.add({ sender: owner, parameters: generateCommand(test) });
-                const k = await getRepository(Keyword).findOne({ keyword: test.keyword });
+                const k = await Keyword.findOne({ keyword: test.keyword });
                 assert.strictEqual(r[0].response, `$sender, keyword ${test.keyword} (${k.id}) was added`);
               });
               break;
             case 'toggle':
               it ('toggle()', async () => {
-                const k = await getRepository(Keyword).findOne({ keyword: test.keyword });
+                const k = await Keyword.findOne({ keyword: test.keyword });
                 const r = await keywords.toggle({ sender: owner, parameters: generateCommand(test) });
                 if (k.enabled) {
                   assert.strictEqual(r[0].response, `$sender, keyword ${test.keyword} was disabled`);
