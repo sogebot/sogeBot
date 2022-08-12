@@ -4,7 +4,7 @@ import { BaseEntity, Column, Entity, Index, PrimaryColumn } from 'typeorm';
 
 @Entity()
 export class Keyword extends BaseEntity {
-  @PrimaryColumn({ generated: 'uuid' })
+  @PrimaryColumn({ generated: 'uuid', type: 'uuid' })
     id: string;
 
   @Column()
@@ -25,7 +25,7 @@ export class Keyword extends BaseEntity {
 
 @Entity()
 export class KeywordResponses extends BaseEntity {
-  @PrimaryColumn({ generated: 'uuid' })
+  @PrimaryColumn({ generated: 'uuid', type: 'uuid' })
     id: string;
 
   @Column()
