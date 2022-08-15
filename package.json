@@ -11,10 +11,10 @@
   "author": "Michal Orlik <sogehige@gmail.com>",
   "license": "MIT",
   "dependencies": {
-    "@sogebot/ui-admin": "^54.0.6",
+    "@sogebot/ui-admin": "^55.0.0",
     "@sogebot/ui-helpers": "^3.1.0",
     "@sogebot/ui-oauth": "~3.1.1",
-    "@sogebot/ui-overlay": "^28.0.3",
+    "@sogebot/ui-overlay": "^29.0.0",
     "@sogebot/ui-public": "^3.0.2",
     "@twurple/api": "^5.2.1",
     "@twurple/auth": "^5.2.1",

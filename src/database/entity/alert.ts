@@ -4,6 +4,7 @@ import { EntitySchema } from 'typeorm';
 import { ColumnNumericTransformer } from './_transformer';
 
 export interface EmitData {
+  alertId?: string;
   name: string;
   amount: number;
   tier: null | 'Prime' | '1' | '2' | '3';
