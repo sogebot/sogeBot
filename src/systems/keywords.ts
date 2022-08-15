@@ -3,6 +3,7 @@ import {
 } from '@entity/keyword';
 import { validateOrReject } from 'class-validator';
 import _, { merge } from 'lodash';
+import { getRepository } from 'typeorm';
 import XRegExp from 'xregexp';
 
 import { parserReply } from '../commons';
@@ -98,6 +99,15 @@ class Keywords extends System {
         merge(itemToSave, req.body);
         await validateOrReject(itemToSave);
         await itemToSave.save();
+
+        await getRepository(KeywordResponses).delete({ keyword: itemToSave });
+        const responses = req.body.responses;
+        for (const response of responses) {
+          const resToSave = new KeywordResponses();
+          merge(resToSave, response);
+          resToSave.keyword = itemToSave;
+          await resToSave.save();
+        }
         res.send({ data: itemToSave });
       } catch (e) {
         res.status(400).send({ errors: e });
