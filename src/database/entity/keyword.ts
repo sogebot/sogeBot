@@ -1,84 +1,61 @@
-import { EntitySchema } from 'typeorm';
+import { IsNotEmpty, MinLength } from 'class-validator';
+import { ManyToOne, OneToMany } from 'typeorm';
+import { BaseEntity, Column, Entity, Index, PrimaryColumn } from 'typeorm';
 
-export interface KeywordInterface {
-  id?: string;
-  keyword: string;
-  enabled: boolean;
-  group: string | null;
-  responses?: KeywordsResponsesInterface[];
+@Entity()
+export class Keyword extends BaseEntity {
+  @PrimaryColumn({ generated: 'uuid', type: 'uuid' })
+    id: string;
+
+  @Column()
+  @IsNotEmpty()
+  @MinLength(2)
+  @Index('IDX_35e3ff88225eef1d85c951e229')
+    keyword: string;
+
+  @Column()
+    enabled: boolean;
+
+  @Column({ nullable: true, type: String })
+    group: string | null;
+
+  @OneToMany(() => KeywordResponses, (item) => item.keyword)
+    responses: KeywordResponses[];
 }
-export class KeywordGroupInterface {
-  name: string;
-  options: {
+
+@Entity()
+export class KeywordResponses extends BaseEntity {
+  @PrimaryColumn({ generated: 'uuid', type: 'uuid' })
+    id: string;
+
+  @Column()
+    order: number;
+
+  @Column({ type: 'text' })
+    response: string;
+
+  @Column()
+    stopIfExecuted: boolean;
+
+  @Column({ nullable: true, type: String })
+    permission: string | null;
+
+  @Column()
+    filter: string;
+
+  @ManyToOne(() => Keyword, (item) => item.responses, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
+    keyword: Keyword;
+}
+
+@Entity()
+export class KeywordGroup extends BaseEntity {
+  @PrimaryColumn()
+  @Index('IDX_keyword_group_unique_name', { unique: true })
+    name: string;
+
+  @Column({ type: 'simple-json' })
+    options: {
     filter: string | null;
     permission: string | null;
   };
 }
-export interface KeywordsResponsesInterface {
-  id?: string;
-  keyword?: KeywordInterface;
-  order: number;
-  response: string;
-  permission: string | null;
-  filter: string;
-  stopIfExecuted: boolean;
-}
-
-export const Keyword = new EntitySchema<Readonly<Required<KeywordInterface>>>({
-  name:    'keyword',
-  columns: {
-    id: {
-      type: 'uuid', primary: true, generated: 'uuid',
-    },
-    keyword: { type: String },
-    group:   { type: String, nullable: true },
-    enabled: { type: Boolean },
-  },
-  indices: [
-    { name: 'IDX_35e3ff88225eef1d85c951e229', columns: ['keyword'] },
-  ],
-  relations: {
-    responses: {
-      type:        'one-to-many',
-      target:      'keyword_responses',
-      inverseSide: 'keyword',
-      cascade:     true,
-    },
-  },
-});
-
-export const KeywordResponses = new EntitySchema<Readonly<Required<KeywordsResponsesInterface>>>({
-  name:    'keyword_responses',
-  columns: {
-    id: {
-      type: 'uuid', primary: true, generated: 'uuid',
-    },
-    order:          { type: Number },
-    response:       { type: 'text' },
-    stopIfExecuted: { type: Boolean },
-    permission:     { type: String, nullable: true },
-    filter:         { type: String },
-  },
-  relations: {
-    keyword: {
-      type:        'many-to-one',
-      target:      'keyword',
-      inverseSide: 'responses',
-      onDelete:    'CASCADE',
-      onUpdate:    'CASCADE',
-    },
-  },
-});
-
-export const KeywordGroup = new EntitySchema<Readonly<Required<KeywordGroupInterface>>>({
-  name:    'keyword_group',
-  columns: {
-    name: {
-      type: String, primary: true,
-    },
-    options: { type: 'simple-json' },
-  },
-  indices: [
-    { name: 'IDX_keyword_group_unique_name', columns: ['name'], unique: true },
-  ],
-});

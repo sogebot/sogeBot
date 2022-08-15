@@ -360,14 +360,6 @@ export type ClientToServerEventsWithNamespace = {
     'generic::groups::getAll': generic<CommandsGroupInterface>['getAll'],
     'generic::groups::save': generic<CommandsGroupInterface>['save'],
   },
-  '/systems/keywords': GenericEvents & {
-    'generic::getAll': generic<KeywordInterface>['getAll'],
-    'generic::getOne': generic<KeywordInterface>['getOne'],
-    'generic::deleteById': generic<KeywordInterface>['deleteById'],
-    'generic::setById': generic<KeywordInterface>['setById'],
-    'generic::groups::getAll': generic<KeywordGroupInterface>['getAll'],
-    'generic::groups::save': generic<KeywordGroupInterface>['save'],
-  },
   '/systems/levels': GenericEvents & {
     'getLevelsExample': (cb: (error: Error | string | null, levels: string[]) => void) => void,
   },

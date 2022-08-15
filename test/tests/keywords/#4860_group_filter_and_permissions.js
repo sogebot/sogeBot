@@ -4,7 +4,7 @@ const assert = require('assert');
 const { getRepository } = require('typeorm');
 
 require('../../general.js');
-const { Keyword, KeywordGroup } = require('../../../dest/database/entity/keyword');
+const { Keyword, KeywordGroup, KeywordResponses } = require('../../../dest/database/entity/keyword');
 const { prepare } = (require('../../../dest/helpers/commons/prepare'));
 const { defaultPermissions } = require('../../../dest/helpers/permissions/');
 const keywords = (require('../../../dest/systems/keywords')).default;
@@ -20,113 +20,129 @@ describe('Keywords - @func3 - #4860 - keywords group permissions and filter shou
   });
 
   it('create filterGroup with filter | $game === "Dota 2"', async () => {
-    await getRepository(KeywordGroup).insert({
-      name:    'filterGroup',
-      options: {
-        filter:     '$game === "Dota 2"',
-        permission: null,
-      },
-    });
+    const group = new KeywordGroup();
+    group.name = 'filterGroup';
+    group.options = {
+      filter:     '$game === "Dota 2"',
+      permission: null,
+    };
+    await group.save();
   });
 
   it('create permGroup with permission | CASTERS', async () => {
-    await getRepository(KeywordGroup).insert({
-      name:    'permGroup',
-      options: {
-        filter:     null,
-        permission: defaultPermissions.CASTERS,
-      },
-    });
+    const group = new KeywordGroup();
+    group.name = 'permGroup';
+    group.options = {
+      filter:     null,
+      permission: defaultPermissions.CASTERS,
+    };
+    await group.save();
   });
 
   it('create permGroup2 without permission', async () => {
-    await getRepository(KeywordGroup).insert({
-      name:    'permGroup2',
-      options: {
-        filter:     null,
-        permission: null,
-      },
-    });
+    const group = new KeywordGroup();
+    group.name = 'permGroup2';
+    group.options = {
+      filter:     null,
+      permission: null,
+    };
+    await group.save();
   });
 
+  let testfilter = '';
+
   it('create keyword testfilter with filterGroup', async () => {
-    await getRepository(Keyword).save({
-      id:        '1a945d76-2d3c-4c7a-ae03-e0daf17142c5',
-      keyword:   'testfilter',
-      enabled:   true,
-      visible:   true,
-      group:     'filterGroup',
-      responses: [{
-        stopIfExecuted: false,
-        response:       'bad449ae-f0b3-488c-a7b0-39a853d5333f',
-        filter:         '',
-        order:          0,
-        permission:     defaultPermissions.VIEWERS,
-      }, {
-        stopIfExecuted: false,
-        response:       'c0f68c62-630b-412b-9c97-f5b1afc734d2',
-        filter:         '$title === \'test\'',
-        order:          1,
-        permission:     defaultPermissions.VIEWERS,
-      }, {
-        stopIfExecuted: false,
-        response:       '4b310000-b105-475a-8a85-a573a0bca1b7',
-        filter:         '$title !== \'test\'',
-        order:          2,
-        permission:     defaultPermissions.VIEWERS,
-      }],
-    });
+    const keyword = new Keyword();
+    keyword.keyword = 'testfilter';
+    keyword.enabled = true;
+    keyword.visible = true;
+    keyword.group = 'filterGroup';
+    await keyword.save();
+    testfilter = keyword.id;
+
+    const response1 = new KeywordResponses();
+    response1.stopIfExecuted = false;
+    response1.response = 'bad449ae-f0b3-488c-a7b0-39a853d5333f';
+    response1.filter = '';
+    response1.order = 0;
+    response1.permission = defaultPermissions.VIEWERS;
+    response1.keyword = keyword;
+    await response1.save();
+
+    const response2 = new KeywordResponses();
+    response2.stopIfExecuted = false;
+    response2.response = 'c0f68c62-630b-412b-9c97-f5b1afc734d2';
+    response2.filter = '$title === \'test\'';
+    response2.order = 1;
+    response2.permission = defaultPermissions.VIEWERS;
+    response2.keyword = keyword;
+    await response2.save();
+
+    const response3 = new KeywordResponses();
+    response3.stopIfExecuted = false;
+    response3.response = '4b310000-b105-475a-8a85-a573a0bca1b7';
+    response3.filter = '$title !== \'test\'';
+    response3.order = 2;
+    response3.permission = defaultPermissions.VIEWERS;
+    response3.keyword = keyword;
+    await response3.save();
   });
 
   it('create keyword testpermnull with permGroup', async () => {
-    await getRepository(Keyword).save({
-      id:        '2584b3c1-d2da-4fae-bf9a-95048724acda',
-      keyword:   'testpermnull',
-      enabled:   true,
-      visible:   true,
-      group:     'permGroup',
-      responses: [{
-        stopIfExecuted: false,
-        response:       '430ea834-da5f-48b1-bf2f-3acaf1f04c63',
-        filter:         '',
-        order:          0,
-        permission:     null,
-      }],
-    });
+    const keyword = new Keyword();
+    keyword.keyword = 'testpermnull';
+    keyword.enabled = true;
+    keyword.visible = true;
+    keyword.group = 'permGroup';
+    await keyword.save();
+
+    const response1 = new KeywordResponses();
+    response1.stopIfExecuted = false;
+    response1.response = '430ea834-da5f-48b1-bf2f-3acaf1f04c63';
+    response1.filter = '';
+    response1.order = 0;
+    response1.permission = null;
+    response1.keyword = keyword;
+    await response1.save();
   });
 
+  let testpermnull2 = '';
+
   it('create keyword testpermnull2 with permGroup2', async () => {
-    await getRepository(Keyword).save({
-      id:        '2584b3c1-d2da-4fae-bf9a-95048724acdb',
-      keyword:   'testpermnull2',
-      enabled:   true,
-      visible:   true,
-      group:     'permGroup2',
-      responses: [{
-        stopIfExecuted: false,
-        response:       '1594a86e-158d-4b7d-9898-0f80bd6a0c98',
-        filter:         '',
-        order:          0,
-        permission:     null,
-      }],
-    });
+    const keyword = new Keyword();
+    keyword.keyword = 'testpermnull2';
+    keyword.enabled = true;
+    keyword.visible = true;
+    keyword.group = 'permGroup2';
+    await keyword.save();
+    testpermnull2 = keyword.id;
+
+    const response1 = new KeywordResponses();
+    response1.stopIfExecuted = false;
+    response1.response = '1594a86e-158d-4b7d-9898-0f80bd6a0c98';
+    response1.filter = '';
+    response1.order = 0;
+    response1.permission = null;
+    response1.keyword = keyword;
+    await response1.save();
   });
 
   it('create keyword testpermmods with permGroup2', async () => {
-    await getRepository(Keyword).save({
-      id:        '2584b3c1-d2da-4fae-bf9a-95048724acdc',
-      keyword:   'testpermmods',
-      enabled:   true,
-      visible:   true,
-      group:     'permGroup2',
-      responses: [{
-        stopIfExecuted: false,
-        response:       'cae8f74f-046a-4756-b6c5-f2219d9a0f4e',
-        filter:         '',
-        order:          1,
-        permission:     defaultPermissions.MODERATORS,
-      }],
-    });
+    const keyword = new Keyword();
+    keyword.keyword = 'testpermmods';
+    keyword.enabled = true;
+    keyword.visible = true;
+    keyword.group = 'permGroup2';
+    await keyword.save();
+
+    const response1 = new KeywordResponses();
+    response1.stopIfExecuted = false;
+    response1.response = 'cae8f74f-046a-4756-b6c5-f2219d9a0f4e';
+    response1.filter = '';
+    response1.order = 0;
+    response1.permission = defaultPermissions.MODERATORS;
+    response1.keyword = keyword;
+    await response1.save();
   });
 
   it('!testpermnull should be triggered by CASTER', async () => {
@@ -144,14 +160,14 @@ describe('Keywords - @func3 - #4860 - keywords group permissions and filter shou
   it('!testpermnull2 should be triggered by CASTER', async () => {
     message.prepare();
     keywords.run({ sender: user.owner, message: 'testpermnull2' });
-    await message.isWarnedRaw('Keyword testpermnull2#2584b3c1-d2da-4fae-bf9a-95048724acdb|0 doesn\'t have any permission set, treating as CASTERS permission.');
+    await message.isWarnedRaw('Keyword testpermnull2#'+testpermnull2+'|0 doesn\'t have any permission set, treating as CASTERS permission.');
     await message.isSentRaw('1594a86e-158d-4b7d-9898-0f80bd6a0c98', user.owner);
   });
 
   it('!testpermnull2 should not be triggered by VIEWER', async () => {
     message.prepare();
     keywords.run({ sender: user.viewer, message: 'testpermnull2' });
-    await message.isWarnedRaw('Keyword testpermnull2#2584b3c1-d2da-4fae-bf9a-95048724acdb|0 doesn\'t have any permission set, treating as CASTERS permission.');
+    await message.isWarnedRaw('Keyword testpermnull2#'+testpermnull2+'|0 doesn\'t have any permission set, treating as CASTERS permission.');
     await message.isNotSentRaw('1594a86e-158d-4b7d-9898-0f80bd6a0c98', user.viewer);
   });
 
@@ -177,7 +193,7 @@ describe('Keywords - @func3 - #4860 - keywords group permissions and filter shou
     });
     it('!testfilter keywords should not be triggered', async () => {
       keywords.run({ sender: user.owner, message: 'testfilter' });
-      await message.isWarnedRaw('Keyword testfilter#1a945d76-2d3c-4c7a-ae03-e0daf17142c5 didn\'t pass group filter.');
+      await message.isWarnedRaw('Keyword testfilter#'+ testfilter +' didn\'t pass group filter.');
     });
   });
 
