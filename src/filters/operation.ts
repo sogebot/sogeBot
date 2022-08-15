@@ -1,8 +1,11 @@
+import { getRepository } from 'typeorm';
+
 import events from '../events';
 import { info } from '../helpers/log';
 
 import type { ResponseFilter } from '.';
 
+import { Price } from '~/database/entity/price';
 import alerts from '~/registries/alerts';
 
 export const operation: ResponseFilter = {
@@ -21,8 +24,10 @@ export const operation: ResponseFilter = {
     if (match && match.groups) {
       info(`Triggering alert ${match.groups.id} by command ${attributes.command}`);
 
+      const price = await getRepository(Price).findOne({ command: attributes.command, enabled: true });
+
       await alerts.trigger({
-        amount:     0,
+        amount:     price ? price.price : 0,
         currency:   'CZK',
         event:      'cmdredeems',
         alertId:    match.groups.id,
