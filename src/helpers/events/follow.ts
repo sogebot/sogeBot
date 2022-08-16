@@ -17,12 +17,11 @@ import { tmiEmitter } from '~/helpers/tmi';
 const events = new Map<string, number>();
 
 export function follow(userId: string, userName: string, followedAt: string) {
-  // cleanup
-  events.forEach((value, key) => {
-    if (value + HOUR <= Date.now()) {
-      events.delete(key);
-    }
-  });
+  if (events.has(userId)) {
+    debug('events', `User ${userName}#${userId} already followed in hour.`);
+    return;
+  }
+  events.set(userId, Date.now());
 
   if (isIgnored({ userName, userId })) {
     debug('events', `User ${userName}#${userId} is in ignore list.`);
@@ -32,11 +31,6 @@ export function follow(userId: string, userName: string, followedAt: string) {
       // remove from eventslit
       getRepository(EventList).delete({ userId });
     }
-    return;
-  }
-
-  if (events.has(userId)) {
-    debug('events', `User ${userName}#${userId} already followed in hour.`);
     return;
   }
 
@@ -66,6 +60,11 @@ export function follow(userId: string, userName: string, followedAt: string) {
       });
     }
 
-    events.set(userId, Date.now());
+    // cleanup
+    events.forEach((value, key) => {
+      if (value + HOUR <= Date.now()) {
+        events.delete(key);
+      }
+    });
   }
 }
