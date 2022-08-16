@@ -505,6 +505,7 @@ class Discord extends Integration {
       this.client = new DiscordJs.Client({
         intents: [
           GatewayIntentBits.GuildMessages,
+          GatewayIntentBits.Guilds,
         ],
         partials: [
           DiscordJs.Partials.Reaction,
@@ -704,6 +705,7 @@ class Discord extends Integration {
     adminEndpoint('/integrations/discord', 'discord::getGuilds', async (cb) => {
       try {
         if (this.client) {
+          await this.client.guilds.fetch();
           return cb(null, this.client.guilds.cache
             .sort((a, b) => {
               const nameA = a.name.toUpperCase(); // ignore upper and lowercase
