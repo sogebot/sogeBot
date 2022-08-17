@@ -1,12 +1,10 @@
-/* global describe it before */
-
 const _ = require('lodash');
 const { getRepository } = require('typeorm');
 const { v4: uuidv4 } = require('uuid');
 
 require('../../general.js');
 
-const { Commands } = require('../../../dest/database/entity/commands');
+const { Commands, CommandsResponses } = require('../../../dest/database/entity/commands');
 const { Event } = require('../../../dest/database/entity/event');
 const { User } = require('../../../dest/database/entity/user');
 const events = (require('../../../dest/events')).default;
@@ -44,34 +42,41 @@ describe('Events - event run command should correctly parse filters and be able 
     }];
     await getRepository(Event).save(event);
 
-    const command = await getRepository(Commands).save({
-      command:   '!test33',
-      enabled:   true,
-      visible:   true,
-      responses: [
-        {
-          order:          0,
-          response:       '1',
-          permission:     defaultPermissions.CASTERS,
-          stopIfExecuted: true,
-          filter:         '$isBotSubscriber',
-        },
-        {
-          order:          1,
-          response:       '2',
-          permission:     defaultPermissions.MODERATORS,
-          stopIfExecuted: true,
-          filter:         `$sender === '${user.viewer2.userName}'`,
-        },
-        {
-          order:          2,
-          response:       '3',
-          permission:     defaultPermissions.VIEWERS,
-          stopIfExecuted: true,
-          filter:         '',
-        },
-      ],
-    });
+    const command = new Commands();
+    command.id =        '1a945d76-2d3c-4c7a-ae03-e0daf17142c5';
+    command.command =   '!test33';
+    command.enabled =   true;
+    command.visible =   true;
+    command.group =     null;
+    await command.save();
+
+    const response = new CommandsResponses();
+    response.stopIfExecuted = false;
+    response.response =       '1';
+    response.filter =         '$isBotSubscriber';
+    response.order =          0;
+    response.permission =     defaultPermissions.CASTERS;
+    response.command = command;
+    await response.save();
+
+    const response2 = new CommandsResponses();
+    response2.stopIfExecuted = false;
+    response2.response =       '2';
+    response2.filter =         `$sender === '${user.viewer2.userName}'`;
+    response2.order =          1;
+    response2.permission =     defaultPermissions.MODERATORS;
+    response2.command = command;
+    await response2.save();
+
+    const response3 = new CommandsResponses();
+    response3.stopIfExecuted = false;
+    response3.response =       '3';
+    response3.filter =         '';
+    response3.order =          2;
+    response3.permission =     defaultPermissions.VIEWERS;
+    response3.command = command;
+    await response3.save();
+
     customcommands.invalidateCache();
   });
 

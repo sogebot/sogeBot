@@ -1,8 +1,9 @@
 import {
-  Commands, CommandsGroup, CommandsGroupInterface, CommandsInterface, CommandsResponsesInterface,
+  Commands, CommandsGroup, CommandsResponses,
 } from '@entity/commands';
 import * as constants from '@sogebot/ui-helpers/constants';
-import _ from 'lodash';
+import { validateOrReject } from 'class-validator';
+import _, { merge } from 'lodash';
 import { getRepository } from 'typeorm';
 
 import { parserReply } from '../commons';
@@ -19,11 +20,12 @@ import {
 } from '~/helpers/commands/count';
 import { prepare } from '~/helpers/commons';
 import { info, warning } from '~/helpers/log';
+import { app } from '~/helpers/panel';
 import {
   addToViewersCache, get, getFromViewersCache,
 } from '~/helpers/permissions';
 import { check, defaultPermissions } from '~/helpers/permissions/index';
-import { adminEndpoint } from '~/helpers/socket';
+import { adminMiddleware } from '~/socket';
 import { translate } from '~/translate';
 
 /*
@@ -42,7 +44,7 @@ let cacheValid = false;
 const findCache: {
   search: string;
   commands: {
-    command: CommandsInterface;
+    command: Commands;
     cmdArray: string[];
   }[]
 }[] = [];
@@ -56,89 +58,95 @@ class CustomCommands extends System {
   }
 
   sockets () {
-    adminEndpoint('/systems/customcommands', 'generic::groups::save', async (item, cb) => {
-      try {
-        cb(null, await getRepository(CommandsGroup).save(item));
-      } catch (e) {
-        if (e instanceof Error) {
-          cb(e.message, undefined);
-        }
-      }
+    if (!app) {
+      setTimeout(() => this.sockets(), 100);
+      return;
+    }
+
+    app.get('/api/systems/customcommands', adminMiddleware, async (req, res) => {
+      res.send({
+        data:  await Commands.find({ relations: ['responses'] }),
+        count: await getAllCountOfCommandUsage(),
+      });
     });
-    adminEndpoint('/systems/customcommands', 'generic::groups::getAll', async (cb) => {
-      let [ commandsGroup, commands ] = await Promise.all([
-        getRepository(CommandsGroup).find(), getRepository(Commands).find(),
+    app.get('/api/systems/customcommands/groups/', adminMiddleware, async (req, res) => {
+      let [ groupsList, items ] = await Promise.all([
+        CommandsGroup.find(), Commands.find(),
       ]);
 
-      for (const item of commands) {
-        if (item.group && !commandsGroup.find(o => o.name === item.group)) {
+      for (const item of items) {
+        if (item.group && !groupsList.find(o => o.name === item.group)) {
           // we dont have any group options -> create temporary group
-          const group: CommandsGroupInterface = {
-            name:    item.group,
-            options: {
-              filter:     null,
-              permission: null,
-            },
+          const group = new CommandsGroup();
+          group.name = item.group;
+          group.options = {
+            filter:     null,
+            permission: null,
           };
-          commandsGroup = [
-            ...commandsGroup,
+          groupsList = [
+            ...groupsList,
             group,
           ];
         }
       }
-      cb(null, commandsGroup);
+      res.send({
+        data: groupsList,
+      });
     });
-    adminEndpoint('/systems/customcommands', 'commands::resetCountByCommand', async (cmd: string, cb) => {
-      await resetCountOfCommandUsage(cmd);
-      cb(null);
+    app.get('/api/systems/customcommands/:id', adminMiddleware, async (req, res) => {
+      const cmd = await Commands.findOne({ where: { id: req.params.id }, relations: ['responses'] });
+      res.send({
+        data:  cmd,
+        count: cmd ? await getCountOfCommandUsage(cmd.command) : 0,
+      });
     });
-    adminEndpoint('/systems/customcommands', 'generic::setById', async (opts, cb) => {
-      try {
-        const item = await getRepository(Commands).findOne({ id: String(opts.id) });
-        await getRepository(Commands).save({ ...item, ...opts.item });
-        this.invalidateCache();
-        if (typeof cb === 'function') {
-          cb(null, item);
-        }
-      } catch (e: any) {
-        if (typeof cb === 'function') {
-          cb(e.stack);
-        }
-      }
-    });
-    adminEndpoint('/systems/customcommands', 'generic::deleteById', async (id, cb) => {
-      await getRepository(Commands).delete({ id: String(id) });
+    app.delete('/api/systems/customcommands/groups/:name', adminMiddleware, async (req, res) => {
+      await CommandsGroup.delete({ name: req.params.name });
       this.invalidateCache();
-      if (cb) {
-        cb(null);
+      res.status(404).send();
+    });
+    app.delete('/api/systems/customcommands/:id', adminMiddleware, async (req, res) => {
+      await Commands.delete({ id: req.params.id });
+      this.invalidateCache();
+      res.status(404).send();
+    });
+    app.post('/api/systems/customcommands/group', adminMiddleware, async (req, res) => {
+      try {
+        this.invalidateCache();
+        const itemToSave = new CommandsGroup();
+        merge(itemToSave, req.body);
+        await validateOrReject(itemToSave);
+        await itemToSave.save();
+        res.send({ data: itemToSave });
+      } catch (e) {
+        res.status(400).send({ errors: e });
       }
     });
-    adminEndpoint('/systems/customcommands', 'generic::getAll', async (cb) => {
+    app.post('/api/systems/customcommands', adminMiddleware, async (req, res) => {
       try {
-        const commands = await getRepository(Commands).find({
-          relations: ['responses'],
-          order:     { command: 'ASC' },
-        });
-        const count = await getAllCountOfCommandUsage();
-        cb(null, commands, count);
-      } catch (e: any) {
-        cb(e.stack, [], null);
-      }
-    });
-    adminEndpoint('/systems/customcommands', 'generic::getOne', async (id, cb) => {
-      try {
-        const cmd = await getRepository(Commands).findOne({
-          where:     { id },
-          relations: ['responses'],
-        });
-        if (!cmd) {
-          cb(null, null, 0);
-        } else {
-          const count = await getCountOfCommandUsage(cmd.command);
-          cb(null, cmd, count);
+        this.invalidateCache();
+        const itemToSave = new Commands();
+
+        const { count, ...data } = req.body;
+        merge(itemToSave, data);
+        await validateOrReject(itemToSave);
+        await itemToSave.save();
+
+        if (count === 0) {
+          await resetCountOfCommandUsage(itemToSave.command);
         }
-      } catch (e: any) {
-        cb (e);
+
+        await getRepository(CommandsResponses).delete({ command: itemToSave });
+        const responses = req.body.responses;
+        for (const response of responses) {
+          const resToSave = new CommandsResponses();
+          merge(resToSave, response);
+          resToSave.command = itemToSave;
+          await resToSave.save();
+        }
+        res.send({ data: itemToSave });
+      } catch (e) {
+        res.status(400).send({ errors: e });
       }
     });
   }
@@ -176,7 +184,7 @@ class CustomCommands extends System {
         throw Error('Command should start with !');
       }
 
-      const cDb = await getRepository(Commands).findOne({
+      const cDb = await Commands.findOne({
         relations: ['responses'],
         where:     { command: cmd },
       });
@@ -200,7 +208,7 @@ class CustomCommands extends System {
         responseDb.stopIfExecuted = stopIfExecuted;
       }
 
-      await getRepository(Commands).save(cDb);
+      await responseDb.save();
       this.invalidateCache();
       return [{ response: prepare('customcmds.command-was-edited', { command: cmd, response }), ...opts }];
     } catch (e: any) {
@@ -229,14 +237,16 @@ class CustomCommands extends System {
         throw Error('Command should start with !');
       }
 
-      const cDb = await getRepository(Commands).findOne({
+      const cDb = await Commands.findOne({
         relations: ['responses'],
         where:     { command: cmd },
       });
       if (!cDb) {
-        await getRepository(Commands).save({
-          command: cmd, enabled: true, visible: true,
-        });
+        const newCommand = new Commands();
+        newCommand.command = cmd;
+        newCommand.enabled = true;
+        newCommand.visible = true;
+        await newCommand.save();
         return this.add(opts);
       }
 
@@ -245,16 +255,14 @@ class CustomCommands extends System {
         throw Error('Permission ' + userlevel + ' not found.');
       }
 
-      await getRepository(Commands).save({
-        ...cDb,
-        responses: [...cDb.responses, {
-          order:          cDb.responses.length,
-          permission:     pItem.id ?? defaultPermissions.VIEWERS,
-          stopIfExecuted: stopIfExecuted,
-          response:       response,
-          filter:         '',
-        }],
-      });
+      const newResponse = new CommandsResponses();
+      newResponse.order =          cDb.responses.length;
+      newResponse.permission =     pItem.id ?? defaultPermissions.VIEWERS;
+      newResponse.stopIfExecuted = stopIfExecuted;
+      newResponse.response =       response;
+      newResponse.filter =         '';
+      newResponse.command = cDb;
+      await newResponse.save();
       this.invalidateCache();
       return [{ response: prepare('customcmds.command-was-added', { command: cmd }), ...opts }];
     } catch (e: any) {
@@ -268,7 +276,7 @@ class CustomCommands extends System {
 
   async find(search: string) {
     const commands: {
-      command: CommandsInterface;
+      command: Commands;
       cmdArray: string[];
     }[] = [];
     if (!cacheValid) {
@@ -285,8 +293,8 @@ class CustomCommands extends System {
     } else {
       const cmdArray = search.toLowerCase().split(' ');
       for (let i = 0, len = search.toLowerCase().split(' ').length; i < len; i++) {
-        const db_commands: CommandsInterface[]
-          = await getRepository(Commands).find({
+        const db_commands: Commands[]
+          = await Commands.find({
             relations: ['responses'],
             where:     { command: cmdArray.join(' ') },
           });
@@ -323,13 +331,13 @@ class CustomCommands extends System {
         warning(`Custom command ${cmd.command.command} (${cmd.command.id}) is disabled!`);
         continue;
       }
-      const _responses: CommandsResponsesInterface[] = [];
+      const _responses: CommandsResponses[] = [];
       // remove found command from message to get param
       const param = opts.message.replace(new RegExp('^(' + cmd.cmdArray.join(' ') + ')', 'i'), '').trim();
       incrementCountOfCommandUsage(cmd.command.command);
 
       // check group filter first
-      let group: Readonly<Required<CommandsGroupInterface>> | undefined;
+      let group: Readonly<Required<CommandsGroup>> | undefined;
       let groupPermission: null | string = null;
       if (cmd.command.group) {
         group = await getRepository(CommandsGroup).findOne({ name: cmd.command.group });
@@ -377,7 +385,7 @@ class CustomCommands extends System {
     return atLeastOnePermissionOk;
   }
 
-  async sendResponse(responses: (CommandsResponsesInterface)[], opts: { param: string; sender: CommandOptions['sender'], discord: CommandOptions['discord'], command: string, processedCommands?: string[], id: string, }) {
+  async sendResponse(responses: (CommandsResponses)[], opts: { param: string; sender: CommandOptions['sender'], discord: CommandOptions['discord'], command: string, processedCommands?: string[], id: string, }) {
     for (let i = 0; i < responses.length; i++) {
       await parserReply(responses[i].response, opts);
     }
@@ -390,13 +398,13 @@ class CustomCommands extends System {
 
     if (!cmd) {
       // print commands
-      const commands = await getRepository(Commands).find({ where: { visible: true, enabled: true } });
+      const commands = await Commands.find({ where: { visible: true, enabled: true } });
       const response = (commands.length === 0 ? translate('customcmds.list-is-empty') : translate('customcmds.list-is-not-empty').replace(/\$list/g, _.orderBy(commands, 'command').map(o => o.command).join(', ')));
       return [{ response, ...opts }];
     } else {
       // print responses
       const command_with_responses
-        = await getRepository(Commands).findOne({
+        = await Commands.findOne({
           relations: ['responses'],
           where:     { command: cmd },
         });
@@ -423,17 +431,15 @@ class CustomCommands extends System {
         .string({ optional: true })
         .toArray();
 
-      const cmd = await getRepository(Commands).findOne({ where: { command: (cmdInput + ' ' + subcommand).trim() } });
+      const cmd = await Commands.findOne({ where: { command: (cmdInput + ' ' + subcommand).trim() } });
       if (!cmd) {
         const response = prepare('customcmds.command-was-not-found', { command: (cmdInput + ' ' + subcommand).trim() });
         return [{ response, ...opts }];
       }
-      await getRepository(Commands).save({
-        ...cmd,
-        enabled: !cmd.enabled,
-      });
+      cmd.enabled = !cmd.enabled;
+      await cmd.save();
       this.invalidateCache();
-      return [{ response: prepare(!cmd.enabled ? 'customcmds.command-was-enabled' : 'customcmds.command-was-disabled', { command: cmd.command }), ...opts }];
+      return [{ response: prepare(cmd.enabled ? 'customcmds.command-was-enabled' : 'customcmds.command-was-disabled', { command: cmd.command }), ...opts }];
     } catch (e: any) {
       const response = prepare('customcmds.commands-parse-failed', { command: this.getCommand('!command') });
       return [{ response, ...opts }];
@@ -449,14 +455,15 @@ class CustomCommands extends System {
         .string({ optional: true })
         .toArray();
 
-      const cmd = await getRepository(Commands).findOne({ where: { command: (cmdInput + ' ' + subcommand).trim() } });
+      const cmd = await Commands.findOne({ where: { command: (cmdInput + ' ' + subcommand).trim() } });
       if (!cmd) {
         const response = prepare('customcmds.command-was-not-found', { command: (cmdInput + ' ' + subcommand).trim() });
         return [{ response, ...opts }];
       }
-      await getRepository(Commands).save({ ...cmd, visible: !cmd.visible });
+      cmd.visible = !cmd.visible;
+      await cmd.save();
 
-      const response = prepare(!cmd.visible ? 'customcmds.command-was-exposed' : 'customcmds.command-was-concealed', { command: cmd.command });
+      const response = prepare(cmd.visible ? 'customcmds.command-was-exposed' : 'customcmds.command-was-concealed', { command: cmd.command });
       this.invalidateCache();
       return [{ response, ...opts }];
 
@@ -483,7 +490,7 @@ class CustomCommands extends System {
         throw Error('Command should start with !');
       }
 
-      const command_db = await getRepository(Commands).findOne({
+      const command_db = await Commands.findOne({
         where:     { command: cmd },
         relations: [ 'responses' ],
       });
@@ -493,17 +500,19 @@ class CustomCommands extends System {
         let response = prepare('customcmds.command-was-removed', { command: cmd });
         if (rId >= 1) {
           const responseDb = command_db.responses.filter(o => o.order !== (rId - 1));
+          const toRemove = command_db.responses.find(o => o.order === (rId - 1));
+          await toRemove?.remove();
+
           // reorder
           responseDb.forEach((item, index) => {
             item.order = index;
           });
-          await getRepository(Commands).save({
-            ...command_db,
-            responses: responseDb,
-          });
+          for (const r of responseDb) {
+            await r.save();
+          }
           response = prepare('customcmds.response-was-removed', { command: cmd, response: rId });
         } else {
-          await getRepository(Commands).remove(command_db);
+          await Commands.remove(command_db);
         }
         this.invalidateCache();
         return [{ response, ...opts }];

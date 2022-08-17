@@ -351,15 +351,6 @@ export type ClientToServerEventsWithNamespace = {
   '/integrations/streamelements': GenericEvents,
   '/integrations/qiwi': GenericEvents,
   '/integrations/lastfm': GenericEvents,
-  '/systems/customcommands': GenericEvents & {
-    'commands::resetCountByCommand': (command: string, cb: (error: Error | string | null) => void) => void,
-    'generic::getAll': (cb: (error: Error | string | null, items: Readonly<Required<CommandsInterface>>[], count: { command: string; count: number; }[] | null) => void) => void,
-    'generic::getOne': (id: string, cb: (error: Error | string | null, item?: Readonly<Required<CommandsInterface>> | null, count?: number) => void) => void,
-    'generic::deleteById': generic<CommandsInterface>['deleteById'],
-    'generic::setById': generic<CommandsInterface>['setById'],
-    'generic::groups::getAll': generic<CommandsGroupInterface>['getAll'],
-    'generic::groups::save': generic<CommandsGroupInterface>['save'],
-  },
   '/systems/levels': GenericEvents & {
     'getLevelsExample': (cb: (error: Error | string | null, levels: string[]) => void) => void,
   },

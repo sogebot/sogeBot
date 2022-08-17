@@ -1,20 +1,17 @@
-/* global describe it before */
+const { v4: uuid } = require('uuid');
+const assert = require('assert');
+const { merge } = require('lodash');
+const { getRepository } = require('typeorm');
 
+const { Commands, CommandsResponses } = require('../../../dest/database/entity/commands');
+const { User } = require('../../../dest/database/entity/user');
+const { defaultPermissions } = require('../../../dest/helpers/permissions/');
+const customcommands = (require('../../../dest/systems/customcommands')).default;
 
 require('../../general.js');
-const { v4: uuid } = require('uuid');
-
 const db = require('../../general.js').db;
 const message = require('../../general.js').message;
-const assert = require('assert');
 
-const { defaultPermissions } = require('../../../dest/helpers/permissions/');
-
-const { getRepository } = require('typeorm');
-const { Commands } = require('../../../dest/database/entity/commands');
-const { User } = require('../../../dest/database/entity/user');
-
-const customcommands = (require('../../../dest/systems/customcommands')).default;
 
 // users
 const owner = { userName: '__broadcaster__', userId: String(Math.floor(Math.random() * 100000)) };
@@ -31,39 +28,69 @@ describe('Custom Commands - @func1 - run()', () => {
 
   describe('\'!test qwerty\' should trigger correct commands', () => {
     it('create \'!test\' command with $_variable', async () => {
-      await getRepository(Commands).save({
-        id: uuid(), command: '!test', enabled: true, visible: true, responses: [{
-          filter: '', response: '$_variable', permission: defaultPermissions.VIEWERS, stopIfExecuted: false, order: 0,
-        }],
+      const command = new Commands();
+      command.command =   '!test';
+      command.enabled =   true;
+      command.visible =   true;
+      command.group =     null;
+      await command.save();
+
+      const response = merge(new CommandsResponses(), {
+        command, filter: '', response: '$_variable', permission: defaultPermissions.VIEWERS, stopIfExecuted: false, order: 0,
       });
+      await response.save()
     });
     it('create \'!test\' command with $param', async () => {
-      await getRepository(Commands).save({
-        id: uuid(), command: '!test', enabled: true, visible: true, responses: [{
-          filter: '', response: '$param by !test command with param', permission: defaultPermissions.VIEWERS, stopIfExecuted: false, order: 0,
-        }],
+      const command = new Commands();
+      command.command =   '!test';
+      command.enabled =   true;
+      command.visible =   true;
+      command.group =     null;
+      await command.save();
+
+      const response = merge(new CommandsResponses(), {
+        command, filter: '', response: '$param by !test command with param', permission: defaultPermissions.VIEWERS, stopIfExecuted: false, order: 0,
       });
+      await response.save()
     });
     it('create \'!test\' command without $param', async () => {
-      await getRepository(Commands).save({
-        id: uuid(), command: '!test', enabled: true, visible: true, responses: [{
-          filter: '!$haveParam', response: 'This should not be triggered', permission: defaultPermissions.VIEWERS, stopIfExecuted: false, order: 0,
-        }],
+      const command = new Commands();
+      command.command =   '!test';
+      command.enabled =   true;
+      command.visible =   true;
+      command.group =     null;
+      await command.save();
+
+      const response = merge(new CommandsResponses(), {
+        command, filter: '!$haveParam', response: 'This should not be triggered', permission: defaultPermissions.VIEWERS, stopIfExecuted: false, order: 0,
       });
+      await response.save()
     });
     it('create \'!test qwerty\' command without $param', async () => {
-      await getRepository(Commands).save({
-        id: uuid(), command: '!test qwerty', enabled: true, visible: true, responses: [{
-          filter: '', response: 'This should be triggered', permission: defaultPermissions.VIEWERS, stopIfExecuted: false, order: 0,
-        }],
+      const command = new Commands();
+      command.command =   '!test qwerty';
+      command.enabled =   true;
+      command.visible =   true;
+      command.group =     null;
+      await command.save();
+
+      const response = merge(new CommandsResponses(), {
+        command, filter: '', response: 'This should be triggered', permission: defaultPermissions.VIEWERS, stopIfExecuted: false, order: 0,
       });
+      await response.save()
     });
     it('create second \'!test qwerty\' command without $param', async () => {
-      await getRepository(Commands).save({
-        id: uuid(), command: '!test qwerty', enabled: true, visible: true, responses: [{
-          filter: '', response: 'This should be triggered as well', permission: defaultPermissions.VIEWERS, stopIfExecuted: false, order: 0,
-        }],
+      const command = new Commands();
+      command.command =   '!test qwerty';
+      command.enabled =   true;
+      command.visible =   true;
+      command.group =     null;
+      await command.save();
+
+      const response = merge(new CommandsResponses(), {
+        command, filter: '', response: 'This should be triggered as well', permission: defaultPermissions.VIEWERS, stopIfExecuted: false, order: 0,
       });
+      await response.save()
     });
 
     it('run command by owner', async () => {
@@ -90,11 +117,17 @@ describe('Custom Commands - @func1 - run()', () => {
       await message.prepare();
     });
     it('create command and response with filter', async () => {
-      await getRepository(Commands).save({
-        id: uuid(), command: '!cmd', enabled: true, visible: true, responses: [{
-          filter: '$sender == "user1"', response: 'Lorem Ipsum', permission: defaultPermissions.VIEWERS, stopIfExecuted: false, order: 0,
-        }],
+      const command = new Commands();
+      command.command =   '!cmd';
+      command.enabled =   true;
+      command.visible =   true;
+      command.group =     null;
+      await command.save();
+
+      const response = merge(new CommandsResponses(), {
+        command, filter: '$sender == "user1"', response: 'Lorem Ipsum', permission: defaultPermissions.VIEWERS, stopIfExecuted: false, order: 0,
       });
+      await response.save()
     });
 
     it('run command as user not defined in filter', async () => {
