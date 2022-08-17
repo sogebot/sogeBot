@@ -2,7 +2,7 @@ import { IsNotEmpty, MinLength } from 'class-validator';
 import { ManyToOne, OneToMany } from 'typeorm';
 import { BaseEntity, Column, Entity, Index, PrimaryColumn } from 'typeorm';
 
-import { IsCommand } from '~/database/validators/IsCommand';
+import { IsCommand } from '../validators/IsCommand';
 
 @Entity()
 export class Commands extends BaseEntity {
