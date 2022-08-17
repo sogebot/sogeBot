@@ -126,9 +126,15 @@ class CustomCommands extends System {
       try {
         this.invalidateCache();
         const itemToSave = new Commands();
-        merge(itemToSave, req.body);
+
+        const { count, ...data } = req.body;
+        merge(itemToSave, data);
         await validateOrReject(itemToSave);
         await itemToSave.save();
+
+        if (count === 0) {
+          await resetCountOfCommandUsage(itemToSave.command);
+        }
 
         await getRepository(CommandsResponses).delete({ command: itemToSave });
         const responses = req.body.responses;
@@ -142,12 +148,6 @@ class CustomCommands extends System {
       } catch (e) {
         res.status(400).send({ errors: e });
       }
-    });
-
-    app.post('/api/systems/customcommands/reset', adminMiddleware, async (req, res) => {
-      this.invalidateCache();
-      await resetCountOfCommandUsage(req.body);
-      res.send();
     });
   }
 
