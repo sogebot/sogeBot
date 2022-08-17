@@ -2,26 +2,29 @@ import { CommandsCount } from '@entity/commands';
 import { MINUTE } from '@sogebot/ui-helpers/constants';
 import { getRepository } from 'typeorm';
 
-const count: { command: string, timestamp: number }[] = [];
+const count: { command: string, timestamp: string }[] = [];
 
 setInterval(() => {
   const length = count.length;
   for (let i = 0; i < length; i++) {
-    getRepository(CommandsCount).insert({ command: count[i].command, timestamp: count[i].timestamp });
+    const c = new CommandsCount();
+    c.command = count[i].command;
+    c.timestamp = count[i].timestamp;
+    c.save();
   }
   count.splice(0,length);
 }, MINUTE);
 
 export async function getCountOfCommandUsage (command: string): Promise<number> {
-  return (await getRepository(CommandsCount).count({ command }) + count.filter(o => o.command === command).length);
+  return (await CommandsCount.count({ command }) + count.filter(o => o.command === command).length);
 }
 
 export function incrementCountOfCommandUsage (command: string): void {
-  count.push({ command, timestamp: Date.now() });
+  count.push({ command, timestamp: new Date().toISOString() });
 }
 
 export async function resetCountOfCommandUsage (command: string): Promise<void> {
-  getRepository(CommandsCount).delete({ command });
+  CommandsCount.delete({ command });
   count.splice(0,count.length);
 }
 

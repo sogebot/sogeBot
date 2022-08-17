@@ -1,15 +1,16 @@
-/* global describe it beforeEach */
 require('../../general.js');
+
+const { getRepository } = require('typeorm');
+const assert = require('assert');
+
+const { User } = require('../../../dest/database/entity/user');
+const { Commands, CommandsResponses } = require('../../../dest/database/entity/commands');
 
 const db = require('../../general.js').db;
 const time = require('../../general.js').time;
-const assert = require('assert');
 const message = require('../../general.js').message;
 const user = require('../../general.js').user;
 
-const { getRepository } = require('typeorm');
-const { User } = require('../../../dest/database/entity/user');
-const { Commands } = require('../../../dest/database/entity/commands');
 
 const customcommands = (require('../../../dest/systems/customcommands')).default;
 const { defaultPermissions } = (require('../../../dest/helpers/permissions/'));
@@ -20,27 +21,31 @@ describe('Custom Commands - @func1 - https://discord.com/channels/31734894614400
     await message.prepare();
     await user.prepare();
 
-    const command = await getRepository(Commands).save({
-      command: '!test',
-      enabled: true,
-      visible: true,
-      responses: [
-        {
-          order: 0,
-          response: '1',
-          permission: defaultPermissions.VIEWERS,
-          stopIfExecuted: true,
-          filter: '$param === "1"'
-        },
-        {
-          order: 1,
-          response: '2',
-          permission: defaultPermissions.VIEWERS,
-          stopIfExecuted: true,
-          filter: '$param === "2"'
-        }
-      ]
-    })
+    const command = new Commands();
+    command.id =        '2584b3c1-d2da-4fae-bf9a-95048724acdc';
+    command.command =   '!test';
+    command.enabled =   true;
+    command.visible =   true;
+    command.group =     'permGroup2';
+    await command.save();
+
+    const response = new CommandsResponses();
+    response.stopIfExecuted = false;
+    response.response =       '1';
+    response.filter =         '$param === "1"';
+    response.order =          1;
+    response.permission =     defaultPermissions.MODERATORS;
+    response.command = command;
+    await response.save();
+
+    const response2 = new CommandsResponses();
+    response2.stopIfExecuted = false;
+    response2.response =       '2';
+    response2.filter =         '$param === "2"';
+    response2.order =          1;
+    response2.permission =     defaultPermissions.VIEWERS;
+    response2.command = command;
+    await response2.save();
   });
 
   it('Run custom command !test 1', async () => {
