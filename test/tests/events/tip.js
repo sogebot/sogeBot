@@ -42,22 +42,22 @@ describe('Events - tip event - @func3', () => {
         }],
       });
 
-      for (const user of ['losslezos', 'rigneir', 'mikasa_hraje', 'foufhs']) {
-        await getRepository(User).save({ userName: user, userId: String(Math.floor(Math.random() * 100000)) });
+      for (const [idx, user] of ['losslezos', 'rigneir', 'mikasa_hraje', 'foufhs'].entries()) {
+        await getRepository(User).save({ userName: user, userId: String(idx * 100000) });
       }
     });
 
-    for (const username of ['losslezos', 'rigneir', 'mikasa_hraje', 'foufhs']) {
+    for (const [idx, username] of ['losslezos', 'rigneir', 'mikasa_hraje', 'foufhs'].entries()) {
       describe(username + ' tip event', () => {
         it('trigger tip event for 10 EUR - ' + username, async () => {
           log.tip(`${username}, amount: 10.00EUR, message: Ahoj jak je`);
           events.fire('tip', {
-            userId: String(Math.floor(Math.random * 100000)), userName: username, amount: 10.00, message: 'Ahoj jak je', currency: 'EUR',
+            userId: String(idx * 100000), userName: username, amount: 10.00, message: 'Ahoj jak je', currency: 'EUR',
           });
         });
 
         it('wait 1s', async () => {
-          await time.waitMs(1000);
+          await time.waitMs(5000);
         });
 
         it('we are not expecting any messages to be sent - quiet mode', async () => {
