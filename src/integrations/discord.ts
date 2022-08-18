@@ -122,6 +122,8 @@ class Discord extends Integration {
         if (channel) {
           const message = await (channel as DiscordJs.TextChannel).messages.fetch(this.embedMessageId);
           const receivedEmbed = message?.embeds[0];
+
+          debug('discord.embed', `Trying to update message ${this.embedMessageId}.`);
           if (message && receivedEmbed) {
             const broadcasterUsername = variables.get('services.twitch.broadcasterUsername') as string;
             const embed = DiscordJs.EmbedBuilder.from(receivedEmbed)
@@ -131,7 +133,13 @@ class Discord extends Integration {
                   .map((o) => this.prepareFields(o))
               )
               .setImage(`https://static-cdn.jtvnw.net/previews-ttv/live_user_${broadcasterUsername}-1920x1080.jpg?${Date.now()}`);
-            message.edit({ embeds: [embed] });
+
+            debug('discord.embed', `Updating message ${this.embedMessageId}.`);
+            message.edit({ embeds: [embed] })
+              .then(() => debug('discord.embed', `Message ${this.embedMessageId} was updated.`))
+              .catch((e) => debug('discord.embed', e));
+          } else {
+            debug('discord.embed', `Error during update of ${this.embedMessageId}. Message or receivedEmbed not found. ${JSON.stringify({ message, receivedEmbed })}`);
           }
         }
       }
@@ -302,6 +310,8 @@ class Discord extends Integration {
       try {
         const message = await (channel as DiscordJs.TextChannel).messages.fetch(this.embedMessageId);
         const receivedEmbed = message?.embeds[0];
+        
+        debug('discord.embed', `Trying to update message ${this.embedMessageId}.`);
         if (message && receivedEmbed) {
           const broadcasterUsername = variables.get('services.twitch.broadcasterUsername') as string;
           const embed = DiscordJs.EmbedBuilder.from(receivedEmbed)
@@ -312,7 +322,13 @@ class Discord extends Integration {
                 .filter((o) => this.filterFields(o))
                 .map((o) => this.prepareFields(o)))
             .setImage(`https://static-cdn.jtvnw.net/ttv-static/404_preview-1920x1080.jpg?${Date.now()}`);
-          message.edit({ embeds: [embed], content: null });
+
+          debug('discord.embed', `Updating message ${this.embedMessageId}.`);
+          message.edit({ embeds: [embed] })
+            .then(() => debug('discord.embed', `Message ${this.embedMessageId} was updated.`))
+            .catch((e) => debug('discord.embed', e));
+        } else {
+          debug('discord.embed', `Error during update of ${this.embedMessageId}. Message or receivedEmbed not found. ${JSON.stringify({ message, receivedEmbed })}`);
         }
       } catch (e: any) {
         warning(`Discord embed couldn't be changed to offline - ${e.message}`);
