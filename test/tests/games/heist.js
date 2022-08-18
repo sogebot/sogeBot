@@ -35,6 +35,8 @@ describe('Heist - !bankheist - @func2', () => {
       heist.lastAnnouncedHeistInProgress = 0;
       heist.lastAnnouncedStart = 0;
       heist.showMaxUsers = 20;
+
+      console.log(heist.levelsValues);
     });
 
     it('User start new bankheist with !bankheist', async () => {

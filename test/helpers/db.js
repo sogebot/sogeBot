@@ -26,6 +26,7 @@ const { Price } = require('../../dest/database/entity/price');
 const { Quotes } = require('../../dest/database/entity/quotes');
 const { Raffle, RaffleParticipant } = require('../../dest/database/entity/raffle');
 const { Rank } = require('../../dest/database/entity/rank');
+const { Settings } = require('../../dest/database/entity/settings');
 const { SongRequest } = require('../../dest/database/entity/song');
 const { Timer, TimerResponse } = require('../../dest/database/entity/timer');
 const { User, UserTip, UserBit } = require('../../dest/database/entity/user');
@@ -60,7 +61,7 @@ module.exports = {
       await changelog.flush();
       await waitMs(1000); // wait little bit for transactions to be done
 
-      const entities = [AliasGroup, CommandsGroup, KeywordGroup, HeistUser, EventList, PointsChangelog, SongRequest, RaffleParticipant, Rank, PermissionCommands, Event, EventOperation, Variable, VariableHistory, VariableURL, Raffle, Duel, PollVote, Poll, TimerResponse, Timer, BetsParticipations, UserTip, UserBit, CommandsResponses, User, ModerationPermit, Alias, Bets, Commands, CommandsCount, Quotes, Cooldown, Keyword, Price, DiscordLink];
+      const entities = [Settings, AliasGroup, CommandsGroup, KeywordGroup, HeistUser, EventList, PointsChangelog, SongRequest, RaffleParticipant, Rank, PermissionCommands, Event, EventOperation, Variable, VariableHistory, VariableURL, Raffle, Duel, PollVote, Poll, TimerResponse, Timer, BetsParticipations, UserTip, UserBit, CommandsResponses, User, ModerationPermit, Alias, Bets, Commands, CommandsCount, Quotes, Cooldown, Keyword, Price, DiscordLink];
       if (['postgres', 'mysql'].includes((await getManager()).connection.options.type)) {
         const metadatas = [];
         for (const entity of entities) {
@@ -72,10 +73,12 @@ module.exports = {
             await transactionalEntityManager.query('SET FOREIGN_KEY_CHECKS=0;');
           }
           for (const metadata of metadatas) {
+            debug('test', chalk.bgRed(`*** Cleaning up ${metadata.tableName} ***`));
+
             if (['mysql'].includes((await getManager()).connection.options.type)) {
-              await transactionalEntityManager.query(`TRUNCATE TABLE ${metadata.tableName}`);
+              await transactionalEntityManager.query(`DELETE FROM \`${metadata.tableName}\` WHERE 1=1`);
             } else {
-              await transactionalEntityManager.query(`TRUNCATE "${metadata.tableName}" CASCADE`);
+              await transactionalEntityManager.query(`DELETE FROM "${metadata.tableName}" WHERE 1=1`);
             }
           }
           if (['mysql'].includes((await getManager()).connection.options.type)) {

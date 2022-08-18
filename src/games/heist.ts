@@ -105,7 +105,9 @@ class Heist extends Game {
     const levels = _.orderBy(this.levelsValues, 'maxUsers', 'asc');
 
     // check if heist is finished
+    debug('heist', 'Checking heist if finished');
     if (!_.isNil(this.startedAt) && Date.now() - this.startedAt > (this.entryCooldownInSeconds * 1000) + 10000) {
+      debug('heist', 'Heist finished, processing');
       const users = await getRepository(HeistUser).find();
       let level = levels.find(o => o.maxUsers >= users.length || _.isNil(o.maxUsers)); // find appropriate level or max level
 
