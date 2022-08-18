@@ -25,9 +25,12 @@ let broadcasterWarning = false;
 class Emotes extends Core {
   cache: {
     code: string;
-    type: 'twitch' | 'twitch-sub' | 'ffz' | 'bttv';
+    type: 'twitch' | 'twitch-sub' | 'ffz' | 'bttv' | '7tv';
     urls: { '1': string; '2': string; '3': string };
   }[] = [];
+
+  @settings()
+    '7tvEmoteSet' = '';
   @settings()
     ffz = true;
   @settings()
@@ -38,6 +41,7 @@ class Emotes extends Core {
     channel: false,
     ffz:     false,
     bttv:    false,
+    '7tv':   false,
   };
 
   lastGlobalEmoteChk = 1;
@@ -45,11 +49,15 @@ class Emotes extends Core {
   lastChannelChk: string | null = null;
   lastFFZEmoteChk = 1;
   lastBTTVEmoteChk = 1;
+  last7TVEmoteChk = 1;
 
   interval: NodeJS.Timer;
 
   get types() {
     const types: Emotes['cache'][number]['type'][] = ['twitch', 'twitch-sub'];
+    if (this['7tvEmoteSet'].length > 0) {
+      types.push('7tv');
+    }
     if (this.bttv) {
       types.push('bttv');
     }
@@ -108,6 +116,9 @@ class Emotes extends Core {
       if (!this.fetch.bttv) {
         this.fetchEmotesBTTV();
       }
+      if (!this.fetch['7tv']) {
+        this.fetchEmotes7TV();
+      }
     }, 10000);
   }
 
@@ -115,6 +126,7 @@ class Emotes extends Core {
     this.lastGlobalEmoteChk = 0;
     this.lastSubscriberEmoteChk = 0;
     this.lastFFZEmoteChk = 0;
+    this.last7TVEmoteChk = 0;
     this.lastBTTVEmoteChk = 0;
     this.cache = [];
 
@@ -129,6 +141,9 @@ class Emotes extends Core {
     }
     if (!this.fetch.bttv) {
       this.fetchEmotesBTTV();
+    }
+    if (!this.fetch['7tv']) {
+      this.fetchEmotes7TV();
     }
   }
 
@@ -264,6 +279,61 @@ class Emotes extends Core {
 
       this.fetch.ffz = false;
     }
+  }
+
+  async fetchEmotes7TV () {
+    const broadcasterUsername = variables.get('services.twitch.broadcasterUsername') as string;
+
+    if (broadcasterUsername.length === 0) {
+      return;
+    }
+
+    const getAllChannelEmotes = async (query: string, urlTemplate: string, channel: string): Promise<void> => {
+      const id = this['7tvEmoteSet'].split('/')[this['7tvEmoteSet'].split('/').length - 1];
+      const request = await axios.post<any>('https://7tv.io/v3/gql', {
+        operationName: 'GetEmoteSet',
+        query,
+        variables:     {
+          id,
+        },
+      });
+
+      if (request.data.data.emoteSet?.emotes) {
+        for (let i = 0, length = request.data.data.emoteSet?.emotes.length; i < length; i++) {
+          await setImmediateAwait();
+          const cachedEmote = this.cache.find(o => o.code === request.data.data.emoteSet?.emotes[i].name && o.type === '7tv');
+          this.cache.push({
+            ...cachedEmote,
+            code: request.data.data.emoteSet?.emotes[i].name,
+            type: '7tv',
+            urls: {
+              '1': urlTemplate.replace('{{id}}', request.data.data.emoteSet?.emotes[i].id).replace('{{image}}', '1x.avif'),
+              '2': urlTemplate.replace('{{id}}', request.data.data.emoteSet?.emotes[i].id).replace('{{image}}', '2x.avif'),
+              '3': urlTemplate.replace('{{id}}', request.data.data.emoteSet?.emotes[i].id).replace('{{image}}', '3x.avif'),
+            },
+          });
+        }
+      }
+    };
+
+    this.fetch['7tv'] = true;
+
+    if (Date.now() - this.last7TVEmoteChk > 1000 * 60 * 60 * 24 * 7) {
+      info('EMOTES: Fetching 7tv emotes');
+      this.last7TVEmoteChk = Date.now();
+      this.cache = this.cache.filter(o => o.type !== '7tv');
+      try {
+        const urlTemplate = `https://cdn.7tv.app/emote/{{id}}/{{image}}`;
+
+        const query2 = `query GetEmoteSet($id: ObjectID!, $formats: [ImageFormat!]) {  emoteSet(id: $id) {    id    name    capacity    emotes {      id      name      emote {        id        name        flags        listed        images(formats: $formats) {          name          format          url          __typename        }        owner {          id          display_name          tag_color          roles          __typename        }        __typename      }      __typename    }    owner {      id      username      display_name      tag_color      avatar_url      roles      __typename    }    __typename  }}`;
+        await getAllChannelEmotes(query2, urlTemplate, broadcasterUsername),
+        info('EMOTES: Fetched 7tv emotes');
+      } catch (e: any) {
+        error(e);
+      }
+    }
+
+    this.fetch['7tv'] = false;
   }
 
   async fetchEmotesBTTV () {
