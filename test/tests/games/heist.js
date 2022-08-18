@@ -1,12 +1,8 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
-/* global describe it before */
-
-require('../../general.js');
-
 const assert = require('assert');
 
 const { getRepository } = require('typeorm');
 
+require('../../general.js');
 const { User } = require('../../../dest/database/entity/user');
 const db = require('../../general.js').db;
 const message = require('../../general.js').message;
@@ -69,12 +65,12 @@ describe('Heist - !bankheist - @func2', () => {
       assert.strictEqual(r[0].response, '$sender, heist is currently in progress!');
     });
 
-    it('We need to wait at least 20 seconds', async() =>{
+    it('We need to wait at least 30 seconds', async() =>{
       const steps = 10;
-      process.stdout.write(`\t... waiting ${(20)}s ...                `);
+      process.stdout.write(`\t... waiting ${(30)}s ...                `);
       for (let i = 0; i < steps; i++) {
-        await time.waitMs(20000 / steps);
-        process.stdout.write(`\r\t... waiting ${20 - ((20 / steps) * i)}s ...                `);
+        await time.waitMs(30000 / steps);
+        process.stdout.write(`\r\t... waiting ${30 - ((30 / steps) * i)}s ...                `);
       }
     });
 
@@ -171,12 +167,12 @@ describe('Heist - !bankheist - @func2', () => {
       // force instant result
       heist.iCheckFinished();
     });
-    it('We need to wait at least 7 seconds', async() =>{
-      const steps = 7;
-      process.stdout.write(`\t... waiting ${(7)}s ...                `);
+    it('We need to wait at least 10 seconds', async() =>{
+      const steps = 10;
+      process.stdout.write(`\t... waiting ${(10)}s ...                `);
       for (let i = 0; i < steps; i++) {
-        await time.waitMs(7000 / steps);
-        process.stdout.write(`\r\t... waiting ${7 - ((7 / steps) * i)}s ...                `);
+        await time.waitMs(10000 / steps);
+        process.stdout.write(`\r\t... waiting ${10 - ((10 / steps) * i)}s ...                `);
       }
     });
 
@@ -192,12 +188,12 @@ describe('Heist - !bankheist - @func2', () => {
         'God divinity, nobody is dead, everyone won!',
       ], { userName: '__bot__' });
     });
-    it('We need to wait at least 7 seconds', async() =>{
-      const steps = 7;
-      process.stdout.write(`\t... waiting ${(7)}s ...                `);
+    it('We need to wait at least 10 seconds', async() =>{
+      const steps = 10;
+      process.stdout.write(`\t... waiting ${(10)}s ...                `);
       for (let i = 0; i < steps; i++) {
-        await time.waitMs(7000 / steps);
-        process.stdout.write(`\r\t... waiting ${7 - ((7 / steps) * i)}s ...                `);
+        await time.waitMs(10000 / steps);
+        process.stdout.write(`\r\t... waiting ${10 - ((10 / steps) * i)}s ...                `);
       }
     });
     it('Heist should be finished - userslist', async () => {
@@ -315,7 +311,7 @@ describe('Heist - !bankheist - @func2', () => {
         '$sender, cops are still searching for last heist team. Try again after 1.0 minute.',
         '$sender, cops are still searching for last heist team. Try again after 0.9 minutes.',
         '$sender, cops are still searching for last heist team. Try again after 0.8 minutes.',
-        '$sender, cops are still searching for last heist team. Try again after 0.7 minutes.',
+        '$sender, cops are still searching for last heist team. Try again after 0.10 minutes.',
         '$sender, cops are still searching for last heist team. Try again after 0.6 minutes.',
         '$sender, cops are still searching for last heist team. Try again after 0.5 minutes.',
         '$sender, cops are still searching for last heist team. Try again after 0.4 minutes.',
@@ -331,12 +327,12 @@ describe('Heist - !bankheist - @func2', () => {
       });
       assert(r.length === 0);
     });
-    it('We need to wait at least 75 seconds', async() =>{
+    it('We need to wait at least 105 seconds', async() =>{
       const steps = 15;
-      process.stdout.write(`\t... waiting ${(75)}s ...                `);
+      process.stdout.write(`\t... waiting ${(105)}s ...                `);
       for (let i = 0; i < steps; i++) {
-        await time.waitMs(75000 / steps);
-        process.stdout.write(`\r\t... waiting ${75 - ((75 / steps) * i)}s ...                `);
+        await time.waitMs(105000 / steps);
+        process.stdout.write(`\r\t... waiting ${105 - ((105 / steps) * i)}s ...                `);
       }
     }).timeout(60000 * 3);
     it('We should get announce that cops are not on cooldown', async () => {
