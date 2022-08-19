@@ -284,7 +284,7 @@ class Emotes extends Core {
   async fetchEmotes7TV () {
     const broadcasterUsername = variables.get('services.twitch.broadcasterUsername') as string;
 
-    if (broadcasterUsername.length === 0) {
+    if (broadcasterUsername.length === 0 || this['7tvEmoteSet'].trim().length === 0) {
       return;
     }
 
@@ -298,18 +298,18 @@ class Emotes extends Core {
         },
       });
 
-      if (request.data.data.emoteSet?.emotes) {
-        for (let i = 0, length = request.data.data.emoteSet?.emotes.length; i < length; i++) {
+      if (request.data.data.emoteSet && request.data.data.emoteSet.emotes) {
+        for (let i = 0, length = request.data.data.emoteSet.emotes.length; i < length; i++) {
           await setImmediateAwait();
-          const cachedEmote = this.cache.find(o => o.code === request.data.data.emoteSet?.emotes[i].name && o.type === '7tv');
+          const cachedEmote = this.cache.find(o => o.code === request.data.data.emoteSet.emotes[i].name && o.type === '7tv');
           this.cache.push({
             ...cachedEmote,
-            code: request.data.data.emoteSet?.emotes[i].name,
+            code: request.data.data.emoteSet.emotes[i].name,
             type: '7tv',
             urls: {
-              '1': urlTemplate.replace('{{id}}', request.data.data.emoteSet?.emotes[i].id).replace('{{image}}', '1x.avif'),
-              '2': urlTemplate.replace('{{id}}', request.data.data.emoteSet?.emotes[i].id).replace('{{image}}', '2x.avif'),
-              '3': urlTemplate.replace('{{id}}', request.data.data.emoteSet?.emotes[i].id).replace('{{image}}', '3x.avif'),
+              '1': urlTemplate.replace('{{id}}', request.data.data.emoteSet.emotes[i].id).replace('{{image}}', '1x.avif'),
+              '2': urlTemplate.replace('{{id}}', request.data.data.emoteSet.emotes[i].id).replace('{{image}}', '2x.avif'),
+              '3': urlTemplate.replace('{{id}}', request.data.data.emoteSet.emotes[i].id).replace('{{image}}', '3x.avif'),
             },
           });
         }
