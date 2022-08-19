@@ -110,6 +110,32 @@ class Discord extends Integration {
   @settings('bot')
     deleteMessagesAfterWhile = false;
 
+  generateEmbed(isOnline: boolean) {
+    const broadcasterUsername = variables.get('services.twitch.broadcasterUsername') as string;
+    const profileImageUrl = variables.get('services.twitch.profileImageUrl') as string;
+
+    const color = isOnline ? 0x00ff00 : 0xff0000;
+    const description = isOnline
+      ? `${broadcasterUsername.charAt(0).toUpperCase() + broadcasterUsername.slice(1)} started stream! Check it out!`
+      : `${broadcasterUsername.charAt(0).toUpperCase() + broadcasterUsername.slice(1)} is not streaming anymore! Check it next time!`;
+
+    return new DiscordJs.EmbedBuilder()
+      .setURL('https://twitch.tv/' + broadcasterUsername)
+      .addFields(
+        this.fields
+          .filter((o) => this.filterFields(o))
+          .map((o) => this.prepareFields(o)))
+    // Set the title of the field
+      .setTitle('https://twitch.tv/' + broadcasterUsername)
+    // Set the color of the embed
+      .setColor(color)
+    // Set the main content of the embed
+      .setDescription(description)
+      .setImage(`https://static-cdn.jtvnw.net/previews-ttv/live_user_${broadcasterUsername}-1920x1080.jpg?${Date.now()}`)
+      .setThumbnail(profileImageUrl)
+      .setFooter({ text: prepare('integrations.discord.announced-by') + ' - https://www.sogebot.xyz' });
+  }
+
   @onStartup()
   onStartup() {
     this.addEvent();
@@ -121,25 +147,15 @@ class Discord extends Integration {
         const channel = this.client.guilds.cache.get(this.guild)?.channels.cache.get(this.sendOnlineAnnounceToChannel);
         if (channel) {
           const message = await (channel as DiscordJs.TextChannel).messages.fetch(this.embedMessageId);
-          const receivedEmbed = message?.embeds[0];
 
           debug('discord.embed', `Trying to update message ${this.embedMessageId}.`);
-          if (message && receivedEmbed) {
-            const broadcasterUsername = variables.get('services.twitch.broadcasterUsername') as string;
-            const embed = DiscordJs.EmbedBuilder.from(receivedEmbed)
-              .setFields(
-                this.fields
-                  .filter((o) => this.filterFields(o))
-                  .map((o) => this.prepareFields(o))
-              )
-              .setImage(`https://static-cdn.jtvnw.net/previews-ttv/live_user_${broadcasterUsername}-1920x1080.jpg?${Date.now()}`);
-
+          if (message) {
             debug('discord.embed', `Updating message ${this.embedMessageId}.`);
-            message.edit({ embeds: [embed] })
+            message.edit({ embeds: [this.generateEmbed(true)] })
               .then(() => debug('discord.embed', `Message ${this.embedMessageId} was updated.`))
               .catch((e) => debug('discord.embed', e));
           } else {
-            debug('discord.embed', `Error during update of ${this.embedMessageId}. Message or receivedEmbed not found. ${JSON.stringify({ message, receivedEmbed })}`);
+            debug('discord.embed', `Error during update of ${this.embedMessageId}. Message not found. ${JSON.stringify({ message })}`);
           }
         }
       }
@@ -310,25 +326,15 @@ class Discord extends Integration {
       try {
         const message = await (channel as DiscordJs.TextChannel).messages.fetch(this.embedMessageId);
         const receivedEmbed = message?.embeds[0];
-        
+
         debug('discord.embed', `Trying to update message ${this.embedMessageId}.`);
         if (message && receivedEmbed) {
-          const broadcasterUsername = variables.get('services.twitch.broadcasterUsername') as string;
-          const embed = DiscordJs.EmbedBuilder.from(receivedEmbed)
-            .setColor(0xff0000)
-            .setDescription(`${broadcasterUsername.charAt(0).toUpperCase() + broadcasterUsername.slice(1)} is not streaming anymore! Check it next time!`)
-            .setFields(
-              this.fields
-                .filter((o) => this.filterFields(o))
-                .map((o) => this.prepareFields(o)))
-            .setImage(`https://static-cdn.jtvnw.net/ttv-static/404_preview-1920x1080.jpg?${Date.now()}`);
-
           debug('discord.embed', `Updating message ${this.embedMessageId}.`);
-          message.edit({ embeds: [embed] })
+          message.edit({ embeds: [this.generateEmbed(false)] })
             .then(() => debug('discord.embed', `Message ${this.embedMessageId} was updated.`))
             .catch((e) => debug('discord.embed', e));
         } else {
-          debug('discord.embed', `Error during update of ${this.embedMessageId}. Message or receivedEmbed not found. ${JSON.stringify({ message, receivedEmbed })}`);
+          debug('discord.embed', `Error during update of ${this.embedMessageId}. Message not found. ${JSON.stringify({ message })}`);
         }
       } catch (e: any) {
         warning(`Discord embed couldn't be changed to offline - ${e.message}`);
@@ -377,34 +383,15 @@ class Discord extends Integration {
     this.changeClientOnlinePresence();
     try {
       if (this.client && this.sendOnlineAnnounceToChannel.length > 0 && this.guild.length > 0) {
-        const broadcasterUsername = variables.get('services.twitch.broadcasterUsername') as string;
-        const profileImageUrl = variables.get('services.twitch.profileImageUrl') as string;
         const channel = this.client.guilds.cache.get(this.guild)?.channels.cache.get(this.sendOnlineAnnounceToChannel);
         if (!channel) {
           throw new Error(`Channel ${this.sendOnlineAnnounceToChannel} not found on your discord server`);
         }
-
         this.embedStartedAt = dayjs().tz(timezone).format('LLL');
-        const embed = new DiscordJs.EmbedBuilder()
-          .setURL('https://twitch.tv/' + broadcasterUsername)
-          .addFields(
-            this.fields
-              .filter((o) => this.filterFields(o))
-              .map((o) => this.prepareFields(o)))
-          // Set the title of the field
-          .setTitle('https://twitch.tv/' + broadcasterUsername)
-          // Set the color of the embed
-          .setColor(0x00ff00)
-          // Set the main content of the embed
-          .setDescription(`${broadcasterUsername.charAt(0).toUpperCase() + broadcasterUsername.slice(1)} started stream! Check it out!`)
-          .setImage(`https://static-cdn.jtvnw.net/previews-ttv/live_user_${broadcasterUsername}-1920x1080.jpg?${Date.now()}`)
-          .setThumbnail(profileImageUrl)
-          .setFooter({ text: prepare('integrations.discord.announced-by') + ' - https://www.sogebot.xyz' });
-
         // Send the embed to the same channel as the message
         const message = await (channel as DiscordJs.TextChannel).send({
           content: this.onlineAnnounceMessage.length > 0 ? this.onlineAnnounceMessage : null,
-          embeds:  [embed],
+          embeds:  [this.generateEmbed(true)],
         });
         this.embedMessageId = message.id;
         chatOut(`#${(channel as DiscordJs.TextChannel).name}: [[online announce embed]] [${this.client.user?.tag}]`);
