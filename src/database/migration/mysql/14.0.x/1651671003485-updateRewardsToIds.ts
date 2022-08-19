@@ -51,7 +51,7 @@ export class updateRewardsToIds1651671003485 implements MigrationInterface {
           if (reward) {
             console.log(`Changing reward name titleOfReward ${definitions.titleOfReward} to rewardId ${reward.id}`);
             definitions = { rewardId: reward.id };
-            await queryRunner.query(`UPDATE \`event\` SET \`definitions\`="${JSON.stringify(definitions)}" WHERE \`id\`="${event.id}"`);
+            await queryRunner.query(`UPDATE \`event\` SET \`definitions\`='${JSON.stringify(definitions)}' WHERE \`id\`="${event.id}"`);
           }
         }
       }
