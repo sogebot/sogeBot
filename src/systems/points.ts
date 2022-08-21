@@ -121,13 +121,6 @@ class Points extends System {
     // cleanup all undoes (only 10minutes should be kept)
     await getRepository(PointsChangelog).delete({ updatedAt: LessThanOrEqual(Date.now() - (10 * MINUTE)) });
 
-    const [interval, offlineInterval, perInterval, perOfflineInterval] = await Promise.all([
-      this.getPermissionBasedSettingsValue('interval'),
-      this.getPermissionBasedSettingsValue('offlineInterval'),
-      this.getPermissionBasedSettingsValue('perInterval'),
-      this.getPermissionBasedSettingsValue('perOfflineInterval'),
-    ]);
-
     try {
       const userPromises: Promise<void>[] = [];
       debug('points.update', `Started points adding, isStreamOnline: ${isStreamOnline.value}`);
@@ -135,9 +128,7 @@ class Points extends System {
         if (isBotId(userId)) {
           continue;
         }
-        userPromises.push(this.processPoints(userId, {
-          interval, offlineInterval, perInterval, perOfflineInterval, isStreamOnline: isStreamOnline.value,
-        }));
+        userPromises.push(this.processPoints(userId));
         await Promise.all(userPromises);
       }
     } catch (e: any) {
@@ -149,11 +140,18 @@ class Points extends System {
     }
   }
 
-  private async processPoints(userId: string, opts: {interval: {[permissionId: string]: any}; offlineInterval: {[permissionId: string]: any}; perInterval: {[permissionId: string]: any}; perOfflineInterval: {[permissionId: string]: any}; isStreamOnline: boolean}): Promise<void> {
+  private async processPoints(userId: string): Promise<void> {
     const user = await changelog.get(userId);
     if (!user) {
       return;
     }
+
+    const [interval, offlineInterval, perInterval, perOfflineInterval] = await Promise.all([
+      this.getPermissionBasedSettingsValue('interval'),
+      this.getPermissionBasedSettingsValue('offlineInterval'),
+      this.getPermissionBasedSettingsValue('perInterval'),
+      this.getPermissionBasedSettingsValue('perOfflineInterval'),
+    ]);
 
     // get user max permission
     const permId = await getUserHighestPermission(userId);
@@ -162,27 +160,29 @@ class Points extends System {
       return; // skip without id
     }
 
-    const interval_calculated = opts.isStreamOnline ? opts.interval[permId] * 60 * 1000 : opts.offlineInterval[permId]  * 60 * 1000;
-    const ptsPerInterval = opts.isStreamOnline ? opts.perInterval[permId]  : opts.perOfflineInterval[permId] ;
+    const interval_calculated = isStreamOnline.value ? interval[permId] * 60 * 1000 : offlineInterval[permId]  * 60 * 1000;
+    const ptsPerInterval = isStreamOnline.value ? perInterval[permId]  : perOfflineInterval[permId] ;
 
-    const chat = await users.getChatOf(userId, opts.isStreamOnline);
-    const userPointsKey = opts.isStreamOnline ? 'pointsOnlineGivenAt' : 'pointsOfflineGivenAt';
-    if (interval_calculated !== 0 && ptsPerInterval[permId]  !== 0) {
-      const givenAt = user[userPointsKey] + interval_calculated;
-      debug('points.update', `${user.userName}#${userId}[${permId}] ${chat} | ${givenAt}`);
+    const chat = await users.getChatOf(userId, isStreamOnline.value);
+    const userPointsKey = isStreamOnline.value ? 'pointsOnlineGivenAt' : 'pointsOfflineGivenAt';
+
+    if (interval_calculated !== 0 && ptsPerInterval  !== 0) {
+      let givenAt = user[userPointsKey];
+      debug('points.update', `${user.userName}#${userId}[${permId}] chat: ${chat} | givenAt: ${givenAt} | interval: ${interval_calculated}`);
 
       let modifier = 0;
-      let userTimePoints = givenAt + interval_calculated;
-      for (; userTimePoints <= chat; userTimePoints += interval_calculated) {
+      while(givenAt < chat) {
         modifier++;
+        givenAt += interval_calculated;
       }
+
       if (modifier > 0) {
         // add points to user[userPointsKey] + interval to user to not overcalculate (this should ensure recursive add points in time)
         debug('points.update', `${user.userName}#${userId}[${permId}] +${Math.floor(ptsPerInterval * modifier)}`);
         changelog.update(userId, {
           ...user,
           points:          user.points + ptsPerInterval * modifier,
-          [userPointsKey]: userTimePoints,
+          [userPointsKey]: givenAt,
         });
       }
     } else {
