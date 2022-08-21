@@ -325,10 +325,9 @@ class Discord extends Integration {
     if (channel && this.embedMessageId !== '') {
       try {
         const message = await (channel as DiscordJs.TextChannel).messages.fetch(this.embedMessageId);
-        const receivedEmbed = message?.embeds[0];
 
         debug('discord.embed', `Trying to update message ${this.embedMessageId}.`);
-        if (message && receivedEmbed) {
+        if (message) {
           debug('discord.embed', `Updating message ${this.embedMessageId}.`);
           message.edit({ embeds: [this.generateEmbed(false)] })
             .then(() => debug('discord.embed', `Message ${this.embedMessageId} was updated.`))
