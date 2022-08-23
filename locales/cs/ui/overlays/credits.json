@@ -2,6 +2,7 @@
   "settings": {
     "cCreditsSpeed": "Rychlost titulek",
     "cCreditsAggregated": "Souhrnné titulky",
+    "cShowGameThumbnail": "Show game thumbnail",
     "cShowFollowers": "Zobrazit followery",
     "cShowHosts": "Zobrazit hosty",
     "cShowRaids": "Zobrazit raidy",

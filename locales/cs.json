@@ -488,7 +488,9 @@
           "displayname": "Zobrazené jméno na Twitteru",
           "url": "Link na tweet"
         },
-        "sceneName": "Název scény"
+        "sceneName": "Název scény",
+        "inputName": "Name of input",
+        "inputMuted": "Mute state (bool)"
       }
     },
     "page-settings": {
@@ -735,6 +737,7 @@
     "follow": "nový follower",
     "tip": "nový tip",
     "obs-scene-changed": "OBS scéna se změnila",
+    "obs-input-mute-state-changed": "OBS input source mute state changed",
     "unfollow": "ztráta followera",
     "hypetrain-started": "Hype Train spuštěn",
     "hypetrain-ended": "Konec Hype Train",
