@@ -5,6 +5,30 @@ import { eventEmitter } from '../events';
 
 declare const window: any;
 
+const inputMuted = (obs: ObsWebSocket, socket?: Socket) => {
+  const listener = (data: {
+    inputName: string; inputMuted: boolean;
+  }) => {
+    if (process.env.BUILD === 'web') {
+      console.debug(`obs::websocket::on:inputmuted ${data.inputName} | ${data.inputMuted}`);
+      socket?.emit('integration::obswebsocket::event', {
+        type:       'obs-input-mute-state-changed',
+        inputName:  data.inputName,
+        inputMuted: data.inputMuted,
+        location:   window.location.href,
+      });
+    } else {
+      eventEmitter.emit('obs-input-mute-state-changed', {
+        inputName:  data.inputName,
+        inputMuted: data.inputMuted,
+        isDirect:   true,
+        linkFilter: '',
+      });
+    }
+  };
+  obs.off('InputMuteStateChanged', listener).on('InputMuteStateChanged', listener);
+};
+
 const switchScenes = (obs: ObsWebSocket, socket?: Socket) => {
   const listener = (data: {
     sceneName: string;
@@ -27,4 +51,4 @@ const switchScenes = (obs: ObsWebSocket, socket?: Socket) => {
   obs.off('CurrentProgramSceneChanged', listener).on('CurrentProgramSceneChanged', listener);
 };
 
-export { switchScenes };
+export { switchScenes, inputMuted };

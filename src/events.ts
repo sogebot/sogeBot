@@ -221,6 +221,7 @@ class Events extends Core {
       'tip',
       'tweet-post-with-hashtag',
       'obs-scene-changed',
+      'obs-input-mute-state-changed',
     ] as const) {
       eventEmitter.on(event, (opts?: EventsEntity.Attributes) => {
         if (typeof opts === 'undefined') {

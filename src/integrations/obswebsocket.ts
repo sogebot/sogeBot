@@ -18,7 +18,7 @@ import {
   error, info, warning,
 } from '~/helpers/log';
 import { obs } from '~/helpers/obswebsocket/client';
-import { switchScenes } from '~/helpers/obswebsocket/listeners';
+import { switchScenes, inputMuted } from '~/helpers/obswebsocket/listeners';
 import { taskRunner } from '~/helpers/obswebsocket/taskrunner';
 import { app, ioServer } from '~/helpers/panel';
 import { ParameterError } from '~/helpers/parameterError';
@@ -59,6 +59,12 @@ class OBSWebsocket extends Integration {
       events.supportedEventsList.push({
         id:          'obs-scene-changed',
         variables:   [ 'sceneName' ],
+        definitions: { linkFilter: '' },
+        check:       this.eventIsProperlyFiltered,
+      });
+      events.supportedEventsList.push({
+        id:          'obs-input-mute-state-changed',
+        variables:   [ 'inputName', 'inputMuted' ],
         definitions: { linkFilter: '' },
         check:       this.eventIsProperlyFiltered,
       });
@@ -106,6 +112,7 @@ class OBSWebsocket extends Integration {
 
           // add listeners
           switchScenes(obs);
+          inputMuted(obs);
 
           this.reconnecting = false;
           this.enableHeartBeat = true;
@@ -206,11 +213,12 @@ class OBSWebsocket extends Integration {
     adminEndpoint('/', 'integration::obswebsocket::generic::getAll', async (cb) => {
       cb(null, await getRepository(OBSWebsocketEntity).find());
     });
-    publicEndpoint(this.nsp, 'integration::obswebsocket::event', (opts) => {
-      eventEmitter.emit(opts.type, {
-        sceneName:  opts.sceneName,
+    publicEndpoint('/', 'integration::obswebsocket::event', (opts) => {
+      const { type, location, ...data } = opts;
+      eventEmitter.emit(type, {
         isDirect:   false,
-        linkFilter: opts.location,
+        linkFilter: location,
+        ...data,
       });
     });
   }
