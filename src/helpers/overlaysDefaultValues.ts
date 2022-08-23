@@ -115,8 +115,8 @@ const values = {
   },
   credits: {
     speed:       'medium',
-    social:      [],
-    customTexts: [],
+    social:      [] as { type: string; text: string }[],
+    customTexts: [] as { type: string; left: string, right: string, middle: string }[],
     clips:       {
       play:        true,
       period:      'custom',
@@ -139,6 +139,7 @@ const values = {
       tip:              'Tips by',
     },
     show: {
+      gameThumbnail:    true,
       follow:           true,
       host:             true,
       raid:             true,
@@ -249,15 +250,11 @@ const values = {
   stats:      null,
 } as const;
 
-function setDefaultOpts(opts: any, type: keyof typeof values) {
-  if (values[type]) {
-    return pick(
-      defaultsDeep(opts, values[type]),
-      Object.keys(values[type] || {}),
-    );
-  } else {
-    return null;
-  }
+function setDefaultOpts<T extends keyof typeof values>(opts: any, type: T) {
+  return pick(
+    defaultsDeep(opts, values[type]),
+    Object.keys(values[type] || {}),
+  );
 }
 
 function defaultValues(item: OverlayMappers) {
