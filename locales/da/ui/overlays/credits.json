@@ -2,6 +2,7 @@
   "settings": {
     "cCreditsSpeed": "Hastighed",
     "cCreditsAggregated": "Sammenlæg credits",
+    "cShowGameThumbnail": "Show game thumbnail",
     "cShowFollowers": "Vis følgere",
     "cShowHosts": "Vis hosts",
     "cShowRaids": "Vis raids",
