@@ -775,7 +775,6 @@
     "send-chat-message": "send a twitch chat message",
     "send-whisper": "send a whisper",
     "run-command": "run a command",
-    "command-redeem": "trigger command redeem event",
     "run-obswebsocket-command": "run an OBS Websocket command",
     "do-nothing": "--- do nothing ---",
     "count": "count",

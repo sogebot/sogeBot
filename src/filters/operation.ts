@@ -31,7 +31,7 @@ export const operation: ResponseFilter = {
         currency:   'CZK',
         event:      'cmdredeems',
         alertId:    match.groups.id,
-        message:    '',
+        message:    attributes.param || '',
         monthsName: '',
         name:       attributes.command,
         tier:       null,

@@ -815,7 +815,7 @@ class Chat {
                 tier:       null,
                 currency:   '',
                 monthsName: '',
-                message:    '',
+                message:    messageFromUser,
               });
             }
           }

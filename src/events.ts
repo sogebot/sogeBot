@@ -29,7 +29,6 @@ import {
 } from '~/helpers/customvariables';
 import { csEmitter } from '~/helpers/customvariables/emitter';
 import { isDbConnected } from '~/helpers/database';
-import { fireCommandRedeem } from '~/helpers/events/command-redeem';
 import { eventEmitter } from '~/helpers/events/emitter';
 import { fireRunCommand } from '~/helpers/events/run-command';
 import emitter from '~/helpers/interfaceEmitter';
@@ -141,9 +140,6 @@ class Events extends Core {
       },
       {
         id: 'send-whisper', definitions: { messageToSend: '' }, fire: this.fireSendWhisper,
-      },
-      {
-        id: 'command-redeem', definitions: { command: '' }, fire: fireCommandRedeem,
       },
       {
         id: 'run-command', definitions: { commandToRun: '', isCommandQuiet: false, timeout: 0, timeoutType: ['normal', 'add', 'reset'] }, fire: fireRunCommand,
