@@ -488,7 +488,9 @@
           "displayname": "Nome de tela no Twitter",
           "url": "Link do tuíte"
         },
-        "sceneName": "Nome de cena"
+        "sceneName": "Nome de cena",
+        "inputName": "Name of input",
+        "inputMuted": "Mute state (bool)"
       }
     },
     "page-settings": {
@@ -735,6 +737,7 @@
     "follow": "novo seguidor",
     "tip": "nova doação",
     "obs-scene-changed": "Cena do OBS mudou",
+    "obs-input-mute-state-changed": "OBS input source mute state changed",
     "unfollow": "deixar de seguir",
     "hypetrain-started": "Trem do Hype iniciado",
     "hypetrain-ended": "Trem do Hype acabou",
