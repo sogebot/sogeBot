@@ -488,7 +488,9 @@
           "displayname": "Екранне ім'я в Twitter",
           "url": "Твітнути"
         },
-        "sceneName": "Назва сцени"
+        "sceneName": "Назва сцени",
+        "inputName": "Name of input",
+        "inputMuted": "Mute state (bool)"
       }
     },
     "page-settings": {
@@ -735,6 +737,7 @@
     "follow": "новий підписник",
     "tip": "новий донат",
     "obs-scene-changed": "Сцена OBS змінена",
+    "obs-input-mute-state-changed": "OBS input source mute state changed",
     "unfollow": "відписка",
     "hypetrain-started": "Hype Train запущено",
     "hypetrain-ended": "Hype Train закінчився",
@@ -773,7 +776,6 @@
     "send-chat-message": "надіслати повідомлення в чат (twitch)",
     "send-whisper": "відправити повідомлення у вісперс",
     "run-command": "виконати команду",
-    "command-redeem": "trigger command redeem event",
     "run-obswebsocket-command": "запускати команду OBS Websocket",
     "do-nothing": "--- нічого не робити --",
     "count": "кількість",

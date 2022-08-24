@@ -2,6 +2,7 @@
   "settings": {
     "cCreditsSpeed": "Скорость",
     "cCreditsAggregated": "Агрегированные кредиты",
+    "cShowGameThumbnail": "Show game thumbnail",
     "cShowFollowers": "Показать подписчиков",
     "cShowHosts": "Показать хосты",
     "cShowRaids": "Показать рейды",
