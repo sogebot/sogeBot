@@ -2,6 +2,7 @@
   "settings": {
     "cCreditsSpeed": "Velocità",
     "cCreditsAggregated": "Crediti aggregati",
+    "cShowGameThumbnail": "Show game thumbnail",
     "cShowFollowers": "Mostra follower",
     "cShowHosts": "Mostra host",
     "cShowRaids": "Mostra raid",

@@ -1,6 +1,6 @@
 {
   "list": "Lista de suas permissões:",
-  "excludeAddSuccessful": "$sender, você adicionou $username na lista de exludsão para permissão $permissionName",
+  "excludeAddSuccessful": "$sender, você adicionou $username na lista de exclusão para permissão $permissionName",
   "excludeRmSuccessful": "$sender, você removeu $username da lista de exclusão para permissão $permissionName",
   "userNotFound": "$sender, o usuário $username não foi encontrado na base de dados.",
   "permissionNotFound": "$sender, permissão $userlevel não foi encontrada na base de dados.",
