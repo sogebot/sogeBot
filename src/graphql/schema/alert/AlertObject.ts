@@ -35,8 +35,8 @@ export class AlertObject implements AlertInterface {
     font: CustomizationFontObject<'left' | 'center' | 'right', string, string>;
   @Field()
     customProfanityList: string;
-  @Field(type => [CommonSettingsObject])
-    promo: CommonSettingsObject[];
+  @Field(type => [AlertResubObject])
+    promo: AlertResubObject[];
   @Field(type => [CommonSettingsObject])
     follows: CommonSettingsObject[];
   @Field(type => [CommonSettingsObject])
