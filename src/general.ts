@@ -101,7 +101,7 @@ class General extends Core {
       try {
         const commands: Command[] = [];
 
-        for (const type of ['overlays', 'integrations', 'core', 'systems', 'games', 'services']) {
+        for (const type of ['overlays', 'integrations', 'core', 'systems', 'games', 'services', 'registries']) {
           for (const system of list(type)) {
             for (const cmd of system._commands) {
               const name = typeof cmd === 'string' ? cmd : cmd.name;

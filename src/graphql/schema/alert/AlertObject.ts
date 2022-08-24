@@ -36,6 +36,8 @@ export class AlertObject implements AlertInterface {
   @Field()
     customProfanityList: string;
   @Field(type => [CommonSettingsObject])
+    promo: CommonSettingsObject[];
+  @Field(type => [CommonSettingsObject])
     follows: CommonSettingsObject[];
   @Field(type => [CommonSettingsObject])
     subs: CommonSettingsObject[];

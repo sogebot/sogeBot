@@ -36,7 +36,7 @@ const stream: ResponseFilter = {
         throw new Error();
       }
 
-      const getChannelInfo = await clientBot.channels.getChannelInfo(getUserByName.id);
+      const getChannelInfo = await clientBot.channels.getChannelInfoById(getUserByName.id);
       if (!getChannelInfo) {
         throw new Error();
       }
@@ -62,7 +62,7 @@ const stream: ResponseFilter = {
         throw new Error();
       }
 
-      const getChannelInfo = await clientBot.channels.getChannelInfo(getUserByName.id);
+      const getChannelInfo = await clientBot.channels.getChannelInfoById(getUserByName.id);
       if (!getChannelInfo) {
         throw new Error();
       }

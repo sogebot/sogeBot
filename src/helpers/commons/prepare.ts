@@ -5,12 +5,12 @@ import { showWithAt } from '../tmi/showWithAt';
  * Prepares strings with replacement attributes
  * @param translate Translation key
  * @param attr Attributes to replace { 'replaceKey': 'value' }
- * @param isTranslation consider if translation key to be translate key or pure message
+ * @param isTranslationKey consider if translation key to be translate key or pure message
  */
-export function prepare(toTranslate: string, attr?: {[x: string]: any }, isTranslation = true): string {
+export function prepare(toTranslate: string, attr?: {[x: string]: any }, isTranslationKey = true): string {
   attr = attr || {};
   let msg = (() => {
-    if (isTranslation) {
+    if (isTranslationKey) {
       return translate(toTranslate);
     } else {
       return toTranslate;

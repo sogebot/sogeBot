@@ -6,12 +6,16 @@ import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized';
 import { getRepository, IsNull } from 'typeorm';
 import { v4 } from 'uuid';
 
-import { persistent } from '../decorators';
+import { command, default_permission, persistent, settings } from '../decorators';
 import Registry from './_interface';
 
+import { parserReply } from '~/commons';
 import { User, UserInterface } from '~/database/entity/user';
+import Expects from '~/expects';
+import { prepare } from '~/helpers/commons';
 import { error, debug } from '~/helpers/log';
 import { ioServer } from '~/helpers/panel';
+import { defaultPermissions } from '~/helpers/permissions';
 import { adminEndpoint, publicEndpoint } from '~/helpers/socket';
 import * as changelog from '~/helpers/user/changelog.js';
 import client from '~/services/twitch/api/client';
@@ -21,8 +25,8 @@ import { variables } from '~/watchers';
 /* secureKeys are used to authenticate use of public overlay endpoint */
 const secureKeys = new Set<string>();
 
-const fetchUserForAlert = (opts: EmitData, type: 'recipient' | 'name'): Promise<Readonly<Required<UserInterface>> | null> => {
-  return new Promise<Readonly<Required<UserInterface>> | null>((resolve) => {
+const fetchUserForAlert = (opts: EmitData, type: 'recipient' | 'name'): Promise<Readonly<Required<UserInterface>> & { game?: string } | null> => {
+  return new Promise<Readonly<Required<UserInterface>> & { game?: string } | null>((resolve) => {
     if ((opts.event === 'rewardredeems' || opts.event === 'cmdredeems') && type === 'name') {
       return resolve(null); // we don't have user on reward redeems
     }
@@ -33,7 +37,7 @@ const fetchUserForAlert = (opts: EmitData, type: 'recipient' | 'name'): Promise<
         Promise.all([
           getRepository(User).findOne({ userName: value }),
           clientBot.users.getUserByName(value),
-        ]).then(([user_db, response]) => {
+        ]).then(async ([user_db, response]) => {
           if (response) {
             changelog.update(response.id, {
               userId:          response.id,
@@ -44,7 +48,20 @@ const fetchUserForAlert = (opts: EmitData, type: 'recipient' | 'name'): Promise<
           }
           const id = user_db?.userId || response?.id;
           if (id) {
-            resolve(changelog.get(id));
+            if (opts.event === 'promo') {
+              const user = await changelog.get(id);
+              const channel = await clientBot.channels.getChannelInfoById(id);
+              if (user && channel) {
+                resolve({
+                  ...user,
+                  game: channel.gameName,
+                });
+              } else {
+                resolve(null);
+              }
+            } else {
+              resolve(changelog.get(id));
+            }
           } else {
             resolve(null);
           }
@@ -73,6 +90,11 @@ class Alerts extends Registry {
     isTTSMuted = false;
   @persistent()
     isSoundMuted = false;
+
+  @settings()
+  ['!promo-shoutoutMessage'] = 'Shoutout to $userName! Lastly seen playing (stream|$userName|game). $customMessage';
+  @settings()
+  ['!promo-enableShoutoutMessage'] = true;
 
   constructor() {
     super();
@@ -218,7 +240,7 @@ class Alerts extends Registry {
       const caster = await getRepository(User).findOne({ userId: broadcasterId }) ?? null;
 
       const data = {
-        ...opts, isTTSMuted: !tts.ready || this.isTTSMuted, isSoundMuted: this.isSoundMuted, TTSService: tts.service, TTSKey: key, user, caster, recipientUser: recipient,
+        ...opts, isTTSMuted: !tts.ready || this.isTTSMuted, isSoundMuted: this.isSoundMuted, TTSService: tts.service, TTSKey: key, user, game: user?.game, caster, recipientUser: recipient,
       };
 
       debug('alerts.send', JSON.stringify(data, null, 2));
@@ -228,6 +250,34 @@ class Alerts extends Registry {
 
   skip() {
     ioServer?.of('/registries/alerts').emit('skip');
+  }
+
+  @command('!promo')
+  @default_permission(defaultPermissions.MODERATORS)
+  async promo(opts: CommandOptions): Promise<CommandResponse[]> {
+    try {
+      const [ userName, customMessage ] = new Expects(opts.parameters)
+        .username()
+        .everything({ optional: true })
+        .toArray();
+
+      const message = await prepare(this['!promo-shoutoutMessage'], {
+        userName, customMessage: customMessage ?? '',
+      }, false);
+      this['!promo-enableShoutoutMessage'] && parserReply(message, { sender: opts.sender, discord: opts.discord, attr: opts.attr, id: '', forbidReply: true });
+      this.trigger({
+        event:      'promo',
+        message:    customMessage,
+        name:       userName,
+        tier:       '1',
+        amount:     0,
+        currency:   '',
+        monthsName: '',
+      });
+    } catch (err) {
+      console.log({ err });
+    }
+    return [];
   }
 }
 

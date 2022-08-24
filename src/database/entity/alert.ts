@@ -163,6 +163,7 @@ export interface AlertInterface {
     }[];
   };
   customProfanityList: string;
+  promo: CommonSettingsInterface[];
   follows: CommonSettingsInterface[];
   subs: CommonSettingsInterface[];
   subgifts: CommonSettingsInterface[];
@@ -284,6 +285,12 @@ export const Alert = new EntitySchema<Readonly<Required<AlertInterface>>>({
     parry:                     { type: 'simple-json' },
   },
   relations: {
+    promo: {
+      type:        'one-to-many',
+      target:      'alert_promo',
+      inverseSide: 'alert',
+      cascade:     true,
+    },
     follows: {
       type:        'one-to-many',
       target:      'alert_follow',
@@ -349,6 +356,21 @@ export const Alert = new EntitySchema<Readonly<Required<AlertInterface>>>({
       target:      'alert_reward_redeem',
       inverseSide: 'alert',
       cascade:     true,
+    },
+  },
+});
+
+export const AlertPromo = new EntitySchema<Readonly<Required<CommonSettingsInterface>>>({
+  name:      'alert_promo',
+  columns:   { ...CommonSettingsSchema },
+  relations: {
+    alert: {
+      type:        'many-to-one',
+      target:      'alert',
+      inverseSide: 'promo',
+      joinColumn:  { name: 'alertId' },
+      onDelete:    'CASCADE',
+      onUpdate:    'CASCADE',
     },
   },
 });
