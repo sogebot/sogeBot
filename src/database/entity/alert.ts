@@ -362,8 +362,8 @@ export const Alert = new EntitySchema<Readonly<Required<AlertInterface>>>({
 });
 
 export const AlertPromo = new EntitySchema<Readonly<Required<AlertResubInterface>>>({
-  name:      'alert_promo',
-  columns:   {
+  name:    'alert_promo',
+  columns: {
     ...CommonSettingsSchema,
     message: { type: 'simple-json' },
   },
