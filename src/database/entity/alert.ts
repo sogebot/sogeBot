@@ -9,6 +9,7 @@ export interface EmitData {
   amount: number;
   tier: null | 'Prime' | '1' | '2' | '3';
   recipient?: string;
+  game?: string;
   service?: string;
   rewardId?: string;
   currency: string;
@@ -163,7 +164,7 @@ export interface AlertInterface {
     }[];
   };
   customProfanityList: string;
-  promo: CommonSettingsInterface[];
+  promo: AlertResubInterface[];
   follows: CommonSettingsInterface[];
   subs: CommonSettingsInterface[];
   subgifts: CommonSettingsInterface[];
@@ -360,9 +361,12 @@ export const Alert = new EntitySchema<Readonly<Required<AlertInterface>>>({
   },
 });
 
-export const AlertPromo = new EntitySchema<Readonly<Required<CommonSettingsInterface>>>({
+export const AlertPromo = new EntitySchema<Readonly<Required<AlertResubInterface>>>({
   name:      'alert_promo',
-  columns:   { ...CommonSettingsSchema },
+  columns:   {
+    ...CommonSettingsSchema,
+    message: { type: 'simple-json' },
+  },
   relations: {
     alert: {
       type:        'many-to-one',
