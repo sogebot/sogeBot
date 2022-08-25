@@ -54,7 +54,8 @@
     "tips": "Dons",
     "hosts": "Hosts",
     "raids": "Raids",
-    "cmdredeems": "Commandes utilisées",
+    "cmdredeems": "Custom",
+    "promo": "Promo",
     "rewardredeems": "Réclamations de récompense"
   },
   "title": {
@@ -113,7 +114,7 @@
   "messageTemplate": {
     "name": "Modèle de message",
     "placeholder": "Mettez votre modèle de message",
-    "help": "Variables possibles: {name}, {amount} (cheers, subs, dons, subgifts, sub gift a la communauté, demandes de commandes), {recipient} (subgifts, demandes de commandes), {monthsName} (subs, subgifts), {currency} (tips)"
+    "help": "Available variables: {name}, {amount} (cheers, subs, tips, subgifts, sub community gifts, command redeems), {recipient} (subgifts, command redeems), {monthsName} (subs, subgifts), {currency} (tips), {game} (promo). If | is added (see promo) then it will show those values in sequence."
   },
   "ttsTemplate": {
     "name": "TTS template",

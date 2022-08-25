@@ -1,5 +1,5 @@
 {
-  "emitRedeemEvent": "Odeslat událost při použití bitů",
+  "emitRedeemEvent": "Spustit vlastní upozornění při zakoupení bity",
   "price": {
     "name": "cena",
     "placeholder": ""

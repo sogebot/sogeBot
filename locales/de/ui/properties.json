@@ -3,5 +3,9 @@
   "command": "Command",
   "price": "Price (points)",
   "priceBits": "Price (bits)",
-  "thisvalue": "This value"
+  "thisvalue": "This value",
+  "promo": {
+    "shoutoutMessage": "Shoutout message",
+    "enableShoutoutMessage": "Send shoutout message in chat"
+  }
 }
