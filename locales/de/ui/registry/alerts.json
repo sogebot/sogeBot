@@ -54,7 +54,8 @@
     "tips": "Tips",
     "hosts": "Hosts",
     "raids": "Raids",
-    "cmdredeems": "Befehl wird eingelöst",
+    "cmdredeems": "Custom",
+    "promo": "Promo",
     "rewardredeems": "Belohnungen einlösen"
   },
   "title": {
@@ -113,7 +114,7 @@
   "messageTemplate": {
     "name": "Nachrichtenvorlage",
     "placeholder": "Nachrichtenvorlage festlegen",
-    "help": "Verfügbare Variablen: {name}, {amount} (Grüße, Subs, Tipps, Subgeschenke, Sub Community Geschenke, Befehlseinlöse), {recipient} (Subgeschenke, Befehlseinlöse), {monthsName} (Subgeschenke, Subgeschenke), {currency} (Tipps)"
+    "help": "Available variables: {name}, {amount} (cheers, subs, tips, subgifts, sub community gifts, command redeems), {recipient} (subgifts, command redeems), {monthsName} (subs, subgifts), {currency} (tips), {game} (promo). If | is added (see promo) then it will show those values in sequence."
   },
   "ttsTemplate": {
     "name": "TTS Vorlage",

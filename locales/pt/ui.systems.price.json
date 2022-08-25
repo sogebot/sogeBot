@@ -1,5 +1,5 @@
 {
-  "emitRedeemEvent": "Emitir evento de resgate mesmo se os bits são usados",
+  "emitRedeemEvent": "Disparar alertas personalizados ao resgatar bits",
   "price": {
     "name": "preço",
     "placeholder": ""

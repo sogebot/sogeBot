@@ -5,7 +5,7 @@
   "priceBits": "Cena (bity)",
   "thisvalue": "Tato hodnota",
   "promo": {
-    "shoutoutMessage": "Shoutout message",
-    "enableShoutoutMessage": "Send shoutout messge in chat"
+    "shoutoutMessage": "Zpráva vyhlášení",
+    "enableShoutoutMessage": "Poslat zprávu vyhlášení do chatu"
   }
 }
