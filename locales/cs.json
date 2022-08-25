@@ -488,7 +488,9 @@
           "displayname": "Zobrazené jméno na Twitteru",
           "url": "Link na tweet"
         },
-        "sceneName": "Název scény"
+        "sceneName": "Název scény",
+        "inputName": "Název vstupu",
+        "inputMuted": "Stav ztlumení (bool)"
       }
     },
     "page-settings": {
@@ -735,6 +737,7 @@
     "follow": "nový follower",
     "tip": "nový tip",
     "obs-scene-changed": "OBS scéna se změnila",
+    "obs-input-mute-state-changed": "Stav ztlumení zdroje v OBS bylo změněno",
     "unfollow": "ztráta followera",
     "hypetrain-started": "Hype Train spuštěn",
     "hypetrain-ended": "Konec Hype Train",
@@ -773,7 +776,6 @@
     "send-chat-message": "odeslat zprávu na twitch chat",
     "send-whisper": "poslat whisper",
     "run-command": "spusť příkaz",
-    "command-redeem": "spustit událost pro koupení příkazu",
     "run-obswebsocket-command": "spustit příkaz OBS Websocketu",
     "do-nothing": "--- nedělat nic ---",
     "count": "počet",
@@ -1213,7 +1215,7 @@
   },
   "time": "Aktuální čas v časovém pásmu streamu je $time",
   "subs": "$sender, je zde právě $onlineSubCount online subscriberů. Poslední sub/resub byl $lastSubUsername $lastSubAgo",
-  "followers": "$sender, last follow was $lastFollowUsername $lastFollowAgo",
+  "followers": "$sender, poslední sledující byl $lastFollowUsername $lastFollowAgo",
   "ignore": {
     "user": {
       "is": {

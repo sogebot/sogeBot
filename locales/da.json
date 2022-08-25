@@ -488,7 +488,9 @@
           "displayname": "Skærmnavn på Twitter",
           "url": "Llink til Tweet"
         },
-        "sceneName": "Navn på scene"
+        "sceneName": "Navn på scene",
+        "inputName": "Name of input",
+        "inputMuted": "Mute state (bool)"
       }
     },
     "page-settings": {
@@ -735,6 +737,7 @@
     "follow": "ny følger",
     "tip": "nyt tip",
     "obs-scene-changed": "OBS-scene skiftet",
+    "obs-input-mute-state-changed": "OBS input source mute state changed",
     "unfollow": "stop med at følge",
     "hypetrain-started": "Hype Train started",
     "hypetrain-ended": "Hype Train ended",
@@ -773,7 +776,6 @@
     "send-chat-message": "send en Twitch-chatbesked",
     "send-whisper": "send en whisper",
     "run-command": "kør en kommando",
-    "command-redeem": "trigger command redeem event",
     "run-obswebsocket-command": "run an OBS Websocket command",
     "do-nothing": "--- gør intet ---",
     "count": "tæller",

@@ -488,7 +488,9 @@
           "displayname": "Screen name on twitter",
           "url": "Tweet link"
         },
-        "sceneName": "Name of scene"
+        "sceneName": "Name of scene",
+        "inputName": "Name of input",
+        "inputMuted": "Mute state (bool)"
       }
     },
     "page-settings": {
@@ -735,6 +737,7 @@
     "follow": "new follow",
     "tip": "new tip",
     "obs-scene-changed": "OBS scene changed",
+    "obs-input-mute-state-changed": "OBS input source mute state changed",
     "unfollow": "unfollow",
     "hypetrain-started": "Hype Train started",
     "hypetrain-ended": "Hype Train ended",
@@ -773,7 +776,6 @@
     "send-chat-message": "send a twitch chat message",
     "send-whisper": "send a whisper",
     "run-command": "run a command",
-    "command-redeem": "trigger command redeem event",
     "run-obswebsocket-command": "run an OBS Websocket command",
     "do-nothing": "--- do nothing ---",
     "count": "count",
