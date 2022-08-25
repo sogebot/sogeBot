@@ -488,7 +488,9 @@
           "displayname": "Twitterでのスクリーン名",
           "url": "ツイートリンク"
         },
-        "sceneName": "シーン名"
+        "sceneName": "シーン名",
+        "inputName": "Name of input",
+        "inputMuted": "Mute state (bool)"
       }
     },
     "page-settings": {
@@ -735,6 +737,7 @@
     "follow": "新しいフォロー",
     "tip": "新しいチップ",
     "obs-scene-changed": "OBSのシーンが変更されました",
+    "obs-input-mute-state-changed": "OBS input source mute state changed",
     "unfollow": "フォロー解除",
     "hypetrain-started": "ハイプトレイン開始",
     "hypetrain-ended": "ハイプトレイン終了",
@@ -773,7 +776,6 @@
     "send-chat-message": "twitchチャットメッセージを送信",
     "send-whisper": "ウィスパーを送る",
     "run-command": "コマンドの実行",
-    "command-redeem": "trigger command redeem event",
     "run-obswebsocket-command": "OBS Websocket コマンドの実行",
     "do-nothing": "--- 何もしない ---",
     "count": "カウント",

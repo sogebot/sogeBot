@@ -54,7 +54,8 @@
     "tips": "Donazioni",
     "hosts": "Host",
     "raids": "Raid",
-    "cmdredeems": "Riscatta Comando",
+    "cmdredeems": "Custom",
+    "promo": "Promo",
     "rewardredeems": "Riscatta Ricompensa"
   },
   "title": {
@@ -113,7 +114,7 @@
   "messageTemplate": {
     "name": "Modello messaggio",
     "placeholder": "Imposta il tuo modello di messaggi",
-    "help": "Variabili disponibili: {name}, {amount} (cheers, subs, tips, subgifts, sub community gifts, command redeems), {recipient} (subgifts, command redeems), {monthsName} (subs, subgifts), {currency} (tips)"
+    "help": "Available variables: {name}, {amount} (cheers, subs, tips, subgifts, sub community gifts, command redeems), {recipient} (subgifts, command redeems), {monthsName} (subs, subgifts), {currency} (tips), {game} (promo). If | is added (see promo) then it will show those values in sequence."
   },
   "ttsTemplate": {
     "name": "TTS template",

@@ -1,5 +1,5 @@
 {
-  "emitRedeemEvent": "Emit redeem event if bits are used",
+  "emitRedeemEvent": "Trigger custom alerts on bit redeem",
   "price": {
     "name": "цена",
     "placeholder": ""

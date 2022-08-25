@@ -488,7 +488,9 @@
           "displayname": "Nome visualizzato su Twitter",
           "url": "Twitta link"
         },
-        "sceneName": "Nome della scena"
+        "sceneName": "Nome della scena",
+        "inputName": "Name of input",
+        "inputMuted": "Mute state (bool)"
       }
     },
     "page-settings": {
@@ -735,6 +737,7 @@
     "follow": "nuovo follow",
     "tip": "nuova mancia",
     "obs-scene-changed": "Scena OBS cambiata",
+    "obs-input-mute-state-changed": "OBS input source mute state changed",
     "unfollow": "unfollow",
     "hypetrain-started": "Hype Train avviato",
     "hypetrain-ended": "Hype Train terminato",
@@ -773,7 +776,6 @@
     "send-chat-message": "invia un messaggio di chat twitch",
     "send-whisper": "invia un messaggio privato",
     "run-command": "esegui un comando",
-    "command-redeem": "trigger command redeem event",
     "run-obswebsocket-command": "esegui un comando OBS Websocket",
     "do-nothing": "--- non fare nulla ---",
     "count": "conteggio",
