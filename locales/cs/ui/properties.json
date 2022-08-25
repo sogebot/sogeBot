@@ -3,5 +3,9 @@
   "command": "Příkaz",
   "price": "Cena (body)",
   "priceBits": "Cena (bity)",
-  "thisvalue": "Tato hodnota"
+  "thisvalue": "Tato hodnota",
+  "promo": {
+    "shoutoutMessage": "Shoutout message",
+    "enableShoutoutMessage": "Send shoutout messge in chat"
+  }
 }
