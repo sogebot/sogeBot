@@ -8,9 +8,28 @@ import {
 
 import { timer } from '~/decorators.js';
 import { getGlobalVariables } from '~/helpers/checkFilter.js';
+import { getUserSender } from '~/helpers/commons';
 import { getBotSender } from '~/helpers/commons/getBotSender';
+import { app } from '~/helpers/panel';
 import twitch from '~/services/twitch';
+import { adminMiddleware } from '~/socket';
 import { translate } from '~/translate';
+
+(function initializeMessageParserAPI() {
+  if (!app) {
+    setTimeout(() => initializeMessageParserAPI(), 100);
+    return;
+  }
+
+  app.post('/api/core/parse', adminMiddleware, async (req, res) => {
+    try {
+      const text = await new Message(req.body.message).parse({ sender: getUserSender(req.body.user.id, req.body.user.username), discord: undefined }) as string;
+      res.send({ data: text });
+    } catch (e) {
+      res.status(400).send({ errors: e });
+    }
+  });
+})();
 
 class Message {
   message = '';

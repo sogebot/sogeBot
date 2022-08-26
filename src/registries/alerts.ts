@@ -6,7 +6,7 @@ import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized';
 import { getRepository, IsNull } from 'typeorm';
 import { v4 } from 'uuid';
 
-import { command, default_permission, persistent, settings } from '../decorators';
+import { command, default_permission, example, persistent, settings } from '../decorators';
 import Registry from './_interface';
 
 import { parserReply } from '~/commons';
@@ -90,11 +90,6 @@ class Alerts extends Registry {
     isTTSMuted = false;
   @persistent()
     isSoundMuted = false;
-
-  @settings()
-  ['!promo-shoutoutMessage'] = 'Shoutout to $userName! Lastly seen playing (stream|$userName|game). $customMessage';
-  @settings()
-  ['!promo-enableShoutoutMessage'] = true;
 
   constructor() {
     super();
@@ -251,8 +246,24 @@ class Alerts extends Registry {
   skip() {
     ioServer?.of('/registries/alerts').emit('skip');
   }
-
+  @settings()
+  ['!promo-shoutoutMessage'] = 'Shoutout to $userName! Lastly seen playing (stream|$userName|game). $customMessage';
+  @settings()
+  ['!promo-enableShoutoutMessage'] = true;
   @command('!promo')
+  @example([
+    [
+      '?!promo <username> <optionalMessage>',
+    ],
+    [
+      '+!promo soge',
+      { if: 'enableShoutoutMessage', message: '-{shoutoutMessage}', replace: { $userName: 'soge', $customMessage: '' } },
+    ],
+    [
+      '+!promo soge Hey! Give him a follow!',
+      { if: 'enableShoutoutMessage', message: '-{shoutoutMessage}', replace: { $userName: 'soge', $customMessage: 'Hey! Give him a follow!' } },
+    ],
+  ])
   @default_permission(defaultPermissions.MODERATORS)
   async promo(opts: CommandOptions): Promise<CommandResponse[]> {
     try {

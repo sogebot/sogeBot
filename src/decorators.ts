@@ -94,6 +94,45 @@ export function ui(opts: any, category?: string) {
   };
 }
 
+export function example(opts: (string|{if?: string, message: string, replace: { [x:string]: string }})[][], category?: string) {
+  const { name, type } = getNameAndTypeFromStackTrace();
+
+  return (target: any, key: string) => {
+    let path = category ? `${category}.${key}` : key;
+
+    const register = async (retries = 0) => {
+      if (!isDbConnected) {
+        setTimeout(() => register(0), 1000);
+        return;
+      }
+      try {
+        const self = find(type, name);
+        if (!self) {
+          throw new Error(`${type}.${name} not found in list`);
+        }
+        // get category from settingsList
+        if (!category) {
+          const s = self.settingsList.find(o => o.key === path);
+          if (s) {
+            path = s.category? s.category + '.' + path : path;
+          } else {
+            if (retries < 500) { // try to wait to settings to be registered
+              setTimeout(() => register(++retries), 10);
+              return;
+            }
+          }
+        }
+        _.set(self, '_ui.' + path, opts);
+      } catch (e: any) {
+        error(e);
+      }
+    };
+    setTimeout(() => {
+      register();
+    }, 10000);
+  };
+}
+
 export function settings(category?: string, isReadOnly = false) {
   const { name, type } = getNameAndTypeFromStackTrace();
 
