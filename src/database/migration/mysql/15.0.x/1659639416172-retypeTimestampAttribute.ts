@@ -16,7 +16,7 @@ export class retypeTimestampAttribute1659639416172 implements MigrationInterface
     for (const item of items) {
       await insertItemIntoTable('cooldown', {
         ...item,
-        timestamp: new Date(item.timestamp).toISOString(),
+        timestamp: new Date(0).toISOString(),
       }, queryRunner);
     }
   }
