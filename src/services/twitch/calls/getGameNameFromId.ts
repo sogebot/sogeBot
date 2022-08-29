@@ -27,7 +27,7 @@ async function getGameNameFromId (id: number) {
     if (!getGameById) {
       throw new Error(`Couldn't find name of game for gid ${id} - fallback to ${stats.value.currentGame}`);
     }
-    await getRepository(CacheGames).save({ id, name: getGameById.name });
+    await getRepository(CacheGames).save({ id, name: getGameById.name, thumbnail: getGameById.boxArtUrl });
     return getGameById.name;
   } catch (e: unknown) {
     if (e instanceof Error) {
