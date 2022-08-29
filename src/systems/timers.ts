@@ -99,7 +99,7 @@ class Timers extends System {
     }
     const timers = await Timer.find({ relations: ['messages'] });
     for (const timer of timers) {
-      timer.triggeredAtMessages = 0
+      timer.triggeredAtMessages = 0;
       timer.triggeredAtTimestamp = new Date().toISOString();
       await timer.save();
     }
@@ -335,7 +335,7 @@ class Timers extends System {
       }
 
       response.isEnabled = !response.isEnabled;
-      await response.save()
+      await response.save();
 
       return [{
         response: translate(response.isEnabled ? 'timers.response-enabled' : 'timers.response-disabled')
@@ -350,7 +350,7 @@ class Timers extends System {
       }
 
       timer.isEnabled = !timer.isEnabled;
-      await timer.save()
+      await timer.save();
 
       return [{
         response: translate(timer.isEnabled ? 'timers.timer-enabled' : 'timers.timer-disabled')
