@@ -19,6 +19,7 @@ import { possibleLists } from '../d.ts/src/helpers/socket.js';
 import emitter from './helpers/interfaceEmitter.js';
 
 import Core from '~/_interface';
+import { CacheGames, CacheGamesInterface } from '~/database/entity/cacheGames.js';
 import { CacheTitles } from '~/database/entity/cacheTitles';
 import { Translation } from '~/database/entity/translation';
 import { TwitchTag, TwitchTagInterface } from '~/database/entity/twitch';
@@ -53,6 +54,7 @@ import * as changelog from '~/helpers/user/changelog.js';
 import lastfm from '~/integrations/lastfm';
 import spotify from '~/integrations/spotify';
 import Parser from '~/parser';
+import { getGameThumbnailFromName } from '~/services/twitch/calls/getGameThumbnailFromName.js';
 import { sendGameFromTwitch } from '~/services/twitch/calls/sendGameFromTwitch';
 import { setTags } from '~/services/twitch/calls/setTags';
 import { setTitleAndGame } from '~/services/twitch/calls/setTitleAndGame';
@@ -334,8 +336,25 @@ class Panel extends Core {
         sendGameFromTwitch(game).then((data) => cb(data));
       });
       socket.on('getUserTwitchGames', async (cb) => {
-        const titles = await getRepository(CacheTitles).find();
-        cb(titles);
+        let titles = await getRepository(CacheTitles).find();
+        const cachedGames = await getRepository(CacheGames).find();
+
+        // we need to cleanup titles if game is not in cache
+        for (const title of titles) {
+          if (!cachedGames.map(o => o.name).includes(title.game)) {
+            await getRepository(CacheTitles).delete({ game: title.game });
+          }
+        }
+
+        const games: CacheGamesInterface[] = [];
+        for (const game of cachedGames) {
+          games.push({
+            ...game,
+            thumbnail: await getGameThumbnailFromName(game.name) || '',
+          });
+        }
+        titles = await getRepository(CacheTitles).find();
+        cb(titles, games);
       });
       socket.on('cleanupGameAndTitle', async () => {
       // remove empty titles

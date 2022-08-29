@@ -35,6 +35,7 @@ import { QuickActions } from '../../../src/database/entity/dashboard';
 import { WidgetCustomInterface, WidgetSocialInterface } from '../../../src/database/entity/widget';
 
 import { AliasGroup, Alias } from '~/database/entity/alias';
+import { CacheGamesInterface } from '~/database/entity/cacheGames';
 import { Plugin } from '~/database/entity/plugins';
 import { MenuItem } from '~/helpers/panel';
 
@@ -102,7 +103,7 @@ export type ClientToServerEventsWithNamespace = {
     'updateGameAndTitle': (emit: { game: string; title: string; tags: never[]; }, cb: (error: Error | string | null) => void) => void,
     'cleanupGameAndTitle': () => void,
     'getGameFromTwitch': (value: string, cb: (values: string[]) => void) => void,
-    'getUserTwitchGames': (cb: (values: CacheTitlesInterface[]) => void) => void,
+    'getUserTwitchGames': (cb: (values: CacheTitlesInterface[], thumbnails: CacheGamesInterface[]) => void) => void,
     'integration::obswebsocket::generic::getOne': generic<OBSWebsocketInterface>['getOne'],
     'integration::obswebsocket::generic::getAll': generic<OBSWebsocketInterface>['getAll'],
     'integration::obswebsocket::generic::save': generic<OBSWebsocketInterface>['save'],
