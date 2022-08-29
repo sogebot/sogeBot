@@ -21,14 +21,15 @@ describe('Timers - unset() - @func2', () => {
     await db.cleanup();
     await message.prepare();
 
-    await getRepository(Timer).save({
-      name: 'test',
-      triggerEveryMessage: 0,
-      triggerEverySecond: 60,
-      isEnabled: true,
-      triggeredAtTimestamp: Date.now(),
-      triggeredAtMessage: linesParsed,
-    });
+    const timer = new Timer();
+    timer.name = 'test';
+    timer.triggerEveryMessage = 0;
+    timer.triggerEverySecond = 60;
+    timer.tickOffline = true;
+    timer.isEnabled = true;
+    timer.triggeredAtTimestamp = Date.now();
+    timer.triggeredAtMessage = linesParsed;
+    await timer.save();
   });
 
   it('', async () => {

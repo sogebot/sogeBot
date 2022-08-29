@@ -22,7 +22,6 @@ import type { RankInterface } from '@entity/rank';
 import type { currentSongType, SongBanInterface, SongPlaylistInterface, SongRequestInterface } from '@entity/song';
 import type { SpotifySongBanInterface } from '@entity/spotify';
 import type { TextInterface } from '@entity/text';
-import type { TimerInterface } from '@entity/timer';
 import type {
   UserBitInterface, UserInterface, UserTipInterface,
 } from '@entity/user';
@@ -413,12 +412,6 @@ export type ClientToServerEventsWithNamespace = {
     'import.video': (opts: { playlist: string, forcedTag: string | null }, cb: (error: Error | string | null, result: import('../parser').CommandResponse[] | null) => void) => void,
     'stop.import': () => void,
     'next': () => void,
-  },
-  '/systems/timers': GenericEvents & {
-    'generic::getAll': (cb: (error: Error | string | null, timers: Readonly<Required<TimerInterface>>[]) => void) => void,
-    'generic::getOne': (id: string, cb: (error: Error | string | null, timer?: Readonly<Required<TimerInterface>>) => void) => void,
-    'generic::setById': generic<TimerInterface>['setById'],
-    'generic::deleteById': generic<TimerInterface>['deleteById'],
   },
   '/widgets/joinpart': GenericEvents & {
     'joinpart': (data: { users: string[], type: 'join' | 'part' }) => void,
