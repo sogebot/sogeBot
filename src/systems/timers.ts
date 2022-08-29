@@ -4,8 +4,9 @@ import {
   Timer, TimerResponse,
 } from '@entity/timer';
 import { SECOND } from '@sogebot/ui-helpers/constants';
+import { validateOrReject } from 'class-validator';
 import * as _ from 'lodash';
-import { sortBy } from 'lodash';
+import { merge, sortBy } from 'lodash';
 
 import { command, default_permission } from '../decorators';
 import Expects from '../expects';
@@ -14,9 +15,10 @@ import System from './_interface';
 import { isStreamOnline } from '~/helpers/api';
 import { announce } from '~/helpers/commons';
 import { isDbConnected } from '~/helpers/database';
+import { app } from '~/helpers/panel';
 import { linesParsed } from '~/helpers/parser';
 import { defaultPermissions } from '~/helpers/permissions/index';
-import { adminEndpoint } from '~/helpers/socket';
+import { adminMiddleware } from '~/socket';
 import { translate } from '~/translate';
 
 /*
@@ -41,43 +43,45 @@ class Timers extends System {
     this.init();
   }
 
-  sockets () {
-    adminEndpoint('/systems/timers', 'generic::getAll', async (callback) => {
-      try {
-        const timers = await Timer.find({ relations: ['messages'] });
-        callback(null, timers);
-      } catch(e: any) {
-        callback(e, []);
-      }
+  sockets() {
+    if (!app) {
+      setTimeout(() => this.sockets(), 100);
+      return;
+    }
+
+    app.get('/api/systems/timer', adminMiddleware, async (req, res) => {
+      res.send({
+        data: await Timer.find({ relations: ['messages'] }),
+      });
     });
-    adminEndpoint('/systems/timers', 'generic::getOne', async (id, callback) => {
-      try {
-        const timer = await Timer.findOne({
-          relations: ['messages'],
-          where:     { id },
-        });
-        callback(null, timer);
-      } catch (e: any) {
-        callback(e);
-      }
+    app.get('/api/systems/timer/:id', adminMiddleware, async (req, res) => {
+      res.send({
+        data: await Timer.findOne({ id: req.params.id }, { relations: ['messages'] }),
+      });
     });
-    adminEndpoint('/systems/timers', 'generic::deleteById', async (id, callback) => {
+    app.delete('/api/systems/timer/:id', adminMiddleware, async (req, res) => {
+      await Timer.delete({ id: req.params.id });
+      res.status(404).send();
+    });
+    app.post('/api/systems/timer', adminMiddleware, async (req, res) => {
       try {
-        const timer = await Timer.findOne({ where: { id } });
-        if (timer) {
-          await Timer.remove(timer);
+        const itemToSave = new Timer();
+        merge(itemToSave, req.body);
+        await validateOrReject(itemToSave);
+        await itemToSave.save();
+
+        await TimerResponse.delete({ timer: itemToSave });
+        const responses = req.body.messages;
+        for (const response of responses) {
+          const resToSave = new TimerResponse();
+          merge(resToSave, response);
+          resToSave.timer = itemToSave;
+          await resToSave.save();
         }
-        callback(null);
-      } catch (e: any) {
-        callback(e);
-      }
-    });
-    adminEndpoint('/systems/timers', 'generic::setById', async (opts, cb) => {
-      try {
-        const item = await Timer.save({ ...(await Timer.findOne({ id: String(opts.id) })), ...opts.item });
-        cb(null, item);
-      } catch (e: any) {
-        cb(e.stack, null);
+
+        res.send({ data: itemToSave });
+      } catch (e) {
+        res.status(400).send({ errors: e });
       }
     });
   }

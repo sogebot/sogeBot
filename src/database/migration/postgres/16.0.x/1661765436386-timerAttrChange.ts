@@ -21,7 +21,7 @@ export class timerAttrChange1661765436386 implements MigrationInterface {
     for (const item of items) {
       await insertItemIntoTable('timer', {
         ...item,
-        timestamp: new Date(item.triggeredAtTimestamp).toISOString(),
+        triggeredAtTimestamp: new Date(item.triggeredAtTimestamp).toISOString(),
       }, queryRunner);
     }
 
