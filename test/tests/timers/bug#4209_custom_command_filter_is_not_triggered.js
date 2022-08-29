@@ -29,14 +29,14 @@ describe('Timers - https://github.com/sogehige/sogeBot/issues/4209 - custom comm
   });
 
   it('Create timer', async () => {
-    await getRepository(Timer).save({
-      name: 'test',
-      triggerEveryMessage: 0,
-      triggerEverySecond: 0,
-      isEnabled: true,
-      triggeredAtTimestamp: Date.now(),
-      triggeredAtMessage: linesParsed,
-    });
+    const timer = new Timer();
+    timer.name = 'test';
+    timer.triggerEveryMessage = 0;
+    timer.triggerEverySecond = 0;
+    timer.isEnabled = true;
+    timer.triggeredAtTimestamp = Date.now();
+    timer.triggeredAtMessage = linesParsed;
+    await timer.save();
   });
 
   it('Add custom command !telemetry', async () => {

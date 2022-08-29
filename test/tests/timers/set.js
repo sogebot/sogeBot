@@ -30,7 +30,7 @@ describe('Timers - set() - @func2', () => {
     const r = await timers.set({ sender: owner, parameters: '-name test' });
     assert.strictEqual(r[0].response, '$sender, timer test was set with 0 messages and 60 seconds to trigger');
 
-    const item = await getRepository(Timer).findOne({
+    const item = await Timer.findOne({
       relations: ['messages'],
       where: { name: 'test' },
     });
@@ -42,7 +42,7 @@ describe('Timers - set() - @func2', () => {
     const r = await timers.set({ sender: owner, parameters: '-name test -seconds 20' });
     assert.strictEqual(r[0].response, '$sender, timer test was set with 0 messages and 20 seconds to trigger');
 
-    const item = await getRepository(Timer).findOne({
+    const item = await Timer.findOne({
       relations: ['messages'],
       where: { name: 'test' },
     });
@@ -53,7 +53,7 @@ describe('Timers - set() - @func2', () => {
   it('-name test -seconds 0', async () => {
     const r = await timers.set({ sender: owner, parameters: '-name test -seconds 0' });
     assert.strictEqual(r[0].response, '$sender, you cannot set both messages and seconds to 0.');
-    const item = await getRepository(Timer).findOne({
+    const item = await Timer.findOne({
       relations: ['messages'],
       where: { name: 'test' },
     });
@@ -64,7 +64,7 @@ describe('Timers - set() - @func2', () => {
     const r = await timers.set({ sender: owner, parameters: '-name test -messages 20' });
     assert.strictEqual(r[0].response, '$sender, timer test was set with 20 messages and 60 seconds to trigger');
 
-    const item = await getRepository(Timer).findOne({
+    const item = await Timer.findOne({
       relations: ['messages'],
       where: { name: 'test' },
     });
@@ -76,7 +76,7 @@ describe('Timers - set() - @func2', () => {
     const r = await timers.set({ sender: owner, parameters: '-name test -messages 0' });
     assert.strictEqual(r[0].response, '$sender, timer test was set with 0 messages and 60 seconds to trigger');
 
-    const item = await getRepository(Timer).findOne({
+    const item = await Timer.findOne({
       relations: ['messages'],
       where: { name: 'test' },
     });
@@ -88,7 +88,7 @@ describe('Timers - set() - @func2', () => {
     const r = await timers.set({ sender: owner, parameters: '-name test -seconds 0 -messages 0' });
     assert.strictEqual(r[0].response, '$sender, you cannot set both messages and seconds to 0.');
 
-    const item = await getRepository(Timer).findOne({
+    const item = await Timer.findOne({
       relations: ['messages'],
       where: { name: 'test' },
     });
@@ -99,7 +99,7 @@ describe('Timers - set() - @func2', () => {
     const r = await timers.set({ sender: owner, parameters: '-name test -seconds 5 -messages 6' });
     assert.strictEqual(r[0].response, '$sender, timer test was set with 6 messages and 5 seconds to trigger');
 
-    const item = await getRepository(Timer).findOne({
+    const item = await Timer.findOne({
       relations: ['messages'],
       where: { name: 'test' },
     });
@@ -111,7 +111,7 @@ describe('Timers - set() - @func2', () => {
     const r = await timers.set({ sender: owner, parameters: '-name test -seconds 5 -messages 6 -offline' });
     assert.strictEqual(r[0].response, '$sender, timer test was set with 6 messages and 5 seconds to trigger even when stream is offline');
 
-    const item = await getRepository(Timer).findOne({
+    const item = await Timer.findOne({
       relations: ['messages'],
       where: { name: 'test' },
     });

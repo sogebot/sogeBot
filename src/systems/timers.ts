@@ -1,12 +1,11 @@
 'use strict';
 
 import {
-  Timer, TimerResponse, TimerResponseInterface,
+  Timer, TimerResponse,
 } from '@entity/timer';
 import { SECOND } from '@sogebot/ui-helpers/constants';
 import * as _ from 'lodash';
 import { sortBy } from 'lodash';
-import { getRepository } from 'typeorm';
 
 import { command, default_permission } from '../decorators';
 import Expects from '../expects';
@@ -45,7 +44,7 @@ class Timers extends System {
   sockets () {
     adminEndpoint('/systems/timers', 'generic::getAll', async (callback) => {
       try {
-        const timers = await getRepository(Timer).find({ relations: ['messages'] });
+        const timers = await Timer.find({ relations: ['messages'] });
         callback(null, timers);
       } catch(e: any) {
         callback(e, []);
@@ -53,7 +52,7 @@ class Timers extends System {
     });
     adminEndpoint('/systems/timers', 'generic::getOne', async (id, callback) => {
       try {
-        const timer = await getRepository(Timer).findOne({
+        const timer = await Timer.findOne({
           relations: ['messages'],
           where:     { id },
         });
@@ -64,9 +63,9 @@ class Timers extends System {
     });
     adminEndpoint('/systems/timers', 'generic::deleteById', async (id, callback) => {
       try {
-        const timer = await getRepository(Timer).findOne({ where: { id } });
+        const timer = await Timer.findOne({ where: { id } });
         if (timer) {
-          await getRepository(Timer).remove(timer);
+          await Timer.remove(timer);
         }
         callback(null);
       } catch (e: any) {
@@ -75,7 +74,7 @@ class Timers extends System {
     });
     adminEndpoint('/systems/timers', 'generic::setById', async (opts, cb) => {
       try {
-        const item = await getRepository(Timer).save({ ...(await getRepository(Timer).findOne({ id: String(opts.id) })), ...opts.item });
+        const item = await Timer.save({ ...(await Timer.findOne({ id: String(opts.id) })), ...opts.item });
         cb(null, item);
       } catch (e: any) {
         cb(e.stack, null);
@@ -98,11 +97,11 @@ class Timers extends System {
       setTimeout(() => this.init(), 1000);
       return;
     }
-    const timers = await getRepository(Timer).find({ relations: ['messages'] });
+    const timers = await Timer.find({ relations: ['messages'] });
     for (const timer of timers) {
-      await getRepository(Timer).save({
-        ...timer, triggeredAtMessages: 0, triggeredAtTimestamp: Date.now(),
-      });
+      timer.triggeredAtMessages = 0
+      timer.triggeredAtTimestamp = new Date().toISOString();
+      await timer.save();
     }
     this.check();
   }
@@ -111,23 +110,23 @@ class Timers extends System {
     clearTimeout(this.timeouts.timersCheck);
 
     if (!isStreamOnline.value) {
-      await getRepository(Timer).update({ tickOffline: false }, { triggeredAtMessages: linesParsed, triggeredAtTimestamp: Date.now() });
+      await Timer.update({ tickOffline: false }, { triggeredAtMessages: linesParsed, triggeredAtTimestamp: new Date().toISOString() });
     }
 
-    const timers = await getRepository(Timer).find({
+    const timers = await Timer.find({
       relations: ['messages'],
       where:     isStreamOnline.value ? { isEnabled: true } : { isEnabled: true, tickOffline: true },
     });
 
     for (const timer of timers) {
-      if (timer.triggerEveryMessage > 0 && timer.triggeredAtMessages - linesParsed + timer.triggerEveryMessage > 0) {
+      if (timer.triggerEveryMessage > 0 && (timer.triggeredAtMessages || 0) - linesParsed + timer.triggerEveryMessage > 0) {
         continue;
       } // not ready to trigger with messages
-      if (timer.triggerEverySecond > 0 && new Date().getTime() - timer.triggeredAtTimestamp < timer.triggerEverySecond * 1000) {
+      if (timer.triggerEverySecond > 0 && new Date().getTime() - new Date(timer.triggeredAtTimestamp || 0).getTime() < timer.triggerEverySecond * 1000) {
         continue;
       } // not ready to trigger with seconds
 
-      const announceResponse = (responses: TimerResponseInterface[]) => {
+      const announceResponse = (responses: TimerResponse[]) => {
         // check if at least one response is enabled
         if (responses.filter(o => o.isEnabled).length === 0) {
           return;
@@ -136,7 +135,7 @@ class Timers extends System {
         responses = _.orderBy(responses, 'timestamp', 'asc');
         const response = responses.shift();
         if (response) {
-          getRepository(TimerResponse).update({ id: response.id }, { timestamp: Date.now() });
+          TimerResponse.update({ id: response.id }, { timestamp: new Date().toISOString() });
           if (!response.isEnabled) {
             // go to next possibly enabled response
             announceResponse(responses);
@@ -146,7 +145,7 @@ class Timers extends System {
         }
       };
       announceResponse(timer.messages);
-      await getRepository(Timer).update({ id: timer.id }, { triggeredAtMessages: linesParsed, triggeredAtTimestamp: Date.now() });
+      await Timer.update({ id: timer.id }, { triggeredAtMessages: linesParsed, triggeredAtTimestamp: new Date().toISOString() });
     }
     this.timeouts.timersCheck = global.setTimeout(() => this.check(), SECOND); // this will run check 1s after full check is correctly done
   }
@@ -176,20 +175,19 @@ class Timers extends System {
     if (messages === 0 && seconds === 0) {
       return [{ response: translate('timers.cannot-set-messages-and-seconds-0'), ...opts }];
     }
-    const timer = await getRepository(Timer).findOne({
+    const timer = await Timer.findOne({
       relations: ['messages'],
       where:     { name },
-    });
-    await getRepository(Timer).save({
-      ...timer,
-      tickOffline,
-      name:                 name,
-      triggerEveryMessage:  messages,
-      triggerEverySecond:   seconds,
-      isEnabled:            true,
-      triggeredAtMessages:  linesParsed,
-      triggeredAtTimestamp: Date.now(),
-    });
+    }) || new Timer();
+
+    timer.tickOffline = tickOffline;
+    timer.name =                 name;
+    timer.triggerEveryMessage =  messages;
+    timer.triggerEverySecond =   seconds;
+    timer.isEnabled =            true;
+    timer.triggeredAtMessages =  linesParsed;
+    timer.triggeredAtTimestamp = new Date().toISOString();
+    await timer.save();
 
     return [{
       response: translate(tickOffline ? 'timers.timer-was-set-with-offline-flag' : 'timers.timer-was-set')
@@ -211,12 +209,12 @@ class Timers extends System {
       name = nameMatch[1];
     }
 
-    const timer = await getRepository(Timer).findOne({ name: name });
+    const timer = await Timer.findOne({ name: name });
     if (!timer) {
       return [{ response: translate('timers.timer-not-found').replace(/\$name/g, name), ...opts }];
     }
 
-    await getRepository(Timer).remove(timer);
+    await Timer.remove(timer);
     return [{ response: translate('timers.timer-deleted').replace(/\$name/g, name), ...opts }];
   }
 
@@ -226,7 +224,7 @@ class Timers extends System {
     // -id [id-of-response]
     try {
       const id = new Expects(opts.parameters).argument({ type: 'uuid', name: 'id' }).toArray()[0];
-      await getRepository(TimerResponse).delete({ id });
+      await TimerResponse.delete({ id });
       return [{
         response: translate('timers.response-deleted')
           .replace(/\$id/g, id), ...opts,
@@ -255,7 +253,7 @@ class Timers extends System {
     } else {
       response = responseMatch[1];
     }
-    const timer = await getRepository(Timer).findOne({
+    const timer = await Timer.findOne({
       relations: ['messages'],
       where:     { name },
     });
@@ -266,12 +264,12 @@ class Timers extends System {
       }];
     }
 
-    const item = await getRepository(TimerResponse).save({
-      isEnabled: true,
-      timestamp: Date.now(),
-      response:  response,
-      timer:     timer,
-    });
+    const item = new TimerResponse();
+    item.isEnabled = true;
+    item.timestamp = new Date().toISOString();
+    item.response =  response;
+    item.timer =     timer;
+    await item.save();
 
     return [{
       response: translate('timers.response-was-added')
@@ -289,13 +287,13 @@ class Timers extends System {
     let name = '';
 
     if (_.isNil(nameMatch)) {
-      const timers = await getRepository(Timer).find();
+      const timers = await Timer.find();
       return [{ response: translate('timers.timers-list').replace(/\$list/g, _.orderBy(timers, 'name').map((o) => (o.isEnabled ? '⚫' : '⚪') + ' ' + o.name).join(', ')), ...opts }];
     } else {
       name = nameMatch[1];
     }
 
-    const timer = await getRepository(Timer).findOne({
+    const timer = await Timer.findOne({
       relations: ['messages'],
       where:     { name },
     });
@@ -331,27 +329,31 @@ class Timers extends System {
     }
 
     if (!_.isNil(id)) {
-      const response = await getRepository(TimerResponse).findOne({ id });
+      const response = await TimerResponse.findOne({ id });
       if (!response) {
         return [{ response: translate('timers.response-not-found').replace(/\$id/g, id), ...opts }];
       }
 
-      await getRepository(TimerResponse).save({ ...response, isEnabled: !response.isEnabled });
+      response.isEnabled = !response.isEnabled;
+      await response.save()
+
       return [{
-        response: translate(!response.isEnabled ? 'timers.response-enabled' : 'timers.response-disabled')
+        response: translate(response.isEnabled ? 'timers.response-enabled' : 'timers.response-disabled')
           .replace(/\$id/g, id), ...opts,
       }];
     }
 
     if (!_.isNil(name)) {
-      const timer = await getRepository(Timer).findOne({ name: name });
+      const timer = await Timer.findOne({ name: name });
       if (!timer) {
         return [{ response: translate('timers.timer-not-found').replace(/\$name/g, name), ...opts }];
       }
 
-      await getRepository(Timer).save({ ...timer, isEnabled: !timer.isEnabled });
+      timer.isEnabled = !timer.isEnabled;
+      await timer.save()
+
       return [{
-        response: translate(!timer.isEnabled ? 'timers.timer-enabled' : 'timers.timer-disabled')
+        response: translate(timer.isEnabled ? 'timers.timer-enabled' : 'timers.timer-disabled')
           .replace(/\$name/g, name), ...opts,
       }];
     }

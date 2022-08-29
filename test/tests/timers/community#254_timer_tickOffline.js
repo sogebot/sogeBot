@@ -20,35 +20,61 @@ describe('Timers - tickOffline should send response into chat when stream is off
     await db.cleanup();
     await message.prepare();
 
-    await getRepository(Timer).save({
-      name: 'test',
-      triggerEveryMessage: 0,
-      triggerEverySecond: 1,
-      tickOffline: true,
-      isEnabled: true,
-      triggeredAtTimestamp: Date.now(),
-      triggeredAtMessage: linesParsed,
-      messages: [
-        { isEnabled: true, response: '1' },
-        { isEnabled: false, response: '2' },
-        { isEnabled: true, response: '3' }
-      ]
-    });
+    const timer = new Timer();
+    timer.name = 'test';
+    timer.triggerEveryMessage = 0;
+    timer.triggerEverySecond = 1;
+    timer.tickOffline = true;
+    timer.isEnabled = true;
+    timer.triggeredAtTimestamp = Date.now();
+    timer.triggeredAtMessage = linesParsed;
+    await timer.save();
 
-    await getRepository(Timer).save({
-      name: 'test2',
-      triggerEveryMessage: 0,
-      triggerEverySecond: 1,
-      tickOffline: false,
-      isEnabled: true,
-      triggeredAtTimestamp: Date.now(),
-      triggeredAtMessage: linesParsed,
-      messages: [
-        { isEnabled: true, response: '4' },
-        { isEnabled: true, response: '5' },
-        { isEnabled: true, response: '6' }
-      ]
-    });
+    const timer2 = new Timer();
+    timer2.name = 'test';
+    timer2.triggerEveryMessage = 0;
+    timer2.triggerEverySecond = 1;
+    timer2.tickOffline = false;
+    timer2.isEnabled = true;
+    timer2.triggeredAtTimestamp = Date.now();
+    timer2.triggeredAtMessage = linesParsed;
+    await timer2.save();
+
+    const response1 = new TimerResponse()
+    response1.isEnabled = true;
+    response1.response = '1';
+    response1.timer = timer;
+    await response1.save();
+
+    const response2 = new TimerResponse()
+    response2.isEnabled = false;
+    response2.response = '2';
+    response2.timer = timer;
+    await response2.save();
+
+    const response3 = new TimerResponse()
+    response3.isEnabled = true;
+    response3.response = '3';
+    response3.timer = timer;
+    await response3.save();
+
+    const response4 = new TimerResponse()
+    response4.isEnabled = true;
+    response4.response = '4';
+    response4.timer = timer2;
+    await response4.save();
+
+    const response5 = new TimerResponse()
+    response5.isEnabled = true;
+    response5.response = '5';
+    response5.timer = timer2;
+    await response5.save();
+
+    const response6 = new TimerResponse()
+    response6.isEnabled = true;
+    response6.response = '6';
+    response6.timer = timer2;
+    await response6.save();
 
     isStreamOnline.value = false;
   });

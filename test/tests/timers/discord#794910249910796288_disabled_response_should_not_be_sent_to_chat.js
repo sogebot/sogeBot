@@ -20,19 +20,32 @@ describe('Timers - disabled response should not be sent to chat - https://discor
     await db.cleanup();
     await message.prepare();
 
-    await getRepository(Timer).save({
-      name: 'test',
-      triggerEveryMessage: 0,
-      triggerEverySecond: 1,
-      isEnabled: true,
-      triggeredAtTimestamp: Date.now(),
-      triggeredAtMessage: linesParsed,
-      messages: [
-        { isEnabled: true, response: '1' },
-        { isEnabled: false, response: '2' },
-        { isEnabled: true, response: '3' }
-      ]
-    });
+    const timer = new Timer();
+    timer.name = 'test';
+    timer.triggerEveryMessage = 0;
+    timer.triggerEverySecond = 1;
+    timer.isEnabled = true;
+    timer.triggeredAtTimestamp = Date.now();
+    timer.triggeredAtMessage = linesParsed;
+    await timer.save();
+
+    const response1 = new TimerResponse()
+    response1.isEnabled = true;
+    response1.response = '1';
+    response1.timer = timer;
+    await response1.save();
+
+    const response2 = new TimerResponse()
+    response2.isEnabled = false;
+    response2.response = '2';
+    response2.timer = timer;
+    await response2.save();
+
+    const response3 = new TimerResponse()
+    response3.isEnabled = true;
+    response3.response = '3';
+    response3.timer = timer;
+    await response3.save();
 
     isStreamOnline.value = true;
   });
@@ -60,19 +73,32 @@ describe('Timers - disabled responses should not be sent to chat - https://disco
     await db.cleanup();
     await message.prepare();
 
-    timer = await getRepository(Timer).save({
-      name: 'test',
-      triggerEveryMessage: 0,
-      triggerEverySecond: 1,
-      isEnabled: true,
-      triggeredAtTimestamp: Date.now(),
-      triggeredAtMessage: linesParsed,
-      messages: [
-        { isEnabled: false, response: '1' },
-        { isEnabled: false, response: '2' },
-        { isEnabled: false, response: '3' }
-      ]
-    });
+    const timer = new Timer();
+    timer.name = 'test';
+    timer.triggerEveryMessage = 0;
+    timer.triggerEverySecond = 1;
+    timer.isEnabled = true;
+    timer.triggeredAtTimestamp = Date.now();
+    timer.triggeredAtMessage = linesParsed;
+    await timer.save();
+
+    const response1 = new TimerResponse()
+    response1.isEnabled = false;
+    response1.response = '1';
+    response1.timer = timer;
+    await response1.save();
+
+    const response2 = new TimerResponse()
+    response2.isEnabled = false;
+    response2.response = '2';
+    response2.timer = timer;
+    await response2.save();
+
+    const response3 = new TimerResponse()
+    response3.isEnabled = false;
+    response3.response = '3';
+    response3.timer = timer;
+    await response3.save();
 
     isStreamOnline.value = true;
   });
