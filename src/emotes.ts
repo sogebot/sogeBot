@@ -1,5 +1,3 @@
-import { setImmediate } from 'timers';
-
 import { shuffle } from '@sogebot/ui-helpers/array';
 import * as constants from '@sogebot/ui-helpers/constants';
 import axios from 'axios';
@@ -197,6 +195,10 @@ class Emotes extends Core {
   }
 
   async fetchEmotesGlobal () {
+    const botUsername = variables.get('services.twitch.botUsername') as string;
+    if (botUsername.length === 0) {
+      return;
+    }
     this.fetch.global = true;
 
     // we want to update once every week
@@ -205,6 +207,7 @@ class Emotes extends Core {
         if (this.lastGlobalEmoteChk !== 0) {
           info('EMOTES: Fetching global emotes');
         }
+
         const clientBot = await client('bot');
         const emotes = await clientBot.chat.getGlobalEmotes();
         this.lastGlobalEmoteChk = Date.now();
@@ -340,7 +343,6 @@ class Emotes extends Core {
     const broadcasterUsername = variables.get('services.twitch.broadcasterUsername') as string;
 
     if (broadcasterUsername.length === 0) {
-      setImmediate(() => this.fetchEmotesBTTV());
       return;
     }
 
