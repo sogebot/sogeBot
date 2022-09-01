@@ -1,4 +1,4 @@
-import { IsNotEmpty, MinLength } from 'class-validator';
+import { IsNotEmpty, MinLength, Matches, Min } from 'class-validator';
 import { ManyToOne, OneToMany } from 'typeorm';
 import { BaseEntity, Column, Entity, PrimaryColumn } from 'typeorm';
 
@@ -10,19 +10,22 @@ export class Timer extends BaseEntity {
   @Column()
   @IsNotEmpty()
   @MinLength(2)
-    name: string;
+  @Matches(/^[a-zA-Z0-9_]*$/)
+    name = '';
 
   @Column()
-    isEnabled: boolean;
+    isEnabled = true;
 
   @Column({ default: false })
-    tickOffline: boolean;
+    tickOffline = false;
 
   @Column()
-    triggerEveryMessage: number;
+  @Min(0)
+    triggerEveryMessage = 30;
 
   @Column()
-    triggerEverySecond: number;
+  @Min(0)
+    triggerEverySecond = 60;
 
   @Column({ type: 'varchar', length: '2022-07-27T00:30:34.569259834Z'.length, default: '1970-01-01T00:00:00.000Z' })
     triggeredAtTimestamp?: string;
