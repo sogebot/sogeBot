@@ -79,6 +79,7 @@
     "lessThan": "less than",
     "lessThanOrEqual": "Меньше чем или равно",
     "contain": "содержит",
+    "contains": "contains",
     "equal": "equal",
     "notEqual": "not equal",
     "present": "is present",
