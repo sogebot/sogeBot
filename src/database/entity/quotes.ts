@@ -1,24 +1,21 @@
-import { EntitySchema } from 'typeorm';
+import { IsNotEmpty } from 'class-validator';
+import { BaseEntity, Column, Entity, PrimaryColumn } from 'typeorm';
 
-import { ColumnNumericTransformer } from './_transformer';
+@Entity()
+export class Quotes extends BaseEntity {
+  @PrimaryColumn({ type: 'int', generated: 'increment' })
+    id: number;
 
-export interface QuotesInterface {
-  id?: number;
-  tags: string[];
-  quote: string;
-  quotedBy: string;
-  createdAt: number;
+  @Column({ type: 'simple-array' })
+    tags: string[];
+
+  @IsNotEmpty()
+  @Column()
+    quote: string;
+
+  @Column()
+    quotedBy: string;
+
+  @Column({ type: 'varchar', length: '2022-07-27T00:30:34.569259834Z'.length, default: '1970-01-01T00:00:00.000Z' })
+    createdAt: string;
 }
-
-export const Quotes = new EntitySchema<Readonly<Required<QuotesInterface>>>({
-  name:    'quotes',
-  columns: {
-    id: {
-      type: 'int', primary: true, generated: 'increment',
-    },
-    tags:      { type: 'simple-array' },
-    quote:     { type: String },
-    quotedBy:  { type: String },
-    createdAt: { type: 'bigint', transformer: new ColumnNumericTransformer() },
-  },
-});

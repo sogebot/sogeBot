@@ -1,4 +1,4 @@
-import { Quotes as QuotesEntity, QuotesInterface } from '@entity/quotes';
+import { Quotes as QuotesEntity } from '@entity/quotes';
 import { sample } from '@sogebot/ui-helpers/array';
 import * as _ from 'lodash';
 import { getManager, getRepository } from 'typeorm';
@@ -73,7 +73,7 @@ class Quotes extends System {
 
   @command('!quote add')
   @default_permission(defaultPermissions.CASTERS)
-  async add (opts: CommandOptions): Promise<(CommandResponse & QuotesInterface)[]> {
+  async add (opts: CommandOptions): Promise<(CommandResponse & Partial<QuotesEntity>)[]> {
     try {
       if (opts.parameters.length === 0) {
         throw new Error();
@@ -85,19 +85,22 @@ class Quotes extends System {
       }).toArray() as [ string, string ];
       const tagsArray = tags.split(',').map((o) => o.trim());
 
-      const result = await getRepository(QuotesEntity).save({
-        tags: tagsArray, quote, quotedBy: opts.sender.userId, createdAt: Date.now(),
-      });
+      const entity = new QuotesEntity();
+      entity.tags = tagsArray;
+      entity.quote = quote;
+      entity.quotedBy = opts.sender.userId;
+      entity.createdAt = new Date().toISOString(),
+      await entity.save();
       const response = prepare('systems.quotes.add.ok', {
-        id: result.id, quote, tags: tagsArray.join(', '),
+        id: entity.id, quote, tags: tagsArray.join(', '),
       });
       return [{
-        response, ...opts, ...result,
+        response, ...opts, ...entity,
       }];
     } catch (e: any) {
       const response = prepare('systems.quotes.add.error', { command: opts.command });
       return [{
-        response, ...opts, createdAt: 0, attr: {}, quote: '', quotedBy: '0', tags: [],
+        response, ...opts, createdAt: new Date(0).toISOString(), attr: {}, quote: '', quotedBy: '0', tags: [],
       }];
     }
   }
@@ -192,7 +195,7 @@ class Quotes extends System {
       }
     } else {
       const quotes = await getRepository(QuotesEntity).find();
-      const quotesWithTags: QuotesInterface[] = [];
+      const quotesWithTags: QuotesEntity[] = [];
       for (const quote of quotes) {
         if (quote.tags.includes(tag)) {
           quotesWithTags.push(quote);
