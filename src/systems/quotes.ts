@@ -1,6 +1,8 @@
 import { Quotes as QuotesEntity } from '@entity/quotes';
 import { sample } from '@sogebot/ui-helpers/array';
+import { validateOrReject } from 'class-validator';
 import * as _ from 'lodash';
+import { merge } from 'lodash';
 import { getManager, getRepository } from 'typeorm';
 
 import { command, default_permission } from '../decorators';
@@ -9,9 +11,10 @@ import users from '../users';
 import System from './_interface';
 
 import { prepare } from '~/helpers/commons';
+import { app } from '~/helpers/panel';
 import { defaultPermissions } from '~/helpers/permissions/index';
-import { adminEndpoint, publicEndpoint } from '~/helpers/socket';
 import { domain } from '~/helpers/ui';
+import { adminMiddleware } from '~/socket';
 
 class Quotes extends System {
   constructor () {
@@ -24,49 +27,38 @@ class Quotes extends System {
   }
 
   sockets() {
-    publicEndpoint('/systems/quotes', 'quotes:getAll', async (_opts, cb) => {
-      try {
-        const items = await getRepository(QuotesEntity).find();
-        cb(null, await Promise.all(items.map(async (item) => {
-          return {
-            ...item,
-            quotedByName: await users.getNameById(item.quotedBy),
-          };
-        })));
-      } catch (e: any) {
-        cb(e.stack, []);
-      }
-    });
+    if (!app) {
+      setTimeout(() => this.sockets(), 100);
+      return;
+    }
 
-    adminEndpoint('/systems/quotes', 'generic::getOne', async (id, cb) => {
-      try {
-        const item = await getRepository(QuotesEntity).findOne({ id: Number(id) });
-        cb(null, item);
-      } catch (e: any) {
-        cb(e.stack);
-      }
+    app.get('/api/systems/quotes', async (req, res) => {
+      const quotes = await QuotesEntity.find();
+      res.send({
+        data:  quotes,
+        users: await Promise.all(quotes.map(quote => new Promise<[string, string]>(resolve => users.getNameById(quote.quotedBy).then((username) => resolve([quote.quotedBy, username]))))),
+      });
     });
-
-    adminEndpoint('/systems/quotes', 'generic::setById', async (opts, cb) => {
-      try {
-        if (!opts.id) {
-          cb(null, await getRepository(QuotesEntity).save(opts.item));
-        } else {
-          cb(null, await getRepository(QuotesEntity).save({ ...(await getRepository(QuotesEntity).findOne({ id: Number(opts.id) })), ...opts.item }));
-        }
-      } catch (e: any) {
-        cb(e.stack);
-      }
+    app.get('/api/systems/quotes/:id', adminMiddleware, async (req, res) => {
+      const quote = await QuotesEntity.findOne({ id: Number(req.params.id) });
+      res.send({
+        data: await QuotesEntity.findOne({ id: Number(req.params.id) }),
+        user: quote ? await users.getNameById(quote.quotedBy) : null,
+      });
     });
-
-    adminEndpoint('/systems/quotes', 'generic::deleteById', async (id, cb) => {
+    app.delete('/api/systems/quotes/:id', adminMiddleware, async (req, res) => {
+      await QuotesEntity.delete({ id: Number(req.params.id) });
+      res.status(404).send();
+    });
+    app.post('/api/systems/quotes', adminMiddleware, async (req, res) => {
       try {
-        if (typeof id === 'number') {
-          await getRepository(QuotesEntity).delete({ id });
-        }
-        cb(null);
-      } catch(e: any) {
-        cb(e.stack);
+        const itemToSave = new QuotesEntity();
+        merge(itemToSave, req.body);
+        await validateOrReject(itemToSave);
+        await itemToSave.save();
+        res.send({ data: itemToSave });
+      } catch (e) {
+        res.status(400).send({ errors: e });
       }
     });
   }
