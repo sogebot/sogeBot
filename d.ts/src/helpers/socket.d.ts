@@ -368,12 +368,6 @@ export type ClientToServerEventsWithNamespace = {
     'queue::clear': (cb: (error: Error | string | null) => void) => void,
     'generic::getAll': generic<QueueInterface>['getAll'],
   },
-  '/systems/quotes': GenericEvents & {
-    'generic::getOne': generic<QuotesInterface>['getOne'],
-    'generic::setById': generic<QuotesInterface>['setById'],
-    'generic::deleteById': generic<QuotesInterface>['deleteById'],
-    'quotes:getAll': (_: unknown, cb: (error: Error | string | null, items: QuotesInterface[]) => void) => void,
-  },
   '/systems/raffles': GenericEvents & {
     'raffle::getWinner': (name: string, cb: (error: Error | string | null, item?: UserInterface) => void) => void,
     'raffle::setEligibility': (opts: {id: string, isEligible: boolean}, cb: (error: Error | string | null) => void) => void,
