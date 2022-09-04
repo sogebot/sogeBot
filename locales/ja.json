@@ -39,7 +39,7 @@
     "offline": "ストリームは現在オフラインで、クリップを作成できません。"
   },
   "uptime": {
-    "online": "ストリームは (if $days>0|$daysd )(if $hours>0|$hoursh )(if $minutes>0|$minutesm )(if $seconds>0|$secondss) オフラインです",
+    "online": "ストリームは (if $days>0|$daysd )(if $hours>0|$hoursh )(if $minutes>0|$minutesm )(if $seconds>0|$secondss) オンラインです",
     "offline": "ストリームは 現在(if $days>0|$daysd )(if $hours>0|$hoursh )(if $minutes>0|$minutesm )(if $seconds>0|$secondss) オンラインです"
   },
   "webpanel": {

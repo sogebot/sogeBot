@@ -79,6 +79,7 @@
     "lessThan": "menší než",
     "lessThanOrEqual": "menší nebo rovno",
     "contain": "obsahuje",
+    "contains": "contains",
     "equal": "rovná se",
     "notEqual": "nerovná se",
     "present": "je přítomen",
