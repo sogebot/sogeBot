@@ -5,7 +5,7 @@
   "priceBits": "Preço (bits)",
   "thisvalue": "Este valor",
   "promo": {
-    "shoutoutMessage": "Shoutout message",
-    "enableShoutoutMessage": "Send shoutout message in chat"
+    "shoutoutMessage": "Mensagem de promo (shout-out)",
+    "enableShoutoutMessage": "Enviar mensagem de shout-out no chat"
   }
 }
