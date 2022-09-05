@@ -55,7 +55,7 @@
     "hosts": "Anfitriões",
     "raids": "Raids",
     "cmdredeems": "Personalizado",
-    "promo": "Promo",
+    "promo": "Promo (shout-out)",
     "rewardredeems": "Resgates de Recompensas"
   },
   "title": {
@@ -79,6 +79,7 @@
     "lessThan": "menor que",
     "lessThanOrEqual": "menor ou igual a",
     "contain": "contém",
+    "contains": "contém",
     "equal": "igual",
     "notEqual": "diferente de",
     "present": "está presente",
@@ -114,7 +115,7 @@
   "messageTemplate": {
     "name": "Modelo de mensagem",
     "placeholder": "Defina o seu modelo de mensagem",
-    "help": "Available variables: {name}, {amount} (cheers, subs, tips, subgifts, sub community gifts, command redeems), {recipient} (subgifts, command redeems), {monthsName} (subs, subgifts), {currency} (tips), {game} (promo). If | is added (see promo) then it will show those values in sequence."
+    "help": "Variáveis disponíveis: {name}, {amount} (cheers, subs, dicas, sub-presetnes, subs-presente da comunidade, resgate de comandos), {recipient} (subs-presente, resgate de comandos), {monthsName} (subs, subs-presente), {currency} (doações), {game} (promo). Se | adicionado (veja a promo) então mostrará esses valores em sequência."
   },
   "ttsTemplate": {
     "name": "Modelos TTS",

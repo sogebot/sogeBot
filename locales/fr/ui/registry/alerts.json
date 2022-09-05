@@ -79,6 +79,7 @@
     "lessThan": "plus petit que",
     "lessThanOrEqual": "inférieur ou égal à",
     "contain": "contient",
+    "contains": "contains",
     "equal": "égal",
     "notEqual": "n'est pas égal à",
     "present": "est présent",
