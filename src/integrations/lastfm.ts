@@ -25,9 +25,6 @@ class LastFM extends Integration {
   @settings()
     notify = NOTIFY.all;
 
-  @settings()
-    notifyWhenOffline = false;
-
   currentSong: null | string = null;
 
   @onStartup()
