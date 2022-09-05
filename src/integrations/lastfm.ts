@@ -5,10 +5,15 @@ import { settings } from '../decorators';
 import { onChange, onStartup } from '../decorators/on';
 import Integration from './_interface';
 
+import { isStreamOnline } from '~/helpers/api';
 import { announce, prepare } from '~/helpers/commons';
 import {  error } from '~/helpers/log';
 
 let canSendRequests = true;
+
+enum NOTIFY {
+  disabled, all, online,
+}
 
 class LastFM extends Integration {
   @settings()
@@ -18,7 +23,10 @@ class LastFM extends Integration {
     username = '';
 
   @settings()
-    notify = false;
+    notify = NOTIFY.all;
+
+  @settings()
+    notifyWhenOffline = false;
 
   currentSong: null | string = null;
 
@@ -48,8 +56,12 @@ class LastFM extends Integration {
         for (const track of tracks) {
           if (track['@attr'] && track['@attr'].nowplaying === 'true') {
             const song = `${track.name} - ${track.artist['#text']}`;
-            if (this.currentSong !== song && this.notify) {
-              this.notifySong(song);
+            if (this.currentSong !== song) {
+              if (this.notify != NOTIFY.disabled
+                && (this.notify == NOTIFY.all
+                  || (this.notify == NOTIFY.online && isStreamOnline.value))) {
+                this.notifySong(song);
+              }
             }
             this.currentSong = song;
           }
