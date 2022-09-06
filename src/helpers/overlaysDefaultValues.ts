@@ -230,11 +230,13 @@ const values = {
     overlayId: null,
   },
   chat: {
-    type:             'vertical',
-    hideMessageAfter: 600000,
-    showTimestamp:    true,
-    showBadges:       true,
-    font:             {
+    type:              'vertical',
+    hideMessageAfter:  600000,
+    showTimestamp:     true,
+    showBadges:        true,
+    reverseOrder:      false,
+    showFromTopOrLeft: false,
+    font:              {
       family:      'PT Sans',
       size:        20,
       borderPx:    1,

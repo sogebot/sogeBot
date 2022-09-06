@@ -23,6 +23,9 @@ export interface OverlayMapperChat extends OverlayMapperInterfaceCommon {
     type: 'vertical' | 'horizontal' | 'niconico';
     hideMessageAfter: number;
     showTimestamp: boolean;
+    showFromTopOrLeft: boolean;
+    reverseOrder: boolean;
+    showBadges: boolean;
     font: {
       family: string;
       size: number;
