@@ -508,6 +508,8 @@ class Discord extends Integration {
         intents: [
           GatewayIntentBits.GuildMessages,
           GatewayIntentBits.Guilds,
+          GatewayIntentBits.MessageContent,
+          GatewayIntentBits.DirectMessages,
         ],
         partials: [
           DiscordJs.Partials.Reaction,
