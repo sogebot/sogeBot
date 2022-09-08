@@ -46,8 +46,6 @@ export class AlertObject implements AlertInterface {
   @Field(type => [CommonSettingsObject])
     subcommunitygifts: CommonSettingsObject[];
   @Field(type => [CommonSettingsObject])
-    hosts: CommonSettingsObject[];
-  @Field(type => [CommonSettingsObject])
     raids: CommonSettingsObject[];
   @Field(type => [AlertTipObject])
     tips: AlertTipObject[];

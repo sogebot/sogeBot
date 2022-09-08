@@ -129,7 +129,6 @@ const values = {
       lastSubMessage:   '~ see you on the next stream ~',
       streamBy:         'Stream by',
       follow:           'Followed by',
-      host:             'Hosted by',
       raid:             'Raided by',
       cheer:            'Cheered by',
       sub:              'Subscribed by',
@@ -141,7 +140,6 @@ const values = {
     show: {
       gameThumbnail:    true,
       follow:           true,
-      host:             true,
       raid:             true,
       sub:              true,
       subgift:          true,

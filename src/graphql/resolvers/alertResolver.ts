@@ -11,7 +11,7 @@ import { v4 } from 'uuid';
 
 import { AlertObject } from '../schema/alert/AlertObject';
 
-const relations = ['promo', 'rewardredeems', 'cmdredeems', 'cheers', 'follows', 'hosts', 'raids', 'resubs', 'subcommunitygifts', 'subgifts', 'subs', 'tips'];
+const relations = ['promo', 'rewardredeems', 'cmdredeems', 'cheers', 'follows', 'raids', 'resubs', 'subcommunitygifts', 'subgifts', 'subs', 'tips'];
 
 @Resolver()
 export class alertResolver {
@@ -79,11 +79,6 @@ export class alertResolver {
         };
       }),
       subcommunitygifts: item.subcommunitygifts.map((o) => {
-        return {
-          ...o, id: v4(), imageId: o.imageId, soundId: o.soundId,
-        };
-      }),
-      hosts: item.hosts.map((o) => {
         return {
           ...o, id: v4(), imageId: o.imageId, soundId: o.soundId,
         };

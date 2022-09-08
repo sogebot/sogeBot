@@ -54,7 +54,6 @@ class EventList extends Widget {
               message:    '',
             });
             break;
-          case 'hosts':
           case 'raids':
             alerts.trigger({
               event:      eventType,

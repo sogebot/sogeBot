@@ -206,7 +206,6 @@ export interface OverlayMapperCredits extends OverlayMapperInterfaceCommon {
       lastSubMessage:   string,
       streamBy:         string,
       follow:           string,
-      host:             string,
       raid:             string,
       cheer:            string,
       sub:              string,
@@ -217,7 +216,6 @@ export interface OverlayMapperCredits extends OverlayMapperInterfaceCommon {
     },
     show: {
       follow:           boolean,
-      host:             boolean,
       raid:             boolean,
       sub:              boolean,
       subgift:          boolean,
