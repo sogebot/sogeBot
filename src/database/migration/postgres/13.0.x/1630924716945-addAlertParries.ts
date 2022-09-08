@@ -8,7 +8,7 @@ export class addAlertParries1630924716945 implements MigrationInterface {
     const alerts = {} as any;
     for (const type of [
       'follow', 'sub', 'subcommunitygift',
-      'subgift', 'host', 'raid', 'tip', 'cheer',
+      'subgift', 'raid', 'tip', 'cheer',
       'resub', 'command_redeem', 'reward_redeem',
     ]) {
       alerts[type]  = await queryRunner.query(`SELECT * FROM alert_${type}`);
@@ -36,7 +36,7 @@ export class addAlertParries1630924716945 implements MigrationInterface {
     // resave all alerts
     for (const type of [
       'follow', 'sub', 'subcommunitygift',
-      'subgift', 'host', 'raid', 'tip', 'cheer',
+      'subgift', 'raid', 'tip', 'cheer',
       'resub', 'command_redeem', 'reward_redeem',
     ]) {
       await queryRunner.manager.getRepository(`alert_${type}`).clear();

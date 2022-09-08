@@ -19,10 +19,9 @@ async function test() {
         process.stdout.write(stdout);
         process.stderr.write(stderr);
         if (error) {
-          process.stderr.write(error);
-          console.log('\n =================================== waiting minute to logs to appear  =================================== \n');
-          setTimeout(() => process.exit(1), 60000);
           reject(error);
+          process.stderr.write(error);
+          process.exit(1);
         }
         resolve();
       });
@@ -67,9 +66,7 @@ async function test() {
       console.log('Dry run removing generated file.');
       execSync('rm ./*generatedMigration*');
     }
-
-    console.log('\n =================================== waiting minute to logs to appear  =================================== \n');
-    setTimeout(() => process.exit(1), 60000);
+    process.exit(1);
   }
 }
 
