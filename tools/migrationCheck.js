@@ -19,9 +19,10 @@ async function test() {
         process.stdout.write(stdout);
         process.stderr.write(stderr);
         if (error) {
-          reject(error);
           process.stderr.write(error);
-          process.exit(1);
+          console.log('\n =================================== waiting minute to logs to appear  =================================== \n');
+          setTimeout(() => process.exit(1), 60000);
+          reject(error);
         }
         resolve();
       });
