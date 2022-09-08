@@ -169,7 +169,6 @@ export interface AlertInterface {
   subs: CommonSettingsInterface[];
   subgifts: CommonSettingsInterface[];
   subcommunitygifts: CommonSettingsInterface[];
-  hosts: CommonSettingsInterface[];
   raids: CommonSettingsInterface[];
   tips: AlertTipInterface[];
   cheers: AlertTipInterface[];
@@ -316,12 +315,6 @@ export const Alert = new EntitySchema<Readonly<Required<AlertInterface>>>({
       inverseSide: 'alert',
       cascade:     true,
     },
-    hosts: {
-      type:        'one-to-many',
-      target:      'alert_host',
-      inverseSide: 'alert',
-      cascade:     true,
-    },
     raids: {
       type:        'one-to-many',
       target:      'alert_raid',
@@ -432,21 +425,6 @@ export const AlertSubgift = new EntitySchema<Readonly<Required<CommonSettingsInt
       type:        'many-to-one',
       target:      'alert',
       inverseSide: 'subgifts',
-      joinColumn:  { name: 'alertId' },
-      onDelete:    'CASCADE',
-      onUpdate:    'CASCADE',
-    },
-  },
-});
-
-export const AlertHost = new EntitySchema<Readonly<Required<CommonSettingsInterface>>>({
-  name:      'alert_host',
-  columns:   { ...CommonSettingsSchema },
-  relations: {
-    alert: {
-      type:        'many-to-one',
-      target:      'alert',
-      inverseSide: 'hosts',
       joinColumn:  { name: 'alertId' },
       onDelete:    'CASCADE',
       onUpdate:    'CASCADE',

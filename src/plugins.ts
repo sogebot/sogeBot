@@ -67,8 +67,6 @@ const listeners = {
   botStarted:             generateListener({}, false),
   twitchStreamStopped:    generateListener({}, false),
   twitchRaid:             generateListener({ hostViewers: 'number' }, true),
-  twitchHosted:           generateListener({ hostViewers: 'number' }, true),
-  twitchHosting:          generateListener({ hostViewers: 'number' }, true),
   twitchChatMessage:      generateListener({ message: 'string' }),
   twitchCommand:          generateListener({ message: 'string' }),
   twitchFollow:           generateListener(),
@@ -169,14 +167,6 @@ class Plugins extends Core {
 
     eventEmitter.on('raid', async (data) => {
       commonHandler('twitchRaid', data);
-    });
-
-    eventEmitter.on('hosted', async (data) => {
-      commonHandler('twitchHosted', data);
-    });
-
-    eventEmitter.on('hosting', async (data) => {
-      this.process('twitchHosting', '', null, data);
     });
   }
 

@@ -172,13 +172,13 @@ class Twitch extends Service {
         // group events if there are more then five in second
         if (events.length > 5) {
           // we need to group everything, as description can be max of 140 chars
-          for (const event of ['follow', 'subs/resubs/gifts', 'tip', 'rewardredeem', 'hosts/raids', 'cheer']) {
+          for (const event of ['follow', 'subs/resubs/gifts', 'tip', 'rewardredeem', 'raids', 'cheer']) {
             const length = events.filter(o => {
               if (event === 'subs/resubs/gifts') {
                 return o.startsWith('subgift') || o.startsWith('resub') || o.startsWith('sub') || o.startsWith('subcommunitygift');
               }
-              if (event === 'hosts/raids') {
-                return o.startsWith('raid') || o.startsWith('host');
+              if (event === 'raids') {
+                return o.startsWith('raid');
               }
               return o.startsWith(event);
             }).length;

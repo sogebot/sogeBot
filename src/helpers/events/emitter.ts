@@ -59,8 +59,6 @@ interface Events {
   'reward-redeemed': (opts: {userId: string; userName: string; rewardId: string; userInput: string;}) => void;
   'timeout': (opts: {userName: string; duration: number}) => void;
   'ban': (opts: {userName: string; reason: string}) => void;
-  'hosting': (opts: {target: string, hostViewers: number}) => void;
-  'hosted': (opts: {userName: string, hostViewers: number, event: string, timestamp: number}) => void;
   'raid': (opts: {userName: string, hostViewers: number, event: string, timestamp: number}) => void;
   'stream-started': () => void;
   'stream-stopped': () => void;

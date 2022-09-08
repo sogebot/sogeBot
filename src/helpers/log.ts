@@ -62,7 +62,6 @@ enum Levels {
   chatOut,
   whisperIn,
   whisperOut,
-  host,
   raid,
   follow,
   cheer,
@@ -95,7 +94,6 @@ const levelFormat = {
   ban:              '+ban',
   unban:            '-ban',
   follow:           '+follow',
-  host:             '+host',
   raid:             '+raid',
   redeem:           '+++ redeem:',
   cheer:            '+cheer',
@@ -204,9 +202,6 @@ export function unban(message: any) {
   log(message);
 }
 export function follow(message: any) {
-  log(message);
-}
-export function host(message: any) {
   log(message);
 }
 export function raid(message: any) {

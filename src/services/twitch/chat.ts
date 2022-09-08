@@ -34,7 +34,7 @@ import {
 import emitter from '~/helpers/interfaceEmitter';
 import { warning } from '~/helpers/log';
 import {
-  chatIn, cheer, debug, error, host, info, raid, resub, sub, subcommunitygift, subgift, whisperIn,
+  chatIn, cheer, debug, error, info, raid, resub, sub, subcommunitygift, subgift, whisperIn,
 } from '~/helpers/log';
 import { linesParsedIncrement, setStatus } from '~/helpers/parser';
 import { tmiEmitter } from '~/helpers/tmi';
@@ -154,7 +154,6 @@ class Chat {
     } catch (e: any) {
       error(e.stack);
       if (type === 'broadcaster' && !this.broadcasterWarning) {
-        error('Broadcaster oauth is not properly set - hosts will not be loaded');
         error('Broadcaster oauth is not properly set - subscribers will not be loaded');
         this.broadcasterWarning = true;
       } else if (!this.botWarning) {
@@ -368,10 +367,6 @@ class Chat {
         eventEmitter.emit('clearchat');
       });
     } else if (type === 'broadcaster') {
-      client.onHost((_channel, target, hostViewers) => {
-        eventEmitter.emit('hosting', { target, hostViewers: hostViewers ?? 0 });
-      });
-
       client.onRaid((_channel, username, raidInfo) => {
         this.raid(username, raidInfo.viewerCount);
       });
@@ -390,35 +385,6 @@ class Chat {
 
       client.onCommunitySub((_channel, username, subInfo, msg) => {
         this.subscriptionGiftCommunity(username, subInfo, msg.userInfo);
-      });
-
-      client.onHosted(async (_channel, username, _auto, hostViewers) => {
-        hostViewers ??= 0;
-        host(`${username}, viewers: ${hostViewers}`);
-
-        const data = {
-          userName:  username,
-          hostViewers,
-          event:     'host',
-          timestamp: Date.now(),
-        };
-
-        eventlist.add({
-          userId:    String(await users.getIdByName(username) ?? '0'),
-          viewers:   hostViewers,
-          event:     'host',
-          timestamp: Date.now(),
-        });
-        eventEmitter.emit('hosted', data);
-        alerts.trigger({
-          event:      'hosts',
-          name:       username,
-          amount:     Number(hostViewers),
-          tier:       null,
-          currency:   '',
-          monthsName: '',
-          message:    '',
-        });
       });
     } else {
       throw Error(`This ${type} is not supported`);

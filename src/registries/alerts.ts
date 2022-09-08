@@ -1,5 +1,5 @@
 import {
-  Alert, AlertCheer, AlertCommandRedeem, AlertFollow, AlertHost, AlertInterface, AlertRaid, AlertResub, AlertSub, AlertSubcommunitygift, AlertSubgift, AlertTip, EmitData,
+  Alert, AlertCheer, AlertCommandRedeem, AlertFollow, AlertInterface, AlertRaid, AlertResub, AlertSub, AlertSubcommunitygift, AlertSubgift, AlertTip, EmitData,
 } from '@entity/alert';
 import { MINUTE } from '@sogebot/ui-helpers/constants';
 import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized';
@@ -163,7 +163,6 @@ class Alerts extends Registry {
         await getRepository(AlertSub).delete({ alertId: IsNull() });
         await getRepository(AlertSubgift).delete({ alertId: IsNull() });
         await getRepository(AlertSubcommunitygift).delete({ alertId: IsNull() });
-        await getRepository(AlertHost).delete({ alertId: IsNull() });
         await getRepository(AlertRaid).delete({ alertId: IsNull() });
         await getRepository(AlertTip).delete({ alertId: IsNull() });
         await getRepository(AlertCheer).delete({ alertId: IsNull() });

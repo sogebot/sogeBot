@@ -115,10 +115,6 @@ class Events extends Core {
       { id: 'clearchat' },
       { id: 'action', variables: [ 'username', 'is.moderator', 'is.subscriber', 'is.vip', 'is.broadcaster', 'is.bot', 'is.owner' ] },
       { id: 'ban', variables: [ 'username', 'is.moderator', 'is.subscriber', 'is.vip', 'is.broadcaster', 'is.bot', 'is.owner', 'reason' ] },
-      { id: 'hosting', variables: [ 'target', 'hostViewers' ] },
-      {
-        id: 'hosted', variables: [ 'username', 'is.moderator', 'is.subscriber', 'is.vip', 'is.broadcaster', 'is.bot', 'is.owner', 'hostViewers' ], definitions: { viewersAtLeast: 1 }, check: this.checkHosted,
-      },
       {
         id: 'raid', variables: [ 'username', 'is.moderator', 'is.subscriber', 'is.vip', 'is.broadcaster', 'is.bot', 'is.owner', 'hostViewers' ], definitions: { viewersAtLeast: 1 }, check: this.checkRaid,
       },
@@ -199,8 +195,6 @@ class Events extends Core {
       'reward-redeemed',
       'timeout',
       'ban',
-      'hosting',
-      'hosted',
       'raid',
       'stream-started',
       'stream-stopped',
@@ -524,12 +518,6 @@ class Events extends Core {
   }
 
   public async checkRaid(event: EventInterface, attributes: EventsEntity.Attributes) {
-    event.definitions.viewersAtLeast = Number(event.definitions.viewersAtLeast); // force Integer
-    const shouldTrigger = (attributes.hostViewers >= event.definitions.viewersAtLeast);
-    return shouldTrigger;
-  }
-
-  public async checkHosted(event: EventInterface, attributes: EventsEntity.Attributes) {
     event.definitions.viewersAtLeast = Number(event.definitions.viewersAtLeast); // force Integer
     const shouldTrigger = (attributes.hostViewers >= event.definitions.viewersAtLeast);
     return shouldTrigger;
