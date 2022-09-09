@@ -123,8 +123,8 @@ class Discord extends Integration {
       .setURL('https://twitch.tv/' + broadcasterUsername)
       .addFields(
         this.fields
-          .filter((o) => this.filterFields(o))
-          .map((o) => this.prepareFields(o)))
+          .filter((o) => this.filterFields(o, isOnline))
+          .map((o) => this.prepareFields(o, isOnline)))
     // Set the title of the field
       .setTitle('https://twitch.tv/' + broadcasterUsername)
     // Set the color of the embed
@@ -132,7 +132,7 @@ class Discord extends Integration {
     // Set the main content of the embed
       .setDescription(description)
       .setImage(`https://static-cdn.jtvnw.net/previews-ttv/live_user_${broadcasterUsername}-1920x1080.jpg?${Date.now()}`)
-      .setThumbnail(profileImageUrl)
+      .setThumbnail(isOnline ? profileImageUrl : null)
       .setFooter({ text: prepare('integrations.discord.announced-by') + ' - https://www.sogebot.xyz' });
   }
 
@@ -342,11 +342,17 @@ class Discord extends Integration {
     this.embedMessageId = '';
   }
 
-  filterFields(o: string) {
+  filterFields(o: string, isOnline: boolean) {
     const broadcasterType = variables.get('services.twitch.broadcasterType') as string;
 
     if (this.fieldsDisabled.includes(o)) {
       return false;
+    }
+
+    if (!isOnline) {
+      if (['$viewers', '$followers', '$subscribers'].includes(o)) {
+        return false;
+      }
     }
 
     if (o === '$subscribers' && broadcasterType !== '') {
@@ -355,7 +361,7 @@ class Discord extends Integration {
     return true;
   }
 
-  prepareFields(o: string) {
+  prepareFields(o: string, isOnline: boolean) {
     if (o === '$game') {
       return { name: prepare('webpanel.responses.variable.game'), value: stats.value.currentGame ?? '' };
     }
@@ -363,7 +369,11 @@ class Discord extends Integration {
       return { name: prepare('webpanel.responses.variable.title'), value: stats.value.currentTitle ?? '' };
     }
     if (o === '$startedAt') {
-      return { name: prepare('integrations.discord.started-at'), value: this.embedStartedAt, inline: true };
+      if (isOnline) {
+        return { name: prepare('integrations.discord.started-at'), value: this.embedStartedAt, inline: true };
+      } else {
+        return { name: prepare('integrations.discord.streamed-at'), value: `${this.embedStartedAt} - ${dayjs().tz(timezone).format('LLL')}`, inline: true };
+      }
     }
     if (o === '$viewers') {
       return { name: prepare('webpanel.viewers'), value: String(stats.value.currentViewers), inline: true };
