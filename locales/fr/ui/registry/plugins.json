@@ -24,8 +24,6 @@
       "twitchStreamStarted": "Twitch stream started",
       "twitchStreamStopped": "Twitch stream stopped",
       "twitchRaid": "Twitch raid incoming",
-      "twitchHosted": "Twitch host incoming",
-      "twitchHosting": "Twitch host outgoing",
       "tip": "Tipped by user",
       "botStarted": "Bot started"
     },
