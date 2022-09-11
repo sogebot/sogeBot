@@ -26,7 +26,7 @@ class Currency extends Core {
   @settings('currency')
   @ui({
     type:   'selector',
-    values: ['USD', 'AUD', 'BGN', 'BRL', 'CAD', 'CHF', 'CNY', 'CZK', 'DKK', 'EUR', 'GBP', 'HKD', 'HRK', 'HUF', 'IDR', 'ILS', 'INR', 'ISK', 'JPY', 'KRW', 'MXN', 'MYR', 'NOK', 'NZD', 'PHP', 'PLN', 'RON', 'RUB', 'SEK', 'SGD', 'THB', 'TRY', 'ZAR'],
+    values: ['USD', 'AUD', 'BGN', 'BRL', 'CAD', 'CHF', 'CNY', 'CZK', 'DKK', 'EUR', 'GBP', 'HKD', 'HRK', 'HUF', 'IDR', 'ILS', 'INR', 'ISK', 'JPY', 'KRW', 'MXN', 'MYR', 'NOK', 'NZD', 'PHP', 'PLN', 'RON', 'RUB', 'SEK', 'SGD', 'THB', 'TRY', 'ZAR', 'UAH'],
   })
   public mainCurrency: CurrencyType = 'EUR';
 
@@ -34,7 +34,7 @@ class Currency extends Core {
     AUD: 0, BGN: 0, BRL: 0, CAD: 0, CHF: 0, CNY: 0, CZK: 1 /* CZK:CZK 1:1 */,
     DKK: 0, EUR: 0, GBP: 0, HKD: 0, HRK: 0, HUF: 0, IDR: 0, ILS: 0, INR: 0,
     ISK: 0, JPY: 0, KRW: 0, MXN: 0, MYR: 0, NOK: 0, NZD: 0, PHP: 0, PLN: 0,
-    RON: 0, RUB: 0, SEK: 0, SGD: 0, THB: 0, TRY: 0, USD: 0, ZAR: 0,
+    RON: 0, RUB: 0, SEK: 0, SGD: 0, THB: 0, TRY: 0, USD: 0, ZAR: 0, UAH: 1.494,
   };
 
   public timeouts: any = {};
