@@ -131,7 +131,7 @@ class Discord extends Integration {
       .setColor(color)
     // Set the main content of the embed
       .setDescription(description)
-      .setImage(`https://static-cdn.jtvnw.net/previews-ttv/live_user_${broadcasterUsername}-1920x1080.jpg?${Date.now()}`)
+      .setImage(isOnline ? `https://static-cdn.jtvnw.net/previews-ttv/live_user_${broadcasterUsername}-1920x1080.jpg?${Date.now()}`: null)
       .setThumbnail(isOnline ? profileImageUrl : null)
       .setFooter({ text: prepare('integrations.discord.announced-by') + ' - https://www.sogebot.xyz' });
   }
