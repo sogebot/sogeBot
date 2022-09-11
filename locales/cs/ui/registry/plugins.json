@@ -24,8 +24,6 @@
       "twitchStreamStarted": "Twitch stream byl spuštěn",
       "twitchStreamStopped": "Twitch stream byl zastaven",
       "twitchRaid": "Příchozí Twitch nájezd",
-      "twitchHosted": "Příchozí Twitch host",
-      "twitchHosting": "Odchozí Twitch host",
       "tip": "Spropitné od uživatele",
       "botStarted": "Bot spuštěn"
     },
