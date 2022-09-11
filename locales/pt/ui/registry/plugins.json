@@ -24,8 +24,6 @@
       "twitchStreamStarted": "Transmissão da Twitch iniciada",
       "twitchStreamStopped": "Transmissão da Twitch parada",
       "twitchRaid": "'Raid' da Twitch chegando",
-      "twitchHosted": "Recebendo host da Twitch",
-      "twitchHosting": "Host realizado da Twitch",
       "tip": "Doado pelo usuário",
       "botStarted": "Bot iniciado"
     },
