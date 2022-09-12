@@ -128,6 +128,8 @@ async function main() {
 
     const files = fs.readdirSync(argv.directory);
 
+    const tableDeleted = [];
+
     for (const table of files.map(o => o.split('.')[0])) {
       process.stdout.clearLine(0);
       process.stdout.write(`Processing table ${table}`);
@@ -136,18 +138,28 @@ async function main() {
       const entity = await getManager().connection.entityMetadatas.find(o => o.tableName === table);
       const relations = entity.ownRelations.map(o => o.type);
       if (type === 'mysql' || type === 'mariadb') {
-        await connection.getRepository(entity.tableName).query(`DELETE FROM \`${entity.tableName}\` WHERE 1=1`);
+        if (!tableDeleted.includes(entity.tableName)) {
+          await connection.getRepository(entity.tableName).query(`DELETE FROM \`${entity.tableName}\` WHERE 1=1`);
+          tableDeleted.push(entity.tableName);
+        }
         for (const relation of relations) {
-          await connection.getRepository(entity.tableName).query(`DELETE FROM \`${relation}\` WHERE 1=1`);
+          if (!tableDeleted.includes(connection.getRepository(relation).metadata.tableName)) {
+            await connection.getRepository(entity.tableName).query(`DELETE FROM \`${connection.getRepository(relation).metadata.tableName}\` WHERE 1=1`);
+            tableDeleted.push(connection.getRepository(relation).metadata.tableName);
+          }
         }
       } else {
-        await connection.getRepository(entity.tableName).query(`DELETE FROM "${entity.tableName}" WHERE 1=1`);
+        if (!tableDeleted.includes(entity.tableName)) {
+          await connection.getRepository(entity.tableName).query(`DELETE FROM "${entity.tableName}" WHERE 1=1`);
+          tableDeleted.push(entity.tableName);
+        }
         for (const relation of relations) {
-          await connection.getRepository(entity.tableName).query(`DELETE FROM "${relation}" WHERE 1=1`);
+          if (!tableDeleted.includes(connection.getRepository(relation).metadata.tableName)) {
+            await connection.getRepository(entity.tableName).query(`DELETE FROM "${connection.getRepository(relation).metadata.tableName}" WHERE 1=1`);
+            tableDeleted.push(connection.getRepository(relation).metadata.tableName);
+          }
         }
       }
-
-      //
 
       for (const ch of _.chunk(backupData, 100)) {
         process.stdout.write('.');
