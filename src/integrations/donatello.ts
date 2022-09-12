@@ -101,7 +101,7 @@ class Donatello extends Integration {
         error('DONATELLO: Something wrong during tips fetch.');
         error(e);
       }
-    }, 10 * constants.SECOND);
+    }, constants.MINUTE);
   }
 
   async parse(data: DonatelloResponse['content'][number], isAnonymous = false): Promise<void> {
