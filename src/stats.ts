@@ -41,6 +41,7 @@ class Stats extends Core {
         const statsFromDb = await getRepository(TwitchStats)
           .createQueryBuilder('stats')
           .offset(1)
+          .cache(true)
           .limit(Number.MAX_SAFE_INTEGER)
           .where('stats.whenOnline > :whenOnline', { whenOnline: Date.now() - (DAY * 31) })
           .orderBy('stats.whenOnline', 'DESC')
