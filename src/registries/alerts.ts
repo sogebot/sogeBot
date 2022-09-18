@@ -13,7 +13,7 @@ import { parserReply } from '~/commons';
 import { User, UserInterface } from '~/database/entity/user';
 import Expects from '~/expects';
 import { prepare } from '~/helpers/commons';
-import { error, debug } from '~/helpers/log';
+import { error, debug, info } from '~/helpers/log';
 import { ioServer } from '~/helpers/panel';
 import { defaultPermissions } from '~/helpers/permissions';
 import { adminEndpoint, publicEndpoint } from '~/helpers/socket';
@@ -237,7 +237,7 @@ class Alerts extends Registry {
         ...opts, isTTSMuted: !tts.ready || this.isTTSMuted, isSoundMuted: this.isSoundMuted, TTSService: tts.service, TTSKey: key, user, game: user?.game, caster, recipientUser: recipient,
       };
 
-      debug('alerts.send', JSON.stringify(data, null, 2));
+      info(`Triggering alert send: ${JSON.stringify(data, null, 2)}`);
       ioServer?.of('/registries/alerts').emit('alert', data);
     }
   }
