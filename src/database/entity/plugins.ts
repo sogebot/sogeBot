@@ -18,6 +18,17 @@ export class Plugin extends BaseEntity {
 
   @Column({ type: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') === 'mysql' ? 'longtext' : 'text' })
     workflow: string;
+
+  @Column('simple-json')
+    settings: {
+    name: string;
+    type: 'string' | 'number' | 'list'
+    defaultValue: string | number;
+    currentValue: string | number;
+
+    availableValues?: string | number;
+    castValueAsNumber?: boolean;
+  }[];
 }
 
 @Entity()
