@@ -237,7 +237,7 @@ class Alerts extends Registry {
         ...opts, isTTSMuted: !tts.ready || this.isTTSMuted, isSoundMuted: this.isSoundMuted, TTSService: tts.service, TTSKey: key, user, game: user?.game, caster, recipientUser: recipient,
       };
 
-      info(`Triggering alert send: ${JSON.stringify(data, null, 2)}`);
+      info(`Triggering alert send: ${JSON.stringify(data)}`);
       ioServer?.of('/registries/alerts').emit('alert', data);
     }
   }
