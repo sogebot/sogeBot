@@ -14,6 +14,7 @@ import Integration from './_interface';
 
 import { isStreamOnline, stats } from '~/helpers/api';
 import { mainCurrency } from '~/helpers/currency';
+import rates from '~/helpers/currency/rates';
 import { eventEmitter } from '~/helpers/events';
 import { triggerInterfaceOnTip } from '~/helpers/interface/triggers';
 import {
@@ -213,7 +214,7 @@ class Streamlabs extends Integration {
             sortAmount:    currency.exchange(Number(event.amount), event.currency, mainCurrency.value),
             message:       event.message,
             tippedAt:      timestamp,
-            exchangeRates: currency.rates,
+            exchangeRates: rates,
             userId:        user.userId,
           };
           getRepository(UserTip).save(newTip);

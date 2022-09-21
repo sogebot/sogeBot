@@ -13,6 +13,7 @@ import Integration from './_interface';
 
 import { isStreamOnline, stats } from '~/helpers/api/index.js';
 import { mainCurrency } from '~/helpers/currency';
+import rates from '~/helpers/currency/rates';
 import { eventEmitter } from '~/helpers/events';
 import { triggerInterfaceOnTip } from '~/helpers/interface/triggers.js';
 import {
@@ -153,7 +154,7 @@ class Donatello extends Integration {
           sortAmount:    currency.exchange(Number(amount), data.currency, mainCurrency.value),
           message:       data.message,
           tippedAt:      timestamp,
-          exchangeRates: currency.rates,
+          exchangeRates: rates,
           userId:        user.userId,
         };
         getRepository(UserTip).save(newTip);

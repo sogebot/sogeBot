@@ -14,6 +14,7 @@ import Integration from './_interface';
 
 import { isStreamOnline, stats } from '~/helpers/api/index.js';
 import { mainCurrency } from '~/helpers/currency';
+import rates from '~/helpers/currency/rates';
 import { eventEmitter } from '~/helpers/events';
 import { triggerInterfaceOnTip } from '~/helpers/interface/triggers';
 import {
@@ -162,7 +163,7 @@ class StreamElements extends Integration {
           sortAmount:    currency.exchange(Number(amount), DONATION_CURRENCY, mainCurrency.value),
           message,
           tippedAt:      timestamp,
-          exchangeRates: currency.rates,
+          exchangeRates: rates,
           userId:        user.userId,
         };
         getRepository(UserTip).save(newTip);

@@ -16,6 +16,7 @@ import {
 import { onStartup } from '~/decorators/on';
 import { isStreamOnline, stats } from '~/helpers/api';
 import { mainCurrency } from '~/helpers/currency';
+import rates from '~/helpers/currency/rates';
 import {
   debug, error, isDebugEnabled,
 } from '~/helpers/log';
@@ -293,7 +294,7 @@ class Users extends Core {
         if (typeof update.tips !== 'undefined') {
           for (const tip of update.tips) {
             if (typeof tip.exchangeRates === 'undefined') {
-              tip.exchangeRates = currency.rates;
+              tip.exchangeRates = rates;
             }
             tip.sortAmount = currency.exchange(Number(tip.amount), tip.currency, 'EUR');
             if (typeof tip.id === 'string') {

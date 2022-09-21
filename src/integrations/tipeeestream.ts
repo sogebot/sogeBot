@@ -14,6 +14,7 @@ import Integration from './_interface';
 import { isStreamOnline } from '~/helpers/api/index';
 import { stats } from '~/helpers/api/stats';
 import { mainCurrency } from '~/helpers/currency/index';
+import rates from '~/helpers/currency/rates';
 import { eventEmitter } from '~/helpers/events/index';
 import { triggerInterfaceOnTip } from '~/helpers/interface/triggers';
 import { error, tip } from '~/helpers/log';
@@ -151,7 +152,7 @@ class TipeeeStream extends Integration {
             currency:      donationCurrency,
             sortAmount:    currency.exchange(Number(amount), donationCurrency, mainCurrency.value),
             message,
-            exchangeRates: currency.rates,
+            exchangeRates: rates,
             tippedAt:      timestamp,
             userId:        user.userId,
           };
