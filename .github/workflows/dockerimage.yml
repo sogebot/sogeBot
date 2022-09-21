@@ -30,7 +30,10 @@ jobs:
           npm install -g npm
 
       - name: Build a bot
-        run: NODE_MODULES_DIR=./node_modules make
+        env:
+          OPENEXCHANGE_APPID: ${{ secrets.OPENEXCHANGE_APPID }}
+          NODE_MODULES_DIR: ./node_modules
+        run: make
 
       - name: Zip a bot
         run: make pack
