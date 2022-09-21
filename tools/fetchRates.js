@@ -2,7 +2,7 @@ const fs = require('fs');
 
 const axios = require('axios');
 
-const appId = '-----TBD------';
+const appId = process.env.OPENEXCHANGE_APPID;
 const ratesFile = './src/helpers/currency/rates.ts';
 
 axios.get('https://openexchangerates.org/api/latest.json?app_id=' + appId)
@@ -11,4 +11,4 @@ axios.get('https://openexchangerates.org/api/latest.json?app_id=' + appId)
     fs.writeFileSync(ratesFile, `export default ${JSON.stringify(rates, null, 2)};`);
     console.log('Rates fetched OK!')
   })
-  .catch(err => console.error(err));
+  .catch(err => console.error(err.response.data));
