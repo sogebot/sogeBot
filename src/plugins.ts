@@ -1,7 +1,7 @@
 import { MINUTE, SECOND } from '@sogebot/ui-helpers/constants';
 import { validateOrReject } from 'class-validator';
 import * as cronparser from 'cron-parser';
-import { cloneDeep } from 'lodash';
+import { cloneDeep, sortBy } from 'lodash';
 import merge from 'lodash/merge';
 
 import type { Node } from '../d.ts/src/plugins';
@@ -221,7 +221,12 @@ class Plugins extends Core {
           const workflow = Object.values(
             JSON.parse(plugin.workflow).drawflow.Home.data
           ) as Node[];
-          this.processPath(pluginId, workflow, node, {}, {}, null);
+
+          const settings: Record<string, any> = {};
+          for (const item of plugin.settings) {
+            settings[item.name] = item.currentValue;
+          }
+          this.processPath(pluginId, workflow, node, {}, { settings }, null);
         }
         cronTriggers.delete(`${pluginId}|${timestamp}`);
       }
@@ -342,7 +347,14 @@ class Plugins extends Core {
         if (isListener && isType) {
           switch(type) {
             case 'twitchCommand': {
-              const { command, parameters } = JSON.parse(o.data.data);
+              let { command, parameters } = JSON.parse(o.data.data);
+
+              // get settings and try to replace in command
+              const _settings = plugin.settings.map(a => ({ [a.name]: a.currentValue })).reduce((prev, obj) => ({ [Object.keys(obj)[0]]: obj[Object.keys(obj)[0]], ...prev }), {});
+              for (const key of sortBy(Object.keys(_settings), (b => -b.length))) {
+                const toReplace = `{settings.${key}}`;
+                command = command.replaceAll(toReplace, _settings[key as any]);
+              }
 
               const haveSubCommandOrParameters = message.replace(`!${command.replace('!', '')}`, '').split(' ').length > 1;
               const isStartingWithCommand = message.startsWith(`!${command.replace('!', '')}`);
@@ -376,13 +388,22 @@ class Plugins extends Core {
               };
 
               if (isStartingWithCommand && doesParametersMatch()) {
-                this.processPath(plugin.id, workflow, o, params, {}, userstate);
+                const settings: Record<string, any> = {};
+                for (const item of plugin.settings) {
+                  settings[item.name] = item.currentValue;
+                }
+                this.processPath(plugin.id, workflow, o, params, { settings }, userstate);
               }
               break;
             }
-            default:
-              this.processPath(plugin.id, workflow, o, params, {}, userstate);
+            default: {
+              const settings: Record<string, any> = {};
+              for (const item of plugin.settings) {
+                settings[item.name] = item.currentValue;
+              }
+              this.processPath(plugin.id, workflow, o, params, { settings }, userstate);
               return true;
+            }
           }
         }
         return false;
