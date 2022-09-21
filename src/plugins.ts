@@ -350,9 +350,10 @@ class Plugins extends Core {
               let { command, parameters } = JSON.parse(o.data.data);
 
               // get settings and try to replace in command
-              const _settings = plugin.settings.map(a => ({ [a.name]: a.currentValue })).flat();
+              const _settings = plugin.settings.map(a => ({ [a.name]: a.currentValue })).reduce((prev, obj) => ({ [Object.keys(obj)[0]]: obj[Object.keys(obj)[0]], ...prev }), {});
               for (const key of sortBy(Object.keys(_settings), (b => -b.length))) {
-                command = command.replace(`$${key}`, _settings[key as any]);
+                const toReplace = `{settings.${key}}`;
+                command = command.replaceAll(toReplace, _settings[key as any]);
               }
 
               const haveSubCommandOrParameters = message.replace(`!${command.replace('!', '')}`, '').split(' ').length > 1;

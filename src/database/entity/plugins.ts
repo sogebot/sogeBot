@@ -22,12 +22,10 @@ export class Plugin extends BaseEntity {
   @Column('simple-json')
     settings: {
     name: string;
-    type: 'string' | 'number' | 'list'
-    defaultValue: string | number;
-    currentValue: string | number;
-
-    availableValues?: string | number;
-    castValueAsNumber?: boolean;
+    type: 'string' | 'number' | 'list';
+    description: string;
+    defaultValue: string | number | string[];
+    currentValue: string | number | string[];
   }[];
 }
 
