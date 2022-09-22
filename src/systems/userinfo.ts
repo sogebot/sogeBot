@@ -7,7 +7,6 @@ import { format } from '@sogebot/ui-helpers/number';
 import { getRepository } from 'typeorm';
 
 import { dateDiff } from '../commons';
-import currency from '../currency';
 import {
   command, default_permission, settings,
 } from '../decorators';
@@ -23,6 +22,7 @@ import ranks from './ranks';
 
 import { prepare } from '~/helpers/commons/index';
 import { mainCurrency } from '~/helpers/currency';
+import exchange from '~/helpers/currency/exchange';
 import { error } from '~/helpers/log';
 import { get, getUserHighestPermission } from '~/helpers/permissions/index';
 import { getPointsName } from '~/helpers/points';
@@ -275,7 +275,7 @@ class UserInfo extends System {
         const idx = message.indexOf('$tips');
         let tipAmount = 0;
         for (const t of tips) {
-          tipAmount += currency.exchange(Number(t.amount), t.currency, mainCurrency.value);
+          tipAmount += exchange(Number(t.amount), t.currency, mainCurrency.value);
         }
         message[idx] = Intl.NumberFormat(general.lang, { style: 'currency', currency: mainCurrency.value }).format(tipAmount);
       }

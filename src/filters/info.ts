@@ -1,7 +1,6 @@
 import { EventList } from '@entity/eventList';
 import { getRepository } from 'typeorm';
 
-import currency from '../currency';
 import users from '../users';
 
 import type { ResponseFilter } from '.';
@@ -10,6 +9,7 @@ import {
   isStreamOnline, stats, streamStatusChangeSince,
 } from '~/helpers/api';
 import { mainCurrency } from '~/helpers/currency';
+import exchange from '~/helpers/currency/exchange';
 
 const info: ResponseFilter = {
   '$toptip.#.#': async function (filter: string) {
@@ -27,8 +27,8 @@ const info: ResponseFilter = {
       .sort((a, b) => {
         const aValue = JSON.parse(a.values_json);
         const bValue = JSON.parse(b.values_json);
-        const aTip = currency.exchange(aValue.amount, aValue.currency, mainCurrency.value);
-        const bTip = currency.exchange(bValue.amount, bValue.currency, mainCurrency.value);
+        const aTip = exchange(aValue.amount, aValue.currency, mainCurrency.value);
+        const bTip = exchange(bValue.amount, bValue.currency, mainCurrency.value);
         return bTip - aTip;
       });
 

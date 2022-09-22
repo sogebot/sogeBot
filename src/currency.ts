@@ -11,9 +11,8 @@ import {
   onChange, onLoad,
 } from '~/decorators/on';
 import { mainCurrency } from '~/helpers/currency';
-import {
-  info, warning,
-} from '~/helpers/log';
+import exchange from '~/helpers/currency/exchange';
+import { info } from '~/helpers/log';
 
 class Currency extends Core {
   mainCurrencyLoaded = false;
@@ -26,35 +25,9 @@ class Currency extends Core {
   public mainCurrency: CurrencyType = 'EUR';
 
   public timeouts: any = {};
-  public base = 'USD';
 
   public isCodeSupported(code: CurrencyType) {
-    return code === this.base || !_.isNil(currentRates[code]);
-  }
-
-  public exchange(value: number, from: CurrencyType, to: CurrencyType, rates?: { [key in CurrencyType]: number }): number {
-    rates ??= _.cloneDeep(currentRates);
-    try {
-      if (from.toLowerCase().trim() === to.toLowerCase().trim()) {
-        return Number(value); // nothing to do
-      }
-      if (_.isNil(rates[from])) {
-        throw Error(`${from} code was not found`);
-      }
-      if (_.isNil(rates[to]) && to.toLowerCase().trim() !== this.base.toLowerCase().trim()) {
-        throw Error(`${to} code was not found`);
-      }
-
-      if (to.toLowerCase().trim() !== this.base.toLowerCase().trim()) {
-        return (value * rates[from]) / rates[to];
-      } else {
-        return value * rates[from];
-      }
-    } catch (e: any) {
-      warning(`Currency exchange error - ${e.message}`);
-      warning(`Available currencies: ${Object.keys(rates).join(', ')}`);
-      return Number(value); // don't change rate if code not found
-    }
+    return code === 'USD' || !_.isNil(currentRates[code]);
   }
 
   @onLoad('mainCurrency')
@@ -71,7 +44,7 @@ class Currency extends Core {
     for (const tip of result) {
       await getRepository(UserTip).save({
         ...tip,
-        sortAmount: this.exchange(tip.amount, tip.currency as CurrencyType, this.mainCurrency, tip.exchangeRates),
+        sortAmount: exchange(tip.amount, tip.currency as CurrencyType, this.mainCurrency, tip.exchangeRates),
       });
     }
     info(chalk.yellow('CURRENCY:') + ' Recalculating tips (completed).');

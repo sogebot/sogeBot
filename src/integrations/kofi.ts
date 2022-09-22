@@ -7,7 +7,7 @@ import alerts from '../registries/alerts.js';
 import users from '../users.js';
 import Integration from './_interface';
 
-import currency from '~/currency.js';
+import exchange from '~/helpers/currency/exchange';
 import { mainCurrency } from '~/helpers/currency/mainCurrency.js';
 import { eventEmitter } from '~/helpers/events';
 import { triggerInterfaceOnTip } from '~/helpers/interface/triggers.js';
@@ -87,7 +87,7 @@ class Kofi extends Integration {
             userName:            data.from_name.toLowerCase(),
             amount:              Number(data.amount).toFixed(2),
             currency:            data.currency,
-            amountInBotCurrency: Number(currency.exchange(Number(data.amount), data.currency, mainCurrency.value)).toFixed(2),
+            amountInBotCurrency: Number(exchange(Number(data.amount), data.currency, mainCurrency.value)).toFixed(2),
             currencyInBot:       mainCurrency.value,
             message:             data.message,
           });

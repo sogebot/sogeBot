@@ -2,7 +2,6 @@ import { UserTip, UserTipInterface } from '@entity/user';
 import axios from 'axios';
 import { getRepository } from 'typeorm';
 
-import currency from '../currency';
 import { settings } from '../decorators';
 import { onChange, onStartup } from '../decorators/on.js';
 import eventlist from '../overlays/eventlist.js';
@@ -12,6 +11,7 @@ import Integration from './_interface';
 
 import { isStreamOnline, stats } from '~/helpers/api/index.js';
 import { mainCurrency } from '~/helpers/currency';
+import exchange from '~/helpers/currency/exchange';
 import rates from '~/helpers/currency/rates';
 import { eventEmitter } from '~/helpers/events';
 import { triggerInterfaceOnTip } from '~/helpers/interface/triggers';
@@ -76,7 +76,7 @@ class Qiwi extends Integration {
         const newTip: UserTipInterface = {
           amount:        Number(amount),
           currency:      DONATION_CURRENCY,
-          sortAmount:    currency.exchange(Number(amount), DONATION_CURRENCY, mainCurrency.value),
+          sortAmount:    exchange(Number(amount), DONATION_CURRENCY, mainCurrency.value),
           message:       message,
           tippedAt:      timestamp,
           exchangeRates: rates,
@@ -86,7 +86,7 @@ class Qiwi extends Integration {
       }
 
       if (isStreamOnline.value) {
-        stats.value.currentTips = stats.value.currentTips + currency.exchange(amount, DONATION_CURRENCY, mainCurrency.value);
+        stats.value.currentTips = stats.value.currentTips + exchange(amount, DONATION_CURRENCY, mainCurrency.value);
       }
 
       eventlist.add({
@@ -105,7 +105,7 @@ class Qiwi extends Integration {
         userName:            username || 'Anonymous',
         amount:              String(amount),
         currency:            DONATION_CURRENCY,
-        amountInBotCurrency: Number(currency.exchange(amount, DONATION_CURRENCY, mainCurrency.value)).toFixed(2),
+        amountInBotCurrency: Number(exchange(amount, DONATION_CURRENCY, mainCurrency.value)).toFixed(2),
         currencyInBot:       mainCurrency.value,
         message,
       });

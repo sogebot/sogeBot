@@ -7,9 +7,10 @@ import {
   getRepository, In, MoreThanOrEqual,
 } from 'typeorm';
 
-import currency from '../../currency';
 import { mainCurrency } from '../currency';
 import { isBotStarted } from '../database';
+
+import exchange from '~/helpers/currency/exchange';
 
 export const types = ['bits', 'tips', 'followers', 'subscribers'] as const;
 
@@ -52,7 +53,7 @@ export async function recountIntervals(type: typeof types[number]) {
           currentAmount: events.reduce((prev, cur) => {
             return prev += cur.sortAmount;
           }, 0) + events2.reduce((prev, cur) => {
-            return prev += Number(currency.exchange(cur.amount / 100, 'USD', mainCurrency.value));
+            return prev += Number(exchange(cur.amount / 100, 'USD', mainCurrency.value));
           }, 0),
         });
       }
