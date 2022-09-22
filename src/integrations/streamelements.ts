@@ -4,7 +4,6 @@ import Axios from 'axios';
 import chalk from 'chalk';
 import { getRepository } from 'typeorm';
 
-import currency from '../currency';
 import { persistent, settings } from '../decorators';
 import { onChange, onStartup } from '../decorators/on';
 import eventlist from '../overlays/eventlist';
@@ -14,6 +13,8 @@ import Integration from './_interface';
 
 import { isStreamOnline, stats } from '~/helpers/api/index.js';
 import { mainCurrency } from '~/helpers/currency';
+import exchange from '~/helpers/currency/exchange';
+import rates from '~/helpers/currency/rates';
 import { eventEmitter } from '~/helpers/events';
 import { triggerInterfaceOnTip } from '~/helpers/interface/triggers';
 import {
@@ -149,7 +150,7 @@ class StreamElements extends Integration {
     const DONATION_CURRENCY = eventData.donation.currency;
 
     if (isStreamOnline.value) {
-      stats.value.currentTips = stats.value.currentTips + currency.exchange(amount, DONATION_CURRENCY, mainCurrency.value);
+      stats.value.currentTips = stats.value.currentTips + exchange(amount, DONATION_CURRENCY, mainCurrency.value);
     }
 
     let isAnonymous = false;
@@ -159,10 +160,10 @@ class StreamElements extends Integration {
         const newTip: UserTipInterface = {
           amount:        Number(amount),
           currency:      DONATION_CURRENCY,
-          sortAmount:    currency.exchange(Number(amount), DONATION_CURRENCY, mainCurrency.value),
+          sortAmount:    exchange(Number(amount), DONATION_CURRENCY, mainCurrency.value),
           message,
           tippedAt:      timestamp,
-          exchangeRates: currency.rates,
+          exchangeRates: rates,
           userId:        user.userId,
         };
         getRepository(UserTip).save(newTip);
@@ -194,7 +195,7 @@ class StreamElements extends Integration {
           userName:            username.toLowerCase(),
           amount:              Number(amount).toFixed(2),
           currency:            DONATION_CURRENCY,
-          amountInBotCurrency: Number(currency.exchange(amount, DONATION_CURRENCY, mainCurrency.value)).toFixed(2),
+          amountInBotCurrency: Number(exchange(amount, DONATION_CURRENCY, mainCurrency.value)).toFixed(2),
           currencyInBot:       mainCurrency.value,
           message,
           isAnonymous,

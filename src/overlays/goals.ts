@@ -3,13 +3,13 @@
 import { Goal } from '@entity/goal';
 import { getRepository } from 'typeorm';
 
-import currency from '../currency';
 import {
   onBit, onFollow, onStartup, onSub, onTip,
 } from '../decorators/on';
 import Overlay from '../overlays/_interface';
 
 import { mainCurrency } from '~/helpers/currency';
+import exchange from '~/helpers/currency/exchange';
 import { recountIntervals } from '~/helpers/goals/recountIntervals';
 
 class Goals extends Overlay {
@@ -35,7 +35,7 @@ class Goals extends Overlay {
     const tipsGoals = await getRepository(Goal).find({ type: 'tips', countBitsAsTips: true });
     for (const goal of tipsGoals) {
       if (new Date(goal.endAfter).getTime() >= new Date().getTime() || goal.endAfterIgnore) {
-        const amount = Number(currency.exchange(bit.amount / 100, 'USD', mainCurrency.value));
+        const amount = Number(exchange(bit.amount / 100, 'USD', mainCurrency.value));
         await getRepository(Goal).increment({ id: goal.id }, 'currentAmount', amount);
       }
     }
@@ -46,7 +46,7 @@ class Goals extends Overlay {
   public async onTip(tip: onEventTip) {
     const goals = await getRepository(Goal).find({ type: 'tips' });
     for (const goal of goals) {
-      const amount = Number(currency.exchange(tip.amount, tip.currency, mainCurrency.value));
+      const amount = Number(exchange(tip.amount, tip.currency, mainCurrency.value));
       if (new Date(goal.endAfter).getTime() >= new Date().getTime() || goal.endAfterIgnore) {
         await getRepository(Goal).increment({ id: goal.id }, 'currentAmount', amount);
       }

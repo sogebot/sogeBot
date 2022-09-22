@@ -8,7 +8,6 @@ import {
 import client from './services/twitch/api/client';
 
 import Core from '~/_interface';
-import currency from '~/currency';
 import { Permissions } from '~/database/entity/permissions';
 import {
   User, UserBit, UserInterface, UserTip,
@@ -16,6 +15,8 @@ import {
 import { onStartup } from '~/decorators/on';
 import { isStreamOnline, stats } from '~/helpers/api';
 import { mainCurrency } from '~/helpers/currency';
+import exchange from '~/helpers/currency/exchange';
+import rates from '~/helpers/currency/rates';
 import {
   debug, error, isDebugEnabled,
 } from '~/helpers/log';
@@ -293,9 +294,9 @@ class Users extends Core {
         if (typeof update.tips !== 'undefined') {
           for (const tip of update.tips) {
             if (typeof tip.exchangeRates === 'undefined') {
-              tip.exchangeRates = currency.rates;
+              tip.exchangeRates = rates;
             }
-            tip.sortAmount = currency.exchange(Number(tip.amount), tip.currency, 'EUR');
+            tip.sortAmount = exchange(Number(tip.amount), tip.currency, 'EUR');
             if (typeof tip.id === 'string') {
               delete tip.id; // remove tip id as it is string (we are expecting number -> autoincrement)
             }
@@ -469,7 +470,7 @@ class Users extends Core {
         const bits =  await getRepository(UserBit).find({ where: { userId } });
 
         if (viewer) {
-          const aggregatedTips = tips.map((o) => currency.exchange(o.amount, o.currency, mainCurrency.value)).reduce((a, b) => a + b, 0);
+          const aggregatedTips = tips.map((o) => exchange(o.amount, o.currency, mainCurrency.value)).reduce((a, b) => a + b, 0);
           const aggregatedBits = bits.map((o) => Number(o.amount)).reduce((a, b) => a + b, 0);
 
           const permId = await getUserHighestPermission(userId);

@@ -9,6 +9,8 @@ import type { default as levelType } from '../../systems/levels';
 import type { default as ranksType } from '../../systems/ranks';
 import { mainCurrency } from '../currency';
 
+import exchange from '~/helpers/currency/exchange';
+
 let levels: typeof levelType;
 let ranks: typeof ranksType;
 let currency: typeof currencyType;
@@ -59,7 +61,7 @@ async function _filters(
         if (!currency) {
           currency = require('../../currency').default;
         }
-        amount = tips.reduce((a, b) => (a + currency.exchange(b.amount, b.currency, mainCurrency.value)), 0);
+        amount = tips.reduce((a, b) => (a + exchange(b.amount, b.currency, mainCurrency.value)), 0);
         break;
       }
       case 'watched':

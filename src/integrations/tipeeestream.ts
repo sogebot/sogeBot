@@ -3,7 +3,6 @@ import * as constants from '@sogebot/ui-helpers/constants';
 import fetch from 'node-fetch';
 import { getRepository } from 'typeorm';
 
-import currency from '../currency';
 import { persistent, settings } from '../decorators';
 import { onStartup } from '../decorators/on';
 import eventlist from '../overlays/eventlist';
@@ -13,7 +12,9 @@ import Integration from './_interface';
 
 import { isStreamOnline } from '~/helpers/api/index';
 import { stats } from '~/helpers/api/stats';
+import exchange from '~/helpers/currency/exchange';
 import { mainCurrency } from '~/helpers/currency/index';
+import rates from '~/helpers/currency/rates';
 import { eventEmitter } from '~/helpers/events/index';
 import { triggerInterfaceOnTip } from '~/helpers/interface/triggers';
 import { error, tip } from '~/helpers/log';
@@ -139,7 +140,7 @@ class TipeeeStream extends Integration {
       const donationCurrency = data.parameters.currency;
 
       if (isStreamOnline.value) {
-        stats.value.currentTips = stats.value.currentTips + Number(currency.exchange(amount, donationCurrency, mainCurrency.value));
+        stats.value.currentTips = stats.value.currentTips + Number(exchange(amount, donationCurrency, mainCurrency.value));
       }
 
       let isAnonymous = false;
@@ -149,9 +150,9 @@ class TipeeeStream extends Integration {
           const newTip: UserTipInterface = {
             amount,
             currency:      donationCurrency,
-            sortAmount:    currency.exchange(Number(amount), donationCurrency, mainCurrency.value),
+            sortAmount:    exchange(Number(amount), donationCurrency, mainCurrency.value),
             message,
-            exchangeRates: currency.rates,
+            exchangeRates: rates,
             tippedAt:      timestamp,
             userId:        user.userId,
           };
@@ -183,7 +184,7 @@ class TipeeeStream extends Integration {
             userName:            userName.toLowerCase(),
             amount:              Number(amount).toFixed(2),
             currency:            donationCurrency,
-            amountInBotCurrency: Number(currency.exchange(amount, donationCurrency, mainCurrency.value)).toFixed(2),
+            amountInBotCurrency: Number(exchange(amount, donationCurrency, mainCurrency.value)).toFixed(2),
             currencyInBot:       mainCurrency.value,
             message,
             isAnonymous,

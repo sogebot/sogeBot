@@ -3,7 +3,6 @@ import * as constants from '@sogebot/ui-helpers/constants';
 import axios from 'axios';
 import { getRepository } from 'typeorm';
 
-import currency from '../currency';
 import { persistent, settings } from '../decorators';
 import { onStartup } from '../decorators/on.js';
 import eventlist from '../overlays/eventlist.js';
@@ -13,6 +12,8 @@ import Integration from './_interface';
 
 import { isStreamOnline, stats } from '~/helpers/api/index.js';
 import { mainCurrency } from '~/helpers/currency';
+import exchange from '~/helpers/currency/exchange';
+import rates from '~/helpers/currency/rates';
 import { eventEmitter } from '~/helpers/events';
 import { triggerInterfaceOnTip } from '~/helpers/interface/triggers.js';
 import {
@@ -131,7 +132,7 @@ class Donatello extends Integration {
           userName:            username.toLowerCase(),
           amount:              amount.toFixed(2),
           currency:            data.currency,
-          amountInBotCurrency: Number(currency.exchange(amount, data.currency, mainCurrency.value)).toFixed(2),
+          amountInBotCurrency: Number(exchange(amount, data.currency, mainCurrency.value)).toFixed(2),
           currencyInBot:       mainCurrency.value,
           message:             data.message,
         });
@@ -150,10 +151,10 @@ class Donatello extends Integration {
         const newTip: UserTipInterface = {
           amount:        Number(amount),
           currency:      data.currency,
-          sortAmount:    currency.exchange(Number(amount), data.currency, mainCurrency.value),
+          sortAmount:    exchange(Number(amount), data.currency, mainCurrency.value),
           message:       data.message,
           tippedAt:      timestamp,
-          exchangeRates: currency.rates,
+          exchangeRates: rates,
           userId:        user.userId,
         };
         getRepository(UserTip).save(newTip);
@@ -188,7 +189,7 @@ class Donatello extends Integration {
       timestamp,
     });
     if (isStreamOnline.value) {
-      stats.value.currentTips = stats.value.currentTips + Number(currency.exchange(amount, data.currency, mainCurrency.value));
+      stats.value.currentTips = stats.value.currentTips + Number(exchange(amount, data.currency, mainCurrency.value));
     }
   }
 }

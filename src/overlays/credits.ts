@@ -2,7 +2,6 @@ import { EventList, EventListInterface } from '@entity/eventList';
 import _ from 'lodash';
 import { getRepository, MoreThanOrEqual } from 'typeorm';
 
-import currency from '../currency';
 import users from '../users';
 import Overlay from './_interface';
 
@@ -11,6 +10,7 @@ import {
   isStreamOnline, stats, streamStatusChangeSince,
 } from '~/helpers/api';
 import { mainCurrency } from '~/helpers/currency';
+import exchange from '~/helpers/currency/exchange';
 import { publicEndpoint } from '~/helpers/socket';
 import { getTopClips } from '~/services/twitch/calls/getTopClips';
 import { variables } from '~/watchers';
@@ -44,7 +44,7 @@ class Credits extends Overlay {
         event.values = JSON.parse(event.values_json);
         if (event.values) {
           if (!_.isNil(event.values.amount) && !_.isNil(event.values.currency)) {
-            event.values.amount = currency.exchange(event.values.amount, event.values.currency, mainCurrency.value);
+            event.values.amount = exchange(event.values.amount, event.values.currency, mainCurrency.value);
             event.values.currency = mainCurrency.value;
           }
         }

@@ -4,7 +4,6 @@ import chalk from 'chalk';
 import { io, Socket } from 'socket.io-client';
 import { getRepository } from 'typeorm';
 
-import currency from '../currency';
 import { persistent, settings } from '../decorators';
 import { onChange, onStartup } from '../decorators/on';
 import eventlist from '../overlays/eventlist';
@@ -14,6 +13,8 @@ import Integration from './_interface';
 
 import { isStreamOnline, stats } from '~/helpers/api';
 import { mainCurrency } from '~/helpers/currency';
+import exchange from '~/helpers/currency/exchange';
+import rates from '~/helpers/currency/rates';
 import { eventEmitter } from '~/helpers/events';
 import { triggerInterfaceOnTip } from '~/helpers/interface/triggers';
 import {
@@ -210,16 +211,16 @@ class Streamlabs extends Integration {
           const newTip: UserTipInterface = {
             amount:        Number(event.amount),
             currency:      event.currency,
-            sortAmount:    currency.exchange(Number(event.amount), event.currency, mainCurrency.value),
+            sortAmount:    exchange(Number(event.amount), event.currency, mainCurrency.value),
             message:       event.message,
             tippedAt:      timestamp,
-            exchangeRates: currency.rates,
+            exchangeRates: rates,
             userId:        user.userId,
           };
           getRepository(UserTip).save(newTip);
 
           if (isStreamOnline.value) {
-            stats.value.currentTips = stats.value.currentTips + Number(currency.exchange(Number(event.amount), event.currency, mainCurrency.value));
+            stats.value.currentTips = stats.value.currentTips + Number(exchange(Number(event.amount), event.currency, mainCurrency.value));
           }
           tip(`${event.from.toLowerCase()}${user.userId ? '#' + user.userId : ''}, amount: ${Number(event.amount).toFixed(2)}${event.currency}, message: ${event.message}`);
         }
@@ -237,7 +238,7 @@ class Streamlabs extends Integration {
           userName:            event.from.toLowerCase(),
           amount:              parseFloat(event.amount).toFixed(2),
           currency:            event.currency,
-          amountInBotCurrency: Number(currency.exchange(Number(event.amount), event.currency, mainCurrency.value)).toFixed(2),
+          amountInBotCurrency: Number(exchange(Number(event.amount), event.currency, mainCurrency.value)).toFixed(2),
           currencyInBot:       mainCurrency.value,
           message:             event.message,
         });

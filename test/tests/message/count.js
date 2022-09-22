@@ -10,6 +10,7 @@ const { getRepository } = require('typeorm');
 
 const { EventList } = require('../../../dest/database/entity/eventList');
 const { User, UserTip, UserBit } = require('../../../dest/database/entity/user');
+const rates = require('../../../dest/helpers/currency/rates').default;
 const Message = require('../../../dest/message').default;
 const db = require('../../general.js').db;
 
@@ -78,7 +79,7 @@ describe('Message - (count|#) filter - @func3', async () => {
         currency:      'EUR',
         message:       'test',
         tippedAt:      getTimestamp(i),
-        exchangeRates: currency.rates,
+        exchangeRates: rates,
         userId:        `${i*10000}`,
       });
       await getRepository(UserBit).save({

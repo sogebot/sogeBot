@@ -4,7 +4,6 @@ import axios from 'axios';
 import chalk from 'chalk';
 import { getRepository } from 'typeorm';
 
-import currency from '../currency';
 import { persistent, settings } from '../decorators';
 import { onChange, onStartup } from '../decorators/on.js';
 import eventlist from '../overlays/eventlist.js';
@@ -14,6 +13,8 @@ import Integration from './_interface';
 
 import { isStreamOnline, stats } from '~/helpers/api/index.js';
 import { mainCurrency } from '~/helpers/currency';
+import exchange from '~/helpers/currency/exchange';
+import rates from '~/helpers/currency/rates';
 import { eventEmitter } from '~/helpers/events';
 import { triggerInterfaceOnTip } from '~/helpers/interface/triggers.js';
 import {
@@ -227,7 +228,7 @@ class Donationalerts extends Integration {
         userName:            data.username.toLowerCase(),
         amount:              data.amount.toFixed(2),
         currency:            data.currency,
-        amountInBotCurrency: Number(currency.exchange(Number(data.amount), data.currency, mainCurrency.value)).toFixed(2),
+        amountInBotCurrency: Number(exchange(Number(data.amount), data.currency, mainCurrency.value)).toFixed(2),
         currencyInBot:       mainCurrency.value,
         message:             data.message,
       });
@@ -246,10 +247,10 @@ class Donationalerts extends Integration {
       const newTip: UserTipInterface = {
         amount:        Number(data.amount),
         currency:      data.currency,
-        sortAmount:    currency.exchange(Number(data.amount), data.currency, mainCurrency.value),
+        sortAmount:    exchange(Number(data.amount), data.currency, mainCurrency.value),
         message:       data.message,
         tippedAt:      timestamp,
-        exchangeRates: currency.rates,
+        exchangeRates: rates,
         userId:        user.userId,
       };
       getRepository(UserTip).save(newTip);
@@ -281,7 +282,7 @@ class Donationalerts extends Integration {
       timestamp,
     });
     if (isStreamOnline.value) {
-      stats.value.currentTips = stats.value.currentTips + Number(currency.exchange(data.amount, data.currency, mainCurrency.value));
+      stats.value.currentTips = stats.value.currentTips + Number(exchange(data.amount, data.currency, mainCurrency.value));
     }
   }
 }

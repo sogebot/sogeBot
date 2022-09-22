@@ -4,7 +4,6 @@ import _ from 'lodash';
 import { getRepository } from 'typeorm';
 
 import { parserReply } from '../commons';
-import currency from '../currency';
 import {
   command, default_permission, helper, parser, settings,
 } from '../decorators';
@@ -19,6 +18,7 @@ import {
   announce, getOwnerAsSender, prepare,
 } from '~/helpers/commons';
 import { mainCurrency } from '~/helpers/currency';
+import exchange from '~/helpers/currency/exchange';
 import { warning } from '~/helpers/log.js';
 import { defaultPermissions } from '~/helpers/permissions/index';
 import { adminEndpoint } from '~/helpers/socket';
@@ -408,7 +408,7 @@ class Polls extends System {
           await getRepository(PollVote).save({
             poll:    cVote,
             option:  i - 1,
-            votes:   Number(currency.exchange(opts.amount, opts.currency, mainCurrency.value)),
+            votes:   Number(exchange(opts.amount, opts.currency, mainCurrency.value)),
             votedBy: opts.userName,
           });
           break;

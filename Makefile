@@ -32,6 +32,8 @@ jsonlint:
 
 bot:
 	@rm -rf dest
+	@echo -ne "\n\t ----- Fetching rates\n"
+	node tools/fetchRates.js
 ifeq ($(ENV),production)
 	@echo -ne "\n\t ----- Building bot (strip comments)\n"
 	@npx tsc --removeComments true
