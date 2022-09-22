@@ -7,6 +7,7 @@ const currency = require('../../../dest/currency').default;
 const { Permissions, PermissionCommands } = require('../../../dest/database/entity/permissions');
 const { User, UserBit, UserTip } = require('../../../dest/database/entity/user');
 const { invalidateParserCache } = require('../../../dest/helpers/cache');
+const rates = require('../../../dest/helpers/currency/rates').default;
 const { defaultPermissions,check } = require('../../../dest/helpers/permissions/');
 const { serialize } = require('../../../dest/helpers/type');
 const Parser = require('../../../dest/parser').default;
@@ -37,7 +38,7 @@ const users = [
   },
   {
     userName: '__viewer_tips__', userId:   String(9), id:       9, tips:     [{
-      userId: String(9), exchangeRates: currency.rates, currency: 'EUR', amount: 100, sortAmount: 100, timestamp: Math.random(), message: '',
+      userId: String(9), exchangeRates: rates, currency: 'EUR', amount: 100, sortAmount: 100, timestamp: Math.random(), message: '',
     }],
   },
   {
