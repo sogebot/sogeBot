@@ -399,7 +399,7 @@ class Discord extends Integration {
         this.embedStartedAt = dayjs().tz(timezone).format('LLL');
         // Send the embed to the same channel as the message
         const message = await (channel as DiscordJs.TextChannel).send({
-          content: this.onlineAnnounceMessage.length > 0 ? this.onlineAnnounceMessage : null,
+          content: this.onlineAnnounceMessage.length > 0 ? this.onlineAnnounceMessage : undefined,
           embeds:  [this.generateEmbed(true)],
         });
         this.embedMessageId = message.id;
