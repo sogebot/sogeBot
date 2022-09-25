@@ -183,6 +183,7 @@ export type ClientToServerEventsWithNamespace = {
   },
   '/overlays/chat': GenericEvents & {
     'test': (data: { message: string; username: string }) => void,
+    'timeout': (userName: string) => void,
     'message': (data: { id: string, show: boolean; message: string; username: string, timestamp: number, badges: any }) => void,
   },
   '/overlays/texttospeech': GenericEvents & {

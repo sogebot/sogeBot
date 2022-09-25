@@ -36,6 +36,7 @@ import { warning } from '~/helpers/log';
 import {
   chatIn, cheer, debug, error, info, raid, resub, sub, subcommunitygift, subgift, whisperIn,
 } from '~/helpers/log';
+import { ioServer } from '~/helpers/panel';
 import { linesParsedIncrement, setStatus } from '~/helpers/parser';
 import { tmiEmitter } from '~/helpers/tmi';
 import { isOwner } from '~/helpers/user';
@@ -367,6 +368,12 @@ class Chat {
         eventEmitter.emit('clearchat');
       });
     } else if (type === 'broadcaster') {
+      client.onBan((channel, user, msg) => {
+        ioServer?.of('/overlays/chat').emit('timeout', user);
+      });
+      client.onTimeout((channel, user, msg) => {
+        ioServer?.of('/overlays/chat').emit('timeout', user);
+      });
       client.onRaid((_channel, username, raidInfo) => {
         this.raid(username, raidInfo.viewerCount);
       });
