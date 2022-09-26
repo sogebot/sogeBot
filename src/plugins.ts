@@ -223,7 +223,7 @@ class Plugins extends Core {
           ) as Node[];
 
           const settings: Record<string, any> = {};
-          for (const item of plugin.settings) {
+          for (const item of (plugin.settings || [])) {
             settings[item.name] = item.currentValue;
           }
           this.processPath(pluginId, workflow, node, {}, { settings }, null);
@@ -350,7 +350,7 @@ class Plugins extends Core {
               let { command, parameters } = JSON.parse(o.data.data);
 
               // get settings and try to replace in command
-              const _settings = plugin.settings.map(a => ({ [a.name]: a.currentValue })).reduce((prev, obj) => ({ [Object.keys(obj)[0]]: obj[Object.keys(obj)[0]], ...prev }), {});
+              const _settings = (plugin.settings || []).map(a => ({ [a.name]: a.currentValue })).reduce((prev, obj) => ({ [Object.keys(obj)[0]]: obj[Object.keys(obj)[0]], ...prev }), {});
               for (const key of sortBy(Object.keys(_settings), (b => -b.length))) {
                 const toReplace = `{settings.${key}}`;
                 command = command.replaceAll(toReplace, _settings[key as any]);
@@ -389,7 +389,7 @@ class Plugins extends Core {
 
               if (isStartingWithCommand && doesParametersMatch()) {
                 const settings: Record<string, any> = {};
-                for (const item of plugin.settings) {
+                for (const item of (plugin.settings || [])) {
                   settings[item.name] = item.currentValue;
                 }
                 this.processPath(plugin.id, workflow, o, params, { settings }, userstate);
@@ -398,7 +398,7 @@ class Plugins extends Core {
             }
             default: {
               const settings: Record<string, any> = {};
-              for (const item of plugin.settings) {
+              for (const item of (plugin.settings || [])) {
                 settings[item.name] = item.currentValue;
               }
               this.processPath(plugin.id, workflow, o, params, { settings }, userstate);
