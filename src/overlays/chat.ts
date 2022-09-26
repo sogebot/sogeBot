@@ -27,7 +27,7 @@ class Chat extends Overlay {
       for (const messageBadgeId of message.sender.badges.keys()) {
         const badge = badgesCache.find(o => o.id === messageBadgeId);
         if (badge) {
-          const badgeImage = badge.getVersion(message.sender.badges.get(messageBadgeId) as string)?.getImageUrl(1);
+          const badgeImage = badge.getVersion(message.sender.badges.get(messageBadgeId) as string)?.getImageUrl(4);
           if (badgeImage) {
             badgeImages.push({ url: badgeImage });
           }
