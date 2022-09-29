@@ -412,27 +412,43 @@ class Users extends Core {
         }
 
         if (typeof opts.filter !== 'undefined') {
-          if (opts.filter.subscribers !== null) {
-            query.andWhere('user.isSubscriber = :isSubscriber', { isSubscriber: opts.filter.subscribers });
+          for (const filter of opts.filter) {
+            query.andWhere(new Brackets(w => {
+              if (connection.options.type === 'postgres') {
+                if (filter.operation === 'contains') {
+                  w.where(`CAST("user"."${filter.columnName}" AS TEXT) like :${filter.columnName}`, { [filter.columnName]: `%${filter.value}%` });
+                } else if (filter.operation === 'equal') {
+                  w.where(`"user"."${filter.columnName}" = :${filter.columnName}`, { [filter.columnName]: filter.value });
+                } else if (filter.operation === 'notEqual') {
+                  w.where(`"user"."${filter.columnName}" != :${filter.columnName}`, { [filter.columnName]: filter.value });
+                } else if (filter.operation === 'greaterThanOrEqual') {
+                  w.where(`"user"."${filter.columnName}" >= :${filter.columnName}`, { [filter.columnName]: filter.value });
+                } else if (filter.operation === 'greaterThan') {
+                  w.where(`"user"."${filter.columnName}" >= :${filter.columnName}`, { [filter.columnName]: filter.value });
+                } else if (filter.operation === 'lessThanOrEqual') {
+                  w.where(`"user"."${filter.columnName}" <= :${filter.columnName}`, { [filter.columnName]: filter.value });
+                } else if (filter.operation === 'lessThan') {
+                  w.where(`"user"."${filter.columnName}" <= :${filter.columnName}`, { [filter.columnName]: filter.value });
+                }
+              } else {
+                if (filter.operation === 'contains') {
+                  w.where(`CAST(\`user\`.\`${filter.columnName}\` AS CHAR) like :${filter.columnName}`, { [filter.columnName]: `%${filter.value}%` });
+                } else if (filter.operation === 'equal') {
+                  w.where(`\`user\`.\`${filter.columnName}\` = :${filter.columnName}`, { [filter.columnName]: filter.value });
+                } else if (filter.operation === 'notEqual') {
+                  w.where(`\`user\`.\`${filter.columnName}\` != :${filter.columnName}`, { [filter.columnName]: filter.value });
+                } else if (filter.operation === 'greaterThanOrEqual') {
+                  w.where(`\`user\`.\`${filter.columnName}\` >= :${filter.columnName}`, { [filter.columnName]: filter.value });
+                } else if (filter.operation === 'greaterThan') {
+                  w.where(`\`user\`.\`${filter.columnName}\` > :${filter.columnName}`, { [filter.columnName]: filter.value });
+                } else if (filter.operation === 'lessThanOrEqual') {
+                  w.where(`\`user\`.\`${filter.columnName}\` <= :${filter.columnName}`, { [filter.columnName]: filter.value });
+                } else if (filter.operation === 'lessThan') {
+                  w.where(`\`user\`.\`${filter.columnName}\` < :${filter.columnName}`, { [filter.columnName]: filter.value });
+                }
+              }
+            }));
           }
-          if (opts.filter.vips !== null) {
-            query.andWhere('user.isVIP = :isVIP', { isVIP: opts.filter.vips });
-          }
-          if (opts.filter.active !== null) {
-            query.andWhere('user.isOnline = :isOnline', { isOnline: opts.filter.active });
-          }
-        }
-
-        if (typeof opts.search !== 'undefined') {
-          query.andWhere(new Brackets(w => {
-            if (connection.options.type === 'postgres') {
-              w.where('"user"."userName" like :like', { like: `%${opts.search}%` });
-              w.orWhere('CAST("user"."userId" AS TEXT) like :like', { like: `%${opts.search}%` });
-            } else {
-              w.where('`user`.`userName` like :like', { like: `%${opts.search}%` });
-              w.orWhere('CAST(`user`.`userId` AS CHAR) like :like', { like: `%${opts.search}%` });
-            }
-          }));
         }
 
         const viewers = await query.getRawMany();
