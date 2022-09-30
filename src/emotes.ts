@@ -162,18 +162,22 @@ class Emotes extends Core {
             info(`EMOTES: Fetching channel ${broadcasterId} emotes`);
           }
           const apiClient = await client('broadcaster');
-          const emotes = await apiClient.chat.getChannelEmotes(broadcasterId);
+          const emotes = await apiClient.callApi<any>({ url: `chat/emotes?broadcaster_id=${broadcasterId}`, type: 'helix' });
           this.lastSubscriberEmoteChk = Date.now();
           this.cache = this.cache.filter(o => o.type !== 'twitch-sub');
-          for (const emote of emotes) {
+          for (const emote of (emotes.data || [])) {
             debug('emotes.channel', `Saving to cache ${emote.name}#${emote.id}`);
+            const template = emotes.template
+              .replace('{{id}}', emote.id)
+              .replace('{{format}}', emote.format.includes('animated') ? 'animated' : 'static')
+              .replace('{{theme_mode}}', 'dark');
             this.cache.push({
               code: emote.name,
               type: 'twitch',
               urls: {
-                '1': emote.getImageUrl(1).replace('/static/', '/default/'), // enables animation
-                '2': emote.getImageUrl(2).replace('/static/', '/default/'), // enables animation
-                '3': emote.getImageUrl(4).replace('/static/', '/default/'), // enables animation
+                '1': template.replace('{{scale}}', '1.0'),
+                '2': template.replace('{{scale}}', '2.0'),
+                '3': template.replace('{{scale}}', '3.0'),
               },
             });
           }
@@ -219,9 +223,9 @@ class Emotes extends Core {
             code: emote.name,
             type: 'twitch',
             urls: {
-              '1': emote.getImageUrl(1).replace('/static/', '/default/'),
-              '2': emote.getImageUrl(2).replace('/static/', '/default/'),
-              '3': emote.getImageUrl(4).replace('/static/', '/default/'),
+              '1': emote.getImageUrl(1),
+              '2': emote.getImageUrl(2),
+              '3': emote.getImageUrl(4),
             },
           });
         }
