@@ -7,6 +7,9 @@ ENV ENV production
 
 RUN --mount=type=secret,id=OPENEXCHANGE_APPID \
   cat /run/secrets/OPENEXCHANGE_APPID
+ENV OPENEXCHANGE_APPID ${OPENEXCHANGE_APPID}
+
+RUN cat /run/secrets/secure-key
 
 RUN apt-get update
 RUN apt-get install -y build-essential nasm libtool make bash git autoconf wget zlib1g-dev python3
@@ -21,7 +24,7 @@ WORKDIR /app
 RUN npm install -g npm@latest
 
 # Install dependencies
-RUN OPENEXCHANGE_APPID=${OPENEXCHANGE_APPID} NODE_MODULES_DIR=./node_modules make
+RUN NODE_MODULES_DIR=./node_modules make
 # Remove dev dependencies (not needed anymore)
 RUN npm prune --production
 # Get latest ui dependencies in time of build
