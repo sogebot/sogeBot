@@ -8,6 +8,9 @@ ENV ENV production
 RUN apt-get update
 RUN apt-get install -y build-essential unzip nasm libtool make bash git autoconf wget zlib1g-dev python3
 
+# Copy artifact
+ADD *.zip /
+
 # Unzip zip file
 RUN unzip *.zip -d /temp
 RUN unzip /temp/*.zip -d /app
