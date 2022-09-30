@@ -107,8 +107,6 @@ jobs:
           context: .
           platforms: linux/amd64,linux/arm/v7,linux/arm64
           push: true
-          secrets: |
-            OPENEXCHANGE_APPID=${{ secrets.OPENEXCHANGE_APPID }}
           tags: |
             sogebot/release:latest
             sogebot/release:${{ steps.get_version.outputs.VERSION }}
