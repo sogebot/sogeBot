@@ -12,9 +12,7 @@ RUN apt-get install -y build-essential unzip nasm libtool make bash git autoconf
 ADD *.zip /
 
 # Unzip zip file
-RUN unzip *.zip -d /temp
-RUN unzip /temp/*.zip -d /app
-RUN rm -rf /temp
+RUN unzip *.zip -d /app
 
 # Change working directory
 WORKDIR /app
