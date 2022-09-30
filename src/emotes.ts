@@ -171,9 +171,9 @@ class Emotes extends Core {
               code: emote.name,
               type: 'twitch',
               urls: {
-                '1': emote.getImageUrl(1),
-                '2': emote.getImageUrl(2),
-                '3': emote.getImageUrl(4),
+                '1': emote.getImageUrl(1).replace('/static/', '/default/'), // enables animation
+                '2': emote.getImageUrl(2).replace('/static/', '/default/'), // enables animation
+                '3': emote.getImageUrl(4).replace('/static/', '/default/'), // enables animation
               },
             });
           }
@@ -219,9 +219,9 @@ class Emotes extends Core {
             code: emote.name,
             type: 'twitch',
             urls: {
-              '1': emote.getImageUrl(1),
-              '2': emote.getImageUrl(2),
-              '3': emote.getImageUrl(4),
+              '1': emote.getImageUrl(1).replace('/static/', '/default/'),
+              '2': emote.getImageUrl(2).replace('/static/', '/default/'),
+              '3': emote.getImageUrl(4).replace('/static/', '/default/'),
             },
           });
         }
