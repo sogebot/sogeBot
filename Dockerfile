@@ -5,6 +5,8 @@ ENV LAST_UPDATED 2022-02-09-1815
 ENV NODE_ENV production
 ENV ENV production
 
+ARG OPENEXCHANGE_APPID
+
 RUN apt-get update
 RUN apt-get install -y build-essential nasm libtool make bash git autoconf wget zlib1g-dev python3
 
@@ -18,7 +20,7 @@ WORKDIR /app
 RUN npm install -g npm@latest
 
 # Install dependencies
-RUN NODE_MODULES_DIR=./node_modules make
+RUN OPENEXCHANGE_APPID=${some_variable_name} NODE_MODULES_DIR=./node_modules make
 # Remove dev dependencies (not needed anymore)
 RUN npm prune --production
 # Get latest ui dependencies in time of build

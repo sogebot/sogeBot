@@ -75,7 +75,7 @@ jobs:
           context: .
           platforms: linux/amd64,linux/arm/v7,linux/arm64
           push: true
-          env: |
+          secrets: |
             OPENEXCHANGE_APPID=${{ secrets.OPENEXCHANGE_APPID }}
           tags: |
             sogebot/nightly:latest
