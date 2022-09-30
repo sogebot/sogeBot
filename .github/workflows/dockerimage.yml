@@ -44,11 +44,16 @@ jobs:
           path: ${{ github.workspace }}/*.zip
 
   build:
+    needs: artifact
     runs-on: ubuntu-latest
     steps:
       -
         name: Checkout
         uses: actions/checkout@v2
+      -
+        name: Get short SHA
+        id: slug
+        run: echo "::set-output name=sha8::$(echo ${GITHUB_SHA} | cut -c1-8)"
       -
         name: Set up QEMU
         uses: docker/setup-qemu-action@v1.2.0
@@ -68,6 +73,12 @@ jobs:
           registry: ghcr.io
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - uses: actions/download-artifact@master
+        with:
+          name: sogeBot-${{ steps.slug.outputs.sha8 }}
+          path: ${{ github.workspace }}/*.zip
+
       -
         name: Build and push
         uses: docker/build-push-action@v3
@@ -75,8 +86,6 @@ jobs:
           context: .
           platforms: linux/amd64,linux/arm/v7,linux/arm64
           push: true
-          secrets: |
-            OPENEXCHANGE_APPID=${{ secrets.OPENEXCHANGE_APPID }}
           tags: |
             sogebot/nightly:latest
             sogebot/nightly:${{ github.sha }}

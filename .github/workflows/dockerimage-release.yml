@@ -64,6 +64,7 @@ jobs:
           args: '*.zip'
 
   build:
+    needs: artifact
     runs-on: ubuntu-latest
     steps:
       -
@@ -93,6 +94,12 @@ jobs:
           registry: ghcr.io
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - uses: actions/download-artifact@master
+        with:
+          name: sogeBot
+          path: ${{ github.workspace }}/*.zip
+
       -
         name: Build and push
         uses: docker/build-push-action@v3

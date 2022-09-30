@@ -5,17 +5,13 @@ ENV LAST_UPDATED 2022-02-09-1815
 ENV NODE_ENV production
 ENV ENV production
 
-RUN --mount=type=secret,id=OPENEXCHANGE_APPID \
-  cat /run/secrets/OPENEXCHANGE_APPID
-ENV OPENEXCHANGE_APPID ${OPENEXCHANGE_APPID}
-
-RUN echo ${OPENEXCHANGE_APPID}
-
 RUN apt-get update
-RUN apt-get install -y build-essential nasm libtool make bash git autoconf wget zlib1g-dev python3
+RUN apt-get install -y build-essential unzip nasm libtool make bash git autoconf wget zlib1g-dev python3
 
-# Copy source code
-COPY . /app
+# Unzip zip file
+RUN unzip *.zip -d /temp
+RUN unzip /temp/*.zip -d /app
+RUN rm -rf /temp
 
 # Change working directory
 WORKDIR /app
@@ -24,7 +20,7 @@ WORKDIR /app
 RUN npm install -g npm@latest
 
 # Install dependencies
-RUN NODE_MODULES_DIR=./node_modules make
+RUN npm install
 # Remove dev dependencies (not needed anymore)
 RUN npm prune --production
 # Get latest ui dependencies in time of build
