@@ -1,6 +1,6 @@
 FROM node:16-bullseye-slim
 
-ENV LAST_UPDATED 2022-02-09-1815
+ENV LAST_UPDATED 2022-09-30-2037
 
 ENV NODE_ENV production
 ENV ENV production
