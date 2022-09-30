@@ -70,12 +70,12 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
       -
         name: Build and push
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v3
         with:
           context: .
           platforms: linux/amd64,linux/arm/v7,linux/arm64
           push: true
-          secrets: |
+          env: |
             OPENEXCHANGE_APPID=${{ secrets.OPENEXCHANGE_APPID }}
           tags: |
             sogebot/nightly:latest
