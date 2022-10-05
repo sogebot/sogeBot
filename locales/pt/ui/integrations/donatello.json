@@ -2,7 +2,7 @@
   "settings": {
     "token": {
       "title": "Token",
-      "help": "Get your token at https://donatello.to/panel/doc-api"
+      "help": "Obtenha seu token de acesso em https://donatello.to/panel/doc-api"
     }
   }
 }
