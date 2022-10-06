@@ -14,6 +14,8 @@
     "name": "Posluchač událostí",
     "type": {
       "twitchChatMessage": "Twitch zpráva chatu",
+      "twitchCheer": "Twitch cheer received",
+      "twitchClearChat": "Twitch chat cleared",
       "twitchCommand": "Příkaz na Twitch",
       "twitchFollow": "Nový Twitch sledující",
       "twitchSubscription": "Nový Twitch odběr",

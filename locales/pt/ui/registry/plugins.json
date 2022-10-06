@@ -14,6 +14,8 @@
     "name": "Ouvinte de evento",
     "type": {
       "twitchChatMessage": "Mensagem de chat Twitch",
+      "twitchCheer": "Twitch cheer received",
+      "twitchClearChat": "Twitch chat cleared",
       "twitchCommand": "Comando Twitch",
       "twitchFollow": "Novo seguidor Twitch",
       "twitchSubscription": "Nova assinatura Twitch",
