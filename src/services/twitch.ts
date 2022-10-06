@@ -386,6 +386,24 @@ class Twitch extends Service {
     }
   }
 
+  @command('!replay')
+  @default_permission(defaultPermissions.CASTERS)
+  async replay (opts: CommandOptions) {
+    const cid = await createClip({ createAfterDelay: false });
+    if (cid) {
+      require('~/overlays/clips').default.showClip(cid);
+      return [{
+        response: prepare('api.clips.created', { link: `https://clips.twitch.tv/${cid}` }),
+        ...opts,
+      }];
+    } else {
+      return [{
+        response: await translate(isStreamOnline.value ? 'clip.notCreated' : 'clip.offline'),
+        ...opts,
+      }];
+    }
+  }
+
   @command('!uptime')
   async uptimeCmd (opts: CommandOptions) {
     const time = getTime(streamStatusChangeSince.value, true) as any;
