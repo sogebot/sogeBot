@@ -12,6 +12,7 @@ import overlaysEmoteFirework from './nodes/overlaysEmoteFirework';
 import twitchBanUser from './nodes/twitchBanUser';
 import twitchSendMessage from './nodes/twitchSendMessage';
 import twitchTimeoutUser from './nodes/twitchTimeoutUser';
+import updateCounter from './nodes/updateCounter';
 import variableSaveToDatabase from './nodes/variableSaveToDatabase';
 import variableSetCustomVariable from './nodes/variableSetCustomVariable';
 import variableSetVariable from './nodes/variableSetVariable';
@@ -25,6 +26,7 @@ export const processes = {
   outputLog,
   gateCounter,
   clearCounter,
+  updateCounter,
   filterPermission,
   debounce,
   filter,
