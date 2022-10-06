@@ -62,14 +62,16 @@ const listeners = {
     botAmount:   'number',
     botCurrency: 'string',
   }),
+  twitchClearChat:        generateListener({}, false),
   twitchStreamStarted:    generateListener({}, false),
+  twitchStreamStopped:    generateListener({}, false),
   twitchGameChanged:      generateListener({}, false),
   botStarted:             generateListener({}, false),
-  twitchStreamStopped:    generateListener({}, false),
   twitchRaid:             generateListener({ hostViewers: 'number' }, true),
   twitchChatMessage:      generateListener({ message: 'string' }),
   twitchCommand:          generateListener({ message: 'string' }),
   twitchFollow:           generateListener(),
+  twitchCheer:            generateListener({ amount: 'number', message: 'string' }),
   twitchSubscription:     generateListener({ method: 'string', subCumulativeMonths: 'number', tier: 'tier' }),
   twitchSubgift:          generateListener({ recipient: 'string', tier: 'tier' }),
   twitchSubcommunitygift: generateListener({ count: 'number' }),
@@ -94,6 +96,20 @@ class Plugins extends Core {
       this.triggerCrons();
     }, SECOND);
 
+    eventEmitter.on('clearchat', async () => {
+      this.process('twitchClearChat');
+    });
+
+    eventEmitter.on('cheer', async (data) => {
+      const user = {
+        userName: data.userName,
+        userId:   data.userId,
+      };
+      this.process('twitchCheer', data.message, user, {
+        amount: data.bits,
+      });
+    });
+
     eventEmitter.on('tip', async (data) => {
       const users = (await import('./users')).default;
       const user = {
@@ -102,7 +118,7 @@ class Plugins extends Core {
       };
       this.process('tip', data.message, user, {
         isAnonymous: data.isAnonymous,
-        amount:      data.amount + 120,
+        amount:      data.amount,
         botAmount:   data.amountInBotCurrency,
         currency:    data.currency,
         botCurrency: data.currencyInBot,
@@ -416,6 +432,9 @@ class Plugins extends Core {
     return pluginsWithListener;
   }
 
+  async trigger(type: 'twitchCheer', message: string, userstate: { userName: string, userId: string }, data: {
+    amount: number,
+  }): Promise<void>;
   async trigger(type: 'tip', message: string, userstate: { userName: string, userId: string }, data: {
     currency: string, amount: number,
     botCurrency: string, botAmount: number,
@@ -430,11 +449,14 @@ class Plugins extends Core {
         break;
       }
       case 'twitchFollow':
+      case 'twitchCheer':
+      case 'twitchClearChat':
       case 'tip': {
         this.process(type, message, userstate, data);
         break;
       }
       default:
+        error(`Unknown plugin trigger ${type}`);
     }
   }
 }
