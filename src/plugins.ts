@@ -65,7 +65,7 @@ const listeners = {
   twitchClearChat:        generateListener({}, false),
   twitchStreamStarted:    generateListener({}, false),
   twitchStreamStopped:    generateListener({}, false),
-  twitchGameChanged:      generateListener({ oldGame: 'string', game: 'string' }, false),
+  twitchGameChanged:      generateListener({ oldCategory: 'string', category: 'string' }, false),
   botStarted:             generateListener({}, false),
   twitchRaid:             generateListener({ hostViewers: 'number' }, true),
   twitchChatMessage:      generateListener({ message: 'string' }),
@@ -126,7 +126,7 @@ class Plugins extends Core {
     });
 
     eventEmitter.on('game-changed', async (data) => {
-      this.process('twitchGameChanged', undefined, undefined, data);
+      this.process('twitchGameChanged', undefined, undefined, { category: data.game, oldCategory: data.oldGame });
     });
 
     eventEmitter.on('stream-started', async () => {
