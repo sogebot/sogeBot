@@ -7,6 +7,8 @@ import gateCounter from './nodes/gateCounter';
 import listener from './nodes/listener';
 import othersIdle from './nodes/othersIdle';
 import outputLog from './nodes/outputLog';
+import overlaysEmoteExplosion from './nodes/overlaysEmoteExplosion';
+import overlaysEmoteFirework from './nodes/overlaysEmoteFirework';
 import twitchBanUser from './nodes/twitchBanUser';
 import twitchSendMessage from './nodes/twitchSendMessage';
 import twitchTimeoutUser from './nodes/twitchTimeoutUser';
@@ -32,6 +34,8 @@ export const processes = {
   twitchTimeoutUser,
   twitchBanUser,
   twitchSendMessage,
+  overlaysEmoteFirework,
+  overlaysEmoteExplosion,
   default: (pluginId: string, currentNode: Node, parameters: Record<string, any>, variables: Record<string, any>, userstate: { userName: string; userId: string; } | null) => {
     warning(`PLUGINS: no idea what should I do with ${currentNode.name}, stopping`);
     return false;
