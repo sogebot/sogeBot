@@ -21,7 +21,7 @@ import { warning } from '~/helpers/log';
 
 export const processes = {
   listener,
-  cron:    listener, // no-op
+  cron: listener, // no-op
   othersIdle,
   outputLog,
   gateCounter,
@@ -38,6 +38,9 @@ export const processes = {
   twitchSendMessage,
   overlaysEmoteFirework,
   overlaysEmoteExplosion,
+  node: () => { // this is just helper node
+    return true;
+  },
   default: (pluginId: string, currentNode: Node, parameters: Record<string, any>, variables: Record<string, any>, userstate: { userName: string; userId: string; } | null) => {
     warning(`PLUGINS: no idea what should I do with ${currentNode.name}, stopping`);
     return false;
