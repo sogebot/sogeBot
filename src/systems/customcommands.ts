@@ -14,6 +14,7 @@ import { parser } from '../decorators';
 import Expects from '../expects';
 import System from './_interface';
 
+import * as cache from '~/helpers/cache/commands';
 import { checkFilter } from '~/helpers/checkFilter';
 import {
   getAllCountOfCommandUsage, getCountOfCommandUsage, incrementCountOfCommandUsage, resetCountOfCommandUsage,
@@ -39,15 +40,6 @@ import { translate } from '~/translate';
  * !command list                                                                       - get commands list
  * !command list ![cmd]                                                                - get responses of command
  */
-
-let cacheValid = false;
-const findCache: {
-  search: string;
-  commands: {
-    command: Commands;
-    cmdArray: string[];
-  }[]
-}[] = [];
 
 class CustomCommands extends System {
   constructor () {
@@ -102,17 +94,14 @@ class CustomCommands extends System {
     });
     app.delete('/api/systems/customcommands/groups/:name', adminMiddleware, async (req, res) => {
       await CommandsGroup.delete({ name: req.params.name });
-      this.invalidateCache();
       res.status(404).send();
     });
     app.delete('/api/systems/customcommands/:id', adminMiddleware, async (req, res) => {
       await Commands.delete({ id: req.params.id });
-      this.invalidateCache();
       res.status(404).send();
     });
     app.post('/api/systems/customcommands/group', adminMiddleware, async (req, res) => {
       try {
-        this.invalidateCache();
         const itemToSave = new CommandsGroup();
         merge(itemToSave, req.body);
         await validateOrReject(itemToSave);
@@ -124,7 +113,6 @@ class CustomCommands extends System {
     });
     app.post('/api/systems/customcommands', adminMiddleware, async (req, res) => {
       try {
-        this.invalidateCache();
         const itemToSave = new Commands();
 
         const { count, ...data } = req.body;
@@ -209,7 +197,6 @@ class CustomCommands extends System {
       }
 
       await responseDb.save();
-      this.invalidateCache();
       return [{ response: prepare('customcmds.command-was-edited', { command: cmd, response }), ...opts }];
     } catch (e: any) {
       return [{ response: prepare('customcmds.commands-parse-failed', { command: this.getCommand('!command') }), ...opts }];
@@ -263,15 +250,10 @@ class CustomCommands extends System {
       newResponse.filter =         '';
       newResponse.command = cDb;
       await newResponse.save();
-      this.invalidateCache();
       return [{ response: prepare('customcmds.command-was-added', { command: cmd }), ...opts }];
     } catch (e: any) {
       return [{ response: prepare('customcmds.commands-parse-failed', { command: this.getCommand('!command') }), ...opts }];
     }
-  }
-
-  invalidateCache() {
-    cacheValid = false;
   }
 
   async find(search: string) {
@@ -279,15 +261,12 @@ class CustomCommands extends System {
       command: Commands;
       cmdArray: string[];
     }[] = [];
-    if (!cacheValid) {
-      // we need to purge findCache and make cacheValid again
-      while(findCache.length > 0) {
-        findCache.shift();
-      }
-      cacheValid = true;
+    // we need to purge findCache and make cacheValid again
+    while(cache.findCache.length > 0) {
+      cache.findCache.shift();
     }
 
-    const fromCache = findCache.find(o => o.search === search);
+    const fromCache = cache.findCache.find(o => o.search === search);
     if (fromCache) {
       return fromCache.commands;
     } else {
@@ -306,7 +285,7 @@ class CustomCommands extends System {
         }
         cmdArray.pop(); // remove last array item if not found
       }
-      findCache.push({ search, commands });
+      cache.findCache.push({ search, commands });
       return commands;
     }
   }
@@ -438,7 +417,6 @@ class CustomCommands extends System {
       }
       cmd.enabled = !cmd.enabled;
       await cmd.save();
-      this.invalidateCache();
       return [{ response: prepare(cmd.enabled ? 'customcmds.command-was-enabled' : 'customcmds.command-was-disabled', { command: cmd.command }), ...opts }];
     } catch (e: any) {
       const response = prepare('customcmds.commands-parse-failed', { command: this.getCommand('!command') });
@@ -464,7 +442,6 @@ class CustomCommands extends System {
       await cmd.save();
 
       const response = prepare(cmd.visible ? 'customcmds.command-was-exposed' : 'customcmds.command-was-concealed', { command: cmd.command });
-      this.invalidateCache();
       return [{ response, ...opts }];
 
     } catch (e: any) {
@@ -514,7 +491,6 @@ class CustomCommands extends System {
         } else {
           await Commands.remove(command_db);
         }
-        this.invalidateCache();
         return [{ response, ...opts }];
       }
     } catch (e: any) {

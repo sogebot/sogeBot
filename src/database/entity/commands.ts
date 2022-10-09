@@ -1,11 +1,20 @@
 import { IsNotEmpty, MinLength } from 'class-validator';
-import { ManyToOne, OneToMany } from 'typeorm';
+import { AfterInsert, AfterRemove, AfterUpdate, ManyToOne, OneToMany } from 'typeorm';
 import { BaseEntity, Column, Entity, Index, PrimaryColumn } from 'typeorm';
 
 import { IsCommand } from '../validators/IsCommand';
 
+import * as cache from '~/helpers/cache/commands';
+
 @Entity()
 export class Commands extends BaseEntity {
+  @AfterInsert()
+  @AfterUpdate()
+  @AfterRemove()
+  invalidateCache() {
+    cache.invalidate();
+  }
+
   @PrimaryColumn({ generated: 'uuid', type: 'uuid' })
     id: string;
 
@@ -31,6 +40,13 @@ export class Commands extends BaseEntity {
 
 @Entity()
 export class CommandsResponses extends BaseEntity {
+  @AfterInsert()
+  @AfterUpdate()
+  @AfterRemove()
+  invalidateCache() {
+    cache.invalidate();
+  }
+
   @PrimaryColumn({ generated: 'uuid', type: 'uuid' })
     id: string;
 
@@ -55,6 +71,13 @@ export class CommandsResponses extends BaseEntity {
 
 @Entity()
 export class CommandsGroup extends BaseEntity {
+  @AfterInsert()
+  @AfterUpdate()
+  @AfterRemove()
+  invalidateCache() {
+    cache.invalidate();
+  }
+
   @PrimaryColumn()
   @Index('IDX_commands_group_unique_name', { unique: true })
     name: string;
