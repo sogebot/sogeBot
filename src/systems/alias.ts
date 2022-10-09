@@ -262,7 +262,6 @@ class Alias extends System {
   @command('!alias group')
   @default_permission(defaultPermissions.CASTERS)
   async group (opts: CommandOptions): Promise<CommandResponse[]> {
-    cache.invalidate();
     try {
       if (opts.parameters.includes('-set')) {
         const [alias, group] = new Expects(opts.parameters)
@@ -346,7 +345,6 @@ class Alias extends System {
   @command('!alias edit')
   @default_permission(defaultPermissions.CASTERS)
   async edit (opts: CommandOptions) {
-    cache.invalidate();
     try {
       const [perm, alias, cmd] = new Expects(opts.parameters)
         .permission({ optional: true, default: defaultPermissions.VIEWERS })
@@ -386,7 +384,6 @@ class Alias extends System {
   @command('!alias add')
   @default_permission(defaultPermissions.CASTERS)
   async add (opts: CommandOptions) {
-    cache.invalidate();
     try {
       const [perm, alias, cmd] = new Expects(opts.parameters)
         .permission({ optional: true, default: defaultPermissions.VIEWERS })
@@ -425,7 +422,6 @@ class Alias extends System {
   @command('!alias list')
   @default_permission(defaultPermissions.CASTERS)
   async list (opts: CommandOptions) {
-    cache.invalidate();
     const alias = await getRepository(AliasEntity).find({ visible: true, enabled: true });
     const response
       = (alias.length === 0
@@ -438,7 +434,6 @@ class Alias extends System {
   @command('!alias toggle')
   @default_permission(defaultPermissions.CASTERS)
   async toggle (opts: CommandOptions) {
-    cache.invalidate();
     try {
       const [alias] = new Expects(opts.parameters)
         .everything()
@@ -465,7 +460,6 @@ class Alias extends System {
   @command('!alias toggle-visibility')
   @default_permission(defaultPermissions.CASTERS)
   async toggleVisibility (opts: CommandOptions) {
-    cache.invalidate();
     try {
       const [alias] = new Expects(opts.parameters)
         .everything()
@@ -492,7 +486,6 @@ class Alias extends System {
   @command('!alias remove')
   @default_permission(defaultPermissions.CASTERS)
   async remove (opts: CommandOptions) {
-    cache.invalidate();
     try {
       const [alias] = new Expects(opts.parameters)
         .everything()

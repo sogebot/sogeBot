@@ -1,11 +1,19 @@
 import { IsNotEmpty, MinLength } from 'class-validator';
-import { BaseEntity, Column, Entity, Index, PrimaryColumn } from 'typeorm';
+import { AfterInsert, AfterUpdate, AfterRemove, BaseEntity, Column, Entity, Index, PrimaryColumn } from 'typeorm';
 
 import { IsCommand } from '../validators/IsCommand';
 import { IsCommandOrCustomVariable } from '../validators/IsCommandOrCustomVariable';
 
+import * as cache from '~/helpers/cache/alias';
+
 @Entity()
 export class Alias extends BaseEntity {
+  @AfterInsert()
+  @AfterUpdate()
+  @AfterRemove()
+  invalidateCache() {
+    cache.invalidate();
+  }
 
   @PrimaryColumn({ generated: 'uuid' })
     id: string;
@@ -38,6 +46,13 @@ export class Alias extends BaseEntity {
 
 @Entity()
 export class AliasGroup extends BaseEntity {
+  @AfterInsert()
+  @AfterUpdate()
+  @AfterRemove()
+  invalidateCache() {
+    cache.invalidate();
+  }
+
   @PrimaryColumn()
   @Index('IDX_alias_group_unique_name', { unique: true })
     name: string;
