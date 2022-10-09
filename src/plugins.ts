@@ -9,7 +9,7 @@ import { Plugin, PluginVariable } from './database/entity/plugins';
 import { isValidationError } from './helpers/errors';
 import { eventEmitter } from './helpers/events';
 import { error } from './helpers/log';
-import { adminEndpoint } from './helpers/socket';
+import { adminEndpoint, publicEndpoint } from './helpers/socket';
 import { processes, processNode } from './plugins/index';
 
 import Core from '~/_interface';
@@ -250,10 +250,39 @@ class Plugins extends Core {
   }
 
   sockets() {
+    publicEndpoint('/core/plugins', 'plugins::getSandbox', async ({ pluginId, nodeId }, cb) => {
+      const plugin = plugins.find(o => o.id === pluginId);
+      const sandbox: Record<string, any> = {
+        variables: {},
+        settings:  {},
+      };
+      if (plugin) {
+        try {
+          const workflow = JSON.parse(plugin.workflow).drawflow.Home.data;
+
+          for (const setting of (plugin.settings || [])) {
+            sandbox.settings[setting.name] = setting.currentValue;
+          }
+
+          for (const node of Object.values<any>(workflow)) {
+            if (node.name === 'variableLoadFromDatabase') {
+              const variableName = node.data.value;
+              const defaultValue = (JSON.parse(node.data.data) as any).value;
+
+              const variable = await PluginVariable.findOne({ variableName, pluginId });
+              sandbox.variables[variableName] = variable ? JSON.parse(variable.value) : defaultValue;
+            }
+          }
+        } catch(e) {
+          error(e);
+        }
+      }
+      cb(sandbox);
+    });
     adminEndpoint('/core/plugins', 'generic::getAll', async (cb) => {
       cb(null, plugins);
     });
-    adminEndpoint('/core/plugins', 'generic::getOne', async (id, cb) => {
+    publicEndpoint('/core/plugins', 'generic::getOne', async (id, cb) => {
       cb(null, plugins.find(o => o.id === id));
     });
     adminEndpoint('/core/plugins', 'generic::deleteById', async (id, cb) => {
