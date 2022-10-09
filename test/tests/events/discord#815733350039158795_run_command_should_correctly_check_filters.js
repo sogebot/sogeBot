@@ -76,8 +76,6 @@ describe('Events - event run command should correctly parse filters and be able 
     response3.permission =     defaultPermissions.VIEWERS;
     response3.command = command;
     await response3.save();
-
-    customcommands.invalidateCache();
   });
 
   it('set bot as subscriber', async () => {

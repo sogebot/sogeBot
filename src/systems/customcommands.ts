@@ -1,5 +1,5 @@
 import {
-  Commands, CommandsGroup, CommandsResponses,
+  Commands, CommandsGroup, CommandsResponses, commands, groups,
 } from '@entity/commands';
 import * as constants from '@sogebot/ui-helpers/constants';
 import { validateOrReject } from 'class-validator';
@@ -14,7 +14,6 @@ import { parser } from '../decorators';
 import Expects from '../expects';
 import System from './_interface';
 
-import * as cache from '~/helpers/cache/commands';
 import { checkFilter } from '~/helpers/checkFilter';
 import {
   getAllCountOfCommandUsage, getCountOfCommandUsage, incrementCountOfCommandUsage, resetCountOfCommandUsage,
@@ -57,16 +56,13 @@ class CustomCommands extends System {
 
     app.get('/api/systems/customcommands', adminMiddleware, async (req, res) => {
       res.send({
-        data:  await Commands.find({ relations: ['responses'] }),
+        data:  commands,
         count: await getAllCountOfCommandUsage(),
       });
     });
     app.get('/api/systems/customcommands/groups/', adminMiddleware, async (req, res) => {
-      let [ groupsList, items ] = await Promise.all([
-        CommandsGroup.find(), Commands.find(),
-      ]);
-
-      for (const item of items) {
+      let groupsList = [...groups];
+      for (const item of commands) {
         if (item.group && !groupsList.find(o => o.name === item.group)) {
           // we dont have any group options -> create temporary group
           const group = new CommandsGroup();
@@ -86,7 +82,7 @@ class CustomCommands extends System {
       });
     });
     app.get('/api/systems/customcommands/:id', adminMiddleware, async (req, res) => {
-      const cmd = await Commands.findOne({ where: { id: req.params.id }, relations: ['responses'] });
+      const cmd = commands.find(o => o.id === req.params.id);
       res.send({
         data:  cmd,
         count: cmd ? await getCountOfCommandUsage(cmd.command) : 0,
@@ -172,10 +168,7 @@ class CustomCommands extends System {
         throw Error('Command should start with !');
       }
 
-      const cDb = await Commands.findOne({
-        relations: ['responses'],
-        where:     { command: cmd },
-      });
+      const cDb = commands.find(o => o.command === cmd);
       if (!cDb) {
         return [{ response: prepare('customcmds.command-was-not-found', { command: cmd }), ...opts }];
       }
@@ -224,10 +217,7 @@ class CustomCommands extends System {
         throw Error('Command should start with !');
       }
 
-      const cDb = await Commands.findOne({
-        relations: ['responses'],
-        where:     { command: cmd },
-      });
+      const cDb = commands.find(o => o.command === cmd);
       if (!cDb) {
         const newCommand = new Commands();
         newCommand.command = cmd;
@@ -257,37 +247,22 @@ class CustomCommands extends System {
   }
 
   async find(search: string) {
-    const commands: {
+    const commandsSearchProgress: {
       command: Commands;
       cmdArray: string[];
     }[] = [];
-    // we need to purge findCache and make cacheValid again
-    while(cache.findCache.length > 0) {
-      cache.findCache.shift();
-    }
-
-    const fromCache = cache.findCache.find(o => o.search === search);
-    if (fromCache) {
-      return fromCache.commands;
-    } else {
-      const cmdArray = search.toLowerCase().split(' ');
-      for (let i = 0, len = search.toLowerCase().split(' ').length; i < len; i++) {
-        const db_commands: Commands[]
-          = await Commands.find({
-            relations: ['responses'],
-            where:     { command: cmdArray.join(' ') },
-          });
-        for (const cmd of db_commands) {
-          commands.push({
-            cmdArray: _.cloneDeep(cmdArray),
-            command:  cmd,
-          });
-        }
-        cmdArray.pop(); // remove last array item if not found
+    const cmdArray = search.toLowerCase().split(' ');
+    for (let i = 0, len = search.toLowerCase().split(' ').length; i < len; i++) {
+      const db_commands = commands.filter(o => o.command === cmdArray.join(' '));
+      for (const cmd of db_commands) {
+        commandsSearchProgress.push({
+          cmdArray: _.cloneDeep(cmdArray),
+          command:  cmd,
+        });
       }
-      cache.findCache.push({ search, commands });
-      return commands;
+      cmdArray.pop(); // remove last array item if not found
     }
+    return commandsSearchProgress;
   }
 
   @timer()
@@ -297,14 +272,14 @@ class CustomCommands extends System {
       return true;
     } // do nothing if it is not a command
 
-    const commands = await this.find(opts.message);
-    if (commands.length === 0) {
+    const _commands = await this.find(opts.message);
+    if (_commands.length === 0) {
       return true;
     } // no command was found - return
 
     // go through all commands
     let atLeastOnePermissionOk = false;
-    for (const cmd of commands) {
+    for (const cmd of _commands) {
       if (!cmd.command.enabled) {
         atLeastOnePermissionOk = true; // continue if command is disabled
         warning(`Custom command ${cmd.command.command} (${cmd.command.id}) is disabled!`);
@@ -319,7 +294,7 @@ class CustomCommands extends System {
       let group: Readonly<Required<CommandsGroup>> | undefined;
       let groupPermission: null | string = null;
       if (cmd.command.group) {
-        group = await getRepository(CommandsGroup).findOne({ name: cmd.command.group });
+        group = groups.find(o => o.name === cmd.command.group);
         if (group) {
           if (group.options.filter && !(await checkFilter(opts, group.options.filter))) {
             warning(`Custom command ${cmd.command.command}#${cmd.command.id} didn't pass group filter.`);
@@ -377,16 +352,12 @@ class CustomCommands extends System {
 
     if (!cmd) {
       // print commands
-      const commands = await Commands.find({ where: { visible: true, enabled: true } });
-      const response = (commands.length === 0 ? translate('customcmds.list-is-empty') : translate('customcmds.list-is-not-empty').replace(/\$list/g, _.orderBy(commands, 'command').map(o => o.command).join(', ')));
+      const _commands = commands.filter(o => o.visible && o.enabled);
+      const response = (_commands.length === 0 ? translate('customcmds.list-is-empty') : translate('customcmds.list-is-not-empty').replace(/\$list/g, _.orderBy(_commands, 'command').map(o => o.command).join(', ')));
       return [{ response, ...opts }];
     } else {
       // print responses
-      const command_with_responses
-        = await Commands.findOne({
-          relations: ['responses'],
-          where:     { command: cmd },
-        });
+      const command_with_responses = commands.find(o => o.command === cmd);
 
       if (!command_with_responses || command_with_responses.responses.length === 0) {
         return [{ response: prepare('customcmds.list-of-responses-is-empty', { command: cmd }), ...opts }];
@@ -410,7 +381,7 @@ class CustomCommands extends System {
         .string({ optional: true })
         .toArray();
 
-      const cmd = await Commands.findOne({ where: { command: (cmdInput + ' ' + subcommand).trim() } });
+      const cmd = commands.find(o => o.command === (cmdInput + ' ' + subcommand).trim());
       if (!cmd) {
         const response = prepare('customcmds.command-was-not-found', { command: (cmdInput + ' ' + subcommand).trim() });
         return [{ response, ...opts }];
@@ -433,7 +404,7 @@ class CustomCommands extends System {
         .string({ optional: true })
         .toArray();
 
-      const cmd = await Commands.findOne({ where: { command: (cmdInput + ' ' + subcommand).trim() } });
+      const cmd = commands.find(o => o.command = (cmdInput + ' ' + subcommand).trim());
       if (!cmd) {
         const response = prepare('customcmds.command-was-not-found', { command: (cmdInput + ' ' + subcommand).trim() });
         return [{ response, ...opts }];
@@ -467,10 +438,7 @@ class CustomCommands extends System {
         throw Error('Command should start with !');
       }
 
-      const command_db = await Commands.findOne({
-        where:     { command: cmd },
-        relations: [ 'responses' ],
-      });
+      const command_db = commands.find(o => o.command === cmd);
       if (!command_db) {
         return [{ response: prepare('customcmds.command-was-not-found', { command: cmd }), ...opts }];
       } else {

@@ -1,20 +1,89 @@
 import { IsNotEmpty, MinLength } from 'class-validator';
-import { AfterInsert, AfterRemove, AfterUpdate, ManyToOne, OneToMany } from 'typeorm';
+import { EntitySubscriberInterface, EventSubscriber, ManyToOne, OneToMany } from 'typeorm';
 import { BaseEntity, Column, Entity, Index, PrimaryColumn } from 'typeorm';
 
 import { IsCommand } from '../validators/IsCommand';
 
-import * as cache from '~/helpers/cache/commands';
+export const commands: Commands[] = [];
+export const groups: CommandsGroup[] = [];
+export const populateCache = () => {
+  return Promise.all([
+    new Promise((resolve) => {
+      Commands.find({ relations: ['responses'] })
+        .then(items => {
+          while (commands.length > 0) {
+            commands.shift();
+          }
+          for (const o of items) {
+            commands.push(o);
+          }
+          resolve(true);
+        });
+    }),
+    new Promise((resolve) => {
+      CommandsGroup.find()
+        .then(items => {
+          while (groups.length > 0) {
+            groups.shift();
+          }
+          for (const o of items) {
+            groups.push(o);
+          }
+          resolve(true);
+        });
+    }),
+  ]);
+};
+@EventSubscriber()
+export class CommandsSubscriber implements EntitySubscriberInterface<Commands> {
+  listenTo() {
+    return Commands;
+  }
+  afterInsert(): void | Promise<any> {
+    return populateCache();
+  }
+  afterUpdate(): void | Promise<any> {
+    return populateCache();
+  }
+  afterRemove(): void | Promise<any> {
+    return populateCache();
+  }
+}
+
+@EventSubscriber()
+export class CommandsGroupSubscriber implements EntitySubscriberInterface<CommandsGroup> {
+  listenTo() {
+    return CommandsGroup;
+  }
+  afterInsert(): void | Promise<any> {
+    return populateCache();
+  }
+  afterUpdate(): void | Promise<any> {
+    return populateCache();
+  }
+  afterRemove(): void | Promise<any> {
+    return populateCache();
+  }
+}
+
+@EventSubscriber()
+export class CommandsResponsesSubscriber implements EntitySubscriberInterface<CommandsResponses> {
+  listenTo() {
+    return CommandsResponses;
+  }
+  afterInsert(): void | Promise<any> {
+    return populateCache();
+  }
+  afterUpdate(): void | Promise<any> {
+    return populateCache();
+  }
+  afterRemove(): void | Promise<any> {
+    return populateCache();
+  }
+}
 
 @Entity()
 export class Commands extends BaseEntity {
-  @AfterInsert()
-  @AfterUpdate()
-  @AfterRemove()
-  invalidateCache() {
-    cache.invalidate();
-  }
-
   @PrimaryColumn({ generated: 'uuid', type: 'uuid' })
     id: string;
 
@@ -40,13 +109,6 @@ export class Commands extends BaseEntity {
 
 @Entity()
 export class CommandsResponses extends BaseEntity {
-  @AfterInsert()
-  @AfterUpdate()
-  @AfterRemove()
-  invalidateCache() {
-    cache.invalidate();
-  }
-
   @PrimaryColumn({ generated: 'uuid', type: 'uuid' })
     id: string;
 
@@ -71,13 +133,6 @@ export class CommandsResponses extends BaseEntity {
 
 @Entity()
 export class CommandsGroup extends BaseEntity {
-  @AfterInsert()
-  @AfterUpdate()
-  @AfterRemove()
-  invalidateCache() {
-    cache.invalidate();
-  }
-
   @PrimaryColumn()
   @Index('IDX_commands_group_unique_name', { unique: true })
     name: string;

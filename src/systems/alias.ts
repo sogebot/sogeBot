@@ -1,6 +1,4 @@
-'use strict';
-
-import { Alias as AliasEntity, AliasGroup } from '@entity/alias';
+import { Alias as AliasEntity, AliasGroup, populateCache, aliases, groups } from '@entity/alias';
 import * as constants from '@sogebot/ui-helpers/constants';
 import { validateOrReject } from 'class-validator';
 import * as _ from 'lodash';
@@ -16,7 +14,7 @@ import { isValidationError } from '../helpers/errors';
 import Parser from '../parser';
 import System from './_interface';
 
-import * as cache from '~/helpers/cache/alias';
+import { onStartup } from '~/decorators/on';
 import { checkFilter } from '~/helpers/checkFilter';
 import { incrementCountOfCommandUsage } from '~/helpers/commands/count';
 import { prepare } from '~/helpers/commons';
@@ -57,10 +55,18 @@ class Alias extends System {
     });
   }
 
+  @onStartup()
+  populateCacheOnStartup() {
+    populateCache();
+  }
+
   sockets() {
     adminEndpoint('/systems/alias', 'generic::groups::deleteById', async (name, cb) => {
       try {
-        const group = await AliasGroup.findOneOrFail({ name });
+        const group = groups.find(o => o.name === name);
+        if (!group) {
+          throw new Error(`Group ${name} not found`);
+        }
         await group.remove();
         cb(null);
       } catch (e) {
@@ -80,12 +86,9 @@ class Alias extends System {
       }
     });
     adminEndpoint('/systems/alias', 'generic::groups::getAll', async (cb) => {
-      let [ aliasGroup, aliasEntity ] = await Promise.all([
-        AliasGroup.find(), AliasEntity.find(),
-      ]);
-
-      for (const item of aliasEntity) {
-        if (item.group && !aliasGroup.find(o => o.name === item.group)) {
+      let aliasGroup = [...groups];
+      for (const item of aliases) {
+        if (item.group && !groups.find(o => o.name === item.group)) {
           // we dont have any group options -> create temporary group
           const group = new AliasGroup();
           group.name = item.group;
@@ -102,14 +105,17 @@ class Alias extends System {
       cb(null, aliasGroup);
     });
     adminEndpoint('/systems/alias', 'generic::getAll', async (cb) => {
-      cb(null, await AliasEntity.find());
+      cb(null, aliases);
     });
     adminEndpoint('/systems/alias', 'generic::getOne', async (id, cb) => {
-      cb(null, await AliasEntity.findOne({ id }));
+      cb(null, aliases.find(o => o.id === id));
     });
     adminEndpoint('/systems/alias', 'generic::deleteById', async (id, cb) => {
       try {
-        const alias = await AliasEntity.findOneOrFail({ id });
+        const alias = aliases.find(o => o.id === id);
+        if (!alias) {
+          throw new Error(`Alias ${id} not found`);
+        }
         await alias.remove();
         cb(null);
       } catch (e) {
@@ -136,7 +142,6 @@ class Alias extends System {
 
   async search(opts: ParserOptions): Promise<[Readonly<Required<AliasEntity>> | null, string[]]> {
     let alias: Readonly<Required<AliasEntity>> | undefined;
-    let fromCache: Readonly<Required<AliasEntity>> | undefined;
     const cmdArray = opts.message.toLowerCase().split(' ');
 
     // is it an command?
@@ -146,14 +151,8 @@ class Alias extends System {
 
     const length = opts.message.toLowerCase().split(' ').length;
     for (let i = 0; i < length; i++) {
-      fromCache = cache.findCache.find(o => o.search === cmdArray.join(' '))?.alias;
-      if (fromCache) {
-        return [fromCache, cmdArray];
-      }
-
-      alias = await getRepository(AliasEntity).findOne({ alias: cmdArray.join(' '), enabled: true });
+      alias = aliases.find(o => o.alias === cmdArray.join(' ') && o.enabled);
       if (alias) {
-        cache.findCache.push({ search: cmdArray.join(' '), alias });
         return [alias, cmdArray];
       }
       cmdArray.pop(); // remove last array item if not found
@@ -197,7 +196,7 @@ class Alias extends System {
         let permission = alias.permission;
         // load alias group if any
         if (alias.group) {
-          const group = await getRepository(AliasGroup).findOne({ name: alias.group });
+          const group = groups.find(o => o.name === alias.group);
           if (group) {
             if (group.options.filter && !(await checkFilter(opts, group.options.filter))) {
               warning(`Alias ${alias.alias}#${alias.id} didn't pass group filter.`);
@@ -272,7 +271,7 @@ class Alias extends System {
             name: 'set', type: String, multi: true, delimiter: '',
           }) // set as multi as group can contain spaces
           .toArray();
-        const item = await getRepository(AliasEntity).findOne({ alias });
+        const item = aliases.find(o => o.alias === alias);
         if (!item) {
           const response = prepare('alias.alias-was-not-found', { alias });
           return [{ response, ...opts }];
@@ -286,7 +285,7 @@ class Alias extends System {
             name: 'unset', type: String, multi: true, delimiter: '',
           }) // set as multi as alias can contain spaces
           .toArray();
-        const item = await getRepository(AliasEntity).findOne({ alias });
+        const item = aliases.find(o => o.alias === alias);
         if (!item) {
           const response = prepare('alias.alias-was-not-found', { alias });
           return [{ response, ...opts }];
@@ -301,17 +300,12 @@ class Alias extends System {
           }) // set as multi as group can contain spaces
           .toArray();
         if (group) {
-          const aliases = await getRepository(AliasEntity).find({
-            where: {
-              visible: true, enabled: true, group,
-            },
-          });
-          const response = prepare('alias.alias-group-list-aliases', { group, list: aliases.length > 0 ? aliases.map(o => o.alias).sort().join(', ') : `<${translate('core.empty')}>` });
+          const items = aliases.filter(o => o.visible && o.enabled && o.group === group);
+          const response = prepare('alias.alias-group-list-aliases', { group, list: items.length > 0 ? items.map(o => o.alias).sort().join(', ') : `<${translate('core.empty')}>` });
           return [{ response, ...opts }];
         } else {
-          const aliases = await getRepository(AliasEntity).find();
-          const groups = [...new Set(aliases.map(o => o.group).filter(o => !!o).sort())];
-          const response = prepare('alias.alias-group-list', { list: groups.length > 0 ? groups.join(', ') : `<${translate('core.empty')}>` });
+          const _groups = [...new Set(aliases.map(o => o.group).filter(o => !!o).sort())];
+          const response = prepare('alias.alias-group-list', { list: _groups.length > 0 ? _groups.join(', ') : `<${translate('core.empty')}>` });
           return [{ response, ...opts }];
         }
       } else if (opts.parameters.includes('-enable')) {
@@ -365,7 +359,7 @@ class Alias extends System {
         throw Error('Permission ' + perm + ' not found.');
       }
 
-      const item = await getRepository(AliasEntity).findOne({ alias });
+      const item = aliases.find(o => o.alias === alias);
       if (!item) {
         const response = prepare('alias.alias-was-not-found', { alias });
         return [{ response, ...opts }];
@@ -422,7 +416,7 @@ class Alias extends System {
   @command('!alias list')
   @default_permission(defaultPermissions.CASTERS)
   async list (opts: CommandOptions) {
-    const alias = await getRepository(AliasEntity).find({ visible: true, enabled: true });
+    const alias = aliases.filter(o => o.visible && o.enabled);
     const response
       = (alias.length === 0
         ? translate('alias.list-is-empty')
@@ -443,7 +437,7 @@ class Alias extends System {
         throw Error('Not starting with !');
       }
 
-      const item = await getRepository(AliasEntity).findOne({ alias });
+      const item = aliases.find(o => o.alias === alias);
       if (!item) {
         const response = prepare('alias.alias-was-not-found', { alias });
         return [{ response, ...opts }];
@@ -469,7 +463,7 @@ class Alias extends System {
         throw Error('Not starting with !');
       }
 
-      const item = await getRepository(AliasEntity).findOne({ alias });
+      const item = aliases.find(o => o.alias === alias);
       if (!item) {
         const response = prepare('alias.alias-was-not-found', { alias });
         return [{ response, ...opts }];
@@ -495,7 +489,7 @@ class Alias extends System {
         throw Error('Not starting with !');
       }
 
-      const item = await getRepository(AliasEntity).findOne({ alias });
+      const item = aliases.find(o => o.alias === alias);
       if (!item) {
         const response = prepare('alias.alias-was-not-found', { alias });
         return [{ response, ...opts }];

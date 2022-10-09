@@ -8,9 +8,9 @@ const waitMs = require('./time').waitMs;
 
 const { getManager, getRepository } = require('typeorm');
 
-const { Alias, AliasGroup } = require('../../dest/database/entity/alias');
+const { Alias, AliasGroup, populateCache: populateCacheAlias } = require('../../dest/database/entity/alias');
 const { Bets, BetsParticipations } = require('../../dest/database/entity/bets');
-const { Commands, CommandsCount, CommandsResponses, CommandsGroup } = require('../../dest/database/entity/commands');
+const { Commands, CommandsCount, CommandsResponses, CommandsGroup, populateCache: populateCacheCommands } = require('../../dest/database/entity/commands');
 const { Cooldown } = require('../../dest/database/entity/cooldown');
 const { DiscordLink } = require('../../dest/database/entity/discord');
 const { Duel } = require('../../dest/database/entity/duel');
@@ -96,6 +96,10 @@ module.exports = {
       await permissions.ensurePreservedPermissionsInDb(); // re-do core permissions
 
       invalidateParserCache();
+
+      // invalidate caches
+      await populateCacheAlias();
+      await populateCacheCommands();
 
       // set owner as broadcaster
       emitter.emit('set', '/services/twitch', 'broadcasterUsername', '__broadcaster__');

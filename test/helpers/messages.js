@@ -59,9 +59,9 @@ module.exports = {
     }
 
     try {
-      sinon.spy(log, 'debug'); // spy because we want to have debug messages printed
+      sinon.stub(log, 'debug');
     } catch (e) {
-      log.chatOut.reset();
+      log.debug.reset();
     }
   },
   debug: async function (category, expected, waitMs = 5000) {
@@ -78,8 +78,8 @@ module.exports = {
         }
       }
       return setError(
-        '\n+\t"' + expected + '"'
-        + '\n-\t\t"' + log.debug.args.join('\n\t\t\t') + '"',
+        '\n+\t' + expected
+        + log.debug.args.filter(o => o.includes(category)).join('\n-\t'),
       );
     }, waitMs);
   },
