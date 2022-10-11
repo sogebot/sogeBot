@@ -1,7 +1,6 @@
 import { Poll, PollVote } from '@entity/poll';
 import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized';
-import _ from 'lodash';
-import { getRepository } from 'typeorm';
+import _, { merge } from 'lodash';
 
 import { parserReply } from '../commons';
 import {
@@ -21,8 +20,10 @@ import { mainCurrency } from '~/helpers/currency';
 import exchange from '~/helpers/currency/exchange';
 import { warning } from '~/helpers/log.js';
 import { defaultPermissions } from '~/helpers/permissions/index';
-import { adminEndpoint } from '~/helpers/socket';
 import { translate } from '~/translate';
+import { app } from '~/helpers/panel';
+import { adminMiddleware } from '~/socket';
+import { validateOrReject } from 'class-validator';
 
 enum ERROR {
   NOT_ENOUGH_OPTIONS,
@@ -70,41 +71,17 @@ class Polls extends System {
   }
 
   public async sockets() {
-    adminEndpoint('/systems/polls', 'generic::deleteById', async (id, cb) => {
-      await getRepository(Poll).delete({ id: String(id) });
-      cb(null);
+    if (!app) {
+      setTimeout(() => this.sockets(), 100);
+      return;
+    }
+
+    app.get('/api/systems/polls', adminMiddleware, async (req, res) => {
+      res.send({
+        data: await Poll.find({ relations: ['votes'] }),
+      });
     });
-    adminEndpoint('/systems/polls', 'generic::getAll', async (cb) => {
-      try {
-        cb(null, await getRepository(Poll).find({
-          relations: ['votes'],
-          order:     { openedAt: 'DESC' },
-        }));
-      } catch(e: any) {
-        cb(e.stack, []);
-      }
-    });
-    adminEndpoint('/systems/polls', 'polls::save', async (vote, cb) => {
-      try {
-        const parameters = `-${vote.type} -title "${vote.title}" ${vote.options.filter((o) => o.trim().length > 0).join(' | ')}`;
-        const response = await this.open({
-          command:            this.getCommand('!poll open'),
-          parameters,
-          createdAt:          0,
-          sender:             getOwnerAsSender(),
-          attr:               { skip: false, quiet: false },
-          isAction:           false,
-          isFirstTimeMessage: false,
-          emotesOffsets:      new Map(),
-          discord:            undefined,
-        });
-        this.sendResponse(response);
-        cb(null);
-      } catch (e: any) {
-        cb(e.stack);
-      }
-    });
-    adminEndpoint('/systems/polls', 'polls::close', async (vote, cb) => {
+    app.delete('/api/systems/polls/', adminMiddleware, async (req, res) => {
       try {
         const response = await this.close({
           command:            this.getCommand('!poll close'),
@@ -118,9 +95,47 @@ class Polls extends System {
           discord:            undefined,
         });
         this.sendResponse(response);
-        cb(null);
+        res.send();
       } catch (e: any) {
-        cb(e.stack);
+        res.status(400).send(e.stack);
+      }
+    });
+    app.get('/api/systems/polls/:id', async (req, res) => {
+      res.send({
+        data: await Poll.findOne({ where: { id: req.params.id }, relations: ['votes'] }),
+      });
+    });
+    app.delete('/api/systems/polls/:id', adminMiddleware, async (req, res) => {
+      await Poll.delete({ id: req.params.id });
+      res.status(404).send();
+    });
+    app.post('/api/systems/polls', adminMiddleware, async (req, res) => {
+      try {
+        const runningPoll = await Poll.findOpened();
+        if (runningPoll) {
+          throw new Error('Cannot save new poll if there is already poll in progress.');
+        }
+        const itemToSave = new Poll();
+        merge(itemToSave, req.body);
+        await validateOrReject(itemToSave);
+
+        const parameters = `-${itemToSave.type} -title "${itemToSave.title}" ${itemToSave.options.filter((o) => o.trim().length > 0).join(' | ')}`;
+        const response = await this.open({
+          command:            this.getCommand('!poll open'),
+          parameters,
+          createdAt:          0,
+          sender:             getOwnerAsSender(),
+          attr:               { skip: false, quiet: false },
+          isAction:           false,
+          isFirstTimeMessage: false,
+          emotesOffsets:      new Map(),
+          discord:            undefined,
+        });
+        this.sendResponse(response);
+
+        res.send({ data: await Poll.findOpened() });
+      } catch (e) {
+        res.status(400).send({ errors: e });
       }
     });
   }
@@ -129,20 +144,14 @@ class Polls extends System {
   @default_permission(defaultPermissions.MODERATORS)
   public async close(opts: CommandOptions): Promise<CommandResponse[]> {
     const responses: CommandResponse[] = [];
-    const cVote = await getRepository(Poll).findOne({
-      relations: ['votes'],
-      where:     { isOpened: true },
-    });
+    const cVote = await Poll.findOpened();
 
     try {
       if (!cVote) {
         throw new Error(String(ERROR.ALREADY_CLOSED));
       } else {
-        await getRepository(Poll).save({
-          ...cVote,
-          isOpened: false,
-          closedAt: Date.now(),
-        });
+        cVote.closedAt = new Date();
+        await cVote.save();
 
         let _total = 0;
         const count = cVote.votes.reduce((prev: { [option: number]: number } | null, cur) => {
@@ -184,7 +193,7 @@ class Polls extends System {
   @command('!poll open')
   @default_permission(defaultPermissions.MODERATORS)
   public async open(opts: CommandOptions): Promise<CommandResponse[]> {
-    const cVote = await getRepository(Poll).findOne({ isOpened: true });
+    const cVote = await Poll.findOpened();
 
     try {
       const responses: CommandResponse[] = [];
@@ -205,13 +214,12 @@ class Polls extends System {
         throw new Error(String(ERROR.NOT_ENOUGH_OPTIONS));
       }
 
-      await getRepository(Poll).save({
-        title:    title,
-        isOpened: true,
-        options:  options,
-        type:     type,
-        openedAt: Date.now(),
-      });
+      const poll = new Poll();
+      poll.title = title;
+      poll.options = options;
+      poll.type = type;
+      poll.openedAt = new Date();
+      await poll.save();
 
       const translations = `systems.polls.opened_${type}`;
       responses.push({
@@ -270,10 +278,7 @@ class Polls extends System {
   @command('!vote')
   @helper()
   public async main(opts: CommandOptions): Promise<CommandResponse[]> {
-    const cVote = await getRepository(Poll).findOne({
-      relations: ['votes'],
-      where:     { isOpened: true },
-    });
+    const cVote = await Poll.findOpened();
     let index: number;
 
     try {
@@ -318,14 +323,14 @@ class Polls extends System {
           const vote = cVote.votes.find(o => o.votedBy === opts.sender.userName);
           if (vote) {
             vote.option = index;
-            await getRepository(Poll).save(cVote);
+            await vote.save();
           } else {
-            await getRepository(PollVote).save({
-              poll:    cVote,
-              votedBy: opts.sender.userName,
-              votes:   1,
-              option:  index,
-            });
+            const pollVote = new PollVote();
+            pollVote.poll = cVote;
+            pollVote.votedBy = opts.sender.userName;
+            pollVote.votes = 1;
+            pollVote.option = index;
+            await pollVote.save();
           }
         }
       } else {
@@ -348,25 +353,22 @@ class Polls extends System {
     }
     try {
       if (opts.message.match(/^(\d+)$/)) {
-        const cVote = await getRepository(Poll).findOne({ isOpened: true, type: 'numbers' });
-        if (!cVote) {
+        const cVote = await Poll.findOpened();
+        if (!cVote || cVote.type !== 'numbers') {
           return true; // do nothing if no vote in progress
         }
-        const vote = await getRepository(PollVote).findOne({ poll: cVote, votedBy: opts.sender.userName });
+        let vote = await PollVote.findOne({ poll: cVote, votedBy: opts.sender.userName });
         if (Number(opts.message) > 0 && Number(opts.message) <= cVote.options.length) {
           if (vote) {
-            await getRepository(PollVote).save({
-              ...vote,
-              option: Number(opts.message) - 1,
-            });
+            vote.option = Number(opts.message) - 1;
           } else {
-            await getRepository(PollVote).save({
-              poll:    cVote,
-              option:  Number(opts.message) - 1,
-              votes:   1,
-              votedBy: opts.sender.userName,
-            });
+            vote = new PollVote();
+            vote.poll = cVote;
+            vote.option = Number(opts.message) - 1;
+            vote.votes = 1;
+            vote.votedBy = opts.sender.userName;
           }
+          await vote.save();
         }
       }
     } catch (e: any) {
@@ -377,19 +379,19 @@ class Polls extends System {
 
   @onBit()
   protected async parseBit(opts: onEventBit): Promise<void> {
-    const cVote = await getRepository(Poll).findOne({ isOpened: true });
+    const cVote = await Poll.findOpened();
 
     if (cVote && cVote.type === 'bits') {
       for (let i = cVote.options.length; i > 0; i--) {
         // we are going downwards because we are checking include and 1 === 10
         if (opts.message.includes('#vote' + i)) {
           // no update as we will not switch vote option as in normal vote
-          await getRepository(PollVote).save({
-            poll:    cVote,
-            option:  i - 1,
-            votes:   opts.amount,
-            votedBy: opts.userName,
-          });
+          const pollVote = new PollVote();
+          pollVote.poll = cVote;
+          pollVote.option = i - 1;
+          pollVote.votes = opts.amount;
+          pollVote.votedBy = opts.userName;
+          await pollVote.save();
           break;
         }
       }
@@ -398,19 +400,19 @@ class Polls extends System {
 
   @onTip()
   protected async parseTip(opts: onEventTip): Promise<void> {
-    const cVote = await getRepository(Poll).findOne({ isOpened: true });
+    const cVote = await Poll.findOpened();
 
     if (cVote && cVote.type === 'tips') {
       for (let i = cVote.options.length; i > 0; i--) {
         // we are going downwards because we are checking include and 1 === 10
         if (opts.message.includes('#vote' + i)) {
           // no update as we will not switch vote option as in normal vote
-          await getRepository(PollVote).save({
-            poll:    cVote,
-            option:  i - 1,
-            votes:   Number(exchange(opts.amount, opts.currency, mainCurrency.value)),
-            votedBy: opts.userName,
-          });
+          const pollVote = new PollVote();
+          pollVote.poll = cVote;
+          pollVote.option = i - 1;
+          pollVote.votes = Math.floor(Number(exchange(opts.amount, opts.currency, mainCurrency.value)));
+          pollVote.votedBy = opts.userName;
+          await pollVote.save();
           break;
         }
       }
@@ -423,7 +425,7 @@ class Polls extends System {
   }
 
   private async reminder() {
-    const vote = await getRepository(Poll).findOne({ isOpened: true });
+    const vote = await Poll.findOpened();
     const shouldRemind = { messages: false, time: false };
 
     if (this.everyXMessages === 0 && this.everyXSeconds === 0 || !vote) {

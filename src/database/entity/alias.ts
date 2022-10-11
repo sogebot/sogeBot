@@ -6,7 +6,6 @@ import { IsCommandOrCustomVariable } from '../validators/IsCommandOrCustomVariab
 
 @Entity()
 export class Alias extends BaseEntity {
-
   @PrimaryColumn({ generated: 'uuid' })
     id: string;
 

@@ -1,6 +1,4 @@
-/* global describe it before */
 const commons = require('../../../dest/commons');
-
 
 require('../../general.js');
 
@@ -8,8 +6,6 @@ const until = require('test-until');
 const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 const time = require('../../general.js').time;
-
-const { getRepository } = require('typeorm');
 const { Poll, PollVote } = require('../../../dest/database/entity/poll');
 const { User } = require('../../../dest/database/entity/user');
 const { getLocalizedName } = require('@sogebot/ui-helpers/getLocalized');
@@ -18,6 +14,7 @@ const translate = require('../../../dest/translate').translate;
 const polls = (require('../../../dest/systems/polls')).default;
 
 const assert = require('assert');
+const { getRepository } = require('typeorm');
 
 const owner = { userName: '__broadcaster__', userId: String(Math.floor(Math.random() * 10000)) };
 
@@ -66,7 +63,7 @@ describe('Polls - numbers - @func2', () => {
       assert.strictEqual(r[0].response, 'Error! Poll was already opened for "Lorem Ipsum?"! You can vote by typing number into chat.');
     });
     it('Voting should be correctly in db', async () => {
-      const cVote = await getRepository(Poll).findOne({ isOpened: true });
+      const cVote = await Poll.findOpened();
       assert.deepEqual(cVote.type, 'numbers');
       assert.deepEqual(cVote.options, ['Lorem', 'Ipsum', 'Dolor Sit']);
       assert.strictEqual(cVote.title, 'Lorem Ipsum?');
@@ -84,19 +81,19 @@ describe('Polls - numbers - @func2', () => {
     });
     it(`User ${owner.userName} will vote for option 0 - should fail`, async () => {
       await polls.participateByNumber({ sender: owner, message: '0' });
-      const vote = await getRepository(PollVote).findOne({ votedBy: owner.userName });
+      const vote = await PollVote.findOne({ votedBy: owner.userName });
       assert(typeof vote === 'undefined');
     });
     it(`User ${owner.userName} will vote for option 4 - should fail`, async () => {
       await polls.participateByNumber({ sender: owner, message: '4' });
-      const vote = await getRepository(PollVote).findOne({ votedBy: owner.userName });
+      const vote = await PollVote.findOne({ votedBy: owner.userName });
       assert(typeof vote === 'undefined');
     });
     for (const o of [1,2,3]) {
       it(`User ${owner.userName} will vote for option ${o} - should be saved in db`, async () => {
         await polls.participateByNumber({ sender: owner, message: String(o) });
-        const vote = await getRepository(PollVote).findOne({ votedBy: owner.userName });
-        const votes = await getRepository(PollVote).find({ votedBy: owner.userName });
+        const vote = await PollVote.findOne({ votedBy: owner.userName });
+        const votes = await PollVote.find({ votedBy: owner.userName });
         assert.strictEqual(vote.option, o - 1);
         assert.strictEqual(votes.length, 1);
       });
@@ -104,13 +101,13 @@ describe('Polls - numbers - @func2', () => {
     it(`10 users will vote for option 1 and another 10 for option 2`, async () => {
       for (const o of [1,2]) {
         for (let i = 0; i < 10; i++) {
-          await getRepository(User).save({ userId: String(Math.floor(Math.random() * 100000)), userName: 'user' + [o, i].join('') })
+          await getRepository(User).save({ userId: String(Math.floor(Math.random() * 100000)), userName: 'user' + [o, i].join('') });
           const user = 'user' + [o, i].join('');
           await polls.participateByNumber({ sender: { userName: user }, message: String(o) });
 
           await until(async (setError) => {
             try {
-              const vote = await getRepository(PollVote).findOne({ votedBy: user });
+              const vote = await PollVote.findOne({ votedBy: user });
               assert.strictEqual(vote.option, o - 1);
               return true;
             } catch (err) {
