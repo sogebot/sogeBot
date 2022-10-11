@@ -1,5 +1,5 @@
 import { IsNotEmpty, MinLength } from 'class-validator';
-import { BaseEntity, Column, Entity, Index, PrimaryColumn, EventSubscriber, EntitySubscriberInterface } from 'typeorm';
+import { BaseEntity, Column, Entity, Index, PrimaryColumn, EventSubscriber, EntitySubscriberInterface, InsertEvent, UpdateEvent, RemoveEvent } from 'typeorm';
 
 import { IsCommand } from '../validators/IsCommand';
 import { IsCommandOrCustomVariable } from '../validators/IsCommandOrCustomVariable';
@@ -40,14 +40,24 @@ export class AliasSubscriber implements EntitySubscriberInterface<Alias> {
   listenTo() {
     return Alias;
   }
-  afterInsert(): void | Promise<any> {
-    return populateCache();
+  afterInsert(event: InsertEvent<Alias>): void | Promise<any> {
+    aliases.push(event.entity);
   }
-  afterUpdate(): void | Promise<any> {
-    return populateCache();
+  afterUpdate(event: UpdateEvent<Alias>): void | Promise<any> {
+    if (event.entity) {
+      const idx = aliases.findIndex(o => o.id === event.entity!.id);
+      if (idx > -1) {
+        Alias.merge(aliases[idx], event.entity);
+      }
+    }
   }
-  afterRemove(): void | Promise<any> {
-    return populateCache();
+  afterRemove(event: RemoveEvent<Alias>): void | Promise<any> {
+    if (event.entity) {
+      const idx = aliases.findIndex(o => o.id === event.entity!.id);
+      if (idx > -1) {
+        aliases.splice(idx, 1);
+      }
+    }
   }
 }
 
@@ -56,14 +66,24 @@ export class AliasGroupSubscriber implements EntitySubscriberInterface<AliasGrou
   listenTo() {
     return AliasGroup;
   }
-  afterInsert(): void | Promise<any> {
-    return populateCache();
+  afterInsert(event: InsertEvent<AliasGroup>): void | Promise<any> {
+    groups.push(event.entity);
   }
-  afterUpdate(): void | Promise<any> {
-    return populateCache();
+  afterUpdate(event: UpdateEvent<AliasGroup>): void | Promise<any> {
+    if (event.entity) {
+      const idx = groups.findIndex(o => o.name === event.entity!.name);
+      if (idx > -1) {
+        AliasGroup.merge(groups[idx], event.entity);
+      }
+    }
   }
-  afterRemove(): void | Promise<any> {
-    return populateCache();
+  afterRemove(event: RemoveEvent<AliasGroup>): void | Promise<any> {
+    if (event.entity) {
+      const idx = groups.findIndex(o => o.name === event.entity!.name);
+      if (idx > -1) {
+        groups.splice(idx, 1);
+      }
+    }
   }
 }
 

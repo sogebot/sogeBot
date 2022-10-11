@@ -4,7 +4,7 @@ const assert = require('assert');
 const { getRepository } = require('typeorm');
 
 require('../../general.js');
-const { Commands, CommandsGroup, CommandsResponses } = require('../../../dest/database/entity/commands');
+const { Commands, CommandsGroup } = require('../../../dest/database/entity/commands');
 const { prepare } = (require('../../../dest/helpers/commons/prepare'));
 const { defaultPermissions } = require('../../../dest/helpers/permissions/');
 const customcommands = (require('../../../dest/systems/customcommands')).default;
@@ -56,34 +56,26 @@ describe('Custom Commands - @func2 - #4860 - customcommands group permissions an
     command.enabled =   true;
     command.visible =   true;
     command.group =     'filterGroup';
+    command.responses = [{
+      stopIfExecuted: false,
+      response:       'bad449ae-f0b3-488c-a7b0-39a853d5333f',
+      filter:         '',
+      order:          0,
+      permission:     defaultPermissions.VIEWERS,
+    }, {
+      stopIfExecuted: false,
+      response:       'c0f68c62-630b-412b-9c97-f5b1afc734d2',
+      filter:         '$title === \'test\'',
+      order:          1,
+      permission:     defaultPermissions.VIEWERS,
+    }, {
+      stopIfExecuted: false,
+      response:       '4b310000-b105-475a-8a85-a573a0bca1b7',
+      filter:         '$title !== \'test\'',
+      order:          2,
+      permission:     defaultPermissions.VIEWERS,
+    }];
     await command.save();
-
-    const response = new CommandsResponses();
-    response.stopIfExecuted = false;
-    response.response =       'bad449ae-f0b3-488c-a7b0-39a853d5333f';
-    response.filter =         '';
-    response.order =          0;
-    response.permission =     defaultPermissions.VIEWERS;
-    response.command = command;
-    await response.save();
-
-    const response2 = new CommandsResponses();
-    response2.stopIfExecuted = false;
-    response2.response =       'c0f68c62-630b-412b-9c97-f5b1afc734d2';
-    response2.filter =         '$title === \'test\'';
-    response2.order =          1;
-    response2.permission =     defaultPermissions.VIEWERS;
-    response2.command = command;
-    await response2.save();
-
-    const response3 = new CommandsResponses();
-    response3.stopIfExecuted = false;
-    response3.response =       '4b310000-b105-475a-8a85-a573a0bca1b7';
-    response3.filter =         '$title !== \'test\'';
-    response3.order =          2;
-    response3.permission =     defaultPermissions.VIEWERS;
-    response3.command = command;
-    await response3.save();
   });
 
   it('create command !testpermnull with permGroup', async () => {
@@ -93,16 +85,14 @@ describe('Custom Commands - @func2 - #4860 - customcommands group permissions an
     command.enabled =   true;
     command.visible =   true;
     command.group =     'permGroup';
+    command.responses = [{
+      stopIfExecuted: false,
+      response:       '430ea834-da5f-48b1-bf2f-3acaf1f04c63',
+      filter:         '',
+      order:          0,
+      permission:     null,
+    }];
     await command.save();
-
-    const response = new CommandsResponses();
-    response.stopIfExecuted = false;
-    response.response =       '430ea834-da5f-48b1-bf2f-3acaf1f04c63';
-    response.filter =         '';
-    response.order =          0;
-    response.permission =     null;
-    response.command = command;
-    await response.save();
   });
 
   it('create command !testpermnull2 with permGroup2', async () => {
@@ -112,16 +102,14 @@ describe('Custom Commands - @func2 - #4860 - customcommands group permissions an
     command.enabled =   true;
     command.visible =   true;
     command.group =     'permGroup2';
+    command.responses = [{
+      stopIfExecuted: false,
+      response:       '1594a86e-158d-4b7d-9898-0f80bd6a0c98',
+      filter:         '',
+      order:          0,
+      permission:     null,
+    }];
     await command.save();
-
-    const response = new CommandsResponses();
-    response.stopIfExecuted = false;
-    response.response =       '1594a86e-158d-4b7d-9898-0f80bd6a0c98';
-    response.filter =         '';
-    response.order =          0;
-    response.permission =     null;
-    response.command = command;
-    await response.save();
   });
 
   it('create command !testpermmods with permGroup2', async () => {
@@ -131,18 +119,16 @@ describe('Custom Commands - @func2 - #4860 - customcommands group permissions an
     command.enabled =   true;
     command.visible =   true;
     command.group =     'permGroup2';
+    command.responses = [{
+      stopIfExecuted: false,
+      response:       'cae8f74f-046a-4756-b6c5-f2219d9a0f4e',
+      filter:         '',
+      order:          1,
+      permission:     defaultPermissions.MODERATORS,
+    }];
     await command.save();
-
-    const response = new CommandsResponses();
-    response.stopIfExecuted = false;
-    response.response =       'cae8f74f-046a-4756-b6c5-f2219d9a0f4e';
-    response.filter =         '';
-    response.order =          1;
-    response.permission =     defaultPermissions.MODERATORS;
-    response.command = command;
-    await response.save();
   });
-
+  
   it('!testpermnull should be triggered by CASTER', async () => {
     message.prepare();
     customcommands.run({ sender: user.owner, message: '!testpermnull' });

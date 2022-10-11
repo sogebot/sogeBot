@@ -1,5 +1,5 @@
 import { IsNotEmpty, MinLength } from 'class-validator';
-import { EntitySubscriberInterface, EventSubscriber, ManyToOne, OneToMany } from 'typeorm';
+import { EntitySubscriberInterface, EventSubscriber, InsertEvent, RemoveEvent, UpdateEvent } from 'typeorm';
 import { BaseEntity, Column, Entity, Index, PrimaryColumn } from 'typeorm';
 
 import { IsCommand } from '../validators/IsCommand';
@@ -9,7 +9,7 @@ export const groups: CommandsGroup[] = [];
 export const populateCache = () => {
   return Promise.all([
     new Promise((resolve) => {
-      Commands.find({ relations: ['responses'] })
+      Commands.find()
         .then(items => {
           while (commands.length > 0) {
             commands.shift();
@@ -34,19 +34,30 @@ export const populateCache = () => {
     }),
   ]);
 };
+
 @EventSubscriber()
 export class CommandsSubscriber implements EntitySubscriberInterface<Commands> {
   listenTo() {
     return Commands;
   }
-  afterInsert(): void | Promise<any> {
-    return populateCache();
+  afterInsert(event: InsertEvent<Commands>): void | Promise<any> {
+    commands.push(event.entity);
   }
-  afterUpdate(): void | Promise<any> {
-    return populateCache();
+  afterUpdate(event: UpdateEvent<Commands>): void | Promise<any> {
+    if (event.entity) {
+      const idx = commands.findIndex(o => o.id === event.entity!.id);
+      if (idx > -1) {
+        Commands.merge(commands[idx], event.entity);
+      }
+    }
   }
-  afterRemove(): void | Promise<any> {
-    return populateCache();
+  afterRemove(event: RemoveEvent<Commands>): void | Promise<any> {
+    if (event.entity) {
+      const idx = commands.findIndex(o => o.id === event.entity!.id);
+      if (idx > -1) {
+        commands.splice(idx, 1);
+      }
+    }
   }
 }
 
@@ -55,30 +66,25 @@ export class CommandsGroupSubscriber implements EntitySubscriberInterface<Comman
   listenTo() {
     return CommandsGroup;
   }
-  afterInsert(): void | Promise<any> {
-    return populateCache();
-  }
-  afterUpdate(): void | Promise<any> {
-    return populateCache();
-  }
-  afterRemove(): void | Promise<any> {
-    return populateCache();
-  }
-}
 
-@EventSubscriber()
-export class CommandsResponsesSubscriber implements EntitySubscriberInterface<CommandsResponses> {
-  listenTo() {
-    return CommandsResponses;
+  afterInsert(event: InsertEvent<CommandsGroup>): void | Promise<any> {
+    groups.push(event.entity);
   }
-  afterInsert(): void | Promise<any> {
-    return populateCache();
+  afterUpdate(event: UpdateEvent<CommandsGroup>): void | Promise<any> {
+    if (event.entity) {
+      const idx = groups.findIndex(o => o.name === event.entity!.name);
+      if (idx > -1) {
+        groups[idx] = event.entity as CommandsGroup;
+      }
+    }
   }
-  afterUpdate(): void | Promise<any> {
-    return populateCache();
-  }
-  afterRemove(): void | Promise<any> {
-    return populateCache();
+  afterRemove(event: RemoveEvent<CommandsGroup>): void | Promise<any> {
+    if (event.entity) {
+      const idx = groups.findIndex(o => o.name === event.entity!.name);
+      if (idx > -1) {
+        groups.splice(idx, 1);
+      }
+    }
   }
 }
 
@@ -103,32 +109,14 @@ export class Commands extends BaseEntity {
   @Column({ nullable: true, type: String })
     group: string | null;
 
-  @OneToMany(() => CommandsResponses, (item) => item.command)
-    responses: CommandsResponses[];
-}
-
-@Entity()
-export class CommandsResponses extends BaseEntity {
-  @PrimaryColumn({ generated: 'uuid', type: 'uuid' })
-    id: string;
-
-  @Column()
+  @Column({ type: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') !== 'better-sqlite3' ? 'json' : 'simple-json' })
+    responses: {
     order: number;
-
-  @Column({ type: 'text' })
     response: string;
-
-  @Column()
     stopIfExecuted: boolean;
-
-  @Column({ nullable: true, type: String })
     permission: string | null;
-
-  @Column()
     filter: string;
-
-  @ManyToOne(() => Commands, (item) => item.responses, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
-    command: Commands;
+  }[] = [];
 }
 
 @Entity()
