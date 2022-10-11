@@ -111,6 +111,7 @@ export class Commands extends BaseEntity {
 
   @Column({ type: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') !== 'better-sqlite3' ? 'json' : 'simple-json' })
     responses: {
+    id: string;
     order: number;
     response: string;
     stopIfExecuted: boolean;

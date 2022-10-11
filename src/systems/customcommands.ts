@@ -26,6 +26,7 @@ import {
 import { check, defaultPermissions } from '~/helpers/permissions/index';
 import { adminMiddleware } from '~/socket';
 import { translate } from '~/translate';
+import { v4 } from 'uuid';
 
 /*
  * !command                                                                            - gets an info about command usage
@@ -224,6 +225,7 @@ class CustomCommands extends System {
       }
 
       cDb.responses.push({
+        id:             v4(),
         order:          cDb.responses.length,
         permission:     pItem.id ?? defaultPermissions.VIEWERS,
         stopIfExecuted: stopIfExecuted,
