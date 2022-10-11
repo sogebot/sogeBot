@@ -364,9 +364,9 @@ class Alias extends System {
         const response = prepare('alias.alias-was-not-found', { alias });
         return [{ response, ...opts }];
       }
-      await getRepository(AliasEntity).save({
-        ...item, command: cmd, permission: pItem.id ?? defaultPermissions.VIEWERS,
-      });
+      item.command = cmd;
+      item.permission = pItem.id ?? defaultPermissions.VIEWERS;
+      await item.save();
 
       const response = prepare('alias.alias-was-edited', { alias, command: cmd });
       return [{ response, ...opts }];
@@ -398,15 +398,14 @@ class Alias extends System {
         throw Error('Permission ' + perm + ' not found.');
       }
 
-      const response = prepare('alias.alias-was-added',
-        await getRepository(AliasEntity).save({
-          alias,
-          command:    cmd,
-          enabled:    true,
-          visible:    true,
-          permission: pItem.id ?? defaultPermissions.VIEWERS,
-        }),
-      );
+      const newAlias = new AliasEntity();
+      newAlias.alias = alias;
+      newAlias.command = cmd;
+      newAlias.enabled = true;
+      newAlias.visible = true;
+      newAlias.permission = pItem.id ?? defaultPermissions.VIEWERS;
+      await newAlias.save();
+      const response = prepare('alias.alias-was-added', newAlias);
       return [{ response, ...opts }];
     } catch (e: any) {
       return [{ response: prepare('alias.alias-parse-failed'), ...opts }];
@@ -442,10 +441,12 @@ class Alias extends System {
         const response = prepare('alias.alias-was-not-found', { alias });
         return [{ response, ...opts }];
       }
-      await getRepository(AliasEntity).save({ ...item, enabled: !item.enabled });
-      const response = prepare(!item.enabled ? 'alias.alias-was-enabled' : 'alias.alias-was-disabled', item);
+      item.enabled = !item.enabled;
+      await item.save();
+      const response = prepare(item.enabled ? 'alias.alias-was-enabled' : 'alias.alias-was-disabled', item);
       return [{ response, ...opts }];
     } catch (e: any) {
+      console.log({ e });
       const response = prepare('alias.alias-parse-failed');
       return [{ response, ...opts }];
     }
@@ -468,8 +469,9 @@ class Alias extends System {
         const response = prepare('alias.alias-was-not-found', { alias });
         return [{ response, ...opts }];
       }
-      await getRepository(AliasEntity).save({ ...item, visible: !item.visible });
-      const response = prepare(!item.visible ? 'alias.alias-was-exposed' : 'alias.alias-was-concealed', item);
+      item.visible = !item.visible;
+      await item.save();
+      const response = prepare(item.visible ? 'alias.alias-was-exposed' : 'alias.alias-was-concealed', item);
       return [{ response, ...opts }];
     } catch (e: any) {
       const response = prepare('alias.alias-parse-failed');

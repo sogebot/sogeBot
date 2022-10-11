@@ -1,10 +1,9 @@
 import {
-  Commands, CommandsGroup, CommandsResponses, commands, groups,
+  Commands, CommandsGroup, commands, groups,
 } from '@entity/commands';
 import * as constants from '@sogebot/ui-helpers/constants';
 import { validateOrReject } from 'class-validator';
 import _, { merge } from 'lodash';
-import { getRepository } from 'typeorm';
 
 import { parserReply } from '../commons';
 import {
@@ -120,14 +119,6 @@ class CustomCommands extends System {
           await resetCountOfCommandUsage(itemToSave.command);
         }
 
-        await getRepository(CommandsResponses).delete({ command: itemToSave });
-        const responses = req.body.responses;
-        for (const response of responses) {
-          const resToSave = new CommandsResponses();
-          merge(resToSave, response);
-          resToSave.command = itemToSave;
-          await resToSave.save();
-        }
         res.send({ data: itemToSave });
       } catch (e) {
         res.status(400).send({ errors: e });
@@ -189,7 +180,7 @@ class CustomCommands extends System {
         responseDb.stopIfExecuted = stopIfExecuted;
       }
 
-      await responseDb.save();
+      await cDb.save();
       return [{ response: prepare('customcmds.command-was-edited', { command: cmd, response }), ...opts }];
     } catch (e: any) {
       return [{ response: prepare('customcmds.commands-parse-failed', { command: this.getCommand('!command') }), ...opts }];
@@ -232,14 +223,14 @@ class CustomCommands extends System {
         throw Error('Permission ' + userlevel + ' not found.');
       }
 
-      const newResponse = new CommandsResponses();
-      newResponse.order =          cDb.responses.length;
-      newResponse.permission =     pItem.id ?? defaultPermissions.VIEWERS;
-      newResponse.stopIfExecuted = stopIfExecuted;
-      newResponse.response =       response;
-      newResponse.filter =         '';
-      newResponse.command = cDb;
-      await newResponse.save();
+      cDb.responses.push({
+        order:          cDb.responses.length,
+        permission:     pItem.id ?? defaultPermissions.VIEWERS,
+        stopIfExecuted: stopIfExecuted,
+        response:       response,
+        filter:         '',
+      });
+      await cDb.save();
       return [{ response: prepare('customcmds.command-was-added', { command: cmd }), ...opts }];
     } catch (e: any) {
       return [{ response: prepare('customcmds.commands-parse-failed', { command: this.getCommand('!command') }), ...opts }];
@@ -285,7 +276,7 @@ class CustomCommands extends System {
         warning(`Custom command ${cmd.command.command} (${cmd.command.id}) is disabled!`);
         continue;
       }
-      const _responses: CommandsResponses[] = [];
+      const _responses: Commands['responses'] = [];
       // remove found command from message to get param
       const param = opts.message.replace(new RegExp('^(' + cmd.cmdArray.join(' ') + ')', 'i'), '').trim();
       incrementCountOfCommandUsage(cmd.command.command);
@@ -339,7 +330,7 @@ class CustomCommands extends System {
     return atLeastOnePermissionOk;
   }
 
-  async sendResponse(responses: (CommandsResponses)[], opts: { param: string; sender: CommandOptions['sender'], discord: CommandOptions['discord'], command: string, processedCommands?: string[], id: string, }) {
+  async sendResponse(responses: Commands['responses'], opts: { param: string; sender: CommandOptions['sender'], discord: CommandOptions['discord'], command: string, processedCommands?: string[], id: string, }) {
     for (let i = 0; i < responses.length; i++) {
       await parserReply(responses[i].response, opts);
     }
@@ -445,16 +436,14 @@ class CustomCommands extends System {
         let response = prepare('customcmds.command-was-removed', { command: cmd });
         if (rId >= 1) {
           const responseDb = command_db.responses.filter(o => o.order !== (rId - 1));
-          const toRemove = command_db.responses.find(o => o.order === (rId - 1));
-          await toRemove?.remove();
 
           // reorder
           responseDb.forEach((item, index) => {
             item.order = index;
           });
-          for (const r of responseDb) {
-            await r.save();
-          }
+
+          await command_db.save();
+
           response = prepare('customcmds.response-was-removed', { command: cmd, response: rId });
         } else {
           await Commands.remove(command_db);

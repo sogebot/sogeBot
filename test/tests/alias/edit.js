@@ -1,4 +1,3 @@
-/* global describe it beforeEach */
 require('../../general.js');
 
 const db = require('../../general.js').db;
@@ -25,27 +24,27 @@ const notFoundTests = [
 const successTests = [
   {
     from: { permission: defaultPermissions.VIEWERS, alias: '!a', command: '!me' },
-    to: { permission: defaultPermissions.VIEWERS, alias: '!a', command: '!uptime' },
+    to:   { permission: defaultPermissions.VIEWERS, alias: '!a', command: '!uptime' },
   },
   {
     from: { permission: 'casters', alias: '!a', command: '!me' },
-    to: { permission: defaultPermissions.VIEWERS, alias: '!a', command: '!uptime' },
+    to:   { permission: defaultPermissions.VIEWERS, alias: '!a', command: '!uptime' },
   },
   {
     from: { permission: defaultPermissions.VIEWERS, alias: '!a', command: '!me' },
-    to: { permission: 'moderators', alias: '!a', command: '!uptime' },
+    to:   { permission: 'moderators', alias: '!a', command: '!uptime' },
   },
   {
     from: { permission: defaultPermissions.VIEWERS, alias: '!한국어', command: '!me' },
-    to: { permission: defaultPermissions.VIEWERS, alias: '!한국어', command: '!uptime' },
+    to:   { permission: defaultPermissions.VIEWERS, alias: '!한국어', command: '!uptime' },
   },
   {
     from: { permission: defaultPermissions.VIEWERS, alias: '!русский', command: '!me' },
-    to: { permission: defaultPermissions.VIEWERS, alias: '!русский', command: '!uptime' },
+    to:   { permission: defaultPermissions.VIEWERS, alias: '!русский', command: '!uptime' },
   },
   {
     from: { permission: defaultPermissions.VIEWERS, alias: '!a with spaces', command: '!me' },
-    to: { permission: defaultPermissions.VIEWERS, alias: '!a with spaces', command: '!uptime' },
+    to:   { permission: defaultPermissions.VIEWERS, alias: '!a with spaces', command: '!uptime' },
   },
 ];
 

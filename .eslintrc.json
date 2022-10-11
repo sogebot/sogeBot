@@ -24,7 +24,7 @@
       "maxEOF": 0,
       "maxBOF": 0
     }],
-    "import/order": ["error", {
+    "import/order": ["warn", {
       "groups": ["builtin", "external", ["internal"],
         ["parent", "sibling"], "index"
       ],
