@@ -1,73 +1,37 @@
-import { EntitySchema } from 'typeorm';
+import { ArrayMinSize, IsNotEmpty, MinLength } from 'class-validator';
+import { BaseEntity, Column, CreateDateColumn, Entity, PrimaryColumn } from 'typeorm';
 
-import { ColumnNumericTransformer } from './_transformer';
+@Entity()
+export class Poll extends BaseEntity {
+  @PrimaryColumn({ generated: 'uuid' })
+    id: string;
 
-export interface PollInterface {
-  id?: string;
-  type: 'tips' | 'bits' | 'normal' | 'numbers';
-  title: string;
-  isOpened: boolean;
-  openedAt?: number;
-  closedAt?: number;
-  options: string[];
-  votes?: PollVoteInterface[];
-}
+  @Column({ type: 'varchar', length: 7 })
+    type: 'tips' | 'bits' | 'normal' | 'numbers' = 'normal';
 
-export interface PollVoteInterface {
-  id?: string;
-  poll: PollInterface;
-  option: number;
-  votes: number;
-  votedBy: string;
-}
+  @Column()
+  @MinLength(2)
+  @IsNotEmpty()
+    title: string;
 
-export const Poll = new EntitySchema<Readonly<Required<PollInterface>>>({
-  name:    'poll',
-  columns: {
-    id: {
-      type: 'uuid', primary: true, generated: 'uuid',
-    },
-    type:     { type: 'varchar', length: 7 },
-    isOpened: { type: Boolean },
-    openedAt: {
-      type: 'bigint', transformer: new ColumnNumericTransformer(), default: 0,
-    },
-    closedAt: {
-      type: 'bigint', transformer: new ColumnNumericTransformer(), default: 0,
-    },
-    options: { type: 'simple-array' },
-    title:   { type: String },
-  },
-  relations: {
+  @CreateDateColumn()
+    openedAt: Date;
+
+  @Column({ nullable: true, type: 'date' })
+    closedAt: number | null;
+
+  @ArrayMinSize(2)
+  @Column({ type: 'simple-array' })
+    options: string[];
+
+  @Column({ type: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') !== 'better-sqlite3' ? 'json' : 'simple-json' })
     votes: {
-      type:        'one-to-many',
-      target:      'poll_vote',
-      inverseSide: 'poll',
-      cascade:     true,
-    },
-  },
-  indices: [
-    { name: 'IDX_poll_isOpened', columns: ['isOpened'] },
-  ],
-});
+    option: number;
+    votes: number;
+    votedBy: string;
+  }[] = [];
 
-export const PollVote = new EntitySchema<Readonly<Required<PollVoteInterface>>>({
-  name:    'poll_vote',
-  columns: {
-    id: {
-      type: String, primary: true, generated: 'uuid',
-    },
-    option:  { type: Number },
-    votes:   { type: Number },
-    votedBy: { type: String },
-  },
-  relations: {
-    poll: {
-      type:        'many-to-one',
-      target:      'poll',
-      inverseSide: 'votes',
-      onDelete:    'CASCADE',
-      onUpdate:    'CASCADE',
-    },
-  },
-});
+  static findOpened() {
+    return this.findOne({ where: { closedAt: null } });
+  }
+}

@@ -1,18 +1,16 @@
-/* global describe it before */
 const commons = require('../../../dest/commons');
 
 require('../../general.js');
 
 const until = require('test-until');
 
-const { Poll, PollVote } = require('../../../dest/database/entity/poll');
+const { Poll } = require('../../../dest/database/entity/poll');
 const translate = require('../../../dest/translate').translate;
 const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 const time = require('../../general.js').time;
 const polls = (require('../../../dest/systems/polls')).default;
 
-const { getRepository } = require('typeorm');
 const { getLocalizedName } = require('@sogebot/ui-helpers/getLocalized');
 
 const assert = require('assert');
@@ -64,7 +62,7 @@ describe('Polls - bits - @func2', () => {
       assert.strictEqual(r[0].response, 'Error! Poll by cheers was already opened for "Lorem Ipsum?"! You can vote by adding hashtag #voteX into bit message');
     });
     it('Voting should be correctly in db', async () => {
-      const cVote = await getRepository(Poll).findOne({ isOpened: true });
+      const cVote = await Poll.findOpened();
       assert.deepEqual(cVote.options, ['Lorem', 'Ipsum', 'Dolor Sit']);
       assert.deepEqual(cVote.type, 'bits');
       assert.strictEqual(cVote.title, 'Lorem Ipsum?');
@@ -83,7 +81,7 @@ describe('Polls - bits - @func2', () => {
     for (const o of [0,1,2,3,4]) {
       it(`User ${owner.userName} will vote for option ${o} - should fail`, async () => {
         await polls.main({ sender: owner, parameters: String(o) });
-        const vote = await getRepository(PollVote).findOne({ votedBy: owner.userName });
+        const vote = (await Poll.findOne({ id: vid })).votes.find(v => v.votedBy === owner.userName);
         assert(typeof vote === 'undefined', 'Expected ' + JSON.stringify({ votedBy: owner.userName, vid }) + ' to not be found in db');
       });
     }
@@ -94,8 +92,8 @@ describe('Polls - bits - @func2', () => {
           const TMI = require('../../../dest/services/twitch/chat').default;
           const tmi = new TMI();
           await tmi.cheer({
-            userName:  user,
-            userId: String(Math.floor(Math.random() * 100000)),
+            userName: user,
+            userId:   String(Math.floor(Math.random() * 100000)),
           },
           'Cool I am voting for #vote' + o + ' enjoy!',
           10,
@@ -103,7 +101,7 @@ describe('Polls - bits - @func2', () => {
 
           await until(async (setError) => {
             try {
-              const vote = await getRepository(PollVote).findOne({ votedBy: user });
+              const vote = (await Poll.findOne({ id: vid })).votes.find(v => v.votedBy === user);
               assert(typeof vote !== 'undefined', 'Expected ' + JSON.stringify({ votedBy: user, vid }) + ' to be found in db');
               assert.strictEqual(vote.option, o - 1);
               return true;
