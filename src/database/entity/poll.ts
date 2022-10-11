@@ -7,7 +7,7 @@ export class Poll extends BaseEntity {
     id: string;
 
   @Column({ type: 'varchar', length: 7 })
-    type: 'tips' | 'bits' | 'normal' | 'numbers';
+    type: 'tips' | 'bits' | 'normal' | 'numbers' = 'normal';
 
   @Column()
   @MinLength(2)
@@ -18,7 +18,7 @@ export class Poll extends BaseEntity {
     openedAt: Date;
 
   @Column({ nullable: true, type: 'date' })
-    closedAt: Date | null;
+    closedAt: number | null;
 
   @ArrayMinSize(2)
   @Column({ type: 'simple-array' })

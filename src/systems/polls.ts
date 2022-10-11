@@ -78,7 +78,7 @@ class Polls extends System {
 
     app.get('/api/systems/polls', adminMiddleware, async (req, res) => {
       res.send({
-        data: await Poll.find({ relations: ['votes'] }),
+        data: await Poll.find(),
       });
     });
     app.delete('/api/systems/polls/', adminMiddleware, async (req, res) => {
@@ -102,11 +102,12 @@ class Polls extends System {
     });
     app.get('/api/systems/polls/:id', async (req, res) => {
       res.send({
-        data: await Poll.findOne({ where: { id: req.params.id }, relations: ['votes'] }),
+        data: await Poll.findOne({ where: { id: req.params.id } }),
       });
     });
     app.delete('/api/systems/polls/:id', adminMiddleware, async (req, res) => {
-      await Poll.delete({ id: req.params.id });
+      const poll = await Poll.findOne({ where: { id: req.params.id } });
+      await poll?.remove();
       res.status(404).send();
     });
     app.post('/api/systems/polls', adminMiddleware, async (req, res) => {
@@ -135,7 +136,11 @@ class Polls extends System {
 
         res.send({ data: await Poll.findOpened() });
       } catch (e) {
-        res.status(400).send({ errors: e });
+        if (e instanceof Error) {
+          res.status(400).send({ errors: e.message });
+        } else {
+          res.status(400).send({ errors: e });
+        }
       }
     });
   }
@@ -150,7 +155,7 @@ class Polls extends System {
       if (!cVote) {
         throw new Error(String(ERROR.ALREADY_CLOSED));
       } else {
-        cVote.closedAt = new Date();
+        cVote.closedAt = new Date().getTime();
         await cVote.save();
 
         let _total = 0;
