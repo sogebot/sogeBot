@@ -101,7 +101,7 @@ describe('Polls - bits - @func2', () => {
 
           await until(async (setError) => {
             try {
-              const vote = (await Poll.findOne({ id: vid })).votes.find(v => v.votedBy === owner.userName);
+              const vote = (await Poll.findOne({ id: vid })).votes.find(v => v.votedBy === user);
               assert(typeof vote !== 'undefined', 'Expected ' + JSON.stringify({ votedBy: user, vid }) + ' to be found in db');
               assert.strictEqual(vote.option, o - 1);
               return true;
