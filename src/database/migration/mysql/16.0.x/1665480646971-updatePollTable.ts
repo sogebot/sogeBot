@@ -14,21 +14,14 @@ export class updatePollTable1665480646971 implements MigrationInterface {
     await queryRunner.query(`DROP TABLE \`poll_vote\``);
     await queryRunner.query(`DROP TABLE \`poll\``);
 
-    await queryRunner.query(`CREATE TABLE \`poll\` (\`id\` varchar(36) NOT NULL, \`type\` varchar(7) NOT NULL, \`title\` varchar(255) NOT NULL, \`openedAt\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), \`closedAt\` date NULL, \`options\` text NOT NULL, PRIMARY KEY (\`id\`)) ENGINE=InnoDB`);
-    await queryRunner.query(`CREATE TABLE \`poll_vote\` (\`id\` varchar(36) NOT NULL, \`option\` int NOT NULL, \`votes\` int NOT NULL, \`votedBy\` varchar(255) NOT NULL, \`pollId\` varchar(255) NULL, PRIMARY KEY (\`id\`)) ENGINE=InnoDB`);
-    await queryRunner.query(`ALTER TABLE \`poll_vote\` ADD CONSTRAINT \`FK_99f9db6d3dae2a0aebebbf8e10a\` FOREIGN KEY (\`pollId\`) REFERENCES \`poll\`(\`id\`) ON DELETE CASCADE ON UPDATE CASCADE`);
+    await queryRunner.query(`CREATE TABLE \`poll\` (\`id\` varchar(36) NOT NULL, \`type\` varchar(7) NOT NULL, \`title\` varchar(255) NOT NULL, \`openedAt\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), \`closedAt\` date NULL, \`options\` text NOT NULL, \`votes\` json PRIMARY KEY (\`id\`)) ENGINE=InnoDB`);
 
     for (const item of items) {
       item.openedAt = new Date(item.openedAt).getTime();
       item.closedAt = item.isOpened ? null : new Date(item.closedAt).getTime();
+      item.votes = JSON.stringify(items2.filter((o: any) => o.pollId === item.id));
       delete item.isOpened;
       await insertItemIntoTable('poll', {
-        ...item,
-      }, queryRunner);
-    }
-
-    for (const item of items2) {
-      await insertItemIntoTable('poll_vote', {
         ...item,
       }, queryRunner);
     }

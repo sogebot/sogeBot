@@ -1,5 +1,5 @@
 import { ArrayMinSize, IsNotEmpty, MinLength } from 'class-validator';
-import { BaseEntity, Column, CreateDateColumn, Entity, ManyToOne, OneToMany, PrimaryColumn } from 'typeorm';
+import { BaseEntity, Column, CreateDateColumn, Entity, PrimaryColumn } from 'typeorm';
 
 @Entity()
 export class Poll extends BaseEntity {
@@ -24,28 +24,14 @@ export class Poll extends BaseEntity {
   @Column({ type: 'simple-array' })
     options: string[];
 
-  @OneToMany(() => PollVote, (item) => item.poll)
-    votes: PollVote[];
+  @Column({ type: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') !== 'better-sqlite3' ? 'json' : 'simple-json' })
+    votes: {
+    option: number;
+    votes: number;
+    votedBy: string;
+  }[] = [];
 
   static findOpened() {
-    return this.findOne({ relations: ['votes'], where: { closedAt: null } });
+    return this.findOne({ where: { closedAt: null } });
   }
-}
-
-@Entity()
-export class PollVote extends BaseEntity {
-  @PrimaryColumn({ generated: 'uuid' })
-    id: string;
-
-  @Column()
-    option: number;
-
-  @Column()
-    votes: number;
-
-  @Column()
-    votedBy: string;
-
-  @ManyToOne(() => Poll, (item) => item.votes, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
-    poll: Poll;
 }

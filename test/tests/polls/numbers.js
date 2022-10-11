@@ -6,7 +6,7 @@ const until = require('test-until');
 const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 const time = require('../../general.js').time;
-const { Poll, PollVote } = require('../../../dest/database/entity/poll');
+const { Poll } = require('../../../dest/database/entity/poll');
 const { User } = require('../../../dest/database/entity/user');
 const { getLocalizedName } = require('@sogebot/ui-helpers/getLocalized');
 const translate = require('../../../dest/translate').translate;
@@ -81,21 +81,19 @@ describe('Polls - numbers - @func2', () => {
     });
     it(`User ${owner.userName} will vote for option 0 - should fail`, async () => {
       await polls.participateByNumber({ sender: owner, message: '0' });
-      const vote = await PollVote.findOne({ votedBy: owner.userName });
+      const vote = (await Poll.findOne({ id: vid })).votes.find(v => v.votedBy === owner.userName);
       assert(typeof vote === 'undefined');
     });
     it(`User ${owner.userName} will vote for option 4 - should fail`, async () => {
       await polls.participateByNumber({ sender: owner, message: '4' });
-      const vote = await PollVote.findOne({ votedBy: owner.userName });
+      const vote = (await Poll.findOne({ id: vid })).votes.find(v => v.votedBy === owner.userName);
       assert(typeof vote === 'undefined');
     });
     for (const o of [1,2,3]) {
       it(`User ${owner.userName} will vote for option ${o} - should be saved in db`, async () => {
         await polls.participateByNumber({ sender: owner, message: String(o) });
-        const vote = await PollVote.findOne({ votedBy: owner.userName });
-        const votes = await PollVote.find({ votedBy: owner.userName });
+        const vote = (await Poll.findOne({ id: vid })).votes.find(v => v.votedBy === owner.userName);
         assert.strictEqual(vote.option, o - 1);
-        assert.strictEqual(votes.length, 1);
       });
     }
     it(`10 users will vote for option 1 and another 10 for option 2`, async () => {
@@ -107,7 +105,7 @@ describe('Polls - numbers - @func2', () => {
 
           await until(async (setError) => {
             try {
-              const vote = await PollVote.findOne({ votedBy: user });
+              const vote = (await Poll.findOne({ id: vid })).votes.find(v => v.votedBy === user);
               assert.strictEqual(vote.option, o - 1);
               return true;
             } catch (err) {

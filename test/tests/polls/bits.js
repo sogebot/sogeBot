@@ -4,7 +4,7 @@ require('../../general.js');
 
 const until = require('test-until');
 
-const { Poll, PollVote } = require('../../../dest/database/entity/poll');
+const { Poll } = require('../../../dest/database/entity/poll');
 const translate = require('../../../dest/translate').translate;
 const db = require('../../general.js').db;
 const message = require('../../general.js').message;
@@ -81,7 +81,7 @@ describe('Polls - bits - @func2', () => {
     for (const o of [0,1,2,3,4]) {
       it(`User ${owner.userName} will vote for option ${o} - should fail`, async () => {
         await polls.main({ sender: owner, parameters: String(o) });
-        const vote = await PollVote.findOne({ votedBy: owner.userName });
+        const vote = (await Poll.findOne({ id: vid })).votes.find(v => v.votedBy === owner.userName);
         assert(typeof vote === 'undefined', 'Expected ' + JSON.stringify({ votedBy: owner.userName, vid }) + ' to not be found in db');
       });
     }
@@ -101,7 +101,7 @@ describe('Polls - bits - @func2', () => {
 
           await until(async (setError) => {
             try {
-              const vote = await PollVote.findOne({ votedBy: user });
+              const vote = (await Poll.findOne({ id: vid })).votes.find(v => v.votedBy === owner.userName);
               assert(typeof vote !== 'undefined', 'Expected ' + JSON.stringify({ votedBy: user, vid }) + ' to be found in db');
               assert.strictEqual(vote.option, o - 1);
               return true;

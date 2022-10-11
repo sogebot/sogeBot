@@ -1,4 +1,4 @@
-import { Poll, PollVote } from '@entity/poll';
+import { Poll } from '@entity/poll';
 import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized';
 import _, { merge } from 'lodash';
 
@@ -323,15 +323,15 @@ class Polls extends System {
           const vote = cVote.votes.find(o => o.votedBy === opts.sender.userName);
           if (vote) {
             vote.option = index;
-            await vote.save();
+            await cVote.save();
           } else {
-            const pollVote = new PollVote();
-            pollVote.poll = cVote;
-            pollVote.votedBy = opts.sender.userName;
-            pollVote.votes = 1;
-            pollVote.option = index;
-            await pollVote.save();
+            cVote.votes.push({
+              votedBy: opts.sender.userName,
+              votes:   1,
+              option:  index,
+            });
           }
+          await cVote.save();
         }
       } else {
         throw new Error(String(ERROR.INVALID_VOTE_TYPE));
@@ -357,18 +357,18 @@ class Polls extends System {
         if (!cVote || cVote.type !== 'numbers') {
           return true; // do nothing if no vote in progress
         }
-        let vote = await PollVote.findOne({ poll: cVote, votedBy: opts.sender.userName });
+        const vote = cVote.votes.find(o => o.votedBy === opts.sender!.userName);
         if (Number(opts.message) > 0 && Number(opts.message) <= cVote.options.length) {
           if (vote) {
             vote.option = Number(opts.message) - 1;
           } else {
-            vote = new PollVote();
-            vote.poll = cVote;
-            vote.option = Number(opts.message) - 1;
-            vote.votes = 1;
-            vote.votedBy = opts.sender.userName;
+            cVote.votes.push({
+              option:  Number(opts.message) - 1,
+              votes:   1,
+              votedBy: opts.sender.userName,
+            });
           }
-          await vote.save();
+          await cVote.save();
         }
       }
     } catch (e: any) {
@@ -386,12 +386,12 @@ class Polls extends System {
         // we are going downwards because we are checking include and 1 === 10
         if (opts.message.includes('#vote' + i)) {
           // no update as we will not switch vote option as in normal vote
-          const pollVote = new PollVote();
-          pollVote.poll = cVote;
-          pollVote.option = i - 1;
-          pollVote.votes = opts.amount;
-          pollVote.votedBy = opts.userName;
-          await pollVote.save();
+          cVote.votes.push({
+            option:  i - 1,
+            votes:   opts.amount,
+            votedBy: opts.userName,
+          });
+          await cVote.save();
           break;
         }
       }
@@ -407,12 +407,12 @@ class Polls extends System {
         // we are going downwards because we are checking include and 1 === 10
         if (opts.message.includes('#vote' + i)) {
           // no update as we will not switch vote option as in normal vote
-          const pollVote = new PollVote();
-          pollVote.poll = cVote;
-          pollVote.option = i - 1;
-          pollVote.votes = Math.floor(Number(exchange(opts.amount, opts.currency, mainCurrency.value)));
-          pollVote.votedBy = opts.userName;
-          await pollVote.save();
+          cVote.votes.push({
+            option:  i - 1,
+            votes:   Number(exchange(opts.amount, opts.currency, mainCurrency.value)),
+            votedBy: opts.userName,
+          });
+          await cVote.save();
           break;
         }
       }

@@ -12,23 +12,18 @@ export class updatePollTable1665480646971 implements MigrationInterface {
     await queryRunner.query(`DELETE from "poll_vote" WHERE 1=1`);
 
     await queryRunner.query(`DROP TABLE "poll"`);
+    await queryRunner.query(`DROP TABLE "poll_vote"`);
     await queryRunner.query(`CREATE TABLE "poll" ("id" varchar PRIMARY KEY NOT NULL, "type" varchar(7) NOT NULL, "title" varchar NOT NULL, "openedAt" datetime NOT NULL DEFAULT (datetime('now')), "closedAt" date, "options" text NOT NULL)`);
 
     for (const item of items) {
       item.openedAt = new Date(item.openedAt).getTime();
       item.closedAt = item.isOpened ? null : new Date(item.closedAt).getTime();
+      item.votes = JSON.stringify(items2.filter((o: any) => o.pollId === item.id));
       delete item.isOpened;
       await insertItemIntoTable('poll', {
         ...item,
       }, queryRunner);
     }
-
-    for (const item of items2) {
-      await insertItemIntoTable('poll_vote', {
-        ...item,
-      }, queryRunner);
-    }
-
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {

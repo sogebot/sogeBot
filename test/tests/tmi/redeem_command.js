@@ -1,4 +1,3 @@
-/* global describe it before */
 const { getBotSender } = require('../../../dest/helpers/commons/getBotSender');
 
 require('../../general.js');
@@ -14,7 +13,7 @@ const customcommands = (require('../../../dest/systems/customcommands')).default
 
 const { getRepository } = require('typeorm');
 
-const { Poll, PollVote } = require('../../../dest/database/entity/poll');
+const { Poll } = require('../../../dest/database/entity/poll');
 
 const { getLocalizedName } = require('@sogebot/ui-helpers/getLocalized');
 
@@ -52,8 +51,8 @@ describe('TMI - redeem command - @func3', () => {
     const TMI = require('../../../dest/services/twitch/chat').default;
     const tmi = new TMI();
     await tmi.cheer({
-      userName:  'testuser',
-      userId: String(Math.floor(Math.random() * 100000)),
+      userName: 'testuser',
+      userId:   String(Math.floor(Math.random() * 100000)),
     },
     '!test',
     5,
@@ -64,8 +63,8 @@ describe('TMI - redeem command - @func3', () => {
     const TMI = require('../../../dest/services/twitch/chat').default;
     const tmi = new TMI();
     await tmi.cheer({
-      userName:  'testuser',
-      userId: String(Math.floor(Math.random() * 100000)),
+      userName: 'testuser',
+      userId:   String(Math.floor(Math.random() * 100000)),
     },
     '!test2',
     5,
@@ -76,22 +75,26 @@ describe('TMI - redeem command - @func3', () => {
     try {
       await message.debug('tmi.cmdredeems', '!test');
       assert(false, 'This should not get here');
-    } catch (e) {}
+    } catch (e) {
+      return;
+    }
   });
 
   it(`Command !test2 was not redeemed`, async () => {
     try {
       await message.debug('tmi.cmdredeems', '!test2');
       assert(false, 'This should not get here');
-    } catch (e) {}
+    } catch (e) {
+      return;
+    }
   });
 
   it(`User will cheer !test with 10 bits (enough)`, async () => {
     const TMI = require('../../../dest/services/twitch/chat').default;
     const tmi = new TMI();
     await tmi.cheer({
-      userName:  'testuser',
-      userId: String(Math.floor(Math.random() * 100000)),
+      userName: 'testuser',
+      userId:   String(Math.floor(Math.random() * 100000)),
     },
     '!test',
     10,
@@ -102,8 +105,8 @@ describe('TMI - redeem command - @func3', () => {
     const TMI = require('../../../dest/services/twitch/chat').default;
     const tmi = new TMI();
     await tmi.cheer({
-      userName:  'testuser',
-      userId: String(Math.floor(Math.random() * 100000)),
+      userName: 'testuser',
+      userId:   String(Math.floor(Math.random() * 100000)),
     },
     '!test2',
     10,
@@ -120,6 +123,8 @@ describe('TMI - redeem command - @func3', () => {
     try {
       await message.debug('tmi.cmdredeems', '!test2');
       assert(false, 'This should not get here');
-    } catch (e) {}
+    } catch (e) {
+      return;
+    }
   });
 });
