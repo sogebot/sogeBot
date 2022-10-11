@@ -36,7 +36,7 @@ const list: ResponseFilter = {
           visible: true, enabled: true, group,
         } : { visible: true, enabled: true },
       }),
-      getRepository(Commands).find({ relations: ['responses'], where:     typeof group !== 'undefined' ? {
+      getRepository(Commands).find({ where: typeof group !== 'undefined' ? {
         visible: true, enabled: true, group,
       } : { visible: true, enabled: true } }),
       getRepository(Cooldown).find({ where: { isEnabled: true } }),
