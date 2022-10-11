@@ -14,7 +14,7 @@ export class updatePollTable1665480646971 implements MigrationInterface {
     await queryRunner.query(`DROP TABLE "poll_vote"`);
     await queryRunner.query(`DROP TABLE "poll"`);
 
-    await queryRunner.query(`CREATE TABLE "poll" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "type" character varying(7) NOT NULL, "title" character varying NOT NULL, "openedAt" TIMESTAMP NOT NULL DEFAULT now(), "closedAt" date, "options" text NOT NULL, "votes" json CONSTRAINT "PK_03b5cf19a7f562b231c3458527e" PRIMARY KEY ("id"))`);
+    await queryRunner.query(`CREATE TABLE "poll" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "type" character varying(7) NOT NULL, "title" character varying NOT NULL, "openedAt" TIMESTAMP NOT NULL DEFAULT now(), "closedAt" date, "options" text NOT NULL, "votes" json NOT NULL, CONSTRAINT "PK_03b5cf19a7f562b231c3458527e" PRIMARY KEY ("id"))`);
 
     for (const item of items) {
       item.openedAt = new Date(item.openedAt).getTime();
