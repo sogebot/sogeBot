@@ -1,10 +1,9 @@
 import {
-  Commands, CommandsGroup, CommandsResponses,
+  Commands, CommandsGroup, commands, groups,
 } from '@entity/commands';
 import * as constants from '@sogebot/ui-helpers/constants';
 import { validateOrReject } from 'class-validator';
 import _, { merge } from 'lodash';
-import { getRepository } from 'typeorm';
 
 import { parserReply } from '../commons';
 import {
@@ -40,15 +39,6 @@ import { translate } from '~/translate';
  * !command list ![cmd]                                                                - get responses of command
  */
 
-let cacheValid = false;
-const findCache: {
-  search: string;
-  commands: {
-    command: Commands;
-    cmdArray: string[];
-  }[]
-}[] = [];
-
 class CustomCommands extends System {
   constructor () {
     super();
@@ -65,16 +55,13 @@ class CustomCommands extends System {
 
     app.get('/api/systems/customcommands', adminMiddleware, async (req, res) => {
       res.send({
-        data:  await Commands.find({ relations: ['responses'] }),
+        data:  commands,
         count: await getAllCountOfCommandUsage(),
       });
     });
     app.get('/api/systems/customcommands/groups/', adminMiddleware, async (req, res) => {
-      let [ groupsList, items ] = await Promise.all([
-        CommandsGroup.find(), Commands.find(),
-      ]);
-
-      for (const item of items) {
+      let groupsList = [...groups];
+      for (const item of commands) {
         if (item.group && !groupsList.find(o => o.name === item.group)) {
           // we dont have any group options -> create temporary group
           const group = new CommandsGroup();
@@ -94,7 +81,7 @@ class CustomCommands extends System {
       });
     });
     app.get('/api/systems/customcommands/:id', adminMiddleware, async (req, res) => {
-      const cmd = await Commands.findOne({ where: { id: req.params.id }, relations: ['responses'] });
+      const cmd = commands.find(o => o.id === req.params.id);
       res.send({
         data:  cmd,
         count: cmd ? await getCountOfCommandUsage(cmd.command) : 0,
@@ -102,17 +89,14 @@ class CustomCommands extends System {
     });
     app.delete('/api/systems/customcommands/groups/:name', adminMiddleware, async (req, res) => {
       await CommandsGroup.delete({ name: req.params.name });
-      this.invalidateCache();
       res.status(404).send();
     });
     app.delete('/api/systems/customcommands/:id', adminMiddleware, async (req, res) => {
       await Commands.delete({ id: req.params.id });
-      this.invalidateCache();
       res.status(404).send();
     });
     app.post('/api/systems/customcommands/group', adminMiddleware, async (req, res) => {
       try {
-        this.invalidateCache();
         const itemToSave = new CommandsGroup();
         merge(itemToSave, req.body);
         await validateOrReject(itemToSave);
@@ -124,7 +108,6 @@ class CustomCommands extends System {
     });
     app.post('/api/systems/customcommands', adminMiddleware, async (req, res) => {
       try {
-        this.invalidateCache();
         const itemToSave = new Commands();
 
         const { count, ...data } = req.body;
@@ -136,14 +119,6 @@ class CustomCommands extends System {
           await resetCountOfCommandUsage(itemToSave.command);
         }
 
-        await getRepository(CommandsResponses).delete({ command: itemToSave });
-        const responses = req.body.responses;
-        for (const response of responses) {
-          const resToSave = new CommandsResponses();
-          merge(resToSave, response);
-          resToSave.command = itemToSave;
-          await resToSave.save();
-        }
         res.send({ data: itemToSave });
       } catch (e) {
         res.status(400).send({ errors: e });
@@ -184,10 +159,7 @@ class CustomCommands extends System {
         throw Error('Command should start with !');
       }
 
-      const cDb = await Commands.findOne({
-        relations: ['responses'],
-        where:     { command: cmd },
-      });
+      const cDb = commands.find(o => o.command === cmd);
       if (!cDb) {
         return [{ response: prepare('customcmds.command-was-not-found', { command: cmd }), ...opts }];
       }
@@ -208,8 +180,7 @@ class CustomCommands extends System {
         responseDb.stopIfExecuted = stopIfExecuted;
       }
 
-      await responseDb.save();
-      this.invalidateCache();
+      await cDb.save();
       return [{ response: prepare('customcmds.command-was-edited', { command: cmd, response }), ...opts }];
     } catch (e: any) {
       return [{ response: prepare('customcmds.commands-parse-failed', { command: this.getCommand('!command') }), ...opts }];
@@ -237,10 +208,7 @@ class CustomCommands extends System {
         throw Error('Command should start with !');
       }
 
-      const cDb = await Commands.findOne({
-        relations: ['responses'],
-        where:     { command: cmd },
-      });
+      const cDb = commands.find(o => o.command === cmd);
       if (!cDb) {
         const newCommand = new Commands();
         newCommand.command = cmd;
@@ -255,60 +223,37 @@ class CustomCommands extends System {
         throw Error('Permission ' + userlevel + ' not found.');
       }
 
-      const newResponse = new CommandsResponses();
-      newResponse.order =          cDb.responses.length;
-      newResponse.permission =     pItem.id ?? defaultPermissions.VIEWERS;
-      newResponse.stopIfExecuted = stopIfExecuted;
-      newResponse.response =       response;
-      newResponse.filter =         '';
-      newResponse.command = cDb;
-      await newResponse.save();
-      this.invalidateCache();
+      cDb.responses.push({
+        order:          cDb.responses.length,
+        permission:     pItem.id ?? defaultPermissions.VIEWERS,
+        stopIfExecuted: stopIfExecuted,
+        response:       response,
+        filter:         '',
+      });
+      await cDb.save();
       return [{ response: prepare('customcmds.command-was-added', { command: cmd }), ...opts }];
     } catch (e: any) {
       return [{ response: prepare('customcmds.commands-parse-failed', { command: this.getCommand('!command') }), ...opts }];
     }
   }
 
-  invalidateCache() {
-    cacheValid = false;
-  }
-
   async find(search: string) {
-    const commands: {
+    const commandsSearchProgress: {
       command: Commands;
       cmdArray: string[];
     }[] = [];
-    if (!cacheValid) {
-      // we need to purge findCache and make cacheValid again
-      while(findCache.length > 0) {
-        findCache.shift();
+    const cmdArray = search.toLowerCase().split(' ');
+    for (let i = 0, len = search.toLowerCase().split(' ').length; i < len; i++) {
+      const db_commands = commands.filter(o => o.command === cmdArray.join(' '));
+      for (const cmd of db_commands) {
+        commandsSearchProgress.push({
+          cmdArray: _.cloneDeep(cmdArray),
+          command:  cmd,
+        });
       }
-      cacheValid = true;
+      cmdArray.pop(); // remove last array item if not found
     }
-
-    const fromCache = findCache.find(o => o.search === search);
-    if (fromCache) {
-      return fromCache.commands;
-    } else {
-      const cmdArray = search.toLowerCase().split(' ');
-      for (let i = 0, len = search.toLowerCase().split(' ').length; i < len; i++) {
-        const db_commands: Commands[]
-          = await Commands.find({
-            relations: ['responses'],
-            where:     { command: cmdArray.join(' ') },
-          });
-        for (const cmd of db_commands) {
-          commands.push({
-            cmdArray: _.cloneDeep(cmdArray),
-            command:  cmd,
-          });
-        }
-        cmdArray.pop(); // remove last array item if not found
-      }
-      findCache.push({ search, commands });
-      return commands;
-    }
+    return commandsSearchProgress;
   }
 
   @timer()
@@ -318,20 +263,20 @@ class CustomCommands extends System {
       return true;
     } // do nothing if it is not a command
 
-    const commands = await this.find(opts.message);
-    if (commands.length === 0) {
+    const _commands = await this.find(opts.message);
+    if (_commands.length === 0) {
       return true;
     } // no command was found - return
 
     // go through all commands
     let atLeastOnePermissionOk = false;
-    for (const cmd of commands) {
+    for (const cmd of _commands) {
       if (!cmd.command.enabled) {
         atLeastOnePermissionOk = true; // continue if command is disabled
         warning(`Custom command ${cmd.command.command} (${cmd.command.id}) is disabled!`);
         continue;
       }
-      const _responses: CommandsResponses[] = [];
+      const _responses: Commands['responses'] = [];
       // remove found command from message to get param
       const param = opts.message.replace(new RegExp('^(' + cmd.cmdArray.join(' ') + ')', 'i'), '').trim();
       incrementCountOfCommandUsage(cmd.command.command);
@@ -340,7 +285,7 @@ class CustomCommands extends System {
       let group: Readonly<Required<CommandsGroup>> | undefined;
       let groupPermission: null | string = null;
       if (cmd.command.group) {
-        group = await getRepository(CommandsGroup).findOne({ name: cmd.command.group });
+        group = groups.find(o => o.name === cmd.command.group);
         if (group) {
           if (group.options.filter && !(await checkFilter(opts, group.options.filter))) {
             warning(`Custom command ${cmd.command.command}#${cmd.command.id} didn't pass group filter.`);
@@ -385,7 +330,7 @@ class CustomCommands extends System {
     return atLeastOnePermissionOk;
   }
 
-  async sendResponse(responses: (CommandsResponses)[], opts: { param: string; sender: CommandOptions['sender'], discord: CommandOptions['discord'], command: string, processedCommands?: string[], id: string, }) {
+  async sendResponse(responses: Commands['responses'], opts: { param: string; sender: CommandOptions['sender'], discord: CommandOptions['discord'], command: string, processedCommands?: string[], id: string, }) {
     for (let i = 0; i < responses.length; i++) {
       await parserReply(responses[i].response, opts);
     }
@@ -398,16 +343,12 @@ class CustomCommands extends System {
 
     if (!cmd) {
       // print commands
-      const commands = await Commands.find({ where: { visible: true, enabled: true } });
-      const response = (commands.length === 0 ? translate('customcmds.list-is-empty') : translate('customcmds.list-is-not-empty').replace(/\$list/g, _.orderBy(commands, 'command').map(o => o.command).join(', ')));
+      const _commands = commands.filter(o => o.visible && o.enabled);
+      const response = (_commands.length === 0 ? translate('customcmds.list-is-empty') : translate('customcmds.list-is-not-empty').replace(/\$list/g, _.orderBy(_commands, 'command').map(o => o.command).join(', ')));
       return [{ response, ...opts }];
     } else {
       // print responses
-      const command_with_responses
-        = await Commands.findOne({
-          relations: ['responses'],
-          where:     { command: cmd },
-        });
+      const command_with_responses = commands.find(o => o.command === cmd);
 
       if (!command_with_responses || command_with_responses.responses.length === 0) {
         return [{ response: prepare('customcmds.list-of-responses-is-empty', { command: cmd }), ...opts }];
@@ -431,14 +372,13 @@ class CustomCommands extends System {
         .string({ optional: true })
         .toArray();
 
-      const cmd = await Commands.findOne({ where: { command: (cmdInput + ' ' + subcommand).trim() } });
+      const cmd = commands.find(o => o.command === (cmdInput + ' ' + subcommand).trim());
       if (!cmd) {
         const response = prepare('customcmds.command-was-not-found', { command: (cmdInput + ' ' + subcommand).trim() });
         return [{ response, ...opts }];
       }
       cmd.enabled = !cmd.enabled;
       await cmd.save();
-      this.invalidateCache();
       return [{ response: prepare(cmd.enabled ? 'customcmds.command-was-enabled' : 'customcmds.command-was-disabled', { command: cmd.command }), ...opts }];
     } catch (e: any) {
       const response = prepare('customcmds.commands-parse-failed', { command: this.getCommand('!command') });
@@ -455,7 +395,7 @@ class CustomCommands extends System {
         .string({ optional: true })
         .toArray();
 
-      const cmd = await Commands.findOne({ where: { command: (cmdInput + ' ' + subcommand).trim() } });
+      const cmd = commands.find(o => o.command = (cmdInput + ' ' + subcommand).trim());
       if (!cmd) {
         const response = prepare('customcmds.command-was-not-found', { command: (cmdInput + ' ' + subcommand).trim() });
         return [{ response, ...opts }];
@@ -464,7 +404,6 @@ class CustomCommands extends System {
       await cmd.save();
 
       const response = prepare(cmd.visible ? 'customcmds.command-was-exposed' : 'customcmds.command-was-concealed', { command: cmd.command });
-      this.invalidateCache();
       return [{ response, ...opts }];
 
     } catch (e: any) {
@@ -490,31 +429,25 @@ class CustomCommands extends System {
         throw Error('Command should start with !');
       }
 
-      const command_db = await Commands.findOne({
-        where:     { command: cmd },
-        relations: [ 'responses' ],
-      });
+      const command_db = commands.find(o => o.command === cmd);
       if (!command_db) {
         return [{ response: prepare('customcmds.command-was-not-found', { command: cmd }), ...opts }];
       } else {
         let response = prepare('customcmds.command-was-removed', { command: cmd });
         if (rId >= 1) {
           const responseDb = command_db.responses.filter(o => o.order !== (rId - 1));
-          const toRemove = command_db.responses.find(o => o.order === (rId - 1));
-          await toRemove?.remove();
 
           // reorder
           responseDb.forEach((item, index) => {
             item.order = index;
           });
-          for (const r of responseDb) {
-            await r.save();
-          }
+
+          await command_db.save();
+
           response = prepare('customcmds.response-was-removed', { command: cmd, response: rId });
         } else {
           await Commands.remove(command_db);
         }
-        this.invalidateCache();
         return [{ response, ...opts }];
       }
     } catch (e: any) {

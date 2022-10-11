@@ -48,36 +48,26 @@ describe('Events - event run command should correctly parse filters and be able 
     command.enabled =   true;
     command.visible =   true;
     command.group =     null;
+    command.responses = [{
+      stopIfExecuted: false,
+      response:       '1',
+      filter:         '$isBotSubscriber',
+      order:          0,
+      permission:     defaultPermissions.CASTERS,
+    }, {
+      stopIfExecuted: false,
+      response:       '2',
+      filter:         `$sender === '${user.viewer2.userName}'`,
+      order:          1,
+      permission:     defaultPermissions.MODERATORS,
+    }, {
+      stopIfExecuted: false,
+      response:       '3',
+      filter:         '',
+      order:          2,
+      permission:     defaultPermissions.VIEWERS,
+    }];
     await command.save();
-
-    const response = new CommandsResponses();
-    response.stopIfExecuted = false;
-    response.response =       '1';
-    response.filter =         '$isBotSubscriber';
-    response.order =          0;
-    response.permission =     defaultPermissions.CASTERS;
-    response.command = command;
-    await response.save();
-
-    const response2 = new CommandsResponses();
-    response2.stopIfExecuted = false;
-    response2.response =       '2';
-    response2.filter =         `$sender === '${user.viewer2.userName}'`;
-    response2.order =          1;
-    response2.permission =     defaultPermissions.MODERATORS;
-    response2.command = command;
-    await response2.save();
-
-    const response3 = new CommandsResponses();
-    response3.stopIfExecuted = false;
-    response3.response =       '3';
-    response3.filter =         '';
-    response3.order =          2;
-    response3.permission =     defaultPermissions.VIEWERS;
-    response3.command = command;
-    await response3.save();
-
-    customcommands.invalidateCache();
   });
 
   it('set bot as subscriber', async () => {

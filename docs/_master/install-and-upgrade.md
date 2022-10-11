@@ -114,8 +114,8 @@
 
     `npm start`
 
-- To access webpanel, go to `http://localhost:<port>` where port is configured
-  in config.json (default: 20000)
+- To access webpanel, go to `http://localhost:<port>` where PORT is environment
+  variable with default value `20000`
 
 ### Upgrade bot from GIT
 

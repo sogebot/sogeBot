@@ -1,3 +1,5 @@
+import { debug } from 'console';
+
 import { template } from '../template';
 
 import type { Node } from '~/../d.ts/src/plugins';
@@ -8,7 +10,21 @@ const counter = new Map<string, number>();
 export const clearCounter = (uuid: string) => {
   for (const key of counter.keys()) {
     if (key.includes(uuid)) {
+      debug('plugins.counter', `Clearing ${key} counter`);
       counter.delete(key);
+    }
+  }
+};
+
+export const updateCounter = (uuid: string, value: number) => {
+  for (const key of counter.keys()) {
+    if (key.includes(uuid)) {
+      const cValue = counter.get(key);
+      if (cValue) {
+        const newValue = cValue + value;
+        counter.set(key, newValue < 0 ? 0 : newValue);
+        debug('plugins.counter', `Set new value of ${key} counter to ${counter.get(key)}`);
+      }
     }
   }
 };
@@ -34,7 +50,7 @@ export default async function(pluginId: string, currentNode: Node<string>, param
     const count = (counter.get(key) ?? 0) + 1;
     counter.set(key, count);
 
-    if (count <= expectedCount) {
+    if (count < expectedCount) {
       throw new Error(`Counter`);
     }
 

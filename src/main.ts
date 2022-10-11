@@ -48,6 +48,7 @@ const connect = async function () {
       migrationsRun:  true,
       charset:        'UTF8MB4_GENERAL_CI',
       entities:       [ 'dest/database/entity/*.js' ],
+      subscribers:    [ 'dest/database/entity/*.js' ],
       migrations:     [ `dest/database/migration/${getMigrationType(connectionOptions.type)}/**/*.js` ],
     } as MysqlConnectionOptions);
   } else {
@@ -59,6 +60,7 @@ const connect = async function () {
       synchronize:   false,
       migrationsRun: true,
       entities:      [ 'dest/database/entity/*.js' ],
+      subscribers:   [ 'dest/database/entity/*.js' ],
       migrations:    [ `dest/database/migration/${getMigrationType(connectionOptions.type)}/**/*.js` ],
     });
   }
