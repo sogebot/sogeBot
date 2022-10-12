@@ -14,7 +14,7 @@ export class updatePollTable1665480646971 implements MigrationInterface {
     await queryRunner.query(`DROP TABLE \`poll_vote\``);
     await queryRunner.query(`DROP TABLE \`poll\``);
 
-    await queryRunner.query(`CREATE TABLE \`poll\` (\`id\` varchar(36) NOT NULL, \`type\` varchar(7) NOT NULL, \`title\` varchar(255) NOT NULL, \`openedAt\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), \`closedAt\` date NULL, \`options\` text NOT NULL, \`votes\` json NOT NULL, PRIMARY KEY (\`id\`)) ENGINE=InnoDB`);
+    await queryRunner.query(`CREATE TABLE \`poll\` (\`id\` varchar(36) NOT NULL, \`type\` varchar(7) NOT NULL, \`title\` varchar(255) NOT NULL, \`openedAt\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), \`closedAt\` datetime(6) NULL, \`options\` text NOT NULL, \`votes\` json NOT NULL, PRIMARY KEY (\`id\`)) ENGINE=InnoDB`);
 
     for (const item of items) {
       item.openedAt = new Date(item.openedAt).getTime();

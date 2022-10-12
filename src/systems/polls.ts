@@ -155,7 +155,7 @@ class Polls extends System {
       if (!cVote) {
         throw new Error(String(ERROR.ALREADY_CLOSED));
       } else {
-        cVote.closedAt = new Date().getTime();
+        cVote.closedAt = new Date();
         await cVote.save();
 
         let _total = 0;

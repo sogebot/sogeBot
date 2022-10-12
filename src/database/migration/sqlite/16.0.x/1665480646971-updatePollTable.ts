@@ -13,7 +13,7 @@ export class updatePollTable1665480646971 implements MigrationInterface {
 
     await queryRunner.query(`DROP TABLE "poll"`);
     await queryRunner.query(`DROP TABLE "poll_vote"`);
-    await queryRunner.query(`CREATE TABLE "poll" ("id" varchar PRIMARY KEY NOT NULL, "type" varchar(7) NOT NULL, "title" varchar NOT NULL, "openedAt" datetime NOT NULL DEFAULT (datetime('now')), "closedAt" date, "options" text NOT NULL, "votes" text NOT NULL)`);
+    await queryRunner.query(`CREATE TABLE "poll" ("id" varchar PRIMARY KEY NOT NULL, "type" varchar(7) NOT NULL, "title" varchar NOT NULL, "openedAt" datetime NOT NULL DEFAULT (datetime('now')), "closedAt" datetime, "options" text NOT NULL, "votes" text NOT NULL)`);
 
     for (const item of items) {
       item.openedAt = new Date(item.openedAt).getTime();
