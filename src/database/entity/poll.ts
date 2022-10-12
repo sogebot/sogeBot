@@ -17,7 +17,7 @@ export class Poll extends BaseEntity {
   @CreateDateColumn()
     openedAt: Date;
 
-  @Column({ nullable: true, type: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') !== 'better-sqlite3' ? 'timestamp' : 'datetime' })
+  @Column({ nullable: true, type: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') === 'postgres' ? 'timestamp' : 'datetime' })
     closedAt: Date | null;
 
   @ArrayMinSize(2)
