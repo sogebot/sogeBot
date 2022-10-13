@@ -377,19 +377,6 @@ export type ClientToServerEventsWithNamespace = {
     'raffle::close': () => void,
     'raffle::open': (message: string) => void,
   },
-  '/systems/polls': GenericEvents & {
-    'generic::getAll': generic<PollInterface>['getAll'],
-    'generic::getOne': generic<PollInterface>['getOne'],
-    'generic::deleteById': generic<PollInterface>['deleteById'],
-    'polls::save': (item: PollInterface, cb: (error: Error | string | null) => void) => void,
-    'polls::close': (item: PollInterface, cb: (error: Error | string | null) => void) => void,
-  },
-  '/systems/ranks': GenericEvents & {
-    'generic::getAll': generic<RankInterface>['getAll'],
-    'generic::getOne': generic<RankInterface>['getOne'],
-    'ranks::remove': (id: string, cb?: (error: Error | string | null) => void) => void,
-    'ranks::save': (item: RankInterface, cb: (error: Error | string | null, item: RankInterface) => void) => void,
-  },
   '/systems/songs': GenericEvents & {
     'isPlaying': (cb: (isPlaying: boolean) => void) => void,
     'songs::getAllRequests': (_: any, cb: (error: Error | string | null, requests: SongRequestInterface[]) => void) => void,
