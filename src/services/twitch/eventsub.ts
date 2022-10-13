@@ -1,7 +1,7 @@
 import crypto from 'crypto';
 
 import { MINUTE } from '@sogebot/ui-helpers/constants';
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import type { Request, Response } from 'express';
 import localtunnel from 'localtunnel';
 import type QueryString from 'qs';
@@ -21,6 +21,7 @@ import {
 } from '~/helpers/log';
 import { ioServer } from '~/helpers/panel';
 import { variables } from '~/watchers';
+import { setImmediateAwait } from '~/helpers/setImmediateAwait.js';
 
 export const eventErrorShown = new Set<string>();
 
@@ -205,7 +206,7 @@ class EventSub {
     });
   }
 
-  async onStartup() {
+  async onStartup(): Promise<void> {
     const broadcasterId = variables.get('services.twitch.broadcasterId') as string;
     const clientId = variables.get('services.twitch.eventSubClientId') as string;
     const useTunneling = variables.get('services.twitch.useTunneling') as string;
@@ -267,7 +268,7 @@ class EventSub {
           'Authorization': 'Bearer ' + token,
           'Client-ID':     clientId,
         },
-        timeout: 20000,
+        timeout: 60000,
       });
 
       const eventsList = [
@@ -303,7 +304,7 @@ class EventSub {
                   'Authorization': 'Bearer ' + token,
                   'Client-ID':     clientId,
                 },
-                timeout: 20000,
+                timeout: 60000,
               });
             } catch (e) {
               if (e instanceof Error) {
@@ -328,8 +329,16 @@ class EventSub {
           await this.subscribe(event);
         }
       }
-    } catch (e: any) {
-      error(e);
+    } catch (e: unknown) {
+      if (e instanceof AxiosError) {
+        if (e.code === 'ECONNABORTED') {
+          warning(`eventsub(onStartup) => Connection to Twitch timed out. Will retry request.`); // ignore etimedout error
+          await setImmediateAwait();
+          return this.onStartup();
+        }
+      } else {
+        error(e);
+      }
     }
   }
 
@@ -364,7 +373,7 @@ class EventSub {
             'secret':   secret,
           },
         },
-        timeout: 20000,
+        timeout: 60000,
       });
       eventErrorShown.delete(event);
     } catch (e: any) {
