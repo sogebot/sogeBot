@@ -1,6 +1,6 @@
 'use strict';
 
-import { Rank, RankInterface } from '@entity/rank';
+import { Rank } from '@entity/rank';
 import { User, UserInterface } from '@entity/user';
 import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized';
 import * as _ from 'lodash';
@@ -12,14 +12,14 @@ import System from './_interface';
 
 import { prepare } from '~/helpers/commons';
 import { defaultPermissions } from '~/helpers/permissions/index';
-import { adminEndpoint } from '~/helpers/socket';
 import * as changelog from '~/helpers/user/changelog.js';
 import { translate } from '~/translate';
+import { app } from '~/helpers/panel';
+import { adminMiddleware } from '~/socket';
 
 /*
  * !rank                          - show user rank
  * !rank add <hours> <rank>       - add <rank> for selected <hours>
- * !rank add-flw <months> <rank>  - add <rank> for selected <hours>
  * !rank add-sub <months> <rank>  - add <rank> for selected <hours>
  * !rank rm <hours>               - remove rank for selected <hours>
  * !rank rm-sub <months>          - remove rank for selected <months> of subscribers
@@ -40,41 +40,43 @@ class Ranks extends System {
   }
 
   sockets () {
-    adminEndpoint('/systems/ranks', 'generic::getAll', async (cb) => {
-      try {
-        cb(null, await getRepository(Rank).find({ order: { value: 'ASC' } }));
-      } catch (e: any) {
-        cb(e.stack, []);
-      }
+    if (!app) {
+      setTimeout(() => this.sockets(), 100);
+      return;
+    }
+
+    app.get('/api/systems/ranks', adminMiddleware, async (req, res) => {
+      res.send({
+        data: await Rank.find(),
+      });
     });
-    adminEndpoint('/systems/ranks', 'generic::getOne', async (id, cb) => {
-      try {
-        cb(null, await getRepository(Rank).findOne(id));
-      } catch(e: any) {
-        cb(e.stack, undefined);
-      }
+    app.get('/api/systems/ranks/:id', async (req, res) => {
+      res.send({
+        data: await Rank.findOne({ where: { id: req.params.id } }),
+      });
     });
-    adminEndpoint('/systems/ranks', 'ranks::remove', async (id, cb) => {
-      try {
-        await getRepository(Rank).delete(id);
-        cb ? cb(null) : null;
-      } catch (e: any) {
-        cb ? cb(e.stack) : null;
-      }
+    app.delete('/api/systems/ranks/:id', adminMiddleware, async (req, res) => {
+      const poll = await Rank.findOne({ where: { id: req.params.id } });
+      await poll?.remove();
+      res.status(404).send();
     });
-    adminEndpoint('/systems/ranks', 'ranks::save', async (item, cb) => {
+    app.post('/api/systems/ranks', adminMiddleware, async (req, res) => {
       try {
-        await getRepository(Rank).save(item);
-        cb(null, item);
-      } catch (e: any) {
-        cb(e.stack, item);
+        const itemToSave = new Rank(req.body);
+        res.send({ data: await itemToSave.validateAndSave() });
+      } catch (e) {
+        if (e instanceof Error) {
+          res.status(400).send({ errors: e.message });
+        } else {
+          res.status(400).send({ errors: e });
+        }
       }
     });
   }
 
   @command('!rank add')
   @default_permission(defaultPermissions.CASTERS)
-  async add (opts: CommandOptions, type: RankInterface['type'] = 'viewer'): Promise<CommandResponse[]> {
+  async add (opts: CommandOptions, type: Rank['type'] = 'viewer'): Promise<CommandResponse[]> {
     const parsed = opts.parameters.match(/^(\d+) ([\S].+)$/);
 
     if (_.isNil(parsed)) {
@@ -108,7 +110,7 @@ class Ranks extends System {
 
   @command('!rank edit')
   @default_permission(defaultPermissions.CASTERS)
-  async edit (opts: CommandOptions, type: RankInterface['type'] = 'viewer'): Promise<CommandResponse[]> {
+  async edit (opts: CommandOptions, type: Rank['type'] = 'viewer'): Promise<CommandResponse[]> {
     const parsed = opts.parameters.match(/^(\d+) ([\S].+)$/);
 
     if (_.isNil(parsed)) {
@@ -185,7 +187,7 @@ class Ranks extends System {
 
   @command('!rank list')
   @default_permission(defaultPermissions.CASTERS)
-  async list (opts: CommandOptions, type: RankInterface['type'] = 'viewer'): Promise<CommandResponse[]> {
+  async list (opts: CommandOptions, type: Rank['type'] = 'viewer'): Promise<CommandResponse[]> {
     const ranks = await getRepository(Rank).find({ type });
     const response = prepare(ranks.length === 0 ? 'ranks.list-is-empty' : 'ranks.list-is-not-empty', {
       list: _.orderBy(ranks, 'value', 'asc').map((l) => {
@@ -203,7 +205,7 @@ class Ranks extends System {
 
   @command('!rank rm')
   @default_permission(defaultPermissions.CASTERS)
-  async rm (opts: CommandOptions, type: RankInterface['type'] = 'viewer'): Promise<CommandResponse[]> {
+  async rm (opts: CommandOptions, type: Rank['type'] = 'viewer'): Promise<CommandResponse[]> {
     const parsed = opts.parameters.match(/^(\d+)$/);
     if (_.isNil(parsed)) {
       const response = prepare('ranks.rank-parse-failed');
@@ -262,7 +264,7 @@ class Ranks extends System {
     return [{ response, ...opts }];
   }
 
-  async get (user: Required<UserInterface> | null): Promise<{current: null | string | Required<RankInterface>; next: null | Required<RankInterface>}> {
+  async get (user: Required<UserInterface> | null): Promise<{current: null | string | Required<Rank>; next: null | Required<Rank>}> {
     if (!user) {
       return { current: null, next: null };
     }
@@ -273,10 +275,9 @@ class Ranks extends System {
 
     const ranks = await getRepository(Rank).find({ order: { value: 'DESC' } });
 
-    let rankToReturn: null | Required<RankInterface> = null;
-    let subNextRank: null | Required<RankInterface> = null;
-    const flwNextRank: null | Required<RankInterface> = null;
-    let nextRank: null | Required<RankInterface> = null;
+    let rankToReturn: null | Required<Rank> = null;
+    let subNextRank: null | Required<Rank> = null;
+    let nextRank: null | Required<Rank> = null;
 
     if (user.isSubscriber) {
       // search for sub rank
@@ -304,7 +305,7 @@ class Ranks extends System {
         nextRank = rank;
       }
     }
-    return { current: rankToReturn, next: subNextRank || flwNextRank || nextRank };
+    return { current: rankToReturn, next: subNextRank || nextRank };
   }
 }
 

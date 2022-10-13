@@ -1,25 +1,22 @@
-import { EntitySchema } from 'typeorm';
+import { IsNotEmpty, Min, MinLength } from 'class-validator';
+import { Column, Entity, PrimaryColumn, Unique } from 'typeorm';
+import { BotEntity } from '~/database/entity/_botEntity';
 
-export interface RankInterface<T = 'viewer' | 'subscriber'> {
-  id?: string;
-  value: number;
-  rank: string;
-  type: T;
+@Entity()
+@Unique('IDX_93c78c94804a13befdace81904', ['type', 'value'])
+export class Rank extends BotEntity {
+  @PrimaryColumn({ generated: 'uuid' })
+    id: string;
+
+  @Column()
+  @Min(0)
+    value: number;
+
+  @Column()
+  @MinLength(2)
+  @IsNotEmpty()
+    rank: string;
+
+  @Column()
+    type: 'viewer' | 'subscriber';
 }
-
-export const Rank = new EntitySchema<Readonly<Required<RankInterface>>>({
-  name:    'rank',
-  columns: {
-    id: {
-      type: String, primary: true, generated: 'uuid',
-    },
-    value: { type: Number },
-    rank:  { type: String },
-    type:  { type: String },
-  },
-  indices: [
-    {
-      name: 'IDX_93c78c94804a13befdace81904', unique: true, columns: [ 'type', 'value' ],
-    },
-  ],
-});
