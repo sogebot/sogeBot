@@ -4,8 +4,10 @@ import { refresh } from '../token/refresh.js';
 
 import { getFunctionName } from '~/helpers/getFunctionName';
 import { variables } from '~/watchers';
+import { setImmediateAwait } from '~/helpers/setImmediateAwait';
+import { HelixStreamMarker } from '@twurple/api/lib';
 
-export async function createMarker (description = 'Marked from sogeBot') {
+export async function createMarker (description = 'Marked from sogeBot'): Promise<HelixStreamMarker | void> {
   if (isDebugEnabled('api.calls')) {
     debug('api.calls', new Error().stack);
   }
@@ -16,6 +18,11 @@ export async function createMarker (description = 'Marked from sogeBot') {
     clientBot.streams.createStreamMarker(broadcasterId, description);
   } catch (e: unknown) {
     if (e instanceof Error) {
+      if (e.message.includes('ETIMEDOUT')) {
+        warning(`${getFunctionName()} => Connection to Twitch timed out. Will retry request.`);
+        await setImmediateAwait();
+        return createMarker(description);
+      }
       if (e.message.includes('Invalid OAuth token')) {
         warning(`${getFunctionName()} => Invalid OAuth token - attempting to refresh token`);
         await refresh('bot');

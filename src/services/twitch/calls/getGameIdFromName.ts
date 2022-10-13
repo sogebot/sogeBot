@@ -5,6 +5,7 @@ import client from '../api/client';
 
 import { stats } from '~/helpers/api';
 import { debug, isDebugEnabled, warning } from '~/helpers/log';
+import { setImmediateAwait } from '~/helpers/setImmediateAwait';
 
 async function getGameIdFromName (name: string): Promise<string | undefined> {
   if (isDebugEnabled('api.calls')) {
@@ -28,7 +29,13 @@ async function getGameIdFromName (name: string): Promise<string | undefined> {
     return String(id);
   } catch (e: unknown) {
     if (e instanceof Error) {
-      warning(`getGameIdFromName => ${e.stack ?? e.message}`);
+      if (e.message.includes('ETIMEDOUT')) {
+        warning(`getGameIdFromName => Connection to Twitch timed out. Will retry request.`);
+        await setImmediateAwait();
+        return getGameIdFromName(name);
+      } else {
+        warning(`getGameIdFromName => ${e.stack ?? e.message}`);
+      }
     }
     return undefined;
   }

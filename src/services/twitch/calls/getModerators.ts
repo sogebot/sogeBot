@@ -39,6 +39,10 @@ export async function getModerators(opts: { isWarned: boolean }) {
     setStatus('MOD', getModeratorsPaginated.map(o => o.userId).includes(botId));
   } catch (e) {
     if (e instanceof Error) {
+      if (e.message.includes('ETIMEDOUT')) {
+        warning(`${getFunctionName()} => Connection to Twitch timed out. Will retry request.`);
+        return { state: false }; // ignore etimedout error
+      }
       if (e.message.includes('Invalid OAuth token')) {
         warning(`${getFunctionName()} => Invalid OAuth token - attempting to refresh token`);
         await refresh('broadcaster');

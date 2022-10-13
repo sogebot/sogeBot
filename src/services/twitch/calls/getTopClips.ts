@@ -10,8 +10,9 @@ import { streamStatusChangeSince } from '~/helpers/api';
 import { getFunctionName } from '~/helpers/getFunctionName';
 import { debug, error, isDebugEnabled, warning } from '~/helpers/log';
 import { variables } from '~/watchers';
+import { setImmediateAwait } from '~/helpers/setImmediateAwait';
 
-export async function getTopClips (opts: any) {
+export async function getTopClips (opts: any): Promise<(Partial<HelixClip> & { mp4: string; game: string | null })[]> {
   if (isDebugEnabled('api.calls')) {
     debug('api.calls', new Error().stack);
   }
@@ -39,6 +40,11 @@ export async function getTopClips (opts: any) {
     return shuffle(clips).slice(0, opts.first);
   } catch (e) {
     if (e instanceof Error) {
+      if (e.message.includes('ETIMEDOUT')) {
+        warning(`${getFunctionName()} => Connection to Twitch timed out. Will retry request.`);
+        await setImmediateAwait();
+        return getTopClips(opts);
+      }
       if (e.message.includes('Invalid OAuth token')) {
         warning(`${getFunctionName()} => Invalid OAuth token - attempting to refresh token`);
         await refresh('bot');

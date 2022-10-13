@@ -2,6 +2,7 @@ import client from '../api/client';
 import { refresh } from '../token/refresh.js';
 
 import { debug, error, isDebugEnabled, warning } from '~/helpers/log';
+import { setImmediateAwait } from '~/helpers/setImmediateAwait';
 
 async function getIdFromTwitch (userName: string): Promise<string> {
   if (isDebugEnabled('api.calls')) {
@@ -17,6 +18,11 @@ async function getIdFromTwitch (userName: string): Promise<string> {
     }
   } catch (e: unknown) {
     if (e instanceof Error) {
+      if (e.message.includes('ETIMEDOUT')) {
+        warning(`getIdFromTwitch => Connection to Twitch timed out. Will retry request.`);
+        await setImmediateAwait();
+        return getIdFromTwitch(userName);
+      }
       if (e.message.includes('Invalid OAuth token')) {
         warning(`getIdFromTwitch => Invalid OAuth token - attempting to refresh token`);
         await refresh('bot');

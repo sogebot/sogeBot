@@ -4,6 +4,7 @@ import { getRepository } from 'typeorm';
 import client from '../api/client';
 
 import { debug, isDebugEnabled, warning } from '~/helpers/log';
+import { setImmediateAwait } from '~/helpers/setImmediateAwait';
 
 async function getGameThumbnailFromName (name: string): Promise<string | undefined> {
   if (isDebugEnabled('api.calls')) {
@@ -27,7 +28,13 @@ async function getGameThumbnailFromName (name: string): Promise<string | undefin
     return String(id);
   } catch (e: unknown) {
     if (e instanceof Error) {
-      warning(`getGameThumbnailFromName => ${e.stack ?? e.message}`);
+      if (e.message.includes('ETIMEDOUT')) {
+        warning(`getGameThumbnailFromName => Connection to Twitch timed out. Will retry request.`);
+        await setImmediateAwait();
+        return getGameThumbnailFromName(name);
+      } else {
+        warning(`getGameThumbnailFromName => ${e.stack ?? e.message}`);
+      }
     }
     return undefined;
   }

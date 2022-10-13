@@ -44,6 +44,10 @@ export async function getAllStreamTags(opts: any) {
     await getRepository(TwitchTagLocalizationName).delete({ tagId: IsNull() });
   } catch (e) {
     if (e instanceof Error) {
+      if (e.message.includes('ETIMEDOUT')) {
+        warning(`${getFunctionName()} => Connection to Twitch timed out. Will retry request.`);
+        return { state: false, opts }; // ignore etimedout error
+      }
       if (e.message.includes('Invalid OAuth token')) {
         warning(`${getFunctionName()} => Invalid OAuth token - attempting to refresh token`);
         await refresh('bot');

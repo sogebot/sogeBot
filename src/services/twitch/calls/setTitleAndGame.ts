@@ -16,6 +16,7 @@ import { debug, isDebugEnabled, warning } from '~/helpers/log';
 import { addUIError } from '~/helpers/panel/index';
 import { translate } from '~/translate';
 import { variables } from '~/watchers';
+import { setImmediateAwait } from '~/helpers/setImmediateAwait';
 
 async function setTitleAndGame (args: { title?: string | null; game?: string | null }): Promise<{ response: string; status: boolean } | null> {
   if (isDebugEnabled('api.calls')) {
@@ -57,6 +58,11 @@ async function setTitleAndGame (args: { title?: string | null; game?: string | n
     });
   } catch (e) {
     if (e instanceof Error) {
+      if (e.message.includes('ETIMEDOUT')) {
+        warning(`${getFunctionName()} => Connection to Twitch timed out. Will retry request.`);
+        await setImmediateAwait();
+        return setTitleAndGame(args);
+      }
       if (e.message.includes('Invalid OAuth token')) {
         warning(`${getFunctionName()} => Invalid OAuth token - attempting to refresh token`);
         await refresh('bot');

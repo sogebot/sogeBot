@@ -3,8 +3,9 @@ import { refresh } from '../token/refresh.js';
 
 import { getFunctionName } from '~/helpers/getFunctionName';
 import { debug, error, isDebugEnabled, warning } from '~/helpers/log';
+import { setImmediateAwait } from '~/helpers/setImmediateAwait';
 
-async function sendGameFromTwitch (game: string) {
+async function sendGameFromTwitch (game: string): Promise<string[]> {
   if (isDebugEnabled('api.calls')) {
     debug('api.calls', new Error().stack);
   }
@@ -14,6 +15,11 @@ async function sendGameFromTwitch (game: string) {
     return searchCategories.map(o => o.name);
   } catch (e) {
     if (e instanceof Error) {
+      if (e.message.includes('ETIMEDOUT')) {
+        warning(`${getFunctionName()} => Connection to Twitch timed out. Will retry request.`);
+        await setImmediateAwait();
+        return sendGameFromTwitch(game);
+      }
       if (e.message.includes('Invalid OAuth token')) {
         warning(`${getFunctionName()} => Invalid OAuth token - attempting to refresh token`);
         await refresh('bot');
@@ -21,7 +27,7 @@ async function sendGameFromTwitch (game: string) {
         error(`${getFunctionName()} => ${e.stack ?? e.message}`);
       }
     }
-    return;
+    return [];
   }
 }
 
