@@ -1,5 +1,4 @@
 import { Poll } from '@entity/poll';
-import { getRepository } from 'typeorm';
 
 import Overlay from './_interface';
 
@@ -11,10 +10,7 @@ class Polls extends Overlay {
       cb(this.getCommand('!vote'));
     });
     publicEndpoint(this.nsp, 'data', async (callback) => {
-      const currentVote = await getRepository(Poll).findOne({
-        relations: ['votes'],
-        where:     { isOpened: true },
-      });
+      const currentVote = await Poll.findOpened();
       callback(currentVote, currentVote?.votes);
     });
   }
