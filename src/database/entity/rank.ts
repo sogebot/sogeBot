@@ -1,5 +1,5 @@
 import { IsNotEmpty, Min, MinLength } from 'class-validator';
-import { Column, Entity, Index, PrimaryColumn, Unique } from 'typeorm';
+import { Column, Entity, Index, PrimaryColumn } from 'typeorm';
 import { BotEntity } from '~/database/entity/_botEntity';
 
 @Entity()
