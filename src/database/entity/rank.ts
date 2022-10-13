@@ -3,7 +3,7 @@ import { Column, Entity, Index, PrimaryColumn } from 'typeorm';
 import { BotEntity } from '~/database/entity/_botEntity';
 
 @Entity()
-@Index('IDX_93c78c94804a13befdace81904', ['type', 'value'])
+@Index('IDX_93c78c94804a13befdace81904', ['type', 'value'], { unique: true })
 export class Rank extends BotEntity {
   @PrimaryColumn({ generated: 'uuid' })
     id: string;
