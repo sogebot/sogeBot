@@ -1,11 +1,13 @@
 import { validateOrReject } from 'class-validator';
 import { BaseEntity } from 'typeorm';
 
-export class BotEntity extends BaseEntity {
-  constructor(initialValues?: Partial<BotEntity>) {
+export class BotEntity<P> extends BaseEntity {
+  constructor(initialValues?: Partial<P>) {
     super();
     if (initialValues) {
-      BotEntity.merge(this, initialValues);
+      for (const key of Object.keys(initialValues)) {
+        this[key as keyof this] = initialValues[key as keyof P] as any;
+      }
     }
   }
 
@@ -21,6 +23,6 @@ export class BotEntity extends BaseEntity {
     });
   }
   validate() {
-    return validateOrReject(this);
+    return validateOrReject(this);6;
   }
 }
