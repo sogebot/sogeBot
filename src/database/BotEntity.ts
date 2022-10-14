@@ -23,6 +23,6 @@ export class BotEntity<P> extends BaseEntity {
     });
   }
   validate() {
-    return validateOrReject(this);6;
+    return validateOrReject(this);
   }
 }
