@@ -9,7 +9,7 @@ export class updateHighlightAndPolls1665996411181 implements MigrationInterface 
     const items2 = await queryRunner.query(`SELECT * from \`poll\``);
     const items3 = await queryRunner.query(`SELECT * from \`poll_vote\``);
 
-    await queryRunner.query(`DELETE from \`poll\` WHERE 1=1`);
+    await queryRunner.query(`DELETE from \`highlight\` WHERE 1=1`);
     await queryRunner.query(`DELETE from \`poll\` WHERE 1=1`);
     await queryRunner.query(`DELETE from \`poll_vote\` WHERE 1=1`);
 
