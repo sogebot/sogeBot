@@ -22,14 +22,14 @@ describe('Bets - @func3 - bet should automatically be locked after given time wi
   });
 
   it('Seed database with soon to be closed bet', async () => {
-    await getRepository(Bets).insert({
+    await new Bets({
       arePointsGiven: true,
-      createdAt: Date.now(),
-      endedAt: Date.now() + 1000,
+      createdAt: new Date().toISOString(),
+      endedAt: new Date(Date.now() + 1000).toISOString(),
       isLocked: false,
       options: ['a', 'b'],
       title: 'test',
-    });
+    }).save();
   });
 
   it('Bet should be locked in db in 15 seconds', async () => {
@@ -37,8 +37,7 @@ describe('Bets - @func3 - bet should automatically be locked after given time wi
       new Promise(resolve => setTimeout(() => resolve(false), 15000)),
       new Promise(resolve => {
         const check = async () => {
-          const currentBet = await getRepository(Bets).findOne({
-            relations: ['participations'],
+          const currentBet = await Bets.findOne({
             order: { createdAt: 'DESC' },
           });
           if (currentBet.isLocked) {

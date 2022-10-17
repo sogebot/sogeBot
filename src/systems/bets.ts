@@ -1,7 +1,6 @@
-import { Bets as BetsEntity, BetsInterface } from '@entity/bets';
+import { Bets as BetsEntity } from '@entity/bets';
 import { format } from '@sogebot/ui-helpers/number';
 import _ from 'lodash';
-import { getRepository } from 'typeorm';
 
 import { parserReply } from '../commons';
 import {
@@ -60,16 +59,15 @@ class Bets extends System {
       return;
     }
     try {
-      const currentBet = await getRepository(BetsEntity).findOne({
-        relations: ['participations'],
-        order:     { createdAt: 'DESC' },
+      const currentBet = await BetsEntity.findOne({
+        order: { createdAt: 'DESC' },
       });
       if (!currentBet || currentBet.isLocked) {
         throw Error(ERROR_NOT_RUNNING);
       }
 
-      if (currentBet.endedAt < Date.now()) {
-        if (currentBet.participations.length > 0) {
+      if (new Date(currentBet.endedAt || 0).getTime() < Date.now()) {
+        if (currentBet.participants.length > 0) {
           if (!isEndAnnounced) {
             announce(prepare('bets.locked'), 'bets');
             isEndAnnounced = true;
@@ -77,7 +75,7 @@ class Bets extends System {
         } else {
           announce(prepare('bets.removed'), 'bets');
         }
-        await getRepository(BetsEntity).update({ id: currentBet.id }, { isLocked: true });
+        await BetsEntity.update({ id: currentBet.id }, { isLocked: true });
       } else {
         // bet is running;
         isEndAnnounced = false;
@@ -97,9 +95,8 @@ class Bets extends System {
   sockets() {
     adminEndpoint('/systems/bets', 'bets::getCurrentBet', async (cb) => {
       try {
-        const currentBet = await getRepository(BetsEntity).findOne({
-          relations: ['participations'],
-          order:     { createdAt: 'DESC' },
+        const currentBet = await BetsEntity.findOne({
+          order: { createdAt: 'DESC' },
         });
         cb(null, currentBet);
       } catch (e: any) {
@@ -143,9 +140,8 @@ class Bets extends System {
   @command('!bet open')
   @default_permission(defaultPermissions.MODERATORS)
   public async open(opts: CommandOptions): Promise<CommandResponse[]> {
-    const currentBet = await getRepository(BetsEntity).findOne({
-      relations: ['participations'],
-      order:     { createdAt: 'DESC' },
+    const currentBet = await BetsEntity.findOne({
+      order: { createdAt: 'DESC' },
     });
     try {
       if (currentBet && !currentBet.isLocked) {
@@ -165,12 +161,13 @@ class Bets extends System {
         throw new Error(ERROR_NOT_ENOUGH_OPTIONS);
       }
 
-      await getRepository(BetsEntity).save({
-        createdAt: Date.now(),
-        endedAt:   Date.now() + (timeout * 1000 * 60),
+      const bet = new BetsEntity({
+        createdAt: new Date().toISOString(),
+        endedAt:   new Date(Date.now() + (timeout * 1000 * 60)).toISOString(),
         title:     title,
         options:   options,
       });
+      await bet.save();
 
       return [{
         response: prepare('bets.opened', {
@@ -190,8 +187,8 @@ class Bets extends System {
           return [{
             response: prepare('bets.running', {
               command:  this.getCommand('!bet'),
-              maxIndex: String((currentBet as BetsInterface).options.length),
-              options:  (currentBet as BetsInterface).options.map((v, i) => `${i+1}. '${v}'`).join(', '),
+              maxIndex: String(currentBet!.options.length),
+              options:  currentBet!.options.map((v, i) => `${i+1}. '${v}'`).join(', '),
             }), ...opts,
           }];
         default:
@@ -201,9 +198,8 @@ class Bets extends System {
   }
 
   public async info(opts: CommandOptions) {
-    const currentBet = await getRepository(BetsEntity).findOne({
-      relations: ['participations'],
-      order:     { createdAt: 'DESC' },
+    const currentBet = await BetsEntity.findOne({
+      order: { createdAt: 'DESC' },
     });
     if (!currentBet || (currentBet.isLocked && currentBet.arePointsGiven)) {
       return [{ response: prepare('bets.notRunning'), ...opts } ];
@@ -214,7 +210,7 @@ class Bets extends System {
           title:    currentBet.title,
           maxIndex: String(currentBet.options.length),
           options:  currentBet.options.map((v, i) => `${i+1}. '${v}'`).join(', '),
-          minutes:  Number((currentBet.endedAt - Date.now()) / 1000 / 60).toFixed(1),
+          minutes:  Number((new Date(currentBet!.endedAt || 0).getTime() - Date.now()) / 1000 / 60).toFixed(1),
         }), ...opts,
       }];
     }
@@ -222,9 +218,8 @@ class Bets extends System {
 
   public async participate(opts: CommandOptions): Promise<CommandResponse[]> {
     const points = (await import('../systems/points')).default;
-    const currentBet = await getRepository(BetsEntity).findOne({
-      relations: ['participations'],
-      order:     { createdAt: 'DESC' },
+    const currentBet = await BetsEntity.findOne({
+      order: { createdAt: 'DESC' },
     });
 
     try {
@@ -233,7 +228,7 @@ class Bets extends System {
       index--;
       if (!_.isNil(tickets) && !_.isNil(index)) {
         const pointsOfUser = await points.getPointsOf(opts.sender.userId);
-        const _betOfUser = currentBet?.participations.find(o => String(o.userId) === opts.sender.userId);
+        const _betOfUser = currentBet?.participants.find(o => String(o.userId) === opts.sender.userId);
 
         if (tickets === 'all' || tickets > pointsOfUser) {
           tickets = pointsOfUser;
@@ -256,7 +251,7 @@ class Bets extends System {
         }
 
         if (!_betOfUser) {
-          currentBet.participations.push({
+          currentBet.participants.push({
             username:  opts.sender.userName,
             userId:    opts.sender.userId,
             optionIdx: index,
@@ -269,7 +264,7 @@ class Bets extends System {
 
         // All OK
         await points.decrement({ userId: opts.sender.userId }, tickets);
-        await getRepository(BetsEntity).save(currentBet);
+        await BetsEntity.save(currentBet);
         return [];
       } else {
         return this.info(opts);
@@ -285,12 +280,12 @@ class Bets extends System {
         case ERROR_IS_LOCKED:
           return [{ response: prepare('bets.timeUpBet'), ...opts } ];
         case ERROR_DIFF_BET: {
-          const result = (currentBet as Required<BetsInterface>).participations.find(o => String(o.userId) === String(opts.sender.userId));
+          const result = currentBet!.participants.find(o => String(o.userId) === String(opts.sender.userId));
           return [{ response: prepare('bets.diffBet').replace(/\$option/g, String((result?.optionIdx || 0) + 1)), ...opts } ];
         }
         default:
           warning(e.stack);
-          return [{ response: prepare('bets.error', { command: opts.command }).replace(/\$maxIndex/g, String((currentBet as BetsInterface).options.length)), ...opts }];
+          return [{ response: prepare('bets.error', { command: opts.command }).replace(/\$maxIndex/g, String(currentBet!.options.length)), ...opts }];
       }
     }
   }
@@ -298,15 +293,14 @@ class Bets extends System {
   @command('!bet refund')
   @default_permission(defaultPermissions.MODERATORS)
   public async refund(opts: CommandOptions): Promise<CommandResponse[]> {
-    const currentBet = await getRepository(BetsEntity).findOne({
-      relations: ['participations'],
-      order:     { createdAt: 'DESC' },
+    const currentBet = await BetsEntity.findOne({
+      order: { createdAt: 'DESC' },
     });
     try {
       if (!currentBet || (currentBet.isLocked && currentBet.arePointsGiven)) {
         throw Error(ERROR_NOT_RUNNING);
       }
-      for (const user of currentBet.participations) {
+      for (const user of currentBet.participants) {
         changelog.increment(opts.sender.userId, { points: user.points });
       }
       return [{ response: prepare('bets.refund'), ...opts } ];
@@ -321,7 +315,7 @@ class Bets extends System {
       }
     } finally {
       if (currentBet) {
-        await getRepository(BetsEntity).update({ id: currentBet.id }, { arePointsGiven: true, isLocked: true });
+        await BetsEntity.update({ id: currentBet.id }, { arePointsGiven: true, isLocked: true });
       }
     }
   }
@@ -329,9 +323,8 @@ class Bets extends System {
   @command('!bet close')
   @default_permission(defaultPermissions.MODERATORS)
   public async close(opts: CommandOptions): Promise<CommandResponse[]> {
-    const currentBet = await getRepository(BetsEntity).findOne({
-      relations: ['participations'],
-      order:     { createdAt: 'DESC' },
+    const currentBet = await BetsEntity.findOne({
+      order: { createdAt: 'DESC' },
     });
     try {
       const index = new Expects(opts.parameters).number().toArray()[0];
@@ -346,18 +339,18 @@ class Bets extends System {
       const percentGain = (currentBet.options.length * this.betPercentGain) / 100;
 
       let total = 0;
-      for (const user of currentBet.participations) {
+      for (const user of currentBet.participants) {
         if (user.optionIdx === index) {
           total += user.points + Math.round((user.points * percentGain));
           changelog.increment(user.userId, { points: user.points + Math.round((user.points * percentGain)) });
         }
       }
 
-      await getRepository(BetsEntity).update({ id: currentBet.id }, { arePointsGiven: true, isLocked: true });
+      await BetsEntity.update({ id: currentBet.id }, { arePointsGiven: true, isLocked: true });
       return [{
         response: prepare('bets.closed')
           .replace(/\$option/g, currentBet.options[index])
-          .replace(/\$amount/g, String(currentBet.participations.filter((o) => o.optionIdx === index).length))
+          .replace(/\$amount/g, String(currentBet.participants.filter((o) => o.optionIdx === index).length))
           .replace(/\$pointsName/g, getPointsName(total))
           .replace(/\$points/g, format(general.numberFormat, 0)(total)),
         ...opts,

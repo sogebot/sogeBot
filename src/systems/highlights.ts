@@ -1,9 +1,8 @@
-import { Highlight, HighlightInterface } from '@entity/highlight';
+import { Highlight } from '@entity/highlight';
 import { dayjs } from '@sogebot/ui-helpers/dayjsHelper';
 import { timestampToObject } from '@sogebot/ui-helpers/getTime';
 import { Request, Response } from 'express';
 import { isNil } from 'lodash';
-import { getRepository } from 'typeorm';
 
 import {
   command, default_permission, settings, ui,
@@ -51,22 +50,22 @@ class Highlights extends System {
     });
     adminEndpoint('/systems/highlights', 'generic::getAll', async (cb) => {
       (async function getAll(callback): Promise<void> {
-        const highlightsToCheck = await getRepository(Highlight).find({ order: { createdAt: 'DESC' }, where: { expired: false } });
+        const highlightsToCheck = await Highlight.find({ order: { createdAt: 'DESC' }, where: { expired: false } });
         try {
           const clientBot = await client('bot');
           const availableVideos = await clientBot.videos.getVideosByIds(highlightsToCheck.map(o => o.videoId));
 
           for (const highlight of highlightsToCheck) {
             if (!availableVideos.find(o => o.id === highlight.videoId)) {
-              await getRepository(Highlight).update(highlight.id, { expired: true });
+              await Highlight.update(highlight.id, { expired: true });
             }
           }
-          const highlights = await getRepository(Highlight).find({ order: { createdAt: 'DESC' } });
+          const highlights = await Highlight.find({ order: { createdAt: 'DESC' } });
           callback(null, highlights, availableVideos);
         } catch (err: any) {
           if (err._statusCode === 404) {
             for (const highlight of highlightsToCheck) {
-              await getRepository(Highlight).update(highlight.id, { expired: true });
+              await Highlight.update(highlight.id, { expired: true });
             }
             return getAll(callback);
           }
@@ -76,7 +75,7 @@ class Highlights extends System {
     });
     adminEndpoint('/systems/highlights', 'generic::deleteById', async (id, cb) => {
       try {
-        await getRepository(Highlight).delete({ id });
+        await Highlight.delete({ id });
         cb(null);
       } catch (err: any) {
         cb(err.message);
@@ -137,16 +136,15 @@ class Highlights extends System {
       const videos = await clientBot.videos.getVideosByUser(broadcasterId, { type: 'archive', limit: 1 });
 
       const timestamp = timestampToObject(dayjs().valueOf() - dayjs(streamStatusChangeSince.value).valueOf());
-      const highlight = {
+      const highlight = new Highlight({
         videoId:   videos.data[0].id,
         timestamp: {
           hours: timestamp.hours, minutes: timestamp.minutes, seconds: timestamp.seconds,
         },
-        game:      stats.value.currentGame || 'n/a',
-        title:     stats.value.currentTitle || 'n/a',
-        createdAt: Date.now(),
-        expired:   false,
-      };
+        game:    stats.value.currentGame || 'n/a',
+        title:   stats.value.currentTitle || 'n/a',
+        expired: false,
+      });
       return this.add(highlight, timestamp, opts);
     } catch (err: any) {
       switch (err.message) {
@@ -163,9 +161,9 @@ class Highlights extends System {
     }
   }
 
-  public async add(highlight: HighlightInterface, timestamp: TimestampObject, opts: CommandOptions): Promise<CommandResponse[]> {
+  public async add(highlight: Highlight, timestamp: TimestampObject, opts: CommandOptions): Promise<CommandResponse[]> {
     createMarker();
-    getRepository(Highlight).insert(highlight);
+    Highlight.insert(highlight);
     return [{
       response: translate('highlights.saved')
         .replace(/\$hours/g, (timestamp.hours < 10) ? '0' + timestamp.hours : timestamp.hours)
@@ -177,7 +175,7 @@ class Highlights extends System {
   @command('!highlight list')
   @default_permission(defaultPermissions.CASTERS)
   public async list(opts: CommandOptions): Promise<CommandResponse[]> {
-    const sortedHighlights = await getRepository(Highlight).find({ order: { createdAt: 'DESC' } });
+    const sortedHighlights = await Highlight.find({ order: { createdAt: 'DESC' } });
     const latestStreamId = sortedHighlights.length > 0 ? sortedHighlights[0].videoId : null;
 
     if (isNil(latestStreamId)) {

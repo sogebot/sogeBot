@@ -143,8 +143,7 @@ describe('Bets - @func3 - workflow()', () => {
 
         if (!s) {
           it ('Bet open should failed', async() => {
-            const currentBet = await getRepository(Bets).findOne({
-              relations: ['participations'],
+            const currentBet = await Bets.findOne({
               order:     { createdAt: 'DESC' },
             });
             assert(typeof currentBet === 'undefined');
@@ -154,8 +153,7 @@ describe('Bets - @func3 - workflow()', () => {
             assert.strictEqual(r[0].response, t.response.open);
           });
           it ('!bet open should be correctly saved in db', async() => {
-            const currentBet = await getRepository(Bets).findOne({
-              relations: ['participations'],
+            const currentBet = await Bets.findOne({
               order:     { createdAt: 'DESC' },
             });
 
@@ -226,8 +224,7 @@ describe('Open bet twice should fail', () => {
     assert.strictEqual(r[0].response, `New bet 'Jak se umistim?' is opened! Bet options: 1. 'Vyhra', 2. 'Top 3', 3. 'Top 10'. Use !bet 1-3 <amount> to win! You have only 5min to bet!`);
   });
   it ('!bet open should be correctly saved in db', async() => {
-    const currentBet = await getRepository(Bets).findOne({
-      relations: ['participations'],
+    const currentBet = await Bets.findOne({
       order:     { createdAt: 'DESC' },
     });
 
@@ -289,8 +286,7 @@ describe('Bet close should fail if wrong option is given', () => {
     assert.strictEqual(r[0].response, `New bet 'Jak se umistim?' is opened! Bet options: 1. 'Vyhra', 2. 'Top 3', 3. 'Top 10'. Use !bet 1-3 <amount> to win! You have only 5min to bet!`);
   });
   it ('!bet open should be correctly saved in db', async() => {
-    const currentBet = await getRepository(Bets).findOne({
-      relations: ['participations'],
+    const currentBet = await Bets.findOne({
       order:     { createdAt: 'DESC' },
     });
 
@@ -333,8 +329,7 @@ describe('Incorrect participate should show info', () => {
     assert.strictEqual(r[0].response, `New bet 'Jak se umistim?' is opened! Bet options: 1. 'Vyhra', 2. 'Top 3', 3. 'Top 10'. Use !bet 1-3 <amount> to win! You have only 5min to bet!`);
   });
   it ('!bet open should be correctly saved in db', async() => {
-    const currentBet = await getRepository(Bets).findOne({
-      relations: ['participations'],
+    const currentBet = await Bets.findOne({
       order:     { createdAt: 'DESC' },
     });
 
@@ -387,8 +382,7 @@ describe('Bet info should show all correct states', () => {
     assert.strictEqual(r[0].response, `New bet 'Jak se umistim?' is opened! Bet options: 1. 'Vyhra', 2. 'Top 3', 3. 'Top 10'. Use !bet 1-3 <amount> to win! You have only 5min to bet!`);
   });
   it ('!bet open should be correctly saved in db', async() => {
-    const currentBet = await getRepository(Bets).findOne({
-      relations: ['participations'],
+    const currentBet = await Bets.findOne({
       order:     { createdAt: 'DESC' },
     });
 
@@ -409,7 +403,7 @@ describe('Bet info should show all correct states', () => {
   });
 
   it('Lock bet', async () => {
-    await getRepository(Bets).update({}, { isLocked: true });
+    await Bets.update({}, { isLocked: true });
   });
 
   it('Bet info when locked bet', async () => {

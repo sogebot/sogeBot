@@ -21,14 +21,14 @@ describe('Bets - @func3 - closed bet shows as opened | https://discord.com/chann
   });
 
   it('Seed database with closed bet', async () => {
-    await getRepository(Bets).insert({
+    await new Bets({
       arePointsGiven: true,
-      createdAt: Date.now(),
-      endedAt: Date.now(),
+      createdAt: new Date().toISOString(),
+      endedAt: new Date().toISOString(),
       isLocked: true,
       options: ['a', 'b'],
       title: 'test',
-    });
+    }).save();
   });
 
   it('!bet should not show any running bet', async () => {

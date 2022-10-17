@@ -1,30 +1,33 @@
-import { EntitySchema } from 'typeorm';
+import { BeforeInsert, Column, Entity, PrimaryColumn } from 'typeorm';
+import { BotEntity } from '~/database/BotEntity';
 
-import { ColumnNumericTransformer } from './_transformer';
+@Entity()
+export class Highlight extends BotEntity<Highlight> {
+  @PrimaryColumn({ generated: 'uuid', type: 'uuid' })
+    id: string;
 
-export interface HighlightInterface {
-  id?: string;
-  videoId: string;
-  game: string;
-  title: string;
-  expired: boolean;
-  timestamp: {
+  @Column()
+    videoId: string;
+
+  @Column()
+    game: string;
+
+  @Column()
+    title: string;
+
+  @Column({ default: false })
+    expired: boolean;
+
+  @Column({ type: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') !== 'better-sqlite3' ? 'json' : 'simple-json' })
+    timestamp: {
     hours: number; minutes: number; seconds: number;
   };
-  createdAt: number;
-}
 
-export const Highlight = new EntitySchema<Readonly<Required<HighlightInterface>>>({
-  name:    'highlight',
-  columns: {
-    id: {
-      type: 'uuid', primary: true, generated: 'uuid',
-    },
-    videoId:   { type: String },
-    game:      { type: String },
-    title:     { type: String },
-    expired:   { type: Boolean, default: false },
-    timestamp: { type: 'simple-json' },
-    createdAt: { type: 'bigint', transformer: new ColumnNumericTransformer() },
-  },
-});
+  @Column({ nullable: false, type: 'varchar', length: '2022-07-27T00:30:34.569259834Z'.length })
+    createdAt?: string;
+
+  @BeforeInsert()
+  generateCreatedAt() {
+    this.createdAt = new Date().toISOString();
+  }
+}

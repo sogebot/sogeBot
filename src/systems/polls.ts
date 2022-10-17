@@ -155,7 +155,7 @@ class Polls extends System {
       if (!cVote) {
         throw new Error(String(ERROR.ALREADY_CLOSED));
       } else {
-        cVote.closedAt = new Date();
+        cVote.closedAt = new Date().toISOString();
         await cVote.save();
 
         let _total = 0;
@@ -223,7 +223,7 @@ class Polls extends System {
       poll.title = title;
       poll.options = options;
       poll.type = type;
-      poll.openedAt = new Date();
+      poll.openedAt = new Date().toISOString();
       await poll.save();
 
       const translations = `systems.polls.opened_${type}`;
