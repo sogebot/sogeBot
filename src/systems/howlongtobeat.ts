@@ -16,6 +16,8 @@ import {
   debug, error,
 } from '~/helpers/log';
 import { defaultPermissions } from '~/helpers/permissions/index';
+import { app } from '~/helpers/panel';
+import { adminMiddleware } from '~/socket';
 
 class HowLongToBeat extends System {
   interval: number = constants.MINUTE;
@@ -73,70 +75,39 @@ class HowLongToBeat extends System {
   }
 
   sockets() {
-    /*
-    adminEndpoint('/systems/howlongtobeat', 'generic::getAll', async (cb) => {
-      try {
-        cb(null, await HowLongToBeatGame.find());
-      } catch (e: any) {
-        cb(e.stack, [], []);
-      }
+    if (!app) {
+      setTimeout(() => this.sockets(), 100);
+      return;
+    }
+
+    app.get('/api/systems/hltb', adminMiddleware, async (req, res) => {
+      res.send({
+        data: await HowLongToBeatGame.find(),
+      });
     });
-    adminEndpoint('/systems/howlongtobeat', 'hltb::save', async (item, cb) => {
-      try {
-        cb(null, await HowLongToBeatGame.save(item));
-      } catch (e: any) {
-        cb(e.stack);
-      }
+    app.get('/api/systems/hltb/:id', async (req, res) => {
+      res.send({
+        data: await HowLongToBeatGame.findOne({ where: { id: req.params.id } }),
+      });
     });
-    adminEndpoint('/systems/howlongtobeat', 'hltb::addNewGame', async (game, cb) => {
+    app.delete('/api/systems/hltb/:id', adminMiddleware, async (req, res) => {
+      const item = await HowLongToBeatGame.findOne({ where: { id: req.params.id } });
+      await item?.remove();
+      res.status(404).send();
+    });
+    app.post('/api/systems/hltb', adminMiddleware, async (req, res) => {
       try {
-        const gameFromHltb = (await this.hltbService.search(game))[0];
-        if (gameFromHltb) {
-          await HowLongToBeatGame.save({
-            game:                  game,
-            startedAt:             new Date().toISOString(),
-            updatedAt:             new Date().toISOString(),
-            gameplayMain:          gameFromHltb.gameplayMain,
-            gameplayMainExtra:     gameFromHltb.gameplayMainExtra,
-            gameplayCompletionist: gameFromHltb.gameplayCompletionist,
-          });
+        const itemToSave = new HowLongToBeatGame(req.body);
+        await itemToSave.validateAndSave();
+        res.send({ data: itemToSave });
+      } catch (e) {
+        if (e instanceof Error) {
+          res.status(400).send({ errors: e.message });
         } else {
-          throw new Error(`Game ${game} not found on HLTB service`);
+          res.status(400).send({ errors: e });
         }
-        cb(null);
-      } catch (e: any) {
-        cb(e.stack);
       }
     });
-    adminEndpoint('/systems/howlongtobeat', 'hltb::getGamesFromHLTB', async (game, cb) => {
-      try {
-        const search = await this.hltbService.search(game);
-        const games = await HowLongToBeatGame.find();
-        cb(null, search
-          .filter((o: any) => {
-            // we need to filter already added gaems
-            return !games.map(a => a.game.toLowerCase()).includes(o.name.toLowerCase());
-          })
-          .map((o: any) => o.name));
-      } catch (e: any) {
-        cb(e.stack, []);
-      }
-    });
-    adminEndpoint('/systems/howlongtobeat', 'generic::deleteById', async (id, cb) => {
-      await HowLongToBeatGame.delete({ id: String(id) });
-      await getRepository(HowLongToBeatGameItem).delete({ hltb_id: String(id) });
-      if (cb) {
-        cb(null);
-      }
-    });
-    adminEndpoint('/systems/howlongtobeat', 'hltb::saveStreamChange', async (stream, cb) => {
-      try {
-        cb(null, await getRepository(HowLongToBeatGameItem).save(stream));
-      } catch (e: any) {
-        cb(e.stack);
-      }
-    });
-    */
   }
 
   async addToGameTimestamp() {
