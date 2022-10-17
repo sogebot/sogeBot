@@ -37,7 +37,7 @@ export class HowLongToBeatGame extends BotEntity<HowLongToBeatGame> {
   @Column({ type: 'float', default: 0, precision: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') === 'mysql' ? 12 : undefined })
     gameplayCompletionist: number;
 
-  @Column({ type: 'bigint', default: 0, precision: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') === 'mysql' ? 12 : undefined, transformer: new ColumnNumericTransformer() })
+  @Column({ type: 'bigint', transformer: new ColumnNumericTransformer(), default: 0 })
     offset: number;
 
   @Column({ type: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') !== 'better-sqlite3' ? 'json' : 'simple-json' })
