@@ -11,6 +11,7 @@ export class updateBets1665996411181 implements MigrationInterface {
     await queryRunner.query(`DROP TABLE "bets_participations"`);
     await queryRunner.query(`DROP TABLE "bets"`);
 
+    await queryRunner.query(`CREATE TABLE "bets" ("id" varchar PRIMARY KEY NOT NULL, "createdAt" varchar(30) NOT NULL, "endedAt" varchar(30) NOT NULL, "isLocked" boolean NOT NULL DEFAULT (0), "arePointsGiven" boolean NOT NULL DEFAULT (0), "options" text NOT NULL, "title" varchar NOT NULL, "participants" text NOT NULL)`);
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
