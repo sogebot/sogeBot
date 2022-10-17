@@ -1,5 +1,5 @@
 import { ArrayMinSize, IsNotEmpty, MinLength } from 'class-validator';
-import { BaseEntity, Column, CreateDateColumn, Entity, PrimaryColumn } from 'typeorm';
+import { BaseEntity, Column, Entity, PrimaryColumn } from 'typeorm';
 
 @Entity()
 export class Poll extends BaseEntity {
@@ -14,11 +14,11 @@ export class Poll extends BaseEntity {
   @IsNotEmpty()
     title: string;
 
-  @CreateDateColumn()
-    openedAt: Date;
+  @Column({ type: 'varchar', length: '2022-07-27T00:30:34.569259834Z'.length })
+    openedAt: string;
 
-  @Column({ nullable: true, type: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') === 'postgres' ? 'timestamp' : 'datetime' })
-    closedAt: Date | null;
+  @Column({ nullable: true, type: 'varchar', length: '2022-07-27T00:30:34.569259834Z'.length })
+    closedAt: string | null;
 
   @ArrayMinSize(2)
   @Column({ type: 'simple-array' })
