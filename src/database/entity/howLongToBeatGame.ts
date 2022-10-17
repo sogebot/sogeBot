@@ -28,13 +28,13 @@ export class HowLongToBeatGame extends BotEntity<HowLongToBeatGame> {
     this.updatedAt = new Date().toISOString();
   }
 
-  @Column({ type: 'float', default: 0, precision: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') === 'mysql' ? 12 : undefined, transformer: new ColumnNumericTransformer() })
+  @Column({ type: 'float', default: 0, precision: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') === 'mysql' ? 12 : undefined })
     gameplayMain: number;
 
-  @Column({ type: 'float', default: 0, precision: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') === 'mysql' ? 12 : undefined, transformer: new ColumnNumericTransformer() })
+  @Column({ type: 'float', default: 0, precision: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') === 'mysql' ? 12 : undefined })
     gameplayMainExtra: number;
 
-  @Column({ type: 'float', default: 0, precision: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') === 'mysql' ? 12 : undefined, transformer: new ColumnNumericTransformer() })
+  @Column({ type: 'float', default: 0, precision: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') === 'mysql' ? 12 : undefined })
     gameplayCompletionist: number;
 
   @Column({ type: 'bigint', default: 0, precision: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') === 'mysql' ? 12 : undefined, transformer: new ColumnNumericTransformer() })

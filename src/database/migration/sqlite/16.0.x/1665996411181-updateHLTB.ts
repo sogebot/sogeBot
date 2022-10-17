@@ -15,7 +15,7 @@ export class updateHLTB1665996411181 implements MigrationInterface {
     await queryRunner.query(`CREATE UNIQUE INDEX "IDX_301758e0e3108fc902d5436527" ON "how_long_to_beat_game" ("game") `);
 
     for (const item of items) {
-      item.streams = items2.filter((o: any) => o.hltb_id === item.id);
+      item.streams = JSON.stringify(items2.filter((o: any) => o.hltb_id === item.id));
       await insertItemIntoTable('how_long_to_beat_game', {
         ...item,
       }, queryRunner);
