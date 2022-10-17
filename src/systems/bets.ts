@@ -166,7 +166,7 @@ class Bets extends System {
         endedAt:   new Date(Date.now() + (timeout * 1000 * 60)).toISOString(),
         title:     title,
         options:   options,
-      })
+      });
       await bet.save();
 
       return [{
