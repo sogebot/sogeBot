@@ -14,6 +14,7 @@ export class updateHighlightAndPolls1665996411181 implements MigrationInterface 
 
     await queryRunner.query(`DROP TABLE \`poll_vote\``);
     await queryRunner.query(`DROP TABLE \`poll\``);
+    await queryRunner.query('CREATE TABLE `poll` (`id` varchar(36) NOT NULL, `type` varchar(6) NOT NULL, `title` varchar(255) NOT NULL, `isOpened` tinyint NOT NULL, `openedAt` bigint NOT NULL DEFAULT 0, `closedAt` bigint NOT NULL DEFAULT 0, `options` text NOT NULL, PRIMARY KEY (`id`)) ENGINE=InnoDB', undefined);
 
     await queryRunner.query(`ALTER TABLE \`highlight\` DROP COLUMN \`timestamp\``);
     await queryRunner.query(`ALTER TABLE \`highlight\` ADD \`timestamp\` json NOT NULL`);
