@@ -1,8 +1,7 @@
-import { HowLongToBeatGame, HowLongToBeatGameItem } from '@entity/howLongToBeatGame';
+import { HowLongToBeatGame } from '@entity/howLongToBeatGame';
 import * as constants from '@sogebot/ui-helpers/constants';
 import { HowLongToBeatService } from 'howlongtobeat';
 import { EntityNotFoundError } from 'typeorm';
-import { getRepository } from 'typeorm';
 
 import { command, default_permission } from '../decorators';
 import { onStartup } from '../decorators/on';
@@ -17,10 +16,9 @@ import {
   debug, error,
 } from '~/helpers/log';
 import { defaultPermissions } from '~/helpers/permissions/index';
-import { adminEndpoint } from '~/helpers/socket';
 
 class HowLongToBeat extends System {
-  interval: number = constants.SECOND * 15;
+  interval: number = constants.MINUTE;
   hltbService = new HowLongToBeatService();
 
   @onStartup()
@@ -47,11 +45,11 @@ class HowLongToBeat extends System {
   }
 
   async updateGameplayTimes() {
-    const games = await getRepository(HowLongToBeatGame).find();
+    const games = await HowLongToBeatGame.find();
 
     for (const game of games) {
       try {
-        if (Date.now() - new Date(game.updatedAt).getTime() < constants.DAY) {
+        if (Date.now() - new Date(game.updatedAt!).getTime() < constants.DAY) {
           throw new Error('Updated recently');
         }
 
@@ -64,13 +62,10 @@ class HowLongToBeat extends System {
           throw new Error('Game not found');
         }
 
-        await getRepository(HowLongToBeatGame).save({
-          ...game,
-          updatedAt:             new Date().toISOString(),
-          gameplayMain:          gameFromHltb.gameplayMain,
-          gameplayMainExtra:     gameFromHltb.gameplayMainExtra,
-          gameplayCompletionist: gameFromHltb.gameplayCompletionist,
-        });
+        game.gameplayMain = gameFromHltb.gameplayMain;
+        game.gameplayMainExtra = gameFromHltb.gameplayMainExtra;
+        game.gameplayCompletionist = gameFromHltb.gameplayCompletionist;
+        await game.save();
       } catch (e) {
         continue;
       }
@@ -78,16 +73,17 @@ class HowLongToBeat extends System {
   }
 
   sockets() {
+    /*
     adminEndpoint('/systems/howlongtobeat', 'generic::getAll', async (cb) => {
       try {
-        cb(null, await getRepository(HowLongToBeatGame).find(), await getRepository(HowLongToBeatGameItem).find());
+        cb(null, await HowLongToBeatGame.find());
       } catch (e: any) {
         cb(e.stack, [], []);
       }
     });
     adminEndpoint('/systems/howlongtobeat', 'hltb::save', async (item, cb) => {
       try {
-        cb(null, await getRepository(HowLongToBeatGame).save(item));
+        cb(null, await HowLongToBeatGame.save(item));
       } catch (e: any) {
         cb(e.stack);
       }
@@ -96,7 +92,7 @@ class HowLongToBeat extends System {
       try {
         const gameFromHltb = (await this.hltbService.search(game))[0];
         if (gameFromHltb) {
-          await getRepository(HowLongToBeatGame).save({
+          await HowLongToBeatGame.save({
             game:                  game,
             startedAt:             new Date().toISOString(),
             updatedAt:             new Date().toISOString(),
@@ -115,7 +111,7 @@ class HowLongToBeat extends System {
     adminEndpoint('/systems/howlongtobeat', 'hltb::getGamesFromHLTB', async (game, cb) => {
       try {
         const search = await this.hltbService.search(game);
-        const games = await getRepository(HowLongToBeatGame).find();
+        const games = await HowLongToBeatGame.find();
         cb(null, search
           .filter((o: any) => {
             // we need to filter already added gaems
@@ -127,7 +123,7 @@ class HowLongToBeat extends System {
       }
     });
     adminEndpoint('/systems/howlongtobeat', 'generic::deleteById', async (id, cb) => {
-      await getRepository(HowLongToBeatGame).delete({ id: String(id) });
+      await HowLongToBeatGame.delete({ id: String(id) });
       await getRepository(HowLongToBeatGameItem).delete({ hltb_id: String(id) });
       if (cb) {
         cb(null);
@@ -140,6 +136,7 @@ class HowLongToBeat extends System {
         cb(e.stack);
       }
     });
+    */
   }
 
   async addToGameTimestamp() {
@@ -154,19 +151,23 @@ class HowLongToBeat extends System {
     }
 
     try {
-      const game = await getRepository(HowLongToBeatGame).findOneOrFail({ where: { game: stats.value.currentGame } });
-      const stream = await getRepository(HowLongToBeatGameItem).findOne({ where: { hltb_id: game.id, createdAt: new Date(streamStatusChangeSince.value).toISOString() } });
+      const game = await HowLongToBeatGame.findOneOrFail({ where: { game: stats.value.currentGame } });
+      const stream = game.streams.find(o => o.createdAt === new Date(streamStatusChangeSince.value).toISOString());
       if (stream) {
         debug('hltb', 'Another 15s entry of this stream for ' + stats.value.currentGame);
-        await getRepository(HowLongToBeatGameItem).increment({ id: stream.id }, 'timestamp', this.interval);
+        stream.timestamp += this.interval;
       } else {
         debug('hltb', 'First entry of this stream for ' + stats.value.currentGame);
-        await getRepository(HowLongToBeatGameItem).save({
-          createdAt: new Date(streamStatusChangeSince.value).toISOString(),
-          hltb_id:   game.id,
-          timestamp: this.interval,
+        game.streams.push({
+          createdAt:              new Date(streamStatusChangeSince.value).toISOString(),
+          timestamp:              this.interval,
+          offset:                 0,
+          isMainCounted:          false,
+          isCompletionistCounted: false,
+          isExtraCounted:         false,
         });
       }
+      await game.save();
     } catch (e: any) {
       if (e instanceof EntityNotFoundError) {
         try {
@@ -179,23 +180,21 @@ class HowLongToBeat extends System {
             throw new Error('Game not found');
           }
           // we don't care if MP game or not (user might want to track his gameplay time)
-          await getRepository(HowLongToBeatGame).save({
+          const game = new HowLongToBeatGame({
             game:                  stats.value.currentGame,
-            startedAt:             new Date().toISOString(),
-            updatedAt:             new Date().toISOString(),
             gameplayMain:          gameFromHltb.gameplayMain,
             gameplayMainExtra:     gameFromHltb.gameplayMainExtra,
             gameplayCompletionist: gameFromHltb.gameplayCompletionist,
           });
+          await game.save();
         } catch {
-          await getRepository(HowLongToBeatGame).save({
+          const game = new HowLongToBeatGame({
             game:                  stats.value.currentGame,
-            startedAt:             new Date().toISOString(),
-            updatedAt:             new Date().toISOString(),
             gameplayMain:          0,
             gameplayMainExtra:     0,
             gameplayCompletionist: 0,
           });
+          await game.save();
         }
       } else {
         error(e.stack);
@@ -217,7 +216,7 @@ class HowLongToBeat extends System {
         gameInput = stats.value.currentGame;
       }
     }
-    const gameToShow = await getRepository(HowLongToBeatGame).findOne({ where: { game: gameInput } });
+    const gameToShow = await HowLongToBeatGame.findOne({ where: { game: gameInput } });
     if (!gameToShow && !retry) {
       if (!stats.value.currentGame) {
         return this.currentGameInfo(opts, true);
@@ -230,10 +229,9 @@ class HowLongToBeat extends System {
     } else if (!gameToShow) {
       return [{ response: prepare('systems.howlongtobeat.error', { game: gameInput }), ...opts }];
     }
-    const timestamps = await getRepository(HowLongToBeatGameItem).find({ where: { hltb_id: gameToShow.id } });
-    const timeToBeatMain = (timestamps.filter(o => o.isMainCounted).reduce((prev, cur) => prev += cur.timestamp + cur.offset , 0) + gameToShow.offset) / constants.HOUR;
-    const timeToBeatMainExtra = (timestamps.filter(o => o.isExtraCounted).reduce((prev, cur) => prev += cur.timestamp + cur.offset, 0) + gameToShow.offset) / constants.HOUR;
-    const timeToBeatCompletionist = (timestamps.filter(o => o.isCompletionistCounted).reduce((prev, cur) => prev += cur.timestamp + cur.offset, 0) + gameToShow.offset) / constants.HOUR;
+    const timeToBeatMain = (gameToShow.streams.filter(o => o.isMainCounted).reduce((prev, cur) => prev += cur.timestamp + cur.offset , 0) + gameToShow.offset) / constants.HOUR;
+    const timeToBeatMainExtra = (gameToShow.streams.filter(o => o.isExtraCounted).reduce((prev, cur) => prev += cur.timestamp + cur.offset, 0) + gameToShow.offset) / constants.HOUR;
+    const timeToBeatCompletionist = (gameToShow.streams.filter(o => o.isCompletionistCounted).reduce((prev, cur) => prev += cur.timestamp + cur.offset, 0) + gameToShow.offset) / constants.HOUR;
 
     const gameplayMain = gameToShow.gameplayMain;
     const gameplayMainExtra = gameToShow.gameplayMainExtra;
