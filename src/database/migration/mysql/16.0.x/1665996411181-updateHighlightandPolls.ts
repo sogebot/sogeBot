@@ -10,6 +10,7 @@ export class updateHighlightAndPolls1665996411181 implements MigrationInterface 
     const items3 = await queryRunner.query(`SELECT * from \`poll_vote\``);
 
     await queryRunner.query(`DELETE from \`poll\` WHERE 1=1`);
+    await queryRunner.query(`DELETE from \`poll\` WHERE 1=1`);
     await queryRunner.query(`DELETE from \`poll_vote\` WHERE 1=1`);
 
     await queryRunner.query(`DROP TABLE \`poll_vote\``);
@@ -20,6 +21,10 @@ export class updateHighlightAndPolls1665996411181 implements MigrationInterface 
     await queryRunner.query(`ALTER TABLE \`highlight\` ADD \`timestamp\` json NOT NULL`);
     await queryRunner.query(`ALTER TABLE \`highlight\` DROP COLUMN \`createdAt\``);
     await queryRunner.query(`ALTER TABLE \`highlight\` ADD \`createdAt\` varchar(30) NOT NULL`);
+    await queryRunner.query(`ALTER TABLE \`poll\` DROP COLUMN \`openedAt\``);
+    await queryRunner.query(`ALTER TABLE \`poll\` ADD \`openedAt\` varchar(30) NOT NULL`);
+    await queryRunner.query(`ALTER TABLE \`poll\` DROP COLUMN \`closedAt\``);
+    await queryRunner.query(`ALTER TABLE \`poll\` ADD \`closedAt\` varchar(30) NULL`);
 
     for (const item of items) {
       item.createdAt = new Date(item.createdAt).toISOString();
