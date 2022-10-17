@@ -7,6 +7,13 @@ export class updateHighlightAndPolls1665996411181 implements MigrationInterface 
   public async up(queryRunner: QueryRunner): Promise<void> {
     const items = await queryRunner.query(`SELECT * from \`highlight\``);
     const items2 = await queryRunner.query(`SELECT * from \`poll\``);
+    const items3 = await queryRunner.query(`SELECT * from \`poll_vote\``);
+
+    await queryRunner.query(`DELETE from \`poll\` WHERE 1=1`);
+    await queryRunner.query(`DELETE from \`poll_vote\` WHERE 1=1`);
+
+    await queryRunner.query(`DROP TABLE \`poll_vote\``);
+    await queryRunner.query(`DROP TABLE \`poll\``);
 
     await queryRunner.query(`ALTER TABLE \`highlight\` DROP COLUMN \`timestamp\``);
     await queryRunner.query(`ALTER TABLE \`highlight\` ADD \`timestamp\` json NOT NULL`);
@@ -27,6 +34,7 @@ export class updateHighlightAndPolls1665996411181 implements MigrationInterface 
     for (const item of items2) {
       item.openedAt = new Date(item.openedAt).toISOString();
       item.closedAt = item.isOpened ? null : new Date(item.closedAt).toISOString();
+      item.votes = JSON.stringify(items3.filter((o: any) => o.pollId === item.id));
       delete item.isOpened;
       await insertItemIntoTable('poll', {
         ...item,
