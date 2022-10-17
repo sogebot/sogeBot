@@ -19,7 +19,6 @@ export class updateHighlightAndPolls1665996411181 implements MigrationInterface 
       }, queryRunner);
     }
 
-    const items2 = await queryRunner.query(`SELECT * from "poll"`);
     await queryRunner.query(`DROP TABLE "poll"`);
     await queryRunner.query(`CREATE TABLE "poll" ("id" varchar PRIMARY KEY NOT NULL, "type" varchar(7) NOT NULL, "title" varchar NOT NULL, "openedAt" varchar(30) NOT NULL, "closedAt" varchar(30), "options" text NOT NULL, "votes" text NOT NULL)`);
 
