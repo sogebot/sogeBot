@@ -1,7 +1,6 @@
 import { Bets as BetsEntity } from '@entity/bets';
 import { format } from '@sogebot/ui-helpers/number';
 import _ from 'lodash';
-import { getRepository } from 'typeorm';
 
 import { parserReply } from '../commons';
 import {
@@ -60,7 +59,7 @@ class Bets extends System {
       return;
     }
     try {
-      const currentBet = await getRepository(BetsEntity).findOne({
+      const currentBet = await BetsEntity.findOne({
         order: { createdAt: 'DESC' },
       });
       if (!currentBet || currentBet.isLocked) {
@@ -76,7 +75,7 @@ class Bets extends System {
         } else {
           announce(prepare('bets.removed'), 'bets');
         }
-        await getRepository(BetsEntity).update({ id: currentBet.id }, { isLocked: true });
+        await BetsEntity.update({ id: currentBet.id }, { isLocked: true });
       } else {
         // bet is running;
         isEndAnnounced = false;
@@ -96,7 +95,7 @@ class Bets extends System {
   sockets() {
     adminEndpoint('/systems/bets', 'bets::getCurrentBet', async (cb) => {
       try {
-        const currentBet = await getRepository(BetsEntity).findOne({
+        const currentBet = await BetsEntity.findOne({
           order: { createdAt: 'DESC' },
         });
         cb(null, currentBet);
@@ -141,7 +140,7 @@ class Bets extends System {
   @command('!bet open')
   @default_permission(defaultPermissions.MODERATORS)
   public async open(opts: CommandOptions): Promise<CommandResponse[]> {
-    const currentBet = await getRepository(BetsEntity).findOne({
+    const currentBet = await BetsEntity.findOne({
       order: { createdAt: 'DESC' },
     });
     try {
@@ -162,12 +161,13 @@ class Bets extends System {
         throw new Error(ERROR_NOT_ENOUGH_OPTIONS);
       }
 
-      await getRepository(BetsEntity).save({
+      const bet = new BetsEntity({
         createdAt: new Date().toISOString(),
         endedAt:   new Date(Date.now() + (timeout * 1000 * 60)).toISOString(),
         title:     title,
         options:   options,
-      });
+      })
+      await bet.save();
 
       return [{
         response: prepare('bets.opened', {
@@ -198,7 +198,7 @@ class Bets extends System {
   }
 
   public async info(opts: CommandOptions) {
-    const currentBet = await getRepository(BetsEntity).findOne({
+    const currentBet = await BetsEntity.findOne({
       order: { createdAt: 'DESC' },
     });
     if (!currentBet || (currentBet.isLocked && currentBet.arePointsGiven)) {
@@ -218,7 +218,7 @@ class Bets extends System {
 
   public async participate(opts: CommandOptions): Promise<CommandResponse[]> {
     const points = (await import('../systems/points')).default;
-    const currentBet = await getRepository(BetsEntity).findOne({
+    const currentBet = await BetsEntity.findOne({
       order: { createdAt: 'DESC' },
     });
 
@@ -264,7 +264,7 @@ class Bets extends System {
 
         // All OK
         await points.decrement({ userId: opts.sender.userId }, tickets);
-        await getRepository(BetsEntity).save(currentBet);
+        await BetsEntity.save(currentBet);
         return [];
       } else {
         return this.info(opts);
@@ -293,7 +293,7 @@ class Bets extends System {
   @command('!bet refund')
   @default_permission(defaultPermissions.MODERATORS)
   public async refund(opts: CommandOptions): Promise<CommandResponse[]> {
-    const currentBet = await getRepository(BetsEntity).findOne({
+    const currentBet = await BetsEntity.findOne({
       order: { createdAt: 'DESC' },
     });
     try {
@@ -315,7 +315,7 @@ class Bets extends System {
       }
     } finally {
       if (currentBet) {
-        await getRepository(BetsEntity).update({ id: currentBet.id }, { arePointsGiven: true, isLocked: true });
+        await BetsEntity.update({ id: currentBet.id }, { arePointsGiven: true, isLocked: true });
       }
     }
   }
@@ -323,7 +323,7 @@ class Bets extends System {
   @command('!bet close')
   @default_permission(defaultPermissions.MODERATORS)
   public async close(opts: CommandOptions): Promise<CommandResponse[]> {
-    const currentBet = await getRepository(BetsEntity).findOne({
+    const currentBet = await BetsEntity.findOne({
       order: { createdAt: 'DESC' },
     });
     try {
@@ -346,7 +346,7 @@ class Bets extends System {
         }
       }
 
-      await getRepository(BetsEntity).update({ id: currentBet.id }, { arePointsGiven: true, isLocked: true });
+      await BetsEntity.update({ id: currentBet.id }, { arePointsGiven: true, isLocked: true });
       return [{
         response: prepare('bets.closed')
           .replace(/\$option/g, currentBet.options[index])

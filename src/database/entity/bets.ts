@@ -12,6 +12,9 @@ export class Bets extends BotEntity<Bets> {
   @BeforeInsert()
   generateCreatedAt() {
     this.createdAt = new Date().toISOString();
+    if (!this.participants) {
+      this.participants = [];
+    }
   }
 
   @Column({ type: 'varchar', length: '2022-07-27T00:30:34.569259834Z'.length })
@@ -35,5 +38,5 @@ export class Bets extends BotEntity<Bets> {
     username: string;
     points: number;
     optionIdx: number;
-  }[];
+  }[] = [];
 }
