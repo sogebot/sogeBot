@@ -27,6 +27,7 @@ export class updateHighlightAndPolls1665996411181 implements MigrationInterface 
     for (const item of items2) {
       item.openedAt = new Date(item.openedAt).toISOString();
       item.closedAt = item.isOpened ? null : new Date(item.closedAt).toISOString();
+      delete item.isOpened;
       await insertItemIntoTable('poll', {
         ...item,
       }, queryRunner);
