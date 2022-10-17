@@ -85,6 +85,19 @@ class HowLongToBeat extends System {
         data: await HowLongToBeatGame.find(),
       });
     });
+    app.post('/api/systems/hltb/:id', async (req, res) => {
+      try {
+        const game = await HowLongToBeatGame.findOneOrFail({ where: { id: req.params.id } });
+        for (const key of Object.keys(req.body)) {
+          (game as any)[key as any] = req.body[key];
+        }
+        res.send({
+          data: await game.save(),
+        });
+      } catch {
+        res.status(404).send();
+      }
+    });
     app.get('/api/systems/hltb/:id', async (req, res) => {
       res.send({
         data: await HowLongToBeatGame.findOne({ where: { id: req.params.id } }),
@@ -97,15 +110,39 @@ class HowLongToBeat extends System {
     });
     app.post('/api/systems/hltb', adminMiddleware, async (req, res) => {
       try {
-        const itemToSave = new HowLongToBeatGame(req.body);
-        await itemToSave.validateAndSave();
-        res.send({ data: itemToSave });
-      } catch (e) {
-        if (e instanceof Error) {
-          res.status(400).send({ errors: e.message });
+        if (req.query.search) {
+          const search = await this.hltbService.search(req.query.search as string);
+          const games = await HowLongToBeatGame.find();
+
+          res.send({
+            data: search
+              .filter((o: any) => {
+              // we need to filter already added gaems
+                return !games.map(a => a.game.toLowerCase()).includes(o.name.toLowerCase());
+              })
+              .map((o: any) => o.name),
+          });
         } else {
-          res.status(400).send({ errors: e });
+          const gameFromHltb = (await this.hltbService.search(req.body))[0];
+          if (gameFromHltb) {
+            const game = new HowLongToBeatGame({
+              game:                  gameFromHltb.name,
+              startedAt:             new Date().toISOString(),
+              updatedAt:             new Date().toISOString(),
+              gameplayMain:          gameFromHltb.gameplayMain,
+              gameplayMainExtra:     gameFromHltb.gameplayMainExtra,
+              gameplayCompletionist: gameFromHltb.gameplayCompletionist,
+            });
+            await game.validateAndSave();
+            res.send({
+              data: game,
+            });
+          } else {
+            throw new Error(`Game ${req.body} not found on HLTB service`);
+          }
         }
+      } catch (e: any) {
+        res.status(404).send();
       }
     });
   }
