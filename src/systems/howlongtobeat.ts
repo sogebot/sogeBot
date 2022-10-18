@@ -133,6 +133,7 @@ class HowLongToBeat extends System {
             gameplayMainExtra:     0,
             gameplayCompletionist: 0,
           });
+          await game.validateAndSave();
           res.send({
             data: game,
           });
