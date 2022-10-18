@@ -332,7 +332,7 @@ class Emotes extends Core {
       try {
         const urlTemplate = `https://cdn.7tv.app/emote/{{id}}/{{image}}`;
 
-        const query2 = `query GetEmoteSet($id: ObjectID!, $formats: [ImageFormat!]) {  emoteSet(id: $id) {    id    name    capacity    emotes {      id      name      emote {        id        name        flags        listed        images(formats: $formats) {          name          format          url          __typename        }        owner {          id          display_name          tag_color          roles          __typename        }        __typename      }      __typename    }    owner {      id      username      display_name      tag_color      avatar_url      roles      __typename    }    __typename  }}`;
+        const query2 = `query GetEmoteSet($id: ObjectID!, $formats: [ImageFormat!]) {  emoteSet(id: $id) {    id    name    capacity    emotes {      id      name      data {        id        name        flags        listed        host {          url          files(formats: $formats) {            name            format            __typename          }          __typename        }        owner {          id          display_name          style {            color            __typename          }          roles          __typename        }        __typename      }      __typename    }    owner {      id      username      display_name      style {        color        __typename      }      avatar_url      roles      connections {        emote_capacity        __typename      }      __typename    }    __typename  }}`;
         await getAllChannelEmotes(query2, urlTemplate, broadcasterUsername),
         info('EMOTES: Fetched 7tv emotes');
       } catch (e: any) {
