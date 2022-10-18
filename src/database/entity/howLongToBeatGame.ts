@@ -1,5 +1,6 @@
 import { BeforeInsert, BeforeUpdate, Column, Entity, Index, PrimaryColumn } from 'typeorm';
 import { BotEntity } from '~/database/BotEntity';
+import { IsNotEmpty, MinLength } from 'class-validator';
 
 import { ColumnNumericTransformer } from './_transformer';
 
@@ -10,6 +11,8 @@ export class HowLongToBeatGame extends BotEntity<HowLongToBeatGame> {
     id: string;
 
   @Column()
+  @MinLength(2)
+  @IsNotEmpty()
     game: string;
 
   @Column({ nullable: false, type: 'varchar', length: '2022-07-27T00:30:34.569259834Z'.length })

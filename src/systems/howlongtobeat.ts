@@ -1,7 +1,8 @@
 import { HowLongToBeatGame } from '@entity/howLongToBeatGame';
+import { CacheGames } from '@entity/cacheGames';
 import * as constants from '@sogebot/ui-helpers/constants';
 import { HowLongToBeatService } from 'howlongtobeat';
-import { EntityNotFoundError } from 'typeorm';
+import { EntityNotFoundError, getRepository } from 'typeorm';
 
 import { command, default_permission } from '../decorators';
 import { onStartup } from '../decorators/on';
@@ -82,7 +83,8 @@ class HowLongToBeat extends System {
 
     app.get('/api/systems/hltb', adminMiddleware, async (req, res) => {
       res.send({
-        data: await HowLongToBeatGame.find(),
+        data:       await HowLongToBeatGame.find(),
+        thumbnails: await getRepository(CacheGames).find(),
       });
     });
     app.post('/api/systems/hltb/:id', async (req, res) => {
@@ -138,11 +140,19 @@ class HowLongToBeat extends System {
               data: game,
             });
           } else {
-            throw new Error(`Game ${req.body} not found on HLTB service`);
+            const game = new HowLongToBeatGame({
+              game:                  req.body.game,
+              startedAt:             new Date().toISOString(),
+              updatedAt:             new Date().toISOString(),
+              gameplayMain:          0,
+              gameplayMainExtra:     0,
+              gameplayCompletionist: 0,
+            });
+            await game.validateAndSave();
           }
         }
       } catch (e: any) {
-        res.status(404).send();
+        res.status(400).send({ errors: e });
       }
     });
   }
