@@ -125,31 +125,17 @@ class HowLongToBeat extends System {
               .map((o: any) => o.name),
           });
         } else {
-          const gameFromHltb = (await this.hltbService.search(req.body))[0];
-          if (gameFromHltb) {
-            const game = new HowLongToBeatGame({
-              game:                  gameFromHltb.name,
-              startedAt:             new Date().toISOString(),
-              updatedAt:             new Date().toISOString(),
-              gameplayMain:          gameFromHltb.gameplayMain,
-              gameplayMainExtra:     gameFromHltb.gameplayMainExtra,
-              gameplayCompletionist: gameFromHltb.gameplayCompletionist,
-            });
-            await game.validateAndSave();
-            res.send({
-              data: game,
-            });
-          } else {
-            const game = new HowLongToBeatGame({
-              game:                  req.body.game,
-              startedAt:             new Date().toISOString(),
-              updatedAt:             new Date().toISOString(),
-              gameplayMain:          0,
-              gameplayMainExtra:     0,
-              gameplayCompletionist: 0,
-            });
-            await game.validateAndSave();
-          }
+          const game = new HowLongToBeatGame({
+            game:                  req.body.game,
+            startedAt:             new Date().toISOString(),
+            updatedAt:             new Date().toISOString(),
+            gameplayMain:          0,
+            gameplayMainExtra:     0,
+            gameplayCompletionist: 0,
+          });
+          res.send({
+            data: game,
+          });
         }
       } catch (e: any) {
         res.status(400).send({ errors: e });
