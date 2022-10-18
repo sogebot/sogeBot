@@ -26,6 +26,7 @@ export class HowLongToBeatGame extends BotEntity<HowLongToBeatGame> {
   @Column({ nullable: false, type: 'varchar', length: '2022-07-27T00:30:34.569259834Z'.length })
     updatedAt?: string;
 
+  @BeforeInsert()
   @BeforeUpdate()
   generateUpdatedAt() {
     this.updatedAt = new Date().toISOString();

@@ -89,15 +89,21 @@ class HowLongToBeat extends System {
     });
     app.post('/api/systems/hltb/:id', async (req, res) => {
       try {
-        const game = await HowLongToBeatGame.findOneOrFail({ where: { id: req.params.id } });
-        for (const key of Object.keys(req.body)) {
-          (game as any)[key as any] = req.body[key];
+        delete req.body.streams; // remove streams to not change this
+
+        let game = await HowLongToBeatGame.findOne({ where: { id: req.params.id } });
+        if (!game) {
+          game = new HowLongToBeatGame(req.body);
+        } else {
+          for (const key of Object.keys(req.body)) {
+            (game as any)[key as any] = req.body[key];
+          }
         }
         res.send({
-          data: await game.save(),
+          data: await game.validateAndSave(),
         });
-      } catch {
-        res.status(404).send();
+      } catch (e) {
+        res.status(400).send({ errors: e });
       }
     });
     app.get('/api/systems/hltb/:id', async (req, res) => {
