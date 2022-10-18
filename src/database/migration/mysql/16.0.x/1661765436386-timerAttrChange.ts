@@ -21,14 +21,14 @@ export class timerAttrChange1661765436386 implements MigrationInterface {
     for (const item of items) {
       await insertItemIntoTable('timer', {
         ...item,
-        triggeredAtTimestamp: new Date(item.triggeredAtTimestamp).toISOString(),
+        triggeredAtTimestamp: new Date(item.triggeredAtTimestamp || Date.now()).toISOString(),
       }, queryRunner);
     }
 
     for (const item of items2) {
       await insertItemIntoTable('timer_response', {
         ...item,
-        timestamp: new Date(item.timestamp).toISOString(),
+        timestamp: new Date(item.timestamp || Date.now()).toISOString(),
       }, queryRunner);
     }
   }
