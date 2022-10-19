@@ -6,7 +6,6 @@ import { HOUR, SECOND } from '@sogebot/ui-helpers/constants';
 import chalk from 'chalk';
 import _ from 'lodash';
 import SpotifyWebApi from 'spotify-web-api-node';
-import { getRepository } from 'typeorm';
 
 import {
   command, default_permission, persistent, settings,
@@ -407,9 +406,10 @@ class Spotify extends Integration {
         });
 
         const track = response.body;
-        await getRepository(SpotifySongBan).save({
+        const songBan = new SpotifySongBan({
           artists: track.artists.map(o => o.name), spotifyUri: track.uri, title: track.name,
         });
+        await songBan.save();
       } catch (e: any) {
         if (e.message !== 'client') {
           if (cb) {
@@ -431,14 +431,14 @@ class Spotify extends Integration {
     adminEndpoint('/integrations/spotify', 'spotify::deleteBan', async (where, cb) => {
       where = where || {};
       if (cb) {
-        await getRepository(SpotifySongBan).delete(where);
+        await SpotifySongBan.delete(where);
         cb(null);
       }
     });
     adminEndpoint('/integrations/spotify', 'spotify::getAllBanned', async (where, cb) => {
       where = where || {};
       if (cb) {
-        cb(null, await getRepository(SpotifySongBan).find(where));
+        cb(null, await SpotifySongBan.find(where));
       }
     });
     adminEndpoint('/integrations/spotify', 'spotify::code', async (token, cb) => {
@@ -596,8 +596,8 @@ class Spotify extends Integration {
   @default_permission(null)
   async unban (opts: CommandOptions): Promise<CommandResponse[]> {
     try {
-      const songToUnban = await getRepository(SpotifySongBan).findOneOrFail({ where: { spotifyUri: opts.parameters } });
-      await getRepository(SpotifySongBan).delete({ spotifyUri: opts.parameters });
+      const songToUnban = await SpotifySongBan.findOneOrFail({ where: { spotifyUri: opts.parameters } });
+      await SpotifySongBan.delete({ spotifyUri: opts.parameters });
       return [{
         response: prepare('integrations.spotify.song-unbanned', {
           artist: songToUnban.artists[0], uri: songToUnban.spotifyUri, name: songToUnban.title,
@@ -621,9 +621,10 @@ class Spotify extends Integration {
     if (Object.keys(currentSong).length === 0) {
       return [{ response: prepare('integrations.spotify.not-banned-song-not-playing'), ...opts }];
     } else {
-      await getRepository(SpotifySongBan).save({
+      const songBan = new SpotifySongBan({
         artists: currentSong.artists.split(', '), spotifyUri: currentSong.uri, title: currentSong.song,
       });
+      await songBan.save();
       this.cSkipSong();
       return [{
         response: prepare('integrations.spotify.song-banned', {
@@ -764,7 +765,7 @@ class Spotify extends Integration {
   async requestSongByAPI(uri: string) {
     if (this.client) {
       try {
-        const isSongBanned = (await getRepository(SpotifySongBan).count({ where: { spotifyUri: uri } })) > 0;
+        const isSongBanned = (await SpotifySongBan.count({ where: { spotifyUri: uri } })) > 0;
         if (isSongBanned) {
           return false;
         }

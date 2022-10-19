@@ -1,16 +1,12 @@
-import { EntitySchema } from 'typeorm';
+import { BotEntity } from '../BotEntity';
+import { Column, Entity, PrimaryColumn } from 'typeorm';
 
-export interface SpotifySongBanInterface {
-  spotifyUri: string;
-  title: string;
-  artists: string[];
+@Entity()
+export class SpotifySongBan extends BotEntity<SpotifySongBan> {
+  @PrimaryColumn()
+    spotifyUri: string;
+  @Column()
+    title: string;
+  @Column({ type: 'simple-array' })
+    artists: string[];
 }
-
-export const SpotifySongBan = new EntitySchema<Readonly<Required<SpotifySongBanInterface>>>({
-  name:    'spotify_song_ban',
-  columns: {
-    spotifyUri: { type: String, primary: true },
-    title:      { type: String },
-    artists:    { type: 'simple-array' },
-  },
-});
