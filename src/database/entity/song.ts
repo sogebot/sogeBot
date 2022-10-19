@@ -1,79 +1,77 @@
-import { EntitySchema } from 'typeorm';
-
-import { ColumnNumericTransformer } from './_transformer';
+import { BeforeInsert, Column, Entity, PrimaryColumn } from 'typeorm';
+import { BotEntity } from '~/database/BotEntity';
 
 export type currentSongType = {
   videoId: null | string, title: string, type: string, username: string, volume: number; loudness: number; forceVolume: boolean; startTime: number; endTime: number;
 };
 
-export interface SongPlaylistInterface {
-  videoId: string;
-  lastPlayedAt?: number;
-  seed: number;
-  title: string;
-  tags: string[];
-  loudness: number;
-  length: number;
-  forceVolume?: boolean;
-  volume: number;
-  startTime: number;
-  endTime: number;
+@Entity()
+export class SongBan extends BotEntity<SongBan> {
+  @PrimaryColumn()
+    videoId: string;
+
+  @Column()
+    title: string;
 }
 
-export interface SongRequestInterface {
-  id?: string;
-  videoId: string;
-  addedAt?: number;
-  title: string;
-  loudness: number;
-  length: number;
-  username: string;
+@Entity()
+export class SongPlaylist extends BotEntity<SongPlaylist> {
+  @PrimaryColumn()
+    videoId: string;
+
+  @Column({ type: 'varchar', length: '2022-07-27T00:30:34.569259834Z'.length, default: '1970-01-01T00:00:00.000Z' })
+    lastPlayedAt?: string;
+
+  @Column()
+    title: string;
+
+  @Column({ type: 'float', precision: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') === 'mysql' ? 12 : undefined  })
+    seed: number;
+
+  @Column({ type: 'float', precision: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') === 'mysql' ? 12 : undefined  })
+    loudness: number;
+
+  @Column({ type: 'simple-array' })
+    tags: string[];
+
+  @Column()
+    length: number;
+
+  @Column()
+    volume: number;
+
+  @Column()
+    startTime: number;
+
+  @Column()
+    endTime: number;
+
+  @Column({ type: Boolean, default: false })
+    forceVolume: boolean;
 }
-export interface SongBanInterface {
-  videoId: string;
-  title: string;
+
+@Entity()
+export class SongRequest extends BotEntity<SongRequest> {
+  @PrimaryColumn({ generated: 'uuid' })
+    id: string;
+
+  @Column()
+    videoId: string;
+
+  @Column({ type: 'varchar', length: '2022-07-27T00:30:34.569259834Z'.length })
+    addedAt?: string;
+
+  @BeforeInsert()
+  generateAddedAt() {
+    this.addedAt = new Date().toISOString();
+  }
+
+  @Column()
+    title: string;
+  @Column({ type: 'float', precision: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') === 'mysql' ? 12 : undefined  })
+    loudness: number;
+  @Column()
+    length: number;
+  @Column()
+    username: string;
 }
-
-export const SongPlaylist = new EntitySchema<Readonly<Required<SongPlaylistInterface>>>({
-  name:    'song_playlist',
-  columns: {
-    videoId:      { type: String, primary: true },
-    lastPlayedAt: {
-      type: 'bigint', transformer: new ColumnNumericTransformer(), default: 0,
-    },
-    seed:        { type: 'float', precision: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') === 'mysql' ? 12 : undefined  },
-    title:       { type: String },
-    tags:        { type: 'simple-array' },
-    loudness:    { type: 'float', precision: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') === 'mysql' ? 12 : undefined  },
-    length:      { type: Number },
-    volume:      { type: Number },
-    startTime:   { type: Number },
-    endTime:     { type: Number },
-    forceVolume: { type: Boolean, default: false },
-  },
-});
-
-export const SongRequest = new EntitySchema<Readonly<Required<SongRequestInterface>>>({
-  name:    'song_request',
-  columns: {
-    id: {
-      type: String, primary: true, generated: 'uuid',
-    },
-    videoId: { type: String },
-    addedAt: {
-      type: 'bigint', transformer: new ColumnNumericTransformer(), default: 0,
-    },
-    title:    { type: String },
-    loudness: { type: 'float', precision: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') === 'mysql' ? 12 : undefined  },
-    length:   { type: Number },
-    username: { type: String },
-  },
-});
-
-export const SongBan = new EntitySchema<Readonly<Required<SongBanInterface>>>({
-  name:    'song_ban',
-  columns: {
-    videoId: { type: String, primary: true },
-    title:   { type: String },
-  },
-});

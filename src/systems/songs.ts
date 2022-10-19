@@ -1,8 +1,6 @@
-import { setInterval } from 'timers';
-
 import {
   currentSongType,
-  SongBan, SongPlaylist, SongPlaylistInterface, SongRequest,
+  SongBan, SongPlaylist, SongRequest,
 } from '@entity/song';
 import { User } from '@entity/user';
 import * as _ from 'lodash';
@@ -91,7 +89,7 @@ class Songs extends System {
     } else {
       cachedTags.clear();
       isCachedTagsValid = true;
-      for (const item of await getRepository(SongPlaylist).find()) {
+      for (const item of await SongPlaylist.find()) {
         for (const tag of item.tags) {
           cachedTags.add(tag);
         }
@@ -132,7 +130,7 @@ class Songs extends System {
       if (opts.perPage === -1) {
         opts.perPage = Number.MAX_SAFE_INTEGER;
       }
-      const query = getRepository(SongPlaylist).createQueryBuilder('playlist')
+      const query = SongPlaylist.createQueryBuilder('playlist')
         .offset(opts.page * opts.perPage)
         .limit(opts.perPage);
 
@@ -167,36 +165,36 @@ class Songs extends System {
         };
       })), count);
     });
-    adminEndpoint('/systems/songs', 'songs::save', async (item: SongPlaylistInterface, cb) => {
+    adminEndpoint('/systems/songs', 'songs::save', async (item: SongPlaylist, cb) => {
       isCachedTagsValid = false;
-      cb(null, await getRepository(SongPlaylist).save(item));
+      cb(null, await SongPlaylist.save(item));
     });
     adminEndpoint('/systems/songs', 'songs::getAllBanned', async (where, cb) => {
       where ??= {};
       if (cb) {
-        cb(null, await getRepository(SongBan).find(where));
+        cb(null, await SongBan.find(where));
       }
     });
     adminEndpoint('/systems/songs', 'songs::removeRequest', async (id: string, cb) => {
-      await getRepository(SongRequest).delete({ id });
+      await SongRequest.delete({ id });
       cb(null);
     });
     publicEndpoint('/systems/songs', 'songs::getAllRequests', async (where, cb) => {
       where = where || {};
-      cb(null, await getRepository(SongRequest).find({
+      cb(null, await SongRequest.find({
         ...where,
         order: { addedAt: 'ASC' },
       }));
     });
     adminEndpoint('/systems/songs', 'delete.playlist', async (videoId, cb) => {
       isCachedTagsValid = false;
-      await getRepository(SongPlaylist).delete({ videoId });
+      await SongPlaylist.delete({ videoId });
       if (cb) {
         cb(null);
       }
     });
     adminEndpoint('/systems/songs', 'delete.ban', async (videoId, cb) => {
-      await getRepository(SongBan).delete({ videoId });
+      await SongBan.delete({ videoId });
       if (cb) {
         cb(null);
       }
@@ -256,7 +254,7 @@ class Songs extends System {
   }
 
   async getMeanLoudness () {
-    const playlist = await getRepository(SongPlaylist).find();
+    const playlist = await SongPlaylist.find();
     if (_.isEmpty(playlist)) {
       this.meanLoudness = -15;
       return -15;
@@ -274,7 +272,7 @@ class Songs extends System {
     return loudness / playlist.length;
   }
 
-  async getVolume (item: SongPlaylistInterface | currentSongType) {
+  async getVolume (item: SongPlaylist | currentSongType) {
     if (!item.forceVolume && this.calculateVolumeByLoudness) {
       item.loudness = !_.isNil(item.loudness) ? item.loudness : -15;
       const volume = this.volume;
@@ -309,7 +307,7 @@ class Songs extends System {
     }
 
     // send timeouts to all users who requested song
-    const request = (await getRepository(SongRequest).find({ videoId: videoID })).map(o => o.username);
+    const request = (await SongRequest.find({ videoId: videoID })).map(o => o.username);
     if (JSON.parse(this.currentSong).videoId === videoID) {
       request.push(JSON.parse(this.currentSong).username);
     }
@@ -320,10 +318,11 @@ class Songs extends System {
       tmiEmitter.emit('timeout', username, 300, typeof data !== 'undefined' && isModerator(data));
     }
 
+    const songBan = new SongBan({ videoId: videoID, title: videoTitle });
     await Promise.all([
-      getRepository(SongBan).save({ videoId: videoID, title: videoTitle }),
-      getRepository(SongPlaylist).delete({ videoId: videoID }),
-      getRepository(SongRequest).delete({ videoId: videoID }),
+      songBan.save(),
+      SongPlaylist.delete({ videoId: videoID }),
+      SongRequest.delete({ videoId: videoID }),
     ]);
 
     this.getMeanLoudness();
@@ -337,9 +336,10 @@ class Songs extends System {
 
   @onChange('calculateVolumeByLoudness')
   async refreshPlaylistVolume () {
-    const playlist = await getRepository(SongPlaylist).find();
+    const playlist = await SongPlaylist.find();
     for (const item of playlist) {
-      await getRepository(SongPlaylist).save({ ...item, volume: await this.getVolume(item) });
+      item.volume = await this.getVolume(item);
+      await item.save();
     }
   }
 
@@ -367,7 +367,7 @@ class Songs extends System {
   @command('!unbansong')
   @default_permission(defaultPermissions.CASTERS)
   async unbanSong (opts: CommandOptions): Promise<CommandResponse[]> {
-    const removed = await getRepository(SongBan).delete({ videoId: opts.parameters });
+    const removed = await SongBan.delete({ videoId: opts.parameters });
     if ((removed.affected || 0) > 0) {
       return [{ response: translate('songs.song-was-unbanned'), ...opts }];
     } else {
@@ -382,7 +382,7 @@ class Songs extends System {
 
     // check if there are any requests
     if (this.songrequest) {
-      const sr = await getRepository(SongRequest).findOne({ order: { addedAt: 'ASC' } });
+      const sr = await SongRequest.findOne({ order: { addedAt: 'ASC' } });
       if (sr) {
         const currentSong: any = sr;
         currentSong.volume = await this.getVolume(currentSong);
@@ -392,7 +392,7 @@ class Songs extends System {
         if (this.notify) {
           this.notifySong();
         }
-        await getRepository(SongRequest).delete({ videoId: sr.videoId });
+        await SongRequest.delete({ videoId: sr.videoId });
         return [];
       }
     }
@@ -404,7 +404,7 @@ class Songs extends System {
         return [];
       }
       const order: any = this.shuffle ? { seed: 'ASC' } : { lastPlayedAt: 'ASC' };
-      const pl = await getRepository(SongPlaylist).findOne({ order });
+      const pl = await SongPlaylist.findOne({ order });
       if (!pl) {
         return []; // don't do anything if no songs in playlist
       }
@@ -416,23 +416,24 @@ class Songs extends System {
       }
 
       if (!pl.tags.includes(this.currentTag)) {
-        await getRepository(SongPlaylist).save({ ...pl, seed: 1 });
+        pl.seed = 1;
+        await pl.save();
         return this.sendNextSongID(); // get next song as this don't belong to tag
       }
 
-      const updatedItem = await getRepository(SongPlaylist).save({
-        ...pl, seed: 1, lastPlayedAt: Date.now(),
-      });
+      pl.seed = 1;
+      pl.lastPlayedAt = new Date().toISOString();
+      await pl.save();
       const currentSong = {
-        videoId:     updatedItem.videoId,
-        title:       updatedItem.title,
+        videoId:     pl.videoId,
+        title:       pl.title,
         type:        'playlist',
         username:    getBot(),
-        forceVolume: updatedItem.forceVolume,
-        loudness:    updatedItem.loudness,
-        volume:      await this.getVolume(updatedItem),
-        endTime:     updatedItem.endTime,
-        startTime:   updatedItem.startTime,
+        forceVolume: pl.forceVolume,
+        loudness:    pl.loudness,
+        volume:      await this.getVolume(pl),
+        endTime:     pl.endTime,
+        startTime:   pl.startTime,
       };
       this.currentSong = JSON.stringify(currentSong);
 
@@ -499,9 +500,10 @@ class Songs extends System {
   }
 
   async createRandomSeeds () {
-    const playlist = await getRepository(SongPlaylist).find();
+    const playlist = await SongPlaylist.find();
     for (const item of playlist) {
-      await getRepository(SongPlaylist).save({ ...item, seed: Math.random() });
+      item.seed = Math.random();
+      await item.save();
     }
   }
 
@@ -567,14 +569,14 @@ class Songs extends System {
     }
 
     // is song banned?
-    const ban = await getRepository(SongBan).findOne({ videoId: videoID });
+    const ban = await SongBan.findOne({ videoId: videoID });
     if (ban) {
       return [{ response: translate('songs.song-is-banned'), ...opts }];
     }
 
     // check if song is in playlist
     if (this.allowRequestsOnlyFromPlaylist) {
-      const inPlaylist = await getRepository(SongPlaylist).count({
+      const inPlaylist = await SongPlaylist.count({
         where: {
           videoId: videoID,
           tags:    Like(`%${this.currentTag}%`),
@@ -603,14 +605,14 @@ class Songs extends System {
         }
         return [{ response: translate('songs.incorrect-category'), ...opts }];
       } else {
-        await getRepository(SongRequest).save({
+        const songRequest = new SongRequest({
           videoId:  videoID,
           title:    videoInfo.videoDetails.title,
-          addedAt:  Date.now(),
           loudness: Number(videoInfo.loudness ?? -15),
           length:   Number(videoInfo.videoDetails.lengthSeconds),
           username: opts.sender.userName,
         });
+        await songRequest.save();
         this.getMeanLoudness();
         const response = prepare('songs.song-was-added-to-queue', { name: videoInfo.videoDetails.title });
         return [{ response, ...opts }];
@@ -631,12 +633,12 @@ class Songs extends System {
 
   @command('!wrongsong')
   async removeSongFromQueue (opts: CommandOptions): Promise<CommandResponse[]> {
-    const sr = await getRepository(SongRequest).findOne({
+    const sr = await SongRequest.findOne({
       where: { username: opts.sender.userName },
       order: { addedAt: 'DESC' },
     });
     if (sr) {
-      getRepository(SongRequest).remove(sr);
+      SongRequest.remove(sr);
       this.getMeanLoudness();
       const response = prepare('songs.song-was-removed-from-queue', { name: sr.title });
       return [{ response, ...opts }];
@@ -655,31 +657,32 @@ class Songs extends System {
     const match = opts.parameters.match(urlRegex);
     const id = (match && match[1].length === 11) ? match[1] : opts.parameters;
 
-    const idsFromDB = (await getRepository(SongPlaylist).find()).map(o => o.videoId);
-    const banFromDb = (await getRepository(SongBan).find()).map(o => o.videoId);
+    const idsFromDB = (await SongPlaylist.find()).map(o => o.videoId);
+    const banFromDb = (await SongBan.find()).map(o => o.videoId);
 
     if (idsFromDB.includes(id)) {
       info(`=> Skipped ${id} - Already in playlist`);
-      return [{ response: prepare('songs.song-is-already-in-playlist', { name: (await getRepository(SongPlaylist).findOneOrFail({ videoId: id })).title }), ...opts }];
+      return [{ response: prepare('songs.song-is-already-in-playlist', { name: (await SongPlaylist.findOneOrFail({ videoId: id })).title }), ...opts }];
     } else if (banFromDb.includes(id)) {
       info(`=> Skipped ${id} - Song is banned`);
-      return [{ response: prepare('songs.song-is-banned', { name: (await getRepository(SongPlaylist).findOneOrFail({ videoId: id })).title }), ...opts }];
+      return [{ response: prepare('songs.song-is-banned', { name: (await SongPlaylist.findOneOrFail({ videoId: id })).title }), ...opts }];
     } else {
       const videoInfo = await ytdl.getInfo('https://www.youtube.com/watch?v=' + id);
       if (videoInfo) {
         info(`=> Imported ${id} - ${videoInfo.videoDetails.title}`);
-        getRepository(SongPlaylist).save({
+        const songPlaylist = new SongPlaylist({
           videoId:      id,
           title:        videoInfo.videoDetails.title,
           loudness:     Number(videoInfo.loudness ?? -15),
           length:       Number(videoInfo.videoDetails.lengthSeconds),
-          lastPlayedAt: Date.now(),
+          lastPlayedAt: new Date().toISOString(),
           seed:         1,
           volume:       20,
           startTime:    0,
           tags:         [ opts.attr.forcedTag ? opts.attr.forcedTag : this.currentTag ],
           endTime:      Number(videoInfo.videoDetails.lengthSeconds),
         });
+        await songPlaylist.save();
         this.refreshPlaylistVolume();
         this.getMeanLoudness();
         isCachedTagsValid = false;
@@ -698,9 +701,9 @@ class Songs extends System {
     }
     const videoID = opts.parameters;
 
-    const song = await getRepository(SongPlaylist).findOne({ videoId: videoID });
+    const song = await SongPlaylist.findOne({ videoId: videoID });
     if (song) {
-      getRepository(SongPlaylist).delete({ videoId: videoID });
+      SongPlaylist.delete({ videoId: videoID });
       const response = prepare('songs.song-was-removed-from-playlist', { name: song.title });
       isCachedTagsValid = false;
       return [{ response, ...opts }];
@@ -735,8 +738,8 @@ class Songs extends System {
       let done = 0;
       importInProgress = true;
 
-      const idsFromDB = (await getRepository(SongPlaylist).find()).map(o => o.videoId);
-      const banFromDb = (await getRepository(SongBan).find()).map(o => o.videoId);
+      const idsFromDB = (await SongPlaylist.find()).map(o => o.videoId);
+      const banFromDb = (await SongBan.find()).map(o => o.videoId);
 
       for (const id of ids) {
         if (!importInProgress) {
@@ -752,18 +755,19 @@ class Songs extends System {
             done++;
             const videoInfo = await ytdl.getInfo('https://www.youtube.com/watch?v=' + id);
             info(`=> Imported ${id} - ${videoInfo.videoDetails.title}`);
-            await getRepository(SongPlaylist).save({
+            const songPlaylist = new SongPlaylist({
               videoId:      id,
               title:        videoInfo.videoDetails.title,
               loudness:     Number(videoInfo.loudness ?? - 15),
               length:       Number(videoInfo.videoDetails.lengthSeconds),
-              lastPlayedAt: Date.now(),
+              lastPlayedAt: new Date().toISOString(),
               seed:         1,
               volume:       20,
               startTime:    0,
               tags:         [ opts.attr.forcedTag ? opts.attr.forcedTag : this.currentTag ],
               endTime:      Number(videoInfo.videoDetails.lengthSeconds),
             });
+            await songPlaylist.save();
             imported++;
           } catch (e: any) {
             error(`=> Skipped ${id} - ${e.message}`);
