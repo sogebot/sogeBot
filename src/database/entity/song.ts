@@ -1,5 +1,5 @@
 import { BeforeInsert, Column, Entity, PrimaryColumn } from 'typeorm';
-import { BotEntity } from '~/database/BotEntity';
+import { BotEntity } from '../BotEntity';
 
 export type currentSongType = {
   videoId: null | string, title: string, type: string, username: string, volume: number; loudness: number; forceVolume: boolean; startTime: number; endTime: number;
