@@ -1,3 +1,5 @@
+import { Filter } from '@devexpress/dx-react-grid';
+
 import type { AlertInterface, EmitData } from '@entity/alert';
 import type { BetsInterface } from '@entity/bets';
 import type { CacheTitlesInterface } from '@entity/cacheTitles';
@@ -381,7 +383,7 @@ export type ClientToServerEventsWithNamespace = {
     'isPlaying': (cb: (isPlaying: boolean) => void) => void,
     'songs::getAllRequests': (_: any, cb: (error: Error | string | null, requests: SongRequestInterface[]) => void) => void,
     'current.playlist.tag': (cb: (error: Error | string | null, tag: string) => void) => void,
-    'find.playlist': (opts: { page: number, search: string, tag: string | null, perPage: number}, cb: (error: Error | string | null, songs: SongPlaylistInterface[], count: number) => void) => void,
+    'find.playlist': (opts: { filters?: Filter[], page: number, search?: string, tag?: string | null, perPage: number}, cb: (error: Error | string | null, songs: SongPlaylistInterface[], count: number) => void) => void,
     'songs::currentSong': (cb: (error: Error | string | null, song: currentSongType) => void) => void,
     'set.playlist.tag': (tag: string) => void,
     'get.playlist.tags': (cb: (error: Error | string | null, tags: string[]) => void) => void,

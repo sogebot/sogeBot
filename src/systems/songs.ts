@@ -28,6 +28,8 @@ import { tmiEmitter } from '~/helpers/tmi';
 import * as changelog from '~/helpers/user/changelog.js';
 import { isModerator } from '~/helpers/user/isModerator';
 import { translate } from '~/translate';
+import shortid from 'shortid';
+import { Filter } from '@devexpress/dx-react-grid';
 
 let importInProgress = false;
 const cachedTags = new Set<string>();
@@ -122,7 +124,7 @@ class Songs extends System {
         cb(e, []);
       }
     });
-    publicEndpoint('/systems/songs', 'find.playlist', async (opts: { perPage?: number, page?: number; search?: string, tag?: string }, cb) => {
+    publicEndpoint('/systems/songs', 'find.playlist', async (opts: { filters?: Filter[], page: number, search?: string, tag?: string | null, perPage: number}, cb) => {
       const connection = await getConnection();
       opts.page = opts.page ?? 0;
       opts.perPage = opts.perPage ?? 25;
@@ -133,6 +135,47 @@ class Songs extends System {
       const query = SongPlaylist.createQueryBuilder('playlist')
         .offset(opts.page * opts.perPage)
         .limit(opts.perPage);
+
+      // filter generator for new UI
+      for (const filter of opts.filters || []) {
+        const name = shortid.characters('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_.');
+
+        if (filter.operation === 'includes') {
+          query.andWhere(new Brackets(w => {
+            for (let i = 0; i < filter.value.length; i++) {
+              const name2 = shortid.characters('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_.');
+              const value = filter.value[i];
+              if  (['postgres'].includes(connection.options.type.toLowerCase())) {
+                w[i === 0 ? 'where' : 'orWhere'](`"playlist"."${filter.columnName}" like :${name2}`, { [name2]: `%${value}%` });
+              } else {
+                w[i === 0 ? 'where' : 'orWhere'](`playlist.${filter.columnName} like :${name2}`, { [name2]: `%${value}%` });
+              }
+            }
+          }));
+        }
+
+        if (filter.operation === 'contains') {
+          if  (['postgres'].includes(connection.options.type.toLowerCase())) {
+            query.andWhere(`"playlist"."${filter.columnName}" like :${name}`, { [name]: `%${filter.value}%` });
+          } else {
+            query.andWhere(`playlist.${filter.columnName} like :${name}`, { [name]: `%${filter.value}%` });
+          }
+        }
+        if (filter.operation === 'equal') {
+          if  (['postgres'].includes(connection.options.type.toLowerCase())) {
+            query.andWhere(`"playlist"."${filter.columnName}" = :${name}`, { [name]: `${filter.value}` });
+          } else {
+            query.andWhere(`playlist.${filter.columnName} =:${name}`, { [name]: `${filter.value}` });
+          }
+        }
+        if (filter.operation === 'notEqual') {
+          if  (['postgres'].includes(connection.options.type.toLowerCase())) {
+            query.andWhere(`"playlist"."${filter.columnName}" != :${name}`, { [name]: `${filter.value}` });
+          } else {
+            query.andWhere(`playlist.${filter.columnName} != :${name}`, { [name]: `${filter.value}` });
+          }
+        }
+      }
 
       if (typeof opts.search !== 'undefined') {
         query.andWhere(new Brackets(w => {

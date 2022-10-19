@@ -104,6 +104,7 @@
     "gc": "cross-env NODE_ENV=development node --inspect --experimental-report --report-on-fatalerror --report-directory=./logs/ --trace-warnings --trace_gc --trace_gc_verbose --optimize_for_size --gc_interval=100 -r source-map-support/register --inspect=0.0.0.0:9229 --nolazy ./dest/main"
   },
   "devDependencies": {
+    "@devexpress/dx-react-grid": "^3.0.6",
     "@types/basic-auth": "1.1.3",
     "@types/color": "3.0.3",
     "@types/cookie": "0.5.1",
