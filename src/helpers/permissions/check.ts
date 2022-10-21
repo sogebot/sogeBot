@@ -1,6 +1,6 @@
-import { Permissions, PermissionsInterface } from '@entity/permissions';
+import { Permissions } from '@entity/permissions';
 import _ from 'lodash';
-import { getRepository, LessThan } from 'typeorm';
+import { LessThan } from 'typeorm';
 
 import { areDecoratorsLoaded } from '../../decorators';
 import {
@@ -42,15 +42,14 @@ async function check(userId: string, permId: string, partial = false): Promise<c
   if (generalOwners.filter(o => typeof o === 'string' && o.trim().length > 0).length === 0 && broadcasterUsername === '' && !isWarnedAboutCasters) {
     isWarnedAboutCasters = true;
     warning('Owners or broadcaster oauth is not set, all users are treated as CASTERS!!!');
-    const pItem = await getRepository(Permissions).findOne({ id: defaultPermissions.CASTERS });
+    const pItem = await Permissions.findOne({ id: defaultPermissions.CASTERS });
     return { access: true, permission: pItem };
   }
 
   const user = await changelog.get(userId);
-  const pItem = (await getRepository(Permissions).findOne({
-    relations: ['filters'],
-    where:     { id: permId },
-  })) as PermissionsInterface;
+  const pItem = await Permissions.findOne({
+    where: { id: permId },
+  });
   try {
     if (!user) {
       return { access: permId === defaultPermissions.VIEWERS, permission: pItem };
@@ -71,7 +70,7 @@ async function check(userId: string, permId: string, partial = false): Promise<c
 
     // get all higher permissions to check if not partial check only
     if (!partial && pItem.isWaterfallAllowed) {
-      const partialPermission = await getRepository(Permissions).find({ where: { order: LessThan(pItem.order) } });
+      const partialPermission = await Permissions.find({ where: { order: LessThan(pItem.order) } });
       for (const p of _.orderBy(partialPermission, 'order', 'asc')) {
         const partialCheck = await check(userId, p.id, true);
         if (partialCheck.access) {

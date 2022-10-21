@@ -1,4 +1,3 @@
-import { PermissionFiltersInterface } from '@entity/permissions';
 import {
   UserBit, UserInterface, UserTip,
 } from '@entity/user';
@@ -10,6 +9,7 @@ import type { default as ranksType } from '../../systems/ranks';
 import { mainCurrency } from '../currency';
 
 import exchange from '~/helpers/currency/exchange';
+import { Permissions } from '~/database/entity/permissions';
 
 let levels: typeof levelType;
 let ranks: typeof ranksType;
@@ -17,7 +17,7 @@ let currency: typeof currencyType;
 
 async function _filters(
   user: Required<UserInterface>,
-  filters: PermissionFiltersInterface[] = [],
+  filters: Permissions['filters'] = [],
 ): Promise<boolean> {
   for (const f of filters) {
     let amount = 0;

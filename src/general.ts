@@ -7,7 +7,7 @@ import {
   capitalize,
   get, isNil,
 } from 'lodash';
-import { getConnection, getRepository } from 'typeorm';
+import { getConnection } from 'typeorm';
 
 import type { Command } from '../d.ts/src/general';
 import { menu } from './helpers/panel';
@@ -21,7 +21,6 @@ import {
   onChange, onLoad, onStartup,
 } from '~/decorators/on';
 import { isStreamOnline } from '~/helpers/api';
-import { refreshCachedCommandPermissions } from '~/helpers/cache';
 import { setValue } from '~/helpers/general';
 import { setLang } from '~/helpers/locales';
 import {
@@ -112,7 +111,7 @@ class General extends Core {
                 type:         capitalize(type),
                 name:         system.__moduleName__,
                 permission:   await new Promise((resolve: (value: string | null) => void) => {
-                  getRepository(PermissionCommands).findOneOrFail({ name })
+                  PermissionCommands.findOneOrFail({ name })
                     .then(data => {
                       resolve(data.permission);
                     })
@@ -144,18 +143,16 @@ class General extends Core {
 
       // handle permission
       if (commandToSet.permission === moduleCommand.permission) {
-        await getRepository(PermissionCommands).delete({ name: moduleCommand.name });
+        await PermissionCommands.delete({ name: moduleCommand.name });
       } else {
-        await getRepository(PermissionCommands).save({
-          ...(await getRepository(PermissionCommands).findOne({ name: moduleCommand.name })),
-          name:       moduleCommand.name,
-          permission: commandToSet.permission,
-        });
+        const entity = await PermissionCommands.findOne({ name: moduleCommand.name }) || new PermissionCommands();
+        entity.name = moduleCommand.name;
+        entity.permission = commandToSet.permission;
+        await entity.save();
       }
 
       // handle new command value
       module.setCommand(commandToSet.defaultValue, commandToSet.command);
-      refreshCachedCommandPermissions();
       cb(null);
     });
   }

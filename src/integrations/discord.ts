@@ -198,9 +198,8 @@ class Discord extends Integration {
         continue;
       }
 
-      const botPermissionsSortedByPriority = await getRepository(PermissionsEntity).find({
-        relations: ['filters'],
-        order:     { order: 'ASC' },
+      const botPermissionsSortedByPriority = await PermissionsEntity.find({
+        order: { order: 'ASC' },
       });
 
       const alreadyAssignedRoles: string[] = [];

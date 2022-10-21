@@ -1,88 +1,90 @@
-import { EntitySchema } from 'typeorm';
+import { BotEntity } from '../BotEntity';
+import { Index, Column, PrimaryColumn, EventSubscriber, RemoveEvent, UpdateEvent, InsertEvent, EntitySubscriberInterface } from 'typeorm';
 
-export class PermissionFiltersInterface {
-  id?: string;
-  comparator: '<' | '>' | '==' | '<=' | '>=';
-  type: 'level' | 'ranks' | 'points' | 'watched' | 'tips' | 'bits' | 'messages' | 'subtier' | 'subcumulativemonths' | 'substreakmonths';
-  value: string;
-  permission: PermissionsInterface;
+export const permissionCommands: PermissionCommands[] = [];
+export const populateCache = () => {
+  return Promise.all([
+    new Promise((resolve) => {
+      PermissionCommands.find()
+        .then(items => {
+          while (permissionCommands.length > 0) {
+            permissionCommands.shift();
+          }
+          for (const o of items) {
+            permissionCommands.push(o);
+          }
+          resolve(true);
+        });
+    }),
+  ]);
+};
+
+@EventSubscriber()
+export class PermissionCommandsSubscriber implements EntitySubscriberInterface<PermissionCommands> {
+  listenTo() {
+    return PermissionCommands;
+  }
+  afterInsert(event: InsertEvent<PermissionCommands>): void | Promise<any> {
+    permissionCommands.push(event.entity);
+  }
+  afterUpdate(event: UpdateEvent<PermissionCommands>): void | Promise<any> {
+    if (event.entity) {
+      const idx = permissionCommands.findIndex(o => o.id === event.entity!.id);
+      if (idx > -1) {
+        PermissionCommands.merge(permissionCommands[idx], event.entity);
+      }
+    }
+  }
+  afterRemove(event: RemoveEvent<PermissionCommands>): void | Promise<any> {
+    if (event.entity) {
+      const idx = permissionCommands.findIndex(o => o.id === event.entity!.id);
+      if (idx > -1) {
+        permissionCommands.splice(idx, 1);
+      }
+    }
+  }
 }
 
-export class PermissionsInterface {
-  id?: string;
-  name: string;
-  order: number;
-  isCorePermission: boolean;
-  isWaterfallAllowed: boolean;
-  automation: 'none' | 'casters' | 'moderators' | 'subscribers' | 'viewers' | 'vip';
-  userIds: string[];
-  excludeUserIds: string[];
-  filters: PermissionFiltersInterface[];
-}
+export class Permissions extends BotEntity<Permissions> {
+  @PrimaryColumn({ generated: 'uuid' })
+    id: string;
 
-export interface PermissionCommandsInterface {
-  id?: string;
-  permission: string | null;
-  name: string;
-}
+  @Column()
+    name: string;
 
-export const Permissions = new EntitySchema<Readonly<Required<PermissionsInterface>>>({
-  name:    'permissions',
-  columns: {
-    id: {
-      type: 'uuid', primary: true, generated: 'uuid',
-    },
-    name:               { type: String },
-    order:              { type: Number },
-    isCorePermission:   { type: Boolean },
-    isWaterfallAllowed: { type: Boolean },
-    automation:         { type: 'varchar', length: 12 },
-    userIds:            { type: 'simple-array' },
-    excludeUserIds:     { type: 'simple-array' },
-  },
-  relations: {
+  @Column()
+    order: number;
+
+  @Column()
+    isCorePermission:   boolean;
+
+  @Column()
+    isWaterfallAllowed: boolean;
+
+  @Column({ type: 'varchar', length: 12 })
+    automation: string;
+
+  @Column({ type: 'simple-array' })
+    userIds:            string[];
+  @Column({ type: 'simple-array' })
+    excludeUserIds:     string[];
+
+  @Column({ type: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') !== 'better-sqlite3' ? 'json' : 'simple-json' })
     filters: {
-      type:        'one-to-many',
-      target:      'permission_filters',
-      inverseSide: 'permission',
-      cascade:     true,
-    },
-  },
-});
+    comparator: '<' | '>' | '==' | '<=' | '>=';
+    type: 'level' | 'ranks' | 'points' | 'watched' | 'tips' | 'bits' | 'messages' | 'subtier' | 'subcumulativemonths' | 'substreakmonths';
+    value: string;
+  }[];
+}
 
-export const PermissionFilters = new EntitySchema<Readonly<Required<PermissionFiltersInterface>>>({
-  name:    'permission_filters',
-  columns: {
-    id: {
-      type: 'uuid', primary: true, generated: 'uuid',
-    },
-    comparator: { type: 'varchar', length: 3 },
-    type:       { type: 'varchar' },
-    value:      { type: String },
-  },
-  relations: {
-    permission: {
-      type:        'many-to-one',
-      target:      'permissions',
-      inverseSide: 'filters',
-      onDelete:    'CASCADE',
-      onUpdate:    'CASCADE',
-    },
-  },
-});
+export class PermissionCommands extends BotEntity<PermissionCommands>{
+  @PrimaryColumn({ generated: 'uuid' })
+    id: string;
 
-export const PermissionCommands = new EntitySchema<Readonly<Required<PermissionCommandsInterface>>>({
-  name:    'permission_commands',
-  columns: {
-    id: {
-      type: 'uuid', primary: true, generated: 'uuid',
-    },
-    name:       { type: String },
-    permission: {
-      type: 'varchar', nullable: true, length: 36,
-    },
-  },
-  indices: [
-    { name: 'IDX_ba6483f5c5882fa15299f22c0a', columns: ['name'] },
-  ],
-});
+  @Column()
+  @Index('IDX_ba6483f5c5882fa15299f22c0a')
+    name: string;
+
+  @Column({ type: 'varchar', length: 36, nullable: true })
+    permission: string | null;
+}
