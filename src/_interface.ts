@@ -523,7 +523,7 @@ class Module {
       promisedSettings._permissions = {};
       for (const command of this._commands) {
         const name = typeof command === 'string' ? command : command.name;
-        const pItem = await getRepository(PermissionCommands).findOne({ name });
+        const pItem = await PermissionCommands.findOne({ name });
         if (pItem) {
           promisedSettings._permissions[name] = pItem.permission;
         } else {
@@ -788,7 +788,7 @@ class Module {
     let permId: string = defaultPermissions.VIEWERS;
 
     // get current full list of permissions
-    const permissions = await getRepository(PermissionsEntity).find({
+    const permissions = await PermissionsEntity.find({
       cache: true,
       order: { order: 'DESC' },
     });

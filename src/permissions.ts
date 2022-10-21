@@ -25,35 +25,34 @@ class Permissions extends Core {
 
   public sockets() {
     adminEndpoint('/core/permissions', 'generic::getAll', async (cb) => {
-      cb(null, await getRepository(PermissionsEntity).find({
-        relations: ['filters'],
-        order:     { order: 'ASC' },
+      cb(null, await PermissionsEntity.find({
+        order: { order: 'ASC' },
       }));
     });
     adminEndpoint('/core/permissions', 'permission::save', async (data, cb) => {
       cleanViewersCache();
       // we need to remove missing permissions
-      const permissionsFromDB = await getRepository(PermissionsEntity).find();
+      const permissionsFromDB = await PermissionsEntity.find();
       for (const permissionFromDB of permissionsFromDB) {
         if (!data.find(o => o.id === permissionFromDB.id)) {
-          await getRepository(PermissionsEntity).remove(permissionFromDB);
+          await PermissionsEntity.remove(permissionFromDB);
         }
       }
       // then save new data
-      await getRepository(PermissionsEntity).save(data);
+      await PermissionsEntity.save(data);
       if (cb) {
         cb(null);
       }
     });
     adminEndpoint('/core/permissions', 'generic::deleteById', async (id, cb) => {
       cleanViewersCache();
-      await getRepository(PermissionsEntity).delete({ id: String(id) });
+      await PermissionsEntity.delete({ id: String(id) });
       if (cb) {
         cb(null);
       }
     });
     adminEndpoint('/core/permissions', 'test.user', async (opts, cb) => {
-      if (!(await getRepository(PermissionsEntity).findOne({ id: String(opts.pid) }))) {
+      if (!(await PermissionsEntity.findOne({ id: String(opts.pid) }))) {
         cb('permissionNotFoundInDatabase');
         return;
       }
@@ -116,7 +115,8 @@ class Permissions extends Core {
         throw Error(prepare('permissions.cannotIgnoreForCorePermission', { userlevel: pItem.name }));
       }
 
-      await getRepository(PermissionsEntity).save({ ...pItem, excludeUserIds: [ String(userId), ...pItem.excludeUserIds ] });
+      pItem.excludeUserIds = [ String(userId), ...pItem.excludeUserIds ];
+      await pItem.save();
       cleanViewersCache();
 
       return [{
@@ -154,7 +154,8 @@ class Permissions extends Core {
         throw Error(prepare('permissions.permissionNotFound', { userlevel }));
       }
 
-      await getRepository(PermissionsEntity).save({ ...pItem, excludeUserIds: [ ...pItem.excludeUserIds.filter(id => id !== String(userId)) ] });
+      pItem.excludeUserIds = [ ...pItem.excludeUserIds.filter(id => id !== String(userId))];
+      await pItem.save();
       cleanViewersCache();
 
       return [{
@@ -172,7 +173,7 @@ class Permissions extends Core {
   @command('!permission list')
   @default_permission(defaultPermissions.CASTERS)
   protected async list(opts: CommandOptions): Promise<CommandResponse[]> {
-    const permissions = await getRepository(PermissionsEntity).find({ order: { order: 'ASC' } });
+    const permissions = await PermissionsEntity.find({ order: { order: 'ASC' } });
     const responses: CommandResponse[] = [];
     responses.push({ response: prepare('core.permissions.list'), ...opts });
     for (let i = 0; i < permissions.length; i++) {
@@ -185,7 +186,7 @@ class Permissions extends Core {
   public async ensurePreservedPermissionsInDb(): Promise<void> {
     let p;
     try {
-      p = await getRepository(PermissionsEntity).find();
+      p = await PermissionsEntity.find();
     } catch (e: any) {
       setTimeout(() => this.ensurePreservedPermissionsInDb(), 1000);
       return;
@@ -193,7 +194,7 @@ class Permissions extends Core {
     let addedCount = 0;
 
     if (!p.find((o) => o.isCorePermission && o.automation === 'casters')) {
-      await getRepository(PermissionsEntity).insert({
+      await PermissionsEntity.insert({
         id:                 defaultPermissions.CASTERS,
         name:               'Casters',
         automation:         'casters',
@@ -208,7 +209,7 @@ class Permissions extends Core {
     }
 
     if (!p.find((o) => o.isCorePermission && o.automation === 'moderators')) {
-      await getRepository(PermissionsEntity).insert({
+      await PermissionsEntity.insert({
         id:                 defaultPermissions.MODERATORS,
         name:               'Moderators',
         automation:         'moderators',
@@ -223,7 +224,7 @@ class Permissions extends Core {
     }
 
     if (!p.find((o) => o.isCorePermission && o.automation === 'subscribers')) {
-      await getRepository(PermissionsEntity).insert({
+      await PermissionsEntity.insert({
         id:                 defaultPermissions.SUBSCRIBERS,
         name:               'Subscribers',
         automation:         'subscribers',
@@ -238,7 +239,7 @@ class Permissions extends Core {
     }
 
     if (!p.find((o) => o.isCorePermission && o.automation === 'vip')) {
-      await getRepository(PermissionsEntity).insert({
+      await PermissionsEntity.insert({
         id:                 defaultPermissions.VIP,
         name:               'VIP',
         automation:         'vip',
@@ -253,7 +254,7 @@ class Permissions extends Core {
     }
 
     if (!p.find((o) => o.isCorePermission && o.automation === 'viewers')) {
-      await getRepository(PermissionsEntity).insert({
+      await PermissionsEntity.insert({
         id:                 defaultPermissions.VIEWERS,
         name:               'Viewers',
         automation:         'viewers',
