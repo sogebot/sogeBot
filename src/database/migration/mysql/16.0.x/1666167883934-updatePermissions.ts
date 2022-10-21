@@ -6,11 +6,12 @@ export class updatePermissions1666167883934 implements MigrationInterface {
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     const tableName = 'permissions';
-    const items = await queryRunner.query(`SELECT * from "${tableName}"`);
-    const items2 = await queryRunner.query(`SELECT * from "permission_filter"`);
+    const items = await queryRunner.query(`SELECT * from \`${tableName}\``);
+    const items2 = await queryRunner.query(`SELECT * from \`permission_filter\``);
 
-    await queryRunner.query(`DROP TABLE "permission_filter"`);
-    await queryRunner.query(`DELETE FROM "${tableName}" WHERE 1=1`);
+    await queryRunner.query(`DROP TABLE \`permission_filter\``);
+    await queryRunner.query(`DELETE FROM \`${tableName}\` WHERE 1=1`);
+    await queryRunner.query(`ALTER TABLE \`${tableName}\` ADD \`filters\` json NOT NULL`);
 
     for (const item of items) {
       item.filters = JSON.stringify(items2.filter((o: { permissionId: any; }) => o.permissionId === item.id));
