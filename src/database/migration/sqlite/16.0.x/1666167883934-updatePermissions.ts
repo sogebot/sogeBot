@@ -10,7 +10,9 @@ export class updatePermissions1666167883934 implements MigrationInterface {
     const items2 = await queryRunner.query(`SELECT * from "permission_filters"`);
 
     await queryRunner.query(`DROP TABLE "permission_filters"`);
-    await queryRunner.query(`DELETE FROM "${tableName}" WHERE 1=1`);
+    await queryRunner.query(`DROP TABLE  "${tableName}"`);
+
+    await queryRunner.query(`CREATE TABLE "${tableName}" ("id" varchar PRIMARY KEY NOT NULL, "name" varchar NOT NULL, "order" integer NOT NULL, "isCorePermission" boolean NOT NULL, "isWaterfallAllowed" boolean NOT NULL, "automation" varchar(12) NOT NULL, "userIds" text NOT NULL, "excludeUserIds" text NOT NULL, "filters" text NOT NULL)`);
 
     for (const item of items) {
       item.filters = JSON.stringify(items2.filter((o: { permissionId: any; }) => o.permissionId === item.id));
