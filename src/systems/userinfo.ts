@@ -93,7 +93,7 @@ class UserInfo extends System {
     const subStreak = user?.subscribeStreak;
     const localePath = 'subage.' + (opts.sender.userName === userName.toLowerCase() ? 'successSameUsername' : 'success') + '.';
 
-    if (!user || !user.isSubscriber || !user.subscribedAt) {
+    if (!user || !user.isSubscriber) {
       return [{
         response: prepare(localePath + (subCumulativeMonths ? 'notNow' : 'never'), {
           username:                userName,
@@ -103,25 +103,28 @@ class UserInfo extends System {
       }];
     } else {
       const units = ['years', 'months', 'days', 'hours', 'minutes'] as const;
-      const diff = dateDiff(new Date(user.subscribedAt).getTime(), Date.now());
+      const diff = user.subscribedAt ? dateDiff(new Date(user.subscribedAt).getTime(), Date.now()) : null;
       const output: string[] = [];
-      for (const unit of units) {
-        if (diff[unit]) {
-          const v = Number(diff[unit]).toFixed();
-          output.push(v + ' ' + getLocalizedName(v, translate('core.' + unit)));
+
+      if (diff) {
+        for (const unit of units) {
+          if (diff[unit]) {
+            const v = Number(diff[unit]).toFixed();
+            output.push(v + ' ' + getLocalizedName(v, translate('core.' + unit)));
+          }
         }
-      }
-      if (output.length === 0) {
-        output.push(0 + ' ' + getLocalizedName(0, translate('core.minutes')));
+        if (output.length === 0) {
+          output.push(0 + ' ' + getLocalizedName(0, translate('core.minutes')));
+        }
       }
 
       return [{
         response: prepare(localePath + (subStreak ? 'timeWithSubStreak' : 'time'), {
           username:                userName,
           subCumulativeMonths,
-          subCumulativeMonthsName: getLocalizedName(subCumulativeMonths || 0, translate('core.months')),
+          subCumulativeMonthsName: getLocalizedName(subCumulativeMonths ?? 1, translate('core.months')),
           subStreak,
-          subStreakMonthsName:     getLocalizedName(subStreak || 0, translate('core.months')),
+          subStreakMonthsName:     getLocalizedName(subStreak ?? 1, translate('core.months')),
           diff:                    output.join(', '),
         }), ...opts,
       }];
