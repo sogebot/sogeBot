@@ -14,7 +14,7 @@ import type { HowLongToBeatGameInterface, HowLongToBeatGameItemInterface } from 
 import type { KeywordGroupInterface, KeywordInterface } from '@entity/keyword';
 import type { OBSWebsocketInterface } from '@entity/obswebsocket';
 import type { OverlayMapperMarathon, OverlayMappers } from '@entity/overlay';
-import type { PermissionsInterface } from '@entity/permissions';
+import type { Permissions } from '@entity/permissions';
 import type { PollInterface } from '@entity/poll';
 import type { QueueInterface } from '@entity/queue';
 import type { QuotesInterface } from '@entity/quotes';
@@ -45,7 +45,7 @@ type Configuration = {
   [x:string]: Configuration | string;
 };
 
-export type ViewerReturnType = UserInterface & {aggregatedBits: number, aggregatedTips: number, permission: PermissionsInterface, tips: UserTipInterface[], bits: UserBitInterface[] };
+export type ViewerReturnType = UserInterface & {aggregatedBits: number, aggregatedTips: number, permission: Permissions, tips: UserTipInterface[], bits: UserBitInterface[] };
 export type possibleLists = 'systems' | 'core' | 'integrations' | 'overlays' | 'games' | 'services';
 export type tiltifyCampaign = { id: number, name: string, slug: string, startsAt: number, endsAt: null | number, description: string, causeId: number, originalFundraiserGoal: number, fundraiserGoalAmount: number, supportingAmountRaised: number, amountRaised: number, supportable: boolean, status: 'published', type: 'Event', avatar: {   src: string,   alt: string,   width: number,   height: number, }, livestream: {   type: 'twitch',   channel: string, } | null, causeCurrency: 'USD', totalAmountRaised: 0, user: {   id: number,   username: string,   slug: string,   url: string,   avatar: {     src: string,     alt: string,     width: number,     height: number,   }, }, regionId: null, metadata: Record<string, unknown>};
 
@@ -263,9 +263,9 @@ export type ClientToServerEventsWithNamespace = {
     'generic::getAll': generic<RandomizerInterface>['getAll'],
   },
   '/core/permissions': GenericEvents & {
-    'generic::deleteById': generic<PermissionsInterface>['deleteById'],
-    'generic::getAll': generic<PermissionsInterface>['getAll'],
-    'permission::save': (data: Required<PermissionsInterface>[], cb?: (error: Error | string | null) => void) => void,
+    'generic::deleteById': generic<Permissions>['deleteById'],
+    'generic::getAll': generic<Permissions>['getAll'],
+    'permission::save': (data: Required<Permissions>[], cb?: (error: Error | string | null) => void) => void,
     'test.user': (opts: { pid: string, value: string, state: string }, cb: (error: Error | string | null, response?: { status: import('../helpers/permissions/check').checkReturnType | { access: 2 }, partial: import('../helpers/permissions/check').checkReturnType | { access: 2 }, state: string }) => void) => void,
   },
   '/registries/text': GenericEvents & {
