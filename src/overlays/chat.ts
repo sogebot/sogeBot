@@ -34,12 +34,13 @@ class Chat extends Overlay {
         }
       }
       ioServer?.of('/overlays/chat').emit('message', {
-        id:        v4(),
-        timestamp: message.timestamp,
-        username:  message.sender.displayName.toLowerCase() === message.sender.userName ? message.sender.displayName : `${message.sender.displayName} (${message.sender.userName})`,
-        message:   data,
-        show:      false,
-        badges:    badgeImages,
+        id:          v4(),
+        timestamp:   message.timestamp,
+        displayName: message.sender.displayName.toLowerCase() === message.sender.userName ? message.sender.displayName : `${message.sender.displayName} (${message.sender.userName})`,
+        userName:    message.sender.userName,
+        message:     data,
+        show:        false,
+        badges:      badgeImages,
       });
     });
   }
