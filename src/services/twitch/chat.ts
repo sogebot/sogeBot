@@ -32,7 +32,7 @@ import {
   triggerInterfaceOnBit, triggerInterfaceOnMessage, triggerInterfaceOnSub,
 } from '~/helpers/interface/triggers';
 import emitter from '~/helpers/interfaceEmitter';
-import { warning } from '~/helpers/log';
+import { ban, warning } from '~/helpers/log';
 import {
   chatIn, cheer, debug, error, info, raid, resub, sub, subcommunitygift, subgift, whisperIn,
 } from '~/helpers/log';
@@ -369,6 +369,7 @@ class Chat {
       });
     } else if (type === 'broadcaster') {
       client.onBan((channel, user, msg) => {
+        ban(`${user} banned.`);
         ioServer?.of('/overlays/chat').emit('timeout', user);
       });
       client.onTimeout((channel, user, msg) => {
