@@ -64,7 +64,7 @@ jobs:
           args: '*.zip'
 
   build:
-    needs: artifact
+    needs: release
     runs-on: ubuntu-latest
     steps:
       -
