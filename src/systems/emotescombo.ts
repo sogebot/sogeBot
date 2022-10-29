@@ -115,8 +115,8 @@ class EmotesCombo extends System {
               );
             }
           }
-          this.comboEmoteCount = 0;
-          this.comboEmote = '';
+          this.comboEmoteCount = 1;
+          this.comboEmote = uniqueEmotes[0];
           ioServer?.of('/systems/emotescombo').emit('combo', { count: this.comboEmoteCount, url: null });
         } else {
           this.comboEmoteCount++;
