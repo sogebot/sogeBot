@@ -1,4 +1,5 @@
 {
+  "artists": "Artists",
   "settings": {
     "enabled": "Status",
     "songRequests": "Song Requests",
