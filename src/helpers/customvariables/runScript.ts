@@ -66,7 +66,8 @@ async function runScript (script: string, opts: { sender: { userId: string; user
   const customVariables = await getAll();
 
   // update globals and replace theirs values
-  strippedScript = (await new Message(strippedScript).global({ escape: '\'' }));
+  // we need to escape " as stripped script replaces all ' to " and text containing " may cause issues
+  strippedScript = (await new Message(strippedScript).global({ escape: '"' }));
 
   const sandbox = {
     waitMs: (ms: number) => {
