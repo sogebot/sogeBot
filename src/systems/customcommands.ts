@@ -1,5 +1,5 @@
 import {
-  Commands, CommandsGroup, commands, groups,
+  Commands, CommandsGroup, commands, groups, populateCache,
 } from '@entity/commands';
 import * as constants from '@sogebot/ui-helpers/constants';
 import { validateOrReject } from 'class-validator';
@@ -27,6 +27,7 @@ import { check, defaultPermissions } from '~/helpers/permissions/index';
 import { adminMiddleware } from '~/socket';
 import { translate } from '~/translate';
 import { v4 } from 'uuid';
+import { onStartup } from '~/decorators/on';
 
 /*
  * !command                                                                            - gets an info about command usage
@@ -46,6 +47,11 @@ class CustomCommands extends System {
     this.addMenu({
       category: 'commands', name: 'customcommands', id: 'commands/customcommands', this: this,
     });
+  }
+
+  @onStartup()
+  populateCacheOnStartup() {
+    populateCache();
   }
 
   sockets () {
