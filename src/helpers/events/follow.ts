@@ -16,12 +16,12 @@ import { tmiEmitter } from '~/helpers/tmi';
 
 const events = new Map<string, number>();
 
-export function follow(userId: string, userName: string, followedAt: string) {
+export async function follow(userId: string, userName: string, followedAt: string) {
   if (events.has(userId)) {
     debug('events', `User ${userName}#${userId} already followed in hour.`);
     return;
   }
-  events.set(userId, Date.now());
+  events.set(userId, new Date(followedAt).getTime());
 
   if (isIgnored({ userName, userId })) {
     debug('events', `User ${userName}#${userId} is in ignore list.`);
@@ -34,13 +34,27 @@ export function follow(userId: string, userName: string, followedAt: string) {
     return;
   }
 
+  const followAlreadyExists = await getRepository(EventList).findOne({
+    where: {
+      userId, event: 'follow',
+    },
+    order: {
+      timestamp: 'DESC',
+    },
+  });
+
+  // skip events if already saved in db
+  if (followAlreadyExists && new Date(followedAt).getTime() === new Date(followAlreadyExists.timestamp).getTime()) {
+    return;
+  }
+
   // trigger events only if follow was in hour
   if (Date.now() - new Date(followedAt).getTime() < HOUR) {
     debug('events', `User ${userName}#${userId} triggered follow event.`);
     eventlist.add({
       event:     'follow',
       userId:    userId,
-      timestamp: Date.now(),
+      timestamp: new Date(followedAt).getTime(),
     });
     if (!isBot(userName)) {
       followLog(`${userName}#${userId}`);
