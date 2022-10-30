@@ -35,16 +35,11 @@ export async function follow(userId: string, userName: string, followedAt: strin
   }
 
   const followAlreadyExists = await getRepository(EventList).findOne({
-    where: {
-      userId, event: 'follow',
-    },
-    order: {
-      timestamp: 'DESC',
-    },
+    userId, event: 'follow', timestamp: new Date(followedAt).getTime(),
   });
 
   // skip events if already saved in db
-  if (followAlreadyExists && new Date(followedAt).getTime() === new Date(followAlreadyExists.timestamp).getTime()) {
+  if (followAlreadyExists) {
     return;
   }
 
