@@ -27,6 +27,14 @@ import {
 import { TypeORMLogger } from '~/helpers/logTypeorm';
 import { startWatcher } from '~/watchers';
 
+// Add stacktrace to console.log
+const log = console.log;
+console.log = function() {
+  log.apply(console, [`WARNING: console.log shouldn't be used, stacktrace: ${new Error().stack}`]);
+  // eslint-disable-next-line prefer-rest-params
+  log.apply(console, Array.from(arguments));
+};
+
 const connect = async function () {
   const connectionOptions = await getConnectionOptions();
   const type = process.env.TYPEORM_CONNECTION;
