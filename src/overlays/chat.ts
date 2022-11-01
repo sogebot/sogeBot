@@ -49,11 +49,13 @@ class Chat extends Overlay {
     adminEndpoint('/overlays/chat', 'test', (data) => {
       this.withEmotes(data.message).then(message => {
         ioServer?.of('/overlays/chat').emit('message', {
-          id:        v4(),
-          timestamp: Date.now(),
-          username:  data.username,
+          id:          v4(),
+          timestamp:   Date.now(),
+          displayName: data.username,
+          userName:    data.username,
           message,
-          show:      false,
+          show:        false,
+          badges:      [],
         });
       });
     });
