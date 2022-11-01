@@ -1,0 +1,12 @@
+diff --git a/node_modules/howlongtobeat/dist/main/howlongtobeat.js b/node_modules/howlongtobeat/dist/main/howlongtobeat.js
+index 8c75369..635643d 100644
+--- a/node_modules/howlongtobeat/dist/main/howlongtobeat.js
++++ b/node_modules/howlongtobeat/dist/main/howlongtobeat.js
+@@ -31,7 +31,6 @@ class HowLongToBeatService {
+         return __awaiter(this, void 0, void 0, function* () {
+             let searchTerms = query.split(' ');
+             let search = yield this.hltb.search(searchTerms, signal);
+-            console.log(`Found ${search.count} results`);
+             let hltbEntries = new Array();
+             for (const resultEntry of search.data) {
+                 hltbEntries.push(new HowLongToBeatEntry('' + resultEntry.game_id, // game id is now a number, but I want to keep the model stable
