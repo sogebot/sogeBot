@@ -3,6 +3,8 @@
   "isPositive": "$property must be greater then 0",
   "isCommand": "$property must start with !",
   "isCommandOrCustomVariable": "$property must start with ! or $_",
+  "min": "$property must be at least $constraint1",
+  "isInt": "$property must be an integer",
   "this_value_must_be_a_positive_number_and_greater_then_0": "This value must be a positive number or greater then 0",
   "command_must_start_with_!": "Command must start with !",
   "this_value_must_be_a_positive_number_or_0": "This value must be a positive number or 0",
