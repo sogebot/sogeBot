@@ -639,6 +639,11 @@ class Points extends System {
     return this.get(opts);
   }
 
+  async increment(where: FindConditions<Readonly<Required<UserInterface>>>, points: number) {
+    await changelog.flush();
+    await getRepository(User).increment(where, 'points', points);
+  }
+
   async decrement(where: FindConditions<Readonly<Required<UserInterface>>>, points: number) {
     await changelog.flush();
     await getRepository(User).decrement(where, 'points', points);

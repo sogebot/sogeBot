@@ -11,7 +11,7 @@
   "author": "Michal Orlik <sogehige@gmail.com>",
   "license": "MIT",
   "dependencies": {
-    "@sogebot/ui-admin": "^67.0.3",
+    "@sogebot/ui-admin": "^68.0.0",
     "@sogebot/ui-helpers": "^3.1.0",
     "@sogebot/ui-oauth": "~3.1.1",
     "@sogebot/ui-overlay": "^34.0.1",
@@ -45,7 +45,7 @@
     "get-changelog-lib": "^3.0.0",
     "git-commit-info": "2.0.1",
     "glob": "8.0.3",
-    "googleapis": "^109.0.0",
+    "googleapis": "^109.0.1",
     "graphql": "^15.6.1",
     "howlongtobeat": "1.6.2",
     "jsonwebtoken": "8.5.1",
@@ -85,7 +85,7 @@
     "vm2": "^3.9.11",
     "ws": "8.10.0",
     "xregexp": "5.1.1",
-    "yargs": "17.6.0",
+    "yargs": "17.6.2",
     "ytdl-core": "4.11.2",
     "ytpl": "2.3.0",
     "ytsr": "3.8.0"

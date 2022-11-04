@@ -17,6 +17,7 @@ import updateCounter from './nodes/updateCounter';
 import variableSaveToDatabase from './nodes/variableSaveToDatabase';
 import variableSetCustomVariable from './nodes/variableSetCustomVariable';
 import variableSetVariable from './nodes/variableSetVariable';
+import runScript from './nodes/runScript';
 
 import { warning } from '~/helpers/log';
 
@@ -37,6 +38,7 @@ export const processes = {
   twitchTimeoutUser,
   twitchBanUser,
   twitchSendMessage,
+  runScript,
   runJavascriptOnCustomOverlay,
   overlaysEmoteFirework,
   overlaysEmoteExplosion,
