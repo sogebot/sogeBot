@@ -1161,16 +1161,6 @@
       "broadcaster": "$sender se pokusil o seppuku, ale ztratil meč.",
       "timeout": "Seppuku timeout nastaven na $values"
     },
-    "fightme": {
-      "cannotFightWithYourself": "$sender, nemůžete bojovat sami se sebou!",
-      "cooldown": "$sender, nemůžete použít $command ještě $cooldown $minutesName.",
-      "challenge": "(ง'̀-'́)ง $sender se chce s tebou porvat $username! Pokud souhlasíš, pošli $command $sender",
-      "winner": "٩(^ᴗ^)۶ $winner je hrdým vítězem a poráží $loser! Kdo je dalším na řadě?",
-      "notEnoughOptions": "$sender, musíš vybrat uživatele k souboji.",
-      "broadcaster": "ψ(｀∇´)ψ $winner je zde bohem. Kaj se $loser! Tento souboj byl rozhodnut ještě než vůbec začal.",
-      "bothModerators": "$challenger (*-`ω´- )人(*-`ω´- ) $sender, tento souboj bude trvat tisíciletí, než se rozhodne!",
-      "oneModerator": "¯\\_(ツ)_/¯ $winner je pod božskou ochranou. Sorry, $loser."
-    },
     "gamble": {
       "chanceToWin": "$sender, šance na výhru !gamble nastavena na $value%",
       "zeroBet": "$sender, nemůžete hrát o 0 $pointsName",
