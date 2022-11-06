@@ -22,7 +22,7 @@ export class Plugin extends BaseEntity {
   @Column('simple-json', { nullable: true })
     settings: {
     name: string;
-    type: 'string' | 'number' | 'array';
+    type: 'string' | 'number' | 'array' | 'boolean';
     description: string;
     defaultValue: string | number | string[];
     currentValue: string | number | string[];
