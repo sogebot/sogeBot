@@ -98,5 +98,6 @@
   "api-explorer": "API エクスプローラー",
   "emotescombo": "エモートコンボ",
   "notifications": "通知",
-  "plugins": "Plugins"
+  "plugins": "Plugins",
+  "tts": "TTS"
 }

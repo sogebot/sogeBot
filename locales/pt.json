@@ -1161,16 +1161,6 @@
       "broadcaster": "$sender tentou cometer seppuku, mas perdeu uma espada.",
       "timeout": "Tempo limite do Seppuku definido para $values"
     },
-    "fightme": {
-      "cannotFightWithYourself": "$sender, você não pode lutar consigo mesmo!",
-      "cooldown": "$sender, você não pode usar $command por $cooldown $minutesName.",
-      "challenge": "(ง'̀-'́)ง $sender quer lutar contra você $username! Se você aceitar, envie $command $sender",
-      "winner": "٩(^ᴗ^)۶ $winner é um vencedor orgulhoso e $loser é um mal perdedor! Quem é o próximo?",
-      "notEnoughOptions": "$sender, você precisa selecionar um usuário para lutar.",
-      "broadcaster": "ψ(｀∇´)ψ $winner é um deus entre vocês. Cuidado $loser! Essa luta foi decidida mesmo antes do começo.",
-      "bothModerators": "$challenger (*-`ω´- )人(*-`ω´- ) $sender, esta luta levará milênios para ser decidida!",
-      "oneModerator": "¯\\_(ツ)_/¯ $winner está sob proteção divina. Lamento, $loser."
-    },
     "gamble": {
       "chanceToWin": "$sender, a chance de ganhar !gamble definido para $value%",
       "zeroBet": "$sender, você não pode apostar 0 $pointsName",
