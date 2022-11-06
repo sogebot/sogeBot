@@ -98,5 +98,6 @@
   "api-explorer": "Проводник API",
   "emotescombo": "Комбо эмоций",
   "notifications": "Notifications",
-  "plugins": "Plugins"
+  "plugins": "Plugins",
+  "tts": "TTS"
 }
