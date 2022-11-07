@@ -1,7 +1,6 @@
 {
   "settings": {
     "ignorelist": "Ignorér liste (ID eller brugernavn)",
-    "globalIgnoreListExclude": "Udeluk fra global ignoreringsliste",
     "showWithAt": "Vis brugere med @",
     "sendWithMe": "Send beskeder med /me",
     "sendAsReply": "Send bot messages as replies",

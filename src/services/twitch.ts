@@ -33,7 +33,7 @@ import { cleanViewersCache } from '~/helpers/permissions';
 import { defaultPermissions } from '~/helpers/permissions/index';
 import { adminEndpoint } from '~/helpers/socket';
 import {
-  globalIgnoreListExclude, ignorelist, sendWithMe, setMuteStatus, showWithAt,
+  ignorelist, sendWithMe, setMuteStatus, showWithAt,
 } from '~/helpers/tmi';
 import { tmiEmitter } from '~/helpers/tmi';
 import * as changelog from '~/helpers/user/changelog.js';
@@ -69,8 +69,6 @@ class Twitch extends Service {
     sendAsReply = false;
   @settings('chat')
     ignorelist: any[] = [];
-  @settings('chat')
-    globalIgnoreListExclude: any[] = [];
   @settings('chat')
     showWithAt = true;
   @settings('chat')
@@ -341,12 +339,6 @@ class Twitch extends Service {
   @onLoad('ignorelist')
   setIgnoreList() {
     ignorelist.value = this.ignorelist;
-  }
-
-  @onChange('globalIgnoreListExclude')
-  @onLoad('globalIgnoreListExclude')
-  setGlobalIgnoreListExclude() {
-    globalIgnoreListExclude.value = this.globalIgnoreListExclude;
   }
 
   @onChange('mute')

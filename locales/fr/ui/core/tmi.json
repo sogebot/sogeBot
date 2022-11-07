@@ -1,7 +1,6 @@
 {
   "settings": {
     "ignorelist": "Ignorer la liste (ID ou nom d'utilisateur)",
-    "globalIgnoreListExclude": "Exclure de la liste globale des utilisateurs ignorés",
     "showWithAt": "Afficher les utilisateurs avec @",
     "sendWithMe": "Envoyer des messages avec /me",
     "sendAsReply": "Envoyer les messages du bot en réponse",

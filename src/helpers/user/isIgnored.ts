@@ -7,7 +7,7 @@ import fetch from 'node-fetch';
 import { timer } from '../../decorators.js';
 import { info } from '../log';
 import {
-  globalIgnoreListExclude, ignorelist, isIgnoredCache,
+  ignorelist, isIgnoredCache,
 } from '../tmi/ignoreList';
 import { isBroadcaster } from './isBroadcaster';
 
@@ -84,7 +84,6 @@ update();
 
 export function getGlobalIgnoreList() {
   return Object.keys(globalIgnoreList)
-    .filter(o => !globalIgnoreListExclude.value.map((ex: number | string) => String(ex)).includes(o))
     .map(id => {
       return { id, ...globalIgnoreList[id as unknown as keyof typeof globalIgnoreList] };
     });
