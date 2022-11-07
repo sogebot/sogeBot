@@ -17,6 +17,17 @@ class Google extends Service {
       });
     });
 
+    app.post('/api/services/google/privatekeys', adminMiddleware, async (req, res) => {
+      const data = req.body;
+      await getRepository(GooglePrivateKeys).save(data);
+      res.send({ data });
+    });
+
+    app.delete('/api/services/google/privatekeys/:id', adminMiddleware, async (req, res) => {
+      await getRepository(GooglePrivateKeys).delete({ id: req.params.id });
+      res.status(404).send();
+    });
+
   }
 }
 
