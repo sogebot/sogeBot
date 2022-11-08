@@ -104,15 +104,6 @@ class Google extends Service {
           this.liveChatId = null;
         }
       }, MINUTE);
-
-      if (this.chatInterval) {
-        clearInterval(this.chatInterval);
-      }
-      this.chatInterval = setInterval(async () => {
-        if (this.liveChatId) {
-          this.getChat();
-        }
-      }, 5000);
     } else {
       error(`'YOUTUBE: Couldn't get channel informations.`);
     }
@@ -137,38 +128,6 @@ class Google extends Service {
         },
       });
     }
-  }
-
-  async getChat() {
-    if (this.nextChatCheckAt > Date.now()) {
-      return;
-    }
-
-    if (this.client && this.liveChatId) {
-      const youtube = google.youtube({
-        auth:    this.client,
-        version: 'v3',
-      });
-
-      // get active broadcasts
-      const request = await youtube.liveChatMessages.list({
-        liveChatId: this.liveChatId,
-        part:       ['snippet','authorDetails'],
-      });
-
-      if (request.data) {
-        // we need to get only chats from this.nextChatCheckAt
-        const chatMessages = request.data.items ?? [];
-        for (const message of chatMessages) {
-          if (new Date(message.snippet?.publishedAt || 0).getTime() > new Date(this.lastMessageProcessedAt || 0).getTime()) {
-            chatIn(`${message.snippet?.authorChannelId}: ${message.snippet?.displayMessage} [${message.authorDetails?.displayName}]`);
-            this.lastMessageProcessedAt = message.snippet?.publishedAt || new Date().toISOString();
-          }
-        }
-        this.nextChatCheckAt = Date.now() + (request.data.pollingIntervalMillis ?? 0);
-      }
-    }
-    return null;
   }
 
   async getStream() {
