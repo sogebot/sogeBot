@@ -67,26 +67,22 @@ export const setServer = () => {
     ioServer.sockets.setMaxListeners(200);
 
     if (process.env.CA_CERT && process.env.CA_KEY && process.env.NODE_EXTRA_CA_CERTS) {
-      info(`Using ${process.env.CA_CERT} certificate for HTTPS`);
+      info(`Using ${process.env.CA_CERT} certificate for HTTPS with ${process.env.NODE_EXTRA_CA_CERTS} CA Bundle`);
       serverSecure = https.createServer({
         key:           fs.readFileSync(normalize(process.env.CA_KEY)),
         cert:          fs.readFileSync(normalize(process.env.CA_CERT)),
         ca:            fs.readFileSync(normalize(process.env.NODE_EXTRA_CA_CERTS)),
         secureOptions: constants.SSL_OP_NO_TLSv1 | constants.SSL_OP_NO_TLSv1_1,
-        ciphers:       [
-          'ECDHE-ECDSA-AES256-GCM-SHA384',
-          'ECDHE-RSA-AES256-GCM-SHA384',
-          'ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256',
-          '!aNULL',
-          '!eNULL',
-          '!EXPORT',
-          '!DES',
-          '!RC4',
-          '!MD5',
-          '!PSK',
-          '!SRP',
-          '!CAMELLIA',
-        ].join(' '),
+      }, app);
+      if (ioServer) {
+        ioServer.attach(serverSecure);
+      }
+    } else if (process.env.CA_CERT && process.env.CA_KEY) {
+      info(`Using ${process.env.CA_CERT} certificate for HTTPS`);
+      serverSecure = https.createServer({
+        key:           fs.readFileSync(normalize(process.env.CA_KEY)),
+        cert:          fs.readFileSync(normalize(process.env.CA_CERT)),
+        secureOptions: constants.SSL_OP_NO_TLSv1 | constants.SSL_OP_NO_TLSv1_1,
       }, app);
       if (ioServer) {
         ioServer.attach(serverSecure);
