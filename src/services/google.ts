@@ -39,6 +39,10 @@ class Google extends Service {
   @onChange('clientId')
   @onStartup()
   async onStartup() {
+    if (this.refreshToken.length === 0 || this.clientId.length === 0) {
+      return;
+    }
+
     if (this.client) {
       this.client = null;
     }
