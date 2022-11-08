@@ -112,7 +112,7 @@ class Google extends Service {
         if (this.liveChatId) {
           this.getChat();
         }
-      }, 100);
+      }, 2000);
     } else {
       error(`'YOUTUBE: Couldn't get channel informations.`);
     }
