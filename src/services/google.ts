@@ -6,7 +6,7 @@ import { onChange, onStartup } from '~/decorators/on';
 import Service from './_interface';
 
 import { google, youtube_v3 } from 'googleapis';
-import { error, info } from '~/helpers/log';
+import { chatIn, error, info } from '~/helpers/log';
 
 import { OAuth2Client } from 'google-auth-library/build/src/auth/oauth2client';
 import { MINUTE } from '@sogebot/ui-helpers/constants';
@@ -30,6 +30,10 @@ class Google extends Service {
   liveChatId: string | null = null;
 
   onStartupInterval: null | NodeJS.Timer = null;
+  chatInterval: null | NodeJS.Timer = null;
+
+  nextChatCheckAt = Date.now();
+  lastMessageProcessedAt = new Date().toISOString();
 
   @onChange('refreshToken')
   @onChange('clientId')
@@ -74,6 +78,7 @@ class Google extends Service {
       const item = channel.data.items[0].snippet!;
       this.channel = [channel.data.items[0].id, item.title, item.customUrl].filter(String).join(' | ');
       info(`YOUTUBE: Authentication to Google Service successful as ${this.channel}.`);
+
       if (this.onStartupInterval) {
         clearInterval(this.onStartupInterval);
       }
@@ -81,14 +86,29 @@ class Google extends Service {
         const stream = await this.getStream();
 
         if (stream && stream.snippet) {
+          if (this.liveChatId !== stream.snippet.liveChatId) {
+            info(`YOUTUBE: Updating liveChatId to ${stream.snippet.liveChatId}`);
+          }
+
           this.liveChatId = stream.snippet.liveChatId ?? null;
           const currentTitle = stats.value.currentTitle || 'n/a';
           if (stream.snippet.title !== currentTitle) {
             info(`YOUTUBE: Title is not matching current title, changing by bot to "${currentTitle}"`);
             await this.updateTitle(stream, currentTitle);
           }
+        } else {
+          this.liveChatId = null;
         }
       }, MINUTE);
+
+      if (this.chatInterval) {
+        clearInterval(this.chatInterval);
+      }
+      this.chatInterval = setInterval(async () => {
+        if (this.liveChatId) {
+          this.getChat();
+        }
+      }, 100);
     } else {
       error(`'YOUTUBE: Couldn't get channel informations.`);
     }
@@ -113,6 +133,38 @@ class Google extends Service {
         },
       });
     }
+  }
+
+  async getChat() {
+    if (this.nextChatCheckAt > Date.now()) {
+      return;
+    }
+
+    if (this.client && this.liveChatId) {
+      const youtube = google.youtube({
+        auth:    this.client,
+        version: 'v3',
+      });
+
+      // get active broadcasts
+      const request = await youtube.liveChatMessages.list({
+        liveChatId: this.liveChatId,
+        part:       ['snippet','authorDetails'],
+      });
+
+      if (request.data) {
+        // we need to get only chats from this.nextChatCheckAt
+        const chatMessages = request.data.items ?? [];
+        for (const message of chatMessages) {
+          if (new Date(message.snippet?.publishedAt || 0).getTime() > new Date(this.lastMessageProcessedAt || 0).getTime()) {
+            chatIn(`${message.snippet?.authorChannelId}: ${message.snippet?.displayMessage} [${message.authorDetails?.displayName}]`);
+            this.lastMessageProcessedAt = message.snippet?.publishedAt || new Date().toISOString();
+          }
+        }
+        this.nextChatCheckAt = Date.now() + (request.data.pollingIntervalMillis ?? 0);
+      }
+    }
+    return null;
   }
 
   async getStream() {
