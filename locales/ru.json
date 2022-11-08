@@ -1161,16 +1161,6 @@
       "broadcaster": "$sender попытался совершить суицид, но потерял меч.",
       "timeout": "Таймаут seppuku установлен на $values"
     },
-    "fightme": {
-      "cannotFightWithYourself": "$sender, вы не можете сражаться с самим собой!",
-      "cooldown": "$sender, вы не можете использовать $command ещё $cooldown $minutesName.",
-      "challenge": "(ง'̀-'́)ง $sender хочет бороться с вами $username! Если вы принимаете, отправьте $command $sender",
-      "winner": "٩(^ᴗ^)۶ $winner гордится победой, $loser проиграл! Кто дальше?",
-      "notEnoughOptions": "$sender, вам нужно выбрать пользователя для боя.",
-      "broadcaster": "ψ(｀∇´)ψ $winner — бог. Остерегайся $loser! Эта битва была решена еще до ее начала.",
-      "bothModerators": "$challenger(*-`ω´- )人(*-`ω´- ) $sender, эта битва займет миллионы лет!",
-      "oneModerator": "¯\\_(ツ)_/¯ $winner находится под божественной защитой. Сожалею, $loser."
-    },
     "gamble": {
       "chanceToWin": "$sender, шанс выиграть в !gamble установлен на $value%",
       "zeroBet": "$sender, вы не можете ставить 0 $pointsName",
