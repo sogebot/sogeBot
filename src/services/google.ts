@@ -6,7 +6,7 @@ import { onChange, onStartup } from '~/decorators/on';
 import Service from './_interface';
 
 import { google, youtube_v3 } from 'googleapis';
-import { chatIn, error, info } from '~/helpers/log';
+import { error, info } from '~/helpers/log';
 
 import { OAuth2Client } from 'google-auth-library/build/src/auth/oauth2client';
 import { MINUTE } from '@sogebot/ui-helpers/constants';
