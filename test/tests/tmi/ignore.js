@@ -44,14 +44,6 @@ describe('TMI - ignore - @func3', () => {
     it ('botwithchangedname should be ignored by default', async () => {
       assert(await isIgnored(botwithchangedname)); // checked by id
     });
-
-    it ('exclude botwithchangedname from ignore list', async () => {
-      twitch.globalIgnoreListExclude = [botwithchangedname.userId];
-    });
-
-    it ('botwithchangedname should not be ignored anymore', async () => {
-      assert(!(await isIgnored(botwithchangedname))); // checked by id
-    });
   });
 
   describe('Ignore workflow', () => {
