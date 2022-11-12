@@ -2,7 +2,7 @@ import { getRepository } from 'typeorm';
 import { GooglePrivateKeys } from '~/database/entity/google';
 import { app } from '~/helpers/panel';
 import { adminMiddleware } from '~/socket';
-import { onChange, onStartup } from '~/decorators/on';
+import { onChange, onStartup, onStreamStart } from '~/decorators/on';
 import Service from './_interface';
 
 import { google, youtube_v3 } from 'googleapis';
@@ -149,6 +149,35 @@ class Google extends Service {
       }
     }
     return null;
+  }
+
+  @onStreamStart()
+  onStreamStart() {
+    // we want to create new stream, private for now for archive purpose
+    if (this.client) {
+      const youtube = google.youtube({
+        auth:    this.client,
+        version: 'v3',
+      });
+      youtube.liveBroadcasts.insert({
+        part:        ['id','snippet','contentDetails','status'],
+        requestBody: {
+          snippet: {
+            title:              stats.value.currentTitle || 'n/a',
+            scheduledStartTime: new Date(Date.now() + 60000).toISOString(),
+          },
+          status: {
+            privacyStatus: 'private',
+          },
+          contentDetails: {
+            enableAutoStart: true,
+            enableAutoStop:  true,
+          },
+        },
+      })
+        .then(liveBroadcastResponse => info(`YOUTUBE: Created new private broadcast ${liveBroadcastResponse.data.id}`))
+        .catch(e => error(`YOUTUBE: Something went wrong:\n${e}`));
+    }
   }
 
   sockets() {
