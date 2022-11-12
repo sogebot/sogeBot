@@ -27,7 +27,6 @@ class Google extends Service {
   expiryDate: null | number = null;
   accessToken: null | string = null;
   client: OAuth2Client | null = null;
-  liveChatId: string | null = null;
 
   onStartupInterval: null | NodeJS.Timer = null;
   chatInterval: null | NodeJS.Timer = null;
@@ -90,18 +89,11 @@ class Google extends Service {
         const stream = await this.getStream();
 
         if (stream && stream.snippet) {
-          if (this.liveChatId !== stream.snippet.liveChatId) {
-            info(`YOUTUBE: Updating liveChatId to ${stream.snippet.liveChatId}`);
-          }
-
-          this.liveChatId = stream.snippet.liveChatId ?? null;
           const currentTitle = stats.value.currentTitle || 'n/a';
           if (stream.snippet.title !== currentTitle) {
             info(`YOUTUBE: Title is not matching current title, changing by bot to "${currentTitle}"`);
             await this.updateTitle(stream, currentTitle);
           }
-        } else {
-          this.liveChatId = null;
         }
       }, MINUTE);
     } else {
