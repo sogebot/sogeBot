@@ -159,7 +159,8 @@ class Google extends Service {
             scheduledStartTime: new Date(Date.now() + 60000).toISOString(),
           },
           status: {
-            privacyStatus: 'private',
+            privacyStatus:           'private',
+            selfDeclaredMadeForKids: false,
           },
           contentDetails: {
             enableAutoStart: true,
@@ -167,8 +168,12 @@ class Google extends Service {
           },
         },
       })
-        .then(liveBroadcastResponse => info(`YOUTUBE: Created new private broadcast ${liveBroadcastResponse.data.id}`))
-        .catch(e => error(`YOUTUBE: Something went wrong:\n${e}`));
+        .then(liveBroadcastResponse => {
+          info(`YOUTUBE: Created new private broadcast ${liveBroadcastResponse.data.id}`);
+        })
+        .catch(e => {
+          error(`YOUTUBE: Something went wrong:\n${e}`);
+        });
     }
   }
 
