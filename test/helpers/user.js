@@ -69,8 +69,6 @@ const mod = {
 
 module.exports = {
   prepare: async () => {
-    const { cleanViewersCache } = require('../../dest/helpers/permissions/cache');
-
     await getRepository(User).save(viewer);
     await getRepository(User).save(viewer2);
     await getRepository(User).save(viewer3);
@@ -80,8 +78,6 @@ module.exports = {
     await getRepository(User).save(viewer7);
     await getRepository(User).save(owner);
     await getRepository(User).save(mod);
-    // clean perm cache
-    cleanViewersCache();
   },
   viewer,
   viewer2,

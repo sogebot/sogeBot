@@ -21,7 +21,7 @@ import { prepare } from '~/helpers/commons';
 import { info, warning } from '~/helpers/log';
 import { app } from '~/helpers/panel';
 import {
-  addToViewersCache, get, getFromViewersCache,
+  get,
 } from '~/helpers/permissions';
 import { check, defaultPermissions } from '~/helpers/permissions/index';
 import { adminMiddleware } from '~/socket';
@@ -311,11 +311,7 @@ class CustomCommands extends System {
           warning(`Custom command ${cmd.command.command}#${cmd.command.id}|${r.order} doesn't have any permission set, treating as CASTERS permission.`);
         }
 
-        if (typeof getFromViewersCache(opts.sender.userId, permission) === 'undefined') {
-          addToViewersCache(opts.sender.userId, permission, (await check(opts.sender.userId, permission, false)).access);
-        }
-
-        if ((opts.skip || getFromViewersCache(opts.sender.userId, permission))
+        if ((opts.skip || (await check(opts.sender.userId, permission, false)).access)
             && (r.filter.length === 0 || (r.filter.length > 0 && await checkFilter(opts, r.filter)))) {
           _responses.push(r);
           atLeastOnePermissionOk = true;

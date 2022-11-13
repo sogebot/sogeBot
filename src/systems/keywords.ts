@@ -20,7 +20,7 @@ import {
 } from '~/helpers/log';
 import { app } from '~/helpers/panel';
 import {
-  addToViewersCache, get, getFromViewersCache,
+  get,
 } from '~/helpers/permissions';
 import { check, defaultPermissions } from '~/helpers/permissions/index';
 import { adminMiddleware } from '~/socket';
@@ -438,11 +438,8 @@ class Keywords extends System {
           permission = defaultPermissions.CASTERS;
           warning(`Keyword ${k.keyword}#${k.id}|${r.order} doesn't have any permission set, treating as CASTERS permission.`);
         }
-        if (typeof getFromViewersCache(opts.sender.userId, permission) === 'undefined') {
-          addToViewersCache(opts.sender.userId, permission, (await check(opts.sender.userId, permission, false)).access);
-        }
 
-        if (getFromViewersCache(opts.sender.userId, permission)
+        if ((await check(opts.sender.userId, permission, false)).access
           && (r.filter.length === 0 || (r.filter.length > 0 && await checkFilter(opts, r.filter)))) {
           _responses.push(r);
           atLeastOnePermissionOk = true;

@@ -15,7 +15,6 @@ import {
   commandsToRegister, loadingInProgress, permissions as permissionsList,
 } from '~/decorators';
 import { getFunctionList } from '~/decorators/on';
-import { invalidateParserCache } from '~/helpers/cache';
 import { isBotStarted } from '~/helpers/database';
 import { flatten, unflatten } from '~/helpers/flatten';
 import { enabled } from '~/helpers/interface/enabled';
@@ -434,7 +433,6 @@ class Module {
 
     if (isStatusChanged) {
       this.enabled = opts.state;
-      invalidateParserCache();
     } else {
       opts.state = this.enabled;
     }
@@ -753,7 +751,6 @@ class Module {
    *
    */
   async setCommand(command: string, updated: string): Promise<void> {
-    invalidateParserCache();
     const c = this._commands.find((o) => o.name === command);
     if (c) {
       if (c.name === updated) {

@@ -6,7 +6,6 @@ import { v4 } from 'uuid';
 import { parser } from '../decorators';
 import Registry from './_interface';
 
-import { addToViewersCache, getFromViewersCache } from '~/helpers/permissions';
 import { check } from '~/helpers/permissions/index';
 import { adminEndpoint, publicEndpoint } from '~/helpers/socket';
 
@@ -75,16 +74,8 @@ class Randomizer extends Registry {
       return true;
     }
 
-    if (typeof getFromViewersCache(opts.sender.userId, randomizer.permissionId) === 'undefined') {
-      addToViewersCache(
-        opts.sender.userId,
-        randomizer.permissionId,
-        (await check(opts.sender.userId, randomizer.permissionId, false)).access,
-      );
-    }
-
     // user doesn't have permision to use command
-    if (!getFromViewersCache(opts.sender.userId, randomizer.permissionId)) {
+    if (!(await check(opts.sender.userId, randomizer.permissionId, false)).access) {
       return true;
     }
 

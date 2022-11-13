@@ -95,8 +95,6 @@ module.exports = {
 
       await permissions.ensurePreservedPermissionsInDb(); // re-do core permissions
 
-      invalidateParserCache();
-
       // invalidate caches
       await populateCacheAlias();
       await populateCacheCommands();

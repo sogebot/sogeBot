@@ -20,7 +20,6 @@ import rates from '~/helpers/currency/rates';
 import {
   debug, error, isDebugEnabled,
 } from '~/helpers/log';
-import { recacheOnlineUsersPermission } from '~/helpers/permissions';
 import { defaultPermissions, getUserHighestPermission } from '~/helpers/permissions/index';
 import { adminEndpoint, viewerEndpoint } from '~/helpers/socket';
 import * as changelog from '~/helpers/user/changelog.js';
@@ -146,8 +145,6 @@ class Users extends Core {
           } else {
             stats.value.currentWatchedTime = stats.value.currentWatchedTime + incrementedUsers.affected * interval;
           }
-
-          recacheOnlineUsersPermission();
         } else {
           debug('tmi.watched', `Incrementing chatTimeOffline users by ${interval}`);
           await changelog.flush();

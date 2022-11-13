@@ -1,13 +1,8 @@
-import crypto from 'crypto';
-
 import * as constants from '@sogebot/ui-helpers/constants';
 import _ from 'lodash';
 import { v4 as uuid } from 'uuid';
 
 import { timer } from '~/decorators.js';
-import {
-  addToParserFindCache, parserFindCache,
-} from '~/helpers/cache';
 import { incrementCountOfCommandUsage } from '~/helpers/commands/count';
 import { getBotSender } from '~/helpers/commons';
 import {
@@ -16,7 +11,7 @@ import {
 import { parserEmitter } from '~/helpers/parser/emitter';
 import { populatedList } from '~/helpers/parser/populatedList';
 import {
-  addToViewersCache, getCommandPermission, getFromViewersCache,
+  getCommandPermission,
 } from '~/helpers/permissions';
 import { check } from '~/helpers/permissions/index';
 import { translate } from '~/translate';
@@ -44,7 +39,6 @@ class Parser {
   skip = false;
   quiet = false;
   successfullParserRuns: any[] = [];
-  cachedParsers: null | any[] = null;
 
   constructor (opts: any = {}) {
     this.message = opts.message || '';
@@ -74,7 +68,7 @@ class Parser {
       return false;
     }
 
-    const parsers = this.cachedParsers ? this.cachedParsers : await this.parsers();
+    const parsers = await this.parsers();
     for (const parser of parsers) {
       const time = Date.now();
       if (parser.priority !== constants.MODERATION) {
@@ -110,7 +104,7 @@ class Parser {
   async process (): Promise<CommandResponse[]> {
     debug('parser.process', 'PROCESS START of "' + this.message + '"');
 
-    const parsers = this.cachedParsers ? this.cachedParsers : await this.parsers();
+    const parsers = await this.parsers();
 
     const text = this.message.trim().replace(/^(!\w+)/i, '');
     const opts: ParserOptions = {
@@ -128,22 +122,11 @@ class Parser {
     };
 
     for (const parser of parsers.filter(o => !o.fireAndForget && o.priority !== constants.MODERATION)) {
-      if (this.sender) {
-        const permissionCheckTime = Date.now();
-        if (typeof getFromViewersCache(this.sender.userId, parser.permission) === 'undefined') {
-          debug('parser.permission', `Permission not cached for ${this.sender.userName}#${this.sender.userId} | ${parser.permission}`);
-          addToViewersCache(this.sender.userId, parser.permission, (await check(this.sender.userId, parser.permission, false)).access);
-          debug('parser.time', `Permission check for ${this.sender.userName}#${this.sender.userId} | ${parser.permission} took ${(Date.now() - permissionCheckTime) / 1000}`);
-        } else {
-          debug('parser.permission', `Permission cached for ${this.sender.userName}#${this.sender.userId} | ${parser.permission}`);
-        }
-      }
-
       if (
         !(this.skip && parser.skippable) // parser is not fully skippable
         && (_.isNil(this.sender) // if user is null -> we are running command through a bot
           || this.skip
-          || getFromViewersCache(this.sender.userId, parser.permission))
+          || (await check(this.sender.userId, parser.permission, false)).access)
       ) {
         debug('parser.process', 'Processing ' + parser.name);
 
@@ -210,7 +193,6 @@ class Parser {
       }
     }
     parsers = _.orderBy(_.flatMap(await Promise.all(parsers)), 'priority', 'asc');
-    this.cachedParsers = parsers;
     return parsers;
   }
 
@@ -243,32 +225,24 @@ class Parser {
   }[] | null = null) {
     debug('parser.find', JSON.stringify({ message, cmdlist }));
 
-    const hash = crypto.createHash('sha1').update(JSON.stringify({ message, cmdlist })).digest('hex');
-    const cache = parserFindCache.find(o => o.hash === hash);
-    if (cache) {
-      return cache.command;
-    } else {
-      if (cmdlist === null) {
-        cmdlist = await this.getCommandsList();
-      }
-      for (const item of cmdlist) {
-        const onlyParams = message.trim().toLowerCase().replace(item.command, '');
-        const isStartingWith = message.trim().toLowerCase().startsWith(item.command);
-
-        debug('parser.find', JSON.stringify({ command: item.command, isStartingWith }));
-
-        if (isStartingWith && (onlyParams.length === 0 || (onlyParams.length > 0 && onlyParams[0] === ' '))) {
-          const customPermission = await getCommandPermission(item.id);
-          if (typeof customPermission !== 'undefined') {
-            item.permission = customPermission;
-          }
-          addToParserFindCache(hash, item);
-          return item;
-        }
-      }
-      addToParserFindCache(hash, null);
-      return null;
+    if (cmdlist === null) {
+      cmdlist = await this.getCommandsList();
     }
+    for (const item of cmdlist) {
+      const onlyParams = message.trim().toLowerCase().replace(item.command, '');
+      const isStartingWith = message.trim().toLowerCase().startsWith(item.command);
+
+      debug('parser.find', JSON.stringify({ command: item.command, isStartingWith }));
+
+      if (isStartingWith && (onlyParams.length === 0 || (onlyParams.length > 0 && onlyParams[0] === ' '))) {
+        const customPermission = await getCommandPermission(item.id);
+        if (typeof customPermission !== 'undefined') {
+          item.permission = customPermission;
+        }
+        return item;
+      }
+    }
+    return null;
   }
 
   @timer()
@@ -308,17 +282,11 @@ class Parser {
       return [];
     } // command is disabled
 
-    if (this.sender && !disablePermissionCheck) {
-      if (typeof getFromViewersCache(this.sender.userId, command.permission) === 'undefined') {
-        addToViewersCache(this.sender.userId, command.permission, (await check(this.sender.userId, command.permission, false)).access);
-      }
-    }
-
     if (
       _.isNil(this.sender) // if user is null -> we are running command through a bot
       || disablePermissionCheck
       || this.skip
-      || getFromViewersCache(this.sender.userId, command.permission)
+      || (await check(this.sender.userId, command.permission, false)).access
     ) {
       const text = message.trim().replace(new RegExp('^(' + command.command + ')', 'i'), '').trim();
       const opts: CommandOptions = {

@@ -5,7 +5,7 @@ import { getRepository } from 'typeorm';
 import users from '../../users';
 import { warning } from '../log';
 import {
-  addToViewersCache, get, getFromCachedHighestPermission, getFromViewersCache,
+  get, getUserHighestPermission,
 } from '../permissions';
 import { defaultPermissions } from '../permissions/';
 import { check } from '../permissions/';
@@ -47,15 +47,9 @@ async function setValueOf (variable: string | Readonly<VariableInterface>, curre
         source:   'twitch',
       };
     }
-
-    if (opts.sender) {
-      if (typeof getFromViewersCache(opts.sender.userId, item.permission) === 'undefined') {
-        addToViewersCache(opts.sender.userId, item.permission, (await check(opts.sender.userId, item.permission, false)).access);
-      }
-    }
-    const permissionsAreValid = isNil(opts.sender) || getFromViewersCache(opts.sender.userId, item.permission);
+    const permissionsAreValid = isNil(opts.sender) || (await check(opts.sender.userId, item.permission, false)).access;
     if ((item.readOnly && !opts.readOnlyBypass) || !permissionsAreValid) {
-      const highestPermission = getFromCachedHighestPermission(opts.sender.userId);
+      const highestPermission = await getUserHighestPermission(opts.sender.userId);
       if (highestPermission) {
         const userPermission = await get(highestPermission);
         const variablePermission = await get(item.permission);

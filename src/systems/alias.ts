@@ -23,7 +23,7 @@ import {
   debug, error, info, warning,
 } from '~/helpers/log';
 import {
-  addToViewersCache, get, getFromViewersCache,
+  get,
 } from '~/helpers/permissions';
 import { check, defaultPermissions } from '~/helpers/permissions/index';
 import { adminEndpoint } from '~/helpers/socket';
@@ -214,10 +214,7 @@ class Alias extends System {
           warning(`Alias ${alias.alias}#${alias.id} doesn't have any permission set, treating as CASTERS permission.`);
         }
 
-        if (typeof getFromViewersCache(opts.sender.userId, permission) === 'undefined') {
-          addToViewersCache(opts.sender.userId, permission, (await check(opts.sender.userId, permission, false)).access);
-        }
-        if (opts.skip || getFromViewersCache(opts.sender.userId, permission)) {
+        if (opts.skip || (await check(opts.sender.userId, permission, false)).access) {
           // process custom variables
           const response = await executeVariablesInText(
             opts.message.replace(replace, alias.command), {

@@ -8,7 +8,7 @@ import { onStartup } from '~/decorators/on';
 import Expects from '~/expects';
 import { prepare } from '~/helpers/commons';
 import { error } from '~/helpers/log';
-import { cleanViewersCache, get } from '~/helpers/permissions';
+import { get } from '~/helpers/permissions';
 import { check, defaultPermissions } from '~/helpers/permissions/index';
 import { adminEndpoint } from '~/helpers/socket';
 import * as changelog from '~/helpers/user/changelog.js';
@@ -31,7 +31,6 @@ class Permissions extends Core {
       }));
     });
     adminEndpoint('/core/permissions', 'permission::save', async (data, cb) => {
-      cleanViewersCache();
       // we need to remove missing permissions
       const permissionsFromDB = await PermissionsEntity.find();
       for (const permissionFromDB of permissionsFromDB) {
@@ -46,7 +45,6 @@ class Permissions extends Core {
       }
     });
     adminEndpoint('/core/permissions', 'generic::deleteById', async (id, cb) => {
-      cleanViewersCache();
       await PermissionsEntity.delete({ id: String(id) });
       if (cb) {
         cb(null);
@@ -118,7 +116,6 @@ class Permissions extends Core {
 
       pItem.excludeUserIds = [ String(userId), ...pItem.excludeUserIds ];
       await pItem.save();
-      cleanViewersCache();
 
       return [{
         response: prepare('permissions.excludeAddSuccessful', {
@@ -157,7 +154,6 @@ class Permissions extends Core {
 
       pItem.excludeUserIds = [ ...pItem.excludeUserIds.filter(id => id !== String(userId))];
       await pItem.save();
-      cleanViewersCache();
 
       return [{
         response: prepare('permissions.excludeRmSuccessful', {

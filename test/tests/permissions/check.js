@@ -489,7 +489,6 @@ describe('Permissions - check() - @func1', () => {
   describe(`Enabled !me command should work`, () => {
     beforeEach(async () => {
       await getRepository(PermissionCommands).clear();
-      invalidateParserCache();
     });
     for (let j = 0; j < users.length; j++) {
       it (`--- ${users[j].userName} should trigger command !me`, async () => {
@@ -541,11 +540,9 @@ describe('Permissions - check() - @func1', () => {
         name:       '!me',
         permission: null,
       });
-      invalidateParserCache();
     });
     after(async () => {
       await getRepository(PermissionCommands).clear();
-      invalidateParserCache();
     });
     for (let j = 0; j < users.length; j++) {
       it (`--- ${users[j].userName} should NOT trigger disabled command !me`, async () => {

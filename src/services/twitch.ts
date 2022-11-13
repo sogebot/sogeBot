@@ -29,7 +29,6 @@ import {
 } from '~/helpers/api';
 import { prepare } from '~/helpers/commons/prepare';
 import { isBotStarted } from '~/helpers/database';
-import { cleanViewersCache } from '~/helpers/permissions';
 import { defaultPermissions } from '~/helpers/permissions/index';
 import { adminEndpoint } from '~/helpers/socket';
 import {
@@ -251,12 +250,6 @@ class Twitch extends Service {
         }
         break;
     }
-  }
-
-  @onChange('generalOwners')
-  @onChange('broadcasterUsername')
-  clearCache() {
-    cleanViewersCache();
   }
 
   @onChange('broadcasterUsername')
