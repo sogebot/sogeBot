@@ -31,7 +31,6 @@ const { SongRequest } = require('../../dest/database/entity/song');
 const { Timer, TimerResponse } = require('../../dest/database/entity/timer');
 const { User, UserTip, UserBit } = require('../../dest/database/entity/user');
 const { Variable, VariableHistory, VariableURL } = require('../../dest/database/entity/variable');
-const { invalidateParserCache } = require('../../dest/helpers/cache');
 const { getIsDbConnected, getIsBotStarted } = require('../../dest/helpers/database');
 const emitter = require('../../dest/helpers/interfaceEmitter').default;
 const translation = (require('../../dest/translate')).default;

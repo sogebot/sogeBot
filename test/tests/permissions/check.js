@@ -6,7 +6,6 @@ require('../../general.js');
 const currency = require('../../../dest/currency').default;
 const { Permissions, PermissionCommands } = require('../../../dest/database/entity/permissions');
 const { User, UserBit, UserTip } = require('../../../dest/database/entity/user');
-const { invalidateParserCache } = require('../../../dest/helpers/cache');
 const rates = require('../../../dest/helpers/currency/rates').default;
 const { defaultPermissions,check } = require('../../../dest/helpers/permissions/');
 const { serialize } = require('../../../dest/helpers/type');

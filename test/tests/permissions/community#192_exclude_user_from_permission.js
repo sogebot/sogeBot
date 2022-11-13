@@ -7,7 +7,6 @@ const message = require('../../general.js').message;
 const assert = require('assert');
 
 const { defaultPermissions,check } = require('../../../dest/helpers/permissions/');
-const { invalidateParserCache } = require('../../../dest/helpers/cache');
 const Parser = require('../../../dest/parser').default;
 const currency = require('../../../dest/currency').default;
 
