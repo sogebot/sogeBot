@@ -37,7 +37,7 @@ jobs:
         id: log
         run: echo ::set-output name=MESSAGE::$(node tools/changelog.js --escape generate)
 
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           name: sogeBot
           path: ${{ github.workspace }}/*.zip
@@ -77,19 +77,19 @@ jobs:
         run: echo ::set-output name=VERSION::${GITHUB_REF#refs/tags/}
       -
         name: Set up QEMU
-        uses: docker/setup-qemu-action@v1.2.0
+        uses: docker/setup-qemu-action@v2.1.0
       -
         name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1.6.0
+        uses: docker/setup-buildx-action@v2.2.1
       -
         name: Login to DockerHub
-        uses: docker/login-action@v1.10.0
+        uses: docker/login-action@v2.1.0
         with:
           username: ${{ secrets.DOCKER_REGISTRY_USERNAME }}
           password: ${{ secrets.DOCKER_REGISTRY_PASSWORD }}
       -
         name: Login to GitHub Container Registry
-        uses: docker/login-action@v1.10.0
+        uses: docker/login-action@v2.1.0
         with:
           registry: ghcr.io
           username: ${{ secrets.DOCKER_USERNAME }}

@@ -38,7 +38,7 @@ jobs:
       - name: Zip a bot
         run: make pack
 
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           name: sogeBot-${{ steps.slug.outputs.sha8 }}
           path: ${{ github.workspace }}/*.zip
@@ -56,19 +56,19 @@ jobs:
         run: echo "::set-output name=sha8::$(echo ${GITHUB_SHA} | cut -c1-8)"
       -
         name: Set up QEMU
-        uses: docker/setup-qemu-action@v1.2.0
+        uses: docker/setup-qemu-action@v2.1.0
       -
         name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1.6.0
+        uses: docker/setup-buildx-action@v2.2.1
       -
         name: Login to DockerHub
-        uses: docker/login-action@v1.10.0
+        uses: docker/login-action@v2.1.0
         with:
           username: ${{ secrets.DOCKER_REGISTRY_USERNAME }}
           password: ${{ secrets.DOCKER_REGISTRY_PASSWORD }}
       -
         name: Login to GitHub Container Registry
-        uses: docker/login-action@v1.10.0
+        uses: docker/login-action@v2.1.0
         with:
           registry: ghcr.io
           username: ${{ secrets.DOCKER_USERNAME }}
