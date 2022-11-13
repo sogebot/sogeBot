@@ -35,7 +35,7 @@ jobs:
 
       - name: Generate changelog
         id: log
-        run: echo ::set-output name=MESSAGE::$(node tools/changelog.js --escape generate)
+        run: echo "MESSAGE=$(node tools/changelog.js --escape generate)" >> $GITHUB_OUTPUT
 
       - uses: actions/upload-artifact@v3
         with:
@@ -74,7 +74,7 @@ jobs:
       -
         name: Get the version
         id: get_version
-        run: echo ::set-output name=VERSION::${GITHUB_REF#refs/tags/}
+        run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
       -
         name: Set up QEMU
         uses: docker/setup-qemu-action@v2.1.0

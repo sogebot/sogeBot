@@ -18,7 +18,7 @@ jobs:
           fetch-depth: 0 # load full history
       - name: Get short SHA
         id: slug
-        run: echo "::set-output name=sha8::$(echo ${GITHUB_SHA} | cut -c1-8)"
+        run: echo "MESSAGE=$(echo ${GITHUB_SHA} | cut -c1-8)" >> $GITHUB_OUTPUT
       - name: install node v18
         uses: actions/setup-node@v3
         with:
