@@ -18,7 +18,7 @@ jobs:
           fetch-depth: 0 # load full history
       - name: Get short SHA
         id: slug
-        run: echo "MESSAGE=$(echo ${GITHUB_SHA} | cut -c1-8)" >> $GITHUB_OUTPUT
+        run: echo "SHA=$(echo ${GITHUB_SHA} | cut -c1-8)" >> $GITHUB_OUTPUT
       - name: install node v18
         uses: actions/setup-node@v3
         with:
@@ -39,5 +39,5 @@ jobs:
 
       - uses: actions/upload-artifact@v2
         with:
-          name: sogeBot-${{ steps.slug.outputs.sha8 }}
+          name: sogeBot-${{ steps.slug.outputs.SHA }}
           path: ${{ github.workspace }}/*.zip
