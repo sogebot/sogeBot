@@ -16,7 +16,7 @@ jobs:
           fetch-depth: 0 # load full history
 
       - name: install node v18
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
           node-version: 18
           check-latest: true

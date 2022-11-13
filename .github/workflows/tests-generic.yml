@@ -24,7 +24,7 @@ jobs:
             exit 1
           fi;
     - name: install node v18
-      uses: actions/setup-node@v2
+      uses: actions/setup-node@v3
       with:
         node-version: 18
         check-latest: true
@@ -50,7 +50,7 @@ jobs:
       run: echo ::set-output name=MESSAGE::$(git log --no-merges -1 --pretty=format:%s%b)
     - name: install node v18
       if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
-      uses: actions/setup-node@v2
+      uses: actions/setup-node@v3
       with:
         node-version: 18
         check-latest: true
