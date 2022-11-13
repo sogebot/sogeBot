@@ -1,8 +1,8 @@
 diff --git a/node_modules/google-auth-library/build/src/auth/oauth2client.js b/node_modules/google-auth-library/build/src/auth/oauth2client.js
-index c6ef22e..1b783ad 100644
+index 75e43df..814c6d9 100644
 --- a/node_modules/google-auth-library/build/src/auth/oauth2client.js
 +++ b/node_modules/google-auth-library/build/src/auth/oauth2client.js
-@@ -717,7 +717,7 @@ OAuth2Client.GOOGLE_OAUTH2_AUTH_BASE_URL_ = 'https://accounts.google.com/o/oauth
+@@ -731,7 +731,7 @@ OAuth2Client.GOOGLE_OAUTH2_AUTH_BASE_URL_ = 'https://accounts.google.com/o/oauth
  /**
   * The base endpoint for token retrieval.
   */
