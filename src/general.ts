@@ -1,4 +1,4 @@
-import { readdirSync, writeFileSync } from 'fs';
+import { existsSync, readdirSync, readFileSync, writeFileSync } from 'fs';
 
 import { HOUR, MINUTE } from '@sogebot/ui-helpers/constants';
 import { setLocale } from '@sogebot/ui-helpers/dayjsHelper';
@@ -232,9 +232,10 @@ class General extends Core {
     const broadcasterId = variables.get('services.twitch.broadcasterId') as string;
 
     const version = get(process, 'env.npm_package_version', 'x.y.z');
+    const commitFile = existsSync('./.commit') ? readFileSync('./.commit').toString() : null;
     debug('*', '======= COPY DEBUG MESSAGE FROM HERE =======');
     debug('*', `GENERAL      | OS: ${process.env.npm_config_user_agent}`);
-    debug('*', `             | Bot version: ${version.replace('SNAPSHOT', gitCommitInfo().shortHash || 'SNAPSHOT')}`);
+    debug('*', `             | Bot version: ${version.replace('SNAPSHOT', commitFile && commitFile.length > 0 ? commitFile : gitCommitInfo().shortHash || 'SNAPSHOT')}`);
     debug('*', `             | DB: ${connection.options.type}`);
     debug('*', `             | HEAP: ${Number(process.memoryUsage().heapUsed / 1048576).toFixed(2)} MB`);
     debug('*', `             | Uptime: ${new Date(1000 * process.uptime()).toISOString().substr(11, 8)}`);

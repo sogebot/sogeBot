@@ -1,6 +1,6 @@
 'use strict';
 
-import fs, { existsSync } from 'fs';
+import fs, { existsSync, readFileSync } from 'fs';
 import path from 'path';
 
 import cors from 'cors';
@@ -586,7 +586,8 @@ class Panel extends Core {
       });
       socket.on('version', function (cb: (version: string) => void) {
         const version = _.get(process, 'env.npm_package_version', 'x.y.z');
-        cb(version.replace('SNAPSHOT', gitCommitInfo().shortHash || 'SNAPSHOT'));
+        const commitFile = existsSync('./.commit') ? readFileSync('./.commit').toString() : null;
+        cb(version.replace('SNAPSHOT', commitFile && commitFile.length > 0 ? commitFile : gitCommitInfo().shortHash || 'SNAPSHOT'));
       });
 
       socket.on('parser.isRegistered', function (data: { emit: string, command: string }) {

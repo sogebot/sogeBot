@@ -24,6 +24,7 @@ import { isModerator } from './user/isModerator';
 
 import Message from '~/message.js';
 import { variables as vars } from '~/watchers';
+import { existsSync, readFileSync } from 'fs';
 
 class HelpersFilter {
   @timer()
@@ -106,7 +107,8 @@ class HelpersFilter {
 
     if (message.includes('$version')) {
       const version = _.get(process, 'env.npm_package_version', 'x.y.z');
-      variables.$version = version.replace('SNAPSHOT', gitCommitInfo().shortHash || 'SNAPSHOT');
+      const commitFile = existsSync('./.commit') ? readFileSync('./.commit').toString() : null;
+      variables.$version = version.replace('SNAPSHOT', commitFile && commitFile.length > 0 ? commitFile : gitCommitInfo().shortHash || 'SNAPSHOT');
     }
 
     if (message.includes('$latestFollower')) {
