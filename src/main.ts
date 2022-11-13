@@ -4,7 +4,7 @@ Error.stackTraceLimit = Infinity;
 
 import 'reflect-metadata';
 
-import { existsSync, unlinkSync } from 'fs';
+import { existsSync, readFileSync, unlinkSync } from 'fs';
 import { normalize } from 'path';
 import util from 'util';
 
@@ -85,8 +85,9 @@ const connect = async function () {
 async function main () {
   try {
     const version = _.get(process, 'env.npm_package_version', 'x.y.z');
+    const commitFile = existsSync('./.commit') ? readFileSync('./.commit').toString() : null;
     if (!existsSync('~/restart.pid')) {
-      const versionString = version.replace('SNAPSHOT', gitCommitInfo().shortHash || 'SNAPSHOT');
+      const versionString = version.replace('SNAPSHOT', commitFile && commitFile.length > 0 ? commitFile : gitCommitInfo().shortHash || 'SNAPSHOT');
       process.stdout.write(figlet.textSync('sogeBot ' + versionString, {
         font:             'ANSI Shadow',
         horizontalLayout: 'default',
