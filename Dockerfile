@@ -20,6 +20,10 @@ RUN unzip *.zip -d /app
 # Change working directory
 WORKDIR /app
 
+# Add startup script
+COPY docker.sh /
+RUN chmod +x /docker.sh
+
 # Copy files as a non-root user. The `node` user is built in the Node image.
 RUN chown node:node ./
 USER node
@@ -32,7 +36,4 @@ EXPOSE 20000
 # Expose profiler to the outside
 EXPOSE 9229
 
-# Add startup script
-COPY docker.sh /
-RUN chmod +x /docker.sh
 ENTRYPOINT ["/docker.sh"]
