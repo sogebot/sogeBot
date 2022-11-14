@@ -36,7 +36,7 @@ jobs:
         run: make
 
       - name: Add commit file
-        run: echo "SHA=$(echo ${GITHUB_SHA} | cut -c1-8)" >> ./.commit
+        run: echo "$(echo ${GITHUB_SHA} | cut -c1-8)" >> ./.commit
 
       - name: Zip a bot
         run: make pack
