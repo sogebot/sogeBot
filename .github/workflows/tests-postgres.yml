@@ -87,7 +87,7 @@ jobs:
     - name: Run mocha
       if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
       run: TESTS=@func1 npm test
-    - uses: codecov/codecov-action@v1
+    - uses: codecov/codecov-action@v3
       if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
       with:
         token: ${{ secrets.CODECOV_TOKEN }} # not required for public repos
@@ -131,7 +131,7 @@ jobs:
     - name: Run mocha
       if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
       run: TESTS=@func2 npm test
-    - uses: codecov/codecov-action@v1
+    - uses: codecov/codecov-action@v3
       if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
       with:
         token: ${{ secrets.CODECOV_TOKEN }} # not required for public repos
@@ -175,7 +175,7 @@ jobs:
     - name: Run mocha
       if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
       run: TESTS=@func3 npm test
-    - uses: codecov/codecov-action@v1
+    - uses: codecov/codecov-action@v3
       if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
       with:
         token: ${{ secrets.CODECOV_TOKEN }} # not required for public repos
