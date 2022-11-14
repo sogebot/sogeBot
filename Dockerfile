@@ -17,16 +17,6 @@ RUN unzip *.zip -d /app
 # Change working directory
 WORKDIR /app
 
-# Install latest npm
-RUN npm install -g npm@latest
-
-# Install dependencies
-RUN npm install
-# Remove dev dependencies (not needed anymore)
-RUN npm prune --production
-# Get latest ui dependencies in time of build
-RUN npm update @sogebot/ui-admin @sogebot/ui-overlay @sogebot/ui-helpers @sogebot/ui-oauth @sogebot/ui-public
-
 # Expose API port to the outside
 EXPOSE 20000
 # Expose profiler to the outside

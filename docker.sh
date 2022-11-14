@@ -1,6 +1,7 @@
 #!/bin/bash
 cd /app
 
+npm ci
 
 if [ -z "$PROFILER" ]
 then
