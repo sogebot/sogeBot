@@ -88,6 +88,7 @@ class Panel extends Core {
   }
 
   expose () {
+    server.listen(port, '::');
     server.listen(port, '0.0.0.0', () => {
       info(`WebPanel is available at http://localhost:${port}`);
     });
