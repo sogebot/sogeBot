@@ -24,10 +24,6 @@ WORKDIR /app
 COPY docker.sh /
 RUN chmod +x /docker.sh
 
-# Copy files as a non-root user. The `node` user is built in the Node image.
-RUN chown node:node ./
-USER node
-
 # Install packages and clean .npm cache (not needed)
 RUN npm ci && npm cache clean --force
 
