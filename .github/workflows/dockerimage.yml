@@ -85,3 +85,5 @@ jobs:
           tags: |
             sogebot/nightly:latest
             sogebot/nightly:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

@@ -103,3 +103,5 @@ jobs:
           tags: |
             sogebot/release:latest
             sogebot/release:${{ steps.get_version.outputs.VERSION }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
