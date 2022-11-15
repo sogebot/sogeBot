@@ -78,12 +78,18 @@ class Levels extends System {
     perMessageOfflineInterval = 0;
 
   sockets () {
-    adminEndpoint('/systems/levels', 'getLevelsExample', (cb) => {
+    adminEndpoint('/systems/levels', 'getLevelsExample', (data, cb) => {
       try {
-        this.getLevelFromCache(21);
-        cb(null, cachedLevels.map(xp => `${Intl.NumberFormat(general.lang).format(xp)} ${this.xpName}`));
+        const firstLevelStartsAt = typeof data === 'function' ? this.firstLevelStartsAt : data.firstLevelStartsAt;
+        const nextLevelFormula = typeof data === 'function' ? this.nextLevelFormula : data.nextLevelFormula;
+        const xpName = typeof data === 'function' ? this.xpName : data.xpName;
+        const levels = [];
+        for (let i = 1; i <= 21; i++) {
+          levels.push(this.getLevelXP(i, BigInt(firstLevelStartsAt), nextLevelFormula, true));
+        }
+        (typeof data === 'function' ? data : cb!)(null, levels.map(xp => `${Intl.NumberFormat(general.lang).format(xp)} ${xpName}`));
       } catch (e: any) {
-        cb(e.stack, []);
+        (typeof data === 'function' ? data : cb!)(e, []);
       }
     });
   }
@@ -142,7 +148,7 @@ class Levels extends System {
 
       if (levelFromCache >= 1) {
         for (; level <= levelFromCache; level++) {
-          const xp = this.getLevelXP(level, true);
+          const xp = this.getLevelXP(level, undefined, undefined, true);
           debug('levels.update', `Recalculating level ${level} - ${xp} XP`);
           cachedLevels.push(xp);
         }
@@ -316,18 +322,18 @@ class Levels extends System {
     return true;
   }
 
-  getLevelXP(level: number, calculate = false) {
-    let prevLevelXP = BigInt(this.firstLevelStartsAt);
+  getLevelXP(level: number, firstLevelStartsAt = BigInt(this.firstLevelStartsAt), nextLevelFormula = this.nextLevelFormula, calculate = false) {
+    let prevLevelXP = firstLevelStartsAt;
 
     if (level === 0) {
       return BigInt(0);
     }
     if (level === 1) {
-      return BigInt(this.firstLevelStartsAt);
+      return firstLevelStartsAt;
     }
 
     for (let i = 1; i < level; i++) {
-      const expr = this.nextLevelFormula
+      const expr = nextLevelFormula
         .replace(/\$prevLevelXP/g, String(prevLevelXP))
         .replace(/\$prevLevel/g, String(i));
       const formula = !calculate

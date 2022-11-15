@@ -355,7 +355,7 @@ export type ClientToServerEventsWithNamespace = {
   '/integrations/qiwi': GenericEvents,
   '/integrations/lastfm': GenericEvents,
   '/systems/levels': GenericEvents & {
-    'getLevelsExample': (cb: (error: Error | string | null, levels: string[]) => void) => void,
+    'getLevelsExample': (data: { firstLevelStartsAt: number, nextLevelFormula: string, xpName: string } | ((error: Error | string | null, levels: string[]) => void), cb?: (error: Error | string | null, levels: string[]) => void) => void,
   },
   '/systems/moderation': GenericEvents & {
     'lists.get': (cb: (error: Error | string | null, lists: { blacklist: string[], whitelist: string[] }) => void) => void,
