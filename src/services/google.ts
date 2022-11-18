@@ -88,6 +88,10 @@ class Google extends Service {
       this.onStartupInterval = setInterval(async () => {
         const stream = await this.getStream();
 
+        if (!stream) {
+          this.prepareStream();
+        }
+
         if (stream && stream.snippet) {
           const currentTitle = stats.value.currentTitle || 'n/a';
           if (stream.snippet.title !== currentTitle) {
@@ -143,14 +147,35 @@ class Google extends Service {
     return null;
   }
 
-  @onStreamStart()
-  onStreamStart() {
+  async prepareStream() {
     // we want to create new stream, private for now for archive purpose
     if (this.client) {
       const youtube = google.youtube({
         auth:    this.client,
         version: 'v3',
       });
+
+      // get active broadcasts
+      const list = await youtube.liveBroadcasts.list({
+        part:            ['id','snippet','contentDetails','status'],
+        broadcastStatus: 'upcoming',
+      });
+
+      if (list.data.items && list.data.items.length > 0) {
+        const stream = list.data.items[0];
+        // if have stream, update scheduledStartTime
+        return youtube.liveBroadcasts.update({
+          part:        ['id','snippet','contentDetails','status'],
+          requestBody: {
+            ...stream,
+            snippet: {
+              ...stream.snippet,
+              scheduledStartTime: new Date(Date.now() + 60000).toISOString(),
+            },
+          },
+        });
+      }
+
       youtube.liveBroadcasts.insert({
         part:        ['id','snippet','contentDetails','status'],
         requestBody: {
