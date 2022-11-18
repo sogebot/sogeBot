@@ -30,6 +30,7 @@ class Google extends Service {
   client: OAuth2Client | null = null;
 
   onStartupInterval: null | NodeJS.Timer = null;
+  onStartupIntervalPrepareStream: null | NodeJS.Timer = null;
   chatInterval: null | NodeJS.Timer = null;
 
   nextChatCheckAt = Date.now();
@@ -89,10 +90,6 @@ class Google extends Service {
       this.onStartupInterval = setInterval(async () => {
         const stream = await this.getStream();
 
-        if (!stream) {
-          this.prepareStream();
-        }
-
         if (stream && stream.snippet) {
           const currentTitle = stats.value.currentTitle || 'n/a';
           if (stream.snippet.title !== currentTitle) {
@@ -101,6 +98,17 @@ class Google extends Service {
           }
         }
       }, MINUTE);
+
+      if (this.onStartupIntervalPrepareStream) {
+        clearInterval(this.onStartupIntervalPrepareStream);
+      }
+      this.onStartupInterval = setInterval(async () => {
+        const stream = await this.getStream();
+
+        if (!stream) {
+          this.prepareStream();
+        }
+      }, 15 * MINUTE);
     } else {
       error(`'YOUTUBE: Couldn't get channel informations.`);
     }
@@ -175,7 +183,7 @@ class Google extends Service {
             snippet: {
               ...stream.snippet,
               title:              stats.value.currentTitle || 'n/a',
-              scheduledStartTime: new Date(Date.now() + 60000).toISOString(),
+              scheduledStartTime: new Date(Date.now() + (15 * 60000)).toISOString(),
             },
           },
         });
@@ -186,7 +194,7 @@ class Google extends Service {
         requestBody: {
           snippet: {
             title:              stats.value.currentTitle || 'n/a',
-            scheduledStartTime: new Date(Date.now() + 60000).toISOString(),
+            scheduledStartTime: new Date(Date.now() + (15 * 60000)).toISOString(),
           },
           status: {
             privacyStatus:           'private',
