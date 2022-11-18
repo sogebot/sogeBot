@@ -2,7 +2,7 @@ import { getRepository } from 'typeorm';
 import { GooglePrivateKeys } from '~/database/entity/google';
 import { app } from '~/helpers/panel';
 import { adminMiddleware } from '~/socket';
-import { onChange, onStartup, onStreamStart } from '~/decorators/on';
+import { onChange, onStartup } from '~/decorators/on';
 import Service from './_interface';
 
 import { google, youtube_v3 } from 'googleapis';
