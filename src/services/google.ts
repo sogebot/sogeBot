@@ -12,6 +12,7 @@ import { OAuth2Client } from 'google-auth-library/build/src/auth/oauth2client';
 import { MINUTE } from '@sogebot/ui-helpers/constants';
 
 import {
+  isStreamOnline,
   stats,
 } from '~/helpers/api';
 import { settings } from '~/decorators';
@@ -148,6 +149,9 @@ class Google extends Service {
   }
 
   async prepareStream() {
+    if (isStreamOnline.value) {
+      return; // do nothing if already streaming
+    }
     // we want to create new stream, private for now for archive purpose
     if (this.client) {
       const youtube = google.youtube({
@@ -170,6 +174,7 @@ class Google extends Service {
             ...stream,
             snippet: {
               ...stream.snippet,
+              title:              stats.value.currentTitle || 'n/a',
               scheduledStartTime: new Date(Date.now() + 60000).toISOString(),
             },
           },
