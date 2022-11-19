@@ -218,6 +218,13 @@ class Google extends Service {
         },
       })
         .then(liveBroadcastResponse => {
+          if (this.streamId.length > 0 && liveBroadcastResponse.data.id) {
+            youtube.liveBroadcasts.bind({
+              part:     ['id'],
+              streamId: this.streamId,
+              id:       liveBroadcastResponse.data.id,
+            });
+          }
           info(`YOUTUBE: Created new private broadcast ${liveBroadcastResponse.data.id}`);
         })
         .catch(e => {
