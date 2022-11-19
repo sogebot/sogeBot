@@ -2,7 +2,7 @@ import { getRepository } from 'typeorm';
 import { GooglePrivateKeys } from '~/database/entity/google';
 import { app } from '~/helpers/panel';
 import { adminMiddleware } from '~/socket';
-import { onChange, onStartup } from '~/decorators/on';
+import { onChange, onStartup, onStreamEnd, onStreamStart } from '~/decorators/on';
 import Service from './_interface';
 
 import { google, youtube_v3 } from 'googleapis';
@@ -16,6 +16,7 @@ import {
   stats,
 } from '~/helpers/api';
 import { settings } from '~/decorators';
+import { getLang } from '~/helpers/locales';
 
 class Google extends Service {
   @settings()
@@ -27,16 +28,92 @@ class Google extends Service {
   @settings()
     streamId = '';
 
+  @settings()
+    onStreamEndTitle = 'Archive | $gamesList | $date';
+  @settings()
+    onStreamEndTitleEnabled = false;
+
+  @settings()
+    onStreamEndDescription = 'Streamed at https://twitch.tv/changeme\nTitle: $title\nGames: $gamesList\nDate: $date';
+  @settings()
+    onStreamEndDescriptionEnabled = false;
+
+  @settings()
+    onStreamEndPrivacyStatus: 'private' | 'public' | 'unlisted' = 'unlisted';
+  @settings()
+    onStreamEndPrivacyStatusEnabled = false;
+
   expiryDate: null | number = null;
   accessToken: null | string = null;
   client: OAuth2Client | null = null;
 
   onStartupInterval: null | NodeJS.Timer = null;
-  onStartupIntervalPrepareStream: null | NodeJS.Timer = null;
+  onStartupIntervalPrepareBroadcast: null | NodeJS.Timer = null;
   chatInterval: null | NodeJS.Timer = null;
 
-  nextChatCheckAt = Date.now();
-  lastMessageProcessedAt = new Date().toISOString();
+  broadcastId: string | null = null;
+  gamesPlayedOnStream: string[] = [];
+  broadcastStartedAt: string = new Date().toLocaleDateString(getLang());
+
+  @onStreamStart()
+  onStreamStart() {
+    this.gamesPlayedOnStream = stats.value.currentGame ? [stats.value.currentGame] : [];
+    this.broadcastStartedAt = new Date().toLocaleDateString(getLang());
+  }
+
+  @onStreamEnd()
+  async onStreamEnd() {
+    if (this.client && this.broadcastId) {
+      const youtube = google.youtube({
+        auth:    this.client,
+        version: 'v3',
+      });
+
+      // load broadcast
+      const list = await youtube.liveBroadcasts.list({
+        part: ['id','snippet','contentDetails','status'],
+        id:   [this.broadcastId],
+      });
+
+      let broadcast: youtube_v3.Schema$LiveBroadcast;
+      if (list.data.items && list.data.items.length > 0) {
+        broadcast = list.data.items[0];
+      } else {
+        // broadcast was not found
+        return;
+      }
+
+      // get active broadcasts
+      youtube.liveBroadcasts.update({
+        part:        ['id','snippet','contentDetails','status'],
+        requestBody: {
+          ...broadcast,
+          id:      this.broadcastId,
+          snippet: {
+            ...broadcast.snippet,
+            title: this.onStreamEndTitleEnabled
+              ? this.onStreamEndTitle
+                .replace('$gamesList', this.gamesPlayedOnStream.join(', '))
+                .replace('$title', stats.value.currentTitle || '')
+                .replace('$date', this.broadcastStartedAt)
+              : broadcast.snippet?.title,
+            description: this.onStreamEndDescriptionEnabled
+              ? this.onStreamEndDescription
+                .replace('$gamesList', this.gamesPlayedOnStream.join(', '))
+                .replace('$title', broadcast.snippet?.title || stats.value.currentTitle || '')
+                .replace('$date', this.broadcastStartedAt)
+              : broadcast.snippet?.description,
+          },
+          status: {
+            ...broadcast.status,
+            privacyStatus: this.onStreamEndPrivacyStatusEnabled
+              ? this.onStreamEndPrivacyStatus
+              : broadcast.status?.privacyStatus,
+          },
+        },
+      });
+    }
+  }
 
   @onChange('refreshToken')
   @onChange('clientId')
@@ -90,7 +167,7 @@ class Google extends Service {
         clearInterval(this.onStartupInterval);
       }
       this.onStartupInterval = setInterval(async () => {
-        const stream = await this.getStream();
+        const stream = await this.getBroadcast();
 
         if (stream && stream.snippet) {
           const currentTitle = stats.value.currentTitle || 'n/a';
@@ -99,16 +176,21 @@ class Google extends Service {
             await this.updateTitle(stream, currentTitle);
           }
         }
+
+        // add game to list
+        if (stats.value.currentGame && !this.gamesPlayedOnStream.includes(stats.value.currentGame)) {
+          this.gamesPlayedOnStream.push(stats.value.currentGame);
+        }
       }, MINUTE);
 
-      if (this.onStartupIntervalPrepareStream) {
-        clearInterval(this.onStartupIntervalPrepareStream);
+      if (this.onStartupIntervalPrepareBroadcast) {
+        clearInterval(this.onStartupIntervalPrepareBroadcast);
       }
       this.onStartupInterval = setInterval(async () => {
-        const stream = await this.getStream();
+        const broadcast = await this.getBroadcast();
 
-        if (!stream) {
-          this.prepareStream();
+        if (!broadcast) {
+          this.prepareBroadcast();
         }
       }, 15 * MINUTE);
     } else {
@@ -137,7 +219,7 @@ class Google extends Service {
     }
   }
 
-  async getStream() {
+  async getBroadcast() {
     if (this.client) {
       const youtube = google.youtube({
         auth:    this.client,
@@ -151,14 +233,15 @@ class Google extends Service {
       });
 
       if (list.data.items && list.data.items.length > 0) {
-        const stream = list.data.items[0];
-        return stream;
+        const broadcast = list.data.items[0];
+        this.broadcastId = broadcast.id ?? null;
+        return broadcast;
       }
     }
     return null;
   }
 
-  async prepareStream() {
+  async prepareBroadcast() {
     if (isStreamOnline.value) {
       return; // do nothing if already streaming
     }
@@ -177,6 +260,8 @@ class Google extends Service {
 
       if (list.data.items && list.data.items.length > 0) {
         const broadcast = list.data.items[0];
+
+        this.broadcastId = broadcast.id ?? null;
 
         if (this.streamId.length > 0 && broadcast.id) {
           await youtube.liveBroadcasts.bind({
