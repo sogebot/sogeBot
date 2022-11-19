@@ -167,6 +167,20 @@ class Google extends Service {
         version: 'v3',
       });
 
+      // get default rmtp
+      const rmtps = await youtube.liveStreams.list({
+        part: ['id', 'snippet', 'cdn', 'status'],
+        mine: true,
+      });
+
+      let streamId: string | null = null;
+      for (const item of rmtps.data.items || []) {
+        if (item.snippet?.isDefaultStream || item.snippet?.title?.toLowerCase().includes('default')) {
+          streamId = item.id ?? null;
+          break;
+        }
+      }
+
       // get active broadcasts
       const list = await youtube.liveBroadcasts.list({
         part:            ['id','snippet','contentDetails','status'],
@@ -174,14 +188,23 @@ class Google extends Service {
       });
 
       if (list.data.items && list.data.items.length > 0) {
-        const stream = list.data.items[0];
-        // if have stream, update scheduledStartTime
+        const broadcast = list.data.items[0];
+
+        if (streamId && broadcast.id) {
+          await youtube.liveBroadcasts.bind({
+            part: ['id'],
+            streamId,
+            id:   broadcast.id,
+          });
+        }
+
+        // if have broadcast, update scheduledStartTime
         return youtube.liveBroadcasts.update({
           part:        ['id','snippet','contentDetails','status'],
           requestBody: {
-            ...stream,
+            ...broadcast,
             snippet: {
-              ...stream.snippet,
+              ...broadcast.snippet,
               title:              stats.value.currentTitle || 'n/a',
               scheduledStartTime: new Date(Date.now() + (15 * 60000)).toISOString(),
             },
