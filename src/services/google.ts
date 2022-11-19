@@ -24,6 +24,8 @@ class Google extends Service {
     refreshToken = '';
   @settings()
     channel = '';
+  @settings()
+    streamId = '';
 
   expiryDate: null | number = null;
   accessToken: null | string = null;
@@ -167,20 +169,6 @@ class Google extends Service {
         version: 'v3',
       });
 
-      // get default rmtp
-      const rmtps = await youtube.liveStreams.list({
-        part: ['id', 'snippet', 'cdn', 'status'],
-        mine: true,
-      });
-
-      let streamId: string | null = null;
-      for (const item of rmtps.data.items || []) {
-        if (item.snippet?.isDefaultStream || item.snippet?.title?.toLowerCase().includes('default')) {
-          streamId = item.id ?? null;
-          break;
-        }
-      }
-
       // get active broadcasts
       const list = await youtube.liveBroadcasts.list({
         part:            ['id','snippet','contentDetails','status'],
@@ -190,11 +178,11 @@ class Google extends Service {
       if (list.data.items && list.data.items.length > 0) {
         const broadcast = list.data.items[0];
 
-        if (streamId && broadcast.id) {
+        if (this.streamId.length > 0 && broadcast.id) {
           await youtube.liveBroadcasts.bind({
-            part: ['id'],
-            streamId,
-            id:   broadcast.id,
+            part:     ['id'],
+            streamId: this.streamId,
+            id:       broadcast.id,
           });
         }
 
@@ -259,6 +247,23 @@ class Google extends Service {
     app.delete('/api/services/google/privatekeys/:id', adminMiddleware, async (req, res) => {
       await getRepository(GooglePrivateKeys).delete({ id: req.params.id });
       res.status(404).send();
+    });
+
+    app.get('/api/services/google/streams', adminMiddleware, async (req, res) => {
+      if (this.client) {
+        const youtube = google.youtube({
+          auth:    this.client,
+          version: 'v3',
+        });
+
+        const rmtps = await youtube.liveStreams.list({
+          part: ['id', 'snippet', 'cdn', 'status'],
+          mine: true,
+        });
+        res.send({ data: rmtps.data.items });
+      } else {
+        res.send({ data: [] });
+      }
     });
   }
 }
