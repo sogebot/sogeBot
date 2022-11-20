@@ -39,7 +39,7 @@ class Google extends Service {
     onStreamEndDescriptionEnabled = false;
 
   @settings()
-    onStreamEndPrivacyStatus: 'private' | 'public' | 'unlisted' = 'unlisted';
+    onStreamEndPrivacyStatus: 'private' | 'public' | 'unlisted' = 'private';
   @settings()
     onStreamEndPrivacyStatusEnabled = false;
 
