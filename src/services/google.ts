@@ -14,9 +14,11 @@ import { MINUTE } from '@sogebot/ui-helpers/constants';
 import {
   isStreamOnline,
   stats,
+  streamStatusChangeSince,
 } from '~/helpers/api';
 import { settings } from '~/decorators';
 import { getLang } from '~/helpers/locales';
+import { getTime } from '@sogebot/ui-helpers/getTime';
 
 class Google extends Service {
   @settings()
@@ -34,7 +36,7 @@ class Google extends Service {
     onStreamEndTitleEnabled = false;
 
   @settings()
-    onStreamEndDescription = 'Streamed at https://twitch.tv/changeme\nTitle: $title\nGames: $gamesList\nDate: $date';
+    onStreamEndDescription = 'Streamed at https://twitch.tv/changeme\nTitle: $title\n\n=========\n$chapters\n========\n\nDate: $date';
   @settings()
     onStreamEndDescriptionEnabled = false;
 
@@ -52,12 +54,12 @@ class Google extends Service {
   chatInterval: null | NodeJS.Timer = null;
 
   broadcastId: string | null = null;
-  gamesPlayedOnStream: string[] = [];
+  gamesPlayedOnStream: { game: string, seconds: number }[] = [];
   broadcastStartedAt: string = new Date().toLocaleDateString(getLang());
 
   @onStreamStart()
   onStreamStart() {
-    this.gamesPlayedOnStream = stats.value.currentGame ? [stats.value.currentGame] : [];
+    this.gamesPlayedOnStream = stats.value.currentGame ? [{ game: stats.value.currentGame, seconds: 0 }] : [];
     this.broadcastStartedAt = new Date().toLocaleDateString(getLang());
   }
 
@@ -93,13 +95,15 @@ class Google extends Service {
             ...broadcast.snippet,
             title: this.onStreamEndTitleEnabled
               ? this.onStreamEndTitle
-                .replace('$gamesList', this.gamesPlayedOnStream.join(', '))
+                .replace('$gamesList', Array.from(new Set(this.gamesPlayedOnStream.map(item => item.game))).join(', '))
                 .replace('$title', stats.value.currentTitle || '')
                 .replace('$date', this.broadcastStartedAt)
               : broadcast.snippet?.title,
             description: this.onStreamEndDescriptionEnabled
               ? this.onStreamEndDescription
-                .replace('$gamesList', this.gamesPlayedOnStream.join(', '))
+                .replace('$chapters', this.gamesPlayedOnStream
+                  .map(item => `${getTime(item.seconds, false)} ${item.game}`)
+                  .join('\n'))
                 .replace('$title', broadcast.snippet?.title || stats.value.currentTitle || '')
                 .replace('$date', this.broadcastStartedAt)
               : broadcast.snippet?.description,
@@ -178,8 +182,12 @@ class Google extends Service {
         }
 
         // add game to list
-        if (stats.value.currentGame && !this.gamesPlayedOnStream.includes(stats.value.currentGame)) {
-          this.gamesPlayedOnStream.push(stats.value.currentGame);
+        if (stats.value.currentGame
+          && (this.gamesPlayedOnStream.length === 0 || this.gamesPlayedOnStream[this.gamesPlayedOnStream.length - 1].game !== stats.value.currentGame)) {
+          this.gamesPlayedOnStream.push({
+            game:    stats.value.currentGame,
+            seconds: (Date.now() - streamStatusChangeSince.value) / 1000,
+          });
         }
       }, MINUTE);
 
