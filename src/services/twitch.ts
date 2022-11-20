@@ -6,7 +6,7 @@ import { getTime } from '@sogebot/ui-helpers/getTime';
 import { getRepository } from 'typeorm';
 
 import {
-  command, default_permission, persistent, settings,
+  command, default_permission, example, persistent, settings,
 } from '../decorators';
 import { onChange, onLoad, onStartup, onStreamStart } from '../decorators/on';
 import Expects from '../expects';
@@ -532,6 +532,33 @@ class Twitch extends Service {
   @command('!game')
   async getGame (opts: CommandOptions) {
     return [ { response: translate('game.current').replace(/\$title/g, stats.value.currentGame || 'n/a'), ...opts }];
+  }
+
+  @command('!marker')
+  @example([
+    [
+      '?!marker <optionalDescription>',
+    ],
+    [
+      '+!marker Something amazing just happened!',
+      { message: '-Stream marker has been created at 00:10:05.', replace: {} },
+    ],
+    [
+      '+!marker',
+      { message: '-Stream marker has been created at 00:10:06.', replace: {} },
+    ],
+  ])
+  @default_permission(defaultPermissions.MODERATORS)
+  async createMarker (opts: CommandOptions) {
+    const description = opts.parameters.trim().length === 0
+      ? 'Created by ' + opts.sender.userName
+      : opts.parameters + ' by ' + opts.sender.userName;
+    const marker = await createMarker(description);
+    if (marker) {
+      return [{ response: translate('marker').replace(/\$time/g, getTime(marker.positionInSeconds, false) || '???'), ...opts }];
+    } else {
+      return [];
+    }
   }
 
   @command('!game set')

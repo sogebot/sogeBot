@@ -1090,6 +1090,7 @@
       "none": "No users were found in queue"
     }
   },
+  "marker": "Stream marker has been created at $time.",
   "title": {
     "current": "$sender, title of stream is '$title'.",
     "change": {

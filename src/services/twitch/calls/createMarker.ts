@@ -7,7 +7,7 @@ import { variables } from '~/watchers';
 import { setImmediateAwait } from '~/helpers/setImmediateAwait';
 import { HelixStreamMarker } from '@twurple/api/lib';
 
-export async function createMarker (description = 'Marked from sogeBot'): Promise<HelixStreamMarker | void> {
+export async function createMarker (description = 'Marked from sogeBot'): Promise<HelixStreamMarker | null> {
   if (isDebugEnabled('api.calls')) {
     debug('api.calls', new Error().stack);
   }
@@ -15,7 +15,7 @@ export async function createMarker (description = 'Marked from sogeBot'): Promis
 
   try {
     const clientBot = await client('bot');
-    clientBot.streams.createStreamMarker(broadcasterId, description);
+    return clientBot.streams.createStreamMarker(broadcasterId, description);
   } catch (e: unknown) {
     if (e instanceof Error) {
       if (e.message.includes('ETIMEDOUT')) {
@@ -31,4 +31,5 @@ export async function createMarker (description = 'Marked from sogeBot'): Promis
       }
     }
   }
+  return null;
 }
