@@ -15,9 +15,6 @@ import client from '~/services/twitch/api/client';
 import stats from '~/stats';
 import { variables } from '~/watchers';
 
-let curRetries = 0;
-const maxRetries = 3;
-
 export async function getCurrentStream (opts: any) {
   if (isDebugEnabled('api.calls')) {
     debug('api.calls', new Error().stack);
@@ -66,12 +63,7 @@ export async function getCurrentStream (opts: any) {
         currentWatched:     apiStats.value.currentWatchedTime,
       });
     } else {
-      if (isStreamOnline.value && curRetries < maxRetries) {
-        // retry if it is not just some network / twitch issue
-        curRetries++;
-      } else {
-        stream.end();
-      }
+      stream.end();
     }
   } catch (e) {
     if (e instanceof Error) {
