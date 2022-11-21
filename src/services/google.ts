@@ -175,7 +175,7 @@ class Google extends Service {
 
         if (stream && stream.snippet) {
           const currentTitle = stats.value.currentTitle || 'n/a';
-          if (stream.snippet.title !== currentTitle) {
+          if (stream.snippet.title !== currentTitle && isStreamOnline.value) {
             info(`YOUTUBE: Title is not matching current title, changing by bot to "${currentTitle}"`);
             await this.updateTitle(stream, currentTitle);
           }
