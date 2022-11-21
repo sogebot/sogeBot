@@ -697,13 +697,13 @@ class Module {
         } else {
           for (const [k2, v2] of Object.entries(v)) {
             if (typeof v2 !== 'undefined') {
-              if (typeof v2.if === 'function') {
-                if (!v2.if()) {
+              if (typeof (v2 as any).if === 'function') {
+                if (!(v2 as any).if()) {
                   delete (ui as any)[k][k2];
                 }
               }
-              if (typeof v2.values === 'function') {
-                v2.values = v2.values();
+              if (typeof (v2 as any).values === 'function') {
+                (v2 as any).values = (v2 as any).values();
               }
             }
           }
