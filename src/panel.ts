@@ -115,15 +115,6 @@ class Panel extends Core {
 
     setServer();
 
-    // get settings
-    app?.get('/api/settings/:type', adminMiddleware, async (req, res) => {
-      const settings: Record<string, any> = {};
-      for (const item of list(req.params.type)) {
-        settings[item.__moduleName__.toLowerCase()] = await item.getAllSettings(true);
-      }
-      res.header('content-type', 'application/json').status(200).send(JSON.stringify(settings));
-    });
-
     // highlights system
     app?.get('/highlights/:id', (req, res) => {
       highlights.url(req, res);
