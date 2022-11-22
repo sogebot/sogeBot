@@ -58,7 +58,7 @@ import { getGameThumbnailFromName } from '~/services/twitch/calls/getGameThumbna
 import { sendGameFromTwitch } from '~/services/twitch/calls/sendGameFromTwitch';
 import { setTags } from '~/services/twitch/calls/setTags';
 import { setTitleAndGame } from '~/services/twitch/calls/setTitleAndGame';
-import { adminMiddleware, default as socketSystem } from '~/socket';
+import { default as socketSystem } from '~/socket';
 import highlights from '~/systems/highlights';
 import songs from '~/systems/songs';
 import translateLib, { translate } from '~/translate';
