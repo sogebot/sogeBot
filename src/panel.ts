@@ -58,7 +58,7 @@ import { getGameThumbnailFromName } from '~/services/twitch/calls/getGameThumbna
 import { sendGameFromTwitch } from '~/services/twitch/calls/sendGameFromTwitch';
 import { setTags } from '~/services/twitch/calls/setTags';
 import { setTitleAndGame } from '~/services/twitch/calls/setTitleAndGame';
-import { default as socketSystem } from '~/socket';
+import { adminMiddleware, default as socketSystem } from '~/socket';
 import highlights from '~/systems/highlights';
 import songs from '~/systems/songs';
 import translateLib, { translate } from '~/translate';
@@ -114,6 +114,15 @@ class Panel extends Core {
     app?.use(express.raw());
 
     setServer();
+
+    // get settings
+    app?.get('/api/settings/:type', adminMiddleware, async (req, res) => {
+      const settings: Record<string, any> = {};
+      for (const item of list(req.params.type)) {
+        settings[item.__moduleName__.toLowerCase()] = await item.getAllSettings(true);
+      }
+      res.header('content-type', 'application/json').status(200).send(JSON.stringify(settings));
+    });
 
     // highlights system
     app?.get('/highlights/:id', (req, res) => {
