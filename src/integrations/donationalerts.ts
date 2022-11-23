@@ -180,7 +180,6 @@ class Donationalerts extends Integration {
     adminEndpoint('/integrations/donationalerts', 'donationalerts::token', async (tokens, cb) => {
       self.access_token = tokens.accessToken;
       self.refresh_token = tokens.refreshToken;
-      await this.connect();
       cb(null);
     });
   }
