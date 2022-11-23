@@ -77,8 +77,10 @@ class Donationalerts extends Integration {
   @persistent()
     afterDate = 0;
 
-  channel = '';
   isRefreshing = false;
+
+  @settings()
+    channel = '';
 
   @settings()
     access_token = '';
