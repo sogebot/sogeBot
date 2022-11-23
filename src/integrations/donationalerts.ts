@@ -170,6 +170,13 @@ class Donationalerts extends Integration {
         cb(null);
       }).catch((e: unknown) => cb(e as Error));
     });
+    adminEndpoint('/integrations/donationalerts', 'donationalerts::revoke', async (cb) => {
+      self.channel = '';
+      self.refresh_token = '';
+      self.access_token = '';
+      info(`DONATIONALERTS: User access revoked.`);
+      cb(null);
+    });
   }
 
   @onStartup()
@@ -289,4 +296,5 @@ class Donationalerts extends Integration {
   }
 }
 
-export default new Donationalerts();
+const self = new Donationalerts();
+export default self;
