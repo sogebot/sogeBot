@@ -140,6 +140,7 @@ export type ClientToServerEventsWithNamespace = {
   '/integrations/donationalerts': GenericEvents & {
     'donationalerts::validate': (token: string, cb: (err: Error | string | null) => void) => void,
     'donationalerts::revoke': (cb: (err: Error | string | null) => void) => void,
+    'donationalerts::token': (data: { accessToken: string, refreshToken: string }, cb: (err: Error | string | null) => void) => void,
   },
   '/integrations/pubg': GenericEvents & {
     'pubg::searchForseasonId': (data: { apiKey: string, platform: string }, cb: (err: Error | string | null, data: null | { data: any[] }) => void) => void,

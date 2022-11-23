@@ -91,7 +91,7 @@ class Donationalerts extends Integration {
   @onStartup()
   interval() {
     setInterval(async () => {
-      if (this.channel.length === 0) {
+      if (this.channel.length === 0 || !this.enabled) {
         return;
       }
 
@@ -132,7 +132,7 @@ class Donationalerts extends Integration {
         'expires_in': number,
         'refresh_token': string,
       }>({
-        url:     'https://www.sogebot.xyz/.netlify/functions/donationalerts',
+        url:     'https://donationalerts.soge.workers.dev',
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
         data:    { refreshToken: this.refresh_token },
@@ -177,21 +177,19 @@ class Donationalerts extends Integration {
       info(`DONATIONALERTS: User access revoked.`);
       cb(null);
     });
+    adminEndpoint('/integrations/donationalerts', 'donationalerts::token', async (tokens, cb) => {
+      self.access_token = tokens.accessToken;
+      self.refresh_token = tokens.refreshToken;
+      await this.connect();
+      cb(null);
+    });
   }
 
   @onStartup()
   @onChange('enabled')
-  onStateChange (key: string, val: boolean) {
-    if (val) {
-      this.connect();
-    } else {
-      this.channel = '';
-    }
-  }
-
   @onChange('access_token')
   async connect () {
-    if (this.access_token.trim() === '' || !this.enabled) {
+    if (this.access_token.trim() === '') {
       this.channel = '';
       return;
     }
