@@ -5,7 +5,7 @@ import chalk from 'chalk';
 import { getRepository } from 'typeorm';
 
 import { persistent, settings } from '../decorators';
-import { onChange, onStartup } from '../decorators/on.js';
+import { onStartup } from '../decorators/on.js';
 import eventlist from '../overlays/eventlist.js';
 import alerts from '../registries/alerts.js';
 import users from '../users.js';
