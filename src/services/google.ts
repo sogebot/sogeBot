@@ -331,13 +331,13 @@ class Google extends Service {
       return;
     }
 
-    adminEndpoint('/integrations/google', 'google::revoke', async (cb) => {
+    adminEndpoint('/services/google', 'google::revoke', async (cb) => {
       self.channel = '';
       self.refreshToken = '';
       info(`YOUTUBE: User access revoked.`);
       cb(null);
     });
-    adminEndpoint('/integrations/google', 'google::token', async (tokens, cb) => {
+    adminEndpoint('/services/google', 'google::token', async (tokens, cb) => {
       self.refreshToken = tokens.refreshToken;
       cb(null);
     });

@@ -137,7 +137,7 @@ export type ClientToServerEventsWithNamespace = {
     'discord::authorize': (cb: (err: Error | string | null, action?: null | { do: 'redirect', opts: any[] } ) => void) => void,
   },
   '/integrations/kofi': GenericEvents,
-  '/integrations/google': GenericEvents & {
+  '/services/google': GenericEvents & {
     'google::revoke': (cb: (err: Error | string | null) => void) => void,
     'google::token': (data: { refreshToken: string }, cb: (err: Error | string | null) => void) => void,
   },
