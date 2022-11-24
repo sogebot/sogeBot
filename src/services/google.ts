@@ -16,14 +16,14 @@ import {
   stats,
   streamStatusChangeSince,
 } from '~/helpers/api';
-import { settings } from '~/decorators';
+import { persistent, settings } from '~/decorators';
 import { getLang } from '~/helpers/locales';
 import { getTime } from '@sogebot/ui-helpers/getTime';
+import { adminEndpoint } from '~/helpers/socket';
 
 class Google extends Service {
-  @settings()
-    clientId = '';
-  @settings()
+  clientId = '225380804535-gjd77dplfkbe4d3ct173d8qm0j83f8tr.apps.googleusercontent.com';
+  @persistent()
     refreshToken = '';
   @settings()
     channel = '';
@@ -120,10 +120,9 @@ class Google extends Service {
   }
 
   @onChange('refreshToken')
-  @onChange('clientId')
   @onStartup()
   async onStartup() {
-    if (this.refreshToken.length === 0 || this.clientId.length === 0) {
+    if (this.refreshToken.length === 0) {
       return;
     }
 
@@ -332,6 +331,17 @@ class Google extends Service {
       return;
     }
 
+    adminEndpoint('/integrations/google', 'google::revoke', async (cb) => {
+      self.channel = '';
+      self.refreshToken = '';
+      info(`YOUTUBE: User access revoked.`);
+      cb(null);
+    });
+    adminEndpoint('/integrations/google', 'google::token', async (tokens, cb) => {
+      self.refreshToken = tokens.refreshToken;
+      cb(null);
+    });
+
     app.get('/api/services/google/privatekeys', adminMiddleware, async (req, res) => {
       res.send({
         data: await getRepository(GooglePrivateKeys).find(),
@@ -367,5 +377,5 @@ class Google extends Service {
     });
   }
 }
-
-export default new Google();
+const self = new Google();
+export default self;
