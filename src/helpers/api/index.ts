@@ -3,7 +3,6 @@ export * from './chatMessagesAtStart';
 export * from './currentStreamTags';
 export * from './gameOrTitleChangedManually';
 export * from './getToken';
-export * from './getClientId';
 export * from './isStreamOnline';
 // exclude from index
 // export * from './parseTitle';

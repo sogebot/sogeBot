@@ -5,7 +5,6 @@ import { variables } from '../../../watchers.js';
 import { expirationDate, validate } from './validate.js';
 
 export class CustomAuthProvider implements AuthProvider {
-  @Enumerable(false) private _clientId: string;
   @Enumerable(false) private _accessToken: AccessToken;
 
   readonly typeOfToken: 'broadcaster' | 'bot';
@@ -16,7 +15,6 @@ export class CustomAuthProvider implements AuthProvider {
   ) {
     this.typeOfToken = type;
     this._accessToken = variables.get(`services.twitch.${this.typeOfToken}AccessToken`);
-    this._clientId = variables.get(`services.twitch.${this.typeOfToken}ClientId`);
   }
 
   async getAccessToken(requestedScopes?: string[]): Promise<AccessToken | null> {
@@ -41,8 +39,7 @@ export class CustomAuthProvider implements AuthProvider {
 	 * The client ID.
 	 */
   get clientId(): string {
-    this._clientId = variables.get(`services.twitch.${this.typeOfToken}ClientId`);
-    return this._clientId;
+    return '89k6demxtifvq0vzgjpvr1mykxaqmf'; // sogebot generator clientid;
   }
 
   /**

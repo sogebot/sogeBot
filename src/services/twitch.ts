@@ -40,9 +40,11 @@ import { isIgnored } from '~/helpers/user/isIgnored';
 import { sendGameFromTwitch } from '~/services/twitch/calls/sendGameFromTwitch';
 import { setTitleAndGame } from '~/services/twitch/calls/setTitleAndGame';
 import { translate } from '~/translate';
+import { capitalize } from 'lodash';
 
 const urls = {
-  'SogeBot Token Generator': 'https://twitch-token-generator.soge.workers.dev/refresh/',
+  'SogeBot Token Generator':    'https://twitch-token-generator.soge.workers.dev/refresh/',
+  'SogeBot Token Generator v2': 'https://credentials.sogebot.xyz/twitch/refresh/',
 };
 const markerEvents = new Set<string>();
 
@@ -74,11 +76,6 @@ class Twitch extends Service {
     mute = false;
   @settings('chat')
     whisperListener = false;
-
-  @settings('bot')
-    botClientId = '';
-  @settings('broadcaster')
-    broadcasterClientId = '';
 
   @settings('general')
     tokenService: keyof typeof urls = 'SogeBot Token Generator';
@@ -257,6 +254,8 @@ class Twitch extends Service {
     if (!this.generalOwners.includes(value)) {
       this.generalOwners.push(value);
     }
+    this.tmi?.part('bot').then(() => this.tmi?.join('bot', this.broadcasterUsername));
+    this.tmi?.part('broadcaster').then(() => this.tmi?.join('broadcaster', this.broadcasterUsername));
   }
 
   @onStartup()
@@ -351,6 +350,32 @@ class Twitch extends Service {
       } catch (e: any) {
         cb(e.stack, '');
       }
+    });
+    adminEndpoint('/services/twitch', 'twitch::revoke', async ({ accountType }, cb) => {
+      if (accountType === 'bot') {
+        this.botRefreshToken = '';
+        this.botAccessToken = '';
+        this.botCurrentScopes = [];
+        this.botId = '';
+        this.botTokenValid = false;
+        this.botUsername = '';
+      } else {
+        this.broadcasterRefreshToken = '';
+        this.broadcasterAccessToken = '';
+        this.broadcasterCurrentScopes = [];
+        this.broadcasterId = '';
+        this.broadcasterTokenValid = false;
+        this.broadcasterUsername = '';
+      }
+      info(`TWITCH: ${capitalize(accountType)} access revoked.`);
+      cb(null);
+    });
+    adminEndpoint('/services/twitch', 'twitch::token', async ({ accessToken, refreshToken, accountType }, cb) => {
+      emitter.emit('set', '/services/twitch', `tokenService`, 'SogeBot Token Generator v2');
+      emitter.emit('set', '/services/twitch', `${accountType}RefreshToken`, refreshToken);
+      emitter.emit('set', '/services/twitch', `${accountType}AccessToken`, accessToken);
+      await validate(accountType);
+      cb(null);
     });
   }
 

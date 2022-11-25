@@ -91,9 +91,12 @@ class Panel extends Core {
     server.listen(port, '::');
     server.listen(port, '0.0.0.0', () => {
       info(`WebPanel is available at http://localhost:${port}`);
+      info(`New dashboard is available at https://dash.sogebot.xyz/?server=http://localhost:${port}`);
     });
     serverSecure?.listen(secureport, '0.0.0.0', () => {
       info(`WebPanel is available at https://localhost:${secureport}`);
+      info(`New dashboard is available at https://dash.sogebot.xyz/?server=https://localhost:${port}`);
+
     });
   }
 

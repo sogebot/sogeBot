@@ -290,6 +290,8 @@ export type ClientToServerEventsWithNamespace = {
     'hypetrain-update': (data: { level: number, goal: number, total: number, subs: Record<string, string>}) => void,
     'eventsub::reset': () => void,
     'broadcaster': (cb: (error: Error | string | null, username: string) => void) => void,
+    'twitch::revoke': (data: { accountType: 'bot' | 'broadcaster' }, cb: (err: Error | string | null) => void) => void,
+    'twitch::token': (data: { accessToken: string, refreshToken: string, accountType: 'bot' | 'broadcaster' }, cb: (err: Error | string | null) => void) => void,
   },
   '/core/socket': GenericEvents & {
     'purgeAllConnections': (cb: (error: Error | string | null) => void, socket?: Socket) => void,

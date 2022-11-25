@@ -3,7 +3,8 @@ import fetch from 'node-fetch';
 import { QueryRunner } from 'typeorm';
 
 const urls = {
-  'SogeBot Token Generator': 'https://twitch-token-generator.soge.workers.dev/refresh/',
+  'SogeBot Token Generator':    'https://twitch-token-generator.soge.workers.dev/refresh/',
+  'SogeBot Token Generator v2': 'https://credentials.sogebot.xyz/twitch/refresh/',
 };
 let accessToken: null | string = null;
 

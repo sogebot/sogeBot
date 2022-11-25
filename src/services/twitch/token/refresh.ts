@@ -32,7 +32,8 @@ setInterval(() => {
 }, 4500);
 
 const urls = {
-  'SogeBot Token Generator': 'https://twitch-token-generator.soge.workers.dev/refresh/',
+  'SogeBot Token Generator':    'https://credentials.sogebot.xyz/twitch/refresh/',
+  'SogeBot Token Generator v2': 'https://credentials.sogebot.xyz/twitch/refresh/',
 };
 
 /*
@@ -108,10 +109,10 @@ export const refresh = async (type: 'bot' | 'broadcaster'): Promise<string | nul
           'SogeBot-Channel': channel,
           'SogeBot-Owners':  generalOwners.join(', '),
         },
-      }) as any;
+      });
       debug('oauth.validate', urls[tokenService] + ' =>');
       debug('oauth.validate', JSON.stringify(request.data, null, 2));
-      if (!request.data.success) {
+      if (request.status === 400) {
         if (request.data.message.includes('Invalid refresh token received')) {
           warning(`Invalid refresh token for ${type}. Please reset your token.`);
           addUIError({
@@ -123,25 +124,25 @@ export const refresh = async (type: 'bot' | 'broadcaster'): Promise<string | nul
         }
         throw new Error(`Token refresh for ${type}: ${request.data.message}`);
       }
-      if (typeof request.data.token !== 'string' || request.data.token.length === 0) {
+      if (typeof request.data.access_token !== 'string' || request.data.access_token.length === 0) {
         throw new Error(`Access token for ${type} was not correctly fetched (not a string)`);
       }
-      if (typeof request.data.refresh !== 'string' || request.data.refresh.length === 0) {
+      if (typeof request.data.refresh_token !== 'string' || request.data.refresh_token.length === 0) {
         throw new Error(`Refresh token for ${type} was not correctly fetched (not a string)`);
       }
 
-      emitter.emit('set', '/services/twitch', `${type}AccessToken`, request.data.token);
-      emitter.emit('set', '/services/twitch', `${type}RefreshToken`, request.data.refresh);
+      emitter.emit('set', '/services/twitch', `${type}AccessToken`, request.data.access_token);
+      emitter.emit('set', '/services/twitch', `${type}RefreshToken`, request.data.refresh_token);
       emitter.emit('services::twitch::api::init', type);
 
       debug('oauth.validate', 'Access token of ' + type + ' was refreshed.');
-      debug('oauth.validate', 'New access token of ' + type + ': ' + request.data.token.replace(/(.{25})/, '*'.repeat(25)));
-      debug('oauth.validate', 'New refresh token of ' + type + ': ' + request.data.refresh.replace(/(.{45})/, '*'.repeat(45)));
+      debug('oauth.validate', 'New access token of ' + type + ': ' + request.data.access_token.replace(/(.{25})/, '*'.repeat(25)));
+      debug('oauth.validate', 'New refresh token of ' + type + ': ' + request.data.refresh_token.replace(/(.{45})/, '*'.repeat(45)));
 
       errorCount[type] = 0;
       emitter.emit('set', '/services/twitch', `${type}TokenValid`, true);
 
-      return request.data.token;
+      return request.data.access_token;
     }
   } catch (e) {
     if (e instanceof Error && (e.message.includes('ETIMEDOUT') || e.message.includes('EHOSTUNREACH'))) {

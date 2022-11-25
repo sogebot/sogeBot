@@ -53,6 +53,8 @@ import users from '~/users';
 import { variables } from '~/watchers';
 import joinpart from '~/widgets/joinpart';
 
+let _connected_channel = '';
+
 const ignoreGiftsFromUser = new Map<string, number>();
 const commandRegexp = new RegExp(/^!\w+$/);
 class Chat {
@@ -198,6 +200,7 @@ class Chat {
   }
 
   async join (type: 'bot' | 'broadcaster', channel: string) {
+    _connected_channel = channel;
     const client = this.client[type];
     if (!client) {
       info(`TMI: ${type} oauth is not properly set, cannot join`);
@@ -243,13 +246,12 @@ class Chat {
   }
 
   async part (type: 'bot' | 'broadcaster') {
-    const broadcasterUsername = variables.get('services.twitch.broadcasterUsername') as string;
     const client = this.client[type];
     if (!client) {
       info(`TMI: ${type} is not connected in any channel`);
     } else {
-      await client.part(broadcasterUsername);
-      info(`TMI: ${type} parted channel ${broadcasterUsername}`);
+      await client.part(_connected_channel);
+      info(`TMI: ${type} parted channel ${_connected_channel}`);
     }
   }
 

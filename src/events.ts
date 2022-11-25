@@ -359,6 +359,7 @@ class Events extends Core {
   }
 
   public async fireBotWillLeaveChannel() {
+    
     tmiEmitter.emit('part', 'bot');
     // force all users offline
     await changelog.flush();
