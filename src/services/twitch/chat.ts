@@ -246,6 +246,9 @@ class Chat {
   }
 
   async part (type: 'bot' | 'broadcaster') {
+    if (_connected_channel.length === 0) {
+      return;
+    }
     const client = this.client[type];
     if (!client) {
       info(`TMI: ${type} is not connected in any channel`);

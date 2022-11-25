@@ -254,8 +254,8 @@ class Twitch extends Service {
     if (!this.generalOwners.includes(value)) {
       this.generalOwners.push(value);
     }
-    this.tmi?.part('bot').then(() => this.tmi?.join('bot', this.broadcasterUsername));
-    this.tmi?.part('broadcaster').then(() => this.tmi?.join('broadcaster', this.broadcasterUsername));
+    this.tmi?.part('bot').then(() => this.tmi?.join('bot', value));
+    this.tmi?.part('broadcaster').then(() => this.tmi?.join('broadcaster', value));
   }
 
   @onStartup()
