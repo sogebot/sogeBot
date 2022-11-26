@@ -132,7 +132,7 @@ class Donationalerts extends Integration {
         'expires_in': number,
         'refresh_token': string,
       }>({
-        url:     'https://donationalerts.soge.workers.dev',
+        url:     'https://credentials.sogebot.xyz/donationalerts',
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
         data:    { refreshToken: this.refresh_token },
