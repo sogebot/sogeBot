@@ -4,6 +4,7 @@ import { app } from '~/helpers/panel';
 import { adminMiddleware } from '~/socket';
 import { onChange, onStartup, onStreamEnd, onStreamStart } from '~/decorators/on';
 import Service from './_interface';
+import { dayjs } from '@sogebot/ui-helpers/dayjsHelper';
 
 import { google, youtube_v3 } from 'googleapis';
 import { error, info } from '~/helpers/log';
@@ -185,7 +186,7 @@ class Google extends Service {
           && (this.gamesPlayedOnStream.length === 0 || this.gamesPlayedOnStream[this.gamesPlayedOnStream.length - 1].game !== stats.value.currentGame)) {
           this.gamesPlayedOnStream.push({
             game:    stats.value.currentGame,
-            seconds: (Date.now() - streamStatusChangeSince.value) / 1000,
+            seconds: (Date.now() / 1000 - Number(dayjs.utc(streamStatusChangeSince.value).unix())),
           });
         }
       }, MINUTE);
