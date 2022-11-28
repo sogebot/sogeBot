@@ -32,7 +32,7 @@ setInterval(() => {
 }, 4500);
 
 const urls = {
-  'SogeBot Token Generator':    'https://credentials.sogebot.xyz/twitch/refresh/',
+  'SogeBot Token Generator':    'https://twitch-token-generator.soge.workers.dev/refresh/',
   'SogeBot Token Generator v2': 'https://credentials.sogebot.xyz/twitch/refresh/',
 };
 
