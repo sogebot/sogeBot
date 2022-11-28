@@ -30,9 +30,7 @@ class PUBG extends Integration {
   @settings('player')
   @ui({ type: 'pubg-player-id' }, 'player')
     playerId = '';
-  @settings('player')
-  @ui({ type: 'pubg-season-id' }, 'player')
-    seasonId = '';
+  seasonId = '';
   @persistent()
     _lastSeasonIdFetch = 0;
 
@@ -71,7 +69,7 @@ class PUBG extends Integration {
   @onChange('platform')
   @onStartup()
   async fetchSeasonId() {
-    if (this.enabled && this.apiKey.length > 0) {
+    if (this.apiKey.length > 0) {
       this._lastSeasonIdFetch = Date.now();
       const request = await axios.get<any>(
         `https://api.pubg.com/shards/${this.platform}/seasons`,
@@ -87,16 +85,16 @@ class PUBG extends Integration {
           this.seasonId = season.id;
           if (this.seasonId !== season.id) {
             info(`PUBG: current season set automatically to ${season.id}`);
+            this.fetchUserStats(true);
+            this.fetchUserStats(false);
           }
         }
       }
     }
   }
-  @onChange('enabled')
-  @onChange('platform')
-  @onStartup()
+
   async fetchUserStats(ranked = false) {
-    if (this.enabled && this.apiKey.length > 0 && this.seasonId.length > 0 && this.playerId.length > 0) {
+    if (this.apiKey.length > 0 && this.seasonId.length > 0 && this.playerId.length > 0) {
       if (ranked) {
         this._lastRankedGameModeStats = Date.now();
       } else {
