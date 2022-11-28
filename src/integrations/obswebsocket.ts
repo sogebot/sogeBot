@@ -1,56 +1,27 @@
 import { Events } from '@entity/event';
 import { OBSWebsocket as OBSWebsocketEntity } from '@entity/obswebsocket';
-import { SECOND } from '@sogebot/ui-helpers/constants';
 import { EntityNotFoundError } from 'typeorm';
 import { getRepository } from 'typeorm';
-import { v4 } from 'uuid';
 
 import {
-  command, default_permission, settings, ui,
+  command, default_permission,
 } from '../decorators';
-import { onChange, onStartup } from '../decorators/on';
+import { onStartup } from '../decorators/on';
 import events from '../events';
 import Expects from '../expects';
 import Integration from './_interface';
 
 import { eventEmitter } from '~/helpers/events';
 import {
-  error, info, warning,
+  error, info,
 } from '~/helpers/log';
-import { obs } from '~/helpers/obswebsocket/client';
-import { switchScenes, inputMuted } from '~/helpers/obswebsocket/listeners';
-import { taskRunner } from '~/helpers/obswebsocket/taskrunner';
 import { app, ioServer } from '~/helpers/panel';
 import { ParameterError } from '~/helpers/parameterError';
 import { defaultPermissions } from '~/helpers/permissions';
 import { adminEndpoint, publicEndpoint } from '~/helpers/socket';
 import { translate } from '~/translate';
 
-let reconnectingTimeout: null | NodeJS.Timeout = null;
-
 class OBSWebsocket extends Integration {
-  reconnecting = false;
-  enableHeartBeat = false;
-
-  endpoint = v4();
-
-  @settings('connection')
-  @ui({ type: 'selector', values: ['direct', 'overlay'] })
-    accessBy: 'direct' | 'overlay' = 'overlay';
-  @settings('connection')
-    address = 'wss://localhost:4455';
-  @settings('connection')
-    password = '';
-
-  @onStartup()
-  @onChange('accessBy')
-  @onChange('address')
-  @onChange('password')
-  @onChange('enabled')
-  async onLoadAccessBy() {
-    this.initOBSWebsocket();
-  }
-
   @onStartup()
   addEvent() {
     if (typeof events === 'undefined') {
@@ -82,7 +53,6 @@ class OBSWebsocket extends Integration {
   }
 
   protected async eventIsProperlyFiltered(event: any, attributes: Events.Attributes): Promise<boolean> {
-    const isDirect = attributes.isDirect;
     const isTriggeredByCorrectOverlay = (function triggeredByCorrectOverlayCheck () {
       const match = new RegExp('[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}').exec(attributes.linkFilter);
       if (match) {
@@ -92,52 +62,7 @@ class OBSWebsocket extends Integration {
         return false;
       }
     })();
-    return isDirect || isTriggeredByCorrectOverlay;
-  }
-
-  async initOBSWebsocket(isHeartBeat = false) {
-    obs.disconnect();
-    if (this.enabled) {
-      if (this.accessBy === 'direct') {
-        reconnectingTimeout = null; // free up setTimeout
-
-        isHeartBeat || this.reconnecting ? null : info('OBSWEBSOCKET: Connecting using direct access from bot.');
-        try {
-          if (this.password === '') {
-            await obs.connect(this.address);
-          } else {
-            await obs.connect(this.address, this.password);
-          }
-          info(isHeartBeat ? 'OBSWEBSOCKET: Reconnected OK!' : 'OBSWEBSOCKET: Connected OK!');
-
-          // add listeners
-          switchScenes(obs);
-          inputMuted(obs);
-
-          this.reconnecting = false;
-          this.enableHeartBeat = true;
-        } catch (e: any) {
-          this.enableHeartBeat = false;
-          if (e.code === 'CONNECTION_ERROR') {
-            if (!this.reconnecting && !isHeartBeat) {
-              warning(`OBSWEBSOCKET: Couldn't connect to OBS Websockets. Will be periodically trying to connect.`);
-              this.reconnecting = true;
-            }
-
-            if (!reconnectingTimeout) { // run timeout only once (race condition with heartBeat)
-              reconnectingTimeout = setTimeout(() => this.initOBSWebsocket(isHeartBeat), 10 * SECOND);
-            }
-          } else if (e.error === 'Authentication Failed.') {
-            error(`OBSWEBSOCKET: Authentication Failed to OBS Websocket. Please check your credentials.`);
-          } else {
-            error(e);
-          }
-        }
-      } else {
-        this.enableHeartBeat = false;
-        info('OBSWEBSOCKET: Integration is enabled, but you need to use overlay to connect to OBS Websocket.');
-      }
-    }
+    return isTriggeredByCorrectOverlay;
   }
 
   @onStartup()
@@ -145,24 +70,6 @@ class OBSWebsocket extends Integration {
     this.addMenu({
       category: 'registry', name: 'obswebsocket', id: 'registry/obswebsocket', this: null,
     });
-  }
-
-  @onStartup()
-  async heartBeat() {
-    try {
-      if (this.enabled && this.accessBy === 'direct' && !this.reconnecting && this.enableHeartBeat) {
-        // getting just stream status to check connection
-        await obs.call('GetStreamStatus');
-      }
-    } catch {
-      // try to reconnect on error (connection lost, OBS is not running)
-      if (!this.reconnecting) {
-        warning(`OBSWEBSOCKET: Lost connection to OBS Websockets. Will be periodically trying to reconnect.`);
-        this.initOBSWebsocket(true);
-      }
-    } finally {
-      setTimeout(() => this.heartBeat(), 10 * SECOND);
-    }
   }
 
   @onStartup()
@@ -183,12 +90,6 @@ class OBSWebsocket extends Integration {
   }
 
   sockets() {
-    publicEndpoint('/', 'integration::obswebsocket::values', (cb) => {
-      cb({
-        address:  this.address,
-        password: this.password,
-      });
-    });
     adminEndpoint('/', 'integration::obswebsocket::trigger', (data, cb) => {
       this.triggerTask(data.code, data.attributes)
         .then(() => cb(null))
@@ -216,7 +117,6 @@ class OBSWebsocket extends Integration {
     publicEndpoint('/', 'integration::obswebsocket::event', (opts) => {
       const { type, location, ...data } = opts;
       eventEmitter.emit(type, {
-        isDirect:   false,
         linkFilter: location,
         ...data,
       });
@@ -224,20 +124,16 @@ class OBSWebsocket extends Integration {
   }
 
   async triggerTask(code: string, attributes?: Events.Attributes) {
-    if (this.accessBy === 'direct') {
-      await taskRunner(obs, { code, attributes });
-    } else {
-      await new Promise((resolve, reject) => {
-        // we need to send on all sockets on /
-        const sockets = ioServer?.of('/').sockets;
-        if (sockets) {
-          for (const socket of sockets.values()) {
-            socket.emit('integration::obswebsocket::trigger', { code, attributes }, () => resolve(true));
-          }
+    await new Promise((resolve, reject) => {
+      // we need to send on all sockets on /
+      const sockets = ioServer?.of('/').sockets;
+      if (sockets) {
+        for (const socket of sockets.values()) {
+          socket.emit('integration::obswebsocket::trigger', { code, attributes }, () => resolve(true));
         }
-        setTimeout(() => reject('Test timed out. Please check if your overlay is opened.'), 10000);
-      });
-    }
+      }
+      setTimeout(() => reject('Test timed out. Please check if your overlay is opened.'), 10000);
+    });
   }
 
   @command('!obsws run')

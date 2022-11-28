@@ -76,8 +76,8 @@ interface Events {
   // Twitter integration
   'tweet-post-with-hashtag': (opts: { tweet: any }) => void;
   // OBS Websocket integration
-  'obs-scene-changed': (opts: { sceneName: string, isDirect: boolean; linkFilter: string }) => void;
-  'obs-input-mute-state-changed': (opts: { inputName: string; inputMuted: boolean; linkFilter: string, isDirect: boolean; }) => void;
+  'obs-scene-changed': (opts: { sceneName: string, linkFilter: string }) => void;
+  'obs-input-mute-state-changed': (opts: { inputName: string; inputMuted: boolean; linkFilter: string }) => void;
 }
 
 class _EventEmitter extends TypedEmitter<Events> {}

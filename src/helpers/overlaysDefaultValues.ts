@@ -207,7 +207,7 @@ const values = {
     inactivityTime:      5000,
     align:               'top',
   },
-  obswebsocket: { allowedIPs: [] },
+  obswebsocket: { allowedIPs: [], password: '', address: 'wss://localhost:4455' },
   group:        {
     canvas: {
       height: 1080,
