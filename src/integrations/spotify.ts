@@ -77,7 +77,7 @@ class Spotify extends Integration {
   @settings('connection')
     clientSecret = '';
   @settings('connection')
-    redirectURI = 'http://localhost:20000/credentials/oauth/spotify';
+    redirectURI = 'http://localhost:20000/credentials/oauth/spotify'; // TODO: remove after old ui is removed
   @settings('connection')
     username = '';
 
@@ -441,7 +441,7 @@ class Spotify extends Integration {
         cb(null, await SpotifySongBan.find(where));
       }
     });
-    adminEndpoint('/integrations/spotify', 'spotify::code', async (token, cb) => {
+    const setCode = async (token: string, cb: any) => {
       const waitForUsername = () => {
         return new Promise((resolve) => {
           const check = async () => {
@@ -469,6 +469,13 @@ class Spotify extends Integration {
       await waitForUsername();
       setTimeout(10000).then(() => this.isUnauthorized = false);
       cb(null, true);
+    };
+    adminEndpoint('/integrations/spotify', 'code', async (token, cb) => {
+      this.redirectURI = 'https://dash.sogebot.xyz/credentials/spotify';
+      setCode(token, cb);
+    });
+    adminEndpoint('/integrations/spotify', 'spotify::code', async (token, cb) => {
+      setCode(token, cb);
     });
     adminEndpoint('/integrations/spotify', 'spotify::revoke', async (cb) => {
       clearTimeout(this.timeouts.IRefreshToken);

@@ -158,6 +158,7 @@ export type ClientToServerEventsWithNamespace = {
     'tiltify::revoke': (cb: (err: Error | string | null) => void) => void,
   },
   '/integrations/spotify': GenericEvents & {
+    'code': (token: string, cb: (err: Error | string | null, state: boolean) => void) => void,
     'spotify::revoke': (cb: (err: Error | string | null, opts?: { do: 'refresh' }) => void) => void,
     'spotify::authorize': (cb: (err: Error | string | null, action?: null | { do: 'redirect', opts: any[] }) => void) => void,
     'spotify::state': (cb: (err: Error | string | null, state: string) => void) => void,
