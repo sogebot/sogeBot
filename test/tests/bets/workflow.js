@@ -5,7 +5,7 @@ require('../../general.js');
 const assert = require('assert');
 
 const _ = require('lodash');
-const { getRepository } = require('typeorm');
+const { AppDataSource } = require('../../../dest/database.js');
 
 const { Bets } = require('../../../dest/database/entity/bets');
 const { User } = require('../../../dest/database/entity/user');
@@ -165,7 +165,7 @@ describe('Bets - @func3 - workflow()', () => {
 
           for (const bet of t.bets) {
             it(`user ${bet.userName} will bet on ${bet.betOn + 1} ${bet.tickets} tickets`, async () => {
-              await getRepository(User).save({
+              await AppDataSource.getRepository(User).save({
                 userName: bet.userName , userId: bet.userId, points: 100,
               });
               await bets.participate({
@@ -185,7 +185,7 @@ describe('Bets - @func3 - workflow()', () => {
             if (t.win !== bet.betOn) {
               it(`LOST: user ${bet.userName} should have ${100 - bet.tickets} tickets`, async () => {
                 await changelog.flush();
-                const user = await getRepository(User).findOne({ userName: bet.userName , userId: bet.userId });
+                const user = await AppDataSource.getRepository(User).findOneBy({ userName: bet.userName , userId: bet.userId });
                 assert.strictEqual(user.points, 100 - bet.tickets);
               });
             } else {
@@ -193,7 +193,7 @@ describe('Bets - @func3 - workflow()', () => {
               const expected = 100 + Math.round(bet.tickets * percentGain);
               it(`WIN: user ${bet.userName} should have ${expected} tickets`, async () => {
                 await changelog.flush();
-                const user = await getRepository(User).findOne({ userName: bet.userName , userId: bet.userId });
+                const user = await AppDataSource.getRepository(User).findOneBy({ userName: bet.userName , userId: bet.userId });
                 assert.strictEqual(user.points, expected);
               });
             }

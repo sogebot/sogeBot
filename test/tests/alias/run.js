@@ -2,13 +2,13 @@
 
 
 const assert = require('assert');
+const { AppDataSource } = require('../../../dest/database');
 const { prepare } = (require('../../../dest/helpers/commons/prepare'));
 require('../../general.js');
 
 const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 
-const { getRepository } = require('typeorm');
 const { User } = require('../../../dest/database/entity/user');
 const alias = (require('../../../dest/systems/alias')).default;
 const duel = (require('../../../dest/games/duel')).default;
@@ -24,8 +24,8 @@ describe('Alias - @func1 - run()', () => {
     await db.cleanup();
     await message.prepare();
 
-    await getRepository(User).save({ userName: owner.userName, userId: owner.userId });
-    await getRepository(User).save({ userName: user.userName, userId: user.userId });
+    await AppDataSource.getRepository(User).save({ userName: owner.userName, userId: owner.userId });
+    await AppDataSource.getRepository(User).save({ userName: user.userName, userId: user.userId });
 
     duel.enabled = true;
     gamble.enabled = true;

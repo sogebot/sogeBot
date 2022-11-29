@@ -3,10 +3,10 @@
 
 require('../../general.js');
 const assert = require('assert');
-
-const { getRepository } = require('typeorm');
+const { IsNull } = require('typeorm');
 
 const commons = require('../../../dest/commons');
+const { AppDataSource } = require('../../../dest/database.js');
 const { Raffle } = require('../../../dest/database/entity/raffle');
 const { User } = require('../../../dest/database/entity/user');
 const changelog = (require('../../../dest/helpers/user/changelog'));
@@ -29,7 +29,7 @@ describe('Raffles - raffle with 1 point cannot over point #3546 - @func2', () =>
   });
 
   it('Update viewer to have 1 point', async () => {
-    await getRepository(User).save({
+    await AppDataSource.getRepository(User).save({
       userName: user.viewer.userName, userId: user.viewer.userId, points: 1,
     });
   });
@@ -40,9 +40,9 @@ describe('Raffles - raffle with 1 point cannot over point #3546 - @func2', () =>
   });
 
   it('expecting 1 participant to have bet of 1', async () => {
-    const raffle = await getRepository(Raffle).findOne({
+    const raffle = await AppDataSource.getRepository(Raffle).findOne({
       relations: ['participants'],
-      where:     { winner: null, isClosed: false },
+      where:     { winner: IsNull(), isClosed: false },
     });
     assert(raffle.participants.length === 1);
     assert(raffle.participants[0].tickets === 1);
@@ -54,9 +54,9 @@ describe('Raffles - raffle with 1 point cannot over point #3546 - @func2', () =>
   });
 
   it('expecting 1 participant to have bet of 1', async () => {
-    const raffle = await getRepository(Raffle).findOne({
+    const raffle = await AppDataSource.getRepository(Raffle).findOne({
       relations: ['participants'],
-      where:     { winner: null, isClosed: false },
+      where:     { winner: IsNull(), isClosed: false },
     });
     assert(raffle.participants.length === 1);
     assert(raffle.participants[0].tickets === 1);
@@ -64,7 +64,7 @@ describe('Raffles - raffle with 1 point cannot over point #3546 - @func2', () =>
 
   it('User should have 0 points', async () => {
     await changelog.flush();
-    const result = await getRepository(User).findOne({ userName: user.viewer.userName, userId: user.viewer.userId });
+    const result = await AppDataSource.getRepository(User).findOneBy({ userName: user.viewer.userName, userId: user.viewer.userId });
     assert(result.points === 0);
   });
 });

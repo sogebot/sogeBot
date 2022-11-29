@@ -8,7 +8,7 @@ const message = require('../../general.js').message;
 const owner = { userName: '__broadcaster__', userId: String(Math.floor(Math.random() * 100000)) };
 const someuser = { userName: 'someuser', userId: String(Math.floor(Math.random() * 100000)) };
 
-const { getRepository } = require('typeorm');
+const { AppDataSource } = require('../../../dest/database.js');
 const { User } = require('../../../dest/database/entity/user');
 
 const customcommands = (require('../../../dest/systems/customcommands')).default;
@@ -18,8 +18,8 @@ describe('Message - $touser filter - @func3', async () => {
     await db.cleanup();
     await message.prepare();
 
-    await getRepository(User).save(owner);
-    await getRepository(User).save(someuser);
+    await AppDataSource.getRepository(User).save(owner);
+    await AppDataSource.getRepository(User).save(someuser);
 
     await customcommands.add({ sender: owner, parameters: '-c !point -r $sender points to $touser'});
   });

@@ -10,7 +10,6 @@ const message = require('../../general.js').message;
 const timers = (require('../../../dest/systems/timers')).default;
 const isStreamOnline = (require('../../../dest/helpers/api/isStreamOnline')).isStreamOnline;
 
-const { getRepository } = require('typeorm');
 const { Timer, TimerResponse } = require('../../../dest/database/entity/timer');
 
 const { linesParsed } = require('../../../dest/helpers/parser');

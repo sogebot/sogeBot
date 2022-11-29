@@ -6,7 +6,7 @@ require('../../general.js');
 const assert = require('assert');
 
 const _ = require('lodash');
-const { getRepository } = require('typeorm');
+const { AppDataSource } = require('../../../dest/database.js');
 
 const { PointsChangelog } = require('../../../dest/database/entity/points');
 const { User } = require('../../../dest/database/entity/user');
@@ -25,7 +25,7 @@ describe('Points - undo() - @func', () => {
 
   describe('!point add command should be undoable', () => {
     it('create user', async () => {
-      await getRepository(User).save({
+      await AppDataSource.getRepository(User).save({
         userName: user.userName, userId: user.userId, points: 150,
       });
     });
@@ -37,12 +37,12 @@ describe('Points - undo() - @func', () => {
 
     it('User should have correctly added 100 points', async () => {
       await userChangelog.flush();
-      const updatedUser = await getRepository(User).findOne({ userName: user.userName });
+      const updatedUser = await AppDataSource.getRepository(User).findOneBy({ userName: user.userName });
       assert.strictEqual(updatedUser.points, 250);
     });
 
     it('Changelog should have 150 -> 250 log', async () => {
-      const changelog = await getRepository(PointsChangelog).findOne({ userId: user.userId });
+      const changelog = await AppDataSource.getRepository(PointsChangelog).findOneBy({ userId: user.userId });
       assert(typeof changelog !== 'undefined');
       assert.strictEqual(changelog.originalValue, 150);
       assert.strictEqual(changelog.updatedValue, 250);
@@ -55,12 +55,12 @@ describe('Points - undo() - @func', () => {
 
     it('User should have correctly set 150 points', async () => {
       await userChangelog.flush();
-      const updatedUser = await getRepository(User).findOne({ userName: user.userName });
+      const updatedUser = await AppDataSource.getRepository(User).findOneBy({ userName: user.userName });
       assert.strictEqual(updatedUser.points, 150);
     });
 
     it('Changelog should be empty', async () => {
-      const changelog = await getRepository(PointsChangelog).find();
+      const changelog = await AppDataSource.getRepository(PointsChangelog).find();
       assert.strictEqual(changelog.length, 0);
     });
 
@@ -72,7 +72,7 @@ describe('Points - undo() - @func', () => {
 
   describe('!point set command should be undoable', () => {
     it('create user', async () => {
-      await getRepository(User).save({
+      await AppDataSource.getRepository(User).save({
         userName: user.userName, userId: user.userId, points: 0,
       });
     });
@@ -84,12 +84,12 @@ describe('Points - undo() - @func', () => {
 
     it('User should have correctly set 100 points', async () => {
       await userChangelog.flush();
-      const updatedUser = await getRepository(User).findOne({ userName: user.userName });
+      const updatedUser = await AppDataSource.getRepository(User).findOneBy({ userName: user.userName });
       assert.strictEqual(updatedUser.points, 100);
     });
 
     it('Changelog should have 0 -> 100 log', async () => {
-      const changelog = await getRepository(PointsChangelog).findOne({ userId: user.userId });
+      const changelog = await AppDataSource.getRepository(PointsChangelog).findOneBy({ userId: user.userId });
       assert(typeof changelog !== 'undefined');
       assert.strictEqual(changelog.originalValue, 0);
       assert.strictEqual(changelog.updatedValue, 100);
@@ -102,12 +102,12 @@ describe('Points - undo() - @func', () => {
 
     it('User should have correctly set 0 points', async () => {
       await userChangelog.flush();
-      const updatedUser = await getRepository(User).findOne({ userName: user.userName });
+      const updatedUser = await AppDataSource.getRepository(User).findOneBy({ userName: user.userName });
       assert.strictEqual(updatedUser.points, 0);
     });
 
     it('Changelog should be empty', async () => {
-      const changelog = await getRepository(PointsChangelog).find();
+      const changelog = await AppDataSource.getRepository(PointsChangelog).find();
       assert.strictEqual(changelog.length, 0);
     });
 
@@ -119,7 +119,7 @@ describe('Points - undo() - @func', () => {
 
   describe('!point remove command should be undoable', () => {
     it('create user', async () => {
-      await getRepository(User).save({
+      await AppDataSource.getRepository(User).save({
         userName: user.userName, userId: user.userId, points: 100,
       });
     });
@@ -131,12 +131,12 @@ describe('Points - undo() - @func', () => {
 
     it('User should have 75 points', async () => {
       await userChangelog.flush();
-      const updatedUser = await getRepository(User).findOne({ userName: user.userName });
+      const updatedUser = await AppDataSource.getRepository(User).findOneBy({ userName: user.userName });
       assert.strictEqual(updatedUser.points, 75);
     });
 
     it('Changelog should have 100 -> 75 log', async () => {
-      const changelog = await getRepository(PointsChangelog).findOne({ where: { userId: user.userId }, order: { updatedAt: 'DESC' } });
+      const changelog = await AppDataSource.getRepository(PointsChangelog).findOne({ where: { userId: user.userId }, order: { updatedAt: 'DESC' } });
       assert(typeof changelog !== 'undefined');
       assert.strictEqual(changelog.originalValue, 100);
       assert.strictEqual(changelog.updatedValue, 75);
@@ -149,12 +149,12 @@ describe('Points - undo() - @func', () => {
 
     it('User should have 0 points', async () => {
       await userChangelog.flush();
-      const updatedUser = await getRepository(User).findOne({ userName: user.userName });
+      const updatedUser = await AppDataSource.getRepository(User).findOneBy({ userName: user.userName });
       assert.strictEqual(updatedUser.points, 0);
     });
 
     it('Changelog should have 75 -> 0 log', async () => {
-      const changelog = await getRepository(PointsChangelog).findOne({ where: { userId: user.userId }, order: { updatedAt: 'DESC' } });
+      const changelog = await AppDataSource.getRepository(PointsChangelog).findOne({ where: { userId: user.userId }, order: { updatedAt: 'DESC' } });
       assert(typeof changelog !== 'undefined');
       assert.strictEqual(changelog.originalValue, 75);
       assert.strictEqual(changelog.updatedValue, 0);
@@ -167,12 +167,12 @@ describe('Points - undo() - @func', () => {
 
     it('User should have correctly set 75 points', async () => {
       await userChangelog.flush();
-      const updatedUser = await getRepository(User).findOne({ userName: user.userName });
+      const updatedUser = await AppDataSource.getRepository(User).findOneBy({ userName: user.userName });
       assert.strictEqual(updatedUser.points, 75);
     });
 
     it('Changelog should have one change', async () => {
-      const changelog = await getRepository(PointsChangelog).find();
+      const changelog = await AppDataSource.getRepository(PointsChangelog).find();
       assert.strictEqual(changelog.length, 1);
     });
 
@@ -183,12 +183,12 @@ describe('Points - undo() - @func', () => {
 
     it('User should have correctly set 100 points', async () => {
       await userChangelog.flush();
-      const updatedUser = await getRepository(User).findOne({ userName: user.userName });
+      const updatedUser = await AppDataSource.getRepository(User).findOneBy({ userName: user.userName });
       assert.strictEqual(updatedUser.points, 100);
     });
 
     it('Changelog should be empty', async () => {
-      const changelog = await getRepository(PointsChangelog).find();
+      const changelog = await AppDataSource.getRepository(PointsChangelog).find();
       assert.strictEqual(changelog.length, 0);
     });
 

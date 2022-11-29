@@ -14,7 +14,6 @@ const assert = require('assert');
 const _ = require('lodash');
 const axios = require('axios');
 
-const { getRepository, getManager } = require('typeorm');
 const { Variable, VariableURL } = require('../../../dest/database/entity/variable');
 
 // stub
@@ -32,7 +31,7 @@ describe('Custom Variable - #4083 - Get url on eval should return correct value 
   let urlId = '';
 
   it(`Create eval $_variable to return Date.now()`, async () => {
-    const variable = await getRepository(Variable).save({
+    const variable = await AppDataSource.getRepository(Variable).save({
       variableName: '$_variable',
       readOnly: false,
       currentValue: '0',
@@ -42,7 +41,7 @@ describe('Custom Variable - #4083 - Get url on eval should return correct value 
       evalValue: 'return Date.now();',
       usableOptions: []
     });
-    urlId = (await getRepository(VariableURL).save({
+    urlId = (await AppDataSource.getRepository(VariableURL).save({
       GET: true,
       variableId: variable.id,
     })).id;

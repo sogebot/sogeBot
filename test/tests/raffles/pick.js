@@ -3,7 +3,7 @@ require('../../general.js');
 const assert = require('assert');
 
 const _ = require('lodash');
-const { getRepository } = require('typeorm');
+const { AppDataSource } = require('../../../dest/database.js');
 
 const { Raffle } = require('../../../dest/database/entity/raffle');
 const { User } = require('../../../dest/database/entity/user');
@@ -32,7 +32,7 @@ describe('Raffles - pick() - @func2', () => {
 
     it('pick a winner', async () => {
       const r = await raffles.pick({ sender: owner });
-      const raffle = await getRepository(Raffle).findOne({ order: { timestamp: 'DESC' } });
+      const raffle = (await AppDataSource.getRepository(Raffle).find({ order: { timestamp: 'DESC' } }))[0];
       assert.strictEqual(r[0].response, '$sender, nobody joined a raffle');
       assert(raffle.isClosed);
       assert(raffle.winner === null);
@@ -52,7 +52,7 @@ describe('Raffles - pick() - @func2', () => {
     const subs = ['sub1', 'sub2', 'sub3', 'sub4'];
     for (const [id, v] of Object.entries(subs)) {
       it('Add user ' + v + ' to db', async () => {
-        await getRepository(User).save({
+        await AppDataSource.getRepository(User).save({
           userName: v , userId: String('100' + id), isSubscriber: true,
         });
       });
@@ -81,12 +81,12 @@ describe('Raffles - pick() - @func2', () => {
     });
 
     it('Create testuser/testuser2 with max points', async () => {
-      await getRepository(User).delete({ userName: testuser.userName });
-      await getRepository(User).delete({ userName: testuser2.userName });
-      user1 = await getRepository(User).save({
+      await AppDataSource.getRepository(User).delete({ userName: testuser.userName });
+      await AppDataSource.getRepository(User).delete({ userName: testuser2.userName });
+      user1 = await AppDataSource.getRepository(User).save({
         userName: testuser.userName , userId: testuser.userId, points: max,
       });
-      user2 = await getRepository(User).save({
+      user2 = await AppDataSource.getRepository(User).save({
         userName: testuser2.userName , userId: testuser2.userId, points: max,
       });
     });
@@ -117,12 +117,12 @@ describe('Raffles - pick() - @func2', () => {
     });
 
     it('Create testuser/testuser2 with max points', async () => {
-      await getRepository(User).delete({ userName: testuser.userName });
-      await getRepository(User).delete({ userName: testuser2.userName });
-      user1 = await getRepository(User).save({
+      await AppDataSource.getRepository(User).delete({ userName: testuser.userName });
+      await AppDataSource.getRepository(User).delete({ userName: testuser2.userName });
+      user1 = await AppDataSource.getRepository(User).save({
         isSubscriber: true, userName: testuser.userName , userId: testuser.userId, points: max,
       });
-      user2 = await getRepository(User).save({
+      user2 = await AppDataSource.getRepository(User).save({
         userName: testuser2.userName , userId: testuser2.userId, points: max,
       });
     });

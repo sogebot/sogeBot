@@ -2,11 +2,11 @@ const assert = require('assert');
 
 const constants = require('@sogebot/ui-helpers/constants');
 const { dayjs } = require('@sogebot/ui-helpers/dayjsHelper');
-const { getRepository } = require('typeorm');
 
 const { User } = require('../../../dest/database/entity/user');
 const { getOwner } = require('../../../dest/helpers/commons/getOwner');
 const { prepare } = require('../../../dest/helpers/commons/prepare');
+const { AppDataSource } = require('../../../dest/database');
 const twitch = require('../../../dest/services/twitch.js').default;
 const top = (require('../../../dest/systems/top')).default;
 const db = require('../../general.js').db;
@@ -23,7 +23,7 @@ describe('Top - !top subage - @func1', () => {
 
   it ('Add 10 users into db and last user will don\'t have any subage', async () => {
     for (let i = 0; i < 10; i++) {
-      await getRepository(User).save({
+      await AppDataSource.getRepository(User).save({
         userId:       String(Math.floor(Math.random() * 100000)),
         userName:     'user' + i,
         isSubscriber: true,
@@ -33,7 +33,7 @@ describe('Top - !top subage - @func1', () => {
   });
 
   it ('Add user with long subage but not subscriber', async () => {
-    await getRepository(User).save({
+    await AppDataSource.getRepository(User).save({
       userId:       String(Math.floor(Math.random() * 100000)),
       userName:     'user11',
       isSubscriber: false,

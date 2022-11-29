@@ -8,13 +8,14 @@ const message = require('../../general.js').message;
 const user = require('../../general.js').user;
 const commons = require('../../../dest/commons');
 
-const { getRepository } = require('typeorm');
 const { User } = require('../../../dest/database/entity/user');
 const { Raffle } = require('../../../dest/database/entity/raffle');
 
 const raffles = (require('../../../dest/systems/raffles')).default;
 
 const assert = require('assert');
+const { IsNull } = require('typeorm');
+const { AppDataSource } = require('../../../dest/database.js');
 
 describe('Raffles - cumulativeTickets - @func1', () => {
   before(async () => {
@@ -30,7 +31,7 @@ describe('Raffles - cumulativeTickets - @func1', () => {
   });
 
   it('Update viewer to have 25 points', async () => {
-    await getRepository(User).save({ userName: user.viewer.userName, userId: user.viewer.userId, points: 25 });
+    await AppDataSource.getRepository(User).save({ userName: user.viewer.userName, userId: user.viewer.userId, points: 25 });
   });
 
   it('Viewer bets 10 points', async () => {
@@ -39,17 +40,17 @@ describe('Raffles - cumulativeTickets - @func1', () => {
   });
 
   it('expecting 1 participant', async () => {
-    const raffle = await getRepository(Raffle).findOne({
+    const raffle = await AppDataSource.getRepository(Raffle).findOne({
       relations: ['participants'],
-      where: { winner: null, isClosed: false },
+      where: { winner: IsNull(), isClosed: false },
     });
     assert(raffle.participants.length === 1);
   });
 
   it('Participant bet 10 points', async () => {
-    const raffle = await getRepository(Raffle).findOne({
+    const raffle = await AppDataSource.getRepository(Raffle).findOne({
       relations: ['participants'],
-      where: { winner: null, isClosed: false },
+      where: { winner: IsNull(), isClosed: false },
     });
     assert(raffle.participants[0].tickets === 10, `${raffle.participants[0].tickets} != 10`);
   });
@@ -60,17 +61,17 @@ describe('Raffles - cumulativeTickets - @func1', () => {
   });
 
   it('expecting 1 participant', async () => {
-    const raffle = await getRepository(Raffle).findOne({
+    const raffle = await AppDataSource.getRepository(Raffle).findOne({
       relations: ['participants'],
-      where: { winner: null, isClosed: false },
+      where: { winner: IsNull(), isClosed: false },
     });
     assert(raffle.participants.length === 1);
   });
 
   it('Participant bet 20 points', async () => {
-    const raffle = await getRepository(Raffle).findOne({
+    const raffle = await AppDataSource.getRepository(Raffle).findOne({
       relations: ['participants'],
-      where: { winner: null, isClosed: false },
+      where: { winner: IsNull(), isClosed: false },
     });
     assert(raffle.participants[0].tickets === 20, `${raffle.participants[0].tickets} != 20`);
   });
@@ -81,17 +82,17 @@ describe('Raffles - cumulativeTickets - @func1', () => {
   });
 
   it('expecting 1 participant', async () => {
-    const raffle = await getRepository(Raffle).findOne({
+    const raffle = await AppDataSource.getRepository(Raffle).findOne({
       relations: ['participants'],
-      where: { winner: null, isClosed: false },
+      where: { winner: IsNull(), isClosed: false },
     });
     assert(raffle.participants.length === 1);
   });
 
   it('Participant bet 25 points', async () => {
-    const raffle = await getRepository(Raffle).findOne({
+    const raffle = await AppDataSource.getRepository(Raffle).findOne({
       relations: ['participants'],
-      where: { winner: null, isClosed: false },
+      where: { winner: IsNull(), isClosed: false },
     });
     assert(raffle.participants[0].tickets === 25, `${raffle.participants[0].tickets} != 25`);
   });

@@ -2,11 +2,10 @@
 
 const assert = require('assert');
 
-const { getRepository } = require('typeorm');
-
 require('../../general.js');
 
 const commons = require('../../../dest/commons');
+const { AppDataSource } = require('../../../dest/database.js');
 const { Settings } = require('../../../dest/database/entity/settings');
 const { User } = require('../../../dest/database/entity/user');
 const isStreamOnline = (require('../../../dest/helpers/api/isStreamOnline')).isStreamOnline;
@@ -36,8 +35,8 @@ describe('TMI - User should have counted messages - https://github.com/sogehige/
     twitch.globalIgnoreListExclude = [];
     twitch.ignorelist = [];
 
-    await getRepository(User).save(testuser1);
-    await getRepository(User).save(testuser2);
+    await AppDataSource.getRepository(User).save(testuser1);
+    await AppDataSource.getRepository(User).save(testuser2);
   });
 
   it ('Set stream as online', async () => {
@@ -74,13 +73,13 @@ describe('TMI - User should have counted messages - https://github.com/sogehige/
 
   it ('testuser1 should have 20 messages', async () => {
     await changelog.flush();
-    const user = await getRepository(User).findOne({ userId: testuser1.userId });
+    const user = await AppDataSource.getRepository(User).findOneBy({ userId: testuser1.userId });
     assert(user.messages === 20, `Expected 20 messages, got ${user.messages} messages`);
   });
 
   it ('testuser2 should have 10 messages', async () => {
     await changelog.flush();
-    const user = await getRepository(User).findOne({ userId: testuser2.userId });
+    const user = await AppDataSource.getRepository(User).findOneBy({ userId: testuser2.userId });
     assert(user.messages === 10, `Expected 10 messages, got ${user.messages} messages`);
   });
 });

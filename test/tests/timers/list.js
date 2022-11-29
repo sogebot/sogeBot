@@ -12,8 +12,8 @@ const { linesParsed } = require('../../../dest/helpers/parser');
 // users
 const owner = { userName: '__broadcaster__' };
 
-const { getRepository } = require('typeorm');
 const { Timer, TimerResponse } = require('../../../dest/database/entity/timer');
+const { AppDataSource } = require('../../../dest/database.js');
 
 describe('Timers - list() - @func2', () => {
   beforeEach(async () => {
@@ -66,8 +66,8 @@ describe('Timers - list() - @func2', () => {
   it('-name test2', async () => {
     const r = await timers.list({ sender: owner, parameters: '-name test2' });
 
-    const response1 = await getRepository(TimerResponse).findOne({ response: 'Lorem Ipsum' });
-    const response2 = await getRepository(TimerResponse).findOne({ response: 'Lorem Ipsum 2' });
+    const response1 = await AppDataSource.getRepository(TimerResponse).findOneBy({ response: 'Lorem Ipsum' });
+    const response2 = await AppDataSource.getRepository(TimerResponse).findOneBy({ response: 'Lorem Ipsum 2' });
 
     assert.strictEqual(r[0].response, '$sender, timer (name: test2) list');
     assert.strictEqual(r[1].response, `⚫ ${response1.id} - Lorem Ipsum`);

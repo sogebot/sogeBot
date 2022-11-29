@@ -1,8 +1,7 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 /* global */
 const assert = require('assert');
-
-const { getRepository } = require('typeorm');
+const { AppDataSource } = require('../../../dest/database');
 
 const { SongRequest, SongPlaylist } = require('../../../dest/database/entity/song');
 const user = require('../../general.js').user;
@@ -25,7 +24,7 @@ describe('Songs - addSongToQueue() - @func1', () => {
     const videoId = 'bmQwZhcZkbU';
 
     it(`Queue is empty`, async () => {
-      const count = await getRepository(SongRequest).count();
+      const count = await AppDataSource.getRepository(SongRequest).count();
       assert(count === 0);
     });
 
@@ -35,7 +34,7 @@ describe('Songs - addSongToQueue() - @func1', () => {
     });
 
     it(`Queue contains song`, async () => {
-      const count = await getRepository(SongRequest).count();
+      const count = await AppDataSource.getRepository(SongRequest).count();
       assert(count === 1);
     });
   });
@@ -51,7 +50,7 @@ describe('Songs - addSongToQueue() - @func1', () => {
     const videoUrl = 'https://www.youtube.com/watch?v=bmQwZhcZkbU';
 
     it(`Queue is empty`, async () => {
-      const count = await getRepository(SongRequest).count();
+      const count = await AppDataSource.getRepository(SongRequest).count();
       assert(count === 0);
     });
 
@@ -61,7 +60,7 @@ describe('Songs - addSongToQueue() - @func1', () => {
     });
 
     it(`Queue contains song`, async () => {
-      const count = await getRepository(SongRequest).count();
+      const count = await AppDataSource.getRepository(SongRequest).count();
       assert(count === 1);
     });
   });
@@ -77,7 +76,7 @@ describe('Songs - addSongToQueue() - @func1', () => {
     const videoSearch = 'The Witcher 3 - Steel for Humans / Lazare (Gingertail Cover)';
 
     it(`Queue is empty`, async () => {
-      const count = await getRepository(SongRequest).count();
+      const count = await AppDataSource.getRepository(SongRequest).count();
       assert(count === 0);
     });
 
@@ -87,7 +86,7 @@ describe('Songs - addSongToQueue() - @func1', () => {
     });
 
     it(`Queue contains song`, async () => {
-      const count = await getRepository(SongRequest).count();
+      const count = await AppDataSource.getRepository(SongRequest).count();
       assert(count === 1);
     });
   });
@@ -103,7 +102,7 @@ describe('Songs - addSongToQueue() - @func1', () => {
     const videoId = 'bmQwZhcZkbU';
 
     it(`Queue is empty`, async () => {
-      const count = await getRepository(SongRequest).count();
+      const count = await AppDataSource.getRepository(SongRequest).count();
       assert(count === 0);
     });
 
@@ -113,7 +112,7 @@ describe('Songs - addSongToQueue() - @func1', () => {
     });
 
     it(`Queue contains song`, async () => {
-      const count = await getRepository(SongRequest).count();
+      const count = await AppDataSource.getRepository(SongRequest).count();
       assert(count === 1);
     });
   });
@@ -129,7 +128,7 @@ describe('Songs - addSongToQueue() - @func1', () => {
     const videoUrl = 'https://www.youtube.com/watch?v=bmQwZhcZkbU';
 
     it(`Queue is empty`, async () => {
-      const count = await getRepository(SongRequest).count();
+      const count = await AppDataSource.getRepository(SongRequest).count();
       assert(count === 0);
     });
 
@@ -139,7 +138,7 @@ describe('Songs - addSongToQueue() - @func1', () => {
     });
 
     it(`Queue contains song`, async () => {
-      const count = await getRepository(SongRequest).count();
+      const count = await AppDataSource.getRepository(SongRequest).count();
       assert(count === 1);
     });
   });
@@ -155,7 +154,7 @@ describe('Songs - addSongToQueue() - @func1', () => {
     const videoSearch = 'The Witcher 3 - Steel for Humans / Lazare (Gingertail Cover)';
 
     it(`Queue is empty`, async () => {
-      const count = await getRepository(SongRequest).count();
+      const count = await AppDataSource.getRepository(SongRequest).count();
       assert(count === 0);
     });
 
@@ -165,7 +164,7 @@ describe('Songs - addSongToQueue() - @func1', () => {
     });
 
     it(`Queue contains song`, async () => {
-      const count = await getRepository(SongRequest).count();
+      const count = await AppDataSource.getRepository(SongRequest).count();
       assert(count === 1);
     });
   });
@@ -181,7 +180,7 @@ describe('Songs - addSongToQueue() - @func1', () => {
     const videoId = 'RwtZrI6HuwY';
 
     it(`Queue is empty`, async () => {
-      const count = await getRepository(SongRequest).count();
+      const count = await AppDataSource.getRepository(SongRequest).count();
       assert(count === 0);
     });
 
@@ -191,7 +190,7 @@ describe('Songs - addSongToQueue() - @func1', () => {
     });
 
     it(`Queue is empty`, async () => {
-      const count = await getRepository(SongRequest).count();
+      const count = await AppDataSource.getRepository(SongRequest).count();
       assert(count === 0);
     });
   });
@@ -207,7 +206,7 @@ describe('Songs - addSongToQueue() - @func1', () => {
     const videoUrl = 'https://www.youtube.com/watch?v=RwtZrI6HuwY';
 
     it(`Queue is empty`, async () => {
-      const count = await getRepository(SongRequest).count();
+      const count = await AppDataSource.getRepository(SongRequest).count();
       assert(count === 0);
     });
 
@@ -217,7 +216,7 @@ describe('Songs - addSongToQueue() - @func1', () => {
     });
 
     it(`Queue is empty`, async () => {
-      const count = await getRepository(SongRequest).count();
+      const count = await AppDataSource.getRepository(SongRequest).count();
       assert(count === 0);
     });
   });
@@ -233,7 +232,7 @@ describe('Songs - addSongToQueue() - @func1', () => {
     const videoSearch = 'Annoying customers after closing time - In and Out';
 
     it(`Queue is empty`, async () => {
-      const count = await getRepository(SongRequest).count();
+      const count = await AppDataSource.getRepository(SongRequest).count();
       assert(count === 0);
     });
 
@@ -243,7 +242,7 @@ describe('Songs - addSongToQueue() - @func1', () => {
     });
 
     it(`Queue is empty`, async () => {
-      const count = await getRepository(SongRequest).count();
+      const count = await AppDataSource.getRepository(SongRequest).count();
       assert(count === 0);
     });
   });
@@ -259,7 +258,7 @@ describe('Songs - addSongToQueue() - @func1', () => {
     const videoId = 'bmQwZhcZkbU';
 
     it(`Queue is empty`, async () => {
-      const count = await getRepository(SongRequest).count();
+      const count = await AppDataSource.getRepository(SongRequest).count();
       assert(count === 0);
     });
 
@@ -269,7 +268,7 @@ describe('Songs - addSongToQueue() - @func1', () => {
     });
 
     it(`Queue contains song`, async () => {
-      const count = await getRepository(SongRequest).count();
+      const count = await AppDataSource.getRepository(SongRequest).count();
       assert(count === 1);
     });
   });
@@ -285,12 +284,12 @@ describe('Songs - addSongToQueue() - @func1', () => {
     const videoUrl = 'https://www.youtube.com/watch?v=bmQwZhcZkbU';
 
     it(`Queue is empty`, async () => {
-      const count = await getRepository(SongRequest).count();
+      const count = await AppDataSource.getRepository(SongRequest).count();
       assert(count === 0);
     });
 
     it(`Add songs to playlist`, async () => {
-      await getRepository(SongPlaylist).save({
+      await AppDataSource.getRepository(SongPlaylist).save({
         videoId:   'bmQwZhcZkbU',
         seed:      0,
         title:     'test',
@@ -301,7 +300,7 @@ describe('Songs - addSongToQueue() - @func1', () => {
         endTime:   0,
         tags:      ['general', 'lorem'],
       });
-      await getRepository(SongPlaylist).save({
+      await AppDataSource.getRepository(SongPlaylist).save({
         videoId:   'RwtZrI6HuwY',
         seed:      0,
         endTime:   0,

@@ -4,7 +4,6 @@
 
 require('../../general.js');
 
-const { getRepository } = require('typeorm');
 const { Cooldown, CooldownViewer } = require('../../../dest/database/entity/cooldown');
 const { User } = require('../../../dest/database/entity/user');
 const { Keyword } = require('../../../dest/database/entity/keyword');
@@ -15,6 +14,7 @@ const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 const time = require('../../general.js').time;
 const { defaultPermissions } = require('../../../dest/helpers/permissions/');
+const { AppDataSource } = require('../../../dest/database.js');
 
 const cooldown = (require('../../../dest/systems/cooldown')).default;
 const customcommands = (require('../../../dest/systems/customcommands')).default;
@@ -37,11 +37,11 @@ describe('Cooldowns - @func3 - default cooldown can be overrided', () => {
       gamble.enabled = true;
       cooldown.__permission_based__defaultCooldownOfCommandsInSeconds[defaultPermissions.VIEWERS] = 5;
 
-      await getRepository(User).save({ userName: usermod1.userName, userId: usermod1.userId, isModerator: true });
-      await getRepository(User).save({ userName: subuser1.userName, userId: subuser1.userId, isSubscriber: true });
-      await getRepository(User).save({ userName: testUser.userName, userId: testUser.userId });
-      await getRepository(User).save({ userName: testUser2.userName, userId: testUser2.userId });
-      await getRepository(User).save({ userName: owner.userName, userId: owner.userId, isSubscriber: true });
+      await AppDataSource.getRepository(User).save({ userName: usermod1.userName, userId: usermod1.userId, isModerator: true });
+      await AppDataSource.getRepository(User).save({ userName: subuser1.userName, userId: subuser1.userId, isSubscriber: true });
+      await AppDataSource.getRepository(User).save({ userName: testUser.userName, userId: testUser.userId });
+      await AppDataSource.getRepository(User).save({ userName: testUser2.userName, userId: testUser2.userId });
+      await AppDataSource.getRepository(User).save({ userName: owner.userName, userId: owner.userId, isSubscriber: true });
 
       await time.waitMs(5000);
     });
@@ -81,11 +81,11 @@ describe('Cooldowns - @func3 - default cooldown can be overrided', () => {
       gamble.enabled = true;
       cooldown.__permission_based__defaultCooldownOfKeywordsInSeconds[defaultPermissions.VIEWERS] = 5;
 
-      await getRepository(User).save({ userName: usermod1.userName, userId: usermod1.userId, isModerator: true });
-      await getRepository(User).save({ userName: subuser1.userName, userId: subuser1.userId, isSubscriber: true });
-      await getRepository(User).save({ userName: testUser.userName, userId: testUser.userId });
-      await getRepository(User).save({ userName: testUser2.userName, userId: testUser2.userId });
-      await getRepository(User).save({ userName: owner.userName, userId: owner.userId, isSubscriber: true });
+      await AppDataSource.getRepository(User).save({ userName: usermod1.userName, userId: usermod1.userId, isModerator: true });
+      await AppDataSource.getRepository(User).save({ userName: subuser1.userName, userId: subuser1.userId, isSubscriber: true });
+      await AppDataSource.getRepository(User).save({ userName: testUser.userName, userId: testUser.userId });
+      await AppDataSource.getRepository(User).save({ userName: testUser2.userName, userId: testUser2.userId });
+      await AppDataSource.getRepository(User).save({ userName: owner.userName, userId: owner.userId, isSubscriber: true });
 
       await time.waitMs(5000);
     });
@@ -97,7 +97,7 @@ describe('Cooldowns - @func3 - default cooldown can be overrided', () => {
     });
 
     it('Create me keyword', async () => {
-      await getRepository(Keyword).save({
+      await AppDataSource.getRepository(Keyword).save({
         keyword: 'me',
         response: '(!me)',
         enabled: true,

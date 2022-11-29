@@ -6,9 +6,8 @@ const assert = require('assert');
 const message = require('../../general.js').message;
 
 const { defaultPermissions } = require('../../../dest/helpers/permissions/');
-
-const { getRepository } = require('typeorm');
 const { User } = require('../../../dest/database/entity/user');
+const { AppDataSource } = require('../../../dest/database.js');
 
 const customcommands = (require('../../../dest/systems/customcommands')).default;
 
@@ -45,7 +44,7 @@ describe('Custom Commands - @func1 - add()', () => {
     await db.cleanup();
     await message.prepare();
 
-    await getRepository(User).save({ userName: owner.userName, userId: owner.userId });
+    await AppDataSource.getRepository(User).save({ userName: owner.userName, userId: owner.userId });
   });
 
   describe('Expected parsed fail', () => {

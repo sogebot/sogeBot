@@ -2,8 +2,7 @@
 /* global describe it before */
 
 const assert = require('assert');
-
-const { getRepository } = require('typeorm');
+const { AppDataSource } = require('../../../dest/database');
 
 const { Settings } = require('../../../dest/database/entity/settings');
 require('../../general.js');
@@ -44,7 +43,7 @@ describe('Persistent null - @func1', () => {
     });
     it('value should be changed in db', async () => {
       await time.waitMs(1000);
-      const value = await getRepository(Settings).findOneOrFail({ name: 'null', namespace: '/test' });
+      const value = await AppDataSource.getRepository(Settings).findOneByOrFail({ name: 'null', namespace: '/test' });
       assert(JSON.parse(value.value) === 'test');
     });
   });
@@ -55,7 +54,7 @@ describe('Persistent null - @func1', () => {
     });
     it('value should be changed in db', async () => {
       await time.waitMs(1000);
-      const value = await getRepository(Settings).findOneOrFail({ name: 'null', namespace: '/test' });
+      const value = await AppDataSource.getRepository(Settings).findOneByOrFail({ name: 'null', namespace: '/test' });
       assert(JSON.parse(value.value) === null);
     });
   });

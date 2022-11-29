@@ -6,10 +6,10 @@ const assert = require('assert');
 
 const owner = { userId: String(Math.floor(Math.random() * 100000)), userName: '__broadcaster__' };
 const constants = require('@sogebot/ui-helpers/constants');
-const { getRepository } = require('typeorm');
 
 const { EventList } = require('../../../dest/database/entity/eventList');
 const { User, UserTip, UserBit } = require('../../../dest/database/entity/user');
+const { AppDataSource } = require('../../../dest/database.js');
 const rates = require('../../../dest/helpers/currency/rates').default;
 const Message = require('../../../dest/message').default;
 const db = require('../../general.js').db;
@@ -59,21 +59,21 @@ describe('Message - (count|#) filter - @func3', async () => {
 
     const currency = require('../../../dest/currency').default;
     for (let i = 0; i < 25; i++) {
-      await getRepository(EventList).save({
+      await AppDataSource.getRepository(EventList).save({
         isTest:      false,
         event:       'sub',
         timestamp:   getTimestamp(i),
         userId:      `${i}`,
         values_json: '{}',
       });
-      await getRepository(EventList).save({
+      await AppDataSource.getRepository(EventList).save({
         isTest:      false,
         event:       'follow',
         timestamp:   getTimestamp(i),
         userId:      `${i*10000}`,
         values_json: '{}',
       });
-      await getRepository(UserTip).save({
+      await AppDataSource.getRepository(UserTip).save({
         amount:        1,
         sortAmount:    1,
         currency:      'EUR',
@@ -82,7 +82,7 @@ describe('Message - (count|#) filter - @func3', async () => {
         exchangeRates: rates,
         userId:        `${i*10000}`,
       });
-      await getRepository(UserBit).save({
+      await AppDataSource.getRepository(UserBit).save({
         amount:    1,
         message:   'test',
         cheeredAt: getTimestamp(i),

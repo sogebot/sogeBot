@@ -15,7 +15,7 @@ const translate = require('../../../dest/translate').translate;
 const polls = (require('../../../dest/systems/polls')).default;
 
 const assert = require('assert');
-const { getRepository } = require('typeorm');
+const { AppDataSource } = require('../../../dest/database');
 
 const owner = { userName: '__broadcaster__', userId: String(Math.floor(Math.random() * 10000)) };
 
@@ -100,7 +100,7 @@ describe('Polls - normal - @func2', () => {
     it(`10 users will vote for option 1 and another 10 for option 2`, async () => {
       for (const o of [1,2]) {
         for (let i = 0; i < 10; i++) {
-          await getRepository(User).save({ userId: String(Math.floor(Math.random() * 100000)), userName: 'user' + [o, i].join('') });
+          await AppDataSource.getRepository(User).save({ userId: String(Math.floor(Math.random() * 100000)), userName: 'user' + [o, i].join('') });
           const user = 'user' + [o, i].join('');
           await polls.main({ sender: { userName: user }, parameters: String(o) });
 

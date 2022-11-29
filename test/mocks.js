@@ -1,8 +1,8 @@
 const axios = require('axios');
 const MockAdapter = require('axios-mock-adapter');
-const { getRepository } = require('typeorm');
 const { v4 } = require('uuid');
 
+const { AppDataSource } = require('../dest/database');
 const { User } = require('../dest/database/entity/user');
 const users = require('./helpers/user');
 
@@ -27,7 +27,7 @@ global.mockClient = (account) => {
         console.log(`Mocking call users.getUserByName(${userName}) for ${account}`);
         let id = String(Math.floor(Math.random() * 100000));
 
-        const user = await getRepository(User).findOne({ userName });
+        const user = await AppDataSource.getRepository(User).findOneBy({ userName });
         const mockUser = getLatest100FollowersMockData.find(o => o.userName === userName);
         if (user) {
           id = user.userId;

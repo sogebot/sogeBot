@@ -4,8 +4,7 @@
 require('../../general.js');
 
 const assert = require('assert');
-
-const { getRepository } = require('typeorm');
+const { AppDataSource } = require('../../../dest/database.js');
 
 const { Cooldown } = require('../../../dest/database/entity/cooldown');
 const { Keyword } = require('../../../dest/database/entity/keyword');
@@ -39,15 +38,15 @@ describe('Cooldowns - @func3 - check()', () => {
       await db.cleanup();
       await message.prepare();
 
-      await getRepository(User).save({
+      await AppDataSource.getRepository(User).save({
         userName: usermod1.userName, userId: usermod1.userId, isModerator: true,
       });
-      await getRepository(User).save({
+      await AppDataSource.getRepository(User).save({
         userName: subuser1.userName, userId: subuser1.userId, isSubscriber: true,
       });
-      await getRepository(User).save({ userName: testUser.userName, userId: testUser.userId });
-      await getRepository(User).save({ userName: testUser2.userName, userId: testUser2.userId });
-      await getRepository(User).save({
+      await AppDataSource.getRepository(User).save({ userName: testUser.userName, userId: testUser.userId });
+      await AppDataSource.getRepository(User).save({ userName: testUser2.userName, userId: testUser2.userId });
+      await AppDataSource.getRepository(User).save({
         userName: owner.userName, userId: owner.userId, isSubscriber: true,
       });
 
@@ -89,15 +88,15 @@ describe('Cooldowns - @func3 - check()', () => {
       await db.cleanup();
       await message.prepare();
 
-      await getRepository(User).save({
+      await AppDataSource.getRepository(User).save({
         userName: usermod1.userName, userId: usermod1.userId, isModerator: true,
       });
-      await getRepository(User).save({
+      await AppDataSource.getRepository(User).save({
         userName: subuser1.userName, userId: subuser1.userId, isSubscriber: true,
       });
-      await getRepository(User).save({ userName: testUser.userName, userId: testUser.userId });
-      await getRepository(User).save({ userName: testUser2.userName, userId: testUser2.userId });
-      await getRepository(User).save({
+      await AppDataSource.getRepository(User).save({ userName: testUser.userName, userId: testUser.userId });
+      await AppDataSource.getRepository(User).save({ userName: testUser2.userName, userId: testUser2.userId });
+      await AppDataSource.getRepository(User).save({
         userName: owner.userName, userId: owner.userId, isSubscriber: true,
       });
     });
@@ -139,15 +138,15 @@ describe('Cooldowns - @func3 - check()', () => {
 
       gamble.enabled = true;
 
-      await getRepository(User).save({
+      await AppDataSource.getRepository(User).save({
         userName: usermod1.userName, userId: usermod1.userId, isModerator: true,
       });
-      await getRepository(User).save({
+      await AppDataSource.getRepository(User).save({
         userName: subuser1.userName, userId: subuser1.userId, isSubscriber: true,
       });
-      await getRepository(User).save({ userName: testUser.userName, userId: testUser.userId });
-      await getRepository(User).save({ userName: testUser2.userName, userId: testUser2.userId });
-      await getRepository(User).save({
+      await AppDataSource.getRepository(User).save({ userName: testUser.userName, userId: testUser.userId });
+      await AppDataSource.getRepository(User).save({ userName: testUser2.userName, userId: testUser2.userId });
+      await AppDataSource.getRepository(User).save({
         userName: owner.userName, userId: owner.userId, isSubscriber: true,
       });
     });
@@ -171,7 +170,7 @@ describe('Cooldowns - @func3 - check()', () => {
     });
 
     it('Add koncha to keywords', async () => {
-      await getRepository(Keyword).save({
+      await AppDataSource.getRepository(Keyword).save({
         keyword:  'koncha',
         response: '$sender KonCha',
         enabled:  true,
@@ -198,15 +197,15 @@ describe('Cooldowns - @func3 - check()', () => {
 
       gamble.enabled = true;
 
-      await getRepository(User).save({
+      await AppDataSource.getRepository(User).save({
         userName: usermod1.userName, userId: usermod1.userId, isModerator: true,
       });
-      await getRepository(User).save({
+      await AppDataSource.getRepository(User).save({
         userName: subuser1.userName, userId: subuser1.userId, isSubscriber: true,
       });
-      await getRepository(User).save({ userName: testUser.userName, userId: testUser.userId });
-      await getRepository(User).save({ userName: testUser2.userName, userId: testUser2.userId });
-      await getRepository(User).save({
+      await AppDataSource.getRepository(User).save({ userName: testUser.userName, userId: testUser.userId });
+      await AppDataSource.getRepository(User).save({ userName: testUser2.userName, userId: testUser2.userId });
+      await AppDataSource.getRepository(User).save({
         userName: owner.userName, userId: owner.userId, isSubscriber: true,
       });
     });
@@ -272,15 +271,15 @@ describe('Cooldowns - @func3 - check()', () => {
       c.isSubscriberAffected = true;
       await c.save();
 
-      await getRepository(User).save({
+      await AppDataSource.getRepository(User).save({
         userName: usermod1.userName, userId: usermod1.userId, isModerator: true,
       });
-      await getRepository(User).save({
+      await AppDataSource.getRepository(User).save({
         userName: subuser1.userName, userId: subuser1.userId, isSubscriber: true,
       });
-      await getRepository(User).save({ userName: testUser.userName, userId: testUser.userId });
-      await getRepository(User).save({ userName: testUser2.userName, userId: testUser2.userId });
-      await getRepository(User).save({
+      await AppDataSource.getRepository(User).save({ userName: testUser.userName, userId: testUser.userId });
+      await AppDataSource.getRepository(User).save({ userName: testUser2.userName, userId: testUser2.userId });
+      await AppDataSource.getRepository(User).save({
         userName: owner.userName, userId: owner.userId, isSubscriber: true,
       });
     });
@@ -338,17 +337,17 @@ describe('Cooldowns - @func3 - check()', () => {
 
       gamble.enabled = true;
       gamble.setCommand('!gamble', '!play');
-      await getRepository(Cooldown).update({}, { isOwnerAffected: false });
+      await AppDataSource.getRepository(Cooldown).update({}, { isOwnerAffected: false });
 
-      await getRepository(User).save({
+      await AppDataSource.getRepository(User).save({
         userName: usermod1.userName, userId: usermod1.userId, isModerator: true,
       });
-      await getRepository(User).save({
+      await AppDataSource.getRepository(User).save({
         userName: subuser1.userName, userId: subuser1.userId, isSubscriber: true,
       });
-      await getRepository(User).save({ userName: testUser.userName, userId: testUser.userId });
-      await getRepository(User).save({ userName: testUser2.userName, userId: testUser2.userId });
-      await getRepository(User).save({
+      await AppDataSource.getRepository(User).save({ userName: testUser.userName, userId: testUser.userId });
+      await AppDataSource.getRepository(User).save({ userName: testUser2.userName, userId: testUser2.userId });
+      await AppDataSource.getRepository(User).save({
         userName: owner.userName, userId: owner.userId, isSubscriber: true,
       });
     });
@@ -365,7 +364,7 @@ describe('Cooldowns - @func3 - check()', () => {
     });
 
     it('check if cooldown is created', async () => {
-      const item = await getRepository(Cooldown).findOne({ where: { name: '!play' } });
+      const item = await AppDataSource.getRepository(Cooldown).findOne({ where: { name: '!play' } });
       assert(item.length !== 0);
     });
 
@@ -413,17 +412,17 @@ describe('Cooldowns - @func3 - check()', () => {
       gamble.enabled = true;
       gamble.setCommand('!gamble', '!play');
       // owners should not be persecuted
-      await getRepository(Cooldown).update({}, { isOwnerAffected: false });
+      await AppDataSource.getRepository(Cooldown).update({}, { isOwnerAffected: false });
 
-      await getRepository(User).save({
+      await AppDataSource.getRepository(User).save({
         userName: usermod1.userName, userId: usermod1.userId, isModerator: true,
       });
-      await getRepository(User).save({
+      await AppDataSource.getRepository(User).save({
         userName: subuser1.userName, userId: subuser1.userId, isSubscriber: true,
       });
-      await getRepository(User).save({ userName: testUser.userName, userId: testUser.userId });
-      await getRepository(User).save({ userName: testUser2.userName, userId: testUser2.userId });
-      await getRepository(User).save({
+      await AppDataSource.getRepository(User).save({ userName: testUser.userName, userId: testUser.userId });
+      await AppDataSource.getRepository(User).save({ userName: testUser2.userName, userId: testUser2.userId });
+      await AppDataSource.getRepository(User).save({
         userName: owner.userName, userId: owner.userId, isSubscriber: true,
       });
     });
@@ -440,7 +439,7 @@ describe('Cooldowns - @func3 - check()', () => {
     });
 
     it('check if cooldown is created', async () => {
-      const item = await getRepository(Cooldown).findOne({ where: { name: '!play' } });
+      const item = await AppDataSource.getRepository(Cooldown).findOne({ where: { name: '!play' } });
       assert(item.length !== 0);
     });
 
@@ -472,15 +471,15 @@ describe('Cooldowns - @func3 - check()', () => {
 
       gamble.enabled = true;
 
-      await getRepository(User).save({
+      await AppDataSource.getRepository(User).save({
         userName: usermod1.userName, userId: usermod1.userId, isModerator: true,
       });
-      await getRepository(User).save({
+      await AppDataSource.getRepository(User).save({
         userName: subuser1.userName, userId: subuser1.userId, isSubscriber: true,
       });
-      await getRepository(User).save({ userName: testUser.userName, userId: testUser.userId });
-      await getRepository(User).save({ userName: testUser2.userName, userId: testUser2.userId });
-      await getRepository(User).save({
+      await AppDataSource.getRepository(User).save({ userName: testUser.userName, userId: testUser.userId });
+      await AppDataSource.getRepository(User).save({ userName: testUser2.userName, userId: testUser2.userId });
+      await AppDataSource.getRepository(User).save({
         userName: owner.userName, userId: owner.userId, isSubscriber: true,
       });
     });
@@ -494,7 +493,7 @@ describe('Cooldowns - @func3 - check()', () => {
       const r = await cooldown.main({ sender: owner, parameters: `${command} ${type} ${seconds} ${quiet}` });
       assert.strictEqual(r[0].response, '$sender, user cooldown for !test was set to 60s');
 
-      const item = await getRepository(Cooldown).findOne({ where: { name: '!test' } });
+      const item = await AppDataSource.getRepository(Cooldown).findOne({ where: { name: '!test' } });
       assert(item.length !== 0);
 
       let isOk = await cooldown.check({ sender: testUser, message: 'Lorem Ipsum !test' });
@@ -513,15 +512,15 @@ describe('Cooldowns - @func3 - check()', () => {
       gamble.enabled = true;
       gamble.setCommand('!gamble', '!test me');
 
-      await getRepository(User).save({
+      await AppDataSource.getRepository(User).save({
         userName: usermod1.userName, userId: usermod1.userId, isModerator: true,
       });
-      await getRepository(User).save({
+      await AppDataSource.getRepository(User).save({
         userName: subuser1.userName, userId: subuser1.userId, isSubscriber: true,
       });
-      await getRepository(User).save({ userName: testUser.userName, userId: testUser.userId });
-      await getRepository(User).save({ userName: testUser2.userName, userId: testUser2.userId });
-      await getRepository(User).save({
+      await AppDataSource.getRepository(User).save({ userName: testUser.userName, userId: testUser.userId });
+      await AppDataSource.getRepository(User).save({ userName: testUser2.userName, userId: testUser2.userId });
+      await AppDataSource.getRepository(User).save({
         userName: owner.userName, userId: owner.userId, isSubscriber: true,
       });
     });
@@ -538,7 +537,7 @@ describe('Cooldowns - @func3 - check()', () => {
     });
 
     it('check if cooldown is created', async () => {
-      const item = await getRepository(Cooldown).findOne({ where: { name: '!test me' } });
+      const item = await AppDataSource.getRepository(Cooldown).findOne({ where: { name: '!test me' } });
       assert(item.length !== 0);
     });
 
@@ -590,15 +589,15 @@ describe('Cooldowns - @func3 - check()', () => {
 
       gamble.enabled = true;
 
-      await getRepository(User).save({
+      await AppDataSource.getRepository(User).save({
         userName: usermod1.userName, userId: usermod1.userId, isModerator: true,
       });
-      await getRepository(User).save({
+      await AppDataSource.getRepository(User).save({
         userName: subuser1.userName, userId: subuser1.userId, isSubscriber: true,
       });
-      await getRepository(User).save({ userName: testUser.userName, userId: testUser.userId });
-      await getRepository(User).save({ userName: testUser2.userName, userId: testUser2.userId });
-      await getRepository(User).save({
+      await AppDataSource.getRepository(User).save({ userName: testUser.userName, userId: testUser.userId });
+      await AppDataSource.getRepository(User).save({ userName: testUser2.userName, userId: testUser2.userId });
+      await AppDataSource.getRepository(User).save({
         userName: owner.userName, userId: owner.userId, isSubscriber: true,
       });
     });
@@ -614,7 +613,7 @@ describe('Cooldowns - @func3 - check()', () => {
     });
 
     it('check if cooldown is created', async () => {
-      const item = await getRepository(Cooldown).findOne({ where: { name: '!test' } });
+      const item = await AppDataSource.getRepository(Cooldown).findOne({ where: { name: '!test' } });
       assert(item.length !== 0);
     });
 
@@ -646,15 +645,15 @@ describe('Cooldowns - @func3 - check()', () => {
 
       gamble.enabled = true;
 
-      await getRepository(User).save({
+      await AppDataSource.getRepository(User).save({
         userName: usermod1.userName, userId: usermod1.userId, isModerator: true,
       });
-      await getRepository(User).save({
+      await AppDataSource.getRepository(User).save({
         userName: subuser1.userName, userId: subuser1.userId, isSubscriber: true,
       });
-      await getRepository(User).save({ userName: testUser.userName, userId: testUser.userId });
-      await getRepository(User).save({ userName: testUser2.userName, userId: testUser2.userId });
-      await getRepository(User).save({
+      await AppDataSource.getRepository(User).save({ userName: testUser.userName, userId: testUser.userId });
+      await AppDataSource.getRepository(User).save({ userName: testUser2.userName, userId: testUser2.userId });
+      await AppDataSource.getRepository(User).save({
         userName: owner.userName, userId: owner.userId, isSubscriber: true,
       });
     });
@@ -670,7 +669,7 @@ describe('Cooldowns - @func3 - check()', () => {
     });
 
     it('check if cooldown is created', async () => {
-      const item = await getRepository(Cooldown).findOne({ where: { name: '!test' } });
+      const item = await AppDataSource.getRepository(Cooldown).findOne({ where: { name: '!test' } });
       assert(item.length !== 0);
     });
 
@@ -697,15 +696,15 @@ describe('Cooldowns - @func3 - check()', () => {
 
       gamble.enabled = true;
 
-      await getRepository(User).save({
+      await AppDataSource.getRepository(User).save({
         userName: usermod1.userName, userId: usermod1.userId, isModerator: true,
       });
-      await getRepository(User).save({
+      await AppDataSource.getRepository(User).save({
         userName: subuser1.userName, userId: subuser1.userId, isSubscriber: true,
       });
-      await getRepository(User).save({ userName: testUser.userName, userId: testUser.userId });
-      await getRepository(User).save({ userName: testUser2.userName, userId: testUser2.userId });
-      await getRepository(User).save({
+      await AppDataSource.getRepository(User).save({ userName: testUser.userName, userId: testUser.userId });
+      await AppDataSource.getRepository(User).save({ userName: testUser2.userName, userId: testUser2.userId });
+      await AppDataSource.getRepository(User).save({
         userName: owner.userName, userId: owner.userId, isSubscriber: true,
       });
     });
@@ -715,7 +714,7 @@ describe('Cooldowns - @func3 - check()', () => {
     });
 
     it('test', async () => {
-      await getRepository(Keyword).save({
+      await AppDataSource.getRepository(Keyword).save({
         keyword:  'me',
         response: '(!me)',
         enabled:  true,
@@ -725,7 +724,7 @@ describe('Cooldowns - @func3 - check()', () => {
       const r = await cooldown.main({ sender: owner, parameters: `${command} ${type} ${seconds} ${quiet}` });
       assert.strictEqual(r[0].response, '$sender, user cooldown for me was set to 60s');
 
-      const item = await getRepository(Cooldown).findOne({ where: { name: 'me' } });
+      const item = await AppDataSource.getRepository(Cooldown).findOne({ where: { name: 'me' } });
       assert(typeof item !== 'undefined');
 
       let isOk = await cooldown.check({ sender: testUser, message: 'me' });
@@ -746,15 +745,15 @@ describe('Cooldowns - @func3 - check()', () => {
 
       gamble.enabled = true;
 
-      await getRepository(User).save({
+      await AppDataSource.getRepository(User).save({
         userName: usermod1.userName, userId: usermod1.userId, isModerator: true,
       });
-      await getRepository(User).save({
+      await AppDataSource.getRepository(User).save({
         userName: subuser1.userName, userId: subuser1.userId, isSubscriber: true,
       });
-      await getRepository(User).save({ userName: testUser.userName, userId: testUser.userId });
-      await getRepository(User).save({ userName: testUser2.userName, userId: testUser2.userId });
-      await getRepository(User).save({
+      await AppDataSource.getRepository(User).save({ userName: testUser.userName, userId: testUser.userId });
+      await AppDataSource.getRepository(User).save({ userName: testUser2.userName, userId: testUser2.userId });
+      await AppDataSource.getRepository(User).save({
         userName: owner.userName, userId: owner.userId, isSubscriber: true,
       });
     });
@@ -764,7 +763,7 @@ describe('Cooldowns - @func3 - check()', () => {
     });
 
     it('test', async () => {
-      await getRepository(Keyword).save({
+      await AppDataSource.getRepository(Keyword).save({
         keyword:  'me',
         response: '(!me)',
         enabled:  true,
@@ -774,7 +773,7 @@ describe('Cooldowns - @func3 - check()', () => {
       const r = await cooldown.main({ sender: owner, parameters: `${command} ${type} ${seconds} ${quiet}` });
       assert.strictEqual(r[0].response, '$sender, global cooldown for me was set to 60s');
 
-      const item = await getRepository(Cooldown).findOne({ where: { name: 'me' } });
+      const item = await AppDataSource.getRepository(Cooldown).findOne({ where: { name: 'me' } });
       assert(typeof item !== 'undefined');
 
       let isOk = await cooldown.check({ sender: testUser, message: 'me' });

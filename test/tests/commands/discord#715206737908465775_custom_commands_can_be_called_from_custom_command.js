@@ -4,9 +4,9 @@ require('../../general.js');
 const db = require('../../general.js').db;
 const time = require('../../general.js').time;
 const assert = require('assert');
+const { AppDataSource } = require('../../../dest/database.js');
 const message = require('../../general.js').message;
 
-const { getRepository } = require('typeorm');
 const { User } = require('../../../dest/database/entity/user');
 
 const customcommands = (require('../../../dest/systems/customcommands')).default;
@@ -19,7 +19,7 @@ describe('Custom Commands - @func1 - https://discordapp.com/channels/31734894614
     await db.cleanup();
     await message.prepare();
 
-    await getRepository(User).save({ userName: owner.userName, userId: owner.userId });
+    await AppDataSource.getRepository(User).save({ userName: owner.userName, userId: owner.userId });
   });
 
   describe('Custom command should correctly run second custom command', () => {

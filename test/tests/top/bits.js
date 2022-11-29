@@ -1,9 +1,8 @@
 /* global describe it before */
-/* global describe it before */
 const assert = require('assert');
+const { AppDataSource } = require('../../../dest/database.js');
 
 require('../../general.js');
-const { getRepository } = require('typeorm');
 
 const currency = require('../../../dest/currency').default;
 const twitch = require('../../../dest/services/twitch').default;
@@ -27,7 +26,7 @@ describe('Top - !top bits - @func1', () => {
     for (let i = 0; i < 10; i++) {
       const userId = String(Math.floor(Math.random() * 100000));
       const bits = [];
-      const user = { ...await getRepository(User).save({ userId, userName: 'user' + i }) };
+      const user = { ...await AppDataSource.getRepository(User).save({ userId, userName: 'user' + i }) };
 
       if (i === 0) {
         continue;
@@ -41,7 +40,7 @@ describe('Top - !top bits - @func1', () => {
           userId,
         });
       }
-      await getRepository(UserBit).save(bits);
+      await AppDataSource.getRepository(UserBit).save(bits);
     }
   });
 

@@ -2,6 +2,7 @@
 
 
 const assert = require('assert');
+const { AppDataSource } = require('../../../dest/database.js');
 require('../../general.js');
 
 const db = require('../../general.js').db;
@@ -10,7 +11,6 @@ const message = require('../../general.js').message;
 const timers = (require('../../../dest/systems/timers')).default;
 const isStreamOnline = (require('../../../dest/helpers/api/isStreamOnline')).isStreamOnline;
 
-const { getRepository } = require('typeorm');
 const { Timer, TimerResponse } = require('../../../dest/database/entity/timer');
 
 const { linesParsed } = require('../../../dest/helpers/parser');
@@ -110,7 +110,7 @@ describe('Timers - disabled responses should not be sent to chat - https://disco
     const time = Date.now();
     const checkTimer = new Promise((resolve) => {
       const check = async () => {
-        const updatedTimer = await getRepository(Timer).findOne(timer.id);
+        const updatedTimer = await AppDataSource.getRepository(Timer).findOneBy(timer.id);
         if (timer.triggeredAtTimestamp < updatedTimer.triggeredAtTimestamp) {
           resolve(true);
         } else {

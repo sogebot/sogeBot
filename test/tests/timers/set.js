@@ -9,7 +9,6 @@ const message = require('../../general.js').message;
 
 const timers = (require('../../../dest/systems/timers')).default;
 
-const { getRepository } = require('typeorm');
 const { Timer } = require('../../../dest/database/entity/timer');
 
 // users

@@ -1,6 +1,5 @@
-const { getRepository } = require('typeorm');
-
 const { User } = require('../../dest/database/entity/user');
+const { AppDataSource } = require('../../dest/database');
 
 const viewer = {
   userId:   '1',
@@ -69,15 +68,15 @@ const mod = {
 
 module.exports = {
   prepare: async () => {
-    await getRepository(User).save(viewer);
-    await getRepository(User).save(viewer2);
-    await getRepository(User).save(viewer3);
-    await getRepository(User).save(viewer4);
-    await getRepository(User).save(viewer5);
-    await getRepository(User).save(viewer6);
-    await getRepository(User).save(viewer7);
-    await getRepository(User).save(owner);
-    await getRepository(User).save(mod);
+    await AppDataSource.getRepository(User).save(viewer);
+    await AppDataSource.getRepository(User).save(viewer2);
+    await AppDataSource.getRepository(User).save(viewer3);
+    await AppDataSource.getRepository(User).save(viewer4);
+    await AppDataSource.getRepository(User).save(viewer5);
+    await AppDataSource.getRepository(User).save(viewer6);
+    await AppDataSource.getRepository(User).save(viewer7);
+    await AppDataSource.getRepository(User).save(owner);
+    await AppDataSource.getRepository(User).save(mod);
   },
   viewer,
   viewer2,

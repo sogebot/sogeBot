@@ -4,12 +4,12 @@
 
 require('../../general.js');
 
-const { getRepository } = require('typeorm');
 const { Cooldown, CooldownViewer } = require('../../../dest/database/entity/cooldown');
 const { User } = require('../../../dest/database/entity/user');
 const { Keyword } = require('../../../dest/database/entity/keyword');
 
 const assert = require('assert');
+const { AppDataSource } = require('../../../dest/database.js');
 
 const db = require('../../general.js').db;
 const message = require('../../general.js').message;
@@ -26,7 +26,7 @@ describe('cooldown - @func3 check should not endlessly loop', () => {
     await db.cleanup();
     await message.prepare();
 
-    await getRepository(User).save({ userName: owner.userName, userId: owner.userId, isSubscriber: true });
+    await AppDataSource.getRepository(User).save({ userName: owner.userName, userId: owner.userId, isSubscriber: true });
 
   });
 

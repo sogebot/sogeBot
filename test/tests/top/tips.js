@@ -1,8 +1,8 @@
 /* global */
 const assert = require('assert');
+const { AppDataSource } = require('../../../dest/database.js');
 
 require('../../general.js');
-const { getRepository } = require('typeorm');
 
 const currency = require('../../../dest/currency').default;
 const { User, UserTip } = require('../../../dest/database/entity/user');
@@ -27,7 +27,7 @@ describe('Top - !top tips - @func1', () => {
     for (let i = 0; i < 10; i++) {
       const userId = String(Math.floor(Math.random() * 100000));
       const tips = [];
-      const user = { ...await getRepository(User).save({ userId, userName: 'user' + i }) };
+      const user = { ...await AppDataSource.getRepository(User).save({ userId, userName: 'user' + i }) };
 
       if (i === 0) {
         continue;
@@ -44,7 +44,7 @@ describe('Top - !top tips - @func1', () => {
           userId,
         });
       }
-      await getRepository(UserTip).save(tips);
+      await AppDataSource.getRepository(UserTip).save(tips);
     }
   });
 

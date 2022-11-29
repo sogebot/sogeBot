@@ -10,7 +10,7 @@ const customcommands = (require('../../../dest/systems/customcommands')).default
 const timers = (require('../../../dest/systems/timers')).default;
 const check = (require('../../../dest/watchers')).check;
 
-const { getRepository } = require('typeorm');
+const { AppDataSource } = require('../../../dest/database.js');
 const { Timer, TimerResponse } = require('../../../dest/database/entity/timer');
 
 const { linesParsed } = require('../../../dest/helpers/parser');
@@ -24,7 +24,7 @@ describe('Message - https://discordapp.com/channels/317348946144002050/619437014
     await message.prepare();
     await alias.add({ sender: owner, parameters: '-a !testAlias -c !me' });
     await customcommands.add({ sender: owner, parameters: '-c !testCmd -r Lorem Ipsum' });
-    const timer = await getRepository(Timer).save({
+    const timer = await AppDataSource.getRepository(Timer).save({
       name: 'test',
       triggerEveryMessage: 0,
       triggerEverySecond: 1,
@@ -32,7 +32,7 @@ describe('Message - https://discordapp.com/channels/317348946144002050/619437014
       triggeredAtTimestamp: Date.now(),
       triggeredAtMessage: linesParsed,
     });
-    await getRepository(TimerResponse).save({
+    await AppDataSource.getRepository(TimerResponse).save({
       response: '(!top time)',
       timestamp: Date.now(),
       isEnabled: true,

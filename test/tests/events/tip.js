@@ -5,8 +5,8 @@ const assert = require('assert');
 
 require('../../general.js');
 
-const { getRepository } = require('typeorm');
 const { v4: uuidv4 } = require('uuid');
+const { AppDataSource } = require('../../../dest/database.js');
 
 const { Event } = require('../../../dest/database/entity/event');
 const { User } = require('../../../dest/database/entity/user');
@@ -25,7 +25,7 @@ describe('Events - tip event - @func3', () => {
 
   describe('#2219 - Give points on tip not working', function () {
     before(async function () {
-      await getRepository(Event).save({
+      await AppDataSource.getRepository(Event).save({
         id:          uuidv4(),
         name:        'tip',
         givenName:   'Tip alert',
@@ -43,7 +43,7 @@ describe('Events - tip event - @func3', () => {
       });
 
       for (const [idx, user] of ['losslezos', 'rigneir', 'mikasa_hraje', 'foufhs'].entries()) {
-        await getRepository(User).save({ userName: user, userId: String(idx * 100000) });
+        await AppDataSource.getRepository(User).save({ userName: user, userId: String(idx * 100000) });
       }
     });
 
@@ -66,7 +66,7 @@ describe('Events - tip event - @func3', () => {
 
         it('user should have 100 points', async () => {
           await changelog.flush();
-          const user = await getRepository(User).findOne({ userName: username });
+          const user = await AppDataSource.getRepository(User).findOneBy({ userName: username });
           assert.strict.equal(user.points, 100);
         });
       });

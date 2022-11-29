@@ -1,9 +1,8 @@
 /* global */
 
 const assert = require('assert');
+const { AppDataSource } = require('../../../dest/database.js');
 require('../../general.js');
-
-const { getRepository } = require('typeorm');
 
 const { User } = require('../../../dest/database/entity/user');
 const users = (require('../../../dest/users')).default;
@@ -23,10 +22,10 @@ describe('User - getUsernamesFromIds - @func1', () => {
     await db.cleanup();
     await message.prepare();
 
-    await getRepository(User).save(testuser);
-    await getRepository(User).save(testuser2);
-    await getRepository(User).save(testuser3);
-    await getRepository(User).save(nightbot);
+    await AppDataSource.getRepository(User).save(testuser);
+    await AppDataSource.getRepository(User).save(testuser2);
+    await AppDataSource.getRepository(User).save(testuser3);
+    await AppDataSource.getRepository(User).save(nightbot);
   });
 
   describe('getUsernamesFromIds should get correct usernames', () => {

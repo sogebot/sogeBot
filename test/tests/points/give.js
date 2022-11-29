@@ -5,7 +5,7 @@ require('../../general.js');
 const assert = require('assert');
 
 const _ = require('lodash');
-const { getRepository } = require('typeorm');
+const { AppDataSource } = require('../../../dest/database.js');
 
 const { User } = require('../../../dest/database/entity/user');
 const points = (require('../../../dest/systems/points')).default;
@@ -27,13 +27,13 @@ describe('Points - give() - @func1', () => {
     });
 
     it('create user1', async () => {
-      await getRepository(User).save({
+      await AppDataSource.getRepository(User).save({
         userName: user1.userName, userId: user1.userId, points: user1.points,
       });
     });
 
     it('create user2', async () => {
-      await getRepository(User).save({
+      await AppDataSource.getRepository(User).save({
         userName: user2.userName, userId: user2.userId, points: user2.points,
       });
     });
@@ -67,13 +67,13 @@ describe('Points - give() - @func1', () => {
     });
 
     it('create user1', async () => {
-      await getRepository(User).save({
+      await AppDataSource.getRepository(User).save({
         userName: user1.userName, userId: user1.userId, points: user1.points,
       });
     });
 
     it('create user2', async () => {
-      await getRepository(User).save({
+      await AppDataSource.getRepository(User).save({
         userName: user2.userName, userId: user2.userId, points: user2.points,
       });
     });
@@ -107,13 +107,13 @@ describe('Points - give() - @func1', () => {
     });
 
     it('create user1', async () => {
-      await getRepository(User).save({
+      await AppDataSource.getRepository(User).save({
         userName: user1.userName, userId: user1.userId, points: user1.points,
       });
     });
 
     it('create user2', async () => {
-      await getRepository(User).save({
+      await AppDataSource.getRepository(User).save({
         userName: user2.userName, userId: user2.userId, points: user2.points,
       });
     });
@@ -147,13 +147,13 @@ describe('Points - give() - @func1', () => {
     });
 
     it('create user1', async () => {
-      await getRepository(User).save({
+      await AppDataSource.getRepository(User).save({
         userName: user1.userName, userId: user1.userId, points: user1.points,
       });
     });
 
     it('create user2', async () => {
-      await getRepository(User).save({
+      await AppDataSource.getRepository(User).save({
         userName: user2.userName, userId: user2.userId, points: user2.points,
       });
     });
@@ -189,13 +189,13 @@ describe('Points - give() - @func1', () => {
     });
 
     it('create user1', async () => {
-      await getRepository(User).save({
+      await AppDataSource.getRepository(User).save({
         userName: user1.userName, userId: user1.userId, points: user1.points,
       });
     });
 
     it('create user2', async () => {
-      await getRepository(User).save({
+      await AppDataSource.getRepository(User).save({
         userName: user2.userName, userId: user2.userId, points: user2.points,
       });
     });
@@ -231,13 +231,13 @@ describe('Points - give() - @func1', () => {
     });
 
     it('create user1', async () => {
-      await getRepository(User).save({
+      await AppDataSource.getRepository(User).save({
         userName: user1.userName, userId: user1.userId, points: user1.points,
       });
     });
 
     it('create user2', async () => {
-      await getRepository(User).save({
+      await AppDataSource.getRepository(User).save({
         userName: user2.userName, userId: user2.userId, points: 0,
       });
     });

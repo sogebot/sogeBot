@@ -155,7 +155,7 @@
     "jsonlint-mod": "1.7.6",
     "lint-staged": "13.0.4",
     "minimist": "1.2.7",
-    "mocha": "9.2.2",
+    "mocha": "10.1.0",
     "nyc": "15.1.0",
     "process": "0.11.10",
     "sinon": "14.0.2",

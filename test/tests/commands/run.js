@@ -1,11 +1,11 @@
 const { v4: uuid } = require('uuid');
 const assert = require('assert');
 const { merge } = require('lodash');
-const { getRepository } = require('typeorm');
 
 const { Commands } = require('../../../dest/database/entity/commands');
 const { User } = require('../../../dest/database/entity/user');
 const { defaultPermissions } = require('../../../dest/helpers/permissions/');
+const { AppDataSource } = require('../../../dest/database');
 const customcommands = (require('../../../dest/systems/customcommands')).default;
 
 require('../../general.js');
@@ -21,8 +21,8 @@ describe('Custom Commands - @func1 - run()', () => {
     await db.cleanup();
     message.prepare();
 
-    await getRepository(User).save({ userName: owner.userName, userId: owner.userId });
-    await getRepository(User).save({ userName: user1.userName, userId: user1.userId });
+    await AppDataSource.getRepository(User).save({ userName: owner.userName, userId: owner.userId });
+    await AppDataSource.getRepository(User).save({ userName: user1.userName, userId: user1.userId });
   });
 
   describe('\'!test qwerty\' should trigger correct commands', () => {

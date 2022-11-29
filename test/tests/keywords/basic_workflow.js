@@ -5,9 +5,9 @@ const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 const assert = require('assert');
 
-const { getRepository } = require('typeorm');
 const { User } = require('../../../dest/database/entity/user');
 const { Keyword } = require('../../../dest/database/entity/keyword');
+const { AppDataSource } = require('../../../dest/database.js');
 
 const keywords = (require('../../../dest/systems/keywords')).default;
 
@@ -118,7 +118,7 @@ describe('Keywords - basic workflow (add, run, edit) - @func2', () => {
       describe(generateCommand(test), () => {
         before(async () => {
           await db.cleanup();
-          await getRepository(User).save(owner);
+          await AppDataSource.getRepository(User).save(owner);
         });
         beforeEach(async () => {
           await message.prepare();

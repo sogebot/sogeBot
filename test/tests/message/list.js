@@ -2,8 +2,7 @@
 require('../../general.js');
 
 const assert = require('assert');
-
-const { getRepository } = require('typeorm');
+const { AppDataSource } = require('../../../dest/database.js');
 
 const { User } = require('../../../dest/database/entity/user');
 const Message = require('../../../dest/message').default;
@@ -20,7 +19,7 @@ describe('Message - list filter - @func3', () => {
   before(async () => {
     await db.cleanup();
     await message.prepare();
-    await getRepository(User).save({ userName: owner.userName, userId: owner.userId });
+    await AppDataSource.getRepository(User).save({ userName: owner.userName, userId: owner.userId });
   });
 
   describe('(list.alias) should return proper message', () => {

@@ -1,6 +1,5 @@
 require('../../general.js');
 
-const { getRepository } = require('typeorm');
 const assert = require('assert');
 
 const { User } = require('../../../dest/database/entity/user');
