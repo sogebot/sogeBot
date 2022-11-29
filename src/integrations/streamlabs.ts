@@ -18,10 +18,11 @@ import rates from '~/helpers/currency/rates';
 import { eventEmitter } from '~/helpers/events';
 import { triggerInterfaceOnTip } from '~/helpers/interface/triggers';
 import {
-  debug, error, info, tip,
+  debug, error, info, tip, warning,
 } from '~/helpers/log';
 import { ioServer } from '~/helpers/panel';
 import { variables } from '~/watchers';
+import { adminEndpoint } from '~/helpers/socket';
 
 namespace StreamlabsEvent {
   export type Donation = {
@@ -64,6 +65,9 @@ class Streamlabs extends Integration {
   @settings()
     socketToken = '';
 
+  @settings()
+    userName = '';
+
   @onStartup()
   onStartup() {
     setInterval(() => {
@@ -73,10 +77,18 @@ class Streamlabs extends Integration {
     }, 30000);
   }
 
+  @onChange('accessToken')
+  async onAccessTokenChange () {
+    await this.getMe();
+    await this.getSocketToken();
+  }
+
   @onStartup()
   @onChange('enabled')
-  onStateChange (key: string, val: boolean) {
+  async onStateChange (key: string, val: boolean) {
     if (val) {
+      await this.getMe();
+      await this.getSocketToken();
       this.connect();
     } else {
       this.disconnect();
@@ -92,6 +104,7 @@ class Streamlabs extends Integration {
 
   async restApiInterval () {
     if (this.enabled && this.accessToken.length > 0) {
+      this.getMe();
       const after = String(this.afterDonationId).length > 0 ? `&after=${this.afterDonationId}` : '';
       const url = 'https://streamlabs.com/api/v1.0/donations?access_token=' + this.accessToken + after;
       try {
@@ -150,6 +163,49 @@ class Streamlabs extends Integration {
         }
       }
     }
+  }
+
+  async getSocketToken() {
+    if (this.enabled && this.accessToken.length > 0 ) {
+      try {
+        const url = 'https://streamlabs.com/api/v1.0/socket/token?access_token=' + this.accessToken;
+        const result = (await axios.get<any>(url)).data;
+        this.socketToken = result.socket_token;
+      } catch (e) {
+        if (this.socketToken === '') {
+          warning('STREAMLABS: Couldn\'t fetch socket token. Will use only REST API polling.');
+        }
+      }
+    }
+  }
+
+  async getMe() {
+    if (this.enabled && this.accessToken.length > 0) {
+      const url = 'https://streamlabs.com/api/v1.0/user?access_token=' + this.accessToken;
+      const result = (await axios.get<any>(url)).data;
+      if (this.userName !== result.streamlabs.username) {
+        info('STREAMLABS: Connected as ' + result.streamlabs.username);
+      }
+      this.userName = result.streamlabs.username;
+    } else {
+      this.userName = '';
+    }
+  }
+
+  sockets() {
+    adminEndpoint('/integrations/streamlabs', 'revoke', async (cb) => {
+      this.socketToken = '';
+      this.userName = '';
+      this.accessToken = '';
+      this.disconnect();
+      info(`STREAMLABS: User access revoked.`);
+      cb(null);
+    });
+    adminEndpoint('/integrations/streamlabs', 'token', async (tokens, cb) => {
+      this.accessToken = tokens.accessToken;
+      await this.connect();
+      cb(null);
+    });
   }
 
   @onChange('socketToken')

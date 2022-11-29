@@ -359,7 +359,10 @@ export type ClientToServerEventsWithNamespace = {
   '/services/google': GenericEvents,
   '/integrations/twitter': GenericEvents,
   '/integrations/tipeeestream': GenericEvents,
-  '/integrations/streamlabs': GenericEvents,
+  '/integrations/streamlabs': GenericEvents & {
+    'revoke': (cb: (err: Error | string | null) => void) => void,
+    'token': (data: { accessToken: string }, cb: (err: Error | string | null) => void) => void,
+  },
   '/integrations/streamelements': GenericEvents,
   '/integrations/qiwi': GenericEvents,
   '/integrations/lastfm': GenericEvents,
