@@ -19,8 +19,8 @@ export async function getAllStreamTags(opts: any) {
     const getAllStreamTagsPaginated = await clientBot.tags.getAllStreamTagsPaginated().getAll();
     for(const tag of getAllStreamTagsPaginated) {
       await setImmediateAwait();
-      const localizationNames = await getRepository(TwitchTagLocalizationName).find({ tagId: tag.id });
-      const localizationDescriptions = await getRepository(TwitchTagLocalizationDescription).find({ tagId: tag.id });
+      const localizationNames = await getRepository(TwitchTagLocalizationName).findBy({ tagId: tag.id });
+      const localizationDescriptions = await getRepository(TwitchTagLocalizationDescription).findBy({ tagId: tag.id });
       await getRepository(TwitchTag).save({
         tag_id:             tag.id,
         is_auto:            tag.isAuto,

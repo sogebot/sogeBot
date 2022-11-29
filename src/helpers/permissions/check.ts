@@ -47,7 +47,7 @@ async function check(userId: string, permId: string, partial = false): Promise<c
   }
 
   const user = await changelog.get(userId);
-  const pItem = await Permissions.findOneBy({
+  const pItem = await Permissions.findOne({
     where: { id: permId },
   });
   try {

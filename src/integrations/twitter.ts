@@ -132,7 +132,7 @@ class Twitter extends Integration {
       // do nothing if client is not defined
       return;
     }
-    const hashtagsToWatch = (await getRepository(Event).find({ name: 'tweet-post-with-hashtag' })).map((o) => {
+    const hashtagsToWatch = (await getRepository(Event).findBy({ name: 'tweet-post-with-hashtag' })).map((o) => {
       return o.definitions.hashtag;
     });
 

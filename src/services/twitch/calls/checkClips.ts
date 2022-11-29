@@ -15,7 +15,7 @@ export async function checkClips () {
   }
   try {
     const clientBot = await client('bot');
-    let notCheckedClips = (await getRepository(TwitchClips).find({ isChecked: false }));
+    let notCheckedClips = (await getRepository(TwitchClips).findBy({ isChecked: false }));
 
     // remove clips which failed
     for (const clip of notCheckedClips.filter((o) => new Date(o.shouldBeCheckedAt).getTime() < new Date().getTime())) {

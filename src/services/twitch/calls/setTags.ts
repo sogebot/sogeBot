@@ -21,7 +21,7 @@ async function setTags (tagsArg: string[]): Promise<boolean> {
     const clientBroadcaster = await client('broadcaster');
 
     for (const tag of tagsArg) {
-      const name = await getRepository(TwitchTagLocalizationName).findOneBy({
+      const name = await getRepository(TwitchTagLocalizationName).findOne({
         where: {
           value: tag,
           tagId: Not(IsNull()),
