@@ -6,7 +6,8 @@ import {
 import { User } from '@entity/user';
 import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized';
 import * as _ from 'lodash';
-import { getRepository, IsNull } from 'typeorm';
+import { AppDataSource } from '~/database';
+import { IsNull } from 'typeorm';
 
 import {
   command, default_permission, parser, settings, timer,
@@ -82,7 +83,7 @@ class Raffles extends System {
         await changelog.flush();
         cb(
           null,
-          await getRepository(User).findOne({ userName }),
+          await AppDataSource.getRepository(User).findOneBy({ userName }) as any,
         );
       } catch (e: any) {
         cb(e.stack);
@@ -90,7 +91,7 @@ class Raffles extends System {
     });
     adminEndpoint('/systems/raffles', 'raffle::setEligibility', async ({ id, isEligible }, cb) => {
       try {
-        await getRepository(RaffleParticipant).update({ id }, { isEligible });
+        await AppDataSource.getRepository(RaffleParticipant).update({ id }, { isEligible });
         cb(null);
       } catch (e: any) {
         cb(e.stack);
@@ -100,10 +101,10 @@ class Raffles extends System {
       try {
         cb(
           null,
-          await getRepository(Raffle).findOne({
+          await AppDataSource.getRepository(Raffle).findOne({
             relations: ['participants', 'participants.messages'],
             order:     { timestamp: 'DESC' },
-          }),
+          }) as any,
         );
       } catch (e: any) {
         cb (e);
@@ -116,13 +117,13 @@ class Raffles extends System {
     });
     adminEndpoint('/systems/raffles', 'raffle::open', async (message) => {
       // force close raffles
-      await getRepository(Raffle).update({}, { isClosed: true });
+      await AppDataSource.getRepository(Raffle).update({}, { isClosed: true });
       this.open({
         attr: {}, command: '!raffle open', createdAt: Date.now(), sender: getOwnerAsSender(), parameters: message, isAction: false, emotesOffsets: new Map(), isFirstTimeMessage: false, discord: undefined,
       });
     });
     adminEndpoint('/systems/raffles', 'raffle::close', async () => {
-      await getRepository(Raffle).update({ isClosed: false }, { isClosed: true });
+      await AppDataSource.getRepository(Raffle).update({ isClosed: false }, { isClosed: true });
     });
   }
 
@@ -132,7 +133,7 @@ class Raffles extends System {
       return true;
     }
 
-    const raffle = await getRepository(Raffle).findOne({
+    const raffle = await AppDataSource.getRepository(Raffle).findOne({
       where: { isClosed: true },
       order: { timestamp: 'DESC' },
     });
@@ -144,11 +145,13 @@ class Raffles extends System {
     const isInFiveMinutesTreshold = Date.now() - raffle.timestamp <= 1000 * 60 * 5;
 
     if (isWinner && isInFiveMinutesTreshold) {
-      const winner = await getRepository(RaffleParticipant).findOne({
+      const winner = await AppDataSource.getRepository(RaffleParticipant).findOne({
         relations: ['messages'],
         where:     {
           username: opts.sender.userName,
-          raffle,
+          raffle:   {
+            id: raffle.id,
+          },
         },
       });
       if (winner) {
@@ -157,7 +160,7 @@ class Raffles extends System {
           text:      opts.message,
         };
         winner.messages.push(message);
-        await getRepository(RaffleParticipant).save(winner);
+        await AppDataSource.getRepository(RaffleParticipant).save(winner);
       }
     }
     return true;
@@ -165,7 +168,7 @@ class Raffles extends System {
 
   async announceEntries() {
     try {
-      const raffle = await getRepository(Raffle).findOneOrFail({ where: { winner: IsNull(), isClosed: false }, relations: ['participants'] });
+      const raffle = await AppDataSource.getRepository(Raffle).findOneOrFail({ where: { winner: IsNull(), isClosed: false }, relations: ['participants'] });
       const eligibility: string[] = [];
       if (raffle.forSubscribers === true) {
         eligibility.push(prepare('raffles.eligibility-subscribers-item'));
@@ -202,7 +205,7 @@ class Raffles extends System {
       return;
     }
 
-    const raffle = await getRepository(Raffle).findOne({ where: { winner: IsNull(), isClosed: false }, relations: ['participants'] });
+    const raffle = await AppDataSource.getRepository(Raffle).findOne({ where: { winner: IsNull(), isClosed: false }, relations: ['participants'] });
     const isTimeToAnnounce = new Date().getTime() - new Date(this.lastAnnounce).getTime() >= (this.raffleAnnounceInterval * 60 * 1000);
     const isMessageCountToAnnounce = linesParsed - this.lastAnnounceMessageCount >= this.raffleAnnounceMessageInterval;
     if (!(isStreamOnline.value) || !raffle || !isTimeToAnnounce || !isMessageCountToAnnounce) {
@@ -247,9 +250,9 @@ class Raffles extends System {
   @command('!raffle remove')
   @default_permission(defaultPermissions.CASTERS)
   async remove (opts: CommandOptions): Promise<CommandResponse[]> {
-    const raffle = await getRepository(Raffle).findOne({ winner: IsNull(), isClosed: false });
+    const raffle = await AppDataSource.getRepository(Raffle).findOneBy({ winner: IsNull(), isClosed: false });
     if (raffle) {
-      await getRepository(Raffle).remove(raffle);
+      await AppDataSource.getRepository(Raffle).remove(raffle);
     }
     return [];
   }
@@ -286,13 +289,13 @@ class Raffles extends System {
     const keyword = keywordMatch[1];
 
     // check if raffle running
-    const raffle = await getRepository(Raffle).findOne({ winner: IsNull(), isClosed: false });
+    const raffle = await AppDataSource.getRepository(Raffle).findOneBy({ winner: IsNull(), isClosed: false });
     if (raffle) {
       const response = prepare('raffles.raffle-is-already-running', { keyword: raffle.keyword });
       return [{ response, ...opts }];
     }
 
-    await getRepository(Raffle).save({
+    await AppDataSource.getRepository(Raffle).save({
       keyword:        keyword,
       forSubscribers: subscribers,
       minTickets,
@@ -333,7 +336,7 @@ class Raffles extends System {
 
   @command('!raffle')
   async main (opts: CommandOptions): Promise<CommandResponse[]> {
-    const raffle = await getRepository(Raffle).findOne({ where: { winner: IsNull(), isClosed: false }, relations: ['participants'] });
+    const raffle = await AppDataSource.getRepository(Raffle).findOne({ where: { winner: IsNull(), isClosed: false }, relations: ['participants'] });
 
     if (!raffle) {
       const response = prepare('raffles.no-raffle-is-currently-running');
@@ -378,7 +381,7 @@ class Raffles extends System {
       return true;
     }
 
-    const raffle = await getRepository(Raffle).findOne({
+    const raffle = await AppDataSource.getRepository(Raffle).findOne({
       relations: ['participants'],
       where:     { winner: IsNull(), isClosed: false },
     });
@@ -469,7 +472,7 @@ class Raffles extends System {
       debug('raffle', selectedParticipant);
       debug('raffle', user);
       debug('raffle', '------------------------------------------------------------------------------------------------');
-      await getRepository(RaffleParticipant).save(selectedParticipant);
+      await AppDataSource.getRepository(RaffleParticipant).save(selectedParticipant);
       return true;
     } else {
       return false;
@@ -479,7 +482,7 @@ class Raffles extends System {
   @command('!raffle pick')
   @default_permission(defaultPermissions.CASTERS)
   async pick (opts: CommandOptions): Promise<CommandResponse[]> {
-    const raffle = await getRepository(Raffle).findOne({
+    const raffle = await AppDataSource.getRepository(Raffle).findOne({
       relations: ['participants'],
       order:     { timestamp: 'DESC' },
     });
@@ -490,7 +493,7 @@ class Raffles extends System {
     if (raffle.participants.length === 0) {
       const response = prepare('raffles.no-participants-to-pick-winner');
       // close raffle on pick
-      await getRepository(Raffle).save({
+      await AppDataSource.getRepository(Raffle).save({
         ...raffle, isClosed: true, timestamp: Date.now(),
       });
       return [{ response, ...opts }];
@@ -535,8 +538,8 @@ class Raffles extends System {
     // uneligible winner (don't want to pick second time same user if repick)
     if (winner) {
       await Promise.all([
-        getRepository(RaffleParticipant).save({ ...winner, isEligible: false }),
-        getRepository(Raffle).save({
+        AppDataSource.getRepository(RaffleParticipant).save({ ...winner, isEligible: false }),
+        AppDataSource.getRepository(Raffle).save({
           ...raffle, winner: winner.username, isClosed: true, timestamp: Date.now(),
         }),
       ]);
@@ -549,7 +552,7 @@ class Raffles extends System {
       announce(response, 'raffles');
     } else {
       // close raffle on pick
-      await getRepository(Raffle).save({
+      await AppDataSource.getRepository(Raffle).save({
         ...raffle, isClosed: true, timestamp: Date.now(),
       }),
       warning('No winner found in raffle');

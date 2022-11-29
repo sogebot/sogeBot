@@ -1,7 +1,7 @@
 import { Currency, UserTip, UserTipInterface } from '@entity/user';
 import * as constants from '@sogebot/ui-helpers/constants';
 import fetch from 'node-fetch';
-import { getRepository } from 'typeorm';
+import { AppDataSource } from '~/database';
 
 import { persistent, settings } from '../decorators';
 import { onStartup } from '../decorators/on';
@@ -156,7 +156,7 @@ class TipeeeStream extends Integration {
             tippedAt:      timestamp,
             userId:        user.userId,
           };
-          getRepository(UserTip).save(newTip);
+          AppDataSource.getRepository(UserTip).save(newTip);
           tip(`${userName.toLowerCase()}${user.userId ? '#' + user.userId : ''}, amount: ${Number(amount).toFixed(2)}${donationCurrency}, message: ${message}`);
           eventlist.add({
             event:    'tip',

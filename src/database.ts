@@ -34,7 +34,7 @@ const PGDataSourceOptions = {
 } satisfies DataSourceOptions;
 
 const SQLiteDataSourceOptions = {
-  type:          'sqlite',
+  type:          'better-sqlite3',
   database:      process.env.TYPEORM_DATABASE ?? 'sogebot.db',
   logging:       ['error'],
   logger:        new TypeORMLogger(),
@@ -42,7 +42,7 @@ const SQLiteDataSourceOptions = {
   migrationsRun: true,
   entities:      [ 'dest/database/entity/*.js' ],
   subscribers:   [ 'dest/database/entity/*.js' ],
-  migrations:    [ `dest/database/migration/postgres/**/*.js` ],
+  migrations:    [ `dest/database/migration/sqlite/**/*.js` ],
 } satisfies DataSourceOptions;
 
 let AppDataSource: DataSource;

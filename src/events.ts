@@ -7,7 +7,7 @@ import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized';
 import _, {
   clone, cloneDeep, get, isNil, random,
 } from 'lodash';
-import { getRepository } from 'typeorm';
+import { AppDataSource } from '~/database';
 import { VM }  from 'vm2';
 
 import Core from '~/_interface';
@@ -242,8 +242,8 @@ class Events extends Core {
 
         await changelog.flush();
         const user = attributes.userId
-          ? await getRepository(User).findOneBy({ userId: attributes.userId })
-          : await getRepository(User).findOneBy({ userName: attributes.userName });
+          ? await AppDataSource.getRepository(User).findOneBy({ userId: attributes.userId })
+          : await AppDataSource.getRepository(User).findOneBy({ userName: attributes.userName });
 
         if (!user) {
           try {
@@ -274,7 +274,7 @@ class Events extends Core {
     }
     if (!isNil(get(attributes, 'recipient', null))) {
       await changelog.flush();
-      const user = await getRepository(User).findOneBy({ userName: attributes.recipient });
+      const user = await AppDataSource.getRepository(User).findOneBy({ userName: attributes.recipient });
       if (!user) {
         const userId = await getIdFromTwitch(attributes.recipient);
         changelog.update(userId, { userName: attributes.recipient });
@@ -297,7 +297,7 @@ class Events extends Core {
       return;
     }
 
-    const eventsFromRepository = await getRepository(Event).find({
+    const eventsFromRepository = await AppDataSource.getRepository(Event).find({
       relations: ['operations'],
       where:     isUUID(eventId)
         ? { id: eventId, isEnabled: true }
@@ -331,8 +331,8 @@ class Events extends Core {
 
   // set triggered attribute to empty object
   public async reset(eventId: string) {
-    for (const event of await getRepository(Event).findBy({ name: eventId })) {
-      await getRepository(Event).save({ ...event, triggered: {} });
+    for (const event of await AppDataSource.getRepository(Event).findBy({ name: eventId })) {
+      await AppDataSource.getRepository(Event).save({ ...event, triggered: {} });
     }
   }
 
@@ -363,7 +363,7 @@ class Events extends Core {
     tmiEmitter.emit('part', 'bot');
     // force all users offline
     await changelog.flush();
-    await getRepository(User).update({}, { isOnline: false });
+    await AppDataSource.getRepository(User).update({}, { isOnline: false });
   }
 
   public async fireStartCommercial(operation: EventsEntity.OperationDefinitions) {
@@ -415,7 +415,7 @@ class Events extends Core {
       userObj = await changelog.get(userId);
     } else {
       await changelog.flush();
-      userObj = await getRepository(User).findOneBy({ userName });
+      userObj = await AppDataSource.getRepository(User).findOneBy({ userName });
     }
     await changelog.flush();
     if (!userObj && !attributes.test) {
@@ -513,7 +513,7 @@ class Events extends Core {
     const shouldTrigger = Date.now() - new Date(event.triggered.runEveryXMinutes).getTime() >= Number(event.definitions.runEveryXMinutes) * 60 * 1000;
     if (shouldTrigger || shouldSave) {
       event.triggered.runEveryXMinutes = Date.now();
-      await getRepository(Event).save(event);
+      await AppDataSource.getRepository(Event).save(event);
     }
     return shouldTrigger;
   }
@@ -538,7 +538,7 @@ class Events extends Core {
                           && Number(dayjs.utc().unix()) - Number(dayjs.utc(streamStatusChangeSince.value).unix()) > Number(event.definitions.runAfterXMinutes) * 60;
     if (shouldTrigger) {
       event.triggered.runAfterXMinutes = event.definitions.runAfterXMinutes;
-      await getRepository(Event).save(event);
+      await AppDataSource.getRepository(Event).save(event);
     }
     return shouldTrigger;
   }
@@ -556,7 +556,7 @@ class Events extends Core {
                         || (event.definitions.runInterval === 0 && event.triggered.runInterval === 0));
     if (shouldTrigger) {
       event.triggered.runInterval = Date.now();
-      await getRepository(Event).save(event);
+      await AppDataSource.getRepository(Event).save(event);
     }
     return shouldTrigger;
   }
@@ -582,7 +582,7 @@ class Events extends Core {
         event.triggered.runInterval = Date.now();
         event.triggered.runEveryXCommands = 0;
       }
-      await getRepository(Event).save(event);
+      await AppDataSource.getRepository(Event).save(event);
     }
     return shouldTrigger;
   }
@@ -615,7 +615,7 @@ class Events extends Core {
         event.triggered.runInterval = Date.now();
         event.triggered.runEveryXKeywords = 0;
       }
-      await getRepository(Event).save(event);
+      await AppDataSource.getRepository(Event).save(event);
     }
     return shouldTrigger;
   }
@@ -711,18 +711,18 @@ class Events extends Core {
     });
     adminEndpoint('/core/events', 'generic::getAll', async (cb) => {
       try {
-        cb(null, await getRepository(Event).find({ relations: ['operations'] }));
+        cb(null, await AppDataSource.getRepository(Event).find({ relations: ['operations'] }));
       } catch (e: any) {
         cb(e.stack, []);
       }
     });
     adminEndpoint('/core/events', 'generic::getOne', async (id, cb) => {
       try {
-        const event = await getRepository(Event).findOne({
+        const event = await AppDataSource.getRepository(Event).findOne({
           relations: ['operations'],
           where:     { id },
         });
-        cb(null, event);
+        cb(null, event as any);
       } catch (e: any) {
         cb(e.stack, undefined);
       }
@@ -805,7 +805,7 @@ class Events extends Core {
           attributes.amount = Number(attributes.amount).toFixed(2);
         }
 
-        const event = await getRepository(Event).findOne({
+        const event = await AppDataSource.getRepository(Event).findOne({
           relations: ['operations'],
           where:     { id },
         });
@@ -825,16 +825,16 @@ class Events extends Core {
 
     adminEndpoint('/core/events', 'events::save', async (event, cb) => {
       try {
-        cb(null, await getRepository(Event).save({ ...event, operations: event.operations.filter(o => o.name !== 'do-nothing') }));
+        cb(null, await AppDataSource.getRepository(Event).save({ ...event, operations: event.operations.filter(o => o.name !== 'do-nothing') }));
       } catch (e: any) {
         cb(e.stack, event);
       }
     });
 
     adminEndpoint('/core/events', 'events::remove', async (eventId, cb) => {
-      const event = await getRepository(Event).findOneBy({ id: eventId });
+      const event = await AppDataSource.getRepository(Event).findOneBy({ id: eventId });
       if (event) {
-        await getRepository(Event).remove(event);
+        await AppDataSource.getRepository(Event).remove(event);
       }
       cb(null);
     });
@@ -847,7 +847,7 @@ class Events extends Core {
     }
 
     try {
-      for (const event of (await getRepository(Event)
+      for (const event of (await AppDataSource.getRepository(Event)
         .createQueryBuilder('event')
         .where('event.name = :event1', { event1: 'command-send-x-times' })
         .orWhere('event.name = :event2', { event2: 'keyword-send-x-times ' })
@@ -855,7 +855,7 @@ class Events extends Core {
         if (isNil(get(event, 'triggered.fadeOutInterval', null))) {
           // fadeOutInterval init
           event.triggered.fadeOutInterval = Date.now();
-          await getRepository(Event).save(event);
+          await AppDataSource.getRepository(Event).save(event);
         } else {
           if (Date.now() - event.triggered.fadeOutInterval >= Number(event.definitions.fadeOutInterval) * 1000) {
             // fade out commands
@@ -867,7 +867,7 @@ class Events extends Core {
 
                 event.triggered.fadeOutInterval = Date.now();
                 event.triggered.runEveryXCommands = event.triggered.runEveryXCommands - Number(event.definitions.fadeOutXCommands);
-                await getRepository(Event).save(event);
+                await AppDataSource.getRepository(Event).save(event);
               }
             } else if (event.name === 'keyword-send-x-times') {
               if (!isNil(get(event, 'triggered.runEveryXKeywords', null))) {
@@ -877,7 +877,7 @@ class Events extends Core {
 
                 event.triggered.fadeOutInterval = Date.now();
                 event.triggered.runEveryXKeywords = event.triggered.runEveryXKeywords - Number(event.definitions.fadeOutXKeywords);
-                await getRepository(Event).save(event);
+                await AppDataSource.getRepository(Event).save(event);
               }
             }
           }

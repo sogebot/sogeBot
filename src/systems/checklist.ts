@@ -1,5 +1,5 @@
 import { Checklist as ChecklistEntity } from '@entity/checklist';
-import { getRepository } from 'typeorm';
+import { AppDataSource } from '~/database';
 
 import { settings, ui } from '../decorators';
 import { onChange, onStreamEnd } from '../decorators/on';
@@ -15,14 +15,14 @@ class Checklist extends System {
   sockets() {
     adminEndpoint('/systems/checklist', 'generic::getAll', async (cb) => {
       try {
-        const checkedItems = await getRepository(ChecklistEntity).find();
+        const checkedItems = await AppDataSource.getRepository(ChecklistEntity).find();
         cb(null, this.itemsArray, checkedItems);
       } catch(e: any) {
         cb(e.stack, [], []);
       }
     });
     adminEndpoint('/systems/checklist', 'checklist::save', async (checklistItem, cb) => {
-      await getRepository(ChecklistEntity).save(checklistItem);
+      await AppDataSource.getRepository(ChecklistEntity).save(checklistItem);
       if (cb) {
         cb(null);
       }
@@ -31,12 +31,12 @@ class Checklist extends System {
 
   @onChange('itemsArray')
   onChangeItemsArray() {
-    getRepository(ChecklistEntity).clear();
+    AppDataSource.getRepository(ChecklistEntity).clear();
   }
 
   @onStreamEnd()
   public onStreamEnd() {
-    getRepository(ChecklistEntity).update({}, { isCompleted: false });
+    AppDataSource.getRepository(ChecklistEntity).update({}, { isCompleted: false });
   }
 }
 

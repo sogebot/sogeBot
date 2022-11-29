@@ -4,7 +4,7 @@ import { Rank } from '@entity/rank';
 import { User, UserInterface } from '@entity/user';
 import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized';
 import * as _ from 'lodash';
-import { getRepository } from 'typeorm';
+import { AppDataSource } from '~/database';
 
 import { command, default_permission } from '../decorators';
 import users from '../users';
@@ -85,9 +85,9 @@ class Ranks extends System {
     }
 
     const value = parseInt(parsed[1], 10);
-    const rank = await getRepository(Rank).findOneBy({ value, type });
+    const rank = await AppDataSource.getRepository(Rank).findOneBy({ value, type });
     if (!rank) {
-      await getRepository(Rank).save({
+      await AppDataSource.getRepository(Rank).save({
         value, rank: parsed[2], type,
       });
     }
@@ -121,13 +121,13 @@ class Ranks extends System {
     const value = parsed[1];
     const rank = parsed[2];
 
-    const item = await getRepository(Rank).findOneBy({ value: parseInt(value, 10), type });
+    const item = await AppDataSource.getRepository(Rank).findOneBy({ value: parseInt(value, 10), type });
     if (!item) {
       const response = prepare('ranks.rank-was-not-found', { value: value });
       return [{ response, ...opts }];
     }
 
-    await getRepository(Rank).save({ ...item, rank });
+    await AppDataSource.getRepository(Rank).save({ ...item, rank });
     const response = prepare('ranks.rank-was-edited',
       {
         hours:   parseInt(value, 10),
@@ -155,7 +155,7 @@ class Ranks extends System {
     }
 
     await changelog.flush();
-    await getRepository(User).update({ userName: parsed[1] }, { haveCustomRank: true, rank: parsed[2].trim() });
+    await AppDataSource.getRepository(User).update({ userName: parsed[1] }, { haveCustomRank: true, rank: parsed[2].trim() });
     const response = prepare('ranks.custom-rank-was-set-to-user', { rank: parsed[2].trim(), username: parsed[1] });
     return [{ response, ...opts }];
   }
@@ -170,7 +170,7 @@ class Ranks extends System {
       return [{ response, ...opts }];
     }
     await changelog.flush();
-    await getRepository(User).update({ userName: parsed[1] }, { haveCustomRank: false, rank: '' });
+    await AppDataSource.getRepository(User).update({ userName: parsed[1] }, { haveCustomRank: false, rank: '' });
     const response = prepare('ranks.custom-rank-was-unset-for-user', { username: parsed[1] });
     return [{ response, ...opts }];
   }
@@ -188,7 +188,7 @@ class Ranks extends System {
   @command('!rank list')
   @default_permission(defaultPermissions.CASTERS)
   async list (opts: CommandOptions, type: Rank['type'] = 'viewer'): Promise<CommandResponse[]> {
-    const ranks = await getRepository(Rank).findBy({ type });
+    const ranks = await AppDataSource.getRepository(Rank).findBy({ type });
     const response = prepare(ranks.length === 0 ? 'ranks.list-is-empty' : 'ranks.list-is-not-empty', {
       list: _.orderBy(ranks, 'value', 'asc').map((l) => {
         return l.value + 'h - ' + l.rank;
@@ -213,7 +213,7 @@ class Ranks extends System {
     }
 
     const value = parseInt(parsed[1], 10);
-    const removed = await getRepository(Rank).delete({ value, type });
+    const removed = await AppDataSource.getRepository(Rank).delete({ value, type });
 
     const response = prepare(removed ? 'ranks.rank-was-removed' : 'ranks.rank-was-not-found',
       {
@@ -273,7 +273,7 @@ class Ranks extends System {
       return { current: user.rank, next: null };
     }
 
-    const ranks = await getRepository(Rank).find({ order: { value: 'DESC' } });
+    const ranks = await AppDataSource.getRepository(Rank).find({ order: { value: 'DESC' } });
 
     let rankToReturn: null | Required<Rank> = null;
     let subNextRank: null | Required<Rank> = null;

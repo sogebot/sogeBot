@@ -2,7 +2,8 @@ import crypto from 'crypto';
 
 import { EventList as EventListEntity } from '@entity/eventList';
 import * as _ from 'lodash';
-import { Brackets, getRepository } from 'typeorm';
+import { Brackets } from 'typeorm';
+import { AppDataSource } from '~/database';
 
 import users from '../users';
 import eventlist from '../widgets/eventlist';
@@ -18,10 +19,10 @@ class EventList extends Overlay {
 
   sockets () {
     adminEndpoint('/overlays/eventlist', 'eventlist::getUserEvents', async (userId, cb) => {
-      const eventsByUserId = await getRepository(EventListEntity).findBy({ userId: userId });
+      const eventsByUserId = await AppDataSource.getRepository(EventListEntity).findBy({ userId: userId });
       // we also need subgifts by giver
       const eventsByRecipientId
-        = (await getRepository(EventListEntity).findBy({ event: 'subgift' }))
+        = (await AppDataSource.getRepository(EventListEntity).findBy({ event: 'subgift' }))
           .filter(o => JSON.parse(o.values_json).fromId === userId);
       const events =  _.orderBy([ ...eventsByRecipientId, ...eventsByUserId ], 'timestamp', 'desc');
       // we need to change userId => username and fromId => fromId username for eventlist compatibility
@@ -50,7 +51,7 @@ class EventList extends Overlay {
       }));
     });
     publicEndpoint('/overlays/eventlist', 'getEvents', async (opts: { ignore: string[]; limit: number }, cb) => {
-      let events = await getRepository(EventListEntity)
+      let events = await AppDataSource.getRepository(EventListEntity)
         .createQueryBuilder('events')
         .select('events')
         .orderBy('events.timestamp', 'DESC')
@@ -112,7 +113,7 @@ class EventList extends Overlay {
       });
     }
 
-    await getRepository(EventListEntity).save({
+    await AppDataSource.getRepository(EventListEntity).save({
       event:       data.event,
       userId:      data.userId,
       timestamp:   Date.now(),

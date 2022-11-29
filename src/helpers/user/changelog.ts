@@ -3,7 +3,7 @@ import { MINUTE } from '@sogebot/ui-helpers/constants';
 import {
   get as _get, cloneDeep, merge, set,
 } from 'lodash';
-import { getRepository } from 'typeorm';
+import { AppDataSource } from '~/database';
 import { v4 } from 'uuid';
 
 import { timer } from '../../decorators';
@@ -78,7 +78,7 @@ class Changelog {
       checkLock(userId, resolve);
     });
 
-    const user = await getRepository(User).findOneBy({ userId });
+    const user = await AppDataSource.getRepository(User).findOneBy({ userId });
     const data = cloneDeep(defaultData);
     merge(data, { userId }, user);
 
@@ -165,7 +165,7 @@ export async function flush() {
 
     if (!users.has(change.userId)) {
       // initial values
-      const user = await getRepository(User).findOneBy({ userId: change.userId });
+      const user = await AppDataSource.getRepository(User).findOneBy({ userId: change.userId });
       const data = cloneDeep(defaultData);
       merge(data, { userId: change.userId }, user);
       users.set(change.userId, data);
@@ -197,7 +197,7 @@ export async function flush() {
 
   for (const user of users.values()) {
     try {
-      await getRepository(User).save(user);
+      await AppDataSource.getRepository(User).save(user);
     } catch (e) {
       if (e instanceof Error) {
         error(e.stack);

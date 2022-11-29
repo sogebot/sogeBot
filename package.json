@@ -92,7 +92,6 @@
   },
   "scripts": {
     "postinstall": "(patch-package || (exit 0))",
-    "prestart": "node ./tools/migration.js",
     "build": "cross-env ENV=development make bot",
     "test": "node tools/runTests.js",
     "test:migration": "node tools/migrationCheck.js",

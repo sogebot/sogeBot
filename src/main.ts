@@ -38,6 +38,8 @@ const connect = async function () {
   }
 
   await AppDataSource.initialize();
+  await AppDataSource.runMigrations();
+
   const typeToLog = {
     'better-sqlite3': 'SQLite3',
     mariadb:          'MySQL/MariaDB',

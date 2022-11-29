@@ -1,7 +1,7 @@
 import { Settings } from '@entity/settings';
 import DeepProxy from 'proxy-deep';
 import { EntityNotFoundError } from 'typeorm';
-import { getRepository } from 'typeorm';
+import { AppDataSource } from '~/database';
 
 import { IsLoadingInProgress, toggleLoadingInProgress } from '../../decorators';
 import { isDbConnected } from '../database';
@@ -52,7 +52,7 @@ function persistent<T>({ value, name, namespace, onChange }: { value: T, name: s
     }
     debug('persistent.set', `Updating ${namespace}/${name}`);
     debug('persistent.set', proxy.value);
-    getRepository(Settings).update({ namespace, name }, { value: JSON.stringify(proxy.value) }).then(() => {
+    AppDataSource.getRepository(Settings).update({ namespace, name }, { value: JSON.stringify(proxy.value) }).then(() => {
       debug('persistent.set', `Update done on ${namespace}/${name}`);
     });
   }
@@ -66,16 +66,16 @@ function persistent<T>({ value, name, namespace, onChange }: { value: T, name: s
     try {
       debug('persistent.load', `Loading ${namespace}/${name}`);
       proxy.value = JSON.parse(
-        (await getRepository(Settings).findOneByOrFail({ namespace, name })).value,
+        (await AppDataSource.getRepository(Settings).findOneByOrFail({ namespace, name })).value,
       );
     } catch (e: any) {
       debug('persistent.load', `Data not found, creating ${namespace}/${name}`);
       if (!(e instanceof EntityNotFoundError)) {
         await setImmediateAwait();
-        await getRepository(Settings).delete({ name, namespace });
+        await AppDataSource.getRepository(Settings).delete({ name, namespace });
       }
       await setImmediateAwait();
-      await getRepository(Settings).insert({
+      await AppDataSource.getRepository(Settings).insert({
         name, namespace, value: JSON.stringify(value),
       });
     } finally {

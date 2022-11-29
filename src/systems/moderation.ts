@@ -7,7 +7,8 @@ import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized';
 import emojiRegex from 'emoji-regex';
 import * as _ from 'lodash';
 import tlds from 'tlds';
-import { getRepository, LessThan } from 'typeorm';
+import { LessThan } from 'typeorm';
+import { AppDataSource } from '~/database';
 import XRegExp from 'xregexp';
 
 import { parserReply } from '../commons';
@@ -210,8 +211,8 @@ class Moderation extends System {
 
   async timeoutUser (sender: CommandOptions['sender'], text: string, warning: string, msg: string, time: number, type: typeof timeoutType[number], msgId: string ) {
     // cleanup warnings
-    await getRepository(ModerationWarning).delete({ timestamp: LessThan(Date.now() - 1000 * 60 * 60) });
-    const warnings = await getRepository(ModerationWarning).findBy({ userId: sender.userId });
+    await AppDataSource.getRepository(ModerationWarning).delete({ timestamp: LessThan(Date.now() - 1000 * 60 * 60) });
+    const warnings = await AppDataSource.getRepository(ModerationWarning).findBy({ userId: sender.userId });
     const silent = await this.isSilent(type);
 
     text = text.trim();
@@ -226,9 +227,9 @@ class Moderation extends System {
     if (isWarningCountAboveThreshold) {
       timeoutLog(`${sender.userName} [${type}] ${time}s timeout | ${text}`);
       tmiEmitter.emit('timeout', sender.userName, time, isModerator(sender));
-      await getRepository(ModerationWarning).delete({ userId: sender.userId });
+      await AppDataSource.getRepository(ModerationWarning).delete({ userId: sender.userId });
     } else {
-      await getRepository(ModerationWarning).insert({ userId: sender.userId, timestamp: Date.now() });
+      await AppDataSource.getRepository(ModerationWarning).insert({ userId: sender.userId, timestamp: Date.now() });
       const warningsLeft = this.cWarningsAllowedCount - warnings.length;
       warning = await new Message(warning.replace(/\$count/g, String(warningsLeft < 0 ? 0 : warningsLeft))).parse();
       if (this.cWarningsShouldClearChat) {
@@ -253,7 +254,7 @@ class Moderation extends System {
     // check if spotify -or- alias of spotify contain open.spotify.com link
     if (spotify.enabled) {
       const cmd = spotify.getCommand('!spotify');
-      const alias = await getRepository(Alias).findOne({ where: { command: cmd } });
+      const alias = await AppDataSource.getRepository(Alias).findOne({ where: { command: cmd } });
       if (alias && alias.enabled && aliasSystem.enabled) {
         spotifyRegex = new RegExp('^(' + cmd + '|' + alias.alias + ') \\S+open\\.spotify\\.com\\/track\\/(\\w+)(.*)?', 'gi');
       } else {
@@ -265,7 +266,7 @@ class Moderation extends System {
     // check if songrequest -or- alias of songrequest contain youtube link
     if (songs.enabled) {
       const cmd = songs.getCommand('!songrequest');
-      const alias = await getRepository(Alias).findOne({ where: { command: cmd } });
+      const alias = await AppDataSource.getRepository(Alias).findOne({ where: { command: cmd } });
       if (alias && alias.enabled && aliasSystem.enabled) {
         ytRegex = new RegExp('^(' + cmd + '|' + alias.alias + ') \\S+(?:youtu.be\\/|v\\/|e\\/|u\\/\\w+\\/|embed\\/|v=)([^#&?]*).*', 'gi');
       } else {
@@ -317,7 +318,7 @@ class Moderation extends System {
 
       const userId = await users.getIdByName(parsed[1].toLowerCase());
       for (let i = 0; i < count; i++) {
-        await getRepository(ModerationPermit).insert({ userId });
+        await AppDataSource.getRepository(ModerationPermit).insert({ userId });
       }
 
       const response = prepare('moderation.user-have-link-permit', {
@@ -394,9 +395,9 @@ class Moderation extends System {
 
     const whitelisted = await this.whitelist(opts.message, permId);
     if (whitelisted.search(urlRegex[cLinksIncludeSpaces[permId] ? 0 : 1]) >= 0) {
-      const permit = await getRepository(ModerationPermit).findOneBy({ userId: opts.sender.userId });
+      const permit = await AppDataSource.getRepository(ModerationPermit).findOneBy({ userId: opts.sender.userId });
       if (permit) {
-        await getRepository(ModerationPermit).remove(permit);
+        await AppDataSource.getRepository(ModerationPermit).remove(permit);
         return true;
       } else {
         this.timeoutUser(opts.sender, whitelisted,

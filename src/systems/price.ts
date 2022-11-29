@@ -4,7 +4,7 @@ import { format } from '@sogebot/ui-helpers/number';
 import { validateOrReject } from 'class-validator';
 import * as _ from 'lodash';
 import { merge } from 'lodash';
-import { getRepository } from 'typeorm';
+import { AppDataSource } from '~/database';
 
 import { parserReply } from '../commons';
 import {
@@ -96,8 +96,8 @@ class Price extends System {
       return this.unset(opts);
     }
 
-    const price = await getRepository(PriceEntity).save({
-      ...(await getRepository(PriceEntity).findOneBy({ command: cmd })),
+    const price = await AppDataSource.getRepository(PriceEntity).save({
+      ...(await AppDataSource.getRepository(PriceEntity).findOneBy({ command: cmd })),
       command: cmd, price: parseInt(argPrice, 10),
     });
     const response = prepare('price.price-was-set', {
@@ -117,7 +117,7 @@ class Price extends System {
     }
 
     const cmd = parsed[1];
-    await getRepository(PriceEntity).delete({ command: cmd });
+    await AppDataSource.getRepository(PriceEntity).delete({ command: cmd });
     const response = prepare('price.price-was-unset', { command: cmd });
     return [{ response, ...opts }];
   }
@@ -133,13 +133,13 @@ class Price extends System {
     }
 
     const cmd = parsed[1];
-    const price = await getRepository(PriceEntity).findOneBy({ command: cmd });
+    const price = await AppDataSource.getRepository(PriceEntity).findOneBy({ command: cmd });
     if (!price) {
       const response = prepare('price.price-was-not-found', { command: cmd });
       return [{ response, ...opts }];
     }
 
-    await getRepository(PriceEntity).save({ ...price, enabled: !price.enabled });
+    await AppDataSource.getRepository(PriceEntity).save({ ...price, enabled: !price.enabled });
     const response = prepare(price.enabled ? 'price.price-was-enabled' : 'price.price-was-disabled', { command: cmd });
     return [{ response, ...opts }];
   }
@@ -147,7 +147,7 @@ class Price extends System {
   @command('!price list')
   @default_permission(defaultPermissions.CASTERS)
   async list (opts: CommandOptions): Promise<CommandResponse[]> {
-    const prices = await getRepository(PriceEntity).find();
+    const prices = await AppDataSource.getRepository(PriceEntity).find();
     const response = (prices.length === 0 ? translate('price.list-is-empty') : translate('price.list-is-not-empty').replace(/\$list/g, (_.orderBy(prices, 'command').map((o) => {
       return `${o.command} - ${o.price}`;
     })).join(', ')));
@@ -166,7 +166,7 @@ class Price extends System {
       return true;
     }
 
-    const price = await getRepository(PriceEntity).findOneBy({ command: parsed[1], enabled: true });
+    const price = await AppDataSource.getRepository(PriceEntity).findOneBy({ command: parsed[1], enabled: true });
     if (!price) { // no price set
       return true;
     }
@@ -207,7 +207,7 @@ class Price extends System {
     ) {
       return true;
     }
-    const price = await getRepository(PriceEntity).findOneBy({ command: parsed[1], enabled: true });
+    const price = await AppDataSource.getRepository(PriceEntity).findOneBy({ command: parsed[1], enabled: true });
     if (price) { // no price set
       const removePts = price.price;
       changelog.increment(opts.sender.userId, { points: removePts });

@@ -3,7 +3,7 @@ import * as constants from '@sogebot/ui-helpers/constants';
 import { validateOrReject } from 'class-validator';
 import * as _ from 'lodash';
 import { merge } from 'lodash';
-import { getRepository } from 'typeorm';
+import { AppDataSource } from '~/database';
 
 import { parserReply } from '../commons';
 import {
@@ -273,7 +273,7 @@ class Alias extends System {
           const response = prepare('alias.alias-was-not-found', { alias });
           return [{ response, ...opts }];
         }
-        await getRepository(AliasEntity).save({ ...item, group });
+        await AppDataSource.getRepository(AliasEntity).save({ ...item, group });
         const response = prepare('alias.alias-group-set', { ...item, group });
         return [{ response, ...opts }];
       } else if (opts.parameters.includes('-unset')) {
@@ -287,7 +287,7 @@ class Alias extends System {
           const response = prepare('alias.alias-was-not-found', { alias });
           return [{ response, ...opts }];
         }
-        await getRepository(AliasEntity).save({ ...item, group: null });
+        await AppDataSource.getRepository(AliasEntity).save({ ...item, group: null });
         const response = prepare('alias.alias-group-unset', item);
         return [{ response, ...opts }];
       } else if (opts.parameters.includes('-list')) {
@@ -311,7 +311,7 @@ class Alias extends System {
             name: 'enable', type: String, multi: true, delimiter: '',
           }) // set as multi as group can contain spaces
           .toArray();
-        await getRepository(AliasEntity).update({ group }, { enabled: true });
+        await AppDataSource.getRepository(AliasEntity).update({ group }, { enabled: true });
         const response = prepare('alias.alias-group-list-enabled', { group });
         return [{ response, ...opts }];
       } else if (opts.parameters.includes('-disable')) {
@@ -320,7 +320,7 @@ class Alias extends System {
             name: 'disable', type: String, multi: true, delimiter: '',
           }) // set as multi as group can contain spaces
           .toArray();
-        await getRepository(AliasEntity).update({ group }, { enabled: false });
+        await AppDataSource.getRepository(AliasEntity).update({ group }, { enabled: false });
         const response = prepare('alias.alias-group-list-disabled', { group });
         return [{ response, ...opts }];
       } else {
@@ -493,7 +493,7 @@ class Alias extends System {
         const response = prepare('alias.alias-was-not-found', { alias });
         return [{ response, ...opts }];
       }
-      await getRepository(AliasEntity).remove(item);
+      await AppDataSource.getRepository(AliasEntity).remove(item);
       const response = prepare('alias.alias-was-removed', { alias });
       return [{ response, ...opts }];
     } catch (e: any) {

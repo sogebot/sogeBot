@@ -1,5 +1,5 @@
 import { UserBit } from '@entity/user';
-import { getRepository } from 'typeorm';
+import { AppDataSource } from '~/database';
 
 import users from '../users';
 import Stats from './_interface';
@@ -17,7 +17,7 @@ class Bits extends Stats {
   sockets() {
     adminEndpoint('/stats/bits', 'generic::getAll', async (cb) => {
       try {
-        const items = await getRepository(UserBit).find();
+        const items = await AppDataSource.getRepository(UserBit).find();
         cb(null, await Promise.all(items.map(async (item) => {
           return {
             ...item,

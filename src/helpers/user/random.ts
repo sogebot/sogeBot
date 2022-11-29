@@ -1,12 +1,11 @@
 import { User } from '@entity/user';
-import { getConnection, getRepository } from 'typeorm';
+import { AppDataSource } from '~/database';
 
 import * as changelog from '~/helpers/user/changelog.js';
 import { variables } from '~/watchers';
 
 async function getRandOrder() {
-  const connection = await getConnection();
-  if (connection.options.type === 'better-sqlite3' || connection.options.type === 'postgres') {
+  if (AppDataSource.options.type === 'better-sqlite3' || AppDataSource.options.type === 'postgres') {
     return 'RANDOM()';
   } else {
     return 'RAND()';
@@ -17,7 +16,7 @@ async function getRandomViewer() {
   await changelog.flush();
   const botUsername = variables.get('services.twitch.botUsername') as string;
   const broadcasterUsername = variables.get('services.twitch.broadcasterUsername') as string;
-  return getRepository(User).createQueryBuilder('user')
+  return AppDataSource.getRepository(User).createQueryBuilder('user')
     .where('user.userName != :botusername', { botusername: botUsername.toLowerCase() })
     .andWhere('user.userName != :broadcasterusername', { broadcasterusername: broadcasterUsername.toLowerCase() })
     .orderBy(await getRandOrder())
@@ -29,7 +28,7 @@ async function getRandomSubscriber() {
   await changelog.flush();
   const botUsername = variables.get('services.twitch.botUsername') as string;
   const broadcasterUsername = variables.get('services.twitch.broadcasterUsername') as string;
-  return getRepository(User).createQueryBuilder('user')
+  return AppDataSource.getRepository(User).createQueryBuilder('user')
     .where('user.userName != :botusername', { botusername: botUsername.toLowerCase() })
     .andWhere('user.userName != :broadcasterusername', { broadcasterusername: broadcasterUsername.toLowerCase() })
     .andWhere('user.isSubscriber = :isSubscriber', { isSubscriber: true })
@@ -42,7 +41,7 @@ async function getRandomOnlineViewer() {
   await changelog.flush();
   const botUsername = variables.get('services.twitch.botUsername') as string;
   const broadcasterUsername = variables.get('services.twitch.broadcasterUsername') as string;
-  return getRepository(User).createQueryBuilder('user')
+  return AppDataSource.getRepository(User).createQueryBuilder('user')
     .where('user.userName != :botusername', { botusername: botUsername.toLowerCase() })
     .andWhere('user.userName != :broadcasterusername', { broadcasterusername: broadcasterUsername.toLowerCase() })
     .andWhere('user.isOnline = :isOnline', { isOnline: true })
@@ -55,7 +54,7 @@ async function getRandomOnlineSubscriber() {
   await changelog.flush();
   const botUsername = variables.get('services.twitch.botUsername') as string;
   const broadcasterUsername = variables.get('services.twitch.broadcasterUsername') as string;
-  return getRepository(User).createQueryBuilder('user')
+  return AppDataSource.getRepository(User).createQueryBuilder('user')
     .where('user.userName != :botusername', { botusername: botUsername.toLowerCase() })
     .andWhere('user.userName != :broadcasterusername', { broadcasterusername: broadcasterUsername.toLowerCase() })
     .andWhere('user.isOnline = :isOnline', { isOnline: true })

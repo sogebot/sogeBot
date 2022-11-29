@@ -70,7 +70,7 @@ class Timers extends System {
         await validateOrReject(itemToSave);
         await itemToSave.save();
 
-        await TimerResponse.delete({ timer: itemToSave });
+        await TimerResponse.delete({ timer: { id: itemToSave.id } });
         const responses = req.body.messages;
         for (const response of responses) {
           const resToSave = new TimerResponse();

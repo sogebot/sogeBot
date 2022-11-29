@@ -1,11 +1,11 @@
-import { getManager } from 'typeorm';
+import { AppDataSource } from '~/database';
 
 export let isDbConnected = false;
 export let isBotStarted = false;
 
 async function setIsDbConnected () {
   try {
-    isDbConnected = (await getManager()).connection.isConnected;
+    isDbConnected = AppDataSource.isInitialized;
   } catch (e: any) {
     const { debug } = await import('./log');
     debug('database', 'Database not yet connected.');

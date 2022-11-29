@@ -1,5 +1,5 @@
 import { CommandsCount } from '@entity/commands';
-import { getRepository } from 'typeorm';
+import { AppDataSource } from '~/database';
 
 import Stats from './_interface';
 
@@ -16,7 +16,7 @@ class CommandCount extends Stats {
   sockets() {
     adminEndpoint('/stats/commandcount', 'commands::count', async (cb) => {
       try {
-        cb(null, await getRepository(CommandsCount).find());
+        cb(null, await AppDataSource.getRepository(CommandsCount).find());
       } catch (e: any) {
         cb(e.stack, []);
       }

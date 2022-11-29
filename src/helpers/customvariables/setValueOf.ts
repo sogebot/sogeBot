@@ -1,6 +1,6 @@
 import { Variable, VariableInterface } from '@entity/variable';
 import { isNil } from 'lodash';
-import { getRepository } from 'typeorm';
+import { AppDataSource } from '~/database';
 
 import users from '../../users';
 import { warning } from '../log';
@@ -16,7 +16,7 @@ import { updateWidgetAndTitle } from './updateWidgetAndTitle';
 
 async function setValueOf (variable: string | Readonly<VariableInterface>, currentValue: any, opts: any): Promise<{ updated: Readonly<VariableInterface>; isOk: boolean; setValue: string; isEval: boolean }> {
   const item = typeof variable === 'string'
-    ? await getRepository(Variable).findOneBy({ variableName: variable })
+    ? await AppDataSource.getRepository(Variable).findOneBy({ variableName: variable })
     : { ...variable };
   let isOk = true;
   let isEval = false;
@@ -92,7 +92,7 @@ async function setValueOf (variable: string | Readonly<VariableInterface>, curre
 
   // do update only on non-eval variables
   if (item.type !== 'eval' && isOk) {
-    await getRepository(Variable).save({
+    await AppDataSource.getRepository(Variable).save({
       ...item,
       currentValue: itemCurrentValue,
     });

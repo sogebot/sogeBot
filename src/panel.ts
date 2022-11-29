@@ -11,9 +11,6 @@ import gitCommitInfo from 'git-commit-info';
 import jwt from 'jsonwebtoken';
 import _ from 'lodash';
 import sanitize from 'sanitize-filename';
-import {
-  getConnection, getManager, getRepository,
-} from 'typeorm';
 
 import { possibleLists } from '../d.ts/src/helpers/socket.js';
 import emitter from './helpers/interfaceEmitter.js';
@@ -63,6 +60,7 @@ import highlights from '~/systems/highlights';
 import songs from '~/systems/songs';
 import translateLib, { translate } from '~/translate';
 import { variables } from '~/watchers';
+import { AppDataSource } from '~/database.js';
 
 const port = Number(process.env.PORT ?? 20000);
 const secureport = Number(process.env.SECUREPORT ?? 20443);
@@ -305,9 +303,8 @@ class Panel extends Core {
       socketsConnectedInc();
 
       socket.on('getCachedTags', async (cb: (results: TwitchTagInterface[]) => void) => {
-        const connection = await getConnection();
-        const joinQuery = connection.options.type === 'postgres' ? '"names"."tagId" = "tag_id" AND "names"."locale"' : 'names.tagId = tag_id AND names.locale';
-        let query = getRepository(TwitchTag)
+        const joinQuery = AppDataSource.options.type === 'postgres' ? '"names"."tagId" = "tag_id" AND "names"."locale"' : 'names.tagId = tag_id AND names.locale';
+        let query = AppDataSource.getRepository(TwitchTag)
           .createQueryBuilder('tags')
           .select('names.locale', 'locale')
           .addSelect('names.value', 'value')
@@ -322,7 +319,7 @@ class Panel extends Core {
           cb(results);
         } else {
         // if we don';t have results with our selected locale => reload with en-us
-          query = getRepository(TwitchTag)
+          query = AppDataSource.getRepository(TwitchTag)
             .createQueryBuilder('tags')
             .select('names.locale', 'locale')
             .addSelect('names.value', 'value')
@@ -340,13 +337,13 @@ class Panel extends Core {
         sendGameFromTwitch(game).then((data) => cb(data));
       });
       socket.on('getUserTwitchGames', async (cb) => {
-        let titles = await getRepository(CacheTitles).find();
-        const cachedGames = await getRepository(CacheGames).find();
+        let titles = await AppDataSource.getRepository(CacheTitles).find();
+        const cachedGames = await AppDataSource.getRepository(CacheGames).find();
 
         // we need to cleanup titles if game is not in cache
         for (const title of titles) {
           if (!cachedGames.map(o => o.name).includes(title.game)) {
-            await getRepository(CacheTitles).delete({ game: title.game });
+            await AppDataSource.getRepository(CacheTitles).delete({ game: title.game });
           }
         }
 
@@ -357,12 +354,12 @@ class Panel extends Core {
             thumbnail: await getGameThumbnailFromName(game.name) || '',
           });
         }
-        titles = await getRepository(CacheTitles).find();
+        titles = await AppDataSource.getRepository(CacheTitles).find();
         cb(titles, games);
       });
       socket.on('cleanupGameAndTitle', async () => {
       // remove empty titles
-        await getManager()
+        await AppDataSource
           .createQueryBuilder()
           .delete()
           .from(CacheTitles, 'titles')
@@ -370,12 +367,12 @@ class Panel extends Core {
           .execute();
 
         // remove duplicates
-        const allTitles = await getRepository(CacheTitles).find();
+        const allTitles = await AppDataSource.getRepository(CacheTitles).find();
         for (const t of allTitles) {
           const titles = allTitles.filter(o => o.game === t.game && o.title === t.title);
           if (titles.length > 1) {
           // remove title if we have more than one title
-            await getManager()
+            await AppDataSource
               .createQueryBuilder()
               .delete()
               .from(CacheTitles, 'titles')
@@ -395,13 +392,13 @@ class Panel extends Core {
         data.title = data.title.trim();
         data.game = data.game.trim();
 
-        const item = await getRepository(CacheTitles).findOneBy({
+        const item = await AppDataSource.getRepository(CacheTitles).findOneBy({
           game:  data.game,
           title: data.title,
         });
 
         if (!item) {
-          await getManager()
+          await AppDataSource
             .createQueryBuilder()
             .insert()
             .into(CacheTitles)
@@ -413,7 +410,7 @@ class Panel extends Core {
             .execute();
         } else {
         // update timestamp
-          await getRepository(CacheTitles).save({ ...item, timestamp: Date.now() });
+          await AppDataSource.getRepository(CacheTitles).save({ ...item, timestamp: Date.now() });
         }
         cb(null);
       });
@@ -424,7 +421,7 @@ class Panel extends Core {
         tmiEmitter.emit('part', 'bot');
         // force all users offline
         await changelog.flush();
-        await getRepository(User).update({}, { isOnline: false });
+        await AppDataSource.getRepository(User).update({}, { isOnline: false });
       });
 
       // custom var
@@ -466,7 +463,7 @@ class Panel extends Core {
         _.remove(translateLib.custom, function (o: any) {
           return o.name === data.name;
         });
-        await getRepository(Translation).delete({ name: data.name });
+        await AppDataSource.getRepository(Translation).delete({ name: data.name });
         callback(translate(data.name));
       });
 

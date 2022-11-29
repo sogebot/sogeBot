@@ -2,9 +2,7 @@ import { User } from '@entity/user';
 import {
   chunk, includes,
 } from 'lodash';
-import {
-  getRepository,
-} from 'typeorm';
+import { AppDataSource } from '~/database';
 
 import client from '../api/client';
 import { refresh } from '../token/refresh.js';
@@ -44,7 +42,7 @@ export const getChannelChattersUnofficialAPI = async (opts: any) => {
     for (const userName of allOnlineUsers) {
       if (!includes(chatters, userName) && userName.toLocaleLowerCase() !== botUsername.toLocaleLowerCase()) {
         // user is no longer in channel
-        await getRepository(User).update({ userName }, { isOnline: false });
+        await AppDataSource.getRepository(User).update({ userName }, { isOnline: false });
         partedUsers.push(userName);
       }
     }
@@ -60,9 +58,9 @@ export const getChannelChattersUnofficialAPI = async (opts: any) => {
     const usersToFetch: string[] = [];
     if (joinedUsers.length > 0) {
       for (const userName of joinedUsers) {
-        const user = await getRepository(User).findOne({ where: { userName } });
+        const user = await AppDataSource.getRepository(User).findOne({ where: { userName } });
         if (user) {
-          await getRepository(User).save({ ...user, isOnline: true });
+          await AppDataSource.getRepository(User).save({ ...user, isOnline: true });
           if (!user.createdAt) {
             // run this after we save new user
             const getUserByName = await clientBot.users.getUserByName(userName);
@@ -79,7 +77,7 @@ export const getChannelChattersUnofficialAPI = async (opts: any) => {
     for (const usernameBatch of chunk(usersToFetch, 100)) {
       clientBot.users.getUsersByNames(usernameBatch).then(users => {
         if (users) {
-          getRepository(User).save(
+          AppDataSource.getRepository(User).save(
             users.map(user => {
               return {
                 userId:          user.id,

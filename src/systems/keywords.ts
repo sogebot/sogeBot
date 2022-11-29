@@ -3,7 +3,7 @@ import {
 } from '@entity/keyword';
 import { validateOrReject } from 'class-validator';
 import _, { merge } from 'lodash';
-import { getRepository } from 'typeorm';
+import { AppDataSource } from '~/database';
 import XRegExp from 'xregexp';
 
 import { parserReply } from '../commons';
@@ -100,7 +100,7 @@ class Keywords extends System {
         await validateOrReject(itemToSave);
         await itemToSave.save();
 
-        await getRepository(KeywordResponses).delete({ where: { keyword: itemToSave } });
+        await AppDataSource.getRepository(KeywordResponses).delete({ keyword: { id: itemToSave.id } });
         const responses = req.body.responses;
         for (const response of responses) {
           const resToSave = new KeywordResponses();

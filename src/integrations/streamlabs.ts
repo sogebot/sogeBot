@@ -2,7 +2,7 @@ import { Currency, UserTip, UserTipInterface } from '@entity/user';
 import axios from 'axios';
 import chalk from 'chalk';
 import { io, Socket } from 'socket.io-client';
-import { getRepository } from 'typeorm';
+import { AppDataSource } from '~/database';
 
 import { persistent, settings } from '../decorators';
 import { onChange, onStartup } from '../decorators/on';
@@ -246,7 +246,7 @@ class Streamlabs extends Integration {
         debug('streamlabs', event);
         if (!event.isTest) {
           const user = await users.getUserByUsername(event.from.toLowerCase());
-          const tips = await getRepository(UserTip).find({ where: { userId: user.userId } });
+          const tips = await AppDataSource.getRepository(UserTip).find({ where: { userId: user.userId } });
 
           // workaround for https://github.com/sogebot/sogeBot/issues/3338
           // incorrect currency on event rerun
@@ -273,7 +273,7 @@ class Streamlabs extends Integration {
             exchangeRates: rates,
             userId:        user.userId,
           };
-          getRepository(UserTip).save(newTip);
+          AppDataSource.getRepository(UserTip).save(newTip);
 
           if (isStreamOnline.value) {
             stats.value.currentTips = stats.value.currentTips + Number(exchange(Number(event.amount), event.currency, mainCurrency.value));

@@ -8,7 +8,7 @@ import { template } from '~/plugins/template';
 import { sendMessage } from '~/helpers/commons/sendMessage';
 import { getBotSender } from '~/helpers/commons';
 import * as changelog from '~/helpers/user/changelog.js';
-import { getRepository } from 'typeorm';
+import { AppDataSource } from '~/database';
 import { User } from '~/database/entity/user';
 import { isBroadcaster } from '~/helpers/user/isBroadcaster';
 import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized';
@@ -76,7 +76,7 @@ export default async function(pluginId: string, currentNode: Node<string>, param
         async isUserModerator(userName: string) {
           await changelog.flush();
           try {
-            const user = await getRepository(User).findOneByOrFail({ userName: userName.toLowerCase() });
+            const user = await AppDataSource.getRepository(User).findOneByOrFail({ userName: userName.toLowerCase() });
             return user.isModerator;
           } catch {
             return false;

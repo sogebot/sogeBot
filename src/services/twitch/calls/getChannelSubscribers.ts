@@ -1,5 +1,5 @@
 import { HelixSubscription } from '@twurple/api/lib';
-import { getRepository } from 'typeorm';
+import { AppDataSource } from '~/database';
 
 import client from '../api/client';
 import { refresh } from '../token/refresh.js';
@@ -63,7 +63,7 @@ export async function getChannelSubscribers<T extends { noAffiliateOrPartnerWarn
 
 async function setSubscribers (subscribers: HelixSubscription[]) {
   await changelog.flush();
-  const currentSubscribers = await getRepository(User).find({ where: { isSubscriber: true } });
+  const currentSubscribers = await AppDataSource.getRepository(User).find({ where: { isSubscriber: true } });
 
   // check if current subscribers are still subs
   for (const user of currentSubscribers) {

@@ -6,8 +6,10 @@ import { User } from '@entity/user';
 import * as _ from 'lodash';
 import io from 'socket.io';
 import {
-  Brackets, getConnection, getRepository, In, Like,
+  Brackets, In, Like,
 } from 'typeorm';
+import { AppDataSource } from '~/database';
+
 import ytdl from 'ytdl-core';
 import ytpl from 'ytpl';
 import ytsr from 'ytsr';
@@ -125,7 +127,6 @@ class Songs extends System {
       }
     });
     publicEndpoint('/systems/songs', 'find.playlist', async (opts: { filters?: Filter[], page: number, search?: string, tag?: string | null, perPage: number}, cb) => {
-      const connection = await getConnection();
       opts.page = opts.page ?? 0;
       opts.perPage = opts.perPage ?? 25;
 
@@ -145,7 +146,7 @@ class Songs extends System {
             for (let i = 0; i < filter.value.length; i++) {
               const name2 = shortid.characters('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_.');
               const value = filter.value[i];
-              if  (['postgres'].includes(connection.options.type.toLowerCase())) {
+              if  (['postgres'].includes(AppDataSource.options.type.toLowerCase())) {
                 w[i === 0 ? 'where' : 'orWhere'](`"playlist"."${filter.columnName}" like :${name2}`, { [name2]: `%${value}%` });
               } else {
                 w[i === 0 ? 'where' : 'orWhere'](`playlist.${filter.columnName} like :${name2}`, { [name2]: `%${value}%` });
@@ -155,21 +156,21 @@ class Songs extends System {
         }
 
         if (filter.operation === 'contains') {
-          if  (['postgres'].includes(connection.options.type.toLowerCase())) {
+          if  (['postgres'].includes(AppDataSource.options.type.toLowerCase())) {
             query.andWhere(`"playlist"."${filter.columnName}" like :${name}`, { [name]: `%${filter.value}%` });
           } else {
             query.andWhere(`playlist.${filter.columnName} like :${name}`, { [name]: `%${filter.value}%` });
           }
         }
         if (filter.operation === 'equal') {
-          if  (['postgres'].includes(connection.options.type.toLowerCase())) {
+          if  (['postgres'].includes(AppDataSource.options.type.toLowerCase())) {
             query.andWhere(`"playlist"."${filter.columnName}" = :${name}`, { [name]: `${filter.value}` });
           } else {
             query.andWhere(`playlist.${filter.columnName} =:${name}`, { [name]: `${filter.value}` });
           }
         }
         if (filter.operation === 'notEqual') {
-          if  (['postgres'].includes(connection.options.type.toLowerCase())) {
+          if  (['postgres'].includes(AppDataSource.options.type.toLowerCase())) {
             query.andWhere(`"playlist"."${filter.columnName}" != :${name}`, { [name]: `${filter.value}` });
           } else {
             query.andWhere(`playlist.${filter.columnName} != :${name}`, { [name]: `${filter.value}` });
@@ -179,7 +180,7 @@ class Songs extends System {
 
       if (typeof opts.search !== 'undefined') {
         query.andWhere(new Brackets(w => {
-          if  (['postgres'].includes(connection.options.type.toLowerCase())) {
+          if  (['postgres'].includes(AppDataSource.options.type.toLowerCase())) {
             w.where('"playlist"."videoId" like :like', { like: `%${opts.search}%` });
             w.orWhere('"playlist"."title" like :like', { like: `%${opts.search}%` });
           } else {
@@ -191,7 +192,7 @@ class Songs extends System {
 
       if (opts.tag) {
         query.andWhere(new Brackets(w => {
-          if  (['postgres'].includes(connection.options.type.toLowerCase())) {
+          if  (['postgres'].includes(AppDataSource.options.type.toLowerCase())) {
             w.where('"playlist"."tags" like :tag', { tag: `%${opts.tag}%` });
           } else {
             w.where('playlist.tags like :tag', { tag: `%${opts.tag}%` });
@@ -355,7 +356,7 @@ class Songs extends System {
       request.push(JSON.parse(this.currentSong).username);
     }
     await changelog.flush();
-    const users = await getRepository(User).findBy({ userName: In(request) });
+    const users = await AppDataSource.getRepository(User).findBy({ userName: In(request) });
     for (const username of request) {
       const data = users.find(o => o.userName === username);
       tmiEmitter.emit('timeout', username, 300, typeof data !== 'undefined' && isModerator(data));

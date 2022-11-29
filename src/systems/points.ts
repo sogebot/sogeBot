@@ -6,8 +6,9 @@ import { MINUTE } from '@sogebot/ui-helpers/constants';
 import { format } from '@sogebot/ui-helpers/number';
 import * as cronparser from 'cron-parser';
 import {
-  FindConditions, getConnection, getRepository, LessThanOrEqual,
+  LessThanOrEqual, FindOptionsWhere,
 } from 'typeorm';
+import { AppDataSource } from '~/database';
 
 import {
   command, default_permission, parser, permission_settings, persistent, settings,
@@ -91,7 +92,7 @@ class Points extends System {
           if (this.isPointResetIntervalEnabled) {
             warning('Points were reset by cron');
             changelog.flush().then(() => {
-              getRepository(User).update({}, { points: 0 });
+              AppDataSource.getRepository(User).update({}, { points: 0 });
             });
           } else {
             debug('points.cron', 'Cron would run, but it is disabled.');
@@ -119,7 +120,7 @@ class Points extends System {
     }
 
     // cleanup all undoes (only 10minutes should be kept)
-    await getRepository(PointsChangelog).delete({ updatedAt: LessThanOrEqual(Date.now() - (10 * MINUTE)) });
+    await AppDataSource.getRepository(PointsChangelog).delete({ updatedAt: LessThanOrEqual(Date.now() - (10 * MINUTE)) });
 
     try {
       const userPromises: Promise<void>[] = [];
@@ -252,8 +253,8 @@ class Points extends System {
 
     adminEndpoint('/systems/points', 'reset', async () => {
       changelog.flush().then(() => {
-        getRepository(PointsChangelog).clear();
-        getRepository(User).update({}, { points: 0 });
+        AppDataSource.getRepository(PointsChangelog).clear();
+        AppDataSource.getRepository(User).update({}, { points: 0 });
       });
     });
   }
@@ -292,7 +293,7 @@ class Points extends System {
         throw new Error(`User ${username} not found in database`);
       }
 
-      const undoOperation = await getRepository(PointsChangelog).findOne({
+      const undoOperation = await AppDataSource.getRepository(PointsChangelog).findOne({
         where: { userId },
         order: { updatedAt: 'DESC' },
       });
@@ -300,7 +301,7 @@ class Points extends System {
         throw new Error(`No undo operation found for ` + username);
       }
 
-      await getRepository(PointsChangelog).delete({ id: undoOperation.id });
+      await AppDataSource.getRepository(PointsChangelog).delete({ id: undoOperation.id });
       changelog.update(userId, { points: undoOperation.originalValue });
 
       return [{
@@ -326,12 +327,12 @@ class Points extends System {
       const [userName, points] = new Expects(opts.parameters).username().points({ all: false }).toArray();
 
       await changelog.flush();
-      const originalUser = await getRepository(User).findOneBy({ userName });
+      const originalUser = await AppDataSource.getRepository(User).findOneBy({ userName });
       if (!originalUser) {
         throw new Error(`User ${userName} not found in database.`);
       }
       changelog.update(originalUser.userId, { points });
-      await getRepository(PointsChangelog).insert({
+      await AppDataSource.getRepository(PointsChangelog).insert({
         userId:        originalUser.userId,
         updatedAt:     Date.now(),
         command:       'set',
@@ -359,7 +360,7 @@ class Points extends System {
         return [];
       }
       await changelog.flush();
-      const guser = await getRepository(User).findOneBy({ userName });
+      const guser = await AppDataSource.getRepository(User).findOneBy({ userName });
       const sender = await changelog.get(opts.sender.userId);
 
       if (!sender) {
@@ -423,7 +424,7 @@ class Points extends System {
         user = await changelog.get(opts.sender.userId);
       } else {
         await changelog.flush();
-        user = await getRepository(User).findOneBy({ userName }) ?? null;
+        user = await AppDataSource.getRepository(User).findOneBy({ userName }) ?? null;
       }
 
       if (!user) {
@@ -436,10 +437,8 @@ class Points extends System {
         }
       }
 
-      const connection = await getConnection();
-
       const broadcasterUsername = variables.get('services.twitch.broadcasterUsername') as string;
-      const query = (type: typeof connection.options.type) => {
+      const query = (type: typeof AppDataSource.options.type) => {
         switch(type) {
           case 'postgres':
           case 'better-sqlite3':
@@ -452,8 +451,8 @@ class Points extends System {
       };
 
       await changelog.flush();
-      const orderQuery = await getRepository(User).query(query(connection.options.type));
-      const count = await getRepository(User).count();
+      const orderQuery = await AppDataSource.getRepository(User).query(query(AppDataSource.options.type));
+      const count = await AppDataSource.getRepository(User).count();
 
       let order: number | string = '?';
       if (orderQuery.length > 0) {
@@ -488,7 +487,7 @@ class Points extends System {
       let response: string;
       if (points >= 0) {
         await changelog.flush();
-        await getRepository(User).increment({}, 'points', points);
+        await AppDataSource.getRepository(User).increment({}, 'points', points);
         response = prepare('points.success.online.positive', {
           amount:     format(general.numberFormat, 0)(points),
           pointsName: getPointsName(points),
@@ -516,7 +515,7 @@ class Points extends System {
       let response: string;
       if (points >= 0) {
         await changelog.flush();
-        await getRepository(User).increment({}, 'points', points);
+        await AppDataSource.getRepository(User).increment({}, 'points', points);
         response = prepare('points.success.all.positive', {
           amount:     format(general.numberFormat, 0)(points),
           pointsName: getPointsName(points),
@@ -543,7 +542,7 @@ class Points extends System {
       const points = new Expects(opts.parameters).points({ all: false }).toArray()[0];
       await changelog.flush();
 
-      for (const user of (await getRepository(User).findBy({ isOnline: true }))) {
+      for (const user of (await AppDataSource.getRepository(User).findBy({ isOnline: true }))) {
         if (isBot(user.userName)) {
           continue;
         }
@@ -567,7 +566,7 @@ class Points extends System {
       const [userName, points] = new Expects(opts.parameters).username().points({ all: false }).toArray();
 
       await changelog.flush();
-      const user = await getRepository(User).findOneBy({ userName });
+      const user = await AppDataSource.getRepository(User).findOneBy({ userName });
 
       if (!user) {
         changelog.update(await getIdFromTwitch(userName), { userName });
@@ -576,7 +575,7 @@ class Points extends System {
         changelog.increment(user.userId, { points });
       }
 
-      await getRepository(PointsChangelog).insert({
+      await AppDataSource.getRepository(PointsChangelog).insert({
         userId:        user.userId,
         command:       'add',
         originalValue: user.points,
@@ -602,7 +601,7 @@ class Points extends System {
       const [userName, points] = new Expects(opts.parameters).username().points({ all: true }).toArray();
 
       await changelog.flush();
-      const user = await getRepository(User).findOneBy({ userName });
+      const user = await AppDataSource.getRepository(User).findOneBy({ userName });
       if (!user) {
         changelog.update(await getIdFromTwitch(userName), { userName });
         return this.remove(opts);
@@ -614,7 +613,7 @@ class Points extends System {
         changelog.update(user.userId, { points: Math.max(user.points - points, 0) });
       }
 
-      await getRepository(PointsChangelog).insert({
+      await AppDataSource.getRepository(PointsChangelog).insert({
         userId:        user.userId,
         command:       'remove',
         originalValue: user.points,
@@ -639,15 +638,15 @@ class Points extends System {
     return this.get(opts);
   }
 
-  async increment(where: FindConditions<Readonly<Required<UserInterface>>>, points: number) {
+  async increment(where: FindOptionsWhere<Readonly<Required<UserInterface>>>, points: number) {
     await changelog.flush();
-    await getRepository(User).increment(where, 'points', points);
+    await AppDataSource.getRepository(User).increment(where, 'points', points);
   }
 
-  async decrement(where: FindConditions<Readonly<Required<UserInterface>>>, points: number) {
+  async decrement(where: FindOptionsWhere<Readonly<Required<UserInterface>>>, points: number) {
     await changelog.flush();
-    await getRepository(User).decrement(where, 'points', points);
-    await getRepository(User).createQueryBuilder()
+    await AppDataSource.getRepository(User).decrement(where, 'points', points);
+    await AppDataSource.getRepository(User).createQueryBuilder()
       .update(User)
       .set({ points: 0 })
       .where('points < 0')

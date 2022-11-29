@@ -1,5 +1,5 @@
 import { EventList } from '@entity/eventList';
-import { getRepository } from 'typeorm';
+import { AppDataSource } from '~/database';
 
 import users from '../users';
 
@@ -18,7 +18,7 @@ const info: ResponseFilter = {
       return '';
     }
 
-    let tips = (await getRepository(EventList).createQueryBuilder('events')
+    let tips = (await AppDataSource.getRepository(EventList).createQueryBuilder('events')
       .select('events')
       .orderBy('events.timestamp', 'DESC')
       .where('events.event >= :event', { event: 'tip' })

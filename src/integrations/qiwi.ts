@@ -1,6 +1,6 @@
 import { UserTip, UserTipInterface } from '@entity/user';
 import axios from 'axios';
-import { getRepository } from 'typeorm';
+import { AppDataSource } from '~/database';
 
 import { settings } from '../decorators';
 import { onChange, onStartup } from '../decorators/on.js';
@@ -82,7 +82,7 @@ class Qiwi extends Integration {
           exchangeRates: rates,
           userId:        user.userId,
         };
-        getRepository(UserTip).save(newTip);
+        AppDataSource.getRepository(UserTip).save(newTip);
       }
 
       if (isStreamOnline.value) {

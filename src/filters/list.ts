@@ -6,7 +6,8 @@ import { Rank } from '@entity/rank';
 import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized';
 import { format } from '@sogebot/ui-helpers/number';
 import _ from 'lodash';
-import { getRepository, IsNull } from 'typeorm';
+import { AppDataSource } from '~/database';
+import { IsNull } from 'typeorm';
 
 import general from '../general.js';
 import Parser from '../parser';
@@ -31,17 +32,17 @@ const list: ResponseFilter = {
       }
     }
     let [alias, commands, cooldowns, ranks, prices] = await Promise.all([
-      getRepository(Alias).find({
+      AppDataSource.getRepository(Alias).find({
         where: typeof group !== 'undefined' ? {
           visible: true, enabled: true, group: group ?? IsNull(),
         } : { visible: true, enabled: true },
       }),
-      getRepository(Commands).find({ where: typeof group !== 'undefined' ? {
+      AppDataSource.getRepository(Commands).find({ where: typeof group !== 'undefined' ? {
         visible: true, enabled: true, group: group ?? IsNull(),
       } : { visible: true, enabled: true } }),
-      getRepository(Cooldown).find({ where: { isEnabled: true } }),
-      getRepository(Rank).find(),
-      getRepository(Price).find({ where: { enabled: true } }),
+      AppDataSource.getRepository(Cooldown).find({ where: { isEnabled: true } }),
+      AppDataSource.getRepository(Rank).find(),
+      AppDataSource.getRepository(Price).find({ where: { enabled: true } }),
     ]);
 
     let listOutput: any = [];

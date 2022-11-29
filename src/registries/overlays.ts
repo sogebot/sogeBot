@@ -1,5 +1,5 @@
 import { SECOND } from '@sogebot/ui-helpers/constants';
-import { getRepository } from 'typeorm';
+import { AppDataSource } from '~/database';
 
 import Registry from './_interface';
 
@@ -22,17 +22,17 @@ setInterval(async () => {
       [id, time] = id.split('|');
     }
     // check if it is without group
-    const item = await getRepository(OverlayMapper).findOneBy({ id });
+    const item = await AppDataSource.getRepository(OverlayMapper).findOneBy({ id });
     if (item) {
       if (item.value === 'countdown' && item.opts) {
-        await getRepository(OverlayMapper).update(id, {
+        await AppDataSource.getRepository(OverlayMapper).update(id, {
           opts: {
             ...item.opts,
             currentTime: Number(time),
           },
         });
       } else if (item.value === 'stopwatch' && item.opts) {
-        await getRepository(OverlayMapper).update(id, {
+        await AppDataSource.getRepository(OverlayMapper).update(id, {
           opts: {
             ...item.opts,
             currentTime: Number(time),
@@ -53,20 +53,20 @@ class Overlays extends Registry {
 
   sockets() {
     adminEndpoint('/registries/overlays', 'generic::deleteById', async (id, cb) => {
-      await getRepository(OverlayMapper).delete(id);
+      await AppDataSource.getRepository(OverlayMapper).delete(id);
       cb(null);
     });
     adminEndpoint('/registries/overlays', 'generic::save', async (opts, cb) => {
-      await getRepository(OverlayMapper).save(opts);
+      await AppDataSource.getRepository(OverlayMapper).save(opts);
       cb(null);
     });
 
     publicEndpoint('/registries/overlays', 'generic::getAll', async (cb) => {
-      const items = await getRepository(OverlayMapper).find();
+      const items = await AppDataSource.getRepository(OverlayMapper).find();
       cb(null, items.map(defaultValues) as OverlayMappers[]);
     });
     publicEndpoint('/registries/overlays', 'generic::getOne', async (id, cb) => {
-      const item = await getRepository(OverlayMapper).findOneBy({ id });
+      const item = await AppDataSource.getRepository(OverlayMapper).findOneBy({ id });
       if (item) {
         cb(null, defaultValues(item));
       } else {

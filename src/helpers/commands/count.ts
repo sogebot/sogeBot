@@ -1,6 +1,6 @@
 import { CommandsCount } from '@entity/commands';
 import { MINUTE } from '@sogebot/ui-helpers/constants';
-import { getRepository } from 'typeorm';
+import { AppDataSource } from '~/database';
 
 const count: { command: string, timestamp: string }[] = [];
 
@@ -16,7 +16,7 @@ setInterval(() => {
 }, MINUTE);
 
 export async function getCountOfCommandUsage (command: string): Promise<number> {
-  return (await CommandsCount.count({ command }) + count.filter(o => o.command === command).length);
+  return (await CommandsCount.countBy({ command }) + count.filter(o => o.command === command).length);
 }
 
 export function incrementCountOfCommandUsage (command: string): void {
@@ -29,7 +29,7 @@ export async function resetCountOfCommandUsage (command: string): Promise<void> 
 }
 
 export async function getAllCountOfCommandUsage (): Promise<{ command: string; count: number }[]> {
-  return getRepository(CommandsCount)
+  return AppDataSource.getRepository(CommandsCount)
     .createQueryBuilder()
     .select('command')
     .addSelect('COUNT(command)', 'count')

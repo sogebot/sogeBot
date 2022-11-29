@@ -1,7 +1,7 @@
 import { HeistUser } from '@entity/heist';
 import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized';
 import _ from 'lodash';
-import { getRepository } from 'typeorm';
+import { AppDataSource } from '~/database';
 
 import { command, settings } from '../decorators';
 import { onStartup } from '../decorators/on';
@@ -108,7 +108,7 @@ class Heist extends Game {
     debug('heist', 'Checking heist if finished');
     if (!_.isNil(this.startedAt) && Date.now() - this.startedAt > (this.entryCooldownInSeconds * 1000) + 10000) {
       debug('heist', 'Heist finished, processing');
-      const users = await getRepository(HeistUser).find();
+      const users = await AppDataSource.getRepository(HeistUser).find();
       let level = levels.find(o => o.maxUsers >= users.length || _.isNil(o.maxUsers)); // find appropriate level or max level
 
       if (!level) {
@@ -124,7 +124,7 @@ class Heist extends Game {
       if (users.length === 0) {
         // cleanup
         this.startedAt = null;
-        await getRepository(HeistUser).clear();
+        await AppDataSource.getRepository(HeistUser).clear();
         this.timeouts.iCheckFinished = global.setTimeout(() => this.iCheckFinished(), 10000);
         announce(this.noUser, 'heist');
         return;
@@ -182,7 +182,7 @@ class Heist extends Game {
       // cleanup
       this.startedAt = null;
       this.lastHeistTimestamp = Date.now();
-      await getRepository(HeistUser).clear();
+      await AppDataSource.getRepository(HeistUser).clear();
     }
 
     // check if cops done patrolling
@@ -250,13 +250,13 @@ class Heist extends Game {
 
     await Promise.all([
       pointsSystem.decrement({ userId: opts.sender.userId }, Number(points)),
-      getRepository(HeistUser).save({
+      AppDataSource.getRepository(HeistUser).save({
         userId: opts.sender.userId, username: opts.sender.userName, points: Number(points),
       }), // add user to heist list
     ]);
 
     // check how many users are in heist
-    const users = await getRepository(HeistUser).find();
+    const users = await AppDataSource.getRepository(HeistUser).find();
     const level = levels.find(o => o.maxUsers >= users.length || _.isNil(o.maxUsers));
     if (level) {
       const nextLevel = levels.find(o => o.maxUsers > level.maxUsers);

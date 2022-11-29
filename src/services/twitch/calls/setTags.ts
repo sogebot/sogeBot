@@ -1,7 +1,6 @@
 import { TwitchTag, TwitchTagLocalizationName } from '@entity/twitch';
-import {
-  getRepository, IsNull, Not,
-} from 'typeorm';
+import { AppDataSource } from '~/database';
+import { IsNull, Not } from 'typeorm';
 
 import client from '../api/client';
 import { refresh } from '../token/refresh.js';
@@ -21,7 +20,7 @@ async function setTags (tagsArg: string[]): Promise<boolean> {
     const clientBroadcaster = await client('broadcaster');
 
     for (const tag of tagsArg) {
-      const name = await getRepository(TwitchTagLocalizationName).findOne({
+      const name = await AppDataSource.getRepository(TwitchTagLocalizationName).findOne({
         where: {
           value: tag,
           tagId: Not(IsNull()),
@@ -33,9 +32,9 @@ async function setTags (tagsArg: string[]): Promise<boolean> {
     }
 
     await clientBroadcaster.streams.replaceStreamTags(cid, tag_ids);
-    await getRepository(TwitchTag).update({ is_auto: false }, { is_current: false });
+    await AppDataSource.getRepository(TwitchTag).update({ is_auto: false }, { is_current: false });
     for (const tag_id of tag_ids) {
-      await getRepository(TwitchTag).update({ tag_id }, { is_current: true });
+      await AppDataSource.getRepository(TwitchTag).update({ tag_id }, { is_current: true });
     }
     return true;
   } catch (e) {

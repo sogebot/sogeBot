@@ -1,6 +1,6 @@
 import { Randomizer as RandomizerEntity } from '@entity/randomizer';
 import { LOW } from '@sogebot/ui-helpers/constants';
-import { getRepository } from 'typeorm';
+import { AppDataSource } from '~/database';
 import { v4 } from 'uuid';
 
 import { parser } from '../decorators';
@@ -19,12 +19,12 @@ class Randomizer extends Registry {
 
   sockets () {
     adminEndpoint('/registries/randomizer', 'generic::getAll', async (cb) => {
-      cb(null, await getRepository(RandomizerEntity).find());
+      cb(null, await AppDataSource.getRepository(RandomizerEntity).find());
     });
     publicEndpoint('/registries/randomizer', 'randomizer::getVisible', async (cb) => {
       cb(
         null,
-        await getRepository(RandomizerEntity).findOne({ where: { isShown: true }, relations: [ 'items'] })
+        await AppDataSource.getRepository(RandomizerEntity).findOne({ where: { isShown: true }, relations: [ 'items'] })
       );
     });
     adminEndpoint('/registries/randomizer', 'randomizer::startSpin', async () => {
@@ -45,8 +45,8 @@ class Randomizer extends Registry {
     });
     adminEndpoint('/registries/randomizer', 'randomizer::showById', async (id, cb) => {
       try {
-        await getRepository(RandomizerEntity).update({}, { isShown: false });
-        await getRepository(RandomizerEntity).update({ id: String(id) }, { isShown: true });
+        await AppDataSource.getRepository(RandomizerEntity).update({}, { isShown: false });
+        await AppDataSource.getRepository(RandomizerEntity).update({ id: String(id) }, { isShown: true });
         cb(null);
       } catch (e: any) {
         cb (e);
@@ -69,7 +69,7 @@ class Randomizer extends Registry {
 
     const [command, subcommand] = opts.message.split(' ');
 
-    const randomizer = await getRepository(RandomizerEntity).findOneBy({ command });
+    const randomizer = await AppDataSource.getRepository(RandomizerEntity).findOneBy({ command });
     if (!randomizer) {
       return true;
     }
@@ -80,12 +80,12 @@ class Randomizer extends Registry {
     }
 
     if (!subcommand) {
-      await getRepository(RandomizerEntity).update({}, { isShown: false });
-      await getRepository(RandomizerEntity).update({ id: randomizer.id }, { isShown: !randomizer.isShown });
+      await AppDataSource.getRepository(RandomizerEntity).update({}, { isShown: false });
+      await AppDataSource.getRepository(RandomizerEntity).update({ id: randomizer.id }, { isShown: !randomizer.isShown });
     } else if (subcommand === 'go') {
       if (!randomizer.isShown) {
-        await getRepository(RandomizerEntity).update({}, { isShown: false });
-        await getRepository(RandomizerEntity).update({ id: randomizer.id }, { isShown: !randomizer.isShown });
+        await AppDataSource.getRepository(RandomizerEntity).update({}, { isShown: false });
+        await AppDataSource.getRepository(RandomizerEntity).update({ id: randomizer.id }, { isShown: !randomizer.isShown });
         setTimeout(() => {
           this.socket?.emit('spin');
         }, 5000);

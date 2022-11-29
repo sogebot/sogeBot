@@ -1,7 +1,7 @@
 import { readdirSync } from 'fs';
 
 import { Text as TextEntity } from '@entity/text';
-import { getRepository } from 'typeorm';
+import { AppDataSource } from '~/database';
 
 import { onStartup } from '../decorators/on';
 import Message from '../message';
@@ -35,7 +35,7 @@ class Text extends Registry {
     adminEndpoint('/registries/text', 'text::remove', async(item, cb) => {
       try {
         if (item.id) {
-          await getRepository(TextEntity).delete({ id: item.id });
+          await AppDataSource.getRepository(TextEntity).delete({ id: item.id });
         } else {
           throw new Error('Missing item id');
         }
@@ -48,7 +48,7 @@ class Text extends Registry {
       try {
         cb(
           null,
-          await getRepository(TextEntity).find(),
+          await AppDataSource.getRepository(TextEntity).find(),
         );
       } catch (e: any) {
         cb(e.stack, []);
@@ -73,7 +73,7 @@ class Text extends Registry {
       try {
         cb(
           null,
-          await getRepository(TextEntity).save(item),
+          await AppDataSource.getRepository(TextEntity).save(item),
         );
       } catch (e: any) {
         cb(e.stack, null);
@@ -81,7 +81,7 @@ class Text extends Registry {
     });
     publicEndpoint('/registries/text', 'generic::getOne', async (opts: { id: any; parseText: boolean }, callback) => {
       try {
-        const item = await getRepository(TextEntity).findOneByOrFail({ id: opts.id });
+        const item = await AppDataSource.getRepository(TextEntity).findOneByOrFail({ id: opts.id });
 
         let text = item.text;
         if (opts.parseText) {

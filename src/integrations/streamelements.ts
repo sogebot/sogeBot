@@ -2,7 +2,7 @@ import { Currency, UserTip, UserTipInterface } from '@entity/user';
 import * as constants from '@sogebot/ui-helpers/constants';
 import Axios from 'axios';
 import chalk from 'chalk';
-import { getRepository } from 'typeorm';
+import { AppDataSource } from '~/database';
 
 import { persistent, settings } from '../decorators';
 import { onChange, onStartup } from '../decorators/on';
@@ -166,7 +166,7 @@ class StreamElements extends Integration {
           exchangeRates: rates,
           userId:        user.userId,
         };
-        getRepository(UserTip).save(newTip);
+        AppDataSource.getRepository(UserTip).save(newTip);
         tip(`${username.toLowerCase()}${user.userId ? '#' + user.userId : ''}, amount: ${Number(amount).toFixed(2)}${DONATION_CURRENCY}, message: ${message}`);
 
         eventlist.add({

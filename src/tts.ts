@@ -3,7 +3,7 @@
 import { MINUTE } from '@sogebot/ui-helpers/constants';
 import { JWT } from 'google-auth-library';
 import { google } from 'googleapis';
-import { getRepository } from 'typeorm';
+import { AppDataSource } from '~/database';
 
 import Core from '~/_interface';
 import { GooglePrivateKeys } from '~/database/entity/google';
@@ -92,7 +92,7 @@ class TTS extends Core {
           }
 
           // get private key
-          const privateKey = await getRepository(GooglePrivateKeys).findOneByOrFail({ id: this.googlePrivateKey });
+          const privateKey = await AppDataSource.getRepository(GooglePrivateKeys).findOneByOrFail({ id: this.googlePrivateKey });
 
           // configure a JWT auth client
           jwtClient = new google.auth.JWT(

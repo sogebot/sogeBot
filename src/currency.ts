@@ -1,6 +1,6 @@
 import chalk from 'chalk';
 import _ from 'lodash';
-import { getRepository } from 'typeorm';
+import { AppDataSource } from '~/database';
 
 import currentRates from './helpers/currency/rates';
 
@@ -40,9 +40,9 @@ class Currency extends Core {
   @onChange('mainCurrency')
   public async recalculateSortAmount() {
     info(chalk.yellow('CURRENCY:') + ' Recalculating tips (in progress).');
-    const result = await getRepository(UserTip).find();
+    const result = await AppDataSource.getRepository(UserTip).find();
     for (const tip of result) {
-      await getRepository(UserTip).save({
+      await AppDataSource.getRepository(UserTip).save({
         ...tip,
         sortAmount: exchange(tip.amount, tip.currency as CurrencyType, this.mainCurrency, tip.exchangeRates),
       });

@@ -1,6 +1,6 @@
 import { OverlayMapper } from '@entity/overlay.js';
 import { MINUTE, SECOND } from '@sogebot/ui-helpers/constants';
-import { getRepository } from 'typeorm';
+import { AppDataSource } from '~/database';
 import { app } from '~/helpers/panel';
 
 import Overlay from './_interface';
@@ -72,10 +72,10 @@ class Stopwatch extends Overlay {
       statusUpdate.delete(data.id);
 
       // we need to check if persistent
-      const overlay = await getRepository(OverlayMapper).findOneBy({ id: data.id });
+      const overlay = await AppDataSource.getRepository(OverlayMapper).findOneBy({ id: data.id });
       if (overlay && overlay.value === 'stopwatch') {
         if (overlay.opts && overlay.opts.isPersistent) {
-          await getRepository(OverlayMapper).update(data.id, {
+          await AppDataSource.getRepository(OverlayMapper).update(data.id, {
             opts: {
               ...overlay.opts,
               currentTime: data.time,

@@ -1,5 +1,6 @@
 import { rawDataSymbol } from '@twurple/common';
-import { getRepository, IsNull } from 'typeorm';
+import { AppDataSource } from '~/database';
+import { IsNull } from 'typeorm';
 
 import client from '../api/client';
 import { refresh } from '../token/refresh.js';
@@ -19,9 +20,9 @@ export async function getAllStreamTags(opts: any) {
     const getAllStreamTagsPaginated = await clientBot.tags.getAllStreamTagsPaginated().getAll();
     for(const tag of getAllStreamTagsPaginated) {
       await setImmediateAwait();
-      const localizationNames = await getRepository(TwitchTagLocalizationName).findBy({ tagId: tag.id });
-      const localizationDescriptions = await getRepository(TwitchTagLocalizationDescription).findBy({ tagId: tag.id });
-      await getRepository(TwitchTag).save({
+      const localizationNames = await AppDataSource.getRepository(TwitchTagLocalizationName).findBy({ tagId: tag.id });
+      const localizationDescriptions = await AppDataSource.getRepository(TwitchTagLocalizationDescription).findBy({ tagId: tag.id });
+      await AppDataSource.getRepository(TwitchTag).save({
         tag_id:             tag.id,
         is_auto:            tag.isAuto,
         localization_names: Object.keys(tag[rawDataSymbol].localization_names).map(key => {
@@ -40,8 +41,8 @@ export async function getAllStreamTags(opts: any) {
         }),
       });
     }
-    await getRepository(TwitchTagLocalizationDescription).delete({ tagId: IsNull() });
-    await getRepository(TwitchTagLocalizationName).delete({ tagId: IsNull() });
+    await AppDataSource.getRepository(TwitchTagLocalizationDescription).delete({ tagId: IsNull() });
+    await AppDataSource.getRepository(TwitchTagLocalizationName).delete({ tagId: IsNull() });
   } catch (e) {
     if (e instanceof Error) {
       if (e.message.includes('ETIMEDOUT')) {

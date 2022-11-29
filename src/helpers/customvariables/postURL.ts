@@ -1,12 +1,12 @@
 import { Variable } from '@entity/variable';
-import { getRepository } from 'typeorm';
+import { AppDataSource } from '~/database';
 
 import { announce, prepare } from '../commons';
 import { setValueOf } from './setValueOf';
 
 async function postURL(req: any, res: any) {
   try {
-    const variable = (await getRepository(Variable).find({ relations: ['urls'] }))
+    const variable = (await AppDataSource.getRepository(Variable).find({ relations: ['urls'] }))
       .find(v => {
         return v.urls.find(url => url.id === req.params.id);
       });

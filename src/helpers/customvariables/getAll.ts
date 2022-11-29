@@ -1,8 +1,8 @@
 import { Variable } from '@entity/variable';
-import { getRepository } from 'typeorm';
+import { AppDataSource } from '~/database';
 
 async function getAll() {
-  return (await getRepository(Variable).find()).reduce((prev: { [x: string]: any }, cur) => {
+  return (await AppDataSource.getRepository(Variable).find()).reduce((prev: { [x: string]: any }, cur) => {
     return { ...prev, [cur.variableName]: cur.currentValue };
   }, {});
 }

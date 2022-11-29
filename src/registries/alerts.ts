@@ -3,7 +3,8 @@ import {
 } from '@entity/alert';
 import { MINUTE } from '@sogebot/ui-helpers/constants';
 import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized';
-import { getRepository, IsNull } from 'typeorm';
+import { AppDataSource } from '~/database';
+import { IsNull } from 'typeorm';
 import { v4 } from 'uuid';
 
 import { command, default_permission, example, persistent, settings } from '../decorators';
@@ -35,7 +36,7 @@ const fetchUserForAlert = (opts: EmitData, type: 'recipient' | 'name'): Promise<
     if (value && value.length > 0) {
       client('bot').then(clientBot => {
         Promise.all([
-          getRepository(User).findOneBy({ userName: value }),
+          AppDataSource.getRepository(User).findOneBy({ userName: value }),
           clientBot.users.getUserByName(value),
         ]).then(async ([user_db, response]) => {
           if (response) {
@@ -123,7 +124,7 @@ class Alerts extends Registry {
     });
     publicEndpoint('/registries/alerts', 'isAlertUpdated', async ({ updatedAt, id }, cb) => {
       try {
-        const alert = await getRepository(Alert).findOneBy({ id });
+        const alert = await AppDataSource.getRepository(Alert).findOneBy({ id });
         if (alert) {
           cb(null, updatedAt < (alert.updatedAt || 0), alert.updatedAt || 0);
         } else {
@@ -150,7 +151,7 @@ class Alerts extends Registry {
       try {
         cb(
           null,
-          await getRepository(Alert).save(item),
+          await AppDataSource.getRepository(Alert).save(item),
         );
       } catch (e: any) {
         cb(e.stack, null);
@@ -158,16 +159,16 @@ class Alerts extends Registry {
     });
     adminEndpoint('/registries/alerts', 'alerts::delete', async (item: Required<AlertInterface>, cb) => {
       try {
-        await getRepository(Alert).remove(item);
-        await getRepository(AlertFollow).delete({ alertId: IsNull() });
-        await getRepository(AlertSub).delete({ alertId: IsNull() });
-        await getRepository(AlertSubgift).delete({ alertId: IsNull() });
-        await getRepository(AlertSubcommunitygift).delete({ alertId: IsNull() });
-        await getRepository(AlertRaid).delete({ alertId: IsNull() });
-        await getRepository(AlertTip).delete({ alertId: IsNull() });
-        await getRepository(AlertCheer).delete({ alertId: IsNull() });
-        await getRepository(AlertResub).delete({ alertId: IsNull() });
-        await getRepository(AlertCommandRedeem).delete({ alertId: IsNull() });
+        await AppDataSource.getRepository(Alert).remove(item);
+        await AppDataSource.getRepository(AlertFollow).delete({ alertId: IsNull() });
+        await AppDataSource.getRepository(AlertSub).delete({ alertId: IsNull() });
+        await AppDataSource.getRepository(AlertSubgift).delete({ alertId: IsNull() });
+        await AppDataSource.getRepository(AlertSubcommunitygift).delete({ alertId: IsNull() });
+        await AppDataSource.getRepository(AlertRaid).delete({ alertId: IsNull() });
+        await AppDataSource.getRepository(AlertTip).delete({ alertId: IsNull() });
+        await AppDataSource.getRepository(AlertCheer).delete({ alertId: IsNull() });
+        await AppDataSource.getRepository(AlertResub).delete({ alertId: IsNull() });
+        await AppDataSource.getRepository(AlertCommandRedeem).delete({ alertId: IsNull() });
         if (cb) {
           cb(null);
         }
@@ -231,7 +232,7 @@ class Alerts extends Registry {
 
       // search for user triggering alert
       const broadcasterId = variables.get('services.twitch.broadcasterId') as string;
-      const caster = await getRepository(User).findOneBy({ userId: broadcasterId }) ?? null;
+      const caster = await AppDataSource.getRepository(User).findOneBy({ userId: broadcasterId }) ?? null;
 
       const data = {
         ...opts, isTTSMuted: !tts.ready || this.isTTSMuted, isSoundMuted: this.isSoundMuted, TTSService: tts.service, TTSKey: key, user, game: user?.game, caster, recipientUser: recipient,
