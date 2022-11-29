@@ -219,7 +219,7 @@ class Module {
     }, 1000);
 
     try {
-      if (typeof variable !== 'undefined') {
+      if (variable) {
         // check if object and if all keys are same
         // e.g. default { 'a': '', 'b': '' }, but loaded have only 'a' key, should not remove 'b' key
         const value = JSON.parse(variable.value);

@@ -6,7 +6,7 @@ import {
 import { User } from '@entity/user';
 import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized';
 import * as _ from 'lodash';
-import { getRepository } from 'typeorm';
+import { getRepository, IsNull } from 'typeorm';
 
 import {
   command, default_permission, parser, settings, timer,
