@@ -39,7 +39,15 @@ export class CustomAuthProvider implements AuthProvider {
 	 * The client ID.
 	 */
   get clientId(): string {
-    return '89k6demxtifvq0vzgjpvr1mykxaqmf'; // sogebot generator clientid;
+    const tokenService = variables.get(`services.twitch.tokenService`);
+    switch (tokenService) {
+      case 'SogeBot Token Generator':
+        return 't8cney2xkc7j4cu6zpv9ijfa27w027';
+      case 'Sogebot Token Generator v2':
+        return '89k6demxtifvq0vzgjpvr1mykxaqmf';
+      default:
+        return variables.get(`services.twitch.tokenServiceCustomClientId`);
+    }
   }
 
   /**
