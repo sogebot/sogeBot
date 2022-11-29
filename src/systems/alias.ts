@@ -108,7 +108,7 @@ class Alias extends System {
       cb(null, aliases);
     });
     adminEndpoint('/systems/alias', 'generic::getOne', async (id, cb) => {
-      cb(null, aliases.find(o => o.id === id));
+      cb(null, aliases.find(o => o.id === id) ?? null);
     });
     adminEndpoint('/systems/alias', 'generic::deleteById', async (id, cb) => {
       try {

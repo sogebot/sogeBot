@@ -100,7 +100,7 @@ class Keywords extends System {
         await validateOrReject(itemToSave);
         await itemToSave.save();
 
-        await getRepository(KeywordResponses).delete({ keyword: itemToSave });
+        await getRepository(KeywordResponses).delete({ where: { keyword: itemToSave } });
         const responses = req.body.responses;
         for (const response of responses) {
           const resToSave = new KeywordResponses();
@@ -150,7 +150,7 @@ class Keywords extends System {
         })
         .toArray();
 
-      let kDb = await Keyword.findOneBy({
+      let kDb = await Keyword.findOne({
         relations: ['responses'],
         where:     { keyword: keywordRegex },
       });
@@ -266,7 +266,7 @@ class Keywords extends System {
     } else {
       // print responses
       const keyword_with_responses
-        = await Keyword.findOneBy({
+        = await Keyword.findOne({
           relations: ['responses'],
           where:     isUUID(keyword) ? { id: keyword } : { keyword },
         });
@@ -417,7 +417,7 @@ class Keywords extends System {
       const _responses: KeywordResponses[] = [];
 
       // check group filter first
-      let group: Readonly<Required<KeywordGroup>> | undefined;
+      let group: Readonly<Required<KeywordGroup>> | null;
       let groupPermission: null | string = null;
       if (k.group) {
         group = await KeywordGroup.findOneBy({ name: k.group });

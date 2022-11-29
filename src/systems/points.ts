@@ -292,7 +292,7 @@ class Points extends System {
         throw new Error(`User ${username} not found in database`);
       }
 
-      const undoOperation = await getRepository(PointsChangelog).findOneBy({
+      const undoOperation = await getRepository(PointsChangelog).findOne({
         where: { userId },
         order: { updatedAt: 'DESC' },
       });
@@ -543,7 +543,7 @@ class Points extends System {
       const points = new Expects(opts.parameters).points({ all: false }).toArray()[0];
       await changelog.flush();
 
-      for (const user of (await getRepository(User).find({ isOnline: true }))) {
+      for (const user of (await getRepository(User).findBy({ isOnline: true }))) {
         if (isBot(user.userName)) {
           continue;
         }

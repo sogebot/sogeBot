@@ -162,7 +162,7 @@ class HowLongToBeat extends System {
     }
 
     try {
-      const game = await HowLongToBeatGame.findOneByOrFail({ where: { game: stats.value.currentGame } });
+      const game = await HowLongToBeatGame.findOneOrFail({ where: { game: stats.value.currentGame } });
       const stream = game.streams.find(o => o.createdAt === new Date(streamStatusChangeSince.value).toISOString());
       if (stream) {
         debug('hltb', 'Another 15s entry of this stream for ' + stats.value.currentGame);

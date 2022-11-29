@@ -137,7 +137,7 @@ class Marathon extends Overlay {
 
   async updateCache() {
     const ids = [];
-    for (const overlay of await getRepository(OverlayMapper).find({ value: 'marathon' }) as OverlayMapperMarathon[]) {
+    for (const overlay of await getRepository(OverlayMapper).findBy({ value: 'marathon' }) as OverlayMapperMarathon[]) {
       if (!cachedOverlays.has(overlay.id)) {
         cachedOverlays.set(overlay.id, overlay);
       }

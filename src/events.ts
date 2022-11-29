@@ -331,7 +331,7 @@ class Events extends Core {
 
   // set triggered attribute to empty object
   public async reset(eventId: string) {
-    for (const event of await getRepository(Event).find({ name: eventId })) {
+    for (const event of await getRepository(Event).findBy({ name: eventId })) {
       await getRepository(Event).save({ ...event, triggered: {} });
     }
   }
@@ -718,7 +718,7 @@ class Events extends Core {
     });
     adminEndpoint('/core/events', 'generic::getOne', async (id, cb) => {
       try {
-        const event = await getRepository(Event).findOneBy({
+        const event = await getRepository(Event).findOne({
           relations: ['operations'],
           where:     { id },
         });
@@ -805,7 +805,7 @@ class Events extends Core {
           attributes.amount = Number(attributes.amount).toFixed(2);
         }
 
-        const event = await getRepository(Event).findOneBy({
+        const event = await getRepository(Event).findOne({
           relations: ['operations'],
           where:     { id },
         });

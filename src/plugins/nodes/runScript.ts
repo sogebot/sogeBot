@@ -52,7 +52,7 @@ export default async function(pluginId: string, currentNode: Node<string>, param
         info(JSON.stringify({
           parameters,
           ...variables,
-          databaseVariables: await PluginVariable.find({ pluginId }),
+          databaseVariables: await PluginVariable.findBy({ pluginId }),
           sender:            userstate ? {
             userName: userstate.userName,
             userId:   userstate.userId,

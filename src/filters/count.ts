@@ -18,28 +18,28 @@ const time: Record<string, number> = {
 const count: ResponseFilter = {
   '(count|subs|#)': async function (filter) {
     const timestamp: number = time[filter.replace('(count|subs|', '').slice(0, -1).toLowerCase()] ?? DAY;
-    return await getRepository(EventList).count({
+    return await getRepository(EventList).countBy({
       timestamp: MoreThanOrEqual(Date.now() - timestamp),
       event:     In(['sub', 'resub']),
     });
   },
   '(count|follows|#)': async function (filter) {
     const timestamp: number = time[filter.replace('(count|follows|', '').slice(0, -1).toLowerCase()] ?? DAY;
-    return await getRepository(EventList).count({
+    return await getRepository(EventList).countBy({
       timestamp: MoreThanOrEqual(Date.now() - timestamp),
       event:     'follow',
     });
   },
   '(count|bits|#)': async function (filter) {
     const timestamp: number = time[filter.replace('(count|bits|', '').slice(0, -1).toLowerCase()] ?? DAY;
-    const events = await getRepository(UserBit).find({ cheeredAt: MoreThanOrEqual(Date.now() - timestamp) });
+    const events = await getRepository(UserBit).findBy({ cheeredAt: MoreThanOrEqual(Date.now() - timestamp) });
     return events.reduce((prev, cur) => {
       return prev += cur.amount;
     }, 0);
   },
   '(count|tips|#)': async function (filter) {
     const timestamp: number = time[filter.replace('(count|tips|', '').slice(0, -1).toLowerCase()] ?? DAY;
-    const events = await getRepository(UserTip).find({ tippedAt: MoreThanOrEqual(Date.now() - timestamp) });
+    const events = await getRepository(UserTip).findBy({ tippedAt: MoreThanOrEqual(Date.now() - timestamp) });
     return events.reduce((prev, cur) => {
       return prev += cur.sortAmount;
     }, 0);

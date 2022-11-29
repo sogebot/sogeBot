@@ -188,7 +188,7 @@ class Ranks extends System {
   @command('!rank list')
   @default_permission(defaultPermissions.CASTERS)
   async list (opts: CommandOptions, type: Rank['type'] = 'viewer'): Promise<CommandResponse[]> {
-    const ranks = await getRepository(Rank).find({ type });
+    const ranks = await getRepository(Rank).findBy({ type });
     const response = prepare(ranks.length === 0 ? 'ranks.list-is-empty' : 'ranks.list-is-not-empty', {
       list: _.orderBy(ranks, 'value', 'asc').map((l) => {
         return l.value + 'h - ' + l.rank;

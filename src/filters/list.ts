@@ -6,7 +6,7 @@ import { Rank } from '@entity/rank';
 import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized';
 import { format } from '@sogebot/ui-helpers/number';
 import _ from 'lodash';
-import { getRepository } from 'typeorm';
+import { getRepository, IsNull } from 'typeorm';
 
 import general from '../general.js';
 import Parser from '../parser';
@@ -33,11 +33,11 @@ const list: ResponseFilter = {
     let [alias, commands, cooldowns, ranks, prices] = await Promise.all([
       getRepository(Alias).find({
         where: typeof group !== 'undefined' ? {
-          visible: true, enabled: true, group,
+          visible: true, enabled: true, group: group ?? IsNull(),
         } : { visible: true, enabled: true },
       }),
       getRepository(Commands).find({ where: typeof group !== 'undefined' ? {
-        visible: true, enabled: true, group,
+        visible: true, enabled: true, group: group ?? IsNull(),
       } : { visible: true, enabled: true } }),
       getRepository(Cooldown).find({ where: { isEnabled: true } }),
       getRepository(Rank).find(),

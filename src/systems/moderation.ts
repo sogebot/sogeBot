@@ -211,7 +211,7 @@ class Moderation extends System {
   async timeoutUser (sender: CommandOptions['sender'], text: string, warning: string, msg: string, time: number, type: typeof timeoutType[number], msgId: string ) {
     // cleanup warnings
     await getRepository(ModerationWarning).delete({ timestamp: LessThan(Date.now() - 1000 * 60 * 60) });
-    const warnings = await getRepository(ModerationWarning).find({ userId: sender.userId });
+    const warnings = await getRepository(ModerationWarning).findBy({ userId: sender.userId });
     const silent = await this.isSilent(type);
 
     text = text.trim();

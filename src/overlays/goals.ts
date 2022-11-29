@@ -24,7 +24,7 @@ class Goals extends Overlay {
 
   @onBit()
   public async onBit(bit: onEventBit) {
-    const goals = await getRepository(Goal).find({ type: 'bits' });
+    const goals = await getRepository(Goal).findBy({ type: 'bits' });
     for (const goal of goals) {
       if (new Date(goal.endAfter).getTime() >= new Date().getTime() || goal.endAfterIgnore) {
         await getRepository(Goal).increment({ id: goal.id }, 'currentAmount', bit.amount);
@@ -32,7 +32,7 @@ class Goals extends Overlay {
     }
 
     // tips with tracking bits
-    const tipsGoals = await getRepository(Goal).find({ type: 'tips', countBitsAsTips: true });
+    const tipsGoals = await getRepository(Goal).findBy({ type: 'tips', countBitsAsTips: true });
     for (const goal of tipsGoals) {
       if (new Date(goal.endAfter).getTime() >= new Date().getTime() || goal.endAfterIgnore) {
         const amount = Number(exchange(bit.amount / 100, 'USD', mainCurrency.value));
@@ -44,7 +44,7 @@ class Goals extends Overlay {
 
   @onTip()
   public async onTip(tip: onEventTip) {
-    const goals = await getRepository(Goal).find({ type: 'tips' });
+    const goals = await getRepository(Goal).findBy({ type: 'tips' });
     for (const goal of goals) {
       const amount = Number(exchange(tip.amount, tip.currency, mainCurrency.value));
       if (new Date(goal.endAfter).getTime() >= new Date().getTime() || goal.endAfterIgnore) {
@@ -56,7 +56,7 @@ class Goals extends Overlay {
 
   @onFollow()
   public async onFollow() {
-    const goals = await getRepository(Goal).find({ type: 'followers' });
+    const goals = await getRepository(Goal).findBy({ type: 'followers' });
     for (const goal of goals) {
       if (new Date(goal.endAfter).getTime() >= new Date().getTime() || goal.endAfterIgnore) {
         await getRepository(Goal).increment({ id: goal.id }, 'currentAmount', 1);
@@ -67,7 +67,7 @@ class Goals extends Overlay {
 
   @onSub()
   public async onSub() {
-    const goals = await getRepository(Goal).find({ type: 'subscribers' });
+    const goals = await getRepository(Goal).findBy({ type: 'subscribers' });
     for (const goal of goals) {
       if (new Date(goal.endAfter).getTime() >= new Date().getTime() || goal.endAfterIgnore) {
         await getRepository(Goal).increment({ id: goal.id }, 'currentAmount', 1);

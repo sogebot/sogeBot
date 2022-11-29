@@ -2,7 +2,7 @@ import { Settings } from '@entity/settings';
 import { getRepository } from 'typeorm';
 
 async function getToken(type: 'bot' | 'broadcaster'){
-  const token = await getRepository(Settings).findOneBy({
+  const token = await getRepository(Settings).findOne({
     where: {
       name:      type + 'AccessToken',
       namespace: '/core/oauth',

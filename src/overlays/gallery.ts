@@ -64,13 +64,13 @@ class Gallery extends Overlay {
   sockets () {
     adminEndpoint('/overlays/gallery', 'generic::getOne', async (id, cb) => {
       try {
-        const item = await getRepository(GalleryEntity).findOneBy({
+        const item = await getRepository(GalleryEntity).findOne({
           where:  { id },
           select: ['id', 'name', 'type', 'folder'],
         });
         cb(null, item);
       } catch (e: any) {
-        cb(e.stack);
+        cb(e.stack, null);
       }
     });
     adminEndpoint('/overlays/gallery', 'generic::getAll', async (cb) => {

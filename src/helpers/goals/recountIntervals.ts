@@ -23,14 +23,14 @@ const interval = {
 } as const;
 
 export async function recountIntervals(type: typeof types[number]) {
-  const items = (await getRepository(Goal).find({ type: 'interval' + type.charAt(0).toUpperCase() + type.slice(1) as GoalInterface['type'] }))
+  const items = (await getRepository(Goal).findBy({ type: 'interval' + type.charAt(0).toUpperCase() + type.slice(1) as GoalInterface['type'] }))
     .filter(item => {
       return item.endAfterIgnore || new Date(item.endAfter).getTime() > Date.now();
     });
 
   for (const item of items) {
     if (item.type === 'intervalBits') {
-      const events = await getRepository(UserBit).find({ cheeredAt: MoreThanOrEqual(Date.now() - interval[item.interval]) });
+      const events = await getRepository(UserBit).findBy({ cheeredAt: MoreThanOrEqual(Date.now() - interval[item.interval]) });
       await getRepository(Goal).save({
         ...item,
         currentAmount: events.reduce((prev, cur) => {
@@ -38,7 +38,7 @@ export async function recountIntervals(type: typeof types[number]) {
         }, 0),
       });
     } else if (item.type === 'intervalTips') {
-      const events = await getRepository(UserTip).find({ tippedAt: MoreThanOrEqual(Date.now() - interval[item.interval]) });
+      const events = await getRepository(UserTip).findBy({ tippedAt: MoreThanOrEqual(Date.now() - interval[item.interval]) });
       if (!item.countBitsAsTips) {
         await getRepository(Goal).save({
           ...item,
@@ -47,7 +47,7 @@ export async function recountIntervals(type: typeof types[number]) {
           }, 0),
         });
       } else {
-        const events2 = await getRepository(UserBit).find({ cheeredAt: MoreThanOrEqual(Date.now() - interval[item.interval]) });
+        const events2 = await getRepository(UserBit).findBy({ cheeredAt: MoreThanOrEqual(Date.now() - interval[item.interval]) });
         await getRepository(Goal).save({
           ...item,
           currentAmount: events.reduce((prev, cur) => {
@@ -60,7 +60,7 @@ export async function recountIntervals(type: typeof types[number]) {
     } else if (item.type === 'intervalFollowers') {
       await getRepository(Goal).save({
         ...item,
-        currentAmount: await getRepository(EventList).count({
+        currentAmount: await getRepository(EventList).countBy({
           timestamp: MoreThanOrEqual(Date.now() - interval[item.interval]),
           event:     'follow',
         }),
@@ -68,7 +68,7 @@ export async function recountIntervals(type: typeof types[number]) {
     } else if (item.type === 'intervalSubscribers') {
       await getRepository(Goal).save({
         ...item,
-        currentAmount: await getRepository(EventList).count({
+        currentAmount: await getRepository(EventList).countBy({
           timestamp: MoreThanOrEqual(Date.now() - interval[item.interval]),
           event:     In(['sub', 'resub']),
         }),

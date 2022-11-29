@@ -59,7 +59,7 @@ class Bets extends System {
       return;
     }
     try {
-      const currentBet = await BetsEntity.findOneBy({
+      const currentBet = await BetsEntity.findOne({
         order: { createdAt: 'DESC' },
       });
       if (!currentBet || currentBet.isLocked) {
@@ -95,7 +95,7 @@ class Bets extends System {
   sockets() {
     adminEndpoint('/systems/bets', 'bets::getCurrentBet', async (cb) => {
       try {
-        const currentBet = await BetsEntity.findOneBy({
+        const currentBet = await BetsEntity.findOne({
           order: { createdAt: 'DESC' },
         });
         cb(null, currentBet);
@@ -140,7 +140,7 @@ class Bets extends System {
   @command('!bet open')
   @default_permission(defaultPermissions.MODERATORS)
   public async open(opts: CommandOptions): Promise<CommandResponse[]> {
-    const currentBet = await BetsEntity.findOneBy({
+    const currentBet = await BetsEntity.findOne({
       order: { createdAt: 'DESC' },
     });
     try {
@@ -198,7 +198,7 @@ class Bets extends System {
   }
 
   public async info(opts: CommandOptions) {
-    const currentBet = await BetsEntity.findOneBy({
+    const currentBet = await BetsEntity.findOne({
       order: { createdAt: 'DESC' },
     });
     if (!currentBet || (currentBet.isLocked && currentBet.arePointsGiven)) {
@@ -218,7 +218,7 @@ class Bets extends System {
 
   public async participate(opts: CommandOptions): Promise<CommandResponse[]> {
     const points = (await import('../systems/points')).default;
-    const currentBet = await BetsEntity.findOneBy({
+    const currentBet = await BetsEntity.findOne({
       order: { createdAt: 'DESC' },
     });
 
@@ -293,7 +293,7 @@ class Bets extends System {
   @command('!bet refund')
   @default_permission(defaultPermissions.MODERATORS)
   public async refund(opts: CommandOptions): Promise<CommandResponse[]> {
-    const currentBet = await BetsEntity.findOneBy({
+    const currentBet = await BetsEntity.findOne({
       order: { createdAt: 'DESC' },
     });
     try {
@@ -323,7 +323,7 @@ class Bets extends System {
   @command('!bet close')
   @default_permission(defaultPermissions.MODERATORS)
   public async close(opts: CommandOptions): Promise<CommandResponse[]> {
-    const currentBet = await BetsEntity.findOneBy({
+    const currentBet = await BetsEntity.findOne({
       order: { createdAt: 'DESC' },
     });
     try {

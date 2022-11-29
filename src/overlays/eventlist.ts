@@ -18,10 +18,10 @@ class EventList extends Overlay {
 
   sockets () {
     adminEndpoint('/overlays/eventlist', 'eventlist::getUserEvents', async (userId, cb) => {
-      const eventsByUserId = await getRepository(EventListEntity).find({ userId: userId });
+      const eventsByUserId = await getRepository(EventListEntity).findBy({ userId: userId });
       // we also need subgifts by giver
       const eventsByRecipientId
-        = (await getRepository(EventListEntity).find({ event: 'subgift' }))
+        = (await getRepository(EventListEntity).findBy({ event: 'subgift' }))
           .filter(o => JSON.parse(o.values_json).fromId === userId);
       const events =  _.orderBy([ ...eventsByRecipientId, ...eventsByUserId ], 'timestamp', 'desc');
       // we need to change userId => username and fromId => fromId username for eventlist compatibility

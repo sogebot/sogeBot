@@ -76,7 +76,7 @@ type GenericEvents = {
 
 type generic<T extends Record<string, any>, K = 'id'> = {
   getAll: (cb: (error: Error | string | null, items: Readonly<Required<T>>[]) => void) => void,
-  getOne: (id: Required<T[K]>, cb: (error: Error | string | null, item?: Readonly<Required<T>>) => void) => void,
+  getOne: (id: Required<T[K]>, cb: (error: Error | string | null, item: Readonly<Required<T>> | null) => void) => void,
   setById: (opts: { id: Required<T[K]>, item: Partial<T> }, cb: (error: ValidationError[] | Error | string | null, item?: Readonly<Required<T>> | null) => void) => void,
   save: (item: Partial<T>, cb: (error: ValidationError[] | Error | string | null, item?: Readonly<Required<T>> | null) => void) => void,
   deleteById: (id: Required<T[K]>, cb: (error: Error | string | null) => void) => void;

@@ -150,7 +150,7 @@ class Cooldown extends System {
         isOwnerAffected:      false,
         isModeratorAffected:  false,
         isSubscriberAffected: true,
-      }, await CooldownEntity.findOneBy({
+      }, await CooldownEntity.findOne({
         where: {
           name,
           type,
@@ -425,7 +425,7 @@ class Cooldown extends System {
         .oneOf({ values: ['global', 'user'], name: 'type' })
         .toArray();
 
-      const cooldown = await getRepository(CooldownEntity).findOneBy({
+      const cooldown = await getRepository(CooldownEntity).findOne({
         where: {
           name,
           type: typeParameter,

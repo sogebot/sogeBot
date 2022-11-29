@@ -10,7 +10,7 @@ class Bets extends Overlay {
 
   public sockets() {
     publicEndpoint(this.nsp, 'data', async (callback) => {
-      const currentBet = await getRepository(BetsEntity).findOneBy({
+      const currentBet = await getRepository(BetsEntity).findOne({
         relations: ['participations'],
         order:     { createdAt: 'DESC' },
         cache:     10000,

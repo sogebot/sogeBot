@@ -56,7 +56,7 @@ class Timers extends System {
     });
     app.get('/api/systems/timer/:id', adminMiddleware, async (req, res) => {
       res.send({
-        data: await Timer.findOneBy({ id: req.params.id }, { relations: ['messages'] }),
+        data: await Timer.findOne({ where: { id: req.params.id }, relations: ['messages'] }),
       });
     });
     app.delete('/api/systems/timer/:id', adminMiddleware, async (req, res) => {
@@ -179,7 +179,7 @@ class Timers extends System {
     if (messages === 0 && seconds === 0) {
       return [{ response: translate('timers.cannot-set-messages-and-seconds-0'), ...opts }];
     }
-    const timer = await Timer.findOneBy({
+    const timer = await Timer.findOne({
       relations: ['messages'],
       where:     { name },
     }) || new Timer();
@@ -257,7 +257,7 @@ class Timers extends System {
     } else {
       response = responseMatch[1];
     }
-    const timer = await Timer.findOneBy({
+    const timer = await Timer.findOne({
       relations: ['messages'],
       where:     { name },
     });
@@ -297,7 +297,7 @@ class Timers extends System {
       name = nameMatch[1];
     }
 
-    const timer = await Timer.findOneBy({
+    const timer = await Timer.findOne({
       relations: ['messages'],
       where:     { name },
     });
