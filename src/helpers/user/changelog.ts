@@ -78,7 +78,7 @@ class Changelog {
       checkLock(userId, resolve);
     });
 
-    const user = await getRepository(User).findOne({ userId });
+    const user = await getRepository(User).findOneBy({ userId });
     const data = cloneDeep(defaultData);
     merge(data, { userId }, user);
 
@@ -165,7 +165,7 @@ export async function flush() {
 
     if (!users.has(change.userId)) {
       // initial values
-      const user = await getRepository(User).findOne({ userId: change.userId });
+      const user = await getRepository(User).findOneBy({ userId: change.userId });
       const data = cloneDeep(defaultData);
       merge(data, { userId: change.userId }, user);
       users.set(change.userId, data);

@@ -127,7 +127,7 @@ async function runScript (script: string, opts: { sender: { userId: string; user
     randomViewer:           async () => getRandomViewer(),
     user:                   async (userName: string) => {
       await changelog.flush();
-      const _user = await getRepository(User).findOne({ userName });
+      const _user = await getRepository(User).findOneBy({ userName });
       if (_user) {
         const userObj = {
           userName,

@@ -603,7 +603,7 @@ class Spotify extends Integration {
   @default_permission(null)
   async unban (opts: CommandOptions): Promise<CommandResponse[]> {
     try {
-      const songToUnban = await SpotifySongBan.findOneOrFail({ where: { spotifyUri: opts.parameters } });
+      const songToUnban = await SpotifySongBan.findOneByOrFail({ where: { spotifyUri: opts.parameters } });
       await SpotifySongBan.delete({ spotifyUri: opts.parameters });
       return [{
         response: prepare('integrations.spotify.song-unbanned', {

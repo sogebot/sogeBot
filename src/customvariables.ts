@@ -34,7 +34,7 @@ class CustomVariables extends Core {
     });
     adminEndpoint('/core/customvariables', 'customvariables::runScript', async (id, cb) => {
       try {
-        const item = await getRepository(Variable).findOne({ id: String(id) });
+        const item = await getRepository(Variable).findOneBy({ id: String(id) });
         if (!item) {
           throw new Error('Variable not found');
         }
@@ -63,10 +63,10 @@ class CustomVariables extends Core {
       cb(null, returnedValue);
     });
     adminEndpoint('/core/customvariables', 'customvariables::isUnique', async ({ variable, id }, cb) => {
-      cb(null, (await getRepository(Variable).find({ variableName: String(variable) })).filter(o => o.id !== id).length === 0);
+      cb(null, (await getRepository(Variable).find({ where: { variableName: String(variable) } })).filter(o => o.id !== id).length === 0);
     });
     adminEndpoint('/core/customvariables', 'customvariables::delete', async (id, cb) => {
-      const item = await getRepository(Variable).findOne({ id: String(id) });
+      const item = await getRepository(Variable).findOneBy({ id: String(id) });
       if (item) {
         await getRepository(Variable).remove(item);
         await getRepository(VariableWatch).delete({ variableId: String(id) });
@@ -116,7 +116,7 @@ class CustomVariables extends Core {
     }
 
     clearTimeout(this.timeouts[`${this.constructor.name}.checkIfCacheOrRefresh`]);
-    const items = await getRepository(Variable).find({ type: 'eval' });
+    const items = await getRepository(Variable).find({ where: { type: 'eval' } });
 
     for (const item of items as Required<VariableInterface>[]) {
       try {

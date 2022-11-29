@@ -72,7 +72,7 @@ class Stopwatch extends Overlay {
       statusUpdate.delete(data.id);
 
       // we need to check if persistent
-      const overlay = await getRepository(OverlayMapper).findOne(data.id);
+      const overlay = await getRepository(OverlayMapper).findOneBy(data.id);
       if (overlay && overlay.value === 'stopwatch') {
         if (overlay.opts && overlay.opts.isPersistent) {
           await getRepository(OverlayMapper).update(data.id, {

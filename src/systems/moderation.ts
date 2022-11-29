@@ -253,7 +253,7 @@ class Moderation extends System {
     // check if spotify -or- alias of spotify contain open.spotify.com link
     if (spotify.enabled) {
       const cmd = spotify.getCommand('!spotify');
-      const alias = await getRepository(Alias).findOne({ where: { command: cmd } });
+      const alias = await getRepository(Alias).findOneBy({ where: { command: cmd } });
       if (alias && alias.enabled && aliasSystem.enabled) {
         spotifyRegex = new RegExp('^(' + cmd + '|' + alias.alias + ') \\S+open\\.spotify\\.com\\/track\\/(\\w+)(.*)?', 'gi');
       } else {
@@ -265,7 +265,7 @@ class Moderation extends System {
     // check if songrequest -or- alias of songrequest contain youtube link
     if (songs.enabled) {
       const cmd = songs.getCommand('!songrequest');
-      const alias = await getRepository(Alias).findOne({ where: { command: cmd } });
+      const alias = await getRepository(Alias).findOneBy({ where: { command: cmd } });
       if (alias && alias.enabled && aliasSystem.enabled) {
         ytRegex = new RegExp('^(' + cmd + '|' + alias.alias + ') \\S+(?:youtu.be\\/|v\\/|e\\/|u\\/\\w+\\/|embed\\/|v=)([^#&?]*).*', 'gi');
       } else {
@@ -394,7 +394,7 @@ class Moderation extends System {
 
     const whitelisted = await this.whitelist(opts.message, permId);
     if (whitelisted.search(urlRegex[cLinksIncludeSpaces[permId] ? 0 : 1]) >= 0) {
-      const permit = await getRepository(ModerationPermit).findOne({ userId: opts.sender.userId });
+      const permit = await getRepository(ModerationPermit).findOneBy({ userId: opts.sender.userId });
       if (permit) {
         await getRepository(ModerationPermit).remove(permit);
         return true;

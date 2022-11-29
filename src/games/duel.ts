@@ -151,7 +151,7 @@ class Duel extends Game {
       }
 
       // check if user is already in duel and add points
-      const userFromDB = await getRepository(DuelEntity).findOne({ id: opts.sender.userId });
+      const userFromDB = await getRepository(DuelEntity).findOneBy({ id: opts.sender.userId });
       const isNewDuelist = !userFromDB;
       if (userFromDB) {
         await getRepository(DuelEntity).save({ ...userFromDB, tickets: Number(userFromDB.tickets) + Number(bet) });
@@ -196,7 +196,7 @@ class Duel extends Game {
         announce(response, 'duel');
       }
 
-      const tickets = (await getRepository(DuelEntity).findOne({ id: opts.sender.userId }))?.tickets ?? 0;
+      const tickets = (await getRepository(DuelEntity).findOneBy({ id: opts.sender.userId }))?.tickets ?? 0;
       const response = prepare(isNewDuelist ? 'gambling.duel.joined' : 'gambling.duel.added', {
         pointsName: getPointsName(tickets),
         points:     format(general.numberFormat, 0)(tickets),

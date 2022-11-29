@@ -34,7 +34,7 @@ export async function follow(userId: string, userName: string, followedAt: strin
     return;
   }
 
-  const followAlreadyExists = await getRepository(EventList).findOne({
+  const followAlreadyExists = await getRepository(EventList).findOneBy({
     userId, event: 'follow', timestamp: new Date(followedAt).getTime(),
   });
 

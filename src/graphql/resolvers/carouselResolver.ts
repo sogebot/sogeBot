@@ -69,7 +69,7 @@ export class CarouselResolver {
   @Authorized()
   @Mutation(returns => Boolean)
   async carouselRemove(@Arg('id') id: string) {
-    const item = await getRepository(Carousel).findOne({ id });
+    const item = await getRepository(Carousel).findOneBy({ id });
     if (item) {
       await getRepository(Carousel).remove(item);
     }

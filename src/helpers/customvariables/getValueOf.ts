@@ -9,7 +9,7 @@ async function getValueOf (variableName: string, opts?: any) {
   if (!variableName.startsWith('$_')) {
     variableName = `$_${variableName}`;
   }
-  const item = await getRepository(Variable).findOne({ variableName });
+  const item = await getRepository(Variable).findOneBy({ variableName });
   if (!item) {
     return '';
   } // return empty if variable doesn't exist

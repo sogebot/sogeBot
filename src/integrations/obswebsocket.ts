@@ -46,7 +46,7 @@ class OBSWebsocket extends Integration {
   }
 
   async runObswebsocketCommand(operation: Events.OperationDefinitions, attributes: Events.Attributes): Promise<void> {
-    const task = await getRepository(OBSWebsocketEntity).findOneOrFail({ id: String(operation.taskId) });
+    const task = await getRepository(OBSWebsocketEntity).findOneByOrFail({ id: String(operation.taskId) });
 
     info(`OBSWEBSOCKETS: Task ${task.id} triggered by operation`);
     await obsws.triggerTask(task.code, attributes);
@@ -105,7 +105,7 @@ class OBSWebsocket extends Integration {
       }
     });
     adminEndpoint('/', 'integration::obswebsocket::generic::getOne', async (id, cb) => {
-      cb(null, await getRepository(OBSWebsocketEntity).findOne({ id }));
+      cb(null, await getRepository(OBSWebsocketEntity).findOneBy({ id }));
     });
     adminEndpoint('/', 'integration::obswebsocket::generic::deleteById', async (id, cb) => {
       await getRepository(OBSWebsocketEntity).delete({ id });
@@ -141,7 +141,7 @@ class OBSWebsocket extends Integration {
   async runTask(opts: CommandOptions) {
     try {
       const [ taskId ] = new Expects(opts.parameters).string().toArray();
-      const task = await getRepository(OBSWebsocketEntity).findOneOrFail(taskId);
+      const task = await getRepository(OBSWebsocketEntity).findOneByOrFail(taskId);
 
       info(`OBSWEBSOCKETS: User ${opts.sender.userName}#${opts.sender.userId} triggered task ${task.id}`);
       await this.triggerTask(task.code);

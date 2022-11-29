@@ -299,7 +299,7 @@ class Discord extends Integration {
         throw new Error(String(errors.NOT_UUID));
       }
 
-      const link = await getRepository(DiscordLink).findOneOrFail({ id: uuid, userId: IsNull() });
+      const link = await getRepository(DiscordLink).findOneByOrFail({ id: uuid, userId: IsNull() });
       // link user
       await getRepository(DiscordLink).save({ ...link, userId: opts.sender.userId });
       return [{ response: prepare('integrations.discord.this-account-was-linked-with', { sender: opts.sender, discordTag: link.tag }), ...opts }];
@@ -476,7 +476,7 @@ class Discord extends Integration {
       }
       const userName = attributes.username === null || typeof attributes.username === 'undefined' ? getOwner() : attributes.username;
       await changelog.flush();
-      const userObj = await getRepository(User).findOne({ userName });
+      const userObj = await getRepository(User).findOneBy({ userName });
       if (!attributes.test) {
         if (!userObj) {
           changelog.update(await getIdFromTwitch(userName), { userName });
@@ -502,7 +502,7 @@ class Discord extends Integration {
       if (match) {
         const username = match.groups?.username as string;
         const userId = await users.getIdByName(username);
-        const link = await getRepository(DiscordLink).findOne({ userId });
+        const link = await getRepository(DiscordLink).findOneBy({ userId });
         if (link) {
           message = message.replace(`@${username}`, `<@${link.discordId}>`);
         }
@@ -625,7 +625,7 @@ class Discord extends Integration {
     }
     try {
       // get linked account
-      const link = await getRepository(DiscordLink).findOneOrFail({ discordId: author.id, userId: Not(IsNull()) });
+      const link = await getRepository(DiscordLink).findOneByOrFail({ discordId: author.id, userId: Not(IsNull()) });
       if (link.userId) {
         const user = await changelog.getOrFail(link.userId);
         const parser = new Parser();

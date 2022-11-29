@@ -292,7 +292,7 @@ class Points extends System {
         throw new Error(`User ${username} not found in database`);
       }
 
-      const undoOperation = await getRepository(PointsChangelog).findOne({
+      const undoOperation = await getRepository(PointsChangelog).findOneBy({
         where: { userId },
         order: { updatedAt: 'DESC' },
       });
@@ -326,7 +326,7 @@ class Points extends System {
       const [userName, points] = new Expects(opts.parameters).username().points({ all: false }).toArray();
 
       await changelog.flush();
-      const originalUser = await getRepository(User).findOne({ userName });
+      const originalUser = await getRepository(User).findOneBy({ userName });
       if (!originalUser) {
         throw new Error(`User ${userName} not found in database.`);
       }
@@ -359,7 +359,7 @@ class Points extends System {
         return [];
       }
       await changelog.flush();
-      const guser = await getRepository(User).findOne({ userName });
+      const guser = await getRepository(User).findOneBy({ userName });
       const sender = await changelog.get(opts.sender.userId);
 
       if (!sender) {
@@ -423,7 +423,7 @@ class Points extends System {
         user = await changelog.get(opts.sender.userId);
       } else {
         await changelog.flush();
-        user = await getRepository(User).findOne({ userName }) ?? null;
+        user = await getRepository(User).findOneBy({ userName }) ?? null;
       }
 
       if (!user) {
@@ -567,7 +567,7 @@ class Points extends System {
       const [userName, points] = new Expects(opts.parameters).username().points({ all: false }).toArray();
 
       await changelog.flush();
-      const user = await getRepository(User).findOne({ userName });
+      const user = await getRepository(User).findOneBy({ userName });
 
       if (!user) {
         changelog.update(await getIdFromTwitch(userName), { userName });
@@ -602,7 +602,7 @@ class Points extends System {
       const [userName, points] = new Expects(opts.parameters).username().points({ all: true }).toArray();
 
       await changelog.flush();
-      const user = await getRepository(User).findOne({ userName });
+      const user = await getRepository(User).findOneBy({ userName });
       if (!user) {
         changelog.update(await getIdFromTwitch(userName), { userName });
         return this.remove(opts);

@@ -82,7 +82,7 @@ class Raffles extends System {
         await changelog.flush();
         cb(
           null,
-          await getRepository(User).findOne({ userName }),
+          await getRepository(User).findOneBy({ userName }),
         );
       } catch (e: any) {
         cb(e.stack);
@@ -100,7 +100,7 @@ class Raffles extends System {
       try {
         cb(
           null,
-          await getRepository(Raffle).findOne({
+          await getRepository(Raffle).findOneBy({
             relations: ['participants', 'participants.messages'],
             order:     { timestamp: 'DESC' },
           }),
@@ -132,7 +132,7 @@ class Raffles extends System {
       return true;
     }
 
-    const raffle = await getRepository(Raffle).findOne({
+    const raffle = await getRepository(Raffle).findOneBy({
       where: { isClosed: true },
       order: { timestamp: 'DESC' },
     });
@@ -144,7 +144,7 @@ class Raffles extends System {
     const isInFiveMinutesTreshold = Date.now() - raffle.timestamp <= 1000 * 60 * 5;
 
     if (isWinner && isInFiveMinutesTreshold) {
-      const winner = await getRepository(RaffleParticipant).findOne({
+      const winner = await getRepository(RaffleParticipant).findOneBy({
         relations: ['messages'],
         where:     {
           username: opts.sender.userName,
@@ -165,7 +165,7 @@ class Raffles extends System {
 
   async announceEntries() {
     try {
-      const raffle = await getRepository(Raffle).findOneOrFail({ where: { winner: null, isClosed: false }, relations: ['participants'] });
+      const raffle = await getRepository(Raffle).findOneByOrFail({ where: { winner: null, isClosed: false }, relations: ['participants'] });
       const eligibility: string[] = [];
       if (raffle.forSubscribers === true) {
         eligibility.push(prepare('raffles.eligibility-subscribers-item'));
@@ -202,7 +202,7 @@ class Raffles extends System {
       return;
     }
 
-    const raffle = await getRepository(Raffle).findOne({ where: { winner: null, isClosed: false }, relations: ['participants'] });
+    const raffle = await getRepository(Raffle).findOneBy({ where: { winner: null, isClosed: false }, relations: ['participants'] });
     const isTimeToAnnounce = new Date().getTime() - new Date(this.lastAnnounce).getTime() >= (this.raffleAnnounceInterval * 60 * 1000);
     const isMessageCountToAnnounce = linesParsed - this.lastAnnounceMessageCount >= this.raffleAnnounceMessageInterval;
     if (!(isStreamOnline.value) || !raffle || !isTimeToAnnounce || !isMessageCountToAnnounce) {
@@ -247,7 +247,7 @@ class Raffles extends System {
   @command('!raffle remove')
   @default_permission(defaultPermissions.CASTERS)
   async remove (opts: CommandOptions): Promise<CommandResponse[]> {
-    const raffle = await getRepository(Raffle).findOne({ winner: null, isClosed: false });
+    const raffle = await getRepository(Raffle).findOneBy({ winner: null, isClosed: false });
     if (raffle) {
       await getRepository(Raffle).remove(raffle);
     }
@@ -286,7 +286,7 @@ class Raffles extends System {
     const keyword = keywordMatch[1];
 
     // check if raffle running
-    const raffle = await getRepository(Raffle).findOne({ winner: null, isClosed: false });
+    const raffle = await getRepository(Raffle).findOneBy({ winner: null, isClosed: false });
     if (raffle) {
       const response = prepare('raffles.raffle-is-already-running', { keyword: raffle.keyword });
       return [{ response, ...opts }];
@@ -333,7 +333,7 @@ class Raffles extends System {
 
   @command('!raffle')
   async main (opts: CommandOptions): Promise<CommandResponse[]> {
-    const raffle = await getRepository(Raffle).findOne({ where: { winner: null, isClosed: false }, relations: ['participants'] });
+    const raffle = await getRepository(Raffle).findOneBy({ where: { winner: null, isClosed: false }, relations: ['participants'] });
 
     if (!raffle) {
       const response = prepare('raffles.no-raffle-is-currently-running');
@@ -378,7 +378,7 @@ class Raffles extends System {
       return true;
     }
 
-    const raffle = await getRepository(Raffle).findOne({
+    const raffle = await getRepository(Raffle).findOneBy({
       relations: ['participants'],
       where:     { winner: null, isClosed: false },
     });
@@ -479,7 +479,7 @@ class Raffles extends System {
   @command('!raffle pick')
   @default_permission(defaultPermissions.CASTERS)
   async pick (opts: CommandOptions): Promise<CommandResponse[]> {
-    const raffle = await getRepository(Raffle).findOne({
+    const raffle = await getRepository(Raffle).findOneBy({
       relations: ['participants'],
       order:     { timestamp: 'DESC' },
     });
@@ -527,7 +527,7 @@ class Raffles extends System {
       tickets = winner.tickets;
       if (winner.isSubscriber) {
         tickets = ((winner.tickets / 100) * sLuck);
-      } 
+      }
     }
 
     const probability = (tickets / _total * 100);

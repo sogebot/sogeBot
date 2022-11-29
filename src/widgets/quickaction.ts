@@ -51,7 +51,7 @@ class QuickAction extends Widget {
   public sockets() {
     adminEndpoint('/widgets/quickaction', 'generic::deleteById', async (id, cb) => {
       try {
-        const item = await getRepository(QuickActionEntity).findOneOrFail({ id });
+        const item = await getRepository(QuickActionEntity).findOneByOrFail({ id });
         await getRepository(QuickActionEntity).remove(item);
         cb(null);
       } catch (e) {
@@ -66,7 +66,7 @@ class QuickAction extends Widget {
       cb(null, items);
     });
     adminEndpoint('/widgets/quickaction', 'trigger', async ({ user, id, value }) => {
-      const item = await getRepository(QuickActionEntity).findOneOrFail({ where: { id, userId: user.userId } });
+      const item = await getRepository(QuickActionEntity).findOneByOrFail({ id, userId: user.userId });
       trigger(item, { userId: user.userId, userName: user.userName }, value);
     });
   }

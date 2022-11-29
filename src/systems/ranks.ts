@@ -52,11 +52,11 @@ class Ranks extends System {
     });
     app.get('/api/systems/ranks/:id', async (req, res) => {
       res.send({
-        data: await Rank.findOne({ where: { id: req.params.id } }),
+        data: await Rank.findOneBy({ where: { id: req.params.id } }),
       });
     });
     app.delete('/api/systems/ranks/:id', adminMiddleware, async (req, res) => {
-      const poll = await Rank.findOne({ where: { id: req.params.id } });
+      const poll = await Rank.findOneBy({ where: { id: req.params.id } });
       await poll?.remove();
       res.status(404).send();
     });
@@ -85,7 +85,7 @@ class Ranks extends System {
     }
 
     const value = parseInt(parsed[1], 10);
-    const rank = await getRepository(Rank).findOne({ value, type });
+    const rank = await getRepository(Rank).findOneBy({ value, type });
     if (!rank) {
       await getRepository(Rank).save({
         value, rank: parsed[2], type,
@@ -121,7 +121,7 @@ class Ranks extends System {
     const value = parsed[1];
     const rank = parsed[2];
 
-    const item = await getRepository(Rank).findOne({ value: parseInt(value, 10), type });
+    const item = await getRepository(Rank).findOneBy({ value: parseInt(value, 10), type });
     if (!item) {
       const response = prepare('ranks.rank-was-not-found', { value: value });
       return [{ response, ...opts }];

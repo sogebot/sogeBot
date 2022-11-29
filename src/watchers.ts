@@ -80,7 +80,7 @@ export const VariableWatcher = {
       if (!isEqual(value, variables.get(k))) {
         const oldValue = variables.get(k);
         variables.set(k, value);
-        const savedSetting = await getRepository(Settings).findOne({
+        const savedSetting = await getRepository(Settings).findOneBy({
           where: {
             name:      variable,
             namespace: checkedModule.nsp,

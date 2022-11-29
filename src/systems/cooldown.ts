@@ -96,7 +96,7 @@ class Cooldown extends System {
     });
     app.get('/api/systems/cooldown/:id', adminMiddleware, async (req, res) => {
       res.send({
-        data: await CooldownEntity.findOne({ id: req.params.id }),
+        data: await CooldownEntity.findOneBy({ id: req.params.id }),
       });
     });
     app.delete('/api/systems/cooldown/:id', adminMiddleware, async (req, res) => {
@@ -150,7 +150,7 @@ class Cooldown extends System {
         isOwnerAffected:      false,
         isModeratorAffected:  false,
         isSubscriberAffected: true,
-      }, await CooldownEntity.findOne({
+      }, await CooldownEntity.findOneBy({
         where: {
           name,
           type,
@@ -242,7 +242,7 @@ class Cooldown extends System {
           }
         }
 
-        const cooldown = await getRepository(CooldownEntity).findOne({ where: [{ name }, { name: In(groupName) }] });
+        const cooldown = await getRepository(CooldownEntity).findOneBy({ where: [{ name }, { name: In(groupName) }] });
         if (!cooldown) {
           const defaultValue = await this.getPermissionBasedSettingsValue('defaultCooldownOfCommandsInSeconds');
           const permId = await getUserHighestPermission(opts.sender.userId);
@@ -425,7 +425,7 @@ class Cooldown extends System {
         .oneOf({ values: ['global', 'user'], name: 'type' })
         .toArray();
 
-      const cooldown = await getRepository(CooldownEntity).findOne({
+      const cooldown = await getRepository(CooldownEntity).findOneBy({
         where: {
           name,
           type: typeParameter,

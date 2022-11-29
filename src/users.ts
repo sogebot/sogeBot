@@ -61,7 +61,7 @@ class Users extends Core {
       const clientBot = await client('bot');
       await Promise.all(viewers.map(async (duplicate) => {
         const userName = duplicate.user_username;
-        const duplicates = await getRepository(User).find({ userName });
+        const duplicates = await getRepository(User).find({ where: { userName } });
         await Promise.all(duplicates.map(async (user) => {
           try {
             const getUserById = await clientBot.users.getUserById(user.userId);
@@ -120,7 +120,7 @@ class Users extends Core {
       } else {
         // get new users
         await changelog.flush();
-        const newChatters = await getRepository(User).find({ isOnline: true, watchedTime: 0 });
+        const newChatters = await getRepository(User).find({ where: { isOnline: true, watchedTime: 0 } });
         debug('tmi.watched', `Adding ${newChatters.length} users as new chatters.`);
         stats.value.newChatters = stats.value.newChatters + newChatters.length;
 
@@ -135,7 +135,7 @@ class Users extends Core {
 
           if (typeof incrementedUsers.affected === 'undefined') {
             await changelog.flush();
-            const users = await getRepository(User).find({ isOnline: true });
+            const users = await getRepository(User).find({ where: { isOnline: true } });
             if (isDebugEnabled('tmi.watched')) {
               for (const user of users) {
                 debug('tmi.watched', `User ${user.userName}#${user.userId} added watched time ${interval}`);
@@ -220,7 +220,7 @@ class Users extends Core {
       userName = userName.substring(1);
     }
     await changelog.flush();
-    const user = await getRepository(User).findOne({ where: { userName }, select: ['userId'] });
+    const user = await getRepository(User).findOneBy({ userName });
     if (!user) {
       const userId = await getIdFromTwitch(userName);
       changelog.update(userId, { userName });
@@ -231,7 +231,7 @@ class Users extends Core {
 
   async getUserByUsername(userName: string, select?: FindOneOptions<Readonly<Required<UserInterface>>>['select']) {
     await changelog.flush();
-    const userByUsername = await getRepository(User).findOne({ where: { userName }, select });
+    const userByUsername = await getRepository(User).findOneBy({ userName });
 
     if (userByUsername) {
       return userByUsername;
@@ -476,7 +476,7 @@ class Users extends Core {
         cb(e.stack, [], 0, null);
       }
     });
-    viewerEndpoint('/core/users', 'viewers::findOne', async (userId, cb) => {
+    viewerEndpoint('/core/users', 'viewers::findOneBy', async (userId, cb) => {
       try {
         const viewer = await changelog.get(userId);
         const tips =  await getRepository(UserTip).find({ where: { userId } });
@@ -487,7 +487,7 @@ class Users extends Core {
           const aggregatedBits = bits.map((o) => Number(o.amount)).reduce((a, b) => a + b, 0);
 
           const permId = await getUserHighestPermission(userId);
-          const permissionGroup = await Permissions.findOneOrFail({ where: { id: permId || defaultPermissions.VIEWERS } });
+          const permissionGroup = await Permissions.findOneByOrFail({ id: permId || defaultPermissions.VIEWERS });
           cb(null, {
             ...viewer, aggregatedBits, aggregatedTips, permission: permissionGroup, tips, bits,
           });

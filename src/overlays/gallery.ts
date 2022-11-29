@@ -44,7 +44,7 @@ class Gallery extends Overlay {
             return;
           }
 
-          const file = await getRepository(GalleryEntity).findOne({ id: req.params.id });
+          const file = await getRepository(GalleryEntity).findOneBy({ id: req.params.id });
           if (file) {
             const data = Buffer.from(file.data.split(',')[1], 'base64');
             res.writeHead(200, {
@@ -64,7 +64,7 @@ class Gallery extends Overlay {
   sockets () {
     adminEndpoint('/overlays/gallery', 'generic::getOne', async (id, cb) => {
       try {
-        const item = await getRepository(GalleryEntity).findOne({
+        const item = await getRepository(GalleryEntity).findOneBy({
           where:  { id },
           select: ['id', 'name', 'type', 'folder'],
         });
@@ -92,7 +92,7 @@ class Gallery extends Overlay {
     adminEndpoint('/overlays/gallery', 'generic::setById', async (opts, cb) => {
       try {
         cb(null, await getRepository(GalleryEntity).save({
-          ...(await getRepository(GalleryEntity).findOne({ id: String(opts.id) })),
+          ...(await getRepository(GalleryEntity).findOneBy({ id: String(opts.id) })),
           ...opts.item,
         }));
         cb(null);
@@ -107,7 +107,7 @@ class Gallery extends Overlay {
         const matches = filedata.b64data.match(/^data:([0-9A-Za-z-+/]+);base64,(.+)$/);
         if (!matches) {
           // update entity
-          const item = await getRepository(GalleryEntity).findOneOrFail({ id: filedata.id });
+          const item = await getRepository(GalleryEntity).findOneByOrFail({ id: filedata.id });
           await getRepository(GalleryEntity).save({
             id:     item.id,
             type:   item.type,

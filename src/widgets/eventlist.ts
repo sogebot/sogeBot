@@ -37,7 +37,7 @@ class EventList extends Widget {
     });
 
     adminEndpoint('/widgets/eventlist', 'eventlist::resend', async (id) => {
-      const event = await getRepository(EventListDB).findOne({ id: String(id) });
+      const event = await getRepository(EventListDB).findOneBy({ id: String(id) });
       if (event) {
         const values = JSON.parse(event.values_json);
         const eventType = event.event + 's';
@@ -163,11 +163,9 @@ class EventList extends Widget {
         // pair tips so we have sortAmount to use in eventlist filter
         if (event.event === 'tip') {
           // search in DB for corresponding tip, unfortunately pre 13.0.0 timestamp won't exactly match (we are adding 10 seconds up/down)
-          const tip = await getRepository(UserTip).findOne({
-            where: {
-              userId:   event.userId,
-              tippedAt: Between(event.timestamp - (10 * SECOND), event.timestamp + (10 * SECOND)),
-            },
+          const tip = await getRepository(UserTip).findOneBy({
+            userId:   event.userId,
+            tippedAt: Between(event.timestamp - (10 * SECOND), event.timestamp + (10 * SECOND)),
           });
           tipMapping.set(event.id, tip?.sortAmount ?? 0);
         }

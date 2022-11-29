@@ -71,7 +71,7 @@ class Keywords extends System {
     });
     app.get('/api/systems/keywords/:id', adminMiddleware, async (req, res) => {
       res.send({
-        data: await Keyword.findOne({ where: { id: req.params.id }, relations: ['responses'] }),
+        data: await Keyword.findOneBy({ where: { id: req.params.id }, relations: ['responses'] }),
       });
     });
     app.delete('/api/systems/keywords/groups/:name', adminMiddleware, async (req, res) => {
@@ -150,7 +150,7 @@ class Keywords extends System {
         })
         .toArray();
 
-      let kDb = await Keyword.findOne({
+      let kDb = await Keyword.findOneBy({
         relations: ['responses'],
         where:     { keyword: keywordRegex },
       });
@@ -266,7 +266,7 @@ class Keywords extends System {
     } else {
       // print responses
       const keyword_with_responses
-        = await Keyword.findOne({
+        = await Keyword.findOneBy({
           relations: ['responses'],
           where:     isUUID(keyword) ? { id: keyword } : { keyword },
         });
@@ -420,7 +420,7 @@ class Keywords extends System {
       let group: Readonly<Required<KeywordGroup>> | undefined;
       let groupPermission: null | string = null;
       if (k.group) {
-        group = await KeywordGroup.findOne({ name: k.group });
+        group = await KeywordGroup.findOneBy({ name: k.group });
         debug('keywords.run', JSON.stringify({ group }));
         if (group) {
           if (group.options.filter && !(await checkFilter(opts, group.options.filter))) {

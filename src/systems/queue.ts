@@ -68,7 +68,7 @@ class Queue extends System {
             data.username = [data.username];
           }
           for (const user of data.username) {
-            const entity = await getRepository(QueueEntity).findOne({ username: user });
+            const entity = await getRepository(QueueEntity).findOneBy({ username: user });
             if (entity) {
               users.push(entity);
             }
@@ -175,7 +175,7 @@ class Queue extends System {
 
       if (eligible) {
         await getRepository(QueueEntity).save({
-          ...(await getRepository(QueueEntity).findOne({ username: opts.sender.userName })),
+          ...(await getRepository(QueueEntity).findOneBy({ username: opts.sender.userName })),
           username:     opts.sender.userName,
           isSubscriber: user.isSubscriber,
           isModerator:  user.isModerator,

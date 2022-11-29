@@ -61,7 +61,7 @@ export class QuickActionResolver {
   @Authorized()
   @Mutation(returns => Boolean)
   async quickActionTrigger(@Ctx('user') user: JwtPayload, @Arg('id') id: string, @Arg('value', { nullable: true }) value: string) {
-    const item = await getRepository(QuickAction).findOneOrFail({ where: { id, userId: user.userId } });
+    const item = await getRepository(QuickAction).findOneByOrFail({ where: { id, userId: user.userId } });
     trigger(item, { userId: user.userId, userName: user.userName }, value);
     return true;
   }

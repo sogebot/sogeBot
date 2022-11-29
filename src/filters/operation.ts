@@ -24,7 +24,7 @@ export const operation: ResponseFilter = {
     if (match && match.groups) {
       info(`Triggering alert ${match.groups.id} by command ${attributes.command}`);
 
-      const price = await getRepository(Price).findOne({ command: attributes.command, enabled: true });
+      const price = await getRepository(Price).findOneBy({ command: attributes.command, enabled: true });
 
       await alerts.trigger({
         amount:     price ? price.price : 0,

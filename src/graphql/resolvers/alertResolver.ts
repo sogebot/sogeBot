@@ -57,7 +57,7 @@ export class alertResolver {
   @Authorized()
   @Mutation(returns => AlertObject)
   async alertClone(@Arg('id') id: string) {
-    const item = await getRepository(Alert).findOneOrFail({ where: { id }, relations });
+    const item = await getRepository(Alert).findOneByOrFail({ where: { id }, relations });
     const clonedItem = {
       ...item,
       id:        v4(),
@@ -135,7 +135,7 @@ export class alertResolver {
   @Authorized()
   @Mutation(returns => Boolean)
   async alertRemove(@Arg('id') id: string) {
-    const item = await getRepository(Alert).findOne({ id });
+    const item = await getRepository(Alert).findOneBy({ id });
     if (item) {
       await getRepository(Alert).remove(item);
     }

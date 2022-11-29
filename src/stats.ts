@@ -90,7 +90,7 @@ class Stats extends Core {
   async save(data: Required<TwitchStatsInterface> & { timestamp: number }) {
     if (data.timestamp - this.latestTimestamp >= MINUTE * 15) {
       const whenOnline = new Date(data.whenOnline).getTime();
-      const statsFromDB = await getRepository(TwitchStats).findOne({ 'whenOnline': whenOnline });
+      const statsFromDB = await getRepository(TwitchStats).findOneBy({ 'whenOnline': whenOnline });
       await getRepository(TwitchStats).save({
         currentViewers:     statsFromDB ? Math.round((data.currentViewers + statsFromDB.currentViewers) / 2) : data.currentViewers,
         whenOnline:         statsFromDB ? statsFromDB.whenOnline : Date.now(),

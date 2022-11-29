@@ -66,7 +66,7 @@ function persistent<T>({ value, name, namespace, onChange }: { value: T, name: s
     try {
       debug('persistent.load', `Loading ${namespace}/${name}`);
       proxy.value = JSON.parse(
-        (await getRepository(Settings).findOneOrFail({ namespace, name })).value,
+        (await getRepository(Settings).findOneByOrFail({ namespace, name })).value,
       );
     } catch (e: any) {
       debug('persistent.load', `Data not found, creating ${namespace}/${name}`);

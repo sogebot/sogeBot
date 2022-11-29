@@ -38,7 +38,7 @@ export class randomizerResolver {
   @Authorized()
   @Mutation(returns => Boolean)
   async randomizersRemove(@Arg('id') id: string) {
-    const item = await getRepository(Randomizer).findOne({ id });
+    const item = await getRepository(Randomizer).findOneBy({ id });
     if (item) {
       await getRepository(Randomizer).remove(item);
     }

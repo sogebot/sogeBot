@@ -112,13 +112,13 @@ class HelpersFilter {
     }
 
     if (message.includes('$latestFollower')) {
-      const latestFollower = await getRepository(EventList).findOne({ order: { timestamp: 'DESC' }, where: { event: 'follow' } });
+      const latestFollower = await getRepository(EventList).findOneBy({ order: { timestamp: 'DESC' }, where: { event: 'follow' } });
       variables.$latestFollower = !_.isNil(latestFollower) ? await users.getNameById(latestFollower.userId) : 'n/a';
     }
 
     // latestSubscriber
     if (message.includes('$latestSubscriber')) {
-      const latestSubscriber = await getRepository(EventList).findOne({
+      const latestSubscriber = await getRepository(EventList).findOneBy({
         order: { timestamp: 'DESC' },
         where: { event: In(['sub', 'resub', 'subgift']) },
       });
@@ -133,7 +133,7 @@ class HelpersFilter {
 
     // latestTip, latestTipAmount, latestTipCurrency, latestTipMessage
     if (message.includes('$latestTip')) {
-      const latestTip = await getRepository(EventList).findOne({ order: { timestamp: 'DESC' }, where: { event: 'tip', isTest: false } });
+      const latestTip = await getRepository(EventList).findOneBy({ order: { timestamp: 'DESC' }, where: { event: 'tip', isTest: false } });
       variables.$latestTipAmount = !_.isNil(latestTip) ? parseFloat(JSON.parse(latestTip.values_json).amount).toFixed(2) : 'n/a';
       variables.$latestTipCurrency = !_.isNil(latestTip) ? JSON.parse(latestTip.values_json).currency : 'n/a';
       variables.$latestTipMessage = !_.isNil(latestTip) ? JSON.parse(latestTip.values_json).message : 'n/a';
@@ -142,7 +142,7 @@ class HelpersFilter {
 
     // latestCheer, latestCheerAmount, latestCheerCurrency, latestCheerMessage
     if (message.includes('$latestCheer')) {
-      const latestCheer = await getRepository(EventList).findOne({ order: { timestamp: 'DESC' }, where: { event: 'cheer' } });
+      const latestCheer = await getRepository(EventList).findOneBy({ order: { timestamp: 'DESC' }, where: { event: 'cheer' } });
       variables.$latestCheerAmount = !_.isNil(latestCheer) ? JSON.parse(latestCheer.values_json).bits : 'n/a';
       variables.$latestCheerMessage = !_.isNil(latestCheer) ? JSON.parse(latestCheer.values_json).message : 'n/a';
       variables.$latestCheer = !_.isNil(latestCheer) ? await users.getNameById(latestCheer.userId) : 'n/a';

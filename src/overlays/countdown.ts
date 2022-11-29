@@ -43,7 +43,7 @@ class Countdown extends Overlay {
 
       let resetTime = 0;
       if (req.params.operation.includes('reset')) {
-        const overlay = await getRepository(OverlayMapper).findOne(req.params.id);
+        const overlay = await getRepository(OverlayMapper).findOneBy(req.params.id);
         if (overlay && overlay.value === 'countdown') {
           resetTime = overlay.opts?.currentTime ?? 0;
         }
@@ -80,7 +80,7 @@ class Countdown extends Overlay {
       statusUpdate.delete(data.id);
 
       // we need to check if persistent
-      const overlay = await getRepository(OverlayMapper).findOne(data.id);
+      const overlay = await getRepository(OverlayMapper).findOneBy(data.id);
       if (overlay && overlay.value === 'countdown') {
         if (overlay.opts && overlay.opts.isPersistent) {
           await getRepository(OverlayMapper).update(data.id, {

@@ -767,7 +767,7 @@ class Chat {
       let redeemTriggered = false;
       if (messageFromUser.trim().startsWith('!')) {
         try {
-          const price = await getRepository(Price).findOneOrFail({ where: { command: messageFromUser.trim().toLowerCase(), enabled: true } });
+          const price = await getRepository(Price).findOneByOrFail({ where: { command: messageFromUser.trim().toLowerCase(), enabled: true } });
           if (price.priceBits <= bits) {
             if (customcommands.enabled) {
               await customcommands.run({

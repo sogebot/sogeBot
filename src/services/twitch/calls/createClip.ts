@@ -21,7 +21,7 @@ export async function createClip (opts: { createAfterDelay: boolean }) {
   const isClipChecked = async function (id: string) {
     return new Promise((resolve: (value: boolean) => void) => {
       const check = async () => {
-        const clip = await getRepository(TwitchClips).findOne({ clipId: id });
+        const clip = await getRepository(TwitchClips).findOneBy({ clipId: id });
         if (!clip) {
           resolve(false);
         } else if (clip.isChecked) {

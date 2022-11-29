@@ -448,7 +448,7 @@ class Levels extends System {
     try {
       const [userName, xp] = new Expects(opts.parameters).username().number({ minus: true }).toArray();
       await changelog.flush();
-      const user = await getRepository(User).findOneOrFail({ userName });
+      const user = await getRepository(User).findOneByOrFail({ userName });
       const chat = await users.getChatOf(user.userId, isStreamOnline.value);
 
       const levels: NonNullable<UserInterface['extra']>['levels'] = {
@@ -482,7 +482,7 @@ class Levels extends System {
     try {
       const [userName] = new Expects(opts.parameters).username({ optional: true, default: opts.sender.userName }).toArray();
       await changelog.flush();
-      const user = await getRepository(User).findOneOrFail({ userName });
+      const user = await getRepository(User).findOneByOrFail({ userName });
 
       let currentLevel = this.firstLevelStartsAt === 0 ? 1 : 0;
       let nextXP = await this.getLevelXP(currentLevel + 1);

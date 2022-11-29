@@ -40,7 +40,7 @@ class Translate {
         }
 
         // we need to manually get if lang is changed so we have proper translations on init
-        const lang = await getRepository(Settings).findOne({ namespace: '/core/general', name: 'lang' });
+        const lang = await getRepository(Settings).findOneBy({ namespace: '/core/general', name: 'lang' });
         if (lang) {
           setLang(JSON.parse(lang.value));
         }

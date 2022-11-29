@@ -53,7 +53,7 @@ export class goalsResolver {
   @Authorized()
   @Mutation(returns => Boolean)
   async goalsRemove(@Arg('id') id: string) {
-    const item = await getRepository(GoalGroup).findOne({ id });
+    const item = await getRepository(GoalGroup).findOneBy({ id });
     if (item) {
       await getRepository(GoalGroup).remove(item);
     }

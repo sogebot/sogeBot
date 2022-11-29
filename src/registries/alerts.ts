@@ -35,7 +35,7 @@ const fetchUserForAlert = (opts: EmitData, type: 'recipient' | 'name'): Promise<
     if (value && value.length > 0) {
       client('bot').then(clientBot => {
         Promise.all([
-          getRepository(User).findOne({ userName: value }),
+          getRepository(User).findOneBy({ userName: value }),
           clientBot.users.getUserByName(value),
         ]).then(async ([user_db, response]) => {
           if (response) {
@@ -123,7 +123,7 @@ class Alerts extends Registry {
     });
     publicEndpoint('/registries/alerts', 'isAlertUpdated', async ({ updatedAt, id }, cb) => {
       try {
-        const alert = await getRepository(Alert).findOne({ id });
+        const alert = await getRepository(Alert).findOneBy({ id });
         if (alert) {
           cb(null, updatedAt < (alert.updatedAt || 0), alert.updatedAt || 0);
         } else {
@@ -231,7 +231,7 @@ class Alerts extends Registry {
 
       // search for user triggering alert
       const broadcasterId = variables.get('services.twitch.broadcasterId') as string;
-      const caster = await getRepository(User).findOne({ userId: broadcasterId }) ?? null;
+      const caster = await getRepository(User).findOneBy({ userId: broadcasterId }) ?? null;
 
       const data = {
         ...opts, isTTSMuted: !tts.ready || this.isTTSMuted, isSoundMuted: this.isSoundMuted, TTSService: tts.service, TTSKey: key, user, game: user?.game, caster, recipientUser: recipient,

@@ -60,7 +60,7 @@ export const getChannelChattersUnofficialAPI = async (opts: any) => {
     const usersToFetch: string[] = [];
     if (joinedUsers.length > 0) {
       for (const userName of joinedUsers) {
-        const user = await getRepository(User).findOne({ where: { userName } });
+        const user = await getRepository(User).findOneBy({ where: { userName } });
         if (user) {
           await getRepository(User).save({ ...user, isOnline: true });
           if (!user.createdAt) {

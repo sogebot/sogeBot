@@ -92,7 +92,7 @@ class TTS extends Core {
           }
 
           // get private key
-          const privateKey = await getRepository(GooglePrivateKeys).findOneOrFail({ id: this.googlePrivateKey });
+          const privateKey = await getRepository(GooglePrivateKeys).findOneByOrFail({ id: this.googlePrivateKey });
 
           // configure a JWT auth client
           jwtClient = new google.auth.JWT(

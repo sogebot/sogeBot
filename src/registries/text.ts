@@ -81,7 +81,7 @@ class Text extends Registry {
     });
     publicEndpoint('/registries/text', 'generic::getOne', async (opts: { id: any; parseText: boolean }, callback) => {
       try {
-        const item = await getRepository(TextEntity).findOneOrFail({ id: opts.id });
+        const item = await getRepository(TextEntity).findOneByOrFail({ id: opts.id });
 
         let text = item.text;
         if (opts.parseText) {

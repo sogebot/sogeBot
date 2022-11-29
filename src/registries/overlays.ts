@@ -22,7 +22,7 @@ setInterval(async () => {
       [id, time] = id.split('|');
     }
     // check if it is without group
-    const item = await getRepository(OverlayMapper).findOne({ id });
+    const item = await getRepository(OverlayMapper).findOneBy({ id });
     if (item) {
       if (item.value === 'countdown' && item.opts) {
         await getRepository(OverlayMapper).update(id, {
@@ -66,7 +66,7 @@ class Overlays extends Registry {
       cb(null, items.map(defaultValues) as OverlayMappers[]);
     });
     publicEndpoint('/registries/overlays', 'generic::getOne', async (id, cb) => {
-      const item = await getRepository(OverlayMapper).findOne({ id });
+      const item = await getRepository(OverlayMapper).findOneBy({ id });
       if (item) {
         cb(null, defaultValues(item));
       } else {

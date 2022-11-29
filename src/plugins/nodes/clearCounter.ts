@@ -5,7 +5,7 @@ import { Plugin } from '~/database/entity/plugins';
 
 export default async function(pluginId: string, currentNode: Node<string>, parameters: Record<string, any>, variables: Record<string, any>, userstate: { userName: string; userId: string; } | null) {
   try {
-    const plugin = await Plugin.findOneOrFail({ id: pluginId });
+    const plugin = await Plugin.findOneByOrFail({ id: pluginId });
     const workflow = Object.values(
       JSON.parse(plugin.workflow).drawflow.Home.data
     ) as Node[];

@@ -10,7 +10,7 @@ async function getGameThumbnailFromName (name: string): Promise<string | undefin
   if (isDebugEnabled('api.calls')) {
     debug('api.calls', new Error().stack);
   }
-  const gameFromDb = await getRepository(CacheGames).findOne({ name });
+  const gameFromDb = await getRepository(CacheGames).findOneBy({ name });
   // check if name is cached
   if (gameFromDb && gameFromDb.thumbnail) {
     return String(gameFromDb.thumbnail);

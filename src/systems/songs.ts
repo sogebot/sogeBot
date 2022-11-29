@@ -425,7 +425,7 @@ class Songs extends System {
 
     // check if there are any requests
     if (this.songrequest) {
-      const sr = await SongRequest.findOne({ order: { addedAt: 'ASC' } });
+      const sr = await SongRequest.findOneBy({ order: { addedAt: 'ASC' } });
       if (sr) {
         const currentSong: any = sr;
         currentSong.volume = await this.getVolume(currentSong);
@@ -447,7 +447,7 @@ class Songs extends System {
         return [];
       }
       const order: any = this.shuffle ? { seed: 'ASC' } : { lastPlayedAt: 'ASC' };
-      const pl = await SongPlaylist.findOne({ order });
+      const pl = await SongPlaylist.findOneBy({ order });
       if (!pl) {
         return []; // don't do anything if no songs in playlist
       }
@@ -612,7 +612,7 @@ class Songs extends System {
     }
 
     // is song banned?
-    const ban = await SongBan.findOne({ videoId: videoID });
+    const ban = await SongBan.findOneBy({ videoId: videoID });
     if (ban) {
       return [{ response: translate('songs.song-is-banned'), ...opts }];
     }
@@ -676,7 +676,7 @@ class Songs extends System {
 
   @command('!wrongsong')
   async removeSongFromQueue (opts: CommandOptions): Promise<CommandResponse[]> {
-    const sr = await SongRequest.findOne({
+    const sr = await SongRequest.findOneBy({
       where: { username: opts.sender.userName },
       order: { addedAt: 'DESC' },
     });
@@ -705,10 +705,10 @@ class Songs extends System {
 
     if (idsFromDB.includes(id)) {
       info(`=> Skipped ${id} - Already in playlist`);
-      return [{ response: prepare('songs.song-is-already-in-playlist', { name: (await SongPlaylist.findOneOrFail({ videoId: id })).title }), ...opts }];
+      return [{ response: prepare('songs.song-is-already-in-playlist', { name: (await SongPlaylist.findOneByOrFail({ videoId: id })).title }), ...opts }];
     } else if (banFromDb.includes(id)) {
       info(`=> Skipped ${id} - Song is banned`);
-      return [{ response: prepare('songs.song-is-banned', { name: (await SongPlaylist.findOneOrFail({ videoId: id })).title }), ...opts }];
+      return [{ response: prepare('songs.song-is-banned', { name: (await SongPlaylist.findOneByOrFail({ videoId: id })).title }), ...opts }];
     } else {
       const videoInfo = await ytdl.getInfo('https://www.youtube.com/watch?v=' + id);
       if (videoInfo) {
@@ -744,7 +744,7 @@ class Songs extends System {
     }
     const videoID = opts.parameters;
 
-    const song = await SongPlaylist.findOne({ videoId: videoID });
+    const song = await SongPlaylist.findOneBy({ videoId: videoID });
     if (song) {
       SongPlaylist.delete({ videoId: videoID });
       const response = prepare('songs.song-was-removed-from-playlist', { name: song.title });

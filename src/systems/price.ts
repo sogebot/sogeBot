@@ -55,7 +55,7 @@ class Price extends System {
     });
     app.get('/api/systems/price/:id', adminMiddleware, async (req, res) => {
       res.send({
-        data: await PriceEntity.findOne({ id: req.params.id }),
+        data: await PriceEntity.findOneBy({ id: req.params.id }),
       });
     });
     app.delete('/api/systems/price/:id', adminMiddleware, async (req, res) => {
@@ -97,7 +97,7 @@ class Price extends System {
     }
 
     const price = await getRepository(PriceEntity).save({
-      ...(await getRepository(PriceEntity).findOne({ command: cmd })),
+      ...(await getRepository(PriceEntity).findOneBy({ command: cmd })),
       command: cmd, price: parseInt(argPrice, 10),
     });
     const response = prepare('price.price-was-set', {
@@ -133,7 +133,7 @@ class Price extends System {
     }
 
     const cmd = parsed[1];
-    const price = await getRepository(PriceEntity).findOne({ command: cmd });
+    const price = await getRepository(PriceEntity).findOneBy({ command: cmd });
     if (!price) {
       const response = prepare('price.price-was-not-found', { command: cmd });
       return [{ response, ...opts }];
@@ -166,7 +166,7 @@ class Price extends System {
       return true;
     }
 
-    const price = await getRepository(PriceEntity).findOne({ command: parsed[1], enabled: true });
+    const price = await getRepository(PriceEntity).findOneBy({ command: parsed[1], enabled: true });
     if (!price) { // no price set
       return true;
     }
@@ -207,7 +207,7 @@ class Price extends System {
     ) {
       return true;
     }
-    const price = await getRepository(PriceEntity).findOne({ command: parsed[1], enabled: true });
+    const price = await getRepository(PriceEntity).findOneBy({ command: parsed[1], enabled: true });
     if (price) { // no price set
       const removePts = price.price;
       changelog.increment(opts.sender.userId, { points: removePts });

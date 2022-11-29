@@ -15,7 +15,7 @@ async function getGameNameFromId (id: number): Promise<string> {
     return '';
   } // return empty game if gid is empty
 
-  const gameFromDb = await getRepository(CacheGames).findOne({ id });
+  const gameFromDb = await getRepository(CacheGames).findOneBy({ id });
 
   // check if id is cached
   if (gameFromDb) {

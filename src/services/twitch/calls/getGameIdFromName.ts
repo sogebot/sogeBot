@@ -11,7 +11,7 @@ async function getGameIdFromName (name: string): Promise<string | undefined> {
   if (isDebugEnabled('api.calls')) {
     debug('api.calls', new Error().stack);
   }
-  const gameFromDb = await getRepository(CacheGames).findOne({ name });
+  const gameFromDb = await getRepository(CacheGames).findOneBy({ name });
   // check if name is cached
   if (gameFromDb) {
     return String(gameFromDb.id);

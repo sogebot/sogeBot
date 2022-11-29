@@ -395,7 +395,7 @@ class Panel extends Core {
         data.title = data.title.trim();
         data.game = data.game.trim();
 
-        const item = await getRepository(CacheTitles).findOne({
+        const item = await getRepository(CacheTitles).findOneBy({
           game:  data.game,
           title: data.title,
         });

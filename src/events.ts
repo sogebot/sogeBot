@@ -242,8 +242,8 @@ class Events extends Core {
 
         await changelog.flush();
         const user = attributes.userId
-          ? await getRepository(User).findOne({ userId: attributes.userId })
-          : await getRepository(User).findOne({ userName: attributes.userName });
+          ? await getRepository(User).findOneBy({ userId: attributes.userId })
+          : await getRepository(User).findOneBy({ userName: attributes.userName });
 
         if (!user) {
           try {
@@ -274,7 +274,7 @@ class Events extends Core {
     }
     if (!isNil(get(attributes, 'recipient', null))) {
       await changelog.flush();
-      const user = await getRepository(User).findOne({ userName: attributes.recipient });
+      const user = await getRepository(User).findOneBy({ userName: attributes.recipient });
       if (!user) {
         const userId = await getIdFromTwitch(attributes.recipient);
         changelog.update(userId, { userName: attributes.recipient });
@@ -359,7 +359,7 @@ class Events extends Core {
   }
 
   public async fireBotWillLeaveChannel() {
-    
+
     tmiEmitter.emit('part', 'bot');
     // force all users offline
     await changelog.flush();
@@ -415,7 +415,7 @@ class Events extends Core {
       userObj = await changelog.get(userId);
     } else {
       await changelog.flush();
-      userObj = await getRepository(User).findOne({ userName });
+      userObj = await getRepository(User).findOneBy({ userName });
     }
     await changelog.flush();
     if (!userObj && !attributes.test) {
@@ -718,7 +718,7 @@ class Events extends Core {
     });
     adminEndpoint('/core/events', 'generic::getOne', async (id, cb) => {
       try {
-        const event = await getRepository(Event).findOne({
+        const event = await getRepository(Event).findOneBy({
           relations: ['operations'],
           where:     { id },
         });
@@ -805,7 +805,7 @@ class Events extends Core {
           attributes.amount = Number(attributes.amount).toFixed(2);
         }
 
-        const event = await getRepository(Event).findOne({
+        const event = await getRepository(Event).findOneBy({
           relations: ['operations'],
           where:     { id },
         });
@@ -832,7 +832,7 @@ class Events extends Core {
     });
 
     adminEndpoint('/core/events', 'events::remove', async (eventId, cb) => {
-      const event = await getRepository(Event).findOne({ id: eventId });
+      const event = await getRepository(Event).findOneBy({ id: eventId });
       if (event) {
         await getRepository(Event).remove(event);
       }

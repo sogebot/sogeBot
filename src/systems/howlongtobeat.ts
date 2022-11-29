@@ -91,7 +91,7 @@ class HowLongToBeat extends System {
       try {
         delete req.body.streams; // remove streams to not change this
 
-        let game = await HowLongToBeatGame.findOne({ where: { id: req.params.id } });
+        let game = await HowLongToBeatGame.findOneBy({ where: { id: req.params.id } });
         if (!game) {
           game = new HowLongToBeatGame(req.body);
         } else {
@@ -108,11 +108,11 @@ class HowLongToBeat extends System {
     });
     app.get('/api/systems/hltb/:id', async (req, res) => {
       res.send({
-        data: await HowLongToBeatGame.findOne({ where: { id: req.params.id } }),
+        data: await HowLongToBeatGame.findOneBy({ where: { id: req.params.id } }),
       });
     });
     app.delete('/api/systems/hltb/:id', adminMiddleware, async (req, res) => {
-      const item = await HowLongToBeatGame.findOne({ where: { id: req.params.id } });
+      const item = await HowLongToBeatGame.findOneBy({ where: { id: req.params.id } });
       await item?.remove();
       res.status(404).send();
     });
@@ -162,7 +162,7 @@ class HowLongToBeat extends System {
     }
 
     try {
-      const game = await HowLongToBeatGame.findOneOrFail({ where: { game: stats.value.currentGame } });
+      const game = await HowLongToBeatGame.findOneByOrFail({ where: { game: stats.value.currentGame } });
       const stream = game.streams.find(o => o.createdAt === new Date(streamStatusChangeSince.value).toISOString());
       if (stream) {
         debug('hltb', 'Another 15s entry of this stream for ' + stats.value.currentGame);
@@ -227,7 +227,7 @@ class HowLongToBeat extends System {
         gameInput = stats.value.currentGame;
       }
     }
-    const gameToShow = await HowLongToBeatGame.findOne({ where: { game: gameInput } });
+    const gameToShow = await HowLongToBeatGame.findOneBy({ where: { game: gameInput } });
     if (!gameToShow && !retry) {
       if (!stats.value.currentGame) {
         return this.currentGameInfo(opts, true);

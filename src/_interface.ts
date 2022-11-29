@@ -99,11 +99,9 @@ class Module {
     if (!_.isEqual(_.get(this, '_enabled', true), value)) {
       _.set(this, '_enabled', value);
       value ? enabled.enable(this.nsp) : enabled.disable(this.nsp);
-      getRepository(Settings).findOne({
-        where: {
-          name:      'enabled',
-          namespace: this.nsp,
-        },
+      getRepository(Settings).findOneBy({
+        name:      'enabled',
+        namespace: this.nsp,
       }).then(data => {
         getRepository(Settings).save({
           ...data,
@@ -521,7 +519,7 @@ class Module {
       promisedSettings._permissions = {};
       for (const command of this._commands) {
         const name = typeof command === 'string' ? command : command.name;
-        const pItem = await PermissionCommands.findOne({ name });
+        const pItem = await PermissionCommands.findOneBy({ name });
         if (pItem) {
           promisedSettings._permissions[name] = pItem.permission;
         } else {
@@ -762,11 +760,9 @@ class Module {
         delete c.command;
       } else {
         c.command = updated;
-        const savedCommand = await getRepository(Settings).findOne({
-          where: {
-            namespace: this.nsp,
-            name:      'commands.' + command,
-          },
+        const savedCommand = await getRepository(Settings).findOneBy({
+          namespace: this.nsp,
+          name:      'commands.' + command,
         });
         await getRepository(Settings).save({
           ...savedCommand,
