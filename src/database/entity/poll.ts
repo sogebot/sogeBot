@@ -32,6 +32,6 @@ export class Poll extends BaseEntity {
   }[] = [];
 
   static findOpened() {
-    return this.findOneBy({ where: { closedAt: null } });
+    return this.findOne({ where: { closedAt: null } });
   }
 }

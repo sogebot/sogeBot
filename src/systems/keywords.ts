@@ -71,7 +71,7 @@ class Keywords extends System {
     });
     app.get('/api/systems/keywords/:id', adminMiddleware, async (req, res) => {
       res.send({
-        data: await Keyword.findOneBy({ where: { id: req.params.id }, relations: ['responses'] }),
+        data: await Keyword.findOne({ where: { id: req.params.id }, relations: ['responses'] }),
       });
     });
     app.delete('/api/systems/keywords/groups/:name', adminMiddleware, async (req, res) => {

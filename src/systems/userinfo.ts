@@ -326,7 +326,7 @@ class UserInfo extends System {
     try {
       const userName = new Expects(opts.parameters).username().toArray()[0].toLowerCase();
       await changelog.flush();
-      const user = await getRepository(User).findOneBy({ where: { userName: userName.toLowerCase() } });
+      const user = await getRepository(User).findOneBy({ userName: userName.toLowerCase() });
 
       if (!user) {
         throw Error(`User ${userName} not found.`);

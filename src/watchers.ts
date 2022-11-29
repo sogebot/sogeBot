@@ -81,10 +81,8 @@ export const VariableWatcher = {
         const oldValue = variables.get(k);
         variables.set(k, value);
         const savedSetting = await getRepository(Settings).findOneBy({
-          where: {
-            name:      variable,
-            namespace: checkedModule.nsp,
-          },
+          name:      variable,
+          namespace: checkedModule.nsp,
         });
         await getRepository(Settings).save({
           ...savedSetting,

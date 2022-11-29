@@ -202,7 +202,7 @@ class Raffles extends System {
       return;
     }
 
-    const raffle = await getRepository(Raffle).findOneBy({ where: { winner: null, isClosed: false }, relations: ['participants'] });
+    const raffle = await getRepository(Raffle).findOne({ where: { winner: null, isClosed: false }, relations: ['participants'] });
     const isTimeToAnnounce = new Date().getTime() - new Date(this.lastAnnounce).getTime() >= (this.raffleAnnounceInterval * 60 * 1000);
     const isMessageCountToAnnounce = linesParsed - this.lastAnnounceMessageCount >= this.raffleAnnounceMessageInterval;
     if (!(isStreamOnline.value) || !raffle || !isTimeToAnnounce || !isMessageCountToAnnounce) {
@@ -333,7 +333,7 @@ class Raffles extends System {
 
   @command('!raffle')
   async main (opts: CommandOptions): Promise<CommandResponse[]> {
-    const raffle = await getRepository(Raffle).findOneBy({ where: { winner: null, isClosed: false }, relations: ['participants'] });
+    const raffle = await getRepository(Raffle).findOne({ where: { winner: IsNull(), isClosed: false }, relations: ['participants'] });
 
     if (!raffle) {
       const response = prepare('raffles.no-raffle-is-currently-running');

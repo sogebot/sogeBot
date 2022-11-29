@@ -102,11 +102,11 @@ class Polls extends System {
     });
     app.get('/api/systems/polls/:id', async (req, res) => {
       res.send({
-        data: await Poll.findOneBy({ where: { id: req.params.id } }),
+        data: await Poll.findOne({ where: { id: req.params.id } }),
       });
     });
     app.delete('/api/systems/polls/:id', adminMiddleware, async (req, res) => {
-      const poll = await Poll.findOneBy({ where: { id: req.params.id } });
+      const poll = await Poll.findOne({ where: { id: req.params.id } });
       await poll?.remove();
       res.status(404).send();
     });

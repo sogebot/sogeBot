@@ -350,12 +350,12 @@ class Songs extends System {
     }
 
     // send timeouts to all users who requested song
-    const request = (await SongRequest.find({ videoId: videoID })).map(o => o.username);
+    const request = (await SongRequest.findBy({ videoId: videoID })).map(o => o.username);
     if (JSON.parse(this.currentSong).videoId === videoID) {
       request.push(JSON.parse(this.currentSong).username);
     }
     await changelog.flush();
-    const users = await getRepository(User).find({ userName: In(request) });
+    const users = await getRepository(User).findBy({ userName: In(request) });
     for (const username of request) {
       const data = users.find(o => o.userName === username);
       tmiEmitter.emit('timeout', username, 300, typeof data !== 'undefined' && isModerator(data));
@@ -425,7 +425,7 @@ class Songs extends System {
 
     // check if there are any requests
     if (this.songrequest) {
-      const sr = await SongRequest.findOneBy({ order: { addedAt: 'ASC' } });
+      const sr = await SongRequest.findOne({ order: { addedAt: 'ASC' } });
       if (sr) {
         const currentSong: any = sr;
         currentSong.volume = await this.getVolume(currentSong);
@@ -447,7 +447,7 @@ class Songs extends System {
         return [];
       }
       const order: any = this.shuffle ? { seed: 'ASC' } : { lastPlayedAt: 'ASC' };
-      const pl = await SongPlaylist.findOneBy({ order });
+      const pl = await SongPlaylist.findOne({ order });
       if (!pl) {
         return []; // don't do anything if no songs in playlist
       }
@@ -676,7 +676,7 @@ class Songs extends System {
 
   @command('!wrongsong')
   async removeSongFromQueue (opts: CommandOptions): Promise<CommandResponse[]> {
-    const sr = await SongRequest.findOneBy({
+    const sr = await SongRequest.findOne({
       where: { username: opts.sender.userName },
       order: { addedAt: 'DESC' },
     });

@@ -24,7 +24,7 @@ class Randomizer extends Registry {
     publicEndpoint('/registries/randomizer', 'randomizer::getVisible', async (cb) => {
       cb(
         null,
-        await getRepository(RandomizerEntity).findOneBy({ where: { isShown: true }, relations: [ 'items'] })
+        await getRepository(RandomizerEntity).findOne({ where: { isShown: true }, relations: [ 'items'] })
       );
     });
     adminEndpoint('/registries/randomizer', 'randomizer::startSpin', async () => {

@@ -52,11 +52,11 @@ class Ranks extends System {
     });
     app.get('/api/systems/ranks/:id', async (req, res) => {
       res.send({
-        data: await Rank.findOneBy({ where: { id: req.params.id } }),
+        data: await Rank.findOne({ where: { id: req.params.id } }),
       });
     });
     app.delete('/api/systems/ranks/:id', adminMiddleware, async (req, res) => {
-      const poll = await Rank.findOneBy({ where: { id: req.params.id } });
+      const poll = await Rank.findOne({ where: { id: req.params.id } });
       await poll?.remove();
       res.status(404).send();
     });

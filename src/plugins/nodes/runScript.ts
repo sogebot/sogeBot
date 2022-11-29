@@ -76,7 +76,7 @@ export default async function(pluginId: string, currentNode: Node<string>, param
         async isUserModerator(userName: string) {
           await changelog.flush();
           try {
-            const user = await getRepository(User).findOneByOrFail({ where: { userName: userName.toLowerCase() } });
+            const user = await getRepository(User).findOneByOrFail({ userName: userName.toLowerCase() });
             return user.isModerator;
           } catch {
             return false;

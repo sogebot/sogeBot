@@ -242,7 +242,7 @@ class Cooldown extends System {
           }
         }
 
-        const cooldown = await getRepository(CooldownEntity).findOneBy({ where: [{ name }, { name: In(groupName) }] });
+        const cooldown = await getRepository(CooldownEntity).findOne({ where: [{ name }, { name: In(groupName) }] });
         if (!cooldown) {
           const defaultValue = await this.getPermissionBasedSettingsValue('defaultCooldownOfCommandsInSeconds');
           const permId = await getUserHighestPermission(opts.sender.userId);
