@@ -30,7 +30,6 @@ async function test() {
     }
   });
 
-  const expectedOutput = 'No changes in database schema were found';
   const out2 = spawn(process.platform === 'win32' ? 'npx.cmd' : 'npx', 'typeorm migration:generate -d dest/database.js --ch ./'.split(' '), {
     env: {
       ...process.env,
