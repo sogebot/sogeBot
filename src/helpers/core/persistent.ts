@@ -1,6 +1,5 @@
 import { Settings } from '@entity/settings';
 import DeepProxy from 'proxy-deep';
-import { AppDataSource } from '~/database';
 
 import { IsLoadingInProgress, toggleLoadingInProgress } from '../../decorators';
 import { isDbConnected } from '../database';
@@ -50,9 +49,10 @@ function persistent<T>({ value, name, namespace, onChange }: { value: T, name: s
     }
     debug('persistent.set', `Updating ${namespace}/${name}`);
     debug('persistent.set', proxy.value);
-    AppDataSource.getRepository(Settings).findOneBy({ namespace, name })
+
+    Settings.findOneBy({ namespace, name })
       .then((row) => {
-        AppDataSource.getRepository(Settings).save({ id: row?.id, namespace, name, value: JSON.stringify(proxy.value) }).then(() => {
+        Settings.save({ id: row?.id, namespace, name, value: JSON.stringify(proxy.value) }).then(() => {
           debug('persistent.set', `Update done on ${namespace}/${name}`);
         });
       });
@@ -67,7 +67,7 @@ function persistent<T>({ value, name, namespace, onChange }: { value: T, name: s
     try {
       debug('persistent.load', `Loading ${namespace}/${name}`);
       proxy.value = JSON.parse(
-        (await AppDataSource.getRepository(Settings).findOneByOrFail({ namespace, name })).value,
+        (await Settings.findOneByOrFail({ namespace, name })).value,
       );
     } catch (e: any) {
       debug('persistent.load', `Data not found, using default value`);
