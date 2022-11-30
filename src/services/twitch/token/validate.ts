@@ -1,5 +1,6 @@
 import * as constants from '@sogebot/ui-helpers/constants';
 import axios from 'axios';
+import { Mutex } from 'async-mutex';
 
 import { setStatus } from '../../../helpers/parser';
 import { tmiEmitter } from '../../../helpers/tmi';
@@ -12,7 +13,6 @@ import {
   error,
   warning,
 } from '~/helpers/log';
-import { setImmediateAwait } from '~/helpers/setImmediateAwait';
 import { variables } from '~/watchers';
 
 let botTokenErrorSent = false;
@@ -27,25 +27,10 @@ export const expirationDate = {
   bot:         -1,
   broadcaster: -1,
 };
-const isValidating = {
-  bot:         false,
-  broadcaster: false,
-};
 
 export const cache: { bot: string; broadcaster: string } = { bot: '', broadcaster: '' };
 
-const waitUntilValidationDone = async (type: 'bot' | 'broadcaster') => {
-  return new Promise((resolve) => {
-    debug('oauth.validate', `Checking validation status of ${type}.`);
-    const check = async () => {
-      while(isValidating[type]) {
-        await setImmediateAwait();
-      }
-    };
-    debug('oauth.validate', `Validation of ${type} free.`);
-    check().then(resolve);
-  });
-};
+const mutex = new Mutex();
 
 /*
   * Validates OAuth access tokens
@@ -65,11 +50,9 @@ const waitUntilValidationDone = async (type: 'bot' | 'broadcaster') => {
     }
   */
 export const validate = async (type: 'bot' | 'broadcaster', retry = 0): Promise < boolean > => {
+  const release = await mutex.acquire();
   try {
     debug('oauth.validate', `Validation: ${type} - ${retry} retries`);
-
-    await waitUntilValidationDone(type);
-    isValidating[type] = true;
 
     const refreshToken = variables.get('services.twitch.' + type + 'RefreshToken') as string;
     if (refreshToken === '') {
@@ -211,6 +194,6 @@ export const validate = async (type: 'bot' | 'broadcaster', retry = 0): Promise 
     }
     throw new Error(e);
   } finally {
-    isValidating[type] = false;
+    release();
   }
 };
