@@ -145,8 +145,8 @@ export const refresh = async (type: 'bot' | 'broadcaster'): Promise<string | nul
       return request.data.access_token;
     }
   } catch (e) {
-    if (e instanceof Error && (e.message.includes('ETIMEDOUT') || e.message.includes('EHOSTUNREACH'))) {
-      warning(`Refresh operation for ${type} access token failed. Caused by ETIMEDOUT or EHOSTUNREACH, retrying in 10 seconds.`);
+    if (e instanceof Error && (e.message.includes('ETIMEDOUT') || e.message.includes('EHOSTUNREACH') || e.message.includes('ECONNRESET'))) {
+      warning(`Refresh operation for ${type} access token failed. Caused by ETIMEDOUT, ECONNRESET or EHOSTUNREACH, retrying in 10 seconds.`);
       await new Promise(resolve => setTimeout(resolve, 10000));
       return refresh(type);
     }
