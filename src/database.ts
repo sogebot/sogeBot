@@ -2,19 +2,21 @@ import { DataSource, DataSourceOptions  } from 'typeorm';
 import { TypeORMLogger } from '~/helpers/logTypeorm';
 
 const MySQLDataSourceOptions = {
-  type:          'mysql',
-  host:          process.env.TYPEORM_HOST,
-  port:          Number(process.env.TYPEORM_PORT ?? 3306),
-  username:      process.env.TYPEORM_USERNAME,
-  password:      process.env.TYPEORM_PASSWORD,
-  database:      process.env.TYPEORM_DATABASE,
-  logging:       ['error'],
-  logger:        new TypeORMLogger(),
-  synchronize:   false,
-  migrationsRun: true,
-  entities:      [ 'dest/database/entity/*.js' ],
-  subscribers:   [ 'dest/database/entity/*.js' ],
-  migrations:    [ `dest/database/migration/mysql/**/*.js` ],
+  type:           'mysql',
+  connectTimeout: 60000,
+  acquireTimeout: 120000,
+  host:           process.env.TYPEORM_HOST,
+  port:           Number(process.env.TYPEORM_PORT ?? 3306),
+  username:       process.env.TYPEORM_USERNAME,
+  password:       process.env.TYPEORM_PASSWORD,
+  database:       process.env.TYPEORM_DATABASE,
+  logging:        ['error'],
+  logger:         new TypeORMLogger(),
+  synchronize:    false,
+  migrationsRun:  true,
+  entities:       [ 'dest/database/entity/*.js' ],
+  subscribers:    [ 'dest/database/entity/*.js' ],
+  migrations:     [ `dest/database/migration/mysql/**/*.js` ],
 } satisfies DataSourceOptions;
 
 const PGDataSourceOptions = {

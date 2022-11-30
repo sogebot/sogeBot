@@ -52,9 +52,12 @@ function persistent<T>({ value, name, namespace, onChange }: { value: T, name: s
     }
     debug('persistent.set', `Updating ${namespace}/${name}`);
     debug('persistent.set', proxy.value);
-    AppDataSource.getRepository(Settings).update({ namespace, name }, { value: JSON.stringify(proxy.value) }).then(() => {
-      debug('persistent.set', `Update done on ${namespace}/${name}`);
-    });
+    AppDataSource.getRepository(Settings).findOneBy({ namespace, name })
+      .then((row) => {
+        AppDataSource.getRepository(Settings).save({ id: row?.id, namespace, name, value: JSON.stringify(proxy.value) }).then(() => {
+          debug('persistent.set', `Update done on ${namespace}/${name}`);
+        });
+      });
   }
 
   async function load() {
@@ -69,15 +72,8 @@ function persistent<T>({ value, name, namespace, onChange }: { value: T, name: s
         (await AppDataSource.getRepository(Settings).findOneByOrFail({ namespace, name })).value,
       );
     } catch (e: any) {
-      debug('persistent.load', `Data not found, creating ${namespace}/${name}`);
-      if (!(e instanceof EntityNotFoundError)) {
-        await setImmediateAwait();
-        await AppDataSource.getRepository(Settings).delete({ name, namespace });
-      }
-      await setImmediateAwait();
-      await AppDataSource.getRepository(Settings).insert({
-        name, namespace, value: JSON.stringify(value),
-      });
+      debug('persistent.load', `Data not found, using default value`);
+      proxy.value = value;
     } finally {
       toggleLoadingInProgress(sym);
       proxy.__loaded__ = true;
