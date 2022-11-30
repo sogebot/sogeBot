@@ -1085,6 +1085,7 @@
       "none": "Пользователи не найдены в очереди"
     }
   },
+  "marker": "Stream marker has been created at $time.",
   "title": {
     "current": "$sender, название стрима '$title'.",
     "change": {
@@ -1154,12 +1155,6 @@
       "mod": "$sender просто напросто не может попасть в свой голову!",
       "broadcaster": "$sender стреляет себе в ногу!",
       "timeout": "Таймаут рулетки установлен на $values"
-    },
-    "seppuku": {
-      "text": "$sender совершил суицид.",
-      "mod": "$sender пытался совершить суицид, но сломал меч.",
-      "broadcaster": "$sender попытался совершить суицид, но потерял меч.",
-      "timeout": "Таймаут seppuku установлен на $values"
     },
     "gamble": {
       "chanceToWin": "$sender, шанс выиграть в !gamble установлен на $value%",

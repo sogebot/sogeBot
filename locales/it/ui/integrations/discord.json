@@ -10,6 +10,7 @@
     "clientId": "ClientId",
     "token": "Token",
     "joinToServerBtn": "Clicca per unirti al bot sul tuo server",
+    "joinToServerBtnDisabled": "Please save changes to enable bot join to your server",
     "cannotJoinToServerBtn": "Imposta token e clientId per essere in grado di unirsi al bot sul tuo server",
     "noChannelSelected": "nessun canale selezionato",
     "noRoleSelected": "nessun ruolo selezionato",

@@ -1085,6 +1085,7 @@
       "none": "Keine Benutzer in der Warteschlange gefunden"
     }
   },
+  "marker": "Stream marker has been created at $time.",
   "title": {
     "current": "$sender, Titel des Stream ist '$title'.",
     "change": {
@@ -1154,12 +1155,6 @@
       "mod": "$sender ist inkompetent und hat seinen Kopf völlig verfehlt!",
       "broadcaster": "$sender benutzt eine leere Waffe, Boo!",
       "timeout": "Roulette Timeout auf $values gesetzt"
-    },
-    "seppuku": {
-      "text": "$sender hat Seppuku begangen.",
-      "mod": "$sender hat versucht Seppuku zu begehen, brach aber sein Schwert.",
-      "broadcaster": "$sender hat versucht Seppuku zu begehen, verlor aber sein Schwert.",
-      "timeout": "Seppuku Timeout auf $values gesetzt"
     },
     "gamble": {
       "chanceToWin": "$sender, Chance zu gewinnen !gamble gesetzt auf $value%",

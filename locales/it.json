@@ -1085,6 +1085,7 @@
       "none": "Nessun utente trovato in coda"
     }
   },
+  "marker": "Stream marker has been created at $time.",
   "title": {
     "current": "$sender, il titolo del flusso è '$title'.",
     "change": {
@@ -1154,12 +1155,6 @@
       "mod": "$sender is incompetent and completely missed his head!",
       "broadcaster": "$sender sta usando degli spazi vuoti, boo!",
       "timeout": "Sospensione della roulette impostato a $values"
-    },
-    "seppuku": {
-      "text": "$sender ha commesso seppuku.",
-      "mod": "$sender ha provato a commettere seppuku, ma ha rotto una spada.",
-      "broadcaster": "$sender ha provato a commettere seppuku, ma ha perso una spada.",
-      "timeout": "Sospensione Seppuku impostato a $values"
     },
     "gamble": {
       "chanceToWin": "$sender, possibilità di vincere!gioca impostata al $value%",

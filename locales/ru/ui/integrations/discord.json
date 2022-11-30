@@ -10,6 +10,7 @@
     "clientId": "ClientId",
     "token": "Токен",
     "joinToServerBtn": "Нажмите, чтобы пригласить бота на ваш сервер",
+    "joinToServerBtnDisabled": "Please save changes to enable bot join to your server",
     "cannotJoinToServerBtn": "Установите токен и clientId, чтобы иметь возможность пригласить бота на ваш сервер",
     "noChannelSelected": "канал не выбран",
     "noRoleSelected": "роль не выбрана",

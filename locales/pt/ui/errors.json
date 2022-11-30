@@ -4,6 +4,7 @@
   "isCommand": "$property deve iniciar com !",
   "isCommandOrCustomVariable": "$property deve iniciar com ! ou $_",
   "min": "$property deve ser ao menos $constraint1",
+  "max": "$property deve ser menor ou igual a $constraint1",
   "isInt": "$property precisa ser um número inteiro",
   "this_value_must_be_a_positive_number_and_greater_then_0": "Este valor deve ser um número positivo ou maior que 0",
   "command_must_start_with_!": "Comandos devem iniciar com !",

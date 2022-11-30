@@ -56,5 +56,6 @@
   "emotes_combo": "Емоції комбо",
   "tmi": "tmi",
   "oauth": "oauth",
-  "eventsub": "eventSub"
+  "eventsub": "eventSub",
+  "rules": "rules"
 }
