@@ -54,4 +54,8 @@ if (process.env.TYPEORM_CONNECTION === 'mysql' || process.env.TYPEORM_CONNECTION
   AppDataSource = new DataSource(SQLiteDataSourceOptions);
 }
 
+if (global.mocha) {
+  console.log(AppDataSource.options);
+}
+
 export { AppDataSource };
