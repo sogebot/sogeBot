@@ -1,4 +1,3 @@
-import axios from 'axios';
 import fetch from 'node-fetch';
 
 import emitter from '~/helpers/interfaceEmitter';
@@ -77,93 +76,73 @@ export const refresh = async (type: 'bot' | 'broadcaster'): Promise<string | nul
 
   debug('oauth.validate', 'Refreshing access token of ' + type);
   const url = urls[tokenService];
-  try {
-    /* if ((type === 'bot' ? botRefreshToken : broadcasterRefreshToken) === '') {
-      throw new Error('no refresh token for ' + type);
-    }*/
+  if (!url) {
+    // custom app is selected
+    const response = await fetch(`https://id.twitch.tv/oauth2/token?client_id=${tokenServiceCustomClientId}&client_secret=${tokenServiceCustomClientSecret}&refresh_token=${refreshToken}&grant_type=refresh_token`, {
+      method: 'POST',
+    });
+    if (response.ok) {
+      const data = await response.json();
 
-    if (!url) {
-      // custom app is selected
-      const response = await fetch(`https://id.twitch.tv/oauth2/token?client_id=${tokenServiceCustomClientId}&client_secret=${tokenServiceCustomClientSecret}&refresh_token=${refreshToken}&grant_type=refresh_token`, {
-        method: 'POST',
-      });
-      if (response.ok) {
-        const data = await response.json();
+      emitter.emit('set', '/services/twitch', `${type}AccessToken`, data.access_token);
+      emitter.emit('set', '/services/twitch', `${type}RefreshToken`, data.refresh_token);
 
-        emitter.emit('set', '/services/twitch', `${type}AccessToken`, data.access_token);
-        emitter.emit('set', '/services/twitch', `${type}RefreshToken`, data.refresh_token);
+      debug('oauth.validate', 'Access token of ' + type + ' was refreshed.');
+      debug('oauth.validate', 'New access token of ' + type + ': ' + data.access_token.replace(/(.{25})/, '*'.repeat(25)));
+      debug('oauth.validate', 'New refresh token of ' + type + ': ' + data.refresh_token.replace(/(.{45})/, '*'.repeat(45)));
+      errorCount[type] = 0;
 
-        debug('oauth.validate', 'Access token of ' + type + ' was refreshed.');
-        debug('oauth.validate', 'New access token of ' + type + ': ' + data.access_token.replace(/(.{25})/, '*'.repeat(25)));
-        debug('oauth.validate', 'New refresh token of ' + type + ': ' + data.refresh_token.replace(/(.{45})/, '*'.repeat(45)));
-        errorCount[type] = 0;
-
-        return data.access_token;
-      } else {
-        throw new Error('Custom token refresh failed');
-      }
+      return data.access_token;
     } else {
-      const request = await axios(url + encodeURIComponent(refreshToken.trim()), {
-        method:  'POST',
-        headers: {
-          'SogeBot-Channel': channel,
-          'SogeBot-Owners':  generalOwners.join(', '),
-        },
-      });
-      debug('oauth.validate', urls[tokenService] + ' =>');
-      debug('oauth.validate', JSON.stringify(request.data, null, 2));
-      if (request.status === 400) {
-        if (request.data.message.includes('Invalid refresh token received')) {
-          warning(`Invalid refresh token for ${type}. Please reset your token.`);
-          addUIError({
-            name:    'Token Error!',
-            message: `Invalid refresh token for ${type}. Please reset your token.`,
-          });
-          errorCount[type] = 1000;
-          return null;
-        }
-        throw new Error(`Token refresh for ${type}: ${request.data.message}`);
+      throw new Error('Custom token refresh failed');
+    }
+  } else {
+    const response = await fetch(url + encodeURIComponent(refreshToken.trim()), {
+      timeout: 120000,
+      method:  'POST',
+      headers: {
+        'SogeBot-Channel': channel,
+        'SogeBot-Owners':  generalOwners.join(', '),
+      },
+    });
+    const data = await response.json();
+    debug('oauth.validate', urls[tokenService] + ' =>');
+    debug('oauth.validate', JSON.stringify(data, null, 2));
+    if (response.status === 400) {
+      if (data.message.includes('Invalid refresh token received')) {
+        warning(`Invalid refresh token for ${type}. Please reset your token.`);
+        addUIError({
+          name:    'Token Error!',
+          message: `Invalid refresh token for ${type}. Please reset your token.`,
+        });
+        errorCount[type] = 1000;
+        return null;
       }
-      if (typeof request.data.access_token !== 'string' || request.data.access_token.length === 0) {
-        throw new Error(`Access token for ${type} was not correctly fetched (not a string)`);
-      }
-      if (typeof request.data.refresh_token !== 'string' || request.data.refresh_token.length === 0) {
-        throw new Error(`Refresh token for ${type} was not correctly fetched (not a string)`);
-      }
+      throw new Error(`Token refresh for ${type}: ${data.message}`);
+    }
 
-      emitter.emit('set', '/services/twitch', `${type}AccessToken`, request.data.access_token);
-      emitter.emit('set', '/services/twitch', `${type}RefreshToken`, request.data.refresh_token);
+    if (response.ok) {
+      emitter.emit('set', '/services/twitch', `${type}AccessToken`, data.access_token);
+      emitter.emit('set', '/services/twitch', `${type}RefreshToken`, data.refresh_token);
       emitter.emit('services::twitch::api::init', type);
 
       debug('oauth.validate', 'Access token of ' + type + ' was refreshed.');
-      debug('oauth.validate', 'New access token of ' + type + ': ' + request.data.access_token.replace(/(.{25})/, '*'.repeat(25)));
-      debug('oauth.validate', 'New refresh token of ' + type + ': ' + request.data.refresh_token.replace(/(.{45})/, '*'.repeat(45)));
+      debug('oauth.validate', 'New access token of ' + type + ': ' + data.access_token.replace(/(.{25})/, '*'.repeat(25)));
+      debug('oauth.validate', 'New refresh token of ' + type + ': ' + data.refresh_token.replace(/(.{45})/, '*'.repeat(45)));
 
       errorCount[type] = 0;
       emitter.emit('set', '/services/twitch', `${type}TokenValid`, true);
 
-      return request.data.access_token;
-    }
-  } catch (e) {
-    if (e instanceof Error && (e.message.includes('ETIMEDOUT') || e.message.includes('EHOSTUNREACH') || e.message.includes('ECONNRESET'))) {
-      warning(`Refresh operation for ${type} access token failed. Caused by ETIMEDOUT, ECONNRESET or EHOSTUNREACH, retrying in 10 seconds.`);
-      await new Promise(resolve => setTimeout(resolve, 10000));
-      return refresh(type);
-    }
-    errorCount[type]++;
-    emitter.emit('set', '/services/twitch', `${type}TokenValid`, false);
+      return data.access_token;
+    } else {
+      errorCount[type]++;
+      emitter.emit('set', '/services/twitch', `${type}TokenValid`, false);
+      emitter.emit('set', '/services/twitch', `${type}Id`, '');
+      emitter.emit('set', '/services/twitch', `${type}Username`, '');
+      emitter.emit('set', '/services/twitch', `${type}CurrentScopes`, []);
 
-    if (axios.isAxiosError(e) && (e.response?.data as any)?.message === 'Invalid refresh token received') {
-      error(`Invalid refresh token used for ${type}.\n${JSON.stringify(e.response?.data, null, 2)}`);
-      errorCount[type] = 1000;
-      return null;
+      error('Access token of ' + type + ' was not refreshed.');
+      throw new Error('Access token of ' + type + ' was not refreshed.');
     }
-
-    emitter.emit('set', '/services/twitch', `${type}Id`, '');
-    emitter.emit('set', '/services/twitch', `${type}Username`, '');
-    emitter.emit('set', '/services/twitch', `${type}CurrentScopes`, []);
-
-    error('Access token of ' + type + ' was not refreshed.');
-    throw e;
   }
 };
