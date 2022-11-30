@@ -58,7 +58,7 @@ module.exports = {
           metadatas.push(AppDataSource.getMetadata(entity));
         }
 
-        await getManager().transaction(async transactionalEntityManager => {
+        await AppDataSource.transaction(async transactionalEntityManager => {
           if (['mysql'].includes(AppDataSource.options.type)) {
             await transactionalEntityManager.query('SET FOREIGN_KEY_CHECKS=0;');
           }
