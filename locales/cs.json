@@ -1085,6 +1085,7 @@
       "none": "Nebyli nalezeni žádní uživatelé ve frontě"
     }
   },
+  "marker": "Stream marker has been created at $time.",
   "title": {
     "current": "$sender, název vysílání je '$title'.",
     "change": {
@@ -1154,12 +1155,6 @@
       "mod": "$sender je nešika, vůbec svou hlavu netrefil!",
       "broadcaster": "$sender použil slepé náboje, buu!",
       "timeout": "Roulette timeout nastaven na $values"
-    },
-    "seppuku": {
-      "text": "$sender spáchal seppuku.",
-      "mod": "$sender se pokusil o seppuku, ale zlomil meč.",
-      "broadcaster": "$sender se pokusil o seppuku, ale ztratil meč.",
-      "timeout": "Seppuku timeout nastaven na $values"
     },
     "gamble": {
       "chanceToWin": "$sender, šance na výhru !gamble nastavena na $value%",

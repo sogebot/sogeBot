@@ -1085,6 +1085,7 @@
       "none": "Немає користувачів у черзі"
     }
   },
+  "marker": "Stream marker has been created at $time.",
   "title": {
     "current": "$sender, назва трансляції '$title.",
     "change": {
@@ -1154,12 +1155,6 @@
       "mod": "$sender просто не зможе влучити собі в голову!",
       "broadcaster": "$sender вистрелив собі в ногу!",
       "timeout": "Тайм-аут рулетки встановлено на $values"
-    },
-    "seppuku": {
-      "text": "$sender скоїв самогубство.",
-      "mod": "$sender намагався вчинити самогубство, але пошкодив меч.",
-      "broadcaster": "$sender намагався вчинити самогубство, але загубив меч.",
-      "timeout": "Таймаут seppuku встановлено на $values"
     },
     "gamble": {
       "chanceToWin": "$sender, шанс виграти !gamble встановлений на $value%",

@@ -1085,6 +1085,7 @@
       "none": "No users were found in queue"
     }
   },
+  "marker": "Stream marker has been created at $time.",
   "title": {
     "current": "$sender, nuværende titel på stream er '$title'.",
     "change": {
@@ -1154,12 +1155,6 @@
       "mod": "$sender is incompetent and completely missed his head!",
       "broadcaster": "$sender is using blanks, boo!",
       "timeout": "Roulette timeout set to $values"
-    },
-    "seppuku": {
-      "text": "$sender has committed seppuku.",
-      "mod": "$sender tried to commit seppuku, but broke a sword.",
-      "broadcaster": "$sender tried to commit seppuku, but lost a sword.",
-      "timeout": "Seppuku timeout set to $values"
     },
     "gamble": {
       "chanceToWin": "$sender, chance to win !gamble set to $value%",

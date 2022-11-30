@@ -10,6 +10,7 @@
     "clientId": "ClientId",
     "token": "Token",
     "joinToServerBtn": "クリックしてあなたのサーバーにボットを参加する",
+    "joinToServerBtnDisabled": "Please save changes to enable bot join to your server",
     "cannotJoinToServerBtn": "Set token and clientId to be able to join bot to your server",
     "noChannelSelected": "no channel selected",
     "noRoleSelected": "no role selected",
