@@ -123,7 +123,9 @@ class Panel extends Core {
 
     app?.get('/health', (req, res) => {
       if (getIsBotStarted()) {
-        res.status(200).send('OK');
+        const version = _.get(process, 'env.npm_package_version', 'x.y.z');
+        const commitFile = existsSync('./.commit') ? readFileSync('./.commit').toString() : null;
+        res.status(200).send(version.replace('SNAPSHOT', commitFile && commitFile.length > 0 ? commitFile : gitCommitInfo().shortHash || 'SNAPSHOT'));
       } else {
         res.status(503).send('Not OK');
       }
