@@ -55,7 +55,7 @@ module.exports = {
       if (['postgres', 'mysql'].includes(AppDataSource.options.type)) {
         const metadatas = [];
         for (const entity of entities) {
-          metadatas.push(AppDataSource.connection.getMetadata(entity));
+          metadatas.push(AppDataSource.getMetadata(entity));
         }
 
         await getManager().transaction(async transactionalEntityManager => {

@@ -20,6 +20,7 @@ import { linesParsed } from '~/helpers/parser';
 import { defaultPermissions } from '~/helpers/permissions/index';
 import { adminMiddleware } from '~/socket';
 import { translate } from '~/translate';
+import { onStartup } from '~/decorators/on';
 
 /*
  * !timers                                                                                                                                 - gets an info about timers usage
@@ -34,15 +35,6 @@ import { translate } from '~/translate';
  */
 
 class Timers extends System {
-  constructor () {
-    super();
-
-    this.addMenu({
-      category: 'manage', name: 'timers', id: 'manage/timers', this: this,
-    });
-    this.init();
-  }
-
   sockets() {
     if (!app) {
       setTimeout(() => this.sockets(), 100);
@@ -96,11 +88,16 @@ class Timers extends System {
     return [{ response: translate('core.usage') + ' => ' + url, ...opts }];
   }
 
+  @onStartup()
   async init () {
     if (!isDbConnected) {
       setTimeout(() => this.init(), 1000);
       return;
     }
+
+    this.addMenu({
+      category: 'manage', name: 'timers', id: 'manage/timers', this: this,
+    });
     const timers = await Timer.find({ relations: ['messages'] });
     for (const timer of timers) {
       timer.triggeredAtMessages = 0;
