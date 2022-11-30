@@ -1,12 +1,10 @@
 import { Settings } from '@entity/settings';
 import DeepProxy from 'proxy-deep';
-import { EntityNotFoundError } from 'typeorm';
 import { AppDataSource } from '~/database';
 
 import { IsLoadingInProgress, toggleLoadingInProgress } from '../../decorators';
 import { isDbConnected } from '../database';
 import { debug } from '../log';
-import { setImmediateAwait } from '../setImmediateAwait';
 
 function persistent<T>({ value, name, namespace, onChange }: { value: T, name: string, namespace: string, onChange?: (cur: T) => void }) {
   const sym = Symbol(name);
