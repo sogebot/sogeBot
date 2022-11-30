@@ -15,7 +15,7 @@ import gitCommitInfo from 'git-commit-info';
 import _ from 'lodash';
 
 import { autoLoad } from '~/helpers/autoLoad';
-import { setIsBotStarted } from '~/helpers/database';
+import { setIsBotStarted, setIsDbConnected } from '~/helpers/database';
 import {
   error, info, isDebugEnabled, setDEBUG, warning,
 } from '~/helpers/log';
@@ -46,8 +46,8 @@ const connect = async function () {
     mysql:            'MySQL/MariaDB',
     postgres:         'PostgreSQL',
   };
-  await new Promise( resolve => setTimeout(resolve, 3000, null) );
   info(`Initialized ${typeToLog[type as keyof typeof typeToLog]} database (${normalize(String(AppDataSource.options.database))})`);
+  setIsDbConnected();
 };
 
 async function main () {

@@ -104,7 +104,7 @@ class Raffles extends System {
           (await AppDataSource.getRepository(Raffle).find({
             relations: ['participants', 'participants.messages'],
             order:     { timestamp: 'DESC' },
-            take: 1,
+            take:      1,
           }))[0],
         );
       } catch (e: any) {
@@ -486,7 +486,7 @@ class Raffles extends System {
     const raffle = (await AppDataSource.getRepository(Raffle).find({
       relations: ['participants'],
       order:     { timestamp: 'DESC' },
-      take: 1,
+      take:      1,
     }))[0];
     if (!raffle) {
       return [];

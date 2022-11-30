@@ -1,8 +1,8 @@
-import { Column, Entity, PrimaryColumn, Unique } from 'typeorm';
+import { Column, Entity, Index, PrimaryColumn } from 'typeorm';
 import { BotEntity } from '~/database/BotEntity';
 
 @Entity()
-@Unique('IDX_d8a83b9ffce680092c8dfee37d', [ 'namespace', 'name' ])
+@Index('IDX_d8a83b9ffce680092c8dfee37d', [ 'namespace', 'name' ], { unique: true })
 export class Settings extends BotEntity<Settings> {
   @PrimaryColumn({ generated: 'rowid' })
     id: number;
