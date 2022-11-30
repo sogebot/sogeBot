@@ -4,7 +4,7 @@ import { EntityNotFoundError } from 'typeorm';
 import { AppDataSource } from '~/database';
 
 import { IsLoadingInProgress, toggleLoadingInProgress } from '../../decorators';
-import { isBotStarted, isDbConnected } from '../database';
+import { isDbConnected } from '../database';
 import { debug } from '../log';
 import { setImmediateAwait } from '../setImmediateAwait';
 
@@ -58,8 +58,8 @@ function persistent<T>({ value, name, namespace, onChange }: { value: T, name: s
   }
 
   async function load() {
-    if (!isDbConnected || !isBotStarted) {
-      setInterval(() => load(), 1000);
+    if (!isDbConnected) {
+      setInterval(() => load(), 5000);
       return;
     }
 
