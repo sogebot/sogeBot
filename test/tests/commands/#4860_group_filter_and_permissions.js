@@ -1,5 +1,6 @@
 /* global */
 const assert = require('assert');
+const { AppDataSource } = require('../../../dest/database.js');
 
 require('../../general.js');
 const { Commands, CommandsGroup } = require('../../../dest/database/entity/commands');

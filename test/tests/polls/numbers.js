@@ -81,18 +81,18 @@ describe('Polls - numbers - @func2', () => {
     });
     it(`User ${owner.userName} will vote for option 0 - should fail`, async () => {
       await polls.participateByNumber({ sender: owner, message: '0' });
-      const vote = (await Poll.findOne({ id: vid })).votes.find(v => v.votedBy === owner.userName);
+      const vote = (await Poll.findOneBy({ id: vid })).votes.find(v => v.votedBy === owner.userName);
       assert(typeof vote === 'undefined');
     });
     it(`User ${owner.userName} will vote for option 4 - should fail`, async () => {
       await polls.participateByNumber({ sender: owner, message: '4' });
-      const vote = (await Poll.findOne({ id: vid })).votes.find(v => v.votedBy === owner.userName);
+      const vote = (await Poll.findOneBy({ id: vid })).votes.find(v => v.votedBy === owner.userName);
       assert(typeof vote === 'undefined');
     });
     for (const o of [1,2,3]) {
       it(`User ${owner.userName} will vote for option ${o} - should be saved in db`, async () => {
         await polls.participateByNumber({ sender: owner, message: String(o) });
-        const vote = (await Poll.findOne({ id: vid })).votes.find(v => v.votedBy === owner.userName);
+        const vote = (await Poll.findOneBy({ id: vid })).votes.find(v => v.votedBy === owner.userName);
         assert.strictEqual(vote.option, o - 1);
       });
     }
@@ -105,7 +105,7 @@ describe('Polls - numbers - @func2', () => {
 
           await until(async (setError) => {
             try {
-              const vote = (await Poll.findOne({ id: vid })).votes.find(v => v.votedBy === user);
+              const vote = (await Poll.findOneBy({ id: vid })).votes.find(v => v.votedBy === user);
               assert.strictEqual(vote.option, o - 1);
               return true;
             } catch (err) {

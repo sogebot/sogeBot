@@ -101,10 +101,11 @@ class Raffles extends System {
       try {
         cb(
           null,
-          await AppDataSource.getRepository(Raffle).findOne({
+          (await AppDataSource.getRepository(Raffle).find({
             relations: ['participants', 'participants.messages'],
             order:     { timestamp: 'DESC' },
-          }) as any,
+            take: 1,
+          }))[0],
         );
       } catch (e: any) {
         cb (e);
@@ -482,10 +483,11 @@ class Raffles extends System {
   @command('!raffle pick')
   @default_permission(defaultPermissions.CASTERS)
   async pick (opts: CommandOptions): Promise<CommandResponse[]> {
-    const raffle = await AppDataSource.getRepository(Raffle).findOne({
+    const raffle = (await AppDataSource.getRepository(Raffle).find({
       relations: ['participants'],
       order:     { timestamp: 'DESC' },
-    });
+      take: 1,
+    }))[0];
     if (!raffle) {
       return [];
     } // no raffle ever

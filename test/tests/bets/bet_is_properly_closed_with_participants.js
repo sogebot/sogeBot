@@ -43,9 +43,9 @@ describe('Bets - @func3 - bet should automatically be locked after given time wi
   });
 
   it('Bet should be locked in db', async () => {
-    const currentBet = await Bets.findOne({
+    const currentBet = (await Bets.find({
       order: { createdAt: 'DESC' },
-    });
+    }))[0];
     assert(currentBet.isLocked, 'Bet was not locked after 15 seconds.');
   });
 

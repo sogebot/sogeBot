@@ -8,7 +8,7 @@ const db = require('../../general.js').db;
 const assert = require('assert');
 const message = require('../../general.js').message;
 
-const { getManager } = require('typeorm');
+const { AppDataSource } = require('../../../dest/database.js');
 const { Quotes } = require('../../../dest/database/entity/quotes');
 
 const quotes = (require('../../../dest/systems/quotes')).default;
@@ -50,7 +50,7 @@ describe('Quotes - add() - @func3', () => {
           assert.strictEqual(response, '$sender, !quote add is not correct or missing -quote parameter');
         });
         it('Database should be empty', async () => {
-          const items = await getManager()
+          const items = await AppDataSource
             .createQueryBuilder()
             .select('quotes')
             .from(Quotes, 'quotes')
@@ -62,7 +62,7 @@ describe('Quotes - add() - @func3', () => {
           assert.strictEqual(response, `$sender, quote ${id} '${test.quote}' was added. (tags: ${test.tags})`);
         });
         it('Database should contain new quote', async () => {
-          const items = await getManager()
+          const items = await AppDataSource
             .createQueryBuilder()
             .select('quotes')
             .from(Quotes, 'quotes')

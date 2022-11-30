@@ -52,7 +52,7 @@ describe('Timers - toggle() - @func2', () => {
   });
 
   it('-id response_id', async () => {
-    const response = await TimerResponse.findOne({ response: 'Lorem Ipsum' });
+    const response = await TimerResponse.findOneBy({ response: 'Lorem Ipsum' });
     const r1 = await timers.toggle({ sender: owner, parameters: '-id ' + response.id });
     assert.strictEqual(r1[0].response, `$sender, response (id: ${response.id}) was disabled`);
 

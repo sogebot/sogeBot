@@ -56,7 +56,7 @@ describe('Timers - set() - @func2', () => {
       relations: ['messages'],
       where: { name: 'test' },
     });
-    assert(typeof item === 'undefined');
+    assert(item === null);
   });
 
   it('-name test -messages 20', async () => {
@@ -91,7 +91,7 @@ describe('Timers - set() - @func2', () => {
       relations: ['messages'],
       where: { name: 'test' },
     });
-    assert(typeof item === 'undefined');
+    assert(item === null);
   });
 
   it('-name test -seconds 5 -messages 6', async () => {

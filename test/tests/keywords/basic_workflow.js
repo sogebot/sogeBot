@@ -128,13 +128,13 @@ describe('Keywords - basic workflow (add, run, edit) - @func2', () => {
             case 'add':
               it ('add()', async () => {
                 const r = await keywords.add({ sender: owner, parameters: generateCommand(test) });
-                const k = await Keyword.findOne({ keyword: test.keyword });
+                const k = await Keyword.findOneBy({ keyword: test.keyword });
                 assert.strictEqual(r[0].response, `$sender, keyword ${test.keyword} (${k.id}) was added`);
               });
               break;
             case 'toggle':
               it ('toggle()', async () => {
-                const k = await Keyword.findOne({ keyword: test.keyword });
+                const k = await Keyword.findOneBy({ keyword: test.keyword });
                 const r = await keywords.toggle({ sender: owner, parameters: generateCommand(test) });
                 if (k.enabled) {
                   assert.strictEqual(r[0].response, `$sender, keyword ${test.keyword} was disabled`);

@@ -77,7 +77,7 @@ describe('Persistent object - @func1', () => {
     });
     it('value should be changed in db', async () => {
       await time.waitMs(100);
-      const value = await AppDataSource.getRepository(Settings).findOnByeOrFail({ name: 'stats', namespace: '/test' });
+      const value = await AppDataSource.getRepository(Settings).findOneByOrFail({ name: 'stats', namespace: '/test' });
       assert.notStrictEqual(JSON.parse(value.value),{
         language:           'fr',
         currentWatchedTime: 0,
@@ -106,7 +106,7 @@ describe('Persistent object - @func1', () => {
     });
     it('change of attributes should be properly saved', async () => {
       await time.waitMs(100);
-      const value = await AppDataSource.getRepository(Settings).findOnByeOrFail({ name: 'stats', namespace: '/test' });
+      const value = await AppDataSource.getRepository(Settings).findOneByOrFail({ name: 'stats', namespace: '/test' });
       assert.notStrictEqual(JSON.parse(value.value),{
         language:           'cs',
         currentWatchedTime: 0,
@@ -133,7 +133,7 @@ describe('Persistent object - @func1', () => {
     });
     it('change of attributes should be properly saved', async () => {
       await time.waitMs(100);
-      const value = await AppDataSource.getRepository(Settings).findOnByeOrFail({ name: 'stats', namespace: '/test' });
+      const value = await AppDataSource.getRepository(Settings).findOneByOrFail({ name: 'stats', namespace: '/test' });
       assert.notStrictEqual(JSON.parse(value.value),{
         language:           'cy',
         currentWatchedTime: 0,

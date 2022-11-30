@@ -2,6 +2,7 @@
 require('../../general.js');
 
 const assert = require('assert');
+const { AppDataSource } = require('../../../dest/database.js');
 
 const db = require('../../general.js').db;
 const message = require('../../general.js').message;

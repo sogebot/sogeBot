@@ -143,7 +143,7 @@ describe('User changelog tests - @func1', () => {
       },
     };
     await changelog.flush();
-    const user = await AppDataSource.getRepository(User).findOneBy('999999');
+    const user = await AppDataSource.getRepository(User).findOneBy({ userId: '999999'});
     assert.deepEqual(user, expected);
   });
 });

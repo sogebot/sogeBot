@@ -78,13 +78,13 @@ describe('Raffles - user should be able to compete within boundaries of tickets 
 
   for (const viewer of [testuser.userName, testuser2.userName]) {
     it(`user ${viewer} should be in raffle participants`, async () => {
-      assert.strictEqual(await AppDataSource.getRepository(RaffleParticipant).count({ username: viewer }), 1);
+      assert.strictEqual(await AppDataSource.getRepository(RaffleParticipant).countBy({ username: viewer }), 1);
     });
   }
 
   for (const viewer of [testuser3.userName, testuser4.userName]) {
     it(`user ${viewer} should not be in raffle participants`, async () => {
-      assert.strictEqual(await AppDataSource.getRepository(RaffleParticipant).count({ username: viewer }), 0);
+      assert.strictEqual(await AppDataSource.getRepository(RaffleParticipant).countBy({ username: viewer }), 0);
     });
   }
 });

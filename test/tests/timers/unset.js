@@ -41,7 +41,7 @@ describe('Timers - unset() - @func2', () => {
     assert.strictEqual(r[0].response, '$sender, timer test and its responses was deleted.');
 
     const item = await AppDataSource.getRepository(Timer).findOneBy({ name: 'test' });
-    assert(typeof item === 'undefined');
+    assert(item === null);
   });
   it('-name nonexistent', async () => {
     const r = await timers.unset({ sender: owner, parameters: '-name nonexistent' });

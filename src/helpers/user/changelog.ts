@@ -80,7 +80,7 @@ class Changelog {
 
     const user = await AppDataSource.getRepository(User).findOneBy({ userId });
     const data = cloneDeep(defaultData);
-    merge(data, { userId }, user);
+    merge(data, { userId }, user ?? {});
 
     for (const { changelogType, ...change } of changelog.filter(o => o.userId === userId)) {
       if (changelogType === 'set') {
@@ -101,7 +101,7 @@ class Changelog {
       }
     }
 
-    if (typeof user === 'undefined' && changelog.filter(o => o.userId === userId).length === 0) {
+    if (!user && changelog.filter(o => o.userId === userId).length === 0) {
       return null;
     }
     return data;
@@ -167,7 +167,7 @@ export async function flush() {
       // initial values
       const user = await AppDataSource.getRepository(User).findOneBy({ userId: change.userId });
       const data = cloneDeep(defaultData);
-      merge(data, { userId: change.userId }, user);
+      merge(data, { userId: change.userId }, user ?? {});
       users.set(change.userId, data);
     }
 

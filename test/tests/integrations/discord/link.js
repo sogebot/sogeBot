@@ -24,7 +24,6 @@ describe('integrations/discord - !link - @func2', () => {
 
       for (let i=0; i<100; i++) {
         await AppDataSource.getRepository(DiscordLink).save({
-          id:        v4(),
           tag:       'test@0123',
           discordId: 'n/a',
           createdAt: Date.now() - (MINUTE / 2) * i,

@@ -1,7 +1,9 @@
 const { User } = require('../../dest/database/entity/user');
 const { AppDataSource } = require('../../dest/database');
+const changelog = require('../../dest/helpers/user/changelog');
 
 const viewer = {
+  points: 0,
   userId:   '1',
   userName: '__viewer__',
   badges:   {},
@@ -9,6 +11,7 @@ const viewer = {
 };
 
 const viewer2 = {
+  points: 0,
   userId:   '3',
   userName: '__viewer2__',
   badges:   {},
@@ -16,6 +19,7 @@ const viewer2 = {
 };
 
 const viewer3 = {
+  points: 0,
   userId:   '5',
   userName: '__viewer3__',
   badges:   {},
@@ -23,6 +27,7 @@ const viewer3 = {
 };
 
 const viewer4 = {
+  points: 0,
   userId:   '50',
   userName: '__viewer4__',
   badges:   {},
@@ -30,6 +35,7 @@ const viewer4 = {
 };
 
 const viewer5 = {
+  points: 0,
   userId:   '55',
   userName: '__viewer5__',
   badges:   {},
@@ -37,6 +43,7 @@ const viewer5 = {
 };
 
 const viewer6 = {
+  points: 0,
   userId:   '56',
   userName: '__viewer6__',
   badges:   {},
@@ -44,6 +51,7 @@ const viewer6 = {
 };
 
 const viewer7 = {
+  points: 0,
   userId:   '57',
   userName: '__viewer7__',
   badges:   {},
@@ -51,6 +59,7 @@ const viewer7 = {
 };
 
 const owner = {
+  points: 0,
   userId:   '2',
   userName: '__broadcaster__',
   badges:   {},
@@ -58,6 +67,7 @@ const owner = {
 };
 
 const mod = {
+  points: 0,
   userId:      '4',
   userName:    '__mod__',
   badges:      {},
@@ -68,6 +78,7 @@ const mod = {
 
 module.exports = {
   prepare: async () => {
+    await changelog.flush();
     await AppDataSource.getRepository(User).save(viewer);
     await AppDataSource.getRepository(User).save(viewer2);
     await AppDataSource.getRepository(User).save(viewer3);

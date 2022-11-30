@@ -15,6 +15,7 @@ const _ = require('lodash');
 const axios = require('axios');
 
 const { Variable, VariableURL } = require('../../../dest/database/entity/variable');
+const { AppDataSource } = require('../../../dest/database');
 
 // stub
 _.set(global, 'widgets.custom_variables.io.emit', function () {
