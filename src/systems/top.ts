@@ -3,9 +3,6 @@ import { dayjs } from '@sogebot/ui-helpers/dayjsHelper';
 import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized';
 import { format } from '@sogebot/ui-helpers/number';
 import _ from 'lodash';
-import {
-  getConnection, getManager, getRepository,
-} from 'typeorm';
 
 import { command, default_permission } from '../decorators';
 import general from '../general';
@@ -23,6 +20,7 @@ import { getIgnoreList, isIgnored } from '~/helpers/user/isIgnored';
 import twitch from '~/services/twitch';
 import { translate } from '~/translate';
 import { variables } from '~/watchers';
+import { AppDataSource } from '~/database';
 
 enum TYPE {
   TIME = '0',
@@ -119,7 +117,6 @@ class Top extends System {
 
     // count ignored users
     const _total = 10 + getIgnoreList().length;
-    const connection = await getConnection();
 
     const botUsername = variables.get('services.twitch.botUsername') as string;
     const broadcasterUsername = variables.get('services.twitch.broadcasterUsername') as string;
@@ -128,27 +125,27 @@ class Top extends System {
     switch (type) {
       case TYPE.LEVEL: {
         let rawSQL = '';
-        if (connection.options.type === 'better-sqlite3') {
+        if (AppDataSource.options.type === 'better-sqlite3') {
           rawSQL = `SELECT JSON_EXTRACT("user"."extra", '$.levels.xp') AS "data", "userId", "userName"
             FROM "user" "user"
             WHERE "user"."userName" IS NOT '${botUsername.toLowerCase()}'
               AND "user"."userName" IS NOT '${broadcasterUsername.toLowerCase()}'
             ORDER BY length(data) DESC, data DESC LIMIT ${_total}`;
-        } else if (connection.options.type === 'postgres') {
+        } else if (AppDataSource.options.type === 'postgres') {
           rawSQL = `SELECT "user"."userId", "user"."userName", CAST("data" as text)
             FROM "user", JSON_EXTRACT_PATH("extra"::json, 'levels') AS "data"
             WHERE "user"."userName" != '${botUsername.toLowerCase()}'
               AND "user"."userName" != '${broadcasterUsername.toLowerCase()}'
             ORDER BY length("data"::text) DESC, "data"::text DESC
             LIMIT ${_total}`;
-        } else if (connection.options.type === 'mysql') {
+        } else if (AppDataSource.options.type === 'mysql') {
           rawSQL = `SELECT JSON_EXTRACT(\`user\`.\`extra\`, '$.levels.xp') AS \`data\`, \`userId\`, \`userName\`
             FROM \`user\` \`user\`
             WHERE \`user\`.\`userName\` != '${botUsername.toLowerCase()}'
               AND \`user\`.\`userName\` != '${broadcasterUsername.toLowerCase()}'
             ORDER BY length(\`data\`) DESC, data DESC LIMIT ${_total}`;
         }
-        const users = (await getManager().query(rawSQL)).filter((o: any) => !isIgnored({ userName: o.userName, userId: o.userId }));
+        const users = (await AppDataSource.query(rawSQL)).filter((o: any) => !isIgnored({ userName: o.userName, userId: o.userId }));
 
         for (const rawUser of users) {
           const user = await changelog.get(rawUser.userId);
@@ -162,7 +159,7 @@ class Top extends System {
       }
       case TYPE.TIME:
         sorted
-          = (await getRepository(User).createQueryBuilder('user')
+          = (await AppDataSource.getRepository(User).createQueryBuilder('user')
             .where('user.userName != :botusername', { botusername: botUsername.toLowerCase() })
             .andWhere('user.userName != :broadcasterusername', { broadcasterusername: broadcasterUsername.toLowerCase() })
             .orderBy('user.watchedTime', 'DESC')
@@ -175,9 +172,9 @@ class Top extends System {
         message = translate('systems.top.time').replace(/\$amount/g, 10);
         break;
       case TYPE.TIPS: {
-        const joinTip = connection.options.type === 'postgres' ? '"user_tip"."userId" = "user"."userId"' : 'user_tip.userId = user.userId';
+        const joinTip = AppDataSource.options.type === 'postgres' ? '"user_tip"."userId" = "user"."userId"' : 'user_tip.userId = user.userId';
         sorted
-         = (await getRepository(User).createQueryBuilder('user')
+         = (await AppDataSource.getRepository(User).createQueryBuilder('user')
             .orderBy('value', 'DESC')
             .addSelect('COALESCE(SUM(user_tip.sortAmount), 0)', 'value')
             .addSelect('user.userName')
@@ -195,7 +192,7 @@ class Top extends System {
           return [];
         }
         sorted
-         = (await getRepository(User).createQueryBuilder('user')
+         = (await AppDataSource.getRepository(User).createQueryBuilder('user')
             .where('user.userName != :botusername', { botusername: botUsername.toLowerCase() })
             .andWhere('user.userName != :broadcasterusername', { broadcasterusername: broadcasterUsername.toLowerCase() })
             .orderBy('user.points', 'DESC')
@@ -209,7 +206,7 @@ class Top extends System {
         break;
       case TYPE.MESSAGES:
         sorted
-          = (await getRepository(User).createQueryBuilder('user')
+          = (await AppDataSource.getRepository(User).createQueryBuilder('user')
             .where('user.userName != :botusername', { botusername: botUsername.toLowerCase() })
             .andWhere('user.userName != :broadcasterusername', { broadcasterusername: broadcasterUsername.toLowerCase() })
             .orderBy('user.messages', 'DESC')
@@ -223,7 +220,7 @@ class Top extends System {
         break;
       case TYPE.SUBAGE:
         sorted
-          = (await getRepository(User).createQueryBuilder('user')
+          = (await AppDataSource.getRepository(User).createQueryBuilder('user')
             .where('user.userName != :botusername', { botusername: botUsername.toLowerCase() })
             .andWhere('user.userName != :broadcasterusername', { broadcasterusername: broadcasterUsername.toLowerCase() })
             .andWhere('user.isSubscriber = :isSubscriber', { isSubscriber: true })
@@ -238,9 +235,9 @@ class Top extends System {
         message = translate('systems.top.subage').replace(/\$amount/g, 10);
         break;
       case TYPE.BITS: {
-        const joinBit = connection.options.type === 'postgres' ? '"user_bit"."userId" = "user"."userId"' : 'user_bit.userId = user.userId';
+        const joinBit = AppDataSource.options.type === 'postgres' ? '"user_bit"."userId" = "user"."userId"' : 'user_bit.userId = user.userId';
         sorted
-         = (await getRepository(User).createQueryBuilder('user')
+         = (await AppDataSource.getRepository(User).createQueryBuilder('user')
             .orderBy('value', 'DESC')
             .addSelect('COALESCE(SUM(user_bit.amount), 0)', 'value')
             .addSelect('user.userName')
@@ -255,7 +252,7 @@ class Top extends System {
       }
       case TYPE.GIFTS:
         sorted
-          = (await getRepository(User).createQueryBuilder('user')
+          = (await AppDataSource.getRepository(User).createQueryBuilder('user')
             .where('user.userName != :botusername', { botusername: botUsername.toLowerCase() })
             .andWhere('user.userName != :broadcasterusername', { broadcasterusername: broadcasterUsername.toLowerCase() })
             .orderBy('user.giftedSubscribes', 'DESC')
@@ -269,7 +266,7 @@ class Top extends System {
         break;
       case TYPE.SUBMONTHS:
         sorted
-          = (await getRepository(User).createQueryBuilder('user')
+          = (await AppDataSource.getRepository(User).createQueryBuilder('user')
             .where('user.userName != :botusername', { botusername: botUsername.toLowerCase() })
             .andWhere('user.userName != :broadcasterusername', { broadcasterusername: broadcasterUsername.toLowerCase() })
             .orderBy('user.subscribeCumulativeMonths', 'DESC')

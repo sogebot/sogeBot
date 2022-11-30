@@ -3,8 +3,8 @@
 const assert = require('assert');
 
 const _ = require('lodash');
-const { getRepository } = require('typeorm');
 const { v4: uuidv4 } = require('uuid');
+const { AppDataSource } = require('../../../dest/database.js');
 
 require('../../general.js');
 
@@ -41,7 +41,7 @@ describe('Events - event run command should be able to skip pricing and cooldown
         isCommandQuiet: false,
       },
     }];
-    await getRepository(Event).save(event);
+    await AppDataSource.getRepository(Event).save(event);
     await alias.add({ sender: user.owner, parameters: '-a !test -c !commercial -p ' + defaultPermissions.CASTERS });
 
     const r = await cooldown.main({ sender: user.owner, parameters: '!test global 20 true' });

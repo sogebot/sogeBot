@@ -4,7 +4,8 @@ import { error } from 'console';
 
 import { DAY, MINUTE } from '@sogebot/ui-helpers/constants';
 import { isNil } from 'lodash';
-import { getRepository, LessThan } from 'typeorm';
+import { LessThan } from 'typeorm';
+import { AppDataSource } from '~/database';
 
 import Core from '~/_interface';
 import { TwitchStats, TwitchStatsInterface } from '~/database/entity/twitch';
@@ -36,9 +37,9 @@ class Stats extends Core {
     adminEndpoint('/', 'getLatestStats', async function (cb) {
       try {
         // cleanup
-        getRepository(TwitchStats).delete({ 'whenOnline': LessThan(Date.now() - (DAY * 31)) });
+        AppDataSource.getRepository(TwitchStats).delete({ 'whenOnline': LessThan(Date.now() - (DAY * 31)) });
 
-        const statsFromDb = await getRepository(TwitchStats)
+        const statsFromDb = await AppDataSource.getRepository(TwitchStats)
           .createQueryBuilder('stats')
           .offset(1)
           .cache(true)
@@ -90,8 +91,8 @@ class Stats extends Core {
   async save(data: Required<TwitchStatsInterface> & { timestamp: number }) {
     if (data.timestamp - this.latestTimestamp >= MINUTE * 15) {
       const whenOnline = new Date(data.whenOnline).getTime();
-      const statsFromDB = await getRepository(TwitchStats).findOne({ 'whenOnline': whenOnline });
-      await getRepository(TwitchStats).save({
+      const statsFromDB = await AppDataSource.getRepository(TwitchStats).findOneBy({ 'whenOnline': whenOnline });
+      await AppDataSource.getRepository(TwitchStats).save({
         currentViewers:     statsFromDB ? Math.round((data.currentViewers + statsFromDB.currentViewers) / 2) : data.currentViewers,
         whenOnline:         statsFromDB ? statsFromDB.whenOnline : Date.now(),
         currentSubscribers: data.currentSubscribers,

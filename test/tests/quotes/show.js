@@ -6,8 +6,8 @@ require('../../general.js');
 const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 const assert = require('assert');
+const { AppDataSource } = require('../../../dest/database.js');
 
-const { getRepository } = require('typeorm');
 const { User } = require('../../../dest/database/entity/user');
 
 const quotes = (require('../../../dest/systems/quotes')).default;
@@ -40,8 +40,8 @@ describe('Quotes - main() - @func3', () => {
       before(async () => {
         await db.cleanup();
         await message.prepare();
-        await getRepository(User).save({ userName: user.userName, userId: user.userId });
-        await getRepository(User).save({ userName: owner.userName, userId: owner.userId });
+        await AppDataSource.getRepository(User).save({ userName: user.userName, userId: user.userId });
+        await AppDataSource.getRepository(User).save({ userName: owner.userName, userId: owner.userId });
         const quote = await quotes.add({ sender: test.sender, parameters: '-tags lorem ipsum -quote Lorem Ipsum', command: '!quote add' });
         id = quote[0].id;
         if (test.id === 1) {

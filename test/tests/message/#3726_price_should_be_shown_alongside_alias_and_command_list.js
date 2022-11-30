@@ -6,6 +6,7 @@ const message = require('../../general.js').message;
 const user = require('../../general.js').user;
 
 const assert = require('assert');
+const { AppDataSource } = require('../../../dest/database.js');
 
 const Message = require('../../../dest/message').default;
 const alias = (require('../../../dest/systems/alias')).default;
@@ -13,7 +14,6 @@ const customcommands = (require('../../../dest/systems/customcommands')).default
 const price = (require('../../../dest/systems/price')).default;
 const owner = { userName: '__broadcaster__', userId: String(Math.floor(Math.random() * 100000)) };
 
-const { getRepository } = require('typeorm');
 const { Price } = require('../../../dest/database/entity/price');
 
 describe('Message - #3726 - price should be shown alongside alias and command list - @func3', () => {
@@ -21,9 +21,9 @@ describe('Message - #3726 - price should be shown alongside alias and command li
     await db.cleanup();
     await message.prepare();
     await user.prepare();
-    await getRepository(Price).save({ command: '!a', price: 10 });
-    await getRepository(Price).save({ command: '!b', price: 0, priceBits: 10 });
-    await getRepository(Price).save({ command: '!c', price: 10, priceBits: 10 });
+    await AppDataSource.getRepository(Price).save({ command: '!a', price: 10 });
+    await AppDataSource.getRepository(Price).save({ command: '!b', price: 0, priceBits: 10 });
+    await AppDataSource.getRepository(Price).save({ command: '!c', price: 10, priceBits: 10 });
   });
   after(() => {
     price.enabled = true;

@@ -1,7 +1,6 @@
 /* global */
 const assert = require('assert');
-
-const { getRepository } = require('typeorm');
+const { AppDataSource } = require('../../../dest/database.js');
 
 require('../../general.js');
 const { Commands, CommandsGroup } = require('../../../dest/database/entity/commands');
@@ -20,7 +19,7 @@ describe('Custom Commands - @func2 - #4860 - customcommands group permissions an
   });
 
   it('create filterGroup with filter | $game === "Dota 2"', async () => {
-    await getRepository(CommandsGroup).insert({
+    await AppDataSource.getRepository(CommandsGroup).insert({
       name:    'filterGroup',
       options: {
         filter:     '$game === "Dota 2"',
@@ -30,7 +29,7 @@ describe('Custom Commands - @func2 - #4860 - customcommands group permissions an
   });
 
   it('create permGroup with permission | CASTERS', async () => {
-    await getRepository(CommandsGroup).insert({
+    await AppDataSource.getRepository(CommandsGroup).insert({
       name:    'permGroup',
       options: {
         filter:     null,
@@ -40,7 +39,7 @@ describe('Custom Commands - @func2 - #4860 - customcommands group permissions an
   });
 
   it('create permGroup2 without permission', async () => {
-    await getRepository(CommandsGroup).insert({
+    await AppDataSource.getRepository(CommandsGroup).insert({
       name:    'permGroup2',
       options: {
         filter:     null,
@@ -128,7 +127,7 @@ describe('Custom Commands - @func2 - #4860 - customcommands group permissions an
     }];
     await command.save();
   });
-  
+
   it('!testpermnull should be triggered by CASTER', async () => {
     message.prepare();
     customcommands.run({ sender: user.owner, message: '!testpermnull' });

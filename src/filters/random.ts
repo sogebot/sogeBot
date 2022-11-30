@@ -1,6 +1,6 @@
 import { User } from '@entity/user';
 import { sample } from '@sogebot/ui-helpers/array';
-import { getRepository } from 'typeorm';
+import { AppDataSource } from '~/database';
 
 import type { ResponseFilter } from '.';
 
@@ -13,7 +13,7 @@ const random: ResponseFilter = {
     await changelog.flush();
     const botUsername = variables.get('services.twitch.botUsername') as string;
     const broadcasterUsername = variables.get('services.twitch.broadcasterUsername') as string;
-    const viewers = (await getRepository(User).createQueryBuilder('user')
+    const viewers = (await AppDataSource.getRepository(User).createQueryBuilder('user')
       .where('user.userName != :botusername', { botusername: botUsername.toLowerCase() })
       .andWhere('user.userName != :broadcasterusername', { broadcasterusername: broadcasterUsername.toLowerCase() })
       .andWhere('user.isOnline = :isOnline', { isOnline: true })
@@ -31,7 +31,7 @@ const random: ResponseFilter = {
     await changelog.flush();
     const botUsername = variables.get('services.twitch.botUsername') as string;
     const broadcasterUsername = variables.get('services.twitch.broadcasterUsername') as string;
-    const subscribers = (await getRepository(User).createQueryBuilder('user')
+    const subscribers = (await AppDataSource.getRepository(User).createQueryBuilder('user')
       .where('user.userName != :botusername', { botusername: botUsername.toLowerCase() })
       .andWhere('user.userName != :broadcasterusername', { broadcasterusername: broadcasterUsername.toLowerCase() })
       .andWhere('user.isSubscriber = :isSubscriber', { isSubscriber: true })
@@ -49,7 +49,7 @@ const random: ResponseFilter = {
     await changelog.flush();
     const botUsername = variables.get('services.twitch.botUsername') as string;
     const broadcasterUsername = variables.get('services.twitch.broadcasterUsername') as string;
-    const viewers = (await getRepository(User).createQueryBuilder('user')
+    const viewers = (await AppDataSource.getRepository(User).createQueryBuilder('user')
       .where('user.userName != :botusername', { botusername: botUsername.toLowerCase() })
       .andWhere('user.userName != :broadcasterusername', { broadcasterusername: broadcasterUsername.toLowerCase() })
       .cache(true)
@@ -65,7 +65,7 @@ const random: ResponseFilter = {
     await changelog.flush();
     const botUsername = variables.get('services.twitch.botUsername') as string;
     const broadcasterUsername = variables.get('services.twitch.broadcasterUsername') as string;
-    const subscribers = (await getRepository(User).createQueryBuilder('user')
+    const subscribers = (await AppDataSource.getRepository(User).createQueryBuilder('user')
       .where('user.userName != :botusername', { botusername: botUsername.toLowerCase() })
       .andWhere('user.userName != :broadcasterusername', { broadcasterusername: broadcasterUsername.toLowerCase() })
       .andWhere('user.isSubscriber = :isSubscriber', { isSubscriber: true })

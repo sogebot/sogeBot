@@ -2,7 +2,7 @@ import { Currency, UserTip, UserTipInterface } from '@entity/user';
 import * as constants from '@sogebot/ui-helpers/constants';
 import axios from 'axios';
 import chalk from 'chalk';
-import { getRepository } from 'typeorm';
+import { AppDataSource } from '~/database';
 
 import { persistent, settings } from '../decorators';
 import { onStartup } from '../decorators/on.js';
@@ -258,7 +258,7 @@ class Donationalerts extends Integration {
         exchangeRates: rates,
         userId:        user.userId,
       };
-      getRepository(UserTip).save(newTip);
+      AppDataSource.getRepository(UserTip).save(newTip);
     } else {
       tip(`anonymous#__anonymous__, amount: ${Number(data.amount).toFixed(2)}${data.currency}, message: ${data.message}`);
       alerts.trigger({

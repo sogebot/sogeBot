@@ -1,29 +1,18 @@
-import { EntitySchema } from 'typeorm';
+import { Column, Entity, Index, PrimaryColumn } from 'typeorm';
+import { BotEntity } from '~/database/BotEntity';
 
-export interface SettingsInterface {
-  id: number;
-  namespace: string;
-  name: string;
-  value: string;
+@Entity()
+@Index('IDX_d8a83b9ffce680092c8dfee37d', [ 'namespace', 'name' ], { unique: true })
+export class Settings extends BotEntity<Settings> {
+  @PrimaryColumn({ generated: 'rowid' })
+    id: number;
+
+  @Column()
+    namespace: string;
+
+  @Column()
+    name: string;
+
+  @Column({ type: ['mysql', 'mariadb'].includes(process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') ? 'longtext' : 'text' })
+    value: string;
 }
-
-export const Settings = new EntitySchema<SettingsInterface>({
-  name:    'settings',
-  columns: {
-    id: {
-      type:      Number,
-      primary:   true,
-      generated: true,
-    },
-    namespace: { type: String },
-    name:      { type: String },
-    value:     { type: ['mysql', 'mariadb'].includes(process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') ? 'longtext' : 'text' },
-  },
-  indices: [
-    {
-      name:    'IDX_d8a83b9ffce680092c8dfee37d',
-      columns: [ 'namespace', 'name' ],
-      unique:  true,
-    },
-  ],
-});

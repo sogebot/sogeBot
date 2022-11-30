@@ -1,7 +1,7 @@
 import { Events } from '@entity/event';
 import { OBSWebsocket as OBSWebsocketEntity } from '@entity/obswebsocket';
 import { EntityNotFoundError } from 'typeorm';
-import { getRepository } from 'typeorm';
+import { AppDataSource } from '~/database';
 
 import {
   command, default_permission,
@@ -46,7 +46,7 @@ class OBSWebsocket extends Integration {
   }
 
   async runObswebsocketCommand(operation: Events.OperationDefinitions, attributes: Events.Attributes): Promise<void> {
-    const task = await getRepository(OBSWebsocketEntity).findOneOrFail({ id: String(operation.taskId) });
+    const task = await AppDataSource.getRepository(OBSWebsocketEntity).findOneByOrFail({ id: String(operation.taskId) });
 
     info(`OBSWEBSOCKETS: Task ${task.id} triggered by operation`);
     await obsws.triggerTask(task.code, attributes);
@@ -97,7 +97,7 @@ class OBSWebsocket extends Integration {
     });
     adminEndpoint('/', 'integration::obswebsocket::generic::save', async (item, cb) => {
       try {
-        cb(null, await getRepository(OBSWebsocketEntity).save(item));
+        cb(null, await AppDataSource.getRepository(OBSWebsocketEntity).save(item));
       } catch (e) {
         if (e instanceof Error) {
           cb(e.message, undefined);
@@ -105,14 +105,14 @@ class OBSWebsocket extends Integration {
       }
     });
     adminEndpoint('/', 'integration::obswebsocket::generic::getOne', async (id, cb) => {
-      cb(null, await getRepository(OBSWebsocketEntity).findOne({ id }));
+      cb(null, await AppDataSource.getRepository(OBSWebsocketEntity).findOneBy({ id }));
     });
     adminEndpoint('/', 'integration::obswebsocket::generic::deleteById', async (id, cb) => {
-      await getRepository(OBSWebsocketEntity).delete({ id });
+      await AppDataSource.getRepository(OBSWebsocketEntity).delete({ id });
       cb(null);
     });
     adminEndpoint('/', 'integration::obswebsocket::generic::getAll', async (cb) => {
-      cb(null, await getRepository(OBSWebsocketEntity).find());
+      cb(null, await AppDataSource.getRepository(OBSWebsocketEntity).find());
     });
     publicEndpoint('/', 'integration::obswebsocket::event', (opts) => {
       const { type, location, ...data } = opts;
@@ -141,7 +141,7 @@ class OBSWebsocket extends Integration {
   async runTask(opts: CommandOptions) {
     try {
       const [ taskId ] = new Expects(opts.parameters).string().toArray();
-      const task = await getRepository(OBSWebsocketEntity).findOneOrFail(taskId);
+      const task = await AppDataSource.getRepository(OBSWebsocketEntity).findOneByOrFail(taskId);
 
       info(`OBSWEBSOCKETS: User ${opts.sender.userName}#${opts.sender.userId} triggered task ${task.id}`);
       await this.triggerTask(task.code);

@@ -17,7 +17,7 @@ const polls = (require('../../../dest/systems/polls')).default;
 const streamlabs = (require('../../../dest/integrations/streamlabs')).default;
 
 const assert = require('assert');
-const { getRepository } = require('typeorm');
+const { AppDataSource } = require('../../../dest/database');
 
 const owner = { userName: '__broadcaster__', userId: String(Math.floor(Math.random() * 10000)) };
 
@@ -87,14 +87,14 @@ describe('Polls - tips - @func2', () => {
     for (const o of [0,1,2,3,4]) {
       it(`User ${owner.userName} will vote for option ${o} - should fail`, async () => {
         await polls.main({ sender: owner, parameters: String(o) });
-        const vote = (await Poll.findOne({ id: vid })).votes.find(v => v.votedBy === owner.userName);
+        const vote = (await Poll.findOneBy({ id: vid })).votes.find(v => v.votedBy === owner.userName);
         assert(typeof vote === 'undefined', 'Expected ' + JSON.stringify({ votedBy: owner.userName, vid }) + ' to not be found in db');
       });
     }
     it(`10 users will vote through tips for option 1 and another 10 for option 2`, async () => {
       for (const o of [1,2]) {
         for (let i = 0; i < 10; i++) {
-          await getRepository(User).save({ userId: String(Math.floor(Math.random() * 100000)), userName: 'user' + [o, i].join('') });
+          await AppDataSource.getRepository(User).save({ userId: String(Math.floor(Math.random() * 100000)), userName: 'user' + [o, i].join('') });
           const user = 'user' + [o, i].join('');
           await streamlabs.parse({
             type:    'donation',
@@ -109,7 +109,7 @@ describe('Polls - tips - @func2', () => {
 
           await until(async (setError) => {
             try {
-              const vote = (await Poll.findOne({ id: vid })).votes.find(v => v.votedBy === user);
+              const vote = (await Poll.findOneBy({ id: vid })).votes.find(v => v.votedBy === user);
               assert.strictEqual(vote.option, o - 1);
               return true;
             } catch (err) {

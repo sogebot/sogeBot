@@ -1,8 +1,7 @@
 require('../../general.js');
 
 const assert = require('assert');
-
-const { getRepository } = require('typeorm');
+const { AppDataSource } = require('../../../dest/database.js');
 
 const { Cooldown } = require('../../../dest/database/entity/cooldown');
 const { Price } = require('../../../dest/database/entity/price');
@@ -20,7 +19,7 @@ describe('Cooldowns - @func3 - #3720 - global cooldown should be properly revert
     await message.prepare();
     await user.prepare();
 
-    await getRepository(User).save({ ...user.viewer2, points: 100 });
+    await AppDataSource.getRepository(User).save({ ...user.viewer2, points: 100 });
   });
 
   it('create cooldown on !me [global 60]', async () => {
@@ -30,7 +29,7 @@ describe('Cooldowns - @func3 - #3720 - global cooldown should be properly revert
   });
 
   it('check if cooldown is created', async () => {
-    const item = await getRepository(Cooldown).findOne({ where: { name: '!me' } });
+    const item = await AppDataSource.getRepository(Cooldown).findOne({ where: { name: '!me' } });
     assert(item);
     timestamp = item.timestamp;
   });
@@ -41,13 +40,13 @@ describe('Cooldowns - @func3 - #3720 - global cooldown should be properly revert
   });
 
   it('save timestamp', async () => {
-    const item = await getRepository(Cooldown).findOne({ where: { name: '!me' } });
+    const item = await AppDataSource.getRepository(Cooldown).findOne({ where: { name: '!me' } });
     assert(item);
     timestamp = item.timestamp;
   });
 
   it('add price for !me', async () => {
-    await getRepository(Price).save({ command: '!me', price: '100' });
+    await AppDataSource.getRepository(Price).save({ command: '!me', price: '100' });
   });
 
   it('wait 6s to cool off cooldown', async() => {
@@ -60,7 +59,7 @@ describe('Cooldowns - @func3 - #3720 - global cooldown should be properly revert
   });
 
   it('cooldown should be reverted', async () => {
-    const item = await getRepository(Cooldown).findOne({ where: { name: '!me' } });
+    const item = await AppDataSource.getRepository(Cooldown).findOne({ where: { name: '!me' } });
     assert.strictEqual(item.timestamp, new Date(0).toISOString());
   });
 
@@ -71,7 +70,7 @@ describe('Cooldowns - @func3 - #3720 - global cooldown should be properly revert
 
   let timestamp = 0;
   it('cooldown should be changed', async () => {
-    const item = await getRepository(Cooldown).findOne({ where: { name: '!me' } });
+    const item = await AppDataSource.getRepository(Cooldown).findOne({ where: { name: '!me' } });
     timestamp = item.timestamp;
     assert(new Date(item.timestamp).getTime() > 0);
   });
@@ -82,7 +81,7 @@ describe('Cooldowns - @func3 - #3720 - global cooldown should be properly revert
   });
 
   it('cooldown should be not changed (still on cooldown period)', async () => {
-    const item = await getRepository(Cooldown).findOne({ where: { name: '!me' } });
+    const item = await AppDataSource.getRepository(Cooldown).findOne({ where: { name: '!me' } });
     assert.strictEqual(item.timestamp, timestamp);
   });
 
@@ -96,7 +95,7 @@ describe('Cooldowns - @func3 - #3720 - global cooldown should be properly revert
   });
 
   it('cooldown should be reverted', async () => {
-    const item = await getRepository(Cooldown).findOne({ where: { name: '!me' } });
+    const item = await AppDataSource.getRepository(Cooldown).findOne({ where: { name: '!me' } });
     assert.strictEqual(item.timestamp, new Date(0).toISOString());
   });
 });

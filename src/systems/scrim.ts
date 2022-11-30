@@ -1,7 +1,7 @@
 import { ScrimMatchId } from '@entity/scrimMatchId';
 import * as constants from '@sogebot/ui-helpers/constants';
 import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized';
-import { getRepository } from 'typeorm';
+import { AppDataSource } from '~/database';
 
 import {
   command, default_permission, settings,
@@ -72,7 +72,7 @@ class Scrim extends System {
       this.isCooldownOnly = isCooldownOnly;
 
       this.lastRemindAt = now;
-      await getRepository(ScrimMatchId).clear();
+      await AppDataSource.getRepository(ScrimMatchId).clear();
       announce(prepare('systems.scrim.countdown', {
         type,
         time: minutes,
@@ -94,8 +94,8 @@ class Scrim extends System {
         return this.currentMatches(opts);
       } else {
         const [matchId] = new Expects(opts.parameters).everything({ name: 'matchId' }).toArray();
-        const scrimMatchId = await getRepository(ScrimMatchId).findOne({ username: opts.sender.userName });
-        await getRepository(ScrimMatchId).save({
+        const scrimMatchId = await AppDataSource.getRepository(ScrimMatchId).findOneBy({ username: opts.sender.userName });
+        await AppDataSource.getRepository(ScrimMatchId).save({
           ...scrimMatchId,
           username: opts.sender.userName,
           matchId,
@@ -159,7 +159,7 @@ class Scrim extends System {
     const matches: {
       [x: string]: string[];
     } = {};
-    const matchIdsFromDb = await getRepository(ScrimMatchId).find();
+    const matchIdsFromDb = await AppDataSource.getRepository(ScrimMatchId).find();
     for (const d of matchIdsFromDb) {
       const id = d.matchId;
       if (typeof matches[id] === 'undefined') {

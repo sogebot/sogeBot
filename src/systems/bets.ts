@@ -59,9 +59,10 @@ class Bets extends System {
       return;
     }
     try {
-      const currentBet = await BetsEntity.findOne({
+      const currentBet = (await BetsEntity.find({
         order: { createdAt: 'DESC' },
-      });
+        take:  1,
+      }))[0];
       if (!currentBet || currentBet.isLocked) {
         throw Error(ERROR_NOT_RUNNING);
       }
@@ -95,9 +96,10 @@ class Bets extends System {
   sockets() {
     adminEndpoint('/systems/bets', 'bets::getCurrentBet', async (cb) => {
       try {
-        const currentBet = await BetsEntity.findOne({
+        const currentBet = (await BetsEntity.find({
           order: { createdAt: 'DESC' },
-        });
+          take:  1,
+        }))[0];
         cb(null, currentBet);
       } catch (e: any) {
         cb(e.stack);
@@ -140,9 +142,10 @@ class Bets extends System {
   @command('!bet open')
   @default_permission(defaultPermissions.MODERATORS)
   public async open(opts: CommandOptions): Promise<CommandResponse[]> {
-    const currentBet = await BetsEntity.findOne({
+    const currentBet = (await BetsEntity.find({
       order: { createdAt: 'DESC' },
-    });
+      take:  1,
+    }))[0];
     try {
       if (currentBet && !currentBet.isLocked) {
         throw new Error(ERROR_ALREADY_OPENED);
@@ -198,9 +201,10 @@ class Bets extends System {
   }
 
   public async info(opts: CommandOptions) {
-    const currentBet = await BetsEntity.findOne({
+    const currentBet = (await BetsEntity.find({
       order: { createdAt: 'DESC' },
-    });
+      take:  1,
+    }))[0];
     if (!currentBet || (currentBet.isLocked && currentBet.arePointsGiven)) {
       return [{ response: prepare('bets.notRunning'), ...opts } ];
     } else {
@@ -218,9 +222,10 @@ class Bets extends System {
 
   public async participate(opts: CommandOptions): Promise<CommandResponse[]> {
     const points = (await import('../systems/points')).default;
-    const currentBet = await BetsEntity.findOne({
+    const currentBet = (await BetsEntity.find({
       order: { createdAt: 'DESC' },
-    });
+      take:  1,
+    }))[0];
 
     try {
       // tslint:disable-next-line:prefer-const
@@ -293,9 +298,10 @@ class Bets extends System {
   @command('!bet refund')
   @default_permission(defaultPermissions.MODERATORS)
   public async refund(opts: CommandOptions): Promise<CommandResponse[]> {
-    const currentBet = await BetsEntity.findOne({
+    const currentBet = (await BetsEntity.find({
       order: { createdAt: 'DESC' },
-    });
+      take:  1,
+    }))[0];
     try {
       if (!currentBet || (currentBet.isLocked && currentBet.arePointsGiven)) {
         throw Error(ERROR_NOT_RUNNING);
@@ -323,9 +329,10 @@ class Bets extends System {
   @command('!bet close')
   @default_permission(defaultPermissions.MODERATORS)
   public async close(opts: CommandOptions): Promise<CommandResponse[]> {
-    const currentBet = await BetsEntity.findOne({
+    const currentBet = (await BetsEntity.find({
       order: { createdAt: 'DESC' },
-    });
+      take:  1,
+    }))[0];
     try {
       const index = new Expects(opts.parameters).number().toArray()[0];
 

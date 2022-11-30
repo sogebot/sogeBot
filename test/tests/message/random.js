@@ -2,12 +2,11 @@
 require('../../general.js');
 
 const assert = require('assert');
+const { AppDataSource } = require('../../../dest/database.js');
 
 const owner = { userId: String(Math.floor(Math.random() * 100000)), userName: '__broadcaster__' };
 const ignoredUser = { userId: String(Math.floor(Math.random() * 100000)), userName: 'ignoreduser' };
 const user = { userId: String(Math.floor(Math.random() * 100000)), userName: 'user1' };
-
-const { getRepository } = require('typeorm');
 
 const { User } = require('../../../dest/database/entity/user');
 const { prepare } = require('../../../dest/helpers/commons/prepare');
@@ -16,9 +15,9 @@ const db = require('../../general.js').db;
 const msg = require('../../general.js').message;
 
 async function setUsersOnline(users) {
-  await getRepository(User).update({}, { isOnline: false });
+  await AppDataSource.getRepository(User).update({}, { isOnline: false });
   for (const userName of users) {
-    await getRepository(User).update({ userName }, { isOnline: true });
+    await AppDataSource.getRepository(User).update({ userName }, { isOnline: true });
   }
 }
 
@@ -32,9 +31,9 @@ describe('Message - random filter - @func3', () => {
       await db.cleanup();
       await msg.prepare();
 
-      await getRepository(User).save(owner);
-      await getRepository(User).save(ignoredUser);
-      await getRepository(User).save(user);
+      await AppDataSource.getRepository(User).save(owner);
+      await AppDataSource.getRepository(User).save(ignoredUser);
+      await AppDataSource.getRepository(User).save(user);
 
       const r = await twitch.ignoreRm({ sender: owner, parameters: 'ignoreduser' });
       assert.strictEqual(r[0].response, prepare('ignore.user.is.removed', { userName: 'ignoreduser' }));
@@ -59,9 +58,9 @@ describe('Message - random filter - @func3', () => {
       await db.cleanup();
       await msg.prepare();
 
-      await getRepository(User).save(owner);
-      await getRepository(User).save(ignoredUser);
-      await getRepository(User).save(user);
+      await AppDataSource.getRepository(User).save(owner);
+      await AppDataSource.getRepository(User).save(ignoredUser);
+      await AppDataSource.getRepository(User).save(user);
 
       const r = await twitch.ignoreRm({ sender: owner, parameters: 'ignoreduser' });
       assert.strictEqual(r[0].response, prepare('ignore.user.is.removed', { userName: 'ignoreduser' }));
@@ -74,7 +73,7 @@ describe('Message - random filter - @func3', () => {
     const users = ['ignoreduser', 'user1'];
     for (const userName of users) {
       it('add user ' + userName + ' to users list', async () => {
-        await getRepository(User).save({ userId: String(Math.floor(Math.random() * 100000)), userName, isSubscriber: true });
+        await AppDataSource.getRepository(User).save({ userId: String(Math.floor(Math.random() * 100000)), userName, isSubscriber: true });
       });
     }
 
@@ -92,9 +91,9 @@ describe('Message - random filter - @func3', () => {
       await db.cleanup();
       await msg.prepare();
 
-      await getRepository(User).save(owner);
-      await getRepository(User).save(ignoredUser);
-      await getRepository(User).save(user);
+      await AppDataSource.getRepository(User).save(owner);
+      await AppDataSource.getRepository(User).save(ignoredUser);
+      await AppDataSource.getRepository(User).save(user);
 
       const r = await twitch.ignoreRm({ sender: owner, parameters: 'ignoreduser' });
       assert.strictEqual(r[0].response, prepare('ignore.user.is.removed', { userName: 'ignoreduser' }));
@@ -108,7 +107,7 @@ describe('Message - random filter - @func3', () => {
     const users = ['ignoreduser', 'user1'];
     for (const userName of users) {
       it('add user ' + userName + ' to users list', async () => {
-        await getRepository(User).save({ userId: String(Math.floor(Math.random() * 100000)), userName });
+        await AppDataSource.getRepository(User).save({ userId: String(Math.floor(Math.random() * 100000)), userName });
       });
     }
 
@@ -125,9 +124,9 @@ describe('Message - random filter - @func3', () => {
       await db.cleanup();
       await msg.prepare();
 
-      await getRepository(User).save(owner);
-      await getRepository(User).save(ignoredUser);
-      await getRepository(User).save(user);
+      await AppDataSource.getRepository(User).save(owner);
+      await AppDataSource.getRepository(User).save(ignoredUser);
+      await AppDataSource.getRepository(User).save(user);
 
       const r = await twitch.ignoreRm({ sender: owner, parameters: 'ignoreduser' });
       assert.strictEqual(r[0].response, prepare('ignore.user.is.removed', { userName: 'ignoreduser' }));
@@ -140,7 +139,7 @@ describe('Message - random filter - @func3', () => {
     const users = ['ignoreduser', 'user1'];
     for (const userName of users) {
       it('add user ' + userName + ' to users list', async () => {
-        await getRepository(User).save({ userId: String(Math.floor(Math.random() * 100000)), userName, isSubscriber: true });
+        await AppDataSource.getRepository(User).save({ userId: String(Math.floor(Math.random() * 100000)), userName, isSubscriber: true });
       });
     }
 

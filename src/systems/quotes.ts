@@ -3,7 +3,7 @@ import { sample } from '@sogebot/ui-helpers/array';
 import { validateOrReject } from 'class-validator';
 import * as _ from 'lodash';
 import { merge } from 'lodash';
-import { getManager, getRepository } from 'typeorm';
+import { AppDataSource } from '~/database';
 
 import { command, default_permission } from '../decorators';
 import Expects from '../expects';
@@ -40,9 +40,9 @@ class Quotes extends System {
       });
     });
     app.get('/api/systems/quotes/:id', adminMiddleware, async (req, res) => {
-      const quote = await QuotesEntity.findOne({ id: Number(req.params.id) });
+      const quote = await QuotesEntity.findOneBy({ id: Number(req.params.id) });
       res.send({
-        data: await QuotesEntity.findOne({ id: Number(req.params.id) }),
+        data: await QuotesEntity.findOneBy({ id: Number(req.params.id) }),
         user: quote ? await users.getNameById(quote.quotedBy) : null,
       });
     });
@@ -105,13 +105,13 @@ class Quotes extends System {
         throw new Error();
       }
       const id = new Expects(opts.parameters).argument({ type: Number, name: 'id' }).toArray()[0];
-      const item = await getRepository(QuotesEntity).findOne({ id });
+      const item = await AppDataSource.getRepository(QuotesEntity).findOneBy({ id });
 
       if (!item) {
         const response = prepare('systems.quotes.remove.not-found', { id });
         return [{ response, ...opts }];
       } else {
-        await getRepository(QuotesEntity).delete({ id });
+        await AppDataSource.getRepository(QuotesEntity).delete({ id });
         const response = prepare('systems.quotes.remove.ok', { id });
         return [{ response, ...opts }];
       }
@@ -132,10 +132,10 @@ class Quotes extends System {
         name: 'tag', multi: true, delimiter: '',
       }).toArray() as [ number, string ];
 
-      const quote = await getRepository(QuotesEntity).findOne({ id });
+      const quote = await AppDataSource.getRepository(QuotesEntity).findOneBy({ id });
       if (quote) {
         const tags = tag.split(',').map((o) => o.trim());
-        await getManager()
+        await AppDataSource
           .createQueryBuilder()
           .update(QuotesEntity)
           .where('id = :id', { id })
@@ -174,7 +174,7 @@ class Quotes extends System {
     }
 
     if (!_.isNil(id)) {
-      const quote = await getRepository(QuotesEntity).findOne({ id });
+      const quote = await AppDataSource.getRepository(QuotesEntity).findOneBy({ id });
       if (!_.isEmpty(quote) && typeof quote !== 'undefined') {
         const quotedBy = await users.getNameById(quote.quotedBy);
         const response = prepare('systems.quotes.show.ok', {
@@ -186,7 +186,7 @@ class Quotes extends System {
         return [{ response, ...opts }];
       }
     } else {
-      const quotes = await getRepository(QuotesEntity).find();
+      const quotes = await AppDataSource.getRepository(QuotesEntity).find();
       const quotesWithTags: QuotesEntity[] = [];
       for (const quote of quotes) {
         if (quote.tags.includes(tag)) {

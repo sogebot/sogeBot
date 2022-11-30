@@ -1,5 +1,5 @@
 import { CacheGames } from '@entity/cacheGames';
-import { getRepository } from 'typeorm';
+import { AppDataSource } from '~/database';
 
 import client from '../api/client';
 
@@ -11,7 +11,7 @@ async function getGameIdFromName (name: string): Promise<string | undefined> {
   if (isDebugEnabled('api.calls')) {
     debug('api.calls', new Error().stack);
   }
-  const gameFromDb = await getRepository(CacheGames).findOne({ name });
+  const gameFromDb = await AppDataSource.getRepository(CacheGames).findOneBy({ name });
   // check if name is cached
   if (gameFromDb) {
     return String(gameFromDb.id);
@@ -25,7 +25,7 @@ async function getGameIdFromName (name: string): Promise<string | undefined> {
     }
     // add id->game to cache
     const id = Number(getGameByName.id);
-    await getRepository(CacheGames).save({ id, name, thumbnail: getGameByName.boxArtUrl });
+    await AppDataSource.getRepository(CacheGames).save({ id, name, thumbnail: getGameByName.boxArtUrl });
     return String(id);
   } catch (e: unknown) {
     if (e instanceof Error) {

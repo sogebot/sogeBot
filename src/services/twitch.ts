@@ -3,7 +3,7 @@ import { User } from '@entity/user';
 import { SECOND } from '@sogebot/ui-helpers/constants';
 import { dayjs, timezone } from '@sogebot/ui-helpers/dayjsHelper';
 import { getTime } from '@sogebot/ui-helpers/getTime';
-import { getRepository } from 'typeorm';
+import { AppDataSource } from '~/database';
 
 import {
   command, default_permission, example, persistent, settings,
@@ -483,7 +483,7 @@ class Twitch extends Service {
 
   @command('!followers')
   async followers (opts: CommandOptions) {
-    const events = await getRepository(EventList)
+    const events = await AppDataSource.getRepository(EventList)
       .createQueryBuilder('events')
       .select('events')
       .orderBy('events.timestamp', 'DESC')
@@ -506,7 +506,7 @@ class Twitch extends Service {
 
   @command('!subs')
   async subs (opts: CommandOptions) {
-    const events = await getRepository(EventList)
+    const events = await AppDataSource.getRepository(EventList)
       .createQueryBuilder('events')
       .select('events')
       .orderBy('events.timestamp', 'DESC')
@@ -515,7 +515,7 @@ class Twitch extends Service {
       .orWhere('events.event = :event3', { event3: 'subgift' })
       .getMany();
     await changelog.flush();
-    const onlineSubscribers = (await getRepository(User).createQueryBuilder('user')
+    const onlineSubscribers = (await AppDataSource.getRepository(User).createQueryBuilder('user')
       .where('user.userName != :botusername', { botusername: this.botUsername.toLowerCase() })
       .andWhere('user.userName != :broadcasterusername', { broadcasterusername: this.broadcasterUsername.toLowerCase() })
       .andWhere('user.isSubscriber = :isSubscriber', { isSubscriber: true })

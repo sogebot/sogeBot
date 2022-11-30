@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 const child_process = require('child_process');
 const fs = require('fs');
 
@@ -28,12 +30,12 @@ async function retest() {
           'mocha',
           '-r', 'tsconfig-paths/register',
           '-r', 'source-map-support/register',
-          '--timeout', '120000',
+          '--timeout', '1200000',
           '--exit',
           '--fgrep="' + suite + '"',
           '--recursive',
           'test/',
-        ], { shell: true });
+        ], { shell: true, env: process.env });
 
         let output = '';
         p.stdout.on('data', (data) => {
@@ -80,7 +82,7 @@ async function retest() {
     'merge',
     './.nyc_output/',
     './coverage/coverage-final.json',
-  ], { shell: true });
+  ], { shell: true, env: process.env });
   process.exit(status);
 }
 
@@ -94,12 +96,12 @@ async function test() {
         '--clean=false',
         'mocha',
         '-r', 'source-map-support/register',
-        '--timeout', '120000',
+        '--timeout', '1200000',
         '--grep="' + process.env.TESTS + '"',
         '--exit',
         '--recursive',
         'test/',
-      ], { shell: true });
+      ], { shell: true, env: process.env });
     } else {
       // run all default behavior
       p = child_process.spawn('npx', [
@@ -108,11 +110,11 @@ async function test() {
         '--clean=false',
         'mocha',
         '-r', 'source-map-support/register',
-        '--timeout', '120000',
+        '--timeout', '1200000',
         '--exit',
         '--recursive',
         'test/',
-      ], { shell: true });
+      ], { shell: true, env: process.env });
     }
 
     const report = fs.createWriteStream('report');

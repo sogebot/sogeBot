@@ -8,13 +8,14 @@ const message = require('../../general.js').message;
 const user = require('../../general.js').user;
 const commons = require('../../../dest/commons');
 
-const { getRepository } = require('typeorm');
 const { User } = require('../../../dest/database/entity/user');
 const { Raffle } = require('../../../dest/database/entity/raffle');
 
 const raffles = (require('../../../dest/systems/raffles')).default;
 const isStreamOnline = (require('../../../dest/helpers/api/isStreamOnline' )).isStreamOnline
 const assert = require('assert');
+const { AppDataSource } = require('../../../dest/database.js');
+const { IsNull } = require('typeorm');
 
 describe('Raffles - announce should contain total entries #4175 - @func3', () => {
   before(async () => {
@@ -35,8 +36,8 @@ describe('Raffles - announce should contain total entries #4175 - @func3', () =>
   });
 
   it('Update viewer and viewer2 to have 200 points', async () => {
-    await getRepository(User).save({ userName: user.viewer.userName, userId: user.viewer.userId, points: 200 });
-    await getRepository(User).save({ userName: user.viewer2.userName, userId: user.viewer2.userId, points: 200 });
+    await AppDataSource.getRepository(User).save({ userName: user.viewer.userName, userId: user.viewer.userId, points: 200 });
+    await AppDataSource.getRepository(User).save({ userName: user.viewer2.userName, userId: user.viewer2.userId, points: 200 });
   });
 
   it('Viewer bets max points', async () => {
@@ -50,9 +51,9 @@ describe('Raffles - announce should contain total entries #4175 - @func3', () =>
   });
 
   it('expecting 2 participants to have bet of 100 and 50', async () => {
-    const raffle = await getRepository(Raffle).findOne({
+    const raffle = await AppDataSource.getRepository(Raffle).findOne({
       relations: ['participants'],
-      where: { winner: null, isClosed: false },
+      where: { winner: IsNull(), isClosed: false },
     });
     assert.strictEqual(raffle.participants.length, 2);
     try {

@@ -1,6 +1,6 @@
 const assert = require('assert');
+const { AppDataSource } = require('../../../dest/database');
 
-const { getRepository } = require('typeorm');
 
 const { User } = require('../../../dest/database/entity/user');
 const changelog = require('../../../dest/helpers/user/changelog');
@@ -16,7 +16,7 @@ describe('Points - User have proper points count - https://discord.com/channels/
     await message.prepare();
     await user.prepare();
 
-    await getRepository(User).update({ userName: user.viewer.userName }, { isOnline: true });
+    await AppDataSource.getRepository(User).update({ userName: user.viewer.userName }, { isOnline: true });
 
     points.messageOfflineInterval = 5;
     points.perMessageOfflineInterval = 1;

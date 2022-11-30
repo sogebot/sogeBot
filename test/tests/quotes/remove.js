@@ -8,7 +8,7 @@ const db = require('../../general.js').db;
 const assert = require('assert');
 const message = require('../../general.js').message;
 
-const { getManager } = require('typeorm');
+const { AppDataSource } = require('../../../dest/database.js');
 const { Quotes } = require('../../../dest/database/entity/quotes');
 
 const quotes = (require('../../../dest/systems/quotes')).default;
@@ -49,7 +49,7 @@ describe('Quotes - remove() - @func3', () => {
           assert.strictEqual(responses[0].response, '$sender, quote ID is missing.');
         });
         it('Database should not be empty', async () => {
-          const items = await getManager()
+          const items = await AppDataSource
             .createQueryBuilder()
             .select('quotes')
             .from(Quotes, 'quotes')
@@ -62,7 +62,7 @@ describe('Quotes - remove() - @func3', () => {
             assert.strictEqual(responses[0].response, `$sender, quote ${id} was successfully deleted.`)
           });
           it('Database should be empty', async () => {
-            const items = await getManager()
+            const items = await AppDataSource
               .createQueryBuilder()
               .select('quotes')
               .from(Quotes, 'quotes')
@@ -74,7 +74,7 @@ describe('Quotes - remove() - @func3', () => {
             assert.strictEqual(responses[0].response, `$sender, quote ${test.id} was not found.`);
           });
           it('Database should not be empty', async () => {
-            const items = await getManager()
+            const items = await AppDataSource
               .createQueryBuilder()
               .select('quotes')
               .from(Quotes, 'quotes')

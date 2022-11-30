@@ -1,5 +1,5 @@
 import { CacheGames } from '@entity/cacheGames';
-import { getRepository } from 'typeorm';
+import { AppDataSource } from '~/database';
 
 import client from '../api/client';
 
@@ -15,7 +15,7 @@ async function getGameNameFromId (id: number): Promise<string> {
     return '';
   } // return empty game if gid is empty
 
-  const gameFromDb = await getRepository(CacheGames).findOne({ id });
+  const gameFromDb = await AppDataSource.getRepository(CacheGames).findOneBy({ id });
 
   // check if id is cached
   if (gameFromDb) {
@@ -28,7 +28,7 @@ async function getGameNameFromId (id: number): Promise<string> {
     if (!getGameById) {
       throw new Error(`Couldn't find name of game for gid ${id} - fallback to ${stats.value.currentGame}`);
     }
-    await getRepository(CacheGames).save({ id, name: getGameById.name, thumbnail: getGameById.boxArtUrl });
+    await AppDataSource.getRepository(CacheGames).save({ id, name: getGameById.name, thumbnail: getGameById.boxArtUrl });
     return getGameById.name;
   } catch (e: unknown) {
     if (e instanceof Error) {

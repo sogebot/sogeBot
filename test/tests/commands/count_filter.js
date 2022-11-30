@@ -6,8 +6,8 @@ require('../../general.js');
 const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 const assert = require('assert');
+const { AppDataSource } = require('../../../dest/database.js');
 
-const { getRepository } = require('typeorm');
 const { User } = require('../../../dest/database/entity/user');
 
 const customcommands = (require('../../../dest/systems/customcommands')).default;
@@ -21,8 +21,8 @@ describe('Custom Commands - @func1 - count filter', () => {
     await db.cleanup();
     await message.prepare();
 
-    await getRepository(User).save({ userName: owner.userName, userId: owner.userId });
-    await getRepository(User).save({ userName: user1.userName, userId: user1.userId });
+    await AppDataSource.getRepository(User).save({ userName: owner.userName, userId: owner.userId });
+    await AppDataSource.getRepository(User).save({ userName: user1.userName, userId: user1.userId });
   });
 
   describe('$count(\'!cmd2\') should be properly parsed', () => {

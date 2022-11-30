@@ -5,8 +5,8 @@ require('../../general.js');
 const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 const assert = require('assert');
+const { AppDataSource } = require('../../../dest/database.js');
 
-const { getRepository } = require('typeorm');
 const { User } = require('../../../dest/database/entity/user');
 
 const points = (require('../../../dest/systems/points')).default;
@@ -20,9 +20,9 @@ describe('Points - all() - @func1', () => {
     await db.cleanup();
     await message.prepare();
 
-    await getRepository(User).save(owner);
-    await getRepository(User).save(user1);
-    await getRepository(User).save(user2);
+    await AppDataSource.getRepository(User).save(owner);
+    await AppDataSource.getRepository(User).save(user1);
+    await AppDataSource.getRepository(User).save(user2);
   });
 
   describe('Points should be correctly given', () => {

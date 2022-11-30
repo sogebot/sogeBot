@@ -10,12 +10,11 @@ const events = (require('../../../dest/events')).default;
 const log = require('../../../dest/helpers/log');
 
 const assert = require('assert');
+const { AppDataSource } = require('../../../dest/database.js');
 
 const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 const time = require('../../general.js').time;
-
-const { getRepository } = require('typeorm');
 
 const userName = 'randomPerson';
 
@@ -23,7 +22,7 @@ describe('discord#752632256270696478 - event attrs are not correctly parsed - @f
   before(async () => {
     await db.cleanup();
     await message.prepare();
-    await getRepository(Event).save({
+    await AppDataSource.getRepository(Event).save({
       id:          uuidv4(),
       name:        'tip',
       givenName:   'Tip alert',
@@ -39,7 +38,7 @@ describe('discord#752632256270696478 - event attrs are not correctly parsed - @f
       }],
     });
 
-    await getRepository(User).save({ userName: userName, userId: String(Math.floor(Math.random() * 100000)) });
+    await AppDataSource.getRepository(User).save({ userName: userName, userId: String(Math.floor(Math.random() * 100000)) });
   });
 
   it('trigger tip event for 10 EUR - ' + userName, async () => {

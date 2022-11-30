@@ -2,7 +2,7 @@ import { Duel as DuelEntity, DuelInterface } from '@entity/duel';
 import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized';
 import { format } from '@sogebot/ui-helpers/number';
 import _ from 'lodash';
-import { getRepository } from 'typeorm';
+import { AppDataSource } from '~/database';
 
 import {
   command, persistent, settings,
@@ -59,7 +59,7 @@ class Duel extends Game {
     }
 
     const [users, timestamp, duelDuration] = await Promise.all([
-      getRepository(DuelEntity).find(),
+      AppDataSource.getRepository(DuelEntity).find(),
       this._timestamp,
       this.duration,
     ]);
@@ -103,7 +103,7 @@ class Duel extends Game {
       changelog.increment(winnerUser.id, { points: total });
 
       // reset duel
-      await getRepository(DuelEntity).clear();
+      await AppDataSource.getRepository(DuelEntity).clear();
       this._timestamp = 0;
 
       this.timeouts.pickDuelWinner = global.setTimeout(() => this.pickDuelWinner(), 30000);
@@ -112,7 +112,7 @@ class Duel extends Game {
 
   @command('!duel bank')
   async bank (opts: CommandOptions) {
-    const users = await getRepository(DuelEntity).find();
+    const users = await AppDataSource.getRepository(DuelEntity).find();
     const bank = users.map((o) => o.tickets).reduce((a, b) => a + b, 0);
 
     return [{
@@ -151,10 +151,10 @@ class Duel extends Game {
       }
 
       // check if user is already in duel and add points
-      const userFromDB = await getRepository(DuelEntity).findOne({ id: opts.sender.userId });
+      const userFromDB = await AppDataSource.getRepository(DuelEntity).findOneBy({ id: opts.sender.userId });
       const isNewDuelist = !userFromDB;
       if (userFromDB) {
-        await getRepository(DuelEntity).save({ ...userFromDB, tickets: Number(userFromDB.tickets) + Number(bet) });
+        await AppDataSource.getRepository(DuelEntity).save({ ...userFromDB, tickets: Number(userFromDB.tickets) + Number(bet) });
         await points.decrement({ userId: opts.sender.userId }, bet);
       } else {
         // check if under gambling cooldown
@@ -166,7 +166,7 @@ class Duel extends Game {
           if (!(this.bypassCooldownByOwnerAndMods && (isMod || isBroadcaster(opts.sender)))) {
             this._cooldown = Date.now();
           }
-          await getRepository(DuelEntity).save({
+          await AppDataSource.getRepository(DuelEntity).save({
             id:       opts.sender.userId,
             username: opts.sender.userName,
             tickets:  Number(bet),
@@ -196,7 +196,7 @@ class Duel extends Game {
         announce(response, 'duel');
       }
 
-      const tickets = (await getRepository(DuelEntity).findOne({ id: opts.sender.userId }))?.tickets ?? 0;
+      const tickets = (await AppDataSource.getRepository(DuelEntity).findOneBy({ id: opts.sender.userId }))?.tickets ?? 0;
       const response = prepare(isNewDuelist ? 'gambling.duel.joined' : 'gambling.duel.added', {
         pointsName: getPointsName(tickets),
         points:     format(general.numberFormat, 0)(tickets),

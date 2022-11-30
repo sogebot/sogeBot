@@ -5,7 +5,7 @@ require('../../general.js');
 const assert = require('assert');
 
 const _ = require('lodash');
-const { getRepository } = require('typeorm');
+const { AppDataSource } = require('../../../dest/database.js');
 
 const { User } = require('../../../dest/database/entity/user');
 const points = (require('../../../dest/systems/points')).default;
@@ -27,7 +27,7 @@ describe('Points - get() - @func1', () => {
 
   describe('User with more than safe points should return safe points', () => {
     it('create user with huge amount of points', async () => {
-      await getRepository(User).save({
+      await AppDataSource.getRepository(User).save({
         userName: hugePointsUser.userName, userId: hugePointsUser.userId, points: hugePointsUser.points,
       });
     });
@@ -40,7 +40,7 @@ describe('Points - get() - @func1', () => {
 
   describe('User with less than safe points should return unchanged points', () => {
     it('create user with normal amount of points', async () => {
-      await getRepository(User).save({
+      await AppDataSource.getRepository(User).save({
         userName: tinyPointsUser.userName, userId: tinyPointsUser.userId, points: tinyPointsUser.points,
       });
     });
@@ -59,7 +59,7 @@ describe('Points - get() - @func1', () => {
 
     for (let i = 1; i <= 10; i++) {
       it(`create user${i} with ${i*100} points`, async () => {
-        await getRepository(User).save({
+        await AppDataSource.getRepository(User).save({
           userName: `user${i}`, userId: String(i), points: i*100,
         });
       });

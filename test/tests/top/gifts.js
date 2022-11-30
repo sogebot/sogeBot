@@ -1,9 +1,8 @@
 /* global describe it before */
 const assert = require('assert');
+const { AppDataSource } = require('../../../dest/database.js');
 
 require('../../general.js');
-
-const { getRepository } = require('typeorm');
 
 const { User } = require('../../../dest/database/entity/user');
 const { getOwner } = require('../../../dest/helpers/commons/getOwner');
@@ -24,7 +23,7 @@ describe('Top - !top gifts - @func3', () => {
 
   it ('Add 10 users into db and last user will don\'t have any gifts', async () => {
     for (let i = 0; i < 10; i++) {
-      await getRepository(User).save({
+      await AppDataSource.getRepository(User).save({
         userId:           String(Math.floor(Math.random() * 100000)),
         userName:         'user' + i,
         giftedSubscribes: i * 100,

@@ -2,7 +2,7 @@ import { Carousel, CarouselInterface } from '@entity/carousel';
 import {
   Arg, Authorized, Mutation, Query, Resolver,
 } from 'type-graphql';
-import { getRepository } from 'typeorm';
+import { AppDataSource } from '~/database';
 
 import { CarouselObject } from '../schema/carousel/carouselObject';
 
@@ -11,7 +11,7 @@ export class CarouselResolver {
   @Query(returns => [CarouselObject])
   async carousels(@Arg('id', { nullable: true }) id: string) {
     if (id) {
-      return getRepository(Carousel).find({
+      return AppDataSource.getRepository(Carousel).find({
         where:  { id }, select: [
           'id', 'order', 'waitAfter',
           'waitBefore', 'duration',
@@ -20,7 +20,7 @@ export class CarouselResolver {
         ],
       });
     } else {
-      return getRepository(Carousel).find({
+      return AppDataSource.getRepository(Carousel).find({
         select: [
           'id', 'order', 'waitAfter',
           'waitBefore', 'duration',
@@ -38,8 +38,8 @@ export class CarouselResolver {
   @Arg('data') data_json: string,
   ) {
     const { base64, type } = JSON.parse(data_json);
-    const order = await getRepository(Carousel).count();
-    const item = await getRepository(Carousel).save({
+    const order = await AppDataSource.getRepository(Carousel).count();
+    const item = await AppDataSource.getRepository(Carousel).save({
       type,
       base64,
       // timers in ms
@@ -63,15 +63,15 @@ export class CarouselResolver {
   @Mutation(returns => CarouselObject)
   async carouselSave(@Arg('data') data_json: string) {
     const item: CarouselInterface = JSON.parse(data_json);
-    return getRepository(Carousel).save(item);
+    return AppDataSource.getRepository(Carousel).save(item);
   }
 
   @Authorized()
   @Mutation(returns => Boolean)
   async carouselRemove(@Arg('id') id: string) {
-    const item = await getRepository(Carousel).findOne({ id });
+    const item = await AppDataSource.getRepository(Carousel).findOneBy({ id });
     if (item) {
-      await getRepository(Carousel).remove(item);
+      await AppDataSource.getRepository(Carousel).remove(item);
     }
     return true;
   }

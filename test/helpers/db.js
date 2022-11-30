@@ -6,8 +6,6 @@ const { debug } = require('../../dest/helpers/log');
 // eslint-disable-next-line import/order
 const waitMs = require('./time').waitMs;
 
-const { getManager, getRepository } = require('typeorm');
-
 const { Alias, AliasGroup, populateCache: populateCacheAlias } = require('../../dest/database/entity/alias');
 const { Bets } = require('../../dest/database/entity/bets');
 const { Commands, CommandsCount, CommandsGroup, populateCache: populateCacheCommands } = require('../../dest/database/entity/commands');
@@ -34,59 +32,52 @@ const { Variable, VariableHistory, VariableURL } = require('../../dest/database/
 const { getIsDbConnected, getIsBotStarted } = require('../../dest/helpers/database');
 const emitter = require('../../dest/helpers/interfaceEmitter').default;
 const translation = (require('../../dest/translate')).default;
-
-let initialCleanup = true;
+const { AppDataSource } = require('../../dest/database');
 
 module.exports = {
   cleanup: async function () {
     const waitForIt = async (resolve, reject) => {
       if (!getIsBotStarted() || !translation.isLoaded || !getIsDbConnected()) {
-        debug('test', `Bot is not yet started, waiting 1s, bot: ${getIsBotStarted()} | db: ${getIsDbConnected()} | translation: ${translation.isLoaded}`);
-        return setTimeout(() => waitForIt(resolve, reject), 1000);
+        debug('test', `Bot is not yet started, waiting 100ms, bot: ${getIsBotStarted()} | db: ${getIsDbConnected()} | translation: ${translation.isLoaded}`);
+        return setTimeout(() => waitForIt(resolve, reject), 100);
       } else {
         debug('test', `Bot is started`);
-        if (initialCleanup) {
-          await waitMs(30000);
-          console.log('=============== Initial 30s wait until tests are started. =============== ');
-          initialCleanup = false;
-        }
       }
 
       const permissions = (require('../../dest/permissions')).default;
       const changelog = (require('../../dest/helpers/user/changelog'));
 
       debug('test', chalk.bgRed('*** Cleaning up collections ***'));
-      await waitMs(1000); // wait little bit for transactions to be done
       await changelog.flush();
       await waitMs(1000); // wait little bit for transactions to be done
 
       const entities = [Settings, AliasGroup, CommandsGroup, KeywordGroup, HeistUser, EventList, PointsChangelog, SongRequest, RaffleParticipant, Rank, PermissionCommands, Event, EventOperation, Variable, VariableHistory, VariableURL, Raffle, Duel, Poll, TimerResponse, Timer, UserTip, UserBit, User, ModerationPermit, Alias, Bets, Commands, CommandsCount, Quotes, Cooldown, Keyword, Price, DiscordLink];
-      if (['postgres', 'mysql'].includes((await getManager()).connection.options.type)) {
+      if (['postgres', 'mysql'].includes(AppDataSource.options.type)) {
         const metadatas = [];
         for (const entity of entities) {
-          metadatas.push((await getManager()).connection.getMetadata(entity));
+          metadatas.push(AppDataSource.getMetadata(entity));
         }
 
-        await getManager().transaction(async transactionalEntityManager => {
-          if (['mysql'].includes((await getManager()).connection.options.type)) {
+        await AppDataSource.transaction(async transactionalEntityManager => {
+          if (['mysql'].includes(AppDataSource.options.type)) {
             await transactionalEntityManager.query('SET FOREIGN_KEY_CHECKS=0;');
           }
           for (const metadata of metadatas) {
             debug('test', chalk.bgRed(`*** Cleaning up ${metadata.tableName} ***`));
 
-            if (['mysql'].includes((await getManager()).connection.options.type)) {
+            if (['mysql'].includes(AppDataSource.options.type)) {
               await transactionalEntityManager.query(`DELETE FROM \`${metadata.tableName}\` WHERE 1=1`);
             } else {
               await transactionalEntityManager.query(`DELETE FROM "${metadata.tableName}" WHERE 1=1`);
             }
           }
-          if (['mysql'].includes((await getManager()).connection.options.type)) {
+          if (['mysql'].includes(AppDataSource.options.type)) {
             await transactionalEntityManager.query('SET FOREIGN_KEY_CHECKS=1;');
           }
         });
       } else {
         for (const entity of entities) {
-          await getRepository(entity).clear();
+          await AppDataSource.getRepository(entity).clear();
         }
       }
 

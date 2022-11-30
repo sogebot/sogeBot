@@ -6,12 +6,12 @@ require('../../general.js');
 const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 const assert = require('assert');
+const { AppDataSource } = require('../../../dest/database.js');
 
 const Parser = require('../../../dest/parser').default;
 
 const owner = { userName: '__broadcaster__', userId: String(Math.floor(Math.random() * 100000)) };
 
-const { getRepository } = require('typeorm');
 const { User } = require('../../../dest/database/entity/user');
 
 describe('Parser - parse time check - @func2', async () => {
@@ -28,7 +28,7 @@ describe('Parser - parse time check - @func2', async () => {
         await db.cleanup();
         await message.prepare();
 
-        await getRepository(User).save({ userName: owner.userName, userId: owner.userId });
+        await AppDataSource.getRepository(User).save({ userName: owner.userName, userId: owner.userId });
       });
 
       let time;

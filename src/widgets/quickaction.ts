@@ -1,4 +1,4 @@
-import { getRepository } from 'typeorm';
+import { AppDataSource } from '~/database';
 
 import { parserReply } from '../commons';
 import { QuickAction as QuickActionEntity, QuickActions } from '../database/entity/dashboard';
@@ -14,7 +14,7 @@ const trigger = async (item: QuickActions.Item, user: { userId: string, userName
   info(`Quick Action ${item.id} triggered by ${user.userName}#${user.userId}`);
   switch (item.type) {
     case 'randomizer': {
-      getRepository(Randomizer).update({ id: item.options.randomizerId }, { isShown: Boolean(value) ?? false });
+      AppDataSource.getRepository(Randomizer).update({ id: item.options.randomizerId }, { isShown: Boolean(value) ?? false });
       break;
     }
     case 'command': {
@@ -51,22 +51,22 @@ class QuickAction extends Widget {
   public sockets() {
     adminEndpoint('/widgets/quickaction', 'generic::deleteById', async (id, cb) => {
       try {
-        const item = await getRepository(QuickActionEntity).findOneOrFail({ id });
-        await getRepository(QuickActionEntity).remove(item);
+        const item = await AppDataSource.getRepository(QuickActionEntity).findOneByOrFail({ id });
+        await AppDataSource.getRepository(QuickActionEntity).remove(item);
         cb(null);
       } catch (e) {
         cb(e as Error);
       }
     });
     adminEndpoint('/widgets/quickaction', 'generic::save', async (item, cb) => {
-      cb(null, await getRepository(QuickActionEntity).save(item));
+      cb(null, await AppDataSource.getRepository(QuickActionEntity).save(item));
     });
     adminEndpoint('/widgets/quickaction', 'generic::getAll', async (userId, cb) => {
-      const items = await getRepository(QuickActionEntity).find({ where: { userId } });
+      const items = await AppDataSource.getRepository(QuickActionEntity).find({ where: { userId } });
       cb(null, items);
     });
     adminEndpoint('/widgets/quickaction', 'trigger', async ({ user, id, value }) => {
-      const item = await getRepository(QuickActionEntity).findOneOrFail({ where: { id, userId: user.userId } });
+      const item = await AppDataSource.getRepository(QuickActionEntity).findOneByOrFail({ id, userId: user.userId });
       trigger(item, { userId: user.userId, userName: user.userName }, value);
     });
   }

@@ -5,13 +5,13 @@ import { JwtPayload } from 'jsonwebtoken';
 import {
   Arg, Authorized, Ctx, Mutation, Query, Resolver,
 } from 'type-graphql';
-import { getRepository } from 'typeorm';
+import { AppDataSource } from '~/database';
 
 @Resolver()
 export class WidgetCustomResolver {
   @Query(returns => [WidgetCustomInterface])
   widgetCustomGet(@Ctx('user') user: JwtPayload) {
-    return getRepository(WidgetCustom).find({
+    return AppDataSource.getRepository(WidgetCustom).find({
       where: { userId: user.userId },
       order: { name: 'DESC' },
     });
@@ -24,7 +24,7 @@ export class WidgetCustomResolver {
       @Arg('data') data: WidgetCustomInput,
       @Ctx('user') user: JwtPayload,
   ): Promise<WidgetCustomInterface> {
-    return getRepository(WidgetCustom).save({
+    return AppDataSource.getRepository(WidgetCustom).save({
       id, ...data, userId: user.userId,
     });
   }
@@ -34,7 +34,7 @@ export class WidgetCustomResolver {
   async widgetCustomRemove(@Arg('id') id: string,
     @Ctx('user') user: JwtPayload,
   ) {
-    await getRepository(WidgetCustom).delete({ id, userId: user.userId });
+    await AppDataSource.getRepository(WidgetCustom).delete({ id, userId: user.userId });
     return true;
   }
 }

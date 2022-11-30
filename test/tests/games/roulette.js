@@ -6,7 +6,7 @@ require('../../general.js');
 const assert = require('assert');
 
 const _ = require('lodash');
-const { getRepository } = require('typeorm');
+const { AppDataSource } = require('../../../dest/database.js');
 
 const { User } = require('../../../dest/database/entity/user');
 const roulette = (require('../../../dest/games/roulette')).default;
@@ -60,7 +60,7 @@ describe('game/roulette - !roulette - @func3', () => {
     before(async () => {
       await db.cleanup();
       await message.prepare();
-      await getRepository(User).save(tests[0].user);
+      await AppDataSource.getRepository(User).save(tests[0].user);
     });
 
     it(`set lose value to 100`, () => {
@@ -80,7 +80,7 @@ describe('game/roulette - !roulette - @func3', () => {
 
     it(`User should not have negative points`, async () => {
       await changelog.flush();
-      const user1 = await getRepository(User).findOne({ userId: tests[0].user.userId });
+      const user1 = await AppDataSource.getRepository(User).findOneBy({ userId: tests[0].user.userId });
       assert.strictEqual(user1.points, 0);
     });
   });
@@ -116,7 +116,7 @@ describe('game/roulette - !roulette - @func3', () => {
         await message.prepare();
         await user.prepare();
         roulette.loserWillLose = 100;
-        await getRepository(User).save({
+        await AppDataSource.getRepository(User).save({
           userId: user.viewer.userId, userName: user.viewer.userName, points: 100,
         });
       });

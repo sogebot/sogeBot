@@ -2,8 +2,8 @@ const assert = require('assert');
 
 require('../../general.js');
 
-const { getRepository } = require('typeorm');
 const { v4: uuidv4 } = require('uuid');
+const { AppDataSource } = require('../../../dest/database.js');
 
 const { Event } = require('../../../dest/database/entity/event');
 const { User } = require('../../../dest/database/entity/user');
@@ -21,7 +21,7 @@ describe('Events - cheer event - @func3', () => {
 
   describe('#1699 - Cheer event is not waiting for user to save id', function () {
     before(async function () {
-      await getRepository(Event).save({
+      await AppDataSource.getRepository(Event).save({
         id:          uuidv4(),
         name:        'cheer',
         givenName:   'Cheer alert',

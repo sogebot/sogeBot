@@ -1,6 +1,5 @@
 const assert = require('assert');
-
-const { getRepository } = require('typeorm');
+const { AppDataSource } = require('../../../dest/database.js');
 
 require('../../general.js');
 const { User } = require('../../../dest/database/entity/user');
@@ -23,7 +22,7 @@ describe('Heist - !bankheist - @func2', () => {
   describe('!bankheist when nobody joined', () => {
     before(async () => {
       await message.prepare();
-      await getRepository(User).save({
+      await AppDataSource.getRepository(User).save({
         userId: user.owner.userId, userName: user.owner.userName, points: 1000,
       });
 
@@ -35,8 +34,6 @@ describe('Heist - !bankheist - @func2', () => {
       heist.lastAnnouncedHeistInProgress = 0;
       heist.lastAnnouncedStart = 0;
       heist.showMaxUsers = 20;
-
-      console.log(heist.levelsValues);
     });
 
     it('User start new bankheist with !bankheist', async () => {
@@ -94,21 +91,21 @@ describe('Heist - !bankheist - @func2', () => {
       heist.lastAnnouncedStart = 0;
       heist.showMaxUsers = 1;
 
-      await getRepository(User).save({
+      await AppDataSource.getRepository(User).save({
         userId: user.owner.userId, userName: user.owner.userName, points: 1000,
       });
-      await getRepository(User).save({
+      await AppDataSource.getRepository(User).save({
         userId: user.viewer.userId, userName: user.viewer.userName, points: 1000,
       });
-      await getRepository(User).save({
+      await AppDataSource.getRepository(User).save({
         userId: user.viewer2.userId, userName: user.viewer2.userName, points: 1000,
       });
-      await getRepository(User).save({
+      await AppDataSource.getRepository(User).save({
         userId: user.mod.userId, userName: user.mod.userName, points: 1000,
       });
       // generate 1000 users
       for (let i=0; i < 1000; i++) {
-        await getRepository(User).save({
+        await AppDataSource.getRepository(User).save({
           userId: String(i * 9999), userName: `user${i}`, points: 1000,
         });
       }
@@ -217,7 +214,7 @@ describe('Heist - !bankheist - @func2', () => {
       heist.lastAnnouncedStart = 0;
       heist.showMaxUsers = 20;
 
-      await getRepository(User).save({
+      await AppDataSource.getRepository(User).save({
         userId: user.viewer.userId, userName: user.viewer.userName, points: 1000,
       });
     });
@@ -265,7 +262,7 @@ describe('Heist - !bankheist - @func2', () => {
       heist.copsCooldownInMinutes = 1;
       heist.entryCooldownInSeconds = 5; // adds 10 seconds to announce results
 
-      await getRepository(User).save({
+      await AppDataSource.getRepository(User).save({
         userId: user.viewer.userId, userName: user.viewer.userName, points: 1000,
       });
     });
@@ -356,12 +353,12 @@ describe('Heist - !bankheist - @func2', () => {
       heist.showMaxUsers = 20;
       heist.entryCooldownInSeconds = 5; // adds 10 seconds to announce results
 
-      await getRepository(User).save({
+      await AppDataSource.getRepository(User).save({
         userId: user.viewer.userId, userName: user.viewer.userName, points: 1000,
       });
       // generate 50 users
       for (let i=0; i < 50; i++) {
-        await getRepository(User).save({
+        await AppDataSource.getRepository(User).save({
           userId: String(i * 9999), userName: `user${i}`, points: 1000,
         });
       }
@@ -455,7 +452,7 @@ describe('Heist - !bankheist - @func2', () => {
       heist.entryCooldownInSeconds = 5; // adds 10 seconds to announce results
       heist.levelsValues = [];
 
-      await getRepository(User).save({
+      await AppDataSource.getRepository(User).save({
         userId: user.viewer.userId, userName: user.viewer.userName, points: 1000,
       });
     });

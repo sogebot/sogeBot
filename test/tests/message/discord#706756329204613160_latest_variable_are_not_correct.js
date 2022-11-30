@@ -3,9 +3,8 @@ const assert = require('assert');
 
 require('../../general.js');
 
-const { getRepository } = require('typeorm');
-
 const { setImmediateAwait } = require('../../../dest//helpers/setImmediateAwait');
+const { AppDataSource } = require('../../../dest/database.js');
 const { EventList } = require('../../../dest/database/entity/eventList');
 const { User } = require('../../../dest/database/entity/user');
 const Message = require('../../../dest/message').default;
@@ -21,14 +20,14 @@ describe('Message - https://discordapp.com/channels/317348946144002050/619437014
     await db.cleanup();
     await message.prepare();
     for (let i = 10000000; i < 10000040; i++) {
-      await getRepository(User).save({ userName: `user${i}`, userId: String(i) });
+      await AppDataSource.getRepository(User).save({ userName: `user${i}`, userId: String(i) });
     }
 
   });
 
   it ('Add 10 follow events', async () => {
     for (let i = 10000000; i < 10000010; i++) {
-      await getRepository(EventList).save({
+      await AppDataSource.getRepository(EventList).save({
         isTest:      false,
         event:       'follow',
         timestamp:   i,
@@ -41,7 +40,7 @@ describe('Message - https://discordapp.com/channels/317348946144002050/619437014
 
   it ('Add 10 sub/resub/subgift events', async () => {
     for (let i = 10000010; i < 10000020; i++) {
-      await getRepository(EventList).save({
+      await AppDataSource.getRepository(EventList).save({
         isTest:      false,
         event:       ['sub', 'resub', 'subgift'][Math.floor(Math.random() * 3)],
         timestamp:   i,
@@ -54,7 +53,7 @@ describe('Message - https://discordapp.com/channels/317348946144002050/619437014
 
   it ('Add 10 tips events', async () => {
     for (let i = 10000020; i < 10000030; i++) {
-      await getRepository(EventList).save({
+      await AppDataSource.getRepository(EventList).save({
         isTest:      false,
         event:       'tip',
         timestamp:   i,
@@ -71,7 +70,7 @@ describe('Message - https://discordapp.com/channels/317348946144002050/619437014
 
   it ('Add 10 cheer events', async () => {
     for (let i = 10000030; i < 10000040; i++) {
-      await getRepository(EventList).save({
+      await AppDataSource.getRepository(EventList).save({
         isTest:      false,
         event:       'cheer',
         timestamp:   i,

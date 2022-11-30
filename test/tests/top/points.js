@@ -6,12 +6,12 @@ require('../../general.js');
 const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 
-const { getRepository } = require('typeorm');
 const { User } = require('../../../dest/database/entity/user');
 
 const { prepare } = require('../../../dest/helpers/commons/prepare');
 const top = (require('../../../dest/systems/top')).default;
 const assert = require('assert');
+const { AppDataSource } = require('../../../dest/database');
 const twitch = require('../../../dest/services/twitch.js').default;
 
 // users
@@ -25,7 +25,7 @@ describe('Top - !top points - @func3', () => {
 
   it ('Add 10 users into db and last user will don\'t have any points', async () => {
     for (let i = 0; i < 10; i++) {
-      user = await getRepository(User).save({
+      user = await AppDataSource.getRepository(User).save({
         userId: String(Math.floor(Math.random() * 100000)),
         userName: 'user' + i,
         points: i * 15,

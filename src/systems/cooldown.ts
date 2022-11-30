@@ -5,7 +5,8 @@ import { Keyword } from '@entity/keyword';
 import * as constants from '@sogebot/ui-helpers/constants';
 import { validateOrReject } from 'class-validator';
 import _, { merge } from 'lodash';
-import { getRepository, In } from 'typeorm';
+import { In } from 'typeorm';
+import { AppDataSource } from '~/database';
 
 import { parserReply } from '../commons';
 import {
@@ -96,7 +97,7 @@ class Cooldown extends System {
     });
     app.get('/api/systems/cooldown/:id', adminMiddleware, async (req, res) => {
       res.send({
-        data: await CooldownEntity.findOne({ id: req.params.id }),
+        data: await CooldownEntity.findOneBy({ id: req.params.id }),
       });
     });
     app.delete('/api/systems/cooldown/:id', adminMiddleware, async (req, res) => {
@@ -179,7 +180,7 @@ class Cooldown extends System {
   async unset (opts: CommandOptions) {
     try {
       const [ commandOrKeyword ] = new Expects(opts.parameters).everything().toArray();
-      await getRepository(CooldownEntity).delete({ name: commandOrKeyword });
+      await AppDataSource.getRepository(CooldownEntity).delete({ name: commandOrKeyword });
       return [{ response: prepare('cooldowns.cooldown-was-unset', { command: commandOrKeyword }), ...opts }];
     } catch (e: any) {
       return this.help(opts);
@@ -242,7 +243,7 @@ class Cooldown extends System {
           }
         }
 
-        const cooldown = await getRepository(CooldownEntity).findOne({ where: [{ name }, { name: In(groupName) }] });
+        const cooldown = await AppDataSource.getRepository(CooldownEntity).findOne({ where: [{ name }, { name: In(groupName) }] });
         if (!cooldown) {
           const defaultValue = await this.getPermissionBasedSettingsValue('defaultCooldownOfCommandsInSeconds');
           const permId = await getUserHighestPermission(opts.sender.userId);
@@ -268,8 +269,8 @@ class Cooldown extends System {
         }
       } else { // text
         let [keywords, cooldowns] = await Promise.all([
-          getRepository(Keyword).find(),
-          getRepository(CooldownEntity).find(),
+          AppDataSource.getRepository(Keyword).find(),
+          AppDataSource.getRepository(CooldownEntity).find(),
         ]);
 
         keywords = keywords.filter(o => {
@@ -411,7 +412,7 @@ class Cooldown extends System {
           viewers = viewers.filter(o => o.userId !== opts.sender?.userId && o.cooldownId !== cooldown.id);
         }
         // rollback timestamp
-        await getRepository(CooldownEntity).save(cooldown);
+        await AppDataSource.getRepository(CooldownEntity).save(cooldown);
       }
     }
     cache.splice(cache.findIndex(o => o.id === opts.id), 1);
@@ -425,7 +426,7 @@ class Cooldown extends System {
         .oneOf({ values: ['global', 'user'], name: 'type' })
         .toArray();
 
-      const cooldown = await getRepository(CooldownEntity).findOne({
+      const cooldown = await AppDataSource.getRepository(CooldownEntity).findOne({
         where: {
           name,
           type: typeParameter,
@@ -436,12 +437,12 @@ class Cooldown extends System {
       }
 
       if (type === 'type') {
-        await getRepository(CooldownEntity).save({
+        await AppDataSource.getRepository(CooldownEntity).save({
           ...cooldown,
           [type]: cooldown[type] === 'global' ? 'user' : 'global',
         });
       } else {
-        await getRepository(CooldownEntity).save({
+        await AppDataSource.getRepository(CooldownEntity).save({
           ...cooldown,
           [type]: !cooldown[type],
         });

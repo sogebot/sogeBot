@@ -2,6 +2,7 @@
 
 
 const assert = require('assert');
+const { AppDataSource } = require('../../../dest/database.js');
 require('../../general.js');
 
 const db = require('../../general.js').db;
@@ -9,7 +10,6 @@ const message = require('../../general.js').message;
 
 const timers = (require('../../../dest/systems/timers')).default;
 
-const { getRepository } = require('typeorm');
 const { Timer, TimerResponse } = require('../../../dest/database/entity/timer');
 
 const { linesParsed } = require('../../../dest/helpers/parser');
@@ -50,7 +50,7 @@ describe('Timers - add() - @func2', () => {
   it('-name test -response "Lorem Ipsum"', async () => {
     const r = await timers.add({ sender: owner, parameters: '-name test -response "Lorem Ipsum"' });
 
-    const item = await getRepository(TimerResponse).findOne({ response: 'Lorem Ipsum' });
+    const item = await AppDataSource.getRepository(TimerResponse).findOneBy({ response: 'Lorem Ipsum' });
     assert(typeof item !== 'undefined');
 
     assert.strictEqual(r[0].response, `$sender, response (id: ${item.id}) for timer (name: test) was added - 'Lorem Ipsum'`);

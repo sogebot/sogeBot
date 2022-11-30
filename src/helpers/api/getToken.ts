@@ -1,8 +1,8 @@
 import { Settings } from '@entity/settings';
-import { getRepository } from 'typeorm';
+import { AppDataSource } from '~/database';
 
 async function getToken(type: 'bot' | 'broadcaster'){
-  const token = await getRepository(Settings).findOne({
+  const token = await AppDataSource.getRepository(Settings).findOne({
     where: {
       name:      type + 'AccessToken',
       namespace: '/core/oauth',

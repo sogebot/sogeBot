@@ -3,7 +3,7 @@ require('../../general.js');
 const assert = require('assert');
 
 const shortid = require('shortid');
-const { getRepository } = require('typeorm');
+const { AppDataSource } = require('../../../dest/database.js');
 
 const { Gallery } = require('../../../dest/database/entity/gallery');
 const db = require('../../general.js').db;
@@ -16,13 +16,13 @@ describe('Gallery - #4969 - id can be shortid - @func3', () => {
   });
 
   it(`Save pseudo-file with shortid`, async () => {
-    await getRepository(Gallery).save({
+    await AppDataSource.getRepository(Gallery).save({
       id, type: '', data: '', name: 'unknown',
     });
   });
 
   it(`Pseudo-file should exist in db`, async () => {
-    const count = await getRepository(Gallery).count({ id });
+    const count = await AppDataSource.getRepository(Gallery).countBy({ id });
     assert.strictEqual(count, 1);
   });
 });

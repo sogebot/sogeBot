@@ -1,5 +1,5 @@
 import { Bets as BetsEntity } from '@entity/bets';
-import { getRepository } from 'typeorm';
+import { AppDataSource } from '~/database';
 
 import Overlay from './_interface';
 
@@ -10,7 +10,7 @@ class Bets extends Overlay {
 
   public sockets() {
     publicEndpoint(this.nsp, 'data', async (callback) => {
-      const currentBet = await getRepository(BetsEntity).findOne({
+      const currentBet = await AppDataSource.getRepository(BetsEntity).findOne({
         relations: ['participations'],
         order:     { createdAt: 'DESC' },
         cache:     10000,

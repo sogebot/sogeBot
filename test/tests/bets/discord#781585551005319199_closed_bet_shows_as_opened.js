@@ -5,7 +5,6 @@ require('../../general.js');
 const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 
-const { getRepository } = require('typeorm');
 const bets = (require('../../../dest/systems/bets')).default;
 const { Bets } = require('../../../dest/database/entity/bets');
 

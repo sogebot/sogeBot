@@ -1,7 +1,7 @@
 import {
   UserBit, UserInterface, UserTip,
 } from '@entity/user';
-import { getRepository } from 'typeorm';
+import { AppDataSource } from '~/database';
 
 import type { default as currencyType } from '../../currency';
 import type { default as levelType } from '../../systems/levels';
@@ -37,7 +37,7 @@ async function _filters(
         amount = levels.getLevelOf(user);
         break;
       case 'bits': {
-        const bits = await getRepository(UserBit).find({ where: { userId: user.userId } });
+        const bits = await AppDataSource.getRepository(UserBit).find({ where: { userId: user.userId } });
         amount = bits.reduce((a, b) => (a + b.amount), 0);
         break;
       }
@@ -57,7 +57,7 @@ async function _filters(
         amount = user.subscribeTier === 'Prime' ? 0 : Number(user.subscribeTier);
         break;
       case 'tips': {
-        const tips = await getRepository(UserTip).find({ where: { userId: user.userId } });
+        const tips = await AppDataSource.getRepository(UserTip).find({ where: { userId: user.userId } });
         if (!currency) {
           currency = require('../../currency').default;
         }

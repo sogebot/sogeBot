@@ -1,7 +1,7 @@
 'use strict';
 
 import { Goal } from '@entity/goal';
-import { getRepository } from 'typeorm';
+import { AppDataSource } from '~/database';
 
 import {
   onBit, onFollow, onStartup, onSub, onTip,
@@ -24,19 +24,19 @@ class Goals extends Overlay {
 
   @onBit()
   public async onBit(bit: onEventBit) {
-    const goals = await getRepository(Goal).find({ type: 'bits' });
+    const goals = await AppDataSource.getRepository(Goal).findBy({ type: 'bits' });
     for (const goal of goals) {
       if (new Date(goal.endAfter).getTime() >= new Date().getTime() || goal.endAfterIgnore) {
-        await getRepository(Goal).increment({ id: goal.id }, 'currentAmount', bit.amount);
+        await AppDataSource.getRepository(Goal).increment({ id: goal.id }, 'currentAmount', bit.amount);
       }
     }
 
     // tips with tracking bits
-    const tipsGoals = await getRepository(Goal).find({ type: 'tips', countBitsAsTips: true });
+    const tipsGoals = await AppDataSource.getRepository(Goal).findBy({ type: 'tips', countBitsAsTips: true });
     for (const goal of tipsGoals) {
       if (new Date(goal.endAfter).getTime() >= new Date().getTime() || goal.endAfterIgnore) {
         const amount = Number(exchange(bit.amount / 100, 'USD', mainCurrency.value));
-        await getRepository(Goal).increment({ id: goal.id }, 'currentAmount', amount);
+        await AppDataSource.getRepository(Goal).increment({ id: goal.id }, 'currentAmount', amount);
       }
     }
     recountIntervals('bits');
@@ -44,11 +44,11 @@ class Goals extends Overlay {
 
   @onTip()
   public async onTip(tip: onEventTip) {
-    const goals = await getRepository(Goal).find({ type: 'tips' });
+    const goals = await AppDataSource.getRepository(Goal).findBy({ type: 'tips' });
     for (const goal of goals) {
       const amount = Number(exchange(tip.amount, tip.currency, mainCurrency.value));
       if (new Date(goal.endAfter).getTime() >= new Date().getTime() || goal.endAfterIgnore) {
-        await getRepository(Goal).increment({ id: goal.id }, 'currentAmount', amount);
+        await AppDataSource.getRepository(Goal).increment({ id: goal.id }, 'currentAmount', amount);
       }
     }
     recountIntervals('tips');
@@ -56,10 +56,10 @@ class Goals extends Overlay {
 
   @onFollow()
   public async onFollow() {
-    const goals = await getRepository(Goal).find({ type: 'followers' });
+    const goals = await AppDataSource.getRepository(Goal).findBy({ type: 'followers' });
     for (const goal of goals) {
       if (new Date(goal.endAfter).getTime() >= new Date().getTime() || goal.endAfterIgnore) {
-        await getRepository(Goal).increment({ id: goal.id }, 'currentAmount', 1);
+        await AppDataSource.getRepository(Goal).increment({ id: goal.id }, 'currentAmount', 1);
       }
     }
     recountIntervals('followers');
@@ -67,10 +67,10 @@ class Goals extends Overlay {
 
   @onSub()
   public async onSub() {
-    const goals = await getRepository(Goal).find({ type: 'subscribers' });
+    const goals = await AppDataSource.getRepository(Goal).findBy({ type: 'subscribers' });
     for (const goal of goals) {
       if (new Date(goal.endAfter).getTime() >= new Date().getTime() || goal.endAfterIgnore) {
-        await getRepository(Goal).increment({ id: goal.id }, 'currentAmount', 1);
+        await AppDataSource.getRepository(Goal).increment({ id: goal.id }, 'currentAmount', 1);
       }
     }
     recountIntervals('subscribers');

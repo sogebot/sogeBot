@@ -1,4 +1,5 @@
-import { getRepository, In, Not } from 'typeorm';
+import { In, Not } from 'typeorm';
+import { AppDataSource } from '~/database';
 
 import client from '../api/client';
 import { refresh } from '../token/refresh.js';
@@ -33,8 +34,8 @@ export async function getModerators(opts: { isWarned: boolean }) {
     const getModeratorsPaginated = await clientBroadcaster.moderation.getModeratorsPaginated(broadcasterId).getAll();
 
     await changelog.flush();
-    await getRepository(User).update({ userId: Not(In(getModeratorsPaginated.map(o => o.userId))) }, { isModerator: false });
-    await getRepository(User).update({ userId: In(getModeratorsPaginated.map(o => o.userId)) }, { isModerator: true });
+    await AppDataSource.getRepository(User).update({ userId: Not(In(getModeratorsPaginated.map(o => o.userId))) }, { isModerator: false });
+    await AppDataSource.getRepository(User).update({ userId: In(getModeratorsPaginated.map(o => o.userId)) }, { isModerator: true });
 
     setStatus('MOD', getModeratorsPaginated.map(o => o.userId).includes(botId));
   } catch (e) {

@@ -1,8 +1,8 @@
 /* global describe it before */
 
 const assert = require('assert');
+const { AppDataSource } = require('../../../dest/database');
 
-const { getRepository } = require('typeorm');
 const v4 = require('uuid').v4;
 
 const { Variable, VariableURL } = require('../../../dest/database/entity/variable');
@@ -20,7 +20,7 @@ describe('Custom Variable - helpers/customvariables/getURL - @func1', () => {
     await db.cleanup();
     await message.prepare();
 
-    const variable = await getRepository(Variable).save({
+    const variable = await AppDataSource.getRepository(Variable).save({
       variableName: '$_variable',
       readOnly: false,
       currentValue: '0',
@@ -30,8 +30,8 @@ describe('Custom Variable - helpers/customvariables/getURL - @func1', () => {
       evalValue: '',
       usableOptions: [],
     });
-    urlId = (await getRepository(VariableURL).save({ GET: true, POST: false, showResponse: false, variableId: variable.id })).id;
-    urlIdWithoutGET = (await getRepository(VariableURL).save({ GET: false, POST: false, showResponse: false, variableId: variable.id })).id;
+    urlId = (await AppDataSource.getRepository(VariableURL).save({ GET: true, POST: false, showResponse: false, variableId: variable.id })).id;
+    urlIdWithoutGET = (await AppDataSource.getRepository(VariableURL).save({ GET: false, POST: false, showResponse: false, variableId: variable.id })).id;
   });
 
   it ('with enabled GET', async () => {

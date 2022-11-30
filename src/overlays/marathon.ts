@@ -1,7 +1,7 @@
 import {
   OverlayMapper, OverlayMapperMarathon,
 } from '@entity/overlay.js';
-import { getRepository } from 'typeorm';
+import { AppDataSource } from '~/database';
 
 import { onStartup } from '../decorators/on.js';
 import Overlay from './_interface';
@@ -137,7 +137,7 @@ class Marathon extends Overlay {
 
   async updateCache() {
     const ids = [];
-    for (const overlay of await getRepository(OverlayMapper).find({ value: 'marathon' }) as OverlayMapperMarathon[]) {
+    for (const overlay of await AppDataSource.getRepository(OverlayMapper).findBy({ value: 'marathon' }) as OverlayMapperMarathon[]) {
       if (!cachedOverlays.has(overlay.id)) {
         cachedOverlays.set(overlay.id, overlay);
       }
@@ -155,7 +155,7 @@ class Marathon extends Overlay {
   async flushCache() {
     for (const value of cachedOverlays.values()) {
       // single overlay
-      await getRepository(OverlayMapper).save(value as OverlayMapperMarathon);
+      await AppDataSource.getRepository(OverlayMapper).save(value as OverlayMapperMarathon);
     }
   }
 

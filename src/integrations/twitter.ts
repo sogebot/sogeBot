@@ -10,7 +10,7 @@ import {
   ETwitterStreamEvent,
   TwitterApi,
 } from 'twitter-api-v2';
-import { getRepository } from 'typeorm';
+import { AppDataSource } from '~/database';
 
 import { settings } from '../decorators';
 import { onChange, onStartup } from '../decorators/on';
@@ -94,7 +94,7 @@ class Twitter extends Integration {
           displayname: tweet.user.name,
           url:         `https://twitter.com/${tweet.user.screen_name}/status/${tweet.id_str}`,
         };
-        getRepository(WidgetSocial).save(data);
+        AppDataSource.getRepository(WidgetSocial).save(data);
         eventEmitter.emit('tweet-post-with-hashtag', { tweet: data });
       });
       await stream?.on(ETwitterStreamEvent.ConnectionError, onError => {
@@ -132,7 +132,7 @@ class Twitter extends Integration {
       // do nothing if client is not defined
       return;
     }
-    const hashtagsToWatch = (await getRepository(Event).find({ name: 'tweet-post-with-hashtag' })).map((o) => {
+    const hashtagsToWatch = (await AppDataSource.getRepository(Event).findBy({ name: 'tweet-post-with-hashtag' })).map((o) => {
       return o.definitions.hashtag;
     });
 

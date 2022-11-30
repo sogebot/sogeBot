@@ -1,5 +1,5 @@
 import { Carousel as CarouselRepository } from '@entity/carousel';
-import { getRepository } from 'typeorm';
+import { AppDataSource } from '~/database';
 
 import { onStartup } from '../decorators/on';
 import { getApp } from '../panel';
@@ -16,7 +16,7 @@ class Carousel extends Overlay {
 
     getApp()?.get('/api/v2/carousel/image/:id', async (req, res) => {
       try {
-        const file = await getRepository(CarouselRepository).findOneOrFail({ id: req.params.id });
+        const file = await AppDataSource.getRepository(CarouselRepository).findOneByOrFail({ id: req.params.id });
         const data = Buffer.from(file.base64, 'base64');
         res.writeHead(200, {
           'Content-Type':   file.type,

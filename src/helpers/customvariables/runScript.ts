@@ -6,7 +6,7 @@ import {
   get, isNil,
 } from 'lodash';
 import { minify } from 'terser';
-import { getRepository } from 'typeorm';
+import { AppDataSource } from '~/database';
 import { VM } from 'vm2';
 
 import Message from '../../message';
@@ -127,7 +127,7 @@ async function runScript (script: string, opts: { sender: { userId: string; user
     randomViewer:           async () => getRandomViewer(),
     user:                   async (userName: string) => {
       await changelog.flush();
-      const _user = await getRepository(User).findOne({ userName });
+      const _user = await AppDataSource.getRepository(User).findOneBy({ userName });
       if (_user) {
         const userObj = {
           userName,

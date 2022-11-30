@@ -11,13 +11,12 @@ const time = require('../../general.js').time;
 const { Price } = require('../../../dest/database/entity/price');
 const customcommands = (require('../../../dest/systems/customcommands')).default;
 
-const { getRepository } = require('typeorm');
-
 const { Poll } = require('../../../dest/database/entity/poll');
 
 const { getLocalizedName } = require('@sogebot/ui-helpers/getLocalized');
 
 const assert = require('assert');
+const { AppDataSource } = require('../../../dest/database');
 
 const owner = { userName: '__broadcaster__', userId: String(Math.floor(Math.random() * 10000)) };
 
@@ -36,13 +35,13 @@ describe('TMI - redeem command - @func3', () => {
   });
 
   it(`Add price !test with emitRedeemEvent`, async () => {
-    await getRepository(Price).save({
+    await AppDataSource.getRepository(Price).save({
       command: '!test', price: 0, priceBits: 10, emitRedeemEvent: true,
     });
   });
 
   it(`Add price !test2 without emitRedeemEvent`, async () => {
-    await getRepository(Price).save({
+    await AppDataSource.getRepository(Price).save({
       command: '!test2', price: 0, priceBits: 10, emitRedeemEvent: false,
     });
   });

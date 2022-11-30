@@ -3,10 +3,10 @@
 
 require('../../general.js');
 const assert = require('assert');
-
-const { getRepository } = require('typeorm');
+const { IsNull } = require('typeorm');
 
 const commons = require('../../../dest/commons');
+const { AppDataSource } = require('../../../dest/database.js');
 const { Raffle } = require('../../../dest/database/entity/raffle');
 const { User } = require('../../../dest/database/entity/user');
 const changelog = (require('../../../dest/helpers/user/changelog'));
@@ -29,7 +29,7 @@ describe('Raffles - over max limit points not adding to raffle #3547 - @func3', 
   });
 
   it('Update viewer to have 1000 points', async () => {
-    await getRepository(User).save({
+    await AppDataSource.getRepository(User).save({
       userName: user.viewer.userName, userId: user.viewer.userId, points: 1000,
     });
   });
@@ -40,9 +40,9 @@ describe('Raffles - over max limit points not adding to raffle #3547 - @func3', 
   });
 
   it('expecting 1 participant to have bet of 100', async () => {
-    const raffle = await getRepository(Raffle).findOne({
+    const raffle = await AppDataSource.getRepository(Raffle).findOne({
       relations: ['participants'],
-      where:     { winner: null, isClosed: false },
+      where:     { winner: IsNull(), isClosed: false },
     });
     assert(raffle.participants.length === 1, 'Participant not found in raffle - ' + JSON.stringify(raffle.participants));
     assert(raffle.participants[0].tickets === 100, `Participant doesn't have correct points - ${raffle.participants[0].tickets} === 100`);
@@ -50,7 +50,7 @@ describe('Raffles - over max limit points not adding to raffle #3547 - @func3', 
 
   it('User should have 900 points', async () => {
     await changelog.flush();
-    const result = await getRepository(User).findOne({ userName: user.viewer.userName, userId: user.viewer.userId });
+    const result = await AppDataSource.getRepository(User).findOneBy({ userName: user.viewer.userName, userId: user.viewer.userId });
     assert(result.points === 900);
   });
 });

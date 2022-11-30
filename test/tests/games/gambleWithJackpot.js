@@ -6,7 +6,7 @@ require('../../general.js');
 const assert = require('assert');
 
 const _ = require('lodash');
-const { getRepository } = require('typeorm');
+const { AppDataSource } = require('../../../dest/database.js');
 
 const { User } = require('../../../dest/database/entity/user');
 const gamble = (require('../../../dest/games/gamble')).default;
@@ -36,7 +36,7 @@ describe('Gambling - gamble with Jackpot - @func1', () => {
     });
 
     it('add points for user', async () => {
-      await getRepository(User).save({
+      await AppDataSource.getRepository(User).save({
         userId: user1.userId, userName: user1.userName, points: 1000,
       });
     });

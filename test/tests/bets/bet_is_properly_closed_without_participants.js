@@ -6,7 +6,6 @@ const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 const time = require('../../general.js').time;
 
-const { getRepository } = require('typeorm');
 const bets = (require('../../../dest/systems/bets')).default;
 const { Bets } = require('../../../dest/database/entity/bets');
 
@@ -37,9 +36,9 @@ describe('Bets - @func3 - bet should automatically be locked after given time wi
       new Promise(resolve => setTimeout(() => resolve(false), 15000)),
       new Promise(resolve => {
         const check = async () => {
-          const currentBet = await Bets.findOne({
+          const currentBet = (await Bets.find({
             order: { createdAt: 'DESC' },
-          });
+          }))[0];
           if (currentBet.isLocked) {
             resolve(true);
           } else {

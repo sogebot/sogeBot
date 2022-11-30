@@ -1,6 +1,7 @@
 import { EventList, EventListInterface } from '@entity/eventList';
 import _ from 'lodash';
-import { getRepository, MoreThanOrEqual } from 'typeorm';
+import { MoreThanOrEqual } from 'typeorm';
+import { AppDataSource } from '~/database';
 
 import users from '../users';
 import Overlay from './_interface';
@@ -28,7 +29,7 @@ class Credits extends Overlay {
       const timestamp = new Date(when).getTime();
       const events: (EventListInterface & { username?: string, values?: {
         currency: Currency; amount: number;
-      };})[] = await getRepository(EventList).find({
+      };})[] = await AppDataSource.getRepository(EventList).find({
         order: { timestamp: 'DESC' },
         where: { timestamp: MoreThanOrEqual(timestamp) },
       });

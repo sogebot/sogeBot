@@ -1,6 +1,6 @@
 import { EventList } from '@entity/eventList';
 import { HOUR } from '@sogebot/ui-helpers/constants';
-import { getRepository } from 'typeorm';
+import { AppDataSource } from '~/database';
 
 import eventlist from '../../overlays/eventlist';
 import alerts from '../../registries/alerts';
@@ -29,12 +29,12 @@ export async function follow(userId: string, userName: string, followedAt: strin
       // autoban + autoblock
       tmiEmitter.emit('ban', userName);
       // remove from eventslit
-      getRepository(EventList).delete({ userId });
+      AppDataSource.getRepository(EventList).delete({ userId });
     }
     return;
   }
 
-  const followAlreadyExists = await getRepository(EventList).findOne({
+  const followAlreadyExists = await AppDataSource.getRepository(EventList).findOneBy({
     userId, event: 'follow', timestamp: new Date(followedAt).getTime(),
   });
 

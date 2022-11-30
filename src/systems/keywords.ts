@@ -3,7 +3,7 @@ import {
 } from '@entity/keyword';
 import { validateOrReject } from 'class-validator';
 import _, { merge } from 'lodash';
-import { getRepository } from 'typeorm';
+import { AppDataSource } from '~/database';
 import XRegExp from 'xregexp';
 
 import { parserReply } from '../commons';
@@ -100,7 +100,7 @@ class Keywords extends System {
         await validateOrReject(itemToSave);
         await itemToSave.save();
 
-        await getRepository(KeywordResponses).delete({ keyword: itemToSave });
+        await AppDataSource.getRepository(KeywordResponses).delete({ keyword: { id: itemToSave.id } });
         const responses = req.body.responses;
         for (const response of responses) {
           const resToSave = new KeywordResponses();
@@ -417,10 +417,10 @@ class Keywords extends System {
       const _responses: KeywordResponses[] = [];
 
       // check group filter first
-      let group: Readonly<Required<KeywordGroup>> | undefined;
+      let group: Readonly<Required<KeywordGroup>> | null;
       let groupPermission: null | string = null;
       if (k.group) {
-        group = await KeywordGroup.findOne({ name: k.group });
+        group = await KeywordGroup.findOneBy({ name: k.group });
         debug('keywords.run', JSON.stringify({ group }));
         if (group) {
           if (group.options.filter && !(await checkFilter(opts, group.options.filter))) {

@@ -1,6 +1,6 @@
 import { Gallery } from '@entity/gallery';
 import { isNil } from 'lodash';
-import { getRepository } from 'typeorm';
+import { AppDataSource } from '~/database';
 
 import { command, default_permission } from '../decorators';
 import Message from '../message';
@@ -14,7 +14,7 @@ import client from '~/services/twitch/api/client';
 class Media extends Overlay {
   sockets() {
     publicEndpoint(this.nsp, 'cache', async (galleryCacheLimitInMb: number, cb: (err: string | null, ids: string[]) => void) => {
-      const items = await getRepository(Gallery).find();
+      const items = await AppDataSource.getRepository(Gallery).find();
       cb(null, items
         .filter(o => Buffer.from(o.data.split(',')[1], 'base64').length <= galleryCacheLimitInMb * 1024 * 1024)
         .map(o => o.id),

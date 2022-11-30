@@ -9,17 +9,17 @@ const user = require('../../general.js').user;
 
 const bets = (require('../../../dest/systems/bets')).default;
 
-const { getRepository } = require('typeorm');
 const { Bets } = require('../../../dest/database/entity/bets');
 const { User } = require('../../../dest/database/entity/user');
 
 const assert = require('assert');
+const { AppDataSource } = require('../../../dest/database.js');
 
 describe('Bets - @func3 - bet should automatically be locked after given time with participants', () => {
   before(async () => {
     await db.cleanup();
     await message.prepare();
-    await getRepository(User).save({ userName: user.owner.userName , userId: user.owner.userId, points: 100 });
+    await AppDataSource.getRepository(User).save({ userName: user.owner.userName , userId: user.owner.userId, points: 100 });
   });
 
   it('Seed database with soon to be closed bet', async () => {
@@ -43,9 +43,9 @@ describe('Bets - @func3 - bet should automatically be locked after given time wi
   });
 
   it('Bet should be locked in db', async () => {
-    const currentBet = await Bets.findOne({
+    const currentBet = (await Bets.find({
       order: { createdAt: 'DESC' },
-    });
+    }))[0];
     assert(currentBet.isLocked, 'Bet was not locked after 15 seconds.');
   });
 

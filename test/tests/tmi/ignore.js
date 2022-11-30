@@ -7,7 +7,6 @@ const db = require('../../general.js').db;
 const { prepare } = require('../../../dest/helpers/commons/prepare');
 const message = require('../../general.js').message;
 
-const { getRepository } = require('typeorm');
 const { User } = require('../../../dest/database/entity/user');
 const { Settings } = require('../../../dest/database/entity/settings');
 
@@ -22,6 +21,7 @@ const nightbot = { userName: 'nightbot', userId: String(4) };
 const botwithchangedname = { userName: 'asdsadas', userId: String(24900234) };
 
 const { isIgnored } = require('../../../dest/helpers/user/isIgnored');
+const { AppDataSource } = require('../../../dest/database.js');
 
 describe('TMI - ignore - @func3', () => {
   before(async () => {
@@ -31,9 +31,9 @@ describe('TMI - ignore - @func3', () => {
     twitch.globalIgnoreListExclude = [];
     twitch.ignorelist = [];
 
-    await getRepository(User).save(testuser);
-    await getRepository(User).save(testuser2);
-    await getRepository(User).save(testuser3);
+    await AppDataSource.getRepository(User).save(testuser);
+    await AppDataSource.getRepository(User).save(testuser2);
+    await AppDataSource.getRepository(User).save(testuser3);
   });
 
   describe('Global ignore workflow', () => {
@@ -64,7 +64,7 @@ describe('TMI - ignore - @func3', () => {
     it('testuser should be in ignore list', async () => {
       const r = await twitch.ignoreCheck({ sender: owner, parameters: 'testuser' });
 
-      const item = await getRepository(Settings).findOne({
+      const item = await AppDataSource.getRepository(Settings).findOne({
         where: {
           namespace: '/services/twitch',
           name: 'ignorelist',
@@ -79,7 +79,7 @@ describe('TMI - ignore - @func3', () => {
 
     it('@testuser2 should be in ignore list', async () => {
       const r = await twitch.ignoreCheck({ sender: owner, parameters: '@testuser2' });
-      const item = await getRepository(Settings).findOne({
+      const item = await AppDataSource.getRepository(Settings).findOne({
         where: {
           namespace: '/services/twitch',
           name: 'ignorelist',
@@ -94,7 +94,7 @@ describe('TMI - ignore - @func3', () => {
 
     it('testuser3 should not be in ignore list', async () => {
       const r = await twitch.ignoreCheck({ sender: owner, parameters: 'testuser3' });
-      const item = await getRepository(Settings).findOne({
+      const item = await AppDataSource.getRepository(Settings).findOne({
         where: {
           namespace: '/services/twitch',
           name: 'ignorelist',

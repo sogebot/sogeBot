@@ -5,7 +5,7 @@ require('../../general.js');
 const assert = require('assert');
 
 const _ = require('lodash');
-const { getRepository } = require('typeorm');
+const { AppDataSource } = require('../../../dest/database.js');
 
 const { Price } = require('../../../dest/database/entity/price');
 const { User } = require('../../../dest/database/entity/user');
@@ -62,20 +62,20 @@ describe('Price - check() - @func3', () => {
     await message.prepare();
     await user.prepare();
 
-    await getRepository(User).save({ userName: user.viewer.userName, userId: user.viewer.userId });
+    await AppDataSource.getRepository(User).save({ userName: user.viewer.userName, userId: user.viewer.userId });
   });
 
   for (const test of tests) {
     it(`${test.user} with ${test.points} points calls ${test.command}, price on ${test.priceOn} set to ${test.price} and should ${test.expected ? 'pass' : 'fail'}`, async () => {
-      await getRepository(User).update({ userId: user.viewer.userId }, { points: test.points });
-      await getRepository(Price).save({ command: test.command, price: test.price });
+      await AppDataSource.getRepository(User).update({ userId: user.viewer.userId }, { points: test.points });
+      await AppDataSource.getRepository(Price).save({ command: test.command, price: test.price });
       const haveEnoughPoints = await price.check({ sender: { userName: test.user, userId: test.userId }, message: test.command });
       assert(haveEnoughPoints === test.expected);
     });
   }
 
   it(`Bits only price should return correct error response`, async () => {
-    await getRepository(Price).save({
+    await AppDataSource.getRepository(Price).save({
       command: '!me', price: 0, priceBits: 10,
     });
     const haveEnoughPoints = await price.check({ sender: { userName: user.viewer.userName, userId: user.viewer.userId }, message: '!me' });
@@ -84,8 +84,8 @@ describe('Price - check() - @func3', () => {
   });
 
   it(`Points and Bits price should return correct error response`, async () => {
-    await getRepository(User).update({ userId: user.viewer.userId }, { points: 10 });
-    await getRepository(Price).save({
+    await AppDataSource.getRepository(User).update({ userId: user.viewer.userId }, { points: 10 });
+    await AppDataSource.getRepository(Price).save({
       command: '!me', price: 100, priceBits: 10,
     });
     const haveEnoughPoints = await price.check({ sender: { userName: user.viewer.userName, userId: user.viewer.userId }, message: '!me' });
@@ -94,8 +94,8 @@ describe('Price - check() - @func3', () => {
   });
 
   it(`Points and Bits price should be OK if user have points`, async () => {
-    await getRepository(User).update({ userId: user.viewer.userId }, { points: 100 });
-    await getRepository(Price).save({
+    await AppDataSource.getRepository(User).update({ userId: user.viewer.userId }, { points: 100 });
+    await AppDataSource.getRepository(Price).save({
       command: '!me', price: 100, priceBits: 10,
     });
     const haveEnoughPoints = await price.check({ sender: { userName: user.viewer.userName, userId: user.viewer.userId }, message: '!me' });
@@ -104,7 +104,7 @@ describe('Price - check() - @func3', () => {
 
   it(`Cheer should trigger alias`, async () => {
     await alias.add({ sender: user.owner, parameters: '-a !a -c !alias' });
-    await getRepository(Price).save({
+    await AppDataSource.getRepository(Price).save({
       command: '!a', price: 100, priceBits: 10,
     });
     const TMI = require('../../../dest/services/twitch/chat').default;
@@ -121,7 +121,7 @@ describe('Price - check() - @func3', () => {
 
   it(`Cheer should trigger custom command`, async () => {
     await customcommands.add({ sender: user.owner, parameters: '-c !b -r Lorem Ipsum' });
-    await getRepository(Price).save({
+    await AppDataSource.getRepository(Price).save({
       command: '!b', price: 100, priceBits: 10,
     });
     const TMI = require('../../../dest/services/twitch/chat').default;
@@ -137,7 +137,7 @@ describe('Price - check() - @func3', () => {
   });
 
   it(`Cheer should trigger core command`, async () => {
-    await getRepository(Price).save({
+    await AppDataSource.getRepository(Price).save({
       command: '!me', price: 100, priceBits: 10,
     });
     const TMI = require('../../../dest/services/twitch/chat').default;

@@ -1,9 +1,8 @@
 import { EventList } from '@entity/eventList';
 import { UserBit, UserTip } from '@entity/user';
 import { DAY, HOUR } from '@sogebot/ui-helpers/constants';
-import {
-  getRepository, In, MoreThanOrEqual,
-} from 'typeorm';
+import { AppDataSource } from '~/database';
+import { In, MoreThanOrEqual } from 'typeorm';
 
 import type { ResponseFilter } from '.';
 
@@ -18,28 +17,28 @@ const time: Record<string, number> = {
 const count: ResponseFilter = {
   '(count|subs|#)': async function (filter) {
     const timestamp: number = time[filter.replace('(count|subs|', '').slice(0, -1).toLowerCase()] ?? DAY;
-    return await getRepository(EventList).count({
+    return await AppDataSource.getRepository(EventList).countBy({
       timestamp: MoreThanOrEqual(Date.now() - timestamp),
       event:     In(['sub', 'resub']),
     });
   },
   '(count|follows|#)': async function (filter) {
     const timestamp: number = time[filter.replace('(count|follows|', '').slice(0, -1).toLowerCase()] ?? DAY;
-    return await getRepository(EventList).count({
+    return await AppDataSource.getRepository(EventList).countBy({
       timestamp: MoreThanOrEqual(Date.now() - timestamp),
       event:     'follow',
     });
   },
   '(count|bits|#)': async function (filter) {
     const timestamp: number = time[filter.replace('(count|bits|', '').slice(0, -1).toLowerCase()] ?? DAY;
-    const events = await getRepository(UserBit).find({ cheeredAt: MoreThanOrEqual(Date.now() - timestamp) });
+    const events = await AppDataSource.getRepository(UserBit).findBy({ cheeredAt: MoreThanOrEqual(Date.now() - timestamp) });
     return events.reduce((prev, cur) => {
       return prev += cur.amount;
     }, 0);
   },
   '(count|tips|#)': async function (filter) {
     const timestamp: number = time[filter.replace('(count|tips|', '').slice(0, -1).toLowerCase()] ?? DAY;
-    const events = await getRepository(UserTip).find({ tippedAt: MoreThanOrEqual(Date.now() - timestamp) });
+    const events = await AppDataSource.getRepository(UserTip).findBy({ tippedAt: MoreThanOrEqual(Date.now() - timestamp) });
     return events.reduce((prev, cur) => {
       return prev += cur.sortAmount;
     }, 0);

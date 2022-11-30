@@ -1,8 +1,7 @@
 /* global describe it before */
 
 const assert = require('assert');
-
-const { getRepository } = require('typeorm');
+const { AppDataSource } = require('../../../dest/database');
 
 const { User } = require('../../../dest/database/entity/user');
 const { prepare } = require('../../../dest/helpers/commons/prepare');
@@ -24,7 +23,7 @@ describe('lib/twitch - subs() - @func2', () => {
 
   it('Set viewer, viewer2, viewer3 as subs', async () => {
     for (const u of [user.viewer, user.viewer2, user.viewer3]) {
-      await getRepository(User).save({
+      await AppDataSource.getRepository(User).save({
         userId: u.userId, userName: u.userName, isSubscriber: true,
       });
     }
@@ -73,7 +72,7 @@ describe('lib/twitch - subs() - @func2', () => {
   });
 
   it('Add user.viewer, user.viewer2, user.viewer3 to online users', async () => {
-    await getRepository(User).update({}, { isOnline: true });
+    await AppDataSource.getRepository(User).update({}, { isOnline: true });
   });
 
   it('!subs should return user.viewer3 and 3 online subs', async () => {

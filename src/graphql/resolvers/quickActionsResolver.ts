@@ -5,7 +5,7 @@ import { JwtPayload } from 'jsonwebtoken';
 import {
   Arg, Authorized, Ctx, Mutation, Query, Resolver,
 } from 'type-graphql';
-import { getRepository } from 'typeorm';
+import { AppDataSource } from '~/database';
 
 import { parserReply } from '../../commons';
 import { getUserSender } from '../../helpers/commons';
@@ -18,9 +18,9 @@ export class QuickActionResolver {
   @Query(returns => [SearchResultUnion])
   quickAction(@Ctx('user') user: JwtPayload, @Arg('id', { nullable: true }) id?: string) {
     if (id) {
-      return getRepository(QuickAction).find({ where: { userId: user.userId, id } });
+      return AppDataSource.getRepository(QuickAction).find({ where: { userId: user.userId, id } });
     } else {
-      return getRepository(QuickAction).find({ where: { userId: user.userId } });
+      return AppDataSource.getRepository(QuickAction).find({ where: { userId: user.userId } });
     }
   }
 
@@ -42,9 +42,9 @@ export class QuickActionResolver {
         for (const item of (data as any)[key]) {
           // get data
           if (item.order === -1) {
-            item.order = await getRepository(QuickAction).count({ userId });
+            item.order = await AppDataSource.getRepository(QuickAction).countBy({ userId });
           }
-          items.push(await getRepository(QuickAction).save({ ...item, userId }));
+          items.push(await AppDataSource.getRepository(QuickAction).save({ ...item, userId }));
         }
       }
     }
@@ -54,14 +54,14 @@ export class QuickActionResolver {
   @Authorized()
   @Mutation(returns => Boolean)
   async quickActionDelete(@Arg('id') id: string) {
-    await getRepository(QuickAction).delete(id);
+    await AppDataSource.getRepository(QuickAction).delete(id);
     return true;
   }
 
   @Authorized()
   @Mutation(returns => Boolean)
   async quickActionTrigger(@Ctx('user') user: JwtPayload, @Arg('id') id: string, @Arg('value', { nullable: true }) value: string) {
-    const item = await getRepository(QuickAction).findOneOrFail({ where: { id, userId: user.userId } });
+    const item = await AppDataSource.getRepository(QuickAction).findOneOrFail({ where: { id, userId: user.userId } });
     trigger(item, { userId: user.userId, userName: user.userName }, value);
     return true;
   }

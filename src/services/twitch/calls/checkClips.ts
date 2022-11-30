@@ -1,6 +1,6 @@
 import { debug } from 'console';
 
-import { getRepository } from 'typeorm';
+import { AppDataSource } from '~/database';
 
 import { TwitchClips } from '../../../database/entity/twitch';
 import { error, isDebugEnabled, warning } from '../../../helpers/log';
@@ -15,11 +15,11 @@ export async function checkClips () {
   }
   try {
     const clientBot = await client('bot');
-    let notCheckedClips = (await getRepository(TwitchClips).find({ isChecked: false }));
+    let notCheckedClips = (await AppDataSource.getRepository(TwitchClips).findBy({ isChecked: false }));
 
     // remove clips which failed
     for (const clip of notCheckedClips.filter((o) => new Date(o.shouldBeCheckedAt).getTime() < new Date().getTime())) {
-      await getRepository(TwitchClips).remove(clip);
+      await AppDataSource.getRepository(TwitchClips).remove(clip);
     }
     notCheckedClips = notCheckedClips.filter((o) => new Date(o.shouldBeCheckedAt).getTime() >= new Date().getTime());
     if (notCheckedClips.length === 0) { // nothing to do
@@ -29,7 +29,7 @@ export async function checkClips () {
     const getClipsByIds = await clientBot.clips.getClipsByIds(notCheckedClips.map((o) => o.clipId));
     for (const clip of getClipsByIds) {
       // clip found in twitch api
-      await getRepository(TwitchClips).update({ clipId: clip.id }, { isChecked: true });
+      await AppDataSource.getRepository(TwitchClips).update({ clipId: clip.id }, { isChecked: true });
     }
   } catch (e) {
     if (e instanceof Error) {

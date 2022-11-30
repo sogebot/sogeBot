@@ -5,8 +5,8 @@ require('../../general.js');
 const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 const assert = require('assert');
+const { AppDataSource } = require('../../../dest/database.js');
 
-const { getRepository } = require('typeorm');
 const { User } = require('../../../dest/database/entity/user');
 
 const points = (require('../../../dest/systems/points')).default;
@@ -16,9 +16,9 @@ const user1 = { userId: String(Math.floor(Math.random() * 100000)), userName: 'u
 const user2 = { userId: String(Math.floor(Math.random() * 100000)), userName: 'user2' };
 
 async function setUsersOnline(users) {
-  await getRepository(User).update({}, { isOnline: false });
+  await AppDataSource.getRepository(User).update({}, { isOnline: false });
   for (const userName of users) {
-    await getRepository(User).update({ userName }, { isOnline: true });
+    await AppDataSource.getRepository(User).update({ userName }, { isOnline: true });
   }
 }
 
@@ -27,9 +27,9 @@ describe('Points - online() - @func1', () => {
     await db.cleanup();
     await message.prepare();
 
-    await getRepository(User).save(owner);
-    await getRepository(User).save(user1);
-    await getRepository(User).save(user2);
+    await AppDataSource.getRepository(User).save(owner);
+    await AppDataSource.getRepository(User).save(user1);
+    await AppDataSource.getRepository(User).save(user2);
   });
 
   describe('Points should be correctly given', () => {

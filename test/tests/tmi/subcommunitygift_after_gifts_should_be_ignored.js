@@ -1,8 +1,8 @@
 /* global */
 const assert = require('assert');
+const { AppDataSource } = require('../../../dest/database.js');
 
 require('../../general.js');
-const { getRepository } = require('typeorm');
 
 const { User } = require('../../../dest/database/entity/user');
 const changelog = (require('../../../dest/helpers/user/changelog'));
@@ -72,7 +72,7 @@ describe('TMI - subcommunitygift after gifts should be ignored - @func3', () => 
   it('Viewer1 should have 6 subgifts', async () => {
     await time.waitMs(1000);
     await changelog.flush();
-    const _user = await getRepository(User).findOne({ userId: user.viewer.userId });
+    const _user = await AppDataSource.getRepository(User).findOneBy({ userId: user.viewer.userId });
     assert(_user.giftedSubscribes === 6, `Expected 6 (5 community + 1 normal) subgifts, got ${_user.giftedSubscribes} subgifts`);
   });
 });

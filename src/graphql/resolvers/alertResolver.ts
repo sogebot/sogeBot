@@ -4,9 +4,7 @@ import {
 import {
   Arg, Authorized, Mutation, Query, Resolver,
 } from 'type-graphql';
-import {
-  getRepository,
-} from 'typeorm';
+import { AppDataSource } from '~/database';
 import { v4 } from 'uuid';
 
 import { AlertObject } from '../schema/alert/AlertObject';
@@ -18,9 +16,9 @@ export class alertResolver {
   @Query(returns => [AlertObject])
   alerts(@Arg('id', { nullable: true }) id: string) {
     if (id) {
-      return getRepository(Alert).find({ where: { id }, relations });
+      return AppDataSource.getRepository(Alert).find({ where: { id }, relations });
     } else {
-      return getRepository(Alert).find({ relations });
+      return AppDataSource.getRepository(Alert).find({ relations });
     }
   }
 
@@ -57,7 +55,7 @@ export class alertResolver {
   @Authorized()
   @Mutation(returns => AlertObject)
   async alertClone(@Arg('id') id: string) {
-    const item = await getRepository(Alert).findOneOrFail({ where: { id }, relations });
+    const item = await AppDataSource.getRepository(Alert).findOneOrFail({ where: { id }, relations });
     const clonedItem = {
       ...item,
       id:        v4(),
@@ -119,7 +117,7 @@ export class alertResolver {
         };
       }),
     };
-    return getRepository(Alert).save(clonedItem);
+    return AppDataSource.getRepository(Alert).save(clonedItem);
   }
 
   @Authorized()
@@ -128,16 +126,16 @@ export class alertResolver {
   @Arg('data') data_json: string,
   ) {
     const data: AlertInterface = JSON.parse(data_json);
-    const alert = await getRepository(Alert).save({ ...data, updatedAt: Date.now() });
+    const alert = await AppDataSource.getRepository(Alert).save({ ...data, updatedAt: Date.now() });
     return alert;
   }
 
   @Authorized()
   @Mutation(returns => Boolean)
   async alertRemove(@Arg('id') id: string) {
-    const item = await getRepository(Alert).findOne({ id });
+    const item = await AppDataSource.getRepository(Alert).findOneBy({ id });
     if (item) {
-      await getRepository(Alert).remove(item);
+      await AppDataSource.getRepository(Alert).remove(item);
     }
     return true;
   }

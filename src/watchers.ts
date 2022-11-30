@@ -2,7 +2,7 @@ import { SECOND } from '@sogebot/ui-helpers/constants';
 import {
   cloneDeep, get, isEqual, set,
 } from 'lodash';
-import { getRepository } from 'typeorm';
+import { AppDataSource } from '~/database';
 
 import { Settings } from '~/database/entity/settings';
 import { getFunctionList } from '~/decorators/on';
@@ -80,13 +80,11 @@ export const VariableWatcher = {
       if (!isEqual(value, variables.get(k))) {
         const oldValue = variables.get(k);
         variables.set(k, value);
-        const savedSetting = await getRepository(Settings).findOne({
-          where: {
-            name:      variable,
-            namespace: checkedModule.nsp,
-          },
+        const savedSetting = await AppDataSource.getRepository(Settings).findOneBy({
+          name:      variable,
+          namespace: checkedModule.nsp,
         });
-        await getRepository(Settings).save({
+        await AppDataSource.getRepository(Settings).save({
           ...savedSetting,
           name:      variable,
           namespace: checkedModule.nsp,

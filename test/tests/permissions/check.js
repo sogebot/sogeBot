@@ -1,6 +1,5 @@
 const assert = require('assert');
-
-const { getRepository } = require('typeorm');
+const { AppDataSource } = require('../../../dest/database.js');
 
 require('../../general.js');
 const currency = require('../../../dest/currency').default;
@@ -72,12 +71,12 @@ describe('Permissions - check() - @func1', () => {
 
     for (const u of users) {
       if (typeof u.tips !== 'undefined') {
-        await getRepository(UserTip).save(u.tips);
+        await AppDataSource.getRepository(UserTip).save(u.tips);
       }
       if (typeof u.bits !== 'undefined') {
-        await getRepository(UserBit).save(u.bits);
+        await AppDataSource.getRepository(UserBit).save(u.bits);
       }
-      await getRepository(User).save(u);
+      await AppDataSource.getRepository(User).save(u);
     }
   });
 
@@ -105,7 +104,7 @@ describe('Permissions - check() - @func1', () => {
 
   describe(`Permission only for __viewer__ userId`, () => {
     beforeEach(async () => {
-      await getRepository(Permissions).save({
+      await AppDataSource.getRepository(Permissions).save({
         id:                 'bbaac669-923f-4063-99e3-f8004b34dac3',
         name:               '__viewer__only',
         order:              Object.keys(defaultPermissions).length + 1,
@@ -138,7 +137,7 @@ describe('Permissions - check() - @func1', () => {
 
   describe(`Permission only for user with 100 points (__viewer_points__)`, () => {
     beforeEach(async () => {
-      await getRepository(Permissions).save({
+      await AppDataSource.getRepository(Permissions).save({
         id:                 'bbaac669-923f-4063-99e3-f8004b34dac3',
         name:               '__viewer_points__only',
         order:              Object.keys(defaultPermissions).length + 1,
@@ -173,7 +172,7 @@ describe('Permissions - check() - @func1', () => {
 
   describe(`Permission only for user with 100h watched (__viewer_watched__)`, () => {
     beforeEach(async () => {
-      await getRepository(Permissions).save({
+      await AppDataSource.getRepository(Permissions).save({
         id:                 'bbaac669-923f-4063-99e3-f8004b34dac3',
         name:               '__viewer_watched__only',
         order:              Object.keys(defaultPermissions).length + 1,
@@ -208,7 +207,7 @@ describe('Permissions - check() - @func1', () => {
 
   describe(`Permission only for user with 100 tips (__viewer_tips__)`, () => {
     beforeEach(async () => {
-      await getRepository(Permissions).save({
+      await AppDataSource.getRepository(Permissions).save({
         id:                 'bbaac669-923f-4063-99e3-f8004b34dac3',
         name:               '__viewer_tips__only',
         order:              Object.keys(defaultPermissions).length + 1,
@@ -243,7 +242,7 @@ describe('Permissions - check() - @func1', () => {
 
   describe(`Permission only for user with 100 bits (__viewer_bits__)`, () => {
     beforeEach(async () => {
-      await getRepository(Permissions).save({
+      await AppDataSource.getRepository(Permissions).save({
         id:                 'bbaac669-923f-4063-99e3-f8004b34dac3',
         name:               '__viewer_bits__only',
         order:              Object.keys(defaultPermissions).length + 1,
@@ -278,7 +277,7 @@ describe('Permissions - check() - @func1', () => {
 
   describe(`Permission only for user with 100 messages (__viewer_messages__)`, () => {
     beforeEach(async () => {
-      await getRepository(Permissions).save({
+      await AppDataSource.getRepository(Permissions).save({
         id:                 'bbaac669-923f-4063-99e3-f8004b34dac3',
         name:               '__viewer_messages__only',
         order:              Object.keys(defaultPermissions).length + 1,
@@ -313,7 +312,7 @@ describe('Permissions - check() - @func1', () => {
 
   describe(`Permission only for user with 2 subtier (__viewer_subtier__)`, () => {
     beforeEach(async () => {
-      await getRepository(Permissions).save({
+      await AppDataSource.getRepository(Permissions).save({
         id:                 'bbaac669-923f-4063-99e3-f8004b34dac3',
         name:               '__viewer_subtier__only',
         order:              Object.keys(defaultPermissions).length + 1,
@@ -348,7 +347,7 @@ describe('Permissions - check() - @func1', () => {
 
   describe(`Permission only for user with 2 subcumulativemonths (__viewer_subcumulativemonths__)`, () => {
     beforeEach(async () => {
-      await getRepository(Permissions).save({
+      await AppDataSource.getRepository(Permissions).save({
         id:                 'bbaac669-923f-4063-99e3-f8004b34dac3',
         name:               '__viewer_subcumulativemonths__only',
         order:              Object.keys(defaultPermissions).length + 1,
@@ -383,7 +382,7 @@ describe('Permissions - check() - @func1', () => {
 
   describe(`Permission only for user with 2 substreakmonths (__viewer_substreakmonths__)`, () => {
     beforeEach(async () => {
-      await getRepository(Permissions).save({
+      await AppDataSource.getRepository(Permissions).save({
         id:                 'bbaac669-923f-4063-99e3-f8004b34dac3',
         name:               '__viewer_substreakmonths__only',
         order:              Object.keys(defaultPermissions).length + 1,
@@ -418,7 +417,7 @@ describe('Permissions - check() - @func1', () => {
 
   describe(`Permission only for user with rank Lorem Ipsum (__viewer_customrank__)`, () => {
     beforeEach(async () => {
-      await getRepository(Permissions).save({
+      await AppDataSource.getRepository(Permissions).save({
         id:                 'bbaac669-923f-4063-99e3-f9904b34dac3',
         name:               '__viewer_customrank__only',
         order:              Object.keys(defaultPermissions).length + 1,
@@ -453,7 +452,7 @@ describe('Permissions - check() - @func1', () => {
 
   describe(`Permission only for user with level 5 (__viewer_level5__)`, () => {
     beforeEach(async () => {
-      await getRepository(Permissions).save({
+      await AppDataSource.getRepository(Permissions).save({
         id:                 'bbaac999-923f-4063-99e3-f9904b34dac3',
         name:               '__viewer_level5__only',
         order:              Object.keys(defaultPermissions).length + 1,
@@ -487,7 +486,7 @@ describe('Permissions - check() - @func1', () => {
   });
   describe(`Enabled !me command should work`, () => {
     beforeEach(async () => {
-      await getRepository(PermissionCommands).clear();
+      await AppDataSource.getRepository(PermissionCommands).clear();
     });
     for (let j = 0; j < users.length; j++) {
       it (`--- ${users[j].userName} should trigger command !me`, async () => {
@@ -535,13 +534,13 @@ describe('Permissions - check() - @func1', () => {
 
   describe(`Disabled !me command should not work`, () => {
     beforeEach(async () => {
-      await getRepository(PermissionCommands).save({
+      await AppDataSource.getRepository(PermissionCommands).save({
         name:       '!me',
         permission: null,
       });
     });
     after(async () => {
-      await getRepository(PermissionCommands).clear();
+      await AppDataSource.getRepository(PermissionCommands).clear();
     });
     for (let j = 0; j < users.length; j++) {
       it (`--- ${users[j].userName} should NOT trigger disabled command !me`, async () => {

@@ -2,8 +2,7 @@
 
 require('../../general.js');
 const assert = require('assert');
-
-const { getRepository } = require('typeorm');
+const { AppDataSource } = require('../../../dest/database.js');
 
 const db = require('../../general.js').db;
 
@@ -144,7 +143,7 @@ describe('User changelog tests - @func1', () => {
       },
     };
     await changelog.flush();
-    const user = await getRepository(User).findOne('999999');
+    const user = await AppDataSource.getRepository(User).findOneBy({ userId: '999999'});
     assert.deepEqual(user, expected);
   });
 });

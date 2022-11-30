@@ -1,8 +1,8 @@
 import { Variable, VariableInterface } from '@entity/variable';
-import { getRepository } from 'typeorm';
+import { AppDataSource } from '~/database';
 
 async function addChangeToHistory(opts: { sender: any; item: VariableInterface; oldValue: any }) {
-  const variable = await getRepository(Variable).findOne({
+  const variable = await AppDataSource.getRepository(Variable).findOne({
     relations: ['history'],
     where:     { id: opts.item.id },
   });
@@ -15,7 +15,7 @@ async function addChangeToHistory(opts: { sender: any; item: VariableInterface; 
       changedAt:    Date.now(),
       variableId:   variable.id,
     });
-    await getRepository(Variable).save(variable);
+    await AppDataSource.getRepository(Variable).save(variable);
   }
 }
 

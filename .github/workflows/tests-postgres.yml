@@ -15,7 +15,7 @@ jobs:
     name: PostgreSQL tests - migration
     services:
       postgres:
-        image: postgres:11.5
+        image: postgres:15
         env:
           POSTGRES_PASSWORD: postgres
           POSTGRES_USER: postgres
@@ -53,7 +53,7 @@ jobs:
     name: PostgreSQL tests - part 1
     services:
       postgres:
-        image: postgres:11.5
+        image: postgres:15
         env:
           POSTGRES_PASSWORD: postgres
           POSTGRES_USER: postgres
@@ -97,7 +97,7 @@ jobs:
     name: PostgreSQL tests - part 2
     services:
       postgres:
-        image: postgres:11.5
+        image: postgres:15
         env:
           POSTGRES_PASSWORD: postgres
           POSTGRES_USER: postgres
@@ -141,7 +141,7 @@ jobs:
     name: PostgreSQL tests - part 3
     services:
       postgres:
-        image: postgres:11.5
+        image: postgres:15
         env:
           POSTGRES_PASSWORD: postgres
           POSTGRES_USER: postgres

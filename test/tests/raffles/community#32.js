@@ -5,7 +5,8 @@ require('../../general.js');
 const assert = require('assert');
 
 const _ = require('lodash');
-const { getRepository } = require('typeorm');
+const { IsNull } = require('typeorm');
+const { AppDataSource } = require('../../../dest/database.js');
 
 const { Raffle } = require('../../../dest/database/entity/raffle');
 const { User } = require('../../../dest/database/entity/user');
@@ -39,9 +40,9 @@ describe('/t/raffle-owner-can-join-raffle-more-then-1-time/32 - @func2', () => {
   });
 
   it('expecting only one participator', async () => {
-    const raffle = await getRepository(Raffle).findOne({
+    const raffle = await AppDataSource.getRepository(Raffle).findOne({
       relations: ['participants'],
-      where:     { winner: null, isClosed: false },
+      where:     { winner: IsNull(), isClosed: false },
     });
     assert(raffle.participants.length === 1);
   });

@@ -1,5 +1,5 @@
 import { defaults } from 'lodash';
-import { getRepository } from 'typeorm';
+import { AppDataSource } from '~/database';
 
 import { TwitchClips } from '../../../database/entity/twitch';
 import { debug, error, isDebugEnabled, warning } from '../../../helpers/log';
@@ -21,7 +21,7 @@ export async function createClip (opts: { createAfterDelay: boolean }) {
   const isClipChecked = async function (id: string) {
     return new Promise((resolve: (value: boolean) => void) => {
       const check = async () => {
-        const clip = await getRepository(TwitchClips).findOne({ clipId: id });
+        const clip = await AppDataSource.getRepository(TwitchClips).findOneBy({ clipId: id });
         if (!clip) {
           resolve(false);
         } else if (clip.isChecked) {
@@ -41,7 +41,7 @@ export async function createClip (opts: { createAfterDelay: boolean }) {
   try {
     const clientBot = await client('bot');
     const clipId = await clientBot.clips.createClip({ ...opts, channelId: broadcasterId });
-    await getRepository(TwitchClips).save({
+    await AppDataSource.getRepository(TwitchClips).save({
       clipId: clipId, isChecked: false, shouldBeCheckedAt: Date.now() + 120 * 1000,
     });
     return (await isClipChecked(clipId)) ? clipId : null;

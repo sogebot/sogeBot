@@ -42,7 +42,7 @@ async function check(userId: string, permId: string, partial = false): Promise<c
   if (generalOwners.filter(o => typeof o === 'string' && o.trim().length > 0).length === 0 && broadcasterUsername === '' && !isWarnedAboutCasters) {
     isWarnedAboutCasters = true;
     warning('Owners or broadcaster oauth is not set, all users are treated as CASTERS!!!');
-    const pItem = await Permissions.findOne({ id: defaultPermissions.CASTERS });
+    const pItem = await Permissions.findOneBy({ id: defaultPermissions.CASTERS });
     return { access: true, permission: pItem };
   }
 

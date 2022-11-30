@@ -1,4 +1,4 @@
-import { getRepository } from 'typeorm';
+import { AppDataSource } from '~/database';
 import { GooglePrivateKeys } from '~/database/entity/google';
 import { app } from '~/helpers/panel';
 import { adminMiddleware } from '~/socket';
@@ -345,18 +345,18 @@ class Google extends Service {
 
     app.get('/api/services/google/privatekeys', adminMiddleware, async (req, res) => {
       res.send({
-        data: await getRepository(GooglePrivateKeys).find(),
+        data: await AppDataSource.getRepository(GooglePrivateKeys).find(),
       });
     });
 
     app.post('/api/services/google/privatekeys', adminMiddleware, async (req, res) => {
       const data = req.body;
-      await getRepository(GooglePrivateKeys).save(data);
+      await AppDataSource.getRepository(GooglePrivateKeys).save(data);
       res.send({ data });
     });
 
     app.delete('/api/services/google/privatekeys/:id', adminMiddleware, async (req, res) => {
-      await getRepository(GooglePrivateKeys).delete({ id: req.params.id });
+      await AppDataSource.getRepository(GooglePrivateKeys).delete({ id: req.params.id });
       res.status(404).send();
     });
 

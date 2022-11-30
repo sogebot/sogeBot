@@ -10,8 +10,8 @@ const message = require('../../general.js').message;
 const customcommands = (require('../../../dest/systems/customcommands')).default;
 const { defaultPermissions } = require('../../../dest/helpers/permissions/');
 
-const { getRepository } = require('typeorm');
 const { User } = require('../../../dest/database/entity/user');
+const { AppDataSource } = require('../../../dest/database.js');
 
 // users
 const owner = { userName: '__broadcaster__', userId: String(Math.floor(Math.random() * 100000)) };
@@ -56,7 +56,7 @@ describe('Custom Commands - @func1 - edit()', () => {
     await db.cleanup();
     await message.prepare();
 
-    await getRepository(User).save({ userName: owner.userName, userId: owner.userId });
+    await AppDataSource.getRepository(User).save({ userName: owner.userName, userId: owner.userId });
   });
 
   describe('Expected parsed fail', () => {

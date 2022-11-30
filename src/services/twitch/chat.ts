@@ -10,7 +10,7 @@ import {
   ChatClient, ChatCommunitySubInfo, ChatSubGiftInfo, ChatSubInfo, ChatUser,
 } from '@twurple/chat';
 import { isNil } from 'lodash';
-import { getRepository } from 'typeorm';
+import { AppDataSource } from '~/database';
 
 import { default as apiClient } from './api/client';
 import { CustomAuthProvider } from './token/CustomAuthProvider.js';
@@ -747,7 +747,7 @@ class Chat {
         message:   messageFromUser,
         userId:    String(userId),
       };
-      await getRepository(UserBit).save(newBits);
+      await AppDataSource.getRepository(UserBit).save(newBits);
 
       eventEmitter.emit('cheer', {
         userName: username, userId, bits: bits, message: messageFromUser,
@@ -767,7 +767,7 @@ class Chat {
       let redeemTriggered = false;
       if (messageFromUser.trim().startsWith('!')) {
         try {
-          const price = await getRepository(Price).findOneOrFail({ where: { command: messageFromUser.trim().toLowerCase(), enabled: true } });
+          const price = await AppDataSource.getRepository(Price).findOneOrFail({ where: { command: messageFromUser.trim().toLowerCase(), enabled: true } });
           if (price.priceBits <= bits) {
             if (customcommands.enabled) {
               await customcommands.run({

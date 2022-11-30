@@ -10,8 +10,8 @@ const alias = (require('../../../dest/systems/alias')).default;
 const { prepare } = (require('../../../dest/helpers/commons/prepare'));
 const { defaultPermissions } = require('../../../dest/helpers/permissions/');
 
-const { getRepository } = require('typeorm');
 const { Variable } = require('../../../dest/database/entity/variable');
+const { AppDataSource } = require('../../../dest/database');
 
 describe('Alias - @func1 - #3738 - alias should trigger commands by variable', () => {
   before(async () => {
@@ -20,7 +20,7 @@ describe('Alias - @func1 - #3738 - alias should trigger commands by variable', (
   });
 
   it('create variable $_alert', async () => {
-    await getRepository(Variable).save({
+    await AppDataSource.getRepository(Variable).save({
       variableName: '$_alert',
       readOnly: false,
       currentValue: '!media type=video',

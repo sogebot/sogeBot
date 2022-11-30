@@ -1,8 +1,8 @@
 /* global describe it before */
 
 const _ = require('lodash');
-const { getRepository } = require('typeorm');
 const { v4: uuidv4 } = require('uuid');
+const { AppDataSource } = require('../../../dest/database.js');
 
 require('../../general.js');
 
@@ -44,7 +44,7 @@ describe('Events - follow event - @func3', () => {
         name:        'send-chat-message',
         definitions: { messageToSend: 'Diky za follow, $username!' },
       }];
-      await getRepository(Event).save(event);
+      await AppDataSource.getRepository(Event).save(event);
     });
 
     for (const follower of [user.viewer, user.viewer2, user.viewer3]) {

@@ -1,8 +1,8 @@
 /* global describe it before */
 
 const assert = require('assert');
+const { AppDataSource } = require('../../../dest/database');
 
-const { getRepository } = require('typeorm');
 const v4 = require('uuid').v4;
 
 const { Variable, VariableURL } = require('../../../dest/database/entity/variable');
@@ -22,7 +22,7 @@ describe('Custom Variable - helpers/customvariables/postURL - @func1', () => {
 
     postURL = require('../../../dest/helpers/customvariables/postURL').postURL;
 
-    const variable = await getRepository(Variable).save({
+    const variable = await AppDataSource.getRepository(Variable).save({
       variableName: '$_variable',
       readOnly: false,
       currentValue: '0',
@@ -33,7 +33,7 @@ describe('Custom Variable - helpers/customvariables/postURL - @func1', () => {
       usableOptions: [],
     });
 
-    const variable2 = await getRepository(Variable).save({
+    const variable2 = await AppDataSource.getRepository(Variable).save({
       variableName: '$_variable2',
       readOnly: false,
       currentValue: '0',
@@ -44,7 +44,7 @@ describe('Custom Variable - helpers/customvariables/postURL - @func1', () => {
       usableOptions: [],
     });
 
-    const variable3 = await getRepository(Variable).save({
+    const variable3 = await AppDataSource.getRepository(Variable).save({
       variableName: '$_variable3',
       readOnly: false,
       currentValue: '0',
@@ -55,10 +55,10 @@ describe('Custom Variable - helpers/customvariables/postURL - @func1', () => {
       evalValue: '',
       usableOptions: [],
     });
-    urlId = (await getRepository(VariableURL).save({ GET: false, POST: true, showResponse: false, variableId: variable.id })).id;
-    urlIdWithoutPOST = (await getRepository(VariableURL).save({ GET: false, POST: false, showResponse: false, variableId: variable.id })).id;
-    urlIdWithResponse1 = (await getRepository(VariableURL).save({ GET: false, POST: true, showResponse: true, variableId: variable2.id })).id;
-    urlIdWithResponse2 = (await getRepository(VariableURL).save({ GET: false, POST: true, showResponse: true, variableId: variable3.id })).id;
+    urlId = (await AppDataSource.getRepository(VariableURL).save({ GET: false, POST: true, showResponse: false, variableId: variable.id })).id;
+    urlIdWithoutPOST = (await AppDataSource.getRepository(VariableURL).save({ GET: false, POST: false, showResponse: false, variableId: variable.id })).id;
+    urlIdWithResponse1 = (await AppDataSource.getRepository(VariableURL).save({ GET: false, POST: true, showResponse: true, variableId: variable2.id })).id;
+    urlIdWithResponse2 = (await AppDataSource.getRepository(VariableURL).save({ GET: false, POST: true, showResponse: true, variableId: variable3.id })).id;
   });
 
   it ('with enabled POST - correct value', async () => {

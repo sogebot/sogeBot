@@ -111,7 +111,7 @@ class General extends Core {
                 type:         capitalize(type),
                 name:         system.__moduleName__,
                 permission:   await new Promise((resolve: (value: string | null) => void) => {
-                  PermissionCommands.findOneOrFail({ name })
+                  PermissionCommands.findOneByOrFail({ name })
                     .then(data => {
                       resolve(data.permission);
                     })
@@ -145,7 +145,7 @@ class General extends Core {
       if (commandToSet.permission === moduleCommand.permission) {
         await PermissionCommands.delete({ name: moduleCommand.name });
       } else {
-        const entity = await PermissionCommands.findOne({ name: moduleCommand.name }) || new PermissionCommands();
+        const entity = await PermissionCommands.findOneBy({ name: moduleCommand.name }) || new PermissionCommands();
         entity.name = moduleCommand.name;
         entity.permission = commandToSet.permission;
         await entity.save();

@@ -3,7 +3,7 @@
 import {
   Variable, VariableWatch,
 } from '@entity/variable';
-import { getRepository } from 'typeorm';
+import { AppDataSource } from '~/database';
 
 import Widget from './_interface';
 
@@ -22,8 +22,8 @@ class CustomVariables extends Widget {
   public sockets() {
     adminEndpoint('/widgets/customvariables', 'watched::save', async (items, cb) => {
       try {
-        await getRepository(VariableWatch).delete({});
-        const variables = await getRepository(VariableWatch).save(items);
+        await AppDataSource.getRepository(VariableWatch).delete({});
+        const variables = await AppDataSource.getRepository(VariableWatch).save(items);
         cb(null, variables);
       } catch (e: any) {
         cb(e.stack, []);
@@ -31,7 +31,7 @@ class CustomVariables extends Widget {
     });
     adminEndpoint('/widgets/customvariables', 'customvariables::list', async (cb) => {
       try {
-        const variables = await getRepository(Variable).find();
+        const variables = await AppDataSource.getRepository(Variable).find();
         cb(null, variables);
       } catch (e: any) {
         cb(e.stack, []);
@@ -39,7 +39,7 @@ class CustomVariables extends Widget {
     });
     adminEndpoint('/widgets/customvariables', 'list.watch', async (cb) => {
       try {
-        const variables = await getRepository(VariableWatch).find({ order: { order: 'ASC' } });
+        const variables = await AppDataSource.getRepository(VariableWatch).find({ order: { order: 'ASC' } });
         cb(null, variables);
       } catch (e: any) {
         cb(e.stack, []);

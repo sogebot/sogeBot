@@ -3,7 +3,8 @@ import { EventList as EventListDB } from '@entity/eventList';
 import { UserTip } from '@entity/user';
 import { SECOND } from '@sogebot/ui-helpers/constants';
 import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized';
-import { Between, getRepository } from 'typeorm';
+import { Between } from 'typeorm';
+import { AppDataSource } from '~/database';
 
 import alerts from '../registries/alerts';
 import users from '../users';
@@ -18,7 +19,7 @@ class EventList extends Widget {
     adminEndpoint('/widgets/eventlist', 'eventlist::removeById', async (idList, cb) => {
       const ids = Array.isArray(idList) ? [...idList] : [idList];
       for (const id of ids) {
-        await getRepository(EventListDB).update(id, { isHidden: true });
+        await AppDataSource.getRepository(EventListDB).update(id, { isHidden: true });
       }
       if (cb) {
         cb(null);
@@ -33,11 +34,11 @@ class EventList extends Widget {
     });
 
     adminEndpoint('/widgets/eventlist', 'cleanup', () => {
-      getRepository(EventListDB).update({ isHidden: false }, { isHidden: true });
+      AppDataSource.getRepository(EventListDB).update({ isHidden: false }, { isHidden: true });
     });
 
     adminEndpoint('/widgets/eventlist', 'eventlist::resend', async (id) => {
-      const event = await getRepository(EventListDB).findOne({ id: String(id) });
+      const event = await AppDataSource.getRepository(EventListDB).findOneBy({ id: String(id) });
       if (event) {
         const values = JSON.parse(event.values_json);
         const eventType = event.event + 's';
@@ -138,7 +139,7 @@ class EventList extends Widget {
 
   public async update(count: number) {
     try {
-      const events = await getRepository(EventListDB).find({
+      const events = await AppDataSource.getRepository(EventListDB).find({
         where: { isHidden: false },
         order: { timestamp: 'DESC' },
         take:  count,
@@ -163,11 +164,9 @@ class EventList extends Widget {
         // pair tips so we have sortAmount to use in eventlist filter
         if (event.event === 'tip') {
           // search in DB for corresponding tip, unfortunately pre 13.0.0 timestamp won't exactly match (we are adding 10 seconds up/down)
-          const tip = await getRepository(UserTip).findOne({
-            where: {
-              userId:   event.userId,
-              tippedAt: Between(event.timestamp - (10 * SECOND), event.timestamp + (10 * SECOND)),
-            },
+          const tip = await AppDataSource.getRepository(UserTip).findOneBy({
+            userId:   event.userId,
+            tippedAt: Between(event.timestamp - (10 * SECOND), event.timestamp + (10 * SECOND)),
           });
           tipMapping.set(event.id, tip?.sortAmount ?? 0);
         }

@@ -1,8 +1,8 @@
 /* global describe it before */
 
 const _ = require('lodash');
-const { getRepository } = require('typeorm');
 const { v4: uuidv4 } = require('uuid');
+const { AppDataSource } = require('../../../dest/database.js');
 
 require('../../general.js');
 
@@ -48,7 +48,7 @@ describe('Events - event run command should be able to run caster command and al
       },
     }];
     const a = await alias.add({ sender: user.owner, parameters: '-a !test2 -c !command -p ' + defaultPermissions.CASTERS });
-    await getRepository(Event).save(event);
+    await AppDataSource.getRepository(Event).save(event);
   });
 
   after(() => {

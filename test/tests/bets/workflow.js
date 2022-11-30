@@ -5,7 +5,7 @@ require('../../general.js');
 const assert = require('assert');
 
 const _ = require('lodash');
-const { getRepository } = require('typeorm');
+const { AppDataSource } = require('../../../dest/database.js');
 
 const { Bets } = require('../../../dest/database/entity/bets');
 const { User } = require('../../../dest/database/entity/user');
@@ -143,9 +143,9 @@ describe('Bets - @func3 - workflow()', () => {
 
         if (!s) {
           it ('Bet open should failed', async() => {
-            const currentBet = await Bets.findOne({
+            const currentBet = (await Bets.find({
               order:     { createdAt: 'DESC' },
-            });
+            }))[0];
             assert(typeof currentBet === 'undefined');
           });
         } else {
@@ -153,9 +153,9 @@ describe('Bets - @func3 - workflow()', () => {
             assert.strictEqual(r[0].response, t.response.open);
           });
           it ('!bet open should be correctly saved in db', async() => {
-            const currentBet = await Bets.findOne({
+            const currentBet = (await Bets.find({
               order:     { createdAt: 'DESC' },
-            });
+            }))[0];
 
             assert(typeof currentBet !== 'undefined');
             assert.strictEqual(currentBet.title, t.title);
@@ -165,7 +165,7 @@ describe('Bets - @func3 - workflow()', () => {
 
           for (const bet of t.bets) {
             it(`user ${bet.userName} will bet on ${bet.betOn + 1} ${bet.tickets} tickets`, async () => {
-              await getRepository(User).save({
+              await AppDataSource.getRepository(User).save({
                 userName: bet.userName , userId: bet.userId, points: 100,
               });
               await bets.participate({
@@ -185,7 +185,7 @@ describe('Bets - @func3 - workflow()', () => {
             if (t.win !== bet.betOn) {
               it(`LOST: user ${bet.userName} should have ${100 - bet.tickets} tickets`, async () => {
                 await changelog.flush();
-                const user = await getRepository(User).findOne({ userName: bet.userName , userId: bet.userId });
+                const user = await AppDataSource.getRepository(User).findOneBy({ userName: bet.userName , userId: bet.userId });
                 assert.strictEqual(user.points, 100 - bet.tickets);
               });
             } else {
@@ -193,7 +193,7 @@ describe('Bets - @func3 - workflow()', () => {
               const expected = 100 + Math.round(bet.tickets * percentGain);
               it(`WIN: user ${bet.userName} should have ${expected} tickets`, async () => {
                 await changelog.flush();
-                const user = await getRepository(User).findOne({ userName: bet.userName , userId: bet.userId });
+                const user = await AppDataSource.getRepository(User).findOneBy({ userName: bet.userName , userId: bet.userId });
                 assert.strictEqual(user.points, expected);
               });
             }
@@ -224,9 +224,9 @@ describe('Open bet twice should fail', () => {
     assert.strictEqual(r[0].response, `New bet 'Jak se umistim?' is opened! Bet options: 1. 'Vyhra', 2. 'Top 3', 3. 'Top 10'. Use !bet 1-3 <amount> to win! You have only 5min to bet!`);
   });
   it ('!bet open should be correctly saved in db', async() => {
-    const currentBet = await Bets.findOne({
+    const currentBet = (await Bets.find({
       order:     { createdAt: 'DESC' },
-    });
+    }))[0];
 
     assert(typeof currentBet !== 'undefined');
     assert.strictEqual(currentBet.title, tests.true[0].title);
@@ -286,9 +286,9 @@ describe('Bet close should fail if wrong option is given', () => {
     assert.strictEqual(r[0].response, `New bet 'Jak se umistim?' is opened! Bet options: 1. 'Vyhra', 2. 'Top 3', 3. 'Top 10'. Use !bet 1-3 <amount> to win! You have only 5min to bet!`);
   });
   it ('!bet open should be correctly saved in db', async() => {
-    const currentBet = await Bets.findOne({
+    const currentBet = (await Bets.find({
       order:     { createdAt: 'DESC' },
-    });
+    }))[0];
 
     assert(typeof currentBet !== 'undefined');
     assert.strictEqual(currentBet.title, tests.true[0].title);
@@ -329,9 +329,9 @@ describe('Incorrect participate should show info', () => {
     assert.strictEqual(r[0].response, `New bet 'Jak se umistim?' is opened! Bet options: 1. 'Vyhra', 2. 'Top 3', 3. 'Top 10'. Use !bet 1-3 <amount> to win! You have only 5min to bet!`);
   });
   it ('!bet open should be correctly saved in db', async() => {
-    const currentBet = await Bets.findOne({
+    const currentBet = (await Bets.find({
       order:     { createdAt: 'DESC' },
-    });
+    }))[0];
 
     assert(typeof currentBet !== 'undefined');
     assert.strictEqual(currentBet.title, tests.true[0].title);
@@ -382,9 +382,9 @@ describe('Bet info should show all correct states', () => {
     assert.strictEqual(r[0].response, `New bet 'Jak se umistim?' is opened! Bet options: 1. 'Vyhra', 2. 'Top 3', 3. 'Top 10'. Use !bet 1-3 <amount> to win! You have only 5min to bet!`);
   });
   it ('!bet open should be correctly saved in db', async() => {
-    const currentBet = await Bets.findOne({
+    const currentBet = (await Bets.find({
       order:     { createdAt: 'DESC' },
-    });
+    }))[0];
 
     assert(typeof currentBet !== 'undefined');
     assert.strictEqual(currentBet.title, tests.true[0].title);

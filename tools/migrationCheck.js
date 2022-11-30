@@ -9,7 +9,7 @@ const getMigrationType = require('../dest/helpers/getMigrationType').getMigratio
 async function test() {
   await new Promise((resolve, reject) => {
     try {
-      exec('npx typeorm migration:run', {
+      exec('npx typeorm migration:run -d dest/database.js', {
         env: {
           ...process.env,
           'TYPEORM_ENTITIES':   'dest/database/entity/*.js',
@@ -30,44 +30,22 @@ async function test() {
     }
   });
 
-  const expectedOutput = 'No changes in database schema were found - cannot generate a migration. To create a new empty migration use "typeorm migration:create" command\n';
-  try {
-    await new Promise((resolve, reject) => {
+  const out2 = spawn(process.platform === 'win32' ? 'npx.cmd' : 'npx', 'typeorm migration:generate -d dest/database.js --ch ./'.split(' '), {
+    env: {
+      ...process.env,
+      'TYPEORM_ENTITIES':   'dest/database/entity/*.js',
+      'TYPEORM_MIGRATIONS': `dest/database/migration/${getMigrationType(process.env.TYPEORM_CONNECTION)}/**/*.js`,
+    },
+  });
 
-      const out2 = spawn(process.platform === 'win32' ? 'npx.cmd' : 'npx', 'typeorm migration:generate -n generatedMigration'.split(' '), {
-        env: {
-          ...process.env,
-          'TYPEORM_ENTITIES':   'dest/database/entity/*.js',
-          'TYPEORM_MIGRATIONS': `dest/database/migration/${getMigrationType(process.env.TYPEORM_CONNECTION)}/**/*.js`,
-        },
-      });
+  out2.stdout.on('data', function(msg){
+    console.log(`${msg}`);
+  });
+  out2.stderr.on('data', function(msg){
+    console.error(`${msg}`);
+  });
 
-      out2.stdout.on('data', function(msg){
-        const value = msg.toString();
-        if (value === expectedOutput) {
-          resolve();
-        }
-        if (value.includes('generated successfully')) {
-          reject();
-        }
-      });
-    });
-    process.exit(0);
-  } catch {
-    await new Promise((resolve2) => {
-      exec('cat ./*generatedMigration*', (error, stdout, stderr) => {
-        console.log('\n =================================== generated migration file  =================================== \n');
-        console.log(stdout);
-        resolve2();
-      });
-    });
-
-    if (process.argv[2] === '-d') {
-      console.log('Dry run removing generated file.');
-      execSync('rm ./*generatedMigration*');
-    }
-    process.exit(1);
-  }
+  out2.on('exit', code => process.exit(code));
 }
 
 test();

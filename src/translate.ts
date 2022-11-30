@@ -4,7 +4,7 @@ import fs from 'fs';
 
 import glob from 'glob';
 import _  from 'lodash';
-import { getRepository } from 'typeorm';
+import { AppDataSource } from '~/database';
 
 import { Settings } from '~/database/entity/settings';
 import { Translation } from '~/database/entity/translation';
@@ -30,7 +30,7 @@ class Translate {
   }
 
   async _load () {
-    this.custom = await getRepository(Translation).find();
+    this.custom = await AppDataSource.getRepository(Translation).find();
     return new Promise<void>((resolve, reject) => {
       const load = async () => {
         if (!areDecoratorsLoaded) {
@@ -40,7 +40,7 @@ class Translate {
         }
 
         // we need to manually get if lang is changed so we have proper translations on init
-        const lang = await getRepository(Settings).findOne({ namespace: '/core/general', name: 'lang' });
+        const lang = await AppDataSource.getRepository(Settings).findOneBy({ namespace: '/core/general', name: 'lang' });
         if (lang) {
           setLang(JSON.parse(lang.value));
         }
@@ -70,7 +70,7 @@ class Translate {
           for (const c of this.custom) {
             if (_.isNil(flatten(this.translations.en)[c.name])) {
               // remove if lang doesn't exist anymore
-              getRepository(Translation).delete({ name: c.name });
+              AppDataSource.getRepository(Translation).delete({ name: c.name });
               this.custom = _.remove(this.custom, (i) => i.name === c.name);
             }
           }
@@ -84,7 +84,7 @@ class Translate {
 
   async _save () {
     for (const c of this.custom) {
-      await getRepository(Translation).save({
+      await AppDataSource.getRepository(Translation).save({
         name:  c.name,
         value: c.value,
       });

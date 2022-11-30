@@ -2,7 +2,6 @@ const assert = require('assert');
 
 const constants = require('@sogebot/ui-helpers/constants');
 const { dayjs } = require('@sogebot/ui-helpers/dayjsHelper');
-const { getRepository } = require('typeorm');
 
 const { User } = require('../../../dest/database/entity/user');
 const { getOwner } = require('../../../dest/helpers/commons/getOwner');
@@ -10,6 +9,7 @@ const { prepare } = require('../../../dest/helpers/commons/prepare');
 const {
   serialize,
 } = require('../../../dest/helpers/type');
+const { AppDataSource } = require('../../../dest/database');
 const twitch = require('../../../dest/services/twitch').default;
 const db = require('../../general.js').db;
 const message = require('../../general.js').message;
@@ -30,7 +30,7 @@ describe('Top - !top level - @func1', () => {
 
   it ('Add 10 users into db and last user will don\'t have any xp', async () => {
     for (let i = 0; i < 10; i++) {
-      await getRepository(User).save({
+      await AppDataSource.getRepository(User).save({
         userId:   String(Math.floor(Math.random() * 100000)),
         userName: 'user' + i,
         extra:    { levels: { xp: serialize(BigInt(i * 1234)) } },

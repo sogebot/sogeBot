@@ -9,7 +9,6 @@ const message = require('../../general.js').message;
 
 const timers = (require('../../../dest/systems/timers')).default;
 
-const { getRepository } = require('typeorm');
 const { Timer } = require('../../../dest/database/entity/timer');
 
 // users
@@ -57,7 +56,7 @@ describe('Timers - set() - @func2', () => {
       relations: ['messages'],
       where: { name: 'test' },
     });
-    assert(typeof item === 'undefined');
+    assert(item === null);
   });
 
   it('-name test -messages 20', async () => {
@@ -92,7 +91,7 @@ describe('Timers - set() - @func2', () => {
       relations: ['messages'],
       where: { name: 'test' },
     });
-    assert(typeof item === 'undefined');
+    assert(item === null);
   });
 
   it('-name test -seconds 5 -messages 6', async () => {

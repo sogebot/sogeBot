@@ -4,7 +4,7 @@ import {
 import { dayjs, timezone } from '@sogebot/ui-helpers/dayjsHelper';
 import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized';
 import { format } from '@sogebot/ui-helpers/number';
-import { getRepository } from 'typeorm';
+import { AppDataSource } from '~/database';
 
 import { dateDiff } from '../commons';
 import {
@@ -88,7 +88,7 @@ class UserInfo extends System {
   protected async subage(opts: CommandOptions): Promise<CommandResponse[]> {
     const [userName] = new Expects(opts.parameters).username({ optional: true, default: opts.sender.userName }).toArray();
     await changelog.flush();
-    const user = await getRepository(User).findOne({ userName });
+    const user = await AppDataSource.getRepository(User).findOneBy({ userName });
     const subCumulativeMonths = user?.subscribeCumulativeMonths;
     const subStreak = user?.subscribeStreak;
     const localePath = 'subage.' + (opts.sender.userName === userName.toLowerCase() ? 'successSameUsername' : 'success') + '.';
@@ -135,7 +135,7 @@ class UserInfo extends System {
   protected async age(opts: CommandOptions, retry = false): Promise<CommandResponse[]> {
     const [userName] = new Expects(opts.parameters).username({ optional: true, default: opts.sender.userName }).toArray();
     await changelog.flush();
-    const user = await getRepository(User).findOne({ userName });
+    const user = await AppDataSource.getRepository(User).findOneBy({ userName });
     if (!user || !user.createdAt) {
       try {
         const clientBot = await client('bot');
@@ -181,7 +181,7 @@ class UserInfo extends System {
     try {
       const [userName] = new Expects(opts.parameters).username().toArray();
       await changelog.flush();
-      const user = await getRepository(User).findOne({ userName: userName });
+      const user = await AppDataSource.getRepository(User).findOneBy({ userName: userName });
       if (!user || !user.seenAt) {
         return [{ response: translate('lastseen.success.never').replace(/\$username/g, userName), ...opts }];
       } else {
@@ -220,8 +220,8 @@ class UserInfo extends System {
       const message: (string | null)[] = [];
       const [user, tips, bits] = await Promise.all([
         changelog.get(opts.sender.userId),
-        getRepository(UserTip).find({ where: { userId: opts.sender.userId } }),
-        getRepository(UserBit).find({ where: { userId: opts.sender.userId } }),
+        AppDataSource.getRepository(UserTip).find({ where: { userId: opts.sender.userId } }),
+        AppDataSource.getRepository(UserBit).find({ where: { userId: opts.sender.userId } }),
       ]);
 
       if (!user) {
@@ -326,7 +326,7 @@ class UserInfo extends System {
     try {
       const userName = new Expects(opts.parameters).username().toArray()[0].toLowerCase();
       await changelog.flush();
-      const user = await getRepository(User).findOne({ where: { userName: userName.toLowerCase() } });
+      const user = await AppDataSource.getRepository(User).findOneBy({ userName: userName.toLowerCase() });
 
       if (!user) {
         throw Error(`User ${userName} not found.`);

@@ -4,7 +4,8 @@ import {
 import {
   Arg, Authorized, Mutation, Query, Resolver,
 } from 'type-graphql';
-import { getRepository, IsNull } from 'typeorm';
+import { AppDataSource } from '~/database';
+import { IsNull } from 'typeorm';
 
 import { GoalGroupObject, GoalsCurrent } from '~/graphql/schema/goals';
 import { stats } from '~/helpers/api';
@@ -15,9 +16,9 @@ export class goalsResolver {
   @Query(returns => [GoalGroupObject])
   goals(@Arg('id', { nullable: true }) id: string) {
     if (id) {
-      return getRepository(GoalGroup).find({ where: { id }, relations: ['goals'] });
+      return AppDataSource.getRepository(GoalGroup).find({ where: { id }, relations: ['goals'] });
     } else {
-      return getRepository(GoalGroup).find({ relations: ['goals'] });
+      return AppDataSource.getRepository(GoalGroup).find({ relations: ['goals'] });
     }
   }
 
@@ -35,8 +36,8 @@ export class goalsResolver {
     @Arg('data') data_json: string,
   ): Promise<GoalGroupInterface> {
     const data: GoalGroupInterface = JSON.parse(data_json);
-    const item = await getRepository(GoalGroup).save(data);
-    getRepository(Goal).delete({ groupId: IsNull() });
+    const item = await AppDataSource.getRepository(GoalGroup).save(data);
+    AppDataSource.getRepository(Goal).delete({ groupId: IsNull() });
 
     const toRecount = new Set();
     data.goals?.forEach(goal => {
@@ -53,9 +54,9 @@ export class goalsResolver {
   @Authorized()
   @Mutation(returns => Boolean)
   async goalsRemove(@Arg('id') id: string) {
-    const item = await getRepository(GoalGroup).findOne({ id });
+    const item = await AppDataSource.getRepository(GoalGroup).findOneBy({ id });
     if (item) {
-      await getRepository(GoalGroup).remove(item);
+      await AppDataSource.getRepository(GoalGroup).remove(item);
     }
     return true;
   }

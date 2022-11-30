@@ -2,7 +2,8 @@ import { HowLongToBeatGame } from '@entity/howLongToBeatGame';
 import { CacheGames } from '@entity/cacheGames';
 import * as constants from '@sogebot/ui-helpers/constants';
 import { HowLongToBeatService } from 'howlongtobeat';
-import { EntityNotFoundError, getRepository } from 'typeorm';
+import { EntityNotFoundError } from 'typeorm';
+import { AppDataSource } from '~/database';
 
 import { command, default_permission } from '../decorators';
 import { onStartup } from '../decorators/on';
@@ -84,7 +85,7 @@ class HowLongToBeat extends System {
     app.get('/api/systems/hltb', adminMiddleware, async (req, res) => {
       res.send({
         data:       await HowLongToBeatGame.find(),
-        thumbnails: await getRepository(CacheGames).find(),
+        thumbnails: await AppDataSource.getRepository(CacheGames).find(),
       });
     });
     app.post('/api/systems/hltb/:id', async (req, res) => {

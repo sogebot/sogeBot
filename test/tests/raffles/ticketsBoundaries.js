@@ -5,7 +5,7 @@ require('../../general.js');
 const assert = require('assert');
 
 const _ = require('lodash');
-const { getRepository } = require('typeorm');
+const { AppDataSource } = require('../../../dest/database.js');
 
 const { RaffleParticipant } = require('../../../dest/database/entity/raffle');
 const { User } = require('../../../dest/database/entity/user');
@@ -34,20 +34,20 @@ describe('Raffles - user should be able to compete within boundaries of tickets 
   });
 
   it('create testuser/testuser2/testuser3 with max points', async () => {
-    await getRepository(User).delete({ userName: testuser.userName });
-    await getRepository(User).delete({ userName: testuser2.userName });
-    await getRepository(User).delete({ userName: testuser3.userName });
-    await getRepository(User).delete({ userName: testuser4.userName });
-    await getRepository(User).save({
+    await AppDataSource.getRepository(User).delete({ userName: testuser.userName });
+    await AppDataSource.getRepository(User).delete({ userName: testuser2.userName });
+    await AppDataSource.getRepository(User).delete({ userName: testuser3.userName });
+    await AppDataSource.getRepository(User).delete({ userName: testuser4.userName });
+    await AppDataSource.getRepository(User).save({
       userName: testuser.userName, userId: testuser.userId, points: max,
     });
-    await getRepository(User).save({
+    await AppDataSource.getRepository(User).save({
       userName: testuser2.userName, userId: testuser2.userId, points: max,
     });
-    await getRepository(User).save({
+    await AppDataSource.getRepository(User).save({
       userName: testuser3.userName, userId: testuser3.userId, points: max,
     });
-    await getRepository(User).save({
+    await AppDataSource.getRepository(User).save({
       userName: testuser4.userName, userId: testuser4.userId, points: max,
     });
   });
@@ -73,18 +73,18 @@ describe('Raffles - user should be able to compete within boundaries of tickets 
   });
 
   it('we should have only 2 raffle participants', async () => {
-    assert.strictEqual(await getRepository(RaffleParticipant).count(), 2);
+    assert.strictEqual(await AppDataSource.getRepository(RaffleParticipant).count(), 2);
   });
 
   for (const viewer of [testuser.userName, testuser2.userName]) {
     it(`user ${viewer} should be in raffle participants`, async () => {
-      assert.strictEqual(await getRepository(RaffleParticipant).count({ username: viewer }), 1);
+      assert.strictEqual(await AppDataSource.getRepository(RaffleParticipant).countBy({ username: viewer }), 1);
     });
   }
 
   for (const viewer of [testuser3.userName, testuser4.userName]) {
     it(`user ${viewer} should not be in raffle participants`, async () => {
-      assert.strictEqual(await getRepository(RaffleParticipant).count({ username: viewer }), 0);
+      assert.strictEqual(await AppDataSource.getRepository(RaffleParticipant).countBy({ username: viewer }), 0);
     });
   }
 });

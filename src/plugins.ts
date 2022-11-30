@@ -269,7 +269,7 @@ class Plugins extends Core {
               const variableName = node.data.value;
               const defaultValue = (JSON.parse(node.data.data) as any).value;
 
-              const variable = await PluginVariable.findOne({ variableName, pluginId });
+              const variable = await PluginVariable.findOneBy({ variableName, pluginId });
               sandbox.variables[variableName] = variable ? JSON.parse(variable.value) : defaultValue;
             }
           }
@@ -344,7 +344,7 @@ class Plugins extends Core {
             const variableName = node.data.value;
             const defaultValue = (JSON.parse(node.data.data) as any).value;
 
-            const variable = await PluginVariable.findOne({ variableName, pluginId });
+            const variable = await PluginVariable.findOneBy({ variableName, pluginId });
             variables[variableName] = variable ? JSON.parse(variable.value) : defaultValue;
             break;
           }

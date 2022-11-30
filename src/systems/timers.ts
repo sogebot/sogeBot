@@ -20,6 +20,7 @@ import { linesParsed } from '~/helpers/parser';
 import { defaultPermissions } from '~/helpers/permissions/index';
 import { adminMiddleware } from '~/socket';
 import { translate } from '~/translate';
+import { onStartup } from '~/decorators/on';
 
 /*
  * !timers                                                                                                                                 - gets an info about timers usage
@@ -34,15 +35,6 @@ import { translate } from '~/translate';
  */
 
 class Timers extends System {
-  constructor () {
-    super();
-
-    this.addMenu({
-      category: 'manage', name: 'timers', id: 'manage/timers', this: this,
-    });
-    this.init();
-  }
-
   sockets() {
     if (!app) {
       setTimeout(() => this.sockets(), 100);
@@ -56,7 +48,7 @@ class Timers extends System {
     });
     app.get('/api/systems/timer/:id', adminMiddleware, async (req, res) => {
       res.send({
-        data: await Timer.findOne({ id: req.params.id }, { relations: ['messages'] }),
+        data: await Timer.findOne({ where: { id: req.params.id }, relations: ['messages'] }),
       });
     });
     app.delete('/api/systems/timer/:id', adminMiddleware, async (req, res) => {
@@ -70,7 +62,7 @@ class Timers extends System {
         await validateOrReject(itemToSave);
         await itemToSave.save();
 
-        await TimerResponse.delete({ timer: itemToSave });
+        await TimerResponse.delete({ timer: { id: itemToSave.id } });
         const responses = req.body.messages;
         for (const response of responses) {
           const resToSave = new TimerResponse();
@@ -96,11 +88,16 @@ class Timers extends System {
     return [{ response: translate('core.usage') + ' => ' + url, ...opts }];
   }
 
+  @onStartup()
   async init () {
     if (!isDbConnected) {
       setTimeout(() => this.init(), 1000);
       return;
     }
+
+    this.addMenu({
+      category: 'manage', name: 'timers', id: 'manage/timers', this: this,
+    });
     const timers = await Timer.find({ relations: ['messages'] });
     for (const timer of timers) {
       timer.triggeredAtMessages = 0;
@@ -213,7 +210,7 @@ class Timers extends System {
       name = nameMatch[1];
     }
 
-    const timer = await Timer.findOne({ name: name });
+    const timer = await Timer.findOneBy({ name: name });
     if (!timer) {
       return [{ response: translate('timers.timer-not-found').replace(/\$name/g, name), ...opts }];
     }
@@ -333,7 +330,7 @@ class Timers extends System {
     }
 
     if (!_.isNil(id)) {
-      const response = await TimerResponse.findOne({ id });
+      const response = await TimerResponse.findOneBy({ id });
       if (!response) {
         return [{ response: translate('timers.response-not-found').replace(/\$id/g, id), ...opts }];
       }
@@ -348,7 +345,7 @@ class Timers extends System {
     }
 
     if (!_.isNil(name)) {
-      const timer = await Timer.findOne({ name: name });
+      const timer = await Timer.findOneBy({ name: name });
       if (!timer) {
         return [{ response: translate('timers.timer-not-found').replace(/\$name/g, name), ...opts }];
       }

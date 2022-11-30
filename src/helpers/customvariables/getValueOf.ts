@@ -1,6 +1,6 @@
 import { Variable } from '@entity/variable';
 import { isNil } from 'lodash';
-import { getRepository } from 'typeorm';
+import { AppDataSource } from '~/database';
 
 import { check } from '../permissions/';
 import { runScript } from './runScript';
@@ -9,7 +9,7 @@ async function getValueOf (variableName: string, opts?: any) {
   if (!variableName.startsWith('$_')) {
     variableName = `$_${variableName}`;
   }
-  const item = await getRepository(Variable).findOne({ variableName });
+  const item = await AppDataSource.getRepository(Variable).findOneBy({ variableName });
   if (!item) {
     return '';
   } // return empty if variable doesn't exist
@@ -23,7 +23,7 @@ async function getValueOf (variableName: string, opts?: any) {
         _current: item.currentValue,
         ...opts,
       });
-      await getRepository(Variable).save({ ...item, currentValue });
+      await AppDataSource.getRepository(Variable).save({ ...item, currentValue });
     }
   }
 

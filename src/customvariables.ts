@@ -1,7 +1,8 @@
 import { setTimeout } from 'timers';
 
 import { isNil } from 'lodash';
-import { getRepository, IsNull } from 'typeorm';
+import { AppDataSource } from '~/database';
+import { IsNull } from 'typeorm';
 
 import Core from '~/_interface';
 import {
@@ -29,12 +30,12 @@ class CustomVariables extends Core {
 
   sockets () {
     adminEndpoint('/core/customvariables', 'customvariables::list', async (cb) => {
-      const variables = await getRepository(Variable).find({ relations: ['history', 'urls'] });
+      const variables = await AppDataSource.getRepository(Variable).find({ relations: ['history', 'urls'] });
       cb(null, variables);
     });
     adminEndpoint('/core/customvariables', 'customvariables::runScript', async (id, cb) => {
       try {
-        const item = await getRepository(Variable).findOne({ id: String(id) });
+        const item = await AppDataSource.getRepository(Variable).findOneBy({ id: String(id) });
         if (!item) {
           throw new Error('Variable not found');
         }
@@ -42,7 +43,7 @@ class CustomVariables extends Core {
           sender: null, _current: item.currentValue, isUI: true,
         });
         const runAt = Date.now();
-        cb(null, await getRepository(Variable).save({
+        cb(null, await AppDataSource.getRepository(Variable).save({
           ...item, currentValue: newCurrentValue, runAt,
         }));
       } catch (e: any) {
@@ -63,13 +64,13 @@ class CustomVariables extends Core {
       cb(null, returnedValue);
     });
     adminEndpoint('/core/customvariables', 'customvariables::isUnique', async ({ variable, id }, cb) => {
-      cb(null, (await getRepository(Variable).find({ variableName: String(variable) })).filter(o => o.id !== id).length === 0);
+      cb(null, (await AppDataSource.getRepository(Variable).find({ where: { variableName: String(variable) } })).filter(o => o.id !== id).length === 0);
     });
     adminEndpoint('/core/customvariables', 'customvariables::delete', async (id, cb) => {
-      const item = await getRepository(Variable).findOne({ id: String(id) });
+      const item = await AppDataSource.getRepository(Variable).findOneBy({ id: String(id) });
       if (item) {
-        await getRepository(Variable).remove(item);
-        await getRepository(VariableWatch).delete({ variableId: String(id) });
+        await AppDataSource.getRepository(Variable).remove(item);
+        await AppDataSource.getRepository(VariableWatch).delete({ variableId: String(id) });
         updateWidgetAndTitle();
       }
       if (cb) {
@@ -78,11 +79,11 @@ class CustomVariables extends Core {
     });
     adminEndpoint('/core/customvariables', 'customvariables::save', async (item, cb) => {
       try {
-        const savedItem = await getRepository(Variable).save(item);
+        const savedItem = await AppDataSource.getRepository(Variable).save(item);
         // somehow this is not populated by save on sqlite
         if (savedItem.urls) {
           for (const url of savedItem.urls) {
-            await getRepository(VariableURL).save({
+            await AppDataSource.getRepository(VariableURL).save({
               ...url,
               variable: savedItem,
             });
@@ -91,14 +92,14 @@ class CustomVariables extends Core {
         // somehow this is not populated by save on sqlite
         if (savedItem.history) {
           for (const history of savedItem.history) {
-            await getRepository(VariableHistory).save({
+            await AppDataSource.getRepository(VariableHistory).save({
               ...history,
               variable: savedItem,
             });
           }
         }
-        await getRepository(VariableHistory).delete({ variableId: IsNull() });
-        await getRepository(VariableURL).delete({ variableId: IsNull() });
+        await AppDataSource.getRepository(VariableHistory).delete({ variableId: IsNull() });
+        await AppDataSource.getRepository(VariableURL).delete({ variableId: IsNull() });
 
         updateWidgetAndTitle(savedItem.variableName);
         csEmitter.emit('variable-changed', savedItem.variableName);
@@ -116,7 +117,7 @@ class CustomVariables extends Core {
     }
 
     clearTimeout(this.timeouts[`${this.constructor.name}.checkIfCacheOrRefresh`]);
-    const items = await getRepository(Variable).find({ type: 'eval' });
+    const items = await AppDataSource.getRepository(Variable).find({ where: { type: 'eval' } });
 
     for (const item of items as Required<VariableInterface>[]) {
       try {
@@ -128,7 +129,7 @@ class CustomVariables extends Core {
           });
           item.runAt = Date.now();
           item.currentValue = newValue;
-          await getRepository(Variable).save(item);
+          await AppDataSource.getRepository(Variable).save(item);
           await updateWidgetAndTitle(item.variableName);
         }
       } catch (e: any) {

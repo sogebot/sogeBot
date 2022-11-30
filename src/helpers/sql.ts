@@ -1,4 +1,4 @@
-import { getManager } from 'typeorm';
+import { AppDataSource } from '~/database';
 
 import { isDbConnected } from '~/helpers/database';
 import { debug } from '~/helpers/log';
@@ -14,7 +14,7 @@ if (['mysql', 'mariadb'].includes(process.env.TYPEORM_CONNECTION ?? 'better-sqli
         setTimeout(() => updateSQLVariableLimit(), 10);
         return;
       }
-      const query = await getManager().query(`show variables like 'max_prepared_stmt_count'`);
+      const query = await AppDataSource.query(`show variables like 'max_prepared_stmt_count'`);
       SQLVariableLimit = Number(query[0].Value);
       debug('sql', `Variable limit for MySQL/MariaDB set dynamically to ${SQLVariableLimit}`);
     };

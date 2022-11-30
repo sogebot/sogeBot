@@ -1,8 +1,8 @@
 import { Variable } from '@entity/variable';
-import { getRepository } from 'typeorm';
+import { AppDataSource } from '~/database';
 
 async function isVariableSet (variableName: string) {
-  return getRepository(Variable).findOne({ variableName });
+  return AppDataSource.getRepository(Variable).findOneBy({ variableName });
 }
 
 export { isVariableSet };

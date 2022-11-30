@@ -6,9 +6,9 @@ require('../../general.js');
 
 const db = require('../../general.js').db;
 const assert = require('assert');
+const { AppDataSource } = require('../../../dest/database.js');
 const message = require('../../general.js').message;
 
-const { getManager } = require('typeorm');
 const { Quotes } = require('../../../dest/database/entity/quotes');
 
 const quotes = (require('../../../dest/systems/quotes')).default;
@@ -56,7 +56,7 @@ describe('Quotes - set() - @func3', () => {
             assert.strictEqual(responses[0].response, `$sender, quote ${id} tags were set. (tags: ${test.tags})`);
           });
           it('Tags should be changed', async () => {
-            const item = await getManager()
+            const item = await AppDataSource
               .createQueryBuilder()
               .select('quote')
               .from(Quotes, 'quote')
@@ -69,13 +69,13 @@ describe('Quotes - set() - @func3', () => {
             assert.strictEqual(responses[0].response, `$sender, quote ${test.id} was not found.`);
           });
           it('Quote should not be created', async () => {
-            const item = await getManager()
+            const item = await AppDataSource
               .createQueryBuilder()
               .select('quote')
               .from(Quotes, 'quote')
               .where('id = :id', { id: test.id })
               .getOne();
-            assert(typeof item === 'undefined');
+            assert(item === null);
           });
         }
       }

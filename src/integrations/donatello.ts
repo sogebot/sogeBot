@@ -1,7 +1,7 @@
 import { Currency, UserTip, UserTipInterface } from '@entity/user';
 import * as constants from '@sogebot/ui-helpers/constants';
 import axios from 'axios';
-import { getRepository } from 'typeorm';
+import { AppDataSource } from '~/database';
 
 import { persistent, settings } from '../decorators';
 import { onStartup } from '../decorators/on.js';
@@ -157,7 +157,7 @@ class Donatello extends Integration {
           exchangeRates: rates,
           userId:        user.userId,
         };
-        getRepository(UserTip).save(newTip);
+        AppDataSource.getRepository(UserTip).save(newTip);
       } catch {
         return this.parse(data, true);
       }

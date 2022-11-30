@@ -4,7 +4,7 @@ import { setTimeout } from 'timers';
 import chalk from 'chalk';
 import _ from 'lodash';
 import type { Namespace } from 'socket.io/dist/namespace';
-import { getRepository } from 'typeorm';
+import { AppDataSource } from '~/database';
 import { v4 as uuid } from 'uuid';
 
 import { ClientToServerEventsWithNamespace } from '../d.ts/src/helpers/socket';
@@ -99,13 +99,11 @@ class Module {
     if (!_.isEqual(_.get(this, '_enabled', true), value)) {
       _.set(this, '_enabled', value);
       value ? enabled.enable(this.nsp) : enabled.disable(this.nsp);
-      getRepository(Settings).findOne({
-        where: {
-          name:      'enabled',
-          namespace: this.nsp,
-        },
+      AppDataSource.getRepository(Settings).findOneBy({
+        name:      'enabled',
+        namespace: this.nsp,
       }).then(data => {
-        getRepository(Settings).save({
+        AppDataSource.getRepository(Settings).save({
           ...data,
           name:      'enabled',
           value:     JSON.stringify(value),
@@ -205,7 +203,7 @@ class Module {
   }
 
   public async loadVariableValue(key: string) {
-    const variable = await getRepository(Settings)
+    const variable = await AppDataSource.getRepository(Settings)
       .createQueryBuilder('settings')
       .select('settings')
       .where('namespace=:namespace', { namespace: this.nsp })
@@ -221,7 +219,7 @@ class Module {
     }, 1000);
 
     try {
-      if (typeof variable !== 'undefined') {
+      if (variable) {
         // check if object and if all keys are same
         // e.g. default { 'a': '', 'b': '' }, but loaded have only 'a' key, should not remove 'b' key
         const value = JSON.parse(variable.value);
@@ -272,7 +270,7 @@ class Module {
         });
 
         // load command from db
-        const dbc = await getRepository(Settings)
+        const dbc = await AppDataSource.getRepository(Settings)
           .createQueryBuilder('settings')
           .select('settings')
           .where('namespace = :namespace', { namespace: this.nsp })
@@ -282,7 +280,7 @@ class Module {
           dbc.value = JSON.parse(dbc.value);
           if (c.name === dbc.value) {
             // remove if default value
-            await getRepository(Settings)
+            await AppDataSource.getRepository(Settings)
               .createQueryBuilder('settings')
               .delete()
               .where('namespace = :namespace', { namespace: this.nsp })
@@ -521,7 +519,7 @@ class Module {
       promisedSettings._permissions = {};
       for (const command of this._commands) {
         const name = typeof command === 'string' ? command : command.name;
-        const pItem = await PermissionCommands.findOne({ name });
+        const pItem = await PermissionCommands.findOneBy({ name });
         if (pItem) {
           promisedSettings._permissions[name] = pItem.permission;
         } else {
@@ -727,7 +725,7 @@ class Module {
   }
 
   protected async loadCommand(command: string): Promise<void> {
-    const cmd = await getRepository(Settings)
+    const cmd = await AppDataSource.getRepository(Settings)
       .createQueryBuilder('settings')
       .select('settings')
       .where('namespace = :namespace', { namespace: this.nsp })
@@ -755,20 +753,18 @@ class Module {
     if (c) {
       if (c.name === updated) {
         // default value
-        await getRepository(Settings).delete({
+        await AppDataSource.getRepository(Settings).delete({
           namespace: this.nsp,
           name:      'commands.' + command,
         });
         delete c.command;
       } else {
         c.command = updated;
-        const savedCommand = await getRepository(Settings).findOne({
-          where: {
-            namespace: this.nsp,
-            name:      'commands.' + command,
-          },
+        const savedCommand = await AppDataSource.getRepository(Settings).findOneBy({
+          namespace: this.nsp,
+          name:      'commands.' + command,
         });
-        await getRepository(Settings).save({
+        await AppDataSource.getRepository(Settings).save({
           ...savedCommand,
           namespace: this.nsp,
           name:      'commands.' + command,

@@ -13,8 +13,8 @@ const user = require('../../general.js').user;
 const assert = require('assert');
 const _ = require('lodash');
 
-const { getRepository } = require('typeorm');
 const { Variable } = require('../../../dest/database/entity/variable');
+const { AppDataSource } = require('../../../dest/database');
 
 // stub
 _.set(global, 'widgets.custom_variables.io.emit', function () {
@@ -33,7 +33,7 @@ describe('Custom Variable - #3379 - Command reply should return correct reply - 
   });
 
   it(`Create initial value 0 of $_variable`, async () => {
-    await getRepository(Variable).save({
+    await AppDataSource.getRepository(Variable).save({
       variableName: '$_variable',
       readOnly: false,
       currentValue: '0',

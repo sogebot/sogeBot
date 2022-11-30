@@ -1,6 +1,6 @@
 const _ = require('lodash');
-const { getRepository } = require('typeorm');
 const { v4: uuidv4 } = require('uuid');
+const { AppDataSource } = require('../../../dest/database.js');
 
 require('../../general.js');
 
@@ -40,7 +40,7 @@ describe('Events - event run command should correctly parse filters and be able 
         isCommandQuiet: false,
       },
     }];
-    await getRepository(Event).save(event);
+    await AppDataSource.getRepository(Event).save(event);
 
     const command = new Commands();
     command.id =        '1a945d76-2d3c-4c7a-ae03-e0daf17142c5';

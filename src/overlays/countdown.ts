@@ -1,6 +1,6 @@
 import { OverlayMapper } from '@entity/overlay.js';
 import { MINUTE, SECOND } from '@sogebot/ui-helpers/constants';
-import { getRepository } from 'typeorm';
+import { AppDataSource } from '~/database';
 import { app } from '~/helpers/panel';
 
 import Overlay from './_interface';
@@ -43,7 +43,7 @@ class Countdown extends Overlay {
 
       let resetTime = 0;
       if (req.params.operation.includes('reset')) {
-        const overlay = await getRepository(OverlayMapper).findOne(req.params.id);
+        const overlay = await AppDataSource.getRepository(OverlayMapper).findOneBy({ id: req.params.id });
         if (overlay && overlay.value === 'countdown') {
           resetTime = overlay.opts?.currentTime ?? 0;
         }
@@ -80,10 +80,10 @@ class Countdown extends Overlay {
       statusUpdate.delete(data.id);
 
       // we need to check if persistent
-      const overlay = await getRepository(OverlayMapper).findOne(data.id);
+      const overlay = await AppDataSource.getRepository(OverlayMapper).findOneBy({ id: data.id });
       if (overlay && overlay.value === 'countdown') {
         if (overlay.opts && overlay.opts.isPersistent) {
-          await getRepository(OverlayMapper).update(data.id, {
+          await AppDataSource.getRepository(OverlayMapper).update(data.id, {
             opts: {
               ...overlay.opts,
               currentTime: data.time,

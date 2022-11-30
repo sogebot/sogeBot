@@ -1,12 +1,12 @@
 const assert = require('assert');
 
 const { MINUTE } = require('@sogebot/ui-helpers/constants');
-const { getRepository } = require('typeorm');
 const { v4 } = require('uuid');
 
 require('../../../general.js');
 
 const { DiscordLink } = require('../../../../dest/database/entity/discord');
+const { AppDataSource } = require('../../../../dest/database.js');
 const discord = (require('../../../../dest/integrations/discord')).default;
 const db = require('../../../general.js').db;
 const message = require('../../../general.js').message;
@@ -23,8 +23,7 @@ describe('integrations/discord - !link - @func2', () => {
       discord.status({ state: true });
 
       for (let i=0; i<100; i++) {
-        await getRepository(DiscordLink).save({
-          id:        v4(),
+        await AppDataSource.getRepository(DiscordLink).save({
           tag:       'test@0123',
           discordId: 'n/a',
           createdAt: Date.now() - (MINUTE / 2) * i,
@@ -42,7 +41,7 @@ describe('integrations/discord - !link - @func2', () => {
     });
 
     it('We should have only 20 links', async () => {
-      const count = await getRepository(DiscordLink).count();
+      const count = await AppDataSource.getRepository(DiscordLink).count();
       assert(count === 20, `Expected 20 links, got ${count}`);
     });
   });
@@ -88,7 +87,7 @@ describe('integrations/discord - !link - @func2', () => {
     });
 
     it('We should have one link in DiscordLink', async () => {
-      const data = await getRepository(DiscordLink).findAndCount();
+      const data = await AppDataSource.getRepository(DiscordLink).findAndCount();
       assert(data[1] === 1, `Expected 1 link, got ${data[1]}`);
       link = data[0][0];
     });
@@ -102,7 +101,7 @@ describe('integrations/discord - !link - @func2', () => {
     });
 
     it('Accounts should be linked in DiscordLink', async () => {
-      const discord_link = await getRepository(DiscordLink).findOne();
+      const discord_link = (await AppDataSource.getRepository(DiscordLink).find())[0];
       assert(discord_link.userId === user.viewer.userId, `Link is not properly linked.\n${JSON.stringify(link, null, 2)}`);
     });
 
@@ -115,7 +114,7 @@ describe('integrations/discord - !link - @func2', () => {
     });
 
     it('Accounts should be linked in DiscordLink to first user', async () => {
-      const discord_link = await getRepository(DiscordLink).findOne();
+      const discord_link = (await AppDataSource.getRepository(DiscordLink).find())[0];
       assert(discord_link.userId === user.viewer.userId, `Link is not properly linked.\n${JSON.stringify(link, null, 2)}`);
     });
 
@@ -127,7 +126,7 @@ describe('integrations/discord - !link - @func2', () => {
     });
 
     it('We should have zero link in DiscordLink', async () => {
-      const count = await getRepository(DiscordLink).count();
+      const count = await AppDataSource.getRepository(DiscordLink).count();
       assert(count === 0, `Expected 0 links, got ${count}`);
     });
   });

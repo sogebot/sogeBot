@@ -13,19 +13,14 @@ import chalk from 'chalk';
 import figlet from 'figlet';
 import gitCommitInfo from 'git-commit-info';
 import _ from 'lodash';
-import { createConnection, getConnectionOptions } from 'typeorm';
-import { MysqlConnectionOptions } from 'typeorm/driver/mysql/MysqlConnectionOptions';
-
-import { monkeypatch } from './database/sqlite-transaction-monkeypatch';
 
 import { autoLoad } from '~/helpers/autoLoad';
-import { setIsBotStarted } from '~/helpers/database';
-import { getMigrationType } from '~/helpers/getMigrationType';
+import { setIsBotStarted, setIsDbConnected } from '~/helpers/database';
 import {
-  debug, error, info, isDebugEnabled, setDEBUG, warning,
+  error, info, isDebugEnabled, setDEBUG, warning,
 } from '~/helpers/log';
-import { TypeORMLogger } from '~/helpers/logTypeorm';
 import { startWatcher } from '~/watchers';
+import { AppDataSource } from '~/database';
 
 // Add stacktrace to console.log
 const log = console.log;
@@ -36,50 +31,23 @@ console.log = function() {
 };
 
 const connect = async function () {
-  const connectionOptions = await getConnectionOptions();
   const type = process.env.TYPEORM_CONNECTION;
   if (!type) {
     error('Set your db in .env or as ENVIROMNENT VARIABLES');
     process.exit(1);
   }
 
-  debug('connection', { connectionOptions });
+  await AppDataSource.initialize();
+  await AppDataSource.runMigrations();
 
-  if (type === 'mysql' || type === 'mariadb') {
-    await createConnection({
-      ...connectionOptions,
-      connectTimeout: 60000,
-      acquireTimeout: 120000,
-      logging:        ['error'],
-      logger:         new TypeORMLogger(),
-      synchronize:    false,
-      migrationsRun:  true,
-      charset:        'UTF8MB4_GENERAL_CI',
-      entities:       [ 'dest/database/entity/*.js' ],
-      subscribers:    [ 'dest/database/entity/*.js' ],
-      migrations:     [ `dest/database/migration/${getMigrationType(connectionOptions.type)}/**/*.js` ],
-    } as MysqlConnectionOptions);
-  } else {
-    monkeypatch();
-    await createConnection({
-      ...connectionOptions,
-      logging:       ['error'],
-      logger:        new TypeORMLogger(),
-      synchronize:   false,
-      migrationsRun: true,
-      entities:      [ 'dest/database/entity/*.js' ],
-      subscribers:   [ 'dest/database/entity/*.js' ],
-      migrations:    [ `dest/database/migration/${getMigrationType(connectionOptions.type)}/**/*.js` ],
-    });
-  }
   const typeToLog = {
     'better-sqlite3': 'SQLite3',
     mariadb:          'MySQL/MariaDB',
     mysql:            'MySQL/MariaDB',
     postgres:         'PostgreSQL',
   };
-  await new Promise( resolve => setTimeout(resolve, 3000, null) );
-  info(`Initialized ${typeToLog[type as keyof typeof typeToLog]} database (${normalize(String(connectionOptions.database))})`);
+  info(`Initialized ${typeToLog[type as keyof typeof typeToLog]} database (${normalize(String(AppDataSource.options.database))})`);
+  setIsDbConnected();
 };
 
 async function main () {

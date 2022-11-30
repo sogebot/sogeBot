@@ -1,10 +1,9 @@
 /* global */
 const assert = require('assert');
 
-const { getRepository } = require('typeorm');
-
 require('../../general.js');
 const { Alias, AliasGroup } = require('../../../dest/database/entity/alias');
+const { AppDataSource } = require('../../../dest/database');
 const { prepare } = (require('../../../dest/helpers/commons/prepare'));
 const { defaultPermissions } = require('../../../dest/helpers/permissions/');
 const alias = (require('../../../dest/systems/alias')).default;
@@ -20,7 +19,7 @@ describe('Alias - @func1 - #4860 - alias group permissions and filter should be 
   });
 
   it('create filterGroup with filter | $game === "Dota 2"', async () => {
-    await getRepository(AliasGroup).insert({
+    await AppDataSource.getRepository(AliasGroup).insert({
       name:    'filterGroup',
       options: {
         filter:     '$game === "Dota 2"',
@@ -30,7 +29,7 @@ describe('Alias - @func1 - #4860 - alias group permissions and filter should be 
   });
 
   it('create permGroup with permission | CASTERS', async () => {
-    await getRepository(AliasGroup).insert({
+    await AppDataSource.getRepository(AliasGroup).insert({
       name:    'permGroup',
       options: {
         filter:     null,
@@ -40,7 +39,7 @@ describe('Alias - @func1 - #4860 - alias group permissions and filter should be 
   });
 
   it('create permGroup2 without permission', async () => {
-    await getRepository(AliasGroup).insert({
+    await AppDataSource.getRepository(AliasGroup).insert({
       name:    'permGroup2',
       options: {
         filter:     null,
@@ -50,7 +49,7 @@ describe('Alias - @func1 - #4860 - alias group permissions and filter should be 
   });
 
   it('create alias !testfilter with filterGroup', async () => {
-    await getRepository(Alias).insert({
+    await AppDataSource.getRepository(Alias).insert({
       id:         '1a945d76-2d3c-4c7a-ae03-e0daf17142c5',
       alias:      '!testfilter',
       command:    '!me',
@@ -62,7 +61,7 @@ describe('Alias - @func1 - #4860 - alias group permissions and filter should be 
   });
 
   it('create alias !testpermnull with permGroup', async () => {
-    await getRepository(Alias).insert({
+    await AppDataSource.getRepository(Alias).insert({
       id:         '2584b3c1-d2da-4fae-bf9a-95048724acde',
       alias:      '!testpermnull',
       command:    '!me',
@@ -74,7 +73,7 @@ describe('Alias - @func1 - #4860 - alias group permissions and filter should be 
   });
 
   it('create alias !testpermnull2 with permGroup2', async () => {
-    await getRepository(Alias).insert({
+    await AppDataSource.getRepository(Alias).insert({
       id:         'ed5f2925-ba73-4146-906b-3856d2583b6a',
       alias:      '!testpermnull2',
       command:    '!me',
@@ -86,7 +85,7 @@ describe('Alias - @func1 - #4860 - alias group permissions and filter should be 
   });
 
   it('create alias !testpermmods with permGroup', async () => {
-    await getRepository(Alias).insert({
+    await AppDataSource.getRepository(Alias).insert({
       id:         '2d33f59d-4900-454e-9d3a-22472ae1d3a7',
       alias:      '!testpermmods',
       command:    '!me',

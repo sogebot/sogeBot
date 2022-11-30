@@ -10,9 +10,9 @@ const { defaultPermissions,check } = require('../../../dest/helpers/permissions/
 const Parser = require('../../../dest/parser').default;
 const currency = require('../../../dest/currency').default;
 
-const { getRepository } = require('typeorm');
 const { Permissions, PermissionCommands } = require('../../../dest/database/entity/permissions');
 const { User } = require('../../../dest/database/entity/user');
+const { AppDataSource } = require('../../../dest/database.js');
 
 const users = [
   { userName: '__viewer__', userId: String(6), id: 6 },
@@ -25,12 +25,12 @@ describe('Permissions - https://community.sogebot.xyz/t/spotify-user-banlist/192
     await message.prepare();
 
     for (const u of users) {
-      await getRepository(User).save(u);
+      await AppDataSource.getRepository(User).save(u);
     }
   });
 
   it('Add permission with excluded __excluded_viewer__', async () => {
-    await getRepository(Permissions).save({
+    await AppDataSource.getRepository(Permissions).save({
       id: 'bbaac669-923f-4063-99e3-f8004b34dac3',
       name: '__permission_with_excluded_user__',
       order: Object.keys(defaultPermissions).length + 1,

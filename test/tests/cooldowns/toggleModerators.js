@@ -2,6 +2,7 @@
 require('../../general.js');
 
 const assert = require('assert');
+const { AppDataSource } = require('../../../dest/database.js');
 
 const db = require('../../general.js').db;
 const message = require('../../general.js').message;
@@ -9,7 +10,6 @@ const url = require('../../general.js').url;
 
 const cooldown = (require('../../../dest/systems/cooldown')).default;
 
-const { getRepository } = require('typeorm');
 const { User } = require('../../../dest/database/entity/user');
 
 // users
@@ -21,8 +21,8 @@ describe('Cooldowns - toggleModerators() - @func3', () => {
     await db.cleanup();
     await message.prepare();
 
-    await getRepository(User).save({ userName: owner.userName, userId: owner.userId });
-    await getRepository(User).save({ userName: mod.userName, userId: mod.userId, isModerator: true });
+    await AppDataSource.getRepository(User).save({ userName: owner.userName, userId: owner.userId });
+    await AppDataSource.getRepository(User).save({ userName: mod.userName, userId: mod.userId, isModerator: true });
   });
 
   it('incorrect toggle', async () => {

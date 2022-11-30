@@ -1,9 +1,9 @@
 /* global */
 
 const assert = require('assert');
+const { AppDataSource } = require('../../../dest/database.js');
 
 require('../../general.js');
-const { getRepository, getConnection } = require('typeorm');
 
 const { Permissions } = require('../../../dest/database/entity/permissions');
 const { defaultPermissions } = require('../../../dest/helpers/permissions/defaultPermissions');
@@ -15,13 +15,13 @@ const user = require('../../general.js').user;
 
 describe('#5583 - If lower permission allows, then it should be allowed - @func1', () => {
   after(async () => {
-    await getConnection()
+    await AppDataSource
       .createQueryBuilder()
       .delete()
       .from(Permissions)
       .where('1 = 1')
       .execute();
-    await getRepository(Permissions).insert({
+    await AppDataSource.getRepository(Permissions).insert({
       id:                 defaultPermissions.CASTERS,
       name:               'Casters',
       automation:         'casters',
@@ -32,7 +32,7 @@ describe('#5583 - If lower permission allows, then it should be allowed - @func1
       excludeUserIds:     [],
       filters:            [],
     });
-    await getRepository(Permissions).insert({
+    await AppDataSource.getRepository(Permissions).insert({
       id:                 defaultPermissions.MODERATORS,
       name:               'Moderators',
       automation:         'moderators',
@@ -43,7 +43,7 @@ describe('#5583 - If lower permission allows, then it should be allowed - @func1
       excludeUserIds:     [],
       filters:            [],
     });
-    await getRepository(Permissions).insert({
+    await AppDataSource.getRepository(Permissions).insert({
       id:                 defaultPermissions.SUBSCRIBERS,
       name:               'Subscribers',
       automation:         'subscribers',
@@ -54,7 +54,7 @@ describe('#5583 - If lower permission allows, then it should be allowed - @func1
       excludeUserIds:     [],
       filters:            [],
     });
-    await getRepository(Permissions).insert({
+    await AppDataSource.getRepository(Permissions).insert({
       id:                 defaultPermissions.VIP,
       name:               'VIP',
       automation:         'vip',
@@ -65,7 +65,7 @@ describe('#5583 - If lower permission allows, then it should be allowed - @func1
       excludeUserIds:     [],
       filters:            [],
     });
-    await getRepository(Permissions).insert({
+    await AppDataSource.getRepository(Permissions).insert({
       id:                 defaultPermissions.VIEWERS,
       name:               'Viewers',
       automation:         'viewers',
@@ -83,13 +83,13 @@ describe('#5583 - If lower permission allows, then it should be allowed - @func1
     await message.prepare();
     await user.prepare();
 
-    await getConnection()
+    await AppDataSource
       .createQueryBuilder()
       .delete()
       .from(Permissions)
       .where('1 = 1')
       .execute();
-    await getRepository(Permissions).insert({
+    await AppDataSource.getRepository(Permissions).insert({
       id:                 defaultPermissions.CASTERS,
       name:               'Casters',
       automation:         'casters',
@@ -102,7 +102,7 @@ describe('#5583 - If lower permission allows, then it should be allowed - @func1
     });
     moderation.__permission_based__cLinksEnabled[defaultPermissions.CASTERS] = true;
 
-    await getRepository(Permissions).insert({
+    await AppDataSource.getRepository(Permissions).insert({
       id:                 defaultPermissions.MODERATORS,
       name:               'Moderators',
       automation:         'moderators',
@@ -114,7 +114,7 @@ describe('#5583 - If lower permission allows, then it should be allowed - @func1
       filters:            [],
     });
     moderation.__permission_based__cLinksEnabled[defaultPermissions.MODERATORS] = true;
-    await getRepository(Permissions).insert({
+    await AppDataSource.getRepository(Permissions).insert({
       id:                 '262e0172-bf00-41d7-b363-346bea52838b',
       name:               'Test',
       automation:         'moderators',
@@ -125,7 +125,7 @@ describe('#5583 - If lower permission allows, then it should be allowed - @func1
       excludeUserIds:     [],
       filters:            [],
     });
-    await getRepository(Permissions).insert({
+    await AppDataSource.getRepository(Permissions).insert({
       id:                 '162e0172-bf00-41d7-b363-346bea52838b',
       name:               'Test 2',
       automation:         'moderators',
@@ -136,7 +136,7 @@ describe('#5583 - If lower permission allows, then it should be allowed - @func1
       excludeUserIds:     [],
       filters:            [],
     });
-    await getRepository(Permissions).insert({
+    await AppDataSource.getRepository(Permissions).insert({
       id:                 defaultPermissions.SUBSCRIBERS,
       name:               'Subscribers',
       automation:         'subscribers',
@@ -149,7 +149,7 @@ describe('#5583 - If lower permission allows, then it should be allowed - @func1
     });
     moderation.__permission_based__cLinksEnabled[defaultPermissions.SUBSCRIBERS] = true;
 
-    await getRepository(Permissions).insert({
+    await AppDataSource.getRepository(Permissions).insert({
       id:                 defaultPermissions.VIP,
       name:               'VIP',
       automation:         'vip',
@@ -162,7 +162,7 @@ describe('#5583 - If lower permission allows, then it should be allowed - @func1
     });
     moderation.__permission_based__cLinksEnabled[defaultPermissions.VIP] = true;
 
-    await getRepository(Permissions).insert({
+    await AppDataSource.getRepository(Permissions).insert({
       id:                 defaultPermissions.VIEWERS,
       name:               'Viewers',
       automation:         'viewers',

@@ -8,7 +8,7 @@ import { template } from '~/plugins/template';
 import { sendMessage } from '~/helpers/commons/sendMessage';
 import { getBotSender } from '~/helpers/commons';
 import * as changelog from '~/helpers/user/changelog.js';
-import { getRepository } from 'typeorm';
+import { AppDataSource } from '~/database';
 import { User } from '~/database/entity/user';
 import { isBroadcaster } from '~/helpers/user/isBroadcaster';
 import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized';
@@ -30,12 +30,12 @@ export default async function(pluginId: string, currentNode: Node<string>, param
     const sandbox = {
       variable: {
         async load(variableName: string) {
-          const variable = await PluginVariable.findOne({ variableName, pluginId });
+          const variable = await PluginVariable.findOneBy({ variableName, pluginId });
           debug('plugins', `Variable ${variableName} loaded: ${JSON.stringify({ variable }, null, 2)}`);
           return variable?.value ? JSON.parse(variable.value) : undefined;
         },
         async save(variableName: string, value: any) {
-          const variable = await PluginVariable.findOne({ variableName, pluginId }) || new PluginVariable();
+          const variable = await PluginVariable.findOneBy({ variableName, pluginId }) || new PluginVariable();
           variable.pluginId = pluginId;
           variable.variableName = variableName;
           variable.value = JSON.stringify(value);
@@ -52,7 +52,7 @@ export default async function(pluginId: string, currentNode: Node<string>, param
         info(JSON.stringify({
           parameters,
           ...variables,
-          databaseVariables: await PluginVariable.find({ pluginId }),
+          databaseVariables: await PluginVariable.findBy({ pluginId }),
           sender:            userstate ? {
             userName: userstate.userName,
             userId:   userstate.userId,
@@ -76,7 +76,7 @@ export default async function(pluginId: string, currentNode: Node<string>, param
         async isUserModerator(userName: string) {
           await changelog.flush();
           try {
-            const user = await getRepository(User).findOneOrFail({ where: { userName: userName.toLowerCase() } });
+            const user = await AppDataSource.getRepository(User).findOneByOrFail({ userName: userName.toLowerCase() });
             return user.isModerator;
           } catch {
             return false;

@@ -1,5 +1,5 @@
 import { Queue as QueueEntity, QueueInterface } from '@entity/queue';
-import { getRepository } from 'typeorm';
+import { AppDataSource } from '~/database';
 
 import {
   command, default_permission, settings,
@@ -46,7 +46,7 @@ class Queue extends System {
       try {
         cb(
           null,
-          await getRepository(QueueEntity).find(),
+          await AppDataSource.getRepository(QueueEntity).find(),
         );
       } catch (e: any) {
         cb(e.stack, []);
@@ -54,7 +54,7 @@ class Queue extends System {
     });
     adminEndpoint('/systems/queue', 'queue::clear', async(cb) => {
       try {
-        await getRepository(QueueEntity).clear(),
+        await AppDataSource.getRepository(QueueEntity).clear(),
         cb(null);
       } catch (e: any) {
         cb(e.stack);
@@ -68,7 +68,7 @@ class Queue extends System {
             data.username = [data.username];
           }
           for (const user of data.username) {
-            const entity = await getRepository(QueueEntity).findOne({ username: user });
+            const entity = await AppDataSource.getRepository(QueueEntity).findOneBy({ username: user });
             if (entity) {
               users.push(entity);
             }
@@ -105,7 +105,7 @@ class Queue extends System {
 
   async getUsers (opts: { random: boolean, amount: number }): Promise<QueueInterface[]> {
     opts = opts || { amount: 1 };
-    let users = await getRepository(QueueEntity).find();
+    let users = await AppDataSource.getRepository(QueueEntity).find();
 
     if (opts.random) {
       users = users.sort(() => Math.random());
@@ -122,7 +122,7 @@ class Queue extends System {
       }
 
       if (i < opts.amount) {
-        await getRepository(QueueEntity).remove(user);
+        await AppDataSource.getRepository(QueueEntity).remove(user);
         toReturn.push(user);
       } else {
         break;
@@ -174,8 +174,8 @@ class Queue extends System {
       }
 
       if (eligible) {
-        await getRepository(QueueEntity).save({
-          ...(await getRepository(QueueEntity).findOne({ username: opts.sender.userName })),
+        await AppDataSource.getRepository(QueueEntity).save({
+          ...(await AppDataSource.getRepository(QueueEntity).findOneBy({ username: opts.sender.userName })),
           username:     opts.sender.userName,
           isSubscriber: user.isSubscriber,
           isModerator:  user.isModerator,
@@ -195,7 +195,7 @@ class Queue extends System {
   @command('!queue clear')
   @default_permission(defaultPermissions.CASTERS)
   clear (opts: CommandOptions): CommandResponse[] {
-    getRepository(QueueEntity).delete({});
+    AppDataSource.getRepository(QueueEntity).delete({});
     this.pickedUsers = [];
     return [{ response: translate('queue.clear'), ...opts }];
   }
@@ -224,7 +224,7 @@ class Queue extends System {
     } else {
       users = opts.users;
       for (const user of users) {
-        await getRepository(QueueEntity).delete({ username: user.username });
+        await AppDataSource.getRepository(QueueEntity).delete({ username: user.username });
       }
     }
 
@@ -262,7 +262,7 @@ class Queue extends System {
   async list (opts: CommandOptions): Promise<CommandResponse[]> {
     const [atUsername, users] = await Promise.all([
       twitch.showWithAt,
-      getRepository(QueueEntity).find(),
+      AppDataSource.getRepository(QueueEntity).find(),
     ]);
     const queueList = users.map(o => atUsername ? `@${o.username}` : o).join(', ');
     return [{ response: prepare('queue.list', { users: queueList }), ...opts }];

@@ -3,7 +3,7 @@
 const assert = require('assert');
 
 const _ = require('lodash');
-const { getRepository } = require('typeorm');
+const { AppDataSource } = require('../../../dest/database.js');
 
 require('../../general.js');
 
@@ -22,7 +22,7 @@ describe('Points - set() - @func1', () => {
 
   describe('Points should be correctly set, not added', () => {
     it('create user', async () => {
-      await getRepository(User).save({ userName: user.userName, userId: user.userId });
+      await AppDataSource.getRepository(User).save({ userName: user.userName, userId: user.userId });
     });
 
     it('!points get should return 0', async () => {
