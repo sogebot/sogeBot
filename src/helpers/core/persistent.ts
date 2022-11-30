@@ -60,7 +60,7 @@ function persistent<T>({ value, name, namespace, onChange }: { value: T, name: s
 
   async function load() {
     if (!isDbConnected) {
-      setInterval(() => load(), 5000);
+      setImmediate(() => load());
       return;
     }
 
