@@ -141,7 +141,7 @@ class OBSWebsocket extends Integration {
   async runTask(opts: CommandOptions) {
     try {
       const [ taskId ] = new Expects(opts.parameters).string().toArray();
-      const task = await AppDataSource.getRepository(OBSWebsocketEntity).findOneByOrFail(taskId);
+      const task = await AppDataSource.getRepository(OBSWebsocketEntity).findOneOrFail({ where: { id: taskId } });
 
       info(`OBSWEBSOCKETS: User ${opts.sender.userName}#${opts.sender.userId} triggered task ${task.id}`);
       await this.triggerTask(task.code);
