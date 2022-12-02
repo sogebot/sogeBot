@@ -50,10 +50,6 @@ class Google extends Service {
   accessToken: null | string = null;
   client: OAuth2Client | null = null;
 
-  onStartupInterval: null | NodeJS.Timer = null;
-  onStartupIntervalPrepareBroadcast: null | NodeJS.Timer = null;
-  chatInterval: null | NodeJS.Timer = null;
-
   broadcastId: string | null = null;
   gamesPlayedOnStream: { game: string, seconds: number }[] = [];
   broadcastStartedAt: string = new Date().toLocaleDateString(getLang());
@@ -120,6 +116,38 @@ class Google extends Service {
     }
   }
 
+  @onStartup()
+  startIntervals() {
+    setInterval(async () => {
+      const stream = await this.getBroadcast();
+
+      if (stream && stream.snippet) {
+        const currentTitle = stats.value.currentTitle || 'n/a';
+        if (stream.snippet.title !== currentTitle && isStreamOnline.value) {
+          info(`YOUTUBE: Title is not matching current title, changing by bot to "${currentTitle}"`);
+          await this.updateTitle(stream, currentTitle);
+        }
+      }
+
+      // add game to list
+      if (stats.value.currentGame
+        && (this.gamesPlayedOnStream.length === 0 || this.gamesPlayedOnStream[this.gamesPlayedOnStream.length - 1].game !== stats.value.currentGame)) {
+        this.gamesPlayedOnStream.push({
+          game:    stats.value.currentGame,
+          seconds: (Date.now() / 1000 - Number(dayjs.utc(streamStatusChangeSince.value).unix())),
+        });
+      }
+    }, MINUTE);
+
+    setInterval(async () => {
+      const broadcast = await this.getBroadcast();
+
+      if (!broadcast) {
+        this.prepareBroadcast();
+      }
+    }, 15 * MINUTE);
+  }
+
   @onChange('refreshToken')
   @onStartup()
   async onStartup() {
@@ -166,41 +194,6 @@ class Google extends Service {
       const item = channel.data.items[0].snippet!;
       this.channel = [channel.data.items[0].id, item.title, item.customUrl].filter(String).join(' | ');
       info(`YOUTUBE: Authentication to Google Service successful as ${this.channel}.`);
-
-      if (this.onStartupInterval) {
-        clearInterval(this.onStartupInterval);
-      }
-      this.onStartupInterval = setInterval(async () => {
-        const stream = await this.getBroadcast();
-
-        if (stream && stream.snippet) {
-          const currentTitle = stats.value.currentTitle || 'n/a';
-          if (stream.snippet.title !== currentTitle && isStreamOnline.value) {
-            info(`YOUTUBE: Title is not matching current title, changing by bot to "${currentTitle}"`);
-            await this.updateTitle(stream, currentTitle);
-          }
-        }
-
-        // add game to list
-        if (stats.value.currentGame
-          && (this.gamesPlayedOnStream.length === 0 || this.gamesPlayedOnStream[this.gamesPlayedOnStream.length - 1].game !== stats.value.currentGame)) {
-          this.gamesPlayedOnStream.push({
-            game:    stats.value.currentGame,
-            seconds: (Date.now() / 1000 - Number(dayjs.utc(streamStatusChangeSince.value).unix())),
-          });
-        }
-      }, MINUTE);
-
-      if (this.onStartupIntervalPrepareBroadcast) {
-        clearInterval(this.onStartupIntervalPrepareBroadcast);
-      }
-      this.onStartupInterval = setInterval(async () => {
-        const broadcast = await this.getBroadcast();
-
-        if (!broadcast) {
-          this.prepareBroadcast();
-        }
-      }, 15 * MINUTE);
     } else {
       error(`'YOUTUBE: Couldn't get channel informations.`);
     }
