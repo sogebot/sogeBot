@@ -4,7 +4,6 @@ import { app } from '~/helpers/panel';
 import { adminMiddleware } from '~/socket';
 import { onChange, onStartup, onStreamEnd, onStreamStart } from '~/decorators/on';
 import Service from './_interface';
-import { dayjs } from '@sogebot/ui-helpers/dayjsHelper';
 
 import { google, youtube_v3 } from 'googleapis';
 import { error, info } from '~/helpers/log';
@@ -51,12 +50,12 @@ class Google extends Service {
   client: OAuth2Client | null = null;
 
   broadcastId: string | null = null;
-  gamesPlayedOnStream: { game: string, seconds: number }[] = [];
+  gamesPlayedOnStream: { game: string, timeMark: string }[] = [];
   broadcastStartedAt: string = new Date().toLocaleDateString(getLang());
 
   @onStreamStart()
   onStreamStart() {
-    this.gamesPlayedOnStream = stats.value.currentGame ? [{ game: stats.value.currentGame, seconds: 0 }] : [];
+    this.gamesPlayedOnStream = stats.value.currentGame ? [{ game: stats.value.currentGame, timeMark: '00:00:00' }] : [];
     this.broadcastStartedAt = new Date().toLocaleDateString(getLang());
   }
 
@@ -99,7 +98,7 @@ class Google extends Service {
             description: this.onStreamEndDescriptionEnabled
               ? this.onStreamEndDescription
                 .replace('$chapters', this.gamesPlayedOnStream
-                  .map(item => `${getTime(item.seconds, false)} ${item.game}`)
+                  .map(item => `${item.timeMark} ${item.game}`)
                   .join('\n'))
                 .replace('$title', broadcast.snippet?.title || stats.value.currentTitle || '')
                 .replace('$date', this.broadcastStartedAt)
@@ -131,10 +130,11 @@ class Google extends Service {
 
       // add game to list
       if (stats.value.currentGame
-        && (this.gamesPlayedOnStream.length === 0 || this.gamesPlayedOnStream[this.gamesPlayedOnStream.length - 1].game !== stats.value.currentGame)) {
+        && (this.gamesPlayedOnStream.length > 0 || this.gamesPlayedOnStream[this.gamesPlayedOnStream.length - 1].game !== stats.value.currentGame)) {
+        info(`YOTUBE: Game changed to ${stats.value.currentGame} at ${Date.now() - streamStatusChangeSince.value}`);
         this.gamesPlayedOnStream.push({
-          game:    stats.value.currentGame,
-          seconds: (Date.now() / 1000 - Number(dayjs.utc(streamStatusChangeSince.value).unix())),
+          game:     stats.value.currentGame,
+          timeMark: getTime(streamStatusChangeSince.value, false) as string,
         });
       }
     }, MINUTE);
