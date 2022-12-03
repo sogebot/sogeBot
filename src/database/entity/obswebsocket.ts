@@ -1,18 +1,14 @@
-import { EntitySchema } from 'typeorm';
+import { Column, Entity, PrimaryColumn } from 'typeorm';
+import { BotEntity } from '~/database/BotEntity';
 
-export interface OBSWebsocketInterface {
-  id: string;
-  name: string;
-  code: string;
+@Entity('obswebsocket')
+export class OBSWebsocket extends BotEntity<OBSWebsocket> {
+  @PrimaryColumn({ type: 'varchar', length: '14' })
+    id: string;
+
+  @Column()
+    name: string;
+
+  @Column({ type: 'text' })
+    code: string;
 }
-
-export const OBSWebsocket = new EntitySchema<Readonly<Required<OBSWebsocketInterface>>>({
-  name:    'obswebsocket',
-  columns: {
-    id: {
-      type: 'varchar', length: '14', primary: true,
-    },
-    name: { type: String },
-    code: { type: 'text' },
-  },
-});
