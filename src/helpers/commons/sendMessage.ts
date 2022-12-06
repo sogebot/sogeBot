@@ -24,6 +24,9 @@ class HelpersCommons {
     isWhisper?: boolean;
     [x: string]: any;
   }, id?: string) {
+    if (id === 'null') {
+      id = undefined;
+    }
     messageToSend = await messageToSend as string; // await if messageToSend is promise (like prepare)
     attr = attr || {};
     sender = sender || null;
