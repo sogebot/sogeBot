@@ -130,7 +130,7 @@ class Google extends Service {
 
       // add game to list
       if (stats.value.currentGame
-        && (this.gamesPlayedOnStream.length > 0 || this.gamesPlayedOnStream[this.gamesPlayedOnStream.length - 1].game !== stats.value.currentGame)) {
+        && (this.gamesPlayedOnStream.length > 0 && this.gamesPlayedOnStream[this.gamesPlayedOnStream.length - 1].game !== stats.value.currentGame)) {
         info(`YOTUBE: Game changed to ${stats.value.currentGame} at ${Date.now() - streamStatusChangeSince.value}`);
         this.gamesPlayedOnStream.push({
           game:     stats.value.currentGame,
