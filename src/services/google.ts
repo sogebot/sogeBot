@@ -295,7 +295,7 @@ class Google extends Service {
           },
           status: {
             privacyStatus:           'private',
-            selfDeclaredMadeForKids: false,
+            selfDeclaredMadeForKids: true,
           },
           contentDetails: {
             enableAutoStart: true,
