@@ -6,7 +6,7 @@ import { onChange, onStartup, onStreamEnd, onStreamStart } from '~/decorators/on
 import Service from './_interface';
 
 import { google, youtube_v3 } from 'googleapis';
-import { error, info } from '~/helpers/log';
+import { error, info, debug } from '~/helpers/log';
 
 import { OAuth2Client } from 'google-auth-library/build/src/auth/oauth2client';
 import { MINUTE } from '@sogebot/ui-helpers/constants';
@@ -151,6 +151,7 @@ class Google extends Service {
   @onChange('refreshToken')
   @onStartup()
   async onStartup() {
+    debug('google', `Refresh token changed to: ${this.refreshToken}`);
     if (this.refreshToken.length === 0) {
       return;
     }
