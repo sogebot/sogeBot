@@ -1,49 +1,5 @@
+import { Column, Entity, Index, PrimaryColumn } from 'typeorm';
 import { BotEntity } from '../BotEntity';
-import { Index, Column, PrimaryColumn, EventSubscriber, RemoveEvent, UpdateEvent, InsertEvent, EntitySubscriberInterface, Entity } from 'typeorm';
-
-export const permissionCommands: PermissionCommands[] = [];
-export const populateCache = () => {
-  return Promise.all([
-    new Promise((resolve) => {
-      PermissionCommands.find()
-        .then(items => {
-          while (permissionCommands.length > 0) {
-            permissionCommands.shift();
-          }
-          for (const o of items) {
-            permissionCommands.push(o);
-          }
-          resolve(true);
-        });
-    }),
-  ]);
-};
-
-@EventSubscriber()
-export class PermissionCommandsSubscriber implements EntitySubscriberInterface<PermissionCommands> {
-  listenTo() {
-    return PermissionCommands;
-  }
-  afterInsert(event: InsertEvent<PermissionCommands>): void | Promise<any> {
-    permissionCommands.push(event.entity);
-  }
-  afterUpdate(event: UpdateEvent<PermissionCommands>): void | Promise<any> {
-    if (event.entity) {
-      const idx = permissionCommands.findIndex(o => o.id === event.entity!.id);
-      if (idx > -1) {
-        PermissionCommands.merge(permissionCommands[idx], event.entity);
-      }
-    }
-  }
-  afterRemove(event: RemoveEvent<PermissionCommands>): void | Promise<any> {
-    if (event.entity) {
-      const idx = permissionCommands.findIndex(o => o.id === event.entity!.id);
-      if (idx > -1) {
-        permissionCommands.splice(idx, 1);
-      }
-    }
-  }
-}
 
 @Entity()
 export class Permissions extends BotEntity<Permissions> {

@@ -1,5 +1,5 @@
 import {
-  Commands, CommandsGroup, commands, groups, populateCache,
+  Commands, CommandsGroup,
 } from '@entity/commands';
 import * as constants from '@sogebot/ui-helpers/constants';
 import { validateOrReject } from 'class-validator';
@@ -7,12 +7,14 @@ import _, { merge } from 'lodash';
 
 import { parserReply } from '../commons';
 import {
-  command, default_permission, helper, timer,
+  command, default_permission, helper,
+  parser,
+  timer,
 } from '../decorators';
-import { parser } from '../decorators';
 import Expects from '../expects';
 import System from './_interface';
 
+import { v4 } from 'uuid';
 import { checkFilter } from '~/helpers/checkFilter';
 import {
   getAllCountOfCommandUsage, getCountOfCommandUsage, incrementCountOfCommandUsage, resetCountOfCommandUsage,
@@ -26,8 +28,6 @@ import {
 import { check, defaultPermissions } from '~/helpers/permissions/index';
 import { adminMiddleware } from '~/socket';
 import { translate } from '~/translate';
-import { v4 } from 'uuid';
-import { onStartup } from '~/decorators/on';
 
 /*
  * !command                                                                            - gets an info about command usage
@@ -49,11 +49,6 @@ class CustomCommands extends System {
     });
   }
 
-  @onStartup()
-  populateCacheOnStartup() {
-    populateCache();
-  }
-
   sockets () {
     if (!app) {
       setTimeout(() => this.sockets(), 100);
@@ -62,13 +57,13 @@ class CustomCommands extends System {
 
     app.get('/api/systems/customcommands', adminMiddleware, async (req, res) => {
       res.send({
-        data:  commands,
+        data:  await Commands.find(),
         count: await getAllCountOfCommandUsage(),
       });
     });
     app.get('/api/systems/customcommands/groups/', adminMiddleware, async (req, res) => {
-      let groupsList = [...groups];
-      for (const item of commands) {
+      let groupsList = await CommandsGroup.find();
+      for (const item of await Commands.find()) {
         if (item.group && !groupsList.find(o => o.name === item.group)) {
           // we dont have any group options -> create temporary group
           const group = new CommandsGroup();
@@ -88,18 +83,24 @@ class CustomCommands extends System {
       });
     });
     app.get('/api/systems/customcommands/:id', adminMiddleware, async (req, res) => {
-      const cmd = commands.find(o => o.id === req.params.id);
+      const cmd = await Commands.findOneBy({ id: req.params.id });
       res.send({
         data:  cmd,
         count: cmd ? await getCountOfCommandUsage(cmd.command) : 0,
       });
     });
     app.delete('/api/systems/customcommands/groups/:name', adminMiddleware, async (req, res) => {
-      await CommandsGroup.delete({ name: req.params.name });
+      const group = await CommandsGroup.findOneBy({ name: req.params.name });
+      if (group) {
+        await group.remove();
+      }
       res.status(404).send();
     });
     app.delete('/api/systems/customcommands/:id', adminMiddleware, async (req, res) => {
-      await Commands.delete({ id: req.params.id });
+      const cmd = await Commands.findOneBy({ id: req.params.id });
+      if (cmd) {
+        await cmd.remove();
+      }
       res.status(404).send();
     });
     app.post('/api/systems/customcommands/group', adminMiddleware, async (req, res) => {
@@ -166,7 +167,7 @@ class CustomCommands extends System {
         throw Error('Command should start with !');
       }
 
-      const cDb = commands.find(o => o.command === cmd);
+      const cDb = await Commands.findOneBy({ command: cmd });
       if (!cDb) {
         return [{ response: prepare('customcmds.command-was-not-found', { command: cmd }), ...opts }];
       }
@@ -215,7 +216,7 @@ class CustomCommands extends System {
         throw Error('Command should start with !');
       }
 
-      const cDb = commands.find(o => o.command === cmd);
+      const cDb = await Commands.findOneBy({ command: cmd });
       if (!cDb) {
         const newCommand = new Commands();
         newCommand.command = cmd;
@@ -252,7 +253,7 @@ class CustomCommands extends System {
     }[] = [];
     const cmdArray = search.toLowerCase().split(' ');
     for (let i = 0, len = search.toLowerCase().split(' ').length; i < len; i++) {
-      const db_commands = commands.filter(o => o.command === cmdArray.join(' '));
+      const db_commands = (await Commands.find()).filter(o => o.command === cmdArray.join(' '));
       for (const cmd of db_commands) {
         commandsSearchProgress.push({
           cmdArray: _.cloneDeep(cmdArray),
@@ -290,10 +291,10 @@ class CustomCommands extends System {
       incrementCountOfCommandUsage(cmd.command.command);
 
       // check group filter first
-      let group: Readonly<Required<CommandsGroup>> | undefined;
+      let group: CommandsGroup | null;
       let groupPermission: null | string = null;
       if (cmd.command.group) {
-        group = groups.find(o => o.name === cmd.command.group);
+        group = await CommandsGroup.findOneBy({ name: cmd.command.group });
         if (group) {
           if (group.options.filter && !(await checkFilter(opts, group.options.filter))) {
             warning(`Custom command ${cmd.command.command}#${cmd.command.id} didn't pass group filter.`);
@@ -345,6 +346,7 @@ class CustomCommands extends System {
   async list (opts: CommandOptions) {
     const cmd = new Expects(opts.parameters).command({ optional: true }).toArray()[0];
 
+    const commands = await Commands.find();
     if (!cmd) {
       // print commands
       const _commands = commands.filter(o => o.visible && o.enabled);
@@ -376,7 +378,7 @@ class CustomCommands extends System {
         .string({ optional: true })
         .toArray();
 
-      const cmd = commands.find(o => o.command === (cmdInput + ' ' + subcommand).trim());
+      const cmd = await Commands.findOneBy({ command: (cmdInput + ' ' + subcommand).trim() });
       if (!cmd) {
         const response = prepare('customcmds.command-was-not-found', { command: (cmdInput + ' ' + subcommand).trim() });
         return [{ response, ...opts }];
@@ -399,7 +401,7 @@ class CustomCommands extends System {
         .string({ optional: true })
         .toArray();
 
-      const cmd = commands.find(o => o.command = (cmdInput + ' ' + subcommand).trim());
+      const cmd = await Commands.findOneBy({ command: (cmdInput + ' ' + subcommand).trim() });
       if (!cmd) {
         const response = prepare('customcmds.command-was-not-found', { command: (cmdInput + ' ' + subcommand).trim() });
         return [{ response, ...opts }];
@@ -433,7 +435,7 @@ class CustomCommands extends System {
         throw Error('Command should start with !');
       }
 
-      const command_db = commands.find(o => o.command === cmd);
+      const command_db = await Commands.findOneBy({ command: cmd });
       if (!command_db) {
         return [{ response: prepare('customcmds.command-was-not-found', { command: cmd }), ...opts }];
       } else {
@@ -450,7 +452,7 @@ class CustomCommands extends System {
 
           response = prepare('customcmds.response-was-removed', { command: cmd, response: rId });
         } else {
-          await Commands.remove(command_db);
+          await command_db.remove();
         }
         return [{ response, ...opts }];
       }

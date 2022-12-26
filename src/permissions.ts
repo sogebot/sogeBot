@@ -1,7 +1,7 @@
 import { AppDataSource } from '~/database';
 
 import Core from '~/_interface';
-import { Permissions as PermissionsEntity, populateCache } from '~/database/entity/permissions';
+import { Permissions as PermissionsEntity } from '~/database/entity/permissions';
 import { User } from '~/database/entity/user';
 import { command, default_permission } from '~/decorators';
 import { onStartup } from '~/decorators/on';
@@ -21,7 +21,6 @@ class Permissions extends Core {
       category: 'settings', name: 'permissions', id: 'settings/permissions', this: null,
     });
     this.ensurePreservedPermissionsInDb();
-    populateCache();
   }
 
   public sockets() {

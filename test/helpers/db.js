@@ -6,9 +6,9 @@ const { debug } = require('../../dest/helpers/log');
 // eslint-disable-next-line import/order
 const waitMs = require('./time').waitMs;
 
-const { Alias, AliasGroup, populateCache: populateCacheAlias } = require('../../dest/database/entity/alias');
+const { Alias, AliasGroup } = require('../../dest/database/entity/alias');
 const { Bets } = require('../../dest/database/entity/bets');
-const { Commands, CommandsCount, CommandsGroup, populateCache: populateCacheCommands } = require('../../dest/database/entity/commands');
+const { Commands, CommandsCount, CommandsGroup } = require('../../dest/database/entity/commands');
 const { Cooldown } = require('../../dest/database/entity/cooldown');
 const { DiscordLink } = require('../../dest/database/entity/discord');
 const { Duel } = require('../../dest/database/entity/duel');
@@ -84,10 +84,6 @@ module.exports = {
       debug('test', chalk.bgRed('*** Cleaned successfully ***'));
 
       await permissions.ensurePreservedPermissionsInDb(); // re-do core permissions
-
-      // invalidate caches
-      await populateCacheAlias();
-      await populateCacheCommands();
 
       // set owner as broadcaster
       emitter.emit('set', '/services/twitch', 'broadcasterUsername', '__broadcaster__');
