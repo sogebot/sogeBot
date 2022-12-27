@@ -14,16 +14,16 @@ import emitter from '../helpers/interfaceEmitter';
 import { debug, error, info } from '../helpers/log';
 import users from '../users';
 import Service from './_interface';
-import { init as apiIntervalInit , stop as apiIntervalStop } from './twitch/api/interval';
+import { init as apiIntervalInit, stop as apiIntervalStop } from './twitch/api/interval';
 import { createClip } from './twitch/calls/createClip';
 import { createMarker } from './twitch/calls/createMarker';
 import Chat from './twitch/chat';
 import EventSub from './twitch/eventsub';
-import { eventErrorShown } from './twitch/eventsub';
 import PubSub from './twitch/pubsub';
 import { cleanErrors } from './twitch/token/refresh';
 import { cache, validate } from './twitch/token/validate';
 
+import { capitalize } from 'lodash';
 import {
   isStreamOnline, stats, streamStatusChangeSince,
 } from '~/helpers/api';
@@ -33,14 +33,13 @@ import { defaultPermissions } from '~/helpers/permissions/index';
 import { adminEndpoint } from '~/helpers/socket';
 import {
   ignorelist, sendWithMe, setMuteStatus, showWithAt,
+  tmiEmitter,
 } from '~/helpers/tmi';
-import { tmiEmitter } from '~/helpers/tmi';
 import * as changelog from '~/helpers/user/changelog.js';
 import { isIgnored } from '~/helpers/user/isIgnored';
 import { sendGameFromTwitch } from '~/services/twitch/calls/sendGameFromTwitch';
 import { setTitleAndGame } from '~/services/twitch/calls/setTitleAndGame';
 import { translate } from '~/translate';
-import { capitalize } from 'lodash';
 
 const urls = {
   'SogeBot Token Generator':    'https://twitch-token-generator.soge.workers.dev/refresh/',
@@ -138,20 +137,19 @@ class Twitch extends Service {
   @settings('bot')
     botCurrentScopes: string[] = [];
 
-  @settings('eventsub')
-    useTunneling = false;
-  @settings('eventsub')
-    domain = '';
-  @settings('eventsub')
-    eventSubClientId = '';
-  @settings('eventsub')
-    eventSubClientSecret = '';
-  @settings('eventsub')
-    eventSubEnabledSubscriptions: string[] = [];
-  @persistent()
-    appToken = '';
-  @persistent()
-    secret = '';
+  @onChange('botCurrentScopes')
+  onChangeBotScopes() {
+    if (this.botCurrentScopes.length > 0) {
+      info('TWITCH: Bot scopes ' + this.botCurrentScopes.join(', '));
+    }
+  }
+
+  @onChange('broadcasterCurrentScopes')
+  onChangeBroadcasterScopes() {
+    if (this.broadcasterCurrentScopes.length > 0) {
+      info('TWITCH: Broadcaster scopes ' + this.broadcasterCurrentScopes.join(', '));
+    }
+  }
 
   constructor() {
     super();
@@ -340,10 +338,6 @@ class Twitch extends Service {
   }
 
   sockets() {
-    adminEndpoint('/services/twitch', 'eventsub::reset', () => {
-      info('EVENTSUB: user authorized, resetting state of eventsub subscriptions.');
-      eventErrorShown.clear();
-    });
     adminEndpoint('/services/twitch', 'broadcaster', (cb) => {
       try {
         cb(null, (this.broadcasterUsername).toLowerCase());

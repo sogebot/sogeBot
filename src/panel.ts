@@ -13,9 +13,9 @@ import _ from 'lodash';
 import sanitize from 'sanitize-filename';
 
 import { possibleLists } from '../d.ts/src/helpers/socket.js';
-import emitter from './helpers/interfaceEmitter.js';
 
 import Core from '~/_interface';
+import { AppDataSource } from '~/database.js';
 import { CacheGames, CacheGamesInterface } from '~/database/entity/cacheGames.js';
 import { CacheTitles } from '~/database/entity/cacheTitles';
 import { Translation } from '~/database/entity/translation';
@@ -60,7 +60,6 @@ import highlights from '~/systems/highlights';
 import songs from '~/systems/songs';
 import translateLib, { translate } from '~/translate';
 import { variables } from '~/watchers';
-import { AppDataSource } from '~/database.js';
 
 const port = Number(process.env.PORT ?? 20000);
 const secureport = Number(process.env.SECUREPORT ?? 20443);
@@ -237,9 +236,6 @@ class Panel extends Core {
     });
     app?.get('/webhooks/callback', function (req, res) {
       res.status(200).send('OK');
-    });
-    app?.post('/webhooks/callback', function (req, res) {
-      emitter.emit('services::twitch::eventsub', req, res);
     });
     app?.get('/popout/', function (req, res) {
       res.sendFile(path.join(__dirname, '..', 'public', 'popout.html'));

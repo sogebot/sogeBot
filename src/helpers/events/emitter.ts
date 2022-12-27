@@ -37,16 +37,16 @@ interface Events {
   }) => void;
   'hypetrain-started': () => void;
   'hypetrain-ended': (opts: {
-    level: 1 | 2 | 3 | 4 | 5, total: number, goal: number,
+    level: number, total: number, goal: number,
     topContributionsBitsUserId: string; topContributionsBitsUsername: string; topContributionsBitsTotal: number;
     topContributionsSubsUserId: string; topContributionsSubsUsername: string; topContributionsSubsTotal: number;
-    lastContributionType: 'bits' | 'subs'; lastContributionUserId: string; lastContributionUsername: string; lastContributionTotal: number;
+    lastContributionType: 'bits' | 'subscription'; lastContributionUserId: string; lastContributionUsername: string; lastContributionTotal: number;
   }) => void;
   'hypetrain-level-reached': (opts: {
-    level: 1 | 2 | 3 | 4 | 5, total: number, goal: number,
+    level: number, total: number, goal: number,
     topContributionsBitsUserId: string; topContributionsBitsUsername: string; topContributionsBitsTotal: number;
     topContributionsSubsUserId: string; topContributionsSubsUsername: string; topContributionsSubsTotal: number;
-    lastContributionType: 'bits' | 'subs'; lastContributionUserId: string; lastContributionUsername: string; lastContributionTotal: number;
+    lastContributionType: 'bits' | 'subscription'; lastContributionUserId: string; lastContributionUsername: string; lastContributionTotal: number;
   }) => void;
   'action': (opts: { userName: string; source: 'discord' | 'twitch' }) => void;
   'commercial': (opts: { duration: number }) => void;

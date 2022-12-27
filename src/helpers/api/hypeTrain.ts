@@ -1,6 +1,6 @@
 import { eventEmitter } from '../events';
 
-let latestLevel = 1 as 1 | 2 | 3 | 4 | 5;
+let latestLevel = 1 as number;
 let total = 0;
 let goal = 0;
 
@@ -8,7 +8,7 @@ let isStarted = false;
 const subs = new Map<string, string>();
 
 let lastContributionTotal = 0;
-let lastContributionType = 'bits' as 'bits' | 'subs';
+let lastContributionType = 'bits' as 'bits' | 'subscription';
 let lastContributionUserId = null as null | string;
 let lastContributionUserName = null as null | string;
 
@@ -26,7 +26,7 @@ function setIsStarted(value: boolean) {
   }
 }
 
-async function setCurrentLevel(level: 1 | 2 | 3 | 4 | 5) {
+async function setCurrentLevel(level: number) {
   if (level > latestLevel && level > 1) {
     let waitForNextLevel = false;
     while(latestLevel < level) {
@@ -38,7 +38,7 @@ async function setCurrentLevel(level: 1 | 2 | 3 | 4 | 5) {
       latestLevel++;
 
       eventEmitter.emit('hypetrain-level-reached', {
-        level: latestLevel as 1 | 2 | 3 | 4 | 5,
+        level: latestLevel,
         total,
         goal,
 
@@ -70,7 +70,7 @@ function setLastContribution(total_: typeof lastContributionTotal, type: typeof 
   lastContributionUserName = username;
 }
 
-function setTopContributions(type: 'bits' | 'subs', total_: typeof lastContributionTotal, userId: typeof topContributionsBitsUserId, username: typeof lastContributionUserName) {
+function setTopContributions(type: 'bits' | 'subscription', total_: typeof lastContributionTotal, userId: typeof topContributionsBitsUserId, username: typeof lastContributionUserName) {
   if (type === 'bits') {
     topContributionsBitsTotal = total_;
     topContributionsBitsUserId = userId;

@@ -1,5 +1,3 @@
-import { Request, Response } from 'express';
-import QueryString from 'qs';
 import { TypedEmitter } from 'tiny-typed-emitter';
 
 interface Events {

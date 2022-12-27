@@ -1,6 +1,6 @@
 import * as constants from '@sogebot/ui-helpers/constants';
-import axios from 'axios';
 import { Mutex } from 'async-mutex';
+import axios from 'axios';
 
 import { setStatus } from '../../../helpers/parser';
 import { tmiEmitter } from '../../../helpers/tmi';
