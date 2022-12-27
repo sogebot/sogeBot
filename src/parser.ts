@@ -255,7 +255,7 @@ class Parser {
     }
     commands = _(await Promise.all(commands)).flatMap().sortBy(o => -o.command.length).value();
     for (const command of commands) {
-      const permission = await PermissionCommands.findOneBy({ id: command.id });
+      const permission = await PermissionCommands.findOneBy({ name: command.id });
       if (permission) {
         command.permission = permission.permission; // change to custom permission
         debug('parser.command', `Checking permission for ${command.id} - custom ${permission.name}`);
