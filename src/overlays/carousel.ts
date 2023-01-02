@@ -11,7 +11,7 @@ class Carousel extends Overlay {
   @onStartup()
   onStartup() {
     this.addMenu({
-      category: 'registry', name: 'carouseloverlay', id: 'registry.carousel', this: null,
+      category: 'registry', name: 'carouseloverlay', id: 'registry/carousel', this: null,
     });
 
     getApp()?.get('/api/v2/carousel/image/:id', async (req, res) => {

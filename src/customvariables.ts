@@ -1,8 +1,8 @@
 import { setTimeout } from 'timers';
 
 import { isNil } from 'lodash';
-import { AppDataSource } from '~/database';
 import { IsNull } from 'typeorm';
+import { AppDataSource } from '~/database';
 
 import Core from '~/_interface';
 import {
@@ -23,7 +23,7 @@ class CustomVariables extends Core {
   @onStartup()
   onStartup() {
     this.addMenu({
-      category: 'registry', name: 'customvariables', id: 'registry.customvariables', this: null,
+      category: 'registry', name: 'customvariables', id: 'registry/customvariables', this: null,
     });
     this.checkIfCacheOrRefresh();
   }

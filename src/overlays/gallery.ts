@@ -15,7 +15,7 @@ class Gallery extends Overlay {
   constructor () {
     super();
     this.addMenu({
-      category: 'registry', name: 'gallery', id: 'registry.gallery', this: null,
+      category: 'registry', name: 'gallery', id: 'registry/gallery', this: null,
     });
 
     const init = (retry = 0) => {
