@@ -221,3 +221,18 @@ export const VariableURL = new EntitySchema<Readonly<VariableURLInterface>>({
     },
   },
 });
+
+export const VariableWatch = new EntitySchema<Readonly<VariableWatchInterface>>({
+  name:    'variable_watch',
+  columns: {
+    id: {
+      type:      Number,
+      primary:   true,
+      generated: 'increment',
+    },
+    variableId: {
+      type: String, nullable: false, name: 'variableId',
+    },
+    order: { type: Number },
+  },
+});
