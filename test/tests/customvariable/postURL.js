@@ -12,9 +12,10 @@ const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 
 describe('Custom Variable - helpers/customvariables/postURL - @func1', () => {
-  let urlId;
-  let urlIdWithoutPOST;
-  let urlIdWithResponse;
+  let urlId = v4();
+  let urlIdWithoutPOST = v4();
+  let urlIdWithResponse1 = v4();
+  let urlIdWithResponse2 = v4();
 
   before(async () => {
     await db.cleanup();
@@ -22,7 +23,7 @@ describe('Custom Variable - helpers/customvariables/postURL - @func1', () => {
 
     postURL = require('../../../dest/helpers/customvariables/postURL').postURL;
 
-    const variable = await AppDataSource.getRepository(Variable).save({
+    const variable = new Variable({
       variableName: '$_variable',
       readOnly: false,
       currentValue: '0',
@@ -31,9 +32,12 @@ describe('Custom Variable - helpers/customvariables/postURL - @func1', () => {
       permission: defaultPermissions.VIEWERS,
       evalValue: '',
       usableOptions: [],
-    });
+      urls: [
+        { GET: false, POST: true, showResponse: false, id: urlId }],
+        { GET: false, POST: false, showResponse: false, id: urlIdWithoutPOST }
+    }).save();
 
-    const variable2 = await AppDataSource.getRepository(Variable).save({
+    const variable2 = new Variable({
       variableName: '$_variable2',
       readOnly: false,
       currentValue: '0',
@@ -42,9 +46,10 @@ describe('Custom Variable - helpers/customvariables/postURL - @func1', () => {
       permission: defaultPermissions.VIEWERS,
       evalValue: '',
       usableOptions: [],
-    });
+      urls: [{ GET: false, POST: true, showResponse: true, id: urlIdWithResponse1 }]
+    }).save();
 
-    const variable3 = await AppDataSource.getRepository(Variable).save({
+    const variable3 = new Variable({
       variableName: '$_variable3',
       readOnly: false,
       currentValue: '0',
@@ -54,11 +59,8 @@ describe('Custom Variable - helpers/customvariables/postURL - @func1', () => {
       permission: defaultPermissions.VIEWERS,
       evalValue: '',
       usableOptions: [],
-    });
-    urlId = (await AppDataSource.getRepository(VariableURL).save({ GET: false, POST: true, showResponse: false, variableId: variable.id })).id;
-    urlIdWithoutPOST = (await AppDataSource.getRepository(VariableURL).save({ GET: false, POST: false, showResponse: false, variableId: variable.id })).id;
-    urlIdWithResponse1 = (await AppDataSource.getRepository(VariableURL).save({ GET: false, POST: true, showResponse: true, variableId: variable2.id })).id;
-    urlIdWithResponse2 = (await AppDataSource.getRepository(VariableURL).save({ GET: false, POST: true, showResponse: true, variableId: variable3.id })).id;
+      urls: [{ GET: false, POST: true, showResponse: true, id: urlIdWithResponse2 }]
+    }).save();
   });
 
   it ('with enabled POST - correct value', async () => {

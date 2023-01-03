@@ -16,6 +16,7 @@ const axios = require('axios');
 
 const { Variable, VariableURL } = require('../../../dest/database/entity/variable');
 const { AppDataSource } = require('../../../dest/database');
+const { v4 } = require('uuid');
 
 // stub
 _.set(global, 'widgets.custom_variables.io.emit', function () {
@@ -29,10 +30,9 @@ describe('Custom Variable - #4083 - Get url on eval should return correct value 
     await user.prepare();
   });
 
-  let urlId = '';
-
+  let urlId = v4();
   it(`Create eval $_variable to return Date.now()`, async () => {
-    const variable = await AppDataSource.getRepository(Variable).save({
+    const variable = await new Variable({
       variableName: '$_variable',
       readOnly: false,
       currentValue: '0',
@@ -40,12 +40,12 @@ describe('Custom Variable - #4083 - Get url on eval should return correct value 
       responseType: 2,
       permission: defaultPermissions.MODERATORS,
       evalValue: 'return Date.now();',
-      usableOptions: []
-    });
-    urlId = (await AppDataSource.getRepository(VariableURL).save({
-      GET: true,
-      variableId: variable.id,
-    })).id;
+      usableOptions: [],
+      urls: [{
+        id: urlId,
+        GET: true,
+      }]
+    }).save();
   });
 
   it(`Fetch endpoint for value and check`, async () => {

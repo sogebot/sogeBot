@@ -13,8 +13,8 @@ const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 
 describe('Custom Variable - helpers/customvariables/getURL - @func1', () => {
-  let urlId;
-  let urlIdWithoutGET;
+  let urlId = v4();
+  let urlIdWithoutGET = v4();
 
   before(async () => {
     await db.cleanup();
@@ -29,9 +29,11 @@ describe('Custom Variable - helpers/customvariables/getURL - @func1', () => {
       permission: defaultPermissions.VIEWERS,
       evalValue: '',
       usableOptions: [],
+      urls: [
+        { GET: true, POST: false, showResponse: false, id: urlId },
+        { GET: false, POST: false, showResponse: false, id: urlIdWithoutGET }
+      ]
     });
-    urlId = (await AppDataSource.getRepository(VariableURL).save({ GET: true, POST: false, showResponse: false, variableId: variable.id })).id;
-    urlIdWithoutGET = (await AppDataSource.getRepository(VariableURL).save({ GET: false, POST: false, showResponse: false, variableId: variable.id })).id;
   });
 
   it ('with enabled GET', async () => {
