@@ -1,6 +1,5 @@
-import { Variable, VariableInterface } from '@entity/variable';
+import { Variable } from '@entity/variable';
 import { isNil } from 'lodash';
-import { AppDataSource } from '~/database';
 
 import users from '../../users';
 import { warning } from '../log';
@@ -14,10 +13,10 @@ import { csEmitter } from './emitter';
 import { getValueOf } from './getValueOf';
 import { updateWidgetAndTitle } from './updateWidgetAndTitle';
 
-async function setValueOf (variable: string | Readonly<VariableInterface>, currentValue: any, opts: any): Promise<{ updated: Readonly<VariableInterface>; isOk: boolean; setValue: string; isEval: boolean }> {
+async function setValueOf (variable: string | Variable, currentValue: any, opts: any): Promise<{ updated: Variable; isOk: boolean; setValue: string; isEval: boolean }> {
   const item = typeof variable === 'string'
-    ? await AppDataSource.getRepository(Variable).findOneBy({ variableName: variable })
-    : { ...variable };
+    ? await Variable.findOneBy({ variableName: variable })
+    : variable;
   let isOk = true;
   let isEval = false;
   const itemOldValue = item?.currentValue;
@@ -27,7 +26,7 @@ async function setValueOf (variable: string | Readonly<VariableInterface>, curre
   opts.readOnlyBypass = isNil(opts.readOnlyBypass) ? false : opts.readOnlyBypass;
   // add simple text variable, if not existing
   if (!item) {
-    const newItem: VariableInterface = {
+    const newItem = new Variable({
       variableName:  variable as string,
       currentValue:  String(currentValue),
       responseType:  0,
@@ -37,7 +36,7 @@ async function setValueOf (variable: string | Readonly<VariableInterface>, curre
       usableOptions: [],
       type:          'text',
       permission:    defaultPermissions.MODERATORS,
-    };
+    });
     return setValueOf(newItem, currentValue, opts);
   } else {
     if (typeof opts.sender === 'string') {
@@ -92,10 +91,8 @@ async function setValueOf (variable: string | Readonly<VariableInterface>, curre
 
   // do update only on non-eval variables
   if (item.type !== 'eval' && isOk) {
-    await AppDataSource.getRepository(Variable).save({
-      ...item,
-      currentValue: itemCurrentValue,
-    });
+    item.currentValue = itemCurrentValue ?? '';
+    await item.save();
   }
 
   const setValue = itemCurrentValue ?? '';
@@ -108,11 +105,9 @@ async function setValueOf (variable: string | Readonly<VariableInterface>, curre
       });
     }
   }
+  item.currentValue = isOk && !isEval ? '' : setValue;
   return {
-    updated: {
-      ...item,
-      currentValue: isOk && !isEval ? '' : setValue, // be silent if parsed correctly eval
-    }, setValue, isOk, isEval,
+    updated: item, setValue, isOk, isEval,
   };
 }
 

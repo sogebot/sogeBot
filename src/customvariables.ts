@@ -1,12 +1,11 @@
 import { setTimeout } from 'timers';
 
 import { isNil } from 'lodash';
-import { IsNull } from 'typeorm';
 import { AppDataSource } from '~/database';
 
 import Core from '~/_interface';
 import {
-  Variable, VariableHistory, VariableInterface, VariableURL, VariableWatch,
+  Variable, VariableWatch,
 } from '~/database/entity/variable';
 import { onStartup } from '~/decorators/on';
 import { getBot } from '~/helpers/commons';
@@ -30,22 +29,22 @@ class CustomVariables extends Core {
 
   sockets () {
     adminEndpoint('/core/customvariables', 'customvariables::list', async (cb) => {
-      const variables = await AppDataSource.getRepository(Variable).find({ relations: ['history', 'urls'] });
+      const variables = await Variable.find({ relations: ['history', 'urls'] });
       cb(null, variables);
     });
     adminEndpoint('/core/customvariables', 'customvariables::runScript', async (id, cb) => {
       try {
-        const item = await AppDataSource.getRepository(Variable).findOneBy({ id: String(id) });
+        const item = await Variable.findOneBy({ id: String(id) });
         if (!item) {
           throw new Error('Variable not found');
         }
         const newCurrentValue = await runScript(item.evalValue, {
           sender: null, _current: item.currentValue, isUI: true,
         });
-        const runAt = Date.now();
-        cb(null, await AppDataSource.getRepository(Variable).save({
-          ...item, currentValue: newCurrentValue, runAt,
-        }));
+        item.runAt = new Date().toISOString();
+        item.currentValue = newCurrentValue;
+
+        cb(null, await item.save());
       } catch (e: any) {
         cb(e.stack, null);
       }
@@ -64,12 +63,12 @@ class CustomVariables extends Core {
       cb(null, returnedValue);
     });
     adminEndpoint('/core/customvariables', 'customvariables::isUnique', async ({ variable, id }, cb) => {
-      cb(null, (await AppDataSource.getRepository(Variable).find({ where: { variableName: String(variable) } })).filter(o => o.id !== id).length === 0);
+      cb(null, (await Variable.find({ where: { variableName: String(variable) } })).filter(o => o.id !== id).length === 0);
     });
     adminEndpoint('/core/customvariables', 'customvariables::delete', async (id, cb) => {
-      const item = await AppDataSource.getRepository(Variable).findOneBy({ id: String(id) });
+      const item = await Variable.findOneBy({ id: String(id) });
       if (item) {
-        await AppDataSource.getRepository(Variable).remove(item);
+        await Variable.remove(item);
         await AppDataSource.getRepository(VariableWatch).delete({ variableId: String(id) });
         updateWidgetAndTitle();
       }
@@ -79,28 +78,7 @@ class CustomVariables extends Core {
     });
     adminEndpoint('/core/customvariables', 'customvariables::save', async (item, cb) => {
       try {
-        const savedItem = await AppDataSource.getRepository(Variable).save(item);
-        // somehow this is not populated by save on sqlite
-        if (savedItem.urls) {
-          for (const url of savedItem.urls) {
-            await AppDataSource.getRepository(VariableURL).save({
-              ...url,
-              variable: savedItem,
-            });
-          }
-        }
-        // somehow this is not populated by save on sqlite
-        if (savedItem.history) {
-          for (const history of savedItem.history) {
-            await AppDataSource.getRepository(VariableHistory).save({
-              ...history,
-              variable: savedItem,
-            });
-          }
-        }
-        await AppDataSource.getRepository(VariableHistory).delete({ variableId: IsNull() });
-        await AppDataSource.getRepository(VariableURL).delete({ variableId: IsNull() });
-
+        const savedItem = await Variable.save(item);
         updateWidgetAndTitle(savedItem.variableName);
         csEmitter.emit('variable-changed', savedItem.variableName);
         cb(null, savedItem.id);
@@ -117,19 +95,19 @@ class CustomVariables extends Core {
     }
 
     clearTimeout(this.timeouts[`${this.constructor.name}.checkIfCacheOrRefresh`]);
-    const items = await AppDataSource.getRepository(Variable).find({ where: { type: 'eval' } });
+    const items = await Variable.find({ where: { type: 'eval' } });
 
-    for (const item of items as Required<VariableInterface>[]) {
+    for (const item of items) {
       try {
-        item.runAt = isNil(item.runAt) ? 0 : item.runAt;
+        item.runAt = isNil(item.runAt) ? new Date().toISOString() : item.runAt;
         const shouldRun = item.runEvery > 0 && Date.now() - new Date(item.runAt).getTime() >= item.runEvery;
         if (shouldRun) {
           const newValue = await runScript(item.evalValue, {
             _current: item.currentValue, sender: getBot(), isUI: false,
           });
-          item.runAt = Date.now();
+          item.runAt = new Date().toISOString();
           item.currentValue = newValue;
-          await AppDataSource.getRepository(Variable).save(item);
+          await Variable.save(item);
           await updateWidgetAndTitle(item.variableName);
         }
       } catch (e: any) {
