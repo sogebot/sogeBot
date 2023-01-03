@@ -33,8 +33,9 @@ describe('Custom Variable - helpers/customvariables/postURL - @func1', () => {
       evalValue: '',
       usableOptions: [],
       urls: [
-        { GET: false, POST: true, showResponse: false, id: urlId }],
+        { GET: false, POST: true, showResponse: false, id: urlId },
         { GET: false, POST: false, showResponse: false, id: urlIdWithoutPOST }
+      ]
     }).save();
 
     const variable2 = new Variable({
