@@ -44,7 +44,7 @@ export class Variable extends BotEntity<Variable> {
     GET: boolean;
     POST: boolean;
     showResponse: boolean;
-  }[];
+  }[] = [];
 
   @Column({ unique: true })
   @IsNotEmpty()
