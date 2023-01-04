@@ -116,7 +116,6 @@ class CustomCommands extends System {
     app.post('/api/systems/customcommands', adminMiddleware, async (req, res) => {
       try {
         const itemToSave = new Commands();
-
         const { count, ...data } = req.body;
         merge(itemToSave, data);
         await validateOrReject(itemToSave);

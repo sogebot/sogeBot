@@ -12,7 +12,7 @@ export class BotEntity<P> extends BaseEntity {
   }
 
   validateAndSave() {
-    return new Promise((resolve, reject) => {
+    return new Promise<this>((resolve, reject) => {
       validateOrReject(this)
         .then(() => {
           this.save()

@@ -27,7 +27,7 @@ import type { TextInterface } from '@entity/text';
 import type {
   UserBitInterface, UserInterface, UserTipInterface,
 } from '@entity/user';
-import type { VariableInterface, VariableWatchInterface } from '@entity/variable';
+import type { Variable, VariableWatch } from '@entity/variable';
 import { HelixVideo } from '@twurple/api/lib';
 import { ValidationError } from 'class-validator';
 import { Socket } from 'socket.io';
@@ -421,9 +421,9 @@ export type ClientToServerEventsWithNamespace = {
     'viewers': (cb: (error: Error | string | null, data: { chatters: any }) => void) => void,
   },
   '/widgets/customvariables': GenericEvents & {
-    'watched::save': (items: VariableWatchInterface[], cb: (error: Error | string | null, variables: VariableWatchInterface[]) => void) => void,
-    'customvariables::list': (cb: (error: Error | string | null, variables: VariableInterface[]) => void) => void,
-    'list.watch': (cb: (error: Error | string | null, variables: VariableWatchInterface[]) => void) => void,
+    'watched::save': (items: VariableWatch[], cb: (error: Error | string | null, variables: VariableWatch[]) => void) => void,
+    'customvariables::list': (cb: (error: Error | string | null, variables: Variable[]) => void) => void,
+    'list.watch': (cb: (error: Error | string | null, variables: VariableWatch[]) => void) => void,
     'watched::setValue': (opts: { id: string, value: string | number }, cb: (error: Error | string | null) => void) => void,
   },
   '/widgets/eventlist': GenericEvents & {
@@ -490,12 +490,12 @@ export type ClientToServerEventsWithNamespace = {
     'generic::setCoreCommand': (commands: import('../general').Command, cb: (error: Error | string | null) => void) => void,
   },
   '/core/customvariables': GenericEvents & {
-    'customvariables::list': (cb: (error: Error | string | null, items: VariableInterface[]) => void) => void,
-    'customvariables::runScript': (id: string, cb: (error: Error | string | null, items: VariableInterface | null) => void) => void,
+    'customvariables::list': (cb: (error: Error | string | null, items: Variable[]) => void) => void,
+    'customvariables::runScript': (id: string, cb: (error: Error | string | null, items: Variable | null) => void) => void,
     'customvariables::testScript': (opts: { evalValue: string, currentValue: string }, cb: (error: Error | string | null, returnedValue: any) => void) => void,
     'customvariables::isUnique': (opts: { variable: string, id: string }, cb: (error: Error | string | null, isUnique: boolean) => void) => void,
     'customvariables::delete': (id: string, cb?: (error: Error | string | null) => void) => void,
-    'customvariables::save': (item: VariableInterface, cb: (error: Error | string | null, itemId: string | null) => void) => void,
+    'customvariables::save': (item: Variable, cb: (error: ValidationError[] | Error | string | null, itemId: string | null) => void) => void,
   }
 };
 

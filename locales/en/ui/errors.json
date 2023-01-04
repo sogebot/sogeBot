@@ -1,4 +1,5 @@
 {
+  "errorDialogHeader": "Unexpected errors during validation",
   "isNotEmpty": "$property is required.",
   "minLength": "$property must be longer than or equal to $constraint1 characters.",
   "isPositive": "$property must be greater then 0",

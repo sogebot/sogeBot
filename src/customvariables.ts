@@ -1,6 +1,6 @@
 import { setTimeout } from 'timers';
 
-import { isNil } from 'lodash';
+import { isNil, merge } from 'lodash';
 import { AppDataSource } from '~/database';
 
 import Core from '~/_interface';
@@ -13,6 +13,7 @@ import { runScript, updateWidgetAndTitle } from '~/helpers/customvariables';
 import { csEmitter } from '~/helpers/customvariables/emitter';
 import { isDbConnected } from '~/helpers/database';
 import { adminEndpoint } from '~/helpers/socket';
+import { isValidationError } from './helpers/errors';
 
 class CustomVariables extends Core {
   timeouts: {
@@ -78,12 +79,19 @@ class CustomVariables extends Core {
     });
     adminEndpoint('/core/customvariables', 'customvariables::save', async (item, cb) => {
       try {
-        const savedItem = await Variable.save(item);
-        updateWidgetAndTitle(savedItem.variableName);
-        csEmitter.emit('variable-changed', savedItem.variableName);
-        cb(null, savedItem.id);
-      } catch (e: any) {
-        cb(e.stack, null);
+        const itemToSave = new Variable();
+        merge(itemToSave, item);
+        await itemToSave.validateAndSave();
+        updateWidgetAndTitle(itemToSave.variableName);
+        csEmitter.emit('variable-changed', itemToSave.variableName);
+        cb(null, itemToSave.id);
+      } catch (e) {
+        if (e instanceof Error) {
+          cb(e.message, null);
+        }
+        if (isValidationError(e)) {
+          cb(e, null);
+        }
       }
     });
   }

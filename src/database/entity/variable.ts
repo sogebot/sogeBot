@@ -64,7 +64,7 @@ export class Variable extends BotEntity<Variable> {
   }[];
 
   @Column({ unique: true })
-  @MinLength(3, { message: '$constraint1' })
+  @MinLength(3)
   @IsCustomVariable()
     variableName: string;
 
