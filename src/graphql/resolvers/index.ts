@@ -1,6 +1,5 @@
 export * from './alertResolver';
 export * from './carouselResolver';
-export * from './customVariableResolver';
 export * from './goalsResolver';
 export * from './googleResolver';
 export * from './menuResolver';

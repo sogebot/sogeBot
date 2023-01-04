@@ -1,238 +1,118 @@
-import {
-  Field, ID, ObjectType,
-} from 'type-graphql';
-import { EntitySchema } from 'typeorm';
+import { BeforeInsert, Column, Entity, PrimaryColumn } from 'typeorm';
 
-import { ColumnNumericTransformer } from './_transformer';
+import { BotEntity } from '../BotEntity';
+import { IsNotEmpty, IsNumber, MinLength } from 'class-validator';
+import { defaultPermissions } from '~/helpers/permissions';
 
-@ObjectType()
-export class VariableHistoryInterface {
-  @Field(type => ID)
-    id?: string;
-  variable?: VariableInterface;
-  variableId: string | null;
-  @Field()
-    userId: string;
-  @Field()
-    username: string;
-  @Field()
-    currentValue: string;
-  @Field()
-    oldValue: string;
-  @Field()
-    changedAt: number;
-}
-
-@ObjectType()
-export class VariableURLInterface {
-  @Field(type => ID)
+@Entity()
+export class VariableWatch extends BotEntity<VariableWatch> {
+  @PrimaryColumn({
+    type:      Number,
+    primary:   true,
+    generated: 'increment',
+  })
     id: string;
-  @Field()
-    GET: boolean;
-  @Field()
-    POST: boolean;
-  @Field()
-    showResponse: boolean;
-  variable: VariableInterface;
-  variableId: string | null;
-}
-
-@ObjectType()
-export class VariableWatchInterface {
-  @Field(type => ID)
-    id: string;
-  variableId: string;
-  @Field()
+  @Column({
+    type: String, nullable: false, name: 'variableId',
+  })
+    variableId: string;
+  @Column()
     order: number;
 }
 
-@ObjectType()
-export class VariableInterface {
-  @Field(type => ID)
-    id?: string;
-  @Field(type => [VariableHistoryInterface])
-    history?: VariableHistoryInterface[];
-  @Field(type => [VariableURLInterface])
-    urls?: VariableURLInterface[];
-  @Field()
-    variableName: string;
-  @Field()
-    description?: string;
-  @Field()
-    type: 'eval' | 'number' | 'options' | 'text';
-  @Field()
-    currentValue: string;
-  @Field()
-    evalValue: string;
-  @Field()
-    runEveryTypeValue?: number;
-  @Field()
-    runEveryType?: 'isUsed' | string;
-  @Field()
-    runEvery?: number;
-  @Field()
-    responseType: number;
-  @Field()
-    responseText?: string;
-  @Field()
-    permission: string;
-  @Field()
-    readOnly?: boolean;
-  @Field(type => [String])
-    usableOptions: string[];
-  @Field()
-    runAt?: number;
-}
+@Entity()
+export class Variable extends BotEntity<Variable> {
+  @BeforeInsert()
+  generateCreatedAt() {
+    if (!this.runAt) {
+      this.runAt = new Date(0).toISOString();
+    }
+    if (!this.urls) {
+      this.urls = [];
+    }
+    if (!this.history) {
+      this.history = [];
+    }
+    if (!this.permission) {
+      this.permission = defaultPermissions.MODERATORS;
+    }
+  }
 
-export const Variable = new EntitySchema<Readonly<Required<VariableInterface>>>({
-  name:    'variable',
-  columns: {
-    id: {
-      type:      'uuid',
-      primary:   true,
-      generated: 'uuid',
-    },
-    variableName: { type: String },
-    description:  {
-      type:    String,
-      default: '',
-    },
-    type:         { type: String },
-    currentValue: {
-      type:     String,
-      nullable: true,
-    },
-    evalValue:         { type: 'text' },
-    runEveryTypeValue: {
-      type:    Number,
-      default: 60000,
-    },
-    runEveryType: {
-      type:    String,
-      default: 'isUsed',
-    },
-    runEvery: {
-      type:    Number,
-      default: 60000,
-    },
-    responseType: { type: Number },
-    responseText: {
-      type:    String,
-      default: '',
-    },
-    permission: { type: String },
-    readOnly:   {
-      type:    Boolean,
-      default: false,
-    },
-    usableOptions: { type: 'simple-array' },
-    runAt:         {
-      type:        'bigint',
-      transformer: new ColumnNumericTransformer(),
-      default:     0,
-    },
-  },
-  relations: {
+  @PrimaryColumn({
+    type:      'uuid',
+    primary:   true,
+    generated: 'uuid',
+  })
+    id: string;
+
+  @Column({ type: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') !== 'better-sqlite3' ? 'json' : 'simple-json' })
     history: {
-      type:        'one-to-many',
-      target:      'variable_history',
-      inverseSide: 'variable',
-    },
+    userId: string;
+    username: string;
+    currentValue: string;
+    oldValue: string;
+    changedAt: string;
+  }[];
+
+  @Column({ type: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') !== 'better-sqlite3' ? 'json' : 'simple-json' })
     urls: {
-      type:        'one-to-many',
-      target:      'variable_url',
-      inverseSide: 'variable',
-    },
-  },
-});
+    id: string;
+    GET: boolean;
+    POST: boolean;
+    showResponse: boolean;
+  }[];
 
-export const VariableHistory = new EntitySchema<Readonly<VariableHistoryInterface>>({
-  name:    'variable_history',
-  columns: {
-    id: {
-      type:      Number,
-      primary:   true,
-      generated: 'increment',
-    },
-    userId: {
-      type:    String,
-      default: '0',
-    },
-    username: {
-      type:    String,
-      default: 'n/a',
-    },
-    currentValue: { type: String },
-    oldValue:     { type: 'simple-json' },
-    changedAt:    {
-      type:        'bigint',
-      transformer: new ColumnNumericTransformer(),
-      default:     0,
-    },
-    variableId: {
-      type: String, nullable: true, name: 'variableId', length: ['mysql', 'mariadb'].includes(process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') ? 36 : undefined,
-    },
-  },
-  relations: {
-    variable: {
-      type:        'many-to-one',
-      target:      'variable',
-      inverseSide: 'history',
-      onDelete:    'CASCADE',
-      onUpdate:    'CASCADE',
-      joinColumn:  { name: 'variableId' },
+  @Column({ unique: true })
+  @IsNotEmpty()
+  @MinLength(3)
+    variableName: string;
 
-    },
-  },
-});
+  @Column({ default: '' })
+    description: string;
 
-export const VariableURL = new EntitySchema<Readonly<VariableURLInterface>>({
-  name:    'variable_url',
-  columns: {
-    id: {
-      type:      String,
-      primary:   true,
-      generated: 'uuid',
-    },
-    GET: {
-      type:    Boolean,
-      default: false,
-    },
-    POST: {
-      type:    Boolean,
-      default: false,
-    },
-    showResponse: {
-      type:    Boolean,
-      default: false,
-    },
-    variableId: {
-      type: String, nullable: true, name: 'variableId', length: ['mysql', 'mariadb'].includes(process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') ? 36 : undefined,
-    },
-  },
-  relations: {
-    variable: {
-      type:        'many-to-one',
-      target:      'variable',
-      inverseSide: 'urls',
-      onDelete:    'CASCADE',
-      onUpdate:    'CASCADE',
-      joinColumn:  { name: 'variableId' },
-    },
-  },
-});
+  @Column({ type: String })
+    type: 'eval' | 'number' | 'options' | 'text';
 
-export const VariableWatch = new EntitySchema<Readonly<VariableWatchInterface>>({
-  name:    'variable_watch',
-  columns: {
-    id: {
-      type:      Number,
-      primary:   true,
-      generated: 'increment',
-    },
-    variableId: {
-      type: String, nullable: false, name: 'variableId',
-    },
-    order: { type: Number },
-  },
-});
+  @Column({
+    type:     String,
+    nullable: true,
+  })
+    currentValue: string;
+
+  @Column({ type: 'text' })
+    evalValue: string;
+
+  @Column({ default: 60000 })
+  @IsNotEmpty()
+  @IsNumber()
+    runEveryTypeValue: number;
+
+  @Column({ type: String, default: 'isUsed' })
+    runEveryType: 'isUsed' | string;
+
+  @Column({ default: 60000 })
+  @IsNotEmpty()
+  @IsNumber()
+    runEvery: number;
+
+  @Column()
+    responseType: number;
+
+  @Column({ default: '' })
+    responseText: string;
+
+  @Column()
+    permission: string;
+
+  @Column({
+    type:    Boolean,
+    default: false,
+  })
+    readOnly: boolean;
+
+  @Column({ type: 'simple-array' })
+    usableOptions: string[];
+
+  @Column({ type: 'varchar', length: '2022-07-27T00:30:34.569259834Z'.length })
+    runAt: string;
+}

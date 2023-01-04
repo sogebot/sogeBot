@@ -28,7 +28,7 @@ const { Settings } = require('../../dest/database/entity/settings');
 const { SongRequest } = require('../../dest/database/entity/song');
 const { Timer, TimerResponse } = require('../../dest/database/entity/timer');
 const { User, UserTip, UserBit } = require('../../dest/database/entity/user');
-const { Variable, VariableHistory, VariableURL } = require('../../dest/database/entity/variable');
+const { Variable } = require('../../dest/database/entity/variable');
 const { getIsDbConnected, getIsBotStarted } = require('../../dest/helpers/database');
 const emitter = require('../../dest/helpers/interfaceEmitter').default;
 const translation = (require('../../dest/translate')).default;
@@ -51,7 +51,7 @@ module.exports = {
       await changelog.flush();
       await waitMs(1000); // wait little bit for transactions to be done
 
-      const entities = [Settings, AliasGroup, CommandsGroup, KeywordGroup, HeistUser, EventList, PointsChangelog, SongRequest, RaffleParticipant, Rank, PermissionCommands, Event, EventOperation, Variable, VariableHistory, VariableURL, Raffle, Duel, Poll, TimerResponse, Timer, UserTip, UserBit, User, ModerationPermit, Alias, Bets, Commands, CommandsCount, Quotes, Cooldown, Keyword, Price, DiscordLink];
+      const entities = [Settings, AliasGroup, CommandsGroup, KeywordGroup, HeistUser, EventList, PointsChangelog, SongRequest, RaffleParticipant, Rank, PermissionCommands, Event, EventOperation, Variable, Raffle, Duel, Poll, TimerResponse, Timer, UserTip, UserBit, User, ModerationPermit, Alias, Bets, Commands, CommandsCount, Quotes, Cooldown, Keyword, Price, DiscordLink];
       if (['postgres', 'mysql'].includes(AppDataSource.options.type)) {
         const metadatas = [];
         for (const entity of entities) {

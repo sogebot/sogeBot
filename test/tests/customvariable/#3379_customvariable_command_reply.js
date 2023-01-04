@@ -33,7 +33,7 @@ describe('Custom Variable - #3379 - Command reply should return correct reply - 
   });
 
   it(`Create initial value 0 of $_variable`, async () => {
-    await AppDataSource.getRepository(Variable).save({
+    await new Variable({
       variableName: '$_variable',
       readOnly: false,
       currentValue: '0',
@@ -42,7 +42,7 @@ describe('Custom Variable - #3379 - Command reply should return correct reply - 
       permission: defaultPermissions.VIEWERS,
       evalValue: '',
       usableOptions: [],
-    });
+    }).save();
   });
 
   it ('`!test` should return `My awesome variable is set to 0`', async () => {

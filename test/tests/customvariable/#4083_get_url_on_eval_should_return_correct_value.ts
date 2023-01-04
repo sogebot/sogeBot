@@ -1,13 +1,9 @@
-/* global describe it before */
-
-const { defaultPermissions } = require('../../../dest/helpers/permissions/');
-const Parser = require('../../../dest/parser').default;
+import { defaultPermissions } from '../../../dest/helpers/permissions';
 
 require('../../general.js');
 
 const db = require('../../general.js').db;
 const message = require('../../general.js').message;
-const customcommands = (require('../../../dest/systems/customcommands')).default;
 const user = require('../../general.js').user;
 
 const assert = require('assert');
@@ -15,7 +11,6 @@ const _ = require('lodash');
 const axios = require('axios');
 
 const { Variable } = require('../../../dest/database/entity/variable');
-const { AppDataSource } = require('../../../dest/database');
 const { v4 } = require('uuid');
 
 // stub
@@ -30,22 +25,24 @@ describe('Custom Variable - #4083 - Get url on eval should return correct value 
     await user.prepare();
   });
 
-  let urlId = v4();
+  const urlId = v4();
   it(`Create eval $_variable to return Date.now()`, async () => {
-    await new Variable({
-      variableName: '$_variable',
-      readOnly: false,
-      currentValue: '0',
-      type: 'eval',
-      responseType: 2,
-      permission: defaultPermissions.MODERATORS,
-      evalValue: 'return Date.now();',
+    await (new Variable({
+      variableName:  '$_variable',
+      readOnly:      false,
+      currentValue:  '0',
+      type:          'eval',
+      responseType:  2,
+      permission:    defaultPermissions.MODERATORS,
+      evalValue:     'return Date.now();',
       usableOptions: [],
-      urls: [{
-        id: urlId,
-        GET: true,
-      }]
-    }).save();
+      urls:          [{
+        id:           urlId,
+        GET:          true,
+        POST:         true,
+        showResponse: true,
+      }],
+    }).save());
   });
 
   it(`Fetch endpoint for value and check`, async () => {
