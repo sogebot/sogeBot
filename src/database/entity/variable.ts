@@ -1,4 +1,4 @@
-import { Column, Entity, PrimaryColumn } from 'typeorm';
+import { BeforeInsert, Column, Entity, PrimaryColumn } from 'typeorm';
 
 import { BotEntity } from '../BotEntity';
 import { IsNotEmpty, IsNumber, MinLength } from 'class-validator';
@@ -22,6 +22,22 @@ export class VariableWatch extends BotEntity<VariableWatch> {
 
 @Entity()
 export class Variable extends BotEntity<Variable> {
+  @BeforeInsert()
+  generateCreatedAt() {
+    if (!this.runAt) {
+      this.runAt = new Date(0).toISOString();
+    }
+    if (!this.urls) {
+      this.urls = [];
+    }
+    if (!this.history) {
+      this.history = [];
+    }
+    if (!this.permission) {
+      this.permission = defaultPermissions.MODERATORS;
+    }
+  }
+
   @PrimaryColumn({
     type:      'uuid',
     primary:   true,
@@ -36,7 +52,7 @@ export class Variable extends BotEntity<Variable> {
     currentValue: string;
     oldValue: string;
     changedAt: string;
-  }[] = [];
+  }[];
 
   @Column({ type: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') !== 'better-sqlite3' ? 'json' : 'simple-json' })
     urls: {
@@ -44,7 +60,7 @@ export class Variable extends BotEntity<Variable> {
     GET: boolean;
     POST: boolean;
     showResponse: boolean;
-  }[] = [];
+  }[];
 
   @Column({ unique: true })
   @IsNotEmpty()
@@ -52,10 +68,10 @@ export class Variable extends BotEntity<Variable> {
     variableName: string;
 
   @Column({ default: '' })
-    description: string = '';
+    description: string;
 
   @Column({ type: String })
-    type: 'eval' | 'number' | 'options' | 'text' = 'text';
+    type: 'eval' | 'number' | 'options' | 'text';
 
   @Column({
     type:     String,
@@ -69,34 +85,34 @@ export class Variable extends BotEntity<Variable> {
   @Column({ default: 60000 })
   @IsNotEmpty()
   @IsNumber()
-    runEveryTypeValue: number = 60000;
+    runEveryTypeValue: number;
 
   @Column({ type: String, default: 'isUsed' })
-    runEveryType: 'isUsed' | string = 'isUsed';
+    runEveryType: 'isUsed' | string;
 
   @Column({ default: 60000 })
   @IsNotEmpty()
   @IsNumber()
-    runEvery: number = 60000;
+    runEvery: number;
 
   @Column()
-    responseType: number = 0;
+    responseType: number;
 
   @Column({ default: '' })
-    responseText: string = '';
+    responseText: string;
 
   @Column()
-    permission: string = defaultPermissions.MODERATORS;
+    permission: string;
 
   @Column({
     type:    Boolean,
     default: false,
   })
-    readOnly: boolean = false;
+    readOnly: boolean;
 
   @Column({ type: 'simple-array' })
-    usableOptions: string[] = [];
+    usableOptions: string[];
 
   @Column({ type: 'varchar', length: '2022-07-27T00:30:34.569259834Z'.length })
-    runAt: string = new Date(0).toISOString();
+    runAt: string;
 }
