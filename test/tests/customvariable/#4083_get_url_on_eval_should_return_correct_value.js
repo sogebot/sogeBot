@@ -14,7 +14,7 @@ const assert = require('assert');
 const _ = require('lodash');
 const axios = require('axios');
 
-const { Variable, VariableURL } = require('../../../dest/database/entity/variable');
+const { Variable } = require('../../../dest/database/entity/variable');
 const { AppDataSource } = require('../../../dest/database');
 const { v4 } = require('uuid');
 
@@ -23,7 +23,7 @@ _.set(global, 'widgets.custom_variables.io.emit', function () {
   return;
 });
 
-describe('Custom Variable - #4083 - Get url on eval should return correct value - @func1', () => {
+describe.only('Custom Variable - #4083 - Get url on eval should return correct value - @func1', () => {
   before(async () => {
     await db.cleanup();
     await message.prepare();

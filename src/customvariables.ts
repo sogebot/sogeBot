@@ -29,7 +29,7 @@ class CustomVariables extends Core {
 
   sockets () {
     adminEndpoint('/core/customvariables', 'customvariables::list', async (cb) => {
-      const variables = await Variable.find({ relations: ['history', 'urls'] });
+      const variables = await Variable.find();
       cb(null, variables);
     });
     adminEndpoint('/core/customvariables', 'customvariables::runScript', async (id, cb) => {

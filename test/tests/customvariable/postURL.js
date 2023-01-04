@@ -5,7 +5,7 @@ const { AppDataSource } = require('../../../dest/database');
 
 const v4 = require('uuid').v4;
 
-const { Variable, VariableURL } = require('../../../dest/database/entity/variable');
+const { Variable } = require('../../../dest/database/entity/variable');
 const { defaultPermissions } = require('../../../dest/helpers/permissions');
 require('../../general.js');
 const db = require('../../general.js').db;

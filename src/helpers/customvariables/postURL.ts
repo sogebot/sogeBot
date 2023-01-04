@@ -6,7 +6,7 @@ import { setValueOf } from './setValueOf';
 
 async function postURL(req: any, res: any) {
   try {
-    const variable = (await AppDataSource.getRepository(Variable).find({ relations: ['urls'] }))
+    const variable = (await AppDataSource.getRepository(Variable).find())
       .find(v => {
         return v.urls.find(url => url.id === req.params.id);
       });
