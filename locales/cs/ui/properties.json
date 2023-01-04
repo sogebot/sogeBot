@@ -1,7 +1,7 @@
 {
   "alias": "Alias",
   "command": "Příkaz",
-  "variableName": "Název proměnné",
+  "variableName": "Variable name",
   "price": "Cena (body)",
   "priceBits": "Cena (bity)",
   "thisvalue": "Tato hodnota",

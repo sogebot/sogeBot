@@ -1,8 +1,11 @@
 {
+  "errorDialogHeader": "Unexpected errors during validation",
   "isNotEmpty": "$property is required.",
+  "minLength": "$property must be longer than or equal to $constraint1 characters.",
   "isPositive": "$property must be greater then 0",
   "isCommand": "$property must start with !",
   "isCommandOrCustomVariable": "$property must start with ! or $_",
+  "isCustomVariable": "$property must start with $_",
   "min": "$property must be at least $constraint1",
   "max": "$property must be lower or equal to $constraint1",
   "isInt": "$property must be an integer",
