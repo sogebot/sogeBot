@@ -8,7 +8,7 @@ const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 
 const customcommands = (require('../../../dest/systems/customcommands')).default;
-const { defaultPermissions } = require('../../../dest/helpers/permissions/');
+const { defaultPermissions } = require('../../../dest/helpers/permissions/defaultPermissions');
 
 const { User } = require('../../../dest/database/entity/user');
 const { AppDataSource } = require('../../../dest/database.js');

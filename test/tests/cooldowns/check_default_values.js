@@ -13,7 +13,7 @@ const assert = require('assert');
 const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 const time = require('../../general.js').time;
-const { defaultPermissions } = require('../../../dest/helpers/permissions/');
+const { defaultPermissions } = require('../../../dest/helpers/permissions/defaultPermissions');
 const { AppDataSource } = require('../../../dest/database.js');
 
 const cooldown = (require('../../../dest/systems/cooldown')).default;

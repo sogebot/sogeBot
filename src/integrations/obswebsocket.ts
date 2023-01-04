@@ -17,7 +17,7 @@ import {
 } from '~/helpers/log';
 import { app, ioServer } from '~/helpers/panel';
 import { ParameterError } from '~/helpers/parameterError';
-import { defaultPermissions } from '~/helpers/permissions';
+import { defaultPermissions } from '~/helpers/permissions/defaultPermissions';
 import { adminEndpoint, publicEndpoint } from '~/helpers/socket';
 import { translate } from '~/translate';
 

@@ -16,7 +16,8 @@ import type { ResponseFilter } from '.';
 
 import { enabled } from '~/helpers/interface/enabled';
 import { error, warning } from '~/helpers/log';
-import { get, getCommandPermission } from '~/helpers/permissions';
+import { get } from '~/helpers/permissions/get';
+import { getCommandPermission } from '~/helpers/permissions/getCommandPermission';
 import { getPointsName } from '~/helpers/points';
 import { translate } from '~/translate';
 

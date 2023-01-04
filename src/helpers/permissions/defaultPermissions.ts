@@ -6,4 +6,5 @@ const defaultPermissions = {
   VIEWERS:     '0efd7b1c-e460-4167-8e06-8aaf2c170311',
 };
 
+export default defaultPermissions;
 export { defaultPermissions };

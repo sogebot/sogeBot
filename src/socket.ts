@@ -12,9 +12,9 @@ import {
 import { onLoad } from '~/decorators/on';
 import { debug, error } from '~/helpers/log';
 import { app, ioServer } from '~/helpers/panel';
-import {
-  check, defaultPermissions, getUserHighestPermission,
-} from '~/helpers/permissions/index';
+import { check } from '~/helpers/permissions/check';
+import { defaultPermissions } from '~/helpers/permissions/defaultPermissions';
+import { getUserHighestPermission } from '~/helpers/permissions/getUserHighestPermission';
 import { adminEndpoint, endpoints } from '~/helpers/socket';
 import * as changelog from '~/helpers/user/changelog.js';
 import { isModerator } from '~/helpers/user/isModerator';

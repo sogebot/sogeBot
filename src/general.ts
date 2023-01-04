@@ -28,7 +28,7 @@ import {
 } from '~/helpers/log';
 import { socketsConnected } from '~/helpers/panel/index';
 import { addUIWarn } from '~/helpers/panel/index';
-import { defaultPermissions } from '~/helpers/permissions/index';
+import defaultPermissions from '~/helpers/permissions/defaultPermissions';
 import { list } from '~/helpers/register';
 import { adminEndpoint } from '~/helpers/socket';
 import { getMuteStatus } from '~/helpers/tmi/muteStatus';

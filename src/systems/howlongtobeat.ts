@@ -17,7 +17,7 @@ import { prepare } from '~/helpers/commons';
 import {
   debug, error,
 } from '~/helpers/log';
-import { defaultPermissions } from '~/helpers/permissions/index';
+import defaultPermissions from '~/helpers/permissions/defaultPermissions';
 import { app } from '~/helpers/panel';
 import { adminMiddleware } from '~/socket';
 

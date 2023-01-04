@@ -10,7 +10,7 @@ import {
   stats,
 } from '~/helpers/api';
 import { prepare } from '~/helpers/commons';
-import { defaultPermissions } from '~/helpers/permissions/index';
+import defaultPermissions from '~/helpers/permissions/defaultPermissions';
 
 const cache = new Map<string, string>();
 

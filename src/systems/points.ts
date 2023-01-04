@@ -28,8 +28,8 @@ import {
   debug, error, warning,
 } from '~/helpers/log';
 import { ParameterError } from '~/helpers/parameterError';
-import { getUserHighestPermission } from '~/helpers/permissions/index';
-import { defaultPermissions } from '~/helpers/permissions/index';
+import { getUserHighestPermission } from '~/helpers/permissions/getUserHighestPermission';
+import defaultPermissions from '~/helpers/permissions/defaultPermissions';
 import { getPointsName, name } from '~/helpers/points/index';
 import { adminEndpoint } from '~/helpers/socket';
 import * as changelog from '~/helpers/user/changelog.js';

@@ -1,6 +1,6 @@
 /* global describe it before */
 
-const { defaultPermissions } = require('../../../dest/helpers/permissions/');
+const { defaultPermissions } = require('../../../dest/helpers/permissions/defaultPermissions');
 const Parser = require('../../../dest/parser').default;
 
 require('../../general.js');

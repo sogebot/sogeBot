@@ -24,7 +24,7 @@ import {
   announce, getBot, getBotSender, prepare,
 } from '~/helpers/commons';
 import { error, info } from '~/helpers/log';
-import { defaultPermissions } from '~/helpers/permissions/index';
+import defaultPermissions from '~/helpers/permissions/defaultPermissions';
 import { adminEndpoint, publicEndpoint } from '~/helpers/socket';
 import { tmiEmitter } from '~/helpers/tmi';
 import * as changelog from '~/helpers/user/changelog.js';

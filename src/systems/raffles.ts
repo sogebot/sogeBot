@@ -22,7 +22,7 @@ import {
 import { isDbConnected } from '~/helpers/database';
 import { debug, warning } from '~/helpers/log';
 import { linesParsed } from '~/helpers/parser';
-import { defaultPermissions } from '~/helpers/permissions/index';
+import defaultPermissions from '~/helpers/permissions/defaultPermissions';
 import { adminEndpoint } from '~/helpers/socket';
 import { tmiEmitter } from '~/helpers/tmi';
 import * as changelog from '~/helpers/user/changelog.js';

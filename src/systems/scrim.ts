@@ -15,7 +15,7 @@ import { getBotSender } from '~/helpers/commons/getBotSender';
 import { prepare } from '~/helpers/commons/prepare';
 import { round5 } from '~/helpers/commons/round5';
 import { debug } from '~/helpers/log';
-import { defaultPermissions } from '~/helpers/permissions/index';
+import defaultPermissions from '~/helpers/permissions/defaultPermissions';
 import twitch from '~/services/twitch';
 import { translate } from '~/translate';
 

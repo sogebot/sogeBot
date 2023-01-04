@@ -11,7 +11,7 @@ import users from '../users';
 import System from './_interface';
 
 import { prepare } from '~/helpers/commons';
-import { defaultPermissions } from '~/helpers/permissions/index';
+import defaultPermissions from '~/helpers/permissions/defaultPermissions';
 import * as changelog from '~/helpers/user/changelog.js';
 import { translate } from '~/translate';
 import { app } from '~/helpers/panel';

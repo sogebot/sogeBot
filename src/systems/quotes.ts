@@ -12,7 +12,7 @@ import System from './_interface';
 
 import { prepare } from '~/helpers/commons';
 import { app } from '~/helpers/panel';
-import { defaultPermissions } from '~/helpers/permissions/index';
+import defaultPermissions from '~/helpers/permissions/defaultPermissions';
 import { domain } from '~/helpers/ui';
 import { adminMiddleware } from '~/socket';
 

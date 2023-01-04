@@ -2,7 +2,7 @@ import { Variable } from '@entity/variable';
 import { isNil } from 'lodash';
 import { AppDataSource } from '~/database';
 
-import { check } from '../permissions/';
+import { check } from '../permissions/check';
 import { runScript } from './runScript';
 
 async function getValueOf (variableName: string, opts?: any) {

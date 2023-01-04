@@ -7,7 +7,7 @@ import Message from '../message';
 import Overlay from './_interface';
 
 import { debug } from '~/helpers/log';
-import { defaultPermissions } from '~/helpers/permissions';
+import { defaultPermissions } from '~/helpers/permissions/defaultPermissions';
 import { publicEndpoint } from '~/helpers/socket';
 import client from '~/services/twitch/api/client';
 

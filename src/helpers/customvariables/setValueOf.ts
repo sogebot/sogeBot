@@ -3,11 +3,10 @@ import { isNil } from 'lodash';
 
 import users from '../../users';
 import { warning } from '../log';
-import {
-  get, getUserHighestPermission,
-} from '../permissions';
-import { defaultPermissions } from '../permissions/';
-import { check } from '../permissions/';
+import { get } from '../permissions/get';
+import { getUserHighestPermission } from '../permissions/getUserHighestPermission';
+import { defaultPermissions } from '../permissions/defaultPermissions';
+import { check } from '../permissions/check';
 import { addChangeToHistory } from './addChangeToHistory';
 import { csEmitter } from './emitter';
 import { getValueOf } from './getValueOf';

@@ -21,10 +21,11 @@ import rates from '~/helpers/currency/rates';
 import {
   debug, error, isDebugEnabled,
 } from '~/helpers/log';
-import { defaultPermissions, getUserHighestPermission } from '~/helpers/permissions/index';
 import { adminEndpoint, viewerEndpoint } from '~/helpers/socket';
 import * as changelog from '~/helpers/user/changelog.js';
 import { getIdFromTwitch } from '~/services/twitch/calls/getIdFromTwitch';
+import { getUserHighestPermission } from './helpers/permissions/getUserHighestPermission';
+import { defaultPermissions } from './helpers/permissions/defaultPermissions';
 
 class Users extends Core {
   constructor () {

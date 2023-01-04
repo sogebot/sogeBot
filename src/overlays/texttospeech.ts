@@ -6,7 +6,7 @@ import {
 import { warning } from '../helpers/log';
 import Overlay from './_interface';
 
-import { defaultPermissions } from '~/helpers/permissions/index';
+import defaultPermissions from '~/helpers/permissions/defaultPermissions';
 
 class TextToSpeech extends Overlay {
   @command('!tts')

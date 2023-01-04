@@ -5,7 +5,7 @@ const { AppDataSource } = require('../../../dest/database.js');
 require('../../general.js');
 const { Commands, CommandsGroup } = require('../../../dest/database/entity/commands');
 const { prepare } = (require('../../../dest/helpers/commons/prepare'));
-const { defaultPermissions } = require('../../../dest/helpers/permissions/');
+const { defaultPermissions } = require('../../../dest/helpers/permissions/defaultPermissions');
 const customcommands = (require('../../../dest/systems/customcommands')).default;
 const db = require('../../general.js').db;
 const message = require('../../general.js').message;

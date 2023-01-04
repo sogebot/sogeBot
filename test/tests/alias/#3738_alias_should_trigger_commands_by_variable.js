@@ -8,7 +8,7 @@ const user = require('../../general.js').user;
 const alias = (require('../../../dest/systems/alias')).default;
 
 const { prepare } = (require('../../../dest/helpers/commons/prepare'));
-const { defaultPermissions } = require('../../../dest/helpers/permissions/');
+const { defaultPermissions } = require('../../../dest/helpers/permissions/defaultPermissions');
 
 const { Variable } = require('../../../dest/database/entity/variable');
 const { AppDataSource } = require('../../../dest/database');

@@ -6,7 +6,7 @@ import { v4 } from 'uuid';
 import { parser } from '../decorators';
 import Registry from './_interface';
 
-import { check } from '~/helpers/permissions/index';
+import { check } from '~/helpers/permissions/check';
 import { adminEndpoint, publicEndpoint } from '~/helpers/socket';
 
 class Randomizer extends Registry {

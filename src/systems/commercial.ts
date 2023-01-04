@@ -12,7 +12,7 @@ import { getOwnerAsSender } from '~/helpers/commons';
 import { eventEmitter } from '~/helpers/events';
 import { error, warning } from '~/helpers/log';
 import { addUIError } from '~/helpers/panel/alerts';
-import { defaultPermissions } from '~/helpers/permissions/index';
+import defaultPermissions from '~/helpers/permissions/defaultPermissions';
 import { adminEndpoint } from '~/helpers/socket';
 import { variables } from '~/watchers';
 

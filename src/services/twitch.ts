@@ -29,7 +29,7 @@ import {
 } from '~/helpers/api';
 import { prepare } from '~/helpers/commons/prepare';
 import { isBotStarted } from '~/helpers/database';
-import { defaultPermissions } from '~/helpers/permissions/index';
+import defaultPermissions from '~/helpers/permissions/defaultPermissions';
 import { adminEndpoint } from '~/helpers/socket';
 import {
   ignorelist, sendWithMe, setMuteStatus, showWithAt,

@@ -17,7 +17,7 @@ import System from './_interface';
 
 import { prepare } from '~/helpers/commons';
 import { app } from '~/helpers/panel';
-import { defaultPermissions } from '~/helpers/permissions/index';
+import defaultPermissions from '~/helpers/permissions/defaultPermissions';
 import { getPointsName } from '~/helpers/points';
 import { isOwner } from '~/helpers/user';
 import * as changelog from '~/helpers/user/changelog.js';

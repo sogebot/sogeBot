@@ -1,4 +1,4 @@
-import { defaultPermissions } from '../../../dest/helpers/permissions';
+import { defaultPermissions } from '../../../dest/helpers/permissions/defaultPermissions';
 
 require('../../general.js');
 

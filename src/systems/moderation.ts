@@ -26,8 +26,8 @@ import {
   error, timeout as timeoutLog, warning as warningLog,
 } from '~/helpers/log';
 import { ParameterError } from '~/helpers/parameterError';
-import { defaultPermissions } from '~/helpers/permissions/index';
-import { getUserHighestPermission } from '~/helpers/permissions/index';
+import defaultPermissions from '~/helpers/permissions/defaultPermissions';
+import { getUserHighestPermission } from '~/helpers/permissions/getUserHighestPermission';
 import { adminEndpoint } from '~/helpers/socket';
 import { tmiEmitter } from '~/helpers/tmi';
 import { isModerator } from '~/helpers/user/isModerator';

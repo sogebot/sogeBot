@@ -8,7 +8,7 @@ import System from './_interface';
 
 import { parserReply } from '~/commons';
 import { getBotSender, prepare } from '~/helpers/commons';
-import { defaultPermissions } from '~/helpers/permissions/index';
+import defaultPermissions from '~/helpers/permissions/defaultPermissions';
 import { adminEndpoint } from '~/helpers/socket';
 import * as changelog from '~/helpers/user/changelog.js';
 import twitch from '~/services/twitch';

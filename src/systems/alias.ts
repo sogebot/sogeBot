@@ -21,10 +21,9 @@ import { executeVariablesInText } from '~/helpers/customvariables';
 import {
   debug, error, info, warning,
 } from '~/helpers/log';
-import {
-  get,
-} from '~/helpers/permissions';
-import { check, defaultPermissions } from '~/helpers/permissions/index';
+import { get } from '~/helpers/permissions/get';
+import { defaultPermissions } from '~/helpers/permissions/defaultPermissions';
+import { check } from '~/helpers/permissions/check';
 import { adminEndpoint } from '~/helpers/socket';
 import customCommands from '~/systems/customcommands';
 import { translate } from '~/translate';

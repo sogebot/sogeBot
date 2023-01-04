@@ -19,7 +19,7 @@ import {
 import { mainCurrency } from '~/helpers/currency';
 import exchange from '~/helpers/currency/exchange';
 import { warning } from '~/helpers/log.js';
-import { defaultPermissions } from '~/helpers/permissions/index';
+import defaultPermissions from '~/helpers/permissions/defaultPermissions';
 import { translate } from '~/translate';
 import { app } from '~/helpers/panel';
 import { adminMiddleware } from '~/socket';

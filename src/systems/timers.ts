@@ -17,7 +17,7 @@ import { announce } from '~/helpers/commons';
 import { isDbConnected } from '~/helpers/database';
 import { app } from '~/helpers/panel';
 import { linesParsed } from '~/helpers/parser';
-import { defaultPermissions } from '~/helpers/permissions/index';
+import defaultPermissions from '~/helpers/permissions/defaultPermissions';
 import { adminMiddleware } from '~/socket';
 import { translate } from '~/translate';
 import { onStartup } from '~/decorators/on';

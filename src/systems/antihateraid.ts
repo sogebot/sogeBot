@@ -6,7 +6,7 @@ import {
 import System from './_interface';
 
 import { prepare } from '~/helpers/commons';
-import { defaultPermissions } from '~/helpers/permissions/index';
+import defaultPermissions from '~/helpers/permissions/defaultPermissions';
 import twitch from '~/services/twitch';
 import { variables } from '~/watchers';
 

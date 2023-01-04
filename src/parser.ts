@@ -11,10 +11,8 @@ import {
 } from '~/helpers/log';
 import { parserEmitter } from '~/helpers/parser/emitter';
 import { populatedList } from '~/helpers/parser/populatedList';
-import {
-  getCommandPermission,
-} from '~/helpers/permissions';
-import { check } from '~/helpers/permissions/index';
+import { getCommandPermission } from '~/helpers/permissions/getCommandPermission';
+import { check } from '~/helpers/permissions/check';
 import { translate } from '~/translate';
 
 parserEmitter.on('process', async (opts, cb) => {

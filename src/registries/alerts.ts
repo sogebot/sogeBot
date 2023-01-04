@@ -16,7 +16,7 @@ import Expects from '~/expects';
 import { prepare } from '~/helpers/commons';
 import { error, debug, info } from '~/helpers/log';
 import { ioServer } from '~/helpers/panel';
-import { defaultPermissions } from '~/helpers/permissions';
+import { defaultPermissions } from '~/helpers/permissions/defaultPermissions';
 import { adminEndpoint, publicEndpoint } from '~/helpers/socket';
 import * as changelog from '~/helpers/user/changelog.js';
 import client from '~/services/twitch/api/client';

@@ -22,10 +22,9 @@ import {
 import { prepare } from '~/helpers/commons';
 import { info, warning } from '~/helpers/log';
 import { app } from '~/helpers/panel';
-import {
-  get,
-} from '~/helpers/permissions';
-import { check, defaultPermissions } from '~/helpers/permissions/index';
+import { get } from '~/helpers/permissions/get';
+import { defaultPermissions } from '~/helpers/permissions/defaultPermissions';
+import { check } from '~/helpers/permissions/check';
 import { adminMiddleware } from '~/socket';
 import { translate } from '~/translate';
 

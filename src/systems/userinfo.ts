@@ -24,10 +24,11 @@ import { prepare } from '~/helpers/commons/index';
 import { mainCurrency } from '~/helpers/currency';
 import exchange from '~/helpers/currency/exchange';
 import { error } from '~/helpers/log';
-import { get, getUserHighestPermission } from '~/helpers/permissions/index';
 import { getPointsName } from '~/helpers/points';
 import * as changelog from '~/helpers/user/changelog.js';
 import { translate } from '~/translate';
+import { getUserHighestPermission } from '~/helpers/permissions/getUserHighestPermission';
+import { get } from '~/helpers/permissions/get';
 
 /*
  * !me

@@ -16,7 +16,7 @@ import {
 } from '~/helpers/commons';
 import { isDbConnected } from '~/helpers/database';
 import { error, warning } from '~/helpers/log';
-import { defaultPermissions } from '~/helpers/permissions/index';
+import defaultPermissions from '~/helpers/permissions/defaultPermissions';
 import { getPointsName } from '~/helpers/points';
 import { adminEndpoint } from '~/helpers/socket';
 import * as changelog from '~/helpers/user/changelog.js';

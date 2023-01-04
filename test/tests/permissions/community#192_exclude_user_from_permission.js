@@ -6,7 +6,8 @@ const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 const assert = require('assert');
 
-const { defaultPermissions,check } = require('../../../dest/helpers/permissions/');
+const { defaultPermissions } = require('../../../dest/helpers/permissions/defaultPermissions');
+const { check } = require('../../../dest/helpers/permissions/check');
 const Parser = require('../../../dest/parser').default;
 const currency = require('../../../dest/currency').default;
 

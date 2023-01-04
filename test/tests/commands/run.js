@@ -4,7 +4,7 @@ const { merge } = require('lodash');
 
 const { Commands } = require('../../../dest/database/entity/commands');
 const { User } = require('../../../dest/database/entity/user');
-const { defaultPermissions } = require('../../../dest/helpers/permissions/');
+const { defaultPermissions } = require('../../../dest/helpers/permissions/defaultPermissions');
 const { AppDataSource } = require('../../../dest/database');
 const customcommands = (require('../../../dest/systems/customcommands')).default;
 

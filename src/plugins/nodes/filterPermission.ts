@@ -1,5 +1,5 @@
 import type { Node } from '~/../d.ts/src/plugins';
-import { check } from '~/helpers/permissions/index';
+import { check } from '~/helpers/permissions/check';
 
 export default async function(pluginId: string, currentNode: Node<string[]>, parameters: Record<string, any>, variables: Record<string, any>, userstate: { userName: string; userId: string; } | null) {
   const permissionsAccessList = currentNode.data.value;

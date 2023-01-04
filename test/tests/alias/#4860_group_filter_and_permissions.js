@@ -5,7 +5,7 @@ require('../../general.js');
 const { Alias, AliasGroup } = require('../../../dest/database/entity/alias');
 const { AppDataSource } = require('../../../dest/database');
 const { prepare } = (require('../../../dest/helpers/commons/prepare'));
-const { defaultPermissions } = require('../../../dest/helpers/permissions/');
+const { defaultPermissions } = require('../../../dest/helpers/permissions/defaultPermissions');
 const alias = (require('../../../dest/systems/alias')).default;
 const db = require('../../general.js').db;
 const message = require('../../general.js').message;

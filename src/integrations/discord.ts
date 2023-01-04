@@ -37,7 +37,7 @@ import {
   chatIn, chatOut, debug, error, info, warning, whisperOut,
 } from '~/helpers/log';
 import { get as getPermission } from '~/helpers/permissions/get';
-import { check } from '~/helpers/permissions/index';
+import { check } from '~/helpers/permissions/check';
 import { adminEndpoint } from '~/helpers/socket';
 import * as changelog from '~/helpers/user/changelog.js';
 import { getIdFromTwitch } from '~/services/twitch/calls/getIdFromTwitch';
