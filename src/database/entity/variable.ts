@@ -3,6 +3,7 @@ import { BeforeInsert, Column, Entity, PrimaryColumn } from 'typeorm';
 import { BotEntity } from '../BotEntity';
 import { IsNotEmpty, IsNumber, MinLength } from 'class-validator';
 import defaultPermissions from '../../helpers/permissions/defaultPermissions';
+import { IsCustomVariable } from '../validators/isCustomVariable';
 
 @Entity()
 export class VariableWatch extends BotEntity<VariableWatch> {
@@ -63,8 +64,8 @@ export class Variable extends BotEntity<Variable> {
   }[];
 
   @Column({ unique: true })
-  @IsNotEmpty()
-  @MinLength(3)
+  @MinLength(3, { message: '$constraint1' })
+  @IsCustomVariable()
     variableName: string;
 
   @Column({ default: '' })
