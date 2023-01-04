@@ -23,7 +23,7 @@ async function postURL(req: any, res: any) {
               }
             }
           }
-          return res.status(200).send({ oldValue: variable.currentValue, value: value.setValue });
+          return res.status(200).send({ oldValue: value.oldValue, value: value.setValue });
         } else {
           return res.status(400).send({ error: 'This value is not applicable for this endpoint', code: 400 });
         }

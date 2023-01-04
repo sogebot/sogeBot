@@ -11,7 +11,7 @@ require('../../general.js');
 const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 
-describe('Custom Variable - helpers/customvariables/postURL - @func1', () => {
+describe.only('Custom Variable - helpers/customvariables/postURL - @func1', () => {
   let urlId = v4();
   let urlIdWithoutPOST = v4();
   let urlIdWithResponse1 = v4();

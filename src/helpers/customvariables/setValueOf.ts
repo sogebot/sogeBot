@@ -13,13 +13,13 @@ import { csEmitter } from './emitter';
 import { getValueOf } from './getValueOf';
 import { updateWidgetAndTitle } from './updateWidgetAndTitle';
 
-async function setValueOf (variable: string | Variable, currentValue: any, opts: any): Promise<{ updated: Variable; isOk: boolean; setValue: string; isEval: boolean }> {
+async function setValueOf (variable: string | Variable, currentValue: any, opts: any): Promise<{ updated: Variable; isOk: boolean; setValue: string; oldValue: string, isEval: boolean }> {
   const item = typeof variable === 'string'
     ? await Variable.findOneBy({ variableName: variable })
     : variable;
   let isOk = true;
   let isEval = false;
-  const itemOldValue = item?.currentValue;
+  const itemOldValue = item?.currentValue ?? currentValue;
   let itemCurrentValue = item?.currentValue;
 
   opts.sender = isNil(opts.sender) ? null : opts.sender;
@@ -107,7 +107,7 @@ async function setValueOf (variable: string | Variable, currentValue: any, opts:
   }
   item.currentValue = isOk && !isEval ? '' : setValue;
   return {
-    updated: item, setValue, isOk, isEval,
+    updated: item, setValue, oldValue: itemOldValue,  isOk, isEval,
   };
 }
 
