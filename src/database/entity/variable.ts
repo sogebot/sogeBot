@@ -2,7 +2,7 @@ import { BeforeInsert, Column, Entity, PrimaryColumn } from 'typeorm';
 
 import { BotEntity } from '../BotEntity';
 import { IsNotEmpty, IsNumber, MinLength } from 'class-validator';
-import { defaultPermissions } from '~/helpers/permissions';
+import defaultPermissions from '~/helpers/permissions/defaultPermissions';
 
 @Entity()
 export class VariableWatch extends BotEntity<VariableWatch> {
