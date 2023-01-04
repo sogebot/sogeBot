@@ -23,7 +23,7 @@ describe('Custom Variable - helpers/customvariables/postURL - @func1', () => {
 
     postURL = require('../../../dest/helpers/customvariables/postURL').postURL;
 
-    const variable = new Variable({
+    new Variable({
       variableName: '$_variable',
       readOnly: false,
       currentValue: '0',
@@ -38,7 +38,7 @@ describe('Custom Variable - helpers/customvariables/postURL - @func1', () => {
       ]
     }).save();
 
-    const variable2 = new Variable({
+    new Variable({
       variableName: '$_variable2',
       readOnly: false,
       currentValue: '0',
@@ -50,7 +50,7 @@ describe('Custom Variable - helpers/customvariables/postURL - @func1', () => {
       urls: [{ GET: false, POST: true, showResponse: true, id: urlIdWithResponse1 }]
     }).save();
 
-    const variable3 = new Variable({
+    new Variable({
       variableName: '$_variable3',
       readOnly: false,
       currentValue: '0',

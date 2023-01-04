@@ -20,7 +20,7 @@ describe('Custom Variable - helpers/customvariables/getURL - @func1', () => {
     await db.cleanup();
     await message.prepare();
 
-    const variable = await AppDataSource.getRepository(Variable).save({
+    await new Variable({
       variableName: '$_variable',
       readOnly: false,
       currentValue: '0',
@@ -33,7 +33,7 @@ describe('Custom Variable - helpers/customvariables/getURL - @func1', () => {
         { GET: true, POST: false, showResponse: false, id: urlId },
         { GET: false, POST: false, showResponse: false, id: urlIdWithoutGET }
       ]
-    });
+    }).save();
   });
 
   it ('with enabled GET', async () => {

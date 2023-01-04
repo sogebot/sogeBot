@@ -162,7 +162,7 @@ describe('Message - cvars filter - @func3', async () => {
                 }
               });
               it(`create initial value '${test.initialValue}' of ${test.variable}`, async () => {
-                await AppDataSource.getRepository(Variable).save({
+                await new Variable({
                   variableName: test.variable,
                   readOnly: false,
                   currentValue: String(test.initialValue),
@@ -170,7 +170,7 @@ describe('Message - cvars filter - @func3', async () => {
                   permission: defaultPermissions[p],
                   evalValue: '',
                   usableOptions: [],
-                });
+                }).save();
               });
               it(`parse '${test.command}' with params`, async () => {
                 message = await new Message(test.command).parse({
@@ -210,12 +210,12 @@ describe('Message - cvars filter - @func3', async () => {
 
               if (user.userName === '__owner__' || (user.userName === '__viewer__' && p === 'VIEWERS')) {
                 it(`check if after value is ${test.afterValue}`, async () => {
-                  const cvar = await AppDataSource.getRepository(Variable).findOneBy({ variableName: test.variable });
+                  const cvar = await Variable.findOneBy({ variableName: test.variable });
                   assert.strictEqual(String(cvar.currentValue), String(test.afterValue));
                 });
               } else {
                 it(`check if after value is ${test.initialValue}`, async () => {
-                  const cvar = await AppDataSource.getRepository(Variable).findOneBy({ variableName: test.variable });
+                  const cvar = await Variable.findOneBy({ variableName: test.variable });
                   assert.strictEqual(String(cvar.currentValue), String(test.initialValue));
                 });
               }
@@ -251,7 +251,7 @@ describe('Message - cvars filter - @func3', async () => {
                 }
               });
               it(`create initial value '${test.initialValue}' of ${test.variable}`, async () => {
-                await AppDataSource.getRepository(Variable).save({
+                await new Variable({
                   variableName: test.variable,
                   readOnly: true,
                   currentValue: String(test.initialValue),
@@ -260,7 +260,7 @@ describe('Message - cvars filter - @func3', async () => {
                   permission: defaultPermissions[p],
                   evalValue: '',
                   usableOptions: [],
-                });
+                }).save();
               });
               it(`parse '${test.command}' with params`, async () => {
                 message = await new Message(test.command).parse({
@@ -285,7 +285,7 @@ describe('Message - cvars filter - @func3', async () => {
               }
 
               it(`check if after value is ${test.initialValue}`, async () => {
-                const cvar = await AppDataSource.getRepository(Variable).findOneBy({ variableName: test.variable });
+                const cvar = await Variable.findOneBy({ variableName: test.variable });
                 assert.strictEqual(String(cvar.currentValue), String(test.initialValue));
               });
 

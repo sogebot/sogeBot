@@ -32,7 +32,7 @@ describe('Custom Variable - #4083 - Get url on eval should return correct value 
 
   let urlId = v4();
   it(`Create eval $_variable to return Date.now()`, async () => {
-    const variable = await new Variable({
+    await new Variable({
       variableName: '$_variable',
       readOnly: false,
       currentValue: '0',

@@ -20,7 +20,7 @@ describe('Alias - @func1 - #3738 - alias should trigger commands by variable', (
   });
 
   it('create variable $_alert', async () => {
-    await AppDataSource.getRepository(Variable).save({
+    await new Variable({
       variableName: '$_alert',
       readOnly: false,
       currentValue: '!media type=video',
@@ -29,7 +29,7 @@ describe('Alias - @func1 - #3738 - alias should trigger commands by variable', (
       permission: defaultPermissions.CASTERS,
       evalValue: '',
       usableOptions: [],
-    });
+    }).save();
   });
 
   it('create alias !test for command !media (caster only)', async () => {

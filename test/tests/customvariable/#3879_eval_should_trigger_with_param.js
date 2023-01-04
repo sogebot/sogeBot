@@ -34,7 +34,7 @@ describe('Custom Variable - #3879 - Eval should trigger with param with proper p
   });
 
   it(`Create eval $_variable to return param`, async () => {
-    await AppDataSource.getRepository(Variable).save({
+    await new Variable({
       variableName: '$_variable',
       readOnly: false,
       currentValue: '0',
@@ -43,7 +43,7 @@ describe('Custom Variable - #3879 - Eval should trigger with param with proper p
       permission: defaultPermissions.MODERATORS,
       evalValue: 'return param || "no param sent";',
       usableOptions: [],
-    });
+    }).save();
   });
 
   describe('!_test 4 by owner', () => {
