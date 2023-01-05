@@ -86,14 +86,6 @@ export class Variable extends BotEntity<Variable> {
   @Column({ default: 60000 })
   @IsNotEmpty()
   @IsNumber()
-    runEveryTypeValue: number;
-
-  @Column({ type: String, default: 'isUsed' })
-    runEveryType: 'isUsed' | string;
-
-  @Column({ default: 60000 })
-  @IsNotEmpty()
-  @IsNumber()
     runEvery: number;
 
   @Column()

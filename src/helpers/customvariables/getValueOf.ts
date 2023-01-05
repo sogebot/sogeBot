@@ -15,7 +15,7 @@ async function getValueOf (variableName: string, opts?: any) {
   } // return empty if variable doesn't exist
 
   let currentValue = item.currentValue;
-  if (item.type === 'eval' && item.runEveryType === 'isUsed' ) {
+  if (item.type === 'eval' && item.runEvery === 0 ) {
     // recheck permission as this may go outside of setValueOf
     const permissionsAreValid = isNil(opts?.sender) || (await check(opts.sender.userId, item.permission, false)).access;
     if (permissionsAreValid) {
