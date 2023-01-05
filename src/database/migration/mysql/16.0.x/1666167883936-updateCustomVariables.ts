@@ -1,5 +1,4 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
-import { insertItemIntoTable } from '~/database/insertItemIntoTable';
 
 export class updateCustomVariables1666167883936 implements MigrationInterface {
   name = 'updateCustomVariables1666167883936';
