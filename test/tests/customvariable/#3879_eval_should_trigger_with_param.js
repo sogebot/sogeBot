@@ -40,6 +40,7 @@ describe('Custom Variable - #3879 - Eval should trigger with param with proper p
       currentValue: '0',
       type: 'eval',
       responseType: 2,
+      runEvery: 0,
       permission: defaultPermissions.MODERATORS,
       evalValue: 'return param || "no param sent";',
       usableOptions: [],
