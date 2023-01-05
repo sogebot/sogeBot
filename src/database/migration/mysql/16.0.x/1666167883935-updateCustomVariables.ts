@@ -23,6 +23,9 @@ export class updateCustomVariables1666167883935 implements MigrationInterface {
     for (const item of items) {
       item.history = JSON.stringify(items2.filter((o: { variableId: any; }) => o.variableId === item.id));
       item.urls = JSON.stringify(items3.filter((o: { variableId: any; }) => o.variableId === item.id));
+      if (item.runEveryType === 'isUsed') {
+        item.runEvery = 0;
+      }
       await insertItemIntoTable('variable', {
         ...item,
       }, queryRunner);
