@@ -57,5 +57,5 @@
   "tmi": "tmi",
   "oauth": "oAuth",
   "eventsub": "eventSub",
-  "rules": "rules"
+  "rules": "pravidla"
 }
