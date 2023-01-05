@@ -1085,7 +1085,7 @@
       "none": "Nebyli nalezeni žádní uživatelé ve frontě"
     }
   },
-  "marker": "Stream marker has been created at $time.",
+  "marker": "Značka streamu byla vytvořena v $time.",
   "title": {
     "current": "$sender, název vysílání je '$title'.",
     "change": {

@@ -15,7 +15,7 @@
     "type": {
       "twitchChatMessage": "Twitch zpráva chatu",
       "twitchCheer": "Twitch cheer received",
-      "twitchClearChat": "Twitch chat cleared",
+      "twitchClearChat": "Twitch chat vymazán",
       "twitchCommand": "Příkaz na Twitch",
       "twitchFollow": "Nový Twitch sledující",
       "twitchSubscription": "Nový Twitch odběr",

@@ -10,7 +10,7 @@
     "clientId": "ClientId",
     "token": "Token",
     "joinToServerBtn": "Kliknutím připojíte bota na váš server",
-    "joinToServerBtnDisabled": "Please save changes to enable bot join to your server",
+    "joinToServerBtnDisabled": "Uložte změny pro připojení bota k serveru",
     "cannotJoinToServerBtn": "Nastavte token a clientId, abyste mohli připojit bota na váš server",
     "noChannelSelected": "není vybrán žádný kanál",
     "noRoleSelected": "není vybrána žádná role",
