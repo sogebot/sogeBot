@@ -73,11 +73,7 @@
     "eval": "スクリプト"
   },
   "runEvery": {
-    "isUsed": "変数が使用されたとき",
-    "seconds": "秒",
-    "minutes": "分",
-    "hours": "時間",
-    "days": "日"
+    "isUsed": "変数が使用されたとき"
   }
 }
 
