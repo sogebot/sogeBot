@@ -73,11 +73,7 @@
     "eval": "Script"
   },
   "runEvery": {
-    "isUsed": "Quando a variável é usada",
-    "seconds": "Segundos",
-    "minutes": "Minutos",
-    "hours": "Horas",
-    "days": "Dias"
+    "isUsed": "Quando a variável é usada"
   }
 }
 

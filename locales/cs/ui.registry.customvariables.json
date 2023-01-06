@@ -73,11 +73,7 @@
     "eval": "Skript"
   },
   "runEvery": {
-    "isUsed": "Při použití proměnné",
-    "seconds": "Vteřiny",
-    "minutes": "Minuty",
-    "hours": "Hodiny",
-    "days": "Dny"
+    "isUsed": "Při použití proměnné"
   }
 }
 
