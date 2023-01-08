@@ -532,6 +532,9 @@ class Discord extends Integration {
           this.updateRolesOfLinkedUsers();
         }
       });
+      this.client.on('error', (err) => {
+        error(`DISCORD: ${err.stack || err.message}`);
+      });
 
       this.client.on('messageCreate', async (msg) => {
         if (this.client && this.guild) {
