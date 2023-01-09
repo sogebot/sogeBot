@@ -1,18 +1,19 @@
-import { VM }  from 'vm2';
+import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized';
 import { Mutex } from 'async-mutex';
+import axios from 'axios';
+import { VM }  from 'vm2';
 
 import type { Node } from '~/../d.ts/src/plugins';
-import { debug, error, info } from '~/helpers/log';
-import { PluginVariable } from '~/database/entity/plugins';
-import { template } from '~/plugins/template';
-import { sendMessage } from '~/helpers/commons/sendMessage';
-import { getBotSender } from '~/helpers/commons';
-import * as changelog from '~/helpers/user/changelog.js';
 import { AppDataSource } from '~/database';
+import { PluginVariable } from '~/database/entity/plugins';
 import { User } from '~/database/entity/user';
-import { isBroadcaster } from '~/helpers/user/isBroadcaster';
-import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized';
+import { getBotSender } from '~/helpers/commons';
+import { sendMessage } from '~/helpers/commons/sendMessage';
+import { debug, error, info } from '~/helpers/log';
 import { tmiEmitter } from '~/helpers/tmi';
+import * as changelog from '~/helpers/user/changelog.js';
+import { isBroadcaster } from '~/helpers/user/isBroadcaster';
+import { template } from '~/plugins/template';
 import points from '~/systems/points';
 
 const semaphores = new Map<string, Mutex>();
@@ -28,6 +29,7 @@ export default async function(pluginId: string, currentNode: Node<string>, param
   const script = currentNode.data.value;
   try {
     const sandbox = {
+      axios,
       variable: {
         async load(variableName: string) {
           const variable = await PluginVariable.findOneBy({ variableName, pluginId });
