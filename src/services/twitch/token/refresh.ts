@@ -122,6 +122,12 @@ export const refresh = async (type: 'bot' | 'broadcaster'): Promise<string | nul
     }
 
     if (response.ok) {
+      if (typeof data.access_token !== 'string' || data.access_token.length === 0) {
+        throw new Error(`Access token for ${type} was not correctly fetched (not a string)`);
+      }
+      if (typeof data.refresh_token !== 'string' || data.refresh_token.length === 0) {
+        throw new Error(`Refresh token for ${type} was not correctly fetched (not a string)`);
+      }
       emitter.emit('set', '/services/twitch', `${type}AccessToken`, data.access_token);
       emitter.emit('set', '/services/twitch', `${type}RefreshToken`, data.refresh_token);
       emitter.emit('services::twitch::api::init', type);
