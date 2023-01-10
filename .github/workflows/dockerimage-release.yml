@@ -8,6 +8,8 @@ on:
 
 jobs:
   release:
+    permissions:
+      contents: write
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -35,7 +37,7 @@ jobs:
 
       - name: Generate changelog
         id: log
-        run: echo "MESSAGE=$(node tools/changelog.js --escape generate)" >> $GITHUB_OUTPUT
+        run: node tools/changelog.js generate > body.md
 
       - uses: actions/upload-artifact@v3
         with:
@@ -43,25 +45,12 @@ jobs:
           path: ${{ github.workspace }}/*.zip
 
       - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+        uses: ncipollo/release-action@v1
         with:
-          tag_name: ${{ github.ref }}
-          release_name: SOGEBOT ${{ github.ref }}
-          body: |
-            ${{ steps.log.outputs.MESSAGE }}
-          draft: false
-          prerelease: false
-
-      - name: Upload the artifacts
-        uses: skx/github-action-publish-binaries@master
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          releaseId: ${{ steps.create_release.outputs.id }}
-          args: '*.zip'
+          name: SOGEBOT ${{ github.ref_name }}
+          artifacts: "*.zip"
+          bodyFile: "body.md"
+          makeLatest: true
 
   build:
     needs: release

@@ -1,3 +1,4 @@
+/* eslint-disable no-useless-escape */
 const { spawnSync } = require('child_process');
 
 const gitSemverTags = require('git-semver-tags');
@@ -104,7 +105,7 @@ if (argv._[0] === 'generate') {
 
     for (const output of changesList) {
       for (const line of output) {
-        process.stdout.write(sanitizeLine(line));
+        process.stdout.write(line);
       }
     }
   });
@@ -113,7 +114,7 @@ if (argv._[0] === 'generate') {
 if (argv._[0] === 'cli') {
   const changesSpawn = spawnSync('git', ['log', argv.commit, '--oneline']);
   for (const output of changes(changesSpawn.stdout.toString().split('\n'))) {
-    process.stdout.write(sanitizeLine(output));
+    process.stdout.write(output);
   }
 }
 
@@ -210,45 +211,24 @@ function changes(changesList) {
     return o.message.startsWith('fix') || o.message.startsWith('feat');
   });
 
-  if (changesList.filter(o => o.message.startsWith('fix')).length > 0) {
-    // print out bugfixes
-    output.push('### Bug Fixes\n');
-    for (const change of changesList.filter(o => o.message.startsWith('fix'))) {
-      output.push(prepareMessage(change));
-    }
-    output.push('\n');
-  }
-
-  if (changesList.filter(o => o.message.startsWith('feat')).length > 0) {
-    // print out bugfixes
-    output.push('### Features\n');
-    for (const change of changesList.filter(o => o.message.startsWith('feat'))) {
-      output.push(prepareMessage(change));
-    }
-    output.push('\n');
+  for (const change of changesList) {
+    output.push(prepareMessage(change));
   }
 
   return output;
+}
+
+function isFix (msg) {
+  return msg.startsWith('fix');
 }
 
 function prepareMessage(change) {
   const regexp = /(fix|feat)\((?<type>\w*)\)\: (?<message>.*)/;
   const match = regexp.exec(change.message);
   try {
-    return `* **${match.groups.type}** - ${match.groups.message}${change.fixes.length > 0 ? ', ' + change.fixes.join(', ') : ''} ([${change.commit}](https://github.com/sogehige/sogeBot/commit/${change.commit}))\n`;
+    return `[![${change.commit}](https://img.shields.io/badge/${change.commit}-${isFix(change.message) ? 'fix-green' : 'feat-blue'}?style=flat-square)](https://github.com/sogebot/sogeBot/commit/${change.commit})[![${match.groups.type}-${encodeURIComponent(match.groups.message)}]( https://img.shields.io/badge/${match.groups.type}-${encodeURIComponent(match.groups.message)}-inactive?style=flat-square&labelColor=important)](https://github.com/sogebot/sogeBot/commit/${change.commit}) ${change.fixes.length > 0 ? ', ' + change.fixes.join(', ') : ''}\n`;
   } catch (e) {
-    return `* ${change.message.replace('fix:', '').replace('feat:', '').trim()} [${change.commit}](https://github.com/sogehige/sogeBot/commit/${change.commit}))\n`;
-  }
-}
-
-function sanitizeLine(line) {
-  if (argv.escape) {
-    const sanitized = line
-      .replace(/\%/g, '%25')
-      .replace(/\n/g, '%0A')
-      .replace(/\r/g, '%0D');
-    return sanitized;
-  } else {
-    return line;
+    const message = change.message.replace('fix:', '').replace('feat:', '').trim();
+    return `[![${change.commit}](https://img.shields.io/badge/${change.commit}-${isFix(change.message) ? 'fix-green' : 'feat-blue'}?style=flat-square)](https://github.com/sogebot/sogeBot/commit/${change.commit})[![${encodeURIComponent(message)}](https://img.shields.io/badge/${encodeURIComponent(message)}-inactive?style=flat-square)](https://github.com/sogebot/sogeBot/commit/${change.commit})\n`;
   }
 }
