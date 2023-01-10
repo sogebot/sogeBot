@@ -184,7 +184,7 @@ export const validate = async (type: 'bot' | 'broadcaster', retry = 0): Promise 
       const refreshToken = variables.get(`services.twitch.${type}RefreshToken`) as string;
 
       if (refreshToken !== '') {
-        refresh(type);
+        await refresh(type);
       } else {
         emitter.emit('set', '/services/twitch', `${type}TokenValid`, false);
         emitter.emit('set', '/services/twitch', `${type}Id`, '');
