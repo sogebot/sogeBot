@@ -10,13 +10,13 @@ import {
   ChatClient, ChatCommunitySubInfo, ChatSubGiftInfo, ChatSubInfo, ChatUser,
 } from '@twurple/chat';
 import { isNil } from 'lodash';
-import { AppDataSource } from '~/database';
 
 import { default as apiClient } from './api/client';
 import { CustomAuthProvider } from './token/CustomAuthProvider.js';
 import { refresh } from './token/refresh';
 
 import { parserReply } from '~/commons';
+import { AppDataSource } from '~/database';
 import { timer } from '~/decorators';
 import {
   getFunctionList,
@@ -632,7 +632,7 @@ class Chat {
   }
 
   @timer()
-  async subgift (recipient: string, subInfo: ChatSubGiftInfo, userstate: ChatUser) {
+  async subgift (recipient: string | null, subInfo: ChatSubGiftInfo, userstate: ChatUser) {
     try {
       const username = subInfo.gifter ?? '';
       const userId = subInfo.gifterUserId ?? '0';
@@ -643,9 +643,13 @@ class Chat {
       const ignoreGifts = (ignoreGiftsFromUser.get(userId) ?? 0);
       let isGiftIgnored = false;
 
+      if (!recipient) {
+        recipient = await users.getNameById(recipientId);
+      }
+      changelog.update(recipientId, { userId: recipientId, userName: recipient });
       const user = await changelog.get(recipientId);
+
       if (!user) {
-        changelog.update(recipientId, { userId: recipientId, userName: username });
         this.subgift(recipient, subInfo, userstate);
         return;
       }
