@@ -3,7 +3,7 @@ import { User } from '@entity/user';
 import { SECOND } from '@sogebot/ui-helpers/constants';
 import { dayjs, timezone } from '@sogebot/ui-helpers/dayjsHelper';
 import { getTime } from '@sogebot/ui-helpers/getTime';
-import { AppDataSource } from '~/database';
+import { capitalize } from 'lodash';
 
 import {
   command, default_permission, example, persistent, settings,
@@ -23,7 +23,7 @@ import PubSub from './twitch/pubsub';
 import { cleanErrors } from './twitch/token/refresh';
 import { cache, validate } from './twitch/token/validate';
 
-import { capitalize } from 'lodash';
+import { AppDataSource } from '~/database';
 import {
   isStreamOnline, stats, streamStatusChangeSince,
 } from '~/helpers/api';
@@ -266,16 +266,32 @@ class Twitch extends Service {
   }
 
   init() {
+    this.tmi = new Chat();
     if (this.botTokenValid && this.broadcasterTokenValid) {
-      this.tmi = new Chat();
-      this.tmi?.initClient('bot');
-      this.tmi?.initClient('broadcaster');
-
-      this.pubsub = new PubSub();
-      this.eventsub = new EventSub();
       apiIntervalInit();
     } else {
       setTimeout(() => this.init(), 1000);
+    }
+  }
+
+  @onLoad('botTokenValid')
+  @onChange('botTokenValid')
+  onBotTokenValidChange() {
+    if (this.botTokenValid) {
+      this.tmi?.initClient('bot');
+    }
+  }
+
+  @onLoad('broadcasterTokenValid')
+  @onChange('broadcasterTokenValid')
+  @onChange('broadcasterAccessToken')
+  onBroadcasterTokenValidChange() {
+    this.pubsub = null;
+    this.eventsub = null;
+    if (this.broadcasterTokenValid) {
+      this.tmi?.initClient('broadcaster');
+      this.pubsub = new PubSub();
+      this.eventsub = new EventSub();
     }
   }
 
