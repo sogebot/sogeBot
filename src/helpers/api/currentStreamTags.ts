@@ -1,9 +1,4 @@
-const _value: {
-  is_auto: boolean;
-  localization_names: {
-    [lang: string]: string;
-  };
-}[] = [];
+const _value: string[] = [];
 
 const currentStreamTags = {
   get value() {

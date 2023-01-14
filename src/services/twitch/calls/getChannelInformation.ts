@@ -1,7 +1,7 @@
 import client from '../api/client';
 import { refresh } from '../token/refresh.js';
 
-import { gameCache, gameOrTitleChangedManually, rawStatus } from '~/helpers/api';
+import {  currentStreamTags, gameCache, gameOrTitleChangedManually, rawStatus } from '~/helpers/api';
 import {
   stats as apiStats,
 } from '~/helpers/api';
@@ -21,10 +21,17 @@ export async function getChannelInformation (opts: any) {
     const broadcasterId = variables.get('services.twitch.broadcasterId') as string;
     const isTitleForced = variables.get('services.twitch.isTitleForced') as string;
     const clientBot = await client('bot');
-    const getChannelInfo = await clientBot.channels.getChannelInfo(broadcasterId);
+    const getChannelInfo = await clientBot.channels.getChannelInfoById(broadcasterId);
 
     if (!getChannelInfo) {
       throw new Error(`Channel ${broadcasterId} not found on Twitch`);
+    }
+
+    while (currentStreamTags.length) {
+      currentStreamTags.pop();
+    }
+    for (const tag of getChannelInfo.tags) {
+      currentStreamTags.push(tag);
     }
 
     if (!gameOrTitleChangedManually.value) {

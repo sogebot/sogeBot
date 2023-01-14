@@ -19,7 +19,6 @@ import { AppDataSource } from '~/database.js';
 import { CacheGames, CacheGamesInterface } from '~/database/entity/cacheGames.js';
 import { CacheTitles } from '~/database/entity/cacheTitles';
 import { Translation } from '~/database/entity/translation';
-import { TwitchTag, TwitchTagInterface } from '~/database/entity/twitch';
 import { User } from '~/database/entity/user';
 import { onStartup } from '~/decorators/on';
 import { schema } from '~/graphql/schema';
@@ -299,36 +298,6 @@ class Panel extends Core {
       });
       socketsConnectedInc();
 
-      socket.on('getCachedTags', async (cb: (results: TwitchTagInterface[]) => void) => {
-        const joinQuery = AppDataSource.options.type === 'postgres' ? '"names"."tagId" = "tag_id" AND "names"."locale"' : 'names.tagId = tag_id AND names.locale';
-        let query = AppDataSource.getRepository(TwitchTag)
-          .createQueryBuilder('tags')
-          .select('names.locale', 'locale')
-          .addSelect('names.value', 'value')
-          .addSelect('tags.tag_id', 'tag_id')
-          .addSelect('tags.is_auto', 'is_auto')
-          .addSelect('tags.is_current', 'is_current')
-          .leftJoinAndSelect('twitch_tag_localization_name', 'names', `${joinQuery} like :tag`)
-          .setParameter('tag', '%' + getLang() +'%');
-
-        let results = await query.execute();
-        if (results.length > 0) {
-          cb(results);
-        } else {
-        // if we don';t have results with our selected locale => reload with en-us
-          query = AppDataSource.getRepository(TwitchTag)
-            .createQueryBuilder('tags')
-            .select('names.locale', 'locale')
-            .addSelect('names.value', 'value')
-            .addSelect('tags.tag_id', 'tag_id')
-            .addSelect('tags.is_auto', 'is_auto')
-            .addSelect('tags.is_current', 'is_current')
-            .leftJoinAndSelect('twitch_tag_localization_name', 'names', `${joinQuery} = :tag`)
-            .setParameter('tag', 'en-us');
-          results = await query.execute();
-        }
-        cb(results);
-      });
       // twitch game and title change
       socket.on('getGameFromTwitch', function (game: string, cb) {
         sendGameFromTwitch(game).then((data) => cb(data));
