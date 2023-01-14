@@ -64,8 +64,8 @@ export const getChannelChatters = async (opts: any) => {
     for (const user of allOnlineUsers) {
       if (!includes(chatters.map(o => o.userId), user.userId) && user.userId !== botId) {
         // user is no longer in channel
-        await AppDataSource.getRepository(User).update({ userId: user.userId }, { isOnline: false, displayname: chatters.find(o => o.userId === user.userId)?.userDisplayName, userName: chatters.find(o => o.userId === user.userId)?.userName });
-        partedUsers.push(user.displayname);
+        await AppDataSource.getRepository(User).update({ userId: user.userId }, { isOnline: false, displayname: chatters.find(o => o.userId === user.userId)?.userDisplayName || chatters.find(o => o.userId === user.userId)?.userName, userName: chatters.find(o => o.userId === user.userId)?.userName });
+        partedUsers.push(user.userName);
       }
     }
 
