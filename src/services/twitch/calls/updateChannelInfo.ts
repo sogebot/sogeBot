@@ -18,7 +18,7 @@ import { translate } from '~/translate';
 import { variables } from '~/watchers';
 import { setImmediateAwait } from '~/helpers/setImmediateAwait';
 
-async function setTitleAndGame (args: { title?: string | null; game?: string | null }): Promise<{ response: string; status: boolean } | null> {
+async function updateChannelInfo (args: { title?: string | null; game?: string | null, tags?: string[] }): Promise<{ response: string; status: boolean } | null> {
   if (isDebugEnabled('api.calls')) {
     debug('api.calls', new Error().stack);
   }
@@ -54,14 +54,14 @@ async function setTitleAndGame (args: { title?: string | null; game?: string | n
 
     const clientBroadcaster = await client('broadcaster');
     clientBroadcaster.channels.updateChannelInfo(cid, {
-      title, gameId: await getGameIdFromName(game),
+      title: title ? title : undefined, gameId: await getGameIdFromName(game), tags: args.tags,
     });
   } catch (e) {
     if (e instanceof Error) {
       if (e.message.includes('ETIMEDOUT')) {
         warning(`${getFunctionName()} => Connection to Twitch timed out. Will retry request.`);
         await setImmediateAwait();
-        return setTitleAndGame(args);
+        return updateChannelInfo(args);
       }
       if (e.message.includes('Invalid OAuth token')) {
         warning(`${getFunctionName()} => Invalid OAuth token - attempting to refresh token`);
@@ -93,4 +93,4 @@ async function setTitleAndGame (args: { title?: string | null; game?: string | n
   return responses;
 }
 
-export { setTitleAndGame };
+export { updateChannelInfo };

@@ -1,13 +1,13 @@
 import { User } from '@entity/user';
+import { HelixChatChatter, HelixForwardPagination } from '@twurple/api/lib';
 import {
   chunk, includes,
 } from 'lodash';
-import { AppDataSource } from '~/database';
 
 import client from '../api/client';
 import { refresh } from '../token/refresh.js';
 
-import { HelixChatChatter, HelixForwardPagination } from '@twurple/api/lib';
+import { AppDataSource } from '~/database';
 import { eventEmitter } from '~/helpers/events';
 import { getAllOnline } from '~/helpers/getAllOnlineUsernames';
 import { getFunctionName } from '~/helpers/getFunctionName';

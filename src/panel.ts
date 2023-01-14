@@ -53,8 +53,7 @@ import spotify from '~/integrations/spotify';
 import Parser from '~/parser';
 import { getGameThumbnailFromName } from '~/services/twitch/calls/getGameThumbnailFromName.js';
 import { sendGameFromTwitch } from '~/services/twitch/calls/sendGameFromTwitch';
-import { setTags } from '~/services/twitch/calls/setTags';
-import { setTitleAndGame } from '~/services/twitch/calls/setTitleAndGame';
+import { updateChannelInfo } from '~/services/twitch/calls/updateChannelInfo.js';
 import { default as socketSystem } from '~/socket';
 import highlights from '~/systems/highlights';
 import songs from '~/systems/songs';
@@ -380,8 +379,7 @@ class Panel extends Core {
         }
       });
       socket.on('updateGameAndTitle', async (data: { game: string, title: string, tags: string[] }, cb: (status: boolean | null) => void) => {
-        const status = await setTitleAndGame(data);
-        await setTags(data.tags);
+        const status = await updateChannelInfo(data);
 
         if (!status) { // twitch refused update
           cb(true);
@@ -402,13 +400,13 @@ class Panel extends Core {
             .into(CacheTitles)
             .values([
               {
-                game: data.game, title: data.title, timestamp: Date.now(),
+                game: data.game, title: data.title, timestamp: Date.now(), tags: data.tags,
               },
             ])
             .execute();
         } else {
         // update timestamp
-          await AppDataSource.getRepository(CacheTitles).save({ ...item, timestamp: Date.now() });
+          await AppDataSource.getRepository(CacheTitles).save({ ...item, timestamp: Date.now(), tags: data.tags });
         }
         cb(null);
       });

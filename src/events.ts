@@ -49,7 +49,7 @@ import client from '~/services/twitch/api/client';
 import { createClip } from '~/services/twitch/calls/createClip';
 import { getCustomRewards } from '~/services/twitch/calls/getCustomRewards';
 import { getIdFromTwitch } from '~/services/twitch/calls/getIdFromTwitch';
-import { setTitleAndGame } from '~/services/twitch/calls/setTitleAndGame';
+import { updateChannelInfo } from '~/services/twitch/calls/updateChannelInfo';
 import { variables } from '~/watchers';
 
 const excludedUsers = new Set<string>();
@@ -457,7 +457,7 @@ class Events extends Core {
     const regexp = new RegExp(`\\$_${customVariableName}`, 'ig');
     const title = rawStatus.value;
     if (title.match(regexp)) {
-      setTitleAndGame({});
+      updateChannelInfo({});
     }
   }
   public async fireIncrementCustomVariable(operation: EventsEntity.OperationDefinitions) {
@@ -479,7 +479,7 @@ class Events extends Core {
     const regexp = new RegExp(`\\$_${customVariableName}`, 'ig');
     const title = rawStatus.value;
     if (title.match(regexp)) {
-      setTitleAndGame({});
+      updateChannelInfo({});
     }
   }
 
@@ -501,7 +501,7 @@ class Events extends Core {
     const regexp = new RegExp(`\\$_${customVariableName}`, 'ig');
     const title = rawStatus.value;
     if (title.match(regexp)) {
-      setTitleAndGame({});
+      updateChannelInfo({});
     }
   }
 

@@ -6,6 +6,7 @@ export interface CacheTitlesInterface {
   id?: number;
   game: string;
   title: string;
+  tags: string[];
   timestamp: number;
 }
 
@@ -17,6 +18,7 @@ export const CacheTitles = new EntitySchema<Readonly<Required<CacheTitlesInterfa
     },
     game:      { type: String },
     title:     { type: String },
+    tags:      { type: 'simple-array' },
     timestamp: { type: 'bigint', transformer: new ColumnNumericTransformer() },
   },
   indices: [

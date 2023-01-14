@@ -8,7 +8,7 @@ import {
 import { parseTitle } from '~/helpers/api/parseTitle';
 import { getFunctionName } from '~/helpers/getFunctionName';
 import { debug, error, info, isDebugEnabled, warning } from '~/helpers/log';
-import { setTitleAndGame } from '~/services/twitch/calls/setTitleAndGame';
+import { updateChannelInfo } from '~/services/twitch/calls/updateChannelInfo';
 import { variables } from '~/watchers';
 
 let retries = 0;
@@ -47,7 +47,7 @@ export async function getChannelInformation (opts: any) {
               info(`Title/category force enabled (but disabled in debug mode) => ${game} | ${_rawStatus}`);
             } else {
               info(`Title/category force enabled => ${game} | ${_rawStatus}`);
-              setTitleAndGame({});
+              updateChannelInfo({});
             }
             return { state: true, opts };
           } else {
