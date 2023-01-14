@@ -212,10 +212,8 @@ class Twitch extends Service {
     cleanErrors('broadcaster');
   }
 
-  @onChange('botAccessToken')
-  @onChange('broadcasterAccessToken')
-  @onLoad('broadcasterAccessToken')
-  @onLoad('botAccessToken')
+  @onChange(['botAccessToken', 'broadcasterAccessToken'])
+  @onLoad(['botAccessToken', 'broadcasterAccessToken'])
   public async onChangeAccessToken(key: string, value: any) {
     if (!this.enabled) {
       return;
@@ -274,24 +272,29 @@ class Twitch extends Service {
     }
   }
 
-  @onLoad('botTokenValid')
-  @onChange('botTokenValid')
+  @onChange(['botTokenValid', 'botAccessToken'])
   onBotTokenValidChange() {
-    if (this.botTokenValid) {
-      this.tmi?.initClient('bot');
+    if (this.botTokenValid && this.botAccessToken.length > 0) {
+      if (this.tmi) {
+        this.tmi.initClient('bot');
+      } else {
+        setTimeout(() => this.onBotTokenValidChange(), 1000);
+      }
     }
   }
 
-  @onLoad('broadcasterTokenValid')
-  @onChange('broadcasterTokenValid')
-  @onChange('broadcasterAccessToken')
+  @onChange(['broadcasterTokenValid', 'broadcasterAccessToken'])
   onBroadcasterTokenValidChange() {
     this.pubsub = null;
     this.eventsub = null;
-    if (this.broadcasterTokenValid) {
-      this.tmi?.initClient('broadcaster');
-      this.pubsub = new PubSub();
-      this.eventsub = new EventSub();
+    if (this.broadcasterTokenValid && this.broadcasterAccessToken.length > 0) {
+      if (this.tmi) {
+        this.tmi.initClient('broadcaster');
+        this.pubsub = new PubSub();
+        this.eventsub = new EventSub();
+      } else {
+        setTimeout(() => this.onBroadcasterTokenValidChange(), 1000);
+      }
     }
   }
 

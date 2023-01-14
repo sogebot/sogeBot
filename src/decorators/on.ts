@@ -39,19 +39,31 @@ export function getFunctionList(type: keyof onEvents, path = ''): onEvent[] {
   }
 }
 
-export function onChange(variableArg: string) {
+export function onChange(variableArg: string | string[]) {
   const { name, type } = getNameAndTypeFromStackTrace();
   return (target: any, fName: string) => {
     const path = type === 'core' ? name : `${type}.${name.toLowerCase()}`;
-    on.change.push({ path: path + '.' + variableArg, fName });
+    if (Array.isArray(variableArg)) {
+      for (const variable of variableArg) {
+        on.change.push({ path: path + '.' + variable, fName });
+      }
+    } else {
+      on.change.push({ path: path + '.' + variableArg, fName });
+    }
   };
 }
 
-export function onLoad(variableArg: string) {
+export function onLoad(variableArg: string | string[]) {
   const { name, type } = getNameAndTypeFromStackTrace();
   return (target: any, fName: string) => {
     const path = type === 'core' ? name : `${type}.${name.toLowerCase()}`;
-    on.load.push({ path: path + '.' + variableArg, fName });
+    if (Array.isArray(variableArg)) {
+      for (const variable of variableArg) {
+        on.load.push({ path: path + '.' + variable, fName });
+      }
+    } else {
+      on.load.push({ path: path + '.' + variableArg, fName });
+    }
   };
 }
 

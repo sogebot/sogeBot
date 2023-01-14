@@ -129,12 +129,14 @@ class Chat {
     }
     clearTimeout(this.timeouts[`initClient.${type}`]);
 
-    const isValidToken = variables.get(`services.twitch.botTokenValid`) && variables.get(`services.twitch.broadcasterTokenValid`);
+    const isValidToken = type === 'bot'
+      ? variables.get(`services.twitch.botTokenValid`)
+      : variables.get(`services.twitch.broadcasterTokenValid`);
     const channel = variables.get('services.twitch.broadcasterUsername') as string;
 
     // wait for initial validation
-    if (!isValidToken) {
-      setTimeout(() => this.initClient(type), 10 * constants.SECOND);
+    if (!isValidToken || channel.length === 0) {
+      this.timeouts[`initClient.${type}`] = setTimeout(() => this.initClient(type), 10 * constants.SECOND);
       return;
     }
 
@@ -164,7 +166,7 @@ class Chat {
         this.botWarning = true;
       }
       refresh(type).then(() => {
-        setTimeout(() => {
+        this.timeouts[`initClient.${type}`] = setTimeout(() => {
           this.initClient(type);
         }, 10000);
       });
