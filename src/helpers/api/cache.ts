@@ -12,4 +12,10 @@ const rawStatus = persistent({
   namespace: '/core/api',
 });
 
-export { rawStatus, gameCache };
+const tagsCache = persistent({
+  value:     '[]',
+  name:      'tagsCache',
+  namespace: '/core/api',
+});
+
+export { rawStatus, gameCache, tagsCache };

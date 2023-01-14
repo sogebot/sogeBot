@@ -15,6 +15,7 @@ const stats = persistent({
     currentGame:        null,
     currentTitle:       null,
     newChatters:        0,
+    currentTags:        [],
   } as {
     language: string;
     currentWatchedTime: number;
@@ -27,6 +28,7 @@ const stats = persistent({
     currentGame: string | null;
     currentTitle: string | null;
     newChatters: number;
+    currentTags?: string[];
   },
   name:      'stats',
   namespace: '/core/api',
@@ -39,6 +41,7 @@ const stats = persistent({
       ['currentSubscribers', 'subscribers'],
       ['currentBits', 'bits'],
       ['currentTitle', 'title'],
+      ['currentTags', 'tags'],
     ]);
     Object.keys(cur).forEach((key) => {
       const variable = mapper.get(key);

@@ -3,7 +3,7 @@ import { isNil } from 'lodash';
 import { default as custom_variables } from '../../widgets/customvariables';
 import { rawStatus } from '../api';
 
-import { setTitleAndGame } from '~/services/twitch/calls/setTitleAndGame';
+import { updateChannelInfo } from '~/services/twitch/calls/updateChannelInfo';
 
 async function updateWidgetAndTitle (variable: string | null = null) {
   if (custom_variables.socket) {
@@ -14,7 +14,7 @@ async function updateWidgetAndTitle (variable: string | null = null) {
     const regexp = new RegExp(`\\${variable}`, 'ig');
 
     if (rawStatus.value.match(regexp)) {
-      setTitleAndGame({});
+      updateChannelInfo({});
     }
   }
 }

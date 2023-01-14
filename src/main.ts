@@ -12,6 +12,9 @@ import blocked from 'blocked-at';
 import chalk from 'chalk';
 import figlet from 'figlet';
 import gitCommitInfo from 'git-commit-info';
+
+import { AppDataSource } from '~/database';
+
 import _ from 'lodash';
 
 import { autoLoad } from '~/helpers/autoLoad';
@@ -20,15 +23,6 @@ import {
   error, info, isDebugEnabled, setDEBUG, warning,
 } from '~/helpers/log';
 import { startWatcher } from '~/watchers';
-import { AppDataSource } from '~/database';
-
-// Add stacktrace to console.log
-const log = console.log;
-console.log = function() {
-  log.apply(console, [`WARNING: console.log shouldn't be used, stacktrace: ${new Error().stack}`]);
-  // eslint-disable-next-line prefer-rest-params
-  log.apply(console, Array.from(arguments));
-};
 
 const connect = async function () {
   const type = process.env.TYPEORM_CONNECTION;

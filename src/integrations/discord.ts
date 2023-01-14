@@ -1,17 +1,50 @@
+import { AppDataSource } from '~/database';
+import { isStreamOnline, stats } from '~/helpers/api';
+import { attributesReplace } from '~/helpers/attributesReplace';
+import {
+  announceTypes, getOwner, getUserSender, isUUID, prepare,
+} from '~/helpers/commons';
+import { isBotStarted, isDbConnected } from '~/helpers/database';
+import { debounce } from '~/helpers/debounce';
+
 import { DiscordLink } from '@entity/discord';
+
+import { eventEmitter } from '~/helpers/events';
+
 import { Events } from '@entity/event';
+
+import {
+  chatIn, chatOut, debug, error, info, warning, whisperOut,
+} from '~/helpers/log';
+
 import { Permissions as PermissionsEntity } from '@entity/permissions';
+
+import { check } from '~/helpers/permissions/check';
+
 import { User } from '@entity/user';
+
+import { get as getPermission } from '~/helpers/permissions/get';
+
 import { HOUR, MINUTE } from '@sogebot/ui-helpers/constants';
+
+import { adminEndpoint } from '~/helpers/socket';
+
 import { dayjs, timezone } from '@sogebot/ui-helpers/dayjsHelper';
+
+import * as changelog from '~/helpers/user/changelog.js';
+
 import chalk from 'chalk';
+
+import { getIdFromTwitch } from '~/services/twitch/calls/getIdFromTwitch';
+import { variables } from '~/watchers';
+
 import * as DiscordJs from 'discord.js';
 import { ChannelType, GatewayIntentBits } from 'discord.js';
 import { get } from 'lodash';
-import { AppDataSource } from '~/database';
 import { IsNull, LessThan, Not } from 'typeorm';
 import { v5 as uuidv5 } from 'uuid';
 
+import Integration from './_interface';
 import {
   command, persistent, settings,
 } from '../decorators';
@@ -23,25 +56,6 @@ import Expects from '../expects';
 import { Message } from '../message';
 import Parser from '../parser';
 import users from '../users';
-import Integration from './_interface';
-
-import { isStreamOnline, stats } from '~/helpers/api';
-import { attributesReplace } from '~/helpers/attributesReplace';
-import {
-  announceTypes, getOwner, getUserSender, isUUID, prepare,
-} from '~/helpers/commons';
-import { isBotStarted, isDbConnected } from '~/helpers/database';
-import { debounce } from '~/helpers/debounce';
-import { eventEmitter } from '~/helpers/events';
-import {
-  chatIn, chatOut, debug, error, info, warning, whisperOut,
-} from '~/helpers/log';
-import { get as getPermission } from '~/helpers/permissions/get';
-import { check } from '~/helpers/permissions/check';
-import { adminEndpoint } from '~/helpers/socket';
-import * as changelog from '~/helpers/user/changelog.js';
-import { getIdFromTwitch } from '~/services/twitch/calls/getIdFromTwitch';
-import { variables } from '~/watchers';
 
 class Discord extends Integration {
   client: DiscordJs.Client | null = null;
@@ -83,7 +97,7 @@ class Discord extends Integration {
     };
 
   @settings('bot')
-    fields: string[] = ['$game', '$title', '$startedAt', '$viewers', '$followers', '$subscribers'];
+    fields: string[] = ['$game', '$title', '$tags', '$startedAt', '$viewers', '$followers', '$subscribers'];
 
   @settings('bot')
     fieldsDisabled: string[] = [''];
@@ -365,6 +379,9 @@ class Discord extends Integration {
     }
     if (o === '$title') {
       return { name: prepare('webpanel.responses.variable.title'), value: stats.value.currentTitle ?? '' };
+    }
+    if (o === '$tags') {
+      return { name: prepare('webpanel.responses.variable.tags'), value: (stats.value.currentTags ?? []).map(tag => `#${tag}`).join(' ') ?? '' };
     }
     if (o === '$startedAt') {
       if (isOnline) {

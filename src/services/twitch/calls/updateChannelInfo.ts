@@ -1,24 +1,30 @@
 import { error } from 'console';
 
+import {
+  gameCache, gameOrTitleChangedManually, rawStatus, stats, tagsCache,
+} from '~/helpers/api';
+
 import { defaults, isNil } from 'lodash';
 
-import client from '../api/client';
-import { refresh } from '../token/refresh.js';
-import { getGameIdFromName } from './getGameIdFromName';
-
-import {
-  gameCache, gameOrTitleChangedManually, rawStatus, stats,
-} from '~/helpers/api';
 import { parseTitle } from '~/helpers/api/parseTitle';
 import { eventEmitter } from '~/helpers/events/emitter';
 import { getFunctionName } from '~/helpers/getFunctionName';
 import { debug, isDebugEnabled, warning } from '~/helpers/log';
 import { addUIError } from '~/helpers/panel/index';
-import { translate } from '~/translate';
-import { variables } from '~/watchers';
 import { setImmediateAwait } from '~/helpers/setImmediateAwait';
 
-async function setTitleAndGame (args: { title?: string | null; game?: string | null }): Promise<{ response: string; status: boolean } | null> {
+import { getChannelInformation } from './getChannelInformation';
+import { getGameIdFromName } from './getGameIdFromName';
+
+import { translate } from '~/translate';
+
+import client from '../api/client';
+
+import { variables } from '~/watchers';
+
+import { refresh } from '../token/refresh.js';
+
+async function updateChannelInfo (args: { title?: string | null; game?: string | null, tags?: string[] }): Promise<{ response: string; status: boolean } | null> {
   if (isDebugEnabled('api.calls')) {
     debug('api.calls', new Error().stack);
   }
@@ -38,6 +44,7 @@ async function setTitleAndGame (args: { title?: string | null; game?: string | n
 
   let title;
   let game;
+  let tags;
 
   try {
     if (!isNil(args.title)) {
@@ -47,21 +54,29 @@ async function setTitleAndGame (args: { title?: string | null; game?: string | n
 
     if (!isNil(args.game)) {
       game = args.game;
-      gameCache.value = args.game; // save game to cache, if changing gae
+      gameCache.value = args.game; // save game to cache, if changing game
     } else {
       game = gameCache.value;
     } // we are not setting game -> load last game
 
+    if (!isNil(args.tags)) {
+      tags = args.tags;
+      tagsCache.value = JSON.stringify(args.tags); // save tags to cache, if changing tags
+    } else {
+      tags = JSON.parse(tagsCache.value) as string[];
+    } // we are not setting game -> load last game
+
     const clientBroadcaster = await client('broadcaster');
-    clientBroadcaster.channels.updateChannelInfo(cid, {
-      title, gameId: await getGameIdFromName(game),
+    await clientBroadcaster.channels.updateChannelInfo(cid, {
+      title: title ? title : undefined, gameId: await getGameIdFromName(game), tags,
     });
+    await getChannelInformation({});
   } catch (e) {
     if (e instanceof Error) {
       if (e.message.includes('ETIMEDOUT')) {
         warning(`${getFunctionName()} => Connection to Twitch timed out. Will retry request.`);
         await setImmediateAwait();
-        return setTitleAndGame(args);
+        return updateChannelInfo(args);
       }
       if (e.message.includes('Invalid OAuth token')) {
         warning(`${getFunctionName()} => Invalid OAuth token - attempting to refresh token`);
@@ -89,8 +104,12 @@ async function setTitleAndGame (args: { title?: string | null; game?: string | n
     responses.status = true;
     stats.value.currentTitle = args.title;
   }
+
+  if (!isNil(args.tags)) {
+    stats.value.currentTags = args.tags;
+  }
   gameOrTitleChangedManually.value = true;
   return responses;
 }
 
-export { setTitleAndGame };
+export { updateChannelInfo };

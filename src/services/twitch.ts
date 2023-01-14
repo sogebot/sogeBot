@@ -38,7 +38,7 @@ import {
 import * as changelog from '~/helpers/user/changelog.js';
 import { isIgnored } from '~/helpers/user/isIgnored';
 import { sendGameFromTwitch } from '~/services/twitch/calls/sendGameFromTwitch';
-import { setTitleAndGame } from '~/services/twitch/calls/setTitleAndGame';
+import { updateChannelInfo } from '~/services/twitch/calls/updateChannelInfo';
 import { translate } from '~/translate';
 
 const urls = {
@@ -563,7 +563,7 @@ class Twitch extends Service {
     if (opts.parameters.length === 0) {
       return [ { response: await translate('title.current').replace(/\$title/g, stats.value.currentTitle || 'n/a'), ...opts }];
     }
-    const status = await setTitleAndGame({ title: opts.parameters });
+    const status = await updateChannelInfo({ title: opts.parameters });
     return status ? [ { response: status.response, ...opts } ] : [];
   }
 
@@ -608,7 +608,7 @@ class Twitch extends Service {
     const games = await sendGameFromTwitch(opts.parameters);
     if (Array.isArray(games) && games.length > 0) {
       const exactMatchIdx = games.findIndex(name => name.toLowerCase() === opts.parameters.toLowerCase());
-      const status = await setTitleAndGame({ game: games[exactMatchIdx !== -1 ? exactMatchIdx : 0] });
+      const status = await updateChannelInfo({ game: games[exactMatchIdx !== -1 ? exactMatchIdx : 0] });
       return status ? [ { response: status.response, ...opts } ] : [];
     }
     return [{ response: translate('game.current').replace(/\$title/g, stats.value.currentGame || 'n/a'), ...opts }];
