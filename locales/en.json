@@ -319,6 +319,7 @@
     },
     "responses": {
       "variable": {
+        "tags": "Tags",
         "titleOfPrediction": "Twitch Prediction - Title",
         "outcomes": "Twitch Prediction - Outcomes",
         "locksAt": "Twitch Prediction - Locks At Date",

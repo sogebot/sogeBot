@@ -28,6 +28,7 @@ export async function template(message: string, params: Record<string, any>, use
       maxViewers:         stats.value.maxViewers,
       newChatters:        stats.value.newChatters,
       game:               stats.value.currentGame,
+      tags:               stats.value.currentTags ?? [],
       status:             stats.value.currentTitle,
       currentWatched:     stats.value.currentWatchedTime,
     },

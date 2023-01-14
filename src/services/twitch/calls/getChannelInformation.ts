@@ -63,14 +63,14 @@ export async function getChannelInformation (opts: any) {
           // if we want title to be forced
           if (isTitleForced) {
             if ((process.env.NODE_ENV || 'development') !== 'production') {
-              info(`Title/category force enabled (but disabled in debug mode) => ${game} [${tags.join(', ')}]: ${_rawStatus}`);
+              info(`Title/category force enabled (but disabled in debug mode) => ${game} | ${_rawStatus} ${tags.map(o => `#${o}`).join(' ')}`);
             } else {
-              info(`Title/category force enabled => ${game} [${tags.join(', ')}]: ${_rawStatus}`);
+              info(`Title/category force enabled => ${game} | ${_rawStatus} ${tags.map(o => `#${o}`).join(' ')}`);
               updateChannelInfo({});
             }
             return { state: true, opts };
           } else {
-            info(`Title/game changed outside of a bot => ${getChannelInfo.gameName} [${getChannelInfo.tags.join(', ')}]: ${getChannelInfo.title}`);
+            info(`Title/game changed outside of a bot => ${getChannelInfo.gameName} | ${getChannelInfo.title} ${getChannelInfo.tags.map(o => `#${o}`).join(' ')}`);
             retries = -1;
             _rawStatus = getChannelInfo.title;
           }

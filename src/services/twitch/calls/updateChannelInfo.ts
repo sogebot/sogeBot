@@ -104,6 +104,10 @@ async function updateChannelInfo (args: { title?: string | null; game?: string |
     responses.status = true;
     stats.value.currentTitle = args.title;
   }
+
+  if (!isNil(args.tags)) {
+    stats.value.currentTags = args.tags;
+  }
   gameOrTitleChangedManually.value = true;
   return responses;
 }

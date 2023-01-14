@@ -12,7 +12,7 @@ import { AppDataSource } from '~/database.js';
 import { onStartup } from '~/decorators/on';
 import { schema } from '~/graphql/schema';
 import {
-  chatMessagesAtStart, currentStreamTags, isStreamOnline, rawStatus, stats, streamStatusChangeSince,
+  chatMessagesAtStart, isStreamOnline, rawStatus, stats, streamStatusChangeSince,
 } from '~/helpers/api';
 import { getOwnerAsSender } from '~/helpers/commons/getOwnerAsSender';
 import {
@@ -636,7 +636,7 @@ const sendStreamData = async () => {
       rawStatus:          rawStatus.value,
       currentSong:        lastfm.currentSong || ytCurrentSong || spotifyCurrentSong || translate('songs.not-playing'),
       currentWatched:     stats.value.currentWatchedTime,
-      tags:               currentStreamTags.value,
+      tags:               stats.value.currentTags ?? [],
     };
     ioServer?.emit('panel::stats', data);
   } catch (e: any) {
