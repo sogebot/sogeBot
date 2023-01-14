@@ -33,6 +33,7 @@ import { adminEndpoint } from '~/helpers/socket';
  */
 
 let currentSongHash = '';
+let isTemporarilyUnavailable = false;
 
 class Spotify extends Integration {
   client: null | SpotifyWebApi = null;
@@ -279,6 +280,8 @@ class Spotify extends Integration {
           info(chalk.yellow('SPOTIFY: ') + `Logged in as ${this.username}#${data.body.id}`);
         }
         this.userId = data.body.id;
+
+        isTemporarilyUnavailable = false;
       }
     } catch (e: any) {
       if (String(e.statusCode).startsWith('5')) {
@@ -288,6 +291,12 @@ class Spotify extends Integration {
       if (e.message.includes('The access token expired.') || e.message.includes('No token provided.')) {
         debug('spotify.user', 'Get of user failed, incorrect or missing access token. Refreshing token and retrying.');
         this.IRefreshToken();
+      } else if (e.message.includes('temporarily_unavailable')) {
+        if (!isTemporarilyUnavailable) {
+          isTemporarilyUnavailable = true;
+          info(chalk.yellow('SPOTIFY: ') + 'Spotify is temporarily unavailable');
+        }
+        return;
       } else if (e.message !== 'Unauthorized') {
         if (!this.isUnauthorized) {
           this.isUnauthorized = true;
@@ -345,11 +354,22 @@ class Spotify extends Integration {
           this.isUnauthorized = false;
 
           this.retry.IRefreshToken = 0;
+          isTemporarilyUnavailable = false;
           ioServer?.emit('api.stats', {
             method: 'GET', data: data.body, timestamp: Date.now(), call: 'spotify::refreshToken', api: 'other', endpoint: 'n/a', code: 200,
           });
         }
       } catch (e: any) {
+        if (e.message.includes('temporarily_unavailable')) {
+          if (!isTemporarilyUnavailable) {
+            isTemporarilyUnavailable = true;
+            info(chalk.yellow('SPOTIFY: ') + 'Spotify is temporarily unavailable');
+          }
+          setTimeout(10000).then(() => {
+            this.IRefreshToken();
+          });
+          return;
+        }
         this.retry.IRefreshToken++;
         ioServer?.emit('api.stats', {
           method: 'GET', data: e.message, timestamp: Date.now(), call: 'spotify::refreshToken', api: 'other', endpoint: 'n/a', code: 500,
