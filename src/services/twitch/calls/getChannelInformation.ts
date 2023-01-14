@@ -1,13 +1,18 @@
-import client from '../api/client';
-import { refresh } from '../token/refresh.js';
+import isEqual from 'lodash/isEqual';
 
-import {  currentStreamTags, gameCache, gameOrTitleChangedManually, rawStatus } from '~/helpers/api';
+import {  currentStreamTags, gameCache, gameOrTitleChangedManually, rawStatus, tagsCache } from '~/helpers/api';
 import {
   stats as apiStats,
 } from '~/helpers/api';
 import { parseTitle } from '~/helpers/api/parseTitle';
 import { getFunctionName } from '~/helpers/getFunctionName';
+
+import client from '../api/client';
+
 import { debug, error, info, isDebugEnabled, warning } from '~/helpers/log';
+
+import { refresh } from '../token/refresh.js';
+
 import { updateChannelInfo } from '~/services/twitch/calls/updateChannelInfo';
 import { variables } from '~/watchers';
 
@@ -37,11 +42,19 @@ export async function getChannelInformation (opts: any) {
     if (!gameOrTitleChangedManually.value) {
       // Just polling update
       let _rawStatus = rawStatus.value;
-      const title = await parseTitle(null);
 
-      if (getChannelInfo.title !== title && retries === -1) {
+      const title = await parseTitle(null);
+      const game = gameCache.value;
+      const tags = JSON.parse(tagsCache.value) as string[];
+
+      const titleEquals = getChannelInfo.title === title;
+      const gameEquals = getChannelInfo.gameName === game;
+      const tagsEquals = isEqual(getChannelInfo.tags.sort(), tags.sort());
+      const isChanged = !titleEquals || !gameEquals || !tagsEquals;
+
+      if (isChanged && retries === -1) {
         return { state: true, opts };
-      } else if (getChannelInfo.title !== title && !opts.forceUpdate) {
+      } else if (isChanged && !opts.forceUpdate) {
         // check if title is same as updated title
         const numOfRetries = isTitleForced ? 1 : 5;
         if (retries >= numOfRetries) {
@@ -49,16 +62,15 @@ export async function getChannelInformation (opts: any) {
 
           // if we want title to be forced
           if (isTitleForced) {
-            const game = gameCache.value;
             if ((process.env.NODE_ENV || 'development') !== 'production') {
-              info(`Title/category force enabled (but disabled in debug mode) => ${game} | ${_rawStatus}`);
+              info(`Title/category force enabled (but disabled in debug mode) => ${game} [${tags.join(', ')}]: ${_rawStatus}`);
             } else {
-              info(`Title/category force enabled => ${game} | ${_rawStatus}`);
+              info(`Title/category force enabled => ${game} [${tags.join(', ')}]: ${_rawStatus}`);
               updateChannelInfo({});
             }
             return { state: true, opts };
           } else {
-            info(`Title/game changed outside of a bot => ${getChannelInfo.gameName} | ${getChannelInfo.title}`);
+            info(`Title/game changed outside of a bot => ${getChannelInfo.gameName} [${getChannelInfo.tags.join(', ')}]: ${getChannelInfo.title}`);
             retries = -1;
             _rawStatus = getChannelInfo.title;
           }

@@ -1,4 +1,5 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
+
 import { insertItemIntoTable } from '~/database/insertItemIntoTable';
 
 export class updateTags1666167883937 implements MigrationInterface {
@@ -15,7 +16,7 @@ export class updateTags1666167883937 implements MigrationInterface {
     for (const item of items) {
       await insertItemIntoTable('cache_titles', {
         ...item,
-        tags: JSON.stringify([]),
+        tags: '',
       }, queryRunner);
     }
 

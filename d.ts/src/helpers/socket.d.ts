@@ -102,7 +102,7 @@ export type ClientToServerEventsWithNamespace = {
     'getLatestStats': (cb: (error: Error | string | null, stats: Record<string, any>) => void) => void,
     'populateListOf':<list extends possibleLists> (type: list, cb: (error: Error | string | null, data: getListOfReturn[list]) => void) => void,
     'custom.variable.value': (variableName: string, cb: (error: Error | string | null, value: string) => void) => void,
-    'updateGameAndTitle': (emit: { game: string; title: string; tags: never[]; }, cb: (error: Error | string | null) => void) => void,
+    'updateGameAndTitle': (emit: { game: string; title: string; tags: string[]; }, cb: (error: Error | string | null) => void) => void,
     'cleanupGameAndTitle': () => void,
     'getGameFromTwitch': (value: string, cb: (values: string[]) => void) => void,
     'getUserTwitchGames': (cb: (values: CacheTitlesInterface[], thumbnails: CacheGamesInterface[]) => void) => void,

@@ -5,7 +5,6 @@ export class updateTags1666167883937 implements MigrationInterface {
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`ALTER TABLE \`cache_titles\` ADD \`tags\` text NOT NULL`);
-    await queryRunner.query(`UPDATE \`cache_titles\` SET \`tags\`='"[]"'`);
     await queryRunner.query(`DROP TABLE \`twitch_tag_localization_name\``);
     await queryRunner.query(`DROP TABLE \`twitch_tag_localization_description\``);
     await queryRunner.query(`DROP TABLE \`twitch_tag\``);
