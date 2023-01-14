@@ -13,7 +13,6 @@ export class updateTags1666167883937 implements MigrationInterface {
     await queryRunner.query(`CREATE INDEX "IDX_a0c6ce833b5b3b13325e6f49b0" ON "cache_titles" ("game") `);
 
     for (const item of items) {
-      item.filters = JSON.stringify(items.filter((o: { permissionId: any; }) => o.permissionId === item.id));
       await insertItemIntoTable('cache_titles', {
         ...item,
         tags: JSON.stringify([]),
