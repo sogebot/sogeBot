@@ -381,7 +381,7 @@ class Discord extends Integration {
       return { name: prepare('webpanel.responses.variable.title'), value: stats.value.currentTitle ?? '' };
     }
     if (o === '$tags') {
-      return { name: prepare('webpanel.responses.variable.tags'), value: (stats.value.currentTags ?? []).map(tag => `#${tag}`).join(' ') ?? '' };
+      return { name: prepare('webpanel.responses.variable.tags'), value: `${(stats.value.currentTags ?? []).map(tag => `${tag}`).join(', ')}` ?? '' };
     }
     if (o === '$startedAt') {
       if (isOnline) {
