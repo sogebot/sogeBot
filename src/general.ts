@@ -1,17 +1,5 @@
 import { existsSync, readdirSync, readFileSync, writeFileSync } from 'fs';
 
-import { HOUR, MINUTE } from '@sogebot/ui-helpers/constants';
-import { setLocale } from '@sogebot/ui-helpers/dayjsHelper';
-import gitCommitInfo from 'git-commit-info';
-import {
-  capitalize,
-  get, isNil,
-} from 'lodash';
-import { getConnection } from 'typeorm';
-
-import type { Command } from '../d.ts/src/general';
-import { menu } from './helpers/panel';
-
 import Core from '~/_interface';
 import { PermissionCommands } from '~/database/entity/permissions';
 import {
@@ -26,14 +14,30 @@ import { setLang } from '~/helpers/locales';
 import {
   debug, error, warning,
 } from '~/helpers/log';
+
+import { HOUR, MINUTE } from '@sogebot/ui-helpers/constants';
+import { setLocale } from '@sogebot/ui-helpers/dayjsHelper';
+
 import { socketsConnected } from '~/helpers/panel/index';
 import { addUIWarn } from '~/helpers/panel/index';
+
+import gitCommitInfo from 'git-commit-info';
+
 import defaultPermissions from '~/helpers/permissions/defaultPermissions';
+
+import {
+  capitalize,
+  get, isNil,
+} from 'lodash';
+
 import { list } from '~/helpers/register';
 import { adminEndpoint } from '~/helpers/socket';
 import { getMuteStatus } from '~/helpers/tmi/muteStatus';
 import translateLib, { translate } from '~/translate';
 import { variables } from '~/watchers';
+
+import { menu } from './helpers/panel';
+import type { Command } from '../d.ts/src/general';
 
 let threadStartTimestamp = Date.now();
 let isInitialLangSet = true;
@@ -197,8 +201,6 @@ class General extends Core {
   @command('!_debug')
   @default_permission(defaultPermissions.CASTERS)
   public async debug(opts: CommandOptions): Promise<CommandResponse[]> {
-    const connection = await getConnection();
-
     const lang = this.lang;
 
     const enabledSystems: {
@@ -236,7 +238,7 @@ class General extends Core {
     debug('*', '======= COPY DEBUG MESSAGE FROM HERE =======');
     debug('*', `GENERAL      | OS: ${process.env.npm_config_user_agent}`);
     debug('*', `             | Bot version: ${version.replace('SNAPSHOT', commitFile && commitFile.length > 0 ? commitFile : gitCommitInfo().shortHash || 'SNAPSHOT')}`);
-    debug('*', `             | DB: ${connection.options.type}`);
+    debug('*', `             | DB: ${process.env.TYPEORM_CONNECTION}`);
     debug('*', `             | HEAP: ${Number(process.memoryUsage().heapUsed / 1048576).toFixed(2)} MB`);
     debug('*', `             | Uptime: ${new Date(1000 * process.uptime()).toISOString().substr(11, 8)}`);
     debug('*', `             | Language: ${lang}`);
