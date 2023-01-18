@@ -1,5 +1,4 @@
 import { Goal } from '@entity/goal';
-import { Randomizer } from '@entity/randomizer';
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class fontMissingShadow1592557005214 implements MigrationInterface {
@@ -8,6 +7,7 @@ export class fontMissingShadow1592557005214 implements MigrationInterface {
     // remove old migration
     await queryRunner.query(`DELETE FROM "migrations" WHERE "name"='fontMissingShadow1592557005213'`);
 
+    /*
     const data = await queryRunner.manager.getRepository(Randomizer).find();
     for (const item of data) {
       if (typeof item.customizationFont.shadow === 'undefined') {
@@ -15,6 +15,7 @@ export class fontMissingShadow1592557005214 implements MigrationInterface {
           .update({ id: item.id }, { customizationFont: { ...item.customizationFont, shadow: [] } });
       }
     }
+    */
     for (const type of ['cheer', 'resub', 'tip', 'raid', 'host', 'subgift', 'subcommunitygift', 'sub', 'follow']) {
       const alerts = await queryRunner.query(`SELECT * from "alert_${type}"`, undefined);
       for (const alert of alerts) {
@@ -26,6 +27,7 @@ export class fontMissingShadow1592557005214 implements MigrationInterface {
       }
     }
 
+    /*
     const data3 = await queryRunner.query('SELECT * FROM goal', undefined);
     for (const item of data3) {
       if (typeof item.customizationFont.shadow === 'undefined') {
@@ -33,9 +35,11 @@ export class fontMissingShadow1592557005214 implements MigrationInterface {
           .update({ id: item.id }, { customizationFont: { ...item.customizationFont, shadow: [] } });
       }
     }
+    */
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
+    /*
     const data = await queryRunner.manager
       .getRepository(Randomizer)
       .createQueryBuilder('user')
@@ -48,6 +52,7 @@ export class fontMissingShadow1592557005214 implements MigrationInterface {
           .update({ id: item.id }, { customizationFont });
       }
     }
+    */
 
     for (const type of ['cheer', 'resub', 'tip', 'raid', 'host', 'subgift', 'subcommunitygift', 'sub', 'follow']) {
       const alerts = await queryRunner.query(`SELECT * from "alert_${type}"`, undefined);
