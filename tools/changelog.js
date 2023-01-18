@@ -34,7 +34,7 @@ if (argv._[0] === 'nextTag') {
 
     if (changesList.includes('### BREAKING CHANGES\n')) {
       process.stdout.write(`${Number(latestMajorVersion)+1}.0.0`);
-    } else if (changesList.includes('### Features\n')) {
+    } else if (changesList.join().includes('-feat-blue')) {
       // new tag
       process.stdout.write(`${latestMajorVersion}.${Number(latestMinorVersion)+1}.0`);
     } else {
