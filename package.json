@@ -16,6 +16,7 @@
     "@sogebot/ui-oauth": "~3.1.1",
     "@sogebot/ui-overlay": "^34.1.0",
     "@sogebot/ui-public": "^4.0.0",
+    "@trpc/server": "^10.9.0",
     "@twurple/api": "^5.3.2",
     "@twurple/auth": "^5.3.2",
     "@twurple/chat": "^5.3.2",

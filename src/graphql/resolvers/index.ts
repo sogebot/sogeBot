@@ -4,6 +4,5 @@ export * from './goalsResolver';
 export * from './googleResolver';
 export * from './menuResolver';
 export * from './quickActionsResolver';
-export * from './randomizerResolver';
 export * from './widgetCustomResolver';
 export * from './widgetSocialResolver';
