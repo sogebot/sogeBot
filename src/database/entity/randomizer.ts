@@ -1,7 +1,7 @@
 import { BeforeInsert, Column, Entity, Index, PrimaryColumn } from 'typeorm';
 
-import { BotEntity } from '../BotEntity';
 import { AlertInterface } from './alert';
+import { BotEntity } from '../BotEntity';
 
 @Entity()
 @Index('idx_randomizer_cmdunique', [ 'command' ], { unique: true })
@@ -16,6 +16,7 @@ export class Randomizer extends BotEntity<Randomizer> {
 
   @Column({ type: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') !== 'better-sqlite3' ? 'json' : 'simple-json' })
     items: {
+    id: string;
     /*
      * This should hlp with grouping things like Bancrupcy, WIN, Bancrupcy, to always appear beside
      */

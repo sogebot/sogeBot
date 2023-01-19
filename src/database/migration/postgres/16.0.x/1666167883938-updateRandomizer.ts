@@ -17,7 +17,8 @@ export class updateRandomizer1666167883938 implements MigrationInterface {
     for (const item of items) {
       await insertItemIntoTable('randomizer', {
         ...item,
-        items: JSON.stringify(items2.filter((o: any) => o.randomizerId === item.id)),
+        createdAt: new Date(item.createdAt).toISOString(),
+        items:     JSON.stringify(items2.filter((o: any) => o.randomizerId === item.id)),
       }, queryRunner);
     }
   }

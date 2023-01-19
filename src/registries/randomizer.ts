@@ -43,6 +43,10 @@ class Randomizer extends Registry {
         data: await RandomizerEntity.findOneBy({ id: req.params.id }),
       });
     });
+    app.post('/api/registries/randomizer/hide', adminMiddleware, async (req, res) => {
+      await AppDataSource.getRepository(RandomizerEntity).update({}, { isShown: false });
+      res.status(204).send();
+    });
     app.post('/api/registries/randomizer/:id/show', adminMiddleware, async (req, res) => {
       await AppDataSource.getRepository(RandomizerEntity).update({}, { isShown: false });
       await AppDataSource.getRepository(RandomizerEntity).update({ id: String(req.params.id) }, { isShown: true });
