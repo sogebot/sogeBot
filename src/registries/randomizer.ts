@@ -1,13 +1,18 @@
 import { Randomizer as RandomizerEntity } from '@entity/randomizer';
 import { LOW } from '@sogebot/ui-helpers/constants';
+import { validateOrReject } from 'class-validator';
+import { merge } from 'lodash';
+
 import { AppDataSource } from '~/database';
+
 import { v4 } from 'uuid';
 
-import { parser } from '../decorators';
-import Registry from './_interface';
-
+import { app } from '~/helpers/panel';
 import { check } from '~/helpers/permissions/check';
-import { adminEndpoint, publicEndpoint } from '~/helpers/socket';
+import { adminMiddleware } from '~/socket';
+
+import Registry from './_interface';
+import { parser } from '../decorators';
 
 class Randomizer extends Registry {
   constructor() {
@@ -18,16 +23,36 @@ class Randomizer extends Registry {
   }
 
   sockets () {
-    adminEndpoint('/registries/randomizer', 'generic::getAll', async (cb) => {
-      cb(null, await AppDataSource.getRepository(RandomizerEntity).find());
+    if (!app) {
+      setTimeout(() => this.sockets(), 100);
+      return;
+    }
+
+    app.get('/api/registries/randomizer', adminMiddleware, async (req, res) => {
+      res.send({
+        data: await RandomizerEntity.find(),
+      });
     });
-    publicEndpoint('/registries/randomizer', 'randomizer::getVisible', async (cb) => {
-      cb(
-        null,
-        await AppDataSource.getRepository(RandomizerEntity).findOne({ where: { isShown: true }, relations: [ 'items'] })
-      );
+    app.get('/api/registries/randomizer/visible', async (req, res) => {
+      res.send({
+        data: await RandomizerEntity.findOneBy({ isShown: true }),
+      });
     });
-    adminEndpoint('/registries/randomizer', 'randomizer::startSpin', async () => {
+    app.get('/api/registries/randomizer/:id', adminMiddleware, async (req, res) => {
+      res.send({
+        data: await RandomizerEntity.findOneBy({ id: req.params.id }),
+      });
+    });
+    app.post('/api/registries/randomizer/hide', adminMiddleware, async (req, res) => {
+      await AppDataSource.getRepository(RandomizerEntity).update({}, { isShown: false });
+      res.status(204).send();
+    });
+    app.post('/api/registries/randomizer/:id/show', adminMiddleware, async (req, res) => {
+      await AppDataSource.getRepository(RandomizerEntity).update({}, { isShown: false });
+      await AppDataSource.getRepository(RandomizerEntity).update({ id: String(req.params.id) }, { isShown: true });
+      res.status(204).send();
+    });
+    app.post('/api/registries/randomizer/:id/spin', adminMiddleware, async (req, res) => {
       const { default: tts, services } = await import ('../tts');
       let key = v4();
       if (tts.ready) {
@@ -42,14 +67,21 @@ class Randomizer extends Registry {
         service: tts.service,
         key,
       });
+      res.status(204).send();
     });
-    adminEndpoint('/registries/randomizer', 'randomizer::showById', async (id, cb) => {
+    app.delete('/api/registries/randomizer/:id', adminMiddleware, async (req, res) => {
+      await RandomizerEntity.delete({ id: req.params.id });
+      res.status(404).send();
+    });
+    app.post('/api/registries/randomizer', adminMiddleware, async (req, res) => {
       try {
-        await AppDataSource.getRepository(RandomizerEntity).update({}, { isShown: false });
-        await AppDataSource.getRepository(RandomizerEntity).update({ id: String(id) }, { isShown: true });
-        cb(null);
-      } catch (e: any) {
-        cb (e);
+        const itemToSave = new RandomizerEntity();
+        merge(itemToSave, req.body);
+        await validateOrReject(itemToSave);
+        await itemToSave.save();
+        res.send({ data: itemToSave });
+      } catch (e) {
+        res.status(400).send({ errors: e });
       }
     });
   }

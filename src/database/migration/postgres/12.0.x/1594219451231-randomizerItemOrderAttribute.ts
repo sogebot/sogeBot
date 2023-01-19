@@ -1,15 +1,14 @@
-import type { RandomizerItemInterface } from '@entity/randomizer';
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class randomizerItemOrderAttribute1594219451231 implements MigrationInterface {
 
   public async up(queryRunner: QueryRunner): Promise<void> {
-    const items = await queryRunner.query(`SELECT * from "randomizer_item"`) as Required<RandomizerItemInterface>[];
+    const items = await queryRunner.query(`SELECT * from "randomizer_item"`);
 
     await queryRunner.query('DELETE FROM "randomizer_item" WHERE 1=1');
     await queryRunner.query(`ALTER TABLE "randomizer_item" ADD "order" integer NOT NULL`, undefined);
 
-    const mapByRandomizerId = new Map() as Map<string, RandomizerItemInterface[]>;
+    const mapByRandomizerId = new Map() as Map<string, any[]>;
     for (const item of items) {
       const randomizerId = item.randomizerId as string;
       const mappedItems = mapByRandomizerId.get(randomizerId);

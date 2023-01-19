@@ -115,7 +115,7 @@ class TTS extends Core {
             return;
           } else {
             if (!jwtClient) {
-              // this shouldn't occur but make TS happy
+            // this shouldn't occur but make TS happy
               return;
             }
 
