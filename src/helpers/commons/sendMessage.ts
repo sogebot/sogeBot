@@ -2,7 +2,13 @@ import type { HelixChatAnnoucementColor } from '@twurple/api';
 import _ from 'lodash';
 
 import { timer } from '../../decorators.js';
+
+import client from '~/services/twitch/api/client.js';
+
 import { Message } from '../../message';
+
+import { variables } from '~/watchers.js';
+
 import {
   chatOut, debug, whisperOut,
 } from '../log';
@@ -10,8 +16,6 @@ import {
   getMuteStatus, message, sendWithMe, showWithAt,
 } from '../tmi';
 
-import client from '~/services/twitch/api/client.js';
-import { variables } from '~/watchers.js';
 import { getBotSender } from '.';
 
 const getAnnouncementColor = (command: string): HelixChatAnnoucementColor => {
@@ -109,8 +113,9 @@ class HelpersCommons {
                 message: messageArray.join(' '),
                 color,
               });
+            } else {
+              message('say', sender.userName, messageToSend, id);
             }
-            message('say', sender.userName, messageToSend, id);
           }
         }
       }
