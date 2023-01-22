@@ -320,6 +320,7 @@
     },
     "responses": {
       "variable": {
+        "tags": "Tags",
         "titleOfPrediction": "Twitch Predikce - Název",
         "outcomes": "Twitch Predikce - Výsledky",
         "locksAt": "Twitch predikce - Uzamknutí k datu",

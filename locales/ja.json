@@ -320,6 +320,7 @@
     },
     "responses": {
       "variable": {
+        "tags": "Tags",
         "titleOfPrediction": "Twitch チャンネルポイント予測 - タイトル",
         "outcomes": "Twitch チャンネルポイント予測 - 結果",
         "locksAt": "Twitch チャンネルポイント予測 - 日付でロック",
