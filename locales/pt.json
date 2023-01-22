@@ -320,6 +320,7 @@
     },
     "responses": {
       "variable": {
+        "tags": "Tags",
         "titleOfPrediction": "Palpites Twitch - Título",
         "outcomes": "Palpites Twitch - Resultado",
         "locksAt": "Palpites Twitch - Bloqueia na Data",
