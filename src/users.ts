@@ -1,20 +1,21 @@
 import { setTimeout } from 'timers';
 
-import { HOUR } from '@sogebot/ui-helpers/constants';
-import {
-  Brackets, FindOneOptions, IsNull,
-} from 'typeorm';
-import { AppDataSource } from '~/database';
-
-import client from './services/twitch/api/client';
-
 import Core from '~/_interface';
+import { AppDataSource } from '~/database';
 import { Permissions } from '~/database/entity/permissions';
 import {
   User, UserBit, UserInterface, UserTip,
 } from '~/database/entity/user';
 import { onStartup } from '~/decorators/on';
+
+import { HOUR } from '@sogebot/ui-helpers/constants';
+
 import { isStreamOnline, stats } from '~/helpers/api';
+
+import {
+  Brackets, FindOneOptions, IsNull,
+} from 'typeorm';
+
 import { mainCurrency } from '~/helpers/currency';
 import exchange from '~/helpers/currency/exchange';
 import rates from '~/helpers/currency/rates';
@@ -23,9 +24,13 @@ import {
 } from '~/helpers/log';
 import { adminEndpoint, viewerEndpoint } from '~/helpers/socket';
 import * as changelog from '~/helpers/user/changelog.js';
-import { getIdFromTwitch } from '~/services/twitch/calls/getIdFromTwitch';
-import { getUserHighestPermission } from './helpers/permissions/getUserHighestPermission';
+
 import { defaultPermissions } from './helpers/permissions/defaultPermissions';
+import { getUserHighestPermission } from './helpers/permissions/getUserHighestPermission';
+
+import { getIdFromTwitch } from '~/services/twitch/calls/getIdFromTwitch';
+
+import client from './services/twitch/api/client';
 
 class Users extends Core {
   constructor () {
@@ -45,6 +50,11 @@ class Users extends Core {
     try {
       let query;
       await changelog.flush();
+
+      await AppDataSource.getRepository(User).delete({
+        userName: '__AnonymousUser__',
+      });
+
       if (AppDataSource.options.type === 'postgres') {
         query = AppDataSource.getRepository(User).createQueryBuilder('user')
           .select('COUNT(*)')
@@ -74,9 +84,9 @@ class Users extends Core {
               debug('users', `Duplicate username ${user.userName}#${user.userId} changed to ${getUserById.name}#${user.userId}`);
             }
           } catch (e: any) {
-            // we are tagging user as __AnonymousUser__, we don't want to get rid of all information
-            debug('users', `Duplicate username ${user.userName}#${user.userId} not found on Twitch => __AnonymousUser__#${user.userId}`);
-            changelog.update(user.userId, { userName: '__AnonymousUser__' });
+            // remove users not in Twitch anymore
+            debug('users', `Duplicate username ${user.userName}#${user.userId} not found on Twitch => '__inactive__${user.userName}#${user.userId}`);
+            changelog.update(user.userId, { userName: '__inactive__' + user.userName });
           }
         }));
       }));
