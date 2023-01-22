@@ -41,7 +41,12 @@ class EventSub {
     const apiClient = await client('broadcaster');
 
     this.listener = new EventSubWsListener({ apiClient });
-    await this.listener.start();
+
+    if (process.env.ENV === 'production') {
+      await this.listener.start();
+    } else {
+      info('EVENTSUB-WS: Eventsub events disabled on dev-mode.');
+    }
 
     try {
       // FOLLOW
