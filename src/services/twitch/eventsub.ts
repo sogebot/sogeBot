@@ -1,15 +1,20 @@
 import { SECOND } from '@sogebot/ui-helpers/constants';
+
+import * as channelPoll from '~/helpers/api/channelPoll';
+
 import { EventSubWsListener } from '@twurple/eventsub-ws';
 
-import { Mutex } from 'async-mutex';
-import * as channelPoll from '~/helpers/api/channelPoll';
 import * as channelPrediction from '~/helpers/api/channelPrediction';
+
+import { Mutex } from 'async-mutex';
+
 import * as hypeTrain from '~/helpers/api/hypeTrain';
 import { eventEmitter } from '~/helpers/events';
 import { follow } from '~/helpers/events/follow';
 import { error, info } from '~/helpers/log.js';
 import { ioServer } from '~/helpers/panel';
 import { variables } from '~/watchers';
+
 import client from './api/client';
 
 const mutex = new Mutex();
@@ -110,7 +115,10 @@ class EventSub {
     } catch (e) {
       await this.listener.stop();
       this.listener = null;
-      error('EVENTSUB-WS: Please reauthorize your broadcaster account to include all necessary scopes.');
+      if (e instanceof Error) {
+        error('EVENTSUB-WS: ' + e.message);
+      }
+      error('EVENTSUB-WS: Unknown error durring initialization. ' + e);
     }
     release();
   }
