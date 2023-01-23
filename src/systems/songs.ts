@@ -31,7 +31,7 @@ import * as changelog from '~/helpers/user/changelog.js';
 import { isModerator } from '~/helpers/user/isModerator';
 import { translate } from '~/translate';
 import shortid from 'shortid';
-import { Filter } from '@devexpress/dx-react-grid';
+import type { Filter } from '@devexpress/dx-react-grid';
 
 let importInProgress = false;
 const cachedTags = new Set<string>();
