@@ -4,12 +4,12 @@ import { UserTip } from '@entity/user';
 import { SECOND } from '@sogebot/ui-helpers/constants';
 import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized';
 import { Between } from 'typeorm';
-import { AppDataSource } from '~/database';
 
+import Widget from './_interface';
 import alerts from '../registries/alerts';
 import users from '../users';
-import Widget from './_interface';
 
+import { AppDataSource } from '~/database';
 import { error } from '~/helpers/log';
 import { adminEndpoint } from '~/helpers/socket';
 import { translate } from '~/translate';
@@ -151,12 +151,22 @@ class EventList extends Widget {
         const values = JSON.parse(event.values_json);
         if (values.fromId && values.fromId != '0') {
           if (!mapping.has(values.fromId)) {
-            mapping.set(values.fromId, await users.getNameById(values.fromId));
+            try {
+              mapping.set(values.fromId, await users.getNameById(values.fromId));
+            } catch {
+              event.isHidden = true; // hide event if user is unknown
+              await AppDataSource.getRepository(EventListDB).save(event);
+            }
           }
         }
         if (!event.userId.includes('__anonymous__')) {
           if (!mapping.has(event.userId)) {
-            mapping.set(event.userId, await users.getNameById(event.userId));
+            try {
+              mapping.set(event.userId, await users.getNameById(event.userId));
+            } catch {
+              event.isHidden = true; // hide event if user is unknown
+              await AppDataSource.getRepository(EventListDB).save(event);
+            }
           }
         } else {
           mapping.set(event.userId, event.userId.replace('#__anonymous__', ''));
@@ -172,18 +182,20 @@ class EventList extends Widget {
         }
       }
       this.emit('update',
-        events.map(event => {
-          const values = JSON.parse(event.values_json);
-          if (values.fromId && values.fromId != '0') {
-            values.fromId = mapping.get(values.fromId);
-          }
-          return {
-            ...event,
-            username:    mapping.get(event.userId),
-            sortAmount:  tipMapping.get(event.id),
-            values_json: JSON.stringify(values),
-          };
-        }),
+        events
+          .filter(o => !o.isHidden) // refilter as we might have new hidden events
+          .map(event => {
+            const values = JSON.parse(event.values_json);
+            if (values.fromId && values.fromId != '0') {
+              values.fromId = mapping.get(values.fromId);
+            }
+            return {
+              ...event,
+              username:    mapping.get(event.userId),
+              sortAmount:  tipMapping.get(event.id),
+              values_json: JSON.stringify(values),
+            };
+          }),
       );
     } catch (e: any) {
       this.emit('update', []);
