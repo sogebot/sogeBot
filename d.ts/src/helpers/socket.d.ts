@@ -3,21 +3,9 @@ import type { AlertInterface, EmitData } from '@entity/alert';
 import type { BetsInterface } from '@entity/bets';
 import type { CacheTitlesInterface } from '@entity/cacheTitles';
 import type { ChecklistInterface } from '@entity/checklist';
-
-import { AliasGroup, Alias } from '~/database/entity/alias';
-
 import type { CommandsCountInterface, CommandsGroupInterface, CommandsInterface } from '@entity/commands';
-
-import { CacheGamesInterface } from '~/database/entity/cacheGames';
-
 import type { CooldownInterface } from '@entity/cooldown';
-
-import { Plugin } from '~/database/entity/plugins';
-
 import type { EventInterface, Events } from '@entity/event';
-
-import { MenuItem } from '~/helpers/panel';
-
 import type { EventListInterface } from '@entity/eventList';
 import type { GalleryInterface } from '@entity/gallery';
 import type { HighlightInterface } from '@entity/highlight';
@@ -46,6 +34,11 @@ import { FindConditions } from 'typeorm';
 
 import { QuickActions } from '../../../src/database/entity/dashboard';
 import { WidgetCustomInterface, WidgetSocialInterface } from '../../../src/database/entity/widget';
+
+import { AliasGroup, Alias } from '~/database/entity/alias';
+import { CacheGamesInterface } from '~/database/entity/cacheGames';
+import { Plugin } from '~/database/entity/plugins';
+import { MenuItem } from '~/helpers/panel';
 
 type Configuration = {
   [x:string]: Configuration | string;
@@ -295,6 +288,7 @@ export type ClientToServerEventsWithNamespace = {
     'broadcaster': (cb: (error: Error | string | null, username: string) => void) => void,
     'twitch::revoke': (data: { accountType: 'bot' | 'broadcaster' }, cb: (err: Error | string | null) => void) => void,
     'twitch::token': (data: { accessToken: string, refreshToken: string, accountType: 'bot' | 'broadcaster' }, cb: (err: Error | string | null) => void) => void,
+    'twitch::token::ownApp': (data: { accessToken: string, refreshToken: string, accountType: 'bot' | 'broadcaster', clientId: string, clientSecret: string }, cb: (err: Error | string | null) => void) => void,
   },
   '/core/socket': GenericEvents & {
     'purgeAllConnections': (cb: (error: Error | string | null) => void, socket?: Socket) => void,

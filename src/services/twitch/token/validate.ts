@@ -2,10 +2,10 @@ import * as constants from '@sogebot/ui-helpers/constants';
 import { Mutex } from 'async-mutex';
 import axios from 'axios';
 
+import { refresh } from './refresh';
 import { setStatus } from '../../../helpers/parser';
 import { tmiEmitter } from '../../../helpers/tmi';
 import client from '../api/client';
-import { refresh } from './refresh';
 
 import emitter from '~/helpers/interfaceEmitter';
 import {
@@ -49,7 +49,7 @@ const mutex = new Mutex();
       "user_id": "<authorized user ID>"
     }
   */
-export const validate = async (type: 'bot' | 'broadcaster', retry = 0): Promise < boolean > => {
+export const validate = async (type: 'bot' | 'broadcaster', retry = 0, force = false): Promise < boolean > => {
   const release = await mutex.acquire();
   try {
     debug('oauth.validate', `Validation: ${type} - ${retry} retries`);
@@ -62,7 +62,7 @@ export const validate = async (type: 'bot' | 'broadcaster', retry = 0): Promise 
     }
 
     let token: string | null;
-    if (expirationDate[type] - Date.now() > 5 * constants.MINUTE && expirationDate[type] !== -1) {
+    if (!force && expirationDate[type] - Date.now() > 5 * constants.MINUTE && expirationDate[type] !== -1) {
       debug('oauth.validate', `Skipping refresh token for ${type}, expiration time: ${new Date(expirationDate[type]).toISOString()}`);
       return true;
     } else {

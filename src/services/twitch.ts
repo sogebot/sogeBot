@@ -5,14 +5,6 @@ import { dayjs, timezone } from '@sogebot/ui-helpers/dayjsHelper';
 import { getTime } from '@sogebot/ui-helpers/getTime';
 import { capitalize } from 'lodash';
 
-import {
-  command, default_permission, example, persistent, settings,
-} from '../decorators';
-import { onChange, onLoad, onStartup, onStreamStart } from '../decorators/on';
-import Expects from '../expects';
-import emitter from '../helpers/interfaceEmitter';
-import { debug, error, info } from '../helpers/log';
-import users from '../users';
 import Service from './_interface';
 import { init as apiIntervalInit, stop as apiIntervalStop } from './twitch/api/interval';
 import { createClip } from './twitch/calls/createClip';
@@ -22,6 +14,14 @@ import EventSub from './twitch/eventsub';
 import PubSub from './twitch/pubsub';
 import { cleanErrors } from './twitch/token/refresh';
 import { cache, validate } from './twitch/token/validate';
+import {
+  command, default_permission, example, persistent, settings,
+} from '../decorators';
+import { onChange, onLoad, onStartup, onStreamStart } from '../decorators/on';
+import Expects from '../expects';
+import emitter from '../helpers/interfaceEmitter';
+import { debug, error, info } from '../helpers/log';
+import users from '../users';
 
 import { AppDataSource } from '~/database';
 import {
@@ -387,8 +387,23 @@ class Twitch extends Service {
       emitter.emit('set', '/services/twitch', `tokenService`, 'SogeBot Token Generator v2');
       emitter.emit('set', '/services/twitch', `${accountType}RefreshToken`, refreshToken);
       emitter.emit('set', '/services/twitch', `${accountType}AccessToken`, accessToken);
-      await validate(accountType);
-      cb(null);
+      emitter.emit('set', '/services/twitch', `${accountType}TokenValid`, true);
+      await validate(accountType, 0, true);
+      setTimeout(async () => {
+        cb(null);
+      }, 1000);
+    });
+    adminEndpoint('/services/twitch', 'twitch::token::ownApp', async ({ accessToken, refreshToken, accountType, clientId, clientSecret }, cb) => {
+      emitter.emit('set', '/services/twitch', `tokenService`, 'Own Twitch App');
+      emitter.emit('set', '/services/twitch', `${accountType}AccessToken`, accessToken);
+      emitter.emit('set', '/services/twitch', `${accountType}RefreshToken`, refreshToken);
+      emitter.emit('set', '/services/twitch', `tokenServiceCustomClientId`, clientId);
+      emitter.emit('set', '/services/twitch', `tokenServiceCustomClientSecret`, clientSecret);
+      emitter.emit('set', '/services/twitch', `${accountType}TokenValid`, true);
+      await validate(accountType, 0, true);
+      setTimeout(async () => {
+        cb(null);
+      }, 1000);
     });
   }
 
