@@ -1,25 +1,26 @@
+import type { Filter } from '@devexpress/dx-react-grid';
 import {
   currentSongType,
   SongBan, SongPlaylist, SongRequest,
 } from '@entity/song';
 import { User } from '@entity/user';
 import * as _ from 'lodash';
+import shortid from 'shortid';
 import io from 'socket.io';
 import {
   Brackets, In, Like,
 } from 'typeorm';
-import { AppDataSource } from '~/database';
-
 import ytdl from 'ytdl-core';
 import ytpl from 'ytpl';
 import ytsr from 'ytsr';
 
+import System from './_interface';
 import {
   command, default_permission, persistent, settings, ui,
 } from '../decorators';
 import { onChange, onStartup } from '../decorators/on';
-import System from './_interface';
 
+import { AppDataSource } from '~/database';
 import {
   announce, getBot, getBotSender, prepare,
 } from '~/helpers/commons';
@@ -30,8 +31,6 @@ import { tmiEmitter } from '~/helpers/tmi';
 import * as changelog from '~/helpers/user/changelog.js';
 import { isModerator } from '~/helpers/user/isModerator';
 import { translate } from '~/translate';
-import shortid from 'shortid';
-import type { Filter } from '@devexpress/dx-react-grid';
 
 let importInProgress = false;
 const cachedTags = new Set<string>();
@@ -426,9 +425,9 @@ class Songs extends System {
 
     // check if there are any requests
     if (this.songrequest) {
-      const sr = await SongRequest.findOne({ order: { addedAt: 'ASC' } });
-      if (sr) {
-        const currentSong: any = sr;
+      const sr = await SongRequest.find({ order: { addedAt: 'ASC' }, take: 1 });
+      if (sr[0]) {
+        const currentSong: any = sr[0];
         currentSong.volume = await this.getVolume(currentSong);
         currentSong.type = 'songrequests';
         this.currentSong = JSON.stringify(currentSong);
@@ -436,7 +435,7 @@ class Songs extends System {
         if (this.notify) {
           this.notifySong();
         }
-        await SongRequest.delete({ videoId: sr.videoId });
+        await SongRequest.delete({ videoId: sr[0].videoId });
         return [];
       }
     }
@@ -448,36 +447,36 @@ class Songs extends System {
         return [];
       }
       const order: any = this.shuffle ? { seed: 'ASC' } : { lastPlayedAt: 'ASC' };
-      const pl = await SongPlaylist.findOne({ order });
-      if (!pl) {
+      const pl = await SongPlaylist.find({ order, take: 1 });
+      if (!pl[0]) {
         return []; // don't do anything if no songs in playlist
       }
 
       // shuffled song is played again
-      if (this.shuffle && pl.seed === 1) {
+      if (this.shuffle && pl[0].seed === 1) {
         await this.createRandomSeeds();
         return this.sendNextSongID(); // retry with new seeds
       }
 
-      if (!pl.tags.includes(this.currentTag)) {
-        pl.seed = 1;
-        await pl.save();
+      if (!pl[0].tags.includes(this.currentTag)) {
+        pl[0].seed = 1;
+        await pl[0].save();
         return this.sendNextSongID(); // get next song as this don't belong to tag
       }
 
-      pl.seed = 1;
-      pl.lastPlayedAt = new Date().toISOString();
-      await pl.save();
+      pl[0].seed = 1;
+      pl[0].lastPlayedAt = new Date().toISOString();
+      await pl[0].save();
       const currentSong = {
-        videoId:     pl.videoId,
-        title:       pl.title,
+        videoId:     pl[0].videoId,
+        title:       pl[0].title,
         type:        'playlist',
         username:    getBot(),
-        forceVolume: pl.forceVolume,
-        loudness:    pl.loudness,
-        volume:      await this.getVolume(pl),
-        endTime:     pl.endTime,
-        startTime:   pl.startTime,
+        forceVolume: pl[0].forceVolume,
+        loudness:    pl[0].loudness,
+        volume:      await this.getVolume(pl[0]),
+        endTime:     pl[0].endTime,
+        startTime:   pl[0].startTime,
       };
       this.currentSong = JSON.stringify(currentSong);
 
