@@ -1,18 +1,15 @@
 import isEqual from 'lodash/isEqual';
 
+import client from '../api/client';
+import { refresh } from '../token/refresh.js';
+
 import {  currentStreamTags, gameCache, gameOrTitleChangedManually, rawStatus, tagsCache } from '~/helpers/api';
 import {
   stats as apiStats,
 } from '~/helpers/api';
 import { parseTitle } from '~/helpers/api/parseTitle';
 import { getFunctionName } from '~/helpers/getFunctionName';
-
-import client from '../api/client';
-
 import { debug, error, info, isDebugEnabled, warning } from '~/helpers/log';
-
-import { refresh } from '../token/refresh.js';
-
 import { updateChannelInfo } from '~/services/twitch/calls/updateChannelInfo';
 import { variables } from '~/watchers';
 
@@ -88,6 +85,7 @@ export async function getChannelInformation (opts: any) {
 
       gameCache.value = getChannelInfo.gameName;
       rawStatus.value = _rawStatus;
+      tagsCache.value = JSON.stringify(getChannelInfo.tags);
     } else {
       gameOrTitleChangedManually.value = false;
     }
