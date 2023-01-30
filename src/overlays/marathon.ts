@@ -149,7 +149,7 @@ class Marathon extends Overlay {
       if (overlay) {
         const item = overlay.items.find(o => o.id === itemId);
         if (item) {
-          item.opts === value;
+          item.opts = value;
         }
         await overlay.save();
       }
