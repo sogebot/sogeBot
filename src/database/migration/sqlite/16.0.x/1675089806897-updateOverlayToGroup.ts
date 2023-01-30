@@ -35,10 +35,12 @@ export class updateOverlayToGroup1675089806897 implements MigrationInterface {
       }
       newGroup = defaultValues(newGroup);
       console.log(`Creating group ${newGroup.name}#${newGroup.id} with ${newGroup.items.length} item(s).`);
+      newGroup.canvas = JSON.stringify(newGroup.canvas);
+      newGroup.items = JSON.stringify(newGroup.items);
       insertItemIntoTable('overlay', newGroup, queryRunner);
     }
 
-    for (const item of items.filter((o: any) => o.value === null)) {
+    for (const item of items.filter((o: any) => o.groupId === null)) {
       console.log('Groupless item', item.id);
     }
   }

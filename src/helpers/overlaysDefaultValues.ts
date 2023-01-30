@@ -263,7 +263,6 @@ function setDefaultOpts<T extends keyof typeof values>(opts: any, type: T) {
 }
 
 function defaultValues(overlay: Overlay) {
-  console.log({ overlay });
   for (const item of overlay.items) {
     if (Object.keys(values).includes(item.opts.typeId)) {
       item.opts = {
