@@ -1,9 +1,8 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
+import { v4 } from 'uuid';
 
 import { insertItemIntoTable } from '~/database/insertItemIntoTable';
 import defaultValues from '~/helpers/overlaysDefaultValues';
-
-// import { insertItemIntoTable } from '~/database/insertItemIntoTable';
 
 export class updateOverlayToGroup1675089806897 implements MigrationInterface {
   name = 'updateOverlayToGroup1675089806897';
@@ -11,6 +10,7 @@ export class updateOverlayToGroup1675089806897 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`CREATE TABLE "overlay" ("id" varchar PRIMARY KEY NOT NULL, "name" varchar NOT NULL, "canvas" text NOT NULL, "items" text NOT NULL)`);
     const items = await queryRunner.query(`SELECT * from "overlay_mapper"`);
+    await queryRunner.query(`DROP TABLE "overlay_mapper"`);
 
     for (const group of items.filter((o: any) => o.value === 'group')) {
       const opts = JSON.parse<any>(group.opts);
@@ -40,8 +40,32 @@ export class updateOverlayToGroup1675089806897 implements MigrationInterface {
       insertItemIntoTable('overlay', newGroup, queryRunner);
     }
 
-    for (const item of items.filter((o: any) => o.groupId === null)) {
-      console.log('Groupless item', item.id);
+    for (const item of items.filter((o: any) => o.groupId === null && o.value !== 'group')) {
+      let newGroup: any = {
+        id:     item.id,
+        name:   item.name ?? 'Migrated from ' + item.id,
+        canvas: {
+          width:  1920,
+          height: 1080,
+        },
+        items: [{
+          id:     v4(),
+          width:  1920,
+          height: 1080,
+          alignX: 0,
+          alignY: 0,
+          opts:   {
+            typeId: item.value,
+            ...JSON.parse<any>(item.opts === null ? '{}' : item.opts),
+          },
+        }],
+      };
+      newGroup = defaultValues(newGroup);
+      console.log(`Creating group ${newGroup.name}#${newGroup.id} with ${newGroup.items.length} item(s).`);
+      newGroup.canvas = JSON.stringify(newGroup.canvas);
+      newGroup.items = JSON.stringify(newGroup.items);
+      insertItemIntoTable('overlay', newGroup, queryRunner);
+
     }
   }
 
