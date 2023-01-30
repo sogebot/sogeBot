@@ -7,6 +7,7 @@ export class stringifyOverlayGroup1634053219263 implements MigrationInterface {
   name = 'stringifyOverlayGroup1634053219263';
 
   public async up(queryRunner: QueryRunner): Promise < void > {
+    return;
     const mapper = await queryRunner.query(`SELECT * from "overlay_mapper"`);
 
     for (const group of mapper as any) {
