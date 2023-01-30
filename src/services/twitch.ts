@@ -264,8 +264,8 @@ class Twitch extends Service {
   }
 
   init() {
-    this.tmi = new Chat();
     if (this.botTokenValid && this.broadcasterTokenValid) {
+      this.tmi = new Chat();
       apiIntervalInit();
     } else {
       setTimeout(() => this.init(), 1000);
