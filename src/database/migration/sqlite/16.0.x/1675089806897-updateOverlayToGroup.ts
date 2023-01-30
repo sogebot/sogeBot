@@ -1,5 +1,6 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
+import { insertItemIntoTable } from '~/database/insertItemIntoTable';
 import defaultValues from '~/helpers/overlaysDefaultValues';
 
 // import { insertItemIntoTable } from '~/database/insertItemIntoTable';
@@ -24,7 +25,6 @@ export class updateOverlayToGroup1675089806897 implements MigrationInterface {
       for (const item of JSON.parse<any>(group.opts).items) {
         const itemId = item.id;
         const itemFromDB = items.find((o: any) => o.id === itemId);
-        console.log(JSON.stringify(itemFromDB, undefined, 2));
         if (itemFromDB) {
           item.opts = {
             typeId: itemFromDB.value,
@@ -33,14 +33,14 @@ export class updateOverlayToGroup1675089806897 implements MigrationInterface {
           newGroup.items.push(item);
         }
       }
-      console.log('AFTER ========================');
       newGroup = defaultValues(newGroup);
-      console.log(JSON.stringify(newGroup, undefined, 2));
+      console.log(`Creating group ${newGroup.name}#${newGroup.id} with ${newGroup.items.length} item(s).`);
+      insertItemIntoTable('overlay', newGroup, queryRunner);
     }
 
-    /*for (const item of items.filter((o: any) => o.value === null)) {
+    for (const item of items.filter((o: any) => o.value === null)) {
       console.log('Groupless item', item.id);
-    }*/
+    }
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
