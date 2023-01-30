@@ -61,6 +61,13 @@ class Overlays extends Registry {
       if (item) {
         cb(null, defaultValues(item));
       } else {
+        // try to find if id is part of group
+        const items = await Overlay.find();
+        for (const it of items) {
+          if (it.items.map(o => o.id).includes(id)) {
+            return cb(null, defaultValues(it));
+          }
+        }
         cb(null, undefined);
       }
     });
