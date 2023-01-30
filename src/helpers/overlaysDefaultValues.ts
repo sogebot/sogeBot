@@ -1,7 +1,7 @@
 import { MINUTE, SECOND } from '@sogebot/ui-helpers/constants';
 import { defaultsDeep, pick } from 'lodash';
 
-import { OverlayMappers } from '~/database/entity/overlay';
+import { Overlay } from '~/database/entity/overlay';
 
 const values = {
   url:            { url: '' },
@@ -262,18 +262,18 @@ function setDefaultOpts<T extends keyof typeof values>(opts: any, type: T) {
   );
 }
 
-function defaultValues(item: OverlayMappers) {
-  const value = item.value as keyof typeof values | null;
-  if (value && Object.keys(values).includes(value)) {
-    if (values[value]) {
-      (item.opts as any) = setDefaultOpts(item.opts, value as any);
-    } else {
-      item.opts = null;
+function defaultValues(overlay: Overlay) {
+  console.log({ overlay });
+  for (const item of overlay.items) {
+    if (Object.keys(values).includes(item.opts.typeId)) {
+      item.opts = {
+        typeId: item.opts.typeId,
+        ...setDefaultOpts(item.opts, item.opts.typeId),
+      } as any;
     }
-  } else {
-    console.log('Missing default values for overlay ' + value);
   }
-  return item;
+
+  return overlay;
 }
 
 export default defaultValues;

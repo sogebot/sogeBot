@@ -1,10 +1,10 @@
-import { OverlayMapper } from '@entity/overlay.js';
+import { Overlay as OverlayEntity } from '@entity/overlay.js';
 import { MINUTE, SECOND } from '@sogebot/ui-helpers/constants';
-import { AppDataSource } from '~/database';
-import { app } from '~/helpers/panel';
 
 import Overlay from './_interface';
 
+import { AppDataSource } from '~/database';
+import { app } from '~/helpers/panel';
 import { adminEndpoint, publicEndpoint } from '~/helpers/socket';
 import { adminMiddleware } from '~/socket';
 
@@ -41,11 +41,15 @@ class Countdown extends Overlay {
         resetAndStop: false,
       };
 
-      let resetTime = 0;
+      const resetTime = 0;
       if (req.params.operation.includes('reset')) {
-        const overlay = await AppDataSource.getRepository(OverlayMapper).findOneBy({ id: req.params.id });
-        if (overlay && overlay.value === 'countdown') {
-          resetTime = overlay.opts?.currentTime ?? 0;
+        const overlays = await AppDataSource.getRepository(OverlayEntity).find();
+        for (const overlay of overlays) {
+          const item = overlay.items.find(o => o.id === req.params.id);
+          if (item && item.opts.typeId === 'countdown') {
+            item.opts.currentTime = 0;
+            await overlay.save();
+          }
         }
       }
 
@@ -80,15 +84,12 @@ class Countdown extends Overlay {
       statusUpdate.delete(data.id);
 
       // we need to check if persistent
-      const overlay = await AppDataSource.getRepository(OverlayMapper).findOneBy({ id: data.id });
-      if (overlay && overlay.value === 'countdown') {
-        if (overlay.opts && overlay.opts.isPersistent) {
-          await AppDataSource.getRepository(OverlayMapper).update(data.id, {
-            opts: {
-              ...overlay.opts,
-              currentTime: data.time,
-            },
-          });
+      const overlays = await AppDataSource.getRepository(OverlayEntity).find();
+      for (const overlay of overlays) {
+        const item = overlay.items.find(o => o.id === data.id);
+        if (item && item.opts.typeId === 'countdown' && item.opts.isPersistent) {
+          item.opts.currentTime = data.time;
+          await overlay.save();
         }
       }
     });
