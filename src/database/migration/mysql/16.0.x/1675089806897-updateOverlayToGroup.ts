@@ -26,6 +26,8 @@ export class updateOverlayToGroup1675089806897 implements MigrationInterface {
         const itemId = item.id;
         const itemFromDB = items.find((o: any) => o.id === itemId);
         if (itemFromDB) {
+          item.name = itemFromDB.name ?? '';
+          item.isVisible = true;
           item.opts = {
             typeId: itemFromDB.value,
             ...JSON.parse(itemFromDB.opts === null ? '{}' : itemFromDB.opts),
@@ -43,18 +45,21 @@ export class updateOverlayToGroup1675089806897 implements MigrationInterface {
     for (const item of items.filter((o: any) => o.groupId === null && o.value !== 'group')) {
       let newGroup: any = {
         id:     item.id,
-        name:   item.name ?? 'Migrated from ' + item.id,
+        name:   item.name ?? 'Group from ' + item.id,
         canvas: {
           width:  1920,
           height: 1080,
         },
         items: [{
-          id:     v4(),
-          width:  1920,
-          height: 1080,
-          alignX: 0,
-          alignY: 0,
-          opts:   {
+          id:        v4(),
+          width:     1920,
+          height:    1080,
+          alignX:    0,
+          alignY:    0,
+          isVisible: true,
+          isVisible: true,
+          name:      item.name ?? '',
+          opts:      {
             typeId: item.value,
             ...JSON.parse<any>(item.opts === null ? '{}' : item.opts),
           },

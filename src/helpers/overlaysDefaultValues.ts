@@ -257,8 +257,11 @@ const values = {
 
 function setDefaultOpts<T extends keyof typeof values>(opts: any, type: T) {
   return pick(
-    defaultsDeep(opts, values[type]),
-    Object.keys(values[type] || {}),
+    {
+      ...defaultsDeep(opts, values[type]),
+      typeId: type,
+    },
+    Object.keys({ ...values[type], typeId: '' }),
   );
 }
 
