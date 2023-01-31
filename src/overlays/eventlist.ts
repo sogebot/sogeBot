@@ -3,12 +3,12 @@ import crypto from 'crypto';
 import { EventList as EventListEntity } from '@entity/eventList';
 import * as _ from 'lodash';
 import { Brackets } from 'typeorm';
-import { AppDataSource } from '~/database';
 
+import Overlay from './_interface';
 import users from '../users';
 import eventlist from '../widgets/eventlist';
-import Overlay from './_interface';
 
+import { AppDataSource } from '~/database';
 import { warning } from '~/helpers/log';
 import { adminEndpoint, publicEndpoint } from '~/helpers/socket';
 import { isBotId } from '~/helpers/user/isBot';
@@ -59,6 +59,7 @@ class EventList extends Overlay {
           const ignored = opts.ignore.map(value => value.trim());
           for (let i = 0; i < ignored.length; i++) {
             qb.andWhere(`events.event != :event_${i}`, { ['event_' + i]: ignored[i] });
+            qb.andWhere(`events.isHidden != :isHidden`, { ['isHidden']: false });
           }
         }))
         .limit(opts.limit)
@@ -72,14 +73,18 @@ class EventList extends Overlay {
       // we need to change userId => username and from => from username for eventlist compatibility
       const mapping = new Map() as Map<string, string>;
       for (const event of events) {
-        const values = JSON.parse(event.values_json);
-        if (values.from && values.from != '0') {
-          if (!mapping.has(values.from)) {
-            mapping.set(values.from, await users.getNameById(values.from));
+        try {
+          const values = JSON.parse(event.values_json);
+          if (values.from && values.from != '0') {
+            if (!mapping.has(values.from)) {
+              mapping.set(values.from, await users.getNameById(values.from));
+            }
           }
-        }
-        if (!mapping.has(event.userId)) {
-          mapping.set(event.userId, await users.getNameById(event.userId));
+          if (!mapping.has(event.userId)) {
+            mapping.set(event.userId, await users.getNameById(event.userId));
+          }
+        } catch (e) {
+          console.error(e);
         }
       }
 
