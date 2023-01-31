@@ -1,7 +1,7 @@
 {
   "alias": "Apelido",
   "command": "Comando",
-  "variableName": "Variable name",
+  "variableName": "Nome da variável",
   "price": "Preço (pontos)",
   "priceBits": "Preço (bits)",
   "thisvalue": "Este valor",
