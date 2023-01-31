@@ -4,9 +4,11 @@ import {
 } from 'typeorm';
 
 export class attachCanvasToGroupOverlay1626478375129 implements MigrationInterface {
+  transaction?: boolean | undefined;
   name = 'attachCanvasToGroupOverlay1626478375129';
 
   public async up(queryRunner: QueryRunner): Promise < void > {
+    return;
     const mapper = await queryRunner.manager.getRepository(`overlay_mapper`).find({ where:  { value: 'group' }, select: {
       'id':    true,
       'value': true,

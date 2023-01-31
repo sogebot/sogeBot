@@ -1,10 +1,10 @@
-import { OverlayMapper } from '@entity/overlay.js';
+import { Overlay as OverlayEntity } from '@entity/overlay';
 import { MINUTE, SECOND } from '@sogebot/ui-helpers/constants';
-import { AppDataSource } from '~/database';
-import { app } from '~/helpers/panel';
 
 import Overlay from './_interface';
 
+import { AppDataSource } from '~/database';
+import { app } from '~/helpers/panel';
 import { adminEndpoint, publicEndpoint } from '~/helpers/socket';
 import { adminMiddleware } from '~/socket';
 
@@ -50,7 +50,7 @@ class Stopwatch extends Overlay {
       res.status(204).send();
     });
 
-    publicEndpoint('/overlays/stopwatch', 'stopwatch::update', async (data: { id: string, isEnabled: boolean, time: number }, cb) => {
+    publicEndpoint('/overlays/stopwatch', 'stopwatch::update', async (data: { groupId: string, id: string, isEnabled: boolean, time: number }, cb) => {
       const update = {
         timestamp: Date.now(),
         isEnabled: data.isEnabled,
@@ -72,15 +72,14 @@ class Stopwatch extends Overlay {
       statusUpdate.delete(data.id);
 
       // we need to check if persistent
-      const overlay = await AppDataSource.getRepository(OverlayMapper).findOneBy({ id: data.id });
-      if (overlay && overlay.value === 'stopwatch') {
-        if (overlay.opts && overlay.opts.isPersistent) {
-          await AppDataSource.getRepository(OverlayMapper).update(data.id, {
-            opts: {
-              ...overlay.opts,
-              currentTime: data.time,
-            },
-          });
+      const overlay = await AppDataSource.getRepository(OverlayEntity).findOneBy({ id: data.groupId });
+      if (overlay) {
+        const item = overlay.items.find(o => o.id === data.id);
+        if (item && item.opts.typeId === 'stopwatch') {
+          if (item.opts && item.opts.isPersistent) {
+            item.opts.currentTime = data.time;
+            await overlay.save();
+          }
         }
       }
     });

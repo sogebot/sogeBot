@@ -1,4 +1,4 @@
-import type { OverlayMapperClipsCarousel } from '@entity/overlay';
+import type { ClipsCarousel as CC } from '@entity/overlay';
 
 import Overlay from './_interface';
 
@@ -7,7 +7,7 @@ import { getTopClips } from '~/services/twitch/calls/getTopClips';
 
 class ClipsCarousel extends Overlay {
   sockets () {
-    publicEndpoint(this.nsp, 'clips', async (data: NonNullable<OverlayMapperClipsCarousel['opts']>, cb) => {
+    publicEndpoint(this.nsp, 'clips', async (data: NonNullable<CC>, cb) => {
       const clips = await getTopClips({
         period: 'custom', days: data.customPeriod, first: data.numOfClips,
       });

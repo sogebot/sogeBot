@@ -8,8 +8,9 @@ export class migrateOverlaySettings1626383147273 implements MigrationInterface {
   name = 'migrateOverlaySettings1626383147273';
 
   public async up(queryRunner: QueryRunner): Promise < void > {
+    return;
     const settings = (await queryRunner.manager.getRepository(`settings`).find()).filter((o: any) => o.namespace.includes('overlay'));
-    const mapper = await queryRunner.manager.getRepository(`overlay_mapper`).find({ select: ['id', 'value', 'opts'] });
+    const mapper = await queryRunner.query(`SELECT * from "overlay_mapper"`);
 
     // check if alert overlay exists
     const alerts = mapper.filter((o: any) => o.value === 'alerts');
