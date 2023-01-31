@@ -57,7 +57,6 @@ export class updateOverlayToGroup1675089806897 implements MigrationInterface {
           alignX:    0,
           alignY:    0,
           isVisible: true,
-          isVisible: true,
           name:      item.name ?? '',
           opts:      {
             typeId: item.value,
