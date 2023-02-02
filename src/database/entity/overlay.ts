@@ -335,6 +335,7 @@ export class Overlay extends BotEntity<Overlay> {
   @Column({ type: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') !== 'better-sqlite3' ? 'json' : 'simple-json' })
     items: {
     id: string;
+    isVisible: boolean;
     width: number;
     height: number;
     alignX: number;
