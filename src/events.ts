@@ -214,7 +214,6 @@ class Events extends Core {
       'subgift',
       'number-of-viewers-is-at-least-x',
       'tip',
-      'tweet-post-with-hashtag',
       'obs-scene-changed',
       'obs-input-mute-state-changed',
     ] as const) {
