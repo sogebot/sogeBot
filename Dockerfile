@@ -24,8 +24,9 @@ WORKDIR /app
 COPY docker.sh /
 RUN chmod +x /docker.sh
 
-# Install packages
-RUN npm ci
+# Install packages and clean .npm cache (not needed)
+RUN npm install
+RUN npm cache clean --force
 
 # Expose API port to the outside
 EXPOSE 20000
