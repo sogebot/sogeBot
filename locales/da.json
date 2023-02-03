@@ -482,12 +482,6 @@
           "bot": "Er modtageren bot? (bool)",
           "owner": "Er modtageren ejer af bot? (bool)"
         },
-        "tweet": {
-          "text": "Tekst til tweet",
-          "username": "Brugernavn på Twitter",
-          "displayname": "Skærmnavn på Twitter",
-          "url": "Llink til Tweet"
-        },
         "sceneName": "Navn på scene",
         "inputName": "Name of input",
         "inputMuted": "Mute state (bool)"
@@ -587,7 +581,6 @@
     "in-seconds": "i sekunder",
     "songs": "Sange",
     "show-usernames-with-at": "Vis brugere med @",
-    "twitter-send-message": "Tweet",
     "send-message-as-a-bot": "Send besked som a bot",
     "chat-as-bot": "Chat (som bot)",
     "product": "Produkt",
@@ -766,7 +759,6 @@
     "mod": "bruger blev ny mod",
     "timeout": "bruger fik timeout",
     "create-a-new-event-listener": "Opret en ny begivenheds-lytter",
-    "send-twitter-message": "send en Twitter-besked",
     "send-discord-message": "send en Discord-besked",
     "send-chat-message": "send en Twitch-chatbesked",
     "send-whisper": "send en whisper",

@@ -482,12 +482,6 @@
           "bot": "Il destinatario è bot? (bool)",
           "owner": "Il destinatario è proprietario del bot? (bool)"
         },
-        "tweet": {
-          "text": "Testo da tweettare",
-          "username": "Nome utente su Twitter",
-          "displayname": "Nome visualizzato su Twitter",
-          "url": "Twitta link"
-        },
         "sceneName": "Nome della scena",
         "inputName": "Name of input",
         "inputMuted": "Mute state (bool)"
@@ -587,7 +581,6 @@
     "in-seconds": "in secondi",
     "songs": "Brani",
     "show-usernames-with-at": "Mostra nomi utente con @",
-    "twitter-send-message": "Tweet",
     "send-message-as-a-bot": "Invia messaggio come bot",
     "chat-as-bot": "Chat (come bot)",
     "product": "Prodotto",
@@ -766,7 +759,6 @@
     "mod": "l'utente è un nuovo mod",
     "timeout": "l'utente è stato timeouttato",
     "create-a-new-event-listener": "Crea un nuovo listener di eventi",
-    "send-twitter-message": "pubblica un messaggio twitter",
     "send-discord-message": "invia un messaggio discord",
     "send-chat-message": "invia un messaggio di chat twitch",
     "send-whisper": "invia un messaggio privato",

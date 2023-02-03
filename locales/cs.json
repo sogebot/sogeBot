@@ -482,12 +482,6 @@
           "bot": "Je příjemce bot? (bool)",
           "owner": "Je příjemce vlastník bota? (bool)"
         },
-        "tweet": {
-          "text": "Text tweetu",
-          "username": "Uživatelské jméno na Twitteru",
-          "displayname": "Zobrazené jméno na Twitteru",
-          "url": "Link na tweet"
-        },
         "sceneName": "Název scény",
         "inputName": "Název vstupu",
         "inputMuted": "Stav ztlumení (bool)"
@@ -587,7 +581,6 @@
     "in-seconds": "v sekundách",
     "songs": "Písničky",
     "show-usernames-with-at": "Zobrazit uživatelské jména s @",
-    "twitter-send-message": "Tweet",
     "send-message-as-a-bot": "Poslat zprávu jako bot",
     "chat-as-bot": "Chat (jako bot)",
     "product": "Produkt",
@@ -766,7 +759,6 @@
     "mod": "uživatel se stal novým modem",
     "timeout": "uživatel dostal timeout",
     "create-a-new-event-listener": "Vytvoř nový event listener",
-    "send-twitter-message": "poslat zprávu na twitter",
     "send-discord-message": "odeslat Discord zprávu",
     "send-chat-message": "odeslat zprávu na twitch chat",
     "send-whisper": "poslat whisper",

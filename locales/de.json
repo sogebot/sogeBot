@@ -482,12 +482,6 @@
           "bot": "Ist Teilnehmer ein Bot? (Bool)",
           "owner": "Ist Teilnehmer der Bot-Besitzer? (Bool)"
         },
-        "tweet": {
-          "text": "Text des Tweets",
-          "username": "Benutzername auf Twitter",
-          "displayname": "Name auf Twitter",
-          "url": "Tweet Link"
-        },
         "sceneName": "Name der Szene",
         "inputName": "Name of input",
         "inputMuted": "Mute state (bool)"
@@ -587,7 +581,6 @@
     "in-seconds": "in Sekunden",
     "songs": "Songs",
     "show-usernames-with-at": "Benutzernamen mit @ anzeigen",
-    "twitter-send-message": "Twittern",
     "send-message-as-a-bot": "Nachricht als Bot senden",
     "chat-as-bot": "Chat (als Bot)",
     "product": "Produkt",
@@ -766,7 +759,6 @@
     "mod": "Benutzer ist ein neuer Mod",
     "timeout": "der Benutzer hatte einen Timeout",
     "create-a-new-event-listener": "Neuen Event Listener erstellen",
-    "send-twitter-message": "Eine Twitter-Nachricht veröffentlichen",
     "send-discord-message": "sende eine Discord Nachricht",
     "send-chat-message": "sende eine Twitch Chat Nachricht",
     "send-whisper": "einen Whisper senden",
