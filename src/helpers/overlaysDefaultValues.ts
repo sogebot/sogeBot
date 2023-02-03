@@ -86,33 +86,6 @@ const values = {
       color:       '#ffffff',
       shadow:      [],
     },
-    countdown: {
-      time:                       60000,
-      currentTime:                60000,
-      isPersistent:               false,
-      isStartedOnSourceLoad:      true,
-      showMilliseconds:           false,
-      messageWhenReachedZero:     '',
-      showMessageWhenReachedZero: false,
-      countdownFont:              {
-        family:      'PT Sans',
-        size:        50,
-        borderPx:    1,
-        borderColor: '#000000',
-        weight:      '500',
-        color:       '#ffffff',
-        shadow:      [],
-      },
-      messageFont: {
-        family:      'PT Sans',
-        size:        35,
-        borderPx:    1,
-        borderColor: '#000000',
-        weight:      '500',
-        color:       '#ffffff',
-        shadow:      [],
-      },
-    },
   },
   credits: {
     speed:       'medium',
@@ -256,22 +229,22 @@ const values = {
   stats:      null,
 } as const;
 
-function setDefaultOpts<T extends keyof typeof values>(opts: any, type: T) {
+function setDefaultOpts<T extends keyof typeof values>(opts: any, type: T): Overlay['items'][number]['opts'] {
   return pick(
     {
       ...defaultsDeep(opts, values[type]),
       typeId: type,
     },
     Object.keys({ ...values[type], typeId: '' }),
-  );
+  ) as any;
 }
 
 function defaultValues(overlay: Overlay) {
   for (const item of overlay.items) {
     if (Object.keys(values).includes(item.opts.typeId)) {
       item.opts = {
-        typeId: item.opts.typeId,
         ...setDefaultOpts(item.opts, item.opts.typeId),
+        typeId: item.opts.typeId,
       } as any;
     }
   }
