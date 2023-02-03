@@ -84,6 +84,13 @@ class EventList extends Overlay {
             mapping.set(event.userId, await users.getNameById(event.userId));
           }
         } catch (e) {
+          if (e instanceof Error) {
+            if (e.message.includes('Cannot get username')) {
+              event.isHidden = true; // hide event if cannot get username
+              await AppDataSource.getRepository(EventListEntity).save(event);
+              continue;
+            }
+          }
           console.error(e);
         }
       }
