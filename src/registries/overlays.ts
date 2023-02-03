@@ -48,8 +48,8 @@ class Overlays extends Registry {
       cb(null);
     });
     adminEndpoint('/registries/overlays', 'generic::save', async (opts, cb) => {
-      await AppDataSource.getRepository(Overlay).save(opts);
-      cb(null);
+      const data = await AppDataSource.getRepository(Overlay).save(opts);
+      cb(null, data);
     });
 
     publicEndpoint('/registries/overlays', 'generic::getAll', async (cb) => {
