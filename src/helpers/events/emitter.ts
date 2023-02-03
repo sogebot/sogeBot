@@ -73,8 +73,6 @@ interface Events {
   'subgift': (opts: { userName: string; recipient: string; tier: number; }) => void;
   'number-of-viewers-is-at-least-x': (opts: { reset: boolean }) => void;
   'tip': (opts: { isAnonymous: boolean, userName: string, amount: string; currency: string; amountInBotCurrency: string; currencyInBot: string; message: string; }) => void;
-  // Twitter integration
-  'tweet-post-with-hashtag': (opts: { tweet: any }) => void;
   // OBS Websocket integration
   'obs-scene-changed': (opts: { sceneName: string, linkFilter: string }) => void;
   'obs-input-mute-state-changed': (opts: { inputName: string; inputMuted: boolean; linkFilter: string }) => void;
