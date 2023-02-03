@@ -14,6 +14,7 @@ const values = {
     isPersistent:               false,
     isStartedOnSourceLoad:      true,
     showMessageWhenReachedZero: false,
+    showMilliseconds:           false,
     countdownFont:              {
       family:      'PT Sans',
       size:        50,
