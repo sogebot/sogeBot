@@ -482,12 +482,6 @@
           "bot": "受信者のボットとは？ (bool)",
           "owner": "受信者のボットの所有者ですか? (bool)"
         },
-        "tweet": {
-          "text": "ツイートのテキスト",
-          "username": "Twitterのユーザー名",
-          "displayname": "Twitterでのスクリーン名",
-          "url": "ツイートリンク"
-        },
         "sceneName": "シーン名",
         "inputName": "Name of input",
         "inputMuted": "Mute state (bool)"
@@ -587,7 +581,6 @@
     "in-seconds": "秒で",
     "songs": "曲",
     "show-usernames-with-at": "@ でユーザー名を表示",
-    "twitter-send-message": "ツイート",
     "send-message-as-a-bot": "ボットとしてメッセージを送信する",
     "chat-as-bot": "チャット (ボットとして)",
     "product": "商品",
@@ -766,7 +759,6 @@
     "mod": "ユーザーは新しいモデレーターです",
     "timeout": "ユーザーはタイムアウトされました",
     "create-a-new-event-listener": "新しいイベントリスナーを作成する",
-    "send-twitter-message": "twitterメッセージを投稿する",
     "send-discord-message": "discordメッセージを送る",
     "send-chat-message": "twitchチャットメッセージを送信",
     "send-whisper": "ウィスパーを送る",

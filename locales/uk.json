@@ -482,12 +482,6 @@
           "bot": "Чи є одержувач ботом? (bool)",
           "owner": "Чи є одержувач власником бота? (bool)"
         },
-        "tweet": {
-          "text": "Текст твіта",
-          "username": "Ім'я користувача у Twitter",
-          "displayname": "Екранне ім'я в Twitter",
-          "url": "Твітнути"
-        },
         "sceneName": "Назва сцени",
         "inputName": "Name of input",
         "inputMuted": "Mute state (bool)"
@@ -587,7 +581,6 @@
     "in-seconds": "в секундах",
     "songs": "Пісні",
     "show-usernames-with-at": "Показувати імена користувачів з @",
-    "twitter-send-message": "Твіт",
     "send-message-as-a-bot": "Надіслати повідомлення як бота",
     "chat-as-bot": "Чат (як бот)",
     "product": "Продукт",
@@ -766,7 +759,6 @@
     "mod": "користувач — новий модератор",
     "timeout": "користувач отримав таймаут",
     "create-a-new-event-listener": "Створити нового прослуховувача подій",
-    "send-twitter-message": "опублікувати повідомлення у Twitter",
     "send-discord-message": "надіслати повідомлення в Discord",
     "send-chat-message": "надіслати повідомлення в чат (twitch)",
     "send-whisper": "відправити повідомлення у вісперс",

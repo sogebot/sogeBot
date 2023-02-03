@@ -482,12 +482,6 @@
           "bot": "O destinatário é bot? (booleano)",
           "owner": "O destinatário é proprietário do bot? (booleano)"
         },
-        "tweet": {
-          "text": "Texto do tuíte",
-          "username": "Nome de usuário no Twitter",
-          "displayname": "Nome de tela no Twitter",
-          "url": "Link do tuíte"
-        },
         "sceneName": "Nome de cena",
         "inputName": "Nome do campo",
         "inputMuted": "Estado do Mudo (boleano)"
@@ -587,7 +581,6 @@
     "in-seconds": "em segundos",
     "songs": "Músicas",
     "show-usernames-with-at": "Mostrar nomes de usuários com @",
-    "twitter-send-message": "Tuitar",
     "send-message-as-a-bot": "Enviar mensagem como um bot",
     "chat-as-bot": "Bate-papo (como bot)",
     "product": "Produto",
@@ -766,7 +759,6 @@
     "mod": "usuário é um novo mod",
     "timeout": "usuário foi temporizado",
     "create-a-new-event-listener": "Criar um novo ouvinte de evento",
-    "send-twitter-message": "postar uma mensagem no Twitter",
     "send-discord-message": "enviar uma mensagem no discord",
     "send-chat-message": "enviar uma mensagem de chat da twitch",
     "send-whisper": "envie um sussurro",
