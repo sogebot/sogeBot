@@ -36,7 +36,7 @@ you don't need to do anything
 ## Supported databases
 
 - SQLite3(**default**)
-- PostgreSQL 11.5
+- PostgreSQL 15
 - MySQL 5.7
   - you need to set `character-set-server=utf8mb4`
     and `collation-server=utf8mb4_general_ci`
