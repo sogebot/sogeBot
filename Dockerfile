@@ -10,7 +10,10 @@ ENV ENV $ENV
 
 RUN apt-get update
 RUN apt-get install -y build-essential unzip nasm libtool make bash git autoconf wget zlib1g-dev python3
-RUN npm install -g npm@latest
+
+# Downgrade to npm 8, permission issue caused by https://github.com/npm/cli/issues/5889
+# ERROR: failed to register layer: Error processing tar file(exit status 1): failed to Lchown "/app/node_modules/brorand/.npmignore" for UID 120012366, GID 120012366: lchown /app/node_modules/brorand/.npmignore: invalid argument
+RUN npm install -g npm@8
 
 # Copy artifact
 ADD *.zip /
