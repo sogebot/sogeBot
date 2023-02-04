@@ -167,6 +167,7 @@ const values = {
     customPeriod: 31,
     numOfClips:   20,
     animation:    'slide',
+    spaceBetween: 200,
   },
   tts: {
     voice:                          'UK English Female',

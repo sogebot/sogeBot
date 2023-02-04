@@ -269,6 +269,7 @@ export interface ClipsCarousel {
   numOfClips: number,
   volume: number,
   animation: string,
+  spaceBetween: number,
 }
 
 export interface TTS {
