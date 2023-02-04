@@ -6,6 +6,7 @@ import { refresh } from './refresh';
 import { setStatus } from '../../../helpers/parser';
 import { tmiEmitter } from '../../../helpers/tmi';
 import client from '../api/client';
+import { updateBroadcasterType } from '../calls/updateBroadcasterType';
 
 import emitter from '~/helpers/interfaceEmitter';
 import {
@@ -100,6 +101,9 @@ export const validate = async (type: 'bot' | 'broadcaster', retry = 0, force = f
 
     if (request.data.user_id && request.data.user_id.length > 0
       && request.data.login && request.data.login.length > 0) {
+      if (type === 'broadcaster' && force) {
+        await updateBroadcasterType();
+      }
       emitter.emit('set', '/services/twitch', `${type}TokenValid`, true);
       invalidDataErrorSent[type] = false;
     } else {
