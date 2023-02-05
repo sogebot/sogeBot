@@ -211,6 +211,8 @@ export interface Eventlist {
   ignore: string[]
   display: string[],
   order: 'asc' | 'desc',
+  /** set item fadeout */
+  fadeOut: boolean,
   /** set eventlist horizontal */
   inline: boolean,
   /** space between two event items */

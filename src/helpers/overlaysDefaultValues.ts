@@ -129,6 +129,7 @@ const values = {
     ignore:                       [],
     count:                        5,
     order:                        'desc',
+    fadeOut:                      false,
     inline:                       false,
     spaceBetweenItems:            5,
     spaceBetweenEventAndUsername: 5,
