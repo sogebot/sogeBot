@@ -211,7 +211,12 @@ export interface Eventlist {
   ignore: string[]
   display: string[],
   order: 'asc' | 'desc',
+  /** set eventlist horizontal */
   inline: boolean,
+  /** space between two event items */
+  spaceBetweenItems: number,
+  /** space between event and username of one item */
+  spaceBetweenEventAndUsername: number,
   usernameFont: {
     align: 'left' | 'center' | 'right';
     family: string;

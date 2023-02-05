@@ -125,12 +125,14 @@ const values = {
     },
   },
   eventlist: {
-    display:      ['username', 'event'],
-    ignore:       [],
-    count:        5,
-    order:        'desc',
-    inline:       false,
-    usernameFont: {
+    display:                      ['username', 'event'],
+    ignore:                       [],
+    count:                        5,
+    order:                        'desc',
+    inline:                       false,
+    spaceBetweenItems:            5,
+    spaceBetweenEventAndUsername: 5,
+    usernameFont:                 {
       family:      'PT Sans',
       align:       'right',
       size:        30,
