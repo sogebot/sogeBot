@@ -211,6 +211,36 @@ export interface Eventlist {
   ignore: string[]
   display: string[],
   order: 'asc' | 'desc',
+  usernameFont: {
+    family: string;
+    size: number;
+    borderPx: number;
+    borderColor: string;
+    weight: number;
+    color: string;
+    shadow: {
+      shiftRight: number;
+      shiftDown: number;
+      blur: number;
+      opacity: number;
+      color: string;
+    }[];
+  }
+  eventFont: {
+    family: string;
+    size: number;
+    borderPx: number;
+    borderColor: string;
+    weight: number;
+    color: string;
+    shadow: {
+      shiftRight: number;
+      shiftDown: number;
+      blur: number;
+      opacity: number;
+      color: string;
+    }[];
+  }
 }
 
 export interface Clips {
