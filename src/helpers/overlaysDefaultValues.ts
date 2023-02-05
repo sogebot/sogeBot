@@ -129,8 +129,10 @@ const values = {
     ignore:       [],
     count:        5,
     order:        'desc',
+    inline:       false,
     usernameFont: {
       family:      'PT Sans',
+      align:       'right',
       size:        30,
       borderPx:    1,
       borderColor: '#000000',
@@ -139,6 +141,7 @@ const values = {
       shadow:      [],
     },
     eventFont: {
+      align:       'left',
       family:      'PT Sans',
       size:        40,
       borderPx:    1,

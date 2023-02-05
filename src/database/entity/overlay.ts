@@ -211,7 +211,9 @@ export interface Eventlist {
   ignore: string[]
   display: string[],
   order: 'asc' | 'desc',
+  inline: boolean,
   usernameFont: {
+    align: 'left' | 'center' | 'right';
     family: string;
     size: number;
     borderPx: number;
@@ -227,6 +229,7 @@ export interface Eventlist {
     }[];
   }
   eventFont: {
+    align: 'left' | 'center' | 'right';
     family: string;
     size: number;
     borderPx: number;
