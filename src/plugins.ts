@@ -4,13 +4,13 @@ import * as cronparser from 'cron-parser';
 import { cloneDeep, sortBy } from 'lodash';
 import merge from 'lodash/merge';
 
-import type { Node } from '../d.ts/src/plugins';
 import { Plugin, PluginVariable } from './database/entity/plugins';
 import { isValidationError } from './helpers/errors';
 import { eventEmitter } from './helpers/events';
 import { error } from './helpers/log';
 import { adminEndpoint, publicEndpoint } from './helpers/socket';
 import { processes, processNode } from './plugins/index';
+import type { Node } from '../d.ts/src/plugins';
 
 import Core from '~/_interface';
 import { onStartup } from '~/decorators/on';
@@ -76,6 +76,7 @@ const listeners = {
   twitchSubgift:          generateListener({ recipient: 'string', tier: 'tier' }),
   twitchSubcommunitygift: generateListener({ count: 'number' }),
   twitchResub:            generateListener({ method: 'string', subCumulativeMonths: 'number', subStreak: 'number', subStreakShareEnabled: 'boolean', tier: 'string' }),
+  twitchRewardRedeem:     generateListener({ userId: 'string', userName: 'string', rewardId: 'string', userInput: 'message' }),
 } as const;
 
 class Plugins extends Core {
@@ -163,6 +164,10 @@ class Plugins extends Core {
 
     eventEmitter.on('resub', async (data) => {
       commonHandler('twitchResub', data);
+    });
+
+    eventEmitter.on('reward-redeemed', async (data) => {
+      commonHandler('twitchRewardRedeem', data);
     });
 
     eventEmitter.on('stream-stopped', async () => {
@@ -461,32 +466,9 @@ class Plugins extends Core {
     return pluginsWithListener;
   }
 
-  async trigger(type: 'twitchCheer', message: string, userstate: { userName: string, userId: string }, data: {
-    amount: number,
-  }): Promise<void>;
-  async trigger(type: 'tip', message: string, userstate: { userName: string, userId: string }, data: {
-    currency: string, amount: number,
-    botCurrency: string, botAmount: number,
-  }): Promise<void>;
-  async trigger(type: 'message', message: string, userstate: { userName: string, userId: string }): Promise<void>;
-  async trigger(type: keyof typeof listeners, message: string, userstate: { userName: string, userId: string }): Promise<void>;
-
-  async trigger(type: string, message: string, userstate: { userName: string, userId: string }, data?: Record<string, any>) {
-    switch(type) {
-      case 'message': {
-        this.process(message.startsWith('!') ? 'twitchCommand' : 'twitchChatMessage', message, userstate);
-        break;
-      }
-      case 'twitchFollow':
-      case 'twitchCheer':
-      case 'twitchClearChat':
-      case 'tip': {
-        this.process(type, message, userstate, data);
-        break;
-      }
-      default:
-        error(`Unknown plugin trigger ${type}`);
-    }
+  /* TODO: replace with event emitter */
+  async trigger(type: 'message', message: string, userstate: { userName: string, userId: string }): Promise<void> {
+    this.process(message.startsWith('!') ? 'twitchCommand' : 'twitchChatMessage', message, userstate);
   }
 }
 
