@@ -25,6 +25,7 @@
       "twitchGameChanged": "Twitch category changed",
       "twitchStreamStarted": "Twitch stream started",
       "twitchStreamStopped": "Twitch stream stopped",
+      "twitchRewardRedeem": "Twitch reward redeemed",
       "twitchRaid": "Twitch raid incoming",
       "tip": "Tipped by user",
       "botStarted": "Bot started"
