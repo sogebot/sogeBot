@@ -3,7 +3,6 @@
 import {
   Timer, TimerResponse,
 } from '@entity/timer';
-import { SECOND } from '@sogebot/ui-helpers/constants';
 import { Mutex } from 'async-mutex';
 import { validateOrReject } from 'class-validator';
 import * as _ from 'lodash';
