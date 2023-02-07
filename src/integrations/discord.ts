@@ -1,33 +1,9 @@
-import { AppDataSource } from '~/database';
-import { isStreamOnline, stats } from '~/helpers/api';
-import { attributesReplace } from '~/helpers/attributesReplace';
-import {
-  announceTypes, getOwner, getUserSender, isUUID, prepare,
-} from '~/helpers/commons';
-import { isBotStarted, isDbConnected } from '~/helpers/database';
-import { debounce } from '~/helpers/debounce';
-
 import { DiscordLink } from '@entity/discord';
-
-import { eventEmitter } from '~/helpers/events';
-
 import { Events } from '@entity/event';
-
-import {
-  chatIn, chatOut, debug, error, info, warning, whisperOut,
-} from '~/helpers/log';
-
 import { Permissions as PermissionsEntity } from '@entity/permissions';
-
-import { check } from '~/helpers/permissions/check';
-
 import { User } from '@entity/user';
 
-import { get as getPermission } from '~/helpers/permissions/get';
-
 import { HOUR, MINUTE } from '@sogebot/ui-helpers/constants';
-
-import { adminEndpoint } from '~/helpers/socket';
 
 import { dayjs, timezone } from '@sogebot/ui-helpers/dayjsHelper';
 
@@ -56,6 +32,21 @@ import Expects from '../expects';
 import { Message } from '../message';
 import Parser from '../parser';
 import users from '../users';
+import { AppDataSource } from '~/database';
+import { isStreamOnline, stats } from '~/helpers/api';
+import { attributesReplace } from '~/helpers/attributesReplace';
+import {
+  announceTypes, getOwner, getUserSender, isUUID, prepare,
+} from '~/helpers/commons';
+import { isBotStarted, isDbConnected } from '~/helpers/database';
+import { debounce } from '~/helpers/debounce';
+import { eventEmitter } from '~/helpers/events';
+import {
+  chatIn, chatOut, debug, error, info, warning, whisperOut,
+} from '~/helpers/log';
+import { check } from '~/helpers/permissions/check';
+import { get as getPermission } from '~/helpers/permissions/get';
+import { adminEndpoint } from '~/helpers/socket';
 
 class Discord extends Integration {
   client: DiscordJs.Client | null = null;
@@ -368,6 +359,11 @@ class Discord extends Integration {
     }
 
     if (o === '$subscribers' && broadcasterType !== '') {
+      return false;
+    }
+
+    if (o === '$tags' && (stats.value.currentTags ?? []).length === 0) {
+      // don't show empty tags
       return false;
     }
     return true;
