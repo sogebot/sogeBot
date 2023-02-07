@@ -15,6 +15,12 @@ export interface Chat {
   showTimestamp: boolean;
   reverseOrder: boolean;
   showBadges: boolean;
+  useCustomLineHeight: boolean;
+  customLineHeight: number;
+  useCustomBadgeSize: boolean;
+  customBadgeSize: number;
+  useCustomEmoteSize: boolean;
+  customEmoteSize: number;
   font: {
     family: string;
     size: number;
