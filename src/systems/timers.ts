@@ -4,14 +4,16 @@ import {
   Timer, TimerResponse,
 } from '@entity/timer';
 import { SECOND } from '@sogebot/ui-helpers/constants';
+import { Mutex } from 'async-mutex';
 import { validateOrReject } from 'class-validator';
 import * as _ from 'lodash';
 import { merge, sortBy } from 'lodash';
 
+import System from './_interface';
 import { command, default_permission } from '../decorators';
 import Expects from '../expects';
-import System from './_interface';
 
+import { onStartup } from '~/decorators/on';
 import { isStreamOnline } from '~/helpers/api';
 import { announce } from '~/helpers/commons';
 import { isDbConnected } from '~/helpers/database';
@@ -20,7 +22,6 @@ import { linesParsed } from '~/helpers/parser';
 import defaultPermissions from '~/helpers/permissions/defaultPermissions';
 import { adminMiddleware } from '~/socket';
 import { translate } from '~/translate';
-import { onStartup } from '~/decorators/on';
 
 /*
  * !timers                                                                                                                                 - gets an info about timers usage
@@ -33,6 +34,7 @@ import { onStartup } from '~/decorators/on';
  * !timers list                                                                                                                            - get timers list
  * !timers list -name [name-of-timer]                                                                                                      - get list of responses on timer
  */
+const mutex = new Mutex();
 
 class Timers extends System {
   sockets() {
@@ -104,12 +106,20 @@ class Timers extends System {
       timer.triggeredAtTimestamp = new Date().toISOString();
       await timer.save();
     }
-    this.check();
+
+    setInterval(async () => {
+      if (!mutex.isLocked) {
+        const release = await mutex.acquire();
+        try {
+          await this.check();
+        } finally {
+          release();
+        }
+      }
+    }, 1000);
   }
 
   async check () {
-    clearTimeout(this.timeouts.timersCheck);
-
     if (!isStreamOnline.value) {
       await Timer.update({ tickOffline: false }, { triggeredAtMessages: linesParsed, triggeredAtTimestamp: new Date().toISOString() });
     }
@@ -148,7 +158,6 @@ class Timers extends System {
       announceResponse(timer.messages);
       await Timer.update({ id: timer.id }, { triggeredAtMessages: linesParsed, triggeredAtTimestamp: new Date().toISOString() });
     }
-    this.timeouts.timersCheck = global.setTimeout(() => this.check(), SECOND); // this will run check 1s after full check is correctly done
   }
 
   @command('!timers set')
