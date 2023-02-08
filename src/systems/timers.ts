@@ -107,7 +107,7 @@ class Timers extends System {
     }
 
     setInterval(async () => {
-      if (!mutex.isLocked) {
+      if (!mutex.isLocked()) {
         const release = await mutex.acquire();
         try {
           await this.check();
@@ -116,6 +116,25 @@ class Timers extends System {
         }
       }
     }, 1000);
+  }
+
+  announceResponse (responses: TimerResponse[]) {
+    // check if at least one response is enabled
+    if (responses.filter(o => o.isEnabled).length === 0) {
+      return;
+    }
+
+    responses = _.orderBy(responses, 'timestamp', 'asc');
+    const response = responses.shift();
+    if (response) {
+      TimerResponse.update({ id: response.id }, { timestamp: new Date().toISOString() });
+      if (!response.isEnabled) {
+        // go to next possibly enabled response
+        this.announceResponse(responses);
+      } else {
+        announce(response.response, 'timers');
+      }
+    }
   }
 
   async check () {
@@ -136,25 +155,7 @@ class Timers extends System {
         continue;
       } // not ready to trigger with seconds
 
-      const announceResponse = (responses: TimerResponse[]) => {
-        // check if at least one response is enabled
-        if (responses.filter(o => o.isEnabled).length === 0) {
-          return;
-        }
-
-        responses = _.orderBy(responses, 'timestamp', 'asc');
-        const response = responses.shift();
-        if (response) {
-          TimerResponse.update({ id: response.id }, { timestamp: new Date().toISOString() });
-          if (!response.isEnabled) {
-            // go to next possibly enabled response
-            announceResponse(responses);
-          } else {
-            announce(response.response, 'timers');
-          }
-        }
-      };
-      announceResponse(timer.messages);
+      this.announceResponse(timer.messages);
       await Timer.update({ id: timer.id }, { triggeredAtMessages: linesParsed, triggeredAtTimestamp: new Date().toISOString() });
     }
   }
