@@ -1,21 +1,17 @@
 import { SECOND } from '@sogebot/ui-helpers/constants';
-
-import * as channelPoll from '~/helpers/api/channelPoll';
-
 import { EventSubWsListener } from '@twurple/eventsub-ws';
-
-import * as channelPrediction from '~/helpers/api/channelPrediction';
-
 import { Mutex } from 'async-mutex';
 
+import client from './api/client';
+
+import * as channelPoll from '~/helpers/api/channelPoll';
+import * as channelPrediction from '~/helpers/api/channelPrediction';
 import * as hypeTrain from '~/helpers/api/hypeTrain';
 import { eventEmitter } from '~/helpers/events';
 import { follow } from '~/helpers/events/follow';
 import { error, info } from '~/helpers/log.js';
 import { ioServer } from '~/helpers/panel';
 import { variables } from '~/watchers';
-
-import client from './api/client';
 
 const mutex = new Mutex();
 
@@ -44,6 +40,7 @@ class EventSub {
 
     if (process.env.ENV === 'production') {
       await this.listener.start();
+      this.listener.removeListener();
     } else {
       info('EVENTSUB-WS: Eventsub events disabled on dev-mode.');
     }
