@@ -10,21 +10,27 @@ const endpoints: {
 }[] = [];
 
 function adminEndpoint<K0 extends keyof O, K1 extends keyof O[K0], O extends Record<PropertyKey, Record<PropertyKey, Fn>> = ClientToServerEventsWithNamespace>(nsp: K0, on: K1, callback: (...args: NestedFnParams<O, K0, K1>) => void): void {
-  endpoints.push({
-    nsp, on, callback, type: 'admin',
-  });
+  if (!endpoints.find(o => o.type === 'admin' && o.nsp === nsp && o.on === on)) {
+    endpoints.push({
+      nsp, on, callback, type: 'admin',
+    });
+  }
 }
 
 const viewerEndpoint = (nsp: string, on: string, callback: (opts: any, cb: (error: Error | string | null, ...response: any) => void) => void, socket?: Socket) => {
-  endpoints.push({
-    nsp, on, callback, type: 'viewer',
-  });
+  if (!endpoints.find(o => o.type === 'viewer' && o.nsp === nsp && o.on === on)) {
+    endpoints.push({
+      nsp, on, callback, type: 'viewer',
+    });
+  }
 };
 
 function publicEndpoint (nsp: string, on: string, callback: (opts: any, cb: (error: Error | string | null | unknown, ...response: any) => void) => void, socket?: Socket) {
-  endpoints.push({
-    nsp, on, callback, type: 'public',
-  });
+  if (!endpoints.find(o => o.type === 'public' && o.nsp === nsp && o.on === on)) {
+    endpoints.push({
+      nsp, on, callback, type: 'public',
+    });
+  }
 }
 
 export {
