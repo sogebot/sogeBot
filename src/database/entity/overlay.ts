@@ -21,6 +21,8 @@ export interface Chat {
   customBadgeSize: number;
   useCustomEmoteSize: boolean;
   customEmoteSize: number;
+  useCustomSpaceBetweenMessages: boolean;
+  customSpaceBetweenMessagese: number;
   font: {
     family: string;
     size: number;
