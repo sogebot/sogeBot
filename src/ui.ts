@@ -3,13 +3,15 @@ import {
   filter, isString, set,
 } from 'lodash';
 
+import { app } from './helpers/panel';
+
 import Core from '~/_interface';
 import { settings } from '~/decorators';
 import { onChange, onLoad } from '~/decorators/on';
 import general from '~/general';
 import { mainCurrency, symbol } from '~/helpers/currency';
 import { find, list } from '~/helpers/register';
-import { adminEndpoint, publicEndpoint } from '~/helpers/socket';
+import { publicEndpoint } from '~/helpers/socket';
 import { domain } from '~/helpers/ui';
 import { variables } from '~/watchers';
 
@@ -36,10 +38,15 @@ class UI extends Core {
   }
 
   sockets() {
-    adminEndpoint('/core/ui', 'configuration', async (cb) => {
-      try {
-        const data: any = {};
+    if (!app) {
+      setTimeout(() => this.sockets(), 100);
+      return;
+    }
 
+    app.get('/api/ui/configuration', async (req, res) => {
+      const data: any = {};
+
+      if (req.headers.adminAccess) {
         for (const system of ['currency', 'ui', 'general', 'dashboard', 'tts']) {
           if (typeof data.core === 'undefined') {
             data.core = {};
@@ -69,11 +76,25 @@ class UI extends Core {
         const generalOwners = variables.get('services.twitch.generalOwners') as string[];
 
         data.isCastersSet = filter(generalOwners, (o) => isString(o) && o.trim().length > 0).length > 0 || broadcasterUsername !== '';
+      } else {
+        for (const dir of ['systems', 'games']) {
+          for (const system of list(dir)) {
+            set(data, `${dir}.${system.__moduleName__}`, await system.getAllSettings(true));
+          }
+        }
 
-        cb(null, data);
-      } catch (e: any) {
-        cb(e.stack);
+        // currencies
+        data.currency = mainCurrency.value;
+        data.currencySymbol = symbol(mainCurrency.value);
+
+        // timezone
+        data.timezone = timezone;
+
+        // lang
+        data.lang = general.lang;
+
       }
+      res.send(JSON.stringify(data));
     });
 
     publicEndpoint('/core/ui', 'configuration', async (cb) => {

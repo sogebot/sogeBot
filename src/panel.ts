@@ -3,6 +3,17 @@
 import fs, { existsSync, readFileSync } from 'fs';
 import path from 'path';
 
+import cors from 'cors';
+import express from 'express';
+import { graphqlHTTP } from 'express-graphql';
+import RateLimit from 'express-rate-limit';
+import gitCommitInfo from 'git-commit-info';
+import jwt from 'jsonwebtoken';
+import _ from 'lodash';
+import sanitize from 'sanitize-filename';
+
+import { possibleLists } from '../d.ts/src/helpers/socket.js';
+
 import Core from '~/_interface';
 import { CacheGames, CacheGamesInterface } from '~/database/entity/cacheGames.js';
 import { CacheTitles } from '~/database/entity/cacheTitles';
@@ -39,40 +50,14 @@ import * as changelog from '~/helpers/user/changelog.js';
 import lastfm from '~/integrations/lastfm';
 import spotify from '~/integrations/spotify';
 import Parser from '~/parser';
-
-import cors from 'cors';
-
 import { getGameThumbnailFromName } from '~/services/twitch/calls/getGameThumbnailFromName.js';
-
-import express from 'express';
-
 import { sendGameFromTwitch } from '~/services/twitch/calls/sendGameFromTwitch';
-
-import { graphqlHTTP } from 'express-graphql';
-
 import { updateChannelInfo } from '~/services/twitch/calls/updateChannelInfo.js';
-
-import RateLimit from 'express-rate-limit';
-
-import { default as socketSystem } from '~/socket';
-
-import gitCommitInfo from 'git-commit-info';
-
+import { processAuth, default as socketSystem } from '~/socket';
 import highlights from '~/systems/highlights';
-
-import jwt from 'jsonwebtoken';
-
 import songs from '~/systems/songs';
-
-import _ from 'lodash';
-
 import translateLib, { translate } from '~/translate';
-
-import sanitize from 'sanitize-filename';
-
 import { variables } from '~/watchers';
-
-import { possibleLists } from '../d.ts/src/helpers/socket.js';
 
 const port = Number(process.env.PORT ?? 20000);
 const secureport = Number(process.env.SECUREPORT ?? 20443);
@@ -112,6 +97,7 @@ class Panel extends Core {
 
   init () {
     setApp(express());
+    app?.use(processAuth);
     app?.use(limiter);
     app?.use(cors());
     app?.use(express.json({

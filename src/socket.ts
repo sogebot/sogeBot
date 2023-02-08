@@ -254,6 +254,37 @@ class Socket extends Core {
   }
 }
 
+const processAuth = (req: { headers: { [x: string]: any; }; }, res: { sendStatus: (arg0: number) => any; }, next: () => void) => {
+  req.headers.adminAccess = false;
+
+  try {
+    const authHeader = req.headers.authorization;
+    const authToken = authHeader && authHeader.split(' ')[1];
+
+    if (authToken === _self.socketToken) {
+      req.headers.adminAccess = true;
+      return next();
+    }
+
+    if (authToken == null) {
+      return next();
+    }
+
+    const token = jwt.verify(authToken, _self.JWTKey) as {
+      userId: string; username: string; privileges: Unpacked<ReturnType<typeof getPrivileges>>;
+    };
+
+    if (token.privileges.haveAdminPrivileges === Authorized.isAuthorized) {
+      req.headers.adminAccess = true;
+      return next();
+    }
+
+  } catch {
+    null;
+  }
+  next();
+};
+
 const adminMiddleware = (req: { headers: { [x: string]: any; }; }, res: { sendStatus: (arg0: number) => any; }, next: () => void) => {
   try {
     const authHeader = req.headers.authorization;
@@ -283,4 +314,4 @@ const adminMiddleware = (req: { headers: { [x: string]: any; }; }, res: { sendSt
 
 const _self = new Socket();
 export default _self;
-export { Socket, getPrivileges, adminMiddleware };
+export { Socket, getPrivileges, adminMiddleware, processAuth };
