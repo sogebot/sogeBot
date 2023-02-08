@@ -48,7 +48,7 @@ const getPrivileges = async(type: 'admin' | 'viewer' | 'public', userId: string)
   }
 };
 
-const initEndpoints = async(socket: SocketIO, privileges: Unpacked<ReturnType<typeof getPrivileges>>) => {
+const initEndpoints = (socket: SocketIO, privileges: Unpacked<ReturnType<typeof getPrivileges>>) => {
   for (const key of [...new Set(endpoints.filter(o => o.nsp === socket.nsp.name).map(o => o.nsp + '||' + o.on))]) {
     const [nsp, on] = key.split('||');
     const endpointsToInit = endpoints.filter(o => o.nsp === nsp && o.on === on);
@@ -230,7 +230,7 @@ class Socket extends Core {
         setTimeout(() => socket.emit('forceDisconnect'), 1000); // force disconnect if we must be logged in
       }
     }
-    next();
+    setTimeout(() => next(), 100);
   }
 
   sockets () {
