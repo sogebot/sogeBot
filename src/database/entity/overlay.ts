@@ -22,7 +22,7 @@ export interface Chat {
   useCustomEmoteSize: boolean;
   customEmoteSize: number;
   useCustomSpaceBetweenMessages: boolean;
-  customSpaceBetweenMessagese: number;
+  customSpaceBetweenMessages: number;
   font: {
     family: string;
     size: number;

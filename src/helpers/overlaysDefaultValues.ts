@@ -238,7 +238,7 @@ const values = {
     useCustomEmoteSize:            false,
     customEmoteSize:               14,
     useCustomSpaceBetweenMessages: false,
-    customSpaceBetweenMessagese:   4,
+    customSpaceBetweenMessages:    4,
     reverseOrder:                  false,
     font:                          {
       family:      'PT Sans',
