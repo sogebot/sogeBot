@@ -1,5 +1,6 @@
 import { BeforeInsert, Column, Entity, PrimaryColumn } from 'typeorm';
-import { BotEntity } from '~/database/BotEntity';
+
+import { BotEntity } from '../BotEntity';
 
 @Entity()
 export class Bets extends BotEntity<Bets> {

@@ -1,5 +1,5 @@
 import { BeforeInsert, BeforeUpdate, Column, Entity, Index, PrimaryColumn } from 'typeorm';
-import { BotEntity } from '~/database/BotEntity';
+import { BotEntity } from '../BotEntity';
 import { IsNotEmpty, MinLength } from 'class-validator';
 
 import { ColumnNumericTransformer } from './_transformer';
