@@ -35,19 +35,25 @@ class Countdown extends Overlay {
     app.post('/api/overlays/countdown/:id/:operation', adminMiddleware, async (req, res) => {
       const check = checks.get(req.params.id);
       const operationEnableList = {
-        stop:         false,
-        start:        true,
-        toggle:       !check?.isEnabled,
-        resetAndStop: false,
+        stop:   false,
+        start:  true,
+        toggle: !check?.isEnabled,
       };
 
-      const resetTime = 0;
-      if (req.params.operation.includes('reset')) {
+      let time: null | number = null;
+
+      if (req.params.operation === 'set') {
+        time = !isNaN(Number(req.body.time)) ? Number(req.body.time) : null;
+        if (!time) {
+          res.status(400).send(`Invalid time value, expected number, got ${typeof req.body.time}.`);
+          return;
+        }
         const overlays = await AppDataSource.getRepository(OverlayEntity).find();
         for (const overlay of overlays) {
           const item = overlay.items.find(o => o.id === req.params.id);
           if (item && item.opts.typeId === 'countdown') {
-            item.opts.currentTime = 0;
+            item.opts.time = time;
+            item.opts.currentTime = time;
             await overlay.save();
           }
         }
@@ -55,7 +61,7 @@ class Countdown extends Overlay {
 
       statusUpdate.set(req.params.id, {
         isEnabled: operationEnableList[req.params.operation as keyof typeof operationEnableList] ?? null,
-        time:      req.params.operation.includes('reset') ? resetTime: check?.time ?? 0,
+        time:      req.params.operation === 'set' && time ? time: check?.time ?? 0,
         timestamp: Date.now(),
       });
 
