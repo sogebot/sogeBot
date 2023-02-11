@@ -1,7 +1,9 @@
+import { IsNotEmpty, MinLength } from 'class-validator';
 import { BeforeInsert, Column, Entity, Index, PrimaryColumn } from 'typeorm';
 
 import { AlertInterface } from './alert';
 import { BotEntity } from '../BotEntity';
+import { IsCommand } from '../validators/IsCommand';
 
 @Entity()
 @Index('idx_randomizer_cmdunique', [ 'command' ], { unique: true })
@@ -32,12 +34,17 @@ export class Randomizer extends BotEntity<Randomizer> {
     createdAt?: string;
 
   @Column()
+  @IsNotEmpty()
+  @MinLength(2)
+  @IsCommand()
     command: string;
 
   @Column()
     permissionId: string;
 
   @Column()
+  @IsNotEmpty()
+  @MinLength(2)
     name: string;
 
   @Column({ type: Boolean, default: false })
