@@ -389,6 +389,7 @@ export class Overlay extends BotEntity<Overlay> {
     height: number;
     alignX: number;
     alignY: number;
+    rotation: number;
     name: string;
     opts:
     URL | Chat | Reference | AlertsRegistry | Carousel | Marathon | Stopwatch |
