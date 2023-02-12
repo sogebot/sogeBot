@@ -156,6 +156,11 @@ const values = {
       shadow:      [],
     },
   },
+  html: {
+    css:        '',
+    javascript: '',
+    html:       '',
+  },
   clips: {
     volume:    0,
     filter:    'none',
