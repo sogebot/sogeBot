@@ -12,7 +12,7 @@
   "license": "MIT",
   "dependencies": {
     "@d-fischer/shared-utils": "^3.5.0",
-    "@sogebot/ui-admin": "^76.0.0",
+    "@sogebot/ui-admin": "^76.0.4",
     "@sogebot/ui-helpers": "^3.1.0",
     "@sogebot/ui-oauth": "~3.1.1",
     "@sogebot/ui-overlay": "^35.1.3",

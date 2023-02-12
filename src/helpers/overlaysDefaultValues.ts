@@ -158,7 +158,7 @@ const values = {
   },
   html: {
     html:       '<!-- you can also use html here, global filters and custom variables are also available -->\n\n',
-    css:        '',
+    css:        '// use #wrapper to target this specific overlay widget\n\n#wrapper {\n\n}',
     javascript: 'function onLoad() { // triggered on page load\n\n}\n\nfunction onChange() { // triggered on variable change\n\n}',
   },
   clips: {
