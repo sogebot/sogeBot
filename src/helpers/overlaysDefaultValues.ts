@@ -157,9 +157,9 @@ const values = {
     },
   },
   html: {
+    html:       '<!-- you can also use html here, global filters and custom variables are also available -->\n\n',
     css:        '',
-    javascript: '',
-    html:       '',
+    javascript: 'function onLoad() { // triggered on page load\n\n}\n\nfunction onChange() { // triggered on variable change\n\n}',
   },
   clips: {
     volume:    0,
