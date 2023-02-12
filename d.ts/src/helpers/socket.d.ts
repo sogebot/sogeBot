@@ -177,6 +177,7 @@ export type ClientToServerEventsWithNamespace = {
     'generic::deleteById': generic<Overlay>['deleteById'],
     'generic::save': generic<Overlay>['save'],
     'overlays::tick': (opts: {groupId: string, id: string, millis: number}) => void,
+    'parse': (text: string, cb: (err: Error | string | null, data: string) => void) => void,
   },
   '/overlays/gallery': GenericEvents & {
     'generic::getOne': generic<GalleryInterface>['getOne'],

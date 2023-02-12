@@ -1,9 +1,11 @@
 import { SECOND } from '@sogebot/ui-helpers/constants';
 
 import Registry from './_interface';
+import Message from '../message';
 
 import { AppDataSource } from '~/database';
 import { Overlay } from '~/database/entity/overlay';
+import { executeVariablesInText } from '~/helpers/customvariables/executeVariablesInText';
 import { isBotStarted } from '~/helpers/database';
 import defaultValues from '~/helpers/overlaysDefaultValues';
 import { adminEndpoint, publicEndpoint } from '~/helpers/socket';
@@ -52,6 +54,13 @@ class Overlays extends Registry {
       cb(null, data);
     });
 
+    publicEndpoint('/registries/overlays', 'parse', async (text, cb) => {
+      try {
+        cb(null, await new Message(await executeVariablesInText(text, null)).parse());
+      } catch (e) {
+        cb(e, '');
+      }
+    });
     publicEndpoint('/registries/overlays', 'generic::getAll', async (cb) => {
       const items = await AppDataSource.getRepository(Overlay).find();
       cb(null, items.map(defaultValues) as Overlay[]);
