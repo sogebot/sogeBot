@@ -410,12 +410,12 @@ class Emotes extends Core {
 
   async firework (data: string[]) {
     const emotes = await this.parseEmotes(data);
-    ioServer?.of('/services/twitch').emit('emote.firework', { emotes });
+    ioServer?.of('/services/twitch').emit('emote.firework', { emotes, id: uuid() });
   }
 
   async explode (data: string[]) {
     const emotes = await this.parseEmotes(data);
-    ioServer?.of('/services/twitch').emit('emote.explode', { emotes });
+    ioServer?.of('/services/twitch').emit('emote.explode', { emotes, id: uuid() });
   }
 
   @parser({ priority: constants.LOW })
