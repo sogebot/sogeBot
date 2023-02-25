@@ -73,7 +73,7 @@ class EventSub {
 
         // update overlay
         ioServer?.of('/services/twitch').emit('hypetrain-update', {
-          total: event.total, goal: event.goal, level: event.level, subs: Object.fromEntries(hypeTrain.subs),
+          id: event.id, total: event.total, goal: event.goal, level: event.level, subs: Object.fromEntries(hypeTrain.subs),
         });
       });
       await this.listener.subscribeToChannelHypeTrainEndEvents(broadcasterId, event => {

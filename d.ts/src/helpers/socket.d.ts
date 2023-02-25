@@ -284,7 +284,7 @@ export type ClientToServerEventsWithNamespace = {
     'emote.firework': (opts: any) => void,
     'emote.explode': (opts: any) => void,
     'hypetrain-end': () => void,
-    'hypetrain-update': (data: { level: number, goal: number, total: number, subs: Record<string, string>}) => void,
+    'hypetrain-update': (data: { id: string, level: number, goal: number, total: number, subs: Record<string, string>}) => void,
     'eventsub::reset': () => void,
     'broadcaster': (cb: (error: Error | string | null, username: string) => void) => void,
     'twitch::revoke': (data: { accountType: 'bot' | 'broadcaster' }, cb: (err: Error | string | null) => void) => void,
