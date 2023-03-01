@@ -96,6 +96,7 @@ export class initialize1573837107520 implements MigrationInterface {
     await queryRunner.query(`ALTER TABLE \`alert\` MODIFY \`loadStandardProfanityList\` json NOT NULL`);
     await queryRunner.query(`ALTER TABLE \`alert\` ADD \`tts\` json NULL`);
     await queryRunner.query(`ALTER TABLE \`alert\` MODIFY \`customProfanityList\` varchar(255) NOT NULL`);
+    await queryRunner.query(`ALTER TABLE \`alert\` ADD \`parry\` json NOT NULL`);
   }
 
   public async down(queryRunner: QueryRunner): Promise<any> {
