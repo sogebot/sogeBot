@@ -124,7 +124,7 @@ export class initialize1573837256390 implements MigrationInterface {
     await queryRunner.query(`ALTER TABLE "alert" ADD "font" json NOT NULL`);
     await queryRunner.query(`ALTER TABLE "alert" ADD "items" json NOT NULL`);
     await queryRunner.query(`ALTER TABLE "alert" ALTER COLUMN "updatedAt" TYPE character varying(30)`);
-    await queryRunner.query(`ALTER TABLE "alert" ALTER COLUMN "loadStandardProfanityList" TYPE json`);
+    await queryRunner.query(`ALTER TABLE "alert" ALTER COLUMN "loadStandardProfanityList" TYPE json USING "loadStandardProfanityList"::json"`);
     await queryRunner.query(`ALTER TABLE "alert" ADD "tts" json`);
     await queryRunner.query(`ALTER TABLE "alert" ALTER COLUMN "customProfanityList" TYPE character varying`);
   }
