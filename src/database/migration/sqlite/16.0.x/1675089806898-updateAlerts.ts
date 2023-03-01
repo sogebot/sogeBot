@@ -17,12 +17,20 @@ export class updateAlerts1675089806898 implements MigrationInterface {
     ];
     const alerts: Record<string, any> = {};
     for (const type of types) {
-      alerts[type] = await queryRunner.query(`SELECT * from "alert_${type}"`);
+      try {
+        alerts[type] = await queryRunner.query(`SELECT * from "alert_${type}"`);
+      } catch {
+        alerts[type] = [];
+      }
     }
 
     // clear tables
     for (const type of types) {
-      await queryRunner.query(`DROP TABLE "alert_${type}"`);
+      try {
+        await queryRunner.query(`DROP TABLE "alert_${type}"`);
+      } catch {
+        null;
+      }
     }
     await queryRunner.query(`DROP TABLE "alert"`);
 

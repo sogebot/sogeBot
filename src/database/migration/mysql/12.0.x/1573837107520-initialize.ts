@@ -89,6 +89,19 @@ export class initialize1573837107520 implements MigrationInterface {
     await queryRunner.query('ALTER TABLE `variable_history` ADD CONSTRAINT `FK_94d39c77652e9c332751a0cee02` FOREIGN KEY (`variableId`) REFERENCES `variable`(`id`) ON DELETE CASCADE ON UPDATE CASCADE', undefined);
     await queryRunner.query('ALTER TABLE `variable_url` ADD CONSTRAINT `FK_806e97dff1efce7f8872b6d4500` FOREIGN KEY (`variableId`) REFERENCES `variable`(`id`) ON DELETE CASCADE ON UPDATE CASCADE', undefined);
     await queryRunner.query('CREATE TABLE `query-result-cache` (`id` int NOT NULL AUTO_INCREMENT, `identifier` varchar(255) NULL, `time` bigint NOT NULL, `duration` int NOT NULL, `query` text NOT NULL, `result` text NOT NULL, PRIMARY KEY (`id`)) ENGINE=InnoDB', undefined);
+    await queryRunner.query(`ALTER TABLE \`alert\` ADD \`fontMessage\` json NOT NULL`);
+    await queryRunner.query(`ALTER TABLE \`alert\` ADD \`font\` json NOT NULL`);
+    await queryRunner.query(`ALTER TABLE \`alert\` ADD \`items\` json NOT NULL`);
+    await queryRunner.query(`ALTER TABLE \`alert\` DROP COLUMN \`updatedAt\``);
+    await queryRunner.query(`ALTER TABLE \`alert\` ADD \`updatedAt\` varchar(30) NULL`);
+    await queryRunner.query(`ALTER TABLE \`alert\` DROP COLUMN \`loadStandardProfanityList\``);
+    await queryRunner.query(`ALTER TABLE \`alert\` ADD \`loadStandardProfanityList\` json NOT NULL`);
+    await queryRunner.query(`ALTER TABLE \`alert\` DROP COLUMN \`parry\``);
+    await queryRunner.query(`ALTER TABLE \`alert\` ADD \`parry\` json NOT NULL`);
+    await queryRunner.query(`ALTER TABLE \`alert\` DROP COLUMN \`tts\``);
+    await queryRunner.query(`ALTER TABLE \`alert\` ADD \`tts\` json NULL`);
+    await queryRunner.query(`ALTER TABLE \`alert\` DROP COLUMN \`customProfanityList\``);
+    await queryRunner.query(`ALTER TABLE \`alert\` ADD \`customProfanityList\` varchar(255) NOT NULL`);
   }
 
   public async down(queryRunner: QueryRunner): Promise<any> {
