@@ -123,15 +123,10 @@ export class initialize1573837256390 implements MigrationInterface {
     await queryRunner.query(`ALTER TABLE "alert" ADD "fontMessage" json NOT NULL`);
     await queryRunner.query(`ALTER TABLE "alert" ADD "font" json NOT NULL`);
     await queryRunner.query(`ALTER TABLE "alert" ADD "items" json NOT NULL`);
-    await queryRunner.query(`ALTER TABLE "alert" DROP COLUMN "updatedAt"`);
     await queryRunner.query(`ALTER TABLE "alert" ADD "updatedAt" character varying(30)`);
-    await queryRunner.query(`ALTER TABLE "alert" DROP COLUMN "loadStandardProfanityList"`);
     await queryRunner.query(`ALTER TABLE "alert" ADD "loadStandardProfanityList" json NOT NULL`);
-    await queryRunner.query(`ALTER TABLE "alert" DROP COLUMN "parry"`);
     await queryRunner.query(`ALTER TABLE "alert" ADD "parry" json NOT NULL`);
-    await queryRunner.query(`ALTER TABLE "alert" DROP COLUMN "tts"`);
     await queryRunner.query(`ALTER TABLE "alert" ADD "tts" json`);
-    await queryRunner.query(`ALTER TABLE "alert" DROP COLUMN "customProfanityList"`);
     await queryRunner.query(`ALTER TABLE "alert" ADD "customProfanityList" character varying NOT NULL`);
   }
 
