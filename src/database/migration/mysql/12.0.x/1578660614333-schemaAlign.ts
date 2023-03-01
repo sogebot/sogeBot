@@ -4,7 +4,6 @@ export class schemaAlign1578660614333 implements MigrationInterface {
   name = 'schemaAlign1578660614333';
 
   public async up(queryRunner: QueryRunner): Promise<any> {
-    await queryRunner.query('ALTER TABLE `alert_media` CHANGE `b64data` `b64data` longtext NOT NULL', undefined);
     await queryRunner.query('ALTER TABLE `alias` CHANGE `command` `command` text NOT NULL', undefined);
     await queryRunner.query('ALTER TABLE `commands_responses` CHANGE `response` `response` text NOT NULL', undefined);
     await queryRunner.query('ALTER TABLE `event_list` CHANGE `values_json` `values_json` text NOT NULL', undefined);
@@ -22,7 +21,6 @@ export class schemaAlign1578660614333 implements MigrationInterface {
     await queryRunner.query('ALTER TABLE `event_list` CHANGE `values_json` `values_json` text NULL', undefined);
     await queryRunner.query('ALTER TABLE `commands_responses` CHANGE `response` `response` text NULL', undefined);
     await queryRunner.query('ALTER TABLE `alias` CHANGE `command` `command` text NULL', undefined);
-    await queryRunner.query('ALTER TABLE `alert_media` CHANGE `b64data` `b64data` longtext NULL', undefined);
   }
 
 }
