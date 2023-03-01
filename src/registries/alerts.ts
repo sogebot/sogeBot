@@ -1,16 +1,15 @@
 import {
-  Alert, AlertCheer, AlertCommandRedeem, AlertFollow, AlertInterface, AlertRaid, AlertResub, AlertSub, AlertSubcommunitygift, AlertSubgift, AlertTip, EmitData,
+  Alert, EmitData,
 } from '@entity/alert';
 import { MINUTE } from '@sogebot/ui-helpers/constants';
 import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized';
-import { AppDataSource } from '~/database';
-import { IsNull } from 'typeorm';
 import { v4 } from 'uuid';
 
-import { command, default_permission, example, persistent, settings } from '../decorators';
 import Registry from './_interface';
+import { command, default_permission, example, persistent, settings } from '../decorators';
 
 import { parserReply } from '~/commons';
+import { AppDataSource } from '~/database';
 import { User, UserInterface } from '~/database/entity/user';
 import Expects from '~/expects';
 import { prepare } from '~/helpers/commons';
@@ -28,7 +27,7 @@ const secureKeys = new Set<string>();
 
 const fetchUserForAlert = (opts: EmitData, type: 'recipient' | 'name'): Promise<Readonly<Required<UserInterface>> & { game?: string } | null> => {
   return new Promise<Readonly<Required<UserInterface>> & { game?: string } | null>((resolve) => {
-    if ((opts.event === 'rewardredeems' || opts.event === 'cmdredeems') && type === 'name') {
+    if ((opts.event === 'rewardredeem' || opts.event === 'custom') && type === 'name') {
       return resolve(null); // we don't have user on reward redeems
     }
 
@@ -157,18 +156,9 @@ class Alerts extends Registry {
         cb(e.stack, null);
       }
     });
-    adminEndpoint('/registries/alerts', 'alerts::delete', async (item: Required<AlertInterface>, cb) => {
+    adminEndpoint('/registries/alerts', 'alerts::delete', async (item: Required<Alert>, cb) => {
       try {
         await AppDataSource.getRepository(Alert).remove(item);
-        await AppDataSource.getRepository(AlertFollow).delete({ alertId: IsNull() });
-        await AppDataSource.getRepository(AlertSub).delete({ alertId: IsNull() });
-        await AppDataSource.getRepository(AlertSubgift).delete({ alertId: IsNull() });
-        await AppDataSource.getRepository(AlertSubcommunitygift).delete({ alertId: IsNull() });
-        await AppDataSource.getRepository(AlertRaid).delete({ alertId: IsNull() });
-        await AppDataSource.getRepository(AlertTip).delete({ alertId: IsNull() });
-        await AppDataSource.getRepository(AlertCheer).delete({ alertId: IsNull() });
-        await AppDataSource.getRepository(AlertResub).delete({ alertId: IsNull() });
-        await AppDataSource.getRepository(AlertCommandRedeem).delete({ alertId: IsNull() });
         if (cb) {
           cb(null);
         }

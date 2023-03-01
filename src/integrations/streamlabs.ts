@@ -299,7 +299,7 @@ class Streamlabs extends Integration {
           message:             event.message,
         });
         alerts.trigger({
-          event:      'tips',
+          event:      'tip',
           name:       event.from.toLowerCase(),
           service:    'streamlabs',
           tier:       null,

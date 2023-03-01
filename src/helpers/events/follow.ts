@@ -55,7 +55,7 @@ export async function follow(userId: string, userName: string, followedAt: strin
       followLog(`${userName}#${userId}`);
       eventEmitter.emit('follow', { userName, userId });
       alerts.trigger({
-        event:      'follows',
+        event:      'follow',
         name:       userName,
         amount:     0,
         tier:       null,

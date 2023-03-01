@@ -92,7 +92,7 @@ class Kofi extends Integration {
             message:             data.message,
           });
           alerts.trigger({
-            event:      'tips',
+            event:      'tip',
             service:    'kofi',
             name:       data.from_name,
             amount:     Number(Number(data.amount).toFixed(2)),

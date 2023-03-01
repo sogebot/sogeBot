@@ -1,7 +1,7 @@
 import { IsNotEmpty, MinLength } from 'class-validator';
 import { BeforeInsert, Column, Entity, Index, PrimaryColumn } from 'typeorm';
 
-import { AlertInterface } from './alert';
+import { Alert } from './alert';
 import { BotEntity } from '../BotEntity';
 import { IsCommand } from '../validators/IsCommand';
 
@@ -89,5 +89,5 @@ export class Randomizer extends BotEntity<Randomizer> {
   };
 
   @Column({ type: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') !== 'better-sqlite3' ? 'json' : 'simple-json' })
-    tts: AlertInterface['tts'] & { enabled: boolean };
+    tts: Alert['tts'] & { enabled: boolean };
 }

@@ -138,7 +138,7 @@ class Donatello extends Integration {
         });
 
         alerts.trigger({
-          event:      'tips',
+          event:      'tip',
           service:    'donationalerts',
           name:       username.toLowerCase(),
           amount:     Number(amount.toFixed(2)),
@@ -164,7 +164,7 @@ class Donatello extends Integration {
     } else {
       tip(`${username}#__anonymous__, amount: ${Number(amount).toFixed(2)}${data.currency}, message: ${data.message}`);
       alerts.trigger({
-        event:      'tips',
+        event:      'tip',
         name:       username,
         amount:     Number(amount.toFixed(2)),
         tier:       null,

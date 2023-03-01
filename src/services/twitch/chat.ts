@@ -425,7 +425,7 @@ class Chat {
     });
     eventEmitter.emit('raid', data);
     alerts.trigger({
-      event:      'raids',
+      event:      'raid',
       name:       username,
       amount:     hostViewers,
       tier:       null,
@@ -488,7 +488,7 @@ class Chat {
         userName: username, method: subInfo.isPrime ? 'Twitch Prime' : '', subCumulativeMonths: amount, tier: String(tier),
       });
       alerts.trigger({
-        event:      'subs',
+        event:      'sub',
         name:       username,
         amount:     0,
         tier,
@@ -579,7 +579,7 @@ class Chat {
         message,
       });
       alerts.trigger({
-        event:      'resubs',
+        event:      'resub',
         name:       username,
         amount:     Number(amount),
         tier,
@@ -618,7 +618,7 @@ class Chat {
       eventEmitter.emit('subcommunitygift', { userName: username, count });
       subcommunitygift(`${username}#${userId}, to ${count} viewers`);
       alerts.trigger({
-        event:      'subcommunitygifts',
+        event:      'subcommunitygift',
         name:       username,
         amount:     Number(count),
         tier:       null,
@@ -664,7 +664,7 @@ class Chat {
       if (!isGiftIgnored) {
         debug('tmi.subgift', `Triggered: ${username}#${userId} -> ${recipient}#${recipientId}`);
         alerts.trigger({
-          event:      'subgifts',
+          event:      'subgift',
           name:       username,
           recipient,
           amount:     amount,
@@ -793,7 +793,7 @@ class Chat {
               redeemTriggered = true;
               debug('tmi.cmdredeems', messageFromUser);
               alerts.trigger({
-                event:      'cmdredeems',
+                event:      'custom',
                 recipient:  username,
                 name:       price.command,
                 amount:     bits,
@@ -810,7 +810,7 @@ class Chat {
       }
       if (!redeemTriggered) {
         alerts.trigger({
-          event:      'cheers',
+          event:      'cheer',
           name:       username,
           amount:     bits,
           tier:       null,

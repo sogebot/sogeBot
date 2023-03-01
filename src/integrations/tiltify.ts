@@ -130,7 +130,7 @@ class Tiltify extends Integration {
         if (this.lastCheckAt < donate.completedAt) {
           tip(`${donate.name} for ${campaign.name}, amount: ${Number(donate.amount).toFixed(2)}${campaign.causeCurrency}, message: ${donate.comment}`);
           alerts.trigger({
-            event:      'tips',
+            event:      'tip',
             service:    'tiltify',
             name:       donate.name,
             amount:     Number(donate.amount.toFixed(2)),
