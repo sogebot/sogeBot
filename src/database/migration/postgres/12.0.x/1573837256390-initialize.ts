@@ -4,7 +4,7 @@ export class initialize1573837256390 implements MigrationInterface {
   name = 'initialize1573837256390';
 
   public async up(queryRunner: QueryRunner): Promise<any> {
-    await queryRunner.query(`CREATE TABLE "alert" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "updatedAt" bigint NOT NULL DEFAULT 0, "name" character varying NOT NULL, "alertDelayInMs" integer NOT NULL, "profanityFilterType" character varying NOT NULL, "loadStandardProfanityList" text NOT NULL, "customProfanityList" text NOT NULL, CONSTRAINT "PK_ad91cad659a3536465d564a4b2f" PRIMARY KEY ("id"))`, undefined);
+    await queryRunner.query(`CREATE TABLE "alert" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "updatedAt" bigint NOT NULL DEFAULT 0, "name" character varying NOT NULL, "alertDelayInMs" integer NOT NULL, "profanityFilterType" character varying NOT NULL, "loadStandardProfanityList" json NOT NULL, "customProfanityList" text NOT NULL, CONSTRAINT "PK_ad91cad659a3536465d564a4b2f" PRIMARY KEY ("id"))`, undefined);
     await queryRunner.query(`CREATE TABLE "alias" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "alias" character varying NOT NULL, "command" character varying NOT NULL, "enabled" boolean NOT NULL, "visible" boolean NOT NULL, "permission" character varying NOT NULL, CONSTRAINT "PK_b1848d04b41d10a5712fc2e673c" PRIMARY KEY ("id"))`, undefined);
     await queryRunner.query(`CREATE INDEX "IDX_6a8a594f0a5546f8082b0c405c" ON "alias" ("alias") `, undefined);
     await queryRunner.query(`CREATE INDEX "IDX_ed5fcb69444dcb0abf0a71053b" ON "alias" ("command") `, undefined);
@@ -124,7 +124,6 @@ export class initialize1573837256390 implements MigrationInterface {
     await queryRunner.query(`ALTER TABLE "alert" ADD "font" json NOT NULL`);
     await queryRunner.query(`ALTER TABLE "alert" ADD "items" json NOT NULL`);
     await queryRunner.query(`ALTER TABLE "alert" ALTER COLUMN "updatedAt" TYPE character varying(30)`);
-    await queryRunner.query(`ALTER TABLE "alert" ALTER COLUMN "loadStandardProfanityList" TYPE json USING (loadStandardProfanityList::json)`);
     await queryRunner.query(`ALTER TABLE "alert" ADD "tts" json`);
     await queryRunner.query(`ALTER TABLE "alert" ALTER COLUMN "customProfanityList" TYPE character varying`);
   }
