@@ -1,10 +1,12 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
+import { insertItemIntoTable } from '~/database/insertItemIntoTable';
+
 export class updateAlerts1675089806898 implements MigrationInterface {
   name = 'updateAlerts1675089806898';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
-    const tables = await queryRunner.query(`SHOW TABLES`);
+    const tables = (await queryRunner.query(`SHOW TABLES`)).map((o: any) => o.Tables_in_sogebot);
     console.log({ tables });
     if (tables.includes('alert_cheer')) {
       let items = await queryRunner.query(`SELECT * from \`alert\``);
@@ -34,8 +36,7 @@ export class updateAlerts1675089806898 implements MigrationInterface {
         }
       }
       await queryRunner.query(`DROP TABLE \`alert\``);
-      /*
-      await queryRunner.query(`CREATE TABLE "alert" ("id" varchar PRIMARY KEY NOT NULL, "updatedAt" varchar(30), "name" varchar NOT NULL, "alertDelayInMs" integer NOT NULL, "profanityFilterType" varchar NOT NULL, "loadStandardProfanityList" text NOT NULL, "parry" text NOT NULL, "tts" text, "fontMessage" text NOT NULL, "font" text NOT NULL, "customProfanityList" varchar NOT NULL, "items" text NOT NULL)`);
+      await queryRunner.query(`CREATE TABLE \`alert\` (\`id\` varchar(36) NOT NULL, \`updatedAt\` varchar(30) NULL, \`name\` varchar(255) NOT NULL, \`alertDelayInMs\` int NOT NULL, \`profanityFilterType\` varchar(255) NOT NULL, \`loadStandardProfanityList\` json NOT NULL, \`parry\` json NOT NULL, \`tts\` json NULL, \`fontMessage\` json NOT NULL, \`font\` json NOT NULL, \`customProfanityList\` varchar(255) NOT NULL, \`items\` json NOT NULL, PRIMARY KEY (\`id\`)) ENGINE=InnoDB`);
       for (const item of items) {
         item.items = [];
         for (let type of types) {
@@ -49,9 +50,10 @@ export class updateAlerts1675089806898 implements MigrationInterface {
         item.items = JSON.stringify(item.items); // stringify items
         await insertItemIntoTable('alert', item, queryRunner);
       }
-      */
     } else {
       await queryRunner.query(`DROP TABLE \`alert\``);
+      await queryRunner.query(`CREATE TABLE \`alert\` (\`id\` varchar(36) NOT NULL, \`updatedAt\` varchar(30) NULL, \`name\` varchar(255) NOT NULL, \`alertDelayInMs\` int NOT NULL, \`profanityFilterType\` varchar(255) NOT NULL, \`loadStandardProfanityList\` json NOT NULL, \`parry\` json NOT NULL, \`tts\` json NULL, \`fontMessage\` json NOT NULL, \`font\` json NOT NULL, \`customProfanityList\` varchar(255) NOT NULL, \`items\` json NOT NULL, PRIMARY KEY (\`id\`)) ENGINE=InnoDB`);
+
     }
   }
 
