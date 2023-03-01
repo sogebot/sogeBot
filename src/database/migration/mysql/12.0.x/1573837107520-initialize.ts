@@ -91,7 +91,6 @@ export class initialize1573837107520 implements MigrationInterface {
     await queryRunner.query('CREATE TABLE `query-result-cache` (`id` int NOT NULL AUTO_INCREMENT, `identifier` varchar(255) NULL, `time` bigint NOT NULL, `duration` int NOT NULL, `query` text NOT NULL, `result` text NOT NULL, PRIMARY KEY (`id`)) ENGINE=InnoDB', undefined);
     await queryRunner.query(`ALTER TABLE \`alert\` ADD \`fontMessage\` json NOT NULL`);
     await queryRunner.query(`ALTER TABLE \`alert\` ADD \`font\` json NOT NULL`);
-    await queryRunner.query(`ALTER TABLE \`alert\` ADD \`items\` json NOT NULL`);
     await queryRunner.query(`ALTER TABLE \`alert\` MODIFY \`updatedAt\` varchar(30) NULL`);
     await queryRunner.query(`ALTER TABLE \`alert\` MODIFY \`loadStandardProfanityList\` json NOT NULL `);
     await queryRunner.query(`ALTER TABLE \`alert\` ADD \`tts\` json NULL`);

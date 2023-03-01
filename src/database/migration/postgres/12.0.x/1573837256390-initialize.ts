@@ -122,7 +122,6 @@ export class initialize1573837256390 implements MigrationInterface {
     await queryRunner.query(`CREATE TABLE "query-result-cache" ("id" SERIAL NOT NULL, "identifier" character varying, "time" bigint NOT NULL, "duration" integer NOT NULL, "query" text NOT NULL, "result" text NOT NULL, CONSTRAINT "PK_6a98f758d8bfd010e7e10ffd3d3" PRIMARY KEY ("id"))`, undefined);
     await queryRunner.query(`ALTER TABLE "alert" ADD "fontMessage" json NOT NULL`);
     await queryRunner.query(`ALTER TABLE "alert" ADD "font" json NOT NULL`);
-    await queryRunner.query(`ALTER TABLE "alert" ADD "items" json NOT NULL`);
     await queryRunner.query(`ALTER TABLE "alert" ALTER COLUMN "updatedAt" TYPE character varying(30)`);
     await queryRunner.query(`ALTER TABLE "alert" ADD "tts" json`);
     await queryRunner.query(`ALTER TABLE "alert" ALTER COLUMN "customProfanityList" TYPE character varying`);
