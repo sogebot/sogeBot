@@ -4,7 +4,7 @@ export class updateAlerts1675089806898 implements MigrationInterface {
   name = 'updateAlerts1675089806898';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
-    const tables = await queryRunner.query(`SELECT table_name FROM information_schema.tables WHERE table_schema='public'`);
+    const tables = await queryRunner.query(`SHOW TABLES`);
     console.log({ tables });
     if (tables.includes('alert_cheer')) {
       let items = await queryRunner.query(`SELECT * from \`alert\``);
