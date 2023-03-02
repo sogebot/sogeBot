@@ -109,7 +109,7 @@ class Alerts extends Registry {
       res.send(await AppDataSource.getRepository(Alert).find());
     });
 
-    app.get('/api/registries/alerts/:id', adminMiddleware, async (req, res) => {
+    app.get('/api/registries/alerts/:id', async (req, res) => {
       try {
         res.send(await AppDataSource.getRepository(Alert).findOneByOrFail({ id: req.params.id }));
       } catch {
