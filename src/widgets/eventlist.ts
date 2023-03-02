@@ -41,12 +41,11 @@ class EventList extends Widget {
       const event = await AppDataSource.getRepository(EventListDB).findOneBy({ id: String(id) });
       if (event) {
         const values = JSON.parse(event.values_json);
-        const eventType = event.event + 's';
-        switch(eventType) {
-          case 'follows':
-          case 'subs':
+        switch(event.event) {
+          case 'follow':
+          case 'sub':
             alerts.trigger({
-              event:      eventType,
+              event:      event.event,
               name:       await users.getNameById(event.userId),
               amount:     0,
               tier:       String(values.tier) as EmitData['tier'],
@@ -55,9 +54,9 @@ class EventList extends Widget {
               message:    '',
             });
             break;
-          case 'raids':
+          case 'raid':
             alerts.trigger({
-              event:      eventType,
+              event:      event.event,
               name:       await users.getNameById(event.userId),
               amount:     Number(values.viewers),
               tier:       null,
@@ -66,9 +65,9 @@ class EventList extends Widget {
               message:    '',
             });
             break;
-          case 'resubs':
+          case 'resub':
             alerts.trigger({
-              event:      eventType,
+              event:      event.event,
               name:       await users.getNameById(event.userId),
               amount:     Number(values.subCumulativeMonths),
               tier:       String(values.tier) as EmitData['tier'],
@@ -77,9 +76,9 @@ class EventList extends Widget {
               message:    values.message,
             });
             break;
-          case 'subgifts':
+          case 'subgift':
             alerts.trigger({
-              event:      eventType,
+              event:      event.event,
               name:       await users.getNameById(event.userId),
               amount:     Number(values.count),
               tier:       null,
@@ -88,9 +87,9 @@ class EventList extends Widget {
               message:    '',
             });
             break;
-          case 'cheers':
+          case 'cheer':
             alerts.trigger({
-              event:      eventType,
+              event:      event.event,
               name:       await users.getNameById(event.userId),
               amount:     Number(values.bits),
               tier:       null,
@@ -99,9 +98,9 @@ class EventList extends Widget {
               message:    values.message,
             });
             break;
-          case 'tips':
+          case 'tip':
             alerts.trigger({
-              event:      eventType,
+              event:      event.event,
               name:       await users.getNameById(event.userId),
               amount:     Number(values.amount),
               tier:       null,
@@ -110,9 +109,9 @@ class EventList extends Widget {
               message:    values.message,
             });
             break;
-          case 'rewardredeems':
+          case 'rewardredeem':
             alerts.trigger({
-              event:      eventType,
+              event:      event.event,
               name:       values.titleOfReward,
               rewardId:   values.rewardId,
               amount:     0,
@@ -124,7 +123,7 @@ class EventList extends Widget {
             });
             break;
           default:
-            error(`Eventtype ${event.event} cannot be retriggered`);
+            error(`event.event ${event.event} cannot be retriggered`);
         }
 
       } else {

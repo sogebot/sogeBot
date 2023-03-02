@@ -201,7 +201,7 @@ class StreamElements extends Integration {
           isAnonymous,
         });
         alerts.trigger({
-          event:      'tips',
+          event:      'tip',
           service:    'streamelements',
           name:       username.toLowerCase(),
           amount:     Number(Number(amount).toFixed(2)),

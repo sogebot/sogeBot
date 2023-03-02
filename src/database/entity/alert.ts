@@ -1,7 +1,8 @@
-import type { EntitySchemaColumnOptions } from 'typeorm';
-import { EntitySchema } from 'typeorm';
+import { IsNotEmpty, MinLength } from 'class-validator';
+import { BeforeInsert, BeforeUpdate } from 'typeorm';
+import { Column, Entity, PrimaryColumn } from 'typeorm';
 
-import { ColumnNumericTransformer } from './_transformer';
+import { BotEntity } from '../BotEntity';
 
 export interface EmitData {
   alertId?: string;
@@ -14,7 +15,7 @@ export interface EmitData {
   rewardId?: string;
   currency: string;
   monthsName: string;
-  event: keyof Omit<AlertInterface, 'id' | 'updatedAt' | 'name' |'alertDelayInMs' | 'profanityFilterType' | 'loadStandardProfanityList' | 'customProfanityList' | 'tts' | 'font' | 'fontMessage' | 'parry'>;
+  event: Alert['items'][number]['type'];
   message: string;
 }
 
@@ -28,8 +29,9 @@ export type Filter = {
   })[]
 } | null;
 
-export interface CommonSettingsInterface {
-  id?: string;
+type Item<T> = {
+  id: string;
+  type: T,
   alertId?: string;
   enabled: boolean;
   title: string;
@@ -106,31 +108,55 @@ export interface CommonSettingsInterface {
       color: string;
     }[];
   } | null;
-  alert?: AlertInterface;
-}
+};
 
-export interface AlertInterface {
-  id?: string;
-  updatedAt?: number;
-  name: string;
-  alertDelayInMs: number;
-  profanityFilterType: 'disabled' | 'replace-with-asterisk' | 'replace-with-happy-words' | 'hide-messages' | 'disable-alerts';
-  loadStandardProfanityList: {
+@Entity()
+export class Alert extends BotEntity<Alert> {
+  @PrimaryColumn({ generated: 'uuid' })
+    id: string;
+
+  @Column({ nullable: true, type: 'varchar', length: '2022-07-27T00:30:34.569259834Z'.length })
+    updatedAt: string | null;
+  @BeforeInsert()
+  @BeforeUpdate()
+  generateUpdatedAt() {
+    this.updatedAt = new Date().toISOString();
+  }
+
+  @Column()
+  @IsNotEmpty()
+  @MinLength(3)
+    name: string;
+
+  @Column()
+    alertDelayInMs: number;
+
+  @Column()
+    profanityFilterType: 'disabled' | 'replace-with-asterisk' | 'replace-with-happy-words' | 'hide-messages' | 'disable-alerts';
+
+  @Column({ type: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') !== 'better-sqlite3' ? 'json' : 'simple-json' })
+    loadStandardProfanityList: {
     cs: boolean;
     en: boolean;
     ru: boolean;
   };
-  parry: {
+
+  @Column({ type: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') !== 'better-sqlite3' ? 'json' : 'simple-json' })
+    parry: {
     enabled: boolean,
     delay: number,
-  },
-  tts: {
+  };
+
+  @Column({ nullable: true, type: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') !== 'better-sqlite3' ? 'json' : 'simple-json' })
+    tts: {
     voice: string;
     pitch: number;
     volume: number;
     rate: number;
   } | null;
-  fontMessage: {
+
+  @Column({ type: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') !== 'better-sqlite3' ? 'json' : 'simple-json' })
+    fontMessage: {
     align: 'left' | 'center' | 'right';
     family: string;
     size: number;
@@ -146,7 +172,9 @@ export interface AlertInterface {
       color: string;
     }[]
   };
-  font: {
+
+  @Column({ type: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') !== 'better-sqlite3' ? 'json' : 'simple-json' })
+    font: {
     align: 'left' | 'center' | 'right';
     family: string;
     size: number;
@@ -163,27 +191,28 @@ export interface AlertInterface {
       color: string;
     }[];
   };
-  customProfanityList: string;
-  promo: AlertResubInterface[];
-  follows: CommonSettingsInterface[];
-  subs: CommonSettingsInterface[];
-  subgifts: CommonSettingsInterface[];
-  subcommunitygifts: CommonSettingsInterface[];
-  raids: CommonSettingsInterface[];
-  tips: AlertTipInterface[];
-  cheers: AlertTipInterface[];
-  resubs: AlertResubInterface[];
-  cmdredeems: CommonSettingsInterface[];
-  rewardredeems: AlertRewardRedeemInterface[];
+  @Column()
+    customProfanityList: string;
+
+  @Column({ type: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') !== 'better-sqlite3' ? 'json' : 'simple-json' })
+    items: (
+    Item<'follow'> |
+    Item<'sub'> |
+    Item<'resub'> & Message |
+    Item<'subgift'> |
+    Item<'subcommunitygift'> |
+    Item<'raid'> |
+    Item<'custom'> |
+    Item<'promo'> & Message |
+    Item<'tip'> & Message<number> |
+    Item<'cheer'> & Message<number> |
+    Item<'rewardredeem'> & { rewardId: null | string }
+  )[];
 }
 
-export interface AlertRewardRedeemInterface extends AlertTipInterface {
-  rewardId: null | string;
-}
-
-export interface AlertTipInterface extends CommonSettingsInterface {
+type Message<minAmountToShow extends number | undefined = undefined> = {
   message: {
-    minAmountToShow: number;
+    minAmountToShow: minAmountToShow,
     allowEmotes: {
       twitch: boolean;
       ffz: boolean;
@@ -206,331 +235,4 @@ export interface AlertTipInterface extends CommonSettingsInterface {
       }[];
     } | null;
   };
-}
-export interface AlertResubInterface extends CommonSettingsInterface {
-  message: {
-    allowEmotes: {
-      twitch: boolean;
-      ffz: boolean;
-      bttv: boolean;
-    };
-    font: {
-      align: 'left' | 'center' | 'right';
-      family: string;
-      size: number;
-      borderPx: number;
-      borderColor: string;
-      weight: number;
-      color: string;
-      shadow: {
-        shiftRight: number;
-        shiftDown: number;
-        blur: number;
-        opacity: number;
-        color: string;
-      }[];
-    } | null;
-  };
-}
-
-export const CommonSettingsSchema = {
-  id: {
-    type: 'uuid', primary: true, generated: 'uuid',
-  } as EntitySchemaColumnOptions,
-  alertId: {
-    nullable: true, name: 'alertId', type: String,
-  } as EntitySchemaColumnOptions,
-  enabled:              { type: Boolean } as EntitySchemaColumnOptions,
-  title:                { type: String } as EntitySchemaColumnOptions,
-  variantAmount:        { type: Number } as EntitySchemaColumnOptions,
-  messageTemplate:      { type: String } as EntitySchemaColumnOptions,
-  ttsTemplate:          { type: String, default: '' },
-  layout:               { type: 'varchar' } as EntitySchemaColumnOptions,
-  animationIn:          { type: 'varchar' } as EntitySchemaColumnOptions,
-  animationInDuration:  { type: Number, default: 2000 } as EntitySchemaColumnOptions,
-  animationOut:         { type: 'varchar' } as EntitySchemaColumnOptions,
-  animationOutDuration: { type: Number, default: 2000 } as EntitySchemaColumnOptions,
-  animationText:        { type: 'varchar' } as EntitySchemaColumnOptions,
-  animationTextOptions: { type: 'simple-json' } as EntitySchemaColumnOptions,
-  imageId:              { type: String, nullable: true } as EntitySchemaColumnOptions,
-  imageOptions:         { type: 'simple-json' } as EntitySchemaColumnOptions,
-  filter:               { type: 'text', nullable: true } as EntitySchemaColumnOptions,
-  soundId:              { type: String, nullable: true } as EntitySchemaColumnOptions,
-  soundVolume:          { type: Number } as EntitySchemaColumnOptions,
-  alertDurationInMs:    { type: Number } as EntitySchemaColumnOptions,
-  alertTextDelayInMs:   { type: Number } as EntitySchemaColumnOptions,
-  enableAdvancedMode:   { type: Boolean } as EntitySchemaColumnOptions,
-  advancedMode:         { type: 'simple-json' } as EntitySchemaColumnOptions,
-  tts:                  { type: 'simple-json' } as EntitySchemaColumnOptions,
-  font:                 { type: 'simple-json', nullable: true } as EntitySchemaColumnOptions,
 };
-
-export const Alert = new EntitySchema<Readonly<Required<AlertInterface>>>({
-  name:    'alert',
-  columns: {
-    id: {
-      type: 'uuid', primary: true, generated: 'uuid',
-    },
-    updatedAt: {
-      type: 'bigint', transformer: new ColumnNumericTransformer(), default: 0,
-    },
-    name:                      { type: String },
-    alertDelayInMs:            { type: Number },
-    profanityFilterType:       { type: String },
-    loadStandardProfanityList: { type: 'simple-json' },
-    customProfanityList:       { type: 'text' },
-    tts:                       { type: 'simple-json', nullable: true },
-    font:                      { type: 'simple-json' },
-    fontMessage:               { type: 'simple-json' },
-    parry:                     { type: 'simple-json' },
-  },
-  relations: {
-    promo: {
-      type:        'one-to-many',
-      target:      'alert_promo',
-      inverseSide: 'alert',
-      cascade:     true,
-    },
-    follows: {
-      type:        'one-to-many',
-      target:      'alert_follow',
-      inverseSide: 'alert',
-      cascade:     true,
-    },
-    subs: {
-      type:        'one-to-many',
-      target:      'alert_sub',
-      inverseSide: 'alert',
-      cascade:     true,
-    },
-    subcommunitygifts: {
-      type:        'one-to-many',
-      target:      'alert_subcommunitygift',
-      inverseSide: 'alert',
-      cascade:     true,
-    },
-    subgifts: {
-      type:        'one-to-many',
-      target:      'alert_subgift',
-      inverseSide: 'alert',
-      cascade:     true,
-    },
-    raids: {
-      type:        'one-to-many',
-      target:      'alert_raid',
-      inverseSide: 'alert',
-      cascade:     true,
-    },
-    tips: {
-      type:        'one-to-many',
-      target:      'alert_tip',
-      inverseSide: 'alert',
-      cascade:     true,
-    },
-    cheers: {
-      type:        'one-to-many',
-      target:      'alert_cheer',
-      inverseSide: 'alert',
-      cascade:     true,
-    },
-    resubs: {
-      type:        'one-to-many',
-      target:      'alert_resub',
-      inverseSide: 'alert',
-      cascade:     true,
-    },
-    cmdredeems: {
-      type:        'one-to-many',
-      target:      'alert_command_redeem',
-      inverseSide: 'alert',
-      cascade:     true,
-    },
-    rewardredeems: {
-      type:        'one-to-many',
-      target:      'alert_reward_redeem',
-      inverseSide: 'alert',
-      cascade:     true,
-    },
-  },
-});
-
-export const AlertPromo = new EntitySchema<Readonly<Required<AlertResubInterface>>>({
-  name:    'alert_promo',
-  columns: {
-    ...CommonSettingsSchema,
-    message: { type: 'simple-json' },
-  },
-  relations: {
-    alert: {
-      type:        'many-to-one',
-      target:      'alert',
-      inverseSide: 'promo',
-      joinColumn:  { name: 'alertId' },
-      onDelete:    'CASCADE',
-      onUpdate:    'CASCADE',
-    },
-  },
-});
-
-export const AlertFollow = new EntitySchema<Readonly<Required<CommonSettingsInterface>>>({
-  name:      'alert_follow',
-  columns:   { ...CommonSettingsSchema },
-  relations: {
-    alert: {
-      type:        'many-to-one',
-      target:      'alert',
-      inverseSide: 'follows',
-      joinColumn:  { name: 'alertId' },
-      onDelete:    'CASCADE',
-      onUpdate:    'CASCADE',
-    },
-  },
-});
-
-export const AlertSub = new EntitySchema<Readonly<Required<CommonSettingsInterface>>>({
-  name:      'alert_sub',
-  columns:   { ...CommonSettingsSchema },
-  relations: {
-    alert: {
-      type:        'many-to-one',
-      target:      'alert',
-      inverseSide: 'subs',
-      joinColumn:  { name: 'alertId' },
-      onDelete:    'CASCADE',
-      onUpdate:    'CASCADE',
-    },
-  },
-});
-
-export const AlertSubcommunitygift = new EntitySchema<Readonly<Required<CommonSettingsInterface>>>({
-  name:      'alert_subcommunitygift',
-  columns:   { ...CommonSettingsSchema },
-  relations: {
-    alert: {
-      type:        'many-to-one',
-      target:      'alert',
-      inverseSide: 'subcommunitygifts',
-      joinColumn:  { name: 'alertId' },
-      onDelete:    'CASCADE',
-      onUpdate:    'CASCADE',
-    },
-  },
-});
-
-export const AlertSubgift = new EntitySchema<Readonly<Required<CommonSettingsInterface>>>({
-  name:      'alert_subgift',
-  columns:   { ...CommonSettingsSchema },
-  relations: {
-    alert: {
-      type:        'many-to-one',
-      target:      'alert',
-      inverseSide: 'subgifts',
-      joinColumn:  { name: 'alertId' },
-      onDelete:    'CASCADE',
-      onUpdate:    'CASCADE',
-    },
-  },
-});
-
-export const AlertRaid = new EntitySchema<Readonly<Required<CommonSettingsInterface>>>({
-  name:      'alert_raid',
-  columns:   { ...CommonSettingsSchema },
-  relations: {
-    alert: {
-      type:        'many-to-one',
-      target:      'alert',
-      inverseSide: 'raids',
-      joinColumn:  { name: 'alertId' },
-      onDelete:    'CASCADE',
-      onUpdate:    'CASCADE',
-    },
-  },
-});
-
-export const AlertTip = new EntitySchema<Readonly<Required<AlertTipInterface>>>({
-  name:    'alert_tip',
-  columns: {
-    ...CommonSettingsSchema,
-    message: { type: 'simple-json' },
-  },
-  relations: {
-    alert: {
-      type:        'many-to-one',
-      target:      'alert',
-      inverseSide: 'tips',
-      joinColumn:  { name: 'alertId' },
-      onDelete:    'CASCADE',
-      onUpdate:    'CASCADE',
-    },
-  },
-});
-
-export const AlertCheer = new EntitySchema<Readonly<Required<AlertTipInterface>>>({
-  name:    'alert_cheer',
-  columns: {
-    ...CommonSettingsSchema,
-    message: { type: 'simple-json' },
-  },
-  relations: {
-    alert: {
-      type:        'many-to-one',
-      target:      'alert',
-      inverseSide: 'cheers',
-      joinColumn:  { name: 'alertId' },
-      onDelete:    'CASCADE',
-      onUpdate:    'CASCADE',
-    },
-  },
-});
-
-export const AlertResub = new EntitySchema<Readonly<Required<AlertResubInterface>>>({
-  name:    'alert_resub',
-  columns: {
-    ...CommonSettingsSchema,
-    message: { type: 'simple-json' },
-  },
-  relations: {
-    alert: {
-      type:        'many-to-one',
-      target:      'alert',
-      inverseSide: 'resubs',
-      joinColumn:  { name: 'alertId' },
-      onDelete:    'CASCADE',
-      onUpdate:    'CASCADE',
-    },
-  },
-});
-
-export const AlertCommandRedeem = new EntitySchema<Readonly<Required<CommonSettingsInterface>>>({
-  name:      'alert_command_redeem',
-  columns:   { ...CommonSettingsSchema },
-  relations: {
-    alert: {
-      type:        'many-to-one',
-      target:      'alert',
-      inverseSide: 'command_redeems',
-      joinColumn:  { name: 'alertId' },
-      onDelete:    'CASCADE',
-      onUpdate:    'CASCADE',
-    },
-  },
-});
-
-export const AlertRewardRedeem = new EntitySchema<Readonly<Required<AlertRewardRedeemInterface>>>({
-  name:    'alert_reward_redeem',
-  columns: {
-    ...CommonSettingsSchema,
-    message:  { type: 'simple-json' },
-    rewardId: { type: String }, // even when rewardId type can be null, we don't want it to be saved in database
-  },
-  relations: {
-    alert: {
-      type:        'many-to-one',
-      target:      'alert',
-      inverseSide: 'reward_redeems',
-      joinColumn:  { name: 'alertId' },
-      onDelete:    'CASCADE',
-      onUpdate:    'CASCADE',
-    },
-  },
-});

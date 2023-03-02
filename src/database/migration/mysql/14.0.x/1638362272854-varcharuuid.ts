@@ -6,28 +6,6 @@ export class varcharUUID1638362272853 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<any> {
     await queryRunner.query('SET FOREIGN_KEY_CHECKS=0;', undefined);
     await queryRunner.query('ALTER TABLE `alert` MODIFY `id` varchar(36) NOT NULL', undefined);
-    await queryRunner.query('ALTER TABLE `alert_follow` MODIFY `id` varchar(36) NOT NULL', undefined);
-    await queryRunner.query('ALTER TABLE `alert_follow` MODIFY `alertId` varchar(255) NULL', undefined);
-    await queryRunner.query('ALTER TABLE `alert_sub` MODIFY `id` varchar(36) NOT NULL', undefined);
-    await queryRunner.query('ALTER TABLE `alert_sub` MODIFY `alertId` varchar(255) NULL', undefined);
-    await queryRunner.query('ALTER TABLE `alert_subcommunitygift` MODIFY `id` varchar(36) NOT NULL', undefined);
-    await queryRunner.query('ALTER TABLE `alert_subcommunitygift` MODIFY `alertId` varchar(255) NULL', undefined);
-    await queryRunner.query('ALTER TABLE `alert_subgift` MODIFY `id` varchar(36) NOT NULL', undefined);
-    await queryRunner.query('ALTER TABLE `alert_subgift` MODIFY `alertId` varchar(255) NULL', undefined);
-    await queryRunner.query('ALTER TABLE `alert_host` MODIFY `id` varchar(36) NOT NULL', undefined);
-    await queryRunner.query('ALTER TABLE `alert_host` MODIFY `alertId` varchar(255) NULL', undefined);
-    await queryRunner.query('ALTER TABLE `alert_raid` MODIFY `id` varchar(36) NOT NULL', undefined);
-    await queryRunner.query('ALTER TABLE `alert_raid` MODIFY `alertId` varchar(255) NULL', undefined);
-    await queryRunner.query('ALTER TABLE `alert_tip` MODIFY `id` varchar(36) NOT NULL', undefined);
-    await queryRunner.query('ALTER TABLE `alert_tip` MODIFY `alertId` varchar(255) NULL', undefined);
-    await queryRunner.query('ALTER TABLE `alert_cheer` MODIFY `id` varchar(36) NOT NULL', undefined);
-    await queryRunner.query('ALTER TABLE `alert_cheer` MODIFY `alertId` varchar(255) NULL', undefined);
-    await queryRunner.query('ALTER TABLE `alert_resub` MODIFY `id` varchar(36) NOT NULL', undefined);
-    await queryRunner.query('ALTER TABLE `alert_resub` MODIFY `alertId` varchar(255) NULL', undefined);
-    await queryRunner.query('ALTER TABLE `alert_command_redeem` MODIFY `id` varchar(36) NOT NULL', undefined);
-    await queryRunner.query('ALTER TABLE `alert_command_redeem` MODIFY `alertId` varchar(255) NULL', undefined);
-    await queryRunner.query('ALTER TABLE `alert_reward_redeem` MODIFY `id` varchar(36) NOT NULL', undefined);
-    await queryRunner.query('ALTER TABLE `alert_reward_redeem` MODIFY `alertId` varchar(255) NULL', undefined);
     await queryRunner.query('ALTER TABLE `alias` MODIFY `id` varchar(36) NOT NULL', undefined);
     await queryRunner.query('ALTER TABLE `cache_emotes` MODIFY `id` varchar(36) NOT NULL', undefined);
     await queryRunner.query('ALTER TABLE `carousel` MODIFY `id` varchar(36) NOT NULL', undefined);

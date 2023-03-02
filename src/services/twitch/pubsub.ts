@@ -130,7 +130,7 @@ class PubSub {
           rewardId:      message.rewardId,
         });
         alerts.trigger({
-          event:      'rewardredeems',
+          event:      'rewardredeem',
           name:       message.rewardTitle,
           rewardId:   message.rewardId,
           amount:     0,

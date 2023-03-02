@@ -1,15 +1,15 @@
 import { Currency, UserTip, UserTipInterface } from '@entity/user';
 import * as constants from '@sogebot/ui-helpers/constants';
 import fetch from 'node-fetch';
-import { AppDataSource } from '~/database';
 
+import Integration from './_interface';
 import { persistent, settings } from '../decorators';
 import { onStartup } from '../decorators/on';
 import eventlist from '../overlays/eventlist';
 import alerts from '../registries/alerts';
 import users from '../users';
-import Integration from './_interface';
 
+import { AppDataSource } from '~/database';
 import { isStreamOnline } from '~/helpers/api/index';
 import { stats } from '~/helpers/api/stats';
 import exchange from '~/helpers/currency/exchange';
@@ -190,7 +190,7 @@ class TipeeeStream extends Integration {
             isAnonymous,
           });
           alerts.trigger({
-            event:      'tips',
+            event:      'tip',
             service:    'tipeeestream',
             name:       userName.toLowerCase(),
             amount:     Number(Number(amount).toFixed(2)),

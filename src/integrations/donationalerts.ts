@@ -239,7 +239,7 @@ class Donationalerts extends Integration {
       });
 
       alerts.trigger({
-        event:      'tips',
+        event:      'tip',
         service:    'donationalerts',
         name:       data.username.toLowerCase(),
         amount:     Number(data.amount.toFixed(2)),
@@ -262,7 +262,7 @@ class Donationalerts extends Integration {
     } else {
       tip(`anonymous#__anonymous__, amount: ${Number(data.amount).toFixed(2)}${data.currency}, message: ${data.message}`);
       alerts.trigger({
-        event:      'tips',
+        event:      'tip',
         name:       'anonymous',
         amount:     Number(data.amount.toFixed(2)),
         tier:       null,

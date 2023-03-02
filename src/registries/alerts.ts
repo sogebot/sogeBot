@@ -1,25 +1,25 @@
 import {
-  Alert, AlertCheer, AlertCommandRedeem, AlertFollow, AlertInterface, AlertRaid, AlertResub, AlertSub, AlertSubcommunitygift, AlertSubgift, AlertTip, EmitData,
+  Alert, EmitData,
 } from '@entity/alert';
 import { MINUTE } from '@sogebot/ui-helpers/constants';
 import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized';
-import { AppDataSource } from '~/database';
-import { IsNull } from 'typeorm';
 import { v4 } from 'uuid';
 
-import { command, default_permission, example, persistent, settings } from '../decorators';
 import Registry from './_interface';
+import { command, default_permission, example, persistent, settings } from '../decorators';
 
 import { parserReply } from '~/commons';
+import { AppDataSource } from '~/database';
 import { User, UserInterface } from '~/database/entity/user';
 import Expects from '~/expects';
 import { prepare } from '~/helpers/commons';
 import { error, debug, info } from '~/helpers/log';
-import { ioServer } from '~/helpers/panel';
+import { app, ioServer } from '~/helpers/panel';
 import { defaultPermissions } from '~/helpers/permissions/defaultPermissions';
 import { adminEndpoint, publicEndpoint } from '~/helpers/socket';
 import * as changelog from '~/helpers/user/changelog.js';
 import client from '~/services/twitch/api/client';
+import { adminMiddleware } from '~/socket';
 import { translate } from '~/translate';
 import { variables } from '~/watchers';
 
@@ -28,7 +28,7 @@ const secureKeys = new Set<string>();
 
 const fetchUserForAlert = (opts: EmitData, type: 'recipient' | 'name'): Promise<Readonly<Required<UserInterface>> & { game?: string } | null> => {
   return new Promise<Readonly<Required<UserInterface>> & { game?: string } | null>((resolve) => {
-    if ((opts.event === 'rewardredeems' || opts.event === 'cmdredeems') && type === 'name') {
+    if ((opts.event === 'rewardredeem' || opts.event === 'custom') && type === 'name') {
       return resolve(null); // we don't have user on reward redeems
     }
 
@@ -100,6 +100,38 @@ class Alerts extends Registry {
   }
 
   sockets () {
+    if (!app) {
+      setTimeout(() => this.sockets(), 100);
+      return;
+    }
+
+    app.get('/api/registries/alerts', adminMiddleware, async (req, res) => {
+      res.send(await Alert.find());
+    });
+
+    app.get('/api/registries/alerts/:id', async (req, res) => {
+      try {
+        res.send(await Alert.findOneByOrFail({ id: req.params.id }));
+      } catch {
+        res.status(404).send();
+      }
+    });
+
+    app.delete('/api/registries/alerts/:id', adminMiddleware, async (req, res) => {
+      await Alert.delete({ id: req.params.id });
+      res.status(404).send();
+    });
+
+    app.post('/api/registries/alerts', adminMiddleware, async (req, res) => {
+      try {
+        const itemToSave = new Alert(req.body);
+        await itemToSave.validateAndSave();
+        res.send(itemToSave);
+      } catch (e) {
+        res.status(400).send({ errors: e });
+      }
+    });
+
     publicEndpoint('/registries/alerts', 'speak', async (opts, cb) => {
       if (secureKeys.has(opts.key)) {
         secureKeys.delete(opts.key);
@@ -124,7 +156,7 @@ class Alerts extends Registry {
     });
     publicEndpoint('/registries/alerts', 'isAlertUpdated', async ({ updatedAt, id }, cb) => {
       try {
-        const alert = await AppDataSource.getRepository(Alert).findOneBy({ id });
+        const alert = await Alert.findOneBy({ id });
         if (alert) {
           cb(null, updatedAt < (alert.updatedAt || 0), alert.updatedAt || 0);
         } else {
@@ -146,35 +178,6 @@ class Alerts extends Registry {
         isSoundMuted:   this.isSoundMuted,
         isTTSMuted:     this.isTTSMuted,
       });
-    });
-    adminEndpoint('/registries/alerts', 'alerts::save', async (item, cb) => {
-      try {
-        cb(
-          null,
-          await AppDataSource.getRepository(Alert).save(item),
-        );
-      } catch (e: any) {
-        cb(e.stack, null);
-      }
-    });
-    adminEndpoint('/registries/alerts', 'alerts::delete', async (item: Required<AlertInterface>, cb) => {
-      try {
-        await AppDataSource.getRepository(Alert).remove(item);
-        await AppDataSource.getRepository(AlertFollow).delete({ alertId: IsNull() });
-        await AppDataSource.getRepository(AlertSub).delete({ alertId: IsNull() });
-        await AppDataSource.getRepository(AlertSubgift).delete({ alertId: IsNull() });
-        await AppDataSource.getRepository(AlertSubcommunitygift).delete({ alertId: IsNull() });
-        await AppDataSource.getRepository(AlertRaid).delete({ alertId: IsNull() });
-        await AppDataSource.getRepository(AlertTip).delete({ alertId: IsNull() });
-        await AppDataSource.getRepository(AlertCheer).delete({ alertId: IsNull() });
-        await AppDataSource.getRepository(AlertResub).delete({ alertId: IsNull() });
-        await AppDataSource.getRepository(AlertCommandRedeem).delete({ alertId: IsNull() });
-        if (cb) {
-          cb(null);
-        }
-      } catch (e: any) {
-        cb(e.stack);
-      }
     });
     adminEndpoint('/registries/alerts', 'test', async (data: EmitData) => {
       this.trigger({

@@ -1,10 +1,9 @@
-import { AppDataSource } from '~/database';
-
 import events from '../events';
 import { info } from '../helpers/log';
 
 import type { ResponseFilter } from '.';
 
+import { AppDataSource } from '~/database';
 import { Price } from '~/database/entity/price';
 import alerts from '~/registries/alerts';
 
@@ -29,7 +28,7 @@ export const operation: ResponseFilter = {
       await alerts.trigger({
         amount:     price ? price.price : 0,
         currency:   'CZK',
-        event:      'cmdredeems',
+        event:      'custom',
         alertId:    match.groups.id,
         message:    attributes.param || '',
         monthsName: '',

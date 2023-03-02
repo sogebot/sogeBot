@@ -111,7 +111,7 @@ class Qiwi extends Integration {
       });
 
       alerts.trigger({
-        event:      'tips',
+        event:      'tip',
         name:       username || 'Anonymous',
         service:    'qiwi',
         amount,
