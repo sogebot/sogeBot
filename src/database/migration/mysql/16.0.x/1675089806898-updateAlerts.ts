@@ -7,7 +7,6 @@ export class updateAlerts1675089806898 implements MigrationInterface {
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     const tables = (await queryRunner.query(`SHOW TABLES`)).map((o: any) => o.Tables_in_sogebot);
-    console.log({ tables });
     if (tables.includes('alert_cheer')) {
       let items = await queryRunner.query(`SELECT * from \`alert\``);
 
