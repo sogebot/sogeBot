@@ -106,14 +106,29 @@ class Alerts extends Registry {
     }
 
     app.get('/api/registries/alerts', adminMiddleware, async (req, res) => {
-      res.send(await AppDataSource.getRepository(Alert).find());
+      res.send(await Alert.find());
     });
 
     app.get('/api/registries/alerts/:id', async (req, res) => {
       try {
-        res.send(await AppDataSource.getRepository(Alert).findOneByOrFail({ id: req.params.id }));
+        res.send(await Alert.findOneByOrFail({ id: req.params.id }));
       } catch {
         res.status(404).send();
+      }
+    });
+
+    app.delete('/api/registries/alerts/:id', adminMiddleware, async (req, res) => {
+      await Alert.delete({ id: req.params.id });
+      res.status(404).send();
+    });
+
+    app.post('/api/registries/alerts', adminMiddleware, async (req, res) => {
+      try {
+        const itemToSave = new Alert(req.body);
+        await itemToSave.validateAndSave();
+        res.send(itemToSave);
+      } catch (e) {
+        res.status(400).send({ errors: e });
       }
     });
 
@@ -141,7 +156,7 @@ class Alerts extends Registry {
     });
     publicEndpoint('/registries/alerts', 'isAlertUpdated', async ({ updatedAt, id }, cb) => {
       try {
-        const alert = await AppDataSource.getRepository(Alert).findOneBy({ id });
+        const alert = await Alert.findOneBy({ id });
         if (alert) {
           cb(null, updatedAt < (alert.updatedAt || 0), alert.updatedAt || 0);
         } else {
@@ -163,26 +178,6 @@ class Alerts extends Registry {
         isSoundMuted:   this.isSoundMuted,
         isTTSMuted:     this.isTTSMuted,
       });
-    });
-    adminEndpoint('/registries/alerts', 'alerts::save', async (item, cb) => {
-      try {
-        cb(
-          null,
-          await AppDataSource.getRepository(Alert).save(item),
-        );
-      } catch (e: any) {
-        cb(e.stack, null);
-      }
-    });
-    adminEndpoint('/registries/alerts', 'alerts::delete', async (item: Required<Alert>, cb) => {
-      try {
-        await AppDataSource.getRepository(Alert).remove(item);
-        if (cb) {
-          cb(null);
-        }
-      } catch (e: any) {
-        cb(e.stack);
-      }
     });
     adminEndpoint('/registries/alerts', 'test', async (data: EmitData) => {
       this.trigger({
