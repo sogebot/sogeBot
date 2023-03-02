@@ -14,11 +14,12 @@ import { User, UserInterface } from '~/database/entity/user';
 import Expects from '~/expects';
 import { prepare } from '~/helpers/commons';
 import { error, debug, info } from '~/helpers/log';
-import { ioServer } from '~/helpers/panel';
+import { app, ioServer } from '~/helpers/panel';
 import { defaultPermissions } from '~/helpers/permissions/defaultPermissions';
 import { adminEndpoint, publicEndpoint } from '~/helpers/socket';
 import * as changelog from '~/helpers/user/changelog.js';
 import client from '~/services/twitch/api/client';
+import { adminMiddleware } from '~/socket';
 import { translate } from '~/translate';
 import { variables } from '~/watchers';
 
@@ -99,6 +100,23 @@ class Alerts extends Registry {
   }
 
   sockets () {
+    if (!app) {
+      setTimeout(() => this.sockets(), 100);
+      return;
+    }
+
+    app.get('/api/registries/alerts', adminMiddleware, async (req, res) => {
+      res.send(await AppDataSource.getRepository(Alert).find());
+    });
+
+    app.get('/api/registries/alerts/:id', adminMiddleware, async (req, res) => {
+      try {
+        res.send(await AppDataSource.getRepository(Alert).findOneByOrFail({ id: req.params.id }));
+      } catch {
+        res.status(404).send();
+      }
+    });
+
     publicEndpoint('/registries/alerts', 'speak', async (opts, cb) => {
       if (secureKeys.has(opts.key)) {
         secureKeys.delete(opts.key);
