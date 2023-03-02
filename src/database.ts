@@ -1,4 +1,5 @@
 import { DataSource, DataSourceOptions  } from 'typeorm';
+
 import { TypeORMLogger } from '~/helpers/logTypeorm';
 
 const MySQLDataSourceOptions = {
@@ -12,7 +13,7 @@ const MySQLDataSourceOptions = {
   database:       process.env.TYPEORM_DATABASE,
   logging:        ['error'],
   logger:         new TypeORMLogger(),
-  synchronize:    false,
+  synchronize:    process.env.FORCE_DB_SYNC === 'IKnowWhatIamDoing',
   migrationsRun:  true,
   entities:       [ 'dest/database/entity/*.js' ],
   subscribers:    [ 'dest/database/entity/*.js' ],
@@ -28,7 +29,7 @@ const PGDataSourceOptions = {
   database:      process.env.TYPEORM_DATABASE,
   logging:       ['error'],
   logger:        new TypeORMLogger(),
-  synchronize:   false,
+  synchronize:   process.env.FORCE_DB_SYNC === 'IKnowWhatIamDoing',
   migrationsRun: true,
   entities:      [ 'dest/database/entity/*.js' ],
   subscribers:   [ 'dest/database/entity/*.js' ],
@@ -40,7 +41,7 @@ const SQLiteDataSourceOptions = {
   database:      process.env.TYPEORM_DATABASE ?? 'sogebot.db',
   logging:       ['error'],
   logger:        new TypeORMLogger(),
-  synchronize:   false,
+  synchronize:   process.env.FORCE_DB_SYNC === 'IKnowWhatIamDoing',
   migrationsRun: true,
   entities:      [ 'dest/database/entity/*.js' ],
   subscribers:   [ 'dest/database/entity/*.js' ],
