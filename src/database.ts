@@ -1,6 +1,14 @@
 import { DataSource, DataSourceOptions  } from 'typeorm';
 
+import { warning } from './helpers/log';
+
 import { TypeORMLogger } from '~/helpers/logTypeorm';
+
+if (process.env.FORCE_DB_SYNC === 'IKnowWhatIamDoing') {
+  setTimeout(() => {
+    warning('FORCE_DB_SYNC is enabled! Are you sure this should be enabled?');
+  }, 5000);
+}
 
 const MySQLDataSourceOptions = {
   type:           'mysql',
