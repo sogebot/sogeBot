@@ -238,7 +238,7 @@ class Alerts extends Registry {
       const caster = await AppDataSource.getRepository(User).findOneBy({ userId: broadcasterId }) ?? null;
 
       const data = {
-        ...opts, isTTSMuted: !tts.ready || this.isTTSMuted, isSoundMuted: this.isSoundMuted, TTSService: tts.service, TTSKey: key, user, game: user?.game, caster, recipientUser: recipient,
+        ...opts, isTTSMuted: !tts.ready || this.isTTSMuted, isSoundMuted: this.isSoundMuted, TTSService: tts.service, TTSKey: key, user, game: user?.game, caster, recipientUser: recipient, id: v4(),
       };
 
       info(`Triggering alert send: ${JSON.stringify(data)}`);
