@@ -80,21 +80,25 @@ class Chat {
       setTimeout(() => this.emitter(), 10);
       return;
     }
-    tmiEmitter.on('timeout', (username, seconds, isMod) => {
-      const broadcasterUsername = variables.get('services.twitch.broadcasterUsername') as string;
+    tmiEmitter.on('timeout', async (username, duration, isMod) => {
+      const broadcasterId = variables.get('services.twitch.broadcasterId') as string;
+      const clientBroadcaster = await apiClient('broadcaster');
+      const userId = await users.getIdByName(username);
+
+      clientBroadcaster.moderation.banUser(broadcasterId, broadcasterId, {
+        userId, duration, reason: '',
+      });
+
       if (isMod) {
         if (this.client.broadcaster) {
-          this.client.broadcaster.timeout(broadcasterUsername, username, seconds);
-          info(`Bot will set mod status for ${username} after ${seconds} seconds.`);
+          info(`Bot will set mod status for ${username} after ${duration} seconds.`);
           setTimeout(() => {
             // we need to remod user
-            this.client.broadcaster?.mod(broadcasterUsername, username);
-          }, (seconds * 1000) + 1000);
+            clientBroadcaster.moderation.addModerator(broadcasterId, userId);
+          }, (duration * 1000) + 1000);
         } else {
           error('Cannot timeout mod user, as you don\'t have set broadcaster in chat');
         }
-      } else {
-        this.client.bot?.timeout(broadcasterUsername, username, seconds);
       }
     });
     tmiEmitter.on('say', (channel, message, opts) => {
