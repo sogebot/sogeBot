@@ -238,7 +238,7 @@ class Moderation extends System {
       }
 
       if (this.cWarningsAnnounceTimeouts) {
-        tmiEmitter.emit('delete', 'bot', msgId);
+        tmiEmitter.emit('delete', msgId);
         if (!silent) {
           parserReply('$sender, ' + warning, { sender, discord: undefined, id: '' });
         } else {

@@ -5,7 +5,7 @@ interface Events {
   'whisper': (username: string, message: string, opts?: { replyTo: string | undefined }) => void,
   'ban': (username: string) => void,
   'timeout': (username: string, seconds: number, isMod: boolean) => void,
-  'delete': (type: 'bot' | 'broadcaster', msgId: string) => void,
+  'delete': (msgId: string) => void,
   'join': (type: 'bot' | 'broadcaster') => void,
   'reconnect': (type: 'bot' | 'broadcaster') => void,
   'part': (type: 'bot' | 'broadcaster') => void,

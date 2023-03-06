@@ -24,7 +24,7 @@ import {
 import { isStreamOnline, stats } from '~/helpers/api';
 import * as hypeTrain from '~/helpers/api/hypeTrain';
 import {
-  getOwner, getUserSender,
+  getUserSender,
 } from '~/helpers/commons';
 import { sendMessage } from '~/helpers/commons/sendMessage';
 import { eventEmitter } from '~/helpers/events';
@@ -120,8 +120,8 @@ class Chat {
     tmiEmitter.on('reconnect', (type) => {
       this.reconnect(type);
     });
-    tmiEmitter.on('delete', (type, msgId) => {
-      this.delete(type, msgId);
+    tmiEmitter.on('delete', (msgId) => {
+      this.delete(msgId);
     });
     tmiEmitter.on('part', (type) => {
       this.part(type);
