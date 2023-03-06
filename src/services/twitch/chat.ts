@@ -107,8 +107,13 @@ class Chat {
     tmiEmitter.on('say', (channel, message, opts) => {
       this.client.bot?.say(channel, message, opts);
     });
-    tmiEmitter.on('whisper', (username, message) => {
-      this.client.bot?.whisper(username, message);
+    tmiEmitter.on('whisper', async (username, message) => {
+      const botId = variables.get('services.twitch.botId') as string;
+
+      const clientBot = await apiClient('bot');
+      const userId = await users.getIdByName(username);
+
+      clientBot.whispers.sendWhisper(botId, userId, message);
     });
     tmiEmitter.on('join', (type) => {
       const broadcasterUsername = variables.get('services.twitch.broadcasterUsername') as string;
@@ -305,7 +310,7 @@ class Chat {
       refresh(type).then(() => this.initClient(type));
     });
 
-    client.onDisconnect((manually, reason) => {
+    client.irc.onDisconnect((manually, reason) => {
       setStatus('TMI', constants.DISCONNECTED);
       if (manually) {
         reason = new Error('Disconnected manually by user');
@@ -315,7 +320,7 @@ class Chat {
       }
     });
 
-    client.onConnect(() => {
+    client.irc.onConnect(() => {
       setStatus('TMI', constants.CONNECTED);
       info(`TMI: ${type} is connected`);
     });
