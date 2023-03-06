@@ -86,7 +86,10 @@ class Chat {
       const userId = await users.getIdByName(username);
 
       clientBroadcaster.moderation.banUser(broadcasterId, broadcasterId, {
-        userId, duration, reason: '',
+        user: {
+          id: userId,
+        },
+        duration, reason: '',
       });
 
       if (isMod) {
@@ -237,15 +240,19 @@ class Chat {
   }
 
   async ban (username: string, type: 'bot' | 'broadcaster' = 'bot' ): Promise<void> {
-    const broadcasterUsername = variables.get('services.twitch.broadcasterUsername') as string;
     const client = this.client[type];
     if (!client && type === 'bot') {
       return this.ban(username, 'broadcaster');
     } else if (!client) {
       error(`TMI: Cannot ban user. Bot/Broadcaster is not connected to TMI.`);
     } else {
-      await client.ban(broadcasterUsername, username);
-      await client.say(broadcasterUsername, `/block ${username}`);
+      const broadcasterId = variables.get('services.twitch.broadcasterId') as string;
+      const clientBroadcaster = await apiClient('broadcaster');
+      clientBroadcaster.moderation.banUser(broadcasterId, broadcasterId, {
+        user: {
+          id: await users.getIdByName(username),
+        }, reason: '',
+      });
       info(`TMI: User ${username} was banned and blocked.`);
       return;
     }
@@ -830,8 +837,9 @@ class Chat {
     }
   }
 
-  delete (client: 'broadcaster' | 'bot', msgId: string): void {
-    this.client[client]?.deleteMessage(getOwner(), msgId);
+  delete (msgId: string): void {
+    const broadcasterId = variables.get('services.twitch.broadcasterId') as string;
+    apiClient('broadcaster').then(c => c.moderation.deleteChatMessages(broadcasterId, broadcasterId, msgId));
   }
 
   @timer()

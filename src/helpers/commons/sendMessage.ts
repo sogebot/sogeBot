@@ -1,4 +1,4 @@
-import type { HelixChatAnnoucementColor } from '@twurple/api';
+import type { HelixChatAnnouncementColor } from '@twurple/api';
 import _ from 'lodash';
 
 import { timer } from '../../decorators.js';
@@ -18,12 +18,12 @@ import {
 
 import { getBotSender } from '.';
 
-const getAnnouncementColor = (command: string): HelixChatAnnoucementColor => {
+const getAnnouncementColor = (command: string): HelixChatAnnouncementColor => {
   const color = command.replace('/announce', '');
   if (color.trim().length === 0) {
     return 'primary';
   } else {
-    return color.trim() as HelixChatAnnoucementColor;
+    return color.trim() as HelixChatAnnouncementColor;
   }
 };
 

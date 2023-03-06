@@ -11,7 +11,6 @@ import { createClip } from './twitch/calls/createClip';
 import { createMarker } from './twitch/calls/createMarker';
 import Chat from './twitch/chat';
 import EventSub from './twitch/eventsub';
-import PubSub from './twitch/pubsub';
 import { cleanErrors } from './twitch/token/refresh';
 import { cache, validate } from './twitch/token/validate';
 import {
@@ -49,7 +48,6 @@ const markerEvents = new Set<string>();
 
 class Twitch extends Service {
   tmi: import('./twitch/chat').default | null;
-  pubsub: import('./twitch/pubsub').default | null;
   eventsub: import('./twitch/eventsub').default | null;
 
   @persistent()
@@ -285,12 +283,10 @@ class Twitch extends Service {
 
   @onChange(['broadcasterTokenValid', 'broadcasterAccessToken'])
   onBroadcasterTokenValidChange() {
-    this.pubsub = null;
     this.eventsub = null;
     if (this.broadcasterTokenValid && this.broadcasterAccessToken.length > 0) {
       if (this.tmi) {
         this.tmi.initClient('broadcaster');
-        this.pubsub = new PubSub();
         this.eventsub = new EventSub();
       } else {
         setTimeout(() => this.onBroadcasterTokenValidChange(), 1000);
@@ -309,11 +305,9 @@ class Twitch extends Service {
       this.init();
     } else {
       apiIntervalStop();
-      this.pubsub?.stop();
       this.tmi?.part('bot');
       this.tmi?.part('broadcaster');
 
-      this.pubsub = null;
       this.eventsub = null;
     }
   }

@@ -40,7 +40,7 @@ export async function createClip (opts: { createAfterDelay: boolean }) {
   const broadcasterId = variables.get('services.twitch.broadcasterId') as string;
   try {
     const clientBot = await client('bot');
-    const clipId = await clientBot.clips.createClip({ ...opts, channelId: broadcasterId });
+    const clipId = await clientBot.clips.createClip({ ...opts, channel: broadcasterId });
     await AppDataSource.getRepository(TwitchClips).save({
       clipId: clipId, isChecked: false, shouldBeCheckedAt: Date.now() + 120 * 1000,
     });
