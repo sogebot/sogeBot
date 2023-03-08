@@ -1,69 +1,73 @@
-import { Enumerable } from '@d-fischer/shared-utils';
-import type { AuthProvider, AccessToken } from '@twurple/auth';
+import { UserIdResolvable, extractUserId } from '@twurple/api/lib/index.js';
+import { RefreshingAuthProvider, AccessTokenWithUserId, refreshUserToken, AccessToken } from '@twurple/auth/lib';
+import fetch from 'node-fetch';
 
-import { variables } from '../../../watchers.js';
-import { expirationDate, validate } from './validate.js';
+import { isBotId } from '~/helpers/user';
+import { variables } from '~/watchers';
 
-export class CustomAuthProvider implements AuthProvider {
-  @Enumerable(false) private _clientId: string;
-  @Enumerable(false) private _accessToken: AccessToken;
+const urls = {
+  'SogeBot Token Generator':    'https://twitch-token-generator.soge.workers.dev/refresh/',
+  'SogeBot Token Generator v2': 'https://credentials.sogebot.xyz/twitch/refresh/',
+};
 
-  readonly typeOfToken: 'broadcaster' | 'bot';
-  readonly tokenType = 'user';
+export class CustomAuthProvider extends RefreshingAuthProvider {
+  async refreshAccessTokenForUser(user: UserIdResolvable): Promise<AccessTokenWithUserId> {
+    const userId = extractUserId(user);
+    const previousTokenData = this._userAccessTokens.get(userId);
+    let tokenData: AccessToken;
+    try {
+      if (!previousTokenData) {
+        throw new Error('Trying to refresh token for user that was not added to the provider');
+      }
 
-  constructor(
-    type: 'broadcaster' | 'bot',
-  ) {
-    this.typeOfToken = type;
-    this._accessToken = variables.get(`services.twitch.${this.typeOfToken}AccessToken`);
-    this.updateClientId();
-  }
+      const tokenService = variables.get('services.twitch.tokenService') as keyof typeof urls;
+      const url = urls[tokenService];
 
-  async getAccessToken(requestedScopes?: string[]): Promise<AccessToken | null> {
-    this.updateClientId();
-    if (variables.get(`services.twitch.${this.typeOfToken}AccessToken`) === '') {
-      return null;
+      if (!url) {
+      // we have custom app so we are using original code
+        const tokenServiceCustomClientId = variables.get('services.twitch.tokenServiceCustomClientId') as string;
+        const tokenServiceCustomClientSecret = variables.get('services.twitch.tokenServiceCustomClientSecret') as string;
+        tokenData = await refreshUserToken(tokenServiceCustomClientId, tokenServiceCustomClientSecret, previousTokenData.refreshToken!);
+      } else {
+      // we are using own generator
+        const generalOwners = variables.get('services.twitch.generalOwners') as string[];
+        const channel = variables.get('services.twitch.broadcasterUsername') as string;
+        const response = await fetch(url + encodeURIComponent(previousTokenData.refreshToken!.trim()), {
+          timeout: 120000,
+          method:  'POST',
+          headers: {
+            'SogeBot-Channel': channel,
+            'SogeBot-Owners':  generalOwners.join(', '),
+          },
+        });
+        tokenData = await response.json();
+      }
+
+      this._userAccessTokens.set(userId, {
+        ...tokenData,
+        userId,
+      });
+
+      if (isBotId(userId)) {
+        variables.set('services.twitch.botCurrentScopes', tokenData.scope);
+        variables.set('services.twitch.botTokenValid', true);
+      } else {
+        variables.set('services.twitch.broadcasterCurrentScopes', tokenData.scope);
+        variables.set('services.twitch.broadcasterTokenValid', true);
+      }
+
+      this._callOnRefresh(userId, tokenData);
+    } catch (e) {
+      if (isBotId(userId)) {
+        variables.set('services.twitch.botTokenValid', false);
+      } else {
+        variables.set('services.twitch.broadcasterTokenValid', false);
+      }
+      throw(e); // rethrow
     }
-
-    await validate(this.typeOfToken);
-
-    this._accessToken = {
-      accessToken:         variables.get(`services.twitch.${this.typeOfToken}AccessToken`),
-      refreshToken:        variables.get(`services.twitch.${this.typeOfToken}RefreshToken`),
-      scope:               [],
-      expiresIn:           expirationDate[this.typeOfToken],
-      obtainmentTimestamp: Date.now(),
+    return {
+      ...tokenData,
+      userId,
     };
-
-    return this._accessToken;
-  }
-
-  updateClientId() {
-    const tokenService = variables.get(`services.twitch.tokenService`);
-    switch (tokenService) {
-      case 'SogeBot Token Generator':
-        this._clientId = 't8cney2xkc7j4cu6zpv9ijfa27w027';
-        break;
-      case 'SogeBot Token Generator v2':
-        this._clientId = '89k6demxtifvq0vzgjpvr1mykxaqmf';
-        break;
-      default:
-        this._clientId = variables.get(`services.twitch.tokenServiceCustomClientId`);
-    }
-  }
-
-  /**
-	 * The client ID.
-	 */
-  get clientId(): string {
-    this.updateClientId();
-    return this._clientId;
-  }
-
-  /**
-	 * The scopes that are currently available using the access token.
-	 */
-  get currentScopes(): string[] {
-    return [];
   }
 }
