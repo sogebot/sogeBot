@@ -11,7 +11,7 @@ export class updateAlerts1675089806898 implements MigrationInterface {
       let items = await queryRunner.query(`SELECT * from "alert"`);
 
       // remap updatedAt
-      items = items.map((o: any) => ({ ...o, updatedAt: new Date(o.updatedAt).toISOString() }));
+      items = items.map((o: any) => ({ ...o, updatedAt: new Date().toISOString() }));
 
       const types = [
         'cheer', 'command_redeem','follow', 'promo', 'raid', 'resub',
