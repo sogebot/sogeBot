@@ -15,56 +15,39 @@ export class CustomAuthProvider extends RefreshingAuthProvider {
     const userId = extractUserId(user);
     const previousTokenData = this._userAccessTokens.get(userId);
     let tokenData: AccessToken;
-    try {
-      if (!previousTokenData) {
-        throw new Error('Trying to refresh token for user that was not added to the provider');
-      }
-
-      const tokenService = variables.get('services.twitch.tokenService') as keyof typeof urls;
-      const url = urls[tokenService];
-
-      if (!url) {
-      // we have custom app so we are using original code
-        const tokenServiceCustomClientId = variables.get('services.twitch.tokenServiceCustomClientId') as string;
-        const tokenServiceCustomClientSecret = variables.get('services.twitch.tokenServiceCustomClientSecret') as string;
-        tokenData = await refreshUserToken(tokenServiceCustomClientId, tokenServiceCustomClientSecret, previousTokenData.refreshToken!);
-      } else {
-      // we are using own generator
-        const generalOwners = variables.get('services.twitch.generalOwners') as string[];
-        const channel = variables.get('services.twitch.broadcasterUsername') as string;
-        const response = await fetch(url + encodeURIComponent(previousTokenData.refreshToken!.trim()), {
-          timeout: 120000,
-          method:  'POST',
-          headers: {
-            'SogeBot-Channel': channel,
-            'SogeBot-Owners':  generalOwners.join(', '),
-          },
-        });
-        tokenData = await response.json();
-      }
-
-      this._userAccessTokens.set(userId, {
-        ...tokenData,
-        userId,
-      });
-
-      if (isBotId(userId)) {
-        variables.set('services.twitch.botCurrentScopes', tokenData.scope);
-        variables.set('services.twitch.botTokenValid', true);
-      } else {
-        variables.set('services.twitch.broadcasterCurrentScopes', tokenData.scope);
-        variables.set('services.twitch.broadcasterTokenValid', true);
-      }
-
-      this._callOnRefresh(userId, tokenData);
-    } catch (e) {
-      if (isBotId(userId)) {
-        variables.set('services.twitch.botTokenValid', false);
-      } else {
-        variables.set('services.twitch.broadcasterTokenValid', false);
-      }
-      throw(e); // rethrow
+    if (!previousTokenData) {
+      throw new Error('Trying to refresh token for user that was not added to the provider');
     }
+
+    const tokenService = variables.get('services.twitch.tokenService') as keyof typeof urls;
+    const url = urls[tokenService];
+
+    if (!url) {
+      // we have custom app so we are using original code
+      const tokenServiceCustomClientId = variables.get('services.twitch.tokenServiceCustomClientId') as string;
+      const tokenServiceCustomClientSecret = variables.get('services.twitch.tokenServiceCustomClientSecret') as string;
+      tokenData = await refreshUserToken(tokenServiceCustomClientId, tokenServiceCustomClientSecret, previousTokenData.refreshToken!);
+    } else {
+      // we are using own generator
+      const generalOwners = variables.get('services.twitch.generalOwners') as string[];
+      const channel = variables.get('services.twitch.broadcasterUsername') as string;
+      const response = await fetch(url + encodeURIComponent(previousTokenData.refreshToken!.trim()), {
+        timeout: 120000,
+        method:  'POST',
+        headers: {
+          'SogeBot-Channel': channel,
+          'SogeBot-Owners':  generalOwners.join(', '),
+        },
+      });
+      tokenData = await response.json();
+    }
+
+    this._userAccessTokens.set(userId, {
+      ...tokenData,
+      userId,
+    });
+
+    this._callOnRefresh(userId, tokenData);
     return {
       ...tokenData,
       userId,

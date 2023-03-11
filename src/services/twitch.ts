@@ -9,13 +9,12 @@ import { capitalize } from 'lodash';
 import Service from './_interface';
 import { createClip } from './twitch/calls/createClip';
 import { createMarker } from './twitch/calls/createMarker';
-import Chat from './twitch/chat';
-import EventSub from './twitch/eventsub';
+import { updateBroadcasterType } from './twitch/calls/updateBroadcasterType';
 import { CustomAuthProvider } from './twitch/token/CustomAuthProvider';
 import {
   command, default_permission, example, persistent, settings,
 } from '../decorators';
-import { onChange, onLoad, onStartup, onStreamStart } from '../decorators/on';
+import { onChange, onLoad } from '../decorators/on';
 import Expects from '../expects';
 import emitter from '../helpers/interfaceEmitter';
 import { error, info } from '../helpers/log';
@@ -36,7 +35,6 @@ import { isIgnored } from '~/helpers/user/isIgnored';
 import { sendGameFromTwitch } from '~/services/twitch/calls/sendGameFromTwitch';
 import { updateChannelInfo } from '~/services/twitch/calls/updateChannelInfo';
 import { translate } from '~/translate';
-import { updateBroadcasterType } from './twitch/calls/updateBroadcasterType';
 
 const urls = {
   'SogeBot Token Generator':    'https://twitch-token-generator.soge.workers.dev/refresh/',
@@ -44,9 +42,14 @@ const urls = {
 };
 const markerEvents = new Set<string>();
 
+// TODO:
+// - simplify custom oauth - done
+// - remove bot token valid
+//
+
 class Twitch extends Service {
-  tmi = new Chat();
-  eventsub = new EventSub();
+  // tmi = new Chat();
+  // eventsub = new EventSub();
 
   authProvider: CustomAuthProvider | null = null;
   apiClient: ApiClient | null = null;
@@ -148,6 +151,7 @@ class Twitch extends Service {
       const tokenInfo = await this.apiClient.asUser(userId, ctx => ctx.getTokenInfo());
       this.botId = userId;
       this.botUsername = tokenInfo.userName ?? '';
+      this.botCurrentScopes = tokenInfo.scopes;
     }
     if (this.broadcasterRefreshToken.length > 0) {
       const userId = await this.authProvider.addUserForToken({
@@ -160,6 +164,7 @@ class Twitch extends Service {
       const tokenInfo = await this.apiClient.asUser(userId, ctx => ctx.getTokenInfo());
       this.broadcasterId = userId;
       this.broadcasterUsername = tokenInfo.userName ?? '';
+      this.broadcasterCurrentScopes = tokenInfo.scopes;
       await updateBroadcasterType();
     }
   }
@@ -216,6 +221,7 @@ class Twitch extends Service {
     }
   }
 
+  /*
   @onChange('broadcasterUsername')
   public async onChangeBroadcasterUsername(key: string, value: any) {
     if (!this.generalOwners.includes(value)) {
@@ -224,14 +230,9 @@ class Twitch extends Service {
     this.tmi?.part('bot').then(() => this.tmi?.join('bot', value));
     this.tmi?.part('broadcaster').then(() => this.tmi?.join('broadcaster', value));
   }
+  */
 
-  @onStartup()
-  async onStartup() {
-    this.addMenu({
-      category: 'stats', name: 'api', id: 'stats/api', this: null,
-    });
-  }
-
+  /*
   @onChange(['botTokenValid'])
   onBotTokenValidChange() {
     if (this.botTokenValid) {
@@ -264,7 +265,7 @@ class Twitch extends Service {
       this.tmi?.part('broadcaster').then(() => this.tmi?.join('broadcaster', this.broadcasterUsername));
     }
   }
-
+*/
   @onChange('showWithAt')
   @onLoad('showWithAt')
   setShowWithAt() {

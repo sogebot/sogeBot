@@ -6,11 +6,10 @@ import {
   get, isNil,
 } from 'lodash';
 import { minify } from 'terser';
-import { AppDataSource } from '~/database';
 import { VM } from 'vm2';
 
+import { getAll } from './getAll';
 import Message from '../../message';
-import client from '../../services/twitch/api/client';
 import users from '../../users';
 import {
   chatMessagesAtStart, isStreamOnline, stats, streamStatusChangeSince,
@@ -23,7 +22,9 @@ import { linesParsed } from '../parser';
 import * as changelog from '../user/changelog.js';
 import { isModerator } from '../user/isModerator';
 import { getRandomOnlineSubscriber, getRandomOnlineViewer, getRandomSubscriber, getRandomViewer } from '../user/random.js';
-import { getAll } from './getAll';
+
+import { AppDataSource } from '~/database';
+import twitch from '~/services/twitch';
 
 async function runScript (script: string, opts: { sender: { userId: string; userName: string; source: 'twitch' | 'discord' } | string | null, isUI: boolean; param?: string | number, _current: any, parameters?: { [x: string]: any }, variables?: { [x: string]: any } }) {
   debug('customvariables.eval', opts);
@@ -144,8 +145,7 @@ async function runScript (script: string, opts: { sender: { userId: string; user
       } else {
         try {
           // we don't have data of user, we will try to get them
-          const clientBot = await client('bot');
-          const getUserByName = await clientBot.users.getUserByName(userName);
+          const getUserByName = await twitch.apiClient?.asIntent(['bot'], ctx => ctx.users.getUserByName(userName));
           if (!getUserByName) {
             return null;
           } else {

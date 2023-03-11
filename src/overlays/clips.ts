@@ -1,12 +1,11 @@
-import client from '../services/twitch/api/client';
 import Overlay from './_interface';
 
 import { ioServer } from '~/helpers/panel';
+import twitch from '~/services/twitch';
 
 class Clips extends Overlay {
   async showClip (clipId: string) {
-    const clientBot = await client('bot');
-    const getClipById = await clientBot.clips.getClipById(clipId);
+    const getClipById = await twitch.apiClient?.clips.getClipById(clipId);
 
     if (getClipById) {
       ioServer?.of('/' + this._name + '/' + this.__moduleName__.toLowerCase())

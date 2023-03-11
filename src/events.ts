@@ -7,11 +7,13 @@ import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized';
 import _, {
   clone, cloneDeep, get, isNil, random,
 } from 'lodash';
-import { AppDataSource } from '~/database';
 import { VM }  from 'vm2';
+
+import twitch from './services/twitch';
 
 import Core from '~/_interface';
 import { parserReply } from '~/commons';
+import { AppDataSource } from '~/database';
 import {
   Event, EventInterface, Events as EventsEntity,
 } from '~/database/entity/event';
@@ -45,7 +47,6 @@ import * as changelog from '~/helpers/user/changelog.js';
 import { isBot, isBotSubscriber } from '~/helpers/user/isBot';
 import { isBroadcaster } from '~/helpers/user/isBroadcaster';
 import { isModerator } from '~/helpers/user/isModerator';
-import client from '~/services/twitch/api/client';
 import { createClip } from '~/services/twitch/calls/createClip';
 import { getCustomRewards } from '~/services/twitch/calls/getCustomRewards';
 import { getIdFromTwitch } from '~/services/twitch/calls/getIdFromTwitch';
@@ -384,8 +385,7 @@ class Events extends Core {
           addUIError({ name: 'OAUTH', message: 'Missing Broadcaster oAuth scope channel:edit:commercial to start commercial' });
           return;
         }
-        const clientBroadcaster = await client('broadcaster');
-        await clientBroadcaster.channels.startChannelCommercial(cid, duration as 30 | 60 | 90 | 120 | 150 | 180);
+        await twitch.apiClient?.asIntent(['broadcaster'], ctx => ctx.channels.startChannelCommercial(cid, duration as 30 | 60 | 90 | 120 | 150 | 180));
         eventEmitter.emit('commercial', { duration });
       } else {
         throw new Error('Incorrect duration set');

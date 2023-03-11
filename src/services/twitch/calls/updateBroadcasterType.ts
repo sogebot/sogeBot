@@ -1,9 +1,7 @@
-import client from '../api/client';
-import { refresh } from '../token/refresh.js';
-
 import { getFunctionName } from '~/helpers/getFunctionName.js';
 import emitter from '~/helpers/interfaceEmitter';
 import { debug, error, isDebugEnabled, warning } from '~/helpers/log';
+import twitch from '~/services/twitch';
 import { variables } from '~/watchers';
 
 async function updateBroadcasterType () {
@@ -12,8 +10,7 @@ async function updateBroadcasterType () {
   }
   try {
     const cid = variables.get('services.twitch.broadcasterId') as string;
-    const clientBroadcaster = await client('broadcaster');
-    const getUserById = await clientBroadcaster.asUser(cid, ctx => ctx.users.getUserById(cid));
+    const getUserById = await twitch.apiClient?.asIntent(['broadcaster'], ctx => ctx.users.getUserById(cid));
 
     if (getUserById) {
       emitter.emit('set', '/services/twitch', 'profileImageUrl', getUserById.profilePictureUrl);
