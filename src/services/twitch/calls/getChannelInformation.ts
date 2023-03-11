@@ -1,8 +1,5 @@
 import isEqual from 'lodash/isEqual';
 
-import client from '../api/client';
-import { refresh } from '../token/refresh.js';
-
 import {  currentStreamTags, gameCache, gameOrTitleChangedManually, rawStatus, tagsCache } from '~/helpers/api';
 import {
   stats as apiStats,
@@ -10,6 +7,7 @@ import {
 import { parseTitle } from '~/helpers/api/parseTitle';
 import { getFunctionName } from '~/helpers/getFunctionName';
 import { debug, error, info, isDebugEnabled, warning } from '~/helpers/log';
+import twitch from '~/services/twitch';
 import { updateChannelInfo } from '~/services/twitch/calls/updateChannelInfo';
 import { variables } from '~/watchers';
 
@@ -22,8 +20,7 @@ export async function getChannelInformation (opts: any) {
   try {
     const broadcasterId = variables.get('services.twitch.broadcasterId') as string;
     const isTitleForced = variables.get('services.twitch.isTitleForced') as string;
-    const clientBot = await client('bot');
-    const getChannelInfo = await clientBot.channels.getChannelInfoById(broadcasterId);
+    const getChannelInfo = await twitch.apiClient?.asIntent(['bot'], ctx => ctx.channels.getChannelInfoById(broadcasterId));
 
     if (!getChannelInfo) {
       throw new Error(`Channel ${broadcasterId} not found on Twitch`);
@@ -94,10 +91,6 @@ export async function getChannelInformation (opts: any) {
       if (e.message.includes('ETIMEDOUT')) {
         warning(`${getFunctionName()} => Connection to Twitch timed out. Will retry request.`);
         return { state: false, opts }; // ignore etimedout error
-      }
-      if (e.message.includes('Invalid OAuth token')) {
-        warning(`${getFunctionName()} => Invalid OAuth token - attempting to refresh token`);
-        await refresh('bot');
       } else {
         error(`${getFunctionName()} => ${e.stack ?? e.message}`);
       }

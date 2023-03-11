@@ -3,17 +3,17 @@ import { sample } from '@sogebot/ui-helpers/array';
 import { validateOrReject } from 'class-validator';
 import * as _ from 'lodash';
 import { merge } from 'lodash';
-import { AppDataSource } from '~/database';
 
+import System from './_interface';
 import { command, default_permission } from '../decorators';
 import Expects from '../expects';
-import users from '../users';
-import System from './_interface';
 
+import { AppDataSource } from '~/database';
 import { prepare } from '~/helpers/commons';
 import { app } from '~/helpers/panel';
 import defaultPermissions from '~/helpers/permissions/defaultPermissions';
 import { domain } from '~/helpers/ui';
+import getNameById from '~/helpers/user/getNameById';
 import { adminMiddleware } from '~/socket';
 
 class Quotes extends System {
@@ -36,14 +36,14 @@ class Quotes extends System {
       const quotes = await QuotesEntity.find();
       res.send({
         data:  quotes,
-        users: await Promise.all(quotes.map(quote => new Promise<[string, string]>(resolve => users.getNameById(quote.quotedBy).then((username) => resolve([quote.quotedBy, username]))))),
+        users: await Promise.all(quotes.map(quote => new Promise<[string, string]>(resolve => getNameById(quote.quotedBy).then((username) => resolve([quote.quotedBy, username]))))),
       });
     });
     app.get('/api/systems/quotes/:id', adminMiddleware, async (req, res) => {
       const quote = await QuotesEntity.findOneBy({ id: Number(req.params.id) });
       res.send({
         data: await QuotesEntity.findOneBy({ id: Number(req.params.id) }),
-        user: quote ? await users.getNameById(quote.quotedBy) : null,
+        user: quote ? await getNameById(quote.quotedBy) : null,
       });
     });
     app.delete('/api/systems/quotes/:id', adminMiddleware, async (req, res) => {
@@ -176,7 +176,7 @@ class Quotes extends System {
     if (!_.isNil(id)) {
       const quote = await AppDataSource.getRepository(QuotesEntity).findOneBy({ id });
       if (!_.isEmpty(quote) && typeof quote !== 'undefined') {
-        const quotedBy = await users.getNameById(quote.quotedBy);
+        const quotedBy = await getNameById(quote.quotedBy);
         const response = prepare('systems.quotes.show.ok', {
           quote: quote.quote, id: quote.id, quotedBy,
         });
@@ -197,7 +197,7 @@ class Quotes extends System {
       if (quotesWithTags.length > 0) {
         const quote = sample(quotesWithTags);
         if (typeof quote !== 'undefined') {
-          const quotedBy = await users.getNameById(quote.quotedBy);
+          const quotedBy = await getNameById(quote.quotedBy);
           const response = prepare('systems.quotes.show.ok', {
             quote: quote.quote, id: quote.id, quotedBy,
           });

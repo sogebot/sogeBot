@@ -3,10 +3,11 @@ import { User } from '@entity/user';
 import { SECOND } from '@sogebot/ui-helpers/constants';
 import { dayjs, timezone } from '@sogebot/ui-helpers/dayjsHelper';
 import { getTime } from '@sogebot/ui-helpers/getTime';
-import { ApiClient } from '@twurple/api/lib';
+import { ApiClient } from '@twurple/api';
 import { capitalize } from 'lodash';
 
 import Service from './_interface';
+import { init } from './twitch/api/interval';
 import { createClip } from './twitch/calls/createClip';
 import { createMarker } from './twitch/calls/createMarker';
 import { updateBroadcasterType } from './twitch/calls/updateBroadcasterType';
@@ -18,7 +19,6 @@ import { onChange, onLoad } from '../decorators/on';
 import Expects from '../expects';
 import emitter from '../helpers/interfaceEmitter';
 import { error, info } from '../helpers/log';
-import users from '../users';
 
 import { AppDataSource } from '~/database';
 import {
@@ -31,6 +31,7 @@ import {
   ignorelist, sendWithMe, setMuteStatus, showWithAt,
 } from '~/helpers/tmi';
 import * as changelog from '~/helpers/user/changelog.js';
+import getNameById from '~/helpers/user/getNameById';
 import { isIgnored } from '~/helpers/user/isIgnored';
 import { sendGameFromTwitch } from '~/services/twitch/calls/sendGameFromTwitch';
 import { updateChannelInfo } from '~/services/twitch/calls/updateChannelInfo';
@@ -46,6 +47,8 @@ const markerEvents = new Set<string>();
 // - simplify custom oauth - done
 // - remove bot token valid
 //
+
+const loadedKeys: string[] = [];
 
 class Twitch extends Service {
   // tmi = new Chat();
@@ -123,9 +126,17 @@ class Twitch extends Service {
     }
   }
 
+  @onLoad(['broadcasterRefreshToken', 'botRefreshToken', 'tokenService', 'tokenServiceCustomClientId', 'tokenServiceCustomClientSecret'])
   @onChange(['broadcasterRefreshToken', 'botRefreshToken', 'tokenService', 'tokenServiceCustomClientId', 'tokenServiceCustomClientSecret'])
-  async onChangeRefreshTokens() {
+  async onChangeRefreshTokens(key: string) {
+    loadedKeys.push(key);
+    if (loadedKeys.length < 5) {
+      return;
+    } else {
+      loadedKeys.length = 5;
+    }
     let clientId;
+
     switch (this.tokenService) {
       case 'SogeBot Token Generator':
         clientId = 't8cney2xkc7j4cu6zpv9ijfa27w027';
@@ -152,6 +163,8 @@ class Twitch extends Service {
       this.botId = userId;
       this.botUsername = tokenInfo.userName ?? '';
       this.botCurrentScopes = tokenInfo.scopes;
+      this.botTokenValid = true;
+      info(`TWITCH: Bot token initialized OK for ${this.botUsername}#${this.botId} with scopes: ${this.botCurrentScopes.join(', ')}`);
     }
     if (this.broadcasterRefreshToken.length > 0) {
       const userId = await this.authProvider.addUserForToken({
@@ -165,12 +178,17 @@ class Twitch extends Service {
       this.broadcasterId = userId;
       this.broadcasterUsername = tokenInfo.userName ?? '';
       this.broadcasterCurrentScopes = tokenInfo.scopes;
+      this.broadcasterTokenValid = true;
       await updateBroadcasterType();
+      info(`TWITCH: Broadcaster token initialized OK for ${this.broadcasterUsername}#${this.broadcasterId} (type: ${this.broadcasterType}) with scopes: ${this.broadcasterCurrentScopes.join(', ')}`);
     }
   }
 
   constructor() {
     super();
+
+    init(); // start up intervals for api
+
     this.botTokenValid = false;
     this.broadcasterTokenValid = false;
 
@@ -449,7 +467,7 @@ class Twitch extends Service {
     let lastFollowAgo = '';
     let lastFollowUsername = 'n/a';
     if (events.length > 0) {
-      lastFollowUsername = await users.getNameById(events[0].userId);
+      lastFollowUsername = await getNameById(events[0].userId);
       lastFollowAgo = dayjs(events[0].timestamp).fromNow();
     }
 
@@ -483,7 +501,7 @@ class Twitch extends Service {
     let lastSubAgo = '';
     let lastSubUsername = 'n/a';
     if (events.length > 0) {
-      lastSubUsername = await users.getNameById(events[0].userId);
+      lastSubUsername = await getNameById(events[0].userId);
       lastSubAgo = dayjs(events[0].timestamp).fromNow();
     }
 

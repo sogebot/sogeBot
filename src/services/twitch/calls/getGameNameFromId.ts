@@ -1,11 +1,10 @@
 import { CacheGames } from '@entity/cacheGames';
+
 import { AppDataSource } from '~/database';
-
-import client from '../api/client';
-
 import { stats } from '~/helpers/api';
 import { debug, isDebugEnabled, warning } from '~/helpers/log';
 import { setImmediateAwait } from '~/helpers/setImmediateAwait';
+import twitch from '~/services/twitch';
 
 async function getGameNameFromId (id: number): Promise<string> {
   if (isDebugEnabled('api.calls')) {
@@ -23,8 +22,7 @@ async function getGameNameFromId (id: number): Promise<string> {
   }
 
   try {
-    const clientBot = await client('bot');
-    const getGameById = await clientBot.games.getGameById(String(id));
+    const getGameById = await twitch.apiClient?.asIntent(['bot'], ctx => ctx.games.getGameById(String(id)));
     if (!getGameById) {
       throw new Error(`Couldn't find name of game for gid ${id} - fallback to ${stats.value.currentGame}`);
     }

@@ -48,13 +48,13 @@ class Media extends Overlay {
       if (object.type === 'clip') {
       // load clip from api
         if (!isNil(object.id)) {
-          const clip = await twitch.apiClient?.clips.getClipById(object.id);
+          const clip = await twitch.apiClient?.asIntent(['bot'], ctx => ctx.clips.getClipById(object.id));
           if (!clip) {
             continue;
           }
           object.url = clip.thumbnailUrl.replace('-preview-480x272.jpg', '.mp4');
         } else if (!isNil(object.url)) {
-          const clip = await twitch.apiClient?.clips.getClipById(object.url.split('/').pop() as string);
+          const clip = await twitch.apiClient?.asIntent(['bot'], ctx => ctx.clips.getClipById(object.url.split('/').pop() as string));
           if (!clip) {
             continue;
           }

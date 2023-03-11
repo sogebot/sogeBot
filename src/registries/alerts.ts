@@ -36,7 +36,7 @@ const fetchUserForAlert = (opts: EmitData, type: 'recipient' | 'name'): Promise<
     if (value && value.length > 0) {
       Promise.all([
         AppDataSource.getRepository(User).findOneBy({ userName: value }),
-        twitch.apiClient?.users.getUserByName(value),
+        twitch.apiClient?.asIntent(['bot'], ctx => ctx.users.getUserByName(value)),
       ]).then(async ([user_db, response]) => {
         if (response) {
           changelog.update(response.id, {
@@ -50,7 +50,7 @@ const fetchUserForAlert = (opts: EmitData, type: 'recipient' | 'name'): Promise<
         if (id) {
           if (opts.event === 'promo') {
             const user = await changelog.get(id);
-            const channel = await twitch.apiClient?.channels.getChannelInfoById(id);
+            const channel = await await twitch.apiClient?.asIntent(['bot'], ctx => ctx.channels.getChannelInfoById(id));
             if (user && channel) {
               resolve({
                 ...user,

@@ -1,16 +1,15 @@
 import { shuffle } from '@sogebot/ui-helpers/array';
 import { DAY } from '@sogebot/ui-helpers/constants';
-import { HelixClip } from '@twurple/api';
+import { HelixClip } from '@twurple/api/lib';
 
-import client from '../api/client';
-import { refresh } from '../token/refresh.js';
 import { getGameNameFromId } from './getGameNameFromId';
 
 import { streamStatusChangeSince } from '~/helpers/api';
 import { getFunctionName } from '~/helpers/getFunctionName';
 import { debug, error, isDebugEnabled, warning } from '~/helpers/log';
-import { variables } from '~/watchers';
 import { setImmediateAwait } from '~/helpers/setImmediateAwait';
+import twitch from '~/services/twitch';
+import { variables } from '~/watchers';
 
 export async function getTopClips (opts: any): Promise<(Partial<HelixClip> & { mp4: string; game: string | null })[]> {
   if (isDebugEnabled('api.calls')) {
@@ -25,12 +24,11 @@ export async function getTopClips (opts: any): Promise<(Partial<HelixClip> & { m
       endDate: (new Date()).toISOString(),
     };
 
-    const clientBot = await client('bot');
-    const getClipsForBroadcaster = await clientBot.clips.getClipsForBroadcasterPaginated(broadcasterId, { ...period }).getAll();
+    const getClipsForBroadcaster = await twitch.apiClient?.asIntent(['bot'], ctx => ctx.clips.getClipsForBroadcasterPaginated(broadcasterId, { ...period }).getAll());
 
     // get mp4 from thumbnail
     const clips: (Partial<HelixClip> & { mp4: string; game: string | null })[] = [];
-    for (const c of getClipsForBroadcaster) {
+    for (const c of getClipsForBroadcaster ?? []) {
       clips.push({
         ...c,
         mp4:  c.thumbnailUrl.replace('-preview-480x272.jpg', '.mp4'),
@@ -44,10 +42,6 @@ export async function getTopClips (opts: any): Promise<(Partial<HelixClip> & { m
         warning(`${getFunctionName()} => Connection to Twitch timed out. Will retry request.`);
         await setImmediateAwait();
         return getTopClips(opts);
-      }
-      if (e.message.includes('Invalid OAuth token')) {
-        warning(`${getFunctionName()} => Invalid OAuth token - attempting to refresh token`);
-        await refresh('bot');
       } else {
         error(`${getFunctionName()} => ${e.stack ?? e.message}`);
       }

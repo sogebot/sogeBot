@@ -5,7 +5,7 @@ import twitch from '~/services/twitch';
 
 class Clips extends Overlay {
   async showClip (clipId: string) {
-    const getClipById = await twitch.apiClient?.clips.getClipById(clipId);
+    const getClipById = await twitch.apiClient?.asIntent(['bot'], ctx => ctx.clips.getClipById(clipId));
 
     if (getClipById) {
       ioServer?.of('/' + this._name + '/' + this.__moduleName__.toLowerCase())

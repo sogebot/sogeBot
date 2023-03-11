@@ -5,12 +5,12 @@ import * as _ from 'lodash';
 import { Brackets } from 'typeorm';
 
 import Overlay from './_interface';
-import users from '../users';
 import eventlist from '../widgets/eventlist';
 
 import { AppDataSource } from '~/database';
 import { warning } from '~/helpers/log';
 import { adminEndpoint, publicEndpoint } from '~/helpers/socket';
+import getNameById from '~/helpers/user/getNameById';
 import { isBotId } from '~/helpers/user/isBot';
 import twitch from '~/services/twitch';
 
@@ -31,11 +31,11 @@ class EventList extends Overlay {
         const values = JSON.parse(event.values_json);
         if (values.fromId && values.fromId != '0') {
           if (!mapping.has(values.fromId)) {
-            mapping.set(values.fromId, await users.getNameById(values.fromId));
+            mapping.set(values.fromId, await getNameById(values.fromId));
           }
         }
         if (!mapping.has(event.userId)) {
-          mapping.set(event.userId, await users.getNameById(event.userId));
+          mapping.set(event.userId, await getNameById(event.userId));
         }
       }
       cb(null, events.map(event => {
@@ -77,11 +77,11 @@ class EventList extends Overlay {
           const values = JSON.parse(event.values_json);
           if (values.from && values.from != '0') {
             if (!mapping.has(values.from)) {
-              mapping.set(values.from, await users.getNameById(values.from));
+              mapping.set(values.from, await getNameById(values.from));
             }
           }
           if (!mapping.has(event.userId)) {
-            mapping.set(event.userId, await users.getNameById(event.userId));
+            mapping.set(event.userId, await getNameById(event.userId));
           }
         } catch (e) {
           if (e instanceof Error) {
@@ -116,7 +116,7 @@ class EventList extends Overlay {
     } // don't save event from a bot
 
     if (!data.userId.includes('__anonymous__')) {
-      users.getNameById(data.userId).then((username) => {
+      getNameById(data.userId).then((username) => {
         let description = username;
         if (data.event === 'tip') {
           description = `${data.amount} ${data.currency}`;

@@ -1,10 +1,9 @@
 import { CacheGames } from '@entity/cacheGames';
+
 import { AppDataSource } from '~/database';
-
-import client from '../api/client';
-
 import { debug, isDebugEnabled, warning } from '~/helpers/log';
 import { setImmediateAwait } from '~/helpers/setImmediateAwait';
+import twitch from '~/services/twitch';
 
 async function getGameThumbnailFromName (name: string): Promise<string | undefined> {
   if (isDebugEnabled('api.calls')) {
@@ -17,8 +16,7 @@ async function getGameThumbnailFromName (name: string): Promise<string | undefin
   }
 
   try {
-    const clientBot = await client('bot');
-    const getGameByName = await clientBot.games.getGameByName(name);
+    const getGameByName = await twitch.apiClient?.asIntent(['bot'], ctx => ctx.games.getGameByName(name));
     if (!getGameByName) {
       return undefined;
     }

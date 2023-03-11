@@ -1,15 +1,13 @@
 import { In, Not } from 'typeorm';
+
 import { AppDataSource } from '~/database';
-
-import client from '../api/client';
-import { refresh } from '../token/refresh.js';
-
 import { User } from '~/database/entity/user';
 import { getFunctionName } from '~/helpers/getFunctionName';
 import { debug, error, isDebugEnabled, warning } from '~/helpers/log';
 import { addUIError } from '~/helpers/panel/index';
 import { setStatus } from '~/helpers/parser';
 import * as changelog from '~/helpers/user/changelog.js';
+import twitch from '~/services/twitch';
 import { variables } from '~/watchers';
 
 export async function getModerators(opts: { isWarned: boolean }) {
@@ -30,8 +28,10 @@ export async function getModerators(opts: { isWarned: boolean }) {
       return { state: false, opts };
     }
 
-    const clientBroadcaster = await client('broadcaster');
-    const getModeratorsPaginated = await clientBroadcaster.moderation.getModeratorsPaginated(broadcasterId).getAll();
+    const getModeratorsPaginated = await twitch.apiClient?.moderation.getModeratorsPaginated(broadcasterId).getAll();
+    if (!getModeratorsPaginated) {
+      return { state: false };
+    }
 
     await changelog.flush();
     await AppDataSource.getRepository(User).update({ userId: Not(In(getModeratorsPaginated.map(o => o.userId))) }, { isModerator: false });
@@ -43,10 +43,6 @@ export async function getModerators(opts: { isWarned: boolean }) {
       if (e.message.includes('ETIMEDOUT')) {
         warning(`${getFunctionName()} => Connection to Twitch timed out. Will retry request.`);
         return { state: false }; // ignore etimedout error
-      }
-      if (e.message.includes('Invalid OAuth token')) {
-        warning(`${getFunctionName()} => Invalid OAuth token - attempting to refresh token`);
-        await refresh('broadcaster');
       } else {
         error(`${getFunctionName()} => ${e.stack ?? e.message}`);
       }

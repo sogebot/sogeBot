@@ -2,11 +2,10 @@
 
 import * as _ from 'lodash';
 
+import System from './_interface';
 import {
   command, default_permission, helper,
 } from '../decorators';
-import client from '../services/twitch/api/client';
-import System from './_interface';
 
 import { getOwnerAsSender } from '~/helpers/commons';
 import { eventEmitter } from '~/helpers/events';
@@ -14,6 +13,7 @@ import { error, warning } from '~/helpers/log';
 import { addUIError } from '~/helpers/panel/alerts';
 import defaultPermissions from '~/helpers/permissions/defaultPermissions';
 import { adminEndpoint } from '~/helpers/socket';
+import twitch from '~/services/twitch';
 import { variables } from '~/watchers';
 
 /*
@@ -68,8 +68,7 @@ class Commercial extends System {
       }
 
       try {
-        const clientBroadcaster = await client('broadcaster');
-        await clientBroadcaster.channels.startChannelCommercial(broadcasterId, commercial.duration as 30 | 60 | 90 | 120 | 150 | 180);
+        await twitch.apiClient?.asIntent(['broadcaster'], ctx => ctx.channels.startChannelCommercial(broadcasterId, commercial.duration as 30 | 60 | 90 | 120 | 150 | 180));
         eventEmitter.emit('commercial', { duration: commercial.duration ?? 30 });
         if (!_.isNil(commercial.message)) {
           return [{ response: commercial.message, ...opts }];

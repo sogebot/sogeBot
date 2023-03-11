@@ -140,7 +140,7 @@ class UserInfo extends System {
     if (!user || !user.createdAt) {
       try {
 
-        const getUserByName = await twitch.apiClient?.users.getUserByName(userName);
+        const getUserByName = await twitch.apiClient?.asIntent(['bot'], ctx => ctx.users.getUserByName(userName));
         if (getUserByName) {
           changelog.update(getUserByName.id, { userName, createdAt: new Date(getUserByName.creationDate).toISOString() });
         }

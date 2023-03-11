@@ -31,12 +31,12 @@ const stream: ResponseFilter = {
     channel = channel.replace('@', '');
 
     try {
-      const getUserByName = await twitch.apiClient?.users.getUserByName(channel);
+      const getUserByName = await twitch.apiClient?.asIntent(['bot'], ctx => ctx.users.getUserByName(channel));
       if (!getUserByName) {
         throw new Error();
       }
 
-      const getChannelInfo = await twitch.apiClient?.channels.getChannelInfoById(getUserByName.id);
+      const getChannelInfo = await twitch.apiClient?.asIntent(['bot'], ctx => ctx.channels.getChannelInfoById(getUserByName.id));
       if (!getChannelInfo) {
         throw new Error();
       }
@@ -56,12 +56,12 @@ const stream: ResponseFilter = {
     channel = channel.replace('@', '');
 
     try {
-      const getUserByName = await twitch.apiClient?.users.getUserByName(channel);
+      const getUserByName = await twitch.apiClient?.asIntent(['bot'], ctx => ctx.users.getUserByName(channel));
       if (!getUserByName) {
         throw new Error();
       }
 
-      const getChannelInfo = await twitch.apiClient?.channels.getChannelInfoById(getUserByName.id);
+      const getChannelInfo = await twitch.apiClient?.asIntent(['bot'], ctx => ctx.channels.getChannelInfoById(getUserByName.id));
       if (!getChannelInfo) {
         throw new Error();
       }
@@ -81,7 +81,7 @@ const stream: ResponseFilter = {
     channel = channel.replace('@', '');
 
     try {
-      const getStreams = await twitch.apiClient?.streams.getStreams({ userName: channel });
+      const getStreams = await twitch.apiClient?.asIntent(['bot'], ctx => ctx.streams.getStreams({ userName: channel }));
       if (!getStreams) {
         throw new Error();
       }
@@ -101,7 +101,7 @@ const stream: ResponseFilter = {
     channel = channel.replace('@', '');
 
     try {
-      const getStreams = await twitch.apiClient?.streams.getStreams({ userName: channel });
+      const getStreams = await twitch.apiClient?.asIntent(['bot'], ctx => ctx.streams.getStreams({ userName: channel }));
       if (!getStreams) {
         throw new Error();
       }

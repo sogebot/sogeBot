@@ -1,7 +1,5 @@
 import { dayjs } from '@sogebot/ui-helpers/dayjsHelper';
 
-import { refresh } from '../token/refresh.js';
-
 import { isStreamOnline, setCurrentRetries, streamId, streamStatusChangeSince, streamType } from '~/helpers/api';
 import {
   stats as apiStats, chatMessagesAtStart,
@@ -11,7 +9,7 @@ import { eventEmitter } from '~/helpers/events';
 import { getFunctionName } from '~/helpers/getFunctionName.js';
 import { debug, error, isDebugEnabled, warning } from '~/helpers/log';
 import { linesParsed } from '~/helpers/parser';
-import client from '~/services/twitch/api/client';
+import twitch from '~/services/twitch';
 import stats from '~/stats';
 import { variables } from '~/watchers';
 
@@ -22,8 +20,7 @@ export async function getCurrentStream (opts: any) {
   const cid = variables.get('services.twitch.broadcasterId') as string;
 
   try {
-    const clientBot = await client('bot');
-    const getStreamByUserId = await clientBot.streams.getStreamByUserId(cid);
+    const getStreamByUserId = await twitch.apiClient?.asIntent(['bot'], ctx => ctx.streams.getStreamByUserId(cid));
     debug('api.stream', 'API: ' + JSON.stringify({ getStreamByUserId }));
 
     if (getStreamByUserId) {
@@ -70,10 +67,6 @@ export async function getCurrentStream (opts: any) {
       if (e.message.includes('ETIMEDOUT')) {
         warning(`${getFunctionName()} => Connection to Twitch timed out. Will retry request.`);
         return { state: false, opts }; // ignore etimedout error
-      }
-      if (e.message.includes('Invalid OAuth token')) {
-        warning(`${getFunctionName()} => Invalid OAuth token - attempting to refresh token`);
-        await refresh('bot');
       } else {
         error(`${getFunctionName()} => ${e.stack ?? e.message}`);
       }

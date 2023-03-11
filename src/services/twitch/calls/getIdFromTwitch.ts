@@ -1,16 +1,13 @@
-import client from '../api/client';
-import { refresh } from '../token/refresh.js';
-
 import { debug, error, isDebugEnabled, warning } from '~/helpers/log';
 import { setImmediateAwait } from '~/helpers/setImmediateAwait';
+import twitch from '~/services/twitch';
 
 async function getIdFromTwitch (userName: string): Promise<string> {
   if (isDebugEnabled('api.calls')) {
     debug('api.calls', new Error().stack);
   }
   try {
-    const clientBot = await client('bot');
-    const getUserByName = await clientBot.users.getUserByName(userName);
+    const getUserByName = await twitch.apiClient?.asIntent(['bot'], ctx => ctx.users.getUserByName(userName));
     if (getUserByName) {
       return getUserByName.id;
     } else {
@@ -22,10 +19,6 @@ async function getIdFromTwitch (userName: string): Promise<string> {
         warning(`getIdFromTwitch => Connection to Twitch timed out. Will retry request.`);
         await setImmediateAwait();
         return getIdFromTwitch(userName);
-      }
-      if (e.message.includes('Invalid OAuth token')) {
-        warning(`getIdFromTwitch => Invalid OAuth token - attempting to refresh token`);
-        await refresh('bot');
       } else if(e.message.includes('not found on Twitch')) {
         warning(`${e.message}`);
       } else {

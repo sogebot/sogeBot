@@ -7,12 +7,12 @@ import { Between } from 'typeorm';
 
 import Widget from './_interface';
 import alerts from '../registries/alerts';
-import users from '../users';
 
 import { AppDataSource } from '~/database';
 import { error } from '~/helpers/log';
 import { adminEndpoint } from '~/helpers/socket';
 import { translate } from '~/translate';
+import getNameById from '~/helpers/user/getNameById';
 
 class EventList extends Widget {
   public sockets() {
@@ -46,7 +46,7 @@ class EventList extends Widget {
           case 'sub':
             alerts.trigger({
               event:      event.event,
-              name:       await users.getNameById(event.userId),
+              name:       await getNameById(event.userId),
               amount:     0,
               tier:       String(values.tier) as EmitData['tier'],
               currency:   '',
@@ -57,7 +57,7 @@ class EventList extends Widget {
           case 'raid':
             alerts.trigger({
               event:      event.event,
-              name:       await users.getNameById(event.userId),
+              name:       await getNameById(event.userId),
               amount:     Number(values.viewers),
               tier:       null,
               currency:   '',
@@ -68,7 +68,7 @@ class EventList extends Widget {
           case 'resub':
             alerts.trigger({
               event:      event.event,
-              name:       await users.getNameById(event.userId),
+              name:       await getNameById(event.userId),
               amount:     Number(values.subCumulativeMonths),
               tier:       String(values.tier) as EmitData['tier'],
               currency:   '',
@@ -79,7 +79,7 @@ class EventList extends Widget {
           case 'subgift':
             alerts.trigger({
               event:      event.event,
-              name:       await users.getNameById(event.userId),
+              name:       await getNameById(event.userId),
               amount:     Number(values.count),
               tier:       null,
               currency:   '',
@@ -90,7 +90,7 @@ class EventList extends Widget {
           case 'cheer':
             alerts.trigger({
               event:      event.event,
-              name:       await users.getNameById(event.userId),
+              name:       await getNameById(event.userId),
               amount:     Number(values.bits),
               tier:       null,
               currency:   '',
@@ -101,7 +101,7 @@ class EventList extends Widget {
           case 'tip':
             alerts.trigger({
               event:      event.event,
-              name:       await users.getNameById(event.userId),
+              name:       await getNameById(event.userId),
               amount:     Number(values.amount),
               tier:       null,
               currency:   values.currency,
@@ -119,7 +119,7 @@ class EventList extends Widget {
               currency:   '',
               monthsName: '',
               message:    values.message,
-              recipient:  await users.getNameById(event.userId),
+              recipient:  await getNameById(event.userId),
             });
             break;
           default:
@@ -151,7 +151,7 @@ class EventList extends Widget {
         if (values.fromId && values.fromId != '0') {
           if (!mapping.has(values.fromId)) {
             try {
-              mapping.set(values.fromId, await users.getNameById(values.fromId));
+              mapping.set(values.fromId, await getNameById(values.fromId));
             } catch {
               event.isHidden = true; // hide event if user is unknown
               await AppDataSource.getRepository(EventListDB).save(event);
@@ -161,7 +161,7 @@ class EventList extends Widget {
         if (!event.userId.includes('__anonymous__')) {
           if (!mapping.has(event.userId)) {
             try {
-              mapping.set(event.userId, await users.getNameById(event.userId));
+              mapping.set(event.userId, await getNameById(event.userId));
             } catch {
               event.isHidden = true; // hide event if user is unknown
               await AppDataSource.getRepository(EventListDB).save(event);

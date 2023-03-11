@@ -162,9 +162,12 @@ class Emotes extends Core {
             info(`EMOTES: Fetching channel ${broadcasterId} emotes`);
           }
           const emotes = await twitch.apiClient?.asIntent(['broadcaster'], ctx => ctx.callApi<any>({ url: `chat/emotes?broadcaster_id=${broadcasterId}`, type: 'helix' }));
+          if (!emotes) {
+            throw new Error('Cannot initialize Twitch API');
+          }
           this.lastSubscriberEmoteChk = Date.now();
           this.cache = this.cache.filter(o => o.type !== 'twitch-sub');
-          for (const emote of (emotes.data || [])) {
+          for (const emote of emotes.data) {
             debug('emotes.channel', `Saving to cache ${emote.name}#${emote.id}`);
             const template = emotes.template
               .replace('{{id}}', emote.id)
@@ -211,7 +214,7 @@ class Emotes extends Core {
           info('EMOTES: Fetching global emotes');
         }
 
-        const emotes = await twitch.apiClient?.chat.getGlobalEmotes();
+        const emotes = await twitch.apiClient?.asIntent(['bot'], ctx => ctx.chat.getGlobalEmotes());
         this.lastGlobalEmoteChk = Date.now();
         this.cache = this.cache.filter(o => o.type !== 'twitch');
         for (const emote of emotes ?? []) {

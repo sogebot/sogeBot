@@ -8,9 +8,9 @@ import emojiRegex from 'emoji-regex';
 import * as _ from 'lodash';
 import tlds from 'tlds';
 import { LessThan } from 'typeorm';
-import { AppDataSource } from '~/database';
 import XRegExp from 'xregexp';
 
+import System from './_interface';
 import { parserReply } from '../commons';
 import {
   command, default_permission, parser, permission_settings, settings, ui,
@@ -19,8 +19,8 @@ import Expects from '../expects';
 import spotify from '../integrations/spotify';
 import Message from '../message';
 import users from '../users';
-import System from './_interface';
 
+import { AppDataSource } from '~/database';
 import { prepare } from '~/helpers/commons';
 import {
   error, timeout as timeoutLog, warning as warningLog,
@@ -28,14 +28,16 @@ import {
 import { ParameterError } from '~/helpers/parameterError';
 import defaultPermissions from '~/helpers/permissions/defaultPermissions';
 import { getUserHighestPermission } from '~/helpers/permissions/getUserHighestPermission';
+import { getUserPermissionsList } from '~/helpers/permissions/getUserPermissionsList';
 import { adminEndpoint } from '~/helpers/socket';
 import { tmiEmitter } from '~/helpers/tmi';
+import getBotId from '~/helpers/user/getBotId';
+import getBroadcasterId from '~/helpers/user/getBroadcasterId';
 import { isModerator } from '~/helpers/user/isModerator';
 import twitch from '~/services/twitch';
 import aliasSystem from '~/systems/alias';
 import songs from '~/systems/songs';
 import { translate } from '~/translate';
-import { getUserPermissionsList } from '~/helpers/permissions/getUserPermissionsList';
 
 const urlRegex = [
   new RegExp(`(www)? ??\\.? ?[a-zA-Z0-9]+([a-zA-Z0-9-]+) ??\\. ?(${tlds.join('|')})(?=\\P{L}|$)`, 'igu'),
@@ -342,7 +344,7 @@ class Moderation extends System {
     } else {
       warningLog('AUTOBAN: No message of user found, user will be just banned.');
     }
-    twitch.tmi?.ban(username);
+    await twitch.apiClient?.asIntent(['bot'], ctx => ctx.moderation.banUser(getBroadcasterId(), getBotId(), { user: { id: opts.sender.userId }, reason: 'AUTOBAN: Message of user found in message list. Banning user.' }));
     return [];
   }
 
@@ -362,7 +364,7 @@ class Moderation extends System {
       warningLog('AUTOBAN: Message of user found in message list. Banning user.');
 
       if (opts.sender) {
-        twitch.tmi?.ban(opts.sender.userName);
+        await twitch.apiClient?.asIntent(['bot'], ctx => ctx.moderation.banUser(getBroadcasterId(), getBotId(), { user: { id: opts.sender!.userId }, reason: 'AUTOBAN: Message of user found in message list. Banning user.' }));
       }
       return false;
     }

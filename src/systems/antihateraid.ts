@@ -1,14 +1,13 @@
 'use strict';
 
+import System from './_interface';
 import {
   command, default_permission, settings,
 } from '../decorators';
-import System from './_interface';
 
 import { prepare } from '~/helpers/commons';
 import defaultPermissions from '~/helpers/permissions/defaultPermissions';
 import twitch from '~/services/twitch';
-import client from '~/services/twitch/api/client';
 import { variables } from '~/watchers';
 
 enum modes {
@@ -29,27 +28,24 @@ class AntiHateRaid extends System {
   @default_permission(defaultPermissions.MODERATORS)
   async antihateraidon (opts: CommandOptions): Promise<CommandResponse[]> {
     const broadcasterId = variables.get('services.twitch.broadcasterId') as string;
-    const apiClient = await client('broadcaster');
 
-    if (twitch.tmi?.client.bot) {
-      if(this.clearChat) {
-        apiClient.moderation.deleteChatMessages(broadcasterId, broadcasterId);
-      }
-      if (this.mode === modes.SUBSONLY) {
-        apiClient.chat.updateSettings(broadcasterId, broadcasterId, {
-          subscriberOnlyModeEnabled: true,
-        });
-      }
-      if (this.mode === modes.FOLLOWONLY) {
-        apiClient.chat.updateSettings(broadcasterId, broadcasterId, {
-          followerOnlyModeEnabled: true,
-        });
-      }
-      if (this.mode === modes.EMOTESONLY) {
-        apiClient.chat.updateSettings(broadcasterId, broadcasterId, {
-          emoteOnlyModeEnabled: true,
-        });
-      }
+    if(this.clearChat) {
+      twitch.apiClient?.asIntent(['broadcaster'], ctx => ctx.moderation.deleteChatMessages(broadcasterId, broadcasterId));
+    }
+    if (this.mode === modes.SUBSONLY) {
+      twitch.apiClient?.asIntent(['broadcaster'], ctx => ctx.chat.updateSettings(broadcasterId, broadcasterId, {
+        subscriberOnlyModeEnabled: true,
+      }));
+    }
+    if (this.mode === modes.FOLLOWONLY) {
+      twitch.apiClient?.asIntent(['broadcaster'], ctx => ctx.chat.updateSettings(broadcasterId, broadcasterId, {
+        followerOnlyModeEnabled: true,
+      }));
+    }
+    if (this.mode === modes.EMOTESONLY) {
+      twitch.apiClient?.asIntent(['broadcaster'], ctx => ctx.chat.updateSettings(broadcasterId, broadcasterId, {
+        emoteOnlyModeEnabled: true,
+      }));
     }
     return [{
       response: prepare(this.customAnnounce.length > 0 ? this.customAnnounce : prepare('systems.antihateraid.announce'), {
@@ -62,22 +58,21 @@ class AntiHateRaid extends System {
   @default_permission(defaultPermissions.MODERATORS)
   async antihateraidoff () {
     const broadcasterId = variables.get('services.twitch.broadcasterId') as string;
-    const apiClient = await client('broadcaster');
 
     if (this.mode === modes.SUBSONLY) {
-      apiClient.chat.updateSettings(broadcasterId, broadcasterId, {
+      twitch.apiClient?.asIntent(['broadcaster'], ctx => ctx.chat.updateSettings(broadcasterId, broadcasterId, {
         subscriberOnlyModeEnabled: false,
-      });
+      }));
     }
     if (this.mode === modes.FOLLOWONLY) {
-      apiClient.chat.updateSettings(broadcasterId, broadcasterId, {
+      twitch.apiClient?.asIntent(['broadcaster'], ctx => ctx.chat.updateSettings(broadcasterId, broadcasterId, {
         followerOnlyModeEnabled: false,
-      });
+      }));
     }
     if (this.mode === modes.EMOTESONLY) {
-      apiClient.chat.updateSettings(broadcasterId, broadcasterId, {
+      twitch.apiClient?.asIntent(['broadcaster'], ctx => ctx.chat.updateSettings(broadcasterId, broadcasterId, {
         emoteOnlyModeEnabled: false,
-      });
+      }));
     }
     return [];
   }

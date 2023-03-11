@@ -51,9 +51,9 @@ const SQLiteDataSourceOptions = {
   logger:        new TypeORMLogger(),
   synchronize:   process.env.FORCE_DB_SYNC === 'IKnowWhatIamDoing',
   migrationsRun: true,
-  entities:      [ 'dest/database/entity/*.js' ],
-  subscribers:   [ 'dest/database/entity/*.js' ],
-  migrations:    [ `dest/database/migration/sqlite/**/*.js` ],
+  entities:      [ './dest/database/entity/*.js' ],
+  subscribers:   [ './dest/database/entity/*.js' ],
+  migrations:    [ `./dest/database/migration/sqlite/**/*.js` ],
 } satisfies DataSourceOptions;
 
 let AppDataSource: DataSource;

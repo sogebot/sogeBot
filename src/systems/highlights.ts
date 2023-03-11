@@ -4,12 +4,11 @@ import { timestampToObject } from '@sogebot/ui-helpers/getTime';
 import { Request, Response } from 'express';
 import { isNil } from 'lodash';
 
+import System from './_interface';
 import {
   command, default_permission, settings, ui,
 } from '../decorators';
-import client from '../services/twitch/api/client';
 import { createClip } from '../services/twitch/calls/createClip';
-import System from './_interface';
 
 import {
   isStreamOnline, stats, streamStatusChangeSince,
@@ -18,9 +17,10 @@ import { getBotSender } from '~/helpers/commons';
 import { error } from '~/helpers/log';
 import defaultPermissions from '~/helpers/permissions/defaultPermissions';
 import { adminEndpoint } from '~/helpers/socket';
+import getBroadcasterId from '~/helpers/user/getBroadcasterId';
+import twitch from '~/services/twitch';
 import { createMarker } from '~/services/twitch/calls/createMarker';
 import { translate } from '~/translate';
-import { variables } from '~/watchers';
 
 const ERROR_STREAM_NOT_ONLINE = '1';
 const ERROR_MISSING_TOKEN = '2';
@@ -52,8 +52,7 @@ class Highlights extends System {
       (async function getAll(callback): Promise<void> {
         const highlightsToCheck = await Highlight.find({ order: { createdAt: 'DESC' }, where: { expired: false } });
         try {
-          const clientBot = await client('bot');
-          const availableVideos = await clientBot.videos.getVideosByIds(highlightsToCheck.map(o => o.videoId));
+          const availableVideos = await twitch.apiClient?.asIntent(['bot'], ctx => ctx.videos.getVideosByIds(highlightsToCheck.map(o => o.videoId))) ?? [];
 
           for (const highlight of highlightsToCheck) {
             if (!availableVideos.find(o => o.id === highlight.videoId)) {
@@ -125,15 +124,15 @@ class Highlights extends System {
   @command('!highlight')
   @default_permission(defaultPermissions.CASTERS)
   public async main(opts: CommandOptions): Promise<CommandResponse[]> {
-    const broadcasterId = variables.get('services.twitch.broadcasterId') as string;
-
     try {
       if (!isStreamOnline.value) {
         throw Error(ERROR_STREAM_NOT_ONLINE);
       }
 
-      const clientBot = await client('bot');
-      const videos = await clientBot.videos.getVideosByUser(broadcasterId, { type: 'archive', limit: 1 });
+      const videos = await twitch.apiClient?.asIntent(['bot'], ctx => ctx.videos.getVideosByUser(getBroadcasterId(), { type: 'archive', limit: 1 }));
+      if (!videos) {
+        throw new Error('Api is not ready');
+      }
 
       const timestamp = timestampToObject(dayjs().valueOf() - dayjs(streamStatusChangeSince.value).valueOf());
       const highlight = new Highlight({

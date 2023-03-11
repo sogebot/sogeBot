@@ -1,10 +1,10 @@
 import { UserTip } from '@entity/user';
-import { AppDataSource } from '~/database';
 
-import users from '../users';
 import Stats from './_interface';
 
+import { AppDataSource } from '~/database';
 import { adminEndpoint } from '~/helpers/socket';
+import getNameById from '~/helpers/user/getNameById';
 
 class Tips extends Stats {
   constructor() {
@@ -21,7 +21,7 @@ class Tips extends Stats {
         cb(null, await Promise.all(items.map(async (item) => {
           return {
             ...item,
-            username: await users.getNameById(item.userId),
+            username: await getNameById(item.userId),
           };
         })));
       } catch (e: any) {

@@ -1,9 +1,6 @@
 import { HelixSubscription } from '@twurple/api/lib';
+
 import { AppDataSource } from '~/database';
-
-import client from '../api/client';
-import { refresh } from '../token/refresh.js';
-
 import { User } from '~/database/entity/user';
 import {
   stats as apiStats,
@@ -12,6 +9,7 @@ import { getFunctionName } from '~/helpers/getFunctionName';
 import { debug, error, isDebugEnabled, warning } from '~/helpers/log';
 import { isBotId, isBotSubscriber } from '~/helpers/user';
 import * as changelog from '~/helpers/user/changelog.js';
+import twitch from '~/services/twitch';
 import { variables } from '~/watchers';
 
 export async function getChannelSubscribers<T extends { noAffiliateOrPartnerWarningSent?: boolean; notCorrectOauthWarningSent?: boolean }> (opts: T): Promise<{ state: boolean; opts: T }> {
@@ -23,7 +21,6 @@ export async function getChannelSubscribers<T extends { noAffiliateOrPartnerWarn
   try {
     const broadcasterId = variables.get('services.twitch.broadcasterId') as string;
     const broadcasterType = variables.get('services.twitch.broadcasterType') as string;
-    const clientBroadcaster = await client('broadcaster');
 
     if (broadcasterType !== 'partner' && broadcasterType !== 'affiliate') {
       if (!opts.noAffiliateOrPartnerWarningSent) {
@@ -32,7 +29,10 @@ export async function getChannelSubscribers<T extends { noAffiliateOrPartnerWarn
       }
       return { state: false, opts: { ...opts, noAffiliateOrPartnerWarningSent: true } };
     }
-    const getSubscriptionsPaginated = await clientBroadcaster.subscriptions.getSubscriptionsPaginated(broadcasterId).getAll();
+    const getSubscriptionsPaginated = await twitch.apiClient?.asIntent(['broadcaster'], ctx => ctx.subscriptions.getSubscriptionsPaginated(broadcasterId).getAll());
+    if (!getSubscriptionsPaginated) {
+      return { state: false, opts };
+    }
     apiStats.value.currentSubscribers = getSubscriptionsPaginated.length - 1; // exclude owner
     setSubscribers(getSubscriptionsPaginated.filter(o => !isBotId(o.userId)));
     if (getSubscriptionsPaginated.find(o => isBotId(o.userId))) {
@@ -49,10 +49,6 @@ export async function getChannelSubscribers<T extends { noAffiliateOrPartnerWarn
       if (e.message.includes('ETIMEDOUT')) {
         warning(`${getFunctionName()} => Connection to Twitch timed out. Will retry request.`);
         return { state: false, opts }; // ignore etimedout error
-      }
-      if (e.message.includes('Invalid OAuth token')) {
-        warning(`${getFunctionName()} => Invalid OAuth token - attempting to refresh token`);
-        await refresh('bot');
       } else {
         error(`${getFunctionName()} => ${e.stack ?? e.message}`);
       }
