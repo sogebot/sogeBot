@@ -81,15 +81,8 @@ class Chat {
     this.emitter();
     this.authProvider = authProvider;
 
-    const start = async () => {
-      const broadcasterUsername = variables.get('services.twitch.broadcasterUsername') as string;
-
-      await this.initClient('bot');
-      await this.initClient('broadcaster');
-      await this.join('bot', broadcasterUsername);
-      await this.join('broadcaster', broadcasterUsername);
-    };
-    start();
+    this.initClient('bot');
+    this.initClient('broadcaster');
   }
 
   @onStreamStart()
