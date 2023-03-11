@@ -12,6 +12,7 @@ import { createClip } from './twitch/calls/createClip';
 import { createMarker } from './twitch/calls/createMarker';
 import { updateBroadcasterType } from './twitch/calls/updateBroadcasterType';
 import Chat from './twitch/chat';
+import EventSub from './twitch/eventsub';
 import { CustomAuthProvider } from './twitch/token/CustomAuthProvider';
 import {
   command, default_permission, example, persistent, settings,
@@ -53,7 +54,7 @@ const loadedKeys: string[] = [];
 
 class Twitch extends Service {
   tmi: Chat | null = null;
-  // eventsub = new EventSub();
+  eventsub: EventSub | null = null;
 
   authProvider: CustomAuthProvider | null = null;
   apiClient: ApiClient | null = null;
@@ -189,6 +190,10 @@ class Twitch extends Service {
 
     if (this.broadcasterTokenValid && this.botTokenValid) {
       this.tmi = new Chat(this.authProvider);
+      this.eventsub = new EventSub(this.apiClient);
+    } else {
+      this.tmi = null;
+      this.eventsub = null;
     }
   }
 
