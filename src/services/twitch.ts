@@ -11,11 +11,12 @@ import { init } from './twitch/api/interval';
 import { createClip } from './twitch/calls/createClip';
 import { createMarker } from './twitch/calls/createMarker';
 import { updateBroadcasterType } from './twitch/calls/updateBroadcasterType';
+import Chat from './twitch/chat';
 import { CustomAuthProvider } from './twitch/token/CustomAuthProvider';
 import {
   command, default_permission, example, persistent, settings,
 } from '../decorators';
-import { onChange, onLoad } from '../decorators/on';
+import { onChange, onLoad, onStreamStart } from '../decorators/on';
 import Expects from '../expects';
 import emitter from '../helpers/interfaceEmitter';
 import { error, info } from '../helpers/log';
@@ -51,7 +52,7 @@ const markerEvents = new Set<string>();
 const loadedKeys: string[] = [];
 
 class Twitch extends Service {
-  // tmi = new Chat();
+  tmi: Chat | null = null;
   // eventsub = new EventSub();
 
   authProvider: CustomAuthProvider | null = null;
@@ -129,6 +130,9 @@ class Twitch extends Service {
   @onLoad(['broadcasterRefreshToken', 'botRefreshToken', 'tokenService', 'tokenServiceCustomClientId', 'tokenServiceCustomClientSecret'])
   @onChange(['broadcasterRefreshToken', 'botRefreshToken', 'tokenService', 'tokenServiceCustomClientId', 'tokenServiceCustomClientSecret'])
   async onChangeRefreshTokens(key: string) {
+    this.botTokenValid = false;
+    this.broadcasterTokenValid = false;
+
     loadedKeys.push(key);
     if (loadedKeys.length < 5) {
       return;
@@ -181,6 +185,10 @@ class Twitch extends Service {
       this.broadcasterTokenValid = true;
       await updateBroadcasterType();
       info(`TWITCH: Broadcaster token initialized OK for ${this.broadcasterUsername}#${this.broadcasterId} (type: ${this.broadcasterType}) with scopes: ${this.broadcasterCurrentScopes.join(', ')}`);
+    }
+
+    if (this.broadcasterTokenValid && this.botTokenValid) {
+      this.tmi = new Chat(this.authProvider);
     }
   }
 
@@ -239,51 +247,18 @@ class Twitch extends Service {
     }
   }
 
-  /*
   @onChange('broadcasterUsername')
   public async onChangeBroadcasterUsername(key: string, value: any) {
     if (!this.generalOwners.includes(value)) {
       this.generalOwners.push(value);
-    }
-    this.tmi?.part('bot').then(() => this.tmi?.join('bot', value));
-    this.tmi?.part('broadcaster').then(() => this.tmi?.join('broadcaster', value));
-  }
-  */
-
-  /*
-  @onChange(['botTokenValid'])
-  onBotTokenValidChange() {
-    if (this.botTokenValid) {
-      if (this.tmi) {
-        this.tmi.initClient('bot');
-      } else {
-        setTimeout(() => this.onBotTokenValidChange(), 1000);
-      }
-    }
-  }
-
-  @onChange(['broadcasterTokenValid'])
-  onBroadcasterTokenValidChange() {
-    this.eventsub = null;
-    if (this.broadcasterTokenValid) {
-      if (this.tmi) {
-        this.tmi.initClient('broadcaster');
-        this.eventsub = new EventSub();
-      } else {
-        setTimeout(() => this.onBroadcasterTokenValidChange(), 1000);
-      }
     }
   }
 
   @onStreamStart()
   reconnectOnStreamStart() {
     this.uptime = 0;
-    if (this.enabled) {
-      this.tmi?.part('bot').then(() => this.tmi?.join('bot', this.broadcasterUsername));
-      this.tmi?.part('broadcaster').then(() => this.tmi?.join('broadcaster', this.broadcasterUsername));
-    }
   }
-*/
+
   @onChange('showWithAt')
   @onLoad('showWithAt')
   setShowWithAt() {
