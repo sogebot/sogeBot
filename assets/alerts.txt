@@ -1,15 +1,14 @@
-<!-- whole alert is wrapped in display: flex -->
-<!-- we are using refs: image, text to ensure animations trigger -->
+<!-- whole alert is wrapped in position: absolute -->
+<!-- users needs to handle animations, timings, themselves,
+     only timing controlled is alert duration -->
 <!-- available variables are {messageTemplate}, {name}, {amount}, {monthsName}, {currency}, {recipient} -->
-<!-- available higlighted variables are {name:highlight}, {amount:highlight}, {monthsName:highlight}, {currency:highlight}, {recipient:highlight} -->
+<!-- image link (for promo as well) is in {image} variable -->
 
-<!-- wrap is needed for CSS to not interfere with each other -->
+<!-- *IMPORTANT* wrap is needed for CSS to not interfere with each other -->
 <div id="wrap">
-  <img ref="image"/>
+  <img src="{image}"/>
 
-  <div ref="text">
-    <!-- {messageTemplate} will be replaced with your message template -->
-    <!-- for example : {name} is now following! or {name} donated {amount} -->
-    <div>{messageTemplate}</div>
-  </div>
+  <!-- {messageTemplate} will be replaced with your message template -->
+  <!-- for example : {name} is now following! or {name} donated {amount} -->
+  <div>{messageTemplate}</div>
 </div>
