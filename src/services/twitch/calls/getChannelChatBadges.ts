@@ -1,10 +1,8 @@
 import { HelixChatBadgeSet } from '@twurple/api/lib';
 
-import client from '../api/client';
-import { refresh } from '../token/refresh.js';
-
 import { getFunctionName } from '~/helpers/getFunctionName';
 import { debug, error, isDebugEnabled, warning } from '~/helpers/log';
+import twitch from '~/services/twitch';
 import { variables } from '~/watchers';
 
 export let badgesCache: HelixChatBadgeSet[] = [];
@@ -15,21 +13,19 @@ export async function getChannelChatBadges() {
   }
   try {
     const broadcasterId = variables.get('services.twitch.broadcasterId') as string;
-    const clientBroadcaster = await client('broadcaster');
+    if (!twitch.apiClient) {
+      return { state: false };
+    }
 
     badgesCache = [
-      ...await clientBroadcaster.chat.getChannelBadges(broadcasterId),
-      ...await clientBroadcaster.chat.getGlobalBadges(),
+      ...await twitch.apiClient.asIntent(['broadcaster'], ctx => ctx.chat.getChannelBadges(broadcasterId)),
+      ...await twitch.apiClient.asIntent(['broadcaster'], ctx => ctx.chat.getGlobalBadges()),
     ];
   } catch (e) {
     if (e instanceof Error) {
       if (e.message.includes('ETIMEDOUT')) {
         warning(`${getFunctionName()} => Connection to Twitch timed out. Will retry request.`);
         return { state: false }; // ignore etimedout error
-      }
-      if (e.message.includes('Invalid OAuth token')) {
-        warning(`${getFunctionName()} => Invalid OAuth token - attempting to refresh token`);
-        await refresh('broadcaster');
       } else {
         error(`${getFunctionName()} => ${e.stack ?? e.message}`);
       }

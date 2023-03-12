@@ -14,5 +14,6 @@ export function getUserSender(userId: string, username: string): Omit<ChatUser, 
     color:         '#000000',
     userType:      'empty',
     badgeInfo:     new Map(),
+    isArtist:      false,
   };
 }

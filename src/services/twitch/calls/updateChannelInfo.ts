@@ -1,28 +1,22 @@
 import { error } from 'console';
 
+import { defaults, isNil } from 'lodash';
+
+import { getChannelInformation } from './getChannelInformation';
+import { getGameIdFromName } from './getGameIdFromName';
+
 import {
   gameCache, gameOrTitleChangedManually, rawStatus, stats, tagsCache,
 } from '~/helpers/api';
-
-import { defaults, isNil } from 'lodash';
-
 import { parseTitle } from '~/helpers/api/parseTitle';
 import { eventEmitter } from '~/helpers/events/emitter';
 import { getFunctionName } from '~/helpers/getFunctionName';
 import { debug, isDebugEnabled, warning } from '~/helpers/log';
 import { addUIError } from '~/helpers/panel/index';
 import { setImmediateAwait } from '~/helpers/setImmediateAwait';
-
-import { getChannelInformation } from './getChannelInformation';
-import { getGameIdFromName } from './getGameIdFromName';
-
+import twitch from '~/services/twitch';
 import { translate } from '~/translate';
-
-import client from '../api/client';
-
 import { variables } from '~/watchers';
-
-import { refresh } from '../token/refresh.js';
 
 async function updateChannelInfo (args: { title?: string | null; game?: string | null, tags?: string[] }): Promise<{ response: string; status: boolean } | null> {
   if (isDebugEnabled('api.calls')) {
@@ -42,9 +36,9 @@ async function updateChannelInfo (args: { title?: string | null; game?: string |
     return { response: '', status: false };
   }
 
-  let title;
+  let title: string;
   let game;
-  let tags;
+  let tags: string[];
 
   try {
     if (!isNil(args.title)) {
@@ -66,10 +60,10 @@ async function updateChannelInfo (args: { title?: string | null; game?: string |
       tags = JSON.parse(tagsCache.value) as string[];
     } // we are not setting game -> load last game
 
-    const clientBroadcaster = await client('broadcaster');
-    await clientBroadcaster.channels.updateChannelInfo(cid, {
-      title: title ? title : undefined, gameId: await getGameIdFromName(game), tags,
-    });
+    const gameId = await getGameIdFromName(game);
+    await twitch.apiClient?.asIntent(['broadcaster'], ctx => ctx.channels.updateChannelInfo(cid, {
+      title: title ? title : undefined, gameId, tags,
+    }));
     await getChannelInformation({});
   } catch (e) {
     if (e instanceof Error) {
@@ -77,10 +71,6 @@ async function updateChannelInfo (args: { title?: string | null; game?: string |
         warning(`${getFunctionName()} => Connection to Twitch timed out. Will retry request.`);
         await setImmediateAwait();
         return updateChannelInfo(args);
-      }
-      if (e.message.includes('Invalid OAuth token')) {
-        warning(`${getFunctionName()} => Invalid OAuth token - attempting to refresh token`);
-        await refresh('bot');
       } else {
         error(`${getFunctionName()} => ${e.stack ?? e.message}`);
       }

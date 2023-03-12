@@ -15,5 +15,6 @@ export function getBotSender(): Omit<ChatUser, '_userName' | '_userData' | '_par
     color:         '#000000',
     userType:      'empty',
     badgeInfo:     new Map(),
+    isArtist:      false,
   };
 }

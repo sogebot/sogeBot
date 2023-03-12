@@ -11,20 +11,23 @@ import {
 } from '@twurple/chat';
 import { isNil } from 'lodash';
 
-import { default as apiClient } from './api/client';
-import { CustomAuthProvider } from './token/CustomAuthProvider.js';
-import { refresh } from './token/refresh';
+import addModerator from './calls/addModerator';
+import banUser from './calls/banUser';
+import deleteChatMessages from './calls/deleteChatMessages';
+import getUserByName from './calls/getUserByName';
+import sendWhisper from './calls/sendWhisper';
+import { CustomAuthProvider } from './token/CustomAuthProvider';
 
 import { parserReply } from '~/commons';
 import { AppDataSource } from '~/database';
 import { timer } from '~/decorators';
 import {
-  getFunctionList,
+  getFunctionList, onStreamStart,
 } from '~/decorators/on';
 import { isStreamOnline, stats } from '~/helpers/api';
 import * as hypeTrain from '~/helpers/api/hypeTrain';
 import {
-  getOwner, getUserSender,
+  getUserSender,
 } from '~/helpers/commons';
 import { sendMessage } from '~/helpers/commons/sendMessage';
 import { eventEmitter } from '~/helpers/events';
@@ -41,6 +44,7 @@ import { linesParsedIncrement, setStatus } from '~/helpers/parser';
 import { tmiEmitter } from '~/helpers/tmi';
 import { isOwner } from '~/helpers/user';
 import * as changelog from '~/helpers/user/changelog.js';
+import getNameById from '~/helpers/user/getNameById';
 import { isBot, isBotId } from '~/helpers/user/isBot';
 import { isIgnored, isIgnoredSafe } from '~/helpers/user/isIgnored';
 import eventlist from '~/overlays/eventlist';
@@ -58,6 +62,8 @@ let _connected_channel = '';
 const ignoreGiftsFromUser = new Map<string, number>();
 const commandRegexp = new RegExp(/^!\w+$/);
 class Chat {
+  authProvider: CustomAuthProvider;
+
   shouldConnect = false;
 
   timeouts: Record<string, any> = {};
@@ -71,8 +77,19 @@ class Chat {
   broadcasterWarning = false;
   botWarning = false;
 
-  constructor() {
+  constructor(authProvider: CustomAuthProvider) {
     this.emitter();
+    this.authProvider = authProvider;
+
+    this.initClient('bot');
+    this.initClient('broadcaster');
+  }
+
+  @onStreamStart()
+  reconnectOnStreamStart() {
+    const broadcasterUsername = variables.get('services.twitch.broadcasterUsername') as string;
+    this.part('bot').then(() => this.join('bot', broadcasterUsername));
+    this.part('broadcaster').then(() => this.join('broadcaster', broadcasterUsername));
   }
 
   emitter() {
@@ -81,20 +98,16 @@ class Chat {
       return;
     }
     tmiEmitter.on('timeout', async (username, duration, isMod) => {
-      const broadcasterId = variables.get('services.twitch.broadcasterId') as string;
-      const clientBroadcaster = await apiClient('broadcaster');
       const userId = await users.getIdByName(username);
 
-      clientBroadcaster.moderation.banUser(broadcasterId, broadcasterId, {
-        userId, duration, reason: '',
-      });
+      banUser(userId, '', duration);
 
       if (isMod) {
         if (this.client.broadcaster) {
           info(`Bot will set mod status for ${username} after ${duration} seconds.`);
           setTimeout(() => {
             // we need to remod user
-            clientBroadcaster.moderation.addModerator(broadcasterId, userId);
+            addModerator(userId);
           }, (duration * 1000) + 1000);
         } else {
           error('Cannot timeout mod user, as you don\'t have set broadcaster in chat');
@@ -104,8 +117,9 @@ class Chat {
     tmiEmitter.on('say', (channel, message, opts) => {
       this.client.bot?.say(channel, message, opts);
     });
-    tmiEmitter.on('whisper', (username, message) => {
-      this.client.bot?.whisper(username, message);
+    tmiEmitter.on('whisper', async (username, message) => {
+      const userId = await users.getIdByName(username);
+      sendWhisper(userId, message);
     });
     tmiEmitter.on('join', (type) => {
       const broadcasterUsername = variables.get('services.twitch.broadcasterUsername') as string;
@@ -117,8 +131,8 @@ class Chat {
     tmiEmitter.on('reconnect', (type) => {
       this.reconnect(type);
     });
-    tmiEmitter.on('delete', (type, msgId) => {
-      this.delete(type, msgId);
+    tmiEmitter.on('delete', (msgId) => {
+      this.delete(msgId);
     });
     tmiEmitter.on('part', (type) => {
       this.part(type);
@@ -152,8 +166,7 @@ class Chat {
         this.client[type] = null;
       }
 
-      const authProvider = new CustomAuthProvider(type);
-      this.client[type] = new ChatClient({ authProvider, isAlwaysMod: true });
+      this.client[type] = new ChatClient({ authProvider: this.authProvider, isAlwaysMod: true, authIntents: [type] });
 
       this.loadListeners(type);
       await this.client[type]?.connect();
@@ -169,11 +182,6 @@ class Chat {
         error('Bot oauth is not properly set');
         this.botWarning = true;
       }
-      refresh(type).then(() => {
-        this.timeouts[`initClient.${type}`] = setTimeout(() => {
-          this.initClient(type);
-        }, 10000);
-      });
     }
   }
 
@@ -237,15 +245,13 @@ class Chat {
   }
 
   async ban (username: string, type: 'bot' | 'broadcaster' = 'bot' ): Promise<void> {
-    const broadcasterUsername = variables.get('services.twitch.broadcasterUsername') as string;
     const client = this.client[type];
     if (!client && type === 'bot') {
       return this.ban(username, 'broadcaster');
     } else if (!client) {
       error(`TMI: Cannot ban user. Bot/Broadcaster is not connected to TMI.`);
     } else {
-      await client.ban(broadcasterUsername, username);
-      await client.say(broadcasterUsername, `/block ${username}`);
+      banUser(await users.getIdByName(username), '');
       info(`TMI: User ${username} was banned and blocked.`);
       return;
     }
@@ -295,10 +301,9 @@ class Chat {
 
     client.onAuthenticationFailure(message => {
       info(`TMI: ${type} authentication failure, ${message}`);
-      refresh(type).then(() => this.initClient(type));
     });
 
-    client.onDisconnect((manually, reason) => {
+    client.irc.onDisconnect((manually, reason) => {
       setStatus('TMI', constants.DISCONNECTED);
       if (manually) {
         reason = new Error('Disconnected manually by user');
@@ -308,7 +313,7 @@ class Chat {
       }
     });
 
-    client.onConnect(() => {
+    client.irc.onConnect(() => {
       setStatus('TMI', constants.CONNECTED);
       info(`TMI: ${type} is connected`);
     });
@@ -458,10 +463,9 @@ class Chat {
 
       let profileImageUrl = null;
       if (user.profileImageUrl.length === 0) {
-        const clientBot = await apiClient('bot');
-        const getUserByName = await clientBot.users.getUserByName(user.userName);
-        if (getUserByName) {
-          profileImageUrl = getUserByName.profilePictureUrl;
+        const res = await getUserByName(username);
+        if (res) {
+          profileImageUrl = res.profilePictureUrl;
         }
       }
 
@@ -537,10 +541,9 @@ class Chat {
 
       let profileImageUrl = null;
       if (user.profileImageUrl.length === 0) {
-        const clientBot = await apiClient('bot');
-        const getUserByName = await clientBot.users.getUserByName(user.userName);
-        if (getUserByName) {
-          profileImageUrl = getUserByName.profilePictureUrl;
+        const res = await getUserByName(user.userName);
+        if (res) {
+          profileImageUrl = res.profilePictureUrl;
         }
       }
 
@@ -650,7 +653,7 @@ class Chat {
       let isGiftIgnored = false;
 
       if (!recipient) {
-        recipient = await users.getNameById(recipientId);
+        recipient = await getNameById(recipientId);
       }
       changelog.update(recipientId, { userId: recipientId, userName: recipient });
       const user = await changelog.get(recipientId);
@@ -830,8 +833,8 @@ class Chat {
     }
   }
 
-  delete (client: 'broadcaster' | 'bot', msgId: string): void {
-    this.client[client]?.deleteMessage(getOwner(), msgId);
+  delete (msgId: string): void {
+    deleteChatMessages(msgId);
   }
 
   @timer()

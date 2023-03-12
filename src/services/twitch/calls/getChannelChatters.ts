@@ -4,9 +4,6 @@ import {
   chunk, includes,
 } from 'lodash';
 
-import client from '../api/client';
-import { refresh } from '../token/refresh.js';
-
 import { AppDataSource } from '~/database';
 import { eventEmitter } from '~/helpers/events';
 import { getAllOnline } from '~/helpers/getAllOnlineUsernames';
@@ -18,15 +15,18 @@ import { setImmediateAwait } from '~/helpers/setImmediateAwait';
 import { SQLVariableLimit } from '~/helpers/sql';
 import * as changelog from '~/helpers/user/changelog.js';
 import { isIgnored } from '~/helpers/user/isIgnored';
+import twitch from '~/services/twitch';
 import { variables } from '~/watchers';
 import joinpart from '~/widgets/joinpart';
 
 const getChannelChattersAll = async (chatters: HelixChatChatter[] = [], after?: HelixForwardPagination['after']): Promise<HelixChatChatter[]> => {
   const broadcasterId = variables.get('services.twitch.broadcasterId') as string;
   const botId = variables.get('services.twitch.botId') as string;
-  const clientBot = await client('bot');
 
-  const response = await clientBot.chat.getChatters(broadcasterId, botId, { after, limit: 100 });
+  const response = await twitch.apiClient?.asIntent(['bot'], ctx => ctx.chat.getChatters(broadcasterId, botId, { after, limit: 100 }));
+  if (!response) {
+    return [];
+  }
   chatters.push(...response.data);
 
   if (response.total === chatters.length) {
@@ -44,11 +44,9 @@ export const getChannelChatters = async (opts: any) => {
     const botId = variables.get('services.twitch.botId') as string;
 
     const [
-      clientBot,
       chatters,
       allOnlineUsers,
     ] = await Promise.all([
-      client('bot'),
       new Promise<HelixChatChatter[]>(resolve => {
         getChannelChattersAll().then(response => resolve(response.filter(data => {
           // exclude global ignore list
@@ -85,7 +83,7 @@ export const getChannelChatters = async (opts: any) => {
           await AppDataSource.getRepository(User).save({ ...user, isOnline: true });
           if (!user.createdAt) {
             // run this after we save new user
-            const getUserById = await clientBot.users.getUserById(joinedUser.userId);
+            const getUserById = await twitch.apiClient?.asIntent(['bot'], ctx => ctx.users.getUserById(joinedUser.userId));
             if (getUserById) {
               changelog.update(getUserById.id, { createdAt: new Date(getUserById.creationDate).toISOString() });
             }
@@ -97,7 +95,7 @@ export const getChannelChatters = async (opts: any) => {
     }
 
     for (const userIdBatch of chunk(usersToFetch, 100)) {
-      clientBot.users.getUsersByIds(userIdBatch).then(users => {
+      twitch.apiClient?.asIntent(['bot'], ctx => ctx.users.getUsersByIds(userIdBatch).then(users => {
         if (users) {
           AppDataSource.getRepository(User).save(
             users.map(user => {
@@ -114,7 +112,7 @@ export const getChannelChatters = async (opts: any) => {
             return;
           });
         }
-      });
+      }));
     }
 
     joinpart.send({ users: partedUsers, type: 'part' });
@@ -133,10 +131,6 @@ export const getChannelChatters = async (opts: any) => {
       if (e.message.includes('ETIMEDOUT')) {
         warning(`${getFunctionName()} => Connection to Twitch timed out. Will retry request.`);
         return { state: false, opts }; // ignore etimedout error
-      }
-      if (e.message.includes('Invalid OAuth token')) {
-        warning(`${getFunctionName()} => Invalid OAuth token - attempting to refresh token`);
-        await refresh('bot');
       } else {
         error(`${getFunctionName()} => ${e.stack ?? e.message}`);
       }

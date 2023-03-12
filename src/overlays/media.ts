@@ -1,15 +1,15 @@
 import { Gallery } from '@entity/gallery';
 import { isNil } from 'lodash';
-import { AppDataSource } from '~/database';
 
+import Overlay from './_interface';
 import { command, default_permission } from '../decorators';
 import Message from '../message';
-import Overlay from './_interface';
 
+import { AppDataSource } from '~/database';
 import { debug } from '~/helpers/log';
 import { defaultPermissions } from '~/helpers/permissions/defaultPermissions';
 import { publicEndpoint } from '~/helpers/socket';
-import client from '~/services/twitch/api/client';
+import twitch from '~/services/twitch';
 
 class Media extends Overlay {
   sockets() {
@@ -44,18 +44,17 @@ class Media extends Overlay {
     // remove clips without url or id
     send = send.filter((o) => (o.type === 'clip' && (isNil(o.id) || isNil(o.url))) || o.type !== 'clip');
 
-    const clientBot = await client('bot');
     for (const object of send) {
       if (object.type === 'clip') {
       // load clip from api
         if (!isNil(object.id)) {
-          const clip = await  clientBot.clips.getClipById(object.id);
+          const clip = await twitch.apiClient?.asIntent(['bot'], ctx => ctx.clips.getClipById(object.id));
           if (!clip) {
             continue;
           }
           object.url = clip.thumbnailUrl.replace('-preview-480x272.jpg', '.mp4');
         } else if (!isNil(object.url)) {
-          const clip = await  clientBot.clips.getClipById(object.url.split('/').pop() as string);
+          const clip = await twitch.apiClient?.asIntent(['bot'], ctx => ctx.clips.getClipById(object.url.split('/').pop() as string));
           if (!clip) {
             continue;
           }

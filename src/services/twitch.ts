@@ -3,39 +3,37 @@ import { User } from '@entity/user';
 import { SECOND } from '@sogebot/ui-helpers/constants';
 import { dayjs, timezone } from '@sogebot/ui-helpers/dayjsHelper';
 import { getTime } from '@sogebot/ui-helpers/getTime';
+import { ApiClient } from '@twurple/api';
 import { capitalize } from 'lodash';
 
 import Service from './_interface';
-import { init as apiIntervalInit, stop as apiIntervalStop } from './twitch/api/interval';
+import { init } from './twitch/api/interval';
 import { createClip } from './twitch/calls/createClip';
 import { createMarker } from './twitch/calls/createMarker';
+import { updateBroadcasterType } from './twitch/calls/updateBroadcasterType';
 import Chat from './twitch/chat';
 import EventSub from './twitch/eventsub';
-import PubSub from './twitch/pubsub';
-import { cleanErrors } from './twitch/token/refresh';
-import { cache, validate } from './twitch/token/validate';
+import { CustomAuthProvider } from './twitch/token/CustomAuthProvider';
 import {
   command, default_permission, example, persistent, settings,
 } from '../decorators';
-import { onChange, onLoad, onStartup, onStreamStart } from '../decorators/on';
+import { onChange, onLoad, onStreamStart } from '../decorators/on';
 import Expects from '../expects';
 import emitter from '../helpers/interfaceEmitter';
-import { debug, error, info } from '../helpers/log';
-import users from '../users';
+import { error, info } from '../helpers/log';
 
 import { AppDataSource } from '~/database';
 import {
   isStreamOnline, stats, streamStatusChangeSince,
 } from '~/helpers/api';
 import { prepare } from '~/helpers/commons/prepare';
-import { isBotStarted } from '~/helpers/database';
 import defaultPermissions from '~/helpers/permissions/defaultPermissions';
 import { adminEndpoint } from '~/helpers/socket';
 import {
   ignorelist, sendWithMe, setMuteStatus, showWithAt,
-  tmiEmitter,
 } from '~/helpers/tmi';
 import * as changelog from '~/helpers/user/changelog.js';
+import getNameById from '~/helpers/user/getNameById';
 import { isIgnored } from '~/helpers/user/isIgnored';
 import { sendGameFromTwitch } from '~/services/twitch/calls/sendGameFromTwitch';
 import { updateChannelInfo } from '~/services/twitch/calls/updateChannelInfo';
@@ -47,10 +45,19 @@ const urls = {
 };
 const markerEvents = new Set<string>();
 
+// TODO:
+// - simplify custom oauth - done
+// - remove bot token valid
+//
+
+const loadedKeys: string[] = [];
+
 class Twitch extends Service {
-  tmi: import('./twitch/chat').default | null;
-  pubsub: import('./twitch/pubsub').default | null;
-  eventsub: import('./twitch/eventsub').default | null;
+  tmi: Chat | null = null;
+  eventsub: EventSub | null = null;
+
+  authProvider: CustomAuthProvider | null = null;
+  apiClient: ApiClient | null = null;
 
   @persistent()
     uptime = 0;
@@ -88,52 +95,22 @@ class Twitch extends Service {
     createMarkerOnEvent = true;
 
   @settings('broadcaster')
-    broadcasterAccessToken = '';
-  @settings('broadcaster')
     broadcasterRefreshToken = '';
   @settings('broadcaster')
     broadcasterId = '';
   @settings('broadcaster')
     broadcasterUsername = '';
-  @settings('broadcaster', true)
-    broadcasterExpectedScopes: string[] = [
-      'channel_editor',
-      'chat:read',
-      'chat:edit',
-      'channel:moderate',
-      'channel:read:subscriptions',
-      'user:edit:broadcast',
-      'user:read:broadcast',
-      'channel:edit:commercial',
-      'channel:read:redemptions',
-      'moderation:read',
-      'channel:read:hype_train',
-    ];
   @settings('broadcaster')
     broadcasterCurrentScopes: string[] = [];
   @persistent()
     broadcasterType: string | null = null;
 
   @settings('bot')
-    botAccessToken = '';
-  @settings('bot')
     botRefreshToken = '';
   @settings('bot')
     botId = '';
   @settings('bot')
     botUsername = '';
-  @settings('bot', true)
-    botExpectedScopes: string[] = [
-      'clips:edit',
-      'user:edit:broadcast',
-      'user:read:broadcast',
-      'chat:read',
-      'chat:edit',
-      'channel:moderate',
-      'whispers:read',
-      'whispers:edit',
-      'channel:edit:commercial',
-    ];
   @settings('bot')
     botCurrentScopes: string[] = [];
 
@@ -151,8 +128,80 @@ class Twitch extends Service {
     }
   }
 
+  @onLoad(['broadcasterRefreshToken', 'botRefreshToken', 'tokenService', 'tokenServiceCustomClientId', 'tokenServiceCustomClientSecret'])
+  @onChange(['broadcasterRefreshToken', 'botRefreshToken', 'tokenService', 'tokenServiceCustomClientId', 'tokenServiceCustomClientSecret'])
+  async onChangeRefreshTokens(key: string) {
+    this.botTokenValid = false;
+    this.broadcasterTokenValid = false;
+
+    loadedKeys.push(key);
+    if (loadedKeys.length < 5) {
+      return;
+    } else {
+      loadedKeys.length = 5;
+    }
+    let clientId;
+
+    switch (this.tokenService) {
+      case 'SogeBot Token Generator':
+        clientId = 't8cney2xkc7j4cu6zpv9ijfa27w027';
+        break;
+      case 'SogeBot Token Generator v2':
+        clientId = '89k6demxtifvq0vzgjpvr1mykxaqmf';
+        break;
+      default:
+        clientId = this.tokenServiceCustomClientId;
+    }
+    this.authProvider = new CustomAuthProvider({
+      clientId,
+      clientSecret: this.tokenServiceCustomClientSecret, // we don't care if we have generator
+    });
+    this.apiClient = new ApiClient({ authProvider: this.authProvider });
+    if (this.botRefreshToken.length > 0) {
+      const userId = await this.authProvider.addUserForToken({
+        expiresIn:           0,
+        refreshToken:        this.botRefreshToken,
+        obtainmentTimestamp: 0,
+      });
+      this.authProvider.addIntentsToUser(userId, ['bot', 'chat']);
+      const tokenInfo = await this.apiClient.asUser(userId, ctx => ctx.getTokenInfo());
+      this.botId = userId;
+      this.botUsername = tokenInfo.userName ?? '';
+      this.botCurrentScopes = tokenInfo.scopes;
+      this.botTokenValid = true;
+      info(`TWITCH: Bot token initialized OK for ${this.botUsername}#${this.botId} with scopes: ${this.botCurrentScopes.join(', ')}`);
+    }
+    if (this.broadcasterRefreshToken.length > 0) {
+      const userId = await this.authProvider.addUserForToken({
+        expiresIn:           0,
+        refreshToken:        this.broadcasterRefreshToken,
+        obtainmentTimestamp: 0,
+      });
+
+      this.authProvider.addIntentsToUser(userId, ['broadcaster']);
+      const tokenInfo = await this.apiClient.asUser(userId, ctx => ctx.getTokenInfo());
+      this.broadcasterId = userId;
+      this.broadcasterUsername = tokenInfo.userName ?? '';
+      this.broadcasterCurrentScopes = tokenInfo.scopes;
+      this.broadcasterTokenValid = true;
+      await updateBroadcasterType();
+      info(`TWITCH: Broadcaster token initialized OK for ${this.broadcasterUsername}#${this.broadcasterId} (type: ${this.broadcasterType}) with scopes: ${this.broadcasterCurrentScopes.join(', ')}`);
+    }
+
+    if (this.broadcasterTokenValid && this.botTokenValid) {
+      this.tmi = new Chat(this.authProvider);
+      this.eventsub = new EventSub(this.apiClient);
+    } else {
+      this.tmi = null;
+      this.eventsub = null;
+    }
+  }
+
   constructor() {
     super();
+
+    init(); // start up intervals for api
+
     this.botTokenValid = false;
     this.broadcasterTokenValid = false;
 
@@ -203,133 +252,16 @@ class Twitch extends Service {
     }
   }
 
-  @onChange('botRefreshToken')
-  onChangeBotRefreshToken() {
-    cleanErrors('bot');
-  }
-  @onChange('broadcasterRefreshToken')
-  onChangeBroadcasterRefreshToken() {
-    cleanErrors('broadcaster');
-  }
-
-  @onChange(['botAccessToken', 'broadcasterAccessToken'])
-  @onLoad(['botAccessToken', 'broadcasterAccessToken'])
-  public async onChangeAccessToken(key: string, value: any) {
-    if (!this.enabled) {
-      return;
-    }
-    switch (key) {
-      case 'broadcasterAccessToken':
-        if (value === '') {
-          cache.broadcaster = 'force_reconnect';
-          emitter.emit('set', '/services/twitch', 'broadcasterUsername', '');
-          emitter.emit('set', '/services/twitch', 'broadcasterType', null);
-          tmiEmitter.emit('part', 'broadcaster');
-        } else {
-          setTimeout(() => {
-            validate('broadcaster', 0);
-          }, 5000);
-        }
-        break;
-      case 'botAccessToken':
-        if (value === '') {
-          cache.bot = 'force_reconnect';
-          emitter.emit('set', '/services/twitch', 'botUsername', '');
-          tmiEmitter.emit('part', 'bot');
-        } else {
-          setTimeout(() => {
-            validate('bot', 0);
-          }, 5000);
-        }
-        break;
-    }
-  }
-
   @onChange('broadcasterUsername')
   public async onChangeBroadcasterUsername(key: string, value: any) {
     if (!this.generalOwners.includes(value)) {
       this.generalOwners.push(value);
     }
-    this.tmi?.part('bot').then(() => this.tmi?.join('bot', value));
-    this.tmi?.part('broadcaster').then(() => this.tmi?.join('broadcaster', value));
-  }
-
-  @onStartup()
-  async onStartup() {
-    this.addMenu({
-      category: 'stats', name: 'api', id: 'stats/api', this: null,
-    });
-
-    this.onStatusChange();
-  }
-
-  init() {
-    if (this.botTokenValid && this.broadcasterTokenValid) {
-      this.tmi = new Chat();
-      apiIntervalInit();
-    } else {
-      setTimeout(() => this.init(), 1000);
-    }
-  }
-
-  @onChange(['botTokenValid', 'botAccessToken'])
-  onBotTokenValidChange() {
-    if (this.botTokenValid && this.botAccessToken.length > 0) {
-      if (this.tmi) {
-        this.tmi.initClient('bot');
-      } else {
-        setTimeout(() => this.onBotTokenValidChange(), 1000);
-      }
-    }
-  }
-
-  @onChange(['broadcasterTokenValid', 'broadcasterAccessToken'])
-  onBroadcasterTokenValidChange() {
-    this.pubsub = null;
-    this.eventsub = null;
-    if (this.broadcasterTokenValid && this.broadcasterAccessToken.length > 0) {
-      if (this.tmi) {
-        this.tmi.initClient('broadcaster');
-        this.pubsub = new PubSub();
-        this.eventsub = new EventSub();
-      } else {
-        setTimeout(() => this.onBroadcasterTokenValidChange(), 1000);
-      }
-    }
-  }
-
-  @onChange('enabled')
-  onStatusChange() {
-    if (!isBotStarted) {
-      return;
-    }
-    if (this.enabled) {
-      // trigger validation
-      this.validateTokens();
-      this.init();
-    } else {
-      apiIntervalStop();
-      this.pubsub?.stop();
-      this.tmi?.part('bot');
-      this.tmi?.part('broadcaster');
-
-      this.pubsub = null;
-      this.eventsub = null;
-    }
-  }
-
-  validateTokens() {
-    debug('oauth.validate', 'Triggering token validation');
-    return [validate('bot'), validate('broadcaster')];
   }
 
   @onStreamStart()
   reconnectOnStreamStart() {
     this.uptime = 0;
-    if (this.enabled) {
-      this.tmi?.part('bot').then(() => this.tmi?.join('bot', this.broadcasterUsername));
-      this.tmi?.part('broadcaster').then(() => this.tmi?.join('broadcaster', this.broadcasterUsername));
-    }
   }
 
   @onChange('showWithAt')
@@ -367,14 +299,12 @@ class Twitch extends Service {
     adminEndpoint('/services/twitch', 'twitch::revoke', async ({ accountType }, cb) => {
       if (accountType === 'bot') {
         this.botRefreshToken = '';
-        this.botAccessToken = '';
         this.botCurrentScopes = [];
         this.botId = '';
         this.botTokenValid = false;
         this.botUsername = '';
       } else {
         this.broadcasterRefreshToken = '';
-        this.broadcasterAccessToken = '';
         this.broadcasterCurrentScopes = [];
         this.broadcasterId = '';
         this.broadcasterTokenValid = false;
@@ -386,21 +316,17 @@ class Twitch extends Service {
     adminEndpoint('/services/twitch', 'twitch::token', async ({ accessToken, refreshToken, accountType }, cb) => {
       emitter.emit('set', '/services/twitch', `tokenService`, 'SogeBot Token Generator v2');
       emitter.emit('set', '/services/twitch', `${accountType}RefreshToken`, refreshToken);
-      emitter.emit('set', '/services/twitch', `${accountType}AccessToken`, accessToken);
       emitter.emit('set', '/services/twitch', `${accountType}TokenValid`, true);
-      await validate(accountType, 0, true);
       setTimeout(async () => {
         cb(null);
       }, 1000);
     });
     adminEndpoint('/services/twitch', 'twitch::token::ownApp', async ({ accessToken, refreshToken, accountType, clientId, clientSecret }, cb) => {
       emitter.emit('set', '/services/twitch', `tokenService`, 'Own Twitch App');
-      emitter.emit('set', '/services/twitch', `${accountType}AccessToken`, accessToken);
       emitter.emit('set', '/services/twitch', `${accountType}RefreshToken`, refreshToken);
       emitter.emit('set', '/services/twitch', `tokenServiceCustomClientId`, clientId);
       emitter.emit('set', '/services/twitch', `tokenServiceCustomClientSecret`, clientSecret);
       emitter.emit('set', '/services/twitch', `${accountType}TokenValid`, true);
-      await validate(accountType, 0, true);
       setTimeout(async () => {
         cb(null);
       }, 1000);
@@ -521,7 +447,7 @@ class Twitch extends Service {
     let lastFollowAgo = '';
     let lastFollowUsername = 'n/a';
     if (events.length > 0) {
-      lastFollowUsername = await users.getNameById(events[0].userId);
+      lastFollowUsername = await getNameById(events[0].userId);
       lastFollowAgo = dayjs(events[0].timestamp).fromNow();
     }
 
@@ -555,7 +481,7 @@ class Twitch extends Service {
     let lastSubAgo = '';
     let lastSubUsername = 'n/a';
     if (events.length > 0) {
-      lastSubUsername = await users.getNameById(events[0].userId);
+      lastSubUsername = await getNameById(events[0].userId);
       lastSubAgo = dayjs(events[0].timestamp).fromNow();
     }
 

@@ -1,0 +1,22 @@
+diff --git a/node_modules/@twurple/auth/lib/providers/RefreshingAuthProvider.d.ts b/node_modules/@twurple/auth/lib/providers/RefreshingAuthProvider.d.ts
+index 4e01c60..5e3034e 100644
+--- a/node_modules/@twurple/auth/lib/providers/RefreshingAuthProvider.d.ts
++++ b/node_modules/@twurple/auth/lib/providers/RefreshingAuthProvider.d.ts
+@@ -35,7 +35,7 @@ export interface RefreshConfig {
+ export declare class RefreshingAuthProvider implements AuthProvider {
+     private readonly _clientId;
+     private readonly _clientSecret;
+-    private readonly _userAccessTokens;
++    public readonly _userAccessTokens;
+     private readonly _userTokenFetchers;
+     private readonly _intentToUserId;
+     private _appAccessToken?;
+@@ -129,7 +129,7 @@ export declare class RefreshingAuthProvider implements AuthProvider {
+      * @param forceNew Whether to always get a new token, even if the old one is still deemed valid internally.
+      */
+     getAppAccessToken(forceNew?: boolean): Promise<AccessToken>;
+-    private _callOnRefresh;
++    public _callOnRefresh;
+     private _fetchUserToken;
+     private _fetchAppToken;
+     private _refreshAppToken;

@@ -1,18 +1,17 @@
 import { EventList } from '@entity/eventList';
-import { AppDataSource } from '~/database';
-
-import users from '../users';
 
 import type { ResponseFilter } from '.';
 
+import { AppDataSource } from '~/database';
 import {
   isStreamOnline, stats, streamStatusChangeSince,
 } from '~/helpers/api';
 import { mainCurrency } from '~/helpers/currency';
 import exchange from '~/helpers/currency/exchange';
+import getNameById from '~/helpers/user/getNameById';
 
 const info: ResponseFilter = {
-  '$toptip.#.#': async function (filter: string) {
+  '_$toptip.#.#': async function (filter: string) {
     const match = filter.match(/\$toptip\.(?<type>overall|stream)\.(?<value>username|amount|message|currency)/);
     if (!match) {
       return '';
@@ -44,7 +43,7 @@ const info: ResponseFilter = {
 
     if (tips.length > 0) {
       const value = match.groups?.value;
-      switch(value) {
+      switch (value) {
         case 'amount':
           return Number(JSON.parse(tips[0].values_json).amount).toFixed(2);
         case 'currency':
@@ -52,10 +51,16 @@ const info: ResponseFilter = {
         case 'message':
           return Number(JSON.parse(tips[0].values_json).message);
         case 'username':
-          return users.getNameById(tips[0].userId);
+          return getNameById(tips[0].userId);
       }
     }
     return '';
+  },
+  get '$toptip.#.#'() {
+    return this['_$toptip.#.#'];
+  },
+  set '$toptip.#.#'(value) {
+    this['_$toptip.#.#'] = value;
   },
   '(game)': async function () {
     return stats.value.currentGame || 'n/a';

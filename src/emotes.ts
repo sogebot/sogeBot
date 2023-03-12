@@ -6,7 +6,7 @@ import { v4 as uuid } from 'uuid';
 import { onStartup } from './decorators/on';
 import emitter from './helpers/interfaceEmitter';
 import { adminEndpoint, publicEndpoint } from './helpers/socket';
-import client from './services/twitch/api/client';
+import twitch from './services/twitch';
 
 import Core from '~/_interface';
 import { parser, settings } from '~/decorators';
@@ -161,11 +161,13 @@ class Emotes extends Core {
           if (this.lastGlobalEmoteChk !== 0) {
             info(`EMOTES: Fetching channel ${broadcasterId} emotes`);
           }
-          const apiClient = await client('broadcaster');
-          const emotes = await apiClient.callApi<any>({ url: `chat/emotes?broadcaster_id=${broadcasterId}`, type: 'helix' });
+          const emotes = await twitch.apiClient?.asIntent(['broadcaster'], ctx => ctx.callApi<any>({ url: `chat/emotes?broadcaster_id=${broadcasterId}`, type: 'helix' }));
+          if (!emotes) {
+            throw new Error('Cannot initialize Twitch API');
+          }
           this.lastSubscriberEmoteChk = Date.now();
           this.cache = this.cache.filter(o => o.type !== 'twitch-sub');
-          for (const emote of (emotes.data || [])) {
+          for (const emote of emotes.data) {
             debug('emotes.channel', `Saving to cache ${emote.name}#${emote.id}`);
             const template = emotes.template
               .replace('{{id}}', emote.id)
@@ -212,11 +214,10 @@ class Emotes extends Core {
           info('EMOTES: Fetching global emotes');
         }
 
-        const clientBot = await client('bot');
-        const emotes = await clientBot.chat.getGlobalEmotes();
+        const emotes = await twitch.apiClient?.asIntent(['bot'], ctx => ctx.chat.getGlobalEmotes());
         this.lastGlobalEmoteChk = Date.now();
         this.cache = this.cache.filter(o => o.type !== 'twitch');
-        for (const emote of emotes) {
+        for (const emote of emotes ?? []) {
           await setImmediateAwait();
           debug('emotes.global', `Saving to cache ${emote.name}#${emote.id}`);
           this.cache.push({

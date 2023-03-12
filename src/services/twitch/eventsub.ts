@@ -1,25 +1,30 @@
 import { SECOND } from '@sogebot/ui-helpers/constants';
+import { ApiClient } from '@twurple/api/lib';
 import { EventSubWsListener } from '@twurple/eventsub-ws';
 import { Mutex } from 'async-mutex';
-
-import client from './api/client';
 
 import * as channelPoll from '~/helpers/api/channelPoll';
 import * as channelPrediction from '~/helpers/api/channelPrediction';
 import * as hypeTrain from '~/helpers/api/hypeTrain';
 import { eventEmitter } from '~/helpers/events';
 import { follow } from '~/helpers/events/follow';
-import { error, info } from '~/helpers/log.js';
+import { ban, error, info, redeem, timeout, unban } from '~/helpers/log.js';
 import { ioServer } from '~/helpers/panel';
+import * as changelog from '~/helpers/user/changelog.js';
+import eventlist from '~/overlays/eventlist';
+import alerts from '~/registries/alerts';
 import { variables } from '~/watchers';
 
 const mutex = new Mutex();
+const rewardsRedeemed: string[] = [];
 
 class EventSub {
+  apiClient: ApiClient;
   listener: EventSubWsListener | null = null;
   listenerBroadcasterId?: string;
 
-  constructor() {
+  constructor(apiClient: ApiClient) {
+    this.apiClient = apiClient;
     setInterval(() => this.onStartup(), SECOND * 10);
   }
 
@@ -34,28 +39,19 @@ class EventSub {
       return;
     }
 
-    const apiClient = await client('broadcaster');
-
-    this.listener = new EventSubWsListener({ apiClient });
-
-    if (process.env.ENV === 'production') {
-      await this.listener.start();
-      this.listener.removeListener();
-    } else {
-      info('EVENTSUB-WS: Eventsub events disabled on dev-mode.');
-    }
+    this.listener = new EventSubWsListener({ apiClient: this.apiClient });
 
     try {
       // FOLLOW
-      await this.listener.subscribeToChannelFollowEvents(broadcasterId, event => follow(event.userId, event.userName, new Date(event.followDate).toISOString()));
+      this.listener.onChannelFollow(broadcasterId, broadcasterId, event => follow(event.userId, event.userName, new Date(event.followDate).toISOString()));
 
       // HYPE TRAIN
-      await this.listener.subscribeToChannelHypeTrainBeginEvents(broadcasterId, _event => {
+      this.listener.onChannelHypeTrainBegin(broadcasterId, () => {
         hypeTrain.setIsStarted(true);
         hypeTrain.setCurrentLevel(1);
         eventEmitter.emit('hypetrain-started');
       });
-      await this.listener.subscribeToChannelHypeTrainProgressEvents(broadcasterId, event => {
+      this.listener.onChannelHypeTrainProgress(broadcasterId, event => {
         hypeTrain.setIsStarted(true);
         hypeTrain.setTotal(event.total);
         hypeTrain.setGoal(event.goal);
@@ -76,7 +72,7 @@ class EventSub {
           id: event.id, total: event.total, goal: event.goal, level: event.level, subs: Object.fromEntries(hypeTrain.subs),
         });
       });
-      await this.listener.subscribeToChannelHypeTrainEndEvents(broadcasterId, event => {
+      this.listener.onChannelHypeTrainEnd(broadcasterId, event => {
         hypeTrain.triggerHypetrainEnd().then(() => {
           hypeTrain.setTotal(0);
           hypeTrain.setGoal(0);
@@ -89,33 +85,100 @@ class EventSub {
       });
 
       // POLLS
-      await this.listener.subscribeToChannelPollBeginEvents(broadcasterId, event => {
+      this.listener.onChannelPollBegin(broadcasterId, event => {
         channelPoll.setData(event);
         channelPoll.triggerPollStart();
       });
-      await this.listener.subscribeToChannelPollProgressEvents(broadcasterId, event => {
+      this.listener.onChannelPollProgress(broadcasterId, event => {
         channelPoll.setData(event);
       });
-      await this.listener.subscribeToChannelPollEndEvents(broadcasterId, event => {
+      this.listener.onChannelPollEnd(broadcasterId, event => {
         channelPoll.setData(event);
         channelPoll.triggerPollEnd();
       });
 
       // PREDICTION
-      await this.listener.subscribeToChannelPredictionBeginEvents(broadcasterId, event => {
+      this.listener.onChannelPredictionBegin(broadcasterId, event => {
         channelPrediction.start(event);
       });
-      await this.listener.subscribeToChannelPredictionLockEvents(broadcasterId, event => {
+      this.listener.onChannelPredictionLock(broadcasterId, event => {
         channelPrediction.lock(event);
       });
-      await this.listener.subscribeToChannelPredictionEndEvents(broadcasterId, event => {
+      this.listener.onChannelPredictionEnd(broadcasterId, event => {
         channelPrediction.end(event);
+      });
+
+      // MOD
+      this.listener.onChannelBan(broadcasterId, (event) => {
+        const userName = event.userName;
+        const userId = event.userId;
+        const createdBy = event.moderatorName;
+        const reason = event.reason;
+        const duration = event.endDate;
+        if (duration) {
+          timeout(`${ userName }#${ userId } by ${ createdBy } for ${ reason } seconds`);
+          eventEmitter.emit('timeout', { userName, duration: duration.getTime() - Date.now() / 1000 });
+        } else {
+          ban(`${ userName }#${ userId } by ${ createdBy }: ${ reason ? reason : '<no reason>' }`);
+          eventEmitter.emit('ban', { userName, reason: reason ? reason : '<no reason>' });
+        }
+      });
+      this.listener.onChannelUnban(broadcasterId, (event) => {
+        unban(`${ event.userName }#${ event.userId } by ${ event.moderatorName }`);
+      });
+
+      // REDEMPTION
+      this.listener.onChannelRedemptionAdd(broadcasterId, event => {
+        if (rewardsRedeemed.includes(event.redemptionDate.toISOString())) {
+          return;
+        }
+        rewardsRedeemed.push(event.redemptionDate.toISOString());
+        if (rewardsRedeemed.length > 10) {
+          rewardsRedeemed.shift();
+        }
+
+        // trigger reward-redeemed event
+        if (event.rewardPrompt.length > 0) {
+          redeem(`${ event.userName }#${ event.userId } redeemed ${ event.rewardTitle }: ${ event.rewardPrompt }`);
+        } else {
+          redeem(`${ event.userName }#${ event.userId } redeemed ${ event.rewardTitle }`);
+        }
+
+        changelog.update(event.userId, {
+          userId: event.userId, userName: event.userName, displayname: event.userDisplayName,
+        });
+
+        eventlist.add({
+          event:         'rewardredeem',
+          userId:        String(event.userId),
+          message:       event.rewardPrompt,
+          timestamp:     Date.now(),
+          titleOfReward: event.rewardTitle,
+          rewardId:      event.rewardId,
+        });
+        alerts.trigger({
+          event:      'rewardredeem',
+          name:       event.rewardTitle,
+          rewardId:   event.rewardId,
+          amount:     0,
+          tier:       null,
+          currency:   '',
+          monthsName: '',
+          message:    event.rewardPrompt,
+          recipient:  event.userName,
+        });
+        eventEmitter.emit('reward-redeemed', {
+          userId:    event.userId,
+          userName:  event.userName,
+          rewardId:  event.rewardId,
+          userInput: event.rewardPrompt,
+        });
       });
 
       this.listenerBroadcasterId = broadcasterId;
       info(`EVENTSUB-WS: Service initialized for ${broadcasterUsername}#${broadcasterId}`);
     } catch (e) {
-      await this.listener.stop();
+      this.listener.stop();
       this.listener = null;
       if (e instanceof Error) {
         error('EVENTSUB-WS: ' + e.message);

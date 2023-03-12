@@ -1,14 +1,8 @@
-import type { HelixChatAnnoucementColor } from '@twurple/api';
+import type { HelixChatAnnouncementColor } from '@twurple/api';
 import _ from 'lodash';
 
 import { timer } from '../../decorators.js';
-
-import client from '~/services/twitch/api/client.js';
-
 import { Message } from '../../message';
-
-import { variables } from '~/watchers.js';
-
 import {
   chatOut, debug, whisperOut,
 } from '../log';
@@ -18,12 +12,15 @@ import {
 
 import { getBotSender } from '.';
 
-const getAnnouncementColor = (command: string): HelixChatAnnoucementColor => {
+import twitch from '~/services/twitch.js';
+import { variables } from '~/watchers.js';
+
+const getAnnouncementColor = (command: string): HelixChatAnnouncementColor => {
   const color = command.replace('/announce', '');
   if (color.trim().length === 0) {
     return 'primary';
   } else {
-    return color.trim() as HelixChatAnnoucementColor;
+    return color.trim() as HelixChatAnnouncementColor;
   }
 };
 
@@ -105,14 +102,13 @@ class HelpersCommons {
                 return true;
               }
 
-              const clientBot = await client('bot');
               const broadcasterId = variables.get('services.twitch.broadcasterId') as string;
               const botId = variables.get('services.twitch.botId') as string;
               const color = getAnnouncementColor(announce);
-              clientBot.chat.sendAnnouncement(broadcasterId, botId, {
+              twitch.apiClient?.asIntent(['bot'], ctx => ctx.chat.sendAnnouncement(broadcasterId, botId, {
                 message: messageArray.join(' '),
                 color,
-              });
+              }));
             } else {
               message('say', sender.userName, messageToSend, id);
             }

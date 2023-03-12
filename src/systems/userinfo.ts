@@ -4,31 +4,31 @@ import {
 import { dayjs, timezone } from '@sogebot/ui-helpers/dayjsHelper';
 import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized';
 import { format } from '@sogebot/ui-helpers/number';
-import { AppDataSource } from '~/database';
 
+import System from './_interface';
+import levels from './levels';
+import points from './points';
+import ranks from './ranks';
 import { dateDiff } from '../commons';
 import {
   command, default_permission, settings,
 } from '../decorators';
 import Expects from '../expects';
 import general from '../general';
-import client from '../services/twitch/api/client';
 import { isFollowerUpdate } from '../services/twitch/calls/isFollowerUpdate';
 import users from '../users';
-import System from './_interface';
-import levels from './levels';
-import points from './points';
-import ranks from './ranks';
 
+import { AppDataSource } from '~/database';
 import { prepare } from '~/helpers/commons/index';
 import { mainCurrency } from '~/helpers/currency';
 import exchange from '~/helpers/currency/exchange';
 import { error } from '~/helpers/log';
+import { get } from '~/helpers/permissions/get';
+import { getUserHighestPermission } from '~/helpers/permissions/getUserHighestPermission';
 import { getPointsName } from '~/helpers/points';
 import * as changelog from '~/helpers/user/changelog.js';
+import twitch from '~/services/twitch';
 import { translate } from '~/translate';
-import { getUserHighestPermission } from '~/helpers/permissions/getUserHighestPermission';
-import { get } from '~/helpers/permissions/get';
 
 /*
  * !me
@@ -139,8 +139,8 @@ class UserInfo extends System {
     const user = await AppDataSource.getRepository(User).findOneBy({ userName });
     if (!user || !user.createdAt) {
       try {
-        const clientBot = await client('bot');
-        const getUserByName = await clientBot.users.getUserByName(userName);
+
+        const getUserByName = await twitch.apiClient?.asIntent(['bot'], ctx => ctx.users.getUserByName(userName));
         if (getUserByName) {
           changelog.update(getUserByName.id, { userName, createdAt: new Date(getUserByName.creationDate).toISOString() });
         }

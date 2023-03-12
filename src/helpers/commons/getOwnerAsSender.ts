@@ -17,5 +17,6 @@ export function getOwnerAsSender(): Omit<ChatUser, '_userName' | '_userData' | '
     color:         '#000000',
     userType:      'empty',
     badgeInfo:     new Map(),
+    isArtist:      false,
   };
 }

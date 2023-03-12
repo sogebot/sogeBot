@@ -1,13 +1,12 @@
 import { defaults } from 'lodash';
-import { AppDataSource } from '~/database';
 
 import { TwitchClips } from '../../../database/entity/twitch';
 import { debug, error, isDebugEnabled, warning } from '../../../helpers/log';
-import client from '../api/client';
-import { refresh } from '../token/refresh.js';
 
+import { AppDataSource } from '~/database';
 import { isStreamOnline } from '~/helpers/api';
 import { getFunctionName } from '~/helpers/getFunctionName';
+import twitch from '~/services/twitch';
 import { variables } from '~/watchers';
 
 export async function createClip (opts: { createAfterDelay: boolean }) {
@@ -39,8 +38,10 @@ export async function createClip (opts: { createAfterDelay: boolean }) {
 
   const broadcasterId = variables.get('services.twitch.broadcasterId') as string;
   try {
-    const clientBot = await client('bot');
-    const clipId = await clientBot.clips.createClip({ ...opts, channelId: broadcasterId });
+    const clipId = await twitch.apiClient?.asIntent(['bot'], ctx => ctx.clips.createClip({ ...opts, channel: broadcasterId }));
+    if (!clipId) {
+      return null;
+    }
     await AppDataSource.getRepository(TwitchClips).save({
       clipId: clipId, isChecked: false, shouldBeCheckedAt: Date.now() + 120 * 1000,
     });
@@ -51,12 +52,7 @@ export async function createClip (opts: { createAfterDelay: boolean }) {
         warning(`${getFunctionName()} => Connection to Twitch timed out. Will retry request.`);
         return { state: false }; // ignore etimedout error
       }
-      if (e.message.includes('Invalid OAuth token')) {
-        warning(`${getFunctionName()} => Invalid OAuth token - attempting to refresh token`);
-        await refresh('bot');
-      } else {
-        error(`${getFunctionName()} => ${e.stack ?? e.message}`);
-      }
+      error(`${getFunctionName()} => ${e.stack ?? e.message}`);
     }
   }
   return null;

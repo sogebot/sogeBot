@@ -18,7 +18,7 @@ import { app, ioServer } from '~/helpers/panel';
 import { defaultPermissions } from '~/helpers/permissions/defaultPermissions';
 import { adminEndpoint, publicEndpoint } from '~/helpers/socket';
 import * as changelog from '~/helpers/user/changelog.js';
-import client from '~/services/twitch/api/client';
+import twitch from '~/services/twitch';
 import { adminMiddleware } from '~/socket';
 import { translate } from '~/translate';
 import { variables } from '~/watchers';
@@ -34,44 +34,37 @@ const fetchUserForAlert = (opts: EmitData, type: 'recipient' | 'name'): Promise<
 
     const value = opts[type];
     if (value && value.length > 0) {
-      client('bot').then(clientBot => {
-        Promise.all([
-          AppDataSource.getRepository(User).findOneBy({ userName: value }),
-          clientBot.users.getUserByName(value),
-        ]).then(async ([user_db, response]) => {
-          if (response) {
-            changelog.update(response.id, {
-              userId:          response.id,
-              userName:        response.name,
-              displayname:     response.displayName,
-              profileImageUrl: response.profilePictureUrl,
-            });
-          }
-          const id = user_db?.userId || response?.id;
-          if (id) {
-            if (opts.event === 'promo') {
-              const user = await changelog.get(id);
-              const channel = await clientBot.channels.getChannelInfoById(id);
-              if (user && channel) {
-                resolve({
-                  ...user,
-                  game: channel.gameName,
-                });
-              } else {
-                resolve(null);
-              }
+      Promise.all([
+        AppDataSource.getRepository(User).findOneBy({ userName: value }),
+        twitch.apiClient?.asIntent(['bot'], ctx => ctx.users.getUserByName(value)),
+      ]).then(async ([user_db, response]) => {
+        if (response) {
+          changelog.update(response.id, {
+            userId:          response.id,
+            userName:        response.name,
+            displayname:     response.displayName,
+            profileImageUrl: response.profilePictureUrl,
+          });
+        }
+        const id = user_db?.userId || response?.id;
+        if (id) {
+          if (opts.event === 'promo') {
+            const user = await changelog.get(id);
+            const channel = await await twitch.apiClient?.asIntent(['bot'], ctx => ctx.channels.getChannelInfoById(id));
+            if (user && channel) {
+              resolve({
+                ...user,
+                game: channel.gameName,
+              });
             } else {
-              resolve(changelog.get(id));
+              resolve(null);
             }
           } else {
-            resolve(null);
+            resolve(changelog.get(id));
           }
-        }).catch((e) => {
-          if (e instanceof Error) {
-            error(e.stack || e.message);
-          }
+        } else {
           resolve(null);
-        });
+        }
       }).catch((e) => {
         if (e instanceof Error) {
           error(e.stack || e.message);

@@ -1,3 +1,5 @@
+import { existsSync, readFileSync } from 'fs';
+
 import { EventList } from '@entity/eventList';
 import { getTime } from '@sogebot/ui-helpers/getTime';
 import gitCommitInfo from 'git-commit-info';
@@ -5,27 +7,26 @@ import _ from 'lodash';
 import { In } from 'typeorm';
 import { VM } from 'vm2';
 
-import { timer } from '../decorators.js';
-import lastfm from '../integrations/lastfm.js';
-import spotify from '../integrations/spotify.js';
-import ranks from '../systems/ranks';
-import songs from '../systems/songs.js';
-import { translate } from '../translate.js';
-import users from '../users.js';
 import { isStreamOnline, stats } from './api';
 import { getAll } from './customvariables';
 import {
   isOwner, isSubscriber, isVIP,
 } from './user';
 import * as changelog from './user/changelog.js';
+import getNameById from './user/getNameById.js';
 import { isBot, isBotSubscriber } from './user/isBot';
 import { isBroadcaster } from './user/isBroadcaster';
 import { isModerator } from './user/isModerator';
+import { timer } from '../decorators.js';
+import lastfm from '../integrations/lastfm.js';
+import spotify from '../integrations/spotify.js';
+import ranks from '../systems/ranks';
+import songs from '../systems/songs.js';
+import { translate } from '../translate.js';
 
+import { AppDataSource } from '~/database.js';
 import Message from '~/message.js';
 import { variables as vars } from '~/watchers';
-import { AppDataSource } from '~/database.js';
-import { existsSync, readFileSync } from 'fs';
 
 class HelpersFilter {
   @timer()
@@ -114,7 +115,7 @@ class HelpersFilter {
 
     if (message.includes('$latestFollower')) {
       const latestFollower = await AppDataSource.getRepository(EventList).findOne({ order: { timestamp: 'DESC' }, where: { event: 'follow' } });
-      variables.$latestFollower = !_.isNil(latestFollower) ? await users.getNameById(latestFollower.userId) : 'n/a';
+      variables.$latestFollower = !_.isNil(latestFollower) ? await getNameById(latestFollower.userId) : 'n/a';
     }
 
     // latestSubscriber
@@ -129,7 +130,7 @@ class HelpersFilter {
         variables.$latestSubscriberMonths = latestSubscriberUser ? String(latestSubscriberUser.subscribeCumulativeMonths) : 'n/a';
         variables.$latestSubscriberStreak = latestSubscriberUser ? String(latestSubscriberUser.subscribeStreak) : 'n/a';
       }
-      variables.$latestSubscriber = !_.isNil(latestSubscriber) ? await users.getNameById(latestSubscriber.userId) : 'n/a';
+      variables.$latestSubscriber = !_.isNil(latestSubscriber) ? await getNameById(latestSubscriber.userId) : 'n/a';
     }
 
     // latestTip, latestTipAmount, latestTipCurrency, latestTipMessage
@@ -138,7 +139,7 @@ class HelpersFilter {
       variables.$latestTipAmount = !_.isNil(latestTip) ? parseFloat(JSON.parse(latestTip.values_json).amount).toFixed(2) : 'n/a';
       variables.$latestTipCurrency = !_.isNil(latestTip) ? JSON.parse(latestTip.values_json).currency : 'n/a';
       variables.$latestTipMessage = !_.isNil(latestTip) ? JSON.parse(latestTip.values_json).message : 'n/a';
-      variables.$latestTip = !_.isNil(latestTip) ? await users.getNameById(latestTip.userId) : 'n/a';
+      variables.$latestTip = !_.isNil(latestTip) ? await getNameById(latestTip.userId) : 'n/a';
     }
 
     // latestCheer, latestCheerAmount, latestCheerCurrency, latestCheerMessage
@@ -146,7 +147,7 @@ class HelpersFilter {
       const latestCheer = await AppDataSource.getRepository(EventList).findOne({ order: { timestamp: 'DESC' }, where: { event: 'cheer' } });
       variables.$latestCheerAmount = !_.isNil(latestCheer) ? JSON.parse(latestCheer.values_json).bits : 'n/a';
       variables.$latestCheerMessage = !_.isNil(latestCheer) ? JSON.parse(latestCheer.values_json).message : 'n/a';
-      variables.$latestCheer = !_.isNil(latestCheer) ? await users.getNameById(latestCheer.userId) : 'n/a';
+      variables.$latestCheer = !_.isNil(latestCheer) ? await getNameById(latestCheer.userId) : 'n/a';
     }
 
     const spotifySong = JSON.parse(spotify.currentSong);

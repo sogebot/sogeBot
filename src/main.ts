@@ -12,11 +12,9 @@ import blocked from 'blocked-at';
 import chalk from 'chalk';
 import figlet from 'figlet';
 import gitCommitInfo from 'git-commit-info';
-
-import { AppDataSource } from '~/database';
-
 import _ from 'lodash';
 
+import { AppDataSource } from '~/database';
 import { autoLoad } from '~/helpers/autoLoad';
 import { setIsBotStarted, setIsDbConnected } from '~/helpers/database';
 import {

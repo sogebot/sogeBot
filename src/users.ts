@@ -1,5 +1,14 @@
 import { setTimeout } from 'timers';
 
+import { HOUR } from '@sogebot/ui-helpers/constants';
+import {
+  Brackets, FindOneOptions, IsNull,
+} from 'typeorm';
+
+import { defaultPermissions } from './helpers/permissions/defaultPermissions';
+import { getUserHighestPermission } from './helpers/permissions/getUserHighestPermission';
+import getNameById from './helpers/user/getNameById';
+
 import Core from '~/_interface';
 import { AppDataSource } from '~/database';
 import { Permissions } from '~/database/entity/permissions';
@@ -7,15 +16,7 @@ import {
   User, UserBit, UserInterface, UserTip,
 } from '~/database/entity/user';
 import { onStartup } from '~/decorators/on';
-
-import { HOUR } from '@sogebot/ui-helpers/constants';
-
 import { isStreamOnline, stats } from '~/helpers/api';
-
-import {
-  Brackets, FindOneOptions, IsNull,
-} from 'typeorm';
-
 import { mainCurrency } from '~/helpers/currency';
 import exchange from '~/helpers/currency/exchange';
 import rates from '~/helpers/currency/rates';
@@ -24,13 +25,7 @@ import {
 } from '~/helpers/log';
 import { adminEndpoint, viewerEndpoint } from '~/helpers/socket';
 import * as changelog from '~/helpers/user/changelog.js';
-
-import { defaultPermissions } from './helpers/permissions/defaultPermissions';
-import { getUserHighestPermission } from './helpers/permissions/getUserHighestPermission';
-
 import { getIdFromTwitch } from '~/services/twitch/calls/getIdFromTwitch';
-
-import client from './services/twitch/api/client';
 
 class Users extends Core {
   constructor () {
@@ -69,13 +64,13 @@ class Users extends Core {
           .having('count > 1');
       }
       const viewers = await query.getRawMany();
-      const clientBot = await client('bot');
       await Promise.all(viewers.map(async (duplicate) => {
         const userName = duplicate.user_username;
         const duplicates = await AppDataSource.getRepository(User).find({ where: { userName } });
         await Promise.all(duplicates.map(async (user) => {
           try {
-            const getUserById = await clientBot.users.getUserById(user.userId);
+            const twitch = ( await import('./services/twitch')).default;
+            const getUserById = await twitch.apiClient?.asIntent(['bot'], ctx => ctx.users.getUserById(user.userId));
             if (!getUserById) {
               throw new Error('unknown');
             }
@@ -211,21 +206,6 @@ class Users extends Core {
     return new Map<string, string>(Object.entries(uniqueWithUsername));
   }
 
-  async getNameById (userId: string): Promise<string> {
-    const user = await await changelog.get(userId);
-    if (!user) {
-      const clientBot = await client('bot');
-      const getUserById = await clientBot.users.getUserById(userId);
-      if (getUserById) {
-        changelog.update(userId, { userName: getUserById.name });
-        return getUserById.name;
-      } else {
-        throw new Error('Cannot get username for userId ' + userId);
-      }
-    }
-    return user.userName;
-  }
-
   async getIdByName (userName: string) {
     if (userName.startsWith('@')) {
       userName = userName.substring(1);
@@ -352,7 +332,7 @@ class Users extends Core {
     });
     adminEndpoint('/core/users', 'getNameById', async (id, cb) => {
       try {
-        cb(null, await this.getNameById(id));
+        cb(null, await getNameById(id));
       } catch (e: any) {
         cb(e.stack, null);
       }

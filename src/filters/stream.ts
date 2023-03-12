@@ -1,7 +1,8 @@
-import client from '../services/twitch/api/client';
 import { param } from './param';
 
 import type { ResponseFilter } from '.';
+
+import twitch from '~/services/twitch';
 
 const stream: ResponseFilter = {
   '(stream|#|link)': async function (filter, attr) {
@@ -30,13 +31,12 @@ const stream: ResponseFilter = {
     channel = channel.replace('@', '');
 
     try {
-      const clientBot = await client('bot');
-      const getUserByName = await clientBot.users.getUserByName(channel);
+      const getUserByName = await twitch.apiClient?.asIntent(['bot'], ctx => ctx.users.getUserByName(channel));
       if (!getUserByName) {
         throw new Error();
       }
 
-      const getChannelInfo = await clientBot.channels.getChannelInfoById(getUserByName.id);
+      const getChannelInfo = await twitch.apiClient?.asIntent(['bot'], ctx => ctx.channels.getChannelInfoById(getUserByName.id));
       if (!getChannelInfo) {
         throw new Error();
       }
@@ -56,13 +56,12 @@ const stream: ResponseFilter = {
     channel = channel.replace('@', '');
 
     try {
-      const clientBot = await client('bot');
-      const getUserByName = await clientBot.users.getUserByName(channel);
+      const getUserByName = await twitch.apiClient?.asIntent(['bot'], ctx => ctx.users.getUserByName(channel));
       if (!getUserByName) {
         throw new Error();
       }
 
-      const getChannelInfo = await clientBot.channels.getChannelInfoById(getUserByName.id);
+      const getChannelInfo = await twitch.apiClient?.asIntent(['bot'], ctx => ctx.channels.getChannelInfoById(getUserByName.id));
       if (!getChannelInfo) {
         throw new Error();
       }
@@ -82,9 +81,8 @@ const stream: ResponseFilter = {
     channel = channel.replace('@', '');
 
     try {
-      const clientBot = await client('bot');
-      const getStreams = await clientBot.streams.getStreams({ userName: channel });
-      if (getStreams.data.length === 0) {
+      const getStreams = await twitch.apiClient?.asIntent(['bot'], ctx => ctx.streams.getStreams({ userName: channel }));
+      if (!getStreams) {
         throw new Error();
       }
       return `${getStreams.data[0].viewers}`;
@@ -103,9 +101,8 @@ const stream: ResponseFilter = {
     channel = channel.replace('@', '');
 
     try {
-      const clientBot = await client('bot');
-      const getStreams = await clientBot.streams.getStreams({ userName: channel });
-      if (getStreams.data.length === 0) {
+      const getStreams = await twitch.apiClient?.asIntent(['bot'], ctx => ctx.streams.getStreams({ userName: channel }));
+      if (!getStreams) {
         throw new Error();
       }
       return `live`;

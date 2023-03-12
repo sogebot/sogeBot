@@ -405,7 +405,7 @@ class Raffles extends System {
       return true;
     }
     if (this.deleteRaffleJoinCommands) {
-      tmiEmitter.emit('delete', 'bot', opts.id);
+      tmiEmitter.emit('delete', opts.id);
     }
 
     opts.message = opts.message.toString().replace(raffle.keyword, '');
