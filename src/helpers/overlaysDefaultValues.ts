@@ -238,6 +238,7 @@ const values = {
     hideMessageAfter:              600000,
     showTimestamp:                 true,
     showBadges:                    true,
+    showCommandMessages:           false,
     useCustomLineHeight:           false,
     customLineHeight:              14,
     useCustomBadgeSize:            false,

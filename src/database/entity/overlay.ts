@@ -12,6 +12,7 @@ export interface Chat {
   typeId: 'chat';
   type: 'vertical' | 'horizontal' | 'niconico';
   hideMessageAfter: number;
+  showCommandMessages: boolean,
   showTimestamp: boolean;
   reverseOrder: boolean;
   showBadges: boolean;
