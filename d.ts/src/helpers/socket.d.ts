@@ -252,6 +252,7 @@ export type ClientToServerEventsWithNamespace = {
     'test': (emit: EmitData) => void,
     'speak': (opts: { text: string, key: string, voice: string; volume: number; rate: number; pitch: number }, cb: (error: Error | string | null, b64mp3: string) => void) => void,
     'alert': (data: (EmitData & {
+      id: string;
       isTTSMuted: boolean;
       isSoundMuted: boolean;
       TTSService: number;
