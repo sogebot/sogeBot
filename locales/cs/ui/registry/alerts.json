@@ -45,17 +45,17 @@
     "help": "Slova musí být oddělena čárkou."
   },
   "event": {
-    "follows": "Sledující",
-    "cheers": "Bity",
-    "subs": "Předplatitel",
-    "resubs": "Předplatitel (resub)",
-    "subgifts": "Darování subscribe",
-    "subcommunitygifts": "Darování subscribe komunitě",
-    "tips": "Spropitné",
-    "raids": "Raidy",
-    "cmdredeems": "Vlastní",
+    "follow": "Follow",
+    "cheer": "Cheer",
+    "sub": "Sub",
+    "resub": "Resub",
+    "subgift": "Subgift",
+    "subcommunitygift": "Subgift to community",
+    "tip": "Tip",
+    "raid": "Raid",
+    "cmdredeem": "Custom",
     "promo": "Promo",
-    "rewardredeems": "Odměna vyplacena"
+    "rewardredeem": "Reward Redeem"
   },
   "title": {
     "name": "Název varianty",

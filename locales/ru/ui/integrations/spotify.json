@@ -1,5 +1,5 @@
 {
-  "artists": "Artists",
+  "artists": "Исполнители",
   "settings": {
     "enabled": "Статус",
     "songRequests": "Запросы песен",
@@ -20,7 +20,7 @@
     "clientSecret": "clientSecret",
     "manualDeviceId": {
       "title": "Идентификатор принудительного устройства",
-      "help": "Empty = disabled, force spotify device ID to be used to queue songs. Check logs for current active device or use button when playing song for at least 10 seconds."
+      "help": "Оставьте поле пустым, чтобы данное свойство не задействовано. Принудительно присвоить ID устройства в очереди песен. Проверьте журналы для текущего активного устройства или используйте кнопку воспроизведения песни не менее 10 секунд."
     },
     "redirectURI": "redirectURI",
     "format": {
@@ -29,13 +29,13 @@
     },
     "username": "Авторизованный пользователь",
     "revokeBtn": "Отменить авторизацию пользователя",
-    "authorizeBtn": "Авторизация пользователя",
+    "authorizeBtn": "Авторизовать пользователя",
     "scopes": "Разрешения",
     "playlistToPlay": {
       "title": "Spotify URI главного плейлиста",
       "help": "Если установлено, по завершении заказанных песен этот плейлист будет продолжаться"
     },
     "continueOnPlaylistAfterRequest": "Продолжить воспроизведение плейлиста после заказанных песен",
-    "notify": "Отправить сообщение при смене песни"
+    "notify": "Отправить сообщение в чат при смене песни"
   }
 }

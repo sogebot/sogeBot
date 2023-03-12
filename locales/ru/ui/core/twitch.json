@@ -1,6 +1,6 @@
 {
   "settings": {
-    "isTitleForced": "Title/Category is forced (bot will rewrite changes from elsewhere)",
+    "isTitleForced": "Принудительно обновлять \"Название\" и \"Категорию\" трансляций с бота",
     "createMarkerOnEvent": "Создать маркер потока на событии"
   }
 }

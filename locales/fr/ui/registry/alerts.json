@@ -45,17 +45,17 @@
     "help": "Les mots doivent être séparés par des virgules."
   },
   "event": {
-    "follows": "Follows",
-    "cheers": "Cheers",
-    "subs": "Subs",
-    "resubs": "Resubs",
-    "subgifts": "Subgifts",
-    "subcommunitygifts": "Subgifts à la communauté",
-    "tips": "Dons",
-    "raids": "Raids",
-    "cmdredeems": "Custom",
+    "follow": "Follow",
+    "cheer": "Cheer",
+    "sub": "Sub",
+    "resub": "Resub",
+    "subgift": "Subgift",
+    "subcommunitygift": "Subgift to community",
+    "tip": "Tip",
+    "raid": "Raid",
+    "cmdredeem": "Custom",
     "promo": "Promo",
-    "rewardredeems": "Réclamations de récompense"
+    "rewardredeem": "Reward Redeem"
   },
   "title": {
     "name": "Nom de la variante",

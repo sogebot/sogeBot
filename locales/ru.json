@@ -302,7 +302,7 @@
         },
         "": "",
         "reward": {
-          "label": "Reward",
+          "label": "Награда",
           "placeholder": ""
         }
       }
@@ -351,7 +351,7 @@
         "topContributionsSubsUsername": "Top Subs Contribution - Username",
         "sender": "Инициатор",
         "title": "Текущее звание",
-        "game": "Current category",
+        "game": "Текущая категория",
         "language": "Текущий язык стрима",
         "viewers": "Текущее количество зрителей",
         "hostViewers": "Raid viewers count",
@@ -426,7 +426,7 @@
         "tier": "Тир",
         "months": "Месяцы",
         "monthsName": "локализованное название месяца (1 месяц, 2 месяца)",
-        "oldGame": "Category before change",
+        "oldGame": "Категория перед изменением",
         "recipientObject": "Полный объект получателя",
         "recipient": "Получатель",
         "ytSong": "Текущая песня с YouTube",
@@ -544,7 +544,7 @@
     "viewers-points-of-all-users": "Поинты всех пользователей",
     "viewers-watchtime-of-all-users": "Время просмотра всех пользователей",
     "viewers-messages-of-all-users": "Сообщения всех пользователей",
-    "events-game-after-change": "category after change",
+    "events-game-after-change": "Категория после изменения",
     "events-game-before-change": "category before change",
     "events-user-triggered-event": "пользователь вызвавший событие",
     "events-method-used-to-subscribe": "способ сабскрайба",
@@ -1088,7 +1088,7 @@
   "game": {
     "current": "$sender, стример сейчас играет в $game.",
     "change": {
-      "success": "$sender, category was set to: $game"
+      "success": "$sender, категория изменена на: $game"
     }
   },
   "cooldowns": {

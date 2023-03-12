@@ -54,7 +54,7 @@
   "roulette": "Рулетка",
   "heist": "Ограбление",
   "oauth": "OAuth",
-  "socket": "Socket",
+  "socket": "Ядро",
   "textoverlay": "Текстовый оверлей",
   "carouseloverlay": "Carousel overlay",
   "alerts": "Алерты",
@@ -97,7 +97,7 @@
   "obswebsocket": "OBS Websocket",
   "api-explorer": "Проводник API",
   "emotescombo": "Комбо эмоций",
-  "notifications": "Notifications",
-  "plugins": "Plugins",
+  "notifications": "Уведомления",
+  "plugins": "Модули",
   "tts": "TTS"
 }

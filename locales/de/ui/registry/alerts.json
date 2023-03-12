@@ -45,17 +45,17 @@
     "help": "Wörter müssen durch Kommas getrennt werden."
   },
   "event": {
-    "follows": "Follows",
-    "cheers": "Cheers",
-    "subs": "Subs",
-    "resubs": "Re-Subs",
-    "subgifts": "Verschenkte Subs",
-    "subcommunitygifts": "SubGifts an Community",
-    "tips": "Tips",
-    "raids": "Raids",
-    "cmdredeems": "Custom",
+    "follow": "Follow",
+    "cheer": "Cheer",
+    "sub": "Sub",
+    "resub": "Resub",
+    "subgift": "Subgift",
+    "subcommunitygift": "Subgift to community",
+    "tip": "Tip",
+    "raid": "Raid",
+    "cmdredeem": "Custom",
     "promo": "Promo",
-    "rewardredeems": "Belohnungen einlösen"
+    "rewardredeem": "Reward Redeem"
   },
   "title": {
     "name": "Variantenname",

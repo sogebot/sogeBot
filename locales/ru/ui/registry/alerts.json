@@ -45,17 +45,17 @@
     "help": "Слова должны быть разделены запятыми."
   },
   "event": {
-    "follows": "Подписки",
-    "cheers": "Чирсы",
-    "subs": "Сабы",
-    "resubs": "Ресабы",
-    "subgifts": "Сабгифты",
-    "subcommunitygifts": "Сабподарки для сообщества",
-    "tips": "Донаты",
-    "raids": "Рейды",
-    "cmdredeems": "Custom",
+    "follow": "Follow",
+    "cheer": "Cheer",
+    "sub": "Sub",
+    "resub": "Resub",
+    "subgift": "Subgift",
+    "subcommunitygift": "Subgift to community",
+    "tip": "Tip",
+    "raid": "Raid",
+    "cmdredeem": "Custom",
     "promo": "Promo",
-    "rewardredeems": "Reward Redeems"
+    "rewardredeem": "Reward Redeem"
   },
   "title": {
     "name": "Название варианта",
@@ -65,7 +65,7 @@
     "name": "Вариант применения"
   },
   "filter": {
-    "name": "Filter",
+    "name": "Фильтр",
     "operator": "Оператор",
     "rule": "Правила",
     "addRule": "Добавить правило",
