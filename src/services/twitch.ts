@@ -27,6 +27,7 @@ import {
   isStreamOnline, stats, streamStatusChangeSince,
 } from '~/helpers/api';
 import { prepare } from '~/helpers/commons/prepare';
+import { start } from '~/helpers/core/stream';
 import defaultPermissions from '~/helpers/permissions/defaultPermissions';
 import { adminEndpoint } from '~/helpers/socket';
 import {
@@ -38,6 +39,7 @@ import { isIgnored } from '~/helpers/user/isIgnored';
 import { sendGameFromTwitch } from '~/services/twitch/calls/sendGameFromTwitch';
 import { updateChannelInfo } from '~/services/twitch/calls/updateChannelInfo';
 import { translate } from '~/translate';
+import { variables } from '~/watchers';
 
 const urls = {
   'SogeBot Token Generator':    'https://twitch-token-generator.soge.workers.dev/refresh/',
@@ -260,8 +262,14 @@ class Twitch extends Service {
   }
 
   @onStreamStart()
-  reconnectOnStreamStart() {
+  async reconnectOnStreamStart() {
+    const broadcasterUsername = variables.get('services.twitch.broadcasterUsername') as string;
+
     this.uptime = 0;
+    await this.tmi?.part('bot');
+    await this.tmi?.join('bot', broadcasterUsername);
+    await this.tmi?.part('broadcaster');
+    await this.tmi?.join('broadcaster', broadcasterUsername);
   }
 
   @onChange('showWithAt')

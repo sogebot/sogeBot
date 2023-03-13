@@ -22,7 +22,7 @@ import { parserReply } from '~/commons';
 import { AppDataSource } from '~/database';
 import { timer } from '~/decorators';
 import {
-  getFunctionList, onStreamStart,
+  getFunctionList,
 } from '~/decorators/on';
 import { isStreamOnline, stats } from '~/helpers/api';
 import * as hypeTrain from '~/helpers/api/hypeTrain';
@@ -83,13 +83,6 @@ class Chat {
 
     this.initClient('bot');
     this.initClient('broadcaster');
-  }
-
-  @onStreamStart()
-  reconnectOnStreamStart() {
-    const broadcasterUsername = variables.get('services.twitch.broadcasterUsername') as string;
-    this.part('bot').then(() => this.join('bot', broadcasterUsername));
-    this.part('broadcaster').then(() => this.join('broadcaster', broadcasterUsername));
   }
 
   emitter() {
