@@ -27,7 +27,6 @@ import {
   isStreamOnline, stats, streamStatusChangeSince,
 } from '~/helpers/api';
 import { prepare } from '~/helpers/commons/prepare';
-import { start } from '~/helpers/core/stream';
 import defaultPermissions from '~/helpers/permissions/defaultPermissions';
 import { adminEndpoint } from '~/helpers/socket';
 import {
