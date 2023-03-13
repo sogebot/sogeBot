@@ -40,7 +40,7 @@ class EventSub {
     }
 
     this.listener = new EventSubWsListener({ apiClient: this.apiClient });
-
+    this.listener.start();
     try {
       // FOLLOW
       this.listener.onChannelFollow(broadcasterId, broadcasterId, event => follow(event.userId, event.userName, new Date(event.followDate).toISOString()));
