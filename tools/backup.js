@@ -1,9 +1,11 @@
 require('dotenv').config();
+
 const fs = require('fs');
+const { normalize } = require('path');
 const { stdout } = require('process');
 
 const _ = require('lodash');
-const { createConnection, getConnectionOptions, getManager } = require('typeorm');
+const { DataSource, DataSourceOptions } = require('typeorm');
 const argv = require('yargs') // eslint-disable-line
   .usage('node tools/backup.js')
   .example('node tools/backup.js backup ./backup')
@@ -57,33 +59,70 @@ const argv = require('yargs') // eslint-disable-line
 const { getMigrationType } = require('../dest/helpers/getMigrationType');
 
 async function main() {
-  const type = process.env.TYPEORM_CONNECTION;
-  const connectionOptions = await getConnectionOptions();
-  let connection;
-
+  const type = process.env.TYPEORM_AppDataSource;
   const migrationsRun = argv._[0] === 'restore';
 
-  if (type === 'mysql' || type === 'mariadb') {
-    connection = await createConnection({
-      ...connectionOptions,
-      synchronize: false,
-      migrationsRun,
-      charset:     'UTF8MB4_GENERAL_CI',
-      entities:    [ './dest/database/entity/*.js' ],
-      migrations:  [ `./dest/database/migration/${getMigrationType(connectionOptions.type)}/**/*.js` ],
-    });
-  } else {
-    connection = await createConnection({
-      ...connectionOptions,
-      synchronize: false,
-      migrationsRun,
-      entities:    [ './dest/database/entity/*.js' ],
-      migrations:  [ `./dest/database/migration/${getMigrationType(connectionOptions.type)}/**/*.js` ],
-    });
-  }
+  const MySQLDataSourceOptions = {
+    type:           'mysql',
+    connectTimeout: 60000,
+    acquireTimeout: 120000,
+    host:           process.env.TYPEORM_HOST,
+    port:           Number(process.env.TYPEORM_PORT ?? 3306),
+    username:       process.env.TYPEORM_USERNAME,
+    password:       process.env.TYPEORM_PASSWORD,
+    database:       process.env.TYPEORM_DATABASE,
+    logging:        ['error'],
+    synchronize:    process.env.FORCE_DB_SYNC === 'IKnowWhatIamDoing',
+    migrationsRun:  true,
+    entities:       [ 'dest/database/entity/*.js' ],
+    subscribers:    [ 'dest/database/entity/*.js' ],
+    migrations:     [ `dest/database/migration/mysql/**/*.js` ],
+  } ;
 
+  const PGDataSourceOptions = {
+    type:          'postgres',
+    host:          process.env.TYPEORM_HOST,
+    port:          Number(process.env.TYPEORM_PORT ?? 3306),
+    username:      process.env.TYPEORM_USERNAME,
+    password:      process.env.TYPEORM_PASSWORD,
+    database:      process.env.TYPEORM_DATABASE,
+    logging:       ['error'],
+    synchronize:   process.env.FORCE_DB_SYNC === 'IKnowWhatIamDoing',
+    migrationsRun: true,
+    entities:      [ 'dest/database/entity/*.js' ],
+    subscribers:   [ 'dest/database/entity/*.js' ],
+    migrations:    [ `dest/database/migration/postgres/**/*.js` ],
+  };
+
+  const SQLiteDataSourceOptions = {
+    type:          'better-sqlite3',
+    database:      process.env.TYPEORM_DATABASE ?? 'sogebot.db',
+    logging:       ['error'],
+    synchronize:   process.env.FORCE_DB_SYNC === 'IKnowWhatIamDoing',
+    migrationsRun: true,
+    entities:      [ 'dest/database/entity/*.js' ],
+    subscribers:   [ 'dest/database/entity/*.js' ],
+    migrations:    [ `dest/database/migration/sqlite/**/*.js` ],
+  };
+
+  let AppDataSource;
+  if (process.env.TYPEORM_AppDataSource === 'mysql' || process.env.TYPEORM_AppDataSource === 'mariadb') {
+    AppDataSource = new DataSource(MySQLDataSourceOptions);
+  } else if (process.env.TYPEORM_AppDataSource === 'postgres') {
+    AppDataSource = new DataSource(PGDataSourceOptions);
+  } else {
+    AppDataSource = new DataSource(SQLiteDataSourceOptions);
+  }
+  await AppDataSource.initialize();
+  const typeToLog = {
+    'better-sqlite3': 'SQLite3',
+    mariadb:          'MySQL/MariaDB',
+    mysql:            'MySQL/MariaDB',
+    postgres:         'PostgreSQL',
+  };
+  console.log(`Initialized ${typeToLog[type]} database (${normalize(String(AppDataSource.options.database))})`);
   if (argv._[0] === 'backup') {
-    const metadatas = await getManager().connection.entityMetadatas;
+    const metadatas = AppDataSource.entityMetadatas;
     const relationTable = [];
     const tables = metadatas
       .map((table) => {
@@ -113,7 +152,7 @@ async function main() {
       process.stdout.write(`Processing table ${table}`);
       const entity = metadatas.find(o => o.tableName === table);
       const relations = entity.ownRelations.map(o => o.propertyName);
-      const data = await connection.getRepository(entity.tableName).find({ relations });
+      const data = await AppDataSource.getRepository(entity.tableName).find({ relations });
       fs.writeFileSync(`${argv.directory}/${table}.json`, JSON.stringify(data, null, 2));
       process.stdout.write(`...OK\n`);
     }
@@ -135,35 +174,35 @@ async function main() {
       process.stdout.write(`Processing table ${table}`);
 
       const backupData = JSON.parse(fs.readFileSync(`${argv.directory}/${table}.json`));
-      const entity = await getManager().connection.entityMetadatas.find(o => o.tableName === table);
+      const entity = await AppDataSource.entityMetadatas.find(o => o.tableName === table);
       const relations = entity.ownRelations.map(o => o.type);
       if (type === 'mysql' || type === 'mariadb') {
         if (!tableDeleted.includes(entity.tableName)) {
-          await connection.getRepository(entity.tableName).query(`DELETE FROM \`${entity.tableName}\` WHERE 1=1`);
+          await AppDataSource.getRepository(entity.tableName).query(`DELETE FROM \`${entity.tableName}\` WHERE 1=1`);
           tableDeleted.push(entity.tableName);
         }
         for (const relation of relations) {
-          if (!tableDeleted.includes(connection.getRepository(relation).metadata.tableName)) {
-            await connection.getRepository(entity.tableName).query(`DELETE FROM \`${connection.getRepository(relation).metadata.tableName}\` WHERE 1=1`);
-            tableDeleted.push(connection.getRepository(relation).metadata.tableName);
+          if (!tableDeleted.includes(AppDataSource.getRepository(relation).metadata.tableName)) {
+            await AppDataSource.getRepository(entity.tableName).query(`DELETE FROM \`${AppDataSource.getRepository(relation).metadata.tableName}\` WHERE 1=1`);
+            tableDeleted.push(AppDataSource.getRepository(relation).metadata.tableName);
           }
         }
       } else {
         if (!tableDeleted.includes(entity.tableName)) {
-          await connection.getRepository(entity.tableName).query(`DELETE FROM "${entity.tableName}" WHERE 1=1`);
+          await AppDataSource.getRepository(entity.tableName).query(`DELETE FROM "${entity.tableName}" WHERE 1=1`);
           tableDeleted.push(entity.tableName);
         }
         for (const relation of relations) {
-          if (!tableDeleted.includes(connection.getRepository(relation).metadata.tableName)) {
-            await connection.getRepository(entity.tableName).query(`DELETE FROM "${connection.getRepository(relation).metadata.tableName}" WHERE 1=1`);
-            tableDeleted.push(connection.getRepository(relation).metadata.tableName);
+          if (!tableDeleted.includes(AppDataSource.getRepository(relation).metadata.tableName)) {
+            await AppDataSource.getRepository(entity.tableName).query(`DELETE FROM "${AppDataSource.getRepository(relation).metadata.tableName}" WHERE 1=1`);
+            tableDeleted.push(AppDataSource.getRepository(relation).metadata.tableName);
           }
         }
       }
 
       for (const ch of _.chunk(backupData, 100)) {
         process.stdout.write('.');
-        await connection.getRepository(entity.tableName).save(ch);
+        await AppDataSource.getRepository(entity.tableName).save(ch);
       }
 
       process.stdout.write(`...OK\n`);
@@ -173,7 +212,7 @@ async function main() {
 
   if (argv._[0] === 'list') {
     console.log('Available tables:\n');
-    const metadatas = await getManager().connection.entityMetadatas;
+    const metadatas = await AppDataSource.entityMetadatas;
     const relationTable = [];
     const tables = metadatas
       .map((table) => {
@@ -194,32 +233,37 @@ async function main() {
   }
 
   if (argv._[0] === 'save') {
-    const metadatas = await getManager().connection.entityMetadatas;
+    const metadatas = await AppDataSource.entityMetadatas;
     const entity = metadatas.find(o => o.tableName === argv.table);
+    if (!entity) {
+      console.error(`Table ${argv.table} was not found in database`);
+      process.exit(1);
+    }
     const relations = entity.ownRelations.map(o => o.propertyName);
-    const backupData = await connection.getRepository(entity.tableName).find({ relations });
+    const backupData = await AppDataSource.getRepository(entity.tableName).find({ relations });
+    console.log(`Database table ${argv.table} saved to ${argv.path}`);
     fs.writeFileSync(argv.path, JSON.stringify(backupData, null, 2));
   }
 
   if (argv._[0] === 'load') {
     const backupData = JSON.parse(fs.readFileSync(argv.path));
-    const entity = await getManager().connection.entityMetadatas.find(o => o.tableName === argv.table);
+    const entity = await AppDataSource.entityMetadatas.find(o => o.tableName === argv.table);
     const relations = entity.ownRelations.map(o => o.type);
     if (type === 'mysql' || type === 'mariadb') {
-      await connection.getRepository(entity.tableName).query(`DELETE FROM \`${entity.tableName}\` WHERE 1=1`);
+      await AppDataSource.getRepository(entity.tableName).query(`DELETE FROM \`${entity.tableName}\` WHERE 1=1`);
       for (const relation of relations) {
-        await connection.getRepository(entity.tableName).query(`DELETE FROM \`${relation}\` WHERE 1=1`);
+        await AppDataSource.getRepository(entity.tableName).query(`DELETE FROM \`${relation}\` WHERE 1=1`);
       }
     } else {
-      await connection.getRepository(entity.tableName).query(`DELETE FROM "${entity.tableName}" WHERE 1=1`);
+      await AppDataSource.getRepository(entity.tableName).query(`DELETE FROM "${entity.tableName}" WHERE 1=1`);
       for (const relation of relations) {
-        await connection.getRepository(entity.tableName).query(`DELETE FROM "${relation}" WHERE 1=1`);
+        await AppDataSource.getRepository(entity.tableName).query(`DELETE FROM "${relation}" WHERE 1=1`);
       }
     }
     process.stdout.write('Processing');
     for (const ch of _.chunk(backupData, 100)) {
       process.stdout.write('.');
-      await connection.getRepository(entity.tableName).save(ch);
+      await AppDataSource.getRepository(entity.tableName).save(ch);
     }
     console.log('DONE!');
   }
