@@ -40,7 +40,13 @@ class EventSub {
     }
 
     this.listener = new EventSubWsListener({ apiClient: this.apiClient });
-    this.listener.start();
+
+    if (process.env.ENV === 'production') {
+      this.listener.start();
+    } else {
+      info('EVENTSUB-WS: Eventsub events disabled on dev-mode.');
+    }
+
     try {
       // FOLLOW
       this.listener.onChannelFollow(broadcasterId, broadcasterId, event => follow(event.userId, event.userName, new Date(event.followDate).toISOString()));
