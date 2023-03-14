@@ -11,8 +11,8 @@ import alerts from '../registries/alerts';
 import { AppDataSource } from '~/database';
 import { error } from '~/helpers/log';
 import { adminEndpoint } from '~/helpers/socket';
-import { translate } from '~/translate';
 import getNameById from '~/helpers/user/getNameById';
+import { translate } from '~/translate';
 
 class EventList extends Widget {
   public sockets() {
@@ -79,11 +79,12 @@ class EventList extends Widget {
           case 'subgift':
             alerts.trigger({
               event:      event.event,
-              name:       await getNameById(event.userId),
-              amount:     Number(values.count),
+              name:       await getNameById(values.fromId),
               tier:       null,
+              recipient:  await getNameById(event.userId),
+              amount:     Number(values.months),
+              monthsName: getLocalizedName(Number(values.months), translate('core.months')),
               currency:   '',
-              monthsName: '',
               message:    '',
             });
             break;
