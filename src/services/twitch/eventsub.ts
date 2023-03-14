@@ -144,8 +144,8 @@ class EventSub {
         }
 
         // trigger reward-redeemed event
-        if (event.rewardPrompt.length > 0) {
-          redeem(`${ event.userName }#${ event.userId } redeemed ${ event.rewardTitle }: ${ event.rewardPrompt }`);
+        if (event.input.length > 0) {
+          redeem(`${ event.userName }#${ event.userId } redeemed ${ event.rewardTitle }: ${ event.input }`);
         } else {
           redeem(`${ event.userName }#${ event.userId } redeemed ${ event.rewardTitle }`);
         }
@@ -157,7 +157,7 @@ class EventSub {
         eventlist.add({
           event:         'rewardredeem',
           userId:        String(event.userId),
-          message:       event.rewardPrompt,
+          message:       event.input,
           timestamp:     Date.now(),
           titleOfReward: event.rewardTitle,
           rewardId:      event.rewardId,
@@ -170,14 +170,14 @@ class EventSub {
           tier:       null,
           currency:   '',
           monthsName: '',
-          message:    event.rewardPrompt,
+          message:    event.input,
           recipient:  event.userName,
         });
         eventEmitter.emit('reward-redeemed', {
           userId:    event.userId,
           userName:  event.userName,
           rewardId:  event.rewardId,
-          userInput: event.rewardPrompt,
+          userInput: event.input,
         });
       });
 
