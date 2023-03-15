@@ -47,7 +47,7 @@ type Item<T> = {
   variantAmount: number;
   messageTemplate: string;
   ttsTemplate: string;
-  layout: '1' | '2' | '3' | '4' | '5';
+  layout: '0' | '1' | '2' | '3' | '4' | '5';
   /*
    * JSON type of Filter
    */
