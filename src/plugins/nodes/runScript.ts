@@ -14,6 +14,8 @@ import { tmiEmitter } from '~/helpers/tmi';
 import * as changelog from '~/helpers/user/changelog.js';
 import { isBroadcaster } from '~/helpers/user/isBroadcaster';
 import { template } from '~/plugins/template';
+import banUser from '~/services/twitch/calls/banUser';
+import { getIdFromTwitch } from '~/services/twitch/calls/getIdFromTwitch';
 import points from '~/systems/points';
 
 const semaphores = new Map<string, Mutex>();
@@ -66,8 +68,15 @@ export default async function(pluginId: string, currentNode: Node<string>, param
         sendMessage(message:string) {
           sendMessage(message, userstate || getBotSender(), { parameters, ...variables });
         },
-        timeout(userName:string, timeout: number) {
-          tmiEmitter.emit('timeout', userName, timeout, true);
+        async timeout(userName:string, timeout: number, reason?: string) {
+          const user = await AppDataSource.getRepository(User).findOneBy({ userName: userName });
+          if (user) {
+            tmiEmitter.emit('timeout', userName, timeout, { mod: user.isModerator }, reason);
+          } else {
+            const userId = await getIdFromTwitch(userName);
+            banUser(userId, reason ?? '', Number(timeout));
+
+          }
         },
       },
       sender: userstate ? {

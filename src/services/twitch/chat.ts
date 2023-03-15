@@ -90,21 +90,17 @@ class Chat {
       setTimeout(() => this.emitter(), 10);
       return;
     }
-    tmiEmitter.on('timeout', async (username, duration, isMod) => {
+    tmiEmitter.on('timeout', async (username, duration, is, reason) => {
       const userId = await users.getIdByName(username);
 
-      banUser(userId, '', duration);
+      banUser(userId, reason ?? '', duration);
 
-      if (isMod) {
-        if (this.client.broadcaster) {
-          info(`Bot will set mod status for ${username} after ${duration} seconds.`);
-          setTimeout(() => {
-            // we need to remod user
-            addModerator(userId);
-          }, (duration * 1000) + 1000);
-        } else {
-          error('Cannot timeout mod user, as you don\'t have set broadcaster in chat');
-        }
+      if (is.mod) {
+        info(`Bot will set mod status for ${username} after ${duration} seconds.`);
+        setTimeout(() => {
+          // we need to remod user
+          addModerator(userId);
+        }, (duration * 1000) + 1000);
       }
     });
     tmiEmitter.on('say', (channel, message, opts) => {
@@ -117,9 +113,6 @@ class Chat {
     tmiEmitter.on('join', (type) => {
       const broadcasterUsername = variables.get('services.twitch.broadcasterUsername') as string;
       this.join(type, broadcasterUsername);
-    });
-    tmiEmitter.on('ban', (username) => {
-      this.ban(username);
     });
     tmiEmitter.on('reconnect', (type) => {
       this.reconnect(type);
@@ -234,19 +227,6 @@ class Chat {
 
         emitter.emit('set', '/services/twitch', 'broadcasterUsername', channel);
       }
-    }
-  }
-
-  async ban (username: string, type: 'bot' | 'broadcaster' = 'bot' ): Promise<void> {
-    const client = this.client[type];
-    if (!client && type === 'bot') {
-      return this.ban(username, 'broadcaster');
-    } else if (!client) {
-      error(`TMI: Cannot ban user. Bot/Broadcaster is not connected to TMI.`);
-    } else {
-      banUser(await users.getIdByName(username), '');
-      info(`TMI: User ${username} was banned and blocked.`);
-      return;
     }
   }
 
@@ -853,12 +833,32 @@ class Chat {
     });
 
     const whisperListener = variables.get('services.twitch.whisperListener') as boolean;
+    let additionalInfo = '+';
+    if (userstate.isVip) {
+      additionalInfo += 'V';
+    }
+    if (userstate.isMod) {
+      additionalInfo += 'M';
+    }
+    if (userstate.isArtist) {
+      additionalInfo += 'A';
+    }
+    if (userstate.isBroadcaster) {
+      additionalInfo += 'B';
+    }
+    if (userstate.isFounder) {
+      additionalInfo += 'F';
+    }
+    if (userstate.isSubscriber) {
+      additionalInfo += 'S';
+    }
+
     if (!skip
         && data.isWhisper
         && (whisperListener || isOwner(userstate))) {
-      whisperIn(`${message} [${userName}]`);
+      whisperIn(`${message} [${userName}${additionalInfo.length > 1 ? additionalInfo : ''}]`);
     } else if (!skip && !isBotId(userId)) {
-      chatIn(`${message} [${userName}]`);
+      chatIn(`${message} [${userName}${additionalInfo.length > 1 ? additionalInfo : ''}]`);
     }
 
     if (commandRegexp.test(message)) {

@@ -358,7 +358,10 @@ class Songs extends System {
     const users = await AppDataSource.getRepository(User).findBy({ userName: In(request) });
     for (const username of request) {
       const data = users.find(o => o.userName === username);
-      tmiEmitter.emit('timeout', username, 300, typeof data !== 'undefined' && isModerator(data));
+      tmiEmitter.emit('timeout', username, 300,
+        {
+          mod: typeof data !== 'undefined' && isModerator(data),
+        });
     }
 
     const songBan = new SongBan({ videoId: videoID, title: videoTitle });

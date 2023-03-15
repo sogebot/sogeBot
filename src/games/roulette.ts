@@ -1,7 +1,7 @@
 import _ from 'lodash';
 
-import { command, settings } from '../decorators';
 import Game from './_interface';
+import { command, settings } from '../decorators';
 
 import { tmiEmitter } from '~/helpers/tmi';
 import * as changelog from '~/helpers/user/changelog.js';
@@ -47,7 +47,7 @@ class Roulette extends Game {
 
     setTimeout(async () => {
       if (!isAlive) {
-        tmiEmitter.emit('timeout', opts.sender.userName, this.timeout, isModerator(opts.sender));
+        tmiEmitter.emit('timeout', opts.sender.userName, this.timeout, { mod: opts.sender.isMod });
       }
     }, 2000);
 

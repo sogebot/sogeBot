@@ -1,6 +1,5 @@
 import { EventList } from '@entity/eventList';
 import { HOUR } from '@sogebot/ui-helpers/constants';
-import { AppDataSource } from '~/database';
 
 import eventlist from '../../overlays/eventlist';
 import alerts from '../../registries/alerts';
@@ -12,7 +11,8 @@ import {
 
 import { eventEmitter } from '.';
 
-import { tmiEmitter } from '~/helpers/tmi';
+import { AppDataSource } from '~/database';
+import banUser from '~/services/twitch/calls/banUser';
 
 const events = new Map<string, number>();
 
@@ -27,7 +27,7 @@ export async function follow(userId: string, userName: string, followedAt: strin
     debug('events', `User ${userName}#${userId} is in ignore list.`);
     if (isInGlobalIgnoreList({ userName, userId })) {
       // autoban + autoblock
-      tmiEmitter.emit('ban', userName);
+      banUser(userId);
       // remove from eventslit
       AppDataSource.getRepository(EventList).delete({ userId });
     }

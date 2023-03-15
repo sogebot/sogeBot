@@ -31,10 +31,7 @@ import { getUserHighestPermission } from '~/helpers/permissions/getUserHighestPe
 import { getUserPermissionsList } from '~/helpers/permissions/getUserPermissionsList';
 import { adminEndpoint } from '~/helpers/socket';
 import { tmiEmitter } from '~/helpers/tmi';
-import getBotId from '~/helpers/user/getBotId';
-import getBroadcasterId from '~/helpers/user/getBroadcasterId';
-import { isModerator } from '~/helpers/user/isModerator';
-import twitch from '~/services/twitch';
+import banUser from '~/services/twitch/calls/banUser';
 import aliasSystem from '~/systems/alias';
 import songs from '~/systems/songs';
 import { translate } from '~/translate';
@@ -221,14 +218,18 @@ class Moderation extends System {
 
     if (this.cWarningsAllowedCount === 0) {
       timeoutLog(`${sender.userName} [${type}] ${time}s timeout | ${text}`);
-      tmiEmitter.emit('timeout', sender.userName, time, isModerator(sender));
+      tmiEmitter.emit('timeout', sender.userName, time, {
+        mod: sender.isMod,
+      });
       return;
     }
 
     const isWarningCountAboveThreshold = warnings.length >= this.cWarningsAllowedCount;
     if (isWarningCountAboveThreshold) {
       timeoutLog(`${sender.userName} [${type}] ${time}s timeout | ${text}`);
-      tmiEmitter.emit('timeout', sender.userName, time, isModerator(sender));
+      tmiEmitter.emit('timeout', sender.userName, time, {
+        mod: sender.isMod,
+      });
       await AppDataSource.getRepository(ModerationWarning).delete({ userId: sender.userId });
     } else {
       await AppDataSource.getRepository(ModerationWarning).insert({ userId: sender.userId, timestamp: Date.now() });
@@ -236,7 +237,9 @@ class Moderation extends System {
       warning = await new Message(warning.replace(/\$count/g, String(warningsLeft < 0 ? 0 : warningsLeft))).parse();
       if (this.cWarningsShouldClearChat) {
         timeoutLog(`${sender.userName} [${type}] 1s timeout, warnings left ${warningsLeft < 0 ? 0 : warningsLeft} | ${text}`);
-        tmiEmitter.emit('timeout', sender.userName, 1, isModerator(sender));
+        tmiEmitter.emit('timeout', sender.userName, 1, {
+          mod: sender.isMod,
+        });
       }
 
       if (this.cWarningsAnnounceTimeouts) {
@@ -344,7 +347,7 @@ class Moderation extends System {
     } else {
       warningLog('AUTOBAN: No message of user found, user will be just banned.');
     }
-    await twitch.apiClient?.asIntent(['bot'], ctx => ctx.moderation.banUser(getBroadcasterId(), getBotId(), { user: { id: opts.sender.userId }, reason: 'AUTOBAN: Message of user found in message list. Banning user.' }));
+    banUser(opts.sender.userId, 'AUTOBAN: Message of user found in message list. Banning user.');
     return [];
   }
 
@@ -364,7 +367,7 @@ class Moderation extends System {
       warningLog('AUTOBAN: Message of user found in message list. Banning user.');
 
       if (opts.sender) {
-        await twitch.apiClient?.asIntent(['bot'], ctx => ctx.moderation.banUser(getBroadcasterId(), getBotId(), { user: { id: opts.sender!.userId }, reason: 'AUTOBAN: Message of user found in message list. Banning user.' }));
+        banUser(opts.sender.userId, 'AUTOBAN: Message of user found in message list. Banning user.');
       }
       return false;
     }
