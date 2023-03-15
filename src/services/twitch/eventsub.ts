@@ -41,6 +41,15 @@ class EventSub {
 
     this.listener = new EventSubWsListener({ apiClient: this.apiClient });
 
+    this.listener.onUserSocketConnect(() => {
+      info(`EVENTSUB-WS: Service initialized for ${broadcasterUsername}#${broadcasterId}`);
+    });
+    this.listener.onUserSocketDisconnect((_, err) => {
+      error(`EVENTSUB-WS: ${err?.stack}`);
+      info(`EVENTSUB-WS: Reconnecting...`);
+      this.onStartup(); // try to reconnect
+    });
+
     if (process.env.ENV === 'production') {
       this.listener.start();
     } else {
@@ -182,7 +191,6 @@ class EventSub {
       });
 
       this.listenerBroadcasterId = broadcasterId;
-      info(`EVENTSUB-WS: Service initialized for ${broadcasterUsername}#${broadcasterId}`);
     } catch (e) {
       this.listener.stop();
       this.listener = null;
