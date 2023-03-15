@@ -3,8 +3,10 @@ import {
 } from '@entity/commands';
 import * as constants from '@sogebot/ui-helpers/constants';
 import { validateOrReject } from 'class-validator';
-import _, { merge } from 'lodash';
+import { cloneDeep, merge, orderBy, shuffle } from 'lodash';
+import { v4 } from 'uuid';
 
+import System from './_interface';
 import { parserReply } from '../commons';
 import {
   command, default_permission, helper,
@@ -12,9 +14,7 @@ import {
   timer,
 } from '../decorators';
 import Expects from '../expects';
-import System from './_interface';
 
-import { v4 } from 'uuid';
 import { checkFilter } from '~/helpers/checkFilter';
 import {
   getAllCountOfCommandUsage, getCountOfCommandUsage, incrementCountOfCommandUsage, resetCountOfCommandUsage,
@@ -22,9 +22,9 @@ import {
 import { prepare } from '~/helpers/commons';
 import { info, warning } from '~/helpers/log';
 import { app } from '~/helpers/panel';
-import { get } from '~/helpers/permissions/get';
-import { defaultPermissions } from '~/helpers/permissions/defaultPermissions';
 import { check } from '~/helpers/permissions/check';
+import { defaultPermissions } from '~/helpers/permissions/defaultPermissions';
+import { get } from '~/helpers/permissions/get';
 import { adminMiddleware } from '~/socket';
 import { translate } from '~/translate';
 
@@ -254,7 +254,7 @@ class CustomCommands extends System {
       const db_commands = (await Commands.find()).filter(o => o.command === cmdArray.join(' '));
       for (const cmd of db_commands) {
         commandsSearchProgress.push({
-          cmdArray: _.cloneDeep(cmdArray),
+          cmdArray: cloneDeep(cmdArray),
           command:  cmd,
         });
       }
@@ -302,7 +302,8 @@ class CustomCommands extends System {
         }
       }
 
-      for (const r of _.orderBy(cmd.command.responses, 'order', 'asc')) {
+      const responses = cmd.command.areResponsesRandomized ? shuffle(cmd.command.responses) : orderBy(cmd.command.responses, 'order', 'asc');
+      for (const r of responses) {
         let permission = r.permission ?? groupPermission;
         // show warning if null permission
         if (!permission) {
@@ -325,7 +326,7 @@ class CustomCommands extends System {
       }
 
       if (!opts.quiet) {
-        this.sendResponse(_.cloneDeep(_responses), {
+        this.sendResponse(cloneDeep(_responses), {
           param, sender: opts.sender, command: cmd.command.command, processedCommands: opts.processedCommands, discord: opts.discord, id: opts.id,
         });
       }
@@ -348,7 +349,7 @@ class CustomCommands extends System {
     if (!cmd) {
       // print commands
       const _commands = commands.filter(o => o.visible && o.enabled);
-      const response = (_commands.length === 0 ? translate('customcmds.list-is-empty') : translate('customcmds.list-is-not-empty').replace(/\$list/g, _.orderBy(_commands, 'command').map(o => o.command).join(', ')));
+      const response = (_commands.length === 0 ? translate('customcmds.list-is-empty') : translate('customcmds.list-is-not-empty').replace(/\$list/g, orderBy(_commands, 'command').map(o => o.command).join(', ')));
       return [{ response, ...opts }];
     } else {
       // print responses
@@ -357,7 +358,7 @@ class CustomCommands extends System {
       if (!command_with_responses || command_with_responses.responses.length === 0) {
         return [{ response: prepare('customcmds.list-of-responses-is-empty', { command: cmd }), ...opts }];
       }
-      return Promise.all(_.orderBy(command_with_responses.responses, 'order', 'asc').map(async(r) => {
+      return Promise.all(orderBy(command_with_responses.responses, 'order', 'asc').map(async(r) => {
         const perm = r.permission ? await get(r.permission) : { name: '-- unset --' };
         const response = prepare('customcmds.response', {
           command: cmd, index: ++r.order, response: r.response, after: r.stopIfExecuted ? '_' : 'v', permission: perm?.name ?? 'n/a',
