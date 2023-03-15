@@ -14,6 +14,7 @@ export class updateAlerts1675089806898 implements MigrationInterface {
     const types = [
       'cheer', 'command_redeem','follow', 'promo', 'raid', 'resub',
       'reward_redeem', 'sub', 'subcommunitygift', 'subgift', 'tip',
+      'host',
     ];
     const alerts: Record<string, any> = {};
     for (const type of types) {
