@@ -45,12 +45,6 @@ const urls = {
   'SogeBot Token Generator v2': 'https://credentials.sogebot.xyz/twitch/refresh/',
 };
 const markerEvents = new Set<string>();
-
-// TODO:
-// - simplify custom oauth - done
-// - remove bot token valid
-//
-
 const loadedKeys: string[] = [];
 
 class Twitch extends Service {
@@ -192,6 +186,10 @@ class Twitch extends Service {
     if (this.broadcasterTokenValid && this.botTokenValid) {
       this.tmi = new Chat(this.authProvider);
       this.eventsub = new EventSub(this.apiClient);
+
+      if (this.broadcasterId === this.botId) {
+        error(`You have set bot and broadcaster oauth for same user ${this.broadcasterUsername}#${this.broadcasterId}. This is *NOT RECOMMENDED*. Please use *SEPARATE* account for bot.`);
+      }
     } else {
       this.tmi = null;
       this.eventsub = null;
