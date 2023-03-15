@@ -20,12 +20,12 @@ jobs:
         ref: ${{ github.event.pull_request.head.sha }}
     - id: log
       name: Load commit message for skip test check
-      run: echo ::set-output name=MESSAGE::$(git log --no-merges -1 --pretty=format:%s%b)
-    - name: install node v16
+      run: echo "MESSAGE=$(git log --no-merges -1 --pretty=format:%s%b)" >> $GITHUB_OUTPUT
+    - name: install node v18
       if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
-      uses: actions/setup-node@v2
+      uses: actions/setup-node@v3
       with:
-        node-version: 16
+        node-version: 18
         check-latest: true
     - name: Install latest npm
       if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
@@ -49,12 +49,12 @@ jobs:
         ref: ${{ github.event.pull_request.head.sha }}
     - id: log
       name: Load commit message for skip test check
-      run: echo ::set-output name=MESSAGE::$(git log --no-merges -1 --pretty=format:%s%b)
-    - name: install node v16
+      run: echo "MESSAGE=$(git log --no-merges -1 --pretty=format:%s%b)" >> $GITHUB_OUTPUT
+    - name: install node v18
       if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
-      uses: actions/setup-node@v2
+      uses: actions/setup-node@v3
       with:
-        node-version: 16
+        node-version: 18
         check-latest: true
     - name: Install latest npm
       if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
@@ -69,7 +69,7 @@ jobs:
     - name: Run mocha
       if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
       run: TESTS=@func1 npm test
-    - uses: codecov/codecov-action@v1
+    - uses: codecov/codecov-action@v3
       if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
       with:
         token: ${{ secrets.CODECOV_TOKEN }} # not required for public repos
@@ -84,12 +84,12 @@ jobs:
         ref: ${{ github.event.pull_request.head.sha }}
     - id: log
       name: Load commit message for skip test check
-      run: echo ::set-output name=MESSAGE::$(git log --no-merges -1 --pretty=format:%s%b)
-    - name: install node v16
+      run: echo "MESSAGE=$(git log --no-merges -1 --pretty=format:%s%b)" >> $GITHUB_OUTPUT
+    - name: install node v18
       if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
-      uses: actions/setup-node@v2
+      uses: actions/setup-node@v3
       with:
-        node-version: 16
+        node-version: 18
         check-latest: true
     - name: Install latest npm
       if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
@@ -104,7 +104,7 @@ jobs:
     - name: Run mocha
       if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
       run: TESTS=@func2 npm test
-    - uses: codecov/codecov-action@v1
+    - uses: codecov/codecov-action@v3
       if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
       with:
         token: ${{ secrets.CODECOV_TOKEN }} # not required for public repos
@@ -119,12 +119,12 @@ jobs:
         ref: ${{ github.event.pull_request.head.sha }}
     - id: log
       name: Load commit message for skip test check
-      run: echo ::set-output name=MESSAGE::$(git log --no-merges -1 --pretty=format:%s%b)
-    - name: install node v16
+      run: echo "MESSAGE=$(git log --no-merges -1 --pretty=format:%s%b)" >> $GITHUB_OUTPUT
+    - name: install node v18
       if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
-      uses: actions/setup-node@v2
+      uses: actions/setup-node@v3
       with:
-        node-version: 16
+        node-version: 18
         check-latest: true
     - name: Install latest npm
       if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
@@ -139,7 +139,7 @@ jobs:
     - name: Run mocha
       if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
       run: TESTS=@func3 npm test
-    - uses: codecov/codecov-action@v1
+    - uses: codecov/codecov-action@v3
       if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
       with:
         token: ${{ secrets.CODECOV_TOKEN }} # not required for public repos

@@ -13,28 +13,31 @@ jobs:
         env:
           GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0 # load full history
       - name: Get short SHA
         id: slug
-        run: echo "::set-output name=sha8::$(echo ${GITHUB_SHA} | cut -c1-8)"
-      - name: install node v16
-        uses: actions/setup-node@v2
+        run: echo "SHA=$(echo ${GITHUB_SHA} | cut -c1-8)" >> $GITHUB_OUTPUT
+      - name: install node v18
+        uses: actions/setup-node@v3
         with:
-          node-version: 16
+          node-version: 18
           check-latest: true
       - name: Install latest npm
         run: |
           npm install --location=global npm
 
       - name: Build a bot
-        run: NODE_MODULES_DIR=./node_modules make
+        env:
+          OPENEXCHANGE_APPID: ${{ secrets.OPENEXCHANGE_APPID }}
+          NODE_MODULES_DIR: ./node_modules
+        run: make
 
       - name: Zip a bot
         run: make pack
 
       - uses: actions/upload-artifact@v2
         with:
-          name: sogeBot-${{ steps.slug.outputs.sha8 }}
+          name: sogeBot-${{ steps.slug.outputs.SHA }}
           path: ${{ github.workspace }}/*.zip
