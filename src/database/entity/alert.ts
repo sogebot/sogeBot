@@ -17,6 +17,15 @@ export interface EmitData {
   monthsName: string;
   event: Alert['items'][number]['type'];
   message: string;
+  customOptions?: {
+    volume?: number;
+    alertDuration? : number;
+    textDelay? : number;
+    layout? : number;
+    messageTemplate? : string;
+    audioId? : string;
+    mediaId? : string;
+  }
 }
 
 export type Filter = {

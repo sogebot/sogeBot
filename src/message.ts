@@ -245,7 +245,7 @@ class Message {
       let regexp = _.escapeRegExp(key);
 
       if (key.startsWith('$')) {
-        regexp = regexp.replace(/#/g, '(\\b.+?\\b)');
+        regexp = regexp.replace(/#/g, '(.+?)');
       } else {
         regexp = regexp.replace(/#/g, '([' + regexpChar + ' ]+?)'); // default behavior for if
       }
