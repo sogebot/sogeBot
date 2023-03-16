@@ -182,15 +182,23 @@ class Twitch extends Service {
       await updateBroadcasterType();
       info(`TWITCH: Broadcaster token initialized OK for ${this.broadcasterUsername}#${this.broadcasterId} (type: ${this.broadcasterType}) with scopes: ${this.broadcasterCurrentScopes.join(', ')}`);
     }
+  }
 
+  @onChange(['botTokenValid', 'broadcasterTokenValid'])
+  onTokenValidChange() {
     this.eventsub?.listener.stop();
     if (this.broadcasterTokenValid && this.botTokenValid) {
-      this.tmi = new Chat(this.authProvider);
-      this.eventsub = new EventSub(this.apiClient);
+      setTimeout(() => {
+        if (!this.authProvider || !this.apiClient) {
+          return;
+        }
+        this.tmi = new Chat(this.authProvider);
+        this.eventsub = new EventSub(this.apiClient);
 
-      if (this.broadcasterId === this.botId) {
-        error(`You have set bot and broadcaster oauth for same user ${this.broadcasterUsername}#${this.broadcasterId}. This is *NOT RECOMMENDED*. Please use *SEPARATE* account for bot.`);
-      }
+        if (this.broadcasterId === this.botId) {
+          error(`You have set bot and broadcaster oauth for same user ${this.broadcasterUsername}#${this.broadcasterId}. This is *NOT RECOMMENDED*. Please use *SEPARATE* account for bot.`);
+        }
+      }, 10000);
     } else {
       this.tmi = null;
       this.eventsub = null;
