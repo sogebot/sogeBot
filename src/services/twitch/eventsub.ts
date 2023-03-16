@@ -45,8 +45,9 @@ class EventSub {
       info(`EVENTSUB-WS: Service initialized for ${broadcasterUsername}#${broadcasterId}`);
     });
     this.listener.onUserSocketDisconnect((_, err) => {
-      error(`EVENTSUB-WS: ${err?.stack}`);
+      error(`EVENTSUB-WS: ${err}`);
       info(`EVENTSUB-WS: Reconnecting...`);
+      this.listenerBroadcasterId = '';
       this.onStartup(); // try to reconnect
     });
 
