@@ -183,11 +183,8 @@ class Twitch extends Service {
       info(`TWITCH: Broadcaster token initialized OK for ${this.broadcasterUsername}#${this.broadcasterId} (type: ${this.broadcasterType}) with scopes: ${this.broadcasterCurrentScopes.join(', ')}`);
     }
 
+    this.eventsub?.listener.stop();
     if (this.broadcasterTokenValid && this.botTokenValid) {
-      if (this.broadcasterId !== this.eventsub?.listenerBroadcasterId) {
-        this.eventsub?.listener.stop();
-        this.eventsub = null;
-      }
       this.tmi = new Chat(this.authProvider);
       this.eventsub = new EventSub(this.apiClient);
 
@@ -195,7 +192,6 @@ class Twitch extends Service {
         error(`You have set bot and broadcaster oauth for same user ${this.broadcasterUsername}#${this.broadcasterId}. This is *NOT RECOMMENDED*. Please use *SEPARATE* account for bot.`);
       }
     } else {
-      this.eventsub?.listener.stop();
       this.tmi = null;
       this.eventsub = null;
     }
