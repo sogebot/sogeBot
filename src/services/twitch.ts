@@ -45,7 +45,7 @@ const urls = {
   'SogeBot Token Generator v2': 'https://credentials.sogebot.xyz/twitch/refresh/',
 };
 const markerEvents = new Set<string>();
-const loadedKeys: string[] = [];
+const loadedKeys = new Set<string>();
 
 class Twitch extends Service {
   tmi: Chat | null = null;
@@ -123,68 +123,68 @@ class Twitch extends Service {
     }
   }
 
-  @onLoad(['broadcasterRefreshToken', 'botRefreshToken', 'tokenService', 'tokenServiceCustomClientId', 'tokenServiceCustomClientSecret'])
+  @onLoad(['botTokenValid', 'broadcasterTokenValid', 'broadcasterRefreshToken', 'botRefreshToken', 'tokenService', 'tokenServiceCustomClientId', 'tokenServiceCustomClientSecret'])
   @onChange(['broadcasterRefreshToken', 'botRefreshToken', 'tokenService', 'tokenServiceCustomClientId', 'tokenServiceCustomClientSecret'])
   async onChangeRefreshTokens(key: string) {
     this.botTokenValid = false;
     this.broadcasterTokenValid = false;
 
-    loadedKeys.push(key);
-    if (loadedKeys.length < 5) {
+    loadedKeys.add(key);
+    if (loadedKeys.size < 7) {
       return;
-    } else {
-      loadedKeys.length = 5;
     }
     let clientId;
 
-    switch (this.tokenService) {
-      case 'SogeBot Token Generator':
-        clientId = 't8cney2xkc7j4cu6zpv9ijfa27w027';
-        break;
-      case 'SogeBot Token Generator v2':
-        clientId = '89k6demxtifvq0vzgjpvr1mykxaqmf';
-        break;
-      default:
-        clientId = this.tokenServiceCustomClientId;
-    }
-    this.authProvider = new CustomAuthProvider({
-      clientId,
-      clientSecret: this.tokenServiceCustomClientSecret, // we don't care if we have generator
-    });
-    this.apiClient = new ApiClient({ authProvider: this.authProvider });
-    if (this.botRefreshToken.length > 0) {
-      const userId = await this.authProvider.addUserForToken({
-        expiresIn:           0,
-        refreshToken:        this.botRefreshToken,
-        obtainmentTimestamp: 0,
+    setTimeout(async () => {
+      switch (this.tokenService) {
+        case 'SogeBot Token Generator':
+          clientId = 't8cney2xkc7j4cu6zpv9ijfa27w027';
+          break;
+        case 'SogeBot Token Generator v2':
+          clientId = '89k6demxtifvq0vzgjpvr1mykxaqmf';
+          break;
+        default:
+          clientId = this.tokenServiceCustomClientId;
+      }
+      this.authProvider = new CustomAuthProvider({
+        clientId,
+        clientSecret: this.tokenServiceCustomClientSecret, // we don't care if we have generator
       });
-      this.authProvider.addIntentsToUser(userId, ['bot', 'chat']);
-      const tokenInfo = await this.apiClient.asUser(userId, ctx => ctx.getTokenInfo());
-      this.botId = userId;
-      this.botUsername = tokenInfo.userName ?? '';
-      this.botCurrentScopes = tokenInfo.scopes;
-      this.botTokenValid = true;
-      info(`TWITCH: Bot token initialized OK for ${this.botUsername}#${this.botId} with scopes: ${this.botCurrentScopes.join(', ')}`);
-    }
-    if (this.broadcasterRefreshToken.length > 0) {
-      const userId = await this.authProvider.addUserForToken({
-        expiresIn:           0,
-        refreshToken:        this.broadcasterRefreshToken,
-        obtainmentTimestamp: 0,
-      });
+      this.apiClient = new ApiClient({ authProvider: this.authProvider });
+      if (this.botRefreshToken.length > 0) {
+        const userId = await this.authProvider.addUserForToken({
+          expiresIn:           0,
+          refreshToken:        this.botRefreshToken,
+          obtainmentTimestamp: 0,
+        });
+        this.authProvider.addIntentsToUser(userId, ['bot', 'chat']);
+        const tokenInfo = await this.apiClient.asUser(userId, ctx => ctx.getTokenInfo());
+        this.botId = userId;
+        this.botUsername = tokenInfo.userName ?? '';
+        this.botCurrentScopes = tokenInfo.scopes;
+        this.botTokenValid = true;
+        info(`TWITCH: Bot token initialized OK for ${this.botUsername}#${this.botId} with scopes: ${this.botCurrentScopes.join(', ')}`);
+      }
+      if (this.broadcasterRefreshToken.length > 0) {
+        const userId = await this.authProvider.addUserForToken({
+          expiresIn:           0,
+          refreshToken:        this.broadcasterRefreshToken,
+          obtainmentTimestamp: 0,
+        });
 
-      this.authProvider.addIntentsToUser(userId, ['broadcaster']);
-      const tokenInfo = await this.apiClient.asUser(userId, ctx => ctx.getTokenInfo());
-      this.broadcasterId = userId;
-      this.broadcasterUsername = tokenInfo.userName ?? '';
-      this.broadcasterCurrentScopes = tokenInfo.scopes;
-      this.broadcasterTokenValid = true;
-      await updateBroadcasterType();
-      info(`TWITCH: Broadcaster token initialized OK for ${this.broadcasterUsername}#${this.broadcasterId} (type: ${this.broadcasterType}) with scopes: ${this.broadcasterCurrentScopes.join(', ')}`);
-    }
+        this.authProvider.addIntentsToUser(userId, ['broadcaster']);
+        const tokenInfo = await this.apiClient.asUser(userId, ctx => ctx.getTokenInfo());
+        this.broadcasterId = userId;
+        this.broadcasterUsername = tokenInfo.userName ?? '';
+        this.broadcasterCurrentScopes = tokenInfo.scopes;
+        this.broadcasterTokenValid = true;
+        await updateBroadcasterType();
+        info(`TWITCH: Broadcaster token initialized OK for ${this.broadcasterUsername}#${this.broadcasterId} (type: ${this.broadcasterType}) with scopes: ${this.broadcasterCurrentScopes.join(', ')}`);
+      }
+      this.onTokenValidChange();
+    }, 2000);
   }
 
-  @onChange(['botTokenValid', 'broadcasterTokenValid'])
   onTokenValidChange() {
     this.eventsub?.listener.stop();
     if (this.broadcasterTokenValid && this.botTokenValid) {
