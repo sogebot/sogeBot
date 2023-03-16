@@ -200,10 +200,12 @@ class Twitch extends Service {
   constructor() {
     super();
 
-    init(); // start up intervals for api
-
     this.botTokenValid = false;
     this.broadcasterTokenValid = false;
+
+    setTimeout(() => {
+      init(); // start up intervals for api
+    }, 30000);
 
     setInterval(() => {
       if (markerEvents.size > 0) {
