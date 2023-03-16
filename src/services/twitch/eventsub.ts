@@ -57,10 +57,12 @@ class EventSub {
     this.listener.onUserSocketDisconnect((_, err) => {
       error(`EVENTSUB-WS: ${err ?? 'Unknown error'}`);
       info(`EVENTSUB-WS: Reconnecting...`);
+      this.listener?.stop();
       this.listener?.start(); // try to reconnect
     });
 
     if (process.env.ENV === 'production') {
+      this.listener.stop();
       this.listener.start();
     } else {
       info('EVENTSUB-WS: Eventsub events disabled on dev-mode.');
