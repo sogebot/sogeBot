@@ -201,8 +201,8 @@ class Emotes extends Core {
   }
 
   async fetchEmotesGlobal () {
-    const botUsername = variables.get('services.twitch.botUsername') as string;
-    if (botUsername.length === 0) {
+    const botTokenValid = variables.get('services.twitch.botTokenValid') as boolean;
+    if (botTokenValid) {
       return;
     }
     this.fetch.global = true;
