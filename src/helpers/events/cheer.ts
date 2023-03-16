@@ -1,0 +1,131 @@
+import util from 'util';
+
+import type { EventSubChannelCheerEvent } from '@twurple/eventsub-base/lib/events/EventSubChannelCheerEvent';
+
+import eventlist from '../../overlays/eventlist';
+import alerts from '../../registries/alerts';
+
+import { eventEmitter } from '.';
+
+import { parserReply } from '~/commons';
+import { AppDataSource } from '~/database';
+import { Price } from '~/database/entity/price';
+import { UserBit, UserBitInterface } from '~/database/entity/user';
+import { isStreamOnline, stats } from '~/helpers/api';
+import { getUserSender } from '~/helpers/commons/getUserSender';
+import { triggerInterfaceOnBit } from '~/helpers/interface';
+import { cheer as cheerLog, debug, error } from '~/helpers/log.js';
+import * as changelog from '~/helpers/user/changelog.js';
+import { isIgnored } from '~/helpers/user/isIgnored';
+import Parser from '~/parser';
+import alias from '~/systems/alias';
+import customcommands from '~/systems/customcommands';
+
+export async function cheer(event: EventSubChannelCheerEvent) {
+  try {
+    const username = event.userName;
+    const userId = event.userId;
+    const message = event.message;
+    const bits = event.bits;
+
+    // remove <string>X or <string>X from message, but exclude from remove #<string>X or !someCommand2
+    const messageFromUser = message.replace(/(?<![#!])(\b\w+[\d]+\b)/g, '').trim();
+    if (!username || !userId || isIgnored({ userName: username, userId })) {
+      return;
+    }
+
+    let user = await changelog.get(userId);
+    if (!user) {
+      // if we still doesn't have user, we create new
+      changelog.update(userId, { userName: username });
+      await changelog.flush();
+      user = await changelog.get(userId);
+    }
+
+    eventlist.add({
+      event:     'cheer',
+      userId:    userId,
+      bits,
+      message:   messageFromUser,
+      timestamp: Date.now(),
+    });
+    cheerLog(`${username}#${userId}, bits: ${bits}, message: ${messageFromUser}`);
+
+    const newBits: UserBitInterface = {
+      amount:    bits,
+      cheeredAt: Date.now(),
+      message:   messageFromUser,
+      userId:    String(userId),
+    };
+    await AppDataSource.getRepository(UserBit).save(newBits);
+
+    eventEmitter.emit('cheer', {
+      userName: username, userId, bits: bits, message: messageFromUser,
+    });
+
+    if (isStreamOnline.value) {
+      stats.value.currentBits = stats.value.currentBits + bits;
+    }
+
+    triggerInterfaceOnBit({
+      userName:  username,
+      amount:    bits,
+      message:   messageFromUser,
+      timestamp: Date.now(),
+    });
+
+    let redeemTriggered = false;
+    if (messageFromUser.trim().startsWith('!')) {
+      try {
+        const price = await AppDataSource.getRepository(Price).findOneOrFail({ where: { command: messageFromUser.trim().toLowerCase(), enabled: true } });
+        if (price.priceBits <= bits) {
+          if (customcommands.enabled) {
+            await customcommands.run({
+              sender: getUserSender(userId, username), id: 'null', skip: true, quiet: false, message: messageFromUser.trim().toLowerCase(), parameters: '', parser: new Parser(), isAction: false, emotesOffsets: new Map(), isFirstTimeMessage: false, discord: undefined, isParserOptions: true,
+            });
+          }
+          if (alias.enabled) {
+            await alias.run({
+              sender: getUserSender(userId, username), id: 'null', skip: true, message: messageFromUser.trim().toLowerCase(), parameters: '', parser: new Parser(), isAction: false, emotesOffsets: new Map(), isFirstTimeMessage: false, discord: undefined, isParserOptions: true,
+            });
+          }
+          const responses = await new Parser().command(getUserSender(userId, username), messageFromUser, true);
+          for (let i = 0; i < responses.length; i++) {
+            await parserReply(responses[i].response, { sender: responses[i].sender, discord: responses[i].discord, attr: responses[i].attr, id: '' });
+          }
+          if (price.emitRedeemEvent) {
+            redeemTriggered = true;
+            debug('tmi.cmdredeems', messageFromUser);
+            alerts.trigger({
+              event:      'custom',
+              recipient:  username,
+              name:       price.command,
+              amount:     bits,
+              tier:       null,
+              currency:   '',
+              monthsName: '',
+              message:    messageFromUser,
+            });
+          }
+        }
+      } catch (e: any) {
+        debug('tmi.cheer', e.stack);
+      }
+    }
+    if (!redeemTriggered) {
+      alerts.trigger({
+        event:      'cheer',
+        name:       username,
+        amount:     bits,
+        tier:       null,
+        currency:   '',
+        monthsName: '',
+        message:    messageFromUser,
+      });
+    }
+  } catch (e: any) {
+    error('Error parsing cheer event');
+    error(util.inspect(event));
+    error(e.stack);
+  }
+}

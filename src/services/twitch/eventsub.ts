@@ -7,7 +7,9 @@ import * as channelPoll from '~/helpers/api/channelPoll';
 import * as channelPrediction from '~/helpers/api/channelPrediction';
 import * as hypeTrain from '~/helpers/api/hypeTrain';
 import { eventEmitter } from '~/helpers/events';
+import { cheer } from '~/helpers/events/cheer';
 import { follow } from '~/helpers/events/follow';
+import { raid } from '~/helpers/events/raid';
 import { ban, error, info, isDebugEnabled, redeem, timeout, unban } from '~/helpers/log.js';
 import { ioServer } from '~/helpers/panel';
 import * as changelog from '~/helpers/user/changelog.js';
@@ -67,6 +69,12 @@ class EventSub {
     try {
       // FOLLOW
       this.listener.onChannelFollow(broadcasterId, broadcasterId, event => follow(event.userId, event.userName, new Date(event.followDate).toISOString()));
+
+      // CHEER
+      this.listener.onChannelCheer(broadcasterId, cheer);
+
+      // RAID
+      this.listener.onChannelRaidFrom(broadcasterId, raid);
 
       // HYPE TRAIN
       this.listener.onChannelHypeTrainBegin(broadcasterId, () => {

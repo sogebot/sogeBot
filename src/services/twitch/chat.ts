@@ -1,8 +1,6 @@
 import util from 'util';
 
 import type { EmitData } from '@entity/alert';
-import { Price } from '@entity/price';
-import { UserBit, UserBitInterface } from '@entity/user';
 import * as constants from '@sogebot/ui-helpers/constants';
 import { dayjs } from '@sogebot/ui-helpers/dayjsHelper';
 import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized';
@@ -18,26 +16,20 @@ import getUserByName from './calls/getUserByName';
 import sendWhisper from './calls/sendWhisper';
 import { CustomAuthProvider } from './token/CustomAuthProvider';
 
-import { parserReply } from '~/commons';
-import { AppDataSource } from '~/database';
 import { timer } from '~/decorators';
 import {
   getFunctionList,
 } from '~/decorators/on';
-import { isStreamOnline, stats } from '~/helpers/api';
 import * as hypeTrain from '~/helpers/api/hypeTrain';
-import {
-  getUserSender,
-} from '~/helpers/commons';
 import { sendMessage } from '~/helpers/commons/sendMessage';
 import { eventEmitter } from '~/helpers/events';
 import {
-  triggerInterfaceOnBit, triggerInterfaceOnMessage, triggerInterfaceOnSub,
+  triggerInterfaceOnMessage, triggerInterfaceOnSub,
 } from '~/helpers/interface/triggers';
 import emitter from '~/helpers/interfaceEmitter';
 import { ban, warning } from '~/helpers/log';
 import {
-  chatIn, cheer, debug, error, info, raid, resub, sub, subcommunitygift, subgift, whisperIn,
+  chatIn, debug, error, info, resub, sub, subcommunitygift, subgift, whisperIn,
 } from '~/helpers/log';
 import { ioServer } from '~/helpers/panel';
 import { linesParsedIncrement, setStatus } from '~/helpers/parser';
@@ -50,8 +42,6 @@ import { isIgnored, isIgnoredSafe } from '~/helpers/user/isIgnored';
 import eventlist from '~/overlays/eventlist';
 import { Parser } from '~/parser';
 import alerts from '~/registries/alerts';
-import alias from '~/systems/alias';
-import customcommands from '~/systems/customcommands';
 import { translate } from '~/translate';
 import users from '~/users';
 import { variables } from '~/watchers';
@@ -309,13 +299,6 @@ class Chat {
         linesParsedIncrement();
       });
 
-      // onCheer
-      client.onMessage((channel, user, message, msg) => {
-        if (msg.isCheer) {
-          this.cheer(msg.userInfo, message, msg.bits);
-        }
-      });
-
       client.onAction((channel, user, message, msg) => {
         const userstate = msg.userInfo;
         if (isBotId(userstate.userId)) {
@@ -364,9 +347,6 @@ class Chat {
       client.onTimeout((channel, user, msg) => {
         ioServer?.of('/overlays/chat').emit('timeout', user);
       });
-      client.onRaid((_channel, username, raidInfo) => {
-        this.raid(username, raidInfo.viewerCount);
-      });
 
       client.onSub((_channel, username, subInfo, msg) => {
         this.subscription(username, subInfo, msg.userInfo);
@@ -386,35 +366,6 @@ class Chat {
     } else {
       throw Error(`This ${type} is not supported`);
     }
-  }
-
-  @timer()
-  async raid(username: string, hostViewers: number) {
-    raid(`${username}, viewers: ${hostViewers}`);
-
-    const data = {
-      userName:  username,
-      hostViewers,
-      event:     'raid',
-      timestamp: Date.now(),
-    };
-
-    eventlist.add({
-      userId:    String(await users.getIdByName(username) ?? '0'),
-      viewers:   hostViewers,
-      event:     'raid',
-      timestamp: Date.now(),
-    });
-    eventEmitter.emit('raid', data);
-    alerts.trigger({
-      event:      'raid',
-      name:       username,
-      amount:     hostViewers,
-      tier:       null,
-      currency:   '',
-      monthsName: '',
-      message:    '',
-    });
   }
 
   @timer()
@@ -693,114 +644,6 @@ class Chat {
       }
     } catch (e: any) {
       error('Error parsing subgift event');
-      error(util.inspect(userstate));
-      error(e.stack);
-    }
-  }
-
-  @timer()
-  async cheer (userstate: ChatUser, message: string, bits: number): Promise<void> {
-    try {
-      const username = userstate.userName;
-      const userId = userstate.userId;
-
-      // remove <string>X or <string>X from message, but exclude from remove #<string>X or !someCommand2
-      const messageFromUser = message.replace(/(?<![#!])(\b\w+[\d]+\b)/g, '').trim();
-      if (!username || !userId || isIgnored({ userName: username, userId })) {
-        return;
-      }
-
-      const user = await changelog.get(userId);
-      if (!user) {
-        // if we still doesn't have user, we create new
-        changelog.update(userId, { userName: username });
-        await changelog.flush();
-        return this.cheer(userstate, message, bits);
-      }
-
-      eventlist.add({
-        event:     'cheer',
-        userId:    userId,
-        bits,
-        message:   messageFromUser,
-        timestamp: Date.now(),
-      });
-      cheer(`${username}#${userId}, bits: ${bits}, message: ${messageFromUser}`);
-
-      const newBits: UserBitInterface = {
-        amount:    bits,
-        cheeredAt: Date.now(),
-        message:   messageFromUser,
-        userId:    String(userId),
-      };
-      await AppDataSource.getRepository(UserBit).save(newBits);
-
-      eventEmitter.emit('cheer', {
-        userName: username, userId, bits: bits, message: messageFromUser,
-      });
-
-      if (isStreamOnline.value) {
-        stats.value.currentBits = stats.value.currentBits + bits;
-      }
-
-      triggerInterfaceOnBit({
-        userName:  username,
-        amount:    bits,
-        message:   messageFromUser,
-        timestamp: Date.now(),
-      });
-
-      let redeemTriggered = false;
-      if (messageFromUser.trim().startsWith('!')) {
-        try {
-          const price = await AppDataSource.getRepository(Price).findOneOrFail({ where: { command: messageFromUser.trim().toLowerCase(), enabled: true } });
-          if (price.priceBits <= bits) {
-            if (customcommands.enabled) {
-              await customcommands.run({
-                sender: getUserSender(userId, username), id: 'null', skip: true, quiet: false, message: messageFromUser.trim().toLowerCase(), parameters: '', parser: new Parser(), isAction: false, emotesOffsets: new Map(), isFirstTimeMessage: false, discord: undefined, isParserOptions: true,
-              });
-            }
-            if (alias.enabled) {
-              await alias.run({
-                sender: getUserSender(userId, username), id: 'null', skip: true, message: messageFromUser.trim().toLowerCase(), parameters: '', parser: new Parser(), isAction: false, emotesOffsets: new Map(), isFirstTimeMessage: false, discord: undefined, isParserOptions: true,
-              });
-            }
-            const responses = await new Parser().command(getUserSender(userId, username), messageFromUser, true);
-            for (let i = 0; i < responses.length; i++) {
-              await parserReply(responses[i].response, { sender: responses[i].sender, discord: responses[i].discord, attr: responses[i].attr, id: '' });
-            }
-            if (price.emitRedeemEvent) {
-              redeemTriggered = true;
-              debug('tmi.cmdredeems', messageFromUser);
-              alerts.trigger({
-                event:      'custom',
-                recipient:  username,
-                name:       price.command,
-                amount:     bits,
-                tier:       null,
-                currency:   '',
-                monthsName: '',
-                message:    messageFromUser,
-              });
-            }
-          }
-        } catch (e: any) {
-          debug('tmi.cheer', e.stack);
-        }
-      }
-      if (!redeemTriggered) {
-        alerts.trigger({
-          event:      'cheer',
-          name:       username,
-          amount:     bits,
-          tier:       null,
-          currency:   '',
-          monthsName: '',
-          message:    messageFromUser,
-        });
-      }
-    } catch (e: any) {
-      error('Error parsing cheer event');
       error(util.inspect(userstate));
       error(e.stack);
     }
