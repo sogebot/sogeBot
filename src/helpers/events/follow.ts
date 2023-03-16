@@ -18,13 +18,13 @@ const events = new Map<string, number>();
 
 export async function follow(userId: string, userName: string, followedAt: string) {
   if (events.has(userId)) {
-    debug('events', `User ${userName}#${userId} already followed in hour.`);
+    debug('follow', `User ${userName}#${userId} already processed.`);
     return;
   }
   events.set(userId, new Date(followedAt).getTime());
 
   if (isIgnored({ userName, userId })) {
-    debug('events', `User ${userName}#${userId} is in ignore list.`);
+    debug('follow', `User ${userName}#${userId} is in ignore list.`);
     if (isInGlobalIgnoreList({ userName, userId })) {
       // autoban + autoblock
       banUser(userId);
@@ -45,7 +45,7 @@ export async function follow(userId: string, userName: string, followedAt: strin
 
   // trigger events only if follow was in hour
   if (Date.now() - new Date(followedAt).getTime() < HOUR) {
-    debug('events', `User ${userName}#${userId} triggered follow event.`);
+    debug('follow', `User ${userName}#${userId} triggered follow event.`);
     eventlist.add({
       event:     'follow',
       userId:    userId,
