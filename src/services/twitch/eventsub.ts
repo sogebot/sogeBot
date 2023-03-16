@@ -8,7 +8,7 @@ import * as channelPrediction from '~/helpers/api/channelPrediction';
 import * as hypeTrain from '~/helpers/api/hypeTrain';
 import { eventEmitter } from '~/helpers/events';
 import { follow } from '~/helpers/events/follow';
-import { ban, error, info, redeem, timeout, unban } from '~/helpers/log.js';
+import { ban, error, info, isDebugEnabled, redeem, timeout, unban } from '~/helpers/log.js';
 import { ioServer } from '~/helpers/panel';
 import * as changelog from '~/helpers/user/changelog.js';
 import eventlist from '~/overlays/eventlist';
@@ -39,7 +39,15 @@ class EventSub {
       return;
     }
 
-    this.listener = new EventSubWsListener({ apiClient: this.apiClient });
+    this.listener = new EventSubWsListener({
+      apiClient: this.apiClient,
+      logger:    {
+        minLevel: isDebugEnabled('eventsub') ? 'debug' : undefined,
+        custom:   (level, message) => {
+          info(`EVENTSUB-WS[${level}]: ${message}`);
+        },
+      },
+    });
 
     this.listener.onUserSocketConnect(() => {
       info(`EVENTSUB-WS: Service initialized for ${broadcasterUsername}#${broadcasterId}`);
