@@ -55,8 +55,7 @@ class EventSub {
     this.listener.onUserSocketDisconnect((_, err) => {
       error(`EVENTSUB-WS: ${err ?? 'Unknown error'}`);
       info(`EVENTSUB-WS: Reconnecting...`);
-      this.listenerBroadcasterId = '';
-      this.onStartup(); // try to reconnect
+      this.listener?.start(); // try to reconnect
     });
 
     if (process.env.ENV === 'production') {
