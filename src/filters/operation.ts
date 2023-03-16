@@ -37,7 +37,7 @@ export const operation: ResponseFilter = {
         amount:     price ? price.price : 0,
         currency:   'CZK',
         event:      'custom',
-        alertId:    match.groups.id,
+        alertId:    match.groups.uuid,
         message:    attributes.param || '',
         monthsName: '',
         name:       attributes.command,
