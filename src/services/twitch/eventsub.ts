@@ -1,7 +1,5 @@
-import { SECOND } from '@sogebot/ui-helpers/constants';
 import { ApiClient } from '@twurple/api/lib';
 import { EventSubWsListener } from '@twurple/eventsub-ws';
-import { Mutex } from 'async-mutex';
 
 import * as channelPoll from '~/helpers/api/channelPoll';
 import * as channelPrediction from '~/helpers/api/channelPrediction';
@@ -17,39 +15,25 @@ import eventlist from '~/overlays/eventlist';
 import alerts from '~/registries/alerts';
 import { variables } from '~/watchers';
 
-const mutex = new Mutex();
 const rewardsRedeemed: string[] = [];
 
 class EventSub {
-  apiClient: ApiClient;
-  listener: EventSubWsListener | null = null;
+  listener: EventSubWsListener;
   listenerBroadcasterId?: string;
 
   constructor(apiClient: ApiClient) {
-    this.apiClient = apiClient;
-    setInterval(() => this.onStartup(), SECOND * 10);
-  }
-
-  async onStartup(): Promise<void> {
-    const release = await mutex.acquire();
-
-    const broadcasterId = variables.get('services.twitch.broadcasterId') as string;
-    const broadcasterUsername = variables.get('services.twitch.broadcasterUsername') as string;
-
-    if (broadcasterId.length === 0 || broadcasterId === this.listenerBroadcasterId) {
-      release();
-      return;
-    }
-
     this.listener = new EventSubWsListener({
-      apiClient: this.apiClient,
-      logger:    {
+      apiClient,
+      logger: {
         minLevel: isDebugEnabled('eventsub') ? 'debug' : undefined,
         custom:   (level, message) => {
           info(`EVENTSUB-WS[${level}]: ${message}`);
         },
       },
     });
+
+    const broadcasterId = variables.get('services.twitch.broadcasterId') as string;
+    const broadcasterUsername = variables.get('services.twitch.broadcasterUsername') as string;
 
     this.listener.onUserSocketConnect(() => {
       info(`EVENTSUB-WS: Service initialized for ${broadcasterUsername}#${broadcasterId}`);
@@ -211,13 +195,11 @@ class EventSub {
       this.listenerBroadcasterId = broadcasterId;
     } catch (e) {
       this.listener.stop();
-      this.listener = null;
       if (e instanceof Error) {
         error('EVENTSUB-WS: ' + e.message);
       }
       error('EVENTSUB-WS: Unknown error durring initialization. ' + e);
     }
-    release();
   }
 }
 
