@@ -3,10 +3,11 @@ const assert = require('assert');
 require('../../general.js');
 
 const { v4: uuidv4 } = require('uuid');
-const { AppDataSource } = require('../../../dest/database.js');
 
+const events = (require('../../../dest/events')).default;
 const { Event } = require('../../../dest/database/entity/event');
 const { User } = require('../../../dest/database/entity/user');
+const { AppDataSource } = require('../../../dest/database.js');
 const log = require('../../../dest/helpers/log');
 const changelog = (require('../../../dest/helpers/user/changelog'));
 const time = require('../../general.js').time;
@@ -43,15 +44,7 @@ describe('Events - cheer event - @func3', () => {
       const userId = String(Math.floor(Math.random() * 10000));
       describe(username + ' cheer event', () => {
         it('trigger cheer event for 1 bit - ' + username, async () => {
-          const TMI = require('../../../dest/services/twitch/chat').default;
-          const tmi = new TMI();
-          await tmi.cheer({
-            userName: username,
-            userId:   userId,
-          },
-          Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5),
-          1,
-          );
+          await events.fire('cheer', { userName: username, userId, bits: 1, message: Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5) });
         });
 
         it('we are expecting message to be sent', async () => {
