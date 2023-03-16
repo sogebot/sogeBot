@@ -42,7 +42,9 @@ class EventSub {
       error(`EVENTSUB-WS: ${err ?? 'Unknown error'}`);
       info(`EVENTSUB-WS: Reconnecting...`);
       this.listener?.stop();
-      this.listener?.start(); // try to reconnect
+      setTimeout(() => {
+        this.listener?.start(); // try to reconnect
+      }, 5000);
     });
 
     if (process.env.ENV === 'production') {
