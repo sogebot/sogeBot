@@ -7,6 +7,7 @@ const until = require('test-until');
 const { Poll } = require('../../../dest/database/entity/poll');
 const translate = require('../../../dest/translate').translate;
 const db = require('../../general.js').db;
+const cheer = (require('../../../dest/helpers/events/cheer')).cheer;
 const message = require('../../general.js').message;
 const time = require('../../general.js').time;
 const polls = (require('../../../dest/systems/polls')).default;
@@ -89,15 +90,7 @@ describe('Polls - bits - @func2', () => {
       for (const o of [1,2]) {
         for (let i = 0; i < 10; i++) {
           const user = 'user' + [o, i].join('');
-          const TMI = require('../../../dest/services/twitch/chat').default;
-          const tmi = new TMI();
-          await tmi.cheer({
-            userName: user,
-            userId:   String(Math.floor(Math.random() * 100000)),
-          },
-          'Cool I am voting for #vote' + o + ' enjoy!',
-          10,
-          );
+          await cheer({ userName: user, userId: String(Math.floor(Math.random() * 100000)), bits: 10, message: 'Cool I am voting for #vote' + o + ' enjoy!' });
 
           await until(async (setError) => {
             try {

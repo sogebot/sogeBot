@@ -4,18 +4,19 @@ require('../../general.js');
 
 const until = require('test-until');
 
+const cheer = (require('../../../dest/helpers/events/cheer')).cheer;
 const translate = require('../../../dest/translate').translate;
 const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 const time = require('../../general.js').time;
 const { Price } = require('../../../dest/database/entity/price');
 const customcommands = (require('../../../dest/systems/customcommands')).default;
-
 const { Poll } = require('../../../dest/database/entity/poll');
 
 const { getLocalizedName } = require('@sogebot/ui-helpers/getLocalized');
 
 const assert = require('assert');
+
 const { AppDataSource } = require('../../../dest/database');
 
 const owner = { userName: '__broadcaster__', userId: String(Math.floor(Math.random() * 10000)) };
@@ -47,27 +48,21 @@ describe('TMI - redeem command - @func3', () => {
   });
 
   it(`User will cheer !test with 5 bits (not enough)`, async () => {
-    const TMI = require('../../../dest/services/twitch/chat').default;
-    const tmi = new TMI();
-    await tmi.cheer({
+    cheer({
       userName: 'testuser',
       userId:   String(Math.floor(Math.random() * 100000)),
-    },
-    '!test',
-    5,
-    );
+      message:  '!test',
+      bits:     5,
+    });
   });
 
   it(`User will cheer !test2 with 5 bits (not enough)`, async () => {
-    const TMI = require('../../../dest/services/twitch/chat').default;
-    const tmi = new TMI();
-    await tmi.cheer({
+    cheer({
       userName: 'testuser',
       userId:   String(Math.floor(Math.random() * 100000)),
-    },
-    '!test2',
-    5,
-    );
+      message:  '!test2',
+      bits:     5,
+    });
   });
 
   it(`Command !test was not redeemed`, async () => {
@@ -89,27 +84,21 @@ describe('TMI - redeem command - @func3', () => {
   });
 
   it(`User will cheer !test with 10 bits (enough)`, async () => {
-    const TMI = require('../../../dest/services/twitch/chat').default;
-    const tmi = new TMI();
-    await tmi.cheer({
+    cheer({
       userName: 'testuser',
       userId:   String(Math.floor(Math.random() * 100000)),
-    },
-    '!test',
-    10,
-    );
+      message:  '!test',
+      bits:     10,
+    });
   });
 
   it(`User will cheer !test2 with 10 bits (enough)`, async () => {
-    const TMI = require('../../../dest/services/twitch/chat').default;
-    const tmi = new TMI();
-    await tmi.cheer({
+    cheer({
       userName: 'testuser',
       userId:   String(Math.floor(Math.random() * 100000)),
-    },
-    '!test2',
-    10,
-    );
+      message:  '!test2',
+      bits:     10,
+    });
   });
 
   it(`Command was !test redeemed`, async () => {

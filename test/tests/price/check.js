@@ -5,11 +5,12 @@ require('../../general.js');
 const assert = require('assert');
 
 const _ = require('lodash');
-const { AppDataSource } = require('../../../dest/database.js');
 
 const { Price } = require('../../../dest/database/entity/price');
 const { User } = require('../../../dest/database/entity/user');
+const { AppDataSource } = require('../../../dest/database.js');
 const alias = (require('../../../dest/systems/alias')).default;
+const cheer = (require('../../../dest/helpers/events/cheer')).cheer;
 const customcommands = (require('../../../dest/systems/customcommands')).default;
 const price = (require('../../../dest/systems/price')).default;
 const db = require('../../general.js').db;
@@ -107,15 +108,12 @@ describe('Price - check() - @func3', () => {
     await AppDataSource.getRepository(Price).save({
       command: '!a', price: 100, priceBits: 10,
     });
-    const TMI = require('../../../dest/services/twitch/chat').default;
-    const tmi = new TMI();
-    tmi.cheer({
+    cheer({
       userName: user.viewer.userName,
       userId:   user.viewer.userId,
-    },
-    '!a',
-    100,
-    );
+      message:  '!a',
+      bits:     100,
+    });
     await message.isSentRaw('Usage => ' + url + '/systems/alias', user.viewer.userName, 20000);
   });
 
@@ -124,15 +122,12 @@ describe('Price - check() - @func3', () => {
     await AppDataSource.getRepository(Price).save({
       command: '!b', price: 100, priceBits: 10,
     });
-    const TMI = require('../../../dest/services/twitch/chat').default;
-    const tmi = new TMI();
-    tmi.cheer({
+    cheer({
       userName: user.viewer.userName,
       userId:   user.viewer.userId,
-    },
-    '!b',
-    100,
-    );
+      message:  '!b',
+      bits:     100,
+    });
     await message.isSentRaw('Lorem Ipsum', user.viewer.userName, 20000);
   });
 
@@ -140,14 +135,12 @@ describe('Price - check() - @func3', () => {
     await AppDataSource.getRepository(Price).save({
       command: '!me', price: 100, priceBits: 10,
     });
-    const TMI = require('../../../dest/services/twitch/chat').default;
-    const tmi = new TMI();
-    tmi.cheer({
+    cheer({
       userName: user.viewer.userName,
       userId:   user.viewer.userId,
-    },
-    '!me',
-    100);
+      message:  '!me',
+      bits:     100,
+    });
     await message.isSentRaw('@__viewer__ | Level 0 | 0 hours | 0 points | 0 messages | €0.00 | 100 bits | 0 months', user.viewer.userName, 20000);
   });
 });
