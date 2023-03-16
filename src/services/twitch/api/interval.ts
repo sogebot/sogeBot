@@ -13,7 +13,6 @@ import { getChannelChatters } from '~/services/twitch/calls/getChannelChatters';
 import { getChannelInformation } from '~/services/twitch/calls/getChannelInformation';
 import { getChannelSubscribers } from '~/services/twitch/calls/getChannelSubscribers';
 import { getCurrentStream } from '~/services/twitch/calls/getCurrentStream';
-import { getLatest100Followers } from '~/services/twitch/calls/getLatest100Followers';
 import { getModerators } from '~/services/twitch/calls/getModerators';
 import { updateBroadcasterType } from '~/services/twitch/calls/updateBroadcasterType';
 import { variables } from '~/watchers';
@@ -35,7 +34,6 @@ const functions = {
   getCurrentStream:      getCurrentStream,
   getChannelInformation: getChannelInformation,
   updateBroadcasterType: updateBroadcasterType,
-  getLatest100Followers: getLatest100Followers,
   getChannelSubscribers: getChannelSubscribers,
   getChannelChatters:    getChannelChatters,
   getChannelChatBadges:  getChannelChatBadges,
@@ -46,7 +44,6 @@ const functions = {
 export const init = () => {
   addInterval('getCurrentStream', constants.MINUTE);
   addInterval('updateBroadcasterType', constants.HOUR);
-  addInterval('getLatest100Followers', constants.MINUTE);
   addInterval('getChannelSubscribers', 2 * constants.MINUTE);
   addInterval('getChannelChatters', 5 * constants.MINUTE);
   addInterval('getChannelChatBadges', 5 * constants.MINUTE);
