@@ -1,3 +1,4 @@
+import { DAY, MINUTE } from '@sogebot/ui-helpers/constants';
 import { ApiClient } from '@twurple/api/lib';
 import { EventSubWsListener } from '@twurple/eventsub-ws';
 
@@ -16,13 +17,22 @@ import alerts from '~/registries/alerts';
 import { variables } from '~/watchers';
 
 const rewardsRedeemed: string[] = [];
+let initialTimeout = 500;
+let lastConnectionAt = new Date();
+
+setInterval(() => {
+  // reset initialTimeout if connection lasts for five minutes
+  if (lastConnectionAt.getTime() > 5 * MINUTE) {
+    initialTimeout = 500;
+  }
+}, 1000);
 
 class EventSub {
   listener: EventSubWsListener;
   listenerBroadcasterId?: string;
 
   constructor(apiClient: ApiClient) {
-    console.debug('eventsub', 'init of eventsub');
+    console.debug('eventsub', 'EventSub: constructor()');
 
     this.listener = new EventSubWsListener({
       apiClient,
@@ -51,14 +61,17 @@ class EventSub {
     });
     this.listener.onUserSocketConnect(() => {
       info(`EVENTSUB-WS: Service initialized for ${broadcasterUsername}#${broadcasterId}`);
+      lastConnectionAt = new Date();
     });
     this.listener.onUserSocketDisconnect((_, err) => {
       error(`EVENTSUB-WS: ${err ?? 'Unknown error'}`);
-      info(`EVENTSUB-WS: Reconnecting...`);
-      /*this.listener?.stop();
+      this.listener?.stop();
+      const maxTimeout = 2 / DAY;
+      const nextTimeout = initialTimeout * 2;
+      info(`EVENTSUB-WS: Reconnecting in ${nextTimeout / 1000}s...`);
       setTimeout(() => {
         this.listener?.start(); // try to reconnect
-      }, 5000);*/
+      }, Math.min(nextTimeout, maxTimeout));
     });
 
     if (process.env.ENV === 'production') {
