@@ -22,7 +22,8 @@ let lastConnectionAt = new Date();
 
 setInterval(() => {
   // reset initialTimeout if connection lasts for five minutes
-  if (lastConnectionAt.getTime() > 5 * MINUTE) {
+  if (lastConnectionAt.getTime() > 5 * MINUTE && initialTimeout !== 500) {
+    console.debug('eventsub', 'EventSub: resetting initialTimeout');
     initialTimeout = 500;
   }
 }, 1000);
