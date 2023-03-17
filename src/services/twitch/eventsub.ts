@@ -69,6 +69,7 @@ class EventSub {
       this.listener?.stop();
       const maxTimeout = 2 / DAY;
       const nextTimeout = initialTimeout * 2;
+      initialTimeout = nextTimeout;
       info(`EVENTSUB-WS: Reconnecting in ${nextTimeout / 1000}s...`);
       setTimeout(() => {
         this.listener?.start(); // try to reconnect
