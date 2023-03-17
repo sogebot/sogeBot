@@ -22,10 +22,12 @@ class EventSub {
   listenerBroadcasterId?: string;
 
   constructor(apiClient: ApiClient) {
+    console.debug('eventsub', 'init of eventsub');
+
     this.listener = new EventSubWsListener({
       apiClient,
       logger: {
-        minLevel: isDebugEnabled('eventsub') ? 'debug' : undefined,
+        minLevel: isDebugEnabled('eventsub') ? 'trace' : undefined,
         custom:   (level, message) => {
           info(`EVENTSUB-WS[${level}]: ${message}`);
         },
@@ -35,18 +37,32 @@ class EventSub {
     const broadcasterId = variables.get('services.twitch.broadcasterId') as string;
     const broadcasterUsername = variables.get('services.twitch.broadcasterUsername') as string;
 
+    this.listener.onSubscriptionDeleteSuccess((ev) => {
+      info(`EVENTSUB-WS: Subscription ${ev.id} removed.`);
+    });
+    this.listener.onSubscriptionCreateSuccess((ev) => {
+      info(`EVENTSUB-WS: Subscription ${ev.id} added.`);
+    });
+    this.listener.onSubscriptionCreateFailure((ev, err) => {
+      error(`EVENTSUB-WS: Subscription create failure: ${err}`);
+    });
+    this.listener.onSubscriptionDeleteFailure((ev, err) => {
+      error(`EVENTSUB-WS: Subscription delete failure: ${err}`);
+    });
     this.listener.onUserSocketConnect(() => {
       info(`EVENTSUB-WS: Service initialized for ${broadcasterUsername}#${broadcasterId}`);
     });
     this.listener.onUserSocketDisconnect((_, err) => {
       error(`EVENTSUB-WS: ${err ?? 'Unknown error'}`);
       info(`EVENTSUB-WS: Reconnecting...`);
-      this.listener?.stop();
+      /*this.listener?.stop();
       setTimeout(() => {
         this.listener?.start(); // try to reconnect
-      }, 5000);
+      }, 5000);*/
     });
 
+    this.listener.stop();
+    this.listener.start();
     if (process.env.ENV === 'production') {
       this.listener.stop();
       this.listener.start();
