@@ -123,18 +123,10 @@ class Twitch extends Service {
     }
   }
 
-  @onLoad(['broadcasterRefreshToken', 'botRefreshToken', 'tokenService', 'tokenServiceCustomClientId', 'tokenServiceCustomClientSecret'])
-  @onChange(['broadcasterRefreshToken', 'botRefreshToken', 'tokenService', 'tokenServiceCustomClientId', 'tokenServiceCustomClientSecret'])
-  async onChangeRefreshTokens(key: string) {
-    this.botTokenValid = false;
-    this.broadcasterTokenValid = false;
-
-    loadedKeys.add(key);
-    if (loadedKeys.size < 5) {
-      return;
-    }
+  @onLoad(['tokenService', 'tokenServiceCustomClientId', 'tokenServiceCustomClientSecret'])
+  @onChange(['tokenService', 'tokenServiceCustomClientId', 'tokenServiceCustomClientSecret'])
+  onTokenServiceChange() {
     let clientId;
-
     switch (this.tokenService) {
       case 'SogeBot Token Generator':
         clientId = 't8cney2xkc7j4cu6zpv9ijfa27w027';
@@ -150,6 +142,19 @@ class Twitch extends Service {
       clientSecret: this.tokenServiceCustomClientSecret, // we don't care if we have generator
     });
     this.apiClient = new ApiClient({ authProvider: this.authProvider });
+  }
+
+  @onLoad(['broadcasterRefreshToken', 'botRefreshToken', 'tokenService', 'tokenServiceCustomClientId', 'tokenServiceCustomClientSecret'])
+  async onChangeRefreshTokens(key: string) {
+    this.botTokenValid = false;
+    this.broadcasterTokenValid = false;
+
+    loadedKeys.add(key);
+    if (loadedKeys.size < 5 || !this.authProvider || !this.apiClient) {
+      console.debug('eventsub', 'Not yet loaded');
+      return;
+    }
+    console.debug('eventsub', 'Adding tokens to authProvider');
     if (this.botRefreshToken.length > 0) {
       const userId = await this.authProvider.addUserForToken({
         expiresIn:           0,
@@ -332,7 +337,7 @@ class Twitch extends Service {
     adminEndpoint('/services/twitch', 'twitch::token', async ({ accessToken, refreshToken, accountType }, cb) => {
       emitter.emit('set', '/services/twitch', `tokenService`, 'SogeBot Token Generator v2');
       emitter.emit('set', '/services/twitch', `${accountType}RefreshToken`, refreshToken);
-      emitter.emit('set', '/services/twitch', `${accountType}TokenValid`, true);
+      this.onChangeRefreshTokens(`${accountType}RefreshToken`);
       setTimeout(async () => {
         cb(null);
       }, 1000);
@@ -342,7 +347,7 @@ class Twitch extends Service {
       emitter.emit('set', '/services/twitch', `${accountType}RefreshToken`, refreshToken);
       emitter.emit('set', '/services/twitch', `tokenServiceCustomClientId`, clientId);
       emitter.emit('set', '/services/twitch', `tokenServiceCustomClientSecret`, clientSecret);
-      emitter.emit('set', '/services/twitch', `${accountType}TokenValid`, true);
+      this.onChangeRefreshTokens(`${accountType}RefreshToken`);
       setTimeout(async () => {
         cb(null);
       }, 1000);

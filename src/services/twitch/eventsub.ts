@@ -61,8 +61,6 @@ class EventSub {
       }, 5000);*/
     });
 
-    this.listener.stop();
-    this.listener.start();
     if (process.env.ENV === 'production') {
       this.listener.stop();
       this.listener.start();
