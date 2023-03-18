@@ -27,7 +27,7 @@ import {
   triggerInterfaceOnMessage, triggerInterfaceOnSub,
 } from '~/helpers/interface/triggers';
 import emitter from '~/helpers/interfaceEmitter';
-import { ban, warning } from '~/helpers/log';
+import { ban, isDebugEnabled, warning } from '~/helpers/log';
 import {
   chatIn, debug, error, info, resub, sub, subcommunitygift, subgift, whisperIn,
 } from '~/helpers/log';
@@ -142,7 +142,17 @@ class Chat {
         this.client[type] = null;
       }
 
-      this.client[type] = new ChatClient({ authProvider: this.authProvider, isAlwaysMod: true, authIntents: [type] });
+      this.client[type] = new ChatClient({
+        authProvider: this.authProvider,
+        isAlwaysMod:  true,
+        authIntents:  [type],
+        logger:       {
+          minLevel: isDebugEnabled('twitch.tmi') ? 'debug' : undefined,
+          custom:   (level, message) => {
+            info(`TMI[${type}:${level}]: ${message}`);
+          },
+        },
+      });
 
       this.loadListeners(type);
       await this.client[type]?.connect();
