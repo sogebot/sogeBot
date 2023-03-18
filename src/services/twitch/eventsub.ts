@@ -24,11 +24,12 @@ const mutex = new Mutex();
 
 setInterval(() => {
   // reset initialTimeout if connection lasts for five minutes
+  debug('eventsub', `Current retry timeout ${initialTimeout * 1000}s`);
   if (Date.now() - lastConnectionAt.getTime() > 5 * MINUTE + initialTimeout && initialTimeout !== 500 && !mutex.isLocked()) {
     console.debug('eventsub', 'EventSub: resetting initialTimeout');
     initialTimeout = 500;
   }
-}, 1000);
+}, 60000);
 
 class EventSub {
   listener: EventSubWsListener;
@@ -89,7 +90,9 @@ class EventSub {
 
     if (process.env.ENV === 'production') {
       this.listener.stop();
-      this.listener.start();
+      setTimeout(() => {
+        this.listener.start();
+      }, 5000);
     } else {
       info('EVENTSUB-WS: Eventsub events disabled on dev-mode.');
     }

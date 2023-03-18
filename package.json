@@ -80,7 +80,7 @@
     "tlds": "1.237.0",
     "trigram-similarity": "^1.0.7",
     "type-graphql": "^1.1.1",
-    "typeorm": "0.3.12",
+    "typeorm": "0.3.11",
     "url-join": "5.0.0",
     "uuid": "9.0.0",
     "velocity-animate": "1.5.2",
