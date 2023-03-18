@@ -1,6 +1,7 @@
 import { DAY, MINUTE } from '@sogebot/ui-helpers/constants';
 import { ApiClient } from '@twurple/api/lib';
 import { EventSubWsListener } from '@twurple/eventsub-ws';
+import { Mutex, MutexInterface } from 'async-mutex';
 
 import * as channelPoll from '~/helpers/api/channelPoll';
 import * as channelPrediction from '~/helpers/api/channelPrediction';
@@ -19,6 +20,7 @@ import { variables } from '~/watchers';
 const rewardsRedeemed: string[] = [];
 let initialTimeout = 500;
 let lastConnectionAt = new Date();
+const mutex = new Mutex();
 
 setInterval(() => {
   // reset initialTimeout if connection lasts for five minutes
@@ -64,7 +66,13 @@ class EventSub {
       info(`EVENTSUB-WS: Service initialized for ${broadcasterUsername}#${broadcasterId}`);
       lastConnectionAt = new Date();
     });
-    this.listener.onUserSocketDisconnect((_, err) => {
+    this.listener.onUserSocketDisconnect(async (_, err) => {
+      let release: MutexInterface.Releaser;
+      if (mutex.isLocked()) {
+        return;
+      } else {
+        release = await mutex.acquire();
+      }
       error(`EVENTSUB-WS: ${err ?? 'Unknown error'}`);
       this.listener?.stop();
       const maxTimeout = 2 / DAY;
@@ -73,6 +81,7 @@ class EventSub {
       info(`EVENTSUB-WS: Reconnecting in ${nextTimeout / 1000}s...`);
       setTimeout(() => {
         this.listener?.start(); // try to reconnect
+        release();
       }, Math.min(nextTimeout, maxTimeout));
     });
 
