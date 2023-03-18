@@ -24,7 +24,7 @@ const mutex = new Mutex();
 
 setInterval(() => {
   // reset initialTimeout if connection lasts for five minutes
-  if (lastConnectionAt.getTime() > 5 * MINUTE && initialTimeout !== 500) {
+  if (Date.now() - lastConnectionAt.getTime() > 5 * MINUTE + initialTimeout && initialTimeout !== 500 && !mutex.isLocked()) {
     console.debug('eventsub', 'EventSub: resetting initialTimeout');
     initialTimeout = 500;
   }
@@ -79,12 +79,12 @@ class EventSub {
       this.listener?.stop();
       const maxTimeout = 2 / DAY;
       const nextTimeout = initialTimeout * 2;
-      initialTimeout = nextTimeout;
-      info(`EVENTSUB-WS: Reconnecting in ${nextTimeout / 1000}s...`);
+      initialTimeout = Math.min(nextTimeout, maxTimeout);
+      info(`EVENTSUB-WS: Reconnecting in ${initialTimeout / 1000}s...`);
       setTimeout(() => {
         this.listener?.start(); // try to reconnect
         release();
-      }, Math.min(nextTimeout, maxTimeout));
+      }, initialTimeout);
     });
 
     if (process.env.ENV === 'production') {
