@@ -2,6 +2,7 @@ import { DAY, MINUTE } from '@sogebot/ui-helpers/constants';
 import { ApiClient } from '@twurple/api/lib';
 import { EventSubWsListener } from '@twurple/eventsub-ws';
 import { Mutex, MutexInterface } from 'async-mutex';
+import humanizeDuration from 'humanize-duration';
 
 import * as channelPoll from '~/helpers/api/channelPoll';
 import * as channelPrediction from '~/helpers/api/channelPrediction';
@@ -24,7 +25,7 @@ const mutex = new Mutex();
 
 setInterval(() => {
   // reset initialTimeout if connection lasts for five minutes
-  debug('eventsub', `Current retry timeout ${initialTimeout * 1000}s`);
+  debug('eventsub', `Current retry timeout ${humanizeDuration(initialTimeout)}`);
   if (Date.now() - lastConnectionAt.getTime() > 5 * MINUTE + initialTimeout && initialTimeout !== 500 && !mutex.isLocked()) {
     console.debug('eventsub', 'EventSub: resetting initialTimeout');
     initialTimeout = 500;
@@ -81,7 +82,7 @@ class EventSub {
       const maxTimeout = 2 / DAY;
       const nextTimeout = initialTimeout * 2;
       initialTimeout = Math.min(nextTimeout, maxTimeout);
-      info(`EVENTSUB-WS: Reconnecting in ${initialTimeout / 1000}s...`);
+      info(`EVENTSUB-WS: Reconnecting in ${humanizeDuration(initialTimeout)}...`);
       setTimeout(() => {
         this.listener?.start(); // try to reconnect
         release();
