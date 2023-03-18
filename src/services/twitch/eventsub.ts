@@ -42,7 +42,7 @@ class EventSub {
     this.listener = new EventSubWsListener({
       apiClient,
       logger: {
-        minLevel: isDebugEnabled('eventsub') ? 'trace' : undefined,
+        minLevel: isDebugEnabled('twitch.eventsub') ? 'trace' : undefined,
         custom:   (level, message) => {
           info(`EVENTSUB-WS[${level}]: ${message}`);
         },
@@ -79,7 +79,7 @@ class EventSub {
       }
       error(`EVENTSUB-WS: ${err ?? 'Unknown error'}`);
       this.listener?.stop();
-      const maxTimeout = 2 / DAY;
+      const maxTimeout = DAY / 2;
       const nextTimeout = initialTimeout * 2;
       initialTimeout = Math.min(nextTimeout, maxTimeout);
       info(`EVENTSUB-WS: Reconnecting in ${humanizeDuration(initialTimeout)}...`);
