@@ -141,13 +141,12 @@ class Chat {
         client.removeListener();
         this.client[type] = null;
       }
-
       this.client[type] = new ChatClient({
         authProvider: this.authProvider,
         isAlwaysMod:  true,
         authIntents:  [type],
         logger:       {
-          minLevel: isDebugEnabled('twitch.tmi') ? 'debug' : undefined,
+          minLevel: isDebugEnabled('twitch.tmi') ? 'debug' : 'warning',
           custom:   (level, message) => {
             info(`TMI[${type}:${level}]: ${message}`);
           },

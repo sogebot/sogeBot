@@ -42,7 +42,7 @@ class EventSub {
     this.listener = new EventSubWsListener({
       apiClient,
       logger: {
-        minLevel: isDebugEnabled('twitch.eventsub') ? 'trace' : undefined,
+        minLevel: isDebugEnabled('twitch.eventsub') ? 'trace' : 'warning',
         custom:   (level, message) => {
           info(`EVENTSUB-WS[${level}]: ${message}`);
         },

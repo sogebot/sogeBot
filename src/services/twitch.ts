@@ -20,7 +20,7 @@ import {
 import { onChange, onLoad, onStreamStart } from '../decorators/on';
 import Expects from '../expects';
 import emitter from '../helpers/interfaceEmitter';
-import { error, info } from '../helpers/log';
+import { debug, error, info } from '../helpers/log';
 
 import { AppDataSource } from '~/database';
 import {
@@ -151,10 +151,10 @@ class Twitch extends Service {
 
     loadedKeys.add(key);
     if (loadedKeys.size < 5 || !this.authProvider || !this.apiClient) {
-      console.debug('eventsub', 'Not yet loaded');
+      debug('twitch.onChangeRefreshTokens', 'Not yet loaded');
       return;
     }
-    console.debug('eventsub', 'Adding tokens to authProvider');
+    debug('twitch.onChangeRefreshTokens', 'Adding tokens to authProvider');
     if (this.botRefreshToken.length > 0) {
       const userId = await this.authProvider.addUserForToken({
         expiresIn:           0,
@@ -189,7 +189,7 @@ class Twitch extends Service {
   }
 
   onTokenValidChange() {
-    console.debug('eventsub', 'onTokenValidChange');
+    debug('twitch.onTokenValidChange', 'onTokenValidChange()');
 
     this.eventsub?.listener.stop();
     if (this.broadcasterTokenValid && this.botTokenValid) {
