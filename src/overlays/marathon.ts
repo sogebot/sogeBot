@@ -183,6 +183,7 @@ class Marathon extends Overlay {
         }
         cachedOverlays.set(key ?? '', item);
       }
+      await this.flushCache();
     });
   }
 }
