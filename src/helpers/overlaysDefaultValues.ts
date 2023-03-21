@@ -213,7 +213,7 @@ const values = {
     inactivityTime:      5000,
     align:               'top',
   },
-  obswebsocket: { allowedIPs: [], password: '', port: 4455 },
+  obswebsocket: { allowedIPs: [], password: '', port: '4455' },
   group:        {
     canvas: {
       height: 1080,

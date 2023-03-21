@@ -341,7 +341,7 @@ export interface Polls {
 export interface OBSWebsocket {
   typeId: 'obswebsocket';
   allowedIPs: string[];
-  port: number;
+  port: string;
   password: string;
 }
 
