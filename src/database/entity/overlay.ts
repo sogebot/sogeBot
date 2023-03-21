@@ -360,6 +360,10 @@ export interface HTML {
   css: string;
 }
 
+export interface Stats {
+  typeId: 'stats';
+}
+
 export interface Group {
   typeId: 'group';
   canvas: {
@@ -403,6 +407,6 @@ export class Overlay extends BotEntity<Overlay> {
     URL | Chat | Reference | AlertsRegistry | Carousel | Marathon | Stopwatch |
     Countdown | Group | Eventlist | EmotesCombo | Credits | Clips | Alerts |
     Emotes | EmotesExplode | EmotesFireworks | Polls | TTS | OBSWebsocket |
-    ClipsCarousel | HypeTrain | Wordcloud | HTML;
+    ClipsCarousel | HypeTrain | Wordcloud | HTML | Stats;
   }[];
 }
