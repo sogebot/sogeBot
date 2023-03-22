@@ -14,7 +14,6 @@ import type { KeywordGroupInterface, KeywordInterface } from '@entity/keyword';
 import type { OBSWebsocketInterface } from '@entity/obswebsocket';
 import type { OverlayMapperMarathon, Overlay } from '@entity/overlay';
 import type { Permissions } from '@entity/permissions';
-import type { PollInterface } from '@entity/poll';
 import type { QueueInterface } from '@entity/queue';
 import type { QuotesInterface } from '@entity/quotes';
 import type { RaffleInterface } from '@entity/raffle';
@@ -218,8 +217,13 @@ export type ClientToServerEventsWithNamespace = {
     'getClips': (opts: Record<string, any>, cb: (data: any[]) => void) => void,
   },
   '/overlays/polls': GenericEvents & {
-    'data': (cb: (item: PollInterface, votes: any[]) => void) => void,
-    'getVoteCommand': (cb: (command: string) => void) => void,
+    'data': (cb: (item: {
+      id: string,
+      title: string,
+      choices: {title: string, totalVotes: number, id: string}[],
+      startDate: string,
+      endDate: string,
+    } | null, votes: any[]) => void) => void,
   },
   '/overlays/marathon': GenericEvents & {
     'marathon::public': (id: string, cb: (err: Error | string | null, item?: OverlayMapperMarathon) => void) => void,

@@ -1,12 +1,13 @@
-import { eventEmitter } from '~/helpers/events';
-
+import { HelixPoll } from '@twurple/api/lib';
 import { EventSubChannelPollBeginEvent } from '@twurple/eventsub-base/lib/events/EventSubChannelPollBeginEvent';
 import { EventSubChannelPollEndEvent } from '@twurple/eventsub-base/lib/events/EventSubChannelPollEndEvent';
 import { EventSubChannelPollProgressEvent } from '@twurple/eventsub-base/lib/events/EventSubChannelPollProgressEvent';
 
-let event: null | EventSubChannelPollBeginEvent | EventSubChannelPollProgressEvent | EventSubChannelPollEndEvent = null;
+import { eventEmitter } from '~/helpers/events';
 
-function setData(event_data: EventSubChannelPollBeginEvent | EventSubChannelPollProgressEvent | EventSubChannelPollEndEvent) {
+let event: null | EventSubChannelPollBeginEvent | EventSubChannelPollProgressEvent | EventSubChannelPollEndEvent | HelixPoll = null;
+
+function setData(event_data: EventSubChannelPollBeginEvent | EventSubChannelPollProgressEvent | EventSubChannelPollEndEvent | HelixPoll) {
   event = event_data;
 }
 function winnerChoice(choices: EventSubChannelPollEndEvent['choices']) {
@@ -48,8 +49,6 @@ async function triggerPollStart() {
     eventEmitter.emit('poll-started', {
       choices:                    event.choices.map(o => o.title).join(', '),
       titleOfPoll:                event.title,
-      bitAmountPerVote:           event.bitsPerVote,
-      bitVotingEnabled:           event.isBitsVotingEnabled,
       channelPointsAmountPerVote: event.channelPointsPerVote,
       channelPointsVotingEnabled: event.isChannelPointsVotingEnabled,
     });
@@ -78,4 +77,5 @@ export {
   setData,
   triggerPollStart,
   triggerPollEnd,
+  event,
 };

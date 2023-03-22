@@ -22,8 +22,6 @@ interface Events {
   'poll-started': (opts: {
     titleOfPoll: string,
     choices: string,
-    bitVotingEnabled: boolean,
-    bitAmountPerVote: number,
     channelPointsVotingEnabled: boolean,
     channelPointsAmountPerVote: number,
   }) => void;
