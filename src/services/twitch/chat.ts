@@ -137,6 +137,7 @@ class Chat {
     try {
       const client = this.client[type];
       if (client) {
+        info(`TMI: ${type} quit on initClient`);
         await this.client[type]?.quit();
         client.removeListener();
         this.client[type] = null;
