@@ -27,7 +27,7 @@ setInterval(() => {
   // reset initialTimeout if connection lasts for five minutes
   debug('eventsub', `Current retry timeout ${humanizeDuration(initialTimeout)}`);
   if (Date.now() - (lastConnectionAt?.getTime() ?? Date.now()) > 5 * MINUTE && initialTimeout !== 500 && !mutex.isLocked()) {
-    console.debug('eventsub', 'EventSub: resetting initialTimeout');
+    debug('eventsub', 'EventSub: resetting initialTimeout');
     initialTimeout = 500;
   }
 }, 60000);
@@ -37,7 +37,7 @@ class EventSub {
   listenerBroadcasterId?: string;
 
   constructor(apiClient: ApiClient) {
-    console.debug('eventsub', 'EventSub: constructor()');
+    debug('eventsub', 'EventSub: constructor()');
 
     this.listener = new EventSubWsListener({
       apiClient,
