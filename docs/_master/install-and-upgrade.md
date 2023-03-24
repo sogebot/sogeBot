@@ -73,7 +73,7 @@
 
 - before starting a bot, you need to install npm dependencies
 
-    `npm ci`
+    `npm install`
 
 - start bot
 
