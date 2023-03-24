@@ -2,7 +2,7 @@ import crypto from 'crypto';
 
 import { EventList as EventListEntity } from '@entity/eventList';
 import * as _ from 'lodash';
-import { Brackets } from 'typeorm';
+import { In, Not } from 'typeorm';
 
 import Overlay from './_interface';
 import eventlist from '../widgets/eventlist';
@@ -52,18 +52,16 @@ class EventList extends Overlay {
     });
     publicEndpoint('/overlays/eventlist', 'getEvents', async (opts: { ignore: string[]; limit: number }, cb) => {
       let events = await AppDataSource.getRepository(EventListEntity)
-        .createQueryBuilder('events')
-        .select('events')
-        .orderBy('events.timestamp', 'DESC')
-        .where(new Brackets(qb => {
-          const ignored = opts.ignore.map(value => value.trim());
-          for (let i = 0; i < ignored.length; i++) {
-            qb.andWhere(`events.event != :event_${i}`, { ['event_' + i]: ignored[i] });
-            qb.andWhere(`events.isHidden != :isHidden`, { ['isHidden']: false });
-          }
-        }))
-        .limit(opts.limit)
-        .getMany();
+        .find({
+          where: {
+            isHidden: false,
+            event:    Not(In(opts.ignore.map(value => value.trim()))),
+          },
+          order: {
+            timestamp: 'DESC',
+          },
+          take: opts.limit,
+        });
       if (events) {
         events = _.uniqBy(events, o =>
           (o.userId + (['cheer', 'rewardredeem'].includes(o.event) ? crypto.randomBytes(64).toString('hex') : o.event)),
