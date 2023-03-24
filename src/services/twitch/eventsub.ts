@@ -20,13 +20,13 @@ import { variables } from '~/watchers';
 
 const rewardsRedeemed: string[] = [];
 let initialTimeout = 500;
-let lastConnectionAt = new Date();
+let lastConnectionAt: Date | null = null;
 const mutex = new Mutex();
 
 setInterval(() => {
   // reset initialTimeout if connection lasts for five minutes
   debug('eventsub', `Current retry timeout ${humanizeDuration(initialTimeout)}`);
-  if (Date.now() - lastConnectionAt.getTime() > 5 * MINUTE + initialTimeout && initialTimeout !== 500 && !mutex.isLocked()) {
+  if (Date.now() - (lastConnectionAt?.getTime() ?? Date.now()) > 5 * MINUTE && initialTimeout !== 500 && !mutex.isLocked()) {
     console.debug('eventsub', 'EventSub: resetting initialTimeout');
     initialTimeout = 500;
   }
@@ -83,6 +83,7 @@ class EventSub {
       const nextTimeout = initialTimeout * 2;
       initialTimeout = Math.min(nextTimeout, maxTimeout);
       info(`EVENTSUB-WS: Reconnecting in ${humanizeDuration(initialTimeout)}...`);
+      lastConnectionAt = null;
       setTimeout(() => {
         this.listener?.start(); // try to reconnect
         release();
