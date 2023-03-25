@@ -2,15 +2,16 @@ import { Bets as BetsEntity } from '@entity/bets';
 import { format } from '@sogebot/ui-helpers/number';
 import _ from 'lodash';
 
+import System from './_interface';
 import { parserReply } from '../commons';
 import {
   command, default_permission, helper, settings, ui,
 } from '../decorators';
-import { onStartup } from '../decorators/on';
+import { onStartup, onStreamStart } from '../decorators/on';
 import Expects from '../expects';
 import general from '../general.js';
-import System from './_interface';
 
+import * as channelPrediction from '~/helpers/api/channelPrediction';
 import {
   announce, getBotSender, getOwner, prepare,
 } from '~/helpers/commons';
@@ -20,6 +21,8 @@ import defaultPermissions from '~/helpers/permissions/defaultPermissions';
 import { getPointsName } from '~/helpers/points';
 import { adminEndpoint } from '~/helpers/socket';
 import * as changelog from '~/helpers/user/changelog.js';
+import getBroadcasterId from '~/helpers/user/getBroadcasterId';
+import twitch from '~/services/twitch';
 
 const ERROR_NOT_ENOUGH_OPTIONS = 'Expected more parameters';
 const ERROR_ALREADY_OPENED = '1';
@@ -31,66 +34,23 @@ const ERROR_DIFF_BET = '6';
 const ERROR_NOT_OPTION = '7';
 
 /*
- * !bet                                                                          - gets an info about bet
- * !bet [option-index] [amount]                                                  - bet [amount] of points on [option]
  * !bet open [-timeout 5] -title "your bet title" option | option | option | ... - open a new bet with selected options
  *                                                                               - -timeout in minutes - optional: default 2
  *                                                                               - -title - must be in "" - optional
  * !bet close [option]                                                           - close a bet and select option as winner
- * !bet refund                                                                   - close a bet and refund all participants
- * !set betPercentGain [0-100]                                                   - sets amount of gain per option
  */
-
-let isEndAnnounced = false;
-
 class Bets extends System {
-  public dependsOn = [ 'systems.points' ];
-
-  @settings()
-  @ui({
-    type: 'number-input', step: 1, min: 0, max: 100,
-  })
-  public betPercentGain = 20;
-
   @onStartup()
-  public async checkIfBetExpired() {
-    if (!isDbConnected) {
-      setTimeout(() => this.checkIfBetExpired(), 1000);
-      return;
-    }
-    try {
-      const currentBet = (await BetsEntity.find({
-        order: { createdAt: 'DESC' },
-        take:  1,
-      }))[0];
-      if (!currentBet || currentBet.isLocked) {
-        throw Error(ERROR_NOT_RUNNING);
-      }
-
-      if (new Date(currentBet.endedAt || 0).getTime() < Date.now()) {
-        if (currentBet.participants.length > 0) {
-          if (!isEndAnnounced) {
-            announce(prepare('bets.locked'), 'bets');
-            isEndAnnounced = true;
-          }
-        } else {
-          announce(prepare('bets.removed'), 'bets');
-        }
-        await BetsEntity.update({ id: currentBet.id }, { isLocked: true });
-      } else {
-        // bet is running;
-        isEndAnnounced = false;
-      }
-    } catch (e: any) {
-      switch (e.message) {
-        case ERROR_NOT_RUNNING:
-          break;
-        default:
-          error(e.stack);
-          break;
+  @onStreamStart()
+  async onStartup() {
+    // initial load of predictions
+    const predictions = await twitch.apiClient?.asIntent(['broadcaster'], ctx => ctx.predictions.getPredictions(getBroadcasterId()));
+    if (predictions) {
+      const prediction = predictions?.data.find(o => o.status === 'ACTIVE');
+      if (prediction) {
+        channelPrediction.status(prediction);
       }
     }
-    setTimeout(() => this.checkIfBetExpired(), 10000);
   }
 
   sockets() {
@@ -316,7 +276,6 @@ class Bets extends System {
           return [{ response: prepare('bets.notRunning'), ...opts } ];
           break;
         default:
-          warning(e.stack);
           return [{ response: prepare('core.error'), ...opts } ];
       }
     } finally {

@@ -165,6 +165,9 @@ class EventSub {
       this.listener.onChannelPredictionBegin(broadcasterId, event => {
         channelPrediction.start(event);
       });
+      this.listener.onChannelPredictionProgress(broadcasterId, event => {
+        channelPrediction.progress(event);
+      });
       this.listener.onChannelPredictionLock(broadcasterId, event => {
         channelPrediction.lock(event);
       });

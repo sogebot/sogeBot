@@ -27,10 +27,9 @@ enum ERROR {
 }
 
 /*
- * !vote
- * !vote [x]
  * !poll open [-tips/-bits/-points] -title "your vote title" option | option | option
  * !poll close
+ * !poll reuse
  */
 
 class Polls extends System {
@@ -45,24 +44,6 @@ class Polls extends System {
         channelPoll.setData(poll);
       }
     }
-  }
-
-  public async sockets() {
-    if (!app) {
-      setTimeout(() => this.sockets(), 100);
-      return;
-    }
-
-    app.get('/api/systems/polls', adminMiddleware, async (req, res) => {
-      res.send(await twitch.apiClient?.asIntent(['broadcaster'], ctx => ctx.polls.getPolls(getBroadcasterId())));
-    });
-    app.delete('/api/systems/polls/', adminMiddleware, async (req, res) => {
-      res.send();
-    });
-    app.post('/api/systems/polls', adminMiddleware, async (req, res) => {
-      res.send();
-
-    });
   }
 
   @command('!poll close')
