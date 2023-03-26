@@ -1,4 +1,4 @@
-import { HelixPrediction, HelixPredictionOutcome } from '@twurple/api/lib';
+import { HelixPrediction } from '@twurple/api/lib';
 import { EventSubChannelPredictionBeginEvent } from '@twurple/eventsub-base/lib/events/EventSubChannelPredictionBeginEvent';
 import { EventSubChannelPredictionEndEvent } from '@twurple/eventsub-base/lib/events/EventSubChannelPredictionEndEvent';
 import { EventSubChannelPredictionLockEvent } from '@twurple/eventsub-base/lib/events/EventSubChannelPredictionLockEvent';
