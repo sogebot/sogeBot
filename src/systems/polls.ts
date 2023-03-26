@@ -11,11 +11,9 @@ import Expects from '../expects.js';
 
 import * as channelPoll from '~/helpers/api/channelPoll';
 import { error } from '~/helpers/log.js';
-import { app } from '~/helpers/panel';
 import defaultPermissions from '~/helpers/permissions/defaultPermissions';
 import getBroadcasterId from '~/helpers/user/getBroadcasterId';
 import twitch from '~/services/twitch';
-import { adminMiddleware } from '~/socket';
 
 enum ERROR {
   NOT_ENOUGH_OPTIONS,
