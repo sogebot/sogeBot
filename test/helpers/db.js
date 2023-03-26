@@ -7,7 +7,6 @@ const { debug } = require('../../dest/helpers/log');
 const waitMs = require('./time').waitMs;
 
 const { Alias, AliasGroup } = require('../../dest/database/entity/alias');
-const { Bets } = require('../../dest/database/entity/bets');
 const { Commands, CommandsCount, CommandsGroup } = require('../../dest/database/entity/commands');
 const { Cooldown } = require('../../dest/database/entity/cooldown');
 const { DiscordLink } = require('../../dest/database/entity/discord');
@@ -19,7 +18,6 @@ const { Keyword, KeywordGroup } = require('../../dest/database/entity/keyword');
 const { ModerationPermit } = require('../../dest/database/entity/moderation');
 const { PermissionCommands } = require('../../dest/database/entity/permissions');
 const { PointsChangelog } = require('../../dest/database/entity/points');
-const { Poll } = require('../../dest/database/entity/poll');
 const { Price } = require('../../dest/database/entity/price');
 const { Quotes } = require('../../dest/database/entity/quotes');
 const { Raffle, RaffleParticipant } = require('../../dest/database/entity/raffle');
@@ -51,7 +49,7 @@ module.exports = {
       await changelog.flush();
       await waitMs(1000); // wait little bit for transactions to be done
 
-      const entities = [Settings, AliasGroup, CommandsGroup, KeywordGroup, HeistUser, EventList, PointsChangelog, SongRequest, RaffleParticipant, Rank, PermissionCommands, Event, EventOperation, Variable, Raffle, Duel, Poll, TimerResponse, Timer, UserTip, UserBit, User, ModerationPermit, Alias, Bets, Commands, CommandsCount, Quotes, Cooldown, Keyword, Price, DiscordLink];
+      const entities = [Settings, AliasGroup, CommandsGroup, KeywordGroup, HeistUser, EventList, PointsChangelog, SongRequest, RaffleParticipant, Rank, PermissionCommands, Event, EventOperation, Variable, Raffle, Duel, TimerResponse, Timer, UserTip, UserBit, User, ModerationPermit, Alias, Commands, CommandsCount, Quotes, Cooldown, Keyword, Price, DiscordLink];
       if (['postgres', 'mysql'].includes(AppDataSource.options.type)) {
         const metadatas = [];
         for (const entity of entities) {

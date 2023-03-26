@@ -11,7 +11,6 @@ const message = require('../../general.js').message;
 const time = require('../../general.js').time;
 const { Price } = require('../../../dest/database/entity/price');
 const customcommands = (require('../../../dest/systems/customcommands')).default;
-const { Poll } = require('../../../dest/database/entity/poll');
 
 const { getLocalizedName } = require('@sogebot/ui-helpers/getLocalized');
 
