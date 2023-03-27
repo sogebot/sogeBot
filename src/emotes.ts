@@ -163,7 +163,7 @@ class Emotes extends Core {
           }
           const emotes = await twitch.apiClient?.asIntent(['broadcaster'], ctx => ctx.callApi<any>({ url: `chat/emotes?broadcaster_id=${broadcasterId}`, type: 'helix' }));
           if (!emotes) {
-            throw new Error('Cannot initialize Twitch API');
+            throw new Error('not found in auth provider');
           }
           this.lastSubscriberEmoteChk = Date.now();
           this.cache = this.cache.filter(o => o.type !== 'twitch-sub');
@@ -187,7 +187,7 @@ class Emotes extends Core {
           broadcasterWarning = false;
         } catch (e) {
           if (e instanceof Error) {
-            if (e.message.includes('Cannot initialize Twitch API')) {
+            if (e.message.includes('not found in auth provider')) {
               this.lastSubscriberEmoteChk = 0; // recheck next tick
               this.fetch.channel = false;
             } else {
@@ -201,10 +201,6 @@ class Emotes extends Core {
   }
 
   async fetchEmotesGlobal () {
-    const botTokenValid = variables.get('services.twitch.botTokenValid') as boolean;
-    if (botTokenValid) {
-      return;
-    }
     this.fetch.global = true;
 
     // we want to update once every week
@@ -233,7 +229,7 @@ class Emotes extends Core {
         info('EMOTES: Fetched global emotes');
       } catch (e) {
         if (e instanceof Error) {
-          if (e.message.includes('Cannot initialize Twitch API')) {
+          if (e.message.includes('not found in auth provider')) {
             this.lastGlobalEmoteChk = 0; // recheck next tick
             this.fetch.global = false;
           } else {
