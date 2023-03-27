@@ -23,23 +23,32 @@ enum ERROR {
   ALREADY_OPENED,
   ALREADY_CLOSED,
 }
+let retryTimeout: NodeJS.Timeout | undefined;
 
 /*
  * !poll open [-tips/-bits/-points] -title "your vote title" option | option | option
  * !poll close
  * !poll reuse
  */
-
 class Polls extends System {
   @onStartup()
   @onStreamStart()
   async onStartup() {
-    // initial load of polls
-    const polls = await twitch.apiClient?.asIntent(['broadcaster'], ctx => ctx.polls.getPolls(getBroadcasterId()));
-    if (polls) {
-      const poll = polls?.data.find(o => o.status === 'ACTIVE');
-      if (poll) {
-        channelPoll.setData(poll);
+    try {
+      // initial load of polls
+      const polls = await twitch.apiClient?.asIntent(['broadcaster'], ctx => ctx.polls.getPolls(getBroadcasterId()));
+      if (polls) {
+        const poll = polls?.data.find(o => o.status === 'ACTIVE');
+        if (poll) {
+          channelPoll.setData(poll);
+        }
+      }
+    } catch (e) {
+      if (e instanceof Error && e.message.includes('not found in auth provider')) {
+        clearTimeout(retryTimeout);
+        retryTimeout = setTimeout(() => this.onStartup(), 10000);
+      } else {
+        throw e;
       }
     }
   }

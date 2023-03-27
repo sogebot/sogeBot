@@ -18,6 +18,7 @@ import twitch from '~/services/twitch';
 
 const ERROR_NOT_ENOUGH_OPTIONS = 'Expected more parameters';
 const ERROR_NOT_OPTION = '7';
+let retryTimeout: NodeJS.Timeout | undefined;
 
 /*
  * !bet open [-timeout 5] -title "your bet title" option | option | option | ... - open a new bet with selected options
@@ -31,12 +32,21 @@ class Bets extends System {
   @onStartup()
   @onStreamStart()
   async onStartup() {
-    // initial load of predictions
-    const predictions = await twitch.apiClient?.asIntent(['broadcaster'], ctx => ctx.predictions.getPredictions(getBroadcasterId()));
-    if (predictions) {
-      const prediction = predictions?.data.find(o => o.status === 'ACTIVE');
-      if (prediction) {
-        channelPrediction.status(prediction);
+    try {
+      // initial load of predictions
+      const predictions = await twitch.apiClient?.asIntent(['broadcaster'], ctx => ctx.predictions.getPredictions(getBroadcasterId()));
+      if (predictions) {
+        const prediction = predictions?.data.find(o => o.status === 'ACTIVE');
+        if (prediction) {
+          channelPrediction.status(prediction);
+        }
+      }
+    } catch (e) {
+      if (e instanceof Error && e.message.includes('not found in auth provider')) {
+        clearTimeout(retryTimeout);
+        retryTimeout = setTimeout(() => this.onStartup(), 10000);
+      } else {
+        throw e;
       }
     }
   }
