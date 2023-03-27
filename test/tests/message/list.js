@@ -2,9 +2,9 @@
 require('../../general.js');
 
 const assert = require('assert');
-const { AppDataSource } = require('../../../dest/database.js');
 
 const { User } = require('../../../dest/database/entity/user');
+const { AppDataSource } = require('../../../dest/database.js');
 const Message = require('../../../dest/message').default;
 const alias = (require('../../../dest/systems/alias')).default;
 const cooldown = (require('../../../dest/systems/cooldown')).default;
@@ -103,12 +103,12 @@ describe('Message - list filter - @func3', () => {
 
     it('(list.core.VIEWERS) should return core commands', async () => {
       const r = await new Message('(list.core.VIEWERS)').parse({});
-      assert.strictEqual(r, 'age, bet, currentsong, followage, followers, game, lastseen, level, level buy, me, ping, points, points give, queue, queue join, quote, quote list, raffle, rank, snipe match, songrequest, subage, subs, time, title, uptime, vote, watched, wrongsong');
+      assert.strictEqual(r, 'age, currentsong, followage, followers, game, lastseen, level, level buy, me, ping, points, points give, queue, queue join, quote, quote list, raffle, rank, snipe match, songrequest, subage, subs, time, title, uptime, watched, wrongsong');
     });
 
     it('(list.!core.VIEWERS) should return core commands', async () => {
       const r = await new Message('(list.!core.VIEWERS)').parse({});
-      assert.strictEqual(r, '!age, !bet, !currentsong, !followage, !followers, !game, !lastseen, !level, !level buy, !me, !ping, !points, !points give, !queue, !queue join, !quote, !quote list, !raffle, !rank, !snipe match, !songrequest, !subage, !subs, !time, !title, !uptime, !vote, !watched, !wrongsong');
+      assert.strictEqual(r, '!age, !currentsong, !followage, !followers, !game, !lastseen, !level, !level buy, !me, !ping, !points, !points give, !queue, !queue join, !quote, !quote list, !raffle, !rank, !snipe match, !songrequest, !subage, !subs, !time, !title, !uptime, !watched, !wrongsong');
     });
   });
 });

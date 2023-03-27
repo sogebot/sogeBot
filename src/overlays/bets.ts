@@ -1,21 +1,22 @@
-import { Bets as BetsEntity } from '@entity/bets';
-import { AppDataSource } from '~/database';
-
 import Overlay from './_interface';
 
+import * as channelPrediction from '~/helpers/api/channelPrediction';
 import { publicEndpoint } from '~/helpers/socket';
 
 class Bets extends Overlay {
-  showInUI = false;
-
   public sockets() {
     publicEndpoint(this.nsp, 'data', async (callback) => {
-      const currentBet = await AppDataSource.getRepository(BetsEntity).findOne({
-        relations: ['participations'],
-        order:     { createdAt: 'DESC' },
-        cache:     10000,
-      });
-      callback(currentBet);
+      const data = channelPrediction.status();
+      callback(data ? {
+        id:               data.id,
+        title:            data.title,
+        autoLockAfter:    'autoLockAfter' in data ? data.autoLockAfter : null,
+        creationDate:     data.creationDate ? new Date(data.creationDate).toISOString() : null,
+        lockDate:         data.lockDate ? new Date(data.lockDate).toISOString() : null,
+        outcomes:         data.outcomes,
+        winningOutcomeId: 'winningOutcomeId' in data ? data.winningOutcomeId : null,
+        winningOutcome:   'winningOutcome' in data ? data.winningOutcome : null,
+      } : null);
     });
   }
 }

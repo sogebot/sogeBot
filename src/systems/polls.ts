@@ -11,11 +11,9 @@ import Expects from '../expects.js';
 
 import * as channelPoll from '~/helpers/api/channelPoll';
 import { error } from '~/helpers/log.js';
-import { app } from '~/helpers/panel';
 import defaultPermissions from '~/helpers/permissions/defaultPermissions';
 import getBroadcasterId from '~/helpers/user/getBroadcasterId';
 import twitch from '~/services/twitch';
-import { adminMiddleware } from '~/socket';
 
 enum ERROR {
   NOT_ENOUGH_OPTIONS,
@@ -25,44 +23,34 @@ enum ERROR {
   ALREADY_OPENED,
   ALREADY_CLOSED,
 }
+let retryTimeout: NodeJS.Timeout | undefined;
 
 /*
- * !vote
- * !vote [x]
  * !poll open [-tips/-bits/-points] -title "your vote title" option | option | option
  * !poll close
+ * !poll reuse
  */
-
 class Polls extends System {
   @onStartup()
   @onStreamStart()
   async onStartup() {
-    // initial load of polls
-    const polls = await twitch.apiClient?.asIntent(['broadcaster'], ctx => ctx.polls.getPolls(getBroadcasterId()));
-    if (polls) {
-      const poll = polls?.data.find(o => o.status === 'ACTIVE');
-      if (poll) {
-        channelPoll.setData(poll);
+    try {
+      // initial load of polls
+      const polls = await twitch.apiClient?.asIntent(['broadcaster'], ctx => ctx.polls.getPolls(getBroadcasterId()));
+      if (polls) {
+        const poll = polls?.data.find(o => o.status === 'ACTIVE');
+        if (poll) {
+          channelPoll.setData(poll);
+        }
+      }
+    } catch (e) {
+      if (e instanceof Error && e.message.includes('not found in auth provider')) {
+        clearTimeout(retryTimeout);
+        retryTimeout = setTimeout(() => this.onStartup(), 10000);
+      } else {
+        throw e;
       }
     }
-  }
-
-  public async sockets() {
-    if (!app) {
-      setTimeout(() => this.sockets(), 100);
-      return;
-    }
-
-    app.get('/api/systems/polls', adminMiddleware, async (req, res) => {
-      res.send(await twitch.apiClient?.asIntent(['broadcaster'], ctx => ctx.polls.getPolls(getBroadcasterId())));
-    });
-    app.delete('/api/systems/polls/', adminMiddleware, async (req, res) => {
-      res.send();
-    });
-    app.post('/api/systems/polls', adminMiddleware, async (req, res) => {
-      res.send();
-
-    });
   }
 
   @command('!poll close')
