@@ -101,8 +101,8 @@ const stream: ResponseFilter = {
     channel = channel.replace('@', '');
 
     try {
-      const getStreams = await twitch.apiClient?.asIntent(['bot'], ctx => ctx.streams.getStreams({ userName: channel }));
-      if (!getStreams) {
+      const getStreams = await twitch.apiClient?.asIntent(['bot'], ctx => ctx.streams.getStreams({ userName: channel, type: 'live' }));
+      if (!getStreams || getStreams.data.length === 0) {
         throw new Error();
       }
       return `live`;
