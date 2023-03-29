@@ -4,6 +4,10 @@ export class initialize1000000000001 implements MigrationInterface {
   name = 'initialize1000000000001';
 
   public async up(queryRunner: QueryRunner): Promise<any> {
+    const migrations = await queryRunner.query(`SELECT * FROM \`migrations\``);
+    if (migrations.length > 0) {
+      console.log('Skipping migration zero, migrations are already in bot');
+    }
     await queryRunner.query(`CREATE TABLE \`alias\` (\`id\` varchar(36) NOT NULL, \`alias\` varchar(255) NOT NULL, \`command\` text NOT NULL, \`enabled\` tinyint NOT NULL, \`visible\` tinyint NOT NULL, \`permission\` varchar(255) NULL, \`group\` varchar(255) NULL, INDEX \`IDX_6a8a594f0a5546f8082b0c405c\` (\`alias\`), PRIMARY KEY (\`id\`)) ENGINE=InnoDB`);
     await queryRunner.query(`CREATE TABLE \`alias_group\` (\`name\` varchar(255) NOT NULL, \`options\` text NOT NULL, UNIQUE INDEX \`IDX_alias_group_unique_name\` (\`name\`), PRIMARY KEY (\`name\`)) ENGINE=InnoDB`);
     await queryRunner.query(`CREATE TABLE \`cooldown\` (\`id\` varchar(36) NOT NULL, \`name\` varchar(255) NOT NULL, \`miliseconds\` int NOT NULL, \`type\` varchar(10) NOT NULL, \`timestamp\` varchar(30) NOT NULL, \`isEnabled\` tinyint NOT NULL, \`isErrorMsgQuiet\` tinyint NOT NULL, \`isOwnerAffected\` tinyint NOT NULL, \`isModeratorAffected\` tinyint NOT NULL, \`isSubscriberAffected\` tinyint NOT NULL, UNIQUE INDEX \`IDX_aa85aa267ec6eaddf7f93e3665\` (\`name\`), PRIMARY KEY (\`id\`)) ENGINE=InnoDB`);
