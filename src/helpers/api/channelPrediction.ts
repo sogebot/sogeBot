@@ -1,4 +1,4 @@
-import { HelixPrediction } from '@twurple/api/lib';
+import { HelixPrediction, HelixPredictionOutcomeColor } from '@twurple/api/lib';
 import { EventSubChannelPredictionBeginEvent } from '@twurple/eventsub-base/lib/events/EventSubChannelPredictionBeginEvent';
 import { EventSubChannelPredictionEndEvent } from '@twurple/eventsub-base/lib/events/EventSubChannelPredictionEndEvent';
 import { EventSubChannelPredictionLockEvent } from '@twurple/eventsub-base/lib/events/EventSubChannelPredictionLockEvent';
@@ -12,7 +12,13 @@ let data: null | {
   autoLockAfter: null | string,
   creationDate: null | string,
   lockDate: null | string;
-  outcomes: HelixPrediction['outcomes'] | EventSubChannelPredictionProgressEvent['outcomes'] | EventSubChannelPredictionBeginEvent['outcomes'],
+  outcomes: {
+    id: string,
+    color: HelixPredictionOutcomeColor,
+    title: string,
+    users: number,
+    totalChannelPoints: number,
+  }[],
   winningOutcomeId: EventSubChannelPredictionEndEvent['winningOutcomeId'];
   winningOutcome: null | EventSubChannelPredictionEndEvent['winningOutcome'] | HelixPrediction['winningOutcome'];
 } = null;
@@ -20,11 +26,17 @@ let data: null | {
 function status(event?: HelixPrediction) {
   if (event) {
     data = {
-      id:               event.id,
-      title:            event.title,
-      autoLockAfter:    data?.autoLockAfter ?? null,
-      creationDate:     data?.creationDate ?? null,
-      outcomes:         event.outcomes,
+      id:            event.id,
+      title:         event.title,
+      autoLockAfter: data?.autoLockAfter ?? null,
+      creationDate:  data?.creationDate ?? null,
+      outcomes:      event.outcomes.map(outcome => ({
+        id:                 outcome.id,
+        color:              outcome.color,
+        title:              outcome.title,
+        users:              outcome.users,
+        totalChannelPoints: outcome.totalChannelPoints,
+      })),
       winningOutcome:   event.winningOutcome,
       winningOutcomeId: event.winningOutcomeId,
       lockDate:         event.lockDate ? new Date(event.lockDate).toISOString() : null,
@@ -34,11 +46,17 @@ function status(event?: HelixPrediction) {
 }
 function progress(event: EventSubChannelPredictionProgressEvent) {
   data = {
-    id:               event.id,
-    title:            event.title,
-    autoLockAfter:    data?.autoLockAfter ?? null,
-    creationDate:     data?.creationDate ?? null,
-    outcomes:         event.outcomes,
+    id:            event.id,
+    title:         event.title,
+    autoLockAfter: data?.autoLockAfter ?? null,
+    creationDate:  data?.creationDate ?? null,
+    outcomes:      event.outcomes.map(outcome => ({
+      id:                 outcome.id,
+      color:              outcome.color as any,
+      title:              outcome.title,
+      users:              outcome.users,
+      totalChannelPoints: outcome.channelPoints,
+    })),
     winningOutcome:   null,
     winningOutcomeId: null,
     lockDate:         null,
@@ -51,11 +69,17 @@ function progress(event: EventSubChannelPredictionProgressEvent) {
 }
 function start(event: EventSubChannelPredictionBeginEvent) {
   data = {
-    id:               event.id,
-    title:            event.title,
-    autoLockAfter:    data?.autoLockAfter ?? null,
-    creationDate:     data?.creationDate ?? null,
-    outcomes:         event.outcomes,
+    id:            event.id,
+    title:         event.title,
+    autoLockAfter: data?.autoLockAfter ?? null,
+    creationDate:  data?.creationDate ?? null,
+    outcomes:      event.outcomes.map(outcome => ({
+      id:                 outcome.id,
+      color:              outcome.color as any,
+      title:              outcome.title,
+      users:              0,
+      totalChannelPoints: 0,
+    })),
     winningOutcome:   null,
     winningOutcomeId: null,
     lockDate:         null,
@@ -69,11 +93,17 @@ function start(event: EventSubChannelPredictionBeginEvent) {
 
 function lock(event: EventSubChannelPredictionLockEvent) {
   data = {
-    id:               event.id,
-    title:            event.title,
-    autoLockAfter:    data?.autoLockAfter ?? null,
-    creationDate:     data?.creationDate ?? null,
-    outcomes:         event.outcomes,
+    id:            event.id,
+    title:         event.title,
+    autoLockAfter: data?.autoLockAfter ?? null,
+    creationDate:  data?.creationDate ?? null,
+    outcomes:      event.outcomes.map(outcome => ({
+      id:                 outcome.id,
+      color:              outcome.color as any,
+      title:              outcome.title,
+      users:              outcome.users,
+      totalChannelPoints: outcome.channelPoints,
+    })),
     winningOutcome:   null,
     winningOutcomeId: null,
     lockDate:         new Date(event.lockDate).toISOString(),
@@ -87,11 +117,17 @@ function lock(event: EventSubChannelPredictionLockEvent) {
 
 async function end(event: EventSubChannelPredictionEndEvent) {
   data = {
-    id:               event.id,
-    title:            event.title,
-    autoLockAfter:    data?.autoLockAfter ?? null,
-    creationDate:     data?.creationDate ?? null,
-    outcomes:         event.outcomes,
+    id:            event.id,
+    title:         event.title,
+    autoLockAfter: data?.autoLockAfter ?? null,
+    creationDate:  data?.creationDate ?? null,
+    outcomes:      event.outcomes.map(outcome => ({
+      id:                 outcome.id,
+      color:              outcome.color as any,
+      title:              outcome.title,
+      users:              outcome.users,
+      totalChannelPoints: outcome.channelPoints,
+    })),
     winningOutcome:   event.winningOutcome,
     winningOutcomeId: event.winningOutcomeId,
     lockDate:         data?.lockDate ?? null,
