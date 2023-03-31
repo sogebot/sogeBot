@@ -1,0 +1,32 @@
+{
+  "settings": {
+    "enabled": "Status",
+    "everyXMessages": {
+      "title": "Remind every X messages",
+      "help": "0 = disabled; both remind conditions must be true to bot print remind"
+    },
+    "everyXSeconds": {
+      "title": "Remind every X seconds",
+      "help": "0 = disabled; both remind conditions must be true to bot print remind"
+    }
+  },
+  "overlay": {
+    "type": "Type",
+    "add": "Add",
+    "inChatToVote": "... in the chat to vote",
+    "tips": "tip",
+    "bits": "cheer",
+    "toYourMessage": "... in your <strong>$type</strong> message"
+  },
+  "title": "Title",
+  "totalVotes": "Total votes",
+  "copy": "Copy",
+  "cannotCopyIfInProgress": "Cannot copy, if another poll is in progress",
+  "closedAt": "Closed at",
+  "activeFor": "Active for",
+  "votingBy": "Voting by",
+  "tips": "tips",
+  "numbers": "numbers",
+  "bits": "bits",
+  "normal": "!vote"
+}
