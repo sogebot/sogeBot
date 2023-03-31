@@ -182,7 +182,7 @@ class Twitch extends Service {
       this.broadcasterUsername = tokenInfo.userName ?? '';
       this.broadcasterCurrentScopes = tokenInfo.scopes;
       this.broadcasterTokenValid = true;
-      await updateBroadcasterType();
+      setTimeout(() => updateBroadcasterType(), 5000);
       info(`TWITCH: Broadcaster token initialized OK for ${this.broadcasterUsername}#${this.broadcasterId} (type: ${this.broadcasterType}) with scopes: ${this.broadcasterCurrentScopes.join(', ')}`);
     }
     this.onTokenValidChange();
