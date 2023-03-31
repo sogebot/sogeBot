@@ -1,25 +1,24 @@
-import { AppDataSource } from '~/database';
-import { GooglePrivateKeys } from '~/database/entity/google';
-import { app } from '~/helpers/panel';
-import { adminMiddleware } from '~/socket';
-import { onChange, onStartup, onStreamEnd, onStreamStart } from '~/decorators/on';
+import { MINUTE } from '@sogebot/ui-helpers/constants';
+import { getTime } from '@sogebot/ui-helpers/getTime';
+import { OAuth2Client } from 'google-auth-library/build/src/auth/oauth2client';
+import { google, youtube_v3 } from 'googleapis';
+
 import Service from './_interface';
 
-import { google, youtube_v3 } from 'googleapis';
-import { error, info, debug } from '~/helpers/log';
-
-import { OAuth2Client } from 'google-auth-library/build/src/auth/oauth2client';
-import { MINUTE } from '@sogebot/ui-helpers/constants';
-
+import { AppDataSource } from '~/database';
+import { GooglePrivateKeys } from '~/database/entity/google';
+import { persistent, settings } from '~/decorators';
+import { onChange, onStartup, onStreamEnd, onStreamStart } from '~/decorators/on';
 import {
   isStreamOnline,
   stats,
   streamStatusChangeSince,
 } from '~/helpers/api';
-import { persistent, settings } from '~/decorators';
 import { getLang } from '~/helpers/locales';
-import { getTime } from '@sogebot/ui-helpers/getTime';
+import { error, info, debug } from '~/helpers/log';
+import { app } from '~/helpers/panel';
 import { adminEndpoint } from '~/helpers/socket';
+import { adminMiddleware } from '~/socket';
 
 class Google extends Service {
   clientId = '225380804535-gjd77dplfkbe4d3ct173d8qm0j83f8tr.apps.googleusercontent.com';
@@ -62,6 +61,7 @@ class Google extends Service {
   @onStreamEnd()
   async onStreamEnd() {
     if (this.client && this.broadcastId) {
+      setTimeout(() => this.prepareBroadcast, 10000);
       const youtube = google.youtube({
         auth:    this.client,
         version: 'v3',
