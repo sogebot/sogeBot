@@ -36,7 +36,7 @@ class Bets extends System {
       // initial load of predictions
       const predictions = await twitch.apiClient?.asIntent(['broadcaster'], ctx => ctx.predictions.getPredictions(getBroadcasterId()));
       if (predictions) {
-        const prediction = predictions?.data.find(o => o.status === 'ACTIVE');
+        const prediction = predictions?.data.find(o => o.status === 'ACTIVE' || o.status === 'LOCKED');
         if (prediction) {
           channelPrediction.status(prediction);
         }
