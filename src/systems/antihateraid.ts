@@ -7,6 +7,8 @@ import {
 
 import { prepare } from '~/helpers/commons';
 import defaultPermissions from '~/helpers/permissions/defaultPermissions';
+import getBotId from '~/helpers/user/getBotId';
+import getBroadcasterId from '~/helpers/user/getBroadcasterId';
 import twitch from '~/services/twitch';
 import { variables } from '~/watchers';
 
@@ -57,20 +59,18 @@ class AntiHateRaid extends System {
   @command('!antihateraidoff')
   @default_permission(defaultPermissions.MODERATORS)
   async antihateraidoff () {
-    const broadcasterId = variables.get('services.twitch.broadcasterId') as string;
-
     if (this.mode === modes.SUBSONLY) {
-      twitch.apiClient?.asIntent(['broadcaster'], ctx => ctx.chat.updateSettings(broadcasterId, broadcasterId, {
+      twitch.apiClient?.asIntent(['bot'], ctx => ctx.chat.updateSettings(getBroadcasterId(), getBotId(), {
         subscriberOnlyModeEnabled: false,
       }));
     }
     if (this.mode === modes.FOLLOWONLY) {
-      twitch.apiClient?.asIntent(['broadcaster'], ctx => ctx.chat.updateSettings(broadcasterId, broadcasterId, {
+      twitch.apiClient?.asIntent(['bot'], ctx => ctx.chat.updateSettings(getBroadcasterId(), getBotId(), {
         followerOnlyModeEnabled: false,
       }));
     }
     if (this.mode === modes.EMOTESONLY) {
-      twitch.apiClient?.asIntent(['broadcaster'], ctx => ctx.chat.updateSettings(broadcasterId, broadcasterId, {
+      twitch.apiClient?.asIntent(['bot'], ctx => ctx.chat.updateSettings(getBroadcasterId(), getBotId(), {
         emoteOnlyModeEnabled: false,
       }));
     }

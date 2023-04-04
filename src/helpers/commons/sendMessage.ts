@@ -9,6 +9,7 @@ import {
 import {
   getMuteStatus, message, sendWithMe, showWithAt,
 } from '../tmi';
+import getBotId from '../user/getBotId.js';
 import getBroadcasterId from '../user/getBroadcasterId.js';
 
 import { getBotSender } from '.';
@@ -94,38 +95,38 @@ class HelpersCommons {
             message('me', sender.userName, messageToSend, id);
           } else {
             if (messageToSend === '/subscribers') {
-              twitch.apiClient?.asIntent(['bot'], ctx => ctx.chat.updateSettings(getBroadcasterId(), getBroadcasterId(), {
+              twitch.apiClient?.asIntent(['bot'], ctx => ctx.chat.updateSettings(getBroadcasterId(), getBotId(), {
                 subscriberOnlyModeEnabled: true,
               }));
             } else if (messageToSend === '/subscribersoff') {
-              twitch.apiClient?.asIntent(['bot'], ctx => ctx.chat.updateSettings(getBroadcasterId(), getBroadcasterId(), {
+              twitch.apiClient?.asIntent(['bot'], ctx => ctx.chat.updateSettings(getBroadcasterId(), getBotId(), {
                 subscriberOnlyModeEnabled: false,
               }));
             } else if (messageToSend === '/emoteonly') {
-              twitch.apiClient?.asIntent(['bot'], ctx => ctx.chat.updateSettings(getBroadcasterId(), getBroadcasterId(), {
+              twitch.apiClient?.asIntent(['bot'], ctx => ctx.chat.updateSettings(getBroadcasterId(), getBotId(), {
                 emoteOnlyModeEnabled: true,
               }));
             } else if (messageToSend === '/emoteonlyoff') {
-              twitch.apiClient?.asIntent(['bot'], ctx => ctx.chat.updateSettings(getBroadcasterId(), getBroadcasterId(), {
+              twitch.apiClient?.asIntent(['bot'], ctx => ctx.chat.updateSettings(getBroadcasterId(), getBotId(), {
                 emoteOnlyModeEnabled: false,
               }));
             } else if (messageToSend === '/followersoff') {
-              twitch.apiClient?.asIntent(['bot'], ctx => ctx.chat.updateSettings(getBroadcasterId(), getBroadcasterId(), {
+              twitch.apiClient?.asIntent(['bot'], ctx => ctx.chat.updateSettings(getBroadcasterId(), getBotId(), {
                 followerOnlyModeEnabled: false,
               }));
             } else if (messageToSend.includes('/followers')) {
               const [, duration] = messageToSend.split(' ');
-              twitch.apiClient?.asIntent(['bot'], ctx => ctx.chat.updateSettings(getBroadcasterId(), getBroadcasterId(), {
+              twitch.apiClient?.asIntent(['bot'], ctx => ctx.chat.updateSettings(getBroadcasterId(), getBotId(), {
                 followerOnlyModeEnabled: true,
                 followerOnlyModeDelay:   duration ? Number(duration) : undefined,
               }));
             } else if (messageToSend === '/slowoff') {
-              twitch.apiClient?.asIntent(['bot'], ctx => ctx.chat.updateSettings(getBroadcasterId(), getBroadcasterId(), {
+              twitch.apiClient?.asIntent(['bot'], ctx => ctx.chat.updateSettings(getBroadcasterId(), getBotId(), {
                 slowModeEnabled: true,
               }));
             } else if (messageToSend.includes('/slow')) {
               const [, duration] = messageToSend.split(' ');
-              twitch.apiClient?.asIntent(['bot'], ctx => ctx.chat.updateSettings(getBroadcasterId(), getBroadcasterId(), {
+              twitch.apiClient?.asIntent(['bot'], ctx => ctx.chat.updateSettings(getBroadcasterId(), getBotId(), {
                 slowModeEnabled: true,
                 slowModeDelay:   duration ? Number(duration) : undefined,
               }));
