@@ -50,7 +50,7 @@ const fetchUserForAlert = (opts: EmitData, type: 'recipient' | 'name'): Promise<
         if (id) {
           if (opts.event === 'promo') {
             const user = await changelog.get(id);
-            const channel = await await twitch.apiClient?.asIntent(['bot'], ctx => ctx.channels.getChannelInfoById(id));
+            const channel = await twitch.apiClient?.asIntent(['bot'], ctx => ctx.channels.getChannelInfoById(id));
             if (user && channel) {
               resolve({
                 ...user,

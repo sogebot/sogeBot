@@ -2,7 +2,7 @@ import * as changelog from '~/helpers/user/changelog.js';
 import twitch from '~/services/twitch';
 
 export default async function getNameById (userId: string): Promise<string> {
-  const user = await await changelog.get(userId);
+  const user = await changelog.get(userId);
   if (!user) {
     const getUserById = await twitch.apiClient?.asIntent(['bot'], ctx => ctx.users.getUserById(userId));
     if (getUserById) {

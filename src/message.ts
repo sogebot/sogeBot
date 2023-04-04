@@ -256,7 +256,7 @@ class Message {
           if ((_.isNil(newString) || newString.length === 0) && removeWhenEmpty) {
             this.message = '';
           }
-          this.message = this.message.replace(rMessage[bkey], newString).trim();
+          this.message = String(this.message.replace(rMessage[bkey], newString)).trim();
         }
       }
     }
