@@ -2,6 +2,7 @@ import * as constants from '@sogebot/ui-helpers/constants';
 import chalk from 'chalk';
 
 import { getChannelChatBadges } from '../calls/getChannelChatBadges';
+import { getChannelFollowers } from '../calls/getChannelFollowers';
 
 import {
   debug, error, warning,
@@ -39,9 +40,11 @@ const functions = {
   getChannelChatBadges:  getChannelChatBadges,
   checkClips:            checkClips,
   getModerators:         getModerators,
+  getChannelFollowers:   getChannelFollowers,
 } as const;
 
 export const init = () => {
+  addInterval('getChannelFollowers', constants.MINUTE);
   addInterval('getCurrentStream', constants.MINUTE);
   addInterval('updateBroadcasterType', constants.HOUR);
   addInterval('getChannelSubscribers', 2 * constants.MINUTE);
