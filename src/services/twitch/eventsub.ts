@@ -90,7 +90,7 @@ class EventSub {
       }, initialTimeout);
     });
 
-    if (process.env.ENV === 'production') {
+    if (process.env.ENV === 'production' || process.env.NODE_ENV === 'production') {
       this.listener.stop();
       setTimeout(() => {
         this.listener.start();
