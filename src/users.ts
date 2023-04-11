@@ -64,12 +64,12 @@ class Users extends Core {
     }
     const viewers = await query.getRawMany();
     if (viewers.length > 0) {
-      debug('users', `Duplicate usernames: ${viewers.map(o => o.user_username).join(', ')}`);
+      debug('users', `Duplicate usernames: ${viewers.map(o => o.user_userName).join(', ')}`);
     } else {
       debug('users', `No duplicated usernames found.`);
     }
     await Promise.all(viewers.map(async (duplicate) => {
-      const userName = duplicate.user_username;
+      const userName = duplicate.user_userName;
       const duplicates = await AppDataSource.getRepository(User).find({ where: { userName } });
       await Promise.all(duplicates.map(async (user) => {
         try {
