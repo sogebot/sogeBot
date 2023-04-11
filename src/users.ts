@@ -42,58 +42,59 @@ class Users extends Core {
   }
 
   async checkDuplicateUsernames() {
-    try {
-      let query;
-      await changelog.flush();
+    let query;
+    await changelog.flush();
 
-      await AppDataSource.getRepository(User).delete({
-        userName: '__AnonymousUser__',
-      });
+    await AppDataSource.getRepository(User).delete({
+      userName: '__AnonymousUser__',
+    });
 
-      if (AppDataSource.options.type === 'postgres') {
-        query = AppDataSource.getRepository(User).createQueryBuilder('user')
-          .select('COUNT(*)')
-          .addSelect('"user"."userName"')
-          .groupBy('"user"."userName"')
-          .having('COUNT(*) > 1');
-      } else {
-        query = AppDataSource.getRepository(User).createQueryBuilder('user')
-          .select('COUNT(*)', 'count')
-          .addSelect('user.userName')
-          .groupBy('user.userName')
-          .having('count > 1');
-      }
-      const viewers = await query.getRawMany();
-      await Promise.all(viewers.map(async (duplicate) => {
-        const userName = duplicate.user_username;
-        const duplicates = await AppDataSource.getRepository(User).find({ where: { userName } });
-        await Promise.all(duplicates.map(async (user) => {
-          try {
-            const twitch = ( await import('./services/twitch')).default;
-            const getUserById = await twitch.apiClient?.asIntent(['bot'], ctx => ctx.users.getUserById(user.userId));
-            if (!getUserById) {
-              throw new Error('unknown');
-            }
-            if (getUserById.name !== userName) {
-              changelog.update(user.userId, { userName: getUserById.name });
-              debug('users', `Duplicate username ${user.userName}#${user.userId} changed to ${getUserById.name}#${user.userId}`);
-            }
-          } catch (e: any) {
-            // remove users not in Twitch anymore
-            debug('users', `Duplicate username ${user.userName}#${user.userId} not found on Twitch => '__inactive__${user.userName}#${user.userId}`);
-            changelog.update(user.userId, { userName: '__inactive__' + user.userName });
-          }
-        }));
-      }));
-    } catch(e) {
-      if (e instanceof Error) {
-        if (e.message !== 'Cannot initialize Twitch API, bot token invalid.') {
-          error(e.stack ?? e.message);
-        }
-      }
-    } finally {
-      setTimeout(() => this.checkDuplicateUsernames(), HOUR);
+    if (AppDataSource.options.type === 'postgres') {
+      query = AppDataSource.getRepository(User).createQueryBuilder('user')
+        .select('COUNT(*)')
+        .addSelect('"user"."userName"')
+        .groupBy('"user"."userName"')
+        .having('COUNT(*) > 1');
+    } else {
+      query = AppDataSource.getRepository(User).createQueryBuilder('user')
+        .select('COUNT(*)', 'count')
+        .addSelect('user.userName')
+        .groupBy('user.userName')
+        .having('count > 1');
     }
+    const viewers = await query.getRawMany();
+    if (viewers.length > 0) {
+      debug('users', `Duplicate usernames: ${viewers.map(o => o.user_username).join(', ')}`);
+    } else {
+      debug('users', `No duplicated usernames found.`);
+    }
+    await Promise.all(viewers.map(async (duplicate) => {
+      const userName = duplicate.user_username;
+      const duplicates = await AppDataSource.getRepository(User).find({ where: { userName } });
+      await Promise.all(duplicates.map(async (user) => {
+        try {
+          const twitch = ( await import('./services/twitch')).default;
+          const getUserById = await twitch.apiClient?.asIntent(['bot'], ctx => ctx.users.getUserById(user.userId));
+          if (!getUserById) {
+            throw new Error('unknown');
+          }
+          if (getUserById.name !== userName) {
+            changelog.update(user.userId, { userName: getUserById.name });
+            debug('users', `Duplicate username ${user.userName}#${user.userId} changed to ${getUserById.name}#${user.userId}`);
+          }
+        } catch (e) {
+          if (e instanceof Error) {
+            if (e.message.includes('not found in auth provider')) {
+              return; // do duplication check next time
+            }
+          }
+          // remove users not in Twitch anymore
+          debug('users', `Duplicate username ${user.userName}#${user.userId} not found on Twitch => '__inactive__${user.userName}#${user.userId}`);
+          changelog.update(user.userId, { userName: '__inactive__' + user.userName });
+        }
+      }));
+    }));
+    setTimeout(() => this.checkDuplicateUsernames(), HOUR);
   }
 
   async getChatOf (id: string, online: boolean): Promise<number> {
