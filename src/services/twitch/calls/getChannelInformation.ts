@@ -1,5 +1,7 @@
 import isEqual from 'lodash/isEqual';
 
+import { AppDataSource } from '~/database';
+import { CacheTitles } from '~/database/entity/cacheTitles';
 import {  currentStreamTags, gameCache, gameOrTitleChangedManually, rawStatus, tagsCache } from '~/helpers/api';
 import {
   stats as apiStats,
@@ -42,9 +44,14 @@ export async function getChannelInformation (opts: any) {
       const tags = JSON.parse(tagsCache.value) as string[];
 
       const titleEquals = getChannelInfo.title === title;
-      const gameEquals = getChannelInfo.gameName === game;
+      const gameEquals = getChannelInfo.gameName.toLowerCase() === game.toLowerCase();
       const tagsEquals = isEqual(getChannelInfo.tags.sort(), tags.sort());
       const isChanged = !titleEquals || !gameEquals || !tagsEquals;
+
+      if (gameEquals && game !== getChannelInfo.gameName) {
+        gameCache.value = getChannelInfo.gameName;
+        await AppDataSource.getRepository(CacheTitles).update({ game }, { game: getChannelInfo.gameName });
+      }
 
       if (isChanged && retries === -1) {
         return { state: true, opts };
