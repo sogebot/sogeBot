@@ -1,0 +1,26 @@
+diff --git a/node_modules/@twurple/eventsub-ws/es/EventSubWsListener.mjs b/node_modules/@twurple/eventsub-ws/es/EventSubWsListener.mjs
+index c86253d..0f2da5b 100644
+--- a/node_modules/@twurple/eventsub-ws/es/EventSubWsListener.mjs
++++ b/node_modules/@twurple/eventsub-ws/es/EventSubWsListener.mjs
+@@ -38,7 +38,7 @@ let EventSubWsListener = class EventSubWsListener extends EventSubBase {
+          * @param error The error that caused the disconnection, or `undefined` for a clean disconnect.
+          */
+         this.onUserSocketDisconnect = this.registerEvent();
+-        this._initialUrl = (_a = config.url) !== null && _a !== void 0 ? _a : 'wss://eventsub-beta.wss.twitch.tv/ws';
++        this._initialUrl = (_a = config.url) !== null && _a !== void 0 ? _a : 'wss://eventsub.wss.twitch.tv/ws';
+         this._loggerOptions = config.logger;
+     }
+     /**
+diff --git a/node_modules/@twurple/eventsub-ws/lib/EventSubWsListener.js b/node_modules/@twurple/eventsub-ws/lib/EventSubWsListener.js
+index 1bb20f1..53f44aa 100644
+--- a/node_modules/@twurple/eventsub-ws/lib/EventSubWsListener.js
++++ b/node_modules/@twurple/eventsub-ws/lib/EventSubWsListener.js
+@@ -41,7 +41,7 @@ let EventSubWsListener = class EventSubWsListener extends eventsub_base_1.EventS
+          * @param error The error that caused the disconnection, or `undefined` for a clean disconnect.
+          */
+         this.onUserSocketDisconnect = this.registerEvent();
+-        this._initialUrl = (_a = config.url) !== null && _a !== void 0 ? _a : 'wss://eventsub-beta.wss.twitch.tv/ws';
++        this._initialUrl = (_a = config.url) !== null && _a !== void 0 ? _a : 'wss://eventsub.wss.twitch.tv/ws';
+         this._loggerOptions = config.logger;
+     }
+     /**
