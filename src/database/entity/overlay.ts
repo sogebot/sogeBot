@@ -8,6 +8,10 @@ export interface Reference {
   groupId: string;
 }
 
+export interface Randomizer {
+  typeId: 'randomizer',
+}
+
 export interface Chat {
   typeId: 'chat';
   type: 'vertical' | 'horizontal' | 'niconico';
