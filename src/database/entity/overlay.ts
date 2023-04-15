@@ -413,6 +413,6 @@ export class Overlay extends BotEntity<Overlay> {
     URL | Chat | Reference | AlertsRegistry | Carousel | Marathon | Stopwatch |
     Countdown | Group | Eventlist | EmotesCombo | Credits | Clips | Alerts |
     Emotes | EmotesExplode | EmotesFireworks | Polls | TTS | OBSWebsocket |
-    ClipsCarousel | HypeTrain | Wordcloud | HTML | Stats;
+    ClipsCarousel | HypeTrain | Wordcloud | HTML | Stats | Randomizer;
   }[];
 }
