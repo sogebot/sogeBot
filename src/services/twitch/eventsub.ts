@@ -1,4 +1,4 @@
-import { DAY, MINUTE } from '@sogebot/ui-helpers/constants';
+import { MINUTE } from '@sogebot/ui-helpers/constants';
 import { ApiClient } from '@twurple/api/lib';
 import { EventSubWsListener } from '@twurple/eventsub-ws';
 import { Mutex, MutexInterface } from 'async-mutex';
@@ -79,7 +79,7 @@ class EventSub {
       }
       error(`EVENTSUB-WS: ${err ?? 'Unknown error'}`);
       this.listener?.stop();
-      const maxTimeout = DAY / 2;
+      const maxTimeout = MINUTE * 5;
       const nextTimeout = initialTimeout * 2;
       initialTimeout = Math.min(nextTimeout, maxTimeout);
       info(`EVENTSUB-WS: Reconnecting in ${humanizeDuration(initialTimeout)}...`);
