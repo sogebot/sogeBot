@@ -1,5 +1,16 @@
 import { existsSync, readdirSync, readFileSync, writeFileSync } from 'fs';
 
+import { HOUR, MINUTE } from '@sogebot/ui-helpers/constants';
+import { setLocale } from '@sogebot/ui-helpers/dayjsHelper';
+import gitCommitInfo from 'git-commit-info';
+import {
+  capitalize,
+  get, isNil,
+} from 'lodash';
+
+import { menu } from './helpers/panel';
+import type { Command } from '../d.ts/src/general';
+
 import Core from '~/_interface';
 import { PermissionCommands } from '~/database/entity/permissions';
 import {
@@ -14,30 +25,14 @@ import { setLang } from '~/helpers/locales';
 import {
   debug, error, warning,
 } from '~/helpers/log';
-
-import { HOUR, MINUTE } from '@sogebot/ui-helpers/constants';
-import { setLocale } from '@sogebot/ui-helpers/dayjsHelper';
-
 import { socketsConnected } from '~/helpers/panel/index';
 import { addUIWarn } from '~/helpers/panel/index';
-
-import gitCommitInfo from 'git-commit-info';
-
 import defaultPermissions from '~/helpers/permissions/defaultPermissions';
-
-import {
-  capitalize,
-  get, isNil,
-} from 'lodash';
-
 import { list } from '~/helpers/register';
 import { adminEndpoint } from '~/helpers/socket';
 import { getMuteStatus } from '~/helpers/tmi/muteStatus';
 import translateLib, { translate } from '~/translate';
 import { variables } from '~/watchers';
-
-import { menu } from './helpers/panel';
-import type { Command } from '../d.ts/src/general';
 
 let threadStartTimestamp = Date.now();
 let isInitialLangSet = true;
@@ -105,7 +100,7 @@ class General extends Core {
         const commands: Command[] = [];
 
         for (const type of ['overlays', 'integrations', 'core', 'systems', 'games', 'services', 'registries']) {
-          for (const system of list(type)) {
+          for (const system of list(type as any)) {
             for (const cmd of system._commands) {
               const name = typeof cmd === 'string' ? cmd : cmd.name;
               commands.push({
@@ -135,7 +130,7 @@ class General extends Core {
 
     adminEndpoint('/core/general', 'generic::setCoreCommand', async (commandToSet, cb) => {
       // get module
-      const module = list(commandToSet.type.toLowerCase()).find(item => item.__moduleName__ === commandToSet.name);
+      const module = list(commandToSet.type.toLowerCase() as any).find(item => item.__moduleName__ === commandToSet.name);
       if (!module) {
         throw new Error(`Module ${commandToSet.name} not found`);
       }
@@ -211,7 +206,7 @@ class General extends Core {
       systems: [], games: [], integrations: [],
     };
     for (const category of ['systems', 'games', 'integrations']) {
-      for (const system of list(category)) {
+      for (const system of list(category as any)) {
         const enabled = system.enabled;
         const areDependenciesEnabled = system.areDependenciesEnabled;
         const isDisabledByEnv = !isNil(process.env.DISABLE) && (process.env.DISABLE.toLowerCase().split(',').includes(system.__moduleName__.toLowerCase()) || process.env.DISABLE === '*');
@@ -280,7 +275,7 @@ class General extends Core {
       }
 
       let found = false;
-      for (const system of list(type + 's')) {
+      for (const system of list(type + 's' as any)) {
         system.status({ state: opts.enable });
         found = true;
         break;

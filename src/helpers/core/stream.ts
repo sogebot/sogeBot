@@ -45,7 +45,7 @@ async function start(data: HelixStream) {
   for (const event of getFunctionList('streamStart')) {
     const type = !event.path.includes('.') ? 'core' : event.path.split('.')[0];
     const module = !event.path.includes('.') ? event.path.split('.')[0] : event.path.split('.')[1];
-    const self = find(type, module);
+    const self = find(type as any, module);
     if (self) {
       (self as any)[event.fName]();
     } else {
@@ -77,7 +77,7 @@ function end() {
     for (const event of getFunctionList('streamEnd')) {
       const type = !event.path.includes('.') ? 'core' : event.path.split('.')[0];
       const module = !event.path.includes('.') ? event.path.split('.')[0] : event.path.split('.')[1];
-      const self = find(type, module);
+      const self = find(type as any, module);
       if (self) {
         (self as any)[event.fName]();
       } else {

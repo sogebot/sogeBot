@@ -43,7 +43,7 @@ import {
 import { errors, warns } from '~/helpers/panel/alerts';
 import { socketsConnectedDec, socketsConnectedInc } from '~/helpers/panel/index';
 import { linesParsed, status as statusObj } from '~/helpers/parser';
-import { list, systems } from '~/helpers/register';
+import { list } from '~/helpers/register';
 import { adminEndpoint } from '~/helpers/socket';
 import { tmiEmitter } from '~/helpers/tmi';
 import * as changelog from '~/helpers/user/changelog.js';
@@ -487,7 +487,7 @@ class Panel extends Core {
       socket.on('populateListOf', async (type: possibleLists, cb: (err: string | null, toEmit: any) => void) => {
         const toEmit: any[] = [];
         if (type === 'systems') {
-          for (const system of systems) {
+          for (const system of list('systems')) {
             toEmit.push({
               name:                   system.__moduleName__.toLowerCase(),
               enabled:                system.enabled,

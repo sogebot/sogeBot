@@ -67,7 +67,7 @@ export function ui(opts: any, category?: string) {
         return;
       }
       try {
-        const self = find(type, name);
+        const self = find(type as any, name);
         if (!self) {
           throw new Error(`${type}.${name} not found in list`);
         }
@@ -106,7 +106,7 @@ export function example(opts: (string|{if?: string, message: string, replace: { 
         return;
       }
       try {
-        const self = find(type, name);
+        const self = find(type as any, name);
         if (!self) {
           throw new Error(`${type}.${name} not found in list`);
         }
@@ -142,7 +142,7 @@ export function settings(category?: string, isReadOnly = false) {
     }
 
     const registerSettings = async () => {
-      const self = find(type, name);
+      const self = find(type as any, name);
       if (!self) {
         throw new Error(`${type}.${name} not found in list`);
       }
@@ -207,7 +207,7 @@ export function permission_settings(category?: string, exclude: string[] = [], e
         return;
       }
       try {
-        const self = find(type, name);
+        const self = find(type as any, name);
         if (!self) {
           throw new Error(`${type}.${name} not found in list`);
         }
@@ -273,7 +273,7 @@ export function persistent() {
         return;
       }
       try {
-        const self = find(type, name);
+        const self = find(type as any, name);
         if (!self) {
           throw new Error(`${type}.${name} not found in list`);
         }
@@ -363,7 +363,7 @@ export function rollback() {
 function registerHelper(m: { type: string, name: string, fnc: string }, retry = 0) {
   setTimeout(() => {
     try {
-      const self = find(m.type, m.name);
+      const self = find(m.type as any, m.name);
       if (!self) {
         throw new Error(`${m.type}.${m.name} not found in list`);
       }
@@ -387,7 +387,7 @@ function registerHelper(m: { type: string, name: string, fnc: string }, retry = 
 function registerRollback(m: { type: string, name: string, fnc: string }) {
   setTimeout(() => {
     try {
-      const self = find(m.type, m.name);
+      const self = find(m.type as any, m.name);
       if (!self) {
         throw new Error(`${m.type}.${m.name} not found in list`);
       }    self._rollback.push({ name: m.fnc });
@@ -402,7 +402,7 @@ function registerParser(opts: {
 }, m: { type: string, name: string, fnc: string }) {
   setTimeout(() => {
     try {
-      const self = find(m.type, m.name);
+      const self = find(m.type as any, m.name);
       if (!self) {
         throw new Error(`${m.type}.${m.name} not found in list`);
       }

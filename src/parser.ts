@@ -2,6 +2,8 @@ import * as constants from '@sogebot/ui-helpers/constants';
 import _ from 'lodash';
 import { v4 as uuid } from 'uuid';
 
+import { list } from './helpers/register';
+
 import { PermissionCommands } from '~/database/entity/permissions';
 import { timer } from '~/decorators.js';
 import { incrementCountOfCommandUsage } from '~/helpers/commands/count';
@@ -10,9 +12,8 @@ import {
   debug, error, info, warning,
 } from '~/helpers/log';
 import { parserEmitter } from '~/helpers/parser/emitter';
-import { populatedList } from '~/helpers/parser/populatedList';
-import { getCommandPermission } from '~/helpers/permissions/getCommandPermission';
 import { check } from '~/helpers/permissions/check';
+import { getCommandPermission } from '~/helpers/permissions/getCommandPermission';
 import { translate } from '~/translate';
 
 parserEmitter.on('process', async (opts, cb) => {
@@ -185,9 +186,9 @@ class Parser {
   @timer()
   async parsers () {
     let parsers: any[] = [];
-    for (let i = 0, length = populatedList.length; i < length; i++) {
-      if (_.isFunction(populatedList[i].parsers)) {
-        parsers.push(populatedList[i].parsers());
+    for (let i = 0, length = list().length; i < length; i++) {
+      if (_.isFunction(list()[i].parsers)) {
+        parsers.push(list()[i].parsers());
       }
     }
     parsers = _.orderBy(_.flatMap(await Promise.all(parsers)), 'priority', 'asc');
@@ -202,9 +203,9 @@ class Parser {
   @timer()
   async rollbacks () {
     const rollbacks: any[] = [];
-    for (let i = 0, length = populatedList.length; i < length; i++) {
-      if (_.isFunction(populatedList[i].rollbacks)) {
-        rollbacks.push(populatedList[i].rollbacks());
+    for (let i = 0, length = list().length; i < length; i++) {
+      if (_.isFunction(list()[i].rollbacks)) {
+        rollbacks.push(list()[i].rollbacks());
       }
     }
     return _.flatMap(await Promise.all(rollbacks));
@@ -246,9 +247,9 @@ class Parser {
   @timer()
   async getCommandsList () {
     let commands: any[] = [];
-    for (let i = 0, length = populatedList.length; i < length; i++) {
-      if (_.isFunction(populatedList[i].commands)) {
-        commands.push(populatedList[i].commands());
+    for (let i = 0, length = list().length; i < length; i++) {
+      if (_.isFunction(list()[i].commands)) {
+        commands.push(list()[i].commands());
       }
     }
     commands = _(await Promise.all(commands)).flatMap().sortBy(o => -o.command.length).value();

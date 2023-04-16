@@ -1,50 +1,32 @@
 import { error, warning } from '~/helpers/log';
 
-export const core: import('../_interface').Module[] = [];
-export const systems: import('../_interface').Module[] = [];
-export const integrations: import('../_interface').Module[] = [];
-export const games: import('../_interface').Module[] = [];
-export const widgets: import('../_interface').Module[] = [];
-export const registries: import('../_interface').Module[] = [];
-export const overlays: import('../_interface').Module[] = [];
-export const stats: import('../_interface').Module[] = [];
-export const services: import('../_interface').Module[] = [];
-
-export const register = (type: 'core' | 'systems' | 'integrations' | 'games' | 'widgets' | 'registries' | 'overlays' | 'stats' | 'services', system: import('../_interface').Module) => {
-  switch(type) {
-    case 'core':
-      core.push(system);
-      break;
-    case 'systems':
-      systems.push(system);
-      break;
-    case 'integrations':
-      integrations.push(system);
-      break;
-    case 'games':
-      games.push(system);
-      break;
-    case 'widgets':
-      widgets.push(system);
-      break;
-    case 'registries':
-      registries.push(system);
-      break;
-    case 'overlays':
-      overlays.push(system);
-      break;
-    case 'stats':
-      stats.push(system);
-      break;
-    case 'services':
-      services.push(system);
-      break;
-    default:
-      throw new Error(`Unknown type ${type} to register`);
-  }
+const systems = {
+  core:         [],
+  systems:      [],
+  integrations: [],
+  games:        [],
+  widgets:      [],
+  registries:   [],
+  overlays:     [],
+  stats:        [],
+  services:     [],
+} as {
+  core:         import('../_interface').Module[],
+  systems:      import('../_interface').Module[],
+  integrations: import('../_interface').Module[],
+  games:        import('../_interface').Module[],
+  widgets:      import('../_interface').Module[],
+  registries:   import('../_interface').Module[],
+  overlays:     import('../_interface').Module[],
+  stats:        import('../_interface').Module[],
+  services:     import('../_interface').Module[],
 };
 
-export const find = (type: string, name: string) => {
+export const register = (type: keyof typeof systems, system: import('../_interface').Module) => {
+  systems[type].push(system);
+};
+
+export const find = (type: keyof typeof systems, name: string) => {
   return list(type).find(m => {
     try {
       if (typeof m.__moduleName__ === 'undefined') {
@@ -60,27 +42,15 @@ export const find = (type: string, name: string) => {
   });
 };
 
-export const list = (type: null | string) => {
-  switch(type) {
-    case 'core':
-      return core;
-    case 'systems':
-      return systems;
-    case 'integrations':
-      return integrations;
-    case 'games':
-      return games;
-    case 'widgets':
-      return widgets;
-    case 'registries':
-      return registries;
-    case 'overlays':
-      return overlays;
-    case 'stats':
-      return stats;
-    case 'services':
-      return services;
-    default:
-      throw new Error(`Unknown type ${type} to register`);
+export const list = (type?: keyof typeof systems) => {
+  if (!type) {
+    const _list: import('../_interface').Module[] = [];
+    for (const key of Object.keys(systems) as (keyof typeof systems)[]) {
+      for (const mod of systems[key]) {
+        _list.push(mod);
+      }
+    }
+    return _list;
   }
+  return systems[type];
 };

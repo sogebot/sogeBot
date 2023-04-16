@@ -29,7 +29,7 @@ function trigger(opts: onEventMessage | onEventSub | onEventBit | onEventTip | o
 
   for (const event of getFunctionList(on_trigger)) {
     const [ type, name ] = event.path.split('.');
-    const self = find(type, name);
+    const self = find(type as any, name);
     if (!self) {
       throw new Error(`${type}.${name} not found in list`);
     }

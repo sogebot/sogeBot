@@ -2,8 +2,8 @@ import { SECOND } from '@sogebot/ui-helpers/constants';
 import {
   cloneDeep, get, isEqual, set,
 } from 'lodash';
-import { AppDataSource } from '~/database';
 
+import { AppDataSource } from '~/database';
 import { Settings } from '~/database/entity/settings';
 import { getFunctionList } from '~/decorators/on';
 import { isDbConnected } from '~/helpers/database';
@@ -67,7 +67,7 @@ export const VariableWatcher = {
     for (const k of variables.keys()) {
       const [ type, name, ...variableArr ] = k.split('.');
       let variable = variableArr.join('.');
-      const checkedModule = find(type, name);
+      const checkedModule = find(type as any, name);
       if (!checkedModule) {
         throw new Error(`${type}.${name} not found in list`);
       }
@@ -109,7 +109,7 @@ export const VariableWatcher = {
     for (const k of readonly.keys()) {
       const [ type, name, ...variableArr ] = k.split('.');
       const variable = variableArr.join('.');
-      const checkedModule = find(type, name);
+      const checkedModule = find(type as any, name);
       if (!checkedModule) {
         throw new Error(`${type}.${name} not found in list`);
       }

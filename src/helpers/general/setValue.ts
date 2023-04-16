@@ -14,7 +14,7 @@ async function setValue(opts: CommandOptions) {
   }
 
   const [ type, module ] = pointer.split('.');
-  const self = find(type, module);
+  const self = find(type as any, module);
   if (!self) {
     throw new Error(`${type}.${module} not found in list`);
   }

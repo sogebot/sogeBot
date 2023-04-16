@@ -58,7 +58,7 @@ class UI extends Core {
           data.core[system] = await self.getAllSettings(true);
         }
         for (const dir of ['systems', 'games', 'overlays', 'integrations', 'services']) {
-          for (const system of list(dir)) {
+          for (const system of list(dir as any)) {
             set(data, `${dir}.${system.__moduleName__}`, await system.getAllSettings(true));
           }
         }
@@ -78,7 +78,7 @@ class UI extends Core {
         data.isCastersSet = filter(generalOwners, (o) => isString(o) && o.trim().length > 0).length > 0 || broadcasterUsername !== '';
       } else {
         for (const dir of ['systems', 'games']) {
-          for (const system of list(dir)) {
+          for (const system of list(dir as any)) {
             set(data, `${dir}.${system.__moduleName__}`, await system.getAllSettings(true));
           }
         }
@@ -102,7 +102,7 @@ class UI extends Core {
         const data: any = {};
 
         for (const dir of ['systems', 'games']) {
-          for (const system of list(dir)) {
+          for (const system of list(dir as any)) {
             set(data, `${dir}.${system.__moduleName__}`, await system.getAllSettings(true));
           }
         }
