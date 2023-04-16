@@ -4,11 +4,11 @@ import { setTimeout } from 'timers';
 import chalk from 'chalk';
 import _ from 'lodash';
 import type { Namespace } from 'socket.io/dist/namespace';
-import { AppDataSource } from '~/database';
 import { v4 as uuid } from 'uuid';
 
 import { ClientToServerEventsWithNamespace } from '../d.ts/src/helpers/socket';
 
+import { AppDataSource } from '~/database';
 import { PermissionCommands, Permissions as PermissionsEntity } from '~/database/entity/permissions';
 import { Settings } from '~/database/entity/settings';
 import {
@@ -178,13 +178,13 @@ class Module {
             (this as any)[event.fName]('enabled', state);
           }
           this.onStartupTriggered = true;
+
+          // require panel/socket
+          socket = (require('~/socket')).default;
+
+          this.registerCommands();
         };
         onStartup();
-
-        // require panel/socket
-        socket = (require('~/socket')).default;
-
-        this.registerCommands();
       } else {
         setImmediate(() => load());
       }
