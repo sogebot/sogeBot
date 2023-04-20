@@ -25,16 +25,15 @@ const mutex = new Mutex();
 
 setInterval(() => {
   // reset initialTimeout if connection lasts for five minutes
-  debug('twitch.eventsub', `Current retry timeout ${humanizeDuration(initialTimeout)}`);
-  if (Date.now() - (lastConnectionAt?.getTime() ?? Date.now()) > 5 * MINUTE && initialTimeout !== 500 && !mutex.isLocked()) {
-    debug('twitch.eventsub', 'EventSub: resetting initialTimeout');
-    initialTimeout = 500;
+  if (Date.now() - (lastConnectionAt?.getTime() ?? Date.now()) > MINUTE / 2 && initialTimeout !== 500 && !mutex.isLocked()) {
+    initialTimeout = 50;
   }
 }, 60000);
 
 class EventSub {
   listener: EventSubWsListener;
   listenerBroadcasterId?: string;
+  reconnection = false;
 
   constructor(apiClient: ApiClient) {
     debug('twitch.eventsub', 'EventSub: constructor()');
@@ -56,7 +55,9 @@ class EventSub {
       info(`EVENTSUB-WS: Subscription ${ev.id} removed.`);
     });
     this.listener.onSubscriptionCreateSuccess((ev) => {
-      info(`EVENTSUB-WS: Subscription ${ev.id} added.`);
+      if (this.reconnection) {
+        info(`EVENTSUB-WS: Subscription ${ev.id} added.`);
+      }
     });
     this.listener.onSubscriptionCreateFailure((ev, err) => {
       error(`EVENTSUB-WS: Subscription create failure: ${err}`);
@@ -84,8 +85,10 @@ class EventSub {
       initialTimeout = Math.min(nextTimeout, maxTimeout);
       info(`EVENTSUB-WS: Reconnecting in ${humanizeDuration(initialTimeout)}...`);
       lastConnectionAt = null;
+      this.reconnection = true;
       setTimeout(() => {
         this.listener?.start(); // try to reconnect
+        info(`EVENTSUB-WS: Reconnected to service for ${broadcasterUsername}#${broadcasterId}`);
         release();
       }, initialTimeout);
     });
