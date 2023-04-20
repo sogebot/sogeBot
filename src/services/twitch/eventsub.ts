@@ -25,9 +25,9 @@ const mutex = new Mutex();
 
 setInterval(() => {
   // reset initialTimeout if connection lasts for five minutes
-  debug('eventsub', `Current retry timeout ${humanizeDuration(initialTimeout)}`);
+  debug('twitch.eventsub', `Current retry timeout ${humanizeDuration(initialTimeout)}`);
   if (Date.now() - (lastConnectionAt?.getTime() ?? Date.now()) > 5 * MINUTE && initialTimeout !== 500 && !mutex.isLocked()) {
-    debug('eventsub', 'EventSub: resetting initialTimeout');
+    debug('twitch.eventsub', 'EventSub: resetting initialTimeout');
     initialTimeout = 500;
   }
 }, 60000);
@@ -37,7 +37,7 @@ class EventSub {
   listenerBroadcasterId?: string;
 
   constructor(apiClient: ApiClient) {
-    debug('eventsub', 'EventSub: constructor()');
+    debug('twitch.eventsub', 'EventSub: constructor()');
 
     this.listener = new EventSubWsListener({
       apiClient,
@@ -71,10 +71,10 @@ class EventSub {
     this.listener.onUserSocketDisconnect(async (_, err) => {
       let release: MutexInterface.Releaser;
       if (mutex.isLocked()) {
-        debug('eventsub', 'onUserSocketDisconnect called, but locked');
+        debug('twitch.eventsub', 'onUserSocketDisconnect called, but locked');
         return;
       } else {
-        debug('eventsub', 'onUserSocketDisconnect called');
+        debug('twitch.eventsub', 'onUserSocketDisconnect called');
         release = await mutex.acquire();
       }
       error(`EVENTSUB-WS: ${err ?? 'Unknown error'}`);

@@ -114,7 +114,11 @@ class Chat {
       this.part(type);
     });
   }
-
+  /**
+ * Inits client
+ * @param type
+ * @returns
+ */
   async initClient (type: 'bot' | 'broadcaster') {
     if ((global as any).mocha) {
       // do nothing if tests
@@ -143,10 +147,15 @@ class Chat {
         this.client[type] = null;
       }
       this.client[type] = new ChatClient({
-        authProvider: this.authProvider,
-        isAlwaysMod:  true,
-        authIntents:  [type],
-        logger:       {
+        rejoinChannelsOnReconnect: true,
+        authProvider:              this.authProvider,
+        connectionOptions:         {
+
+        },
+        channels:    [channel],
+        isAlwaysMod: true,
+        authIntents: [type],
+        logger:      {
           minLevel: isDebugEnabled('twitch.tmi') ? 'debug' : 'warning',
           custom:   (level, message) => {
             info(`TMI[${type}:${level}]: ${message}`);
@@ -350,14 +359,6 @@ class Chat {
         eventEmitter.emit('clearchat');
       });
     } else if (type === 'broadcaster') {
-      client.onBan((channel, user, msg) => {
-        ban(`${user} banned.`);
-        ioServer?.of('/overlays/chat').emit('timeout', user);
-      });
-      client.onTimeout((channel, user, msg) => {
-        ioServer?.of('/overlays/chat').emit('timeout', user);
-      });
-
       client.onSub((_channel, username, subInfo, msg) => {
         this.subscription(username, subInfo, msg.userInfo);
       });
