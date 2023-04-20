@@ -27,11 +27,10 @@ import {
   triggerInterfaceOnMessage, triggerInterfaceOnSub,
 } from '~/helpers/interface/triggers';
 import emitter from '~/helpers/interfaceEmitter';
-import { ban, isDebugEnabled, warning } from '~/helpers/log';
+import { isDebugEnabled, warning } from '~/helpers/log';
 import {
   chatIn, debug, error, info, resub, sub, subcommunitygift, subgift, whisperIn,
 } from '~/helpers/log';
-import { ioServer } from '~/helpers/panel';
 import { linesParsedIncrement, setStatus } from '~/helpers/parser';
 import { tmiEmitter } from '~/helpers/tmi';
 import { isOwner } from '~/helpers/user';
@@ -114,11 +113,7 @@ class Chat {
       this.part(type);
     });
   }
-  /**
- * Inits client
- * @param type
- * @returns
- */
+
   async initClient (type: 'bot' | 'broadcaster') {
     if ((global as any).mocha) {
       // do nothing if tests
@@ -149,13 +144,10 @@ class Chat {
       this.client[type] = new ChatClient({
         rejoinChannelsOnReconnect: true,
         authProvider:              this.authProvider,
-        connectionOptions:         {
-
-        },
-        channels:    [channel],
-        isAlwaysMod: true,
-        authIntents: [type],
-        logger:      {
+        channels:                  [channel],
+        isAlwaysMod:               true,
+        authIntents:               [type],
+        logger:                    {
           minLevel: isDebugEnabled('twitch.tmi') ? 'debug' : 'warning',
           custom:   (level, message) => {
             info(`TMI[${type}:${level}]: ${message}`);
