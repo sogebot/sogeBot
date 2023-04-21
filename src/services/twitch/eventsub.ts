@@ -55,7 +55,7 @@ class EventSub {
       info(`EVENTSUB-WS: Subscription ${ev.id} removed.`);
     });
     this.listener.onSubscriptionCreateSuccess((ev) => {
-      if (this.reconnection) {
+      if (!this.reconnection) {
         info(`EVENTSUB-WS: Subscription ${ev.id} added.`);
       }
     });
