@@ -20,7 +20,7 @@ import { variables } from '~/watchers';
 
 const rewardsRedeemed: string[] = [];
 // let initialTimeout = 500;
-let lastConnectionAt: Date | null = null;
+// let lastConnectionAt: Date | null = null;
 // const mutex = new Mutex();
 
 // setInterval(() => {
@@ -78,7 +78,7 @@ class EventSub {
     });
     this.listener.onUserSocketConnect(() => {
       info(`EVENTSUB-WS: Service initialized for ${broadcasterUsername}#${broadcasterId}`);
-      lastConnectionAt = new Date();
+      // lastConnectionAt = new Date();
     });
     this.listener.onUserSocketDisconnect(async (_, err) => {
       // let release: MutexInterface.Releaser;
