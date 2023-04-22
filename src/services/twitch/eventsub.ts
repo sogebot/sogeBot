@@ -52,8 +52,7 @@ class EventSub {
       logger: {
         minLevel: isDebugEnabled('twitch.eventsub') ? 'trace' : 'warning',
         custom:   (level, message) => {
-          const parsed = JSON.parse(message);
-          if (parsed.metadata.message_type === 'session_keepalive') {
+          if (message.includes('"message_type":"session_keepalive"')) {
             keepAliveCount++;
           } else {
             info(`EVENTSUB-WS[${level}]: ${message}`);
