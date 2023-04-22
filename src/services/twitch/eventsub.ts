@@ -81,7 +81,7 @@ class EventSub {
     });
     this.listener.onUserSocketConnect(() => {
       info(`EVENTSUB-WS: Service initialized for ${broadcasterUsername}#${broadcasterId}`);
-      lastConnectionAt = new Date();
+      // lastConnectionAt = new Date();
     });
     this.listener.onUserSocketDisconnect(async (_, err) => {
       // let release: MutexInterface.Releaser;
