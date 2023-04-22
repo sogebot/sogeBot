@@ -89,7 +89,7 @@ class EventSub {
       //   debug('twitch.eventsub', 'onUserSocketDisconnect called, but locked');
       //   return;
       // } else {
-      //   debug('twitch.eventsub', 'onUserSocketDisconnect called');
+      debug('twitch.eventsub', 'onUserSocketDisconnect called');
       //   release = await mutex.acquire();
       // }
       error(`EVENTSUB-WS: ${err ?? 'Unknown error'}`);
