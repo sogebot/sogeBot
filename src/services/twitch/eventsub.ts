@@ -106,15 +106,6 @@ class EventSub {
       // }, initialTimeout);
     });
 
-    if (process.env.ENV === 'production' || process.env.NODE_ENV === 'production') {
-      this.listener.stop();
-      setTimeout(() => {
-        this.listener.start();
-      }, 5000);
-    } else {
-      info('EVENTSUB-WS: Eventsub events disabled on dev-mode.');
-    }
-
     try {
       // FOLLOW
       this.listener.onChannelFollow(broadcasterId, broadcasterId, event => follow(event.userId, event.userName, new Date(event.followDate).toISOString()));
@@ -265,6 +256,17 @@ class EventSub {
         error('EVENTSUB-WS: ' + e.message);
       }
       error('EVENTSUB-WS: Unknown error durring initialization. ' + e);
+    }
+
+
+
+    if (process.env.ENV === 'production' || process.env.NODE_ENV === 'production') {
+      this.listener.stop();
+      setTimeout(() => {
+        this.listener.start();
+      }, 5000);
+    } else {
+      info('EVENTSUB-WS: Eventsub events disabled on dev-mode.');
     }
   }
 }
