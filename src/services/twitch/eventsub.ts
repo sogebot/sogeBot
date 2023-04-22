@@ -30,16 +30,14 @@ let lastConnectionAt: Date | null = null;
 //   }
 // }, 60000);
 
-let keepAliveTime = Date.now();
+let keepAliveCount = 0;
 
 setInterval(() => {
-  if (!lastConnectionAt) {
-    return;
+  if (isDebugEnabled('twitch.eventsub')) {
+    info(`EVENTSUB-WS: ${keepAliveCount} events received in 10 minutes.`);
   }
-  if (Date.now() - keepAliveTime > 12000) {
-    error(`EVENTSUB-WS: Keep alive message not received in 10s.`);
-  }
-}, 1000);
+  keepAliveCount = 0;
+}, 600000);
 
 class EventSub {
   listener: EventSubWsListener;
@@ -54,8 +52,9 @@ class EventSub {
       logger: {
         minLevel: isDebugEnabled('twitch.eventsub') ? 'trace' : 'warning',
         custom:   (level, message) => {
-          if (message.includes('session_keepalive')) {
-            keepAliveTime = Date.now();
+          const parsed = JSON.parse(message);
+          if (parsed.metadata.message_type === 'session_keepalive') {
+            keepAliveCount++;
           } else {
             info(`EVENTSUB-WS[${level}]: ${message}`);
           }
