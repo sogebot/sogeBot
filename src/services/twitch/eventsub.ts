@@ -33,10 +33,10 @@ const rewardsRedeemed: string[] = [];
 let keepAliveTime = Date.now();
 
 setInterval(() => {
-  if (Date.now() - keepAliveTime > 1200) {
-    error(`EVENTSUB-WS: Keep alive message not received in 1s.`);
+  if (Date.now() - keepAliveTime > 12000) {
+    error(`EVENTSUB-WS: Keep alive message not received in 10s.`);
   }
-}, 100);
+}, 1000);
 
 class EventSub {
   listener: EventSubWsListener;
