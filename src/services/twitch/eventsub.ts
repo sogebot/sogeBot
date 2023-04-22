@@ -20,7 +20,7 @@ import { variables } from '~/watchers';
 
 const rewardsRedeemed: string[] = [];
 // let initialTimeout = 500;
-let lastConnectionAt: Date | null = null;
+// let lastConnectionAt: Date | null = null;
 // const mutex = new Mutex();
 
 // setInterval(() => {
@@ -34,7 +34,7 @@ let keepAliveCount = 0;
 
 setInterval(() => {
   if (isDebugEnabled('twitch.eventsub')) {
-    info(`EVENTSUB-WS: ${keepAliveCount} events received in 10 minutes.`);
+    info(`EVENTSUB-WS: ${keepAliveCount} keepalive events received in 10 minutes.`);
   }
   keepAliveCount = 0;
 }, 600000);
