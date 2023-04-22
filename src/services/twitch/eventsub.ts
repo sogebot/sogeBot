@@ -32,6 +32,12 @@ let lastConnectionAt: Date | null = null;
 
 let keepAliveTime = Date.now();
 
+setInterval(() => {
+  if (Date.now() - keepAliveTime > 1200) {
+    error(`EVENTSUB-WS: Keep alive message not received in 1s.`);
+  }
+}, 100);
+
 class EventSub {
   listener: EventSubWsListener;
   listenerBroadcasterId?: string;
@@ -46,9 +52,6 @@ class EventSub {
         minLevel: isDebugEnabled('twitch.eventsub') ? 'trace' : 'warning',
         custom:   (level, message) => {
           info(`EVENTSUB-WS[${level}]: ${message}`);
-          if (Date.now() - keepAliveTime > 1200) {
-            info(`EVENTSUB-WS[4]: Keep alive message not received in 1s.`);
-          }
           if (message.includes('session_keepalive')) {
             keepAliveTime = Date.now();
           }
