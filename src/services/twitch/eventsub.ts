@@ -51,9 +51,10 @@ class EventSub {
       logger: {
         minLevel: isDebugEnabled('twitch.eventsub') ? 'trace' : 'warning',
         custom:   (level, message) => {
-          info(`EVENTSUB-WS[${level}]: ${message}`);
           if (message.includes('session_keepalive')) {
             keepAliveTime = Date.now();
+          } else {
+            info(`EVENTSUB-WS[${level}]: ${message}`);
           }
         },
       },
