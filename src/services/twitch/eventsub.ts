@@ -1,8 +1,8 @@
-import { MINUTE } from '@sogebot/ui-helpers/constants';
+// import { MINUTE } from '@sogebot/ui-helpers/constants';
 import { ApiClient } from '@twurple/api/lib';
 import { EventSubWsListener } from '@twurple/eventsub-ws';
-import { Mutex, MutexInterface } from 'async-mutex';
-import humanizeDuration from 'humanize-duration';
+// import { Mutex, MutexInterface } from 'async-mutex';
+// import humanizeDuration from 'humanize-duration';
 
 import * as channelPoll from '~/helpers/api/channelPoll';
 import * as channelPrediction from '~/helpers/api/channelPrediction';
@@ -19,16 +19,18 @@ import alerts from '~/registries/alerts';
 import { variables } from '~/watchers';
 
 const rewardsRedeemed: string[] = [];
-let initialTimeout = 500;
+// let initialTimeout = 500;
 let lastConnectionAt: Date | null = null;
-const mutex = new Mutex();
+// const mutex = new Mutex();
 
-setInterval(() => {
-  // reset initialTimeout if connection lasts for five minutes
-  if (Date.now() - (lastConnectionAt?.getTime() ?? Date.now()) > MINUTE / 2 && initialTimeout !== 500 && !mutex.isLocked()) {
-    initialTimeout = 50;
-  }
-}, 60000);
+// setInterval(() => {
+//   // reset initialTimeout if connection lasts for five minutes
+//   if (Date.now() - (lastConnectionAt?.getTime() ?? Date.now()) > MINUTE / 2 && initialTimeout !== 500 && !mutex.isLocked()) {
+//     initialTimeout = 50;
+//   }
+// }, 60000);
+
+let keepAliveTime = Date.now();
 
 class EventSub {
   listener: EventSubWsListener;
@@ -44,6 +46,12 @@ class EventSub {
         minLevel: isDebugEnabled('twitch.eventsub') ? 'trace' : 'warning',
         custom:   (level, message) => {
           info(`EVENTSUB-WS[${level}]: ${message}`);
+          if (Date.now() - keepAliveTime > 1200) {
+            info(`EVENTSUB-WS[4]: Keep alive message not received in 1s.`);
+          }
+          if (message.includes('session_keepalive')) {
+            keepAliveTime = Date.now();
+          }
         },
       },
     });
@@ -70,27 +78,27 @@ class EventSub {
       lastConnectionAt = new Date();
     });
     this.listener.onUserSocketDisconnect(async (_, err) => {
-      let release: MutexInterface.Releaser;
-      if (mutex.isLocked()) {
-        debug('twitch.eventsub', 'onUserSocketDisconnect called, but locked');
-        return;
-      } else {
-        debug('twitch.eventsub', 'onUserSocketDisconnect called');
-        release = await mutex.acquire();
-      }
+      // let release: MutexInterface.Releaser;
+      // if (mutex.isLocked()) {
+      //   debug('twitch.eventsub', 'onUserSocketDisconnect called, but locked');
+      //   return;
+      // } else {
+      //   debug('twitch.eventsub', 'onUserSocketDisconnect called');
+      //   release = await mutex.acquire();
+      // }
       error(`EVENTSUB-WS: ${err ?? 'Unknown error'}`);
-      this.listener?.stop();
-      const maxTimeout = MINUTE * 5;
-      const nextTimeout = initialTimeout * 2;
-      initialTimeout = Math.min(nextTimeout, maxTimeout);
-      info(`EVENTSUB-WS: Reconnecting in ${humanizeDuration(initialTimeout)}...`);
-      lastConnectionAt = null;
-      this.reconnection = true;
-      setTimeout(() => {
-        this.listener?.start(); // try to reconnect
-        info(`EVENTSUB-WS: Reconnected to service for ${broadcasterUsername}#${broadcasterId}`);
-        release();
-      }, initialTimeout);
+      // this.listener?.stop();
+      // const maxTimeout = MINUTE * 5;
+      // const nextTimeout = initialTimeout * 2;
+      // initialTimeout = Math.min(nextTimeout, maxTimeout);
+      // info(`EVENTSUB-WS: Reconnecting in ${humanizeDuration(initialTimeout)}...`);
+      // lastConnectionAt = null;
+      // this.reconnection = true;
+      // setTimeout(() => {
+      //   this.listener?.start(); // try to reconnect
+      //   info(`EVENTSUB-WS: Reconnected to service for ${broadcasterUsername}#${broadcasterId}`);
+      //   release();
+      // }, initialTimeout);
     });
 
     if (process.env.ENV === 'production' || process.env.NODE_ENV === 'production') {
