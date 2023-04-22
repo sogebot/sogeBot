@@ -255,7 +255,6 @@ class EventSub {
 
       this.listenerBroadcasterId = broadcasterId;
     } catch (e) {
-      this.listener.stop();
       if (e instanceof Error) {
         error('EVENTSUB-WS: ' + e.message);
       }
@@ -263,7 +262,7 @@ class EventSub {
     }
 
     if (process.env.ENV === 'production' || process.env.NODE_ENV === 'production') {
-      // this.listener.stop();
+      this.listener.stop();
       setTimeout(() => {
         this.listener.start();
       }, 5000);
