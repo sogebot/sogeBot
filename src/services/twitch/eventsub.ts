@@ -20,7 +20,7 @@ import { variables } from '~/watchers';
 
 const rewardsRedeemed: string[] = [];
 // let initialTimeout = 500;
-// let lastConnectionAt: Date | null = null;
+let lastConnectionAt: Date | null = null;
 // const mutex = new Mutex();
 
 // setInterval(() => {
@@ -33,6 +33,9 @@ const rewardsRedeemed: string[] = [];
 let keepAliveTime = Date.now();
 
 setInterval(() => {
+  if (!lastConnectionAt) {
+    return;
+  }
   if (Date.now() - keepAliveTime > 12000) {
     error(`EVENTSUB-WS: Keep alive message not received in 10s.`);
   }
@@ -79,7 +82,7 @@ class EventSub {
     });
     this.listener.onUserSocketConnect(() => {
       info(`EVENTSUB-WS: Service initialized for ${broadcasterUsername}#${broadcasterId}`);
-      // lastConnectionAt = new Date();
+      lastConnectionAt = new Date();
     });
     this.listener.onUserSocketDisconnect(async (_, err) => {
       // let release: MutexInterface.Releaser;
