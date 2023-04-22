@@ -34,7 +34,7 @@ let keepAliveCount = 0;
 
 setInterval(() => {
   if (isDebugEnabled('twitch.eventsub')) {
-    info(`EVENTSUB-WS: ${keepAliveCount} keepalive events received in 10 minutes.`);
+    info(`EVENTSUB-WS: ${keepAliveCount} session_keepalive events received in 10 minutes.`);
   }
   keepAliveCount = 0;
 }, 600000);
