@@ -258,10 +258,8 @@ class EventSub {
       error('EVENTSUB-WS: Unknown error durring initialization. ' + e);
     }
 
-
-
     if (process.env.ENV === 'production' || process.env.NODE_ENV === 'production') {
-      this.listener.stop();
+      // this.listener.stop();
       setTimeout(() => {
         this.listener.start();
       }, 5000);
