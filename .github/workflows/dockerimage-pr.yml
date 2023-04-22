@@ -1,0 +1,86 @@
+name: Pull Request
+
+concurrency:
+  group: pr-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+on:
+  pull_request
+
+jobs:
+  artifact:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0 # load full history
+      - name: Get short SHA
+        id: slug
+        run: echo "SHA=$(echo ${GITHUB_SHA} | cut -c1-8)" >> $GITHUB_OUTPUT
+      - name: install node v18
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          check-latest: true
+      - name: Install latest npm
+        run: |
+          npm install -g npm
+
+      - name: Build a bot
+        env:
+          OPENEXCHANGE_APPID: ${{ secrets.OPENEXCHANGE_APPID }}
+          NODE_MODULES_DIR: ./node_modules
+        run: make
+
+      - name: Add commit file
+        run: echo "$(echo ${GITHUB_SHA} | cut -c1-8)" >> ./.commit
+
+      - name: Zip a bot
+        run: make pack
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: sogeBot-${{ steps.slug.outputs.SHA }}
+          path: ${{ github.workspace }}/*.zip
+
+  build:
+    needs: artifact
+    runs-on: ubuntu-latest
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v3
+      -
+        name: Get short SHA
+        id: slug
+        run: echo "SHA=$(echo ${GITHUB_SHA} | cut -c1-8)" >> $GITHUB_OUTPUT
+      -
+        name: Set up QEMU
+        uses: docker/setup-qemu-action@v2.1.0
+      -
+        name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2.2.1
+      -
+        name: Login to DockerHub
+        uses: docker/login-action@v2.1.0
+        with:
+          username: ${{ secrets.DOCKER_REGISTRY_USERNAME }}
+          password: ${{ secrets.DOCKER_REGISTRY_PASSWORD }}
+
+      - uses: actions/download-artifact@master
+        with:
+          name: sogeBot-${{ steps.slug.outputs.SHA }}
+          path: ${{ github.workspace }}/*.zip
+
+      -
+        name: Build and push
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          platforms: linux/amd64
+          push: true
+          tags: |
+            sogebot/pr:${{github.head_ref}}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
