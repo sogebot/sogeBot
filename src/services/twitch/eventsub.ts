@@ -110,7 +110,7 @@ class EventSub {
       this.listener.onChannelCheer(broadcasterId, cheer);
 
       // RAID
-      this.listener.onChannelRaidFrom(broadcasterId, raid);
+      this.listener.onChannelRaidTo(broadcasterId, raid);
 
       // HYPE TRAIN
       this.listener.onChannelHypeTrainBegin(broadcasterId, () => {
