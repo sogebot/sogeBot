@@ -191,7 +191,10 @@ class Twitch extends Service {
   onTokenValidChange() {
     debug('twitch.onTokenValidChange', 'onTokenValidChange()');
 
-    this.eventsub?.listener.stop();
+    if (!this.broadcasterTokenValid) {
+      debug('twitch.eventsub', 'onTokenValidChange() listener stop()');
+      this.eventsub?.listener.stop();
+    }
     if (this.broadcasterTokenValid && this.botTokenValid) {
       setTimeout(() => {
         if (!this.authProvider || !this.apiClient) {
