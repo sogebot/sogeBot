@@ -1,6 +1,7 @@
 import { MINUTE } from '@sogebot/ui-helpers/constants';
 import { ApiClient } from '@twurple/api/lib';
 import { EventSubWsListener } from '@twurple/eventsub-ws';
+import { Mutex, MutexInterface } from 'async-mutex';
 import humanizeDuration from 'humanize-duration';
 
 import * as channelPoll from '~/helpers/api/channelPoll';
@@ -20,10 +21,11 @@ import { variables } from '~/watchers';
 const rewardsRedeemed: string[] = [];
 let initialTimeout = 500;
 let lastConnectionAt: Date | null = null;
+const mutex = new Mutex();
 
 setInterval(() => {
   // reset initialTimeout if connection lasts for five minutes
-  if (Date.now() - (lastConnectionAt?.getTime() ?? Date.now()) > MINUTE / 2 && initialTimeout !== 500 ) {
+  if (Date.now() - (lastConnectionAt?.getTime() ?? Date.now()) > MINUTE / 2 && initialTimeout !== 500 && !mutex.isLocked()) {
     initialTimeout = 50;
   }
 }, 60000);
@@ -86,6 +88,14 @@ class EventSub {
     });
     this.listener.onUserSocketDisconnect(async (_, err) => {
       error(`EVENTSUB-WS: ${err ?? 'Unknown error'}`);
+      let release: MutexInterface.Releaser;
+      if (mutex.isLocked()) {
+        debug('twitch.eventsub', 'onUserSocketDisconnect called, but locked');
+        return;
+      } else {
+        debug('twitch.eventsub', 'onUserSocketDisconnect called');
+        release = await mutex.acquire();
+      }
       if (!err) {
         const maxTimeout = MINUTE * 5;
         const nextTimeout = initialTimeout * 2;
@@ -95,7 +105,10 @@ class EventSub {
         this.reconnection = true;
         setTimeout(() => {
           this.listener?.start(); // try to reconnect
+          release();
         }, initialTimeout);
+      } else {
+        release();
       }
     });
 
