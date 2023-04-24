@@ -20,7 +20,6 @@ import alerts from '~/registries/alerts';
 import { variables } from '~/watchers';
 
 const mutex = new Mutex();
-const events: string[] = [];
 
 let lastMessage = '';
 class EventSub {
@@ -41,15 +40,6 @@ class EventSub {
           });
 
           if (response.status === 200) {
-            // check if event is new or already used
-            if (events.includes(response.data.event.id)) {
-              return;
-            }
-            events.push(response.data.event.id);
-            if (events.length > 10) {
-              events.shift();
-            }
-
             // we have unique data
             info(`EVENTSUB: Received event ${response.data.subscription.type}.`);
             const availableEvents = {
