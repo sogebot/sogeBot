@@ -193,7 +193,6 @@ class Twitch extends Service {
 
     if (!this.broadcasterTokenValid) {
       debug('twitch.eventsub', 'onTokenValidChange() listener stop()');
-      this.eventsub?.listener.stop();
     }
     if (this.broadcasterTokenValid && this.botTokenValid) {
       setTimeout(() => {
@@ -201,7 +200,7 @@ class Twitch extends Service {
           return;
         }
         this.tmi = new Chat(this.authProvider);
-        this.eventsub = new EventSub(this.apiClient);
+        this.eventsub = new EventSub();
 
         if (this.broadcasterId === this.botId) {
           error(`You have set bot and broadcaster oauth for same user ${this.broadcasterUsername}#${this.broadcasterId}. This is *NOT RECOMMENDED*. Please use *SEPARATE* account for bot.`);
