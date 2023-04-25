@@ -2,17 +2,31 @@ import { MINUTE } from '@sogebot/ui-helpers/constants';
 import { EventSubChannelBanEventData } from '@twurple/eventsub-base/lib/events/EventSubChannelBanEvent.external';
 import { EventSubChannelCheerEventData } from '@twurple/eventsub-base/lib/events/EventSubChannelCheerEvent.external';
 import { EventSubChannelFollowEventData } from '@twurple/eventsub-base/lib/events/EventSubChannelFollowEvent.external';
+import { EventSubChannelHypeTrainBeginEventData } from '@twurple/eventsub-base/lib/events/EventSubChannelHypeTrainBeginEvent.external';
+import { EventSubChannelHypeTrainEndEventData } from '@twurple/eventsub-base/lib/events/EventSubChannelHypeTrainEndEvent.external';
+import { EventSubChannelHypeTrainProgressEventData } from '@twurple/eventsub-base/lib/events/EventSubChannelHypeTrainProgressEvent.external';
+import { EventSubChannelPollBeginEventData } from '@twurple/eventsub-base/lib/events/EventSubChannelPollBeginEvent.external';
+import { EventSubChannelPollEndEventData } from '@twurple/eventsub-base/lib/events/EventSubChannelPollEndEvent.external';
+import { EventSubChannelPollProgressEventData } from '@twurple/eventsub-base/lib/events/EventSubChannelPollProgressEvent.external';
+import { EventSubChannelPredictionBeginEventData } from '@twurple/eventsub-base/lib/events/EventSubChannelPredictionBeginEvent.external';
+import { EventSubChannelPredictionEndEventData } from '@twurple/eventsub-base/lib/events/EventSubChannelPredictionEndEvent.external';
+import { EventSubChannelPredictionLockEventData } from '@twurple/eventsub-base/lib/events/EventSubChannelPredictionLockEvent.external';
+import { EventSubChannelPredictionProgressEventData } from '@twurple/eventsub-base/lib/events/EventSubChannelPredictionProgressEvent.external';
 import { EventSubChannelRaidEventData } from '@twurple/eventsub-base/lib/events/EventSubChannelRaidEvent.external';
 import { EventSubChannelRedemptionAddEventData } from '@twurple/eventsub-base/lib/events/EventSubChannelRedemptionAddEvent.external';
 import { EventSubChannelUnbanEventData } from '@twurple/eventsub-base/lib/events/EventSubChannelUnbanEvent.external';
 import { Mutex } from 'async-mutex';
 import axios from 'axios';
 
+import * as channelPoll from '~/helpers/api/channelPoll';
+import * as channelPrediction from '~/helpers/api/channelPrediction';
+import * as hypeTrain from '~/helpers/api/hypeTrain';
 import { eventEmitter } from '~/helpers/events';
 import { cheer } from '~/helpers/events/cheer';
 import { follow } from '~/helpers/events/follow';
 import { raid } from '~/helpers/events/raid';
 import { ban, error, info, redeem, timeout, unban, warning } from '~/helpers/log.js';
+import { ioServer } from '~/helpers/panel';
 import * as changelog from '~/helpers/user/changelog.js';
 import getBroadcasterId from '~/helpers/user/getBroadcasterId';
 import eventlist from '~/overlays/eventlist';
@@ -49,6 +63,16 @@ class EventSub {
               'channel.raid':                                        this.onChannelRaid,
               'channel.ban':                                         this.onChannelBan,
               'channel.unban':                                       this.onChannelUnban,
+              'channel.prediction.begin':                            this.onChannelPredictionBegin,
+              'channel.prediction.progress':                         this.onChannelPredictionProgress,
+              'channel.prediction.lock':                             this.onChannelPredictionLock,
+              'channel.prediction.end':                              this.onChannelPredictionEnd,
+              'channel.poll.begin':                                  this.onChannelPollBegin,
+              'channel.poll.progress':                               this.onChannelPollProgress,
+              'channel.poll.end':                                    this.onChannelPollEnd,
+              'channel.hype_train.begin':                            this.onChannelHypeTrainBegin,
+              'channel.hype_train.progress':                         this.onChannelHypeTrainProgress,
+              'channel.hype_train.end':                              this.onChannelHypeTrainEnd,
             } as const;
             if (availableEvents[response.data.subscription.type as keyof typeof availableEvents]) {
               availableEvents[response.data.subscription.type as keyof typeof availableEvents](response.data.event);
@@ -143,6 +167,76 @@ class EventSub {
 
   onChannelUnban(event: EventSubChannelUnbanEventData) {
     unban(`${ event.user_login }#${ event.user_id } by ${ event.moderator_user_login }#${ event.moderator_user_id }`);
+  }
+
+  onChannelPredictionBegin(event: EventSubChannelPredictionBeginEventData) {
+    channelPrediction.start(event);
+  }
+
+  onChannelPredictionProgress(event: EventSubChannelPredictionProgressEventData) {
+    channelPrediction.progress(event);
+  }
+
+  onChannelPredictionLock(event: EventSubChannelPredictionLockEventData) {
+    channelPrediction.lock(event);
+  }
+
+  onChannelPredictionEnd(event: EventSubChannelPredictionEndEventData) {
+    channelPrediction.end(event);
+  }
+
+  onChannelPollBegin(event: EventSubChannelPollBeginEventData) {
+    channelPoll.setData(event);
+    channelPoll.triggerPollStart();
+  }
+
+  onChannelPollProgress(event: EventSubChannelPollProgressEventData) {
+    channelPoll.setData(event);
+  }
+
+  onChannelPollEnd(event: EventSubChannelPollEndEventData) {
+    channelPoll.setData(event);
+    channelPoll.triggerPollEnd();
+  }
+
+  onChannelHypeTrainBegin(event: EventSubChannelHypeTrainBeginEventData) {
+    hypeTrain.setIsStarted(true);
+    hypeTrain.setCurrentLevel(1);
+    eventEmitter.emit('hypetrain-started');
+  }
+
+  onChannelHypeTrainProgress(event: EventSubChannelHypeTrainProgressEventData) {
+    hypeTrain.setIsStarted(true);
+    hypeTrain.setTotal(event.total);
+    hypeTrain.setGoal(event.goal);
+    for (const top of (event.top_contributions ?? [])) {
+      if (top.type === 'other') {
+        continue;
+      }
+      hypeTrain.setTopContributions(top.type, top.total, top.user_id, top.user_login);
+    }
+
+    if (event.last_contribution.type !== 'other') {
+      hypeTrain.setLastContribution(event.last_contribution.total, event.last_contribution.type, event.last_contribution.user_id, event.last_contribution.user_login);
+    }
+    hypeTrain.setCurrentLevel(event.level);
+
+    // update overlay
+    ioServer?.of('/services/twitch').emit('hypetrain-update', {
+      id: event.id, total: event.total, goal: event.goal, level: event.level, subs: Object.fromEntries(hypeTrain.subs),
+    });
+  }
+
+  onChannelHypeTrainEnd(event: EventSubChannelHypeTrainEndEventData) {
+    hypeTrain.triggerHypetrainEnd().then(() => {
+      hypeTrain.setTotal(0);
+      hypeTrain.setGoal(0);
+      hypeTrain.setLastContribution(0, 'bits', null, null);
+      hypeTrain.setTopContributions('bits', 0, null, null);
+      hypeTrain.setTopContributions('subscription', 0, null, null);
+      hypeTrain.setCurrentLevel(1);
+      ioServer?.of('/services/twitch').emit('hypetrain-end');
+    });
   }
 }
 
