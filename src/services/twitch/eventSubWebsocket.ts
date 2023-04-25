@@ -1,8 +1,8 @@
-import { MINUTE } from '@sogebot/ui-helpers/constants';
-import { ApiClient } from '@twurple/api/lib';
+import { ApiClient } from '@twurple/api';
+import { rawDataSymbol } from '@twurple/common';
 import { EventSubWsListener } from '@twurple/eventsub-ws';
-import { Mutex, MutexInterface } from 'async-mutex';
-import humanizeDuration from 'humanize-duration';
+
+import { isAlreadyProcessed } from './eventsub/events';
 
 import * as channelPoll from '~/helpers/api/channelPoll';
 import * as channelPrediction from '~/helpers/api/channelPrediction';
@@ -19,27 +19,16 @@ import alerts from '~/registries/alerts';
 import { variables } from '~/watchers';
 
 const rewardsRedeemed: string[] = [];
-let initialTimeout = 500;
-let lastConnectionAt: Date | null = null;
-const mutex = new Mutex();
+
+let keepAliveCount: null | number = null;
 
 setInterval(() => {
-  // reset initialTimeout if connection lasts for five minutes
-  if (Date.now() - (lastConnectionAt?.getTime() ?? Date.now()) > MINUTE / 2 && initialTimeout !== 500 && !mutex.isLocked()) {
-    initialTimeout = 50;
+  if (keepAliveCount) {
+    keepAliveCount--;
   }
-}, 60000);
+}, 1000);
 
-let keepAliveCount = 0;
-
-setInterval(() => {
-  if (isDebugEnabled('twitch.eventsub')) {
-    info(`EVENTSUB-WS: ${keepAliveCount} session_keepalive events received in 10 minutes.`);
-  }
-  keepAliveCount = 0;
-}, 600000);
-
-class EventSub {
+class EventSubWebsocket {
   listener: EventSubWsListener;
   listenerBroadcasterId?: string;
   reconnection = false;
@@ -53,6 +42,9 @@ class EventSub {
         minLevel: isDebugEnabled('twitch.eventsub') ? 'trace' : 'warning',
         custom:   (level, message) => {
           if (message.includes('"message_type":"session_keepalive"')) {
+            if (!keepAliveCount) {
+              keepAliveCount = 0;
+            }
             keepAliveCount++;
           } else {
             info(`EVENTSUB-WS[${level}]: ${message}`);
@@ -60,6 +52,21 @@ class EventSub {
         },
       },
     });
+
+    setInterval(() => {
+      // check if we have keepAliveCount around 0
+      if (!keepAliveCount) {
+        return;
+      }
+      if (keepAliveCount < -5) {
+        // we didn't get keepAlive for 5 seconds -> reconnecting
+        keepAliveCount = null;
+        // set as reconnection
+        this.reconnection = true;
+        this.listener.stop();
+        this.listener.start();
+      }
+    }, 10000);
 
     const broadcasterId = variables.get('services.twitch.broadcasterId') as string;
     const broadcasterUsername = variables.get('services.twitch.broadcasterUsername') as string;
@@ -84,51 +91,52 @@ class EventSub {
       } else {
         info(`EVENTSUB-WS: Service initialized for ${broadcasterUsername}#${broadcasterId}`);
       }
-      lastConnectionAt = new Date();
+      keepAliveCount = 0; // reset keepAliveCount
     });
     this.listener.onUserSocketDisconnect(async (_, err) => {
-      error(`EVENTSUB-WS: ${err ?? 'Unknown error'}`);
-      let release: MutexInterface.Releaser;
-      if (mutex.isLocked()) {
-        debug('twitch.eventsub', 'onUserSocketDisconnect called, but locked');
-        return;
-      } else {
-        debug('twitch.eventsub', 'onUserSocketDisconnect called');
-        release = await mutex.acquire();
-      }
-      if (!err) {
-        const maxTimeout = MINUTE * 5;
-        const nextTimeout = initialTimeout * 2;
-        initialTimeout = Math.min(nextTimeout, maxTimeout);
-        info(`EVENTSUB-WS: Reconnecting in ${humanizeDuration(initialTimeout)}...`);
-        lastConnectionAt = null;
-        this.reconnection = true;
-        setTimeout(() => {
-          this.listener?.start(); // try to reconnect
-          release();
-        }, initialTimeout);
-      } else {
-        release();
+      if (err) {
+        error(`EVENTSUB-WS: ${err}`);
       }
     });
 
     try {
       // FOLLOW
-      this.listener.onChannelFollow(broadcasterId, broadcasterId, event => follow(event.userId, event.userName, new Date(event.followDate).toISOString()));
+      this.listener.onChannelFollow(broadcasterId, broadcasterId, event => {
+        if (isAlreadyProcessed(event[rawDataSymbol])) {
+          return;
+        }
+        follow(event.userId, event.userName, new Date(event.followDate).toISOString());
+      });
 
       // CHEER
-      this.listener.onChannelCheer(broadcasterId, cheer);
+      this.listener.onChannelCheer(broadcasterId, event => {
+        if (isAlreadyProcessed(event[rawDataSymbol])) {
+          return;
+        }
+        cheer(event[rawDataSymbol]);
+      });
 
       // RAID
-      this.listener.onChannelRaidTo(broadcasterId, raid);
+      this.listener.onChannelRaidTo(broadcasterId, event => {
+        if (isAlreadyProcessed(event[rawDataSymbol])) {
+          return;
+        }
+        raid(event[rawDataSymbol]);
+      });
 
       // HYPE TRAIN
-      this.listener.onChannelHypeTrainBegin(broadcasterId, () => {
+      this.listener.onChannelHypeTrainBegin(broadcasterId, event => {
+        if (isAlreadyProcessed(event[rawDataSymbol])) {
+          return;
+        }
         hypeTrain.setIsStarted(true);
         hypeTrain.setCurrentLevel(1);
         eventEmitter.emit('hypetrain-started');
       });
       this.listener.onChannelHypeTrainProgress(broadcasterId, event => {
+        if (isAlreadyProcessed(event[rawDataSymbol])) {
+          return;
+        }
         hypeTrain.setIsStarted(true);
         hypeTrain.setTotal(event.total);
         hypeTrain.setGoal(event.goal);
@@ -150,6 +158,9 @@ class EventSub {
         });
       });
       this.listener.onChannelHypeTrainEnd(broadcasterId, event => {
+        if (isAlreadyProcessed(event[rawDataSymbol])) {
+          return;
+        }
         hypeTrain.triggerHypetrainEnd().then(() => {
           hypeTrain.setTotal(0);
           hypeTrain.setGoal(0);
@@ -163,29 +174,50 @@ class EventSub {
 
       // POLLS
       this.listener.onChannelPollBegin(broadcasterId, event => {
-        channelPoll.setData(event);
+        if (isAlreadyProcessed(event[rawDataSymbol])) {
+          return;
+        }
+        channelPoll.setData(event[rawDataSymbol]);
         channelPoll.triggerPollStart();
       });
       this.listener.onChannelPollProgress(broadcasterId, event => {
-        channelPoll.setData(event);
+        if (isAlreadyProcessed(event[rawDataSymbol])) {
+          return;
+        }
+        channelPoll.setData(event[rawDataSymbol]);
       });
       this.listener.onChannelPollEnd(broadcasterId, event => {
-        channelPoll.setData(event);
+        if (isAlreadyProcessed(event[rawDataSymbol])) {
+          return;
+        }
+        channelPoll.setData(event[rawDataSymbol]);
         channelPoll.triggerPollEnd();
       });
 
       // PREDICTION
       this.listener.onChannelPredictionBegin(broadcasterId, event => {
-        channelPrediction.start(event);
+        if (isAlreadyProcessed(event[rawDataSymbol])) {
+          return;
+        }
+        channelPrediction.start(event[rawDataSymbol]);
       });
       this.listener.onChannelPredictionProgress(broadcasterId, event => {
-        channelPrediction.progress(event);
+        if (isAlreadyProcessed(event[rawDataSymbol])) {
+          return;
+        }
+        channelPrediction.progress(event[rawDataSymbol]);
       });
       this.listener.onChannelPredictionLock(broadcasterId, event => {
-        channelPrediction.lock(event);
+        if (isAlreadyProcessed(event[rawDataSymbol])) {
+          return;
+        }
+        channelPrediction.lock(event[rawDataSymbol]);
       });
       this.listener.onChannelPredictionEnd(broadcasterId, event => {
-        channelPrediction.end(event);
+        if (isAlreadyProcessed(event[rawDataSymbol])) {
+          return;
+        }
+        channelPrediction.end(event[rawDataSymbol]);
       });
 
       // MOD
@@ -274,4 +306,4 @@ class EventSub {
   }
 }
 
-export default EventSub;
+export default EventSubWebsocket;

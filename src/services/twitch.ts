@@ -12,7 +12,8 @@ import { createClip } from './twitch/calls/createClip';
 import { createMarker } from './twitch/calls/createMarker';
 import { updateBroadcasterType } from './twitch/calls/updateBroadcasterType';
 import Chat from './twitch/chat';
-import EventSub from './twitch/eventsub';
+import EventSubLongPolling from './twitch/eventSubLongPolling';
+import EventSubWebsocket from './twitch/eventSubWebsocket';
 import { CustomAuthProvider } from './twitch/token/CustomAuthProvider';
 import {
   command, default_permission, example, persistent, settings,
@@ -49,7 +50,8 @@ const loadedKeys = new Set<string>();
 
 class Twitch extends Service {
   tmi: Chat | null = null;
-  eventsub: EventSub | null = null;
+  eventSubLongPolling: EventSubLongPolling | null = null;
+  eventSubWebsocket: EventSubWebsocket | null = null;
 
   authProvider: CustomAuthProvider | null = null;
   apiClient: ApiClient | null = null;
@@ -200,7 +202,8 @@ class Twitch extends Service {
           return;
         }
         this.tmi = new Chat(this.authProvider);
-        this.eventsub = new EventSub();
+        this.eventSubLongPolling = new EventSubLongPolling();
+        this.eventSubWebsocket = new EventSubWebsocket(this.apiClient);
 
         if (this.broadcasterId === this.botId) {
           error(`You have set bot and broadcaster oauth for same user ${this.broadcasterUsername}#${this.broadcasterId}. This is *NOT RECOMMENDED*. Please use *SEPARATE* account for bot.`);
@@ -208,7 +211,8 @@ class Twitch extends Service {
       }, 2000);
     } else {
       this.tmi = null;
-      this.eventsub = null;
+      this.eventSubLongPolling = null;
+      this.eventSubWebsocket = null;
     }
   }
 
