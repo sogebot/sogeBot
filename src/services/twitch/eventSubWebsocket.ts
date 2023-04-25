@@ -18,8 +18,6 @@ import eventlist from '~/overlays/eventlist';
 import alerts from '~/registries/alerts';
 import { variables } from '~/watchers';
 
-const rewardsRedeemed: string[] = [];
-
 let keepAliveCount: null | number = null;
 
 setInterval(() => {
