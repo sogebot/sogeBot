@@ -222,6 +222,9 @@ class EventSubWebsocket {
 
       // MOD
       this.listener.onChannelBan(broadcasterId, (event) => {
+        if (isAlreadyProcessed(event[rawDataSymbol])) {
+          return;
+        }
         const userName = event.userName;
         const userId = event.userId;
         const createdBy = event.moderatorName;
@@ -236,17 +239,16 @@ class EventSubWebsocket {
         }
       });
       this.listener.onChannelUnban(broadcasterId, (event) => {
+        if (isAlreadyProcessed(event[rawDataSymbol])) {
+          return;
+        }
         unban(`${ event.userName }#${ event.userId } by ${ event.moderatorName }`);
       });
 
       // REDEMPTION
       this.listener.onChannelRedemptionAdd(broadcasterId, event => {
-        if (rewardsRedeemed.includes(event.redemptionDate.toISOString())) {
+        if (isAlreadyProcessed(event[rawDataSymbol])) {
           return;
-        }
-        rewardsRedeemed.push(event.redemptionDate.toISOString());
-        if (rewardsRedeemed.length > 10) {
-          rewardsRedeemed.shift();
         }
 
         // trigger reward-redeemed event
