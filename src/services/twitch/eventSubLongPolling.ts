@@ -41,10 +41,10 @@ let lastMessage = '';
 class EventSubLongPolling {
   constructor() {
     info('EVENTSUB: Long-polling initiated.');
-    warning('---------------------------------------------------------------------------------------------');
-    warning('EVENTSUB: If you updated a bot, you need to login into https://dash.sogebot.xyz at least once');
-    warning('          to have eventsub long-polling working correctly!                                   ');
-    warning('---------------------------------------------------------------------------------------------');
+    warning('--------------------------------------------------------------------------------------------- !');
+    warning('EVENTSUB: If you updated a bot, you need to login into https://dash.sogebot.xyz at least once !');
+    warning('          to have eventsub long-polling working correctly!                                    !');
+    warning('--------------------------------------------------------------------------------------------- !');
 
     setInterval(async () => {
       //  polling
