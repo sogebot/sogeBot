@@ -6,17 +6,22 @@ import { publicEndpoint } from '~/helpers/socket';
 class Polls extends Overlay {
   public sockets() {
     publicEndpoint(this.nsp, 'data', async (callback) => {
-      callback(channelPoll.event ? {
-        id:      channelPoll.event?.id,
-        title:   channelPoll.event?.title,
-        choices: channelPoll.event?.choices.map(choice => ({
-          id:         choice.id,
-          title:      choice.title,
-          totalVotes: 'totalVotes' in choice ? choice.totalVotes : 0,
-        })),
-        startDate: channelPoll.event?.startDate,
-        endDate:   channelPoll.event?.endDate,
-      } : null);
+      const event = channelPoll.event;
+      if (event) {
+        callback({
+          id:      event.id,
+          title:   event.title,
+          choices: event.choices.map(choice => ({
+            id:         choice.id,
+            title:      choice.title,
+            totalVotes: 'votes' in choice ? choice.votes : 0,
+          })),
+          startDate: event.started_at,
+          endDate:   'ended_at' in event ? event.ended_at : null,
+        });
+      } else {
+        callback(null);
+      }
     });
   }
 }

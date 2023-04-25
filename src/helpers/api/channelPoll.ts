@@ -1,12 +1,13 @@
+import { HelixPollData } from '@twurple/api/lib/interfaces/endpoints/poll.external';
 import { EventSubChannelPollBeginEventData } from '@twurple/eventsub-base/lib/events/EventSubChannelPollBeginEvent.external';
 import { EventSubChannelPollEndEventData } from '@twurple/eventsub-base/lib/events/EventSubChannelPollEndEvent.external';
 import { EventSubChannelPollProgressEventData } from '@twurple/eventsub-base/lib/events/EventSubChannelPollProgressEvent.external';
 
 import { eventEmitter } from '~/helpers/events';
 
-let event: null | EventSubChannelPollBeginEventData | EventSubChannelPollProgressEventData | EventSubChannelPollEndEventData = null;
+let event: null | EventSubChannelPollBeginEventData | EventSubChannelPollProgressEventData | EventSubChannelPollEndEventData | HelixPollData = null;
 
-function setData(event_data: EventSubChannelPollBeginEventData | EventSubChannelPollProgressEventData | EventSubChannelPollEndEventData) {
+function setData(event_data: EventSubChannelPollBeginEventData | EventSubChannelPollProgressEventData | EventSubChannelPollEndEventData | HelixPollData) {
   event = event_data;
 }
 function winnerChoice(choices: EventSubChannelPollEndEventData['choices']) {
@@ -44,6 +45,7 @@ function winnerPercentage(choices: EventSubChannelPollEndEventData['choices']) {
 }
 
 async function triggerPollStart() {
+  event = event as EventSubChannelPollBeginEventData;
   if (event) {
     eventEmitter.emit('poll-started', {
       choices:                    event.choices.map(o => o.title).join(', '),

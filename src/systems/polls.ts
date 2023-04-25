@@ -1,3 +1,4 @@
+import { rawDataSymbol } from '@twurple/common';
 import _ from 'lodash';
 
 import System from './_interface';
@@ -40,7 +41,7 @@ class Polls extends System {
       if (polls) {
         const poll = polls?.data.find(o => o.status === 'ACTIVE');
         if (poll) {
-          channelPoll.setData(poll);
+          channelPoll.setData(poll[rawDataSymbol]);
         }
       }
     } catch (e) {
