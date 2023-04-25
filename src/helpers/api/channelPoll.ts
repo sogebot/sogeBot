@@ -1,73 +1,74 @@
-import { HelixPoll } from '@twurple/api/lib';
-import { EventSubChannelPollBeginEvent } from '@twurple/eventsub-base/lib/events/EventSubChannelPollBeginEvent';
-import { EventSubChannelPollEndEvent } from '@twurple/eventsub-base/lib/events/EventSubChannelPollEndEvent';
-import { EventSubChannelPollProgressEvent } from '@twurple/eventsub-base/lib/events/EventSubChannelPollProgressEvent';
+import { HelixPollData } from '@twurple/api/lib/interfaces/endpoints/poll.external';
+import { EventSubChannelPollBeginEventData } from '@twurple/eventsub-base/lib/events/EventSubChannelPollBeginEvent.external';
+import { EventSubChannelPollEndEventData } from '@twurple/eventsub-base/lib/events/EventSubChannelPollEndEvent.external';
+import { EventSubChannelPollProgressEventData } from '@twurple/eventsub-base/lib/events/EventSubChannelPollProgressEvent.external';
 
 import { eventEmitter } from '~/helpers/events';
 
-let event: null | EventSubChannelPollBeginEvent | EventSubChannelPollProgressEvent | EventSubChannelPollEndEvent | HelixPoll = null;
+let event: null | EventSubChannelPollBeginEventData | EventSubChannelPollProgressEventData | EventSubChannelPollEndEventData | HelixPollData = null;
 
-function setData(event_data: EventSubChannelPollBeginEvent | EventSubChannelPollProgressEvent | EventSubChannelPollEndEvent | HelixPoll) {
+function setData(event_data: EventSubChannelPollBeginEventData | EventSubChannelPollProgressEventData | EventSubChannelPollEndEventData | HelixPollData) {
   event = event_data;
 }
-function winnerChoice(choices: EventSubChannelPollEndEvent['choices']) {
+function winnerChoice(choices: EventSubChannelPollEndEventData['choices']) {
   let winner = '';
   let votes = 0;
   for (const choice of choices) {
-    if (votes < (choice.totalVotes ?? 0)) {
-      votes = choice.totalVotes ?? 0;
+    if (votes < (choice.votes ?? 0)) {
+      votes = choice.votes ?? 0;
       winner = choice.title;
     }
   }
   return winner;
 }
 
-function winnerVotes(choices: EventSubChannelPollEndEvent['choices']) {
+function winnerVotes(choices: EventSubChannelPollEndEventData['choices']) {
   let votes = 0;
   for (const choice of choices) {
-    if (votes < (choice.totalVotes ?? 0)) {
-      votes = choice.totalVotes ?? 0;
+    if (votes < (choice.votes ?? 0)) {
+      votes = choice.votes ?? 0;
     }
   }
   return votes;
 }
 
-function winnerPercentage(choices: EventSubChannelPollEndEvent['choices']) {
+function winnerPercentage(choices: EventSubChannelPollEndEventData['choices']) {
   let votes = 0;
   let totalVotes = 0;
   for (const choice of choices) {
-    if (votes < (choice.totalVotes ?? 0)) {
-      votes = choice.totalVotes ?? 0;
+    if (votes < (choice.votes ?? 0)) {
+      votes = choice.votes ?? 0;
     }
-    totalVotes += choice.totalVotes ?? 0;
+    totalVotes += choice.votes ?? 0;
   }
   return Math.floor((votes / totalVotes) * 100);
 }
 
 async function triggerPollStart() {
+  event = event as EventSubChannelPollBeginEventData;
   if (event) {
     eventEmitter.emit('poll-started', {
       choices:                    event.choices.map(o => o.title).join(', '),
       titleOfPoll:                event.title,
-      channelPointsAmountPerVote: event.channelPointsPerVote,
-      channelPointsVotingEnabled: event.isChannelPointsVotingEnabled,
+      channelPointsAmountPerVote: event.channel_points_voting.amount_per_vote,
+      channelPointsVotingEnabled: event.channel_points_voting.is_enabled,
     });
   }
 }
 
 async function triggerPollEnd() {
   if (event) {
-    const votes = (event as EventSubChannelPollEndEvent).choices.reduce((total, item) => {
-      return total + (item.totalVotes ?? 0);
+    const votes = (event as EventSubChannelPollEndEventData).choices.reduce((total, item) => {
+      return total + (item.votes ?? 0);
     }, 0);
 
     eventEmitter.emit('poll-ended', {
       choices:          event.choices.map(o => o.title).join(', '),
       titleOfPoll:      event.title,
       votes,
-      winnerChoice:     winnerChoice((event as EventSubChannelPollEndEvent).choices),
-      winnerPercentage: winnerPercentage((event as EventSubChannelPollEndEvent).choices),
-      winnerVotes:      winnerVotes((event as EventSubChannelPollEndEvent).choices),
+      winnerChoice:     winnerChoice((event as EventSubChannelPollEndEventData).choices),
+      winnerPercentage: winnerPercentage((event as EventSubChannelPollEndEventData).choices),
+      winnerVotes:      winnerVotes((event as EventSubChannelPollEndEventData).choices),
 
     });
   }

@@ -1,4 +1,4 @@
-import type { EventSubChannelRaidEvent } from '@twurple/eventsub-base/lib/events/EventSubChannelRaidEvent';
+import { EventSubChannelRaidEventData } from '@twurple/eventsub-base/lib/events/EventSubChannelRaidEvent.external';
 
 import { eventEmitter } from './emitter';
 
@@ -9,8 +9,8 @@ import eventlist from '~/overlays/eventlist';
 import alerts from '~/registries/alerts';
 import users from '~/users';
 
-export async function raid(event: EventSubChannelRaidEvent) {
-  const userName = event.raidingBroadcasterName;
+export async function raid(event: EventSubChannelRaidEventData) {
+  const userName = event.from_broadcaster_user_login;
   const hostViewers = event.viewers;
 
   raidLog(`${userName}, viewers: ${hostViewers}`);

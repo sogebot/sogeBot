@@ -20,6 +20,7 @@
     "@twurple/api": "6.2.0",
     "@twurple/auth": "6.2.0",
     "@twurple/chat": "6.2.0",
+    "@twurple/eventsub-base": "^6.2.0",
     "@twurple/eventsub-ws": "6.2.0",
     "@twurple/pubsub": "6.2.0",
     "async-mutex": "^0.4.0",

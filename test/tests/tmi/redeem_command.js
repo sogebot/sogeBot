@@ -18,7 +18,7 @@ const assert = require('assert');
 
 const { AppDataSource } = require('../../../dest/database');
 
-const owner = { userName: '__broadcaster__', userId: String(Math.floor(Math.random() * 10000)) };
+const owner = { userName: '__broadcaster__', user_id: String(Math.floor(Math.random() * 10000)) };
 
 describe('TMI - redeem command - @func3', () => {
   before(async () => {
@@ -48,19 +48,19 @@ describe('TMI - redeem command - @func3', () => {
 
   it(`User will cheer !test with 5 bits (not enough)`, async () => {
     cheer({
-      userName: 'testuser',
-      userId:   String(Math.floor(Math.random() * 100000)),
-      message:  '!test',
-      bits:     5,
+      user_login: 'testuser',
+      user_id:    String(Math.floor(Math.random() * 100000)),
+      message:    '!test',
+      bits:       5,
     });
   });
 
   it(`User will cheer !test2 with 5 bits (not enough)`, async () => {
     cheer({
-      userName: 'testuser',
-      userId:   String(Math.floor(Math.random() * 100000)),
-      message:  '!test2',
-      bits:     5,
+      user_login: 'testuser',
+      user_id:    String(Math.floor(Math.random() * 100000)),
+      message:    '!test2',
+      bits:       5,
     });
   });
 
@@ -84,19 +84,19 @@ describe('TMI - redeem command - @func3', () => {
 
   it(`User will cheer !test with 10 bits (enough)`, async () => {
     cheer({
-      userName: 'testuser',
-      userId:   String(Math.floor(Math.random() * 100000)),
-      message:  '!test',
-      bits:     10,
+      user_login: 'testuser',
+      user_id:    String(Math.floor(Math.random() * 100000)),
+      message:    '!test',
+      bits:       10,
     });
   });
 
   it(`User will cheer !test2 with 10 bits (enough)`, async () => {
     cheer({
-      userName: 'testuser',
-      userId:   String(Math.floor(Math.random() * 100000)),
-      message:  '!test2',
-      bits:     10,
+      user_login: 'testuser',
+      user_id:    String(Math.floor(Math.random() * 100000)),
+      message:    '!test2',
+      bits:       10,
     });
   });
 

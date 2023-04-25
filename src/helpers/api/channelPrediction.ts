@@ -1,8 +1,10 @@
 import { HelixPrediction, HelixPredictionOutcomeColor } from '@twurple/api/lib';
-import { EventSubChannelPredictionBeginEvent } from '@twurple/eventsub-base/lib/events/EventSubChannelPredictionBeginEvent';
+import { EventSubChannelPredictionOutcomeData } from '@twurple/eventsub-base/lib/events/common/EventSubChannelPredictionOutcome.external';
+import { EventSubChannelPredictionBeginEventData } from '@twurple/eventsub-base/lib/events/EventSubChannelPredictionBeginEvent.external';
 import { EventSubChannelPredictionEndEvent } from '@twurple/eventsub-base/lib/events/EventSubChannelPredictionEndEvent';
-import { EventSubChannelPredictionLockEvent } from '@twurple/eventsub-base/lib/events/EventSubChannelPredictionLockEvent';
-import { EventSubChannelPredictionProgressEvent } from '@twurple/eventsub-base/lib/events/EventSubChannelPredictionProgressEvent';
+import { EventSubChannelPredictionEndEventData } from '@twurple/eventsub-base/lib/events/EventSubChannelPredictionEndEvent.external';
+import { EventSubChannelPredictionLockEventData } from '@twurple/eventsub-base/lib/events/EventSubChannelPredictionLockEvent.external';
+import { EventSubChannelPredictionProgressEventData } from '@twurple/eventsub-base/lib/events/EventSubChannelPredictionProgressEvent.external';
 
 import { eventEmitter } from '~/helpers/events';
 
@@ -20,7 +22,7 @@ let data: null | {
     totalChannelPoints: number,
   }[],
   winningOutcomeId: EventSubChannelPredictionEndEvent['winningOutcomeId'];
-  winningOutcome: null | EventSubChannelPredictionEndEvent['winningOutcome'] | HelixPrediction['winningOutcome'];
+  winningOutcome: null | EventSubChannelPredictionOutcomeData | HelixPrediction['winningOutcome'];
 } = null;
 
 function status(event?: HelixPrediction) {
@@ -44,7 +46,7 @@ function status(event?: HelixPrediction) {
   }
   return data;
 }
-function progress(event: EventSubChannelPredictionProgressEvent) {
+function progress(event: EventSubChannelPredictionProgressEventData) {
   data = {
     id:            event.id,
     title:         event.title,
@@ -55,7 +57,7 @@ function progress(event: EventSubChannelPredictionProgressEvent) {
       color:              outcome.color as any,
       title:              outcome.title,
       users:              outcome.users,
-      totalChannelPoints: outcome.channelPoints,
+      totalChannelPoints: outcome.channel_points,
     })),
     winningOutcome:   null,
     winningOutcomeId: null,
@@ -64,10 +66,10 @@ function progress(event: EventSubChannelPredictionProgressEvent) {
   eventEmitter.emit('prediction-started', {
     outcomes:          event.outcomes.map(o => o.title).join(', '),
     titleOfPrediction: event.title,
-    locksAt:           new Date(event.lockDate).toISOString(),
+    locksAt:           new Date(event.locks_at).toISOString(),
   });
 }
-function start(event: EventSubChannelPredictionBeginEvent) {
+function start(event: EventSubChannelPredictionBeginEventData) {
   data = {
     id:            event.id,
     title:         event.title,
@@ -87,11 +89,11 @@ function start(event: EventSubChannelPredictionBeginEvent) {
   eventEmitter.emit('prediction-started', {
     outcomes:          event.outcomes.map(o => o.title).join(', '),
     titleOfPrediction: event.title,
-    locksAt:           new Date(event.lockDate).toISOString(),
+    locksAt:           new Date(event.locks_at).toISOString(),
   });
 }
 
-function lock(event: EventSubChannelPredictionLockEvent) {
+function lock(event: EventSubChannelPredictionLockEventData) {
   data = {
     id:            event.id,
     title:         event.title,
@@ -102,20 +104,21 @@ function lock(event: EventSubChannelPredictionLockEvent) {
       color:              outcome.color as any,
       title:              outcome.title,
       users:              outcome.users,
-      totalChannelPoints: outcome.channelPoints,
+      totalChannelPoints: outcome.channel_points,
     })),
     winningOutcome:   null,
     winningOutcomeId: null,
-    lockDate:         new Date(event.lockDate).toISOString(),
+    lockDate:         new Date(event.locked_at).toISOString(),
   };
   eventEmitter.emit('prediction-locked', {
     outcomes:          event.outcomes.map(o => o.title).join(', '),
     titleOfPrediction: event.title,
-    locksAt:           new Date(event.lockDate).toISOString(),
+    locksAt:           new Date(event.locked_at).toISOString(),
   });
 }
 
-async function end(event: EventSubChannelPredictionEndEvent) {
+async function end(event: EventSubChannelPredictionEndEventData) {
+  const winningOutcome = event.outcomes.find(o => o.id === event.winning_outcome_id) ?? null;
   data = {
     id:            event.id,
     title:         event.title,
@@ -126,22 +129,22 @@ async function end(event: EventSubChannelPredictionEndEvent) {
       color:              outcome.color as any,
       title:              outcome.title,
       users:              outcome.users,
-      totalChannelPoints: outcome.channelPoints,
+      totalChannelPoints: outcome.channel_points,
     })),
-    winningOutcome:   event.winningOutcome,
-    winningOutcomeId: event.winningOutcomeId,
+    winningOutcome:   winningOutcome,
+    winningOutcomeId: event.winning_outcome_id,
     lockDate:         data?.lockDate ?? null,
   };
   const points = event.outcomes.reduce((total, item) => {
-    return total + (item.channelPoints ?? 0);
+    return total + (item.channel_points ?? 0);
   }, 0);
   eventEmitter.emit('prediction-ended', {
     outcomes:                  event.outcomes.map(o => o.title).join(', '),
     titleOfPrediction:         event.title,
-    locksAt:                   new Date(event.endDate).toISOString(),
-    winningOutcomeTitle:       event.winningOutcome?.title || '',
-    winningOutcomeTotalPoints: event.winningOutcome?.channelPoints || 0,
-    winningOutcomePercentage:  points > 0 ? (event.winningOutcome?.channelPoints || 0) / points : 100,
+    locksAt:                   new Date(event.ended_at).toISOString(),
+    winningOutcomeTitle:       winningOutcome?.title || '',
+    winningOutcomeTotalPoints: winningOutcome?.channel_points || 0,
+    winningOutcomePercentage:  points > 0 ? (winningOutcome?.channel_points || 0) / points : 100,
   });
 }
 

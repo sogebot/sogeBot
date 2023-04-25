@@ -244,15 +244,6 @@ class Chat {
     }
   }
 
-  getUsernameFromRaw (raw: string) {
-    const match = raw.match(/@([a-z_0-9]*).tmi.twitch.tv/);
-    if (match) {
-      return match[1];
-    } else {
-      return null;
-    }
-  }
-
   loadListeners (type: 'bot' | 'broadcaster') {
     const client = this.client[type];
     if (!client) {

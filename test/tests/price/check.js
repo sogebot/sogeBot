@@ -1,5 +1,3 @@
-/* global describe it beforeEach */
-
 require('../../general.js');
 
 const assert = require('assert');
@@ -21,7 +19,7 @@ const url = require('../../general.js').url;
 const tests = [
   {
     user:     user.owner.userName,
-    userId:   user.owner.userId,
+    user_id:  user.owner.userId,
     points:   10,
     command:  '!me',
     price:    15,
@@ -30,7 +28,7 @@ const tests = [
   },
   {
     user:     user.viewer.userName,
-    userId:   user.viewer.userId,
+    user_id:  user.viewer.userId,
     points:   15,
     command:  '!me',
     price:    15,
@@ -39,7 +37,7 @@ const tests = [
   },
   {
     user:     user.viewer.userName,
-    userId:   user.viewer.userId,
+    user_id:  user.viewer.userId,
     points:   10,
     command:  '!me',
     price:    15,
@@ -48,7 +46,7 @@ const tests = [
   },
   {
     user:     user.viewer.userName,
-    userId:   user.viewer.userId,
+    user_id:  user.viewer.userId,
     points:   20,
     command:  '!me',
     price:    15,
@@ -68,9 +66,9 @@ describe('Price - check() - @func3', () => {
 
   for (const test of tests) {
     it(`${test.user} with ${test.points} points calls ${test.command}, price on ${test.priceOn} set to ${test.price} and should ${test.expected ? 'pass' : 'fail'}`, async () => {
-      await AppDataSource.getRepository(User).update({ userId: user.viewer.userId }, { points: test.points });
+      await AppDataSource.getRepository(User).update({ userId: test.user_id }, { points: test.points });
       await AppDataSource.getRepository(Price).save({ command: test.command, price: test.price });
-      const haveEnoughPoints = await price.check({ sender: { userName: test.user, userId: test.userId }, message: test.command });
+      const haveEnoughPoints = await price.check({ sender: { userName: test.user, userId: test.user_id }, message: test.command });
       assert(haveEnoughPoints === test.expected);
     });
   }
@@ -109,10 +107,10 @@ describe('Price - check() - @func3', () => {
       command: '!a', price: 100, priceBits: 10,
     });
     cheer({
-      userName: user.viewer.userName,
-      userId:   user.viewer.userId,
-      message:  '!a',
-      bits:     100,
+      user_login: user.viewer.userName,
+      user_id:    user.viewer.userId,
+      message:    '!a',
+      bits:       100,
     });
     await message.isSentRaw('Usage => ' + url + '/systems/alias', user.viewer.userName, 20000);
   });
@@ -123,10 +121,10 @@ describe('Price - check() - @func3', () => {
       command: '!b', price: 100, priceBits: 10,
     });
     cheer({
-      userName: user.viewer.userName,
-      userId:   user.viewer.userId,
-      message:  '!b',
-      bits:     100,
+      user_login: user.viewer.userName,
+      user_id:    user.viewer.userId,
+      message:    '!b',
+      bits:       100,
     });
     await message.isSentRaw('Lorem Ipsum', user.viewer.userName, 20000);
   });
@@ -136,10 +134,10 @@ describe('Price - check() - @func3', () => {
       command: '!me', price: 100, priceBits: 10,
     });
     cheer({
-      userName: user.viewer.userName,
-      userId:   user.viewer.userId,
-      message:  '!me',
-      bits:     100,
+      user_login: user.viewer.userName,
+      user_id:    user.viewer.userId,
+      message:    '!me',
+      bits:       100,
     });
     await message.isSentRaw('@__viewer__ | Level 0 | 0 hours | 0 points | 0 messages | €0.00 | 100 bits | 0 months', user.viewer.userName, 20000);
   });

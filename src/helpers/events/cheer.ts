@@ -1,6 +1,6 @@
 import util from 'util';
 
-import type { EventSubChannelCheerEvent } from '@twurple/eventsub-base/lib/events/EventSubChannelCheerEvent';
+import type { EventSubChannelCheerEventData } from '@twurple/eventsub-base/lib/events/EventSubChannelCheerEvent.external';
 
 import eventlist from '../../overlays/eventlist';
 import alerts from '../../registries/alerts';
@@ -21,10 +21,10 @@ import Parser from '~/parser';
 import alias from '~/systems/alias';
 import customcommands from '~/systems/customcommands';
 
-export async function cheer(event: EventSubChannelCheerEvent) {
+export async function cheer(event: EventSubChannelCheerEventData) {
   try {
-    const username = event.userName;
-    const userId = event.userId;
+    const username = event.user_login;
+    const userId = event.user_id;
     const message = event.message;
     const bits = event.bits;
 

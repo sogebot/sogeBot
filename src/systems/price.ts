@@ -4,8 +4,8 @@ import { format } from '@sogebot/ui-helpers/number';
 import { validateOrReject } from 'class-validator';
 import * as _ from 'lodash';
 import { merge } from 'lodash';
-import { AppDataSource } from '~/database';
 
+import System from './_interface';
 import { parserReply } from '../commons';
 import {
   command, default_permission, rollback,
@@ -13,13 +13,13 @@ import {
 import { parser } from '../decorators';
 import general from '../general.js';
 import Parser from '../parser';
-import System from './_interface';
 
+import { AppDataSource } from '~/database';
 import { prepare } from '~/helpers/commons';
 import { app } from '~/helpers/panel';
 import defaultPermissions from '~/helpers/permissions/defaultPermissions';
 import { getPointsName } from '~/helpers/points';
-import { isOwner } from '~/helpers/user';
+import { isBroadcaster, isOwner } from '~/helpers/user';
 import * as changelog from '~/helpers/user/changelog.js';
 import { adminMiddleware } from '~/socket';
 import { translate } from '~/translate';
@@ -158,8 +158,8 @@ class Price extends System {
   async check (opts: ParserOptions): Promise<boolean> {
     const points = (await import('../systems/points')).default;
     const parsed = opts.message.match(/^(![\S]+)/);
-    if (!opts.sender || !parsed || isOwner(opts.sender)) {
-      return true; // skip if not command or user is owner
+    if (!opts.sender || !parsed || isBroadcaster(opts.sender?.userName)) {
+      return true; // skip if not command or user is broadcaster
     }
     const helpers = (await (opts.parser || new Parser()).getCommandsList()).filter(o => o.isHelper).map(o => o.command);
     if (helpers.includes(opts.message)) {
