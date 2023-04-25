@@ -21,7 +21,7 @@ import { variables } from '~/watchers';
 let keepAliveCount: null | number = null;
 
 setInterval(() => {
-  if (keepAliveCount) {
+  if (keepAliveCount !== null) {
     keepAliveCount--;
   }
 }, 1000);
@@ -40,10 +40,7 @@ class EventSubWebsocket {
         minLevel: isDebugEnabled('twitch.eventsub') ? 'trace' : 'warning',
         custom:   (level, message) => {
           if (message.includes('"message_type":"session_keepalive"')) {
-            if (!keepAliveCount) {
-              keepAliveCount = 0;
-            }
-            keepAliveCount++;
+            keepAliveCount = 0;
           } else {
             info(`EVENTSUB-WS[${level}]: ${message}`);
           }
