@@ -11,7 +11,7 @@ import { eventEmitter } from '~/helpers/events';
 import { cheer } from '~/helpers/events/cheer';
 import { follow } from '~/helpers/events/follow';
 import { raid } from '~/helpers/events/raid';
-import { ban, debug, error, info, isDebugEnabled, redeem, timeout, unban } from '~/helpers/log.js';
+import { ban, error, info, isDebugEnabled, redeem, timeout, unban } from '~/helpers/log.js';
 import { ioServer } from '~/helpers/panel';
 import * as changelog from '~/helpers/user/changelog.js';
 import eventlist from '~/overlays/eventlist';
