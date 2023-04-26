@@ -24,7 +24,7 @@ setInterval(() => {
   if (keepAliveCount !== null) {
     keepAliveCount--;
   }
-}, 1000);
+}, 10000);
 
 class EventSubWebsocket {
   listener: EventSubWsListener;
@@ -53,8 +53,8 @@ class EventSubWebsocket {
       if (!keepAliveCount) {
         return;
       }
-      if (keepAliveCount < -5) {
-        // we didn't get keepAlive for 5 seconds -> reconnecting
+      if (keepAliveCount < -2) {
+        // we didn't get keepAlive for 20 seconds -> reconnecting
         keepAliveCount = null;
         // set as reconnection
         this.reconnection = true;
