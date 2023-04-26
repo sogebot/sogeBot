@@ -32,17 +32,17 @@ class EventSubWebsocket {
   reconnection = false;
 
   constructor(apiClient: ApiClient) {
-    debug('twitch.eventsub', 'EventSub: constructor()');
-
     this.listener = new EventSubWsListener({
       apiClient,
       logger: {
-        minLevel: isDebugEnabled('twitch.eventsub') ? 'trace' : 'warning',
+        minLevel: 'trace',
         custom:   (level, message) => {
           if (message.includes('"message_type":"session_keepalive"')) {
             keepAliveCount = 0;
           } else {
-            info(`EVENTSUB-WS[${level}]: ${message}`);
+            if (isDebugEnabled('twitch.eventsub')) {
+              info(`EVENTSUB-WS[${level}]: ${message}`);
+            }
           }
         },
       },
