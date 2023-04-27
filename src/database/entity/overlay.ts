@@ -310,7 +310,7 @@ export interface EmotesExplode {
 }
 export interface Carousel {
   typeId: 'carousel';
-  images: [{
+  images: {
     waitBefore: number;
     waitAfter: number;
     duration: number;
@@ -321,7 +321,7 @@ export interface Carousel {
     showOnlyOncePerStream: boolean;
     url: string,
     base64: string;
-  }]
+  }[]
 }
 
 export interface HypeTrain {
