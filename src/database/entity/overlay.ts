@@ -318,8 +318,6 @@ export interface Carousel {
     animationIn: string;
     animationOutDuration: number;
     animationOut: string;
-    showOnlyOncePerStream: boolean;
-    url: string,
     base64: string;
   }[]
 }
