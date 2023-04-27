@@ -20,7 +20,6 @@ import {
 } from '../decorators';
 import { onChange, onLoad, onStreamStart } from '../decorators/on';
 import Expects from '../expects';
-import emitter from '../helpers/interfaceEmitter';
 import { debug, error, info } from '../helpers/log';
 
 import { AppDataSource } from '~/database';
@@ -42,7 +41,6 @@ import { translate } from '~/translate';
 import { variables } from '~/watchers';
 
 const urls = {
-  'SogeBot Token Generator':    'https://twitch-token-generator.soge.workers.dev/refresh/',
   'SogeBot Token Generator v2': 'https://credentials.sogebot.xyz/twitch/refresh/',
 };
 const markerEvents = new Set<string>();
@@ -81,7 +79,7 @@ class Twitch extends Service {
     whisperListener = false;
 
   @settings('general')
-    tokenService: keyof typeof urls = 'SogeBot Token Generator';
+    tokenService: keyof typeof urls | 'Own Twitch App' = 'SogeBot Token Generator v2';
   @settings('general')
     tokenServiceCustomClientId = '';
   @settings('general')
@@ -130,9 +128,6 @@ class Twitch extends Service {
   onTokenServiceChange() {
     let clientId;
     switch (this.tokenService) {
-      case 'SogeBot Token Generator':
-        clientId = 't8cney2xkc7j4cu6zpv9ijfa27w027';
-        break;
       case 'SogeBot Token Generator v2':
         clientId = '89k6demxtifvq0vzgjpvr1mykxaqmf';
         break;
@@ -341,22 +336,28 @@ class Twitch extends Service {
       cb(null);
     });
     adminEndpoint('/services/twitch', 'twitch::token', async ({ accessToken, refreshToken, accountType }, cb) => {
-      emitter.emit('set', '/services/twitch', `tokenService`, 'SogeBot Token Generator v2');
-      emitter.emit('set', '/services/twitch', `${accountType}RefreshToken`, refreshToken);
-      this.onChangeRefreshTokens(`${accountType}RefreshToken`);
-      setTimeout(async () => {
-        cb(null);
-      }, 1000);
+      this.tokenService = 'SogeBot Token Generator v2';
+      this[`${accountType}RefreshToken`] = refreshToken;
+      // waiting a while for variable propagation
+      setTimeout(() => {
+        this.onChangeRefreshTokens(`${accountType}RefreshToken`);
+        setTimeout(async () => {
+          cb(null);
+        }, 1000);
+      }, 250);
     });
     adminEndpoint('/services/twitch', 'twitch::token::ownApp', async ({ accessToken, refreshToken, accountType, clientId, clientSecret }, cb) => {
-      emitter.emit('set', '/services/twitch', `tokenService`, 'Own Twitch App');
-      emitter.emit('set', '/services/twitch', `${accountType}RefreshToken`, refreshToken);
-      emitter.emit('set', '/services/twitch', `tokenServiceCustomClientId`, clientId);
-      emitter.emit('set', '/services/twitch', `tokenServiceCustomClientSecret`, clientSecret);
-      this.onChangeRefreshTokens(`${accountType}RefreshToken`);
-      setTimeout(async () => {
-        cb(null);
-      }, 1000);
+      this.tokenService ='Own Twitch App';
+      this[`${accountType}RefreshToken`] = refreshToken;
+      this.tokenServiceCustomClientId = clientId;
+      this.tokenServiceCustomClientSecret = clientSecret;
+      // waiting a while for variable propagation
+      setTimeout(() => {
+        this.onChangeRefreshTokens(`${accountType}RefreshToken`);
+        setTimeout(async () => {
+          cb(null);
+        }, 1000);
+      }, 250);
     });
   }
 

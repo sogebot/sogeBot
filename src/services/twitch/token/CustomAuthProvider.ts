@@ -6,7 +6,6 @@ import fetch from 'node-fetch';
 import { variables } from '~/watchers';
 
 const urls = {
-  'SogeBot Token Generator':    'https://twitch-token-generator.soge.workers.dev/refresh/',
   'SogeBot Token Generator v2': 'https://credentials.sogebot.xyz/twitch/refresh/',
 };
 

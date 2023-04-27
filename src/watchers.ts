@@ -1,4 +1,3 @@
-import { SECOND } from '@sogebot/ui-helpers/constants';
 import {
   cloneDeep, get, isEqual, set,
 } from 'lodash';
@@ -52,7 +51,7 @@ export const check = async (forceCheck = false) => {
 
 export const startWatcher = () => {
   check();
-  setInterval(check, SECOND);
+  setInterval(check, 100);
 };
 
 export const VariableWatcher = {
