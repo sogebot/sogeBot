@@ -1,4 +1,3 @@
-export * from './carouselResolver';
 export * from './goalsResolver';
 export * from './googleResolver';
 export * from './menuResolver';

@@ -258,7 +258,9 @@ const values = {
       shadow:      [],
     },
   },
-  carousel:   null,
+  carousel: {
+    images: [],
+  },
   hypetrain:  null,
   randomizer: null,
   stats:      null,

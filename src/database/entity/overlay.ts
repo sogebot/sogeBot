@@ -310,6 +310,17 @@ export interface EmotesExplode {
 }
 export interface Carousel {
   typeId: 'carousel';
+  images: {
+    waitBefore: number;
+    waitAfter: number;
+    duration: number;
+    animationInDuration: number;
+    animationIn: string;
+    animationOutDuration: number;
+    animationOut: string;
+    url: string;
+    id: string;
+  }[]
 }
 
 export interface HypeTrain {
