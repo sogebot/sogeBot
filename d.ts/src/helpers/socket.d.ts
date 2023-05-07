@@ -208,6 +208,7 @@ export type ClientToServerEventsWithNamespace = {
   },
   '/overlays/clips': GenericEvents & {
     'clips': (data: any) => void
+    'test': (clipURL: string) => void
   },
   '/overlays/clipscarousel': GenericEvents & {
     'clips': (opts: { customPeriod: number, numOfClips: number }, cb: (error: Error | string | null,data: { clips: any, settings: any }) => void) => void
