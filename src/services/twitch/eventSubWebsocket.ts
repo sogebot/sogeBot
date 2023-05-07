@@ -81,9 +81,7 @@ class EventSubWebsocket {
       error(`EVENTSUB-WS: Subscription delete failure: ${err}`);
     });
     this.listener.onUserSocketConnect(() => {
-      if (this.reconnection) {
-        info(`EVENTSUB-WS: Reconnected to service for ${broadcasterUsername}#${broadcasterId}`);
-      } else {
+      if (!this.reconnection) {
         info(`EVENTSUB-WS: Service initialized for ${broadcasterUsername}#${broadcasterId}`);
       }
       keepAliveCount = 0; // reset keepAliveCount
