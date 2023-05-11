@@ -45,15 +45,15 @@
     "help": "Wörter müssen durch Kommas getrennt werden."
   },
   "event": {
-    "follow": "Follow",
+    "follow": "Folgen",
     "cheer": "Cheer",
     "sub": "Sub",
     "resub": "Resub",
     "subgift": "Subgift",
     "subcommunitygift": "Subgift to community",
-    "tip": "Tip",
+    "tip": "Trinkgeld",
     "raid": "Raid",
-    "cmdredeem": "Custom",
+    "custom": "Custom",
     "promo": "Promo",
     "rewardredeem": "Reward Redeem"
   },

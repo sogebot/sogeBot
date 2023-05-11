@@ -1,5 +1,5 @@
 {
-  "announce": "This chat was set to $mode by $username to get rid of hate raid. Sorry for inconvenience!",
+  "announce": "Ce chat a été réglé sur $mode par $username pour se débarrasser du raid haineux. Désolé pour le dérangement !",
   "mode": {
     "0": "subs-only",
     "1": "follow-only",

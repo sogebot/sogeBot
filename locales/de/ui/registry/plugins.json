@@ -23,11 +23,11 @@
       "twitchSubcommunitygift": "New Twitch subscription community gift",
       "twitchResub": "New Twitch recurring subscription",
       "twitchGameChanged": "Twitch category changed",
-      "twitchStreamStarted": "Twitch stream started",
-      "twitchStreamStopped": "Twitch stream stopped",
+      "twitchStreamStarted": "Twitch-Stream gestartet",
+      "twitchStreamStopped": "Twitch-Stream gestoppt",
       "twitchRewardRedeem": "Twitch reward redeemed",
       "twitchRaid": "Twitch raid incoming",
-      "tip": "Tipped by user",
+      "tip": "Trinkgeld vom Nutzer",
       "botStarted": "Bot started"
     },
     "command": {
