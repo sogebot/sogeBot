@@ -1,6 +1,6 @@
 {
   "settings": {
-    "isTitleForced": "Title/Category is forced (bot will rewrite changes from elsewhere)",
+    "isTitleForced": "Titel/Spiel ist erzwungen (Bot wird Änderungen von anderswo überschreiben)",
     "createMarkerOnEvent": "Streammarker bei Ereignis erstellen"
   }
 }

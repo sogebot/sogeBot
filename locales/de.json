@@ -239,11 +239,11 @@
           "placeholder": "Set timeout in milliseconds"
         },
         "timeoutType": {
-          "label": "Type of timeout",
+          "label": "Art des Timeouts",
           "placeholder": "Set type of timeout"
         },
         "command": {
-          "label": "Command",
+          "label": "Befehl",
           "placeholder": "Set your !command"
         },
         "commandToRun": {
@@ -302,7 +302,7 @@
         },
         "": "",
         "reward": {
-          "label": "Reward",
+          "label": "Belohnung",
           "placeholder": ""
         }
       }
@@ -351,7 +351,7 @@
         "topContributionsSubsUsername": "Top Subs Beitrag - Benutzername",
         "sender": "Benutzer der initiiert hat",
         "title": "Aktueller Titel",
-        "game": "Current category",
+        "game": "Aktuelle Kategorie",
         "language": "Aktuelle Sprache des Stream",
         "viewers": "Anzahl der aktuellen Zuschauer",
         "hostViewers": "Raid viewers count",
