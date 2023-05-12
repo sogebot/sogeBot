@@ -6,6 +6,7 @@ import { v4 as uuid } from 'uuid';
 import { onStartup } from './decorators/on';
 import emitter from './helpers/interfaceEmitter';
 import { adminEndpoint, publicEndpoint } from './helpers/socket';
+import getBroadcasterId from './helpers/user/getBroadcasterId';
 import twitch from './services/twitch';
 
 import Core from '~/_interface';
@@ -35,11 +36,12 @@ class Emotes extends Core {
     bttv = true;
 
   fetch = {
-    global:  false,
-    channel: false,
-    ffz:     false,
-    bttv:    false,
-    '7tv':   false,
+    global:     false,
+    channel:    false,
+    ffz:        false,
+    bttv:       false,
+    globalBttv: false,
+    '7tv':      false,
   };
 
   lastGlobalEmoteChk = 1;
@@ -47,6 +49,7 @@ class Emotes extends Core {
   lastChannelChk: string | null = null;
   lastFFZEmoteChk = 1;
   lastBTTVEmoteChk = 1;
+  lastGlobalBTTVEmoteChk = 1;
   last7TVEmoteChk = 1;
 
   interval: NodeJS.Timer;
@@ -114,6 +117,9 @@ class Emotes extends Core {
       if (!this.fetch.bttv) {
         this.fetchEmotesBTTV();
       }
+      if (!this.fetch.globalBttv) {
+        this.fetchEmotesGlobalBTTV();
+      }
       if (!this.fetch['7tv']) {
         this.fetchEmotes7TV();
       }
@@ -139,6 +145,9 @@ class Emotes extends Core {
     }
     if (!this.fetch.bttv) {
       this.fetchEmotesBTTV();
+    }
+    if (!this.fetch.globalBttv) {
+      this.fetchEmotesGlobalBTTV();
     }
     if (!this.fetch['7tv']) {
       this.fetchEmotes7TV();
@@ -339,11 +348,46 @@ class Emotes extends Core {
 
     this.fetch['7tv'] = false;
   }
+  async fetchEmotesGlobalBTTV () {
+    this.fetch.globalBttv = true;
+
+    // fetch BTTV emotes
+    if (Date.now() - this.lastGlobalBTTVEmoteChk > 1000 * 60 * 60 * 24 * 7) {
+      info('EMOTES: Fetching global bttv emotes');
+      this.lastGlobalBTTVEmoteChk = Date.now();
+      this.cache = this.cache.filter(o => o.type !== 'bttv');
+      try {
+        const request = await axios.get<any>('https://api.betterttv.net/3/cached/emotes/global');
+
+        const urlTemplate = 'https://cdn.betterttv.net/emote/{{id}}/{{image}}.webp';
+        const emotes = request.data;
+
+        for (let i = 0, length = emotes.length; i < length; i++) {
+          const cachedEmote = this.cache.find(o => o.code === emotes[i].code && o.type === 'bttv');
+          this.cache.push({
+            ...cachedEmote,
+            code: emotes[i].code,
+            type: 'bttv',
+            urls: {
+              '1': urlTemplate.replace('{{id}}', emotes[i].id).replace('{{image}}', '1x'),
+              '2': urlTemplate.replace('{{id}}', emotes[i].id).replace('{{image}}', '2x'),
+              '3': urlTemplate.replace('{{id}}', emotes[i].id).replace('{{image}}', '3x'),
+            },
+          });
+        }
+        info('EMOTES: Fetched global bttv emotes');
+      } catch (e: any) {
+        error(e);
+      }
+    }
+
+    this.fetch.globalBttv = false;
+  }
 
   async fetchEmotesBTTV () {
-    const broadcasterUsername = variables.get('services.twitch.broadcasterUsername') as string;
+    const broadcasterId = getBroadcasterId();
 
-    if (broadcasterUsername.length === 0) {
+    if (broadcasterId.length === 0) {
       return;
     }
 
@@ -355,10 +399,10 @@ class Emotes extends Core {
       this.lastBTTVEmoteChk = Date.now();
       this.cache = this.cache.filter(o => o.type !== 'bttv');
       try {
-        const request = await axios.get<any>('https://api.betterttv.net/2/channels/' + broadcasterUsername);
+        const request = await axios.get<any>('https://api.betterttv.net/3/cached/users/twitch/' + broadcasterId);
 
         const urlTemplate = request.data.urlTemplate;
-        const emotes = request.data.emotes;
+        const emotes = request.data;
 
         for (let i = 0, length = emotes.length; i < length; i++) {
           const cachedEmote = this.cache.find(o => o.code === emotes[i].code && o.type === 'bttv');
@@ -376,7 +420,7 @@ class Emotes extends Core {
         info('EMOTES: Fetched bttv emotes');
       } catch (e: any) {
         if (e.response.status === 404) {
-          warning(`EMOTES: Channel ${broadcasterUsername} not found in bttv`);
+          warning(`EMOTES: Channel ${broadcasterId} not found in bttv`);
         } else {
           error(e);
         }
