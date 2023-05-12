@@ -495,7 +495,7 @@ class Emotes extends Core {
       }
     }
 
-    for (const potentialEmoteCode of opts.message.split(' ').filter(Boolean)) {
+    for (const potentialEmoteCode of opts.message.trim().split(' ').filter(Boolean)) {
       if (parsed.includes(potentialEmoteCode)) {
         continue;
       } // this emote was already parsed
@@ -509,8 +509,8 @@ class Emotes extends Core {
     }
 
     const emotes = shuffle(Object.keys(usedEmotes));
-    const id = uuid();
     for (let i = 0; i < emotes.length; i++) {
+      const id = uuid();
       ioServer?.of('/services/twitch').emit('emote', { id, url: usedEmotes[emotes[i]].urls });
     }
     return true;
