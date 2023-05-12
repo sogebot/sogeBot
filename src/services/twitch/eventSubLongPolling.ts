@@ -61,6 +61,7 @@ class EventSubLongPolling {
 
           if (response.status === 200) {
             if (isAlreadyProcessed(response.data.event)) {
+              release();
               return;
             }
 
