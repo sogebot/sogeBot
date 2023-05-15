@@ -32,7 +32,9 @@ export default async function(pluginId: string, currentNode: Node<string>, param
   try {
     const sandbox = {
       axios,
-      variable: {
+      setTimeout:   setTimeout,
+      setImmediate: setImmediate,
+      variable:     {
         async load(variableName: string) {
           const variable = await PluginVariable.findOneBy({ variableName, pluginId });
           debug('plugins', `Variable ${variableName} loaded: ${JSON.stringify({ variable }, null, 2)}`);
