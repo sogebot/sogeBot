@@ -377,6 +377,60 @@ export interface HTML {
   css: string;
 }
 
+export interface Goal {
+  typeId: 'goal';
+  display: {
+    type: 'fade';
+    durationMs: number;
+    animationInMs: number;
+    animationOutMs: number;
+  } | {
+    type: 'multi';
+    spaceBetweenGoalsInPx: number;
+  };
+  campaigns: {
+    name: string;
+    type:
+    'followers' | 'currentFollowers' | 'currentSubscribers'
+    | 'subscribers' | 'tips' | 'bits' | 'intervalSubscribers'
+    | 'intervalFollowers' | 'intervalTips' | 'intervalBits' | 'tiltifyCampaign';
+    countBitsAsTips: boolean;
+    display: 'simple' | 'full' | 'custom';
+    timestamp?: string;
+    tiltifyCampaign?: number | null,
+    interval?: 'hour' | 'day' | 'week' | 'month' | 'year';
+    goalAmount?: number;
+    currentAmount?: number;
+    endAfter: string;
+    endAfterIgnore: boolean;
+    customizationBar: {
+      color: string;
+      backgroundColor: string;
+      borderColor: string;
+      borderPx: number;
+      height: number;
+    };
+    customizationFont: {
+      family: string;
+      color: string;
+      size: number;
+      weight: number;
+      borderColor: string;
+      borderPx: number;
+      shadow: {
+        shiftRight: number;
+        shiftDown: number;
+        blur: number;
+        opacity: number;
+        color: string;
+      }[];
+    };
+    customizationHtml: string;
+    customizationJs: string;
+    customizationCss: string;
+  }[];
+}
+
 export interface Stats {
   typeId: 'stats';
 }
@@ -424,6 +478,6 @@ export class Overlay extends BotEntity<Overlay> {
     URL | Chat | Reference | AlertsRegistry | Carousel | Marathon | Stopwatch |
     Countdown | Group | Eventlist | EmotesCombo | Credits | Clips | Alerts |
     Emotes | EmotesExplode | EmotesFireworks | Polls | TTS | OBSWebsocket |
-    ClipsCarousel | HypeTrain | Wordcloud | HTML | Stats | Randomizer;
+    ClipsCarousel | HypeTrain | Wordcloud | HTML | Stats | Randomizer | Goal;
   }[];
 }
