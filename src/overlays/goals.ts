@@ -12,15 +12,6 @@ import exchange from '~/helpers/currency/exchange';
 import { recountIntervals } from '~/helpers/goals/recountIntervals';
 
 class Goals extends Overlay {
-  showInUI = false;
-
-  @onStartup()
-  onStartup() {
-    this.addMenu({
-      category: 'registry', name: 'goals', id: 'registry/goals', this: null,
-    });
-  }
-
   @onBit()
   public async onBit(bit: onEventBit) {
     const overlays = await OverlayEntity.find();
