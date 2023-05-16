@@ -1,4 +1,3 @@
-export * from './goalsResolver';
 export * from './googleResolver';
 export * from './menuResolver';
 export * from './quickActionsResolver';
