@@ -35,7 +35,7 @@ export class initialize1000000000001 implements MigrationInterface {
     await queryRunner.query(`CREATE TABLE "permissions" ("id" varchar PRIMARY KEY NOT NULL, "name" varchar NOT NULL, "order" integer NOT NULL, "isCorePermission" boolean NOT NULL, "isWaterfallAllowed" boolean NOT NULL, "automation" varchar(12) NOT NULL, "userIds" text NOT NULL, "excludeUserIds" text NOT NULL, "filters" text NOT NULL)`);
     await queryRunner.query(`CREATE TABLE "permission_commands" ("id" varchar PRIMARY KEY NOT NULL, "name" varchar NOT NULL, "permission" varchar(36))`);
     await queryRunner.query(`CREATE INDEX "IDX_ba6483f5c5882fa15299f22c0a" ON "permission_commands" ("name") `);
-    await queryRunner.query(`CREATE TABLE "settings" ("id" integer PRIMARY KEY NOT NULL, "namespace" varchar NOT NULL, "name" varchar NOT NULL, "value" text NOT NULL)`);
+    await queryRunner.query(`CREATE TABLE "settings" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "namespace" varchar NOT NULL, "name" varchar NOT NULL, "value" text NOT NULL)`);
     await queryRunner.query(`CREATE UNIQUE INDEX "IDX_d8a83b9ffce680092c8dfee37d" ON "settings" ("namespace", "name") `);
     await queryRunner.query(`CREATE TABLE "plugin" ("id" varchar PRIMARY KEY NOT NULL, "name" varchar NOT NULL, "enabled" boolean NOT NULL, "workflow" text NOT NULL, "settings" text)`);
     await queryRunner.query(`CREATE TABLE "plugin_variable" ("variableName" varchar NOT NULL, "pluginId" varchar NOT NULL, "value" text NOT NULL, PRIMARY KEY ("variableName", "pluginId"))`);
