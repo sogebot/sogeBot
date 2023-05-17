@@ -132,6 +132,13 @@ export class initialize1000000000001 implements MigrationInterface {
     await queryRunner.query(`INSERT INTO "temporary_raffle_participant_message"("id", "timestamp", "text", "participantId") SELECT "id", "timestamp", "text", "participantId" FROM "raffle_participant_message"`);
     await queryRunner.query(`DROP TABLE "raffle_participant_message"`);
     await queryRunner.query(`ALTER TABLE "temporary_raffle_participant_message" RENAME TO "raffle_participant_message"`);
+
+    await queryRunner.query(`DROP INDEX "IDX_d8a83b9ffce680092c8dfee37d"`);
+    await queryRunner.query(`CREATE TABLE "temporary_settings" ("id" integer PRIMARY KEY NOT NULL, "namespace" varchar NOT NULL, "name" varchar NOT NULL, "value" text NOT NULL)`);
+    await queryRunner.query(`INSERT INTO "temporary_settings"("id", "namespace", "name", "value") SELECT "id", "namespace", "name", "value" FROM "settings"`);
+    await queryRunner.query(`DROP TABLE "settings"`);
+    await queryRunner.query(`ALTER TABLE "temporary_settings" RENAME TO "settings"`);
+    await queryRunner.query(`CREATE UNIQUE INDEX "IDX_d8a83b9ffce680092c8dfee37d" ON "settings" ("namespace", "name") `);
   }
 
   public async down(queryRunner: QueryRunner): Promise<any> {

@@ -80,6 +80,9 @@ export class initialize1000000000001 implements MigrationInterface {
     await queryRunner.query(`ALTER TABLE \`goal\` ADD CONSTRAINT \`FK_a1a6bd23cb8ef7ddf921f54c0bb\` FOREIGN KEY (\`groupId\`) REFERENCES \`goal_group\`(\`id\`) ON DELETE CASCADE ON UPDATE CASCADE`);
     await queryRunner.query(`ALTER TABLE \`raffle_participant\` ADD CONSTRAINT \`FK_bc112542267bdd487f4479a94a1\` FOREIGN KEY (\`raffleId\`) REFERENCES \`raffle\`(\`id\`) ON DELETE CASCADE ON UPDATE CASCADE`);
     await queryRunner.query(`ALTER TABLE \`raffle_participant_message\` ADD CONSTRAINT \`FK_e6eda53bcd6ceb62b5edd9e02b5\` FOREIGN KEY (\`participantId\`) REFERENCES \`raffle_participant\`(\`id\`) ON DELETE CASCADE ON UPDATE CASCADE`);
+    await queryRunner.query(`ALTER TABLE \`settings\` DROP PRIMARY KEY`);
+    await queryRunner.query(`ALTER TABLE \`settings\` DROP COLUMN \`id\``);
+    await queryRunner.query(`ALTER TABLE \`settings\` ADD \`id\` int NOT NULL PRIMARY KEY`);
   }
 
   public async down(queryRunner: QueryRunner): Promise<any> {
