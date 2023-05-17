@@ -3,7 +3,7 @@
 import { Goal, Overlay as OverlayEntity } from '@entity/overlay';
 
 import {
-  onBit, onFollow, onStartup, onSub, onTip,
+  onBit, onFollow, onSub, onTip,
 } from '../decorators/on';
 import Overlay from '../overlays/_interface';
 

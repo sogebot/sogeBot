@@ -425,9 +425,6 @@ export interface Goal {
         color: string;
       }[];
     };
-    customizationHtml: string;
-    customizationJs: string;
-    customizationCss: string;
   }[];
 }
 
@@ -481,3 +478,89 @@ export class Overlay extends BotEntity<Overlay> {
     ClipsCarousel | HypeTrain | Wordcloud | HTML | Stats | Randomizer | Goal;
   }[];
 }
+
+// @Entity({ name: "overlay" })
+// export class OverlayPlus extends BotEntity<OverlayPlus> {
+//   @PrimaryColumn({ generated: 'uuid' })
+//     id: string;
+
+//   @Column()
+//     name: string;
+
+//   @Column({ type: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') !== 'better-sqlite3' ? 'json' : 'simple-json' })
+//     canvas: {
+//     width: number;
+//     height: number;
+//   };
+
+//   @Column({ type: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') !== 'better-sqlite3' ? 'json' : 'simple-json' })
+//     items: ({
+//     id: string;
+//     version: 2;
+//     isVisible: boolean;
+//     width: number;
+//     height: number;
+//     alignX: number;
+//     alignY: number;
+//     rotation: number;
+//     name: string;
+//     state: {
+//       default: {
+//         box: {
+//           width: number;
+//           height: number;
+//           alignX: number;
+//           alignY: number;
+//           rotation: number;
+//           anchorPos: 'left-top' | 'left-center' | 'left-bottom'
+//           | 'center-top' | 'center-center' | 'center-bottom'
+//           | 'right-top' | 'right-right' | 'center-bottom',
+//         }
+//         // filter to show based on e.g. follower count, game etc.
+//         filter: string,
+//         animation: {
+//           // animation in is triggered on state show
+//           animationInDuration: number;
+//           animationIn: 'fadeIn';
+//           animationInDelay: number;
+//           // animation out is triggered on state change (on state hide)
+//           animationOutDuration: number;
+//           animationOut: 'fadeOut';
+//           animationOutDelay: number;
+//         }
+//         automation: {
+//           // next state, if same as current state, do nothing
+//           goTo: string;
+//           // how long to change to next state
+//           delay: number;
+//         }
+//         // we just support text item for now
+//         item: {
+//           text: string;
+//           animationText: 'none' | 'baffle' | 'bounce' | 'bounce2' | 'flip' | 'flash' | 'pulse2' | 'rubberBand'
+//           | 'shake2' | 'swing' | 'tada' | 'wave' | 'wobble' | 'wiggle' | 'wiggle2' | 'jello' | 'typewriter';
+//           animationTextOptions: {
+//             speed: number | 'slower' | 'slow' | 'fast' | 'faster';
+//             maxTimeToDecrypt: number;
+//             characters: string;
+//           };
+//           font: {
+//             family: string;
+//             size: number;
+//             borderPx: number;
+//             borderColor: string;
+//             weight: number;
+//             color: string;
+//             shadow: {
+//               shiftRight: number;
+//               shiftDown: number;
+//               blur: number;
+//               opacity: number;
+//               color: string;
+//             }[];
+//           }
+//         }
+//       }[]
+//     }
+//   })[];
+// }
