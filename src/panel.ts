@@ -265,14 +265,6 @@ class Panel extends Core {
         res.sendFile(path.join(__dirname, '..', 'assets', sanitize(req.params.asset)));
       }
     });
-    app?.get('/assets/presets/textOverlay/:preset/:file', function (req, res) {
-      const file = path.join(__dirname, '..', 'assets', 'presets', 'textOverlay', sanitize(req.params.preset), sanitize(req.params.file));
-      if (existsSync(file)) {
-        res.sendFile(path.join(__dirname, '..', 'assets', 'presets', 'textOverlay', sanitize(req.params.preset), sanitize(req.params.file)));
-      } else {
-        res.status(404).send('Not Found');
-      }
-    });
     app?.get('/custom/:custom', function (req, res) {
       res.sendFile(path.join(__dirname, '..', 'public', 'custom', sanitize(req.params.custom) + '.html'));
     });
