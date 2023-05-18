@@ -403,6 +403,11 @@ export interface Goal {
     currentAmount?: number;
     endAfter: string;
     endAfterIgnore: boolean;
+    customization: {
+      html: string;
+      js: string;
+      css: string;
+    };
     customizationBar: {
       color: string;
       backgroundColor: string;

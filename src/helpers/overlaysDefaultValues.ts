@@ -268,6 +268,7 @@ const values = {
       animationInMs:  1000,
       animationOutMs: 1000,
     },
+    campaigns: [],
   },
   hypetrain:  null,
   randomizer: null,
