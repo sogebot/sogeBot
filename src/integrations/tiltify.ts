@@ -1,8 +1,8 @@
 import { Mutex } from 'async-mutex';
 import fetch from 'node-fetch';
 
-import { command, persistent, settings } from '../decorators';
 import Integration from './_interface';
+import { command, persistent, settings } from '../decorators';
 
 import { onStartup } from '~/decorators/on';
 import { prepare } from '~/helpers/commons';
@@ -86,17 +86,15 @@ class Tiltify extends Integration {
       info(`TILTIFY: Not logged in.`);
     }
     setInterval(async () => {
-      if (this.enabled) {
-        if (this.access_token.length > 0 && this.userName.length > 0 && String(this.userId).length > 0) {
-          const release = await mutex.acquire();
-          try {
-            await this.getCampaigns();
-            await this.getDonations();
-          } catch(e) {
-            error(e);
-          }
-          release();
+      if (this.access_token.length > 0 && this.userName.length > 0 && String(this.userId).length > 0) {
+        const release = await mutex.acquire();
+        try {
+          await this.getCampaigns();
+          await this.getDonations();
+        } catch(e) {
+          error(e);
         }
+        release();
       }
     }, 30000);
   }
@@ -212,4 +210,3 @@ class Tiltify extends Integration {
 }
 
 const self = new Tiltify();
-export default self;
