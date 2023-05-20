@@ -160,7 +160,7 @@ class Tiltify extends Integration {
 
   sockets () {
     publicEndpoint('/integrations/tiltify', 'tiltify::campaigns', async (cb) => {
-      cb(this.enabled ? this.campaigns : []);
+      cb(this.campaigns);
     });
     adminEndpoint('/integrations/tiltify', 'tiltify::revoke', async (cb) => {
       self.access_token = '';
