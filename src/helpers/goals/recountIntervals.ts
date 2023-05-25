@@ -63,7 +63,7 @@ export async function recountIntervals(type: typeof types[number]) {
         }
       }
     }
-    isChanged ? await overlay.save() : null;
+    isChanged ? await overlay.save() : {};
   }
 }
 

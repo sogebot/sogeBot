@@ -44,7 +44,7 @@ class Goals extends Overlay {
           }
         }
       }
-      isChanged ? await overlay.save() : null;
+      isChanged ? await overlay.save() : {};
     }
     recountIntervals('bits');
   }
@@ -65,7 +65,7 @@ class Goals extends Overlay {
           }
         }
       }
-      isChanged ? await overlay.save() : null;
+      isChanged ? await overlay.save() : {};
     }
     recountIntervals('tips');
   }
@@ -84,7 +84,7 @@ class Goals extends Overlay {
             isChanged = true;
           }
         }
-        isChanged ? await overlay.save() : null;
+        isChanged ? await overlay.save() : {};
       }
     }
     recountIntervals('followers');
@@ -104,7 +104,7 @@ class Goals extends Overlay {
             isChanged = true;
           }
         }
-        isChanged ? await overlay.save() : null;
+        isChanged ? await overlay.save() : {};
       }
     }
     recountIntervals('subscribers');
