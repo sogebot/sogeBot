@@ -63,7 +63,7 @@ export async function recountIntervals() {
         }
       }
     }
-    isChanged ? await overlay.save() : {};
+    isChanged && await overlay.save();
   }
 }
 

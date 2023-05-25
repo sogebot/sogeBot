@@ -44,7 +44,7 @@ class Goals extends Overlay {
           }
         }
       }
-      isChanged ? await overlay.save() : {};
+      isChanged && await overlay.save();
     }
     recountIntervals();
   }
@@ -65,7 +65,7 @@ class Goals extends Overlay {
           }
         }
       }
-      isChanged ? await overlay.save() : {};
+      isChanged && await overlay.save();
     }
     recountIntervals();
   }
@@ -84,7 +84,7 @@ class Goals extends Overlay {
             isChanged = true;
           }
         }
-        isChanged ? await overlay.save() : {};
+        isChanged && await overlay.save();
       }
     }
     recountIntervals();
@@ -104,7 +104,7 @@ class Goals extends Overlay {
             isChanged = true;
           }
         }
-        isChanged ? await overlay.save() : {};
+        isChanged && await overlay.save();
       }
     }
     recountIntervals();
