@@ -21,7 +21,7 @@ const interval = {
   'year':  365 * constants.DAY,
 } as const;
 
-export async function recountIntervals(type: typeof types[number]) {
+export async function recountIntervals() {
   const overlays = await Overlay.find();
   for (const overlay of overlays) {
     let isChanged = false;
@@ -69,8 +69,6 @@ export async function recountIntervals(type: typeof types[number]) {
 
 setInterval(async () => {
   if (isBotStarted) {
-    for (const type of types) {
-      await recountIntervals(type);
-    }
+    await recountIntervals();
   }
-}, MINUTE);
+}, 5 * MINUTE);

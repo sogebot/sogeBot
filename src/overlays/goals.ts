@@ -46,7 +46,7 @@ class Goals extends Overlay {
       }
       isChanged ? await overlay.save() : {};
     }
-    recountIntervals('bits');
+    recountIntervals();
   }
 
   @onTip()
@@ -67,7 +67,7 @@ class Goals extends Overlay {
       }
       isChanged ? await overlay.save() : {};
     }
-    recountIntervals('tips');
+    recountIntervals();
   }
 
   @onFollow()
@@ -87,7 +87,7 @@ class Goals extends Overlay {
         isChanged ? await overlay.save() : {};
       }
     }
-    recountIntervals('followers');
+    recountIntervals();
   }
 
   @onSub()
@@ -107,7 +107,7 @@ class Goals extends Overlay {
         isChanged ? await overlay.save() : {};
       }
     }
-    recountIntervals('subscribers');
+    recountIntervals();
   }
 }
 
