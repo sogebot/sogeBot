@@ -261,6 +261,15 @@ const values = {
   carousel: {
     images: [],
   },
+  goal: {
+    display: {
+      type:           'fade',
+      durationMs:     30000,
+      animationInMs:  1000,
+      animationOutMs: 1000,
+    },
+    campaigns: [],
+  },
   hypetrain:  null,
   randomizer: null,
   stats:      null,
