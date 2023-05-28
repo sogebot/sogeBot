@@ -5,6 +5,7 @@ import { VM }  from 'vm2';
 
 import type { Node } from '~/../d.ts/src/plugins';
 import { AppDataSource } from '~/database';
+import { EmitData } from '~/database/entity/alert';
 import { PluginVariable } from '~/database/entity/plugins';
 import { User } from '~/database/entity/user';
 import { getBotSender } from '~/helpers/commons';
@@ -14,6 +15,7 @@ import { tmiEmitter } from '~/helpers/tmi';
 import * as changelog from '~/helpers/user/changelog.js';
 import { isBroadcaster } from '~/helpers/user/isBroadcaster';
 import { template } from '~/plugins/template';
+import alerts from '~/registries/alerts';
 import banUser from '~/services/twitch/calls/banUser';
 import { getIdFromTwitch } from '~/services/twitch/calls/getIdFromTwitch';
 import points from '~/systems/points';
@@ -111,6 +113,25 @@ export default async function(pluginId: string, currentNode: Node<string>, param
         getLocalizedName(value: number, format: string) {
           return getLocalizedName(value, format);
         },
+      },
+      async triggerAlert(uuid: string, name?: string, message?: string, customOptions?: EmitData['customOptions']) {
+        if (customOptions) {
+          info(`PLUGINS#${pluginId}: Triggering alert ${uuid} with custom options ${JSON.stringify(customOptions)}`);
+        } else {
+          info(`PLUGINS#${pluginId}: Triggering alert ${uuid}`);
+        }
+        await alerts.trigger({
+          amount:     0,
+          currency:   'CZK',
+          event:      'custom',
+          alertId:    uuid,
+          message:    message || '',
+          monthsName: '',
+          name:       name ?? '',
+          tier:       null,
+          recipient:  userstate?.userName ?? '',
+          customOptions,
+        });
       },
       parameters,
       ...variables,
