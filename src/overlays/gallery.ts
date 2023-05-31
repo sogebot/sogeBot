@@ -1,10 +1,10 @@
 import path from 'path';
 
 import { Gallery as GalleryEntity } from '@entity/gallery';
-import { AppDataSource } from '~/database';
 
 import Overlay from './_interface';
 
+import { AppDataSource } from '~/database';
 import { debug } from '~/helpers/log';
 import { app } from '~/helpers/panel';
 import { adminEndpoint } from '~/helpers/socket';
@@ -51,6 +51,7 @@ class Gallery extends Overlay {
               'Content-Type':   file.type,
               'Content-Length': data.length,
               'Cache-Control':  'public, max-age=31536000',
+              'Accept-Ranges':  'bytes',
               'ETag':           req.params.id + '-' + request.size,
             });
             res.end(data);
