@@ -28,7 +28,7 @@ export async function recountIntervals() {
     const goals = overlay.items.filter(o => o.opts.typeId === 'goal');
     for (const goal of goals) {
       goal.opts = goal.opts as Goal;
-      for (const campaign of goal.opts.campaigns) {
+      for (const campaign of goal.opts.campaigns ?? []) {
         if (campaign.type === 'intervalBits') {
           isChanged = true;
           const events = await AppDataSource.getRepository(UserBit).findBy({ cheeredAt: MoreThanOrEqual(Date.now() - interval[campaign.interval!]) });
@@ -71,4 +71,4 @@ setInterval(async () => {
   if (isBotStarted) {
     await recountIntervals();
   }
-}, 5 * MINUTE);
+}, (5 * MINUTE) / 5 / 60);
