@@ -4,7 +4,8 @@ import Registry from './_interface';
 import Message from '../message';
 
 import { AppDataSource } from '~/database';
-import { Overlay } from '~/database/entity/overlay';
+import { Goal, Overlay } from '~/database/entity/overlay';
+import { stats } from '~/helpers/api';
 import { executeVariablesInText } from '~/helpers/customvariables/executeVariablesInText';
 import { isBotStarted } from '~/helpers/database';
 import defaultValues from '~/helpers/overlaysDefaultValues';
@@ -35,6 +36,24 @@ setInterval(async () => {
     }
   }
 }, SECOND * 1);
+
+const updateGoalValues = (output: Overlay) => {
+  // we need to set up current values for goals current
+  for (const item_ of output.items) {
+    if (item_.opts.typeId === 'goal') {
+      for (const campaign of (item_.opts as Goal).campaigns) {
+        console.log({ campaign });
+        if (campaign.type === 'currentFollowers') {
+          campaign.currentAmount = stats.value.currentFollowers;
+        }
+        if (campaign.type === 'currentSubscribers') {
+          campaign.currentAmount = stats.value.currentSubscribers;
+        }
+      }
+    }
+  }
+  return output.items;
+};
 
 class Overlays extends Registry {
   constructor() {
@@ -68,13 +87,17 @@ class Overlays extends Registry {
     publicEndpoint('/registries/overlays', 'generic::getOne', async (id, cb) => {
       const item = await AppDataSource.getRepository(Overlay).findOneBy({ id });
       if (item) {
-        cb(null, defaultValues(item));
+        const output = defaultValues(item);
+        output.items = updateGoalValues(output);
+        cb(null, output);
       } else {
         // try to find if id is part of group
         const items = await Overlay.find();
         for (const it of items) {
           if (it.items.map(o => o.id).includes(id)) {
-            return cb(null, defaultValues(it));
+            const output = defaultValues(it);
+            output.items = updateGoalValues(output);
+            return cb(null, output);
           }
         }
         cb(null, undefined);
