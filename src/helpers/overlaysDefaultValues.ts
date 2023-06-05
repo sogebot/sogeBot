@@ -263,10 +263,11 @@ const values = {
   },
   goal: {
     display: {
-      type:           'fade',
-      durationMs:     30000,
-      animationInMs:  1000,
-      animationOutMs: 1000,
+      type:                  'fade',
+      durationMs:            30000,
+      animationInMs:         1000,
+      animationOutMs:        1000,
+      spaceBetweenGoalsInPx: 1,
     },
     campaigns: [],
   },
