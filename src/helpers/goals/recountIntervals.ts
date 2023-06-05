@@ -71,4 +71,4 @@ setInterval(async () => {
   if (isBotStarted) {
     await recountIntervals();
   }
-}, (5 * MINUTE) / 5 / 60);
+}, (5 * MINUTE));
