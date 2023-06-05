@@ -42,7 +42,6 @@ const updateGoalValues = (output: Overlay) => {
   for (const item_ of output.items) {
     if (item_.opts.typeId === 'goal') {
       for (const campaign of (item_.opts as Goal).campaigns) {
-        console.log({ campaign });
         if (campaign.type === 'currentFollowers') {
           campaign.currentAmount = stats.value.currentFollowers;
         }
