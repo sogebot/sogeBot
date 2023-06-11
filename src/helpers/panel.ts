@@ -26,10 +26,6 @@ menu.push({
   category: 'main', name: 'dashboard', id: '', this: null,
 });
 
-menu.push({
-  category: 'stats', name: 'api-explorer', id: 'stats/api-explorer', this: null,
-});
-
 export let ioServer: io | null = null;
 export let app: express.Application | null = null;
 export let server: Server;
