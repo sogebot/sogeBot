@@ -244,7 +244,7 @@ class Google extends Service {
   }
 
   async prepareBroadcast() {
-    if (isStreamOnline.value) {
+    if (isStreamOnline.value || this.refreshToken === '') {
       return; // do nothing if already streaming
     }
     // we want to create new stream, private for now for archive purpose
