@@ -44,6 +44,8 @@ export class CustomAuthProvider extends RefreshingAuthProvider {
       });
       tokenData = createAccessTokenFromData(await response.json());
     }
+
+    debug('twitch.token', JSON.stringify({ tokenData }));
     return tokenData;
   }
 

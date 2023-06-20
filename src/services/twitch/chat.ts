@@ -92,24 +92,34 @@ class Chat {
         }, (duration * 1000) + 1000);
       }
     });
-    tmiEmitter.on('say', (channel, message, opts) => {
-      this.client.bot?.say(channel, message, opts);
+    tmiEmitter.on('say', async (channel, message, opts) => {
+      debug('emitter.say', JSON.stringify({ channel, message, opts }));
+      if (this.client.bot) {
+        await this.client.bot.say(channel, message, opts);
+      } else {
+        throw new Error('Bot client is not available.');
+      }
     });
     tmiEmitter.on('whisper', async (username, message) => {
+      debug('emitter.whisper', JSON.stringify({ username, message }));
       const userId = await users.getIdByName(username);
       sendWhisper(userId, message);
     });
     tmiEmitter.on('join', (type) => {
+      debug('emitter.join', JSON.stringify({ type }));
       const broadcasterUsername = variables.get('services.twitch.broadcasterUsername') as string;
       this.join(type, broadcasterUsername);
     });
     tmiEmitter.on('reconnect', (type) => {
+      debug('emitter.reconnect', JSON.stringify({ type }));
       this.reconnect(type);
     });
     tmiEmitter.on('delete', (msgId) => {
+      debug('emitter.delete', JSON.stringify({ msgId }));
       this.delete(msgId);
     });
     tmiEmitter.on('part', (type) => {
+      debug('emitter.part', JSON.stringify({ type }));
       this.part(type);
     });
   }
