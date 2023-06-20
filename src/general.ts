@@ -228,6 +228,8 @@ class General extends Core {
     const botId = variables.get('services.twitch.botId') as string;
     const broadcasterId = variables.get('services.twitch.broadcasterId') as string;
 
+    const twitch = (await import('./services/twitch')).default;
+
     const version = get(process, 'env.npm_package_version', 'x.y.z');
     const commitFile = existsSync('./.commit') ? readFileSync('./.commit').toString() : null;
     debug('*', '======= COPY DEBUG MESSAGE FROM HERE =======');
@@ -241,7 +243,7 @@ class General extends Core {
     debug('*', `SYSTEMS      | ${enabledSystems.systems.join(', ')}`);
     debug('*', `GAMES        | ${enabledSystems.games.join(', ')}`);
     debug('*', `INTEGRATIONS | ${enabledSystems.integrations.join(', ')}`);
-    debug('*', `OAUTH        | BOT ${botUsername}#${botId} | BROADCASTER ${broadcasterUsername}#${broadcasterId}`);
+    debug('*', `OAUTH        | BOT ${botUsername}#${botId} isConnected: ${twitch.tmi?.client.bot?.isConnected} | BROADCASTER ${broadcasterUsername}#${broadcasterId} isConnected: ${twitch.tmi?.client.broadcaster?.isConnected}`);
     debug('*', '======= END OF DEBUG MESSAGE =======');
     return [];
   }

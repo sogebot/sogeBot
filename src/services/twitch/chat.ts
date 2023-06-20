@@ -72,6 +72,17 @@ class Chat {
 
     this.initClient('bot');
     this.initClient('broadcaster');
+
+    setInterval(() => {
+      if (this.client.bot && !this.client.bot.isConnected) {
+        info(`TMI: Found bot disconnected from TMI, reconnecting.`);
+        this.client.bot.connect();
+      }
+      if (this.client.broadcaster && !this.client.broadcaster.isConnected) {
+        info(`TMI: Found broadcaster disconnected from TMI, reconnecting.`);
+        this.client.broadcaster.connect();
+      }
+    }, constants.MINUTE);
   }
 
   emitter() {
@@ -79,7 +90,9 @@ class Chat {
       setTimeout(() => this.emitter(), 10);
       return;
     }
+
     tmiEmitter.on('timeout', async (username, duration, is, reason) => {
+      debug('emitter.timeout', JSON.stringify({ username, duration, is, reason }));
       const userId = await users.getIdByName(username);
 
       banUser(userId, reason ?? '', duration);
@@ -94,6 +107,7 @@ class Chat {
     });
     tmiEmitter.on('say', async (channel, message, opts) => {
       debug('emitter.say', JSON.stringify({ channel, message, opts }));
+
       if (this.client.bot) {
         await this.client.bot.say(channel, message, opts);
       } else {
