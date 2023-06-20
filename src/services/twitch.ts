@@ -582,6 +582,21 @@ class Twitch extends Service {
     }
     return [{ response: translate('game.current').replace(/\$title/g, stats.value.currentGame || 'n/a'), ...opts }];
   }
+
+  @default_permission(defaultPermissions.CASTERS)
+  @command('!reconnect')
+  async reconnect() {
+    if (this.tmi) {
+      info('TMI: Triggering reconnect from chat');
+      this.tmi.shouldConnect = true;
+      this.tmi.reconnect('bot');
+      this.tmi.reconnect('broadcaster');
+    } else {
+      error('TMI: Not initialized');
+    }
+    return [];
+  }
+
 }
 
 export default new Twitch();
