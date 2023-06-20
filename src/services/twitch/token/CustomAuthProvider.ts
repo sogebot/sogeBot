@@ -2,6 +2,7 @@ import { MakeOptional } from '@d-fischer/shared-utils';
 import { UserIdResolvable, extractUserId } from '@twurple/api';
 import { RefreshingAuthProvider, AccessTokenWithUserId, AccessToken, refreshUserToken, accessTokenIsExpired, getTokenInfo, InvalidTokenError, InvalidTokenTypeError, TokenInfo } from '@twurple/auth';
 import fetch from 'node-fetch';
+import { debug } from '~/helpers/log';
 
 import { variables } from '~/watchers';
 
