@@ -2,18 +2,27 @@
 
 import { error } from 'console';
 
+import { app } from '@sogebot/backend/src/helpers/panel';
+import { adminMiddleware } from '@sogebot/backend/src/socket';
 import { DAY, MINUTE } from '@sogebot/ui-helpers/constants';
 import { isNil } from 'lodash';
 import { LessThan } from 'typeorm';
-import { AppDataSource } from '~/database';
-
+import songs from '~/systems/songs';
+import lastfm from '~/integrations/lastfm';
+import spotify from '~/integrations/spotify';
 import Core from '~/_interface';
+import { AppDataSource } from '~/database';
 import { TwitchStats, TwitchStatsInterface } from '~/database/entity/twitch';
 import { persistent } from '~/decorators';
 import { onStreamStart } from '~/decorators/on';
-import { stats } from '~/helpers/api';
 import { debug } from '~/helpers/log';
-import { adminEndpoint } from '~/helpers/socket';
+import translateLib, { translate } from '~/translate';
+import { variables } from '~/watchers';
+import {
+  chatMessagesAtStart, isStreamOnline, rawStatus, stats, streamStatusChangeSince,
+} from '~/helpers/api';
+import { linesParsed } from '~/helpers/parser';
+import _ from 'lodash';
 
 class Stats extends Core {
   @persistent()
@@ -34,7 +43,54 @@ class Stats extends Core {
   }
 
   sockets() {
-    adminEndpoint('/', 'getLatestStats', async function (cb) {
+    if (!app) {
+      setTimeout(() => this.sockets(), 100);
+      return;
+    }
+
+    app.get('/api/stats/current', adminMiddleware, async (req, res) => {
+      try {
+        if (!translateLib.isLoaded) {
+          throw new Error('Translation not yet loaded');
+        }
+
+        const ytCurrentSong = Object.values(songs.isPlaying).find(o => o) ? _.get(JSON.parse(songs.currentSong), 'title', null) : null;
+        let spotifyCurrentSong: null | string = _.get(JSON.parse(spotify.currentSong), 'song', '') + ' - ' + _.get(JSON.parse(spotify.currentSong), 'artist', '');
+        if (spotifyCurrentSong.trim().length === 1 /* '-' */  || !_.get(JSON.parse(spotify.currentSong), 'is_playing', false)) {
+          spotifyCurrentSong = null;
+        }
+
+        const broadcasterType = variables.get('services.twitch.broadcasterType') as string;
+        const data = {
+          broadcasterType:    broadcasterType,
+          uptime:             isStreamOnline.value ? streamStatusChangeSince.value : null,
+          currentViewers:     stats.value.currentViewers,
+          currentSubscribers: stats.value.currentSubscribers,
+          currentBits:        stats.value.currentBits,
+          currentTips:        stats.value.currentTips,
+          chatMessages:       isStreamOnline.value ? linesParsed - chatMessagesAtStart.value : 0,
+          currentFollowers:   stats.value.currentFollowers,
+          maxViewers:         stats.value.maxViewers,
+          newChatters:        stats.value.newChatters,
+          game:               stats.value.currentGame,
+          status:             stats.value.currentTitle,
+          rawStatus:          rawStatus.value,
+          currentSong:        lastfm.currentSong || ytCurrentSong || spotifyCurrentSong || translate('songs.not-playing'),
+          currentWatched:     stats.value.currentWatchedTime,
+          tags:               stats.value.currentTags ?? [],
+        };
+        res.send(data);
+      } catch (e: any) {
+        if (e instanceof Error) {
+          if (e.message !== 'Translation not yet loaded') {
+            error(e);
+            res.status(500).send(e.message);
+          }
+        }
+      }
+    });
+
+    app.get('/api/stats/latest', adminMiddleware, async (req, res) => {
       try {
         // cleanup
         AppDataSource.getRepository(TwitchStats).delete({ 'whenOnline': LessThan(Date.now() - (DAY * 31)) });
@@ -75,15 +131,15 @@ class Stats extends Core {
           statsToReturn.maxViewers = Number(Number(statsToReturn.maxViewers / statsFromDb.length).toFixed(0));
           statsToReturn.newChatters = Number(Number(statsToReturn.newChatters / statsFromDb.length).toFixed(0));
           statsToReturn.currentWatched = Number(Number(statsToReturn.currentWatched / statsFromDb.length).toFixed(0));
-          cb(null, {
+          res.send({
             ...statsToReturn, currentFollowers: _self.currentFollowers, currentSubscribers: _self.currentSubscribers,
           });
         } else {
-          cb(null, {});
+          res.status(204).send();
         }
       } catch (e: any) {
         error(e);
-        cb(e.stack, {});
+        res.status(500).send();
       }
     });
   }

@@ -92,7 +92,6 @@ export type ClientToServerEventsWithNamespace = {
     'responses.revert': (data: { name: string }, cb: () => void) => void,
     'api.stats': (data: { code: number, remaining: number | string, data: string}) => void,
     'translations': (cb: (lang: Record<string, any>) => void) => void,
-    'panel::stats': (cb: (data: Record<string, any>) => void) => void,
     'version': (cb: (version: string) => void) => void,
     'debug::get': (cb: (error: Error | string | null, debug: string) => void) => void,
     'debug::set': (debug: string, cb: (error: Error | string | null) => void) => void,

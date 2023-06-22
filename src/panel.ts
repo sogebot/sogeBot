@@ -22,9 +22,6 @@ import { User } from '~/database/entity/user';
 import { AppDataSource } from '~/database.js';
 import { onStartup } from '~/decorators/on';
 import { schema } from '~/graphql/schema';
-import {
-  chatMessagesAtStart, isStreamOnline, rawStatus, stats, streamStatusChangeSince,
-} from '~/helpers/api';
 import { getOwnerAsSender } from '~/helpers/commons/getOwnerAsSender';
 import {
   getURL, getValueOf, isVariableSet, postURL,
@@ -34,7 +31,6 @@ import { flatten } from '~/helpers/flatten';
 import { setValue } from '~/helpers/general';
 import { getLang } from '~/helpers/locales';
 import {
-  error,
   getDEBUG, info, setDEBUG,
 } from '~/helpers/log';
 import {
@@ -42,20 +38,17 @@ import {
 } from '~/helpers/panel';
 import { errors, warns } from '~/helpers/panel/alerts';
 import { socketsConnectedDec, socketsConnectedInc } from '~/helpers/panel/index';
-import { linesParsed, status as statusObj } from '~/helpers/parser';
+import { status as statusObj } from '~/helpers/parser';
 import { list } from '~/helpers/register';
 import { adminEndpoint } from '~/helpers/socket';
 import { tmiEmitter } from '~/helpers/tmi';
 import * as changelog from '~/helpers/user/changelog.js';
-import lastfm from '~/integrations/lastfm';
-import spotify from '~/integrations/spotify';
 import Parser from '~/parser';
 import { getGameThumbnailFromName } from '~/services/twitch/calls/getGameThumbnailFromName.js';
 import { sendGameFromTwitch } from '~/services/twitch/calls/sendGameFromTwitch';
 import { updateChannelInfo } from '~/services/twitch/calls/updateChannelInfo.js';
 import { processAuth, default as socketSystem } from '~/socket';
 import highlights from '~/systems/highlights';
-import songs from '~/systems/songs';
 import translateLib, { translate } from '~/translate';
 import { variables } from '~/watchers';
 
@@ -79,7 +72,6 @@ class Panel extends Core {
   onStartup() {
     this.init();
     this.expose();
-    sendStreamData();
   }
 
   expose () {
@@ -583,48 +575,6 @@ export const getServer = function () {
 
 export const getApp = function () {
   return app;
-};
-
-const sendStreamData = async () => {
-  try {
-    if (!translateLib.isLoaded) {
-      throw new Error('Translation not yet loaded');
-    }
-
-    const ytCurrentSong = Object.values(songs.isPlaying).find(o => o) ? _.get(JSON.parse(songs.currentSong), 'title', null) : null;
-    let spotifyCurrentSong: null | string = _.get(JSON.parse(spotify.currentSong), 'song', '') + ' - ' + _.get(JSON.parse(spotify.currentSong), 'artist', '');
-    if (spotifyCurrentSong.trim().length === 1 /* '-' */  || !_.get(JSON.parse(spotify.currentSong), 'is_playing', false)) {
-      spotifyCurrentSong = null;
-    }
-
-    const broadcasterType = variables.get('services.twitch.broadcasterType') as string;
-    const data = {
-      broadcasterType:    broadcasterType,
-      uptime:             isStreamOnline.value ? streamStatusChangeSince.value : null,
-      currentViewers:     stats.value.currentViewers,
-      currentSubscribers: stats.value.currentSubscribers,
-      currentBits:        stats.value.currentBits,
-      currentTips:        stats.value.currentTips,
-      chatMessages:       isStreamOnline.value ? linesParsed - chatMessagesAtStart.value : 0,
-      currentFollowers:   stats.value.currentFollowers,
-      maxViewers:         stats.value.maxViewers,
-      newChatters:        stats.value.newChatters,
-      game:               stats.value.currentGame,
-      status:             stats.value.currentTitle,
-      rawStatus:          rawStatus.value,
-      currentSong:        lastfm.currentSong || ytCurrentSong || spotifyCurrentSong || translate('songs.not-playing'),
-      currentWatched:     stats.value.currentWatchedTime,
-      tags:               stats.value.currentTags ?? [],
-    };
-    ioServer?.emit('panel::stats', data);
-  } catch (e: any) {
-    if (e instanceof Error) {
-      if (e.message !== 'Translation not yet loaded') {
-        error(e);
-      }
-    }
-  }
-  setTimeout(async () => await sendStreamData(), 1000);
 };
 
 export default new Panel();
