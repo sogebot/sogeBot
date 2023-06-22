@@ -1,6 +1,7 @@
 {
   "upgrade": true,
   "reject": [
-    "graphql"
+    "strip-ansi",
+    "chalk"
   ]
 }
