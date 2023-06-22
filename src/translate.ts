@@ -2,8 +2,9 @@
 
 import fs from 'fs';
 
-import glob from 'glob';
+import { glob } from 'glob';
 import _  from 'lodash';
+import { normalize } from 'path';
 import { AppDataSource } from '~/database';
 
 import { Settings } from '~/database/entity/settings';
@@ -45,17 +46,14 @@ class Translate {
           setLang(JSON.parse(lang.value));
         }
 
-        glob('./locales/**', (err, files) => {
-          if (err) {
-            return reject(err);
-          }
+        glob('./locales/**').then((files) => {
           for (const f of files) {
             if (!f.endsWith('.json')) {
               continue;
             }
-            const withoutLocales = f.replace('./locales/', '').replace('.json', '');
+            const withoutLocales = normalize(f).replace('locales\\', '').replace('.json', '');
             try {
-              _.set(this.translations, withoutLocales.split('/').join('.'), JSON.parse(fs.readFileSync(f, 'utf8')));
+              _.set(this.translations, withoutLocales.split('\\').join('.'), JSON.parse(fs.readFileSync(f, 'utf8')));
             } catch (e: any) {
               error('Incorrect JSON file: ' + f);
               error(e.stack);
@@ -100,6 +98,7 @@ class Translate {
     if (_.isUndefined(translate_class.translations[getLang()]) && !_.isUndefined(text)) {
       return '{missing_translation: ' + getLang() + '.' + String(text) + '}';
     } else if (typeof text === 'object') {
+      console.log(_.cloneDeep(translate_class.translations)[getLang()], text.root);
       const t = _.cloneDeep(translate_class.translations)[getLang()][text.root];
       for (const c of translate_class.custom) {
         t[c.name.replace(`${text.root}.`, '')] = c.value;

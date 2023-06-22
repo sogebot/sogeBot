@@ -1,9 +1,9 @@
 import { MakeOptional } from '@d-fischer/shared-utils';
 import { UserIdResolvable, extractUserId } from '@twurple/api';
 import { RefreshingAuthProvider, AccessTokenWithUserId, AccessToken, refreshUserToken, accessTokenIsExpired, getTokenInfo, InvalidTokenError, InvalidTokenTypeError, TokenInfo } from '@twurple/auth';
-import fetch from 'node-fetch';
-import { debug } from '~/helpers/log';
+import axios from 'axios';
 
+import { debug } from '~/helpers/log';
 import { variables } from '~/watchers';
 
 const urls = {
@@ -35,15 +35,14 @@ export class CustomAuthProvider extends RefreshingAuthProvider {
       // we are using own generator
       const generalOwners = variables.get('services.twitch.generalOwners') as string[];
       const channel = variables.get('services.twitch.broadcasterUsername') as string;
-      const response = await fetch(url + encodeURIComponent(refreshToken.trim()), {
-        timeout: 120000,
-        method:  'POST',
+      const response = await axios.post(url + encodeURIComponent(refreshToken.trim()), undefined, {
         headers: {
           'SogeBot-Channel': channel,
           'SogeBot-Owners':  generalOwners.join(', '),
         },
+        timeout: 120000,
       });
-      tokenData = createAccessTokenFromData(await response.json());
+      tokenData = createAccessTokenFromData(response.data);
     }
 
     debug('twitch.token', JSON.stringify({ tokenData }));

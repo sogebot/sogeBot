@@ -2,9 +2,7 @@
   "upgrade": true,
   "reject": [
     "strip-ansi",
-    "mocha",
     "chalk",
-    "node-fetch",
-    "graphql"
+    "node-fetch"
   ]
 }

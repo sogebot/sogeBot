@@ -1,27 +1,12 @@
-import {
-  Field, ID, InputType, ObjectType,
-} from 'type-graphql';
 import { EntitySchema } from 'typeorm';
 
 import { ColumnNumericTransformer } from './_transformer';
 
-@ObjectType()
 export class WidgetCustomInterface {
-  @Field(type => ID)
-    id: string;
-  @Field()
-    userId: string;
-  @Field()
-    url: string;
-  @Field()
-    name: string;
-}
-@InputType()
-export class WidgetCustomInput {
-  @Field()
-    url: string;
-  @Field()
-    name: string;
+  id: string;
+  userId: string;
+  url: string;
+  name: string;
 }
 
 export const WidgetCustom = new EntitySchema<Readonly<Required<WidgetCustomInterface>>>({
@@ -37,24 +22,15 @@ export const WidgetCustom = new EntitySchema<Readonly<Required<WidgetCustomInter
   },
 });
 
-@ObjectType()
 export class WidgetSocialInterface {
-  @Field(type => ID)
-    id: string;
-  @Field()
-    type: string;
-  @Field()
-    hashtag: string;
-  @Field()
-    text: string;
-  @Field()
-    username: string;
-  @Field()
-    displayname: string;
-  @Field()
-    url: string;
-  @Field()
-    timestamp: number;
+  id: string;
+  type: string;
+  hashtag: string;
+  text: string;
+  username: string;
+  displayname: string;
+  url: string;
+  timestamp: number;
 }
 
 export const WidgetSocial = new EntitySchema<Readonly<Required<WidgetSocialInterface>>>({

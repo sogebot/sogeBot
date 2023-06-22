@@ -32,7 +32,7 @@ export const getAccessTokenInMigration = async (queryRunner: QueryRunner, type: 
       method: 'POST',
     });
     if (response.ok) {
-      const data = await response.json();
+      const data = await response.json() as { access_token: string };
       accessToken = data.access_token;
       return data.access_token;
     } else {

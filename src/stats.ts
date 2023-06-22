@@ -2,27 +2,28 @@
 
 import { error } from 'console';
 
-import { app } from '@sogebot/backend/src/helpers/panel';
-import { adminMiddleware } from '@sogebot/backend/src/socket';
 import { DAY, MINUTE } from '@sogebot/ui-helpers/constants';
 import { isNil } from 'lodash';
+import _ from 'lodash';
 import { LessThan } from 'typeorm';
-import songs from '~/systems/songs';
-import lastfm from '~/integrations/lastfm';
-import spotify from '~/integrations/spotify';
+
 import Core from '~/_interface';
 import { AppDataSource } from '~/database';
 import { TwitchStats, TwitchStatsInterface } from '~/database/entity/twitch';
 import { persistent } from '~/decorators';
 import { onStreamStart } from '~/decorators/on';
-import { debug } from '~/helpers/log';
-import translateLib, { translate } from '~/translate';
-import { variables } from '~/watchers';
 import {
   chatMessagesAtStart, isStreamOnline, rawStatus, stats, streamStatusChangeSince,
 } from '~/helpers/api';
+import { debug } from '~/helpers/log';
+import { app } from '~/helpers/panel';
 import { linesParsed } from '~/helpers/parser';
-import _ from 'lodash';
+import lastfm from '~/integrations/lastfm';
+import spotify from '~/integrations/spotify';
+import { adminMiddleware } from '~/socket';
+import songs from '~/systems/songs';
+import translateLib, { translate } from '~/translate';
+import { variables } from '~/watchers';
 
 class Stats extends Core {
   @persistent()
@@ -48,7 +49,7 @@ class Stats extends Core {
       return;
     }
 
-    app.get('/api/stats/current', adminMiddleware, async (req, res) => {
+    app.get('/api/stats/current', adminMiddleware, async (__, res) => {
       try {
         if (!translateLib.isLoaded) {
           throw new Error('Translation not yet loaded');
@@ -90,7 +91,7 @@ class Stats extends Core {
       }
     });
 
-    app.get('/api/stats/latest', adminMiddleware, async (req, res) => {
+    app.get('/api/stats/latest', adminMiddleware, async (__, res) => {
       try {
         // cleanup
         AppDataSource.getRepository(TwitchStats).delete({ 'whenOnline': LessThan(Date.now() - (DAY * 31)) });
