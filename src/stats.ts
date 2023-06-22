@@ -2,8 +2,6 @@
 
 import { error } from 'console';
 
-import { app } from './helpers/panel';
-import { adminMiddleware } from './socket';
 import { DAY, MINUTE } from '@sogebot/ui-helpers/constants';
 import { isNil } from 'lodash';
 import _ from 'lodash';
@@ -18,9 +16,11 @@ import {
   chatMessagesAtStart, isStreamOnline, rawStatus, stats, streamStatusChangeSince,
 } from '~/helpers/api';
 import { debug } from '~/helpers/log';
+import { app } from '~/helpers/panel';
 import { linesParsed } from '~/helpers/parser';
 import lastfm from '~/integrations/lastfm';
 import spotify from '~/integrations/spotify';
+import { adminMiddleware } from '~/socket';
 import songs from '~/systems/songs';
 import translateLib, { translate } from '~/translate';
 import { variables } from '~/watchers';
