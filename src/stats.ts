@@ -2,8 +2,8 @@
 
 import { error } from 'console';
 
-import { app } from '@sogebot/backend/src/helpers/panel';
-import { adminMiddleware } from '@sogebot/backend/src/socket';
+import { app } from './helpers/panel';
+import { adminMiddleware } from './socket';
 import { DAY, MINUTE } from '@sogebot/ui-helpers/constants';
 import { isNil } from 'lodash';
 import _ from 'lodash';
