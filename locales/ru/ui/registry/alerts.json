@@ -45,7 +45,7 @@
     "help": "Слова должны быть разделены запятыми."
   },
   "event": {
-    "follow": "Follow",
+    "follow": "Отслеживать",
     "cheer": "Cheer",
     "sub": "Sub",
     "resub": "Resub",
@@ -53,7 +53,7 @@
     "subcommunitygift": "Subgift to community",
     "tip": "Tip",
     "raid": "Raid",
-    "custom": "Custom",
+    "custom": "Пользовательский",
     "promo": "Promo",
     "rewardredeem": "Reward Redeem"
   },
