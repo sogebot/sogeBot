@@ -1,4 +1,4 @@
-import { defaultPermissions } from '../../../dest/helpers/permissions/defaultPermissions';
+const { defaultPermissions } = require ('../../../dest/helpers/permissions/defaultPermissions');
 
 require('../../general.js');
 
@@ -7,10 +7,12 @@ const message = require('../../general.js').message;
 const user = require('../../general.js').user;
 
 const assert = require('assert');
+
 const _ = require('lodash');
 const axios = require('axios');
 
 const { Variable } = require('../../../dest/database/entity/variable');
+
 const { v4 } = require('uuid');
 
 // stub

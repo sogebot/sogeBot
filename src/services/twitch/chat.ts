@@ -106,6 +106,9 @@ class Chat {
       }
     });
     tmiEmitter.on('say', async (channel, message, opts) => {
+      if ((global as any).mocha) {
+        return;
+      }
       debug('emitter.say', JSON.stringify({ channel, message, opts }));
 
       if (this.client.bot) {
