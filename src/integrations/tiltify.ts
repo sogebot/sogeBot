@@ -105,7 +105,7 @@ class Tiltify extends Integration {
         'Authorization': `Bearer ${this.access_token}`,
       },
     });
-    this.campaigns = (await response.json()).data;
+    this.campaigns = (await response.json() as any).data;
   }
 
   async getDonations() {
@@ -115,7 +115,7 @@ class Tiltify extends Integration {
           'Authorization': `Bearer ${this.access_token}`,
         },
       });
-      const data = (await response.json()).data as {
+      const data = (await response.json() as any).data as {
         'id': number,
         'amount': number,
         'name': string,
@@ -178,7 +178,7 @@ class Tiltify extends Integration {
       });
 
       if (response.ok) {
-        const user = await response.json();
+        const user = await response.json() as any;
         this.userName = user.data.username;
         this.userId = user.data.id;
         info(`TILTIFY: Logged in as ${this.userName}#${this.userId}.`);
