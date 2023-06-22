@@ -2,7 +2,7 @@
 
 import fs from 'fs';
 
-import glob from 'glob';
+import { glob } from 'glob';
 import _  from 'lodash';
 import { AppDataSource } from '~/database';
 
@@ -45,10 +45,7 @@ class Translate {
           setLang(JSON.parse(lang.value));
         }
 
-        glob('./locales/**', (err, files) => {
-          if (err) {
-            return reject(err);
-          }
+        glob('./locales/**').then((files) => {
           for (const f of files) {
             if (!f.endsWith('.json')) {
               continue;
