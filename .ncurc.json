@@ -2,6 +2,7 @@
   "upgrade": true,
   "reject": [
     "strip-ansi",
-    "chalk"
+    "chalk",
+    "node-fetch"
   ]
 }
