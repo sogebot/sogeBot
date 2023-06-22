@@ -1,12 +1,12 @@
 'use strict';
 
 import fs from 'fs';
+import { normalize } from 'path';
 
 import { glob } from 'glob';
 import _  from 'lodash';
-import { normalize } from 'path';
-import { AppDataSource } from '~/database';
 
+import { AppDataSource } from '~/database';
 import { Settings } from '~/database/entity/settings';
 import { Translation } from '~/database/entity/translation';
 import { areDecoratorsLoaded } from '~/decorators';
@@ -51,9 +51,9 @@ class Translate {
             if (!f.endsWith('.json')) {
               continue;
             }
-            const withoutLocales = normalize(f).replace('locales\\', '').replace('.json', '');
+            const withoutLocales = normalize(f).replace(/\\/g, '/').replace('locales/', '').replace('.json', '');
             try {
-              _.set(this.translations, withoutLocales.split('\\').join('.'), JSON.parse(fs.readFileSync(f, 'utf8')));
+              _.set(this.translations, withoutLocales.split('/').join('.'), JSON.parse(fs.readFileSync(f, 'utf8')));
             } catch (e: any) {
               error('Incorrect JSON file: ' + f);
               error(e.stack);
