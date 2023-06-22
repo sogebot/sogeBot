@@ -98,7 +98,6 @@ class Translate {
     if (_.isUndefined(translate_class.translations[getLang()]) && !_.isUndefined(text)) {
       return '{missing_translation: ' + getLang() + '.' + String(text) + '}';
     } else if (typeof text === 'object') {
-      console.log(_.cloneDeep(translate_class.translations)[getLang()], text.root);
       const t = _.cloneDeep(translate_class.translations)[getLang()][text.root];
       for (const c of translate_class.custom) {
         t[c.name.replace(`${text.root}.`, '')] = c.value;
