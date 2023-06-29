@@ -1,5 +1,6 @@
 import { Column, Entity, PrimaryColumn } from 'typeorm';
 
+import { Alert } from './alert';
 import { BotEntity } from '../BotEntity';
 
 export interface Reference {
@@ -174,49 +175,38 @@ export interface Countdown {
   }
 }
 
+type CreditsScreenLastGame = {
+  type: 'lastGame',
+};
+type CreditsScreenEvents = {
+  type: 'events',
+  columns: number,
+  excludeEvents: Alert['items'][number]['type'][]
+};
+type CreditsScreenText = {
+  type: 'text',
+  html: string,
+  css: string,
+};
+type CreditsScreenSocial = {
+  type: 'social',
+  items: {
+    type: string, text: string;
+  }[]
+};
+type CreditsScreenClips = {
+  type: 'clips',
+  play: boolean,
+  period: 'custom' | 'stream',
+  periodValue: number,
+  numOfClips: number,
+  volume: number,
+};
 export interface Credits {
   typeId: 'credits';
-  social: {
-    type: string, text: string;
-  }[],
+  spaceBetweenScreens: number | 'full-screen-between' | 'none';
   speed: 'very slow' | 'slow' | 'medium' | 'fast' | 'very fast',
-  customTexts: {
-    type: 'bigHeader' | 'header' | 'text' | 'smallText' | 'separator',
-    left: string,
-    middle: string,
-    right: string,
-  }[],
-  clips: {
-    play: boolean,
-    period: 'custom' | 'stream',
-    periodValue: number,
-    numOfClips: number,
-    volume: number,
-  },
-  text:  {
-    lastMessage:      string,
-    lastSubMessage:   string,
-    streamBy:         string,
-    follow:           string,
-    raid:             string,
-    cheer:            string,
-    sub:              string,
-    resub:            string,
-    subgift:          string,
-    subcommunitygift: string,
-    tip:              string,
-  },
-  show: {
-    follow:           boolean,
-    raid:             boolean,
-    sub:              boolean,
-    subgift:          boolean,
-    subcommunitygift: boolean,
-    resub:            boolean,
-    cheer:            boolean,
-    clips:            boolean,
-    tip:              boolean,
-  }
+  screens: (CreditsScreenText | CreditsScreenClips | CreditsScreenSocial | CreditsScreenEvents | CreditsScreenLastGame)[],
 }
 export interface Eventlist {
   typeId: 'eventlist';
@@ -480,7 +470,7 @@ export class Overlay extends BotEntity<Overlay> {
     URL | Chat | Reference | AlertsRegistry | Carousel | Marathon | Stopwatch |
     Countdown | Group | Eventlist | EmotesCombo | Credits | Clips | Alerts |
     Emotes | EmotesExplode | EmotesFireworks | Polls | TTS | OBSWebsocket |
-    ClipsCarousel | HypeTrain | Wordcloud | HTML | Stats | Randomizer | Goal;
+    ClipsCarousel | HypeTrain | Wordcloud | HTML | Stats | Randomizer | Goal | Credits;
   }[];
 }
 
