@@ -175,39 +175,58 @@ export interface Countdown {
   }
 }
 
-type CreditsScreenLastGame = {
-  type: 'lastGame',
+type CreditsCommonOptions = {
+  id: string;
+  /** wait at the end of the screen roll */
+  waitBetweenScreens: null | number ;
+  /** specifies space between screens
+   * - number is pixels
+   * - full-screen-between is height of the visible part
+   * - none shows next screen immediately
+  */
+  spaceBetweenScreens: null | number | 'full-screen-between' | 'none';
+  /** speed of rolling */
+  speed: null | 'very slow' | 'slow' | 'medium' | 'fast' | 'very fast',
 };
-type CreditsScreenEvents = {
+// expands object types recursively
+type ExpandRecursively<T> = T extends object
+  ? T extends infer O ? { [K in keyof O]: ExpandRecursively<O[K]> } : never
+  : T;
+type RemoveNull<T> = {
+  [K in keyof T]: NonNullable<T[K]>;
+};
+type CreditsScreenTitle = ExpandRecursively<{
+  type: 'title',
+  height: number;
+} & CreditsCommonOptions>;
+type CreditsScreenEvents = ExpandRecursively<{
   type: 'events',
   columns: number,
   excludeEvents: Alert['items'][number]['type'][]
-};
-type CreditsScreenText = {
+} & CreditsCommonOptions>;
+type CreditsScreenText = ExpandRecursively<{
   type: 'text',
   html: string,
   css: string,
-};
-type CreditsScreenSocial = {
+} & CreditsCommonOptions>;
+type CreditsScreenSocial = ExpandRecursively<{
   type: 'social',
   items: {
     type: string, text: string;
   }[]
-};
-type CreditsScreenClips = {
+} & CreditsCommonOptions>;
+type CreditsScreenClips = ExpandRecursively<{
   type: 'clips',
   play: boolean,
   period: 'custom' | 'stream',
   periodValue: number,
   numOfClips: number,
   volume: number,
-};
-export interface Credits {
+} & CreditsCommonOptions>;
+export type Credits = ExpandRecursively<{
   typeId: 'credits';
-  spaceBetweenScreens: number | 'full-screen-between' | 'none';
-  speed: 'very slow' | 'slow' | 'medium' | 'fast' | 'very fast',
-  screens: (CreditsScreenText | CreditsScreenClips | CreditsScreenSocial | CreditsScreenEvents | CreditsScreenLastGame)[],
-}
+  screens: (CreditsScreenText | CreditsScreenClips | CreditsScreenSocial | CreditsScreenEvents | CreditsScreenTitle)[],
+} & RemoveNull<Exclude<CreditsCommonOptions, 'id'>>>;
 export interface Eventlist {
   typeId: 'eventlist';
   count: number,

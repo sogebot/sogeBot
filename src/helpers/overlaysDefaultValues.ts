@@ -91,7 +91,8 @@ const values = {
   },
   credits: {
     speed:               'medium',
-    spaceBetweenScreens: 50,
+    spaceBetweenScreens: 250,
+    waitBetweenScreens:  0,
     screens:             [],
   },
   eventlist: {
