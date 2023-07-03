@@ -3,6 +3,29 @@ import { Column, Entity, PrimaryColumn } from 'typeorm';
 import { Alert } from './alert';
 import { BotEntity } from '../BotEntity';
 
+// expands object types recursively
+type ExpandRecursively<T> = T extends object
+  ? T extends infer O ? { [K in keyof O]: ExpandRecursively<O[K]> } : never
+  : T;
+type RemoveNull<T> = {
+  [K in keyof T]: NonNullable<T[K]>;
+};
+type Font = {
+  family: string;
+  size: number;
+  borderPx: number;
+  borderColor: string;
+  weight: number;
+  color: string;
+  shadow: {
+    shiftRight: number;
+    shiftDown: number;
+    blur: number;
+    opacity: number;
+    color: string;
+  }[];
+};
+
 export interface Reference {
   typeId: 'reference',
   overlayId: string;
@@ -29,21 +52,7 @@ export interface Chat {
   customEmoteSize: number;
   useCustomSpaceBetweenMessages: boolean;
   customSpaceBetweenMessages: number;
-  font: {
-    family: string;
-    size: number;
-    borderPx: number;
-    borderColor: string;
-    weight: number;
-    color: string;
-    shadow: {
-      shiftRight: number;
-      shiftDown: number;
-      blur: number;
-      opacity: number;
-      color: string;
-    }[];
-  }
+  font: Font
 }
 
 export interface Marathon {
@@ -83,21 +92,7 @@ export interface Marathon {
       time: number;
     },
   }
-  marathonFont: {
-    family: string;
-    size: number;
-    borderPx: number;
-    borderColor: string;
-    weight: number;
-    color: string;
-    shadow: {
-      shiftRight: number;
-      shiftDown: number;
-      blur: number;
-      opacity: number;
-      color: string;
-    }[];
-  }
+  marathonFont: Font
 }
 
 export interface Stopwatch {
@@ -106,21 +101,7 @@ export interface Stopwatch {
   isPersistent: boolean;
   isStartedOnSourceLoad: boolean;
   showMilliseconds: boolean;
-  stopwatchFont: {
-    family: string;
-    size: number;
-    borderPx: number;
-    borderColor: string;
-    weight: number;
-    color: string;
-    shadow: {
-      shiftRight: number;
-      shiftDown: number;
-      blur: number;
-      opacity: number;
-      color: string;
-    }[];
-  }
+  stopwatchFont: Font
 }
 
 export interface Wordcloud {
@@ -143,39 +124,11 @@ export interface Countdown {
   messageWhenReachedZero: string;
   showMessageWhenReachedZero: boolean;
   showMilliseconds: boolean;
-  countdownFont: {
-    family: string;
-    size: number;
-    borderPx: number;
-    borderColor: string;
-    weight: number;
-    color: string;
-    shadow: {
-      shiftRight: number;
-      shiftDown: number;
-      blur: number;
-      opacity: number;
-      color: string;
-    }[];
-  }
-  messageFont: {
-    family: string;
-    size: number;
-    borderPx: number;
-    borderColor: string;
-    weight: number;
-    color: string;
-    shadow: {
-      shiftRight: number;
-      shiftDown: number;
-      blur: number;
-      opacity: number;
-      color: string;
-    }[];
-  }
+  countdownFont: Font
+  messageFont: Font
 }
 
-type CreditsCommonOptions = {
+type CreditsScreenOptions = {
   id: string;
   /** wait at the end of the screen roll */
   waitBetweenScreens: null | number ;
@@ -187,34 +140,22 @@ type CreditsCommonOptions = {
   spaceBetweenScreens: null | number | 'full-screen-between' | 'none';
   /** speed of rolling */
   speed: null | 'very slow' | 'slow' | 'medium' | 'fast' | 'very fast',
+  name: string,
 };
-// expands object types recursively
-type ExpandRecursively<T> = T extends object
-  ? T extends infer O ? { [K in keyof O]: ExpandRecursively<O[K]> } : never
-  : T;
-type RemoveNull<T> = {
-  [K in keyof T]: NonNullable<T[K]>;
-};
-type CreditsScreenTitle = ExpandRecursively<{
-  type: 'title',
+type CreditsCommonOptions = {
+  id: string;
+  width: number;
   height: number;
-} & CreditsCommonOptions>;
+  alignX: number;
+  alignY: number;
+  rotation: number;
+};
 type CreditsScreenEvents = ExpandRecursively<{
   type: 'events',
+  name: string,
   columns: number,
   excludeEvents: Alert['items'][number]['type'][]
-} & CreditsCommonOptions>;
-type CreditsScreenText = ExpandRecursively<{
-  type: 'text',
-  html: string,
-  css: string,
-} & CreditsCommonOptions>;
-type CreditsScreenSocial = ExpandRecursively<{
-  type: 'social',
-  items: {
-    type: string, text: string;
-  }[]
-} & CreditsCommonOptions>;
+} & CreditsScreenOptions>;
 type CreditsScreenClips = ExpandRecursively<{
   type: 'clips',
   play: boolean,
@@ -222,11 +163,23 @@ type CreditsScreenClips = ExpandRecursively<{
   periodValue: number,
   numOfClips: number,
   volume: number,
-} & CreditsCommonOptions>;
+} & CreditsScreenOptions>;
+
+export type CreditsScreenCustom = ExpandRecursively<{
+  type: 'custom',
+  items: ExpandRecursively<{
+    css: string,
+    html: string,
+    font: ExpandRecursively<Font & {
+      align: 'left' | 'center' | 'right';
+    }>,
+  } & CreditsCommonOptions>[]
+} & CreditsScreenOptions>;
 export type Credits = ExpandRecursively<{
   typeId: 'credits';
-  screens: (CreditsScreenText | CreditsScreenClips | CreditsScreenSocial | CreditsScreenEvents | CreditsScreenTitle)[],
-} & RemoveNull<Exclude<CreditsCommonOptions, 'id'>>>;
+  screens: (ExpandRecursively<CreditsScreenCustom | CreditsScreenEvents | CreditsScreenClips>)[],
+} & RemoveNull<Exclude<CreditsScreenOptions, 'id'>>>;
+
 export interface Eventlist {
   typeId: 'eventlist';
   count: number,
