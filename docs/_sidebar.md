@@ -9,6 +9,7 @@
   * [Google](/services/google.md)
 * Systems
   * [Alias](/systems/alias.md)
+  * [Bets](/systems/bets.md)
   * [Commercial](/systems/commercial.md)
   * [Permissions](/systems/permissions.md)
   * [Custom Commands](/systems/custom-commands.md)
@@ -31,7 +32,6 @@
   * [Quotes](/systems/quotes.md)
   * [Miscellaneous](/systems/miscellaneous.md)
 * Games
-  * [Bets](/games/bets.md)
   * [Duel](/games/duel.md)
   * [FightMe](/games/fightme.md)
   * [Gamble](/games/gamble.md)
