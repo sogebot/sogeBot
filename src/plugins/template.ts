@@ -51,8 +51,7 @@ export async function template(message: string, params: Record<string, any>, use
 
   const variables = await getGlobalVariables(message, { sender: userstate });
   for (const variable of Object.keys(variables)) {
-    const regexp2 = new RegExp(`\\${variable}`, 'g');
-    message = message.replace(regexp2, String(variables[variable as keyof typeof variables] ?? ''));
+    message = message.replaceAll(variable, String(variables[variable as keyof typeof variables] ?? ''));
   }
 
   if (userstate) {

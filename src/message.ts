@@ -48,8 +48,7 @@ class Message {
 
     const variables = await getGlobalVariables(this.message, opts);
     for (const variable of Object.keys(variables)) {
-      const regexp = new RegExp(`\\${variable}`, 'g');
-      this.message = this.message.replace(regexp, String(variables[variable as keyof typeof variables] ?? ''));
+      this.message = this.message.replaceAll(variable, String(variables[variable as keyof typeof variables] ?? ''));
     }
 
     return this.message;
