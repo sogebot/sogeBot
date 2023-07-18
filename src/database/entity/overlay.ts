@@ -149,6 +149,7 @@ export type CreditsScreenEvents = ExpandRecursively<{
   name: string,
   columns: number,
   excludeEvents: Alert['items'][number]['type'][],
+  headers: Record<Alert['items'][number]['type'], string>,
   headerFont: ExpandRecursively<Font & {
     align: 'left' | 'center' | 'right';
     pl: number;

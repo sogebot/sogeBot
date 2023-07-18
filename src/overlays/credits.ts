@@ -16,6 +16,19 @@ import { publicEndpoint } from '~/helpers/socket';
 import { getTopClips } from '~/services/twitch/calls/getTopClips';
 import { variables } from '~/watchers';
 
+export type Event = (EventListInterface & { username?: string, values?: {
+  currency: Currency;
+  amount: number;
+  fromId?: string;
+  fromUsername?: string;
+  subCumulativeMonths?: number;
+  subCumulativeMonthsName?: string;
+  bits?: number;
+  count?: number;
+  viewers?: number;
+  titleOfReward?: string;
+} & Event});
+
 class Credits extends Overlay {
   sockets () {
     publicEndpoint(this.nsp, 'getClips', async(opts, cb) => {
@@ -27,15 +40,18 @@ class Credits extends Overlay {
     publicEndpoint(this.nsp, 'load', async (cb) => {
       const when = isStreamOnline.value ? streamStatusChangeSince.value : Date.now() - 50000000000;
       const timestamp = new Date(when).getTime();
-      const events: (EventListInterface & { username?: string, values?: {
-        currency: Currency; amount: number;
-      };})[] = await AppDataSource.getRepository(EventList).find({
+      const events: Event[] = await AppDataSource.getRepository(EventList).find({
         order: { timestamp: 'DESC' },
         where: { timestamp: MoreThanOrEqual(timestamp), isHidden: false },
       });
 
       // we need to map usernames
-      const mapping = await users.getUsernamesFromIds(events.map(o => o.userId));
+      const userIds = events.map(o => o.userId);
+      const fromIds =  events.filter(o => 'fromId' in (o.values ?? {})).map(o => o.values!.fromId!);
+      const mapping = await users.getUsernamesFromIds(Array.from(new Set([
+        ...userIds,
+        ...fromIds,
+      ])));
       for (const event of events) {
         event.username = mapping.get(event.userId) ?? 'n/a';
       }
@@ -44,6 +60,9 @@ class Credits extends Overlay {
       for (const event of events) {
         event.values = JSON.parse(event.values_json);
         if (event.values) {
+          if (event.values.fromId) {
+            event.values.fromUsername = mapping.get(event.values.fromId) ?? 'n/a';
+          }
           if (!_.isNil(event.values.amount) && !_.isNil(event.values.currency)) {
             event.values.amount = exchange(event.values.amount, event.values.currency, mainCurrency.value);
             event.values.currency = mainCurrency.value;
