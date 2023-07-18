@@ -132,12 +132,6 @@ type CreditsScreenOptions = {
   id: string;
   /** wait at the end of the screen roll */
   waitBetweenScreens: null | number ;
-  /** specifies space between screens
-   * - number is pixels
-   * - full-screen-between is height of the visible part
-   * - none shows next screen immediately
-  */
-  spaceBetweenScreens: null | number | 'full-screen-between' | 'none';
   /** speed of rolling */
   speed: null | 'very slow' | 'slow' | 'medium' | 'fast' | 'very fast',
   name: string,
@@ -167,6 +161,7 @@ type CreditsScreenClips = ExpandRecursively<{
 
 export type CreditsScreenCustom = ExpandRecursively<{
   type: 'custom',
+  height: number,
   items: ExpandRecursively<{
     css: string,
     html: string,

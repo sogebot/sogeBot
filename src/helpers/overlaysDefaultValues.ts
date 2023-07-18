@@ -90,10 +90,9 @@ const values = {
     },
   },
   credits: {
-    speed:               'medium',
-    spaceBetweenScreens: 250,
-    waitBetweenScreens:  0,
-    screens:             [],
+    speed:              'medium',
+    waitBetweenScreens: 0,
+    screens:            [],
   },
   eventlist: {
     display:                      ['username', 'event'],
