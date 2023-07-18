@@ -1,11 +1,11 @@
 import { EventList, EventListInterface } from '@entity/eventList';
 import _ from 'lodash';
 import { MoreThanOrEqual } from 'typeorm';
-import { AppDataSource } from '~/database';
 
-import users from '../users';
 import Overlay from './_interface';
+import users from '../users';
 
+import { AppDataSource } from '~/database';
 import type { Currency } from '~/database/entity/user';
 import {
   isStreamOnline, stats, streamStatusChangeSince,
@@ -31,7 +31,7 @@ class Credits extends Overlay {
         currency: Currency; amount: number;
       };})[] = await AppDataSource.getRepository(EventList).find({
         order: { timestamp: 'DESC' },
-        where: { timestamp: MoreThanOrEqual(timestamp) },
+        where: { timestamp: MoreThanOrEqual(timestamp), isHidden: false },
       });
 
       // we need to map usernames

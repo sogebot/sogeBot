@@ -144,11 +144,28 @@ type CreditsCommonOptions = {
   alignY: number;
   rotation: number;
 };
-type CreditsScreenEvents = ExpandRecursively<{
+export type CreditsScreenEvents = ExpandRecursively<{
   type: 'events',
   name: string,
   columns: number,
-  excludeEvents: Alert['items'][number]['type'][]
+  excludeEvents: Alert['items'][number]['type'][],
+  headerFont: ExpandRecursively<Font & {
+    align: 'left' | 'center' | 'right';
+    pl: number;
+    pr: number;
+    pt: number;
+    pb: number;
+  }>,
+  itemFont: ExpandRecursively<Font & {
+    align: 'left' | 'center' | 'right';
+    pl: number;
+    pr: number;
+    pt: number;
+    pb: number;
+  }>,
+  highlightFont: ExpandRecursively<Font & {
+    align: 'left' | 'center' | 'right';
+  }>,
 } & CreditsScreenOptions>;
 type CreditsScreenClips = ExpandRecursively<{
   type: 'clips',
