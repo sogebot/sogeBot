@@ -24,16 +24,14 @@ export async function getTopClips (opts: any): Promise<(Partial<HelixClip> & { m
       endDate: (new Date()).toISOString(),
     };
 
-    const getClipsForBroadcaster = await twitch.apiClient?.asIntent(['bot'], ctx => ctx.clips.getClipsForBroadcasterPaginated(broadcasterId, { ...period }).getAll());
+    const getClipsForBroadcaster = await twitch.apiClient?.asIntent(['bot'], ctx => ctx.clips.getClipsForBroadcasterPaginated(broadcasterId, { ...period }).getAll()) as unknown as (HelixClip & { mp4: string; game: string | null })[];
 
     // get mp4 from thumbnail
     const clips: (Partial<HelixClip> & { mp4: string; game: string | null })[] = [];
     for (const c of getClipsForBroadcaster ?? []) {
-      clips.push({
-        ...c,
-        mp4:  c.thumbnailUrl.replace('-preview-480x272.jpg', '.mp4'),
-        game: await getGameNameFromId(Number(c.gameId)),
-      });
+      c.mp4 = c.thumbnailUrl.replace('-preview-480x272.jpg', '.mp4');
+      c.game = await getGameNameFromId(Number(c.gameId));
+      clips.push(c);
     }
     return shuffle(clips).slice(0, opts.first);
   } catch (e) {

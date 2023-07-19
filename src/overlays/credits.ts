@@ -32,10 +32,24 @@ export type Event = (EventListInterface & { username?: string, values?: {
 class Credits extends Overlay {
   sockets () {
     publicEndpoint(this.nsp, 'getClips', async(opts, cb) => {
-      cb(opts.show ? await getTopClips({
-        period: opts.period, days: opts.periodValue, first: opts.numOfClips,
-      }) : [],
-      );
+      if (opts.show) {
+        const clips = await getTopClips({
+          period: opts.period, days: opts.periodValue, first: opts.numOfClips,
+        });
+        cb(await Promise.all(
+          clips.map(async (o) => {
+            return {
+              creatorDisplayName: o.creatorDisplayName,
+              title:              o.title,
+              duration:           o.duration,
+              game:               o.game,
+              mp4:                o.mp4,
+            };
+          })
+        ));
+      } else {
+        cb([]);
+      }
     });
     publicEndpoint(this.nsp, 'load', async (cb) => {
       const when = isStreamOnline.value ? streamStatusChangeSince.value : Date.now() - 50000000000;

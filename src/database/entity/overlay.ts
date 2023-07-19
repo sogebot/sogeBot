@@ -168,13 +168,34 @@ export type CreditsScreenEvents = ExpandRecursively<{
     align: 'left' | 'center' | 'right';
   }>,
 } & CreditsScreenOptions>;
-type CreditsScreenClips = ExpandRecursively<{
+export type CreditsScreenClips = ExpandRecursively<{
   type: 'clips',
   play: boolean,
   period: 'custom' | 'stream',
   periodValue: number,
   numOfClips: number,
   volume: number,
+  gameFont: ExpandRecursively<Font & {
+    align: 'left' | 'center' | 'right';
+    pl: number;
+    pr: number;
+    pt: number;
+    pb: number;
+  }>,
+  titleFont: ExpandRecursively<Font & {
+    align: 'left' | 'center' | 'right';
+    pl: number;
+    pr: number;
+    pt: number;
+    pb: number;
+  }>,
+  createdByFont: ExpandRecursively<Font & {
+    align: 'left' | 'center' | 'right';
+    pl: number;
+    pr: number;
+    pt: number;
+    pb: number;
+  }>,
 } & CreditsScreenOptions>;
 
 export type CreditsScreenCustom = ExpandRecursively<{
