@@ -1,0 +1,15 @@
+diff --git a/node_modules/ytsr/lib/utils.js b/node_modules/ytsr/lib/utils.js
+index 94e4ace..f03ef67 100644
+--- a/node_modules/ytsr/lib/utils.js
++++ b/node_modules/ytsr/lib/utils.js
+@@ -18,7 +18,9 @@ const DEFAULT_CONTEXT = {
+ exports.parseFilters = json => {
+   const pc = json.contents.twoColumnSearchResultsRenderer.primaryContents;
+   const wrapper = pc.sectionListRenderer || pc.richGridRenderer;
+-  const filterWrapper = (wrapper.subMenu || wrapper.submenu).searchSubMenuRenderer.groups;
++  const filterWrapper = (wrapper.subMenu || wrapper.submenu).searchSubMenuRenderer.groups ||
++    json.header.searchHeaderRenderer.searchFilterButton.buttonRenderer.command.openPopupAction.popup
++      .searchFilterOptionsDialogRenderer.groups || [];
+   const parsedGroups = new Map();
+   for (const filterGroup of filterWrapper) {
+     const singleFilterGroup = new Map();
