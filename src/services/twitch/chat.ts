@@ -76,11 +76,11 @@ class Chat {
     setInterval(() => {
       if (this.client.bot && !this.client.bot.isConnected) {
         info(`TMI: Found bot disconnected from TMI, reconnecting.`);
-        this.client.bot.connect();
+        this.client.bot.reconnect();
       }
       if (this.client.broadcaster && !this.client.broadcaster.isConnected) {
         info(`TMI: Found broadcaster disconnected from TMI, reconnecting.`);
-        this.client.broadcaster.connect();
+        this.client.broadcaster.reconnect();
       }
     }, constants.MINUTE);
   }
