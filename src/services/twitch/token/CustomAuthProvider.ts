@@ -21,6 +21,11 @@ function createAccessTokenFromData(data: any): AccessToken {
 }
 
 export class CustomAuthProvider extends RefreshingAuthProvider {
+  private readonly _userAccessTokens = new Map<
+  string,
+  MakeOptional<AccessTokenWithUserId, 'accessToken' | 'scope'>
+  >();
+
   async refreshUserToken(refreshToken: string) {
     let tokenData: AccessToken;
 
@@ -75,7 +80,7 @@ export class CustomAuthProvider extends RefreshingAuthProvider {
       );
 
       const tokenInfo = await getTokenInfo(refreshedToken.accessToken);
-      this._callOnRefresh(tokenInfo.userId!, refreshedToken);
+      this.emit(this.onRefresh, tokenInfo.userId!, refreshedToken);
       tokenWithInfo = [refreshedToken, tokenInfo];
     }
 
@@ -112,7 +117,7 @@ export class CustomAuthProvider extends RefreshingAuthProvider {
       userId,
     });
 
-    this._callOnRefresh(userId, tokenData);
+    this.emit(this.onRefresh, userId, tokenData);
     return {
       ...tokenData,
       userId,

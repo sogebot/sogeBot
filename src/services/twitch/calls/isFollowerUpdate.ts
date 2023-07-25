@@ -13,10 +13,10 @@ export async function isFollowerUpdate (id: string): Promise<string | false> {
   const broadcasterId = variables.get('services.twitch.broadcasterId') as string;
 
   try {
-    const helixFollow = await twitch.apiClient?.asIntent(['bot'], ctx => ctx.users.getFollowFromUserToBroadcaster(id, broadcasterId));
+    const helixFollow = await twitch.apiClient?.asIntent(['bot'], ctx => ctx.channels.getChannelFollowers(broadcasterId, id));
 
-    if (helixFollow) {
-      return new Date(helixFollow.followDate).toISOString();
+    if ((helixFollow?.total ?? 0) > 0) {
+      return new Date(helixFollow!.data[0]!.followDate!).toISOString();
     }
   } catch (e: any) {
     if (e instanceof Error) {

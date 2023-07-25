@@ -21,9 +21,8 @@ import joinpart from '~/widgets/joinpart';
 
 const getChannelChattersAll = async (chatters: HelixChatChatter[] = [], after?: HelixForwardPagination['after']): Promise<HelixChatChatter[]> => {
   const broadcasterId = variables.get('services.twitch.broadcasterId') as string;
-  const botId = variables.get('services.twitch.botId') as string;
 
-  const response = await twitch.apiClient?.asIntent(['bot'], ctx => ctx.chat.getChatters(broadcasterId, botId, { after, limit: 100 }));
+  const response = await twitch.apiClient?.asIntent(['bot'], ctx => ctx.chat.getChatters(broadcasterId, { after, limit: 100 }));
   if (!response) {
     return [];
   }
