@@ -1,6 +1,6 @@
-FROM node:18-bullseye-slim
+FROM node:lts
 
-ENV LAST_UPDATED 2022-11-09-1237
+ENV LAST_UPDATED 2023-27-07-1033
 
 # Defaults to production, docker-compose overrides this to development on build and run.
 ARG NODE_ENV=production
