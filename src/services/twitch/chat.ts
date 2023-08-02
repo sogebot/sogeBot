@@ -1,4 +1,6 @@
 import util from 'util';
+import { mainCurrency } from '~/helpers/currency';
+import { Currency } from '@entity/user';
 
 import type { EmitData } from '@entity/alert';
 import * as constants from '@sogebot/ui-helpers/constants';
@@ -8,6 +10,7 @@ import {
   ChatClient, ChatCommunitySubInfo, ChatSubGiftInfo, ChatSubInfo, ChatUser,
 } from '@twurple/chat';
 import { isNil } from 'lodash';
+import exchange from '~/helpers/currency/exchange';
 
 import addModerator from './calls/addModerator';
 import banUser from './calls/banUser';
@@ -27,7 +30,7 @@ import {
   triggerInterfaceOnMessage, triggerInterfaceOnSub,
 } from '~/helpers/interface/triggers';
 import emitter from '~/helpers/interfaceEmitter';
-import { isDebugEnabled, warning } from '~/helpers/log';
+import { isDebugEnabled, warning, tip } from '~/helpers/log';
 import {
   chatIn, debug, error, info, resub, sub, subcommunitygift, subgift, whisperIn,
 } from '~/helpers/log';
@@ -348,11 +351,53 @@ class Chat {
         eventEmitter.emit('action', { userName: userstate.userName?.toLowerCase() ?? '', source: 'twitch' });
       });
 
-      client.onMessage((_channel, user, message, msg) => {
+      client.onMessage(async (_channel, user, message, msg) => {
         const userstate = msg.userInfo;
         if (isBotId(userstate.userId)) {
           return;
         }
+
+        const hypeChatAmount = Number(msg.tags.get('pinned-chat-paid-amount')) / Math.pow(10, Number(msg.tags.get('pinned-chat-paid-exponent')));
+        const hypeChatCurrency = msg.tags.get('pinned-chat-paid-currency') as Currency;
+
+        // treat hypeChat as a tip
+        if (!isNaN(hypeChatAmount) && hypeChatCurrency) {
+          const userName = userstate.userName;
+          const userId = userstate.userId;
+
+          tip(`${userName.toLowerCase()}${userId ? '#' + userId : ''}, amount: ${hypeChatAmount.toFixed(2)}${hypeChatCurrency}, message: ${message}`);
+          eventlist.add({
+            event:     'tip',
+            amount:    hypeChatAmount,
+            currency:  hypeChatCurrency,
+            userId:    String(await users.getIdByName(userName.toLowerCase()) ?? '0'),
+            message,
+            method:    'hypeChat',
+            timestamp: Date.now(),
+          });
+
+          eventEmitter.emit('tip', {
+            isAnonymous:         false,
+            userName:            userName.toLowerCase(),
+            amount:              hypeChatAmount.toFixed(2),
+            currency:            hypeChatCurrency,
+            amountInBotCurrency: Number(exchange(hypeChatAmount, hypeChatCurrency, mainCurrency.value)).toFixed(2),
+            currencyInBot:       mainCurrency.value,
+            message,
+          });
+
+          alerts.trigger({
+            event:      'tip',
+            service:    'twitchHypeChat',
+            name:       userName.toLowerCase(),
+            amount:     Number(hypeChatAmount.toFixed(2)),
+            tier:       null,
+            currency:   hypeChatCurrency,
+            monthsName: '',
+            message,
+          });
+        }
+
         this.message({
           userstate, message, id: msg.id, emotesOffsets: msg.emoteOffsets, isAction: false, isFirstTimeMessage: msg.tags.get('first-msg') === '1',
         }).then(() => {
