@@ -328,13 +328,13 @@ class Panel extends Core {
             .into(CacheTitles)
             .values([
               {
-                game: data.game, title: data.title, timestamp: Date.now(), tags: data.tags,
+                game: data.game, title: data.title, timestamp: Date.now(), tags: data.tags, content_classification_labels: data.contentClassificationLabels,
               },
             ])
             .execute();
         } else {
         // update timestamp
-          await AppDataSource.getRepository(CacheTitles).save({ ...item, timestamp: Date.now(), tags: data.tags });
+          await AppDataSource.getRepository(CacheTitles).save({ ...item, timestamp: Date.now(), tags: data.tags, content_classification_labels: data.contentClassificationLabels });
         }
         cb(null);
       });
