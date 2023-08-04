@@ -1,6 +1,5 @@
 {
   "settings": {
-    "isTitleForced": "Título/Categoria foi forçado (alterações serão feitas a partir doutra origem)",
     "createMarkerOnEvent": "Criar marcador de stream no evento"
   }
 }

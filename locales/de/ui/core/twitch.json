@@ -1,6 +1,5 @@
 {
   "settings": {
-    "isTitleForced": "Titel/Spiel ist erzwungen (Bot wird Änderungen von anderswo überschreiben)",
     "createMarkerOnEvent": "Streammarker bei Ereignis erstellen"
   }
 }

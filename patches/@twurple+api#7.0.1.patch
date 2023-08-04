@@ -1,0 +1,57 @@
+Index: \@twurple\api\es\interfaces\endpoints\channel.external.mjs
+===================================================================
+--- \@twurple\api\es\interfaces\endpoints\channel.external.mjs
++++ \@twurple\api\es\interfaces\endpoints\channel.external.mjs
+@@ -8,8 +8,9 @@
+         broadcaster_language: data.language,
+         title: data.title,
+         delay: (_a = data.delay) === null || _a === void 0 ? void 0 : _a.toString(),
+         tags: data.tags
++        content_classification_labels: data.content_classification_labels
+     };
+ }
+ /** @internal */
+ export function createChannelCommercialBody(broadcaster, length) {
+Index: \@twurple\api\lib\interfaces\endpoints\channel.external.d.ts
+===================================================================
+--- \@twurple\api\lib\interfaces\endpoints\channel.external.d.ts
++++ \@twurple\api\lib\interfaces\endpoints\channel.external.d.ts
+@@ -8,8 +8,9 @@
+     game_name: string;
+     title: string;
+     delay: number;
+     tags: string[];
++    content_classification_labels: string[];
+ }
+ /** @private */
+ export interface HelixChannelEditorData {
+     user_id: string;
+Index: \@twurple\api\lib\interfaces\endpoints\channel.external.js
+===================================================================
+--- \@twurple\api\lib\interfaces\endpoints\channel.external.js
++++ \@twurple\api\lib\interfaces\endpoints\channel.external.js
+@@ -10,9 +10,10 @@
+         game_id: data.gameId,
+         broadcaster_language: data.language,
+         title: data.title,
+         delay: (_a = data.delay) === null || _a === void 0 ? void 0 : _a.toString(),
+-        tags: data.tags
++        tags: data.tags,
++        content_classification_labels: data.content_classification_labels
+     };
+ }
+ exports.createChannelUpdateBody = createChannelUpdateBody;
+ /** @internal */
+Index: \@twurple\api\lib\interfaces\endpoints\channel.input.d.ts
+===================================================================
+--- \@twurple\api\lib\interfaces\endpoints\channel.input.d.ts
++++ \@twurple\api\lib\interfaces\endpoints\channel.input.d.ts
+@@ -26,6 +26,7 @@
+      * A channel may specify a maximum of 10 tags. Each tag is limited to a maximum of 25 characters and may not be an empty string
+      * or contain spaces or special characters. Tags are case insensitive.
+      */
+     tags?: string[];
++    content_classification_labels?: {id: string, is_enabled: boolean}[];
+ }
+ //# sourceMappingURL=channel.input.d.ts.map
+\ No newline at end of file

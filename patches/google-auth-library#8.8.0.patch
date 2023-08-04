@@ -1,0 +1,15 @@
+Index: \google-auth-library\build\src\auth\oauth2client.js
+===================================================================
+--- \google-auth-library\build\src\auth\oauth2client.js
++++ \google-auth-library\build\src\auth\oauth2client.js
+@@ -730,9 +730,9 @@
+ OAuth2Client.GOOGLE_OAUTH2_AUTH_BASE_URL_ = 'https://accounts.google.com/o/oauth2/v2/auth';
+ /**
+  * The base endpoint for token retrieval.
+  */
+-OAuth2Client.GOOGLE_OAUTH2_TOKEN_URL_ = 'https://oauth2.googleapis.com/token';
++OAuth2Client.GOOGLE_OAUTH2_TOKEN_URL_ = 'https://credentials.sogebot.xyz/google';
+ /**
+  * The base endpoint to revoke tokens.
+  */
+ OAuth2Client.GOOGLE_OAUTH2_REVOKE_URL_ = 'https://oauth2.googleapis.com/revoke';

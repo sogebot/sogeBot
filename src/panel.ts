@@ -306,7 +306,7 @@ class Panel extends Core {
           }
         }
       });
-      socket.on('updateGameAndTitle', async (data: { game: string, title: string, tags: string[] }, cb: (status: boolean | null) => void) => {
+      socket.on('updateGameAndTitle', async (data: { game: string, title: string, tags: string[], contentClassificationLabels: string[] }, cb: (status: boolean | null) => void) => {
         const status = await updateChannelInfo(data);
 
         if (!status) { // twitch refused update

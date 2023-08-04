@@ -62,9 +62,6 @@ class Twitch extends Service {
   @persistent() // needs to be persistent as we are using it with variables.get
     broadcasterTokenValid = false;
 
-  @settings('general')
-    isTitleForced = false;
-
   @settings('chat')
     sendWithMe = false;
   @settings('chat')

@@ -59,7 +59,7 @@
     "node-fetch": "^2.6.6",
     "npm-check-updates": "^16.10.16",
     "obs-websocket-js": "5.0.3",
-    "patch-package": "7.0.2",
+    "custompatch": "1.0.22",
     "pg": "8.11.1",
     "proxy-deep": "3.1.1",
     "reflect-metadata": "0.1.13",
@@ -90,7 +90,7 @@
     "ytsr": "3.8.2"
   },
   "scripts": {
-    "postinstall": "(patch-package || (exit 0))",
+    "postinstall": "(custompatch || (exit 0))",
     "build": "cross-env ENV=development make bot",
     "test": "node tools/runTests.js",
     "test:migration": "node tools/migrationCheck.js",

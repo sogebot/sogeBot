@@ -4,18 +4,20 @@ import { csEmitter } from '../customvariables/emitter';
 const old = new Map<string, any>();
 const stats = persistent({
   value: {
-    language:           'en',
-    currentWatchedTime: 0,
-    currentViewers:     0,
-    maxViewers:         0,
-    currentSubscribers: 0,
-    currentBits:        0,
-    currentTips:        0,
-    currentFollowers:   0,
-    currentGame:        null,
-    currentTitle:       null,
-    newChatters:        0,
-    currentTags:        [],
+    language:                   'en',
+    currentWatchedTime:         0,
+    currentViewers:             0,
+    maxViewers:                 0,
+    currentSubscribers:         0,
+    currentBits:                0,
+    currentTips:                0,
+    currentFollowers:           0,
+    currentGame:                null,
+    currentTitle:               null,
+    newChatters:                0,
+    currentTags:                [],
+    contentClasificationLabels: [],
+
   } as {
     language: string;
     currentWatchedTime: number;
@@ -29,6 +31,7 @@ const stats = persistent({
     currentTitle: string | null;
     newChatters: number;
     currentTags?: string[];
+    contentClasificationLabels?: string[];
   },
   name:      'stats',
   namespace: '/core/api',

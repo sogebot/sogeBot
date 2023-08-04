@@ -9,6 +9,7 @@ import {
   gameCache, gameOrTitleChangedManually, rawStatus, stats, tagsCache,
 } from '~/helpers/api';
 import { parseTitle } from '~/helpers/api/parseTitle';
+import { CONTENT_CLASSIFICATION_LABELS } from '~/helpers/constants';
 import { eventEmitter } from '~/helpers/events/emitter';
 import { getFunctionName } from '~/helpers/getFunctionName';
 import { debug, isDebugEnabled, warning } from '~/helpers/log';
@@ -18,7 +19,7 @@ import twitch from '~/services/twitch';
 import { translate } from '~/translate';
 import { variables } from '~/watchers';
 
-async function updateChannelInfo (args: { title?: string | null; game?: string | null, tags?: string[] }): Promise<{ response: string; status: boolean } | null> {
+async function updateChannelInfo (args: { title?: string | null; game?: string | null, tags?: string[], contentClassificationLabels?: string[] }): Promise<{ response: string; status: boolean } | null> {
   if (isDebugEnabled('api.calls')) {
     debug('api.calls', new Error().stack);
   }
@@ -60,9 +61,29 @@ async function updateChannelInfo (args: { title?: string | null; game?: string |
       tags = JSON.parse(tagsCache.value) as string[];
     } // we are not setting game -> load last game
 
+    if (!isNil(args.tags)) {
+      tags = args.tags;
+      tagsCache.value = JSON.stringify(args.tags); // save tags to cache, if changing tags
+    } else {
+      tags = JSON.parse(tagsCache.value) as string[];
+    } // we are not setting game -> load last game
+
     const gameId = await getGameIdFromName(game);
+
+    let content_classification_labels: {id: string, is_enabled: boolean}[] | undefined = undefined;
+    //  if content classification is present, do a change, otherwise we are not changing anything
+    if (args.contentClassificationLabels) {
+      content_classification_labels = [];
+      for (const id of Object.keys(CONTENT_CLASSIFICATION_LABELS)) {
+        if (id === 'MatureGame') {
+          continue; // set automatically
+        }
+        content_classification_labels.push({ id, is_enabled: args.contentClassificationLabels.includes(id) });
+      }
+    }
+
     await twitch.apiClient?.asIntent(['broadcaster'], ctx => ctx.channels.updateChannelInfo(cid, {
-      title: title ? title : undefined, gameId, tags,
+      title: title ? title : undefined, gameId, tags, content_classification_labels,
     }));
     await getChannelInformation({});
   } catch (e) {

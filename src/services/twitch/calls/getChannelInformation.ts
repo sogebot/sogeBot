@@ -1,3 +1,4 @@
+import { rawDataSymbol } from '@twurple/common';
 import isEqual from 'lodash/isEqual';
 
 import { AppDataSource } from '~/database';
@@ -10,7 +11,6 @@ import { parseTitle } from '~/helpers/api/parseTitle';
 import { getFunctionName } from '~/helpers/getFunctionName';
 import { debug, error, info, isDebugEnabled, warning } from '~/helpers/log';
 import twitch from '~/services/twitch';
-import { updateChannelInfo } from '~/services/twitch/calls/updateChannelInfo';
 import { variables } from '~/watchers';
 
 let retries = 0;
@@ -21,7 +21,6 @@ export async function getChannelInformation (opts: any) {
   }
   try {
     const broadcasterId = variables.get('services.twitch.broadcasterId') as string;
-    const isTitleForced = variables.get('services.twitch.isTitleForced') as string;
     const getChannelInfo = await twitch.apiClient?.asIntent(['bot'], ctx => ctx.channels.getChannelInfoById(broadcasterId));
 
     if (!getChannelInfo) {
@@ -57,24 +56,12 @@ export async function getChannelInformation (opts: any) {
         return { state: true, opts };
       } else if (isChanged && !opts.forceUpdate) {
         // check if title is same as updated title
-        const numOfRetries = isTitleForced ? 1 : 5;
+        const numOfRetries = 1;
         if (retries >= numOfRetries) {
           retries = 0;
-
-          // if we want title to be forced
-          if (isTitleForced) {
-            if ((process.env.NODE_ENV || 'development') !== 'production') {
-              info(`Title/category force enabled (but disabled in debug mode) => ${game} | ${_rawStatus} ${tags.map(o => `#${o}`).join(' ')}`);
-            } else {
-              info(`Title/category force enabled => ${game} | ${_rawStatus} ${tags.map(o => `#${o}`).join(' ')}`);
-              updateChannelInfo({});
-            }
-            return { state: true, opts };
-          } else {
-            info(`Title/game changed outside of a bot => ${getChannelInfo.gameName} | ${getChannelInfo.title} ${getChannelInfo.tags.map(o => `#${o}`).join(' ')}`);
-            retries = -1;
-            _rawStatus = getChannelInfo.title;
-          }
+          info(`Title/game changed outside of a bot => ${getChannelInfo.gameName} | ${getChannelInfo.title} ${getChannelInfo.tags.map(o => `#${o}`).join(' ')}`);
+          retries = -1;
+          _rawStatus = getChannelInfo.title;
         } else {
           retries++;
           return { state: false, opts };
@@ -84,6 +71,8 @@ export async function getChannelInformation (opts: any) {
       }
 
       apiStats.value.language = getChannelInfo.language;
+      apiStats.value.currentTags = getChannelInfo.tags;
+      apiStats.value.contentClasificationLabels = getChannelInfo[rawDataSymbol].content_classification_labels;
       apiStats.value.currentGame = getChannelInfo.gameName;
       apiStats.value.currentTitle = getChannelInfo.title;
 
