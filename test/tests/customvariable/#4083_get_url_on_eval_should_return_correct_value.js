@@ -37,6 +37,7 @@ describe('Custom Variable - #4083 - Get url on eval should return correct value 
       responseType:  2,
       permission:    defaultPermissions.MODERATORS,
       evalValue:     'return Date.now();',
+      runEvery:      0,
       usableOptions: [],
       urls:          [{
         id:           urlId,
@@ -50,6 +51,7 @@ describe('Custom Variable - #4083 - Get url on eval should return correct value 
   it(`Fetch endpoint for value and check`, async () => {
     const now = Date.now();
     const response = await axios.get(`http://localhost:20000/customvariables/${urlId}`);
+    console.log(JSON.stringify(response.data));
     assert(response.data.value > now && response.data.value < Date.now());
   });
 });
