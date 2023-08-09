@@ -1,8 +1,7 @@
 import util from 'util';
-import { mainCurrency } from '~/helpers/currency';
-import { Currency } from '@entity/user';
 
 import type { EmitData } from '@entity/alert';
+import { Currency } from '@entity/user';
 import * as constants from '@sogebot/ui-helpers/constants';
 import { dayjs } from '@sogebot/ui-helpers/dayjsHelper';
 import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized';
@@ -10,7 +9,6 @@ import {
   ChatClient, ChatCommunitySubInfo, ChatSubGiftInfo, ChatSubInfo, ChatUser,
 } from '@twurple/chat';
 import { isNil } from 'lodash';
-import exchange from '~/helpers/currency/exchange';
 
 import addModerator from './calls/addModerator';
 import banUser from './calls/banUser';
@@ -25,12 +23,15 @@ import {
 } from '~/decorators/on';
 import * as hypeTrain from '~/helpers/api/hypeTrain';
 import { sendMessage } from '~/helpers/commons/sendMessage';
+import { mainCurrency } from '~/helpers/currency';
+import exchange from '~/helpers/currency/exchange';
+import { isDebugEnabled } from '~/helpers/debug';
 import { eventEmitter } from '~/helpers/events';
 import {
   triggerInterfaceOnMessage, triggerInterfaceOnSub,
 } from '~/helpers/interface/triggers';
 import emitter from '~/helpers/interfaceEmitter';
-import { isDebugEnabled, warning, tip } from '~/helpers/log';
+import { warning, tip } from '~/helpers/log';
 import {
   chatIn, debug, error, info, resub, sub, subcommunitygift, subgift, whisperIn,
 } from '~/helpers/log';

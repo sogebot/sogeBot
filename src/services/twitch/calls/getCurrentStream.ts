@@ -5,9 +5,10 @@ import {
   stats as apiStats, chatMessagesAtStart,
 } from '~/helpers/api';
 import * as stream from '~/helpers/core/stream';
+import { isDebugEnabled } from '~/helpers/debug';
 import { eventEmitter } from '~/helpers/events';
 import { getFunctionName } from '~/helpers/getFunctionName.js';
-import { debug, error, isDebugEnabled, warning } from '~/helpers/log';
+import { debug, error, warning } from '~/helpers/log';
 import { linesParsed } from '~/helpers/parser';
 import twitch from '~/services/twitch';
 import stats from '~/stats';

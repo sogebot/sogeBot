@@ -5,8 +5,9 @@ import { User } from '~/database/entity/user';
 import {
   stats as apiStats,
 } from '~/helpers/api';
+import { isDebugEnabled } from '~/helpers/debug';
 import { getFunctionName } from '~/helpers/getFunctionName';
-import { debug, error, isDebugEnabled, warning } from '~/helpers/log';
+import { debug, error, warning } from '~/helpers/log';
 import { isBotId, isBotSubscriber } from '~/helpers/user';
 import * as changelog from '~/helpers/user/changelog.js';
 import twitch from '~/services/twitch';

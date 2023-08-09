@@ -8,8 +8,9 @@ import {
   stats as apiStats,
 } from '~/helpers/api';
 import { parseTitle } from '~/helpers/api/parseTitle';
+import { isDebugEnabled } from '~/helpers/debug';
 import { getFunctionName } from '~/helpers/getFunctionName';
-import { debug, error, info, isDebugEnabled, warning } from '~/helpers/log';
+import { debug, error, info, warning } from '~/helpers/log';
 import twitch from '~/services/twitch';
 import { variables } from '~/watchers';
 

@@ -1,10 +1,11 @@
 import { defaults } from 'lodash';
 
 import { TwitchClips } from '../../../database/entity/twitch';
-import { debug, error, isDebugEnabled, warning } from '../../../helpers/log';
+import { debug, error, warning } from '../../../helpers/log';
 
 import { AppDataSource } from '~/database';
 import { isStreamOnline } from '~/helpers/api';
+import { isDebugEnabled } from '~/helpers/debug';
 import { getFunctionName } from '~/helpers/getFunctionName';
 import twitch from '~/services/twitch';
 import { variables } from '~/watchers';

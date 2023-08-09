@@ -1,7 +1,8 @@
 import {
   stats as apiStats,
 } from '~/helpers/api';
-import { debug, isDebugEnabled } from '~/helpers/log';
+import { isDebugEnabled } from '~/helpers/debug';
+import { debug } from '~/helpers/log';
 import getBroadcasterId from '~/helpers/user/getBroadcasterId';
 import twitch from '~/services/twitch';
 

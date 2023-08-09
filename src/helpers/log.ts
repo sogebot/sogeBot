@@ -6,6 +6,8 @@ import { dayjs, timezone } from '@sogebot/ui-helpers/dayjsHelper';
 import { createStream, Generator } from 'rotating-file-stream';
 import stripAnsi from 'strip-ansi';
 
+import { isDebugEnabled } from './debug';
+import { logEmitter } from './log/emitter';
 import { getFunctionNameFromStackTrace } from './stacktrace';
 
 import { isDbConnected } from '~/helpers/database';
@@ -115,38 +117,28 @@ function format(level: Levels, message: any, category?: string) {
   return [timestamp, levelFormat[Levels[level] as keyof typeof Levels], category, message].filter(Boolean).join(' ');
 }
 
-let debugEnv = '';
-export function isDebugEnabled(category: string) {
-  if (debugEnv.trim().length === 0) {
-    return false;
+function log(message: any, level?: keyof typeof Levels) {
+  if (!level) {
+    level = getFunctionNameFromStackTrace() as keyof typeof Levels;
   }
-  const categories = category.split('.');
-  let bEnabled = false;
-  bEnabled = debugEnv.includes(category) || debugEnv.includes(categories[0] + '.*');
-  bEnabled = debugEnv === '*' || bEnabled;
-  return bEnabled;
-}
-
-export const setDEBUG = (newDebugEnv: string) => {
-  if (newDebugEnv.trim().length === 0) {
-    warning('DEBUG unset');
-  } else {
-    warning('DEBUG set to: ' + newDebugEnv);
-  }
-  debugEnv = newDebugEnv.trim();
-};
-export const getDEBUG = () => {
-  return debugEnv;
-};
-
-function log(message: any) {
-  const level = getFunctionNameFromStackTrace();
-  if (Levels[level as keyof typeof Levels] <= Levels[logLevel as keyof typeof Levels]) {
+  if (Levels[level] <= Levels[logLevel as keyof typeof Levels]) {
     const formattedMessage = format(Levels[level as keyof typeof Levels], message);
     process.stdout.write(formattedMessage + '\n');
     logFile.write(stripAnsi(formattedMessage) + os.EOL);
   }
 }
+
+logEmitter.on('debug', (message: string) => {
+  log(message, 'debug');
+});
+
+logEmitter.on('warning', (message: string) => {
+  log(message, 'warning');
+});
+
+logEmitter.on('error', (message: string) => {
+  log(message, 'error');
+});
 
 export function performance(message:string) {
   if (isDebugEnabled('performance')) {

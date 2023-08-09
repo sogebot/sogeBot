@@ -1,5 +1,6 @@
-import { debug, error, isDebugEnabled, warning } from '../../../helpers/log';
+import { debug, error, warning } from '../../../helpers/log';
 
+import { isDebugEnabled } from '~/helpers/debug';
 import { getFunctionName } from '~/helpers/getFunctionName';
 import { setImmediateAwait } from '~/helpers/setImmediateAwait';
 import twitch from '~/services/twitch';

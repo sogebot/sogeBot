@@ -18,9 +18,10 @@ import { AppDataSource } from '~/database';
 import { autoLoad } from '~/helpers/autoLoad';
 import { setIsBotStarted, setIsDbConnected } from '~/helpers/database';
 import {
-  error, info, isDebugEnabled, setDEBUG, warning,
+  error, info, warning,
 } from '~/helpers/log';
 import { startWatcher } from '~/watchers';
+import { setDEBUG, isDebugEnabled } from './helpers/debug';
 
 const connect = async function () {
   const type = process.env.TYPEORM_CONNECTION;

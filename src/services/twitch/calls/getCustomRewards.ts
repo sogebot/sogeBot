@@ -1,7 +1,8 @@
 import { HelixCustomReward } from '@twurple/api/lib';
 
+import { isDebugEnabled } from '~/helpers/debug';
 import { getFunctionName } from '~/helpers/getFunctionName';
-import { debug, error, isDebugEnabled, warning } from '~/helpers/log';
+import { debug, error, warning } from '~/helpers/log';
 import { setImmediateAwait } from '~/helpers/setImmediateAwait';
 import twitch from '~/services/twitch';
 import { variables } from '~/watchers';

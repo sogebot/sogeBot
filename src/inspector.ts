@@ -4,8 +4,10 @@ import { gzip } from 'zlib';
 
 import { MINUTE, SECOND } from '@sogebot/ui-helpers/constants';
 
+import { getDEBUG, setDEBUG } from './helpers/debug';
+
 import {
-  error, getDEBUG, setDEBUG, warning,
+  error, warning,
 } from '~/helpers/log';
 
 let isProfilerRunning = false;

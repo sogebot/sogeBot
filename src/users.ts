@@ -20,8 +20,9 @@ import { isStreamOnline, stats } from '~/helpers/api';
 import { mainCurrency } from '~/helpers/currency';
 import exchange from '~/helpers/currency/exchange';
 import rates from '~/helpers/currency/rates';
+import { isDebugEnabled } from '~/helpers/debug';
 import {
-  debug, error, isDebugEnabled,
+  debug, error,
 } from '~/helpers/log';
 import { adminEndpoint, viewerEndpoint } from '~/helpers/socket';
 import * as changelog from '~/helpers/user/changelog.js';

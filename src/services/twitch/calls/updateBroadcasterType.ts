@@ -1,6 +1,7 @@
+import { isDebugEnabled } from '~/helpers/debug';
 import { getFunctionName } from '~/helpers/getFunctionName.js';
 import emitter from '~/helpers/interfaceEmitter';
-import { debug, error, isDebugEnabled, warning } from '~/helpers/log';
+import { debug, error, warning } from '~/helpers/log';
 import twitch from '~/services/twitch';
 import { variables } from '~/watchers';
 

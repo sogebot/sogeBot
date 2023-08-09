@@ -1,9 +1,10 @@
 import { debug } from 'console';
 
 import { TwitchClips } from '../../../database/entity/twitch';
-import { error, isDebugEnabled, warning } from '../../../helpers/log';
+import { error, warning } from '../../../helpers/log';
 
 import { AppDataSource } from '~/database';
+import { isDebugEnabled } from '~/helpers/debug';
 import { getFunctionName } from '~/helpers/getFunctionName';
 import twitch from '~/services/twitch';
 

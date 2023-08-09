@@ -5,11 +5,12 @@ import {
 } from 'lodash';
 
 import { AppDataSource } from '~/database';
+import { isDebugEnabled } from '~/helpers/debug';
 import { eventEmitter } from '~/helpers/events';
 import { getAllOnline } from '~/helpers/getAllOnlineUsernames';
 import { getFunctionName } from '~/helpers/getFunctionName';
 import {
-  debug, error, isDebugEnabled, warning,
+  debug, error, warning,
 } from '~/helpers/log';
 import { setImmediateAwait } from '~/helpers/setImmediateAwait';
 import { SQLVariableLimit } from '~/helpers/sql';

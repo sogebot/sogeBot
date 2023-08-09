@@ -10,6 +10,7 @@ import gitCommitInfo from 'git-commit-info';
 import _ from 'lodash';
 import sanitize from 'sanitize-filename';
 
+import { getDEBUG, setDEBUG } from './helpers/debug.js';
 import { possibleLists } from '../d.ts/src/helpers/socket.js';
 
 import Core from '~/_interface';
@@ -28,7 +29,7 @@ import { flatten } from '~/helpers/flatten';
 import { setValue } from '~/helpers/general';
 import { getLang } from '~/helpers/locales';
 import {
-  getDEBUG, info, setDEBUG,
+  info,
 } from '~/helpers/log';
 import {
   app, ioServer, server, serverSecure, setApp, setServer,

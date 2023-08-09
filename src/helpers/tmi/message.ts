@@ -1,8 +1,9 @@
 import { capitalize } from 'lodash';
 import XRegExp from 'xregexp';
 
-import { error, isDebugEnabled } from '../log';
+import { error } from '../log';
 
+import { isDebugEnabled } from '~/helpers/debug';
 import { tmiEmitter } from '~/helpers/tmi';
 import { variables } from '~/watchers';
 

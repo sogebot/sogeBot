@@ -2,8 +2,9 @@ import { In, Not } from 'typeorm';
 
 import { AppDataSource } from '~/database';
 import { User } from '~/database/entity/user';
+import { isDebugEnabled } from '~/helpers/debug';
 import { getFunctionName } from '~/helpers/getFunctionName';
-import { debug, error, isDebugEnabled, warning } from '~/helpers/log';
+import { debug, error, warning } from '~/helpers/log';
 import { addUIError } from '~/helpers/panel/index';
 import { setStatus } from '~/helpers/parser';
 import * as changelog from '~/helpers/user/changelog.js';

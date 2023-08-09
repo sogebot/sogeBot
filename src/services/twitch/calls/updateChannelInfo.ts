@@ -10,9 +10,10 @@ import {
 } from '~/helpers/api';
 import { parseTitle } from '~/helpers/api/parseTitle';
 import { CONTENT_CLASSIFICATION_LABELS } from '~/helpers/constants';
+import { isDebugEnabled } from '~/helpers/debug';
 import { eventEmitter } from '~/helpers/events/emitter';
 import { getFunctionName } from '~/helpers/getFunctionName';
-import { debug, isDebugEnabled, warning } from '~/helpers/log';
+import { debug, warning } from '~/helpers/log';
 import { addUIError } from '~/helpers/panel/index';
 import { setImmediateAwait } from '~/helpers/setImmediateAwait';
 import twitch from '~/services/twitch';

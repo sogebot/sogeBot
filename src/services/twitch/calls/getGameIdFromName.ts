@@ -2,7 +2,8 @@ import { CacheGames } from '@entity/cacheGames';
 
 import { AppDataSource } from '~/database';
 import { stats } from '~/helpers/api';
-import { debug, isDebugEnabled, warning } from '~/helpers/log';
+import { isDebugEnabled } from '~/helpers/debug';
+import { debug, warning } from '~/helpers/log';
 import { setImmediateAwait } from '~/helpers/setImmediateAwait';
 import twitch from '~/services/twitch';
 
