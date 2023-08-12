@@ -1,83 +1,19 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import { MINUTE, SECOND } from '@sogebot/ui-helpers/constants';
 import { validateOrReject } from 'class-validator';
-import * as cronparser from 'cron-parser';
-import { cloneDeep, sortBy } from 'lodash';
 import merge from 'lodash/merge';
+import * as ts from 'typescript';
 
 import { Plugin, PluginVariable } from './database/entity/plugins';
 import { isValidationError } from './helpers/errors';
 import { eventEmitter } from './helpers/events';
-import { error } from './helpers/log';
+import { error, info } from './helpers/log';
 import { adminEndpoint, publicEndpoint } from './helpers/socket';
-import { processes, processNode } from './plugins/index';
-import type { Node } from '../d.ts/src/plugins';
 
 import Core from '~/_interface';
 import { onStartup } from '~/decorators/on';
 
-const cronTriggers = new Map<string, Node>();
 const plugins: Plugin[] = [];
-
-const generateListener = (parameters = {}, containSender = true) => {
-  const values: Record<string, any> = {};
-  if (containSender) {
-    values.sender = {
-      userName: 'string',
-      userId:   'string',
-    };
-  }
-
-  if (Object.keys(parameters).length > 0) {
-    values.parameters = parameters;
-  }
-
-  return values;
-};
-
-const generateRegex = (parameters: { name: string; type: 'number' | 'word' | 'sentence' | 'custom'; regexp?: string; }[]) => {
-  const matcher = {
-    'number':   '[0-9]+',
-    'word':     '[a-zA-Z]+',
-    'sentence': '\'[a-zA-Z ]+\'',
-  } as const;
-
-  const regex = [];
-  for (const param of parameters) {
-    if (param.type === 'custom') {
-      regex.push(`(?<${param.name}>${param.regexp})`);
-
-    } else {
-      regex.push(`(?<${param.name}>${matcher[param.type]})`);
-    }
-  }
-  return `^${regex.join(' ')}$`;
-};
-
-const listeners = {
-  tip: generateListener({
-    isAnonymous: 'boolean',
-    message:     'string',
-    amount:      'number',
-    currency:    'string',
-    botAmount:   'number',
-    botCurrency: 'string',
-  }),
-  twitchClearChat:        generateListener({}, false),
-  twitchStreamStarted:    generateListener({}, false),
-  twitchStreamStopped:    generateListener({}, false),
-  twitchGameChanged:      generateListener({ oldCategory: 'string', category: 'string' }, false),
-  botStarted:             generateListener({}, false),
-  twitchRaid:             generateListener({ hostViewers: 'number' }, true),
-  twitchChatMessage:      generateListener({ message: 'string' }),
-  twitchCommand:          generateListener({ message: 'string' }),
-  twitchFollow:           generateListener(),
-  twitchCheer:            generateListener({ amount: 'number', message: 'string' }),
-  twitchSubscription:     generateListener({ method: 'string', subCumulativeMonths: 'number', tier: 'tier' }),
-  twitchSubgift:          generateListener({ recipient: 'string', tier: 'tier' }),
-  twitchSubcommunitygift: generateListener({ count: 'number' }),
-  twitchResub:            generateListener({ method: 'string', subCumulativeMonths: 'number', subStreak: 'number', subStreakShareEnabled: 'boolean', tier: 'string' }),
-  twitchRewardRedeem:     generateListener({ userId: 'string', userName: 'string', rewardId: 'string', userInput: 'message' }),
-} as const;
 
 class Plugins extends Core {
 
@@ -138,7 +74,7 @@ class Plugins extends Core {
       this.process('twitchStreamStopped');
     });
 
-    const commonHandler = async <T extends { [x:string]: any, userName: string }>(event: keyof typeof listeners, data: T) => {
+    const commonHandler = async <T extends { [x:string]: any, userName: string }>(event: any, data: T) => {
       const users = (await import('./users')).default;
       const { userName, ...parameters } = data;
       const user = {
@@ -207,51 +143,51 @@ class Plugins extends Core {
     // e.g. if we have cron every 1s -> 120 crons
     //                           10s -> 12  crons
     //                           10m -> 1   cron
-    const cron = await this.process('cron', '', null, {});
+    // const cron = await this.process('cron', '', null, {});
 
-    cronTriggers.clear();
-    for (const { plugin, listeners: workflowListeners } of cron) {
-      for (const node of workflowListeners) {
-        try {
-          const cronParsed = cronparser.parseExpression(node.data.value);
+    // cronTriggers.clear();
+    // for (const { plugin, listeners: workflowListeners } of cron) {
+    //   for (const node of workflowListeners) {
+    //     try {
+    //       const cronParsed = cronparser.parseExpression(node.data.value);
 
-          const currentTime = Date.now();
-          let lastTime = new Date().toISOString();
-          const intervals: string[] = [];
-          while (currentTime + (2 * MINUTE) > new Date(lastTime).getTime()) {
-            lastTime = cronParsed.next().toISOString();
-            intervals.push(lastTime);
-          }
+    //       const currentTime = Date.now();
+    //       let lastTime = new Date().toISOString();
+    //       const intervals: string[] = [];
+    //       while (currentTime + (2 * MINUTE) > new Date(lastTime).getTime()) {
+    //         lastTime = cronParsed.next().toISOString();
+    //         intervals.push(lastTime);
+    //       }
 
-          for (const interval of intervals) {
-            cronTriggers.set(`${plugin.id}|${interval}`, node);
-          }
-        } catch (e) {
-          error(e);
-        }
-      }
-    }
+    //       for (const interval of intervals) {
+    //         cronTriggers.set(`${plugin.id}|${interval}`, node);
+    //       }
+    //     } catch (e) {
+    //       error(e);
+    //     }
+    //   }
+    // }
   }
 
   async triggerCrons() {
-    for (const [pluginId, timestamp] of [...cronTriggers.keys()].map(o => o.split('|'))) {
-      if (new Date(timestamp).getTime() < Date.now()) {
-        const plugin = plugins.find(o => o.id === pluginId);
-        const node = cronTriggers.get(`${pluginId}|${timestamp}`);
-        if (plugin && node) {
-          const workflow = Object.values(
-            JSON.parse(plugin.workflow).drawflow.Home.data
-          ) as Node[];
+    // for (const [pluginId, timestamp] of [...cronTriggers.keys()].map(o => o.split('|'))) {
+    //   if (new Date(timestamp).getTime() < Date.now()) {
+    //     const plugin = plugins.find(o => o.id === pluginId);
+    //     const node = cronTriggers.get(`${pluginId}|${timestamp}`);
+    //     if (plugin && node) {
+    //       const workflow = Object.values(
+    //         JSON.parse(plugin.workflow).drawflow.Home.data
+    //       ) as Node[];
 
-          const settings: Record<string, any> = {};
-          for (const item of (plugin.settings || [])) {
-            settings[item.name] = item.currentValue;
-          }
-          this.processPath(pluginId, workflow, node, {}, { settings }, null);
-        }
-        cronTriggers.delete(`${pluginId}|${timestamp}`);
-      }
-    }
+    //       const settings: Record<string, any> = {};
+    //       for (const item of (plugin.settings || [])) {
+    //         settings[item.name] = item.currentValue;
+    //       }
+    //       this.processPath(pluginId, workflow, node, {}, { settings }, null);
+    //     }
+    //     cronTriggers.delete(`${pluginId}|${timestamp}`);
+    //   }
+    // }
   }
 
   sockets() {
@@ -328,142 +264,73 @@ class Plugins extends Core {
         }
       }
     });
-    adminEndpoint('/core/plugins', 'listeners', async (cb) => {
-      cb(listeners);
-    });
   }
 
-  async processPath(pluginId: string, workflow: Node[], currentNode: Node, parameters: Record<string, any>, variables: Record<string, any>, userstate: { userName: string; userId: string } | null ) {
-    parameters = cloneDeep(parameters);
-    variables = cloneDeep(variables);
-
-    // we need to check inputs first (currently just for load variable)
-    if (currentNode.inputs.input_1) {
-      const inputs = currentNode.inputs.input_1.connections.map((item) => workflow.find(wItem => wItem.id === Number(item.node)));
-      for(const node of inputs) {
-        if (!node) {
-          continue;
-        }
-        switch(node.name) {
-          case 'variableLoadFromDatabase': {
-            const variableName = node.data.value;
-            const defaultValue = (JSON.parse(node.data.data) as any).value;
-
-            const variable = await PluginVariable.findOneBy({ variableName, pluginId });
-            variables[variableName] = variable ? JSON.parse(variable.value) : defaultValue;
-            break;
-          }
-        }
-      }
-    }
-
-    const result = await processNode(currentNode.name as keyof typeof processes, pluginId, currentNode, parameters, variables, userstate);
-    const output = result ? 'output_1' : 'output_2';
-
-    if (currentNode.outputs[output]) {
-      const nodes = currentNode.outputs[output].connections.map((item) => workflow.find(wItem => wItem.id === Number(item.node)));
-      for (const node of nodes) {
-        if (!node) {
-          continue;
-        }
-        this.processPath(pluginId, workflow, node, parameters, variables, userstate);
-      }
-    }
-  }
-
-  async process(type: keyof typeof listeners | 'cron', message = '', userstate: { userName: string, userId: string } | null = null, params?: Record<string, any>) {
+  async process(type: any | 'cron', message = '', userstate: { userName: string, userId: string } | null = null, params?: Record<string, any>) {
     const pluginsEnabled = plugins.filter(o => o.enabled);
-    const pluginsWithListener: { plugin: Plugin, listeners: Node[] }[] = [];
     for (const plugin of pluginsEnabled) {
       // explore drawflow
-      const workflow = Object.values(
-        JSON.parse(plugin.workflow).drawflow.Home.data
-      ) as Node[];
+      const __________workflow__________: {
+        code: { name: string, source: string, id: string}[],
+        overflow: { name: string, source: string, id: string}[]
+      } = (
+        JSON.parse(plugin.workflow)
+      );
+      if (!Array.isArray(__________workflow__________.code)) {
+        continue; // skip legacy plugins
+      }
 
-      const workflowListeners = workflow.filter((o: Node) => {
-        params ??= {};
-        const isListener = o.name === 'listener';
-        const isWithoutFiltering
-          = (o.name === 'cron' && type === 'cron')
-          || (o.name === 'botStarted');
-        const isType = o.data.value === type;
-
-        params.message = message;
-
-        if (isWithoutFiltering) {
-          return true;
-        }
-
-        if (isListener && isType) {
-          switch(type) {
-            case 'twitchCommand': {
-              let { command, parameters } = JSON.parse(o.data.data);
-
-              // get settings and try to replace in command
-              const _settings = (plugin.settings || []).map(a => ({ [a.name]: a.currentValue })).reduce((prev, obj) => ({ [Object.keys(obj)[0]]: obj[Object.keys(obj)[0]], ...prev }), {});
-              for (const key of sortBy(Object.keys(_settings), (b => -b.length))) {
-                const toReplace = `{settings.${key}}`;
-                command = command.replaceAll(toReplace, _settings[key as any]);
-              }
-
-              const haveSubCommandOrParameters = message.replace(`!${command.replace('!', '')}`, '').split(' ').length > 1;
-              const isStartingWithCommand = message.startsWith(`!${command.replace('!', '')}`);
-              const doesParametersMatch = () => {
-                try {
-                  if (parameters.length === 0) {
-                    if (haveSubCommandOrParameters) {
-                      return false;
-                    }
-                    throw new Error(); // not expecting params
-                  }
-                  const messageWithoutCommandArray = message.split(' ');
-                  messageWithoutCommandArray.shift();
-                  const messageWithoutCommand = messageWithoutCommandArray.join(' ').trim();
-
-                  const paramMatch = messageWithoutCommand.match(generateRegex(parameters as any));
-                  if (paramMatch && paramMatch.groups) {
-                    const groups: { [key: string]: string | number; } = paramMatch.groups;
-                    for (const param of parameters) {
-                      if (param.type === 'number') {
-                        groups[param.name] = Number(groups[param.name]);
-                      }
-                    }
-                    params = paramMatch.groups;
-                    return true;
-                  }
-                  return false;
-                } catch (e) {
-                  return message === `!${command.replace('!', '')}`;
+      for (const ___code___ of  __________workflow__________.code) {
+        try {
+        // own scope
+        // @ts-ignore
+          const ListenTo = {
+            Twitch: {
+              command: (opts: { command: string }, callback: any) => {
+                if (type === 'twitchCommand') {
+                  console.log('command called');
+                  callback({
+                    userId:   '1',
+                    userName: 'test',
+                  }, []);
                 }
-              };
-
-              if (isStartingWithCommand && doesParametersMatch()) {
-                const settings: Record<string, any> = {};
-                for (const item of (plugin.settings || [])) {
-                  settings[item.name] = item.currentValue;
+              },
+              message: (callback: any) => {
+                if (type === 'twitchChatMessage') {
+                  console.log('message called');
+                  callback({
+                    userId:   '1',
+                    userName: 'test',
+                  }, message);
                 }
-                this.processPath(plugin.id, workflow, o, params, { settings }, userstate);
-              }
-              break;
-            }
-            default: {
-              const settings: Record<string, any> = {};
-              for (const item of (plugin.settings || [])) {
-                settings[item.name] = item.currentValue;
-              }
-              this.processPath(plugin.id, workflow, o, params, { settings }, userstate);
-              return true;
-            }
-          }
-        }
-        return false;
-      });
+              },
 
-      if (workflowListeners.length > 0) {
-        pluginsWithListener.push({ plugin, listeners: workflowListeners });
+            },
+          };
+          // @ts-ignore
+          const Twitch = {
+            sendMessage: () => {
+              console.log('sendMessage called');
+            },
+          };
+          // @ts-ignore
+          const Permission = {
+            accessTo: () => {
+              console.log('accessTo called');
+            },
+          };
+          // @ts-ignore
+          const Log = {
+            info: (msg: string) => {
+              info(`PLUGINS#${plugin.id}:./${___code___.name}: ${msg}`);
+            },
+          };
+          eval(ts.transpile(___code___.source));
+        } catch (e) {
+          error(`PLUGINS#${plugin.id}:./${___code___.name}: ${e}`);
+        }
       }
     }
-    return pluginsWithListener;
   }
 
   /* TODO: replace with event emitter */
