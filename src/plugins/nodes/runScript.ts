@@ -8,11 +8,13 @@ import { AppDataSource } from '~/database';
 import { EmitData } from '~/database/entity/alert';
 import { PluginVariable } from '~/database/entity/plugins';
 import { User } from '~/database/entity/user';
-import { getBotSender } from '~/helpers/commons';
+import { getUserSender } from '~/helpers/commons';
 import { sendMessage } from '~/helpers/commons/sendMessage';
 import { debug, error, info } from '~/helpers/log';
 import { tmiEmitter } from '~/helpers/tmi';
 import * as changelog from '~/helpers/user/changelog.js';
+import getBotId from '~/helpers/user/getBotId';
+import getBotUserName from '~/helpers/user/getBotUserName';
 import { isBroadcaster } from '~/helpers/user/isBroadcaster';
 import { template } from '~/plugins/template';
 import alerts from '~/registries/alerts';
@@ -70,7 +72,7 @@ export default async function(pluginId: string, currentNode: Node<string>, param
       },
       twitch: {
         sendMessage(message:string) {
-          sendMessage(message, userstate || getBotSender(), { parameters, ...variables });
+          sendMessage(message, userstate || getUserSender(getBotId(), getBotUserName()), { parameters, ...variables });
         },
         async timeout(userName:string, timeout: number, reason?: string) {
           const user = await AppDataSource.getRepository(User).findOneBy({ userName: userName });

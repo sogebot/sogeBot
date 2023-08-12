@@ -7,8 +7,13 @@ import * as ts from 'typescript';
 import { Plugin, PluginVariable } from './database/entity/plugins';
 import { isValidationError } from './helpers/errors';
 import { eventEmitter } from './helpers/events';
-import { error, info } from './helpers/log';
+import { error } from './helpers/log';
+import defaultPermissions from './helpers/permissions/defaultPermissions';
 import { adminEndpoint, publicEndpoint } from './helpers/socket';
+import { ListenToGenerator } from './plugins/ListenTo';
+import { LogGenerator } from './plugins/Log';
+import { PermissionGenerator } from './plugins/Permission';
+import { TwitchGenerator } from './plugins/Twitch';
 
 import Core from '~/_interface';
 import { onStartup } from '~/decorators/on';
@@ -282,49 +287,16 @@ class Plugins extends Core {
 
       for (const ___code___ of  __________workflow__________.code) {
         try {
-        // own scope
-        // @ts-ignore
-          const ListenTo = {
-            Twitch: {
-              command: (opts: { command: string }, callback: any) => {
-                if (type === 'twitchCommand') {
-                  console.log('command called');
-                  callback({
-                    userId:   '1',
-                    userName: 'test',
-                  }, []);
-                }
-              },
-              message: (callback: any) => {
-                if (type === 'twitchChatMessage') {
-                  console.log('message called');
-                  callback({
-                    userId:   '1',
-                    userName: 'test',
-                  }, message);
-                }
-              },
-
-            },
-          };
           // @ts-ignore
-          const Twitch = {
-            sendMessage: () => {
-              console.log('sendMessage called');
-            },
-          };
+          const ListenTo = ListenToGenerator(plugin.id, type, message, userstate);
           // @ts-ignore
-          const Permission = {
-            accessTo: () => {
-              console.log('accessTo called');
-            },
-          };
+          const Twitch = TwitchGenerator(plugin.id, userstate);
           // @ts-ignore
-          const Log = {
-            info: (msg: string) => {
-              info(`PLUGINS#${plugin.id}:./${___code___.name}: ${msg}`);
-            },
-          };
+          const Permission = PermissionGenerator(plugin.id);
+          // @ts-ignore
+          const permission = defaultPermissions;
+          // @ts-ignore
+          const Log = LogGenerator(plugin.id, ___code___.name);
           eval(ts.transpile(___code___.source));
         } catch (e) {
           error(`PLUGINS#${plugin.id}:./${___code___.name}: ${e}`);
@@ -335,7 +307,7 @@ class Plugins extends Core {
 
   /* TODO: replace with event emitter */
   async trigger(type: 'message', message: string, userstate: { userName: string, userId: string }): Promise<void> {
-    this.process(message.startsWith('!') ? 'twitchCommand' : 'twitchChatMessage', message, userstate);
+    this.process(message.startsWith('!') ? 'Twitch.command' : 'Twitch.message', message, userstate);
   }
 }
 

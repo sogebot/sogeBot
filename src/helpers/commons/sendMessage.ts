@@ -11,10 +11,11 @@ import {
 } from '../tmi';
 import getBroadcasterId from '../user/getBroadcasterId.js';
 
-import { getBotSender } from '.';
-
 import twitch from '~/services/twitch.js';
 import { variables } from '~/watchers.js';
+import { getUserSender } from './getUserSender.js';
+import getBotId from '../user/getBotId.js';
+import getBotUserName from '../user/getBotUserName.js';
 
 const getAnnouncementColor = (command: string): HelixChatAnnouncementColor => {
   const color = command.replace('/announce', '');
@@ -68,7 +69,7 @@ class HelpersCommons {
     }
 
     if (!attr.skip) {
-      messageToSend = await new Message(messageToSend).parse({ ...attr, sender: attr.sender ? attr.sender as UserStateTagsWithId : getBotSender(), discord: attr.discord  }) as string;
+      messageToSend = await new Message(messageToSend).parse({ ...attr, sender: attr.sender ? attr.sender as UserStateTagsWithId : getUserSender(getBotId(), getBotUserName()), discord: attr.discord  }) as string;
     }
     if (messageToSend.length === 0) {
       return false;

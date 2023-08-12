@@ -1,19 +1,20 @@
 import { setTimeout } from 'timers';
 
 import { isNil, merge } from 'lodash';
-import { AppDataSource } from '~/database';
+
+import { isValidationError } from './helpers/errors';
+import getBotUserName from './helpers/user/getBotUserName';
 
 import Core from '~/_interface';
+import { AppDataSource } from '~/database';
 import {
   Variable, VariableWatch,
 } from '~/database/entity/variable';
 import { onStartup } from '~/decorators/on';
-import { getBot } from '~/helpers/commons';
 import { runScript, updateWidgetAndTitle } from '~/helpers/customvariables';
 import { csEmitter } from '~/helpers/customvariables/emitter';
 import { isDbConnected } from '~/helpers/database';
 import { adminEndpoint } from '~/helpers/socket';
-import { isValidationError } from './helpers/errors';
 
 class CustomVariables extends Core {
   timeouts: {
@@ -111,7 +112,7 @@ class CustomVariables extends Core {
         const shouldRun = item.runEvery > 0 && Date.now() - new Date(item.runAt).getTime() >= item.runEvery;
         if (shouldRun) {
           const newValue = await runScript(item.evalValue, {
-            _current: item.currentValue, sender: getBot(), isUI: false,
+            _current: item.currentValue, sender: getBotUserName(), isUI: false,
           });
           item.runAt = new Date().toISOString();
           item.currentValue = newValue;

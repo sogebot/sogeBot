@@ -11,7 +11,6 @@ import overlaysEmoteExplosion from './nodes/overlaysEmoteExplosion';
 import overlaysEmoteFirework from './nodes/overlaysEmoteFirework';
 import runJavascriptOnCustomOverlay from './nodes/runCustomJavascriptOnOverlay';
 import twitchBanUser from './nodes/twitchBanUser';
-import twitchSendMessage from './nodes/twitchSendMessage';
 import twitchTimeoutUser from './nodes/twitchTimeoutUser';
 import updateCounter from './nodes/updateCounter';
 import variableSaveToDatabase from './nodes/variableSaveToDatabase';
@@ -37,7 +36,6 @@ export const processes = {
   variableSetCustomVariable,
   twitchTimeoutUser,
   twitchBanUser,
-  twitchSendMessage,
   runScript,
   runJavascriptOnCustomOverlay,
   overlaysEmoteFirework,

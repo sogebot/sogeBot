@@ -5,11 +5,12 @@ import { v4 } from 'uuid';
 import {
   operation, command, count, custom, evaluate, ifp, info, list, math, online, param, price, qs, random, ResponseFilter, stream, youtube,
 } from './filters';
+import getBotId from './helpers/user/getBotId';
+import getBotUserName from './helpers/user/getBotUserName';
 
 import { timer } from '~/decorators.js';
 import { getGlobalVariables } from '~/helpers/checkFilter.js';
 import { getUserSender } from '~/helpers/commons';
-import { getBotSender } from '~/helpers/commons/getBotSender';
 import { app } from '~/helpers/panel';
 import twitch from '~/services/twitch';
 import { adminMiddleware } from '~/socket';
@@ -55,7 +56,7 @@ class Message {
   }
 
   @timer()
-  async parse (attr: { [name: string]: any, isFilter?: boolean, sender: CommandOptions['sender'], discord: CommandOptions['discord'], forceWithoutAt?: boolean } = { sender: getBotSender(), discord: undefined, isFilter: false }) {
+  async parse (attr: { [name: string]: any, isFilter?: boolean, sender: CommandOptions['sender'], discord: CommandOptions['discord'], forceWithoutAt?: boolean } = { sender: getUserSender(getBotId(), getBotUserName()), discord: undefined, isFilter: false }) {
     this.message = await this.message; // if is promise
 
     if (!attr.isFilter) {
