@@ -15,4 +15,10 @@ export const TwitchGenerator = (pluginId: string, userstate: { userName: string,
       : `PLUGINS#${pluginId}: Timeouting user ${userId} for ${timeout}s`);
     banUser(userId, reason, Number(timeout));
   },
+  ban: async  (userId: string, reason?: string) => {
+    info(reason
+      ? `PLUGINS#${pluginId}: Banning user ${userId} with reason: ${reason}`
+      : `PLUGINS#${pluginId}: Banning user ${userId}`);
+    banUser(userId, reason);
+  },
 });
