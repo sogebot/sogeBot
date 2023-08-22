@@ -8,6 +8,7 @@ import { Plugin, PluginVariable } from './database/entity/plugins';
 import { isValidationError } from './helpers/errors';
 import { eventEmitter } from './helpers/events';
 import { error } from './helpers/log';
+import { app } from './helpers/panel';
 import defaultPermissions from './helpers/permissions/defaultPermissions';
 import { adminEndpoint, publicEndpoint } from './helpers/socket';
 import { ListenToGenerator } from './plugins/ListenTo';
@@ -21,7 +22,6 @@ import { onStartup } from '~/decorators/on';
 const plugins: Plugin[] = [];
 
 class Plugins extends Core {
-
   @onStartup()
   onStartup() {
     this.addMenu({
@@ -196,6 +196,59 @@ class Plugins extends Core {
   }
 
   sockets() {
+    if (!app) {
+      setTimeout(() => this.sockets(), 100);
+      return;
+    }
+    app.get('/overlays/plugin/:pid/:id', async (req, res) => {
+      try {
+        const plugin = plugins.find(o => o.id === req.params.pid);
+        if (!plugin) {
+          return res.status(404).send();
+        }
+
+        const files = JSON.parse(plugin.workflow);
+        const overlay = files.overlay.find((o: any) => o.id === req.params.id);
+        if (!overlay) {
+          return res.status(404).send();
+        }
+
+        const source = overlay.source.replace('</body>', `
+        <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"crossorigin="anonymous"></script>
+        <script type="text/javascript">
+          window.socket = io('/core/plugins', {
+            transports: [ 'websocket' ],
+          });
+          window.socket.on("connect_error", () => {
+            console.log('Socket connect_error', window.socket.id); // undefined
+
+          })
+          window.socket.on("connect", () => {
+            console.log('Socket connected', window.socket.id); // x8WIv7-mJelg7on_ALbx
+            window.socket.on("disconnect", () => {
+              console.log('Socket disconnected', window.socket.id); // undefined
+            });
+            window.socket.on('trigger::function', (functionName, args, overlayId) => {
+              if (overlayId && overlayId !== location.pathname.split('/')[location.pathname.split('/').length - 1]) {
+                // do nothing if overlay ID is defined and doesn't match
+                return;
+              }
+              console.groupCollapsed('trigger::function');
+              console.log({functionName, args});
+              console.groupEnd();
+              window[functionName](...args)
+            })
+          });
+        </script>
+        </body>
+        `);
+        res.send(source);
+      } catch (e) {
+        error(e);
+        return res.status(500).send();
+      }
+    });
+
     publicEndpoint('/core/plugins', 'plugins::getSandbox', async ({ pluginId, nodeId }, cb) => {
       const plugin = plugins.find(o => o.id === pluginId);
       const sandbox: Record<string, any> = {
@@ -273,6 +326,7 @@ class Plugins extends Core {
 
   async process(type: any | 'cron', message = '', userstate: { userName: string, userId: string } | null = null, params?: Record<string, any>) {
     const pluginsEnabled = plugins.filter(o => o.enabled);
+    const _____socket______ = this.socket;
     for (const plugin of pluginsEnabled) {
       // explore drawflow
       const __________workflow__________: {
@@ -297,6 +351,12 @@ class Plugins extends Core {
           const permission = defaultPermissions;
           // @ts-ignore
           const Log = LogGenerator(plugin.id, ___code___.name);
+          // @ts-ignore
+          const Overlay = {
+            runFunction(functionName: string, args: any[], overlayId?: string) {
+              _____socket______?.emit('trigger::function', functionName, args, overlayId);
+            },
+          };
           eval(ts.transpile(___code___.source));
         } catch (e) {
           error(`PLUGINS#${plugin.id}:./${___code___.name}: ${e}`);
