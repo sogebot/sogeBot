@@ -11,7 +11,7 @@ import { error } from './helpers/log';
 import { app } from './helpers/panel';
 import defaultPermissions from './helpers/permissions/defaultPermissions';
 import { adminEndpoint, publicEndpoint } from './helpers/socket';
-import { ListenToGenerator } from './plugins/ListenTo';
+import { ListenToGenerator, Types } from './plugins/ListenTo';
 import { LogGenerator } from './plugins/Log';
 import { PermissionGenerator } from './plugins/Permission';
 import { TwitchGenerator } from './plugins/Twitch';
@@ -36,7 +36,7 @@ class Plugins extends Core {
     }, SECOND);
 
     eventEmitter.on('clearchat', async () => {
-      this.process('twitchClearChat');
+      this.process(Types.TwitchClearChat);
     });
 
     eventEmitter.on('cheer', async (data) => {
@@ -44,7 +44,7 @@ class Plugins extends Core {
         userName: data.userName,
         userId:   data.userId,
       };
-      this.process('twitchCheer', data.message, user, {
+      this.process(Types.TwitchCheer, data.message, user, {
         amount: data.bits,
       });
     });
@@ -65,18 +65,18 @@ class Plugins extends Core {
     });
 
     eventEmitter.on('game-changed', async (data) => {
-      this.process('twitchGameChanged', undefined, undefined, { category: data.game, oldCategory: data.oldGame });
+      this.process(Types.TwitchGameChanged, undefined, undefined, { category: data.game, oldCategory: data.oldGame });
     });
 
     eventEmitter.on('stream-started', async () => {
-      this.process('twitchStreamStarted');
+      this.process(Types.TwitchStreamStarted);
     });
 
     eventEmitter.on('stream-stopped', async () => {
-      this.process('twitchStreamStopped');
+      this.process(Types.TwitchStreamStopped);
     });
 
-    const commonHandler = async <T extends { [x:string]: any, userName: string }>(event: any, data: T) => {
+    const commonHandler = async <T extends { [x:string]: any, userName: string }>(event: Types, data: T) => {
       const users = (await import('./users')).default;
       const { userName, ...parameters } = data;
       const user = {
@@ -85,11 +85,10 @@ class Plugins extends Core {
       };
 
       this.process(event, '', user, parameters);
-
     };
 
     eventEmitter.on('subscription', async (data) => {
-      commonHandler('twitchSubscription', data);
+      commonHandler(Types.TwitchSubscription, data);
     });
 
     eventEmitter.on('subgift', async (data) => {
@@ -106,14 +105,6 @@ class Plugins extends Core {
 
     eventEmitter.on('reward-redeemed', async (data) => {
       commonHandler('twitchRewardRedeem', data);
-    });
-
-    eventEmitter.on('stream-stopped', async () => {
-      this.process('twitchStreamStopped');
-    });
-
-    eventEmitter.on('stream-stopped', async () => {
-      this.process('twitchStreamStopped');
     });
 
     eventEmitter.on('stream-stopped', async () => {
@@ -292,7 +283,7 @@ class Plugins extends Core {
     });
   }
 
-  async process(type: any | 'cron', message = '', userstate: { userName: string, userId: string } | null = null, params?: Record<string, any>) {
+  async process(type: Types, message = '', userstate: { userName: string, userId: string } | null = null, params?: Record<string, any>) {
     const pluginsEnabled = plugins.filter(o => o.enabled);
     const _____socket______ = this.socket;
     for (const plugin of pluginsEnabled) {
@@ -310,7 +301,7 @@ class Plugins extends Core {
       for (const ___code___ of  __________workflow__________.code) {
         try {
           // @ts-ignore
-          const ListenTo = ListenToGenerator(plugin.id, type, message, userstate);
+          const ListenTo = ListenToGenerator(plugin.id, type, message, userstate, params);
           // @ts-ignore
           const Twitch = TwitchGenerator(plugin.id, userstate);
           // @ts-ignore
@@ -335,7 +326,7 @@ class Plugins extends Core {
 
   /* TODO: replace with event emitter */
   async trigger(type: 'message', message: string, userstate: { userName: string, userId: string }): Promise<void> {
-    this.process(message.startsWith('!') ? 'Twitch.command' : 'Twitch.message', message, userstate);
+    this.process(message.startsWith('!') ? Types.TwitchCommand : Types.TwitchMessage, message, userstate);
   }
 }
 
