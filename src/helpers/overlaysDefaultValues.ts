@@ -229,6 +229,10 @@ const values = {
   carousel: {
     images: [],
   },
+  plugin: {
+    pluginId:  '',
+    overlayId: '',
+  },
   goal: {
     display: {
       type:                  'fade',

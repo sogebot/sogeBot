@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import { MINUTE, SECOND } from '@sogebot/ui-helpers/constants';
+import { SECOND } from '@sogebot/ui-helpers/constants';
 import { validateOrReject } from 'class-validator';
 import merge from 'lodash/merge';
 import * as ts from 'typescript';
@@ -31,9 +31,6 @@ class Plugins extends Core {
     this.updateCache().then(() => {
       this.process('botStarted');
     });
-    setInterval(() => {
-      this.updateAllCrons();
-    }, MINUTE);
     setInterval(() => {
       this.triggerCrons();
     }, SECOND);
@@ -140,59 +137,30 @@ class Plugins extends Core {
     for (const plugin of _plugins) {
       plugins.push(plugin);
     }
-    await this.updateAllCrons();
-  }
-
-  async updateAllCrons() {
-    // we will generate at least 2 minutes of span of crons
-    // e.g. if we have cron every 1s -> 120 crons
-    //                           10s -> 12  crons
-    //                           10m -> 1   cron
-    // const cron = await this.process('cron', '', null, {});
-
-    // cronTriggers.clear();
-    // for (const { plugin, listeners: workflowListeners } of cron) {
-    //   for (const node of workflowListeners) {
-    //     try {
-    //       const cronParsed = cronparser.parseExpression(node.data.value);
-
-    //       const currentTime = Date.now();
-    //       let lastTime = new Date().toISOString();
-    //       const intervals: string[] = [];
-    //       while (currentTime + (2 * MINUTE) > new Date(lastTime).getTime()) {
-    //         lastTime = cronParsed.next().toISOString();
-    //         intervals.push(lastTime);
-    //       }
-
-    //       for (const interval of intervals) {
-    //         cronTriggers.set(`${plugin.id}|${interval}`, node);
-    //       }
-    //     } catch (e) {
-    //       error(e);
-    //     }
-    //   }
-    // }
   }
 
   async triggerCrons() {
-    // for (const [pluginId, timestamp] of [...cronTriggers.keys()].map(o => o.split('|'))) {
-    //   if (new Date(timestamp).getTime() < Date.now()) {
-    //     const plugin = plugins.find(o => o.id === pluginId);
-    //     const node = cronTriggers.get(`${pluginId}|${timestamp}`);
-    //     if (plugin && node) {
-    //       const workflow = Object.values(
-    //         JSON.parse(plugin.workflow).drawflow.Home.data
-    //       ) as Node[];
+    for (const plugin of plugins) {
+      if (!plugin.enabled) {
+        continue;
+      }
+      try {
+        const workflow = JSON.parse(plugin.workflow);
+        if (!Array.isArray(workflow.code)) {
+          continue;
+        }
 
-    //       const settings: Record<string, any> = {};
-    //       for (const item of (plugin.settings || [])) {
-    //         settings[item.name] = item.currentValue;
-    //       }
-    //       this.processPath(pluginId, workflow, node, {}, { settings }, null);
-    //     }
-    //     cronTriggers.delete(`${pluginId}|${timestamp}`);
-    //   }
-    // }
+        for (const file of workflow.code) {
+          if (!file.source.includes('ListenTo.Cron')) {
+            continue;
+          }
+
+          this.process('cron');
+        }
+      } catch {
+        continue;
+      }
+    }
   }
 
   sockets() {

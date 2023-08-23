@@ -361,6 +361,12 @@ export interface AlertsRegistry {
   id: string,
 }
 
+export interface Plugin {
+  typeId: 'plugin';
+  pluginId: string;
+  overlayId: string;
+}
+
 export interface URL {
   typeId: 'url';
   url: string,
@@ -476,7 +482,8 @@ export class Overlay extends BotEntity<Overlay> {
     URL | Chat | Reference | AlertsRegistry | Carousel | Marathon | Stopwatch |
     Countdown | Group | Eventlist | EmotesCombo | Credits | Clips | Alerts |
     Emotes | EmotesExplode | EmotesFireworks | Polls | TTS | OBSWebsocket |
-    ClipsCarousel | HypeTrain | Wordcloud | HTML | Stats | Randomizer | Goal | Credits;
+    ClipsCarousel | HypeTrain | Wordcloud | HTML | Stats | Randomizer | Goal | Credits |
+    Plugin;
   }[];
 }
 
