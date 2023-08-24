@@ -18,6 +18,9 @@ export enum Types {
   'TwitchFollow',
   'TwitchRaid',
   'TwitchRewardRedeem',
+  'TwitchSubgift',
+  'TwitchSubcommunitygift',
+  'GenericTip',
 }
 
 export const ListenToGenerator = (pluginId: string, type: Types, message: string, userstate: { userName: string, userId: string } | null, params?: Record<string, any>) => ({
@@ -103,6 +106,23 @@ export const ListenToGenerator = (pluginId: string, type: Types, message: string
     onSubscription: (callback: any) => {
       if (type === Types.TwitchSubscription) {
         callback(userstate, params);
+      }
+    },
+    onSubGift: (callback: any) => {
+      if (type === Types.TwitchSubscription) {
+        callback(userstate, params);
+      }
+    },
+    onSubCommunityGift: (callback: any) => {
+      if (type === Types.TwitchSubscription) {
+        callback(userstate, params);
+      }
+    },
+  },
+  Generic: {
+    onTip: (callback: any) => {
+      if (type === Types.GenericTip) {
+        callback(userstate, message, params);
       }
     },
   },

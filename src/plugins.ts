@@ -3,6 +3,7 @@ import { SECOND } from '@sogebot/ui-helpers/constants';
 import { validateOrReject } from 'class-validator';
 import merge from 'lodash/merge';
 import * as ts from 'typescript';
+import emitter from '~/helpers/interfaceEmitter';
 
 import { Plugin, PluginVariable } from './database/entity/plugins';
 import { isValidationError } from './helpers/errors';
@@ -29,7 +30,7 @@ class Plugins extends Core {
     });
 
     this.updateCache().then(() => {
-      this.process('botStarted');
+      this.process(Types.Started);
     });
     setInterval(() => {
       this.triggerCrons();
@@ -55,7 +56,7 @@ class Plugins extends Core {
         userName: data.userName,
         userId:   !data.isAnonymous ? await users.getIdByName(data.userName) : '0',
       };
-      this.process('tip', data.message, user, {
+      this.process(Types.GenericTip, data.message, user, {
         isAnonymous: data.isAnonymous,
         amount:      data.amount,
         botAmount:   data.amountInBotCurrency,
@@ -92,11 +93,11 @@ class Plugins extends Core {
     });
 
     eventEmitter.on('subgift', async (data) => {
-      commonHandler('twitchSubgift', data);
+      commonHandler(Types.TwitchSubgift, data);
     });
 
     eventEmitter.on('subcommunitygift', async (data) => {
-      commonHandler('twitchSubcommunitygift', data);
+      commonHandler(Types.TwitchSubcommunitygift, data);
     });
 
     eventEmitter.on('resub', async (data) => {
@@ -308,6 +309,12 @@ class Plugins extends Core {
           const Log = LogGenerator(plugin.id, ___code___.name);
           // @ts-ignore
           const Overlay = {
+            emoteExplosion(emotes: string[]) {
+              emitter.emit('services::twitch::emotes', 'explode', emotes);
+            },
+            emoteFirework(emotes: string[]) {
+              emitter.emit('services::twitch::emotes', 'firework', emotes);
+            },
             runFunction(functionName: string, args: any[], overlayId?: string) {
               _____socket______?.emit('trigger::function', functionName, args, overlayId);
             },
