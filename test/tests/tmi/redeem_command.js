@@ -1,5 +1,3 @@
-const { getBotSender } = require('../../../dest/helpers/commons/getBotSender');
-
 require('../../general.js');
 
 const until = require('test-until');
