@@ -14,6 +14,10 @@ export enum Types {
   'TwitchGameChanged',
   'TwitchStreamStarted',
   'TwitchStreamStopped',
+  'TwitchResub',
+  'TwitchFollow',
+  'TwitchRaid',
+  'TwitchRewardRedeem',
 }
 
 export const ListenToGenerator = (pluginId: string, type: Types, message: string, userstate: { userName: string, userId: string } | null, params?: Record<string, any>) => ({
@@ -74,6 +78,26 @@ export const ListenToGenerator = (pluginId: string, type: Types, message: string
       if (type === Types.TwitchMessage) {
         debug('plugins', `PLUGINS#${pluginId}: Twitch message executed`);
         callback(userstate, message);
+      }
+    },
+    onFollow: (callback: any) => {
+      if (type === Types.TwitchFollow) {
+        callback(userstate);
+      }
+    },
+    onRaid: (callback: any) => {
+      if (type === Types.TwitchRaid) {
+        callback(userstate, params);
+      }
+    },
+    onRewardRedeem: (callback: any) => {
+      if (type === Types.TwitchResub) {
+        callback(userstate, params);
+      }
+    },
+    onResub: (callback: any) => {
+      if (type === Types.TwitchResub) {
+        callback(userstate, params);
       }
     },
     onSubscription: (callback: any) => {

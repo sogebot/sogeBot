@@ -100,23 +100,19 @@ class Plugins extends Core {
     });
 
     eventEmitter.on('resub', async (data) => {
-      commonHandler('twitchResub', data);
+      commonHandler(Types.TwitchResub, data);
     });
 
     eventEmitter.on('reward-redeemed', async (data) => {
-      commonHandler('twitchRewardRedeem', data);
-    });
-
-    eventEmitter.on('stream-stopped', async () => {
-      this.process('twitchStreamStopped');
+      commonHandler(Types.TwitchRewardRedeem, data);
     });
 
     eventEmitter.on('follow', async (data) => {
-      this.process('twitchFollow', '', data);
+      this.process(Types.TwitchFollow, '', data);
     });
 
     eventEmitter.on('raid', async (data) => {
-      commonHandler('twitchRaid', data);
+      commonHandler(Types.TwitchRaid, data);
     });
   }
 
@@ -146,7 +142,7 @@ class Plugins extends Core {
             continue;
           }
 
-          this.process('cron');
+          this.process(Types.Cron);
         }
       } catch {
         continue;
