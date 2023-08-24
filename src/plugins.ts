@@ -3,12 +3,12 @@ import { SECOND } from '@sogebot/ui-helpers/constants';
 import { validateOrReject } from 'class-validator';
 import merge from 'lodash/merge';
 import * as ts from 'typescript';
-import emitter from '~/helpers/interfaceEmitter';
 
+import { EmitData } from './database/entity/alert';
 import { Plugin, PluginVariable } from './database/entity/plugins';
 import { isValidationError } from './helpers/errors';
 import { eventEmitter } from './helpers/events';
-import { error } from './helpers/log';
+import { error, info } from './helpers/log';
 import { app } from './helpers/panel';
 import defaultPermissions from './helpers/permissions/defaultPermissions';
 import { adminEndpoint, publicEndpoint } from './helpers/socket';
@@ -16,9 +16,13 @@ import { ListenToGenerator, Types } from './plugins/ListenTo';
 import { LogGenerator } from './plugins/Log';
 import { PermissionGenerator } from './plugins/Permission';
 import { TwitchGenerator } from './plugins/Twitch';
+import { VariableGenerator } from './plugins/Variable';
+import alerts from './registries/alerts';
+import points from './systems/points';
 
 import Core from '~/_interface';
 import { onStartup } from '~/decorators/on';
+import emitter from '~/helpers/interfaceEmitter';
 
 const plugins: Plugin[] = [];
 
@@ -307,6 +311,39 @@ class Plugins extends Core {
           const permission = defaultPermissions;
           // @ts-ignore
           const Log = LogGenerator(plugin.id, ___code___.name);
+          // @ts-ignore
+          const Variable = VariableGenerator(plugin.id);
+          // @ts-ignore
+          const Alerts = {
+            async trigger(uuid: string, name?: string, msg?: string, customOptions?: EmitData['customOptions']) {
+              if (customOptions) {
+                info(`PLUGINS#${plugin.id}: Triggering alert ${uuid} with custom options ${JSON.stringify(customOptions)}`);
+              } else {
+                info(`PLUGINS#${plugin.id}: Triggering alert ${uuid}`);
+              }
+              await alerts.trigger({
+                amount:     0,
+                currency:   'CZK',
+                event:      'custom',
+                alertId:    uuid,
+                message:    msg || '',
+                monthsName: '',
+                name:       name ?? '',
+                tier:       null,
+                recipient:  userstate?.userName ?? '',
+                customOptions,
+              });
+            },
+          };
+          // @ts-ignore
+          const Points = {
+            async increment(userName: string, value: number) {
+              await points.increment({ userName }, Math.abs(Number(value)));
+            },
+            async decrement(userName: string, value: number) {
+              await points.decrement({ userName }, Math.abs(Number(value)));
+            },
+          };
           // @ts-ignore
           const Overlay = {
             emoteExplosion(emotes: string[]) {
