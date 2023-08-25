@@ -6,15 +6,15 @@ import {
 import { User } from '@entity/user';
 import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized';
 import * as _ from 'lodash';
-import { AppDataSource } from '~/database';
 import { IsNull } from 'typeorm';
 
+import System from './_interface';
 import {
   command, default_permission, parser, settings, timer,
 } from '../decorators';
 import { onStartup } from '../decorators/on';
-import System from './_interface';
 
+import { AppDataSource } from '~/database';
 import { isStreamOnline } from '~/helpers/api';
 import {
   announce, getOwnerAsSender, prepare,
