@@ -1,14 +1,19 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
+import { getTime } from '@sogebot/ui-helpers/getTime';
 import axios, { AxiosRequestConfig } from 'axios';
 import * as ts from 'typescript';
 
 import { Types } from './ListenTo';
-import { getRandomOnlineSubscriber, getRandomSubscriber, getRandomOnlineViewer, getRandomViewer } from '../../dest/helpers/user/random';
 
 import type { EmitData } from '~/database/entity/alert';
 import { Plugin } from '~/database/entity/plugins';
+import { chatMessagesAtStart, isStreamOnline, stats } from '~/helpers/api';
+import { streamStatusChangeSince } from '~/helpers/api/streamStatusChangeSince';
+import { mainCurrency, symbol } from '~/helpers/currency';
 import emitter from '~/helpers/interfaceEmitter';
 import { info } from '~/helpers/log';
+import { linesParsed } from '~/helpers/parser';
+import { getRandomOnlineSubscriber, getRandomSubscriber, getRandomOnlineViewer, getRandomViewer } from '~/helpers/user/random';
 import alerts from '~/registries/alerts';
 import points from '~/systems/points';
 import users from '~/users';
@@ -100,6 +105,22 @@ export const runScriptInSandbox = (plugin: Plugin,
   // @ts-ignore
   const fetch = async (uri: string, config: AxiosRequestConfig) => {
     return (await axios(uri, config));
+  };
+  // @ts-ignore
+  const stream = {
+    uptime:             getTime(isStreamOnline.value ? streamStatusChangeSince.value : null, false),
+    currentViewers:     stats.value.currentViewers,
+    currentSubscribers: stats.value.currentSubscribers,
+    currentBits:        stats.value.currentBits,
+    currentTips:        stats.value.currentTips,
+    currency:           symbol(mainCurrency.value),
+    chatMessages:       (isStreamOnline.value) ? linesParsed - chatMessagesAtStart.value : 0,
+    currentFollowers:   stats.value.currentFollowers,
+    maxViewers:         stats.value.maxViewers,
+    newChatters:        stats.value.newChatters,
+    game:               stats.value.currentGame,
+    status:             stats.value.currentTitle,
+    currentWatched:     stats.value.currentWatchedTime,
   };
   eval(ts.transpile(___code___.source));
 };

@@ -2,7 +2,7 @@ import { setTimeout } from 'timers';
 
 import { HOUR } from '@sogebot/ui-helpers/constants';
 import {
-  Brackets, FindOneOptions, IsNull,
+  Brackets, IsNull,
 } from 'typeorm';
 
 import { defaultPermissions } from './helpers/permissions/defaultPermissions';
