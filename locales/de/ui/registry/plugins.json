@@ -13,11 +13,11 @@
   "listener": {
     "name": "Event listener",
     "type": {
-      "twitchChatMessage": "Twitch chat message",
+      "twitchChatMessage": "Twitch Chat-Nachricht",
       "twitchCheer": "Twitch cheer received",
       "twitchClearChat": "Twitch chat cleared",
-      "twitchCommand": "Twitch command",
-      "twitchFollow": "New Twitch follower",
+      "twitchCommand": "Twitch Befehl",
+      "twitchFollow": "Neuer Twitch Follower",
       "twitchSubscription": "New Twitch subscription",
       "twitchSubgift": "New Twitch subscription gift",
       "twitchSubcommunitygift": "New Twitch subscription community gift",
@@ -28,7 +28,7 @@
       "twitchRewardRedeem": "Twitch reward redeemed",
       "twitchRaid": "Twitch raid incoming",
       "tip": "Trinkgeld vom Nutzer",
-      "botStarted": "Bot started"
+      "botStarted": "Bot gestartet"
     },
     "command": {
       "add-parameter": "Add parameter",
@@ -38,7 +38,7 @@
   },
   "others": {
     "idle": {
-      "name": "Idle"
+      "name": "Inaktiv"
     }
   },
   "output": {
@@ -49,10 +49,10 @@
       "name": "Timeout user"
     },
     "ban-user": {
-      "name": "Ban user"
+      "name": "Benutzer sperren"
     },
     "send-twitch-message": {
-      "name": "Send Twitch Message"
+      "name": "Twitch Nachricht senden"
     }
   }
 }

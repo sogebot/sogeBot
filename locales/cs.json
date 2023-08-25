@@ -316,7 +316,8 @@
       "resub": "Obnoven <strong>odběr</strong> s <strong>$subType</strong>. Byli přihlášeni k odběru $subCumulativeMonths $subCumulativeMonthsName.",
       "cheer": "<strong>Bity</strong>",
       "tip": "<strong>Spropitné</strong>",
-      "tipToCharity": "<strong>přispěl</strong> pro <strong>$campaignName</strong>"
+      "tipToCharity": "<strong>přispěl</strong> pro <strong>$campaignName</strong>",
+      "hypeChatTip": "sent <strong>hype chat</strong>"
     },
     "responses": {
       "variable": {
