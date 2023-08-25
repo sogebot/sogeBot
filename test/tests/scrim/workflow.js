@@ -3,7 +3,7 @@ const assert = require('assert');
 
 const { getLocalizedName } = require('@sogebot/ui-helpers/getLocalized');
 
-const { getBotUserName } = require('../../../dest/helpers/user/getBotUserName');
+const getBotUserName = require('../../../dest/helpers/user/getBotUserName').default;
 const { translate } = require('../../../dest/translate');
 require('../../general.js');
 const db = require('../../general.js').db;
