@@ -1,28 +1,18 @@
-/* eslint-disable @typescript-eslint/ban-ts-comment */
 import { SECOND } from '@sogebot/ui-helpers/constants';
 import { validateOrReject } from 'class-validator';
 import merge from 'lodash/merge';
-import * as ts from 'typescript';
 
-import { EmitData } from './database/entity/alert';
 import { Plugin, PluginVariable } from './database/entity/plugins';
 import { isValidationError } from './helpers/errors';
 import { eventEmitter } from './helpers/events';
-import { error, info } from './helpers/log';
+import { error } from './helpers/log';
 import { app } from './helpers/panel';
-import defaultPermissions from './helpers/permissions/defaultPermissions';
 import { adminEndpoint, publicEndpoint } from './helpers/socket';
-import { ListenToGenerator, Types } from './plugins/ListenTo';
-import { LogGenerator } from './plugins/Log';
-import { PermissionGenerator } from './plugins/Permission';
-import { TwitchGenerator } from './plugins/Twitch';
-import { VariableGenerator } from './plugins/Variable';
-import alerts from './registries/alerts';
-import points from './systems/points';
+import { Types } from './plugins/ListenTo';
+import { runScriptInSandbox } from './plugins/Sandbox';
 
 import Core from '~/_interface';
 import { onStartup } from '~/decorators/on';
-import emitter from '~/helpers/interfaceEmitter';
 
 const plugins: Plugin[] = [];
 
@@ -286,7 +276,6 @@ class Plugins extends Core {
 
   async process(type: Types, message = '', userstate: { userName: string, userId: string } | null = null, params?: Record<string, any>) {
     const pluginsEnabled = plugins.filter(o => o.enabled);
-    const _____socket______ = this.socket;
     for (const plugin of pluginsEnabled) {
       // explore drawflow
       const __________workflow__________: {
@@ -301,62 +290,9 @@ class Plugins extends Core {
 
       for (const ___code___ of  __________workflow__________.code) {
         try {
-          // @ts-ignore
-          const ListenTo = ListenToGenerator(plugin.id, type, message, userstate, params);
-          // @ts-ignore
-          const Twitch = TwitchGenerator(plugin.id, userstate);
-          // @ts-ignore
-          const Permission = PermissionGenerator(plugin.id);
-          // @ts-ignore
-          const permission = defaultPermissions;
-          // @ts-ignore
-          const Log = LogGenerator(plugin.id, ___code___.name);
-          // @ts-ignore
-          const Variable = VariableGenerator(plugin.id);
-          // @ts-ignore
-          const Alerts = {
-            async trigger(uuid: string, name?: string, msg?: string, customOptions?: EmitData['customOptions']) {
-              if (customOptions) {
-                info(`PLUGINS#${plugin.id}: Triggering alert ${uuid} with custom options ${JSON.stringify(customOptions)}`);
-              } else {
-                info(`PLUGINS#${plugin.id}: Triggering alert ${uuid}`);
-              }
-              await alerts.trigger({
-                amount:     0,
-                currency:   'CZK',
-                event:      'custom',
-                alertId:    uuid,
-                message:    msg || '',
-                monthsName: '',
-                name:       name ?? '',
-                tier:       null,
-                recipient:  userstate?.userName ?? '',
-                customOptions,
-              });
-            },
-          };
-          // @ts-ignore
-          const Points = {
-            async increment(userName: string, value: number) {
-              await points.increment({ userName }, Math.abs(Number(value)));
-            },
-            async decrement(userName: string, value: number) {
-              await points.decrement({ userName }, Math.abs(Number(value)));
-            },
-          };
-          // @ts-ignore
-          const Overlay = {
-            emoteExplosion(emotes: string[]) {
-              emitter.emit('services::twitch::emotes', 'explode', emotes);
-            },
-            emoteFirework(emotes: string[]) {
-              emitter.emit('services::twitch::emotes', 'firework', emotes);
-            },
-            runFunction(functionName: string, args: any[], overlayId?: string) {
-              _____socket______?.emit('trigger::function', functionName, args, overlayId);
-            },
-          };
-          eval(ts.transpile(___code___.source));
+          runScriptInSandbox(plugin, userstate, message, type, ___code___, {
+            socket: this.socket,
+          });
         } catch (e) {
           error(`PLUGINS#${plugin.id}:./${___code___.name}: ${e}`);
         }

@@ -222,7 +222,12 @@ class Users extends Core {
     return user.userId;
   }
 
-  async getUserByUsername(userName: string, select?: FindOneOptions<Readonly<Required<UserInterface>>>['select']) {
+  async getUserByUserId(userId: string) {
+    await changelog.flush();
+    return changelog.get(userId) as Promise<Readonly<Required<UserInterface>>>;
+  }
+
+  async getUserByUsername(userName: string) {
     await changelog.flush();
     const userByUsername = await AppDataSource.getRepository(User).findOneBy({ userName });
 
@@ -232,9 +237,7 @@ class Users extends Core {
 
     const userId = await this.getIdByName(userName);
     await changelog.flush();
-    const userById = await changelog.get(userId);
-
-    return userById as Readonly<Required<UserInterface>>;
+    return changelog.get(userId) as Promise<Readonly<Required<UserInterface>>>;
   }
 
   sockets () {
