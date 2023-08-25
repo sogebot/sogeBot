@@ -2,10 +2,10 @@
   "core": {
     "loaded": "carregado, e",
     "enabled": "ativado",
-    "disabled": "desativado",
+    "disabled": "desabilitado",
     "usage": "Utilização",
-    "lang-selected": "O idioma do bot está atualmente definido como português do brazil",
-    "refresh-panel": "Você precisará atualizar a interface do usuário para ver as alterações.",
+    "lang-selected": "O idioma do bot está atualmente definido como Inglês",
+    "refresh-panel": "Você precisará atualizar a UI para ver as alterações.",
     "command-parse": "Desculpe, $sender, mas esse comando não está correto, use",
     "error": "Desculpe, $sender, mas algo deu errado!",
     "no-response": "",
@@ -52,16 +52,16 @@
     "go-to-public": "Painel do usuario",
     "logout": "Finalizar sessão",
     "popout": "Desanexar",
-    "not-logged-in": "Desconectado",
+    "not-logged-in": "Não está logado",
     "remove-widget": "Remover o widget <strong>$name</strong>",
     "join-channel": "Associar ‘bot’ ao canal",
     "leave-channel": "Desassociar ‘bot’ do canal",
     "set-default": "Definir como padrão",
     "add": "Adicionar",
     "placeholders": {
-      "text-url-generator": "Cole seu texto ou html para gerar base64 abaixo e URL acima",
+      "text-url-generator": "Cole seu texto ou HTML para gerar base64 abaixo e URL acima",
       "text-decode-base64": "Cole seu base64 para gerar o URL e o texto acima",
-      "creditsSpeed": "Definir velocidade de execução de créditos, mais baixo = mais rápido"
+      "creditsSpeed": "Definir velocidade de rolagem de créditos, mais baixo = mais rápido"
     },
     "timers": {
       "title": "Temporizadores",
@@ -316,7 +316,8 @@
       "resub": "<strong>Re-inscreveu-se</strong> com <strong>$subType</strong>. Inscrição pelo período $subCumulativeMonths $subCumulativeMonthsName.",
       "cheer": "Deu um <strong>Cheered</strong> em você",
       "tip": "<strong>Doou </strong> para você",
-      "tipToCharity": "<strong>doou</strong> para <strong>$campaignName</strong>"
+      "tipToCharity": "<strong>doou</strong> para <strong>$campaignName</strong>",
+      "hypeChatTip": "sent <strong>hype chat</strong>"
     },
     "responses": {
       "variable": {

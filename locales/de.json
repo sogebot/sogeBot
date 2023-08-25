@@ -316,7 +316,8 @@
       "resub": "<strong>Resubscribed</strong> with <strong>$subType</strong>. They've been subscribed for $subCumulativeMonths $subCumulativeMonthsName.",
       "cheer": "<strong>Cheered</strong> you",
       "tip": "<strong>Tipped</strong> you",
-      "tipToCharity": "<strong>donated</strong> to <strong>$campaignName</strong>"
+      "tipToCharity": "<strong>donated</strong> to <strong>$campaignName</strong>",
+      "hypeChatTip": "sent <strong>hype chat</strong>"
     },
     "responses": {
       "variable": {
@@ -354,7 +355,7 @@
         "game": "Aktuelle Kategorie",
         "language": "Aktuelle Sprache des Stream",
         "viewers": "Anzahl der aktuellen Zuschauer",
-        "hostViewers": "Raid viewers count",
+        "hostViewers": "Anzahl der Raid-Zuschauer",
         "followers": "Aktuelle Follower Anzahl",
         "subscribers": "Anzahl aktueller Abonnenten",
         "arg": "Argument",
