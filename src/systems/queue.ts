@@ -1,16 +1,18 @@
 import { Queue as QueueEntity, QueueInterface } from '@entity/queue';
-import { AppDataSource } from '~/database';
 
+import System from './_interface';
 import {
   command, default_permission, settings,
 } from '../decorators';
-import System from './_interface';
 
 import { parserReply } from '~/commons';
-import { getBotSender, prepare } from '~/helpers/commons';
+import { AppDataSource } from '~/database';
+import { getUserSender, prepare } from '~/helpers/commons';
 import defaultPermissions from '~/helpers/permissions/defaultPermissions';
 import { adminEndpoint } from '~/helpers/socket';
 import * as changelog from '~/helpers/user/changelog.js';
+import getBotId from '~/helpers/user/getBotId';
+import getBotUserName from '~/helpers/user/getBotUserName';
 import twitch from '~/services/twitch';
 import { translate } from '~/translate';
 
@@ -75,7 +77,7 @@ class Queue extends System {
           }
           if (cb) {
             const opts = {
-              sender: getBotSender(), users, attr: {}, createdAt: Date.now(), command: '', parameters: '', isAction: false, emotesOffsets: new Map(), isFirstTimeMessage: false, discord: undefined,
+              sender: getUserSender(getBotId(), getBotUserName()), users, attr: {}, createdAt: Date.now(), command: '', parameters: '', isAction: false, emotesOffsets: new Map(), isFirstTimeMessage: false, discord: undefined,
             };
             const picked = await this.pickUsers(opts, data.random);
             for (let i = 0; i < picked.responses.length; i++) {
@@ -86,7 +88,7 @@ class Queue extends System {
         } else {
           if (cb) {
             const opts = {
-              sender: getBotSender(), attr: {}, createdAt: Date.now(), command: '', parameters: String(data.count), isAction: false, emotesOffsets: new Map(), isFirstTimeMessage: false, discord: undefined,
+              sender: getUserSender(getBotId(), getBotUserName()), attr: {}, createdAt: Date.now(), command: '', parameters: String(data.count), isAction: false, emotesOffsets: new Map(), isFirstTimeMessage: false, discord: undefined,
             };
             const picked = await this.pickUsers(opts, data.random);
             for (let i = 0; i < picked.responses.length; i++) {

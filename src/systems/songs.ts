@@ -22,7 +22,7 @@ import { onChange, onStartup } from '../decorators/on';
 
 import { AppDataSource } from '~/database';
 import {
-  announce, getBot, getBotSender, prepare,
+  announce, getUserSender, prepare,
 } from '~/helpers/commons';
 import { error, info } from '~/helpers/log';
 import defaultPermissions from '~/helpers/permissions/defaultPermissions';
@@ -31,6 +31,8 @@ import { tmiEmitter } from '~/helpers/tmi';
 import * as changelog from '~/helpers/user/changelog.js';
 import { isModerator } from '~/helpers/user/isModerator';
 import { translate } from '~/translate';
+import getBotId from '~/helpers/user/getBotId';
+import getBotUserName from '~/helpers/user/getBotUserName';
 
 let importInProgress = false;
 const cachedTags = new Set<string>();
@@ -248,7 +250,7 @@ class Songs extends System {
     adminEndpoint('/systems/songs', 'import.ban', async (url, cb) => {
       try {
         cb(null, await this.banSong({
-          isAction: false, emotesOffsets: new Map(), isFirstTimeMessage: false, parameters: this.getIdFromURL(url), sender: getBotSender(), command: '', createdAt: Date.now(), attr: {}, discord: undefined,
+          isAction: false, emotesOffsets: new Map(), isFirstTimeMessage: false, parameters: this.getIdFromURL(url), sender: getUserSender(getBotId(), getBotUserName()), command: '', createdAt: Date.now(), attr: {}, discord: undefined,
         }));
       } catch (e: any) {
         cb(e.stack, []);
@@ -258,7 +260,7 @@ class Songs extends System {
       try {
         isCachedTagsValid = false;
         cb(null, await this.importPlaylist({
-          isAction: false, emotesOffsets: new Map(), isFirstTimeMessage: false, parameters: playlist, sender: getBotSender(), command: '', createdAt: Date.now(), attr: { forcedTag }, discord: undefined,
+          isAction: false, emotesOffsets: new Map(), isFirstTimeMessage: false, parameters: playlist, sender: getUserSender(getBotId(), getBotUserName()), command: '', createdAt: Date.now(), attr: { forcedTag }, discord: undefined,
         }));
       } catch (e: any) {
         cb(e.stack, null);
@@ -267,7 +269,7 @@ class Songs extends System {
     adminEndpoint('/systems/songs', 'import.video', async ({ playlist, forcedTag }, cb) => {
       try {
         cb(null, await this.addSongToPlaylist({
-          isAction: false, emotesOffsets: new Map(), isFirstTimeMessage: false, parameters: playlist, sender: getBotSender(), command: '', createdAt: Date.now(), attr: { forcedTag }, discord: undefined,
+          isAction: false, emotesOffsets: new Map(), isFirstTimeMessage: false, parameters: playlist, sender: getUserSender(getBotId(), getBotUserName()), command: '', createdAt: Date.now(), attr: { forcedTag }, discord: undefined,
         }));
       } catch (e: any) {
         cb(e.stack, null);
@@ -474,7 +476,7 @@ class Songs extends System {
         videoId:     pl[0].videoId,
         title:       pl[0].title,
         type:        'playlist',
-        username:    getBot(),
+        username:    getBotUserName(),
         forceVolume: pl[0].forceVolume,
         loudness:    pl[0].loudness,
         volume:      await this.getVolume(pl[0]),
@@ -538,7 +540,7 @@ class Songs extends System {
       }
 
       return this.addSongToPlaylist({
-        ...opts, sender: getBotSender(), parameters: currentSong.videoId, attr: {}, createdAt: Date.now(), command: '',
+        ...opts, sender: getUserSender(getBotId(), getBotUserName()), parameters: currentSong.videoId, attr: {}, createdAt: Date.now(), command: '',
       });
     } catch (err: any) {
       return [{ response: translate('songs.no-song-is-currently-playing'), ...opts }];

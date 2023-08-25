@@ -2,12 +2,14 @@ import * as constants from '@sogebot/ui-helpers/constants';
 import _ from 'lodash';
 import { v4 as uuid } from 'uuid';
 
+import { getUserSender } from './helpers/commons';
 import { list } from './helpers/register';
+import getBotId from './helpers/user/getBotId';
+import getBotUserName from './helpers/user/getBotUserName';
 
 import { PermissionCommands } from '~/database/entity/permissions';
 import { timer } from '~/decorators.js';
 import { incrementCountOfCommandUsage } from '~/helpers/commands/count';
-import { getBotSender } from '~/helpers/commons';
 import {
   debug, error, info, warning,
 } from '~/helpers/log';
@@ -289,7 +291,7 @@ class Parser {
     ) {
       const text = message.trim().replace(new RegExp('^(' + command.command + ')', 'i'), '').trim();
       const opts: CommandOptions = {
-        sender:             sender || getBotSender(),
+        sender:             sender || getUserSender(getBotId(), getBotUserName()),
         discord:            this.discord ?? undefined,
         emotesOffsets:      this.emotesOffsets,
         isAction:           this.isAction,

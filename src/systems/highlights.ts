@@ -13,10 +13,12 @@ import { createClip } from '../services/twitch/calls/createClip';
 import {
   isStreamOnline, stats, streamStatusChangeSince,
 } from '~/helpers/api';
-import { getBotSender } from '~/helpers/commons';
+import { getUserSender } from '~/helpers/commons';
 import { error } from '~/helpers/log';
 import defaultPermissions from '~/helpers/permissions/defaultPermissions';
 import { adminEndpoint } from '~/helpers/socket';
+import getBotId from '~/helpers/user/getBotId';
+import getBotUserName from '~/helpers/user/getBotUserName';
 import getBroadcasterId from '~/helpers/user/getBroadcasterId';
 import twitch from '~/services/twitch';
 import { createMarker } from '~/services/twitch/calls/createMarker';
@@ -45,7 +47,7 @@ class Highlights extends System {
   public sockets() {
     adminEndpoint('/systems/highlights', 'highlight', () => {
       this.main({
-        parameters: '', sender: getBotSender(), attr: {}, command: '!highlight', createdAt: Date.now(), isAction: false, emotesOffsets: new Map(), isFirstTimeMessage: false, discord: undefined,
+        parameters: '', sender: getUserSender(getBotId(), getBotUserName()), attr: {}, command: '!highlight', createdAt: Date.now(), isAction: false, emotesOffsets: new Map(), isFirstTimeMessage: false, discord: undefined,
       });
     });
     adminEndpoint('/systems/highlights', 'generic::getAll', async (cb) => {
@@ -110,7 +112,7 @@ class Highlights extends System {
           }
           if (url.highlight) {
             this.main({
-              parameters: '', sender: getBotSender(), attr: {}, command: '!highlight', createdAt: Date.now(), isAction: false, emotesOffsets: new Map(), isFirstTimeMessage: false, discord: undefined,
+              parameters: '', sender: getUserSender(getBotId(), getBotUserName()), attr: {}, command: '!highlight', createdAt: Date.now(), isAction: false, emotesOffsets: new Map(), isFirstTimeMessage: false, discord: undefined,
             });
           }
           return res.status(200).send({ ok: true });

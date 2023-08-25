@@ -3,7 +3,7 @@ SHELL            := /bin/bash
 VERSION          := `node -pe "require('./package.json').version"`
 ENV              ?= production
 NODE_MODULES_DIR ?= ../node_modules
-
+NODE_OPTIONS="--max-old-space-size=4096"
 
 all : info clean dependencies bot
 .PHONY : all
@@ -24,7 +24,7 @@ dependencies:
 
 eslint:
 	@echo -ne "\n\t ----- Checking eslint\n"
-	npx eslint --ext .ts src --quiet
+	NODE_OPTIONS="--max-old-space-size=4096" npx eslint --ext .ts src --quiet
 
 jsonlint:
 	@echo -ne "\n\t ----- Checking jsonlint\n"

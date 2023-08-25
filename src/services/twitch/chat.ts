@@ -1,5 +1,4 @@
 import util from 'util';
-
 import type { EmitData } from '@entity/alert';
 import { Currency } from '@entity/user';
 import * as constants from '@sogebot/ui-helpers/constants';

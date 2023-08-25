@@ -1,21 +1,23 @@
 import { ScrimMatchId } from '@entity/scrimMatchId';
 import * as constants from '@sogebot/ui-helpers/constants';
 import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized';
-import { AppDataSource } from '~/database';
 
+import System from './_interface';
 import {
   command, default_permission, settings,
 } from '../decorators';
 import { onStartup } from '../decorators/on';
 import Expects from '../expects.js';
-import System from './_interface';
 
+import { AppDataSource } from '~/database';
+import { getUserSender } from '~/helpers/commons';
 import { announce } from '~/helpers/commons/announce';
-import { getBotSender } from '~/helpers/commons/getBotSender';
 import { prepare } from '~/helpers/commons/prepare';
 import { round5 } from '~/helpers/commons/round5';
 import { debug } from '~/helpers/log';
 import defaultPermissions from '~/helpers/permissions/defaultPermissions';
+import getBotId from '~/helpers/user/getBotId';
+import getBotUserName from '~/helpers/user/getBotUserName';
 import twitch from '~/services/twitch';
 import { translate } from '~/translate';
 
@@ -204,7 +206,7 @@ class Scrim extends System {
             return; // user restarted !snipe
           }
           const currentMatches = await this.currentMatches({
-            sender: getBotSender(), parameters: '', createdAt: Date.now(), command: '', attr: {}, isAction: false, emotesOffsets: new Map(), isFirstTimeMessage: false, discord: undefined,
+            sender: getUserSender(getBotId(), getBotUserName()), parameters: '', createdAt: Date.now(), command: '', attr: {}, isAction: false, emotesOffsets: new Map(), isFirstTimeMessage: false, discord: undefined,
           });
           for (const r of currentMatches) {
             announce(await r.response, 'scrim');

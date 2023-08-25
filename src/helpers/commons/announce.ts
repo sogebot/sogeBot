@@ -1,10 +1,11 @@
 import { ChannelType, TextChannel } from 'discord.js';
 
 import { chatOut } from '../log';
-import { getBotSender } from './getBotSender';
 import { getUserSender } from './getUserSender';
 
 import { variables } from '~/watchers';
+import getBotId from '../user/getBotId';
+import getBotUserName from '../user/getBotUserName';
 
 /**
  * Announce in all channels (discord, twitch)
@@ -22,7 +23,7 @@ export async function announce(messageToAnnounce: string, type: typeof announceT
   const Message = (require('../../message') as typeof import('../../message')).Message;
   const sendMessage = (require('./sendMessage') as typeof import('./sendMessage')).sendMessage;
 
-  messageToAnnounce = await new Message(messageToAnnounce).parse({ sender: getBotSender(), replaceCustomVariables, discord: undefined }) as string;
+  messageToAnnounce = await new Message(messageToAnnounce).parse({ sender: getUserSender(getBotId(), getBotUserName()), replaceCustomVariables, discord: undefined }) as string;
   sendMessage(messageToAnnounce, getUserSender(botId, botUsername), { force: true, skip: true });
 
   if (Discord.sendAnnouncesToChannel[type].length > 0 && Discord.client) {

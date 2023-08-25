@@ -1,86 +1,32 @@
-import { MINUTE, SECOND } from '@sogebot/ui-helpers/constants';
+/* eslint-disable @typescript-eslint/ban-ts-comment */
+import { SECOND } from '@sogebot/ui-helpers/constants';
 import { validateOrReject } from 'class-validator';
-import * as cronparser from 'cron-parser';
-import { cloneDeep, sortBy } from 'lodash';
 import merge from 'lodash/merge';
+import * as ts from 'typescript';
 
+import { EmitData } from './database/entity/alert';
 import { Plugin, PluginVariable } from './database/entity/plugins';
 import { isValidationError } from './helpers/errors';
 import { eventEmitter } from './helpers/events';
-import { error } from './helpers/log';
+import { error, info } from './helpers/log';
+import { app } from './helpers/panel';
+import defaultPermissions from './helpers/permissions/defaultPermissions';
 import { adminEndpoint, publicEndpoint } from './helpers/socket';
-import { processes, processNode } from './plugins/index';
-import type { Node } from '../d.ts/src/plugins';
+import { ListenToGenerator, Types } from './plugins/ListenTo';
+import { LogGenerator } from './plugins/Log';
+import { PermissionGenerator } from './plugins/Permission';
+import { TwitchGenerator } from './plugins/Twitch';
+import { VariableGenerator } from './plugins/Variable';
+import alerts from './registries/alerts';
+import points from './systems/points';
 
 import Core from '~/_interface';
 import { onStartup } from '~/decorators/on';
+import emitter from '~/helpers/interfaceEmitter';
 
-const cronTriggers = new Map<string, Node>();
 const plugins: Plugin[] = [];
 
-const generateListener = (parameters = {}, containSender = true) => {
-  const values: Record<string, any> = {};
-  if (containSender) {
-    values.sender = {
-      userName: 'string',
-      userId:   'string',
-    };
-  }
-
-  if (Object.keys(parameters).length > 0) {
-    values.parameters = parameters;
-  }
-
-  return values;
-};
-
-const generateRegex = (parameters: { name: string; type: 'number' | 'word' | 'sentence' | 'custom'; regexp?: string; }[]) => {
-  const matcher = {
-    'number':   '[0-9]+',
-    'word':     '[a-zA-Z]+',
-    'sentence': '\'[a-zA-Z ]+\'',
-  } as const;
-
-  const regex = [];
-  for (const param of parameters) {
-    if (param.type === 'custom') {
-      regex.push(`(?<${param.name}>${param.regexp})`);
-
-    } else {
-      regex.push(`(?<${param.name}>${matcher[param.type]})`);
-    }
-  }
-  return `^${regex.join(' ')}$`;
-};
-
-const listeners = {
-  tip: generateListener({
-    isAnonymous: 'boolean',
-    message:     'string',
-    amount:      'number',
-    currency:    'string',
-    botAmount:   'number',
-    botCurrency: 'string',
-  }),
-  twitchClearChat:        generateListener({}, false),
-  twitchStreamStarted:    generateListener({}, false),
-  twitchStreamStopped:    generateListener({}, false),
-  twitchGameChanged:      generateListener({ oldCategory: 'string', category: 'string' }, false),
-  botStarted:             generateListener({}, false),
-  twitchRaid:             generateListener({ hostViewers: 'number' }, true),
-  twitchChatMessage:      generateListener({ message: 'string' }),
-  twitchCommand:          generateListener({ message: 'string' }),
-  twitchFollow:           generateListener(),
-  twitchCheer:            generateListener({ amount: 'number', message: 'string' }),
-  twitchSubscription:     generateListener({ method: 'string', subCumulativeMonths: 'number', tier: 'tier' }),
-  twitchSubgift:          generateListener({ recipient: 'string', tier: 'tier' }),
-  twitchSubcommunitygift: generateListener({ count: 'number' }),
-  twitchResub:            generateListener({ method: 'string', subCumulativeMonths: 'number', subStreak: 'number', subStreakShareEnabled: 'boolean', tier: 'string' }),
-  twitchRewardRedeem:     generateListener({ userId: 'string', userName: 'string', rewardId: 'string', userInput: 'message' }),
-} as const;
-
 class Plugins extends Core {
-
   @onStartup()
   onStartup() {
     this.addMenu({
@@ -88,17 +34,14 @@ class Plugins extends Core {
     });
 
     this.updateCache().then(() => {
-      this.process('botStarted');
+      this.process(Types.Started);
     });
-    setInterval(() => {
-      this.updateAllCrons();
-    }, MINUTE);
     setInterval(() => {
       this.triggerCrons();
     }, SECOND);
 
     eventEmitter.on('clearchat', async () => {
-      this.process('twitchClearChat');
+      this.process(Types.TwitchClearChat);
     });
 
     eventEmitter.on('cheer', async (data) => {
@@ -106,7 +49,7 @@ class Plugins extends Core {
         userName: data.userName,
         userId:   data.userId,
       };
-      this.process('twitchCheer', data.message, user, {
+      this.process(Types.TwitchCheer, data.message, user, {
         amount: data.bits,
       });
     });
@@ -117,7 +60,7 @@ class Plugins extends Core {
         userName: data.userName,
         userId:   !data.isAnonymous ? await users.getIdByName(data.userName) : '0',
       };
-      this.process('tip', data.message, user, {
+      this.process(Types.GenericTip, data.message, user, {
         isAnonymous: data.isAnonymous,
         amount:      data.amount,
         botAmount:   data.amountInBotCurrency,
@@ -127,18 +70,18 @@ class Plugins extends Core {
     });
 
     eventEmitter.on('game-changed', async (data) => {
-      this.process('twitchGameChanged', undefined, undefined, { category: data.game, oldCategory: data.oldGame });
+      this.process(Types.TwitchGameChanged, undefined, undefined, { category: data.game, oldCategory: data.oldGame });
     });
 
     eventEmitter.on('stream-started', async () => {
-      this.process('twitchStreamStarted');
+      this.process(Types.TwitchStreamStarted);
     });
 
     eventEmitter.on('stream-stopped', async () => {
-      this.process('twitchStreamStopped');
+      this.process(Types.TwitchStreamStopped);
     });
 
-    const commonHandler = async <T extends { [x:string]: any, userName: string }>(event: keyof typeof listeners, data: T) => {
+    const commonHandler = async <T extends { [x:string]: any, userName: string }>(event: Types, data: T) => {
       const users = (await import('./users')).default;
       const { userName, ...parameters } = data;
       const user = {
@@ -147,47 +90,34 @@ class Plugins extends Core {
       };
 
       this.process(event, '', user, parameters);
-
     };
 
     eventEmitter.on('subscription', async (data) => {
-      commonHandler('twitchSubscription', data);
+      commonHandler(Types.TwitchSubscription, data);
     });
 
     eventEmitter.on('subgift', async (data) => {
-      commonHandler('twitchSubgift', data);
+      commonHandler(Types.TwitchSubgift, data);
     });
 
     eventEmitter.on('subcommunitygift', async (data) => {
-      commonHandler('twitchSubcommunitygift', data);
+      commonHandler(Types.TwitchSubcommunitygift, data);
     });
 
     eventEmitter.on('resub', async (data) => {
-      commonHandler('twitchResub', data);
+      commonHandler(Types.TwitchResub, data);
     });
 
     eventEmitter.on('reward-redeemed', async (data) => {
-      commonHandler('twitchRewardRedeem', data);
-    });
-
-    eventEmitter.on('stream-stopped', async () => {
-      this.process('twitchStreamStopped');
-    });
-
-    eventEmitter.on('stream-stopped', async () => {
-      this.process('twitchStreamStopped');
-    });
-
-    eventEmitter.on('stream-stopped', async () => {
-      this.process('twitchStreamStopped');
+      commonHandler(Types.TwitchRewardRedeem, data);
     });
 
     eventEmitter.on('follow', async (data) => {
-      this.process('twitchFollow', '', data);
+      this.process(Types.TwitchFollow, '', data);
     });
 
     eventEmitter.on('raid', async (data) => {
-      commonHandler('twitchRaid', data);
+      commonHandler(Types.TwitchRaid, data);
     });
   }
 
@@ -199,62 +129,86 @@ class Plugins extends Core {
     for (const plugin of _plugins) {
       plugins.push(plugin);
     }
-    await this.updateAllCrons();
-  }
-
-  async updateAllCrons() {
-    // we will generate at least 2 minutes of span of crons
-    // e.g. if we have cron every 1s -> 120 crons
-    //                           10s -> 12  crons
-    //                           10m -> 1   cron
-    const cron = await this.process('cron', '', null, {});
-
-    cronTriggers.clear();
-    for (const { plugin, listeners: workflowListeners } of cron) {
-      for (const node of workflowListeners) {
-        try {
-          const cronParsed = cronparser.parseExpression(node.data.value);
-
-          const currentTime = Date.now();
-          let lastTime = new Date().toISOString();
-          const intervals: string[] = [];
-          while (currentTime + (2 * MINUTE) > new Date(lastTime).getTime()) {
-            lastTime = cronParsed.next().toISOString();
-            intervals.push(lastTime);
-          }
-
-          for (const interval of intervals) {
-            cronTriggers.set(`${plugin.id}|${interval}`, node);
-          }
-        } catch (e) {
-          error(e);
-        }
-      }
-    }
   }
 
   async triggerCrons() {
-    for (const [pluginId, timestamp] of [...cronTriggers.keys()].map(o => o.split('|'))) {
-      if (new Date(timestamp).getTime() < Date.now()) {
-        const plugin = plugins.find(o => o.id === pluginId);
-        const node = cronTriggers.get(`${pluginId}|${timestamp}`);
-        if (plugin && node) {
-          const workflow = Object.values(
-            JSON.parse(plugin.workflow).drawflow.Home.data
-          ) as Node[];
-
-          const settings: Record<string, any> = {};
-          for (const item of (plugin.settings || [])) {
-            settings[item.name] = item.currentValue;
-          }
-          this.processPath(pluginId, workflow, node, {}, { settings }, null);
+    for (const plugin of plugins) {
+      if (!plugin.enabled) {
+        continue;
+      }
+      try {
+        const workflow = JSON.parse(plugin.workflow);
+        if (!Array.isArray(workflow.code)) {
+          continue;
         }
-        cronTriggers.delete(`${pluginId}|${timestamp}`);
+
+        for (const file of workflow.code) {
+          if (!file.source.includes('ListenTo.Cron')) {
+            continue;
+          }
+
+          this.process(Types.Cron);
+        }
+      } catch {
+        continue;
       }
     }
   }
 
   sockets() {
+    if (!app) {
+      setTimeout(() => this.sockets(), 100);
+      return;
+    }
+    app.get('/overlays/plugin/:pid/:id', async (req, res) => {
+      try {
+        const plugin = plugins.find(o => o.id === req.params.pid);
+        if (!plugin) {
+          return res.status(404).send();
+        }
+
+        const files = JSON.parse(plugin.workflow);
+        const overlay = files.overlay.find((o: any) => o.id === req.params.id);
+        if (!overlay) {
+          return res.status(404).send();
+        }
+
+        const source = overlay.source.replace('</body>', `
+        <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"crossorigin="anonymous"></script>
+        <script type="text/javascript">
+          window.socket = io('/core/plugins', {
+            transports: [ 'websocket' ],
+          });
+          window.socket.on("connect_error", () => {
+            console.log('Socket connect_error', window.socket.id); // undefined
+
+          })
+          window.socket.on("connect", () => {
+            console.log('Socket connected', window.socket.id); // x8WIv7-mJelg7on_ALbx
+            window.socket.on("disconnect", () => {
+              console.log('Socket disconnected', window.socket.id); // undefined
+            });
+            window.socket.on('trigger::function', (functionName, args, overlayId) => {
+              if (overlayId && overlayId !== location.pathname.split('/')[location.pathname.split('/').length - 1]) {
+                // do nothing if overlay ID is defined and doesn't match
+                return;
+              }
+              console.groupCollapsed('trigger::function');
+              console.log({functionName, args});
+              console.groupEnd();
+              window[functionName](...args)
+            })
+          });
+        </script>
+        </body>
+        `);
+        res.send(source);
+      } catch (e) {
+        error(e);
+        return res.status(500).send();
+      }
+    });
+
     publicEndpoint('/core/plugins', 'plugins::getSandbox', async ({ pluginId, nodeId }, cb) => {
       const plugin = plugins.find(o => o.id === pluginId);
       const sandbox: Record<string, any> = {
@@ -328,147 +282,91 @@ class Plugins extends Core {
         }
       }
     });
-    adminEndpoint('/core/plugins', 'listeners', async (cb) => {
-      cb(listeners);
-    });
   }
 
-  async processPath(pluginId: string, workflow: Node[], currentNode: Node, parameters: Record<string, any>, variables: Record<string, any>, userstate: { userName: string; userId: string } | null ) {
-    parameters = cloneDeep(parameters);
-    variables = cloneDeep(variables);
-
-    // we need to check inputs first (currently just for load variable)
-    if (currentNode.inputs.input_1) {
-      const inputs = currentNode.inputs.input_1.connections.map((item) => workflow.find(wItem => wItem.id === Number(item.node)));
-      for(const node of inputs) {
-        if (!node) {
-          continue;
-        }
-        switch(node.name) {
-          case 'variableLoadFromDatabase': {
-            const variableName = node.data.value;
-            const defaultValue = (JSON.parse(node.data.data) as any).value;
-
-            const variable = await PluginVariable.findOneBy({ variableName, pluginId });
-            variables[variableName] = variable ? JSON.parse(variable.value) : defaultValue;
-            break;
-          }
-        }
-      }
-    }
-
-    const result = await processNode(currentNode.name as keyof typeof processes, pluginId, currentNode, parameters, variables, userstate);
-    const output = result ? 'output_1' : 'output_2';
-
-    if (currentNode.outputs[output]) {
-      const nodes = currentNode.outputs[output].connections.map((item) => workflow.find(wItem => wItem.id === Number(item.node)));
-      for (const node of nodes) {
-        if (!node) {
-          continue;
-        }
-        this.processPath(pluginId, workflow, node, parameters, variables, userstate);
-      }
-    }
-  }
-
-  async process(type: keyof typeof listeners | 'cron', message = '', userstate: { userName: string, userId: string } | null = null, params?: Record<string, any>) {
+  async process(type: Types, message = '', userstate: { userName: string, userId: string } | null = null, params?: Record<string, any>) {
     const pluginsEnabled = plugins.filter(o => o.enabled);
-    const pluginsWithListener: { plugin: Plugin, listeners: Node[] }[] = [];
+    const _____socket______ = this.socket;
     for (const plugin of pluginsEnabled) {
       // explore drawflow
-      const workflow = Object.values(
-        JSON.parse(plugin.workflow).drawflow.Home.data
-      ) as Node[];
+      const __________workflow__________: {
+        code: { name: string, source: string, id: string}[],
+        overflow: { name: string, source: string, id: string}[]
+      } = (
+        JSON.parse(plugin.workflow)
+      );
+      if (!Array.isArray(__________workflow__________.code)) {
+        continue; // skip legacy plugins
+      }
 
-      const workflowListeners = workflow.filter((o: Node) => {
-        params ??= {};
-        const isListener = o.name === 'listener';
-        const isWithoutFiltering
-          = (o.name === 'cron' && type === 'cron')
-          || (o.name === 'botStarted');
-        const isType = o.data.value === type;
-
-        params.message = message;
-
-        if (isWithoutFiltering) {
-          return true;
+      for (const ___code___ of  __________workflow__________.code) {
+        try {
+          // @ts-ignore
+          const ListenTo = ListenToGenerator(plugin.id, type, message, userstate, params);
+          // @ts-ignore
+          const Twitch = TwitchGenerator(plugin.id, userstate);
+          // @ts-ignore
+          const Permission = PermissionGenerator(plugin.id);
+          // @ts-ignore
+          const permission = defaultPermissions;
+          // @ts-ignore
+          const Log = LogGenerator(plugin.id, ___code___.name);
+          // @ts-ignore
+          const Variable = VariableGenerator(plugin.id);
+          // @ts-ignore
+          const Alerts = {
+            async trigger(uuid: string, name?: string, msg?: string, customOptions?: EmitData['customOptions']) {
+              if (customOptions) {
+                info(`PLUGINS#${plugin.id}: Triggering alert ${uuid} with custom options ${JSON.stringify(customOptions)}`);
+              } else {
+                info(`PLUGINS#${plugin.id}: Triggering alert ${uuid}`);
+              }
+              await alerts.trigger({
+                amount:     0,
+                currency:   'CZK',
+                event:      'custom',
+                alertId:    uuid,
+                message:    msg || '',
+                monthsName: '',
+                name:       name ?? '',
+                tier:       null,
+                recipient:  userstate?.userName ?? '',
+                customOptions,
+              });
+            },
+          };
+          // @ts-ignore
+          const Points = {
+            async increment(userName: string, value: number) {
+              await points.increment({ userName }, Math.abs(Number(value)));
+            },
+            async decrement(userName: string, value: number) {
+              await points.decrement({ userName }, Math.abs(Number(value)));
+            },
+          };
+          // @ts-ignore
+          const Overlay = {
+            emoteExplosion(emotes: string[]) {
+              emitter.emit('services::twitch::emotes', 'explode', emotes);
+            },
+            emoteFirework(emotes: string[]) {
+              emitter.emit('services::twitch::emotes', 'firework', emotes);
+            },
+            runFunction(functionName: string, args: any[], overlayId?: string) {
+              _____socket______?.emit('trigger::function', functionName, args, overlayId);
+            },
+          };
+          eval(ts.transpile(___code___.source));
+        } catch (e) {
+          error(`PLUGINS#${plugin.id}:./${___code___.name}: ${e}`);
         }
-
-        if (isListener && isType) {
-          switch(type) {
-            case 'twitchCommand': {
-              let { command, parameters } = JSON.parse(o.data.data);
-
-              // get settings and try to replace in command
-              const _settings = (plugin.settings || []).map(a => ({ [a.name]: a.currentValue })).reduce((prev, obj) => ({ [Object.keys(obj)[0]]: obj[Object.keys(obj)[0]], ...prev }), {});
-              for (const key of sortBy(Object.keys(_settings), (b => -b.length))) {
-                const toReplace = `{settings.${key}}`;
-                command = command.replaceAll(toReplace, _settings[key as any]);
-              }
-
-              const haveSubCommandOrParameters = message.replace(`!${command.replace('!', '')}`, '').split(' ').length > 1;
-              const isStartingWithCommand = message.startsWith(`!${command.replace('!', '')}`);
-              const doesParametersMatch = () => {
-                try {
-                  if (parameters.length === 0) {
-                    if (haveSubCommandOrParameters) {
-                      return false;
-                    }
-                    throw new Error(); // not expecting params
-                  }
-                  const messageWithoutCommandArray = message.split(' ');
-                  messageWithoutCommandArray.shift();
-                  const messageWithoutCommand = messageWithoutCommandArray.join(' ').trim();
-
-                  const paramMatch = messageWithoutCommand.match(generateRegex(parameters as any));
-                  if (paramMatch && paramMatch.groups) {
-                    const groups: { [key: string]: string | number; } = paramMatch.groups;
-                    for (const param of parameters) {
-                      if (param.type === 'number') {
-                        groups[param.name] = Number(groups[param.name]);
-                      }
-                    }
-                    params = paramMatch.groups;
-                    return true;
-                  }
-                  return false;
-                } catch (e) {
-                  return message === `!${command.replace('!', '')}`;
-                }
-              };
-
-              if (isStartingWithCommand && doesParametersMatch()) {
-                const settings: Record<string, any> = {};
-                for (const item of (plugin.settings || [])) {
-                  settings[item.name] = item.currentValue;
-                }
-                this.processPath(plugin.id, workflow, o, params, { settings }, userstate);
-              }
-              break;
-            }
-            default: {
-              const settings: Record<string, any> = {};
-              for (const item of (plugin.settings || [])) {
-                settings[item.name] = item.currentValue;
-              }
-              this.processPath(plugin.id, workflow, o, params, { settings }, userstate);
-              return true;
-            }
-          }
-        }
-        return false;
-      });
-
-      if (workflowListeners.length > 0) {
-        pluginsWithListener.push({ plugin, listeners: workflowListeners });
       }
     }
-    return pluginsWithListener;
   }
 
   /* TODO: replace with event emitter */
   async trigger(type: 'message', message: string, userstate: { userName: string, userId: string }): Promise<void> {
-    this.process(message.startsWith('!') ? 'twitchCommand' : 'twitchChatMessage', message, userstate);
+    this.process(message.startsWith('!') ? Types.TwitchCommand : Types.TwitchMessage, message, userstate);
   }
 }
 

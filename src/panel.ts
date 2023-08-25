@@ -206,34 +206,12 @@ class Panel extends Core {
     app?.get('/popout/', function (req, res) {
       res.sendFile(path.join(__dirname, '..', 'public', 'popout.html'));
     });
-    app?.get(['/overlays/:id', '/overlays/text/:id', '/overlays/alerts/:id', '/overlays/goals/:id', '/overlays/plugins/:id/:nid'], function (req, res) {
-      res.sendFile(path.join(__dirname, '..', 'node_modules', '@sogebot', 'ui-overlay', 'dist', 'index.html'));
-    });
-    app?.get('/public/:page?', function (req, res) {
-      if (variables.get('core.ui.enablePublicPage')) {
-        res.sendFile(path.join(__dirname, '..', 'node_modules', '@sogebot', 'ui-public', 'out', `${req.params.page ?? 'index'}.html`));
-      } else {
-        if (req.originalUrl !== '/public/?check=true') {
-          info('Public page has been disabled, enable in Admin UI -> settings -> ui');
-        }
-        res.status(404).send();
-      }
-    });
-    app?.get('/credentials/oauth/:page?', function (req, res) {
-      res.sendFile(path.join(__dirname, '..', 'node_modules', '@sogebot', 'ui-oauth', 'dist', 'oauth', 'index.html'));
-    });
-    app?.get('/credentials/login', function (req, res) {
-      res.sendFile(path.join(__dirname, '..', 'node_modules', '@sogebot', 'ui-oauth', 'dist', 'login', 'index.html'));
-    });
     app?.get('/assets/:asset/:file?', function (req, res) {
       if (req.params.file) {
         res.sendFile(path.join(__dirname, '..', 'assets', sanitize(req.params.asset), sanitize(req.params.file)));
       } else {
         res.sendFile(path.join(__dirname, '..', 'assets', sanitize(req.params.asset)));
       }
-    });
-    app?.get('/custom/:custom', function (req, res) {
-      res.sendFile(path.join(__dirname, '..', 'public', 'custom', sanitize(req.params.custom) + '.html'));
     });
     app?.get('/fonts', function (req, res) {
       res.sendFile(path.join(__dirname, '..', 'fonts.json'));
