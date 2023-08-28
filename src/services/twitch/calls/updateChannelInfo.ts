@@ -86,7 +86,6 @@ async function updateChannelInfo (args: { title?: string | null; game?: string |
     await twitch.apiClient?.asIntent(['broadcaster'], ctx => ctx.channels.updateChannelInfo(cid, {
       title: title ? title : undefined, gameId, tags, content_classification_labels,
     }));
-    await getChannelInformation({});
   } catch (e) {
     if (e instanceof Error) {
       if (e.message.includes('ETIMEDOUT')) {
@@ -121,6 +120,8 @@ async function updateChannelInfo (args: { title?: string | null; game?: string |
     stats.value.currentTags = args.tags;
   }
   gameOrTitleChangedManually.value = true;
+
+  await getChannelInformation({});
   return responses;
 }
 
