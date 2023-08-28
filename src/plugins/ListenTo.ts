@@ -55,7 +55,7 @@ export const ListenToGenerator = (pluginId: string, type: Types, message: string
     },
     onCategoryChange: (callback: (category: string, oldCategory: string) => void) => {
       if (type === Types.TwitchGameChanged) {
-        callback(params?.category || '', params?.fromCategory || '');
+        callback(params?.category || '', params?.oldCategory || '');
       }
     },
     onChatClear: (callback: () => void) => {
