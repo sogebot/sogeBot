@@ -213,6 +213,12 @@ class Panel extends Core {
         res.sendFile(path.join(__dirname, '..', 'assets', sanitize(req.params.asset)));
       }
     });
+    app?.get('/credentials/oauth/:page?', function (req, res) {
+      res.sendFile(path.join(__dirname, '..', 'node_modules', '@sogebot', 'ui-oauth', 'dist', 'oauth', 'index.html'));
+    });
+    app?.get('/credentials/login', function (req, res) {
+      res.sendFile(path.join(__dirname, '..', 'node_modules', '@sogebot', 'ui-oauth', 'dist', 'login', 'index.html'));
+    });
     app?.get('/fonts', function (req, res) {
       res.sendFile(path.join(__dirname, '..', 'fonts.json'));
     });
