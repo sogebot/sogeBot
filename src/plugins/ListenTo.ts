@@ -94,7 +94,7 @@ export const ListenToGenerator = (pluginId: string, type: Types, message: string
       }
     },
     onRewardRedeem: (callback: any) => {
-      if (type === Types.TwitchResub) {
+      if (type === Types.TwitchRewardRedeem) {
         callback(userstate, params);
       }
     },
@@ -109,12 +109,12 @@ export const ListenToGenerator = (pluginId: string, type: Types, message: string
       }
     },
     onSubGift: (callback: any) => {
-      if (type === Types.TwitchSubscription) {
+      if (type === Types.TwitchSubgift) {
         callback(userstate, params);
       }
     },
     onSubCommunityGift: (callback: any) => {
-      if (type === Types.TwitchSubscription) {
+      if (type === Types.TwitchSubcommunitygift) {
         callback(userstate, params);
       }
     },
