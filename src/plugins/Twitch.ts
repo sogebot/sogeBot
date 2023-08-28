@@ -1,12 +1,16 @@
 import { getUserSender } from '~/helpers/commons';
 import { sendMessage } from '~/helpers/commons/sendMessage';
 import { info } from '~/helpers/log';
+import getBotId from '~/helpers/user/getBotId';
+import getBotUserName from '~/helpers/user/getBotUserName';
 import banUser from '~/services/twitch/calls/banUser';
 
 export const TwitchGenerator = (pluginId: string, userstate: { userName: string, userId: string } | null) => ({
   sendMessage: (message:string) => {
     if (userstate) {
       sendMessage(message, getUserSender(userstate.userId, userstate.userName));
+    } else {
+      sendMessage(message, getUserSender(getBotId(), getBotUserName()));
     }
   },
   timeout: async  (userId: string, timeout: number, reason?: string) => {
