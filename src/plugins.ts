@@ -198,36 +198,6 @@ class Plugins extends Core {
         return res.status(500).send();
       }
     });
-
-    publicEndpoint('/core/plugins', 'plugins::getSandbox', async ({ pluginId, nodeId }, cb) => {
-      const plugin = plugins.find(o => o.id === pluginId);
-      const sandbox: Record<string, any> = {
-        variables: {},
-        settings:  {},
-      };
-      if (plugin) {
-        try {
-          const workflow = JSON.parse(plugin.workflow).drawflow.Home.data;
-
-          for (const setting of (plugin.settings || [])) {
-            sandbox.settings[setting.name] = setting.currentValue;
-          }
-
-          for (const node of Object.values<any>(workflow)) {
-            if (node.name === 'variableLoadFromDatabase') {
-              const variableName = node.data.value;
-              const defaultValue = (JSON.parse(node.data.data) as any).value;
-
-              const variable = await PluginVariable.findOneBy({ variableName, pluginId });
-              sandbox.variables[variableName] = variable ? JSON.parse(variable.value) : defaultValue;
-            }
-          }
-        } catch(e) {
-          error(e);
-        }
-      }
-      cb(sandbox);
-    });
     adminEndpoint('/core/plugins', 'generic::getAll', async (cb) => {
       cb(null, plugins);
     });
@@ -290,7 +260,7 @@ class Plugins extends Core {
 
       for (const ___code___ of  __________workflow__________.code) {
         try {
-          runScriptInSandbox(plugin, userstate, message, type, ___code___, {
+          runScriptInSandbox(plugin, userstate, message, type, ___code___, params, {
             socket: this.socket,
           });
         } catch (e) {
