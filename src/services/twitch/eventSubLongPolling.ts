@@ -167,7 +167,7 @@ class EventSubLongPolling {
     const reason = event.reason;
     const duration = event.ends_at ? new Date(event.ends_at) : null;
     if (duration) {
-      timeout(`${ userName }#${ userId } by ${ createdBy }#${ createdById } for ${ reason } seconds`);
+      timeout(`${ userName }#${ userId } by ${ createdBy }#${ createdById } for ${ duration } seconds`);
       eventEmitter.emit('timeout', { userName, duration: duration.getTime() - Date.now() / 1000 });
     } else {
       ban(`${ userName }#${ userId } by ${ createdBy }: ${ reason ? reason : '<no reason>' }`);

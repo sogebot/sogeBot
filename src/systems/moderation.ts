@@ -23,7 +23,7 @@ import users from '../users';
 import { AppDataSource } from '~/database';
 import { prepare } from '~/helpers/commons';
 import {
-  error, timeout as timeoutLog, warning as warningLog,
+  error, warning as warningLog,
 } from '~/helpers/log';
 import { ParameterError } from '~/helpers/parameterError';
 import defaultPermissions from '~/helpers/permissions/defaultPermissions';
@@ -217,29 +217,26 @@ class Moderation extends System {
     text = text.trim();
 
     if (this.cWarningsAllowedCount === 0) {
-      timeoutLog(`${sender.userName} [${type}] ${time}s timeout | ${text}`);
       tmiEmitter.emit('timeout', sender.userName, time, {
         mod: sender.isMod,
-      });
+      }, text.length > 0 ? text : undefined);
       return;
     }
 
     const isWarningCountAboveThreshold = warnings.length >= this.cWarningsAllowedCount;
     if (isWarningCountAboveThreshold) {
-      timeoutLog(`${sender.userName} [${type}] ${time}s timeout | ${text}`);
       tmiEmitter.emit('timeout', sender.userName, time, {
         mod: sender.isMod,
-      });
+      }, text.length > 0 ? text : undefined);
       await AppDataSource.getRepository(ModerationWarning).delete({ userId: sender.userId });
     } else {
       await AppDataSource.getRepository(ModerationWarning).insert({ userId: sender.userId, timestamp: Date.now() });
       const warningsLeft = this.cWarningsAllowedCount - warnings.length;
       warning = await new Message(warning.replace(/\$count/g, String(warningsLeft < 0 ? 0 : warningsLeft))).parse();
       if (this.cWarningsShouldClearChat) {
-        timeoutLog(`${sender.userName} [${type}] 1s timeout, warnings left ${warningsLeft < 0 ? 0 : warningsLeft} | ${text}`);
         tmiEmitter.emit('timeout', sender.userName, 1, {
           mod: sender.isMod,
-        });
+        }, `warnings left ${warningsLeft < 0 ? 0 : warningsLeft} ${text.length > 0 ? ' | ' + text : ''}`);
       }
 
       if (this.cWarningsAnnounceTimeouts) {

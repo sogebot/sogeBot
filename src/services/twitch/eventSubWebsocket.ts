@@ -222,10 +222,11 @@ class EventSubWebsocket {
         const userName = event.userName;
         const userId = event.userId;
         const createdBy = event.moderatorName;
+        const createdById = event.moderatorId;
         const reason = event.reason;
         const duration = event.endDate;
         if (duration) {
-          timeout(`${ userName }#${ userId } by ${ createdBy } for ${ reason } seconds`);
+          timeout(`${ userName }#${ userId } by ${ createdBy }#${ createdById } for ${ duration } seconds`);
           eventEmitter.emit('timeout', { userName, duration: duration.getTime() - Date.now() / 1000 });
         } else {
           ban(`${ userName }#${ userId } by ${ createdBy }: ${ reason ? reason : '<no reason>' }`);
