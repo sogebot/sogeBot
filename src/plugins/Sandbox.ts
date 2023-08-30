@@ -13,12 +13,16 @@ import type { EmitData } from '~/database/entity/alert';
 import { Plugin } from '~/database/entity/plugins';
 import { chatMessagesAtStart, isStreamOnline, stats } from '~/helpers/api';
 import { streamStatusChangeSince } from '~/helpers/api/streamStatusChangeSince';
+import { getUserSender } from '~/helpers/commons';
 import { mainCurrency, symbol } from '~/helpers/currency';
 import emitter from '~/helpers/interfaceEmitter';
 import { info } from '~/helpers/log';
 import { linesParsed } from '~/helpers/parser';
 import defaultPermissions from '~/helpers/permissions/defaultPermissions';
+import getBotId from '~/helpers/user/getBotId';
+import getBotUserName from '~/helpers/user/getBotUserName';
 import { getRandomOnlineSubscriber, getRandomSubscriber, getRandomOnlineViewer, getRandomViewer } from '~/helpers/user/random';
+import tts from '~/overlays/texttospeech';
 import alerts from '~/registries/alerts';
 import points from '~/systems/points';
 import users from '~/users';
@@ -106,6 +110,21 @@ export const runScriptInSandbox = (plugin: Plugin,
     },
     runFunction(functionName: string, args: any[], overlayId?: string) {
       ______opts.socket?.emit('trigger::function', functionName, args, overlayId);
+    },
+    triggerTTSOverlay(parameters: string) {
+      tts.textToSpeech({
+        discord:            undefined,
+        createdAt:          Date.now(),
+        emotesOffsets:      new Map(),
+        isFirstTimeMessage: false,
+        isAction:           false,
+        sender:             getUserSender(getBotId(), getBotUserName()),
+        parameters,
+        attr:               {
+          highlight: false,
+        },
+        command: '!tts',
+      });
     },
   };
   // @ts-expect-error TS6133
