@@ -16,6 +16,7 @@ export interface CommandOptions {
   command: string;
   parameters: string;
   isAction: boolean,
+  isHighlight: boolean,
   isFirstTimeMessage: boolean,
   createdAt: number;
   attr: {

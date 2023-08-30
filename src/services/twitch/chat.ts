@@ -1,4 +1,5 @@
 import util from 'util';
+
 import type { EmitData } from '@entity/alert';
 import { Currency } from '@entity/user';
 import * as constants from '@sogebot/ui-helpers/constants';
@@ -326,7 +327,7 @@ class Chat {
           return;
         }
         this.message({
-          userstate: msg.userInfo, message, isWhisper: true, emotesOffsets: msg.emoteOffsets, isAction: false,
+          userstate: msg.userInfo, message, isWhisper: true, emotesOffsets: msg.emoteOffsets, isAction: false, isHighlight: false,
         });
         linesParsedIncrement();
       });
@@ -399,7 +400,12 @@ class Chat {
         }
 
         this.message({
-          userstate, message, id: msg.id, emotesOffsets: msg.emoteOffsets, isAction: false, isFirstTimeMessage: msg.tags.get('first-msg') === '1',
+          userstate, message,
+          id:                 msg.id,
+          emotesOffsets:      msg.emoteOffsets,
+          isAction:           false,
+          isFirstTimeMessage: msg.tags.get('first-msg') === '1',
+          isHighlight:        msg.isHighlight,
         }).then(() => {
           linesParsedIncrement();
           triggerInterfaceOnMessage({
@@ -720,7 +726,7 @@ class Chat {
   }
 
   @timer()
-  async message (data: { skip?: boolean, quiet?: boolean, message: string, userstate: ChatUser, id?: string, isWhisper?: boolean, emotesOffsets?: Map<string, string[]>, isAction: boolean, isFirstTimeMessage?: boolean }) {
+  async message (data: { skip?: boolean, quiet?: boolean, message: string, userstate: ChatUser, id?: string, isHighlight?: boolean, isWhisper?: boolean, emotesOffsets?: Map<string, string[]>, isAction: boolean, isFirstTimeMessage?: boolean }) {
     data.emotesOffsets ??= new Map();
     data.isAction ??= false;
     data.isFirstTimeMessage ??= false;
@@ -738,7 +744,15 @@ class Chat {
     }
 
     const parse = new Parser({
-      sender: userstate, message: message, skip: skip, quiet: quiet, id: data.id, emotesOffsets: data.emotesOffsets, isAction: data.isAction, isFirstTimeMessage: data.isFirstTimeMessage,
+      sender:             userstate,
+      message:            message,
+      skip:               skip,
+      quiet:              quiet,
+      id:                 data.id,
+      emotesOffsets:      data.emotesOffsets,
+      isAction:           data.isAction,
+      isFirstTimeMessage: data.isFirstTimeMessage,
+      isHighlight:        data.isHighlight,
     });
 
     const whisperListener = variables.get('services.twitch.whisperListener') as boolean;
@@ -767,7 +781,11 @@ class Chat {
         && (whisperListener || isOwner(userstate))) {
       whisperIn(`${message} [${userName}${additionalInfo.length > 1 ? additionalInfo : ''}]`);
     } else if (!skip && !isBotId(userId)) {
-      chatIn(`${message} [${userName}${additionalInfo.length > 1 ? additionalInfo : ''}]`);
+      if (data.isHighlight) {
+        chatIn(`**${message}** [${userName}${additionalInfo.length > 1 ? additionalInfo : ''}]`);
+      } else {
+        chatIn(`${message} [${userName}${additionalInfo.length > 1 ? additionalInfo : ''}]`);
+      }
     }
 
     if (commandRegexp.test(message)) {

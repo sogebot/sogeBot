@@ -1,10 +1,10 @@
 import { v4 } from 'uuid';
 
+import Overlay from './_interface';
 import {
   command, default_permission,
 } from '../decorators';
 import { warning } from '../helpers/log';
-import Overlay from './_interface';
 
 import defaultPermissions from '~/helpers/permissions/defaultPermissions';
 
@@ -24,7 +24,7 @@ class TextToSpeech extends Overlay {
 
       this.emit('speak', {
         text:      opts.parameters,
-        highlight: opts.attr.highlight,
+        highlight: opts.isHighlight,
         service:   tts.service,
         key,
       });

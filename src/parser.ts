@@ -33,6 +33,7 @@ class Parser {
   started_at = Date.now();
   message = '';
   isAction = false;
+  isHighlight = false;
   isFirstTimeMessage = false;
   sender: CommandOptions['sender'] | null = null;
   discord: CommandOptions['discord'] = undefined;
@@ -50,6 +51,7 @@ class Parser {
     this.skip = opts.skip || false;
     this.isAction = opts.isAction || false;
     this.isFirstTimeMessage = opts.isFirstTimeMessage || false;
+    this.isHighlight = opts.isHighlight || false;
     this.quiet = opts.quiet || false;
     this.successfullParserRuns = [];
   }
@@ -82,6 +84,7 @@ class Parser {
         id:                 this.id,
         emotesOffsets:      this.emotesOffsets,
         isAction:           this.isAction,
+        isHighlight:        this.isHighlight,
         isFirstTimeMessage: this.isFirstTimeMessage,
         sender:             this.sender,
         discord:            this.discord ?? undefined,
@@ -115,6 +118,7 @@ class Parser {
       discord:            this.discord ?? undefined,
       emotesOffsets:      this.emotesOffsets,
       isAction:           this.isAction,
+      isHighlight:        this.isHighlight,
       isFirstTimeMessage: this.isFirstTimeMessage,
       message:            this.message.trim(),
       parameters:         text.trim(),
@@ -295,6 +299,7 @@ class Parser {
         discord:            this.discord ?? undefined,
         emotesOffsets:      this.emotesOffsets,
         isAction:           this.isAction,
+        isHighlight:        this.isHighlight,
         isFirstTimeMessage: this.isFirstTimeMessage,
         command:            command.command,
         parameters:         text.trim(),

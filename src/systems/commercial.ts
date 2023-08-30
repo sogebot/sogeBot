@@ -32,6 +32,7 @@ class Commercial extends System {
         createdAt:          Date.now(),
         emotesOffsets:      new Map(),
         isAction:           false,
+        isHighlight:        false,
         isFirstTimeMessage: false,
         discord:            undefined,
       });

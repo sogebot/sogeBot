@@ -77,7 +77,7 @@ class Queue extends System {
           }
           if (cb) {
             const opts = {
-              sender: getUserSender(getBotId(), getBotUserName()), users, attr: {}, createdAt: Date.now(), command: '', parameters: '', isAction: false, emotesOffsets: new Map(), isFirstTimeMessage: false, discord: undefined,
+              sender: getUserSender(getBotId(), getBotUserName()), users, attr: {}, createdAt: Date.now(), command: '', parameters: '', isAction: false, isHighlight: false, emotesOffsets: new Map(), isFirstTimeMessage: false, discord: undefined,
             };
             const picked = await this.pickUsers(opts, data.random);
             for (let i = 0; i < picked.responses.length; i++) {
@@ -88,7 +88,7 @@ class Queue extends System {
         } else {
           if (cb) {
             const opts = {
-              sender: getUserSender(getBotId(), getBotUserName()), attr: {}, createdAt: Date.now(), command: '', parameters: String(data.count), isAction: false, emotesOffsets: new Map(), isFirstTimeMessage: false, discord: undefined,
+              sender: getUserSender(getBotId(), getBotUserName()), attr: {}, createdAt: Date.now(), command: '', parameters: String(data.count), isAction: false, isHighlight: false, emotesOffsets: new Map(), isFirstTimeMessage: false, discord: undefined,
             };
             const picked = await this.pickUsers(opts, data.random);
             for (let i = 0; i < picked.responses.length; i++) {

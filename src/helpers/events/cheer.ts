@@ -81,12 +81,12 @@ export async function cheer(event: EventSubChannelCheerEventData) {
         if (price.priceBits <= bits) {
           if (customcommands.enabled) {
             await customcommands.run({
-              sender: getUserSender(userId, username), id: 'null', skip: true, quiet: false, message: messageFromUser.trim().toLowerCase(), parameters: '', parser: new Parser(), isAction: false, emotesOffsets: new Map(), isFirstTimeMessage: false, discord: undefined, isParserOptions: true,
+              sender: getUserSender(userId, username), id: 'null', skip: true, quiet: false, message: messageFromUser.trim().toLowerCase(), parameters: '', parser: new Parser(), isAction: false, emotesOffsets: new Map(), isFirstTimeMessage: false, isHighlight: false, discord: undefined, isParserOptions: true,
             });
           }
           if (alias.enabled) {
             await alias.run({
-              sender: getUserSender(userId, username), id: 'null', skip: true, message: messageFromUser.trim().toLowerCase(), parameters: '', parser: new Parser(), isAction: false, emotesOffsets: new Map(), isFirstTimeMessage: false, discord: undefined, isParserOptions: true,
+              sender: getUserSender(userId, username), id: 'null', skip: true, message: messageFromUser.trim().toLowerCase(), parameters: '', parser: new Parser(), isAction: false, emotesOffsets: new Map(), isFirstTimeMessage: false, isHighlight: false, discord: undefined, isParserOptions: true,
             });
           }
           const responses = await new Parser().command(getUserSender(userId, username), messageFromUser, true);

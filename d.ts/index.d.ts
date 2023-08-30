@@ -172,6 +172,7 @@ interface ParserOptions {
   emotesOffsets: Map<string, string[]>
   discord: { author: DiscordJsUser; channel: DiscordJsTextChannel } | undefined
   isAction: boolean,
+  isHighlight: boolean,
   isFirstTimeMessage: boolean,
   parameters: string;
   message: string;

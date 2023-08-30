@@ -113,14 +113,14 @@ class Raffles extends System {
     });
     adminEndpoint('/systems/raffles', 'raffle::pick', async () => {
       this.pick({
-        attr: {}, command: '!raffle', createdAt: Date.now(), parameters: '', sender: getOwnerAsSender(), isAction: false, emotesOffsets: new Map(), isFirstTimeMessage: false, discord: undefined,
+        attr: {}, command: '!raffle', createdAt: Date.now(), parameters: '', sender: getOwnerAsSender(), isAction: false, isHighlight: false, emotesOffsets: new Map(), isFirstTimeMessage: false, discord: undefined,
       });
     });
     adminEndpoint('/systems/raffles', 'raffle::open', async (message) => {
       // force close raffles
       await AppDataSource.getRepository(Raffle).update({}, { isClosed: true });
       this.open({
-        attr: {}, command: '!raffle open', createdAt: Date.now(), sender: getOwnerAsSender(), parameters: message, isAction: false, emotesOffsets: new Map(), isFirstTimeMessage: false, discord: undefined,
+        attr: {}, command: '!raffle open', createdAt: Date.now(), sender: getOwnerAsSender(), parameters: message, isAction: false, isHighlight: false, emotesOffsets: new Map(), isFirstTimeMessage: false, discord: undefined,
       });
     });
     adminEndpoint('/systems/raffles', 'raffle::close', async () => {

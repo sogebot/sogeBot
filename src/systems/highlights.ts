@@ -47,7 +47,7 @@ class Highlights extends System {
   public sockets() {
     adminEndpoint('/systems/highlights', 'highlight', () => {
       this.main({
-        parameters: '', sender: getUserSender(getBotId(), getBotUserName()), attr: {}, command: '!highlight', createdAt: Date.now(), isAction: false, emotesOffsets: new Map(), isFirstTimeMessage: false, discord: undefined,
+        parameters: '', sender: getUserSender(getBotId(), getBotUserName()), attr: {}, command: '!highlight', createdAt: Date.now(), isAction: false, isHighlight: false, emotesOffsets: new Map(), isFirstTimeMessage: false, discord: undefined,
       });
     });
     adminEndpoint('/systems/highlights', 'generic::getAll', async (cb) => {
@@ -112,7 +112,7 @@ class Highlights extends System {
           }
           if (url.highlight) {
             this.main({
-              parameters: '', sender: getUserSender(getBotId(), getBotUserName()), attr: {}, command: '!highlight', createdAt: Date.now(), isAction: false, emotesOffsets: new Map(), isFirstTimeMessage: false, discord: undefined,
+              parameters: '', sender: getUserSender(getBotId(), getBotUserName()), attr: {}, command: '!highlight', createdAt: Date.now(), isAction: false, isHighlight: false, emotesOffsets: new Map(), isFirstTimeMessage: false, discord: undefined,
             });
           }
           return res.status(200).send({ ok: true });

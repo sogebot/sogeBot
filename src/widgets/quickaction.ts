@@ -1,13 +1,12 @@
-import { AppDataSource } from '~/database';
-
+import Widget from './_interface';
 import { parserReply } from '../commons';
 import { QuickAction as QuickActionEntity, QuickActions } from '../database/entity/dashboard';
 import { Randomizer } from '../database/entity/randomizer';
 import { getUserSender } from '../helpers/commons';
 import { setValueOf } from '../helpers/customvariables';
 import { info } from '../helpers/log';
-import Widget from './_interface';
 
+import { AppDataSource } from '~/database';
 import { adminEndpoint } from '~/helpers/socket';
 
 const trigger = async (item: QuickActions.Item, user: { userId: string, userName: string }, value?: string) => {
@@ -29,12 +28,12 @@ const trigger = async (item: QuickActions.Item, user: { userId: string, userName
 
       if (customcommands.enabled) {
         await customcommands.run({
-          sender: getUserSender(user.userId, user.userName), id: 'null', skip: true, quiet: false, message: item.options.command, parameters: item.options.command.trim().replace(/^(!\w+)/i, ''), parser: parser, isAction: false, emotesOffsets: new Map(), isFirstTimeMessage: false, discord: undefined, isParserOptions: true,
+          sender: getUserSender(user.userId, user.userName), id: 'null', skip: true, quiet: false, message: item.options.command, parameters: item.options.command.trim().replace(/^(!\w+)/i, ''), parser: parser, isAction: false, isHighlight: false, emotesOffsets: new Map(), isFirstTimeMessage: false, discord: undefined, isParserOptions: true,
         });
       }
       if (alias.enabled) {
         await alias.run({
-          sender: getUserSender(user.userId, user.userName), id: 'null', skip: true, message: item.options.command, parameters: item.options.command.trim().replace(/^(!\w+)/i, ''), parser: parser, isAction: false, emotesOffsets: new Map(), isFirstTimeMessage: false, discord: undefined, isParserOptions: true,
+          sender: getUserSender(user.userId, user.userName), id: 'null', skip: true, message: item.options.command, parameters: item.options.command.trim().replace(/^(!\w+)/i, ''), parser: parser, isAction: false, isHighlight: false, emotesOffsets: new Map(), isFirstTimeMessage: false, discord: undefined, isParserOptions: true,
         });
       }
 
