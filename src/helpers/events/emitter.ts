@@ -58,6 +58,7 @@ interface Events {
   'timeout': (opts: {userName: string; duration: number}) => void;
   'ban': (opts: {userName: string; reason: string}) => void;
   'raid': (opts: {userName: string, hostViewers: number, event: string, timestamp: number}) => void;
+  'highlight': (opts: {userId: string, message: string}) => void;
   'stream-started': () => void;
   'stream-stopped': () => void;
   'subscription': (opts: { userName: string; method: string; subCumulativeMonths: number; tier: string}) => void;

@@ -6,9 +6,21 @@ import {
 } from '../decorators';
 import { warning } from '../helpers/log';
 
+import { onStartup } from '~/decorators/on';
+import { eventEmitter } from '~/helpers/events';
 import defaultPermissions from '~/helpers/permissions/defaultPermissions';
 
 class TextToSpeech extends Overlay {
+  @onStartup()
+  onStartup() {
+    eventEmitter.on('highlight', (opts) => {
+      this.textToSpeech({
+        parameters:  opts.message,
+        isHighlight: true,
+      } as any);
+    });
+  }
+
   @command('!tts')
   @default_permission(defaultPermissions.CASTERS)
   async textToSpeech(opts: CommandOptions): Promise<CommandResponse[]> {

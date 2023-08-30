@@ -782,6 +782,9 @@ class Chat {
       whisperIn(`${message} [${userName}${additionalInfo.length > 1 ? additionalInfo : ''}]`);
     } else if (!skip && !isBotId(userId)) {
       if (data.isHighlight) {
+        if (userId) {
+          eventEmitter.emit('highlight', { userId, message });
+        }
         chatIn(`**${message}** [${userName}${additionalInfo.length > 1 ? additionalInfo : ''}]`);
       } else {
         chatIn(`${message} [${userName}${additionalInfo.length > 1 ? additionalInfo : ''}]`);
