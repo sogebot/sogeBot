@@ -3,9 +3,9 @@
 import { MINUTE } from '@sogebot/ui-helpers/constants';
 import { JWT } from 'google-auth-library';
 import { google } from 'googleapis';
-import { AppDataSource } from '~/database';
 
 import Core from '~/_interface';
+import { AppDataSource } from '~/database';
 import { GooglePrivateKeys } from '~/database/entity/google';
 import { settings } from '~/decorators';
 import {
@@ -128,7 +128,7 @@ class TTS extends Core {
 
             // get voices list
             const list = await texttospeech.voices.list();
-            this.googleVoices = list.data.voices?.map(o => String(o.name)).sort() ?? [];
+            this.googleVoices = Array.from(new Set(list.data.voices?.map(o => String(o.name)).sort() ?? []));
             info(`TTS: Cached ${this.googleVoices.length} Google Service voices.`);
           }
         });
