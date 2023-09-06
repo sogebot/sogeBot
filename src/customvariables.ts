@@ -3,7 +3,9 @@ import { setTimeout } from 'timers';
 import { isNil, merge } from 'lodash';
 
 import { isValidationError } from './helpers/errors';
+import { eventEmitter } from './helpers/events';
 import getBotUserName from './helpers/user/getBotUserName';
+import { Types } from './plugins/ListenTo';
 
 import Core from '~/_interface';
 import { AppDataSource } from '~/database';
@@ -12,7 +14,6 @@ import {
 } from '~/database/entity/variable';
 import { onStartup } from '~/decorators/on';
 import { runScript, updateWidgetAndTitle } from '~/helpers/customvariables';
-import { csEmitter } from '~/helpers/customvariables/emitter';
 import { isDbConnected } from '~/helpers/database';
 import { adminEndpoint } from '~/helpers/socket';
 
@@ -84,7 +85,7 @@ class CustomVariables extends Core {
         merge(itemToSave, item);
         await itemToSave.validateAndSave();
         updateWidgetAndTitle(itemToSave.variableName);
-        csEmitter.emit('variable-changed', itemToSave.variableName);
+        eventEmitter.emit(Types.CustomVariableOnChange, itemToSave.variableName, itemToSave.currentValue, null);
         cb(null, itemToSave.id);
       } catch (e) {
         if (e instanceof Error) {

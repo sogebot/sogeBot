@@ -1,6 +1,10 @@
 import { TypedEmitter } from 'tiny-typed-emitter';
 
+import { Types } from '~/plugins/ListenTo';
+
 interface Events {
+  'CustomVariable:OnRefresh': () => void;
+  [Types.CustomVariableOnChange]: (variableName: string, cur: any, prev: any) => void;
   'prediction-started': (opts: {
     titleOfPrediction: string,
     outcomes: string,

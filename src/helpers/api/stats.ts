@@ -1,5 +1,6 @@
+import { Types } from '~/plugins/ListenTo';
 import { persistent } from '../core/persistent';
-import { csEmitter } from '../customvariables/emitter';
+import { eventEmitter } from '../events';
 
 const old = new Map<string, any>();
 const stats = persistent({
@@ -50,7 +51,7 @@ const stats = persistent({
       const variable = mapper.get(key);
       if (variable) {
         if ((cur as any)[key] !== old.get(key)) {
-          csEmitter.emit('variable-changed', variable);
+          eventEmitter.emit(Types.CustomVariableOnChange, variable, (cur as any)[key], old.get(key));
         }
         old.set(key, (cur as any)[key]);
       }

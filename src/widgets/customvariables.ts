@@ -8,13 +8,13 @@ import { AppDataSource } from '~/database';
 import Widget from './_interface';
 
 import { isVariableSetById, setValueOf } from '~/helpers/customvariables';
-import { csEmitter } from '~/helpers/customvariables/emitter';
 import { adminEndpoint } from '~/helpers/socket';
+import { eventEmitter } from '~/helpers/events';
 
 class CustomVariables extends Widget {
   constructor() {
     super();
-    csEmitter.on('refresh', () => {
+    eventEmitter.on('CustomVariable:OnRefresh', () => {
       this.emit('refresh');
     });
   }

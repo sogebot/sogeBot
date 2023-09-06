@@ -21,6 +21,7 @@ export enum Types {
   'TwitchSubgift',
   'TwitchSubcommunitygift',
   'GenericTip',
+  'CustomVariableOnChange'
 }
 
 export const ListenToGenerator = (pluginId: string, type: Types, message: string, userstate: { userName: string, userId: string } | null, params?: Record<string, any>) => ({
@@ -116,6 +117,16 @@ export const ListenToGenerator = (pluginId: string, type: Types, message: string
     onSubCommunityGift: (callback: any) => {
       if (type === Types.TwitchSubcommunitygift) {
         callback(userstate, params);
+      }
+    },
+  },
+  CustomVariable: {
+    onChange: (variableName: string, callback: any) => {
+      if (type === Types.CustomVariableOnChange) {
+        if (variableName === params?.variableName) {
+          debug('plugins', `PLUGINS#${pluginId}: CustomVariable:onChange executed`);
+          callback(params?.cur, params?.prev);
+        }
       }
     },
   },

@@ -30,6 +30,10 @@ class Plugins extends Core {
       this.triggerCrons();
     }, SECOND);
 
+    eventEmitter.on(Types.CustomVariableOnChange, async (variableName, cur, prev) => {
+      this.process(Types.CustomVariableOnChange, undefined, undefined, { variableName, cur, prev });
+    });
+
     eventEmitter.on('clearchat', async () => {
       this.process(Types.TwitchClearChat);
     });

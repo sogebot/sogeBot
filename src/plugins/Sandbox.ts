@@ -8,6 +8,7 @@ import { LogGenerator } from './Log';
 import { PermissionGenerator } from './Permission';
 import { TwitchGenerator } from './Twitch';
 import { VariableGenerator } from './Variable';
+import { CustomVariableGenerator } from './CustomVariable';
 
 import type { EmitData } from '~/database/entity/alert';
 import { Plugin } from '~/database/entity/plugins';
@@ -52,6 +53,8 @@ export const runScriptInSandbox = (plugin: Plugin,
   const Log = LogGenerator(plugin.id, ___code___.name);
   // @ts-expect-error TS6133
   const Variable = VariableGenerator(plugin.id);
+  // @ts-expect-error TS6133
+  const CustomVariable = CustomVariableGenerator(plugin.id);
   // @ts-expect-error TS6133
   const Alerts = {
     async trigger(uuid: string, name?: string, msg?: string, customOptions?: EmitData['customOptions']) {

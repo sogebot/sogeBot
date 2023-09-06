@@ -29,7 +29,6 @@ import { mainCurrency } from '~/helpers/currency';
 import {
   getAll, getValueOf, setValueOf,
 } from '~/helpers/customvariables';
-import { csEmitter } from '~/helpers/customvariables/emitter';
 import { isDbConnected } from '~/helpers/database';
 import { eventEmitter } from '~/helpers/events/emitter';
 import { fireRunCommand } from '~/helpers/events/run-command';
@@ -451,7 +450,7 @@ class Events extends Core {
     await setValueOf(String(customVariableName), value, {});
 
     // Update widgets and titles
-    csEmitter.emit('refresh');
+    eventEmitter.emit('CustomVariable:OnRefresh');
 
     const regexp = new RegExp(`\\$_${customVariableName}`, 'ig');
     const title = rawStatus.value;
@@ -473,7 +472,7 @@ class Events extends Core {
     await setValueOf(String('$_' + customVariableName), currentValue, {});
 
     // Update widgets and titles
-    csEmitter.emit('refresh');
+    eventEmitter.emit('CustomVariable:OnRefresh');
 
     const regexp = new RegExp(`\\$_${customVariableName}`, 'ig');
     const title = rawStatus.value;
@@ -496,7 +495,7 @@ class Events extends Core {
     await setValueOf(String('$_' + customVariableName), currentValue, {});
 
     // Update widgets and titles
-    csEmitter.emit('refresh');
+    eventEmitter.emit('CustomVariable:OnRefresh');
     const regexp = new RegExp(`\\$_${customVariableName}`, 'ig');
     const title = rawStatus.value;
     if (title.match(regexp)) {

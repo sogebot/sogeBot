@@ -1,16 +1,17 @@
 import { Variable } from '@entity/variable';
 import { isNil } from 'lodash';
 
-import users from '../../users';
-import { warning } from '../log';
-import { get } from '../permissions/get';
-import { getUserHighestPermission } from '../permissions/getUserHighestPermission';
-import { defaultPermissions } from '../permissions/defaultPermissions';
-import { check } from '../permissions/check';
 import { addChangeToHistory } from './addChangeToHistory';
-import { csEmitter } from './emitter';
 import { getValueOf } from './getValueOf';
 import { updateWidgetAndTitle } from './updateWidgetAndTitle';
+import users from '../../users';
+import { eventEmitter } from '../events';
+import { warning } from '../log';
+import { check } from '../permissions/check';
+import { defaultPermissions } from '../permissions/defaultPermissions';
+import { get } from '../permissions/get';
+import { getUserHighestPermission } from '../permissions/getUserHighestPermission';
+import { Types } from '~/plugins/ListenTo';
 
 async function setValueOf (variable: string | Variable, currentValue: any, opts: any): Promise<{ updated: Variable; isOk: boolean; setValue: string; oldValue: string, isEval: boolean }> {
   const item = typeof variable === 'string'
@@ -97,7 +98,7 @@ async function setValueOf (variable: string | Variable, currentValue: any, opts:
   const setValue = itemCurrentValue ?? '';
   if (isOk) {
     updateWidgetAndTitle(item.variableName);
-    csEmitter.emit('variable-changed', item.variableName);
+    eventEmitter.emit(Types.CustomVariableOnChange, item.variableName, setValue, itemOldValue);
     if (!isEval) {
       addChangeToHistory({
         sender: opts.sender, item, oldValue: itemOldValue,
