@@ -86,6 +86,9 @@ class Tiltify extends Integration {
       info(`TILTIFY: Not logged in.`);
     }
     setInterval(async () => {
+      if (this.enabled) {
+        return;
+      }
       if (this.access_token.length > 0 && this.userName.length > 0 && String(this.userId).length > 0) {
         const release = await mutex.acquire();
         try {
