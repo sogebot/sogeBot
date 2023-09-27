@@ -124,7 +124,7 @@ export const getChannelChatters = async (opts: any) => {
     joinpart.send({ users: joinedUsers.map(o => o.userDisplayName), type: 'join' });
     for (const user of joinedUsers) {
       await setImmediateAwait();
-      eventEmitter.emit('user-joined-channel', { userName: user.userDisplayName });
+      eventEmitter.emit('user-joined-channel', { userName: user.userName });
     }
   } catch (e) {
     if (e instanceof Error) {
