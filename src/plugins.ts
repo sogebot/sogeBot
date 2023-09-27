@@ -7,6 +7,7 @@ import { isValidationError } from './helpers/errors';
 import { eventEmitter } from './helpers/events';
 import { error } from './helpers/log';
 import { app } from './helpers/panel';
+import { setImmediateAwait } from './helpers/setImmediateAwait';
 import { adminEndpoint, publicEndpoint } from './helpers/socket';
 import { Types } from './plugins/ListenTo';
 import { runScriptInSandbox } from './plugins/Sandbox';
@@ -142,6 +143,7 @@ class Plugins extends Core {
           }
 
           this.process(Types.Cron);
+          break; // we found at least one cron to run
         }
       } catch {
         continue;
@@ -251,6 +253,7 @@ class Plugins extends Core {
   async process(type: Types, message = '', userstate: { userName: string, userId: string } | null = null, params?: Record<string, any>) {
     const pluginsEnabled = plugins.filter(o => o.enabled);
     for (const plugin of pluginsEnabled) {
+      await setImmediateAwait();
       // explore drawflow
       const __________workflow__________: {
         code: { name: string, source: string, id: string}[],
@@ -263,6 +266,7 @@ class Plugins extends Core {
       }
 
       for (const ___code___ of  __________workflow__________.code) {
+        await setImmediateAwait();
         try {
           runScriptInSandbox(plugin, userstate, message, type, ___code___, params, {
             socket: this.socket,
