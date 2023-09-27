@@ -1,5 +1,5 @@
 import fs from 'fs';
-import { Session } from 'inspector';
+import { Session } from 'node:inspector';
 import { gzip } from 'zlib';
 
 import { MINUTE, SECOND } from '@sogebot/ui-helpers/constants';

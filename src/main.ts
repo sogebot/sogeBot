@@ -9,10 +9,11 @@ import { normalize } from 'path';
 import util from 'util';
 
 import blocked from 'blocked-at';
-import chalk from 'chalk';
 import figlet from 'figlet';
 import gitCommitInfo from 'git-commit-info';
 import _ from 'lodash';
+
+import { setDEBUG, isDebugEnabled } from './helpers/debug';
 
 import { AppDataSource } from '~/database';
 import { autoLoad } from '~/helpers/autoLoad';
@@ -21,7 +22,6 @@ import {
   error, info, warning,
 } from '~/helpers/log';
 import { startWatcher } from '~/watchers';
-import { setDEBUG, isDebugEnabled } from './helpers/debug';
 
 const connect = async function () {
   const type = process.env.TYPEORM_CONNECTION;
@@ -97,11 +97,6 @@ async function main () {
         await autoLoad('./dest/games/');
         await autoLoad('./dest/integrations/');
         await autoLoad('./dest/services/');
-
-        if (process.env.HEAP) {
-          warning(chalk.bgRed.bold('HEAP debugging is ENABLED'));
-          setTimeout(() => require('~/heapdump.js').init('heap/'), 120000);
-        }
 
         setTimeout(() => {
           if (existsSync('~/restart.pid')) {
