@@ -1,3 +1,8 @@
+import fs from 'node:fs';
+import { Session } from 'node:inspector';
+import { normalize } from 'node:path';
+import { gzip } from 'zlib';
+
 import { MINUTE } from '@sogebot/ui-helpers/constants';
 import { v4 } from 'uuid';
 
@@ -6,6 +11,132 @@ import { logEmitter as log } from './log/emitter';
 import { variables } from '~/watchers';
 
 const execCommands = {
+  'profiler.5': async () => {
+    const session = new Session();
+    session.connect();
+
+    session.post('Profiler.enable', () => {
+      session.post('Profiler.start', () => {
+        log.emit('warning', 'Profiler start at ' + new Date().toLocaleString() + ' | Expected end at ' + new Date(Date.now() + (5 * MINUTE)).toLocaleString());
+        setTimeout(() => {
+          // some time later...
+          session.post('Profiler.stop', (err, { profile }) => {
+            session.disconnect();
+            // Write profile to disk, upload, etc.
+            if (!err) {
+              gzip(JSON.stringify(profile), (err2, buf) => {
+                if (err2) {
+                  log.emit('error', err2.stack ?? '');
+                } else {
+                  fs.writeFileSync('./logs/profile-' + Date.now() + '.cpuprofile.gz', buf);
+                  log.emit('warning', 'Profiler saved at ./logs/profile-' + Date.now() + '.cpuprofile.gz');
+                }
+              });
+            }
+          });
+        }, 5 * MINUTE);
+      });
+    });
+  },
+  'profiler.15': async () => {
+    const session = new Session();
+    session.connect();
+
+    session.post('Profiler.enable', () => {
+      session.post('Profiler.start', () => {
+        log.emit('warning', 'Profiler start at ' + new Date().toLocaleString() + ' | Expected end at ' + new Date(Date.now() + (15 * MINUTE)).toLocaleString());
+        setTimeout(() => {
+          // some time later...
+          session.post('Profiler.stop', (err, { profile }) => {
+            session.disconnect();
+            // Write profile to disk, upload, etc.
+            if (!err) {
+              gzip(JSON.stringify(profile), (err2, buf) => {
+                if (err2) {
+                  log.emit('error', err2.stack ?? '');
+                } else {
+                  fs.writeFileSync('./logs/profile-' + Date.now() + '.cpuprofile.gz', buf);
+                  log.emit('warning', 'Profiler saved at ./logs/profile-' + Date.now() + '.cpuprofile.gz');
+                }
+              });
+            }
+          });
+        }, 15 * MINUTE);
+      });
+    });
+  },
+  'profiler.30': async () => {
+    const session = new Session();
+    session.connect();
+
+    session.post('Profiler.enable', () => {
+      session.post('Profiler.start', () => {
+        log.emit('warning', 'Profiler start at ' + new Date().toLocaleString() + ' | Expected end at ' + new Date(Date.now() + (30 * MINUTE)).toLocaleString());
+        setTimeout(() => {
+          // some time later...
+          session.post('Profiler.stop', (err, { profile }) => {
+            session.disconnect();
+            // Write profile to disk, upload, etc.
+            if (!err) {
+              gzip(JSON.stringify(profile), (err2, buf) => {
+                if (err2) {
+                  log.emit('error', err2.stack ?? '');
+                } else {
+                  fs.writeFileSync('./logs/profile-' + Date.now() + '.cpuprofile.gz', buf);
+                  log.emit('warning', 'Profiler saved at ./logs/profile-' + Date.now() + '.cpuprofile.gz');
+                }
+              });
+            }
+          });
+        }, 30 * MINUTE);
+      });
+    });
+  },
+  'profiler.60': async () => {
+    const session = new Session();
+    session.connect();
+
+    session.post('Profiler.enable', () => {
+      session.post('Profiler.start', () => {
+        log.emit('warning', 'Profiler start at ' + new Date().toLocaleString() + ' | Expected end at ' + new Date(Date.now() + (60 * MINUTE)).toLocaleString());
+        setTimeout(() => {
+          // some time later...
+          session.post('Profiler.stop', (err, { profile }) => {
+            session.disconnect();
+            // Write profile to disk, upload, etc.
+            if (!err) {
+              gzip(JSON.stringify(profile), (err2, buf) => {
+                if (err2) {
+                  log.emit('error', err2.stack ?? '');
+                } else {
+                  fs.writeFileSync('./logs/profile-' + Date.now() + '.cpuprofile.gz', buf);
+                  log.emit('warning', 'Profiler saved at ./logs/profile-' + Date.now() + '.cpuprofile.gz');
+                }
+              });
+            }
+          });
+        }, 60 * MINUTE);
+      });
+    });
+  },
+  'heap': async () => {
+    const session = new Session();
+    const filename = normalize(`./logs/profile-${Date.now()}.heapsnapshot`);
+    const fd = fs.openSync(filename, 'w');
+    session.connect();
+
+    session.on('HeapProfiler.addHeapSnapshotChunk', (m) => {
+      fs.writeSync(fd, m.params.chunk);
+    });
+
+    log.emit('warning', `HeapProfiler.takeHeapSnapshot started`);
+    session.post('HeapProfiler.takeHeapSnapshot', undefined, (err: any, r: any) => {
+      log.emit('warning', `HeapProfiler.takeHeapSnapshot done: ${err} ${JSON.stringify(r)}`);
+      log.emit('warning', `Heap saved at ${filename}`);
+      session.disconnect();
+      fs.closeSync(fd);
+    });
+  },
   'twitch/clear/broadcaster/credentials': () => {
     log.emit('warning', 'Clearing up BROADCASTER twitch credentials');
     variables.set('services.twitch.broadcasterTokenValid', false);

@@ -112,8 +112,6 @@ async function main () {
               error(stack);
             }, { threshold: 1000 });
           }
-
-          require('~/inspector');
         }, 30000);
       });
     }, 5000);
