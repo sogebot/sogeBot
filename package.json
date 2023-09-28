@@ -151,7 +151,7 @@
     "escope": "4.0.0",
     "eslint": "8.49.0",
     "eslint-plugin-import": "2.28.1",
-    "git-semver-tags": "7.0.1",
+    "git-semver-tags": "5.0.1",
     "husky": "^8.0.3",
     "jsonlint-mod": "1.7.6",
     "lint-staged": "14.0.1",

@@ -3,6 +3,7 @@
   "reject": [
     "strip-ansi",
     "chalk",
-    "node-fetch"
+    "node-fetch",
+    "git-semver-tags"
   ]
 }
