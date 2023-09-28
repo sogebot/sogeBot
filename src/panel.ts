@@ -447,7 +447,7 @@ class Panel extends Core {
             });
           }
         } else if (type === 'core') {
-          for (const system of ['dashboard', 'currency', 'ui', 'general', 'twitch', 'socket', 'eventsub', 'updater', 'tts', 'emotes']) {
+          for (const system of ['dashboard', 'currency', 'ui', 'general', 'twitch', 'socket', 'eventsub', 'tts', 'emotes']) {
             toEmit.push({ name: system.toLowerCase(), type: 'core' });
           }
         } else if (type === 'integrations') {

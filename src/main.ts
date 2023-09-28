@@ -84,7 +84,6 @@ async function main () {
         require('./plugins');
         require('./customvariables');
         require('./permissions');
-        require('./updater');
         require('./dashboard');
         require('./tts');
         require('./emotes');
