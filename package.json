@@ -98,7 +98,7 @@
     "test:config:mysql": "cp src/data/.env.mysql .env",
     "test:config:postgres": "cp src/data/.env.postgres .env",
     "test:config:sqlite": "cp src/data/.env.sqlite .env",
-    "start": "cross-env NODE_ENV=production node --experimental-report --report-on-fatalerror --report-directory=./logs/ --optimize_for_size --gc_interval=100 -r source-map-support/register  ./dest/main",
+    "start": "cross-env NODE_ENV=production node --max-old-space-size=512 --experimental-report --report-on-fatalerror --report-directory=./logs/ --optimize_for_size --gc_interval=100 -r source-map-support/register  ./dest/main",
     "debug": "cross-env NODE_ENV=development node --inspect --experimental-report --report-on-fatalerror --report-directory=./logs/ --trace-warnings --optimize_for_size --gc_interval=100 -r source-map-support/register --inspect=0.0.0.0:9229 --nolazy ./dest/main",
     "gc": "cross-env NODE_ENV=development node --inspect --experimental-report --report-on-fatalerror --report-directory=./logs/ --trace-warnings --trace_gc --trace_gc_verbose --optimize_for_size --gc_interval=100 -r source-map-support/register --inspect=0.0.0.0:9229 --nolazy ./dest/main"
   },
