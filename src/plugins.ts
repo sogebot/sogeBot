@@ -5,12 +5,12 @@ import merge from 'lodash/merge';
 import { Plugin, PluginVariable } from './database/entity/plugins';
 import { isValidationError } from './helpers/errors';
 import { eventEmitter } from './helpers/events';
-import { error } from './helpers/log';
+import { debug, error } from './helpers/log';
 import { app } from './helpers/panel';
 import { setImmediateAwait } from './helpers/setImmediateAwait';
 import { adminEndpoint, publicEndpoint } from './helpers/socket';
 import { Types } from './plugins/ListenTo';
-import { runScriptInSandbox } from './plugins/Sandbox';
+import { runScriptInSandbox, transpiledFiles } from './plugins/Sandbox';
 
 import Core from '~/_interface';
 import { onStartup } from '~/decorators/on';
@@ -214,6 +214,7 @@ class Plugins extends Core {
       await Plugin.delete({ id });
       await PluginVariable.delete({ pluginId: id });
       await this.updateCache();
+      transpiledFiles.clear();
       cb(null);
     });
     adminEndpoint('/core/plugins', 'generic::validate', async (data, cb) => {
@@ -238,6 +239,7 @@ class Plugins extends Core {
         await validateOrReject(itemToSave);
         await itemToSave.save();
         await this.updateCache();
+        transpiledFiles.clear();
         cb(null, itemToSave);
       } catch (e) {
         if (e instanceof Error) {
@@ -251,6 +253,7 @@ class Plugins extends Core {
   }
 
   async process(type: Types, message = '', userstate: { userName: string, userId: string } | null = null, params?: Record<string, any>) {
+    debug('plugins', `Processing plugin: ${JSON.stringify({ type, message, userstate, params })}`);
     const pluginsEnabled = plugins.filter(o => o.enabled);
     for (const plugin of pluginsEnabled) {
       await setImmediateAwait();

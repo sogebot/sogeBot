@@ -3,12 +3,12 @@ import { getTime } from '@sogebot/ui-helpers/getTime';
 import axios, { AxiosRequestConfig } from 'axios';
 import * as ts from 'typescript';
 
+import { CustomVariableGenerator } from './CustomVariable';
 import { ListenToGenerator, Types } from './ListenTo';
 import { LogGenerator } from './Log';
 import { PermissionGenerator } from './Permission';
 import { TwitchGenerator } from './Twitch';
 import { VariableGenerator } from './Variable';
-import { CustomVariableGenerator } from './CustomVariable';
 
 import type { EmitData } from '~/database/entity/alert';
 import { Plugin } from '~/database/entity/plugins';
@@ -17,7 +17,7 @@ import { streamStatusChangeSince } from '~/helpers/api/streamStatusChangeSince';
 import { getUserSender } from '~/helpers/commons';
 import { mainCurrency, symbol } from '~/helpers/currency';
 import emitter from '~/helpers/interfaceEmitter';
-import { info } from '~/helpers/log';
+import { debug, info } from '~/helpers/log';
 import { linesParsed } from '~/helpers/parser';
 import defaultPermissions from '~/helpers/permissions/defaultPermissions';
 import getBotId from '~/helpers/user/getBotId';
@@ -27,6 +27,8 @@ import tts from '~/overlays/texttospeech';
 import alerts from '~/registries/alerts';
 import points from '~/systems/points';
 import users from '~/users';
+
+export const transpiledFiles = new Map<string, string>();
 
 export const runScriptInSandbox = (plugin: Plugin,
   userstate: { userName: string, userId: string } | null,
@@ -151,5 +153,17 @@ export const runScriptInSandbox = (plugin: Plugin,
     status:             stats.value.currentTitle,
     currentWatched:     stats.value.currentWatchedTime,
   };
-  eval(ts.transpile(___code___.source));
+
+  eval(getTranspiledCode(___code___.id, ___code___.source));
+};
+
+const getTranspiledCode = (codeId: string, source: string) => {
+  if (transpiledFiles.has(codeId)) {
+    debug('plugins', `Using cached code ${codeId}`);
+    return transpiledFiles.get(codeId)!;
+  } else {
+    debug('plugins', `Transpiling code ${codeId}`);
+    transpiledFiles.set(codeId, ts.transpile(source));
+    return transpiledFiles.get(codeId)!;
+  }
 };
