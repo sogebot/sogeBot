@@ -285,7 +285,20 @@ export interface Alerts {
     list:        { [x:string]: boolean };
     customWords: string;
   };
-  items: ExpandRecursively<AlertFollow>[]
+  font: ExpandRecursively<Font & {
+    align: 'left' | 'center' | 'right',
+    highlightcolor: string;
+  }>;
+  fontMessage: ExpandRecursively<Font & {
+    align: 'left' | 'center' | 'right',
+  }>;
+  tts: {
+    voice: string;
+    pitch: number;
+    volume: number;
+    rate: number;
+  };
+  items: ExpandRecursively<AlertFollow>[];
 }
 
 type AlertCommonOptions = ExpandRecursively<CreditsCommonOptions & {
