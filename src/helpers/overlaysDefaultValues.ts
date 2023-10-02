@@ -89,6 +89,23 @@ const values = {
       shadow:      [],
     },
   },
+  alerts: {
+    alertDelayInMs: 0,
+    parry:          {
+      enabled: false,
+      delay:   0,
+    },
+    profanityFilter: {
+      type: 'replace-with-asterisk',
+      list: {
+        cs: false,
+        en: true,
+        ru: false,
+      },
+      customWords: '',
+    },
+    items: [],
+  },
   credits: {
     speed:              'medium',
     waitBetweenScreens: 0,

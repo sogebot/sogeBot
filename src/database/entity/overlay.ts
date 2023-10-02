@@ -269,10 +269,44 @@ export interface Clips {
   showLabel: boolean,
 }
 
-export interface Alerts {
+export interface Media {
   typeId: 'media';
-  galleryCache: boolean,
-  galleryCacheLimitInMb: number,
+}
+
+export interface Alerts {
+  typeId: 'alerts';
+  alertDelayInMs: number;
+  parry: {
+    enabled: boolean;
+    delay: number;
+  };
+  profanityFilter: {
+    type: 'disabled' | 'replace-with-asterisk' | 'replace-with-happy-words' | 'hide-messages' | 'disable-alerts';
+    list:        { [x:string]: boolean };
+    customWords: string;
+  };
+  items: ExpandRecursively<AlertFollow>[]
+}
+
+type AlertCommonOptions = ExpandRecursively<CreditsCommonOptions & {
+  align: 'left' | 'center' | 'right',
+}>;
+
+type AlertImage = ExpandRecursively<AlertCommonOptions & {
+  galleryId: string;
+}>;
+
+export interface AlertFollow {
+  id: string;
+  /**
+   * Hooks determinate what events will trigger this alert
+   */
+  hooks: ['follow', 'raid'];
+  items: ExpandRecursively<AlertImage>[]
+  /**
+   * additional hook filters
+   */
+  filter: '';
 }
 
 export interface Emotes {
@@ -483,7 +517,7 @@ export class Overlay extends BotEntity<Overlay> {
     Countdown | Group | Eventlist | EmotesCombo | Credits | Clips | Alerts |
     Emotes | EmotesExplode | EmotesFireworks | Polls | TTS | OBSWebsocket |
     ClipsCarousel | HypeTrain | Wordcloud | HTML | Stats | Randomizer | Goal | Credits |
-    Plugin;
+    Plugin | Media;
   }[];
 }
 
