@@ -306,15 +306,17 @@ type AlertCommonOptions = ExpandRecursively<CreditsCommonOptions & {
 }>;
 
 type AlertImage = ExpandRecursively<AlertCommonOptions & {
+  type: 'gallery';
   galleryId: string;
 }>;
 
 export interface AlertFollow {
   id: string;
+  name: string;
   /**
    * Hooks determinate what events will trigger this alert
    */
-  hooks: ['follow', 'raid'];
+  hooks: ('follow' | 'raid')[];
   items: ExpandRecursively<AlertImage>[]
   /**
    * additional hook filters
