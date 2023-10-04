@@ -305,9 +305,18 @@ type AlertCommonOptions = ExpandRecursively<CreditsCommonOptions & {
   align: 'left' | 'center' | 'right',
 }>;
 
-type AlertImage = ExpandRecursively<AlertCommonOptions & {
+export type AlertImage = ExpandRecursively<AlertCommonOptions & {
   type: 'gallery';
   galleryId: string;
+}>;
+
+export type AlertText = ExpandRecursively<AlertCommonOptions & {
+  type: 'text';
+  font: null | Font;
+  tts: {
+    enabled: boolean,
+  }
+  messageTemplate: string;
 }>;
 
 export interface AlertFollow {
@@ -317,7 +326,7 @@ export interface AlertFollow {
    * Hooks determinate what events will trigger this alert
    */
   hooks: ('follow' | 'raid')[];
-  items: ExpandRecursively<AlertImage>[]
+  items: ExpandRecursively<AlertImage | AlertText>[]
   /**
    * additional hook filters
    */
