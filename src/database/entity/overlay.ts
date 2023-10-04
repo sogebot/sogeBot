@@ -298,7 +298,49 @@ export interface Alerts {
     volume: number;
     rate: number;
   };
-  items: ExpandRecursively<AlertFollow>[];
+  items: ExpandRecursively<{
+    id: string;
+    name: string;
+    ttsTemplate: string;
+    /**
+     * Hooks determinate what events will trigger this alert
+     */
+    hooks: ('follow' | 'raid')[];
+    items: ExpandRecursively<AlertImage | AlertText>[]
+    /**
+     * additional hook filters
+     */
+    filter: '';
+
+    /**
+     * animations
+     */
+    animationInDuration: number;
+    animationIn: 'none' | 'fadeIn' | 'fadeInDown' | 'fadeInLeft' | 'fadeInRight'
+    | 'fadeInUp' | 'fadeInDownBig' | 'fadeInLeftBig' | 'fadeInRightBig'
+    | 'fadeInUpBig' | 'bounceIn' | 'bounceInDown' | 'bounceInLeft'
+    | 'bounceInRight' | 'bounceInUp' | 'flipInX' | 'flipInY' | 'lightSpeedIn'
+    | 'rotateIn' | 'rotateInDownLeft' | 'rotateInDownRight' | 'rotateInUpLeft'
+    | 'rotateInUpRight' | 'slideInDown' | 'slideInLeft' | 'slideInRight'
+    | 'slideInUp' | 'zoomIn' | 'zoomInDown' | 'zoomInLeft' | 'zoomInRight'
+    | 'zoomInUp' | 'rollIn' | 'jackInTheBox';
+    animationOutDuration: number;
+    animationOut: 'none' | 'fadeOut' | 'fadeOutDown' | 'fadeOutLeft' | 'fadeOutRight' | 'fadeOutUp'
+    | 'fadeOutDownBig' | 'fadeOutLeftBig' | 'fadeOutRightBig' | 'fadeOutUpBig'
+    | 'bounceOut' | 'bounceOutDown' | 'bounceOutLeft' | 'bounceOutRight'
+    | 'bounceOutUp' | 'flipOutX' | 'flipOutY' | 'lightSpeedOut' | 'rotateOut'
+    | 'rotateOutDownLeft' | 'rotateOutDownRight' | 'rotateOutUpLeft'
+    | 'rotateOutUpRight' | 'slideOutDown' | 'slideOutLeft' | 'slideOutRight'
+    | 'slideOutUp' | 'zoomOut' | 'zoomOutDown' | 'zoomOutLeft' | 'zoomOutRight'
+    | 'zoomOutUp' | 'rollOut';
+    animationText: 'none' | 'baffle' | 'bounce' | 'bounce2' | 'flip' | 'flash' | 'pulse2' | 'rubberBand'
+    | 'shake2' | 'swing' | 'tada' | 'wave' | 'wobble' | 'wiggle' | 'wiggle2' | 'jello' | 'typewriter';
+    animationTextOptions: {
+      speed: number | 'slower' | 'slow' | 'fast' | 'faster';
+      maxTimeToDecrypt: number;
+      characters: string;
+    };
+  }>[];
 }
 
 type AlertCommonOptions = ExpandRecursively<CreditsCommonOptions & {
@@ -320,51 +362,6 @@ export type AlertText = ExpandRecursively<AlertCommonOptions & {
   }
   messageTemplate: string;
 }>;
-
-export interface AlertFollow {
-  id: string;
-  name: string;
-  ttsTemplate: string;
-  /**
-   * Hooks determinate what events will trigger this alert
-   */
-  hooks: ('follow' | 'raid')[];
-  items: ExpandRecursively<AlertImage | AlertText>[]
-  /**
-   * additional hook filters
-   */
-  filter: '';
-
-  /**
-   * animations
-   */
-  animationInDuration: number;
-  animationIn: 'none' | 'fadeIn' | 'fadeInDown' | 'fadeInLeft' | 'fadeInRight'
-  | 'fadeInUp' | 'fadeInDownBig' | 'fadeInLeftBig' | 'fadeInRightBig'
-  | 'fadeInUpBig' | 'bounceIn' | 'bounceInDown' | 'bounceInLeft'
-  | 'bounceInRight' | 'bounceInUp' | 'flipInX' | 'flipInY' | 'lightSpeedIn'
-  | 'rotateIn' | 'rotateInDownLeft' | 'rotateInDownRight' | 'rotateInUpLeft'
-  | 'rotateInUpRight' | 'slideInDown' | 'slideInLeft' | 'slideInRight'
-  | 'slideInUp' | 'zoomIn' | 'zoomInDown' | 'zoomInLeft' | 'zoomInRight'
-  | 'zoomInUp' | 'rollIn' | 'jackInTheBox';
-  animationOutDuration: number;
-  animationOut: 'none' | 'fadeOut' | 'fadeOutDown' | 'fadeOutLeft' | 'fadeOutRight' | 'fadeOutUp'
-  | 'fadeOutDownBig' | 'fadeOutLeftBig' | 'fadeOutRightBig' | 'fadeOutUpBig'
-  | 'bounceOut' | 'bounceOutDown' | 'bounceOutLeft' | 'bounceOutRight'
-  | 'bounceOutUp' | 'flipOutX' | 'flipOutY' | 'lightSpeedOut' | 'rotateOut'
-  | 'rotateOutDownLeft' | 'rotateOutDownRight' | 'rotateOutUpLeft'
-  | 'rotateOutUpRight' | 'slideOutDown' | 'slideOutLeft' | 'slideOutRight'
-  | 'slideOutUp' | 'zoomOut' | 'zoomOutDown' | 'zoomOutLeft' | 'zoomOutRight'
-  | 'zoomOutUp' | 'rollOut';
-  animationText: 'none' | 'baffle' | 'bounce' | 'bounce2' | 'flip' | 'flash' | 'pulse2' | 'rubberBand'
-  | 'shake2' | 'swing' | 'tada' | 'wave' | 'wobble' | 'wiggle' | 'wiggle2' | 'jello' | 'typewriter';
-  animationTextOptions: {
-    speed: number | 'slower' | 'slow' | 'fast' | 'faster';
-    maxTimeToDecrypt: number;
-    characters: string;
-  };
-}
-
 export interface Emotes {
   typeId: 'emotes';
   emotesSize: 1 | 2 | 3,
