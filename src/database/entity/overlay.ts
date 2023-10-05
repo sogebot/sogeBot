@@ -355,8 +355,8 @@ type AlertCommonOptions = ExpandRecursively<CreditsCommonOptions & {
 export type AlertImage = ExpandRecursively<AlertCommonOptions & {
   type: 'gallery';
   galleryId: string;
-  scale: number;
   loop: boolean;
+  volume: number;
 }>;
 
 export type AlertText = ExpandRecursively<AlertCommonOptions & {
