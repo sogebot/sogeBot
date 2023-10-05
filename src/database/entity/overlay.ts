@@ -307,6 +307,11 @@ export interface Alerts {
      */
     hooks: ('follow' | 'raid')[];
     items: ExpandRecursively<AlertImage | AlertText>[]
+    variants: {
+      [x: string]: {
+        [itemId: string]: Record<string, any>
+      }
+    }
     /**
      * additional hook filters
      */
