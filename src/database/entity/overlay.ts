@@ -306,7 +306,7 @@ export interface Alerts {
      * Hooks determinate what events will trigger this alert
      */
     hooks: ('follow' | 'raid')[];
-    items: ExpandRecursively<AlertImage | AlertText>[]
+    items: ExpandRecursively<AlertImage | AlertText | AlertAudio>[]
     variants: {
       [x: string]: {
         [itemId: string]: Record<string, any>
@@ -350,6 +350,12 @@ export interface Alerts {
 
 type AlertCommonOptions = ExpandRecursively<CreditsCommonOptions & {
   align: 'left' | 'center' | 'right',
+}>;
+
+export type AlertAudio = ExpandRecursively<AlertCommonOptions & {
+  type: 'audio';
+  galleryId: string;
+  volume: number;
 }>;
 
 export type AlertImage = ExpandRecursively<AlertCommonOptions & {
