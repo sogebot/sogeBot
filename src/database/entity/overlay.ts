@@ -317,6 +317,8 @@ export interface Alerts {
      */
     filter: '';
 
+    alertDuration: number;
+
     /**
      * animations
      */
