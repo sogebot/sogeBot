@@ -348,24 +348,32 @@ export interface Alerts {
   }>[];
 }
 
-type AlertCommonOptions = ExpandRecursively<CreditsCommonOptions & {
-  align: 'left' | 'center' | 'right',
-}>;
+type AlertCommonOptions = ExpandRecursively<CreditsCommonOptions>;
+
+type AlertAnimationOptions = {
+  animationDelay: number;
+  animationInDuration: null | number;
+  animationOutDuration: null | number;
+  animationIn: null | Alerts['items'][number]['animationIn'];
+  animationOut: null | Alerts['items'][number]['animationOut'];
+};
 
 export type AlertAudio = ExpandRecursively<AlertCommonOptions & {
   type: 'audio';
   galleryId: string;
   volume: number;
+  delay: number;
 }>;
 
-export type AlertImage = ExpandRecursively<AlertCommonOptions & {
+export type AlertImage = ExpandRecursively<AlertCommonOptions & AlertAnimationOptions & {
   type: 'gallery';
   galleryId: string;
   loop: boolean;
   volume: number;
+  isVideo: boolean;
 }>;
 
-export type AlertText = ExpandRecursively<AlertCommonOptions & {
+export type AlertText = ExpandRecursively<AlertCommonOptions & AlertAnimationOptions & {
   type: 'text';
   font: null | Font;
   tts: {
