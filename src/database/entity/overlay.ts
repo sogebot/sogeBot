@@ -285,13 +285,11 @@ export interface Alerts {
     list:        { [x:string]: boolean };
     customWords: string;
   };
-  font: ExpandRecursively<Font & {
+  globalFont1: ExpandRecursively<Font & {
     align: 'left' | 'center' | 'right',
     highlightcolor: string;
   }>;
-  fontMessage: ExpandRecursively<Font & {
-    align: 'left' | 'center' | 'right',
-  }>;
+  globalFont2: ExpandRecursively<Alerts['globalFont1']>;
   tts: {
     voice: string;
     pitch: number;
@@ -377,7 +375,8 @@ export type AlertImage = ExpandRecursively<AlertCommonOptions & AlertAnimationOp
 
 export type AlertText = ExpandRecursively<AlertCommonOptions & AlertAnimationOptions & {
   type: 'text';
-  font: null | Alerts['font'];
+  globalFont: 'globalFont1' | 'globalFont2';
+  font: null | Alerts['globalFont1'];
   tts: {
     enabled: boolean,
   }

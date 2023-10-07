@@ -104,7 +104,7 @@ const values = {
       },
       customWords: '',
     },
-    font: {
+    globalFont1: {
       align:          'center',
       family:         'PT Sans',
       size:           24,
@@ -115,15 +115,16 @@ const values = {
       highlightcolor: '#00ff00',
       shadow:         [],
     },
-    fontMessage: {
-      align:       'left',
-      family:      'PT Sans',
-      size:        16,
-      borderPx:    1,
-      borderColor: '#000000',
-      weight:      500,
-      color:       '#ffffff',
-      shadow:      [],
+    globalFont2: {
+      align:          'left',
+      family:         'PT Sans',
+      size:           16,
+      borderPx:       1,
+      borderColor:    '#000000',
+      highlightcolor: '#00ff00',
+      weight:         500,
+      color:          '#ffffff',
+      shadow:         [],
     },
     tts: {
       voice:  'UK English Female',
