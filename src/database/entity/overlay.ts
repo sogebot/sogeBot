@@ -377,7 +377,7 @@ export type AlertImage = ExpandRecursively<AlertCommonOptions & AlertAnimationOp
 
 export type AlertText = ExpandRecursively<AlertCommonOptions & AlertAnimationOptions & {
   type: 'text';
-  font: null | Font;
+  font: null | Alerts['font'];
   tts: {
     enabled: boolean,
   }
