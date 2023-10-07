@@ -350,7 +350,7 @@ export interface Alerts {
 
 type AlertCommonOptions = ExpandRecursively<CreditsCommonOptions>;
 
-type AlertAnimationOptions = {
+export type AlertAnimationOptions = {
   animationDelay: number;
   animationInDuration: null | number;
   animationOutDuration: null | number;
