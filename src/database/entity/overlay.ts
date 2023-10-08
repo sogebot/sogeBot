@@ -303,7 +303,7 @@ export interface Alerts {
      * Hooks determinate what events will trigger this alert
      */
     hooks: ('follow' | 'raid')[];
-    items: ExpandRecursively<AlertImage | AlertText | AlertAudio | AlertTTS>[]
+    items: ExpandRecursively<AlertImage | AlertText | AlertAudio | AlertTTS | AlertCustom>[]
     variants: {
       [x: string]: {
         [itemId: string]: Record<string, any>
@@ -377,6 +377,15 @@ export type AlertTTS = ExpandRecursively<AlertCommonOptions & {
   tts: null | Alerts['tts'];
   ttsTemplate: string;
   enabledWhen: string;
+}>;
+
+export type AlertCustom = ExpandRecursively<AlertCommonOptions & {
+  type: 'custom';
+  css: string;
+  html: string;
+  javascript: string;
+  globalFont: 'globalFont1' | 'globalFont2';
+  font: null | Alerts['globalFont1'];
 }>;
 
 export type AlertText = ExpandRecursively<AlertCommonOptions & AlertAnimationOptions & {
