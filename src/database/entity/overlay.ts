@@ -299,12 +299,11 @@ export interface Alerts {
   items: ExpandRecursively<{
     id: string;
     name: string;
-    ttsTemplate: string;
     /**
      * Hooks determinate what events will trigger this alert
      */
     hooks: ('follow' | 'raid')[];
-    items: ExpandRecursively<AlertImage | AlertText | AlertAudio>[]
+    items: ExpandRecursively<AlertImage | AlertText | AlertAudio | AlertTTS>[]
     variants: {
       [x: string]: {
         [itemId: string]: Record<string, any>
@@ -373,13 +372,17 @@ export type AlertImage = ExpandRecursively<AlertCommonOptions & AlertAnimationOp
   isVideo: boolean;
 }>;
 
+export type AlertTTS = ExpandRecursively<AlertCommonOptions & {
+  type: 'tts';
+  tts: null | Alerts['tts'];
+  ttsTemplate: string;
+  enabledWhen: string;
+}>;
+
 export type AlertText = ExpandRecursively<AlertCommonOptions & AlertAnimationOptions & {
   type: 'text';
   globalFont: 'globalFont1' | 'globalFont2';
   font: null | Alerts['globalFont1'];
-  tts: {
-    enabled: boolean,
-  }
   messageTemplate: string;
 }>;
 export interface Emotes {
