@@ -299,16 +299,12 @@ export interface Alerts {
   items: ExpandRecursively<{
     id: string;
     name: string;
+    variants: ExpandRecursively<Omit<Alerts['items'][number], 'variants' | 'hooks'>>[]
     /**
      * Hooks determinate what events will trigger this alert
      */
     hooks: ('follow' | 'raid')[];
     items: ExpandRecursively<AlertImage | AlertText | AlertAudio | AlertTTS | AlertCustom>[]
-    variants: {
-      [x: string]: {
-        [itemId: string]: Record<string, any>
-      }
-    }
     /**
      * additional hook filters
      */
@@ -340,7 +336,7 @@ export interface Alerts {
     animationText: 'none' | 'baffle' | 'bounce' | 'bounce2' | 'flip' | 'flash' | 'pulse2' | 'rubberBand'
     | 'shake2' | 'swing' | 'tada' | 'wave' | 'wobble' | 'wiggle' | 'wiggle2' | 'jello' | 'typewriter';
     animationTextOptions: {
-      speed: number | 'slower' | 'slow' | 'fast' | 'faster';
+      speed: 'slower' | 'slow' | 'normal' |  'fast' | 'faster';
       maxTimeToDecrypt: number;
       characters: string;
     };
