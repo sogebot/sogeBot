@@ -1,11 +1,14 @@
-import { Types } from '~/plugins/ListenTo';
 import { persistent } from '../core/persistent';
 import { eventEmitter } from '../events';
+
+import { Types } from '~/plugins/ListenTo';
 
 const old = new Map<string, any>();
 const stats = persistent({
   value: {
     language:                   'en',
+    channelDisplayName:         '',
+    channelUserName:            '',
     currentWatchedTime:         0,
     currentViewers:             0,
     maxViewers:                 0,
@@ -21,6 +24,8 @@ const stats = persistent({
 
   } as {
     language: string;
+    channelDisplayName: string;
+    channelUserName: string;
     currentWatchedTime: number;
     currentViewers: number;
     maxViewers: number;

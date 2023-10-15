@@ -156,6 +156,14 @@ bot it is twitch by default
 
 - return uptime of the stream
 
+`$channelDisplayName`
+
+- return channel display name
+
+`$channelUserName`
+
+- return channel user name
+
 ## Count subs / follows/ bits / tips in date interval
 
 - `(count|subs|<interval>)`

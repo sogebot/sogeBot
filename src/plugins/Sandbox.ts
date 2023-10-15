@@ -152,6 +152,8 @@ export const runScriptInSandbox = (plugin: Plugin,
     game:               stats.value.currentGame,
     status:             stats.value.currentTitle,
     currentWatched:     stats.value.currentWatchedTime,
+    channelDisplayName: stats.value.channelDisplayName,
+    channelUserName:    stats.value.channelUserName,
   };
 
   eval(getTranspiledCode(___code___.id, ___code___.source));

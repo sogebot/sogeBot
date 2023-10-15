@@ -76,6 +76,8 @@ export async function getChannelInformation (opts: any) {
       apiStats.value.contentClasificationLabels = getChannelInfo[rawDataSymbol].content_classification_labels;
       apiStats.value.currentGame = getChannelInfo.gameName;
       apiStats.value.currentTitle = getChannelInfo.title;
+      apiStats.value.channelDisplayName = getChannelInfo.displayName;
+      apiStats.value.channelUserName = getChannelInfo.name;
 
       gameCache.value = getChannelInfo.gameName;
       rawStatus.value = _rawStatus;

@@ -95,17 +95,19 @@ class HelpersFilter {
     const uptime = vars.get('services.twitch.uptime') as number;
 
     const variables: Record<string, any> = {
-      $game:            stats.value.currentGame,
-      $language:        stats.value.language,
-      $viewers:         isStreamOnline.value ? stats.value.currentViewers : 0,
-      $followers:       stats.value.currentFollowers,
-      $subscribers:     stats.value.currentSubscribers,
-      $bits:            isStreamOnline.value ? stats.value.currentBits : 0,
-      $title:           stats.value.currentTitle,
-      $source:          opts.sender && typeof opts.discord !== 'undefined' ? 'discord' : 'twitch',
-      $isBotSubscriber: isBotSubscriber(),
-      $isStreamOnline:  isStreamOnline.value,
-      $uptime:          getTime(Date.now() - uptime, false),
+      $game:               stats.value.currentGame,
+      $language:           stats.value.language,
+      $viewers:            isStreamOnline.value ? stats.value.currentViewers : 0,
+      $followers:          stats.value.currentFollowers,
+      $subscribers:        stats.value.currentSubscribers,
+      $bits:               isStreamOnline.value ? stats.value.currentBits : 0,
+      $title:              stats.value.currentTitle,
+      $source:             opts.sender && typeof opts.discord !== 'undefined' ? 'discord' : 'twitch',
+      $isBotSubscriber:    isBotSubscriber(),
+      $isStreamOnline:     isStreamOnline.value,
+      $uptime:             getTime(Date.now() - uptime, false),
+      $channelDisplayName: stats.value.channelDisplayName,
+      $channelUserName:    stats.value.channelUserName,
     };
 
     if (message.includes('$thumbnail') && stats.value.currentGame) {
