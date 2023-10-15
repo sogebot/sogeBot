@@ -139,7 +139,7 @@
       "errors": {
         "command_must_start_with_!": "O comando deve começar com !",
         "this_value_must_be_a_positive_number_or_0": "Este valor deve ser um número positivo ou 0",
-        "value_cannot_be_empty": "O valor não pode estar vazio"
+        "value_cannot_be_empty": "O valor não pode ficar vazio"
       },
       "dialog": {
         "title": {
@@ -151,7 +151,7 @@
         },
         "alerts": {
           "success": "Evento foi <strong>salvo com sucesso</strong>.",
-          "fail": "Alguma coisa deu <strong>errada</strong>."
+          "fail": "Algo deu <strong>errado</strong>."
         },
         "close": "Fechar",
         "save-changes": "Salvar alterações",
@@ -317,7 +317,7 @@
       "cheer": "Deu um <strong>Cheered</strong> em você",
       "tip": "<strong>Doou </strong> para você",
       "tipToCharity": "<strong>doou</strong> para <strong>$campaignName</strong>",
-      "hypeChatTip": "sent <strong>hype chat</strong>"
+      "hypeChatTip": "<strong>hype chat</strong> enviado"
     },
     "responses": {
       "variable": {
