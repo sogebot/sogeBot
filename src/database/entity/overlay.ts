@@ -386,6 +386,10 @@ export type AlertCustom = ExpandRecursively<AlertCommonOptions & {
   javascript: string;
   globalFont: 'globalFont1' | 'globalFont2';
   font: null | Alerts['globalFont1'];
+  enabledWhen: Filter;
+  allowEmotes:     {
+    twitch: boolean, ffz: boolean, bttv: boolean,
+  },
 }>;
 
 export type AlertText = ExpandRecursively<AlertCommonOptions & AlertAnimationOptions & {
@@ -393,6 +397,10 @@ export type AlertText = ExpandRecursively<AlertCommonOptions & AlertAnimationOpt
   globalFont: 'globalFont1' | 'globalFont2';
   font: null | Alerts['globalFont1'];
   messageTemplate: string;
+  enabledWhen: Filter;
+  allowEmotes:     {
+    twitch: boolean, ffz: boolean, bttv: boolean,
+  },
 }>;
 export interface Emotes {
   typeId: 'emotes';
