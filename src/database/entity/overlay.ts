@@ -298,6 +298,7 @@ export interface Alerts {
   };
   items: ExpandRecursively<{
     id: string;
+    enabled: boolean;
     name: string;
     variants: ExpandRecursively<Omit<Alerts['items'][number], 'variants' | 'hooks'>>[];
     /**
