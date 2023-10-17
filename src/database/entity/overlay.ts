@@ -378,6 +378,7 @@ export type AlertTTS = ExpandRecursively<AlertCommonOptions & {
   tts: null | Alerts['tts'];
   ttsTemplate: string;
   enabledWhen: Filter;
+  speakDelay?: number;
 }>;
 
 export type AlertCustom = ExpandRecursively<AlertCommonOptions & {
