@@ -300,6 +300,7 @@ export interface Alerts {
     id: string;
     enabled: boolean;
     name: string;
+    variantName?: string | null;
     variants: ExpandRecursively<Omit<Alerts['items'][number], 'variants' | 'hooks'>>[];
     /**
      * weight of this alert, higher weight means higher priority
