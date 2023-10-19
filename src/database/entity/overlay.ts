@@ -326,6 +326,7 @@ export interface Alerts {
     /**
      * animations
      */
+    animationInWindowBoundaries?: boolean;
     animationInDuration: number;
     animationIn: 'none' | 'fadeIn' | 'fadeInDown' | 'fadeInLeft' | 'fadeInRight'
     | 'fadeInUp' | 'fadeInDownBig' | 'fadeInLeftBig' | 'fadeInRightBig'
@@ -335,6 +336,7 @@ export interface Alerts {
     | 'rotateInUpRight' | 'slideInDown' | 'slideInLeft' | 'slideInRight'
     | 'slideInUp' | 'zoomIn' | 'zoomInDown' | 'zoomInLeft' | 'zoomInRight'
     | 'zoomInUp' | 'rollIn' | 'jackInTheBox';
+    animationOutWindowBoundaries?: boolean;
     animationOutDuration: number;
     animationOut: 'none' | 'fadeOut' | 'fadeOutDown' | 'fadeOutLeft' | 'fadeOutRight' | 'fadeOutUp'
     | 'fadeOutDownBig' | 'fadeOutLeftBig' | 'fadeOutRightBig' | 'fadeOutUpBig'
