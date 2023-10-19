@@ -9,6 +9,8 @@ import { Price } from '~/database/entity/price';
 import alerts from '~/registries/alerts';
 
 const selectedItemRegex = /\$triggerAlert\((?<uuid>[0-9A-F]{8}(?:-[0-9A-F]{4}){3}-[0-9A-F]{12}),? ?(?<options>.*)?\)/mi;
+// expecting 21 symbols for nanoid
+const selectedItemRegexNanoId = /\$triggerAlert\((?<uuid>.{21}),? ?(?<options>.*)?\)/mi;
 
 export const operation: ResponseFilter = {
   '$triggerOperation(#)': async function (filter: string, attributes) {
@@ -21,31 +23,34 @@ export const operation: ResponseFilter = {
     return '';
   },
   '$triggerAlert(#)': async function (filter: string, attributes) {
-    const match = selectedItemRegex.exec(filter);
-    if (match && match.groups) {
-      let customOptions: EmitData['customOptions'] = {};
-      if (match.groups.options) {
-        customOptions = JSON.parse(Buffer.from(match.groups.options, 'base64').toString('utf-8'));
-        info(`Triggering alert ${match.groups.uuid} by command ${attributes.command} with custom options ${JSON.stringify(customOptions)}`);
-      } else {
-        info(`Triggering alert ${match.groups.uuid} by command ${attributes.command}`);
+    // TODO: selectedItemRegex is deprecated
+    for (const regex of [selectedItemRegex, selectedItemRegexNanoId]) {
+      const match = regex.exec(filter);
+      if (match && match.groups) {
+        let customOptions: EmitData['customOptions'] = {};
+        if (match.groups.options) {
+          customOptions = JSON.parse(Buffer.from(match.groups.options, 'base64').toString('utf-8'));
+          info(`Triggering alert ${match.groups.uuid} by command ${attributes.command} with custom options ${JSON.stringify(customOptions)}`);
+        } else {
+          info(`Triggering alert ${match.groups.uuid} by command ${attributes.command}`);
+        }
+
+        const price = await AppDataSource.getRepository(Price).findOneBy({ command: attributes.command, enabled: true });
+
+        await alerts.trigger({
+          amount:     price ? price.price : 0,
+          currency:   'CZK',
+          event:      'custom',
+          alertId:    match.groups.uuid,
+          message:    attributes.param || '',
+          monthsName: '',
+          name:       attributes.command,
+          tier:       null,
+          recipient:  attributes.sender.userName,
+          customOptions,
+        });
       }
-
-      const price = await AppDataSource.getRepository(Price).findOneBy({ command: attributes.command, enabled: true });
-
-      await alerts.trigger({
-        amount:     price ? price.price : 0,
-        currency:   'CZK',
-        event:      'custom',
-        alertId:    match.groups.uuid,
-        message:    attributes.param || '',
-        monthsName: '',
-        name:       attributes.command,
-        tier:       null,
-        recipient:  attributes.sender.userName,
-        customOptions,
-      });
+      return '';
     }
-    return '';
   },
 };
