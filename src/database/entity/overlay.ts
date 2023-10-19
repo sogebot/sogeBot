@@ -309,7 +309,7 @@ export interface Alerts {
     /**
      * Hooks determinate what events will trigger this alert
      */
-    hooks: ('follow' | 'raid')[];
+    hooks: string[];
     items: ExpandRecursively<AlertImage | AlertText | AlertAudio | AlertTTS | AlertCustom>[]
     /**
      * additional hook filters

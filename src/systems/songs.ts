@@ -5,7 +5,7 @@ import {
 } from '@entity/song';
 import { User } from '@entity/user';
 import * as _ from 'lodash';
-import shortid from 'shortid';
+import { nanoid } from 'nanoid';
 import io from 'socket.io';
 import {
   Brackets, In, Like,
@@ -29,10 +29,10 @@ import defaultPermissions from '~/helpers/permissions/defaultPermissions';
 import { adminEndpoint, publicEndpoint } from '~/helpers/socket';
 import { tmiEmitter } from '~/helpers/tmi';
 import * as changelog from '~/helpers/user/changelog.js';
-import { isModerator } from '~/helpers/user/isModerator';
-import { translate } from '~/translate';
 import getBotId from '~/helpers/user/getBotId';
 import getBotUserName from '~/helpers/user/getBotUserName';
+import { isModerator } from '~/helpers/user/isModerator';
+import { translate } from '~/translate';
 
 let importInProgress = false;
 const cachedTags = new Set<string>();
@@ -140,12 +140,12 @@ class Songs extends System {
 
       // filter generator for new UI
       for (const filter of opts.filters || []) {
-        const name = shortid.characters('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_.');
+        const name = nanoid();
 
         if (filter.operation === 'includes') {
           query.andWhere(new Brackets(w => {
             for (let i = 0; i < filter.value.length; i++) {
-              const name2 = shortid.characters('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_.');
+              const name2 = nanoid();
               const value = filter.value[i];
               if  (['postgres'].includes(AppDataSource.options.type.toLowerCase())) {
                 w[i === 0 ? 'where' : 'orWhere'](`"playlist"."${filter.columnName}" like :${name2}`, { [name2]: `%${value}%` });
