@@ -314,6 +314,11 @@ export interface Alerts {
      * additional hook filters
      */
     filter: Filter;
+    /**
+     * what rewardId should trigger this
+     * available only for reward alerts
+     */
+    rewardId?: string;
 
     alertDuration: number;
 
