@@ -50,7 +50,7 @@ export const operation: ResponseFilter = {
           customOptions,
         });
       }
-      return '';
     }
+    return '';
   },
 };
