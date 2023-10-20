@@ -25,6 +25,21 @@ export interface EmitData {
     messageTemplate? : string;
     audioId? : string;
     mediaId? : string;
+
+    animationIn?: string;
+    animationInDuration?: number;
+    animationInWindowBoundaries?: boolean;
+
+    animationOut?: string;
+    animationOutDuration?: number;
+    animationOutWindowBoundaries?: boolean;
+
+    animationText?: any;
+    animationTextOptions?: any;
+
+    components?: {
+      [componentId: string]: any
+    }
   }
 }
 
