@@ -7,7 +7,7 @@ import { IsCommand } from '../validators/IsCommand.js';
 
 @Entity()
 @Index('idx_randomizer_cmdunique', [ 'command' ], { unique: true })
-export class Randomizer extends BotEntity<Randomizer> {
+export class Randomizer extends BotEntity {
   @BeforeInsert()
   generateCreatedAt() {
     this.createdAt = new Date().toISOString();

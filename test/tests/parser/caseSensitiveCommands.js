@@ -1,18 +1,18 @@
 /* global describe it before */
 
 
-require('../../general.js');
+import('../../general.js');
 
 import { db } from '../../general.js';
 import { message } from '../../general.js';
 import assert from 'assert';
-const { AppDataSource } = require('../../../dest/database.js');
+import { AppDataSource } from '../../../dest/database.js';
 
-const Parser = require('../../../dest/parser').default;
+import { Parser } from '../../../dest/parser.js';
 
 const owner = { userName: '__broadcaster__', userId: String(Math.floor(Math.random() * 100000)) };
 
-const { User } = require('../../../dest/database/entity/user');
+import { User } from '../../../dest/database/entity/user.js';
 
 describe('Parser - case sensitive commands - @func2', async () => {
   const tests = [

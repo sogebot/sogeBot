@@ -3,11 +3,9 @@ const commons = require('../../../dest/commons');
 
 const moderation = (require('../../../dest/systems/moderation')).default;
 
-require('../../general.js');
+import('../../general.js');
 
-import { db } from '../../general.js';
-import { message } from '../../general.js';
-const user = require('../../general.js').user;
+import { db, message, user } from '../../general.js';
 import assert from 'assert';
 
 const owner = Object.freeze({ userName: '__broadcaster__', badges: {}, userId: 12345 });

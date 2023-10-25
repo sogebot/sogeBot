@@ -1,14 +1,14 @@
 /* global describe it before */
 
 import assert from 'assert';
-const { AppDataSource } = require('../../../dest/database');
+import { AppDataSource } from '../../../dest/database.js'
 
 const v4 = require('uuid').v4;
 
-const { Variable } = require('../../../dest/database/entity/variable');
+import { Variable } from '../../../dest/database/entity/variable.js';
 const getURL = require('../../../dest/helpers/customvariables/getURL').getURL;
-const { defaultPermissions } = require('../../../dest/helpers/permissions/defaultPermissions');
-require('../../general.js');
+import { defaultPermissions } from '../../../dest/helpers/permissions/defaultPermissions.js';
+import('../../general.js');
 import { db } from '../../general.js';
 import { message } from '../../general.js';
 
@@ -20,7 +20,7 @@ describe('Custom Variable - helpers/customvariables/getURL - @func1', () => {
     await db.cleanup();
     await message.prepare();
 
-    await new Variable({
+    await Variable.create({
       variableName: '$_variable',
       readOnly: false,
       currentValue: '0',

@@ -2,15 +2,15 @@
 
 const _ = require('lodash');
 const { v4: uuidv4 } = require('uuid');
-const { AppDataSource } = require('../../../dest/database.js');
+import { AppDataSource } from '../../../dest/database.js';
 
-require('../../general.js');
+import('../../general.js');
 
 const { Event } = require('../../../dest/database/entity/event');
-const { User } = require('../../../dest/database/entity/user');
+import { User } from '../../../dest/database/entity/user.js';
 const events = (require('../../../dest/events')).default;
 const defaultPermissions = (require('../../../dest/helpers/permissions/defaultPermissions')).defaultPermissions;
-const alias = (require('../../../dest/systems/alias')).default;
+import alias from '../../../dest/systems/alias.js';
 const commercial = (require('../../../dest/systems/commercial')).default;
 import { db } from '../../general.js';
 import { message } from '../../general.js';

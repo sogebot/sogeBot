@@ -1,9 +1,9 @@
-require('../../general.js');
+import('../../general.js');
 
 import assert from 'assert';
 
 const shortid = require('shortid');
-const { AppDataSource } = require('../../../dest/database.js');
+import { AppDataSource } from '../../../dest/database.js';
 
 const { Gallery } = require('../../../dest/database/entity/gallery');
 import { db } from '../../general.js';

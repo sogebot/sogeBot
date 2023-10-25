@@ -1,12 +1,12 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 import assert from 'assert';
 
-require('../../general.js');
+import('../../general.js');
 
 const { setImmediateAwait } = require('../../../dest//helpers/setImmediateAwait');
-const { AppDataSource } = require('../../../dest/database.js');
+import { AppDataSource } from '../../../dest/database.js';
 const { EventList } = require('../../../dest/database/entity/eventList');
-const { User } = require('../../../dest/database/entity/user');
+import { User } from '../../../dest/database/entity/user.js';
 const Message = require('../../../dest/message').default;
 const eventlist = require('../../../dest/overlays/eventlist.js').default;
 import { db } from '../../general.js';

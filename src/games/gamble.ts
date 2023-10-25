@@ -54,7 +54,7 @@ class Gamble extends Game {
 
   @command('!gamble')
   async main (opts: CommandOptions): Promise<CommandResponse[]> {
-    const pointsSystem = (await import('../systems/points')).default;
+    const pointsSystem = (await import('../systems/points.js')).default;
 
     let points, message;
 

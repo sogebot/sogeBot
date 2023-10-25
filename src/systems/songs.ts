@@ -366,7 +366,7 @@ class Songs extends System {
         });
     }
 
-    const songBan = new SongBan({ videoId: videoID, title: videoTitle });
+    const songBan = SongBan.create({ videoId: videoID, title: videoTitle });
     await Promise.all([
       songBan.save(),
       SongPlaylist.delete({ videoId: videoID }),
@@ -647,13 +647,13 @@ class Songs extends System {
           });
           return this.addSongToQueue(opts, (retry ?? 0) + 1 );
         }
-        if ((global as any).mocha) {
+        if (process.argv[1].endsWith('mocha.js')) {
           error('-- TEST ONLY ERROR --');
           error({ category: videoInfo.videoDetails.category });
         }
         return [{ response: translate('songs.incorrect-category'), ...opts }];
       } else {
-        const songRequest = new SongRequest({
+        const songRequest = SongRequest.create({
           videoId:  videoID,
           title:    videoInfo.videoDetails.title,
           loudness: Number(videoInfo.loudness ?? -15),
@@ -718,7 +718,7 @@ class Songs extends System {
       const videoInfo = await ytdl.getInfo('https://www.youtube.com/watch?v=' + id);
       if (videoInfo) {
         info(`=> Imported ${id} - ${videoInfo.videoDetails.title}`);
-        const songPlaylist = new SongPlaylist({
+        const songPlaylist = SongPlaylist.create({
           videoId:      id,
           title:        videoInfo.videoDetails.title,
           loudness:     Number(videoInfo.loudness ?? -15),
@@ -803,7 +803,7 @@ class Songs extends System {
             done++;
             const videoInfo = await ytdl.getInfo('https://www.youtube.com/watch?v=' + id);
             info(`=> Imported ${id} - ${videoInfo.videoDetails.title}`);
-            const songPlaylist = new SongPlaylist({
+            const songPlaylist = SongPlaylist.create({
               videoId:      id,
               title:        videoInfo.videoDetails.title,
               loudness:     Number(videoInfo.loudness ?? - 15),

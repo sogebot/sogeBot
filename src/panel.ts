@@ -48,6 +48,8 @@ import highlights from '~/systems/highlights.js';
 import translateLib, { translate } from '~/translate.js';
 import { variables } from '~/watchers.js';
 
+// __dirname is not available in ES6 module
+const __dirname = new URL('.', import.meta.url).pathname;
 const port = Number(process.env.PORT ?? 20000);
 const secureport = Number(process.env.SECUREPORT ?? 20443);
 

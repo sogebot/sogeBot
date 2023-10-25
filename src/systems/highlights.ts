@@ -137,7 +137,7 @@ class Highlights extends System {
       }
 
       const timestamp = timestampToObject(dayjs().valueOf() - dayjs(streamStatusChangeSince.value).valueOf());
-      const highlight = new Highlight({
+      const highlight = Highlight.create({
         videoId:   videos.data[0].id,
         timestamp: {
           hours: timestamp.hours, minutes: timestamp.minutes, seconds: timestamp.seconds,

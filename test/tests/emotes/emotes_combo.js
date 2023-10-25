@@ -3,10 +3,8 @@ import assert from 'assert';
 const { getLocalizedName } = require('@sogebot/ui-helpers/getLocalized');
 
 const { translate } = require('../../../dest/translate');
-require('../../general.js');
-import { db } from '../../general.js';
-import { message } from '../../general.js';
-const user = require('../../general.js').user;
+import('../../general.js');
+import { db, message, user } from '../../general.js';
 
 let emotes;
 

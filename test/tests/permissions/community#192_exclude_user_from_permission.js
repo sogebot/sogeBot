@@ -1,19 +1,19 @@
 /* global describe it beforeEach */
 
-require('../../general.js');
+import('../../general.js');
 
 import { db } from '../../general.js';
 import { message } from '../../general.js';
 import assert from 'assert';
 
-const { defaultPermissions } = require('../../../dest/helpers/permissions/defaultPermissions');
+import { defaultPermissions } from '../../../dest/helpers/permissions/defaultPermissions.js';
 const { check } = require('../../../dest/helpers/permissions/check');
-const Parser = require('../../../dest/parser').default;
+import { Parser } from '../../../dest/parser.js';
 const currency = require('../../../dest/currency').default;
 
 const { Permissions, PermissionCommands } = require('../../../dest/database/entity/permissions');
-const { User } = require('../../../dest/database/entity/user');
-const { AppDataSource } = require('../../../dest/database.js');
+import { User } from '../../../dest/database/entity/user.js';
+import { AppDataSource } from '../../../dest/database.js';
 
 const users = [
   { userName: '__viewer__', userId: String(6), id: 6 },

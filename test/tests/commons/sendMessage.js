@@ -2,10 +2,10 @@
 
 import assert from 'assert';
 
-require('../../general.js');
-const { getOwnerAsSender } = require('../../../dest/helpers/commons/getOwnerAsSender');
-const { sendMessage } = require('../../../dest/helpers/commons/sendMessage');
-const emitter = require('../../../dest/helpers/interfaceEmitter').default;
+import('../../general.js');
+import { getOwnerAsSender } from '../../../dest/helpers/commons/getOwnerAsSender.js';
+import { sendMessage } from '../../../dest/helpers/commons/sendMessage.js';
+import emitter from '../../../dest/helpers/interfaceEmitter.js';
 import { db } from '../../general.js';
 import { message } from '../../general.js';
 

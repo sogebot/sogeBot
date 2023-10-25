@@ -1,5 +1,5 @@
 /* global describe it beforeEach */
-require('../../general.js');
+import('../../general.js');
 
 import { db } from '../../general.js';
 import assert from 'assert';
@@ -13,7 +13,7 @@ const { linesParsed } = require('../../../dest/helpers/parser');
 const owner = { userName: '__broadcaster__' };
 
 const { Timer, TimerResponse } = require('../../../dest/database/entity/timer');
-const { AppDataSource } = require('../../../dest/database.js');
+import { AppDataSource } from '../../../dest/database.js';
 
 describe('Timers - list() - @func2', () => {
   beforeEach(async () => {

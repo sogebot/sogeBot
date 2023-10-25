@@ -1,6 +1,6 @@
 /* global describe it before */
 
-require('../../general.js');
+import('../../general.js');
 
 import { db } from '../../general.js';
 import { message } from '../../general.js';
@@ -8,10 +8,10 @@ import { message } from '../../general.js';
 const owner = { userName: '__broadcaster__', userId: String(Math.floor(Math.random() * 100000)) };
 const someuser = { userName: 'someuser', userId: String(Math.floor(Math.random() * 100000)) };
 
-const { AppDataSource } = require('../../../dest/database.js');
-const { User } = require('../../../dest/database/entity/user');
+import { AppDataSource } from '../../../dest/database.js';
+import { User } from '../../../dest/database/entity/user.js';
 
-const customcommands = (require('../../../dest/systems/customcommands')).default;
+import customcommands from '../../../dest/systems/customcommands.js';
 
 describe('Message - $touser filter - @func3', async () => {
   beforeEach(async () => {

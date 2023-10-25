@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 /* global describe it  */
 
-require('../../general.js');
+import('../../general.js');
 import assert from 'assert';
 const songs = (require('../../../dest/systems/songs')).default;
 

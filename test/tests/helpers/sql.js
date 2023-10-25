@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 /* global describe it before */
 
-require('../../general.js');
+import('../../general.js');
 
 import assert from 'assert';
 import { db } from '../../general.js';

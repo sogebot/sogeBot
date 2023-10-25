@@ -1,8 +1,8 @@
 /* global describe it beforeEach */
-require('../../general.js');
+import('../../general.js');
 
 import assert from 'assert';
-const { AppDataSource } = require('../../../dest/database.js');
+import { AppDataSource } from '../../../dest/database.js';
 
 import { db } from '../../general.js';
 import { message } from '../../general.js';
@@ -10,7 +10,7 @@ const url = require('../../general.js').url;
 
 const cooldown = (require('../../../dest/systems/cooldown')).default;
 
-const { User } = require('../../../dest/database/entity/user');
+import { User } from '../../../dest/database/entity/user.js';
 
 // users
 const owner = { userId: String(Math.floor(Math.random() * 100000)), userName: '__broadcaster__', badges: {} };

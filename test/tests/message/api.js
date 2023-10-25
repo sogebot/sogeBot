@@ -1,5 +1,5 @@
 /* global */
-require('../../general.js');
+import('../../general.js');
 require('../../mocks.js');
 
 import assert from 'assert';

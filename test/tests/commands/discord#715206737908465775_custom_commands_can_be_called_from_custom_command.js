@@ -1,15 +1,14 @@
 /* global describe it beforeEach */
-require('../../general.js');
+import('../../general.js');
 
-import { db } from '../../general.js';
-const time = require('../../general.js').time;
+import { db, time } from '../../general.js';
 import assert from 'assert';
-const { AppDataSource } = require('../../../dest/database.js');
+import { AppDataSource } from '../../../dest/database.js';
 import { message } from '../../general.js';
 
-const { User } = require('../../../dest/database/entity/user');
+import { User } from '../../../dest/database/entity/user.js';
 
-const customcommands = (require('../../../dest/systems/customcommands')).default;
+import customcommands from '../../../dest/systems/customcommands.js';
 
 // users
 const owner = { userName: '__broadcaster__', userId: String(Math.floor(Math.random() * 100000)) };

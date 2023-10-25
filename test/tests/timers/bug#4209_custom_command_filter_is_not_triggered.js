@@ -2,14 +2,14 @@
 
 
 import assert from 'assert';
-const { AppDataSource } = require('../../../dest/database.js');
-require('../../general.js');
+import { AppDataSource } from '../../../dest/database.js';
+import('../../general.js');
 
 import { db } from '../../general.js';
 import { message } from '../../general.js';
 
 const timers = (require('../../../dest/systems/timers')).default;
-const customcommands = (require('../../../dest/systems/customcommands')).default;
+import customcommands from '../../../dest/systems/customcommands.js';
 const isStreamOnline = (require('../../../dest/helpers/api/isStreamOnline')).isStreamOnline;
 
 const { Timer, TimerResponse } = require('../../../dest/database/entity/timer');

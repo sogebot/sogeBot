@@ -15,10 +15,10 @@ if ((process.env?.npm_package_version ?? 'x.y.z-SNAPSHOT').includes('SNAPSHOT'))
 
 import * as db from './helpers/db.js';
 import * as message from './helpers/messages.js';
-// import * as user from './helpers/user.js';
+import * as user from './helpers/user.js';
 // import * as tmi from './helpers/tmi.js';
-// import * as variable from './helpers/variable.js';
-// import * as time from './helpers/time.js';
+import * as variable from './helpers/variable.js';
+import * as time from './helpers/time.js';
 
 
-export { db, message, /*user, tmi, variable, time */};
+export { db, message, user, time, variable /* tmi, variable, time */};

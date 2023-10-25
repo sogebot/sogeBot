@@ -46,7 +46,7 @@ class EmotesCombo extends System {
       return true;
     }
 
-    const Emotes = (await import('../emotes')).default;
+    const Emotes = (await import('../emotes.js')).default;
 
     const parsed: string[] = [];
     const usedEmotes: { [code: string]: typeof Emotes.cache[number]} = {};

@@ -135,7 +135,7 @@ type Item<T> = {
 };
 
 @Entity()
-export class Alert extends BotEntity<Alert> {
+export class Alert extends BotEntity {
   @PrimaryColumn({ generated: 'uuid' })
     id: string;
 

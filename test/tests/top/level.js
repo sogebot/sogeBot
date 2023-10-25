@@ -3,18 +3,18 @@ import assert from 'assert';
 const constants = require('@sogebot/ui-helpers/constants');
 const { dayjs } = require('@sogebot/ui-helpers/dayjsHelper');
 
-const { User } = require('../../../dest/database/entity/user');
+import { User } from '../../../dest/database/entity/user.js';
 const { getOwner } = require('../../../dest/helpers/commons/getOwner');
 const { prepare } = require('../../../dest/helpers/commons/prepare');
 const {
   serialize,
 } = require('../../../dest/helpers/type');
-const { AppDataSource } = require('../../../dest/database');
+import { AppDataSource } from '../../../dest/database.js'
 const twitch = require('../../../dest/services/twitch').default;
 import { db } from '../../general.js';
 import { message } from '../../general.js';
 
-require('../../general.js');
+import('../../general.js');
 
 // users
 const owner = { userName: '__broadcaster__' };

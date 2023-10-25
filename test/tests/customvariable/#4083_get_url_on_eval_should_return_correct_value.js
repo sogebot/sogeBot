@@ -1,17 +1,15 @@
 const { defaultPermissions } = require ('../../../dest/helpers/permissions/defaultPermissions');
 
-require('../../general.js');
+import('../../general.js');
 
-import { db } from '../../general.js';
-import { message } from '../../general.js';
-const user = require('../../general.js').user;
+import { db, message, user } from '../../general.js';
 
 import assert from 'assert';
 
 const _ = require('lodash');
 const axios = require('axios');
 
-const { Variable } = require('../../../dest/database/entity/variable');
+import { Variable } from '../../../dest/database/entity/variable.js';
 
 const { v4 } = require('uuid');
 
@@ -29,7 +27,7 @@ describe('Custom Variable - #4083 - Get url on eval should return correct value 
 
   const urlId = v4();
   it(`Create eval $_variable to return Date.now()`, async () => {
-    await (new Variable({
+    await (Variable.create({
       variableName:  '$_variable',
       readOnly:      false,
       currentValue:  '0',

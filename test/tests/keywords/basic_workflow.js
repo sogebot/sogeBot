@@ -1,13 +1,13 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
-require('../../general.js');
+import('../../general.js');
 
 import { db } from '../../general.js';
 import { message } from '../../general.js';
 import assert from 'assert';
 
-const { User } = require('../../../dest/database/entity/user');
+import { User } from '../../../dest/database/entity/user.js';
 const { Keyword } = require('../../../dest/database/entity/keyword');
-const { AppDataSource } = require('../../../dest/database.js');
+import { AppDataSource } from '../../../dest/database.js';
 
 const keywords = (require('../../../dest/systems/keywords')).default;
 

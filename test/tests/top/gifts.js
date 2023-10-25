@@ -1,10 +1,10 @@
 /* global describe it before */
 import assert from 'assert';
-const { AppDataSource } = require('../../../dest/database.js');
+import { AppDataSource } from '../../../dest/database.js';
 
-require('../../general.js');
+import('../../general.js');
 
-const { User } = require('../../../dest/database/entity/user');
+import { User } from '../../../dest/database/entity/user.js';
 const { getOwner } = require('../../../dest/helpers/commons/getOwner');
 const { prepare } = require('../../../dest/helpers/commons/prepare');
 const top = (require('../../../dest/systems/top')).default;

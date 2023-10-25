@@ -1,13 +1,13 @@
 /* global describe it before */
 
 import assert from 'assert';
-const { AppDataSource } = require('../../../dest/database');
+import { AppDataSource } from '../../../dest/database.js'
 
 const v4 = require('uuid').v4;
 
-const { Variable } = require('../../../dest/database/entity/variable');
-const { defaultPermissions } = require('../../../dest/helpers/permissions/defaultPermissions');
-require('../../general.js');
+import { Variable } from '../../../dest/database/entity/variable.js';
+import { defaultPermissions } from '../../../dest/helpers/permissions/defaultPermissions.js';
+import('../../general.js');
 import { db } from '../../general.js';
 import { message } from '../../general.js';
 
@@ -23,7 +23,7 @@ describe('Custom Variable - helpers/customvariables/postURL - @func1', () => {
 
     postURL = require('../../../dest/helpers/customvariables/postURL').postURL;
 
-    new Variable({
+    Variable.create({
       variableName: '$_variable',
       readOnly: false,
       currentValue: '0',
@@ -38,7 +38,7 @@ describe('Custom Variable - helpers/customvariables/postURL - @func1', () => {
       ]
     }).save();
 
-    new Variable({
+    Variable.create({
       variableName: '$_variable2',
       readOnly: false,
       currentValue: '0',
@@ -50,7 +50,7 @@ describe('Custom Variable - helpers/customvariables/postURL - @func1', () => {
       urls: [{ GET: false, POST: true, showResponse: true, id: urlIdWithResponse1 }]
     }).save();
 
-    new Variable({
+    Variable.create({
       variableName: '$_variable3',
       readOnly: false,
       currentValue: '0',

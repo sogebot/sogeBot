@@ -1,4 +1,4 @@
-require('../../general.js');
+import('../../general.js');
 import assert from 'assert';
 
 const runScript = (require('../../../dest/helpers/customvariables/runScript')).runScript;

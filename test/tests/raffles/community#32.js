@@ -1,15 +1,15 @@
 /* global describe it before */
 
-require('../../general.js');
+import('../../general.js');
 
 import assert from 'assert';
 
 const _ = require('lodash');
 const { IsNull } = require('typeorm');
-const { AppDataSource } = require('../../../dest/database.js');
+import { AppDataSource } from '../../../dest/database.js';
 
 const { Raffle } = require('../../../dest/database/entity/raffle');
-const { User } = require('../../../dest/database/entity/user');
+import { User } from '../../../dest/database/entity/user.js';
 const { getOwnerAsSender } = require('../../../dest/helpers/commons/getOwnerAsSender');
 const raffles = (require('../../../dest/systems/raffles')).default;
 import { db } from '../../general.js';

@@ -1,13 +1,13 @@
 /* global describe it before */
 
 import assert from 'assert';
-require('../../general.js');
+import('../../general.js');
 
 import { db } from '../../general.js';
 const { prepare } = require('../../../dest/helpers/commons/prepare');
 import { message } from '../../general.js';
 
-const { User } = require('../../../dest/database/entity/user');
+import { User } from '../../../dest/database/entity/user.js';
 const { Settings } = require('../../../dest/database/entity/settings');
 
 const twitch = (require('../../../dest/services/twitch')).default;
@@ -21,7 +21,7 @@ const nightbot = { userName: 'nightbot', userId: String(4) };
 const botwithchangedname = { userName: 'asdsadas', userId: String(24900234) };
 
 const { isIgnored } = require('../../../dest/helpers/user/isIgnored');
-const { AppDataSource } = require('../../../dest/database.js');
+import { AppDataSource } from '../../../dest/database.js';
 
 describe('TMI - ignore - @func3', () => {
   before(async () => {

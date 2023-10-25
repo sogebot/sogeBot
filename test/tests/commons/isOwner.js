@@ -1,10 +1,8 @@
 import assert from 'assert';
 
-const { isOwner } = require('../../../dest/helpers/user/isOwner');
-require('../../general.js');
-import { db } from '../../general.js';
-import { message } from '../../general.js';
-const user = require('../../general.js').user;
+import { isOwner } from '../../../dest/helpers/user/isOwner.js';
+import('../../general.js');
+import { db, message, user } from '../../general.js';
 
 describe('lib/commons - @func2 - isOwner()', () => {
   before(async () => {

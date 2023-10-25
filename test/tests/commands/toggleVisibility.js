@@ -1,8 +1,8 @@
 /* global describe it beforeEach */
-require('../../general.js');
+import('../../general.js');
 import assert from 'assert';
 
-const customcommands = (require('../../../dest/systems/customcommands')).default;
+import customcommands from '../../../dest/systems/customcommands.js';
 import { db } from '../../general.js';
 import { message } from '../../general.js';
 

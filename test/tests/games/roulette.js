@@ -1,20 +1,18 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 /* global */
 
-require('../../general.js');
+import('../../general.js');
 
 import assert from 'assert';
 
 const _ = require('lodash');
-const { AppDataSource } = require('../../../dest/database.js');
+import { AppDataSource } from '../../../dest/database.js';
 
-const { User } = require('../../../dest/database/entity/user');
+import { User } from '../../../dest/database/entity/user.js';
 const roulette = (require('../../../dest/games/roulette')).default;
 const changelog = (require('../../../dest/helpers/user/changelog'));
 const points = (require('../../../dest/systems/points')).default;
-import { db } from '../../general.js';
-import { message } from '../../general.js';
-const user = require('../../general.js').user;
+import { db, message, user } from '../../general.js';
 
 const tests = [
   { user: { userName: 'user1', userId: String(_.random(999999, false)) } },

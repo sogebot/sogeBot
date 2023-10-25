@@ -3,10 +3,10 @@ import assert from 'assert';
 const constants = require('@sogebot/ui-helpers/constants');
 const { dayjs } = require('@sogebot/ui-helpers/dayjsHelper');
 
-const { User } = require('../../../dest/database/entity/user');
+import { User } from '../../../dest/database/entity/user.js';
 const { getOwner } = require('../../../dest/helpers/commons/getOwner');
 const { prepare } = require('../../../dest/helpers/commons/prepare');
-const { AppDataSource } = require('../../../dest/database');
+import { AppDataSource } from '../../../dest/database.js'
 const twitch = require('../../../dest/services/twitch.js').default;
 const top = (require('../../../dest/systems/top')).default;
 import { db } from '../../general.js';

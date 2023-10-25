@@ -2,11 +2,11 @@
 /* global describe it before */
 
 
-require('../../general.js');
+import('../../general.js');
 
 import { db } from '../../general.js';
 import assert from 'assert';
-const { AppDataSource } = require('../../../dest/database.js');
+import { AppDataSource } from '../../../dest/database.js';
 import { message } from '../../general.js';
 
 const { Quotes } = require('../../../dest/database/entity/quotes');

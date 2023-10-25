@@ -127,7 +127,7 @@ class Duel extends Game {
 
   @command('!duel')
   async main (opts: CommandOptions) {
-    const points = (await import('../systems/points')).default;
+    const points = (await import('../systems/points.js')).default;
     const responses: CommandResponse[] = [];
     let bet;
 

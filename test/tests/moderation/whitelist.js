@@ -2,9 +2,9 @@
 import assert from 'assert';
 
 const _ = require('lodash');
-require('../../general.js');
+import('../../general.js');
 
-const alias = (require('../../../dest/systems/alias')).default;
+import alias from '../../../dest/systems/alias.js';
 const moderation = (require('../../../dest/systems/moderation')).default;
 const songs = (require('../../../dest/systems/songs')).default;
 import { message } from '../../general.js';

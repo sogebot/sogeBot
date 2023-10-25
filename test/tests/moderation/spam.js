@@ -2,7 +2,7 @@
 
 import assert from 'assert';
 
-require('../../general.js');
+import('../../general.js');
 
 const moderation = (require('../../../dest/systems/moderation')).default;
 import { db } from '../../general.js';

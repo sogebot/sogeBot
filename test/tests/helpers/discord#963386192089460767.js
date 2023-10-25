@@ -1,6 +1,6 @@
 import assert from 'assert';
 
-require('../../general.js');
+import('../../general.js');
 import { db } from '../../general.js';
 const user = require('../../general.js').user;
 

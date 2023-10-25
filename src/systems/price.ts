@@ -156,7 +156,7 @@ class Price extends System {
 
   @parser({ priority: constants.HIGH, skippable: true })
   async check (opts: ParserOptions): Promise<boolean> {
-    const points = (await import('../systems/points')).default;
+    const points = (await import('../systems/points.js')).default;
     const parsed = opts.message.match(/^(![\S]+)/);
     if (!opts.sender || !parsed || isBroadcaster(opts.sender?.userName)) {
       return true; // skip if not command or user is broadcaster

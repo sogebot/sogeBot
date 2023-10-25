@@ -1,15 +1,15 @@
 import assert from 'assert';
-const { AppDataSource } = require('../../../dest/database.js');
+import { AppDataSource } from '../../../dest/database.js';
 
-require('../../general.js');
+import('../../general.js');
 const currency = require('../../../dest/currency').default;
 const { Permissions, PermissionCommands } = require('../../../dest/database/entity/permissions');
 const { User, UserBit, UserTip } = require('../../../dest/database/entity/user');
 const rates = require('../../../dest/helpers/currency/rates').default;
-const { defaultPermissions } = require('../../../dest/helpers/permissions/defaultPermissions');
+import { defaultPermissions } from '../../../dest/helpers/permissions/defaultPermissions.js';
 const { check } = require('../../../dest/helpers/permissions/check');
 const { serialize } = require('../../../dest/helpers/type');
-const Parser = require('../../../dest/parser').default;
+import { Parser } from '../../../dest/parser.js';
 import { db } from '../../general.js';
 import { message } from '../../general.js';
 

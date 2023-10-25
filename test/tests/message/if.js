@@ -1,5 +1,5 @@
 /* global describe it beforeEach */
-require('../../general.js');
+import('../../general.js');
 
 import { db } from '../../general.js';
 const msg = require('../../general.js').message;

@@ -1,12 +1,12 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
-require('../../general.js');
+import('../../general.js');
 
 import { db } from '../../general.js';
 import { message } from '../../general.js';
 
-const alias = (require('../../../dest/systems/alias')).default;
-const customcommands = (require('../../../dest/systems/customcommands')).default;
-const { announce } = require('../../../dest/helpers/commons/announce');
+import alias from '../../../dest/systems/alias.js';
+import customcommands from '../../../dest/systems/customcommands.js';
+import { announce } from '../../../dest/helpers/commons/announce.js';
 
 // users
 const owner = { userName: '__broadcaster__' };

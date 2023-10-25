@@ -1,8 +1,8 @@
 /* global */
 
-require('../../general.js');
+import('../../general.js');
 import assert from 'assert';
-const { AppDataSource } = require('../../../dest/database.js');
+import { AppDataSource } from '../../../dest/database.js';
 
 import { db } from '../../general.js';
 

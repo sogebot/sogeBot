@@ -1,19 +1,18 @@
 /* global describe it beforeEach afterEach */
 
-
 import assert from 'assert';
-const { AppDataSource } = require('../../../dest/database');
-const { prepare } = (require('../../../dest/helpers/commons/prepare'));
-require('../../general.js');
+import { AppDataSource } from '../../../dest/database.js'
+import { prepare } from '../../../dest/helpers/commons/prepare.js';
+import('../../general.js');
 
 import { db } from '../../general.js';
 import { message } from '../../general.js';
 
-const { User } = require('../../../dest/database/entity/user');
-const alias = (require('../../../dest/systems/alias')).default;
-const duel = (require('../../../dest/games/duel')).default;
-const gamble = (require('../../../dest/games/gamble')).default;
-const customCommands = (require('../../../dest/systems/customcommands')).default;
+import { User } from '../../../dest/database/entity/user.js';
+import alias from '../../../dest/systems/alias.js';
+import duel from '../../../dest/games/duel.js'
+import gamble from '../../../dest/games/gamble.js'
+import customCommands from '../../../dest/systems/customcommands.js'
 
 // users
 const owner = { userName: '__broadcaster__', userId: String(Math.floor(Math.random() * 100000)) };

@@ -378,7 +378,7 @@ class Levels extends System {
 
   @command('!level buy')
   async buy (opts: CommandOptions): Promise<CommandResponse[]> {
-    const points = (await import('../systems/points')).default;
+    const points = (await import('../systems/points.js')).default;
     try {
       if (!points.enabled) {
         throw new Error('Point system disabled.');

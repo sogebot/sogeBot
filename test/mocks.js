@@ -1,10 +1,10 @@
-const axios = require('axios');
-const MockAdapter = require('axios-mock-adapter');
-const { v4 } = require('uuid');
+import axios from 'axios';
+import MockAdapter from 'axios-mock-adapter';
+import { v4 } from 'uuid';
 
-const { AppDataSource } = require('../dest/database');
-const { User } = require('../dest/database/entity/user');
-const users = require('./helpers/user');
+import { AppDataSource } from '../dest/database.js';
+import { User } from '../dest/database/entity/user.js';
+import * as users from './helpers/user.js';
 
 const getLatest100FollowersMockData = [];
 for (let i = 0; i < 100; i++) {

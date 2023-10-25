@@ -1,7 +1,7 @@
 /* global describe it before */
 
 
-require('../../general.js');
+import('../../general.js');
 
 import { db } from '../../general.js';
 import { message } from '../../general.js';

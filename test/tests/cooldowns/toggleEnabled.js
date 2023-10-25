@@ -7,7 +7,7 @@ import { db } from '../../general.js';
 import { message } from '../../general.js';
 const url = require('../../general.js').url;
 
-require('../../general.js');
+import('../../general.js');
 
 // users
 const owner = {

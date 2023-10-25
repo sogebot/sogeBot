@@ -1,6 +1,6 @@
 /* global */
 
-require('../../general.js');
+import('../../general.js');
 
 import assert from 'assert';
 
@@ -9,7 +9,7 @@ const constants = require('@sogebot/ui-helpers/constants');
 
 const { EventList } = require('../../../dest/database/entity/eventList');
 const { User, UserTip, UserBit } = require('../../../dest/database/entity/user');
-const { AppDataSource } = require('../../../dest/database.js');
+import { AppDataSource } from '../../../dest/database.js';
 const rates = require('../../../dest/helpers/currency/rates').default;
 const Message = require('../../../dest/message').default;
 import { db } from '../../general.js';

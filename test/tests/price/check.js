@@ -1,19 +1,17 @@
-require('../../general.js');
+import('../../general.js');
 
 import assert from 'assert';
 
 const _ = require('lodash');
 
 const { Price } = require('../../../dest/database/entity/price');
-const { User } = require('../../../dest/database/entity/user');
-const { AppDataSource } = require('../../../dest/database.js');
-const alias = (require('../../../dest/systems/alias')).default;
+import { User } from '../../../dest/database/entity/user.js';
+import { AppDataSource } from '../../../dest/database.js';
+import alias from '../../../dest/systems/alias.js';
 const cheer = (require('../../../dest/helpers/events/cheer')).cheer;
-const customcommands = (require('../../../dest/systems/customcommands')).default;
+import customcommands from '../../../dest/systems/customcommands.js';
 const price = (require('../../../dest/systems/price')).default;
-import { db } from '../../general.js';
-import { message } from '../../general.js';
-const user = require('../../general.js').user;
+import { db, message, user } from '../../general.js';
 const url = require('../../general.js').url;
 
 const tests = [

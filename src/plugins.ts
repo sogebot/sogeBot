@@ -50,7 +50,7 @@ class Plugins extends Core {
     });
 
     eventEmitter.on('tip', async (data) => {
-      const users = (await import('./users')).default;
+      const users = (await import('./users.js')).default;
       const user = {
         userName: data.userName,
         userId:   !data.isAnonymous ? await users.getIdByName(data.userName) : '0',
@@ -77,7 +77,7 @@ class Plugins extends Core {
     });
 
     const commonHandler = async <T extends { [x:string]: any, userName: string }>(event: Types, data: T) => {
-      const users = (await import('./users')).default;
+      const users = (await import('./users.js')).default;
       const { userName, ...parameters } = data;
       const user = {
         userName,

@@ -5,7 +5,7 @@ const { getLocalizedName } = require('@sogebot/ui-helpers/getLocalized');
 
 const getBotUserName = require('../../../dest/helpers/user/getBotUserName').default;
 const { translate } = require('../../../dest/translate');
-require('../../general.js');
+import('../../general.js');
 import { db } from '../../general.js';
 import { message } from '../../general.js';
 

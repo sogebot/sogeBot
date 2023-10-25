@@ -110,7 +110,7 @@ class Chat {
       }
     });
     tmiEmitter.on('say', async (channel, message, opts) => {
-      if ((global as any).mocha) {
+      if (process.argv[1].endsWith('mocha.js')) {
         return;
       }
       debug('emitter.say', JSON.stringify({ channel, message, opts }));
@@ -146,7 +146,7 @@ class Chat {
   }
 
   async initClient (type: 'bot' | 'broadcaster') {
-    if ((global as any).mocha) {
+    if (process.argv[1].endsWith('mocha.js')) {
       // do nothing if tests
       warning('initClient disabled due to mocha test run.');
       return;
@@ -811,7 +811,7 @@ class Chat {
     }
 
     // trigger plugins
-    (await import('../../plugins')).default.trigger('message', message, userstate);
+    (await import('../../plugins.js')).default.trigger('message', message, userstate);
 
     if (!skip && !isNil(userName)) {
       const user = await changelog.get(userstate.userId);

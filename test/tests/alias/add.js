@@ -1,13 +1,13 @@
 /* global describe it beforeEach */
-require('../../general.js');
+import('../../general.js');
 
 import { db } from '../../general.js';
 import { message } from '../../general.js';
 
-const { defaultPermissions } = require('../../../dest/helpers/permissions/defaultPermissions');
-const alias = (require('../../../dest/systems/alias')).default;
+import { defaultPermissions } from '../../../dest/helpers/permissions/defaultPermissions.js';
+import alias from '../../../dest/systems/alias.js';
 import assert from 'assert';
-const { prepare } = (require('../../../dest/helpers/commons/prepare'));
+import { prepare } from '../../../dest/helpers/commons/prepare.js';
 
 // users
 const owner = { userName: '__broadcaster__' };

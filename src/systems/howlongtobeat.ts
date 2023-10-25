@@ -94,14 +94,14 @@ class HowLongToBeat extends System {
 
         let game = await HowLongToBeatGame.findOne({ where: { id: req.params.id } });
         if (!game) {
-          game = new HowLongToBeatGame(req.body);
+          game = HowLongToBeatGame.create(req.body);
         } else {
           for (const key of Object.keys(req.body)) {
             (game as any)[key as any] = req.body[key];
           }
         }
         res.send({
-          data: await game.validateAndSave(),
+          data: await game!.validateAndSave(),
         });
       } catch (e) {
         res.status(400).send({ errors: e });
@@ -132,7 +132,7 @@ class HowLongToBeat extends System {
               .map((o: any) => o.name),
           });
         } else {
-          const game = new HowLongToBeatGame({
+          const game = HowLongToBeatGame.create({
             game:                  req.body.game,
             startedAt:             new Date().toISOString(),
             updatedAt:             new Date().toISOString(),
@@ -192,7 +192,7 @@ class HowLongToBeat extends System {
             throw new Error('Game not found');
           }
           // we don't care if MP game or not (user might want to track his gameplay time)
-          const game = new HowLongToBeatGame({
+          const game = HowLongToBeatGame.create({
             game:                  stats.value.currentGame,
             gameplayMain:          gameFromHltb.gameplayMain,
             gameplayMainExtra:     gameFromHltb.gameplayMainExtra,
@@ -200,7 +200,7 @@ class HowLongToBeat extends System {
           });
           await game.save();
         } catch {
-          const game = new HowLongToBeatGame({
+          const game = HowLongToBeatGame.create({
             game:                  stats.value.currentGame,
             gameplayMain:          0,
             gameplayMainExtra:     0,

@@ -1,4 +1,4 @@
-require('../../general.js');
+import('../../general.js');
 
 const until = require('test-until');
 
@@ -8,13 +8,13 @@ import { db } from '../../general.js';
 import { message } from '../../general.js';
 const time = require('../../general.js').time;
 const { Price } = require('../../../dest/database/entity/price');
-const customcommands = (require('../../../dest/systems/customcommands')).default;
+import customcommands from '../../../dest/systems/customcommands.js';
 
 const { getLocalizedName } = require('@sogebot/ui-helpers/getLocalized');
 
 import assert from 'assert';
 
-const { AppDataSource } = require('../../../dest/database');
+import { AppDataSource } from '../../../dest/database.js'
 
 const owner = { userName: '__broadcaster__', user_id: String(Math.floor(Math.random() * 10000)) };
 

@@ -1,7 +1,7 @@
 import assert from 'assert';
-const { AppDataSource } = require('../../../dest/database');
+import { AppDataSource } from '../../../dest/database.js'
 
-const { User } = require('../../../dest/database/entity/user');
+import { User } from '../../../dest/database/entity/user.js';
 const { prepare } = require('../../../dest/helpers/commons/prepare');
 const eventlist = (require('../../../dest/overlays/eventlist')).default;
 const twitch = (require('../../../dest/services/twitch')).default;
@@ -10,7 +10,7 @@ import { message } from '../../general.js';
 const time = require('../../general.js').time;
 const user = require('../../general.js').user;
 
-require('../../general.js');
+import('../../general.js');
 
 describe('lib/twitch - followers() - @func1', () => {
   before(async () => {

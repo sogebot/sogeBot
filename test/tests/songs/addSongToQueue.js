@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 /* global */
 import assert from 'assert';
-const { AppDataSource } = require('../../../dest/database');
+import { AppDataSource } from '../../../dest/database.js'
 
 const { SongRequest, SongPlaylist } = require('../../../dest/database/entity/song');
 const user = require('../../general.js').user;

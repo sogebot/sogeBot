@@ -1,20 +1,20 @@
 /* global describe it before */
 
-const { defaultPermissions } = require('../../../dest/helpers/permissions/defaultPermissions');
-const Parser = require('../../../dest/parser').default;
+import { defaultPermissions } from '../../../dest/helpers/permissions/defaultPermissions.js';
+import { Parser } from '../../../dest/parser.js';
 
-require('../../general.js');
+import('../../general.js');
 
 import { db } from '../../general.js';
 import { message } from '../../general.js';
-const customcommands = (require('../../../dest/systems/customcommands')).default;
+import customcommands from '../../../dest/systems/customcommands.js';
 const user = require('../../general.js').user;
 
 import assert from 'assert';
 const _ = require('lodash');
 
-const { Variable } = require('../../../dest/database/entity/variable');
-const { AppDataSource } = require('../../../dest/database');
+import { Variable } from '../../../dest/database/entity/variable.js';
+import { AppDataSource } from '../../../dest/database.js'
 
 // stub
 _.set(global, 'widgets.custom_variables.io.emit', function () {
@@ -34,7 +34,7 @@ describe('Custom Variable - #3879 - Eval should trigger with param with proper p
   });
 
   it(`Create eval $_variable to return param`, async () => {
-    await new Variable({
+    await Variable.create({
       variableName: '$_variable',
       readOnly: false,
       currentValue: '0',

@@ -2,8 +2,8 @@
 
 
 import assert from 'assert';
-const { AppDataSource } = require('../../../dest/database.js');
-require('../../general.js');
+import { AppDataSource } from '../../../dest/database.js';
+import('../../general.js');
 
 import { db } from '../../general.js';
 import { message } from '../../general.js';

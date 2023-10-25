@@ -1,13 +1,13 @@
 /* global describe it before */
 import assert from 'assert';
 
-require('../../general.js');
+import('../../general.js');
 const constants = require('@sogebot/ui-helpers/constants');
 
-const { User } = require('../../../dest/database/entity/user');
+import { User } from '../../../dest/database/entity/user.js';
 const { getOwner } = require('../../../dest/helpers/commons/getOwner');
 const { prepare } = require('../../../dest/helpers/commons/prepare');
-const { AppDataSource } = require('../../../dest/database.js');
+import { AppDataSource } from '../../../dest/database.js';
 const top = (require('../../../dest/systems/top')).default;
 import { db } from '../../general.js';
 import { message } from '../../general.js';

@@ -1,13 +1,11 @@
 /* global describe it */
-require('../../general.js');
+import('../../general.js');
 
-import { db } from '../../general.js';
-import { message } from '../../general.js';
-const user = require('../../general.js').user;
-const alias = (require('../../../dest/systems/alias')).default;
-const streamStatusChangeSince = (require('../../../dest/helpers/api/streamStatusChangeSince')).streamStatusChangeSince;
+import { db, message, user } from '../../general.js';
+import alias from '../../../dest/systems/alias.js';
+import {streamStatusChangeSince} from '../../../dest/helpers/api/streamStatusChangeSince.js';
 import assert from 'assert';
-const { prepare } = (require('../../../dest/helpers/commons/prepare'));
+import { prepare } from '../../../dest/helpers/commons/prepare.js';
 
 // users
 const owner = { userName: '__broadcaster__' };

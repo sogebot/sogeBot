@@ -1,16 +1,16 @@
-require('../../general.js');
+import('../../general.js');
 
 import { db } from '../../general.js';
 import { message } from '../../general.js';
 const time = require('../../general.js').time;
 
 const isStreamOnline = (require('../../../dest/helpers/api/isStreamOnline')).isStreamOnline;
-const alias = (require('../../../dest/systems/alias')).default;
-const customcommands = (require('../../../dest/systems/customcommands')).default;
+import alias from '../../../dest/systems/alias.js';
+import customcommands from '../../../dest/systems/customcommands.js';
 const timers = (require('../../../dest/systems/timers')).default;
 const check = (require('../../../dest/watchers')).check;
 
-const { AppDataSource } = require('../../../dest/database.js');
+import { AppDataSource } from '../../../dest/database.js';
 const { Timer, TimerResponse } = require('../../../dest/database/entity/timer');
 
 const { linesParsed } = require('../../../dest/helpers/parser');

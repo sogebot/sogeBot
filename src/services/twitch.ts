@@ -380,7 +380,7 @@ class Twitch extends Service {
   async replay (opts: CommandOptions) {
     const cid = await createClip({ createAfterDelay: false });
     if (cid) {
-      (await import('~/overlays/clips')).default.showClip(cid);
+      (await import('~/overlays/clips.js')).default.showClip(cid);
       return [{
         response: prepare('api.clips.created', { link: `https://clips.twitch.tv/${cid}` }),
         ...opts,

@@ -1,12 +1,12 @@
 /* global */
 
 import assert from 'assert';
-const { AppDataSource } = require('../../../dest/database.js');
+import { AppDataSource } from '../../../dest/database.js';
 
-require('../../general.js');
+import('../../general.js');
 
 const { Permissions } = require('../../../dest/database/entity/permissions');
-const { defaultPermissions } = require('../../../dest/helpers/permissions/defaultPermissions');
+import { defaultPermissions } from '../../../dest/helpers/permissions/defaultPermissions.js';
 const moderation = (require('../../../dest/systems/moderation')).default;
 import { db } from '../../general.js';
 const variable = require('../../general.js').variable;

@@ -1,8 +1,8 @@
 /* global */
 import assert from 'assert';
-const { AppDataSource } = require('../../../dest/database.js');
+import { AppDataSource } from '../../../dest/database.js';
 
-require('../../general.js');
+import('../../general.js');
 
 const currency = require('../../../dest/currency').default;
 const { User, UserTip } = require('../../../dest/database/entity/user');

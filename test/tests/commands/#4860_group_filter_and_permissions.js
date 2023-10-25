@@ -1,15 +1,13 @@
 /* global */
 import assert from 'assert';
-const { AppDataSource } = require('../../../dest/database.js');
+import { AppDataSource } from '../../../dest/database.js';
 
-require('../../general.js');
-const { Commands, CommandsGroup } = require('../../../dest/database/entity/commands');
-const { prepare } = (require('../../../dest/helpers/commons/prepare'));
-const { defaultPermissions } = require('../../../dest/helpers/permissions/defaultPermissions');
-const customcommands = (require('../../../dest/systems/customcommands')).default;
-import { db } from '../../general.js';
-import { message } from '../../general.js';
-const user = require('../../general.js').user;
+import('../../general.js');
+import { Commands, CommandsGroup } from '../../../dest/database/entity/commands';
+import { prepare } from '../../../dest/helpers/commons/prepare.js';
+import { defaultPermissions } from '../../../dest/helpers/permissions/defaultPermissions.js';
+import customcommands from '../../../dest/systems/customcommands.js';
+import { db, message, user } from '../../general.js';
 
 describe('Custom Commands - @func2 - #4860 - customcommands group permissions and filter should be considered', () => {
   before(async () => {
@@ -171,7 +169,7 @@ describe('Custom Commands - @func2 - #4860 - customcommands group permissions an
       message.prepare();
     });
     it('set $game to Test', () => {
-      const stats = require('../../../dest/helpers/api').stats;
+            const {stats} = await import('../../../dest/helpers/api/stats.js');
       stats.value.currentGame = 'Test';
     });
     it('!testfilter customcommands should not be triggered', async () => {
@@ -185,7 +183,7 @@ describe('Custom Commands - @func2 - #4860 - customcommands group permissions an
       message.prepare();
     });
     it('set $game to Dota 2', () => {
-      const stats = require('../../../dest/helpers/api').stats;
+            const {stats} = await import('../../../dest/helpers/api/stats.js');
       stats.value.currentGame = 'Dota 2';
     });
     it('!testfilter customcommands should be triggered', async () => {

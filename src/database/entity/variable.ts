@@ -6,7 +6,7 @@ import defaultPermissions from '../../helpers/permissions/defaultPermissions.js'
 import { IsCustomVariable } from '../validators/isCustomVariable.js';
 
 @Entity()
-export class VariableWatch extends BotEntity<VariableWatch> {
+export class VariableWatch extends BotEntity {
   @PrimaryColumn({
     type:      Number,
     primary:   true,
@@ -22,7 +22,7 @@ export class VariableWatch extends BotEntity<VariableWatch> {
 }
 
 @Entity()
-export class Variable extends BotEntity<Variable> {
+export class Variable extends BotEntity {
   @BeforeInsert()
   generateCreatedAt() {
     if (!this.runAt) {

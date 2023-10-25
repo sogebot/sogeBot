@@ -228,7 +228,7 @@ class General extends Core {
     const botId = variables.get('services.twitch.botId') as string;
     const broadcasterId = variables.get('services.twitch.broadcasterId') as string;
 
-    const twitch = (await import('./services/twitch')).default;
+    const twitch = (await import('./services/twitch.js')).default;
 
     const version = get(process, 'env.npm_package_version', 'x.y.z');
     const commitFile = existsSync('./.commit') ? readFileSync('./.commit').toString() : null;

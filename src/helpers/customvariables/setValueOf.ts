@@ -27,7 +27,7 @@ async function setValueOf (variable: string | Variable, currentValue: any, opts:
   opts.readOnlyBypass = isNil(opts.readOnlyBypass) ? false : opts.readOnlyBypass;
   // add simple text variable, if not existing
   if (!item) {
-    const newItem = new Variable({
+    const newItem = Variable.create({
       variableName:  variable as string,
       currentValue:  String(currentValue),
       responseType:  0,

@@ -1,9 +1,9 @@
 /* global describe it before */
 
-const { defaultPermissions } = require('../../../dest/helpers/permissions/defaultPermissions');
+import { defaultPermissions } from '../../../dest/helpers/permissions/defaultPermissions.js';
 const { getOwner } = require('../../../dest/helpers/commons/getOwner');
 
-require('../../general.js');
+import('../../general.js');
 
 import { db } from '../../general.js';
 const msg = require('../../general.js').message;
@@ -11,9 +11,9 @@ const Message = require('../../../dest/message').default;
 import assert from 'assert';
 const _ = require('lodash');
 
-const { User } = require('../../../dest/database/entity/user');
-const { Variable } = require('../../../dest/database/entity/variable');
-const { AppDataSource } = require('../../../dest/database');
+import { User } from '../../../dest/database/entity/user.js';
+import { Variable } from '../../../dest/database/entity/variable.js';
+import { AppDataSource } from '../../../dest/database.js'
 
 // stub
 _.set(global, 'widgets.custom_variables.io.emit', function () {});
@@ -162,7 +162,7 @@ describe('Message - cvars filter - @func3', async () => {
                 }
               });
               it(`create initial value '${test.initialValue}' of ${test.variable}`, async () => {
-                await new Variable({
+                await Variable.create({
                   variableName: test.variable,
                   readOnly: false,
                   currentValue: String(test.initialValue),
@@ -251,7 +251,7 @@ describe('Message - cvars filter - @func3', async () => {
                 }
               });
               it(`create initial value '${test.initialValue}' of ${test.variable}`, async () => {
-                await new Variable({
+                await Variable.create({
                   variableName: test.variable,
                   readOnly: true,
                   currentValue: String(test.initialValue),

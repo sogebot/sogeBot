@@ -2,10 +2,10 @@
 /* global describe it before */
 
 import assert from 'assert';
-const { AppDataSource } = require('../../../dest/database');
+import { AppDataSource } from '../../../dest/database.js'
 
 const { Settings } = require('../../../dest/database/entity/settings');
-require('../../general.js');
+import('../../general.js');
 import { db } from '../../general.js';
 const time = require('../../general.js').time;
 

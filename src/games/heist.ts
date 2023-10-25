@@ -195,7 +195,7 @@ class Heist extends Game {
 
   @command('!bankheist')
   async main (opts: CommandOptions): Promise<CommandResponse[]> {
-    const pointsSystem = (await import('../systems/points')).default;
+    const pointsSystem = (await import('../systems/points.js')).default;
     const [entryCooldown, lastHeistTimestamp, copsCooldown] = await Promise.all([
       this.entryCooldownInSeconds,
       this.lastHeistTimestamp,

@@ -1,9 +1,9 @@
-const { AppDataSource } = require('../../dest/database');
-const { User } = require('../../dest/database/entity/user');
-const changelog = require('../../dest/helpers/user/changelog');
-const emitter = require('../../dest/helpers/interfaceEmitter').default;
+import { AppDataSource } from '../../dest/database.js'
+import { User } from '../../dest/database/entity/user.js'
+import * as changelog from '../../dest/helpers/user/changelog.js'
+import emitter from '../../dest/helpers/interfaceEmitter.js'
 
-const viewer = {
+export const viewer = {
   points:   0,
   userId:   '1',
   userName: '__viewer__',
@@ -11,7 +11,7 @@ const viewer = {
   emotes:   [],
 };
 
-const viewer2 = {
+export const viewer2 = {
   points:   0,
   userId:   '3',
   userName: '__viewer2__',
@@ -19,7 +19,7 @@ const viewer2 = {
   emotes:   [],
 };
 
-const viewer3 = {
+export const viewer3 = {
   points:   0,
   userId:   '5',
   userName: '__viewer3__',
@@ -27,7 +27,7 @@ const viewer3 = {
   emotes:   [],
 };
 
-const viewer4 = {
+export const viewer4 = {
   points:   0,
   userId:   '50',
   userName: '__viewer4__',
@@ -35,7 +35,7 @@ const viewer4 = {
   emotes:   [],
 };
 
-const viewer5 = {
+export const viewer5 = {
   points:   0,
   userId:   '55',
   userName: '__viewer5__',
@@ -43,7 +43,7 @@ const viewer5 = {
   emotes:   [],
 };
 
-const viewer6 = {
+export const viewer6 = {
   points:   0,
   userId:   '56',
   userName: '__viewer6__',
@@ -51,7 +51,7 @@ const viewer6 = {
   emotes:   [],
 };
 
-const viewer7 = {
+export const viewer7 = {
   points:   0,
   userId:   '57',
   userName: '__viewer7__',
@@ -59,7 +59,7 @@ const viewer7 = {
   emotes:   [],
 };
 
-const owner = {
+export const owner = {
   points:   0,
   userId:   '2',
   userName: '__broadcaster__',
@@ -67,7 +67,7 @@ const owner = {
   emotes:   [],
 };
 
-const mod = {
+export const mod = {
   points:      0,
   userId:      '4',
   userName:    '__mod__',
@@ -77,29 +77,18 @@ const mod = {
   isMod:       true,
 };
 
-module.exports = {
-  prepare: async () => {
-    await changelog.flush();
-    await AppDataSource.getRepository(User).save(viewer);
-    await AppDataSource.getRepository(User).save(viewer2);
-    await AppDataSource.getRepository(User).save(viewer3);
-    await AppDataSource.getRepository(User).save(viewer4);
-    await AppDataSource.getRepository(User).save(viewer5);
-    await AppDataSource.getRepository(User).save(viewer6);
-    await AppDataSource.getRepository(User).save(viewer7);
-    await AppDataSource.getRepository(User).save(owner);
-    await AppDataSource.getRepository(User).save(mod);
-    emitter.emit('set', '/services/twitch', 'broadcasterUsername', owner.userName);
-    emitter.emit('set', '/services/twitch', 'broadcasterId', owner.userId);
-    await new Promise((resolve => setTimeout(() => resolve(), 1000)));
-  },
-  viewer,
-  viewer2,
-  viewer3,
-  viewer4,
-  viewer5,
-  viewer6,
-  viewer7,
-  owner,
-  mod,
-};
+export const prepare = async () => {
+  await changelog.flush();
+  await AppDataSource.getRepository(User).save(viewer);
+  await AppDataSource.getRepository(User).save(viewer2);
+  await AppDataSource.getRepository(User).save(viewer3);
+  await AppDataSource.getRepository(User).save(viewer4);
+  await AppDataSource.getRepository(User).save(viewer5);
+  await AppDataSource.getRepository(User).save(viewer6);
+  await AppDataSource.getRepository(User).save(viewer7);
+  await AppDataSource.getRepository(User).save(owner);
+  await AppDataSource.getRepository(User).save(mod);
+  emitter.emit('set', '/services/twitch', 'broadcasterUsername', owner.userName);
+  emitter.emit('set', '/services/twitch', 'broadcasterId', owner.userId);
+  await new Promise((resolve => setTimeout(() => resolve(), 1000)));
+}

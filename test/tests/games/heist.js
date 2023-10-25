@@ -1,11 +1,9 @@
 import assert from 'assert';
-const { AppDataSource } = require('../../../dest/database.js');
+import { AppDataSource } from '../../../dest/database.js';
 
-require('../../general.js');
-const { User } = require('../../../dest/database/entity/user');
-import { db } from '../../general.js';
-import { message } from '../../general.js';
-const user = require('../../general.js').user;
+import('../../general.js');
+import { User } from '../../../dest/database/entity/user.js';
+import { db, message, user } from '../../general.js';
 const time = require('../../general.js').time;
 
 const command = '!bankheist';

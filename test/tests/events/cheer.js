@@ -1,13 +1,13 @@
 import assert from 'assert';
 
-require('../../general.js');
+import('../../general.js');
 
 const { v4: uuidv4 } = require('uuid');
 
 const events = (require('../../../dest/events')).default;
 const { Event } = require('../../../dest/database/entity/event');
-const { User } = require('../../../dest/database/entity/user');
-const { AppDataSource } = require('../../../dest/database.js');
+import { User } from '../../../dest/database/entity/user.js';
+import { AppDataSource } from '../../../dest/database.js';
 const log = require('../../../dest/helpers/log');
 const changelog = (require('../../../dest/helpers/user/changelog'));
 const time = require('../../general.js').time;

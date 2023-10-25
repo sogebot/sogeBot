@@ -2,14 +2,14 @@
 /* global describe it before */
 
 
-require('../../general.js');
+import('../../general.js');
 
 const { Cooldown, CooldownViewer } = require('../../../dest/database/entity/cooldown');
-const { User } = require('../../../dest/database/entity/user');
+import { User } from '../../../dest/database/entity/user.js';
 const { Keyword } = require('../../../dest/database/entity/keyword');
 
 import assert from 'assert';
-const { AppDataSource } = require('../../../dest/database.js');
+import { AppDataSource } from '../../../dest/database.js';
 
 import { db } from '../../general.js';
 import { message } from '../../general.js';

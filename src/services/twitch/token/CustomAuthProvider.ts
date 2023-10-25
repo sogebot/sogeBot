@@ -21,7 +21,7 @@ function createAccessTokenFromData(data: any): AccessToken {
 }
 
 export class CustomAuthProvider extends RefreshingAuthProvider {
-  private readonly _userAccessTokens = new Map<
+  private readonly _userAccessTokensCustom = new Map<
   string,
   MakeOptional<AccessTokenWithUserId, 'accessToken' | 'scope'>
   >();
@@ -105,14 +105,14 @@ export class CustomAuthProvider extends RefreshingAuthProvider {
   }
   async refreshAccessTokenForUser(user: UserIdResolvable): Promise<AccessTokenWithUserId> {
     const userId = extractUserId(user);
-    const previousTokenData = this._userAccessTokens.get(userId);
+    const previousTokenData = this._userAccessTokensCustom.get(userId);
     if (!previousTokenData) {
       throw new Error('Trying to refresh token for user that was not added to the provider');
     }
 
     const tokenData = await this.refreshUserToken(previousTokenData.refreshToken!);
 
-    this._userAccessTokens.set(userId, {
+    this._userAccessTokensCustom.set(userId, {
       ...tokenData,
       userId,
     });

@@ -1,5 +1,5 @@
 /* global describe it */
-require('../../general.js');
+import('../../general.js');
 
 import { db } from '../../general.js';
 import { message } from '../../general.js';
@@ -8,7 +8,7 @@ import assert from 'assert';
 const keywords = (require('../../../dest/systems/keywords')).default;
 
 const { Keyword } = require('../../../dest/database/entity/keyword');
-const { User } = require('../../../dest/database/entity/user');
+import { User } from '../../../dest/database/entity/user.js';
 
 // users
 const owner = { userName: '__broadcaster__', userId: String(Math.floor(Math.random() * 100000)) };

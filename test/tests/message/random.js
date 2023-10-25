@@ -1,14 +1,14 @@
 /* global */
-require('../../general.js');
+import('../../general.js');
 
 import assert from 'assert';
-const { AppDataSource } = require('../../../dest/database.js');
+import { AppDataSource } from '../../../dest/database.js';
 
 const owner = { userId: String(Math.floor(Math.random() * 100000)), userName: '__broadcaster__' };
 const ignoredUser = { userId: String(Math.floor(Math.random() * 100000)), userName: 'ignoreduser' };
 const user = { userId: String(Math.floor(Math.random() * 100000)), userName: 'user1' };
 
-const { User } = require('../../../dest/database/entity/user');
+import { User } from '../../../dest/database/entity/user.js';
 const { prepare } = require('../../../dest/helpers/commons/prepare');
 const Message = require('../../../dest/message').default;
 import { db } from '../../general.js';

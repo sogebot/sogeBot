@@ -1,12 +1,9 @@
 /* global describe it before */
 
-require('../../general.js');
+import('../../general.js');
 
-import { db } from '../../general.js';
-import { message } from '../../general.js';
-const variable = require('../../general.js').variable;
-
-const { flatten, unflatten } = require('../../../dest/helpers/flatten');
+import { db, message, variable } from '../../general.js';
+import { flatten, unflatten } from '../../../dest/helpers/flatten.js';
 
 import assert from 'assert';
 

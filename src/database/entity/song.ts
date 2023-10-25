@@ -6,7 +6,7 @@ export type currentSongType = {
 };
 
 @Entity()
-export class SongBan extends BotEntity<SongBan> {
+export class SongBan extends BotEntity {
   @PrimaryColumn()
     videoId: string;
 
@@ -15,7 +15,7 @@ export class SongBan extends BotEntity<SongBan> {
 }
 
 @Entity()
-export class SongPlaylist extends BotEntity<SongPlaylist> {
+export class SongPlaylist extends BotEntity {
   @PrimaryColumn()
     videoId: string;
 
@@ -51,7 +51,7 @@ export class SongPlaylist extends BotEntity<SongPlaylist> {
 }
 
 @Entity()
-export class SongRequest extends BotEntity<SongRequest> {
+export class SongRequest extends BotEntity {
   @PrimaryColumn({ generated: 'uuid' })
     id: string;
 

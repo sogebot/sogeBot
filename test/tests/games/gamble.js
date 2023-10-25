@@ -1,14 +1,14 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 /* global */
 
-require('../../general.js');
+import('../../general.js');
 
 import assert from 'assert';
 
 const _ = require('lodash');
-const { AppDataSource } = require('../../../dest/database.js');
+import { AppDataSource } from '../../../dest/database.js';
 
-const { User } = require('../../../dest/database/entity/user');
+import { User } from '../../../dest/database/entity/user.js';
 const gamble = (require('../../../dest/games/gamble')).default;
 const { prepare } = require('../../../dest/helpers/commons/prepare');
 const { getPointsName } = require('../../../dest/helpers/points/getPointsName');

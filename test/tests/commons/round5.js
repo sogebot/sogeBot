@@ -1,12 +1,9 @@
 /* global describe it before */
 
-require('../../general.js');
+import('../../general.js');
 
-import { db } from '../../general.js';
-import { message } from '../../general.js';
-const variable = require('../../general.js').variable;
-
-const { round5 } = require('../../../dest/helpers/commons/round5');
+import { db, message, variable } from '../../general.js';
+import  { round5 } from '../../../dest/helpers/commons/round5.js';
 
 import assert from 'assert';
 

@@ -4,7 +4,7 @@ import { BotEntity } from '../BotEntity.js';
 
 @Entity()
 @Index('IDX_93c78c94804a13befdace81904', ['type', 'value'], { unique: true })
-export class Rank extends BotEntity<Rank> {
+export class Rank extends BotEntity {
   @PrimaryColumn({ generated: 'uuid' })
     id: string;
 

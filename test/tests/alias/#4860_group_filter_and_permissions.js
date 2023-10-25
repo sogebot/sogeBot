@@ -1,15 +1,13 @@
 /* global */
 import assert from 'assert';
 
-require('../../general.js');
-const { Alias, AliasGroup } = require('../../../dest/database/entity/alias');
-const { AppDataSource } = require('../../../dest/database');
-const { prepare } = (require('../../../dest/helpers/commons/prepare'));
-const { defaultPermissions } = require('../../../dest/helpers/permissions/defaultPermissions');
-const alias = (require('../../../dest/systems/alias')).default;
-import { db } from '../../general.js';
-import { message } from '../../general.js';
-const user = require('../../general.js').user;
+import('../../general.js');
+import { Alias, AliasGroup } from '../../../dest/database/entity/alias.js';
+import { AppDataSource } from '../../../dest/database.js'
+import { prepare } from '../../../dest/helpers/commons/prepare.js';
+import { defaultPermissions } from '../../../dest/helpers/permissions/defaultPermissions.js';
+import alias from '../../../dest/systems/alias.js';
+import { db, message, user } from '../../general.js';
 
 describe('Alias - @func1 - #4860 - alias group permissions and filter should be considered', () => {
   before(async () => {
@@ -138,8 +136,8 @@ describe('Alias - @func1 - #4860 - alias group permissions and filter should be 
     before(() => {
       message.prepare();
     });
-    it('set $game to Test', () => {
-      const stats = require('../../../dest/helpers/api').stats;
+    it('set $game to Test', async () => {
+      const {stats} = await import('../../../dest/helpers/api/stats.js');
       stats.value.currentGame = 'Test';
     });
     it('!testfilter alias should not be triggered', async () => {
@@ -152,8 +150,8 @@ describe('Alias - @func1 - #4860 - alias group permissions and filter should be 
     before(() => {
       message.prepare();
     });
-    it('set $game to Dota 2', () => {
-      const stats = require('../../../dest/helpers/api').stats;
+    it('set $game to Dota 2', async() => {
+      const {stats} = await import('../../../dest/helpers/api/stats.js');
       stats.value.currentGame = 'Dota 2';
     });
     it('!testfilter alias should be triggered', async () => {

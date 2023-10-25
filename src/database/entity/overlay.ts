@@ -592,7 +592,7 @@ export interface Group {
 }
 
 @Entity()
-export class Overlay extends BotEntity<Overlay> {
+export class Overlay extends BotEntity {
   @PrimaryColumn({ generated: 'uuid' })
     id: string;
 

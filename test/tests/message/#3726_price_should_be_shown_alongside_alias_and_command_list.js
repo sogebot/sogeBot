@@ -1,16 +1,14 @@
 /* global describe it */
-require('../../general.js');
+import('../../general.js');
 
-import { db } from '../../general.js';
-import { message } from '../../general.js';
-const user = require('../../general.js').user;
+import { db, message, user } from '../../general.js';
 
 import assert from 'assert';
-const { AppDataSource } = require('../../../dest/database.js');
+import { AppDataSource } from '../../../dest/database.js';
 
 const Message = require('../../../dest/message').default;
-const alias = (require('../../../dest/systems/alias')).default;
-const customcommands = (require('../../../dest/systems/customcommands')).default;
+import alias from '../../../dest/systems/alias.js';
+import customcommands from '../../../dest/systems/customcommands.js';
 const price = (require('../../../dest/systems/price')).default;
 const owner = { userName: '__broadcaster__', userId: String(Math.floor(Math.random() * 100000)) };
 

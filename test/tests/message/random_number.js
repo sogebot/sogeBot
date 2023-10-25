@@ -2,7 +2,7 @@
 
 /* global describe it before */
 
-require('../../general.js');
+import('../../general.js');
 
 import { db } from '../../general.js';
 const Message = require('../../../dest/message').default;

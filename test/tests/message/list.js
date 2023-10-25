@@ -1,14 +1,14 @@
 /* global */
-require('../../general.js');
+import('../../general.js');
 
 import assert from 'assert';
 
-const { User } = require('../../../dest/database/entity/user');
-const { AppDataSource } = require('../../../dest/database.js');
+import { User } from '../../../dest/database/entity/user.js';
+import { AppDataSource } from '../../../dest/database.js';
 const Message = require('../../../dest/message').default;
-const alias = (require('../../../dest/systems/alias')).default;
+import alias from '../../../dest/systems/alias.js';
 const cooldown = (require('../../../dest/systems/cooldown')).default;
-const customcommands = (require('../../../dest/systems/customcommands')).default;
+import customcommands from '../../../dest/systems/customcommands.js';
 const ranks = (require('../../../dest/systems/ranks')).default;
 import { db } from '../../general.js';
 import { message } from '../../general.js';

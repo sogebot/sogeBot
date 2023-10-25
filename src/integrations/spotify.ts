@@ -426,7 +426,7 @@ class Spotify extends Integration {
         });
 
         const track = response.body;
-        const songBan = new SpotifySongBan({
+        const songBan = SpotifySongBan.create({
           artists: track.artists.map(o => o.name), spotifyUri: track.uri, title: track.name,
         });
         await songBan.save();
@@ -648,7 +648,7 @@ class Spotify extends Integration {
     if (Object.keys(currentSong).length === 0) {
       return [{ response: prepare('integrations.spotify.not-banned-song-not-playing'), ...opts }];
     } else {
-      const songBan = new SpotifySongBan({
+      const songBan = SpotifySongBan.create({
         artists: currentSong.artists.split(', '), spotifyUri: currentSong.uri, title: currentSong.song,
       });
       await songBan.save();

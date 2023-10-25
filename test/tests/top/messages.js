@@ -1,7 +1,7 @@
 /* global describe it before */
 const { getOwner } = require('../../../dest/helpers/commons/getOwner');
 
-require('../../general.js');
+import('../../general.js');
 
 import { db } from '../../general.js';
 import { message } from '../../general.js';
@@ -9,9 +9,9 @@ import { message } from '../../general.js';
 const top = (require('../../../dest/systems/top')).default;
 
 const { prepare } = require('../../../dest/helpers/commons/prepare');
-const { User } = require('../../../dest/database/entity/user');
+import { User } from '../../../dest/database/entity/user.js';
 import assert from 'assert';
-const { AppDataSource } = require('../../../dest/database');
+import { AppDataSource } from '../../../dest/database.js'
 const twitch = require('../../../dest/services/twitch.js').default;
 
 // users

@@ -1,16 +1,14 @@
-require('../../general.js');
+import('../../general.js');
 
 import assert from 'assert';
-const { AppDataSource } = require('../../../dest/database.js');
+import { AppDataSource } from '../../../dest/database.js';
 
 const { Cooldown } = require('../../../dest/database/entity/cooldown');
 const { Price } = require('../../../dest/database/entity/price');
-const { User } = require('../../../dest/database/entity/user');
-const Parser = require('../../../dest/parser').default;
+import { User } from '../../../dest/database/entity/user.js';
+import { Parser } from '../../../dest/parser.js';
 const cooldown = (require('../../../dest/systems/cooldown')).default;
-import { db } from '../../general.js';
-import { message } from '../../general.js';
-const user = require('../../general.js').user;
+import { db, message, user } from '../../general.js';
 const time = require('../../general.js').time;
 
 describe('Cooldowns - @func3 - #3720 - global cooldown should be properly reverted', () => {
