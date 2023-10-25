@@ -129,7 +129,7 @@ class Alerts extends Registry {
       if (secureKeys.has(opts.key)) {
         secureKeys.delete(opts.key);
 
-        const { default: tts, services } = await import ('../tts');
+        const { default: tts, services } = await import ('../tts.js');
         if (!tts.ready) {
           cb(new Error('TTS is not properly set and ready.'));
           return;
@@ -183,7 +183,7 @@ class Alerts extends Registry {
       if (secureKeys.has(opts.key)) {
         secureKeys.delete(opts.key);
 
-        const { default: tts, services } = await import ('../tts');
+        const { default: tts, services } = await import ('../tts.js');
         if (!tts.ready) {
           cb(new Error('TTS is not properly set and ready.'));
           return;
@@ -205,7 +205,7 @@ class Alerts extends Registry {
 
   async trigger(opts: EmitData, isTest = false) {
     debug('alerts.trigger', JSON.stringify(opts, null, 2));
-    const { default: tts, services } = await import ('../tts');
+    const { default: tts, services } = await import ('../tts.js');
     if (!this.areAlertsMuted || isTest) {
       let key = v4();
       if (tts.service === services.RESPONSIVEVOICE) {

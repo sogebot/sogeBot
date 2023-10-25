@@ -24,7 +24,7 @@ class TextToSpeech extends Overlay {
   @command('!tts')
   @default_permission(defaultPermissions.CASTERS)
   async textToSpeech(opts: CommandOptions): Promise<CommandResponse[]> {
-    const { default: tts, services } = await import ('../tts');
+    const { default: tts, services } = await import ('../tts.js');
     if (tts.ready) {
       let key = v4();
       if (tts.service === services.RESPONSIVEVOICE) {
