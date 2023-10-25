@@ -2,9 +2,8 @@
 
 import { error } from 'console';
 
-import { DAY, MINUTE } from '@sogebot/ui-helpers/constants';
-import { isNil } from 'lodash';
-import _ from 'lodash';
+import { DAY, MINUTE } from '@sogebot/ui-helpers/constants.js';
+import { get, isNil } from 'lodash-es';
 import { LessThan } from 'typeorm';
 
 import Core from '~/_interface.js';
@@ -55,9 +54,9 @@ class Stats extends Core {
           throw new Error('Translation not yet loaded');
         }
 
-        const ytCurrentSong = Object.values(songs.isPlaying).find(o => o) ? _.get(JSON.parse(songs.currentSong), 'title', null) : null;
-        let spotifyCurrentSong: null | string = _.get(JSON.parse(spotify.currentSong), 'song', '') + ' - ' + _.get(JSON.parse(spotify.currentSong), 'artist', '');
-        if (spotifyCurrentSong.trim().length === 1 /* '-' */  || !_.get(JSON.parse(spotify.currentSong), 'is_playing', false)) {
+        const ytCurrentSong = Object.values(songs.isPlaying).find(o => o) ? get(JSON.parse(songs.currentSong), 'title', null) : null;
+        let spotifyCurrentSong: null | string = get(JSON.parse(spotify.currentSong), 'song', '') + ' - ' + get(JSON.parse(spotify.currentSong), 'artist', '');
+        if (spotifyCurrentSong.trim().length === 1 /* '-' */  || get(JSON.parse(spotify.currentSong), 'is_playing', false)) {
           spotifyCurrentSong = null;
         }
 
