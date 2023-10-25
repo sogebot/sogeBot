@@ -66,6 +66,7 @@ describe('Emotes - combo - @func2', () => {
       await db.cleanup();
       await message.prepare();
       await user.prepare();
+      emotes.comboEmoteCount = 0;
     });
 
     // we run it twice as to test without cooldown
@@ -123,6 +124,7 @@ describe('Emotes - combo - @func2', () => {
       await user.prepare();
       emotes.comboLastBreak = 0;
       emotes.comboCooldown = 60;
+      emotes.comboEmoteCount = 0;
     });
     after(() => {
       emotes.comboCooldown = 0;
@@ -132,6 +134,8 @@ describe('Emotes - combo - @func2', () => {
     for (let j = 0; j < 2; j++) {
       for (let i = 0; i < 3; i++) {
         it('Send a message with Kappa emote', async () => {
+          console.log(emotes.comboEmote)
+          console.log(emotes.comboEmoteCount)
           await emotes.containsEmotes({
             emotesOffsets: emotesOffsetsKappa,
             sender:        user.owner,

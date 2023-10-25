@@ -8,16 +8,19 @@ import { translate } from '../../../dest/translate.js';
 import('../../general.js');
 import { db } from '../../general.js';
 import { message } from '../../general.js';
-import scrim from '../../../dest/systems/scrim.js'
 // users
 const owner = { userName: '__broadcaster__' };
 
 describe('Scrim - full workflow', () => {
+  let scrim;
+  before(async () => {
+   scrim = (await import('../../../dest/systems/scrim.js')).default
+  })
+
   describe('cooldown only - @func1', () => {
     before(async () => {
       await db.cleanup();
       await message.prepare();
-
       scrim.waitForMatchIdsInSeconds = 10;
     });
 

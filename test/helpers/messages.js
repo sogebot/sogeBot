@@ -265,7 +265,7 @@ export const prepare = () => {
     }
     user = _.cloneDeep(user);
     const race = await Promise.race([
-      this.isSent(expected, user, wait * 2),
+      isSent(expected, user, wait * 2),
       new Promise((resolve) => {
         setTimeout(() => resolve(false), wait);
       }),
