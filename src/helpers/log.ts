@@ -14,6 +14,7 @@ import { getFunctionNameFromStackTrace } from './stacktrace.js';
 import { isDbConnected } from '~/helpers/database.js';
 
 const isMochaTestRun = () => process.argv[1].endsWith('mocha.js');
+console.log(process.argv);
 
 const logDir = './logs';
 
