@@ -3,7 +3,7 @@ import {exec, spawn, execSync } from 'child_process'
 import dotenv from 'dotenv';
 dotenv.config();
 
-import {getMigrationType} from '../dest/helpers/getMigrationType';
+import {getMigrationType} from '../src/helpers/getMigrationType';
 
 async function test() {
   await new Promise((resolve, reject) => {
