@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import { getTime } from '@sogebot/ui-helpers/getTime.js';
 import axios, { AxiosRequestConfig } from 'axios';
-import * as ts from 'typescript';
+import ts from 'typescript';
 
 import { CustomVariableGenerator } from './CustomVariable.js';
 import { ListenToGenerator, Types } from './ListenTo.js';
