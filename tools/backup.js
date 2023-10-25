@@ -3,10 +3,9 @@ dotenv.config();
 
 import fs from 'fs'
 import { normalize } from 'path';
-import { stdout } from 'process';
 
 import _ from 'lodash';
-import { DataSource, DataSourceOptions } from 'typeorm';
+import { DataSource } from 'typeorm';
 import argv from 'yargs'
 argv
   .usage('node tools/backup.js')

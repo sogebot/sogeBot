@@ -1,4 +1,4 @@
-import {exec, spawn, execSync } from 'child_process'
+import {exec, spawn } from 'child_process'
 
 import dotenv from 'dotenv';
 dotenv.config();
