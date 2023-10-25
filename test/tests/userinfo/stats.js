@@ -1,13 +1,11 @@
 /* global describe it beforeEach */
 
-require('../../general.js');
+import('../../general.js');
 
-const db = require('../../general.js').db;
-const message = require('../../general.js').message;
-const user = require('../../general.js').user;
+import { db, message, user } from '../../general.js';
 
-const assert = require('assert');
-const userinfo = (require('../../../dest/systems/userinfo')).default;
+import assert from 'assert';
+import userinfo from '../../../dest/systems/userinfo.js'
 
 describe('Userinfo - stats() - @func3', () => {
   beforeEach(async () => {

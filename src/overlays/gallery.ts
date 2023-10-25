@@ -1,13 +1,13 @@
 import path from 'path';
 
-import { Gallery as GalleryEntity } from '@entity/gallery';
+import { Gallery as GalleryEntity } from '@entity/gallery.js';
 
-import Overlay from './_interface';
+import Overlay from './_interface.js';
 
-import { AppDataSource } from '~/database';
-import { debug } from '~/helpers/log';
-import { app } from '~/helpers/panel';
-import { adminEndpoint } from '~/helpers/socket';
+import { AppDataSource } from '~/database.js';
+import { debug } from '~/helpers/log.js';
+import { app } from '~/helpers/panel.js';
+import { adminEndpoint } from '~/helpers/socket.js';
 
 class Gallery extends Overlay {
   showInUI = false;

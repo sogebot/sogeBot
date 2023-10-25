@@ -1,21 +1,21 @@
 import { setTimeout } from 'timers';
 
-import { isNil, merge } from 'lodash';
+import { isNil, merge } from 'lodash-es';
 
-import { isValidationError } from './helpers/errors';
-import { eventEmitter } from './helpers/events';
-import getBotUserName from './helpers/user/getBotUserName';
-import { Types } from './plugins/ListenTo';
+import { isValidationError } from './helpers/errors.js';
+import { eventEmitter } from './helpers/events/index.js';
+import getBotUserName from './helpers/user/getBotUserName.js';
+import { Types } from './plugins/ListenTo.js';
 
-import Core from '~/_interface';
-import { AppDataSource } from '~/database';
+import Core from '~/_interface.js';
 import {
   Variable, VariableWatch,
-} from '~/database/entity/variable';
-import { onStartup } from '~/decorators/on';
-import { runScript, updateWidgetAndTitle } from '~/helpers/customvariables';
-import { isDbConnected } from '~/helpers/database';
-import { adminEndpoint } from '~/helpers/socket';
+} from '~/database/entity/variable.js';
+import { AppDataSource } from '~/database.js';
+import { onStartup } from '~/decorators/on.js';
+import { runScript, updateWidgetAndTitle } from '~/helpers/customvariables/index.js';
+import { isDbConnected } from '~/helpers/database.js';
+import { adminEndpoint } from '~/helpers/socket.js';
 
 class CustomVariables extends Core {
   timeouts: {

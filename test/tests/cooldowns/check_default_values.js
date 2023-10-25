@@ -1,24 +1,23 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
+
 /* global describe it before */
 
 
-require('../../general.js');
+import('../../general.js');
 
-const { Cooldown, CooldownViewer } = require('../../../dest/database/entity/cooldown');
-const { User } = require('../../../dest/database/entity/user');
-const { Keyword } = require('../../../dest/database/entity/keyword');
+import { Cooldown } from '../../../dest/database/entity/cooldown.js';
+import { User } from '../../../dest/database/entity/user.js';
+import { Keyword } from '../../../dest/database/entity/keyword.js';
 
-const assert = require('assert');
+import assert from 'assert';
 
-const db = require('../../general.js').db;
-const message = require('../../general.js').message;
-const time = require('../../general.js').time;
-const { defaultPermissions } = require('../../../dest/helpers/permissions/defaultPermissions');
-const { AppDataSource } = require('../../../dest/database.js');
+import { db } from '../../general.js';
+import { message, time } from '../../general.js';
+import { defaultPermissions } from '../../../dest/helpers/permissions/defaultPermissions.js';
+import { AppDataSource } from '../../../dest/database.js';
 
-const cooldown = (require('../../../dest/systems/cooldown')).default;
-const customcommands = (require('../../../dest/systems/customcommands')).default;
-const gamble = (require('../../../dest/games/gamble')).default;
+import cooldown from '../../../dest/systems/cooldown.js'
+import customcommands from '../../../dest/systems/customcommands.js';
+import gamble from '../../../dest/games/gamble.js';
 
 // users
 const owner = { userId: String(Math.floor(Math.random() * 100000)), userName: '__broadcaster__', badges: {} };

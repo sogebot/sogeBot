@@ -1,25 +1,25 @@
-import { Alias } from '@entity/alias';
-import { Commands } from '@entity/commands';
-import { Cooldown } from '@entity/cooldown';
-import { Price } from '@entity/price';
-import { Rank } from '@entity/rank';
-import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized';
-import { format } from '@sogebot/ui-helpers/number';
-import _ from 'lodash';
-import { AppDataSource } from '~/database';
+import { Alias } from '@entity/alias.js';
+import { Commands } from '@entity/commands.js';
+import { Cooldown } from '@entity/cooldown.js';
+import { Price } from '@entity/price.js';
+import { Rank } from '@entity/rank.js';
+import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized.js';
+import { format } from '@sogebot/ui-helpers/number.js';
+import _ from 'lodash-es';
 import { IsNull } from 'typeorm';
 
 import general from '../general.js';
-import Parser from '../parser';
+import { Parser } from '../parser.js';
 
-import type { ResponseFilter } from '.';
+import type { ResponseFilter } from './index.js';
 
-import { enabled } from '~/helpers/interface/enabled';
-import { error, warning } from '~/helpers/log';
-import { get } from '~/helpers/permissions/get';
-import { getCommandPermission } from '~/helpers/permissions/getCommandPermission';
-import { getPointsName } from '~/helpers/points';
-import { translate } from '~/translate';
+import { AppDataSource } from '~/database.js';
+import { enabled } from '~/helpers/interface/enabled.js';
+import { error, warning } from '~/helpers/log.js';
+import { get } from '~/helpers/permissions/get.js';
+import { getCommandPermission } from '~/helpers/permissions/getCommandPermission.js';
+import { getPointsName } from '~/helpers/points/index.js';
+import { translate } from '~/translate.js';
 
 const list: ResponseFilter = {
   '(list.#)': async function (filter: string) {

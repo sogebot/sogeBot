@@ -1,6 +1,6 @@
 import { runScript } from '../helpers/customvariables/runScript.js';
 
-import type { ResponseFilter } from '.';
+import type { ResponseFilter } from './index.js';
 
 const evaluate: ResponseFilter = {
   '(eval#)': async function (filter, attr) {

@@ -1,11 +1,11 @@
-import { Checklist as ChecklistEntity } from '@entity/checklist';
-import { AppDataSource } from '~/database';
+import { Checklist as ChecklistEntity } from '@entity/checklist.js';
 
-import { settings, ui } from '../decorators';
-import { onChange, onStreamEnd } from '../decorators/on';
-import System from './_interface';
+import System from './_interface.js';
+import { onChange, onStreamEnd } from '../decorators/on.js';
+import { settings, ui } from '../decorators.js';
 
-import { adminEndpoint } from '~/helpers/socket';
+import { AppDataSource } from '~/database.js';
+import { adminEndpoint } from '~/helpers/socket.js';
 
 class Checklist extends System {
   @settings('customization')

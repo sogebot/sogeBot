@@ -1,32 +1,32 @@
-import { Alias as AliasEntity, AliasGroup } from '@entity/alias';
-import * as constants from '@sogebot/ui-helpers/constants';
+import { Alias as AliasEntity, AliasGroup } from '@entity/alias.js';
+import * as constants from '@sogebot/ui-helpers/constants.js';
 import { validateOrReject } from 'class-validator';
-import * as _ from 'lodash';
-import { merge } from 'lodash';
-import { AppDataSource } from '~/database';
+import * as _ from 'lodash-es';
+import { merge } from 'lodash-es';
 
-import { parserReply } from '../commons';
+import System from './_interface.js';
+import { parserReply } from '../commons.js';
 import {
   command, default_permission, parser, timer,
-} from '../decorators';
-import Expects from '../expects';
-import { isValidationError } from '../helpers/errors';
-import Parser from '../parser';
-import System from './_interface';
+} from '../decorators.js';
+import { Expects } from  '../expects.js';
+import { isValidationError } from '../helpers/errors.js';
+import { Parser } from '../parser.js';
 
-import { checkFilter } from '~/helpers/checkFilter';
-import { incrementCountOfCommandUsage } from '~/helpers/commands/count';
-import { prepare } from '~/helpers/commons';
-import { executeVariablesInText } from '~/helpers/customvariables';
+import { AppDataSource } from '~/database.js';
+import { checkFilter } from '~/helpers/checkFilter.js';
+import { incrementCountOfCommandUsage } from '~/helpers/commands/count.js';
+import { prepare } from '~/helpers/commons/index.js';
+import { executeVariablesInText } from '~/helpers/customvariables/index.js';
 import {
   debug, error, info, warning,
-} from '~/helpers/log';
-import { get } from '~/helpers/permissions/get';
-import { defaultPermissions } from '~/helpers/permissions/defaultPermissions';
-import { check } from '~/helpers/permissions/check';
-import { adminEndpoint } from '~/helpers/socket';
-import customCommands from '~/systems/customcommands';
-import { translate } from '~/translate';
+} from '~/helpers/log.js';
+import { check } from '~/helpers/permissions/check.js';
+import { defaultPermissions } from '~/helpers/permissions/defaultPermissions.js';
+import { get } from '~/helpers/permissions/get.js';
+import { adminEndpoint } from '~/helpers/socket.js';
+import customCommands from '~/systems/customcommands.js';
+import { translate } from '~/translate.js';
 
 /*
  * !alias                                              - gets an info about alias usage

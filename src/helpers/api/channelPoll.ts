@@ -3,7 +3,7 @@ import { EventSubChannelPollBeginEventData } from '@twurple/eventsub-base/lib/ev
 import { EventSubChannelPollEndEventData } from '@twurple/eventsub-base/lib/events/EventSubChannelPollEndEvent.external';
 import { EventSubChannelPollProgressEventData } from '@twurple/eventsub-base/lib/events/EventSubChannelPollProgressEvent.external';
 
-import { eventEmitter } from '~/helpers/events';
+import { eventEmitter } from '~/helpers/events/index.js';
 
 let event: null | EventSubChannelPollBeginEventData | EventSubChannelPollProgressEventData | EventSubChannelPollEndEventData | HelixPollData = null;
 

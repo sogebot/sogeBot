@@ -1,9 +1,9 @@
-require('../../general.js');
-const assert = require('assert');
+import('../../general.js');
+import assert from 'assert';
 
-const runScript = (require('../../../dest/helpers/customvariables/runScript')).runScript;
-const db = require('../../general.js').db;
-const message = require('../../general.js').message;
+import { runScript } from '../../../dest/helpers/customvariables/runScript.js';
+import { db } from '../../general.js';
+import { message } from '../../general.js';
 
 describe('Custom Variable - #3737 - Infinite script loop should not lock bot - @func1', () => {
   let result = '';

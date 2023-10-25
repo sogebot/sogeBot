@@ -1,5 +1,5 @@
-import { translate } from '../../translate';
-import { showWithAt } from '../tmi/showWithAt';
+import { translate } from '../../translate.js';
+import { showWithAt } from '../tmi/showWithAt.js';
 
 /**
  * Prepares strings with replacement attributes

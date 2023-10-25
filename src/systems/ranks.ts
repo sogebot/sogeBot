@@ -1,21 +1,19 @@
-'use strict';
+import { Rank } from '@entity/rank.js';
+import { User, UserInterface } from '@entity/user.js';
+import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized.js';
+import * as _ from 'lodash-es';
 
-import { Rank } from '@entity/rank';
-import { User, UserInterface } from '@entity/user';
-import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized';
-import * as _ from 'lodash';
-import { AppDataSource } from '~/database';
+import System from './_interface.js';
+import { command, default_permission } from '../decorators.js';
+import users from '../users.js';
 
-import { command, default_permission } from '../decorators';
-import users from '../users';
-import System from './_interface';
-
-import { prepare } from '~/helpers/commons';
-import defaultPermissions from '~/helpers/permissions/defaultPermissions';
+import { AppDataSource } from '~/database.js';
+import { prepare } from '~/helpers/commons/index.js';
+import { app } from '~/helpers/panel.js';
+import defaultPermissions from '~/helpers/permissions/defaultPermissions.js';
 import * as changelog from '~/helpers/user/changelog.js';
-import { translate } from '~/translate';
-import { app } from '~/helpers/panel';
-import { adminMiddleware } from '~/socket';
+import { adminMiddleware } from '~/socket.js';
+import { translate } from '~/translate.js';
 
 /*
  * !rank                          - show user rank
@@ -62,7 +60,7 @@ class Ranks extends System {
     });
     app.post('/api/systems/ranks', adminMiddleware, async (req, res) => {
       try {
-        const itemToSave = new Rank(req.body);
+        const itemToSave = Rank.create(req.body);
         res.send({ data: await itemToSave.validateAndSave() });
       } catch (e) {
         if (e instanceof Error) {

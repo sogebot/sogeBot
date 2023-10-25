@@ -1,11 +1,11 @@
-require('../../general.js');
+import('../../general.js');
 
-const assert = require('assert');
+import assert from 'assert';
 
-const { prepare } = require('../../../dest/helpers/commons/prepare');
-const permissions = (require('../../../dest/permissions')).default;
-const db = require('../../general.js').db;
-const message = require('../../general.js').message;
+import { prepare } from '../../../dest/helpers/commons/prepare.js';
+import permissions from '../../../dest/permissions.js'
+import { db } from '../../general.js';
+import { message } from '../../general.js';
 
 // users
 const owner = { userName: '__broadcaster__' };

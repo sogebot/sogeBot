@@ -1,15 +1,15 @@
 import {
   cloneDeep, get, isEqual, set,
-} from 'lodash';
+} from 'lodash-es';
 
-import { AppDataSource } from '~/database';
-import { Settings } from '~/database/entity/settings';
-import { getFunctionList } from '~/decorators/on';
-import { isDbConnected } from '~/helpers/database';
-import emitter from '~/helpers/interfaceEmitter';
-import { debug, error } from '~/helpers/log';
-import { logAvgTime } from '~/helpers/profiler';
-import { find } from '~/helpers/register';
+import { Settings } from '~/database/entity/settings.js';
+import { AppDataSource } from '~/database.js';
+import { getFunctionList } from '~/decorators/on.js';
+import { isDbConnected } from '~/helpers/database.js';
+import emitter from '~/helpers/interfaceEmitter.js';
+import { debug, error } from '~/helpers/log.js';
+import { logAvgTime } from '~/helpers/profiler.js';
+import { find } from '~/helpers/register.js';
 
 export const variables = new Map<string, any>();
 export const readonly = new Map<string, any>();

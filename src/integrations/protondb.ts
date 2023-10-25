@@ -1,16 +1,16 @@
-import { capitalize, noop } from 'lodash';
+import { capitalize, noop } from 'lodash-es';
 import fetch from 'node-fetch';
 import trigramSimilarity from 'trigram-similarity';
 
-import System from './_interface';
-import { command, default_permission } from '../decorators';
-import Expects from '../expects';
+import System from './_interface.js';
+import { command, default_permission } from '../decorators.js';
+import { Expects } from  '../expects.js';
 
 import {
   stats,
-} from '~/helpers/api';
-import { prepare } from '~/helpers/commons';
-import defaultPermissions from '~/helpers/permissions/defaultPermissions';
+} from '~/helpers/api/index.js';
+import { prepare } from '~/helpers/commons/index.js';
+import defaultPermissions from '~/helpers/permissions/defaultPermissions.js';
 
 const cache = new Map<string, string>();
 

@@ -1,13 +1,13 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
+
 /* global describe it before */
 
-const assert = require('assert');
-const { AppDataSource } = require('../../../dest/database');
+import assert from 'assert';
+import { AppDataSource } from '../../../dest/database.js'
 
-const { Settings } = require('../../../dest/database/entity/settings');
-require('../../general.js');
-const db = require('../../general.js').db;
-const time = require('../../general.js').time;
+import { Settings } from '../../../dest/database/entity/settings.js';
+import('../../general.js');
+import { db } from '../../general.js';
+import { time } from '../../general.js';
 
 let stats;
 let onChangeTriggered = 0;
@@ -15,7 +15,7 @@ let onChangeTriggered = 0;
 describe('Persistent object - @func1', () => {
   before(async () => {
     await db.cleanup();
-    const { persistent } =  require('../../../dest/helpers/core/persistent');
+    const { persistent } =  await import('../../../dest/helpers/core/persistent.js');
 
     // save incorrect value
     await AppDataSource.getRepository(Settings).save({

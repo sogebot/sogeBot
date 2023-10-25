@@ -1,4 +1,4 @@
-const fs = require('fs');
+import fs from 'node:fs';
 
 const COMMIT_EDITMSG = process.argv[2];
 const commitMessage = fs.readFileSync(COMMIT_EDITMSG).toString().trim();

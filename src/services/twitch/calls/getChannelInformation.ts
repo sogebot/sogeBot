@@ -1,18 +1,17 @@
-import { rawDataSymbol } from '@twurple/common';
-import isEqual from 'lodash/isEqual';
+import { isEqual } from 'lodash-es';
 
-import { AppDataSource } from '~/database';
-import { CacheTitles } from '~/database/entity/cacheTitles';
-import {  currentStreamTags, gameCache, gameOrTitleChangedManually, rawStatus, tagsCache } from '~/helpers/api';
+import { CacheTitles } from '~/database/entity/cacheTitles.js';
+import { AppDataSource } from '~/database.js';
+import {  currentStreamTags, gameCache, gameOrTitleChangedManually, rawStatus, tagsCache } from '~/helpers/api/index.js';
 import {
   stats as apiStats,
-} from '~/helpers/api';
-import { parseTitle } from '~/helpers/api/parseTitle';
-import { isDebugEnabled } from '~/helpers/debug';
-import { getFunctionName } from '~/helpers/getFunctionName';
-import { debug, error, info, warning } from '~/helpers/log';
-import twitch from '~/services/twitch';
-import { variables } from '~/watchers';
+} from '~/helpers/api/index.js';
+import { parseTitle } from '~/helpers/api/parseTitle.js';
+import { isDebugEnabled } from '~/helpers/debug.js';
+import { getFunctionName } from '~/helpers/getFunctionName.js';
+import { debug, error, info, warning } from '~/helpers/log.js';
+import twitch from '~/services/twitch.js';
+import { variables } from '~/watchers.js';
 
 let retries = 0;
 
@@ -23,7 +22,6 @@ export async function getChannelInformation (opts: any) {
   try {
     const broadcasterId = variables.get('services.twitch.broadcasterId') as string;
     const getChannelInfo = await twitch.apiClient?.asIntent(['bot'], ctx => ctx.channels.getChannelInfoById(broadcasterId));
-
     if (!getChannelInfo) {
       throw new Error(`Channel ${broadcasterId} not found on Twitch`);
     }
@@ -73,7 +71,7 @@ export async function getChannelInformation (opts: any) {
 
       apiStats.value.language = getChannelInfo.language;
       apiStats.value.currentTags = getChannelInfo.tags;
-      apiStats.value.contentClasificationLabels = getChannelInfo[rawDataSymbol].content_classification_labels;
+      apiStats.value.contentClasificationLabels = getChannelInfo.contentClassificationLabels;
       apiStats.value.currentGame = getChannelInfo.gameName;
       apiStats.value.currentTitle = getChannelInfo.title;
       apiStats.value.channelDisplayName = getChannelInfo.displayName;

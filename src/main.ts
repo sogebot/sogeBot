@@ -1,8 +1,10 @@
-require('dotenv').config();
-
 Error.stackTraceLimit = Infinity;
 
 import 'reflect-metadata';
+
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 import { existsSync, readFileSync, unlinkSync } from 'fs';
 import { normalize } from 'path';
@@ -11,17 +13,17 @@ import util from 'util';
 import blocked from 'blocked-at';
 import figlet from 'figlet';
 import gitCommitInfo from 'git-commit-info';
-import _ from 'lodash';
+import { get } from 'lodash-es';
 
-import { setDEBUG, isDebugEnabled } from './helpers/debug';
+import { autoLoad } from './helpers/autoLoad.js';
+import { isDebugEnabled, setDEBUG } from './helpers/debug.js';
+import { startWatcher } from './watchers.js';
 
-import { AppDataSource } from '~/database';
-import { autoLoad } from '~/helpers/autoLoad';
-import { setIsBotStarted, setIsDbConnected } from '~/helpers/database';
+import { AppDataSource } from '~/database.js';
+import { setIsBotStarted, setIsDbConnected } from '~/helpers/database.js';
 import {
   error, info, warning,
-} from '~/helpers/log';
-import { startWatcher } from '~/watchers';
+} from '~/helpers/log.js';
 
 const connect = async function () {
   const type = process.env.TYPEORM_CONNECTION;
@@ -45,7 +47,7 @@ const connect = async function () {
 
 async function main () {
   try {
-    const version = _.get(process, 'env.npm_package_version', 'x.y.z');
+    const version = get(process, 'env.npm_package_version', 'x.y.z');
     const commitFile = existsSync('./.commit') ? readFileSync('./.commit').toString() : null;
     if (!existsSync('~/restart.pid')) {
       const versionString = version.replace('SNAPSHOT', commitFile && commitFile.length > 0 ? commitFile : gitCommitInfo().shortHash || 'SNAPSHOT');
@@ -67,27 +69,26 @@ async function main () {
     error('Exiting bot.');
     process.exit(1);
   }
-  let translate;
   try {
     // Initialize all core singletons
-    setTimeout(() => {
-      translate = require('./translate');
+    setTimeout(async () => {
+      const translate = (await import('./translate.js')).default;
 
-      translate.default._load().then(async () => {
-        require('./general');
-        require('./socket');
-        require('./ui');
-        require('./currency');
-        require('./stats');
-        require('./users');
-        require('./events');
-        require('./plugins');
-        require('./customvariables');
-        require('./permissions');
-        require('./dashboard');
-        require('./tts');
-        require('./emotes');
-        require('./panel');
+      translate._load().then(async () => {
+        await import('./general.js');
+        await import('./socket.js');
+        await import('./ui.js');
+        await import('./currency.js');
+        await import('./stats.js');
+        await import('./users.js');
+        await import('./events.js');
+        await import('./plugins.js');
+        await import('./customvariables.js');
+        await import('./permissions.js');
+        await import('./dashboard.js');
+        await import('./tts.js');
+        await import('./emotes.js');
+        await import('./panel.js');
         await autoLoad('./dest/stats/');
         await autoLoad('./dest/registries/');
         await autoLoad('./dest/systems/');

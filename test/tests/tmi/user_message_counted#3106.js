@@ -1,16 +1,16 @@
 /* global */
 
-const assert = require('assert');
+import assert from 'assert';
 
-require('../../general.js');
+import('../../general.js');
 
-const commons = require('../../../dest/commons');
-const { AppDataSource } = require('../../../dest/database.js');
-const { Settings } = require('../../../dest/database/entity/settings');
-const { User } = require('../../../dest/database/entity/user');
-const isStreamOnline = (require('../../../dest/helpers/api/isStreamOnline')).isStreamOnline;
-const changelog = (require('../../../dest/helpers/user/changelog'));
-const twitch = require('../../../dest/services/twitch.js').default;
+import * as commons from '../../../dest/commons.js'
+import { AppDataSource } from '../../../dest/database.js';
+import { Settings } from '../../../dest/database/entity/settings.js';
+import { User } from '../../../dest/database/entity/user.js';
+import { isStreamOnline } from '../../../dest/helpers/api/isStreamOnline.js'
+import * as changelog from '../../../dest/helpers/user/changelog.js';
+import twitch from '../../../dest/services/twitch.js';
 // users
 const owner = { userName: '__broadcaster__' };
 const testuser1 = {
@@ -20,11 +20,11 @@ const testuser2 = {
   userName: 'testuser2', userId: '2',
 };
 
-const { VariableWatcher } = require('../../../dest/watchers');
-const message = require('../../general.js').message;
-const db = require('../../general.js').db;
+import { VariableWatcher } from '../../../dest/watchers.js';
+import { message } from '../../general.js';
+import { db } from '../../general.js';
 
-const TMI = require('../../../dest/services/twitch/chat').default;
+import TMI from '../../../dest/services/twitch/chat.js';
 const tmi = new TMI();
 
 describe('TMI - User should have counted messages - https://github.com/sogehige/sogeBot/issues/3106 - @func3', () => {

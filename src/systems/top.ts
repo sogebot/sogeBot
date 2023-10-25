@@ -1,26 +1,26 @@
-import { User } from '@entity/user';
-import { dayjs } from '@sogebot/ui-helpers/dayjsHelper';
-import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized';
-import { format } from '@sogebot/ui-helpers/number';
-import _ from 'lodash';
+import { User } from '@entity/user.js';
+import { dayjs } from '@sogebot/ui-helpers/dayjsHelper.js';
+import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized.js';
+import { format } from '@sogebot/ui-helpers/number.js';
+import _ from 'lodash-es';
 
-import { command, default_permission } from '../decorators';
-import general from '../general';
-import System from './_interface';
-import levels from './levels';
-import points from './points';
+import System from './_interface.js';
+import levels from './levels.js';
+import points from './points.js';
+import { command, default_permission } from '../decorators.js';
+import general from '../general.js';
 
-import { mainCurrency } from '~/helpers/currency';
-import { debug } from '~/helpers/log';
-import defaultPermissions from '~/helpers/permissions/defaultPermissions';
-import { getPointsName } from '~/helpers/points';
-import { unserialize } from '~/helpers/type';
+import { AppDataSource } from '~/database.js';
+import { mainCurrency } from '~/helpers/currency/index.js';
+import { debug } from '~/helpers/log.js';
+import defaultPermissions from '~/helpers/permissions/defaultPermissions.js';
+import { getPointsName } from '~/helpers/points/index.js';
+import { unserialize } from '~/helpers/type.js';
 import * as changelog from '~/helpers/user/changelog.js';
-import { getIgnoreList, isIgnored } from '~/helpers/user/isIgnored';
-import twitch from '~/services/twitch';
-import { translate } from '~/translate';
-import { variables } from '~/watchers';
-import { AppDataSource } from '~/database';
+import { getIgnoreList, isIgnored } from '~/helpers/user/isIgnored.js';
+import twitch from '~/services/twitch.js';
+import { translate } from '~/translate.js';
+import { variables } from '~/watchers.js';
 
 enum TYPE {
   TIME = '0',

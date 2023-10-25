@@ -1,11 +1,11 @@
-import { capitalize } from 'lodash';
+import { capitalize } from 'lodash-es';
 import XRegExp from 'xregexp';
 
-import { error } from '../log';
+import { error } from '../log.js';
 
-import { isDebugEnabled } from '~/helpers/debug';
-import { tmiEmitter } from '~/helpers/tmi';
-import { variables } from '~/watchers';
+import { isDebugEnabled } from '~/helpers/debug.js';
+import { tmiEmitter } from '~/helpers/tmi/index.js';
+import { variables } from '~/watchers.js';
 
 export async function message(type: 'say' | 'whisper' | 'me', username: string | undefined | null, messageToSend: string, messageId?: string, retry = true) {
   const broadcasterUsername = variables.get('services.twitch.broadcasterUsername') as string;

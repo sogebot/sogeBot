@@ -1,16 +1,16 @@
-const assert = require('assert');
-const { AppDataSource } = require('../../../dest/database');
+import assert from 'assert';
+import { AppDataSource } from '../../../dest/database.js'
 
-const { User } = require('../../../dest/database/entity/user');
-const { prepare } = require('../../../dest/helpers/commons/prepare');
-const eventlist = (require('../../../dest/overlays/eventlist')).default;
-const twitch = (require('../../../dest/services/twitch')).default;
-const db = require('../../general.js').db;
-const message = require('../../general.js').message;
-const time = require('../../general.js').time;
-const user = require('../../general.js').user;
+import { User } from '../../../dest/database/entity/user.js';
+import { prepare } from '../../../dest/helpers/commons/prepare.js';
+import eventlist from '../../../dest/overlays/eventlist.js';
+import twitch from '../../../dest/services/twitch.js';
+import { db } from '../../general.js';
+import { message } from '../../general.js';
+import { time } from '../../general.js';
+import { user } from '../../general.js';
 
-require('../../general.js');
+import('../../general.js');
 
 describe('lib/twitch - followers() - @func1', () => {
   before(async () => {

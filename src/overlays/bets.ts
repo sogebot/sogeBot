@@ -1,7 +1,7 @@
-import Overlay from './_interface';
+import Overlay from './_interface.js';
 
-import * as channelPrediction from '~/helpers/api/channelPrediction';
-import { publicEndpoint } from '~/helpers/socket';
+import * as channelPrediction from '~/helpers/api/channelPrediction.js';
+import { publicEndpoint } from '~/helpers/socket.js';
 
 class Bets extends Overlay {
   public sockets() {

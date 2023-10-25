@@ -1,5 +1,5 @@
 export const parseTextWithEmotes = async (text: string | undefined, size: 1 | 2 | 3 = 1)  =>{
-  const Emotes = (await import('../emotes')).default;
+  const Emotes = (await import('../emotes.js')).default;
   if (typeof text === 'undefined' || text.length === 0) {
     return '';
   }

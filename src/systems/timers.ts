@@ -1,26 +1,24 @@
-'use strict';
-
 import {
   Timer, TimerResponse,
-} from '@entity/timer';
+} from '@entity/timer.js';
 import { Mutex } from 'async-mutex';
 import { validateOrReject } from 'class-validator';
-import * as _ from 'lodash';
-import { merge, sortBy } from 'lodash';
+import * as _ from 'lodash-es';
+import { merge, sortBy } from 'lodash-es';
 
-import System from './_interface';
-import { command, default_permission } from '../decorators';
-import Expects from '../expects';
+import System from './_interface.js';
+import { command, default_permission } from '../decorators.js';
+import { Expects } from  '../expects.js';
 
-import { onStartup } from '~/decorators/on';
-import { isStreamOnline } from '~/helpers/api';
-import { announce } from '~/helpers/commons';
-import { isDbConnected } from '~/helpers/database';
-import { app } from '~/helpers/panel';
-import { linesParsed } from '~/helpers/parser';
-import defaultPermissions from '~/helpers/permissions/defaultPermissions';
-import { adminMiddleware } from '~/socket';
-import { translate } from '~/translate';
+import { onStartup } from '~/decorators/on.js';
+import { isStreamOnline } from '~/helpers/api/index.js';
+import { announce } from '~/helpers/commons/index.js';
+import { isDbConnected } from '~/helpers/database.js';
+import { app } from '~/helpers/panel.js';
+import { linesParsed } from '~/helpers/parser.js';
+import defaultPermissions from '~/helpers/permissions/defaultPermissions.js';
+import { adminMiddleware } from '~/socket.js';
+import { translate } from '~/translate.js';
 
 /*
  * !timers                                                                                                                                 - gets an info about timers usage

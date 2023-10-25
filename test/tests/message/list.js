@@ -1,17 +1,17 @@
 /* global */
-require('../../general.js');
+import('../../general.js');
 
-const assert = require('assert');
+import assert from 'assert';
 
-const { User } = require('../../../dest/database/entity/user');
-const { AppDataSource } = require('../../../dest/database.js');
-const Message = require('../../../dest/message').default;
-const alias = (require('../../../dest/systems/alias')).default;
-const cooldown = (require('../../../dest/systems/cooldown')).default;
-const customcommands = (require('../../../dest/systems/customcommands')).default;
-const ranks = (require('../../../dest/systems/ranks')).default;
-const db = require('../../general.js').db;
-const message = require('../../general.js').message;
+import { User } from '../../../dest/database/entity/user.js';
+import { AppDataSource } from '../../../dest/database.js';
+import {Message} from '../../../dest/message.js';
+import alias from '../../../dest/systems/alias.js';
+import cooldown from '../../../dest/systems/cooldown.js'
+import customcommands from '../../../dest/systems/customcommands.js';
+import ranks from '../../../dest/systems/ranks.js';
+import { db } from '../../general.js';
+import { message } from '../../general.js';
 
 const owner = { userName: '__broadcaster__', userId: String(Math.floor(Math.random() * 100000)) };
 

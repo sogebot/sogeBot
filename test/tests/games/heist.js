@@ -1,12 +1,10 @@
-const assert = require('assert');
-const { AppDataSource } = require('../../../dest/database.js');
+import assert from 'assert';
+import { AppDataSource } from '../../../dest/database.js';
 
-require('../../general.js');
-const { User } = require('../../../dest/database/entity/user');
-const db = require('../../general.js').db;
-const message = require('../../general.js').message;
-const user = require('../../general.js').user;
-const time = require('../../general.js').time;
+import('../../general.js');
+import { User } from '../../../dest/database/entity/user.js';
+import { db, message, user } from '../../general.js';
+import { time } from '../../general.js';
 
 const command = '!bankheist';
 let heist;
@@ -16,7 +14,7 @@ describe('Heist - !bankheist - @func2', () => {
     await db.cleanup();
     await user.prepare();
 
-    heist = (require('../../../dest/games/heist')).default;
+    heist = (await import('../../../dest/games/heist.js')).default;
   });
 
   describe('!bankheist when nobody joined', () => {

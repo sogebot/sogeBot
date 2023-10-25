@@ -1,18 +1,16 @@
-'use strict';
-
-import { MINUTE } from '@sogebot/ui-helpers/constants';
+import { MINUTE } from '@sogebot/ui-helpers/constants.js';
 import { JWT } from 'google-auth-library';
 import { google } from 'googleapis';
 
-import Core from '~/_interface';
-import { AppDataSource } from '~/database';
-import { GooglePrivateKeys } from '~/database/entity/google';
-import { settings } from '~/decorators';
+import Core from '~/_interface.js';
+import { GooglePrivateKeys } from '~/database/entity/google.js';
+import { AppDataSource } from '~/database.js';
 import {
   onStartup,
-} from '~/decorators/on';
-import { error, info, warning } from '~/helpers/log';
-import { adminEndpoint, publicEndpoint } from '~/helpers/socket';
+} from '~/decorators/on.js';
+import { settings } from '~/decorators.js';
+import { error, info, warning } from '~/helpers/log.js';
+import { adminEndpoint, publicEndpoint } from '~/helpers/socket.js';
 
 /* secureKeys are used to authenticate use of public overlay endpoint */
 const secureKeys = new Set<string>();

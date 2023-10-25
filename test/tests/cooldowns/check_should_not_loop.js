@@ -1,20 +1,20 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
+
 /* global describe it before */
 
 
-require('../../general.js');
+import('../../general.js');
 
-const { Cooldown, CooldownViewer } = require('../../../dest/database/entity/cooldown');
-const { User } = require('../../../dest/database/entity/user');
-const { Keyword } = require('../../../dest/database/entity/keyword');
+import { Cooldown } from '../../../dest/database/entity/cooldown.js';
+import { User } from '../../../dest/database/entity/user.js';
+import { Keyword } from '../../../dest/database/entity/keyword.js';
 
-const assert = require('assert');
-const { AppDataSource } = require('../../../dest/database.js');
+import assert from 'assert';
+import { AppDataSource } from '../../../dest/database.js';
 
-const db = require('../../general.js').db;
-const message = require('../../general.js').message;
+import { db } from '../../general.js';
+import { message } from '../../general.js';
 
-const cooldown = (require('../../../dest/systems/cooldown')).default;
+import cooldown from '../../../dest/systems/cooldown.js'
 
 // users
 const owner = { userId: String(Math.floor(Math.random() * 100000)), userName: '__broadcaster__', badges: {} };

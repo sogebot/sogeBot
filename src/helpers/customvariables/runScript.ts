@@ -1,30 +1,30 @@
-import { User } from '@entity/user';
-import { getTime } from '@sogebot/ui-helpers/getTime';
+import { User } from '@entity/user.js';
+import { getTime } from '@sogebot/ui-helpers/getTime.js';
 import axios from 'axios';
-import _ from 'lodash';
+import _ from 'lodash-es';
 import {
   get, isNil,
-} from 'lodash';
+} from 'lodash-es';
 import { minify } from 'terser';
 import { VM } from 'vm2';
 
-import { getAll } from './getAll';
-import Message from '../../message';
-import users from '../../users';
+import { getAll } from './getAll.js';
+import { Message } from  '../../message.js';
+import users from '../../users.js';
 import {
   chatMessagesAtStart, isStreamOnline, stats, streamStatusChangeSince,
-} from '../api';
-import { mainCurrency, symbol } from '../currency';
+} from '../api/index.js';
+import { mainCurrency, symbol } from '../currency/index.js';
 import {
   debug, error, info, warning,
-} from '../log';
-import { linesParsed } from '../parser';
+} from '../log.js';
+import { linesParsed } from '../parser.js';
 import * as changelog from '../user/changelog.js';
-import { isModerator } from '../user/isModerator';
+import { isModerator } from '../user/isModerator.js';
 import { getRandomOnlineSubscriber, getRandomOnlineViewer, getRandomSubscriber, getRandomViewer } from '../user/random.js';
 
-import { AppDataSource } from '~/database';
-import twitch from '~/services/twitch';
+import { AppDataSource } from '~/database.js';
+import twitch from '~/services/twitch.js';
 
 async function runScript (script: string, opts: { sender: { userId: string; userName: string; source: 'twitch' | 'discord' } | string | null, isUI: boolean; param?: string | number, _current: any, parameters?: { [x: string]: any }, variables?: { [x: string]: any } }) {
   debug('customvariables.eval', opts);

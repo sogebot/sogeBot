@@ -1,14 +1,11 @@
 /* global describe it before */
 
-require('../../general.js');
+import('../../general.js');
 
-const db = require('../../general.js').db;
-const message = require('../../general.js').message;
-const variable = require('../../general.js').variable;
+import { db, message, variable } from '../../general.js';
+import { flatten, unflatten } from '../../../dest/helpers/flatten.js';
 
-const { flatten, unflatten } = require('../../../dest/helpers/flatten');
-
-const assert = require('assert');
+import assert from 'assert';
 
 describe('lib/commons - @func2 - flatten()', () => {
   it('Object with string should be correctly flatten', async () => {

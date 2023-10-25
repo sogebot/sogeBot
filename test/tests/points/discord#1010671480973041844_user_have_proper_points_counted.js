@@ -1,14 +1,12 @@
-const assert = require('assert');
-const { AppDataSource } = require('../../../dest/database');
+import assert from 'assert';
+import { AppDataSource } from '../../../dest/database.js'
 
 
-const { User } = require('../../../dest/database/entity/user');
-const changelog = require('../../../dest/helpers/user/changelog');
-const points = (require('../../../dest/systems/points')).default;
-require('../../general.js');
-const db = require('../../general.js').db;
-const message = require('../../general.js').message;
-const user = require('../../general.js').user;
+import { User } from '../../../dest/database/entity/user.js';
+import * as  changelog from '../../../dest/helpers/user/changelog.js';
+import points from '../../../dest/systems/points.js';
+import('../../general.js');
+import { db, message, user } from '../../general.js';
 
 describe('Points - User have proper points count - https://discord.com/channels/317348946144002050/689472714544513025/1010671480973041844 - @func3', () => {
   before(async () => {

@@ -1,24 +1,24 @@
-import { Duel as DuelEntity, DuelInterface } from '@entity/duel';
-import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized';
-import { format } from '@sogebot/ui-helpers/number';
-import _ from 'lodash';
-import { AppDataSource } from '~/database';
+import { Duel as DuelEntity, DuelInterface } from '@entity/duel.js';
+import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized.js';
+import { format } from '@sogebot/ui-helpers/number.js';
+import _ from 'lodash-es';
 
+import Game from './_interface.js';
+import { onStartup } from '../decorators/on.js';
 import {
   command, persistent, settings,
-} from '../decorators';
-import { onStartup } from '../decorators/on';
+} from '../decorators.js';
 import general from '../general.js';
-import Game from './_interface';
 
-import { announce, prepare } from '~/helpers/commons';
-import { isDbConnected } from '~/helpers/database';
-import { error } from '~/helpers/log';
-import { getPointsName } from '~/helpers/points';
+import { AppDataSource } from '~/database.js';
+import { announce, prepare } from '~/helpers/commons/index.js';
+import { isDbConnected } from '~/helpers/database.js';
+import { error } from '~/helpers/log.js';
+import { getPointsName } from '~/helpers/points/index.js';
 import * as changelog from '~/helpers/user/changelog.js';
-import { isBroadcaster } from '~/helpers/user/isBroadcaster';
-import { isModerator } from '~/helpers/user/isModerator';
-import { translate } from '~/translate';
+import { isBroadcaster } from '~/helpers/user/isBroadcaster.js';
+import { isModerator } from '~/helpers/user/isModerator.js';
+import { translate } from '~/translate.js';
 
 const ERROR_NOT_ENOUGH_OPTIONS = '0';
 const ERROR_ZERO_BET = '1';
@@ -127,7 +127,7 @@ class Duel extends Game {
 
   @command('!duel')
   async main (opts: CommandOptions) {
-    const points = (await import('../systems/points')).default;
+    const points = (await import('../systems/points.js')).default;
     const responses: CommandResponse[] = [];
     let bet;
 

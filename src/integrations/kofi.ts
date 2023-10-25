@@ -1,20 +1,20 @@
-import { Currency } from '@entity/user';
+import { Currency } from '@entity/user.js';
 
-import { settings } from '../decorators';
+import Integration from './_interface.js';
 import { onStartup } from '../decorators/on.js';
+import { settings } from '../decorators.js';
 import eventlist from '../overlays/eventlist.js';
 import alerts from '../registries/alerts.js';
 import users from '../users.js';
-import Integration from './_interface';
 
-import exchange from '~/helpers/currency/exchange';
+import exchange from '~/helpers/currency/exchange.js';
 import { mainCurrency } from '~/helpers/currency/mainCurrency.js';
-import { eventEmitter } from '~/helpers/events';
+import { eventEmitter } from '~/helpers/events/index.js';
 import { triggerInterfaceOnTip } from '~/helpers/interface/triggers.js';
 import {
   error, tip, info,
 } from '~/helpers/log.js';
-import { app } from '~/helpers/panel';
+import { app } from '~/helpers/panel.js';
 
 type KoFiData = {
   'message_id':string,

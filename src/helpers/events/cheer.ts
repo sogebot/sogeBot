@@ -2,24 +2,24 @@ import util from 'util';
 
 import type { EventSubChannelCheerEventData } from '@twurple/eventsub-base/lib/events/EventSubChannelCheerEvent.external';
 
-import eventlist from '../../overlays/eventlist';
-import alerts from '../../registries/alerts';
+import eventlist from '../../overlays/eventlist.js';
+import alerts from '../../registries/alerts.js';
 
-import { eventEmitter } from '.';
+import { eventEmitter } from './index.js';
 
-import { parserReply } from '~/commons';
-import { AppDataSource } from '~/database';
-import { Price } from '~/database/entity/price';
-import { UserBit, UserBitInterface } from '~/database/entity/user';
-import { isStreamOnline, stats } from '~/helpers/api';
-import { getUserSender } from '~/helpers/commons/getUserSender';
-import { triggerInterfaceOnBit } from '~/helpers/interface';
+import { parserReply } from '~/commons.js';
+import { Price } from '~/database/entity/price.js';
+import { UserBit, UserBitInterface } from '~/database/entity/user.js';
+import { AppDataSource } from '~/database.js';
+import { isStreamOnline, stats } from '~/helpers/api/index.js';
+import { getUserSender } from '~/helpers/commons/getUserSender.js';
+import { triggerInterfaceOnBit } from '~/helpers/interface/index.js';
 import { cheer as cheerLog, debug, error } from '~/helpers/log.js';
 import * as changelog from '~/helpers/user/changelog.js';
-import { isIgnored } from '~/helpers/user/isIgnored';
-import Parser from '~/parser';
-import alias from '~/systems/alias';
-import customcommands from '~/systems/customcommands';
+import { isIgnored } from '~/helpers/user/isIgnored.js';
+import { Parser } from '~/parser.js';
+import alias from '~/systems/alias.js';
+import customcommands from '~/systems/customcommands.js';
 
 export async function cheer(event: EventSubChannelCheerEventData) {
   try {

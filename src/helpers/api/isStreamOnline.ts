@@ -1,4 +1,4 @@
-import { persistent } from '../core/persistent';
+import { persistent } from '../core/persistent.js';
 
 const isStreamOnline = persistent({
   value:     false,

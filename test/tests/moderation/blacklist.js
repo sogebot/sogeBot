@@ -1,17 +1,16 @@
 /* global describe it before */
 
 
-require('../../general.js');
+import('../../general.js');
 
-const db = require('../../general.js').db;
-const variable = require('../../general.js').variable;
-const message = require('../../general.js').message;
-const user = require('../../general.js').user;
+import { db } from '../../general.js';
+import { variable } from '../../general.js';
+import { message } from '../../general.js';
+import { user } from '../../general.js';
 
-const _ = require('lodash');
-const assert = require('assert');
-
-const moderation = (require('../../../dest/systems/moderation')).default;
+import _ from 'lodash-es';
+import assert from 'assert';
+import moderation from '../../../dest/systems/moderation.js';
 
 const tests = {
   'test': {

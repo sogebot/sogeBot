@@ -1,4 +1,4 @@
-import { parse, sep as separator } from 'path';
+import { normalize, parse } from 'path';
 
 type onEvent = { path: string; fName: string };
 type onEvents = {
@@ -154,8 +154,9 @@ function getNameAndTypeFromStackTrace() {
   Error.prepareStackTrace = _prepareStackTrace;
 
   const path = parse(stack[2].getFileName() || '');
-  const _type = path.dir.split(separator)[path.dir.split(separator).length - 1];
-  const type = _type === 'dest' ? 'core' : _type;
+  const dir = normalize(path.dir).replace(/\\/g, '/');
+  const _type = dir.split('/')[dir.split('/').length - 1];
+  const type = (_type === 'dest' ? 'core' : _type);
   const name = path.name;
 
   return { name, type };

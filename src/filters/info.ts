@@ -1,14 +1,14 @@
-import { EventList } from '@entity/eventList';
+import { EventList } from '@entity/eventList.js';
 
-import type { ResponseFilter } from '.';
+import type { ResponseFilter } from './index.js';
 
-import { AppDataSource } from '~/database';
+import { AppDataSource } from '~/database.js';
 import {
   isStreamOnline, stats, streamStatusChangeSince,
-} from '~/helpers/api';
-import { mainCurrency } from '~/helpers/currency';
-import exchange from '~/helpers/currency/exchange';
-import getNameById from '~/helpers/user/getNameById';
+} from '~/helpers/api/index.js';
+import exchange from '~/helpers/currency/exchange.js';
+import { mainCurrency } from '~/helpers/currency/index.js';
+import getNameById from '~/helpers/user/getNameById.js';
 
 async function toptipFilter(type: 'overall' | 'stream', value: 'username' | 'amount' | 'message' | 'currency'): Promise<string> {
   let tips = (await AppDataSource.getRepository(EventList).createQueryBuilder('events')

@@ -1,20 +1,18 @@
-'use strict';
+import * as _ from 'lodash-es';
 
-import * as _ from 'lodash';
-
-import System from './_interface';
+import System from './_interface.js';
 import {
   command, default_permission, helper,
-} from '../decorators';
+} from '../decorators.js';
 
-import { getOwnerAsSender } from '~/helpers/commons';
-import { eventEmitter } from '~/helpers/events';
-import { error, warning } from '~/helpers/log';
-import { addUIError } from '~/helpers/panel/alerts';
-import defaultPermissions from '~/helpers/permissions/defaultPermissions';
-import { adminEndpoint } from '~/helpers/socket';
-import twitch from '~/services/twitch';
-import { variables } from '~/watchers';
+import { getOwnerAsSender } from '~/helpers/commons/index.js';
+import { eventEmitter } from '~/helpers/events/index.js';
+import { error, warning } from '~/helpers/log.js';
+import { addUIError } from '~/helpers/panel/alerts.js';
+import defaultPermissions from '~/helpers/permissions/defaultPermissions.js';
+import { adminEndpoint } from '~/helpers/socket.js';
+import twitch from '~/services/twitch.js';
+import { variables } from '~/watchers.js';
 
 /*
  * !commercial                        - gets an info about alias usage

@@ -1,22 +1,22 @@
-const _ = require('lodash');
-const { v4: uuidv4 } = require('uuid');
-const { AppDataSource } = require('../../../dest/database.js');
+import _ from 'lodash-es';
+import { v4 as uuidv4 } from 'uuid';
+import { AppDataSource } from '../../../dest/database.js';
 
-require('../../general.js');
+import('../../general.js');
 
-const { Commands, CommandsResponses } = require('../../../dest/database/entity/commands');
-const { Event } = require('../../../dest/database/entity/event');
-const { User } = require('../../../dest/database/entity/user');
-const events = (require('../../../dest/events')).default;
-const { defaultPermissions } = (require('../../../dest/helpers/permissions/defaultPermissions'));
-const { isBotSubscriber } = require('../../../dest/helpers/user/isBot');
-const alias = (require('../../../dest/systems/alias')).default;
-const commercial = (require('../../../dest/systems/commercial')).default;
-const customcommands = (require('../../../dest/systems/customcommands')).default;
-const db = require('../../general.js').db;
-const message = require('../../general.js').message;
-const time = require('../../general.js').time;
-const user = require('../../general.js').user;
+import { Commands } from '../../../dest/database/entity/commands.js';
+import { Event } from '../../../dest/database/entity/event.js';
+import { User } from '../../../dest/database/entity/user.js';
+import events from '../../../dest/events.js';
+import { defaultPermissions } from '../../../dest/helpers/permissions/defaultPermissions.js';
+import { isBotSubscriber } from '../../../dest/helpers/user/isBot.js';
+import alias from '../../../dest/systems/alias.js';
+import commercial from '../../../dest/systems/commercial.js';
+import customcommands from '../../../dest/systems/customcommands.js';
+import { db } from '../../general.js';
+import { message } from '../../general.js';
+import { time } from '../../general.js';
+import { user } from '../../general.js';
 
 let event;
 describe('Events - event run command should correctly parse filters and be able to use CASTERS permissions - https://discord.com/channels/317348946144002050/619437014001123338/8157333500391587958 - @func3', () => {

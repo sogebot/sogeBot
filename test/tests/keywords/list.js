@@ -1,14 +1,14 @@
 /* global describe it */
-require('../../general.js');
+import('../../general.js');
 
-const db = require('../../general.js').db;
-const message = require('../../general.js').message;
-const assert = require('assert');
+import { db } from '../../general.js';
+import { message } from '../../general.js';
+import assert from 'assert';
 
-const keywords = (require('../../../dest/systems/keywords')).default;
+import keywords from '../../../dest/systems/keywords.js';
 
-const { Keyword } = require('../../../dest/database/entity/keyword');
-const { User } = require('../../../dest/database/entity/user');
+import { Keyword } from '../../../dest/database/entity/keyword.js';
+import { User } from '../../../dest/database/entity/user.js';
 
 // users
 const owner = { userName: '__broadcaster__', userId: String(Math.floor(Math.random() * 100000)) };

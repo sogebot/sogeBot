@@ -1,9 +1,9 @@
-import _ from 'lodash';
+import _ from 'lodash-es';
 
-import currentRates from './rates';
+import currentRates from './rates.js';
 
-import { Currency as CurrencyType } from '~/database/entity/user';
-import { warning } from '~/helpers/log';
+import { Currency as CurrencyType } from '~/database/entity/user.js';
+import { warning } from '~/helpers/log.js';
 
 const base = 'USD';
 

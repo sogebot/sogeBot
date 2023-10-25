@@ -1,18 +1,18 @@
 /* global */
 
-require('../../general.js');
+import('../../general.js');
 
-const assert = require('assert');
+import assert from 'assert';
 
 const owner = { userId: String(Math.floor(Math.random() * 100000)), userName: '__broadcaster__' };
-const constants = require('@sogebot/ui-helpers/constants');
+import constants from '@sogebot/ui-helpers/constants.js';
 
-const { EventList } = require('../../../dest/database/entity/eventList');
-const { User, UserTip, UserBit } = require('../../../dest/database/entity/user');
-const { AppDataSource } = require('../../../dest/database.js');
-const rates = require('../../../dest/helpers/currency/rates').default;
-const Message = require('../../../dest/message').default;
-const db = require('../../general.js').db;
+import { EventList } from '../../../dest/database/entity/eventList.js';
+import { User, UserTip, UserBit } from '../../../dest/database/entity/user.js';
+import { AppDataSource } from '../../../dest/database.js';
+import rates from '../../../dest/helpers/currency/rates.js';
+import {Message} from '../../../dest/message.js';
+import { db } from '../../general.js';
 
 const tests = [
   { text: `(count|subs|hour)`, expect: '5' },
@@ -57,7 +57,7 @@ describe('Message - (count|#) filter - @func3', async () => {
   beforeEach(async () => {
     await db.cleanup();
 
-    const currency = require('../../../dest/currency').default;
+    const currency = (await import('../../../dest/currency.js')).default;
     for (let i = 0; i < 25; i++) {
       await AppDataSource.getRepository(EventList).save({
         isTest:      false,

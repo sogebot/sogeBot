@@ -1,4 +1,4 @@
-import { PluginVariable } from '~/database/entity/plugins';
+import { PluginVariable } from '~/database/entity/plugins.js';
 
 export const VariableGenerator = (pluginId: string) => ({
   async loadFromDatabase(variableName: string) {

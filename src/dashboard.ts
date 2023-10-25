@@ -1,7 +1,7 @@
 import { v4 } from 'uuid';
 
-import Core from '~/_interface';
-import { settings } from '~/decorators';
+import Core from '~/_interface.js';
+import { settings } from '~/decorators.js';
 
 class Dashboard extends Core {
   @settings()

@@ -1,32 +1,32 @@
 import { setTimeout } from 'timers';
 
-import { HOUR } from '@sogebot/ui-helpers/constants';
+import { HOUR } from '@sogebot/ui-helpers/constants.js';
 import {
   Brackets, IsNull,
 } from 'typeorm';
 
-import { defaultPermissions } from './helpers/permissions/defaultPermissions';
-import { getUserHighestPermission } from './helpers/permissions/getUserHighestPermission';
-import getNameById from './helpers/user/getNameById';
+import { defaultPermissions } from './helpers/permissions/defaultPermissions.js';
+import { getUserHighestPermission } from './helpers/permissions/getUserHighestPermission.js';
+import getNameById from './helpers/user/getNameById.js';
 
-import Core from '~/_interface';
-import { AppDataSource } from '~/database';
-import { Permissions } from '~/database/entity/permissions';
+import Core from '~/_interface.js';
+import { Permissions } from '~/database/entity/permissions.js';
 import {
   User, UserBit, UserInterface, UserTip,
-} from '~/database/entity/user';
-import { onStartup } from '~/decorators/on';
-import { isStreamOnline, stats } from '~/helpers/api';
-import { mainCurrency } from '~/helpers/currency';
-import exchange from '~/helpers/currency/exchange';
-import rates from '~/helpers/currency/rates';
-import { isDebugEnabled } from '~/helpers/debug';
+} from '~/database/entity/user.js';
+import { AppDataSource } from '~/database.js';
+import { onStartup } from '~/decorators/on.js';
+import { isStreamOnline, stats } from '~/helpers/api/index.js';
+import exchange from '~/helpers/currency/exchange.js';
+import { mainCurrency } from '~/helpers/currency/index.js';
+import rates from '~/helpers/currency/rates.js';
+import { isDebugEnabled } from '~/helpers/debug.js';
 import {
   debug, error,
-} from '~/helpers/log';
-import { adminEndpoint, viewerEndpoint } from '~/helpers/socket';
+} from '~/helpers/log.js';
+import { adminEndpoint, viewerEndpoint } from '~/helpers/socket.js';
 import * as changelog from '~/helpers/user/changelog.js';
-import { getIdFromTwitch } from '~/services/twitch/calls/getIdFromTwitch';
+import { getIdFromTwitch } from '~/services/twitch/calls/getIdFromTwitch.js';
 
 class Users extends Core {
   constructor () {
@@ -74,7 +74,7 @@ class Users extends Core {
       const duplicates = await AppDataSource.getRepository(User).find({ where: { userName } });
       await Promise.all(duplicates.map(async (user) => {
         try {
-          const twitch = ( await import('./services/twitch')).default;
+          const twitch = ( await import('./services/twitch.js')).default;
           const getUserById = await twitch.apiClient?.asIntent(['bot'], ctx => ctx.users.getUserById(user.userId));
           if (!getUserById) {
             throw new Error('unknown');
@@ -445,7 +445,7 @@ class Users extends Core {
 
         const viewers = await query.getRawMany();
 
-        const levels = require('~/systems/levels').default;
+        const levels = (await import('~/systems/levels.js')).default;
         for (const viewer of viewers) {
           // add level to user
           viewer.extra = JSON.parse(viewer.extra);

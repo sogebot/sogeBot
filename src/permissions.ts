@@ -1,19 +1,18 @@
-import { AppDataSource } from '~/database';
-
-import Core from '~/_interface';
-import { Permissions as PermissionsEntity } from '~/database/entity/permissions';
-import { User } from '~/database/entity/user';
-import { command, default_permission } from '~/decorators';
-import { onStartup } from '~/decorators/on';
-import Expects from '~/expects';
-import { prepare } from '~/helpers/commons';
-import { error } from '~/helpers/log';
-import { get } from '~/helpers/permissions/get';
-import { defaultPermissions } from '~/helpers/permissions/defaultPermissions';
-import { check } from '~/helpers/permissions/check';
-import { adminEndpoint } from '~/helpers/socket';
+import Core from '~/_interface.js';
+import { Permissions as PermissionsEntity } from '~/database/entity/permissions.js';
+import { User } from '~/database/entity/user.js';
+import { AppDataSource } from '~/database.js';
+import { onStartup } from '~/decorators/on.js';
+import { command, default_permission } from '~/decorators.js';
+import { Expects } from  '~/expects.js';
+import { prepare } from '~/helpers/commons/index.js';
+import { error } from '~/helpers/log.js';
+import { check } from '~/helpers/permissions/check.js';
+import { defaultPermissions } from '~/helpers/permissions/defaultPermissions.js';
+import { get } from '~/helpers/permissions/get.js';
+import { adminEndpoint } from '~/helpers/socket.js';
 import * as changelog from '~/helpers/user/changelog.js';
-import users from '~/users';
+import users from '~/users.js';
 
 class Permissions extends Core {
   @onStartup()

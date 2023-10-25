@@ -3,12 +3,12 @@ import { Session } from 'node:inspector';
 import { normalize } from 'node:path';
 import { gzip } from 'zlib';
 
-import { MINUTE } from '@sogebot/ui-helpers/constants';
+import { MINUTE } from '@sogebot/ui-helpers/constants.js';
 import { v4 } from 'uuid';
 
-import { logEmitter as log } from './log/emitter';
+import { logEmitter as log } from './log/emitter.js';
 
-import { variables } from '~/watchers';
+import { variables } from '~/watchers.js';
 
 const execCommands = {
   'profiler.5': async () => {

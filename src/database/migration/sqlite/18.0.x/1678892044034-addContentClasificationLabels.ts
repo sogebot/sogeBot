@@ -1,6 +1,6 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-import { insertItemIntoTable } from '~/database/insertItemIntoTable';
+import { insertItemIntoTable } from '~/database/insertItemIntoTable.js';
 
 export class addContentClasificationLabels1678892044034 implements MigrationInterface {
   name = 'addContentClasificationLabels1678892044034';

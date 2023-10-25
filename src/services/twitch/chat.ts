@@ -1,54 +1,54 @@
 import util from 'util';
 
-import type { EmitData } from '@entity/alert';
-import { Currency } from '@entity/user';
-import * as constants from '@sogebot/ui-helpers/constants';
-import { dayjs } from '@sogebot/ui-helpers/dayjsHelper';
-import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized';
+import type { EmitData } from '@entity/alert.js';
+import { Currency } from '@entity/user.js';
+import * as constants from '@sogebot/ui-helpers/constants.js';
+import { dayjs } from '@sogebot/ui-helpers/dayjsHelper.js';
+import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized.js';
 import {
   ChatClient, ChatCommunitySubInfo, ChatSubGiftInfo, ChatSubInfo, ChatUser,
 } from '@twurple/chat';
-import { isNil } from 'lodash';
+import { isNil } from 'lodash-es';
 
-import addModerator from './calls/addModerator';
-import banUser from './calls/banUser';
-import deleteChatMessages from './calls/deleteChatMessages';
-import getUserByName from './calls/getUserByName';
-import sendWhisper from './calls/sendWhisper';
-import { CustomAuthProvider } from './token/CustomAuthProvider';
+import addModerator from './calls/addModerator.js';
+import banUser from './calls/banUser.js';
+import deleteChatMessages from './calls/deleteChatMessages.js';
+import getUserByName from './calls/getUserByName.js';
+import sendWhisper from './calls/sendWhisper.js';
+import { CustomAuthProvider } from './token/CustomAuthProvider.js';
 
-import { timer } from '~/decorators';
 import {
   getFunctionList,
-} from '~/decorators/on';
-import * as hypeTrain from '~/helpers/api/hypeTrain';
-import { sendMessage } from '~/helpers/commons/sendMessage';
-import { mainCurrency } from '~/helpers/currency';
-import exchange from '~/helpers/currency/exchange';
-import { isDebugEnabled } from '~/helpers/debug';
-import { eventEmitter } from '~/helpers/events';
+} from '~/decorators/on.js';
+import { timer } from '~/decorators.js';
+import * as hypeTrain from '~/helpers/api/hypeTrain.js';
+import { sendMessage } from '~/helpers/commons/sendMessage.js';
+import exchange from '~/helpers/currency/exchange.js';
+import { mainCurrency } from '~/helpers/currency/index.js';
+import { isDebugEnabled } from '~/helpers/debug.js';
+import { eventEmitter } from '~/helpers/events/index.js';
 import {
   triggerInterfaceOnMessage, triggerInterfaceOnSub,
-} from '~/helpers/interface/triggers';
-import emitter from '~/helpers/interfaceEmitter';
-import { warning, tip } from '~/helpers/log';
+} from '~/helpers/interface/triggers.js';
+import emitter from '~/helpers/interfaceEmitter.js';
+import { warning, tip } from '~/helpers/log.js';
 import {
   chatIn, debug, error, info, resub, sub, subcommunitygift, subgift, whisperIn,
-} from '~/helpers/log';
-import { linesParsedIncrement, setStatus } from '~/helpers/parser';
-import { tmiEmitter } from '~/helpers/tmi';
-import { isOwner } from '~/helpers/user';
+} from '~/helpers/log.js';
+import { linesParsedIncrement, setStatus } from '~/helpers/parser.js';
+import { tmiEmitter } from '~/helpers/tmi/index.js';
 import * as changelog from '~/helpers/user/changelog.js';
-import getNameById from '~/helpers/user/getNameById';
-import { isBot, isBotId } from '~/helpers/user/isBot';
-import { isIgnored, isIgnoredSafe } from '~/helpers/user/isIgnored';
-import eventlist from '~/overlays/eventlist';
-import { Parser } from '~/parser';
-import alerts from '~/registries/alerts';
-import { translate } from '~/translate';
-import users from '~/users';
-import { variables } from '~/watchers';
-import joinpart from '~/widgets/joinpart';
+import getNameById from '~/helpers/user/getNameById.js';
+import { isOwner } from '~/helpers/user/index.js';
+import { isBot, isBotId } from '~/helpers/user/isBot.js';
+import { isIgnored, isIgnoredSafe } from '~/helpers/user/isIgnored.js';
+import eventlist from '~/overlays/eventlist.js';
+import { Parser } from '~/parser.js';
+import alerts from '~/registries/alerts.js';
+import { translate } from '~/translate.js';
+import users from '~/users.js';
+import { variables } from '~/watchers.js';
+import joinpart from '~/widgets/joinpart.js';
 
 let _connected_channel = '';
 
@@ -110,15 +110,8 @@ class Chat {
       }
     });
     tmiEmitter.on('say', async (channel, message, opts) => {
-      if ((global as any).mocha) {
+      if (typeof (global as any).it === 'function') {
         return;
-      }
-      debug('emitter.say', JSON.stringify({ channel, message, opts }));
-
-      if (this.client.bot) {
-        await this.client.bot.say(channel, message, opts);
-      } else {
-        throw new Error('Bot client is not available.');
       }
     });
     tmiEmitter.on('whisper', async (username, message) => {
@@ -146,7 +139,7 @@ class Chat {
   }
 
   async initClient (type: 'bot' | 'broadcaster') {
-    if ((global as any).mocha) {
+    if (typeof (global as any).it === 'function') {
       // do nothing if tests
       warning('initClient disabled due to mocha test run.');
       return;
@@ -811,7 +804,7 @@ class Chat {
     }
 
     // trigger plugins
-    (await import('../../plugins')).default.trigger('message', message, userstate);
+    (await import('../../plugins.js')).default.trigger('message', message, userstate);
 
     if (!skip && !isNil(userName)) {
       const user = await changelog.get(userstate.userId);

@@ -1,4 +1,4 @@
-import type { UIError } from '~/../d.ts/src/helpers/panel/alerts';
+import type { UIError } from '~/../d.ts/src/helpers/panel/alerts.js';
 
 const warns: UIError[] = [];
 const errors: UIError[] = [];

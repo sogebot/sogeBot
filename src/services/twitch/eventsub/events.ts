@@ -1,6 +1,6 @@
-import { isEqual } from 'lodash';
+import { isEqual } from 'lodash-es';
 
-import { debug } from '~/helpers/log';
+import { debug } from '~/helpers/log.js';
 
 const events: Record<string, any>[] = [];
 export function isAlreadyProcessed(event: Record<string, any>) {

@@ -1,14 +1,12 @@
 /* global */
-const assert = require('assert');
+import assert from 'assert';
 
-require('../../general.js');
-const { Keyword, KeywordGroup, KeywordResponses } = require('../../../dest/database/entity/keyword');
-const { prepare } = (require('../../../dest/helpers/commons/prepare'));
-const { defaultPermissions } = require('../../../dest/helpers/permissions/defaultPermissions');
-const keywords = (require('../../../dest/systems/keywords')).default;
-const db = require('../../general.js').db;
-const message = require('../../general.js').message;
-const user = require('../../general.js').user;
+import('../../general.js');
+import { Keyword, KeywordGroup, KeywordResponses } from '../../../dest/database/entity/keyword.js';
+import { prepare } from '../../../dest/helpers/commons/prepare.js';
+import { defaultPermissions } from '../../../dest/helpers/permissions/defaultPermissions.js';
+import keywords from '../../../dest/systems/keywords.js';
+import { db, message, user } from '../../general.js';
 
 describe('Keywords - @func3 - #4860 - keywords group permissions and filter should be considered', () => {
   before(async () => {
@@ -185,8 +183,8 @@ describe('Keywords - @func3 - #4860 - keywords group permissions and filter shou
     before(() => {
       message.prepare();
     });
-    it('set $game to Test', () => {
-      const stats = require('../../../dest/helpers/api').stats;
+    it('set $game to Test', async () => {
+      const {stats} = await import('../../../dest/helpers/api/stats.js');
       stats.value.currentGame = 'Test';
     });
     it('!testfilter keywords should not be triggered', async () => {
@@ -199,8 +197,8 @@ describe('Keywords - @func3 - #4860 - keywords group permissions and filter shou
     before(() => {
       message.prepare();
     });
-    it('set $game to Dota 2', () => {
-      const stats = require('../../../dest/helpers/api').stats;
+    it('set $game to Dota 2', async () => {
+      const {stats} = await import('../../../dest/helpers/api/stats.js');
       stats.value.currentGame = 'Dota 2';
     });
     it('!testfilter keywords should be triggered', async () => {

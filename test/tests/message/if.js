@@ -1,10 +1,9 @@
 /* global describe it beforeEach */
-require('../../general.js');
+import('../../general.js');
 
-const db = require('../../general.js').db;
-const msg = require('../../general.js').message;
-const Message = require('../../../dest/message').default;
-const assert = require('assert');
+import { db, message as msg } from '../../general.js';
+import {Message} from '../../../dest/message.js';
+import assert from 'assert';
 
 describe('Message - if filter - @func3', () => {
   beforeEach(async () => {

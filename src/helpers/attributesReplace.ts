@@ -1,7 +1,7 @@
-import { Events } from '@entity/event';
+import { Events } from '@entity/event.js';
 
-import twitch from '../services/twitch';
-import { flatten } from './flatten';
+import { flatten } from './flatten.js';
+import twitch from '../services/twitch.js';
 
 const attributesReplace = (attributes: Events.Attributes, replaceIn: string) => {
   const atUsername = twitch.showWithAt;

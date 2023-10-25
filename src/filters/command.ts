@@ -1,12 +1,12 @@
-import { parserReply } from '../commons';
-import Parser from '../parser';
-import alias from '../systems/alias';
-import customcommands from '../systems/customcommands';
+import { parserReply } from '../commons.js';
+import { Parser } from '../parser.js';
+import alias from '../systems/alias.js';
+import customcommands from '../systems/customcommands.js';
 
-import type { ResponseFilter } from '.';
+import type { ResponseFilter } from './index.js';
 
-import { getCountOfCommandUsage } from '~/helpers/commands/count';
-import { debug, error } from '~/helpers/log';
+import { getCountOfCommandUsage } from '~/helpers/commands/count.js';
+import { debug, error } from '~/helpers/log.js';
 
 const command: ResponseFilter = {
   '$count(\'#\')': async function (filter: string) {

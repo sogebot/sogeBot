@@ -1,6 +1,6 @@
-import type { ResponseFilter } from '.';
+import type { ResponseFilter } from './index.js';
 
-import { isStreamOnline } from '~/helpers/api';
+import { isStreamOnline } from '~/helpers/api/index.js';
 
 const online: ResponseFilter = {
   '(onlineonly)': async function () {

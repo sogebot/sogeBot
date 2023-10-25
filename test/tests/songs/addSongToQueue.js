@@ -1,17 +1,17 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
+
 /* global */
-const assert = require('assert');
-const { AppDataSource } = require('../../../dest/database');
+import assert from 'assert';
+import { AppDataSource } from '../../../dest/database.js'
 
-const { SongRequest, SongPlaylist } = require('../../../dest/database/entity/song');
-const user = require('../../general.js').user;
-const db = require('../../general.js').db;
-const message = require('../../general.js').message;
+import { SongRequest, SongPlaylist } from '../../../dest/database/entity/song.js';
+import { user } from '../../general.js';
+import { db } from '../../general.js';
+import { message } from '../../general.js';
 
-let songs;
 describe('Songs - addSongToQueue() - @func1', () => {
-  before(() => {
-    songs = (require('../../../dest/systems/songs')).default;
+  let songs;
+  before(async () => {
+    songs = (await import('../../../dest/systems/songs.js')).default;
   });
   describe('Add music song by videoId', () => {
     before(async () => {

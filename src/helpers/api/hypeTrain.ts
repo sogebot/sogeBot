@@ -1,4 +1,4 @@
-import { eventEmitter } from '../events';
+import { eventEmitter } from '../events/index.js';
 
 let latestLevel = 1 as number;
 let total = 0;

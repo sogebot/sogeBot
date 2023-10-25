@@ -1,56 +1,56 @@
 import { setTimeout } from 'timers'; // tslint workaround
 
-import { sample } from '@sogebot/ui-helpers/array';
-import { dayjs } from '@sogebot/ui-helpers/dayjsHelper';
-import { generateUsername } from '@sogebot/ui-helpers/generateUsername';
-import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized';
+import { sample } from '@sogebot/ui-helpers/array.js';
+import { dayjs } from '@sogebot/ui-helpers/dayjsHelper.js';
+import { generateUsername } from '@sogebot/ui-helpers/generateUsername.js';
+import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized.js';
 import _, {
   clone, cloneDeep, get, isNil, random,
-} from 'lodash';
+} from 'lodash-es';
 import { VM }  from 'vm2';
 
-import twitch from './services/twitch';
+import twitch from './services/twitch.js';
 
-import Core from '~/_interface';
-import { parserReply } from '~/commons';
-import { AppDataSource } from '~/database';
+import Core from '~/_interface.js';
+import { parserReply } from '~/commons.js';
 import {
   Event, EventInterface, Events as EventsEntity,
-} from '~/database/entity/event';
-import { User } from '~/database/entity/user';
-import { onStreamEnd } from '~/decorators/on';
-import events from '~/events';
-import { isStreamOnline, rawStatus, stats, streamStatusChangeSince } from '~/helpers/api';
-import { attributesReplace } from '~/helpers/attributesReplace';
+} from '~/database/entity/event.js';
+import { User } from '~/database/entity/user.js';
+import { AppDataSource } from '~/database.js';
+import { onStreamEnd } from '~/decorators/on.js';
+import events from '~/events.js';
+import { isStreamOnline, rawStatus, stats, streamStatusChangeSince } from '~/helpers/api/index.js';
+import { attributesReplace } from '~/helpers/attributesReplace.js';
 import {
   announce, getOwner, getUserSender, isUUID, prepare,
-} from '~/helpers/commons';
-import { mainCurrency } from '~/helpers/currency';
+} from '~/helpers/commons/index.js';
+import { mainCurrency } from '~/helpers/currency/index.js';
 import {
   getAll, getValueOf, setValueOf,
-} from '~/helpers/customvariables';
-import { isDbConnected } from '~/helpers/database';
-import { eventEmitter } from '~/helpers/events/emitter';
-import { fireRunCommand } from '~/helpers/events/run-command';
-import emitter from '~/helpers/interfaceEmitter';
+} from '~/helpers/customvariables/index.js';
+import { isDbConnected } from '~/helpers/database.js';
+import { eventEmitter } from '~/helpers/events/emitter.js';
+import { fireRunCommand } from '~/helpers/events/run-command.js';
+import emitter from '~/helpers/interfaceEmitter.js';
 import {
   debug, error, info, warning,
-} from '~/helpers/log';
-import { addUIError } from '~/helpers/panel/index';
-import { adminEndpoint } from '~/helpers/socket';
-import { tmiEmitter } from '~/helpers/tmi';
+} from '~/helpers/log.js';
+import { addUIError } from '~/helpers/panel/index.js';
+import { adminEndpoint } from '~/helpers/socket.js';
+import { tmiEmitter } from '~/helpers/tmi/index.js';
+import * as changelog from '~/helpers/user/changelog.js';
 import {
   isOwner, isSubscriber, isVIP,
-} from '~/helpers/user';
-import * as changelog from '~/helpers/user/changelog.js';
-import { isBot, isBotSubscriber } from '~/helpers/user/isBot';
-import { isBroadcaster } from '~/helpers/user/isBroadcaster';
-import { isModerator } from '~/helpers/user/isModerator';
-import { createClip } from '~/services/twitch/calls/createClip';
-import { getCustomRewards } from '~/services/twitch/calls/getCustomRewards';
-import { getIdFromTwitch } from '~/services/twitch/calls/getIdFromTwitch';
-import { updateChannelInfo } from '~/services/twitch/calls/updateChannelInfo';
-import { variables } from '~/watchers';
+} from '~/helpers/user/index.js';
+import { isBot, isBotSubscriber } from '~/helpers/user/isBot.js';
+import { isBroadcaster } from '~/helpers/user/isBroadcaster.js';
+import { isModerator } from '~/helpers/user/isModerator.js';
+import { createClip } from '~/services/twitch/calls/createClip.js';
+import { getCustomRewards } from '~/services/twitch/calls/getCustomRewards.js';
+import { getIdFromTwitch } from '~/services/twitch/calls/getIdFromTwitch.js';
+import { updateChannelInfo } from '~/services/twitch/calls/updateChannelInfo.js';
+import { variables } from '~/watchers.js';
 
 const excludedUsers = new Set<string>();
 
@@ -343,7 +343,7 @@ class Events extends Core {
       }
 
       if (operation.replay) {
-        require('~/overlays/clips').default.showClip(cid);
+        (await import('~/overlays/clips.js')).default.showClip(cid);
       }
       info('Clip was created successfully');
       return cid;

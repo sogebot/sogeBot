@@ -1,2 +1,2 @@
-export * from './enabled';
-export * from './triggers';
+export * from './enabled.js';
+export * from './triggers.js';

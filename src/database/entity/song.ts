@@ -1,12 +1,12 @@
 import { BeforeInsert, Column, Entity, PrimaryColumn } from 'typeorm';
-import { BotEntity } from '../BotEntity';
+import { BotEntity } from '../BotEntity.js';
 
 export type currentSongType = {
   videoId: null | string, title: string, type: string, username: string, volume: number; loudness: number; forceVolume: boolean; startTime: number; endTime: number;
 };
 
 @Entity()
-export class SongBan extends BotEntity<SongBan> {
+export class SongBan extends BotEntity {
   @PrimaryColumn()
     videoId: string;
 
@@ -15,7 +15,7 @@ export class SongBan extends BotEntity<SongBan> {
 }
 
 @Entity()
-export class SongPlaylist extends BotEntity<SongPlaylist> {
+export class SongPlaylist extends BotEntity {
   @PrimaryColumn()
     videoId: string;
 
@@ -51,7 +51,7 @@ export class SongPlaylist extends BotEntity<SongPlaylist> {
 }
 
 @Entity()
-export class SongRequest extends BotEntity<SongRequest> {
+export class SongRequest extends BotEntity {
   @PrimaryColumn({ generated: 'uuid' })
     id: string;
 

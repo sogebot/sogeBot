@@ -1,7 +1,8 @@
-import { Variable } from '@entity/variable';
-import { AppDataSource } from '~/database';
+import { Variable } from '@entity/variable.js';
 
-import { getValueOf } from './getValueOf';
+import { getValueOf } from './getValueOf.js';
+
+import { AppDataSource } from '~/database.js';
 
 async function getURL(req: any, res: any) {
   try {

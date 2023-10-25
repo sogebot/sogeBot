@@ -1,15 +1,15 @@
 /* global describe it before */
 
-require('../../general.js');
+import('../../general.js');
 
-const db = require('../../general.js').db;
-const message = require('../../general.js').message;
-const assert = require('assert');
-const { AppDataSource } = require('../../../dest/database.js');
+import { db } from '../../general.js';
+import { message } from '../../general.js';
+import assert from 'assert';
+import { AppDataSource } from '../../../dest/database.js';
 
-const { User } = require('../../../dest/database/entity/user');
+import { User } from '../../../dest/database/entity/user.js';
 
-const points = (require('../../../dest/systems/points')).default;
+import points from '../../../dest/systems/points.js';
 
 const owner = { userId: String(Math.floor(Math.random() * 100000)), userName: '__broadcaster__' };
 const user1 = { userId: String(Math.floor(Math.random() * 100000)), userName: 'user1', points: 100 };

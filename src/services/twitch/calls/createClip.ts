@@ -1,21 +1,21 @@
-import { defaults } from 'lodash';
+import { defaults } from 'lodash-es';
 
-import { TwitchClips } from '../../../database/entity/twitch';
-import { debug, error, warning } from '../../../helpers/log';
+import { TwitchClips } from '../../../database/entity/twitch.js';
+import { debug, error, warning } from '../../../helpers/log.js';
 
-import { AppDataSource } from '~/database';
-import { isStreamOnline } from '~/helpers/api';
-import { isDebugEnabled } from '~/helpers/debug';
-import { getFunctionName } from '~/helpers/getFunctionName';
-import twitch from '~/services/twitch';
-import { variables } from '~/watchers';
+import { AppDataSource } from '~/database.js';
+import { isStreamOnline } from '~/helpers/api/index.js';
+import { isDebugEnabled } from '~/helpers/debug.js';
+import { getFunctionName } from '~/helpers/getFunctionName.js';
+import twitch from '~/services/twitch.js';
+import { variables } from '~/watchers.js';
 
-export async function createClip (opts: { createAfterDelay: boolean }) {
+export async function createClip (opts: { createAfterDelay: boolean }): Promise<string | null> {
   if (isDebugEnabled('api.calls')) {
     debug('api.calls', new Error().stack);
   }
   if (!(isStreamOnline.value)) {
-    return;
+    return null;
   } // do nothing if stream is offline
 
   const isClipChecked = async function (id: string) {
@@ -51,7 +51,7 @@ export async function createClip (opts: { createAfterDelay: boolean }) {
     if (e instanceof Error) {
       if (e.message.includes('ETIMEDOUT')) {
         warning(`${getFunctionName()} => Connection to Twitch timed out. Will retry request.`);
-        return { state: false }; // ignore etimedout error
+        return null;
       }
       error(`${getFunctionName()} => ${e.stack ?? e.message}`);
     }

@@ -1,22 +1,22 @@
-import * as constants from '@sogebot/ui-helpers/constants';
-import _ from 'lodash';
+import * as constants from '@sogebot/ui-helpers/constants.js';
+import { flatMap, sortBy, isFunction, isNil, orderBy } from 'lodash-es';
 import { v4 as uuid } from 'uuid';
 
-import { getUserSender } from './helpers/commons';
-import { list } from './helpers/register';
-import getBotId from './helpers/user/getBotId';
-import getBotUserName from './helpers/user/getBotUserName';
+import { getUserSender } from './helpers/commons/index.js';
+import { list } from './helpers/register.js';
+import getBotId from './helpers/user/getBotId.js';
+import getBotUserName from './helpers/user/getBotUserName.js';
 
-import { PermissionCommands } from '~/database/entity/permissions';
+import { PermissionCommands } from '~/database/entity/permissions.js';
 import { timer } from '~/decorators.js';
-import { incrementCountOfCommandUsage } from '~/helpers/commands/count';
+import { incrementCountOfCommandUsage } from '~/helpers/commands/count.js';
 import {
   debug, error, info, warning,
-} from '~/helpers/log';
-import { parserEmitter } from '~/helpers/parser/emitter';
-import { check } from '~/helpers/permissions/check';
-import { getCommandPermission } from '~/helpers/permissions/getCommandPermission';
-import { translate } from '~/translate';
+} from '~/helpers/log.js';
+import { parserEmitter } from '~/helpers/parser/emitter.js';
+import { check } from '~/helpers/permissions/check.js';
+import { getCommandPermission } from '~/helpers/permissions/getCommandPermission.js';
+import { translate } from '~/translate.js';
 
 parserEmitter.on('process', async (opts, cb) => {
   cb(await (new Parser(opts)).process());
@@ -28,7 +28,7 @@ parserEmitter.on('fireAndForget', async (opts) => {
   });
 });
 
-class Parser {
+export class Parser {
   id = uuid();
   started_at = Date.now();
   message = '';
@@ -129,7 +129,7 @@ class Parser {
     for (const parser of parsers.filter(o => !o.fireAndForget && o.priority !== constants.MODERATION)) {
       if (
         !(this.skip && parser.skippable) // parser is not fully skippable
-        && (_.isNil(this.sender) // if user is null -> we are running command through a bot
+        && (isNil(this.sender) // if user is null -> we are running command through a bot
           || this.skip
           || (await check(this.sender.userId, parser.permission, false)).access)
       ) {
@@ -193,11 +193,11 @@ class Parser {
   async parsers () {
     let parsers: any[] = [];
     for (let i = 0, length = list().length; i < length; i++) {
-      if (_.isFunction(list()[i].parsers)) {
+      if (isFunction(list()[i].parsers)) {
         parsers.push(list()[i].parsers());
       }
     }
-    parsers = _.orderBy(_.flatMap(await Promise.all(parsers)), 'priority', 'asc');
+    parsers = orderBy(flatMap(await Promise.all(parsers)), 'priority', 'asc');
     return parsers;
   }
 
@@ -210,11 +210,11 @@ class Parser {
   async rollbacks () {
     const rollbacks: any[] = [];
     for (let i = 0, length = list().length; i < length; i++) {
-      if (_.isFunction(list()[i].rollbacks)) {
+      if (isFunction(list()[i].rollbacks)) {
         rollbacks.push(list()[i].rollbacks());
       }
     }
-    return _.flatMap(await Promise.all(rollbacks));
+    return flatMap(await Promise.all(rollbacks));
   }
 
   /**
@@ -254,11 +254,11 @@ class Parser {
   async getCommandsList () {
     let commands: any[] = [];
     for (let i = 0, length = list().length; i < length; i++) {
-      if (_.isFunction(list()[i].commands)) {
+      if (isFunction(list()[i].commands)) {
         commands.push(list()[i].commands());
       }
     }
-    commands = _(await Promise.all(commands)).flatMap().sortBy(o => -o.command.length).value();
+    commands = sortBy(flatMap(await Promise.all(commands)), (o => -o.command.length));
     for (const command of commands) {
       const permission = await PermissionCommands.findOneBy({ name: command.id });
       if (permission) {
@@ -279,7 +279,7 @@ class Parser {
     } // do nothing, this is not a command or user is ignored
     const command = await this.find(message, null);
     debug('parser.command', { command });
-    if (_.isNil(command)) {
+    if (isNil(command)) {
       return [];
     } // command not found, do nothing
     if (command.permission === null) {
@@ -288,7 +288,7 @@ class Parser {
     } // command is disabled
 
     if (
-      _.isNil(this.sender) // if user is null -> we are running command through a bot
+      isNil(this.sender) // if user is null -> we are running command through a bot
       || disablePermissionCheck
       || this.skip
       || (await check(this.sender.userId, command.permission, false)).access
@@ -310,11 +310,11 @@ class Parser {
         },
       };
 
-      if (_.isNil(command.id)) {
+      if (isNil(command.id)) {
         throw Error(`command id is missing from ${command.fnc}`);
       }
 
-      if (typeof command.fnc === 'function' && !_.isNil(command.id)) {
+      if (typeof command.fnc === 'function' && !isNil(command.id)) {
         incrementCountOfCommandUsage(command.command);
         debug('parser.command', 'Running ' + command.command);
         const responses = command.fnc.apply(command.this, [opts]) as CommandResponse[];
@@ -351,6 +351,3 @@ class Parser {
     }
   }
 }
-
-export default Parser;
-export { Parser };

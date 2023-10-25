@@ -1,9 +1,9 @@
 import * as express from 'express';
 import * as jwt from 'jsonwebtoken';
 
-import { UnauthorizedError } from '../errors';
+import { UnauthorizedError } from '../errors.js';
 
-export function expressAuthentication(
+export async function expressAuthentication(
   req: express.Request,
   securityName: string,
   scopes?: any,
@@ -18,7 +18,7 @@ export function expressAuthentication(
     if (authType !== 'Bearer') {
       return Promise.reject(new UnauthorizedError('Expected a Bearer token'));
     }
-    const JWTKey = require('../../socket').default.JWTKey;
+    const JWTKey = (await import('../../socket.js')).default.JWTKey;
     const validatedToken = jwt.verify(token, JWTKey) as {
       userId: string; username: string; privileges: any;
     };

@@ -1,40 +1,42 @@
 // 3rdparty libraries
 
-import { Alias } from '@entity/alias';
-import { ModerationPermit, ModerationWarning } from '@entity/moderation';
-import * as constants from '@sogebot/ui-helpers/constants';
-import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized';
+import { Alias } from '@entity/alias.js';
+import { ModerationPermit, ModerationWarning } from '@entity/moderation.js';
+import * as constants from '@sogebot/ui-helpers/constants.js';
+import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized.js';
 import emojiRegex from 'emoji-regex';
-import * as _ from 'lodash';
-import tlds from 'tlds';
+import { TLDs } from 'global-tld-list';
+import * as _ from 'lodash-es';
 import { LessThan } from 'typeorm';
 import XRegExp from 'xregexp';
 
-import System from './_interface';
-import { parserReply } from '../commons';
+import System from './_interface.js';
+import { parserReply } from '../commons.js';
 import {
   command, default_permission, parser, permission_settings, settings, ui,
-} from '../decorators';
-import Expects from '../expects';
-import spotify from '../integrations/spotify';
-import Message from '../message';
-import users from '../users';
+} from '../decorators.js';
+import { Expects } from  '../expects.js';
+import spotify from '../integrations/spotify.js';
+import { Message } from  '../message.js';
+import users from '../users.js';
 
-import { AppDataSource } from '~/database';
-import { prepare } from '~/helpers/commons';
+import { AppDataSource } from '~/database.js';
+import { prepare } from '~/helpers/commons/index.js';
 import {
   error, warning as warningLog,
-} from '~/helpers/log';
-import { ParameterError } from '~/helpers/parameterError';
-import defaultPermissions from '~/helpers/permissions/defaultPermissions';
-import { getUserHighestPermission } from '~/helpers/permissions/getUserHighestPermission';
-import { getUserPermissionsList } from '~/helpers/permissions/getUserPermissionsList';
-import { adminEndpoint } from '~/helpers/socket';
-import { tmiEmitter } from '~/helpers/tmi';
-import banUser from '~/services/twitch/calls/banUser';
-import aliasSystem from '~/systems/alias';
-import songs from '~/systems/songs';
-import { translate } from '~/translate';
+} from '~/helpers/log.js';
+import { ParameterError } from '~/helpers/parameterError.js';
+import defaultPermissions from '~/helpers/permissions/defaultPermissions.js';
+import { getUserHighestPermission } from '~/helpers/permissions/getUserHighestPermission.js';
+import { getUserPermissionsList } from '~/helpers/permissions/getUserPermissionsList.js';
+import { adminEndpoint } from '~/helpers/socket.js';
+import { tmiEmitter } from '~/helpers/tmi/index.js';
+import banUser from '~/services/twitch/calls/banUser.js';
+import aliasSystem from '~/systems/alias.js';
+import songs from '~/systems/songs.js';
+import { translate } from '~/translate.js';
+
+const tlds = [...TLDs.tlds.keys()];
 
 const urlRegex = [
   new RegExp(`(www)? ??\\.? ?[a-zA-Z0-9]+([a-zA-Z0-9-]+) ??\\. ?(${tlds.join('|')})(?=\\P{L}|$)`, 'igu'),

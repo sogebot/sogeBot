@@ -1,4 +1,4 @@
-import { variables } from '~/watchers';
+import { variables } from '~/watchers.js';
 
 export function isBroadcaster(user: string | CommandOptions['sender'] | { username: string | null; userId?: number | string } | UserStateTags) {
   const broadcasterUsername = variables.get('services.twitch.broadcasterUsername') as string;

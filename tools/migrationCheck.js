@@ -1,10 +1,9 @@
-const exec = require('child_process').exec;
-const spawn = require('child_process').spawn;
-const execSync = require('child_process').execSync;
+import {exec, spawn } from 'child_process'
 
-require('dotenv').config();
+import dotenv from 'dotenv';
+dotenv.config();
 
-const getMigrationType = require('../dest/helpers/getMigrationType').getMigrationType;
+import { getMigrationType } from '../dest/helpers/getMigrationType.js';
 
 async function test() {
   await new Promise((resolve, reject) => {

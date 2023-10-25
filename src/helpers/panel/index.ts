@@ -1,2 +1,2 @@
-export * from './alerts';
-export * from './socketsConnected';
+export * from './alerts.js';
+export * from './socketsConnected.js';

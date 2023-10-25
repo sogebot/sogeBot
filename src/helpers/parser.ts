@@ -1,4 +1,4 @@
-import * as constants from '@sogebot/ui-helpers/constants';
+import * as constants from '@sogebot/ui-helpers/constants.js';
 
 export let linesParsed = 0;
 export const linesParsedIncrement = () => {

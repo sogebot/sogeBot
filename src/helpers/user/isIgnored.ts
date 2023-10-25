@@ -1,15 +1,15 @@
 import { readFileSync } from 'fs';
 
-import { HOUR } from '@sogebot/ui-helpers/constants';
-import { cloneDeep, isEqual } from 'lodash';
+import { HOUR } from '@sogebot/ui-helpers/constants.js';
+import { cloneDeep, isEqual } from 'lodash-es';
 import fetch from 'node-fetch';
 
+import { isBroadcaster } from './isBroadcaster.js';
 import { timer } from '../../decorators.js';
-import { info } from '../log';
+import { info } from '../log.js';
 import {
   ignorelist, isIgnoredCache,
-} from '../tmi/ignoreList';
-import { isBroadcaster } from './isBroadcaster';
+} from '../tmi/ignoreList.js';
 
 let globalIgnoreList = JSON.parse(readFileSync('./assets/globalIgnoreList.json', 'utf8'));
 

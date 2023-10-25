@@ -1,17 +1,17 @@
 /* global describe it beforeEach */
-require('../../general.js');
+import('../../general.js');
 
-const _ = require('lodash');
-const assert = require('assert');
+import _ from 'lodash-es'
+import assert from 'assert';
 
-const db = require('../../general.js').db;
-const message = require('../../general.js').message;
+import { db } from '../../general.js';
+import { message } from '../../general.js';
 
-const customcommands = (require('../../../dest/systems/customcommands')).default;
-const { defaultPermissions } = require('../../../dest/helpers/permissions/defaultPermissions');
+import customcommands from '../../../dest/systems/customcommands.js';
+import { defaultPermissions } from '../../../dest/helpers/permissions/defaultPermissions.js';
 
-const { User } = require('../../../dest/database/entity/user');
-const { AppDataSource } = require('../../../dest/database.js');
+import { User } from '../../../dest/database/entity/user.js';
+import { AppDataSource } from '../../../dest/database.js';
 
 // users
 const owner = { userName: '__broadcaster__', userId: String(Math.floor(Math.random() * 100000)) };

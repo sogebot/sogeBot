@@ -1,34 +1,34 @@
 import {
   Cooldown as CooldownEntity,
-} from '@entity/cooldown';
-import { Keyword } from '@entity/keyword';
-import * as constants from '@sogebot/ui-helpers/constants';
+} from '@entity/cooldown.js';
+import { Keyword } from '@entity/keyword.js';
+import * as constants from '@sogebot/ui-helpers/constants.js';
 import { validateOrReject } from 'class-validator';
-import _, { merge } from 'lodash';
+import _, { merge } from 'lodash-es';
 import { In } from 'typeorm';
-import { AppDataSource } from '~/database';
 
-import { parserReply } from '../commons';
+import System from './_interface.js';
+import { parserReply } from '../commons.js';
+import { onChange } from '../decorators/on.js';
 import {
   command, default_permission, parser, permission_settings, rollback, settings,
-} from '../decorators';
-import { onChange } from '../decorators/on';
-import Expects from '../expects';
-import Parser from '../parser';
-import System from './_interface';
+} from '../decorators.js';
+import { Expects } from  '../expects.js';
+import { Parser } from '../parser.js';
 
-import { prepare } from '~/helpers/commons';
-import { debug, error } from '~/helpers/log';
-import { app } from '~/helpers/panel';
-import { ParameterError } from '~/helpers/parameterError';
-import { getUserHighestPermission } from '~/helpers/permissions/getUserHighestPermission';
-import defaultPermissions from '~/helpers/permissions/defaultPermissions';
-import { isOwner } from '~/helpers/user';
+import { AppDataSource } from '~/database.js';
+import { prepare } from '~/helpers/commons/index.js';
+import { debug, error } from '~/helpers/log.js';
+import { app } from '~/helpers/panel.js';
+import { ParameterError } from '~/helpers/parameterError.js';
+import defaultPermissions from '~/helpers/permissions/defaultPermissions.js';
+import { getUserHighestPermission } from '~/helpers/permissions/getUserHighestPermission.js';
 import * as changelog from '~/helpers/user/changelog.js';
-import { adminMiddleware } from '~/socket';
-import alias from '~/systems/alias';
-import customCommands from '~/systems/customcommands';
-import { translate } from '~/translate';
+import { isOwner } from '~/helpers/user/index.js';
+import { adminMiddleware } from '~/socket.js';
+import alias from '~/systems/alias.js';
+import customCommands from '~/systems/customcommands.js';
+import { translate } from '~/translate.js';
 
 const cache: { id: string; cooldowns: CooldownEntity[] }[] = [];
 const defaultCooldowns: { name: string; lastRunAt: number, permId: string }[] = [];

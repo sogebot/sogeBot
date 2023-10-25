@@ -1,20 +1,20 @@
-import { Currency, UserTip, UserTipInterface } from '@entity/user';
-import * as constants from '@sogebot/ui-helpers/constants';
+import { Currency, UserTip, UserTipInterface } from '@entity/user.js';
+import * as constants from '@sogebot/ui-helpers/constants.js';
 import axios from 'axios';
-import { AppDataSource } from '~/database';
 
-import { persistent, settings } from '../decorators';
+import Integration from './_interface.js';
 import { onStartup } from '../decorators/on.js';
+import { persistent, settings } from '../decorators.js';
 import eventlist from '../overlays/eventlist.js';
 import alerts from '../registries/alerts.js';
 import users from '../users.js';
-import Integration from './_interface';
 
+import { AppDataSource } from '~/database.js';
 import { isStreamOnline, stats } from '~/helpers/api/index.js';
-import { mainCurrency } from '~/helpers/currency';
-import exchange from '~/helpers/currency/exchange';
-import rates from '~/helpers/currency/rates';
-import { eventEmitter } from '~/helpers/events';
+import exchange from '~/helpers/currency/exchange.js';
+import { mainCurrency } from '~/helpers/currency/index.js';
+import rates from '~/helpers/currency/rates.js';
+import { eventEmitter } from '~/helpers/events/index.js';
 import { triggerInterfaceOnTip } from '~/helpers/interface/triggers.js';
 import {
   error, tip,

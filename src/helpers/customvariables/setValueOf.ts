@@ -1,17 +1,18 @@
-import { Variable } from '@entity/variable';
-import { isNil } from 'lodash';
+import { Variable } from '@entity/variable.js';
+import { isNil } from 'lodash-es';
 
-import { addChangeToHistory } from './addChangeToHistory';
-import { getValueOf } from './getValueOf';
-import { updateWidgetAndTitle } from './updateWidgetAndTitle';
-import users from '../../users';
-import { eventEmitter } from '../events';
-import { warning } from '../log';
-import { check } from '../permissions/check';
-import { defaultPermissions } from '../permissions/defaultPermissions';
-import { get } from '../permissions/get';
-import { getUserHighestPermission } from '../permissions/getUserHighestPermission';
-import { Types } from '~/plugins/ListenTo';
+import { addChangeToHistory } from './addChangeToHistory.js';
+import { getValueOf } from './getValueOf.js';
+import { updateWidgetAndTitle } from './updateWidgetAndTitle.js';
+import users from '../../users.js';
+import { eventEmitter } from '../events/index.js';
+import { warning } from '../log.js';
+import { check } from '../permissions/check.js';
+import { defaultPermissions } from '../permissions/defaultPermissions.js';
+import { get } from '../permissions/get.js';
+import { getUserHighestPermission } from '../permissions/getUserHighestPermission.js';
+
+import { Types } from '~/plugins/ListenTo.js';
 
 async function setValueOf (variable: string | Variable, currentValue: any, opts: any): Promise<{ updated: Variable; isOk: boolean; setValue: string; oldValue: string, isEval: boolean }> {
   const item = typeof variable === 'string'
@@ -26,7 +27,7 @@ async function setValueOf (variable: string | Variable, currentValue: any, opts:
   opts.readOnlyBypass = isNil(opts.readOnlyBypass) ? false : opts.readOnlyBypass;
   // add simple text variable, if not existing
   if (!item) {
-    const newItem = new Variable({
+    const newItem = Variable.create({
       variableName:  variable as string,
       currentValue:  String(currentValue),
       responseType:  0,

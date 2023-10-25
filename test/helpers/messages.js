@@ -1,20 +1,23 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
-const assert = require('assert');
-const util = require('util');
+import assert from 'assert';
+import util from 'util';
 
-const chalk = require('chalk');
-const _ = require('lodash');
-const sinon = require('sinon');
-const until = require('test-until');
+import chalk from 'chalk';
+import _ from 'lodash';
+import sinon from 'sinon';
+import until from 'test-until';
 
 let eventSpy;
 
-const log = require('../../dest/helpers/log');
+import * as log from '../../dest/helpers/log.js';
 
-module.exports = {
-  prepare: function () {
-    const eventEmitter = (require('../../dest/helpers/events/emitter')).eventEmitter;
-    const tmi = (require('../../dest/services/twitch/chat')).default;
+export const prepare = () => {
+  Promise.all([
+    import('../../dest/helpers/events/emitter.js'),
+    import('../../dest/services/twitch/chat.js'),
+  ]).then((imports) => {
+    const eventEmitter = imports[0].eventEmitter;
+    const tmi = imports[1].default;
 
     log.debug('test', chalk.bgRed('*** Restoring all spies ***'));
 
@@ -46,25 +49,12 @@ module.exports = {
       },
     };
 
-    try {
-      sinon.stub(log, 'chatOut');
-    } catch (e) {
-      log.chatOut.reset();
-    }
-
-    try {
-      sinon.stub(log, 'warning');
-    } catch (e) {
-      log.warning.reset();
-    }
-
-    try {
-      sinon.stub(log, 'debug');
-    } catch (e) {
-      log.debug.reset();
-    }
-  },
-  debug: async function (category, expected, waitMs = 5000) {
+    log.chatOut.reset();
+    log.warning.reset();
+    log.debug.reset();
+  })
+}
+  export const debug = async (category, expected, waitMs = 5000) => {
     await until(setError => {
       if (Array.isArray(expected)) {
         for (const ex of expected) {
@@ -82,8 +72,8 @@ module.exports = {
         + log.debug.args.filter(o => o.includes(category)).join('\n-\t'),
       );
     }, waitMs);
-  },
-  isWarnedRaw: async function (entry, user, opts) {
+  }
+  export const isWarnedRaw = async (entry, user, opts) => {
     opts = opts || {};
     await until(async setError => {
       let expected = [];
@@ -110,9 +100,9 @@ module.exports = {
           '\nExpected message:\t"' + JSON.stringify(expected) + '"\nActual message:\t"' + (!_.isNil(log.warning.lastCall) ? log.warning.lastCall.args[0] : '') + '"');
       }
     }, 5000);
-  },
-  isWarned: async function (entry, user, opts) {
-    const { prepare } = require('../../dest/helpers/commons/prepare');
+  }
+  export const isWarned = async (entry, user, opts) => {
+    const { prepare } = await import('../../dest/helpers/commons/prepare.js');
     user = _.cloneDeep(user);
     opts = opts || {};
     await until(async setError => {
@@ -142,9 +132,9 @@ module.exports = {
           '\nExpected message:\t"' + JSON.stringify(expected) + '"\nActual message:\t"' + (!_.isNil(log.warning.lastCall) ? log.warning.lastCall.args[0] : '') + '"');
       }
     }, 5000);
-  },
-  isSent: util.deprecate(async function (entry, user, opts, wait) {
-    const { prepare } = require('../../dest/helpers/commons/prepare');
+  }
+  export const isSent = util.deprecate(async function (entry, user, opts, wait) {
+    const { prepare } = await import('../../dest/helpers/commons/prepare.js');
     if (typeof user === 'string') {
       user = {
         userName: user,
@@ -203,8 +193,8 @@ module.exports = {
         );
       }
     }, wait || 5000);
-  }, 'We should not use isSent as it may cause false positive tests'),
-  sentMessageContain: async function (expected, wait) {
+  }, 'We should not use isSent as it may cause false positive tests')
+  export const sentMessageContain = async (expected, wait) => {
     if (!Array.isArray(expected)) {
       expected = [expected];
     }
@@ -231,8 +221,8 @@ module.exports = {
         );
       }
     }, wait || 5000);
-  },
-  isSentRaw: async function (expected, user, wait) {
+  }
+  export const isSentRaw = async (expected, user, wait) => {
     if (!Array.isArray(expected)) {
       expected = [expected];
     }
@@ -266,8 +256,8 @@ module.exports = {
         );
       }
     }, wait || 5000);
-  },
-  isNotSent: async function (expected, user, wait) {
+  }
+  export const isNotSent = async (expected, user, wait) => {
     if (typeof user === 'string') {
       user = {
         userName: user,
@@ -275,14 +265,14 @@ module.exports = {
     }
     user = _.cloneDeep(user);
     const race = await Promise.race([
-      this.isSent(expected, user, wait * 2),
+      isSent(expected, user, wait * 2),
       new Promise((resolve) => {
         setTimeout(() => resolve(false), wait);
       }),
     ]);
     assert(!race, 'Message was unexpectedly sent ' + expected);
-  },
-  isNotSentRaw: async function (expected, user, wait) {
+  }
+  export const isNotSentRaw = async (expected, user, wait) => {
     if (typeof user === 'string') {
       user = {
         userName: user,
@@ -290,11 +280,10 @@ module.exports = {
     }
     user = _.cloneDeep(user);
     const race = await Promise.race([
-      this.isSentRaw(expected, user, wait * 2),
+      isSentRaw(expected, user, wait * 2),
       new Promise((resolve) => {
         setTimeout(() => resolve(false), wait);
       }),
     ]);
     assert(!race, 'Message was unexpectedly sent ' + expected);
-  },
-};
+  }

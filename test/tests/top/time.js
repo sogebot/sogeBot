@@ -1,17 +1,17 @@
 /* global describe it before */
-const assert = require('assert');
+import assert from 'assert';
 
-require('../../general.js');
-const constants = require('@sogebot/ui-helpers/constants');
+import('../../general.js');
+import constants from '@sogebot/ui-helpers/constants.js';
 
-const { User } = require('../../../dest/database/entity/user');
-const { getOwner } = require('../../../dest/helpers/commons/getOwner');
-const { prepare } = require('../../../dest/helpers/commons/prepare');
-const { AppDataSource } = require('../../../dest/database.js');
-const top = (require('../../../dest/systems/top')).default;
-const db = require('../../general.js').db;
-const message = require('../../general.js').message;
-const twitch = require('../../../dest/services/twitch.js').default;
+import { User } from '../../../dest/database/entity/user.js';
+import { getOwner } from '../../../dest/helpers/commons/getOwner.js';
+import { prepare } from '../../../dest/helpers/commons/prepare.js';
+import { AppDataSource } from '../../../dest/database.js';
+import top from '../../../dest/systems/top.js';
+import { db } from '../../general.js';
+import { message } from '../../general.js';
+import twitch from '../../../dest/services/twitch.js';
 
 // users
 const owner = { userName: '__broadcaster__' };

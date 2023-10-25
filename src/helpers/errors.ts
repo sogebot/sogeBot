@@ -1,5 +1,5 @@
 import { ValidationError } from 'class-validator';
-import { isArray } from 'lodash';
+import { isArray } from 'lodash-es';
 
 export class UnauthorizedError extends Error {}
 export class TokenError extends Error {}

@@ -1,19 +1,19 @@
-import { SECOND } from '@sogebot/ui-helpers/constants';
+import { SECOND } from '@sogebot/ui-helpers/constants.js';
 import { validateOrReject } from 'class-validator';
-import merge from 'lodash/merge';
+import { merge } from 'lodash-es';
 
-import { Plugin, PluginVariable } from './database/entity/plugins';
-import { isValidationError } from './helpers/errors';
-import { eventEmitter } from './helpers/events';
-import { debug, error } from './helpers/log';
-import { app } from './helpers/panel';
-import { setImmediateAwait } from './helpers/setImmediateAwait';
-import { adminEndpoint, publicEndpoint } from './helpers/socket';
-import { Types } from './plugins/ListenTo';
-import { runScriptInSandbox, transpiledFiles } from './plugins/Sandbox';
+import { Plugin, PluginVariable } from './database/entity/plugins.js';
+import { isValidationError } from './helpers/errors.js';
+import { eventEmitter } from './helpers/events/index.js';
+import { debug, error } from './helpers/log.js';
+import { app } from './helpers/panel.js';
+import { setImmediateAwait } from './helpers/setImmediateAwait.js';
+import { adminEndpoint, publicEndpoint } from './helpers/socket.js';
+import { Types } from './plugins/ListenTo.js';
+import { runScriptInSandbox, transpiledFiles } from './plugins/Sandbox.js';
 
-import Core from '~/_interface';
-import { onStartup } from '~/decorators/on';
+import Core from '~/_interface.js';
+import { onStartup } from '~/decorators/on.js';
 
 const plugins: Plugin[] = [];
 
@@ -50,7 +50,7 @@ class Plugins extends Core {
     });
 
     eventEmitter.on('tip', async (data) => {
-      const users = (await import('./users')).default;
+      const users = (await import('./users.js')).default;
       const user = {
         userName: data.userName,
         userId:   !data.isAnonymous ? await users.getIdByName(data.userName) : '0',
@@ -77,7 +77,7 @@ class Plugins extends Core {
     });
 
     const commonHandler = async <T extends { [x:string]: any, userName: string }>(event: Types, data: T) => {
-      const users = (await import('./users')).default;
+      const users = (await import('./users.js')).default;
       const { userName, ...parameters } = data;
       const user = {
         userName,

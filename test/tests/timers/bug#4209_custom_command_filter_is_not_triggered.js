@@ -1,20 +1,20 @@
 /* global describe it beforeEach */
 
 
-const assert = require('assert');
-const { AppDataSource } = require('../../../dest/database.js');
-require('../../general.js');
+import assert from 'assert';
+import { AppDataSource } from '../../../dest/database.js';
+import('../../general.js');
 
-const db = require('../../general.js').db;
-const message = require('../../general.js').message;
+import { db } from '../../general.js';
+import { message } from '../../general.js';
 
-const timers = (require('../../../dest/systems/timers')).default;
-const customcommands = (require('../../../dest/systems/customcommands')).default;
-const isStreamOnline = (require('../../../dest/helpers/api/isStreamOnline')).isStreamOnline;
+import timers from '../../../dest/systems/timers.js';
+import customcommands from '../../../dest/systems/customcommands.js';
+import { isStreamOnline } from '../../../dest/helpers/api/isStreamOnline.js'
 
-const { Timer, TimerResponse } = require('../../../dest/database/entity/timer');
+import { Timer, TimerResponse } from '../../../dest/database/entity/timer.js';
 
-const { linesParsed } = require('../../../dest/helpers/parser');
+import { linesParsed } from '../../../dest/helpers/parser.js';
 
 // users
 const owner = { userName: '__broadcaster__' };

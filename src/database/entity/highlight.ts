@@ -1,8 +1,8 @@
 import { BeforeInsert, Column, Entity, PrimaryColumn } from 'typeorm';
-import { BotEntity } from '../BotEntity';
+import { BotEntity } from '../BotEntity.js';
 
 @Entity()
-export class Highlight extends BotEntity<Highlight> {
+export class Highlight extends BotEntity {
   @PrimaryColumn({ generated: 'uuid', type: 'uuid' })
     id: string;
 

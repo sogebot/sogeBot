@@ -1,11 +1,9 @@
-const assert = require('assert');
+import assert from 'assert';
 
-require('../../general.js');
+import('../../general.js');
 
-const runScript = (require('../../../dest/helpers/customvariables/runScript')).runScript;
-const db = require('../../general.js').db;
-const message = require('../../general.js').message;
-const user = require('../../general.js').user;
+import { runScript } from '../../../dest/helpers/customvariables/runScript.js';
+import { db, message, user } from '../../general.js';
 
 describe('Custom Variable - Return random user - @func1', () => {
   let result = '';

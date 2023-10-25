@@ -1,36 +1,34 @@
-'use strict';
-
-import { User, UserInterface } from '@entity/user';
-import { MINUTE, SECOND } from '@sogebot/ui-helpers/constants';
-import { format } from '@sogebot/ui-helpers/number';
+import { User, UserInterface } from '@entity/user.js';
+import { MINUTE, SECOND } from '@sogebot/ui-helpers/constants.js';
+import { format } from '@sogebot/ui-helpers/number.js';
 import { evaluate as mathJsEvaluate, round } from 'mathjs';
-import { AppDataSource } from '~/database';
 
+import System from './_interface.js';
+import { onStartup } from '../decorators/on.js';
 import {
   command, default_permission, parser, permission_settings, settings, ui,
-} from '../decorators';
-import { onStartup } from '../decorators/on';
-import Expects from '../expects';
-import general from '../general';
-import users from '../users';
-import System from './_interface';
+} from '../decorators.js';
+import { Expects } from  '../expects.js';
+import general from '../general.js';
+import users from '../users.js';
 
-import { isStreamOnline } from '~/helpers/api';
-import { ResponseError } from '~/helpers/commandError';
-import { prepare } from '~/helpers/commons';
-import { getAllOnlineIds } from '~/helpers/getAllOnlineUsernames';
-import { debug, error } from '~/helpers/log';
-import { getUserHighestPermission } from '~/helpers/permissions/getUserHighestPermission';
-import defaultPermissions from '~/helpers/permissions/defaultPermissions';
-import { getPointsName } from '~/helpers/points';
-import { setImmediateAwait } from '~/helpers/setImmediateAwait';
-import { adminEndpoint } from '~/helpers/socket';
+import { AppDataSource } from '~/database.js';
+import { isStreamOnline } from '~/helpers/api/index.js';
+import { ResponseError } from '~/helpers/commandError.js';
+import { prepare } from '~/helpers/commons/index.js';
+import { getAllOnlineIds } from '~/helpers/getAllOnlineUsernames.js';
+import { debug, error } from '~/helpers/log.js';
+import defaultPermissions from '~/helpers/permissions/defaultPermissions.js';
+import { getUserHighestPermission } from '~/helpers/permissions/getUserHighestPermission.js';
+import { getPointsName } from '~/helpers/points/index.js';
+import { setImmediateAwait } from '~/helpers/setImmediateAwait.js';
+import { adminEndpoint } from '~/helpers/socket.js';
 import {
   bigIntMax, serialize, unserialize,
-} from '~/helpers/type';
+} from '~/helpers/type.js';
 import * as changelog from '~/helpers/user/changelog.js';
-import { isBotId } from '~/helpers/user/isBot';
-import { translate } from '~/translate';
+import { isBotId } from '~/helpers/user/isBot.js';
+import { translate } from '~/translate.js';
 
 let cachedLevelsHash = '';
 const cachedLevels: bigint[] = [];
@@ -380,7 +378,7 @@ class Levels extends System {
 
   @command('!level buy')
   async buy (opts: CommandOptions): Promise<CommandResponse[]> {
-    const points = (await import('../systems/points')).default;
+    const points = (await import('../systems/points.js')).default;
     try {
       if (!points.enabled) {
         throw new Error('Point system disabled.');

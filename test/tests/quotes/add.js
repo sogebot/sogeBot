@@ -1,17 +1,17 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
+
 /* global describe it before */
 
 
-require('../../general.js');
+import('../../general.js');
 
-const db = require('../../general.js').db;
-const assert = require('assert');
-const message = require('../../general.js').message;
+import { db } from '../../general.js';
+import assert from 'assert';
+import { message } from '../../general.js';
 
-const { AppDataSource } = require('../../../dest/database.js');
-const { Quotes } = require('../../../dest/database/entity/quotes');
+import { AppDataSource } from '../../../dest/database.js';
+import { Quotes } from '../../../dest/database/entity/quotes.js';
 
-const quotes = (require('../../../dest/systems/quotes')).default;
+import quotes from '../../../dest/systems/quotes.js'
 
 // users
 const owner = { userName: '__broadcaster__', userId: 1 };

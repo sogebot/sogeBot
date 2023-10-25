@@ -1,15 +1,13 @@
-'use strict';
-
 import {
   Variable, VariableWatch,
-} from '@entity/variable';
-import { AppDataSource } from '~/database';
+} from '@entity/variable.js';
 
-import Widget from './_interface';
+import Widget from './_interface.js';
 
-import { isVariableSetById, setValueOf } from '~/helpers/customvariables';
-import { adminEndpoint } from '~/helpers/socket';
-import { eventEmitter } from '~/helpers/events';
+import { AppDataSource } from '~/database.js';
+import { isVariableSetById, setValueOf } from '~/helpers/customvariables/index.js';
+import { eventEmitter } from '~/helpers/events/index.js';
+import { adminEndpoint } from '~/helpers/socket.js';
 
 class CustomVariables extends Widget {
   constructor() {

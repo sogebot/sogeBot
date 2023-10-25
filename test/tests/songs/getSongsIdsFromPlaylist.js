@@ -1,9 +1,9 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
+
 /* global describe it  */
 
-require('../../general.js');
-const assert = require('assert');
-const songs = (require('../../../dest/systems/songs')).default;
+import('../../general.js');
+import assert from 'assert';
+import songs from '../../../dest/systems/songs.js';
 
 describe('Songs - getSongsIdsFromPlaylist() - @func1', () => {
   describe('Load songs ids', () => {

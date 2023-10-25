@@ -1,12 +1,10 @@
 /* global describe it beforeEach */
-require('../../general.js');
-const assert = require('assert');
+import('../../general.js');
+import assert from 'assert';
 
-const db = require('../../general.js').db;
-const message = require('../../general.js').message;
-const user = require('../../general.js').user;
+import { db, message, user } from '../../general.js';
 
-const customcommands = (require('../../../dest/systems/customcommands')).default;
+import customcommands from '../../../dest/systems/customcommands.js';
 
 describe('Custom Commands - @func1 - remove()', () => {
   beforeEach(async () => {

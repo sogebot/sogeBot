@@ -1,16 +1,16 @@
 /* global describe it before */
 
-const assert = require('assert');
-require('../../general.js');
+import assert from 'assert';
+import('../../general.js');
 
-const db = require('../../general.js').db;
-const { prepare } = require('../../../dest/helpers/commons/prepare');
-const message = require('../../general.js').message;
+import { db } from '../../general.js';
+import { prepare } from '../../../dest/helpers/commons/prepare.js';
+import { message } from '../../general.js';
 
-const { User } = require('../../../dest/database/entity/user');
-const { Settings } = require('../../../dest/database/entity/settings');
+import { User } from '../../../dest/database/entity/user.js';
+import { Settings } from '../../../dest/database/entity/settings.js';
 
-const twitch = (require('../../../dest/services/twitch')).default;
+import twitch from '../../../dest/services/twitch.js';
 
 // users
 const owner = { userName: '__broadcaster__' };
@@ -20,8 +20,8 @@ const testuser3 = { userName: 'testuser3', userId: String(3) };
 const nightbot = { userName: 'nightbot', userId: String(4) };
 const botwithchangedname = { userName: 'asdsadas', userId: String(24900234) };
 
-const { isIgnored } = require('../../../dest/helpers/user/isIgnored');
-const { AppDataSource } = require('../../../dest/database.js');
+import { isIgnored } from '../../../dest/helpers/user/isIgnored.js';
+import { AppDataSource } from '../../../dest/database.js';
 
 describe('TMI - ignore - @func3', () => {
   before(async () => {

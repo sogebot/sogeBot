@@ -1,23 +1,23 @@
-import { Permissions } from '@entity/permissions';
-import _ from 'lodash';
+import { Permissions } from '@entity/permissions.js';
+import _ from 'lodash-es';
 import { LessThan } from 'typeorm';
 
-import { areDecoratorsLoaded } from '../../decorators';
+import { defaultPermissions } from './defaultPermissions.js';
+import { areDecoratorsLoaded } from '../../decorators.js';
 import {
   debug, error, warning,
-} from '../log';
+} from '../log.js';
+import * as changelog from '../user/changelog.js';
 import {
   isOwner, isSubscriber, isVIP,
-} from '../user';
-import * as changelog from '../user/changelog.js';
-import { isBot } from '../user/isBot';
-import { isBroadcaster } from '../user/isBroadcaster';
-import { isModerator } from '../user/isModerator';
-import { defaultPermissions } from './defaultPermissions';
+} from '../user/index.js';
+import { isBot } from '../user/isBot.js';
+import { isBroadcaster } from '../user/isBroadcaster.js';
+import { isModerator } from '../user/isModerator.js';
 
-import type { checkReturnType } from '~/../d.ts/src/helpers/permissions/check';
-import { filters } from '~/helpers/permissions/filters';
-import { variables } from '~/watchers';
+import type { checkReturnType } from '~/../d.ts/src/helpers/permissions/check.js';
+import { filters } from '~/helpers/permissions/filters.js';
+import { variables } from '~/watchers.js';
 
 let isWarnedAboutCasters = false;
 

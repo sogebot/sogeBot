@@ -1,18 +1,18 @@
 /* global describe it beforeEach */
 
-const assert = require('assert');
+import assert from 'assert';
 
-require('../../general.js');
+import('../../general.js');
 
-const db = require('../../general.js').db;
-const message = require('../../general.js').message;
+import { db } from '../../general.js';
+import { message } from '../../general.js';
 
-const timers = (require('../../../dest/systems/timers')).default;
-const isStreamOnline = (require('../../../dest/helpers/api/isStreamOnline')).isStreamOnline;
+import timers from '../../../dest/systems/timers.js';
+import { isStreamOnline } from '../../../dest/helpers/api/isStreamOnline.js'
 
-const { Timer, TimerResponse } = require('../../../dest/database/entity/timer');
+import { Timer, TimerResponse } from '../../../dest/database/entity/timer.js';
 
-const { linesParsed } = require('../../../dest/helpers/parser');
+import { linesParsed } from '../../../dest/helpers/parser.js';
 
 describe('Timers - tickOffline should send response into chat when stream is off - https://community.sogebot.xyz/t/timers-offline-mode/254 - @func2', () => {
   before(async () => {

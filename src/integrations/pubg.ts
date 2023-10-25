@@ -1,21 +1,21 @@
 // bot libraries
 
-import { HOUR, MINUTE } from '@sogebot/ui-helpers/constants';
+import { HOUR, MINUTE } from '@sogebot/ui-helpers/constants.js';
 import axios from 'axios';
-import { escapeRegExp } from 'lodash';
+import { escapeRegExp } from 'lodash-es';
 
+import Integration from './_interface.js';
+import { onChange, onStartup } from '../decorators/on.js';
 import {
   command, persistent, settings, ui,
-} from '../decorators';
-import { onChange, onStartup } from '../decorators/on';
-import Expects from '../expects';
-import Message from '../message';
-import Integration from './_interface';
+} from '../decorators.js';
+import { Expects } from  '../expects.js';
+import { Message } from  '../message.js';
 
-import { prepare } from '~/helpers/commons';
-import { flatten } from '~/helpers/flatten';
-import { error, info } from '~/helpers/log';
-import { adminEndpoint } from '~/helpers/socket';
+import { prepare } from '~/helpers/commons/index.js';
+import { flatten } from '~/helpers/flatten.js';
+import { error, info } from '~/helpers/log.js';
+import { adminEndpoint } from '~/helpers/socket.js';
 
 class PUBG extends Integration {
   @settings()

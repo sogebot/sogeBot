@@ -1,15 +1,13 @@
-'use strict';
-
-import System from './_interface';
+import System from './_interface.js';
 import {
   command, default_permission, settings,
-} from '../decorators';
+} from '../decorators.js';
 
-import { prepare } from '~/helpers/commons';
-import defaultPermissions from '~/helpers/permissions/defaultPermissions';
-import getBroadcasterId from '~/helpers/user/getBroadcasterId';
-import twitch from '~/services/twitch';
-import { variables } from '~/watchers';
+import { prepare } from '~/helpers/commons/index.js';
+import defaultPermissions from '~/helpers/permissions/defaultPermissions.js';
+import getBroadcasterId from '~/helpers/user/getBroadcasterId.js';
+import twitch from '~/services/twitch.js';
+import { variables } from '~/watchers.js';
 
 enum modes {
   'SUBSONLY', 'FOLLOWONLY', 'EMOTESONLY'

@@ -1,18 +1,18 @@
-import { parse, sep as separator } from 'path';
+import { parse, normalize } from 'path';
 
-import * as constants from '@sogebot/ui-helpers/constants';
-import * as _ from 'lodash';
-import { xor } from 'lodash';
+import * as constants from '@sogebot/ui-helpers/constants.js';
+import * as _ from 'lodash-es';
+import { xor } from 'lodash-es';
 
-import type { Module } from '~/_interface';
-import { isDbConnected } from '~/helpers/database';
-import emitter from '~/helpers/interfaceEmitter';
+import type { Module } from '~/_interface.js';
+import { isDbConnected } from '~/helpers/database.js';
+import emitter from '~/helpers/interfaceEmitter.js';
 import {
   debug, error, performance,
-} from '~/helpers/log';
-import { defaultPermissions } from '~/helpers/permissions/defaultPermissions';
-import { find } from '~/helpers/register';
-import { VariableWatcher } from '~/watchers';
+} from '~/helpers/log.js';
+import { defaultPermissions } from '~/helpers/permissions/defaultPermissions.js';
+import { find, systems } from '~/helpers/register.js';
+import { VariableWatcher } from '~/watchers.js';
 
 export let loadingInProgress: (string|symbol)[] = [];
 export let areDecoratorsLoaded = false;
@@ -22,6 +22,15 @@ export const commandsToRegister: {
   opts: string | Command;
   m: { type: string; name: string; fnc: string };
 }[] = [];
+
+/* import Message and Parser outside init */
+let Message: null | any = null;
+let Parser: null | any = null;
+async function loadImports() {
+  Message = (await import('./message.js')).Message;
+  Parser = (await import('./parser.js')).Parser;
+}
+setTimeout(() => loadImports(), 10000);
 
 const checkIfDecoratorsAreLoaded = () => {
   if (!isDbConnected) {
@@ -41,15 +50,16 @@ const checkIfDecoratorsAreLoaded = () => {
 };
 checkIfDecoratorsAreLoaded();
 
-function getNameAndTypeFromStackTrace() {
+function getNameAndTypeFromStackTrace(): { name: string, type: keyof typeof systems} {
   const _prepareStackTrace = Error.prepareStackTrace;
   Error.prepareStackTrace = (_s, s) => s;
   const stack = (new Error().stack as unknown as NodeJS.CallSite[]);
   Error.prepareStackTrace = _prepareStackTrace;
 
   const path = parse(stack[2].getFileName() || '');
-  const _type = path.dir.split(separator)[path.dir.split(separator).length - 1];
-  const type = _type === 'dest' ? 'core' : _type;
+  const dir = normalize(path.dir).replace(/\\/g, '/');
+  const _type = dir.split('/')[dir.split('/').length - 1];
+  const type = (_type === 'dest' ? 'core' : _type) as keyof typeof systems;
   const name = path.name;
 
   return { name, type };
@@ -399,7 +409,7 @@ function registerRollback(m: { type: string, name: string, fnc: string }) {
 
 function registerParser(opts: {
   permission: string; priority: number, dependsOn: Module[]; fireAndForget: boolean; skippable: boolean;
-}, m: { type: string, name: string, fnc: string }) {
+}, m: { type: keyof typeof systems, name: string, fnc: string }) {
   setTimeout(() => {
     try {
       const self = find(m.type as any, m.name);
@@ -434,9 +444,6 @@ export function timer() {
 
     if (method.constructor.name === 'AsyncFunction') {
       descriptor.value = async function (){
-        const Parser = require('~/parser.js').Parser;
-        const Message = require('~/message.js').Message;
-
         const start = Date.now();
         // eslint-disable-next-line prefer-rest-params
         const result = await method.apply(this, arguments);
@@ -453,9 +460,6 @@ export function timer() {
       };
     } else {
       descriptor.value = function (){
-        const Parser = require('~/parser.js').Parser;
-        const Message = require('~/message.js').Message;
-
         const start = Date.now();
         // eslint-disable-next-line prefer-rest-params
         const result = method.apply(this, arguments);

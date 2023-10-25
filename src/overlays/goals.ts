@@ -1,15 +1,13 @@
-'use strict';
-
-import { Goal, Overlay as OverlayEntity } from '@entity/overlay';
+import { Goal, Overlay as OverlayEntity } from '@entity/overlay.js';
 
 import {
   onBit, onFollow, onSub, onTip,
-} from '../decorators/on';
-import Overlay from '../overlays/_interface';
+} from '../decorators/on.js';
+import Overlay from '../overlays/_interface.js';
 
-import { mainCurrency } from '~/helpers/currency';
-import exchange from '~/helpers/currency/exchange';
-import { recountIntervals } from '~/helpers/goals/recountIntervals';
+import exchange from '~/helpers/currency/exchange.js';
+import { mainCurrency } from '~/helpers/currency/index.js';
+import { recountIntervals } from '~/helpers/goals/recountIntervals.js';
 
 class Goals extends Overlay {
   @onBit()

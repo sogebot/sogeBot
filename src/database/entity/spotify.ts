@@ -1,8 +1,8 @@
-import { BotEntity } from '../BotEntity';
+import { BotEntity } from '../BotEntity.js';
 import { Column, Entity, PrimaryColumn } from 'typeorm';
 
 @Entity()
-export class SpotifySongBan extends BotEntity<SpotifySongBan> {
+export class SpotifySongBan extends BotEntity {
   @PrimaryColumn()
     spotifyUri: string;
   @Column()

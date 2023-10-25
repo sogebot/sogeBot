@@ -1,20 +1,20 @@
-import { EventList, EventListInterface } from '@entity/eventList';
-import _ from 'lodash';
+import { EventList, EventListInterface } from '@entity/eventList.js';
+import _ from 'lodash-es';
 import { MoreThanOrEqual } from 'typeorm';
 
-import Overlay from './_interface';
-import users from '../users';
+import Overlay from './_interface.js';
+import users from '../users.js';
 
-import { AppDataSource } from '~/database';
-import type { Currency } from '~/database/entity/user';
+import type { Currency } from '~/database/entity/user.js';
+import { AppDataSource } from '~/database.js';
 import {
   isStreamOnline, stats, streamStatusChangeSince,
-} from '~/helpers/api';
-import { mainCurrency } from '~/helpers/currency';
-import exchange from '~/helpers/currency/exchange';
-import { publicEndpoint } from '~/helpers/socket';
-import { getTopClips } from '~/services/twitch/calls/getTopClips';
-import { variables } from '~/watchers';
+} from '~/helpers/api/index.js';
+import exchange from '~/helpers/currency/exchange.js';
+import { mainCurrency } from '~/helpers/currency/index.js';
+import { publicEndpoint } from '~/helpers/socket.js';
+import { getTopClips } from '~/services/twitch/calls/getTopClips.js';
+import { variables } from '~/watchers.js';
 
 export type Event = (EventListInterface & { username?: string, values?: {
   currency: Currency;
@@ -45,7 +45,7 @@ class Credits extends Overlay {
               game:               o.game,
               mp4:                o.mp4,
             };
-          })
+          }),
         ));
       } else {
         cb([]);

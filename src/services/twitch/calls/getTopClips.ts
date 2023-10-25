@@ -1,16 +1,16 @@
-import { shuffle } from '@sogebot/ui-helpers/array';
-import { DAY } from '@sogebot/ui-helpers/constants';
+import { shuffle } from '@sogebot/ui-helpers/array.js';
+import { DAY } from '@sogebot/ui-helpers/constants.js';
 import { HelixClip } from '@twurple/api/lib';
 
-import { getGameNameFromId } from './getGameNameFromId';
+import { getGameNameFromId } from './getGameNameFromId.js';
 
-import { streamStatusChangeSince } from '~/helpers/api';
-import { isDebugEnabled } from '~/helpers/debug';
-import { getFunctionName } from '~/helpers/getFunctionName';
-import { debug, error, warning } from '~/helpers/log';
-import { setImmediateAwait } from '~/helpers/setImmediateAwait';
-import twitch from '~/services/twitch';
-import { variables } from '~/watchers';
+import { streamStatusChangeSince } from '~/helpers/api/index.js';
+import { isDebugEnabled } from '~/helpers/debug.js';
+import { getFunctionName } from '~/helpers/getFunctionName.js';
+import { debug, error, warning } from '~/helpers/log.js';
+import { setImmediateAwait } from '~/helpers/setImmediateAwait.js';
+import twitch from '~/services/twitch.js';
+import { variables } from '~/watchers.js';
 
 export async function getTopClips (opts: any): Promise<(Partial<HelixClip> & { mp4: string; game: string | null })[]> {
   if (isDebugEnabled('api.calls')) {

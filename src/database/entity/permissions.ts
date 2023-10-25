@@ -1,8 +1,8 @@
 import { Column, Entity, Index, PrimaryColumn } from 'typeorm';
-import { BotEntity } from '../BotEntity';
+import { BotEntity } from '../BotEntity.js';
 
 @Entity()
-export class Permissions extends BotEntity<Permissions> {
+export class Permissions extends BotEntity {
   @PrimaryColumn({ generated: 'uuid' })
     id: string;
 
@@ -35,7 +35,7 @@ export class Permissions extends BotEntity<Permissions> {
 }
 
 @Entity()
-export class PermissionCommands extends BotEntity<PermissionCommands>{
+export class PermissionCommands extends BotEntity{
   @PrimaryColumn({ generated: 'uuid' })
     id: string;
 

@@ -1,6 +1,6 @@
 import querystring from 'querystring';
 
-import type { ResponseFilter } from '.';
+import type { ResponseFilter } from './index.js';
 
 const qs: ResponseFilter = {
   '$querystring': async function (_variable, attr) {

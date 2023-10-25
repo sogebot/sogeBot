@@ -1,15 +1,15 @@
 /* global describe it beforeEach */
 
 
-const assert = require('assert');
-require('../../general.js');
+import assert from 'assert';
+import('../../general.js');
 
-const db = require('../../general.js').db;
-const message = require('../../general.js').message;
+import { db } from '../../general.js';
+import { message } from '../../general.js';
 
-const timers = (require('../../../dest/systems/timers')).default;
+import timers from '../../../dest/systems/timers.js';
 
-const { Timer } = require('../../../dest/database/entity/timer');
+import { Timer } from '../../../dest/database/entity/timer.js';
 
 // users
 const owner = { userName: '__broadcaster__' };

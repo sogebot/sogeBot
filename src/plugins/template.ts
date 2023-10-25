@@ -1,13 +1,13 @@
-import { getTime } from '@sogebot/ui-helpers/getTime';
+import { getTime } from '@sogebot/ui-helpers/getTime.js';
 
 import {
   chatMessagesAtStart, isStreamOnline, stats, streamStatusChangeSince,
-} from '~/helpers/api';
-import { getGlobalVariables } from '~/helpers/checkFilter';
-import { mainCurrency, symbol } from '~/helpers/currency';
-import { flatten } from '~/helpers/flatten';
-import { linesParsed } from '~/helpers/parser';
-import { showWithAt } from '~/helpers/tmi';
+} from '~/helpers/api/index.js';
+import { getGlobalVariables } from '~/helpers/checkFilter.js';
+import { mainCurrency, symbol } from '~/helpers/currency/index.js';
+import { flatten } from '~/helpers/flatten.js';
+import { linesParsed } from '~/helpers/parser.js';
+import { showWithAt } from '~/helpers/tmi/index.js';
 
 export async function template(message: string, params: Record<string, any>, userstate?: { userName: string; userId: string } | null) {
   if (userstate === null) {

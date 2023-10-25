@@ -1,20 +1,20 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
+
 /* global describe it before */
 
-const { v4: uuidv4 } = require('uuid');
+import { v4 as uuidv4 } from 'uuid';
 
-require('../../general.js');
-const { Event } = require('../../../dest/database/entity/event');
-const { User } = require('../../../dest/database/entity/user');
-const events = (require('../../../dest/events')).default;
-const log = require('../../../dest/helpers/log');
+import('../../general.js');
+import { Event } from '../../../dest/database/entity/event.js';
+import { User } from '../../../dest/database/entity/user.js';
+import events from '../../../dest/events.js';
+import * as log from '../../../dest/helpers/log.js';
 
-const assert = require('assert');
-const { AppDataSource } = require('../../../dest/database.js');
+import assert from 'assert';
+import { AppDataSource } from '../../../dest/database.js';
 
-const db = require('../../general.js').db;
-const message = require('../../general.js').message;
-const time = require('../../general.js').time;
+import { db } from '../../general.js';
+import { message } from '../../general.js';
+import { time } from '../../general.js';
 
 const userName = 'randomPerson';
 

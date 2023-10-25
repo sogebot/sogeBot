@@ -1,7 +1,7 @@
 import cronparser from 'cron-parser';
-import { escapeRegExp } from 'lodash';
+import { escapeRegExp } from 'lodash-es';
 
-import { debug } from '~/helpers/log';
+import { debug } from '~/helpers/log.js';
 
 export enum Types {
   'Started',

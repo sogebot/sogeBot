@@ -1,7 +1,7 @@
 import { Column, Entity, PrimaryColumn } from 'typeorm';
 
-import { Alert, Filter } from './alert';
-import { BotEntity } from '../BotEntity';
+import { Alert, Filter } from './alert.js';
+import { BotEntity } from '../BotEntity.js';
 
 // expands object types recursively
 type ExpandRecursively<T> = T extends object
@@ -592,7 +592,7 @@ export interface Group {
 }
 
 @Entity()
-export class Overlay extends BotEntity<Overlay> {
+export class Overlay extends BotEntity {
   @PrimaryColumn({ generated: 'uuid' })
     id: string;
 

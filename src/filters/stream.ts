@@ -1,8 +1,8 @@
-import { param } from './param';
+import { param } from './param.js';
 
-import type { ResponseFilter } from '.';
+import type { ResponseFilter } from './index.js';
 
-import twitch from '~/services/twitch';
+import twitch from '~/services/twitch.js';
 
 const stream: ResponseFilter = {
   '(stream|#|link)': async function (filter, attr) {

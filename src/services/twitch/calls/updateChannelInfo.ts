@@ -1,24 +1,24 @@
 import { error } from 'console';
 
-import { defaults, isNil } from 'lodash';
+import { defaults, isNil } from 'lodash-es';
 
-import { getChannelInformation } from './getChannelInformation';
-import { getGameIdFromName } from './getGameIdFromName';
+import { getChannelInformation } from './getChannelInformation.js';
+import { getGameIdFromName } from './getGameIdFromName.js';
 
 import {
   gameCache, gameOrTitleChangedManually, rawStatus, stats, tagsCache,
-} from '~/helpers/api';
-import { parseTitle } from '~/helpers/api/parseTitle';
-import { CONTENT_CLASSIFICATION_LABELS } from '~/helpers/constants';
-import { isDebugEnabled } from '~/helpers/debug';
-import { eventEmitter } from '~/helpers/events/emitter';
-import { getFunctionName } from '~/helpers/getFunctionName';
-import { debug, warning } from '~/helpers/log';
-import { addUIError } from '~/helpers/panel/index';
-import { setImmediateAwait } from '~/helpers/setImmediateAwait';
-import twitch from '~/services/twitch';
-import { translate } from '~/translate';
-import { variables } from '~/watchers';
+} from '~/helpers/api/index.js';
+import { parseTitle } from '~/helpers/api/parseTitle.js';
+import { CONTENT_CLASSIFICATION_LABELS } from '~/helpers/constants.js';
+import { isDebugEnabled } from '~/helpers/debug.js';
+import { eventEmitter } from '~/helpers/events/emitter.js';
+import { getFunctionName } from '~/helpers/getFunctionName.js';
+import { debug, warning } from '~/helpers/log.js';
+import { addUIError } from '~/helpers/panel/index.js';
+import { setImmediateAwait } from '~/helpers/setImmediateAwait.js';
+import twitch from '~/services/twitch.js';
+import { translate } from '~/translate.js';
+import { variables } from '~/watchers.js';
 
 async function updateChannelInfo (args: { title?: string | null; game?: string | null, tags?: string[], contentClassificationLabels?: string[] }): Promise<{ response: string; status: boolean } | null> {
   if (isDebugEnabled('api.calls')) {
@@ -71,20 +71,22 @@ async function updateChannelInfo (args: { title?: string | null; game?: string |
 
     const gameId = await getGameIdFromName(game);
 
-    let content_classification_labels: {id: string, is_enabled: boolean}[] | undefined = undefined;
+    let contentClassificationLabels: string[] | undefined = undefined;
     //  if content classification is present, do a change, otherwise we are not changing anything
     if (args.contentClassificationLabels) {
-      content_classification_labels = [];
+      contentClassificationLabels = [];
       for (const id of Object.keys(CONTENT_CLASSIFICATION_LABELS)) {
         if (id === 'MatureGame') {
           continue; // set automatically
         }
-        content_classification_labels.push({ id, is_enabled: args.contentClassificationLabels.includes(id) });
+        if (args.contentClassificationLabels.includes(id)) {
+          contentClassificationLabels.push(id);
+        }
       }
     }
 
     await twitch.apiClient?.asIntent(['broadcaster'], ctx => ctx.channels.updateChannelInfo(cid, {
-      title: title ? title : undefined, gameId, tags, content_classification_labels,
+      title: title ? title : undefined, gameId, tags, contentClassificationLabels,
     }));
   } catch (e) {
     if (e instanceof Error) {

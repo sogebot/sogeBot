@@ -1,19 +1,19 @@
-require('../../general.js');
+import('../../general.js');
 
-const db = require('../../general.js').db;
-const message = require('../../general.js').message;
-const time = require('../../general.js').time;
+import { db } from '../../general.js';
+import { message } from '../../general.js';
+import { time } from '../../general.js';
 
-const isStreamOnline = (require('../../../dest/helpers/api/isStreamOnline')).isStreamOnline;
-const alias = (require('../../../dest/systems/alias')).default;
-const customcommands = (require('../../../dest/systems/customcommands')).default;
-const timers = (require('../../../dest/systems/timers')).default;
-const check = (require('../../../dest/watchers')).check;
+import { isStreamOnline } from '../../../dest/helpers/api/isStreamOnline.js'
+import alias from '../../../dest/systems/alias.js';
+import customcommands from '../../../dest/systems/customcommands.js';
+import timers from '../../../dest/systems/timers.js';
+import {check} from '../../../dest/watchers.js'
 
-const { AppDataSource } = require('../../../dest/database.js');
-const { Timer, TimerResponse } = require('../../../dest/database/entity/timer');
+import { AppDataSource } from '../../../dest/database.js';
+import { Timer, TimerResponse } from '../../../dest/database/entity/timer.js';
 
-const { linesParsed } = require('../../../dest/helpers/parser');
+import { linesParsed } from '../../../dest/helpers/parser.js';
 
 // users
 const owner = { userName: '__broadcaster__' };

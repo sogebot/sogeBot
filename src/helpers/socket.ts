@@ -1,6 +1,6 @@
 import { Socket } from 'socket.io';
 
-import type { Fn, ClientToServerEventsWithNamespace, NestedFnParams } from '~/../d.ts/src/helpers/socket';
+import type { Fn, ClientToServerEventsWithNamespace, NestedFnParams } from '~/../d.ts/src/helpers/socket.js';
 
 const endpoints: {
   type: 'admin' | 'viewer' | 'public';

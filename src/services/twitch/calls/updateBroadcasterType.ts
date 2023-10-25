@@ -1,9 +1,9 @@
-import { isDebugEnabled } from '~/helpers/debug';
+import { isDebugEnabled } from '~/helpers/debug.js';
 import { getFunctionName } from '~/helpers/getFunctionName.js';
-import emitter from '~/helpers/interfaceEmitter';
-import { debug, error, warning } from '~/helpers/log';
-import twitch from '~/services/twitch';
-import { variables } from '~/watchers';
+import emitter from '~/helpers/interfaceEmitter.js';
+import { debug, error, warning } from '~/helpers/log.js';
+import twitch from '~/services/twitch.js';
+import { variables } from '~/watchers.js';
 
 async function updateBroadcasterType () {
   if (isDebugEnabled('api.calls')) {

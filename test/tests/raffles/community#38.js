@@ -1,17 +1,17 @@
-require('../../general.js');
+import('../../general.js');
 
-const assert = require('assert');
+import assert from 'assert';
 
-const _ = require('lodash');
-const { IsNull } = require('typeorm');
+import _ from 'lodash-es';
+import { IsNull } from 'typeorm';
 
-const commons = require('../../../dest/commons');
-const { AppDataSource } = require('../../../dest/database.js');
-const { Raffle } = require('../../../dest/database/entity/raffle');
-const { User } = require('../../../dest/database/entity/user');
-const raffles = (require('../../../dest/systems/raffles')).default;
-const db = require('../../general.js').db;
-const message = require('../../general.js').message;
+import * as commons from '../../../dest/commons.js'
+import { AppDataSource } from '../../../dest/database.js';
+import { Raffle } from '../../../dest/database/entity/raffle.js';
+import { User } from '../../../dest/database/entity/user.js';
+import raffles from '../../../dest/systems/raffles.js';
+import { db } from '../../general.js';
+import { message } from '../../general.js';
 
 const owner = { userName: '__broadcaster__', userId: String(_.random(999999, false)) };
 

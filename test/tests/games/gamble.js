@@ -1,27 +1,27 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
+
 /* global */
 
-require('../../general.js');
+import('../../general.js');
 
-const assert = require('assert');
+import assert from 'assert';
 
-const _ = require('lodash');
-const { AppDataSource } = require('../../../dest/database.js');
+import _ from 'lodash-es';
+import { AppDataSource } from '../../../dest/database.js';
 
-const { User } = require('../../../dest/database/entity/user');
-const gamble = (require('../../../dest/games/gamble')).default;
-const { prepare } = require('../../../dest/helpers/commons/prepare');
-const { getPointsName } = require('../../../dest/helpers/points/getPointsName');
-const points = (require('../../../dest/systems/points')).default;
-const db = require('../../general.js').db;
-const message = require('../../general.js').message;
+import { User } from '../../../dest/database/entity/user.js';
+import gamble from '../../../dest/games/gamble.js';
+import { prepare } from '../../../dest/helpers/commons/prepare.js';
+import { getPointsName } from '../../../dest/helpers/points/getPointsName.js';
+import points from '../../../dest/systems/points.js';
+import { db } from '../../general.js';
+import { message } from '../../general.js';
 
 const user1 = { userName: 'user1', userId: String(_.random(999999, false)) };
 const command = '!gamble';
 
 describe('Gambling - gamble - @func3', () => {
   beforeEach(async () => {
-    const changelog = (require('../../../dest/helpers/user/changelog'));
+    const changelog = await import('../../../dest/helpers/user/changelog.js');
     await changelog.flush();
     await AppDataSource.getRepository(User).save({
       userId: user1.userId, userName: user1.userName, points: 100,

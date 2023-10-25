@@ -1,18 +1,18 @@
 import chalk from 'chalk';
-import _ from 'lodash';
-import { AppDataSource } from '~/database';
+import _ from 'lodash-es';
 
-import currentRates from './helpers/currency/rates';
+import currentRates from './helpers/currency/rates.js';
 
-import Core from '~/_interface';
-import { Currency as CurrencyType, UserTip } from '~/database/entity/user';
-import { settings, ui } from '~/decorators';
+import Core from '~/_interface.js';
+import { Currency as CurrencyType, UserTip } from '~/database/entity/user.js';
+import { AppDataSource } from '~/database.js';
 import {
   onChange, onLoad,
-} from '~/decorators/on';
-import { mainCurrency } from '~/helpers/currency';
-import exchange from '~/helpers/currency/exchange';
-import { info } from '~/helpers/log';
+} from '~/decorators/on.js';
+import { settings, ui } from '~/decorators.js';
+import exchange from '~/helpers/currency/exchange.js';
+import { mainCurrency } from '~/helpers/currency/index.js';
+import { info } from '~/helpers/log.js';
 
 class Currency extends Core {
   mainCurrencyLoaded = false;

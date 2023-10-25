@@ -1,14 +1,11 @@
 /* global describe it before */
-const commons = require('../../../dest/commons');
+import * as commons from '../../../dest/commons.js'
+import moderation from '../../../dest/systems/moderation.js';
 
-const moderation = (require('../../../dest/systems/moderation')).default;
+import('../../general.js');
 
-require('../../general.js');
-
-const db = require('../../general.js').db;
-const message = require('../../general.js').message;
-const user = require('../../general.js').user;
-const assert = require('assert');
+import { db, message, user } from '../../general.js';
+import assert from 'assert';
 
 const owner = Object.freeze({ userName: '__broadcaster__', badges: {}, userId: 12345 });
 

@@ -1,18 +1,18 @@
-import type { EmitData } from '@entity/alert';
-import { EventList as EventListDB } from '@entity/eventList';
-import { UserTip } from '@entity/user';
-import { SECOND } from '@sogebot/ui-helpers/constants';
-import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized';
+import type { EmitData } from '@entity/alert.js';
+import { EventList as EventListDB } from '@entity/eventList.js';
+import { UserTip } from '@entity/user.js';
+import { SECOND } from '@sogebot/ui-helpers/constants.js';
+import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized.js';
 import { Between } from 'typeorm';
 
-import Widget from './_interface';
-import alerts from '../registries/alerts';
+import Widget from './_interface.js';
+import alerts from '../registries/alerts.js';
 
-import { AppDataSource } from '~/database';
-import { error } from '~/helpers/log';
-import { adminEndpoint } from '~/helpers/socket';
-import getNameById from '~/helpers/user/getNameById';
-import { translate } from '~/translate';
+import { AppDataSource } from '~/database.js';
+import { error } from '~/helpers/log.js';
+import { adminEndpoint } from '~/helpers/socket.js';
+import getNameById from '~/helpers/user/getNameById.js';
+import { translate } from '~/translate.js';
 
 class EventList extends Widget {
   public sockets() {

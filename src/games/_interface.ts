@@ -1,4 +1,4 @@
-import Module from '../_interface';
+import Module from '../_interface.js';
 
 class Game extends Module {
   constructor() {

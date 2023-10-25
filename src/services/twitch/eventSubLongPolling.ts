@@ -1,4 +1,4 @@
-import { MINUTE } from '@sogebot/ui-helpers/constants';
+import { MINUTE } from '@sogebot/ui-helpers/constants.js';
 import { EventSubChannelBanEventData } from '@twurple/eventsub-base/lib/events/EventSubChannelBanEvent.external';
 import { EventSubChannelCheerEventData } from '@twurple/eventsub-base/lib/events/EventSubChannelCheerEvent.external';
 import { EventSubChannelFollowEventData } from '@twurple/eventsub-base/lib/events/EventSubChannelFollowEvent.external';
@@ -18,22 +18,22 @@ import { EventSubChannelUnbanEventData } from '@twurple/eventsub-base/lib/events
 import { Mutex } from 'async-mutex';
 import axios from 'axios';
 
-import { isAlreadyProcessed } from './eventsub/events';
+import { isAlreadyProcessed } from './eventsub/events.js';
 
-import * as channelPoll from '~/helpers/api/channelPoll';
-import * as channelPrediction from '~/helpers/api/channelPrediction';
-import * as hypeTrain from '~/helpers/api/hypeTrain';
-import { eventEmitter } from '~/helpers/events';
-import { cheer } from '~/helpers/events/cheer';
-import { follow } from '~/helpers/events/follow';
-import { raid } from '~/helpers/events/raid';
+import * as channelPoll from '~/helpers/api/channelPoll.js';
+import * as channelPrediction from '~/helpers/api/channelPrediction.js';
+import * as hypeTrain from '~/helpers/api/hypeTrain.js';
+import { cheer } from '~/helpers/events/cheer.js';
+import { follow } from '~/helpers/events/follow.js';
+import { eventEmitter } from '~/helpers/events/index.js';
+import { raid } from '~/helpers/events/raid.js';
 import { ban, error, info, redeem, timeout, unban, warning } from '~/helpers/log.js';
-import { ioServer } from '~/helpers/panel';
+import { ioServer } from '~/helpers/panel.js';
 import * as changelog from '~/helpers/user/changelog.js';
-import getBroadcasterId from '~/helpers/user/getBroadcasterId';
-import eventlist from '~/overlays/eventlist';
-import alerts from '~/registries/alerts';
-import { variables } from '~/watchers';
+import getBroadcasterId from '~/helpers/user/getBroadcasterId.js';
+import eventlist from '~/overlays/eventlist.js';
+import alerts from '~/registries/alerts.js';
+import { variables } from '~/watchers.js';
 
 const mutex = new Mutex();
 

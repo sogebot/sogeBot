@@ -1,19 +1,19 @@
 /* global describe it before */
 
-require('../../general.js');
+import('../../general.js');
 
-const assert = require('assert');
+import assert from 'assert';
 
-const _ = require('lodash');
-const { IsNull } = require('typeorm');
-const { AppDataSource } = require('../../../dest/database.js');
+import _ from 'lodash-es';
+import { IsNull } from 'typeorm';
+import { AppDataSource } from '../../../dest/database.js';
 
-const { Raffle } = require('../../../dest/database/entity/raffle');
-const { User } = require('../../../dest/database/entity/user');
-const { getOwnerAsSender } = require('../../../dest/helpers/commons/getOwnerAsSender');
-const raffles = (require('../../../dest/systems/raffles')).default;
-const db = require('../../general.js').db;
-const message = require('../../general.js').message;
+import { Raffle } from '../../../dest/database/entity/raffle.js';
+import { User } from '../../../dest/database/entity/user.js';
+import { getOwnerAsSender } from '../../../dest/helpers/commons/getOwnerAsSender.js';
+import raffles from '../../../dest/systems/raffles.js';
+import { db } from '../../general.js';
+import { message } from '../../general.js';
 
 const max = Math.floor(Number.MAX_SAFE_INTEGER / 10000000);
 

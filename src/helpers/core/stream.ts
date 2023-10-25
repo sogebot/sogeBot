@@ -1,21 +1,21 @@
 import { HelixStream } from '@twurple/api/lib';
 
-import { getFunctionList } from '../../decorators/on';
-import { chatMessagesAtStart, streamType } from '../api';
-import { isStreamOnline } from '../api/isStreamOnline';
-import { setCurrentRetries } from '../api/retries';
-import { stats } from '../api/stats';
-import { streamId } from '../api/streamId';
-import { streamStatusChangeSince } from '../api/streamStatusChangeSince';
-import { eventEmitter } from '../events/emitter';
+import { getFunctionList } from '../../decorators/on.js';
+import { chatMessagesAtStart, streamType } from '../api/index.js';
+import { isStreamOnline } from '../api/isStreamOnline.js';
+import { setCurrentRetries } from '../api/retries.js';
+import { stats } from '../api/stats.js';
+import { streamId } from '../api/streamId.js';
+import { streamStatusChangeSince } from '../api/streamStatusChangeSince.js';
+import { eventEmitter } from '../events/emitter.js';
 import {
   error, start as startLog, stop,
-} from '../log';
-import { linesParsed } from '../parser';
-import { find } from '../register';
+} from '../log.js';
+import { linesParsed } from '../parser.js';
+import { find } from '../register.js';
 
-import { getGameNameFromId } from '~/services/twitch/calls/getGameNameFromId';
-import { variables } from '~/watchers';
+import { getGameNameFromId } from '~/services/twitch/calls/getGameNameFromId.js';
+import { variables } from '~/watchers.js';
 
 async function start(data: HelixStream) {
   const broadcasterId = variables.get('services.twitch.broadcasterId') as string;

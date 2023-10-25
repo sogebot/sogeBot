@@ -2,28 +2,27 @@
 
 import { error } from 'console';
 
-import { DAY, MINUTE } from '@sogebot/ui-helpers/constants';
-import { isNil } from 'lodash';
-import _ from 'lodash';
+import { DAY, MINUTE } from '@sogebot/ui-helpers/constants.js';
+import { get, isNil } from 'lodash-es';
 import { LessThan } from 'typeorm';
 
-import Core from '~/_interface';
-import { AppDataSource } from '~/database';
-import { TwitchStats, TwitchStatsInterface } from '~/database/entity/twitch';
-import { persistent } from '~/decorators';
-import { onStreamStart } from '~/decorators/on';
+import Core from '~/_interface.js';
+import { TwitchStats, TwitchStatsInterface } from '~/database/entity/twitch.js';
+import { AppDataSource } from '~/database.js';
+import { onStreamStart } from '~/decorators/on.js';
+import { persistent } from '~/decorators.js';
 import {
   chatMessagesAtStart, isStreamOnline, rawStatus, stats, streamStatusChangeSince,
-} from '~/helpers/api';
-import { debug } from '~/helpers/log';
-import { app } from '~/helpers/panel';
-import { linesParsed } from '~/helpers/parser';
-import lastfm from '~/integrations/lastfm';
-import spotify from '~/integrations/spotify';
-import { adminMiddleware } from '~/socket';
-import songs from '~/systems/songs';
-import translateLib, { translate } from '~/translate';
-import { variables } from '~/watchers';
+} from '~/helpers/api/index.js';
+import { debug } from '~/helpers/log.js';
+import { app } from '~/helpers/panel.js';
+import { linesParsed } from '~/helpers/parser.js';
+import lastfm from '~/integrations/lastfm.js';
+import spotify from '~/integrations/spotify.js';
+import { adminMiddleware } from '~/socket.js';
+import songs from '~/systems/songs.js';
+import translateLib, { translate } from '~/translate.js';
+import { variables } from '~/watchers.js';
 
 class Stats extends Core {
   @persistent()
@@ -55,9 +54,9 @@ class Stats extends Core {
           throw new Error('Translation not yet loaded');
         }
 
-        const ytCurrentSong = Object.values(songs.isPlaying).find(o => o) ? _.get(JSON.parse(songs.currentSong), 'title', null) : null;
-        let spotifyCurrentSong: null | string = _.get(JSON.parse(spotify.currentSong), 'song', '') + ' - ' + _.get(JSON.parse(spotify.currentSong), 'artist', '');
-        if (spotifyCurrentSong.trim().length === 1 /* '-' */  || !_.get(JSON.parse(spotify.currentSong), 'is_playing', false)) {
+        const ytCurrentSong = Object.values(songs.isPlaying).find(o => o) ? get(JSON.parse(songs.currentSong), 'title', null) : null;
+        let spotifyCurrentSong: null | string = get(JSON.parse(spotify.currentSong), 'song', '') + ' - ' + get(JSON.parse(spotify.currentSong), 'artist', '');
+        if (spotifyCurrentSong.trim().length === 1 /* '-' */  || get(JSON.parse(spotify.currentSong), 'is_playing', false)) {
           spotifyCurrentSong = null;
         }
 

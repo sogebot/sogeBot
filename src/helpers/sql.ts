@@ -1,7 +1,7 @@
-import { AppDataSource } from '~/database';
+import { AppDataSource } from '~/database.js';
 
-import { isDbConnected } from '~/helpers/database';
-import { debug } from '~/helpers/log';
+import { isDbConnected } from '~/helpers/database.js';
+import { debug } from '~/helpers/log.js';
 
 // TODO: dynamic way to determinate limit of SQL variables
 export let SQLVariableLimit = 999; // sqlite have default limit of 999

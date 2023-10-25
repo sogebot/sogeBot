@@ -2,15 +2,18 @@ import fs from 'fs';
 import os from 'os';
 import util from 'util';
 
-import { dayjs, timezone } from '@sogebot/ui-helpers/dayjsHelper';
+import { dayjs, timezone } from '@sogebot/ui-helpers/dayjsHelper.js';
 import { createStream, Generator } from 'rotating-file-stream';
+import sinon from 'sinon';
 import stripAnsi from 'strip-ansi';
 
-import { isDebugEnabled } from './debug';
-import { logEmitter } from './log/emitter';
-import { getFunctionNameFromStackTrace } from './stacktrace';
+import { isDebugEnabled } from './debug.js';
+import { logEmitter } from './log/emitter.js';
+import { getFunctionNameFromStackTrace } from './stacktrace.js';
 
-import { isDbConnected } from '~/helpers/database';
+import { isDbConnected } from '~/helpers/database.js';
+
+const isMochaTestRun = () => typeof (global as any).it === 'function';
 
 const logDir = './logs';
 
@@ -147,8 +150,25 @@ export function performance(message:string) {
   perfFile.write(dayjs().tz(timezone).format('YYYY-MM-DD[T]HH:mm:ss.SSS') + ' ' + (message.replace(/ /g, '\t')) + os.EOL);
 }
 
-/* * category will be always shown */
-export function debug(category: string, message: any) {
+export function error(message: any) {
+  // we have custom typeorm logger to show QueryFailedError
+  // stack from those errors are not usable so we don't need it
+  if (typeof message !== 'string' || (typeof message === 'string' && !message.startsWith('QueryFailedError: '))) {
+    log(message);
+  }
+}
+
+export function chatIn(message: any) {
+  log(message);
+}
+
+const logFunction = (message: any) => {
+  log(message);
+};
+
+export const chatOut = isMochaTestRun() ? sinon.stub() : logFunction;
+export const warning = isMochaTestRun() ? sinon.stub() : logFunction;
+export const debug = isMochaTestRun() ? sinon.stub() : (category: string, message: any) => {
   const categories = category.split('.');
   if (categories.length > 2 && category !== '*') {
     throw Error('For debug use only <main>.<sub> or *');
@@ -158,20 +178,8 @@ export function debug(category: string, message: any) {
     process.stdout.write(formattedMessage + '\n');
     logFile.write(formattedMessage + os.EOL);
   }
-}
-export function error(message: any) {
-  // we have custom typeorm logger to show QueryFailedError
-  // stack from those errors are not usable so we don't need it
-  if (typeof message !== 'string' || (typeof message === 'string' && !message.startsWith('QueryFailedError: '))) {
-    log(message);
-  }
-}
-export function chatIn(message: any) {
-  log(message);
-}
-export function chatOut(message: any) {
-  log(message);
-}
+};
+
 export function whisperIn(message: any) {
   log(message);
 }
@@ -179,9 +187,6 @@ export function whisperOut(message: any) {
   log(message);
 }
 export function info(message: any) {
-  log(message);
-}
-export function warning(message: any) {
   log(message);
 }
 export function timeout(message: any) {

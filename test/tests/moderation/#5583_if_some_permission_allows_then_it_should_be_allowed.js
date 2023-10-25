@@ -1,17 +1,17 @@
 /* global */
 
-const assert = require('assert');
-const { AppDataSource } = require('../../../dest/database.js');
+import assert from 'assert';
+import { AppDataSource } from '../../../dest/database.js';
 
-require('../../general.js');
+import('../../general.js');
 
-const { Permissions } = require('../../../dest/database/entity/permissions');
-const { defaultPermissions } = require('../../../dest/helpers/permissions/defaultPermissions');
-const moderation = (require('../../../dest/systems/moderation')).default;
-const db = require('../../general.js').db;
-const variable = require('../../general.js').variable;
-const message = require('../../general.js').message;
-const user = require('../../general.js').user;
+import { Permissions } from '../../../dest/database/entity/permissions.js';
+import { defaultPermissions } from '../../../dest/helpers/permissions/defaultPermissions.js';
+import moderation from '../../../dest/systems/moderation.js';
+import { db } from '../../general.js';
+import { variable } from '../../general.js';
+import { message } from '../../general.js';
+import { user } from '../../general.js';
 
 describe('#5583 - If lower permission allows, then it should be allowed - @func1', () => {
   after(async () => {

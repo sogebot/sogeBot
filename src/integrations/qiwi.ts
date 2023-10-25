@@ -1,21 +1,21 @@
-import { UserTip, UserTipInterface } from '@entity/user';
+import { UserTip, UserTipInterface } from '@entity/user.js';
 import axios from 'axios';
-import { AppDataSource } from '~/database';
 
-import { settings } from '../decorators';
+import Integration from './_interface.js';
 import { onChange, onStartup } from '../decorators/on.js';
+import { settings } from '../decorators.js';
 import eventlist from '../overlays/eventlist.js';
 import alerts from '../registries/alerts.js';
 import users from '../users.js';
-import Integration from './_interface';
 
+import { AppDataSource } from '~/database.js';
 import { isStreamOnline, stats } from '~/helpers/api/index.js';
-import { mainCurrency } from '~/helpers/currency';
-import exchange from '~/helpers/currency/exchange';
-import rates from '~/helpers/currency/rates';
-import { eventEmitter } from '~/helpers/events';
-import { triggerInterfaceOnTip } from '~/helpers/interface/triggers';
-import { error, tip } from '~/helpers/log';
+import exchange from '~/helpers/currency/exchange.js';
+import { mainCurrency } from '~/helpers/currency/index.js';
+import rates from '~/helpers/currency/rates.js';
+import { eventEmitter } from '~/helpers/events/index.js';
+import { triggerInterfaceOnTip } from '~/helpers/interface/triggers.js';
+import { error, tip } from '~/helpers/log.js';
 
 class Qiwi extends Integration {
   interval: any = null;

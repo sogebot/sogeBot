@@ -1,20 +1,18 @@
-require('../../general.js');
+import('../../general.js');
 
-const until = require('test-until');
+import {cheer } from '../../../dest/helpers/events/cheer.js';
+import {translate} from '../../../dest/translate.js'
+import { db } from '../../general.js';
+import { message } from '../../general.js';
+import { time } from '../../general.js';
+import { Price } from '../../../dest/database/entity/price.js';
+import customcommands from '../../../dest/systems/customcommands.js';
 
-const cheer = (require('../../../dest/helpers/events/cheer')).cheer;
-const translate = require('../../../dest/translate').translate;
-const db = require('../../general.js').db;
-const message = require('../../general.js').message;
-const time = require('../../general.js').time;
-const { Price } = require('../../../dest/database/entity/price');
-const customcommands = (require('../../../dest/systems/customcommands')).default;
+import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized.js';
 
-const { getLocalizedName } = require('@sogebot/ui-helpers/getLocalized');
+import assert from 'assert';
 
-const assert = require('assert');
-
-const { AppDataSource } = require('../../../dest/database');
+import { AppDataSource } from '../../../dest/database.js'
 
 const owner = { userName: '__broadcaster__', user_id: String(Math.floor(Math.random() * 10000)) };
 

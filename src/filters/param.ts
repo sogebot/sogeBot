@@ -1,6 +1,6 @@
-import twitch from '../services/twitch';
+import twitch from '../services/twitch.js';
 
-import type { ResponseFilter } from '.';
+import type { ResponseFilter } from './index.js';
 
 const param: ResponseFilter = {
   '$touser': async function (_variable, attr) {

@@ -1,17 +1,14 @@
-require('../../general.js');
+import('../../general.js');
 
-const assert = require('assert');
+import assert from 'assert';
 
-const { User } = require('../../../dest/database/entity/user');
-const { Commands } = require('../../../dest/database/entity/commands');
+import { User } from '../../../dest/database/entity/user.js';
+import { Commands } from '../../../dest/database/entity/commands.js';
 
-const db = require('../../general.js').db;
-const time = require('../../general.js').time;
-const message = require('../../general.js').message;
-const user = require('../../general.js').user;
+import { db, time, message, user } from '../../general.js';
 
-const customcommands = (require('../../../dest/systems/customcommands')).default;
-const { defaultPermissions } = (require('../../../dest/helpers/permissions/defaultPermissions'));
+import customcommands from '../../../dest/systems/customcommands.js';
+import { defaultPermissions } from '../../../dest/helpers/permissions/defaultPermissions.js';
 
 describe('Custom Commands - @func1 - https://discord.com/channels/317348946144002050/317349069024395264/794732878595752016 - Custom command $param filter should be properly evaluated', () => {
   before(async () => {

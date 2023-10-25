@@ -1,10 +1,10 @@
 import { IsNotEmpty } from 'class-validator';
 import { Entity, PrimaryColumn, Column, BaseEntity } from 'typeorm';
 
-import { BotEntity } from '../BotEntity';
+import { BotEntity } from '../BotEntity.js';
 
 @Entity()
-export class Plugin extends BotEntity<Plugin> {
+export class Plugin extends BotEntity {
 
   @PrimaryColumn()
     id: string;

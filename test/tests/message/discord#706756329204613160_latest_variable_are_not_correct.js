@@ -1,16 +1,16 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
-const assert = require('assert');
 
-require('../../general.js');
+import assert from 'assert';
 
-const { setImmediateAwait } = require('../../../dest//helpers/setImmediateAwait');
-const { AppDataSource } = require('../../../dest/database.js');
-const { EventList } = require('../../../dest/database/entity/eventList');
-const { User } = require('../../../dest/database/entity/user');
-const Message = require('../../../dest/message').default;
-const eventlist = require('../../../dest/overlays/eventlist.js').default;
-const db = require('../../general.js').db;
-const message = require('../../general.js').message;
+import('../../general.js');
+
+import { setImmediateAwait } from '../../../dest//helpers/setImmediateAwait.js';
+import { AppDataSource } from '../../../dest/database.js';
+import { EventList } from '../../../dest/database/entity/eventList.js';
+import { User } from '../../../dest/database/entity/user.js';
+import {Message} from '../../../dest/message.js';
+import eventlist from '../../../dest/overlays/eventlist.js';
+import { db } from '../../general.js';
+import { message } from '../../general.js';
 
 // users
 const owner = { userName: '__broadcaster__' };

@@ -1,9 +1,9 @@
-import { isNil } from 'lodash';
+import { isNil } from 'lodash-es';
 
-import { default as custom_variables } from '../../widgets/customvariables';
-import { rawStatus } from '../api';
+import { default as custom_variables } from '../../widgets/customvariables.js';
+import { rawStatus } from '../api/index.js';
 
-import { updateChannelInfo } from '~/services/twitch/calls/updateChannelInfo';
+import { updateChannelInfo } from '~/services/twitch/calls/updateChannelInfo.js';
 
 async function updateWidgetAndTitle (variable: string | null = null) {
   if (custom_variables.socket) {

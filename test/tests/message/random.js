@@ -1,18 +1,17 @@
 /* global */
-require('../../general.js');
+import('../../general.js');
 
-const assert = require('assert');
-const { AppDataSource } = require('../../../dest/database.js');
+import assert from 'assert';
+import { AppDataSource } from '../../../dest/database.js';
 
 const owner = { userId: String(Math.floor(Math.random() * 100000)), userName: '__broadcaster__' };
 const ignoredUser = { userId: String(Math.floor(Math.random() * 100000)), userName: 'ignoreduser' };
 const user = { userId: String(Math.floor(Math.random() * 100000)), userName: 'user1' };
 
-const { User } = require('../../../dest/database/entity/user');
-const { prepare } = require('../../../dest/helpers/commons/prepare');
-const Message = require('../../../dest/message').default;
-const db = require('../../general.js').db;
-const msg = require('../../general.js').message;
+import { User } from '../../../dest/database/entity/user.js';
+import { prepare } from '../../../dest/helpers/commons/prepare.js';
+import {Message} from '../../../dest/message.js';
+import { db, message as msg } from '../../general.js';
 
 async function setUsersOnline(users) {
   await AppDataSource.getRepository(User).update({}, { isOnline: false });
@@ -23,8 +22,8 @@ async function setUsersOnline(users) {
 
 let twitch;
 describe('Message - random filter - @func3', () => {
-  before(() => {
-    twitch = require('../../../dest/services/twitch.js').default;
+  before(async () => {
+    twitch = (await import('../../../dest/services/twitch.js')).default;
   });
   describe('(random.online.viewer) should exclude ignored user', () => {
     before(async () => {

@@ -1,28 +1,28 @@
 import crypto from 'crypto';
 import { setTimeout } from 'timers/promises';
 
-import { SpotifySongBan } from '@entity/spotify';
-import { HOUR, SECOND } from '@sogebot/ui-helpers/constants';
+import { SpotifySongBan } from '@entity/spotify.js';
+import { HOUR, SECOND } from '@sogebot/ui-helpers/constants.js';
 import chalk from 'chalk';
-import _ from 'lodash';
+import _ from 'lodash-es';
 import SpotifyWebApi from 'spotify-web-api-node';
 
-import {
-  command, default_permission, persistent, settings,
-} from '../decorators';
+import Integration from './_interface.js';
 import {
   onChange, onLoad, onStartup,
-} from '../decorators/on';
-import Expects from '../expects';
-import Integration from './_interface';
+} from '../decorators/on.js';
+import {
+  command, default_permission, persistent, settings,
+} from '../decorators.js';
+import { Expects } from  '../expects.js';
 
-import { isStreamOnline } from '~/helpers/api';
-import { CommandError } from '~/helpers/commandError';
-import { announce, prepare } from '~/helpers/commons';
-import { debug, error, info, warning } from '~/helpers/log';
-import { ioServer } from '~/helpers/panel';
-import { addUIError } from '~/helpers/panel/index';
-import { adminEndpoint } from '~/helpers/socket';
+import { isStreamOnline } from '~/helpers/api/index.js';
+import { CommandError } from '~/helpers/commandError.js';
+import { announce, prepare } from '~/helpers/commons/index.js';
+import { debug, error, info, warning } from '~/helpers/log.js';
+import { addUIError } from '~/helpers/panel/index.js';
+import { ioServer } from '~/helpers/panel.js';
+import { adminEndpoint } from '~/helpers/socket.js';
 
 /*
  * How to integrate:
@@ -426,7 +426,7 @@ class Spotify extends Integration {
         });
 
         const track = response.body;
-        const songBan = new SpotifySongBan({
+        const songBan = SpotifySongBan.create({
           artists: track.artists.map(o => o.name), spotifyUri: track.uri, title: track.name,
         });
         await songBan.save();
@@ -648,7 +648,7 @@ class Spotify extends Integration {
     if (Object.keys(currentSong).length === 0) {
       return [{ response: prepare('integrations.spotify.not-banned-song-not-playing'), ...opts }];
     } else {
-      const songBan = new SpotifySongBan({
+      const songBan = SpotifySongBan.create({
         artists: currentSong.artists.split(', '), spotifyUri: currentSong.uri, title: currentSong.song,
       });
       await songBan.save();

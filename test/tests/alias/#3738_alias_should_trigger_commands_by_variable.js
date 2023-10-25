@@ -1,17 +1,15 @@
 /* global describe it */
-const assert = require('assert');
+import assert from 'assert';
 
-require('../../general.js');
-const db = require('../../general.js').db;
-const message = require('../../general.js').message;
-const user = require('../../general.js').user;
-const alias = (require('../../../dest/systems/alias')).default;
+import('../../general.js');
+import { db, message, user } from '../../general.js';
+import alias from '../../../dest/systems/alias.js';
 
-const { prepare } = (require('../../../dest/helpers/commons/prepare'));
-const { defaultPermissions } = require('../../../dest/helpers/permissions/defaultPermissions');
+import { prepare } from '../../../dest/helpers/commons/prepare.js';
+import { defaultPermissions } from '../../../dest/helpers/permissions/defaultPermissions.js';
 
-const { Variable } = require('../../../dest/database/entity/variable');
-const { AppDataSource } = require('../../../dest/database');
+import { Variable } from '../../../dest/database/entity/variable.js';
+import { AppDataSource } from '../../../dest/database.js'
 
 describe('Alias - @func1 - #3738 - alias should trigger commands by variable', () => {
   before(async () => {
@@ -20,7 +18,7 @@ describe('Alias - @func1 - #3738 - alias should trigger commands by variable', (
   });
 
   it('create variable $_alert', async () => {
-    await new Variable({
+    const variable = Variable.create({
       variableName: '$_alert',
       readOnly: false,
       currentValue: '!media type=video',
@@ -29,7 +27,8 @@ describe('Alias - @func1 - #3738 - alias should trigger commands by variable', (
       permission: defaultPermissions.CASTERS,
       evalValue: '',
       usableOptions: [],
-    }).save();
+    })
+    await variable.save();
   });
 
   it('create alias !test for command !media (caster only)', async () => {

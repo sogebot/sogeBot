@@ -1,18 +1,18 @@
 /* global */
 
-require('../../general.js');
-const assert = require('assert');
-const { AppDataSource } = require('../../../dest/database.js');
+import('../../general.js');
+import assert from 'assert';
+import { AppDataSource } from '../../../dest/database.js';
 
-const db = require('../../general.js').db;
+import { db } from '../../general.js';
 
-let changelog;
-let User;
 describe('User changelog tests - @func1', () => {
+  let User;
+  let changelog;
   before(async () => {
     await db.cleanup();
-    changelog = require('../../../dest/helpers/user/changelog');
-    User = require('../../../dest/database/entity/user').User;
+    changelog = await import('../../../dest/helpers/user/changelog.js');
+    User = (await import('../../../dest/database/entity/user.js')).User;
   });
 
   it('get of unknown user should return null', async () => {

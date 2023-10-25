@@ -1,13 +1,12 @@
 /* global  */
 
-const assert = require('assert');
+import assert from 'assert';
 
-const cooldown = (require('../../../dest/systems/cooldown')).default;
-const db = require('../../general.js').db;
-const message = require('../../general.js').message;
-const url = require('../../general.js').url;
+import cooldown from '../../../dest/systems/cooldown.js'
+import { db } from '../../general.js';
+import { message, url } from '../../general.js';
 
-require('../../general.js');
+import('../../general.js');
 
 // users
 const owner = {

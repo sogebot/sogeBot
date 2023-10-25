@@ -1,13 +1,13 @@
 import { v4 } from 'uuid';
 
-import { badgesCache } from '../services/twitch/calls/getChannelChatBadges';
-import Overlay from './_interface';
+import { badgesCache } from '../services/twitch/calls/getChannelChatBadges.js';
+import Overlay from './_interface.js';
 
-import { timer } from '~/decorators';
-import { onMessage } from '~/decorators/on';
-import { ioServer } from '~/helpers/panel';
-import { parseTextWithEmotes } from '~/helpers/parseTextWithEmotes';
-import { adminEndpoint } from '~/helpers/socket';
+import { timer } from '~/decorators.js';
+import { onMessage } from '~/decorators/on.js';
+import { ioServer } from '~/helpers/panel.js';
+import { parseTextWithEmotes } from '~/helpers/parseTextWithEmotes.js';
+import { adminEndpoint } from '~/helpers/socket.js';
 
 class Chat extends Overlay {
   showInUI = false;

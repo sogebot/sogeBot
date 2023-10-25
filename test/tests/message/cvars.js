@@ -1,19 +1,18 @@
 /* global describe it before */
 
-const { defaultPermissions } = require('../../../dest/helpers/permissions/defaultPermissions');
-const { getOwner } = require('../../../dest/helpers/commons/getOwner');
+import { defaultPermissions } from '../../../dest/helpers/permissions/defaultPermissions.js';
+import { getOwner } from '../../../dest/helpers/commons/getOwner.js';
 
-require('../../general.js');
+import('../../general.js');
 
-const db = require('../../general.js').db;
-const msg = require('../../general.js').message;
-const Message = require('../../../dest/message').default;
-const assert = require('assert');
-const _ = require('lodash');
+import { db, message as msg } from '../../general.js';
+import {Message} from '../../../dest/message.js';
+import assert from 'assert';
+import _ from 'lodash-es';
 
-const { User } = require('../../../dest/database/entity/user');
-const { Variable } = require('../../../dest/database/entity/variable');
-const { AppDataSource } = require('../../../dest/database');
+import { User } from '../../../dest/database/entity/user.js';
+import { Variable } from '../../../dest/database/entity/variable.js';
+import { AppDataSource } from '../../../dest/database.js'
 
 // stub
 _.set(global, 'widgets.custom_variables.io.emit', function () {});
@@ -162,7 +161,7 @@ describe('Message - cvars filter - @func3', async () => {
                 }
               });
               it(`create initial value '${test.initialValue}' of ${test.variable}`, async () => {
-                await new Variable({
+                await Variable.create({
                   variableName: test.variable,
                   readOnly: false,
                   currentValue: String(test.initialValue),
@@ -251,7 +250,7 @@ describe('Message - cvars filter - @func3', async () => {
                 }
               });
               it(`create initial value '${test.initialValue}' of ${test.variable}`, async () => {
-                await new Variable({
+                await Variable.create({
                   variableName: test.variable,
                   readOnly: true,
                   currentValue: String(test.initialValue),

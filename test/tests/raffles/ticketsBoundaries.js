@@ -1,17 +1,17 @@
 /* global describe it before */
 
-require('../../general.js');
+import('../../general.js');
 
-const assert = require('assert');
+import assert from 'assert';
 
-const _ = require('lodash');
-const { AppDataSource } = require('../../../dest/database.js');
+import _ from 'lodash-es';
+import { AppDataSource } from '../../../dest/database.js';
 
-const { RaffleParticipant } = require('../../../dest/database/entity/raffle');
-const { User } = require('../../../dest/database/entity/user');
-const raffles = (require('../../../dest/systems/raffles')).default;
-const message = require('../../general.js').message;
-const db = require('../../general.js').db;
+import { RaffleParticipant } from '../../../dest/database/entity/raffle.js';
+import { User } from '../../../dest/database/entity/user.js';
+import raffles from '../../../dest/systems/raffles.js';
+import { message } from '../../general.js';
+import { db } from '../../general.js';
 
 const max = 100;
 

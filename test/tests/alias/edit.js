@@ -1,12 +1,9 @@
-require('../../general.js');
+import { db, message } from '../../general.js';
 
-const db = require('../../general.js').db;
-const message = require('../../general.js').message;
-
-const { defaultPermissions } = require('../../../dest/helpers/permissions/defaultPermissions');
-const alias = (require('../../../dest/systems/alias')).default;
-const assert = require('assert');
-const { prepare } = (require('../../../dest/helpers/commons/prepare'));
+import { defaultPermissions } from '../../../dest/helpers/permissions/defaultPermissions.js';
+import alias from '../../../dest/systems/alias.js';
+import assert from 'assert';
+import { prepare } from '../../../dest/helpers/commons/prepare.js';
 
 // users
 const owner = { userName: '__broadcaster__' };

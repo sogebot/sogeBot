@@ -1,19 +1,17 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
+
 /* global */
 
-require('../../general.js');
-const assert = require('assert');
-const { IsNull } = require('typeorm');
+import('../../general.js');
+import assert from 'assert';
+import { IsNull } from 'typeorm';
 
-const commons = require('../../../dest/commons');
-const { AppDataSource } = require('../../../dest/database.js');
-const { Raffle } = require('../../../dest/database/entity/raffle');
-const { User } = require('../../../dest/database/entity/user');
-const changelog = (require('../../../dest/helpers/user/changelog'));
-const raffles = (require('../../../dest/systems/raffles')).default;
-const db = require('../../general.js').db;
-const message = require('../../general.js').message;
-const user = require('../../general.js').user;
+import * as commons from '../../../dest/commons.js'
+import { AppDataSource } from '../../../dest/database.js';
+import { Raffle } from '../../../dest/database/entity/raffle.js';
+import { User } from '../../../dest/database/entity/user.js';
+import * as changelog from '../../../dest/helpers/user/changelog.js';
+import raffles from '../../../dest/systems/raffles.js';
+import { db, message, user } from '../../general.js';
 
 describe('Raffles - user will lose points when join raffle with number and all #3587 - @func1', () => {
   before(async () => {

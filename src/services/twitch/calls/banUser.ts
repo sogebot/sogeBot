@@ -1,5 +1,5 @@
-import getBroadcasterId from '~/helpers/user/getBroadcasterId';
-import twitch from '~/services/twitch';
+import getBroadcasterId from '~/helpers/user/getBroadcasterId.js';
+import twitch from '~/services/twitch.js';
 
 export default function banUser(userId: string, reason?: string, duration?: number, type: 'bot' | 'broadcaster' = 'bot') {
   twitch.apiClient?.asIntent([type], ctx => ctx.moderation.banUser(getBroadcasterId(), {

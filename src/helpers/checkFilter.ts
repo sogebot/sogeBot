@@ -1,33 +1,33 @@
 import { existsSync, readFileSync } from 'fs';
 
-import { EventList } from '@entity/eventList';
-import { getTime } from '@sogebot/ui-helpers/getTime';
+import { EventList } from '@entity/eventList.js';
+import { getTime } from '@sogebot/ui-helpers/getTime.js';
 import gitCommitInfo from 'git-commit-info';
-import _, { sortBy } from 'lodash';
+import _, { sortBy } from 'lodash-es';
 import { In } from 'typeorm';
 import { VM } from 'vm2';
 
-import { isStreamOnline, stats } from './api';
-import { getAll } from './customvariables';
-import {
-  isOwner, isSubscriber, isVIP,
-} from './user';
+import { isStreamOnline, stats } from './api/index.js';
+import { getAll } from './customvariables/index.js';
 import * as changelog from './user/changelog.js';
 import getNameById from './user/getNameById.js';
-import { isBot, isBotSubscriber } from './user/isBot';
-import { isBroadcaster } from './user/isBroadcaster';
-import { isModerator } from './user/isModerator';
+import {
+  isOwner, isSubscriber, isVIP,
+} from './user/index.js';
+import { isBot, isBotSubscriber } from './user/isBot.js';
+import { isBroadcaster } from './user/isBroadcaster.js';
+import { isModerator } from './user/isModerator.js';
 import { timer } from '../decorators.js';
 import lastfm from '../integrations/lastfm.js';
 import spotify from '../integrations/spotify.js';
-import ranks from '../systems/ranks';
+import ranks from '../systems/ranks.js';
 import songs from '../systems/songs.js';
 import { translate } from '../translate.js';
 
-import { CacheGames } from '~/database/entity/cacheGames';
+import { CacheGames } from '~/database/entity/cacheGames.js';
 import { AppDataSource } from '~/database.js';
-import Message from '~/message.js';
-import { variables as vars } from '~/watchers';
+import { Message } from  '~/message.js';
+import { variables as vars } from '~/watchers.js';
 
 class HelpersFilter {
   @timer()

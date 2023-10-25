@@ -1,24 +1,24 @@
-import { MINUTE } from '@sogebot/ui-helpers/constants';
-import { getTime } from '@sogebot/ui-helpers/getTime';
+import { MINUTE } from '@sogebot/ui-helpers/constants.js';
+import { getTime } from '@sogebot/ui-helpers/getTime.js';
 import { OAuth2Client } from 'google-auth-library/build/src/auth/oauth2client';
 import { google, youtube_v3 } from 'googleapis';
 
-import Service from './_interface';
+import Service from './_interface.js';
 
-import { AppDataSource } from '~/database';
-import { GooglePrivateKeys } from '~/database/entity/google';
-import { persistent, settings } from '~/decorators';
-import { onChange, onStartup, onStreamEnd, onStreamStart } from '~/decorators/on';
+import { GooglePrivateKeys } from '~/database/entity/google.js';
+import { AppDataSource } from '~/database.js';
+import { onChange, onStartup, onStreamEnd, onStreamStart } from '~/decorators/on.js';
+import { persistent, settings } from '~/decorators.js';
 import {
   isStreamOnline,
   stats,
   streamStatusChangeSince,
-} from '~/helpers/api';
-import { getLang } from '~/helpers/locales';
-import { error, info, debug } from '~/helpers/log';
-import { app } from '~/helpers/panel';
-import { adminEndpoint } from '~/helpers/socket';
-import { adminMiddleware } from '~/socket';
+} from '~/helpers/api/index.js';
+import { getLang } from '~/helpers/locales.js';
+import { error, info, debug } from '~/helpers/log.js';
+import { app } from '~/helpers/panel.js';
+import { adminEndpoint } from '~/helpers/socket.js';
+import { adminMiddleware } from '~/socket.js';
 
 class Google extends Service {
   clientId = '225380804535-gjd77dplfkbe4d3ct173d8qm0j83f8tr.apps.googleusercontent.com';

@@ -1,19 +1,19 @@
-import { timezone } from '@sogebot/ui-helpers/dayjsHelper';
+import { timezone } from '@sogebot/ui-helpers/dayjsHelper.js';
 import {
   filter, isString, set,
-} from 'lodash';
+} from 'lodash-es';
 
-import { app } from './helpers/panel';
+import { app } from './helpers/panel.js';
 
-import Core from '~/_interface';
-import { settings } from '~/decorators';
-import { onChange, onLoad } from '~/decorators/on';
-import general from '~/general';
-import { mainCurrency, symbol } from '~/helpers/currency';
-import { find, list } from '~/helpers/register';
-import { publicEndpoint } from '~/helpers/socket';
-import { domain } from '~/helpers/ui';
-import { variables } from '~/watchers';
+import Core from '~/_interface.js';
+import { onChange, onLoad } from '~/decorators/on.js';
+import { settings } from '~/decorators.js';
+import general from '~/general.js';
+import { mainCurrency, symbol } from '~/helpers/currency/index.js';
+import { find, list } from '~/helpers/register.js';
+import { publicEndpoint } from '~/helpers/socket.js';
+import { domain } from '~/helpers/ui/index.js';
+import { variables } from '~/watchers.js';
 
 class UI extends Core {
   @settings()

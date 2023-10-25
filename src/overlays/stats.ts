@@ -1,11 +1,11 @@
-import { getTime } from '@sogebot/ui-helpers/getTime';
+import { getTime } from '@sogebot/ui-helpers/getTime.js';
 
-import Overlay from './_interface';
+import Overlay from './_interface.js';
 
 import {
   isStreamOnline, stats, streamStatusChangeSince,
-} from '~/helpers/api';
-import { publicEndpoint } from '~/helpers/socket';
+} from '~/helpers/api/index.js';
+import { publicEndpoint } from '~/helpers/socket.js';
 
 class Stats extends Overlay {
   showInUI = false;

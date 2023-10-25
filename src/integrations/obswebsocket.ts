@@ -1,25 +1,25 @@
-import { Events } from '@entity/event';
-import { OBSWebsocket as OBSWebsocketEntity } from '@entity/obswebsocket';
+import { Events } from '@entity/event.js';
+import { OBSWebsocket as OBSWebsocketEntity } from '@entity/obswebsocket.js';
 import { EntityNotFoundError } from 'typeorm';
-import { AppDataSource } from '~/database';
 
+import Integration from './_interface.js';
+import { onStartup } from '../decorators/on.js';
 import {
   command, default_permission,
-} from '../decorators';
-import { onStartup } from '../decorators/on';
-import events from '../events';
-import Expects from '../expects';
-import Integration from './_interface';
+} from '../decorators.js';
+import events from '../events.js';
+import { Expects } from  '../expects.js';
 
-import { eventEmitter } from '~/helpers/events';
+import { AppDataSource } from '~/database.js';
+import { eventEmitter } from '~/helpers/events/index.js';
 import {
   error, info,
-} from '~/helpers/log';
-import { app, ioServer } from '~/helpers/panel';
-import { ParameterError } from '~/helpers/parameterError';
-import { defaultPermissions } from '~/helpers/permissions/defaultPermissions';
-import { adminEndpoint, publicEndpoint } from '~/helpers/socket';
-import { translate } from '~/translate';
+} from '~/helpers/log.js';
+import { app, ioServer } from '~/helpers/panel.js';
+import { ParameterError } from '~/helpers/parameterError.js';
+import { defaultPermissions } from '~/helpers/permissions/defaultPermissions.js';
+import { adminEndpoint, publicEndpoint } from '~/helpers/socket.js';
+import { translate } from '~/translate.js';
 
 class OBSWebsocket extends Integration {
   @onStartup()

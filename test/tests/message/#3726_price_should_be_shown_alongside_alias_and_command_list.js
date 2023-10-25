@@ -1,20 +1,18 @@
 /* global describe it */
-require('../../general.js');
+import('../../general.js');
 
-const db = require('../../general.js').db;
-const message = require('../../general.js').message;
-const user = require('../../general.js').user;
+import { db, message, user } from '../../general.js';
 
-const assert = require('assert');
-const { AppDataSource } = require('../../../dest/database.js');
+import assert from 'assert';
+import { AppDataSource } from '../../../dest/database.js';
 
-const Message = require('../../../dest/message').default;
-const alias = (require('../../../dest/systems/alias')).default;
-const customcommands = (require('../../../dest/systems/customcommands')).default;
-const price = (require('../../../dest/systems/price')).default;
+import {Message} from '../../../dest/message.js';
+import alias from '../../../dest/systems/alias.js';
+import customcommands from '../../../dest/systems/customcommands.js';
+import price from '../../../dest/systems/price.js';
 const owner = { userName: '__broadcaster__', userId: String(Math.floor(Math.random() * 100000)) };
 
-const { Price } = require('../../../dest/database/entity/price');
+import { Price } from '../../../dest/database/entity/price.js';
 
 describe('Message - #3726 - price should be shown alongside alias and command list - @func3', () => {
   before(async () => {

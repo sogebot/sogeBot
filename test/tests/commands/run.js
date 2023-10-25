@@ -1,16 +1,14 @@
-const { v4: uuid } = require('uuid');
-const assert = require('assert');
-const { merge } = require('lodash');
+import assert from 'assert';
 
-const { Commands } = require('../../../dest/database/entity/commands');
-const { User } = require('../../../dest/database/entity/user');
-const { defaultPermissions } = require('../../../dest/helpers/permissions/defaultPermissions');
-const { AppDataSource } = require('../../../dest/database');
-const customcommands = (require('../../../dest/systems/customcommands')).default;
+import { Commands } from '../../../dest/database/entity/commands.js';
+import { User } from '../../../dest/database/entity/user.js';
+import { defaultPermissions } from '../../../dest/helpers/permissions/defaultPermissions.js';
+import { AppDataSource } from '../../../dest/database.js'
+import customcommands from '../../../dest/systems/customcommands.js';
 
-require('../../general.js');
-const db = require('../../general.js').db;
-const message = require('../../general.js').message;
+import('../../general.js');
+import { db } from '../../general.js';
+import { message } from '../../general.js';
 
 // users
 const owner = { userName: '__broadcaster__', userId: String(Math.floor(Math.random() * 100000)) };

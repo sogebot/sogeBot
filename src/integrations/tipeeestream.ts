@@ -1,23 +1,23 @@
-import { Currency, UserTip, UserTipInterface } from '@entity/user';
-import * as constants from '@sogebot/ui-helpers/constants';
+import { Currency, UserTip, UserTipInterface } from '@entity/user.js';
+import * as constants from '@sogebot/ui-helpers/constants.js';
 import fetch from 'node-fetch';
 
-import Integration from './_interface';
-import { persistent, settings } from '../decorators';
-import { onStartup } from '../decorators/on';
-import eventlist from '../overlays/eventlist';
-import alerts from '../registries/alerts';
-import users from '../users';
+import Integration from './_interface.js';
+import { persistent, settings } from '../decorators.js';
+import { onStartup } from '../decorators/on.js';
+import eventlist from '../overlays/eventlist.js';
+import alerts from '../registries/alerts.js';
+import users from '../users.js';
 
-import { AppDataSource } from '~/database';
-import { isStreamOnline } from '~/helpers/api/index';
-import { stats } from '~/helpers/api/stats';
-import exchange from '~/helpers/currency/exchange';
-import { mainCurrency } from '~/helpers/currency/index';
-import rates from '~/helpers/currency/rates';
-import { eventEmitter } from '~/helpers/events/index';
-import { triggerInterfaceOnTip } from '~/helpers/interface/triggers';
-import { error, tip } from '~/helpers/log';
+import { AppDataSource } from '~/database.js';
+import { isStreamOnline } from '~/helpers/api/index.js';
+import { stats } from '~/helpers/api/stats.js';
+import exchange from '~/helpers/currency/exchange.js';
+import { mainCurrency } from '~/helpers/currency/index.js';
+import rates from '~/helpers/currency/rates.js';
+import { eventEmitter } from '~/helpers/events/index.js';
+import { triggerInterfaceOnTip } from '~/helpers/interface/triggers.js';
+import { error, tip } from '~/helpers/log.js';
 
 type TipeeestreamEvent = {
   message: string,

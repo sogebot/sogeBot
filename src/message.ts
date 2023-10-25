@@ -1,20 +1,20 @@
 import axios from 'axios';
-import _ from 'lodash';
+import _ from 'lodash-es';
 import { v4 } from 'uuid';
 
 import {
   operation, command, count, custom, evaluate, ifp, info, list, math, online, param, price, qs, random, ResponseFilter, stream, youtube,
-} from './filters';
-import getBotId from './helpers/user/getBotId';
-import getBotUserName from './helpers/user/getBotUserName';
+} from './filters/index.js';
+import getBotId from './helpers/user/getBotId.js';
+import getBotUserName from './helpers/user/getBotUserName.js';
 
 import { timer } from '~/decorators.js';
 import { getGlobalVariables } from '~/helpers/checkFilter.js';
-import { getUserSender } from '~/helpers/commons';
-import { app } from '~/helpers/panel';
-import twitch from '~/services/twitch';
-import { adminMiddleware } from '~/socket';
-import { translate } from '~/translate';
+import { getUserSender } from '~/helpers/commons/index.js';
+import { app } from '~/helpers/panel.js';
+import twitch from '~/services/twitch.js';
+import { adminMiddleware } from '~/socket.js';
+import { translate } from '~/translate.js';
 
 (function initializeMessageParserAPI() {
   if (!app) {
@@ -32,7 +32,7 @@ import { translate } from '~/translate';
   });
 })();
 
-class Message {
+export class Message {
   message = '';
   id = v4();
 
@@ -262,6 +262,3 @@ class Message {
     }
   }
 }
-
-export { Message };
-export default Message;

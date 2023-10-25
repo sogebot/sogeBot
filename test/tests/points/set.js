@@ -1,16 +1,16 @@
 /* global describe it before */
 
-const assert = require('assert');
+import assert from 'assert';
 
-const _ = require('lodash');
-const { AppDataSource } = require('../../../dest/database.js');
+import _ from 'lodash-es';
+import { AppDataSource } from '../../../dest/database.js';
 
-require('../../general.js');
+import('../../general.js');
 
-const { User } = require('../../../dest/database/entity/user');
-const points = (require('../../../dest/systems/points')).default;
-const db = require('../../general.js').db;
-const message = require('../../general.js').message;
+import { User } from '../../../dest/database/entity/user.js';
+import points from '../../../dest/systems/points.js';
+import { db } from '../../general.js';
+import { message } from '../../general.js';
 
 const user = { userName: 'oneuser', userId: String(_.random(999999, false)) };
 

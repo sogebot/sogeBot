@@ -1,6 +1,6 @@
 import { Logger, QueryRunner } from 'typeorm';
 
-import { error as errorLog } from '~/helpers/log';
+import { error as errorLog } from '~/helpers/log.js';
 
 export class TypeORMLogger implements Logger {
   /**

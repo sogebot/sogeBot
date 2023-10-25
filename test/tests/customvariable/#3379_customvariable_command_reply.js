@@ -1,20 +1,19 @@
 /* global describe it before */
 
-const { defaultPermissions } = require('../../../dest/helpers/permissions/defaultPermissions');
-const Parser = require('../../../dest/parser').default;
+import { defaultPermissions } from '../../../dest/helpers/permissions/defaultPermissions.js';
+import { Parser } from '../../../dest/parser.js';
 
-require('../../general.js');
+import('../../general.js');
 
-const db = require('../../general.js').db;
-const message = require('../../general.js').message;
-const customcommands = (require('../../../dest/systems/customcommands')).default;
-const user = require('../../general.js').user;
+import { db } from '../../general.js';
+import { message, user } from '../../general.js';
+import customcommands from '../../../dest/systems/customcommands.js';
 
-const assert = require('assert');
-const _ = require('lodash');
+import assert from 'assert';
+import _ from 'lodash-es';
 
-const { Variable } = require('../../../dest/database/entity/variable');
-const { AppDataSource } = require('../../../dest/database');
+import { Variable } from '../../../dest/database/entity/variable.js';
+import { AppDataSource } from '../../../dest/database.js'
 
 // stub
 _.set(global, 'widgets.custom_variables.io.emit', function () {
@@ -33,7 +32,7 @@ describe('Custom Variable - #3379 - Command reply should return correct reply - 
   });
 
   it(`Create initial value 0 of $_variable`, async () => {
-    await new Variable({
+    await Variable.create({
       variableName: '$_variable',
       readOnly: false,
       currentValue: '0',

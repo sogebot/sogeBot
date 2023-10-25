@@ -1,18 +1,18 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
+
 /* global describe it before */
 
-require('../../general.js');
+import('../../general.js');
 
-const assert = require('assert');
+import assert from 'assert';
 
-const _ = require('lodash');
-const { AppDataSource } = require('../../../dest/database.js');
+import _ from 'lodash-es';
+import { AppDataSource } from '../../../dest/database.js';
 
-const { User } = require('../../../dest/database/entity/user');
-const gamble = (require('../../../dest/games/gamble')).default;
-const { prepare } = require('../../../dest/helpers/commons/prepare');
-const db = require('../../general.js').db;
-const message = require('../../general.js').message;
+import { User } from '../../../dest/database/entity/user.js';
+import gamble from '../../../dest/games/gamble.js';
+import { prepare } from '../../../dest/helpers/commons/prepare.js';
+import { db } from '../../general.js';
+import { message } from '../../general.js';
 
 const user1 = { userName: 'user1', userId: String(_.random(999999, false)) };
 const command = '!gamble';

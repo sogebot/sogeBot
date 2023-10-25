@@ -1,17 +1,17 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
+
 /* global describe it before */
 
 
-require('../../general.js');
+import('../../general.js');
 
-const db = require('../../general.js').db;
-const assert = require('assert');
-const { AppDataSource } = require('../../../dest/database.js');
-const message = require('../../general.js').message;
+import { db } from '../../general.js';
+import assert from 'assert';
+import { AppDataSource } from '../../../dest/database.js';
+import { message } from '../../general.js';
 
-const { Quotes } = require('../../../dest/database/entity/quotes');
+import { Quotes } from '../../../dest/database/entity/quotes.js';
 
-const quotes = (require('../../../dest/systems/quotes')).default;
+import quotes from '../../../dest/systems/quotes.js'
 
 // users
 const owner = { userName: '__broadcaster__', userId: 1 };
@@ -28,6 +28,7 @@ const tests = [
   { sender: owner, parameters: '-tag ipsum, dolor -id 99999', id: 99999, tags: 'ipsum, dolor', shouldFail: false, exist: false },
 ];
 
+let id;
 describe('Quotes - set() - @func3', () => {
   for (const test of tests) {
     describe(test.parameters, async () => {

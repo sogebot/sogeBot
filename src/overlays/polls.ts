@@ -1,7 +1,7 @@
-import Overlay from './_interface';
+import Overlay from './_interface.js';
 
-import * as channelPoll from '~/helpers/api/channelPoll';
-import { publicEndpoint } from '~/helpers/socket';
+import * as channelPoll from '~/helpers/api/channelPoll.js';
+import { publicEndpoint } from '~/helpers/socket.js';
 
 class Polls extends Overlay {
   public sockets() {

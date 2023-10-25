@@ -1,17 +1,17 @@
 import { HelixSubscription } from '@twurple/api/lib';
 
-import { AppDataSource } from '~/database';
-import { User } from '~/database/entity/user';
+import { User } from '~/database/entity/user.js';
+import { AppDataSource } from '~/database.js';
 import {
   stats as apiStats,
-} from '~/helpers/api';
-import { isDebugEnabled } from '~/helpers/debug';
-import { getFunctionName } from '~/helpers/getFunctionName';
-import { debug, error, warning } from '~/helpers/log';
-import { isBotId, isBotSubscriber } from '~/helpers/user';
+} from '~/helpers/api/index.js';
+import { isDebugEnabled } from '~/helpers/debug.js';
+import { getFunctionName } from '~/helpers/getFunctionName.js';
+import { debug, error, warning } from '~/helpers/log.js';
 import * as changelog from '~/helpers/user/changelog.js';
-import twitch from '~/services/twitch';
-import { variables } from '~/watchers';
+import { isBotId, isBotSubscriber } from '~/helpers/user/index.js';
+import twitch from '~/services/twitch.js';
+import { variables } from '~/watchers.js';
 
 export async function getChannelSubscribers<T extends { noAffiliateOrPartnerWarningSent?: boolean; notCorrectOauthWarningSent?: boolean }> (opts: T): Promise<{ state: boolean; opts: T }> {
   if (isDebugEnabled('api.calls')) {

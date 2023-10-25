@@ -1,4 +1,4 @@
-import { info, warning } from '~/helpers/log';
+import { info, warning } from '~/helpers/log.js';
 
 export const LogGenerator = (pluginId: string, fileName: string) => ({
   info: async (message: string) => {

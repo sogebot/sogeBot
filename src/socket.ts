@@ -1,23 +1,23 @@
-import { DAY } from '@sogebot/ui-helpers/constants';
+import { DAY } from '@sogebot/ui-helpers/constants.js';
 import axios from 'axios';
 import { NextFunction } from 'express';
-import jwt, { JsonWebTokenError } from 'jsonwebtoken';
+import jwt from 'jsonwebtoken';
 import { Socket as SocketIO } from 'socket.io';
 import { v4 as uuid } from 'uuid';
 
-import Core from '~/_interface';
+import Core from '~/_interface.js';
+import { onLoad } from '~/decorators/on.js';
 import {
   persistent, settings, ui,
-} from '~/decorators';
-import { onLoad } from '~/decorators/on';
-import { debug, error } from '~/helpers/log';
-import { app, ioServer } from '~/helpers/panel';
-import { check } from '~/helpers/permissions/check';
-import { defaultPermissions } from '~/helpers/permissions/defaultPermissions';
-import { getUserHighestPermission } from '~/helpers/permissions/getUserHighestPermission';
-import { adminEndpoint, endpoints } from '~/helpers/socket';
+} from '~/decorators.js';
+import { debug, error } from '~/helpers/log.js';
+import { app, ioServer } from '~/helpers/panel.js';
+import { check } from '~/helpers/permissions/check.js';
+import { defaultPermissions } from '~/helpers/permissions/defaultPermissions.js';
+import { getUserHighestPermission } from '~/helpers/permissions/getUserHighestPermission.js';
+import { adminEndpoint, endpoints } from '~/helpers/socket.js';
 import * as changelog from '~/helpers/user/changelog.js';
-import { isModerator } from '~/helpers/user/isModerator';
+import { isModerator } from '~/helpers/user/isModerator.js';
 
 enum Authorized {
   inProgress,
@@ -213,7 +213,7 @@ class Socket extends Core {
           debug('socket', JSON.stringify(token, null, 4));
           initEndpoints(socket, token.privileges);
         } catch (e: any) {
-          if (e instanceof JsonWebTokenError) {
+          if (e instanceof jwt.JsonWebTokenError) {
             error('Used token for authorization is malformed or invalid: ' + e.message);
             debug('socket', e.stack);
           } else if (e instanceof Error) {

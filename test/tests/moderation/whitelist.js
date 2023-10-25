@@ -1,14 +1,13 @@
 /* global describe it before */
-const assert = require('assert');
+import assert from 'assert';
 
-const _ = require('lodash');
-require('../../general.js');
+import _ from 'lodash-es';
+import('../../general.js');
 
-const alias = (require('../../../dest/systems/alias')).default;
-const moderation = (require('../../../dest/systems/moderation')).default;
-const songs = (require('../../../dest/systems/songs')).default;
-const message = require('../../general.js').message;
-const db = require('../../general.js').db;
+import alias from '../../../dest/systems/alias.js';import moderation from '../../../dest/systems/moderation.js';
+import songs from '../../../dest/systems/songs.js';
+import { message } from '../../general.js';
+import { db } from '../../general.js';
 
 // users
 const owner = { userName: '__broadcaster__' };

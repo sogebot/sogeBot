@@ -1,14 +1,14 @@
 import { v4 } from 'uuid';
 
-import Overlay from './_interface';
+import Overlay from './_interface.js';
 import {
   command, default_permission,
-} from '../decorators';
-import { warning } from '../helpers/log';
+} from '../decorators.js';
+import { warning } from '../helpers/log.js';
 
-import { onStartup } from '~/decorators/on';
-import { eventEmitter } from '~/helpers/events';
-import defaultPermissions from '~/helpers/permissions/defaultPermissions';
+import { onStartup } from '~/decorators/on.js';
+import { eventEmitter } from '~/helpers/events/index.js';
+import defaultPermissions from '~/helpers/permissions/defaultPermissions.js';
 
 class TextToSpeech extends Overlay {
   @onStartup()
@@ -24,7 +24,7 @@ class TextToSpeech extends Overlay {
   @command('!tts')
   @default_permission(defaultPermissions.CASTERS)
   async textToSpeech(opts: CommandOptions): Promise<CommandResponse[]> {
-    const { default: tts, services } = await import ('../tts');
+    const { default: tts, services } = await import ('../tts.js');
     if (tts.ready) {
       let key = v4();
       if (tts.service === services.RESPONSIVEVOICE) {

@@ -6,7 +6,7 @@ import { EventSubChannelPredictionEndEventData } from '@twurple/eventsub-base/li
 import { EventSubChannelPredictionLockEventData } from '@twurple/eventsub-base/lib/events/EventSubChannelPredictionLockEvent.external';
 import { EventSubChannelPredictionProgressEventData } from '@twurple/eventsub-base/lib/events/EventSubChannelPredictionProgressEvent.external';
 
-import { eventEmitter } from '~/helpers/events';
+import { eventEmitter } from '~/helpers/events/index.js';
 
 let data: null | {
   id: string,

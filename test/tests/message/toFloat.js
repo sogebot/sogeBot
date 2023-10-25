@@ -1,10 +1,10 @@
 /* global describe it before */
 
-require('../../general.js');
+import('../../general.js');
 
-const db = require('../../general.js').db;
-const Message = require('../../../dest/message').default;
-const assert = require('assert');
+import { db } from '../../general.js';
+import {Message} from '../../../dest/message.js';
+import assert from 'assert';
 const owner = { userId: String(Math.floor(Math.random() * 100000)), userName: '__broadcaster__' };
 
 const tests = [

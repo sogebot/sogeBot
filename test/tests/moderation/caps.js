@@ -1,15 +1,14 @@
 /* global describe it before */
 
-const assert = require('assert');
+import assert from 'assert';
 
-require('../../general.js');
-
-const moderation = (require('../../../dest/systems/moderation')).default;
-const db = require('../../general.js').db;
-const variable = require('../../general.js').variable;
-const message = require('../../general.js').message;
-const user = require('../../general.js').user;
-const time = require('../../general.js').time;
+import('../../general.js');
+import moderation from '../../../dest/systems/moderation.js';
+import { db } from '../../general.js';
+import { variable } from '../../general.js';
+import { message } from '../../general.js';
+import { user } from '../../general.js';
+import { time } from '../../general.js';
 
 const emotesOffsetsKAPOW = new Map();
 emotesOffsetsKAPOW.set('133537', ['7-11', '13-17']);

@@ -1,11 +1,11 @@
 /* global describe it beforeEach */
-require('../../general.js');
+import('../../general.js');
 
-const assert = require('assert');
+import assert from 'assert';
 
-const customcommands = (require('../../../dest/systems/customcommands')).default;
-const db = require('../../general.js').db;
-const message = require('../../general.js').message;
+import customcommands from '../../../dest/systems/customcommands.js';
+import { db } from '../../general.js';
+import { message } from '../../general.js';
 
 // users
 const owner = { userName: '__broadcaster__' };

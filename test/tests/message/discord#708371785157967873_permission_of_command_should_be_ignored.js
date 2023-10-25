@@ -1,13 +1,11 @@
-require('../../general.js');
+import('../../general.js');
 
-const db = require('../../general.js').db;
-const message = require('../../general.js').message;
-const user = require('../../general.js').user;
+import { db, message, user } from '../../general.js';
 
-const assert = require('assert');
+import assert from 'assert';
 
-const customcommands = (require('../../../dest/systems/customcommands')).default;
-const Parser = require('../../../dest/parser').default;
+import customcommands from '../../../dest/systems/customcommands.js';
+import { Parser } from '../../../dest/parser.js';
 
 describe('Message - https://discordapp.com/channels/317348946144002050/619437014001123338/708371785157967873 - permission of command with (!#) should be ignored - @func3', () => {
   before(async () => {

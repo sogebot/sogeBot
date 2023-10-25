@@ -1,20 +1,20 @@
-import { Quotes as QuotesEntity } from '@entity/quotes';
-import { sample } from '@sogebot/ui-helpers/array';
+import { Quotes as QuotesEntity } from '@entity/quotes.js';
+import { sample } from '@sogebot/ui-helpers/array.js';
 import { validateOrReject } from 'class-validator';
-import * as _ from 'lodash';
-import { merge } from 'lodash';
+import * as _ from 'lodash-es';
+import { merge } from 'lodash-es';
 
-import System from './_interface';
-import { command, default_permission } from '../decorators';
-import Expects from '../expects';
+import System from './_interface.js';
+import { command, default_permission } from '../decorators.js';
+import { Expects } from  '../expects.js';
 
-import { AppDataSource } from '~/database';
-import { prepare } from '~/helpers/commons';
-import { app } from '~/helpers/panel';
-import defaultPermissions from '~/helpers/permissions/defaultPermissions';
-import { domain } from '~/helpers/ui';
-import getNameById from '~/helpers/user/getNameById';
-import { adminMiddleware } from '~/socket';
+import { AppDataSource } from '~/database.js';
+import { prepare } from '~/helpers/commons/index.js';
+import { app } from '~/helpers/panel.js';
+import defaultPermissions from '~/helpers/permissions/defaultPermissions.js';
+import { domain } from '~/helpers/ui/index.js';
+import getNameById from '~/helpers/user/getNameById.js';
+import { adminMiddleware } from '~/socket.js';
 
 class Quotes extends System {
   constructor () {

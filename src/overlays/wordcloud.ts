@@ -1,5 +1,5 @@
-import { parser } from '../decorators';
-import Overlay from './_interface';
+import Overlay from './_interface.js';
+import { parser } from '../decorators.js';
 
 const re = new RegExp('\\p{L}*', 'gmu');
 class WordCloud extends Overlay {

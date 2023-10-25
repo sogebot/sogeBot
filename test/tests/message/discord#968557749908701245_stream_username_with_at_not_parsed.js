@@ -1,14 +1,12 @@
-const assert = require('assert');
+import assert from 'assert';
 
-require('../../general.js');
+import('../../general.js');
 
-const db = require('../../general.js').db;
-const message = require('../../general.js').message;
-const user = require('../../general.js').user;
+import { db, message, user } from '../../general.js';
 
 describe('Message - https://discord.com/channels/317348946144002050/317349069024395264/968557749908701245 - stream response filter should be able to parse user with at - @func3', () => {
   before(async () => {
-    const customcommands = (require('../../../dest/systems/customcommands')).default;
+    const customcommands = (await import('../../../dest/systems/customcommands.js')).default;
 
     await db.cleanup();
     await message.prepare();
@@ -16,7 +14,7 @@ describe('Message - https://discord.com/channels/317348946144002050/317349069024
   });
 
   it('!test should properly parse @user', async () => {
-    const customcommands = (require('../../../dest/systems/customcommands')).default;
+    const customcommands = (await import('../../../dest/systems/customcommands.js')).default;
 
     await customcommands.run({ sender: user.viewer, message: '!test @user' });
     await message.debug('sendMessage.message', 'twitch.tv/user twitch.tv/user');

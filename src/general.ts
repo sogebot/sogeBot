@@ -1,38 +1,38 @@
 import { existsSync, readdirSync, readFileSync, writeFileSync } from 'fs';
 
-import { HOUR, MINUTE } from '@sogebot/ui-helpers/constants';
-import { setLocale } from '@sogebot/ui-helpers/dayjsHelper';
+import { HOUR, MINUTE } from '@sogebot/ui-helpers/constants.js';
+import { setLocale } from '@sogebot/ui-helpers/dayjsHelper.js';
 import gitCommitInfo from 'git-commit-info';
 import {
   capitalize,
   get, isNil,
-} from 'lodash';
+} from 'lodash-es';
 
-import { menu } from './helpers/panel';
-import type { Command } from '../d.ts/src/general';
+import { menu } from './helpers/panel.js';
+import type { Command } from '../d.ts/src/general.js';
 
-import Core from '~/_interface';
-import { PermissionCommands } from '~/database/entity/permissions';
-import {
-  command, default_permission, settings, ui,
-} from '~/decorators';
+import Core from '~/_interface.js';
+import { PermissionCommands } from '~/database/entity/permissions.js';
 import {
   onChange, onLoad, onStartup,
-} from '~/decorators/on';
-import { isStreamOnline } from '~/helpers/api';
-import { setValue } from '~/helpers/general';
-import { setLang } from '~/helpers/locales';
+} from '~/decorators/on.js';
+import {
+  command, default_permission, settings, ui,
+} from '~/decorators.js';
+import { isStreamOnline } from '~/helpers/api/index.js';
+import { setValue } from '~/helpers/general/index.js';
+import { setLang } from '~/helpers/locales.js';
 import {
   debug, error, warning,
-} from '~/helpers/log';
-import { socketsConnected } from '~/helpers/panel/index';
-import { addUIWarn } from '~/helpers/panel/index';
-import defaultPermissions from '~/helpers/permissions/defaultPermissions';
-import { list } from '~/helpers/register';
-import { adminEndpoint } from '~/helpers/socket';
-import { getMuteStatus } from '~/helpers/tmi/muteStatus';
-import translateLib, { translate } from '~/translate';
-import { variables } from '~/watchers';
+} from '~/helpers/log.js';
+import { socketsConnected } from '~/helpers/panel/index.js';
+import { addUIWarn } from '~/helpers/panel/index.js';
+import defaultPermissions from '~/helpers/permissions/defaultPermissions.js';
+import { list } from '~/helpers/register.js';
+import { adminEndpoint } from '~/helpers/socket.js';
+import { getMuteStatus } from '~/helpers/tmi/muteStatus.js';
+import translateLib, { translate } from '~/translate.js';
+import { variables } from '~/watchers.js';
 
 let threadStartTimestamp = Date.now();
 let isInitialLangSet = true;
@@ -228,7 +228,7 @@ class General extends Core {
     const botId = variables.get('services.twitch.botId') as string;
     const broadcasterId = variables.get('services.twitch.broadcasterId') as string;
 
-    const twitch = (await import('./services/twitch')).default;
+    const twitch = (await import('./services/twitch.js')).default;
 
     const version = get(process, 'env.npm_package_version', 'x.y.z');
     const commitFile = existsSync('./.commit') ? readFileSync('./.commit').toString() : null;

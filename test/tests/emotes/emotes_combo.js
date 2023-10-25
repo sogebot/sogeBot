@@ -1,14 +1,10 @@
-const assert = require('assert');
+import assert from 'assert';
 
-const { getLocalizedName } = require('@sogebot/ui-helpers/getLocalized');
+import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized.js';
 
-const { translate } = require('../../../dest/translate');
-require('../../general.js');
-const db = require('../../general.js').db;
-const message = require('../../general.js').message;
-const user = require('../../general.js').user;
+import { translate } from '../../../dest/translate.js';
+import { db, message, user } from '../../general.js';
 
-let emotes;
 
 const emotesOffsetsKappa = new Map();
 emotesOffsetsKappa.set('25', ['0-4']);
@@ -16,19 +12,19 @@ emotesOffsetsKappa.set('25', ['0-4']);
 const emotesOffsetsHeyGuys = new Map();
 emotesOffsetsHeyGuys.set('30259', ['0-6']);
 
+
 describe('Emotes - combo - @func2', () => {
+  let emotes = null;
+  beforeEach(async () => {
+    await db.cleanup();
+    emotes = (await import('../../../dest/systems/emotescombo.js')).default
+  });
   describe('Emotes combo should send proper message after 3 emotes', () => {
     let comboLastBreak = 0;
     before(async () => {
       await db.cleanup();
       await message.prepare();
       await user.prepare();
-      emotes = (require('../../../dest/systems/emotescombo')).default;
-      emotes.enableEmotesCombo = true;
-      emotes.comboEmoteCount = 0;
-    });
-    after(() => {
-      emotes.enableEmotesCombo = false;
     });
 
     // we run it twice as to test without cooldown
@@ -70,12 +66,7 @@ describe('Emotes - combo - @func2', () => {
       await db.cleanup();
       await message.prepare();
       await user.prepare();
-      emotes = (require('../../../dest/systems/emotescombo')).default;
-      emotes.enableEmotesCombo = true;
       emotes.comboEmoteCount = 0;
-    });
-    after(() => {
-      emotes.enableEmotesCombo = false;
     });
 
     // we run it twice as to test without cooldown
@@ -131,14 +122,11 @@ describe('Emotes - combo - @func2', () => {
       await db.cleanup();
       await message.prepare();
       await user.prepare();
-      emotes = (require('../../../dest/systems/emotescombo')).default;
       emotes.comboLastBreak = 0;
-      emotes.enableEmotesCombo = true;
       emotes.comboCooldown = 60;
       emotes.comboEmoteCount = 0;
     });
     after(() => {
-      emotes.enableEmotesCombo = false;
       emotes.comboCooldown = 0;
     });
 
@@ -146,6 +134,8 @@ describe('Emotes - combo - @func2', () => {
     for (let j = 0; j < 2; j++) {
       for (let i = 0; i < 3; i++) {
         it('Send a message with Kappa emote', async () => {
+          console.log(emotes.comboEmote)
+          console.log(emotes.comboEmoteCount)
           await emotes.containsEmotes({
             emotesOffsets: emotesOffsetsKappa,
             sender:        user.owner,

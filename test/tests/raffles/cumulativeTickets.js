@@ -1,21 +1,19 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
+
 /* global describe it before */
 
-require('../../general.js');
+import('../../general.js');
 
-const db = require('../../general.js').db;
-const message = require('../../general.js').message;
-const user = require('../../general.js').user;
-const commons = require('../../../dest/commons');
+import { db, message, user } from '../../general.js';
+import * as commons from '../../../dest/commons.js'
 
-const { User } = require('../../../dest/database/entity/user');
-const { Raffle } = require('../../../dest/database/entity/raffle');
+import { User } from '../../../dest/database/entity/user.js';
+import { Raffle } from '../../../dest/database/entity/raffle.js';
 
-const raffles = (require('../../../dest/systems/raffles')).default;
+import raffles from '../../../dest/systems/raffles.js';
 
-const assert = require('assert');
-const { IsNull } = require('typeorm');
-const { AppDataSource } = require('../../../dest/database.js');
+import assert from 'assert';
+import { IsNull } from 'typeorm';
+import { AppDataSource } from '../../../dest/database.js';
 
 describe('Raffles - cumulativeTickets - @func1', () => {
   before(async () => {

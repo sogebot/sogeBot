@@ -1,21 +1,22 @@
 /* global describe it before */
-const { getOwner } = require('../../../dest/helpers/commons/getOwner');
+import { getOwner } from '../../../dest/helpers/commons/getOwner.js';
 
-require('../../general.js');
+import('../../general.js');
 
-const db = require('../../general.js').db;
-const message = require('../../general.js').message;
+import { db } from '../../general.js';
+import { message } from '../../general.js';
 
-const { User } = require('../../../dest/database/entity/user');
+import { User } from '../../../dest/database/entity/user.js';
 
-const { prepare } = require('../../../dest/helpers/commons/prepare');
-const top = (require('../../../dest/systems/top')).default;
-const assert = require('assert');
-const { AppDataSource } = require('../../../dest/database');
-const twitch = require('../../../dest/services/twitch.js').default;
+import { prepare } from '../../../dest/helpers/commons/prepare.js';
+import top from '../../../dest/systems/top.js';
+import assert from 'assert';
+import { AppDataSource } from '../../../dest/database.js'
+import twitch from '../../../dest/services/twitch.js';
 
 // users
 const owner = { userName: '__broadcaster__' };
+let user;
 
 describe('Top - !top points - @func3', () => {
   before(async () => {

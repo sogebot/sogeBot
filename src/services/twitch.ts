@@ -1,44 +1,44 @@
-import { EventList } from '@entity/eventList';
-import { User } from '@entity/user';
-import { SECOND } from '@sogebot/ui-helpers/constants';
-import { dayjs, timezone } from '@sogebot/ui-helpers/dayjsHelper';
-import { getTime } from '@sogebot/ui-helpers/getTime';
+import { EventList } from '@entity/eventList.js';
+import { User } from '@entity/user.js';
+import { SECOND } from '@sogebot/ui-helpers/constants.js';
+import { dayjs, timezone } from '@sogebot/ui-helpers/dayjsHelper.js';
+import { getTime } from '@sogebot/ui-helpers/getTime.js';
 import { ApiClient } from '@twurple/api';
-import { capitalize } from 'lodash';
+import { capitalize } from 'lodash-es';
 
-import Service from './_interface';
-import { init } from './twitch/api/interval';
-import { createClip } from './twitch/calls/createClip';
-import { createMarker } from './twitch/calls/createMarker';
-import { updateBroadcasterType } from './twitch/calls/updateBroadcasterType';
-import Chat from './twitch/chat';
-import EventSubLongPolling from './twitch/eventSubLongPolling';
-import EventSubWebsocket from './twitch/eventSubWebsocket';
-import { CustomAuthProvider } from './twitch/token/CustomAuthProvider';
+import Service from './_interface.js';
+import { init } from './twitch/api/interval.js';
+import { createClip } from './twitch/calls/createClip.js';
+import { createMarker } from './twitch/calls/createMarker.js';
+import { updateBroadcasterType } from './twitch/calls/updateBroadcasterType.js';
+import Chat from './twitch/chat.js';
+import EventSubLongPolling from './twitch/eventSubLongPolling.js';
+import EventSubWebsocket from './twitch/eventSubWebsocket.js';
+import { CustomAuthProvider } from './twitch/token/CustomAuthProvider.js';
+import { onChange, onLoad, onStreamStart } from '../decorators/on.js';
 import {
   command, default_permission, example, persistent, settings,
-} from '../decorators';
-import { onChange, onLoad, onStreamStart } from '../decorators/on';
-import Expects from '../expects';
-import { debug, error, info } from '../helpers/log';
+} from '../decorators.js';
+import { Expects } from  '../expects.js';
+import { debug, error, info } from '../helpers/log.js';
 
-import { AppDataSource } from '~/database';
+import { AppDataSource } from '~/database.js';
 import {
   isStreamOnline, stats, streamStatusChangeSince,
-} from '~/helpers/api';
-import { prepare } from '~/helpers/commons/prepare';
-import defaultPermissions from '~/helpers/permissions/defaultPermissions';
-import { adminEndpoint } from '~/helpers/socket';
+} from '~/helpers/api/index.js';
+import { prepare } from '~/helpers/commons/prepare.js';
+import defaultPermissions from '~/helpers/permissions/defaultPermissions.js';
+import { adminEndpoint } from '~/helpers/socket.js';
 import {
   ignorelist, sendWithMe, setMuteStatus, showWithAt,
-} from '~/helpers/tmi';
+} from '~/helpers/tmi/index.js';
 import * as changelog from '~/helpers/user/changelog.js';
-import getNameById from '~/helpers/user/getNameById';
-import { isIgnored } from '~/helpers/user/isIgnored';
-import { sendGameFromTwitch } from '~/services/twitch/calls/sendGameFromTwitch';
-import { updateChannelInfo } from '~/services/twitch/calls/updateChannelInfo';
-import { translate } from '~/translate';
-import { variables } from '~/watchers';
+import getNameById from '~/helpers/user/getNameById.js';
+import { isIgnored } from '~/helpers/user/isIgnored.js';
+import { sendGameFromTwitch } from '~/services/twitch/calls/sendGameFromTwitch.js';
+import { updateChannelInfo } from '~/services/twitch/calls/updateChannelInfo.js';
+import { translate } from '~/translate.js';
+import { variables } from '~/watchers.js';
 
 const urls = {
   'SogeBot Token Generator v2': 'https://credentials.sogebot.xyz/twitch/refresh/',
@@ -380,7 +380,7 @@ class Twitch extends Service {
   async replay (opts: CommandOptions) {
     const cid = await createClip({ createAfterDelay: false });
     if (cid) {
-      require('~/overlays/clips').default.showClip(cid);
+      (await import('~/overlays/clips.js')).default.showClip(cid);
       return [{
         response: prepare('api.clips.created', { link: `https://clips.twitch.tv/${cid}` }),
         ...opts,

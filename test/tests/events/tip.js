@@ -1,21 +1,21 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
+
 /* global  */
 
-const assert = require('assert');
+import assert from 'assert';
 
-require('../../general.js');
+import('../../general.js');
 
-const { v4: uuidv4 } = require('uuid');
-const { AppDataSource } = require('../../../dest/database.js');
+import { v4 as uuidv4 } from 'uuid';
+import { AppDataSource } from '../../../dest/database.js';
 
-const { Event } = require('../../../dest/database/entity/event');
-const { User } = require('../../../dest/database/entity/user');
-const events = (require('../../../dest/events')).default;
-const log = require('../../../dest/helpers/log');
-const changelog = (require('../../../dest/helpers/user/changelog'));
-const time = require('../../general.js').time;
-const db = require('../../general.js').db;
-const message = require('../../general.js').message;
+import { Event } from '../../../dest/database/entity/event.js';
+import { User } from '../../../dest/database/entity/user.js';
+import events from '../../../dest/events.js';
+import * as log from '../../../dest/helpers/log.js';
+import * as changelog from '../../../dest/helpers/user/changelog.js';
+import { time } from '../../general.js';
+import { db } from '../../general.js';
+import { message } from '../../general.js';
 
 describe('Events - tip event - @func3', () => {
   before(async () => {

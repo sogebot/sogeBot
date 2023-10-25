@@ -1,5 +1,5 @@
 import * as changelog from '~/helpers/user/changelog.js';
-import twitch from '~/services/twitch';
+import twitch from '~/services/twitch.js';
 
 export default async function getNameById (userId: string): Promise<string> {
   const user = await changelog.get(userId);

@@ -1,18 +1,17 @@
-const assert = require('assert');
+import assert from 'assert';
 
-require('../../general.js');
+import('../../general.js');
 
-const { v4: uuidv4 } = require('uuid');
+import { v4 as uuidv4 } from 'uuid';
 
-const events = (require('../../../dest/events')).default;
-const { Event } = require('../../../dest/database/entity/event');
-const { User } = require('../../../dest/database/entity/user');
-const { AppDataSource } = require('../../../dest/database.js');
-const log = require('../../../dest/helpers/log');
-const changelog = (require('../../../dest/helpers/user/changelog'));
-const time = require('../../general.js').time;
-const db = require('../../general.js').db;
-const message = require('../../general.js').message;
+import events from '../../../dest/events.js';
+import { Event } from '../../../dest/database/entity/event.js';
+import { User } from '../../../dest/database/entity/user.js';
+import { AppDataSource } from '../../../dest/database.js';
+import * as changelog from '../../../dest/helpers/user/changelog.js';
+import { time } from '../../general.js';
+import { db } from '../../general.js';
+import { message } from '../../general.js';
 
 describe('Events - cheer event - @func3', () => {
   before(async () => {
@@ -52,7 +51,7 @@ describe('Events - cheer event - @func3', () => {
         });
 
         it('user should have 10 points', async () => {
-          const points = (require('../../../dest/systems/points')).default;
+          const points = (await import('../../../dest/systems/points.js')).default;
           assert.strict.equal(await points.getPointsOf(userId), 10);
         });
       });

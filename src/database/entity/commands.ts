@@ -1,7 +1,7 @@
 import { IsNotEmpty, MinLength } from 'class-validator';
 import { BaseEntity, Column, Entity, Index, PrimaryColumn } from 'typeorm';
 
-import { IsCommand } from '../validators/IsCommand';
+import { IsCommand } from '../validators/IsCommand.js';
 
 @Entity()
 export class Commands extends BaseEntity {

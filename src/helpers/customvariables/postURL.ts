@@ -1,8 +1,9 @@
-import { Variable } from '@entity/variable';
-import { AppDataSource } from '~/database';
+import { Variable } from '@entity/variable.js';
 
-import { announce, prepare } from '../commons';
-import { setValueOf } from './setValueOf';
+import { setValueOf } from './setValueOf.js';
+import { announce, prepare } from '../commons/index.js';
+
+import { AppDataSource } from '~/database.js';
 
 async function postURL(req: any, res: any) {
   try {

@@ -1,19 +1,19 @@
 /* global describe it beforeEach */
-require('../../general.js');
+import('../../general.js');
 
-const db = require('../../general.js').db;
-const assert = require('assert');
-const message = require('../../general.js').message;
+import { db } from '../../general.js';
+import assert from 'assert';
+import { message } from '../../general.js';
 
-const timers = (require('../../../dest/systems/timers')).default;
+import timers from '../../../dest/systems/timers.js';
 
-const { linesParsed } = require('../../../dest/helpers/parser');
+import { linesParsed } from '../../../dest/helpers/parser.js';
 
 // users
 const owner = { userName: '__broadcaster__' };
 
-const { Timer, TimerResponse } = require('../../../dest/database/entity/timer');
-const { AppDataSource } = require('../../../dest/database.js');
+import { Timer, TimerResponse } from '../../../dest/database/entity/timer.js';
+import { AppDataSource } from '../../../dest/database.js';
 
 describe('Timers - list() - @func2', () => {
   beforeEach(async () => {
