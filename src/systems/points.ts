@@ -2,7 +2,7 @@ import { PointsChangelog } from '@entity/points.js';
 import { User, UserInterface } from '@entity/user.js';
 import { MINUTE } from '@sogebot/ui-helpers/constants.js';
 import { format } from '@sogebot/ui-helpers/number.js';
-import * as cronparser from 'cron-parser';
+import cronparser from 'cron-parser';
 import {
   LessThanOrEqual, FindOptionsWhere,
 } from 'typeorm';
