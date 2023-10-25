@@ -21,7 +21,7 @@ describe('Emotes - combo - @func2', () => {
       await db.cleanup();
       await message.prepare();
       await user.prepare();
-      emotes = await import('../../../dest/systems/emotescombo.js');
+      emotes = (await import('../../../dest/systems/emotescombo.js')).default;
       emotes.enableEmotesCombo = true;
       emotes.comboEmoteCount = 0;
     });
