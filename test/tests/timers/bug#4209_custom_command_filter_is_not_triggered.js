@@ -10,7 +10,7 @@ import { message } from '../../general.js';
 
 import timers from '../../../dest/systems/timers.js';
 import customcommands from '../../../dest/systems/customcommands.js';
-const isStreamOnline = (require('../../../dest/helpers/api/isStreamOnline')).isStreamOnline;
+import { isStreamOnline } from '../../../dest/helpers/api/isStreamOnline.js'
 
 import { Timer, TimerResponse } from '../../../dest/database/entity/timer.js.js';
 

@@ -1,7 +1,7 @@
 import('../../general.js');
 
-const cheer = (require('../../../dest/helpers/events/cheer')).cheer;
-const translate = require('../../../dest/translate').translate;
+import cheer from '../../../dest/helpers/events/cheer.js';
+import {translate} from '../../../dest/translate.js'
 import { db } from '../../general.js';
 import { message } from '../../general.js';
 import { time } from '../../general.js';

@@ -8,7 +8,7 @@ import { AppDataSource } from '../../../dest/database.js';
 import { EventList } from '../../../dest/database/entity/eventList.js.js';
 import { User } from '../../../dest/database/entity/user.js';
 import Message from '../../../dest/message.js';
-const eventlist = require('../../../dest/overlays/eventlist.js').default;
+import eventlist from '../../../dest/overlays/eventlist.js';
 import { db } from '../../general.js';
 import { message } from '../../general.js';
 

@@ -3,11 +3,11 @@
 import('../../general.js');
 
 import { db } from '../../general.js';
-import { message } from '../../general.js';
-const { prepare, viewer, owner } = require('../../general.js').user;
+import { message, user } from '../../general.js';
+const { prepare, viewer, owner } = user
 import assert from 'assert';
 
-const ranks = (require('../../../dest/systems/ranks')).default;
+import ranks from '../../../dest/systems/ranks.js';
 
 describe('Ranks - custom rank - @func2', () => {
   before(async () => {

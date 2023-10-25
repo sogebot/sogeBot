@@ -4,14 +4,14 @@
 import('../../general.js');
 
 import { db } from '../../general.js';
-const variable = require('../../general.js').variable;
+import { variable } from '../../general.js';
 import { message } from '../../general.js';
 import { user } from '../../general.js';
 
 import _ from 'lodash-es';
 import assert from 'assert';
 
-const moderation = (require('../../../dest/systems/moderation')).default;
+import moderation = import('../../../dest/systems/moderation.js');
 
 const tests = {
   'test': {

@@ -3,7 +3,7 @@
 
 import('../../general.js');
 import assert from 'assert';
-const songs = (require('../../../dest/systems/songs')).default;
+import songs from '../../../dest/systems/songs.js';
 
 describe('Songs - getSongsIdsFromPlaylist() - @func1', () => {
   describe('Load songs ids', () => {

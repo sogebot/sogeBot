@@ -4,8 +4,8 @@ import { AppDataSource } from '../../../dest/database.js';
 
 import('../../general.js');
 
-const currency = require('../../../dest/currency').default;
-const twitch = require('../../../dest/services/twitch').default;
+const currency = (await import('../../../dest/currency.js')).default;
+import twitch  from '../../../dest/services/twitch.js'
 import { User, UserBit } from '../../../dest/database/entity/user.js.js';
 import { getOwner } from '../../../dest/helpers/commons/getOwner.js.js';
 import { prepare } from '../../../dest/helpers/commons/prepare.js.js';

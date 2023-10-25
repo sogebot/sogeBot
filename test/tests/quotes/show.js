@@ -10,7 +10,7 @@ import { AppDataSource } from '../../../dest/database.js';
 
 import { User } from '../../../dest/database/entity/user.js';
 
-const quotes = (require('../../../dest/systems/quotes')).default;
+import quotes from '../../../dest/systems/quotes.js'
 
 // users
 const owner = { userName: '__broadcaster__', userId: '1' };

@@ -5,7 +5,7 @@ import('../../general.js');
 import { Keyword, KeywordGroup, KeywordResponses } from '../../../dest/database/entity/keyword.js.js';
 import { prepare } from '../../../dest/helpers/commons/prepare.js';
 import { defaultPermissions } from '../../../dest/helpers/permissions/defaultPermissions.js';
-const keywords = (require('../../../dest/systems/keywords')).default;
+import keywords from '../../../dest/systems/keywords.js';
 import { db, message, user } from '../../general.js';
 
 describe('Keywords - @func3 - #4860 - keywords group permissions and filter should be considered', () => {

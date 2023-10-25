@@ -11,8 +11,7 @@ const user = { userId: String(Math.floor(Math.random() * 100000)), userName: 'us
 import { User } from '../../../dest/database/entity/user.js';
 import { prepare } from '../../../dest/helpers/commons/prepare.js.js';
 import Message from '../../../dest/message.js';
-import { db } from '../../general.js';
-const msg = require('../../general.js').message;
+import { db, message as msg } from '../../general.js';
 
 async function setUsersOnline(users) {
   await AppDataSource.getRepository(User).update({}, { isOnline: false });
@@ -23,8 +22,8 @@ async function setUsersOnline(users) {
 
 let twitch;
 describe('Message - random filter - @func3', () => {
-  before(() => {
-    twitch = require('../../../dest/services/twitch.js').default;
+  before(async () => {
+    twitch = (await import('../../../dest/services/twitch.js')).default;
   });
   describe('(random.online.viewer) should exclude ignored user', () => {
     before(async () => {

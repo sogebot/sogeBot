@@ -8,7 +8,7 @@ import * as commons from '../../../dest/commons.js'
 import { AppDataSource } from '../../../dest/database.js';
 import { Settings } from '../../../dest/database/entity/settings.js.js';
 import { User } from '../../../dest/database/entity/user.js';
-const isStreamOnline = (require('../../../dest/helpers/api/isStreamOnline')).isStreamOnline;
+import { isStreamOnline } from '../../../dest/helpers/api/isStreamOnline.js'
 import * as changelog from '../../../dest/user/changelog.js';
 import twitch from '../../../dest/services/twitch.js';
 // users
@@ -24,7 +24,7 @@ import { VariableWatcher } from '../../../dest/watchers.js.js';
 import { message } from '../../general.js';
 import { db } from '../../general.js';
 
-const TMI = require('../../../dest/services/twitch/chat').default;
+import TMI from '../../../dest/services/twitch/chat.js';
 const tmi = new TMI();
 
 describe('TMI - User should have counted messages - https://github.com/sogehige/sogeBot/issues/3106 - @func3', () => {

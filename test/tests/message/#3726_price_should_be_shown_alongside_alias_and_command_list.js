@@ -9,7 +9,7 @@ import { AppDataSource } from '../../../dest/database.js';
 import Message from '../../../dest/message.js';
 import alias from '../../../dest/systems/alias.js';
 import customcommands from '../../../dest/systems/customcommands.js';
-const price = (require('../../../dest/systems/price')).default;
+import price from '../../../dest/systems/price.js';
 const owner = { userName: '__broadcaster__', userId: String(Math.floor(Math.random() * 100000)) };
 
 import { Price } from '../../../dest/database/entity/price.js.js';

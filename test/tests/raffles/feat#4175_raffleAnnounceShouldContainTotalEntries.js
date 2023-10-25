@@ -10,7 +10,7 @@ import { User } from '../../../dest/database/entity/user.js';
 import { Raffle } from '../../../dest/database/entity/raffle.js.js';
 
 import raffles from '../../../dest/systems/raffles.js';
-const isStreamOnline = (require('../../../dest/helpers/api/isStreamOnline' )).isStreamOnline
+import {isStreamOnline} from '../../../dest/helpers/api/isStreamOnline.js'
 import assert from 'assert';
 import { AppDataSource } from '../../../dest/database.js';
 import { IsNull } from 'typeorm.js.js';

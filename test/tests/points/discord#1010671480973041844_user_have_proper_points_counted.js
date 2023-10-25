@@ -3,7 +3,7 @@ import { AppDataSource } from '../../../dest/database.js'
 
 
 import { User } from '../../../dest/database/entity/user.js';
-const changelog = require('../../../dest/helpers/user/changelog');
+import * as  changelog from '../../../dest/helpers/user/changelog.js';
 import points from '../../../dest/systems/points.js';
 import('../../general.js');
 import { db, message, user } from '../../general.js';

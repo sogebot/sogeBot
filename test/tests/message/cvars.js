@@ -5,8 +5,7 @@ import { getOwner } from '../../../dest/helpers/commons/getOwner.js.js';
 
 import('../../general.js');
 
-import { db } from '../../general.js';
-const msg = require('../../general.js').message;
+import { db, message as msg } from '../../general.js';
 import Message from '../../../dest/message.js';
 import assert from 'assert';
 import _ from 'lodash-es';

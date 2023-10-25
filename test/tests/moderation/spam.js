@@ -4,9 +4,9 @@ import assert from 'assert';
 
 import('../../general.js');
 
-const moderation = (require('../../../dest/systems/moderation')).default;
+import moderation = import('../../../dest/systems/moderation.js');
 import { db } from '../../general.js';
-const variable = require('../../general.js').variable;
+import { variable } from '../../general.js';
 import { message } from '../../general.js';
 import { time } from '../../general.js';
 import { user } from '../../general.js';

@@ -9,12 +9,12 @@ import('../../general.js');
 import { Event } from '../../../dest/database/entity/event.js.js';
 import { User } from '../../../dest/database/entity/user.js';
 import events from '../../../dest/events.js';
-const defaultPermissions = (require('../../../dest/helpers/permissions/defaultPermissions')).defaultPermissions;
+import { defaultPermissions } from '../../../dest/helpers/permissions/defaultPermissions.js';
 import alias from '../../../dest/systems/alias.js';
 import commercial from '../../../dest/helpers/systems/commercial.js';
 import { db } from '../../general.js';
 import { message } from '../../general.js';
-const url = require('../../general.js').url;
+import { url } from '../../general.js';
 import { time } from '../../general.js';
 import { user } from '../../general.js';
 

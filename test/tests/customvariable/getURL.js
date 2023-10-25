@@ -6,7 +6,7 @@ import { AppDataSource } from '../../../dest/database.js'
 import { v4 } from 'uuid';
 
 import { Variable } from '../../../dest/database/entity/variable.js';
-const getURL = require('../../../dest/helpers/customvariables/getURL').getURL;
+import {getURL} from '../../../dest/helpers/customvariables/getURL.js';
 import { defaultPermissions } from '../../../dest/helpers/permissions/defaultPermissions.js';
 import('../../general.js');
 import { db } from '../../general.js';

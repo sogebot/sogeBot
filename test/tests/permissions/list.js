@@ -3,7 +3,7 @@ import('../../general.js');
 import assert from 'assert';
 
 import { prepare } from '../../../dest/helpers/commons/prepare.js.js';
-const permissions = (require('../../../dest/permissions')).default;
+import permissions from '../../../dest/permissions.js'
 import { db } from '../../general.js';
 import { message } from '../../general.js';
 

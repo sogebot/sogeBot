@@ -57,7 +57,7 @@ describe('Message - (count|#) filter - @func3', async () => {
   beforeEach(async () => {
     await db.cleanup();
 
-    const currency = require('../../../dest/currency').default;
+    const currency = (await import('../../../dest/currency.js')).default;
     for (let i = 0; i < 25; i++) {
       await AppDataSource.getRepository(EventList).save({
         isTest:      false,

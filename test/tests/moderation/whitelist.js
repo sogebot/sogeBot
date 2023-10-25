@@ -5,8 +5,8 @@ import _ from 'lodash-es';
 import('../../general.js');
 
 import alias from '../../../dest/systems/alias.js';
-const moderation = (require('../../../dest/systems/moderation')).default;
-const songs = (require('../../../dest/systems/songs')).default;
+import moderation = import('../../../dest/systems/moderation.js');
+import songs from '../../../dest/systems/songs.js';
 import { message } from '../../general.js';
 import { db } from '../../general.js';
 

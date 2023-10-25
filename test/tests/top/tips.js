@@ -4,7 +4,7 @@ import { AppDataSource } from '../../../dest/database.js';
 
 import('../../general.js');
 
-const currency = require('../../../dest/currency').default;
+const currency = (await import('../../../dest/currency.js')).default;
 import { User, UserTip } from '../../../dest/database/entity/user.js.js';
 import { getOwner } from '../../../dest/helpers/commons/getOwner.js.js';
 import { prepare } from '../../../dest/helpers/commons/prepare.js.js';

@@ -3,18 +3,16 @@ import assert from 'assert';
 
 import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized.js.js';
 
-const getBotUserName = require('../../../dest/helpers/user/getBotUserName').default;
+import {getBotUserName} from '../../../dest/helpers/user/getBotUserName.js'
 import { translate } from '../../../dest/translate.js.js';
 import('../../general.js');
 import { db } from '../../general.js';
 import { message } from '../../general.js';
-
+import scrim from '../../../dest/systems/scrim.js'
 // users
 const owner = { userName: '__broadcaster__' };
 
-let scrim;
 describe('Scrim - full workflow', () => {
-  scrim = (require('../../../dest/systems/scrim')).default;
   describe('cooldown only - @func1', () => {
     before(async () => {
       await db.cleanup();

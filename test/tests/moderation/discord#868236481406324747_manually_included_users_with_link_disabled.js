@@ -7,9 +7,9 @@ import('../../general.js');
 
 import { Permissions } from '../../../dest/database/entity/permissions.js.js';
 import { defaultPermissions } from '../../../dest/helpers/permissions/defaultPermissions.js';
-const moderation = (require('../../../dest/systems/moderation')).default;
+import moderation = import('../../../dest/systems/moderation.js');
 import { db } from '../../general.js';
-const variable = require('../../general.js').variable;
+import { variable } from '../../general.js';
 import { message } from '../../general.js';
 import { user } from '../../general.js';
 

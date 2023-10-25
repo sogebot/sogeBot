@@ -6,11 +6,11 @@ import { dayjs } from '@sogebot/ui-helpers/dayjsHelper.js.js';
 import { User } from '../../../dest/database/entity/user.js';
 import { getOwner } from '../../../dest/helpers/commons/getOwner.js.js';
 import { prepare } from '../../../dest/helpers/commons/prepare.js.js';
-const {
+import {
   serialize,
-} = require('../../../dest/helpers/type');
+} from '../../../dest/helpers/type.js';
 import { AppDataSource } from '../../../dest/database.js'
-const twitch = require('../../../dest/services/twitch').default;
+import twitch  from '../../../dest/services/twitch.js'
 import { db } from '../../general.js';
 import { message } from '../../general.js';
 
@@ -23,7 +23,7 @@ let top;
 
 describe('Top - !top level - @func1', () => {
   before(async () => {
-    top = (require('../../../dest/systems/top')).default;
+    top = (await import('../../../dest/systems/top')).default;
     await db.cleanup();
     await message.prepare();
   });

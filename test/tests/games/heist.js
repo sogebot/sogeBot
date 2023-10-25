@@ -14,7 +14,7 @@ describe('Heist - !bankheist - @func2', () => {
     await db.cleanup();
     await user.prepare();
 
-    heist = (require('../../../dest/games/heist')).default;
+    heist = (await import('../../../dest/games/heist.js')).default;
   });
 
   describe('!bankheist when nobody joined', () => {

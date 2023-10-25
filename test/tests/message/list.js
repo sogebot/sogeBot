@@ -9,7 +9,7 @@ import Message from '../../../dest/message.js';
 import alias from '../../../dest/systems/alias.js';
 import cooldown from '../../../dest/systems/cooldown.js'
 import customcommands from '../../../dest/systems/customcommands.js';
-const ranks = (require('../../../dest/systems/ranks')).default;
+import ranks from '../../../dest/systems/ranks.js';
 import { db } from '../../general.js';
 import { message } from '../../general.js';
 

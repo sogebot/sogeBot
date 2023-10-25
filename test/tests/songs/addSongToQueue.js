@@ -10,8 +10,8 @@ import { message } from '../../general.js';
 
 let songs;
 describe('Songs - addSongToQueue() - @func1', () => {
-  before(() => {
-    songs = (require('../../../dest/systems/songs')).default;
+  before(async () => {
+    songs = (await import('../../../dest/systems/songs')).default;
   });
   describe('Add music song by videoId', () => {
     before(async () => {

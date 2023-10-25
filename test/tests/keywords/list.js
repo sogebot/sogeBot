@@ -5,7 +5,7 @@ import { db } from '../../general.js';
 import { message } from '../../general.js';
 import assert from 'assert';
 
-const keywords = (require('../../../dest/systems/keywords')).default;
+import keywords from '../../../dest/systems/keywords.js';
 
 import { Keyword } from '../../../dest/database/entity/keyword.js.js';
 import { User } from '../../../dest/database/entity/user.js';

@@ -8,11 +8,10 @@ import { Price } from '../../../dest/database/entity/price.js.js';
 import { User } from '../../../dest/database/entity/user.js';
 import { AppDataSource } from '../../../dest/database.js';
 import alias from '../../../dest/systems/alias.js';
-const cheer = (require('../../../dest/helpers/events/cheer')).cheer;
+import cheer from '../../../dest/helpers/events/cheer.js';
 import customcommands from '../../../dest/systems/customcommands.js';
-const price = (require('../../../dest/systems/price')).default;
-import { db, message, user } from '../../general.js';
-const url = require('../../general.js').url;
+import price from '../../../dest/systems/price.js';
+import { db, message, user, url } from '../../general.js';
 
 const tests = [
   {

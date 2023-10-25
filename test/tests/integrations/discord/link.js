@@ -3,14 +3,11 @@ import assert from 'assert';
 import { MINUTE } from '@sogebot/ui-helpers/constants.js.js';
 import { v4 } from 'uuid'
 
-require('../../../general.js');
+import { db, message, user } from '../../../general.js';
 
 import { DiscordLink } from '../../../../dest/database/entity/discord.js.js';
 import { AppDataSource } from '../../../../dest/database.js.js.js';
-const discord = (require('../../../../dest/integrations/discord')).default;
-const db = require('../../../general.js').db;
-const message = require('../../../general.js').message;
-const user = require('../../../general.js').user;
+import discord from '../../../../dest/integrations/discord.js'
 
 describe('integrations/discord - !link - @func2', () => {
   describe('removeExpiredLinks removes 10 minutes old links', async () => {

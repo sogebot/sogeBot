@@ -21,7 +21,7 @@ describe('Custom Variable - helpers/customvariables/postURL - @func1', () => {
     await db.cleanup();
     await message.prepare();
 
-    postURL = require('../../../dest/helpers/customvariables/postURL').postURL;
+    postURL = (await import('../../../dest/helpers/customvariables/postURL.js')).postURL;
 
     Variable.create({
       variableName: '$_variable',

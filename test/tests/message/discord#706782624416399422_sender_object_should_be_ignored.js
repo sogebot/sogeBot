@@ -4,11 +4,11 @@ import { db } from '../../general.js';
 import { message } from '../../general.js';
 import { time } from '../../general.js';
 
-const isStreamOnline = (require('../../../dest/helpers/api/isStreamOnline')).isStreamOnline;
+import { isStreamOnline } from '../../../dest/helpers/api/isStreamOnline.js'
 import alias from '../../../dest/systems/alias.js';
 import customcommands from '../../../dest/systems/customcommands.js';
 import timers from '../../../dest/systems/timers.js';
-const check = (require('../../../dest/watchers')).check;
+import {check} from '../../../dest/watchers.js'
 
 import { AppDataSource } from '../../../dest/database.js';
 import { Timer, TimerResponse } from '../../../dest/database/entity/timer.js.js';

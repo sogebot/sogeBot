@@ -11,7 +11,7 @@ import { message } from '../../general.js';
 
 import { Quotes } from '../../../dest/database/entity/quotes.js.js';
 
-const quotes = (require('../../../dest/systems/quotes')).default;
+import quotes from '../../../dest/systems/quotes.js'
 
 // users
 const owner = { userName: '__broadcaster__', userId: 1 };

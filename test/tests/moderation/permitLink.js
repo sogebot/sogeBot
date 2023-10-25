@@ -1,7 +1,7 @@
 /* global describe it before */
 import * as commons from '../../../dest/commons.js'
 
-const moderation = (require('../../../dest/systems/moderation')).default;
+import moderation = import('../../../dest/systems/moderation.js');
 
 import('../../general.js');
 

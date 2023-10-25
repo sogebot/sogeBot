@@ -2,7 +2,7 @@ import assert from 'assert';
 import { AppDataSource } from '../../../dest/database.js';
 
 import('../../general.js');
-const currency = require('../../../dest/currency').default;
+const currency = (await import('../../../dest/currency.js')).default;
 import { Permissions, PermissionCommands } from '../../../dest/database/entity/permissions.js.js';
 import { User, UserBit, UserTip } from '../../../dest/database/entity/user.js.js';
 import rates from '../../../dest/helpers/currency/rates.js';
