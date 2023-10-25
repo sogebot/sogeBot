@@ -6,9 +6,9 @@ import { AppDataSource } from '../../../dest/database.js';
 
 import { db } from '../../general.js';
 
-let changelog;
-let User;
 describe('User changelog tests - @func1', () => {
+  let User;
+  let changelog;
   before(async () => {
     await db.cleanup();
     changelog = await import('../../../dest/helpers/user/changelog.js');

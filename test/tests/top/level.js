@@ -19,11 +19,11 @@ import('../../general.js');
 // users
 const owner = { userName: '__broadcaster__' };
 
-let top;
 
 describe('Top - !top level - @func1', () => {
+  let top;
   before(async () => {
-    top = (await import('../../../dest/systems/top')).default;
+    top = (await import('../../../dest/systems/top.js')).default;
     await db.cleanup();
     await message.prepare();
   });

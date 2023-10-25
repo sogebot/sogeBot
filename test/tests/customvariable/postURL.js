@@ -10,6 +10,7 @@ import { defaultPermissions } from '../../../dest/helpers/permissions/defaultPer
 import('../../general.js');
 import { db } from '../../general.js';
 import { message } from '../../general.js';
+import {postURL} from '../../../dest/helpers/customvariables/postURL.js';
 
 describe('Custom Variable - helpers/customvariables/postURL - @func1', () => {
   let urlId = v4();
@@ -20,8 +21,6 @@ describe('Custom Variable - helpers/customvariables/postURL - @func1', () => {
   before(async () => {
     await db.cleanup();
     await message.prepare();
-
-    postURL = (await import('../../../dest/helpers/customvariables/postURL.js')).postURL;
 
     Variable.create({
       variableName: '$_variable',
