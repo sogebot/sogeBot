@@ -1,9 +1,9 @@
 /* global describe it */
-const assert = require('assert');
+import assert from 'assert';
 
 require('../../general.js');
-const db = require('../../general.js').db;
-const message = require('../../general.js').message;
+import { db } from '../../general.js';
+import { message } from '../../general.js';
 const user = require('../../general.js').user;
 const alias = (require('../../../dest/systems/alias')).default;
 

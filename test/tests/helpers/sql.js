@@ -3,8 +3,8 @@
 
 require('../../general.js');
 
-const assert = require('assert');
-const db = require('../../general.js').db;
+import assert from 'assert';
+import { db } from '../../general.js';
 
 describe('SQLVariableLimit should have correct value - @func1', () => {
   before(async () => {

@@ -1,7 +1,7 @@
 /* global */
 require('../../general.js');
 
-const assert = require('assert');
+import assert from 'assert';
 
 const { User } = require('../../../dest/database/entity/user');
 const { AppDataSource } = require('../../../dest/database.js');
@@ -10,8 +10,8 @@ const alias = (require('../../../dest/systems/alias')).default;
 const cooldown = (require('../../../dest/systems/cooldown')).default;
 const customcommands = (require('../../../dest/systems/customcommands')).default;
 const ranks = (require('../../../dest/systems/ranks')).default;
-const db = require('../../general.js').db;
-const message = require('../../general.js').message;
+import { db } from '../../general.js';
+import { message } from '../../general.js';
 
 const owner = { userName: '__broadcaster__', userId: String(Math.floor(Math.random() * 100000)) };
 

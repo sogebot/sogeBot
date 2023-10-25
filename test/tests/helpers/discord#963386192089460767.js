@@ -1,7 +1,7 @@
-const assert = require('assert');
+import assert from 'assert';
 
 require('../../general.js');
-const db = require('../../general.js').db;
+import { db } from '../../general.js';
 const user = require('../../general.js').user;
 
 describe('checkFilter should properly parse $param in stream - https://discord.com/channels/317348946144002050/317349069024395264/963386192089460767 - @func2', () => {

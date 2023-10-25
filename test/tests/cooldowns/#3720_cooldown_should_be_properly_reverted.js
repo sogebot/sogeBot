@@ -1,6 +1,6 @@
 require('../../general.js');
 
-const assert = require('assert');
+import assert from 'assert';
 const { AppDataSource } = require('../../../dest/database.js');
 
 const { Cooldown } = require('../../../dest/database/entity/cooldown');
@@ -8,8 +8,8 @@ const { Price } = require('../../../dest/database/entity/price');
 const { User } = require('../../../dest/database/entity/user');
 const Parser = require('../../../dest/parser').default;
 const cooldown = (require('../../../dest/systems/cooldown')).default;
-const db = require('../../general.js').db;
-const message = require('../../general.js').message;
+import { db } from '../../general.js';
+import { message } from '../../general.js';
 const user = require('../../general.js').user;
 const time = require('../../general.js').time;
 

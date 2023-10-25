@@ -2,7 +2,7 @@
 
 require('../../general.js');
 
-const assert = require('assert');
+import assert from 'assert';
 
 const _ = require('lodash');
 const { IsNull } = require('typeorm');
@@ -12,8 +12,8 @@ const { Raffle } = require('../../../dest/database/entity/raffle');
 const { User } = require('../../../dest/database/entity/user');
 const { getOwnerAsSender } = require('../../../dest/helpers/commons/getOwnerAsSender');
 const raffles = (require('../../../dest/systems/raffles')).default;
-const db = require('../../general.js').db;
-const message = require('../../general.js').message;
+import { db } from '../../general.js';
+import { message } from '../../general.js';
 
 const max = Math.floor(Number.MAX_SAFE_INTEGER / 10000000);
 

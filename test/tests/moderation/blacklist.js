@@ -3,13 +3,13 @@
 
 require('../../general.js');
 
-const db = require('../../general.js').db;
+import { db } from '../../general.js';
 const variable = require('../../general.js').variable;
-const message = require('../../general.js').message;
+import { message } from '../../general.js';
 const user = require('../../general.js').user;
 
 const _ = require('lodash');
-const assert = require('assert');
+import assert from 'assert';
 
 const moderation = (require('../../../dest/systems/moderation')).default;
 

@@ -4,15 +4,15 @@ const until = require('test-until');
 
 const cheer = (require('../../../dest/helpers/events/cheer')).cheer;
 const translate = require('../../../dest/translate').translate;
-const db = require('../../general.js').db;
-const message = require('../../general.js').message;
+import { db } from '../../general.js';
+import { message } from '../../general.js';
 const time = require('../../general.js').time;
 const { Price } = require('../../../dest/database/entity/price');
 const customcommands = (require('../../../dest/systems/customcommands')).default;
 
 const { getLocalizedName } = require('@sogebot/ui-helpers/getLocalized');
 
-const assert = require('assert');
+import assert from 'assert';
 
 const { AppDataSource } = require('../../../dest/database');
 

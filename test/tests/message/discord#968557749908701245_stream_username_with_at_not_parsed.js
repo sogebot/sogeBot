@@ -1,9 +1,9 @@
-const assert = require('assert');
+import assert from 'assert';
 
 require('../../general.js');
 
-const db = require('../../general.js').db;
-const message = require('../../general.js').message;
+import { db } from '../../general.js';
+import { message } from '../../general.js';
 const user = require('../../general.js').user;
 
 describe('Message - https://discord.com/channels/317348946144002050/317349069024395264/968557749908701245 - stream response filter should be able to parse user with at - @func3', () => {

@@ -2,11 +2,11 @@
 
 require('../../general.js');
 
-const db = require('../../general.js').db;
-const message = require('../../general.js').message;
+import { db } from '../../general.js';
+import { message } from '../../general.js';
 const user = require('../../general.js').user;
 
-const assert = require('assert');
+import assert from 'assert';
 const userinfo = (require('../../../dest/systems/userinfo')).default;
 
 describe('Userinfo - stats() - @func3', () => {

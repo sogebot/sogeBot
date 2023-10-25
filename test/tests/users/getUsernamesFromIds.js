@@ -1,13 +1,13 @@
 /* global */
 
-const assert = require('assert');
+import assert from 'assert';
 const { AppDataSource } = require('../../../dest/database.js');
 require('../../general.js');
 
 const { User } = require('../../../dest/database/entity/user');
 const users = (require('../../../dest/users')).default;
-const db = require('../../general.js').db;
-const message = require('../../general.js').message;
+import { db } from '../../general.js';
+import { message } from '../../general.js';
 
 // users
 const testuser = { userName: 'testuser', userId: '1' };

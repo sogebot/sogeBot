@@ -1,9 +1,9 @@
 /* global describe it */
 require('../../general.js');
 
-const db = require('../../general.js').db;
-const message = require('../../general.js').message;
-const assert = require('assert');
+import { db } from '../../general.js';
+import { message } from '../../general.js';
+import assert from 'assert';
 
 const keywords = (require('../../../dest/systems/keywords')).default;
 

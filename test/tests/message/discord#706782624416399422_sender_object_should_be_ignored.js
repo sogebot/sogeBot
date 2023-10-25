@@ -1,7 +1,7 @@
 require('../../general.js');
 
-const db = require('../../general.js').db;
-const message = require('../../general.js').message;
+import { db } from '../../general.js';
+import { message } from '../../general.js';
 const time = require('../../general.js').time;
 
 const isStreamOnline = (require('../../../dest/helpers/api/isStreamOnline')).isStreamOnline;

@@ -1,14 +1,14 @@
 /* global */
-const assert = require('assert');
+import assert from 'assert';
 const { AppDataSource } = require('../../../dest/database.js');
 
 require('../../general.js');
 
 const { User } = require('../../../dest/database/entity/user');
 const changelog = (require('../../../dest/helpers/user/changelog'));
-const db = require('../../general.js').db;
+import { db } from '../../general.js';
 const time = require('../../general.js').time;
-const message = require('../../general.js').message;
+import { message } from '../../general.js';
 const user = require('../../general.js').user;
 
 describe('TMI - subcommunitygift after gifts should be ignored - @func3', () => {

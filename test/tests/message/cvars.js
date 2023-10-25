@@ -5,10 +5,10 @@ const { getOwner } = require('../../../dest/helpers/commons/getOwner');
 
 require('../../general.js');
 
-const db = require('../../general.js').db;
+import { db } from '../../general.js';
 const msg = require('../../general.js').message;
 const Message = require('../../../dest/message').default;
-const assert = require('assert');
+import assert from 'assert';
 const _ = require('lodash');
 
 const { User } = require('../../../dest/database/entity/user');

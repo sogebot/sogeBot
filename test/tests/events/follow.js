@@ -9,8 +9,8 @@ require('../../general.js');
 const { Event } = require('../../../dest/database/entity/event');
 const { User } = require('../../../dest/database/entity/user');
 const events = (require('../../../dest/events')).default;
-const db = require('../../general.js').db;
-const message = require('../../general.js').message;
+import { db } from '../../general.js';
+import { message } from '../../general.js';
 const time = require('../../general.js').time;
 const user = require('../../general.js').user;
 

@@ -1,4 +1,4 @@
-const assert = require('assert');
+import assert from 'assert';
 const until = require('test-until');
 const _ = require('lodash');
 const util = require('util');

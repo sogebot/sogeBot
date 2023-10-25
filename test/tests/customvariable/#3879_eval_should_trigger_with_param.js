@@ -5,12 +5,12 @@ const Parser = require('../../../dest/parser').default;
 
 require('../../general.js');
 
-const db = require('../../general.js').db;
-const message = require('../../general.js').message;
+import { db } from '../../general.js';
+import { message } from '../../general.js';
 const customcommands = (require('../../../dest/systems/customcommands')).default;
 const user = require('../../general.js').user;
 
-const assert = require('assert');
+import assert from 'assert';
 const _ = require('lodash');
 
 const { Variable } = require('../../../dest/database/entity/variable');

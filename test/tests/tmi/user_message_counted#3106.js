@@ -1,6 +1,6 @@
 /* global */
 
-const assert = require('assert');
+import assert from 'assert';
 
 require('../../general.js');
 
@@ -21,8 +21,8 @@ const testuser2 = {
 };
 
 const { VariableWatcher } = require('../../../dest/watchers');
-const message = require('../../general.js').message;
-const db = require('../../general.js').db;
+import { message } from '../../general.js';
+import { db } from '../../general.js';
 
 const TMI = require('../../../dest/services/twitch/chat').default;
 const tmi = new TMI();

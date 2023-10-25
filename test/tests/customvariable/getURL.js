@@ -1,6 +1,6 @@
 /* global describe it before */
 
-const assert = require('assert');
+import assert from 'assert';
 const { AppDataSource } = require('../../../dest/database');
 
 const v4 = require('uuid').v4;
@@ -9,8 +9,8 @@ const { Variable } = require('../../../dest/database/entity/variable');
 const getURL = require('../../../dest/helpers/customvariables/getURL').getURL;
 const { defaultPermissions } = require('../../../dest/helpers/permissions/defaultPermissions');
 require('../../general.js');
-const db = require('../../general.js').db;
-const message = require('../../general.js').message;
+import { db } from '../../general.js';
+import { message } from '../../general.js';
 
 describe('Custom Variable - helpers/customvariables/getURL - @func1', () => {
   let urlId = v4();

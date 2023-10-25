@@ -8,10 +8,10 @@ const { Cooldown, CooldownViewer } = require('../../../dest/database/entity/cool
 const { User } = require('../../../dest/database/entity/user');
 const { Keyword } = require('../../../dest/database/entity/keyword');
 
-const assert = require('assert');
+import assert from 'assert';
 
-const db = require('../../general.js').db;
-const message = require('../../general.js').message;
+import { db } from '../../general.js';
+import { message } from '../../general.js';
 const time = require('../../general.js').time;
 const { defaultPermissions } = require('../../../dest/helpers/permissions/defaultPermissions');
 const { AppDataSource } = require('../../../dest/database.js');

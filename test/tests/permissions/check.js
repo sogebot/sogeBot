@@ -1,4 +1,4 @@
-const assert = require('assert');
+import assert from 'assert';
 const { AppDataSource } = require('../../../dest/database.js');
 
 require('../../general.js');
@@ -10,8 +10,8 @@ const { defaultPermissions } = require('../../../dest/helpers/permissions/defaul
 const { check } = require('../../../dest/helpers/permissions/check');
 const { serialize } = require('../../../dest/helpers/type');
 const Parser = require('../../../dest/parser').default;
-const db = require('../../general.js').db;
-const message = require('../../general.js').message;
+import { db } from '../../general.js';
+import { message } from '../../general.js';
 
 const users = [
   {

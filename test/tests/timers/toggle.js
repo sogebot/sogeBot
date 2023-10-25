@@ -1,9 +1,9 @@
 /* global describe it beforeEach */
 require('../../general.js');
-const assert = require('assert');
+import assert from 'assert';
 
-const db = require('../../general.js').db;
-const message = require('../../general.js').message;
+import { db } from '../../general.js';
+import { message } from '../../general.js';
 
 const { linesParsed } = require('../../../dest/helpers/parser');
 

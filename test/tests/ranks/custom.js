@@ -2,10 +2,10 @@
 /* global describe it */
 require('../../general.js');
 
-const db = require('../../general.js').db;
-const message = require('../../general.js').message;
+import { db } from '../../general.js';
+import { message } from '../../general.js';
 const { prepare, viewer, owner } = require('../../general.js').user;
-const assert = require('assert');
+import assert from 'assert';
 
 const ranks = (require('../../../dest/systems/ranks')).default;
 

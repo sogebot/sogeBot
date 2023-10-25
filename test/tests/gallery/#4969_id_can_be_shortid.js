@@ -1,12 +1,12 @@
 require('../../general.js');
 
-const assert = require('assert');
+import assert from 'assert';
 
 const shortid = require('shortid');
 const { AppDataSource } = require('../../../dest/database.js');
 
 const { Gallery } = require('../../../dest/database/entity/gallery');
-const db = require('../../general.js').db;
+import { db } from '../../general.js';
 
 const id = shortid.generate();
 

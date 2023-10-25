@@ -1,4 +1,4 @@
-const assert = require('assert');
+import assert from 'assert';
 
 require('../../general.js');
 
@@ -11,8 +11,8 @@ const { AppDataSource } = require('../../../dest/database.js');
 const log = require('../../../dest/helpers/log');
 const changelog = (require('../../../dest/helpers/user/changelog'));
 const time = require('../../general.js').time;
-const db = require('../../general.js').db;
-const message = require('../../general.js').message;
+import { db } from '../../general.js';
+import { message } from '../../general.js';
 
 describe('Events - cheer event - @func3', () => {
   before(async () => {

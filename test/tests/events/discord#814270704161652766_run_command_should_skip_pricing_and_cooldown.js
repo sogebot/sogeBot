@@ -1,6 +1,6 @@
 /* global */
 
-const assert = require('assert');
+import assert from 'assert';
 
 const _ = require('lodash');
 const { v4: uuidv4 } = require('uuid');
@@ -15,8 +15,8 @@ const defaultPermissions = (require('../../../dest/helpers/permissions/defaultPe
 const alias = (require('../../../dest/systems/alias')).default;
 const commercial = (require('../../../dest/systems/commercial')).default;
 const cooldown = (require('../../../dest/systems/cooldown')).default;
-const db = require('../../general.js').db;
-const message = require('../../general.js').message;
+import { db } from '../../general.js';
+import { message } from '../../general.js';
 const time = require('../../general.js').time;
 const user = require('../../general.js').user;
 

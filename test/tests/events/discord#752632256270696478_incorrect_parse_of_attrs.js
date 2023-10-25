@@ -9,11 +9,11 @@ const { User } = require('../../../dest/database/entity/user');
 const events = (require('../../../dest/events')).default;
 const log = require('../../../dest/helpers/log');
 
-const assert = require('assert');
+import assert from 'assert';
 const { AppDataSource } = require('../../../dest/database.js');
 
-const db = require('../../general.js').db;
-const message = require('../../general.js').message;
+import { db } from '../../general.js';
+import { message } from '../../general.js';
 const time = require('../../general.js').time;
 
 const userName = 'randomPerson';

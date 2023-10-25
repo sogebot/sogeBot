@@ -13,8 +13,8 @@ const { isBotSubscriber } = require('../../../dest/helpers/user/isBot');
 const alias = (require('../../../dest/systems/alias')).default;
 const commercial = (require('../../../dest/systems/commercial')).default;
 const customcommands = (require('../../../dest/systems/customcommands')).default;
-const db = require('../../general.js').db;
-const message = require('../../general.js').message;
+import { db } from '../../general.js';
+import { message } from '../../general.js';
 const time = require('../../general.js').time;
 const user = require('../../general.js').user;
 

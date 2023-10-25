@@ -1,13 +1,13 @@
 /* global */
-const assert = require('assert');
+import assert from 'assert';
 
 require('../../general.js');
 const { Keyword, KeywordGroup, KeywordResponses } = require('../../../dest/database/entity/keyword');
 const { prepare } = (require('../../../dest/helpers/commons/prepare'));
 const { defaultPermissions } = require('../../../dest/helpers/permissions/defaultPermissions');
 const keywords = (require('../../../dest/systems/keywords')).default;
-const db = require('../../general.js').db;
-const message = require('../../general.js').message;
+import { db } from '../../general.js';
+import { message } from '../../general.js';
 const user = require('../../general.js').user;
 
 describe('Keywords - @func3 - #4860 - keywords group permissions and filter should be considered', () => {

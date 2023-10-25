@@ -1,15 +1,15 @@
 /* global describe it before */
 
-const assert = require('assert');
+import assert from 'assert';
 const { AppDataSource } = require('../../../dest/database');
 
 const { User } = require('../../../dest/database/entity/user');
 const { prepare } = require('../../../dest/helpers/commons/prepare');
 const eventlist = (require('../../../dest/overlays/eventlist')).default;
 const twitch = (require('../../../dest/services/twitch')).default;
-const db = require('../../general.js').db;
+import { db } from '../../general.js';
 const time = require('../../general.js').time;
-const message = require('../../general.js').message;
+import { message } from '../../general.js';
 const user = require('../../general.js').user;
 
 require('../../general.js');

@@ -1,7 +1,7 @@
 /* global */
 require('../../general.js');
 
-const assert = require('assert');
+import assert from 'assert';
 const { AppDataSource } = require('../../../dest/database.js');
 
 const owner = { userId: String(Math.floor(Math.random() * 100000)), userName: '__broadcaster__' };
@@ -11,7 +11,7 @@ const user = { userId: String(Math.floor(Math.random() * 100000)), userName: 'us
 const { User } = require('../../../dest/database/entity/user');
 const { prepare } = require('../../../dest/helpers/commons/prepare');
 const Message = require('../../../dest/message').default;
-const db = require('../../general.js').db;
+import { db } from '../../general.js';
 const msg = require('../../general.js').message;
 
 async function setUsersOnline(users) {

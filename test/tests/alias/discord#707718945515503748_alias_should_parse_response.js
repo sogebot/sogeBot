@@ -1,12 +1,12 @@
 /* global describe it */
 require('../../general.js');
 
-const db = require('../../general.js').db;
-const message = require('../../general.js').message;
+import { db } from '../../general.js';
+import { message } from '../../general.js';
 const user = require('../../general.js').user;
 const alias = (require('../../../dest/systems/alias')).default;
 const streamStatusChangeSince = (require('../../../dest/helpers/api/streamStatusChangeSince')).streamStatusChangeSince;
-const assert = require('assert');
+import assert from 'assert';
 const { prepare } = (require('../../../dest/helpers/commons/prepare'));
 
 // users

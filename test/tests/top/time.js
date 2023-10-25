@@ -1,5 +1,5 @@
 /* global describe it before */
-const assert = require('assert');
+import assert from 'assert';
 
 require('../../general.js');
 const constants = require('@sogebot/ui-helpers/constants');
@@ -9,8 +9,8 @@ const { getOwner } = require('../../../dest/helpers/commons/getOwner');
 const { prepare } = require('../../../dest/helpers/commons/prepare');
 const { AppDataSource } = require('../../../dest/database.js');
 const top = (require('../../../dest/systems/top')).default;
-const db = require('../../general.js').db;
-const message = require('../../general.js').message;
+import { db } from '../../general.js';
+import { message } from '../../general.js';
 const twitch = require('../../../dest/services/twitch.js').default;
 
 // users

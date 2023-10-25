@@ -1,4 +1,4 @@
-const assert = require('assert');
+import assert from 'assert';
 
 const { MINUTE } = require('@sogebot/ui-helpers/constants');
 const { v4 } = require('uuid');

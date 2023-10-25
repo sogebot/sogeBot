@@ -1,5 +1,5 @@
 /* global */
-const assert = require('assert');
+import assert from 'assert';
 
 require('../../general.js');
 const { Alias, AliasGroup } = require('../../../dest/database/entity/alias');
@@ -7,8 +7,8 @@ const { AppDataSource } = require('../../../dest/database');
 const { prepare } = (require('../../../dest/helpers/commons/prepare'));
 const { defaultPermissions } = require('../../../dest/helpers/permissions/defaultPermissions');
 const alias = (require('../../../dest/systems/alias')).default;
-const db = require('../../general.js').db;
-const message = require('../../general.js').message;
+import { db } from '../../general.js';
+import { message } from '../../general.js';
 const user = require('../../general.js').user;
 
 describe('Alias - @func1 - #4860 - alias group permissions and filter should be considered', () => {

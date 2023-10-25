@@ -1,6 +1,6 @@
 require('../../general.js');
 
-const assert = require('assert');
+import assert from 'assert';
 
 const _ = require('lodash');
 const { IsNull } = require('typeorm');
@@ -10,8 +10,8 @@ const { AppDataSource } = require('../../../dest/database.js');
 const { Raffle } = require('../../../dest/database/entity/raffle');
 const { User } = require('../../../dest/database/entity/user');
 const raffles = (require('../../../dest/systems/raffles')).default;
-const db = require('../../general.js').db;
-const message = require('../../general.js').message;
+import { db } from '../../general.js';
+import { message } from '../../general.js';
 
 const owner = { userName: '__broadcaster__', userId: String(_.random(999999, false)) };
 

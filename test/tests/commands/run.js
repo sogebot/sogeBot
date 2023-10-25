@@ -1,5 +1,5 @@
 const { v4: uuid } = require('uuid');
-const assert = require('assert');
+import assert from 'assert';
 const { merge } = require('lodash');
 
 const { Commands } = require('../../../dest/database/entity/commands');
@@ -9,8 +9,8 @@ const { AppDataSource } = require('../../../dest/database');
 const customcommands = (require('../../../dest/systems/customcommands')).default;
 
 require('../../general.js');
-const db = require('../../general.js').db;
-const message = require('../../general.js').message;
+import { db } from '../../general.js';
+import { message } from '../../general.js';
 
 // users
 const owner = { userName: '__broadcaster__', userId: String(Math.floor(Math.random() * 100000)) };

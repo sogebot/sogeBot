@@ -1,6 +1,6 @@
 require('../../general.js');
 
-const assert = require('assert');
+import assert from 'assert';
 
 const _ = require('lodash');
 const { AppDataSource } = require('../../../dest/database.js');
@@ -8,8 +8,8 @@ const { AppDataSource } = require('../../../dest/database.js');
 const { Raffle } = require('../../../dest/database/entity/raffle');
 const { User } = require('../../../dest/database/entity/user');
 const raffles = (require('../../../dest/systems/raffles')).default;
-const message = require('../../general.js').message;
-const db = require('../../general.js').db;
+import { message } from '../../general.js';
+import { db } from '../../general.js';
 
 const max = Math.floor(Number.MAX_SAFE_INTEGER / 10000000);
 

@@ -3,10 +3,10 @@
 
 require('../../general.js');
 
-const db = require('../../general.js').db;
-const message = require('../../general.js').message;
+import { db } from '../../general.js';
+import { message } from '../../general.js';
 const runScript = (require('../../../dest/helpers/customvariables/runScript')).runScript;
-const assert = require('assert');
+import assert from 'assert';
 
 describe('Custom Variable - #3820 - For loop should work corectly - @func1', () => {
   let result = '';

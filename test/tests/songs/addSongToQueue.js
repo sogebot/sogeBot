@@ -1,12 +1,12 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 /* global */
-const assert = require('assert');
+import assert from 'assert';
 const { AppDataSource } = require('../../../dest/database');
 
 const { SongRequest, SongPlaylist } = require('../../../dest/database/entity/song');
 const user = require('../../general.js').user;
-const db = require('../../general.js').db;
-const message = require('../../general.js').message;
+import { db } from '../../general.js';
+import { message } from '../../general.js';
 
 let songs;
 describe('Songs - addSongToQueue() - @func1', () => {

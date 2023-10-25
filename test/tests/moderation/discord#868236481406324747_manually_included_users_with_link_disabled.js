@@ -1,6 +1,6 @@
 /* global */
 
-const assert = require('assert');
+import assert from 'assert';
 const { AppDataSource } = require('../../../dest/database.js');
 
 require('../../general.js');
@@ -8,9 +8,9 @@ require('../../general.js');
 const { Permissions } = require('../../../dest/database/entity/permissions');
 const { defaultPermissions } = require('../../../dest/helpers/permissions/defaultPermissions');
 const moderation = (require('../../../dest/systems/moderation')).default;
-const db = require('../../general.js').db;
+import { db } from '../../general.js';
 const variable = require('../../general.js').variable;
-const message = require('../../general.js').message;
+import { message } from '../../general.js';
 const user = require('../../general.js').user;
 
 describe('discord#868236481406324747 - Manually included users with link disabled should not be purged - @func1', () => {

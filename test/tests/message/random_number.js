@@ -4,9 +4,9 @@
 
 require('../../general.js');
 
-const db = require('../../general.js').db;
+import { db } from '../../general.js';
 const Message = require('../../../dest/message').default;
-const assert = require('assert');
+import assert from 'assert';
 const owner = { userId: String(Math.floor(Math.random() * 100000)), userName: '__broadcaster__' };
 
 describe('Message - (random.number-#-to-#) filter - @func3', async () => {

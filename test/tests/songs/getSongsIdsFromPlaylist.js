@@ -2,7 +2,7 @@
 /* global describe it  */
 
 require('../../general.js');
-const assert = require('assert');
+import assert from 'assert';
 const songs = (require('../../../dest/systems/songs')).default;
 
 describe('Songs - getSongsIdsFromPlaylist() - @func1', () => {

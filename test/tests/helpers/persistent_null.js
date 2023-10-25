@@ -1,12 +1,12 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 /* global describe it before */
 
-const assert = require('assert');
+import assert from 'assert';
 const { AppDataSource } = require('../../../dest/database');
 
 const { Settings } = require('../../../dest/database/entity/settings');
 require('../../general.js');
-const db = require('../../general.js').db;
+import { db } from '../../general.js';
 const time = require('../../general.js').time;
 
 let stats;

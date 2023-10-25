@@ -1,5 +1,5 @@
 /* global */
-const assert = require('assert');
+import assert from 'assert';
 const { AppDataSource } = require('../../../dest/database.js');
 
 require('../../general.js');
@@ -7,8 +7,8 @@ const { Commands, CommandsGroup } = require('../../../dest/database/entity/comma
 const { prepare } = (require('../../../dest/helpers/commons/prepare'));
 const { defaultPermissions } = require('../../../dest/helpers/permissions/defaultPermissions');
 const customcommands = (require('../../../dest/systems/customcommands')).default;
-const db = require('../../general.js').db;
-const message = require('../../general.js').message;
+import { db } from '../../general.js';
+import { message } from '../../general.js';
 const user = require('../../general.js').user;
 
 describe('Custom Commands - @func2 - #4860 - customcommands group permissions and filter should be considered', () => {

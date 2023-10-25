@@ -1,9 +1,9 @@
-const assert = require('assert');
+import assert from 'assert';
 
 const { isOwner } = require('../../../dest/helpers/user/isOwner');
 require('../../general.js');
-const db = require('../../general.js').db;
-const message = require('../../general.js').message;
+import { db } from '../../general.js';
+import { message } from '../../general.js';
 const user = require('../../general.js').user;
 
 describe('lib/commons - @func2 - isOwner()', () => {

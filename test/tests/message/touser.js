@@ -2,8 +2,8 @@
 
 require('../../general.js');
 
-const db = require('../../general.js').db;
-const message = require('../../general.js').message;
+import { db } from '../../general.js';
+import { message } from '../../general.js';
 
 const owner = { userName: '__broadcaster__', userId: String(Math.floor(Math.random() * 100000)) };
 const someuser = { userName: 'someuser', userId: String(Math.floor(Math.random() * 100000)) };

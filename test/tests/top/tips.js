@@ -1,5 +1,5 @@
 /* global */
-const assert = require('assert');
+import assert from 'assert';
 const { AppDataSource } = require('../../../dest/database.js');
 
 require('../../general.js');
@@ -11,8 +11,8 @@ const { prepare } = require('../../../dest/helpers/commons/prepare');
 const rates = require('../../../dest/helpers/currency/rates').default;
 const twitch = require('../../../dest/services/twitch.js').default;
 const top = (require('../../../dest/systems/top')).default;
-const db = require('../../general.js').db;
-const message = require('../../general.js').message;
+import { db } from '../../general.js';
+import { message } from '../../general.js';
 
 // users
 const owner = { userName: '__broadcaster__' };

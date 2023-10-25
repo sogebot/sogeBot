@@ -4,9 +4,9 @@
 
 require('../../general.js');
 
-const db = require('../../general.js').db;
-const assert = require('assert');
-const message = require('../../general.js').message;
+import { db } from '../../general.js';
+import assert from 'assert';
+import { message } from '../../general.js';
 
 const { AppDataSource } = require('../../../dest/database.js');
 const { Quotes } = require('../../../dest/database/entity/quotes');

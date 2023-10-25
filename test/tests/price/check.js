@@ -1,6 +1,6 @@
 require('../../general.js');
 
-const assert = require('assert');
+import assert from 'assert';
 
 const _ = require('lodash');
 
@@ -11,8 +11,8 @@ const alias = (require('../../../dest/systems/alias')).default;
 const cheer = (require('../../../dest/helpers/events/cheer')).cheer;
 const customcommands = (require('../../../dest/systems/customcommands')).default;
 const price = (require('../../../dest/systems/price')).default;
-const db = require('../../general.js').db;
-const message = require('../../general.js').message;
+import { db } from '../../general.js';
+import { message } from '../../general.js';
 const user = require('../../general.js').user;
 const url = require('../../general.js').url;
 

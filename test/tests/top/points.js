@@ -3,14 +3,14 @@ const { getOwner } = require('../../../dest/helpers/commons/getOwner');
 
 require('../../general.js');
 
-const db = require('../../general.js').db;
-const message = require('../../general.js').message;
+import { db } from '../../general.js';
+import { message } from '../../general.js';
 
 const { User } = require('../../../dest/database/entity/user');
 
 const { prepare } = require('../../../dest/helpers/commons/prepare');
 const top = (require('../../../dest/systems/top')).default;
-const assert = require('assert');
+import assert from 'assert';
 const { AppDataSource } = require('../../../dest/database');
 const twitch = require('../../../dest/services/twitch.js').default;
 

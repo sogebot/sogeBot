@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 require('../../general.js');
 
-const db = require('../../general.js').db;
-const message = require('../../general.js').message;
-const assert = require('assert');
+import { db } from '../../general.js';
+import { message } from '../../general.js';
+import assert from 'assert';
 
 const { User } = require('../../../dest/database/entity/user');
 const { Keyword } = require('../../../dest/database/entity/keyword');

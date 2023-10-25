@@ -2,7 +2,7 @@
 
 require('../../general.js');
 
-const assert = require('assert');
+import assert from 'assert';
 
 const owner = { userId: String(Math.floor(Math.random() * 100000)), userName: '__broadcaster__' };
 const constants = require('@sogebot/ui-helpers/constants');
@@ -12,7 +12,7 @@ const { User, UserTip, UserBit } = require('../../../dest/database/entity/user')
 const { AppDataSource } = require('../../../dest/database.js');
 const rates = require('../../../dest/helpers/currency/rates').default;
 const Message = require('../../../dest/message').default;
-const db = require('../../general.js').db;
+import { db } from '../../general.js';
 
 const tests = [
   { text: `(count|subs|hour)`, expect: '5' },

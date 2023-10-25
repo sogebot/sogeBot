@@ -1,10 +1,10 @@
 /* global */
 
 require('../../general.js');
-const assert = require('assert');
+import assert from 'assert';
 const { AppDataSource } = require('../../../dest/database.js');
 
-const db = require('../../general.js').db;
+import { db } from '../../general.js';
 
 let changelog;
 let User;

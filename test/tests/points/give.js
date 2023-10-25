@@ -2,15 +2,15 @@
 
 require('../../general.js');
 
-const assert = require('assert');
+import assert from 'assert';
 
 const _ = require('lodash');
 const { AppDataSource } = require('../../../dest/database.js');
 
 const { User } = require('../../../dest/database/entity/user');
 const points = (require('../../../dest/systems/points')).default;
-const db = require('../../general.js').db;
-const message = require('../../general.js').message;
+import { db } from '../../general.js';
+import { message } from '../../general.js';
 
 const user1 = {
   userName: 'user1', points: 100, userId: String(_.random(999999, false)),

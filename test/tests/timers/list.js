@@ -1,9 +1,9 @@
 /* global describe it beforeEach */
 require('../../general.js');
 
-const db = require('../../general.js').db;
-const assert = require('assert');
-const message = require('../../general.js').message;
+import { db } from '../../general.js';
+import assert from 'assert';
+import { message } from '../../general.js';
 
 const timers = (require('../../../dest/systems/timers')).default;
 

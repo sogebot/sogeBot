@@ -2,9 +2,9 @@
 
 require('../../general.js');
 
-const db = require('../../general.js').db;
-const message = require('../../general.js').message;
-const assert = require('assert');
+import { db } from '../../general.js';
+import { message } from '../../general.js';
+import assert from 'assert';
 
 const { defaultPermissions } = require('../../../dest/helpers/permissions/defaultPermissions');
 const { check } = require('../../../dest/helpers/permissions/check');

@@ -1,5 +1,5 @@
 /* global describe it before */
-const assert = require('assert');
+import assert from 'assert';
 
 const _ = require('lodash');
 require('../../general.js');
@@ -7,8 +7,8 @@ require('../../general.js');
 const alias = (require('../../../dest/systems/alias')).default;
 const moderation = (require('../../../dest/systems/moderation')).default;
 const songs = (require('../../../dest/systems/songs')).default;
-const message = require('../../general.js').message;
-const db = require('../../general.js').db;
+import { message } from '../../general.js';
+import { db } from '../../general.js';
 
 // users
 const owner = { userName: '__broadcaster__' };

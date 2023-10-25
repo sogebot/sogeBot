@@ -2,13 +2,13 @@
 
 require('../../general.js');
 
-const db = require('../../general.js').db;
-const message = require('../../general.js').message;
+import { db } from '../../general.js';
+import { message } from '../../general.js';
 const variable = require('../../general.js').variable;
 
 const { round5 } = require('../../../dest/helpers/commons/round5');
 
-const assert = require('assert');
+import assert from 'assert';
 
 describe('lib/commons - @func2 - round5()', () => {
   it('6 => 5', async () => {

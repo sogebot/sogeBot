@@ -4,10 +4,10 @@
 
 require('../../general.js');
 
-const db = require('../../general.js').db;
-const assert = require('assert');
+import { db } from '../../general.js';
+import assert from 'assert';
 const { AppDataSource } = require('../../../dest/database.js');
-const message = require('../../general.js').message;
+import { message } from '../../general.js';
 
 const { Quotes } = require('../../../dest/database/entity/quotes');
 

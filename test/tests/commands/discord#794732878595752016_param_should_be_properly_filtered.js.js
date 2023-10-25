@@ -1,13 +1,13 @@
 require('../../general.js');
 
-const assert = require('assert');
+import assert from 'assert';
 
 const { User } = require('../../../dest/database/entity/user');
 const { Commands } = require('../../../dest/database/entity/commands');
 
-const db = require('../../general.js').db;
+import { db } from '../../general.js';
 const time = require('../../general.js').time;
-const message = require('../../general.js').message;
+import { message } from '../../general.js';
 const user = require('../../general.js').user;
 
 const customcommands = (require('../../../dest/systems/customcommands')).default;

@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 /* global  */
 
-const assert = require('assert');
+import assert from 'assert';
 
 require('../../general.js');
 
@@ -14,8 +14,8 @@ const events = (require('../../../dest/events')).default;
 const log = require('../../../dest/helpers/log');
 const changelog = (require('../../../dest/helpers/user/changelog'));
 const time = require('../../general.js').time;
-const db = require('../../general.js').db;
-const message = require('../../general.js').message;
+import { db } from '../../general.js';
+import { message } from '../../general.js';
 
 describe('Events - tip event - @func3', () => {
   before(async () => {

@@ -1,11 +1,11 @@
 /* global describe it before */
 
-const assert = require('assert');
+import assert from 'assert';
 require('../../general.js');
 
-const db = require('../../general.js').db;
+import { db } from '../../general.js';
 const { prepare } = require('../../../dest/helpers/commons/prepare');
-const message = require('../../general.js').message;
+import { message } from '../../general.js';
 
 const { User } = require('../../../dest/database/entity/user');
 const { Settings } = require('../../../dest/database/entity/settings');

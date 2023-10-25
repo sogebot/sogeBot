@@ -1,13 +1,13 @@
 /* global describe it before */
-const assert = require('assert');
+import assert from 'assert';
 
 const { getLocalizedName } = require('@sogebot/ui-helpers/getLocalized');
 
 const getBotUserName = require('../../../dest/helpers/user/getBotUserName').default;
 const { translate } = require('../../../dest/translate');
 require('../../general.js');
-const db = require('../../general.js').db;
-const message = require('../../general.js').message;
+import { db } from '../../general.js';
+import { message } from '../../general.js';
 
 // users
 const owner = { userName: '__broadcaster__' };

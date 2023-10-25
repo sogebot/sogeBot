@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
-const assert = require('assert');
+import assert from 'assert';
 
 require('../../general.js');
 
@@ -9,8 +9,8 @@ const { EventList } = require('../../../dest/database/entity/eventList');
 const { User } = require('../../../dest/database/entity/user');
 const Message = require('../../../dest/message').default;
 const eventlist = require('../../../dest/overlays/eventlist.js').default;
-const db = require('../../general.js').db;
-const message = require('../../general.js').message;
+import { db } from '../../general.js';
+import { message } from '../../general.js';
 
 // users
 const owner = { userName: '__broadcaster__' };
