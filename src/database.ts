@@ -65,7 +65,7 @@ if (process.env.TYPEORM_CONNECTION === 'mysql' || process.env.TYPEORM_CONNECTION
   AppDataSource = new DataSource(SQLiteDataSourceOptions);
 }
 
-if (process.argv[1].endsWith('mocha.js')) {
+if (typeof (global as any).it === 'function') {
   console.log(AppDataSource.options);
 }
 

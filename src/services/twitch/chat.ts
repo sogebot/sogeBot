@@ -110,15 +110,8 @@ class Chat {
       }
     });
     tmiEmitter.on('say', async (channel, message, opts) => {
-      if (process.argv[1].endsWith('mocha.js')) {
+      if (typeof (global as any).it === 'function') {
         return;
-      }
-      debug('emitter.say', JSON.stringify({ channel, message, opts }));
-
-      if (this.client.bot) {
-        await this.client.bot.say(channel, message, opts);
-      } else {
-        throw new Error('Bot client is not available.');
       }
     });
     tmiEmitter.on('whisper', async (username, message) => {
@@ -146,7 +139,7 @@ class Chat {
   }
 
   async initClient (type: 'bot' | 'broadcaster') {
-    if (process.argv[1].endsWith('mocha.js')) {
+    if (typeof (global as any).it === 'function') {
       // do nothing if tests
       warning('initClient disabled due to mocha test run.');
       return;

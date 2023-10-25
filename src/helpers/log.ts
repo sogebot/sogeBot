@@ -2,9 +2,9 @@ import fs from 'fs';
 import os from 'os';
 import util from 'util';
 
-import sinon from 'sinon';
 import { dayjs, timezone } from '@sogebot/ui-helpers/dayjsHelper.js';
 import { createStream, Generator } from 'rotating-file-stream';
+import sinon from 'sinon';
 import stripAnsi from 'strip-ansi';
 
 import { isDebugEnabled } from './debug.js';
@@ -13,8 +13,7 @@ import { getFunctionNameFromStackTrace } from './stacktrace.js';
 
 import { isDbConnected } from '~/helpers/database.js';
 
-const isMochaTestRun = () => process.argv[1].endsWith('mocha.js');
-console.log(process.argv);
+const isMochaTestRun = () => typeof (global as any).it === 'function';
 
 const logDir = './logs';
 
