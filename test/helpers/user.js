@@ -90,5 +90,9 @@ export const prepare = async () => {
   await AppDataSource.getRepository(User).save(mod);
   emitter.emit('set', '/services/twitch', 'broadcasterUsername', owner.userName);
   emitter.emit('set', '/services/twitch', 'broadcasterId', owner.userId);
-  await new Promise((resolve => setTimeout(() => resolve(), 1000)));
+  await new Promise((resolve => {
+    setTimeout(() =>{
+      resolve();
+    }, 1000);
+  }));
 }
