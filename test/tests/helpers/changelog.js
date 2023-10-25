@@ -12,7 +12,7 @@ describe('User changelog tests - @func1', () => {
   before(async () => {
     await db.cleanup();
     changelog = await import('../../../dest/helpers/user/changelog.js');
-    User = (await import('../../../dest/database/entity/user')).User;
+    User = (await import('../../../dest/database/entity/user.js')).User;
   });
 
   it('get of unknown user should return null', async () => {
