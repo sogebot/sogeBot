@@ -3,10 +3,8 @@ import assert from 'assert';
 import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized.js';
 
 import { translate } from '../../../dest/translate.js';
-import('../../general.js');
 import { db, message, user } from '../../general.js';
 
-let emotes;
 
 const emotesOffsetsKappa = new Map();
 emotesOffsetsKappa.set('25', ['0-4']);
@@ -14,19 +12,22 @@ emotesOffsetsKappa.set('25', ['0-4']);
 const emotesOffsetsHeyGuys = new Map();
 emotesOffsetsHeyGuys.set('30259', ['0-6']);
 
+
 describe('Emotes - combo - @func2', () => {
+  let emotes = null;
+  beforeEach(async () => {
+    await db.cleanup();
+    await message.prepare();
+    await user.prepare();
+    emotes = (await import('../../../dest/systems/emotescombo.js')).default
+    emotes.comboEmoteCount = 0;
+  });
   describe('Emotes combo should send proper message after 3 emotes', () => {
     let comboLastBreak = 0;
     before(async () => {
       await db.cleanup();
       await message.prepare();
       await user.prepare();
-      emotes = (await import('../../../dest/systems/emotescombo.js')).default;
-      emotes.enableEmotesCombo = true;
-      emotes.comboEmoteCount = 0;
-    });
-    after(() => {
-      emotes.enableEmotesCombo = false;
     });
 
     // we run it twice as to test without cooldown
@@ -68,12 +69,6 @@ describe('Emotes - combo - @func2', () => {
       await db.cleanup();
       await message.prepare();
       await user.prepare();
-      emotes = await import('../../../dest/systems/emotescombo.js');
-      emotes.enableEmotesCombo = true;
-      emotes.comboEmoteCount = 0;
-    });
-    after(() => {
-      emotes.enableEmotesCombo = false;
     });
 
     // we run it twice as to test without cooldown
@@ -129,14 +124,10 @@ describe('Emotes - combo - @func2', () => {
       await db.cleanup();
       await message.prepare();
       await user.prepare();
-      emotes = await import('../../../dest/systems/emotescombo.js');
       emotes.comboLastBreak = 0;
-      emotes.enableEmotesCombo = true;
       emotes.comboCooldown = 60;
-      emotes.comboEmoteCount = 0;
     });
     after(() => {
-      emotes.enableEmotesCombo = false;
       emotes.comboCooldown = 0;
     });
 

@@ -16,6 +16,7 @@ import twitch from '../../../dest/services/twitch.js';
 
 // users
 const owner = { userName: '__broadcaster__' };
+let user;
 
 describe('Top - !top points - @func3', () => {
   before(async () => {
