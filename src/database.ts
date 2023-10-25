@@ -1,8 +1,8 @@
 import { DataSource, DataSourceOptions  } from 'typeorm';
 
-import { warning } from './helpers/log';
+import { warning } from './helpers/log.js';
 
-import { TypeORMLogger } from '~/helpers/logTypeorm';
+import { TypeORMLogger } from '~/helpers/logTypeorm.js';
 
 if (process.env.FORCE_DB_SYNC === 'IKnowWhatIamDoing') {
   setTimeout(() => {

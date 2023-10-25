@@ -1,33 +1,31 @@
-'use strict';
-
 import {
   Raffle, RaffleParticipant, RaffleParticipantInterface, RaffleParticipantMessageInterface,
-} from '@entity/raffle';
-import { User } from '@entity/user';
-import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized';
-import * as _ from 'lodash';
+} from '@entity/raffle.js';
+import { User } from '@entity/user.js';
+import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized.js';
+import * as _ from 'lodash-es';
 import { IsNull } from 'typeorm';
 
-import System from './_interface';
+import System from './_interface.js';
+import { onStartup } from '../decorators/on.js';
 import {
   command, default_permission, parser, settings, timer,
-} from '../decorators';
-import { onStartup } from '../decorators/on';
+} from '../decorators.js';
 
-import { AppDataSource } from '~/database';
-import { isStreamOnline } from '~/helpers/api';
+import { AppDataSource } from '~/database.js';
+import { isStreamOnline } from '~/helpers/api/index.js';
 import {
   announce, getOwnerAsSender, prepare,
-} from '~/helpers/commons';
-import { isDbConnected } from '~/helpers/database';
-import { debug, warning } from '~/helpers/log';
-import { linesParsed } from '~/helpers/parser';
-import defaultPermissions from '~/helpers/permissions/defaultPermissions';
-import { adminEndpoint } from '~/helpers/socket';
-import { tmiEmitter } from '~/helpers/tmi';
+} from '~/helpers/commons/index.js';
+import { isDbConnected } from '~/helpers/database.js';
+import { debug, warning } from '~/helpers/log.js';
+import { linesParsed } from '~/helpers/parser.js';
+import defaultPermissions from '~/helpers/permissions/defaultPermissions.js';
+import { adminEndpoint } from '~/helpers/socket.js';
+import { tmiEmitter } from '~/helpers/tmi/index.js';
 import * as changelog from '~/helpers/user/changelog.js';
-import points from '~/systems/points';
-import { translate } from '~/translate';
+import points from '~/systems/points.js';
+import { translate } from '~/translate.js';
 
 const TYPE_NORMAL = 0;
 const TYPE_TICKETS = 1;

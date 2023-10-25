@@ -1,6 +1,5 @@
-const fs = require('fs');
-
-const axios = require('axios');
+import fs from 'fs'
+import axios from 'axios'
 
 const appId = process.env.OPENEXCHANGE_APPID;
 const ratesFile = './src/helpers/currency/rates.ts';

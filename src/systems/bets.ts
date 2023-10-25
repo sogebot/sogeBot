@@ -1,20 +1,20 @@
-import _ from 'lodash';
+import _ from 'lodash-es';
 
-import System from './_interface';
+import System from './_interface.js';
 import {
   command, default_permission,
-} from '../decorators';
-import Expects from '../expects';
+} from '../decorators.js';
+import Expects from '../expects.js';
 
-import { onStartup, onStreamStart } from '~/decorators/on';
-import * as channelPrediction from '~/helpers/api/channelPrediction';
+import { onStartup, onStreamStart } from '~/decorators/on.js';
+import * as channelPrediction from '~/helpers/api/channelPrediction.js';
 import {
   prepare,
-} from '~/helpers/commons';
-import { error } from '~/helpers/log';
-import defaultPermissions from '~/helpers/permissions/defaultPermissions';
-import getBroadcasterId from '~/helpers/user/getBroadcasterId';
-import twitch from '~/services/twitch';
+} from '~/helpers/commons/index.js';
+import { error } from '~/helpers/log.js';
+import defaultPermissions from '~/helpers/permissions/defaultPermissions.js';
+import getBroadcasterId from '~/helpers/user/getBroadcasterId.js';
+import twitch from '~/services/twitch.js';
 
 const ERROR_NOT_ENOUGH_OPTIONS = 'Expected more parameters';
 const ERROR_NOT_OPTION = '7';

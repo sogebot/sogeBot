@@ -1,8 +1,9 @@
-require('dotenv').config();
-
 Error.stackTraceLimit = Infinity;
 
+import dotenv from 'dotenv';
 import 'reflect-metadata';
+
+dotenv.config();
 
 import { existsSync, readFileSync, unlinkSync } from 'fs';
 import { normalize } from 'path';
@@ -11,17 +12,17 @@ import util from 'util';
 import blocked from 'blocked-at';
 import figlet from 'figlet';
 import gitCommitInfo from 'git-commit-info';
-import _ from 'lodash';
+import { get } from 'lodash-es';
 
-import { setDEBUG, isDebugEnabled } from './helpers/debug';
+import { autoLoad } from './helpers/autoLoad.js';
+import { isDebugEnabled, setDEBUG } from './helpers/debug.js';
+import { startWatcher } from './watchers.js';
 
-import { AppDataSource } from '~/database';
-import { autoLoad } from '~/helpers/autoLoad';
-import { setIsBotStarted, setIsDbConnected } from '~/helpers/database';
+import { AppDataSource } from '~/database.js';
+import { setIsBotStarted, setIsDbConnected } from '~/helpers/database.js';
 import {
   error, info, warning,
-} from '~/helpers/log';
-import { startWatcher } from '~/watchers';
+} from '~/helpers/log.js';
 
 const connect = async function () {
   const type = process.env.TYPEORM_CONNECTION;
@@ -45,7 +46,7 @@ const connect = async function () {
 
 async function main () {
   try {
-    const version = _.get(process, 'env.npm_package_version', 'x.y.z');
+    const version = get(process, 'env.npm_package_version', 'x.y.z');
     const commitFile = existsSync('./.commit') ? readFileSync('./.commit').toString() : null;
     if (!existsSync('~/restart.pid')) {
       const versionString = version.replace('SNAPSHOT', commitFile && commitFile.length > 0 ? commitFile : gitCommitInfo().shortHash || 'SNAPSHOT');
@@ -67,52 +68,57 @@ async function main () {
     error('Exiting bot.');
     process.exit(1);
   }
-  let translate;
   try {
     // Initialize all core singletons
-    setTimeout(() => {
-      translate = require('./translate');
+    setTimeout(async () => {
+      try {
+        console.log('Translation loading');
+        const translate = await import('./translate.js');
+        console.log('Translation loaded');
 
-      translate.default._load().then(async () => {
-        require('./general');
-        require('./socket');
-        require('./ui');
-        require('./currency');
-        require('./stats');
-        require('./users');
-        require('./events');
-        require('./plugins');
-        require('./customvariables');
-        require('./permissions');
-        require('./dashboard');
-        require('./tts');
-        require('./emotes');
-        require('./panel');
-        await autoLoad('./dest/stats/');
-        await autoLoad('./dest/registries/');
-        await autoLoad('./dest/systems/');
-        await autoLoad('./dest/widgets/');
-        await autoLoad('./dest/overlays/');
-        await autoLoad('./dest/games/');
-        await autoLoad('./dest/integrations/');
-        await autoLoad('./dest/services/');
+        translate.default._load().then(async () => {
+          await import('./general.js');
+          await import('./socket.js');
+          await import('./ui.js');
+          await import('./currency.js');
+          await import('./stats.js');
+          await import('./users.js');
+          await import('./events.js');
+          await import('./plugins.js');
+          await import('./customvariables.js');
+          await import('./permissions.js');
+          await import('./dashboard.js');
+          await import('./tts.js');
+          await import('./emotes.js');
+          await import('./panel.js');
+          await autoLoad('./dest/stats/');
+          await autoLoad('./dest/registries/');
+          await autoLoad('./dest/systems/');
+          await autoLoad('./dest/widgets/');
+          await autoLoad('./dest/overlays/');
+          await autoLoad('./dest/games/');
+          await autoLoad('./dest/integrations/');
+          await autoLoad('./dest/services/');
 
-        setTimeout(() => {
-          if (existsSync('~/restart.pid')) {
-            unlinkSync('~/restart.pid');
-          }
-          setIsBotStarted();
-          startWatcher();
+          setTimeout(() => {
+            if (existsSync('~/restart.pid')) {
+              unlinkSync('~/restart.pid');
+            }
+            setIsBotStarted();
+            startWatcher();
 
-          if (isDebugEnabled('eventloop')) {
-            warning('EVENTLOOP BLOCK DETECTION ENABLED! This may cause some performance issues.');
-            blocked((time: any, stack: any) => {
-              error(`EVENTLOOP BLOCK !!! Blocked for ${time}ms, operation started here:`);
-              error(stack);
-            }, { threshold: 1000 });
-          }
-        }, 30000);
-      });
+            if (isDebugEnabled('eventloop')) {
+              warning('EVENTLOOP BLOCK DETECTION ENABLED! This may cause some performance issues.');
+              blocked((time: any, stack: any) => {
+                error(`EVENTLOOP BLOCK !!! Blocked for ${time}ms, operation started here:`);
+                error(stack);
+              }, { threshold: 1000 });
+            }
+          }, 30000);
+        });
+      } catch(e) {
+        console.log((e as any).stack);
+      }
     }, 5000);
   } catch (e: any) {
     error(e);

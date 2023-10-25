@@ -1,1 +1,1 @@
-export * from './setValue';
+export * from './setValue.js';

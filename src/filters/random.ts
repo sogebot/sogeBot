@@ -1,12 +1,12 @@
-import { User } from '@entity/user';
-import { sample } from '@sogebot/ui-helpers/array';
-import { AppDataSource } from '~/database';
+import { User } from '@entity/user.js';
+import { sample } from '@sogebot/ui-helpers/array.js';
+import { AppDataSource } from '~/database.js';
 
-import type { ResponseFilter } from '.';
+import type { ResponseFilter } from './index.js';
 
 import * as changelog from '~/helpers/user/changelog.js';
-import { isIgnored } from '~/helpers/user/isIgnored';
-import { variables } from '~/watchers';
+import { isIgnored } from '~/helpers/user/isIgnored.js';
+import { variables } from '~/watchers.js';
 
 const random: ResponseFilter = {
   '(random.online.viewer)': async function () {

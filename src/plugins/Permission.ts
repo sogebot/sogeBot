@@ -1,5 +1,5 @@
-import { debug } from '~/helpers/log';
-import { check } from '~/helpers/permissions/check';
+import { debug } from '~/helpers/log.js';
+import { check } from '~/helpers/permissions/check.js';
 
 export const PermissionGenerator = (pluginId: string) => ({
   accessTo: async (userId: string, permId: string) => {

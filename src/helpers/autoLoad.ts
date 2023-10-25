@@ -9,7 +9,7 @@ export async function autoLoad(directory: string): Promise<{ [x: string]: any }>
       continue;
     }
     // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const imported = require(normalize(join(process.cwd(), directory, file)));
+    const imported = await import(normalize(join(process.cwd(), directory, `${file}.js`)));
     if (typeof imported.default !== 'undefined') {
       loaded[file.split('.')[0]] = imported.default; // remap default to root object
     } else {

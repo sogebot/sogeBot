@@ -7,23 +7,23 @@ import { isNil } from 'lodash';
 import _ from 'lodash';
 import { LessThan } from 'typeorm';
 
-import Core from '~/_interface';
-import { AppDataSource } from '~/database';
-import { TwitchStats, TwitchStatsInterface } from '~/database/entity/twitch';
-import { persistent } from '~/decorators';
-import { onStreamStart } from '~/decorators/on';
+import Core from '~/_interface.js';
+import { TwitchStats, TwitchStatsInterface } from '~/database/entity/twitch.js';
+import { AppDataSource } from '~/database.js';
+import { onStreamStart } from '~/decorators/on.js';
+import { persistent } from '~/decorators.js';
 import {
   chatMessagesAtStart, isStreamOnline, rawStatus, stats, streamStatusChangeSince,
-} from '~/helpers/api';
-import { debug } from '~/helpers/log';
-import { app } from '~/helpers/panel';
-import { linesParsed } from '~/helpers/parser';
-import lastfm from '~/integrations/lastfm';
-import spotify from '~/integrations/spotify';
-import { adminMiddleware } from '~/socket';
-import songs from '~/systems/songs';
-import translateLib, { translate } from '~/translate';
-import { variables } from '~/watchers';
+} from '~/helpers/api/index.js';
+import { debug } from '~/helpers/log.js';
+import { app } from '~/helpers/panel.js';
+import { linesParsed } from '~/helpers/parser.js';
+import lastfm from '~/integrations/lastfm.js';
+import spotify from '~/integrations/spotify.js';
+import { adminMiddleware } from '~/socket.js';
+import songs from '~/systems/songs.js';
+import translateLib, { translate } from '~/translate.js';
+import { variables } from '~/watchers.js';
 
 class Stats extends Core {
   @persistent()

@@ -1,13 +1,13 @@
 import {
   DAY, HOUR, MINUTE, SECOND,
-} from '@sogebot/ui-helpers/constants';
+} from '@sogebot/ui-helpers/constants.js';
 import {
   defaults, get, isNil,
-} from 'lodash';
+} from 'lodash-es';
 import XRegExp from 'xregexp';
 
-import { debug } from '~/helpers/log';
-import { ParameterError } from '~/helpers/parameterError';
+import { debug } from '~/helpers/log.js';
+import { ParameterError } from '~/helpers/parameterError.js';
 
 declare global {
   interface RegExpExecArray extends Array<string> {

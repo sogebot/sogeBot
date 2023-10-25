@@ -1,11 +1,11 @@
-import { get } from 'lodash';
+import { get } from 'lodash-es';
 
-import { parserReply } from '../commons';
+import { parserReply } from '../commons.js';
 
-import type { ResponseFilter } from '.';
+import type { ResponseFilter } from './index.js';
 
-import { prepare } from '~/helpers/commons';
-import { getValueOf, setValueOf } from '~/helpers/customvariables';
+import { prepare } from '~/helpers/commons/index.js';
+import { getValueOf, setValueOf } from '~/helpers/customvariables/index.js';
 
 const custom: ResponseFilter = {
   '$_#': async (variable, attr) => {

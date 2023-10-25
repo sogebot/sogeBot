@@ -2,22 +2,22 @@ import { ApiClient } from '@twurple/api';
 import { rawDataSymbol } from '@twurple/common';
 import { EventSubWsListener } from '@twurple/eventsub-ws';
 
-import { isAlreadyProcessed } from './eventsub/events';
+import { isAlreadyProcessed } from './eventsub/events.js';
 
-import * as channelPoll from '~/helpers/api/channelPoll';
-import * as channelPrediction from '~/helpers/api/channelPrediction';
-import * as hypeTrain from '~/helpers/api/hypeTrain';
-import { isDebugEnabled } from '~/helpers/debug';
-import { eventEmitter } from '~/helpers/events';
-import { cheer } from '~/helpers/events/cheer';
-import { follow } from '~/helpers/events/follow';
-import { raid } from '~/helpers/events/raid';
+import * as channelPoll from '~/helpers/api/channelPoll.js';
+import * as channelPrediction from '~/helpers/api/channelPrediction.js';
+import * as hypeTrain from '~/helpers/api/hypeTrain.js';
+import { isDebugEnabled } from '~/helpers/debug.js';
+import { cheer } from '~/helpers/events/cheer.js';
+import { follow } from '~/helpers/events/follow.js';
+import { eventEmitter } from '~/helpers/events/index.js';
+import { raid } from '~/helpers/events/raid.js';
 import { ban, error, info, redeem, timeout, unban } from '~/helpers/log.js';
-import { ioServer } from '~/helpers/panel';
+import { ioServer } from '~/helpers/panel.js';
 import * as changelog from '~/helpers/user/changelog.js';
-import eventlist from '~/overlays/eventlist';
-import alerts from '~/registries/alerts';
-import { variables } from '~/watchers';
+import eventlist from '~/overlays/eventlist.js';
+import alerts from '~/registries/alerts.js';
+import { variables } from '~/watchers.js';
 
 let keepAliveCount: null | number = null;
 

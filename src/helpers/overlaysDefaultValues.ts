@@ -1,9 +1,9 @@
-import { MINUTE, SECOND } from '@sogebot/ui-helpers/constants';
-import { defaultsDeep, pick } from 'lodash';
+import { MINUTE, SECOND } from '@sogebot/ui-helpers/constants.js';
+import { defaultsDeep, pick } from 'lodash-es';
 
-import { flatten, unflatten } from './flatten';
+import { flatten, unflatten } from './flatten.js';
 
-import { Overlay } from '~/database/entity/overlay';
+import { Overlay } from '~/database/entity/overlay.js';
 
 const values = {
   url:            { url: '' },

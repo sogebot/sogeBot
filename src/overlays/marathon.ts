@@ -1,12 +1,12 @@
-import { Marathon as MarathonItem, Overlay as OverlayEntity } from '@entity/overlay';
+import { Marathon as MarathonItem, Overlay as OverlayEntity } from '@entity/overlay.js';
 
-import Overlay from './_interface';
+import Overlay from './_interface.js';
 import { onStartup } from '../decorators/on.js';
 
 import { eventEmitter } from '~/helpers/events/emitter.js';
 import { error } from '~/helpers/log.js';
 import { addUIError } from '~/helpers/panel/alerts.js';
-import { adminEndpoint, publicEndpoint } from '~/helpers/socket';
+import { adminEndpoint, publicEndpoint } from '~/helpers/socket.js';
 
 const cachedOverlays = new Map<string, MarathonItem>();
 

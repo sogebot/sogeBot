@@ -1,7 +1,7 @@
-import { isNil } from 'lodash';
+import { isNil } from 'lodash-es';
 import { VM } from 'vm2';
 
-import type { ResponseFilter } from '.';
+import type { ResponseFilter } from './index.js';
 
 const vm = new VM();
 

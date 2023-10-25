@@ -1,4 +1,4 @@
-import Widget from './_interface';
+import Widget from './_interface.js';
 
 class JoinPart extends Widget {
   public send(event: { users: string[], type: 'join' | 'part' }) {

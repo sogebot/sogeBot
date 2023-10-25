@@ -1,4 +1,4 @@
-import { Variable } from '@entity/variable';
+import { Variable } from '@entity/variable.js';
 
 async function addChangeToHistory(opts: { sender: any; item: Variable; oldValue: any }) {
   const variable = await Variable.findOneBy({ id: opts.item.id });

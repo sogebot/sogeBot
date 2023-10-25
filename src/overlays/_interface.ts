@@ -1,4 +1,4 @@
-import Module from '../_interface';
+import Module from '../_interface.js';
 
 class Overlay extends Module {
   constructor() {

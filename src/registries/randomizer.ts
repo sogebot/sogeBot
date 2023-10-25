@@ -1,18 +1,18 @@
-import { Randomizer as RandomizerEntity } from '@entity/randomizer';
-import { LOW } from '@sogebot/ui-helpers/constants';
+import { Randomizer as RandomizerEntity } from '@entity/randomizer.js';
+import { LOW } from '@sogebot/ui-helpers/constants.js';
 import { validateOrReject } from 'class-validator';
-import { merge } from 'lodash';
+import { merge } from 'lodash-es';
 
-import { AppDataSource } from '~/database';
+import { AppDataSource } from '~/database.js';
 
 import { v4 } from 'uuid';
 
-import { app } from '~/helpers/panel';
-import { check } from '~/helpers/permissions/check';
-import { adminMiddleware } from '~/socket';
+import { app } from '~/helpers/panel.js';
+import { check } from '~/helpers/permissions/check.js';
+import { adminMiddleware } from '~/socket.js';
 
-import Registry from './_interface';
-import { parser } from '../decorators';
+import Registry from './_interface.js';
+import { parser } from '../decorators.js';
 
 class Randomizer extends Registry {
   constructor() {

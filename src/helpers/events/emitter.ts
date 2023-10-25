@@ -1,6 +1,6 @@
 import { TypedEmitter } from 'tiny-typed-emitter';
 
-import { Types } from '~/plugins/ListenTo';
+import { Types } from '~/plugins/ListenTo.js';
 
 interface Events {
   'CustomVariable:OnRefresh': () => void;

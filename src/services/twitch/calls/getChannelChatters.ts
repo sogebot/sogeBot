@@ -1,24 +1,24 @@
-import { User } from '@entity/user';
+import { User } from '@entity/user.js';
 import { HelixChatChatter, HelixForwardPagination } from '@twurple/api/lib';
 import {
   chunk, includes,
-} from 'lodash';
+} from 'lodash-es';
 
-import { AppDataSource } from '~/database';
-import { isDebugEnabled } from '~/helpers/debug';
-import { eventEmitter } from '~/helpers/events';
-import { getAllOnline } from '~/helpers/getAllOnlineUsernames';
-import { getFunctionName } from '~/helpers/getFunctionName';
+import { AppDataSource } from '~/database.js';
+import { isDebugEnabled } from '~/helpers/debug.js';
+import { eventEmitter } from '~/helpers/events/index.js';
+import { getAllOnline } from '~/helpers/getAllOnlineUsernames.js';
+import { getFunctionName } from '~/helpers/getFunctionName.js';
 import {
   debug, error, warning,
-} from '~/helpers/log';
-import { setImmediateAwait } from '~/helpers/setImmediateAwait';
-import { SQLVariableLimit } from '~/helpers/sql';
+} from '~/helpers/log.js';
+import { setImmediateAwait } from '~/helpers/setImmediateAwait.js';
+import { SQLVariableLimit } from '~/helpers/sql.js';
 import * as changelog from '~/helpers/user/changelog.js';
-import { isIgnored } from '~/helpers/user/isIgnored';
-import twitch from '~/services/twitch';
-import { variables } from '~/watchers';
-import joinpart from '~/widgets/joinpart';
+import { isIgnored } from '~/helpers/user/isIgnored.js';
+import twitch from '~/services/twitch.js';
+import { variables } from '~/watchers.js';
+import joinpart from '~/widgets/joinpart.js';
 
 const getChannelChattersAll = async (chatters: HelixChatChatter[] = [], after?: HelixForwardPagination['after']): Promise<HelixChatChatter[]> => {
   const broadcasterId = variables.get('services.twitch.broadcasterId') as string;

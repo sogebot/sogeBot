@@ -1,42 +1,40 @@
-'use strict';
-
-import { PointsChangelog } from '@entity/points';
-import { User, UserInterface } from '@entity/user';
-import { MINUTE } from '@sogebot/ui-helpers/constants';
-import { format } from '@sogebot/ui-helpers/number';
+import { PointsChangelog } from '@entity/points.js';
+import { User, UserInterface } from '@entity/user.js';
+import { MINUTE } from '@sogebot/ui-helpers/constants.js';
+import { format } from '@sogebot/ui-helpers/number.js';
 import * as cronparser from 'cron-parser';
 import {
   LessThanOrEqual, FindOptionsWhere,
 } from 'typeorm';
-import { AppDataSource } from '~/database';
 
-import {
-  command, default_permission, parser, permission_settings, persistent, settings,
-} from '../decorators';
+import System from './_interface.js';
 import {
   onChange, onLoad, onStartup,
-} from '../decorators/on';
-import Expects from '../expects';
+} from '../decorators/on.js';
+import {
+  command, default_permission, parser, permission_settings, persistent, settings,
+} from '../decorators.js';
+import Expects from '../expects.js';
 import general from '../general.js';
-import users from '../users';
-import System from './_interface';
+import users from '../users.js';
 
-import { isStreamOnline } from '~/helpers/api';
-import { prepare } from '~/helpers/commons';
-import { getAllOnlineIds } from '~/helpers/getAllOnlineUsernames';
+import { AppDataSource } from '~/database.js';
+import { isStreamOnline } from '~/helpers/api/index.js';
+import { prepare } from '~/helpers/commons/index.js';
+import { getAllOnlineIds } from '~/helpers/getAllOnlineUsernames.js';
 import {
   debug, error, warning,
-} from '~/helpers/log';
-import { ParameterError } from '~/helpers/parameterError';
-import { getUserHighestPermission } from '~/helpers/permissions/getUserHighestPermission';
-import defaultPermissions from '~/helpers/permissions/defaultPermissions';
-import { getPointsName, name } from '~/helpers/points/index';
-import { adminEndpoint } from '~/helpers/socket';
+} from '~/helpers/log.js';
+import { ParameterError } from '~/helpers/parameterError.js';
+import defaultPermissions from '~/helpers/permissions/defaultPermissions.js';
+import { getUserHighestPermission } from '~/helpers/permissions/getUserHighestPermission.js';
+import { getPointsName, name } from '~/helpers/points/index.js';
+import { adminEndpoint } from '~/helpers/socket.js';
 import * as changelog from '~/helpers/user/changelog.js';
-import { isBot, isBotId } from '~/helpers/user/isBot';
-import { getIdFromTwitch } from '~/services/twitch/calls/getIdFromTwitch';
-import { translate } from '~/translate';
-import { variables } from '~/watchers';
+import { isBot, isBotId } from '~/helpers/user/isBot.js';
+import { getIdFromTwitch } from '~/services/twitch/calls/getIdFromTwitch.js';
+import { translate } from '~/translate.js';
+import { variables } from '~/watchers.js';
 
 class Points extends System {
   cronTask: any = null;

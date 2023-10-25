@@ -1,8 +1,8 @@
 import {
   isBoolean, isNumber, isString,
-} from 'lodash';
+} from 'lodash-es';
 
-import { find } from '../register';
+import { find } from '../register.js';
 
 async function setValue(opts: CommandOptions) {
   // get value so we have a type

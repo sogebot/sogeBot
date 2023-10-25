@@ -1,4 +1,4 @@
-import { Permissions } from '@entity/permissions';
+import { Permissions } from '@entity/permissions.js';
 
 async function get(identifier: string): Promise<Permissions | null> {
   const uuidRegex = /([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})/;

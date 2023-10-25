@@ -1,23 +1,23 @@
-import { shuffle } from '@sogebot/ui-helpers/array';
-import * as constants from '@sogebot/ui-helpers/constants';
+import { shuffle } from '@sogebot/ui-helpers/array.js';
+import * as constants from '@sogebot/ui-helpers/constants.js';
 import axios from 'axios';
 import { v4 as uuid } from 'uuid';
 
-import { onStartup } from './decorators/on';
-import emitter from './helpers/interfaceEmitter';
-import { adminEndpoint, publicEndpoint } from './helpers/socket';
-import getBroadcasterId from './helpers/user/getBroadcasterId';
-import twitch from './services/twitch';
+import { onStartup } from './decorators/on.js';
+import emitter from './helpers/interfaceEmitter.js';
+import { adminEndpoint, publicEndpoint } from './helpers/socket.js';
+import getBroadcasterId from './helpers/user/getBroadcasterId.js';
+import twitch from './services/twitch.js';
 
-import Core from '~/_interface';
-import { parser, settings } from '~/decorators';
+import Core from '~/_interface.js';
+import { parser, settings } from '~/decorators.js';
 import {
   debug,
   error, info, warning,
-} from '~/helpers/log';
-import { ioServer } from '~/helpers/panel';
-import { setImmediateAwait } from '~/helpers/setImmediateAwait';
-import { variables } from '~/watchers';
+} from '~/helpers/log.js';
+import { ioServer } from '~/helpers/panel.js';
+import { setImmediateAwait } from '~/helpers/setImmediateAwait.js';
+import { variables } from '~/watchers.js';
 
 let broadcasterWarning = false;
 

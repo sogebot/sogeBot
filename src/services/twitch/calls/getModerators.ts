@@ -1,15 +1,15 @@
 import { In, Not } from 'typeorm';
 
-import { AppDataSource } from '~/database';
-import { User } from '~/database/entity/user';
-import { isDebugEnabled } from '~/helpers/debug';
-import { getFunctionName } from '~/helpers/getFunctionName';
-import { debug, error, warning } from '~/helpers/log';
-import { addUIError } from '~/helpers/panel/index';
-import { setStatus } from '~/helpers/parser';
+import { User } from '~/database/entity/user.js';
+import { AppDataSource } from '~/database.js';
+import { isDebugEnabled } from '~/helpers/debug.js';
+import { getFunctionName } from '~/helpers/getFunctionName.js';
+import { debug, error, warning } from '~/helpers/log.js';
+import { addUIError } from '~/helpers/panel/index.js';
+import { setStatus } from '~/helpers/parser.js';
 import * as changelog from '~/helpers/user/changelog.js';
-import twitch from '~/services/twitch';
-import { variables } from '~/watchers';
+import twitch from '~/services/twitch.js';
+import { variables } from '~/watchers.js';
 
 export async function getModerators(opts: { isWarned: boolean }) {
   if (isDebugEnabled('api.calls')) {

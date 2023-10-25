@@ -1,4 +1,4 @@
-import { Currency } from '~/database/entity/user';
+import { Currency } from '~/database/entity/user.js';
 
 let _mainCurrency: Currency = 'EUR';
 

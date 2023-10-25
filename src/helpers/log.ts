@@ -2,15 +2,15 @@ import fs from 'fs';
 import os from 'os';
 import util from 'util';
 
-import { dayjs, timezone } from '@sogebot/ui-helpers/dayjsHelper';
+import { dayjs, timezone } from '@sogebot/ui-helpers/dayjsHelper.js';
 import { createStream, Generator } from 'rotating-file-stream';
 import stripAnsi from 'strip-ansi';
 
-import { isDebugEnabled } from './debug';
-import { logEmitter } from './log/emitter';
-import { getFunctionNameFromStackTrace } from './stacktrace';
+import { isDebugEnabled } from './debug.js';
+import { logEmitter } from './log/emitter.js';
+import { getFunctionNameFromStackTrace } from './stacktrace.js';
 
-import { isDbConnected } from '~/helpers/database';
+import { isDbConnected } from '~/helpers/database.js';
 
 const logDir = './logs';
 

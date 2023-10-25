@@ -1,11 +1,11 @@
 import { TextChannel } from 'discord.js';
 
 import { timer } from '~/decorators.js';
-import { prepare } from '~/helpers/commons/prepare';
-import { sendMessage } from '~/helpers/commons/sendMessage';
-import { chatOut, warning } from '~/helpers/log';
-import Discord from '~/integrations/discord';
-import { Message } from '~/message';
+import { prepare } from '~/helpers/commons/prepare.js';
+import { sendMessage } from '~/helpers/commons/sendMessage.js';
+import { chatOut, warning } from '~/helpers/log.js';
+import Discord from '~/integrations/discord.js';
+import { Message } from '~/message.js';
 
 const isParserOpts = (opts: ParserOptions | { isParserOptions?: boolean, id: string, sender: CommandOptions['sender']; attr?: CommandOptions['attr'] }): opts is ParserOptions => {
   return typeof opts.isParserOptions !== 'undefined';

@@ -2,33 +2,33 @@ import { existsSync } from 'fs';
 import { setTimeout } from 'timers';
 
 import chalk from 'chalk';
-import _ from 'lodash';
+import _ from 'lodash-es';
 import type { Namespace } from 'socket.io/dist/namespace';
 import { v4 as uuid } from 'uuid';
 
-import { ClientToServerEventsWithNamespace } from '../d.ts/src/helpers/socket';
+import { ClientToServerEventsWithNamespace } from '../d.ts/src/helpers/socket.js';
 
-import { AppDataSource } from '~/database';
-import { PermissionCommands, Permissions as PermissionsEntity } from '~/database/entity/permissions';
-import { Settings } from '~/database/entity/settings';
+import { PermissionCommands, Permissions as PermissionsEntity } from '~/database/entity/permissions.js';
+import { Settings } from '~/database/entity/settings.js';
+import { AppDataSource } from '~/database.js';
+import { getFunctionList } from '~/decorators/on.js';
 import {
   commandsToRegister, loadingInProgress, permissions as permissionsList,
-} from '~/decorators';
-import { getFunctionList } from '~/decorators/on';
-import { isBotStarted } from '~/helpers/database';
-import { flatten, unflatten } from '~/helpers/flatten';
-import { enabled } from '~/helpers/interface/enabled';
-import emitter from '~/helpers/interfaceEmitter';
+} from '~/decorators.js';
+import { isBotStarted } from '~/helpers/database.js';
+import { flatten, unflatten } from '~/helpers/flatten.js';
+import { enabled } from '~/helpers/interface/enabled.js';
+import emitter from '~/helpers/interfaceEmitter.js';
 import {
   error, info, warning,
-} from '~/helpers/log';
+} from '~/helpers/log.js';
 import {
   addMenu, addMenuPublic, ioServer, menu, menuPublic,
-} from '~/helpers/panel';
-import defaultPermissions from '~/helpers/permissions/defaultPermissions';
-import { register } from '~/helpers/register';
-import { adminEndpoint, publicEndpoint } from '~/helpers/socket';
-import * as watchers from '~/watchers';
+} from '~/helpers/panel.js';
+import defaultPermissions from '~/helpers/permissions/defaultPermissions.js';
+import { register } from '~/helpers/register.js';
+import { adminEndpoint, publicEndpoint } from '~/helpers/socket.js';
+import * as watchers from '~/watchers.js';
 
 let socket: import('~/socket').Socket | any = null;
 
@@ -180,7 +180,7 @@ class Module {
           this.onStartupTriggered = true;
 
           // require panel/socket
-          socket = (require('~/socket')).default;
+          socket = (await import('~/socket.js')).default;
 
           this.registerCommands();
         };

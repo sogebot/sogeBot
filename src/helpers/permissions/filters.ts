@@ -1,15 +1,15 @@
 import {
   UserBit, UserInterface, UserTip,
-} from '@entity/user';
-import { AppDataSource } from '~/database';
+} from '@entity/user.js';
 
-import type { default as currencyType } from '../../currency';
-import type { default as levelType } from '../../systems/levels';
-import type { default as ranksType } from '../../systems/ranks';
-import { mainCurrency } from '../currency';
+import type { default as currencyType } from '../../currency.js';
+import type { default as levelType } from '../../systems/levels.js';
+import type { default as ranksType } from '../../systems/ranks.js';
+import { mainCurrency } from '../currency/index.js';
 
-import exchange from '~/helpers/currency/exchange';
-import { Permissions } from '~/database/entity/permissions';
+import { Permissions } from '~/database/entity/permissions.js';
+import { AppDataSource } from '~/database.js';
+import exchange from '~/helpers/currency/exchange.js';
 
 let levels: typeof levelType;
 let ranks: typeof ranksType;
@@ -24,7 +24,7 @@ async function _filters(
     switch (f.type) {
       case 'ranks': {
         if (!ranks) {
-          ranks = require('../../systems/ranks').default;
+          ranks = (await import('../../systems/ranks.js')).default;
         }
         const rank = await ranks.get(user);
         // we can return immediately
@@ -32,7 +32,7 @@ async function _filters(
       }
       case 'level':
         if (!levels) {
-          levels = require('../../systems/levels').default;
+          levels = (await import('../../systems/levels.js')).default;
         }
         amount = levels.getLevelOf(user);
         break;
@@ -59,7 +59,7 @@ async function _filters(
       case 'tips': {
         const tips = await AppDataSource.getRepository(UserTip).find({ where: { userId: user.userId } });
         if (!currency) {
-          currency = require('../../currency').default;
+          currency = (await import('../../currency.js')).default;
         }
         amount = tips.reduce((a, b) => (a + exchange(b.amount, b.currency, mainCurrency.value)), 0);
         break;

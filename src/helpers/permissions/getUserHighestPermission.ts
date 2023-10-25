@@ -1,6 +1,6 @@
-import { Permissions } from '@entity/permissions';
+import { Permissions } from '@entity/permissions.js';
 
-import { check } from '~/helpers/permissions/check';
+import { check } from '~/helpers/permissions/check.js';
 
 async function getUserHighestPermission(userId: string): Promise<string> {
   const permissions = await Permissions.find({

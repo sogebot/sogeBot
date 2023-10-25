@@ -1,34 +1,34 @@
 import {
   User, UserBit, UserTip,
-} from '@entity/user';
-import { dayjs, timezone } from '@sogebot/ui-helpers/dayjsHelper';
-import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized';
-import { format } from '@sogebot/ui-helpers/number';
+} from '@entity/user.js';
+import { dayjs, timezone } from '@sogebot/ui-helpers/dayjsHelper.js';
+import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized.js';
+import { format } from '@sogebot/ui-helpers/number.js';
 
-import System from './_interface';
-import levels from './levels';
-import points from './points';
-import ranks from './ranks';
-import { dateDiff } from '../commons';
+import System from './_interface.js';
+import levels from './levels.js';
+import points from './points.js';
+import ranks from './ranks.js';
+import { dateDiff } from '../commons.js';
 import {
   command, default_permission, settings,
-} from '../decorators';
-import Expects from '../expects';
-import general from '../general';
-import { isFollowerUpdate } from '../services/twitch/calls/isFollowerUpdate';
-import users from '../users';
+} from '../decorators.js';
+import Expects from '../expects.js';
+import general from '../general.js';
+import { isFollowerUpdate } from '../services/twitch/calls/isFollowerUpdate.js';
+import users from '../users.js';
 
-import { AppDataSource } from '~/database';
-import { prepare } from '~/helpers/commons/index';
-import { mainCurrency } from '~/helpers/currency';
-import exchange from '~/helpers/currency/exchange';
-import { error } from '~/helpers/log';
-import { get } from '~/helpers/permissions/get';
-import { getUserHighestPermission } from '~/helpers/permissions/getUserHighestPermission';
-import { getPointsName } from '~/helpers/points';
+import { AppDataSource } from '~/database.js';
+import { prepare } from '~/helpers/commons/index.js';
+import exchange from '~/helpers/currency/exchange.js';
+import { mainCurrency } from '~/helpers/currency/index.js';
+import { error } from '~/helpers/log.js';
+import { get } from '~/helpers/permissions/get.js';
+import { getUserHighestPermission } from '~/helpers/permissions/getUserHighestPermission.js';
+import { getPointsName } from '~/helpers/points/index.js';
 import * as changelog from '~/helpers/user/changelog.js';
-import twitch from '~/services/twitch';
-import { translate } from '~/translate';
+import twitch from '~/services/twitch.js';
+import { translate } from '~/translate.js';
 
 /*
  * !me

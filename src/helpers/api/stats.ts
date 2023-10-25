@@ -1,7 +1,7 @@
-import { persistent } from '../core/persistent';
-import { eventEmitter } from '../events';
+import { persistent } from '../core/persistent.js';
+import { eventEmitter } from '../events/index.js';
 
-import { Types } from '~/plugins/ListenTo';
+import { Types } from '~/plugins/ListenTo.js';
 
 const old = new Map<string, any>();
 const stats = persistent({

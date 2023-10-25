@@ -1,18 +1,18 @@
-import { dayjs } from '@sogebot/ui-helpers/dayjsHelper';
+import { dayjs } from '@sogebot/ui-helpers/dayjsHelper.js';
 
-import { isStreamOnline, setCurrentRetries, streamId, streamStatusChangeSince, streamType } from '~/helpers/api';
+import { isStreamOnline, setCurrentRetries, streamId, streamStatusChangeSince, streamType } from '~/helpers/api/index.js';
 import {
   stats as apiStats, chatMessagesAtStart,
-} from '~/helpers/api';
-import * as stream from '~/helpers/core/stream';
-import { isDebugEnabled } from '~/helpers/debug';
-import { eventEmitter } from '~/helpers/events';
+} from '~/helpers/api/index.js';
+import * as stream from '~/helpers/core/stream.js';
+import { isDebugEnabled } from '~/helpers/debug.js';
+import { eventEmitter } from '~/helpers/events/index.js';
 import { getFunctionName } from '~/helpers/getFunctionName.js';
-import { debug, error, warning } from '~/helpers/log';
-import { linesParsed } from '~/helpers/parser';
-import twitch from '~/services/twitch';
-import stats from '~/stats';
-import { variables } from '~/watchers';
+import { debug, error, warning } from '~/helpers/log.js';
+import { linesParsed } from '~/helpers/parser.js';
+import twitch from '~/services/twitch.js';
+import stats from '~/stats.js';
+import { variables } from '~/watchers.js';
 
 export async function getCurrentStream (opts: any) {
   if (isDebugEnabled('api.calls')) {

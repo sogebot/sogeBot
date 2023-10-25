@@ -1,10 +1,10 @@
-import { CacheGames } from '@entity/cacheGames';
+import { CacheGames } from '@entity/cacheGames.js';
 
-import { AppDataSource } from '~/database';
-import { isDebugEnabled } from '~/helpers/debug';
-import { debug, warning } from '~/helpers/log';
-import { setImmediateAwait } from '~/helpers/setImmediateAwait';
-import twitch from '~/services/twitch';
+import { AppDataSource } from '~/database.js';
+import { isDebugEnabled } from '~/helpers/debug.js';
+import { debug, warning } from '~/helpers/log.js';
+import { setImmediateAwait } from '~/helpers/setImmediateAwait.js';
+import twitch from '~/services/twitch.js';
 
 async function getGameThumbnailFromName (name: string): Promise<string | undefined> {
   if (isDebugEnabled('api.calls')) {

@@ -5,7 +5,7 @@
     "importHelpers": true,
     "target": "es2021",
     "strict": true,
-    "module": "commonjs",
+    "module": "ESNext",
     "incremental": true,
     "removeComments": true,
     "noImplicitAny": true,

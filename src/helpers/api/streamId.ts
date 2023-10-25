@@ -1,4 +1,4 @@
-import { persistent } from '../core/persistent';
+import { persistent } from '../core/persistent.js';
 
 const streamId = persistent({
   value:     null as null | string,

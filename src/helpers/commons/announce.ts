@@ -1,11 +1,11 @@
 import { ChannelType, TextChannel } from 'discord.js';
 
-import { chatOut } from '../log';
-import { getUserSender } from './getUserSender';
+import { getUserSender } from './getUserSender.js';
+import { chatOut } from '../log.js';
+import getBotId from '../user/getBotId.js';
+import getBotUserName from '../user/getBotUserName.js';
 
-import { variables } from '~/watchers';
-import getBotId from '../user/getBotId';
-import getBotUserName from '../user/getBotUserName';
+import { variables } from '~/watchers.js';
 
 /**
  * Announce in all channels (discord, twitch)
@@ -19,9 +19,9 @@ export async function announce(messageToAnnounce: string, type: typeof announceT
   const botId = variables.get('services.twitch.botId') as string;
 
   // importing here as we want to get rid of import loops
-  const Discord = (require('../../integrations/discord') as typeof import('../../integrations/discord')).default;
-  const Message = (require('../../message') as typeof import('../../message')).Message;
-  const sendMessage = (require('./sendMessage') as typeof import('./sendMessage')).sendMessage;
+  const Discord = (await import('../../integrations/discord.js') as typeof import('../../integrations/discord')).default;
+  const Message = (await import('../../message.js') as typeof import('../../message')).Message;
+  const sendMessage = (await import('./sendMessage.js') as typeof import('./sendMessage')).sendMessage;
 
   messageToAnnounce = await new Message(messageToAnnounce).parse({ sender: getUserSender(getBotId(), getBotUserName()), replaceCustomVariables, discord: undefined }) as string;
   sendMessage(messageToAnnounce, getUserSender(botId, botUsername), { force: true, skip: true });

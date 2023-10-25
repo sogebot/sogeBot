@@ -1,17 +1,17 @@
 import axios from 'axios';
 
-import { timer } from '../decorators';
-import { badgesCache } from '../services/twitch/calls/getChannelChatBadges';
-import Widget from './_interface';
+import Widget from './_interface.js';
+import { timer } from '../decorators.js';
+import { badgesCache } from '../services/twitch/calls/getChannelChatBadges.js';
 
-import { onMessage } from '~/decorators/on';
-import { getUserSender } from '~/helpers/commons';
-import { sendMessage } from '~/helpers/commons/sendMessage';
-import { ioServer } from '~/helpers/panel';
-import { parseTextWithEmotes } from '~/helpers/parseTextWithEmotes';
-import { adminEndpoint, publicEndpoint } from '~/helpers/socket';
-import { getIgnoreList } from '~/helpers/user/isIgnored';
-import { variables } from '~/watchers';
+import { onMessage } from '~/decorators/on.js';
+import { getUserSender } from '~/helpers/commons/index.js';
+import { sendMessage } from '~/helpers/commons/sendMessage.js';
+import { ioServer } from '~/helpers/panel.js';
+import { parseTextWithEmotes } from '~/helpers/parseTextWithEmotes.js';
+import { adminEndpoint, publicEndpoint } from '~/helpers/socket.js';
+import { getIgnoreList } from '~/helpers/user/isIgnored.js';
+import { variables } from '~/watchers.js';
 
 class Chat extends Widget {
   @timer()

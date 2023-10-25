@@ -1,25 +1,25 @@
-import { ScrimMatchId } from '@entity/scrimMatchId';
-import * as constants from '@sogebot/ui-helpers/constants';
-import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized';
+import { ScrimMatchId } from '@entity/scrimMatchId.js';
+import * as constants from '@sogebot/ui-helpers/constants.js';
+import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized.js';
 
-import System from './_interface';
+import System from './_interface.js';
+import { onStartup } from '../decorators/on.js';
 import {
   command, default_permission, settings,
-} from '../decorators';
-import { onStartup } from '../decorators/on';
+} from '../decorators.js';
 import Expects from '../expects.js';
 
-import { AppDataSource } from '~/database';
-import { getUserSender } from '~/helpers/commons';
-import { announce } from '~/helpers/commons/announce';
-import { prepare } from '~/helpers/commons/prepare';
-import { round5 } from '~/helpers/commons/round5';
-import { debug } from '~/helpers/log';
-import defaultPermissions from '~/helpers/permissions/defaultPermissions';
-import getBotId from '~/helpers/user/getBotId';
-import getBotUserName from '~/helpers/user/getBotUserName';
-import twitch from '~/services/twitch';
-import { translate } from '~/translate';
+import { AppDataSource } from '~/database.js';
+import { announce } from '~/helpers/commons/announce.js';
+import { getUserSender } from '~/helpers/commons/index.js';
+import { prepare } from '~/helpers/commons/prepare.js';
+import { round5 } from '~/helpers/commons/round5.js';
+import { debug } from '~/helpers/log.js';
+import defaultPermissions from '~/helpers/permissions/defaultPermissions.js';
+import getBotId from '~/helpers/user/getBotId.js';
+import getBotUserName from '~/helpers/user/getBotUserName.js';
+import twitch from '~/services/twitch.js';
+import { translate } from '~/translate.js';
 
 enum ERROR {
   ALREADY_OPENED,

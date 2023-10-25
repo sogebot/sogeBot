@@ -1,25 +1,25 @@
-import { HowLongToBeatGame } from '@entity/howLongToBeatGame';
-import { CacheGames } from '@entity/cacheGames';
-import * as constants from '@sogebot/ui-helpers/constants';
+import { CacheGames } from '@entity/cacheGames.js';
+import { HowLongToBeatGame } from '@entity/howLongToBeatGame.js';
+import * as constants from '@sogebot/ui-helpers/constants.js';
 import { HowLongToBeatService } from 'howlongtobeat';
 import { EntityNotFoundError } from 'typeorm';
-import { AppDataSource } from '~/database';
 
-import { command, default_permission } from '../decorators';
-import { onStartup } from '../decorators/on';
-import Expects from '../expects';
-import System from './_interface';
+import System from './_interface.js';
+import { onStartup } from '../decorators/on.js';
+import { command, default_permission } from '../decorators.js';
+import Expects from '../expects.js';
 
+import { AppDataSource } from '~/database.js';
 import {
   isStreamOnline, stats, streamStatusChangeSince,
-} from '~/helpers/api';
-import { prepare } from '~/helpers/commons';
+} from '~/helpers/api/index.js';
+import { prepare } from '~/helpers/commons/index.js';
 import {
   debug, error,
-} from '~/helpers/log';
-import defaultPermissions from '~/helpers/permissions/defaultPermissions';
-import { app } from '~/helpers/panel';
-import { adminMiddleware } from '~/socket';
+} from '~/helpers/log.js';
+import { app } from '~/helpers/panel.js';
+import defaultPermissions from '~/helpers/permissions/defaultPermissions.js';
+import { adminMiddleware } from '~/socket.js';
 
 class HowLongToBeat extends System {
   interval: number = constants.MINUTE;

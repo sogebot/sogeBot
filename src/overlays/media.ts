@@ -1,15 +1,15 @@
-import { Gallery } from '@entity/gallery';
-import { isNil } from 'lodash';
+import { Gallery } from '@entity/gallery.js';
+import { isNil } from 'lodash-es';
 
-import Overlay from './_interface';
-import { command, default_permission } from '../decorators';
-import Message from '../message';
+import Overlay from './_interface.js';
+import { command, default_permission } from '../decorators.js';
+import Message from '../message.js';
 
-import { AppDataSource } from '~/database';
-import { debug } from '~/helpers/log';
-import { defaultPermissions } from '~/helpers/permissions/defaultPermissions';
-import { publicEndpoint } from '~/helpers/socket';
-import twitch from '~/services/twitch';
+import { AppDataSource } from '~/database.js';
+import { debug } from '~/helpers/log.js';
+import { defaultPermissions } from '~/helpers/permissions/defaultPermissions.js';
+import { publicEndpoint } from '~/helpers/socket.js';
+import twitch from '~/services/twitch.js';
 
 class Media extends Overlay {
   sockets() {

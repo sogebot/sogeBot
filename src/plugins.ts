@@ -1,19 +1,19 @@
-import { SECOND } from '@sogebot/ui-helpers/constants';
+import { SECOND } from '@sogebot/ui-helpers/constants.js';
 import { validateOrReject } from 'class-validator';
-import merge from 'lodash/merge';
+import { merge } from 'lodash-es';
 
-import { Plugin, PluginVariable } from './database/entity/plugins';
-import { isValidationError } from './helpers/errors';
-import { eventEmitter } from './helpers/events';
-import { debug, error } from './helpers/log';
-import { app } from './helpers/panel';
-import { setImmediateAwait } from './helpers/setImmediateAwait';
-import { adminEndpoint, publicEndpoint } from './helpers/socket';
-import { Types } from './plugins/ListenTo';
-import { runScriptInSandbox, transpiledFiles } from './plugins/Sandbox';
+import { Plugin, PluginVariable } from './database/entity/plugins.js';
+import { isValidationError } from './helpers/errors.js';
+import { eventEmitter } from './helpers/events/index.js';
+import { debug, error } from './helpers/log.js';
+import { app } from './helpers/panel.js';
+import { setImmediateAwait } from './helpers/setImmediateAwait.js';
+import { adminEndpoint, publicEndpoint } from './helpers/socket.js';
+import { Types } from './plugins/ListenTo.js';
+import { runScriptInSandbox, transpiledFiles } from './plugins/Sandbox.js';
 
-import Core from '~/_interface';
-import { onStartup } from '~/decorators/on';
+import Core from '~/_interface.js';
+import { onStartup } from '~/decorators/on.js';
 
 const plugins: Plugin[] = [];
 

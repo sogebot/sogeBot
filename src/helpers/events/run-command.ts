@@ -1,17 +1,17 @@
-import { isNil, isObject } from 'lodash';
-import _ from 'lodash';
+import { isNil, isObject } from 'lodash-es';
+import _ from 'lodash-es';
 import { v4 } from 'uuid';
 
-import { getOwner, getUserSender } from '../commons';
+import { getOwner, getUserSender } from '../commons/index.js';
 
-import { parserReply } from '~/commons';
+import { parserReply } from '~/commons.js';
 import {
   Events as EventsEntity,
-} from '~/database/entity/event';
-import { debug } from '~/helpers/log';
-import { parserEmitter } from '~/helpers/parser/index';
-import Message from '~/message';
-import users from '~/users';
+} from '~/database/entity/event.js';
+import { debug } from '~/helpers/log.js';
+import { parserEmitter } from '~/helpers/parser/index.js';
+import Message from '~/message.js';
+import users from '~/users.js';
 
 type data = {
   command: string; userName: string, userId: string, timeout: number; isCommandQuiet: boolean,

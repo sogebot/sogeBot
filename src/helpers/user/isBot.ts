@@ -1,6 +1,6 @@
-import type { UserInterface } from '@entity/user';
+import type { UserInterface } from '@entity/user.js';
 
-import { variables } from '~/watchers';
+import { variables } from '~/watchers.js';
 
 export function isBot(user: string | CommandOptions['sender'] | UserInterface | UserStateTags) {
   try {

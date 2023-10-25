@@ -1,11 +1,11 @@
-import { UserTip } from '@entity/user';
+import { UserTip } from '@entity/user.js';
 
-import Stats from './_interface';
+import Stats from './_interface.js';
 
-import { AppDataSource } from '~/database';
-import { error } from '~/helpers/log';
-import { adminEndpoint } from '~/helpers/socket';
-import getNameById from '~/helpers/user/getNameById';
+import { AppDataSource } from '~/database.js';
+import { error } from '~/helpers/log.js';
+import { adminEndpoint } from '~/helpers/socket.js';
+import getNameById from '~/helpers/user/getNameById.js';
 
 class Tips extends Stats {
   constructor() {

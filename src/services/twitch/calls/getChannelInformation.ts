@@ -1,18 +1,18 @@
 import { rawDataSymbol } from '@twurple/common';
-import isEqual from 'lodash/isEqual';
+import { isEqual } from 'lodash-es';
 
-import { AppDataSource } from '~/database';
-import { CacheTitles } from '~/database/entity/cacheTitles';
-import {  currentStreamTags, gameCache, gameOrTitleChangedManually, rawStatus, tagsCache } from '~/helpers/api';
+import { CacheTitles } from '~/database/entity/cacheTitles.js';
+import { AppDataSource } from '~/database.js';
+import {  currentStreamTags, gameCache, gameOrTitleChangedManually, rawStatus, tagsCache } from '~/helpers/api/index.js';
 import {
   stats as apiStats,
-} from '~/helpers/api';
-import { parseTitle } from '~/helpers/api/parseTitle';
-import { isDebugEnabled } from '~/helpers/debug';
-import { getFunctionName } from '~/helpers/getFunctionName';
-import { debug, error, info, warning } from '~/helpers/log';
-import twitch from '~/services/twitch';
-import { variables } from '~/watchers';
+} from '~/helpers/api/index.js';
+import { parseTitle } from '~/helpers/api/parseTitle.js';
+import { isDebugEnabled } from '~/helpers/debug.js';
+import { getFunctionName } from '~/helpers/getFunctionName.js';
+import { debug, error, info, warning } from '~/helpers/log.js';
+import twitch from '~/services/twitch.js';
+import { variables } from '~/watchers.js';
 
 let retries = 0;
 

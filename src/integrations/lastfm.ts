@@ -1,13 +1,13 @@
-import { MINUTE } from '@sogebot/ui-helpers/constants';
+import { MINUTE } from '@sogebot/ui-helpers/constants.js';
 import axios from 'axios';
 
-import { settings } from '../decorators';
-import { onChange, onStartup } from '../decorators/on';
-import Integration from './_interface';
+import Integration from './_interface.js';
+import { onChange, onStartup } from '../decorators/on.js';
+import { settings } from '../decorators.js';
 
-import { isStreamOnline } from '~/helpers/api';
-import { announce, prepare } from '~/helpers/commons';
-import {  error } from '~/helpers/log';
+import { isStreamOnline } from '~/helpers/api/index.js';
+import { announce, prepare } from '~/helpers/commons/index.js';
+import {  error } from '~/helpers/log.js';
 
 let canSendRequests = true;
 

@@ -1,27 +1,27 @@
 import {
   Alert, EmitData,
-} from '@entity/alert';
-import { MINUTE } from '@sogebot/ui-helpers/constants';
-import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized';
+} from '@entity/alert.js';
+import { MINUTE } from '@sogebot/ui-helpers/constants.js';
+import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized.js';
 import { v4 } from 'uuid';
 
-import Registry from './_interface';
-import { command, default_permission, example, persistent, settings } from '../decorators';
+import Registry from './_interface.js';
+import { command, default_permission, example, persistent, settings } from '../decorators.js';
 
-import { parserReply } from '~/commons';
-import { AppDataSource } from '~/database';
-import { User, UserInterface } from '~/database/entity/user';
-import Expects from '~/expects';
-import { prepare } from '~/helpers/commons';
-import { error, debug, info } from '~/helpers/log';
-import { app, ioServer } from '~/helpers/panel';
-import { defaultPermissions } from '~/helpers/permissions/defaultPermissions';
-import { adminEndpoint, publicEndpoint } from '~/helpers/socket';
+import { parserReply } from '~/commons.js';
+import { User, UserInterface } from '~/database/entity/user.js';
+import { AppDataSource } from '~/database.js';
+import Expects from '~/expects.js';
+import { prepare } from '~/helpers/commons/index.js';
+import { error, debug, info } from '~/helpers/log.js';
+import { app, ioServer } from '~/helpers/panel.js';
+import { defaultPermissions } from '~/helpers/permissions/defaultPermissions.js';
+import { adminEndpoint, publicEndpoint } from '~/helpers/socket.js';
 import * as changelog from '~/helpers/user/changelog.js';
-import twitch from '~/services/twitch';
-import { adminMiddleware } from '~/socket';
-import { translate } from '~/translate';
-import { variables } from '~/watchers';
+import twitch from '~/services/twitch.js';
+import { adminMiddleware } from '~/socket.js';
+import { translate } from '~/translate.js';
+import { variables } from '~/watchers.js';
 
 /* secureKeys are used to authenticate use of public overlay endpoint */
 const secureKeys = new Set<string>();

@@ -1,9 +1,9 @@
 import { IsNotEmpty, MinLength } from 'class-validator';
 import { BeforeInsert, Column, Entity, Index, PrimaryColumn } from 'typeorm';
 
-import { Alert } from './alert';
-import { BotEntity } from '../BotEntity';
-import { IsCommand } from '../validators/IsCommand';
+import { Alert } from './alert.js';
+import { BotEntity } from '../BotEntity.js';
+import { IsCommand } from '../validators/IsCommand.js';
 
 @Entity()
 @Index('idx_randomizer_cmdunique', [ 'command' ], { unique: true })

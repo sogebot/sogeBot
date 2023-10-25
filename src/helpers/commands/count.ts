@@ -1,6 +1,7 @@
-import { CommandsCount } from '@entity/commands';
-import { MINUTE } from '@sogebot/ui-helpers/constants';
-import { AppDataSource } from '~/database';
+import { CommandsCount } from '@entity/commands.js';
+import { MINUTE } from '@sogebot/ui-helpers/constants.js';
+
+import { AppDataSource } from '~/database.js';
 
 const count: { command: string, timestamp: string }[] = [];
 

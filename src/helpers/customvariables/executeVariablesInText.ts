@@ -1,5 +1,5 @@
-import { getValueOf } from './getValueOf';
-import { isVariableSet } from './isVariableSet';
+import { getValueOf } from './getValueOf.js';
+import { isVariableSet } from './isVariableSet.js';
 
 const customVariableRegex = new RegExp('\\$_[a-zA-Z0-9_]+', 'g');
 

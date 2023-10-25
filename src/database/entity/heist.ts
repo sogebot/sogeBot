@@ -1,6 +1,6 @@
 import { EntitySchema } from 'typeorm';
 
-import { ColumnNumericTransformer } from './_transformer';
+import { ColumnNumericTransformer } from './_transformer.js';
 
 export interface HeistUserInterface {
   userId: string;

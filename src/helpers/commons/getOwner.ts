@@ -1,4 +1,4 @@
-import { variables } from '~/watchers';
+import { variables } from '~/watchers.js';
 
 export function getOwner() {
   const generalOwners = variables.get('services.twitch.generalOwners') as string[];

@@ -1,5 +1,5 @@
 import { Column, Entity, Index, PrimaryColumn } from 'typeorm';
-import { BotEntity } from '../BotEntity';
+import { BotEntity } from '../BotEntity.js';
 
 @Entity()
 export class Permissions extends BotEntity<Permissions> {

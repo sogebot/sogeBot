@@ -1,28 +1,28 @@
-import { Price as PriceEntity } from '@entity/price';
-import * as constants from '@sogebot/ui-helpers/constants';
-import { format } from '@sogebot/ui-helpers/number';
+import { Price as PriceEntity } from '@entity/price.js';
+import * as constants from '@sogebot/ui-helpers/constants.js';
+import { format } from '@sogebot/ui-helpers/number.js';
 import { validateOrReject } from 'class-validator';
-import * as _ from 'lodash';
-import { merge } from 'lodash';
+import * as _ from 'lodash-es';
+import { merge } from 'lodash-es';
 
-import System from './_interface';
-import { parserReply } from '../commons';
+import System from './_interface.js';
+import { parserReply } from '../commons.js';
 import {
   command, default_permission, rollback,
-} from '../decorators';
-import { parser } from '../decorators';
+} from '../decorators.js';
+import { parser } from '../decorators.js';
 import general from '../general.js';
-import Parser from '../parser';
+import Parser from '../parser.js';
 
-import { AppDataSource } from '~/database';
-import { prepare } from '~/helpers/commons';
-import { app } from '~/helpers/panel';
-import defaultPermissions from '~/helpers/permissions/defaultPermissions';
-import { getPointsName } from '~/helpers/points';
-import { isBroadcaster, isOwner } from '~/helpers/user';
+import { AppDataSource } from '~/database.js';
+import { prepare } from '~/helpers/commons/index.js';
+import { app } from '~/helpers/panel.js';
+import defaultPermissions from '~/helpers/permissions/defaultPermissions.js';
+import { getPointsName } from '~/helpers/points/index.js';
 import * as changelog from '~/helpers/user/changelog.js';
-import { adminMiddleware } from '~/socket';
-import { translate } from '~/translate';
+import { isBroadcaster, isOwner } from '~/helpers/user/index.js';
+import { adminMiddleware } from '~/socket.js';
+import { translate } from '~/translate.js';
 
 /*
  * !price                     - gets an info about price usage

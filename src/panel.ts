@@ -1,5 +1,3 @@
-'use strict';
-
 import fs, { existsSync, readFileSync } from 'fs';
 import path from 'path';
 
@@ -7,48 +5,48 @@ import cors from 'cors';
 import express from 'express';
 import RateLimit from 'express-rate-limit';
 import gitCommitInfo from 'git-commit-info';
-import _ from 'lodash';
+import _ from 'lodash-es';
 import sanitize from 'sanitize-filename';
 
 import { getDEBUG, setDEBUG } from './helpers/debug.js';
 import { possibleLists } from '../d.ts/src/helpers/socket.js';
 
-import Core from '~/_interface';
+import Core from '~/_interface.js';
 import { CacheGames, CacheGamesInterface } from '~/database/entity/cacheGames.js';
-import { CacheTitles } from '~/database/entity/cacheTitles';
-import { Translation } from '~/database/entity/translation';
-import { User } from '~/database/entity/user';
+import { CacheTitles } from '~/database/entity/cacheTitles.js';
+import { Translation } from '~/database/entity/translation.js';
+import { User } from '~/database/entity/user.js';
 import { AppDataSource } from '~/database.js';
-import { onStartup } from '~/decorators/on';
-import { getOwnerAsSender } from '~/helpers/commons/getOwnerAsSender';
+import { onStartup } from '~/decorators/on.js';
+import { getOwnerAsSender } from '~/helpers/commons/getOwnerAsSender.js';
 import {
   getURL, getValueOf, isVariableSet, postURL,
-} from '~/helpers/customvariables';
-import { getIsBotStarted } from '~/helpers/database';
-import { flatten } from '~/helpers/flatten';
-import { setValue } from '~/helpers/general';
-import { getLang } from '~/helpers/locales';
+} from '~/helpers/customvariables/index.js';
+import { getIsBotStarted } from '~/helpers/database.js';
+import { flatten } from '~/helpers/flatten.js';
+import { setValue } from '~/helpers/general/index.js';
+import { getLang } from '~/helpers/locales.js';
 import {
   info,
-} from '~/helpers/log';
+} from '~/helpers/log.js';
+import { errors, warns } from '~/helpers/panel/alerts.js';
+import { socketsConnectedDec, socketsConnectedInc } from '~/helpers/panel/index.js';
 import {
   app, ioServer, server, serverSecure, setApp, setServer,
-} from '~/helpers/panel';
-import { errors, warns } from '~/helpers/panel/alerts';
-import { socketsConnectedDec, socketsConnectedInc } from '~/helpers/panel/index';
-import { status as statusObj } from '~/helpers/parser';
-import { list } from '~/helpers/register';
-import { adminEndpoint } from '~/helpers/socket';
-import { tmiEmitter } from '~/helpers/tmi';
+} from '~/helpers/panel.js';
+import { status as statusObj } from '~/helpers/parser.js';
+import { list } from '~/helpers/register.js';
+import { adminEndpoint } from '~/helpers/socket.js';
+import { tmiEmitter } from '~/helpers/tmi/index.js';
 import * as changelog from '~/helpers/user/changelog.js';
-import Parser from '~/parser';
+import Parser from '~/parser.js';
 import { getGameThumbnailFromName } from '~/services/twitch/calls/getGameThumbnailFromName.js';
-import { sendGameFromTwitch } from '~/services/twitch/calls/sendGameFromTwitch';
+import { sendGameFromTwitch } from '~/services/twitch/calls/sendGameFromTwitch.js';
 import { updateChannelInfo } from '~/services/twitch/calls/updateChannelInfo.js';
-import { processAuth, default as socketSystem } from '~/socket';
-import highlights from '~/systems/highlights';
-import translateLib, { translate } from '~/translate';
-import { variables } from '~/watchers';
+import { processAuth, default as socketSystem } from '~/socket.js';
+import highlights from '~/systems/highlights.js';
+import translateLib, { translate } from '~/translate.js';
+import { variables } from '~/watchers.js';
 
 const port = Number(process.env.PORT ?? 20000);
 const secureport = Number(process.env.SECUREPORT ?? 20443);

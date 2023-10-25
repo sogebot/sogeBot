@@ -1,21 +1,21 @@
 import type { HelixChatAnnouncementColor } from '@twurple/api';
-import _ from 'lodash';
+import _ from 'lodash-es';
 
+import { getUserSender } from './getUserSender.js';
 import { timer } from '../../decorators.js';
-import { Message } from '../../message';
+import { Message } from '../../message.js';
 import {
   chatOut, debug, whisperOut,
-} from '../log';
+} from '../log.js';
 import {
   getMuteStatus, message, sendWithMe, showWithAt,
-} from '../tmi';
+} from '../tmi/index.js';
+import getBotId from '../user/getBotId.js';
+import getBotUserName from '../user/getBotUserName.js';
 import getBroadcasterId from '../user/getBroadcasterId.js';
 
 import twitch from '~/services/twitch.js';
 import { variables } from '~/watchers.js';
-import { getUserSender } from './getUserSender.js';
-import getBotId from '../user/getBotId.js';
-import getBotUserName from '../user/getBotUserName.js';
 
 const getAnnouncementColor = (command: string): HelixChatAnnouncementColor => {
   const color = command.replace('/announce', '');

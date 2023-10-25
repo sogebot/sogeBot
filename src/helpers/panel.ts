@@ -8,10 +8,10 @@ import express from 'express';
 import { Server as io } from 'socket.io';
 import { DefaultEventsMap } from 'socket.io/dist/typed-events';
 
-import type { Module } from '../_interface';
+import type { Module } from '../_interface.js';
 
-import type { ClientToServerEventsWithNamespace } from '~/../d.ts/src/helpers/socket';
-import { info } from '~/helpers/log';
+import type { ClientToServerEventsWithNamespace } from '~/../d.ts/src/helpers/socket.js';
+import { info } from '~/helpers/log.js';
 
 export type MenuItem = {
   id: string;

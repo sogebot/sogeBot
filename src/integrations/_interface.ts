@@ -1,4 +1,4 @@
-import Module from '../_interface';
+import Module from '../_interface.js';
 
 class Integration extends Module {
   constructor() {

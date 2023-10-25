@@ -1,6 +1,6 @@
 import { IsNotEmpty, Min, MinLength } from 'class-validator';
 import { Column, Entity, Index, PrimaryColumn } from 'typeorm';
-import { BotEntity } from '../BotEntity';
+import { BotEntity } from '../BotEntity.js';
 
 @Entity()
 @Index('IDX_93c78c94804a13befdace81904', ['type', 'value'], { unique: true })

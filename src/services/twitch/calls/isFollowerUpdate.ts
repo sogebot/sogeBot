@@ -1,10 +1,10 @@
-import { debug, error, warning } from '../../../helpers/log';
+import { debug, error, warning } from '../../../helpers/log.js';
 
-import { isDebugEnabled } from '~/helpers/debug';
-import { getFunctionName } from '~/helpers/getFunctionName';
-import { setImmediateAwait } from '~/helpers/setImmediateAwait';
-import twitch from '~/services/twitch';
-import { variables } from '~/watchers';
+import { isDebugEnabled } from '~/helpers/debug.js';
+import { getFunctionName } from '~/helpers/getFunctionName.js';
+import { setImmediateAwait } from '~/helpers/setImmediateAwait.js';
+import twitch from '~/services/twitch.js';
+import { variables } from '~/watchers.js';
 
 export async function isFollowerUpdate (id: string): Promise<string | false> {
   if (isDebugEnabled('api.calls')) {

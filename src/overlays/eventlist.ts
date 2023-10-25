@@ -1,18 +1,18 @@
 import crypto from 'crypto';
 
-import { EventList as EventListEntity } from '@entity/eventList';
-import * as _ from 'lodash';
+import { EventList as EventListEntity } from '@entity/eventList.js';
+import * as _ from 'lodash-es';
 import { In, Not } from 'typeorm';
 
-import Overlay from './_interface';
-import eventlist from '../widgets/eventlist';
+import Overlay from './_interface.js';
+import eventlist from '../widgets/eventlist.js';
 
-import { AppDataSource } from '~/database';
-import { warning } from '~/helpers/log';
-import { adminEndpoint, publicEndpoint } from '~/helpers/socket';
-import getNameById from '~/helpers/user/getNameById';
-import { isBotId } from '~/helpers/user/isBot';
-import twitch from '~/services/twitch';
+import { AppDataSource } from '~/database.js';
+import { warning } from '~/helpers/log.js';
+import { adminEndpoint, publicEndpoint } from '~/helpers/socket.js';
+import getNameById from '~/helpers/user/getNameById.js';
+import { isBotId } from '~/helpers/user/isBot.js';
+import twitch from '~/services/twitch.js';
 
 class EventList extends Overlay {
   showInUI = false;

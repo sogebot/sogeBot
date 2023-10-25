@@ -1,5 +1,5 @@
 import { Column, Entity, PrimaryColumn } from 'typeorm';
-import { BotEntity } from '../BotEntity';
+import { BotEntity } from '../BotEntity.js';
 
 @Entity('obswebsocket')
 export class OBSWebsocket extends BotEntity<OBSWebsocket> {

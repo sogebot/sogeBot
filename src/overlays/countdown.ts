@@ -1,12 +1,12 @@
 import { Overlay as OverlayEntity } from '@entity/overlay.js';
-import { MINUTE, SECOND } from '@sogebot/ui-helpers/constants';
+import { MINUTE, SECOND } from '@sogebot/ui-helpers/constants.js';
 
-import Overlay from './_interface';
+import Overlay from './_interface.js';
 
-import { AppDataSource } from '~/database';
-import { app } from '~/helpers/panel';
-import { adminEndpoint, publicEndpoint } from '~/helpers/socket';
-import { adminMiddleware } from '~/socket';
+import { AppDataSource } from '~/database.js';
+import { app } from '~/helpers/panel.js';
+import { adminEndpoint, publicEndpoint } from '~/helpers/socket.js';
+import { adminMiddleware } from '~/socket.js';
 
 const checks = new Map<string, { timestamp: number; isEnabled: boolean; time: number; }>();
 const statusUpdate = new Map<string, { timestamp: number; isEnabled: boolean | null; time: number | null; }>();

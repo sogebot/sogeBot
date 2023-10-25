@@ -3,8 +3,8 @@ import { UserIdResolvable, extractUserId } from '@twurple/api';
 import { RefreshingAuthProvider, AccessTokenWithUserId, AccessToken, refreshUserToken, accessTokenIsExpired, getTokenInfo, InvalidTokenError, InvalidTokenTypeError, TokenInfo } from '@twurple/auth';
 import axios from 'axios';
 
-import { debug } from '~/helpers/log';
-import { variables } from '~/watchers';
+import { debug } from '~/helpers/log.js';
+import { variables } from '~/watchers.js';
 
 const urls = {
   'SogeBot Token Generator v2': 'https://credentials.sogebot.xyz/twitch/refresh/',
@@ -56,7 +56,7 @@ export class CustomAuthProvider extends RefreshingAuthProvider {
 
   async addUserForToken(
     initialToken: MakeOptional<AccessToken, 'accessToken' | 'scope'>,
-    intents?: string[]
+    intents?: string[],
   ): Promise<string> {
     let tokenWithInfo: [MakeOptional<AccessToken, 'accessToken' | 'scope'>, TokenInfo] | null = null;
     if (initialToken.accessToken && !accessTokenIsExpired(initialToken)) {
@@ -76,7 +76,7 @@ export class CustomAuthProvider extends RefreshingAuthProvider {
       }
 
       const refreshedToken = await this.refreshUserToken(
-        initialToken.refreshToken
+        initialToken.refreshToken,
       );
 
       const tokenInfo = await getTokenInfo(refreshedToken.accessToken);
@@ -88,7 +88,7 @@ export class CustomAuthProvider extends RefreshingAuthProvider {
 
     if (!tokenInfo.userId) {
       throw new InvalidTokenTypeError(
-        'Could not determine a user ID for your token; you might be trying to disguise an app token as a user token.'
+        'Could not determine a user ID for your token; you might be trying to disguise an app token as a user token.',
       );
     }
 

@@ -1,13 +1,13 @@
-import Widget from './_interface';
-import { parserReply } from '../commons';
-import { QuickAction as QuickActionEntity, QuickActions } from '../database/entity/dashboard';
-import { Randomizer } from '../database/entity/randomizer';
-import { getUserSender } from '../helpers/commons';
-import { setValueOf } from '../helpers/customvariables';
-import { info } from '../helpers/log';
+import Widget from './_interface.js';
+import { parserReply } from '../commons.js';
+import { QuickAction as QuickActionEntity, QuickActions } from '../database/entity/dashboard.js';
+import { Randomizer } from '../database/entity/randomizer.js';
+import { getUserSender } from '../helpers/commons/index.js';
+import { setValueOf } from '../helpers/customvariables/index.js';
+import { info } from '../helpers/log.js';
 
-import { AppDataSource } from '~/database';
-import { adminEndpoint } from '~/helpers/socket';
+import { AppDataSource } from '~/database.js';
+import { adminEndpoint } from '~/helpers/socket.js';
 
 const trigger = async (item: QuickActions.Item, user: { userId: string, userName: string }, value?: string) => {
   info(`Quick Action ${item.id} triggered by ${user.userName}#${user.userId}`);
@@ -17,9 +17,9 @@ const trigger = async (item: QuickActions.Item, user: { userId: string, userName
       break;
     }
     case 'command': {
-      const parser = new (require('../parser').default)();
-      const alias = require('../systems/alias').default as typeof import('../systems/alias').default;
-      const customcommands = require('../systems/customcommands').default as typeof import('../systems/customcommands').default;
+      const parser = new ((await import('../parser')).default)();
+      const alias = (await import('../systems/alias')).default as typeof import('../systems/alias').default;
+      const customcommands = (await import('../systems/customcommands')).default as typeof import('../systems/customcommands').default;
 
       const responses = await parser.command(getUserSender(user.userId, user.userName), item.options.command, true);
       for (let i = 0; i < responses.length; i++) {

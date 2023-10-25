@@ -1,18 +1,21 @@
 import { parse, sep as separator } from 'path';
 
-import * as constants from '@sogebot/ui-helpers/constants';
-import * as _ from 'lodash';
-import { xor } from 'lodash';
+import * as constants from '@sogebot/ui-helpers/constants.js';
+import * as _ from 'lodash-es';
+import { xor } from 'lodash-es';
 
-import type { Module } from '~/_interface';
-import { isDbConnected } from '~/helpers/database';
-import emitter from '~/helpers/interfaceEmitter';
+import Message from './message.js';
+import Parser from './parser.js';
+
+import type { Module } from '~/_interface.js';
+import { isDbConnected } from '~/helpers/database.js';
+import emitter from '~/helpers/interfaceEmitter.js';
 import {
   debug, error, performance,
-} from '~/helpers/log';
-import { defaultPermissions } from '~/helpers/permissions/defaultPermissions';
-import { find } from '~/helpers/register';
-import { VariableWatcher } from '~/watchers';
+} from '~/helpers/log.js';
+import { defaultPermissions } from '~/helpers/permissions/defaultPermissions.js';
+import { find } from '~/helpers/register.js';
+import { VariableWatcher } from '~/watchers.js';
 
 export let loadingInProgress: (string|symbol)[] = [];
 export let areDecoratorsLoaded = false;
@@ -434,9 +437,6 @@ export function timer() {
 
     if (method.constructor.name === 'AsyncFunction') {
       descriptor.value = async function (){
-        const Parser = require('~/parser.js').Parser;
-        const Message = require('~/message.js').Message;
-
         const start = Date.now();
         // eslint-disable-next-line prefer-rest-params
         const result = await method.apply(this, arguments);
@@ -453,9 +453,6 @@ export function timer() {
       };
     } else {
       descriptor.value = function (){
-        const Parser = require('~/parser.js').Parser;
-        const Message = require('~/message.js').Message;
-
         const start = Date.now();
         // eslint-disable-next-line prefer-rest-params
         const result = method.apply(this, arguments);

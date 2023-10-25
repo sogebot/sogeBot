@@ -1,4 +1,4 @@
-import { cloneDeep } from 'lodash';
+import { cloneDeep } from 'lodash-es';
 
 let _ignorelist: any[] = [];
 

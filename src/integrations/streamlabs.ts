@@ -1,28 +1,28 @@
-import { Currency, UserTip, UserTipInterface } from '@entity/user';
+import { Currency, UserTip, UserTipInterface } from '@entity/user.js';
 import axios from 'axios';
 import chalk from 'chalk';
 import { io, Socket } from 'socket.io-client';
-import { AppDataSource } from '~/database';
 
-import { persistent, settings } from '../decorators';
-import { onChange, onStartup } from '../decorators/on';
-import eventlist from '../overlays/eventlist';
-import alerts from '../registries/alerts';
-import users from '../users';
-import Integration from './_interface';
+import Integration from './_interface.js';
+import { onChange, onStartup } from '../decorators/on.js';
+import { persistent, settings } from '../decorators.js';
+import eventlist from '../overlays/eventlist.js';
+import alerts from '../registries/alerts.js';
+import users from '../users.js';
 
-import { isStreamOnline, stats } from '~/helpers/api';
-import { mainCurrency } from '~/helpers/currency';
-import exchange from '~/helpers/currency/exchange';
-import rates from '~/helpers/currency/rates';
-import { eventEmitter } from '~/helpers/events';
-import { triggerInterfaceOnTip } from '~/helpers/interface/triggers';
+import { AppDataSource } from '~/database.js';
+import { isStreamOnline, stats } from '~/helpers/api/index.js';
+import exchange from '~/helpers/currency/exchange.js';
+import { mainCurrency } from '~/helpers/currency/index.js';
+import rates from '~/helpers/currency/rates.js';
+import { eventEmitter } from '~/helpers/events/index.js';
+import { triggerInterfaceOnTip } from '~/helpers/interface/triggers.js';
 import {
   debug, error, info, tip, warning,
-} from '~/helpers/log';
-import { ioServer } from '~/helpers/panel';
-import { variables } from '~/watchers';
-import { adminEndpoint } from '~/helpers/socket';
+} from '~/helpers/log.js';
+import { ioServer } from '~/helpers/panel.js';
+import { adminEndpoint } from '~/helpers/socket.js';
+import { variables } from '~/watchers.js';
 
 namespace StreamlabsEvent {
   export type Donation = {

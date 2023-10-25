@@ -2,7 +2,7 @@ import { IsNotEmpty, MinLength } from 'class-validator';
 import { BeforeInsert, BeforeUpdate } from 'typeorm';
 import { Column, Entity, PrimaryColumn } from 'typeorm';
 
-import { BotEntity } from '../BotEntity';
+import { BotEntity } from '../BotEntity.js';
 
 export interface EmitData {
   alertId?: string;

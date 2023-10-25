@@ -1,10 +1,10 @@
-import { Variable } from '@entity/variable';
-import { isNil } from 'lodash';
+import { Variable } from '@entity/variable.js';
+import { isNil } from 'lodash-es';
 
-import { runScript } from './runScript';
-import { check } from '../permissions/check';
+import { runScript } from './runScript.js';
+import { check } from '../permissions/check.js';
 
-import { AppDataSource } from '~/database';
+import { AppDataSource } from '~/database.js';
 
 async function getValueOf (variableName: string, opts?: any) {
   if (!variableName.startsWith('$_')) {

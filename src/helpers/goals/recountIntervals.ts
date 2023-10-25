@@ -1,15 +1,15 @@
-import { EventList } from '@entity/eventList';
-import { Goal, Overlay } from '@entity/overlay';
-import { UserBit, UserTip } from '@entity/user';
-import { MINUTE } from '@sogebot/ui-helpers/constants';
-import * as constants from '@sogebot/ui-helpers/constants';
+import { EventList } from '@entity/eventList.js';
+import { Goal, Overlay } from '@entity/overlay.js';
+import { UserBit, UserTip } from '@entity/user.js';
+import { MINUTE } from '@sogebot/ui-helpers/constants.js';
+import * as constants from '@sogebot/ui-helpers/constants.js';
 import { In, MoreThanOrEqual } from 'typeorm';
 
-import { mainCurrency } from '../currency';
-import { isBotStarted } from '../database';
+import { mainCurrency } from '../currency/index.js';
+import { isBotStarted } from '../database.js';
 
-import { AppDataSource } from '~/database';
-import exchange from '~/helpers/currency/exchange';
+import { AppDataSource } from '~/database.js';
+import exchange from '~/helpers/currency/exchange.js';
 
 export const types = ['bits', 'tips', 'followers', 'subscribers'] as const;
 

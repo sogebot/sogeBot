@@ -1,13 +1,13 @@
-import * as constants from '@sogebot/ui-helpers/constants';
+import * as constants from '@sogebot/ui-helpers/constants.js';
 
-import { parserReply } from '../commons';
-import { parser, settings } from '../decorators';
-import System from './_interface';
+import System from './_interface.js';
+import { parserReply } from '../commons.js';
+import { parser, settings } from '../decorators.js';
 
-import { onStreamStart } from '~/decorators/on';
-import { prepare } from '~/helpers/commons';
-import { ioServer } from '~/helpers/panel';
-import { translate } from '~/translate';
+import { onStreamStart } from '~/decorators/on.js';
+import { prepare } from '~/helpers/commons/index.js';
+import { ioServer } from '~/helpers/panel.js';
+import { translate } from '~/translate.js';
 
 class EmotesCombo extends System {
   @settings()

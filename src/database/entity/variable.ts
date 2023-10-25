@@ -1,9 +1,9 @@
 import { BeforeInsert, Column, Entity, PrimaryColumn } from 'typeorm';
 
-import { BotEntity } from '../BotEntity';
+import { BotEntity } from '../BotEntity.js';
 import { IsNotEmpty, IsNumber, MinLength } from 'class-validator';
-import defaultPermissions from '../../helpers/permissions/defaultPermissions';
-import { IsCustomVariable } from '../validators/isCustomVariable';
+import defaultPermissions from '../../helpers/permissions/defaultPermissions.js';
+import { IsCustomVariable } from '../validators/isCustomVariable.js';
 
 @Entity()
 export class VariableWatch extends BotEntity<VariableWatch> {

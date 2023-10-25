@@ -1,9 +1,9 @@
-import { Settings } from '@entity/settings';
+import { Settings } from '@entity/settings.js';
 import DeepProxy from 'proxy-deep';
 
-import { IsLoadingInProgress, toggleLoadingInProgress } from '../../decorators';
-import { isDbConnected } from '../database';
-import { debug } from '../log';
+import { IsLoadingInProgress, toggleLoadingInProgress } from '../../decorators.js';
+import { isDbConnected } from '../database.js';
+import { debug } from '../log.js';
 
 function persistent<T>({ value, name, namespace, onChange }: { value: T, name: string, namespace: string, onChange?: (cur: T) => void }) {
   const sym = Symbol(name);

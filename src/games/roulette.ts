@@ -1,13 +1,13 @@
-import _ from 'lodash';
+import _ from 'lodash-es';
 
-import Game from './_interface';
-import { command, settings } from '../decorators';
+import Game from './_interface.js';
+import { command, settings } from '../decorators.js';
 
-import { tmiEmitter } from '~/helpers/tmi';
+import { tmiEmitter } from '~/helpers/tmi/index.js';
 import * as changelog from '~/helpers/user/changelog.js';
-import { isBroadcaster } from '~/helpers/user/isBroadcaster';
-import { isModerator } from '~/helpers/user/isModerator';
-import { translate } from '~/translate';
+import { isBroadcaster } from '~/helpers/user/isBroadcaster.js';
+import { isModerator } from '~/helpers/user/isModerator.js';
+import { translate } from '~/translate.js';
 
 /*
  * !roulette - 50/50 chance to timeout yourself

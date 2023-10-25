@@ -1,29 +1,29 @@
 import {
   Keyword, KeywordGroup, KeywordResponses,
-} from '@entity/keyword';
+} from '@entity/keyword.js';
 import { validateOrReject } from 'class-validator';
-import _, { merge } from 'lodash';
-import { AppDataSource } from '~/database';
+import _, { merge } from 'lodash-es';
 import XRegExp from 'xregexp';
 
-import { parserReply } from '../commons';
+import System from './_interface.js';
+import { parserReply } from '../commons.js';
 import {
   command, default_permission, helper, parser, timer,
-} from '../decorators';
-import Expects from '../expects';
-import System from './_interface';
+} from '../decorators.js';
+import Expects from '../expects.js';
 
-import { checkFilter } from '~/helpers/checkFilter';
-import { isUUID, prepare } from '~/helpers/commons';
+import { AppDataSource } from '~/database.js';
+import { checkFilter } from '~/helpers/checkFilter.js';
+import { isUUID, prepare } from '~/helpers/commons/index.js';
 import {
   debug, error, warning,
-} from '~/helpers/log';
-import { app } from '~/helpers/panel';
-import { get } from '~/helpers/permissions/get';
-import { defaultPermissions } from '~/helpers/permissions/defaultPermissions';
-import { check } from '~/helpers/permissions/check';
-import { adminMiddleware } from '~/socket';
-import { translate } from '~/translate';
+} from '~/helpers/log.js';
+import { app } from '~/helpers/panel.js';
+import { check } from '~/helpers/permissions/check.js';
+import { defaultPermissions } from '~/helpers/permissions/defaultPermissions.js';
+import { get } from '~/helpers/permissions/get.js';
+import { adminMiddleware } from '~/socket.js';
+import { translate } from '~/translate.js';
 
 class Keywords extends System {
   constructor() {

@@ -1,6 +1,6 @@
-import { UserInterface } from '@entity/user';
+import { UserInterface } from '@entity/user.js';
 
-import { variables } from '~/watchers';
+import { variables } from '~/watchers.js';
 
 export function isOwner(user: string | CommandOptions['sender'] | UserInterface | UserStateTags) {
   try {

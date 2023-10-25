@@ -1,4 +1,4 @@
-import { error, warning } from '~/helpers/log';
+import { error, warning } from '~/helpers/log.js';
 
 const systems = {
   core:         [],

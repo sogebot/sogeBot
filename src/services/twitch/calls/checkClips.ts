@@ -1,12 +1,12 @@
 import { debug } from 'console';
 
-import { TwitchClips } from '../../../database/entity/twitch';
-import { error, warning } from '../../../helpers/log';
+import { TwitchClips } from '../../../database/entity/twitch.js';
+import { error, warning } from '../../../helpers/log.js';
 
-import { AppDataSource } from '~/database';
-import { isDebugEnabled } from '~/helpers/debug';
-import { getFunctionName } from '~/helpers/getFunctionName';
-import twitch from '~/services/twitch';
+import { AppDataSource } from '~/database.js';
+import { isDebugEnabled } from '~/helpers/debug.js';
+import { getFunctionName } from '~/helpers/getFunctionName.js';
+import twitch from '~/services/twitch.js';
 
 export async function checkClips () {
   if (isDebugEnabled('api.calls')) {

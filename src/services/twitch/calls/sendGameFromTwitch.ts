@@ -1,7 +1,7 @@
-import { isDebugEnabled } from '~/helpers/debug';
-import { debug, error, warning } from '~/helpers/log';
-import { setImmediateAwait } from '~/helpers/setImmediateAwait';
-import twitch from '~/services/twitch';
+import { isDebugEnabled } from '~/helpers/debug.js';
+import { debug, error, warning } from '~/helpers/log.js';
+import { setImmediateAwait } from '~/helpers/setImmediateAwait.js';
+import twitch from '~/services/twitch.js';
 
 async function sendGameFromTwitch (game: string): Promise<string[]> {
   if (isDebugEnabled('api.calls')) {

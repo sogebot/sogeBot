@@ -1,20 +1,20 @@
-import { Queue as QueueEntity, QueueInterface } from '@entity/queue';
+import { Queue as QueueEntity, QueueInterface } from '@entity/queue.js';
 
-import System from './_interface';
+import System from './_interface.js';
 import {
   command, default_permission, settings,
-} from '../decorators';
+} from '../decorators.js';
 
-import { parserReply } from '~/commons';
-import { AppDataSource } from '~/database';
-import { getUserSender, prepare } from '~/helpers/commons';
-import defaultPermissions from '~/helpers/permissions/defaultPermissions';
-import { adminEndpoint } from '~/helpers/socket';
+import { parserReply } from '~/commons.js';
+import { AppDataSource } from '~/database.js';
+import { getUserSender, prepare } from '~/helpers/commons/index.js';
+import defaultPermissions from '~/helpers/permissions/defaultPermissions.js';
+import { adminEndpoint } from '~/helpers/socket.js';
 import * as changelog from '~/helpers/user/changelog.js';
-import getBotId from '~/helpers/user/getBotId';
-import getBotUserName from '~/helpers/user/getBotUserName';
-import twitch from '~/services/twitch';
-import { translate } from '~/translate';
+import getBotId from '~/helpers/user/getBotId.js';
+import getBotUserName from '~/helpers/user/getBotUserName.js';
+import twitch from '~/services/twitch.js';
+import { translate } from '~/translate.js';
 
 /*
  * !queue                            - gets an info whether queue is opened or closed

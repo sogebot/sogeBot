@@ -1,20 +1,20 @@
 import { rawDataSymbol } from '@twurple/common';
-import _ from 'lodash';
+import _ from 'lodash-es';
 
-import System from './_interface';
-import {
-  command, default_permission,
-} from '../decorators';
+import System from './_interface.js';
 import {
   onStartup, onStreamStart,
-} from '../decorators/on';
+} from '../decorators/on.js';
+import {
+  command, default_permission,
+} from '../decorators.js';
 import Expects from '../expects.js';
 
-import * as channelPoll from '~/helpers/api/channelPoll';
+import * as channelPoll from '~/helpers/api/channelPoll.js';
 import { error } from '~/helpers/log.js';
-import defaultPermissions from '~/helpers/permissions/defaultPermissions';
-import getBroadcasterId from '~/helpers/user/getBroadcasterId';
-import twitch from '~/services/twitch';
+import defaultPermissions from '~/helpers/permissions/defaultPermissions.js';
+import getBroadcasterId from '~/helpers/user/getBroadcasterId.js';
+import twitch from '~/services/twitch.js';
 
 enum ERROR {
   NOT_ENOUGH_OPTIONS,

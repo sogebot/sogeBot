@@ -1,8 +1,8 @@
-import { isNil } from 'lodash';
+import { isNil } from 'lodash-es';
 
-import { translate } from '../../translate';
-import { getValueOf, isVariableSet } from '../customvariables';
-import { rawStatus } from './cache';
+import { rawStatus } from './cache.js';
+import { translate } from '../../translate.js';
+import { getValueOf, isVariableSet } from '../customvariables/index.js';
 
 async function parseTitle (title: string | null) {
   if (isNil(title)) {

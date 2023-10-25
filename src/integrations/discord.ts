@@ -1,52 +1,47 @@
-import { DiscordLink } from '@entity/discord';
-import { Events } from '@entity/event';
-import { Permissions as PermissionsEntity } from '@entity/permissions';
-import { User } from '@entity/user';
-
-import { HOUR, MINUTE } from '@sogebot/ui-helpers/constants';
-
-import { dayjs, timezone } from '@sogebot/ui-helpers/dayjsHelper';
-
-import * as changelog from '~/helpers/user/changelog.js';
-
+import { DiscordLink } from '@entity/discord.js';
+import { Events } from '@entity/event.js';
+import { Permissions as PermissionsEntity } from '@entity/permissions.js';
+import { User } from '@entity/user.js';
+import { HOUR, MINUTE } from '@sogebot/ui-helpers/constants.js';
+import { dayjs, timezone } from '@sogebot/ui-helpers/dayjsHelper.js';
 import chalk from 'chalk';
-
-import { getIdFromTwitch } from '~/services/twitch/calls/getIdFromTwitch';
-import { variables } from '~/watchers';
-
 import * as DiscordJs from 'discord.js';
 import { ChannelType, GatewayIntentBits } from 'discord.js';
-import { get } from 'lodash';
+import { get } from 'lodash-es';
 import { IsNull, LessThan, Not } from 'typeorm';
 import { v5 as uuidv5 } from 'uuid';
 
-import Integration from './_interface';
-import {
-  command, persistent, settings,
-} from '../decorators';
+import Integration from './_interface.js';
 import {
   onChange, onStartup, onStreamEnd, onStreamStart,
-} from '../decorators/on';
-import events from '../events';
-import Expects from '../expects';
-import { Message } from '../message';
-import Parser from '../parser';
-import users from '../users';
-import { AppDataSource } from '~/database';
-import { isStreamOnline, stats } from '~/helpers/api';
-import { attributesReplace } from '~/helpers/attributesReplace';
+} from '../decorators/on.js';
+import {
+  command, persistent, settings,
+} from '../decorators.js';
+import events from '../events.js';
+import Expects from '../expects.js';
+import { Message } from '../message.js';
+import Parser from '../parser.js';
+import users from '../users.js';
+
+import { AppDataSource } from '~/database.js';
+import { isStreamOnline, stats } from '~/helpers/api/index.js';
+import { attributesReplace } from '~/helpers/attributesReplace.js';
 import {
   announceTypes, getOwner, getUserSender, isUUID, prepare,
-} from '~/helpers/commons';
-import { isBotStarted, isDbConnected } from '~/helpers/database';
-import { debounce } from '~/helpers/debounce';
-import { eventEmitter } from '~/helpers/events';
+} from '~/helpers/commons/index.js';
+import { isBotStarted, isDbConnected } from '~/helpers/database.js';
+import { debounce } from '~/helpers/debounce.js';
+import { eventEmitter } from '~/helpers/events/index.js';
 import {
   chatIn, chatOut, debug, error, info, warning, whisperOut,
-} from '~/helpers/log';
-import { check } from '~/helpers/permissions/check';
-import { get as getPermission } from '~/helpers/permissions/get';
-import { adminEndpoint } from '~/helpers/socket';
+} from '~/helpers/log.js';
+import { check } from '~/helpers/permissions/check.js';
+import { get as getPermission } from '~/helpers/permissions/get.js';
+import { adminEndpoint } from '~/helpers/socket.js';
+import * as changelog from '~/helpers/user/changelog.js';
+import { getIdFromTwitch } from '~/services/twitch/calls/getIdFromTwitch.js';
+import { variables } from '~/watchers.js';
 
 class Discord extends Integration {
   client: DiscordJs.Client | null = null;

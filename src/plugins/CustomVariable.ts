@@ -1,5 +1,5 @@
-import { getValueOf } from '~/helpers/customvariables/getValueOf';
-import { setValueOf } from '~/helpers/customvariables/setValueOf';
+import { getValueOf } from '~/helpers/customvariables/getValueOf.js';
+import { setValueOf } from '~/helpers/customvariables/setValueOf.js';
 
 export const CustomVariableGenerator = (pluginId: string) => ({
   async set(variableName: string, value: any) {

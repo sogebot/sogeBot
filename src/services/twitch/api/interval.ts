@@ -1,22 +1,22 @@
-import * as constants from '@sogebot/ui-helpers/constants';
+import * as constants from '@sogebot/ui-helpers/constants.js';
 import chalk from 'chalk';
 
-import { getChannelChatBadges } from '../calls/getChannelChatBadges';
-import { getChannelFollowers } from '../calls/getChannelFollowers';
+import { getChannelChatBadges } from '../calls/getChannelChatBadges.js';
+import { getChannelFollowers } from '../calls/getChannelFollowers.js';
 
 import {
   debug, error, warning,
-} from '~/helpers/log';
-import { logAvgTime } from '~/helpers/profiler';
-import { setImmediateAwait } from '~/helpers/setImmediateAwait';
-import { checkClips } from '~/services/twitch/calls/checkClips';
-import { getChannelChatters } from '~/services/twitch/calls/getChannelChatters';
-import { getChannelInformation } from '~/services/twitch/calls/getChannelInformation';
-import { getChannelSubscribers } from '~/services/twitch/calls/getChannelSubscribers';
-import { getCurrentStream } from '~/services/twitch/calls/getCurrentStream';
-import { getModerators } from '~/services/twitch/calls/getModerators';
-import { updateBroadcasterType } from '~/services/twitch/calls/updateBroadcasterType';
-import { variables } from '~/watchers';
+} from '~/helpers/log.js';
+import { logAvgTime } from '~/helpers/profiler.js';
+import { setImmediateAwait } from '~/helpers/setImmediateAwait.js';
+import { checkClips } from '~/services/twitch/calls/checkClips.js';
+import { getChannelChatters } from '~/services/twitch/calls/getChannelChatters.js';
+import { getChannelInformation } from '~/services/twitch/calls/getChannelInformation.js';
+import { getChannelSubscribers } from '~/services/twitch/calls/getChannelSubscribers.js';
+import { getCurrentStream } from '~/services/twitch/calls/getCurrentStream.js';
+import { getModerators } from '~/services/twitch/calls/getModerators.js';
+import { updateBroadcasterType } from '~/services/twitch/calls/updateBroadcasterType.js';
+import { variables } from '~/watchers.js';
 
 const intervals = new Map<keyof typeof functions, {
   interval: number;

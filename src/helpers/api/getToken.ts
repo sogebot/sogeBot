@@ -1,5 +1,6 @@
-import { Settings } from '@entity/settings';
-import { AppDataSource } from '~/database';
+import { Settings } from '@entity/settings.js';
+
+import { AppDataSource } from '~/database.js';
 
 async function getToken(type: 'bot' | 'broadcaster'){
   const token = await AppDataSource.getRepository(Settings).findOne({

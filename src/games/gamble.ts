@@ -1,21 +1,21 @@
-import { format } from '@sogebot/ui-helpers/number';
+import { format } from '@sogebot/ui-helpers/number.js';
 import {
   get, isNil, random, set,
-} from 'lodash';
+} from 'lodash-es';
 
+import Game from './_interface.js';
 import {
   command, permission_settings, persistent, settings,
-} from '../decorators';
+} from '../decorators.js';
 import general from '../general.js';
-import users from '../users';
-import Game from './_interface';
+import users from '../users.js';
 
-import { prepare } from '~/helpers/commons';
-import { error } from '~/helpers/log';
-import { getUserHighestPermission } from '~/helpers/permissions/getUserHighestPermission';
-import { getPointsName } from '~/helpers/points';
+import { prepare } from '~/helpers/commons/index.js';
+import { error } from '~/helpers/log.js';
+import { getUserHighestPermission } from '~/helpers/permissions/getUserHighestPermission.js';
+import { getPointsName } from '~/helpers/points/index.js';
 import * as changelog from '~/helpers/user/changelog.js';
-import { translate } from '~/translate';
+import { translate } from '~/translate.js';
 
 const ERROR_NOT_ENOUGH_OPTIONS = '0';
 const ERROR_ZERO_BET = '1';

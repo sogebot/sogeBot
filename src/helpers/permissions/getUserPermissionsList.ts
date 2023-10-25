@@ -1,5 +1,6 @@
-import { Permissions } from '@entity/permissions';
-import { check } from '~/helpers/permissions/check';
+import { Permissions } from '@entity/permissions.js';
+
+import { check } from '~/helpers/permissions/check.js';
 
 async function getUserPermissionsList(userId: string, noCache = false): Promise<string[]> {
   const list: string[] = [];

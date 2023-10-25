@@ -1,15 +1,15 @@
-import { SECOND } from '@sogebot/ui-helpers/constants';
+import { SECOND } from '@sogebot/ui-helpers/constants.js';
 
-import Registry from './_interface';
-import Message from '../message';
+import Registry from './_interface.js';
+import Message from '../message.js';
 
-import { AppDataSource } from '~/database';
-import { Goal, Overlay } from '~/database/entity/overlay';
-import { stats } from '~/helpers/api';
-import { executeVariablesInText } from '~/helpers/customvariables/executeVariablesInText';
-import { isBotStarted } from '~/helpers/database';
-import defaultValues from '~/helpers/overlaysDefaultValues';
-import { adminEndpoint, publicEndpoint } from '~/helpers/socket';
+import { Goal, Overlay } from '~/database/entity/overlay.js';
+import { AppDataSource } from '~/database.js';
+import { stats } from '~/helpers/api/index.js';
+import { executeVariablesInText } from '~/helpers/customvariables/executeVariablesInText.js';
+import { isBotStarted } from '~/helpers/database.js';
+import defaultValues from '~/helpers/overlaysDefaultValues.js';
+import { adminEndpoint, publicEndpoint } from '~/helpers/socket.js';
 
 const ticks: string[] = [];
 

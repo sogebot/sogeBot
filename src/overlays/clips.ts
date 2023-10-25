@@ -1,8 +1,8 @@
-import Overlay from './_interface';
+import Overlay from './_interface.js';
 
-import { ioServer } from '~/helpers/panel';
-import { adminEndpoint } from '~/helpers/socket';
-import twitch from '~/services/twitch';
+import { ioServer } from '~/helpers/panel.js';
+import { adminEndpoint } from '~/helpers/socket.js';
+import twitch from '~/services/twitch.js';
 
 class Clips extends Overlay {
   sockets() {

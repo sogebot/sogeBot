@@ -1,17 +1,17 @@
 import { Mutex } from 'async-mutex';
 import fetch from 'node-fetch';
 
-import Integration from './_interface';
-import { command, persistent, settings } from '../decorators';
+import Integration from './_interface.js';
+import { command, persistent, settings } from '../decorators.js';
 
-import { onStartup } from '~/decorators/on';
-import { prepare } from '~/helpers/commons';
-import { triggerInterfaceOnTip } from '~/helpers/interface';
-import { getLang } from '~/helpers/locales';
-import { error, info, tip } from '~/helpers/log';
-import { adminEndpoint, publicEndpoint } from '~/helpers/socket';
-import eventlist from '~/overlays/eventlist';
-import alerts from '~/registries/alerts';
+import { onStartup } from '~/decorators/on.js';
+import { prepare } from '~/helpers/commons/index.js';
+import { triggerInterfaceOnTip } from '~/helpers/interface/index.js';
+import { getLang } from '~/helpers/locales.js';
+import { error, info, tip } from '~/helpers/log.js';
+import { adminEndpoint, publicEndpoint } from '~/helpers/socket.js';
+import eventlist from '~/overlays/eventlist.js';
+import alerts from '~/registries/alerts.js';
 
 const mutex = new Mutex();
 

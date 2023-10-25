@@ -1,18 +1,18 @@
-import { EventList } from '@entity/eventList';
-import { HOUR } from '@sogebot/ui-helpers/constants';
+import { EventList } from '@entity/eventList.js';
+import { HOUR } from '@sogebot/ui-helpers/constants.js';
 
-import eventlist from '../../overlays/eventlist';
-import alerts from '../../registries/alerts';
-import { triggerInterfaceOnFollow } from '../interface';
-import { debug, follow as followLog } from '../log';
+import eventlist from '../../overlays/eventlist.js';
+import alerts from '../../registries/alerts.js';
+import { triggerInterfaceOnFollow } from '../interface/index.js';
+import { debug, follow as followLog } from '../log.js';
 import {
   isBot, isIgnored, isInGlobalIgnoreList,
-} from '../user';
+} from '../user/index.js';
 
-import { eventEmitter } from '.';
+import { eventEmitter } from './index.js';
 
-import { AppDataSource } from '~/database';
-import banUser from '~/services/twitch/calls/banUser';
+import { AppDataSource } from '~/database.js';
+import banUser from '~/services/twitch/calls/banUser.js';
 
 const events = new Map<string, number>();
 

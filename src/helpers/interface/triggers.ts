@@ -1,7 +1,7 @@
-import { getFunctionList } from '../../decorators/on';
-import { debug } from '../log';
-import { find } from '../register';
-import { getFunctionNameFromStackTrace } from '../stacktrace';
+import { getFunctionList } from '../../decorators/on.js';
+import { debug } from '../log.js';
+import { find } from '../register.js';
+import { getFunctionNameFromStackTrace } from '../stacktrace.js';
 
 export function triggerInterfaceOnMessage(opts: onEventMessage) {
   trigger(opts);

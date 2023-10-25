@@ -1,10 +1,10 @@
 import { HelixChatBadgeSet } from '@twurple/api/lib';
 
-import { isDebugEnabled } from '~/helpers/debug';
-import { getFunctionName } from '~/helpers/getFunctionName';
-import { debug, error, warning } from '~/helpers/log';
-import twitch from '~/services/twitch';
-import { variables } from '~/watchers';
+import { isDebugEnabled } from '~/helpers/debug.js';
+import { getFunctionName } from '~/helpers/getFunctionName.js';
+import { debug, error, warning } from '~/helpers/log.js';
+import twitch from '~/services/twitch.js';
+import { variables } from '~/watchers.js';
 
 export let badgesCache: HelixChatBadgeSet[] = [];
 

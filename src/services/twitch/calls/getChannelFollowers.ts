@@ -1,10 +1,10 @@
 import {
   stats as apiStats,
-} from '~/helpers/api';
-import { isDebugEnabled } from '~/helpers/debug';
-import { debug } from '~/helpers/log';
-import getBroadcasterId from '~/helpers/user/getBroadcasterId';
-import twitch from '~/services/twitch';
+} from '~/helpers/api/index.js';
+import { isDebugEnabled } from '~/helpers/debug.js';
+import { debug } from '~/helpers/log.js';
+import getBroadcasterId from '~/helpers/user/getBroadcasterId.js';
+import twitch from '~/services/twitch.js';
 
 export async function getChannelFollowers() {
   if (isDebugEnabled('api.calls')) {

@@ -4,16 +4,16 @@ import fs from 'fs';
 import { normalize } from 'path';
 
 import { glob } from 'glob';
-import _  from 'lodash';
+import { set, isNil, remove, cloneDeep, get, each, isUndefined } from 'lodash-es';
 
-import { AppDataSource } from '~/database';
-import { Settings } from '~/database/entity/settings';
-import { Translation } from '~/database/entity/translation';
-import { areDecoratorsLoaded } from '~/decorators';
-import { flatten } from '~/helpers/flatten';
-import { getLang, setLang } from '~/helpers/locales';
-import { error, warning } from '~/helpers/log';
-import { addMenu } from '~/helpers/panel';
+import { Settings } from '~/database/entity/settings.js';
+import { Translation } from '~/database/entity/translation.js';
+import { AppDataSource } from '~/database.js';
+import { areDecoratorsLoaded } from '~/decorators.js';
+import { flatten } from '~/helpers/flatten.js';
+import { getLang, setLang } from '~/helpers/locales.js';
+import { error, warning } from '~/helpers/log.js';
+import { addMenu } from '~/helpers/panel.js';
 
 class Translate {
   custom: any[] = [];
@@ -53,7 +53,7 @@ class Translate {
             }
             const withoutLocales = normalize(f).replace(/\\/g, '/').replace('locales/', '').replace('.json', '');
             try {
-              _.set(this.translations, withoutLocales.split('/').join('.'), JSON.parse(fs.readFileSync(f, 'utf8')));
+              set(this.translations, withoutLocales.split('/').join('.'), JSON.parse(fs.readFileSync(f, 'utf8')));
             } catch (e: any) {
               error('Incorrect JSON file: ' + f);
               error(e.stack);
@@ -66,10 +66,10 @@ class Translate {
           }
 
           for (const c of this.custom) {
-            if (_.isNil(flatten(this.translations.en)[c.name])) {
+            if (isNil(flatten(this.translations.en)[c.name])) {
               // remove if lang doesn't exist anymore
               AppDataSource.getRepository(Translation).delete({ name: c.name });
-              this.custom = _.remove(this.custom, (i) => i.name === c.name);
+              this.custom = remove(this.custom, (i) => i.name === c.name);
             }
           }
           this.isLoaded = true;
@@ -95,10 +95,10 @@ class Translate {
       const stack = (new Error('Translations are not yet loaded.')).stack;
       warning(stack);
     }
-    if (_.isUndefined(translate_class.translations[getLang()]) && !_.isUndefined(text)) {
+    if (isUndefined(translate_class.translations[getLang()]) && !isUndefined(text)) {
       return '{missing_translation: ' + getLang() + '.' + String(text) + '}';
     } else if (typeof text === 'object') {
-      const t = _.cloneDeep(translate_class.translations)[getLang()][text.root];
+      const t = cloneDeep(translate_class.translations)[getLang()][text.root];
       for (const c of translate_class.custom) {
         t[c.name.replace(`${text.root}.`, '')] = c.value;
       }
@@ -118,9 +118,9 @@ class Translate {
       if (customTranslated && customTranslated.value && !orig) {
         translated = customTranslated.value;
       } else {
-        translated = _.get(this.translations[getLang()], String(text), undefined);
+        translated = get(this.translations[getLang()], String(text), undefined);
       }
-      _.each(translated.match(/(\{[\w-.]+\})/g), (toTranslate) => {
+      each(translated.match(/(\{[\w-.]+\})/g), (toTranslate) => {
         translated = translated.replace(toTranslate, this.get(toTranslate.replace('{', '').replace('}', ''), orig));
       });
       return translated;

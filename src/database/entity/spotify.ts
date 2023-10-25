@@ -1,4 +1,4 @@
-import { BotEntity } from '../BotEntity';
+import { BotEntity } from '../BotEntity.js';
 import { Column, Entity, PrimaryColumn } from 'typeorm';
 
 @Entity()

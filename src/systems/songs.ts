@@ -2,9 +2,9 @@ import type { Filter } from '@devexpress/dx-react-grid';
 import {
   currentSongType,
   SongBan, SongPlaylist, SongRequest,
-} from '@entity/song';
-import { User } from '@entity/user';
-import * as _ from 'lodash';
+} from '@entity/song.js';
+import { User } from '@entity/user.js';
+import * as _ from 'lodash-es';
 import { nanoid } from 'nanoid';
 import io from 'socket.io';
 import {
@@ -14,25 +14,25 @@ import ytdl from 'ytdl-core';
 import ytpl from 'ytpl';
 import ytsr from 'ytsr';
 
-import System from './_interface';
+import System from './_interface.js';
+import { onChange, onStartup } from '../decorators/on.js';
 import {
   command, default_permission, persistent, settings, ui,
-} from '../decorators';
-import { onChange, onStartup } from '../decorators/on';
+} from '../decorators.js';
 
-import { AppDataSource } from '~/database';
+import { AppDataSource } from '~/database.js';
 import {
   announce, getUserSender, prepare,
-} from '~/helpers/commons';
-import { error, info } from '~/helpers/log';
-import defaultPermissions from '~/helpers/permissions/defaultPermissions';
-import { adminEndpoint, publicEndpoint } from '~/helpers/socket';
-import { tmiEmitter } from '~/helpers/tmi';
+} from '~/helpers/commons/index.js';
+import { error, info } from '~/helpers/log.js';
+import defaultPermissions from '~/helpers/permissions/defaultPermissions.js';
+import { adminEndpoint, publicEndpoint } from '~/helpers/socket.js';
+import { tmiEmitter } from '~/helpers/tmi/index.js';
 import * as changelog from '~/helpers/user/changelog.js';
-import getBotId from '~/helpers/user/getBotId';
-import getBotUserName from '~/helpers/user/getBotUserName';
-import { isModerator } from '~/helpers/user/isModerator';
-import { translate } from '~/translate';
+import getBotId from '~/helpers/user/getBotId.js';
+import getBotUserName from '~/helpers/user/getBotUserName.js';
+import { isModerator } from '~/helpers/user/isModerator.js';
+import { translate } from '~/translate.js';
 
 let importInProgress = false;
 const cachedTags = new Set<string>();

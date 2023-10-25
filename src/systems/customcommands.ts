@@ -1,32 +1,32 @@
 import {
   Commands, CommandsGroup,
-} from '@entity/commands';
-import * as constants from '@sogebot/ui-helpers/constants';
+} from '@entity/commands.js';
+import * as constants from '@sogebot/ui-helpers/constants.js';
 import { validateOrReject } from 'class-validator';
-import { cloneDeep, merge, orderBy, shuffle } from 'lodash';
+import { cloneDeep, merge, orderBy, shuffle } from 'lodash-es';
 import { v4 } from 'uuid';
 
-import System from './_interface';
-import { parserReply } from '../commons';
+import System from './_interface.js';
+import { parserReply } from '../commons.js';
 import {
   command, default_permission, helper,
   parser,
   timer,
-} from '../decorators';
-import Expects from '../expects';
+} from '../decorators.js';
+import Expects from '../expects.js';
 
-import { checkFilter } from '~/helpers/checkFilter';
+import { checkFilter } from '~/helpers/checkFilter.js';
 import {
   getAllCountOfCommandUsage, getCountOfCommandUsage, incrementCountOfCommandUsage, resetCountOfCommandUsage,
-} from '~/helpers/commands/count';
-import { prepare } from '~/helpers/commons';
-import { info, warning } from '~/helpers/log';
-import { app } from '~/helpers/panel';
-import { check } from '~/helpers/permissions/check';
-import { defaultPermissions } from '~/helpers/permissions/defaultPermissions';
-import { get } from '~/helpers/permissions/get';
-import { adminMiddleware } from '~/socket';
-import { translate } from '~/translate';
+} from '~/helpers/commands/count.js';
+import { prepare } from '~/helpers/commons/index.js';
+import { info, warning } from '~/helpers/log.js';
+import { app } from '~/helpers/panel.js';
+import { check } from '~/helpers/permissions/check.js';
+import { defaultPermissions } from '~/helpers/permissions/defaultPermissions.js';
+import { get } from '~/helpers/permissions/get.js';
+import { adminMiddleware } from '~/socket.js';
+import { translate } from '~/translate.js';
 
 /*
  * !command                                                                            - gets an info about command usage

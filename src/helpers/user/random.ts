@@ -1,8 +1,8 @@
-import { User } from '@entity/user';
-import { AppDataSource } from '~/database';
+import { User } from '@entity/user.js';
 
+import { AppDataSource } from '~/database.js';
 import * as changelog from '~/helpers/user/changelog.js';
-import { variables } from '~/watchers';
+import { variables } from '~/watchers.js';
 
 async function getRandOrder() {
   if (AppDataSource.options.type === 'better-sqlite3' || AppDataSource.options.type === 'postgres') {

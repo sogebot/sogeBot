@@ -1,9 +1,9 @@
-import { getUserSender } from '~/helpers/commons';
-import { sendMessage } from '~/helpers/commons/sendMessage';
-import { info } from '~/helpers/log';
-import getBotId from '~/helpers/user/getBotId';
-import getBotUserName from '~/helpers/user/getBotUserName';
-import banUser from '~/services/twitch/calls/banUser';
+import { getUserSender } from '~/helpers/commons/index.js';
+import { sendMessage } from '~/helpers/commons/sendMessage.js';
+import { info } from '~/helpers/log.js';
+import getBotId from '~/helpers/user/getBotId.js';
+import getBotUserName from '~/helpers/user/getBotUserName.js';
+import banUser from '~/services/twitch/calls/banUser.js';
 
 export const TwitchGenerator = (pluginId: string, userstate: { userName: string, userId: string } | null) => ({
   sendMessage: (message:string) => {

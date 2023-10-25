@@ -1,28 +1,28 @@
-import { Highlight } from '@entity/highlight';
-import { dayjs } from '@sogebot/ui-helpers/dayjsHelper';
-import { timestampToObject } from '@sogebot/ui-helpers/getTime';
+import { Highlight } from '@entity/highlight.js';
+import { dayjs } from '@sogebot/ui-helpers/dayjsHelper.js';
+import { timestampToObject } from '@sogebot/ui-helpers/getTime.js';
 import { Request, Response } from 'express';
-import { isNil } from 'lodash';
+import { isNil } from 'lodash-es';
 
-import System from './_interface';
+import System from './_interface.js';
 import {
   command, default_permission, settings, ui,
-} from '../decorators';
-import { createClip } from '../services/twitch/calls/createClip';
+} from '../decorators.js';
+import { createClip } from '../services/twitch/calls/createClip.js';
 
 import {
   isStreamOnline, stats, streamStatusChangeSince,
-} from '~/helpers/api';
-import { getUserSender } from '~/helpers/commons';
-import { error } from '~/helpers/log';
-import defaultPermissions from '~/helpers/permissions/defaultPermissions';
-import { adminEndpoint } from '~/helpers/socket';
-import getBotId from '~/helpers/user/getBotId';
-import getBotUserName from '~/helpers/user/getBotUserName';
-import getBroadcasterId from '~/helpers/user/getBroadcasterId';
-import twitch from '~/services/twitch';
-import { createMarker } from '~/services/twitch/calls/createMarker';
-import { translate } from '~/translate';
+} from '~/helpers/api/index.js';
+import { getUserSender } from '~/helpers/commons/index.js';
+import { error } from '~/helpers/log.js';
+import defaultPermissions from '~/helpers/permissions/defaultPermissions.js';
+import { adminEndpoint } from '~/helpers/socket.js';
+import getBotId from '~/helpers/user/getBotId.js';
+import getBotUserName from '~/helpers/user/getBotUserName.js';
+import getBroadcasterId from '~/helpers/user/getBroadcasterId.js';
+import { createMarker } from '~/services/twitch/calls/createMarker.js';
+import twitch from '~/services/twitch.js';
+import { translate } from '~/translate.js';
 
 const ERROR_STREAM_NOT_ONLINE = '1';
 const ERROR_MISSING_TOKEN = '2';

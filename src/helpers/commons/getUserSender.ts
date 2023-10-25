@@ -1,4 +1,4 @@
-import { isBroadcaster } from '../user';
+import { isBroadcaster } from '../user/index.js';
 
 export function getUserSender(userId: string, username: string): Omit<ChatUser, '_userName' | '_userData' | '_parseBadgesLike'> {
   return {

@@ -1,32 +1,32 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import { getTime } from '@sogebot/ui-helpers/getTime';
+import { getTime } from '@sogebot/ui-helpers/getTime.js';
 import axios, { AxiosRequestConfig } from 'axios';
 import * as ts from 'typescript';
 
-import { CustomVariableGenerator } from './CustomVariable';
-import { ListenToGenerator, Types } from './ListenTo';
-import { LogGenerator } from './Log';
-import { PermissionGenerator } from './Permission';
-import { TwitchGenerator } from './Twitch';
-import { VariableGenerator } from './Variable';
+import { CustomVariableGenerator } from './CustomVariable.js';
+import { ListenToGenerator, Types } from './ListenTo.js';
+import { LogGenerator } from './Log.js';
+import { PermissionGenerator } from './Permission.js';
+import { TwitchGenerator } from './Twitch.js';
+import { VariableGenerator } from './Variable.js';
 
-import type { EmitData } from '~/database/entity/alert';
-import { Plugin } from '~/database/entity/plugins';
-import { chatMessagesAtStart, isStreamOnline, stats } from '~/helpers/api';
-import { streamStatusChangeSince } from '~/helpers/api/streamStatusChangeSince';
-import { getUserSender } from '~/helpers/commons';
-import { mainCurrency, symbol } from '~/helpers/currency';
-import emitter from '~/helpers/interfaceEmitter';
-import { debug, info } from '~/helpers/log';
-import { linesParsed } from '~/helpers/parser';
-import defaultPermissions from '~/helpers/permissions/defaultPermissions';
-import getBotId from '~/helpers/user/getBotId';
-import getBotUserName from '~/helpers/user/getBotUserName';
-import { getRandomOnlineSubscriber, getRandomSubscriber, getRandomOnlineViewer, getRandomViewer } from '~/helpers/user/random';
-import tts from '~/overlays/texttospeech';
-import alerts from '~/registries/alerts';
-import points from '~/systems/points';
-import users from '~/users';
+import type { EmitData } from '~/database/entity/alert.js';
+import { Plugin } from '~/database/entity/plugins.js';
+import { chatMessagesAtStart, isStreamOnline, stats } from '~/helpers/api/index.js';
+import { streamStatusChangeSince } from '~/helpers/api/streamStatusChangeSince.js';
+import { getUserSender } from '~/helpers/commons/index.js';
+import { mainCurrency, symbol } from '~/helpers/currency/index.js';
+import emitter from '~/helpers/interfaceEmitter.js';
+import { debug, info } from '~/helpers/log.js';
+import { linesParsed } from '~/helpers/parser.js';
+import defaultPermissions from '~/helpers/permissions/defaultPermissions.js';
+import getBotId from '~/helpers/user/getBotId.js';
+import getBotUserName from '~/helpers/user/getBotUserName.js';
+import { getRandomOnlineSubscriber, getRandomSubscriber, getRandomOnlineViewer, getRandomViewer } from '~/helpers/user/random.js';
+import tts from '~/overlays/texttospeech.js';
+import alerts from '~/registries/alerts.js';
+import points from '~/systems/points.js';
+import users from '~/users.js';
 
 export const transpiledFiles = new Map<string, string>();
 

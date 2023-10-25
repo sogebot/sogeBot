@@ -1,14 +1,15 @@
-import { User, UserInterface } from '@entity/user';
-import { MINUTE } from '@sogebot/ui-helpers/constants';
+import { User, UserInterface } from '@entity/user.js';
+import { MINUTE } from '@sogebot/ui-helpers/constants.js';
 import {
   get as _get, cloneDeep, merge, set,
-} from 'lodash';
-import { AppDataSource } from '~/database';
+} from 'lodash-es';
 import { v4 } from 'uuid';
 
-import { timer } from '../../decorators';
+import { timer } from '../../decorators.js';
 import { flatten } from '../flatten.js';
-import { debug, error } from '../log';
+import { debug, error } from '../log.js';
+
+import { AppDataSource } from '~/database.js';
 
 const changelog: (Partial<UserInterface> & { userId: string, changelogType: 'set' | 'increment' })[] = [];
 const lock = new Map<string, boolean>();
