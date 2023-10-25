@@ -1,4 +1,4 @@
-const { defaultPermissions } = require ('../../../dest/helpers/permissions/defaultPermissions');
+import { defaultPermissions } from '../../../dest/helpers/permissions/defaultPermissions.js';
 
 import('../../general.js');
 
@@ -6,12 +6,12 @@ import { db, message, user } from '../../general.js';
 
 import assert from 'assert';
 
-const _ = require('lodash');
-const axios = require('axios');
+import _ from 'lodash-es';
+import axios from 'axios';
 
 import { Variable } from '../../../dest/database/entity/variable.js';
 
-const { v4 } = require('uuid');
+import { v4 } from 'uuid'
 
 // stub
 _.set(global, 'widgets.custom_variables.io.emit', function () {

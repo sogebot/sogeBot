@@ -2,10 +2,9 @@
 
 import assert from 'assert';
 
-const cooldown = (require('../../../dest/systems/cooldown')).default;
+import cooldown from '../../../dest/systems/cooldown.js'
 import { db } from '../../general.js';
-import { message } from '../../general.js';
-const url = require('../../general.js').url;
+import { message, url } from '../../general.js';
 
 import('../../general.js');
 

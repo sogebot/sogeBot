@@ -4,13 +4,13 @@ import assert from 'assert';
 import { AppDataSource } from '../../../dest/database.js'
 
 import { User } from '../../../dest/database/entity/user.js';
-const { prepare } = require('../../../dest/helpers/commons/prepare');
-const eventlist = (require('../../../dest/overlays/eventlist')).default;
-const twitch = (require('../../../dest/services/twitch')).default;
+import { prepare } from '../../../dest/helpers/commons/prepare.js.js';
+import eventlist from '../../../dest/overlays/eventlist.js';
+import twitch from '../../../dest/services/twitch.js';
 import { db } from '../../general.js';
-const time = require('../../general.js').time;
+import { time } from '../../general.js';
 import { message } from '../../general.js';
-const user = require('../../general.js').user;
+import { user } from '../../general.js';
 
 import('../../general.js');
 

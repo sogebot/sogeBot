@@ -2,23 +2,23 @@
 
 import assert from 'assert';
 
-const _ = require('lodash');
-const { v4: uuidv4 } = require('uuid');
+import _ from 'lodash-es';
+import { vs as uuidv4 } from 'uuid';
 import { AppDataSource } from '../../../dest/database.js';
 
 import('../../general.js');
 
-const { Event } = require('../../../dest/database/entity/event');
+import { Event } from '../../../dest/database/entity/event.js.js';
 import { User } from '../../../dest/database/entity/user.js';
-const events = (require('../../../dest/events')).default;
+import events from '../../../dest/events.js';
 const defaultPermissions = (require('../../../dest/helpers/permissions/defaultPermissions')).defaultPermissions;
 import alias from '../../../dest/systems/alias.js';
-const commercial = (require('../../../dest/systems/commercial')).default;
-const cooldown = (require('../../../dest/systems/cooldown')).default;
+import commercial from '../../../dest/helpers/systems/commercial.js';
+import cooldown from '../../../dest/systems/cooldown.js'
 import { db } from '../../general.js';
 import { message } from '../../general.js';
-const time = require('../../general.js').time;
-const user = require('../../general.js').user;
+import { time } from '../../general.js';
+import { user } from '../../general.js';
 
 describe('Events - event run command should be able to skip pricing and cooldown - https://discord.com/channels/317348946144002050/619437014001123338/814270704161652766 - @func3', () => {
   before(async () => {

@@ -4,13 +4,13 @@ import assert from 'assert';
 import('../../general.js');
 
 import { db } from '../../general.js';
-const { prepare } = require('../../../dest/helpers/commons/prepare');
+import { prepare } from '../../../dest/helpers/commons/prepare.js.js';
 import { message } from '../../general.js';
 
 import { User } from '../../../dest/database/entity/user.js';
-const { Settings } = require('../../../dest/database/entity/settings');
+import { Settings } from '../../../dest/database/entity/settings.js.js';
 
-const twitch = (require('../../../dest/services/twitch')).default;
+import twitch from '../../../dest/services/twitch.js';
 
 // users
 const owner = { userName: '__broadcaster__' };
@@ -20,7 +20,7 @@ const testuser3 = { userName: 'testuser3', userId: String(3) };
 const nightbot = { userName: 'nightbot', userId: String(4) };
 const botwithchangedname = { userName: 'asdsadas', userId: String(24900234) };
 
-const { isIgnored } = require('../../../dest/helpers/user/isIgnored');
+import { isIgnored } from '../../../dest/helpers/user/isIgnored.js.js';
 import { AppDataSource } from '../../../dest/database.js';
 
 describe('TMI - ignore - @func3', () => {

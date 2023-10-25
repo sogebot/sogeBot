@@ -2,12 +2,12 @@ import('../../general.js');
 
 import assert from 'assert';
 
-const _ = require('lodash');
+import _ from 'lodash-es';
 import { AppDataSource } from '../../../dest/database.js';
 
-const { Raffle } = require('../../../dest/database/entity/raffle');
+import { Raffle } from '../../../dest/database/entity/raffle.js.js';
 import { User } from '../../../dest/database/entity/user.js';
-const raffles = (require('../../../dest/systems/raffles')).default;
+import raffles from '../../../dest/systems/raffles.js';
 import { message } from '../../general.js';
 import { db } from '../../general.js';
 

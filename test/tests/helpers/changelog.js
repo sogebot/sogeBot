@@ -11,8 +11,8 @@ let User;
 describe('User changelog tests - @func1', () => {
   before(async () => {
     await db.cleanup();
-    changelog = require('../../../dest/helpers/user/changelog');
-    User = require('../../../dest/database/entity/user').User;
+    changelog = await import('../../../dest/helpers/user/changelog.js');
+    User = (await import('../../../dest/database/entity/user')).User;
   });
 
   it('get of unknown user should return null', async () => {

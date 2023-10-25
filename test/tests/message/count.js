@@ -5,13 +5,13 @@ import('../../general.js');
 import assert from 'assert';
 
 const owner = { userId: String(Math.floor(Math.random() * 100000)), userName: '__broadcaster__' };
-const constants = require('@sogebot/ui-helpers/constants');
+import constants from '@sogebot/ui-helpers/constants.js';
 
-const { EventList } = require('../../../dest/database/entity/eventList');
-const { User, UserTip, UserBit } = require('../../../dest/database/entity/user');
+import { EventList } from '../../../dest/database/entity/eventList.js.js';
+import { User, UserTip, UserBit } from '../../../dest/database/entity/user.js.js';
 import { AppDataSource } from '../../../dest/database.js';
-const rates = require('../../../dest/helpers/currency/rates').default;
-const Message = require('../../../dest/message').default;
+import rates from '../../../dest/helpers/currency/rates.js';
+import Message from '../../../dest/message.js';
 import { db } from '../../general.js';
 
 const tests = [

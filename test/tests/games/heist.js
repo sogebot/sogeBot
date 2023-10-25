@@ -4,7 +4,7 @@ import { AppDataSource } from '../../../dest/database.js';
 import('../../general.js');
 import { User } from '../../../dest/database/entity/user.js';
 import { db, message, user } from '../../general.js';
-const time = require('../../general.js').time;
+import { time } from '../../general.js';
 
 const command = '!bankheist';
 let heist;

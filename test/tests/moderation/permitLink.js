@@ -1,5 +1,5 @@
 /* global describe it before */
-const commons = require('../../../dest/commons');
+import * as commons from '../../../dest/commons.js'
 
 const moderation = (require('../../../dest/systems/moderation')).default;
 

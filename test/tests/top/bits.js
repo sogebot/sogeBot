@@ -6,10 +6,10 @@ import('../../general.js');
 
 const currency = require('../../../dest/currency').default;
 const twitch = require('../../../dest/services/twitch').default;
-const { User, UserBit } = require('../../../dest/database/entity/user');
-const { getOwner } = require('../../../dest/helpers/commons/getOwner');
-const { prepare } = require('../../../dest/helpers/commons/prepare');
-const top = (require('../../../dest/systems/top')).default;
+import { User, UserBit } from '../../../dest/database/entity/user.js.js';
+import { getOwner } from '../../../dest/helpers/commons/getOwner.js.js';
+import { prepare } from '../../../dest/helpers/commons/prepare.js.js';
+import top from '../../../dest/systems/top.js';
 import { db } from '../../general.js';
 import { message } from '../../general.js';
 

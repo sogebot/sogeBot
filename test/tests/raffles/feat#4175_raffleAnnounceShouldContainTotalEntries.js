@@ -1,19 +1,19 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
+
 /* global describe it before */
 
 import('../../general.js');
 
 import { db, message, user } from '../../general.js';
-const commons = require('../../../dest/commons');
+import * as commons from '../../../dest/commons.js'
 
 import { User } from '../../../dest/database/entity/user.js';
-const { Raffle } = require('../../../dest/database/entity/raffle');
+import { Raffle } from '../../../dest/database/entity/raffle.js.js';
 
-const raffles = (require('../../../dest/systems/raffles')).default;
+import raffles from '../../../dest/systems/raffles.js';
 const isStreamOnline = (require('../../../dest/helpers/api/isStreamOnline' )).isStreamOnline
 import assert from 'assert';
 import { AppDataSource } from '../../../dest/database.js';
-const { IsNull } = require('typeorm');
+import { IsNull } from 'typeorm.js.js';
 
 describe('Raffles - announce should contain total entries #4175 - @func3', () => {
   before(async () => {

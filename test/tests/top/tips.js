@@ -5,12 +5,12 @@ import { AppDataSource } from '../../../dest/database.js';
 import('../../general.js');
 
 const currency = require('../../../dest/currency').default;
-const { User, UserTip } = require('../../../dest/database/entity/user');
-const { getOwner } = require('../../../dest/helpers/commons/getOwner');
-const { prepare } = require('../../../dest/helpers/commons/prepare');
-const rates = require('../../../dest/helpers/currency/rates').default;
-const twitch = require('../../../dest/services/twitch.js').default;
-const top = (require('../../../dest/systems/top')).default;
+import { User, UserTip } from '../../../dest/database/entity/user.js.js';
+import { getOwner } from '../../../dest/helpers/commons/getOwner.js.js';
+import { prepare } from '../../../dest/helpers/commons/prepare.js.js';
+import rates from '../../../dest/helpers/currency/rates.js';
+import twitch from '../../../dest/services/twitch.js';
+import top from '../../../dest/systems/top.js';
 import { db } from '../../general.js';
 import { message } from '../../general.js';
 

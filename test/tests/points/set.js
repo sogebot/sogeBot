@@ -2,13 +2,13 @@
 
 import assert from 'assert';
 
-const _ = require('lodash');
+import _ from 'lodash-es';
 import { AppDataSource } from '../../../dest/database.js';
 
 import('../../general.js');
 
 import { User } from '../../../dest/database/entity/user.js';
-const points = (require('../../../dest/systems/points')).default;
+import points from '../../../dest/systems/points.js';
 import { db } from '../../general.js';
 import { message } from '../../general.js';
 

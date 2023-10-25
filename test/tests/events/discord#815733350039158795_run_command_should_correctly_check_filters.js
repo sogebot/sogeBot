@@ -1,22 +1,22 @@
-const _ = require('lodash');
-const { v4: uuidv4 } = require('uuid');
+import _ from 'lodash-es';
+import { vs as uuidv4 } from 'uuid';
 import { AppDataSource } from '../../../dest/database.js';
 
 import('../../general.js');
 
-const { Commands, CommandsResponses } = require('../../../dest/database/entity/commands');
-const { Event } = require('../../../dest/database/entity/event');
+import { Commands, CommandsResponses } from '../../../dest/database/entity/commands.js.js';
+import { Event } from '../../../dest/database/entity/event.js.js';
 import { User } from '../../../dest/database/entity/user.js';
-const events = (require('../../../dest/events')).default;
-const { defaultPermissions } = (require('../../../dest/helpers/permissions/defaultPermissions'));
-const { isBotSubscriber } = require('../../../dest/helpers/user/isBot');
+import events from '../../../dest/events.js';
+import { defaultPermissions } from '../../../dest/helpers/permissions/defaultPermissions.js';
+import { isBotSubscriber } from '../../../dest/helpers/user/isBot.js.js';
 import alias from '../../../dest/systems/alias.js';
-const commercial = (require('../../../dest/systems/commercial')).default;
+import commercial from '../../../dest/helpers/systems/commercial.js';
 import customcommands from '../../../dest/systems/customcommands.js';
 import { db } from '../../general.js';
 import { message } from '../../general.js';
-const time = require('../../general.js').time;
-const user = require('../../general.js').user;
+import { time } from '../../general.js';
+import { user } from '../../general.js';
 
 let event;
 describe('Events - event run command should correctly parse filters and be able to use CASTERS permissions - https://discord.com/channels/317348946144002050/619437014001123338/8157333500391587958 - @func3', () => {

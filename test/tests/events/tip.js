@@ -1,19 +1,19 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
+
 /* global  */
 
 import assert from 'assert';
 
 import('../../general.js');
 
-const { v4: uuidv4 } = require('uuid');
+import { vs as uuidv4 } from 'uuid';
 import { AppDataSource } from '../../../dest/database.js';
 
-const { Event } = require('../../../dest/database/entity/event');
+import { Event } from '../../../dest/database/entity/event.js.js';
 import { User } from '../../../dest/database/entity/user.js';
-const events = (require('../../../dest/events')).default;
-const log = require('../../../dest/helpers/log');
-const changelog = (require('../../../dest/helpers/user/changelog'));
-const time = require('../../general.js').time;
+import events from '../../../dest/events.js';
+import log from '../../../dest/helpers/log.js';
+import * as changelog from '../../../dest/user/changelog.js';
+import { time } from '../../general.js';
 import { db } from '../../general.js';
 import { message } from '../../general.js';
 

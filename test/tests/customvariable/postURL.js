@@ -3,7 +3,7 @@
 import assert from 'assert';
 import { AppDataSource } from '../../../dest/database.js'
 
-const v4 = require('uuid').v4;
+import { v4 } from 'uuid';
 
 import { Variable } from '../../../dest/database/entity/variable.js';
 import { defaultPermissions } from '../../../dest/helpers/permissions/defaultPermissions.js';

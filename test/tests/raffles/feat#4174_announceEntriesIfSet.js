@@ -1,19 +1,19 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
+
 /* global describe it before */
 
 import('../../general.js');
 
 import { db, message, user } from '../../general.js';
-const commons = require('../../../dest/commons');
+import * as commons from '../../../dest/commons.js'
 
 import { User } from '../../../dest/database/entity/user.js';
-const { Raffle } = require('../../../dest/database/entity/raffle');
+import { Raffle } from '../../../dest/database/entity/raffle.js.js';
 
-const raffles = (require('../../../dest/systems/raffles')).default;
+import raffles from '../../../dest/systems/raffles.js';
 
 import assert from 'assert';
 import { AppDataSource } from '../../../dest/database.js';
-const { IsNull } = require('typeorm');
+import { IsNull } from 'typeorm.js.js';
 
 describe('Raffles - announce entries if set #4174 - @func2', () => {
   describe('ticket raffle', () => {

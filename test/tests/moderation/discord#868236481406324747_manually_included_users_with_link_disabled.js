@@ -5,13 +5,13 @@ import { AppDataSource } from '../../../dest/database.js';
 
 import('../../general.js');
 
-const { Permissions } = require('../../../dest/database/entity/permissions');
+import { Permissions } from '../../../dest/database/entity/permissions.js.js';
 import { defaultPermissions } from '../../../dest/helpers/permissions/defaultPermissions.js';
 const moderation = (require('../../../dest/systems/moderation')).default;
 import { db } from '../../general.js';
 const variable = require('../../general.js').variable;
 import { message } from '../../general.js';
-const user = require('../../general.js').user;
+import { user } from '../../general.js';
 
 describe('discord#868236481406324747 - Manually included users with link disabled should not be purged - @func1', () => {
   after(async () => {

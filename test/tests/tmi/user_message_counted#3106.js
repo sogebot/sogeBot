@@ -4,13 +4,13 @@ import assert from 'assert';
 
 import('../../general.js');
 
-const commons = require('../../../dest/commons');
+import * as commons from '../../../dest/commons.js'
 import { AppDataSource } from '../../../dest/database.js';
-const { Settings } = require('../../../dest/database/entity/settings');
+import { Settings } from '../../../dest/database/entity/settings.js.js';
 import { User } from '../../../dest/database/entity/user.js';
 const isStreamOnline = (require('../../../dest/helpers/api/isStreamOnline')).isStreamOnline;
-const changelog = (require('../../../dest/helpers/user/changelog'));
-const twitch = require('../../../dest/services/twitch.js').default;
+import * as changelog from '../../../dest/user/changelog.js';
+import twitch from '../../../dest/services/twitch.js';
 // users
 const owner = { userName: '__broadcaster__' };
 const testuser1 = {
@@ -20,7 +20,7 @@ const testuser2 = {
   userName: 'testuser2', userId: '2',
 };
 
-const { VariableWatcher } = require('../../../dest/watchers');
+import { VariableWatcher } from '../../../dest/watchers.js.js';
 import { message } from '../../general.js';
 import { db } from '../../general.js';
 

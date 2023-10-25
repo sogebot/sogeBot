@@ -5,9 +5,9 @@ import assert from 'assert';
 
 import { User } from '../../../dest/database/entity/user.js';
 import { AppDataSource } from '../../../dest/database.js';
-const Message = require('../../../dest/message').default;
+import Message from '../../../dest/message.js';
 import alias from '../../../dest/systems/alias.js';
-const cooldown = (require('../../../dest/systems/cooldown')).default;
+import cooldown from '../../../dest/systems/cooldown.js'
 import customcommands from '../../../dest/systems/customcommands.js';
 const ranks = (require('../../../dest/systems/ranks')).default;
 import { db } from '../../general.js';

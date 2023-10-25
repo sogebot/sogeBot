@@ -4,14 +4,14 @@ import('../../general.js');
 
 import assert from 'assert';
 
-const _ = require('lodash');
-const { IsNull } = require('typeorm');
+import _ from 'lodash-es';
+import { IsNull } from 'typeorm.js.js';
 import { AppDataSource } from '../../../dest/database.js';
 
-const { Raffle } = require('../../../dest/database/entity/raffle');
+import { Raffle } from '../../../dest/database/entity/raffle.js.js';
 import { User } from '../../../dest/database/entity/user.js';
-const { getOwnerAsSender } = require('../../../dest/helpers/commons/getOwnerAsSender');
-const raffles = (require('../../../dest/systems/raffles')).default;
+import { getOwnerAsSender } from '../../../dest/helpers/commons/getOwnerAsSender.js.js';
+import raffles from '../../../dest/systems/raffles.js';
 import { db } from '../../general.js';
 import { message } from '../../general.js';
 

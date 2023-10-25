@@ -8,8 +8,8 @@ const moderation = (require('../../../dest/systems/moderation')).default;
 import { db } from '../../general.js';
 const variable = require('../../general.js').variable;
 import { message } from '../../general.js';
-const user = require('../../general.js').user;
-const time = require('../../general.js').time;
+import { user } from '../../general.js';
+import { time } from '../../general.js';
 
 describe('systems/moderation - Emotes() - @func2', () => {
   const cEmotesEmojisAreEmotes = { message: '😀 😁 😂 🤣 😃 😄 😅 😆 😉 😊 😋 😎 😍 😘 😗 😙 😚 🙂 🤗 🤩 🤔 🤨 😐 😑 😶 🙄 😏 😣 😥 😮 🤐 😯 😪 😫 😴 😌 😛 😜 😝 🤤 😒 😓 😔 😕 🙃 🤑 😲 ☹️ 🙁 😖 😞 😟 😤 😢 😭 😦 😧 😨 😩 🤯 😬 😰 😱', sender: user.viewer };

@@ -9,8 +9,8 @@ const ignoredUser = { userId: String(Math.floor(Math.random() * 100000)), userNa
 const user = { userId: String(Math.floor(Math.random() * 100000)), userName: 'user1' };
 
 import { User } from '../../../dest/database/entity/user.js';
-const { prepare } = require('../../../dest/helpers/commons/prepare');
-const Message = require('../../../dest/message').default;
+import { prepare } from '../../../dest/helpers/commons/prepare.js.js';
+import Message from '../../../dest/message.js';
 import { db } from '../../general.js';
 const msg = require('../../general.js').message;
 

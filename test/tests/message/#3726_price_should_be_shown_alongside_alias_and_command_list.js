@@ -6,13 +6,13 @@ import { db, message, user } from '../../general.js';
 import assert from 'assert';
 import { AppDataSource } from '../../../dest/database.js';
 
-const Message = require('../../../dest/message').default;
+import Message from '../../../dest/message.js';
 import alias from '../../../dest/systems/alias.js';
 import customcommands from '../../../dest/systems/customcommands.js';
 const price = (require('../../../dest/systems/price')).default;
 const owner = { userName: '__broadcaster__', userId: String(Math.floor(Math.random() * 100000)) };
 
-const { Price } = require('../../../dest/database/entity/price');
+import { Price } from '../../../dest/database/entity/price.js.js';
 
 describe('Message - #3726 - price should be shown alongside alias and command list - @func3', () => {
   before(async () => {

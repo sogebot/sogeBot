@@ -3,12 +3,12 @@ import { AppDataSource } from '../../../dest/database.js';
 
 import('../../general.js');
 const currency = require('../../../dest/currency').default;
-const { Permissions, PermissionCommands } = require('../../../dest/database/entity/permissions');
-const { User, UserBit, UserTip } = require('../../../dest/database/entity/user');
-const rates = require('../../../dest/helpers/currency/rates').default;
+import { Permissions, PermissionCommands } from '../../../dest/database/entity/permissions.js.js';
+import { User, UserBit, UserTip } from '../../../dest/database/entity/user.js.js';
+import rates from '../../../dest/helpers/currency/rates.js';
 import { defaultPermissions } from '../../../dest/helpers/permissions/defaultPermissions.js';
-const { check } = require('../../../dest/helpers/permissions/check');
-const { serialize } = require('../../../dest/helpers/type');
+import { check } from '../../../dest/helpers/permissions/check.js.js';
+import { serialize } from '../../../dest/helpers/type.js.js';
 import { Parser } from '../../../dest/parser.js';
 import { db } from '../../general.js';
 import { message } from '../../general.js';

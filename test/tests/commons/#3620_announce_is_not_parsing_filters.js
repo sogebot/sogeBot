@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
+
 import('../../general.js');
 
 import { db } from '../../general.js';

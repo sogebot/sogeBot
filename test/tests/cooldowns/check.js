@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
+
 /* global */
 
 import('../../general.js');
@@ -6,11 +6,11 @@ import('../../general.js');
 import assert from 'assert';
 import { AppDataSource } from '../../../dest/database.js';
 
-const { Cooldown } = require('../../../dest/database/entity/cooldown');
-const { Keyword } = require('../../../dest/database/entity/keyword');
+import { Cooldown } from '../../../dest/database/entity/cooldown.js.js';
+import { Keyword } from '../../../dest/database/entity/keyword.js.js';
 import { User } from '../../../dest/database/entity/user.js';
-const gamble = (require('../../../dest/games/gamble')).default;
-const cooldown = (require('../../../dest/systems/cooldown')).default;
+import gamble from '../../../dest/games/gamble.js';
+import cooldown from '../../../dest/systems/cooldown.js'
 import customcommands from '../../../dest/systems/customcommands.js';
 import { db } from '../../general.js';
 import { message } from '../../general.js';

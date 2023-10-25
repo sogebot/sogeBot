@@ -5,7 +5,7 @@ import { AppDataSource } from '../../../dest/database.js';
 import('../../general.js');
 
 import { User } from '../../../dest/database/entity/user.js';
-const users = (require('../../../dest/users')).default;
+import users from '../../../dest/users.js';
 import { db } from '../../general.js';
 import { message } from '../../general.js';
 

@@ -2,7 +2,7 @@ import('../../general.js');
 
 import assert from 'assert';
 
-const { prepare } = require('../../../dest/helpers/commons/prepare');
+import { prepare } from '../../../dest/helpers/commons/prepare.js.js';
 const permissions = (require('../../../dest/permissions')).default;
 import { db } from '../../general.js';
 import { message } from '../../general.js';

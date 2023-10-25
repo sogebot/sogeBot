@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
+
 /* global describe it before */
 
 
@@ -9,7 +9,7 @@ import assert from 'assert';
 import { AppDataSource } from '../../../dest/database.js';
 import { message } from '../../general.js';
 
-const { Quotes } = require('../../../dest/database/entity/quotes');
+import { Quotes } from '../../../dest/database/entity/quotes.js.js';
 
 const quotes = (require('../../../dest/systems/quotes')).default;
 

@@ -8,12 +8,12 @@ import('../../general.js');
 import { db } from '../../general.js';
 import { message } from '../../general.js';
 
-const timers = (require('../../../dest/systems/timers')).default;
+import timers from '../../../dest/systems/timers.js';
 const isStreamOnline = (require('../../../dest/helpers/api/isStreamOnline')).isStreamOnline;
 
-const { Timer, TimerResponse } = require('../../../dest/database/entity/timer');
+import { Timer, TimerResponse } from '../../../dest/database/entity/timer.js.js';
 
-const { linesParsed } = require('../../../dest/helpers/parser');
+import { linesParsed } from '../../../dest/helpers/parser.js.js';
 
 describe('Timers - disabled response should not be sent to chat - https://discord.com/channels/317348946144002050/619437014001123338/794910249910796288 - @func2', () => {
   before(async () => {

@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
+
 import('../../general.js');
 
 import { db } from '../../general.js';
@@ -6,7 +6,7 @@ import { message } from '../../general.js';
 import assert from 'assert';
 
 import { User } from '../../../dest/database/entity/user.js';
-const { Keyword } = require('../../../dest/database/entity/keyword');
+import { Keyword } from '../../../dest/database/entity/keyword.js.js';
 import { AppDataSource } from '../../../dest/database.js';
 
 const keywords = (require('../../../dest/systems/keywords')).default;

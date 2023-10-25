@@ -1,16 +1,16 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
+
 /* global */
 
 import('../../general.js');
 import assert from 'assert';
-const { IsNull } = require('typeorm');
+import { IsNull } from 'typeorm.js.js';
 
-const commons = require('../../../dest/commons');
+import * as commons from '../../../dest/commons.js'
 import { AppDataSource } from '../../../dest/database.js';
-const { Raffle } = require('../../../dest/database/entity/raffle');
+import { Raffle } from '../../../dest/database/entity/raffle.js.js';
 import { User } from '../../../dest/database/entity/user.js';
-const changelog = (require('../../../dest/helpers/user/changelog'));
-const raffles = (require('../../../dest/systems/raffles')).default;
+import * as changelog from '../../../dest/user/changelog.js';
+import raffles from '../../../dest/systems/raffles.js';
 import { db, message, user } from '../../general.js';
 
 describe('Raffles - over max limit points not adding to raffle #3547 - @func3', () => {

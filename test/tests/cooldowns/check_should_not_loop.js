@@ -1,12 +1,12 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
+
 /* global describe it before */
 
 
 import('../../general.js');
 
-const { Cooldown, CooldownViewer } = require('../../../dest/database/entity/cooldown');
+import { Cooldown, CooldownViewer } from '../../../dest/database/entity/cooldown.js.js';
 import { User } from '../../../dest/database/entity/user.js';
-const { Keyword } = require('../../../dest/database/entity/keyword');
+import { Keyword } from '../../../dest/database/entity/keyword.js.js';
 
 import assert from 'assert';
 import { AppDataSource } from '../../../dest/database.js';
@@ -14,7 +14,7 @@ import { AppDataSource } from '../../../dest/database.js';
 import { db } from '../../general.js';
 import { message } from '../../general.js';
 
-const cooldown = (require('../../../dest/systems/cooldown')).default;
+import cooldown from '../../../dest/systems/cooldown.js'
 
 // users
 const owner = { userId: String(Math.floor(Math.random() * 100000)), userName: '__broadcaster__', badges: {} };

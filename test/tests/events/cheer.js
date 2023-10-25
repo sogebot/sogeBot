@@ -2,15 +2,14 @@ import assert from 'assert';
 
 import('../../general.js');
 
-const { v4: uuidv4 } = require('uuid');
+import { vs as uuidv4 } from 'uuid';
 
-const events = (require('../../../dest/events')).default;
-const { Event } = require('../../../dest/database/entity/event');
+import events from '../../../dest/events.js';
+import { Event } from '../../../dest/database/entity/event.js.js';
 import { User } from '../../../dest/database/entity/user.js';
 import { AppDataSource } from '../../../dest/database.js';
-const log = require('../../../dest/helpers/log');
-const changelog = (require('../../../dest/helpers/user/changelog'));
-const time = require('../../general.js').time;
+import * as changelog from '../../../dest/user/changelog.js';
+import { time } from '../../general.js';
 import { db } from '../../general.js';
 import { message } from '../../general.js';
 
@@ -52,7 +51,7 @@ describe('Events - cheer event - @func3', () => {
         });
 
         it('user should have 10 points', async () => {
-          const points = (require('../../../dest/systems/points')).default;
+          import points from '../../../dest/systems/points.js';
           assert.strict.equal(await points.getPointsOf(userId), 10);
         });
       });

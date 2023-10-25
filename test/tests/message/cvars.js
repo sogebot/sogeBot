@@ -1,15 +1,15 @@
 /* global describe it before */
 
 import { defaultPermissions } from '../../../dest/helpers/permissions/defaultPermissions.js';
-const { getOwner } = require('../../../dest/helpers/commons/getOwner');
+import { getOwner } from '../../../dest/helpers/commons/getOwner.js.js';
 
 import('../../general.js');
 
 import { db } from '../../general.js';
 const msg = require('../../general.js').message;
-const Message = require('../../../dest/message').default;
+import Message from '../../../dest/message.js';
 import assert from 'assert';
-const _ = require('lodash');
+import _ from 'lodash-es';
 
 import { User } from '../../../dest/database/entity/user.js';
 import { Variable } from '../../../dest/database/entity/variable.js';

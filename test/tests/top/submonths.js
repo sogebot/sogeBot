@@ -1,18 +1,18 @@
 /* global describe it before */
-const { getOwner } = require('../../../dest/helpers/commons/getOwner');
+import { getOwner } from '../../../dest/helpers/commons/getOwner.js.js';
 
 import('../../general.js');
 
 import { db } from '../../general.js';
 import { message } from '../../general.js';
 
-const top = (require('../../../dest/systems/top')).default;
+import top from '../../../dest/systems/top.js';
 
-const { prepare } = require('../../../dest/helpers/commons/prepare');
+import { prepare } from '../../../dest/helpers/commons/prepare.js.js';
 import { User } from '../../../dest/database/entity/user.js';
 import assert from 'assert';
 import { AppDataSource } from '../../../dest/database.js'
-const twitch = require('../../../dest/services/twitch.js').default;
+import twitch from '../../../dest/services/twitch.js';
 
 // users
 const owner = { userName: '__broadcaster__' };

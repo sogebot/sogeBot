@@ -5,7 +5,7 @@ import('../../general.js');
 
 import { db } from '../../general.js';
 import { message } from '../../general.js';
-const runScript = (require('../../../dest/helpers/customvariables/runScript')).runScript;
+import { runScript } from '../../../dest/helpers/customvariables/runScript.js';
 import assert from 'assert';
 
 describe('Custom Variable - #3820 - For loop should work corectly - @func1', () => {

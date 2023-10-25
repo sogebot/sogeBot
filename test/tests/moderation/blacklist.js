@@ -6,9 +6,9 @@ import('../../general.js');
 import { db } from '../../general.js';
 const variable = require('../../general.js').variable;
 import { message } from '../../general.js';
-const user = require('../../general.js').user;
+import { user } from '../../general.js';
 
-const _ = require('lodash');
+import _ from 'lodash-es';
 import assert from 'assert';
 
 const moderation = (require('../../../dest/systems/moderation')).default;

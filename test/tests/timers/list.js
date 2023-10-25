@@ -5,14 +5,14 @@ import { db } from '../../general.js';
 import assert from 'assert';
 import { message } from '../../general.js';
 
-const timers = (require('../../../dest/systems/timers')).default;
+import timers from '../../../dest/systems/timers.js';
 
-const { linesParsed } = require('../../../dest/helpers/parser');
+import { linesParsed } from '../../../dest/helpers/parser.js.js';
 
 // users
 const owner = { userName: '__broadcaster__' };
 
-const { Timer, TimerResponse } = require('../../../dest/database/entity/timer');
+import { Timer, TimerResponse } from '../../../dest/database/entity/timer.js.js';
 import { AppDataSource } from '../../../dest/database.js';
 
 describe('Timers - list() - @func2', () => {

@@ -1,10 +1,10 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
+
 /* global */
 import assert from 'assert';
 import { AppDataSource } from '../../../dest/database.js'
 
-const { SongRequest, SongPlaylist } = require('../../../dest/database/entity/song');
-const user = require('../../general.js').user;
+import { SongRequest, SongPlaylist } from '../../../dest/database/entity/song.js.js';
+import { user } from '../../general.js';
 import { db } from '../../general.js';
 import { message } from '../../general.js';
 

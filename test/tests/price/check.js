@@ -2,9 +2,9 @@ import('../../general.js');
 
 import assert from 'assert';
 
-const _ = require('lodash');
+import _ from 'lodash-es';
 
-const { Price } = require('../../../dest/database/entity/price');
+import { Price } from '../../../dest/database/entity/price.js.js';
 import { User } from '../../../dest/database/entity/user.js';
 import { AppDataSource } from '../../../dest/database.js';
 import alias from '../../../dest/systems/alias.js';

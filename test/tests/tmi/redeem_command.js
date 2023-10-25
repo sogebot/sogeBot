@@ -1,16 +1,14 @@
 import('../../general.js');
 
-const until = require('test-until');
-
 const cheer = (require('../../../dest/helpers/events/cheer')).cheer;
 const translate = require('../../../dest/translate').translate;
 import { db } from '../../general.js';
 import { message } from '../../general.js';
-const time = require('../../general.js').time;
-const { Price } = require('../../../dest/database/entity/price');
+import { time } from '../../general.js';
+import { Price } from '../../../dest/database/entity/price.js.js';
 import customcommands from '../../../dest/systems/customcommands.js';
 
-const { getLocalizedName } = require('@sogebot/ui-helpers/getLocalized');
+import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized.js.js';
 
 import assert from 'assert';
 

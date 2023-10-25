@@ -1,8 +1,8 @@
 import assert from 'assert';
 
-const { getLocalizedName } = require('@sogebot/ui-helpers/getLocalized');
+import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized.js.js';
 
-const { translate } = require('../../../dest/translate');
+import { translate } from '../../../dest/translate.js.js';
 import('../../general.js');
 import { db, message, user } from '../../general.js';
 
@@ -21,7 +21,7 @@ describe('Emotes - combo - @func2', () => {
       await db.cleanup();
       await message.prepare();
       await user.prepare();
-      emotes = (require('../../../dest/systems/emotescombo')).default;
+      emotes = await import('../../../dest/systems/emotescombo.js');
       emotes.enableEmotesCombo = true;
       emotes.comboEmoteCount = 0;
     });
@@ -68,7 +68,7 @@ describe('Emotes - combo - @func2', () => {
       await db.cleanup();
       await message.prepare();
       await user.prepare();
-      emotes = (require('../../../dest/systems/emotescombo')).default;
+      emotes = await import('../../../dest/systems/emotescombo.js');
       emotes.enableEmotesCombo = true;
       emotes.comboEmoteCount = 0;
     });
@@ -129,7 +129,7 @@ describe('Emotes - combo - @func2', () => {
       await db.cleanup();
       await message.prepare();
       await user.prepare();
-      emotes = (require('../../../dest/systems/emotescombo')).default;
+      emotes = await import('../../../dest/systems/emotescombo.js');
       emotes.comboLastBreak = 0;
       emotes.enableEmotesCombo = true;
       emotes.comboCooldown = 60;

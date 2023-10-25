@@ -7,11 +7,11 @@ import { message } from '../../general.js';
 import assert from 'assert';
 
 import { defaultPermissions } from '../../../dest/helpers/permissions/defaultPermissions.js';
-const { check } = require('../../../dest/helpers/permissions/check');
+import { check } from '../../../dest/helpers/permissions/check.js.js';
 import { Parser } from '../../../dest/parser.js';
 const currency = require('../../../dest/currency').default;
 
-const { Permissions, PermissionCommands } = require('../../../dest/database/entity/permissions');
+import { Permissions, PermissionCommands } from '../../../dest/database/entity/permissions.js.js';
 import { User } from '../../../dest/database/entity/user.js';
 import { AppDataSource } from '../../../dest/database.js';
 

@@ -1,10 +1,10 @@
 /* global describe it before */
 import assert from 'assert';
 
-const { getLocalizedName } = require('@sogebot/ui-helpers/getLocalized');
+import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized.js.js';
 
 const getBotUserName = require('../../../dest/helpers/user/getBotUserName').default;
-const { translate } = require('../../../dest/translate');
+import { translate } from '../../../dest/translate.js.js';
 import('../../general.js');
 import { db } from '../../general.js';
 import { message } from '../../general.js';

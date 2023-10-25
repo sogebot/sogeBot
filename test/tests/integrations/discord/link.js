@@ -1,12 +1,12 @@
 import assert from 'assert';
 
-const { MINUTE } = require('@sogebot/ui-helpers/constants');
-const { v4 } = require('uuid');
+import { MINUTE } from '@sogebot/ui-helpers/constants.js.js';
+import { v4 } from 'uuid'
 
 require('../../../general.js');
 
-const { DiscordLink } = require('../../../../dest/database/entity/discord');
-const { AppDataSource } = require('../../../../dest/database.js');
+import { DiscordLink } from '../../../../dest/database/entity/discord.js.js';
+import { AppDataSource } from '../../../../dest/database.js.js.js';
 const discord = (require('../../../../dest/integrations/discord')).default;
 const db = require('../../../general.js').db;
 const message = require('../../../general.js').message;

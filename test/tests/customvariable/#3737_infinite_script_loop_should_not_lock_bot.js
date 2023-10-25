@@ -1,7 +1,7 @@
 import('../../general.js');
 import assert from 'assert';
 
-const runScript = (require('../../../dest/helpers/customvariables/runScript')).runScript;
+import { runScript } from '../../../dest/helpers/customvariables/runScript.js';
 import { db } from '../../general.js';
 import { message } from '../../general.js';
 

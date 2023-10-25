@@ -1,7 +1,7 @@
 /* global describe it before */
 import assert from 'assert';
 
-const _ = require('lodash');
+import _ from 'lodash-es';
 import('../../general.js');
 
 import alias from '../../../dest/systems/alias.js';

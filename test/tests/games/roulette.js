@@ -1,17 +1,17 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
+
 /* global */
 
 import('../../general.js');
 
 import assert from 'assert';
 
-const _ = require('lodash');
+import _ from 'lodash-es';
 import { AppDataSource } from '../../../dest/database.js';
 
 import { User } from '../../../dest/database/entity/user.js';
-const roulette = (require('../../../dest/games/roulette')).default;
-const changelog = (require('../../../dest/helpers/user/changelog'));
-const points = (require('../../../dest/systems/points')).default;
+import roulette from '../../../dest/games/roulette.js';
+import * as changelog from '../../../dest/user/changelog.js';
+import points from '../../../dest/systems/points.js';
 import { db, message, user } from '../../general.js';
 
 const tests = [

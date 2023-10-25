@@ -3,13 +3,12 @@ import('../../general.js');
 import assert from 'assert';
 import { AppDataSource } from '../../../dest/database.js';
 
-const { Cooldown } = require('../../../dest/database/entity/cooldown');
-const { Price } = require('../../../dest/database/entity/price');
+import { Cooldown } from '../../../dest/database/entity/cooldown.js.js';
+import { Price } from '../../../dest/database/entity/price.js.js';
 import { User } from '../../../dest/database/entity/user.js';
 import { Parser } from '../../../dest/parser.js';
-const cooldown = (require('../../../dest/systems/cooldown')).default;
-import { db, message, user } from '../../general.js';
-const time = require('../../general.js').time;
+import cooldown from '../../../dest/systems/cooldown.js'
+import { db, message, user, time } from '../../general.js';
 
 describe('Cooldowns - @func3 - #3720 - global cooldown should be properly reverted', () => {
   before(async () => {

@@ -8,8 +8,8 @@ const moderation = (require('../../../dest/systems/moderation')).default;
 import { db } from '../../general.js';
 const variable = require('../../general.js').variable;
 import { message } from '../../general.js';
-const time = require('../../general.js').time;
-const user = require('../../general.js').user;
+import { time } from '../../general.js';
+import { user } from '../../general.js';
 
 const tests = {
   'timeout': [

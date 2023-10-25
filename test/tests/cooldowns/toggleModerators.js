@@ -5,10 +5,9 @@ import assert from 'assert';
 import { AppDataSource } from '../../../dest/database.js';
 
 import { db } from '../../general.js';
-import { message } from '../../general.js';
-const url = require('../../general.js').url;
+import { message, url } from '../../general.js';
 
-const cooldown = (require('../../../dest/systems/cooldown')).default;
+import cooldown from '../../../dest/systems/cooldown.js'
 
 import { User } from '../../../dest/database/entity/user.js';
 

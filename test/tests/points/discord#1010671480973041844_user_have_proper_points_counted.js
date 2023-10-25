@@ -4,7 +4,7 @@ import { AppDataSource } from '../../../dest/database.js'
 
 import { User } from '../../../dest/database/entity/user.js';
 const changelog = require('../../../dest/helpers/user/changelog');
-const points = (require('../../../dest/systems/points')).default;
+import points from '../../../dest/systems/points.js';
 import('../../general.js');
 import { db, message, user } from '../../general.js';
 

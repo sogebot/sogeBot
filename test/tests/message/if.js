@@ -3,7 +3,7 @@ import('../../general.js');
 
 import { db } from '../../general.js';
 const msg = require('../../general.js').message;
-const Message = require('../../../dest/message').default;
+import Message from '../../../dest/message.js';
 import assert from 'assert';
 
 describe('Message - if filter - @func3', () => {

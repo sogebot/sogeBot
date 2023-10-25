@@ -6,12 +6,11 @@ import { Parser } from '../../../dest/parser.js';
 import('../../general.js');
 
 import { db } from '../../general.js';
-import { message } from '../../general.js';
+import { message, user } from '../../general.js';
 import customcommands from '../../../dest/systems/customcommands.js';
-const user = require('../../general.js').user;
 
 import assert from 'assert';
-const _ = require('lodash');
+import _ from 'lodash-es';
 
 import { Variable } from '../../../dest/database/entity/variable.js';
 import { AppDataSource } from '../../../dest/database.js'

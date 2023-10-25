@@ -5,7 +5,7 @@ import('../../general.js');
 import { db, message, user } from '../../general.js';
 
 import assert from 'assert';
-const userinfo = (require('../../../dest/systems/userinfo')).default;
+import userinfo from '../../../dest/systems/userinfo.js'
 
 describe('Userinfo - stats() - @func3', () => {
   beforeEach(async () => {
