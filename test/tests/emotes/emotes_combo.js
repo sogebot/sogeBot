@@ -17,10 +17,7 @@ describe('Emotes - combo - @func2', () => {
   let emotes = null;
   beforeEach(async () => {
     await db.cleanup();
-    await message.prepare();
-    await user.prepare();
     emotes = (await import('../../../dest/systems/emotescombo.js')).default
-    emotes.comboEmoteCount = 0;
   });
   describe('Emotes combo should send proper message after 3 emotes', () => {
     let comboLastBreak = 0;
