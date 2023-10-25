@@ -13,7 +13,7 @@ import {
   parser,
   timer,
 } from '../decorators.js';
-import Expects from '../expects.js';
+import { Expects } from  '../expects.js';
 
 import { checkFilter } from '~/helpers/checkFilter.js';
 import {

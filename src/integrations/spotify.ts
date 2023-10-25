@@ -14,7 +14,7 @@ import {
 import {
   command, default_permission, persistent, settings,
 } from '../decorators.js';
-import Expects from '../expects.js';
+import { Expects } from  '../expects.js';
 
 import { isStreamOnline } from '~/helpers/api/index.js';
 import { CommandError } from '~/helpers/commandError.js';

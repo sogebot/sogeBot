@@ -7,7 +7,7 @@ import { EntityNotFoundError } from 'typeorm';
 import System from './_interface.js';
 import { onStartup } from '../decorators/on.js';
 import { command, default_permission } from '../decorators.js';
-import Expects from '../expects.js';
+import { Expects } from  '../expects.js';
 
 import { AppDataSource } from '~/database.js';
 import {

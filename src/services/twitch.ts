@@ -19,7 +19,7 @@ import { onChange, onLoad, onStreamStart } from '../decorators/on.js';
 import {
   command, default_permission, example, persistent, settings,
 } from '../decorators.js';
-import Expects from '../expects.js';
+import { Expects } from  '../expects.js';
 import { debug, error, info } from '../helpers/log.js';
 
 import { AppDataSource } from '~/database.js';

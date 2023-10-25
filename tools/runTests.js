@@ -1,7 +1,8 @@
-require('dotenv').config();
+import dotenv from 'dotenv';
+dotenv.config();
 
-const child_process = require('child_process');
-const fs = require('fs');
+import child_process from 'child_process'
+import fs from 'fs'
 
 let status = 0;
 async function retest() {

@@ -8,7 +8,7 @@ import { merge, sortBy } from 'lodash-es';
 
 import System from './_interface.js';
 import { command, default_permission } from '../decorators.js';
-import Expects from '../expects.js';
+import { Expects } from  '../expects.js';
 
 import { onStartup } from '~/decorators/on.js';
 import { isStreamOnline } from '~/helpers/api/index.js';

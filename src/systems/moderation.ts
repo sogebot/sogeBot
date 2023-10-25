@@ -5,8 +5,8 @@ import { ModerationPermit, ModerationWarning } from '@entity/moderation.js';
 import * as constants from '@sogebot/ui-helpers/constants.js';
 import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized.js';
 import emojiRegex from 'emoji-regex';
+import { TLDs } from 'global-tld-list';
 import * as _ from 'lodash-es';
-import tlds from 'tlds';
 import { LessThan } from 'typeorm';
 import XRegExp from 'xregexp';
 
@@ -15,9 +15,9 @@ import { parserReply } from '../commons.js';
 import {
   command, default_permission, parser, permission_settings, settings, ui,
 } from '../decorators.js';
-import Expects from '../expects.js';
+import { Expects } from  '../expects.js';
 import spotify from '../integrations/spotify.js';
-import Message from '../message.js';
+import { Message } from  '../message.js';
 import users from '../users.js';
 
 import { AppDataSource } from '~/database.js';
@@ -35,6 +35,8 @@ import banUser from '~/services/twitch/calls/banUser.js';
 import aliasSystem from '~/systems/alias.js';
 import songs from '~/systems/songs.js';
 import { translate } from '~/translate.js';
+
+const tlds = [...TLDs.tlds.keys()];
 
 const urlRegex = [
   new RegExp(`(www)? ??\\.? ?[a-zA-Z0-9]+([a-zA-Z0-9-]+) ??\\. ?(${tlds.join('|')})(?=\\P{L}|$)`, 'igu'),

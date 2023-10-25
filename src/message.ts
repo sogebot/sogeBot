@@ -32,7 +32,7 @@ import { translate } from '~/translate.js';
   });
 })();
 
-class Message {
+export class Message {
   message = '';
   id = v4();
 
@@ -262,6 +262,3 @@ class Message {
     }
   }
 }
-
-export { Message };
-export default Message;

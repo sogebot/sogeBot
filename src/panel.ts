@@ -39,7 +39,7 @@ import { list } from '~/helpers/register.js';
 import { adminEndpoint } from '~/helpers/socket.js';
 import { tmiEmitter } from '~/helpers/tmi/index.js';
 import * as changelog from '~/helpers/user/changelog.js';
-import Parser from '~/parser.js';
+import { Parser } from '~/parser.js';
 import { getGameThumbnailFromName } from '~/services/twitch/calls/getGameThumbnailFromName.js';
 import { sendGameFromTwitch } from '~/services/twitch/calls/sendGameFromTwitch.js';
 import { updateChannelInfo } from '~/services/twitch/calls/updateChannelInfo.js';

@@ -1,7 +1,8 @@
 Error.stackTraceLimit = Infinity;
 
-import dotenv from 'dotenv';
 import 'reflect-metadata';
+
+import dotenv from 'dotenv';
 
 dotenv.config();
 
@@ -71,54 +72,48 @@ async function main () {
   try {
     // Initialize all core singletons
     setTimeout(async () => {
-      try {
-        console.log('Translation loading');
-        const translate = await import('./translate.js');
-        console.log('Translation loaded');
+      const translate = (await import('./translate.js')).default;
 
-        translate.default._load().then(async () => {
-          await import('./general.js');
-          await import('./socket.js');
-          await import('./ui.js');
-          await import('./currency.js');
-          await import('./stats.js');
-          await import('./users.js');
-          await import('./events.js');
-          await import('./plugins.js');
-          await import('./customvariables.js');
-          await import('./permissions.js');
-          await import('./dashboard.js');
-          await import('./tts.js');
-          await import('./emotes.js');
-          await import('./panel.js');
-          await autoLoad('./dest/stats/');
-          await autoLoad('./dest/registries/');
-          await autoLoad('./dest/systems/');
-          await autoLoad('./dest/widgets/');
-          await autoLoad('./dest/overlays/');
-          await autoLoad('./dest/games/');
-          await autoLoad('./dest/integrations/');
-          await autoLoad('./dest/services/');
+      translate._load().then(async () => {
+        await import('./general.js');
+        await import('./socket.js');
+        await import('./ui.js');
+        await import('./currency.js');
+        await import('./stats.js');
+        await import('./users.js');
+        await import('./events.js');
+        await import('./plugins.js');
+        await import('./customvariables.js');
+        await import('./permissions.js');
+        await import('./dashboard.js');
+        await import('./tts.js');
+        await import('./emotes.js');
+        await import('./panel.js');
+        await autoLoad('./dest/stats/');
+        await autoLoad('./dest/registries/');
+        await autoLoad('./dest/systems/');
+        await autoLoad('./dest/widgets/');
+        await autoLoad('./dest/overlays/');
+        await autoLoad('./dest/games/');
+        await autoLoad('./dest/integrations/');
+        await autoLoad('./dest/services/');
 
-          setTimeout(() => {
-            if (existsSync('~/restart.pid')) {
-              unlinkSync('~/restart.pid');
-            }
-            setIsBotStarted();
-            startWatcher();
+        setTimeout(() => {
+          if (existsSync('~/restart.pid')) {
+            unlinkSync('~/restart.pid');
+          }
+          setIsBotStarted();
+          startWatcher();
 
-            if (isDebugEnabled('eventloop')) {
-              warning('EVENTLOOP BLOCK DETECTION ENABLED! This may cause some performance issues.');
-              blocked((time: any, stack: any) => {
-                error(`EVENTLOOP BLOCK !!! Blocked for ${time}ms, operation started here:`);
-                error(stack);
-              }, { threshold: 1000 });
-            }
-          }, 30000);
-        });
-      } catch(e) {
-        console.log((e as any).stack);
-      }
+          if (isDebugEnabled('eventloop')) {
+            warning('EVENTLOOP BLOCK DETECTION ENABLED! This may cause some performance issues.');
+            blocked((time: any, stack: any) => {
+              error(`EVENTLOOP BLOCK !!! Blocked for ${time}ms, operation started here:`);
+              error(stack);
+            }, { threshold: 1000 });
+          }
+        }, 30000);
+      });
     }, 5000);
   } catch (e: any) {
     error(e);

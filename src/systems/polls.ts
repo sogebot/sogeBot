@@ -8,7 +8,7 @@ import {
 import {
   command, default_permission,
 } from '../decorators.js';
-import Expects from '../expects.js';
+import { Expects } from  '../expects.js';
 
 import * as channelPoll from '~/helpers/api/channelPoll.js';
 import { error } from '~/helpers/log.js';

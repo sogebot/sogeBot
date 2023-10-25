@@ -1,6 +1,6 @@
 import { error, warning } from '~/helpers/log.js';
 
-const systems = {
+export const systems = {
   core:         [],
   systems:      [],
   integrations: [],
@@ -11,19 +11,32 @@ const systems = {
   stats:        [],
   services:     [],
 } as {
-  core:         import('../_interface').Module[],
-  systems:      import('../_interface').Module[],
-  integrations: import('../_interface').Module[],
-  games:        import('../_interface').Module[],
-  widgets:      import('../_interface').Module[],
-  registries:   import('../_interface').Module[],
-  overlays:     import('../_interface').Module[],
-  stats:        import('../_interface').Module[],
-  services:     import('../_interface').Module[],
+  core:         import('../_interface.js').Module[],
+  systems:      import('../_interface.js').Module[],
+  integrations: import('../_interface.js').Module[],
+  games:        import('../_interface.js').Module[],
+  widgets:      import('../_interface.js').Module[],
+  registries:   import('../_interface.js').Module[],
+  overlays:     import('../_interface.js').Module[],
+  stats:        import('../_interface.js').Module[],
+  services:     import('../_interface.js').Module[],
 };
 
-export const register = (type: keyof typeof systems, system: import('../_interface').Module) => {
+export const register = (type: keyof typeof systems, system: import('../_interface.js').Module) => {
   systems[type].push(system);
+};
+
+export const list = (type?: keyof typeof systems) => {
+  if (!type) {
+    const _list: import('../_interface.js').Module[] = [];
+    for (const key of Object.keys(systems) as (keyof typeof systems)[]) {
+      for (const mod of systems[key]) {
+        _list.push(mod);
+      }
+    }
+    return _list;
+  }
+  return systems[type];
 };
 
 export const find = (type: keyof typeof systems, name: string) => {
@@ -40,17 +53,4 @@ export const find = (type: keyof typeof systems, name: string) => {
       error(e);
     }
   });
-};
-
-export const list = (type?: keyof typeof systems) => {
-  if (!type) {
-    const _list: import('../_interface').Module[] = [];
-    for (const key of Object.keys(systems) as (keyof typeof systems)[]) {
-      for (const mod of systems[key]) {
-        _list.push(mod);
-      }
-    }
-    return _list;
-  }
-  return systems[type];
 };

@@ -9,9 +9,9 @@ import { parserReply } from '../commons.js';
 import {
   command, default_permission, parser, timer,
 } from '../decorators.js';
-import Expects from '../expects.js';
+import { Expects } from  '../expects.js';
 import { isValidationError } from '../helpers/errors.js';
-import Parser from '../parser.js';
+import { Parser } from '../parser.js';
 
 import { AppDataSource } from '~/database.js';
 import { checkFilter } from '~/helpers/checkFilter.js';

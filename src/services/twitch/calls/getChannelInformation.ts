@@ -1,4 +1,3 @@
-import { rawDataSymbol } from '@twurple/common';
 import { isEqual } from 'lodash-es';
 
 import { CacheTitles } from '~/database/entity/cacheTitles.js';
@@ -23,7 +22,6 @@ export async function getChannelInformation (opts: any) {
   try {
     const broadcasterId = variables.get('services.twitch.broadcasterId') as string;
     const getChannelInfo = await twitch.apiClient?.asIntent(['bot'], ctx => ctx.channels.getChannelInfoById(broadcasterId));
-
     if (!getChannelInfo) {
       throw new Error(`Channel ${broadcasterId} not found on Twitch`);
     }
@@ -73,7 +71,7 @@ export async function getChannelInformation (opts: any) {
 
       apiStats.value.language = getChannelInfo.language;
       apiStats.value.currentTags = getChannelInfo.tags;
-      apiStats.value.contentClasificationLabels = getChannelInfo[rawDataSymbol].content_classification_labels;
+      apiStats.value.contentClasificationLabels = getChannelInfo.contentClassificationLabels;
       apiStats.value.currentGame = getChannelInfo.gameName;
       apiStats.value.currentTitle = getChannelInfo.title;
       apiStats.value.channelDisplayName = getChannelInfo.displayName;

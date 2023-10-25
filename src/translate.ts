@@ -1,15 +1,14 @@
-'use strict';
-
 import fs from 'fs';
 import { normalize } from 'path';
 
 import { glob } from 'glob';
-import { set, isNil, remove, cloneDeep, get, each, isUndefined } from 'lodash-es';
+import { set, isNil, remove, isUndefined, cloneDeep, each, get } from 'lodash-es';
+
+import { areDecoratorsLoaded } from './decorators.js';
 
 import { Settings } from '~/database/entity/settings.js';
 import { Translation } from '~/database/entity/translation.js';
 import { AppDataSource } from '~/database.js';
-import { areDecoratorsLoaded } from '~/decorators.js';
 import { flatten } from '~/helpers/flatten.js';
 import { getLang, setLang } from '~/helpers/locales.js';
 import { error, warning } from '~/helpers/log.js';
@@ -62,7 +61,7 @@ class Translate {
 
           // dayjs locale include
           for(const key of Object.keys(this.translations)) {
-            require('dayjs/locale/' + key);
+            import(`dayjs/locale/${key}.js`);
           }
 
           for (const c of this.custom) {
@@ -90,7 +89,7 @@ class Translate {
     }
   }
 
-  translate (text: string | { root: string }, orig = false) {
+  translate (text: string | { root: string }, orig = false): any {
     if (!translate_class.isLoaded) {
       const stack = (new Error('Translations are not yet loaded.')).stack;
       warning(stack);
@@ -106,7 +105,6 @@ class Translate {
     } else if (typeof text !== 'undefined') {
       return translate_class.get(text, orig);
     }
-    return null;
   }
 
   get (text: string, orig: string | boolean) {

@@ -1,7 +1,7 @@
 import { SECOND } from '@sogebot/ui-helpers/constants.js';
 
 import Registry from './_interface.js';
-import Message from '../message.js';
+import { Message } from  '../message.js';
 
 import { Goal, Overlay } from '~/database/entity/overlay.js';
 import { AppDataSource } from '~/database.js';

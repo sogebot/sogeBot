@@ -12,7 +12,7 @@ import {
 } from '../decorators.js';
 import { parser } from '../decorators.js';
 import general from '../general.js';
-import Parser from '../parser.js';
+import { Parser } from '../parser.js';
 
 import { AppDataSource } from '~/database.js';
 import { prepare } from '~/helpers/commons/index.js';

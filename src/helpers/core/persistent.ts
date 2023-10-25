@@ -40,7 +40,6 @@ function persistent<T>({ value, name, namespace, onChange }: { value: T, name: s
       return Reflect.set(target, prop, receiver);
     },
   });
-
   toggleLoadingInProgress(sym);
 
   async function save() {

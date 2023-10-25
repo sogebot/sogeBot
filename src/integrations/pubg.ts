@@ -9,8 +9,8 @@ import { onChange, onStartup } from '../decorators/on.js';
 import {
   command, persistent, settings, ui,
 } from '../decorators.js';
-import Expects from '../expects.js';
-import Message from '../message.js';
+import { Expects } from  '../expects.js';
+import { Message } from  '../message.js';
 
 import { prepare } from '~/helpers/commons/index.js';
 import { flatten } from '~/helpers/flatten.js';

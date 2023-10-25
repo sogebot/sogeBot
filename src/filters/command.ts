@@ -1,5 +1,5 @@
 import { parserReply } from '../commons.js';
-import Parser from '../parser.js';
+import { Parser } from '../parser.js';
 import alias from '../systems/alias.js';
 import customcommands from '../systems/customcommands.js';
 

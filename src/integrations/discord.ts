@@ -19,9 +19,9 @@ import {
   command, persistent, settings,
 } from '../decorators.js';
 import events from '../events.js';
-import Expects from '../expects.js';
+import { Expects } from  '../expects.js';
 import { Message } from '../message.js';
-import Parser from '../parser.js';
+import { Parser } from '../parser.js';
 import users from '../users.js';
 
 import { AppDataSource } from '~/database.js';

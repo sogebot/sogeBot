@@ -4,7 +4,7 @@ import { User } from '~/database/entity/user.js';
 import { AppDataSource } from '~/database.js';
 import { onStartup } from '~/decorators/on.js';
 import { command, default_permission } from '~/decorators.js';
-import Expects from '~/expects.js';
+import { Expects } from  '~/expects.js';
 import { prepare } from '~/helpers/commons/index.js';
 import { error } from '~/helpers/log.js';
 import { check } from '~/helpers/permissions/check.js';

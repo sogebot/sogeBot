@@ -13,8 +13,8 @@ import { onChange } from '../decorators/on.js';
 import {
   command, default_permission, parser, permission_settings, rollback, settings,
 } from '../decorators.js';
-import Expects from '../expects.js';
-import Parser from '../parser.js';
+import { Expects } from  '../expects.js';
+import { Parser } from '../parser.js';
 
 import { AppDataSource } from '~/database.js';
 import { prepare } from '~/helpers/commons/index.js';

@@ -10,7 +10,7 @@ import { parserReply } from '../commons.js';
 import {
   command, default_permission, helper, parser, timer,
 } from '../decorators.js';
-import Expects from '../expects.js';
+import { Expects } from  '../expects.js';
 
 import { AppDataSource } from '~/database.js';
 import { checkFilter } from '~/helpers/checkFilter.js';

@@ -9,7 +9,7 @@ import { minify } from 'terser';
 import { VM } from 'vm2';
 
 import { getAll } from './getAll.js';
-import Message from '../../message.js';
+import { Message } from  '../../message.js';
 import users from '../../users.js';
 import {
   chatMessagesAtStart, isStreamOnline, stats, streamStatusChangeSince,

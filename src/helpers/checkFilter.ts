@@ -26,7 +26,7 @@ import { translate } from '../translate.js';
 
 import { CacheGames } from '~/database/entity/cacheGames.js';
 import { AppDataSource } from '~/database.js';
-import Message from '~/message.js';
+import { Message } from  '~/message.js';
 import { variables as vars } from '~/watchers.js';
 
 class HelpersFilter {

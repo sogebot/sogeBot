@@ -11,7 +11,7 @@ import { command, default_permission, example, persistent, settings } from '../d
 import { parserReply } from '~/commons.js';
 import { User, UserInterface } from '~/database/entity/user.js';
 import { AppDataSource } from '~/database.js';
-import Expects from '~/expects.js';
+import { Expects } from  '~/expects.js';
 import { prepare } from '~/helpers/commons/index.js';
 import { error, debug, info } from '~/helpers/log.js';
 import { app, ioServer } from '~/helpers/panel.js';

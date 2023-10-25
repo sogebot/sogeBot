@@ -5,7 +5,7 @@ import _ from 'lodash-es';
 import Game from './_interface.js';
 import { onStartup } from '../decorators/on.js';
 import { command, settings } from '../decorators.js';
-import Expects from '../expects.js';
+import { Expects } from  '../expects.js';
 import twitch from '../services/twitch.js';
 
 import { AppDataSource } from '~/database.js';

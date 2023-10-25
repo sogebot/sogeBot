@@ -9,7 +9,7 @@ import _ from 'lodash-es';
 import { IsNull } from 'typeorm';
 
 import general from '../general.js';
-import Parser from '../parser.js';
+import { Parser } from '../parser.js';
 
 import type { ResponseFilter } from './index.js';
 

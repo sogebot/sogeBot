@@ -3,7 +3,7 @@ import { isNil } from 'lodash-es';
 
 import Overlay from './_interface.js';
 import { command, default_permission } from '../decorators.js';
-import Message from '../message.js';
+import { Message } from  '../message.js';
 
 import { AppDataSource } from '~/database.js';
 import { debug } from '~/helpers/log.js';

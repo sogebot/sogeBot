@@ -7,7 +7,7 @@ import { onStartup } from '../decorators/on.js';
 import {
   command, default_permission, settings,
 } from '../decorators.js';
-import Expects from '../expects.js';
+import { Expects } from  '../expects.js';
 
 import { AppDataSource } from '~/database.js';
 import { announce } from '~/helpers/commons/announce.js';

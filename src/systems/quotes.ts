@@ -6,7 +6,7 @@ import { merge } from 'lodash-es';
 
 import System from './_interface.js';
 import { command, default_permission } from '../decorators.js';
-import Expects from '../expects.js';
+import { Expects } from  '../expects.js';
 
 import { AppDataSource } from '~/database.js';
 import { prepare } from '~/helpers/commons/index.js';

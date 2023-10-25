@@ -4,7 +4,7 @@ import trigramSimilarity from 'trigram-similarity';
 
 import System from './_interface.js';
 import { command, default_permission } from '../decorators.js';
-import Expects from '../expects.js';
+import { Expects } from  '../expects.js';
 
 import {
   stats,

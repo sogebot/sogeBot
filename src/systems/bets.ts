@@ -4,7 +4,7 @@ import System from './_interface.js';
 import {
   command, default_permission,
 } from '../decorators.js';
-import Expects from '../expects.js';
+import { Expects } from  '../expects.js';
 
 import { onStartup, onStreamStart } from '~/decorators/on.js';
 import * as channelPrediction from '~/helpers/api/channelPrediction.js';

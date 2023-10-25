@@ -17,7 +17,7 @@ declare global {
   }
 }
 
-class Expects {
+export class Expects {
   originalText = '';
   text = '';
   match: any[] = [];
@@ -613,6 +613,3 @@ class Expects {
     return this;
   }
 }
-
-module.exports = Expects;
-export default Expects;

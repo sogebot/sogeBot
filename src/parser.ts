@@ -28,7 +28,7 @@ parserEmitter.on('fireAndForget', async (opts) => {
   });
 });
 
-class Parser {
+export class Parser {
   id = uuid();
   started_at = Date.now();
   message = '';
@@ -351,6 +351,3 @@ class Parser {
     }
   }
 }
-
-export default Parser;
-export { Parser };

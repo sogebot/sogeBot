@@ -1,8 +1,8 @@
-/* eslint-disable no-useless-escape */
-const { spawnSync } = require('child_process');
+import spawnSync from 'child_process';
 
-const gitSemverTags = require('git-semver-tags');
-const argv = require('yargs') // eslint-disable-line
+import gitSemverTags from 'git-semver-tags';
+import argv from 'yargs'
+argv
   .usage('node tools/changelog.js <cmd> [args]')
   .option('escape', {
     description: 'Escapes outpu (useful for github action)',

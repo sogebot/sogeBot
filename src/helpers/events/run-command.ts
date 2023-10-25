@@ -10,7 +10,7 @@ import {
 } from '~/database/entity/event.js';
 import { debug } from '~/helpers/log.js';
 import { parserEmitter } from '~/helpers/parser/index.js';
-import Message from '~/message.js';
+import { Message } from  '~/message.js';
 import users from '~/users.js';
 
 type data = {

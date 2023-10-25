@@ -17,9 +17,9 @@ const trigger = async (item: QuickActions.Item, user: { userId: string, userName
       break;
     }
     case 'command': {
-      const parser = new ((await import('../parser')).default)();
-      const alias = (await import('../systems/alias')).default as typeof import('../systems/alias').default;
-      const customcommands = (await import('../systems/customcommands')).default as typeof import('../systems/customcommands').default;
+      const parser = new ((await import('../parser.js')).Parser)();
+      const alias = (await import('../systems/alias.js')).default;
+      const customcommands = (await import('../systems/customcommands.js')).default;
 
       const responses = await parser.command(getUserSender(user.userId, user.userName), item.options.command, true);
       for (let i = 0; i < responses.length; i++) {

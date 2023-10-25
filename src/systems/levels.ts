@@ -8,7 +8,7 @@ import { onStartup } from '../decorators/on.js';
 import {
   command, default_permission, parser, permission_settings, settings, ui,
 } from '../decorators.js';
-import Expects from '../expects.js';
+import { Expects } from  '../expects.js';
 import general from '../general.js';
 import users from '../users.js';
 

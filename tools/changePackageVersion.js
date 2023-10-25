@@ -1,5 +1,5 @@
-const fs = require('fs');
+import fs from 'fs'
 
-const package = require('../package.json');
+import package from '../package.json'
 
 fs.writeFileSync('./package.json', JSON.stringify({ ...package, version: process.argv[2] }, null, 2));

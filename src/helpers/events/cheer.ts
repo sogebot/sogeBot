@@ -17,7 +17,7 @@ import { triggerInterfaceOnBit } from '~/helpers/interface/index.js';
 import { cheer as cheerLog, debug, error } from '~/helpers/log.js';
 import * as changelog from '~/helpers/user/changelog.js';
 import { isIgnored } from '~/helpers/user/isIgnored.js';
-import Parser from '~/parser.js';
+import { Parser } from '~/parser.js';
 import alias from '~/systems/alias.js';
 import customcommands from '~/systems/customcommands.js';
 

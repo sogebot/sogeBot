@@ -71,20 +71,22 @@ async function updateChannelInfo (args: { title?: string | null; game?: string |
 
     const gameId = await getGameIdFromName(game);
 
-    let content_classification_labels: {id: string, is_enabled: boolean}[] | undefined = undefined;
+    let contentClassificationLabels: string[] | undefined = undefined;
     //  if content classification is present, do a change, otherwise we are not changing anything
     if (args.contentClassificationLabels) {
-      content_classification_labels = [];
+      contentClassificationLabels = [];
       for (const id of Object.keys(CONTENT_CLASSIFICATION_LABELS)) {
         if (id === 'MatureGame') {
           continue; // set automatically
         }
-        content_classification_labels.push({ id, is_enabled: args.contentClassificationLabels.includes(id) });
+        if (args.contentClassificationLabels.includes(id)) {
+          contentClassificationLabels.push(id);
+        }
       }
     }
 
     await twitch.apiClient?.asIntent(['broadcaster'], ctx => ctx.channels.updateChannelInfo(cid, {
-      title: title ? title : undefined, gameId, tags, content_classification_labels,
+      title: title ? title : undefined, gameId, tags, contentClassificationLabels,
     }));
   } catch (e) {
     if (e instanceof Error) {

@@ -1,7 +1,7 @@
 import { DAY } from '@sogebot/ui-helpers/constants.js';
 import axios from 'axios';
 import { NextFunction } from 'express';
-import jwt, { JsonWebTokenError } from 'jsonwebtoken';
+import jwt from 'jsonwebtoken';
 import { Socket as SocketIO } from 'socket.io';
 import { v4 as uuid } from 'uuid';
 
@@ -213,7 +213,7 @@ class Socket extends Core {
           debug('socket', JSON.stringify(token, null, 4));
           initEndpoints(socket, token.privileges);
         } catch (e: any) {
-          if (e instanceof JsonWebTokenError) {
+          if (e instanceof jwt.JsonWebTokenError) {
             error('Used token for authorization is malformed or invalid: ' + e.message);
             debug('socket', e.stack);
           } else if (e instanceof Error) {

@@ -1,12 +1,14 @@
-require('dotenv').config();
+import dotenv from 'dotenv';
+dotenv.config();
 
-const fs = require('fs');
-const { normalize } = require('path');
-const { stdout } = require('process');
+import fs from 'fs'
+import { normalize } from 'path';
+import { stdout } from 'process';
 
-const _ = require('lodash');
-const { DataSource, DataSourceOptions } = require('typeorm');
-const argv = require('yargs') // eslint-disable-line
+import _ from 'lodash';
+import { DataSource, DataSourceOptions } from 'typeorm';
+import argv from 'yargs'
+argv
   .usage('node tools/backup.js')
   .example('node tools/backup.js backup ./backup')
   .example('node tools/backup.js restore ./backup')

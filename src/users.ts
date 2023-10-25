@@ -74,7 +74,7 @@ class Users extends Core {
       const duplicates = await AppDataSource.getRepository(User).find({ where: { userName } });
       await Promise.all(duplicates.map(async (user) => {
         try {
-          const twitch = ( await import('./services/twitch')).default;
+          const twitch = ( await import('./services/twitch.js')).default;
           const getUserById = await twitch.apiClient?.asIntent(['bot'], ctx => ctx.users.getUserById(user.userId));
           if (!getUserById) {
             throw new Error('unknown');

@@ -8,7 +8,7 @@ import {
   command, default_permission,
 } from '../decorators.js';
 import events from '../events.js';
-import Expects from '../expects.js';
+import { Expects } from  '../expects.js';
 
 import { AppDataSource } from '~/database.js';
 import { eventEmitter } from '~/helpers/events/index.js';
