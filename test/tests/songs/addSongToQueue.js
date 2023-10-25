@@ -3,7 +3,7 @@
 import assert from 'assert';
 import { AppDataSource } from '../../../dest/database.js'
 
-import { SongRequest, SongPlaylist } from '../../../dest/database/entity/song.js.js';
+import { SongRequest, SongPlaylist } from '../../../dest/database/entity/song.js';
 import { user } from '../../general.js';
 import { db } from '../../general.js';
 import { message } from '../../general.js';

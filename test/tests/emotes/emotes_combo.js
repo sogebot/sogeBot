@@ -1,8 +1,8 @@
 import assert from 'assert';
 
-import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized.js.js';
+import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized.js';
 
-import { translate } from '../../../dest/translate.js.js';
+import { translate } from '../../../dest/translate.js';
 import('../../general.js');
 import { db, message, user } from '../../general.js';
 

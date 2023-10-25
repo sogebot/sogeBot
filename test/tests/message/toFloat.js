@@ -3,7 +3,7 @@
 import('../../general.js');
 
 import { db } from '../../general.js';
-import Message from '../../../dest/message.js';
+import {Message} from '../../../dest/message.js';
 import assert from 'assert';
 const owner = { userId: String(Math.floor(Math.random() * 100000)), userName: '__broadcaster__' };
 

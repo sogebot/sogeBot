@@ -1,14 +1,14 @@
 import('../../general.js');
 
-import cheer from '../../../dest/helpers/events/cheer.js';
+import {cheer } from '../../../dest/helpers/events/cheer.js';
 import {translate} from '../../../dest/translate.js'
 import { db } from '../../general.js';
 import { message } from '../../general.js';
 import { time } from '../../general.js';
-import { Price } from '../../../dest/database/entity/price.js.js';
+import { Price } from '../../../dest/database/entity/price.js';
 import customcommands from '../../../dest/systems/customcommands.js';
 
-import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized.js.js';
+import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized.js';
 
 import assert from 'assert';
 

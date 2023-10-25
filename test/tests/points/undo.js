@@ -8,7 +8,7 @@ import assert from 'assert';
 import _ from 'lodash-es';
 import { AppDataSource } from '../../../dest/database.js';
 
-import { PointsChangelog } from '../../../dest/database/entity/points.js.js';
+import { PointsChangelog } from '../../../dest/database/entity/points.js';
 import { User } from '../../../dest/database/entity/user.js';
 import * as userChangelog from '../../../dest/helpers/user/changelog.js';
 import points from '../../../dest/systems/points.js';

@@ -4,9 +4,9 @@
 
 import('../../general.js');
 
-import { Cooldown, CooldownViewer } from '../../../dest/database/entity/cooldown.js.js';
+import { Cooldown } from '../../../dest/database/entity/cooldown.js';
 import { User } from '../../../dest/database/entity/user.js';
-import { Keyword } from '../../../dest/database/entity/keyword.js.js';
+import { Keyword } from '../../../dest/database/entity/keyword.js';
 
 import assert from 'assert';
 import { AppDataSource } from '../../../dest/database.js';

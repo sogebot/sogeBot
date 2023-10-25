@@ -5,8 +5,8 @@ import('../../general.js');
 import constants from '@sogebot/ui-helpers/constants.js';
 
 import { User } from '../../../dest/database/entity/user.js';
-import { getOwner } from '../../../dest/helpers/commons/getOwner.js.js';
-import { prepare } from '../../../dest/helpers/commons/prepare.js.js';
+import { getOwner } from '../../../dest/helpers/commons/getOwner.js';
+import { prepare } from '../../../dest/helpers/commons/prepare.js';
 import { AppDataSource } from '../../../dest/database.js';
 import top from '../../../dest/systems/top.js';
 import { db } from '../../general.js';

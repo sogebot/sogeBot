@@ -2,7 +2,7 @@
 import assert from 'assert';
 
 import('../../general.js');
-import { Keyword, KeywordGroup, KeywordResponses } from '../../../dest/database/entity/keyword.js.js';
+import { Keyword, KeywordGroup, KeywordResponses } from '../../../dest/database/entity/keyword.js';
 import { prepare } from '../../../dest/helpers/commons/prepare.js';
 import { defaultPermissions } from '../../../dest/helpers/permissions/defaultPermissions.js';
 import keywords from '../../../dest/systems/keywords.js';
@@ -183,7 +183,7 @@ describe('Keywords - @func3 - #4860 - keywords group permissions and filter shou
     before(() => {
       message.prepare();
     });
-    it('set $game to Test', () => {
+    it('set $game to Test', async () => {
       const {stats} = await import('../../../dest/helpers/api/stats.js');
       stats.value.currentGame = 'Test';
     });
@@ -197,7 +197,7 @@ describe('Keywords - @func3 - #4860 - keywords group permissions and filter shou
     before(() => {
       message.prepare();
     });
-    it('set $game to Dota 2', () => {
+    it('set $game to Dota 2', async () => {
       const {stats} = await import('../../../dest/helpers/api/stats.js');
       stats.value.currentGame = 'Dota 2';
     });

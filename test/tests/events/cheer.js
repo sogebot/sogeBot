@@ -2,13 +2,13 @@ import assert from 'assert';
 
 import('../../general.js');
 
-import { vs as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from 'uuid';
 
 import events from '../../../dest/events.js';
-import { Event } from '../../../dest/database/entity/event.js.js';
+import { Event } from '../../../dest/database/entity/event.js';
 import { User } from '../../../dest/database/entity/user.js';
 import { AppDataSource } from '../../../dest/database.js';
-import * as changelog from '../../../dest/user/changelog.js';
+import * as changelog from '../../../dest/helpers/user/changelog.js';
 import { time } from '../../general.js';
 import { db } from '../../general.js';
 import { message } from '../../general.js';
@@ -51,7 +51,7 @@ describe('Events - cheer event - @func3', () => {
         });
 
         it('user should have 10 points', async () => {
-          import points from '../../../dest/systems/points.js';
+          const points = (await import('../../../dest/systems/points.js')).default;
           assert.strict.equal(await points.getPointsOf(userId), 10);
         });
       });

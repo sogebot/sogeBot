@@ -5,7 +5,7 @@ import assert from 'assert';
 
 import { User } from '../../../dest/database/entity/user.js';
 import { AppDataSource } from '../../../dest/database.js';
-import Message from '../../../dest/message.js';
+import {Message} from '../../../dest/message.js';
 import alias from '../../../dest/systems/alias.js';
 import cooldown from '../../../dest/systems/cooldown.js'
 import customcommands from '../../../dest/systems/customcommands.js';

@@ -5,9 +5,9 @@ import { AppDataSource } from '../../../dest/database.js';
 
 import('../../general.js');
 
-import { Permissions } from '../../../dest/database/entity/permissions.js.js';
+import { Permissions } from '../../../dest/database/entity/permissions.js';
 import { defaultPermissions } from '../../../dest/helpers/permissions/defaultPermissions.js';
-import moderation = import('../../../dest/systems/moderation.js');
+import moderation from '../../../dest/systems/moderation.js';
 import { db } from '../../general.js';
 import { variable } from '../../general.js';
 import { message } from '../../general.js';

@@ -11,9 +11,9 @@ import { message } from '../../general.js';
 import timers from '../../../dest/systems/timers.js';
 import { isStreamOnline } from '../../../dest/helpers/api/isStreamOnline.js'
 
-import { Timer, TimerResponse } from '../../../dest/database/entity/timer.js.js';
+import { Timer, TimerResponse } from '../../../dest/database/entity/timer.js';
 
-import { linesParsed } from '../../../dest/helpers/parser.js.js';
+import { linesParsed } from '../../../dest/helpers/parser.js';
 
 describe('Timers - disabled response should not be sent to chat - https://discord.com/channels/317348946144002050/619437014001123338/794910249910796288 - @func2', () => {
   before(async () => {

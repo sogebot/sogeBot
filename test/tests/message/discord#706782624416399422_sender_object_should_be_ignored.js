@@ -11,9 +11,9 @@ import timers from '../../../dest/systems/timers.js';
 import {check} from '../../../dest/watchers.js'
 
 import { AppDataSource } from '../../../dest/database.js';
-import { Timer, TimerResponse } from '../../../dest/database/entity/timer.js.js';
+import { Timer, TimerResponse } from '../../../dest/database/entity/timer.js';
 
-import { linesParsed } from '../../../dest/helpers/parser.js.js';
+import { linesParsed } from '../../../dest/helpers/parser.js';
 
 // users
 const owner = { userName: '__broadcaster__' };

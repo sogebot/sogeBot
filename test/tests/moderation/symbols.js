@@ -3,12 +3,10 @@
 import assert from 'assert';
 
 import('../../general.js');
-
-import moderation = import('../../../dest/systems/moderation.js');
+import moderation from '../../../dest/systems/moderation.js';
 import { db } from '../../general.js';
 import { variable } from '../../general.js';
 import { message } from '../../general.js';
-import { variable } from '../../general.js';
 import { user } from '../../general.js';
 import { time } from '../../general.js';
 

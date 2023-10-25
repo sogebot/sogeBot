@@ -10,8 +10,8 @@ import { AppDataSource } from '../../../dest/database.js';
 
 import { User } from '../../../dest/database/entity/user.js';
 import gamble from '../../../dest/games/gamble.js';
-import { prepare } from '../../../dest/helpers/commons/prepare.js.js';
-import { getPointsName } from '../../../dest/helpers/points/getPointsName.js.js';
+import { prepare } from '../../../dest/helpers/commons/prepare.js';
+import { getPointsName } from '../../../dest/helpers/points/getPointsName.js';
 import points from '../../../dest/systems/points.js';
 import { db } from '../../general.js';
 import { message } from '../../general.js';
@@ -21,7 +21,7 @@ const command = '!gamble';
 
 describe('Gambling - gamble - @func3', () => {
   beforeEach(async () => {
-    import * as changelog from '../../../dest/user/changelog.js';
+    const changelog = await import('../../../dest/helpers/user/changelog.js');
     await changelog.flush();
     await AppDataSource.getRepository(User).save({
       userId: user1.userId, userName: user1.userName, points: 100,

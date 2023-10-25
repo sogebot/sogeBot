@@ -3,11 +3,11 @@ import('../../general.js');
 import assert from 'assert';
 
 import _ from 'lodash-es';
-import { IsNull } from 'typeorm.js.js';
+import { IsNull } from 'typeorm';
 
 import * as commons from '../../../dest/commons.js'
 import { AppDataSource } from '../../../dest/database.js';
-import { Raffle } from '../../../dest/database/entity/raffle.js.js';
+import { Raffle } from '../../../dest/database/entity/raffle.js';
 import { User } from '../../../dest/database/entity/user.js';
 import raffles from '../../../dest/systems/raffles.js';
 import { db } from '../../general.js';

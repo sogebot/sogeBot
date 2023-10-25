@@ -3,8 +3,8 @@ import('../../general.js');
 import assert from 'assert';
 import { AppDataSource } from '../../../dest/database.js';
 
-import { Cooldown } from '../../../dest/database/entity/cooldown.js.js';
-import { Price } from '../../../dest/database/entity/price.js.js';
+import { Cooldown } from '../../../dest/database/entity/cooldown.js';
+import { Price } from '../../../dest/database/entity/price.js';
 import { User } from '../../../dest/database/entity/user.js';
 import { Parser } from '../../../dest/parser.js';
 import cooldown from '../../../dest/systems/cooldown.js'

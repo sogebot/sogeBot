@@ -6,10 +6,10 @@ import('../../general.js');
 
 import * as commons from '../../../dest/commons.js'
 import { AppDataSource } from '../../../dest/database.js';
-import { Settings } from '../../../dest/database/entity/settings.js.js';
+import { Settings } from '../../../dest/database/entity/settings.js';
 import { User } from '../../../dest/database/entity/user.js';
 import { isStreamOnline } from '../../../dest/helpers/api/isStreamOnline.js'
-import * as changelog from '../../../dest/user/changelog.js';
+import * as changelog from '../../../dest/helpers/user/changelog.js';
 import twitch from '../../../dest/services/twitch.js';
 // users
 const owner = { userName: '__broadcaster__' };
@@ -20,7 +20,7 @@ const testuser2 = {
   userName: 'testuser2', userId: '2',
 };
 
-import { VariableWatcher } from '../../../dest/watchers.js.js';
+import { VariableWatcher } from '../../../dest/watchers.js';
 import { message } from '../../general.js';
 import { db } from '../../general.js';
 

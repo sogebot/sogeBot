@@ -1,12 +1,12 @@
 import assert from 'assert';
 
-import { MINUTE } from '@sogebot/ui-helpers/constants.js.js';
+import { MINUTE } from '@sogebot/ui-helpers/constants.js';
 import { v4 } from 'uuid'
 
 import { db, message, user } from '../../../general.js';
 
-import { DiscordLink } from '../../../../dest/database/entity/discord.js.js';
-import { AppDataSource } from '../../../../dest/database.js.js.js';
+import { DiscordLink } from '../../../../dest/database/entity/discord.js';
+import { AppDataSource } from '../../../../dest/database.js';
 import discord from '../../../../dest/integrations/discord.js'
 
 describe('integrations/discord - !link - @func2', () => {

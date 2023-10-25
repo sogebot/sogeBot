@@ -6,7 +6,7 @@ import { message } from '../../general.js';
 import assert from 'assert';
 
 import { User } from '../../../dest/database/entity/user.js';
-import { Keyword } from '../../../dest/database/entity/keyword.js.js';
+import { Keyword } from '../../../dest/database/entity/keyword.js';
 import { AppDataSource } from '../../../dest/database.js';
 
 import keywords from '../../../dest/systems/keywords.js';

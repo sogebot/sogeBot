@@ -1,7 +1,6 @@
 /* global describe it before */
 import * as commons from '../../../dest/commons.js'
-
-import moderation = import('../../../dest/systems/moderation.js');
+import moderation from '../../../dest/systems/moderation.js';
 
 import('../../general.js');
 

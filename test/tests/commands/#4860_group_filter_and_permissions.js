@@ -3,7 +3,7 @@ import assert from 'assert';
 import { AppDataSource } from '../../../dest/database.js';
 
 import('../../general.js');
-import { Commands, CommandsGroup } from '../../../dest/database/entity/commands';
+import { Commands, CommandsGroup } from '../../../dest/database/entity/commands.js';
 import { prepare } from '../../../dest/helpers/commons/prepare.js';
 import { defaultPermissions } from '../../../dest/helpers/permissions/defaultPermissions.js';
 import customcommands from '../../../dest/systems/customcommands.js';
@@ -168,8 +168,8 @@ describe('Custom Commands - @func2 - #4860 - customcommands group permissions an
     before(() => {
       message.prepare();
     });
-    it('set $game to Test', () => {
-            const {stats} = await import('../../../dest/helpers/api/stats.js');
+    it('set $game to Test', async () => {
+      const {stats} = await import('../../../dest/helpers/api/stats.js');
       stats.value.currentGame = 'Test';
     });
     it('!testfilter customcommands should not be triggered', async () => {
@@ -182,8 +182,8 @@ describe('Custom Commands - @func2 - #4860 - customcommands group permissions an
     before(() => {
       message.prepare();
     });
-    it('set $game to Dota 2', () => {
-            const {stats} = await import('../../../dest/helpers/api/stats.js');
+    it('set $game to Dota 2', async () => {
+      const {stats} = await import('../../../dest/helpers/api/stats.js');
       stats.value.currentGame = 'Dota 2';
     });
     it('!testfilter customcommands should be triggered', async () => {

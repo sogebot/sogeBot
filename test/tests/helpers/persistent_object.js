@@ -4,7 +4,7 @@
 import assert from 'assert';
 import { AppDataSource } from '../../../dest/database.js'
 
-import { Settings } from '../../../dest/database/entity/settings.js.js';
+import { Settings } from '../../../dest/database/entity/settings.js';
 import('../../general.js');
 import { db } from '../../general.js';
 import { time } from '../../general.js';

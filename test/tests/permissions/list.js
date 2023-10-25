@@ -2,7 +2,7 @@ import('../../general.js');
 
 import assert from 'assert';
 
-import { prepare } from '../../../dest/helpers/commons/prepare.js.js';
+import { prepare } from '../../../dest/helpers/commons/prepare.js';
 import permissions from '../../../dest/permissions.js'
 import { db } from '../../general.js';
 import { message } from '../../general.js';

@@ -5,14 +5,14 @@ import assert from 'assert';
 import { db } from '../../general.js';
 import { message } from '../../general.js';
 
-import { linesParsed } from '../../../dest/helpers/parser.js.js';
+import { linesParsed } from '../../../dest/helpers/parser.js';
 
 // users
 const owner = { userName: '__broadcaster__' };
 
 import timers from '../../../dest/systems/timers.js';
 
-import { Timer, TimerResponse } from '../../../dest/database/entity/timer.js.js';
+import { Timer, TimerResponse } from '../../../dest/database/entity/timer.js';
 
 describe('Timers - toggle() - @func2', () => {
   beforeEach(async () => {

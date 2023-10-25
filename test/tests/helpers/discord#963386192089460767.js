@@ -11,13 +11,13 @@ describe('checkFilter should properly parse $param in stream - https://discord.c
   });
 
   it('returns correct value - true filter', async () => {
-    import { checkFilter } from '../../../dest/helpers/checkFilter.js.js';
+    const checkFilter = (await import('../../../dest/helpers/checkFilter.js')).checkFilter;
     assert(await checkFilter({ parameters: 'test', sender: user.viewer }, '"(stream|$param|link)" === "twitch.tv/test"'));
     assert(await checkFilter({ parameters: 'test', sender: user.viewer }, '"(stream|$touser|link)" === "twitch.tv/test"'));
   });
 
   it('returns correct value - false filter', async () => {
-    import { checkFilter } from '../../../dest/helpers/checkFilter.js.js';
+    const checkFilter = (await import('../../../dest/helpers/checkFilter.js')).checkFilter;
     assert(!(await checkFilter({ parameters: 'test2', sender: user.viewer }, '"(stream|$param|link)" === "twitch.tv/test"')));
     assert(!(await checkFilter({ parameters: 'test2', sender: user.viewer }, '"(stream|$touser|link)" === "twitch.tv/test"')));
   });

@@ -10,7 +10,7 @@ import { AppDataSource } from '../../../dest/database.js';
 
 import { User } from '../../../dest/database/entity/user.js';
 import roulette from '../../../dest/games/roulette.js';
-import * as changelog from '../../../dest/user/changelog.js';
+import * as changelog from '../../../dest/helpers/user/changelog.js';
 import points from '../../../dest/systems/points.js';
 import { db, message, user } from '../../general.js';
 

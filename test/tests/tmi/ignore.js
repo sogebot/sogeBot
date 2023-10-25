@@ -4,11 +4,11 @@ import assert from 'assert';
 import('../../general.js');
 
 import { db } from '../../general.js';
-import { prepare } from '../../../dest/helpers/commons/prepare.js.js';
+import { prepare } from '../../../dest/helpers/commons/prepare.js';
 import { message } from '../../general.js';
 
 import { User } from '../../../dest/database/entity/user.js';
-import { Settings } from '../../../dest/database/entity/settings.js.js';
+import { Settings } from '../../../dest/database/entity/settings.js';
 
 import twitch from '../../../dest/services/twitch.js';
 
@@ -20,7 +20,7 @@ const testuser3 = { userName: 'testuser3', userId: String(3) };
 const nightbot = { userName: 'nightbot', userId: String(4) };
 const botwithchangedname = { userName: 'asdsadas', userId: String(24900234) };
 
-import { isIgnored } from '../../../dest/helpers/user/isIgnored.js.js';
+import { isIgnored } from '../../../dest/helpers/user/isIgnored.js';
 import { AppDataSource } from '../../../dest/database.js';
 
 describe('TMI - ignore - @func3', () => {

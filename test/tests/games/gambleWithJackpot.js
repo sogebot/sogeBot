@@ -10,7 +10,7 @@ import { AppDataSource } from '../../../dest/database.js';
 
 import { User } from '../../../dest/database/entity/user.js';
 import gamble from '../../../dest/games/gamble.js';
-import { prepare } from '../../../dest/helpers/commons/prepare.js.js';
+import { prepare } from '../../../dest/helpers/commons/prepare.js';
 import { db } from '../../general.js';
 import { message } from '../../general.js';
 

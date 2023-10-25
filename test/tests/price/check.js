@@ -4,11 +4,11 @@ import assert from 'assert';
 
 import _ from 'lodash-es';
 
-import { Price } from '../../../dest/database/entity/price.js.js';
+import { Price } from '../../../dest/database/entity/price.js';
 import { User } from '../../../dest/database/entity/user.js';
 import { AppDataSource } from '../../../dest/database.js';
 import alias from '../../../dest/systems/alias.js';
-import cheer from '../../../dest/helpers/events/cheer.js';
+import {cheer } from '../../../dest/helpers/events/cheer.js';
 import customcommands from '../../../dest/systems/customcommands.js';
 import price from '../../../dest/systems/price.js';
 import { db, message, user, url } from '../../general.js';

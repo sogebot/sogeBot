@@ -5,9 +5,9 @@ import { AppDataSource } from '../../../dest/database.js';
 import('../../general.js');
 
 const currency = (await import('../../../dest/currency.js')).default;
-import { User, UserTip } from '../../../dest/database/entity/user.js.js';
-import { getOwner } from '../../../dest/helpers/commons/getOwner.js.js';
-import { prepare } from '../../../dest/helpers/commons/prepare.js.js';
+import { User, UserTip } from '../../../dest/database/entity/user.js';
+import { getOwner } from '../../../dest/helpers/commons/getOwner.js';
+import { prepare } from '../../../dest/helpers/commons/prepare.js';
 import rates from '../../../dest/helpers/currency/rates.js';
 import twitch from '../../../dest/services/twitch.js';
 import top from '../../../dest/systems/top.js';

@@ -1,12 +1,12 @@
 /* global describe it before */
 
 import { defaultPermissions } from '../../../dest/helpers/permissions/defaultPermissions.js';
-import { getOwner } from '../../../dest/helpers/commons/getOwner.js.js';
+import { getOwner } from '../../../dest/helpers/commons/getOwner.js';
 
 import('../../general.js');
 
 import { db, message as msg } from '../../general.js';
-import Message from '../../../dest/message.js';
+import {Message} from '../../../dest/message.js';
 import assert from 'assert';
 import _ from 'lodash-es';
 

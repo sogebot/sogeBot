@@ -1,10 +1,10 @@
 /* global describe it before */
 import assert from 'assert';
 
-import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized.js.js';
+import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized.js';
 
-import {getBotUserName} from '../../../dest/helpers/user/getBotUserName.js'
-import { translate } from '../../../dest/translate.js.js';
+import getBotUserName from '../../../dest/helpers/user/getBotUserName.js'
+import { translate } from '../../../dest/translate.js';
 import('../../general.js');
 import { db } from '../../general.js';
 import { message } from '../../general.js';

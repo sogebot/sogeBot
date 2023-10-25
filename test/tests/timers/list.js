@@ -7,12 +7,12 @@ import { message } from '../../general.js';
 
 import timers from '../../../dest/systems/timers.js';
 
-import { linesParsed } from '../../../dest/helpers/parser.js.js';
+import { linesParsed } from '../../../dest/helpers/parser.js';
 
 // users
 const owner = { userName: '__broadcaster__' };
 
-import { Timer, TimerResponse } from '../../../dest/database/entity/timer.js.js';
+import { Timer, TimerResponse } from '../../../dest/database/entity/timer.js';
 import { AppDataSource } from '../../../dest/database.js';
 
 describe('Timers - list() - @func2', () => {

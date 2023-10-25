@@ -1,5 +1,5 @@
 /* global describe it before */
-import { getOwner } from '../../../dest/helpers/commons/getOwner.js.js';
+import { getOwner } from '../../../dest/helpers/commons/getOwner.js';
 
 import('../../general.js');
 
@@ -8,7 +8,7 @@ import { message } from '../../general.js';
 
 import { User } from '../../../dest/database/entity/user.js';
 
-import { prepare } from '../../../dest/helpers/commons/prepare.js.js';
+import { prepare } from '../../../dest/helpers/commons/prepare.js';
 import top from '../../../dest/systems/top.js';
 import assert from 'assert';
 import { AppDataSource } from '../../../dest/database.js'

@@ -9,7 +9,7 @@ import { message } from '../../general.js';
 
 import timers from '../../../dest/systems/timers.js';
 
-import { Timer } from '../../../dest/database/entity/timer.js.js';
+import { Timer } from '../../../dest/database/entity/timer.js';
 
 // users
 const owner = { userName: '__broadcaster__' };

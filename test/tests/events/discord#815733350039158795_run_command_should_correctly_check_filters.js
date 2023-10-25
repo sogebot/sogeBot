@@ -1,17 +1,17 @@
 import _ from 'lodash-es';
-import { vs as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from 'uuid';
 import { AppDataSource } from '../../../dest/database.js';
 
 import('../../general.js');
 
-import { Commands, CommandsResponses } from '../../../dest/database/entity/commands.js.js';
-import { Event } from '../../../dest/database/entity/event.js.js';
+import { Commands } from '../../../dest/database/entity/commands.js';
+import { Event } from '../../../dest/database/entity/event.js';
 import { User } from '../../../dest/database/entity/user.js';
 import events from '../../../dest/events.js';
 import { defaultPermissions } from '../../../dest/helpers/permissions/defaultPermissions.js';
-import { isBotSubscriber } from '../../../dest/helpers/user/isBot.js.js';
+import { isBotSubscriber } from '../../../dest/helpers/user/isBot.js';
 import alias from '../../../dest/systems/alias.js';
-import commercial from '../../../dest/helpers/systems/commercial.js';
+import commercial from '../../../dest/systems/commercial.js';
 import customcommands from '../../../dest/systems/customcommands.js';
 import { db } from '../../general.js';
 import { message } from '../../general.js';

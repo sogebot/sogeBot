@@ -3,11 +3,11 @@ import assert from 'assert';
 
 import('../../general.js');
 
-import { setImmediateAwait } from '../../../dest//helpers/setImmediateAwait.js.js';
+import { setImmediateAwait } from '../../../dest//helpers/setImmediateAwait.js';
 import { AppDataSource } from '../../../dest/database.js';
-import { EventList } from '../../../dest/database/entity/eventList.js.js';
+import { EventList } from '../../../dest/database/entity/eventList.js';
 import { User } from '../../../dest/database/entity/user.js';
-import Message from '../../../dest/message.js';
+import {Message} from '../../../dest/message.js';
 import eventlist from '../../../dest/overlays/eventlist.js';
 import { db } from '../../general.js';
 import { message } from '../../general.js';

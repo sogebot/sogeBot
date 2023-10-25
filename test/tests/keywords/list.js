@@ -7,7 +7,7 @@ import assert from 'assert';
 
 import keywords from '../../../dest/systems/keywords.js';
 
-import { Keyword } from '../../../dest/database/entity/keyword.js.js';
+import { Keyword } from '../../../dest/database/entity/keyword.js';
 import { User } from '../../../dest/database/entity/user.js';
 
 // users

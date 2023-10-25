@@ -1,13 +1,13 @@
 
 /* global describe it before */
 
-import { vs as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from 'uuid';
 
 import('../../general.js');
-import { Event } from '../../../dest/database/entity/event.js.js';
+import { Event } from '../../../dest/database/entity/event.js';
 import { User } from '../../../dest/database/entity/user.js';
 import events from '../../../dest/events.js';
-import log from '../../../dest/helpers/log.js';
+import * as log from '../../../dest/helpers/log.js';
 
 import assert from 'assert';
 import { AppDataSource } from '../../../dest/database.js';

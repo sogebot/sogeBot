@@ -9,7 +9,7 @@ import assert from 'assert';
 import { message } from '../../general.js';
 
 import { AppDataSource } from '../../../dest/database.js';
-import { Quotes } from '../../../dest/database/entity/quotes.js.js';
+import { Quotes } from '../../../dest/database/entity/quotes.js';
 
 import quotes from '../../../dest/systems/quotes.js'
 

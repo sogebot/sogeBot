@@ -7,11 +7,11 @@ import assert from 'assert';
 const owner = { userId: String(Math.floor(Math.random() * 100000)), userName: '__broadcaster__' };
 import constants from '@sogebot/ui-helpers/constants.js';
 
-import { EventList } from '../../../dest/database/entity/eventList.js.js';
-import { User, UserTip, UserBit } from '../../../dest/database/entity/user.js.js';
+import { EventList } from '../../../dest/database/entity/eventList.js';
+import { User, UserTip, UserBit } from '../../../dest/database/entity/user.js';
 import { AppDataSource } from '../../../dest/database.js';
 import rates from '../../../dest/helpers/currency/rates.js';
-import Message from '../../../dest/message.js';
+import {Message} from '../../../dest/message.js';
 import { db } from '../../general.js';
 
 const tests = [

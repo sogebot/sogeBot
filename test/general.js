@@ -21,4 +21,4 @@ import * as variable from './helpers/variable.js';
 import * as time from './helpers/time.js';
 
 
-export { db, message, user, time, variable, tmi, url};
+export { db, message, user, time, variable, tmi, url };

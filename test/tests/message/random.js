@@ -9,8 +9,8 @@ const ignoredUser = { userId: String(Math.floor(Math.random() * 100000)), userNa
 const user = { userId: String(Math.floor(Math.random() * 100000)), userName: 'user1' };
 
 import { User } from '../../../dest/database/entity/user.js';
-import { prepare } from '../../../dest/helpers/commons/prepare.js.js';
-import Message from '../../../dest/message.js';
+import { prepare } from '../../../dest/helpers/commons/prepare.js';
+import {Message} from '../../../dest/message.js';
 import { db, message as msg } from '../../general.js';
 
 async function setUsersOnline(users) {

@@ -6,8 +6,8 @@ import('../../general.js');
 import assert from 'assert';
 import { AppDataSource } from '../../../dest/database.js';
 
-import { Cooldown } from '../../../dest/database/entity/cooldown.js.js';
-import { Keyword } from '../../../dest/database/entity/keyword.js.js';
+import { Cooldown } from '../../../dest/database/entity/cooldown.js';
+import { Keyword } from '../../../dest/database/entity/keyword.js';
 import { User } from '../../../dest/database/entity/user.js';
 import gamble from '../../../dest/games/gamble.js';
 import cooldown from '../../../dest/systems/cooldown.js'

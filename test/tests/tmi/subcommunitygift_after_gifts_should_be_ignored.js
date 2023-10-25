@@ -5,7 +5,7 @@ import { AppDataSource } from '../../../dest/database.js';
 import('../../general.js');
 
 import { User } from '../../../dest/database/entity/user.js';
-import * as changelog from '../../../dest/user/changelog.js';
+import * as changelog from '../../../dest/helpers/user/changelog.js';
 import { db } from '../../general.js';
 import { time } from '../../general.js';
 import { message } from '../../general.js';

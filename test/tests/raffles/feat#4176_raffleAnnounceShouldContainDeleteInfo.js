@@ -7,7 +7,7 @@ import { db, message, user } from '../../general.js';
 import * as commons from '../../../dest/commons.js'
 
 import { User } from '../../../dest/database/entity/user.js';
-import { Raffle } from '../../../dest/database/entity/raffle.js.js';
+import { Raffle } from '../../../dest/database/entity/raffle.js';
 
 import raffles from '../../../dest/systems/raffles.js';
 import { isStreamOnline } from '../../../dest/helpers/api/isStreamOnline.js'

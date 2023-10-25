@@ -2,7 +2,7 @@
 import('../../general.js');
 
 import { db, message as msg } from '../../general.js';
-import Message from '../../../dest/message.js';
+import {Message} from '../../../dest/message.js';
 import assert from 'assert';
 
 describe('Message - if filter - @func3', () => {

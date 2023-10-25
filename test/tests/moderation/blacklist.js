@@ -10,8 +10,7 @@ import { user } from '../../general.js';
 
 import _ from 'lodash-es';
 import assert from 'assert';
-
-import moderation = import('../../../dest/systems/moderation.js');
+import moderation from '../../../dest/systems/moderation.js';
 
 const tests = {
   'test': {

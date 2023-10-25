@@ -5,14 +5,14 @@ import assert from 'assert';
 
 import('../../general.js');
 
-import { vs as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from 'uuid';
 import { AppDataSource } from '../../../dest/database.js';
 
-import { Event } from '../../../dest/database/entity/event.js.js';
+import { Event } from '../../../dest/database/entity/event.js';
 import { User } from '../../../dest/database/entity/user.js';
 import events from '../../../dest/events.js';
-import log from '../../../dest/helpers/log.js';
-import * as changelog from '../../../dest/user/changelog.js';
+import * as log from '../../../dest/helpers/log.js';
+import * as changelog from '../../../dest/helpers/user/changelog.js';
 import { time } from '../../general.js';
 import { db } from '../../general.js';
 import { message } from '../../general.js';

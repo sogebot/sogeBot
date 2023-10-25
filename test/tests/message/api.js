@@ -4,7 +4,7 @@ import('../../mocks.js');
 
 import assert from 'assert';
 
-import Message from '../../../dest/message.js';
+import {Message} from '../../../dest/message.js';
 import { db, message as msg } from '../../general.js';
 
 describe('Message - api filter - @func3', () => {

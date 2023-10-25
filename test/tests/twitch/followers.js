@@ -2,7 +2,7 @@ import assert from 'assert';
 import { AppDataSource } from '../../../dest/database.js'
 
 import { User } from '../../../dest/database/entity/user.js';
-import { prepare } from '../../../dest/helpers/commons/prepare.js.js';
+import { prepare } from '../../../dest/helpers/commons/prepare.js';
 import eventlist from '../../../dest/overlays/eventlist.js';
 import twitch from '../../../dest/services/twitch.js';
 import { db } from '../../general.js';

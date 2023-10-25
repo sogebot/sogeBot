@@ -10,9 +10,9 @@ import { message } from '../../general.js';
 import timers from '../../../dest/systems/timers.js';
 import { isStreamOnline } from '../../../dest/helpers/api/isStreamOnline.js'
 
-import { Timer, TimerResponse } from '../../../dest/database/entity/timer.js.js';
+import { Timer, TimerResponse } from '../../../dest/database/entity/timer.js';
 
-import { linesParsed } from '../../../dest/helpers/parser.js.js';
+import { linesParsed } from '../../../dest/helpers/parser.js';
 
 describe('Timers - tickOffline should send response into chat when stream is off - https://community.sogebot.xyz/t/timers-offline-mode/254 - @func2', () => {
   before(async () => {

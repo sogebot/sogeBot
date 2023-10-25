@@ -4,8 +4,7 @@ import assert from 'assert';
 import _ from 'lodash-es';
 import('../../general.js');
 
-import alias from '../../../dest/systems/alias.js';
-import moderation = import('../../../dest/systems/moderation.js');
+import alias from '../../../dest/systems/alias.js';import moderation from '../../../dest/systems/moderation.js';
 import songs from '../../../dest/systems/songs.js';
 import { message } from '../../general.js';
 import { db } from '../../general.js';

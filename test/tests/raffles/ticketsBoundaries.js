@@ -7,7 +7,7 @@ import assert from 'assert';
 import _ from 'lodash-es';
 import { AppDataSource } from '../../../dest/database.js';
 
-import { RaffleParticipant } from '../../../dest/database/entity/raffle.js.js';
+import { RaffleParticipant } from '../../../dest/database/entity/raffle.js';
 import { User } from '../../../dest/database/entity/user.js';
 import raffles from '../../../dest/systems/raffles.js';
 import { message } from '../../general.js';
