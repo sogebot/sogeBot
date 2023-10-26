@@ -4,7 +4,6 @@ import util from 'util';
 
 import { dayjs, timezone } from '@sogebot/ui-helpers/dayjsHelper.js';
 import { createStream, Generator } from 'rotating-file-stream';
-import sinon from 'sinon';
 import stripAnsi from 'strip-ansi';
 
 import { isDebugEnabled } from './debug.js';
@@ -12,6 +11,14 @@ import { logEmitter } from './log/emitter.js';
 import { getFunctionNameFromStackTrace } from './stacktrace.js';
 
 import { isDbConnected } from '~/helpers/database.js';
+
+let sinon;
+try {
+  // Attempt to import sinon as it is only dev dependency
+  sinon = await import('sinon');
+} catch {
+  sinon = null;
+}
 
 const isMochaTestRun = () => typeof (global as any).it === 'function';
 
@@ -166,9 +173,9 @@ const logFunction = (message: any) => {
   log(message);
 };
 
-export const chatOut = isMochaTestRun() ? sinon.stub() : logFunction;
-export const warning = isMochaTestRun() ? sinon.stub() : logFunction;
-export const debug = isMochaTestRun() ? sinon.stub() : (category: string, message: any) => {
+export const chatOut = isMochaTestRun() && sinon ? sinon.stub() : logFunction;
+export const warning = isMochaTestRun() && sinon ? sinon.stub() : logFunction;
+export const debug = isMochaTestRun() && sinon ? sinon.stub() : (category: string, message: any) => {
   const categories = category.split('.');
   if (categories.length > 2 && category !== '*') {
     throw Error('For debug use only <main>.<sub> or *');
