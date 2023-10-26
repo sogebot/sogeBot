@@ -1,0 +1,15 @@
+Index: \@twurple\api\lib\interfaces\endpoints\channel.input.d.ts
+===================================================================
+--- \@twurple\api\lib\interfaces\endpoints\channel.input.d.ts
++++ \@twurple\api\lib\interfaces\endpoints\channel.input.d.ts
+@@ -29,9 +29,9 @@
+     tags?: string[];
+     /**
+      * The content classification labels to apply to the channel.
+      */
+-    contentClassificationLabels?: string[];
++    contentClassificationLabels?: {id: string, is_enabled: boolean}[];
+     /**
+      * Whether the channel currently displays branded content.
+      */
+     isBrandedContent?: boolean;

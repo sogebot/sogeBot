@@ -71,7 +71,7 @@ async function updateChannelInfo (args: { title?: string | null; game?: string |
 
     const gameId = await getGameIdFromName(game);
 
-    let contentClassificationLabels: string[] | undefined = undefined;
+    let contentClassificationLabels: {id: string, is_enabled: boolean}[] | undefined = undefined;
     //  if content classification is present, do a change, otherwise we are not changing anything
     if (args.contentClassificationLabels) {
       contentClassificationLabels = [];
@@ -79,9 +79,7 @@ async function updateChannelInfo (args: { title?: string | null; game?: string |
         if (id === 'MatureGame') {
           continue; // set automatically
         }
-        if (args.contentClassificationLabels.includes(id)) {
-          contentClassificationLabels.push(id);
-        }
+        contentClassificationLabels.push({ id, is_enabled: args.contentClassificationLabels.includes(id) });
       }
     }
 
