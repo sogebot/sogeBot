@@ -2,7 +2,7 @@ Index: \google-auth-library\build\src\auth\oauth2client.js
 ===================================================================
 --- \google-auth-library\build\src\auth\oauth2client.js
 +++ \google-auth-library\build\src\auth\oauth2client.js
-@@ -730,9 +730,9 @@
+@@ -731,9 +731,9 @@
  OAuth2Client.GOOGLE_OAUTH2_AUTH_BASE_URL_ = 'https://accounts.google.com/o/oauth2/v2/auth';
  /**
   * The base endpoint for token retrieval.
