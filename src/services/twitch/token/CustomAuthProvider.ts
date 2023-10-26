@@ -21,11 +21,6 @@ function createAccessTokenFromData(data: any): AccessToken {
 }
 
 export class CustomAuthProvider extends RefreshingAuthProvider {
-  private readonly _userAccessTokens = new Map<
-  string,
-  MakeOptional<AccessTokenWithUserId, 'accessToken' | 'scope'>
-  >();
-
   async refreshUserToken(refreshToken: string) {
     let tokenData: AccessToken;
 

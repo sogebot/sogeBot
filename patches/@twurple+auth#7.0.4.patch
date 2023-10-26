@@ -1,0 +1,14 @@
+Index: \@twurple\auth\lib\providers\RefreshingAuthProvider.d.ts
+===================================================================
+--- \@twurple\auth\lib\providers\RefreshingAuthProvider.d.ts
++++ \@twurple\auth\lib\providers\RefreshingAuthProvider.d.ts
+@@ -36,8 +36,9 @@
+     private readonly _intentToUserId;
+     private readonly _userIdToIntents;
+     private readonly _cachedRefreshFailures;
+     private readonly _appImpliedScopes;
++    readonly _userAccessTokens;
+     /**
+      * Fires when a user token is refreshed.
+      *
+      * @param userId The ID of the user whose token was successfully refreshed.
