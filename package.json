@@ -9,7 +9,10 @@
   },
   "type": "module",
   "main": "main.js",
-  "exports": "./dest/main.js",
+  "exports":{
+    "./dest/*": "./dest/*",
+    "./src/*": "./src/*"
+  },
   "author": "Michal Orlik <sogehige@gmail.com>",
   "license": "MIT",
   "dependencies": {
