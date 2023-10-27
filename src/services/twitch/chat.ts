@@ -27,13 +27,14 @@ import exchange from '~/helpers/currency/exchange.js';
 import { mainCurrency } from '~/helpers/currency/index.js';
 import { isDebugEnabled } from '~/helpers/debug.js';
 import { eventEmitter } from '~/helpers/events/index.js';
+import { subscription } from '~/helpers/events/subscription.js';
 import {
   triggerInterfaceOnMessage, triggerInterfaceOnSub,
 } from '~/helpers/interface/triggers.js';
 import emitter from '~/helpers/interfaceEmitter.js';
 import { warning, tip } from '~/helpers/log.js';
 import {
-  chatIn, debug, error, info, resub, sub, subcommunitygift, subgift, whisperIn,
+  chatIn, debug, error, info, resub, subcommunitygift, subgift, whisperIn,
 } from '~/helpers/log.js';
 import { linesParsedIncrement, setStatus } from '~/helpers/parser.js';
 import { tmiEmitter } from '~/helpers/tmi/index.js';
@@ -421,7 +422,7 @@ class Chat {
       });
     } else if (type === 'broadcaster') {
       client.onSub((_channel, username, subInfo, msg) => {
-        this.subscription(username, subInfo, msg.userInfo);
+        subscription(username, subInfo, msg.userInfo);
       });
 
       client.onResub((_channel, username, subInfo, msg) => {
@@ -437,79 +438,6 @@ class Chat {
       });
     } else {
       throw Error(`This ${type} is not supported`);
-    }
-  }
-
-  @timer()
-  async subscription (username: string , subInfo: ChatSubInfo, userstate: ChatUser) {
-    try {
-      const amount = subInfo.months;
-      const tier = (subInfo.isPrime ? 'Prime' : String(Number(subInfo.plan ?? 1000) / 1000)) as EmitData['tier'];
-
-      if (isIgnored({ userName: username, userId: userstate.userId })) {
-        return;
-      }
-
-      const user = await changelog.get(userstate.userId);
-      if (!user) {
-        changelog.update(userstate.userId, { userName: username });
-        this.subscription(username, subInfo, userstate);
-        return;
-      }
-
-      let profileImageUrl = null;
-      if (user.profileImageUrl.length === 0) {
-        const res = await getUserByName(username);
-        if (res) {
-          profileImageUrl = res.profilePictureUrl;
-        }
-      }
-
-      changelog.update(user.userId, {
-        ...user,
-        isSubscriber:              user.haveSubscriberLock ? user.isSubscriber : true,
-        subscribedAt:              user.haveSubscribedAtLock ? user.subscribedAt : new Date().toISOString(),
-        subscribeTier:             String(tier),
-        subscribeCumulativeMonths: amount,
-        subscribeStreak:           0,
-        profileImageUrl:           profileImageUrl ? profileImageUrl : user.profileImageUrl,
-      });
-
-      hypeTrain.addSub({
-        username:        user.userName,
-        profileImageUrl: profileImageUrl ? profileImageUrl : user.profileImageUrl,
-      });
-
-      eventlist.add({
-        event:     'sub',
-        tier:      String(tier),
-        userId:    String(userstate.userId),
-        method:    subInfo.isPrime ? 'Twitch Prime' : '' ,
-        timestamp: Date.now(),
-      });
-      sub(`${username}#${userstate.userId}, tier: ${tier}`);
-      eventEmitter.emit('subscription', {
-        userName: username, method: subInfo.isPrime ? 'Twitch Prime' : '', subCumulativeMonths: amount, tier: String(tier),
-      });
-      alerts.trigger({
-        event:      'sub',
-        name:       username,
-        amount:     0,
-        tier,
-        currency:   '',
-        monthsName: '',
-        message:    '',
-      });
-
-      triggerInterfaceOnSub({
-        userName:            username,
-        userId:              userstate.userId,
-        subCumulativeMonths: amount,
-      });
-    } catch (e: any) {
-      error('Error parsing subscription event');
-      error(util.inspect(userstate));
-      error(e.stack);
     }
   }
 

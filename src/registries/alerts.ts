@@ -13,11 +13,13 @@ import { User, UserInterface } from '~/database/entity/user.js';
 import { AppDataSource } from '~/database.js';
 import { Expects } from  '~/expects.js';
 import { prepare } from '~/helpers/commons/index.js';
+import { eventEmitter } from '~/helpers/events/emitter.js';
 import { error, debug, info } from '~/helpers/log.js';
 import { app, ioServer } from '~/helpers/panel.js';
 import { defaultPermissions } from '~/helpers/permissions/defaultPermissions.js';
 import { adminEndpoint, publicEndpoint } from '~/helpers/socket.js';
 import * as changelog from '~/helpers/user/changelog.js';
+import { Types } from '~/plugins/ListenTo.js';
 import twitch from '~/services/twitch.js';
 import { adminMiddleware } from '~/socket.js';
 import { translate } from '~/translate.js';
@@ -97,6 +99,18 @@ class Alerts extends Registry {
       setTimeout(() => this.sockets(), 100);
       return;
     }
+
+    eventEmitter.on(Types.onChannelShoutoutCreate, (opts) => {
+      this.trigger({
+        event:      'promo',
+        message:    '',
+        name:       opts.shoutedOutBroadcasterDisplayName,
+        tier:       '1',
+        amount:     opts.viewerCount,
+        currency:   '',
+        monthsName: '',
+      });
+    });
 
     app.get('/api/registries/alerts', adminMiddleware, async (req, res) => {
       res.send(await Alert.find());

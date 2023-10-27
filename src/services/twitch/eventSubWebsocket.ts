@@ -13,10 +13,11 @@ import { cheer } from '~/helpers/events/cheer.js';
 import { follow } from '~/helpers/events/follow.js';
 import { eventEmitter } from '~/helpers/events/index.js';
 import { raid } from '~/helpers/events/raid.js';
-import { ban, error, info, redeem, timeout, unban } from '~/helpers/log.js';
+import { ban, error, info, redeem, timeout, unban, warning } from '~/helpers/log.js';
 import { ioServer } from '~/helpers/panel.js';
 import * as changelog from '~/helpers/user/changelog.js';
 import eventlist from '~/overlays/eventlist.js';
+import { Types } from '~/plugins/ListenTo.js';
 import alerts from '~/registries/alerts.js';
 import { variables } from '~/watchers.js';
 
@@ -28,8 +29,21 @@ setInterval(() => {
   }
 }, 10000);
 
-// TODO: add missing scopes
 export const broadcasterMissingScopes: string[] = [];
+const CHANNEL_READ_CHARITY = 'channel:read:charity' as const;
+const CHANNEL_READ_GOALS = 'channel:read:goals' as const;
+const MODERATOR_READ_SHIELD_MODE = 'moderator:read:shield_mode' as const;
+const MODERATOR_READ_SHOUTOUTS = 'moderator:read:shoutouts' as const;
+
+const runIfScopeIsApproved = (scopes: string[], scope: string, callback: () => void) => {
+  if (scopes.includes(scope)) {
+    callback();
+  } else {
+    if (!broadcasterMissingScopes.includes(scope)) {
+      broadcasterMissingScopes.push(scope);
+    }
+  }
+};
 
 class EventSubWebsocket {
   listener: EventSubWsListener;
@@ -98,6 +112,358 @@ class EventSubWebsocket {
     });
 
     try {
+      const broadcasterScopes = variables.get('services.twitch.broadcasterCurrentScopes') as string[];
+
+      runIfScopeIsApproved(broadcasterScopes, CHANNEL_READ_CHARITY, () => {
+        this.listener.onChannelCharityCampaignProgress(broadcasterId, event => {
+          if (isAlreadyProcessed(event[rawDataSymbol])) {
+            return;
+          }
+          eventEmitter.emit(Types.onChannelCharityCampaignProgress, {
+            broadcasterDisplayName: event.broadcasterDisplayName,
+            broadcasterId:          event.broadcasterId,
+            broadcasterName:        event.broadcasterName,
+            charityDescription:     event.charityDescription,
+            charityLogo:            event.charityLogo,
+            charityName:            event.charityName,
+            charityWebsite:         event.charityWebsite,
+            currentAmount:          event.currentAmount.localizedValue,
+            currentAmountCurrency:  event.currentAmount.currency,
+            targetAmount:           event.targetAmount.localizedValue,
+            targetAmountCurrency:   event.targetAmount.currency,
+          });
+        });
+        this.listener.onChannelCharityCampaignStart(broadcasterId, event => {
+          if (isAlreadyProcessed(event[rawDataSymbol])) {
+            return;
+          }
+          eventEmitter.emit(Types.onChannelCharityCampaignStart, {
+            broadcasterDisplayName: event.broadcasterDisplayName,
+            broadcasterId:          event.broadcasterId,
+            broadcasterName:        event.broadcasterName,
+            charityDescription:     event.charityDescription,
+            charityLogo:            event.charityLogo,
+            charityName:            event.charityName,
+            charityWebsite:         event.charityWebsite,
+            currentAmount:          event.currentAmount.localizedValue,
+            currentAmountCurrency:  event.currentAmount.currency,
+            targetAmount:           event.targetAmount.localizedValue,
+            targetAmountCurrency:   event.targetAmount.currency,
+            startDate:              event.startDate.toISOString(),
+          });
+        });
+        this.listener.onChannelCharityCampaignStop(broadcasterId, event => {
+          if (isAlreadyProcessed(event[rawDataSymbol])) {
+            return;
+          }
+          eventEmitter.emit(Types.onChannelCharityCampaignStop, {
+            broadcasterDisplayName: event.broadcasterDisplayName,
+            broadcasterId:          event.broadcasterId,
+            broadcasterName:        event.broadcasterName,
+            charityDescription:     event.charityDescription,
+            charityLogo:            event.charityLogo,
+            charityName:            event.charityName,
+            charityWebsite:         event.charityWebsite,
+            currentAmount:          event.currentAmount.localizedValue,
+            currentAmountCurrency:  event.currentAmount.currency,
+            targetAmount:           event.targetAmount.localizedValue,
+            targetAmountCurrency:   event.targetAmount.currency,
+            endDate:                event.endDate.toISOString(),
+          });
+        });
+        this.listener.onChannelCharityDonation(broadcasterId, event => {
+          if (isAlreadyProcessed(event[rawDataSymbol])) {
+            return;
+          }
+          eventEmitter.emit(Types.onChannelCharityDonation, {
+            broadcasterDisplayName: event.broadcasterDisplayName,
+            broadcasterId:          event.broadcasterId,
+            broadcasterName:        event.broadcasterName,
+            charityDescription:     event.charityDescription,
+            charityLogo:            event.charityLogo,
+            charityName:            event.charityName,
+            charityWebsite:         event.charityWebsite,
+            campaignId:             event.campaignId,
+            donorDisplayName:       event.donorDisplayName,
+            donorId:                event.donorId,
+            donorName:              event.donorName,
+            amount:                 event.amount.localizedValue,
+            amountCurrency:         event.amount.currency,
+          });
+        });
+      });
+
+      // GOAL
+      runIfScopeIsApproved(broadcasterScopes, CHANNEL_READ_GOALS, () => {
+        this.listener.onChannelGoalBegin(broadcasterId, event => {
+          if (isAlreadyProcessed(event[rawDataSymbol])) {
+            return;
+          }
+          eventEmitter.emit(Types.onChannelGoalBegin, {
+            broadcasterDisplayName: event.broadcasterDisplayName,
+            broadcasterId:          event.broadcasterId,
+            broadcasterName:        event.broadcasterName,
+            currentAmount:          event.currentAmount,
+            description:            event.description,
+            startDate:              event.startDate.toISOString(),
+            targetAmount:           event.targetAmount,
+            type:                   event.type,
+          });
+        });
+        this.listener.onChannelGoalEnd(broadcasterId, event => {
+          if (isAlreadyProcessed(event[rawDataSymbol])) {
+            return;
+          }
+          eventEmitter.emit(Types.onChannelGoalEnd, {
+            broadcasterDisplayName: event.broadcasterDisplayName,
+            broadcasterId:          event.broadcasterId,
+            broadcasterName:        event.broadcasterName,
+            currentAmount:          event.currentAmount,
+            description:            event.description,
+            startDate:              event.startDate.toISOString(),
+            endDate:                event.endDate.toISOString(),
+            targetAmount:           event.targetAmount,
+            type:                   event.type,
+            isAchieved:             event.isAchieved,
+          });
+        });
+        this.listener.onChannelGoalProgress(broadcasterId, event => {
+          if (isAlreadyProcessed(event[rawDataSymbol])) {
+            return;
+          }
+          eventEmitter.emit(Types.onChannelGoalProgress, {
+            broadcasterDisplayName: event.broadcasterDisplayName,
+            broadcasterId:          event.broadcasterId,
+            broadcasterName:        event.broadcasterName,
+            currentAmount:          event.currentAmount,
+            description:            event.description,
+            startDate:              event.startDate.toISOString(),
+            targetAmount:           event.targetAmount,
+            type:                   event.type,
+          });
+        });
+      });
+
+      // MODERATOR
+      this.listener.onChannelModeratorAdd(broadcasterId, event => {
+        if (isAlreadyProcessed(event[rawDataSymbol])) {
+          return;
+        }
+        eventEmitter.emit(Types.onChannelModeratorAdd, {
+          broadcasterDisplayName: event.broadcasterDisplayName,
+          broadcasterId:          event.broadcasterId,
+          broadcasterName:        event.broadcasterName,
+          userDisplayName:        event.userDisplayName,
+          userId:                 event.userId,
+          userName:               event.userName,
+        });
+      });
+      this.listener.onChannelModeratorRemove(broadcasterId, event => {
+        if (isAlreadyProcessed(event[rawDataSymbol])) {
+          return;
+        }
+        eventEmitter.emit(Types.onChannelModeratorRemove, {
+          broadcasterDisplayName: event.broadcasterDisplayName,
+          broadcasterId:          event.broadcasterId,
+          broadcasterName:        event.broadcasterName,
+          userDisplayName:        event.userDisplayName,
+          userId:                 event.userId,
+          userName:               event.userName,
+        });
+      });
+
+      // REWARD
+      this.listener.onChannelRewardAdd(broadcasterId, event => {
+        if (isAlreadyProcessed(event[rawDataSymbol])) {
+          return;
+        }
+        eventEmitter.emit(Types.onChannelRewardAdd, {
+          broadcasterDisplayName:         event.broadcasterDisplayName,
+          broadcasterId:                  event.broadcasterId,
+          broadcasterName:                event.broadcasterName,
+          autoApproved:                   event.autoApproved,
+          backgroundColor:                event.backgroundColor,
+          cooldownExpiryDate:             event.cooldownExpiryDate?.toISOString() ?? null,
+          cost:                           event.cost,
+          globalCooldown:                 event.globalCooldown,
+          id:                             event.id,
+          isEnabled:                      event.isEnabled,
+          isInStock:                      event.isInStock,
+          isPaused:                       event.isPaused,
+          maxRedemptionsPerStream:        event.maxRedemptionsPerStream,
+          maxRedemptionsPerUserPerStream: event.maxRedemptionsPerUserPerStream,
+          prompt:                         event.prompt,
+          redemptionsThisStream:          event.redemptionsThisStream,
+          title:                          event.title,
+          userInputRequired:              event.userInputRequired,
+        });
+      });
+      this.listener.onChannelRewardRemove(broadcasterId, event => {
+        if (isAlreadyProcessed(event[rawDataSymbol])) {
+          return;
+        }
+        eventEmitter.emit(Types.onChannelRewardRemove, {
+          broadcasterDisplayName:         event.broadcasterDisplayName,
+          broadcasterId:                  event.broadcasterId,
+          broadcasterName:                event.broadcasterName,
+          autoApproved:                   event.autoApproved,
+          backgroundColor:                event.backgroundColor,
+          cooldownExpiryDate:             event.cooldownExpiryDate?.toISOString() ?? null,
+          cost:                           event.cost,
+          globalCooldown:                 event.globalCooldown,
+          id:                             event.id,
+          isEnabled:                      event.isEnabled,
+          isInStock:                      event.isInStock,
+          isPaused:                       event.isPaused,
+          maxRedemptionsPerStream:        event.maxRedemptionsPerStream,
+          maxRedemptionsPerUserPerStream: event.maxRedemptionsPerUserPerStream,
+          prompt:                         event.prompt,
+          redemptionsThisStream:          event.redemptionsThisStream,
+          title:                          event.title,
+          userInputRequired:              event.userInputRequired,
+        });
+      });
+      this.listener.onChannelRewardUpdate(broadcasterId, event => {
+        if (isAlreadyProcessed(event[rawDataSymbol])) {
+          return;
+        }
+        eventEmitter.emit(Types.onChannelRewardUpdate, {
+          broadcasterDisplayName:         event.broadcasterDisplayName,
+          broadcasterId:                  event.broadcasterId,
+          broadcasterName:                event.broadcasterName,
+          autoApproved:                   event.autoApproved,
+          backgroundColor:                event.backgroundColor,
+          cooldownExpiryDate:             event.cooldownExpiryDate?.toISOString() ?? null,
+          cost:                           event.cost,
+          globalCooldown:                 event.globalCooldown,
+          id:                             event.id,
+          isEnabled:                      event.isEnabled,
+          isInStock:                      event.isInStock,
+          isPaused:                       event.isPaused,
+          maxRedemptionsPerStream:        event.maxRedemptionsPerStream,
+          maxRedemptionsPerUserPerStream: event.maxRedemptionsPerUserPerStream,
+          prompt:                         event.prompt,
+          redemptionsThisStream:          event.redemptionsThisStream,
+          title:                          event.title,
+          userInputRequired:              event.userInputRequired,
+        });
+      });
+
+      // SHIELD
+      runIfScopeIsApproved(broadcasterScopes, MODERATOR_READ_SHIELD_MODE, () => {
+        this.listener.onChannelShieldModeBegin(broadcasterId, broadcasterId, event => {
+          if (isAlreadyProcessed(event[rawDataSymbol])) {
+            return;
+          }
+          eventEmitter.emit(Types.onChannelShieldModeBegin, {
+            broadcasterDisplayName: event.broadcasterDisplayName,
+            broadcasterId:          event.broadcasterId,
+            broadcasterName:        event.broadcasterName,
+            moderatorDisplayName:   event.moderatorDisplayName,
+            moderatorId:            event.moderatorId,
+            moderatorName:          event.moderatorName,
+          });
+        });
+        this.listener.onChannelShieldModeEnd(broadcasterId, broadcasterId, event => {
+          if (isAlreadyProcessed(event[rawDataSymbol])) {
+            return;
+          }
+          eventEmitter.emit(Types.onChannelShieldModeEnd, {
+            broadcasterDisplayName: event.broadcasterDisplayName,
+            broadcasterId:          event.broadcasterId,
+            broadcasterName:        event.broadcasterName,
+            moderatorDisplayName:   event.moderatorDisplayName,
+            moderatorId:            event.moderatorId,
+            moderatorName:          event.moderatorName,
+            endDate:                event.endDate.toISOString(),
+          });
+        });
+      });
+
+      // SHOUTOUT
+      runIfScopeIsApproved(broadcasterScopes, MODERATOR_READ_SHOUTOUTS, () => {
+        this.listener.onChannelShoutoutCreate(broadcasterId, broadcasterId, event => {
+          if (isAlreadyProcessed(event[rawDataSymbol])) {
+            return;
+          }
+          eventEmitter.emit(Types.onChannelShoutoutCreate, {
+            broadcasterDisplayName:           event.broadcasterDisplayName,
+            broadcasterId:                    event.broadcasterId,
+            broadcasterName:                  event.broadcasterName,
+            moderatorDisplayName:             event.moderatorDisplayName,
+            moderatorId:                      event.moderatorId,
+            moderatorName:                    event.moderatorName,
+            cooldownEndDate:                  event.cooldownEndDate.toISOString(),
+            shoutedOutBroadcasterDisplayName: event.shoutedOutBroadcasterDisplayName,
+            shoutedOutBroadcasterId:          event.shoutedOutBroadcasterId,
+            shoutedOutBroadcasterName:        event.shoutedOutBroadcasterName,
+            startDate:                        event.startDate.toISOString(),
+            viewerCount:                      event.viewerCount,
+          });
+        });
+        this.listener.onChannelShoutoutReceive(broadcasterId, broadcasterId, event => {
+          if (isAlreadyProcessed(event[rawDataSymbol])) {
+            return;
+          }
+          eventEmitter.emit(Types.onChannelShoutoutReceive, {
+            broadcasterDisplayName:            event.broadcasterDisplayName,
+            broadcasterId:                     event.broadcasterId,
+            broadcasterName:                   event.broadcasterName,
+            startDate:                         event.startDate.toISOString(),
+            viewerCount:                       event.viewerCount,
+            shoutingOutBroadcasterDisplayName: event.shoutingOutBroadcasterDisplayName,
+            shoutingOutBroadcasterId:          event.shoutingOutBroadcasterId,
+            shoutingOutBroadcasterName:        event.shoutingOutBroadcasterName,
+          });
+        });
+      });
+
+      // SUBSCRIPTION
+      // We are currently not using this event, because it is missing if subscription is with Prime or not
+      // revise after https://twitch.uservoice.com/forums/310213-developers/suggestions/42012043-add-is-prime-to-subscription-events
+      // this.listener.onChannelSubscription(broadcasterId, async (event) => {});
+      // this.listener.onChannelSubscriptionEnd(broadcasterId, event => {});
+      // this.listener.onChannelSubscriptionGift(broadcasterId, event => {});
+      // this.listener.onChannelSubscriptionMessage(broadcasterId, event => {});
+
+      // CHANNEL UPDATE
+      this.listener.onChannelUpdate(broadcasterId, event => {
+        if (isAlreadyProcessed(event[rawDataSymbol])) {
+          return;
+        }
+        eventEmitter.emit(Types.onChannelUpdate, {
+          broadcasterDisplayName: event.broadcasterDisplayName,
+          broadcasterId:          event.broadcasterId,
+          broadcasterName:        event.broadcasterName,
+          categoryId:             event.categoryId,
+          categoryName:           event.categoryName,
+          isMature:               event.isMature,
+          streamLanguage:         event.streamLanguage,
+          streamTitle:            event.streamTitle,
+        });
+      });
+
+      // STREAM
+      // We are currently not using this event, because we have own API polling logic at getCurrentStream
+      // Will need to be revised eventually
+      // this.listener.onStreamOnline(broadcasterId, event => {});
+      // this.listener.onStreamOffline(broadcasterId, event => {});
+
+      // USER UPDATE
+      this.listener.onUserUpdate(broadcasterId, event => {
+        if (isAlreadyProcessed(event[rawDataSymbol])) {
+          return;
+        }
+        eventEmitter.emit(Types.onUserUpdate, {
+          userDescription:     event.userDescription,
+          userDisplayName:     event.userDisplayName,
+          userId:              event.userId,
+          userEmail:           event.userEmail,
+          userEmailIsVerified: event.userEmailIsVerified,
+          userName:            event.userName,
+        });
+      });
+
       // FOLLOW
       this.listener.onChannelFollow(broadcasterId, broadcasterId, event => {
         if (isAlreadyProcessed(event[rawDataSymbol])) {
@@ -115,6 +481,20 @@ class EventSubWebsocket {
       });
 
       // RAID
+      this.listener.onChannelRaidFrom(broadcasterId, event => {
+        if (isAlreadyProcessed(event[rawDataSymbol])) {
+          return;
+        }
+        eventEmitter.emit(Types.onChannelRaidFrom, {
+          raidedBroadcasterDisplayName:  event.raidedBroadcasterDisplayName,
+          raidedBroadcasterName:         event.raidedBroadcasterName,
+          raidedBroadcasterId:           event.raidedBroadcasterId,
+          raidingBroadcasterDisplayName: event.raidingBroadcasterDisplayName,
+          raidingBroadcasterName:        event.raidingBroadcasterName,
+          raidingBroadcasterId:          event.raidingBroadcasterId,
+          viewers:                       event.viewers,
+        });
+      });
       this.listener.onChannelRaidTo(broadcasterId, event => {
         if (isAlreadyProcessed(event[rawDataSymbol])) {
           return;
@@ -288,6 +668,28 @@ class EventSubWebsocket {
           userInput: event.input,
         });
       });
+      this.listener.onChannelRedemptionUpdate(broadcasterId, event => {
+        if (isAlreadyProcessed(event[rawDataSymbol])) {
+          return;
+        }
+
+        eventEmitter.emit(Types.onChannelRedemptionUpdate, {
+          broadcasterDisplayName: event.broadcasterDisplayName,
+          broadcasterId:          event.broadcasterId,
+          broadcasterName:        event.broadcasterName,
+          id:                     event.id,
+          input:                  event.input,
+          redemptionDate:         event.redemptionDate.toISOString(),
+          rewardCost:             event.rewardCost,
+          rewardId:               event.rewardId,
+          rewardPrompt:           event.rewardPrompt,
+          rewardTitle:            event.rewardTitle,
+          status:                 event.status,
+          userDisplayName:        event.userDisplayName,
+          userId:                 event.userId,
+          userName:               event.userName,
+        });
+      });
 
       this.listenerBroadcasterId = broadcasterId;
     } catch (e) {
@@ -295,6 +697,10 @@ class EventSubWebsocket {
         error('EVENTSUB-WS: ' + e.message);
       }
       error('EVENTSUB-WS: Unknown error durring initialization. ' + e);
+    } finally {
+      if (broadcasterMissingScopes.length > 0) {
+        warning('TWITCH: Broadcaster token is missing the following scopes: ' + broadcasterMissingScopes.join(', ') + '. Please re-authenticate your account.');
+      }
     }
 
     if (process.env.ENV === 'production' || process.env.NODE_ENV === 'production') {

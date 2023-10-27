@@ -31,6 +31,74 @@ class Plugins extends Core {
       this.triggerCrons();
     }, SECOND);
 
+    eventEmitter.on(Types.onChannelCharityCampaignStart, async (args) => {
+      this.process(Types.onChannelCharityCampaignStart, undefined, undefined, { args });
+    });
+    eventEmitter.on(Types.onChannelCharityCampaignProgress, async (args) => {
+      this.process(Types.onChannelCharityCampaignProgress, undefined, undefined, { args });
+    });
+    eventEmitter.on(Types.onChannelCharityCampaignStop, async (args) => {
+      this.process(Types.onChannelCharityCampaignStop, undefined, undefined, { args });
+    });
+
+    eventEmitter.on(Types.onChannelCharityDonation, async (args) => {
+      this.process(Types.onChannelCharityDonation, undefined, undefined, { args });
+    });
+
+    eventEmitter.on(Types.onChannelGoalBegin, async (args) => {
+      this.process(Types.onChannelGoalBegin, undefined, undefined, { args });
+    });
+    eventEmitter.on(Types.onChannelGoalProgress, async (args) => {
+      this.process(Types.onChannelGoalProgress, undefined, undefined, { args });
+    });
+    eventEmitter.on(Types.onChannelGoalEnd, async (args) => {
+      this.process(Types.onChannelGoalEnd, undefined, undefined, { args });
+    });
+
+    eventEmitter.on(Types.onChannelModeratorAdd, async (args) => {
+      this.process(Types.onChannelModeratorAdd, undefined, undefined, { args });
+    });
+    eventEmitter.on(Types.onChannelModeratorRemove, async (args) => {
+      this.process(Types.onChannelModeratorRemove, undefined, undefined, { args });
+    });
+
+    eventEmitter.on(Types.onChannelRewardAdd, async (args) => {
+      this.process(Types.onChannelRewardAdd, undefined, undefined, { args });
+    });
+    eventEmitter.on(Types.onChannelRewardUpdate, async (args) => {
+      this.process(Types.onChannelRewardUpdate, undefined, undefined, { args });
+    });
+    eventEmitter.on(Types.onChannelRewardRemove, async (args) => {
+      this.process(Types.onChannelRewardRemove, undefined, undefined, { args });
+    });
+
+    eventEmitter.on(Types.onChannelShieldModeBegin, async (args) => {
+      this.process(Types.onChannelShieldModeBegin, undefined, undefined, { args });
+    });
+    eventEmitter.on(Types.onChannelShieldModeEnd, async (args) => {
+      this.process(Types.onChannelShieldModeEnd, undefined, undefined, { args });
+    });
+
+    eventEmitter.on(Types.onChannelShoutoutCreate, async (args) => {
+      this.process(Types.onChannelShoutoutCreate, undefined, undefined, { args });
+    });
+    eventEmitter.on(Types.onChannelShoutoutReceive, async (args) => {
+      this.process(Types.onChannelShoutoutReceive, undefined, undefined, { args });
+    });
+
+    eventEmitter.on(Types.onChannelUpdate, async (args) => {
+      this.process(Types.onChannelUpdate, undefined, undefined, { args });
+    });
+    eventEmitter.on(Types.onUserUpdate, async (args) => {
+      this.process(Types.onUserUpdate, undefined, undefined, { args });
+    });
+    eventEmitter.on(Types.onChannelRaidFrom, async (args) => {
+      this.process(Types.onChannelRaidFrom, undefined, undefined, { args });
+    });
+    eventEmitter.on(Types.onChannelRedemptionUpdate, async (args) => {
+      this.process(Types.onChannelRedemptionUpdate, undefined, undefined, { args });
+    });
+
     eventEmitter.on(Types.CustomVariableOnChange, async (variableName, cur, prev) => {
       this.process(Types.CustomVariableOnChange, undefined, undefined, { variableName, cur, prev });
     });
