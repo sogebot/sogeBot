@@ -8,7 +8,6 @@ import stripAnsi from 'strip-ansi';
 
 import { isDebugEnabled } from './debug.js';
 import { logEmitter } from './log/emitter.js';
-import { getFunctionNameFromStackTrace } from './stacktrace.js';
 
 import { isDbConnected } from '~/helpers/database.js';
 
@@ -127,10 +126,7 @@ function format(level: Levels, message: any, category?: string) {
   return [timestamp, levelFormat[Levels[level] as keyof typeof Levels], category, message].filter(Boolean).join(' ');
 }
 
-function log(message: any, level?: keyof typeof Levels) {
-  if (!level) {
-    level = getFunctionNameFromStackTrace() as keyof typeof Levels;
-  }
+function log(message: any, level: keyof typeof Levels) {
   if (Levels[level] <= Levels[logLevel as keyof typeof Levels]) {
     const formattedMessage = format(Levels[level as keyof typeof Levels], message);
     process.stdout.write(formattedMessage + '\n');
@@ -161,20 +157,20 @@ export function error(message: any) {
   // we have custom typeorm logger to show QueryFailedError
   // stack from those errors are not usable so we don't need it
   if (typeof message !== 'string' || (typeof message === 'string' && !message.startsWith('QueryFailedError: '))) {
-    log(message);
+    log(message, 'error');
   }
 }
 
 export function chatIn(message: any) {
-  log(message);
+  log(message, 'chatIn');
 }
 
-const logFunction = (message: any) => {
-  log(message);
+export const chatOut = isMochaTestRun() && sinon ? sinon.stub() : (message: any) => {
+  log(message, 'chatOut');
 };
-
-export const chatOut = isMochaTestRun() && sinon ? sinon.stub() : logFunction;
-export const warning = isMochaTestRun() && sinon ? sinon.stub() : logFunction;
+export const warning = isMochaTestRun() && sinon ? sinon.stub() : (message: any) => {
+  log(message, 'warning');
+};
 export const debug = isMochaTestRun() && sinon ? sinon.stub() : (category: string, message: any) => {
   const categories = category.split('.');
   if (categories.length > 2 && category !== '*') {
@@ -188,55 +184,55 @@ export const debug = isMochaTestRun() && sinon ? sinon.stub() : (category: strin
 };
 
 export function whisperIn(message: any) {
-  log(message);
+  log(message, 'whisperIn');
 }
 export function whisperOut(message: any) {
-  log(message);
+  log(message, 'whisperOut');
 }
 export function info(message: any) {
-  log(message);
+  log(message, 'info');
 }
 export function timeout(message: any) {
-  log(message);
+  log(message, 'timeout');
 }
 export function ban(message: any) {
-  log(message);
+  log(message, 'ban');
 }
 export function unban(message: any) {
-  log(message);
+  log(message, 'unban');
 }
 export function follow(message: any) {
-  log(message);
+  log(message, 'follow');
 }
 export function raid(message: any) {
-  log(message);
+  log(message, 'raid');
 }
 export function cheer(message: any) {
-  log(message);
+  log(message, 'cheer');
 }
 export function tip(message: any) {
-  log(message);
+  log(message, 'tip');
 }
 export function sub(message: any) {
-  log(message);
+  log(message, 'sub');
 }
 export function subgift(message: any) {
-  log(message);
+  log(message, 'subgift');
 }
 export function subcommunitygift(message: any) {
-  log(message);
+  log(message, 'subcommunitygift');
 }
 export function resub(message: any) {
-  log(message);
+  log(message, 'resub');
 }
 export function start(message: any) {
-  log(message);
+  log(message, 'start');
 }
 export function stop(message: any) {
-  log(message);
+  log(message, 'stop');
 }
 export function redeem(message: any) {
-  log(message);
+  log(message, 'redeem');
 }
 
 const logTimezone = async () => {

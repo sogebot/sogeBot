@@ -1,33 +1,31 @@
 import { getFunctionList } from '../../decorators/on.js';
 import { debug } from '../log.js';
 import { find } from '../register.js';
-import { getFunctionNameFromStackTrace } from '../stacktrace.js';
 
 export function triggerInterfaceOnMessage(opts: onEventMessage) {
-  trigger(opts);
+  trigger(opts, 'message');
 }
 
 export function triggerInterfaceOnSub(opts: onEventSub) {
-  trigger(opts);
+  trigger(opts, 'sub');
 }
 
 export function triggerInterfaceOnFollow(opts: onEventFollow) {
-  trigger(opts);
+  trigger(opts, 'follow');
 }
 
 export function triggerInterfaceOnTip(opts: onEventTip) {
-  trigger(opts);
+  trigger(opts, 'tip');
 }
 
 export function triggerInterfaceOnBit(opts: Omit<onEventTip, 'currency'>) {
-  trigger(opts);
+  trigger(opts, 'bit');
 }
 
-function trigger(opts: onEventMessage | onEventSub | onEventBit | onEventTip | onEventFollow) {
-  const on_trigger: 'bit' | 'tip' | 'sub' | 'follow' | 'message' = getFunctionNameFromStackTrace().replace('triggerInterfaceOn', '').toLowerCase() as any;
-  debug('trigger', `event ${on_trigger}`);
+function trigger(opts: onEventMessage | onEventSub | onEventBit | onEventTip | onEventFollow, on: 'bit' | 'tip' | 'sub' | 'follow' | 'message') {
+  debug('trigger', `event ${on}`);
 
-  for (const event of getFunctionList(on_trigger)) {
+  for (const event of getFunctionList(on)) {
     const [ type, name ] = event.path.split('.');
     const self = find(type as any, name);
     if (!self) {
@@ -35,7 +33,7 @@ function trigger(opts: onEventMessage | onEventSub | onEventBit | onEventTip | o
     }
 
     if (typeof (self as any)[event.fName] === 'function') {
-      debug('trigger', `event ${on_trigger} => ${self.__moduleName__}`);
+      debug('trigger', `event ${on} => ${self.__moduleName__}`);
       (self as any)[event.fName](opts);
     }
   }
