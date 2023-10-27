@@ -113,6 +113,13 @@ class Chat {
       if (typeof (global as any).it === 'function') {
         return;
       }
+      debug('emitter.say', JSON.stringify({ channel, message, opts }));
+
+      if (this.client.bot) {
+        await this.client.bot.say(channel, message, opts);
+      } else {
+        throw new Error('Bot client is not available.');
+      }
     });
     tmiEmitter.on('whisper', async (username, message) => {
       debug('emitter.whisper', JSON.stringify({ username, message }));
