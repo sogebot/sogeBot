@@ -23,6 +23,7 @@ import { isAlreadyProcessed } from './eventsub/events.js';
 import * as channelPoll from '~/helpers/api/channelPoll.js';
 import * as channelPrediction from '~/helpers/api/channelPrediction.js';
 import * as hypeTrain from '~/helpers/api/hypeTrain.js';
+import { dayjs } from '~/helpers/dayjsHelper.js';
 import { cheer } from '~/helpers/events/cheer.js';
 import { follow } from '~/helpers/events/follow.js';
 import { eventEmitter } from '~/helpers/events/index.js';
@@ -165,10 +166,11 @@ class EventSubLongPolling {
     const createdBy = event.moderator_user_login;
     const createdById = event.moderator_user_id;
     const reason = event.reason;
-    const duration = event.ends_at ? new Date(event.ends_at) : null;
-    if (duration) {
-      timeout(`${ userName }#${ userId } by ${ createdBy }#${ createdById } for ${ duration } seconds`);
-      eventEmitter.emit('timeout', { userName, duration: duration.getTime() - Date.now() / 1000 });
+    const ends_at = event.ends_at ? dayjs(event.ends_at) : null;
+    if (ends_at) {
+      const duration = dayjs.duration(ends_at.diff(dayjs(event.banned_at)));
+      timeout(`${ userName }#${ userId } by ${ createdBy }#${ createdById } for ${ duration.asSeconds() } seconds`);
+      eventEmitter.emit('timeout', { userName, duration: duration.asSeconds() });
     } else {
       ban(`${ userName }#${ userId } by ${ createdBy }: ${ reason ? reason : '<no reason>' }`);
       eventEmitter.emit('ban', { userName, reason: reason ? reason : '<no reason>' });
