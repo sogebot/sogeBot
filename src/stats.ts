@@ -55,9 +55,10 @@ class Stats extends Core {
         }
 
         const ytCurrentSong = Object.values(songs.isPlaying).find(o => o) ? get(JSON.parse(songs.currentSong), 'title', null) : null;
-        let spotifyCurrentSong: null | string = get(JSON.parse(spotify.currentSong), 'song', '') + ' - ' + get(JSON.parse(spotify.currentSong), 'artist', '');
-        if (spotifyCurrentSong.trim().length === 1 /* '-' */  || get(JSON.parse(spotify.currentSong), 'is_playing', false)) {
-          spotifyCurrentSong = null;
+        const spotifySongParsed = JSON.parse(spotify.currentSong);
+        let spotifyCurrentSong: null | string = null;
+        if (spotifySongParsed && spotifySongParsed.is_playing) {
+          spotifyCurrentSong = `${spotifySongParsed.song} - ${spotifySongParsed.artist}`;
         }
 
         const broadcasterType = variables.get('services.twitch.broadcasterType') as string;
