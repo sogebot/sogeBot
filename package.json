@@ -9,7 +9,7 @@
   },
   "type": "module",
   "main": "main.js",
-  "exports":{
+  "exports": {
     "./dest/*": "./dest/*",
     "./src/*": "./src/*"
   },
