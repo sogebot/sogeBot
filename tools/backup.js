@@ -6,8 +6,10 @@ import { normalize } from 'path';
 
 import _ from 'lodash';
 import { DataSource } from 'typeorm';
-import argv from 'yargs'
-argv
+import yargs from 'yargs'
+import { hideBin } from 'yargs/helpers'
+
+const argv = yargs(hideBin(process.argv))
   .usage('node tools/backup.js')
   .example('node tools/backup.js backup ./backup')
   .example('node tools/backup.js restore ./backup')
@@ -57,7 +59,7 @@ argv
   .help()
   .argv;
 
-const { getMigrationType } = require('../dest/helpers/getMigrationType');
+import { getMigrationType } from '../dest/helpers/getMigrationType.js';
 
 async function main() {
   const type = process.env.TYPEORM_AppDataSource;
