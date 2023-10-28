@@ -1,6 +1,6 @@
 {
   "name": "@sogebot/backend",
-  "version": "20.1.4",
+  "version": "20.2.0-SNAPSHOT",
   "description": "Free Twitch Bot built on Node.js",
   "private": true,
   "engines": {
