@@ -2,7 +2,7 @@
   "settings": {
     "verification_token": {
       "title": "Bestätigungstoken",
-      "help": "Get your verification token at <a href='https://ko-fi.com/manage/webhooks' target='_blank'>https://ko-fi.com/manage/webhooks</a>"
+      "help": "Holen Sie sich Ihren Verifizierungs-Token auf <a href='https://ko-fi.com/manage/webhooks' target='_blank'>https://ko-fi.com/manage/webhooks</a>"
     },
     "webhook_url": {
       "title": "Webhook URL",

@@ -235,16 +235,16 @@
           "placeholder": "Channelname oder ID"
         },
         "timeout": {
-          "label": "Timeout",
-          "placeholder": "Set timeout in milliseconds"
+          "label": "Auszeit, Unterbrechung / Zeitüberschreitung",
+          "placeholder": "Timeout in Millisekunden festlegen"
         },
         "timeoutType": {
           "label": "Art des Timeouts",
-          "placeholder": "Set type of timeout"
+          "placeholder": "Art des Timeouts festlegen"
         },
         "command": {
           "label": "Befehl",
-          "placeholder": "Set your !command"
+          "placeholder": "!Befehl festlegen"
         },
         "commandToRun": {
           "label": "Befehl zum Starten",
@@ -308,11 +308,11 @@
       }
     },
     "eventlist-events": {
-      "follow": "<strong>Followed</strong> you",
-      "raid": "<strong>Raided</strong> you with <strong>$viewers</strong> raiders.",
-      "sub": "<strong>Subscribed</strong> to you with <strong>$subType</strong>. They've been subscribed for $subCumulativeMonths $subCumulativeMonthsName.",
-      "subgift": "has been <strong>gifted</strong> subscription from <strong>$username</strong>",
-      "subcommunitygift": "<strong>Gifted</strong> subscriptions for community",
+      "follow": "<strong>folgt</strong> dir",
+      "raid": "<strong>raided</strong> you with <strong>$viewers</strong> raiders.",
+      "sub": "hat dich <strong>abonniert</strong> <strong>$subType</strong>. Sie abonnieren dich bereits seit $subCumulativeMonths $subCumulativeMonthsName.",
+      "subgift": "wurde <strong>mit</strong> von <strong>$username</strong> verschenkt",
+      "subcommunitygift": "<strong>Gönnete</strong> Abonnements für Community",
       "resub": "<strong>Resubscribed</strong> with <strong>$subType</strong>. They've been subscribed for $subCumulativeMonths $subCumulativeMonthsName.",
       "cheer": "<strong>Cheered</strong> you",
       "tip": "<strong>Tipped</strong> you",
