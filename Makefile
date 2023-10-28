@@ -18,7 +18,7 @@ dependencies:
 	@rm -rf node_modules
 	@rm -rf ${NODE_MODULES_DIR}
 	@echo -ne "\n\t ----- Installation of dependencies\n"
-	npm install --include=dev --force
+	npm install --include=dev
 	@echo -ne "\n\t ----- Installation of husky\n"
 	npx --yes husky install
 
