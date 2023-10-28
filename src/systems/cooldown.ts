@@ -394,6 +394,7 @@ class Cooldown extends System {
       }
       return result;
     } catch (e: any) {
+      error(`Something went wrong during cooldown check: ${e.stack}`);
       return false;
     }
   }
