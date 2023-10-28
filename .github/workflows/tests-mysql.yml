@@ -32,11 +32,11 @@ jobs:
     - id: log
       name: Load commit message for skip test check
       run: echo "MESSAGE=$(git log --no-merges -1 --pretty=format:%s%b)" >> $GITHUB_OUTPUT
-    - name: install node v18
+    - name: install node LTS
       if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
       uses: actions/setup-node@v3
       with:
-        node-version: 18
+        node-version: lts/*
         check-latest: true
     - name: Install latest npm
       if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
@@ -72,11 +72,11 @@ jobs:
     - id: log
       name: Load commit message for skip test check
       run: echo "MESSAGE=$(git log --no-merges -1 --pretty=format:%s%b)" >> $GITHUB_OUTPUT
-    - name: install node v18
+    - name: install node LTS
       if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
       uses: actions/setup-node@v3
       with:
-        node-version: 18
+        node-version: lts/*
         check-latest: true
     - name: Install latest npm
       if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
@@ -118,11 +118,11 @@ jobs:
     - id: log
       name: Load commit message for skip test check
       run: echo "MESSAGE=$(git log --no-merges -1 --pretty=format:%s%b)" >> $GITHUB_OUTPUT
-    - name: install node v18
+    - name: install node LTS
       if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
       uses: actions/setup-node@v3
       with:
-        node-version: 18
+        node-version: lts/*
         check-latest: true
     - name: Install latest npm
       if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
@@ -164,11 +164,11 @@ jobs:
     - id: log
       name: Load commit message for skip test check
       run: echo "MESSAGE=$(git log --no-merges -1 --pretty=format:%s%b)" >> $GITHUB_OUTPUT
-    - name: install node v18
+    - name: install node LTS
       if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
       uses: actions/setup-node@v3
       with:
-        node-version: 18
+        node-version: lts/*
         check-latest: true
     - name: Install latest npm
       if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"

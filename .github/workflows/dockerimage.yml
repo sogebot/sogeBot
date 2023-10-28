@@ -20,10 +20,10 @@ jobs:
       - name: Get short SHA
         id: slug
         run: echo "SHA=$(echo ${GITHUB_SHA} | cut -c1-8)" >> $GITHUB_OUTPUT
-      - name: install node v18
+      - name: install node LTS
         uses: actions/setup-node@v3
         with:
-          node-version: 18
+          node-version: lts/*
           check-latest: true
       - name: Install latest npm
         run: |

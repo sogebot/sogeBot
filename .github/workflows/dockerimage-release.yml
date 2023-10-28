@@ -17,10 +17,10 @@ jobs:
         with:
           fetch-depth: 0 # load full history
 
-      - name: install node v18
+      - name: install node LTS
         uses: actions/setup-node@v3
         with:
-          node-version: 18
+          node-version: lts/*
           check-latest: true
       - name: Install latest npm
         run: |
