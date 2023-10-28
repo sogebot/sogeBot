@@ -99,7 +99,7 @@ yargs(hideBin(process.argv))
         process.stdout.write(line);
       }
     }
-  });
+  })
   .demandCommand()
   .parse()
 
