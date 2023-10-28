@@ -18,7 +18,7 @@ import { Parser } from '../parser.js';
 
 import { AppDataSource } from '~/database.js';
 import { prepare } from '~/helpers/commons/index.js';
-import { debug, error } from '~/helpers/log.js';
+import { debug, error, info } from '~/helpers/log.js';
 import { app } from '~/helpers/panel.js';
 import { ParameterError } from '~/helpers/parameterError.js';
 import defaultPermissions from '~/helpers/permissions/defaultPermissions.js';
@@ -381,7 +381,7 @@ class Cooldown extends System {
               parserReply(response, opts, 'chat');
             }
           }
-          debug('cooldown.check', `${opts.sender.userName}#${opts.sender.userId} have ${cooldown.name} on cooldown, remaining ${Math.ceil((cooldown.miliseconds - now + new Date(timestamp).getTime()) / 1000)}s`);
+          info(`${opts.sender.userName}#${opts.sender.userId} have ${cooldown.name} on cooldown, remaining ${Math.ceil((cooldown.miliseconds - now + new Date(timestamp).getTime()) / 1000)}s`);
           result = false;
           break; // disable _.each and updateQueue with false
         }
