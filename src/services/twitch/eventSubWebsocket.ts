@@ -28,6 +28,9 @@ setInterval(() => {
   }
 }, 10000);
 
+// TODO: add missing scopes
+export const broadcasterMissingScopes: string[] = [];
+
 class EventSubWebsocket {
   listener: EventSubWsListener;
   listenerBroadcasterId?: string;

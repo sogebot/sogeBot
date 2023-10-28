@@ -47,6 +47,7 @@ import { processAuth, default as socketSystem } from '~/socket.js';
 import highlights from '~/systems/highlights.js';
 import translateLib, { translate } from '~/translate.js';
 import { variables } from '~/watchers.js';
+import { broadcasterMissingScopes } from './services/twitch/eventSubWebsocket.js';
 
 // __dirname is not available in ES6 module
 const __dirname = new URL('.', import.meta.url).pathname;
@@ -382,6 +383,10 @@ class Panel extends Core {
 
       adminEndpoint('/', 'debug::set', (data) => {
         setDEBUG(data);
+      });
+
+      adminEndpoint('/', 'token::broadcaster-missing-scopes', (cb) => {
+        cb(broadcasterMissingScopes);
       });
 
       adminEndpoint('/', 'panel::alerts', (cb) => {

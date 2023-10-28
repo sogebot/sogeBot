@@ -31,8 +31,8 @@ import { ValidationError } from 'class-validator';
 import { Socket } from 'socket.io';
 import { FindConditions } from 'typeorm';
 
-import { QuickActions } from '../../../src/database/entity/dashboard';
-import { WidgetCustomInterface, WidgetSocialInterface } from '../../../src/database/entity/widget';
+import { QuickActions } from '../../../src/database/entity/dashboard.js';
+import { WidgetCustomInterface, WidgetSocialInterface } from '../../../src/database/entity/widget.js';
 
 import { AliasGroup, Alias } from '~/database/entity/alias';
 import { CacheGamesInterface } from '~/database/entity/cacheGames';
@@ -83,6 +83,7 @@ type generic<T extends Record<string, any>, K = 'id'> = {
 
 export type ClientToServerEventsWithNamespace = {
   '/': GenericEvents & {
+    'token::broadcaster-missing-scopes': (cb: (scopes: string[]) => void) => void,
     'leaveBot': () => void,
     'joinBot': () => void,
     'channelName': (cb: (name: string) => void) => void,
