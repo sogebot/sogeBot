@@ -100,8 +100,6 @@ yargs(hideBin(process.argv))
       }
     }
   });
-
-  })
   .demandCommand()
   .parse()
 
