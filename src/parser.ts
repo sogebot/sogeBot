@@ -137,6 +137,7 @@ export class Parser {
 
         const time = Date.now();
         const status = await parser.fnc.apply(parser.this, [opts]);
+        debug('parser.process', 'Status ' + JSON.stringify({ status }));
         if (!status) {
           const rollbacks = await this.rollbacks();
           for (const r of rollbacks) {
