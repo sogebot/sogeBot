@@ -1,70 +1,61 @@
-import spawnSync from 'child_process';
+import {spawnSync} from 'child_process';
 
 import gitSemverTags from 'git-semver-tags';
-import argv from 'yargs'
-argv
-  .usage('node tools/changelog.js <cmd> [args]')
-  .option('escape', {
-    description: 'Escapes outpu (useful for github action)',
-    type:        'boolean',
+import yargs from 'yargs'
+import { hideBin } from 'yargs/helpers'
+
+yargs(hideBin(process.argv))
+  .command('cli <commit>', 'create changelog between commits/tags', (yargs) => {
+    return yargs
+      .positional('commit', {
+        describe: 'commit(preferred) or tag interval e.g. 9.0.3 or 9.0.2..9.0.3',
+        type: 'string',
+      })
+    }, (argv) => {
+      const changesSpawn = spawnSync('git', ['log', argv.commit, '--oneline']);
+      for (const output of changes(changesSpawn.stdout.toString().split('\n'))) {
+        process.stdout.write(output);
+      }
   })
-  .command('generate', 'generate changelog')
-  .command('nextTag', 'get next tag')
-  .command('nextTagMajor', 'get next major tag')
-  .command('cli [commit]', 'create changelog between commits/tags', (yargs) => {
-    yargs.demandOption(['commit'], 'Please provide commit or tag argument to work with this tool');
-    yargs.positional('commit', {
-      type:     'string',
-      describe: 'commit(preferred) or tag interval e.g. 9.0.3 or 9.0.2..9.0.3',
+  .command('nextTagMajor', 'get next major tag', () => {}, (argv) => {
+    gitSemverTags().then((tags) => {
+      const latestTag = tags[0];
+
+      const changesList = [];
+      const changesSpawn = spawnSync('git', ['log', `${latestTag}...HEAD`, '--oneline']);
+      changesList.push(...changes(changesSpawn.stdout.toString().split('\n')));
+
+      const [ latestMajorVersion, latestMinorVersion, latestPatchVersion ] = tags[0].split('.');
+      process.stdout.write(`${Number(latestMajorVersion)+1}.0.0`);
     });
   })
-  .demandCommand()
-  .help()
-  .argv;
+  .command('nextTag', 'get next tag', () => {}, (argv) => {
+      gitSemverTags().then((tags) => {
+        const latestTag = tags[0];
 
-if (argv._[0] === 'nextTag') {
-  gitSemverTags(function(err, tags) {
-    const latestTag = tags[0];
+        const changesList = [];
+        const changesSpawn = spawnSync('git', ['log', `${latestTag}...HEAD`, '--oneline']);
+        changesList.push(...changes(changesSpawn.stdout.toString().split('\n')));
 
-    const changesList = [];
-    const changesSpawn = spawnSync('git', ['log', `${latestTag}...HEAD`, '--oneline']);
-    changesList.push(...changes(changesSpawn.stdout.toString().split('\n')));
+        const [ latestMajorVersion, latestMinorVersion, latestPatchVersion ] = tags[0].split('.');
 
-    const [ latestMajorVersion, latestMinorVersion, latestPatchVersion ] = tags[0].split('.');
-
-    if (changesList.includes('### BREAKING CHANGES\n')) {
-      process.stdout.write(`${Number(latestMajorVersion)+1}.0.0`);
-    } else if (changesList.join().includes('-feat-blue')) {
-      // new tag
-      process.stdout.write(`${latestMajorVersion}.${Number(latestMinorVersion)+1}.0`);
-    } else {
-      process.stdout.write(`${latestMajorVersion}.${latestMinorVersion}.${Number(latestPatchVersion)+1}`);
-    }
-  });
-}
-
-if (argv._[0] === 'nextTagMajor') {
-  gitSemverTags(function(err, tags) {
-    const latestTag = tags[0];
-
-    const changesList = [];
-    const changesSpawn = spawnSync('git', ['log', `${latestTag}...HEAD`, '--oneline']);
-    changesList.push(...changes(changesSpawn.stdout.toString().split('\n')));
-
-    const [ latestMajorVersion, latestMinorVersion, latestPatchVersion ] = tags[0].split('.');
-    process.stdout.write(`${Number(latestMajorVersion)+1}.0.0`);
-  });
-}
-
-if (argv._[0] === 'nextSnapshot') {
-  gitSemverTags(function(err, tags) {
-    const [ latestMajorVersion, latestMinorVersion ] = tags[0].split('.');
-    process.stdout.write(`${latestMajorVersion}.${Number(latestMinorVersion)+1}.0-SNAPSHOT`);
-  });
-}
-
-if (argv._[0] === 'generate') {
-  gitSemverTags(function(err, tags) {
+        if (changesList.includes('### BREAKING CHANGES\n')) {
+          process.stdout.write(`${Number(latestMajorVersion)+1}.0.0`);
+        } else if (changesList.join().includes('-feat-blue')) {
+          // new tag
+          process.stdout.write(`${latestMajorVersion}.${Number(latestMinorVersion)+1}.0`);
+        } else {
+          process.stdout.write(`${latestMajorVersion}.${latestMinorVersion}.${Number(latestPatchVersion)+1}`);
+        }
+        });
+  })
+  .command('nextSnapshot', 'get next tag', () => {}, (argv) => {
+    gitSemverTags().then((tags) => {
+      const [ latestMajorVersion, latestMinorVersion ] = tags[0].split('.');
+      process.stdout.write(`${latestMajorVersion}.${Number(latestMinorVersion)+1}.0-SNAPSHOT`);
+    });
+  })
+  .command('generate', 'generate changelog', () => {}, (argv) => {//   gitSemverTags().then((tags) => {
     const tagsToGenerate = [];
     const [ latestMajorVersion, latestMinorVersion, latestPatchVersion ] = tags[0].split('.');
 
@@ -109,14 +100,10 @@ if (argv._[0] === 'generate') {
       }
     }
   });
-}
 
-if (argv._[0] === 'cli') {
-  const changesSpawn = spawnSync('git', ['log', argv.commit, '--oneline']);
-  for (const output of changes(changesSpawn.stdout.toString().split('\n'))) {
-    process.stdout.write(output);
-  }
-}
+  })
+  .demandCommand()
+  .parse()
 
 function changes(changesList) {
   // sort alphabetically
