@@ -55,50 +55,52 @@ yargs(hideBin(process.argv))
       process.stdout.write(`${latestMajorVersion}.${Number(latestMinorVersion)+1}.0-SNAPSHOT`);
     });
   })
-  .command('generate', 'generate changelog', () => {}, (argv) => {//   gitSemverTags().then((tags) => {
-    const tagsToGenerate = [];
-    const [ latestMajorVersion, latestMinorVersion, latestPatchVersion ] = tags[0].split('.');
+  .command('generate', 'generate changelog', () => {}, (argv) => {
+    gitSemverTags().then((tags) => {
+      const tagsToGenerate = [];
+      const [ latestMajorVersion, latestMinorVersion, latestPatchVersion ] = tags[0].split('.');
 
-    for (let i = latestPatchVersion; i >= 0; i--) {
-      tagsToGenerate.push(`${latestMajorVersion}.${latestMinorVersion}.${i}`);
-    }
+      for (let i = latestPatchVersion; i >= 0; i--) {
+        tagsToGenerate.push(`${latestMajorVersion}.${latestMinorVersion}.${i}`);
+      }
 
-    // we need last release before
-    const beforeTag = tags[tags.findIndex((val) => val === tagsToGenerate[tagsToGenerate.length - 1]) + 1];
-    const majorTagRelease = tagsToGenerate[tagsToGenerate.length - 1];
-    const changesList = [];
+      // we need last release before
+      const beforeTag = tags[tags.findIndex((val) => val === tagsToGenerate[tagsToGenerate.length - 1]) + 1];
+      const majorTagRelease = tagsToGenerate[tagsToGenerate.length - 1];
+      const changesList = [];
 
-    // we have minor patches
-    if (tagsToGenerate.length > 1) {
-      const latestMinorTag = tagsToGenerate[0];
+      // we have minor patches
+      if (tagsToGenerate.length > 1) {
+        const latestMinorTag = tagsToGenerate[0];
 
-      // get change between new and last versions
-      changesList.push(`## ${latestMinorTag}\n\n`);
+        // get change between new and last versions
+        changesList.push(`## ${latestMinorTag}\n\n`);
+        let changesSpawn;
+        if (tagsToGenerate[tagsToGenerate.length - 2] === latestMinorTag) {
+          changesSpawn = spawnSync('git', ['log', `${majorTagRelease}...${latestMinorTag}`, '--oneline']);
+        } else {
+          changesSpawn = spawnSync('git', ['log', `${tagsToGenerate[1]}...${latestMinorTag}`, '--oneline']);
+        }
+        changesList.push(...changes(changesSpawn.stdout.toString().split('\n')));
+      }
+
+      // major patch changelog
       let changesSpawn;
-      if (tagsToGenerate[tagsToGenerate.length - 2] === latestMinorTag) {
-        changesSpawn = spawnSync('git', ['log', `${majorTagRelease}...${latestMinorTag}`, '--oneline']);
+      if (tagsToGenerate.length > 1 && tagsToGenerate[1] !== majorTagRelease) {
+        changesList.push(`## ${latestMajorVersion}.${latestMinorVersion}.0 - ${tagsToGenerate[1]}\n\n`);
+        changesSpawn = spawnSync('git', ['log', `${beforeTag}...${tagsToGenerate[1]}`, '--oneline']);
       } else {
-        changesSpawn = spawnSync('git', ['log', `${tagsToGenerate[1]}...${latestMinorTag}`, '--oneline']);
+        changesList.push(`## ${latestMajorVersion}.${latestMinorVersion}.0\n\n`);
+        changesSpawn = spawnSync('git', ['log', `${beforeTag}...${majorTagRelease}`, '--oneline']);
       }
       changesList.push(...changes(changesSpawn.stdout.toString().split('\n')));
-    }
 
-    // major patch changelog
-    let changesSpawn;
-    if (tagsToGenerate.length > 1 && tagsToGenerate[1] !== majorTagRelease) {
-      changesList.push(`## ${latestMajorVersion}.${latestMinorVersion}.0 - ${tagsToGenerate[1]}\n\n`);
-      changesSpawn = spawnSync('git', ['log', `${beforeTag}...${tagsToGenerate[1]}`, '--oneline']);
-    } else {
-      changesList.push(`## ${latestMajorVersion}.${latestMinorVersion}.0\n\n`);
-      changesSpawn = spawnSync('git', ['log', `${beforeTag}...${majorTagRelease}`, '--oneline']);
-    }
-    changesList.push(...changes(changesSpawn.stdout.toString().split('\n')));
-
-    for (const output of changesList) {
-      for (const line of output) {
-        process.stdout.write(line);
+      for (const output of changesList) {
+        for (const line of output) {
+          process.stdout.write(line);
+        }
       }
-    }
+    })
   })
   .demandCommand()
   .parse()
