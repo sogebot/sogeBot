@@ -27,10 +27,6 @@ jobs:
       with:
         node-version: lts/*
         check-latest: true
-    - name: Install latest npm
-      if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
-      run: |
-        npm install --location=global npm
     - name: Install all dependencies and build just a bot
       if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
       run: ENV=development NODE_MODULES_DIR=./node_modules make info clean dependencies bot
@@ -56,10 +52,6 @@ jobs:
       with:
         node-version: lts/*
         check-latest: true
-    - name: Install latest npm
-      if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
-      run: |
-        npm install --location=global npm
     - name: Install all dependencies and build just a bot
       if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
       run: ENV=development NODE_MODULES_DIR=./node_modules make info clean dependencies bot
@@ -91,10 +83,6 @@ jobs:
       with:
         node-version: lts/*
         check-latest: true
-    - name: Install latest npm
-      if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
-      run: |
-        npm install --location=global npm
     - name: Install all dependencies and build just a bot
       if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
       run: ENV=development NODE_MODULES_DIR=./node_modules make info clean dependencies bot
@@ -126,10 +114,6 @@ jobs:
       with:
         node-version: lts/*
         check-latest: true
-    - name: Install latest npm
-      if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
-      run: |
-        npm install --location=global npm
     - name: Install all dependencies and build just a bot
       if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
       run: ENV=development NODE_MODULES_DIR=./node_modules make info clean dependencies bot

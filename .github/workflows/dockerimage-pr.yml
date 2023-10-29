@@ -23,9 +23,6 @@ jobs:
         with:
           node-version: lts/*
           check-latest: true
-      - name: Install latest npm
-        run: |
-          npm install -g npm
 
       - name: Build a bot
         env:

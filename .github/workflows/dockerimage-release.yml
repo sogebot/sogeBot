@@ -22,9 +22,6 @@ jobs:
         with:
           node-version: lts/*
           check-latest: true
-      - name: Install latest npm
-        run: |
-          npm install --location=global npm
 
       - name: Build a bot
         env:
