@@ -62,7 +62,7 @@ const argv = yargs(hideBin(process.argv))
 import { getMigrationType } from '../dest/helpers/getMigrationType.js';
 
 async function main() {
-  const type = process.env.TYPEORM_AppDataSource;
+  const type = process.env.TYPEORM_CONNECTION;
   const migrationsRun = argv._[0] === 'restore';
 
   const MySQLDataSourceOptions = {
@@ -109,9 +109,9 @@ async function main() {
   };
 
   let AppDataSource;
-  if (process.env.TYPEORM_AppDataSource === 'mysql' || process.env.TYPEORM_AppDataSource === 'mariadb') {
+  if (process.env.TYPEORM_CONNECTION === 'mysql' || process.env.TYPEORM_CONNECTION === 'mariadb') {
     AppDataSource = new DataSource(MySQLDataSourceOptions);
-  } else if (process.env.TYPEORM_AppDataSource === 'postgres') {
+  } else if (process.env.TYPEORM_CONNECTION === 'postgres') {
     AppDataSource = new DataSource(PGDataSourceOptions);
   } else {
     AppDataSource = new DataSource(SQLiteDataSourceOptions);
@@ -123,6 +123,7 @@ async function main() {
     mysql:            'MySQL/MariaDB',
     postgres:         'PostgreSQL',
   };
+  console.log({type})
   console.log(`Initialized ${typeToLog[type]} database (${normalize(String(AppDataSource.options.database))})`);
   if (argv._[0] === 'backup') {
     const metadatas = AppDataSource.entityMetadatas;
