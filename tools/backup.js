@@ -123,7 +123,6 @@ async function main() {
     mysql:            'MySQL/MariaDB',
     postgres:         'PostgreSQL',
   };
-  console.log({type})
   console.log(`Initialized ${typeToLog[type]} database (${normalize(String(AppDataSource.options.database))})`);
   if (argv._[0] === 'backup') {
     const metadatas = AppDataSource.entityMetadatas;
