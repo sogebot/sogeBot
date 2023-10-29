@@ -8,6 +8,7 @@ export class initialize1000000000001 implements MigrationInterface {
     const migrations = await queryRunner.query(`SELECT * FROM \`migrations\``);
     if (migrations.length > 0) {
       console.log('Skipping migration zero, migrations are already in bot');
+      return;
     }
     await queryRunner.query(`CREATE TABLE \`alert\` (\`id\` varchar(36) NOT NULL, \`updatedAt\` varchar(30) NULL, \`name\` varchar(255) NOT NULL, \`alertDelayInMs\` int NOT NULL, \`profanityFilterType\` varchar(255) NOT NULL, \`loadStandardProfanityList\` json NOT NULL, \`parry\` json NOT NULL, \`tts\` json NULL, \`fontMessage\` json NOT NULL, \`font\` json NOT NULL, \`customProfanityList\` varchar(255) NOT NULL, \`items\` json NOT NULL, PRIMARY KEY (\`id\`)) ENGINE=InnoDB`);
     await queryRunner.query(`CREATE TABLE \`alias\` (\`id\` varchar(36) NOT NULL, \`alias\` varchar(255) NOT NULL, \`command\` text NOT NULL, \`enabled\` tinyint NOT NULL, \`visible\` tinyint NOT NULL, \`permission\` varchar(255) NULL, \`group\` varchar(255) NULL, INDEX \`IDX_6a8a594f0a5546f8082b0c405c\` (\`alias\`), PRIMARY KEY (\`id\`)) ENGINE=InnoDB`);

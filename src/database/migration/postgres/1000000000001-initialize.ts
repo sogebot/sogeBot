@@ -8,7 +8,9 @@ export class initialize1000000000001 implements MigrationInterface {
     const migrations = await queryRunner.query(`SELECT * FROM "migrations"`);
     if (migrations.length > 0) {
       console.log('Skipping migration zero, migrations are already in bot');
-    } await queryRunner.query(`CREATE TABLE "alert" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "updatedAt" character varying(30), "name" character varying NOT NULL, "alertDelayInMs" integer NOT NULL, "profanityFilterType" character varying NOT NULL, "loadStandardProfanityList" json NOT NULL, "parry" json NOT NULL, "tts" json, "fontMessage" json NOT NULL, "font" json NOT NULL, "customProfanityList" character varying NOT NULL, "items" json NOT NULL, CONSTRAINT "PK_ad91cad659a3536465d564a4b2f" PRIMARY KEY ("id"))`);
+      return;
+    }
+    await queryRunner.query(`CREATE TABLE "alert" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "updatedAt" character varying(30), "name" character varying NOT NULL, "alertDelayInMs" integer NOT NULL, "profanityFilterType" character varying NOT NULL, "loadStandardProfanityList" json NOT NULL, "parry" json NOT NULL, "tts" json, "fontMessage" json NOT NULL, "font" json NOT NULL, "customProfanityList" character varying NOT NULL, "items" json NOT NULL, CONSTRAINT "PK_ad91cad659a3536465d564a4b2f" PRIMARY KEY ("id"))`);
     await queryRunner.query(`CREATE TABLE "alias" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "alias" character varying NOT NULL, "command" text NOT NULL, "enabled" boolean NOT NULL, "visible" boolean NOT NULL, "permission" character varying, "group" character varying, CONSTRAINT "PK_b1848d04b41d10a5712fc2e673c" PRIMARY KEY ("id"))`);
     await queryRunner.query(`CREATE INDEX "IDX_6a8a594f0a5546f8082b0c405c" ON "alias" ("alias") `);
     await queryRunner.query(`CREATE TABLE "alias_group" ("name" character varying NOT NULL, "options" text NOT NULL, CONSTRAINT "PK_2d40a2a41c8eb8d436b6ce1387c" PRIMARY KEY ("name"))`);

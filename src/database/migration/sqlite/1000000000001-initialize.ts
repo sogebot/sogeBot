@@ -8,7 +8,9 @@ export class initialize1000000000001 implements MigrationInterface {
     const migrations = await queryRunner.query(`SELECT * FROM "migrations"`);
     if (migrations.length > 0) {
       console.log('Skipping migration zero, migrations are already in bot');
-    }     await queryRunner.query(`CREATE TABLE "alert" ("id" varchar PRIMARY KEY NOT NULL, "updatedAt" varchar(30), "name" varchar NOT NULL, "alertDelayInMs" integer NOT NULL, "profanityFilterType" varchar NOT NULL, "loadStandardProfanityList" text NOT NULL, "parry" text NOT NULL, "tts" text, "fontMessage" text NOT NULL, "font" text NOT NULL, "customProfanityList" varchar NOT NULL, "items" text NOT NULL)`);
+      return;
+    }
+    await queryRunner.query(`CREATE TABLE "alert" ("id" varchar PRIMARY KEY NOT NULL, "updatedAt" varchar(30), "name" varchar NOT NULL, "alertDelayInMs" integer NOT NULL, "profanityFilterType" varchar NOT NULL, "loadStandardProfanityList" text NOT NULL, "parry" text NOT NULL, "tts" text, "fontMessage" text NOT NULL, "font" text NOT NULL, "customProfanityList" varchar NOT NULL, "items" text NOT NULL)`);
     await queryRunner.query(`CREATE TABLE "alias" ("id" varchar PRIMARY KEY NOT NULL, "alias" varchar NOT NULL, "command" text NOT NULL, "enabled" boolean NOT NULL, "visible" boolean NOT NULL, "permission" varchar, "group" varchar)`);
     await queryRunner.query(`CREATE INDEX "IDX_6a8a594f0a5546f8082b0c405c" ON "alias" ("alias") `);
     await queryRunner.query(`CREATE TABLE "alias_group" ("name" varchar PRIMARY KEY NOT NULL, "options" text NOT NULL)`);
