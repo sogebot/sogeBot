@@ -315,7 +315,9 @@ class Cooldown extends System {
       let result = false;
 
       const affectedCooldowns: CooldownEntity[] = [];
+
       for (const cooldown of data) {
+        debug('cooldown.check', `Checking cooldown entity: ${JSON.stringify(cooldown)}`);
         if (cooldown.type === 'default') {
           debug('cooldown.check', `Checking default cooldown ${cooldown.name} (${cooldown.permId}) ${cooldown.canBeRunAt}`);
           if (cooldown.canBeRunAt >= Date.now()) {
@@ -339,7 +341,11 @@ class Cooldown extends System {
           }
           continue;
         }
+        debug('cooldown.check', `isOwner: ${isOwner(opts.sender)} isModerator: ${user.isModerator} isSubscriber: ${user.isSubscriber}`);
+        debug('cooldown.check', `isOwnerAffected: ${cooldown.isOwnerAffected} isModeratorAffected: ${cooldown.isModeratorAffected} isSubscriberAffected: ${cooldown.isSubscriberAffected}`);
+
         if ((isOwner(opts.sender) && !cooldown.isOwnerAffected) || (user.isModerator && !cooldown.isModeratorAffected) || (user.isSubscriber && !cooldown.isSubscriberAffected)) {
+          debug('cooldown.check', `User is not affected by this cooldown entity`);
           result = true;
           continue;
         }
@@ -392,6 +398,7 @@ class Cooldown extends System {
       while(cache.length > 50) {
         cache.shift();
       }
+      debug('cooldown.check', `User ${opts.sender.userName}#${opts.sender.userId} have ${result ? 'no' : 'some'} cooldowns`);
       return result;
     } catch (e: any) {
       error(`Something went wrong during cooldown check: ${e.stack}`);
