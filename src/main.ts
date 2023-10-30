@@ -2,9 +2,7 @@ Error.stackTraceLimit = Infinity;
 
 import 'reflect-metadata';
 
-import dotenv from 'dotenv';
-
-dotenv.config();
+import 'dotenv/config';
 
 import { existsSync, readFileSync, unlinkSync } from 'fs';
 import { normalize } from 'path';
