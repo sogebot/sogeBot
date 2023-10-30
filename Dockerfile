@@ -30,8 +30,6 @@ COPY --from=builder  /app/ /app/
 COPY docker.sh /
 RUN chmod +x /docker.sh
 
-RUN ls -sh /
-
 # Expose API port to the outside
 EXPOSE 20000
 # Expose profiler to the outside
