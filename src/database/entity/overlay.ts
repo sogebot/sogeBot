@@ -310,7 +310,7 @@ export interface Alerts {
      * Hooks determinate what events will trigger this alert
      */
     hooks: string[];
-    items: ExpandRecursively<AlertImage | AlertText | AlertAudio | AlertTTS | AlertCustom>[]
+    items: ExpandRecursively<AlertImage | AlertText | AlertAudio | AlertTTS | AlertCustom | AlertProfileImage>[]
     /**
      * additional hook filters
      */
@@ -371,6 +371,10 @@ export type AlertAudio = ExpandRecursively<AlertCommonOptions & {
   galleryId: string;
   volume: number;
   delay: number;
+}>;
+
+export type AlertProfileImage = ExpandRecursively<AlertCommonOptions & AlertAnimationOptions & {
+  type: 'profileImage';
 }>;
 
 export type AlertImage = ExpandRecursively<AlertCommonOptions & AlertAnimationOptions & {
