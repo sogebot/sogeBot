@@ -25,6 +25,6 @@
   "channel_is_not_set": "Kanál není nastaven",
   "please_set_your_broadcaster_oauth_or_owners": "Prosím nastavte <a href=\"#/settings/modules/services/twitch\">oauth castera nebo vlastníky</a>, nebo všichni uživatelé <strong>budou mít přístup</strong> k tomuto dashboardu a budou považováni za <strong>castery</strong>.",
   "new_update_available": "Nová aktualizace k dispozici",
-  "new_bot_version_available_at": "Nová verze bota {version} je k dispozici na <a href=\"https://github.com/sogehige/sogeBot/releases/tag/{version}\">GitHub</a>.",
+  "new_bot_version_available_at": "New bot version {version} available at {link}.",
   "one_of_inputs_must_be_set": "Alespoň jedno vstupní pole musí být nastaveno"
 }
