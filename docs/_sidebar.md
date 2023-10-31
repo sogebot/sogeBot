@@ -24,7 +24,6 @@
   * [Scrim](/systems/scrim.md)
   * [Songs](/systems/songs.md)
   * [Top](/systems/top.md)
-  * [Overlays](/systems/overlays.md)
   * [Ranks](/systems/ranks.md)
   * [Raffles](/systems/raffles.md)
   * [Queue](/systems/queue.md)
