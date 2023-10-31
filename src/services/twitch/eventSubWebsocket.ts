@@ -37,6 +37,9 @@ const MODERATOR_READ_SHOUTOUTS = 'moderator:read:shoutouts' as const;
 
 const runIfScopeIsApproved = (scopes: string[], scope: string, callback: () => void) => {
   if (scopes.includes(scope)) {
+    if (broadcasterMissingScopes.includes(scope)) {
+      broadcasterMissingScopes.splice(broadcasterMissingScopes.findIndex(o => o === scope), 1);
+    }
     callback();
   } else {
     if (!broadcasterMissingScopes.includes(scope)) {
