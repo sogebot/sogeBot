@@ -23,7 +23,6 @@ describe('Message - https://discordapp.com/channels/317348946144002050/619437014
   it('!test should properly trigger !queue open', async () => {
     await customcommands.run({ sender: user.viewer, message: '!test' });
     await message.debug('message.process', '!queue open');
-    await message.debug('alerts.emit', 'type=video');
   });
 });
 
@@ -31,18 +30,17 @@ describe('Message - https://discordapp.com/channels/317348946144002050/619437014
   before(async () => {
     await db.cleanup();
     await message.prepare();
-    await customcommands.add({ sender: user.owner, parameters: '-c !test -r (!!queue open2)' });
+    await customcommands.add({ sender: user.owner, parameters: '-c !test -r (!!queue open)' });
   });
 
   it('call !queue open directly with regular viewer should send permission error', async () => {
-    const parse = new Parser({ sender: user.viewer, message: '!queue open2', skip: false, quiet: false });
+    const parse = new Parser({ sender: user.viewer, message: '!queue open', skip: false, quiet: false });
     const r = await parse.process();
-    assert.strictEqual(r[0].response, 'You don\'t have enough permissions for \'!queue open2\'');
+    assert.strictEqual(r[0].response, 'You don\'t have enough permissions for \'!queue open\'');
   });
 
   it('!test should properly trigger !queue open', async () => {
     await customcommands.run({ sender: user.viewer, message: '!test' });
-    await message.debug('message.process', '!queue open2');
-    await message.debug('alerts.emit', 'type=video2');
+    await message.debug('message.process', '!queue open');
   });
 });

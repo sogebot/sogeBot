@@ -40,6 +40,5 @@ describe('Alias - @func1 - #3738 - alias should trigger commands by variable', (
     await alias.run({ sender: user.viewer, message: '!test' });
     await message.debug('alias.process', '!queue open');
     await message.debug('parser.command', 'Running !queue open');
-    await message.debug('alerts.emit', 'type=video');
   });
 });

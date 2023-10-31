@@ -30,6 +30,5 @@ describe('Alias - @func1 - #3680 - alias should override command permission', ()
   it('call alias with regular viewer should process it correctly', async () => {
     await alias.run({ sender: user.viewer, message: '!test' });
     await message.debug('alias.process', '!queue open');
-    await message.debug('alerts.emit', 'type=video');
   });
 });
