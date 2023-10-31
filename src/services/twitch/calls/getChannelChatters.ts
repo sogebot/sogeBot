@@ -1,6 +1,8 @@
 import { User } from '@entity/user.js';
 import { HelixChatChatter, HelixForwardPagination } from '@twurple/api/lib';
+import { HttpStatusCodeError } from '@twurple/api-call';
 import {
+  capitalize,
   chunk, includes,
 } from 'lodash-es';
 
@@ -8,7 +10,6 @@ import { AppDataSource } from '~/database.js';
 import { isDebugEnabled } from '~/helpers/debug.js';
 import { eventEmitter } from '~/helpers/events/index.js';
 import { getAllOnline } from '~/helpers/getAllOnlineUsernames.js';
-import { getFunctionName } from '~/helpers/getFunctionName.js';
 import {
   debug, error, warning,
 } from '~/helpers/log.js';
@@ -23,17 +24,32 @@ import joinpart from '~/widgets/joinpart.js';
 const getChannelChattersAll = async (chatters: HelixChatChatter[] = [], after?: HelixForwardPagination['after']): Promise<HelixChatChatter[]> => {
   const broadcasterId = variables.get('services.twitch.broadcasterId') as string;
 
-  const response = await twitch.apiClient?.asIntent(['bot'], ctx => ctx.chat.getChatters(broadcasterId, { after, limit: 100 }));
-  if (!response) {
+  try {
+    const response = await twitch.apiClient?.asIntent(['bot'], ctx => ctx.chat.getChatters(broadcasterId, { after, limit: 100 }));
+    if (!response) {
+      return [];
+    }
+    chatters.push(...response.data);
+
+    if (response.total === chatters.length) {
+      return chatters;
+    }
+
+    return getChannelChattersAll(chatters, response.cursor);
+  } catch (e)  {
+    if (e instanceof Error) {
+      if (e instanceof HttpStatusCodeError) {
+        if (e.statusCode === 403) {
+          error(`No chatters found. ${capitalize(JSON.parse(e.body).message)}`);
+        } else {
+          error(`getChannelChattersAll => ${e.statusCode} - ${JSON.parse(e.body).message}`);
+        }
+      } else {
+        error(`getChannelChattersAll => ${e.stack ?? e.message}`);
+      }
+    }
     return [];
   }
-  chatters.push(...response.data);
-
-  if (response.total === chatters.length) {
-    return chatters;
-  }
-
-  return getChannelChattersAll(chatters, response.cursor);
 };
 
 export const getChannelChatters = async (opts: any) => {
@@ -129,10 +145,9 @@ export const getChannelChatters = async (opts: any) => {
   } catch (e) {
     if (e instanceof Error) {
       if (e.message.includes('ETIMEDOUT')) {
-        warning(`${getFunctionName()} => Connection to Twitch timed out. Will retry request.`);
-        return { state: false, opts }; // ignore etimedout error
+        warning(`getChannelChattersAll => Connection to Twitch timed out. Will retry request.`);
       } else {
-        error(`${getFunctionName()} => ${e.stack ?? e.message}`);
+        error(`getChannelChattersAll => ${e.stack ?? e.message}`);
       }
     }
     return { state: false, opts };
