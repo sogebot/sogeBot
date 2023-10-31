@@ -3,7 +3,6 @@ import { HelixStream } from '@twurple/api/lib';
 import { getFunctionList } from '../../decorators/on.js';
 import { chatMessagesAtStart, streamType } from '../api/index.js';
 import { isStreamOnline } from '../api/isStreamOnline.js';
-import { setCurrentRetries } from '../api/retries.js';
 import { stats } from '../api/stats.js';
 import { streamId } from '../api/streamId.js';
 import { streamStatusChangeSince } from '../api/streamStatusChangeSince.js';
@@ -69,7 +68,6 @@ function end() {
     stop('');
     streamStatusChangeSince.value = Date.now();
     isStreamOnline.value = false;
-    setCurrentRetries(0);
     eventEmitter.emit('stream-stopped');
     eventEmitter.emit('stream-is-running-x-minutes', { reset: true });
     eventEmitter.emit('number-of-viewers-is-at-least-x', { reset: true });

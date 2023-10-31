@@ -1,6 +1,6 @@
 import { dayjs } from '@sogebot/ui-helpers/dayjsHelper.js';
 
-import { isStreamOnline, setCurrentRetries, streamId, streamStatusChangeSince, streamType } from '~/helpers/api/index.js';
+import { isStreamOnline, streamId, streamStatusChangeSince, streamType } from '~/helpers/api/index.js';
 import {
   stats as apiStats, chatMessagesAtStart,
 } from '~/helpers/api/index.js';
@@ -38,8 +38,6 @@ export async function getCurrentStream (opts: any) {
           stream.start(getStreamByUserId);
         }
       }
-
-      setCurrentRetries(0);
 
       apiStats.value.currentViewers = getStreamByUserId.viewers;
 

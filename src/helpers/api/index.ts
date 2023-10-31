@@ -6,7 +6,6 @@ export * from './getToken.js';
 export * from './isStreamOnline.js';
 // exclude from index
 // export * from './parseTitle';
-export * from './retries.js';
 export * from './stats.js';
 export * from './streamId.js';
 export * from './streamStatusChangeSince.js';
