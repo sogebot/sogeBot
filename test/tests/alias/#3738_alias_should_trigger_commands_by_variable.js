@@ -21,7 +21,7 @@ describe('Alias - @func1 - #3738 - alias should trigger commands by variable', (
     const variable = Variable.create({
       variableName: '$_alert',
       readOnly: false,
-      currentValue: '!media type=video',
+      currentValue: '!queue open',
       type: 'string',
       responseType: 0,
       permission: defaultPermissions.CASTERS,
@@ -31,15 +31,15 @@ describe('Alias - @func1 - #3738 - alias should trigger commands by variable', (
     await variable.save();
   });
 
-  it('create alias !test for command !media (caster only)', async () => {
+  it('create alias !test for command !queue open (caster only)', async () => {
     const r = await alias.add({ sender: user.owner, parameters: '-a !test -c $_alert' });
     assert.strictEqual(r[0].response, prepare('alias.alias-was-added', { alias: '!test', command: '$_alert' }));
   });
 
   it('call alias with regular viewer should process it correctly', async () => {
     await alias.run({ sender: user.viewer, message: '!test' });
-    await message.debug('alias.process', '!media type=video');
-    await message.debug('parser.command', 'Running !media');
+    await message.debug('alias.process', '!queue open');
+    await message.debug('parser.command', 'Running !queue open');
     await message.debug('alerts.emit', 'type=video');
   });
 });
