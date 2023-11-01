@@ -43,6 +43,10 @@ else
 endif
 	@npx tsc-alias
 
+pack-modules:
+	@echo -ne "\n\t ----- Packing into node_modules-$(VERSION).zip\n"
+	@npx --yes bestzip node_modules-$(VERSION).zip node_modules
+
 pack:
 	@echo -ne "\n\t ----- Packing into sogeBot-$(VERSION).zip\n"
 	@cp ./src/data/.env* ./

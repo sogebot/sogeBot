@@ -38,6 +38,9 @@ jobs:
       - name: Zip a bot
         run: make pack
 
+      - name: Zip node_modules
+        run: make pack-modules
+
       - uses: actions/upload-artifact@v3
         with:
           name: sogeBot-${{ steps.slug.outputs.SHA }}

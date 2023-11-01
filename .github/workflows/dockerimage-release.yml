@@ -32,6 +32,9 @@ jobs:
       - name: Zip a bot
         run: make pack
 
+      - name: Zip node_modules
+        run: make pack-modules
+
       - name: Generate changelog
         id: log
         run: node tools/changelog.js generate > body.md
@@ -45,7 +48,7 @@ jobs:
         uses: ncipollo/release-action@v1
         with:
           name: SOGEBOT ${{ github.ref_name }}
-          artifacts: "*.zip"
+          artifacts: "sogeBot-*.zip"
           bodyFile: "body.md"
           makeLatest: true
 

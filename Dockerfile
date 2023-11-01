@@ -20,9 +20,11 @@ RUN unzip *.zip -d /app
 # Change working directory
 WORKDIR /app
 
-# Install packages (forcing to)
-RUN npm install -g npm
-RUN npm install --verbose --force --omit=dev
+# Rebuid node modules
+RUN npm rebuild
+
+# Prune development dependencies
+RUN npm prune --production
 
 FROM node:lts-slim
 COPY --from=builder  /app/ /app/
