@@ -21,6 +21,7 @@ RUN unzip *.zip -d /app
 WORKDIR /app
 
 # Install packages (forcing to)
+RUN npm install -g npm
 RUN npm install --verbose --force --omit=dev
 
 FROM node:lts-slim
