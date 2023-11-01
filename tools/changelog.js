@@ -216,8 +216,8 @@ function prepareMessage(change) {
   const regexp = /(.*?):\((?<type>\w*)\)\: (?<message>.*)/;
   const match = regexp.exec(change.message);
   try {
-    return `[${change.commit}] ${change.message}${change.fixes.length > 0 ? ', ' + change.fixes.join(', ') : ''}\n`;
+    return `- ${change.commit} ${change.message}${change.fixes.length > 0 ? ', ' + change.fixes.join(', ') : ''}\n`;
   } catch (e) {
-    return `[${change.commit}] ${change.message}\n`;
+    return `- ${change.commit} ${change.message}\n`;
   }
 }
