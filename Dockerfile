@@ -15,7 +15,8 @@ RUN apt-get install -y build-essential unzip nasm libtool make bash git autoconf
 ADD *.zip /
 
 # Unzip zip file
-RUN unzip *.zip -d /app
+RUN unzip sogeBot-*.zip -d /app
+RUN unzip node_modules-*.zip -d /app
 
 # Change working directory
 WORKDIR /app
