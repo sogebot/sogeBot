@@ -52,7 +52,8 @@ export interface Chat {
   customEmoteSize: number;
   useCustomSpaceBetweenMessages: boolean;
   customSpaceBetweenMessages: number;
-  font: Font
+  font: Font;
+  useGeneratedColors: boolean;
 }
 
 export interface Marathon {

@@ -259,6 +259,7 @@ const values = {
     useCustomEmoteSize:            false,
     customEmoteSize:               14,
     useCustomSpaceBetweenMessages: false,
+    useGeneratedColors:            true,
     customSpaceBetweenMessages:    4,
     reverseOrder:                  false,
     font:                          {

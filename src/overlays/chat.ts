@@ -1,10 +1,10 @@
 import { v4 } from 'uuid';
 
-import { badgesCache } from '../services/twitch/calls/getChannelChatBadges.js';
 import Overlay from './_interface.js';
+import { badgesCache } from '../services/twitch/calls/getChannelChatBadges.js';
 
-import { timer } from '~/decorators.js';
 import { onMessage } from '~/decorators/on.js';
+import { timer } from '~/decorators.js';
 import { ioServer } from '~/helpers/panel.js';
 import { parseTextWithEmotes } from '~/helpers/parseTextWithEmotes.js';
 import { adminEndpoint } from '~/helpers/socket.js';
@@ -41,6 +41,7 @@ class Chat extends Overlay {
         message:     data,
         show:        false,
         badges:      badgeImages,
+        color:       message.sender.color,
       });
     });
   }
