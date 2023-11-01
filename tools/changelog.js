@@ -195,7 +195,7 @@ function changes(changesList) {
 
   // filter to have only fix and feat
   changesList = changesList.filter(o => {
-    return o.message.startsWith('fix') || o.message.startsWith('feat');
+    return !o.message.startsWith('build');
   });
 
   for (const change of changesList) {
@@ -210,12 +210,14 @@ function isFix (msg) {
 }
 
 function prepareMessage(change) {
-  const regexp = /(fix|feat)\((?<type>\w*)\)\: (?<message>.*)/;
+  if (change.commit.length === 0) {
+    return ''
+  }
+  const regexp = /(.*?):\((?<type>\w*)\)\: (?<message>.*)/;
   const match = regexp.exec(change.message);
   try {
-    return `[![${change.commit}](https://img.shields.io/badge/${change.commit}-${isFix(change.message) ? 'fix-green' : 'feat-blue'}?style=flat-square)](https://github.com/sogebot/sogeBot/commit/${change.commit})[![${match.groups.type}-${encodeURIComponent(match.groups.message)}]( https://img.shields.io/badge/${match.groups.type}-${encodeURIComponent(match.groups.message)}-inactive?style=flat-square&labelColor=important)](https://github.com/sogebot/sogeBot/commit/${change.commit}) ${change.fixes.length > 0 ? ', ' + change.fixes.join(', ') : ''}\n`;
+    return `[${change.commit}] ${change.message}${change.fixes.length > 0 ? ', ' + change.fixes.join(', ') : ''}\n`;
   } catch (e) {
-    const message = change.message.replace('fix:', '').replace('feat:', '').trim();
-    return `[![${change.commit}](https://img.shields.io/badge/${change.commit}-${isFix(change.message) ? 'fix-green' : 'feat-blue'}?style=flat-square)](https://github.com/sogebot/sogeBot/commit/${change.commit})[![${encodeURIComponent(message)}](https://img.shields.io/badge/${encodeURIComponent(message)}-inactive?style=flat-square)](https://github.com/sogebot/sogeBot/commit/${change.commit})\n`;
+    return `[${change.commit}] ${change.message}\n`;
   }
 }
