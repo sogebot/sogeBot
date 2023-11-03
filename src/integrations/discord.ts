@@ -608,8 +608,19 @@ class Discord extends Integration {
           id:          link.id,
           command:     this.getCommand('!link'),
         });
-        author.send(message);
-        whisperOut(`${author.tag}: ${message}`);
+        try {
+          await author.send(message);
+          whisperOut(`${author.tag}: ${message}`);
+        } catch (e) {
+          const reply = await msg.reply(`@${author.tag}, Cannot send whisper to you. Please enable it in your Discord settings.`);
+          chatOut(`#${channel.name}: @${author.tag}, Cannot send whisper to you. Please enable it in your Discord settings. [${author.tag}]`);
+          if (this.deleteMessagesAfterWhile) {
+            setTimeout(() => {
+              msg.delete();
+              reply.delete();
+            }, 10000);
+          }
+        }
 
         const reply = await msg.reply(prepare('integrations.discord.check-your-dm'));
         chatOut(`#${channel.name}: @${author.tag}, ${prepare('integrations.discord.check-your-dm')} [${author.tag}]`);
