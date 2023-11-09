@@ -1,7 +1,5 @@
 import { MINUTE, SECOND } from '@sogebot/ui-helpers/constants.js';
-import { defaultsDeep, pick } from 'lodash-es';
-
-import { flatten, unflatten } from './flatten.js';
+import { defaultsDeep } from 'lodash-es';
 
 import { Overlay } from '~/database/entity/overlay.js';
 
@@ -301,15 +299,10 @@ const values = {
 } as const;
 
 function setDefaultOpts<T extends keyof typeof values>(opts: any, type: T): Overlay['items'][number]['opts'] {
-  const val = {
+  return {
     ...defaultsDeep(opts, values[type]),
     typeId: type,
   };
-
-  const expectedKeys = Object.keys(flatten({ ...values[type], typeId: '' }));
-  // flatten to get proper pick
-  const picked = pick(flatten(val), expectedKeys);
-  return unflatten(picked) as Overlay['items'][number]['opts'];
 }
 
 function defaultValues(overlay: Overlay) {
