@@ -260,7 +260,9 @@ const values = {
     customEmoteSize:               14,
     useCustomSpaceBetweenMessages: false,
     useGeneratedColors:            true,
+    useCustomUsernameColor:        false,
     customSpaceBetweenMessages:    4,
+    messagePadding:                0,
     reverseOrder:                  false,
     font:                          {
       family:      'PT Sans',
@@ -271,6 +273,10 @@ const values = {
       color:       '#ffffff',
       shadow:      [],
     },
+    separatorFont:          null,
+    usernameFont:           null,
+    separator:              ': ',
+    messageBackgroundColor: '#ffffff00',
   },
   carousel: {
     images: [],

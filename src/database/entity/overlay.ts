@@ -54,6 +54,12 @@ export interface Chat {
   customSpaceBetweenMessages: number;
   font: Font;
   useGeneratedColors: boolean;
+  useCustomUsernameColor?: boolean;
+  usernameFont: Font | null;
+  separatorFont: Font | null;
+  separator: string;
+  messageBackgroundColor: string;
+  messagePadding: number;
 }
 
 export interface Marathon {
