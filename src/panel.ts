@@ -1,5 +1,6 @@
 import fs, { existsSync, readFileSync } from 'fs';
-import path from 'path';
+import path, { dirname } from 'path';
+import { fileURLToPath } from 'url';
 
 import cors from 'cors';
 import express from 'express';
@@ -9,6 +10,7 @@ import _ from 'lodash-es';
 import sanitize from 'sanitize-filename';
 
 import { getDEBUG, setDEBUG } from './helpers/debug.js';
+import { broadcasterMissingScopes } from './services/twitch/eventSubWebsocket.js';
 import { possibleLists } from '../d.ts/src/helpers/socket.js';
 
 import Core from '~/_interface.js';
@@ -47,10 +49,10 @@ import { processAuth, default as socketSystem } from '~/socket.js';
 import highlights from '~/systems/highlights.js';
 import translateLib, { translate } from '~/translate.js';
 import { variables } from '~/watchers.js';
-import { broadcasterMissingScopes } from './services/twitch/eventSubWebsocket.js';
 
 // __dirname is not available in ES6 module
-const __dirname = new URL('.', import.meta.url).pathname;
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 const port = Number(process.env.PORT ?? 20000);
 const secureport = Number(process.env.SECUREPORT ?? 20443);
 
