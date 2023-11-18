@@ -316,8 +316,7 @@
       "resub": "<strong>Re-inscreveu-se</strong> com <strong>$subType</strong>. Inscrição pelo período $subCumulativeMonths $subCumulativeMonthsName.",
       "cheer": "Deu um <strong>Cheered</strong> em você",
       "tip": "<strong>Doou </strong> para você",
-      "tipToCharity": "<strong>doou</strong> para <strong>$campaignName</strong>",
-      "hypeChatTip": "<strong>hype chat</strong> enviado"
+      "tipToCharity": "<strong>doou</strong> para <strong>$campaignName</strong>"
     },
     "responses": {
       "variable": {
