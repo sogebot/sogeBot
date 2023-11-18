@@ -1,7 +1,6 @@
 import util from 'util';
 
 import type { EmitData } from '@entity/alert.js';
-import { Currency } from '@entity/user.js';
 import * as constants from '@sogebot/ui-helpers/constants.js';
 import { dayjs } from '@sogebot/ui-helpers/dayjsHelper.js';
 import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized.js';
@@ -23,8 +22,6 @@ import {
 import { timer } from '~/decorators.js';
 import * as hypeTrain from '~/helpers/api/hypeTrain.js';
 import { sendMessage } from '~/helpers/commons/sendMessage.js';
-import exchange from '~/helpers/currency/exchange.js';
-import { mainCurrency } from '~/helpers/currency/index.js';
 import { isDebugEnabled } from '~/helpers/debug.js';
 import { eventEmitter } from '~/helpers/events/index.js';
 import { subscription } from '~/helpers/events/subscription.js';
@@ -32,7 +29,7 @@ import {
   triggerInterfaceOnMessage, triggerInterfaceOnSub,
 } from '~/helpers/interface/triggers.js';
 import emitter from '~/helpers/interfaceEmitter.js';
-import { warning, tip } from '~/helpers/log.js';
+import { warning } from '~/helpers/log.js';
 import {
   chatIn, debug, error, info, resub, subcommunitygift, subgift, whisperIn,
 } from '~/helpers/log.js';
