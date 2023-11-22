@@ -1,4 +1,5 @@
-import path from 'path';
+import { fileURLToPath } from 'node:url';
+import path, { dirname } from 'path';
 
 import { Gallery as GalleryEntity } from '@entity/gallery.js';
 
@@ -9,6 +10,9 @@ import { debug } from '~/helpers/log.js';
 import { app } from '~/helpers/panel.js';
 import { adminEndpoint } from '~/helpers/socket.js';
 
+// __dirname is not available in ES6 module
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 class Gallery extends Overlay {
   showInUI = false;
 
