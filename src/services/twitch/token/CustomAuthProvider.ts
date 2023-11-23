@@ -21,6 +21,8 @@ function createAccessTokenFromData(data: any): AccessToken {
 }
 
 export class CustomAuthProvider extends RefreshingAuthProvider {
+  erroredRefreshTokens = new Set<string>();
+
   async refreshUserToken(refreshToken: string) {
     let tokenData: AccessToken;
 
@@ -35,14 +37,20 @@ export class CustomAuthProvider extends RefreshingAuthProvider {
       // we are using own generator
       const generalOwners = variables.get('services.twitch.generalOwners') as string[];
       const channel = variables.get('services.twitch.broadcasterUsername') as string;
-      const response = await axios.post(url + encodeURIComponent(refreshToken.trim()), undefined, {
-        headers: {
-          'SogeBot-Channel': channel,
-          'SogeBot-Owners':  generalOwners.join(', '),
-        },
-        timeout: 120000,
-      });
-      tokenData = createAccessTokenFromData(response.data);
+      const isBotToken = variables.get('services.twitch.botRefreshToken') as string === refreshToken;
+      try {
+        const response = await axios.post(url + encodeURIComponent(refreshToken.trim()), undefined, {
+          headers: {
+            'SogeBot-Channel': channel,
+            'SogeBot-Owners':  generalOwners.join(', '),
+            'Account-Type':    isBotToken ? 'bot' : 'broadcaster',
+          },
+          timeout: 120000,
+        });
+        tokenData = createAccessTokenFromData(response.data);
+      } catch (e) {
+        throw new InvalidTokenError();
+      }
     }
 
     debug('twitch.token', JSON.stringify({ tokenData }));
