@@ -1,4 +1,3 @@
-import { Events } from '@entity/event.js';
 import { OBSWebsocket as OBSWebsocketEntity } from '@entity/obswebsocket.js';
 import { EntityNotFoundError } from 'typeorm';
 
@@ -10,6 +9,7 @@ import {
 import events from '../events.js';
 import { Expects } from  '../expects.js';
 
+import { Attributes, Event } from '~/database/entity/event.js';
 import { AppDataSource } from '~/database.js';
 import { eventEmitter } from '~/helpers/events/index.js';
 import {
@@ -45,14 +45,14 @@ class OBSWebsocket extends Integration {
     }
   }
 
-  async runObswebsocketCommand(operation: Events.OperationDefinitions, attributes: Events.Attributes): Promise<void> {
+  async runObswebsocketCommand(operation: Event['operations'][number]['definitions'], attributes: Attributes): Promise<void> {
     const task = await AppDataSource.getRepository(OBSWebsocketEntity).findOneByOrFail({ id: String(operation.taskId) });
 
     info(`OBSWEBSOCKETS: Task ${task.id} triggered by operation`);
     await obsws.triggerTask(task.code, attributes);
   }
 
-  protected async eventIsProperlyFiltered(event: any, attributes: Events.Attributes): Promise<boolean> {
+  protected async eventIsProperlyFiltered(event: any, attributes: Attributes): Promise<boolean> {
     const isTriggeredByCorrectOverlay = (function triggeredByCorrectOverlayCheck () {
       const match = new RegExp('[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}').exec(attributes.linkFilter);
       if (match) {
@@ -123,7 +123,7 @@ class OBSWebsocket extends Integration {
     });
   }
 
-  async triggerTask(code: string, attributes?: Events.Attributes) {
+  async triggerTask(code: string, attributes?: Attributes) {
     await new Promise((resolve, reject) => {
       // we need to send on all sockets on /
       const sockets = ioServer?.of('/').sockets;

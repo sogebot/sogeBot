@@ -62,9 +62,9 @@ export class Generic {
 export class CommandSendXTimes {
   name: 'command-send-x-times';
   triggered: {
-    runEveryXCommands: number,
-    runInterval: number,
-    fadeOutInterval: number,
+    runEveryXCommands?: number,
+    runInterval?: number,
+    fadeOutInterval?: number,
   };
   definitions: {
     fadeOutXCommands: number,
@@ -77,15 +77,15 @@ export class CommandSendXTimes {
 class KeywordSendXTimes {
   name: 'keyword-send-x-times';
   triggered: {
-    runEveryXKeywords: number,
-    runInterval: number,
-    fadeOutInterval: number,
+    runEveryXKeywords?: number,
+    runInterval?: number,
+    fadeOutInterval?: number,
   };
   definitions: {
     fadeOutXKeywords: number,
     fadeOutInterval: number,
     runEveryXKeywords: number,
-    commandToWatch: string,
+    keywordToWatch: string,
     runInterval: number,
     resetCountEachMessage: boolean,
   };
@@ -94,7 +94,7 @@ class KeywordSendXTimes {
 class NumberOfViewersIsAtLeastX {
   name: 'number-of-viewers-is-at-least-x';
   triggered: {
-    runInterval: number,
+    runInterval?: number,
   };
   definitions: {
     viewersAtLeast: number,
@@ -105,7 +105,7 @@ class NumberOfViewersIsAtLeastX {
 class StreamIsRunningXMinutes {
   name: 'stream-is-running-x-minutes';
   triggered: {
-    runAfterXMinutes: number,
+    runAfterXMinutes?: number,
   };
   definitions: {
     runAfterXMinutes: number,
@@ -121,7 +121,7 @@ class RewardRedeemed {
 }
 
 class Raid {
-  name: 'reward-redeemed';
+  name: 'raid';
   triggered: Record<string, never>;
   definitions: {
     viewersAtLeast: number,
@@ -131,7 +131,7 @@ class Raid {
 class EveryXMinutesOfStream {
   name: 'every-x-minutes-of-stream';
   triggered: {
-    runEveryXMinutes: number,
+    runEveryXMinutes?: number,
   };
   definitions: {
     runEveryXMinutes: number,
