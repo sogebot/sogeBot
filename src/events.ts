@@ -294,7 +294,7 @@ class Events extends Core {
 
     const eventsFromRepository = await Event.findBy(isUUID(eventId)
       ? { id: eventId, isEnabled: true }
-      : { attributes: { name: eventId }, isEnabled: true },
+      : { event: { name: eventId }, isEnabled: true },
     );
 
     for (const event of eventsFromRepository) {
@@ -324,8 +324,8 @@ class Events extends Core {
 
   // set triggered attribute to empty object
   public async reset(eventId: string) {
-    for (const event of await Event.findBy({ attributes: { name: eventId } })) {
-      event.attributes.triggered = {};
+    for (const event of await Event.findBy({ event: { name: eventId } })) {
+      event.event.triggered = {};
       await event.save();
     }
   }
@@ -499,100 +499,100 @@ class Events extends Core {
   }
 
   public async everyXMinutesOfStream(event: Event) {
-    if (event.attributes.name !== 'every-x-minutes-of-stream') {
+    if (event.event.name !== 'every-x-minutes-of-stream') {
       return false;
     }
     // set to Date.now() because 0 will trigger event immediatelly after stream start
     const shouldSave = get(event, 'triggered.runEveryXMinutes', 0) === 0 || typeof get(event, 'triggered.runEveryXMinutes', 0) !== 'number';
-    event.attributes.triggered.runEveryXMinutes = get(event, 'triggered.runEveryXMinutes', Date.now());
+    event.event.triggered.runEveryXMinutes = get(event, 'triggered.runEveryXMinutes', Date.now());
 
-    const shouldTrigger = Date.now() - new Date(event.attributes.triggered.runEveryXMinutes).getTime() >= Number(event.attributes.definitions.runEveryXMinutes) * 60 * 1000;
+    const shouldTrigger = Date.now() - new Date(event.event.triggered.runEveryXMinutes).getTime() >= Number(event.event.definitions.runEveryXMinutes) * 60 * 1000;
     if (shouldTrigger || shouldSave) {
-      event.attributes.triggered.runEveryXMinutes = Date.now();
+      event.event.triggered.runEveryXMinutes = Date.now();
       await Event.save(event);
     }
     return shouldTrigger;
   }
 
   public async isCorrectReward(event: Event, attributes: Attributes) {
-    if (event.attributes.name !== 'reward-redeemed') {
+    if (event.event.name !== 'reward-redeemed') {
       return false;
     }
-    const shouldTrigger = (attributes.rewardId === event.attributes.definitions.rewardId);
+    const shouldTrigger = (attributes.rewardId === event.event.definitions.rewardId);
     return shouldTrigger;
   }
 
   public async checkRaid(event: Event, attributes: Attributes) {
-    if (event.attributes.name !== 'raid') {
+    if (event.event.name !== 'raid') {
       return false;
     }
-    event.attributes.definitions.viewersAtLeast = Number(event.attributes.definitions.viewersAtLeast); // force Integer
-    const shouldTrigger = (attributes.hostViewers >= event.attributes.definitions.viewersAtLeast);
+    event.event.definitions.viewersAtLeast = Number(event.event.definitions.viewersAtLeast); // force Integer
+    const shouldTrigger = (attributes.hostViewers >= event.event.definitions.viewersAtLeast);
     return shouldTrigger;
   }
 
   public async checkStreamIsRunningXMinutes(event: Event) {
-    if (event.attributes.name !== 'stream-is-running-x-minutes') {
+    if (event.event.name !== 'stream-is-running-x-minutes') {
       return false;
     }
     if (!isStreamOnline.value) {
       return false;
     }
-    event.attributes.triggered.runAfterXMinutes = get(event, 'triggered.runAfterXMinutes', 0);
-    const shouldTrigger = event.attributes.triggered.runAfterXMinutes === 0
-                          && Number(dayjs.utc().unix()) - Number(dayjs.utc(streamStatusChangeSince.value).unix()) > Number(event.attributes.definitions.runAfterXMinutes) * 60;
+    event.event.triggered.runAfterXMinutes = get(event, 'triggered.runAfterXMinutes', 0);
+    const shouldTrigger = event.event.triggered.runAfterXMinutes === 0
+                          && Number(dayjs.utc().unix()) - Number(dayjs.utc(streamStatusChangeSince.value).unix()) > Number(event.event.definitions.runAfterXMinutes) * 60;
     if (shouldTrigger) {
-      event.attributes.triggered.runAfterXMinutes = Number(event.attributes.definitions.runAfterXMinutes);
+      event.event.triggered.runAfterXMinutes = Number(event.event.definitions.runAfterXMinutes);
       await Event.save(event);
     }
     return shouldTrigger;
   }
 
   public async checkNumberOfViewersIsAtLeast(event: Event) {
-    if (event.attributes.name !== 'number-of-viewers-is-at-least-x') {
+    if (event.event.name !== 'number-of-viewers-is-at-least-x') {
       return false;
     }
-    event.attributes.triggered.runInterval = get(event, 'triggered.runInterval', 0);
+    event.event.triggered.runInterval = get(event, 'triggered.runInterval', 0);
 
-    event.attributes.definitions.runInterval = Number(event.attributes.definitions.runInterval); // force Integer
-    event.attributes.definitions.viewersAtLeast = Number(event.attributes.definitions.viewersAtLeast); // force Integer
+    event.event.definitions.runInterval = Number(event.event.definitions.runInterval); // force Integer
+    event.event.definitions.viewersAtLeast = Number(event.event.definitions.viewersAtLeast); // force Integer
 
     const viewers = stats.value.currentViewers;
 
-    const shouldTrigger = viewers >= event.attributes.definitions.viewersAtLeast
-                        && ((event.attributes.definitions.runInterval > 0 && Date.now() - event.attributes.triggered.runInterval >= event.attributes.definitions.runInterval * 1000)
-                        || (event.attributes.definitions.runInterval === 0 && event.attributes.triggered.runInterval === 0));
+    const shouldTrigger = viewers >= event.event.definitions.viewersAtLeast
+                        && ((event.event.definitions.runInterval > 0 && Date.now() - event.event.triggered.runInterval >= event.event.definitions.runInterval * 1000)
+                        || (event.event.definitions.runInterval === 0 && event.event.triggered.runInterval === 0));
     if (shouldTrigger) {
-      event.attributes.triggered.runInterval = Date.now();
+      event.event.triggered.runInterval = Date.now();
       await Event.save(event);
     }
     return shouldTrigger;
   }
 
   public async checkCommandSendXTimes(event: Event, attributes: Attributes) {
-    if (event.attributes.name !== 'command-send-x-times') {
+    if (event.event.name !== 'command-send-x-times') {
       return false;
     }
 
-    const regexp = new RegExp(`^${event.attributes.definitions.commandToWatch}\\s`, 'i');
+    const regexp = new RegExp(`^${event.event.definitions.commandToWatch}\\s`, 'i');
 
     let shouldTrigger = false;
     attributes.message += ' ';
     if (attributes.message.match(regexp)) {
-      event.attributes.triggered.runEveryXCommands = get(event, 'triggered.runEveryXCommands', 0);
-      event.attributes.triggered.runInterval = get(event, 'triggered.runInterval', 0);
+      event.event.triggered.runEveryXCommands = get(event, 'triggered.runEveryXCommands', 0);
+      event.event.triggered.runInterval = get(event, 'triggered.runInterval', 0);
 
-      event.attributes.definitions.runInterval = Number(event.attributes.definitions.runInterval); // force Integer
-      event.attributes.triggered.runInterval = Number(event.attributes.triggered.runInterval); // force Integer
+      event.event.definitions.runInterval = Number(event.event.definitions.runInterval); // force Integer
+      event.event.triggered.runInterval = Number(event.event.triggered.runInterval); // force Integer
 
-      event.attributes.triggered.runEveryXCommands++;
+      event.event.triggered.runEveryXCommands++;
       shouldTrigger
-        = event.attributes.triggered.runEveryXCommands >= Number(event.attributes.definitions.runEveryXCommands)
-        && ((event.attributes.definitions.runInterval > 0 && Date.now() - event.attributes.triggered.runInterval >= event.attributes.definitions.runInterval * 1000)
-        || (event.attributes.definitions.runInterval === 0 && event.attributes.triggered.runInterval === 0));
+        = event.event.triggered.runEveryXCommands >= Number(event.event.definitions.runEveryXCommands)
+        && ((event.event.definitions.runInterval > 0 && Date.now() - event.event.triggered.runInterval >= event.event.definitions.runInterval * 1000)
+        || (event.event.definitions.runInterval === 0 && event.event.triggered.runInterval === 0));
       if (shouldTrigger) {
-        event.attributes.triggered.runInterval = Date.now();
-        event.attributes.triggered.runEveryXCommands = 0;
+        event.event.triggered.runInterval = Date.now();
+        event.event.triggered.runEveryXCommands = 0;
       }
       await Event.save(event);
     }
@@ -600,35 +600,35 @@ class Events extends Core {
   }
 
   public async checkKeywordSendXTimes(event: Event, attributes: Attributes) {
-    if (event.attributes.name !== 'keyword-send-x-times') {
+    if (event.event.name !== 'keyword-send-x-times') {
       return false;
     }
-    const regexp = new RegExp(`${event.attributes.definitions.keywordToWatch}`, 'gi');
+    const regexp = new RegExp(`${event.event.definitions.keywordToWatch}`, 'gi');
 
     let shouldTrigger = false;
     attributes.message += ' ';
     const match = attributes.message.match(regexp);
     if (match) {
-      event.attributes.triggered.runEveryXKeywords = get(event, 'triggered.runEveryXKeywords', 0);
-      event.attributes.triggered.runInterval = get(event, 'triggered.runInterval', 0);
+      event.event.triggered.runEveryXKeywords = get(event, 'triggered.runEveryXKeywords', 0);
+      event.event.triggered.runInterval = get(event, 'triggered.runInterval', 0);
 
-      event.attributes.definitions.runInterval = Number(event.attributes.definitions.runInterval); // force Integer
-      event.attributes.triggered.runInterval = Number(event.attributes.triggered.runInterval); // force Integer
+      event.event.definitions.runInterval = Number(event.event.definitions.runInterval); // force Integer
+      event.event.triggered.runInterval = Number(event.event.triggered.runInterval); // force Integer
 
-      if (event.attributes.definitions.resetCountEachMessage) {
-        event.attributes.triggered.runEveryXKeywords = 0;
+      if (event.event.definitions.resetCountEachMessage) {
+        event.event.triggered.runEveryXKeywords = 0;
       }
 
       // add count from match
-      event.attributes.triggered.runEveryXKeywords = Number(event.attributes.triggered.runEveryXKeywords) + Number(match.length);
+      event.event.triggered.runEveryXKeywords = Number(event.event.triggered.runEveryXKeywords) + Number(match.length);
 
       shouldTrigger
-        = event.attributes.triggered.runEveryXKeywords >= Number(event.attributes.definitions.runEveryXKeywords)
-        && ((event.attributes.definitions.runInterval > 0 && Date.now() - event.attributes.triggered.runInterval >= event.attributes.definitions.runInterval * 1000)
-        || (event.attributes.definitions.runInterval === 0 && event.attributes.triggered.runInterval === 0));
+        = event.event.triggered.runEveryXKeywords >= Number(event.event.definitions.runEveryXKeywords)
+        && ((event.event.definitions.runInterval > 0 && Date.now() - event.event.triggered.runInterval >= event.event.definitions.runInterval * 1000)
+        || (event.event.definitions.runInterval === 0 && event.event.triggered.runInterval === 0));
       if (shouldTrigger) {
-        event.attributes.triggered.runInterval = Date.now();
-        event.attributes.triggered.runEveryXKeywords = 0;
+        event.event.triggered.runInterval = Date.now();
+        event.event.triggered.runEveryXKeywords = 0;
       }
       await Event.save(event);
     }
@@ -636,7 +636,7 @@ class Events extends Core {
   }
 
   public async checkDefinition(event: Event, attributes: Attributes) {
-    const foundEvent = this.supportedEventsList.find((o) => o.id === event.attributes.name);
+    const foundEvent = this.supportedEventsList.find((o) => o.id === event.event.name);
     if (!foundEvent || !foundEvent.check) {
       return true;
     }
@@ -863,40 +863,40 @@ class Events extends Core {
 
     try {
       for (const event of await Event.find({ where: [
-        { attributes: { name: 'command-send-x-times' } },
-        { attributes: { name: 'keyword-send-x-times' } },
+        { event: { name: 'command-send-x-times' } },
+        { event: { name: 'keyword-send-x-times' } },
       ] })) {
         // narrow typings
-        if (event.attributes.name !== 'command-send-x-times' && event.attributes.name !== 'keyword-send-x-times') {
+        if (event.event.name !== 'command-send-x-times' && event.event.name !== 'keyword-send-x-times') {
           continue;
         }
 
-        if ('fadeOutInterval' in event.attributes.triggered) {
-          if (event.attributes.triggered.fadeOutInterval === null) {
+        if ('fadeOutInterval' in event.event.triggered) {
+          if (event.event.triggered.fadeOutInterval === null) {
           // fadeOutInterval init
-            event.attributes.triggered.fadeOutInterval = Date.now();
+            event.event.triggered.fadeOutInterval = Date.now();
             await Event.save(event);
           } else {
-            if (Date.now() - event.attributes.triggered.fadeOutInterval! >= Number(event.attributes.definitions.fadeOutInterval) * 1000) {
+            if (Date.now() - event.event.triggered.fadeOutInterval! >= Number(event.event.definitions.fadeOutInterval) * 1000) {
             // fade out commands
-              if (event.attributes.name === 'command-send-x-times') {
+              if (event.event.name === 'command-send-x-times') {
                 if (!isNil(get(event, 'triggered.runEveryXCommands', null))) {
-                  if (event.attributes.triggered.runEveryXCommands! <= 0) {
+                  if (event.event.triggered.runEveryXCommands! <= 0) {
                     continue;
                   }
 
-                  event.attributes.triggered.fadeOutInterval = Date.now();
-                  event.attributes.triggered.runEveryXCommands = event.attributes.triggered.runEveryXCommands! - Number(event.attributes.definitions.fadeOutXCommands);
+                  event.event.triggered.fadeOutInterval = Date.now();
+                  event.event.triggered.runEveryXCommands = event.event.triggered.runEveryXCommands! - Number(event.event.definitions.fadeOutXCommands);
                   await Event.save(event);
                 }
-              } else if (event.attributes.name === 'keyword-send-x-times') {
+              } else if (event.event.name === 'keyword-send-x-times') {
                 if (!isNil(get(event, 'triggered.runEveryXKeywords', null))) {
-                  if (event.attributes.triggered.runEveryXKeywords! <= 0) {
+                  if (event.event.triggered.runEveryXKeywords! <= 0) {
                     continue;
                   }
 
-                  event.attributes.triggered.fadeOutInterval = Date.now();
-                  event.attributes.triggered.runEveryXKeywords = event.attributes.triggered.runEveryXKeywords! - Number(event.attributes.definitions.fadeOutXKeywords);
+                  event.event.triggered.fadeOutInterval = Date.now();
+                  event.event.triggered.runEveryXKeywords = event.event.triggered.runEveryXKeywords! - Number(event.event.definitions.fadeOutXKeywords);
                   await Event.save(event);
                 }
               }

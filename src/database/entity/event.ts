@@ -143,7 +143,7 @@ export class Event extends BaseEntity {
     id: string;
 
   @Column(() => Generic)
-    attributes:
+    event:
   NumberOfViewersIsAtLeastX | StreamIsRunningXMinutes |
   CommandSendXTimes | KeywordSendXTimes | RewardRedeemed | Raid |
   EveryXMinutesOfStream | Generic;
