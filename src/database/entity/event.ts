@@ -44,7 +44,6 @@ export type Operations = {
   };
 };
 
-@Entity()
 export class Generic {
   @Column({ type: 'text' })
   @IsNotEmpty()
