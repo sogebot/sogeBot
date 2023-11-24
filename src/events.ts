@@ -871,34 +871,31 @@ class Events extends Core {
           continue;
         }
 
-        if ('fadeOutInterval' in event.event.triggered) {
-          if (event.event.triggered.fadeOutInterval === null) {
-          // fadeOutInterval init
-            event.event.triggered.fadeOutInterval = Date.now();
-            await Event.save(event);
-          } else {
-            if (Date.now() - event.event.triggered.fadeOutInterval! >= Number(event.event.definitions.fadeOutInterval) * 1000) {
+        if (isNil(get(event, 'triggered.fadeOutInterval', null))) {
+          event.event.triggered.fadeOutInterval = Date.now();
+          await Event.save(event);
+        } else {
+          if (Date.now() - event.event.triggered.fadeOutInterval! >= Number(event.event.definitions.fadeOutInterval) * 1000) {
             // fade out commands
-              if (event.event.name === 'command-send-x-times') {
-                if (!isNil(get(event, 'triggered.runEveryXCommands', null))) {
-                  if (event.event.triggered.runEveryXCommands! <= 0) {
-                    continue;
-                  }
-
-                  event.event.triggered.fadeOutInterval = Date.now();
-                  event.event.triggered.runEveryXCommands = event.event.triggered.runEveryXCommands! - Number(event.event.definitions.fadeOutXCommands);
-                  await Event.save(event);
+            if (event.event.name === 'command-send-x-times') {
+              if (!isNil(get(event, 'triggered.runEveryXCommands', null))) {
+                if (event.event.triggered.runEveryXCommands! <= 0) {
+                  continue;
                 }
-              } else if (event.event.name === 'keyword-send-x-times') {
-                if (!isNil(get(event, 'triggered.runEveryXKeywords', null))) {
-                  if (event.event.triggered.runEveryXKeywords! <= 0) {
-                    continue;
-                  }
 
-                  event.event.triggered.fadeOutInterval = Date.now();
-                  event.event.triggered.runEveryXKeywords = event.event.triggered.runEveryXKeywords! - Number(event.event.definitions.fadeOutXKeywords);
-                  await Event.save(event);
+                event.event.triggered.fadeOutInterval = Date.now();
+                event.event.triggered.runEveryXCommands = event.event.triggered.runEveryXCommands! - Number(event.event.definitions.fadeOutXCommands);
+                await Event.save(event);
+              }
+            } else if (event.event.name === 'keyword-send-x-times') {
+              if (!isNil(get(event, 'triggered.runEveryXKeywords', null))) {
+                if (event.event.triggered.runEveryXKeywords! <= 0) {
+                  continue;
                 }
+
+                event.event.triggered.fadeOutInterval = Date.now();
+                event.event.triggered.runEveryXKeywords = event.event.triggered.runEveryXKeywords! - Number(event.event.definitions.fadeOutXKeywords);
+                await Event.save(event);
               }
             }
           }
