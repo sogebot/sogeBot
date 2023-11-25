@@ -1,16 +1,30 @@
 import { validateOrReject } from 'class-validator';
+import { cloneDeep } from 'lodash-es';
 import { BaseEntity } from 'typeorm';
+import { z } from 'zod';
 
 export class BotEntity extends BaseEntity {
-  validateAndSave() {
+  static create<T extends BaseEntity>(
+    this: { new (): T } & typeof BaseEntity,
+    entityOrEntities?: any,
+  ) {
+    if (typeof window === 'undefined') {
+      return this.getRepository<T>().create(entityOrEntities);
+    } else {
+      return cloneDeep(entityOrEntities);
+    }
+  }
+
+  validateAndSave(schema: z.AnyZodObject) {
     return new Promise<this>((resolve, reject) => {
-      validateOrReject(this)
-        .then(() => {
-          this.save()
-            .then(resolve)
-            .catch(reject);
-        })
-        .catch(reject);
+      try {
+        schema.parse(this);
+        this.save()
+          .then(resolve)
+          .catch(reject);
+      } catch (e) {
+        reject(e);
+      }
     });
   }
   validate() {

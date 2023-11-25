@@ -1,5 +1,4 @@
 import { DiscordLink } from '@entity/discord.js';
-import { Events } from '@entity/event.js';
 import { Permissions as PermissionsEntity } from '@entity/permissions.js';
 import { User } from '@entity/user.js';
 import { HOUR, MINUTE } from '@sogebot/ui-helpers/constants.js';
@@ -24,6 +23,7 @@ import { Message } from '../message.js';
 import { Parser } from '../parser.js';
 import users from '../users.js';
 
+import { Event, Attributes } from '~/database/entity/event.js';
 import { AppDataSource } from '~/database.js';
 import { isStreamOnline, stats } from '~/helpers/api/index.js';
 import { attributesReplace } from '~/helpers/attributesReplace.js';
@@ -475,7 +475,7 @@ class Discord extends Integration {
   }
 
   /* note: as we are using event, we need to use self as pointer to discord class */
-  public async fireSendDiscordMessage(operation: Events.OperationDefinitions, attributes: Events.Attributes): Promise<void> {
+  public async fireSendDiscordMessage(operation: Event['operations'][number]['definitions'], attributes: Attributes): Promise<void> {
     const dMchannel = String(operation.channel);
     try {
       if (self.client === null) {

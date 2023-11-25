@@ -1,6 +1,6 @@
 import { setTimeout } from 'timers';
 
-import { isNil, merge } from 'lodash-es';
+import { isNil } from 'lodash-es';
 
 import { isValidationError } from './helpers/errors.js';
 import { eventEmitter } from './helpers/events/index.js';
@@ -9,7 +9,7 @@ import { Types } from './plugins/ListenTo.js';
 
 import Core from '~/_interface.js';
 import {
-  Variable, VariableWatch,
+  Variable, VariableWatch, variableSchema,
 } from '~/database/entity/variable.js';
 import { AppDataSource } from '~/database.js';
 import { onStartup } from '~/decorators/on.js';
@@ -81,9 +81,7 @@ class CustomVariables extends Core {
     });
     adminEndpoint('/core/customvariables', 'customvariables::save', async (item, cb) => {
       try {
-        const itemToSave = new Variable();
-        merge(itemToSave, item);
-        await itemToSave.validateAndSave();
+        const itemToSave = await Variable.create(item).validateAndSave(variableSchema);
         updateWidgetAndTitle(itemToSave.variableName);
         eventEmitter.emit(Types.CustomVariableOnChange, itemToSave.variableName, itemToSave.currentValue, null);
         cb(null, itemToSave.id);

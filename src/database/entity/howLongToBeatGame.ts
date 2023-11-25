@@ -1,8 +1,8 @@
 import { BeforeInsert, BeforeUpdate, Column, Entity, Index, PrimaryColumn } from 'typeorm';
-import { BotEntity } from '../BotEntity.js';
-import { IsNotEmpty, MinLength } from 'class-validator';
+import { z } from 'zod';
 
 import { ColumnNumericTransformer } from './_transformer.js';
+import { BotEntity } from '../BotEntity.js';
 
 @Entity()
 @Index('IDX_301758e0e3108fc902d5436527', ['game'], { unique: true })
@@ -11,8 +11,6 @@ export class HowLongToBeatGame extends BotEntity {
     id: string;
 
   @Column()
-  @MinLength(2)
-  @IsNotEmpty()
     game: string;
 
   @Column({ nullable: false, type: 'varchar', length: '2022-07-27T00:30:34.569259834Z'.length })
@@ -54,3 +52,7 @@ export class HowLongToBeatGame extends BotEntity {
     isExtraCounted: boolean;
   }[] = [];
 }
+
+export const HowLongToBeatGameSchema = z.object({
+  game: z.string().min(3),
+});

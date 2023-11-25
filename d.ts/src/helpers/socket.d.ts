@@ -5,7 +5,7 @@ import type { CacheTitlesInterface } from '@entity/cacheTitles';
 import type { ChecklistInterface } from '@entity/checklist';
 import type { CommandsCountInterface, CommandsGroupInterface, CommandsInterface } from '@entity/commands';
 import type { CooldownInterface } from '@entity/cooldown';
-import type { EventInterface, Events } from '@entity/event';
+import type { Event, Events } from '@entity/event';
 import type { EventListInterface } from '@entity/eventList';
 import type { GalleryInterface } from '@entity/gallery';
 import type { HighlightInterface } from '@entity/highlight';
@@ -454,13 +454,13 @@ export type ClientToServerEventsWithNamespace = {
   },
   '/core/events': GenericEvents & {
     'events::getRedeemedRewards': (cb: (error: Error | string | null, rewards: { id: string, name: string }[]) => void) => void,
-    'generic::getAll': (cb: (error: Error | string | null, data: EventInterface[]) => void) => void,
-    'generic::getOne': (id: string, cb: (error: Error | string | null, data?: EventInterface) => void) => void,
+    'generic::getAll': (cb: (error: Error | string | null, data: Event[]) => void) => void,
+    'generic::getOne': (id: string, cb: (error: Error | string | null, data?: Event) => void) => void,
     'list.supported.events': (cb: (error: Error | string | null, data: any[] /* TODO: missing type */) => void) => void,
     'list.supported.operations': (cb: (error: Error | string | null, data: any[] /* TODO: missing type */) => void) => void,
     'test.event': (opts: { id: string; randomized: string[], variables: string[], values: any[] }, cb: (error: Error | string | null) => void) => void,
-    'events::save': (event: EventInterface, cb: (error: Error | string | null, data: EventInterface) => void) => void,
-    'events::remove': (eventId: Required<EventInterface['id']>, cb: (error: Error | string | null) => void) => void,
+    'events::save': (event: Event, cb: (error: Error | string | null, data: Event) => void) => void,
+    'events::remove': (eventId: Required<Event['id']>, cb: (error: Error | string | null) => void) => void,
   },
   '/core/tts': GenericEvents & {
     'google::speak': (opts: { volume: number; pitch: number; rate: number; text: string; voice: string; }, cb: (error: Error | string | null, audioContent?: string | null) => void) => void,

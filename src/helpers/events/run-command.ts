@@ -5,9 +5,7 @@ import { v4 } from 'uuid';
 import { getOwner, getUserSender } from '../commons/index.js';
 
 import { parserReply } from '~/commons.js';
-import {
-  Events as EventsEntity,
-} from '~/database/entity/event.js';
+import { Event, Attributes } from '~/database/entity/event.js';
 import { debug } from '~/helpers/log.js';
 import { parserEmitter } from '~/helpers/parser/index.js';
 import { Message } from  '~/message.js';
@@ -19,7 +17,7 @@ type data = {
 
 const commandsToRun = new Map<string, data>();
 
-export async function fireRunCommand(operation: EventsEntity.OperationDefinitions, attributes: EventsEntity.Attributes) {
+export async function fireRunCommand(operation: Event['operations'][number]['definitions'], attributes: Attributes) {
   const userName = isNil(attributes.userName) ? getOwner() : attributes.userName;
   const userId = attributes.userId ? attributes.userId : await users.getIdByName(userName);
   operation.timeout ??= 0;

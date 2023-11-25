@@ -1,9 +1,8 @@
 import { BeforeInsert, Column, Entity, PrimaryColumn } from 'typeorm';
+import { z } from 'zod';
 
-import { BotEntity } from '../BotEntity.js';
-import { IsNotEmpty, IsNumber, MinLength } from 'class-validator';
 import defaultPermissions from '../../helpers/permissions/defaultPermissions.js';
-import { IsCustomVariable } from '../validators/isCustomVariable.js';
+import { BotEntity } from '../BotEntity.js';
 
 @Entity()
 export class VariableWatch extends BotEntity {
@@ -64,8 +63,6 @@ export class Variable extends BotEntity {
   }[];
 
   @Column({ unique: true })
-  @MinLength(3)
-  @IsCustomVariable()
     variableName: string;
 
   @Column({ default: '' })
@@ -84,8 +81,6 @@ export class Variable extends BotEntity {
     evalValue: string;
 
   @Column({ default: 60000 })
-  @IsNotEmpty()
-  @IsNumber()
     runEvery: number;
 
   @Column()
@@ -109,3 +104,14 @@ export class Variable extends BotEntity {
   @Column({ type: 'varchar', length: '2022-07-27T00:30:34.569259834Z'.length })
     runAt: string;
 }
+
+export const variableSchema = z.object({
+  variableName: z.union([
+    z.string().min(3),
+    z.custom<string>((value) => {
+      return typeof value === 'string'
+            && value.length > 2 && value.startsWith('$_');
+    }, 'IsCustomVariable'),
+  ]),
+  runEvery: z.number().int(),
+});
