@@ -17,6 +17,12 @@ export class eventsUpdate1678892044036 implements MigrationInterface {
       const eventOperation = operations.filter((operation: any) => operation.eventId === event.id);
       eventOperation.forEach((operation: any) => {
         operation.definitions = JSON.parse(operation.definitions);
+        if ('numberToDecrement' in operation.definitions) {
+          operation.definitions.numberToDecrement = Number(operation.definitions.numberToDecrement);
+        }
+        if ('numberToIncrement' in operation.definitions) {
+          operation.definitions.numberToIncrement = Number(operation.definitions.numberToIncrement);
+        }
       });
       event.operations = JSON.stringify(eventOperation ?? []);
       event.eventTriggered = JSON.stringify({});
