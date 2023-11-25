@@ -131,6 +131,7 @@ class Alias extends System {
       return [null, cmdArray];
     }
 
+    const length = opts.message.toLowerCase().split(' ').length;
     const aliases = await AliasEntity.find();
     for (let i = 0; i < length; i++) {
       alias = aliases.find(o => o.alias === cmdArray.join(' ') && o.enabled);
