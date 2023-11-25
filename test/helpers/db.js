@@ -10,7 +10,7 @@ import { Commands, CommandsCount, CommandsGroup } from '../../dest/database/enti
 import { Cooldown } from '../../dest/database/entity/cooldown.js';
 import { DiscordLink } from '../../dest/database/entity/discord.js';
 import { Duel } from '../../dest/database/entity/duel.js';
-import { Event, EventOperation } from '../../dest/database/entity/event.js';
+import { Event } from '../../dest/database/entity/event.js';
 import { EventList } from '../../dest/database/entity/eventList.js';
 import { HeistUser } from '../../dest/database/entity/heist.js';
 import { Keyword, KeywordGroup } from '../../dest/database/entity/keyword.js';
@@ -47,7 +47,7 @@ export const cleanup = async () => {
     await changelog.flush();
     await waitMs(1000); // wait little bit for transactions to be done
 
-    const entities = [Settings, AliasGroup, CommandsGroup, KeywordGroup, HeistUser, EventList, PointsChangelog, SongRequest, RaffleParticipant, Rank, PermissionCommands, Event, EventOperation, Variable, Raffle, Duel, TimerResponse, Timer, UserTip, UserBit, User, ModerationPermit, Alias, Commands, CommandsCount, Quotes, Cooldown, Keyword, Price, DiscordLink];
+    const entities = [Settings, AliasGroup, CommandsGroup, KeywordGroup, HeistUser, EventList, PointsChangelog, SongRequest, RaffleParticipant, Rank, PermissionCommands, Event, Variable, Raffle, Duel, TimerResponse, Timer, UserTip, UserBit, User, ModerationPermit, Alias, Commands, CommandsCount, Quotes, Cooldown, Keyword, Price, DiscordLink];
     if (['postgres', 'mysql'].includes(AppDataSource.options.type)) {
       const metadatas = [];
       for (const entity of entities) {
