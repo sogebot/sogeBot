@@ -15,6 +15,9 @@ export class eventsUpdate1678892044036 implements MigrationInterface {
 
     for (const event of events) {
       const eventOperation = operations.filter((operation: any) => operation.eventId === event.id);
+      eventOperation.forEach((operation: any) => {
+        operation.definitions = JSON.parse(operation.definitions);
+      });
       event.operations = JSON.stringify(eventOperation ?? []);
       event.eventTriggered = JSON.stringify({});
       event.eventDefinitions = event.definitions;

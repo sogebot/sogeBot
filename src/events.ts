@@ -14,8 +14,7 @@ import twitch from './services/twitch.js';
 import Core from '~/_interface.js';
 import { parserReply } from '~/commons.js';
 import {
-  Attributes,
-  Event, Operations,
+  Attributes, Event, EventSchema, Operations,
 } from '~/database/entity/event.js';
 import { User } from '~/database/entity/user.js';
 import { AppDataSource } from '~/database.js';
@@ -733,9 +732,9 @@ class Events extends Core {
     });
     adminEndpoint('/core/events', 'generic::getOne', async (id, cb) => {
       try {
+        Event.create({ id });
         const event = await Event.findOne({
-          relations: ['operations'],
-          where:     { id },
+          where: { id },
         });
         cb(null, event as any);
       } catch (e: any) {
@@ -821,8 +820,7 @@ class Events extends Core {
         }
 
         const event = await Event.findOne({
-          relations: ['operations'],
-          where:     { id },
+          where: { id },
         });
         if (event) {
           for (const operation of event.operations) {
@@ -840,9 +838,9 @@ class Events extends Core {
 
     adminEndpoint('/core/events', 'events::save', async (event, cb) => {
       try {
-        cb(null, await Event.save({ ...event, operations: event.operations.filter(o => o.name !== 'do-nothing') }));
+        cb(null, await Event.create(event).validateAndSave(EventSchema));
       } catch (e: any) {
-        cb(e.stack, event);
+        cb(e, event);
       }
     });
 

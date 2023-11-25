@@ -40,6 +40,7 @@
     "cross-env": "7.0.3",
     "crypto-browserify": "3.12.0",
     "currency-symbol-map": "5.1.0",
+    "custompatch": "^1.0.23",
     "dayjs": "1.11.10",
     "decode-html": "2.0.0",
     "discord.js": "14.13.0",
@@ -82,8 +83,7 @@
     "tiny-typed-emitter": "2.1.0",
     "trigram-similarity": "^1.0.7",
     "typeorm": "0.3.17",
-    "typescript": "5.2.2",
-    "custompatch": "^1.0.23",
+    "typescript": "5.3.2",
     "url-join": "5.0.0",
     "uuid": "9.0.1",
     "velocity-animate": "1.5.2",
@@ -93,7 +93,8 @@
     "yargs": "17.7.2",
     "ytdl-core": "4.11.5",
     "ytpl": "2.3.0",
-    "ytsr": "3.8.4"
+    "ytsr": "3.8.4",
+    "zod": "^3.22.4"
   },
   "scripts": {
     "postinstall": "(custompatch || (exit 0))",

@@ -1,6 +1,7 @@
-import { IsNotEmpty } from 'class-validator';
-import { Column, PrimaryColumn } from 'typeorm';
-import { Entity, BaseEntity } from 'typeorm';
+import { Column, PrimaryColumn, Entity } from 'typeorm';
+import { z } from 'zod';
+
+import { BotEntity } from '../BotEntity.js';
 
 export type SupportedOperation = {
   id: string,
@@ -44,9 +45,24 @@ export type Operations = {
   };
 };
 
+class Definitions {
+  fadeOutXCommands?: number;
+  fadeOutXKeywords?: number;
+  fadeOutInterval?: number;
+  runEveryXCommands?: number;
+  runEveryXKeywords?: number;
+  commandToWatch?: string;
+  keywordToWatch?: string;
+  runInterval?: number;
+  rewardId?: string;
+  viewersAtLeast?: number;
+  runAfterXMinutes?: number;
+  runEveryXMinutes?: number;
+  resetCountEachMessage?: boolean;
+}
+
 export class Generic {
   @Column({ type: 'text' })
-  @IsNotEmpty()
     name: string;
 
   @Column({ type: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') !== 'better-sqlite3' ? 'json' : 'simple-json' })
@@ -54,9 +70,7 @@ export class Generic {
 
   // TODO: write validator for all definitions if keys exist
   @Column({ type: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') !== 'better-sqlite3' ? 'json' : 'simple-json' })
-    definitions: {
-    [x: string]: string | boolean | number;
-  };
+    definitions: Definitions;
 }
 export class CommandSendXTimes {
   name: 'command-send-x-times';
@@ -138,7 +152,7 @@ class EveryXMinutesOfStream {
 }
 
 @Entity()
-export class Event extends BaseEntity {
+export class Event extends BotEntity {
   @PrimaryColumn({ generated: 'uuid' })
     id: string;
 
@@ -157,3 +171,84 @@ export class Event extends BaseEntity {
   @Column({ type: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') !== 'better-sqlite3' ? 'json' : 'simple-json' })
     operations: Operations[];
 }
+
+const defaultEventValidationSchema = (key: string) => z.object({
+  name:        z.literal(key),
+  triggered:   z.object({}),
+  definitions: z.object({}),
+});
+
+export const EventSchema = z.object({
+  event: z.discriminatedUnion('name', [
+    z.object({
+      name:        z.literal('number-of-viewers-is-at-least-x'),
+      triggered:   z.object({}),
+      definitions: z.object({
+        viewersAtLeast: z.number().int().min(0),
+        runInterval:    z.number().int().min(0),
+      }),
+    }),
+    z.object({
+      name:        z.literal('stream-is-running-x-minutes'),
+      triggered:   z.object({}),
+      definitions: z.object({
+        runAfterXMinutes: z.number().int().min(0),
+      }),
+    }),
+    z.object({
+      name:        z.literal('reward-redeemed'),
+      triggered:   z.object({}),
+      definitions: z.object({
+        rewardId: z.custom((val) => typeof val === 'string' && val.length > 0, 'isNotEmpty'),
+      }),
+    }),
+    z.object({
+      name:        z.literal('command-send-x-times'),
+      triggered:   z.object({}),
+      definitions: z.object({
+        fadeOutXCommands:  z.number().int().min(0),
+        fadeOutInterval:   z.number().int().min(1),
+        runEveryXCommands: z.number().int().min(0),
+        commandToWatch:    z.string().trim().min(2),
+        runInterval:       z.number().int().min(0),
+      }),
+    }),
+    z.object({
+      name:        z.literal('keyword-send-x-times'),
+      triggered:   z.object({}),
+      definitions: z.object({
+        fadeOutXKeywords:      z.number().int().min(0),
+        fadeOutInterval:       z.number().int().min(1),
+        runEveryXKeywords:     z.number().int().min(0),
+        keywordToWatch:        z.string().trim().min(2),
+        runInterval:           z.number().int().min(0),
+        resetCountEachMessage: z.boolean(),
+      }),
+    }),
+    z.object({
+      name:        z.literal('raid'),
+      triggered:   z.object({}),
+      definitions: z.object({
+        viewersAtLeast: z.number().int().min(0),
+      }),
+    }),
+    z.object({
+      name:        z.literal('every-x-minutes-of-stream'),
+      triggered:   z.object({}),
+      definitions: z.object({
+        runEveryXMinutes: z.number().int().min(1),
+      }),
+    }),
+    ...[
+      'prediction-started', 'prediction-locked', 'prediction-ended',
+      'poll-started', 'poll-ended',
+      'hypetrain-started', 'hypetrain-ended', 'hypetrain-level-reached',
+      'user-joined-channel', 'user-parted-channel',
+      'mod', 'commercial', 'timeout',
+      'action', 'clearchat', 'stream-started', 'stream-stopped',
+      'ban', 'cheer', 'game-changed', 'follow', 'subscription', 'subgift',
+      'subcommunitygift', 'resub', 'tip',
+    ].map(defaultEventValidationSchema),
+  ]),
+
+});
