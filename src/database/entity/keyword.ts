@@ -1,15 +1,19 @@
-import { IsNotEmpty, MinLength } from 'class-validator';
 import { ManyToOne, OneToMany } from 'typeorm';
 import { BaseEntity, Column, Entity, Index, PrimaryColumn } from 'typeorm';
+import { z } from 'zod';
+
+import { BotEntity } from '../BotEntity.js';
 
 @Entity()
-export class Keyword extends BaseEntity {
+export class Keyword extends BotEntity {
+  schema = z.object({
+    name: z.string().min(2),
+  });
+
   @PrimaryColumn({ generated: 'uuid', type: 'uuid' })
     id: string;
 
   @Column()
-  @IsNotEmpty()
-  @MinLength(2)
   @Index('IDX_35e3ff88225eef1d85c951e229')
     keyword: string;
 

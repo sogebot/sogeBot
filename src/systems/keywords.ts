@@ -1,7 +1,6 @@
 import {
   Keyword, KeywordGroup, KeywordResponses,
 } from '@entity/keyword.js';
-import { validateOrReject } from 'class-validator';
 import _, { merge } from 'lodash-es';
 import XRegExp from 'xregexp';
 
@@ -83,21 +82,14 @@ class Keywords extends System {
     });
     app.post('/api/systems/keywords/group', adminMiddleware, async (req, res) => {
       try {
-        const itemToSave = new KeywordGroup();
-        merge(itemToSave, req.body);
-        await validateOrReject(itemToSave);
-        await itemToSave.save();
-        res.send({ data: itemToSave });
+        res.send({ data: await KeywordGroup.create(req.body).save() });
       } catch (e) {
         res.status(400).send({ errors: e });
       }
     });
     app.post('/api/systems/keywords', adminMiddleware, async (req, res) => {
       try {
-        const itemToSave = new Keyword();
-        merge(itemToSave, req.body);
-        await validateOrReject(itemToSave);
-        await itemToSave.save();
+        const itemToSave = await Keyword.create(req.body).save();
 
         await AppDataSource.getRepository(KeywordResponses).delete({ keyword: { id: itemToSave.id } });
         const responses = req.body.responses;

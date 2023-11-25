@@ -1,15 +1,20 @@
-import { IsNotEmpty } from 'class-validator';
-import { BaseEntity, Column, Entity, PrimaryColumn } from 'typeorm';
+import { Column, Entity, PrimaryColumn } from 'typeorm';
+import { z } from 'zod';
+
+import { BotEntity } from '../BotEntity.js';
 
 @Entity()
-export class Quotes extends BaseEntity {
+export class Quotes extends BotEntity {
+  schema = z.object({
+    quote: z.string().min(1),
+  });
+
   @PrimaryColumn({ type: 'int', generated: 'increment' })
     id: number;
 
   @Column({ type: 'simple-array' })
     tags: string[];
 
-  @IsNotEmpty()
   @Column()
     quote: string;
 

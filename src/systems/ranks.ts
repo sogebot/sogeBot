@@ -61,7 +61,7 @@ class Ranks extends System {
     app.post('/api/systems/ranks', adminMiddleware, async (req, res) => {
       try {
         const itemToSave = Rank.create(req.body);
-        res.send({ data: await itemToSave.validateAndSave() });
+        res.send({ data: await itemToSave.save() });
       } catch (e) {
         if (e instanceof Error) {
           res.status(400).send({ errors: e.message });

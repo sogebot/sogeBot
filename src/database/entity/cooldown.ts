@@ -1,14 +1,18 @@
-import { IsNotEmpty, MinLength } from 'class-validator';
-import { BaseEntity, Column, Entity, Index, PrimaryColumn } from 'typeorm';
+import { Column, Entity, Index, PrimaryColumn } from 'typeorm';
+import { z } from 'zod';
+
+import { BotEntity } from '../BotEntity.js';
 
 @Entity()
-export class Cooldown extends BaseEntity {
+export class Cooldown extends BotEntity {
+  schema = z.object({
+    name: z.string().min(2),
+  });
+
   @PrimaryColumn({ generated: 'uuid', type: 'uuid' })
     id: string;
 
   @Column()
-  @IsNotEmpty()
-  @MinLength(2)
   @Index('IDX_aa85aa267ec6eaddf7f93e3665', { unique: true })
     name: string;
 

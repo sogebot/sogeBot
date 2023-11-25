@@ -1,9 +1,6 @@
 import { SECOND } from '@sogebot/ui-helpers/constants.js';
-import { validateOrReject } from 'class-validator';
-import { merge } from 'lodash-es';
 
 import { Plugin, PluginVariable } from './database/entity/plugins.js';
-import { isValidationError } from './helpers/errors.js';
 import { eventEmitter } from './helpers/events/index.js';
 import { debug, error } from './helpers/log.js';
 import { app } from './helpers/panel.js';
@@ -285,37 +282,14 @@ class Plugins extends Core {
       transpiledFiles.clear();
       cb(null);
     });
-    adminEndpoint('/core/plugins', 'generic::validate', async (data, cb) => {
-      try {
-        const item = new Plugin();
-        merge(item, data);
-        await validateOrReject(item);
-        cb(null);
-      } catch (e) {
-        if (e instanceof Error) {
-          cb(e.message);
-        }
-        if (isValidationError(e)) {
-          cb(e);
-        }
-      }
-    });
     adminEndpoint('/core/plugins', 'generic::save', async (item, cb) => {
       try {
-        const itemToSave = new Plugin();
-        merge(itemToSave, item);
-        await validateOrReject(itemToSave);
-        await itemToSave.save();
+        const itemToSave = await Plugin.create(item).save();
         await this.updateCache();
         transpiledFiles.clear();
         cb(null, itemToSave);
       } catch (e) {
-        if (e instanceof Error) {
-          cb(e.message, undefined);
-        }
-        if (isValidationError(e)) {
-          cb(e, undefined);
-        }
+        cb(e, undefined);
       }
     });
   }

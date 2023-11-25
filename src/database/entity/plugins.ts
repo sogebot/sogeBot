@@ -1,16 +1,18 @@
-import { IsNotEmpty } from 'class-validator';
 import { Entity, PrimaryColumn, Column, BaseEntity } from 'typeorm';
+import { z } from 'zod';
 
 import { BotEntity } from '../BotEntity.js';
 
 @Entity()
 export class Plugin extends BotEntity {
-
+  schema = z.object({
+    name: z.string().min(1),
+  });
+  
   @PrimaryColumn()
     id: string;
 
   @Column()
-  @IsNotEmpty()
     name: string;
 
   @Column()

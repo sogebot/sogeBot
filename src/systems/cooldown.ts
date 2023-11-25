@@ -3,7 +3,6 @@ import {
 } from '@entity/cooldown.js';
 import { Keyword } from '@entity/keyword.js';
 import * as constants from '@sogebot/ui-helpers/constants.js';
-import { validateOrReject } from 'class-validator';
 import _, { merge } from 'lodash-es';
 import { In } from 'typeorm';
 
@@ -106,11 +105,7 @@ class Cooldown extends System {
     });
     app.post('/api/systems/cooldown', adminMiddleware, async (req, res) => {
       try {
-        const itemToSave = new CooldownEntity();
-        merge(itemToSave, req.body);
-        await validateOrReject(itemToSave);
-        await itemToSave.save();
-        res.send({ data: itemToSave });
+        res.send({ data: await CooldownEntity.create(req.body).save() });
       } catch (e) {
         res.status(400).send({ errors: e });
       }

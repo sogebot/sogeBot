@@ -1,17 +1,15 @@
-import { IsNotEmpty, MinLength } from 'class-validator';
 import { BaseEntity, Column, Entity, Index, PrimaryColumn } from 'typeorm';
+import { z } from 'zod';
 
-import { IsCommand } from '../validators/IsCommand.js';
+import { command } from '../validators/IsCommand.js';
+import { BotEntity } from '../BotEntity.js';
 
 @Entity()
-export class Commands extends BaseEntity {
+export class Commands extends BotEntity {
   @PrimaryColumn({ generated: 'uuid', type: 'uuid' })
     id: string;
 
   @Column()
-  @IsNotEmpty()
-  @MinLength(2)
-  @IsCommand()
   @Index('IDX_1a8c40f0a581447776c325cb4f')
     command: string;
 
@@ -63,3 +61,7 @@ export class CommandsCount extends BaseEntity {
   @Column({ type: 'varchar', length: '2022-07-27T00:30:34.569259834Z'.length })
     timestamp: string;
 }
+
+export const CommandSchema = z.object({
+  command: command(),
+});
