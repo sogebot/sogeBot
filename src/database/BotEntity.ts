@@ -1,4 +1,5 @@
 import { validateOrReject } from 'class-validator';
+import { cloneDeep } from 'lodash-es';
 import { BaseEntity } from 'typeorm';
 import { z } from 'zod';
 
@@ -10,7 +11,7 @@ export class BotEntity extends BaseEntity {
     if (typeof window === 'undefined') {
       return this.getRepository<T>().create(entityOrEntities);
     } else {
-      return entityOrEntities;
+      return cloneDeep(entityOrEntities);
     }
   }
 

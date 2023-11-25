@@ -2,6 +2,8 @@ import { Column, PrimaryColumn, Entity } from 'typeorm';
 import { z } from 'zod';
 
 import { BotEntity } from '../BotEntity.js';
+import { command } from '../validators/IsCommand.js';
+import { customvariable } from '../validators/isCustomVariable.js';
 
 export type SupportedOperation = {
   id: string,
@@ -209,7 +211,7 @@ export const EventSchema = z.object({
         fadeOutXCommands:  z.number().int().min(0),
         fadeOutInterval:   z.number().int().min(1),
         runEveryXCommands: z.number().int().min(0),
-        commandToWatch:    z.string().trim().min(2),
+        commandToWatch:    command(),
         runInterval:       z.number().int().min(0),
       }),
     }),
@@ -250,5 +252,74 @@ export const EventSchema = z.object({
       'subcommunitygift', 'resub', 'tip',
     ].map(defaultEventValidationSchema),
   ]),
-
+  operations: z.array(z.discriminatedUnion('name', [
+    z.object({
+      name:        z.literal('run-obswebsocket-command'),
+      definitions: z.object({
+        taskId: z.custom((val) => typeof val === 'string' && val.length > 0, 'isNotEmpty'),
+      }),
+    }),
+    z.object({
+      name:        z.literal('send-discord-message'),
+      definitions: z.object({
+        channel:       z.string().trim().min(1),
+        messageToSend: z.string().trim().min(1),
+      }),
+    }),
+    z.object({
+      name:        z.literal('send-chat-message'),
+      definitions: z.object({
+        messageToSend: z.string().trim().min(1),
+      }),
+    }),
+    z.object({
+      name:        z.literal('send-whisper'),
+      definitions: z.object({
+        messageToSend: z.string().trim().min(1),
+      }),
+    }),
+    z.object({
+      name:        z.literal('run-command'),
+      definitions: z.object({
+        commandToRun: command(),
+      }),
+    }),
+    z.object({
+      name:        z.literal('emote-explosion'),
+      definitions: z.object({
+        emotesToExplode: z.string().trim().min(1),
+      }),
+    }),
+    z.object({
+      name:        z.literal('emote-firework'),
+      definitions: z.object({
+        emotesToFirework: z.string().trim().min(1),
+      }),
+    }),
+    z.object({
+      name:        z.literal('increment-custom-variable'),
+      definitions: z.object({
+        customVariable:    customvariable(),
+        numberToIncrement: z.number().min(0),
+      }),
+    }),
+    z.object({
+      name:        z.literal('set-custom-variable'),
+      definitions: z.object({
+        customVariable: customvariable(),
+      }),
+    }),
+    z.object({
+      name:        z.literal('decrement-custom-variable'),
+      definitions: z.object({
+        customVariable:    customvariable(),
+        numberToDecrement: z.number().min(0),
+      }),
+    }),
+    ...[
+      'bot-will-join-channel', 'bot-will-part-channel', 'create-a-clip', 'start-commercial',
+    ].map((name) => z.object({
+      name: z.literal(name),
+    })),
+  ])),
 });

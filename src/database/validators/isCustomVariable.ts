@@ -1,4 +1,5 @@
 import { registerDecorator, ValidationOptions } from 'class-validator';
+import { z } from 'zod';
 
 export function IsCustomVariable(validationOptions?: ValidationOptions) {
   return function (object: any, propertyName: string) {
@@ -15,4 +16,9 @@ export function IsCustomVariable(validationOptions?: ValidationOptions) {
       },
     });
   };
+}
+
+export function customvariable() {
+  return z.custom(value => typeof value === 'string'
+  && value.length > 2 && value.startsWith('$_'), 'isCustomVariable');
 }

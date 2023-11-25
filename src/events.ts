@@ -159,13 +159,13 @@ class Events extends Core {
         id: 'create-a-clip', definitions: { announce: false, hasDelay: true, replay: false }, fire: this.fireCreateAClip,
       },
       {
-        id: 'increment-custom-variable', definitions: { customVariable: '', numberToIncrement: '1' }, fire: this.fireIncrementCustomVariable,
+        id: 'increment-custom-variable', definitions: { customVariable: '', numberToIncrement: 1 }, fire: this.fireIncrementCustomVariable,
       },
       {
         id: 'set-custom-variable', definitions: { customVariable: '', value: '' }, fire: this.fireSetCustomVariable,
       },
       {
-        id: 'decrement-custom-variable', definitions: { customVariable: '', numberToDecrement: '1' }, fire: this.fireDecrementCustomVariable,
+        id: 'decrement-custom-variable', definitions: { customVariable: '', numberToDecrement: 1 }, fire: this.fireDecrementCustomVariable,
       },
     ];
 

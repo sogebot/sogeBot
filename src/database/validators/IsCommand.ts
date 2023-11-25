@@ -1,4 +1,5 @@
 import { registerDecorator, ValidationOptions } from 'class-validator';
+import { z } from 'zod';
 
 export function IsCommand(validationOptions?: ValidationOptions) {
   return function (object: any, propertyName: string) {
@@ -15,4 +16,8 @@ export function IsCommand(validationOptions?: ValidationOptions) {
       },
     });
   };
+}
+
+export function command() {
+  return z.custom(value => typeof value === 'string' && value.trim().length > 1 && value.startsWith('!'), 'isCommand');
 }
