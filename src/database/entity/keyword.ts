@@ -7,7 +7,7 @@ import { BotEntity } from '../BotEntity.js';
 @Entity()
 export class Keyword extends BotEntity {
   schema = z.object({
-    name: z.string().min(2),
+    keyword: z.string().min(2),
   });
 
   @PrimaryColumn({ generated: 'uuid', type: 'uuid' })
