@@ -23,10 +23,12 @@ describe('Events - cheer event - @func3', () => {
     before(async function () {
       await AppDataSource.getRepository(Event).save({
         id:          uuidv4(),
-        name:        'cheer',
+        event: {
+          name: 'cheer',
+          triggered:   {},
+          definitions: {},
+        }
         givenName:   'Cheer alert',
-        triggered:   {},
-        definitions: {},
         filter:      '',
         isEnabled:   true,
         operations:  [{

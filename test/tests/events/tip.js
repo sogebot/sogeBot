@@ -27,10 +27,12 @@ describe('Events - tip event - @func3', () => {
     before(async function () {
       await AppDataSource.getRepository(Event).save({
         id:          uuidv4(),
-        name:        'tip',
+        event: {
+          name: 'tip',
+          triggered:   {},
+          definitions: {},
+        }
         givenName:   'Tip alert',
-        triggered:   {},
-        definitions: {},
         filter:      '',
         isEnabled:   true,
         operations:  [{
