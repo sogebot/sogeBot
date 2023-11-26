@@ -3,7 +3,7 @@ import { BaseEntity } from 'typeorm';
 import { z } from 'zod';
 
 export class BotEntity extends BaseEntity {
-  schema: z.AnyZodObject | z.ZodEffects<any> | null = null;
+  schema: z.AnyZodObject | z.ZodEffects<any> | z.ZodIntersection<any, any> | null = null;
 
   static create<T extends BotEntity>(
     this: { new (): T } & typeof BotEntity,
