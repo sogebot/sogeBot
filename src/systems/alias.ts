@@ -1,6 +1,5 @@
 import { Alias as AliasEntity, AliasGroup } from '@entity/alias.js';
 import * as constants from '@sogebot/ui-helpers/constants.js';
-import { validateOrReject } from 'class-validator';
 import * as _ from 'lodash-es';
 import { merge } from 'lodash-es';
 
@@ -10,7 +9,6 @@ import {
   command, default_permission, parser, timer,
 } from '../decorators.js';
 import { Expects } from  '../expects.js';
-import { isValidationError } from '../helpers/errors.js';
 import { Parser } from '../parser.js';
 
 import { AppDataSource } from '~/database.js';
@@ -117,18 +115,9 @@ class Alias extends System {
     });
     adminEndpoint('/systems/alias', 'generic::save', async (item, cb) => {
       try {
-        const itemToSave = new AliasEntity();
-        merge(itemToSave, item);
-        await validateOrReject(itemToSave);
-        await itemToSave.save();
-        cb(null, itemToSave);
+        cb(null, await AliasEntity.create(item).save());
       } catch (e) {
-        if (e instanceof Error) {
-          cb(e.message, undefined);
-        }
-        if (isValidationError(e)) {
-          cb(e, undefined);
-        }
+        cb(e, undefined);
       }
     });
   }

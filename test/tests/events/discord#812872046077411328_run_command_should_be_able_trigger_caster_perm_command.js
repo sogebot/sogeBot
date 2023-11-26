@@ -26,15 +26,16 @@ describe('Events - event run command should be able to run caster command and al
 
     commercial.setCommand('!commercial', '!test');
 
-    const event = {};
-    event.id = uuidv4();
-    event.name = 'follow';
-    event.givenName = 'Follow alert';
-    event.triggered = {};
-    event.definitions = {};
-    event.filter = '';
-    event.isEnabled = true;
-    event.operations = [{
+    const ev = new Event();
+    ev.event = {
+      definitions: {},
+      triggered:{},
+      name: 'follow',
+    };
+    ev.givenName = 'ChFolloweer alert';
+    ev.filter = '';
+    ev.isEnabled = true;
+    ev.operations = [{
       name:        'run-command',
       definitions: {
         commandToRun:   '!test',
@@ -47,8 +48,8 @@ describe('Events - event run command should be able to run caster command and al
         isCommandQuiet: false,
       },
     }];
+    await ev.save();
     const a = await alias.add({ sender: user.owner, parameters: '-a !test2 -c !command -p ' + defaultPermissions.CASTERS });
-    await AppDataSource.getRepository(Event).save(event);
   });
 
   after(() => {

@@ -7,6 +7,10 @@ import { BotEntity } from '../BotEntity.js';
 @Entity()
 @Index('IDX_301758e0e3108fc902d5436527', ['game'], { unique: true })
 export class HowLongToBeatGame extends BotEntity {
+  schema = z.object({
+    game: z.string().min(3),
+  });
+
   @PrimaryColumn({ generated: 'uuid', type: 'uuid' })
     id: string;
 
@@ -52,7 +56,3 @@ export class HowLongToBeatGame extends BotEntity {
     isExtraCounted: boolean;
   }[] = [];
 }
-
-export const HowLongToBeatGameSchema = z.object({
-  game: z.string().min(3),
-});

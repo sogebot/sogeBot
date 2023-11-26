@@ -10,6 +10,7 @@ import { db, message, user } from '../../general.js';
 
 describe('Points - User have proper points count - https://discord.com/channels/317348946144002050/689472714544513025/1010671480973041844 - @func3', () => {
   before(async () => {
+    await changelog.reset();
     await db.cleanup();
     await message.prepare();
     await user.prepare();

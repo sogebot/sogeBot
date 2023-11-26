@@ -14,7 +14,7 @@ import twitch from './services/twitch.js';
 import Core from '~/_interface.js';
 import { parserReply } from '~/commons.js';
 import {
-  Attributes, Event, EventSchema, Operations,
+  Attributes, Event, Operations,
 } from '~/database/entity/event.js';
 import { User } from '~/database/entity/user.js';
 import { AppDataSource } from '~/database.js';
@@ -838,7 +838,7 @@ class Events extends Core {
 
     adminEndpoint('/core/events', 'events::save', async (event, cb) => {
       try {
-        cb(null, await Event.create(event).validateAndSave(EventSchema));
+        cb(null, await Event.create(event).save());
       } catch (e: any) {
         cb(e, event);
       }

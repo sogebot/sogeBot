@@ -24,10 +24,12 @@ describe('discord#752632256270696478 - event attrs are not correctly parsed - @f
     await message.prepare();
     await AppDataSource.getRepository(Event).save({
       id:          uuidv4(),
-      name:        'tip',
+      event: {
+        name: 'tip',
+        triggered:   {},
+        definitions: {},
+      },
       givenName:   'Tip alert',
-      triggered:   {},
-      definitions: {},
       filter:      '',
       isEnabled:   true,
       operations:  [{

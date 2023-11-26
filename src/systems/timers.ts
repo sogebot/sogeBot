@@ -2,7 +2,6 @@ import {
   Timer, TimerResponse,
 } from '@entity/timer.js';
 import { Mutex } from 'async-mutex';
-import { validateOrReject } from 'class-validator';
 import * as _ from 'lodash-es';
 import { merge, sortBy } from 'lodash-es';
 
@@ -56,11 +55,7 @@ class Timers extends System {
     });
     app.post('/api/systems/timer', adminMiddleware, async (req, res) => {
       try {
-        const itemToSave = new Timer();
-        merge(itemToSave, req.body);
-        await validateOrReject(itemToSave);
-        await itemToSave.save();
-
+        const itemToSave = await Timer.create(req.body).save();
         await TimerResponse.delete({ timer: { id: itemToSave.id } });
         const responses = req.body.messages;
         for (const response of responses) {

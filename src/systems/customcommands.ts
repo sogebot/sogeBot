@@ -2,8 +2,7 @@ import {
   Commands, CommandsGroup,
 } from '@entity/commands.js';
 import * as constants from '@sogebot/ui-helpers/constants.js';
-import { validateOrReject } from 'class-validator';
-import { cloneDeep, merge, orderBy, shuffle } from 'lodash-es';
+import { cloneDeep, orderBy, shuffle } from 'lodash-es';
 import { v4 } from 'uuid';
 
 import System from './_interface.js';
@@ -104,28 +103,21 @@ class CustomCommands extends System {
     });
     app.post('/api/systems/customcommands/group', adminMiddleware, async (req, res) => {
       try {
-        const itemToSave = new CommandsGroup();
-        merge(itemToSave, req.body);
-        await validateOrReject(itemToSave);
-        await itemToSave.save();
-        res.send({ data: itemToSave });
+        res.send({ data: await CommandsGroup.create(req.body).save() });
       } catch (e) {
         res.status(400).send({ errors: e });
       }
     });
     app.post('/api/systems/customcommands', adminMiddleware, async (req, res) => {
       try {
-        const itemToSave = new Commands();
         const { count, ...data } = req.body;
-        merge(itemToSave, data);
-        await validateOrReject(itemToSave);
-        await itemToSave.save();
+        const saved = await Commands.create(data).save();
 
         if (count === 0) {
-          await resetCountOfCommandUsage(itemToSave.command);
+          await resetCountOfCommandUsage(saved.command);
         }
 
-        res.send({ data: itemToSave });
+        res.send({ data: saved });
       } catch (e) {
         res.status(400).send({ errors: e });
       }

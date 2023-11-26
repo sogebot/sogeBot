@@ -211,6 +211,11 @@ export async function flush() {
   debug('flush', `done - ${id}`);
 }
 
+export const reset = async () => {
+  await flush();
+  changelog.splice(0);
+};
+
 (async function flushInterval() {
   await flush();
   setTimeout(() => flushInterval(), MINUTE);

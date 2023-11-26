@@ -1,9 +1,7 @@
 import { Price as PriceEntity } from '@entity/price.js';
 import * as constants from '@sogebot/ui-helpers/constants.js';
 import { format } from '@sogebot/ui-helpers/number.js';
-import { validateOrReject } from 'class-validator';
 import * as _ from 'lodash-es';
-import { merge } from 'lodash-es';
 
 import System from './_interface.js';
 import { parserReply } from '../commons.js';
@@ -64,11 +62,7 @@ class Price extends System {
     });
     app.post('/api/systems/price', adminMiddleware, async (req, res) => {
       try {
-        const itemToSave = new PriceEntity();
-        merge(itemToSave, req.body);
-        await validateOrReject(itemToSave);
-        await itemToSave.save();
-        res.send({ data: itemToSave });
+        res.send({ data: await PriceEntity.create(req.body).save() });
       } catch (e) {
         res.status(400).send({ errors: e });
       }

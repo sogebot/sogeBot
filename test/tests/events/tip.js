@@ -25,22 +25,23 @@ describe('Events - tip event - @func3', () => {
 
   describe('#2219 - Give points on tip not working', function () {
     before(async function () {
-      await AppDataSource.getRepository(Event).save({
-        id:          uuidv4(),
-        name:        'tip',
-        givenName:   'Tip alert',
-        triggered:   {},
+      const ev = new Event();
+      ev.event = {
         definitions: {},
-        filter:      '',
-        isEnabled:   true,
-        operations:  [{
-          name:        'run-command',
-          definitions: {
-            isCommandQuiet: true,
-            commandToRun:   '!points add $username (math.$amount*10)',
-          },
-        }],
-      });
+        triggered:{},
+        name: 'tip',
+      };
+      ev.givenName = 'Tip alert';
+      ev.filter = '';
+      ev.isEnabled = true;
+      ev.operations = [{
+        name:        'run-command',
+        definitions: {
+          isCommandQuiet: true,
+          commandToRun:   '!points add $username (math.$amount*10)',
+        },
+      }];
+      await ev.save();
 
       for (const [idx, user] of ['losslezos', 'rigneir', 'mikasa_hraje', 'foufhs'].entries()) {
         await AppDataSource.getRepository(User).save({ userName: user, userId: String(idx * 100000) });

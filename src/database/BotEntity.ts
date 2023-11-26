@@ -1,25 +1,39 @@
-import { validateOrReject } from 'class-validator';
 import { cloneDeep } from 'lodash-es';
 import { BaseEntity } from 'typeorm';
 import { z } from 'zod';
 
 export class BotEntity extends BaseEntity {
-  static create<T extends BaseEntity>(
-    this: { new (): T } & typeof BaseEntity,
+  schema: z.AnyZodObject | z.ZodEffects<any> | z.ZodIntersection<any, any> | null = null;
+
+  static create<T extends BotEntity>(
+    this: { new (): T } & typeof BotEntity,
     entityOrEntities?: any,
-  ) {
+  ): T {
     if (typeof window === 'undefined') {
-      return this.getRepository<T>().create(entityOrEntities);
+      if (Array.isArray(entityOrEntities)) {
+        throw new Error('Create from array is not supported');
+      }
+      return this.getRepository<T>().create(entityOrEntities) as unknown as T;
     } else {
-      return cloneDeep(entityOrEntities);
+      if (entityOrEntities) {
+        if (Array.isArray(entityOrEntities)) {
+          throw new Error('Create from array is not supported in the browser');
+        } else {
+          return cloneDeep(entityOrEntities) as T;
+        }
+      } else {
+        throw new Error('entityOrEntities is undefined');
+      }
     }
   }
 
-  validateAndSave(schema: z.AnyZodObject) {
+  save() {
     return new Promise<this>((resolve, reject) => {
       try {
-        schema.parse(this);
-        this.save()
+        if (this.schema) {
+          this.schema.parse(this);
+        }
+        super.save()
           .then(resolve)
           .catch(reject);
       } catch (e) {
@@ -27,7 +41,6 @@ export class BotEntity extends BaseEntity {
       }
     });
   }
-  validate() {
-    return validateOrReject(this);
+  validate(schema: z.AnyZodObject) {
   }
 }

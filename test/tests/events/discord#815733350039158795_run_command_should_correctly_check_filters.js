@@ -25,22 +25,23 @@ describe('Events - event run command should correctly parse filters and be able 
     await message.prepare();
     await user.prepare();
 
-    event = {};
-    event.id = uuidv4();
-    event.name = 'follow';
-    event.givenName = 'Follow alert';
-    event.triggered = {};
-    event.definitions = {};
-    event.filter = '';
-    event.isEnabled = true;
-    event.operations = [{
+    const ev = new Event();
+    ev.event = {
+      definitions: {},
+      triggered:{},
+      name: 'follow',
+    };
+    ev.givenName = 'Follow alert';
+    ev.filter = '';
+    ev.isEnabled = true;
+    ev.operations = [{
       name:        'run-command',
       definitions: {
         commandToRun:   '!test33',
         isCommandQuiet: false,
       },
     }];
-    await AppDataSource.getRepository(Event).save(event);
+    await ev.save();
 
     const command = new Commands();
     command.id =        '1a945d76-2d3c-4c7a-ae03-e0daf17142c5';

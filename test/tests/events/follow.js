@@ -23,15 +23,16 @@ describe('Events - follow event - @func3', () => {
 
   describe('#1370 - Second follow event didn\'t trigger event ', function () {
     before(async function () {
-      const event = {};
-      event.id = uuidv4();
-      event.name = 'follow';
-      event.givenName = 'Follow alert';
-      event.triggered = {};
-      event.definitions = {};
-      event.filter = '';
-      event.isEnabled = true;
-      event.operations = [{
+      const ev = new Event();
+      ev.event = {
+        definitions: {},
+        triggered:{},
+        name: 'follow',
+      };
+      ev.givenName = 'Follow alert';
+      ev.filter = '';
+      ev.isEnabled = true;
+      ev.operations = [{
         name:        'emote-explosion',
         definitions: { emotesToExplode: 'purpleHeart <3' },
       }, {
@@ -44,7 +45,7 @@ describe('Events - follow event - @func3', () => {
         name:        'send-chat-message',
         definitions: { messageToSend: 'Diky za follow, $username!' },
       }];
-      await AppDataSource.getRepository(Event).save(event);
+      await ev.save();
     });
 
     for (const follower of [user.viewer, user.viewer2, user.viewer3]) {

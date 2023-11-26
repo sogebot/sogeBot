@@ -1,5 +1,5 @@
 import { CacheGames } from '@entity/cacheGames.js';
-import { HowLongToBeatGame, HowLongToBeatGameSchema } from '@entity/howLongToBeatGame.js';
+import { HowLongToBeatGame } from '@entity/howLongToBeatGame.js';
 import * as constants from '@sogebot/ui-helpers/constants.js';
 import { HowLongToBeatService } from 'howlongtobeat';
 import { EntityNotFoundError } from 'typeorm';
@@ -101,7 +101,7 @@ class HowLongToBeat extends System {
           }
         }
         res.send({
-          data: await game!.validateAndSave(HowLongToBeatGameSchema),
+          data: await game!.save(),
         });
       } catch (e) {
         res.status(400).send({ errors: e });
@@ -140,9 +140,8 @@ class HowLongToBeat extends System {
             gameplayMainExtra:     0,
             gameplayCompletionist: 0,
           });
-          await game.validateAndSave(HowLongToBeatGameSchema);
           res.send({
-            data: game,
+            data: await game.save(),
           });
         }
       } catch (e: any) {

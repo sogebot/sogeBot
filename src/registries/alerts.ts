@@ -132,7 +132,7 @@ class Alerts extends Registry {
     app.post('/api/registries/alerts', adminMiddleware, async (req, res) => {
       try {
         const itemToSave = Alert.create(req.body);
-        await itemToSave.validateAndSave();
+        await itemToSave.save();
         res.send(itemToSave);
       } catch (e) {
         res.status(400).send({ errors: e });

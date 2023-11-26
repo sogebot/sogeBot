@@ -1,4 +1,3 @@
-import { IsNotEmpty, MinLength } from 'class-validator';
 import { BeforeInsert, BeforeUpdate } from 'typeorm';
 import { Column, Entity, PrimaryColumn } from 'typeorm';
 
@@ -148,8 +147,6 @@ export class Alert extends BotEntity {
   }
 
   @Column()
-  @IsNotEmpty()
-  @MinLength(3)
     name: string;
 
   @Column()

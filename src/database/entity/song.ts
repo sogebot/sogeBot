@@ -1,4 +1,6 @@
 import { BeforeInsert, Column, Entity, PrimaryColumn } from 'typeorm';
+import { z } from 'zod';
+
 import { BotEntity } from '../BotEntity.js';
 
 export type currentSongType = {
@@ -16,6 +18,10 @@ export class SongBan extends BotEntity {
 
 @Entity()
 export class SongPlaylist extends BotEntity {
+  schema = z.object({
+    videoId: z.string().min(1),
+  });
+
   @PrimaryColumn()
     videoId: string;
 

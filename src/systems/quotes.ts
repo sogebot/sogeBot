@@ -1,8 +1,6 @@
 import { Quotes as QuotesEntity } from '@entity/quotes.js';
 import { sample } from '@sogebot/ui-helpers/array.js';
-import { validateOrReject } from 'class-validator';
 import * as _ from 'lodash-es';
-import { merge } from 'lodash-es';
 
 import System from './_interface.js';
 import { command, default_permission } from '../decorators.js';
@@ -52,11 +50,7 @@ class Quotes extends System {
     });
     app.post('/api/systems/quotes', adminMiddleware, async (req, res) => {
       try {
-        const itemToSave = new QuotesEntity();
-        merge(itemToSave, req.body);
-        await validateOrReject(itemToSave);
-        await itemToSave.save();
-        res.send({ data: itemToSave });
+        res.send({ data: await QuotesEntity.create(req.body).save() });
       } catch (e) {
         res.status(400).send({ errors: e });
       }

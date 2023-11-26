@@ -1,25 +1,25 @@
-import { IsNotEmpty, MinLength } from 'class-validator';
 import { BaseEntity, Column, Entity, Index, PrimaryColumn } from 'typeorm';
+import { z } from 'zod';
 
-import { IsCommand } from '../validators/IsCommand.js';
-import { IsCommandOrCustomVariable } from '../validators/IsCommandOrCustomVariable.js';
+import { command } from '../validators/IsCommand.js';
+import { commandOrCustomVariable } from '../validators/IsCommandOrCustomVariable.js';
+import { BotEntity } from '../BotEntity.js';
 
 @Entity()
-export class Alias extends BaseEntity {
+export class Alias extends BotEntity {
+  schema = z.object({
+    alias:   command(),
+    command: commandOrCustomVariable(),
+  });
+
   @PrimaryColumn({ generated: 'uuid' })
     id: string;
 
   @Column()
-  @IsNotEmpty()
-  @MinLength(2)
-  @IsCommand()
   @Index('IDX_6a8a594f0a5546f8082b0c405c')
     alias: string;
 
   @Column({ type: 'text' })
-  @IsCommandOrCustomVariable()
-  @MinLength(2)
-  @IsNotEmpty()
     command: string;
 
   @Column()

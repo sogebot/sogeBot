@@ -1,13 +1,18 @@
-import { IsNotEmpty, MinLength } from 'class-validator';
 import { BeforeInsert, Column, Entity, Index, PrimaryColumn } from 'typeorm';
+import { z } from 'zod';
 
 import { Alert } from './alert.js';
 import { BotEntity } from '../BotEntity.js';
-import { IsCommand } from '../validators/IsCommand.js';
+import { command } from '../validators/IsCommand.js';
 
 @Entity()
 @Index('idx_randomizer_cmdunique', [ 'command' ], { unique: true })
 export class Randomizer extends BotEntity {
+  schema = z.object({
+    command: command(),
+    name:    z.string().min(2),
+  });
+
   @BeforeInsert()
   generateCreatedAt() {
     this.createdAt = new Date().toISOString();
@@ -34,17 +39,12 @@ export class Randomizer extends BotEntity {
     createdAt?: string;
 
   @Column()
-  @IsNotEmpty()
-  @MinLength(2)
-  @IsCommand()
     command: string;
 
   @Column()
     permissionId: string;
 
   @Column()
-  @IsNotEmpty()
-  @MinLength(2)
     name: string;
 
   @Column({ type: Boolean, default: false })

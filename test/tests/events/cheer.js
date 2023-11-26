@@ -21,22 +21,23 @@ describe('Events - cheer event - @func3', () => {
 
   describe('#1699 - Cheer event is not waiting for user to save id', function () {
     before(async function () {
-      await AppDataSource.getRepository(Event).save({
-        id:          uuidv4(),
-        name:        'cheer',
-        givenName:   'Cheer alert',
-        triggered:   {},
+      const ev = new Event();
+      ev.event = {
         definitions: {},
-        filter:      '',
-        isEnabled:   true,
-        operations:  [{
-          name:        'run-command',
-          definitions: {
-            isCommandQuiet: false,
-            commandToRun:   '!points add $username (math.$bits*10)',
-          },
-        }],
-      });
+        triggered:{},
+        name: 'cheer',
+      };
+      ev.givenName = 'Cheer alert';
+      ev.filter = '';
+      ev.isEnabled = true;
+      ev.operations = [{
+        name:        'run-command',
+        definitions: {
+          isCommandQuiet: false,
+          commandToRun:   '!points add $username (math.$bits*10)',
+        },
+      }];
+      await ev.save();
     });
 
     for (const username of ['losslezos', 'rigneir', 'mikasa_hraje', 'foufhs']) {

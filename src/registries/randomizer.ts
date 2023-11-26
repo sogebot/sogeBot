@@ -1,18 +1,14 @@
 import { Randomizer as RandomizerEntity } from '@entity/randomizer.js';
 import { LOW } from '@sogebot/ui-helpers/constants.js';
-import { validateOrReject } from 'class-validator';
-import { merge } from 'lodash-es';
-
-import { AppDataSource } from '~/database.js';
-
 import { v4 } from 'uuid';
-
-import { app } from '~/helpers/panel.js';
-import { check } from '~/helpers/permissions/check.js';
-import { adminMiddleware } from '~/socket.js';
 
 import Registry from './_interface.js';
 import { parser } from '../decorators.js';
+
+import { AppDataSource } from '~/database.js';
+import { app } from '~/helpers/panel.js';
+import { check } from '~/helpers/permissions/check.js';
+import { adminMiddleware } from '~/socket.js';
 
 class Randomizer extends Registry {
   constructor() {
@@ -75,11 +71,7 @@ class Randomizer extends Registry {
     });
     app.post('/api/registries/randomizer', adminMiddleware, async (req, res) => {
       try {
-        const itemToSave = new RandomizerEntity();
-        merge(itemToSave, req.body);
-        await validateOrReject(itemToSave);
-        await itemToSave.save();
-        res.send({ data: itemToSave });
+        res.send({ data: await RandomizerEntity.create(req.body).save() });
       } catch (e) {
         res.status(400).send({ errors: e });
       }
