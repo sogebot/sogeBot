@@ -26,9 +26,11 @@ describe('Events - tip event - @func3', () => {
   describe('#2219 - Give points on tip not working', function () {
     before(async function () {
       const ev = new Event();
-      ev.event.definitions = {}
-      ev.event.triggered = {};
-      ev.event.name = 'tip';
+      ev.event = {
+        definitions: {},
+        triggered:{},
+        name: 'tip',
+      };
       ev.givenName = 'Tip alert';
       ev.filter = '';
       ev.isEnabled = true;

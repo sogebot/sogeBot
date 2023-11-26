@@ -24,9 +24,11 @@ describe('Events - follow event - @func3', () => {
   describe('#1370 - Second follow event didn\'t trigger event ', function () {
     before(async function () {
       const ev = new Event();
-      ev.event.definitions = {}
-      ev.event.triggered = {};
-      ev.event.name = 'cheer';
+      ev.event = {
+        definitions: {},
+        triggered:{},
+        name: 'follow',
+      };
       ev.givenName = 'Follow alert';
       ev.filter = '';
       ev.isEnabled = true;

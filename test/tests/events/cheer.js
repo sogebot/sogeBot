@@ -22,9 +22,11 @@ describe('Events - cheer event - @func3', () => {
   describe('#1699 - Cheer event is not waiting for user to save id', function () {
     before(async function () {
       const ev = new Event();
-      ev.event.definitions = {}
-      ev.event.triggered = {};
-      ev.event.name = 'cheer';
+      ev.event = {
+        definitions: {},
+        triggered:{},
+        name: 'cheer',
+      };
       ev.givenName = 'Cheer alert';
       ev.filter = '';
       ev.isEnabled = true;
