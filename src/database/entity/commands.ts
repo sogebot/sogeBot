@@ -1,11 +1,15 @@
 import { BaseEntity, Column, Entity, Index, PrimaryColumn } from 'typeorm';
 import { z } from 'zod';
 
-import { command } from '../validators/IsCommand.js';
 import { BotEntity } from '../BotEntity.js';
+import { command } from '../validators/IsCommand.js';
 
 @Entity()
 export class Commands extends BotEntity {
+  schema = z.object({
+    command: command(),
+  });
+
   @PrimaryColumn({ generated: 'uuid', type: 'uuid' })
     id: string;
 
@@ -61,7 +65,3 @@ export class CommandsCount extends BaseEntity {
   @Column({ type: 'varchar', length: '2022-07-27T00:30:34.569259834Z'.length })
     timestamp: string;
 }
-
-export const CommandSchema = z.object({
-  command: command(),
-});
