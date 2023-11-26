@@ -31,7 +31,7 @@ describe('Events - tip event - @func3', () => {
           name: 'tip',
           triggered:   {},
           definitions: {},
-        }
+        },
         givenName:   'Tip alert',
         filter:      '',
         isEnabled:   true,

@@ -28,7 +28,7 @@ describe('discord#752632256270696478 - event attrs are not correctly parsed - @f
         name: 'tip',
         triggered:   {},
         definitions: {},
-      }
+      },
       givenName:   'Tip alert',
       filter:      '',
       isEnabled:   true,

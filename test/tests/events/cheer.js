@@ -27,7 +27,7 @@ describe('Events - cheer event - @func3', () => {
           name: 'cheer',
           triggered:   {},
           definitions: {},
-        }
+        },
         givenName:   'Cheer alert',
         filter:      '',
         isEnabled:   true,
