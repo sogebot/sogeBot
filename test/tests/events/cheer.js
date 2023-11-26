@@ -33,7 +33,7 @@ describe('Events - cheer event - @func3', () => {
       ev.operations = [{
         name:        'run-command',
         definitions: {
-          isCommandQuiet: true,
+          isCommandQuiet: false,
           commandToRun:   '!points add $username (math.$bits*10)',
         },
       }];

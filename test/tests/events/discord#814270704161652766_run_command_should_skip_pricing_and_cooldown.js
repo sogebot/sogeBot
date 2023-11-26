@@ -26,22 +26,23 @@ describe('Events - event run command should be able to skip pricing and cooldown
     await message.prepare();
     await user.prepare();
 
-    const event = {};
-    event.id = uuidv4();
-    event.name = 'follow';
-    event.givenName = 'Follow alert';
-    event.triggered = {};
-    event.definitions = {};
-    event.filter = '';
-    event.isEnabled = true;
-    event.operations = [{
+    const ev = new Event();
+    ev.event = {
+      definitions: {},
+      triggered:{},
+      name: 'follow',
+    };
+    ev.givenName = 'Follow alert';
+    ev.filter = '';
+    ev.isEnabled = true;
+    ev.operations = [{
       name:        'run-command',
       definitions: {
         commandToRun:   '!test',
         isCommandQuiet: false,
       },
     }];
-    await AppDataSource.getRepository(Event).save(event);
+    await ev.save();
     await alias.add({ sender: user.owner, parameters: '-a !test -c !commercial -p ' + defaultPermissions.CASTERS });
 
     const r = await cooldown.main({ sender: user.owner, parameters: '!test global 20 true' });
