@@ -51,7 +51,7 @@ class Randomizer extends Registry {
     });
     app.post('/api/registries/randomizer/:id/spin', adminMiddleware, async (req, res) => {
       const { default: tts, services } = await import ('../tts.js');
-      let key = randomUUID();
+      let key: string = randomUUID();
       if (tts.ready) {
         if (tts.service === services.RESPONSIVEVOICE) {
           key = tts.responsiveVoiceKey;

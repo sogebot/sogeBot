@@ -222,7 +222,7 @@ class Alerts extends Registry {
     debug('alerts.trigger', JSON.stringify(opts, null, 2));
     const { default: tts, services } = await import ('../tts.js');
     if (!this.areAlertsMuted || isTest) {
-      let key = randomUUID();
+      let key: string = randomUUID();
       if (tts.service === services.RESPONSIVEVOICE) {
         key = tts.responsiveVoiceKey;
       }
