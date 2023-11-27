@@ -1,9 +1,10 @@
+import { randomUUID } from 'node:crypto';
+
 import { User, UserInterface } from '@entity/user.js';
 import { MINUTE } from '@sogebot/ui-helpers/constants.js';
 import {
   get as _get, cloneDeep, merge, set,
 } from 'lodash-es';
-import { v4 } from 'uuid';
 
 import { timer } from '../../decorators.js';
 import { flatten } from '../flatten.js';
@@ -139,7 +140,7 @@ export async function flush() {
     debug('flush', 'empty');
     return;
   }
-  const id = v4();
+  const id = randomUUID();
   flushQueue.push(id);
   debug('flush', `start - ${id}`);
   try {

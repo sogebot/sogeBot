@@ -1,6 +1,6 @@
 import axios from 'axios';
 import MockAdapter from 'axios-mock-adapter';
-import { v4 } from 'uuid';
+import { randomUUID } from 'node:crypto';
 
 import { AppDataSource } from '../dest/database.js';
 import { User } from '../dest/database/entity/user.js';
@@ -11,7 +11,7 @@ for (let i = 0; i < 100; i++) {
   // we want to have each follower every minute
   getLatest100FollowersMockData.push({
     'userId':     String(Math.floor(Math.random() * 10000000)),
-    'userName':   v4(),
+    'userName':   randomUUID(),
     'followDate': null, // we are refreshing on each call
   });
 }

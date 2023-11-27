@@ -1,6 +1,7 @@
+import { randomUUID } from 'node:crypto';
+
 import axios from 'axios';
 import _ from 'lodash-es';
-import { v4 } from 'uuid';
 
 import {
   operation, command, count, custom, evaluate, ifp, info, list, math, online, param, price, qs, random, ResponseFilter, stream, youtube,
@@ -34,7 +35,7 @@ import { translate } from '~/translate.js';
 
 export class Message {
   message = '';
-  id = v4();
+  id = randomUUID();
 
   constructor (message: string) {
     this.message = message;

@@ -1,7 +1,6 @@
 import assert from 'assert';
 
 import { MINUTE } from '@sogebot/ui-helpers/constants.js';
-import { v4 } from 'uuid'
 
 import { db, message, user } from '../../../general.js';
 

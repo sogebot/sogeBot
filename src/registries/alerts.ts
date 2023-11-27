@@ -1,9 +1,10 @@
+import { randomUUID } from 'node:crypto';
+
 import {
   Alert, EmitData,
 } from '@entity/alert.js';
 import { MINUTE } from '@sogebot/ui-helpers/constants.js';
 import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized.js';
-import { v4 } from 'uuid';
 
 import Registry from './_interface.js';
 import { command, default_permission, example, persistent, settings } from '../decorators.js';
@@ -221,7 +222,7 @@ class Alerts extends Registry {
     debug('alerts.trigger', JSON.stringify(opts, null, 2));
     const { default: tts, services } = await import ('../tts.js');
     if (!this.areAlertsMuted || isTest) {
-      let key = v4();
+      let key: string = randomUUID();
       if (tts.service === services.RESPONSIVEVOICE) {
         key = tts.responsiveVoiceKey;
       }
@@ -245,7 +246,7 @@ class Alerts extends Registry {
       const caster = await AppDataSource.getRepository(User).findOneBy({ userId: broadcasterId }) ?? null;
 
       const data = {
-        ...opts, isTTSMuted: !tts.ready || this.isTTSMuted, isSoundMuted: this.isSoundMuted, TTSService: tts.service, TTSKey: key, user, game: user?.game, caster, recipientUser: recipient, id: v4(),
+        ...opts, isTTSMuted: !tts.ready || this.isTTSMuted, isSoundMuted: this.isSoundMuted, TTSService: tts.service, TTSKey: key, user, game: user?.game, caster, recipientUser: recipient, id: randomUUID(),
       };
 
       info(`Triggering alert send: ${JSON.stringify(data)}`);

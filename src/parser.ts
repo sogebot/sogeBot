@@ -1,6 +1,7 @@
+import { randomUUID } from 'node:crypto';
+
 import * as constants from '@sogebot/ui-helpers/constants.js';
 import { flatMap, sortBy, isFunction, isNil, orderBy } from 'lodash-es';
-import { v4 as uuid } from 'uuid';
 
 import { getUserSender } from './helpers/commons/index.js';
 import { list } from './helpers/register.js';
@@ -29,7 +30,7 @@ parserEmitter.on('fireAndForget', async (opts) => {
 });
 
 export class Parser {
-  id = uuid();
+  id = randomUUID();
   started_at = Date.now();
   message = '';
   isAction = false;

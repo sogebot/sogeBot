@@ -3,7 +3,6 @@
 import assert from 'assert';
 
 import _ from 'lodash-es';
-import { v4 as uuidv4 } from 'uuid';
 import { AppDataSource } from '../../../dest/database.js';
 
 import('../../general.js');

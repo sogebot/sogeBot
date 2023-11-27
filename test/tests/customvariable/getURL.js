@@ -3,7 +3,7 @@
 import assert from 'assert';
 import { AppDataSource } from '../../../dest/database.js'
 
-import { v4 } from 'uuid';
+import { randomUUID } from 'node:crypto';
 
 import { Variable } from '../../../dest/database/entity/variable.js';
 import {getURL} from '../../../dest/helpers/customvariables/getURL.js';
@@ -13,8 +13,8 @@ import { db } from '../../general.js';
 import { message } from '../../general.js';
 
 describe('Custom Variable - helpers/customvariables/getURL - @func1', () => {
-  let urlId = v4();
-  let urlIdWithoutGET = v4();
+  let urlId = randomUUID();
+  let urlIdWithoutGET = randomUUID();
 
   before(async () => {
     await db.cleanup();
@@ -99,7 +99,7 @@ describe('Custom Variable - helpers/customvariables/getURL - @func1', () => {
     };
     await getURL({
       params: {
-        id: v4(),
+        id: randomUUID(),
       },
     }, res);
 

@@ -1,9 +1,10 @@
+import { randomUUID } from 'node:crypto';
+
 import {
   Commands, CommandsGroup,
 } from '@entity/commands.js';
 import * as constants from '@sogebot/ui-helpers/constants.js';
 import { cloneDeep, orderBy, shuffle } from 'lodash-es';
-import { v4 } from 'uuid';
 
 import System from './_interface.js';
 import { parserReply } from '../commons.js';
@@ -222,7 +223,7 @@ class CustomCommands extends System {
       }
 
       cDb.responses.push({
-        id:             v4(),
+        id:             randomUUID(),
         order:          cDb.responses.length,
         permission:     pItem.id ?? defaultPermissions.VIEWERS,
         stopIfExecuted: stopIfExecuted,

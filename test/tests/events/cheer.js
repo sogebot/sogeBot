@@ -2,8 +2,6 @@ import assert from 'assert';
 
 import('../../general.js');
 
-import { v4 as uuidv4 } from 'uuid';
-
 import events from '../../../dest/events.js';
 import { Event } from '../../../dest/database/entity/event.js';
 import { User } from '../../../dest/database/entity/user.js';
