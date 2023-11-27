@@ -3,7 +3,6 @@
 import assert from 'assert';
 
 import _ from 'lodash-es';
-import { randomUUID } from 'node:crypto';
 import { AppDataSource } from '../../../dest/database.js';
 
 import('../../general.js');
