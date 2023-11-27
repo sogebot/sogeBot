@@ -11,7 +11,7 @@ import axios from 'axios';
 
 import { Variable } from '../../../dest/database/entity/variable.js';
 
-import { v4 } from 'uuid'
+import { randomUUID } from 'node:crypto';
 
 // stub
 _.set(global, 'widgets.custom_variables.io.emit', function () {
@@ -25,7 +25,7 @@ describe('Custom Variable - #4083 - Get url on eval should return correct value 
     await user.prepare();
   });
 
-  const urlId = v4();
+  const urlId = randomUUID();
   it(`Create eval $_variable to return Date.now()`, async () => {
     await (Variable.create({
       variableName:  '$_variable',

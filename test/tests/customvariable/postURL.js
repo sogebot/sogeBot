@@ -3,7 +3,7 @@
 import assert from 'assert';
 import { AppDataSource } from '../../../dest/database.js'
 
-import { v4 } from 'uuid';
+import { randomUUID } from 'node:crypto';
 
 import { Variable } from '../../../dest/database/entity/variable.js';
 import { defaultPermissions } from '../../../dest/helpers/permissions/defaultPermissions.js';
@@ -13,10 +13,10 @@ import { message } from '../../general.js';
 import {postURL} from '../../../dest/helpers/customvariables/postURL.js';
 
 describe('Custom Variable - helpers/customvariables/postURL - @func1', () => {
-  let urlId = v4();
-  let urlIdWithoutPOST = v4();
-  let urlIdWithResponse1 = v4();
-  let urlIdWithResponse2 = v4();
+  let urlId = randomUUID();
+  let urlIdWithoutPOST = randomUUID();
+  let urlIdWithResponse1 = randomUUID();
+  let urlIdWithResponse2 = randomUUID();
 
   before(async () => {
     await db.cleanup();
@@ -214,7 +214,7 @@ describe('Custom Variable - helpers/customvariables/postURL - @func1', () => {
     };
     await postURL({
       params: {
-        id: v4(),
+        id: randomUUID(),
       },
     }, res);
 

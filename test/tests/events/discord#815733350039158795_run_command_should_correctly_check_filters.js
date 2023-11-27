@@ -1,5 +1,5 @@
 import _ from 'lodash-es';
-import { v4 as uuidv4 } from 'uuid';
+import { randomUUID } from 'node:crypto';
 import { AppDataSource } from '../../../dest/database.js';
 
 import('../../general.js');

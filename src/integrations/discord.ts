@@ -8,7 +8,6 @@ import * as DiscordJs from 'discord.js';
 import { ChannelType, GatewayIntentBits } from 'discord.js';
 import { get } from 'lodash-es';
 import { IsNull, LessThan, Not } from 'typeorm';
-import { v5 as uuidv5 } from 'uuid';
 
 import Integration from './_interface.js';
 import {
@@ -259,7 +258,7 @@ class Discord extends Integration {
   @onChange('enabled')
   @onChange('token')
   async onStateChange(key: string, value: boolean) {
-    if (await debounce(uuidv5('onStateChange', this.uuid), 1000)) {
+    if (await debounce('onStateChange', 1000)) {
       if (this.enabled && this.token.length > 0) {
         this.initClient();
         if (this.client) {

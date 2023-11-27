@@ -1,4 +1,4 @@
-import { v4 } from 'uuid';
+import { randomUUID } from 'node:crypto';
 
 import Core from '~/_interface.js';
 import { settings } from '~/decorators.js';
@@ -6,18 +6,18 @@ import { settings } from '~/decorators.js';
 class Dashboard extends Core {
   @settings()
     µWidgets = [
-      'twitch|status|' + v4(),
-      'twitch|uptime|' + v4(),
-      'twitch|viewers|' + v4(),
-      'twitch|maxViewers|' + v4(),
-      'twitch|newChatters|' + v4(),
-      'twitch|chatMessages|' + v4(),
-      'twitch|followers|' + v4(),
-      'twitch|subscribers|' + v4(),
-      'twitch|bits|' + v4(),
-      'general|tips|' + v4(),
-      'twitch|watchedTime|' + v4(),
-      'general|currentSong|' + v4(),
+      'twitch|status|' + randomUUID(),
+      'twitch|uptime|' + randomUUID(),
+      'twitch|viewers|' + randomUUID(),
+      'twitch|maxViewers|' + randomUUID(),
+      'twitch|newChatters|' + randomUUID(),
+      'twitch|chatMessages|' + randomUUID(),
+      'twitch|followers|' + randomUUID(),
+      'twitch|subscribers|' + randomUUID(),
+      'twitch|bits|' + randomUUID(),
+      'general|tips|' + randomUUID(),
+      'twitch|watchedTime|' + randomUUID(),
+      'general|currentSong|' + randomUUID(),
     ];
 }
 

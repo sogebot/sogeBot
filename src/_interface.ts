@@ -4,8 +4,7 @@ import { setTimeout } from 'timers';
 import chalk from 'chalk';
 import _ from 'lodash-es';
 import type { Namespace } from 'socket.io/dist/namespace';
-import { v4 as uuid } from 'uuid';
-
+import { randomUUID } from 'node:crypto';
 import { ClientToServerEventsWithNamespace } from '../d.ts/src/helpers/socket.js';
 
 import { PermissionCommands, Permissions as PermissionsEntity } from '~/database/entity/permissions.js';
@@ -42,7 +41,7 @@ class Module {
   public settingsPermList: { category?: string; key: string; defaultValue: any }[] = [];
   public on: InterfaceSettings.On;
   public socket: Namespace | null = null;
-  public uuid = uuid();
+  public uuid = randomUUID();
   private firstStatusSent = false;
 
   onStartupTriggered = false;
@@ -257,7 +256,7 @@ class Module {
         return command.m.type === this._name
           && command.m.name === this.__moduleName__.toLowerCase();
       })) {
-        const opts = typeof options === 'string' ? { name: options, id: uuid() } : { ...options, id: uuid() };
+        const opts = typeof options === 'string' ? { name: options, id: randomUUID() } : { ...options, id: randomUUID() };
         opts.fnc = m.fnc; // force function to decorated function
         const c = this.prepareCommand(opts);
 

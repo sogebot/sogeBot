@@ -1,4 +1,4 @@
-import { v4 } from 'uuid';
+import { randomUUID } from 'node:crypto';
 
 import Overlay from './_interface.js';
 import {
@@ -26,7 +26,7 @@ class TextToSpeech extends Overlay {
   async textToSpeech(opts: CommandOptions): Promise<CommandResponse[]> {
     const { default: tts, services } = await import ('../tts.js');
     if (tts.ready) {
-      let key = v4();
+      let key = randomUUID();
       if (tts.service === services.RESPONSIVEVOICE) {
         key = tts.responsiveVoiceKey;
       }

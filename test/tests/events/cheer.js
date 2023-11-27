@@ -2,7 +2,7 @@ import assert from 'assert';
 
 import('../../general.js');
 
-import { v4 as uuidv4 } from 'uuid';
+import { randomUUID } from 'node:crypto';
 
 import events from '../../../dest/events.js';
 import { Event } from '../../../dest/database/entity/event.js';

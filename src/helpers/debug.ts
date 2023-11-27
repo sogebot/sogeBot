@@ -1,10 +1,10 @@
+import { randomUUID } from 'node:crypto';
 import fs from 'node:fs';
 import { Session } from 'node:inspector';
 import { normalize } from 'node:path';
 import { gzip } from 'zlib';
 
 import { MINUTE } from '@sogebot/ui-helpers/constants.js';
-import { v4 } from 'uuid';
 
 import { logEmitter as log } from './log/emitter.js';
 
@@ -194,7 +194,7 @@ const registeredCommands: { [x: string]: keyof typeof execCommands} = {};
 export const handleExec = async (command: keyof typeof execCommands) => {
   if (command in execCommands) {
     // we need to create confirm command
-    const uuid = v4();
+    const uuid = randomUUID();
     registeredCommands[uuid] = command;
     log.emit('debug', `Received EXEC ${command}. To confirm, paste into debug input\n\t\ndebug::confirm::${uuid}\n`);
     setTimeout(() => {

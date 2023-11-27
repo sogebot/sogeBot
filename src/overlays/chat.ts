@@ -1,4 +1,4 @@
-import { v4 } from 'uuid';
+import { randomUUID } from 'node:crypto';
 
 import Overlay from './_interface.js';
 import { badgesCache } from '../services/twitch/calls/getChannelChatBadges.js';
@@ -34,7 +34,7 @@ class Chat extends Overlay {
         }
       }
       ioServer?.of('/overlays/chat').emit('message', {
-        id:          v4(),
+        id:          randomUUID(),
         timestamp:   message.timestamp,
         displayName: message.sender.displayName.toLowerCase() === message.sender.userName ? message.sender.displayName : `${message.sender.displayName} (${message.sender.userName})`,
         userName:    message.sender.userName,
@@ -50,7 +50,7 @@ class Chat extends Overlay {
     adminEndpoint('/overlays/chat', 'test', (data) => {
       this.withEmotes(data.message).then(message => {
         ioServer?.of('/overlays/chat').emit('message', {
-          id:          v4(),
+          id:          randomUUID(),
           timestamp:   Date.now(),
           displayName: data.username,
           userName:    data.username,

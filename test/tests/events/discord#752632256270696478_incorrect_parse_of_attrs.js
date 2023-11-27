@@ -1,7 +1,7 @@
 
 /* global describe it before */
 
-import { v4 as uuidv4 } from 'uuid';
+import { randomUUID } from 'node:crypto';
 
 import('../../general.js');
 import { Event } from '../../../dest/database/entity/event.js';
@@ -23,7 +23,7 @@ describe('discord#752632256270696478 - event attrs are not correctly parsed - @f
     await db.cleanup();
     await message.prepare();
     await AppDataSource.getRepository(Event).save({
-      id:          uuidv4(),
+      id:          uuidrandomUUID(),
       event: {
         name: 'tip',
         triggered:   {},

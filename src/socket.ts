@@ -1,9 +1,10 @@
+import { randomUUID } from 'node:crypto';
+
 import { DAY } from '@sogebot/ui-helpers/constants.js';
 import axios from 'axios';
 import { NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import { Socket as SocketIO } from 'socket.io';
-import { v4 as uuid } from 'uuid';
 
 import Core from '~/_interface.js';
 import { onLoad } from '~/decorators/on.js';
@@ -100,7 +101,7 @@ class Socket extends Core {
   @onLoad('JWTKey')
   JWTKeyGenerator() {
     if (this.JWTKey === '') {
-      this.JWTKey = uuid();
+      this.JWTKey = randomUUID();
     }
   }
 
@@ -235,7 +236,7 @@ class Socket extends Core {
 
   sockets () {
     adminEndpoint('/core/socket', 'purgeAllConnections', (cb, socket) => {
-      this.JWTKey = uuid();
+      this.JWTKey = randomUUID();
       ioServer?.emit('forceDisconnect');
       if (socket) {
         initEndpoints(socket, {
@@ -249,7 +250,7 @@ class Socket extends Core {
   @onLoad('socketToken')
   generateSocketTokenIfNeeded() {
     if (this.socketToken === '') {
-      this.socketToken = uuid();
+      this.socketToken = randomUUID();
     }
   }
 }

@@ -1,6 +1,7 @@
+import { randomUUID } from 'node:crypto';
+
 import { isNil, isObject } from 'lodash-es';
 import _ from 'lodash-es';
-import { v4 } from 'uuid';
 
 import { getOwner, getUserSender } from '../commons/index.js';
 
@@ -37,7 +38,7 @@ export async function fireRunCommand(operation: Event['operations'][number]['def
   if (operation.timeoutType === 'normal') {
     debug('events.runCommand', `Adding new command to queue`);
     // each event command will be triggered
-    commandsToRun.set(v4(), {
+    commandsToRun.set(randomUUID(), {
       userName, userId, command, timeout: Date.now() + Number(operation.timeout), isCommandQuiet: operation.isCommandQuiet as boolean,
     });
   } else {

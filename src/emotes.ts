@@ -1,7 +1,8 @@
+import { randomUUID } from 'node:crypto';
+
 import { shuffle } from '@sogebot/ui-helpers/array.js';
 import * as constants from '@sogebot/ui-helpers/constants.js';
 import axios from 'axios';
-import { v4 as uuid } from 'uuid';
 
 import { onStartup } from './decorators/on.js';
 import emitter from './helpers/interfaceEmitter.js';
@@ -440,7 +441,7 @@ class Emotes extends Core {
 
   async _test () {
     ioServer?.of('/services/twitch').emit('emote', {
-      id:  uuid(),
+      id:  randomUUID(),
       url: {
         1: 'https://static-cdn.jtvnw.net/emoticons/v1/9/1.0',
         2: 'https://static-cdn.jtvnw.net/emoticons/v1/9/2.0',
@@ -451,12 +452,12 @@ class Emotes extends Core {
 
   async firework (data: string[]) {
     const emotes = await this.parseEmotes(data);
-    ioServer?.of('/services/twitch').emit('emote.firework', { emotes, id: uuid() });
+    ioServer?.of('/services/twitch').emit('emote.firework', { emotes, id: randomUUID() });
   }
 
   async explode (data: string[]) {
     const emotes = await this.parseEmotes(data);
-    ioServer?.of('/services/twitch').emit('emote.explode', { emotes, id: uuid() });
+    ioServer?.of('/services/twitch').emit('emote.explode', { emotes, id: randomUUID() });
   }
 
   @parser({ priority: constants.LOW })
@@ -510,7 +511,7 @@ class Emotes extends Core {
 
     const emotes = shuffle(Object.keys(usedEmotes));
     for (let i = 0; i < emotes.length; i++) {
-      const id = uuid();
+      const id = randomUUID();
       ioServer?.of('/services/twitch').emit('emote', { id, url: usedEmotes[emotes[i]].urls });
     }
     return true;

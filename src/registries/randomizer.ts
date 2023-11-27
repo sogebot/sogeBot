@@ -1,6 +1,7 @@
+import { randomUUID } from 'node:crypto';
+
 import { Randomizer as RandomizerEntity } from '@entity/randomizer.js';
 import { LOW } from '@sogebot/ui-helpers/constants.js';
-import { v4 } from 'uuid';
 
 import Registry from './_interface.js';
 import { parser } from '../decorators.js';
@@ -50,7 +51,7 @@ class Randomizer extends Registry {
     });
     app.post('/api/registries/randomizer/:id/spin', adminMiddleware, async (req, res) => {
       const { default: tts, services } = await import ('../tts.js');
-      let key = v4();
+      let key = randomUUID();
       if (tts.ready) {
         if (tts.service === services.RESPONSIVEVOICE) {
           key = tts.responsiveVoiceKey;
