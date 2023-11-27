@@ -5,7 +5,6 @@ import assert from 'assert';
 
 import('../../general.js');
 
-import { randomUUID } from 'node:crypto';
 import { AppDataSource } from '../../../dest/database.js';
 
 import { Event } from '../../../dest/database/entity/event.js';
