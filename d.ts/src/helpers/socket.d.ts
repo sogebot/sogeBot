@@ -249,10 +249,7 @@ export type ClientToServerEventsWithNamespace = {
     'stopwatch::update': (data: { id: string, isEnabled: boolean | null, time: number | null }, cb: (_err: null, data?: { isEnabled: boolean | null, time :string | null }) => void) => void,
   },
   '/registries/alerts': GenericEvents & {
-    'isAlertUpdated': (data: { updatedAt: number; id: string }, cb: (err: Error | null, isUpdated: boolean, updatedAt: number) => void) => void,
     'alerts::settings': (data: null | { areAlertsMuted: boolean; isSoundMuted: boolean; isTTSMuted: boolean; }, cb: (item: { areAlertsMuted: boolean; isSoundMuted: boolean; isTTSMuted: boolean; }) => void) => void,
-    'alerts::save': (item: Required<AlertInterface>, cb: (error: Error | string | null | unknown, item: null | Required<AlertInterface>) => void) => void,
-    'alerts::delete': (item: Required<AlertInterface>, cb: (error: Error | string | null | unknown) => void) => void,
     'test': (emit: EmitData) => void,
     'speak': (opts: { text: string, key: string, voice: string; volume: number; rate: number; pitch: number }, cb: (error: Error | string | null | unknown, b64mp3: string) => void) => void,
     'alert': (data: (EmitData & {

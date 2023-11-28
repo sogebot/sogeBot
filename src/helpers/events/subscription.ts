@@ -12,7 +12,7 @@ import {
 
 import { eventEmitter } from './index.js';
 
-import { EmitData } from '~/database/entity/alert.js';
+import { EmitData } from '~/database/entity/overlay.js';
 import * as hypeTrain from '~/helpers/api/hypeTrain.js';
 import * as changelog from '~/helpers/user/changelog.js';
 import getUserByName from '~/services/twitch/calls/getUserByName.js';

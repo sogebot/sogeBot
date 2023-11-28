@@ -1,6 +1,5 @@
 import { Column, Entity, PrimaryColumn } from 'typeorm';
 
-import { Alert, Filter } from './alert.js';
 import { BotEntity } from '../BotEntity.js';
 
 // expands object types recursively
@@ -25,6 +24,55 @@ type Font = {
     color: string;
   }[];
 };
+
+export interface EmitData {
+  alertId?: string;
+  name: string;
+  amount: number;
+  tier: null | 'Prime' | '1' | '2' | '3';
+  recipient?: string;
+  game?: string;
+  service?: string;
+  rewardId?: string;
+  currency: string;
+  monthsName: string;
+  event: Events;
+  message: string;
+  customOptions?: {
+    volume?: number;
+    alertDuration? : number;
+    textDelay? : number;
+    layout? : number;
+    messageTemplate? : string;
+    audioId? : string;
+    mediaId? : string;
+
+    animationIn?: string;
+    animationInDuration?: number;
+    animationInWindowBoundaries?: boolean;
+
+    animationOut?: string;
+    animationOutDuration?: number;
+    animationOutWindowBoundaries?: boolean;
+
+    animationText?: any;
+    animationTextOptions?: any;
+
+    components?: {
+      [componentId: string]: any
+    }
+  }
+}
+
+export type Filter = {
+  operator: string;
+  items: (Filter | {
+    comparator: string;
+    value: string | number;
+    type: string;
+    typeof: string;
+  })[]
+} | null;
 
 export interface Reference {
   typeId: 'reference',
@@ -151,12 +199,15 @@ type CreditsCommonOptions = {
   alignY: number;
   rotation: number;
 };
+
+type Events = 'follow' | 'sub' | 'resub' | 'subgift' | 'subcommunitygift' | 'raid' | 'custom' | 'promo' | 'tip' | 'cheer' | 'rewardredeem';
+
 export type CreditsScreenEvents = ExpandRecursively<{
   type: 'events',
   name: string,
   columns: number,
-  excludeEvents: Alert['items'][number]['type'][],
-  headers: Record<Alert['items'][number]['type'], string>,
+  excludeEvents: Events[],
+  headers: Record<Events, string>,
   headerFont: ExpandRecursively<Font & {
     align: 'left' | 'center' | 'right';
     pl: number;

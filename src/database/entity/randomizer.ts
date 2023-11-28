@@ -1,7 +1,7 @@
 import { BeforeInsert, Column, Entity, Index, PrimaryColumn } from 'typeorm';
 import { z } from 'zod';
 
-import { Alert } from './alert.js';
+import { AlertTTS } from './overlay.js';
 import { BotEntity } from '../BotEntity.js';
 import { command } from '../validators/IsCommand.js';
 
@@ -89,5 +89,5 @@ export class Randomizer extends BotEntity {
   };
 
   @Column({ type: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') !== 'better-sqlite3' ? 'json' : 'simple-json' })
-    tts: Alert['tts'] & { enabled: boolean };
+    tts: AlertTTS['tts'] & { enabled: boolean };
 }

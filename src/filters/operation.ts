@@ -4,7 +4,7 @@ import { info } from '../helpers/log.js';
 import type { ResponseFilter } from './index.js';
 
 import { AppDataSource } from '~/database.js';
-import { EmitData } from '~/database/entity/alert.js';
+import { EmitData } from '~/database/entity/overlay.js';
 import { Price } from '~/database/entity/price.js';
 import alerts from '~/registries/alerts.js';
 

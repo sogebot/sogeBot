@@ -10,7 +10,7 @@ import { PermissionGenerator } from './Permission.js';
 import { TwitchGenerator } from './Twitch.js';
 import { VariableGenerator } from './Variable.js';
 
-import type { EmitData } from '~/database/entity/alert.js';
+import type { EmitData } from '~/database/entity/overlay.js';
 import { Plugin } from '~/database/entity/plugins.js';
 import { chatMessagesAtStart, isStreamOnline, stats } from '~/helpers/api/index.js';
 import { streamStatusChangeSince } from '~/helpers/api/streamStatusChangeSince.js';
