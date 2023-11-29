@@ -329,7 +329,12 @@ class CustomCommands extends System {
 
   async sendResponse(responses: Commands['responses'], opts: { param: string; sender: CommandOptions['sender'], discord: CommandOptions['discord'], command: string, processedCommands?: string[], id: string, }) {
     for (let i = 0; i < responses.length; i++) {
-      await parserReply(responses[i].response, opts);
+      // check if response have new line, then split it and send it as separate messages
+      for (const response of responses[i].response.split('\n')) {
+        if (response.trim().length > 0) {
+          await parserReply(response, opts);
+        }
+      }
     }
   }
 
