@@ -111,7 +111,7 @@ class Timers extends System {
     }, 1000);
   }
 
-  announceResponse (responses: TimerResponse[]) {
+  async announceResponse (responses: TimerResponse[]) {
     // check if at least one response is enabled
     if (responses.filter(o => o.isEnabled).length === 0) {
       return;
@@ -125,7 +125,13 @@ class Timers extends System {
         // go to next possibly enabled response
         this.announceResponse(responses);
       } else {
-        announce(response.response, 'timers');
+
+        // check if response have new line, then split it and send it as separate messages
+        for (const responseSplit of response.response.split('\n')) {
+          if (responseSplit.trim().length > 0) {
+            await announce(responseSplit, 'timers');
+          }
+        }
       }
     }
   }
