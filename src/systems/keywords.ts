@@ -450,7 +450,12 @@ class Keywords extends System {
 
   async sendResponse(responses: (KeywordResponses)[], opts: { sender: CommandOptions['sender'], discord: CommandOptions['discord'], id: string }) {
     for (let i = 0; i < responses.length; i++) {
-      await parserReply(responses[i].response, opts);
+      // check if response have new line, then split it and send it as separate messages
+      for (const response of responses[i].response.split('\n')) {
+        if (response.trim().length > 0) {
+          await parserReply(response, opts);
+        }
+      }
     }
   }
 }
