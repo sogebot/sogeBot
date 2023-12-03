@@ -58,9 +58,15 @@ export class OverlayStopwatchItem extends QuickActionsDefaultAttributes {
   type: 'overlayStopwatch';
   options: OverlayStopwatchItemOptions;
 }
+export class DividerItem extends QuickActionsDefaultAttributes {
+  type: 'divider';
+  options: QuickActionsDefaultOptions & {
+    height: number;
+  };
+}
 
 export declare namespace QuickActions {
-  type Item = CommandItem | CustomVariableItem | RandomizerItem | OverlayCountdownItem | OverlayStopwatchItem | OverlayMarathonItem;
+  type Item = CommandItem | CustomVariableItem | RandomizerItem | OverlayCountdownItem | OverlayStopwatchItem | OverlayMarathonItem | DividerItem;
 }
 
 export const QuickAction = new EntitySchema<Readonly<Required<QuickActions.Item>>>({
