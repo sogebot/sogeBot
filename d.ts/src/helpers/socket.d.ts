@@ -12,7 +12,7 @@ import type { HighlightInterface } from '@entity/highlight';
 import type { HowLongToBeatGameInterface, HowLongToBeatGameItemInterface } from '@entity/howLongToBeatGame';
 import type { KeywordGroupInterface, KeywordInterface } from '@entity/keyword';
 import type { OBSWebsocketInterface } from '@entity/obswebsocket';
-import type { OverlayMapperMarathon, Overlay } from '@entity/overlay';
+import type { OverlayMapperMarathon, Overlay, TTSService } from '@entity/overlay';
 import type { Permissions } from '@entity/permissions';
 import type { QueueInterface } from '@entity/queue';
 import type { QuotesInterface } from '@entity/quotes';
@@ -194,7 +194,7 @@ export type ClientToServerEventsWithNamespace = {
     'message': (data: { id: string, show: boolean; message: string; username: string, timestamp: number, badges: any }) => void,
   },
   '/overlays/texttospeech': GenericEvents & {
-    'speak': (data: { text: string; highlight: boolean, service: 0 | 1, key: string }) => void,
+    'speak': (data: { text: string; highlight: boolean, key: string }) => void,
   },
   '/overlays/wordcloud': GenericEvents & {
     'wordcloud:word': (words: string[]) => void,
@@ -251,7 +251,6 @@ export type ClientToServerEventsWithNamespace = {
   '/registries/alerts': GenericEvents & {
     'alerts::settings': (data: null | { areAlertsMuted: boolean; isSoundMuted: boolean; isTTSMuted: boolean; }, cb: (item: { areAlertsMuted: boolean; isSoundMuted: boolean; isTTSMuted: boolean; }) => void) => void,
     'test': (emit: EmitData) => void,
-    'speak': (opts: { text: string, key: string, voice: string; volume: number; rate: number; pitch: number }, cb: (error: Error | string | null | unknown, b64mp3: string) => void) => void,
     'alert': (data: (EmitData & {
       id: string;
       isTTSMuted: boolean;
@@ -459,8 +458,7 @@ export type ClientToServerEventsWithNamespace = {
     'events::remove': (eventId: Required<Event['id']>, cb: (error: Error | string | null | unknown) => void) => void,
   },
   '/core/tts': GenericEvents & {
-    'google::speak': (opts: { volume: number; pitch: number; rate: number; text: string; voice: string; }, cb: (error: Error | string | null | unknown, audioContent?: string | null) => void) => void,
-    'speak': (opts: { text: string, key: string, voice: string; volume: number; rate: number; pitch: number; triggerTTSByHighlightedMessage?: boolean; }, cb: (error: Error | string | null | unknown, b64mp3: string) => void) => void,
+    'speak': (opts: { service: TTSService, text: string, key: string, voice: string; volume: number; rate: number; pitch: number; triggerTTSByHighlightedMessage?: boolean; }, cb: (error: Error | string | null | unknown, b64mp3?: string) => void) => void,
   },
   '/core/ui': GenericEvents & {
     'configuration': (cb: (error: Error | string | null | unknown, data?: Configuration) => void) => void,
