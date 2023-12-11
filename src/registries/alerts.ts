@@ -79,13 +79,6 @@ class Alerts extends Registry {
   @persistent()
     isSoundMuted = false;
 
-  constructor() {
-    super();
-    this.addMenu({
-      category: 'registry', name: 'alerts', id: 'registry/alerts/', this: null,
-    });
-  }
-
   sockets () {
     if (!app) {
       setTimeout(() => this.sockets(), 100);
