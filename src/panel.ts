@@ -1,4 +1,4 @@
-import fs, { existsSync, readFileSync } from 'fs';
+import { existsSync, readFileSync } from 'fs';
 import path, { dirname } from 'path';
 import { fileURLToPath } from 'url';
 
@@ -78,13 +78,10 @@ class Panel extends Core {
   expose () {
     server.listen(port, '::');
     server.listen(port, '0.0.0.0', () => {
-      info(`WebPanel is available at http://localhost:${port}`);
-      info(`New dashboard is available at https://dash.sogebot.xyz/?server=http://localhost:${port}`);
+      info(`WebPanel is available at http://localhost:${port} or https://dash.sogebot.xyz/?server=http://localhost:${port}`);
     });
     serverSecure?.listen(secureport, '0.0.0.0', () => {
-      info(`WebPanel is available at https://localhost:${secureport}`);
-      info(`New dashboard is available at https://dash.sogebot.xyz/?server=https://localhost:${port}`);
-
+      info(`WebPanel is available at https://localhost:${port} or https://dash.sogebot.xyz/?server=https://localhost:${port}`);
     });
   }
 
@@ -133,76 +130,6 @@ class Panel extends Core {
     // static routing
     app?.use('/dist', express.static(path.join(__dirname, '..', 'public', 'dist')));
 
-    const nuxtCache = new Map<string, string>();
-    app?.get(['/_static/*', '/credentials/_static/*'], (req, res) => {
-      if (!nuxtCache.get(req.url)) {
-      // search through node_modules to find correct nuxt file
-        const paths = [
-          path.join(__dirname, '..', 'node_modules', '@sogebot', 'ui-oauth', 'dist', '_static'),
-          path.join(__dirname, '..', 'node_modules', '@sogebot', 'ui-public', 'dist', '_static'),
-          path.join(__dirname, '..', 'node_modules', '@sogebot', 'ui-admin', 'dist', '_static'),
-          path.join(__dirname, '..', 'node_modules', '@sogebot', 'ui-overlay', 'dist', '_static'),
-        ];
-        for (const dir of paths) {
-          const pathToFile = path.join(dir, req.url.replace('_static', ''));
-          if (fs.existsSync(pathToFile)) { // lgtm [js/path-injection]
-            nuxtCache.set(req.url, pathToFile);
-          }
-        }
-      }
-
-      const filepath = path.join(nuxtCache.get(req.url) ?? '') as string;
-      if (fs.existsSync(filepath) && nuxtCache.has(req.url)) { // lgtm [js/path-injection]
-        res.sendFile(filepath);
-      } else {
-        res.sendStatus(404);
-      }
-    });
-    app?.get(['/public/_next/*'], (req, res) => {
-      if (!nuxtCache.get(req.url)) {
-      // search through node_modules to find correct nuxt file
-        const paths = [
-          path.join(__dirname, '..', 'node_modules', '@sogebot', 'ui-public', 'out', '_next'),
-        ];
-        for (const dir of paths) {
-          const url = req.url.replace('public', '').replace('_next', '');
-          const pathToFile = path.join(dir, url);
-          if (fs.existsSync(pathToFile)) { // lgtm [js/path-injection]
-            nuxtCache.set(req.url, pathToFile);
-          }
-        }
-      }
-      const filepath = path.join(nuxtCache.get(req.url) ?? '');
-      if (fs.existsSync(filepath) && nuxtCache.has(req.url)) { // lgtm [js/path-injection]
-        res.sendFile(filepath);
-      } else {
-        nuxtCache.delete(req.url);
-        res.sendStatus(404);
-      }
-    });
-    app?.get(['/_nuxt/*', '/credentials/_nuxt/*', '/overlays/_nuxt/*'], (req, res) => {
-      if (!nuxtCache.get(req.url)) {
-      // search through node_modules to find correct nuxt file
-        const paths = [
-          path.join(__dirname, '..', 'node_modules', '@sogebot', 'ui-oauth', 'dist', '_nuxt'),
-          path.join(__dirname, '..', 'node_modules', '@sogebot', 'ui-admin', 'dist', '_nuxt'),
-          path.join(__dirname, '..', 'node_modules', '@sogebot', 'ui-overlay', 'dist', '_nuxt'),
-        ];
-        for (const dir of paths) {
-          const pathToFile = path.join(dir, req.url.replace('_nuxt', '').replace('credentials', '').replace('overlays', ''));
-          if (fs.existsSync(pathToFile)) { // lgtm [js/path-injection]
-            nuxtCache.set(req.url, pathToFile);
-          }
-        }
-      }
-      const filepath = path.join(nuxtCache.get(req.url) ?? '');
-      if (fs.existsSync(filepath) && nuxtCache.has(req.url)) { // lgtm [js/path-injection]
-        res.sendFile(filepath);
-      } else {
-        nuxtCache.delete(req.url);
-        res.sendStatus(404);
-      }
-    });
     app?.get('/webhooks/callback', function (req, res) {
       res.status(200).send('OK');
     });
@@ -216,25 +143,14 @@ class Panel extends Core {
         res.sendFile(path.join(__dirname, '..', 'assets', sanitize(req.params.asset)));
       }
     });
-    app?.get('/credentials/oauth/:page?', function (req, res) {
-      res.sendFile(path.join(__dirname, '..', 'node_modules', '@sogebot', 'ui-oauth', 'dist', 'oauth', 'index.html'));
-    });
-    app?.get('/credentials/login', function (req, res) {
-      res.sendFile(path.join(__dirname, '..', 'node_modules', '@sogebot', 'ui-oauth', 'dist', 'login', 'index.html'));
-    });
     app?.get('/fonts', function (req, res) {
       res.sendFile(path.join(__dirname, '..', 'fonts.json'));
     });
     app?.get('/favicon.ico', function (req, res) {
       res.sendFile(path.join(__dirname, '..', 'favicon.ico'));
     });
-    app?.get('/:page?', function (req, res) {
-      const indexPath = path.join(__dirname, '..', 'node_modules', '@sogebot', 'ui-admin', 'dist', 'index.html');
-      if (fs.existsSync(indexPath)) {
-        res.sendFile(path.join(__dirname, '..', 'node_modules', '@sogebot', 'ui-admin', 'dist', 'index.html'));
-      } else {
-        res.sendFile(path.join(__dirname, '..', 'assets', 'updating.html'));
-      }
+    app?.get('/', function (req, res) {
+      res.status(301).redirect(`https://dash.sogebot.xyz/?server=` + req.protocol + '://' + req.get('host'));
     });
 
     ioServer?.use(socketSystem.authorize as any);

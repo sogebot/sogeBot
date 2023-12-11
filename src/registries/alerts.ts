@@ -1,8 +1,8 @@
 import { randomUUID } from 'node:crypto';
 
 import {
-  Alert, EmitData,
-} from '@entity/alert.js';
+  EmitData,
+} from '@entity/overlay.js';
 import { MINUTE } from '@sogebot/ui-helpers/constants.js';
 import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized.js';
 
@@ -22,7 +22,6 @@ import { adminEndpoint, publicEndpoint } from '~/helpers/socket.js';
 import * as changelog from '~/helpers/user/changelog.js';
 import { Types } from '~/plugins/ListenTo.js';
 import twitch from '~/services/twitch.js';
-import { adminMiddleware } from '~/socket.js';
 import { translate } from '~/translate.js';
 import { variables } from '~/watchers.js';
 
@@ -113,33 +112,6 @@ class Alerts extends Registry {
       });
     });
 
-    app.get('/api/registries/alerts', adminMiddleware, async (req, res) => {
-      res.send(await Alert.find());
-    });
-
-    app.get('/api/registries/alerts/:id', async (req, res) => {
-      try {
-        res.send(await Alert.findOneByOrFail({ id: req.params.id }));
-      } catch {
-        res.status(404).send();
-      }
-    });
-
-    app.delete('/api/registries/alerts/:id', adminMiddleware, async (req, res) => {
-      await Alert.delete({ id: req.params.id });
-      res.status(404).send();
-    });
-
-    app.post('/api/registries/alerts', adminMiddleware, async (req, res) => {
-      try {
-        const itemToSave = Alert.create(req.body);
-        await itemToSave.save();
-        res.send(itemToSave);
-      } catch (e) {
-        res.status(400).send({ errors: e });
-      }
-    });
-
     publicEndpoint('/registries/alerts', 'speak', async (opts, cb) => {
       if (secureKeys.has(opts.key)) {
         secureKeys.delete(opts.key);
@@ -160,18 +132,6 @@ class Alerts extends Registry {
         }
       } else {
         cb(new Error('Invalid auth.'));
-      }
-    });
-    publicEndpoint('/registries/alerts', 'isAlertUpdated', async ({ updatedAt, id }, cb) => {
-      try {
-        const alert = await Alert.findOneBy({ id });
-        if (alert) {
-          cb(null, updatedAt < (alert.updatedAt || 0), alert.updatedAt || 0);
-        } else {
-          cb(null, false, 0);
-        }
-      } catch (e: any) {
-        cb(e.stack, false, 0);
       }
     });
     adminEndpoint('/registries/alerts', 'alerts::settings', async (data, cb) => {

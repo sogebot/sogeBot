@@ -1,6 +1,6 @@
 import util from 'util';
 
-import type { EmitData } from '@entity/alert.js';
+import type { EmitData } from '@entity/overlay.js';
 import * as constants from '@sogebot/ui-helpers/constants.js';
 import { dayjs } from '@sogebot/ui-helpers/dayjsHelper.js';
 import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized.js';

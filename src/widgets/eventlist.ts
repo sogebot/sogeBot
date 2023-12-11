@@ -1,4 +1,4 @@
-import type { EmitData } from '@entity/alert.js';
+import type { EmitData } from '@entity/overlay.js';
 import { EventList as EventListDB } from '@entity/eventList.js';
 import { UserTip } from '@entity/user.js';
 import { SECOND } from '@sogebot/ui-helpers/constants.js';
