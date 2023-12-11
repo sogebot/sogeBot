@@ -731,6 +731,8 @@
     "unfollow": "Entfolgen",
     "hypetrain-started": "Hype Zug gestartet",
     "hypetrain-ended": "Hype Zug beendet",
+    "shoutout-created": "Twitch Shoutout - Created",
+    "shoutout-received": "Twitch Shoutout - Received",
     "prediction-started": "Twitch Vorhersage gestartet",
     "prediction-locked": "Twitch-Vorhersage gesperrt",
     "prediction-ended": "Twitch Vorhersage beendet",
