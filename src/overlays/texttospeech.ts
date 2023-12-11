@@ -1,10 +1,7 @@
-import { randomUUID } from 'node:crypto';
-
 import Overlay from './_interface.js';
 import {
   command, default_permission,
 } from '../decorators.js';
-import { warning } from '../helpers/log.js';
 
 import { onStartup } from '~/decorators/on.js';
 import { eventEmitter } from '~/helpers/events/index.js';
@@ -24,25 +21,12 @@ class TextToSpeech extends Overlay {
   @command('!tts')
   @default_permission(defaultPermissions.CASTERS)
   async textToSpeech(opts: CommandOptions): Promise<CommandResponse[]> {
-    const { default: tts, services } = await import ('../tts.js');
-    if (tts.ready) {
-      let key: string = randomUUID();
-      if (tts.service === services.RESPONSIVEVOICE) {
-        key = tts.responsiveVoiceKey;
-      }
-      if (tts.service === services.GOOGLE) {
-        tts.addSecureKey(key);
-      }
-
-      this.emit('speak', {
-        text:      opts.parameters,
-        highlight: opts.isHighlight,
-        service:   tts.service,
-        key,
-      });
-    } else {
-      warning('!tts command cannot be executed. TTS is not properly set in a bot.');
-    }
+    const { generateAndAddSecureKey } = await import ('../tts.js');
+    this.emit('speak', {
+      text:      opts.parameters,
+      highlight: opts.isHighlight,
+      key:       generateAndAddSecureKey(),
+    });
     return [];
   }
 }

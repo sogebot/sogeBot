@@ -1,11 +1,16 @@
+import { randomUUID } from 'crypto';
+
 import { MINUTE } from '@sogebot/ui-helpers/constants.js';
 import { JWT } from 'google-auth-library';
 import { google } from 'googleapis';
+
+import { TTSService } from './database/entity/overlay.js';
 
 import Core from '~/_interface.js';
 import { GooglePrivateKeys } from '~/database/entity/google.js';
 import { AppDataSource } from '~/database.js';
 import {
+  onChange,
   onStartup,
 } from '~/decorators/on.js';
 import { settings } from '~/decorators.js';
@@ -15,18 +20,22 @@ import { adminEndpoint, publicEndpoint } from '~/helpers/socket.js';
 /* secureKeys are used to authenticate use of public overlay endpoint */
 const secureKeys = new Set<string>();
 
-export enum services {
-  'NONE' = -1,
-  'RESPONSIVEVOICE',
-  'GOOGLE'
-}
+export const addSecureKey = (key: string) => {
+  secureKeys.add(key);
+  setTimeout(() => {
+    secureKeys.delete(key);
+  }, 10 * MINUTE);
+};
+
+export const generateAndAddSecureKey = () => {
+  const key = randomUUID();
+  addSecureKey(key);
+  return key;
+};
 
 let jwtClient: null | JWT = null;
 
 class TTS extends Core {
-  @settings()
-    service: services = services.NONE;
-
   @settings()
     responsiveVoiceKey = '';
 
@@ -35,124 +44,150 @@ class TTS extends Core {
   @settings()
     googleVoices: string[] = [];
 
-  addSecureKey(key: string) {
-    secureKeys.add(key);
-    setTimeout(() => {
-      secureKeys.delete(key);
-    }, 10 * MINUTE);
-  }
-
   sockets() {
     adminEndpoint('/core/tts', 'settings.refresh', async () => {
-      this.onStartup(); // reset settings
-    });
-
-    adminEndpoint('/core/tts', 'google::speak', async (opts, cb) => {
-      const audioContent = await this.googleSpeak(opts);
-      if (cb) {
-        cb(null, audioContent);
-      }
+      this.initializeTTSServices(); // reset settings
     });
 
     publicEndpoint('/core/tts', 'speak', async (opts, cb) => {
       if (secureKeys.has(opts.key)) {
         secureKeys.delete(opts.key);
 
-        if (!this.ready) {
-          cb(new Error('TTS is not properly set and ready.'));
-          return;
-        }
+        if (opts.service === TTSService.GOOGLE) {
+          const audioContent = await this.googleSpeak(opts);
 
-        if (this.service === services.GOOGLE) {
-          try {
-            const audioContent = await this.googleSpeak(opts);
-            cb(null, audioContent);
-          } catch (e) {
-            cb(e);
+          if (!audioContent) {
+            throw new Error('Something went wrong');
           }
+          if (cb) {
+            cb(null, audioContent);
+          }
+        } else {
+          throw new Error('Invalid service.');
         }
       } else {
         cb(new Error('Invalid auth.'));
       }
     });
+
+    adminEndpoint('/core/tts', 'speak', async (opts, cb) => {
+      try {
+        if (opts.service === TTSService.GOOGLE) {
+          const audioContent = await this.googleSpeak(opts);
+
+          if (!audioContent) {
+            throw new Error('Something went wrong');
+          }
+          if (cb) {
+            cb(null, audioContent);
+          }
+        } else {
+          throw new Error('Invalid service.');
+        }
+      } catch (e) {
+        cb(e);
+      }
+    });
   }
 
-  @onStartup()
-  async onStartup() {
-    switch(this.service) {
-      case services.NONE:
-        warning('TTS: no selected service has been configured.');
-        break;
-      case services.GOOGLE:
-        try {
-          if (this.googlePrivateKey.length === 0) {
-            throw new Error('Missing private key');
-          }
+  initializedGoogleTTSHash: string | null = null;
+  async initializeGoogleTTS() {
+    if (this.initializedGoogleTTSHash === this.googlePrivateKey && jwtClient) {
+      // already initialized
+      return;
+    }
 
-          // get private key
-          const privateKey = await AppDataSource.getRepository(GooglePrivateKeys).findOneByOrFail({ id: this.googlePrivateKey });
+    if (this.googlePrivateKey.length === 0) {
+      warning('TTS: Google Private Key is not properly set.');
+      this.initializedGoogleTTSHash = this.googlePrivateKey;
+      return;
+    }
 
-          // configure a JWT auth client
-          jwtClient = new google.auth.JWT(
-            privateKey.clientEmail,
-            undefined,
-            privateKey.privateKey,
-            ['https://www.googleapis.com/auth/cloud-platform']);
-        } catch (err) {
+    try {
+    // get private key
+      const privateKey = await AppDataSource.getRepository(GooglePrivateKeys).findOneByOrFail({ id: this.googlePrivateKey });
+
+      // configure a JWT auth client
+      jwtClient = new google.auth.JWT(
+        privateKey.clientEmail,
+        undefined,
+        privateKey.privateKey,
+        ['https://www.googleapis.com/auth/cloud-platform']);
+
+      info('TTS: Authentication to Google Service successful.');
+
+      // authenticate request
+      jwtClient?.authorize(async (err) => {
+        if (err) {
           error('TTS: Something went wrong with authentication to Google Service.');
           error(err);
           jwtClient = null;
-        }
-
-        // authenticate request
-        jwtClient?.authorize(async (err) => {
-          if (err) {
-            error('TTS: Something went wrong with authentication to Google Service.');
-            error(err);
-            jwtClient = null;
-            return;
-          } else {
-            if (!jwtClient) {
-            // this shouldn't occur but make TS happy
-              return;
-            }
-
-            info('TTS: Authentication to Google Service successful.');
-
-            const texttospeech = google.texttospeech({
-              auth:    jwtClient,
-              version: 'v1',
-            });
-
-            // get voices list
-            const list = await texttospeech.voices.list();
-            this.googleVoices = Array.from(new Set(list.data.voices?.map(o => String(o.name)).sort() ?? []));
-            info(`TTS: Cached ${this.googleVoices.length} Google Service voices.`);
-          }
-        });
-        break;
-      case services.RESPONSIVEVOICE:
-        if (this.responsiveVoiceKey.length > 0) {
-          info('TTS: ResponsiveVoice ready.');
+          return;
         } else {
-          warning('TTS: ResponsiveVoice ApiKey is not properly set.');
+          if (!jwtClient) {
+            // this shouldn't occur but make TS happy
+            return;
+          }
+
+          info('TTS: Authentication to Google Service successful.');
+          this.initializedGoogleTTSHash = this.googlePrivateKey;
+
+          const texttospeech = google.texttospeech({
+            auth:    jwtClient,
+            version: 'v1',
+          });
+
+          // get voices list
+          const list = await texttospeech.voices.list();
+          this.googleVoices = Array.from(new Set(list.data.voices?.map(o => String(o.name)).sort() ?? []));
+          info(`TTS: Cached ${this.googleVoices.length} Google Service voices.`);
         }
-        break;
+      });
+    } catch (err) {
+      error('TTS: Something went wrong with authentication to Google Service.');
+      error(err);
+      jwtClient = null;
     }
   }
 
-  get ready() {
-    if (this.service === services.NONE) {
+  initializedResponsiveVoiceTTSHash: string | null = null;
+  initializeResponsiveVoiceTTS() {
+    if (this.initializedResponsiveVoiceTTSHash === this.responsiveVoiceKey) {
+      // already initialized
+      return;
+    }
+    if (this.responsiveVoiceKey.length === 0) {
+      warning('TTS: ResponsiveVoice ApiKey is not properly set.');
+      this.initializedResponsiveVoiceTTSHash = this.responsiveVoiceKey;
+      return;
+    }
+    if (this.responsiveVoiceKey.length > 0) {
+      info('TTS: ResponsiveVoice ready.');
+      this.initializedResponsiveVoiceTTSHash = this.responsiveVoiceKey;
+    } else {
+      warning('TTS: ResponsiveVoice ApiKey is not properly set.');
+    }
+  }
+
+  isReady(service: TTSService) {
+    if (service === TTSService.NONE) {
       return false;
     }
-
-    if (this.service === services.RESPONSIVEVOICE) {
-      return this.responsiveVoiceKey.length > 0;
+    if (service === TTSService.GOOGLE) {
+      return this.initializedGoogleTTSHash === this.googlePrivateKey && jwtClient !== null;
     }
-
-    if (this.service === services.GOOGLE) {
-      return this.googlePrivateKey.length > 0;
+    if (service === TTSService.RESPONSIVEVOICE) {
+      return this.initializedResponsiveVoiceTTSHash === this.responsiveVoiceKey;
     }
+    return false;
+  }
+
+  @onStartup()
+  @onChange('googlePrivateKey')
+  @onChange('responsiveVoiceKey')
+  async initializeTTSServices() {
+    this.initializeGoogleTTS();
+    this.initializeResponsiveVoiceTTS();
   }
 
   async googleSpeak(opts: {
@@ -170,14 +205,13 @@ class TTS extends Core {
       version: 'v1',
     });
 
-    const volumeGainDb = -6 + (12 * opts.volume);
     const synthesize = await texttospeech.text.synthesize({
       requestBody: {
         audioConfig: {
           audioEncoding: 'MP3',
           pitch:         opts.pitch,
           speakingRate:  opts.rate,
-          volumeGainDb:  volumeGainDb,
+          volumeGainDb:  10,
         },
         input: {
           text: opts.text,

@@ -1,13 +1,10 @@
-import { randomUUID } from 'node:crypto';
-
-import {
-  EmitData,
-} from '@entity/overlay.js';
-import { MINUTE } from '@sogebot/ui-helpers/constants.js';
+import { EmitData } from '@entity/overlay.js';
 import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized.js';
 
 import Registry from './_interface.js';
 import { command, default_permission, example, persistent, settings } from '../decorators.js';
+import * as changelog from '../helpers/user/changelog.js';
+import twitch from '../services/twitch.js';
 
 import { parserReply } from '~/commons.js';
 import { User, UserInterface } from '~/database/entity/user.js';
@@ -15,18 +12,13 @@ import { AppDataSource } from '~/database.js';
 import { Expects } from  '~/expects.js';
 import { prepare } from '~/helpers/commons/index.js';
 import { eventEmitter } from '~/helpers/events/emitter.js';
-import { error, debug, info } from '~/helpers/log.js';
+import { debug, info, error } from '~/helpers/log.js';
 import { app, ioServer } from '~/helpers/panel.js';
 import { defaultPermissions } from '~/helpers/permissions/defaultPermissions.js';
-import { adminEndpoint, publicEndpoint } from '~/helpers/socket.js';
-import * as changelog from '~/helpers/user/changelog.js';
+import { adminEndpoint } from '~/helpers/socket.js';
 import { Types } from '~/plugins/ListenTo.js';
-import twitch from '~/services/twitch.js';
 import { translate } from '~/translate.js';
 import { variables } from '~/watchers.js';
-
-/* secureKeys are used to authenticate use of public overlay endpoint */
-const secureKeys = new Set<string>();
 
 const fetchUserForAlert = (opts: EmitData, type: 'recipient' | 'name'): Promise<Readonly<Required<UserInterface>> & { game?: string } | null> => {
   return new Promise<Readonly<Required<UserInterface>> & { game?: string } | null>((resolve) => {
@@ -112,28 +104,6 @@ class Alerts extends Registry {
       });
     });
 
-    publicEndpoint('/registries/alerts', 'speak', async (opts, cb) => {
-      if (secureKeys.has(opts.key)) {
-        secureKeys.delete(opts.key);
-
-        const { default: tts, services } = await import ('../tts.js');
-        if (!tts.ready) {
-          cb(new Error('TTS is not properly set and ready.'));
-          return;
-        }
-
-        if (tts.service === services.GOOGLE) {
-          try {
-            const audioContent = await tts.googleSpeak(opts);
-            cb(null, audioContent);
-          } catch (e) {
-            cb(e);
-          }
-        }
-      } else {
-        cb(new Error('Invalid auth.'));
-      }
-    });
     adminEndpoint('/registries/alerts', 'alerts::settings', async (data, cb) => {
       if (data) {
         this.areAlertsMuted = data.areAlertsMuted;
@@ -153,49 +123,14 @@ class Alerts extends Registry {
         monthsName: getLocalizedName(data.amount, translate('core.months')),
       }, true);
     });
-
-    publicEndpoint('/registries/alerts', 'speak', async (opts, cb) => {
-      if (secureKeys.has(opts.key)) {
-        secureKeys.delete(opts.key);
-
-        const { default: tts, services } = await import ('../tts.js');
-        if (!tts.ready) {
-          cb(new Error('TTS is not properly set and ready.'));
-          return;
-        }
-
-        if (tts.service === services.GOOGLE) {
-          try {
-            const audioContent = await tts.googleSpeak(opts);
-            cb(null, audioContent);
-          } catch (e) {
-            cb(e);
-          }
-        }
-      } else {
-        cb(new Error('Invalid auth.'));
-      }
-    });
   }
 
   async trigger(opts: EmitData, isTest = false) {
     debug('alerts.trigger', JSON.stringify(opts, null, 2));
-    const { default: tts, services } = await import ('../tts.js');
+    const { generateAndAddSecureKey } = await import ('../tts.js');
+    const key = generateAndAddSecureKey();
+
     if (!this.areAlertsMuted || isTest) {
-      let key: string = randomUUID();
-      if (tts.service === services.RESPONSIVEVOICE) {
-        key = tts.responsiveVoiceKey;
-      }
-      if (tts.service === services.GOOGLE) {
-        // add secureKey
-        secureKeys.add(key);
-        setTimeout(() => {
-          secureKeys.delete(key);
-        }, 10 * MINUTE);
-      }
-
-      secureKeys.add(key);
-
       const [ user, recipient ] = await Promise.all([
         fetchUserForAlert(opts, 'name'),
         fetchUserForAlert(opts, 'recipient'),
@@ -206,7 +141,7 @@ class Alerts extends Registry {
       const caster = await AppDataSource.getRepository(User).findOneBy({ userId: broadcasterId }) ?? null;
 
       const data = {
-        ...opts, isTTSMuted: !tts.ready || this.isTTSMuted, isSoundMuted: this.isSoundMuted, TTSService: tts.service, TTSKey: key, user, game: user?.game, caster, recipientUser: recipient, id: randomUUID(),
+        ...opts, isTTSMuted: this.isTTSMuted, isSoundMuted: this.isSoundMuted, TTSKey: key, user, game: user?.game, caster, recipientUser: recipient, id: key,
       };
 
       info(`Triggering alert send: ${JSON.stringify(data)}`);

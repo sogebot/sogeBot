@@ -331,6 +331,13 @@ export interface Media {
   typeId: 'media';
 }
 
+export enum TTSService {
+  NONE = '-1',
+  RESPONSIVEVOICE = '0',
+  GOOGLE = '1',
+  SPEECHSYNTHESIS = '2',
+}
+
 export interface Alerts {
   typeId: 'alerts';
   alertDelayInMs: number;
@@ -349,6 +356,29 @@ export interface Alerts {
   }>;
   globalFont2: ExpandRecursively<Alerts['globalFont1']>;
   tts: {
+    selectedService: TTSService;
+    // we are using this to store tts settings for each service, so if we are changing service, then we can previously set settings
+    services: {
+      [TTSService.NONE]?: null,
+      [TTSService.SPEECHSYNTHESIS]?: {
+        voice: string;
+        pitch: number;
+        volume: number;
+        rate: number;
+      },
+      [TTSService.GOOGLE]?: {
+        voice: string;
+        pitch: number;
+        volume: number;
+        rate: number;
+      },
+      [TTSService.RESPONSIVEVOICE]?: {
+        voice: string;
+        pitch: number;
+        volume: number;
+        rate: number;
+      }
+    }
     voice: string;
     pitch: number;
     volume: number;
@@ -533,10 +563,9 @@ export interface ClipsCarousel {
 
 export interface TTS {
   typeId: 'tts';
-  voice: string,
-  volume: number,
-  rate: number,
-  pitch: number,
+  selectedService: TTSService;
+  // we are using this to store tts settings for each service, so if we are changing service, then we can previously set settings
+  services: Alerts['tts']['services'];
   triggerTTSByHighlightedMessage: boolean,
 }
 
