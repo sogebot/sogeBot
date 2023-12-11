@@ -25,7 +25,7 @@
     "@twurple/eventsub-ws": "7.0.4",
     "@twurple/pubsub": "7.0.4",
     "async-mutex": "^0.4.0",
-    "axios": "1.5.1",
+    "axios": "1.6.0",
     "basic-auth": "2.0.1",
     "better-sqlite3": "^8.0.0",
     "blocked-at": "1.2.0",
