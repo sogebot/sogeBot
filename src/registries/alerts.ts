@@ -1,6 +1,4 @@
-import {
-  Alert, EmitData,
-} from '@entity/alert.js';
+import { EmitData } from '@entity/overlay.js';
 import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized.js';
 
 import Registry from './_interface.js';
@@ -17,9 +15,8 @@ import { eventEmitter } from '~/helpers/events/emitter.js';
 import { debug, info, error } from '~/helpers/log.js';
 import { app, ioServer } from '~/helpers/panel.js';
 import { defaultPermissions } from '~/helpers/permissions/defaultPermissions.js';
-import { adminEndpoint, publicEndpoint } from '~/helpers/socket.js';
+import { adminEndpoint } from '~/helpers/socket.js';
 import { Types } from '~/plugins/ListenTo.js';
-import { adminMiddleware } from '~/socket.js';
 import { translate } from '~/translate.js';
 import { variables } from '~/watchers.js';
 
@@ -107,44 +104,6 @@ class Alerts extends Registry {
       });
     });
 
-    app.get('/api/registries/alerts', adminMiddleware, async (req, res) => {
-      res.send(await Alert.find());
-    });
-
-    app.get('/api/registries/alerts/:id', async (req, res) => {
-      try {
-        res.send(await Alert.findOneByOrFail({ id: req.params.id }));
-      } catch {
-        res.status(404).send();
-      }
-    });
-
-    app.delete('/api/registries/alerts/:id', adminMiddleware, async (req, res) => {
-      await Alert.delete({ id: req.params.id });
-      res.status(404).send();
-    });
-
-    app.post('/api/registries/alerts', adminMiddleware, async (req, res) => {
-      try {
-        const itemToSave = Alert.create(req.body);
-        await itemToSave.save();
-        res.send(itemToSave);
-      } catch (e) {
-        res.status(400).send({ errors: e });
-      }
-    });
-    publicEndpoint('/registries/alerts', 'isAlertUpdated', async ({ updatedAt, id }, cb) => {
-      try {
-        const alert = await Alert.findOneBy({ id });
-        if (alert) {
-          cb(null, updatedAt < (alert.updatedAt || 0), alert.updatedAt || 0);
-        } else {
-          cb(null, false, 0);
-        }
-      } catch (e: any) {
-        cb(e.stack, false, 0);
-      }
-    });
     adminEndpoint('/registries/alerts', 'alerts::settings', async (data, cb) => {
       if (data) {
         this.areAlertsMuted = data.areAlertsMuted;
