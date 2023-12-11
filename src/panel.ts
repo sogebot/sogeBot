@@ -2,6 +2,7 @@ import { existsSync, readFileSync } from 'fs';
 import path, { dirname } from 'path';
 import { fileURLToPath } from 'url';
 
+import axios from 'axios';
 import cors from 'cors';
 import express from 'express';
 import RateLimit from 'express-rate-limit';
@@ -151,6 +152,20 @@ class Panel extends Core {
     });
     app?.get('/', function (req, res) {
       res.status(301).redirect(`https://dash.sogebot.xyz/?server=` + req.protocol + '://' + req.get('host'));
+    });
+    app?.get('/_dash_version', async function (req, res) {
+      try {
+        const response = await axios.get(`https://hub.docker.com/v2/repositories/sogebot/dashboard/tags`);
+
+        if (response.status === 200) {
+          const tags = response.data.results.map((tag: any) => tag.name);
+          res.status(200).send(tags[0] === 'latest' ? tags[1] : tags[0]);
+        } else {
+          res.status(response.status).send(`Failed to fetch tags for dashboard. Status code: ${response.status}`);
+        }
+      } catch (error) {
+        res.status(500).send(`Failed to fetch tags for dashboard: ${error}`);
+      }
     });
 
     ioServer?.use(socketSystem.authorize as any);
