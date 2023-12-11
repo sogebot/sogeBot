@@ -9,6 +9,7 @@ import _, {
 } from 'lodash-es';
 import { VM }  from 'vm2';
 
+import { Types } from './plugins/ListenTo.js';
 import twitch from './services/twitch.js';
 
 import Core from '~/_interface.js';
@@ -76,6 +77,23 @@ class Events extends Core {
     super();
 
     this.supportedEventsList = [
+      { id:        'shoutout-created', variables: [
+        'broadcasterDisplayName',
+        'broadcasterId',
+        'broadcasterName',
+        'shoutedOutBroadcasterDisplayName',
+        'shoutedOutBroadcasterId',
+        'shoutedOutBroadcasterName',
+        'viewerCount' ] },
+      { id:        'shoutout-received', variables: [
+        'broadcasterDisplayName',
+        'broadcasterId',
+        'broadcasterName',
+        'viewerCount',
+        'shoutingOutBroadcasterDisplayName',
+        'shoutingOutBroadcasterId',
+        'shoutingOutBroadcasterName',
+      ] },
       { id: 'prediction-started', variables: [ 'titleOfPrediction', 'outcomes', 'locksAt' ] },
       { id: 'prediction-locked', variables: [ 'titleOfPrediction', 'outcomes', 'locksAt' ] },
       { id: 'prediction-ended', variables: [ 'titleOfPrediction', 'outcomes', 'locksAt', 'winningOutcomeTitle', 'winningOutcomeTotalPoints', 'winningOutcomePercentage' ] },
@@ -211,12 +229,20 @@ class Events extends Core {
       'tip',
       'obs-scene-changed',
       'obs-input-mute-state-changed',
+      Types.onChannelShoutoutCreate,
+      Types.onChannelShoutoutReceive,
     ] as const) {
       eventEmitter.on(event, (opts?: Attributes) => {
         if (typeof opts === 'undefined') {
           opts = {};
         }
-        events.fire(event, { ...opts });
+        if (Types.onChannelShoutoutReceive) {
+          events.fire('shoutout-received', { ...opts });
+        } else if (Types.onChannelShoutoutCreate) {
+          events.fire('shoutout-created', { ...opts });
+        } else {
+          events.fire(event as any, { ...opts });
+        }
       });
     }
   }
