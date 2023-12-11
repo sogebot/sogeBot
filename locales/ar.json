@@ -731,6 +731,8 @@
     "unfollow": "unfollow",
     "hypetrain-started": "Hype Train started",
     "hypetrain-ended": "Hype Train ended",
+    "shoutout-created": "Twitch Shoutout - Created",
+    "shoutout-received": "Twitch Shoutout - Received",
     "prediction-started": "Twitch Prediction started",
     "prediction-locked": "Twitch Prediction locked",
     "prediction-ended": "Twitch Prediction ended",

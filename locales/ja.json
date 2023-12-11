@@ -731,6 +731,8 @@
     "unfollow": "フォロー解除",
     "hypetrain-started": "ハイプトレイン開始",
     "hypetrain-ended": "ハイプトレイン終了",
+    "shoutout-created": "Twitch Shoutout - Created",
+    "shoutout-received": "Twitch Shoutout - Received",
     "prediction-started": "Twitch予測開始",
     "prediction-locked": "Twitch予測はロックされました",
     "prediction-ended": "Twitch 予測が終了しました",
