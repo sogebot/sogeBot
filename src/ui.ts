@@ -101,6 +101,17 @@ class UI extends Core {
       try {
         const data: any = {};
 
+        for (const system of ['tts']) {
+          if (typeof data.core === 'undefined') {
+            data.core = {};
+          }
+          const self = find('core', system);
+          if (!self) {
+            throw new Error(`core.${system} not found in list`);
+          }
+          data.core[system] = await self.getAllSettings(true);
+        }
+
         for (const dir of ['systems', 'games']) {
           for (const system of list(dir as any)) {
             set(data, `${dir}.${system.__moduleName__}`, await system.getAllSettings(true));
