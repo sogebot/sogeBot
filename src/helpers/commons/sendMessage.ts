@@ -15,6 +15,7 @@ import getBotUserName from '../user/getBotUserName.js';
 import getBroadcasterId from '../user/getBroadcasterId.js';
 
 import twitch from '~/services/twitch.js';
+import users from '~/users.js';
 import { variables } from '~/watchers.js';
 
 const getAnnouncementColor = (command: string): HelixChatAnnouncementColor => {
@@ -146,7 +147,19 @@ class HelpersCommons {
                 message: messageArray.join(' '),
                 color,
               }));
-            } else {
+            } else if (messageToSend.startsWith('/shoutout')) {
+              const username = messageToSend.split(' ')[1];
+
+              const botCurrentScopes = variables.get('services.twitch.botCurrentScopes') as string[];
+              if (!botCurrentScopes.includes('moderator:manage:shoutouts')) {
+                message('say', sender.userName, 'Bot is missing moderator:manage:shoutouts scope, please reauthorize in dashboard.', id);
+                return true;
+              }
+
+              const broadcasterId = variables.get('services.twitch.broadcasterId') as string;
+              const userId = await users.getIdByName(username);
+              twitch.apiClient?.asIntent(['bot'], ctx => ctx.chat.shoutoutUser(broadcasterId, userId));
+            }  else {
               message('say', sender.userName, messageToSend, id);
             }
           }
