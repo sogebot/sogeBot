@@ -9,7 +9,7 @@ export class BotEntity extends BaseEntity {
     this: { new (): T } & typeof BotEntity,
     entityOrEntities?: any,
   ): T {
-    if (typeof window === 'undefined') {
+    if (typeof (window as any) === 'undefined') {
       if (Array.isArray(entityOrEntities)) {
         throw new Error('Create from array is not supported');
       }
