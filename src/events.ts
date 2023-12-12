@@ -1,9 +1,13 @@
 import { setTimeout } from 'timers'; // tslint workaround
+
 import _, {
   clone, cloneDeep, get, isNil, random, sample,
 } from 'lodash-es';
 import { VM }  from 'vm2';
 
+import { dayjs } from './helpers/dayjsHelper.js';
+import { generateUsername } from './helpers/generateUsername.js';
+import { getLocalizedName } from './helpers/getLocalizedName.js';
 import { Types } from './plugins/ListenTo.js';
 import twitch from './services/twitch.js';
 
@@ -47,9 +51,6 @@ import { getCustomRewards } from '~/services/twitch/calls/getCustomRewards.js';
 import { getIdFromTwitch } from '~/services/twitch/calls/getIdFromTwitch.js';
 import { updateChannelInfo } from '~/services/twitch/calls/updateChannelInfo.js';
 import { variables } from '~/watchers.js';
-import { dayjs } from './helpers/dayjsHelper.js';
-import { generateUsername } from './helpers/generateUsername.js';
-import { getLocalizedName } from './helpers/getLocalizedName.js';
 
 const excludedUsers = new Set<string>();
 
@@ -75,6 +76,17 @@ class Events extends Core {
     super();
 
     this.supportedEventsList = [
+      { id:        'commercial-started', variables: [
+        'duration',
+        'startedAt',
+        'isAutomatic',
+        'broadcasterDisplayName',
+        'broadcasterId',
+        'broadcasterName',
+        'requesterDisplayName',
+        'requesterId',
+        'requesterName',
+      ] },
       { id:        'shoutout-created', variables: [
         'broadcasterDisplayName',
         'broadcasterId',
@@ -229,14 +241,17 @@ class Events extends Core {
       'obs-input-mute-state-changed',
       Types.onChannelShoutoutCreate,
       Types.onChannelShoutoutReceive,
+      Types.onChannelAdBreakBegin,
     ] as const) {
       eventEmitter.on(event, (opts?: Attributes) => {
         if (typeof opts === 'undefined') {
           opts = {};
         }
-        if (Types.onChannelShoutoutReceive) {
+        if (event === Types.onChannelAdBreakBegin) {
+          events.fire('commercial-started', { ...opts });
+        } else if (event === Types.onChannelShoutoutReceive) {
           events.fire('shoutout-received', { ...opts });
-        } else if (Types.onChannelShoutoutCreate) {
+        } else if (event === Types.onChannelShoutoutCreate) {
           events.fire('shoutout-created', { ...opts });
         } else {
           events.fire(event as any, { ...opts });

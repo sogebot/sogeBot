@@ -42,7 +42,7 @@ import { cheer } from '~/helpers/events/cheer.js';
 import { follow } from '~/helpers/events/follow.js';
 import { eventEmitter } from '~/helpers/events/index.js';
 import { raid } from '~/helpers/events/raid.js';
-import { ban, error, info, redeem, timeout, unban, warning } from '~/helpers/log.js';
+import { ban, commercial, error, info, redeem, timeout, unban, warning } from '~/helpers/log.js';
 import { ioServer } from '~/helpers/panel.js';
 import * as changelog from '~/helpers/user/changelog.js';
 import getBroadcasterId from '~/helpers/user/getBroadcasterId.js';
@@ -83,6 +83,7 @@ class EventSubLongPolling {
 
             info(`EVENTSUB: Received event ${response.data.subscription.type}.`);
             const availableEvents = {
+              'channel.ad_break.begin':                                 this.onChannelAdBreakBegin,
               'channel.channel_points_custom_reward_redemption.add':    this.onChannelRedemptionAdd,
               'channel.channel_points_custom_reward_redemption.update': this.onChannelRedemptionUpdate,
               'channel.follow':                                         this.onChannelFollow,
@@ -141,6 +142,36 @@ class EventSubLongPolling {
         release();
       }
     }, 200);
+  }
+
+  onChannelAdBreakBegin(event: {
+    duration_seconds: string,
+    started_at: string,
+    is_automatic: 'true' | 'false',
+    broadcaster_user_id: string,
+    broadcaster_user_login: string,
+    broadcaster_user_name: string,
+    requester_user_id: string,
+    requester_user_login: string,
+    requester_user_name: string,
+  }) {
+    if (String(event.is_automatic) === 'true') {
+      commercial(`automatic ${ event.duration_seconds } seconds ad break`);
+    } else {
+      commercial(`${ event.broadcaster_user_login }#${ event.requester_user_id } started a ${ event.duration_seconds } seconds ad break`);
+    }
+
+    eventEmitter.emit(Types.onChannelAdBreakBegin, {
+      duration:               Number(event.duration_seconds),
+      startedAt:              event.started_at,
+      isAutomatic:            String(event.is_automatic) === 'true',
+      broadcasterDisplayName: event.broadcaster_user_name,
+      broadcasterId:          event.broadcaster_user_id,
+      broadcasterName:        event.broadcaster_user_login,
+      requesterDisplayName:   event.requester_user_name,
+      requesterId:            event.requester_user_id,
+      requesterName:          event.requester_user_login,
+    });
   }
 
   onChannelRedemptionAdd(event: EventSubChannelRedemptionAddEventData) {

@@ -43,6 +43,7 @@ export enum Types {
   'onUserUpdate',
   'onChannelRaidFrom',
   'onChannelRedemptionUpdate',
+  'onChannelAdBreakBegin',
 }
 
 export const ListenToGenerator = (pluginId: string, type: Types, message: string, userstate: { userName: string, userId: string } | null, params?: Record<string, any>) => ({
@@ -108,6 +109,11 @@ export const ListenToGenerator = (pluginId: string, type: Types, message: string
     onChannelModeratorRemove: (callback: (args: Parameters<Events[Types.onChannelModeratorRemove]>[0]) => void) => {
       if (type === Types.onChannelModeratorRemove) {
         params && callback(params as Parameters<Events[Types.onChannelModeratorRemove]>[0]);
+      }
+    },
+    onChannelAdBreakBegin: (callback: any) => {
+      if (type === Types.onChannelAdBreakBegin) {
+        params && callback(params);
       }
     },
     onChannelRewardAdd: (callback: (args: Parameters<Events[Types.onChannelRewardAdd]>[0]) => void) => {

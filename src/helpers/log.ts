@@ -82,6 +82,7 @@ enum Levels {
   subcommunitygift,
   resub,
   redeem,
+  commercial,
   timeout,
   ban,
   unban,
@@ -107,6 +108,7 @@ const levelFormat = {
   follow:           '+follow',
   raid:             '+raid',
   redeem:           '+++ redeem:',
+  commercial:       '!commercial',
   cheer:            '+cheer',
   tip:              '+tip',
   sub:              '+sub',
@@ -233,6 +235,9 @@ export function stop(message: any) {
 }
 export function redeem(message: any) {
   log(message, 'redeem');
+}
+export function commercial(message: any) {
+  log(message, 'commercial');
 }
 
 const logTimezone = async () => {

@@ -250,6 +250,17 @@ export interface Events {
     userId: string;
     userName: string;
   }) => void;
+  [Types.onChannelAdBreakBegin]: (opts: {
+    duration: number;
+    startedAt:              string,
+    isAutomatic:            boolean,
+    broadcasterDisplayName: string,
+    broadcasterId:          string,
+    broadcasterName:        string,
+    requesterDisplayName:   string,
+    requesterId:            string,
+    requesterName:          string,
+  }) => void;
 }
 
 class _EventEmitter extends TypedEmitter<Events> {}
