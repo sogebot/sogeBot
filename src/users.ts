@@ -1,10 +1,10 @@
 import { setTimeout } from 'timers';
 
-import { HOUR } from '@sogebot/ui-helpers/constants.js';
 import {
   Brackets, IsNull,
 } from 'typeorm';
 
+import { HOUR } from './helpers/constants.js';
 import { defaultPermissions } from './helpers/permissions/defaultPermissions.js';
 import { getUserHighestPermission } from './helpers/permissions/getUserHighestPermission.js';
 import getNameById from './helpers/user/getNameById.js';

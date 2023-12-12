@@ -1,11 +1,11 @@
 import { readFileSync } from 'fs';
 
-import { HOUR } from '@sogebot/ui-helpers/constants.js';
 import { cloneDeep, isEqual } from 'lodash-es';
 import fetch from 'node-fetch';
 
 import { isBroadcaster } from './isBroadcaster.js';
 import { timer } from '../../decorators.js';
+import { HOUR } from '../constants.js';
 import { info } from '../log.js';
 import {
   ignorelist, isIgnoredCache,

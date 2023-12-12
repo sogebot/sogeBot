@@ -1,8 +1,6 @@
 import { DiscordLink } from '@entity/discord.js';
 import { Permissions as PermissionsEntity } from '@entity/permissions.js';
 import { User } from '@entity/user.js';
-import { HOUR, MINUTE } from '@sogebot/ui-helpers/constants.js';
-import { dayjs, timezone } from '@sogebot/ui-helpers/dayjsHelper.js';
 import chalk from 'chalk';
 import * as DiscordJs from 'discord.js';
 import { ChannelType, GatewayIntentBits } from 'discord.js';
@@ -29,7 +27,9 @@ import { attributesReplace } from '~/helpers/attributesReplace.js';
 import {
   announceTypes, getOwner, getUserSender, isUUID, prepare,
 } from '~/helpers/commons/index.js';
+import { MINUTE, HOUR } from '~/helpers/constants.js';
 import { isBotStarted, isDbConnected } from '~/helpers/database.js';
+import { dayjs, timezone } from '~/helpers/dayjsHelper.js';
 import { debounce } from '~/helpers/debounce.js';
 import { eventEmitter } from '~/helpers/events/index.js';
 import {

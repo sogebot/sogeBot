@@ -1,6 +1,6 @@
 import { Quotes as QuotesEntity } from '@entity/quotes.js';
-import { sample } from '@sogebot/ui-helpers/array.js';
 import * as _ from 'lodash-es';
+import { sample } from 'lodash-es';
 
 import System from './_interface.js';
 import { command, default_permission } from '../decorators.js';

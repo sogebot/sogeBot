@@ -1,10 +1,10 @@
-import { shuffle } from '@sogebot/ui-helpers/array.js';
-import { DAY } from '@sogebot/ui-helpers/constants.js';
 import { HelixClip } from '@twurple/api/lib';
+import { shuffle } from 'lodash-es';
 
 import { getGameNameFromId } from './getGameNameFromId.js';
 
 import { streamStatusChangeSince } from '~/helpers/api/index.js';
+import { DAY } from '~/helpers/constants.js';
 import { isDebugEnabled } from '~/helpers/debug.js';
 import { getFunctionName } from '~/helpers/getFunctionName.js';
 import { debug, error, warning } from '~/helpers/log.js';

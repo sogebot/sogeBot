@@ -1,5 +1,4 @@
 import { Currency, UserTip, UserTipInterface } from '@entity/user.js';
-import * as constants from '@sogebot/ui-helpers/constants.js';
 import Axios from 'axios';
 import chalk from 'chalk';
 
@@ -20,6 +19,7 @@ import { triggerInterfaceOnTip } from '~/helpers/interface/triggers.js';
 import {
   error, info, tip,
 } from '~/helpers/log.js';
+import { MINUTE } from '~/helpers/constants.js';
 
 type StreamElementsEvent = {
   donation: {
@@ -107,7 +107,7 @@ class StreamElements extends Integration {
 
       this.afterDate = beforeDate;
 
-    }, constants.MINUTE);
+    }, MINUTE);
   }
 
   @onStartup()

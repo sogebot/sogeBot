@@ -1,5 +1,3 @@
-import { MINUTE } from '@sogebot/ui-helpers/constants.js';
-import { getTime } from '@sogebot/ui-helpers/getTime.js';
 import { OAuth2Client } from 'google-auth-library/build/src/auth/oauth2client';
 import { google, youtube_v3 } from 'googleapis';
 
@@ -14,6 +12,8 @@ import {
   stats,
   streamStatusChangeSince,
 } from '~/helpers/api/index.js';
+import { MINUTE } from '~/helpers/constants.js';
+import { getTime } from '~/helpers/getTime.js';
 import { getLang } from '~/helpers/locales.js';
 import { error, info, debug } from '~/helpers/log.js';
 import { app } from '~/helpers/panel.js';

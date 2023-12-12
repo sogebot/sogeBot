@@ -4,8 +4,7 @@ import { Session } from 'node:inspector';
 import { normalize } from 'node:path';
 import { gzip } from 'zlib';
 
-import { MINUTE } from '@sogebot/ui-helpers/constants.js';
-
+import { MINUTE } from './constants.js';
 import { logEmitter as log } from './log/emitter.js';
 
 import { variables } from '~/watchers.js';

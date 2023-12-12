@@ -2,8 +2,6 @@
 
 import { Alias } from '@entity/alias.js';
 import { ModerationPermit, ModerationWarning } from '@entity/moderation.js';
-import * as constants from '@sogebot/ui-helpers/constants.js';
-import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized.js';
 import emojiRegex from 'emoji-regex';
 import { TLDs } from 'global-tld-list';
 import * as _ from 'lodash-es';
@@ -22,6 +20,8 @@ import users from '../users.js';
 
 import { AppDataSource } from '~/database.js';
 import { prepare } from '~/helpers/commons/index.js';
+import { MODERATION } from '~/helpers/constants.js';
+import { getLocalizedName } from '~/helpers/getLocalizedName.js';
 import {
   error, warning as warningLog,
 } from '~/helpers/log.js';
@@ -350,7 +350,7 @@ class Moderation extends System {
     return [];
   }
 
-  @parser({ priority: constants.MODERATION })
+  @parser({ priority: MODERATION })
   async saveMessageAndCheckAutoban(opts: ParserOptions) {
     // remove all messages from user as we want to keep only last one
     const idxs = messages.reduce(function(a, e, i) {
@@ -374,7 +374,7 @@ class Moderation extends System {
     return true;
   }
 
-  @parser({ priority: constants.MODERATION })
+  @parser({ priority: MODERATION })
   async containsLink (opts: ParserOptions) {
     if (!opts.sender || immuneUsers.get('links')?.has(String(opts.sender.userId))) {
       return true;
@@ -415,7 +415,7 @@ class Moderation extends System {
     }
   }
 
-  @parser({ priority: constants.MODERATION })
+  @parser({ priority: MODERATION })
   async symbols (opts: ParserOptions) {
     if (!opts.sender || immuneUsers.get('symbols')?.has(String(opts.sender.userId))) {
       return true;
@@ -467,7 +467,7 @@ class Moderation extends System {
     return true;
   }
 
-  @parser({ priority: constants.MODERATION })
+  @parser({ priority: MODERATION })
   async longMessage (opts: ParserOptions) {
     if (!opts.sender || immuneUsers.get('longmessage')?.has(String(opts.sender.userId))) {
       return true;
@@ -504,7 +504,7 @@ class Moderation extends System {
     }
   }
 
-  @parser({ priority: constants.MODERATION })
+  @parser({ priority: MODERATION })
   async caps (opts: ParserOptions) {
     if (!opts.sender || immuneUsers.get('caps')?.has(String(opts.sender.userId))) {
       return true;
@@ -568,7 +568,7 @@ class Moderation extends System {
     return true;
   }
 
-  @parser({ priority: constants.MODERATION })
+  @parser({ priority: MODERATION })
   async spam (opts: ParserOptions) {
     if (!opts.sender || immuneUsers.get('spam')?.has(String(opts.sender.userId))) {
       return true;
@@ -611,7 +611,7 @@ class Moderation extends System {
     return true;
   }
 
-  @parser({ priority: constants.MODERATION })
+  @parser({ priority: MODERATION })
   async color (opts: ParserOptions) {
     if (!opts.sender || immuneUsers.get('color')?.has(String(opts.sender.userId))) {
       return true;
@@ -644,7 +644,7 @@ class Moderation extends System {
     }
   }
 
-  @parser({ priority: constants.MODERATION })
+  @parser({ priority: MODERATION })
   async emotes (opts: ParserOptions) {
     if (!opts.sender || immuneUsers.get('emotes')?.has(String(opts.sender.userId))) {
       return true;
@@ -690,7 +690,7 @@ class Moderation extends System {
     }
   }
 
-  @parser({ priority: constants.MODERATION })
+  @parser({ priority: MODERATION })
   async blacklist (opts: ParserOptions) {
     if (!opts.sender || immuneUsers.get('blacklist')?.has(String(opts.sender.userId))) {
       return true;

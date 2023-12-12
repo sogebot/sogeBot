@@ -1,9 +1,9 @@
 import { randomUUID } from 'node:crypto';
 
-import * as constants from '@sogebot/ui-helpers/constants.js';
 import { flatMap, sortBy, isFunction, isNil, orderBy } from 'lodash-es';
 
 import { getUserSender } from './helpers/commons/index.js';
+import { MODERATION } from './helpers/constants.js';
 import { list } from './helpers/register.js';
 import getBotId from './helpers/user/getBotId.js';
 import getBotUserName from './helpers/user/getBotUserName.js';
@@ -75,7 +75,7 @@ export class Parser {
     const parsers = await this.parsers();
     for (const parser of parsers) {
       const time = Date.now();
-      if (parser.priority !== constants.MODERATION) {
+      if (parser.priority !== MODERATION) {
         continue;
       } // skip non-moderation parsers
       debug('parser.process', 'Processing ' + parser.name);
@@ -127,7 +127,7 @@ export class Parser {
       parser:             this,
     };
 
-    for (const parser of parsers.filter(o => !o.fireAndForget && o.priority !== constants.MODERATION)) {
+    for (const parser of parsers.filter(o => !o.fireAndForget && o.priority !== MODERATION)) {
       if (
         !(this.skip && parser.skippable) // parser is not fully skippable
         && (isNil(this.sender) // if user is null -> we are running command through a bot

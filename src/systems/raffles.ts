@@ -2,7 +2,6 @@ import {
   Raffle, RaffleParticipant, RaffleParticipantInterface, RaffleParticipantMessageInterface,
 } from '@entity/raffle.js';
 import { User } from '@entity/user.js';
-import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized.js';
 import * as _ from 'lodash-es';
 import { IsNull } from 'typeorm';
 
@@ -26,6 +25,7 @@ import { tmiEmitter } from '~/helpers/tmi/index.js';
 import * as changelog from '~/helpers/user/changelog.js';
 import points from '~/systems/points.js';
 import { translate } from '~/translate.js';
+import { getLocalizedName } from '~/helpers/getLocalizedName.js';
 
 const TYPE_NORMAL = 0;
 const TYPE_TICKETS = 1;

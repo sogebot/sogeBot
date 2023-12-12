@@ -1,8 +1,8 @@
-import { timezone } from '@sogebot/ui-helpers/dayjsHelper.js';
 import {
   filter, isString, set,
 } from 'lodash-es';
 
+import { timezone } from './helpers/dayjsHelper.js';
 import { app } from './helpers/panel.js';
 
 import Core from '~/_interface.js';

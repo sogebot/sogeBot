@@ -1,9 +1,9 @@
-import * as constants from '@sogebot/ui-helpers/constants.js';
 import chalk from 'chalk';
 
 import { getChannelChatBadges } from '../calls/getChannelChatBadges.js';
 import { getChannelFollowers } from '../calls/getChannelFollowers.js';
 
+import { HOUR, MINUTE } from '~/helpers/constants.js';
 import {
   debug, error, warning,
 } from '~/helpers/log.js';
@@ -44,15 +44,15 @@ const functions = {
 } as const;
 
 export const init = () => {
-  addInterval('getChannelFollowers', constants.MINUTE);
-  addInterval('getCurrentStream', constants.MINUTE);
-  addInterval('updateBroadcasterType', constants.HOUR);
-  addInterval('getChannelSubscribers', 2 * constants.MINUTE);
-  addInterval('getChannelChatters', 5 * constants.MINUTE);
-  addInterval('getChannelChatBadges', 5 * constants.MINUTE);
-  addInterval('getChannelInformation', constants.MINUTE);
-  addInterval('checkClips', constants.MINUTE);
-  addInterval('getModerators', 10 * constants.MINUTE);
+  addInterval('getChannelFollowers', MINUTE);
+  addInterval('getCurrentStream', MINUTE);
+  addInterval('updateBroadcasterType', HOUR);
+  addInterval('getChannelSubscribers', 2 * MINUTE);
+  addInterval('getChannelChatters', 5 * MINUTE);
+  addInterval('getChannelChatBadges', 5 * MINUTE);
+  addInterval('getChannelInformation', MINUTE);
+  addInterval('checkClips', MINUTE);
+  addInterval('getModerators', 10 * MINUTE);
 };
 
 export const stop = () => {
@@ -98,7 +98,7 @@ const check = async () => {
               .then((data: any) => resolve(data))
               .catch((e: any) => reject(e));
           }),
-          new Promise((_resolve, reject) => setTimeout(() => reject(), 10 * constants.MINUTE)),
+          new Promise((_resolve, reject) => setTimeout(() => reject(), 10 * MINUTE)),
         ]);
         logAvgTime(`api.${fnc}()`, process.hrtime(time));
         debug('api.interval', chalk.yellow(fnc + '(time: ' + (Date.now() - time2 + ') ') + JSON.stringify(value)));

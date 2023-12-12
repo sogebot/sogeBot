@@ -1,11 +1,6 @@
 import { setTimeout } from 'timers'; // tslint workaround
-
-import { sample } from '@sogebot/ui-helpers/array.js';
-import { dayjs } from '@sogebot/ui-helpers/dayjsHelper.js';
-import { generateUsername } from '@sogebot/ui-helpers/generateUsername.js';
-import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized.js';
 import _, {
-  clone, cloneDeep, get, isNil, random,
+  clone, cloneDeep, get, isNil, random, sample,
 } from 'lodash-es';
 import { VM }  from 'vm2';
 
@@ -52,6 +47,9 @@ import { getCustomRewards } from '~/services/twitch/calls/getCustomRewards.js';
 import { getIdFromTwitch } from '~/services/twitch/calls/getIdFromTwitch.js';
 import { updateChannelInfo } from '~/services/twitch/calls/updateChannelInfo.js';
 import { variables } from '~/watchers.js';
+import { dayjs } from './helpers/dayjsHelper.js';
+import { generateUsername } from './helpers/generateUsername.js';
+import { getLocalizedName } from './helpers/getLocalizedName.js';
 
 const excludedUsers = new Set<string>();
 

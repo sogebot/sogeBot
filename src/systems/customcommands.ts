@@ -3,7 +3,6 @@ import { randomUUID } from 'node:crypto';
 import {
   Commands, CommandsGroup,
 } from '@entity/commands.js';
-import * as constants from '@sogebot/ui-helpers/constants.js';
 import { cloneDeep, orderBy, shuffle } from 'lodash-es';
 
 import System from './_interface.js';
@@ -27,6 +26,7 @@ import { defaultPermissions } from '~/helpers/permissions/defaultPermissions.js'
 import { get } from '~/helpers/permissions/get.js';
 import { adminMiddleware } from '~/socket.js';
 import { translate } from '~/translate.js';
+import { HIGHEST } from '~/helpers/constants.js';
 
 /*
  * !command                                                                            - gets an info about command usage
@@ -257,7 +257,7 @@ class CustomCommands extends System {
   }
 
   @timer()
-  @parser({ priority: constants.HIGHEST, fireAndForget: true })
+  @parser({ priority: HIGHEST, fireAndForget: true })
   async run (opts: ParserOptions & { quiet?: boolean, processedCommands?: string[] }): Promise<boolean> {
     if (!opts.message.startsWith('!') || !opts.sender) {
       return true;

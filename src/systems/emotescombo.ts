@@ -1,11 +1,10 @@
-import * as constants from '@sogebot/ui-helpers/constants.js';
-
 import System from './_interface.js';
 import { parserReply } from '../commons.js';
 import { parser, settings } from '../decorators.js';
 
 import { onStreamStart } from '~/decorators/on.js';
 import { prepare } from '~/helpers/commons/index.js';
+import { LOW, SECOND } from '~/helpers/constants.js';
 import { ioServer } from '~/helpers/panel.js';
 import { translate } from '~/translate.js';
 
@@ -40,7 +39,7 @@ class EmotesCombo extends System {
     this.comboLastBreak = 0;
   }
 
-  @parser({ priority: constants.LOW, fireAndForget: true })
+  @parser({ priority: LOW, fireAndForget: true })
   async containsEmotes (opts: ParserOptions) {
     if (!opts.sender || !this.enabled) {
       return true;
@@ -92,7 +91,7 @@ class EmotesCombo extends System {
       }
     }
 
-    if (Date.now() - this.comboLastBreak > this.comboCooldown * constants.SECOND) {
+    if (Date.now() - this.comboLastBreak > this.comboCooldown * SECOND) {
       const uniqueEmotes = Object.keys(usedEmotes);
       // we want to count only messages with emotes (skip text only)
       if (uniqueEmotes.length !== 0) {

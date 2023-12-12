@@ -1,10 +1,9 @@
 import {
-  DAY, HOUR, MINUTE, SECOND,
-} from '@sogebot/ui-helpers/constants.js';
-import {
   defaults, get, isNil,
 } from 'lodash-es';
 import XRegExp from 'xregexp';
+
+import { SECOND, MINUTE, HOUR, DAY } from './helpers/constants.js';
 
 import { debug } from '~/helpers/log.js';
 import { ParameterError } from '~/helpers/parameterError.js';

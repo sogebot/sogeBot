@@ -1,5 +1,4 @@
 import { User } from '@entity/user.js';
-import { getTime } from '@sogebot/ui-helpers/getTime.js';
 import axios from 'axios';
 import _ from 'lodash-es';
 import {
@@ -15,6 +14,7 @@ import {
   chatMessagesAtStart, isStreamOnline, stats, streamStatusChangeSince,
 } from '../api/index.js';
 import { mainCurrency, symbol } from '../currency/index.js';
+import { getTime } from '../getTime.js';
 import {
   debug, error, info, warning,
 } from '../log.js';

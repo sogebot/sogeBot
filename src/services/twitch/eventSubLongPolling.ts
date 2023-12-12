@@ -1,4 +1,3 @@
-import { MINUTE } from '@sogebot/ui-helpers/constants.js';
 import { EventSubChannelBanEventData } from '@twurple/eventsub-base/lib/events/EventSubChannelBanEvent.external';
 import { EventSubChannelCharityCampaignProgressEventData } from '@twurple/eventsub-base/lib/events/EventSubChannelCharityCampaignProgressEvent.external.js';
 import { EventSubChannelCharityCampaignStartEventData } from '@twurple/eventsub-base/lib/events/EventSubChannelCharityCampaignStartEvent.external.js';
@@ -37,6 +36,7 @@ import { isAlreadyProcessed } from './eventsub/events.js';
 import * as channelPoll from '~/helpers/api/channelPoll.js';
 import * as channelPrediction from '~/helpers/api/channelPrediction.js';
 import * as hypeTrain from '~/helpers/api/hypeTrain.js';
+import { MINUTE } from '~/helpers/constants.js';
 import { dayjs } from '~/helpers/dayjsHelper.js';
 import { cheer } from '~/helpers/events/cheer.js';
 import { follow } from '~/helpers/events/follow.js';

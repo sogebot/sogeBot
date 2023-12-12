@@ -1,10 +1,10 @@
 import { randomUUID } from 'node:crypto';
 
-import { shuffle } from '@sogebot/ui-helpers/array.js';
-import * as constants from '@sogebot/ui-helpers/constants.js';
 import axios from 'axios';
+import { shuffle } from 'lodash-es';
 
 import { onStartup } from './decorators/on.js';
+import { LOW } from './helpers/constants.js';
 import emitter from './helpers/interfaceEmitter.js';
 import { adminEndpoint, publicEndpoint } from './helpers/socket.js';
 import getBroadcasterId from './helpers/user/getBroadcasterId.js';
@@ -13,8 +13,7 @@ import twitch from './services/twitch.js';
 import Core from '~/_interface.js';
 import { parser, settings } from '~/decorators.js';
 import {
-  debug,
-  error, info, warning,
+  debug, error, info, warning,
 } from '~/helpers/log.js';
 import { ioServer } from '~/helpers/panel.js';
 import { setImmediateAwait } from '~/helpers/setImmediateAwait.js';
@@ -460,7 +459,7 @@ class Emotes extends Core {
     ioServer?.of('/services/twitch').emit('emote.explode', { emotes, id: randomUUID() });
   }
 
-  @parser({ priority: constants.LOW })
+  @parser({ priority: LOW })
   async containsEmotes (opts: ParserOptions) {
     if (!opts.sender) {
       return true;

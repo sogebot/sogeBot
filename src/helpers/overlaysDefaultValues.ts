@@ -1,5 +1,6 @@
-import { MINUTE, SECOND } from '@sogebot/ui-helpers/constants.js';
 import { defaultsDeep } from 'lodash-es';
+
+import { MINUTE, SECOND } from './constants.js';
 
 import { Overlay } from '~/database/entity/overlay.js';
 

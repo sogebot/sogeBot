@@ -1,10 +1,10 @@
 import { Randomizer as RandomizerEntity } from '@entity/randomizer.js';
-import { LOW } from '@sogebot/ui-helpers/constants.js';
 
 import Registry from './_interface.js';
 import { parser } from '../decorators.js';
 
 import { AppDataSource } from '~/database.js';
+import { LOW } from '~/helpers/constants.js';
 import { app } from '~/helpers/panel.js';
 import { check } from '~/helpers/permissions/check.js';
 import { adminMiddleware } from '~/socket.js';

@@ -3,9 +3,7 @@ import { Commands } from '@entity/commands.js';
 import { Cooldown } from '@entity/cooldown.js';
 import { Price } from '@entity/price.js';
 import { Rank } from '@entity/rank.js';
-import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized.js';
-import { format } from '@sogebot/ui-helpers/number.js';
-import _ from 'lodash-es';
+import { orderBy } from 'lodash-es';
 import { IsNull } from 'typeorm';
 
 import general from '../general.js';
@@ -14,8 +12,10 @@ import { Parser } from '../parser.js';
 import type { ResponseFilter } from './index.js';
 
 import { AppDataSource } from '~/database.js';
+import { getLocalizedName } from '~/helpers/getLocalizedName.js';
 import { enabled } from '~/helpers/interface/enabled.js';
 import { error, warning } from '~/helpers/log.js';
+import { format } from '~/helpers/number.js';
 import { get } from '~/helpers/permissions/get.js';
 import { getCommandPermission } from '~/helpers/permissions/getCommandPermission.js';
 import { getPointsName } from '~/helpers/points/index.js';
@@ -157,12 +157,12 @@ const list: ResponseFilter = {
         }).join(', ');
         return listOutput.length > 0 ? listOutput : ' ';
       case 'ranks':
-        listOutput = _.orderBy(ranks.filter((o: { type: string; }) => o.type === 'viewer'), 'value', 'asc').map((o) => {
+        listOutput = orderBy(ranks.filter((o: { type: string; }) => o.type === 'viewer'), 'value', 'asc').map((o) => {
           return `${o.rank} (${o.value}h)`;
         }).join(', ');
         return listOutput.length > 0 ? listOutput : ' ';
       case 'ranks.sub':
-        listOutput = _.orderBy(ranks.filter((o: { type: string; }) => o.type === 'subscriber'), 'value', 'asc').map((o) => {
+        listOutput = orderBy(ranks.filter((o: { type: string; }) => o.type === 'subscriber'), 'value', 'asc').map((o) => {
           return `${o.rank} (${o.value} ${getLocalizedName(o.value, translate('core.months'))})`;
         }).join(', ');
         return listOutput.length > 0 ? listOutput : ' ';

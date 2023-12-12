@@ -1,4 +1,3 @@
-import { MINUTE } from '@sogebot/ui-helpers/constants.js';
 import axios from 'axios';
 
 import Integration from './_interface.js';
@@ -8,6 +7,7 @@ import { settings } from '../decorators.js';
 import { isStreamOnline } from '~/helpers/api/index.js';
 import { announce, prepare } from '~/helpers/commons/index.js';
 import {  error } from '~/helpers/log.js';
+import { MINUTE } from '~/helpers/constants.js';
 
 let canSendRequests = true;
 

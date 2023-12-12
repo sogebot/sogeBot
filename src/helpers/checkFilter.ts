@@ -1,7 +1,6 @@
 import { existsSync, readFileSync } from 'fs';
 
 import { EventList } from '@entity/eventList.js';
-import { getTime } from '@sogebot/ui-helpers/getTime.js';
 import gitCommitInfo from 'git-commit-info';
 import _, { sortBy } from 'lodash-es';
 import { In } from 'typeorm';
@@ -9,6 +8,7 @@ import { VM } from 'vm2';
 
 import { isStreamOnline, stats } from './api/index.js';
 import { getAll } from './customvariables/index.js';
+import { getTime } from './getTime.js';
 import * as changelog from './user/changelog.js';
 import getNameById from './user/getNameById.js';
 import {

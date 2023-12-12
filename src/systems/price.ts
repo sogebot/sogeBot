@@ -1,6 +1,4 @@
 import { Price as PriceEntity } from '@entity/price.js';
-import * as constants from '@sogebot/ui-helpers/constants.js';
-import { format } from '@sogebot/ui-helpers/number.js';
 import * as _ from 'lodash-es';
 
 import System from './_interface.js';
@@ -21,6 +19,8 @@ import * as changelog from '~/helpers/user/changelog.js';
 import { isBroadcaster, isOwner } from '~/helpers/user/index.js';
 import { adminMiddleware } from '~/socket.js';
 import { translate } from '~/translate.js';
+import { format } from '~/helpers/number.js';
+import { HIGH } from '~/helpers/constants.js';
 
 /*
  * !price                     - gets an info about price usage
@@ -148,7 +148,7 @@ class Price extends System {
     return [{ response, ...opts }];
   }
 
-  @parser({ priority: constants.HIGH, skippable: true })
+  @parser({ priority: HIGH, skippable: true })
   async check (opts: ParserOptions): Promise<boolean> {
     const points = (await import('../systems/points.js')).default;
     const parsed = opts.message.match(/^(![\S]+)/);

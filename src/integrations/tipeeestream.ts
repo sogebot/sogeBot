@@ -1,5 +1,4 @@
 import { Currency, UserTip, UserTipInterface } from '@entity/user.js';
-import * as constants from '@sogebot/ui-helpers/constants.js';
 import fetch from 'node-fetch';
 
 import Integration from './_interface.js';
@@ -18,6 +17,7 @@ import rates from '~/helpers/currency/rates.js';
 import { eventEmitter } from '~/helpers/events/index.js';
 import { triggerInterfaceOnTip } from '~/helpers/interface/triggers.js';
 import { error, tip } from '~/helpers/log.js';
+import { MINUTE } from '~/helpers/constants.js';
 
 type TipeeestreamEvent = {
   message: string,
@@ -129,7 +129,7 @@ class TipeeeStream extends Integration {
         }
       }
 
-    }, constants.MINUTE);
+    }, MINUTE);
   }
 
   async parse(data: TipeeestreamEvent['datas']['items'][number]) {

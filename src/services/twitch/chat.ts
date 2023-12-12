@@ -1,9 +1,6 @@
 import util from 'util';
 
 import type { EmitData } from '@entity/overlay.js';
-import * as constants from '@sogebot/ui-helpers/constants.js';
-import { dayjs } from '@sogebot/ui-helpers/dayjsHelper.js';
-import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized.js';
 import {
   ChatClient, ChatCommunitySubInfo, ChatSubGiftInfo, ChatSubInfo, ChatUser,
 } from '@twurple/chat';
@@ -22,9 +19,12 @@ import {
 import { timer } from '~/decorators.js';
 import * as hypeTrain from '~/helpers/api/hypeTrain.js';
 import { sendMessage } from '~/helpers/commons/sendMessage.js';
+import { MINUTE, SECOND, DISCONNECTED, CONNECTED } from '~/helpers/constants.js';
+import { dayjs } from '~/helpers/dayjsHelper.js';
 import { isDebugEnabled } from '~/helpers/debug.js';
 import { eventEmitter } from '~/helpers/events/index.js';
 import { subscription } from '~/helpers/events/subscription.js';
+import { getLocalizedName } from '~/helpers/getLocalizedName.js';
 import {
   triggerInterfaceOnMessage, triggerInterfaceOnSub,
 } from '~/helpers/interface/triggers.js';
@@ -84,7 +84,7 @@ class Chat {
         info(`TMI: Found broadcaster disconnected from TMI, reconnecting.`);
         this.client.broadcaster.reconnect();
       }
-    }, constants.MINUTE);
+    }, MINUTE);
   }
 
   emitter() {
@@ -158,7 +158,7 @@ class Chat {
 
     // wait for initial validation
     if (!isValidToken || channel.length === 0) {
-      this.timeouts[`initClient.${type}`] = setTimeout(() => this.initClient(type), 10 * constants.SECOND);
+      this.timeouts[`initClient.${type}`] = setTimeout(() => this.initClient(type), 10 * SECOND);
       return;
     }
 
@@ -188,7 +188,7 @@ class Chat {
       await this.client[type]?.connect();
       setTimeout(() => {
         this.join(type, channel);
-      }, 5 * constants.SECOND);
+      }, 5 * SECOND);
     } catch (e: any) {
       error(e.stack);
       if (type === 'broadcaster' && !this.broadcasterWarning) {
@@ -238,7 +238,7 @@ class Chat {
       if (channel === '') {
         info(`TMI: ${type} is not properly set, cannot join empty channel`);
         if (type ==='bot') {
-          setStatus('TMI', constants.DISCONNECTED);
+          setStatus('TMI', DISCONNECTED);
         }
       } else {
         try {
@@ -246,13 +246,13 @@ class Chat {
         } catch (e: unknown) {
           if (e instanceof Error) {
             warning('TMI: ' + e.message + ' for ' + type);
-            setTimeout(() => this.initClient(type), constants.SECOND * 5);
+            setTimeout(() => this.initClient(type), SECOND * 5);
             return;
           }
         }
         info(`TMI: ${type} joined channel ${channel}`);
         if (type ==='bot') {
-          setStatus('TMI', constants.CONNECTED);
+          setStatus('TMI', CONNECTED);
         }
 
         emitter.emit('set', '/services/twitch', 'broadcasterUsername', channel);
@@ -286,7 +286,7 @@ class Chat {
     client.onPart((channel, user) => {
       if (isBot(user)) {
         info(`TMI: ${type} is disconnected from channel`);
-        setStatus('TMI', constants.DISCONNECTED);
+        setStatus('TMI', DISCONNECTED);
         for (const event of getFunctionList('partChannel')) {
           (this as any)[event.fName]();
         }
@@ -298,7 +298,7 @@ class Chat {
     });
 
     client.irc.onDisconnect((manually, reason) => {
-      setStatus('TMI', constants.DISCONNECTED);
+      setStatus('TMI', DISCONNECTED);
       if (manually) {
         reason = new Error('Disconnected manually by user');
       }
@@ -308,12 +308,12 @@ class Chat {
     });
 
     client.irc.onConnect(() => {
-      setStatus('TMI', constants.CONNECTED);
+      setStatus('TMI', CONNECTED);
       info(`TMI: ${type} is connected`);
     });
 
     client.onJoin(async () => {
-      setStatus('TMI', constants.CONNECTED);
+      setStatus('TMI', CONNECTED);
       for (const event of getFunctionList('joinChannel')) {
         (this as any)[event.fName]();
       }

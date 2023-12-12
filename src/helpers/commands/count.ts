@@ -1,5 +1,6 @@
 import { CommandsCount } from '@entity/commands.js';
-import { MINUTE } from '@sogebot/ui-helpers/constants.js';
+
+import { MINUTE } from '../constants.js';
 
 import { AppDataSource } from '~/database.js';
 

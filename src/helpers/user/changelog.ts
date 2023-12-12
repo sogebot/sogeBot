@@ -1,7 +1,6 @@
 import { randomUUID } from 'node:crypto';
 
 import { User, UserInterface } from '@entity/user.js';
-import { MINUTE } from '@sogebot/ui-helpers/constants.js';
 import {
   get as _get, cloneDeep, merge, set,
 } from 'lodash-es';
@@ -11,6 +10,7 @@ import { flatten } from '../flatten.js';
 import { debug, error } from '../log.js';
 
 import { AppDataSource } from '~/database.js';
+import { MINUTE } from '../constants.js';
 
 const changelog: (Partial<UserInterface> & { userId: string, changelogType: 'set' | 'increment' })[] = [];
 const lock = new Map<string, boolean>();

@@ -1,6 +1,5 @@
 // bot libraries
 
-import { HOUR, MINUTE } from '@sogebot/ui-helpers/constants.js';
 import axios from 'axios';
 import { escapeRegExp } from 'lodash-es';
 
@@ -13,6 +12,7 @@ import { Expects } from  '../expects.js';
 import { Message } from  '../message.js';
 
 import { prepare } from '~/helpers/commons/index.js';
+import { HOUR, MINUTE } from '~/helpers/constants.js';
 import { flatten } from '~/helpers/flatten.js';
 import { error, info } from '~/helpers/log.js';
 import { adminEndpoint } from '~/helpers/socket.js';

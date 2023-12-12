@@ -1,13 +1,13 @@
 import { existsSync, readdirSync, readFileSync, writeFileSync } from 'fs';
 
-import { HOUR, MINUTE } from '@sogebot/ui-helpers/constants.js';
-import { setLocale } from '@sogebot/ui-helpers/dayjsHelper.js';
 import gitCommitInfo from 'git-commit-info';
 import {
   capitalize,
   get, isNil,
 } from 'lodash-es';
 
+import { HOUR, MINUTE } from './helpers/constants.js';
+import { setLocale } from './helpers/dayjsHelper.js';
 import { menu } from './helpers/panel.js';
 import type { Command } from '../d.ts/src/general.js';
 

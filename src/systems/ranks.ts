@@ -1,6 +1,5 @@
 import { Rank } from '@entity/rank.js';
 import { User, UserInterface } from '@entity/user.js';
-import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized.js';
 import * as _ from 'lodash-es';
 
 import System from './_interface.js';
@@ -9,6 +8,7 @@ import users from '../users.js';
 
 import { AppDataSource } from '~/database.js';
 import { prepare } from '~/helpers/commons/index.js';
+import { getLocalizedName } from '~/helpers/getLocalizedName.js';
 import { app } from '~/helpers/panel.js';
 import defaultPermissions from '~/helpers/permissions/defaultPermissions.js';
 import * as changelog from '~/helpers/user/changelog.js';

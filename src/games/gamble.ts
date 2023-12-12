@@ -1,4 +1,3 @@
-import { format } from '@sogebot/ui-helpers/number.js';
 import {
   get, isNil, random, set,
 } from 'lodash-es';
@@ -12,6 +11,7 @@ import users from '../users.js';
 
 import { prepare } from '~/helpers/commons/index.js';
 import { error } from '~/helpers/log.js';
+import { format } from '~/helpers/number.js';
 import { getUserHighestPermission } from '~/helpers/permissions/getUserHighestPermission.js';
 import { getPointsName } from '~/helpers/points/index.js';
 import * as changelog from '~/helpers/user/changelog.js';

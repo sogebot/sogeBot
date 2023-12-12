@@ -1,9 +1,9 @@
 import { Overlay as OverlayEntity } from '@entity/overlay.js';
-import { MINUTE, SECOND } from '@sogebot/ui-helpers/constants.js';
 
 import Overlay from './_interface.js';
 
 import { AppDataSource } from '~/database.js';
+import { MINUTE, SECOND } from '~/helpers/constants.js';
 import { app } from '~/helpers/panel.js';
 import { adminEndpoint, publicEndpoint } from '~/helpers/socket.js';
 import { adminMiddleware } from '~/socket.js';

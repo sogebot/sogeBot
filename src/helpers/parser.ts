@@ -1,4 +1,4 @@
-import * as constants from '@sogebot/ui-helpers/constants.js';
+import { DISCONNECTED } from './constants.js';
 
 export let linesParsed = 0;
 export const linesParsedIncrement = () => {
@@ -6,8 +6,8 @@ export const linesParsedIncrement = () => {
 };
 
 export const status = {
-  TMI: constants.DISCONNECTED,
-  API: constants.DISCONNECTED,
+  TMI: DISCONNECTED,
+  API: DISCONNECTED,
   MOD: false,
 };
 

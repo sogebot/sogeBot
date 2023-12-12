@@ -1,8 +1,6 @@
 import { parse, normalize } from 'path';
 
-import * as constants from '@sogebot/ui-helpers/constants.js';
-import * as _ from 'lodash-es';
-import { xor } from 'lodash-es';
+import { xor, set, cloneDeep } from 'lodash-es';
 
 import type { Module } from '~/_interface.js';
 import { isDbConnected } from '~/helpers/database.js';
@@ -13,6 +11,7 @@ import {
 import { defaultPermissions } from '~/helpers/permissions/defaultPermissions.js';
 import { find, systems } from '~/helpers/register.js';
 import { VariableWatcher } from '~/watchers.js';
+import { MEDIUM } from './helpers/constants.js';
 
 export let loadingInProgress: (string|symbol)[] = [];
 export let areDecoratorsLoaded = false;
@@ -93,7 +92,7 @@ export function ui(opts: any, category?: string) {
             }
           }
         }
-        _.set(self, '_ui.' + path, opts);
+        set(self, '_ui.' + path, opts);
       } catch (e: any) {
         error(e);
       }
@@ -132,7 +131,7 @@ export function example(opts: (string|{if?: string, message: string, replace: { 
             }
           }
         }
-        _.set(self, '_ui.' + path, opts);
+        set(self, '_ui.' + path, opts);
       } catch (e: any) {
         error(e);
       }
@@ -174,17 +173,17 @@ export function settings(category?: string, isReadOnly = false) {
             self.loadVariableValue(key).then((value) => {
               if (typeof value !== 'undefined') {
                 VariableWatcher.add(path, value, isReadOnly); // rewrite value on var load
-                _.set(self, key, value);
-                emitter.emit('load', path, _.cloneDeep(value));
+                set(self, key, value);
+                emitter.emit('load', path, cloneDeep(value));
               } else {
-                emitter.emit('load', path, _.cloneDeep((self as any)[key]));
+                emitter.emit('load', path, cloneDeep((self as any)[key]));
               }
               loadingInProgress = loadingInProgress.filter(o => o !== path);
             });
           };
           setTimeout(() => loadVariableValue(), 5000);
         } else {
-          emitter.emit('load', path, _.cloneDeep((self as any)[key]));
+          emitter.emit('load', path, cloneDeep((self as any)[key]));
         }
 
         // add variable to settingsList
@@ -222,7 +221,7 @@ export function permission_settings(category?: string, exclude: string[] = [], e
           throw new Error(`${type}.${name} not found in list`);
         }
 
-        _.set(self, '__permission_based__' + key, {}); // set init value
+        set(self, '__permission_based__' + key, {}); // set init value
         VariableWatcher.add(`${type}.${name}.__permission_based__${key}`, {}, false);
 
         // load variable from db
@@ -251,7 +250,7 @@ export function permission_settings(category?: string, exclude: string[] = [], e
             }
 
             VariableWatcher.add(`${type}.${name}.__permission_based__${key}`, value, false);
-            _.set(self, '__permission_based__' + key, value);
+            set(self, '__permission_based__' + key, value);
             loadingInProgress = loadingInProgress.filter(o => o !== `${type}.${name}.${key}`);
           });
         };
@@ -293,10 +292,10 @@ export function persistent() {
           self.loadVariableValue(key).then((value) => {
             if (typeof value !== 'undefined') {
               VariableWatcher.add(path, value, false); // rewrite value on var load
-              emitter.emit('load', path, _.cloneDeep(value));
-              _.set(self, key, value);
+              emitter.emit('load', path, cloneDeep(value));
+              set(self, key, value);
             } else {
-              emitter.emit('load', path, _.cloneDeep((self as any)[key]));
+              emitter.emit('load', path, cloneDeep((self as any)[key]));
             }
             loadingInProgress = loadingInProgress.filter(o => o !== path);
           });
@@ -313,7 +312,7 @@ export function persistent() {
 }
 
 export function parser(
-  { skippable = false, fireAndForget = false, permission = defaultPermissions.VIEWERS, priority = constants.MEDIUM, dependsOn = [] }:
+  { skippable = false, fireAndForget = false, permission = defaultPermissions.VIEWERS, priority = MEDIUM, dependsOn = [] }:
   { skippable?: boolean; fireAndForget?: boolean; permission?: string; priority?: number; dependsOn?: import('~/_interface').Module[] } = {}) {
   const { name, type } = getNameAndTypeFromStackTrace();
 

@@ -2,9 +2,10 @@
 
 import { error } from 'console';
 
-import { DAY, MINUTE } from '@sogebot/ui-helpers/constants.js';
 import { get, isNil } from 'lodash-es';
 import { LessThan } from 'typeorm';
+
+import { DAY, MINUTE } from './helpers/constants.js';
 
 import Core from '~/_interface.js';
 import { TwitchStats, TwitchStatsInterface } from '~/database/entity/twitch.js';

@@ -1,10 +1,9 @@
-import { dayjs } from '@sogebot/ui-helpers/dayjsHelper.js';
-
 import { isStreamOnline, streamId, streamStatusChangeSince, streamType } from '~/helpers/api/index.js';
 import {
   stats as apiStats, chatMessagesAtStart,
 } from '~/helpers/api/index.js';
 import * as stream from '~/helpers/core/stream.js';
+import { dayjs } from '~/helpers/dayjsHelper';
 import { isDebugEnabled } from '~/helpers/debug.js';
 import { eventEmitter } from '~/helpers/events/index.js';
 import { getFunctionName } from '~/helpers/getFunctionName.js';

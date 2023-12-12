@@ -1,5 +1,4 @@
 import { HeistUser } from '@entity/heist.js';
-import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized.js';
 import _ from 'lodash-es';
 
 import Game from './_interface.js';
@@ -10,6 +9,7 @@ import twitch from '../services/twitch.js';
 
 import { AppDataSource } from '~/database.js';
 import { announce, prepare } from '~/helpers/commons/index.js';
+import { getLocalizedName } from '~/helpers/getLocalizedName.js';
 import { debug, warning } from '~/helpers/log.js';
 import * as changelog from '~/helpers/user/changelog.js';
 import { translate } from '~/translate.js';

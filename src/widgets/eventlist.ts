@@ -1,14 +1,14 @@
-import type { EmitData } from '@entity/overlay.js';
 import { EventList as EventListDB } from '@entity/eventList.js';
+import type { EmitData } from '@entity/overlay.js';
 import { UserTip } from '@entity/user.js';
-import { SECOND } from '@sogebot/ui-helpers/constants.js';
-import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized.js';
 import { Between } from 'typeorm';
 
 import Widget from './_interface.js';
 import alerts from '../registries/alerts.js';
 
 import { AppDataSource } from '~/database.js';
+import { SECOND } from '~/helpers/constants.js';
+import { getLocalizedName } from '~/helpers/getLocalizedName.js';
 import { error } from '~/helpers/log.js';
 import { adminEndpoint } from '~/helpers/socket.js';
 import getNameById from '~/helpers/user/getNameById.js';

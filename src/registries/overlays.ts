@@ -1,5 +1,3 @@
-import { SECOND } from '@sogebot/ui-helpers/constants.js';
-
 import Registry from './_interface.js';
 import { Message } from  '../message.js';
 
@@ -10,6 +8,7 @@ import { executeVariablesInText } from '~/helpers/customvariables/executeVariabl
 import { isBotStarted } from '~/helpers/database.js';
 import defaultValues from '~/helpers/overlaysDefaultValues.js';
 import { adminEndpoint, publicEndpoint } from '~/helpers/socket.js';
+import { SECOND } from '~/helpers/constants.js';
 
 const ticks: string[] = [];
 

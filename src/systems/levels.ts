@@ -1,6 +1,4 @@
 import { User, UserInterface } from '@entity/user.js';
-import { MINUTE, SECOND } from '@sogebot/ui-helpers/constants.js';
-import { format } from '@sogebot/ui-helpers/number.js';
 import { evaluate as mathJsEvaluate, round } from 'mathjs';
 
 import System from './_interface.js';
@@ -29,6 +27,8 @@ import {
 import * as changelog from '~/helpers/user/changelog.js';
 import { isBotId } from '~/helpers/user/isBot.js';
 import { translate } from '~/translate.js';
+import { MINUTE, SECOND } from '~/helpers/constants.js';
+import { format } from '~/helpers/number.js';
 
 let cachedLevelsHash = '';
 const cachedLevels: bigint[] = [];

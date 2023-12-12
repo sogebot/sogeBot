@@ -1,9 +1,9 @@
 import { Price } from '@entity/price.js';
-import { format } from '@sogebot/ui-helpers/number.js';
 
 import type { ResponseFilter } from './index.js';
 
 import { AppDataSource } from '~/database.js';
+import { format } from '~/helpers/number.js';
 import { getPointsName } from '~/helpers/points/index.js';
 
 const price: ResponseFilter = {

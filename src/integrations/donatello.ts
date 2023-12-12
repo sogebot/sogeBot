@@ -1,5 +1,4 @@
 import { Currency, UserTip, UserTipInterface } from '@entity/user.js';
-import * as constants from '@sogebot/ui-helpers/constants.js';
 import axios from 'axios';
 
 import Integration from './_interface.js';
@@ -19,6 +18,7 @@ import { triggerInterfaceOnTip } from '~/helpers/interface/triggers.js';
 import {
   error, tip,
 } from '~/helpers/log.js';
+import { MINUTE } from '~/helpers/constants.js';
 
 type DonatelloResponse = {
   content: {
@@ -102,7 +102,7 @@ class Donatello extends Integration {
         error('DONATELLO: Something wrong during tips fetch.');
         error(e);
       }
-    }, constants.MINUTE);
+    }, MINUTE);
   }
 
   async parse(data: DonatelloResponse['content'][number], isAnonymous = false): Promise<void> {

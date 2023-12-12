@@ -1,10 +1,11 @@
 import { EventList } from '@entity/eventList.js';
 import { UserBit, UserTip } from '@entity/user.js';
-import { DAY, HOUR } from '@sogebot/ui-helpers/constants.js';
-import { AppDataSource } from '~/database.js';
 import { In, MoreThanOrEqual } from 'typeorm';
 
 import type { ResponseFilter } from './index.js';
+
+import { AppDataSource } from '~/database.js';
+import { DAY, HOUR } from '~/helpers/constants.js';
 
 const time: Record<string, number> = {
   'hour':  HOUR,

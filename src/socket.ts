@@ -1,10 +1,11 @@
 import { randomUUID } from 'node:crypto';
 
-import { DAY } from '@sogebot/ui-helpers/constants.js';
 import axios from 'axios';
 import { NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import { Socket as SocketIO } from 'socket.io';
+
+import { DAY } from './helpers/constants.js';
 
 import Core from '~/_interface.js';
 import { onLoad } from '~/decorators/on.js';

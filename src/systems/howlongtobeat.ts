@@ -1,6 +1,5 @@
 import { CacheGames } from '@entity/cacheGames.js';
 import { HowLongToBeatGame } from '@entity/howLongToBeatGame.js';
-import * as constants from '@sogebot/ui-helpers/constants.js';
 import { HowLongToBeatService } from 'howlongtobeat';
 import { EntityNotFoundError } from 'typeorm';
 
@@ -14,6 +13,7 @@ import {
   isStreamOnline, stats, streamStatusChangeSince,
 } from '~/helpers/api/index.js';
 import { prepare } from '~/helpers/commons/index.js';
+import { MINUTE, HOUR, DAY } from '~/helpers/constants.js';
 import {
   debug, error,
 } from '~/helpers/log.js';
@@ -22,7 +22,7 @@ import defaultPermissions from '~/helpers/permissions/defaultPermissions.js';
 import { adminMiddleware } from '~/socket.js';
 
 class HowLongToBeat extends System {
-  interval: number = constants.MINUTE;
+  interval: number = MINUTE;
   hltbService = new HowLongToBeatService();
 
   @onStartup()
@@ -33,7 +33,7 @@ class HowLongToBeat extends System {
 
     setInterval(() => {
       this.updateGameplayTimes();
-    }, constants.HOUR);
+    }, HOUR);
 
     let lastDbgMessage = '';
     setInterval(async () => {
@@ -53,7 +53,7 @@ class HowLongToBeat extends System {
 
     for (const game of games) {
       try {
-        if (Date.now() - new Date(game.updatedAt!).getTime() < constants.DAY) {
+        if (Date.now() - new Date(game.updatedAt!).getTime() < DAY) {
           throw new Error('Updated recently');
         }
 
@@ -240,9 +240,9 @@ class HowLongToBeat extends System {
     } else if (!gameToShow) {
       return [{ response: prepare('systems.howlongtobeat.error', { game: gameInput }), ...opts }];
     }
-    const timeToBeatMain = (gameToShow.streams.filter(o => o.isMainCounted).reduce((prev, cur) => prev += cur.timestamp + cur.offset , 0) + gameToShow.offset) / constants.HOUR;
-    const timeToBeatMainExtra = (gameToShow.streams.filter(o => o.isExtraCounted).reduce((prev, cur) => prev += cur.timestamp + cur.offset, 0) + gameToShow.offset) / constants.HOUR;
-    const timeToBeatCompletionist = (gameToShow.streams.filter(o => o.isCompletionistCounted).reduce((prev, cur) => prev += cur.timestamp + cur.offset, 0) + gameToShow.offset) / constants.HOUR;
+    const timeToBeatMain = (gameToShow.streams.filter(o => o.isMainCounted).reduce((prev, cur) => prev += cur.timestamp + cur.offset , 0) + gameToShow.offset) / HOUR;
+    const timeToBeatMainExtra = (gameToShow.streams.filter(o => o.isExtraCounted).reduce((prev, cur) => prev += cur.timestamp + cur.offset, 0) + gameToShow.offset) / HOUR;
+    const timeToBeatCompletionist = (gameToShow.streams.filter(o => o.isCompletionistCounted).reduce((prev, cur) => prev += cur.timestamp + cur.offset, 0) + gameToShow.offset) / HOUR;
 
     const gameplayMain = gameToShow.gameplayMain;
     const gameplayMainExtra = gameToShow.gameplayMainExtra;

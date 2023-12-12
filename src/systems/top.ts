@@ -1,7 +1,4 @@
 import { User } from '@entity/user.js';
-import { dayjs } from '@sogebot/ui-helpers/dayjsHelper.js';
-import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized.js';
-import { format } from '@sogebot/ui-helpers/number.js';
 import _ from 'lodash-es';
 
 import System from './_interface.js';
@@ -12,7 +9,10 @@ import general from '../general.js';
 
 import { AppDataSource } from '~/database.js';
 import { mainCurrency } from '~/helpers/currency/index.js';
+import { dayjs } from '~/helpers/dayjsHelper.js';
+import { getLocalizedName } from '~/helpers/getLocalizedName.js';
 import { debug } from '~/helpers/log.js';
+import { format } from '~/helpers/number.js';
 import defaultPermissions from '~/helpers/permissions/defaultPermissions.js';
 import { getPointsName } from '~/helpers/points/index.js';
 import { unserialize } from '~/helpers/type.js';

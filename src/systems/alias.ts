@@ -1,5 +1,4 @@
 import { Alias as AliasEntity, AliasGroup } from '@entity/alias.js';
-import * as constants from '@sogebot/ui-helpers/constants.js';
 import * as _ from 'lodash-es';
 import { merge } from 'lodash-es';
 
@@ -25,6 +24,7 @@ import { get } from '~/helpers/permissions/get.js';
 import { adminEndpoint } from '~/helpers/socket.js';
 import customCommands from '~/systems/customcommands.js';
 import { translate } from '~/translate.js';
+import { HIGH } from '~/helpers/constants.js';
 
 /*
  * !alias                                              - gets an info about alias usage
@@ -144,7 +144,7 @@ class Alias extends System {
   }
 
   @timer()
-  @parser({ priority: constants.HIGH, fireAndForget: true })
+  @parser({ priority: HIGH, fireAndForget: true })
   async run (opts: ParserOptions): Promise<boolean> {
     const alias = (await this.search(opts))[0];
     if (!alias || !opts.sender) {

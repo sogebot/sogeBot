@@ -1,11 +1,10 @@
-import { getTime } from '@sogebot/ui-helpers/getTime.js';
-
 import {
   chatMessagesAtStart, isStreamOnline, stats, streamStatusChangeSince,
 } from '~/helpers/api/index.js';
 import { getGlobalVariables } from '~/helpers/checkFilter.js';
 import { mainCurrency, symbol } from '~/helpers/currency/index.js';
 import { flatten } from '~/helpers/flatten.js';
+import { getTime } from '~/helpers/getTime';
 import { linesParsed } from '~/helpers/parser.js';
 import { showWithAt } from '~/helpers/tmi/index.js';
 

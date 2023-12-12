@@ -1,10 +1,9 @@
 import { EventList } from '@entity/eventList.js';
 import { Goal, Overlay } from '@entity/overlay.js';
 import { UserBit, UserTip } from '@entity/user.js';
-import { MINUTE } from '@sogebot/ui-helpers/constants.js';
-import * as constants from '@sogebot/ui-helpers/constants.js';
 import { In, MoreThanOrEqual } from 'typeorm';
 
+import { HOUR, DAY, MINUTE } from '../constants.js';
 import { mainCurrency } from '../currency/index.js';
 import { isBotStarted } from '../database.js';
 
@@ -14,11 +13,11 @@ import exchange from '~/helpers/currency/exchange.js';
 export const types = ['bits', 'tips', 'followers', 'subscribers'] as const;
 
 const interval = {
-  'hour':  constants.HOUR,
-  'day':   constants.DAY,
-  'week':  7 * constants.DAY,
-  'month': 31 * constants.DAY,
-  'year':  365 * constants.DAY,
+  'hour':  HOUR,
+  'day':   DAY,
+  'week':  7 * DAY,
+  'month': 31 * DAY,
+  'year':  365 * DAY,
 } as const;
 
 export async function recountIntervals() {

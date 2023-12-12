@@ -1,8 +1,8 @@
 import { EventList } from '@entity/eventList.js';
-import { HOUR } from '@sogebot/ui-helpers/constants.js';
 
 import eventlist from '../../overlays/eventlist.js';
 import alerts from '../../registries/alerts.js';
+import { HOUR } from '../constants.js';
 import { triggerInterfaceOnFollow } from '../interface/index.js';
 import { debug, follow as followLog } from '../log.js';
 import {

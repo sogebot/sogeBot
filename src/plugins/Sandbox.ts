@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/ban-ts-comment */
-import { getTime } from '@sogebot/ui-helpers/getTime.js';
 import axios, { AxiosRequestConfig } from 'axios';
 import ts from 'typescript';
 
@@ -16,6 +14,7 @@ import { chatMessagesAtStart, isStreamOnline, stats } from '~/helpers/api/index.
 import { streamStatusChangeSince } from '~/helpers/api/streamStatusChangeSince.js';
 import { getUserSender } from '~/helpers/commons/index.js';
 import { mainCurrency, symbol } from '~/helpers/currency/index.js';
+import { getTime } from '~/helpers/getTime.js';
 import emitter from '~/helpers/interfaceEmitter.js';
 import { debug, info } from '~/helpers/log.js';
 import { linesParsed } from '~/helpers/parser.js';

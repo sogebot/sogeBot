@@ -1,9 +1,6 @@
 import {
   User, UserBit, UserTip,
 } from '@entity/user.js';
-import { dayjs, timezone } from '@sogebot/ui-helpers/dayjsHelper.js';
-import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized.js';
-import { format } from '@sogebot/ui-helpers/number.js';
 
 import System from './_interface.js';
 import levels from './levels.js';
@@ -22,7 +19,10 @@ import { AppDataSource } from '~/database.js';
 import { prepare } from '~/helpers/commons/index.js';
 import exchange from '~/helpers/currency/exchange.js';
 import { mainCurrency } from '~/helpers/currency/index.js';
+import { dayjs, timezone } from '~/helpers/dayjsHelper.js';
+import { getLocalizedName } from '~/helpers/getLocalizedName.js';
 import { error } from '~/helpers/log.js';
+import { format } from '~/helpers/number.js';
 import { get } from '~/helpers/permissions/get.js';
 import { getUserHighestPermission } from '~/helpers/permissions/getUserHighestPermission.js';
 import { getPointsName } from '~/helpers/points/index.js';

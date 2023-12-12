@@ -2,7 +2,6 @@ import {
   Cooldown as CooldownEntity,
 } from '@entity/cooldown.js';
 import { Keyword } from '@entity/keyword.js';
-import * as constants from '@sogebot/ui-helpers/constants.js';
 import _, { merge } from 'lodash-es';
 import { In } from 'typeorm';
 
@@ -28,6 +27,7 @@ import { adminMiddleware } from '~/socket.js';
 import alias from '~/systems/alias.js';
 import customCommands from '~/systems/customcommands.js';
 import { translate } from '~/translate.js';
+import { HIGH, HOUR } from '~/helpers/constants.js';
 
 const cache: { id: string; cooldowns: CooldownEntity[] }[] = [];
 const defaultCooldowns: { name: string; lastRunAt: number, permId: string }[] = [];
@@ -37,7 +37,7 @@ setInterval(async () => {
   for (const cooldown of await CooldownEntity.find()) {
     viewers = viewers.filter(o => (Date.now() + o.timestamp < cooldown.miliseconds && o.cooldownId === cooldown.id) || o.cooldownId !== cooldown.id);
   }
-}, constants.HOUR);
+}, HOUR);
 
 /*
  * !cooldown set [keyword|!command|g:group] [global|user] [seconds] [true/false] - set cooldown for keyword or !command, true/false set quiet mode
@@ -182,7 +182,7 @@ class Cooldown extends System {
     }
   }
 
-  @parser({ priority: constants.HIGH, skippable: true })
+  @parser({ priority: HIGH, skippable: true })
   async check (opts: ParserOptions): Promise<boolean> {
     try {
       if (!opts.sender) {

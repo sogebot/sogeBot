@@ -1,10 +1,10 @@
 import { randomUUID } from 'crypto';
 
-import { MINUTE } from '@sogebot/ui-helpers/constants.js';
 import { JWT } from 'google-auth-library';
 import { google } from 'googleapis';
 
 import { TTSService } from './database/entity/overlay.js';
+import { MINUTE } from './helpers/constants.js';
 
 import Core from '~/_interface.js';
 import { GooglePrivateKeys } from '~/database/entity/google.js';

@@ -1,6 +1,5 @@
-import { SECOND } from '@sogebot/ui-helpers/constants.js';
-
 import { Plugin, PluginVariable } from './database/entity/plugins.js';
+import { SECOND } from './helpers/constants.js';
 import { eventEmitter } from './helpers/events/index.js';
 import { debug, error } from './helpers/log.js';
 import { app } from './helpers/panel.js';

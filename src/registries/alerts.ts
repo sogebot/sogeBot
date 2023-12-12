@@ -1,5 +1,4 @@
 import { EmitData } from '@entity/overlay.js';
-import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized.js';
 
 import Registry from './_interface.js';
 import { command, default_permission, example, persistent, settings } from '../decorators.js';
@@ -12,6 +11,7 @@ import { AppDataSource } from '~/database.js';
 import { Expects } from  '~/expects.js';
 import { prepare } from '~/helpers/commons/index.js';
 import { eventEmitter } from '~/helpers/events/emitter.js';
+import { getLocalizedName } from '~/helpers/getLocalizedName.js';
 import { debug, info, error } from '~/helpers/log.js';
 import { app, ioServer } from '~/helpers/panel.js';
 import { defaultPermissions } from '~/helpers/permissions/defaultPermissions.js';

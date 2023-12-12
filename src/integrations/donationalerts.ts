@@ -1,5 +1,4 @@
 import { Currency, UserTip, UserTipInterface } from '@entity/user.js';
-import * as constants from '@sogebot/ui-helpers/constants.js';
 import axios from 'axios';
 import chalk from 'chalk';
 
@@ -12,6 +11,7 @@ import users from '../users.js';
 
 import { AppDataSource } from '~/database.js';
 import { isStreamOnline, stats } from '~/helpers/api/index.js';
+import { SECOND } from '~/helpers/constants.js';
 import exchange from '~/helpers/currency/exchange.js';
 import { mainCurrency } from '~/helpers/currency/index.js';
 import rates from '~/helpers/currency/rates.js';
@@ -116,7 +116,7 @@ class Donationalerts extends Integration {
       } catch (e) {
         this.refresh();
       }
-    }, 10 * constants.SECOND);
+    }, 10 * SECOND);
   }
 
   refresh() {

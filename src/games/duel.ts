@@ -1,7 +1,5 @@
 import { Duel as DuelEntity, DuelInterface } from '@entity/duel.js';
-import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized.js';
-import { format } from '@sogebot/ui-helpers/number.js';
-import _ from 'lodash-es';
+import { isNil, random, round } from 'lodash-es';
 
 import Game from './_interface.js';
 import { onStartup } from '../decorators/on.js';
@@ -13,7 +11,9 @@ import general from '../general.js';
 import { AppDataSource } from '~/database.js';
 import { announce, prepare } from '~/helpers/commons/index.js';
 import { isDbConnected } from '~/helpers/database.js';
+import { getLocalizedName } from '~/helpers/getLocalizedName.js';
 import { error } from '~/helpers/log.js';
+import { format } from '~/helpers/number.js';
 import { getPointsName } from '~/helpers/points/index.js';
 import * as changelog from '~/helpers/user/changelog.js';
 import { isBroadcaster } from '~/helpers/user/isBroadcaster.js';
@@ -75,7 +75,7 @@ class Duel extends Game {
       return;
     }
 
-    let winner = _.random(0, total, false);
+    let winner = random(0, total, false);
     let winnerUser: Required<DuelInterface> | undefined;
     for (const user of users) {
       winner = winner - user.tickets;
@@ -91,7 +91,7 @@ class Duel extends Game {
       const m = prepare(users.length === 1 ? 'gambling.duel.noContestant' : 'gambling.duel.winner', {
         pointsName:  getPointsName(total),
         points:      format(general.numberFormat, 0)(total),
-        probability: _.round(probability, 2),
+        probability: round(probability, 2),
         ticketsName: getPointsName(winnerUser.tickets),
         tickets:     format(general.numberFormat, 0)(winnerUser.tickets),
         winner:      winnerUser.username,
@@ -133,7 +133,7 @@ class Duel extends Game {
 
     try {
       const parsed = opts.parameters.trim().match(/^([\d]+|all)$/);
-      if (_.isNil(parsed)) {
+      if (isNil(parsed)) {
         throw Error(ERROR_NOT_ENOUGH_OPTIONS);
       }
 

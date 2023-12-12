@@ -1,6 +1,4 @@
 import { ScrimMatchId } from '@entity/scrimMatchId.js';
-import * as constants from '@sogebot/ui-helpers/constants.js';
-import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized.js';
 
 import System from './_interface.js';
 import { onStartup } from '../decorators/on.js';
@@ -14,6 +12,8 @@ import { announce } from '~/helpers/commons/announce.js';
 import { getUserSender } from '~/helpers/commons/index.js';
 import { prepare } from '~/helpers/commons/prepare.js';
 import { round5 } from '~/helpers/commons/round5.js';
+import { MINUTE, SECOND } from '~/helpers/constants.js';
+import { getLocalizedName } from '~/helpers/getLocalizedName.js';
 import { debug } from '~/helpers/log.js';
 import defaultPermissions from '~/helpers/permissions/defaultPermissions.js';
 import getBotId from '~/helpers/user/getBotId.js';
@@ -69,7 +69,7 @@ class Scrim extends System {
 
       const now = Date.now();
 
-      this.closingAt = now + (minutes * constants.MINUTE);
+      this.closingAt = now + (minutes * MINUTE);
       this.type = type;
       this.isCooldownOnly = isCooldownOnly;
 
@@ -126,12 +126,12 @@ class Scrim extends System {
     } else if (this.closingAt !== 0) {
       const lastRemindAtDiffMs = -(this.lastRemindAt - Date.now());
 
-      const minutesToGo = (this.closingAt - Date.now()) / constants.MINUTE;
-      const secondsToGo = round5((this.closingAt - Date.now()) / constants.SECOND);
+      const minutesToGo = (this.closingAt - Date.now()) / MINUTE;
+      const secondsToGo = round5((this.closingAt - Date.now()) / SECOND);
 
       if (minutesToGo > 1) {
         // countdown every minute
-        if (lastRemindAtDiffMs >= constants.MINUTE) {
+        if (lastRemindAtDiffMs >= MINUTE) {
           announce(prepare('systems.scrim.countdown', {
             type: this.type,
             time: minutesToGo.toFixed(),
@@ -141,7 +141,7 @@ class Scrim extends System {
         }
       } else if (secondsToGo <= 60 && secondsToGo > 0) {
         // countdown every 15s
-        if (lastRemindAtDiffMs >= 15 * constants.SECOND) {
+        if (lastRemindAtDiffMs >= 15 * SECOND) {
           announce(prepare('systems.scrim.countdown', {
             type: this.type,
             time: String(secondsToGo === 60 ? 1 : secondsToGo),
@@ -211,8 +211,8 @@ class Scrim extends System {
           for (const r of currentMatches) {
             announce(await r.response, 'scrim');
           }
-        }, this.waitForMatchIdsInSeconds * constants.SECOND);
-      }, 15 * constants.SECOND);
+        }, this.waitForMatchIdsInSeconds * SECOND);
+      }, 15 * SECOND);
     }
   }
 }

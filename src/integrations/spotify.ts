@@ -2,7 +2,6 @@ import crypto from 'crypto';
 import { setTimeout } from 'timers/promises';
 
 import { SpotifySongBan } from '@entity/spotify.js';
-import { HOUR, SECOND } from '@sogebot/ui-helpers/constants.js';
 import chalk from 'chalk';
 import _ from 'lodash-es';
 import SpotifyWebApi from 'spotify-web-api-node';
@@ -23,6 +22,7 @@ import { debug, error, info, warning } from '~/helpers/log.js';
 import { addUIError } from '~/helpers/panel/index.js';
 import { ioServer } from '~/helpers/panel.js';
 import { adminEndpoint } from '~/helpers/socket.js';
+import { HOUR, SECOND } from '~/helpers/constants.js';
 
 /*
  * How to integrate:
