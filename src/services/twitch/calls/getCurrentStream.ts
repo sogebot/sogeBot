@@ -3,7 +3,7 @@ import {
   stats as apiStats, chatMessagesAtStart,
 } from '~/helpers/api/index.js';
 import * as stream from '~/helpers/core/stream.js';
-import { dayjs } from '~/helpers/dayjsHelper';
+import { dayjs } from '~/helpers/dayjsHelper.js';
 import { isDebugEnabled } from '~/helpers/debug.js';
 import { eventEmitter } from '~/helpers/events/index.js';
 import { getFunctionName } from '~/helpers/getFunctionName.js';
