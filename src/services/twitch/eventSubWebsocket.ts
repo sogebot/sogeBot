@@ -636,9 +636,9 @@ class EventSubWebsocket {
 
         // trigger reward-redeemed event
         if (event.input.length > 0) {
-          redeem(`${ event.userName }#${ event.userId } redeemed ${ event.rewardTitle }: ${ event.input }`);
+          redeem(`${ event.userName }#${ event.userId } redeemed ${ event.rewardTitle }(${ event.rewardId }): ${ event.input }`);
         } else {
-          redeem(`${ event.userName }#${ event.userId } redeemed ${ event.rewardTitle }`);
+          redeem(`${ event.userName }#${ event.userId } redeemed ${ event.rewardTitle }(${ event.rewardId })`);
         }
 
         changelog.update(event.userId, {

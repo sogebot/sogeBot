@@ -177,9 +177,9 @@ class EventSubLongPolling {
   onChannelRedemptionAdd(event: EventSubChannelRedemptionAddEventData) {
     // trigger reward-redeemed event
     if (event.user_input.length > 0) {
-      redeem(`${ event.user_login }#${ event.user_id } redeemed ${ event.reward.title }: ${ event.user_input }`);
+      redeem(`${ event.user_login }#${ event.user_id } redeemed ${ event.reward.title }(${ event.reward.id }): ${ event.user_input }`);
     } else {
-      redeem(`${ event.user_login }#${ event.user_id } redeemed ${ event.reward.title }`);
+      redeem(`${ event.user_login }#${ event.user_id } redeemed ${ event.reward.title }(${ event.reward.id })`);
     }
 
     changelog.update(event.user_id, {
