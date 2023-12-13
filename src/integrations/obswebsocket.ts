@@ -84,7 +84,7 @@ class OBSWebsocket extends Integration {
       if (typeof req.body.message !== 'string') {
         message = JSON.stringify(req.body.message, null, 2);
       }
-      ioServer?.of('/').emit('integration::obswebsocket::log', message || '');
+      info('OBSWEBSOCKETS: ' + message);
       res.status(200).send();
     });
   }
