@@ -44,9 +44,19 @@ export enum Types {
   'onChannelRaidFrom',
   'onChannelRedemptionUpdate',
   'onChannelAdBreakBegin',
+  'onOBSWebsocketEvent',
 }
 
 export const ListenToGenerator = (pluginId: string, type: Types, message: string, userstate: { userName: string, userId: string } | null, params?: Record<string, any>) => ({
+  OBS: {
+    on: (event: string, callback: (args: any) => void) => {
+      if (type === Types.onOBSWebsocketEvent) {
+        if (event === params?.event) {
+          callback(params?.args);
+        }
+      }
+    },
+  },
   Bot: {
     started(callback: () => void) {
       if (type === Types.Started) {

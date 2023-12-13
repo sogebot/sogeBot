@@ -261,6 +261,10 @@ export interface Events {
     requesterId:            string,
     requesterName:          string,
   }) => void;
+  [Types.onOBSWebsocketEvent]: (opts: {
+    event: string,
+    args: any,
+  }) => void;
 }
 
 class _EventEmitter extends TypedEmitter<Events> {}

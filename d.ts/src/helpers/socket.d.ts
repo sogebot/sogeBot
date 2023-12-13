@@ -114,6 +114,7 @@ export type ClientToServerEventsWithNamespace = {
     'integration::obswebsocket::values': (cb: (data: { address: string, password: string }) => void) => void,
     'integration::obswebsocket::function': (fnc: any, cb: any) => void,
     'integration::obswebsocket::log': (toLog: string) => void,
+    'integration::obswebsocket::listener': (opts: { event: string, args: any }) => void,
   },
   '/core/plugins': GenericEvents & {
     'listeners': (cb: (listeners: Record<string, any>) => void) => void,
