@@ -108,6 +108,8 @@ export type ClientToServerEventsWithNamespace = {
     'integration::obswebsocket::generic::getAll': generic<OBSWebsocketInterface>['getAll'],
     'integration::obswebsocket::generic::save': generic<OBSWebsocketInterface>['save'],
     'integration::obswebsocket::generic::deleteById': generic<OBSWebsocketInterface>['deleteById'],
+    'integration::obswebsocket::call': (opts: { id: string, event: string, args?: any }, cb: any) => void,
+    'integration::obswebsocket::callBatch': (opts: { id: string, requests: Record<string, any>[], options?: Record<string, any> }, cb: any) => void,
     'integration::obswebsocket::trigger': (opts: { code: string, attributes?: Events.Attributes }, cb: any) => void,
     'integration::obswebsocket::values': (cb: (data: { address: string, password: string }) => void) => void,
     'integration::obswebsocket::function': (fnc: any, cb: any) => void,

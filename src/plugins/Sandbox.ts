@@ -1,3 +1,5 @@
+import { randomUUID } from 'crypto';
+
 import axios, { AxiosRequestConfig } from 'axios';
 import ts from 'typescript';
 
@@ -17,6 +19,7 @@ import { mainCurrency, symbol } from '~/helpers/currency/index.js';
 import { getTime } from '~/helpers/getTime.js';
 import emitter from '~/helpers/interfaceEmitter.js';
 import { debug, info } from '~/helpers/log.js';
+import { ioServer } from '~/helpers/panel.js';
 import { linesParsed } from '~/helpers/parser.js';
 import defaultPermissions from '~/helpers/permissions/defaultPermissions.js';
 import getBotId from '~/helpers/user/getBotId.js';
@@ -56,6 +59,29 @@ export const runScriptInSandbox = (plugin: Plugin,
   const Variable = VariableGenerator(plugin.id);
   // @ts-expect-error TS6133
   const CustomVariable = CustomVariableGenerator(plugin.id);
+  // @ts-expect-error TS6133
+  const OBS = {
+    async call(event: string, args?: any) {
+      const id = randomUUID();
+      // we need to send on all sockets on /
+      const sockets = ioServer?.of('/').sockets;
+      if (sockets) {
+        for (const socket of sockets.values()) {
+          socket.emit('integration::obswebsocket::call', { id, event, args });
+        }
+      }
+    },
+    async callBatch(requests: Record<string, any>[], options?: Record<string, any>) {
+      const id = randomUUID();
+      // we need to send on all sockets on /
+      const sockets = ioServer?.of('/').sockets;
+      if (sockets) {
+        for (const socket of sockets.values()) {
+          socket.emit('integration::obswebsocket::callBatch', { id, requests, options });
+        }
+      }
+    },
+  };
   // @ts-expect-error TS6133
   const Alerts = {
     async trigger(uuid: string, name?: string, msg?: string, customOptions?: EmitData['customOptions']) {
