@@ -2,7 +2,7 @@ import { defaultsDeep } from 'lodash-es';
 
 import { MINUTE, SECOND } from './constants.js';
 
-import { Overlay } from '~/database/entity/overlay.js';
+import { Overlay, TTSService } from '~/database/entity/overlay.js';
 
 const values = {
   url:            { url: '' },
@@ -126,10 +126,8 @@ const values = {
       shadow:         [],
     },
     tts: {
-      voice:  'UK English Female',
-      volume: 50,
-      rate:   1,
-      pitch:  1,
+      selectedService: TTSService.NONE,
+      services:        {},
     },
     items: [],
   },
@@ -213,10 +211,8 @@ const values = {
     spaceBetween: 200,
   },
   tts: {
-    voice:                          'UK English Female',
-    volume:                         50,
-    rate:                           1,
-    pitch:                          1,
+    selectedService:                TTSService.NONE,
+    services:                       {},
     triggerTTSByHighlightedMessage: false,
   },
   polls: {

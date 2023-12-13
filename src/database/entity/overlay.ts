@@ -379,10 +379,6 @@ export interface Alerts {
         rate: number;
       }
     }
-    voice: string;
-    pitch: number;
-    volume: number;
-    rate: number;
   };
   items: ExpandRecursively<{
     id: string;
