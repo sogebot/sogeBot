@@ -61,25 +61,27 @@ export const runScriptInSandbox = (plugin: Plugin,
   const CustomVariable = CustomVariableGenerator(plugin.id);
   // @ts-expect-error TS6133
   const OBS = {
-    async call(event: string, args?: any) {
-      const id = randomUUID();
-      // we need to send on all sockets on /
-      const sockets = ioServer?.of('/').sockets;
-      if (sockets) {
-        for (const socket of sockets.values()) {
-          socket.emit('integration::obswebsocket::call', { id, event, args });
-        }
-      }
+    call(event: string, args?: any) {
+      return new Promise((resolve, reject) => {
+        const id = randomUUID();
+        ioServer?.of('/').emit('integration::obswebsocket::call', { id, event, args }, (data: any) => {
+          resolve(data);
+        });
+        setTimeout(() => {
+          reject(new Error('Timeout'));
+        }, 5000);
+      });
     },
     async callBatch(requests: Record<string, any>[], options?: Record<string, any>) {
-      const id = randomUUID();
-      // we need to send on all sockets on /
-      const sockets = ioServer?.of('/').sockets;
-      if (sockets) {
-        for (const socket of sockets.values()) {
-          socket.emit('integration::obswebsocket::callBatch', { id, requests, options });
-        }
-      }
+      return new Promise((resolve, reject) => {
+        const id = randomUUID();
+        ioServer?.of('/').emit('integration::obswebsocket::call', { id, requests, options }, (data: any) => {
+          resolve(data);
+        });
+        setTimeout(() => {
+          reject(new Error('Timeout'));
+        }, 5000);
+      });
     },
   };
   // @ts-expect-error TS6133
