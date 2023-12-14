@@ -108,7 +108,7 @@ const levelFormat = {
   follow:           '+follow',
   raid:             '+raid',
   redeem:           '+++ redeem:',
-  commercial:       '!commercial',
+  commercial:       '<commercial>',
   cheer:            '+cheer',
   tip:              '+tip',
   sub:              '+sub',
