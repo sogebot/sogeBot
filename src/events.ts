@@ -76,7 +76,7 @@ class Events extends Core {
     super();
 
     this.supportedEventsList = [
-      { id:        'commercial-started', variables: [
+      { id:        'commercial', variables: [
         'duration',
         'startedAt',
         'isAutomatic',
@@ -121,7 +121,6 @@ class Events extends Core {
         id: 'stream-is-running-x-minutes', definitions: { runAfterXMinutes: 100 }, check: this.checkStreamIsRunningXMinutes,
       },
       { id: 'mod', variables: [ 'username', 'is.moderator', 'is.subscriber', 'is.vip', 'is.broadcaster', 'is.bot', 'is.owner' ] },
-      { id: 'commercial', variables: [ 'duration' ] },
       { id: 'timeout', variables: [ 'username', 'is.moderator', 'is.subscriber', 'is.vip', 'is.broadcaster', 'is.bot', 'is.owner', 'duration' ] },
       {
         id: 'reward-redeemed', definitions: { rewardId: '' }, variables: [ 'username', 'is.moderator', 'is.subscriber', 'is.vip', 'is.broadcaster', 'is.bot', 'is.owner', 'userInput' ], check: this.isCorrectReward,
@@ -248,7 +247,7 @@ class Events extends Core {
           opts = {};
         }
         if (event === Types.onChannelAdBreakBegin) {
-          events.fire('commercial-started', { ...opts });
+          events.fire('commercial', { ...opts });
         } else if (event === Types.onChannelShoutoutReceive) {
           events.fire('shoutout-received', { ...opts });
         } else if (event === Types.onChannelShoutoutCreate) {
