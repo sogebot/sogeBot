@@ -19,7 +19,7 @@ import { mainCurrency, symbol } from '~/helpers/currency/index.js';
 import { getTime } from '~/helpers/getTime.js';
 import emitter from '~/helpers/interfaceEmitter.js';
 import { debug, info } from '~/helpers/log.js';
-import { ioServer } from '~/helpers/panel.js';
+import { app, ioServer } from '~/helpers/panel.js';
 import { linesParsed } from '~/helpers/parser.js';
 import defaultPermissions from '~/helpers/permissions/defaultPermissions.js';
 import getBotId from '~/helpers/user/getBotId.js';
@@ -31,6 +31,26 @@ import points from '~/systems/points.js';
 import users from '~/users.js';
 
 export const transpiledFiles = new Map<string, string>();
+
+const expectedIds = new Set<string>();
+const responses = new Map<string, any>();
+(function registerAPIPath() {
+  if (!app) {
+    setTimeout(() => registerAPIPath(), 100);
+    return;
+  }
+  app.post('/api/plugins/obs', (req, res) => {
+    if (req.headers.id && expectedIds.has(req.headers.id as string)) {
+      expectedIds.delete(req.headers.id as string);
+      const data = req.body;
+      responses.set(req.headers.id as string, data);
+      res.status(200).send();
+      setTimeout(() => {
+        responses.delete(req.headers.id as string);
+      }, 1000);
+    }
+  });
+})();
 
 export const runScriptInSandbox = (plugin: Plugin,
   userstate: { userName: string, userId: string } | null,
@@ -64,23 +84,51 @@ export const runScriptInSandbox = (plugin: Plugin,
     call(event: string, args?: any) {
       return new Promise((resolve, reject) => {
         const id = randomUUID();
-        ioServer?.of('/').emit('integration::obswebsocket::call', { id, event, args }, (data: any) => {
-          resolve(data);
+        const waitUntil = Date.now() + 5000;
+        expectedIds.add(id);
+        ioServer?.of('/').sockets.forEach(socket => {
+          socket.emit('integration::obswebsocket::call', { id, event, args });
         });
-        setTimeout(() => {
-          reject(new Error('Timeout'));
-        }, 5000);
+        (function check() {
+          if (Date.now() > waitUntil) {
+            expectedIds.delete(id);
+            reject(new Error('Response not received in 5 seconds'));
+          } else {
+            if (responses.has(id)) {
+              const data = responses.get(id);
+              responses.delete(id);
+              resolve(data);
+            } else {
+              setTimeout(check, 100);
+            }
+          }
+        })();
       });
     },
     async callBatch(requests: Record<string, any>[], options?: Record<string, any>) {
       return new Promise((resolve, reject) => {
         const id = randomUUID();
-        ioServer?.of('/').emit('integration::obswebsocket::call', { id, requests, options }, (data: any) => {
-          resolve(data);
+        const waitUntil = Date.now() + 5000;
+        expectedIds.add(id);
+        ioServer?.of('/').sockets.forEach(socket => {
+          socket.emit('integration::obswebsocket::callBatch', { id, requests, options }, (err: any, data: any) => {
+            resolve(data);
+          });
         });
-        setTimeout(() => {
-          reject(new Error('Timeout'));
-        }, 5000);
+        (function check() {
+          if (Date.now() > waitUntil) {
+            expectedIds.delete(id);
+            reject(new Error('Response not received in 5 seconds'));
+          } else {
+            if (responses.has(id)) {
+              const data = responses.get(id);
+              responses.delete(id);
+              resolve(data);
+            } else {
+              setTimeout(check, 100);
+            }
+          }
+        })();
       });
     },
   };
