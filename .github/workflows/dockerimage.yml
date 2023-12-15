@@ -70,7 +70,7 @@ jobs:
           username: ${{ secrets.DOCKER_REGISTRY_USERNAME }}
           password: ${{ secrets.DOCKER_REGISTRY_PASSWORD }}
 
-      - uses: actions/download-artifact@master
+      - uses: actions/download-artifact@v3
         with:
           name: sogeBot-${{ steps.slug.outputs.SHA }}
           path: ${{ github.workspace }}/*.zip
