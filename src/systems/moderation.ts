@@ -32,6 +32,7 @@ import { getUserPermissionsList } from '~/helpers/permissions/getUserPermissions
 import { adminEndpoint } from '~/helpers/socket.js';
 import { tmiEmitter } from '~/helpers/tmi/index.js';
 import banUser from '~/services/twitch/calls/banUser.js';
+import getUserByName from '~/services/twitch/calls/getUserByName.js';
 import aliasSystem from '~/systems/alias.js';
 import songs from '~/systems/songs.js';
 import { translate } from '~/translate.js';
@@ -346,7 +347,10 @@ class Moderation extends System {
     } else {
       warningLog('AUTOBAN: No message of user found, user will be just banned.');
     }
-    banUser(opts.sender.userId, 'AUTOBAN: Message of user found in message list. Banning user.');
+    const user = await getUserByName(username);
+    if (user) {
+      banUser(user.id, 'AUTOBAN: Message of user found in message list. Banning user.');
+    }
     return [];
   }
 
