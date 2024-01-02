@@ -461,7 +461,8 @@ export type ClientToServerEventsWithNamespace = {
     'events::remove': (eventId: Required<Event['id']>, cb: (error: Error | string | null | unknown) => void) => void,
   },
   '/core/tts': GenericEvents & {
-    'speak': (opts: { service: TTSService, text: string, key: string, voice: string; volume: number; rate: number; pitch: number; triggerTTSByHighlightedMessage?: boolean; }, cb: (error: Error | string | null | unknown, b64mp3?: string) => void) => void,
+    'speak': (opts: { service: TTSService, text: string, key: string, voice: string; volume: number; rate: number; pitch: number; triggerTTSByHighlightedMessage?: boolean; } |
+    { service: TTSService.ELEVENLABS, text: string, key: string, voice: string; volume: number; clarity: number; stability: number; exaggeration: number; triggerTTSByHighlightedMessage?: boolean; }, cb: (error: Error | string | null | unknown, b64mp3?: string) => void) => void,
   },
   '/core/ui': GenericEvents & {
     'configuration': (cb: (error: Error | string | null | unknown, data?: Configuration) => void) => void,

@@ -1,5 +1,6 @@
 import { randomUUID } from 'crypto';
 
+import axios from 'axios';
 import { JWT } from 'google-auth-library';
 import { google } from 'googleapis';
 
@@ -44,6 +45,9 @@ class TTS extends Core {
   @settings()
     googleVoices: string[] = [];
 
+  @settings()
+    elevenlabsApiKey = '';
+
   sockets() {
     adminEndpoint('/core/tts', 'settings.refresh', async () => {
       this.initializeTTSServices(); // reset settings
@@ -52,8 +56,16 @@ class TTS extends Core {
     publicEndpoint('/core/tts', 'speak', async (opts, cb) => {
       if (secureKeys.has(opts.key)) {
         secureKeys.delete(opts.key);
+        if (opts.service === TTSService.ELEVENLABS) {
+          const audioContent = await this.elevenlabsSpeak(opts as any);
 
-        if (opts.service === TTSService.GOOGLE) {
+          if (!audioContent) {
+            throw new Error('Something went wrong');
+          }
+          if (cb) {
+            cb(null, audioContent);
+          }
+        } else if (opts.service === TTSService.GOOGLE) {
           const audioContent = await this.googleSpeak(opts);
 
           if (!audioContent) {
@@ -72,7 +84,16 @@ class TTS extends Core {
 
     adminEndpoint('/core/tts', 'speak', async (opts, cb) => {
       try {
-        if (opts.service === TTSService.GOOGLE) {
+        if (opts.service === TTSService.ELEVENLABS) {
+          const audioContent = await this.elevenlabsSpeak(opts as any);
+
+          if (!audioContent) {
+            throw new Error('Something went wrong');
+          }
+          if (cb) {
+            cb(null, audioContent);
+          }
+        } else if (opts.service === TTSService.GOOGLE) {
           const audioContent = await this.googleSpeak(opts);
 
           if (!audioContent) {
@@ -188,6 +209,36 @@ class TTS extends Core {
   async initializeTTSServices() {
     this.initializeGoogleTTS();
     this.initializeResponsiveVoiceTTS();
+  }
+
+  async elevenlabsSpeak(opts: {
+    voice: string;
+    text: string;
+    clarity: number;
+    stability: number;
+    exaggeration: number;
+  }) {
+    const response = await axios(`https://api.elevenlabs.io/v1/text-to-speech/${opts.voice}`, {
+      method:  'POST',
+      headers: {
+        'xi-api-key':   this.elevenlabsApiKey,
+        'Content-Type': 'application/json',
+      },
+      responseType: 'arraybuffer',
+      data:         {
+        model_id:       'eleven_multilingual_v2',
+        text:           opts.text,
+        output_format:  'mp3_44100_128', // default, but for clarity
+        voice_settings: {
+          similarity_boost:  opts.clarity,
+          stability:         opts.stability,
+          style:             opts.exaggeration,
+          use_speaker_boost: true,
+        },
+      },
+    });
+
+    return btoa(String.fromCharCode(...new Uint8Array(response.data)));
   }
 
   async googleSpeak(opts: {

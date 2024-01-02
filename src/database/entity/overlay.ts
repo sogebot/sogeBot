@@ -336,6 +336,7 @@ export enum TTSService {
   RESPONSIVEVOICE = '0',
   GOOGLE = '1',
   SPEECHSYNTHESIS = '2',
+  ELEVENLABS = '3',
 }
 
 export interface Alerts {
@@ -360,6 +361,13 @@ export interface Alerts {
     // we are using this to store tts settings for each service, so if we are changing service, then we can previously set settings
     services: {
       [TTSService.NONE]?: null,
+      [TTSService.ELEVENLABS]?: {
+        voice: string;
+        clarity: number;
+        stability: number;
+        exaggeration: number;
+        volume: number;
+      },
       [TTSService.SPEECHSYNTHESIS]?: {
         voice: string;
         pitch: number;
