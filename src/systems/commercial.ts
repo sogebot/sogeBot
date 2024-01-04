@@ -6,7 +6,6 @@ import {
 } from '../decorators.js';
 
 import { getOwnerAsSender } from '~/helpers/commons/index.js';
-import { eventEmitter } from '~/helpers/events/index.js';
 import { error, warning } from '~/helpers/log.js';
 import { addUIError } from '~/helpers/panel/alerts.js';
 import defaultPermissions from '~/helpers/permissions/defaultPermissions.js';
@@ -68,7 +67,6 @@ class Commercial extends System {
 
       try {
         await twitch.apiClient?.asIntent(['broadcaster'], ctx => ctx.channels.startChannelCommercial(broadcasterId, commercial.duration as 30 | 60 | 90 | 120 | 150 | 180));
-        eventEmitter.emit('commercial', { duration: commercial.duration ?? 30 });
         if (!_.isNil(commercial.message)) {
           return [{ response: commercial.message, ...opts }];
         }
