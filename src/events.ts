@@ -417,7 +417,6 @@ class Events extends Core {
           return;
         }
         await twitch.apiClient?.asIntent(['broadcaster'], ctx => ctx.channels.startChannelCommercial(cid, duration as 30 | 60 | 90 | 120 | 150 | 180));
-        eventEmitter.emit('commercial', { duration });
       } else {
         throw new Error('Incorrect duration set');
       }
