@@ -99,6 +99,17 @@ class EventList extends Widget {
               message:    values.message,
             });
             break;
+          case 'subcommunitygift':
+            alerts.trigger({
+              event:      event.event,
+              name:       await getNameById(event.userId),
+              amount:     Number(values.count),
+              tier:       null,
+              currency:   '',
+              monthsName: '',
+              message:    '',
+            });
+            break;
           case 'tip':
             alerts.trigger({
               event:      event.event,
