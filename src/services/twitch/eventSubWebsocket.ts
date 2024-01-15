@@ -611,7 +611,7 @@ class EventSubWebsocket {
         const createdBy = event.moderatorName;
         const createdById = event.moderatorId;
         const reason = event.reason;
-        const ends_at = dayjs(event.endDate);
+        const ends_at = event.endDate ? dayjs(event.endDate) : null;
         if (ends_at) {
           const duration = dayjs.duration(ends_at.diff(dayjs(event.startDate)));
           timeout(`${ userName }#${ userId } by ${ createdBy }#${ createdById } for ${ duration.asSeconds() } seconds`);
@@ -706,14 +706,14 @@ class EventSubWebsocket {
       }
     }
 
-    if (process.env.ENV === 'production' || process.env.NODE_ENV === 'production') {
-      this.listener.stop();
-      setTimeout(() => {
-        this.listener.start();
-      }, 5000);
-    } else {
-      info('EVENTSUB-WS: Eventsub events disabled on dev-mode.');
-    }
+    // if (process.env.ENV === 'production' || process.env.NODE_ENV === 'production') {
+    this.listener.stop();
+    setTimeout(() => {
+      this.listener.start();
+    }, 5000);
+    // } else {
+    //   info('EVENTSUB-WS: Eventsub events disabled on dev-mode.');
+    // }
   }
 }
 
