@@ -225,6 +225,7 @@ export class Event extends BotEntity {
         'action', 'clearchat', 'stream-started', 'stream-stopped',
         'ban', 'cheer', 'game-changed', 'follow', 'subscription', 'subgift',
         'subcommunitygift', 'resub', 'tip',
+        'shoutout-created', 'shoutout-received',
       ].map(defaultEventValidationSchema),
     ]),
     operations: z.array(z.discriminatedUnion('name', [
@@ -298,7 +299,7 @@ export class Event extends BotEntity {
       })),
     ])),
   });
-  
+
   @PrimaryColumn({ generated: 'uuid' })
     id: string;
 
