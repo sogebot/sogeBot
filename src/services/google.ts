@@ -1,3 +1,5 @@
+import { randomUUID } from 'node:crypto';
+
 import { OAuth2Client } from 'google-auth-library/build/src/auth/oauth2client';
 import { google, youtube_v3 } from 'googleapis';
 import { TubeChat } from 'tubechat';
@@ -17,9 +19,11 @@ import { MINUTE } from '~/helpers/constants.js';
 import { getTime } from '~/helpers/getTime.js';
 import { getLang } from '~/helpers/locales.js';
 import { error, info, debug } from '~/helpers/log.js';
-import { app } from '~/helpers/panel.js';
+import { app, ioServer } from '~/helpers/panel.js';
 import { adminEndpoint } from '~/helpers/socket.js';
 import { adminMiddleware } from '~/socket.js';
+
+const tubeChat = new TubeChat();
 
 class Google extends Service {
   clientId = '225380804535-gjd77dplfkbe4d3ct173d8qm0j83f8tr.apps.googleusercontent.com';
@@ -29,8 +33,6 @@ class Google extends Service {
     channel = '';
   @settings()
     streamId = '';
-  @settings()
-    accountId = 'sogehige';
 
   @settings()
     onStreamEndTitle = 'Archive | $gamesList | $date';
@@ -55,26 +57,45 @@ class Google extends Service {
   gamesPlayedOnStream: { game: string, timeMark: string }[] = [];
   broadcastStartedAt: string = new Date().toLocaleDateString(getLang());
 
-  @onLoad('accountId')
-  @onChange('accountId')
+  @onLoad('channel')
+  @onChange('channel')
   async onStartupAndAccountChange() {
-    const tubeChat = new TubeChat();
+    tubeChat.channelList().forEach(channel => tubeChat.disconnect(channel.user));
+    tubeChat.removeAllListeners();
+
+    if (this.channel.length === 0) {
+      return; // do nothing if channel is not set
+    }
+
+    const customUrl = this.channel.split('|')[2]?.trim().replace('@', '');
     // todo: get account id from oauth, also we gett broadcaster ID from channel connected, no need for polling
-    info(`YOUTUBE: Connecting to chat for ${this.accountId}`);
-    tubeChat.connect(this.accountId);
+    info(`YOUTUBE: Starting chat listener for ${customUrl.replace('@', '')}`);
+    tubeChat.connect(customUrl.replace('@', ''));
 
     tubeChat.on('chat_connected', (channel, videoId) => {
       // stream is live
-      info(`YOUTUBE: ${channel} chat connected ${videoId}`);
+      info(`YOUTUBE: ${channel} connected to chat for video ${videoId}`);
     });
 
     tubeChat.on('chat_disconnected', (channel, videoId) => {
       // stream is offline
-      info(`YOUTUBE: ${channel} chat disconnected ${videoId}`);
+      info(`YOUTUBE: ${channel} chat disconnected from video ${videoId}`);
     });
 
     tubeChat.on('message', ({ badges, channel, channelId, color, id, isMembership, isModerator, isNewMember, isOwner, isVerified, message, name, thumbnail, timestamp }) => {
+      ioServer?.of('/overlays/chat').emit('message', {
+        id:          randomUUID(),
+        timestamp:   timestamp.getTime(),
+        displayName: name,
+        userName:    name,
+        message:     message.map(item => item.text || item.textEmoji || item.emoji).join(''),
+        show:        false,
+        badges,
+        color:       color,
+        service:     'youtube',
+      });
       // todo: send to chat overlay
+      // add service icons boolean
       console.log(channel, name, message);
     });
 
@@ -335,7 +356,7 @@ class Google extends Service {
           },
           status: {
             privacyStatus:           'private',
-            selfDeclaredMadeForKids: true,
+            selfDeclaredMadeForKids: false,
           },
           contentDetails: {
             enableAutoStart: true,

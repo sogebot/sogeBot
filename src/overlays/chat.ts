@@ -42,6 +42,7 @@ class Chat extends Overlay {
         show:        false,
         badges:      badgeImages,
         color:       message.sender.color,
+        service:     'twitch',
       });
     });
   }

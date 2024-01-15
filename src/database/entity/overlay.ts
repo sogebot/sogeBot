@@ -88,6 +88,11 @@ export interface Chat {
   typeId: 'chat';
   type: 'vertical' | 'horizontal' | 'niconico';
   hideMessageAfter: number;
+
+  showServiceIcons: boolean,
+  customServiceIconSize: number;
+  useCustomServiceIconSize: boolean;
+
   showCommandMessages: boolean,
   showTimestamp: boolean;
   reverseOrder: boolean;
