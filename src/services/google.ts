@@ -1,11 +1,12 @@
 import { OAuth2Client } from 'google-auth-library/build/src/auth/oauth2client';
 import { google, youtube_v3 } from 'googleapis';
+import { TubeChat } from 'tubechat';
 
 import Service from './_interface.js';
 
 import { GooglePrivateKeys } from '~/database/entity/google.js';
 import { AppDataSource } from '~/database.js';
-import { onChange, onStartup, onStreamEnd, onStreamStart } from '~/decorators/on.js';
+import { onChange, onLoad, onStartup, onStreamEnd, onStreamStart } from '~/decorators/on.js';
 import { persistent, settings } from '~/decorators.js';
 import {
   isStreamOnline,
@@ -28,6 +29,8 @@ class Google extends Service {
     channel = '';
   @settings()
     streamId = '';
+  @settings()
+    accountId = 'sogehige';
 
   @settings()
     onStreamEndTitle = 'Archive | $gamesList | $date';
@@ -51,6 +54,42 @@ class Google extends Service {
   broadcastId: string | null = null;
   gamesPlayedOnStream: { game: string, timeMark: string }[] = [];
   broadcastStartedAt: string = new Date().toLocaleDateString(getLang());
+
+  @onLoad('accountId')
+  @onChange('accountId')
+  async onStartupAndAccountChange() {
+    const tubeChat = new TubeChat();
+    // todo: get account id from oauth, also we gett broadcaster ID from channel connected, no need for polling
+    info(`YOUTUBE: Connecting to chat for ${this.accountId}`);
+    tubeChat.connect(this.accountId);
+
+    tubeChat.on('chat_connected', (channel, videoId) => {
+      // stream is live
+      info(`YOUTUBE: ${channel} chat connected ${videoId}`);
+    });
+
+    tubeChat.on('chat_disconnected', (channel, videoId) => {
+      // stream is offline
+      info(`YOUTUBE: ${channel} chat disconnected ${videoId}`);
+    });
+
+    tubeChat.on('message', ({ badges, channel, channelId, color, id, isMembership, isModerator, isNewMember, isOwner, isVerified, message, name, thumbnail, timestamp }) => {
+      // todo: send to chat overlay
+      console.log(channel, name, message);
+    });
+
+    // todo: send events
+    tubeChat.on('superchatSticker', (superchatSticker) => {
+    });
+    tubeChat.on('superchat', (superchat) => {
+    });
+
+    tubeChat.on('sub', (sub) => {});
+    tubeChat.on('subGift', (subGift) => {});
+    tubeChat.on('subgiftGroup', (subgiftGroup) => {});
+
+    tubeChat.on('userReceiveSubGift', (userReceiveSubGift) => {});
+  }
 
   @onStreamStart()
   onStreamStart() {
