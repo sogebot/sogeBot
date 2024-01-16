@@ -1,7 +1,7 @@
 import assert from 'assert';
 
-import constants from '../../../../dest/constants.js';
-import { dayjs } from '../../../../dest/helpers/dayjsHelper.js';
+import { HOUR } from '../../../dest/helpers/constants.js';
+import { dayjs } from '../../../dest/helpers/dayjsHelper.js';
 import { User } from '../../../dest/database/entity/user.js';
 import { getOwner } from '../../../dest/helpers/commons/getOwner.js';
 import { prepare } from '../../../dest/helpers/commons/prepare.js';
@@ -26,7 +26,7 @@ describe('Top - !top subage - @func1', () => {
         userId:       String(Math.floor(Math.random() * 100000)),
         userName:     'user' + i,
         isSubscriber: true,
-        subscribedAt: new Date(Date.now() - (constants.HOUR * i)).toISOString(),
+        subscribedAt: new Date(Date.now() - (HOUR * i)).toISOString(),
       });
     }
   });
@@ -36,7 +36,7 @@ describe('Top - !top subage - @func1', () => {
       userId:       String(Math.floor(Math.random() * 100000)),
       userName:     'user11',
       isSubscriber: false,
-      subscribedAt: new Date(Date.now() - (constants.HOUR * 24 * 30)).toISOString(),
+      subscribedAt: new Date(Date.now() - (HOUR * 24 * 30)).toISOString(),
     });
   });
 
@@ -44,7 +44,7 @@ describe('Top - !top subage - @func1', () => {
     const r = await top.subage({ sender: { userName: getOwner() } });
     const dates = [];
     for (let i = 0; i < 10; i++) {
-      dates.push(`${dayjs.utc(Date.now() - (constants.HOUR * i)).format('L')} (${dayjs.utc(Date.now() - (constants.HOUR * i)).fromNow()})`);
+      dates.push(`${dayjs.utc(Date.now() - (HOUR * i)).format('L')} (${dayjs.utc(Date.now() - (HOUR * i)).fromNow()})`);
     }
     assert.strictEqual(r[0].response, `Top 10 (subage): 1. @user9 - ${dates[9]}, 2. @user8 - ${dates[8]}, 3. @user7 - ${dates[7]}, 4. @user6 - ${dates[6]}, 5. @user5 - ${dates[5]}, 6. @user4 - ${dates[4]}, 7. @user3 - ${dates[3]}, 8. @user2 - ${dates[2]}, 9. @user1 - ${dates[1]}, 10. @user0 - ${dates[0]}`, owner);
   });
@@ -58,7 +58,7 @@ describe('Top - !top subage - @func1', () => {
     const r = await top.subage({ sender: { userName: getOwner() } });
     const dates = [];
     for (let i = 0; i < 10; i++) {
-      dates.push(`${dayjs.utc(Date.now() - (constants.HOUR * i)).format('L')} (${dayjs.utc(Date.now() - (constants.HOUR * i)).fromNow()})`);
+      dates.push(`${dayjs.utc(Date.now() - (HOUR * i)).format('L')} (${dayjs.utc(Date.now() - (HOUR * i)).fromNow()})`);
     }
     assert.strictEqual(r[0].response, `Top 10 (subage): 1. @user9 - ${dates[9]}, 2. @user8 - ${dates[8]}, 3. @user7 - ${dates[7]}, 4. @user6 - ${dates[6]}, 5. @user5 - ${dates[5]}, 6. @user4 - ${dates[4]}, 7. @user3 - ${dates[3]}, 8. @user2 - ${dates[2]}, 9. @user1 - ${dates[1]}`, owner);
   });

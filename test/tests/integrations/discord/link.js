@@ -1,6 +1,6 @@
 import assert from 'assert';
 
-import { MINUTE } from '../../../../dest/constants.js';
+import { MINUTE } from '../../../../dest/helpers/constants.js';
 
 import { db, message, user } from '../../../general.js';
 

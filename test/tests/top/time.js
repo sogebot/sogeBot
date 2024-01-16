@@ -3,7 +3,7 @@ import assert from 'assert';
 
 import('../../general.js');
 
-import constants from '../../../../dest/constants.js';
+import { HOUR } from '../../../dest/helpers/constants.js';
 import { User } from '../../../dest/database/entity/user.js';
 import { getOwner } from '../../../dest/helpers/commons/getOwner.js';
 import { prepare } from '../../../dest/helpers/commons/prepare.js';
@@ -27,7 +27,7 @@ describe('Top - !top time - @func3', () => {
       await AppDataSource.getRepository(User).save({
         userId:      String(Math.floor(Math.random() * 100000)),
         userName:    'user' + i,
-        watchedTime: i * constants.HOUR,
+        watchedTime: i * HOUR,
       });
     }
   });

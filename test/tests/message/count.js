@@ -5,7 +5,7 @@ import('../../general.js');
 import assert from 'assert';
 
 const owner = { userId: String(Math.floor(Math.random() * 100000)), userName: '__broadcaster__' };
-import constants from '../../../../dest/constants.js';
+import { HOUR, DAY } from '../../../dest/helpers/constants.js';
 
 import { EventList } from '../../../dest/database/entity/eventList.js';
 import { User, UserTip, UserBit } from '../../../dest/database/entity/user.js';
@@ -42,15 +42,15 @@ const tests = [
 
 const getTimestamp = (idx) => {
   if (idx < 5) {
-    return Date.now() - (constants.HOUR / 2);
+    return Date.now() - (HOUR / 2);
   } else if (idx < 10) {
-    return Date.now() - (constants.DAY / 2);
+    return Date.now() - (DAY / 2);
   } else if (idx < 15) {
-    return Date.now() - ((constants.DAY * 7) / 2);
+    return Date.now() - ((DAY * 7) / 2);
   } else if (idx < 20) {
-    return Date.now() - ((constants.DAY * 31) / 2);
+    return Date.now() - ((DAY * 31) / 2);
   }
-  return Date.now() - (constants.DAY * 180);
+  return Date.now() - (DAY * 180);
 };
 
 describe('Message - (count|#) filter - @func3', async () => {
