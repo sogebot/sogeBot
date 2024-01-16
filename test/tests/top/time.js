@@ -2,8 +2,8 @@
 import assert from 'assert';
 
 import('../../general.js');
-import constants from '@sogebot/ui-helpers/constants.js';
 
+import constants from '../../../../dest/constants.js';
 import { User } from '../../../dest/database/entity/user.js';
 import { getOwner } from '../../../dest/helpers/commons/getOwner.js';
 import { prepare } from '../../../dest/helpers/commons/prepare.js';

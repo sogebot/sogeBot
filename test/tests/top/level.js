@@ -1,8 +1,7 @@
 import assert from 'assert';
 
-import constants from '@sogebot/ui-helpers/constants.js';
-import { dayjs } from '@sogebot/ui-helpers/dayjsHelper.js';
-
+import constants from '../../../../dest/constants.js';
+import { dayjs } from '../../../../dest/helpers/dayjsHelper.js';
 import { User } from '../../../dest/database/entity/user.js';
 import { getOwner } from '../../../dest/helpers/commons/getOwner.js';
 import { prepare } from '../../../dest/helpers/commons/prepare.js';

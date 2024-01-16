@@ -8,7 +8,7 @@ import { time } from '../../general.js';
 import { Price } from '../../../dest/database/entity/price.js';
 import customcommands from '../../../dest/systems/customcommands.js';
 
-import { getLocalizedName } from '@sogebot/ui-helpers/getLocalized.js';
+import { getLocalizedName } from '../../../dest/helpers/getLocalizedName.js';
 
 import assert from 'assert';
 

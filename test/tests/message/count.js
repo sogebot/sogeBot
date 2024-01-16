@@ -5,7 +5,7 @@ import('../../general.js');
 import assert from 'assert';
 
 const owner = { userId: String(Math.floor(Math.random() * 100000)), userName: '__broadcaster__' };
-import constants from '@sogebot/ui-helpers/constants.js';
+import constants from '../../../../dest/constants.js';
 
 import { EventList } from '../../../dest/database/entity/eventList.js';
 import { User, UserTip, UserBit } from '../../../dest/database/entity/user.js';
