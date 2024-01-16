@@ -242,11 +242,16 @@ const values = {
     overlayId: null,
   },
   chat: {
-    type:                          'vertical',
-    hideMessageAfter:              600000,
-    showTimestamp:                 true,
-    showBadges:                    true,
-    showCommandMessages:           false,
+    type:                'vertical',
+    hideMessageAfter:    600000,
+    showTimestamp:       true,
+    showBadges:          true,
+    showCommandMessages: false,
+
+    showServiceIcons:         false,
+    useCustomServiceIconSize: false,
+    customServiceIconSize:    14,
+
     useCustomLineHeight:           false,
     customLineHeight:              14,
     useCustomBadgeSize:            false,

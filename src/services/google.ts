@@ -1,11 +1,14 @@
+import { randomUUID } from 'node:crypto';
+
 import { OAuth2Client } from 'google-auth-library/build/src/auth/oauth2client';
 import { google, youtube_v3 } from 'googleapis';
+import { TubeChat } from 'tubechat';
 
 import Service from './_interface.js';
 
 import { GooglePrivateKeys } from '~/database/entity/google.js';
 import { AppDataSource } from '~/database.js';
-import { onChange, onStartup, onStreamEnd, onStreamStart } from '~/decorators/on.js';
+import { onChange, onLoad, onStartup, onStreamEnd, onStreamStart } from '~/decorators/on.js';
 import { persistent, settings } from '~/decorators.js';
 import {
   isStreamOnline,
@@ -15,10 +18,13 @@ import {
 import { MINUTE } from '~/helpers/constants.js';
 import { getTime } from '~/helpers/getTime.js';
 import { getLang } from '~/helpers/locales.js';
-import { error, info, debug } from '~/helpers/log.js';
-import { app } from '~/helpers/panel.js';
+import { error, info, debug, chatIn } from '~/helpers/log.js';
+import { app, ioServer } from '~/helpers/panel.js';
+import { parseTextWithEmotes } from '~/helpers/parseTextWithEmotes.js';
 import { adminEndpoint } from '~/helpers/socket.js';
 import { adminMiddleware } from '~/socket.js';
+
+const tubeChat = new TubeChat();
 
 class Google extends Service {
   clientId = '225380804535-gjd77dplfkbe4d3ct173d8qm0j83f8tr.apps.googleusercontent.com';
@@ -51,6 +57,72 @@ class Google extends Service {
   broadcastId: string | null = null;
   gamesPlayedOnStream: { game: string, timeMark: string }[] = [];
   broadcastStartedAt: string = new Date().toLocaleDateString(getLang());
+
+  @onLoad('channel')
+  @onChange('channel')
+  async onStartupAndAccountChange() {
+    tubeChat.channelList().forEach(channel => tubeChat.disconnect(channel.user));
+    tubeChat.removeAllListeners();
+
+    if (this.channel.length === 0) {
+      return; // do nothing if channel is not set
+    }
+
+    const customUrl = this.channel.split('|')[2]?.trim().replace('@', '');
+    // todo: get account id from oauth, also we gett broadcaster ID from channel connected, no need for polling
+    info(`YOUTUBE: Starting chat listener for ${customUrl.replace('@', '')}`);
+    tubeChat.connect(customUrl.replace('@', ''));
+
+    tubeChat.on('chat_connected', (channel, videoId) => {
+      // stream is live
+      info(`YOUTUBE: ${channel} connected to chat for video ${videoId}`);
+    });
+
+    tubeChat.on('chat_disconnected', (channel, videoId) => {
+      // stream is offline
+      info(`YOUTUBE: ${channel} chat disconnected from video ${videoId}`);
+    });
+
+    tubeChat.on('message', async ({ badges, channel, channelId, color, id, isMembership, isModerator, isNewMember, isOwner, isVerified, message, name, thumbnail, timestamp }) => {
+      chatIn(`@${channel}: ${message.map(item => {
+        if (item.text || item.textEmoji) {
+          return item.text || item.textEmoji;
+        } else {
+          return `[yt:emoji]`;
+        }
+      }).join('').trim()} [${name}]`);
+
+      const messageJoined = message.map(item => {
+        if (item.text || item.textEmoji) {
+          return item.text || item.textEmoji;
+        } else {
+          return `[yt:emoji:${item.emoji}]`;
+        }
+      }).join('').trim();
+
+      ioServer?.of('/overlays/chat').emit('message', {
+        id:          randomUUID(),
+        timestamp:   timestamp.getTime(),
+        displayName: name,
+        userName:    name,
+        message:     await parseTextWithEmotes(messageJoined),
+        show:        false,
+        badges,
+        color:       color,
+        service:     'youtube',
+      });
+    });
+
+    // todo: send events
+    tubeChat.on('superchatSticker', (superchatSticker) => {});
+    tubeChat.on('superchat', (superchat) => {});
+
+    tubeChat.on('sub', (sub) => {});
+    tubeChat.on('subGift', (subGift) => {});
+    tubeChat.on('subgiftGroup', (subgiftGroup) => {});
+
+    tubeChat.on('userReceiveSubGift', (userReceiveSubGift) => {});
+  }
 
   @onStreamStart()
   onStreamStart() {
@@ -121,7 +193,9 @@ class Google extends Service {
       const stream = await this.getBroadcast();
 
       if (stream && stream.snippet) {
-        const currentTitle = stats.value.currentTitle || 'n/a';
+        const currentTags = (stats.value.currentTags || []).join(' ');
+        const currentTitle = [stats.value.currentTitle || 'n/a', currentTags].filter(String).join(' ');
+
         if (stream.snippet.title !== currentTitle && isStreamOnline.value) {
           info(`YOUTUBE: Title is not matching current title, changing by bot to "${currentTitle}"`);
           await this.updateTitle(stream, currentTitle);
@@ -296,7 +370,7 @@ class Google extends Service {
           },
           status: {
             privacyStatus:           'private',
-            selfDeclaredMadeForKids: true,
+            selfDeclaredMadeForKids: false,
           },
           contentDetails: {
             enableAutoStart: true,
