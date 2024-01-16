@@ -4,6 +4,9 @@ export const parseTextWithEmotes = async (text: string | undefined, size: 1 | 2 
     return '';
   }
 
+  // checking youtube emojis
+  text = text.replace(/\[yt:emoji:(.*?)\]/g, '<span class="simpleChatImage"><img src="$1" class="emote"/></span>');
+
   // checking emotes
   for (const emote of Emotes.cache) {
     const split: string[] = (text as string).split(' ');

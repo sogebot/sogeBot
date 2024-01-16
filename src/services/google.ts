@@ -18,8 +18,9 @@ import {
 import { MINUTE } from '~/helpers/constants.js';
 import { getTime } from '~/helpers/getTime.js';
 import { getLang } from '~/helpers/locales.js';
-import { error, info, debug } from '~/helpers/log.js';
+import { error, info, debug, chatIn } from '~/helpers/log.js';
 import { app, ioServer } from '~/helpers/panel.js';
+import { parseTextWithEmotes } from '~/helpers/parseTextWithEmotes.js';
 import { adminEndpoint } from '~/helpers/socket.js';
 import { adminMiddleware } from '~/socket.js';
 
@@ -82,28 +83,39 @@ class Google extends Service {
       info(`YOUTUBE: ${channel} chat disconnected from video ${videoId}`);
     });
 
-    tubeChat.on('message', ({ badges, channel, channelId, color, id, isMembership, isModerator, isNewMember, isOwner, isVerified, message, name, thumbnail, timestamp }) => {
+    tubeChat.on('message', async ({ badges, channel, channelId, color, id, isMembership, isModerator, isNewMember, isOwner, isVerified, message, name, thumbnail, timestamp }) => {
+      chatIn(`@${channel}: ${message.map(item => {
+        if (item.text || item.textEmoji) {
+          return item.text || item.textEmoji;
+        } else {
+          return `[yt:emoji]`;
+        }
+      }).join('').trim()} [${name}]`);
+
+      const messageJoined = message.map(item => {
+        if (item.text || item.textEmoji) {
+          return item.text || item.textEmoji;
+        } else {
+          return `[yt:emoji:${item.emoji}]`;
+        }
+      }).join('').trim();
+
       ioServer?.of('/overlays/chat').emit('message', {
         id:          randomUUID(),
         timestamp:   timestamp.getTime(),
         displayName: name,
         userName:    name,
-        message:     message.map(item => item.text || item.textEmoji || item.emoji).join(''),
+        message:     await parseTextWithEmotes(messageJoined),
         show:        false,
         badges,
         color:       color,
         service:     'youtube',
       });
-      // todo: send to chat overlay
-      // add service icons boolean
-      console.log(channel, name, message);
     });
 
     // todo: send events
-    tubeChat.on('superchatSticker', (superchatSticker) => {
-    });
-    tubeChat.on('superchat', (superchat) => {
-    });
+    tubeChat.on('superchatSticker', (superchatSticker) => {});
+    tubeChat.on('superchat', (superchat) => {});
 
     tubeChat.on('sub', (sub) => {});
     tubeChat.on('subGift', (subGift) => {});
@@ -181,7 +193,9 @@ class Google extends Service {
       const stream = await this.getBroadcast();
 
       if (stream && stream.snippet) {
-        const currentTitle = stats.value.currentTitle || 'n/a';
+        const currentTags = (stats.value.currentTags || []).join(' ');
+        const currentTitle = [stats.value.currentTitle || 'n/a', currentTags].filter(String).join(' ');
+
         if (stream.snippet.title !== currentTitle && isStreamOnline.value) {
           info(`YOUTUBE: Title is not matching current title, changing by bot to "${currentTitle}"`);
           await this.updateTitle(stream, currentTitle);
