@@ -193,8 +193,8 @@ class Google extends Service {
       const stream = await this.getBroadcast();
 
       if (stream && stream.snippet) {
-        const currentTags = (stats.value.currentTags || []).join(' ');
-        const currentTitle = [stats.value.currentTitle || 'n/a', currentTags].filter(String).join(' ');
+        const currentTags = (stats.value.currentTags || []).map(o => `#${o}`).join(' ');
+        const currentTitle = [(stats.value.currentTitle || 'n/a') + ` | ${stats.value.currentGame ?? 'n/a'}`, currentTags].filter(String).join(' | ');
 
         if (stream.snippet.title !== currentTitle && isStreamOnline.value) {
           info(`YOUTUBE: Title is not matching current title, changing by bot to "${currentTitle}"`);
