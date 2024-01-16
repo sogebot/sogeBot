@@ -538,14 +538,18 @@ class Events extends Core {
     if (event.event.name !== 'every-x-minutes-of-stream') {
       return false;
     }
-    // set to Date.now() because 0 will trigger event immediatelly after stream start
-    const shouldSave = get(event, 'triggered.runEveryXMinutes', 0) === 0 || typeof get(event, 'triggered.runEveryXMinutes', 0) !== 'number';
-    event.event.triggered.runEveryXMinutes = get(event, 'triggered.runEveryXMinutes', Date.now());
 
-    const shouldTrigger = Date.now() - new Date(event.event.triggered.runEveryXMinutes).getTime() >= Number(event.event.definitions.runEveryXMinutes) * 60 * 1000;
-    if (shouldTrigger || shouldSave) {
+    if (get(event.event, 'triggered.runEveryXMinutes', 0) === 0 || typeof get(event.event, 'triggered.runEveryXMinutes', 0) !== 'number') {
+      // set to Date.now() because 0 will trigger event immediatelly after stream start
       event.event.triggered.runEveryXMinutes = Date.now();
-      await Event.save(event);
+      await event.save();
+    }
+
+    const runEveryXMinutesTriggered = event.event.triggered.runEveryXMinutes!;
+    const shouldTrigger = Date.now() - new Date(runEveryXMinutesTriggered).getTime() >= Number(event.event.definitions.runEveryXMinutes) * 60 * 1000;
+    if (shouldTrigger) {
+      event.event.triggered.runEveryXMinutes = Date.now();
+      await event.save();
     }
     return shouldTrigger;
   }
