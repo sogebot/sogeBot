@@ -46,6 +46,9 @@ class Google extends Service {
     onStreamEndDescriptionEnabled = false;
 
   @settings()
+    onStreamStartPrivacyStatus: 'private' | 'public' | 'unlisted' = 'public';
+
+  @settings()
     onStreamEndPrivacyStatus: 'private' | 'public' | 'unlisted' = 'private';
   @settings()
     onStreamEndPrivacyStatusEnabled = false;
@@ -125,9 +128,44 @@ class Google extends Service {
   }
 
   @onStreamStart()
-  onStreamStart() {
+  async onStreamStart() {
     this.gamesPlayedOnStream = stats.value.currentGame ? [{ game: stats.value.currentGame, timeMark: '00:00:00' }] : [];
     this.broadcastStartedAt = new Date().toLocaleDateString(getLang());
+
+    if (this.client && this.broadcastId) {
+    // update privacy status
+      const youtube = google.youtube({
+        auth:    this.client,
+        version: 'v3',
+      });
+
+      // load broadcast
+      const list = await youtube.liveBroadcasts.list({
+        part: ['id','snippet','contentDetails','status'],
+        id:   [this.broadcastId],
+      });
+
+      let broadcast: youtube_v3.Schema$LiveBroadcast;
+      if (list.data.items && list.data.items.length > 0) {
+        broadcast = list.data.items[0];
+      } else {
+      // broadcast was not found
+        return;
+      }
+
+      // get active broadcasts
+      youtube.liveBroadcasts.update({
+        part:        ['id','snippet','contentDetails','status'],
+        requestBody: {
+          ...broadcast,
+          id:     this.broadcastId,
+          status: {
+            ...broadcast.status,
+            privacyStatus: this.onStreamStartPrivacyStatus,
+          },
+        },
+      });
+    }
   }
 
   @onStreamEnd()
