@@ -72,6 +72,7 @@ type onEventBit = {
 
 type onEventMessage = {
   sender: ChatUser | null;
+  id: string,
   message: string;
   timestamp: number;
 };

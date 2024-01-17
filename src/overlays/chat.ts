@@ -38,7 +38,7 @@ class Chat extends Overlay {
         return;
       }
       ioServer?.of('/overlays/chat').emit('message', {
-        id:          randomUUID(),
+        id:          message.id,
         timestamp:   message.timestamp,
         displayName: message.sender.displayName.toLowerCase() === message.sender.userName ? message.sender.displayName : `${message.sender.displayName} (${message.sender.userName})`,
         userName:    message.sender.userName,

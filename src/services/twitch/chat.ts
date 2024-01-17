@@ -344,6 +344,7 @@ class Chat {
           .then(() => {
             linesParsedIncrement();
             triggerInterfaceOnMessage({
+              id:        msg.id,
               sender:    userstate,
               message,
               timestamp: Date.now(),
@@ -382,11 +383,17 @@ class Chat {
         }).then(() => {
           linesParsedIncrement();
           triggerInterfaceOnMessage({
+            id:        msg.id,
             sender:    userstate,
             message,
             timestamp: Date.now(),
           });
         });
+      });
+
+      client.onMessageRemove(async (_, msgId) => {
+        const chatWidget = await import('../../widgets/chat.js');
+        chatWidget.default.messageDeleted(msgId);
       });
 
       client.onChatClear(() => {

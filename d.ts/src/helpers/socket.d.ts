@@ -419,6 +419,12 @@ export type ClientToServerEventsWithNamespace = {
     'message': (cb: (error: Error | string | null | unknown, message: { timestamp: string, message: string, username: string }) => void) => void,
     'room': (cb: (error: Error | string | null | unknown, room: string) => void) => void,
     'chat.message.send': (message: string) => void,
+    'moderation': (opts: {
+      type: 'ban' | 'autoban' | 'timeout' | 'delete',
+      messageId: string,
+      username: string,
+      timeout?: number,
+    }) => void,
     'viewers': (cb: (error: Error | string | null | unknown, data: { chatters: any }) => void) => void,
   },
   '/widgets/customvariables': GenericEvents & {
