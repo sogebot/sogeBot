@@ -9,6 +9,20 @@ import { ioServer } from '~/helpers/panel.js';
 import { parseTextWithEmotes } from '~/helpers/parseTextWithEmotes.js';
 import { adminEndpoint } from '~/helpers/socket.js';
 
+export const getBadgeImagesFromBadgeSet = (badgesMap: Map<string, string>) => {
+  const badgeImages: {url: string }[] = [];
+  for (const messageBadgeId of badgesMap.keys()) {
+    const badge = badgesCache.find(o => o.id === messageBadgeId);
+    if (badge) {
+      const badgeImage = badge.getVersion(badgesMap.get(messageBadgeId) as string)?.getImageUrl(4);
+      if (badgeImage) {
+        badgeImages.push({ url: badgeImage });
+      }
+    }
+  }
+  return badgeImages;
+};
+
 class Chat extends Overlay {
   showInUI = false;
 
@@ -23,16 +37,6 @@ class Chat extends Overlay {
       if (!message.sender) {
         return;
       }
-      const badgeImages: {url: string }[] = [];
-      for (const messageBadgeId of message.sender.badges.keys()) {
-        const badge = badgesCache.find(o => o.id === messageBadgeId);
-        if (badge) {
-          const badgeImage = badge.getVersion(message.sender.badges.get(messageBadgeId) as string)?.getImageUrl(4);
-          if (badgeImage) {
-            badgeImages.push({ url: badgeImage });
-          }
-        }
-      }
       ioServer?.of('/overlays/chat').emit('message', {
         id:          randomUUID(),
         timestamp:   message.timestamp,
@@ -40,7 +44,7 @@ class Chat extends Overlay {
         userName:    message.sender.userName,
         message:     data,
         show:        false,
-        badges:      badgeImages,
+        badges:      getBadgeImagesFromBadgeSet(message.sender.badges),
         color:       message.sender.color,
         service:     'twitch',
       });

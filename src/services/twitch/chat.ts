@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto';
 import util from 'util';
 
 import type { EmitData } from '@entity/overlay.js';
@@ -33,6 +34,7 @@ import { warning } from '~/helpers/log.js';
 import {
   chatIn, debug, error, info, resub, subcommunitygift, subgift, whisperIn,
 } from '~/helpers/log.js';
+import { ioServer } from '~/helpers/panel.js';
 import { linesParsedIncrement, setStatus } from '~/helpers/parser.js';
 import { tmiEmitter } from '~/helpers/tmi/index.js';
 import * as changelog from '~/helpers/user/changelog.js';
@@ -40,6 +42,7 @@ import getNameById from '~/helpers/user/getNameById.js';
 import { isOwner } from '~/helpers/user/index.js';
 import { isBot, isBotId } from '~/helpers/user/isBot.js';
 import { isIgnored, isIgnoredSafe } from '~/helpers/user/isIgnored.js';
+import { getBadgeImagesFromBadgeSet } from '~/overlays/chat.js';
 import eventlist from '~/overlays/eventlist.js';
 import { Parser } from '~/parser.js';
 import alerts from '~/registries/alerts.js';
@@ -353,6 +356,19 @@ class Chat {
       client.onMessage(async (_channel, user, message, msg) => {
         const userstate = msg.userInfo;
         if (isBotId(userstate.userId)) {
+          // send to dashboard and ignore
+          ioServer?.of('/widgets/chat').emit('bot-message', {
+            id:          randomUUID(),
+            timestamp:   Date.now(),
+            displayName: msg.userInfo.displayName.toLowerCase() === msg.userInfo.userName ? msg.userInfo.displayName : `${msg.userInfo.displayName} (${msg.userInfo.userName})`,
+            userName:    msg.userInfo.userName,
+            message:     message,
+            show:        false,
+            badges:      getBadgeImagesFromBadgeSet(msg.userInfo.badges),
+            color:       msg.userInfo.color,
+            service:     'twitch',
+            isBot:       true,
+          });
           return;
         }
 
