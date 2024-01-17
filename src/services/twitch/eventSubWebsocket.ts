@@ -706,14 +706,14 @@ class EventSubWebsocket {
       }
     }
 
-    // if (process.env.ENV === 'production' || process.env.NODE_ENV === 'production') {
-    this.listener.stop();
-    setTimeout(() => {
-      this.listener.start();
-    }, 5000);
-    // } else {
-    //   info('EVENTSUB-WS: Eventsub events disabled on dev-mode.');
-    // }
+    if (process.env.ENV === 'production' || process.env.NODE_ENV === 'production') {
+      this.listener.stop();
+      setTimeout(() => {
+        this.listener.start();
+      }, 5000);
+    } else {
+      info('EVENTSUB-WS: Eventsub events disabled on dev-mode.');
+    }
   }
 }
 
