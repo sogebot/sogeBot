@@ -6,7 +6,7 @@ import Widget from './_interface.js';
 import { timer } from '../decorators.js';
 import { badgesCache } from '../services/twitch/calls/getChannelChatBadges.js';
 
-import { onMessage } from '~/decorators/on.js';
+import { onMessage, onStreamStart } from '~/decorators/on.js';
 import { getOwnerAsSender, getUserSender } from '~/helpers/commons/index.js';
 import { sendMessage } from '~/helpers/commons/sendMessage.js';
 import { eventEmitter } from '~/helpers/events/emitter.js';
@@ -57,6 +57,21 @@ class Chat extends Widget {
         message:   data,
         badges:    badgeImages,
       });
+    });
+  }
+
+  @onStreamStart()
+  public streamStarted(msgId: string) {
+    ioServer?.of('/overlays/chat').emit('message', {
+      id:          randomUUID(),
+      timestamp:   Date.now(),
+      displayName: ``,
+      userName:    ``,
+      message:     ``,
+      show:        false,
+      badges:      [],
+      color:       [],
+      service:     '@stream-started',
     });
   }
 
