@@ -3,10 +3,14 @@ import { randomUUID } from 'node:crypto';
 import { OAuth2Client } from 'google-auth-library/build/src/auth/oauth2client';
 import { google, youtube_v3 } from 'googleapis';
 import { TubeChat } from 'tubechat';
+import { ISuperChatSticker, ExtendChannel, ISuperChat } from 'tubechat/lib/lib/actions/superchat.js';
 
 import Service from './_interface.js';
+import eventlist from '../overlays/eventlist.js';
+import alerts from '../registries/alerts.js';
 
 import { GooglePrivateKeys } from '~/database/entity/google.js';
+import { Currency } from '~/database/entity/user.js';
 import { AppDataSource } from '~/database.js';
 import { onChange, onLoad, onStartup, onStreamEnd, onStreamStart } from '~/decorators/on.js';
 import { persistent, settings } from '~/decorators.js';
@@ -16,7 +20,11 @@ import {
   streamStatusChangeSince,
 } from '~/helpers/api/index.js';
 import { MINUTE } from '~/helpers/constants.js';
+import exchange from '~/helpers/currency/exchange.js';
+import { mainCurrency } from '~/helpers/currency/index.js';
+import { eventEmitter } from '~/helpers/events/index.js';
 import { getTime } from '~/helpers/getTime.js';
+import { triggerInterfaceOnTip } from '~/helpers/interface/triggers.js';
 import { getLang } from '~/helpers/locales.js';
 import { error, info, debug, chatIn } from '~/helpers/log.js';
 import { app, ioServer } from '~/helpers/panel.js';
@@ -60,6 +68,54 @@ class Google extends Service {
   broadcastId: string | null = null;
   gamesPlayedOnStream: { game: string, timeMark: string }[] = [];
   broadcastStartedAt: string = new Date().toLocaleDateString(getLang());
+
+  receivedSuperChat(data: ISuperChatSticker | ISuperChat ) {
+    const username = data.name;
+    const amount = data.amount;
+    const message = data.message.map(val => val.text || val.textEmoji).join('');
+    const currency = data.currency as Currency;
+
+    if (isStreamOnline.value) {
+      stats.value.currentTips = stats.value.currentTips + exchange(amount, currency, mainCurrency.value);
+    }
+
+    eventlist.add({
+      event:     'tip',
+      amount,
+      currency,
+      userId:    `${username}#__anonymous__`,
+      message,
+      timestamp: Date.now(),
+    });
+
+    eventEmitter.emit('tip', {
+      userName:            username.toLowerCase(),
+      amount:              Number(amount).toFixed(2),
+      currency:            currency,
+      amountInBotCurrency: Number(exchange(amount, currency, mainCurrency.value)).toFixed(2),
+      currencyInBot:       mainCurrency.value,
+      message,
+      isAnonymous:         true,
+    });
+    alerts.trigger({
+      event:      'tip',
+      service:    'YouTube SuperChat',
+      name:       username.toLowerCase(),
+      amount:     Number(Number(amount).toFixed(2)),
+      tier:       null,
+      currency:   currency,
+      monthsName: '',
+      message,
+    });
+
+    triggerInterfaceOnTip({
+      userName:  username.toLowerCase(),
+      amount,
+      message,
+      currency:  currency,
+      timestamp: Date.now(),
+    });
+  }
 
   @onLoad('channel')
   @onChange('channel')
@@ -116,10 +172,14 @@ class Google extends Service {
       });
     });
 
-    // todo: send events
-    tubeChat.on('superchatSticker', (superchatSticker) => {});
-    tubeChat.on('superchat', (superchat) => {});
+    tubeChat.on('superchatSticker', (superchatSticker) => {
+      this.receivedSuperChat(superchatSticker);
+    });
+    tubeChat.on('superchat', (superchat) => {
+      this.receivedSuperChat(superchat);
+    });
 
+    // todo: send events
     tubeChat.on('sub', (sub) => {});
     tubeChat.on('subGift', (subGift) => {});
     tubeChat.on('subgiftGroup', (subgiftGroup) => {});
