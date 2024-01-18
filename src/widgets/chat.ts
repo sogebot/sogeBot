@@ -62,7 +62,7 @@ class Chat extends Widget {
 
   @onStreamStart()
   public streamStarted(msgId: string) {
-    ioServer?.of('/overlays/chat').emit('message', {
+    ioServer?.of('/overlays/chat').emit('bot-message', {
       id:          randomUUID(),
       timestamp:   Date.now(),
       displayName: ``,
