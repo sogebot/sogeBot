@@ -73,7 +73,7 @@ class Google extends Service {
     const username = data.name;
     const amount = data.amount;
     const message = data.message.map(val => val.text || val.textEmoji).join('');
-    const currency = data.currency as Currency;
+    const currency = data.currency.toUpperCase() as Currency; // in lower case usually
 
     if (isStreamOnline.value) {
       stats.value.currentTips = stats.value.currentTips + exchange(amount, currency, mainCurrency.value);
