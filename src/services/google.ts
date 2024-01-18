@@ -3,7 +3,7 @@ import { randomUUID } from 'node:crypto';
 import { OAuth2Client } from 'google-auth-library/build/src/auth/oauth2client';
 import { google, youtube_v3 } from 'googleapis';
 import { TubeChat } from 'tubechat';
-import { ISuperChatSticker, ExtendChannel, ISuperChat } from 'tubechat/lib/lib/actions/superchat.js';
+import { ISuperChatSticker, ISuperChat } from 'tubechat/lib/lib/actions/superchat.js';
 
 import Service from './_interface.js';
 import eventlist from '../overlays/eventlist.js';
