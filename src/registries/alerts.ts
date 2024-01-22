@@ -1,4 +1,5 @@
 import { AlertQueue, EmitData } from '@entity/overlay.js';
+import { itemsToEvalPart } from '@sogebot/commons/queryFilter.js';
 
 import Registry from './_interface.js';
 import { command, default_permission, example, persistent, settings } from '../decorators.js';
@@ -167,7 +168,7 @@ class Alerts extends Registry {
       };
 
       // todo: check if alert is in queue
-      const queue = await this.isInQueue(data);
+      const queue = await this.getValidQueue(data);
       if (queue && !queue.passthrough) {
         info(`Alert is in queue: ${queue.id}`);
         queue.emitData.push(data);
@@ -180,9 +181,39 @@ class Alerts extends Registry {
     }
   }
 
-  async isInQueue(data: EmitData) {
-    // do something with filter yada yada
-    return await AlertQueue.findOne({});
+  async getValidQueue(data: EmitData) {
+    const queues = await AlertQueue.find();
+    for (const queue of queues) {
+      if (queue.filter && queue.filter.items) {
+        const script = itemsToEvalPart(queue.filter.items, queue.filter.operator);
+        const tierAsNumber = data.tier === 'Prime' ? 0 : Number(data.tier);
+
+        {
+          // @ts-expect-error: TS6133
+          const event =     data.event;
+          // @ts-expect-error: TS6133
+          const username =  data.name;
+          // @ts-expect-error: TS6133
+          const name =      data.name;
+          // @ts-expect-error: TS6133
+          const game =      data.game || '';
+          // @ts-expect-error: TS6133
+          const amount =    data.amount;
+          // @ts-expect-error: TS6133
+          const service =   data.service;
+          // @ts-expect-error: TS6133
+          const message =   data.message;
+          // @ts-expect-error: TS6133
+          const tier =      tierAsNumber;
+          // @ts-expect-error: TS6133
+          const recipient = data.recipient;
+          if (eval(script)) {
+            return queue;
+          }
+        }
+      }
+    }
+    return null;
   }
 
   skip() {
