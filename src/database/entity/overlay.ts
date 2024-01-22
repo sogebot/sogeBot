@@ -699,8 +699,8 @@ export class AlertQueue extends BotEntity {
   @Column({ type: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') !== 'better-sqlite3' ? 'json' : 'simple-json' })
     emitData: EmitData[];
 
-  @Column()
-    filter: string | null;
+  @Column({ type: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') !== 'better-sqlite3' ? 'json' : 'simple-json', nullable: true })
+    filter: Filter;
 
   @Column()
     passthrough: boolean;
