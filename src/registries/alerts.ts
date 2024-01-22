@@ -1,5 +1,4 @@
 import { AlertQueue, EmitData } from '@entity/overlay.js';
-import { itemsToEvalPart } from '@sogebot/commons/queryFilter.js';
 
 import Registry from './_interface.js';
 import { command, default_permission, example, persistent, settings } from '../decorators.js';
@@ -16,6 +15,7 @@ import { getLocalizedName } from '~/helpers/getLocalizedName.js';
 import { debug, info, error } from '~/helpers/log.js';
 import { app, ioServer } from '~/helpers/panel.js';
 import { defaultPermissions } from '~/helpers/permissions/defaultPermissions.js';
+import { itemsToEvalPart } from '~/helpers/queryFilter.js';
 import { adminEndpoint } from '~/helpers/socket.js';
 import { Types } from '~/plugins/ListenTo.js';
 import { adminMiddleware } from '~/socket.js';
