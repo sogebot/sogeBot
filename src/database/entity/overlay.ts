@@ -1,4 +1,4 @@
-import { Column, Entity, PrimaryColumn } from 'typeorm';
+import { BeforeInsert, Column, Entity, PrimaryColumn } from 'typeorm';
 
 import { BotEntity } from '../BotEntity.js';
 
@@ -689,6 +689,24 @@ export interface Group {
     alignX: number;
     alignY: number;
   }[],
+}
+
+@Entity()
+export class AlertQueue extends BotEntity {
+  @PrimaryColumn({ generated: 'uuid' })
+    id: string;
+
+  @Column({ type: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') !== 'better-sqlite3' ? 'json' : 'simple-json' })
+    emitData: EmitData[];
+
+  @Column()
+    filter: string | null;
+
+  @Column()
+    passthrough: boolean;
+
+  @Column()
+    play: boolean;
 }
 
 @Entity()

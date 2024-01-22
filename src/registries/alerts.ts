@@ -1,4 +1,4 @@
-import { EmitData } from '@entity/overlay.js';
+import { AlertQueue, EmitData } from '@entity/overlay.js';
 
 import Registry from './_interface.js';
 import { command, default_permission, example, persistent, settings } from '../decorators.js';
@@ -17,6 +17,7 @@ import { app, ioServer } from '~/helpers/panel.js';
 import { defaultPermissions } from '~/helpers/permissions/defaultPermissions.js';
 import { adminEndpoint } from '~/helpers/socket.js';
 import { Types } from '~/plugins/ListenTo.js';
+import { adminMiddleware } from '~/socket.js';
 import { translate } from '~/translate.js';
 import { variables } from '~/watchers.js';
 
@@ -85,6 +86,34 @@ class Alerts extends Registry {
       return;
     }
 
+    app.get('/api/registries/alerts/queue/', async (req, res) => {
+      const cmd = await AlertQueue.find({
+        select: [ 'id' ],
+      });
+      res.send({
+        data: cmd,
+      });
+    });
+
+    app.post('/api/registries/alerts/queue/:id/trigger', adminMiddleware, async (req, res) => {
+      const queue = await AlertQueue.findOneBy({ id: req.params.id });
+      if (queue && queue.play) {
+        const data = queue.emitData.shift();
+        if (data) {
+          queue.save();
+          this.trigger(data);
+        }
+      }
+      res.send().status(200);
+    });
+
+    app.get('/api/registries/alerts/queue/:id', async (req, res) => {
+      const cmd = await AlertQueue.findOneBy({ id: req.params.id });
+      res.send({
+        data: cmd,
+      });
+    });
+
     eventEmitter.on(Types.onChannelShoutoutCreate, (opts) => {
       this.trigger({
         event:      'promo',
@@ -137,9 +166,23 @@ class Alerts extends Registry {
         ...opts, isTTSMuted: this.isTTSMuted, isSoundMuted: this.isSoundMuted, TTSKey: key, user, game: user?.game, caster, recipientUser: recipient, id: key,
       };
 
-      info(`Triggering alert send: ${JSON.stringify(data)}`);
-      ioServer?.of('/registries/alerts').emit('alert', data);
+      // todo: check if alert is in queue
+      const queue = await this.isInQueue(data);
+      if (queue && !queue.passthrough) {
+        info(`Alert is in queue: ${queue.id}`);
+        queue.emitData.push(data);
+        await queue.save();
+        await AlertQueue.create({ emitData: data }).save();
+      } else {
+        info(`Triggering alert send: ${JSON.stringify(data)}`);
+        ioServer?.of('/registries/alerts').emit('alert', data);
+      }
     }
+  }
+
+  async isInQueue(data: EmitData) {
+    // do something with filter yada yada
+    return await AlertQueue.findOne({});
   }
 
   skip() {
