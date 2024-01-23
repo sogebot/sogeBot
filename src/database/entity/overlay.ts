@@ -1,4 +1,4 @@
-import { Column, Entity, PrimaryColumn } from 'typeorm';
+import { BeforeInsert, BeforeUpdate, Column, Entity, PrimaryColumn } from 'typeorm';
 
 import { BotEntity } from '../BotEntity.js';
 
@@ -700,13 +700,22 @@ export class AlertQueue extends BotEntity {
     emitData: EmitData[];
 
   @Column({ type: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') !== 'better-sqlite3' ? 'json' : 'simple-json', nullable: true })
-    filter: Filter;
+    filter: { [x: string]: Filter };
 
   @Column()
     passthrough: boolean;
 
   @Column()
     play: boolean;
+
+  @Column({ nullable: false, type: 'varchar', length: '2022-07-27T00:30:34.569259834Z'.length })
+    updatedAt?: string;
+
+  @BeforeInsert()
+  @BeforeUpdate()
+  generateUpdatedAt() {
+    this.updatedAt = new Date().toISOString();
+  }
 }
 
 @Entity()

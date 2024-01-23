@@ -1,4 +1,5 @@
 import { AlertQueue, EmitData } from '@entity/overlay.js';
+import { Mutex } from 'async-mutex';
 
 import Registry from './_interface.js';
 import { command, default_permission, example, persistent, settings } from '../decorators.js';
@@ -21,6 +22,8 @@ import { Types } from '~/plugins/ListenTo.js';
 import { adminMiddleware } from '~/socket.js';
 import { translate } from '~/translate.js';
 import { variables } from '~/watchers.js';
+
+const filterMutex = new Mutex();
 
 const fetchUserForAlert = (opts: EmitData, type: 'recipient' | 'name'): Promise<Readonly<Required<UserInterface>> & { game?: string } | null> => {
   return new Promise<Readonly<Required<UserInterface>> & { game?: string } | null>((resolve) => {
@@ -88,31 +91,65 @@ class Alerts extends Registry {
     }
 
     app.get('/api/registries/alerts/queue/', async (req, res) => {
-      const cmd = await AlertQueue.find({
-        select: [ 'id' ],
-      });
+      const release = await filterMutex.acquire();
+      const cmd = await AlertQueue.find();
       res.send({
         data: cmd,
       });
+      release();
+    });
+
+    app.patch('/api/registries/alerts/queue/:id', adminMiddleware, async (req, res) => {
+      const release = await filterMutex.acquire();
+      const queue = await AlertQueue.findOneBy({ id: req.params.id });
+      if (queue) {
+        queue.passthrough = 'passthrough' in req.body ? req.body.passthrough : queue.passthrough;
+        queue.play = 'play' in req.body ? req.body.play : queue.play;
+        await queue.save();
+        res.status(200).send();
+      } else {
+        res.status(404).send();
+      }
+      release();
     });
 
     app.post('/api/registries/alerts/queue/:id/trigger', adminMiddleware, async (req, res) => {
+      const release = await filterMutex.acquire();
       const queue = await AlertQueue.findOneBy({ id: req.params.id });
-      if (queue && queue.play) {
+      if (queue) {
         const data = queue.emitData.shift();
         if (data) {
           queue.save();
           this.trigger(data);
         }
+      } else {
+        res.status(200).send();
       }
-      res.send().status(200);
+      release();
     });
 
-    app.get('/api/registries/alerts/queue/:id', async (req, res) => {
-      const cmd = await AlertQueue.findOneBy({ id: req.params.id });
-      res.send({
-        data: cmd,
-      });
+    app.post('/api/registries/alerts/queue', adminMiddleware, async (req, res) => {
+      const release = await filterMutex.acquire();
+      try {
+        const { count, ...data } = req.body;
+        const saved = await AlertQueue.create(data).save();
+        res.send({ data: saved });
+      } catch (e) {
+        res.status(400).send({ errors: e });
+      }
+      release();
+    });
+
+    app.delete('/api/registries/alerts/queue/:id', adminMiddleware, async (req, res) => {
+      const release = await filterMutex.acquire();
+      const group = await AlertQueue.findOneBy({ id: req.params.id });
+      if (group) {
+        await group.remove();
+        res.status(204).send();
+      } else {
+        res.status(404).send();
+      }
+      release();
     });
 
     eventEmitter.on(Types.onChannelShoutoutCreate, (opts) => {
@@ -184,13 +221,17 @@ class Alerts extends Registry {
   async getValidQueue(data: EmitData) {
     const queues = await AlertQueue.find();
     for (const queue of queues) {
-      if (queue.filter && queue.filter.items) {
-        const script = itemsToEvalPart(queue.filter.items, queue.filter.operator);
+      const filter = queue.filter[data.event];
+      if (filter === null) {
+        // if filter is null, it means that we want to queue alert on every event
+        return queue;
+      }
+      if (filter && filter.items) {
+        // if filter is not null, we want to check if alert matches filter
+        const script = itemsToEvalPart(filter.items, filter.operator);
         const tierAsNumber = data.tier === 'Prime' ? 0 : Number(data.tier);
 
         {
-          // @ts-expect-error: TS6133
-          const event =     data.event;
           // @ts-expect-error: TS6133
           const username =  data.name;
           // @ts-expect-error: TS6133
