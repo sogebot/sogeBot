@@ -11,6 +11,7 @@ import users from '../users.js';
 
 import { AppDataSource } from '~/database.js';
 import { isStreamOnline, stats } from '~/helpers/api/index.js';
+import { MINUTE } from '~/helpers/constants.js';
 import exchange from '~/helpers/currency/exchange.js';
 import { mainCurrency } from '~/helpers/currency/index.js';
 import rates from '~/helpers/currency/rates.js';
@@ -19,7 +20,6 @@ import { triggerInterfaceOnTip } from '~/helpers/interface/triggers.js';
 import {
   error, info, tip,
 } from '~/helpers/log.js';
-import { MINUTE } from '~/helpers/constants.js';
 
 type StreamElementsEvent = {
   donation: {
@@ -155,6 +155,7 @@ class StreamElements extends Integration {
 
     let isAnonymous = false;
     const timestamp = Date.now();
+    let evData: any = null;
     users.getUserByUsername(username)
       .then(async(user) => {
         const newTip: UserTipInterface = {
@@ -169,7 +170,7 @@ class StreamElements extends Integration {
         AppDataSource.getRepository(UserTip).save(newTip);
         tip(`${username.toLowerCase()}${user.userId ? '#' + user.userId : ''}, amount: ${Number(amount).toFixed(2)}${DONATION_CURRENCY}, message: ${message}`);
 
-        eventlist.add({
+        evData = await eventlist.add({
           event:    'tip',
           amount,
           currency: DONATION_CURRENCY,
@@ -178,10 +179,10 @@ class StreamElements extends Integration {
           timestamp,
         });
       })
-      .catch(() => {
+      .catch(async () => {
         // user not found on Twitch
         tip(`${username.toLowerCase()}#__anonymous__, amount: ${Number(amount).toFixed(2)}${DONATION_CURRENCY}, message: ${message}`);
-        eventlist.add({
+        evData = await eventlist.add({
           event:    'tip',
           amount,
           currency: DONATION_CURRENCY,
@@ -201,6 +202,7 @@ class StreamElements extends Integration {
           isAnonymous,
         });
         alerts.trigger({
+          eventId:    evData?.id ?? null,
           event:      'tip',
           service:    'streamelements',
           name:       username.toLowerCase(),

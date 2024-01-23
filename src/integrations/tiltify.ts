@@ -130,7 +130,17 @@ class Tiltify extends Integration {
       for (const donate of data) {
         if (this.lastCheckAt < donate.completedAt) {
           tip(`${donate.name} for ${campaign.name}, amount: ${Number(donate.amount).toFixed(2)}${campaign.causeCurrency}, message: ${donate.comment}`);
+          const eventData = await eventlist.add({
+            event:               'tip',
+            amount:              donate.amount,
+            currency:            campaign.causeCurrency,
+            userId:              `${donate.name}#__anonymous__`,
+            message:             donate.comment,
+            timestamp:           donate.completedAt,
+            charityCampaignName: campaign.name,
+          });
           alerts.trigger({
+            eventId:    eventData?.id ?? null,
             event:      'tip',
             service:    'tiltify',
             name:       donate.name,
@@ -139,15 +149,6 @@ class Tiltify extends Integration {
             currency:   campaign.causeCurrency,
             monthsName: '',
             message:    donate.comment,
-          });
-          eventlist.add({
-            event:               'tip',
-            amount:              donate.amount,
-            currency:            campaign.causeCurrency,
-            userId:              `${donate.name}#__anonymous__`,
-            message:             donate.comment,
-            timestamp:           donate.completedAt,
-            charityCampaignName: campaign.name,
           });
           triggerInterfaceOnTip({
             userName:  donate.name,

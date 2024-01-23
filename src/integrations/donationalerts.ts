@@ -219,7 +219,7 @@ class Donationalerts extends Integration {
       const user = await users.getUserByUsername(data.username);
       tip(`${data.username.toLowerCase()}${user.userId ? '#' + user.userId : ''}, amount: ${Number(data.amount).toFixed(2)}${data.currency}, message: ${data.message}`);
 
-      eventlist.add({
+      const eventData = await eventlist.add({
         event:    'tip',
         amount:   data.amount,
         currency: data.currency,
@@ -239,6 +239,7 @@ class Donationalerts extends Integration {
       });
 
       alerts.trigger({
+        eventId:    eventData?.id ?? null,
         event:      'tip',
         service:    'donationalerts',
         name:       data.username.toLowerCase(),
@@ -261,7 +262,16 @@ class Donationalerts extends Integration {
       AppDataSource.getRepository(UserTip).save(newTip);
     } else {
       tip(`anonymous#__anonymous__, amount: ${Number(data.amount).toFixed(2)}${data.currency}, message: ${data.message}`);
+      const eventData = await eventlist.add({
+        event:    'tip',
+        amount:   data.amount,
+        currency: data.currency,
+        userId:   `anonymous#__anonymous__`,
+        message:  data.message,
+        timestamp,
+      });
       alerts.trigger({
+        eventId:    eventData?.id ?? null,
         event:      'tip',
         name:       'anonymous',
         amount:     Number(data.amount.toFixed(2)),
@@ -269,14 +279,6 @@ class Donationalerts extends Integration {
         currency:   data.currency,
         monthsName: '',
         message:    data.message,
-      });
-      eventlist.add({
-        event:    'tip',
-        amount:   data.amount,
-        currency: data.currency,
-        userId:   `anonymous#__anonymous__`,
-        message:  data.message,
-        timestamp,
       });
     }
     triggerInterfaceOnTip({

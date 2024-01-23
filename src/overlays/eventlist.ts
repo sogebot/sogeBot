@@ -123,7 +123,7 @@ class EventList extends Overlay {
       });
     }
 
-    await AppDataSource.getRepository(EventListEntity).save({
+    const event = await AppDataSource.getRepository(EventListEntity).save({
       event:       data.event,
       userId:      data.userId,
       timestamp:   Date.now(),
@@ -140,6 +140,7 @@ class EventList extends Overlay {
       ),
     });
     eventlist.askForGet();
+    return event;
   }
 }
 

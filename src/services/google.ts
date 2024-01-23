@@ -69,7 +69,7 @@ class Google extends Service {
   gamesPlayedOnStream: { game: string, timeMark: string }[] = [];
   broadcastStartedAt: string = new Date().toLocaleDateString(getLang());
 
-  receivedSuperChat(data: ISuperChatSticker | ISuperChat ) {
+  async receivedSuperChat(data: ISuperChatSticker | ISuperChat ) {
     const username = data.name;
     const amount = data.amount;
     const message = data.message.map(val => val.text || val.textEmoji).join('');
@@ -79,7 +79,7 @@ class Google extends Service {
       stats.value.currentTips = stats.value.currentTips + exchange(amount, currency, mainCurrency.value);
     }
 
-    eventlist.add({
+    const eventData = await eventlist.add({
       event:     'tip',
       amount,
       currency,
@@ -98,6 +98,7 @@ class Google extends Service {
       isAnonymous:         true,
     });
     alerts.trigger({
+      eventId:    eventData?.id ?? null,
       event:      'tip',
       service:    'YouTube SuperChat',
       name:       username.toLowerCase(),

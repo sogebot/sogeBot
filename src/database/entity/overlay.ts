@@ -26,6 +26,7 @@ type Font = {
 };
 
 export interface EmitData {
+  eventId: string | null;
   alertId?: string;
   name: string;
   amount: number;

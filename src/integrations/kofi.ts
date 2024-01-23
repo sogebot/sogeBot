@@ -73,7 +73,7 @@ class Kofi extends Integration {
             tip(`${data.from_name.toLowerCase()}#${userId}, amount: ${Number(data.amount).toFixed(2)}${data.currency}, message: ${data.message}`);
           }
 
-          eventlist.add({
+          const eventData = await eventlist.add({
             event:     'tip',
             amount:    Number(data.amount),
             currency:  data.currency,
@@ -92,6 +92,7 @@ class Kofi extends Integration {
             message:             data.message,
           });
           alerts.trigger({
+            eventId:    eventData?.id ?? null,
             event:      'tip',
             service:    'kofi',
             name:       data.from_name,

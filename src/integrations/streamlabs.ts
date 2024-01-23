@@ -280,7 +280,7 @@ class Streamlabs extends Integration {
           }
           tip(`${event.from.toLowerCase()}${user.userId ? '#' + user.userId : ''}, amount: ${Number(event.amount).toFixed(2)}${event.currency}, message: ${event.message}`);
         }
-        eventlist.add({
+        const ev = await eventlist.add({
           event:    'tip',
           amount:   Number(event.amount),
           currency: event.currency,
@@ -299,6 +299,7 @@ class Streamlabs extends Integration {
           message:             event.message,
         });
         alerts.trigger({
+          eventId:    ev?.id ?? null,
           event:      'tip',
           name:       event.from.toLowerCase(),
           service:    'streamlabs',

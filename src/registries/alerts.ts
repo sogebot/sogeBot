@@ -1,3 +1,5 @@
+import { randomUUID } from 'crypto';
+
 import { AlertQueue, EmitData } from '@entity/overlay.js';
 import { Mutex } from 'async-mutex';
 
@@ -103,9 +105,25 @@ class Alerts extends Registry {
       const release = await filterMutex.acquire();
       const queue = await AlertQueue.findOneBy({ id: req.params.id });
       if (queue) {
-        queue.passthrough = 'passthrough' in req.body ? req.body.passthrough : queue.passthrough;
-        queue.play = 'play' in req.body ? req.body.play : queue.play;
+        for (const key of Object.keys(queue)) {
+          if (key in req.body && key in queue) {
+            (queue as any)[key] = req.body[key];
+          }
+        }
         await queue.save();
+        res.status(200).send();
+      } else {
+        res.status(404).send();
+      }
+      release();
+    });
+
+    app.post('/api/registries/alerts/queue/:id/reset', adminMiddleware, async (req, res) => {
+      const release = await filterMutex.acquire();
+      const queue = await AlertQueue.findOneBy({ id: req.params.id });
+      if (queue) {
+        queue.emitData = [];
+        queue.save();
         res.status(200).send();
       } else {
         res.status(404).send();
@@ -120,10 +138,12 @@ class Alerts extends Registry {
         const data = queue.emitData.shift();
         if (data) {
           queue.save();
-          this.trigger(data);
+          // setting eventId null to skip queue
+          this.trigger({ ...data, eventId: null });
         }
-      } else {
         res.status(200).send();
+      } else {
+        res.status(404).send();
       }
       release();
     });
@@ -154,6 +174,7 @@ class Alerts extends Registry {
 
     eventEmitter.on(Types.onChannelShoutoutCreate, (opts) => {
       this.trigger({
+        eventId:    randomUUID(), // randomizing eventId, we are not saving it to eventlist but we want it to be queued
         event:      'promo',
         message:    '',
         name:       opts.shoutedOutBroadcasterDisplayName,
@@ -204,13 +225,11 @@ class Alerts extends Registry {
         ...opts, isTTSMuted: this.isTTSMuted, isSoundMuted: this.isSoundMuted, TTSKey: key, user, game: user?.game, caster, recipientUser: recipient, id: key,
       };
 
-      // todo: check if alert is in queue
       const queue = await this.getValidQueue(data);
-      if (queue && !queue.passthrough) {
-        info(`Alert is in queue: ${queue.id}`);
+      if (queue && !queue.passthrough && data.eventId) {
+        info(`Alert is in queue#${queue.id}: ${JSON.stringify(data)}`);
         queue.emitData.push(data);
         await queue.save();
-        await AlertQueue.create({ emitData: data }).save();
       } else {
         info(`Triggering alert send: ${JSON.stringify(data)}`);
         ioServer?.of('/registries/alerts').emit('alert', data);
@@ -246,6 +265,8 @@ class Alerts extends Registry {
           const message =   data.message;
           // @ts-expect-error: TS6133
           const tier =      tierAsNumber;
+          // @ts-expect-error: TS6133
+          const rewardId =  data.rewardId;
           // @ts-expect-error: TS6133
           const recipient = data.recipient;
           if (eval(script)) {
@@ -291,6 +312,7 @@ class Alerts extends Registry {
       }, false);
       this['!promo-enableShoutoutMessage'] && parserReply(message, { sender: opts.sender, discord: opts.discord, attr: opts.attr, id: '', forbidReply: true });
       this.trigger({
+        eventId:    randomUUID(), // randomizing eventId, we are not saving it to eventlist but we want it to be queued
         event:      'promo',
         message:    customMessage,
         name:       userName,

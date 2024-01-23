@@ -141,6 +141,7 @@ export const runScriptInSandbox = (plugin: Plugin,
         info(`PLUGINS#${plugin.id}: Triggering alert ${uuid}`);
       }
       await alerts.trigger({
+        eventId:    null,
         amount:     0,
         currency:   'CZK',
         event:      'custom',

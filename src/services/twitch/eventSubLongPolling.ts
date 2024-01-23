@@ -174,7 +174,7 @@ class EventSubLongPolling {
     });
   }
 
-  onChannelRedemptionAdd(event: EventSubChannelRedemptionAddEventData) {
+  async onChannelRedemptionAdd(event: EventSubChannelRedemptionAddEventData) {
     // trigger reward-redeemed event
     if (event.user_input.length > 0) {
       redeem(`${ event.user_login }#${ event.user_id } redeemed ${ event.reward.title }(${ event.reward.id }): ${ event.user_input }`);
@@ -186,7 +186,7 @@ class EventSubLongPolling {
       userId: event.user_id, userName: event.user_login, displayname: event.user_name,
     });
 
-    eventlist.add({
+    const eventData = await eventlist.add({
       event:         'rewardredeem',
       userId:        String(event.user_id),
       message:       event.user_input,
@@ -195,6 +195,7 @@ class EventSubLongPolling {
       rewardId:      event.reward.id,
     });
     alerts.trigger({
+      eventId:    eventData?.id ?? null,
       event:      'rewardredeem',
       name:       event.reward.title,
       rewardId:   event.reward.id,

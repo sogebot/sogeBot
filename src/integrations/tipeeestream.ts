@@ -2,8 +2,8 @@ import { Currency, UserTip, UserTipInterface } from '@entity/user.js';
 import fetch from 'node-fetch';
 
 import Integration from './_interface.js';
-import { persistent, settings } from '../decorators.js';
 import { onStartup } from '../decorators/on.js';
+import { persistent, settings } from '../decorators.js';
 import eventlist from '../overlays/eventlist.js';
 import alerts from '../registries/alerts.js';
 import users from '../users.js';
@@ -11,13 +11,13 @@ import users from '../users.js';
 import { AppDataSource } from '~/database.js';
 import { isStreamOnline } from '~/helpers/api/index.js';
 import { stats } from '~/helpers/api/stats.js';
+import { MINUTE } from '~/helpers/constants.js';
 import exchange from '~/helpers/currency/exchange.js';
 import { mainCurrency } from '~/helpers/currency/index.js';
 import rates from '~/helpers/currency/rates.js';
 import { eventEmitter } from '~/helpers/events/index.js';
 import { triggerInterfaceOnTip } from '~/helpers/interface/triggers.js';
 import { error, tip } from '~/helpers/log.js';
-import { MINUTE } from '~/helpers/constants.js';
 
 type TipeeestreamEvent = {
   message: string,
@@ -145,6 +145,7 @@ class TipeeeStream extends Integration {
 
       let isAnonymous = false;
       const timestamp = Date.now();
+      let eventData: any = null;
       users.getUserByUsername(userName)
         .then(async(user) => {
           const newTip: UserTipInterface = {
@@ -158,7 +159,7 @@ class TipeeeStream extends Integration {
           };
           AppDataSource.getRepository(UserTip).save(newTip);
           tip(`${userName.toLowerCase()}${user.userId ? '#' + user.userId : ''}, amount: ${Number(amount).toFixed(2)}${donationCurrency}, message: ${message}`);
-          eventlist.add({
+          eventData = await eventlist.add({
             event:    'tip',
             amount,
             currency: donationCurrency,
@@ -167,10 +168,10 @@ class TipeeeStream extends Integration {
             timestamp,
           });
         })
-        .catch(() => {
+        .catch(async () => {
           // user not found on Twitch
           tip(`${userName.toLowerCase()}#__anonymous__, amount: ${Number(amount).toFixed(2)}${donationCurrency}, message: ${message}`);
-          eventlist.add({
+          eventData = await eventlist.add({
             event:    'tip',
             amount,
             currency: donationCurrency,
@@ -190,6 +191,7 @@ class TipeeeStream extends Integration {
             isAnonymous,
           });
           alerts.trigger({
+            eventId:    eventData?.id ?? null,
             event:      'tip',
             service:    'tipeeestream',
             name:       userName.toLowerCase(),

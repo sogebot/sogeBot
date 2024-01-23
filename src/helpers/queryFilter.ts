@@ -24,7 +24,7 @@ export function itemsToEvalPart (items: any[], operator: string): string {
 
       if (['pr'].includes(item.comparator)) {
         output += `${item.type}.length > 0`;
-      } else if (item.typeof === 'string' || item.typeof === 'service') {
+      } else if (item.typeof === 'string' || item.typeof === 'service' || item.typeof === 'reward') {
         if (['includes'].includes(item.comparator)) {
           output += `[${item.value.split(',').map((o: string) => `'${o.trim()}'`).join(', ')}].includes(${item.type})`;
         } else if (['co'].includes(item.comparator)) {
