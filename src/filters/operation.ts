@@ -40,9 +40,9 @@ export const operation: ResponseFilter = {
         await alerts.trigger({
           eventId:    null,
           amount:     price ? price.price : 0,
+          alertId:    match.groups.uuid,
           currency:   'CZK',
           event:      'custom',
-          alertId:    match.groups.uuid,
           message:    attributes.param || '',
           monthsName: '',
           name:       attributes.command,

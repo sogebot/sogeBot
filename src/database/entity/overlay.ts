@@ -28,6 +28,7 @@ type Font = {
 export interface EmitData {
   eventId: string | null;
   alertId?: string;
+  queueId?: string;
   name: string;
   amount: number;
   tier: null | 'Prime' | '1' | '2' | '3';
