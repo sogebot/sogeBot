@@ -132,7 +132,6 @@ class Alerts extends Registry {
     });
 
     app.post('/api/registries/alerts/queue/:id/extend', async (req, res) => {
-      console.log('extend', req.params.id);
       const id = req.params.id;
 
       if (continousPlayMutex[id]) {
@@ -143,7 +142,6 @@ class Alerts extends Registry {
     });
 
     app.post('/api/registries/alerts/queue/:id/release', async (req, res) => {
-      console.log('release', req.params.id);
       const id = req.params.id;
 
       if (continousPlayMutex[id]) {
