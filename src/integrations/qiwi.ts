@@ -89,7 +89,7 @@ class Qiwi extends Integration {
         stats.value.currentTips = stats.value.currentTips + exchange(amount, DONATION_CURRENCY, mainCurrency.value);
       }
 
-      eventlist.add({
+      const eventData = await eventlist.add({
         event:    'tip',
         amount,
         currency: DONATION_CURRENCY,
@@ -111,6 +111,7 @@ class Qiwi extends Integration {
       });
 
       alerts.trigger({
+        eventId:    eventData?.id ?? null,
         event:      'tip',
         name:       username || 'Anonymous',
         service:    'qiwi',

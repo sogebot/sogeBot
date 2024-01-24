@@ -42,7 +42,7 @@ export async function cheer(event: EventSubChannelCheerEventData) {
       user = await changelog.get(userId);
     }
 
-    eventlist.add({
+    const eventData = await eventlist.add({
       event:     'cheer',
       userId:    userId,
       bits,
@@ -97,6 +97,7 @@ export async function cheer(event: EventSubChannelCheerEventData) {
             redeemTriggered = true;
             debug('tmi.cmdredeems', messageFromUser);
             alerts.trigger({
+              eventId:    eventData?.id ?? null,
               event:      'custom',
               recipient:  username,
               name:       price.command,
@@ -114,6 +115,7 @@ export async function cheer(event: EventSubChannelCheerEventData) {
     }
     if (!redeemTriggered) {
       alerts.trigger({
+        eventId:    eventData?.id ?? null,
         event:      'cheer',
         name:       username,
         amount:     bits,

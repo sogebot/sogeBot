@@ -46,7 +46,7 @@ export async function follow(userId: string, userName: string, followedAt: strin
   // trigger events only if follow was in hour
   if (Date.now() - new Date(followedAt).getTime() < HOUR) {
     debug('follow', `User ${userName}#${userId} triggered follow event.`);
-    eventlist.add({
+    const eventData = await eventlist.add({
       event:     'follow',
       userId:    userId,
       timestamp: new Date(followedAt).getTime(),
@@ -55,6 +55,7 @@ export async function follow(userId: string, userName: string, followedAt: strin
       followLog(`${userName}#${userId}`);
       eventEmitter.emit('follow', { userName, userId });
       alerts.trigger({
+        eventId:    eventData?.id ?? null,
         event:      'follow',
         name:       userName,
         amount:     0,

@@ -10,6 +10,7 @@ import users from '../users.js';
 
 import { AppDataSource } from '~/database.js';
 import { isStreamOnline, stats } from '~/helpers/api/index.js';
+import { MINUTE } from '~/helpers/constants.js';
 import exchange from '~/helpers/currency/exchange.js';
 import { mainCurrency } from '~/helpers/currency/index.js';
 import rates from '~/helpers/currency/rates.js';
@@ -18,7 +19,6 @@ import { triggerInterfaceOnTip } from '~/helpers/interface/triggers.js';
 import {
   error, tip,
 } from '~/helpers/log.js';
-import { MINUTE } from '~/helpers/constants.js';
 
 type DonatelloResponse = {
   content: {
@@ -118,7 +118,7 @@ class Donatello extends Integration {
         const user = await users.getUserByUsername(username);
         tip(`${username.toLowerCase()}${user.userId ? '#' + user.userId : ''}, amount: ${amount.toFixed(2)}${data.currency}, message: ${data.message}`);
 
-        eventlist.add({
+        const eventData = await eventlist.add({
           event:    'tip',
           amount:   amount,
           currency: data.currency,
@@ -138,6 +138,7 @@ class Donatello extends Integration {
         });
 
         alerts.trigger({
+          eventId:    eventData?.id ?? null,
           event:      'tip',
           service:    'donationalerts',
           name:       username.toLowerCase(),
@@ -163,7 +164,16 @@ class Donatello extends Integration {
       }
     } else {
       tip(`${username}#__anonymous__, amount: ${Number(amount).toFixed(2)}${data.currency}, message: ${data.message}`);
+      const eventData = await eventlist.add({
+        event:    'tip',
+        amount:   amount,
+        currency: data.currency,
+        userId:   `${username}#__anonymous__`,
+        message:  data.message,
+        timestamp,
+      });
       alerts.trigger({
+        eventId:    eventData?.id ?? null,
         event:      'tip',
         name:       username,
         amount:     Number(amount.toFixed(2)),
@@ -171,14 +181,6 @@ class Donatello extends Integration {
         currency:   data.currency,
         monthsName: '',
         message:    data.message,
-      });
-      eventlist.add({
-        event:    'tip',
-        amount:   amount,
-        currency: data.currency,
-        userId:   `${username}#__anonymous__`,
-        message:  data.message,
-        timestamp,
       });
     }
     triggerInterfaceOnTip({

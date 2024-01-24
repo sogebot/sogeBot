@@ -465,7 +465,7 @@ class Chat {
         profileImageUrl: profileImageUrl ? profileImageUrl : user.profileImageUrl,
       });
 
-      eventlist.add({
+      const eventData = await eventlist.add({
         event:                   'resub',
         tier:                    String(tier),
         userId:                  String(userstate.userId),
@@ -489,6 +489,7 @@ class Chat {
         message,
       });
       alerts.trigger({
+        eventId:    eventData?.id ?? null,
         event:      'resub',
         name:       username,
         amount:     Number(amount),
@@ -519,7 +520,7 @@ class Chat {
         return;
       }
 
-      eventlist.add({
+      const eventData = await eventlist.add({
         event:     'subcommunitygift',
         userId:    userId,
         count,
@@ -528,6 +529,7 @@ class Chat {
       eventEmitter.emit('subcommunitygift', { userName: username, count });
       subcommunitygift(`${username}#${userId}, to ${count} viewers`);
       alerts.trigger({
+        eventId:    eventData?.id ?? null,
         event:      'subcommunitygift',
         name:       username,
         amount:     Number(count),
@@ -571,9 +573,23 @@ class Chat {
         ignoreGiftsFromUser.set(userId, ignoreGifts - 1);
       }
 
+      if (isIgnored({ userName: username, userId: recipientId })) {
+        return;
+      }
+
+      const eventData = await eventlist.add({
+        event:      'subgift',
+        userId:     recipientId,
+        fromId:     userId,
+        monthsName: getLocalizedName(amount, translate('core.months')),
+        months:     amount,
+        timestamp:  Date.now(),
+      });
+
       if (!isGiftIgnored) {
         debug('tmi.subgift', `Triggered: ${username}#${userId} -> ${recipient}#${recipientId}`);
         alerts.trigger({
+          eventId:    eventData?.id ?? null,
           event:      'subgift',
           name:       username,
           recipient,
@@ -594,9 +610,6 @@ class Chat {
       } else {
         debug('tmi.subgift', `Ignored: ${username}#${userId} -> ${recipient}#${recipientId}`);
       }
-      if (isIgnored({ userName: username, userId: recipientId })) {
-        return;
-      }
 
       changelog.update(user.userId, {
         ...user,
@@ -605,15 +618,6 @@ class Chat {
         subscribeTier:             String(tier),
         subscribeCumulativeMonths: amount,
         subscribeStreak:           user.subscribeStreak + 1,
-      });
-
-      eventlist.add({
-        event:      'subgift',
-        userId:     recipientId,
-        fromId:     userId,
-        monthsName: getLocalizedName(amount, translate('core.months')),
-        months:     amount,
-        timestamp:  Date.now(),
       });
       subgift(`${recipient}#${recipientId}, from: ${username}#${userId}, months: ${amount}`);
 

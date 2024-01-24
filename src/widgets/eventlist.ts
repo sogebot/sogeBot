@@ -44,40 +44,37 @@ class EventList extends Widget {
         switch(event.event) {
           case 'follow':
           case 'sub':
-            alerts.trigger({
+            alerts.trigger({ eventId:    null,
               event:      event.event,
               name:       await getNameById(event.userId),
               amount:     0,
               tier:       String(values.tier) as EmitData['tier'],
               currency:   '',
               monthsName: '',
-              message:    '',
-            });
+              message:    '' });
             break;
           case 'raid':
-            alerts.trigger({
+            alerts.trigger({ eventId:    null,
               event:      event.event,
               name:       await getNameById(event.userId),
               amount:     Number(values.viewers),
               tier:       null,
               currency:   '',
               monthsName: '',
-              message:    '',
-            });
+              message:    '' });
             break;
           case 'resub':
-            alerts.trigger({
+            alerts.trigger({ eventId:    null,
               event:      event.event,
               name:       await getNameById(event.userId),
               amount:     Number(values.subCumulativeMonths),
               tier:       String(values.tier) as EmitData['tier'],
               currency:   '',
               monthsName: getLocalizedName(values.subCumulativeMonths, translate('core.months')),
-              message:    values.message,
-            });
+              message:    values.message });
             break;
           case 'subgift':
-            alerts.trigger({
+            alerts.trigger({ eventId:    null,
               event:      event.event,
               name:       await getNameById(values.fromId),
               tier:       null,
@@ -85,44 +82,40 @@ class EventList extends Widget {
               amount:     Number(values.months),
               monthsName: getLocalizedName(Number(values.months), translate('core.months')),
               currency:   '',
-              message:    '',
-            });
+              message:    '' });
             break;
           case 'cheer':
-            alerts.trigger({
+            alerts.trigger({ eventId:    null,
               event:      event.event,
               name:       await getNameById(event.userId),
               amount:     Number(values.bits),
               tier:       null,
               currency:   '',
               monthsName: '',
-              message:    values.message,
-            });
+              message:    values.message });
             break;
           case 'subcommunitygift':
-            alerts.trigger({
+            alerts.trigger({ eventId:    null,
               event:      event.event,
               name:       await getNameById(event.userId),
               amount:     Number(values.count),
               tier:       null,
               currency:   '',
               monthsName: '',
-              message:    '',
-            });
+              message:    '' });
             break;
           case 'tip':
-            alerts.trigger({
+            alerts.trigger({ eventId:    null,
               event:      event.event,
               name:       await getNameById(event.userId),
               amount:     Number(values.amount),
               tier:       null,
               currency:   values.currency,
               monthsName: '',
-              message:    values.message,
-            });
+              message:    values.message });
             break;
           case 'rewardredeem':
-            alerts.trigger({
+            alerts.trigger({ eventId:    null,
               event:      event.event,
               name:       values.titleOfReward,
               rewardId:   values.rewardId,
@@ -131,8 +124,7 @@ class EventList extends Widget {
               currency:   '',
               monthsName: '',
               message:    values.message,
-              recipient:  await getNameById(event.userId),
-            });
+              recipient:  await getNameById(event.userId) });
             break;
           default:
             error(`event.event ${event.event} cannot be retriggered`);

@@ -21,8 +21,7 @@ export async function raid(event: EventSubChannelRaidEventData) {
     event:     'raid',
     timestamp: Date.now(),
   };
-
-  eventlist.add({
+  const eventData = await eventlist.add({
     userId:    String(await users.getIdByName(userName) ?? '0'),
     viewers:   hostViewers,
     event:     'raid',
@@ -30,6 +29,7 @@ export async function raid(event: EventSubChannelRaidEventData) {
   });
   eventEmitter.emit('raid', data);
   alerts.trigger({
+    eventId:    eventData?.id ?? null,
     event:      'raid',
     name:       userName,
     amount:     hostViewers,

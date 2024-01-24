@@ -56,7 +56,7 @@ export const subscription = async (username: string , subInfo: ChatSubInfo, user
       profileImageUrl: profileImageUrl ? profileImageUrl : user.profileImageUrl,
     });
 
-    eventlist.add({
+    const eventData = await eventlist.add({
       event:     'sub',
       tier:      String(tier),
       userId:    String(userstate.userId),
@@ -68,6 +68,7 @@ export const subscription = async (username: string , subInfo: ChatSubInfo, user
       userName: username, method: subInfo.isPrime ? 'Twitch Prime' : '', subCumulativeMonths: amount, tier: String(tier),
     });
     alerts.trigger({
+      eventId:    eventData?.id ?? null,
       event:      'sub',
       name:       username,
       amount:     0,

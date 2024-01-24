@@ -629,7 +629,7 @@ class EventSubWebsocket {
       });
 
       // REDEMPTION
-      this.listener.onChannelRedemptionAdd(broadcasterId, event => {
+      this.listener.onChannelRedemptionAdd(broadcasterId, async (event) => {
         if (isAlreadyProcessed(event[rawDataSymbol])) {
           return;
         }
@@ -645,7 +645,7 @@ class EventSubWebsocket {
           userId: event.userId, userName: event.userName, displayname: event.userDisplayName,
         });
 
-        eventlist.add({
+        const eventData = await eventlist.add({
           event:         'rewardredeem',
           userId:        String(event.userId),
           message:       event.input,
@@ -654,6 +654,7 @@ class EventSubWebsocket {
           rewardId:      event.rewardId,
         });
         alerts.trigger({
+          eventId:    eventData?.id ?? null,
           event:      'rewardredeem',
           name:       event.rewardTitle,
           rewardId:   event.rewardId,

@@ -1,4 +1,4 @@
-import { Column, Entity, PrimaryColumn } from 'typeorm';
+import { BeforeInsert, BeforeUpdate, Column, Entity, PrimaryColumn } from 'typeorm';
 
 import { BotEntity } from '../BotEntity.js';
 
@@ -26,7 +26,9 @@ type Font = {
 };
 
 export interface EmitData {
+  eventId: string | null;
   alertId?: string;
+  queueId?: string;
   name: string;
   amount: number;
   tier: null | 'Prime' | '1' | '2' | '3';
@@ -689,6 +691,33 @@ export interface Group {
     alignX: number;
     alignY: number;
   }[],
+}
+
+@Entity()
+export class AlertQueue extends BotEntity {
+  @PrimaryColumn({ generated: 'uuid' })
+    id: string;
+
+  @Column({ type: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') !== 'better-sqlite3' ? 'json' : 'simple-json' })
+    emitData: EmitData[];
+
+  @Column({ type: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') !== 'better-sqlite3' ? 'json' : 'simple-json', nullable: true })
+    filter: { [x: string]: Filter };
+
+  @Column()
+    passthrough: boolean;
+
+  @Column()
+    play: boolean;
+
+  @Column({ nullable: false, type: 'varchar', length: '2022-07-27T00:30:34.569259834Z'.length })
+    updatedAt?: string;
+
+  @BeforeInsert()
+  @BeforeUpdate()
+  generateUpdatedAt() {
+    this.updatedAt = new Date().toISOString();
+  }
 }
 
 @Entity()

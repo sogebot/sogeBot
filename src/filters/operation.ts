@@ -3,9 +3,9 @@ import { info } from '../helpers/log.js';
 
 import type { ResponseFilter } from './index.js';
 
-import { AppDataSource } from '~/database.js';
 import { EmitData } from '~/database/entity/overlay.js';
 import { Price } from '~/database/entity/price.js';
+import { AppDataSource } from '~/database.js';
 import alerts from '~/registries/alerts.js';
 
 const selectedItemRegex = /\$triggerAlert\((?<uuid>[0-9A-F]{8}(?:-[0-9A-F]{4}){3}-[0-9A-F]{12}),? ?(?<options>.*)?\)/mi;
@@ -38,10 +38,11 @@ export const operation: ResponseFilter = {
         const price = await AppDataSource.getRepository(Price).findOneBy({ command: attributes.command, enabled: true });
 
         await alerts.trigger({
+          eventId:    null,
           amount:     price ? price.price : 0,
+          alertId:    match.groups.uuid,
           currency:   'CZK',
           event:      'custom',
-          alertId:    match.groups.uuid,
           message:    attributes.param || '',
           monthsName: '',
           name:       attributes.command,
