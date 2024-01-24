@@ -104,7 +104,7 @@ class Alerts extends Registry {
       return;
     }
 
-    app.get('/api/registries/alerts/queue/', async (req, res) => {
+    app.get('/api/registries/alerts/queue/', adminMiddleware, async (req, res) => {
       const release = await filterMutex.acquire();
       const cmd = await AlertQueue.find();
       res.send({
