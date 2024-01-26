@@ -34,6 +34,8 @@ import { adminMiddleware } from '~/socket.js';
 
 const tubeChat = new TubeChat();
 
+let titleChangeRequestRetry = 0;
+
 class Google extends Service {
   clientId = '225380804535-gjd77dplfkbe4d3ct173d8qm0j83f8tr.apps.googleusercontent.com';
   @persistent()
@@ -44,12 +46,17 @@ class Google extends Service {
     streamId = '';
 
   @settings()
+    onStreamTitle = '$title | $game';
+  @settings()
+    onStreamDescription = 'Streaming at https://twitch.tv/changeme\n\n=========\n$chapters\n========\n\n$tags';
+
+  @settings()
     onStreamEndTitle = 'Archive | $gamesList | $date';
   @settings()
     onStreamEndTitleEnabled = false;
 
   @settings()
-    onStreamEndDescription = 'Streamed at https://twitch.tv/changeme\nTitle: $title\n\n=========\n$chapters\n========\n\nDate: $date';
+    onStreamEndDescription = 'Streamed at https://twitch.tv/changeme\nTitle: $title\n\n=========\n$chapters\n========\n\nDate: $date\n\n$tags';
   @settings()
     onStreamEndDescriptionEnabled = false;
 
@@ -265,6 +272,7 @@ class Google extends Service {
                 .replace('$gamesList', Array.from(new Set(this.gamesPlayedOnStream.map(item => item.game))).join(', '))
                 .replace('$title', stats.value.currentTitle || '')
                 .replace('$date', this.broadcastStartedAt)
+                .slice(0, 100) // max 100 chars
               : broadcast.snippet?.title,
             description: this.onStreamEndDescriptionEnabled
               ? this.onStreamEndDescription
@@ -273,6 +281,8 @@ class Google extends Service {
                   .join('\n'))
                 .replace('$title', broadcast.snippet?.title || stats.value.currentTitle || '')
                 .replace('$date', this.broadcastStartedAt)
+                .replace('$tags', (stats.value.currentTags || []).map(o => `#${o}`).join(' '))
+                .slice(0, 5000) // max 5000 chars
               : broadcast.snippet?.description,
           },
           status: {
@@ -295,9 +305,35 @@ class Google extends Service {
         const currentTags = (stats.value.currentTags || []).map(o => `#${o}`).join(' ');
         const currentTitle = [(stats.value.currentTitle || 'n/a') + ` | ${stats.value.currentGame ?? 'n/a'}`, currentTags].filter(String).join(' | ');
 
-        if (stream.snippet.title !== currentTitle && isStreamOnline.value) {
-          info(`YOUTUBE: Title is not matching current title, changing by bot to "${currentTitle}"`);
-          await this.updateTitle(stream, currentTitle);
+        const title = this.onStreamTitle
+          .replace('$game', stats.value.currentGame || 'n/a')
+          .replace('$title', stats.value.currentTitle || 'n/a')
+          .replace('$tags', currentTags)
+          .slice(0, 100); // max 100 chars
+        const description = this.onStreamDescription
+          .replace('$game', stats.value.currentGame || 'n/a')
+          .replace('$title', stats.value.currentTitle || 'n/a')
+          .replace('$tags', currentTags)
+          .replace('$chapters', this.gamesPlayedOnStream
+            .map(item => `${item.timeMark} ${item.game}`)
+            .join('\n'))
+          .slice(0, 5000); // max 5000 chars
+
+        if (stream.snippet.title !== title && isStreamOnline.value) {
+          if (titleChangeRequestRetry < 5) {
+            if (titleChangeRequestRetry === 0) {
+              info(`YOUTUBE: Title is not matching current title, changing by bot to "${title}"`);
+            } else {
+              info(`YOUTUBE: Title is not matching current title, retrying (${titleChangeRequestRetry}) to change to "${currentTitle}"`);
+            }
+            try {
+              await this.updateTitle(stream, title, description);
+              titleChangeRequestRetry = 0;
+            } catch (e) {
+              titleChangeRequestRetry++;
+              error(`YOUTUBE: Failed to change title:\n${e}`);
+            }
+          }
         }
       }
 
@@ -373,7 +409,7 @@ class Google extends Service {
     }
   }
 
-  async updateTitle(stream: youtube_v3.Schema$LiveBroadcast, title: string) {
+  async updateTitle(stream: youtube_v3.Schema$LiveBroadcast, title: string, description: string) {
     if (this.client) {
       const youtube = google.youtube({
         auth:    this.client,
@@ -388,6 +424,7 @@ class Google extends Service {
           snippet: {
             ...stream.snippet,
             title,
+            description,
           },
         },
       });
