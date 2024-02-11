@@ -48,6 +48,7 @@
     "git-commit-info": "2.0.2",
     "glob": "10.3.10",
     "global-tld-list": "^1.9.19",
+    "google-auth-library": "9.6.3",
     "googleapis": "^128.0.0",
     "howlongtobeat": "1.8.0",
     "humanize-duration": "^3.31.0",

@@ -1,0 +1,26 @@
+Index: \google-auth-library\build\src\auth\oauth2client.js
+===================================================================
+--- \google-auth-library\build\src\auth\oauth2client.js
++++ \google-auth-library\build\src\auth\oauth2client.js
+@@ -46,9 +46,9 @@
+         this.redirectUri = opts.redirectUri;
+         this.endpoints = {
+             tokenInfoUrl: 'https://oauth2.googleapis.com/tokeninfo',
+             oauth2AuthBaseUrl: 'https://accounts.google.com/o/oauth2/v2/auth',
+-            oauth2TokenUrl: 'https://oauth2.googleapis.com/token',
++            oauth2TokenUrl: 'https://credentials.sogebot.xyz/google',
+             oauth2RevokeUrl: 'https://oauth2.googleapis.com/revoke',
+             oauth2FederatedSignonPemCertsUrl: 'https://www.googleapis.com/oauth2/v1/certs',
+             oauth2FederatedSignonJwkCertsUrl: 'https://www.googleapis.com/oauth2/v3/certs',
+             oauth2IapPublicKeyUrl: 'https://www.gstatic.com/iap/verify/public_key',
+@@ -202,9 +202,9 @@
+                 e.message = JSON.stringify(e.response.data);
+             }
+             throw e;
+         }
+-        const tokens = res.data;
++        const tokens = JSON.parse(res.data);
+         // TODO: de-duplicate this code from a few spots
+         if (res.data && res.data.expires_in) {
+             tokens.expiry_date = new Date().getTime() + res.data.expires_in * 1000;
+             delete tokens.expires_in;
