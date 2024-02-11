@@ -92,7 +92,7 @@
     "zod": "^3.22.4"
   },
   "scripts": {
-    "postinstall": "(custompatch || (exit 0))",
+    "postinstall": "custompatch",
     "build": "cross-env ENV=development make bot",
     "test": "node tools/runTests.js",
     "test:migration": "node tools/migrationCheck.js",

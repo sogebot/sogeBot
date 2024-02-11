@@ -2,7 +2,7 @@ Index: \google-auth-library\build\src\auth\oauth2client.js
 ===================================================================
 --- \google-auth-library\build\src\auth\oauth2client.js
 +++ \google-auth-library\build\src\auth\oauth2client.js
-@@ -191,9 +191,9 @@
+@@ -187,9 +187,9 @@
                  e.message = JSON.stringify(e.response.data);
              }
              throw e;
@@ -13,7 +13,7 @@ Index: \google-auth-library\build\src\auth\oauth2client.js
          if (res.data && res.data.expires_in) {
              tokens.expiry_date = new Date().getTime() + res.data.expires_in * 1000;
              delete tokens.expires_in;
-@@ -731,9 +731,9 @@
+@@ -727,9 +727,9 @@
  OAuth2Client.GOOGLE_OAUTH2_AUTH_BASE_URL_ = 'https://accounts.google.com/o/oauth2/v2/auth';
  /**
   * The base endpoint for token retrieval.

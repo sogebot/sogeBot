@@ -392,21 +392,25 @@ class Google extends Service {
       }
     });
 
-    const youtube = google.youtube({
-      auth:    this.client,
-      version: 'v3',
-    });
+    try {
+      const youtube = google.youtube({
+        auth:    this.client,
+        version: 'v3',
+      });
 
-    const channel = await youtube.channels.list({
-      part: ['snippet,contentDetails'],
-      mine: true,
-    });
-    if (channel.data.items && channel.data.items.length > 0) {
-      const item = channel.data.items[0].snippet!;
-      this.channel = [channel.data.items[0].id, item.title, item.customUrl].filter(String).join(' | ');
-      info(`YOUTUBE: Authentication to Google Service successful as ${this.channel}.`);
-    } else {
-      error(`'YOUTUBE: Couldn't get channel informations.`);
+      const channel = await youtube.channels.list({
+        part: ['snippet,contentDetails'],
+        mine: true,
+      });
+      if (channel.data.items && channel.data.items.length > 0) {
+        const item = channel.data.items[0].snippet!;
+        this.channel = [channel.data.items[0].id, item.title, item.customUrl].filter(String).join(' | ');
+        info(`YOUTUBE: Authentication to Google Service successful as ${this.channel}.`);
+      } else {
+        error(`'YOUTUBE: Couldn't get channel informations.`);
+      }
+    } catch (e) {
+      error(`'YOUTUBE: Something went wrong:\n${e}`);
     }
   }
 
