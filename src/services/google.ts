@@ -1,5 +1,6 @@
 import { randomUUID } from 'node:crypto';
 
+import { GaxiosError } from 'gaxios';
 import { OAuth2Client } from 'google-auth-library/build/src/auth/oauth2client';
 import { google, youtube_v3 } from 'googleapis';
 import { TubeChat } from 'tubechat';
@@ -410,12 +411,8 @@ class Google extends Service {
   }
 
   async updateTitle(stream: youtube_v3.Schema$LiveBroadcast, title: string, description: string) {
-    if (this.client) {
-      const youtube = google.youtube({
-        auth:    this.client,
-        version: 'v3',
-      });
-
+    const youtube = this.getYoutube();
+    if (youtube) {
       // get active broadcasts
       await youtube.liveBroadcasts.update({
         part:        ['id','snippet','contentDetails','status'],
@@ -431,13 +428,30 @@ class Google extends Service {
     }
   }
 
-  async getBroadcast() {
-    if (this.client) {
-      const youtube = google.youtube({
-        auth:    this.client,
-        version: 'v3',
-      });
+  getYoutube() {
+    try {
+      if (this.client) {
+        return google.youtube({
+          auth:    this.client,
+          version: 'v3',
+        });
+      } else {
+        return null;
+      }
+    } catch (e) {
+      if (e instanceof GaxiosError) {
+        error(`YOUTUBE: getYoutube() GaxiosError - ${e.code} - ${e.stack} - ${e.message} - `);
+        error(`YOUTUBE: ${JSON.stringify(e.response)}`);
+      } else {
+        error(`YOUTUBE: Failed to get youtube client:\n${e}`);
+      }
+      this.client = null;
+    }
+  }
 
+  async getBroadcast() {
+    const youtube = this.getYoutube();
+    if (youtube) {
       // get active broadcasts
       const list = await youtube.liveBroadcasts.list({
         part:            ['id','snippet','contentDetails','status'],
@@ -457,13 +471,9 @@ class Google extends Service {
     if (isStreamOnline.value || this.refreshToken === '') {
       return; // do nothing if already streaming
     }
+    const youtube = this.getYoutube();
     // we want to create new stream, private for now for archive purpose
-    if (this.client) {
-      const youtube = google.youtube({
-        auth:    this.client,
-        version: 'v3',
-      });
-
+    if (youtube) {
       // get active broadcasts
       const list = await youtube.liveBroadcasts.list({
         part:            ['id','snippet','contentDetails','status'],
@@ -565,12 +575,8 @@ class Google extends Service {
     });
 
     app.get('/api/services/google/streams', adminMiddleware, async (req, res) => {
-      if (this.client) {
-        const youtube = google.youtube({
-          auth:    this.client,
-          version: 'v3',
-        });
-
+      const youtube = this.getYoutube();
+      if (youtube) {
         const rmtps = await youtube.liveStreams.list({
           part: ['id', 'snippet', 'cdn', 'status'],
           mine: true,
