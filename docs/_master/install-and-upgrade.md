@@ -1,7 +1,7 @@
 ## Prerequisites
 
 - **Browsers**: only latest Chrome/Chromium stable are supported
-- **[Node.js](https://nodejs.org/en/)**: **18.x LTS** version
+- **[Node.js](https://nodejs.org/en/)**: **latest LTS** version
 - **RAM**: Minimum 512MB, Recommended 1024MB
 - **HDD**: Minimum 500MB
 - Twitch bot account
