@@ -47,6 +47,9 @@ class Google extends Service {
     streamId = '';
 
   @settings()
+    shouldPrepareBroadcast = false;
+
+  @settings()
     onStreamTitle = '$title | $game';
   @settings()
     onStreamDescription = 'Streaming at https://twitch.tv/changeme\n\n=========\n$chapters\n========\n\n$tags';
@@ -475,7 +478,7 @@ class Google extends Service {
   }
 
   async prepareBroadcast() {
-    if (isStreamOnline.value || this.refreshToken === '') {
+    if (isStreamOnline.value || this.refreshToken === '' || this.shouldPrepareBroadcast === false) {
       return; // do nothing if already streaming
     }
     const youtube = this.getYoutube();
