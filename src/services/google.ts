@@ -300,6 +300,9 @@ class Google extends Service {
   @onStartup()
   startIntervals() {
     setInterval(async () => {
+      if (!isStreamOnline.value) {
+        return;
+      }
       const stream = await this.getBroadcast();
 
       if (stream && stream.snippet) {
