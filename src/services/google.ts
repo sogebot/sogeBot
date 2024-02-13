@@ -76,7 +76,6 @@ class Google extends Service {
   accessToken: null | string = null;
   client: OAuth2Client | null = null;
 
-  broadcastId: string | null = null;
   gamesPlayedOnStream: { game: string, timeMark: string }[] = [];
   broadcastStartedAt: string = new Date().toLocaleDateString(getLang());
 
@@ -204,33 +203,21 @@ class Google extends Service {
     this.gamesPlayedOnStream = stats.value.currentGame ? [{ game: stats.value.currentGame, timeMark: '00:00:00' }] : [];
     this.broadcastStartedAt = new Date().toLocaleDateString(getLang());
 
-    if (this.client && this.broadcastId) {
+    const broadcast = await this.getBroadcast();
+
+    if (this.client && broadcast) {
     // update privacy status
       const youtube = google.youtube({
         auth:    this.client,
         version: 'v3',
       });
 
-      // load broadcast
-      const list = await youtube.liveBroadcasts.list({
-        part: ['id','snippet','contentDetails','status'],
-        id:   [this.broadcastId],
-      });
-
-      let broadcast: youtube_v3.Schema$LiveBroadcast;
-      if (list.data.items && list.data.items.length > 0) {
-        broadcast = list.data.items[0];
-      } else {
-      // broadcast was not found
-        return;
-      }
-
       // get active broadcasts
       youtube.liveBroadcasts.update({
         part:        ['id','snippet','contentDetails','status'],
         requestBody: {
           ...broadcast,
-          id:     this.broadcastId,
+          id:     broadcast.id,
           status: {
             ...broadcast.status,
             privacyStatus: this.onStreamStartPrivacyStatus,
@@ -242,33 +229,20 @@ class Google extends Service {
 
   @onStreamEnd()
   async onStreamEnd() {
-    if (this.client && this.broadcastId) {
+    const broadcast = await this.getBroadcast();
+    if (this.client && broadcast) {
       setTimeout(() => this.prepareBroadcast, 10000);
       const youtube = google.youtube({
         auth:    this.client,
         version: 'v3',
       });
 
-      // load broadcast
-      const list = await youtube.liveBroadcasts.list({
-        part: ['id','snippet','contentDetails','status'],
-        id:   [this.broadcastId],
-      });
-
-      let broadcast: youtube_v3.Schema$LiveBroadcast;
-      if (list.data.items && list.data.items.length > 0) {
-        broadcast = list.data.items[0];
-      } else {
-        // broadcast was not found
-        return;
-      }
-
       // get active broadcasts
       youtube.liveBroadcasts.update({
         part:        ['id','snippet','contentDetails','status'],
         requestBody: {
           ...broadcast,
-          id:      this.broadcastId,
+          id:      broadcast.id,
           snippet: {
             ...broadcast.snippet,
             title: this.onStreamEndTitleEnabled
@@ -470,7 +444,6 @@ class Google extends Service {
 
       if (list.data.items && list.data.items.length > 0) {
         const broadcast = list.data.items[0];
-        this.broadcastId = broadcast.id ?? null;
         return broadcast;
       }
     }
@@ -492,8 +465,6 @@ class Google extends Service {
 
       if (list.data.items && list.data.items.length > 0) {
         const broadcast = list.data.items[0];
-
-        this.broadcastId = broadcast.id ?? null;
 
         if (this.streamId.length > 0 && broadcast.id) {
           await youtube.liveBroadcasts.bind({
