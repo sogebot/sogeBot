@@ -357,19 +357,6 @@ class Chat {
       client.onMessage(async (_channel, user, message, msg) => {
         const userstate = msg.userInfo;
         if (isBotId(userstate.userId)) {
-          // send to dashboard and ignore
-          ioServer?.of('/widgets/chat').emit('bot-message', {
-            id:          randomUUID(),
-            timestamp:   Date.now(),
-            displayName: msg.userInfo.displayName.toLowerCase() === msg.userInfo.userName ? msg.userInfo.displayName : `${msg.userInfo.displayName} (${msg.userInfo.userName})`,
-            userName:    msg.userInfo.userName,
-            message:     message,
-            show:        false,
-            badges:      getBadgeImagesFromBadgeSet(msg.userInfo.badges),
-            color:       msg.userInfo.color,
-            service:     'twitch',
-            isBot:       true,
-          });
           return;
         }
 
@@ -400,6 +387,26 @@ class Chat {
         eventEmitter.emit('clearchat');
       });
     } else if (type === 'broadcaster') {
+
+      client.onMessage(async (_channel, user, message, msg) => {
+        const userstate = msg.userInfo;
+        if (isBotId(userstate.userId)) {
+          // send to dashboard and ignore
+          ioServer?.of('/widgets/chat').emit('bot-message', {
+            id:          randomUUID(),
+            timestamp:   Date.now(),
+            displayName: msg.userInfo.displayName.toLowerCase() === msg.userInfo.userName ? msg.userInfo.displayName : `${msg.userInfo.displayName} (${msg.userInfo.userName})`,
+            userName:    msg.userInfo.userName,
+            message:     message,
+            show:        false,
+            badges:      getBadgeImagesFromBadgeSet(msg.userInfo.badges),
+            color:       msg.userInfo.color,
+            service:     'twitch',
+            isBot:       true,
+          });
+          return;
+        }
+      });
       client.onSub((_channel, username, subInfo, msg) => {
         subscription(username, subInfo, msg.userInfo);
       });
