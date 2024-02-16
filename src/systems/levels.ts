@@ -14,8 +14,10 @@ import { AppDataSource } from '~/database.js';
 import { isStreamOnline } from '~/helpers/api/index.js';
 import { ResponseError } from '~/helpers/commandError.js';
 import { prepare } from '~/helpers/commons/index.js';
+import { MINUTE, SECOND } from '~/helpers/constants.js';
 import { getAllOnlineIds } from '~/helpers/getAllOnlineUsernames.js';
 import { debug, error } from '~/helpers/log.js';
+import { format } from '~/helpers/number.js';
 import defaultPermissions from '~/helpers/permissions/defaultPermissions.js';
 import { getUserHighestPermission } from '~/helpers/permissions/getUserHighestPermission.js';
 import { getPointsName } from '~/helpers/points/index.js';
@@ -27,8 +29,6 @@ import {
 import * as changelog from '~/helpers/user/changelog.js';
 import { isBotId } from '~/helpers/user/isBot.js';
 import { translate } from '~/translate.js';
-import { MINUTE, SECOND } from '~/helpers/constants.js';
-import { format } from '~/helpers/number.js';
 
 let cachedLevelsHash = '';
 const cachedLevels: bigint[] = [];

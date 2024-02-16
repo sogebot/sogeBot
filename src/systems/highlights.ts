@@ -12,6 +12,8 @@ import {
   isStreamOnline, stats, streamStatusChangeSince,
 } from '~/helpers/api/index.js';
 import { getUserSender } from '~/helpers/commons/index.js';
+import { dayjs } from '~/helpers/dayjsHelper.js';
+import { timestampToObject } from '~/helpers/getTime.js';
 import { error } from '~/helpers/log.js';
 import defaultPermissions from '~/helpers/permissions/defaultPermissions.js';
 import { adminEndpoint } from '~/helpers/socket.js';
@@ -21,8 +23,6 @@ import getBroadcasterId from '~/helpers/user/getBroadcasterId.js';
 import { createMarker } from '~/services/twitch/calls/createMarker.js';
 import twitch from '~/services/twitch.js';
 import { translate } from '~/translate.js';
-import { timestampToObject } from '~/helpers/getTime.js';
-import { dayjs } from '~/helpers/dayjsHelper.js';
 
 const ERROR_STREAM_NOT_ONLINE = '1';
 const ERROR_MISSING_TOKEN = '2';
@@ -40,7 +40,7 @@ class Highlights extends System {
   constructor() {
     super();
     this.addMenu({
-      category: 'manage', name: 'highlights', id: 'manage/highlights', this: this,
+      category: 'manage', name: 'highlights', id: 'manage/highlights', this: this, scopeParent: this.scope(),
     });
   }
 

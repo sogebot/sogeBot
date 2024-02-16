@@ -24,7 +24,11 @@ class CustomVariables extends Core {
   @onStartup()
   onStartup() {
     this.addMenu({
-      category: 'registry', name: 'customvariables', id: 'registry/customvariables', this: null,
+      scopeParent: this.scope(),
+      category:    'registry',
+      name:        'customvariables',
+      id:          'registry/customvariables',
+      this:        null,
     });
     this.checkIfCacheOrRefresh();
   }

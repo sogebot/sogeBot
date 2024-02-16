@@ -90,7 +90,7 @@ class Timers extends System {
     }
 
     this.addMenu({
-      category: 'manage', name: 'timers', id: 'manage/timers', this: this,
+      category: 'manage', name: 'timers', id: 'manage/timers', this: this, scopeParent: this.scope(),
     });
     const timers = await Timer.find({ relations: ['messages'] });
     for (const timer of timers) {

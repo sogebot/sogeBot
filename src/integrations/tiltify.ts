@@ -9,7 +9,7 @@ import { prepare } from '~/helpers/commons/index.js';
 import { triggerInterfaceOnTip } from '~/helpers/interface/index.js';
 import { getLang } from '~/helpers/locales.js';
 import { error, info, tip } from '~/helpers/log.js';
-import { adminEndpoint, publicEndpoint } from '~/helpers/socket.js';
+import { adminEndpoint, endpoint } from '~/helpers/socket.js';
 import eventlist from '~/overlays/eventlist.js';
 import alerts from '~/registries/alerts.js';
 
@@ -178,7 +178,7 @@ class Tiltify extends Integration {
   }
 
   sockets () {
-    publicEndpoint('/integrations/tiltify', 'tiltify::campaigns', async (cb) => {
+    endpoint([], '/integrations/tiltify', 'tiltify::campaigns', async (cb) => {
       cb(this.campaigns);
     });
     adminEndpoint('/integrations/tiltify', 'tiltify::revoke', async (cb) => {

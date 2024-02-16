@@ -1,8 +1,7 @@
-import { AppDataSource } from '~/database.js';
-
-import { WidgetCustom } from '../database/entity/widget.js';
 import Widget from './_interface.js';
+import { WidgetCustom } from '../database/entity/widget.js';
 
+import { AppDataSource } from '~/database.js';
 import { adminEndpoint } from '~/helpers/socket.js';
 
 class Custom extends Widget {

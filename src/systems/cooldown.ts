@@ -16,6 +16,7 @@ import { Parser } from '../parser.js';
 
 import { AppDataSource } from '~/database.js';
 import { prepare } from '~/helpers/commons/index.js';
+import { HIGH, HOUR } from '~/helpers/constants.js';
 import { debug, error, info } from '~/helpers/log.js';
 import { app } from '~/helpers/panel.js';
 import { ParameterError } from '~/helpers/parameterError.js';
@@ -27,7 +28,6 @@ import { adminMiddleware } from '~/socket.js';
 import alias from '~/systems/alias.js';
 import customCommands from '~/systems/customcommands.js';
 import { translate } from '~/translate.js';
-import { HIGH, HOUR } from '~/helpers/constants.js';
 
 const cache: { id: string; cooldowns: CooldownEntity[] }[] = [];
 const defaultCooldowns: { name: string; lastRunAt: number, permId: string }[] = [];
@@ -79,7 +79,7 @@ class Cooldown extends System {
   constructor () {
     super();
     this.addMenu({
-      category: 'commands', name: 'cooldowns', id: 'commands/cooldowns', this: this,
+      category: 'commands', name: 'cooldowns', id: 'commands/cooldowns', this: this, scopeParent: this.scope(),
     });
   }
 

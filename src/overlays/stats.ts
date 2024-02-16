@@ -4,13 +4,13 @@ import {
   isStreamOnline, stats, streamStatusChangeSince,
 } from '~/helpers/api/index.js';
 import { getTime } from '~/helpers/getTime.js';
-import { publicEndpoint } from '~/helpers/socket.js';
+import { endpoint } from '~/helpers/socket.js';
 
 class Stats extends Overlay {
   showInUI = false;
 
   sockets () {
-    publicEndpoint(this.nsp, 'get', async (cb) => {
+    endpoint([], this.nsp, 'get' as any, async (cb: any) => {
       cb({
         uptime:      getTime(isStreamOnline.value ? streamStatusChangeSince.value : 0, false),
         viewers:     stats.value.currentViewers,

@@ -1,3 +1,4 @@
+import { isEqual } from 'lodash-es';
 import { Socket } from 'socket.io';
 
 import type { Fn, ClientToServerEventsWithNamespace, NestedFnParams } from '~/../d.ts/src/helpers/socket.js';
@@ -8,6 +9,27 @@ const endpoints: {
   nsp: any;
   callback: any;
 }[] = [];
+
+const newEndpoints: {
+  scopes: string[];
+  on: any;
+  nsp: any;
+  callback: any;
+}[] = [];
+
+const scopes: Set<string> = new Set();
+// Add default scopes
+scopes.add('dashboard:admin:read');
+scopes.add('dashboard:admin:manage');
+
+function endpoint<K0 extends keyof O, K1 extends keyof O[K0], O extends Record<PropertyKey, Record<PropertyKey, Fn>> = ClientToServerEventsWithNamespace>(allowedScopes: string[], nsp: K0, on: K1, callback: (...args: NestedFnParams<O, K0, K1>) => void): void {
+  if (!newEndpoints.find(o => isEqual(o.scopes, allowedScopes) && o.nsp === nsp && o.on === on)) {
+    newEndpoints.push({
+      scopes: allowedScopes, nsp, on, callback,
+    });
+    allowedScopes.forEach(scope => scopes.add(scope));
+  }
+}
 
 function adminEndpoint<K0 extends keyof O, K1 extends keyof O[K0], O extends Record<PropertyKey, Record<PropertyKey, Fn>> = ClientToServerEventsWithNamespace>(nsp: K0, on: K1, callback: (...args: NestedFnParams<O, K0, K1>) => void): void {
   if (!endpoints.find(o => o.type === 'admin' && o.nsp === nsp && o.on === on)) {
@@ -25,14 +47,6 @@ const viewerEndpoint = (nsp: string, on: string, callback: (opts: any, cb: (erro
   }
 };
 
-function publicEndpoint (nsp: string, on: string, callback: (opts: any, cb: (error: Error | string | null | unknown, ...response: any) => void) => void, socket?: Socket) {
-  if (!endpoints.find(o => o.type === 'public' && o.nsp === nsp && o.on === on)) {
-    endpoints.push({
-      nsp, on, callback, type: 'public',
-    });
-  }
-}
-
 export {
-  endpoints, adminEndpoint, viewerEndpoint, publicEndpoint,
+  endpoints, adminEndpoint, viewerEndpoint, endpoint, scopes, newEndpoints,
 };

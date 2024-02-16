@@ -18,7 +18,7 @@ import {
 import { app, ioServer } from '~/helpers/panel.js';
 import { ParameterError } from '~/helpers/parameterError.js';
 import { defaultPermissions } from '~/helpers/permissions/defaultPermissions.js';
-import { adminEndpoint, publicEndpoint } from '~/helpers/socket.js';
+import { adminEndpoint, endpoint } from '~/helpers/socket.js';
 import { Types } from '~/plugins/ListenTo.js';
 import { translate } from '~/translate.js';
 
@@ -115,11 +115,11 @@ class OBSWebsocket extends Integration {
     adminEndpoint('/', 'integration::obswebsocket::generic::getAll', async (cb) => {
       cb(null, await AppDataSource.getRepository(OBSWebsocketEntity).find());
     });
-    publicEndpoint('/', 'integration::obswebsocket::listener', (opts) => {
+    endpoint([], '/', 'integration::obswebsocket::listener', (opts) => {
       const { event, args } = opts;
       eventEmitter.emit(Types.onOBSWebsocketEvent, { event, args });
     });
-    publicEndpoint('/', 'integration::obswebsocket::event', (opts) => {
+    endpoint([], '/', 'integration::obswebsocket::event' as any, (opts: any) => {
       const { type, location, ...data } = opts;
       eventEmitter.emit(type, {
         linkFilter: location,

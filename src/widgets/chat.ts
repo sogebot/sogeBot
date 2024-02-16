@@ -12,7 +12,7 @@ import { sendMessage } from '~/helpers/commons/sendMessage.js';
 import { eventEmitter } from '~/helpers/events/emitter.js';
 import { ioServer } from '~/helpers/panel.js';
 import { parseTextWithEmotes } from '~/helpers/parseTextWithEmotes.js';
-import { adminEndpoint, publicEndpoint } from '~/helpers/socket.js';
+import { adminEndpoint, endpoint } from '~/helpers/socket.js';
 import { getIgnoreList } from '~/helpers/user/isIgnored.js';
 import banUser from '~/services/twitch/calls/banUser.js';
 import deleteChatMessages from '~/services/twitch/calls/deleteChatMessages.js';
@@ -128,7 +128,7 @@ class Chat extends Widget {
       sendMessage(message, getUserSender(botId, botUsername), { force: true });
     });
 
-    publicEndpoint('/widgets/chat', 'room', async (cb: (error: null, data: string) => void) => {
+    endpoint([], '/widgets/chat', 'room', async (cb: (error: null, data: string) => void) => {
       const broadcasterUsername = variables.get('services.twitch.broadcasterUsername') as string;
       cb(null, broadcasterUsername.toLowerCase());
     });

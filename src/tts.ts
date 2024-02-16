@@ -16,7 +16,7 @@ import {
 } from '~/decorators/on.js';
 import { settings } from '~/decorators.js';
 import { error, info, warning } from '~/helpers/log.js';
-import { adminEndpoint, publicEndpoint } from '~/helpers/socket.js';
+import { adminEndpoint, endpoint } from '~/helpers/socket.js';
 
 /* secureKeys are used to authenticate use of public overlay endpoint */
 const secureKeys = new Set<string>();
@@ -53,7 +53,7 @@ class TTS extends Core {
       this.initializeTTSServices(); // reset settings
     });
 
-    publicEndpoint('/core/tts', 'speak', async (opts, cb) => {
+    endpoint([], '/core/tts', 'speak', async (opts, cb) => {
       if (secureKeys.has(opts.key)) {
         secureKeys.delete(opts.key);
         if (opts.service === TTSService.ELEVENLABS) {

@@ -197,7 +197,7 @@ class Events extends Core {
     ];
 
     this.addMenu({
-      category: 'manage', name: 'events', id: 'manage/events', this: null,
+      category: 'manage', name: 'events', id: 'manage/events', this: null, scopeParent: this.scope(),
     });
     this.fadeOut();
 

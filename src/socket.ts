@@ -17,15 +17,9 @@ import { app, ioServer } from '~/helpers/panel.js';
 import { check } from '~/helpers/permissions/check.js';
 import { defaultPermissions } from '~/helpers/permissions/defaultPermissions.js';
 import { getUserHighestPermission } from '~/helpers/permissions/getUserHighestPermission.js';
-import { adminEndpoint, endpoints } from '~/helpers/socket.js';
+import { adminEndpoint, endpoints, newEndpoints, scopes } from '~/helpers/socket.js';
 import * as changelog from '~/helpers/user/changelog.js';
 import { isModerator } from '~/helpers/user/isModerator.js';
-
-enum Authorized {
-  inProgress,
-  NotAuthorized,
-  isAuthorized,
-}
 
 type Unpacked<T> =
   T extends (infer U)[] ? U :
@@ -33,55 +27,90 @@ type Unpacked<T> =
       T extends Promise<infer E> ? E :
         T;
 
-const getPrivileges = async(type: 'admin' | 'viewer' | 'public', userId: string) => {
+const getPrivileges = async(userId: string): Promise<{
+  haveAdminPrivileges: boolean;
+  scopes:             string[];
+}> => {
   try {
+    const isAdmin = await check(userId, defaultPermissions.CASTERS, true);
+    if (isAdmin.access) {
+      return {
+        haveAdminPrivileges: true,
+        scopes:              Array.from(scopes), // allow all scopes for admin
+      };
+    }
     const user = await changelog.getOrFail(userId);
-    return {
-      haveAdminPrivileges:  type === 'admin' ? Authorized.isAuthorized : Authorized.NotAuthorized,
-      haveModPrivileges:    isModerator(user) ? Authorized.isAuthorized : Authorized.NotAuthorized,
-      haveViewerPrivileges: Authorized.isAuthorized,
+    const privileges = {
+      haveAdminPrivileges: false,
+      scopes:              isModerator(user) ? [
+        'dashboard:admin:read',
+        'mod:settings:read',
+        'systems:alias:read',
+      ] : [
+        // viewer don't have any scope
+      ],
+      // haveModPrivileges:    isModerator(user) ? true : false,
+      // haveViewerPrivileges: true,
     };
+    console.log({ privileges });
+    return privileges;
   } catch (e: any) {
     return {
-      haveAdminPrivileges:  Authorized.NotAuthorized,
-      haveModPrivileges:    Authorized.NotAuthorized,
-      haveViewerPrivileges: Authorized.NotAuthorized,
+      haveAdminPrivileges: false,
+      scopes:              [],
     };
   }
 };
 
 const initEndpoints = (socket: SocketIO, privileges: Unpacked<ReturnType<typeof getPrivileges>>) => {
+  socket.offAny(); // remove all listeners in case we call this twice
   for (const key of [...new Set(endpoints.filter(o => o.nsp === socket.nsp.name).map(o => o.nsp + '||' + o.on))]) {
     const [nsp, on] = key.split('||');
     const endpointsToInit = endpoints.filter(o => o.nsp === nsp && o.on === on);
-    socket.offAny(); // remove all listeners in case we call this twice
+    if (endpointsToInit.length > 0) {
+      socket.on(on, async (opts: any, cb: (error: Error | string | null, ...response: any) => void) => {
+      // initialize all endpoints given by privileges scopes
+        const adminEndpointInit = endpointsToInit.find(o => o.type === 'admin');
+        const viewerEndpoint = endpointsToInit.find(o => o.type === 'viewer');
+        const endpoint = endpointsToInit.find(o => o.type === 'public');
+        if (adminEndpointInit && privileges.haveAdminPrivileges) {
+          adminEndpointInit.callback(opts, cb ?? socket, socket);
+          return;
+        } else if (!viewerEndpoint && !endpoint) {
+          debug('socket', `User dont have admin access to ${socket.nsp.name}`);
+          debug('socket', privileges);
+          cb && cb('User doesn\'t have access to this endpoint', null);
+          return;
+        }
 
-    socket.on(on, async (opts: any, cb: (error: Error | string | null, ...response: any) => void) => {
-      const adminEndpointInit = endpointsToInit.find(o => o.type === 'admin');
-      const viewerEndpoint = endpointsToInit.find(o => o.type === 'viewer');
-      const publicEndpoint = endpointsToInit.find(o => o.type === 'public');
-      if (adminEndpointInit && privileges.haveAdminPrivileges) {
-        adminEndpointInit.callback(opts, cb ?? socket, socket);
-        return;
-      } else if (!viewerEndpoint && !publicEndpoint) {
-        debug('socket', `User dont have admin access to ${socket.nsp.name}`);
-        debug('socket', privileges);
-        cb('User doesn\'t have access to this endpoint', null);
-        return;
-      }
+        if (viewerEndpoint) {
+          viewerEndpoint.callback(opts, cb ?? socket, socket);
+          return;
+        } else if (!endpoint) {
+          debug('socket', `User dont have viewer access to ${socket.nsp.name}`);
+          debug('socket', privileges);
+          cb && cb('User doesn\'t have access to this endpoint', null);
+          return;
+        }
 
-      if (viewerEndpoint && privileges.haveViewerPrivileges) {
-        viewerEndpoint.callback(opts, cb ?? socket, socket);
-        return;
-      } else if (!publicEndpoint) {
-        debug('socket', `User dont have viewer access to ${socket.nsp.name}`);
-        debug('socket', privileges);
-        cb('User doesn\'t have access to this endpoint', null);
-        return;
-      }
-
-      publicEndpoint.callback(opts, cb ?? socket, socket);
-    });
+        endpoint.callback(opts, cb ?? socket, socket);
+      });
+    }
+  }
+  // new code for new endpoints with scopes
+  for (const key of [...new Set(newEndpoints.filter(o => o.nsp === socket.nsp.name).map(o => o.nsp + '||' + o.on))]) {
+    const [nsp, on] = key.split('||');
+    const scopedEndpoints = newEndpoints.filter(o => o.nsp === nsp && o.on === on);
+    if (newEndpoints.length > 0) {
+      socket.on(on, async (opts: any, cb: (error: Error | string | null, ...response: any) => void) => {
+        for (const endpoint of scopedEndpoints) {
+          if (endpoint.scopes.some(scope => privileges.scopes.includes(scope))) {
+            endpoint.callback(opts, cb ?? socket, socket);
+          }
+        }
+        cb && cb('User doesn\'t have access to this endpoint', null);
+      });
+    }
   }
 };
 
@@ -143,7 +172,7 @@ class Socket extends Core {
             const accessToken = jwt.sign({
               userId,
               userName,
-              privileges: await getPrivileges(haveCasterPermission ? 'admin' : 'viewer', userId),
+              privileges: await getPrivileges(userId),
             }, this.JWTKey, { expiresIn: `${this.accessTokenExpirationTime}s` });
             const refreshToken = jwt.sign({
               userId,
@@ -177,7 +206,7 @@ class Socket extends Core {
             const accessToken = jwt.sign({
               userId:     data.userId,
               username:   data.username,
-              privileges: await getPrivileges(userPermission === defaultPermissions.CASTERS ? 'admin' : 'viewer', data.userId),
+              privileges: await getPrivileges(data.userId),
             }, this.JWTKey, { expiresIn: `${this.accessTokenExpirationTime}s` });
             const refreshToken = jwt.sign({
               userId:   data.userId,
@@ -204,7 +233,8 @@ class Socket extends Core {
     // first check if token is socketToken
     if (authToken === this.socketToken) {
       initEndpoints(socket, {
-        haveAdminPrivileges: Authorized.isAuthorized, haveModPrivileges: Authorized.isAuthorized, haveViewerPrivileges: Authorized.isAuthorized,
+        haveAdminPrivileges: true,
+        scopes:              Array.from(scopes), // allow all scopes
       });
     } else {
       if (authToken !== '' && authToken !== null) {
@@ -226,7 +256,7 @@ class Socket extends Core {
         }
       } else {
         initEndpoints(socket, {
-          haveAdminPrivileges: Authorized.NotAuthorized, haveModPrivileges: Authorized.NotAuthorized, haveViewerPrivileges: Authorized.NotAuthorized,
+          haveAdminPrivileges: false, scopes: [],
         });
         debug('socket', `Authorize endpoint failed with token '${authToken}'`);
         setTimeout(() => socket.emit('forceDisconnect'), 1000); // force disconnect if we must be logged in
@@ -241,7 +271,7 @@ class Socket extends Core {
       ioServer?.emit('forceDisconnect');
       if (socket) {
         initEndpoints(socket, {
-          haveAdminPrivileges: Authorized.NotAuthorized, haveModPrivileges: Authorized.NotAuthorized, haveViewerPrivileges: Authorized.NotAuthorized,
+          haveAdminPrivileges: false, scopes: [],
         });
       }
       cb(null);
@@ -276,11 +306,14 @@ const processAuth = (req: { headers: { [x: string]: any; }; }, res: { sendStatus
       userId: string; username: string; privileges: Unpacked<ReturnType<typeof getPrivileges>>;
     };
 
-    if (token.privileges.haveAdminPrivileges === Authorized.isAuthorized) {
+    if (token.privileges.scopes) {
+      req.headers.scopes = token.privileges.scopes;
+    }
+
+    if (token.privileges.haveAdminPrivileges === true) {
       req.headers.adminAccess = true;
       return next();
     }
-
   } catch {
     null;
   }
@@ -304,7 +337,7 @@ const adminMiddleware = (req: { headers: { [x: string]: any; }; }, res: { sendSt
       userId: string; username: string; privileges: Unpacked<ReturnType<typeof getPrivileges>>;
     };
 
-    if (token.privileges.haveAdminPrivileges !== Authorized.isAuthorized) {
+    if (token.privileges.haveAdminPrivileges !== true) {
       return res.sendStatus(401);
     }
 

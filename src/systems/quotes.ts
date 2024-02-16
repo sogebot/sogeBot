@@ -19,7 +19,7 @@ class Quotes extends System {
     super();
 
     this.addMenu({
-      category: 'manage', name: 'quotes', id: 'manage/quotes', this: this,
+      category: 'manage', name: 'quotes', id: 'manage/quotes', this: this, scopeParent: this.scope(),
     });
     this.addMenuPublic({ id: 'quotes', name: 'quotes' });
   }

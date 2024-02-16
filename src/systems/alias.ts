@@ -14,6 +14,7 @@ import { AppDataSource } from '~/database.js';
 import { checkFilter } from '~/helpers/checkFilter.js';
 import { incrementCountOfCommandUsage } from '~/helpers/commands/count.js';
 import { prepare } from '~/helpers/commons/index.js';
+import { HIGH } from '~/helpers/constants.js';
 import { executeVariablesInText } from '~/helpers/customvariables/index.js';
 import {
   debug, error, info, warning,
@@ -21,10 +22,9 @@ import {
 import { check } from '~/helpers/permissions/check.js';
 import { defaultPermissions } from '~/helpers/permissions/defaultPermissions.js';
 import { get } from '~/helpers/permissions/get.js';
-import { adminEndpoint } from '~/helpers/socket.js';
+import { adminEndpoint, endpoint } from '~/helpers/socket.js';
 import customCommands from '~/systems/customcommands.js';
 import { translate } from '~/translate.js';
-import { HIGH } from '~/helpers/constants.js';
 
 /*
  * !alias                                              - gets an info about alias usage
@@ -47,7 +47,11 @@ class Alias extends System {
     super();
 
     this.addMenu({
-      category: 'commands', name: 'alias', id: 'commands/alias', this: this,
+      scopeParent: this.scope(),
+      category:    'commands',
+      name:        'alias',
+      id:          'commands/alias',
+      this:        this,
     });
   }
 
@@ -95,10 +99,10 @@ class Alias extends System {
       }
       cb(null, groupsList);
     });
-    adminEndpoint('/systems/alias', 'generic::getAll', async (cb) => {
+    endpoint([this.scope('read')], '/systems/alias', 'generic::getAll', async (cb) => {
       cb(null, await AliasEntity.find());
     });
-    adminEndpoint('/systems/alias', 'generic::getOne', async (id, cb) => {
+    endpoint([this.scope('read')], '/systems/alias', 'generic::getOne', async (id, cb) => {
       cb(null, await AliasEntity.findOneBy({ id }));
     });
     adminEndpoint('/systems/alias', 'generic::deleteById', async (id, cb) => {

@@ -1,11 +1,11 @@
 import Overlay from './_interface.js';
 
 import * as channelPrediction from '~/helpers/api/channelPrediction.js';
-import { publicEndpoint } from '~/helpers/socket.js';
+import { endpoint } from '~/helpers/socket.js';
 
 class Bets extends Overlay {
   public sockets() {
-    publicEndpoint(this.nsp, 'data', async (callback) => {
+    endpoint([], this.nsp, 'data' as any, async (callback: any) => {
       const data = channelPrediction.status();
       callback(data ? {
         id:               data.id,

@@ -44,7 +44,7 @@ class CustomCommands extends System {
   constructor () {
     super();
     this.addMenu({
-      category: 'commands', name: 'customcommands', id: 'commands/customcommands', this: this,
+      category: 'commands', name: 'customcommands', id: 'commands/customcommands', this: this, scopeParent: this.scope(),
     });
   }
 

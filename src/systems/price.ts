@@ -36,7 +36,7 @@ class Price extends System {
   constructor () {
     super();
     this.addMenu({
-      category: 'commands', name: 'price', id: 'commands/price', this: this,
+      category: 'commands', name: 'price', id: 'commands/price', this: this, scopeParent: this.scope(),
     });
   }
 

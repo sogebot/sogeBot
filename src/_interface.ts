@@ -1,10 +1,11 @@
 import { existsSync } from 'fs';
+import { randomUUID } from 'node:crypto';
 import { setTimeout } from 'timers';
 
 import chalk from 'chalk';
 import _ from 'lodash-es';
 import type { Namespace } from 'socket.io/dist/namespace';
-import { randomUUID } from 'node:crypto';
+
 import { ClientToServerEventsWithNamespace } from '../d.ts/src/helpers/socket.js';
 
 import { PermissionCommands, Permissions as PermissionsEntity } from '~/database/entity/permissions.js';
@@ -26,7 +27,7 @@ import {
 } from '~/helpers/panel.js';
 import defaultPermissions from '~/helpers/permissions/defaultPermissions.js';
 import { register } from '~/helpers/register.js';
-import { adminEndpoint, publicEndpoint } from '~/helpers/socket.js';
+import { endpoint } from '~/helpers/socket.js';
 import * as watchers from '~/watchers.js';
 
 let socket: import('~/socket').Socket | any = null;
@@ -113,6 +114,7 @@ class Module {
   }
 
   public _name: string;
+  private _scope: string;
   protected _ui: InterfaceSettings.UI;
   public _commands: Command[];
   public _parsers: Parser[];
@@ -135,6 +137,7 @@ class Module {
     this._ui = {};
     this._name = name;
     this._enabled = enabledArg;
+    this._scope = [this._name, this.__moduleName__.toLowerCase()].join(':');
     enabledArg ? enabled.enable(this.nsp) : enabled.disable(this.nsp);
 
     register(this._name as any, this);
@@ -189,6 +192,10 @@ class Module {
       }
     };
     load();
+  }
+
+  public scope (type?: 'read' | 'manage') {
+    return this._scope + (type ? ':' + type : '');
   }
 
   public sockets() {
@@ -306,14 +313,19 @@ class Module {
       };
 
       // default socket listeners
-      adminEndpoint(this.nsp, 'settings', async (cb) => {
+      endpoint([
+        this.nsp.split('/').map(o => o.trim()).filter(String).join(':') + ':settings:read',
+        this.nsp.split('/').map(o => o.trim()).filter(String).join(':') + ':settings:manage',
+      ], this.nsp, 'settings', async (cb) => {
         try {
           cb(null, await this.getAllSettings(), await this.getUI());
         } catch (e: any) {
           cb(e.stack, {}, {});
         }
       });
-      adminEndpoint(this.nsp, 'settings.update', async (opts, cb) => {
+      endpoint([
+        this.nsp.split('/').map(o => o.trim()).filter(String).join(':') + ':settings:manage',
+      ], this.nsp, 'settings.update', async (opts, cb) => {
         // flatten and remove category
         const data = flatten(opts);
         const remap: ({ key: string; actual: string; toRemove: string[] } | { key: null; actual: null; toRemove: null })[] = Object.keys(flatten(data)).map(o => {
@@ -392,7 +404,9 @@ class Module {
         }
       });
 
-      adminEndpoint(this.nsp, 'set.value', async (opts, cb) => {
+      endpoint([
+        this.nsp.split('/').map(o => o.trim()).filter(String).join(':') + ':settings:manage',
+      ], this.nsp, 'set.value', async (opts, cb) => {
         try {
           (this as any)[opts.variable] = opts.value;
           if (cb) {
@@ -404,7 +418,7 @@ class Module {
           }
         }
       });
-      publicEndpoint(this.nsp, 'get.value', async (variable, cb) => {
+      endpoint([], this.nsp, 'get.value', async (variable, cb) => {
         try {
           cb(null, await (this as any)[variable]);
         } catch (e: any) {

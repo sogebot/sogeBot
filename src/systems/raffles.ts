@@ -17,6 +17,7 @@ import {
   announce, getOwnerAsSender, prepare,
 } from '~/helpers/commons/index.js';
 import { isDbConnected } from '~/helpers/database.js';
+import { getLocalizedName } from '~/helpers/getLocalizedName.js';
 import { debug, warning } from '~/helpers/log.js';
 import { linesParsed } from '~/helpers/parser.js';
 import defaultPermissions from '~/helpers/permissions/defaultPermissions.js';
@@ -25,7 +26,6 @@ import { tmiEmitter } from '~/helpers/tmi/index.js';
 import * as changelog from '~/helpers/user/changelog.js';
 import points from '~/systems/points.js';
 import { translate } from '~/translate.js';
-import { getLocalizedName } from '~/helpers/getLocalizedName.js';
 
 const TYPE_NORMAL = 0;
 const TYPE_TICKETS = 1;

@@ -28,7 +28,7 @@ class HowLongToBeat extends System {
   @onStartup()
   onStartup() {
     this.addMenu({
-      category: 'manage', name: 'howlongtobeat', id: 'manage/howlongtobeat', this: this,
+      category: 'manage', name: 'howlongtobeat', id: 'manage/howlongtobeat', this: this, scopeParent: this.scope(),
     });
 
     setInterval(() => {

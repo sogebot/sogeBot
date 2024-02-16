@@ -18,7 +18,7 @@ class Permissions extends Core {
   @onStartup()
   onStartup() {
     this.addMenu({
-      category: 'settings', name: 'permissions', id: 'settings/permissions', this: null,
+      category: 'settings', name: 'permissions', id: 'settings/permissions', this: null, scopeParent: this.scope(),
     });
     this.ensurePreservedPermissionsInDb();
   }
