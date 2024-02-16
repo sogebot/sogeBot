@@ -17,6 +17,7 @@ import general from '../general.js';
 import users from '../users.js';
 
 import { AppDataSource } from '~/database.js';
+import { Post } from '~/decorators/endpoint.js';
 import { isStreamOnline } from '~/helpers/api/index.js';
 import { prepare } from '~/helpers/commons/index.js';
 import { MINUTE } from '~/helpers/constants.js';
@@ -29,7 +30,6 @@ import { ParameterError } from '~/helpers/parameterError.js';
 import defaultPermissions from '~/helpers/permissions/defaultPermissions.js';
 import { getUserHighestPermission } from '~/helpers/permissions/getUserHighestPermission.js';
 import { getPointsName, name } from '~/helpers/points/index.js';
-import { adminEndpoint } from '~/helpers/socket.js';
 import * as changelog from '~/helpers/user/changelog.js';
 import { isBot, isBotId } from '~/helpers/user/isBot.js';
 import { getIdFromTwitch } from '~/services/twitch/calls/getIdFromTwitch.js';
@@ -153,7 +153,7 @@ class Points extends System {
     ]);
 
     // get user max permission
-    const permId = await getUserHighestPermission(userId);
+    const permId = (await getUserHighestPermission(userId)).id;
     if (!permId) {
       debug('points.update', `User ${user.userName}#${userId} permId not found`);
       return; // skip without id
@@ -207,7 +207,7 @@ class Points extends System {
     ]);
 
     // get user max permission
-    const permId = await getUserHighestPermission(opts.sender.userId);
+    const permId = (await getUserHighestPermission(opts.sender.userId)).id;
     if (!permId) {
       return true; // skip without permission
     }
@@ -234,27 +234,23 @@ class Points extends System {
     return true;
   }
 
-  sockets () {
-    adminEndpoint('/systems/points', 'parseCron', (cron, cb) => {
-      try {
-        const interval = cronparser.parseExpression(cron);
-        // get 5 dates
-        const intervals: number[] = [];
-        for (let i = 0; i < 5; i++) {
-          intervals.push(new Date(interval.next().toISOString()).getTime());
-        }
-        cb(null, intervals);
-      } catch (e: any) {
-        cb(e.message, []);
-      }
-    });
+  @Post('/cron')
+  async postCron(req: any) {
+    const cron = req.body.cron;
+    const interval = cronparser.parseExpression(cron);
+    // get 5 dates
+    const intervals: number[] = [];
+    for (let i = 0; i < 5; i++) {
+      intervals.push(new Date(interval.next().toISOString()).getTime());
+    }
+    return intervals;
+  }
 
-    adminEndpoint('/systems/points', 'reset', async () => {
-      changelog.flush().then(() => {
-        AppDataSource.getRepository(PointsChangelog).clear();
-        AppDataSource.getRepository(User).update({}, { points: 0 });
-      });
-    });
+  @Post('/reset')
+  async postReset() {
+    await changelog.flush();
+    await AppDataSource.getRepository(PointsChangelog).clear();
+    await AppDataSource.getRepository(User).update({}, { points: 0 });
   }
 
   maxSafeInteger(number: number) {

@@ -1,9 +1,9 @@
 import {
   Raffle, RaffleParticipant, RaffleParticipantInterface, RaffleParticipantMessageInterface,
 } from '@entity/raffle.js';
-import { User } from '@entity/user.js';
 import * as _ from 'lodash-es';
 import { IsNull } from 'typeorm';
+import { z } from 'zod';
 
 import System from './_interface.js';
 import { onStartup } from '../decorators/on.js';
@@ -12,20 +12,20 @@ import {
 } from '../decorators.js';
 
 import { AppDataSource } from '~/database.js';
+import { Get, Post } from '~/decorators/endpoint.js';
 import { isStreamOnline } from '~/helpers/api/index.js';
 import {
   announce, getOwnerAsSender, prepare,
 } from '~/helpers/commons/index.js';
 import { isDbConnected } from '~/helpers/database.js';
+import { getLocalizedName } from '~/helpers/getLocalizedName.js';
 import { debug, warning } from '~/helpers/log.js';
 import { linesParsed } from '~/helpers/parser.js';
 import defaultPermissions from '~/helpers/permissions/defaultPermissions.js';
-import { adminEndpoint } from '~/helpers/socket.js';
 import { tmiEmitter } from '~/helpers/tmi/index.js';
 import * as changelog from '~/helpers/user/changelog.js';
 import points from '~/systems/points.js';
 import { translate } from '~/translate.js';
-import { getLocalizedName } from '~/helpers/getLocalizedName.js';
 
 const TYPE_NORMAL = 0;
 const TYPE_TICKETS = 1;
@@ -75,55 +75,48 @@ class Raffles extends System {
     }, 1000);
   }
 
-  sockets () {
-    adminEndpoint('/systems/raffles', 'raffle::getWinner', async (userName: string, cb) => {
-      try {
-        await changelog.flush();
-        cb(
-          null,
-          await AppDataSource.getRepository(User).findOneBy({ userName }) as any,
-        );
-      } catch (e: any) {
-        cb(e.stack);
-      }
+  @Get('/')
+  async getLatest() {
+    return (await AppDataSource.getRepository(Raffle).find({
+      relations: ['participants', 'participants.messages'],
+      order:     { timestamp: 'DESC' },
+      take:      1,
+    }))[0];
+  }
+
+  @Post('/', { action: 'pick' })
+  async postPick() {
+    this.pick({
+      attr: {}, command: '!raffle', createdAt: Date.now(), parameters: '', sender: getOwnerAsSender(), isAction: false, isHighlight: false, emotesOffsets: new Map(), isFirstTimeMessage: false, discord: undefined,
     });
-    adminEndpoint('/systems/raffles', 'raffle::setEligibility', async ({ id, isEligible }, cb) => {
-      try {
-        await AppDataSource.getRepository(RaffleParticipant).update({ id }, { isEligible });
-        cb(null);
-      } catch (e: any) {
-        cb(e.stack);
-      }
+    return;
+  }
+
+  @Post('/', { zodValidator: z.object({ message: z.string() }), action: 'open' })
+  async postOpen(req: any) {
+    const { message } = req.body;
+    // force close raffles
+    await AppDataSource.getRepository(Raffle).update({}, { isClosed: true });
+    await this.open({
+      attr: {}, command: '!raffle open', createdAt: Date.now(), sender: getOwnerAsSender(), parameters: message, isAction: false, isHighlight: false, emotesOffsets: new Map(), isFirstTimeMessage: false, discord: undefined,
     });
-    adminEndpoint('/systems/raffles', 'raffle:getLatest', async (cb) => {
-      try {
-        cb(
-          null,
-          (await AppDataSource.getRepository(Raffle).find({
-            relations: ['participants', 'participants.messages'],
-            order:     { timestamp: 'DESC' },
-            take:      1,
-          }))[0],
-        );
-      } catch (e: any) {
-        cb (e);
-      }
-    });
-    adminEndpoint('/systems/raffles', 'raffle::pick', async () => {
-      this.pick({
-        attr: {}, command: '!raffle', createdAt: Date.now(), parameters: '', sender: getOwnerAsSender(), isAction: false, isHighlight: false, emotesOffsets: new Map(), isFirstTimeMessage: false, discord: undefined,
-      });
-    });
-    adminEndpoint('/systems/raffles', 'raffle::open', async (message) => {
-      // force close raffles
-      await AppDataSource.getRepository(Raffle).update({}, { isClosed: true });
-      this.open({
-        attr: {}, command: '!raffle open', createdAt: Date.now(), sender: getOwnerAsSender(), parameters: message, isAction: false, isHighlight: false, emotesOffsets: new Map(), isFirstTimeMessage: false, discord: undefined,
-      });
-    });
-    adminEndpoint('/systems/raffles', 'raffle::close', async () => {
-      await AppDataSource.getRepository(Raffle).update({ isClosed: false }, { isClosed: true });
-    });
+    return (await AppDataSource.getRepository(Raffle).find({
+      relations: ['participants', 'participants.messages'],
+      order:     { timestamp: 'DESC' },
+      take:      1,
+    }))[0];
+  }
+
+  @Post('/', { action: 'close' })
+  async postClose() {
+    await AppDataSource.getRepository(Raffle).update({ isClosed: false }, { isClosed: true });
+    return;
+  }
+
+  @Post('/', { action: 'eligibility', zodValidator: z.object({ id: z.string(), isEligible: z.boolean() }) })
+  async postEligibility(req: any) {
+    const { id, isEligible } = req.body;
+    await AppDataSource.getRepository(RaffleParticipant).update({ id }, { isEligible });
   }
 
   @parser({ fireAndForget: true })
@@ -166,33 +159,6 @@ class Raffles extends System {
   }
 
   async announceEntries() {
-    try {
-      const raffle = await AppDataSource.getRepository(Raffle).findOneOrFail({ where: { winner: IsNull(), isClosed: false }, relations: ['participants'] });
-      const eligibility: string[] = [];
-      if (raffle.forSubscribers === true) {
-        eligibility.push(prepare('raffles.eligibility-subscribers-item'));
-      }
-      if (_.isEmpty(eligibility)) {
-        eligibility.push(prepare('raffles.eligibility-everyone-item'));
-      }
-
-      const message = prepare(raffle.type === TYPE_NORMAL ? 'raffles.added-entries' : 'raffles.added-ticket-entries', {
-        l10n_entries: getLocalizedName(announceNewEntriesCount, translate('core.entries')),
-        count:        announceNewEntriesCount,
-        countTotal:   raffle.participants.reduce((a, b) => {
-          a += b.tickets;
-          return a;
-        }, 0),
-        keyword:     raffle.keyword,
-        min:         raffle.minTickets,
-        max:         raffle.maxTickets,
-        eligibility: eligibility.join(', '),
-      });
-
-      announce(message, 'raffles');
-    } catch (e: any) {
-      warning('No active raffle found to announce added entries.');
-    }
     announceNewEntriesTime = 0;
     announceNewEntriesCount = 0;
   }

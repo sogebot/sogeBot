@@ -14,8 +14,8 @@ import { getGlobalVariables } from '~/helpers/checkFilter.js';
 import { getUserSender } from '~/helpers/commons/index.js';
 import { app } from '~/helpers/panel.js';
 import twitch from '~/services/twitch.js';
-import { adminMiddleware } from '~/socket.js';
 import { translate } from '~/translate.js';
+import { withScope } from './helpers/socket.js';
 
 (function initializeMessageParserAPI() {
   if (!app) {
@@ -23,7 +23,7 @@ import { translate } from '~/translate.js';
     return;
   }
 
-  app.post('/api/core/parse', adminMiddleware, async (req, res) => {
+  app.post('/api/core/parse', withScope(['dashboard:manage']), async (req, res) => {
     try {
       const text = await new Message(req.body.message).parse({ sender: getUserSender(req.body.user.id, req.body.user.username), discord: undefined }) as string;
       res.send({ data: text });

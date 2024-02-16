@@ -20,10 +20,10 @@ import { app } from '~/helpers/panel.js';
 import { linesParsed } from '~/helpers/parser.js';
 import lastfm from '~/integrations/lastfm.js';
 import spotify from '~/integrations/spotify.js';
-import { adminMiddleware } from '~/socket.js';
 import songs from '~/systems/songs.js';
 import translateLib, { translate } from '~/translate.js';
 import { variables } from '~/watchers.js';
+import { withScope } from './helpers/socket.js';
 
 class Stats extends Core {
   @persistent()
@@ -49,7 +49,7 @@ class Stats extends Core {
       return;
     }
 
-    app.get('/api/stats/current', adminMiddleware, async (__, res) => {
+    app.get('/api/stats/current', withScope(['dashboard:read']), async (__, res) => {
       try {
         if (!translateLib.isLoaded) {
           throw new Error('Translation not yet loaded');
@@ -93,7 +93,7 @@ class Stats extends Core {
       }
     });
 
-    app.get('/api/stats/latest', adminMiddleware, async (__, res) => {
+    app.get('/api/stats/latest', withScope(['dashboard:read']), async (__, res) => {
       try {
         // cleanup
         AppDataSource.getRepository(TwitchStats).delete({ 'whenOnline': LessThan(Date.now() - (DAY * 31)) });

@@ -21,9 +21,8 @@ import { debug, info, error } from '~/helpers/log.js';
 import { app, ioServer } from '~/helpers/panel.js';
 import { defaultPermissions } from '~/helpers/permissions/defaultPermissions.js';
 import { itemsToEvalPart } from '~/helpers/queryFilter.js';
-import { adminEndpoint } from '~/helpers/socket.js';
+import { adminEndpoint, withScope } from '~/helpers/socket.js';
 import { Types } from '~/plugins/ListenTo.js';
-import { adminMiddleware } from '~/socket.js';
 import { translate } from '~/translate.js';
 import { variables } from '~/watchers.js';
 
@@ -104,7 +103,7 @@ class Alerts extends Registry {
       return;
     }
 
-    app.get('/api/registries/alerts/queue/', adminMiddleware, async (req, res) => {
+    app.get('/api/registries/alerts/queue/', withScope(['alerts:read']), async (req, res) => {
       const release = await filterMutex.acquire();
       const cmd = await AlertQueue.find();
       res.send({
@@ -113,7 +112,7 @@ class Alerts extends Registry {
       release();
     });
 
-    app.patch('/api/registries/alerts/queue/:id', adminMiddleware, async (req, res) => {
+    app.patch('/api/registries/alerts/queue/:id', withScope(['alerts:manage']), async (req, res) => {
       const release = await filterMutex.acquire();
       const queue = await AlertQueue.findOneBy({ id: req.params.id });
       if (queue) {
@@ -150,7 +149,7 @@ class Alerts extends Registry {
       res.status(200).send();
     });
 
-    app.post('/api/registries/alerts/queue/:id/reset', adminMiddleware, async (req, res) => {
+    app.post('/api/registries/alerts/queue/:id/reset', withScope(['alerts:manage']), async (req, res) => {
       const release = await filterMutex.acquire();
       const queue = await AlertQueue.findOneBy({ id: req.params.id });
       if (queue) {
@@ -163,7 +162,7 @@ class Alerts extends Registry {
       release();
     });
 
-    app.post('/api/registries/alerts/queue/:id/trigger', adminMiddleware, async (req, res) => {
+    app.post('/api/registries/alerts/queue/:id/trigger', withScope(['alerts:manage']), async (req, res) => {
       const release = await filterMutex.acquire();
       const queue = await AlertQueue.findOneBy({ id: req.params.id });
       if (queue) {
@@ -180,7 +179,7 @@ class Alerts extends Registry {
       release();
     });
 
-    app.post('/api/registries/alerts/queue', adminMiddleware, async (req, res) => {
+    app.post('/api/registries/alerts/queue', withScope(['alerts:manage']), async (req, res) => {
       const release = await filterMutex.acquire();
       try {
         const { count, ...data } = req.body;
@@ -192,7 +191,7 @@ class Alerts extends Registry {
       release();
     });
 
-    app.delete('/api/registries/alerts/queue/:id', adminMiddleware, async (req, res) => {
+    app.delete('/api/registries/alerts/queue/:id', withScope(['alerts:manage']), async (req, res) => {
       const release = await filterMutex.acquire();
       const group = await AlertQueue.findOneBy({ id: req.params.id });
       if (group) {

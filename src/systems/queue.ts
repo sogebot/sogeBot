@@ -1,4 +1,5 @@
 import { Queue as QueueEntity, QueueInterface } from '@entity/queue.js';
+import { z } from 'zod';
 
 import System from './_interface.js';
 import {
@@ -7,9 +8,9 @@ import {
 
 import { parserReply } from '~/commons.js';
 import { AppDataSource } from '~/database.js';
+import { Get, Post } from '~/decorators/endpoint.js';
 import { getUserSender, prepare } from '~/helpers/commons/index.js';
 import defaultPermissions from '~/helpers/permissions/defaultPermissions.js';
-import { adminEndpoint } from '~/helpers/socket.js';
 import * as changelog from '~/helpers/user/changelog.js';
 import getBotId from '~/helpers/user/getBotId.js';
 import getBotUserName from '~/helpers/user/getBotUserName.js';
@@ -32,78 +33,66 @@ class Queue extends System {
   @settings('eligibility')
     eligibilityAll = true;
   @settings('eligibility')
-    eligibilitySubscribers = true;
+    eligibilitySubscribers = false;
 
   pickedUsers: QueueInterface[] = [];
 
-  sockets () {
-    adminEndpoint('/systems/queue', 'queue::getAllPicked', async(cb) => {
-      try {
-        cb(null, this.pickedUsers);
-      } catch (e: any) {
-        cb(e.stack, []);
-      }
-    });
-    adminEndpoint('/systems/queue', 'generic::getAll', async(cb) => {
-      try {
-        cb(
-          null,
-          await AppDataSource.getRepository(QueueEntity).find(),
-        );
-      } catch (e: any) {
-        cb(e.stack, []);
-      }
-    });
-    adminEndpoint('/systems/queue', 'queue::clear', async(cb) => {
-      try {
-        await AppDataSource.getRepository(QueueEntity).clear(),
-        cb(null);
-      } catch (e: any) {
-        cb(e.stack);
-      }
-    });
-    adminEndpoint('/systems/queue', 'queue::pick', async (data, cb) => {
-      try {
-        if (data.username) {
-          const users: any[] = [];
-          if (typeof data.username === 'string') {
-            data.username = [data.username];
-          }
-          for (const user of data.username) {
-            const entity = await AppDataSource.getRepository(QueueEntity).findOneBy({ username: user });
-            if (entity) {
-              users.push(entity);
-            }
-          }
-          if (cb) {
-            const opts = {
-              sender: getUserSender(getBotId(), getBotUserName()), users, attr: {}, createdAt: Date.now(), command: '', parameters: '', isAction: false, isHighlight: false, emotesOffsets: new Map(), isFirstTimeMessage: false, discord: undefined,
-            };
-            const picked = await this.pickUsers(opts, data.random);
-            for (let i = 0; i < picked.responses.length; i++) {
-              await parserReply(picked.responses[i].response, { sender: picked.responses[i].sender, discord: picked.responses[i].discord, attr: picked.responses[i].attr, id: '' });
-            }
-            cb(null, picked.users);
-          }
-        } else {
-          if (cb) {
-            const opts = {
-              sender: getUserSender(getBotId(), getBotUserName()), attr: {}, createdAt: Date.now(), command: '', parameters: String(data.count), isAction: false, isHighlight: false, emotesOffsets: new Map(), isFirstTimeMessage: false, discord: undefined,
-            };
-            const picked = await this.pickUsers(opts, data.random);
-            for (let i = 0; i < picked.responses.length; i++) {
-              await parserReply(picked.responses[i].response, { sender: picked.responses[i].sender, discord: picked.responses[i].discord, attr: picked.responses[i].attr, id: '' });
-            }
-            cb(null, picked.users);
-          }
-        }
-      } catch (e: any) {
-        if (cb) {
-          cb(e.stack, []);
-        }
-      }
-    });
+  ///////////////////////// <! API endpoints
+  @Get('/')
+  async getAll(req: any) {
+    const action = req.query._action;
+    if (action === 'picked') {
+      return this.pickedUsers;
+    }
+    return AppDataSource.getRepository(QueueEntity).find();
   }
+  @Post('/', {
+    zodValidator: z.object({
+      username: z.string().min(2).optional(),
+      count:    z.number().int(),
+      random:   z.boolean(),
+    }),
+  })
+  async postAction(req: any) {
+    const action = req.query._action;
+    if (action === 'clear') {
+      await AppDataSource.getRepository(QueueEntity).clear();
+      return;
+    }
+    if (action === 'pick') {
+      const data = req.body;
+      if (data.username) {
+        const users: any[] = [];
+        if (typeof data.username === 'string') {
+          data.username = [data.username];
+        }
+        for (const user of data.username) {
+          const entity = await AppDataSource.getRepository(QueueEntity).findOneBy({ username: user });
+          if (entity) {
+            users.push(entity);
+          }
+        }
+        const opts = {
+          sender: getUserSender(getBotId(), getBotUserName()), users, attr: {}, createdAt: Date.now(), command: '', parameters: '', isAction: false, isHighlight: false, emotesOffsets: new Map(), isFirstTimeMessage: false, discord: undefined,
+        };
+        const picked = await this.pickUsers(opts, data.random);
+        for (let i = 0; i < picked.responses.length; i++) {
+          await parserReply(picked.responses[i].response, { sender: picked.responses[i].sender, discord: picked.responses[i].discord, attr: picked.responses[i].attr, id: '' });
+        }
+        return picked.users;
+      } else {
+        const opts = {
+          sender: getUserSender(getBotId(), getBotUserName()), attr: {}, createdAt: Date.now(), command: '', parameters: String(data.count), isAction: false, isHighlight: false, emotesOffsets: new Map(), isFirstTimeMessage: false, discord: undefined,
+        };
+        const picked = await this.pickUsers(opts, data.random);
+        for (let i = 0; i < picked.responses.length; i++) {
+          await parserReply(picked.responses[i].response, { sender: picked.responses[i].sender, discord: picked.responses[i].discord, attr: picked.responses[i].attr, id: '' });
+        }
+        return picked.users;
+      }
+    }
+  }
+  ///////////////////////// API endpoints />
 
   async getUsers (opts: { random: boolean, amount: number }): Promise<QueueInterface[]> {
     opts = opts || { amount: 1 };
@@ -161,14 +150,13 @@ class Queue extends System {
         changelog.update(opts.sender.userId, { userName: opts.sender.userName });
         return this.join(opts);
       }
-      const [all, subscribers] = await Promise.all([this.eligibilityAll, this.eligibilitySubscribers]);
 
       // get message
       const message = opts.parameters.length > 0 ? opts.parameters : null;
 
       let eligible = false;
-      if (!all) {
-        if (subscribers && user.isSubscriber) {
+      if (!this.eligibilityAll) {
+        if (this.eligibilitySubscribers && user.isSubscriber) {
           eligible = true;
         }
       } else {

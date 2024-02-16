@@ -2,41 +2,34 @@ import { Checklist as ChecklistEntity } from '@entity/checklist.js';
 
 import System from './_interface.js';
 import { onChange, onStreamEnd } from '../decorators/on.js';
-import { settings, ui } from '../decorators.js';
+import { settings } from '../decorators.js';
 
-import { AppDataSource } from '~/database.js';
-import { adminEndpoint } from '~/helpers/socket.js';
+import { Get, Post } from '~/decorators/endpoint.js';
 
 class Checklist extends System {
   @settings('customization')
-  @ui({ type: 'configurable-list' })
     itemsArray: any[] = [];
 
-  sockets() {
-    adminEndpoint('/systems/checklist', 'generic::getAll', async (cb) => {
-      try {
-        const checkedItems = await AppDataSource.getRepository(ChecklistEntity).find();
-        cb(null, this.itemsArray, checkedItems);
-      } catch(e: any) {
-        cb(e.stack, [], []);
-      }
-    });
-    adminEndpoint('/systems/checklist', 'checklist::save', async (checklistItem, cb) => {
-      await AppDataSource.getRepository(ChecklistEntity).save(checklistItem);
-      if (cb) {
-        cb(null);
-      }
-    });
+  ///////////////////////// <! API endpoints
+  @Get('/')
+  async findAll() {
+    const checkedItems = await ChecklistEntity.find();
+    return this.itemsArray.map(it => ({ id: it, isCompleted: checkedItems.find(cit => cit.id === it)?.isCompleted ?? false }));
   }
+  @Post('/')
+  saveOneGroup(req: any) {
+    return ChecklistEntity.create(req.body).save();
+  }
+  ///////////////////////// API endpoints />
 
   @onChange('itemsArray')
   onChangeItemsArray() {
-    AppDataSource.getRepository(ChecklistEntity).clear();
+    ChecklistEntity.clear();
   }
 
   @onStreamEnd()
   public onStreamEnd() {
-    AppDataSource.getRepository(ChecklistEntity).update({}, { isCompleted: false });
+    ChecklistEntity.update({}, { isCompleted: false });
   }
 }
 

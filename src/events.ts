@@ -1,13 +1,16 @@
 import { setTimeout } from 'timers'; // tslint workaround
 
-import _, {
-  clone, cloneDeep, get, isNil, random, sample,
+import { EventList as EventListEntity } from '@entity/eventList.js';
+import {
+  clone, cloneDeep, get, isNil, random, sample, orderBy,
 } from 'lodash-es';
 import { VM }  from 'vm2';
 
+import { Get } from './decorators/endpoint.js';
 import { dayjs } from './helpers/dayjsHelper.js';
 import { generateUsername } from './helpers/generateUsername.js';
 import { getLocalizedName } from './helpers/getLocalizedName.js';
+import getNameById from './helpers/user/getNameById.js';
 import { Types } from './plugins/ListenTo.js';
 import twitch from './services/twitch.js';
 
@@ -197,7 +200,7 @@ class Events extends Core {
     ];
 
     this.addMenu({
-      category: 'manage', name: 'events', id: 'manage/events', this: null,
+      category: 'manage', name: 'events', id: 'manage/events', this: null, scopeParent: this.scope(),
     });
     this.fadeOut();
 
@@ -262,6 +265,41 @@ class Events extends Core {
   @onStreamEnd()
   resetExcludedUsers() {
     excludedUsers.clear();
+  }
+
+  @Get('/:userId')
+  async getUserEvents(req: any) {
+    const userId = req.params.userId;
+    const eventsByUserId = await AppDataSource.getRepository(EventListEntity).findBy({ userId: userId });
+    // we also need subgifts by giver
+    const eventsByRecipientId
+        = (await AppDataSource.getRepository(EventListEntity).findBy({ event: 'subgift' }))
+          .filter(o => JSON.parse(o.values_json).fromId === userId);
+    const evs =  orderBy([ ...eventsByRecipientId, ...eventsByUserId ], 'timestamp', 'desc');
+    // we need to change userId => username and fromId => fromId username for eventlist compatibility
+    const mapping = new Map() as Map<string, string>;
+    for (const event of evs) {
+      const values = JSON.parse(event.values_json);
+      if (values.fromId && values.fromId != '0') {
+        if (!mapping.has(values.fromId)) {
+          mapping.set(values.fromId, await getNameById(values.fromId));
+        }
+      }
+      if (!mapping.has(event.userId)) {
+        mapping.set(event.userId, await getNameById(event.userId));
+      }
+    }
+    return evs.map(event => {
+      const values = JSON.parse(event.values_json);
+      if (values.fromId && values.fromId != '0') {
+        values.fromId = mapping.get(values.fromId);
+      }
+      return {
+        ...event,
+        username:    mapping.get(event.userId),
+        values_json: JSON.stringify(values),
+      };
+    });
   }
 
   public async fire(eventId: string, attributes: Attributes): Promise<void> {
@@ -480,9 +518,6 @@ class Events extends Core {
     const value = attributesReplace(attributes, String(operation.value));
     await setValueOf(String(customVariableName), value, {});
 
-    // Update widgets and titles
-    eventEmitter.emit('CustomVariable:OnRefresh');
-
     const regexp = new RegExp(`\\$_${customVariableName}`, 'ig');
     const title = rawStatus.value;
     if (title.match(regexp)) {
@@ -495,15 +530,12 @@ class Events extends Core {
 
     // check if value is number
     let currentValue: string | number = await getValueOf('$_' + customVariableName);
-    if (!_.isFinite(parseInt(currentValue, 10))) {
+    if (!isFinite(parseInt(currentValue, 10))) {
       currentValue = String(numberToIncrement);
     } else {
       currentValue = String(parseInt(currentValue, 10) + numberToIncrement);
     }
     await setValueOf(String('$_' + customVariableName), currentValue, {});
-
-    // Update widgets and titles
-    eventEmitter.emit('CustomVariable:OnRefresh');
 
     const regexp = new RegExp(`\\$_${customVariableName}`, 'ig');
     const title = rawStatus.value;
@@ -518,15 +550,13 @@ class Events extends Core {
 
     // check if value is number
     let currentValue = await getValueOf('$_' + customVariableName);
-    if (!_.isFinite(parseInt(currentValue, 10))) {
+    if (!isFinite(parseInt(currentValue, 10))) {
       currentValue = String(numberToDecrement * -1);
     } else {
       currentValue = String(parseInt(currentValue, 10) - numberToDecrement);
     }
     await setValueOf(String('$_' + customVariableName), currentValue, {});
 
-    // Update widgets and titles
-    eventEmitter.emit('CustomVariable:OnRefresh');
     const regexp = new RegExp(`\\$_${customVariableName}`, 'ig');
     const title = rawStatus.value;
     if (title.match(regexp)) {

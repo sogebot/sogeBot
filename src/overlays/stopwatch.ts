@@ -3,10 +3,9 @@ import { Overlay as OverlayEntity } from '@entity/overlay.js';
 import Overlay from './_interface.js';
 
 import { AppDataSource } from '~/database.js';
-import { app } from '~/helpers/panel.js';
-import { adminEndpoint, publicEndpoint } from '~/helpers/socket.js';
-import { adminMiddleware } from '~/socket.js';
 import { MINUTE, SECOND } from '~/helpers/constants.js';
+import { app } from '~/helpers/panel.js';
+import { adminEndpoint, endpoint, withScope } from '~/helpers/socket.js';
 
 const checks = new Map<string, { timestamp: number; isEnabled: boolean; time: number; }>();
 const statusUpdate = new Map<string, { timestamp: number; isEnabled: boolean | null; time: number | null; }>();
@@ -32,7 +31,7 @@ class Stopwatch extends Overlay {
       return;
     }
 
-    app.post('/api/overlays/stopwatch/:id/:operation', adminMiddleware, async (req, res) => {
+    app.post('/api/overlays/stopwatch/:id/:operation', withScope(['overlay:manage']), async (req, res) => {
       const check = checks.get(req.params.id);
       const operationEnableList = {
         stop:         false,
@@ -50,7 +49,7 @@ class Stopwatch extends Overlay {
       res.status(204).send();
     });
 
-    publicEndpoint('/overlays/stopwatch', 'stopwatch::update', async (data: { groupId: string, id: string, isEnabled: boolean, time: number }, cb) => {
+    endpoint([], '/overlays/stopwatch', 'stopwatch::update', async (data: { groupId: string, id: string, isEnabled: boolean, time: number }, cb) => {
       const update = {
         timestamp: Date.now(),
         isEnabled: data.isEnabled,
@@ -68,7 +67,7 @@ class Stopwatch extends Overlay {
       }
 
       checks.set(data.id, update);
-      cb(null, statusUpdate.get(data.id));
+      cb(null, statusUpdate.get(data.id) as any);
       statusUpdate.delete(data.id);
 
       // we need to check if persistent

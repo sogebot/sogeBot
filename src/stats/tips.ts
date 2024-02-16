@@ -3,8 +3,8 @@ import { UserTip } from '@entity/user.js';
 import Stats from './_interface.js';
 
 import { AppDataSource } from '~/database.js';
+import { Get } from '~/decorators/endpoint.js';
 import { error } from '~/helpers/log.js';
-import { adminEndpoint } from '~/helpers/socket.js';
 import getNameById from '~/helpers/user/getNameById.js';
 
 class Tips extends Stats {
@@ -15,26 +15,21 @@ class Tips extends Stats {
     });
   }
 
-  sockets() {
-    adminEndpoint('/stats/tips', 'generic::getAll', async (cb) => {
+  @Get('/')
+  async getAll() {
+    const items = await AppDataSource.getRepository(UserTip).find();
+    return await Promise.all(items.map(async (item) => {
+      let username = 'NotExisting';
       try {
-        const items = await AppDataSource.getRepository(UserTip).find();
-        cb(null, await Promise.all(items.map(async (item) => {
-          let username = 'NotExisting';
-          try {
-            username = await getNameById(item.userId);
-          } catch(e) {
-            error(`STATS: userId ${item.userId} is not found on Twitch`);
-          }
-          return {
-            ...item,
-            username,
-          };
-        })));
-      } catch (e: any) {
-        cb(e.stack, []);
+        username = await getNameById(item.userId);
+      } catch(e) {
+        error(`STATS: userId ${item.userId} is not found on Twitch`);
       }
-    });
+      return {
+        ...item,
+        username,
+      };
+    }));
   }
 }
 

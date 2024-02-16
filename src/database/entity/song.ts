@@ -18,7 +18,7 @@ export class SongBan extends BotEntity {
 
 @Entity()
 export class SongPlaylist extends BotEntity {
-  schema = z.object({
+  _schema = z.object({
     videoId: z.string().min(1),
   });
 

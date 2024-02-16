@@ -2,21 +2,14 @@ import { Filter } from '@devexpress/dx-react-grid';
 import type { AlertInterface, EmitData } from '@entity/alert';
 import type { BetsInterface } from '@entity/bets';
 import type { CacheTitlesInterface } from '@entity/cacheTitles';
-import type { ChecklistInterface } from '@entity/checklist';
-import type { CommandsCountInterface, CommandsGroupInterface, CommandsInterface } from '@entity/commands';
-import type { CooldownInterface } from '@entity/cooldown';
+import type { CommandsCountInterface } from '@entity/commands';
 import type { Event, Events } from '@entity/event';
 import type { EventListInterface } from '@entity/eventList';
 import type { GalleryInterface } from '@entity/gallery';
 import type { HighlightInterface } from '@entity/highlight';
-import type { HowLongToBeatGameInterface, HowLongToBeatGameItemInterface } from '@entity/howLongToBeatGame';
-import type { KeywordGroupInterface, KeywordInterface } from '@entity/keyword';
 import type { OBSWebsocketInterface } from '@entity/obswebsocket';
 import type { OverlayMapperMarathon, Overlay, TTSService } from '@entity/overlay';
 import type { Permissions } from '@entity/permissions';
-import type { QueueInterface } from '@entity/queue';
-import type { QuotesInterface } from '@entity/quotes';
-import type { RaffleInterface } from '@entity/raffle';
 import type { RandomizerInterface } from '@entity/randomizer';
 import type { RankInterface } from '@entity/rank';
 import type { currentSongType, SongBanInterface, SongPlaylistInterface, SongRequestInterface } from '@entity/song';
@@ -116,27 +109,12 @@ export type ClientToServerEventsWithNamespace = {
     'integration::obswebsocket::log': (toLog: string) => void,
     'integration::obswebsocket::listener': (opts: { event: string, args: any }) => void,
   },
-  '/core/plugins': GenericEvents & {
-    'listeners': (cb: (listeners: Record<string, any>) => void) => void,
-    'generic::getOne': generic<Plugin>['getOne'],
-    'generic::getAll': generic<Plugin>['getAll'],
-    'generic::save': generic<Plugin>['save'],
-    'generic::deleteById': generic<Plugin>['deleteById'],
-  },
-  '/core/emotes': GenericEvents & {
-    'testExplosion': (cb: (err: Error | string | null | unknown, data: null ) => void) => void,
-    'testFireworks': (cb: (err: Error | string | null | unknown, data: null ) => void) => void,
-    'test': (cb: (err: Error | string | null | unknown, data: null ) => void) => void,
-    'removeCache': (cb: (err: Error | string | null | unknown, data: null ) => void) => void,
-    'getCache': (cb: (err: Error | string | null | unknown, data: any ) => void) => void,
-  },
   '/integrations/discord': GenericEvents & {
     'discord::getRoles': (cb: (err: Error | string | null | unknown, data: { text: string, value: string}[] ) => void) => void,
     'discord::getGuilds': (cb: (err: Error | string | null | unknown, data: { text: string, value: string}[] ) => void) => void,
     'discord::getChannels': (cb: (err: Error | string | null | unknown, data: { text: string, value: string}[] ) => void) => void,
     'discord::authorize': (cb: (err: Error | string | null | unknown, action?: null | { do: 'redirect', opts: any[] } ) => void) => void,
   },
-  '/integrations/kofi': GenericEvents,
   '/services/google': GenericEvents & {
     'google::revoke': (cb: (err: Error | string | null | unknown) => void) => void,
     'google::token': (data: { refreshToken: string }, cb: (err: Error | string | null | unknown) => void) => void,
@@ -145,17 +123,6 @@ export type ClientToServerEventsWithNamespace = {
     'donationalerts::validate': (token: string, cb: (err: Error | string | null | unknown) => void) => void,
     'donationalerts::revoke': (cb: (err: Error | string | null | unknown) => void) => void,
     'donationalerts::token': (data: { accessToken: string, refreshToken: string }, cb: (err: Error | string | null | unknown) => void) => void,
-  },
-  '/integrations/pubg': GenericEvents & {
-    'pubg::searchForseasonId': (data: { apiKey: string, platform: string }, cb: (err: Error | string | null | unknown, data: null | { data: any[] }) => void) => void,
-    'pubg::searchForPlayerId': (data: { apiKey: string, platform: string, playerName: string }, cb: (err: Error | string | null | unknown, data: null | any) => void) => void,
-    'pubg::getUserStats': (data: { apiKey: string, platform: string, playerId: string, seasonId: string, ranked: boolean}, cb: (err: Error | string | null | unknown, data: null | any) => void) => void,
-    'pubg::exampleParse': (data: { text: string}, cb: (err: Error | string | null | unknown, data: string | null) => void) => void,
-  },
-  '/integrations/tiltify': GenericEvents & {
-    'tiltify::campaigns': (cb: (campaigns: tiltifyCampaign[]) => void) => void,
-    'tiltify::code': (token: string, cb: (err: Error | string | null | unknown) => void) => void,
-    'tiltify::revoke': (cb: (err: Error | string | null | unknown) => void) => void,
   },
   '/integrations/spotify': GenericEvents & {
     'code': (token: string, cb: (err: Error | string | null | unknown, state: boolean) => void) => void,
@@ -168,13 +135,7 @@ export type ClientToServerEventsWithNamespace = {
     'spotify::deleteBan': (where: FindConditions<SpotifySongBanInterface>, cb?: (err: Error | string | null | unknown) => void) => void,
     'spotify::getAllBanned': (where: FindConditions<SpotifySongBanInterface>, cb?: (err: Error | string | null | unknown, items: SpotifySongBanInterface[]) => void) => void,
   },
-  '/overlays/eventlist': GenericEvents & {
-    'getEvents': (opts: { ignore: any[], limit: number }, cb: (err: Error | string | null | unknown, data: EventListInterface[]) => void) => void,
-    'eventlist::getUserEvents': (userId: string, cb: (err: Error | string | null | unknown, events: EventListInterface[]) => void) => void,
-  },
   '/registries/overlays': GenericEvents & {
-    'generic::getOne': generic<Overlay>['getOne'],
-    'generic::getAll': generic<Overlay>['getAll'],
     'generic::deleteById': generic<Overlay>['deleteById'],
     'generic::save': generic<Overlay>['save'],
     'overlays::tick': (opts: {groupId: string, id: string, millis: number}) => void,
@@ -249,7 +210,7 @@ export type ClientToServerEventsWithNamespace = {
       time: number;
     }) => void) => void,
     'stopwatch::update::set': (data: { id: string, isEnabled: boolean | null, time: number | null }) => void,
-    'stopwatch::update': (data: { id: string, isEnabled: boolean | null, time: number | null }, cb: (_err: null, data?: { isEnabled: boolean | null, time :string | null }) => void) => void,
+    'stopwatch::update': (data: any, cb: (_err: null, data?: { isEnabled: boolean | null, time :string | null }) => void) => void,
   },
   '/registries/alerts': GenericEvents & {
     'alerts::settings': (data: null | { areAlertsMuted: boolean; isSoundMuted: boolean; isTTSMuted: boolean; }, cb: (item: { areAlertsMuted: boolean; isSoundMuted: boolean; isTTSMuted: boolean; }) => void) => void,
@@ -268,12 +229,6 @@ export type ClientToServerEventsWithNamespace = {
   },
   '/registries/randomizer': GenericEvents & {
     'spin': (data: { service: 0 | 1, key: string }) => void,
-  },
-  '/core/permissions': GenericEvents & {
-    'generic::deleteById': generic<Permissions>['deleteById'],
-    'generic::getAll': generic<Permissions>['getAll'],
-    'permission::save': (data: Required<Permissions>[], cb?: (error: Error | string | null | unknown) => void) => void,
-    'test.user': (opts: { pid: string, value: string, state: string }, cb: (error: Error | string | null | unknown, response?: { status: import('../helpers/permissions/check').checkReturnType | { access: 2 }, partial: import('../helpers/permissions/check').checkReturnType | { access: 2 }, state: string }) => void) => void,
   },
   '/registries/text': GenericEvents & {
     'text::save': (item: TextInterface, cb: (error: Error | string | null | unknown, item: TextInterface | null) => void) => void,
@@ -301,96 +256,8 @@ export type ClientToServerEventsWithNamespace = {
   '/stats/commandcount': GenericEvents & {
     'commands::count': (cb: (error: Error | string | null | unknown, items: CommandsCountInterface[]) => void) => void,
   },
-  '/stats/profiler': GenericEvents & {
-    'profiler::load': (cb: (error: Error | string | null | unknown, items: [string, number[]][]) => void) => void,
-  },
-  '/stats/bits': GenericEvents & {
-    'generic::getAll': generic<UserBitInterface & { username: string }>['getAll'],
-  },
-  '/stats/tips': GenericEvents & {
-    'generic::getAll': generic<UserTipInterface & { username: string }>['getAll'],
-  },
-  '/systems/alias': GenericEvents & {
-    'generic::getOne': generic<Alias>['getOne'],
-    'generic::groups::getAll': generic<AliasGroup>['getAll'],
-    'generic::groups::deleteById': generic<AliasGroup, 'name'>['deleteById'],
-    'generic::groups::save': generic<AliasGroup>['save'],
-    'generic::getAll': generic<Alias>['getAll'],
-    'generic::save': generic<Alias>['save'],
-    'generic::deleteById': generic<Alias>['deleteById'],
-  },
-  '/systems/bets': GenericEvents & {
-    'bets::getCurrentBet': (cb: (error: Error | string | null | unknown, item?: BetsInterface) => void) => void,
-    'bets::close': (option: 'refund' | string) => void,
-  },
-  '/systems/commercial': GenericEvents & {
-    'commercial.run': (data: { seconds: string }) => void,
-  },
-  '/systems/highlights': GenericEvents & {
-    'highlight': () => void,
-    'generic::getAll': (cb: (error: Error | string | null | unknown, highlights: Readonly<Required<HighlightInterface>>[], videos: HelixVideo[]) => void) => void,
-    'generic::deleteById': generic<HighlightInterface>['deleteById'],
-  },
-  '/systems/howlongtobeat': GenericEvents & {
-    'generic::getAll': (cb: (error: Error | string | null | unknown, item: Readonly<Required<HowLongToBeatGameInterface>>[], gameItem: Readonly<Required<HowLongToBeatGameItemInterface>>[]) => void) => void,
-    'hltb::save': (item: HowLongToBeatGameInterface, cb: (error: Error | string | null | unknown, item?: HowLongToBeatGameInterface) => void) => void,
-    'hltb::addNewGame': (game: string, cb: (error: Error | string | null | unknown) => void) => void,
-    'hltb::getGamesFromHLTB': (game: string, cb: (error: Error | string | null | unknown, games: string[]) => void) => void,
-    'hltb::saveStreamChange': (stream: HowLongToBeatGameItemInterface, cb: (error: Error | string | null | unknown, stream?: HowLongToBeatGameItemInterface) => void) => void,
-    'generic::deleteById': generic<HowLongToBeatGameInterface>['deleteById'],
-  },
-  '/systems/checklist': GenericEvents & {
-    'generic::getAll': (cb: (error: Error | string | null | unknown, array: any[], items: Readonly<Required<ChecklistInterface>>[]) => void) => void,
-    'checklist::save': (item: ChecklistInterface, cb: (error: Error | string | null | unknown) => void) => void,
-  },
-  '/games/seppuku': GenericEvents,
-  '/games/heist': GenericEvents,
-  '/games/fightme': GenericEvents,
-  '/games/duel': GenericEvents,
-  '/games/roulette': GenericEvents,
-  '/games/gamble': GenericEvents,
-  '/core/dashboard': GenericEvents,
-  '/core/currency': GenericEvents,
-  '/systems/userinfo': GenericEvents,
-  '/systems/scrim': GenericEvents,
   '/systems/emotescombo': GenericEvents & {
     'combo': (opts: { count: number; url: string }) => void,
-  },
-  '/systems/antihateraid': GenericEvents,
-  '/services/google': GenericEvents,
-  '/integrations/twitter': GenericEvents,
-  '/integrations/tipeeestream': GenericEvents,
-  '/integrations/streamlabs': GenericEvents & {
-    'revoke': (cb: (err: Error | string | null | unknown) => void) => void,
-    'token': (data: { accessToken: string }, cb: (err: Error | string | null | unknown) => void) => void,
-  },
-  '/integrations/streamelements': GenericEvents,
-  '/integrations/qiwi': GenericEvents,
-  '/integrations/lastfm': GenericEvents,
-  '/systems/levels': GenericEvents & {
-    'getLevelsExample': (data: { firstLevelStartsAt: number, nextLevelFormula: string, xpName: string } | ((error: Error | string | null | unknown, levels: string[]) => void), cb?: (error: Error | string | null | unknown, levels: string[]) => void) => void,
-  },
-  '/systems/moderation': GenericEvents & {
-    'lists.get': (cb: (error: Error | string | null | unknown, lists: { blacklist: string[], whitelist: string[] }) => void) => void,
-    'lists.set': (lists: { blacklist: string[], whitelist: string[] }) => void,
-  },
-  '/systems/points': GenericEvents & {
-    'parseCron': (cron: string, cb: (error: Error | string | null | unknown, intervals: number[]) => void) => void,
-    'reset': () => void,
-  },
-  '/systems/queue': GenericEvents & {
-    'queue::getAllPicked': (cb: (error: Error | string | null | unknown, items: QueueInterface[]) => void) => void,
-    'queue::pick': (data: { username?: string | string[], random: boolean, count: number; }, cb: (error: Error | string | null | unknown, items: QueueInterface[]) => void) => void,
-    'queue::clear': (cb: (error: Error | string | null | unknown) => void) => void,
-    'generic::getAll': generic<QueueInterface>['getAll'],
-  },
-  '/systems/raffles': GenericEvents & {
-    'raffle::getWinner': (name: string, cb: (error: Error | string | null | unknown, item?: UserInterface) => void) => void,
-    'raffle::setEligibility': (opts: {id: string, isEligible: boolean}, cb: (error: Error | string | null | unknown) => void) => void,
-    'raffle:getLatest': (cb: (error: Error | string | null | unknown, item?: RaffleInterface) => void) => void,
-    'raffle::pick': () => void,
-    'raffle::close': () => void,
-    'raffle::open': (message: string) => void,
   },
   '/systems/songs': GenericEvents & {
     'isPlaying': (cb: (isPlaying: boolean) => void) => void,
@@ -411,51 +278,6 @@ export type ClientToServerEventsWithNamespace = {
     'stop.import': () => void,
     'next': () => void,
   },
-  '/widgets/joinpart': GenericEvents & {
-    'joinpart': (data: { users: string[], type: 'join' | 'part' }) => void,
-    'viewers': (cb: (error: Error | string | null | unknown, data: { chatters: any }) => void) => void,
-  },
-  '/widgets/chat': GenericEvents & {
-    'message': (cb: (error: Error | string | null | unknown, message: { timestamp: string, message: string, username: string }) => void) => void,
-    'room': (cb: (error: Error | string | null | unknown, room: string) => void) => void,
-    'chat.message.send': (message: string) => void,
-    'moderation': (opts: {
-      type: 'ban' | 'autoban' | 'timeout' | 'delete',
-      messageId: string,
-      username: string,
-      timeout?: number,
-    }) => void,
-    'viewers': (cb: (error: Error | string | null | unknown, data: { chatters: any }) => void) => void,
-  },
-  '/widgets/customvariables': GenericEvents & {
-    'watched::save': (items: VariableWatch[], cb: (error: Error | string | null | unknown, variables: VariableWatch[]) => void) => void,
-    'customvariables::list': (cb: (error: Error | string | null | unknown, variables: Variable[]) => void) => void,
-    'list.watch': (cb: (error: Error | string | null | unknown, variables: VariableWatch[]) => void) => void,
-    'watched::setValue': (opts: { id: string, value: string | number }, cb: (error: Error | string | null | unknown) => void) => void,
-  },
-  '/widgets/eventlist': GenericEvents & {
-    'eventlist::removeById': (idList: string[] | string, cb: (error: Error | string | null | unknown) => void) => void,
-    'eventlist::get': (count: number) => void,
-    'skip': () => void,
-    'cleanup': () => void,
-    'eventlist::resend': (id: string) => void,
-    'update': (cb: (values: any) => void) => void,
-    'askForGet': (cb: () => void) => void,
-  },
-  '/widgets/custom': GenericEvents & {
-    'generic::getAll': (userId: string, cb: (error: Error | string | null | unknown, items: Readonly<Required<WidgetCustomInterface>>[]) => void) => void,
-    'generic::save': generic<WidgetCustomInterface>['save'];
-    'generic::deleteById': generic<WidgetCustomInterface>['deleteById'];
-  },
-  '/widgets/quickaction': GenericEvents & {
-    'generic::deleteById': generic<QuickActions>['deleteById'],
-    'generic::save': generic<QuickActions>['save'],
-    'generic::getAll': (userId: string, cb: (error: Error | string | null | unknown, items: Readonly<Required<QuickActions>>[]) => void) => void,
-    'trigger': (data: { user: { userId: string, userName: string }, id: string, value?: any}) => void,
-  },
-  '/widgets/social': GenericEvents & {
-    'generic::getAll': generic<WidgetSocialInterface>['getAll'];
-  },
   '/core/events': GenericEvents & {
     'events::getRedeemedRewards': (cb: (error: Error | string | null | unknown, rewards: { id: string, name: string }[]) => void) => void,
     'generic::getAll': (cb: (error: Error | string | null | unknown, data: Event[]) => void) => void,
@@ -473,17 +295,7 @@ export type ClientToServerEventsWithNamespace = {
   '/core/ui': GenericEvents & {
     'configuration': (cb: (error: Error | string | null | unknown, data?: Configuration) => void) => void,
   },
-  '/core/updater': GenericEvents & {
-    'updater::check': (cb: (error: Error | string | null | unknown) => void) => void,
-    'updater::trigger': (opts: { pkg: string, version: string }, cb?: (error: Error | string | null | unknown) => void) => void,
-  },
   '/core/users': GenericEvents & {
-    'viewers::resetPointsAll': (cb?: (error: Error | string | null | unknown) => void) => void,
-    'viewers::resetMessagesAll': (cb?: (error: Error | string | null | unknown) => void) => void,
-    'viewers::resetWatchedTimeAll': (cb?: (error: Error | string | null | unknown) => void) => void,
-    'viewers::resetSubgiftsAll': (cb?: (error: Error | string | null | unknown) => void) => void,
-    'viewers::resetBitsAll': (cb?: (error: Error | string | null | unknown) => void) => void,
-    'viewers::resetTipsAll': (cb?: (error: Error | string | null | unknown) => void) => void,
     'viewers::update': (data: [userId: string, update: Partial<UserInterface> & { tips?: UserTipInterface[], bits?: UserBitInterface[] }], cb: (error: Error | string | null | unknown) => void) => void,
     'viewers::remove': (userId: string, cb: (error: Error | string | null | unknown) => void) => void,
     'getNameById': (id: string, cb: (error: Error | string | null | unknown, user: string | null) => void) => void,
@@ -491,19 +303,6 @@ export type ClientToServerEventsWithNamespace = {
     'find.viewers': (opts: { exactUsernameFromTwitch?: boolean, state: string, page?: number; perPage?: number; order?: { orderBy: string, sortOrder: 'ASC' | 'DESC' }, filter?: { columnName: string, operation: string, value: any }[], search?: string }, cb: (error: Error | string | null | unknown, viewers: any[], count: number, state: string | null) => void) => void,
     'logout': (data: { accessToken: string | null, refreshToken: string | null }) => void
   },
-  '/core/general': GenericEvents & {
-    'menu::private': (cb: (items: (MenuItem & { enabled: boolean })[]) => void) => void,
-    'generic::getCoreCommands': (cb: (error: Error | string | null | unknown, commands: import('../general').Command[]) => void) => void,
-    'generic::setCoreCommand': (commands: import('../general').Command, cb: (error: Error | string | null | unknown) => void) => void,
-  },
-  '/core/customvariables': GenericEvents & {
-    'customvariables::list': (cb: (error: Error | string | null | unknown, items: Variable[]) => void) => void,
-    'customvariables::runScript': (id: string, cb: (error: Error | string | null | unknown, items: Variable | null) => void) => void,
-    'customvariables::testScript': (opts: { evalValue: string, currentValue: string }, cb: (error: Error | string | null | unknown, returnedValue: any) => void) => void,
-    'customvariables::isUnique': (opts: { variable: string, id: string }, cb: (error: Error | string | null | unknown, isUnique: boolean) => void) => void,
-    'customvariables::delete': (id: string, cb?: (error: Error | string | null | unknown) => void) => void,
-    'customvariables::save': (item: Variable, cb: (error: ValidationError[] | Error | string | null | unknown, itemId: string | null) => void) => void,
-  }
 };
 
 type Fn<Params extends readonly any[] = readonly any[], Result = any> =

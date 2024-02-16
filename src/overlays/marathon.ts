@@ -6,7 +6,7 @@ import { onStartup } from '../decorators/on.js';
 import { eventEmitter } from '~/helpers/events/emitter.js';
 import { error } from '~/helpers/log.js';
 import { addUIError } from '~/helpers/panel/alerts.js';
-import { adminEndpoint, publicEndpoint } from '~/helpers/socket.js';
+import { adminEndpoint, endpoint } from '~/helpers/socket.js';
 
 const cachedOverlays = new Map<string, MarathonItem>();
 
@@ -157,7 +157,7 @@ class Marathon extends Overlay {
   }
 
   sockets () {
-    publicEndpoint('/overlays/marathon', 'marathon::public', async (marathonId: string, cb) => {
+    endpoint([], '/overlays/marathon', 'marathon::public', async (marathonId: string, cb) => {
       // no updateCache
       const key = Array.from(cachedOverlays.keys()).find(id => id.includes(marathonId));
       cb(null, cachedOverlays.get(key ?? ''));

@@ -8,21 +8,21 @@ import {
 } from '../decorators.js';
 import { createClip } from '../services/twitch/calls/createClip.js';
 
+import { Post, Get, Delete } from '~/decorators/endpoint.js';
 import {
   isStreamOnline, stats, streamStatusChangeSince,
 } from '~/helpers/api/index.js';
 import { getUserSender } from '~/helpers/commons/index.js';
+import { dayjs } from '~/helpers/dayjsHelper.js';
+import { timestampToObject } from '~/helpers/getTime.js';
 import { error } from '~/helpers/log.js';
 import defaultPermissions from '~/helpers/permissions/defaultPermissions.js';
-import { adminEndpoint } from '~/helpers/socket.js';
 import getBotId from '~/helpers/user/getBotId.js';
 import getBotUserName from '~/helpers/user/getBotUserName.js';
 import getBroadcasterId from '~/helpers/user/getBroadcasterId.js';
 import { createMarker } from '~/services/twitch/calls/createMarker.js';
 import twitch from '~/services/twitch.js';
 import { translate } from '~/translate.js';
-import { timestampToObject } from '~/helpers/getTime.js';
-import { dayjs } from '~/helpers/dayjsHelper.js';
 
 const ERROR_STREAM_NOT_ONLINE = '1';
 const ERROR_MISSING_TOKEN = '2';
@@ -40,49 +40,49 @@ class Highlights extends System {
   constructor() {
     super();
     this.addMenu({
-      category: 'manage', name: 'highlights', id: 'manage/highlights', this: this,
+      category: 'manage', name: 'highlights', id: 'manage/highlights', this: this, scopeParent: this.scope(),
     });
   }
 
-  public sockets() {
-    adminEndpoint('/systems/highlights', 'highlight', () => {
-      this.main({
-        parameters: '', sender: getUserSender(getBotId(), getBotUserName()), attr: {}, command: '!highlight', createdAt: Date.now(), isAction: false, isHighlight: false, emotesOffsets: new Map(), isFirstTimeMessage: false, discord: undefined,
-      });
+  ///////////////////////// <! API endpoints
+  @Post('/')
+  async trigger() {
+    this.main({
+      parameters: '', sender: getUserSender(getBotId(), getBotUserName()), attr: {}, command: '!highlight', createdAt: Date.now(), isAction: false, isHighlight: false, emotesOffsets: new Map(), isFirstTimeMessage: false, discord: undefined,
     });
-    adminEndpoint('/systems/highlights', 'generic::getAll', async (cb) => {
-      (async function getAll(callback): Promise<void> {
-        const highlightsToCheck = await Highlight.find({ order: { createdAt: 'DESC' }, where: { expired: false } });
-        try {
-          const availableVideos = await twitch.apiClient?.asIntent(['bot'], ctx => ctx.videos.getVideosByIds(highlightsToCheck.map(o => o.videoId))) ?? [];
+    return;
+  }
+  @Get('/')
+  async findAll(): Promise<Highlight[]> {
+    const highlightsToCheck = await Highlight.find({ order: { createdAt: 'DESC' }, where: { expired: false } });
+    try {
+      const availableVideos = await twitch.apiClient?.asIntent(['bot'], ctx => ctx.videos.getVideosByIds(highlightsToCheck.map(o => o.videoId))) ?? [];
 
-          for (const highlight of highlightsToCheck) {
-            if (!availableVideos.find(o => o.id === highlight.videoId)) {
-              await Highlight.update(highlight.id, { expired: true });
-            }
-          }
-          const highlights = await Highlight.find({ order: { createdAt: 'DESC' } });
-          callback(null, highlights, availableVideos);
-        } catch (err: any) {
-          if (err._statusCode === 404) {
-            for (const highlight of highlightsToCheck) {
-              await Highlight.update(highlight.id, { expired: true });
-            }
-            return getAll(callback);
-          }
-          callback(err.stack, [], []);
+      for (const highlight of highlightsToCheck) {
+        if (!availableVideos.find(o => o.id === highlight.videoId)) {
+          await Highlight.update(highlight.id, { expired: true });
         }
-      })(cb);
-    });
-    adminEndpoint('/systems/highlights', 'generic::deleteById', async (id, cb) => {
-      try {
-        await Highlight.delete({ id });
-        cb(null);
-      } catch (err: any) {
-        cb(err.message);
       }
-    });
+      const highlights = await Highlight.find({ order: { createdAt: 'DESC' } });
+      return highlights;
+    } catch (err: any) {
+      if (err._statusCode === 404) {
+        for (const highlight of highlightsToCheck) {
+          await Highlight.update(highlight.id, { expired: true });
+        }
+        return this.findAll();
+      }
+      throw err;
+    }
   }
+  @Delete('/:id')
+  async removeOne(req: any) {
+    const al = await Highlight.findOneBy({ id: req.params.id });
+    if (al) {
+      await al.remove();
+    }
+  }
+  ///////////////////////// API endpoints />
 
   public async url(req: Request, res: Response) {
     const url = this.urls.find((o) => {

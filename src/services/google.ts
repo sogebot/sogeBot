@@ -30,8 +30,7 @@ import { getLang } from '~/helpers/locales.js';
 import { error, info, debug, chatIn } from '~/helpers/log.js';
 import { app, ioServer } from '~/helpers/panel.js';
 import { parseTextWithEmotes } from '~/helpers/parseTextWithEmotes.js';
-import { adminEndpoint } from '~/helpers/socket.js';
-import { adminMiddleware } from '~/socket.js';
+import { adminEndpoint, withScope } from '~/helpers/socket.js';
 
 const tubeChat = new TubeChat();
 let titleChangeRequestRetry = 0;
@@ -543,24 +542,24 @@ class Google extends Service {
       cb(null);
     });
 
-    app.get('/api/services/google/privatekeys', adminMiddleware, async (req, res) => {
+    app.get('/api/services/google/privatekeys', withScope(['integrations:read']), async (req, res) => {
       res.send({
         data: await AppDataSource.getRepository(GooglePrivateKeys).find(),
       });
     });
 
-    app.post('/api/services/google/privatekeys', adminMiddleware, async (req, res) => {
+    app.post('/api/services/google/privatekeys', withScope(['integrations:manage']), async (req, res) => {
       const data = req.body;
       await AppDataSource.getRepository(GooglePrivateKeys).save(data);
       res.send({ data });
     });
 
-    app.delete('/api/services/google/privatekeys/:id', adminMiddleware, async (req, res) => {
+    app.delete('/api/services/google/privatekeys/:id', withScope(['integrations:manage']), async (req, res) => {
       await AppDataSource.getRepository(GooglePrivateKeys).delete({ id: req.params.id });
       res.status(404).send();
     });
 
-    app.get('/api/services/google/streams', adminMiddleware, async (req, res) => {
+    app.get('/api/services/google/streams', withScope(['integrations:read']), async (req, res) => {
       const youtube = this.getYoutube();
       if (youtube) {
         const rmtps = await youtube.liveStreams.list({

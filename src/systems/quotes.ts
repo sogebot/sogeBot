@@ -7,55 +7,61 @@ import { command, default_permission } from '../decorators.js';
 import { Expects } from  '../expects.js';
 
 import { AppDataSource } from '~/database.js';
+import { Post, Get, Delete } from '~/decorators/endpoint.js';
 import { prepare } from '~/helpers/commons/index.js';
-import { app } from '~/helpers/panel.js';
 import defaultPermissions from '~/helpers/permissions/defaultPermissions.js';
 import { domain } from '~/helpers/ui/index.js';
 import getNameById from '~/helpers/user/getNameById.js';
-import { adminMiddleware } from '~/socket.js';
 
 class Quotes extends System {
   constructor () {
     super();
 
     this.addMenu({
-      category: 'manage', name: 'quotes', id: 'manage/quotes', this: this,
+      category: 'manage', name: 'quotes', id: 'manage/quotes', this: this, scopeParent: this.scope(),
     });
     this.addMenuPublic({ id: 'quotes', name: 'quotes' });
   }
 
-  sockets() {
-    if (!app) {
-      setTimeout(() => this.sockets(), 100);
-      return;
-    }
-
-    app.get('/api/systems/quotes', async (req, res) => {
-      const quotes = await QuotesEntity.find();
-      res.send({
-        data:  quotes,
-        users: await Promise.all(quotes.map(quote => new Promise<[string, string]>(resolve => getNameById(quote.quotedBy).then((username) => resolve([quote.quotedBy, username]))))),
-      });
-    });
-    app.get('/api/systems/quotes/:id', adminMiddleware, async (req, res) => {
-      const quote = await QuotesEntity.findOneBy({ id: Number(req.params.id) });
-      res.send({
-        data: await QuotesEntity.findOneBy({ id: Number(req.params.id) }),
-        user: quote ? await getNameById(quote.quotedBy) : null,
-      });
-    });
-    app.delete('/api/systems/quotes/:id', adminMiddleware, async (req, res) => {
-      await QuotesEntity.delete({ id: Number(req.params.id) });
-      res.status(404).send();
-    });
-    app.post('/api/systems/quotes', adminMiddleware, async (req, res) => {
-      try {
-        res.send({ data: await QuotesEntity.create(req.body).save() });
-      } catch (e) {
-        res.status(400).send({ errors: e });
-      }
-    });
+  ///////////////////////// <! API endpoints
+  @Post('/')
+  postOne(req: any) {
+    return QuotesEntity.create(req.body).save();
   }
+  @Get('/')
+  async getAll() {
+    const quotes = await QuotesEntity.find();
+    for (const quote of quotes) {
+      try {
+        quote.quotedByUserName = await getNameById(quote.quotedBy);
+      } catch (e) {
+        quote.quotedByUserName = null;
+      }
+    }
+    return quotes;
+  }
+  @Get('/:id')
+  async getOne(req: any) {
+    const quote = await QuotesEntity.findOneBy({ id: Number(req.params.id) });
+    if (quote) {
+      try {
+        quote.quotedByUserName = await getNameById(quote.quotedBy);
+      } catch (e) {
+        quote.quotedByUserName = null;
+      }
+      return quote;
+    } else {
+      return null;
+    }
+  }
+  @Delete('/:id')
+  async deleteOne(req: any) {
+    const al = await QuotesEntity.findOneBy({ id: req.params.id });
+    if (al) {
+      await al.remove();
+    }
+  }
+  ///////////////////////// API endpoints />
 
   @command('!quote add')
   @default_permission(defaultPermissions.CASTERS)

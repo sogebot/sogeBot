@@ -1,15 +1,15 @@
 import crypto from 'crypto';
 
 import { EventList as EventListEntity } from '@entity/eventList.js';
+import { Request } from 'express';
 import * as _ from 'lodash-es';
 import { In, Not } from 'typeorm';
 
 import Overlay from './_interface.js';
-import eventlist from '../widgets/eventlist.js';
 
 import { AppDataSource } from '~/database.js';
+import { Get } from '~/decorators/endpoint.js';
 import { warning } from '~/helpers/log.js';
-import { adminEndpoint, publicEndpoint } from '~/helpers/socket.js';
 import getNameById from '~/helpers/user/getNameById.js';
 import { isBotId } from '~/helpers/user/isBot.js';
 import twitch from '~/services/twitch.js';
@@ -17,93 +17,62 @@ import twitch from '~/services/twitch.js';
 class EventList extends Overlay {
   showInUI = false;
 
-  sockets () {
-    adminEndpoint('/overlays/eventlist', 'eventlist::getUserEvents', async (userId, cb) => {
-      const eventsByUserId = await AppDataSource.getRepository(EventListEntity).findBy({ userId: userId });
-      // we also need subgifts by giver
-      const eventsByRecipientId
-        = (await AppDataSource.getRepository(EventListEntity).findBy({ event: 'subgift' }))
-          .filter(o => JSON.parse(o.values_json).fromId === userId);
-      const events =  _.orderBy([ ...eventsByRecipientId, ...eventsByUserId ], 'timestamp', 'desc');
-      // we need to change userId => username and fromId => fromId username for eventlist compatibility
-      const mapping = new Map() as Map<string, string>;
-      for (const event of events) {
+  @Get('/', { scope: 'public' })
+  async getEvents(req: Request) {
+    const ignore: string[] = req.query.ignore ? JSON.parse(String(req.query.ignore)) : [];
+    const limit: number = req.query.limit ? Number(req.query.limit) : 100;
+    let events = await AppDataSource.getRepository(EventListEntity)
+      .find({
+        where: {
+          isHidden: false,
+          event:    Not(In(ignore.map(value => value.trim()))),
+        },
+        order: {
+          timestamp: 'DESC',
+        },
+        take: limit,
+      });
+    if (events) {
+      events = _.uniqBy(events, o =>
+        (o.userId + (['cheer', 'rewardredeem'].includes(o.event) ? crypto.randomBytes(64).toString('hex') : o.event)),
+      );
+    }
+
+    // we need to change userId => username and from => from username for eventlist compatibility
+    const mapping = new Map() as Map<string, string>;
+    for (const event of events) {
+      try {
         const values = JSON.parse(event.values_json);
-        if (values.fromId && values.fromId != '0') {
-          if (!mapping.has(values.fromId)) {
-            mapping.set(values.fromId, await getNameById(values.fromId));
+        if (values.from && values.from != '0') {
+          if (!mapping.has(values.from)) {
+            mapping.set(values.from, await getNameById(values.from));
           }
         }
         if (!mapping.has(event.userId)) {
           mapping.set(event.userId, await getNameById(event.userId));
         }
-      }
-      cb(null, events.map(event => {
-        const values = JSON.parse(event.values_json);
-        if (values.fromId && values.fromId != '0') {
-          values.fromId = mapping.get(values.fromId);
+      } catch (e) {
+        if (e instanceof Error) {
+          if (e.message.includes('Cannot get username')) {
+            event.isHidden = true; // hide event if cannot get username
+            await AppDataSource.getRepository(EventListEntity).save(event);
+            continue;
+          }
         }
-        return {
-          ...event,
-          username:    mapping.get(event.userId),
-          values_json: JSON.stringify(values),
-        };
-      }));
-    });
-    publicEndpoint('/overlays/eventlist', 'getEvents', async (opts: { ignore: string[]; limit: number }, cb) => {
-      let events = await AppDataSource.getRepository(EventListEntity)
-        .find({
-          where: {
-            isHidden: false,
-            event:    Not(In(opts.ignore.map(value => value.trim()))),
-          },
-          order: {
-            timestamp: 'DESC',
-          },
-          take: opts.limit,
-        });
-      if (events) {
-        events = _.uniqBy(events, o =>
-          (o.userId + (['cheer', 'rewardredeem'].includes(o.event) ? crypto.randomBytes(64).toString('hex') : o.event)),
-        );
+        console.error(e);
       }
+    }
 
-      // we need to change userId => username and from => from username for eventlist compatibility
-      const mapping = new Map() as Map<string, string>;
-      for (const event of events) {
-        try {
-          const values = JSON.parse(event.values_json);
-          if (values.from && values.from != '0') {
-            if (!mapping.has(values.from)) {
-              mapping.set(values.from, await getNameById(values.from));
-            }
-          }
-          if (!mapping.has(event.userId)) {
-            mapping.set(event.userId, await getNameById(event.userId));
-          }
-        } catch (e) {
-          if (e instanceof Error) {
-            if (e.message.includes('Cannot get username')) {
-              event.isHidden = true; // hide event if cannot get username
-              await AppDataSource.getRepository(EventListEntity).save(event);
-              continue;
-            }
-          }
-          console.error(e);
-        }
+    return events.map(event => {
+      const values = JSON.parse(event.values_json);
+      if (values.from && values.from != '0') {
+        values.from = mapping.get(values.from);
       }
-
-      cb(null, events.map(event => {
-        const values = JSON.parse(event.values_json);
-        if (values.from && values.from != '0') {
-          values.from = mapping.get(values.from);
-        }
-        return {
-          ...event,
-          username:    mapping.get(event.userId),
-          values_json: JSON.stringify(values),
-        };
-      }));
+      return {
+        ...event,
+        username:    mapping.get(event.userId),
+        values_json: JSON.stringify(values),
+      };
     });
   }
 
@@ -139,7 +108,6 @@ class EventList extends Overlay {
           }, {}),
       ),
     });
-    eventlist.askForGet();
     return event;
   }
 }

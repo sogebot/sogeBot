@@ -3,10 +3,10 @@ import { randomUUID } from 'node:crypto';
 import axios from 'axios';
 import { shuffle } from 'lodash-es';
 
+import { Get, Post } from './decorators/endpoint.js';
 import { onStartup } from './decorators/on.js';
 import { LOW } from './helpers/constants.js';
 import emitter from './helpers/interfaceEmitter.js';
-import { adminEndpoint, publicEndpoint } from './helpers/socket.js';
 import getBroadcasterId from './helpers/user/getBroadcasterId.js';
 import twitch from './services/twitch.js';
 
@@ -68,33 +68,66 @@ class Emotes extends Core {
     return types;
   }
 
+  @Get('/', {
+    scope: 'public',
+  })
+  async getCache () {
+    return this.cache.filter(o => this.types.includes(o.type));
+  }
+
+  @Post('/', { action: 'testExplosion' })
+  async testExplosion () {
+    this.explode(['Kappa', 'GivePLZ', 'PogChamp']);
+  }
+
+  @Post('/', { action: 'testFireworks' })
+  async testFireworks () {
+    this.firework(['Kappa', 'GivePLZ', 'PogChamp']);
+  }
+
+  @Post('/', { action: 'test' })
+  async test () {
+    ioServer?.of('/services/twitch').emit('emote', {
+      id:  randomUUID(),
+      url: {
+        1: 'https://static-cdn.jtvnw.net/emoticons/v1/9/1.0',
+        2: 'https://static-cdn.jtvnw.net/emoticons/v1/9/2.0',
+        3: 'https://static-cdn.jtvnw.net/emoticons/v1/9/3.0',
+      },
+    });
+  }
+
+  @Post('/', { action: 'removeCache' })
+  async removeCache () {
+    this.lastGlobalEmoteChk = 0;
+    this.lastSubscriberEmoteChk = 0;
+    this.lastFFZEmoteChk = 0;
+    this.last7TVEmoteChk = 0;
+    this.lastBTTVEmoteChk = 0;
+    this.cache = [];
+
+    if (!this.fetch.global) {
+      this.fetchEmotesGlobal();
+    }
+    if (!this.fetch.channel) {
+      this.fetchEmotesChannel();
+    }
+    if (!this.fetch.ffz) {
+      this.fetchEmotesFFZ();
+    }
+    if (!this.fetch.bttv) {
+      this.fetchEmotesBTTV();
+    }
+    if (!this.fetch.globalBttv) {
+      this.fetchEmotesGlobalBTTV();
+    }
+    if (!this.fetch['7tv']) {
+      this.fetchEmotes7TV();
+    }
+  }
+
   @onStartup()
   onStartup() {
-    publicEndpoint('/core/emotes', 'getCache', async (cb) => {
-      try {
-        cb(null, this.cache.filter(o => this.types.includes(o.type)));
-      } catch (e: any) {
-        cb(e.stack, []);
-      }
-    });
-
-    adminEndpoint('/core/emotes', 'testExplosion', (cb) => {
-      this._testExplosion();
-      cb(null, null);
-    });
-    adminEndpoint('/core/emotes', 'testFireworks', (cb) => {
-      this._testFireworks();
-      cb(null, null);
-    });
-    adminEndpoint('/core/emotes', 'test', (cb) => {
-      this._test();
-      cb(null, null);
-    });
-    adminEndpoint('/core/emotes', 'removeCache', (cb) => {
-      this.removeCache();
-      cb(null, null);
-    });
-
     emitter.on('services::twitch::emotes', (type, value) => {
       if (type === 'explode') {
         this.explode(value);
@@ -124,34 +157,6 @@ class Emotes extends Core {
         this.fetchEmotes7TV();
       }
     }, 10000);
-  }
-
-  async removeCache () {
-    this.lastGlobalEmoteChk = 0;
-    this.lastSubscriberEmoteChk = 0;
-    this.lastFFZEmoteChk = 0;
-    this.last7TVEmoteChk = 0;
-    this.lastBTTVEmoteChk = 0;
-    this.cache = [];
-
-    if (!this.fetch.global) {
-      this.fetchEmotesGlobal();
-    }
-    if (!this.fetch.channel) {
-      this.fetchEmotesChannel();
-    }
-    if (!this.fetch.ffz) {
-      this.fetchEmotesFFZ();
-    }
-    if (!this.fetch.bttv) {
-      this.fetchEmotesBTTV();
-    }
-    if (!this.fetch.globalBttv) {
-      this.fetchEmotesGlobalBTTV();
-    }
-    if (!this.fetch['7tv']) {
-      this.fetchEmotes7TV();
-    }
   }
 
   async fetchEmotesChannel () {
@@ -428,25 +433,6 @@ class Emotes extends Core {
     }
 
     this.fetch.bttv = false;
-  }
-
-  async _testFireworks () {
-    this.firework(['Kappa', 'GivePLZ', 'PogChamp']);
-  }
-
-  async _testExplosion () {
-    this.explode(['Kappa', 'GivePLZ', 'PogChamp']);
-  }
-
-  async _test () {
-    ioServer?.of('/services/twitch').emit('emote', {
-      id:  randomUUID(),
-      url: {
-        1: 'https://static-cdn.jtvnw.net/emoticons/v1/9/1.0',
-        2: 'https://static-cdn.jtvnw.net/emoticons/v1/9/2.0',
-        3: 'https://static-cdn.jtvnw.net/emoticons/v1/9/3.0',
-      },
-    });
   }
 
   async firework (data: string[]) {

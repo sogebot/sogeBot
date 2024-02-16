@@ -14,19 +14,18 @@ import {
 } from '../decorators.js';
 import { Expects } from  '../expects.js';
 
+import { Post, Get, Delete } from '~/decorators/endpoint.js';
 import { checkFilter } from '~/helpers/checkFilter.js';
 import {
   getAllCountOfCommandUsage, getCountOfCommandUsage, incrementCountOfCommandUsage, resetCountOfCommandUsage,
 } from '~/helpers/commands/count.js';
 import { prepare } from '~/helpers/commons/index.js';
+import { HIGHEST } from '~/helpers/constants.js';
 import { info, warning } from '~/helpers/log.js';
-import { app } from '~/helpers/panel.js';
 import { check } from '~/helpers/permissions/check.js';
 import { defaultPermissions } from '~/helpers/permissions/defaultPermissions.js';
 import { get } from '~/helpers/permissions/get.js';
-import { adminMiddleware } from '~/socket.js';
 import { translate } from '~/translate.js';
-import { HIGHEST } from '~/helpers/constants.js';
 
 /*
  * !command                                                                            - gets an info about command usage
@@ -44,86 +43,88 @@ class CustomCommands extends System {
   constructor () {
     super();
     this.addMenu({
-      category: 'commands', name: 'customcommands', id: 'commands/customcommands', this: this,
+      category: 'commands', name: 'customcommands', id: 'commands/customcommands', this: this, scopeParent: this.scope(),
     });
   }
 
-  sockets () {
-    if (!app) {
-      setTimeout(() => this.sockets(), 100);
-      return;
+  ///////////////////////// <! API endpoints
+  @Post('/')
+  async saveOne(req: any) {
+    const { count, ...data } = req.body;
+    const saved = await Commands.create(data).save();
+
+    if (count === 0) {
+      await resetCountOfCommandUsage(saved.command);
     }
-
-    app.get('/api/systems/customcommands', adminMiddleware, async (req, res) => {
-      res.send({
-        data:  await Commands.find(),
-        count: await getAllCountOfCommandUsage(),
-      });
-    });
-    app.get('/api/systems/customcommands/groups/', adminMiddleware, async (req, res) => {
-      let groupsList = await CommandsGroup.find();
-      for (const item of await Commands.find()) {
-        if (item.group && !groupsList.find(o => o.name === item.group)) {
+    return saved;
+  }
+  @Get('/')
+  async findAll() {
+    const [ items, count ] = await Promise.all([Commands.find(), getAllCountOfCommandUsage()]);
+    return {
+      items, count,
+    };
+  }
+  @Get('/:id')
+  async findOne(req: any) {
+    const cmd = await Commands.findOneBy({ id: req.params.id });
+    return {
+      data:  cmd,
+      count: cmd ? await getCountOfCommandUsage(cmd.command) : 0,
+    };
+  }
+  @Delete('/:id')
+  async removeOne(req: any) {
+    const al = await Commands.findOneBy({ id: req.params.id });
+    if (al) {
+      await al.remove();
+    }
+  }
+  @Post('/', { customEndpoint: '/systems/groups/customcommands' })
+  saveOneGroup(req: any) {
+    return CommandsGroup.create(req.body).save();
+  }
+  @Get('/', {
+    scope:          'read',
+    customEndpoint: '/systems/groups/customcommands',
+  })
+  findAllGroups() {
+    return new Promise((resolve) => {
+      Promise.all([CommandsGroup.find(), Commands.find()]).then(([groupsList, aliases]) => {
+        for (const item of aliases) {
+          if (item.group && !groupsList.find(o => o.name === item.group)) {
           // we dont have any group options -> create temporary group
-          const group = new CommandsGroup();
-          group.name = item.group;
-          group.options = {
-            filter:     null,
-            permission: null,
-          };
-          groupsList = [
-            ...groupsList,
-            group,
-          ];
+            const group = new CommandsGroup();
+            group.name = item.group;
+            group.options = {
+              filter:     null,
+              permission: null,
+            };
+            groupsList = [
+              ...groupsList,
+              group,
+            ];
+          }
         }
-      }
-      res.send({
-        data: groupsList,
+        resolve(groupsList);
       });
-    });
-    app.get('/api/systems/customcommands/:id', adminMiddleware, async (req, res) => {
-      const cmd = await Commands.findOneBy({ id: req.params.id });
-      res.send({
-        data:  cmd,
-        count: cmd ? await getCountOfCommandUsage(cmd.command) : 0,
-      });
-    });
-    app.delete('/api/systems/customcommands/groups/:name', adminMiddleware, async (req, res) => {
-      const group = await CommandsGroup.findOneBy({ name: req.params.name });
-      if (group) {
-        await group.remove();
-      }
-      res.status(404).send();
-    });
-    app.delete('/api/systems/customcommands/:id', adminMiddleware, async (req, res) => {
-      const cmd = await Commands.findOneBy({ id: req.params.id });
-      if (cmd) {
-        await cmd.remove();
-      }
-      res.status(404).send();
-    });
-    app.post('/api/systems/customcommands/group', adminMiddleware, async (req, res) => {
-      try {
-        res.send({ data: await CommandsGroup.create(req.body).save() });
-      } catch (e) {
-        res.status(400).send({ errors: e });
-      }
-    });
-    app.post('/api/systems/customcommands', adminMiddleware, async (req, res) => {
-      try {
-        const { count, ...data } = req.body;
-        const saved = await Commands.create(data).save();
-
-        if (count === 0) {
-          await resetCountOfCommandUsage(saved.command);
-        }
-
-        res.send({ data: saved });
-      } catch (e) {
-        res.status(400).send({ errors: e });
-      }
     });
   }
+  @Get('/:name', {
+    scope:          'read',
+    customEndpoint: '/systems/groups/customcommands',
+  })
+  findOneGroup(req: any) {
+    return CommandsGroup.findOneBy({ name: req.params.name });
+  }
+  @Delete('/:name', '/systems/groups/customcommands')
+  async removeOneGroup(req: any) {
+    const al = await CommandsGroup.findOneBy({ name: req.params.name });
+    if (al) {
+      await al.remove();
+    }
+  }
+  ///////////////////////// API endpoints />
 
   @command('!command')
   @default_permission(defaultPermissions.CASTERS)

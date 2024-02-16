@@ -2,6 +2,7 @@
 
 import axios from 'axios';
 import { escapeRegExp } from 'lodash-es';
+import { z } from 'zod';
 
 import Integration from './_interface.js';
 import { onChange, onStartup } from '../decorators/on.js';
@@ -11,11 +12,11 @@ import {
 import { Expects } from  '../expects.js';
 import { Message } from  '../message.js';
 
+import { Post } from '~/decorators/endpoint.js';
 import { prepare } from '~/helpers/commons/index.js';
 import { HOUR, MINUTE } from '~/helpers/constants.js';
 import { flatten } from '~/helpers/flatten.js';
 import { error, info } from '~/helpers/log.js';
-import { adminEndpoint } from '~/helpers/socket.js';
 
 class PUBG extends Integration {
   @settings()
@@ -117,73 +118,35 @@ class PUBG extends Integration {
     }
   }
 
-  sockets() {
-    adminEndpoint('/integrations/pubg', 'pubg::searchForseasonId', async ({ apiKey, platform }, cb) => {
-      try {
-        const request = await axios.get<any>(
-          `https://api.pubg.com/shards/${platform}/seasons`,
-          {
-            headers: {
-              Authorization: `Bearer ${apiKey}`,
-              Accept:        'application/vnd.api+json',
-            },
-          },
-        );
-        for (const season of request.data.data) {
-          if (season.attributes.isCurrentSeason) {
-            cb(null, { data: [season] });
-          }
-        }
-        throw new Error('No current season found.');
-      } catch (e: any) {
-        cb(e.message, null);
-      }
-    });
-    adminEndpoint('/integrations/pubg', 'pubg::getUserStats', async ({ apiKey, platform, playerId, seasonId, ranked }, cb) => {
-      try {
-        const request = await axios.get<any>(
-          ranked ? `https://api.pubg.com/shards/${platform}/players/${playerId}/seasons/${seasonId}/ranked` : `https://api.pubg.com/shards/${platform}/players/${playerId}/seasons/${seasonId}`,
-          {
-            headers: {
-              Authorization: `Bearer ${apiKey}`,
-              Accept:        'application/vnd.api+json',
-            },
-          },
-        );
-        if (ranked) {
-          this.rankedGameModeStats = request.data.data.attributes.rankedGameModeStats;
-        } else {
-          this.gameModeStats = request.data.data.attributes.gameModeStats;
-        }
-        cb(null, request.data.data.attributes[ranked ? 'rankedGameModeStats' : 'gameModeStats']);
-      } catch (e: any) {
-        cb(e.message, null);
-      }
-    });
-    adminEndpoint('/integrations/pubg', 'pubg::searchForPlayerId', async ({ apiKey, platform, playerName }, cb) => {
-      try {
-        const request = await axios.get<any>(
-          `https://api.pubg.com/shards/${platform}/players?filter[playerNames]=${playerName}`,
-          {
-            headers: {
-              Authorization: `Bearer ${apiKey}`,
-              Accept:        'application/vnd.api+json',
-            },
-          },
-        );
-        cb(null, request.data);
-      } catch (e: any) {
-        cb(e.message, null);
-      }
-    });
-    adminEndpoint('/integrations/pubg', 'pubg::exampleParse', async ({ text }, cb) => {
-      try {
-        const messageToSend = await new Message(text).parse() as string;
-        cb(null, messageToSend);
-      } catch (e: any) {
-        cb(e.message, null);
-      }
-    });
+  @Post('/', {
+    action:       'searchForPlayerId',
+    zodValidator: z.object({
+      apiKey:     z.string(),
+      platform:   z.string(),
+      playerName: z.string(),
+    }),
+  })
+  async searchForPlayerId(req: any) {
+    const request = await axios.get<any>(
+      `https://api.pubg.com/shards/${req.body.platform}/players?filter[playerNames]=${req.body.playerName}`,
+      {
+        headers: {
+          Authorization: `Bearer ${req.body.apiKey}`,
+          Accept:        'application/vnd.api+json',
+        },
+      },
+    );
+    return request.data;
+  }
+
+  @Post('/', {
+    action:       'exampleParse',
+    zodValidator: z.object({
+      text: z.string(),
+    }),
+  })
+  async exampleParse(req: any) {
+    return await new Message(req.body.text).parse();
   }
 
   @command('!pubg normal')
@@ -193,10 +156,7 @@ class PUBG extends Integration {
       if (typeof this.gameModeStats[gameType] === 'undefined') {
         throw new Error('Expected parameter');
       }
-      let text = this.gameModeStatsCustomization;
-      for (const key of Object.keys(flatten(this.gameModeStats[gameType]))) {
-        text = text.replace(new RegExp(escapeRegExp(`$${key}`), 'gi'), flatten(this.gameModeStats[gameType])[key]);
-      }
+      const text = this.gameModeStatsCustomization;
       return [{ response: await new Message(`$sender, ${text}`).parse(), ...opts }];
     } catch (e: any) {
       if (e.message.includes('Expected parameter')) {

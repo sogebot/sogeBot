@@ -155,7 +155,7 @@ class EveryXMinutesOfStream {
 
 @Entity()
 export class Event extends BotEntity {
-  schema = z.object({
+  _schema = z.object({
     event: z.discriminatedUnion('name', [
       z.object({
         name:        z.literal('number-of-viewers-is-at-least-x'),

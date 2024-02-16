@@ -5,10 +5,10 @@ import { BotEntity } from '../BotEntity.js';
 
 @Entity()
 export class Plugin extends BotEntity {
-  schema = z.object({
+  _schema = z.object({
     name: z.string().min(1),
   });
-  
+
   @PrimaryColumn()
     id: string;
 

@@ -1,15 +1,12 @@
-import { EntitySchema } from 'typeorm';
+import { Entity, PrimaryColumn, Column } from 'typeorm';
 
-export interface ChecklistInterface {
-  id: string; isCompleted: boolean;
+import { BotEntity } from '../BotEntity.js';
+
+@Entity()
+export class Checklist extends BotEntity {
+  @PrimaryColumn()
+    id: string;
+
+  @Column()
+    isCompleted: boolean;
 }
-
-export const Checklist = new EntitySchema<Readonly<Required<ChecklistInterface>>>({
-  name:    'checklist',
-  columns: {
-    id: {
-      type: String, primary: true,
-    },
-    isCompleted: { type: Boolean },
-  },
-});

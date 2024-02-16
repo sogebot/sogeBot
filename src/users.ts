@@ -4,6 +4,7 @@ import {
   Brackets, IsNull,
 } from 'typeorm';
 
+import { Get, Post } from './decorators/endpoint.js';
 import { HOUR } from './helpers/constants.js';
 import { defaultPermissions } from './helpers/permissions/defaultPermissions.js';
 import { getUserHighestPermission } from './helpers/permissions/getUserHighestPermission.js';
@@ -34,6 +35,16 @@ class Users extends Core {
     this.addMenu({
       category: 'manage', name: 'viewers', id: 'manage/viewers', this: null,
     });
+  }
+
+  @Get('/:id')
+  async _getOne (req: any) {
+    let id = req.params.id;
+    await changelog.flush();
+    if (req.query._query === 'userName') {
+      id = await this.getIdByName(id);
+    }
+    return changelog.get(id);
   }
 
   @onStartup()
@@ -240,48 +251,36 @@ class Users extends Core {
     return changelog.get(userId) as Promise<Readonly<Required<UserInterface>>>;
   }
 
-  sockets () {
-    adminEndpoint('/core/users', 'viewers::resetPointsAll', async (cb) => {
-      await changelog.flush();
-      await AppDataSource.getRepository(User).update({}, { points: 0 });
-      if (cb) {
-        cb(null);
-      }
-    });
-    adminEndpoint('/core/users', 'viewers::resetMessagesAll', async (cb) => {
-      await changelog.flush();
-      await AppDataSource.getRepository(User).update({}, { messages: 0, pointsByMessageGivenAt: 0 });
-      if (cb) {
-        cb(null);
-      }
-    });
-    adminEndpoint('/core/users', 'viewers::resetWatchedTimeAll', async (cb) => {
-      await changelog.flush();
-      await AppDataSource.getRepository(User).update({}, { watchedTime: 0 });
-      if (cb) {
-        cb(null);
-      }
-    });
-    adminEndpoint('/core/users', 'viewers::resetSubgiftsAll', async (cb) => {
-      await changelog.flush();
-      await AppDataSource.getRepository(User).update({}, { giftedSubscribes: 0 });
-      if (cb) {
-        cb(null);
-      }
-    });
-    adminEndpoint('/core/users', 'viewers::resetBitsAll', async (cb) => {
-      await AppDataSource.getRepository(UserBit).clear();
-      if (cb) {
-        cb(null);
-      }
-    });
-    adminEndpoint('/core/users', 'viewers::resetTipsAll', async (cb) => {
-      await AppDataSource.getRepository(UserTip).clear();
-      if (cb) {
-        cb(null);
-      }
-    });
+  @Post('/', { action: 'resetPointsAll' })
+  async resetPointsAll () {
+    await changelog.flush();
+    await AppDataSource.getRepository(User).update({}, { points: 0 });
+  }
+  @Post('/', { action: 'resetMessagesAll' })
+  async resetMessagesAll () {
+    await changelog.flush();
+    await AppDataSource.getRepository(User).update({}, { messages: 0, pointsByMessageGivenAt: 0 });
+  }
+  @Post('/', { action: 'resetWatchedTimeAll' })
+  async resetWatchedTimeAll () {
+    await changelog.flush();
+    await AppDataSource.getRepository(User).update({}, { watchedTime: 0 });
+  }
+  @Post('/', { action: 'resetSubgiftsAll' })
+  async resetSubgiftsAll () {
+    await changelog.flush();
+    await AppDataSource.getRepository(User).update({}, { giftedSubscribes: 0 });
+  }
+  @Post('/', { action: 'resetBitsAll' })
+  async resetBitsAll () {
+    await AppDataSource.getRepository(UserBit).clear();
+  }
+  @Post('/', { action: 'resetTipsAll' })
+  async resetTipsAll () {
+    await AppDataSource.getRepository(UserTip).clear();
+  }
 
+  sockets () {
     adminEndpoint('/core/users', 'viewers::update', async ([userId, update], cb) => {
       try {
         if (typeof update.tips !== 'undefined') {
@@ -481,7 +480,7 @@ class Users extends Core {
           const aggregatedTips = tips.map((o) => exchange(o.amount, o.currency, mainCurrency.value)).reduce((a, b) => a + b, 0);
           const aggregatedBits = bits.map((o) => Number(o.amount)).reduce((a, b) => a + b, 0);
 
-          const permId = await getUserHighestPermission(userId);
+          const permId = (await getUserHighestPermission(userId)).id;
           const permissionGroup = await Permissions.findOneByOrFail({ id: permId || defaultPermissions.VIEWERS });
           cb(null, {
             ...viewer, aggregatedBits, aggregatedTips, permission: permissionGroup, tips, bits,

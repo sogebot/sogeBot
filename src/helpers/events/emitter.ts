@@ -5,7 +5,6 @@ import { EmitData } from '~/database/entity/overlay.js';
 import { Types } from '~/plugins/ListenTo.js';
 
 export interface Events {
-  'CustomVariable:OnRefresh': () => void;
   [Types.CustomVariableOnChange]: (variableName: string, cur: any, prev: any) => void;
   'prediction-started': (opts: {
     titleOfPrediction: string,

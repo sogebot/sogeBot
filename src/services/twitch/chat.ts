@@ -49,7 +49,6 @@ import alerts from '~/registries/alerts.js';
 import { translate } from '~/translate.js';
 import users from '~/users.js';
 import { variables } from '~/watchers.js';
-import joinpart from '~/widgets/joinpart.js';
 
 let _connected_channel = '';
 
@@ -736,7 +735,6 @@ class Chat {
       const user = await changelog.get(userstate.userId);
       if (user) {
         if (!user.isOnline) {
-          joinpart.send({ users: [userName], type: 'join' });
           eventEmitter.emit('user-joined-channel', { userName: userName });
         }
 
@@ -752,7 +750,6 @@ class Chat {
           seenAt:       new Date().toISOString(),
         });
       } else {
-        joinpart.send({ users: [userName], type: 'join' });
         eventEmitter.emit('user-joined-channel', { userName: userName });
         changelog.update(userstate.userId, {
           userName:     userName,

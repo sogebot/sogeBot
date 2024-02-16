@@ -17,7 +17,7 @@ import ytsr from 'ytsr';
 import System from './_interface.js';
 import { onChange, onStartup } from '../decorators/on.js';
 import {
-  command, default_permission, persistent, settings, ui,
+  command, default_permission, persistent, settings,
 } from '../decorators.js';
 
 import { AppDataSource } from '~/database.js';
@@ -26,7 +26,7 @@ import {
 } from '~/helpers/commons/index.js';
 import { error, info } from '~/helpers/log.js';
 import defaultPermissions from '~/helpers/permissions/defaultPermissions.js';
-import { adminEndpoint, publicEndpoint } from '~/helpers/socket.js';
+import { adminEndpoint, endpoint } from '~/helpers/socket.js';
 import { tmiEmitter } from '~/helpers/tmi/index.js';
 import * as changelog from '~/helpers/user/changelog.js';
 import getBotId from '~/helpers/user/getBotId.js';
@@ -51,12 +51,6 @@ class Songs extends System {
     currentTag = 'general';
 
   @settings()
-  @ui({
-    type: 'number-input',
-    step: '1',
-    min:  '0',
-    max:  '100',
-  })
     volume = 25;
   @settings()
     duration = 10;
@@ -79,10 +73,10 @@ class Songs extends System {
   startup() {
     this.getMeanLoudness();
     this.addMenu({
-      category: 'manage', name: 'playlist', id: 'manage/songs/playlist', this: this,
+      category: 'manage', name: 'playlist', id: 'manage/songs/playlist', this: this, scopeParent: this.scope(),
     });
     this.addMenu({
-      category: 'manage', name: 'bannedsongs', id: 'manage/songs/bannedsongs', this: this,
+      category: 'manage', name: 'bannedsongs', id: 'manage/songs/bannedsongs', this: this, scopeParent: this.scope(),
     });
     this.addMenuPublic({ id: 'songrequests', name: 'songs' });
     this.addMenuPublic({ id: 'playlist', name: 'playlist' });
@@ -117,7 +111,7 @@ class Songs extends System {
       }
       this.currentTag = tag;
     });
-    publicEndpoint('/systems/songs', 'current.playlist.tag', async (cb) => {
+    endpoint([], '/systems/songs', 'current.playlist.tag', async (cb) => {
       cb(null, this.currentTag);
     });
     adminEndpoint('/systems/songs', 'get.playlist.tags', async (cb) => {
@@ -127,7 +121,7 @@ class Songs extends System {
         cb(e, []);
       }
     });
-    publicEndpoint('/systems/songs', 'find.playlist', async (opts: { filters?: Filter[], page: number, search?: string, tag?: string | null, perPage: number}, cb) => {
+    endpoint([], '/systems/songs', 'find.playlist', async (opts: { filters?: Filter[], page: number, search?: string, tag?: string | null, perPage: number}, cb) => {
       opts.page = opts.page ?? 0;
       opts.perPage = opts.perPage ?? 25;
 
@@ -224,7 +218,7 @@ class Songs extends System {
       await SongRequest.delete({ id });
       cb(null);
     });
-    publicEndpoint('/systems/songs', 'songs::getAllRequests', async (where, cb) => {
+    endpoint([], '/systems/songs', 'songs::getAllRequests', async (where, cb) => {
       where = where || {};
       cb(null, await SongRequest.find({
         ...where,

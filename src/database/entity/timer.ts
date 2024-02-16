@@ -6,7 +6,7 @@ import { BotEntity } from '../BotEntity.js';
 
 @Entity()
 export class Timer extends BotEntity {
-  schema = z.object({
+  _schema = z.object({
     name:                z.string().min(2).regex(/^[a-zA-Z0-9_]*$/),
     triggerEveryMessage: z.number().min(0),
     triggerEverySecond:  z.number().min(0),

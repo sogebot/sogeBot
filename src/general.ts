@@ -5,7 +5,9 @@ import {
   capitalize,
   get, isNil,
 } from 'lodash-es';
+import { z } from 'zod';
 
+import { Get, Post } from './decorators/endpoint.js';
 import { HOUR, MINUTE } from './helpers/constants.js';
 import { setLocale } from './helpers/dayjsHelper.js';
 import { menu } from './helpers/panel.js';
@@ -29,7 +31,6 @@ import { socketsConnected } from '~/helpers/panel/index.js';
 import { addUIWarn } from '~/helpers/panel/index.js';
 import defaultPermissions from '~/helpers/permissions/defaultPermissions.js';
 import { list } from '~/helpers/register.js';
-import { adminEndpoint } from '~/helpers/socket.js';
 import { getMuteStatus } from '~/helpers/tmi/muteStatus.js';
 import translateLib, { translate } from '~/translate.js';
 import { variables } from '~/watchers.js';
@@ -79,7 +80,7 @@ class General extends Core {
       name: 'index', id: '', this: this,
     });
     this.addMenu({
-      category: 'commands', name: 'botcommands', id: 'commands/botcommands', this: this,
+      category: 'commands', name: 'botcommands', id: 'commands/botcommands', this: this, scopeParent: this.scope(),
     });
     this.addMenu({
       category: 'settings', name: 'modules', id: 'settings/modules', this: null,
@@ -88,72 +89,83 @@ class General extends Core {
     setInterval(gracefulExit, 1000);
   }
 
-  sockets() {
-    adminEndpoint('/core/general', 'menu::private', async (cb) => {
-      cb(menu.map((o) => ({
-        category: o.category, name: o.name, id: o.id, enabled: o.this ? o.this.enabled : true,
-      })));
-    });
-
-    adminEndpoint('/core/general', 'generic::getCoreCommands', async (cb) => {
-      try {
-        const commands: Command[] = [];
-
-        for (const type of ['overlays', 'integrations', 'core', 'systems', 'games', 'services', 'registries']) {
-          for (const system of list(type as any)) {
-            for (const cmd of system._commands) {
-              const name = typeof cmd === 'string' ? cmd : cmd.name;
-              commands.push({
-                id:           cmd.id,
-                defaultValue: name,
-                command:      cmd.command ?? name,
-                type:         capitalize(type),
-                name:         system.__moduleName__,
-                permission:   await new Promise((resolve: (value: string | null) => void) => {
-                  PermissionCommands.findOneByOrFail({ name })
-                    .then(data => {
-                      resolve(data.permission);
-                    })
-                    .catch(() => {
-                      resolve(cmd.permission ?? null);
-                    });
-                }),
-              });
-            }
-          }
+  @Get('/commands')
+  async getAll() {
+    const commands: Command[] = [];
+    for (const type of ['overlays', 'integrations', 'core', 'systems', 'games', 'services', 'registries']) {
+      for (const system of list(type as any)) {
+        for (const cmd of system._commands) {
+          const name = typeof cmd === 'string' ? cmd : cmd.name;
+          commands.push({
+            id:           cmd.id,
+            defaultValue: name,
+            command:      cmd.command ?? name,
+            type:         capitalize(type),
+            name:         system.__moduleName__,
+            permission:   await new Promise((resolve: (value: string | null) => void) => {
+              PermissionCommands.findOneByOrFail({ name })
+                .then(data => {
+                  resolve(data.permission);
+                })
+                .catch(() => {
+                  resolve(cmd.permission ?? null);
+                });
+            }),
+          });
         }
-        cb(null, commands);
-      } catch (e: any) {
-        cb(e, []);
       }
-    });
+    }
+    return commands;
+  }
 
-    adminEndpoint('/core/general', 'generic::setCoreCommand', async (commandToSet, cb) => {
-      // get module
-      const module = list(commandToSet.type.toLowerCase() as any).find(item => item.__moduleName__ === commandToSet.name);
-      if (!module) {
-        throw new Error(`Module ${commandToSet.name} not found`);
-      }
+  @Post('/commands', {
+    zodValidator: z.object({
+      name:         z.string(),
+      type:         z.string(),
+      defaultValue: z.string(),
+      command:      z.string(),
+      permission:   z.string(),
+    }),
+  })
+  async save(req: any) {
+    // get module
+    const module = list(req.body.type.toLowerCase() as any).find(item => item.__moduleName__ === req.body.name);
+    if (!module) {
+      throw new Error(`Module ${req.body.name} not found`);
+    }
 
-      const moduleCommand = module._commands.find((o) => o.name === commandToSet.defaultValue);
-      if (!moduleCommand) {
-        throw new Error(`Command ${commandToSet.defaultValue} not found in module ${commandToSet.name}`);
-      }
+    const moduleCommand = module._commands.find((o) => o.name === req.body.defaultValue);
+    if (!moduleCommand) {
+      throw new Error(`Command ${req.body.defaultValue} not found in module ${req.body.name}`);
+    }
 
-      // handle permission
-      if (commandToSet.permission === moduleCommand.permission) {
-        await PermissionCommands.delete({ name: moduleCommand.name });
-      } else {
-        const entity = await PermissionCommands.findOneBy({ name: moduleCommand.name }) || new PermissionCommands();
-        entity.name = moduleCommand.name;
-        entity.permission = commandToSet.permission;
-        await entity.save();
-      }
+    // handle permission
+    if (req.body.permission === moduleCommand.permission) {
+      await PermissionCommands.delete({ name: moduleCommand.name });
+    } else {
+      const entity = await PermissionCommands.findOneBy({ name: moduleCommand.name }) || new PermissionCommands();
+      entity.name = moduleCommand.name;
+      entity.permission = req.body.permission;
+      await entity.save();
+    }
 
-      // handle new command value
-      module.setCommand(commandToSet.defaultValue, commandToSet.command);
-      cb(null);
-    });
+    // handle new command value
+    module.setCommand(req.body.defaultValue, req.body.command);
+  }
+
+  @Get('/menu', {
+    scope:          'read',
+    scopeOrigin:    'dashboard',
+    customEndpoint: '/ui', // /api/ui/menu
+  })
+  async getMenu() {
+    return menu.map((o) => ({
+      scopeParent: o.scopeParent,
+      category:    o.category,
+      name:        o.name,
+      id:          o.id,
+      enabled:     o.this ? o.this.enabled : true,
+    }));
   }
 
   @command('!enable')

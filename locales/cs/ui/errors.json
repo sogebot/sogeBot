@@ -2,6 +2,7 @@
   "errorDialogHeader": "Neočekávané chyby při ověření",
   "isNotEmpty": "$property je povinný údaj.",
   "minLength": "$property musí být delší nebo rovna $constraint1 znakům.",
+  "isUnique": "$property must be unique",
   "isPositive": "$property musí být větší než 0",
   "isCommand": "$property musí začínat s !",
   "isCommandOrCustomVariable": "$property musí začínat s ! nebo $_",

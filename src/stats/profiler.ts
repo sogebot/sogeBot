@@ -1,7 +1,7 @@
 import Stats from './_interface.js';
 
+import { Get } from '~/decorators/endpoint.js';
 import { avgTime } from '~/helpers/profiler.js';
-import { adminEndpoint } from '~/helpers/socket.js';
 
 class Profiler extends Stats {
   constructor() {
@@ -10,10 +10,10 @@ class Profiler extends Stats {
       category: 'stats', name: 'profiler', id: 'stats/profiler', this: null,
     });
   }
-  public sockets() {
-    adminEndpoint('/stats/profiler', 'profiler::load', async (cb) => {
-      cb(null, Array.from(avgTime.entries()));
-    });
+
+  @Get('/')
+  public async read() {
+    return Array.from(avgTime.entries());
   }
 }
 
