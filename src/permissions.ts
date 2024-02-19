@@ -1,3 +1,5 @@
+import { withScope } from './socket.js';
+
 import Core from '~/_interface.js';
 import { Permissions as PermissionsEntity } from '~/database/entity/permissions.js';
 import { User } from '~/database/entity/user.js';
@@ -7,6 +9,7 @@ import { command, default_permission } from '~/decorators.js';
 import { Expects } from  '~/expects.js';
 import { prepare } from '~/helpers/commons/index.js';
 import { error } from '~/helpers/log.js';
+import { app } from '~/helpers/panel.js';
 import { check } from '~/helpers/permissions/check.js';
 import { defaultPermissions } from '~/helpers/permissions/defaultPermissions.js';
 import { get } from '~/helpers/permissions/get.js';
@@ -24,10 +27,20 @@ class Permissions extends Core {
   }
 
   public sockets() {
-    adminEndpoint('/core/permissions', 'generic::getAll', async (cb) => {
-      cb(null, await PermissionsEntity.find({
-        order: { order: 'ASC' },
-      }));
+    if (!app) {
+      setTimeout(() => this.sockets(), 100);
+      return;
+    }
+
+    app.get('/api/core/permissions', withScope(['dashboard:admin:read']), async (req, res) => {
+      res.send({
+        status: 'success',
+        data:   {
+          items: await PermissionsEntity.find({
+            order: { order: 'ASC' },
+          }),
+        },
+      });
     });
     adminEndpoint('/core/permissions', 'permission::save', async (data, cb) => {
       // we need to remove missing permissions

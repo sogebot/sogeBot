@@ -46,6 +46,7 @@ const getPrivileges = async(userId: string): Promise<{
         'dashboard:admin:read',
         'mod:settings:read',
         'systems:alias:read',
+        'systems:alias:manage',
       ] : [
         // viewer don't have any scope
       ],
@@ -321,32 +322,50 @@ const processAuth = (req: { headers: { [x: string]: any; }; }, res: { sendStatus
 };
 
 const adminMiddleware = (req: { headers: { [x: string]: any; }; }, res: { sendStatus: (arg0: number) => any; }, next: () => void) => {
-  try {
-    const authHeader = req.headers.authorization;
-    const authToken = authHeader && authHeader.split(' ')[1];
+  // adminmiddleware disabled, deprecated
+  next();
+};
 
-    if (authToken === _self.socketToken) {
-      return next();
-    }
+const withScope = (allowedScopes: string[], isPublic: boolean = false) => {
+  return (req: { headers: { [x: string]: any; }; }, res: { sendStatus: (arg0: number) => any; }, next: () => void) => {
+    try {
+      const authHeader = req.headers.authorization;
+      const authToken = authHeader && authHeader.split(' ')[1];
 
-    if (authToken == null) {
+      req.headers.public = isPublic;
+      req.headers.private = true;
+
+      if (authToken === _self.socketToken) {
+        return next();
+      }
+
+      if (authToken == null) {
+        return res.sendStatus(401);
+      }
+
+      const token = jwt.verify(authToken, _self.JWTKey) as {
+        userId: string; username: string; privileges: Unpacked<ReturnType<typeof getPrivileges>>;
+      };
+
+      token.privileges.scopes = token.privileges.scopes || [];
+      req.headers.scopes = token.privileges.scopes;
+
+      if (!token.privileges.scopes.some(scope => allowedScopes.includes(scope))) {
+        req.headers.private = false;
+        if (isPublic) {
+          next();
+          return;
+        }
+        return res.sendStatus(401);
+      }
+
+      next();
+    } catch (e) {
       return res.sendStatus(401);
     }
-
-    const token = jwt.verify(authToken, _self.JWTKey) as {
-      userId: string; username: string; privileges: Unpacked<ReturnType<typeof getPrivileges>>;
-    };
-
-    if (token.privileges.haveAdminPrivileges !== true) {
-      return res.sendStatus(401);
-    }
-
-    next();
-  } catch (e) {
-    return res.sendStatus(401);
-  }
+  };
 };
 
 const _self = new Socket();
 export default _self;
-export { Socket, getPrivileges, adminMiddleware, processAuth };
+export { Socket, getPrivileges, adminMiddleware, processAuth, withScope };

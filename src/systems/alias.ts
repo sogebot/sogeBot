@@ -19,10 +19,12 @@ import { executeVariablesInText } from '~/helpers/customvariables/index.js';
 import {
   debug, error, info, warning,
 } from '~/helpers/log.js';
+import { app } from '~/helpers/panel.js';
 import { check } from '~/helpers/permissions/check.js';
 import { defaultPermissions } from '~/helpers/permissions/defaultPermissions.js';
 import { get } from '~/helpers/permissions/get.js';
-import { adminEndpoint, endpoint } from '~/helpers/socket.js';
+import { endpoint } from '~/helpers/socket.js';
+import { withScope } from '~/socket.js';
 import customCommands from '~/systems/customcommands.js';
 import { translate } from '~/translate.js';
 
@@ -56,31 +58,28 @@ class Alias extends System {
   }
 
   sockets() {
-    adminEndpoint('/systems/alias', 'generic::groups::deleteById', async (name, cb) => {
-      try {
-        const group = await AliasGroup.findOneBy({ name });
-        if (!group) {
-          throw new Error(`Group ${name} not found`);
-        }
-        await group.remove();
-        cb(null);
-      } catch (e) {
-        cb(e as Error);
-      }
+    if (!app) {
+      setTimeout(() => this.sockets(), 100);
+      return;
+    }
+
+    app.get('/api/systems/alias', withScope([this.scope('read')]), async (req, res) => {
+      res.send({
+        status: 'success',
+        data:   {
+          items: await AliasEntity.find(),
+        },
+      });
     });
-    adminEndpoint('/systems/alias', 'generic::groups::save', async (item, cb) => {
-      try {
-        const itemToSave = new AliasGroup();
-        merge(itemToSave, item);
-        await itemToSave.save();
-        cb(null, itemToSave);
-      } catch (e) {
-        if (e instanceof Error) {
-          cb(e.message, undefined);
-        }
-      }
+    app.get('/api/systems/alias/:id', withScope([this.scope('read')]), async (req, res) => {
+      res.send({
+        status: 'success',
+        data:   {
+          items: await AliasEntity.findOneBy({ id: req.params.id }),
+        },
+      });
     });
-    adminEndpoint('/systems/alias', 'generic::groups::getAll', async (cb) => {
+    app.get('/api/systems/alias/groups/', withScope([this.scope('read')]), async (req, res) => {
       let groupsList = await AliasGroup.find();
       for (const item of await AliasEntity.find()) {
         if (item.group && !groupsList.find(o => o.name === item.group)) {
@@ -97,15 +96,39 @@ class Alias extends System {
           ];
         }
       }
-      cb(null, groupsList);
+      res.send({
+        status: 'success',
+        data:   {
+          items: groupsList,
+        },
+      });
     });
-    endpoint([this.scope('read')], '/systems/alias', 'generic::getAll', async (cb) => {
-      cb(null, await AliasEntity.find());
+
+    endpoint([this.scope('manage')], '/systems/alias', 'generic::groups::deleteById', async (name, cb) => {
+      try {
+        const group = await AliasGroup.findOneBy({ name });
+        if (!group) {
+          throw new Error(`Group ${name} not found`);
+        }
+        await group.remove();
+        cb(null);
+      } catch (e) {
+        cb(e as Error);
+      }
     });
-    endpoint([this.scope('read')], '/systems/alias', 'generic::getOne', async (id, cb) => {
-      cb(null, await AliasEntity.findOneBy({ id }));
+    endpoint([this.scope('manage')], '/systems/alias', 'generic::groups::save', async (item, cb) => {
+      try {
+        const itemToSave = new AliasGroup();
+        merge(itemToSave, item);
+        await itemToSave.save();
+        cb(null, itemToSave);
+      } catch (e) {
+        if (e instanceof Error) {
+          cb(e.message, undefined);
+        }
+      }
     });
-    adminEndpoint('/systems/alias', 'generic::deleteById', async (id, cb) => {
+    endpoint([this.scope('manage')], '/systems/alias', 'generic::deleteById', async (id, cb) => {
       try {
         const alias = await AliasEntity.findOneBy({ id });
         if (!alias) {
@@ -117,7 +140,7 @@ class Alias extends System {
         cb(e as Error);
       }
     });
-    adminEndpoint('/systems/alias', 'generic::save', async (item, cb) => {
+    endpoint([this.scope('manage')], '/systems/alias', 'generic::save', async (item, cb) => {
       try {
         cb(null, await AliasEntity.create(item).save());
       } catch (e) {
