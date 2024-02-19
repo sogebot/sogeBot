@@ -63,7 +63,7 @@ class Alias extends System {
       return;
     }
 
-    app.get('/api/systems/alias', withScope([this.scope('read')]), async (req, res) => {
+    app.get('/api/systems/alias', withScope([this.scope('read'), this.scope('manage')]), async (req, res) => {
       res.send({
         status: 'success',
         data:   {
@@ -71,7 +71,7 @@ class Alias extends System {
         },
       });
     });
-    app.get('/api/systems/alias/:id', withScope([this.scope('read')]), async (req, res) => {
+    app.get('/api/systems/alias/:id', withScope([this.scope('read'), this.scope('manage')]), async (req, res) => {
       res.send({
         status: 'success',
         data:   {
@@ -79,7 +79,7 @@ class Alias extends System {
         },
       });
     });
-    app.get('/api/systems/alias/groups/', withScope([this.scope('read')]), async (req, res) => {
+    app.get('/api/systems/alias/groups/', withScope([this.scope('read'), this.scope('manage')]), async (req, res) => {
       let groupsList = await AliasGroup.find();
       for (const item of await AliasEntity.find()) {
         if (item.group && !groupsList.find(o => o.name === item.group)) {
