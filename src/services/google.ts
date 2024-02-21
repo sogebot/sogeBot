@@ -327,7 +327,7 @@ class Google extends Service {
           timeMark: getTime(streamStatusChangeSince.value, false) as string,
         });
       }
-    }, MINUTE);
+    }, 5 * MINUTE);
 
     setInterval(async () => {
       const broadcast = await this.getBroadcast();
