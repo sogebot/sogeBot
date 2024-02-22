@@ -1,4 +1,4 @@
-import { withScope } from './socket.js';
+import { withScope } from './helpers/socket.js';
 
 import Core from '~/_interface.js';
 import { Permissions as PermissionsEntity } from '~/database/entity/permissions.js';

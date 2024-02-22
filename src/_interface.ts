@@ -23,11 +23,11 @@ import {
   error, info, warning,
 } from '~/helpers/log.js';
 import {
-  addMenu, addMenuPublic, ioServer, menu, menuPublic,
+  addMenu, addMenuPublic, app, ioServer, menu, menuPublic,
 } from '~/helpers/panel.js';
 import defaultPermissions from '~/helpers/permissions/defaultPermissions.js';
 import { register } from '~/helpers/register.js';
-import { endpoint } from '~/helpers/socket.js';
+import { addScope, endpoint, withScope } from '~/helpers/socket.js';
 import * as watchers from '~/watchers.js';
 
 let socket: import('~/socket').Socket | any = null;
@@ -38,7 +38,7 @@ class Module {
   public dependsOn: string[] = [];
   public showInUI = true;
   public timeouts: { [x: string]: NodeJS.Timeout } = {};
-  public settingsList: { category?: string; key: string; defaultValue: any }[] = [];
+  public settingsList: { category?: string; key: string; defaultValue: any, secret: boolean }[] = [];
   public settingsPermList: { category?: string; key: string; defaultValue: any }[] = [];
   public on: InterfaceSettings.On;
   public socket: Namespace | null = null;
@@ -195,6 +195,8 @@ class Module {
   }
 
   public scope (type?: 'read' | 'manage') {
+    // add scope if used
+    addScope(this._scope + (type ? ':' + type : ''));
     return this._scope + (type ? ':' + type : '');
   }
 
@@ -272,7 +274,7 @@ class Module {
         }
 
         this.settingsList.push({
-          category: 'commands', key: c.name, defaultValue: c.name,
+          category: 'commands', key: c.name, defaultValue: c.name, secret: false,
         });
 
         // load command from db
@@ -303,7 +305,7 @@ class Module {
   }
 
   public _sockets() {
-    if (socket === null || ioServer === null) {
+    if (socket === null || ioServer === null || !app) {
       setTimeout(() => this._sockets(), 100);
     } else {
       this.socket = ioServer.of(this.nsp).use(socket.authorize);
@@ -312,19 +314,24 @@ class Module {
         error(this.nsp + ': Cannot initialize sockets second time');
       };
 
-      // default socket listeners
-      endpoint([
-        this.nsp.split('/').map(o => o.trim()).filter(String).join(':') + ':settings:read',
-        this.nsp.split('/').map(o => o.trim()).filter(String).join(':') + ':settings:manage',
-      ], this.nsp, 'settings', async (cb) => {
+      app.get(`/api${this.nsp}/settings`, withScope([this.scope('read'), this.scope('manage')]), async (req, res) => {
         try {
-          cb(null, await this.getAllSettings(), await this.getUI());
+          res.json({
+            status: 'success',
+            data:   {
+              settings: await this.getAllSettings(
+                undefined, req.headers?.scopes?.includes(`${this.nsp.split('/').map(o => o.trim()).filter(String).join(':')}:sensitive`),
+              ),
+              ui: await this.getUI(),
+            },
+          });
         } catch (e: any) {
-          cb(e.stack, {}, {});
+          res.status(500).json({ error: e.stack, status: 'error' });
         }
       });
+
       endpoint([
-        this.nsp.split('/').map(o => o.trim()).filter(String).join(':') + ':settings:manage',
+        this.nsp.split('/').map(o => o.trim()).filter(String).join(':') + ':manage',
       ], this.nsp, 'settings.update', async (opts, cb) => {
         // flatten and remove category
         const data = flatten(opts);
@@ -405,7 +412,7 @@ class Module {
       });
 
       endpoint([
-        this.nsp.split('/').map(o => o.trim()).filter(String).join(':') + ':settings:manage',
+        this.nsp.split('/').map(o => o.trim()).filter(String).join(':') + ':manage',
       ], this.nsp, 'set.value', async (opts, cb) => {
         try {
           (this as any)[opts.variable] = opts.value;
@@ -488,13 +495,17 @@ class Module {
     addMenuPublic(opts);
   }
 
-  public async getAllSettings(withoutDefaults = false) {
+  public async getAllSettings(withoutDefaults = false, sensitive = false) {
     const promisedSettings: {
       [x: string]: any;
     } = {};
 
     // go through expected settings
-    for (const { category, key, defaultValue } of this.settingsList) {
+    for (const { category, key, defaultValue, secret } of this.settingsList) {
+      // skip secret settings if not sensitive scope
+      if (secret && !sensitive) {
+        continue;
+      }
       if (category) {
         if (typeof promisedSettings[category] === 'undefined') {
           promisedSettings[category] = {};

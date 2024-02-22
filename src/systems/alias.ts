@@ -23,8 +23,7 @@ import { app } from '~/helpers/panel.js';
 import { check } from '~/helpers/permissions/check.js';
 import { defaultPermissions } from '~/helpers/permissions/defaultPermissions.js';
 import { get } from '~/helpers/permissions/get.js';
-import { endpoint } from '~/helpers/socket.js';
-import { withScope } from '~/socket.js';
+import { endpoint, withScope } from '~/helpers/socket.js';
 import customCommands from '~/systems/customcommands.js';
 import { translate } from '~/translate.js';
 
@@ -63,23 +62,7 @@ class Alias extends System {
       return;
     }
 
-    app.get('/api/systems/alias', withScope([this.scope('read'), this.scope('manage')]), async (req, res) => {
-      res.send({
-        status: 'success',
-        data:   {
-          items: await AliasEntity.find(),
-        },
-      });
-    });
-    app.get('/api/systems/alias/:id', withScope([this.scope('read'), this.scope('manage')]), async (req, res) => {
-      res.send({
-        status: 'success',
-        data:   {
-          items: await AliasEntity.findOneBy({ id: req.params.id }),
-        },
-      });
-    });
-    app.get('/api/systems/alias/groups/', withScope([this.scope('read'), this.scope('manage')]), async (req, res) => {
+    app.get('/api/systems/alias/groups/', withScope([this.scope('read')]), async (req, res) => {
       let groupsList = await AliasGroup.find();
       for (const item of await AliasEntity.find()) {
         if (item.group && !groupsList.find(o => o.name === item.group)) {
@@ -100,6 +83,24 @@ class Alias extends System {
         status: 'success',
         data:   {
           items: groupsList,
+        },
+      });
+    });
+
+    app.get('/api/systems/alias', withScope([this.scope('read')]), async (req, res) => {
+      res.send({
+        status: 'success',
+        data:   {
+          items: await AliasEntity.find(),
+        },
+      });
+    });
+
+    app.get('/api/systems/alias/:id', withScope([this.scope('read')]), async (req, res) => {
+      res.send({
+        status: 'success',
+        data:   {
+          items: await AliasEntity.findOneBy({ id: req.params.id }),
         },
       });
     });

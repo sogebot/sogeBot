@@ -17,7 +17,7 @@ import ytsr from 'ytsr';
 import System from './_interface.js';
 import { onChange, onStartup } from '../decorators/on.js';
 import {
-  command, default_permission, persistent, settings, ui,
+  command, default_permission, persistent, settings,
 } from '../decorators.js';
 
 import { AppDataSource } from '~/database.js';
@@ -51,12 +51,6 @@ class Songs extends System {
     currentTag = 'general';
 
   @settings()
-  @ui({
-    type: 'number-input',
-    step: '1',
-    min:  '0',
-    max:  '100',
-  })
     volume = 25;
   @settings()
     duration = 10;

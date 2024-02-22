@@ -17,103 +17,8 @@ import { app, ioServer } from '~/helpers/panel.js';
 import { check } from '~/helpers/permissions/check.js';
 import { defaultPermissions } from '~/helpers/permissions/defaultPermissions.js';
 import { getUserHighestPermission } from '~/helpers/permissions/getUserHighestPermission.js';
-import { adminEndpoint, endpoints, newEndpoints, scopes } from '~/helpers/socket.js';
+import { adminEndpoint, getPrivileges, initEndpoints, scopes } from '~/helpers/socket.js';
 import * as changelog from '~/helpers/user/changelog.js';
-import { isModerator } from '~/helpers/user/isModerator.js';
-
-type Unpacked<T> =
-  T extends (infer U)[] ? U :
-    T extends (...args: any[]) => infer R ? R :
-      T extends Promise<infer E> ? E :
-        T;
-
-const getPrivileges = async(userId: string): Promise<{
-  haveAdminPrivileges: boolean;
-  scopes:             string[];
-}> => {
-  try {
-    const isAdmin = await check(userId, defaultPermissions.CASTERS, true);
-    if (isAdmin.access) {
-      return {
-        haveAdminPrivileges: true,
-        scopes:              Array.from(scopes), // allow all scopes for admin
-      };
-    }
-    const user = await changelog.getOrFail(userId);
-    const privileges = {
-      haveAdminPrivileges: false,
-      scopes:              isModerator(user) ? [
-        'dashboard:admin:read',
-        'mod:settings:read',
-        'systems:alias:read',
-        'systems:alias:manage',
-      ] : [
-        // viewer don't have any scope
-      ],
-      // haveModPrivileges:    isModerator(user) ? true : false,
-      // haveViewerPrivileges: true,
-    };
-    console.log({ privileges });
-    return privileges;
-  } catch (e: any) {
-    return {
-      haveAdminPrivileges: false,
-      scopes:              [],
-    };
-  }
-};
-
-const initEndpoints = (socket: SocketIO, privileges: Unpacked<ReturnType<typeof getPrivileges>>) => {
-  socket.offAny(); // remove all listeners in case we call this twice
-  for (const key of [...new Set(endpoints.filter(o => o.nsp === socket.nsp.name).map(o => o.nsp + '||' + o.on))]) {
-    const [nsp, on] = key.split('||');
-    const endpointsToInit = endpoints.filter(o => o.nsp === nsp && o.on === on);
-    if (endpointsToInit.length > 0) {
-      socket.on(on, async (opts: any, cb: (error: Error | string | null, ...response: any) => void) => {
-      // initialize all endpoints given by privileges scopes
-        const adminEndpointInit = endpointsToInit.find(o => o.type === 'admin');
-        const viewerEndpoint = endpointsToInit.find(o => o.type === 'viewer');
-        const endpoint = endpointsToInit.find(o => o.type === 'public');
-        if (adminEndpointInit && privileges.haveAdminPrivileges) {
-          adminEndpointInit.callback(opts, cb ?? socket, socket);
-          return;
-        } else if (!viewerEndpoint && !endpoint) {
-          debug('socket', `User dont have admin access to ${socket.nsp.name}`);
-          debug('socket', privileges);
-          cb && cb('User doesn\'t have access to this endpoint', null);
-          return;
-        }
-
-        if (viewerEndpoint) {
-          viewerEndpoint.callback(opts, cb ?? socket, socket);
-          return;
-        } else if (!endpoint) {
-          debug('socket', `User dont have viewer access to ${socket.nsp.name}`);
-          debug('socket', privileges);
-          cb && cb('User doesn\'t have access to this endpoint', null);
-          return;
-        }
-
-        endpoint.callback(opts, cb ?? socket, socket);
-      });
-    }
-  }
-  // new code for new endpoints with scopes
-  for (const key of [...new Set(newEndpoints.filter(o => o.nsp === socket.nsp.name).map(o => o.nsp + '||' + o.on))]) {
-    const [nsp, on] = key.split('||');
-    const scopedEndpoints = newEndpoints.filter(o => o.nsp === nsp && o.on === on);
-    if (newEndpoints.length > 0) {
-      socket.on(on, async (opts: any, cb: (error: Error | string | null, ...response: any) => void) => {
-        for (const endpoint of scopedEndpoints) {
-          if (endpoint.scopes.some(scope => privileges.scopes.includes(scope))) {
-            endpoint.callback(opts, cb ?? socket, socket);
-          }
-        }
-        cb && cb('User doesn\'t have access to this endpoint', null);
-      });
-    }
-  }
-};
 
 class Socket extends Core {
   @persistent()
@@ -326,46 +231,6 @@ const adminMiddleware = (req: { headers: { [x: string]: any; }; }, res: { sendSt
   next();
 };
 
-const withScope = (allowedScopes: string[], isPublic: boolean = false) => {
-  return (req: { headers: { [x: string]: any; }; }, res: { sendStatus: (arg0: number) => any; }, next: () => void) => {
-    try {
-      const authHeader = req.headers.authorization;
-      const authToken = authHeader && authHeader.split(' ')[1];
-
-      req.headers.public = isPublic;
-      req.headers.private = true;
-
-      if (authToken === _self.socketToken) {
-        return next();
-      }
-
-      if (authToken == null) {
-        return res.sendStatus(401);
-      }
-
-      const token = jwt.verify(authToken, _self.JWTKey) as {
-        userId: string; username: string; privileges: Unpacked<ReturnType<typeof getPrivileges>>;
-      };
-
-      token.privileges.scopes = token.privileges.scopes || [];
-      req.headers.scopes = token.privileges.scopes;
-
-      if (!token.privileges.scopes.some(scope => allowedScopes.includes(scope))) {
-        req.headers.private = false;
-        if (isPublic) {
-          next();
-          return;
-        }
-        return res.sendStatus(401);
-      }
-
-      next();
-    } catch (e) {
-      return res.sendStatus(401);
-    }
-  };
-};
-
 const _self = new Socket();
 export default _self;
-export { Socket, getPrivileges, adminMiddleware, processAuth, withScope };
+export { Socket, getPrivileges, adminMiddleware, processAuth };

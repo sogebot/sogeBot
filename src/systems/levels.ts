@@ -4,7 +4,7 @@ import { evaluate as mathJsEvaluate, round } from 'mathjs';
 import System from './_interface.js';
 import { onStartup } from '../decorators/on.js';
 import {
-  command, default_permission, parser, permission_settings, settings, ui,
+  command, default_permission, parser, permission_settings, settings,
 } from '../decorators.js';
 import { Expects } from  '../expects.js';
 import general from '../general.js';
@@ -42,11 +42,6 @@ class Levels extends System {
 
   @settings('levels')
     nextLevelFormula = '$prevLevelXP + ($prevLevelXP * 1.5)';
-
-  @ui({ type: 'levels-showcase', emit: 'getLevelsExample' }, 'levels')
-    levelShowcase = null;
-  @ui({ type: 'helpbox' }, 'levels')
-    levelShowcaseHelp = null;
 
   @settings('xp')
     xpName = 'XP';

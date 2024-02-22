@@ -11,7 +11,7 @@ import XRegExp from 'xregexp';
 import System from './_interface.js';
 import { parserReply } from '../commons.js';
 import {
-  command, default_permission, parser, permission_settings, settings, ui,
+  command, default_permission, parser, permission_settings, settings,
 } from '../decorators.js';
 import { Expects } from  '../expects.js';
 import spotify from '../integrations/spotify.js';
@@ -86,10 +86,6 @@ class Moderation extends System {
   @settings('lists')
     cListsWhitelist: string[] = [];
   @settings('lists')
-  @ui({
-    type:   'textarea-from-array',
-    secret: true,
-  })
     cListsBlacklist: string[] = [];
   @permission_settings('lists', [ defaultPermissions.CASTERS ], { [defaultPermissions.MODERATORS]: false })
     cListsEnabled = true;
