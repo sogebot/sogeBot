@@ -12,7 +12,7 @@ export class permissionScopes1678892044040 implements MigrationInterface {
     await queryRunner.query(`CREATE TABLE "permissions" ("id" varchar PRIMARY KEY NOT NULL, "name" varchar NOT NULL, "order" integer NOT NULL, "isCorePermission" boolean NOT NULL, "isWaterfallAllowed" boolean NOT NULL, "automation" varchar(12) NOT NULL, "userIds" text NOT NULL, "excludeUserIds" text NOT NULL, "filters" text NOT NULL, "haveAllScopes" boolean NOT NULL DEFAULT (0), "scopes" text NOT NULL)`);
 
     for (const item of items) {
-      item.scopes = [];
+      item.scopes = '[]';
       item.haveAllScopes = item.id === defaultPermissions.CASTERS;
       await insertItemIntoTable('permissions', item, queryRunner);
     }
