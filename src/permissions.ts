@@ -32,7 +32,7 @@ class Permissions extends Core {
       return;
     }
 
-    app.get('/api/core/permissions', withScope(['dashboard:admin:read']), async (req, res) => {
+    app.get('/api/core/permissions', withScope(['dashboard:admin:read', 'core:permission:read']), async (req, res) => {
       res.send({
         status: 'success',
         data:   {

@@ -1,0 +1,27 @@
+import { MigrationInterface, QueryRunner } from 'typeorm';
+
+import { insertItemIntoTable } from '~/database/insertItemIntoTable';
+import defaultPermissions from '~/helpers/permissions/defaultPermissions';
+
+export class permissionScopes1678892044040 implements MigrationInterface {
+  name = 'permissionScopes1678892044040';
+
+  public async up(queryRunner: QueryRunner): Promise<void> {
+    const items = await queryRunner.query(`SELECT * FROM "permissions"`);
+    await queryRunner.query(`DROP TABLE "permissions"`);
+    await queryRunner.query(`CREATE TABLE "permissions" ("id" varchar PRIMARY KEY NOT NULL, "name" varchar NOT NULL, "order" integer NOT NULL, "isCorePermission" boolean NOT NULL, "isWaterfallAllowed" boolean NOT NULL, "automation" varchar(12) NOT NULL, "userIds" text NOT NULL, "excludeUserIds" text NOT NULL, "filters" text NOT NULL, "haveAllScopes" boolean NOT NULL DEFAULT (0), "scopes" text NOT NULL DEFAULT ())`);
+
+    for (const item of items) {
+      item.scopes = [];
+      item.haveAllScopes = item.id === defaultPermissions.CASTERS;
+      await insertItemIntoTable('permissions', item, queryRunner);
+    }
+    await queryRunner.query(`CREATE TABLE "alert_queue" ("id" varchar PRIMARY KEY NOT NULL, "emitData" text NOT NULL, "filter" text, "passthrough" boolean NOT NULL, "play" boolean NOT NULL, "updatedAt" varchar(30) NOT NULL)`);
+    return;
+  }
+
+  public async down(queryRunner: QueryRunner): Promise<void> {
+    return;
+  }
+
+}
