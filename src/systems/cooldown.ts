@@ -241,7 +241,7 @@ class Cooldown extends System {
         const cooldown = await AppDataSource.getRepository(CooldownEntity).findOne({ where: [{ name }, { name: In(groupName) }] });
         if (!cooldown) {
           const defaultValue = await this.getPermissionBasedSettingsValue('defaultCooldownOfCommandsInSeconds');
-          const permId = await getUserHighestPermission(opts.sender.userId);
+          const permId = (await getUserHighestPermission(opts.sender.userId)).id;
 
           // user group have some default cooldown
           if (defaultValue[permId] > 0) {
@@ -280,7 +280,7 @@ class Cooldown extends System {
               data.push(cooldown);
             } else {
               const defaultValue = await this.getPermissionBasedSettingsValue('defaultCooldownOfKeywordsInSeconds');
-              const permId = await getUserHighestPermission(opts.sender.userId);
+              const permId = (await getUserHighestPermission(opts.sender.userId)).id;
               // user group have some default cooldown
               if (defaultValue[permId] > 0) {
                 const canBeRunAt = (defaultCooldowns.find(o =>

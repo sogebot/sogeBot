@@ -4,11 +4,10 @@ import { Socket } from 'socket.io';
 
 import { check } from './permissions/check.js';
 import defaultPermissions from './permissions/defaultPermissions.js';
+import { getUserHighestPermission } from './permissions/getUserHighestPermission.js';
 
 import type { Fn, ClientToServerEventsWithNamespace, NestedFnParams } from '~/../d.ts/src/helpers/socket.js';
 import { debug } from '~/helpers/log.js';
-import * as changelog from '~/helpers/user/changelog.js';
-import { isModerator } from '~/helpers/user/isModerator.js';
 
 const endpoints: {
   type: 'admin' | 'viewer' | 'public';
@@ -44,18 +43,10 @@ const getPrivileges = async(userId: string): Promise<{
         scopes:              Array.from(scopes), // allow all scopes for admin
       };
     }
-    const user = await changelog.getOrFail(userId);
+    const userPermission = await getUserHighestPermission(userId);
     const privileges = {
-      haveAdminPrivileges: false,
-      scopes:              isModerator(user) ? [
-        'dashboard:admin:read',
-        'systems:alias:read',
-        'systems:alias:manage',
-      ] : [
-        // viewer don't have any scope
-      ],
-      // haveModPrivileges:    isModerator(user) ? true : false,
-      // haveViewerPrivileges: true,
+      haveAdminPrivileges: userPermission.haveAllScopes,
+      scopes:              userPermission.scopes ?? [],
     };
     console.log({ privileges });
     return privileges;

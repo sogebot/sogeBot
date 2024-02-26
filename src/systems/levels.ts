@@ -158,7 +158,7 @@ class Levels extends System {
     }
 
     // get user max permission
-    const permId = await getUserHighestPermission(userId);
+    const permId = (await getUserHighestPermission(userId)).id;
     if (!permId) {
       debug('levels.update', `User ${user.userName}#${userId} permId not found`);
       return; // skip without id
@@ -251,7 +251,7 @@ class Levels extends System {
     ]);
 
     // get user max permission
-    const permId = await getUserHighestPermission(opts.sender.userId);
+    const permId = (await getUserHighestPermission(opts.sender.userId)).id;
     if (!permId) {
       return true; // skip without permission
     }

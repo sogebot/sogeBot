@@ -1,4 +1,5 @@
 import { Column, Entity, Index, PrimaryColumn } from 'typeorm';
+
 import { BotEntity } from '../BotEntity.js';
 
 @Entity()
@@ -32,6 +33,12 @@ export class Permissions extends BotEntity {
     type: 'level' | 'ranks' | 'points' | 'watched' | 'tips' | 'bits' | 'messages' | 'subtier' | 'subcumulativemonths' | 'substreakmonths';
     value: string;
   }[];
+
+  @Column({ default: false })
+    haveAllScopes: boolean;
+
+  @Column({ type: 'simple-array', default: [] })
+    scopes: string[];
 }
 
 @Entity()

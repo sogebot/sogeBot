@@ -298,7 +298,7 @@ class UserInfo extends System {
       if (message.includes('$role')) {
         const idx = message.indexOf('$role');
         message[idx] = null;
-        const permId = await getUserHighestPermission(opts.sender.userId);
+        const permId = (await getUserHighestPermission(opts.sender.userId)).id;
         if (permId) {
           const pItem = await get(permId);
           if (pItem) {

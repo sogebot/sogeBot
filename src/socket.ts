@@ -119,7 +119,7 @@ class Socket extends Core {
               username: data.username,
             }, this.JWTKey, { expiresIn: `${this.refreshTokenExpirationTime}s` });
             const payload = {
-              accessToken, refreshToken, userType: userPermission === defaultPermissions.CASTERS ? 'admin' : 'viewer',
+              accessToken, refreshToken, userType: userPermission.id === defaultPermissions.CASTERS ? 'admin' : 'viewer',
             };
             debug('socket', '/socket/refresh ->');
             debug('socket', JSON.stringify(payload, null, 2));

@@ -384,7 +384,7 @@ class Moderation extends System {
     const cLinksIncludeSpaces = await this.getPermissionBasedSettingsValue('cLinksIncludeSpaces');
     const timeoutValues = await this.getPermissionBasedSettingsValue('cLinksTimeout');
 
-    const permId = await getUserHighestPermission(opts.sender.userId);
+    const permId = (await getUserHighestPermission(opts.sender.userId)).id;
     if (permId === defaultPermissions.CASTERS) {
       return true;
     }
@@ -427,7 +427,7 @@ class Moderation extends System {
     const cSymbolsMaxSymbolsPercent = await this.getPermissionBasedSettingsValue('cSymbolsMaxSymbolsPercent');
     const timeoutValues = await this.getPermissionBasedSettingsValue('cSymbolsTimeout');
 
-    const permId = await getUserHighestPermission(opts.sender.userId);
+    const permId = (await getUserHighestPermission(opts.sender.userId)).id;
     if (permId === defaultPermissions.CASTERS) {
       return true;
     }
@@ -477,7 +477,7 @@ class Moderation extends System {
     const cLongMessageTriggerLength = await this.getPermissionBasedSettingsValue('cLongMessageTriggerLength');
     const timeoutValues = await this.getPermissionBasedSettingsValue('cLongMessageTimeout');
 
-    const permId = await getUserHighestPermission(opts.sender.userId);
+    const permId = (await getUserHighestPermission(opts.sender.userId)).id;
     if (permId === defaultPermissions.CASTERS) {
       return true;
     }
@@ -515,7 +515,7 @@ class Moderation extends System {
     const cCapsMaxCapsPercent = await this.getPermissionBasedSettingsValue('cCapsMaxCapsPercent');
     const timeoutValues = await this.getPermissionBasedSettingsValue('cCapsTimeout');
 
-    const permId = await getUserHighestPermission(opts.sender.userId);
+    const permId = (await getUserHighestPermission(opts.sender.userId)).id;
     if (permId === defaultPermissions.CASTERS) {
       return true;
     }
@@ -579,7 +579,7 @@ class Moderation extends System {
     const cSpamMaxLength = await this.getPermissionBasedSettingsValue('cSpamMaxLength');
     const timeoutValues = await this.getPermissionBasedSettingsValue('cSpamTimeout');
 
-    const permId = await getUserHighestPermission(opts.sender.userId);
+    const permId = (await getUserHighestPermission(opts.sender.userId)).id;
     if (permId === defaultPermissions.CASTERS) {
       return true;
     }
@@ -620,7 +620,7 @@ class Moderation extends System {
     const enabled = await this.getPermissionBasedSettingsValue('cColorEnabled');
     const timeoutValues = await this.getPermissionBasedSettingsValue('cColorTimeout');
 
-    const permId = await getUserHighestPermission(opts.sender.userId);
+    const permId = (await getUserHighestPermission(opts.sender.userId)).id;
     if (permId === defaultPermissions.CASTERS) {
       return true;
     }
@@ -655,7 +655,7 @@ class Moderation extends System {
     const cEmotesMaxCount = await this.getPermissionBasedSettingsValue('cEmotesMaxCount');
     const timeoutValues = await this.getPermissionBasedSettingsValue('cEmotesTimeout');
 
-    const permId = await getUserHighestPermission(opts.sender.userId);
+    const permId = (await getUserHighestPermission(opts.sender.userId)).id;
     if (permId === defaultPermissions.CASTERS) {
       return true;
     }
@@ -699,7 +699,7 @@ class Moderation extends System {
     const enabled = await this.getPermissionBasedSettingsValue('cListsEnabled');
     const timeoutValues = await this.getPermissionBasedSettingsValue('cListsTimeout');
 
-    const permId = await getUserHighestPermission(opts.sender.userId);
+    const permId = (await getUserHighestPermission(opts.sender.userId)).id;
     if (permId === defaultPermissions.CASTERS) {
       return true;
     }

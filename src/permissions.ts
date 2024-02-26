@@ -213,6 +213,8 @@ class Permissions extends Core {
         userIds:            [],
         excludeUserIds:     [],
         filters:            [],
+        scopes:             [],
+        haveAllScopes:      true,
       });
       addedCount++;
     }
@@ -228,6 +230,7 @@ class Permissions extends Core {
         userIds:            [],
         excludeUserIds:     [],
         filters:            [],
+        scopes:             [],
       });
       addedCount++;
     }
@@ -243,6 +246,7 @@ class Permissions extends Core {
         userIds:            [],
         excludeUserIds:     [],
         filters:            [],
+        scopes:             [],
       });
       addedCount++;
     }
@@ -258,6 +262,7 @@ class Permissions extends Core {
         userIds:            [],
         excludeUserIds:     [],
         filters:            [],
+        scopes:             [],
       });
       addedCount++;
     }
@@ -273,6 +278,7 @@ class Permissions extends Core {
         userIds:            [],
         excludeUserIds:     [],
         filters:            [],
+        scopes:             [],
       });
       addedCount++;
     }
