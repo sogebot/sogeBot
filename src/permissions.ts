@@ -1,4 +1,4 @@
-import { withScope } from './helpers/socket.js';
+import { scopes, withScope } from './helpers/socket.js';
 
 import Core from '~/_interface.js';
 import { Permissions as PermissionsEntity } from '~/database/entity/permissions.js';
@@ -32,7 +32,7 @@ class Permissions extends Core {
       return;
     }
 
-    app.get('/api/core/permissions', withScope(['dashboard:admin:read', 'core:permission:read']), async (req, res) => {
+    app.get('/api/core/permissions', withScope(['dashboard:admin:read', this.scope('read')]), async (req, res) => {
       res.send({
         status: 'success',
         data:   {
@@ -40,6 +40,12 @@ class Permissions extends Core {
             order: { order: 'ASC' },
           }),
         },
+      });
+    });
+    app.get('/api/core/permissions/availableScopes', withScope([this.scope('read')]), async (req, res) => {
+      res.send({
+        status: 'success',
+        data:   Array.from(scopes),
       });
     });
     adminEndpoint('/core/permissions', 'permission::save', async (data, cb) => {

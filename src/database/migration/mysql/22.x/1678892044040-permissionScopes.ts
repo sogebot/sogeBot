@@ -1,6 +1,6 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-import defaultPermissions from '~/helpers/permissions/defaultPermissions';
+import defaultPermissions from '../../../../helpers/permissions/defaultPermissions.js';
 
 export class permissionScopes1678892044040 implements MigrationInterface {
   name = 'permissionScopes1678892044040';

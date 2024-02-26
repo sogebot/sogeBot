@@ -1,7 +1,7 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-import { insertItemIntoTable } from '~/database/insertItemIntoTable';
-import defaultPermissions from '~/helpers/permissions/defaultPermissions';
+import defaultPermissions from '../../../../helpers/permissions/defaultPermissions.js';
+import { insertItemIntoTable } from '../../../insertItemIntoTable.js';
 
 export class permissionScopes1678892044040 implements MigrationInterface {
   name = 'permissionScopes1678892044040';
