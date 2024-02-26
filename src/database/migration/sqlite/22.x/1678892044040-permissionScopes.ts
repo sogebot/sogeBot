@@ -13,7 +13,7 @@ export class permissionScopes1678892044040 implements MigrationInterface {
 
     for (const item of items) {
       item.scopes = '[]';
-      item.haveAllScopes = item.id === defaultPermissions.CASTERS;
+      item.haveAllScopes = Number(item.id === defaultPermissions.CASTERS);
       await insertItemIntoTable('permissions', item, queryRunner);
     }
     return;
