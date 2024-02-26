@@ -37,7 +37,7 @@ export class Permissions extends BotEntity {
   @Column({ default: false })
     haveAllScopes: boolean;
 
-  @Column({ type: 'simple-array', default: [] })
+  @Column({ type: 'simple-array' })
     scopes: string[];
 }
 

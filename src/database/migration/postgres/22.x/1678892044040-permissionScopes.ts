@@ -7,7 +7,7 @@ export class permissionScopes1678892044040 implements MigrationInterface {
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`ALTER TABLE "permissions" ADD "haveAllScopes" boolean NOT NULL DEFAULT false`);
-    await queryRunner.query(`ALTER TABLE "permissions" ADD "scopes" text NOT NULL DEFAULT '[]'`);
+    await queryRunner.query(`ALTER TABLE "permissions" ADD "scopes" text NOT NULL`);
     await queryRunner.query('UPDATE "permissions" SET "haveAllScopes" = true WHERE "id" != $1', [defaultPermissions.CASTERS]);
     return;
   }
