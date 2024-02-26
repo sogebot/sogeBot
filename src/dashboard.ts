@@ -4,6 +4,7 @@ import Core from '~/_interface.js';
 import { settings } from '~/decorators.js';
 
 class Dashboard extends Core {
+
   @settings(undefined, false)
     µWidgets = [
       'twitch|status|' + randomUUID(),

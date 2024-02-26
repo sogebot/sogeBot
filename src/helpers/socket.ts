@@ -29,6 +29,7 @@ function addScope(scope: string) {
 }
 // Add default scopes
 addScope('dashboard:admin:read');
+console.log('// TODO: change dashboard:admin:manage to use twitch integration scope');
 addScope('dashboard:admin:manage');
 
 const getPrivileges = async(userId: string): Promise<{
