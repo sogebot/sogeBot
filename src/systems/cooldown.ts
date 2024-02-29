@@ -22,9 +22,9 @@ import { app } from '~/helpers/panel.js';
 import { ParameterError } from '~/helpers/parameterError.js';
 import defaultPermissions from '~/helpers/permissions/defaultPermissions.js';
 import { getUserHighestPermission } from '~/helpers/permissions/getUserHighestPermission.js';
+import { withScope } from '~/helpers/socket.js';
 import * as changelog from '~/helpers/user/changelog.js';
 import { isOwner } from '~/helpers/user/index.js';
-import { adminMiddleware } from '~/socket.js';
 import alias from '~/systems/alias.js';
 import customCommands from '~/systems/customcommands.js';
 import { translate } from '~/translate.js';
@@ -89,25 +89,49 @@ class Cooldown extends System {
       return;
     }
 
-    app.get('/api/systems/cooldown', adminMiddleware, async (req, res) => {
+    app.get('/api/systems/cooldown', withScope([
+      this.scope('read'),
+      this.scope('manage'),
+    ]), async (req, res) => {
       res.send({
-        data: await CooldownEntity.find(),
+        status: 'success',
+        data:   {
+          items: await CooldownEntity.find(),
+        },
       });
     });
-    app.get('/api/systems/cooldown/:id', adminMiddleware, async (req, res) => {
+
+    app.get('/api/systems/cooldown/:id', withScope([
+      this.scope('read'),
+      this.scope('manage'),
+    ]), async (req, res) => {
       res.send({
-        data: await CooldownEntity.findOneBy({ id: req.params.id }),
+        status: 'success',
+        data:   await CooldownEntity.findOneBy({ id: req.params.id }),
       });
     });
-    app.delete('/api/systems/cooldown/:id', adminMiddleware, async (req, res) => {
-      await CooldownEntity.delete({ id: req.params.id });
-      res.status(404).send();
+
+    app.delete('/api/systems/cooldown/:id', withScope([
+      this.scope('manage'),
+    ]), async (req, res) => {
+      const item = await CooldownEntity.findOneBy({ id: req.params.id });
+      if (item) {
+        await item.remove();
+      }
+      res.status(204).send();
     });
-    app.post('/api/systems/cooldown', adminMiddleware, async (req, res) => {
+
+    app.post('/api/systems/cooldown', withScope([
+      this.scope('manage'),
+    ]), async (req, res) => {
       try {
-        res.send({ data: await CooldownEntity.create(req.body).save() });
+        const saved = await CooldownEntity.create(req.body).save();
+        res.send({
+          status: 'success',
+          data:   saved,
+        });
       } catch (e) {
-        res.status(400).send({ errors: e });
+        res.status(400).send({ status: 'failure', errors: e });
       }
     });
   }
