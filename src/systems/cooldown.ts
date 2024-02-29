@@ -15,6 +15,7 @@ import { Expects } from  '../expects.js';
 import { Parser } from '../parser.js';
 
 import { AppDataSource } from '~/database.js';
+import { Delete, Get, Post } from '~/decorators/endpoint.js';
 import { prepare } from '~/helpers/commons/index.js';
 import { HIGH, HOUR } from '~/helpers/constants.js';
 import { debug, error, info } from '~/helpers/log.js';
@@ -76,63 +77,32 @@ class Cooldown extends System {
     }
   }
 
+  ///////////////////////// <! API endpoints
+  @Get('/', 'read')
+  findAll() {
+    return CooldownEntity.find();
+  }
+  @Get('/:id', 'read')
+  findOne(params: any) {
+    return CooldownEntity.findOneBy({ id: params.id });
+  }
+  @Delete('/:id')
+  async removeOne(params: any) {
+    const al = await CooldownEntity.findOneBy({ id: params.id });
+    if (al) {
+      await al.remove();
+    }
+  }
+  @Post('/')
+  saveOneGroup(body: any) {
+    return CooldownEntity.create(body).save();
+  }
+  ///////////////////////// API endpoints />
+
   constructor () {
     super();
     this.addMenu({
       category: 'commands', name: 'cooldowns', id: 'commands/cooldowns', this: this, scopeParent: this.scope(),
-    });
-  }
-
-  sockets() {
-    if (!app) {
-      setTimeout(() => this.sockets(), 100);
-      return;
-    }
-
-    app.get('/api/systems/cooldown', withScope([
-      this.scope('read'),
-      this.scope('manage'),
-    ]), async (req, res) => {
-      res.send({
-        status: 'success',
-        data:   {
-          items: await CooldownEntity.find(),
-        },
-      });
-    });
-
-    app.get('/api/systems/cooldown/:id', withScope([
-      this.scope('read'),
-      this.scope('manage'),
-    ]), async (req, res) => {
-      res.send({
-        status: 'success',
-        data:   await CooldownEntity.findOneBy({ id: req.params.id }),
-      });
-    });
-
-    app.delete('/api/systems/cooldown/:id', withScope([
-      this.scope('manage'),
-    ]), async (req, res) => {
-      const item = await CooldownEntity.findOneBy({ id: req.params.id });
-      if (item) {
-        await item.remove();
-      }
-      res.status(204).send();
-    });
-
-    app.post('/api/systems/cooldown', withScope([
-      this.scope('manage'),
-    ]), async (req, res) => {
-      try {
-        const saved = await CooldownEntity.create(req.body).save();
-        res.send({
-          status: 'success',
-          data:   saved,
-        });
-      } catch (e) {
-        res.status(400).send({ status: 'failure', errors: e });
-      }
     });
   }
 
