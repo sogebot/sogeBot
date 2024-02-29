@@ -2,41 +2,50 @@ import { Checklist as ChecklistEntity } from '@entity/checklist.js';
 
 import System from './_interface.js';
 import { onChange, onStreamEnd } from '../decorators/on.js';
-import { settings, ui } from '../decorators.js';
+import { settings } from '../decorators.js';
 
-import { AppDataSource } from '~/database.js';
-import { adminEndpoint } from '~/helpers/socket.js';
+import { app } from '~/helpers/panel.js';
+import { withScope } from '~/helpers/socket.js';
 
 class Checklist extends System {
   @settings('customization')
-  @ui({ type: 'configurable-list' })
     itemsArray: any[] = [];
 
   sockets() {
-    adminEndpoint('/systems/checklist', 'generic::getAll', async (cb) => {
-      try {
-        const checkedItems = await AppDataSource.getRepository(ChecklistEntity).find();
-        cb(null, this.itemsArray, checkedItems);
-      } catch(e: any) {
-        cb(e.stack, [], []);
-      }
+    if (!app) {
+      setTimeout(() => this.sockets(), 100);
+      return;
+    }
+
+    app.get('/api/systems/checklist', withScope([this.scope('read'), this.scope('manage')]), async (req, res) => {
+      const checkedItems = await ChecklistEntity.find();
+      res.send({
+        status: 'success',
+        data:   {
+          items: this.itemsArray.map(it => ({ id: it, isCompleted: checkedItems.find(cit => cit.id === it)?.isCompleted ?? false })),
+        },
+      });
     });
-    adminEndpoint('/systems/checklist', 'checklist::save', async (checklistItem, cb) => {
-      await AppDataSource.getRepository(ChecklistEntity).save(checklistItem);
-      if (cb) {
-        cb(null);
+    app.post('/api/systems/checklist',  withScope([this.scope('manage')]), async (req, res) => {
+      try {
+        await ChecklistEntity.create(req.body).save();
+        res.send({
+          status: 'success',
+        });
+      } catch (e) {
+        res.status(400).send({ errors: e });
       }
     });
   }
 
   @onChange('itemsArray')
   onChangeItemsArray() {
-    AppDataSource.getRepository(ChecklistEntity).clear();
+    ChecklistEntity.clear();
   }
 
   @onStreamEnd()
   public onStreamEnd() {
-    AppDataSource.getRepository(ChecklistEntity).update({}, { isCompleted: false });
+    ChecklistEntity.update({}, { isCompleted: false });
   }
 }
 

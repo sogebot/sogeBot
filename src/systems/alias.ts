@@ -1,6 +1,5 @@
 import { Alias as AliasEntity, AliasGroup } from '@entity/alias.js';
 import * as _ from 'lodash-es';
-import { merge } from 'lodash-es';
 
 import System from './_interface.js';
 import { parserReply } from '../commons.js';
@@ -23,7 +22,7 @@ import { app } from '~/helpers/panel.js';
 import { check } from '~/helpers/permissions/check.js';
 import { defaultPermissions } from '~/helpers/permissions/defaultPermissions.js';
 import { get } from '~/helpers/permissions/get.js';
-import { endpoint, withScope } from '~/helpers/socket.js';
+import { withScope } from '~/helpers/socket.js';
 import customCommands from '~/systems/customcommands.js';
 import { translate } from '~/translate.js';
 
@@ -62,7 +61,7 @@ class Alias extends System {
       return;
     }
 
-    app.get('/api/systems/alias/groups/', withScope([this.scope('read')]), async (req, res) => {
+    app.get('/api/systems/groups/alias/', withScope([this.scope('read')]), async (req, res) => {
       let groupsList = await AliasGroup.find();
       for (const item of await AliasEntity.find()) {
         if (item.group && !groupsList.find(o => o.name === item.group)) {
@@ -87,7 +86,10 @@ class Alias extends System {
       });
     });
 
-    app.get('/api/systems/alias', withScope([this.scope('read')]), async (req, res) => {
+    app.get('/api/systems/alias', withScope([
+      this.scope('read'),
+      this.scope('manage'),
+    ]), async (req, res) => {
       res.send({
         status: 'success',
         data:   {
@@ -96,7 +98,10 @@ class Alias extends System {
       });
     });
 
-    app.get('/api/systems/alias/:id', withScope([this.scope('read')]), async (req, res) => {
+    app.get('/api/systems/alias/:id', withScope([
+      this.scope('read'),
+      this.scope('manage'),
+    ]), async (req, res) => {
       res.send({
         status: 'success',
         data:   {
@@ -105,47 +110,61 @@ class Alias extends System {
       });
     });
 
-    endpoint([this.scope('manage')], '/systems/alias', 'generic::groups::deleteById', async (name, cb) => {
+    app.delete('/api/systems/alias/:id', withScope([
+      this.scope('manage'),
+    ]), async (req, res) => {
+      const al = await AliasEntity.findOneBy({ id: req.params.id });
+      if (al) {
+        await al.remove();
+      }
+      res.status(204).send();
+    });
+
+    app.post('/api/systems/alias', withScope([
+      this.scope('manage'),
+    ]), async (req, res) => {
       try {
-        const group = await AliasGroup.findOneBy({ name });
-        if (!group) {
-          throw new Error(`Group ${name} not found`);
-        }
-        await group.remove();
-        cb(null);
+        const saved = await AliasEntity.create(req.body).save();
+        res.send({
+          status: 'success',
+          data:   saved,
+        });
       } catch (e) {
-        cb(e as Error);
+        res.status(400).send({ status: 'failure', errors: e });
       }
     });
-    endpoint([this.scope('manage')], '/systems/alias', 'generic::groups::save', async (item, cb) => {
-      try {
-        const itemToSave = new AliasGroup();
-        merge(itemToSave, item);
-        await itemToSave.save();
-        cb(null, itemToSave);
-      } catch (e) {
-        if (e instanceof Error) {
-          cb(e.message, undefined);
-        }
-      }
+
+    app.get('/api/systems/groups/alias/:name', withScope([
+      this.scope('read'),
+      this.scope('manage'),
+    ]), async (req, res) => {
+      res.send({
+        status: 'success',
+        data:   await AliasGroup.findOneBy({ name: req.params.name }),
+      });
     });
-    endpoint([this.scope('manage')], '/systems/alias', 'generic::deleteById', async (id, cb) => {
-      try {
-        const alias = await AliasEntity.findOneBy({ id });
-        if (!alias) {
-          throw new Error(`Alias ${id} not found`);
-        }
-        await alias.remove();
-        cb(null);
-      } catch (e) {
-        cb(e as Error);
+
+    app.delete('/api/systems/groups/alias/:name', withScope([
+      this.scope('manage'),
+    ]), async (req, res) => {
+      const al = await AliasGroup.findOneBy({ name: req.params.name });
+      if (al) {
+        await al.remove();
       }
+      res.status(204).send();
     });
-    endpoint([this.scope('manage')], '/systems/alias', 'generic::save', async (item, cb) => {
+
+    app.post('/api/systems/groups/alias', withScope([
+      this.scope('manage'),
+    ]), async (req, res) => {
       try {
-        cb(null, await AliasEntity.create(item).save());
+        const saved = await AliasGroup.create(req.body).save();
+        res.send({
+          status: 'success',
+          data:   saved,
+        });
       } catch (e) {
-        cb(e, undefined);
+        res.status(400).send({ status: 'failure', errors: e });
       }
     });
   }
