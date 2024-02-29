@@ -10,6 +10,7 @@ import { Expects } from  '../expects.js';
 import { Parser } from '../parser.js';
 
 import { AppDataSource } from '~/database.js';
+import { Delete, Get, Post } from '~/decorators/endpoint.js';
 import { checkFilter } from '~/helpers/checkFilter.js';
 import { incrementCountOfCommandUsage } from '~/helpers/commands/count.js';
 import { prepare } from '~/helpers/commons/index.js';
@@ -18,11 +19,9 @@ import { executeVariablesInText } from '~/helpers/customvariables/index.js';
 import {
   debug, error, info, warning,
 } from '~/helpers/log.js';
-import { app } from '~/helpers/panel.js';
 import { check } from '~/helpers/permissions/check.js';
 import { defaultPermissions } from '~/helpers/permissions/defaultPermissions.js';
 import { get } from '~/helpers/permissions/get.js';
-import { withScope } from '~/helpers/socket.js';
 import customCommands from '~/systems/customcommands.js';
 import { translate } from '~/translate.js';
 
@@ -55,119 +54,65 @@ class Alias extends System {
     });
   }
 
-  sockets() {
-    if (!app) {
-      setTimeout(() => this.sockets(), 100);
-      return;
+  ///////////////////////// <! API endpoints
+  @Post('/')
+  saveOne(body: any) {
+    return AliasEntity.create(body).save();
+  }
+  @Get('/', 'read')
+  findAll() {
+    return AliasEntity.find();
+  }
+  @Get('/:id', 'read')
+  findOne(params: any) {
+    return AliasEntity.findOneBy({ id: params.id });
+  }
+  @Delete('/:id')
+  async removeOne(params: any) {
+    const al = await AliasEntity.findOneBy({ id: params.id });
+    if (al) {
+      await al.remove();
     }
-
-    app.get('/api/systems/groups/alias/', withScope([this.scope('read')]), async (req, res) => {
-      let groupsList = await AliasGroup.find();
-      for (const item of await AliasEntity.find()) {
-        if (item.group && !groupsList.find(o => o.name === item.group)) {
+  }
+  @Post('/', '/systems/groups/alias')
+  saveOneGroup(body: any) {
+    return AliasGroup.create(body).save();
+  }
+  @Get('/', 'read', '/systems/groups/alias')
+  findAllGroups(params: any) {
+    return new Promise((resolve, reject) => {
+      Promise.all([AliasGroup.find(), AliasEntity.find()]).then(([groupsList, aliases]) => {
+        for (const item of aliases) {
+          if (item.group && !groupsList.find(o => o.name === item.group)) {
           // we dont have any group options -> create temporary group
-          const group = new AliasGroup();
-          group.name = item.group;
-          group.options = {
-            filter:     null,
-            permission: null,
-          };
-          groupsList = [
-            ...groupsList,
-            group,
-          ];
+            const group = new AliasGroup();
+            group.name = item.group;
+            group.options = {
+              filter:     null,
+              permission: null,
+            };
+            groupsList = [
+              ...groupsList,
+              group,
+            ];
+          }
         }
-      }
-      res.send({
-        status: 'success',
-        data:   {
-          items: groupsList,
-        },
+        resolve(groupsList);
       });
-    });
-
-    app.get('/api/systems/alias', withScope([
-      this.scope('read'),
-      this.scope('manage'),
-    ]), async (req, res) => {
-      res.send({
-        status: 'success',
-        data:   {
-          items: await AliasEntity.find(),
-        },
-      });
-    });
-
-    app.get('/api/systems/alias/:id', withScope([
-      this.scope('read'),
-      this.scope('manage'),
-    ]), async (req, res) => {
-      res.send({
-        status: 'success',
-        data:   {
-          items: await AliasEntity.findOneBy({ id: req.params.id }),
-        },
-      });
-    });
-
-    app.delete('/api/systems/alias/:id', withScope([
-      this.scope('manage'),
-    ]), async (req, res) => {
-      const al = await AliasEntity.findOneBy({ id: req.params.id });
-      if (al) {
-        await al.remove();
-      }
-      res.status(204).send();
-    });
-
-    app.post('/api/systems/alias', withScope([
-      this.scope('manage'),
-    ]), async (req, res) => {
-      try {
-        const saved = await AliasEntity.create(req.body).save();
-        res.send({
-          status: 'success',
-          data:   saved,
-        });
-      } catch (e) {
-        res.status(400).send({ status: 'failure', errors: e });
-      }
-    });
-
-    app.get('/api/systems/groups/alias/:name', withScope([
-      this.scope('read'),
-      this.scope('manage'),
-    ]), async (req, res) => {
-      res.send({
-        status: 'success',
-        data:   await AliasGroup.findOneBy({ name: req.params.name }),
-      });
-    });
-
-    app.delete('/api/systems/groups/alias/:name', withScope([
-      this.scope('manage'),
-    ]), async (req, res) => {
-      const al = await AliasGroup.findOneBy({ name: req.params.name });
-      if (al) {
-        await al.remove();
-      }
-      res.status(204).send();
-    });
-
-    app.post('/api/systems/groups/alias', withScope([
-      this.scope('manage'),
-    ]), async (req, res) => {
-      try {
-        const saved = await AliasGroup.create(req.body).save();
-        res.send({
-          status: 'success',
-          data:   saved,
-        });
-      } catch (e) {
-        res.status(400).send({ status: 'failure', errors: e });
-      }
     });
   }
+  @Get('/:name', 'read', '/systems/groups/alias')
+  findOneGroup(params: any) {
+    return AliasGroup.findOneBy({ name: params.name });
+  }
+  @Delete('/:name', '/systems/groups/alias')
+  async removeOneGroup(params: any) {
+    const al = await AliasGroup.findOneBy({ name: params.name });
+    if (al) {
+      await al.remove();
+    }
+  }
+  ///////////////////////// API endpoints />
 
   async search(opts: ParserOptions): Promise<[Readonly<Required<AliasEntity>> | null, string[]]> {
     let alias: Readonly<Required<AliasEntity>> | undefined;

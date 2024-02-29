@@ -51,7 +51,7 @@ const checkIfDecoratorsAreLoaded = () => {
 };
 checkIfDecoratorsAreLoaded();
 
-function getNameAndTypeFromStackTrace(): { name: string, type: keyof typeof systems} {
+export function getNameAndTypeFromStackTrace(): { name: string, type: keyof typeof systems} {
   const _prepareStackTrace = Error.prepareStackTrace;
   Error.prepareStackTrace = (_s, s) => s;
   const stack = (new Error().stack as unknown as NodeJS.CallSite[]);
