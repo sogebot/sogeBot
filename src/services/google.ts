@@ -230,13 +230,15 @@ class Google extends Service {
   @onStreamEnd()
   async onStreamEnd() {
     const broadcast = await this.getBroadcast();
+
     if (this.client && broadcast) {
-      setTimeout(() => this.prepareBroadcast, 10000);
+      setTimeout(() => this.prepareBroadcast(), 10000);
       const youtube = google.youtube({
         auth:    this.client,
         version: 'v3',
       });
 
+      info(`YOUTUBE: Stream ended, updating title, description and privacy status of the broadcast ${broadcast.id}.`);
       // get active broadcasts
       youtube.liveBroadcasts.update({
         part:        ['id','snippet','contentDetails','status'],
