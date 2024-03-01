@@ -5,8 +5,6 @@ import { onChange, onStreamEnd } from '../decorators/on.js';
 import { settings } from '../decorators.js';
 
 import { Get, Post } from '~/decorators/endpoint.js';
-import { app } from '~/helpers/panel.js';
-import { withScope } from '~/helpers/socket.js';
 
 class Checklist extends System {
   @settings('customization')

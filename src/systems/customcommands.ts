@@ -14,19 +14,18 @@ import {
 } from '../decorators.js';
 import { Expects } from  '../expects.js';
 
+import { Post, Get, Delete } from '~/decorators/endpoint.js';
 import { checkFilter } from '~/helpers/checkFilter.js';
 import {
   getAllCountOfCommandUsage, getCountOfCommandUsage, incrementCountOfCommandUsage, resetCountOfCommandUsage,
 } from '~/helpers/commands/count.js';
 import { prepare } from '~/helpers/commons/index.js';
+import { HIGHEST } from '~/helpers/constants.js';
 import { info, warning } from '~/helpers/log.js';
-import { app } from '~/helpers/panel.js';
 import { check } from '~/helpers/permissions/check.js';
 import { defaultPermissions } from '~/helpers/permissions/defaultPermissions.js';
 import { get } from '~/helpers/permissions/get.js';
-import { adminMiddleware } from '~/socket.js';
 import { translate } from '~/translate.js';
-import { HIGHEST } from '~/helpers/constants.js';
 
 /*
  * !command                                                                            - gets an info about command usage
@@ -48,82 +47,78 @@ class CustomCommands extends System {
     });
   }
 
-  sockets () {
-    if (!app) {
-      setTimeout(() => this.sockets(), 100);
-      return;
+  ///////////////////////// <! API endpoints
+  @Post('/')
+  async saveOne(body: any) {
+    const { count, ...data } = body;
+    const saved = await Commands.create(data).save();
+
+    if (count === 0) {
+      await resetCountOfCommandUsage(saved.command);
     }
-
-    app.get('/api/systems/customcommands', adminMiddleware, async (req, res) => {
-      res.send({
-        data:  await Commands.find(),
-        count: await getAllCountOfCommandUsage(),
-      });
-    });
-    app.get('/api/systems/customcommands/groups/', adminMiddleware, async (req, res) => {
-      let groupsList = await CommandsGroup.find();
-      for (const item of await Commands.find()) {
-        if (item.group && !groupsList.find(o => o.name === item.group)) {
+    return saved;
+  }
+  @Get('/', 'read')
+  async findAll() {
+    const [ items, count ] = await Promise.all([Commands.find(), getAllCountOfCommandUsage()]);
+    return {
+      items, count,
+    };
+  }
+  @Get('/:id', 'read')
+  async findOne(params: any) {
+    const cmd = await Commands.findOneBy({ id: params.id });
+    return {
+      data:  cmd,
+      count: cmd ? await getCountOfCommandUsage(cmd.command) : 0,
+    };
+  }
+  @Delete('/:id')
+  async removeOne(params: any) {
+    const al = await Commands.findOneBy({ id: params.id });
+    if (al) {
+      await al.remove();
+    }
+  }
+  @Post('/', '/systems/groups/customcommands')
+  saveOneGroup(body: any) {
+    return CommandsGroup.create(body).save();
+  }
+  @Get('/', 'read', '/systems/groups/customcommands')
+  findAllGroups(params: any) {
+    return new Promise((resolve, reject) => {
+      Promise.all([CommandsGroup.find(), Commands.find()]).then(([groupsList, aliases]) => {
+        for (const item of aliases) {
+          if (item.group && !groupsList.find(o => o.name === item.group)) {
           // we dont have any group options -> create temporary group
-          const group = new CommandsGroup();
-          group.name = item.group;
-          group.options = {
-            filter:     null,
-            permission: null,
-          };
-          groupsList = [
-            ...groupsList,
-            group,
-          ];
+            const group = new CommandsGroup();
+            group.name = item.group;
+            group.options = {
+              filter:     null,
+              permission: null,
+            };
+            groupsList = [
+              ...groupsList,
+              group,
+            ];
+          }
         }
-      }
-      res.send({
-        data: groupsList,
+        resolve(groupsList);
       });
-    });
-    app.get('/api/systems/customcommands/:id', adminMiddleware, async (req, res) => {
-      const cmd = await Commands.findOneBy({ id: req.params.id });
-      res.send({
-        data:  cmd,
-        count: cmd ? await getCountOfCommandUsage(cmd.command) : 0,
-      });
-    });
-    app.delete('/api/systems/customcommands/groups/:name', adminMiddleware, async (req, res) => {
-      const group = await CommandsGroup.findOneBy({ name: req.params.name });
-      if (group) {
-        await group.remove();
-      }
-      res.status(404).send();
-    });
-    app.delete('/api/systems/customcommands/:id', adminMiddleware, async (req, res) => {
-      const cmd = await Commands.findOneBy({ id: req.params.id });
-      if (cmd) {
-        await cmd.remove();
-      }
-      res.status(404).send();
-    });
-    app.post('/api/systems/customcommands/group', adminMiddleware, async (req, res) => {
-      try {
-        res.send({ data: await CommandsGroup.create(req.body).save() });
-      } catch (e) {
-        res.status(400).send({ errors: e });
-      }
-    });
-    app.post('/api/systems/customcommands', adminMiddleware, async (req, res) => {
-      try {
-        const { count, ...data } = req.body;
-        const saved = await Commands.create(data).save();
-
-        if (count === 0) {
-          await resetCountOfCommandUsage(saved.command);
-        }
-
-        res.send({ data: saved });
-      } catch (e) {
-        res.status(400).send({ errors: e });
-      }
     });
   }
+  @Get('/:name', 'read', '/systems/groups/customcommands')
+  findOneGroup(params: any) {
+    return CommandsGroup.findOneBy({ name: params.name });
+  }
+  @Delete('/:name', '/systems/groups/customcommands')
+  async removeOneGroup(params: any) {
+    const al = await CommandsGroup.findOneBy({ name: params.name });
+    if (al) {
+      await al.remove();
+    }
+  }
+  ///////////////////////// API endpoints />
 
   @command('!command')
   @default_permission(defaultPermissions.CASTERS)
