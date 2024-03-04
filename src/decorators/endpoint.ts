@@ -38,10 +38,16 @@ export function Post<T extends string>(endpoint: T, customEndpoint?: string) {
           if (fnc.value) {
             try {
               const data = await fnc.value.bind(self)(req.body as any);
-              res.send({
-                status: 'success',
-                data:   data,
-              });
+              if (data === undefined) {
+                res.send({
+                  status: 'success',
+                });
+              } else {
+                res.send({
+                  status: 'success',
+                  data:   data,
+                });
+              }
             } catch (e) {
               res.status(400).send({ status: 'error', errors: e });
             }
