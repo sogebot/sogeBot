@@ -34,7 +34,6 @@ import { adminEndpoint } from '~/helpers/socket.js';
 import { adminMiddleware } from '~/socket.js';
 
 const tubeChat = new TubeChat();
-
 let titleChangeRequestRetry = 0;
 
 class Google extends Service {
@@ -380,6 +379,7 @@ class Google extends Service {
         version: 'v3',
       });
 
+      debug('google', 'youtube.liveBroadcasts.list()');
       const channel = await youtube.channels.list({
         part: ['snippet,contentDetails'],
         mine: true,
@@ -400,6 +400,7 @@ class Google extends Service {
     const youtube = this.getYoutube();
     if (youtube) {
       // get active broadcasts
+      debug('google', 'youtube.liveBroadcasts.update()');
       await youtube.liveBroadcasts.update({
         part:        ['id','snippet','contentDetails','status'],
         requestBody: {
@@ -439,6 +440,7 @@ class Google extends Service {
     const youtube = this.getYoutube();
     if (youtube) {
       // get active broadcasts
+      debug('google', 'youtube.liveBroadcasts.list(active)');
       const list = await youtube.liveBroadcasts.list({
         part:            ['id','snippet','contentDetails','status'],
         broadcastStatus: 'active',
@@ -460,6 +462,7 @@ class Google extends Service {
     // we want to create new stream, private for now for archive purpose
     if (youtube) {
       // get active broadcasts
+      debug('google', 'youtube.liveBroadcasts.list(upcoming)');
       const list = await youtube.liveBroadcasts.list({
         part:            ['id','snippet','contentDetails','status'],
         broadcastStatus: 'upcoming',
