@@ -487,7 +487,7 @@ class Chat {
       resub(`${username}#${userstate.userId}, streak share: ${subStreakShareEnabled}, streak: ${subStreak}, months: ${amount}, message: ${message}, tier: ${tier}`);
       eventEmitter.emit('resub', {
         userName:                username,
-        tier:                    String(tier),
+        tier,
         subStreakShareEnabled,
         subStreak,
         subStreakName:           getLocalizedName(subStreak, translate('core.months')),
@@ -517,6 +517,7 @@ class Chat {
     try {
       const userId = subInfo.gifterUserId ?? '';
       const count = subInfo.count;
+      const tier = String(Number(subInfo.plan) / 1000) as EmitData['tier'];
 
       changelog.increment(userId, { giftedSubscribes: Number(count) });
 
@@ -533,14 +534,14 @@ class Chat {
         count,
         timestamp: Date.now(),
       });
-      eventEmitter.emit('subcommunitygift', { userName: username, count });
+      eventEmitter.emit('subcommunitygift', { userName: username, count, tier });
       subcommunitygift(`${username}#${userId}, to ${count} viewers`);
       alerts.trigger({
         eventId:    eventData?.id ?? null,
         event:      'subcommunitygift',
         name:       username,
         amount:     Number(count),
-        tier:       null,
+        tier,
         currency:   '',
         monthsName: '',
         message:    '',
@@ -559,7 +560,7 @@ class Chat {
       const userId = subInfo.gifterUserId ?? '0';
       const amount = subInfo.months;
       const recipientId = subInfo.userId;
-      const tier = (subInfo.isPrime ? 1 : (Number(subInfo.plan ?? 1000) / 1000));
+      const tier = String(subInfo.isPrime ? 'Prime' : (Number(subInfo.plan ?? 1000) / 1000)) as EmitData['tier'];
 
       const ignoreGifts = (ignoreGiftsFromUser.get(userId) ?? 0);
       let isGiftIgnored = false;

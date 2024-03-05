@@ -1,6 +1,7 @@
 import { EventSubChannelGoalType } from '@twurple/eventsub-base/lib/events/common/EventSubChannelGoalType';
 import { TypedEmitter } from 'tiny-typed-emitter';
 
+import { EmitData } from '~/database/entity/overlay.js';
 import { Types } from '~/plugins/ListenTo.js';
 
 export interface Events {
@@ -58,7 +59,7 @@ export interface Events {
   'cheer': (opts: {userName: string, userId: string, bits: number, message: string}) => void;
   'user-joined-channel': (opts: {userName: string}) => void;
   'user-parted-channel': (opts: {userName: string}) => void;
-  'subcommunitygift': (opts: {userName: string; count: number}) => void;
+  'subcommunitygift': (opts: {userName: string; count: number, tier: EmitData['tier']}) => void;
   'reward-redeemed': (opts: {userId: string; userName: string; rewardId: string; userInput: string;}) => void;
   'timeout': (opts: {userName: string; duration: number}) => void;
   'ban': (opts: {userName: string; reason: string}) => void;
@@ -66,15 +67,15 @@ export interface Events {
   'highlight': (opts: {userId: string, message: string}) => void;
   'stream-started': () => void;
   'stream-stopped': () => void;
-  'subscription': (opts: { userName: string; method: string; subCumulativeMonths: number; tier: string}) => void;
-  'resub': (opts: { userName: string; subStreakShareEnabled: boolean, subStreak: number; subStreakName: string; subCumulativeMonthsName: string; message: string; subCumulativeMonths: number; tier: string}) => void;
+  'subscription': (opts: { userName: string; method: string; subCumulativeMonths: number; tier: EmitData['tier']}) => void;
+  'resub': (opts: { userName: string; subStreakShareEnabled: boolean, subStreak: number; subStreakName: string; subCumulativeMonthsName: string; message: string; subCumulativeMonths: number; tier: EmitData['tier']}) => void;
   'clearchat': () => void;
   'command-send-x-times': (opts: { reset: boolean } | { userName: string, message: string, source: 'discord' | 'twitch' }) => void;
   'keyword-send-x-times': (opts: { reset: boolean } | { userName: string, message: string, source: 'discord' | 'twitch' }) => void;
   'chatter-first-message': (opts: { userName: string, message: string, source: 'twitch' }) => void;
   'every-x-minutes-of-stream': (opts: { reset: boolean }) => void;
   'stream-is-running-x-minutes': (opts: { reset: boolean }) => void;
-  'subgift': (opts: { userName: string; recipient: string; tier: number; }) => void;
+  'subgift': (opts: { userName: string; recipient: string; tier: EmitData['tier']; }) => void;
   'number-of-viewers-is-at-least-x': (opts: { reset: boolean }) => void;
   'tip': (opts: { isAnonymous: boolean, userName: string, amount: string; currency: string; amountInBotCurrency: string; currencyInBot: string; message: string; }) => void;
   // OBS Websocket integration
