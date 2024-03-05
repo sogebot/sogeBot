@@ -85,6 +85,8 @@ class Tiltify extends Integration {
     } else {
       info(`TILTIFY: Not logged in.`);
     }
+
+    let loggedError = false;
     setInterval(async () => {
       if (this.enabled) {
         return;
@@ -94,8 +96,15 @@ class Tiltify extends Integration {
         try {
           await this.getCampaigns();
           await this.getDonations();
+          if (loggedError) {
+            info(`TILTIFY: Successfully fetched campaigns and donations.`);
+          }
+          loggedError = false;
         } catch(e) {
-          error(e);
+          if (!loggedError) {
+            error(e);
+            loggedError = true;
+          }
         }
         release();
       }
@@ -108,6 +117,9 @@ class Tiltify extends Integration {
         'Authorization': `Bearer ${this.access_token}`,
       },
     });
+    if (response.status !== 200) {
+      throw new Error(`TILTIFY: Error during fetching campaigns. Status: ${response.status}`);
+    }
     this.campaigns = (await response.json() as any).data;
   }
 
@@ -118,6 +130,9 @@ class Tiltify extends Integration {
           'Authorization': `Bearer ${this.access_token}`,
         },
       });
+      if (response.status !== 200) {
+        throw new Error(`TILTIFY: Error during fetching donations. Status: ${response.status}`);
+      }
       const data = (await response.json() as any).data as {
         'id': number,
         'amount': number,
