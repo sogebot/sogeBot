@@ -17,8 +17,8 @@ class Checklist extends System {
     return this.itemsArray.map(it => ({ id: it, isCompleted: checkedItems.find(cit => cit.id === it)?.isCompleted ?? false }));
   }
   @Post('/')
-  saveOneGroup(body: any) {
-    return ChecklistEntity.create(body).save();
+  saveOneGroup(req: any) {
+    return ChecklistEntity.create(req.body).save();
   }
   ///////////////////////// API endpoints />
 

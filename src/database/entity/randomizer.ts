@@ -8,7 +8,7 @@ import { command } from '../validators/IsCommand.js';
 @Entity()
 @Index('idx_randomizer_cmdunique', [ 'command' ], { unique: true })
 export class Randomizer extends BotEntity {
-  schema = z.object({
+  _schema = z.object({
     command: command(),
     name:    z.string().min(2),
   });

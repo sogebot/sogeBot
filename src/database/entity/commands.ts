@@ -6,7 +6,7 @@ import { command } from '../validators/IsCommand.js';
 
 @Entity()
 export class Commands extends BotEntity {
-  schema = z.object({
+  _schema = z.object({
     command: command(),
   });
 

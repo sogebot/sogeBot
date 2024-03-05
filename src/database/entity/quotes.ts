@@ -5,7 +5,7 @@ import { BotEntity } from '../BotEntity.js';
 
 @Entity()
 export class Quotes extends BotEntity {
-  schema = z.object({
+  _schema = z.object({
     quote: z.string().min(1),
   });
 

@@ -92,8 +92,8 @@ class Cooldown extends System {
     }
   }
   @Post('/')
-  saveOneGroup(body: any) {
-    return CooldownEntity.create(body).save();
+  saveOneGroup(req: any) {
+    return CooldownEntity.create(req.body).save();
   }
   ///////////////////////// API endpoints />
 

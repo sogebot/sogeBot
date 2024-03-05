@@ -6,7 +6,7 @@ import { command } from '../validators/IsCommand.js';
 
 @Entity()
 export class Price extends BotEntity {
-  schema = z.intersection(
+  _schema = z.intersection(
     // we need to validate command separately as refine is not triggered until all other validation passes
     z.object({
       command: command(),

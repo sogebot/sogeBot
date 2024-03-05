@@ -49,8 +49,8 @@ class CustomCommands extends System {
 
   ///////////////////////// <! API endpoints
   @Post('/')
-  async saveOne(body: any) {
-    const { count, ...data } = body;
+  async saveOne(req: any) {
+    const { count, ...data } = req.body;
     const saved = await Commands.create(data).save();
 
     if (count === 0) {
@@ -81,8 +81,8 @@ class CustomCommands extends System {
     }
   }
   @Post('/', '/systems/groups/customcommands')
-  saveOneGroup(body: any) {
-    return CommandsGroup.create(body).save();
+  saveOneGroup(req: any) {
+    return CommandsGroup.create(req.body).save();
   }
   @Get('/', 'read', '/systems/groups/customcommands')
   findAllGroups(params: any) {

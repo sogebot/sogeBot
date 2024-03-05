@@ -56,8 +56,8 @@ class Alias extends System {
 
   ///////////////////////// <! API endpoints
   @Post('/')
-  saveOne(body: any) {
-    return AliasEntity.create(body).save();
+  saveOne(req: any) {
+    return AliasEntity.create(req.body).save();
   }
   @Get('/', 'read')
   findAll() {
@@ -75,8 +75,8 @@ class Alias extends System {
     }
   }
   @Post('/', '/systems/groups/alias')
-  saveOneGroup(body: any) {
-    return AliasGroup.create(body).save();
+  saveOneGroup(req: any) {
+    return AliasGroup.create(req.body).save();
   }
   @Get('/', 'read', '/systems/groups/alias')
   findAllGroups(params: any) {

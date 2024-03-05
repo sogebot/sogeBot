@@ -10,7 +10,7 @@ import { withScope } from '~/helpers/socket.js';
 export function Post<T extends string>(endpoint: T, customEndpoint?: string) {
   const { name, type } = getNameAndTypeFromStackTrace();
 
-  return (_target: any, key: string, fnc: TypedPropertyDescriptor<(params?: RouteParameters<T>) => Promise<any>>) => {
+  return (_target: any, key: string, fnc: TypedPropertyDescriptor<(req?: any) => Promise<any>>) => {
     let retries = 0;
 
     const registerEndpoint = () => {
@@ -37,7 +37,10 @@ export function Post<T extends string>(endpoint: T, customEndpoint?: string) {
         try {
           if (fnc.value) {
             try {
-              const data = await fnc.value.bind(self)(req.body as any);
+              if (req.body._schema) {
+                delete req.body._schema;
+              }
+              const data = await fnc.value.bind(self)(req);
               if (data === undefined) {
                 res.send({
                   status: 'success',

@@ -5,7 +5,7 @@ import { BotEntity } from '../BotEntity.js';
 
 @Entity()
 export class Keyword extends BotEntity {
-  schema = z.object({
+  _schema = z.object({
     keyword: z.string().min(2),
   });
 

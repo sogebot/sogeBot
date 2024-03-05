@@ -7,7 +7,7 @@ import { commandOrCustomVariable } from '../validators/IsCommandOrCustomVariable
 
 @Entity()
 export class Alias extends BotEntity {
-  schema = z.object({
+  _schema = z.object({
     alias:   command(),
     command: commandOrCustomVariable(),
   });
@@ -37,7 +37,7 @@ export class Alias extends BotEntity {
 
 @Entity()
 export class AliasGroup extends BotEntity {
-  schema = z.object({
+  _schema = z.object({
     name: z.string().min(2),
   });
 
