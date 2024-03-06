@@ -13,16 +13,15 @@ import {
 } from '../decorators.js';
 import { Expects } from  '../expects.js';
 
+import { Delete, Get, Post } from '~/decorators/endpoint.js';
 import { checkFilter } from '~/helpers/checkFilter.js';
 import { isUUID, prepare } from '~/helpers/commons/index.js';
 import {
   debug, error, warning,
 } from '~/helpers/log.js';
-import { app } from '~/helpers/panel.js';
 import { check } from '~/helpers/permissions/check.js';
 import { defaultPermissions } from '~/helpers/permissions/defaultPermissions.js';
 import { get } from '~/helpers/permissions/get.js';
-import { adminMiddleware } from '~/socket.js';
 import { translate } from '~/translate.js';
 
 class Keywords extends System {
@@ -33,70 +32,65 @@ class Keywords extends System {
     });
   }
 
-  sockets () {
-    if (!app) {
-      setTimeout(() => this.sockets(), 100);
-      return;
+  ///////////////////////// <! API endpoints
+  @Post('/')
+  async saveOne(req: any) {
+    return Keyword.create(req.body).save();
+  }
+  @Get('/', 'read')
+  async findAll() {
+    return Keyword.find();
+  }
+  @Get('/:id', 'read')
+  async findOne(params: any) {
+    return Keyword.findOneBy({ id: params.id });
+  }
+  @Delete('/:id')
+  async removeOne(params: any) {
+    const al = await Keyword.findOneBy({ id: params.id });
+    if (al) {
+      await al.remove();
     }
-
-    app.get('/api/systems/keywords', adminMiddleware, async (req, res) => {
-      res.send({
-        data: await Keyword.find(),
-      });
-    });
-    app.get('/api/systems/keywords/groups/', adminMiddleware, async (req, res) => {
-      let [ groupsList, items ] = await Promise.all([
-        KeywordGroup.find(), Keyword.find(),
-      ]);
-
-      for (const item of items) {
-        if (item.group && !groupsList.find(o => o.name === item.group)) {
+  }
+  @Post('/', '/systems/groups/keywords')
+  saveOneGroup(req: any) {
+    return KeywordGroup.create(req.body).save();
+  }
+  @Get('/', 'read', '/systems/groups/keywords')
+  findAllGroups(params: any) {
+    return new Promise((resolve, reject) => {
+      Promise.all([KeywordGroup.find(), Keyword.find()]).then(([groupsList, items]) => {
+        for (const item of items) {
+          if (item.group && !groupsList.find(o => o.name === item.group)) {
           // we dont have any group options -> create temporary group
-          const group = new KeywordGroup();
-          group.name = item.group;
-          group.options = {
-            filter:     null,
-            permission: null,
-          };
-          groupsList = [
-            ...groupsList,
-            group,
-          ];
+            const group = new KeywordGroup();
+            group.name = item.group;
+            group.options = {
+              filter:     null,
+              permission: null,
+            };
+            groupsList = [
+              ...groupsList,
+              group,
+            ];
+          }
         }
-      }
-      res.send({
-        data: groupsList,
+        resolve(groupsList);
       });
-    });
-    app.get('/api/systems/keywords/:id', adminMiddleware, async (req, res) => {
-      res.send({
-        data: await Keyword.findOne({ where: { id: req.params.id } }),
-      });
-    });
-    app.delete('/api/systems/keywords/groups/:name', adminMiddleware, async (req, res) => {
-      await KeywordGroup.delete({ name: req.params.name });
-      res.status(404).send();
-    });
-    app.delete('/api/systems/keywords/:id', adminMiddleware, async (req, res) => {
-      await Keyword.delete({ id: req.params.id });
-      res.status(404).send();
-    });
-    app.post('/api/systems/keywords/group', adminMiddleware, async (req, res) => {
-      try {
-        res.send({ data: await KeywordGroup.create(req.body).save() });
-      } catch (e) {
-        res.status(400).send({ errors: e });
-      }
-    });
-    app.post('/api/systems/keywords', adminMiddleware, async (req, res) => {
-      try {
-        const itemToSave = await Keyword.create(req.body).save();
-        res.send({ data: itemToSave });
-      } catch (e) {
-        res.status(400).send({ errors: e });
-      }
     });
   }
+  @Get('/:name', 'read', '/systems/groups/keywords')
+  findOneGroup(params: any) {
+    return KeywordGroup.findOneBy({ name: params.name });
+  }
+  @Delete('/:name', '/systems/groups/keywords')
+  async removeOneGroup(params: any) {
+    const al = await KeywordGroup.findOneBy({ name: params.name });
+    if (al) {
+      await al.remove();
+    }
+  }
+  ///////////////////////// API endpoints />
 
   @command('!keyword')
   @default_permission(defaultPermissions.CASTERS)
