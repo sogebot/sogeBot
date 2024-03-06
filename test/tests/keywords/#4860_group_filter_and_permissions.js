@@ -2,7 +2,7 @@
 import assert from 'assert';
 
 import('../../general.js');
-import { Keyword, KeywordGroup, KeywordResponses } from '../../../dest/database/entity/keyword.js';
+import { Keyword, KeywordGroup } from '../../../dest/database/entity/keyword.js';
 import { prepare } from '../../../dest/helpers/commons/prepare.js';
 import { defaultPermissions } from '../../../dest/helpers/permissions/defaultPermissions.js';
 import keywords from '../../../dest/systems/keywords.js';
@@ -53,35 +53,31 @@ describe('Keywords - @func3 - #4860 - keywords group permissions and filter shou
     keyword.enabled = true;
     keyword.visible = true;
     keyword.group = 'filterGroup';
+    keyword.responses = [
+      {
+        stopIfExecuted: false,
+        response: 'bad449ae-f0b3-488c-a7b0-39a853d5333f',
+        filter: '',
+        order: 0,
+        permission: defaultPermissions.VIEWERS,
+      },
+      {
+        stopIfExecuted: false,
+        response: 'c0f68c62-630b-412b-9c97-f5b1afc734d2',
+        filter: '$title === \'test\'',
+        order: 1,
+        permission: defaultPermissions.VIEWERS,
+      },
+      {
+        stopIfExecuted: false,
+        response: '4b310000-b105-475a-8a85-a573a0bca1b7',
+        filter: '$title !== \'test\'',
+        order: 2,
+        permission: defaultPermissions.VIEWERS,
+      },
+    ]
     await keyword.save();
     testfilter = keyword.id;
-
-    const response1 = new KeywordResponses();
-    response1.stopIfExecuted = false;
-    response1.response = 'bad449ae-f0b3-488c-a7b0-39a853d5333f';
-    response1.filter = '';
-    response1.order = 0;
-    response1.permission = defaultPermissions.VIEWERS;
-    response1.keyword = keyword;
-    await response1.save();
-
-    const response2 = new KeywordResponses();
-    response2.stopIfExecuted = false;
-    response2.response = 'c0f68c62-630b-412b-9c97-f5b1afc734d2';
-    response2.filter = '$title === \'test\'';
-    response2.order = 1;
-    response2.permission = defaultPermissions.VIEWERS;
-    response2.keyword = keyword;
-    await response2.save();
-
-    const response3 = new KeywordResponses();
-    response3.stopIfExecuted = false;
-    response3.response = '4b310000-b105-475a-8a85-a573a0bca1b7';
-    response3.filter = '$title !== \'test\'';
-    response3.order = 2;
-    response3.permission = defaultPermissions.VIEWERS;
-    response3.keyword = keyword;
-    await response3.save();
   });
 
   it('create keyword testpermnull with permGroup', async () => {
@@ -90,16 +86,14 @@ describe('Keywords - @func3 - #4860 - keywords group permissions and filter shou
     keyword.enabled = true;
     keyword.visible = true;
     keyword.group = 'permGroup';
+    keyword.responses = [{
+      stopIfExecuted: false,
+      response: '430ea834-da5f-48b1-bf2f-3acaf1f04c63',
+      filter: '',
+      order: 0,
+      permission: null,
+    }];
     await keyword.save();
-
-    const response1 = new KeywordResponses();
-    response1.stopIfExecuted = false;
-    response1.response = '430ea834-da5f-48b1-bf2f-3acaf1f04c63';
-    response1.filter = '';
-    response1.order = 0;
-    response1.permission = null;
-    response1.keyword = keyword;
-    await response1.save();
   });
 
   let testpermnull2 = '';
@@ -110,17 +104,15 @@ describe('Keywords - @func3 - #4860 - keywords group permissions and filter shou
     keyword.enabled = true;
     keyword.visible = true;
     keyword.group = 'permGroup2';
+    keyword.responses = [{
+      stopIfExecuted: false,
+      response: '1594a86e-158d-4b7d-9898-0f80bd6a0c98',
+      filter: '',
+      order: 0,
+      permission: null,
+    }];
     await keyword.save();
     testpermnull2 = keyword.id;
-
-    const response1 = new KeywordResponses();
-    response1.stopIfExecuted = false;
-    response1.response = '1594a86e-158d-4b7d-9898-0f80bd6a0c98';
-    response1.filter = '';
-    response1.order = 0;
-    response1.permission = null;
-    response1.keyword = keyword;
-    await response1.save();
   });
 
   it('create keyword testpermmods with permGroup2', async () => {
@@ -129,16 +121,14 @@ describe('Keywords - @func3 - #4860 - keywords group permissions and filter shou
     keyword.enabled = true;
     keyword.visible = true;
     keyword.group = 'permGroup2';
+    keyword.responses = [{
+      stopIfExecuted: false,
+      response: 'cae8f74f-046a-4756-b6c5-f2219d9a0f4e',
+      filter: '',
+      order: 0,
+      permission: defaultPermissions.MODERATORS,
+    }];
     await keyword.save();
-
-    const response1 = new KeywordResponses();
-    response1.stopIfExecuted = false;
-    response1.response = 'cae8f74f-046a-4756-b6c5-f2219d9a0f4e';
-    response1.filter = '';
-    response1.order = 0;
-    response1.permission = defaultPermissions.MODERATORS;
-    response1.keyword = keyword;
-    await response1.save();
   });
 
   it('!testpermnull should be triggered by CASTER', async () => {

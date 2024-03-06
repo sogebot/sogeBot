@@ -1,7 +1,9 @@
+import { randomUUID } from 'node:crypto';
+
 import {
-  Keyword, KeywordGroup, KeywordResponses,
+  Keyword, KeywordGroup,
 } from '@entity/keyword.js';
-import _, { merge } from 'lodash-es';
+import _, { orderBy, shuffle } from 'lodash-es';
 import XRegExp from 'xregexp';
 
 import System from './_interface.js';
@@ -11,7 +13,6 @@ import {
 } from '../decorators.js';
 import { Expects } from  '../expects.js';
 
-import { AppDataSource } from '~/database.js';
 import { checkFilter } from '~/helpers/checkFilter.js';
 import { isUUID, prepare } from '~/helpers/commons/index.js';
 import {
@@ -40,7 +41,7 @@ class Keywords extends System {
 
     app.get('/api/systems/keywords', adminMiddleware, async (req, res) => {
       res.send({
-        data: await Keyword.find({ relations: ['responses'] }),
+        data: await Keyword.find(),
       });
     });
     app.get('/api/systems/keywords/groups/', adminMiddleware, async (req, res) => {
@@ -69,7 +70,7 @@ class Keywords extends System {
     });
     app.get('/api/systems/keywords/:id', adminMiddleware, async (req, res) => {
       res.send({
-        data: await Keyword.findOne({ where: { id: req.params.id }, relations: ['responses'] }),
+        data: await Keyword.findOne({ where: { id: req.params.id } }),
       });
     });
     app.delete('/api/systems/keywords/groups/:name', adminMiddleware, async (req, res) => {
@@ -90,15 +91,6 @@ class Keywords extends System {
     app.post('/api/systems/keywords', adminMiddleware, async (req, res) => {
       try {
         const itemToSave = await Keyword.create(req.body).save();
-
-        await AppDataSource.getRepository(KeywordResponses).delete({ keyword: { id: itemToSave.id } });
-        const responses = req.body.responses;
-        for (const response of responses) {
-          const resToSave = new KeywordResponses();
-          merge(resToSave, response);
-          resToSave.keyword = itemToSave;
-          await resToSave.save();
-        }
         res.send({ data: itemToSave });
       } catch (e) {
         res.status(400).send({ errors: e });
@@ -142,8 +134,7 @@ class Keywords extends System {
         .toArray();
 
       let kDb = await Keyword.findOne({
-        relations: ['responses'],
-        where:     { keyword: keywordRegex },
+        where: { keyword: keywordRegex },
       });
       if (!kDb) {
         kDb = new Keyword();
@@ -158,14 +149,16 @@ class Keywords extends System {
         throw Error('Permission ' + userlevel + ' not found.');
       }
 
-      const newResponse = new KeywordResponses();
-      newResponse.keyword = kDb;
-      newResponse.order = kDb.responses.length;
-      newResponse.permission = pItem.id ?? defaultPermissions.VIEWERS;
-      newResponse.stopIfExecuted = stopIfExecuted;
-      newResponse.response = response;
-      newResponse.filter = '';
-      await newResponse.save();
+      kDb.responses.push({
+        id:             randomUUID(),
+        order:          kDb.responses.length,
+        permission:     pItem.id ?? defaultPermissions.VIEWERS,
+        stopIfExecuted: stopIfExecuted,
+        response:       response,
+        filter:         '',
+      });
+
+      await kDb.save();
       return [{
         response: prepare('keywords.keyword-was-added', kDb), ...opts, id: kDb.id,
       }];
@@ -204,9 +197,9 @@ class Keywords extends System {
 
       let keywords: Required<Keyword>[] = [];
       if (isUUID(keywordRegexOrUUID)) {
-        keywords = await Keyword.find({ where: { id: keywordRegexOrUUID }, relations: ['responses'] });
+        keywords = await Keyword.find({ where: { id: keywordRegexOrUUID } });
       } else {
-        keywords = await Keyword.find({ where: { keyword: keywordRegexOrUUID }, relations: ['responses'] });
+        keywords = await Keyword.find({ where: { keyword: keywordRegexOrUUID } });
       }
 
       if (keywords.length === 0) {
@@ -230,7 +223,7 @@ class Keywords extends System {
         if (stopIfExecuted) {
           responseDb.stopIfExecuted = stopIfExecuted;
         }
-        await responseDb.save();
+        await keyword.save();
         return [{ response: prepare('keywords.keyword-was-edited', { keyword: keyword.keyword, response }), ...opts }];
       }
     } catch (e: any) {
@@ -258,8 +251,7 @@ class Keywords extends System {
       // print responses
       const keyword_with_responses
         = await Keyword.findOne({
-          relations: ['responses'],
-          where:     isUUID(keyword) ? { id: keyword } : { keyword },
+          where: isUUID(keyword) ? { id: keyword } : { keyword },
         });
 
       if (!keyword_with_responses || keyword_with_responses.responses.length === 0) {
@@ -309,28 +301,22 @@ class Keywords extends System {
         return [{ response: prepare('keywords.keyword-is-ambiguous'), ...opts }];
       } else {
         const keyword = keywords[0];
-        if (rId) {
-          const responseDb = keyword.responses.find(o => o.order === (rId - 1));
-          if (!responseDb) {
-            return [{ response: prepare('keywords.response-was-not-found'), ...opts }];
-          }
-          // remove and reorder
-          let count = 0;
-          for (let i = 0; i < keyword.responses.length; i++) {
-            const response = _.orderBy(keyword.responses, 'order', 'asc')[i];
-            if (responseDb.id !== response.id) {
-              response.order = count;
-              count++;
-              await response.save();
-            } else {
-              await response.remove();
-            }
-          }
-          return [{ response: prepare('keywords.response-was-removed', keyword), ...opts }];
+        let response = prepare('keywords.keyword-was-removed', keyword);
+        if (rId >= 1) {
+          const responseDb = keyword.responses.filter(o => o.order !== (rId - 1));
+
+          // reorder
+          responseDb.forEach((item, index) => {
+            item.order = index;
+          });
+
+          await keyword.save();
+          response = prepare('keywords.response-was-removed', { keyword, response: rId });
         } else {
-          await Keyword.remove(keyword);
-          return [{ response: prepare('keywords.keyword-was-removed', keyword), ...opts }];
+          await keyword.remove();
         }
+        return [{ response, ...opts }];
+
       }
     } catch (e: any) {
       error(e.stack);
@@ -391,7 +377,7 @@ class Keywords extends System {
       return true;
     }
 
-    const keywords = (await Keyword.find({ relations: ['responses'] })).filter((o) => {
+    const keywords = (await Keyword.find()).filter((o) => {
       const regexp = `([!"#$%&'()*+,-.\\/:;<=>?\\b\\s]${o.keyword}[!"#$%&'()*+,-.\\/:;<=>?\\b\\s])|(^${o.keyword}[!"#$%&'()*+,-.\\/:;<=>?\\b\\s])|([!"#$%&'()*+,-.\\/:;<=>?\\b\\s]${o.keyword}$)|(^${o.keyword}$)`;
       const isFoundInMessage = XRegExp(regexp, 'giu').test(opts.message);
       const isEnabled = o.enabled;
@@ -405,7 +391,7 @@ class Keywords extends System {
     let atLeastOnePermissionOk = false;
     for (const k of keywords) {
       debug('keywords.run', JSON.stringify({ k }));
-      const _responses: KeywordResponses[] = [];
+      const _responses: Keyword['responses'] = [];
 
       // check group filter first
       let group: Readonly<Required<KeywordGroup>> | null;
@@ -422,7 +408,8 @@ class Keywords extends System {
         }
       }
 
-      for (const r of _.orderBy(k.responses, 'order', 'asc')) {
+      const responses = k.areResponsesRandomized ? shuffle(k.responses) : orderBy(k.responses, 'order', 'asc');
+      for (const r of responses) {
         let permission = r.permission ?? groupPermission;
         // show warning if null permission
         if (!permission) {
@@ -448,7 +435,7 @@ class Keywords extends System {
     return atLeastOnePermissionOk;
   }
 
-  async sendResponse(responses: (KeywordResponses)[], opts: { sender: CommandOptions['sender'], discord: CommandOptions['discord'], id: string }) {
+  async sendResponse(responses: (Keyword['responses']), opts: { sender: CommandOptions['sender'], discord: CommandOptions['discord'], id: string }) {
     for (let i = 0; i < responses.length; i++) {
       // check if response have new line, then split it and send it as separate messages
       for (const response of responses[i].response.split('\n')) {

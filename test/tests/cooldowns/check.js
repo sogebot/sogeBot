@@ -172,7 +172,14 @@ describe('Cooldowns - @func3 - check()', () => {
     it('Add koncha to keywords', async () => {
       await AppDataSource.getRepository(Keyword).save({
         keyword:  'koncha',
-        response: '$sender KonCha',
+        responses: [{
+          id: '1234',
+          order: 0,
+          response: '$sender KonCha',
+          stopIfExecuted: false,
+          permission: '0efd7b1c-e460-4167-8e06-8aaf2c170311',
+          filter: '',
+        }],
         enabled:  true,
       });
     });
@@ -716,7 +723,14 @@ describe('Cooldowns - @func3 - check()', () => {
     it('test', async () => {
       await AppDataSource.getRepository(Keyword).save({
         keyword:  'me',
-        response: '(!me)',
+        responses: [{
+          id: '1234',
+          order: 0,
+          response: '(!me)',
+          stopIfExecuted: false,
+          permission: '0efd7b1c-e460-4167-8e06-8aaf2c170311',
+          filter: '',
+        }],
         enabled:  true,
       });
 
@@ -765,7 +779,14 @@ describe('Cooldowns - @func3 - check()', () => {
     it('test', async () => {
       await AppDataSource.getRepository(Keyword).save({
         keyword:  'me',
-        response: '(!me)',
+        responses: [{
+          id: '1234',
+          order: 0,
+          response: '(!me)',
+          stopIfExecuted: false,
+          permission: '0efd7b1c-e460-4167-8e06-8aaf2c170311',
+          filter: '',
+        }],
         enabled:  true,
       });
 

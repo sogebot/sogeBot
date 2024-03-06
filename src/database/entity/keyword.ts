@@ -1,4 +1,3 @@
-import { ManyToOne, OneToMany } from 'typeorm';
 import { BaseEntity, Column, Entity, Index, PrimaryColumn } from 'typeorm';
 import { z } from 'zod';
 
@@ -23,32 +22,18 @@ export class Keyword extends BotEntity {
   @Column({ nullable: true, type: String })
     group: string | null;
 
-  @OneToMany(() => KeywordResponses, (item) => item.keyword)
-    responses: KeywordResponses[];
-}
+  @Column({ default: false })
+    areResponsesRandomized: boolean;
 
-@Entity()
-export class KeywordResponses extends BaseEntity {
-  @PrimaryColumn({ generated: 'uuid', type: 'uuid' })
+  @Column({ type: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') !== 'better-sqlite3' ? 'json' : 'simple-json' })
+    responses: {
     id: string;
-
-  @Column()
     order: number;
-
-  @Column({ type: 'text' })
     response: string;
-
-  @Column()
     stopIfExecuted: boolean;
-
-  @Column({ nullable: true, type: String })
     permission: string | null;
-
-  @Column()
     filter: string;
-
-  @ManyToOne(() => Keyword, (item) => item.responses, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
-    keyword: Keyword;
+  }[] = [];
 }
 
 @Entity()
