@@ -98,7 +98,14 @@ describe('Cooldowns - @func3 - default cooldown can be overrided', () => {
     it('Create me keyword', async () => {
       await AppDataSource.getRepository(Keyword).save({
         keyword: 'me',
-        response: '(!me)',
+        responses: [{
+          id: '1234',
+          order: 0,
+          response: '(!me)',
+          stopIfExecuted: false,
+          permission: defaultPermissions.VIEWERS,
+          filter: '',
+        }],
         enabled: true,
       });
     });
