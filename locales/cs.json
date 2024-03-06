@@ -320,7 +320,7 @@
     },
     "responses": {
       "variable": {
-        "tags": "Tags",
+        "tags": "Tagy",
         "titleOfPrediction": "Twitch Predikce - Název",
         "outcomes": "Twitch Predikce - Výsledky",
         "locksAt": "Twitch predikce - Uzamknutí k datu",
@@ -731,8 +731,8 @@
     "unfollow": "ztráta followera",
     "hypetrain-started": "Hype Train spuštěn",
     "hypetrain-ended": "Konec Hype Train",
-    "shoutout-created": "Twitch Shoutout - Created",
-    "shoutout-received": "Twitch Shoutout - Received",
+    "shoutout-created": "Twitch Shoutout - Vytvořen",
+    "shoutout-received": "Twitch Shoutout - Přijat",
     "prediction-started": "Twitch predikce byla spuštěna",
     "prediction-locked": "Twitch predikce byla uzamčena",
     "prediction-ended": "Twitch predikce byla ukončena",
