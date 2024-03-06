@@ -93,7 +93,6 @@ describe('Keywords - @func3 - #4860 - keywords group permissions and filter shou
       order: 0,
       permission: null,
     }];
-    }
     await keyword.save();
   });
 
@@ -106,12 +105,12 @@ describe('Keywords - @func3 - #4860 - keywords group permissions and filter shou
     keyword.visible = true;
     keyword.group = 'permGroup2';
     keyword.responses = [{
-        stopIfExecuted: false,
-        response: '1594a86e-158d-4b7d-9898-0f80bd6a0c98',
-        filter: '',
-        order: 0,
-        permission: null,
-      }];
+      stopIfExecuted: false,
+      response: '1594a86e-158d-4b7d-9898-0f80bd6a0c98',
+      filter: '',
+      order: 0,
+      permission: null,
+    }];
     await keyword.save();
     testpermnull2 = keyword.id;
   });
