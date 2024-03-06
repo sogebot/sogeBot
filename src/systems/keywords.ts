@@ -3,7 +3,7 @@ import { randomUUID } from 'node:crypto';
 import {
   Keyword, KeywordGroup,
 } from '@entity/keyword.js';
-import _ from 'lodash-es';
+import _, { orderBy, shuffle } from 'lodash-es';
 import XRegExp from 'xregexp';
 
 import System from './_interface.js';
@@ -408,7 +408,8 @@ class Keywords extends System {
         }
       }
 
-      for (const r of _.orderBy(k.responses, 'order', 'asc')) {
+      const responses = k.areResponsesRandomized ? shuffle(k.responses) : orderBy(k.responses, 'order', 'asc');
+      for (const r of responses) {
         let permission = r.permission ?? groupPermission;
         // show warning if null permission
         if (!permission) {

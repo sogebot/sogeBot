@@ -15,7 +15,7 @@ export class changeKeywordsResponses1678892044040 implements MigrationInterface 
     await queryRunner.query(`DROP TABLE \`keyword_responses\``);
     await queryRunner.query(`DROP TABLE \`keyword\``);
 
-    await queryRunner.query(`CREATE TABLE \`keyword\` (\`id\` varchar(36) NOT NULL, \`keyword\` varchar(255) NOT NULL, \`enabled\` tinyint NOT NULL, \`group\` varchar(255) NULL, \`responses\` json NOT NULL, INDEX \`IDX_35e3ff88225eef1d85c951e229\` (\`keyword\`), PRIMARY KEY (\`id\`)) ENGINE=InnoDB`);
+    await queryRunner.query(`CREATE TABLE \`keyword\` (\`id\` varchar(36) NOT NULL, \`keyword\` varchar(255) NOT NULL, \`enabled\` tinyint NOT NULL, \`group\` varchar(255) NULL, \`areResponsesRandomized\` tinyint NOT NULL DEFAULT 0, \`responses\` json NOT NULL, INDEX \`IDX_35e3ff88225eef1d85c951e229\` (\`keyword\`), PRIMARY KEY (\`id\`)) ENGINE=InnoDB`);
 
     for (const item of items) {
       item.responses = JSON.stringify(items2.filter((o: any) => o.keywordId === item.id));

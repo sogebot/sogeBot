@@ -15,7 +15,7 @@ export class changeKeywordsResponses1678892044040 implements MigrationInterface 
     await queryRunner.query(`DROP TABLE "keyword_responses"`);
     await queryRunner.query(`DROP TABLE "keyword"`);
 
-    await queryRunner.query(`CREATE TABLE "keyword" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "keyword" character varying NOT NULL, "enabled" boolean NOT NULL, "group" character varying, "responses" json NOT NULL, CONSTRAINT "PK_affdb8c8fa5b442900cb3aa21dc" PRIMARY KEY ("id"))`);
+    await queryRunner.query(`CREATE TABLE "keyword" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "areResponsesRandomized" boolean NOT NULL DEFAULT false, "keyword" character varying NOT NULL, "enabled" boolean NOT NULL, "group" character varying, "responses" json NOT NULL, CONSTRAINT "PK_affdb8c8fa5b442900cb3aa21dc" PRIMARY KEY ("id"))`);
     await queryRunner.query(`CREATE INDEX "IDX_35e3ff88225eef1d85c951e229" ON "keyword" ("keyword") `);
 
     for (const item of items) {
