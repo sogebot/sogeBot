@@ -316,7 +316,7 @@ class Module {
         error(this.nsp + ': Cannot initialize sockets second time');
       };
 
-      app.get(`/api${this.nsp}/settings`, withScope([this.scope('read'), this.scope('manage')]), async (req, res) => {
+      app.get(`/api/settings${this.nsp}`, withScope([this.scope('read'), this.scope('manage')]), async (req, res) => {
         try {
           res.json({
             status: 'success',
@@ -332,11 +332,8 @@ class Module {
         }
       });
 
-      endpoint([
-        this.nsp.split('/').map(o => o.trim()).filter(String).join(':') + ':manage',
-      ], this.nsp, 'settings.update', async (opts, cb) => {
-        // flatten and remove category
-        const data = flatten(opts);
+      app.post(`/api/settings${this.nsp}`, withScope([this.scope('manage')]), async (req, res) => {
+        const data = flatten(req.body);
         const remap: ({ key: string; actual: string; toRemove: string[] } | { key: null; actual: null; toRemove: null })[] = Object.keys(flatten(data)).map(o => {
           // skip commands, enabled and permissions
           if (o.startsWith('commands') || o.startsWith('enabled') || o.startsWith('_permissions')) {
@@ -384,33 +381,32 @@ class Module {
             }
           }
         }
-        try {
-          for (const [key, value] of Object.entries(unflatten(data))) {
-            if (key === 'enabled' && this._enabled === null) {
-              // ignore enabled if we don't want to enable/disable at will
-              continue;
-            } else if (key === 'enabled') {
-              this.status({ state: value });
-            } else if (key === '__permission_based__') {
-              for (const vKey of Object.keys(value as any)) {
-                (this as any)['__permission_based__' + vKey] = (value as any)[vKey];
-              }
-            } else {
-              (this as any)[key] = value;
+        for (const [key, value] of Object.entries(unflatten(data))) {
+          if (key === 'enabled' && this._enabled === null) {
+            // ignore enabled if we don't want to enable/disable at will
+            continue;
+          } else if (key === 'enabled') {
+            this.status({ state: value });
+          } else if (key === '__permission_based__') {
+            for (const vKey of Object.keys(value as any)) {
+              (this as any)['__permission_based__' + vKey] = (value as any)[vKey];
             }
-          }
-        } catch (e: any) {
-          error(e.stack);
-          if (typeof cb === 'function') {
-            setTimeout(() => cb(e.stack), 1000);
+          } else {
+            (this as any)[key] = value;
           }
         }
 
         await watchers.check(true); // force watcher to refresh
 
-        if (typeof cb === 'function') {
-          setTimeout(() => cb(null), 1000);
+        // trigger onSettingsSave
+        for (const event of getFunctionList('settingsSave', this.__moduleName__.toLowerCase())) {
+          if (typeof (this as any)[event.fName] === 'function') {
+            (this as any)[event.fName]();
+          } else {
+            error(`${event.fName}() is not function in ${this._name}/${this.__moduleName__.toLowerCase()}`);
+          }
         }
+        res.json({ status: 'success' });
       });
 
       endpoint([

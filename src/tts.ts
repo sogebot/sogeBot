@@ -12,6 +12,7 @@ import { GooglePrivateKeys } from '~/database/entity/google.js';
 import { AppDataSource } from '~/database.js';
 import {
   onChange,
+  onSettingsSave,
   onStartup,
 } from '~/decorators/on.js';
 import { settings } from '~/decorators.js';
@@ -47,6 +48,11 @@ class TTS extends Core {
 
   @settings()
     elevenlabsApiKey = '';
+
+  @onSettingsSave()
+  refresh(req: any) {
+    this.initializeTTSServices();  // reset settings
+  }
 
   sockets() {
     adminEndpoint('/core/tts', 'settings.refresh', async () => {

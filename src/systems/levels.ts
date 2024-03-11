@@ -11,6 +11,7 @@ import general from '../general.js';
 import users from '../users.js';
 
 import { AppDataSource } from '~/database.js';
+import { Post } from '~/decorators/endpoint.js';
 import { isStreamOnline } from '~/helpers/api/index.js';
 import { ResponseError } from '~/helpers/commandError.js';
 import { prepare } from '~/helpers/commons/index.js';
@@ -22,7 +23,6 @@ import defaultPermissions from '~/helpers/permissions/defaultPermissions.js';
 import { getUserHighestPermission } from '~/helpers/permissions/getUserHighestPermission.js';
 import { getPointsName } from '~/helpers/points/index.js';
 import { setImmediateAwait } from '~/helpers/setImmediateAwait.js';
-import { adminEndpoint } from '~/helpers/socket.js';
 import {
   bigIntMax, serialize, unserialize,
 } from '~/helpers/type.js';
@@ -70,21 +70,16 @@ class Levels extends System {
   @permission_settings('xp')
     perMessageOfflineInterval = 0;
 
-  sockets () {
-    adminEndpoint('/systems/levels', 'getLevelsExample', (data, cb) => {
-      try {
-        const firstLevelStartsAt = typeof data === 'function' ? this.firstLevelStartsAt : data.firstLevelStartsAt;
-        const nextLevelFormula = typeof data === 'function' ? this.nextLevelFormula : data.nextLevelFormula;
-        const xpName = typeof data === 'function' ? this.xpName : data.xpName;
-        const levels = [];
-        for (let i = 1; i <= 21; i++) {
-          levels.push(this.getLevelXP(i, BigInt(firstLevelStartsAt), nextLevelFormula, true));
-        }
-        (typeof data === 'function' ? data : cb!)(null, levels.map(xp => `${Intl.NumberFormat(general.lang).format(xp)} ${xpName}`));
-      } catch (e: any) {
-        (typeof data === 'function' ? data : cb!)(e, []);
-      }
-    });
+  @Post('/example')
+  async getLevelsExample(req: any) {
+    const firstLevelStartsAt = req.body.firstLevelStartsAt;
+    const nextLevelFormula = req.body.nextLevelFormula;
+    const xpName = req.body.xpName;
+    const levels = [];
+    for (let i = 1; i <= 21; i++) {
+      levels.push(this.getLevelXP(i, BigInt(firstLevelStartsAt), nextLevelFormula, true));
+    }
+    return levels.map(xp => `${Intl.NumberFormat(general.lang).format(xp)} ${xpName}`);
   }
 
   @onStartup()

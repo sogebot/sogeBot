@@ -52,7 +52,7 @@ export function Post<T extends string>(endpoint: T, customEndpoint?: string) {
                 });
               }
             } catch (e) {
-              res.status(400).send({ status: 'error', errors: e });
+              res.status(400).send({ status: 'error', errors: e instanceof Error ? e.message : e });
             }
           } else {
             res.send({
