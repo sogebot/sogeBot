@@ -29,7 +29,6 @@ import { ParameterError } from '~/helpers/parameterError.js';
 import defaultPermissions from '~/helpers/permissions/defaultPermissions.js';
 import { getUserHighestPermission } from '~/helpers/permissions/getUserHighestPermission.js';
 import { getUserPermissionsList } from '~/helpers/permissions/getUserPermissionsList.js';
-import { adminEndpoint } from '~/helpers/socket.js';
 import { tmiEmitter } from '~/helpers/tmi/index.js';
 import banUser from '~/services/twitch/calls/banUser.js';
 import getUserByName from '~/services/twitch/calls/getUserByName.js';
@@ -157,19 +156,6 @@ class Moderation extends System {
     cWarningsAnnounceTimeouts = true;
   @settings('warnings')
     cWarningsShouldClearChat = true;
-
-  sockets () {
-    adminEndpoint('/systems/moderation', 'lists.get', async (cb) => {
-      cb(null, {
-        blacklist: this.cListsBlacklist,
-        whitelist: this.cListsWhitelist,
-      });
-    });
-    adminEndpoint('/systems/moderation', 'lists.set', (data) => {
-      this.cListsBlacklist = data.blacklist.filter(entry => entry.trim() !== '');
-      this.cListsWhitelist = data.whitelist.filter(entry => entry.trim() !== '');
-    });
-  }
 
   @command('!immune')
   @default_permission(defaultPermissions.CASTERS)
