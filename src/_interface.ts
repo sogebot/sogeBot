@@ -197,7 +197,7 @@ class Module {
   public scope (type?: 'read' | 'manage') {
     // add scope if used
     if (type) {
-      addScope(this._scope + (type ? ':' + type : ''));
+      addScope(this._scope + ':' + type);
     }
     return this._scope + (type ? ':' + type : '');
   }
