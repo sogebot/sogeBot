@@ -10,7 +10,7 @@ class Integration extends Module {
   public scope (type?: 'read' | 'manage') {
     // add scope if used
     if (type) {
-      addScope(`integrations:${type ?? 'read'}`);
+      addScope(`integrations:${type}`);
     }
     return `integrations:${type ?? 'read'}`;
   }
