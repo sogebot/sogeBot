@@ -15,12 +15,10 @@ import { Delete, Get, Post } from '~/decorators/endpoint.js';
 import { prepare } from '~/helpers/commons/index.js';
 import { HIGH } from '~/helpers/constants.js';
 import { format } from '~/helpers/number.js';
-import { app } from '~/helpers/panel.js';
 import defaultPermissions from '~/helpers/permissions/defaultPermissions.js';
 import { getPointsName } from '~/helpers/points/index.js';
 import * as changelog from '~/helpers/user/changelog.js';
 import { isBroadcaster, isOwner } from '~/helpers/user/index.js';
-import { adminMiddleware } from '~/socket.js';
 import { translate } from '~/translate.js';
 
 /*
