@@ -10,7 +10,7 @@ class Widget extends Module {
   scope (type?: 'read' | 'manage') {
     // add scope if used
     if (type) {
-      addScope('dashboard:admin:' + (type ?? ''));
+      addScope('dashboard:admin:' + type);
     }
     return 'dashboard:admin:' + (type ?? '');
   }

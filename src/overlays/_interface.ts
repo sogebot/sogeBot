@@ -10,7 +10,7 @@ class Overlay extends Module {
   scope (type?: 'read' | 'manage') {
     // add scope if used
     if (type) {
-      addScope('overlay:' + (type ?? ''));
+      addScope('overlay:' + type);
     }
     return 'overlay:' + (type ?? '');
   }
