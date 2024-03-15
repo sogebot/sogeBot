@@ -81,8 +81,8 @@ class Cooldown extends System {
     return CooldownEntity.find();
   }
   @Get('/:id', 'read')
-  findOne(params: any) {
-    return CooldownEntity.findOneBy({ id: params.id });
+  findOne(req: any) {
+    return CooldownEntity.findOneBy({ id: req.params.id });
   }
   @Delete('/:id')
   async removeOne(params: any) {

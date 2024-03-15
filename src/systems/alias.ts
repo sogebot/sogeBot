@@ -64,8 +64,8 @@ class Alias extends System {
     return AliasEntity.find();
   }
   @Get('/:id', 'read')
-  findOne(params: any) {
-    return AliasEntity.findOneBy({ id: params.id });
+  findOne(req: any) {
+    return AliasEntity.findOneBy({ id: req.params.id });
   }
   @Delete('/:id')
   async removeOne(params: any) {
@@ -79,7 +79,7 @@ class Alias extends System {
     return AliasGroup.create(req.body).save();
   }
   @Get('/', 'read', '/systems/groups/alias')
-  findAllGroups(params: any) {
+  findAllGroups() {
     return new Promise((resolve, reject) => {
       Promise.all([AliasGroup.find(), AliasEntity.find()]).then(([groupsList, aliases]) => {
         for (const item of aliases) {
@@ -102,8 +102,8 @@ class Alias extends System {
     });
   }
   @Get('/:name', 'read', '/systems/groups/alias')
-  findOneGroup(params: any) {
-    return AliasGroup.findOneBy({ name: params.name });
+  findOneGroup(req: any) {
+    return AliasGroup.findOneBy({ name: req.params.name });
   }
   @Delete('/:name', '/systems/groups/alias')
   async removeOneGroup(params: any) {

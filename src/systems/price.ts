@@ -49,8 +49,8 @@ class Price extends System {
     return PriceEntity.find({ order: { price: 'ASC' } });
   }
   @Get('/:id', 'read')
-  getOne(params: any) {
-    return PriceEntity.findOneBy({ id: params.id });
+  getOne(req: any) {
+    return PriceEntity.findOneBy({ id: req.params.id });
   }
   @Delete('/:id')
   async deleteOne(params: any) {

@@ -76,7 +76,7 @@ export function Post<T extends string>(endpoint: T, customEndpoint?: string) {
 export function Get<T extends string>(endpoint: T, scope: 'public' | 'read' | 'manage', customEndpoint?: string) {
   const { name, type } = getNameAndTypeFromStackTrace();
 
-  return (_target: any, key: string, fnc: TypedPropertyDescriptor<(params?: RouteParameters<T>) => Promise<any>>) => {
+  return (_target: any, key: string, fnc: TypedPropertyDescriptor<(req?: any) => Promise<any>>) => {
     let retries = 0;
 
     const registerEndpoint = () => {
@@ -107,13 +107,16 @@ export function Get<T extends string>(endpoint: T, scope: 'public' | 'read' | 'm
       app.get(generatedEndpoint, withScope(scopes), async (req, res) => {
         try {
           if (fnc.value) {
-            const data = await fnc.value.bind(self)(req.params as any);
+            const data = await fnc.value.bind(self)(req);
+
+            // if no data and params are present, return 404
+            if (data === null && Object.keys(req.params).length > 0) {
+              throw new Error('404');
+            }
+
             res.send({
               status: 'success',
-              data:   Array.isArray(data)
-                ? {
-                  items: data,
-                } : data,
+              data,
             });
           } else {
             res.send({
@@ -122,6 +125,10 @@ export function Get<T extends string>(endpoint: T, scope: 'public' | 'read' | 'm
             }).status(500);
           }
         } catch (e) {
+          if (e instanceof Error && e.message === '404') {
+            res.status(404).send({ status: 'error', message: 'Not found' });
+            return;
+          }
           error(e);
           res.send({
             status:  'error',

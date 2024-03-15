@@ -66,8 +66,8 @@ class CustomCommands extends System {
     };
   }
   @Get('/:id', 'read')
-  async findOne(params: any) {
-    const cmd = await Commands.findOneBy({ id: params.id });
+  async findOne(req: any) {
+    const cmd = await Commands.findOneBy({ id: req.params.id });
     return {
       data:  cmd,
       count: cmd ? await getCountOfCommandUsage(cmd.command) : 0,
@@ -85,8 +85,8 @@ class CustomCommands extends System {
     return CommandsGroup.create(req.body).save();
   }
   @Get('/', 'read', '/systems/groups/customcommands')
-  findAllGroups(params: any) {
-    return new Promise((resolve, reject) => {
+  findAllGroups() {
+    return new Promise((resolve) => {
       Promise.all([CommandsGroup.find(), Commands.find()]).then(([groupsList, aliases]) => {
         for (const item of aliases) {
           if (item.group && !groupsList.find(o => o.name === item.group)) {
@@ -108,8 +108,8 @@ class CustomCommands extends System {
     });
   }
   @Get('/:name', 'read', '/systems/groups/customcommands')
-  findOneGroup(params: any) {
-    return CommandsGroup.findOneBy({ name: params.name });
+  findOneGroup(req: any) {
+    return CommandsGroup.findOneBy({ name: req.params.name });
   }
   @Delete('/:name', '/systems/groups/customcommands')
   async removeOneGroup(params: any) {

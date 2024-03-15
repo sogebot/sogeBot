@@ -42,8 +42,8 @@ class Keywords extends System {
     return Keyword.find();
   }
   @Get('/:id', 'read')
-  async findOne(params: any) {
-    return Keyword.findOneBy({ id: params.id });
+  async findOne(req: any) {
+    return Keyword.findOneBy({ id: req.params.id });
   }
   @Delete('/:id')
   async removeOne(params: any) {
@@ -57,7 +57,7 @@ class Keywords extends System {
     return KeywordGroup.create(req.body).save();
   }
   @Get('/', 'read', '/systems/groups/keywords')
-  findAllGroups(params: any) {
+  findAllGroups() {
     return new Promise((resolve, reject) => {
       Promise.all([KeywordGroup.find(), Keyword.find()]).then(([groupsList, items]) => {
         for (const item of items) {
@@ -80,8 +80,8 @@ class Keywords extends System {
     });
   }
   @Get('/:name', 'read', '/systems/groups/keywords')
-  findOneGroup(params: any) {
-    return KeywordGroup.findOneBy({ name: params.name });
+  findOneGroup(req: any) {
+    return KeywordGroup.findOneBy({ name: req.params.name });
   }
   @Delete('/:name', '/systems/groups/keywords')
   async removeOneGroup(params: any) {

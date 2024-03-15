@@ -86,8 +86,8 @@ class HowLongToBeat extends System {
     return data;
   }
   @Get('/:id', 'read')
-  async findOne(params: any) {
-    return HowLongToBeatGame.findOne({ where: { id: params.id } });
+  async findOne(req: any) {
+    return HowLongToBeatGame.findOne({ where: { id: req.params.id } });
   }
   @Post('/:id')
   async saveOne(req: any) {

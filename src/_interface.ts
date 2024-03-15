@@ -27,7 +27,7 @@ import {
 } from '~/helpers/panel.js';
 import defaultPermissions from '~/helpers/permissions/defaultPermissions.js';
 import { register } from '~/helpers/register.js';
-import { addScope, endpoint, withScope } from '~/helpers/socket.js';
+import { addScope, withScope } from '~/helpers/socket.js';
 import * as watchers from '~/watchers.js';
 
 let socket: import('~/socket').Socket | any = null;
@@ -332,6 +332,28 @@ class Module {
         }
       });
 
+      app.get(`/api/settings${this.nsp}/:variable`, withScope([this.scope('read'), this.scope('manage')]), async (req, res) => {
+        try {
+          res.json({
+            status: 'success',
+            data:   await (this as any)[req.params.variable],
+          });
+        } catch (e: any) {
+          res.status(500).json({ error: e.stack, status: 'error' });
+        }
+      });
+
+      app.post(`/api/settings${this.nsp}/:variable`, withScope([this.scope('manage')]), async (req, res) => {
+        try {
+          (this as any)[req.params.variable] = req.body.value;
+          res.json({
+            status: 'success',
+          });
+        } catch (e: any) {
+          res.status(500).json({ error: e.stack, status: 'error' });
+        }
+      });
+
       app.post(`/api/settings${this.nsp}`, withScope([this.scope('manage')]), async (req, res) => {
         const data = flatten(req.body);
         const remap: ({ key: string; actual: string; toRemove: string[] } | { key: null; actual: null; toRemove: null })[] = Object.keys(flatten(data)).map(o => {
@@ -407,28 +429,6 @@ class Module {
           }
         }
         res.json({ status: 'success' });
-      });
-
-      endpoint([
-        this.nsp.split('/').map(o => o.trim()).filter(String).join(':') + ':manage',
-      ], this.nsp, 'set.value', async (opts, cb) => {
-        try {
-          (this as any)[opts.variable] = opts.value;
-          if (cb) {
-            cb(null, { variable: opts.variable, value: opts.value });
-          }
-        } catch (e: any) {
-          if (cb) {
-            cb(e.stack, null);
-          }
-        }
-      });
-      endpoint([], this.nsp, 'get.value', async (variable, cb) => {
-        try {
-          cb(null, await (this as any)[variable]);
-        } catch (e: any) {
-          cb(e.stack, undefined);
-        }
       });
     }
   }
