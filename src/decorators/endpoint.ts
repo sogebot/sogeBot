@@ -1,4 +1,5 @@
 import { RouteParameters } from 'express-serve-static-core';
+import { ZodObject } from 'zod';
 
 import { getNameAndTypeFromStackTrace } from '~/decorators.js';
 import { isBotStarted } from '~/helpers/database.js';
@@ -7,7 +8,7 @@ import { app } from '~/helpers/panel.js';
 import { find } from '~/helpers/register.js';
 import { withScope } from '~/helpers/socket.js';
 
-export function Post<T extends string>(endpoint: T, customEndpoint?: string) {
+export function Post<T extends string>(endpoint: T, customEndpoint?: string, zodValidator?: ZodObject<any>) {
   const { name, type } = getNameAndTypeFromStackTrace();
 
   return (_target: any, key: string, fnc: TypedPropertyDescriptor<(req?: any) => Promise<any>>) => {
@@ -40,6 +41,11 @@ export function Post<T extends string>(endpoint: T, customEndpoint?: string) {
               if (req.body._schema) {
                 delete req.body._schema;
               }
+
+              if (zodValidator) {
+                zodValidator.parse(req.body);
+              }
+
               const data = await fnc.value.bind(self)(req);
               if (data === undefined) {
                 res.send({

@@ -1,4 +1,5 @@
 import { Queue as QueueEntity, QueueInterface } from '@entity/queue.js';
+import { z } from 'zod';
 
 import System from './_interface.js';
 import {
@@ -45,7 +46,11 @@ class Queue extends System {
     }
     return AppDataSource.getRepository(QueueEntity).find();
   }
-  @Post('/')
+  @Post('/', undefined, z.object({
+    username: z.string().min(2).optional(),
+    count:    z.number().int(),
+    random:   z.boolean(),
+  }))
   async postAction(req: any) {
     const action = req.query._action;
     if (action === 'clear') {
