@@ -39,7 +39,7 @@ class Queue extends System {
   ///////////////////////// <! API endpoints
   @Get('/', 'read')
   async getAll(req: any) {
-    const action = req.query.action;
+    const action = req.query._action;
     if (action === 'picked') {
       return this.pickedUsers;
     }
@@ -47,7 +47,7 @@ class Queue extends System {
   }
   @Post('/')
   async postAction(req: any) {
-    const action = req.query.action;
+    const action = req.query._action;
     if (action === 'clear') {
       await AppDataSource.getRepository(QueueEntity).clear();
       return;
