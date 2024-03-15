@@ -39,18 +39,20 @@ class Queue extends System {
   ///////////////////////// <! API endpoints
   @Get('/', 'read')
   async getAll(req: any) {
-    if (req.headers['x-action'] === 'picked') {
+    const action = req.query.action;
+    if (action === 'picked') {
       return this.pickedUsers;
     }
     return AppDataSource.getRepository(QueueEntity).find();
   }
   @Post('/')
   async postAction(req: any) {
-    if (req.headers['x-action'] === 'clear') {
+    const action = req.query.action;
+    if (action === 'clear') {
       await AppDataSource.getRepository(QueueEntity).clear();
       return;
     }
-    if (req.headers['x-action'] === 'pick') {
+    if (action === 'pick') {
       const data = req.body;
       if (data.username) {
         const users: any[] = [];
