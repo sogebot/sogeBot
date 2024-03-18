@@ -45,6 +45,9 @@ export enum Types {
   'onChannelRedemptionUpdate',
   'onChannelAdBreakBegin',
   'onOBSWebsocketEvent',
+  'onChannelHypeTrainBegin',
+  'onChannelHypeTrainProgress',
+  'onChannelHypeTrainEnd',
 }
 
 export const ListenToGenerator = (pluginId: string, type: Types, message: string, userstate: { userName: string, userId: string } | null, params?: Record<string, any>) => ({
@@ -76,6 +79,21 @@ export const ListenToGenerator = (pluginId: string, type: Types, message: string
     }
   },
   Twitch: {
+    onChannelHypeTrainBegin: (callback: any) => {
+      if (type === Types.onChannelHypeTrainBegin) {
+        callback();
+      }
+    },
+    onChannelHypeTrainProgress: (callback: any) => {
+      if (type === Types.onChannelHypeTrainProgress) {
+        params && callback(params);
+      }
+    },
+    onChannelHypeTrainEnd: (callback: any) => {
+      if (type === Types.onChannelHypeTrainEnd) {
+        params && callback(params);
+      }
+    },
     onChannelCharityCampaignStart: (callback: (args: Parameters<Events[Types.onChannelCharityCampaignStart]>[0]) => void) => {
       if (type === Types.onChannelCharityCampaignStart) {
         params && callback(params as Parameters<Events[Types.onChannelCharityCampaignStart]>[0]);

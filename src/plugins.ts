@@ -106,6 +106,18 @@ class Plugins extends Core {
       this.process(Types.TwitchClearChat);
     });
 
+    eventEmitter.on('hypetrain-started', async () => {
+      this.process(Types.onChannelHypeTrainBegin);
+    });
+
+    eventEmitter.on('hypetrain-level-reached', async (args) => {
+      this.process(Types.onChannelHypeTrainProgress, undefined, undefined, { args });
+    });
+
+    eventEmitter.on('hypetrain-ended', async (args) => {
+      this.process(Types.onChannelHypeTrainEnd, undefined, undefined, { args });
+    });
+
     eventEmitter.on('cheer', async (data) => {
       const user = {
         userName: data.userName,
