@@ -7,7 +7,7 @@ import { stats } from '~/helpers/api/index.js';
 import { executeVariablesInText } from '~/helpers/customvariables/executeVariablesInText.js';
 import { isBotStarted } from '~/helpers/database.js';
 import defaultValues from '~/helpers/overlaysDefaultValues.js';
-import { adminEndpoint, publicEndpoint } from '~/helpers/socket.js';
+import { adminEndpoint, endpoint } from '~/helpers/socket.js';
 import { SECOND } from '~/helpers/constants.js';
 
 const ticks: string[] = [];
@@ -71,18 +71,18 @@ class Overlays extends Registry {
       cb(null, data);
     });
 
-    publicEndpoint('/registries/overlays', 'parse', async (text, cb) => {
+    endpoint([], '/registries/overlays', 'parse', async (text, cb) => {
       try {
         cb(null, await new Message(await executeVariablesInText(text, null)).parse());
       } catch (e) {
         cb(e, '');
       }
     });
-    publicEndpoint('/registries/overlays', 'generic::getAll', async (cb) => {
+    endpoint([], '/registries/overlays', 'generic::getAll', async (cb) => {
       const items = await AppDataSource.getRepository(Overlay).find();
       cb(null, items.map(defaultValues) as Overlay[]);
     });
-    publicEndpoint('/registries/overlays', 'generic::getOne', async (id, cb) => {
+    endpoint([], '/registries/overlays', 'generic::getOne', async (id, cb) => {
       const item = await AppDataSource.getRepository(Overlay).findOneBy({ id });
       if (item) {
         const output = defaultValues(item);
@@ -98,10 +98,10 @@ class Overlays extends Registry {
             return cb(null, output);
           }
         }
-        cb(null, undefined);
+        cb(null, null);
       }
     });
-    publicEndpoint('/registry/overlays', 'overlays::tick', (opts) => {
+    endpoint([], '/registry/overlays' as any, 'overlays::tick', (opts: any) => {
       ticks.push(`${opts.groupId}|${opts.id}|${opts.millis}`);
     });
   }

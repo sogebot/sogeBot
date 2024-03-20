@@ -6,7 +6,7 @@ import { shuffle } from 'lodash-es';
 import { onStartup } from './decorators/on.js';
 import { LOW } from './helpers/constants.js';
 import emitter from './helpers/interfaceEmitter.js';
-import { adminEndpoint, publicEndpoint } from './helpers/socket.js';
+import { adminEndpoint, endpoint } from './helpers/socket.js';
 import getBroadcasterId from './helpers/user/getBroadcasterId.js';
 import twitch from './services/twitch.js';
 
@@ -70,7 +70,7 @@ class Emotes extends Core {
 
   @onStartup()
   onStartup() {
-    publicEndpoint('/core/emotes', 'getCache', async (cb) => {
+    endpoint([], '/core/emotes', 'getCache', async (cb) => {
       try {
         cb(null, this.cache.filter(o => this.types.includes(o.type)));
       } catch (e: any) {

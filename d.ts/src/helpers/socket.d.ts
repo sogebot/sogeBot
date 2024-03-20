@@ -249,7 +249,7 @@ export type ClientToServerEventsWithNamespace = {
       time: number;
     }) => void) => void,
     'stopwatch::update::set': (data: { id: string, isEnabled: boolean | null, time: number | null }) => void,
-    'stopwatch::update': (data: { id: string, isEnabled: boolean | null, time: number | null }, cb: (_err: null, data?: { isEnabled: boolean | null, time :string | null }) => void) => void,
+    'stopwatch::update': (data: any, cb: (_err: null, data?: { isEnabled: boolean | null, time :string | null }) => void) => void,
   },
   '/registries/alerts': GenericEvents & {
     'alerts::settings': (data: null | { areAlertsMuted: boolean; isSoundMuted: boolean; isTTSMuted: boolean; }, cb: (item: { areAlertsMuted: boolean; isSoundMuted: boolean; isTTSMuted: boolean; }) => void) => void,

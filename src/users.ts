@@ -481,7 +481,7 @@ class Users extends Core {
           const aggregatedTips = tips.map((o) => exchange(o.amount, o.currency, mainCurrency.value)).reduce((a, b) => a + b, 0);
           const aggregatedBits = bits.map((o) => Number(o.amount)).reduce((a, b) => a + b, 0);
 
-          const permId = await getUserHighestPermission(userId);
+          const permId = (await getUserHighestPermission(userId)).id;
           const permissionGroup = await Permissions.findOneByOrFail({ id: permId || defaultPermissions.VIEWERS });
           cb(null, {
             ...viewer, aggregatedBits, aggregatedTips, permission: permissionGroup, tips, bits,

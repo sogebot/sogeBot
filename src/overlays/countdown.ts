@@ -5,7 +5,7 @@ import Overlay from './_interface.js';
 import { AppDataSource } from '~/database.js';
 import { MINUTE, SECOND } from '~/helpers/constants.js';
 import { app } from '~/helpers/panel.js';
-import { adminEndpoint, publicEndpoint } from '~/helpers/socket.js';
+import { adminEndpoint, endpoint } from '~/helpers/socket.js';
 import { adminMiddleware } from '~/socket.js';
 
 const checks = new Map<string, { timestamp: number; isEnabled: boolean; time: number; }>();
@@ -68,7 +68,7 @@ class Countdown extends Overlay {
       res.status(204).send();
     });
 
-    publicEndpoint('/overlays/countdown', 'countdown::update', async (data: { id: string, isEnabled: boolean, time: number }, cb) => {
+    endpoint([], '/overlays/countdown', 'countdown::update' as any, async (data: any, cb: any) => {
       const update = {
         timestamp: Date.now(),
         isEnabled: data.isEnabled,

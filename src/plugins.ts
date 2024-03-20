@@ -4,7 +4,7 @@ import { eventEmitter } from './helpers/events/index.js';
 import { debug, error } from './helpers/log.js';
 import { app } from './helpers/panel.js';
 import { setImmediateAwait } from './helpers/setImmediateAwait.js';
-import { adminEndpoint, publicEndpoint } from './helpers/socket.js';
+import { adminEndpoint, endpoint } from './helpers/socket.js';
 import { Types } from './plugins/ListenTo.js';
 import { runScriptInSandbox, transpiledFiles } from './plugins/Sandbox.js';
 
@@ -286,8 +286,8 @@ class Plugins extends Core {
     adminEndpoint('/core/plugins', 'generic::getAll', async (cb) => {
       cb(null, plugins);
     });
-    publicEndpoint('/core/plugins', 'generic::getOne', async (id, cb) => {
-      cb(null, plugins.find(o => o.id === id));
+    endpoint([this.scope('read')], '/core/plugins', 'generic::getOne', async (id, cb) => {
+      cb(null, plugins.find(o => o.id === id) ?? null);
     });
     adminEndpoint('/core/plugins', 'generic::deleteById', async (id, cb) => {
       await Plugin.delete({ id });

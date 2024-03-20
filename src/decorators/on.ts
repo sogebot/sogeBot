@@ -14,21 +14,23 @@ type onEvents = {
   follow: onEvent[];
   bit: onEvent[];
   tip: onEvent[];
+  settingsSave: onEvent[];
 };
 
 const on: onEvents = {
-  streamStart: [],
-  streamEnd:   [],
-  change:      [],
-  load:        [],
-  startup:     [],
-  message:     [],
-  joinChannel: [],
-  partChannel: [],
-  sub:         [],
-  follow:      [],
-  bit:         [],
-  tip:         [],
+  streamStart:  [],
+  streamEnd:    [],
+  change:       [],
+  load:         [],
+  startup:      [],
+  message:      [],
+  joinChannel:  [],
+  partChannel:  [],
+  sub:          [],
+  follow:       [],
+  bit:          [],
+  tip:          [],
+  settingsSave: [],
 };
 
 export function getFunctionList(type: keyof onEvents, path = ''): onEvent[] {
@@ -144,6 +146,14 @@ export function onBit() {
   return (target: any, fName: string) => {
     const path = type === 'core' ? name : `${type}.${name.toLowerCase()}`;
     on.bit.push({ path, fName });
+  };
+}
+
+export function onSettingsSave() {
+  const { name, type } = getNameAndTypeFromStackTrace();
+  return (target: any, fName: string) => {
+    const path = type === 'core' ? name : `${type}.${name.toLowerCase()}`;
+    on.settingsSave.push({ path, fName });
   };
 }
 

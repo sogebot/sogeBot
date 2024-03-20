@@ -9,7 +9,7 @@ import eventlist from '../widgets/eventlist.js';
 
 import { AppDataSource } from '~/database.js';
 import { warning } from '~/helpers/log.js';
-import { adminEndpoint, publicEndpoint } from '~/helpers/socket.js';
+import { adminEndpoint, endpoint } from '~/helpers/socket.js';
 import getNameById from '~/helpers/user/getNameById.js';
 import { isBotId } from '~/helpers/user/isBot.js';
 import twitch from '~/services/twitch.js';
@@ -50,7 +50,7 @@ class EventList extends Overlay {
         };
       }));
     });
-    publicEndpoint('/overlays/eventlist', 'getEvents', async (opts: { ignore: string[]; limit: number }, cb) => {
+    endpoint([], '/overlays/eventlist', 'getEvents', async (opts: { ignore: string[]; limit: number }, cb) => {
       let events = await AppDataSource.getRepository(EventListEntity)
         .find({
           where: {

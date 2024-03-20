@@ -5,7 +5,7 @@ import { BotEntity } from '../BotEntity.js';
 
 @Entity()
 export class Cooldown extends BotEntity {
-  schema = z.object({
+  _schema = z.object({
     name: z.string().min(2),
   });
 

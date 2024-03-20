@@ -5,7 +5,7 @@ import { BotEntity } from '../BotEntity.js';
 
 @Entity()
 export class Quotes extends BotEntity {
-  schema = z.object({
+  _schema = z.object({
     quote: z.string().min(1),
   });
 
@@ -20,6 +20,7 @@ export class Quotes extends BotEntity {
 
   @Column()
     quotedBy: string;
+  quotedByUserName?: string | null; // not in database
 
   @Column({ type: 'varchar', length: '2022-07-27T00:30:34.569259834Z'.length, default: '1970-01-01T00:00:00.000Z' })
     createdAt: string;

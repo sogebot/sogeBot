@@ -2,6 +2,9 @@ import { parse, normalize } from 'path';
 
 import { xor, set, cloneDeep } from 'lodash-es';
 
+import { MEDIUM } from './helpers/constants.js';
+import { addScope } from './helpers/socket.js';
+
 import type { Module } from '~/_interface.js';
 import { isDbConnected } from '~/helpers/database.js';
 import emitter from '~/helpers/interfaceEmitter.js';
@@ -11,7 +14,6 @@ import {
 import { defaultPermissions } from '~/helpers/permissions/defaultPermissions.js';
 import { find, systems } from '~/helpers/register.js';
 import { VariableWatcher } from '~/watchers.js';
-import { MEDIUM } from './helpers/constants.js';
 
 export let loadingInProgress: (string|symbol)[] = [];
 export let areDecoratorsLoaded = false;
@@ -49,7 +51,7 @@ const checkIfDecoratorsAreLoaded = () => {
 };
 checkIfDecoratorsAreLoaded();
 
-function getNameAndTypeFromStackTrace(): { name: string, type: keyof typeof systems} {
+export function getNameAndTypeFromStackTrace(): { name: string, type: keyof typeof systems} {
   const _prepareStackTrace = Error.prepareStackTrace;
   Error.prepareStackTrace = (_s, s) => s;
   const stack = (new Error().stack as unknown as NodeJS.CallSite[]);
@@ -142,12 +144,17 @@ export function example(opts: (string|{if?: string, message: string, replace: { 
   };
 }
 
-export function settings(category?: string, isReadOnly = false) {
+export function settings(category?: string, isReadOnly = false, isSecret = false) {
   const { name, type } = getNameAndTypeFromStackTrace();
 
   return (target: any, key: string) => {
     if (!isReadOnly) {
       loadingInProgress.push(`${type}.${name}.${key}`);
+    }
+
+    if (isSecret) {
+      // add sensitive scope
+      addScope(`${type}:${name.toLowerCase()}:sensitive`);
     }
 
     const registerSettings = async () => {
@@ -188,7 +195,7 @@ export function settings(category?: string, isReadOnly = false) {
 
         // add variable to settingsList
         self.settingsList.push({
-          category, key, defaultValue: (self as any)[key],
+          category, key, defaultValue: (self as any)[key], secret: isSecret,
         });
       } catch (e: any) {
         error(e.stack);

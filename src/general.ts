@@ -8,7 +8,7 @@ import {
 
 import { HOUR, MINUTE } from './helpers/constants.js';
 import { setLocale } from './helpers/dayjsHelper.js';
-import { menu } from './helpers/panel.js';
+import { app, menu } from './helpers/panel.js';
 import type { Command } from '../d.ts/src/general.js';
 
 import Core from '~/_interface.js';
@@ -79,7 +79,7 @@ class General extends Core {
       name: 'index', id: '', this: this,
     });
     this.addMenu({
-      category: 'commands', name: 'botcommands', id: 'commands/botcommands', this: this,
+      category: 'commands', name: 'botcommands', id: 'commands/botcommands', this: this, scopeParent: this.scope(),
     });
     this.addMenu({
       category: 'settings', name: 'modules', id: 'settings/modules', this: null,
@@ -89,10 +89,22 @@ class General extends Core {
   }
 
   sockets() {
-    adminEndpoint('/core/general', 'menu::private', async (cb) => {
-      cb(menu.map((o) => ({
-        category: o.category, name: o.name, id: o.id, enabled: o.this ? o.this.enabled : true,
-      })));
+    if (!app) {
+      setTimeout(() => this.sockets(), 100);
+      return;
+    }
+    app.get('/api/ui/menu', async (req, res) => {
+      if (req.headers.scopes?.includes('dashboard:admin:read')) {
+        res.send(menu.map((o) => ({
+          scopeParent: o.scopeParent,
+          category:    o.category,
+          name:        o.name,
+          id:          o.id,
+          enabled:     o.this ? o.this.enabled : true,
+        })));
+      } else {
+        res.send().status(401);
+      }
     });
 
     adminEndpoint('/core/general', 'generic::getCoreCommands', async (cb) => {

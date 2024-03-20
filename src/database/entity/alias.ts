@@ -1,13 +1,13 @@
-import { BaseEntity, Column, Entity, Index, PrimaryColumn } from 'typeorm';
+import { Column, Entity, Index, PrimaryColumn } from 'typeorm';
 import { z } from 'zod';
 
+import { BotEntity } from '../BotEntity.js';
 import { command } from '../validators/IsCommand.js';
 import { commandOrCustomVariable } from '../validators/IsCommandOrCustomVariable.js';
-import { BotEntity } from '../BotEntity.js';
 
 @Entity()
 export class Alias extends BotEntity {
-  schema = z.object({
+  _schema = z.object({
     alias:   command(),
     command: commandOrCustomVariable(),
   });
@@ -36,7 +36,11 @@ export class Alias extends BotEntity {
 }
 
 @Entity()
-export class AliasGroup extends BaseEntity {
+export class AliasGroup extends BotEntity {
+  _schema = z.object({
+    name: z.string().min(2),
+  });
+
   @PrimaryColumn()
   @Index('IDX_alias_group_unique_name', { unique: true })
     name: string;

@@ -4,31 +4,31 @@ import { evaluate as mathJsEvaluate, round } from 'mathjs';
 import System from './_interface.js';
 import { onStartup } from '../decorators/on.js';
 import {
-  command, default_permission, parser, permission_settings, settings, ui,
+  command, default_permission, parser, permission_settings, settings,
 } from '../decorators.js';
 import { Expects } from  '../expects.js';
 import general from '../general.js';
 import users from '../users.js';
 
 import { AppDataSource } from '~/database.js';
+import { Post } from '~/decorators/endpoint.js';
 import { isStreamOnline } from '~/helpers/api/index.js';
 import { ResponseError } from '~/helpers/commandError.js';
 import { prepare } from '~/helpers/commons/index.js';
+import { MINUTE, SECOND } from '~/helpers/constants.js';
 import { getAllOnlineIds } from '~/helpers/getAllOnlineUsernames.js';
 import { debug, error } from '~/helpers/log.js';
+import { format } from '~/helpers/number.js';
 import defaultPermissions from '~/helpers/permissions/defaultPermissions.js';
 import { getUserHighestPermission } from '~/helpers/permissions/getUserHighestPermission.js';
 import { getPointsName } from '~/helpers/points/index.js';
 import { setImmediateAwait } from '~/helpers/setImmediateAwait.js';
-import { adminEndpoint } from '~/helpers/socket.js';
 import {
   bigIntMax, serialize, unserialize,
 } from '~/helpers/type.js';
 import * as changelog from '~/helpers/user/changelog.js';
 import { isBotId } from '~/helpers/user/isBot.js';
 import { translate } from '~/translate.js';
-import { MINUTE, SECOND } from '~/helpers/constants.js';
-import { format } from '~/helpers/number.js';
 
 let cachedLevelsHash = '';
 const cachedLevels: bigint[] = [];
@@ -42,11 +42,6 @@ class Levels extends System {
 
   @settings('levels')
     nextLevelFormula = '$prevLevelXP + ($prevLevelXP * 1.5)';
-
-  @ui({ type: 'levels-showcase', emit: 'getLevelsExample' }, 'levels')
-    levelShowcase = null;
-  @ui({ type: 'helpbox' }, 'levels')
-    levelShowcaseHelp = null;
 
   @settings('xp')
     xpName = 'XP';
@@ -75,21 +70,16 @@ class Levels extends System {
   @permission_settings('xp')
     perMessageOfflineInterval = 0;
 
-  sockets () {
-    adminEndpoint('/systems/levels', 'getLevelsExample', (data, cb) => {
-      try {
-        const firstLevelStartsAt = typeof data === 'function' ? this.firstLevelStartsAt : data.firstLevelStartsAt;
-        const nextLevelFormula = typeof data === 'function' ? this.nextLevelFormula : data.nextLevelFormula;
-        const xpName = typeof data === 'function' ? this.xpName : data.xpName;
-        const levels = [];
-        for (let i = 1; i <= 21; i++) {
-          levels.push(this.getLevelXP(i, BigInt(firstLevelStartsAt), nextLevelFormula, true));
-        }
-        (typeof data === 'function' ? data : cb!)(null, levels.map(xp => `${Intl.NumberFormat(general.lang).format(xp)} ${xpName}`));
-      } catch (e: any) {
-        (typeof data === 'function' ? data : cb!)(e, []);
-      }
-    });
+  @Post('/example')
+  async getLevelsExample(req: any) {
+    const firstLevelStartsAt = req.body.firstLevelStartsAt;
+    const nextLevelFormula = req.body.nextLevelFormula;
+    const xpName = req.body.xpName;
+    const levels = [];
+    for (let i = 1; i <= 21; i++) {
+      levels.push(this.getLevelXP(i, BigInt(firstLevelStartsAt), nextLevelFormula, true));
+    }
+    return levels.map(xp => `${Intl.NumberFormat(general.lang).format(xp)} ${xpName}`);
   }
 
   @onStartup()
@@ -163,7 +153,7 @@ class Levels extends System {
     }
 
     // get user max permission
-    const permId = await getUserHighestPermission(userId);
+    const permId = (await getUserHighestPermission(userId)).id;
     if (!permId) {
       debug('levels.update', `User ${user.userName}#${userId} permId not found`);
       return; // skip without id
@@ -256,7 +246,7 @@ class Levels extends System {
     ]);
 
     // get user max permission
-    const permId = await getUserHighestPermission(opts.sender.userId);
+    const permId = (await getUserHighestPermission(opts.sender.userId)).id;
     if (!permId) {
       return true; // skip without permission
     }
