@@ -4,6 +4,7 @@ import axios, { AxiosRequestConfig } from 'axios';
 import ts from 'typescript';
 
 import { CustomVariableGenerator } from './CustomVariable.js';
+import { DiscordGenerator } from './Discord.js';
 import { ListenToGenerator, Types } from './ListenTo.js';
 import { LogGenerator } from './Log.js';
 import { PermissionGenerator } from './Permission.js';
@@ -67,6 +68,8 @@ export const runScriptInSandbox = (plugin: Plugin,
   }) => {
   // @ts-expect-error TS6133
   const ListenTo = ListenToGenerator(plugin.id, type, message, userstate, params);
+  // @ts-expect-error TS6133
+  const Discord = DiscordGenerator(plugin.id, userstate);
   // @ts-expect-error TS6133
   const Twitch = TwitchGenerator(plugin.id, userstate);
   // @ts-expect-error TS6133
