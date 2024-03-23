@@ -27,6 +27,10 @@ class Plugins extends Core {
       this.triggerCrons();
     }, SECOND);
 
+    eventEmitter.on(Types.onDiscordMessage, async (args) => {
+      this.process(Types.onDiscordMessage, undefined, undefined, args);
+    });
+
     eventEmitter.on(Types.onOBSWebsocketEvent, async (args) => {
       this.process(Types.onOBSWebsocketEvent, undefined, undefined, args);
     });

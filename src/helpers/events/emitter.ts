@@ -266,6 +266,15 @@ export interface Events {
     event: string,
     args: any,
   }) => void;
+  [Types.onDiscordMessage]: (opts: {
+    channelId: string,
+    channelName: string,
+    userName: string,
+    userId: string,
+    userDisplayName: string,
+    message: string,
+    twitchLinkedUserId: string | null,
+  }) => void;
 }
 
 class _EventEmitter extends TypedEmitter<Events> {}

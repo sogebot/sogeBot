@@ -39,6 +39,7 @@ import { check } from '~/helpers/permissions/check.js';
 import { get as getPermission } from '~/helpers/permissions/get.js';
 import { adminEndpoint } from '~/helpers/socket.js';
 import * as changelog from '~/helpers/user/changelog.js';
+import { Types } from '~/plugins/ListenTo.js';
 import { getIdFromTwitch } from '~/services/twitch/calls/getIdFromTwitch.js';
 import { variables } from '~/watchers.js';
 
@@ -573,6 +574,15 @@ class Discord extends Integration {
   async message(content: string, channel: DiscordJsTextChannel, author: DiscordJsUser, msg?: DiscordJs.Message) {
     chatIn(`#${channel.name}: ${content} [${author.tag}]`);
     if (msg) {
+      eventEmitter.emit(Types.onDiscordMessage, {
+        channelId:          channel.id,
+        channelName:        channel.name,
+        userName:           author.tag,
+        userId:             author.id,
+        userDisplayName:    author.displayName,
+        message:            content,
+        twitchLinkedUserId: (await AppDataSource.getRepository(DiscordLink).findOneByOrFail({ discordId: author.id, userId: Not(IsNull()) })).userId,
+      });
       const broadcasterUsername = variables.get('services.twitch.broadcasterUsername') as string;
       if (content === this.getCommand('!_debug')) {
         info('======= COPY DISCORD DEBUG MESSAGE FROM HERE =======');

@@ -48,6 +48,7 @@ export enum Types {
   'onChannelHypeTrainBegin',
   'onChannelHypeTrainProgress',
   'onChannelHypeTrainEnd',
+  'onDiscordMessage'
 }
 
 export const ListenToGenerator = (pluginId: string, type: Types, message: string, userstate: { userName: string, userId: string } | null, params?: Record<string, any>) => ({
@@ -77,6 +78,14 @@ export const ListenToGenerator = (pluginId: string, type: Types, message: string
         callback();
       }
     }
+  },
+  Discord: {
+    onMessage: (callback: any) => {
+      if (type === Types.onDiscordMessage) {
+        debug('plugins', `PLUGINS#${pluginId}: Discord message executed`);
+        callback(params);
+      }
+    },
   },
   Twitch: {
     onChannelHypeTrainBegin: (callback: any) => {
