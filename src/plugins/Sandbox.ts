@@ -137,7 +137,13 @@ export const runScriptInSandbox = (plugin: Plugin,
   };
   // @ts-expect-error TS6133
   const Alerts = {
-    async trigger(uuid: string, name?: string, msg?: string, customOptions?: EmitData['customOptions']) {
+    async trigger(uuid: string, config?: string) {
+      let customOptions: EmitData['customOptions'] = {};
+
+      if (config) {
+        customOptions = JSON.parse(Buffer.from(config, 'base64').toString('utf-8'));
+      }
+
       if (customOptions) {
         info(`PLUGINS#${plugin.id}: Triggering alert ${uuid} with custom options ${JSON.stringify(customOptions)}`);
       } else {
@@ -145,12 +151,13 @@ export const runScriptInSandbox = (plugin: Plugin,
       }
       await alerts.trigger({
         eventId:    null,
+        alertId:    uuid,
         amount:     0,
         currency:   'CZK',
         event:      'custom',
-        message:    msg || '',
+        message:    '',
         monthsName: '',
-        name:       name ?? '',
+        name:       '',
         tier:       null,
         recipient:  userstate?.userName ?? '',
         customOptions,
