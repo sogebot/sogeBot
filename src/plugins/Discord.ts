@@ -21,15 +21,13 @@ export const DiscordGenerator = (pluginId: string, fileName: string) => ({
     if (Discord.client) {
       let channelFound = false;
       for (const [ id, channel ] of Discord.client.channels.cache) {
-        if (channel.type === ChannelType.GuildText) {
-          if (id === channelName || (channel as TextChannel).name === channelName) {
-            const ch = Discord.client.channels.cache.find(o => o.id === id);
-            if (ch) {
-              (ch as TextChannel).send(await Discord.replaceLinkedUsernameInMessage(message));
-              chatOut(`#${(ch as TextChannel).name}: ${message} [${Discord.client.user?.tag}]`);
-              channelFound = true;
-              break;
-            }
+        if (id === channelName || (channel as TextChannel).name === channelName) {
+          const ch = Discord.client.channels.cache.find(o => o.id === id);
+          if (ch) {
+            (ch as TextChannel).send(await Discord.replaceLinkedUsernameInMessage(message));
+            chatOut(`#${(ch as TextChannel).name}: ${message} [${Discord.client.user?.tag}]`);
+            channelFound = true;
+            break;
           }
         }
       }
