@@ -1,4 +1,4 @@
-import { ChannelType, TextChannel } from 'discord.js';
+import { TextChannel } from 'discord.js';
 
 import { getUserSender } from '~/helpers/commons/index.js';
 import { chatOut, error } from '~/helpers/log.js';
