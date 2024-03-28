@@ -69,7 +69,7 @@ export const runScriptInSandbox = (plugin: Plugin,
   // @ts-expect-error TS6133
   const ListenTo = ListenToGenerator(plugin.id, type, message, userstate, params);
   // @ts-expect-error TS6133
-  const Discord = DiscordGenerator(plugin.id, userstate);
+  const Discord = DiscordGenerator(plugin.id, ___code___.name);
   // @ts-expect-error TS6133
   const Twitch = TwitchGenerator(plugin.id, userstate);
   // @ts-expect-error TS6133
