@@ -21,13 +21,6 @@ Set port for listening of UI.
 - `SECUREPORT=12345`
 - `SECUREPORT=20443` *default*
 
-## CA_KEY, CA_CERT
-
-Sets your certificate and certificate key by **full path**
-
-- `CA_KEY=/path/to/your/cert.key`
-- `CA_CERT=/path/to/your/cert.cert`
-
 ## HEAP
 
 Enables HEAP snapshot tracking and saving for a bot. In normal environment,
@@ -79,7 +72,7 @@ in different timezones.
 ### Available values
 
 - *system* - will set timezone defined by system
-- other timezones can be found at https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+- other timezones can be found at <https://en.wikipedia.org/wiki/List_of_tz_database_time_zones>
   - you are interested in TZ values on wiki:
     - Africa/Abidjan
     - Europe/Prague
