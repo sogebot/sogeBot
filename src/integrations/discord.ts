@@ -574,14 +574,15 @@ class Discord extends Integration {
   async message(content: string, channel: DiscordJsTextChannel, author: DiscordJsUser, msg?: DiscordJs.Message) {
     chatIn(`#${channel.name}: ${content} [${author.tag}]`);
     if (msg) {
+      const twitchLinkedUserId = (await AppDataSource.getRepository(DiscordLink).findOneBy({ discordId: author.id, userId: Not(IsNull()) }))?.userId ?? null;
       eventEmitter.emit(Types.onDiscordMessage, {
-        channelId:          channel.id,
-        channelName:        channel.name,
-        userName:           author.tag,
-        userId:             author.id,
-        userDisplayName:    author.displayName,
-        message:            content,
-        twitchLinkedUserId: (await AppDataSource.getRepository(DiscordLink).findOneByOrFail({ discordId: author.id, userId: Not(IsNull()) })).userId,
+        channelId:       channel.id,
+        channelName:     channel.name,
+        userName:        author.tag,
+        userId:          author.id,
+        userDisplayName: author.displayName,
+        message:         content,
+        twitchLinkedUserId,
       });
       const broadcasterUsername = variables.get('services.twitch.broadcasterUsername') as string;
       if (content === this.getCommand('!_debug')) {
