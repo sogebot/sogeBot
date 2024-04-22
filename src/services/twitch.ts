@@ -553,7 +553,7 @@ class Twitch extends Service {
     ],
   ])
   @default_permission(defaultPermissions.MODERATORS)
-  async createMarker (opts: CommandOptions) {
+  async marker (opts: CommandOptions) {
     const description = opts.parameters.trim().length === 0
       ? 'Created by ' + opts.sender.userName
       : opts.parameters + ' by ' + opts.sender.userName;
