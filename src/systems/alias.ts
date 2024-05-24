@@ -14,6 +14,7 @@ import { AppDataSource } from '~/database.js';
 import { checkFilter } from '~/helpers/checkFilter.js';
 import { incrementCountOfCommandUsage } from '~/helpers/commands/count.js';
 import { prepare } from '~/helpers/commons/index.js';
+import { HIGH } from '~/helpers/constants.js';
 import { executeVariablesInText } from '~/helpers/customvariables/index.js';
 import {
   debug, error, info, warning,
@@ -22,9 +23,10 @@ import { check } from '~/helpers/permissions/check.js';
 import { defaultPermissions } from '~/helpers/permissions/defaultPermissions.js';
 import { get } from '~/helpers/permissions/get.js';
 import { adminEndpoint } from '~/helpers/socket.js';
+import { Types } from '~/plugins/ListenTo.js';
+import plugins from '~/plugins.js';
 import customCommands from '~/systems/customcommands.js';
 import { translate } from '~/translate.js';
-import { HIGH } from '~/helpers/constants.js';
 
 /*
  * !alias                                              - gets an info about alias usage
@@ -213,9 +215,11 @@ class Alias extends System {
           for (let i = 0; i < responses.length; i++) {
             await parserReply(responses[i].response, { sender: responses[i].sender, discord: responses[i].discord, attr: responses[i].attr, id: opts.id });
           }
-          // go through custom commands
           if (response.startsWith('!')) {
+            // go through custom commands
             customCommands.run({ ...opts, message: response });
+            // go through plugins
+            plugins.process(Types.TwitchCommand, response, opts.sender);
           }
 
           incrementCountOfCommandUsage(alias.alias);
