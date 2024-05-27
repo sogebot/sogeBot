@@ -136,7 +136,7 @@ class Alias extends System {
     const length = opts.message.toLowerCase().split(' ').length;
     const aliases = await AliasEntity.find();
     for (let i = 0; i < length; i++) {
-      alias = aliases.find(o => o.alias === cmdArray.join(' ') && o.enabled);
+      alias = aliases.find(o => o.alias.toLowerCase() === cmdArray.join(' ') && o.enabled);
       if (alias) {
         return [alias, cmdArray];
       }
@@ -149,6 +149,7 @@ class Alias extends System {
   @parser({ priority: HIGH, fireAndForget: true })
   async run (opts: ParserOptions): Promise<boolean> {
     const alias = (await this.search(opts))[0];
+
     if (!alias || !opts.sender) {
       return true;
     } // no alias was found - return
