@@ -278,16 +278,6 @@ export type ClientToServerEventsWithNamespace = {
     'stop.import': () => void,
     'next': () => void,
   },
-  '/core/events': GenericEvents & {
-    'events::getRedeemedRewards': (cb: (error: Error | string | null | unknown, rewards: { id: string, name: string }[]) => void) => void,
-    'generic::getAll': (cb: (error: Error | string | null | unknown, data: Event[]) => void) => void,
-    'generic::getOne': (id: string, cb: (error: Error | string | null | unknown, data?: Event) => void) => void,
-    'list.supported.events': (cb: (error: Error | string | null | unknown, data: any[] /* TODO: missing type */) => void) => void,
-    'list.supported.operations': (cb: (error: Error | string | null | unknown, data: any[] /* TODO: missing type */) => void) => void,
-    'test.event': (opts: { id: string; randomized: string[], variables: string[], values: any[] }, cb: (error: Error | string | null | unknown) => void) => void,
-    'events::save': (event: Event, cb: (error: Error | string | null | unknown, data: Event) => void) => void,
-    'events::remove': (eventId: Required<Event['id']>, cb: (error: Error | string | null | unknown) => void) => void,
-  },
   '/core/tts': GenericEvents & {
     'speak': (opts: { service: TTSService, text: string, key: string, voice: string; volume: number; rate: number; pitch: number; triggerTTSByHighlightedMessage?: boolean; } |
     { service: TTSService.ELEVENLABS, text: string, key: string, voice: string; volume: number; clarity: number; stability: number; exaggeration: number; triggerTTSByHighlightedMessage?: boolean; }, cb: (error: Error | string | null | unknown, b64mp3?: string) => void) => void,

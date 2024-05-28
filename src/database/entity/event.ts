@@ -293,7 +293,7 @@ export class Event extends BotEntity {
         }),
       }),
       ...[
-        'bot-will-join-channel', 'bot-will-part-channel', 'create-a-clip', 'start-commercial',
+        'bot-will-join-channel', 'bot-will-leave-channel', 'create-a-clip', 'start-commercial',
       ].map((name) => z.object({
         name: z.literal(name),
       })),
