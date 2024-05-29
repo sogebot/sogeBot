@@ -1,5 +1,3 @@
-import { randomUUID } from 'node:crypto';
-
 import Overlay from './_interface.js';
 import { badgesCache } from '../services/twitch/calls/getChannelChatBadges.js';
 
@@ -7,7 +5,6 @@ import { onMessage } from '~/decorators/on.js';
 import { timer } from '~/decorators.js';
 import { ioServer } from '~/helpers/panel.js';
 import { parseTextWithEmotes } from '~/helpers/parseTextWithEmotes.js';
-import { adminEndpoint } from '~/helpers/socket.js';
 
 export const getBadgeImagesFromBadgeSet = (badgesMap: Map<string, string>) => {
   const badgeImages: {url: string }[] = [];
@@ -47,22 +44,6 @@ class Chat extends Overlay {
         badges:      getBadgeImagesFromBadgeSet(message.sender.badges),
         color:       message.sender.color,
         service:     'twitch',
-      });
-    });
-  }
-
-  sockets() {
-    adminEndpoint('/overlays/chat', 'test', (data) => {
-      this.withEmotes(data.message).then(message => {
-        ioServer?.of('/overlays/chat').emit('message', {
-          id:          randomUUID(),
-          timestamp:   Date.now(),
-          displayName: data.username,
-          userName:    data.username,
-          message,
-          show:        false,
-          badges:      [],
-        });
       });
     });
   }

@@ -148,11 +148,6 @@ export type ClientToServerEventsWithNamespace = {
     'alert': (data: any) => void,
     'cache': (cacheLimit: number, cb: (err: Error | string | null | unknown, data: any) => void) => void,
   },
-  '/overlays/chat': GenericEvents & {
-    'test': (data: { message: string; username: string }) => void,
-    'timeout': (userName: string) => void,
-    'message': (data: { id: string, show: boolean; message: string; username: string, timestamp: number, badges: any }) => void,
-  },
   '/overlays/texttospeech': GenericEvents & {
     'speak': (data: { text: string; highlight: boolean, key: string }) => void,
   },
