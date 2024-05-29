@@ -7,7 +7,7 @@ import defaultPermissions from './permissions/defaultPermissions.js';
 import { getUserHighestPermission } from './permissions/getUserHighestPermission.js';
 
 import type { Fn, ClientToServerEventsWithNamespace, NestedFnParams } from '~/../d.ts/src/helpers/socket.js';
-import { debug } from '~/helpers/log.js';
+import { debug, error } from '~/helpers/log.js';
 
 const endpoints: {
   type: 'admin' | 'viewer' | 'public';
@@ -139,9 +139,9 @@ const viewerEndpoint = (nsp: string, on: string, callback: (opts: any, cb: (erro
 
 const withScope = (allowedScopes: string[], isPublic: boolean = false) => {
   return async (req: { headers: { [x: string]: any; }; }, res: { sendStatus: (arg0: number) => any; }, next: () => void) => {
+    const authHeader = req.headers.authorization;
+    const authToken = authHeader && authHeader.split(' ')[1];
     try {
-      const authHeader = req.headers.authorization;
-      const authToken = authHeader && authHeader.split(' ')[1];
 
       const socket = (await import('../socket.js')).default;
 
@@ -178,6 +178,7 @@ const withScope = (allowedScopes: string[], isPublic: boolean = false) => {
 
       res.sendStatus(401);
     } catch (e) {
+      error(e);
       res.sendStatus(500);
       return ;
     }

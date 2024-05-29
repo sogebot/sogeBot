@@ -166,7 +166,7 @@ class General extends Core {
       name:        o.name,
       id:          o.id,
       enabled:     o.this ? o.this.enabled : true,
-    })).filter(o => o.scopeParent ? scopes.includes(o.scopeParent) : true);
+    })).filter(o => o.scopeParent ? scopes.map(sc => sc.split(':')[0]).includes(o.scopeParent) : true);
   }
 
   @command('!enable')

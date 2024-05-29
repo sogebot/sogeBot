@@ -142,6 +142,10 @@ class Module {
 
     register(this._name as any, this);
 
+    // add default scopes for higher level
+    addScope(`${this._name}:read`);
+    addScope(`${this._name}:manage`);
+
     // prepare proxies for variables
     this._sockets();
 
@@ -316,7 +320,7 @@ class Module {
         error(this.nsp + ': Cannot initialize sockets second time');
       };
 
-      app.get(`/api/settings${this.nsp}`, withScope([this.scope('read'), this.scope('manage')]), async (req, res) => {
+      app.get(`/api/settings${this.nsp}`, withScope([`${this._name}:read`, `${this._name}:manage`]), async (req, res) => {
         try {
           res.json({
             status: 'success',
@@ -332,7 +336,7 @@ class Module {
         }
       });
 
-      app.get(`/api/settings${this.nsp}/:variable`, withScope([this.scope('read'), this.scope('manage')]), async (req, res) => {
+      app.get(`/api/settings${this.nsp}/:variable`, withScope([`${this._name}:read`, `${this._name}:manage`]), async (req, res) => {
         try {
           res.json({
             status: 'success',
@@ -343,7 +347,7 @@ class Module {
         }
       });
 
-      app.post(`/api/settings${this.nsp}/:variable`, withScope([this.scope('manage')]), async (req, res) => {
+      app.post(`/api/settings${this.nsp}/:variable`, withScope([`${this._name}:manage`]), async (req, res) => {
         try {
           (this as any)[req.params.variable] = req.body.value;
           res.json({
@@ -354,7 +358,7 @@ class Module {
         }
       });
 
-      app.post(`/api/settings${this.nsp}`, withScope([this.scope('manage')]), async (req, res) => {
+      app.post(`/api/settings${this.nsp}`, withScope([`${this._name}:manage`]), async (req, res) => {
         const data = flatten(req.body);
         const remap: ({ key: string; actual: string; toRemove: string[] } | { key: null; actual: null; toRemove: null })[] = Object.keys(flatten(data)).map(o => {
           // skip commands, enabled and permissions

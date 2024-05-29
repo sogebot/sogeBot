@@ -71,6 +71,9 @@ export function Post<T extends string>(endpoint: T, params: {
         }
       }
 
+      for (const scope of scopes) {
+        addScope(scope);
+      }
       app.post(generatedEndpoint, withScope(scopes), async (req, res) => {
         try {
           const endpointHandler = registeredEndpoint[generatedEndpoint][req.query._action as string ?? 'default'];
@@ -104,6 +107,10 @@ export function Post<T extends string>(endpoint: T, params: {
                 });
               }
             } catch (e) {
+              if (e instanceof Error && e.message === '404') {
+                res.status(404).send({ status: 'error', message: 'Not found' });
+                return;
+              }
               if (e instanceof ZodError) {
                 res.status(400).send({ status: 'invalid-data', errors: e.errors });
               } else {
@@ -117,6 +124,90 @@ export function Post<T extends string>(endpoint: T, params: {
             });
           }
         } catch (e) {
+          error(e);
+          res.status(500).send({
+            status:  'error',
+            message: 'Internal Server Error',
+          });
+        }
+      });
+    };
+    registerEndpoint();
+  };
+}
+
+export function Patch<T extends string>(endpoint: T, params: {
+  isSensitive?: boolean,
+  scopeOrigin?: string
+  customEndpoint?: string
+} = {}) {
+  const { name, type } = getNameAndTypeFromStackTrace();
+
+  return (_target: any, key: string, fnc: TypedPropertyDescriptor<(req?: any) => Promise<any>>) => {
+    let retries = 0;
+
+    const registerEndpoint = () => {
+      if (!isBotStarted) {
+        setTimeout(() => registerEndpoint(), 100);
+        return;
+      }
+
+      if (retries > 120) {
+        throw new Error('Failed to register endpoint');
+      }
+      const self = find(type as any, name) as typeof _target;
+      if (!app || !self) {
+        retries++;
+        setTimeout(() => registerEndpoint(), 1000);
+        return;
+      }
+      let scopes: string[] = [];
+
+      // if scopeOrigin is present, use it
+      if (params.scopeOrigin) {
+        scopes = [`${params.scopeOrigin}:manage`];
+        if (params.isSensitive) {
+          scopes = [`${params.scopeOrigin}:sensitive`];
+        }
+      } else {
+        scopes =[self.scope('manage')];
+        if (params.isSensitive) {
+          scopes = [self.scope('sensitive')];
+        }
+      }
+      let generatedEndpoint = `/api${params.customEndpoint ? params.customEndpoint : self.nsp as string}${endpoint}`;
+      // if ends with /, remove it
+      if (generatedEndpoint.endsWith('/')) {
+        generatedEndpoint = generatedEndpoint.slice(0, -1);
+      }
+
+      for (const scope of scopes) {
+        addScope(scope);
+      }
+      app.patch(generatedEndpoint, withScope(scopes), async (req, res) => {
+        try {
+          if (fnc.value) {
+            const data = await fnc.value.bind(self)(req);
+
+            if ('_raw' in req.query) {
+              res.send(data);
+            } else {
+              res.send({
+                status: 'success',
+                data,
+              });
+            }
+          } else {
+            res.status(500).send({
+              status:  'error',
+              message: 'No function to call',
+            });
+          }
+        } catch (e) {
+          if (e instanceof Error && e.message === '404') {
+            res.status(404).send({ status: 'error', message: 'Not found' });
+            return;
+          }
           error(e);
           res.status(500).send({
             status:  'error',
@@ -185,6 +276,10 @@ export function Get<T extends string>(endpoint: T, params: {
       if (generatedEndpoint.endsWith('/')) {
         generatedEndpoint = generatedEndpoint.slice(0, -1);
       }
+
+      for (const scope of scopes) {
+        addScope(scope);
+      }
       app.get(generatedEndpoint, withScope(scopes, params.scope === 'public'), async (req, res) => {
         try {
           if (fnc.value) {
@@ -252,6 +347,7 @@ export function Delete<T extends string>(endpoint: T, params: { customEndpoint?:
       if (generatedEndpoint.endsWith('/')) {
         generatedEndpoint = generatedEndpoint.slice(0, -1);
       }
+      addScope(self.scope(params.isSensitive ? 'sensitive' : 'manage'));
       app.delete(generatedEndpoint, withScope([self.scope(params.isSensitive ? 'sensitive' : 'manage')]), async (req, res) => {
         try {
           if (fnc.value) {

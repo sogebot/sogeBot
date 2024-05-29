@@ -2,6 +2,7 @@ import { randomUUID } from 'crypto';
 
 import { AlertQueue, EmitData } from '@entity/overlay.js';
 import { Mutex } from 'async-mutex';
+import { Request } from 'express';
 
 import Registry from './_interface.js';
 import { command, default_permission, example, persistent, settings } from '../decorators.js';
@@ -11,6 +12,7 @@ import twitch from '../services/twitch.js';
 import { parserReply } from '~/commons.js';
 import { User, UserInterface } from '~/database/entity/user.js';
 import { AppDataSource } from '~/database.js';
+import { Delete, Get, Patch, Post } from '~/decorators/endpoint.js';
 import { onStartup } from '~/decorators/on.js';
 import { Expects } from  '~/expects.js';
 import { isStreamOnline } from '~/helpers/api/isStreamOnline.js';
@@ -18,10 +20,10 @@ import { prepare } from '~/helpers/commons/index.js';
 import { eventEmitter } from '~/helpers/events/emitter.js';
 import { getLocalizedName } from '~/helpers/getLocalizedName.js';
 import { debug, info, error } from '~/helpers/log.js';
-import { app, ioServer } from '~/helpers/panel.js';
+import { ioServer } from '~/helpers/panel.js';
 import { defaultPermissions } from '~/helpers/permissions/defaultPermissions.js';
 import { itemsToEvalPart } from '~/helpers/queryFilter.js';
-import { adminEndpoint, withScope } from '~/helpers/socket.js';
+import { adminEndpoint } from '~/helpers/socket.js';
 import { Types } from '~/plugins/ListenTo.js';
 import { translate } from '~/translate.js';
 import { variables } from '~/watchers.js';
@@ -97,112 +99,98 @@ class Alerts extends Registry {
   @persistent()
     isSoundMuted = false;
 
-  sockets () {
-    if (!app) {
-      setTimeout(() => this.sockets(), 100);
-      return;
+  @Get('/queue')
+  async queue() {
+    const release = await filterMutex.acquire();
+    const cmd = await AlertQueue.find();
+    release();
+    return cmd;
+  }
+
+  @Patch('/queue/:id')
+  async queuePatch(req: Request) {
+    const release = await filterMutex.acquire();
+    const queue = await AlertQueue.findOneBy({ id: req.params.id });
+    if (queue) {
+      for (const key of Object.keys(queue)) {
+        if (key in req.body && key in queue) {
+          (queue as any)[key] = req.body[key];
+        }
+      }
+      await queue.save();
     }
+    release();
+  }
 
-    app.get('/api/registries/alerts/queue/', withScope(['alerts:read']), async (req, res) => {
-      const release = await filterMutex.acquire();
-      const cmd = await AlertQueue.find();
-      res.send({
-        data: cmd,
-      });
-      release();
-    });
+  @Post('/queue/:id/extend')
+  async queueExtend(req: Request) {
+    const id = req.params.id;
 
-    app.patch('/api/registries/alerts/queue/:id', withScope(['alerts:manage']), async (req, res) => {
-      const release = await filterMutex.acquire();
-      const queue = await AlertQueue.findOneBy({ id: req.params.id });
-      if (queue) {
-        for (const key of Object.keys(queue)) {
-          if (key in req.body && key in queue) {
-            (queue as any)[key] = req.body[key];
-          }
-        }
-        await queue.save();
-        res.status(200).send();
-      } else {
-        res.status(404).send();
-      }
-      release();
-    });
+    if (continousPlayMutex[id]) {
+      // increase validity if alert is still in overlay queue prepared to play
+      continousPlayMutex[id] = Date.now() + 5000;
+    }
+  }
 
-    app.post('/api/registries/alerts/queue/:id/extend', async (req, res) => {
-      const id = req.params.id;
+  @Post('/queue/:id/release')
+  async queueRelease(req: Request) {
+    const id = req.params.id;
 
-      if (continousPlayMutex[id]) {
-        // increase validity if alert is still in overlay queue prepared to play
-        continousPlayMutex[id] = Date.now() + 5000;
-      }
-      res.status(200).send();
-    });
+    if (continousPlayMutex[id]) {
+      // release mutex
+      delete continousPlayMutex[id];
+    }
+  }
 
-    app.post('/api/registries/alerts/queue/:id/release', async (req, res) => {
-      const id = req.params.id;
+  @Post('/queue/:id/reset')
+  async queueReset(req: Request) {
+    const release = await filterMutex.acquire();
+    const queue = await AlertQueue.findOneBy({ id: req.params.id });
+    release();
+    if (queue) {
+      queue.emitData = [];
+      queue.save();
+    } else {
+      throw new Error('404');
+    }
+  }
 
-      if (continousPlayMutex[id]) {
-        // release mutex
-        delete continousPlayMutex[id];
-      }
-      res.status(200).send();
-    });
-
-    app.post('/api/registries/alerts/queue/:id/reset', withScope(['alerts:manage']), async (req, res) => {
-      const release = await filterMutex.acquire();
-      const queue = await AlertQueue.findOneBy({ id: req.params.id });
-      if (queue) {
-        queue.emitData = [];
+  @Post('/queue/:id/trigger')
+  async queueTrigger(req: Request) {
+    const release = await filterMutex.acquire();
+    const queue = await AlertQueue.findOneBy({ id: req.params.id });
+    release();
+    if (queue) {
+      const data = queue.emitData.shift();
+      if (data) {
         queue.save();
-        res.status(200).send();
-      } else {
-        res.status(404).send();
+        // setting eventId null to skip queue
+        this.trigger({ ...data, eventId: null });
       }
-      release();
-    });
+    } else {
+      throw new Error('404');
+    }
+  }
 
-    app.post('/api/registries/alerts/queue/:id/trigger', withScope(['alerts:manage']), async (req, res) => {
-      const release = await filterMutex.acquire();
-      const queue = await AlertQueue.findOneBy({ id: req.params.id });
-      if (queue) {
-        const data = queue.emitData.shift();
-        if (data) {
-          queue.save();
-          // setting eventId null to skip queue
-          this.trigger({ ...data, eventId: null });
-        }
-        res.status(200).send();
-      } else {
-        res.status(404).send();
-      }
-      release();
-    });
+  @Post('/queue')
+  async save(req: Request) {
+    const release = await filterMutex.acquire();
+    const { count, ...data } = req.body;
+    setTimeout(() => release(), 100);
+    return AlertQueue.create(data).save();
+  }
 
-    app.post('/api/registries/alerts/queue', withScope(['alerts:manage']), async (req, res) => {
-      const release = await filterMutex.acquire();
-      try {
-        const { count, ...data } = req.body;
-        const saved = await AlertQueue.create(data).save();
-        res.send({ data: saved });
-      } catch (e) {
-        res.status(400).send({ errors: e });
-      }
-      release();
-    });
+  @Delete('/queue/:id')
+  async delete(req: Request) {
+    const release = await filterMutex.acquire();
+    const queue = await AlertQueue.findOneBy({ id: req.params.id });
+    if (queue) {
+      await queue.remove();
+    }
+    release();
+  }
 
-    app.delete('/api/registries/alerts/queue/:id', withScope(['alerts:manage']), async (req, res) => {
-      const release = await filterMutex.acquire();
-      const group = await AlertQueue.findOneBy({ id: req.params.id });
-      if (group) {
-        await group.remove();
-        res.status(204).send();
-      } else {
-        res.status(404).send();
-      }
-      release();
-    });
-
+  sockets () {
     eventEmitter.on(Types.onChannelShoutoutCreate, (opts) => {
       this.trigger({
         eventId:    randomUUID(), // randomizing eventId, we are not saving it to eventlist but we want it to be queued
