@@ -158,14 +158,15 @@ class General extends Core {
     scopeOrigin:    'dashboard',
     customEndpoint: '/ui', // /api/ui/menu
   })
-  async getMenu() {
+  async getMenu(req: Request) {
+    const scopes = (req.headers as any).scopes as string[];
     return menu.map((o) => ({
       scopeParent: o.scopeParent,
       category:    o.category,
       name:        o.name,
       id:          o.id,
       enabled:     o.this ? o.this.enabled : true,
-    }));
+    })).filter(o => o.scopeParent ? scopes.includes(o.scopeParent) : true);
   }
 
   @command('!enable')

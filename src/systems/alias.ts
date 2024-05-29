@@ -113,7 +113,7 @@ class Alias extends System {
   findOneGroup(req: any) {
     return AliasGroup.findOneBy({ name: req.params.name });
   }
-  @Delete('/:name', '/systems/groups/alias')
+  @Delete('/:name', { customEndpoint: '/systems/groups/alias' })
   async removeOneGroup(req: any) {
     const al = await AliasGroup.findOneBy({ name: req.params.name });
     if (al) {

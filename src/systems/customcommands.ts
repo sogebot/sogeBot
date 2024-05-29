@@ -117,7 +117,7 @@ class CustomCommands extends System {
   findOneGroup(req: any) {
     return CommandsGroup.findOneBy({ name: req.params.name });
   }
-  @Delete('/:name', '/systems/groups/customcommands')
+  @Delete('/:name', { customEndpoint: '/systems/groups/customcommands' })
   async removeOneGroup(req: any) {
     const al = await CommandsGroup.findOneBy({ name: req.params.name });
     if (al) {

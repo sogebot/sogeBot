@@ -115,10 +115,6 @@ export type ClientToServerEventsWithNamespace = {
     'discord::getChannels': (cb: (err: Error | string | null | unknown, data: { text: string, value: string}[] ) => void) => void,
     'discord::authorize': (cb: (err: Error | string | null | unknown, action?: null | { do: 'redirect', opts: any[] } ) => void) => void,
   },
-  '/services/google': GenericEvents & {
-    'google::revoke': (cb: (err: Error | string | null | unknown) => void) => void,
-    'google::token': (data: { refreshToken: string }, cb: (err: Error | string | null | unknown) => void) => void,
-  },
   '/integrations/donationalerts': GenericEvents & {
     'donationalerts::validate': (token: string, cb: (err: Error | string | null | unknown) => void) => void,
     'donationalerts::revoke': (cb: (err: Error | string | null | unknown) => void) => void,

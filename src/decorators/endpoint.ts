@@ -64,7 +64,11 @@ export function Post<T extends string>(endpoint: T, params: {
       const scopes = params.isSensitive ? [self.scope('sensitive')] : [self.scope('manage')];
       if (params.isSensitive) {
       // add sensitive scope
-        addScope(`${type}:${name.toLowerCase()}:sensitive`);
+        if (type === 'integrations' || type === 'services') {
+          addScope(`${type}:sensitive`);
+        } else {
+          addScope(`${name.toLowerCase()}:sensitive`);
+        }
       }
 
       app.post(generatedEndpoint, withScope(scopes), async (req, res) => {
@@ -127,6 +131,7 @@ export function Post<T extends string>(endpoint: T, params: {
 
 export function Get<T extends string>(endpoint: T, params: {
   scope?: 'public' | 'read' | 'manage',
+  isSensitive?: boolean,
   scopeOrigin?: string
   customEndpoint?: string
 } = {}) {
@@ -162,12 +167,18 @@ export function Get<T extends string>(endpoint: T, params: {
         if (params.scope === 'manage') {
           scopes = [`${params.scopeOrigin}:${params.scope}`];
         }
+        if (params.isSensitive) {
+          scopes = [`${params.scopeOrigin}:sensitive`];
+        }
       } else {
         scopes = params.scope === 'public'
           ? []
           : params.scope === 'read' || typeof params.scope === 'undefined'
             ? [self.scope('read'), self.scope('manage')]
             : [self.scope('manage')];
+        if (params.isSensitive) {
+          scopes = [self.scope('sensitive')];
+        }
       }
       let generatedEndpoint = `/api${params.customEndpoint ? params.customEndpoint : self.nsp as string}${endpoint}`;
       // if ends with /, remove it
@@ -215,7 +226,7 @@ export function Get<T extends string>(endpoint: T, params: {
   };
 }
 
-export function Delete<T extends string>(endpoint: T, customEndpoint?: string) {
+export function Delete<T extends string>(endpoint: T, params: { customEndpoint?: string, isSensitive?: boolean } = {}) {
   const { name, type } = getNameAndTypeFromStackTrace();
 
   return (_target: any, key: string, fnc: TypedPropertyDescriptor<(req?: any) => Promise<any>>) => {
@@ -236,12 +247,12 @@ export function Delete<T extends string>(endpoint: T, customEndpoint?: string) {
         setTimeout(() => registerEndpoint(), 1000);
         return;
       }
-      let generatedEndpoint = `/api${customEndpoint ? customEndpoint : self.nsp as string}${endpoint}`;
+      let generatedEndpoint = `/api${params.customEndpoint ? params.customEndpoint : self.nsp as string}${endpoint}`;
       // if ends with /, remove it
       if (generatedEndpoint.endsWith('/')) {
         generatedEndpoint = generatedEndpoint.slice(0, -1);
       }
-      app.delete(generatedEndpoint, withScope([self.scope('manage')]), async (req, res) => {
+      app.delete(generatedEndpoint, withScope([self.scope(params.isSensitive ? 'sensitive' : 'manage')]), async (req, res) => {
         try {
           if (fnc.value) {
             await fnc.value.bind(self)(req);

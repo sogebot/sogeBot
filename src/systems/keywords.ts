@@ -89,7 +89,7 @@ class Keywords extends System {
   findOneGroup(req: any) {
     return KeywordGroup.findOneBy({ name: req.params.name });
   }
-  @Delete('/:name', '/systems/groups/keywords')
+  @Delete('/:name', { customEndpoint: '/systems/groups/keywords' })
   async removeOneGroup(req: any) {
     const al = await KeywordGroup.findOneBy({ name: req.params.name });
     if (al) {

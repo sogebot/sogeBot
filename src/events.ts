@@ -785,7 +785,7 @@ class Events extends Core {
     return !!result; // force boolean
   }
 
-  @Post('/', { action: 'getRedeemedRewards' })
+  @Get('/rewards', { scope: 'public' })
   public async getRedeemedRewards() {
     const rewards = await getCustomRewards() ?? [];
     return [...rewards.map(o => ({ name: o.title, id: o.id }))];

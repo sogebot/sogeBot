@@ -51,7 +51,6 @@ const getPrivileges = async(userId: string): Promise<{
       excludeSensitiveScopes: userPermission.excludeSensitiveScopes,
       scopes:                 userPermission.scopes ?? [],
     };
-    console.log({ privileges });
     return privileges;
   } catch (e: any) {
     return {
@@ -163,12 +162,21 @@ const withScope = (allowedScopes: string[], isPublic: boolean = false) => {
       req.headers.scopes = token.privileges.scopes.sort();
       req.headers.authUser = { userId: token.userId, userName: token.userName };
 
-      if (!token.privileges.scopes.some(scope => allowedScopes.includes(scope))) {
-        res.sendStatus(401);
-        return;
+      for (const allowed of allowedScopes) {
+        // allow manage also if read is allowed
+        if (allowed.includes(':read')) {
+          if (token.privileges.scopes.includes(allowed.replace(':read', ':manage'))) {
+            return next();
+          }
+        }
+
+        // check if user have the scope
+        if (token.privileges.scopes.includes(allowed)) {
+          return next();
+        }
       }
 
-      next();
+      res.sendStatus(401);
     } catch (e) {
       res.sendStatus(500);
       return ;
