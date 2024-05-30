@@ -137,13 +137,6 @@ export type ClientToServerEventsWithNamespace = {
     'overlays::tick': (opts: {groupId: string, id: string, millis: number}) => void,
     'parse': (text: string, cb: (err: Error | string | null | unknown, data: string) => void) => void,
   },
-  '/overlays/gallery': GenericEvents & {
-    'generic::getOne': generic<GalleryInterface>['getOne'],
-    'generic::getAll': generic<GalleryInterface>['getAll'],
-    'generic::deleteById': generic<GalleryInterface>['deleteById'],
-    'generic::setById': generic<GalleryInterface>['setById'],
-    'gallery::upload': (data: [filename: string, data: { id: string, b64data: string, folder?: string }], cb: (err: Error | string | null | unknown, item?: OverlayMapperMarathon) => void) => void,
-  },
   '/overlays/media': GenericEvents & {
     'alert': (data: any) => void,
     'cache': (cacheLimit: number, cb: (err: Error | string | null | unknown, data: any) => void) => void,
