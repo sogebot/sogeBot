@@ -1,10 +1,13 @@
 import { randomUUID } from 'crypto';
 
 import axios from 'axios';
+import { Request } from 'express';
 import { JWT } from 'google-auth-library';
 import { google } from 'googleapis';
+import { z } from 'zod';
 
 import { TTSService } from './database/entity/overlay.js';
+import { Post } from './decorators/endpoint.js';
 import { MINUTE } from './helpers/constants.js';
 
 import Core from '~/_interface.js';
@@ -17,7 +20,6 @@ import {
 } from '~/decorators/on.js';
 import { settings } from '~/decorators.js';
 import { error, info, warning } from '~/helpers/log.js';
-import { adminEndpoint, endpoint } from '~/helpers/socket.js';
 
 /* secureKeys are used to authenticate use of public overlay endpoint */
 const secureKeys = new Set<string>();
@@ -54,67 +56,55 @@ class TTS extends Core {
     this.initializeTTSServices();  // reset settings
   }
 
-  sockets() {
-    adminEndpoint('/core/tts', 'settings.refresh', async () => {
-      this.initializeTTSServices(); // reset settings
-    });
+  @Post('/speak', {
+    scope:        'public',
+    zodValidator: z.union([
+      z.object({
+        key:                            z.string(),
+        service:                        z.literal(TTSService.ELEVENLABS),
+        voice:                          z.string(),
+        text:                           z.string(),
+        clarity:                        z.number(),
+        stability:                      z.number(),
+        exaggeration:                   z.number(),
+        triggerTTSByHighlightedMessage: z.boolean().optional(),
+      }),
+      z.object({
+        key:                            z.string(),
+        service:                        z.nativeEnum(TTSService),
+        voice:                          z.string(),
+        text:                           z.string(),
+        volume:                         z.number(),
+        pitch:                          z.number(),
+        rate:                           z.number(),
+        triggerTTSByHighlightedMessage: z.boolean().optional(),
+      }),
+    ]),
+  })
+  async speak(req: Request) {
+    // public endpoint
+    const { key, service, ...opts } = req.body;
+    if (secureKeys.has(key) || req.headers.authUser) {
+      if (!req.headers.authUser) {
+        secureKeys.delete(key);
+      }
+      const speakFunctions = {
+        [TTSService.ELEVENLABS]: this.elevenlabsSpeak,
+        [TTSService.GOOGLE]:     this.googleSpeak,
+      };
 
-    endpoint([], '/core/tts', 'speak', async (opts, cb) => {
-      if (secureKeys.has(opts.key)) {
-        secureKeys.delete(opts.key);
-        if (opts.service === TTSService.ELEVENLABS) {
-          const audioContent = await this.elevenlabsSpeak(opts as any);
-
-          if (!audioContent) {
-            throw new Error('Something went wrong');
-          }
-          if (cb) {
-            cb(null, audioContent);
-          }
-        } else if (opts.service === TTSService.GOOGLE) {
-          const audioContent = await this.googleSpeak(opts);
-
-          if (!audioContent) {
-            throw new Error('Something went wrong');
-          }
-          if (cb) {
-            cb(null, audioContent);
-          }
-        } else {
-          throw new Error('Invalid service.');
+      if (Object.keys(speakFunctions).includes(service)) {
+        const audioContent = await speakFunctions[service as keyof typeof speakFunctions](opts as any);
+        if (!audioContent) {
+          new Error('Something went wrong');
         }
+        return audioContent;
       } else {
-        cb(new Error('Invalid auth.'));
+        new Error('Invalid service.');
       }
-    });
-
-    adminEndpoint('/core/tts', 'speak', async (opts, cb) => {
-      try {
-        if (opts.service === TTSService.ELEVENLABS) {
-          const audioContent = await this.elevenlabsSpeak(opts as any);
-
-          if (!audioContent) {
-            throw new Error('Something went wrong');
-          }
-          if (cb) {
-            cb(null, audioContent);
-          }
-        } else if (opts.service === TTSService.GOOGLE) {
-          const audioContent = await this.googleSpeak(opts);
-
-          if (!audioContent) {
-            throw new Error('Something went wrong');
-          }
-          if (cb) {
-            cb(null, audioContent);
-          }
-        } else {
-          throw new Error('Invalid service.');
-        }
-      } catch (e) {
-        cb(e);
-      }
-    });
+    } else {
+      new Error('Invalid auth.');
+    }
   }
 
   initializedGoogleTTSHash: string | null = null;

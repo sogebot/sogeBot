@@ -22,12 +22,12 @@ class Randomizer extends Registry {
     return RandomizerEntity.find();
   }
 
-  @Get('/visible')
+  @Get('/visible', { scope: 'public' })
   async getVisible () {
     return RandomizerEntity.findOneBy({ isShown: true });
   }
 
-  @Get('/:id')
+  @Get('/:id', { scope: 'public' })
   async getOne (req: Request) {
     return RandomizerEntity.findOneBy({ id: req.params.id });
   }

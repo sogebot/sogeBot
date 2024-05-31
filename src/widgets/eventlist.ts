@@ -92,7 +92,7 @@ class EventList extends Widget {
 
   @Post('/:id', { action: 'resend' })
   async resend(req: Request) {
-    const id = req.body.id;
+    const id = req.params.id;
     const event = await AppDataSource.getRepository(EventListDB).findOneBy({ id: String(id) });
     if (event) {
       const values = JSON.parse(event.values_json);

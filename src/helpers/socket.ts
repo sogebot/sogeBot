@@ -113,10 +113,10 @@ const initEndpoints = (socket: Socket, privileges: Unpacked<ReturnType<typeof ge
   }
 };
 
-function endpoint<K0 extends keyof O, K1 extends keyof O[K0], O extends Record<PropertyKey, Record<PropertyKey, Fn>> = ClientToServerEventsWithNamespace>(allowedScopes: string[], nsp: K0, on: K1, callback: (...args: NestedFnParams<O, K0, K1>) => void): void {
-  if (!newEndpoints.find(o => isEqual(o.scopes, allowedScopes) && o.nsp === nsp && o.on === on)) {
+function endpoint<K0 extends keyof O, K1 extends keyof O[K0], O extends Record<PropertyKey, Record<PropertyKey, Fn>> = ClientToServerEventsWithNamespace>(requiredScopes: string[], nsp: K0, on: K1, callback: (...args: NestedFnParams<O, K0, K1>) => void): void {
+  if (!newEndpoints.find(o => isEqual(o.scopes, requiredScopes) && o.nsp === nsp && o.on === on)) {
     newEndpoints.push({
-      scopes: allowedScopes, nsp, on, callback,
+      scopes: requiredScopes, nsp, on, callback,
     });
   }
 }
@@ -137,7 +137,7 @@ const viewerEndpoint = (nsp: string, on: string, callback: (opts: any, cb: (erro
   }
 };
 
-const withScope = (allowedScopes: string[], isPublic: boolean = false) => {
+const withScope = (requiredScopes: string[], isPublic: boolean = false) => {
   return async (req: { headers: { [x: string]: any; }; }, res: { sendStatus: (arg0: number) => any; }, next: () => void) => {
     const authHeader = req.headers.authorization;
     const authToken = authHeader && authHeader.split(' ')[1];
@@ -145,7 +145,7 @@ const withScope = (allowedScopes: string[], isPublic: boolean = false) => {
 
       const socket = (await import('../socket.js')).default;
 
-      if (authToken === socket.socketToken || isPublic) {
+      if (authToken === socket.socketToken || isPublic || requiredScopes.length === 0) {
         return next();
       }
 
@@ -162,7 +162,7 @@ const withScope = (allowedScopes: string[], isPublic: boolean = false) => {
       req.headers.scopes = token.privileges.scopes.sort();
       req.headers.authUser = { userId: token.userId, userName: token.userName };
 
-      for (const allowed of allowedScopes) {
+      for (const allowed of requiredScopes) {
         // allow manage also if read is allowed
         if (allowed.includes(':read')) {
           if (token.privileges.scopes.includes(allowed.replace(':read', ':manage'))) {

@@ -1,4 +1,4 @@
-import { ZodError, ZodObject } from 'zod';
+import { ZodError, ZodTypeAny } from 'zod';
 
 import { getNameAndTypeFromStackTrace } from '~/decorators.js';
 import { isBotStarted } from '~/helpers/database.js';
@@ -11,13 +11,15 @@ const registeredEndpoint: {
   [endpoint: string]: {
     [action: string]: {
       fnc?: (req?: any) => Promise<any>,
-      zodValidator: ZodObject<any> | undefined,
+      zodValidator: ZodTypeAny | undefined,
     },
   }
 } = {};
 
 export function Post<T extends string>(endpoint: T, params: {
-  customEndpoint?: string, zodValidator?: ZodObject<any>, action?: string, isSensitive?: boolean
+  /** public or manage (you cannot mismatch different scope, if it is public, you need to handle auth yourself) */
+  scope?: 'public' | 'manage',
+  customEndpoint?: string, zodValidator?: ZodTypeAny, action?: string, isSensitive?: boolean
 } = {}) {
   const { name, type } = getNameAndTypeFromStackTrace();
 
@@ -61,7 +63,10 @@ export function Post<T extends string>(endpoint: T, params: {
       }
 
       // change scopes to sensitive if we are handling logins or sensitive data endpoints
-      const scopes = params.isSensitive ? [self.scope('sensitive')] : [self.scope('manage')];
+      const scopes
+        = params.scope === 'public'
+          ? []
+          : params.isSensitive ? [self.scope('sensitive')] : [self.scope('manage')];
       if (params.isSensitive) {
       // add sensitive scope
         if (type === 'integrations' || type === 'services') {
