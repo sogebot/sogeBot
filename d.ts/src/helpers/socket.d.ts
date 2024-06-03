@@ -265,14 +265,6 @@ export type ClientToServerEventsWithNamespace = {
   '/core/ui': GenericEvents & {
     'configuration': (cb: (error: Error | string | null | unknown, data?: Configuration) => void) => void,
   },
-  '/core/users': GenericEvents & {
-    'viewers::update': (data: [userId: string, update: Partial<UserInterface> & { tips?: UserTipInterface[], bits?: UserBitInterface[] }], cb: (error: Error | string | null | unknown) => void) => void,
-    'viewers::remove': (userId: string, cb: (error: Error | string | null | unknown) => void) => void,
-    'getNameById': (id: string, cb: (error: Error | string | null | unknown, user: string | null) => void) => void,
-    'viewers::findOneBy': (id: string, cb: (error: Error | string | null | unknown, viewer: ViewerReturnType) => void) => void
-    'find.viewers': (opts: { exactUsernameFromTwitch?: boolean, state: string, page?: number; perPage?: number; order?: { orderBy: string, sortOrder: 'ASC' | 'DESC' }, filter?: { columnName: string, operation: string, value: any }[], search?: string }, cb: (error: Error | string | null | unknown, viewers: any[], count: number, state: string | null) => void) => void,
-    'logout': (data: { accessToken: string | null, refreshToken: string | null }) => void
-  },
 };
 
 type Fn<Params extends readonly any[] = readonly any[], Result = any> =
