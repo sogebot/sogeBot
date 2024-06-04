@@ -131,12 +131,6 @@ export type ClientToServerEventsWithNamespace = {
     'spotify::deleteBan': (where: FindConditions<SpotifySongBanInterface>, cb?: (err: Error | string | null | unknown) => void) => void,
     'spotify::getAllBanned': (where: FindConditions<SpotifySongBanInterface>, cb?: (err: Error | string | null | unknown, items: SpotifySongBanInterface[]) => void) => void,
   },
-  '/registries/overlays': GenericEvents & {
-    'generic::deleteById': generic<Overlay>['deleteById'],
-    'generic::save': generic<Overlay>['save'],
-    'overlays::tick': (opts: {groupId: string, id: string, millis: number}) => void,
-    'parse': (text: string, cb: (err: Error | string | null | unknown, data: string) => void) => void,
-  },
   '/overlays/media': GenericEvents & {
     'alert': (data: any) => void,
     'cache': (cacheLimit: number, cb: (err: Error | string | null | unknown, data: any) => void) => void,
@@ -229,10 +223,6 @@ export type ClientToServerEventsWithNamespace = {
     'hypetrain-end': () => void,
     'hypetrain-update': (data: { id: string, level: number, goal: number, total: number, subs: Record<string, string>}) => void,
     'eventsub::reset': () => void,
-    'broadcaster': (cb: (error: Error | string | null | unknown, username: string) => void) => void,
-    'twitch::revoke': (data: { accountType: 'bot' | 'broadcaster' }, cb: (err: Error | string | null | unknown) => void) => void,
-    'twitch::token': (data: { accessToken: string, refreshToken: string, accountType: 'bot' | 'broadcaster' }, cb: (err: Error | string | null | unknown) => void) => void,
-    'twitch::token::ownApp': (data: { accessToken: string, refreshToken: string, accountType: 'bot' | 'broadcaster', clientId: string, clientSecret: string }, cb: (err: Error | string | null | unknown) => void) => void,
   },
   '/core/socket': GenericEvents & {
     'purgeAllConnections': (cb: (error: Error | string | null | unknown) => void, socket?: Socket) => void,

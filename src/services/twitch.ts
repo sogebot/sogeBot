@@ -1,7 +1,9 @@
 import { EventList } from '@entity/eventList.js';
 import { User } from '@entity/user.js';
 import { ApiClient } from '@twurple/api';
+import { Request } from 'express';
 import { capitalize } from 'lodash-es';
+import { z } from 'zod';
 
 import Service from './_interface.js';
 import { init } from './twitch/api/interval.js';
@@ -20,6 +22,7 @@ import { Expects } from  '../expects.js';
 import { debug, error, info } from '../helpers/log.js';
 
 import { AppDataSource } from '~/database.js';
+import { Get, Post } from '~/decorators/endpoint.js';
 import {
   isStreamOnline, stats, streamStatusChangeSince,
 } from '~/helpers/api/index.js';
@@ -28,7 +31,6 @@ import { SECOND } from '~/helpers/constants.js';
 import { dayjs, timezone } from '~/helpers/dayjsHelper.js';
 import { getTime } from '~/helpers/getTime.js';
 import defaultPermissions from '~/helpers/permissions/defaultPermissions.js';
-import { adminEndpoint } from '~/helpers/socket.js';
 import {
   ignorelist, sendWithMe, setMuteStatus, showWithAt,
 } from '~/helpers/tmi/index.js';
@@ -307,55 +309,66 @@ class Twitch extends Service {
     setMuteStatus(this.mute);
   }
 
-  sockets() {
-    adminEndpoint('/services/twitch', 'broadcaster', (cb) => {
-      try {
-        cb(null, (this.broadcasterUsername).toLowerCase());
-      } catch (e: any) {
-        cb(e.stack, '');
-      }
-    });
-    adminEndpoint('/services/twitch', 'twitch::revoke', async ({ accountType }, cb) => {
-      if (accountType === 'bot') {
-        this.botRefreshToken = '';
-        this.botCurrentScopes = [];
-        this.botId = '';
-        this.botTokenValid = false;
-        this.botUsername = '';
-      } else {
-        this.broadcasterRefreshToken = '';
-        this.broadcasterCurrentScopes = [];
-        this.broadcasterId = '';
-        this.broadcasterTokenValid = false;
-        this.broadcasterUsername = '';
-      }
-      info(`TWITCH: ${capitalize(accountType)} access revoked.`);
-      cb(null);
-    });
-    adminEndpoint('/services/twitch', 'twitch::token', async ({ accessToken, refreshToken, accountType }, cb) => {
-      this.tokenService = 'SogeBot Token Generator v2';
-      this[`${accountType}RefreshToken`] = refreshToken;
-      // waiting a while for variable propagation
-      setTimeout(() => {
-        this.onChangeRefreshTokens(`${accountType}RefreshToken`);
-        setTimeout(async () => {
-          cb(null);
-        }, 1000);
-      }, 250);
-    });
-    adminEndpoint('/services/twitch', 'twitch::token::ownApp', async ({ accessToken, refreshToken, accountType, clientId, clientSecret }, cb) => {
-      this.tokenService ='Own Twitch App';
-      this[`${accountType}RefreshToken`] = refreshToken;
-      this.tokenServiceCustomClientId = clientId;
-      this.tokenServiceCustomClientSecret = clientSecret;
-      // waiting a while for variable propagation
-      setTimeout(() => {
-        this.onChangeRefreshTokens(`${accountType}RefreshToken`);
-        setTimeout(async () => {
-          cb(null);
-        }, 1000);
-      }, 250);
-    });
+  @Get('/broadcaster')
+  async getBroadcaster() {
+    return this.broadcasterUsername.toLowerCase();
+  }
+
+  @Post('/', { action: 'revoke', isSensitive: true, zodValidator: z.object({ accountType: z.enum(['bot', 'broadcaster']) }) })
+  async revoke(req: Request) {
+    const { accountType } = req.body;
+    if (accountType === 'bot') {
+      this.botRefreshToken = '';
+      this.botCurrentScopes = [];
+      this.botId = '';
+      this.botTokenValid = false;
+      this.botUsername = '';
+    } else {
+      this.broadcasterRefreshToken = '';
+      this.broadcasterCurrentScopes = [];
+      this.broadcasterId = '';
+      this.broadcasterTokenValid = false;
+      this.broadcasterUsername = '';
+    }
+    info(`TWITCH: ${capitalize(accountType)} access revoked.`);
+  }
+
+  @Post('/', {
+    action:       'token',
+    isSensitive:  true,
+    zodValidator: z.object({
+      refreshToken: z.string(),
+      accountType:  z.enum(['bot', 'broadcaster']),
+    }),
+  })
+  async token(req: Request) {
+    const { refreshToken, accountType } = req.body;
+    this.tokenService = 'SogeBot Token Generator v2';
+    this[`${accountType as 'bot' | 'broadcaster'}RefreshToken`] = refreshToken;
+    await new Promise(resolve => setTimeout(resolve, 250));
+    this.onChangeRefreshTokens(`${accountType}RefreshToken`);
+    await new Promise(resolve => setTimeout(resolve, 1000));
+  }
+
+  @Post('/', {
+    action:       'tokenOwnApp',
+    isSensitive:  true,
+    zodValidator: z.object({
+      refreshToken: z.string(),
+      accountType:  z.enum(['bot', 'broadcaster']),
+      clientId:     z.string(),
+      clientSecret: z.string(),
+    }),
+  })
+  async tokenOwnApp(req: Request) {
+    const { refreshToken, accountType, clientId, clientSecret } = req.body;
+    this.tokenService ='Own Twitch App';
+    this[`${accountType as 'bot' | 'broadcaster'}RefreshToken`] = refreshToken;
+    this.tokenServiceCustomClientId = clientId;
+    this.tokenServiceCustomClientSecret = clientSecret;
+    await new Promise(resolve => setTimeout(resolve, 250));
+    this.onChangeRefreshTokens(`${accountType}RefreshToken`);
+    await new Promise(resolve => setTimeout(resolve, 1000));
   }
 
   @command('!clip')

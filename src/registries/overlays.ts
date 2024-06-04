@@ -5,13 +5,12 @@ import { Message } from  '../message.js';
 
 import { Goal, Overlay } from '~/database/entity/overlay.js';
 import { AppDataSource } from '~/database.js';
-import { Get } from '~/decorators/endpoint.js';
+import { Delete, Get, Post } from '~/decorators/endpoint.js';
 import { stats } from '~/helpers/api/index.js';
 import { SECOND } from '~/helpers/constants.js';
 import { executeVariablesInText } from '~/helpers/customvariables/executeVariablesInText.js';
 import { isBotStarted } from '~/helpers/database.js';
 import defaultValues from '~/helpers/overlaysDefaultValues.js';
-import { adminEndpoint, endpoint } from '~/helpers/socket.js';
 
 const ticks: string[] = [];
 
@@ -91,26 +90,24 @@ class Overlays extends Registry {
     }
   }
 
-  sockets() {
-    adminEndpoint('/registries/overlays', 'generic::deleteById', async (id, cb) => {
-      await AppDataSource.getRepository(Overlay).delete(id);
-      cb(null);
-    });
-    adminEndpoint('/registries/overlays', 'generic::save', async (opts, cb) => {
-      const data = await AppDataSource.getRepository(Overlay).save(opts);
-      cb(null, data);
-    });
+  @Delete('/:id')
+  deleteById(req: Request) {
+    const id = req.params.id;
+    return AppDataSource.getRepository(Overlay).delete(id);
+  }
+  @Post('/')
+  async save(req: Request) {
+    return Overlay.create(req.body).save();
+  }
 
-    endpoint([], '/registries/overlays', 'parse', async (text, cb) => {
-      try {
-        cb(null, await new Message(await executeVariablesInText(text, null)).parse());
-      } catch (e) {
-        cb(e, '');
-      }
-    });
-    endpoint([], '/registry/overlays' as any, 'overlays::tick', (opts: any) => {
-      ticks.push(`${opts.groupId}|${opts.id}|${opts.millis}`);
-    });
+  @Post('/parse', { scope: 'public' })
+  async parse(req: Request) {
+    return new Message(await executeVariablesInText(req.body.text, null)).parse();
+  }
+
+  @Post('/tick/:groupId/:id/:millis', { scope: 'public' })
+  async tick(req: Request) {
+    ticks.push(`${req.params.groupId}|${req.params.id}|${req.params.millis}`);
   }
 }
 
