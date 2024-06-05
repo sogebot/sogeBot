@@ -147,10 +147,6 @@ export type ClientToServerEventsWithNamespace = {
   '/overlays/bets': GenericEvents & {
     'data': (cb: (data: Required<BetsInterface>) => void) => void,
   },
-  '/overlays/clips': GenericEvents & {
-    'clips': (data: any) => void
-    'test': (clipURL: string) => void
-  },
   '/overlays/clipscarousel': GenericEvents & {
     'clips': (opts: { customPeriod: number, numOfClips: number }, cb: (error: Error | string | null | unknown,data: { clips: any, settings: any }) => void) => void
   },
@@ -171,15 +167,6 @@ export type ClientToServerEventsWithNamespace = {
     'marathon::public': (id: string, cb: (err: Error | string | null | unknown, item?: OverlayMapperMarathon) => void) => void,
     'marathon::check': (id: string, cb: (err: Error | string | null | unknown, item?: OverlayMapperMarathon) => void) => void,
     'marathon::update::set': (data: { time: number, id: string }) => void,
-  },
-  '/overlays/countdown': GenericEvents & {
-    'countdown::check': (id: string, cb: (err: Error | string | null | unknown, update?: {
-      timestamp: number;
-      isEnabled: boolean;
-      time: number;
-    }) => void) => void,
-    'countdown::update': (data: { id: string, isEnabled: boolean | null, time: number | null }, cb: (_err: null, data?: { isEnabled: boolean | null, time :string | null }) => void) => void,
-    'countdown::update::set': (data: { id: string, isEnabled: boolean | null, time: number | null }) => void,
   },
   '/overlays/stopwatch': GenericEvents & {
     'stopwatch::check': (id: string, cb: (err: Error | string | null | unknown, update?: {
@@ -223,9 +210,6 @@ export type ClientToServerEventsWithNamespace = {
     'hypetrain-end': () => void,
     'hypetrain-update': (data: { id: string, level: number, goal: number, total: number, subs: Record<string, string>}) => void,
     'eventsub::reset': () => void,
-  },
-  '/core/socket': GenericEvents & {
-    'purgeAllConnections': (cb: (error: Error | string | null | unknown) => void, socket?: Socket) => void,
   },
   '/stats/commandcount': GenericEvents & {
     'commands::count': (cb: (error: Error | string | null | unknown, items: CommandsCountInterface[]) => void) => void,

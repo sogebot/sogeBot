@@ -5,6 +5,7 @@ import { NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import { Socket as SocketIO } from 'socket.io';
 
+import { Post } from './decorators/endpoint.js';
 import { DAY } from './helpers/constants.js';
 
 import Core from '~/_interface.js';
@@ -17,7 +18,7 @@ import { app, ioServer } from '~/helpers/panel.js';
 import { check } from '~/helpers/permissions/check.js';
 import { defaultPermissions } from '~/helpers/permissions/defaultPermissions.js';
 import { getUserHighestPermission } from '~/helpers/permissions/getUserHighestPermission.js';
-import { adminEndpoint, getPrivileges, initEndpoints, scopes } from '~/helpers/socket.js';
+import { getPrivileges, initEndpoints, scopes } from '~/helpers/socket.js';
 import * as changelog from '~/helpers/user/changelog.js';
 
 class Socket extends Core {
@@ -172,17 +173,10 @@ class Socket extends Core {
     setTimeout(() => next(), 100);
   }
 
-  sockets () {
-    adminEndpoint('/core/socket', 'purgeAllConnections', (cb, socket) => {
-      this.JWTKey = randomUUID();
-      ioServer?.emit('forceDisconnect');
-      if (socket) {
-        initEndpoints(socket, {
-          haveAdminPrivileges: false, excludeSensitiveScopes: true, scopes: [],
-        });
-      }
-      cb(null);
-    });
+  @Post('/purgeAllConnections')
+  async purgeAllConnections () {
+    this.JWTKey = randomUUID();
+    ioServer?.emit('forceDisconnect');
   }
 
   @onLoad('socketToken')
