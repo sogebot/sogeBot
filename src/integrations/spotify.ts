@@ -25,7 +25,6 @@ import { HOUR, SECOND } from '~/helpers/constants.js';
 import { debug, error, info, warning } from '~/helpers/log.js';
 import { addUIError } from '~/helpers/panel/index.js';
 import { ioServer } from '~/helpers/panel.js';
-import { adminEndpoint } from '~/helpers/socket.js';
 
 /*
  * How to integrate:

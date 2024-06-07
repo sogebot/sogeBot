@@ -47,7 +47,11 @@ export class ErrorInternalServer extends Error {
 export function Post<T extends string>(endpoint: T, params: {
   /** public or manage (you cannot mismatch different scope, if it is public, you need to handle auth yourself) */
   scope?: 'public' | 'manage',
-  customEndpoint?: string, zodValidator?: ZodTypeAny, action?: string, isSensitive?: boolean
+  customEndpoint?: string,
+  zodValidator?: ZodTypeAny,
+  action?: string,
+  isSensitive?: boolean,
+  scopeOrigin?: string
 } = {}) {
   const { name, type } = getNameAndTypeFromStackTrace();
 
@@ -90,17 +94,31 @@ export function Post<T extends string>(endpoint: T, params: {
         return; // endpoint is already registered and we already have handler below
       }
 
-      // change scopes to sensitive if we are handling logins or sensitive data endpoints
-      const scopes
-        = params.scope === 'public'
-          ? []
-          : params.isSensitive ? [self.scope('sensitive')] : [self.scope('manage')];
-      if (params.isSensitive) {
-      // add sensitive scope
-        if (type === 'integrations' || type === 'services') {
-          addScope(`${type}:sensitive`);
-        } else {
-          addScope(`${name.toLowerCase()}:sensitive`);
+      let scopes: string[] = [];
+
+      // if scopeOrigin is present, use it
+      if (params.scopeOrigin) {
+        scopes = params.scope === 'public' ? [] : [`${params.scopeOrigin}:manage`];
+        if (params.isSensitive) {
+          scopes = [`${params.scopeOrigin}:sensitive`];
+        }
+      } else {
+        scopes =[self.scope('manage')];
+        if (params.isSensitive) {
+          scopes = [self.scope('sensitive')];
+        }
+        if (params.scope === 'public') {
+          scopes = [];
+        }
+      }
+
+      for (const scope of scopes) {
+        if (scope.includes('sensitive')) {
+          if (type === 'integrations' || type === 'services') {
+            addScope(`${type}:sensitive`);
+          } else {
+            addScope(`${name}`);
+          }
         }
       }
 
@@ -335,10 +353,18 @@ export function Get<T extends string>(endpoint: T, params: {
             if ('_raw' in req.query) {
               res.send(data);
             } else {
-              res.send({
-                status: 'success',
-                data,
-              });
+              if ('items' in data && 'total' in data) {
+                res.send({
+                  status: 'success',
+                  data:   data.items,
+                  total:  data.total,
+                });
+              } else {
+                res.send({
+                  status: 'success',
+                  data,
+                });
+              }
             }
           } else {
             res.status(500).send({
