@@ -13,7 +13,6 @@ import type { Permissions } from '@entity/permissions';
 import type { RandomizerInterface } from '@entity/randomizer';
 import type { RankInterface } from '@entity/rank';
 import type { currentSongType, SongBanInterface, SongPlaylistInterface, SongRequestInterface } from '@entity/song';
-import type { SpotifySongBanInterface } from '@entity/spotify';
 import type { TextInterface } from '@entity/text';
 import type {
   UserBitInterface, UserInterface, UserTipInterface,
@@ -119,17 +118,6 @@ export type ClientToServerEventsWithNamespace = {
     'donationalerts::validate': (token: string, cb: (err: Error | string | null | unknown) => void) => void,
     'donationalerts::revoke': (cb: (err: Error | string | null | unknown) => void) => void,
     'donationalerts::token': (data: { accessToken: string, refreshToken: string }, cb: (err: Error | string | null | unknown) => void) => void,
-  },
-  '/integrations/spotify': GenericEvents & {
-    'code': (token: string, cb: (err: Error | string | null | unknown, state: boolean) => void) => void,
-    'spotify::revoke': (cb: (err: Error | string | null | unknown, opts?: { do: 'refresh' }) => void) => void,
-    'spotify::authorize': (cb: (err: Error | string | null | unknown, action?: null | { do: 'redirect', opts: any[] }) => void) => void,
-    'spotify::state': (cb: (err: Error | string | null | unknown, state: string) => void) => void,
-    'spotify::code': (token: string, cb: (err: Error | string | null | unknown, state: boolean) => void) => void,
-    'spotify::skip': (cb: (err: Error | string | null | unknown) => void) => void,
-    'spotify::addBan': (spotifyUri: string, cb?: (err: Error | string | null | unknown) => void) => void,
-    'spotify::deleteBan': (where: FindConditions<SpotifySongBanInterface>, cb?: (err: Error | string | null | unknown) => void) => void,
-    'spotify::getAllBanned': (where: FindConditions<SpotifySongBanInterface>, cb?: (err: Error | string | null | unknown, items: SpotifySongBanInterface[]) => void) => void,
   },
   '/overlays/media': GenericEvents & {
     'alert': (data: any) => void,

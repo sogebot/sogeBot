@@ -16,6 +16,34 @@ const registeredEndpoint: {
   }
 } = {};
 
+export class ErrorBadRequest extends Error {
+  constructor(message: string) {
+    // Pass the error message to the parent Error class
+    super(message);
+    // Set the name property to this specific error class name
+    this.name = 'ErrorBadRequest';
+
+    // Maintain proper stack trace (only available in V8 engines)
+    if (Error.captureStackTrace) {
+      Error.captureStackTrace(this, ErrorBadRequest);
+    }
+  }
+}
+
+export class ErrorInternalServer extends Error {
+  constructor(message: string) {
+    // Pass the error message to the parent Error class
+    super(message);
+    // Set the name property to this specific error class name
+    this.name = 'ErrorInternalServer';
+
+    // Maintain proper stack trace (only available in V8 engines)
+    if (Error.captureStackTrace) {
+      Error.captureStackTrace(this, ErrorInternalServer);
+    }
+  }
+}
+
 export function Post<T extends string>(endpoint: T, params: {
   /** public or manage (you cannot mismatch different scope, if it is public, you need to handle auth yourself) */
   scope?: 'public' | 'manage',
@@ -112,6 +140,15 @@ export function Post<T extends string>(endpoint: T, params: {
                 });
               }
             } catch (e) {
+              if (e instanceof ErrorBadRequest) {
+                res.status(400).send({ status: 'error', message: e.message });
+                return;
+              }
+              if (e instanceof ErrorInternalServer) {
+                error(e.stack ?? e.message);
+                res.status(500).send({ status: 'error', message: 'Internal Server Error. Check your bot logs.' });
+                return;
+              }
               if (e instanceof Error && e.message === '404') {
                 res.status(404).send({ status: 'error', message: 'Not found' });
                 return;

@@ -3,8 +3,10 @@ import { setTimeout } from 'timers/promises';
 
 import { SpotifySongBan } from '@entity/spotify.js';
 import chalk from 'chalk';
+import { Request } from 'express';
 import _ from 'lodash-es';
 import SpotifyWebApi from 'spotify-web-api-node';
+import { z } from 'zod';
 
 import Integration from './_interface.js';
 import {
@@ -15,14 +17,15 @@ import {
 } from '../decorators.js';
 import { Expects } from  '../expects.js';
 
+import { ErrorBadRequest, ErrorInternalServer, Get, Post } from '~/decorators/endpoint.js';
 import { isStreamOnline } from '~/helpers/api/index.js';
 import { CommandError } from '~/helpers/commandError.js';
 import { announce, prepare } from '~/helpers/commons/index.js';
+import { HOUR, SECOND } from '~/helpers/constants.js';
 import { debug, error, info, warning } from '~/helpers/log.js';
 import { addUIError } from '~/helpers/panel/index.js';
 import { ioServer } from '~/helpers/panel.js';
 import { adminEndpoint } from '~/helpers/socket.js';
-import { HOUR, SECOND } from '~/helpers/constants.js';
 
 /*
  * How to integrate:
@@ -392,156 +395,124 @@ class Spotify extends Integration {
     }
   }
 
-  sockets () {
-    adminEndpoint('/integrations/spotify', 'spotify::state', async (callback) => {
-      callback(null, this.state);
-    });
-    adminEndpoint('/integrations/spotify', 'spotify::skip', async (callback) => {
-      this.cSkipSong();
-      callback(null);
-    });
-    adminEndpoint('/integrations/spotify', 'spotify::addBan', async (spotifyUri, cb) => {
-      try {
-        if (!this.client) {
-          addUIError({ name: 'Spotify Ban Import', message: 'You are not connected to spotify API, authorize your user' });
-          throw Error('client');
-        }
-        let id = '';
-        if (spotifyUri.startsWith('spotify:')) {
-          id = spotifyUri.replace('spotify:track:', '');
-        } else {
-          const regex = new RegExp('\\S+open\\.spotify\\.com\\/track\\/(\\w+)(.*)?', 'gi');
-          const exec = regex.exec(spotifyUri as unknown as string);
-          if (exec) {
-            id = exec[1];
-          } else {
-            throw Error('ID was not found in ' + spotifyUri);
-          }
-        }
-
-        const response = await this.client.getTrack(id);
-
-        ioServer?.emit('api.stats', {
-          method: 'GET', data: response.body, timestamp: Date.now(), call: 'spotify::addBan', api: 'other', endpoint: 'n/a', code: 200,
-        });
-
-        const track = response.body;
-        const songBan = SpotifySongBan.create({
-          artists: track.artists.map(o => o.name), spotifyUri: track.uri, title: track.name,
-        });
-        await songBan.save();
-      } catch (e: any) {
-        if (e.message !== 'client') {
-          if (cb) {
-            cb(e);
-          }
-          addUIError({ name: 'Spotify Ban Import', message: 'Something went wrong with banning song. Check your spotifyURI.' });
-        }
-        ioServer?.emit('api.stats', {
-          method: 'GET', data: e.response, timestamp: Date.now(), call: 'spotify::addBan', api: 'other', endpoint: 'n/a', code: 'n/a',
-        });
-        if (cb) {
-          cb(e);
-        }
-      }
-      if (cb) {
-        cb(null);
-      }
-    });
-    adminEndpoint('/integrations/spotify', 'spotify::deleteBan', async (where, cb) => {
-      where = where || {};
-      if (cb) {
-        await SpotifySongBan.delete(where);
-        cb(null);
-      }
-    });
-    adminEndpoint('/integrations/spotify', 'spotify::getAllBanned', async (where, cb) => {
-      where = where || {};
-      if (cb) {
-        cb(null, await SpotifySongBan.find(where));
-      }
-    });
-    const setCode = async (token: string, cb: any) => {
-      const waitForUsername = () => {
-        return new Promise((resolve) => {
-          const check = async () => {
-            if (this.client) {
-              this.client.getMe()
-                .then((data) => {
-                  this.username = data.body.display_name ? data.body.display_name : data.body.id;
-                  resolve(true);
-                })
-                .catch(() => {
-                  setTimeout(10000).then(() => {
-                    check();
-                  });
+  @Post('/', { action: 'state' })
+  async getState() {
+    return this.state;
+  }
+  @Post('/', { action: 'code', zodValidator: z.object({ code: z.string() }) })
+  async setCode(req: Request) {
+    this.redirectURI = 'https://dash.sogebot.xyz/credentials/spotify';
+    const waitForUsername = () => {
+      return new Promise((resolve) => {
+        const check = async () => {
+          if (this.client) {
+            this.client.getMe()
+              .then((data) => {
+                this.username = data.body.display_name ? data.body.display_name : data.body.id;
+                resolve(true);
+              })
+              .catch(() => {
+                setTimeout(10000).then(() => {
+                  check();
                 });
-            } else {
-              resolve(true);
-            }
-          };
-          check();
-        });
-      };
-
-      this.currentSong = JSON.stringify(null);
-      this.connect({ token });
-      await waitForUsername();
-      setTimeout(10000).then(() => this.isUnauthorized = false);
-      cb(null, true);
-    };
-    adminEndpoint('/integrations/spotify', 'code', async (token, cb) => {
-      this.redirectURI = 'https://dash.sogebot.xyz/credentials/spotify';
-      setCode(token, cb);
-    });
-    adminEndpoint('/integrations/spotify', 'spotify::code', async (token, cb) => {
-      setCode(token, cb);
-    });
-    adminEndpoint('/integrations/spotify', 'spotify::revoke', async (cb) => {
-      clearTimeout(this.timeouts.IRefreshToken);
-      try {
-        if (this.client !== null) {
-          this.client.resetAccessToken();
-          this.client.resetRefreshToken();
-        }
-
-        const username = this.username;
-        this.userId = null;
-        this._accessToken = null;
-        this._refreshToken = null;
-        this.username = '';
-        this.currentSong = JSON.stringify(null);
-
-        info(chalk.yellow('SPOTIFY: ') + `Access to account ${username} is revoked`);
-
-        cb(null, { do: 'refresh' });
-      } catch (e: any) {
-        cb(e.stack);
-      } finally {
-        this.timeouts.IRefreshToken = global.setTimeout(() => this.IRefreshToken(), 60000);
-      }
-    });
-    adminEndpoint('/integrations/spotify', 'spotify::authorize', async (cb) => {
-      if (
-        this.clientId === ''
-        || this.clientSecret === ''
-      ) {
-        cb('Cannot authorize! Missing clientId or clientSecret. Please save before authorizing.', null);
-      } else {
-        try {
-          const authorizeURI = this.authorizeURI();
-          if (!authorizeURI) {
-            error('Integration must be enabled to authorize');
-            cb('Integration must enabled to authorize');
+              });
           } else {
-            cb(null, { do: 'redirect', opts: [authorizeURI] });
+            resolve(true);
           }
-        } catch (e: any) {
-          error(e.stack);
-          cb(e.stack, null);
+        };
+        check();
+      });
+    };
+
+    this.currentSong = JSON.stringify(null);
+    this.connect({ token: req.body.code });
+    await waitForUsername();
+    setTimeout(10000).then(() => this.isUnauthorized = false);
+    return;
+  }
+  @Post('/', { action: 'addBan', zodValidator: z.object({ spotifyUri: z.string() }) })
+  async addBan(req: Request) {
+    const spotifyUri = req.body.spotifyUri;
+    try {
+      if (!this.client) {
+        addUIError({ name: 'Spotify Ban Import', message: 'You are not connected to spotify API, authorize your user' });
+        throw Error('client');
+      }
+      let id = '';
+      if (spotifyUri.startsWith('spotify:')) {
+        id = spotifyUri.replace('spotify:track:', '');
+      } else {
+        const regex = new RegExp('\\S+open\\.spotify\\.com\\/track\\/(\\w+)(.*)?', 'gi');
+        const exec = regex.exec(spotifyUri as unknown as string);
+        if (exec) {
+          id = exec[1];
+        } else {
+          throw Error('ID was not found in ' + spotifyUri);
         }
       }
-    });
+
+      const response = await this.client.getTrack(id);
+      const track = response.body;
+      const songBan = SpotifySongBan.create({
+        artists: track.artists.map(o => o.name), spotifyUri: track.uri, title: track.name,
+      });
+      await songBan.save();
+    } catch (e: any) {
+      if (e.message !== 'client') {
+        throw new ErrorBadRequest('Something went wrong with banning song. Check your spotifyURI.');
+      }
+    }
+  }
+  @Post('/', { action: 'deleteBan', zodValidator: z.object({ spotifyUri: z.string() }) })
+  async deleteBan(req: Request) {
+    const spotifyUri = req.body.spotifyUri;
+    await SpotifySongBan.delete({ spotifyUri });
+  }
+  @Get('/banned/all')
+  async getAllBanned() {
+    return await SpotifySongBan.find();
+  }
+  @Post('/', { action: 'revoke', isSensitive: true })
+  async revoke() {
+    clearTimeout(this.timeouts.IRefreshToken);
+    this.timeouts.IRefreshToken = global.setTimeout(() => this.IRefreshToken(), 60000);
+    if (this.client !== null) {
+      this.client.resetAccessToken();
+      this.client.resetRefreshToken();
+    }
+
+    const username = this.username;
+    this.userId = null;
+    this._accessToken = null;
+    this._refreshToken = null;
+    this.username = '';
+    this.currentSong = JSON.stringify(null);
+
+    info(chalk.yellow('SPOTIFY: ') + `Access to account ${username} is revoked`);
+  }
+
+  @Post('/', { action: 'authorize', isSensitive: true })
+  async authorize() {
+    if (
+      this.clientId === ''
+        || this.clientSecret === ''
+    ) {
+      throw new ErrorBadRequest('Cannot authorize! Missing clientId or clientSecret. Please save before authorizing.');
+    } else {
+      try {
+        const authorizeURI = this.authorizeURI();
+        if (!authorizeURI) {
+          error('Integration must be enabled to authorize');
+          throw new ErrorBadRequest('Integration must enabled to authorize');
+        } else {
+          return { do: 'redirect', opts: [authorizeURI] };
+        }
+      } catch (e: unknown) {
+        if (e instanceof Error) {
+          throw new ErrorInternalServer(e.message);
+        }
+      }
+    }
   }
 
   connect (opts: { token?: string } = {}) {
