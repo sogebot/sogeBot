@@ -353,7 +353,7 @@ export function Get<T extends string>(endpoint: T, params: {
             if ('_raw' in req.query) {
               res.send(data);
             } else {
-              if ('items' in data && 'total' in data) {
+              if (typeof data === 'object' && 'items' in data && 'total' in data) {
                 res.send({
                   status: 'success',
                   data:   data.items,

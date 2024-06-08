@@ -22,13 +22,12 @@ import {
 } from '../decorators.js';
 
 import { AppDataSource } from '~/database.js';
-import { Get, Post } from '~/decorators/endpoint.js';
+import { Delete, Get, Post } from '~/decorators/endpoint.js';
 import {
   announce, getUserSender, prepare,
 } from '~/helpers/commons/index.js';
 import { error, info } from '~/helpers/log.js';
 import defaultPermissions from '~/helpers/permissions/defaultPermissions.js';
-import { adminEndpoint, endpoint } from '~/helpers/socket.js';
 import { tmiEmitter } from '~/helpers/tmi/index.js';
 import * as changelog from '~/helpers/user/changelog.js';
 import getBotId from '~/helpers/user/getBotId.js';
@@ -216,80 +215,73 @@ class Songs extends System {
       total: count,
     };
   }
+  @Post('/playlist')
+  async apiAddSongToPlaylist (req: Request) {
+    isCachedTagsValid = false;
+    return SongPlaylist.save(req.body);
+  }
+  @Delete('/playlist/:id')
+  async apiDeleteSongFromPlaylist (req: Request) {
+    isCachedTagsValid = false;
+    return SongPlaylist.delete({ videoId: req.params.id });
+  }
+  @Delete('/requests/:id')
+  async apiDeleteRequest (req: Request) {
+    return SongRequest.delete({ videoId: req.params.id });
+  }
+  @Get('/requests', { scope: 'public' })
+  async apiGetRequests () {
+    return SongRequest.find();
+  }
+  @Get('/ban')
+  async apiGetBannedSongs () {
+    return SongBan.find();
+  }
+  @Delete('/ban/:id')
+  async apiDeleteBan (req: Request) {
+    return SongBan.delete({ videoId: req.params.id });
+  }
+  @Post('/', { action: 'stopImport' })
+  async stopImport () {
+    importInProgress = false;
+  }
+  @Post('/import/ban', {
+    zodValidator: z.object({ url: z.string() }),
+  })
+  async apiImportBan (req: Request) {
+    const url = req.body.url;
+    return this.banSong({
+      isAction: false, isHighlight: false, emotesOffsets: new Map(), isFirstTimeMessage: false, parameters: this.getIdFromURL(url), sender: getUserSender(getBotId(), getBotUserName()), command: '', createdAt: Date.now(), attr: {}, discord: undefined,
+    });
+  }
+  @Post('/import/playlist', {
+    zodValidator: z.object({ playlist: z.string(), forcedTag: z.string().optional() }),
+  })
+  async apiImportPlaylist (req: Request) {
+    isCachedTagsValid = false;
+    return this.importPlaylist({
+      isAction: false, isHighlight: false, emotesOffsets: new Map(), isFirstTimeMessage: false, parameters: req.body.playlist, sender: getUserSender(getBotId(), getBotUserName()), command: '', createdAt: Date.now(), attr: { forcedTag: req.body.forcedTag }, discord: undefined,
+    });
+  }
+  @Post('/import/video', {
+    zodValidator: z.object({ playlist: z.string(), forcedTag: z.string().optional() }),
+  })
+  async apiImportVideo (req: Request) {
+    isCachedTagsValid = false;
+    return this.addSongToPlaylist({
+      isAction: false, isHighlight: false, emotesOffsets: new Map(), isFirstTimeMessage: false, parameters: req.body.playlist, sender: getUserSender(getBotId(), getBotUserName()), command: '', createdAt: Date.now(), attr: { forcedTag: req.body.forcedTag }, discord: undefined,
+    });
+  }
+  @Post('/', { action: 'next' })
+  async apiNextSong () {
+    this.sendNextSongID();
+  }
 
   sockets () {
     if (this.socket === null) {
       setTimeout(() => this.sockets(), 100);
       return;
     }
-    adminEndpoint('/systems/songs', 'songs::save', async (item: SongPlaylist, cb) => {
-      isCachedTagsValid = false;
-      cb(null, await SongPlaylist.save(item));
-    });
-    adminEndpoint('/systems/songs', 'songs::getAllBanned', async (where, cb) => {
-      where ??= {};
-      if (cb) {
-        cb(null, await SongBan.find(where));
-      }
-    });
-    adminEndpoint('/systems/songs', 'songs::removeRequest', async (id: string, cb) => {
-      await SongRequest.delete({ id });
-      cb(null);
-    });
-    endpoint([], '/systems/songs', 'songs::getAllRequests', async (where, cb) => {
-      where = where || {};
-      cb(null, await SongRequest.find({
-        ...where,
-        order: { addedAt: 'ASC' },
-      }));
-    });
-    adminEndpoint('/systems/songs', 'delete.playlist', async (videoId, cb) => {
-      isCachedTagsValid = false;
-      await SongPlaylist.delete({ videoId });
-      if (cb) {
-        cb(null);
-      }
-    });
-    adminEndpoint('/systems/songs', 'delete.ban', async (videoId, cb) => {
-      await SongBan.delete({ videoId });
-      if (cb) {
-        cb(null);
-      }
-    });
-    adminEndpoint('/systems/songs', 'stop.import', () => {
-      importInProgress = false;
-    });
-    adminEndpoint('/systems/songs', 'import.ban', async (url, cb) => {
-      try {
-        cb(null, await this.banSong({
-          isAction: false, isHighlight: false, emotesOffsets: new Map(), isFirstTimeMessage: false, parameters: this.getIdFromURL(url), sender: getUserSender(getBotId(), getBotUserName()), command: '', createdAt: Date.now(), attr: {}, discord: undefined,
-        }));
-      } catch (e: any) {
-        cb(e.stack, []);
-      }
-    });
-    adminEndpoint('/systems/songs', 'import.playlist', async ({ playlist, forcedTag }, cb) => {
-      try {
-        isCachedTagsValid = false;
-        cb(null, await this.importPlaylist({
-          isAction: false, isHighlight: false, emotesOffsets: new Map(), isFirstTimeMessage: false, parameters: playlist, sender: getUserSender(getBotId(), getBotUserName()), command: '', createdAt: Date.now(), attr: { forcedTag }, discord: undefined,
-        }));
-      } catch (e: any) {
-        cb(e.stack, null);
-      }
-    });
-    adminEndpoint('/systems/songs', 'import.video', async ({ playlist, forcedTag }, cb) => {
-      try {
-        cb(null, await this.addSongToPlaylist({
-          isAction: false, isHighlight: false, emotesOffsets: new Map(), isFirstTimeMessage: false, parameters: playlist, sender: getUserSender(getBotId(), getBotUserName()), command: '', createdAt: Date.now(), attr: { forcedTag }, discord: undefined,
-        }));
-      } catch (e: any) {
-        cb(e.stack, null);
-      }
-    });
-    adminEndpoint('/systems/songs', 'next', async () => {
-      this.sendNextSongID();
-    });
 
     this.socket.on('connection', (socket: io.Socket) => {
       socket.on('disconnect', () => {

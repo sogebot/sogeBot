@@ -467,7 +467,7 @@ class Spotify extends Integration {
     const spotifyUri = req.body.spotifyUri;
     await SpotifySongBan.delete({ spotifyUri });
   }
-  @Get('/banned/all')
+  @Get('/ban')
   async getAllBanned() {
     return await SpotifySongBan.find();
   }
