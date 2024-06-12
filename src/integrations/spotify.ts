@@ -55,9 +55,9 @@ class Spotify extends Integration {
     started_at: number; song: string; artist: string; artists: string, uri: string; is_playing: boolean; is_enabled: boolean;
   });
 
-  @settings()
+  @persistent()
     _accessToken: string | null = null;
-  @settings()
+  @persistent()
     _refreshToken: string | null = null;
   @settings()
     songRequests = true;

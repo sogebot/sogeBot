@@ -129,14 +129,6 @@ function adminEndpoint<K0 extends keyof O, K1 extends keyof O[K0], O extends Rec
   }
 }
 
-const viewerEndpoint = (nsp: string, on: string, callback: (opts: any, cb: (error: Error | string | null, ...response: any) => void) => void, socket?: Socket) => {
-  if (!endpoints.find(o => o.type === 'viewer' && o.nsp === nsp && o.on === on)) {
-    endpoints.push({
-      nsp, on, callback, type: 'viewer',
-    });
-  }
-};
-
 const withScope = (requiredScopes: string[], isPublic: boolean = false) => {
   return async (req: { headers: { [x: string]: any; }; }, res: { sendStatus: (arg0: number) => any; }, next: () => void) => {
     const authHeader = req.headers.authorization;
@@ -186,5 +178,5 @@ const withScope = (requiredScopes: string[], isPublic: boolean = false) => {
 };
 
 export {
-  endpoints, adminEndpoint, viewerEndpoint, endpoint, scopes, newEndpoints, addScope, withScope, getPrivileges, initEndpoints,
+  endpoints, adminEndpoint, endpoint, scopes, newEndpoints, addScope, withScope, getPrivileges, initEndpoints,
 };

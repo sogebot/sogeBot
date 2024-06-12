@@ -50,6 +50,5 @@
   * [Run random command](_master/howto/run-random-command.md)
   * [Write own system](_master/howto/write-own-system.md)
 * Integrations
-  * [Twitter](_master/integrations/twitter.md)
   * [Last.fm](_master/integrations/lastfm.md)
   * [Spotify](_master/integrations/spotify.md)

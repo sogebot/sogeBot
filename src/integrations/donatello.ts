@@ -65,7 +65,7 @@ class Donatello extends Integration {
   @persistent()
     lastPubId = '';
 
-  @settings()
+  @settings(undefined, undefined, true)
     token = '';
 
   @onStartup()

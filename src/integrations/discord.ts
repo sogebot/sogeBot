@@ -22,6 +22,7 @@ import users from '../users.js';
 
 import { Event, Attributes } from '~/database/entity/event.js';
 import { AppDataSource } from '~/database.js';
+import { Get } from '~/decorators/endpoint.js';
 import { isStreamOnline, stats } from '~/helpers/api/index.js';
 import { attributesReplace } from '~/helpers/attributesReplace.js';
 import {
@@ -37,7 +38,6 @@ import {
 } from '~/helpers/log.js';
 import { check } from '~/helpers/permissions/check.js';
 import { get as getPermission } from '~/helpers/permissions/get.js';
-import { adminEndpoint } from '~/helpers/socket.js';
 import * as changelog from '~/helpers/user/changelog.js';
 import { Types } from '~/plugins/ListenTo.js';
 import { getIdFromTwitch } from '~/services/twitch/calls/getIdFromTwitch.js';
@@ -51,10 +51,12 @@ class Discord extends Integration {
   @persistent()
     embedMessageId = '';
 
-  @settings('general')
+  // set secret clientId
+  @settings('general', false, true)
     clientId = '';
 
-  @settings('general')
+  // set secret token
+  @settings('general', false, true)
     token = '';
 
   @settings('bot')
@@ -720,95 +722,72 @@ class Discord extends Integration {
     }
   }
 
-  sockets() {
-    adminEndpoint('/integrations/discord', 'discord::getRoles', async (cb) => {
-      try {
-        if (this.client && this.guild) {
-          return cb(null, this.client.guilds.cache.get(this.guild)?.roles.cache
-            .sort((a, b) => {
-              const nameA = a.name.toUpperCase(); // ignore upper and lowercase
-              const nameB = b.name.toUpperCase(); // ignore upper and lowercase
-              if (nameA < nameB) {
-                return -1;
-              }
-              if (nameA > nameB) {
-                return 1;
-              }
-              // names must be equal
-              return 0;
-            })
-            .map(o => ({ text: `<strong>${o.name}</strong> <small class="font-italic">${o.id}</small>`, value: o.id })) || [],
-          );
-        } else {
-          cb(null, []);
-        }
-      } catch (e: any) {
-        cb(e.message, []);
-      }
-    });
-    adminEndpoint('/integrations/discord', 'discord::getGuilds', async (cb) => {
-      try {
-        if (this.client) {
-          await this.client.guilds.fetch();
-          return cb(null, this.client.guilds.cache
-            .sort((a, b) => {
-              const nameA = a.name.toUpperCase(); // ignore upper and lowercase
-              const nameB = b.name.toUpperCase(); // ignore upper and lowercase
-              if (nameA < nameB) {
-                return -1;
-              }
-              if (nameA > nameB) {
-                return 1;
-              }
-              // names must be equal
-              return 0;
-            })
-            .map(o => ({ text: `<strong>${o.name}</strong> <small class="font-italic">${o.id}</small>`, value: o.id })));
-        } else {
-          cb(null, []);
-        }
-      } catch (e: any) {
-        cb(e.message, []);
-      }
-    });
-    adminEndpoint('/integrations/discord', 'discord::getChannels', async (cb) => {
-      try {
-        if (this.client && this.guild) {
-          cb(null, this.client.guilds.cache.get(this.guild)?.channels.cache
-            .filter(o => o.type === ChannelType.GuildText)
-            .sort((a, b) => {
-              const nameA = (a as DiscordJs.TextChannel).name.toUpperCase(); // ignore upper and lowercase
-              const nameB = (b as DiscordJs.TextChannel).name.toUpperCase(); // ignore upper and lowercase
-              if (nameA < nameB) {
-                return -1;
-              }
-              if (nameA > nameB) {
-                return 1;
-              }
-              // names must be equal
-              return 0;
-            })
-            .map(o => ({ text: `<strong>#${(o as DiscordJs.TextChannel).name}</strong> <small class="font-italic">${o.id}</small>`, value: o.id })) || [],
-          );
-        } else {
-          cb(null, []);
-        }
-      } catch (e: any) {
-        cb(e.stack, []);
-      }
-    });
-    adminEndpoint('/integrations/discord', 'discord::authorize', async (cb) => {
-      if (this.token === '' || this.clientId === '') {
-        cb('Cannot authorize! Missing clientId or token. Please save changes before authorizing.', null);
-      } else {
-        try {
-          cb(null, { do: 'redirect', opts: [`https://discordapp.com/oauth2/authorize?&scope=bot&permissions=8&client_id=${this.clientId}`] });
-        } catch (e: any) {
-          error(e.stack);
-          cb(e.stack, null);
-        }
-      }
-    });
+  @Get('/roles')
+  async getRoles() {
+    if (this.client && this.guild) {
+      return this.client.guilds.cache.get(this.guild)?.roles.cache
+        .sort((a, b) => {
+          const nameA = a.name.toUpperCase(); // ignore upper and lowercase
+          const nameB = b.name.toUpperCase(); // ignore upper and lowercase
+          if (nameA < nameB) {
+            return -1;
+          }
+          if (nameA > nameB) {
+            return 1;
+          }
+          // names must be equal
+          return 0;
+        })
+        .map(o => ({ text: `<strong>${o.name}</strong> <small class="font-italic">${o.id}</small>`, value: o.id })) || [];
+    } else {
+      return [];
+    }
+  }
+
+  @Get('/guilds')
+  async getGuilds() {
+    if (this.client) {
+      await this.client.guilds.fetch();
+      return this.client.guilds.cache
+        .sort((a, b) => {
+          const nameA = a.name.toUpperCase(); // ignore upper and lowercase
+          const nameB = b.name.toUpperCase(); // ignore upper and lowercase
+          if (nameA < nameB) {
+            return -1;
+          }
+          if (nameA > nameB) {
+            return 1;
+          }
+          // names must be equal
+          return 0;
+        })
+        .map(o => ({ text: `<strong>${o.name}</strong> <small class="font-italic">${o.id}</small>`, value: o.id }));
+    } else {
+      return [];
+    }
+  }
+
+  @Get('/channels')
+  async getChannels() {
+    if (this.client && this.guild) {
+      return this.client.guilds.cache.get(this.guild)?.channels.cache
+        .filter(o => o.type === ChannelType.GuildText)
+        .sort((a, b) => {
+          const nameA = (a as DiscordJs.TextChannel).name.toUpperCase(); // ignore upper and lowercase
+          const nameB = (b as DiscordJs.TextChannel).name.toUpperCase(); // ignore upper and lowercase
+          if (nameA < nameB) {
+            return -1;
+          }
+          if (nameA > nameB) {
+            return 1;
+          }
+          // names must be equal
+          return 0;
+        })
+        .map(o => ({ text: `<strong>#${(o as DiscordJs.TextChannel).name}</strong> <small class="font-italic">${o.id}</small>`, value: o.id })) || [];
+    } else {
+      return [];
+    }
   }
 }
 

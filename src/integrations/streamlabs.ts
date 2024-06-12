@@ -58,12 +58,10 @@ class Streamlabs extends Integration {
   @persistent()
     afterDonationId = '';
 
-  @settings()
+  @persistent()
     accessToken = '';
 
-  accessTokenBtn = null;
-
-  @settings()
+  @persistent()
     socketToken = '';
 
   @settings()

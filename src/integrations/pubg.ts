@@ -19,7 +19,7 @@ import { flatten } from '~/helpers/flatten.js';
 import { error, info } from '~/helpers/log.js';
 
 class PUBG extends Integration {
-  @settings()
+  @settings(undefined, undefined, true)
   @ui({ type: 'text-input', secret: true })
     apiKey = '';
 
