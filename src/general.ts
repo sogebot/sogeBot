@@ -28,7 +28,6 @@ import {
   debug, error, warning,
 } from '~/helpers/log.js';
 import { socketsConnected } from '~/helpers/panel/index.js';
-import { addUIWarn } from '~/helpers/panel/index.js';
 import defaultPermissions from '~/helpers/permissions/defaultPermissions.js';
 import { list } from '~/helpers/register.js';
 import { getMuteStatus } from '~/helpers/tmi/muteStatus.js';
@@ -36,7 +35,6 @@ import translateLib, { translate } from '~/translate.js';
 import { variables } from '~/watchers.js';
 
 let threadStartTimestamp = Date.now();
-let isInitialLangSet = true;
 
 const gracefulExit = () => {
   if (general.gracefulExitEachXHours > 0) {
@@ -195,10 +193,6 @@ class General extends Core {
       setLocale(this.lang);
       setLang(this.lang);
       warning(translate('core.lang-selected'));
-      if (!isInitialLangSet) {
-        addUIWarn({ name: 'UI', message: translate('core.lang-selected') + '. ' + translate('core.refresh-panel') });
-      }
-      isInitialLangSet = false;
     }
   }
 

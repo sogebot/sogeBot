@@ -7,16 +7,9 @@ import defaultPermissions from './permissions/defaultPermissions.js';
 import { getUserHighestPermission } from './permissions/getUserHighestPermission.js';
 
 import type { Fn, ClientToServerEventsWithNamespace, NestedFnParams } from '~/../d.ts/src/helpers/socket.js';
-import { debug, error } from '~/helpers/log.js';
+import { error } from '~/helpers/log.js';
 
 const endpoints: {
-  type: 'admin' | 'viewer' | 'public';
-  on: any;
-  nsp: any;
-  callback: any;
-}[] = [];
-
-const newEndpoints: {
   scopes: string[];
   on: any;
   nsp: any;
@@ -63,44 +56,11 @@ const getPrivileges = async(userId: string): Promise<{
 
 const initEndpoints = (socket: Socket, privileges: Unpacked<ReturnType<typeof getPrivileges>>) => {
   socket.offAny(); // remove all listeners in case we call this twice
+  // new code for new endpoints with scopes
   for (const key of [...new Set(endpoints.filter(o => o.nsp === socket.nsp.name).map(o => o.nsp + '||' + o.on))]) {
     const [nsp, on] = key.split('||');
-    const endpointsToInit = endpoints.filter(o => o.nsp === nsp && o.on === on);
-    if (endpointsToInit.length > 0) {
-      socket.on(on, async (opts: any, cb: (error: Error | string | null, ...response: any) => void) => {
-      // initialize all endpoints given by privileges scopes
-        const adminEndpointInit = endpointsToInit.find(o => o.type === 'admin');
-        const viewerEndpoint = endpointsToInit.find(o => o.type === 'viewer');
-        const publicEndpoint = endpointsToInit.find(o => o.type === 'public');
-        if (adminEndpointInit && privileges.haveAdminPrivileges) {
-          adminEndpointInit.callback(opts, cb ?? socket, socket);
-          return;
-        } else if (!viewerEndpoint && !publicEndpoint) {
-          debug('socket', `User dont have admin access to ${socket.nsp.name}`);
-          debug('socket', privileges);
-          cb && cb('User doesn\'t have access to this endpoint', null);
-          return;
-        }
-
-        if (viewerEndpoint) {
-          viewerEndpoint.callback(opts, cb ?? socket, socket);
-          return;
-        } else if (!publicEndpoint) {
-          debug('socket', `User dont have viewer access to ${socket.nsp.name}`);
-          debug('socket', privileges);
-          cb && cb('User doesn\'t have access to this endpoint', null);
-          return;
-        }
-
-        publicEndpoint.callback(opts, cb ?? socket, socket);
-      });
-    }
-  }
-  // new code for new endpoints with scopes
-  for (const key of [...new Set(newEndpoints.filter(o => o.nsp === socket.nsp.name).map(o => o.nsp + '||' + o.on))]) {
-    const [nsp, on] = key.split('||');
-    const scopedEndpoints = newEndpoints.filter(o => o.nsp === nsp && o.on === on);
-    if (newEndpoints.length > 0) {
+    const scopedEndpoints = endpoints.filter(o => o.nsp === nsp && o.on === on);
+    if (endpoints.length > 0) {
       socket.on(on, async (opts: any, cb: (error: Error | string | null, ...response: any) => void) => {
         for (const scopedEndpoint of scopedEndpoints) {
           if (scopedEndpoint.scopes.some(scope => privileges.scopes.includes(scope))) {
@@ -114,17 +74,9 @@ const initEndpoints = (socket: Socket, privileges: Unpacked<ReturnType<typeof ge
 };
 
 function endpoint<K0 extends keyof O, K1 extends keyof O[K0], O extends Record<PropertyKey, Record<PropertyKey, Fn>> = ClientToServerEventsWithNamespace>(requiredScopes: string[], nsp: K0, on: K1, callback: (...args: NestedFnParams<O, K0, K1>) => void): void {
-  if (!newEndpoints.find(o => isEqual(o.scopes, requiredScopes) && o.nsp === nsp && o.on === on)) {
-    newEndpoints.push({
-      scopes: requiredScopes, nsp, on, callback,
-    });
-  }
-}
-
-function adminEndpoint<K0 extends keyof O, K1 extends keyof O[K0], O extends Record<PropertyKey, Record<PropertyKey, Fn>> = ClientToServerEventsWithNamespace>(nsp: K0, on: K1, callback: (...args: NestedFnParams<O, K0, K1>) => void): void {
-  if (!endpoints.find(o => o.type === 'admin' && o.nsp === nsp && o.on === on)) {
+  if (!endpoints.find(o => isEqual(o.scopes, requiredScopes) && o.nsp === nsp && o.on === on)) {
     endpoints.push({
-      nsp, on, callback, type: 'admin',
+      scopes: requiredScopes, nsp, on, callback,
     });
   }
 }
@@ -178,5 +130,5 @@ const withScope = (requiredScopes: string[], isPublic: boolean = false) => {
 };
 
 export {
-  endpoints, adminEndpoint, endpoint, scopes, newEndpoints, addScope, withScope, getPrivileges, initEndpoints,
+  endpoint, scopes, endpoints, addScope, withScope, getPrivileges, initEndpoints,
 };

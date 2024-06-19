@@ -16,6 +16,20 @@ const registeredEndpoint: {
   }
 } = {};
 
+export class ErrorNotFound extends Error {
+  constructor(message?: string) {
+    // Pass the error message to the parent Error class
+    super(message);
+    // Set the name property to this specific error class name
+    this.name = 'ErrorNotFound';
+
+    // Maintain proper stack trace (only available in V8 engines)
+    if (Error.captureStackTrace) {
+      Error.captureStackTrace(this, ErrorNotFound);
+    }
+  }
+}
+
 export class ErrorBadRequest extends Error {
   constructor(message: string) {
     // Pass the error message to the parent Error class
@@ -167,7 +181,7 @@ export function Post<T extends string>(endpoint: T, params: {
                 res.status(500).send({ status: 'error', message: 'Internal Server Error. Check your bot logs.' });
                 return;
               }
-              if (e instanceof Error && e.message === '404') {
+              if (e instanceof ErrorNotFound) {
                 res.status(404).send({ status: 'error', message: 'Not found' });
                 return;
               }
@@ -264,7 +278,7 @@ export function Patch<T extends string>(endpoint: T, params: {
             });
           }
         } catch (e) {
-          if (e instanceof Error && e.message === '404') {
+          if (e instanceof ErrorNotFound) {
             res.status(404).send({ status: 'error', message: 'Not found' });
             return;
           }
@@ -347,7 +361,7 @@ export function Get<T extends string>(endpoint: T, params: {
 
             // if no data and params are present, return 404
             if (data === null && Object.keys(req.params).length > 0) {
-              throw new Error('404');
+              throw new ErrorNotFound();
             }
 
             if ('_raw' in req.query) {
@@ -373,7 +387,7 @@ export function Get<T extends string>(endpoint: T, params: {
             });
           }
         } catch (e) {
-          if (e instanceof Error && e.message === '404') {
+          if (e instanceof ErrorNotFound) {
             res.status(404).send({ status: 'error', message: 'Not found' });
             return;
           }

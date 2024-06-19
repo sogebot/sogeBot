@@ -86,9 +86,6 @@ export type ClientToServerEventsWithNamespace = {
     'api.stats': (data: { code: number, remaining: number | string, data: string}) => void,
     'translations': (cb: (lang: Record<string, any>) => void) => void,
     'version': (cb: (version: string) => void) => void,
-    'debug::get': (cb: (error: Error | string | null | unknown, debug: string) => void) => void,
-    'debug::set': (debug: string, cb: (error: Error | string | null | unknown) => void) => void,
-    'panel::alerts': (cb: (error: Error | string | null | unknown, data: { errors: import('./panel/alerts').UIError[], warns: import('./panel/alerts').UIError[] }) => void) => void,
     'getLatestStats': (cb: (error: Error | string | null | unknown, stats: Record<string, any>) => void) => void,
     'populateListOf':<list extends possibleLists> (type: list, cb: (error: Error | string | null | unknown, data: getListOfReturn[list]) => void) => void,
     'custom.variable.value': (variableName: string, cb: (error: Error | string | null | unknown, value: string) => void) => void,
@@ -101,11 +98,6 @@ export type ClientToServerEventsWithNamespace = {
     'integration::obswebsocket::values': (cb: (data: { address: string, password: string }) => void) => void,
     'integration::obswebsocket::function': (fnc: any, cb: any) => void,
     'integration::obswebsocket::log': (toLog: string) => void,
-  },
-  '/integrations/donationalerts': GenericEvents & {
-    'donationalerts::validate': (token: string, cb: (err: Error | string | null | unknown) => void) => void,
-    'donationalerts::revoke': (cb: (err: Error | string | null | unknown) => void) => void,
-    'donationalerts::token': (data: { accessToken: string, refreshToken: string }, cb: (err: Error | string | null | unknown) => void) => void,
   },
   '/overlays/media': GenericEvents & {
     'alert': (data: any) => void,
@@ -139,23 +131,7 @@ export type ClientToServerEventsWithNamespace = {
       endDate: string,
     } | null, votes: any[]) => void) => void,
   },
-  '/overlays/marathon': GenericEvents & {
-    'marathon::public': (id: string, cb: (err: Error | string | null | unknown, item?: OverlayMapperMarathon) => void) => void,
-    'marathon::check': (id: string, cb: (err: Error | string | null | unknown, item?: OverlayMapperMarathon) => void) => void,
-    'marathon::update::set': (data: { time: number, id: string }) => void,
-  },
-  '/overlays/stopwatch': GenericEvents & {
-    'stopwatch::check': (id: string, cb: (err: Error | string | null | unknown, update?: {
-      timestamp: number;
-      isEnabled: boolean;
-      time: number;
-    }) => void) => void,
-    'stopwatch::update::set': (data: { id: string, isEnabled: boolean | null, time: number | null }) => void,
-    'stopwatch::update': (data: any, cb: (_err: null, data?: { isEnabled: boolean | null, time :string | null }) => void) => void,
-  },
   '/registries/alerts': GenericEvents & {
-    'alerts::settings': (data: null | { areAlertsMuted: boolean; isSoundMuted: boolean; isTTSMuted: boolean; }, cb: (item: { areAlertsMuted: boolean; isSoundMuted: boolean; isTTSMuted: boolean; }) => void) => void,
-    'test': (emit: EmitData) => void,
     'alert': (data: (EmitData & {
       id: string;
       isTTSMuted: boolean;

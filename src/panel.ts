@@ -4,14 +4,15 @@ import { fileURLToPath } from 'url';
 
 import axios from 'axios';
 import cors from 'cors';
-import express from 'express';
+import express, { Request } from 'express';
 import RateLimit from 'express-rate-limit';
 import gitCommitInfo from 'git-commit-info';
 import _ from 'lodash-es';
 import sanitize from 'sanitize-filename';
+import { z } from 'zod';
 
+import { Get, Post } from './decorators/endpoint.js';
 import { getDEBUG, setDEBUG } from './helpers/debug.js';
-import { broadcasterMissingScopes } from './services/twitch/eventSubWebsocket.js';
 import { possibleLists } from '../d.ts/src/helpers/socket.js';
 
 import Core from '~/_interface.js';
@@ -32,14 +33,12 @@ import { getLang } from '~/helpers/locales.js';
 import {
   info,
 } from '~/helpers/log.js';
-import { errors, warns } from '~/helpers/panel/alerts.js';
 import { socketsConnectedDec, socketsConnectedInc } from '~/helpers/panel/index.js';
 import {
   app, ioServer, server, serverSecure, setApp, setServer,
 } from '~/helpers/panel.js';
 import { status as statusObj } from '~/helpers/parser.js';
 import { list } from '~/helpers/register.js';
-import { adminEndpoint } from '~/helpers/socket.js';
 import { tmiEmitter } from '~/helpers/tmi/index.js';
 import * as changelog from '~/helpers/user/changelog.js';
 import { Parser } from '~/parser.js';
@@ -84,6 +83,16 @@ class Panel extends Core {
     serverSecure?.listen(secureport, '0.0.0.0', () => {
       info(`WebPanel is available at https://localhost:${port} or https://dash.sogebot.xyz/?server=https://localhost:${port}`);
     });
+  }
+
+  @Get('/debug')
+  async getDebug() {
+    return getDEBUG();
+  }
+
+  @Post('/debug', { zodValidator: z.object({ debug: z.string() }) })
+  async setDebug(req: Request) {
+    return setDEBUG(req.body.debug);
   }
 
   init () {
@@ -308,47 +317,6 @@ class Panel extends Core {
         });
         await AppDataSource.getRepository(Translation).delete({ name: data.name });
         callback(translate(data.name));
-      });
-
-      adminEndpoint('/', 'debug::get', (cb) => {
-        cb(null, getDEBUG());
-      });
-
-      adminEndpoint('/', 'debug::set', (data) => {
-        setDEBUG(data);
-      });
-
-      adminEndpoint('/', 'token::broadcaster-missing-scopes', (cb) => {
-        cb(broadcasterMissingScopes);
-      });
-
-      adminEndpoint('/', 'panel::alerts', (cb) => {
-        const toShow: { errors: typeof errors, warns: typeof warns }  = { errors: [], warns: [] };
-        do {
-          const err = errors.shift();
-          if (!err) {
-            break;
-          }
-
-          if (!toShow.errors.find((o) => {
-            return o.name === err.name && o.message === err.message;
-          })) {
-            toShow.errors.push(err);
-          }
-        } while (errors.length > 0);
-        do {
-          const warn = warns.shift();
-          if (!warn) {
-            break;
-          }
-
-          if (!toShow.warns.find((o) => {
-            return o.name === warn.name && o.message === warn.message;
-          })) {
-            toShow.warns.push(warn);
-          }
-        } while (warns.length > 0);
-        cb(null, toShow);
       });
 
       socket.on('connection_status', (cb: (status: typeof statusObj) => void) => {

@@ -12,7 +12,7 @@ import { createMarker } from './twitch/calls/createMarker.js';
 import { updateBroadcasterType } from './twitch/calls/updateBroadcasterType.js';
 import Chat from './twitch/chat.js';
 import EventSubLongPolling from './twitch/eventSubLongPolling.js';
-import EventSubWebsocket from './twitch/eventSubWebsocket.js';
+import EventSubWebsocket, { broadcasterMissingScopes } from './twitch/eventSubWebsocket.js';
 import { CustomAuthProvider } from './twitch/token/CustomAuthProvider.js';
 import { onChange, onLoad, onStreamStart } from '../decorators/on.js';
 import {
@@ -312,6 +312,11 @@ class Twitch extends Service {
   @Get('/broadcaster')
   async getBroadcaster() {
     return this.broadcasterUsername.toLowerCase();
+  }
+
+  @Get('/broadcaster/missingScopes')
+  async getBroadcasterMissingScopes() {
+    return broadcasterMissingScopes;
   }
 
   @Post('/', { action: 'revoke', isSensitive: true, zodValidator: z.object({ accountType: z.enum(['bot', 'broadcaster']) }) })

@@ -5,7 +5,6 @@ import { AppDataSource } from '~/database.js';
 import { isDebugEnabled } from '~/helpers/debug.js';
 import { getFunctionName } from '~/helpers/getFunctionName.js';
 import { debug, error, warning } from '~/helpers/log.js';
-import { addUIError } from '~/helpers/panel/index.js';
 import { setStatus } from '~/helpers/parser.js';
 import * as changelog from '~/helpers/user/changelog.js';
 import twitch from '~/services/twitch.js';
@@ -24,7 +23,6 @@ export async function getModerators(opts: { isWarned: boolean }) {
       if (!opts.isWarned) {
         opts.isWarned = true;
         warning('Missing Broadcaster oAuth scope moderation:read to read channel moderators.');
-        addUIError({ name: 'OAUTH', message: 'Missing Broadcaster oAuth scope moderation:read to read channel moderators.' });
       }
       return { state: false, opts };
     }

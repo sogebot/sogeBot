@@ -40,7 +40,6 @@ import emitter from '~/helpers/interfaceEmitter.js';
 import {
   debug, error, info, warning,
 } from '~/helpers/log.js';
-import { addUIError } from '~/helpers/panel/index.js';
 import { tmiEmitter } from '~/helpers/tmi/index.js';
 import * as changelog from '~/helpers/user/changelog.js';
 import {
@@ -446,12 +445,10 @@ class Events extends Core {
       if ([30, 60, 90, 120, 150, 180].includes(duration)) {
         if (!broadcasterCurrentScopes.includes('channel:edit:commercial')) {
           warning('Missing Broadcaster oAuth scope channel:edit:commercial to start commercial');
-          addUIError({ name: 'OAUTH', message: 'Missing Broadcaster oAuth scope channel:edit:commercial to start commercial' });
           return;
         }
         if (!broadcasterCurrentScopes.includes('channel:edit:commercial')) {
           warning('Missing Broadcaster oAuth scope channel:edit:commercial to start commercial');
-          addUIError({ name: 'OAUTH', message: 'Missing Broadcaster oAuth scope channel:edit:commercial to start commercial' });
           return;
         }
         await twitch.apiClient?.asIntent(['broadcaster'], ctx => ctx.channels.startChannelCommercial(cid, duration as 30 | 60 | 90 | 120 | 150 | 180));

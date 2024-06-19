@@ -14,7 +14,6 @@ import { isDebugEnabled } from '~/helpers/debug.js';
 import { eventEmitter } from '~/helpers/events/emitter.js';
 import { getFunctionName } from '~/helpers/getFunctionName.js';
 import { debug, warning } from '~/helpers/log.js';
-import { addUIError } from '~/helpers/panel/index.js';
 import { setImmediateAwait } from '~/helpers/setImmediateAwait.js';
 import twitch from '~/services/twitch.js';
 import { translate } from '~/translate.js';
@@ -30,11 +29,9 @@ async function updateChannelInfo (args: { title?: string | null; game?: string |
 
   if (!broadcasterCurrentScopes.includes('channel_editor')) {
     warning('Missing Broadcaster oAuth scope channel_editor to change game or title. This mean you can have inconsistent game set across Twitch: https://github.com/twitchdev/issues/issues/224');
-    addUIError({ name: 'OAUTH', message: 'Missing Broadcaster oAuth scope channel_editor to change game or title. This mean you can have inconsistent game set across Twitch: <a href="https://github.com/twitchdev/issues/issues/224">Twitch Issue # 224</a>' });
   }
   if (!broadcasterCurrentScopes.includes('user:edit:broadcast')) {
     warning('Missing Broadcaster oAuth scope user:edit:broadcast to change game or title');
-    addUIError({ name: 'OAUTH', message: 'Missing Broadcaster oAuth scope user:edit:broadcast to change game or title' });
     return { response: '', status: false };
   }
 

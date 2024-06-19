@@ -3,6 +3,7 @@ import { randomUUID } from 'crypto';
 import { AlertQueue, EmitData } from '@entity/overlay.js';
 import { Mutex } from 'async-mutex';
 import { Request } from 'express';
+import { z } from 'zod';
 
 import Registry from './_interface.js';
 import { command, default_permission, example, persistent, settings } from '../decorators.js';
@@ -12,7 +13,7 @@ import twitch from '../services/twitch.js';
 import { parserReply } from '~/commons.js';
 import { User, UserInterface } from '~/database/entity/user.js';
 import { AppDataSource } from '~/database.js';
-import { Delete, Get, Patch, Post } from '~/decorators/endpoint.js';
+import { Delete, ErrorNotFound, Get, Patch, Post } from '~/decorators/endpoint.js';
 import { onStartup } from '~/decorators/on.js';
 import { Expects } from  '~/expects.js';
 import { isStreamOnline } from '~/helpers/api/isStreamOnline.js';
@@ -23,7 +24,6 @@ import { debug, info, error } from '~/helpers/log.js';
 import { ioServer } from '~/helpers/panel.js';
 import { defaultPermissions } from '~/helpers/permissions/defaultPermissions.js';
 import { itemsToEvalPart } from '~/helpers/queryFilter.js';
-import { adminEndpoint } from '~/helpers/socket.js';
 import { Types } from '~/plugins/ListenTo.js';
 import { translate } from '~/translate.js';
 import { variables } from '~/watchers.js';
@@ -151,7 +151,7 @@ class Alerts extends Registry {
       queue.emitData = [];
       queue.save();
     } else {
-      throw new Error('404');
+      throw new ErrorNotFound();
     }
   }
 
@@ -168,7 +168,7 @@ class Alerts extends Registry {
         this.trigger({ ...data, eventId: null });
       }
     } else {
-      throw new Error('404');
+      throw new ErrorNotFound();
     }
   }
 
@@ -190,6 +190,45 @@ class Alerts extends Registry {
     release();
   }
 
+  @Post('/settings', {
+    zodValidator: z.object({
+      areAlertsMuted: z.boolean(),
+      isSoundMuted:   z.boolean(),
+      isTTSMuted:     z.boolean(),
+    }),
+  })
+  async postSettings(req: Request) {
+    const { areAlertsMuted, isSoundMuted, isTTSMuted } = req.body;
+
+    if (req.body) {
+      this.areAlertsMuted = areAlertsMuted;
+      this.isSoundMuted = isSoundMuted;
+      this.isTTSMuted = isTTSMuted;
+    }
+
+    return {
+      areAlertsMuted: this.areAlertsMuted,
+      isSoundMuted:   this.isSoundMuted,
+      isTTSMuted:     this.isTTSMuted,
+    };
+  }
+  @Get('/settings')
+  async getSettings() {
+    return {
+      areAlertsMuted: this.areAlertsMuted,
+      isSoundMuted:   this.isSoundMuted,
+      isTTSMuted:     this.isTTSMuted,
+    };
+  }
+
+  @Post('/', { action: 'test' })
+  async test(req: Request) {
+    this.trigger({
+      ...req.body,
+      monthsName: getLocalizedName(req.body.amount, translate('core.months')),
+    }, true);
+  }
+
   sockets () {
     eventEmitter.on(Types.onChannelShoutoutCreate, (opts) => {
       this.trigger({
@@ -202,26 +241,6 @@ class Alerts extends Registry {
         currency:   '',
         monthsName: '',
       });
-    });
-
-    adminEndpoint('/registries/alerts', 'alerts::settings', async (data, cb) => {
-      if (data) {
-        this.areAlertsMuted = data.areAlertsMuted;
-        this.isSoundMuted = data.isSoundMuted;
-        this.isTTSMuted = data.isTTSMuted;
-      }
-
-      cb({
-        areAlertsMuted: this.areAlertsMuted,
-        isSoundMuted:   this.isSoundMuted,
-        isTTSMuted:     this.isTTSMuted,
-      });
-    });
-    adminEndpoint('/registries/alerts', 'test', async (data: EmitData) => {
-      this.trigger({
-        ...data,
-        monthsName: getLocalizedName(data.amount, translate('core.months')),
-      }, true);
     });
   }
 

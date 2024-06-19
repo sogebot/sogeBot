@@ -6,7 +6,6 @@ import {
 } from '../decorators.js';
 
 import { error, warning } from '~/helpers/log.js';
-import { addUIError } from '~/helpers/panel/alerts.js';
 import defaultPermissions from '~/helpers/permissions/defaultPermissions.js';
 import twitch from '~/services/twitch.js';
 import { variables } from '~/watchers.js';
@@ -42,7 +41,6 @@ class Commercial extends System {
     if ([30, 60, 90, 120, 150, 180].includes(commercial.duration ?? 0)) {
       if (!broadcasterCurrentScopes.includes('channel:edit:commercial')) {
         warning('Missing Broadcaster oAuth scope channel:edit:commercial to start commercial');
-        addUIError({ name: 'OAUTH', message: 'Missing Broadcaster oAuth scope channel:edit:commercial to start commercial' });
         return;
       }
 

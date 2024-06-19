@@ -5,7 +5,7 @@ import {
   Brackets,
 } from 'typeorm';
 
-import { Delete, Get, Post } from './decorators/endpoint.js';
+import { Delete, ErrorNotFound, Get, Post } from './decorators/endpoint.js';
 import { HOUR } from './helpers/constants.js';
 import { defaultPermissions } from './helpers/permissions/defaultPermissions.js';
 import { getUserHighestPermission } from './helpers/permissions/getUserHighestPermission.js';
@@ -303,7 +303,7 @@ class Users extends Core {
       };
     }
 
-    throw new Error('404');
+    throw new ErrorNotFound();
   }
 
   @Get('/')

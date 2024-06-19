@@ -23,7 +23,6 @@ import { CommandError } from '~/helpers/commandError.js';
 import { announce, prepare } from '~/helpers/commons/index.js';
 import { HOUR, SECOND } from '~/helpers/constants.js';
 import { debug, error, info, warning } from '~/helpers/log.js';
-import { addUIError } from '~/helpers/panel/index.js';
 import { ioServer } from '~/helpers/panel.js';
 
 /*
@@ -385,7 +384,6 @@ class Spotify extends Integration {
     }
 
     if (this.retry.IRefreshToken >= 5) {
-      addUIError({ name: 'SPOTIFY', message: 'Refreshing access token failed. Revoking access.' });
       this.userId = null;
       this._accessToken = null;
       this._refreshToken = null;
@@ -434,7 +432,6 @@ class Spotify extends Integration {
     const spotifyUri = req.body.spotifyUri;
     try {
       if (!this.client) {
-        addUIError({ name: 'Spotify Ban Import', message: 'You are not connected to spotify API, authorize your user' });
         throw Error('client');
       }
       let id = '';
@@ -557,7 +554,6 @@ class Spotify extends Integration {
               this.retry.IRefreshToken = 0;
             }, (authorizationError) => {
               if (authorizationError) {
-                addUIError({ name: 'SPOTIFY', message: 'Getting of accessToken and refreshToken failed.' });
                 info(chalk.yellow('SPOTIFY: ') + 'Getting of accessToken and refreshToken failed');
               }
             });
@@ -567,7 +563,6 @@ class Spotify extends Integration {
         }
       } catch (e: any) {
         error(e.stack);
-        addUIError({ name: 'SPOTIFY', message: 'Client connection failed.' });
         info(chalk.yellow('SPOTIFY: ') + 'Client connection failed');
       }
     } catch (e: any) {

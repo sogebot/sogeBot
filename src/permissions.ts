@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import { Delete, Get, Post } from './decorators/endpoint.js';
+import { Delete, ErrorNotFound, Get, Post } from './decorators/endpoint.js';
 import { scopes } from './helpers/socket.js';
 
 import Core from '~/_interface.js';
@@ -77,7 +77,7 @@ class Permissions extends Core {
   async testUser(req: any) {
     const { pid, value, state } = req.body;
     if (!(await PermissionsEntity.findOneBy({ id: String(pid) }))) {
-      throw new Error('404');
+      throw new ErrorNotFound();
     }
     if (typeof value === 'string') {
       await changelog.flush();

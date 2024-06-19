@@ -1,5 +1,5 @@
 import { Plugin, PluginVariable } from './database/entity/plugins.js';
-import { Delete, Get, Post } from './decorators/endpoint.js';
+import { Delete, ErrorNotFound, Get, Post } from './decorators/endpoint.js';
 import { SECOND } from './helpers/constants.js';
 import { eventEmitter } from './helpers/events/index.js';
 import { debug, error } from './helpers/log.js';
@@ -240,13 +240,13 @@ class Plugins extends Core {
   async getOverlaySource(req: any) {
     const plugin = plugins.find(o => o.id === req.params.pid);
     if (!plugin) {
-      throw new Error('404');
+      throw new ErrorNotFound();
     }
 
     const files = JSON.parse(plugin.workflow);
     const overlay = files.overlay.find((o: any) => o.id === req.params.id);
     if (!overlay) {
-      throw new Error('404');
+      throw new ErrorNotFound();
     }
 
     const source = overlay.source.replace('</body>', `
