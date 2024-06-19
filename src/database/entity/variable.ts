@@ -30,7 +30,7 @@ export class Variable extends BotEntity {
               && value.length > 2 && value.startsWith('$_');
       }, 'IsCustomVariable'),
     ]),
-    runEvery: z.number().int(),
+    runEvery: z.number().int().optional(),
   });
 
   @BeforeInsert()
