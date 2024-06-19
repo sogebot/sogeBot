@@ -1,6 +1,7 @@
 import {
   Raffle, RaffleParticipant, RaffleParticipantInterface, RaffleParticipantMessageInterface,
 } from '@entity/raffle.js';
+import { Mutex } from 'async-mutex';
 import * as _ from 'lodash-es';
 import { IsNull } from 'typeorm';
 import { z } from 'zod';
@@ -44,6 +45,8 @@ const TYPE_TICKETS = 1;
 let announceNewEntriesTime = 0;
 let announceNewEntriesCount = 0;
 
+const announceMutex = new Mutex();
+
 class Raffles extends System {
   lastAnnounce = Date.now();
   lastAnnounceMessageCount = 0;
@@ -67,8 +70,8 @@ class Raffles extends System {
 
   @onStartup()
   onStartup() {
-    this.announce();
     setInterval(() => {
+      this.announce();
       if (this.announceNewEntries && announceNewEntriesTime !== 0 && announceNewEntriesTime <= Date.now()) {
         this.announceEntries();
       }
@@ -159,22 +162,53 @@ class Raffles extends System {
   }
 
   async announceEntries() {
+    try {
+      const raffle = await AppDataSource.getRepository(Raffle).findOneOrFail({ where: { winner: IsNull(), isClosed: false }, relations: ['participants'] });
+      const eligibility: string[] = [];
+      if (raffle.forSubscribers === true) {
+        eligibility.push(prepare('raffles.eligibility-subscribers-item'));
+      }
+      if (_.isEmpty(eligibility)) {
+        eligibility.push(prepare('raffles.eligibility-everyone-item'));
+      }
+
+      const message = prepare(raffle.type === TYPE_NORMAL ? 'raffles.added-entries' : 'raffles.added-ticket-entries', {
+        l10n_entries: getLocalizedName(announceNewEntriesCount, translate('core.entries')),
+        count:        announceNewEntriesCount,
+        countTotal:   raffle.participants.reduce((a, b) => {
+          a += b.tickets;
+          return a;
+        }, 0),
+        keyword:     raffle.keyword,
+        min:         raffle.minTickets,
+        max:         raffle.maxTickets,
+        eligibility: eligibility.join(', '),
+      });
+
+      announce(message, 'raffles');
+    } catch (e: any) {
+      warning('No active raffle found to announce added entries.');
+    }
     announceNewEntriesTime = 0;
     announceNewEntriesCount = 0;
   }
 
   async announce () {
-    clearTimeout(this.timeouts.raffleAnnounce);
     if (!isDbConnected) {
-      this.timeouts.raffleAnnounce = global.setTimeout(() => this.announce(), 1000);
       return;
     }
+
+    if (announceMutex.isLocked()) {
+      return;
+    }
+    await announceMutex.acquire();
+    setTimeout(() => announceMutex.release(), 60000);
 
     const raffle = await AppDataSource.getRepository(Raffle).findOne({ where: { winner: IsNull(), isClosed: false }, relations: ['participants'] });
     const isTimeToAnnounce = new Date().getTime() - new Date(this.lastAnnounce).getTime() >= (this.raffleAnnounceInterval * 60 * 1000);
     const isMessageCountToAnnounce = linesParsed - this.lastAnnounceMessageCount >= this.raffleAnnounceMessageInterval;
+
     if (!(isStreamOnline.value) || !raffle || !isTimeToAnnounce || !isMessageCountToAnnounce) {
-      this.timeouts.raffleAnnounce = global.setTimeout(() => this.announce(), 60000);
       return;
     }
     this.lastAnnounce = Date.now();
@@ -209,7 +243,6 @@ class Raffles extends System {
       message += ' ' + prepare('raffles.join-messages-will-be-deleted');
     }
     announce(message, 'raffles');
-    this.timeouts.raffleAnnounce = global.setTimeout(() => this.announce(), 60000);
   }
 
   @command('!raffle remove')
