@@ -29,7 +29,8 @@ describe('#5583 - If lower permission allows, then it should be allowed - @func1
       isWaterfallAllowed: true,
       order:              0,
       userIds:            [],
-      excludeUserIds:     [],
+      scopes:     [],
+excludeUserIds:     [],
       filters:            [],
     });
     await AppDataSource.getRepository(Permissions).insert({
@@ -40,7 +41,8 @@ describe('#5583 - If lower permission allows, then it should be allowed - @func1
       isWaterfallAllowed: true,
       order:              1,
       userIds:            [],
-      excludeUserIds:     [],
+      scopes:     [],
+excludeUserIds:     [],
       filters:            [],
     });
     await AppDataSource.getRepository(Permissions).insert({
@@ -51,7 +53,8 @@ describe('#5583 - If lower permission allows, then it should be allowed - @func1
       isWaterfallAllowed: true,
       order:              2,
       userIds:            [],
-      excludeUserIds:     [],
+      scopes:     [],
+excludeUserIds:     [],
       filters:            [],
     });
     await AppDataSource.getRepository(Permissions).insert({
@@ -62,7 +65,8 @@ describe('#5583 - If lower permission allows, then it should be allowed - @func1
       isWaterfallAllowed: true,
       order:              3,
       userIds:            [],
-      excludeUserIds:     [],
+      scopes:     [],
+excludeUserIds:     [],
       filters:            [],
     });
     await AppDataSource.getRepository(Permissions).insert({
@@ -73,7 +77,8 @@ describe('#5583 - If lower permission allows, then it should be allowed - @func1
       isWaterfallAllowed: true,
       order:              4,
       userIds:            [],
-      excludeUserIds:     [],
+      scopes:     [],
+excludeUserIds:     [],
       filters:            [],
     });
   });
@@ -97,7 +102,8 @@ describe('#5583 - If lower permission allows, then it should be allowed - @func1
       isWaterfallAllowed: true,
       order:              0,
       userIds:            [],
-      excludeUserIds:     [],
+      scopes:     [],
+excludeUserIds:     [],
       filters:            [],
     });
     moderation.__permission_based__cLinksEnabled[defaultPermissions.CASTERS] = true;
@@ -110,7 +116,8 @@ describe('#5583 - If lower permission allows, then it should be allowed - @func1
       isWaterfallAllowed: true,
       order:              1,
       userIds:            [],
-      excludeUserIds:     [],
+      scopes:     [],
+excludeUserIds:     [],
       filters:            [],
     });
     moderation.__permission_based__cLinksEnabled[defaultPermissions.MODERATORS] = true;
@@ -122,7 +129,8 @@ describe('#5583 - If lower permission allows, then it should be allowed - @func1
       isWaterfallAllowed: true,
       order:              2,
       userIds:            [user.viewer.userId],
-      excludeUserIds:     [],
+      scopes:     [],
+excludeUserIds:     [],
       filters:            [],
     });
     await AppDataSource.getRepository(Permissions).insert({
@@ -133,7 +141,8 @@ describe('#5583 - If lower permission allows, then it should be allowed - @func1
       isWaterfallAllowed: true,
       order:              2,
       userIds:            [user.viewer.userId],
-      excludeUserIds:     [],
+      scopes:     [],
+excludeUserIds:     [],
       filters:            [],
     });
     await AppDataSource.getRepository(Permissions).insert({
@@ -144,7 +153,8 @@ describe('#5583 - If lower permission allows, then it should be allowed - @func1
       isWaterfallAllowed: true,
       order:              3,
       userIds:            [],
-      excludeUserIds:     [],
+      scopes:     [],
+excludeUserIds:     [],
       filters:            [],
     });
     moderation.__permission_based__cLinksEnabled[defaultPermissions.SUBSCRIBERS] = true;
@@ -157,7 +167,8 @@ describe('#5583 - If lower permission allows, then it should be allowed - @func1
       isWaterfallAllowed: true,
       order:              4,
       userIds:            [],
-      excludeUserIds:     [],
+      scopes:     [],
+excludeUserIds:     [],
       filters:            [],
     });
     moderation.__permission_based__cLinksEnabled[defaultPermissions.VIP] = true;
@@ -170,7 +181,8 @@ describe('#5583 - If lower permission allows, then it should be allowed - @func1
       isWaterfallAllowed: true,
       order:              5,
       userIds:            [],
-      excludeUserIds:     [],
+      scopes:     [],
+excludeUserIds:     [],
       filters:            [],
     });
     moderation.__permission_based__cLinksEnabled[defaultPermissions.VIEWERS] = true;
