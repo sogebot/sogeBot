@@ -20,7 +20,7 @@ import { error, tip } from '~/helpers/log.js';
 class Qiwi extends Integration {
   interval: any = null;
 
-  @settings()
+  @settings(undefined, undefined, true)
     secretToken = '';
 
   @onStartup()

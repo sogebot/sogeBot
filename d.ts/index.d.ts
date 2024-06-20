@@ -12,6 +12,12 @@ declare class Stringified<T> extends String {
   private ___stringified: T;
 }
 
+type Unpacked<T> =
+  T extends (infer U)[] ? U :
+    T extends (...args: any[]) => infer R ? R :
+      T extends Promise<infer E> ? E :
+        T;
+
 interface JSON {
   stringify<T>(value: T, replacer?: (this: any, key: string, value: any) => any, space?: string | number): string & Stringified<T>;
   parse<T>(text: Stringified<T>, reviver?: (key: any, value: any) => any): T

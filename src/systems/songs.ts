@@ -1,9 +1,9 @@
-import type { Filter } from '@devexpress/dx-react-grid';
 import {
   currentSongType,
   SongBan, SongPlaylist, SongRequest,
 } from '@entity/song.js';
 import { User } from '@entity/user.js';
+import { Request } from 'express';
 import * as _ from 'lodash-es';
 import { nanoid } from 'nanoid';
 import io from 'socket.io';
@@ -13,20 +13,21 @@ import {
 import ytdl from 'ytdl-core';
 import ytpl from 'ytpl';
 import ytsr from 'ytsr';
+import { z } from 'zod';
 
 import System from './_interface.js';
 import { onChange, onStartup } from '../decorators/on.js';
 import {
-  command, default_permission, persistent, settings, ui,
+  command, default_permission, persistent, settings,
 } from '../decorators.js';
 
 import { AppDataSource } from '~/database.js';
+import { Delete, Get, Post } from '~/decorators/endpoint.js';
 import {
   announce, getUserSender, prepare,
 } from '~/helpers/commons/index.js';
 import { error, info } from '~/helpers/log.js';
 import defaultPermissions from '~/helpers/permissions/defaultPermissions.js';
-import { adminEndpoint, publicEndpoint } from '~/helpers/socket.js';
 import { tmiEmitter } from '~/helpers/tmi/index.js';
 import * as changelog from '~/helpers/user/changelog.js';
 import getBotId from '~/helpers/user/getBotId.js';
@@ -51,12 +52,6 @@ class Songs extends System {
     currentTag = 'general';
 
   @settings()
-  @ui({
-    type: 'number-input',
-    step: '1',
-    min:  '0',
-    max:  '100',
-  })
     volume = 25;
   @settings()
     duration = 10;
@@ -79,10 +74,10 @@ class Songs extends System {
   startup() {
     this.getMeanLoudness();
     this.addMenu({
-      category: 'manage', name: 'playlist', id: 'manage/songs/playlist', this: this,
+      category: 'manage', name: 'playlist', id: 'manage/songs/playlist', this: this, scopeParent: this.scope(),
     });
     this.addMenu({
-      category: 'manage', name: 'bannedsongs', id: 'manage/songs/bannedsongs', this: this,
+      category: 'manage', name: 'bannedsongs', id: 'manage/songs/bannedsongs', this: this, scopeParent: this.scope(),
     });
     this.addMenuPublic({ id: 'songrequests', name: 'songs' });
     this.addMenuPublic({ id: 'playlist', name: 'playlist' });
@@ -103,181 +98,190 @@ class Songs extends System {
     }
   }
 
-  sockets () {
-    if (this.socket === null) {
-      setTimeout(() => this.sockets(), 100);
-      return;
+  @Get('/current', { scopeOrigin: 'dashboard' })
+  async apiGetCurrentSong () {
+    return JSON.parse(this.currentSong);
+  }
+  @Post('/playlist/tag', { scopeOrigin: 'dashboard', zodValidator: z.object({ tag: z.string() }) })
+  async apiSetPlaylistTag (req: Request) {
+    const tag = req.body.tag;
+    if (this.currentTag !== tag) {
+      info(`SONGS: Playlist changed to ${tag}`);
     }
-    adminEndpoint('/systems/songs', 'songs::currentSong', async (cb) => {
-      cb(null, JSON.parse(this.currentSong));
-    });
-    adminEndpoint('/systems/songs', 'set.playlist.tag', async (tag) => {
-      if (this.currentTag !== tag) {
-        info(`SONGS: Playlist changed to ${tag}`);
-      }
-      this.currentTag = tag;
-    });
-    publicEndpoint('/systems/songs', 'current.playlist.tag', async (cb) => {
-      cb(null, this.currentTag);
-    });
-    adminEndpoint('/systems/songs', 'get.playlist.tags', async (cb) => {
-      try {
-        cb(null, await this.getTags());
-      } catch (e: any) {
-        cb(e, []);
-      }
-    });
-    publicEndpoint('/systems/songs', 'find.playlist', async (opts: { filters?: Filter[], page: number, search?: string, tag?: string | null, perPage: number}, cb) => {
-      opts.page = opts.page ?? 0;
-      opts.perPage = opts.perPage ?? 25;
+    this.currentTag = tag;
+  }
+  @Get('/playlist/tag/current', { scopeOrigin: 'dashboard' })
+  async apiGetPlaylistTag () {
+    return this.currentTag;
+  }
+  @Get('/playlist/tags', { scopeOrigin: 'dashboard' })
+  async apiGetPlaylistTags () {
+    return this.getTags();
+  }
+  @Get('/playlist')
+  async apiGetPlaylist (req: Request) {
+    const opts = {
+      page:                    req.query.page ? Number(req.query.page) : 0,
+      perPage:                 req.query.perPage ? Number(req.query.perPage) : 25,
+      filter:                  req.query.filter ? JSON.parse(String(req.query.filter)) : undefined,
+      exactUsernameFromTwitch: req.query.exactUsernameFromTwitch ? Boolean(req.query.exactUsernameFromTwitch) : false,
+      search:                  req.query.search ? String(req.query.search) : undefined,
+      state:                   req.query.state ? String(req.query.state) : undefined,
+      tag:                     req.query.tag ? String(req.query.tag) : undefined,
+    };
 
-      if (opts.perPage === -1) {
-        opts.perPage = Number.MAX_SAFE_INTEGER;
-      }
-      const query = SongPlaylist.createQueryBuilder('playlist')
-        .offset(opts.page * opts.perPage)
-        .limit(opts.perPage);
+    opts.page = opts.page ?? 0;
+    opts.perPage = opts.perPage ?? 25;
 
-      // filter generator for new UI
-      for (const filter of opts.filters || []) {
-        const name = nanoid();
+    if (opts.perPage === -1) {
+      opts.perPage = Number.MAX_SAFE_INTEGER;
+    }
+    const query = SongPlaylist.createQueryBuilder('playlist')
+      .offset(opts.page * opts.perPage)
+      .limit(opts.perPage);
 
-        if (filter.operation === 'includes') {
-          query.andWhere(new Brackets(w => {
-            for (let i = 0; i < filter.value.length; i++) {
-              const name2 = nanoid();
-              const value = filter.value[i];
-              if  (['postgres'].includes(AppDataSource.options.type.toLowerCase())) {
-                w[i === 0 ? 'where' : 'orWhere'](`"playlist"."${filter.columnName}" like :${name2}`, { [name2]: `%${value}%` });
-              } else {
-                w[i === 0 ? 'where' : 'orWhere'](`playlist.${filter.columnName} like :${name2}`, { [name2]: `%${value}%` });
-              }
+    // filter generator for new UI
+    for (const filter of opts.filter || []) {
+      const name = nanoid();
+
+      if (filter.operation === 'includes') {
+        query.andWhere(new Brackets(w => {
+          for (let i = 0; i < filter.value.length; i++) {
+            const name2 = nanoid();
+            const value = filter.value[i];
+            if  (['postgres'].includes(AppDataSource.options.type.toLowerCase())) {
+              w[i === 0 ? 'where' : 'orWhere'](`"playlist"."${filter.columnName}" like :${name2}`, { [name2]: `%${value}%` });
+            } else {
+              w[i === 0 ? 'where' : 'orWhere'](`playlist.${filter.columnName} like :${name2}`, { [name2]: `%${value}%` });
             }
-          }));
-        }
-
-        if (filter.operation === 'contains') {
-          if  (['postgres'].includes(AppDataSource.options.type.toLowerCase())) {
-            query.andWhere(`"playlist"."${filter.columnName}" like :${name}`, { [name]: `%${filter.value}%` });
-          } else {
-            query.andWhere(`playlist.${filter.columnName} like :${name}`, { [name]: `%${filter.value}%` });
-          }
-        }
-        if (filter.operation === 'equal') {
-          if  (['postgres'].includes(AppDataSource.options.type.toLowerCase())) {
-            query.andWhere(`"playlist"."${filter.columnName}" = :${name}`, { [name]: `${filter.value}` });
-          } else {
-            query.andWhere(`playlist.${filter.columnName} =:${name}`, { [name]: `${filter.value}` });
-          }
-        }
-        if (filter.operation === 'notEqual') {
-          if  (['postgres'].includes(AppDataSource.options.type.toLowerCase())) {
-            query.andWhere(`"playlist"."${filter.columnName}" != :${name}`, { [name]: `${filter.value}` });
-          } else {
-            query.andWhere(`playlist.${filter.columnName} != :${name}`, { [name]: `${filter.value}` });
-          }
-        }
-      }
-
-      if (typeof opts.search !== 'undefined') {
-        query.andWhere(new Brackets(w => {
-          if  (['postgres'].includes(AppDataSource.options.type.toLowerCase())) {
-            w.where('"playlist"."videoId" like :like', { like: `%${opts.search}%` });
-            w.orWhere('"playlist"."title" like :like', { like: `%${opts.search}%` });
-          } else {
-            w.where('playlist.videoId like :like', { like: `%${opts.search}%` });
-            w.orWhere('playlist.title like :like', { like: `%${opts.search}%` });
           }
         }));
       }
 
-      if (opts.tag) {
-        query.andWhere(new Brackets(w => {
-          if  (['postgres'].includes(AppDataSource.options.type.toLowerCase())) {
-            w.where('"playlist"."tags" like :tag', { tag: `%${opts.tag}%` });
-          } else {
-            w.where('playlist.tags like :tag', { tag: `%${opts.tag}%` });
-          }
-
-        }));
+      if (filter.operation === 'contains') {
+        if  (['postgres'].includes(AppDataSource.options.type.toLowerCase())) {
+          query.andWhere(`"playlist"."${filter.columnName}" like :${name}`, { [name]: `%${filter.value}%` });
+        } else {
+          query.andWhere(`playlist.${filter.columnName} like :${name}`, { [name]: `%${filter.value}%` });
+        }
       }
-      const [playlist, count] = await query.getManyAndCount();
-      cb(null, await Promise.all(playlist.map(async (pl) => {
+      if (filter.operation === 'equal') {
+        if  (['postgres'].includes(AppDataSource.options.type.toLowerCase())) {
+          query.andWhere(`"playlist"."${filter.columnName}" = :${name}`, { [name]: `${filter.value}` });
+        } else {
+          query.andWhere(`playlist.${filter.columnName} =:${name}`, { [name]: `${filter.value}` });
+        }
+      }
+      if (filter.operation === 'notEqual') {
+        if  (['postgres'].includes(AppDataSource.options.type.toLowerCase())) {
+          query.andWhere(`"playlist"."${filter.columnName}" != :${name}`, { [name]: `${filter.value}` });
+        } else {
+          query.andWhere(`playlist.${filter.columnName} != :${name}`, { [name]: `${filter.value}` });
+        }
+      }
+    }
+
+    if (typeof opts.search !== 'undefined') {
+      query.andWhere(new Brackets(w => {
+        if  (['postgres'].includes(AppDataSource.options.type.toLowerCase())) {
+          w.where('"playlist"."videoId" like :like', { like: `%${opts.search}%` });
+          w.orWhere('"playlist"."title" like :like', { like: `%${opts.search}%` });
+        } else {
+          w.where('playlist.videoId like :like', { like: `%${opts.search}%` });
+          w.orWhere('playlist.title like :like', { like: `%${opts.search}%` });
+        }
+      }));
+    }
+
+    if (opts.tag) {
+      query.andWhere(new Brackets(w => {
+        if  (['postgres'].includes(AppDataSource.options.type.toLowerCase())) {
+          w.where('"playlist"."tags" like :tag', { tag: `%${opts.tag}%` });
+        } else {
+          w.where('playlist.tags like :tag', { tag: `%${opts.tag}%` });
+        }
+
+      }));
+    }
+    const [playlist, count] = await query.getManyAndCount();
+    return {
+      items: await Promise.all(playlist.map(async (pl) => {
         return {
           ...pl,
           volume:      await this.getVolume(pl),
           forceVolume: pl.forceVolume || false,
         };
-      })), count);
+      })),
+      total: count,
+    };
+  }
+  @Post('/playlist')
+  async apiAddSongToPlaylist (req: Request) {
+    isCachedTagsValid = false;
+    return SongPlaylist.save(req.body);
+  }
+  @Delete('/playlist/:id')
+  async apiDeleteSongFromPlaylist (req: Request) {
+    isCachedTagsValid = false;
+    return SongPlaylist.delete({ videoId: req.params.id });
+  }
+  @Delete('/requests/:id')
+  async apiDeleteRequest (req: Request) {
+    return SongRequest.delete({ videoId: req.params.id });
+  }
+  @Get('/requests', { scope: 'public' })
+  async apiGetRequests () {
+    return SongRequest.find();
+  }
+  @Get('/ban')
+  async apiGetBannedSongs () {
+    return SongBan.find();
+  }
+  @Delete('/ban/:id')
+  async apiDeleteBan (req: Request) {
+    return SongBan.delete({ videoId: req.params.id });
+  }
+  @Post('/', { action: 'stopImport' })
+  async stopImport () {
+    importInProgress = false;
+  }
+  @Post('/import/ban', {
+    zodValidator: z.object({ url: z.string() }),
+  })
+  async apiImportBan (req: Request) {
+    const url = req.body.url;
+    return this.banSong({
+      isAction: false, isHighlight: false, emotesOffsets: new Map(), isFirstTimeMessage: false, parameters: this.getIdFromURL(url), sender: getUserSender(getBotId(), getBotUserName()), command: '', createdAt: Date.now(), attr: {}, discord: undefined,
     });
-    adminEndpoint('/systems/songs', 'songs::save', async (item: SongPlaylist, cb) => {
-      isCachedTagsValid = false;
-      cb(null, await SongPlaylist.save(item));
+  }
+  @Post('/import/playlist', {
+    zodValidator: z.object({ playlist: z.string(), forcedTag: z.string().optional() }),
+  })
+  async apiImportPlaylist (req: Request) {
+    isCachedTagsValid = false;
+    return this.importPlaylist({
+      isAction: false, isHighlight: false, emotesOffsets: new Map(), isFirstTimeMessage: false, parameters: req.body.playlist, sender: getUserSender(getBotId(), getBotUserName()), command: '', createdAt: Date.now(), attr: { forcedTag: req.body.forcedTag }, discord: undefined,
     });
-    adminEndpoint('/systems/songs', 'songs::getAllBanned', async (where, cb) => {
-      where ??= {};
-      if (cb) {
-        cb(null, await SongBan.find(where));
-      }
+  }
+  @Post('/import/video', {
+    zodValidator: z.object({ playlist: z.string(), forcedTag: z.string().optional() }),
+  })
+  async apiImportVideo (req: Request) {
+    isCachedTagsValid = false;
+    return this.addSongToPlaylist({
+      isAction: false, isHighlight: false, emotesOffsets: new Map(), isFirstTimeMessage: false, parameters: req.body.playlist, sender: getUserSender(getBotId(), getBotUserName()), command: '', createdAt: Date.now(), attr: { forcedTag: req.body.forcedTag }, discord: undefined,
     });
-    adminEndpoint('/systems/songs', 'songs::removeRequest', async (id: string, cb) => {
-      await SongRequest.delete({ id });
-      cb(null);
-    });
-    publicEndpoint('/systems/songs', 'songs::getAllRequests', async (where, cb) => {
-      where = where || {};
-      cb(null, await SongRequest.find({
-        ...where,
-        order: { addedAt: 'ASC' },
-      }));
-    });
-    adminEndpoint('/systems/songs', 'delete.playlist', async (videoId, cb) => {
-      isCachedTagsValid = false;
-      await SongPlaylist.delete({ videoId });
-      if (cb) {
-        cb(null);
-      }
-    });
-    adminEndpoint('/systems/songs', 'delete.ban', async (videoId, cb) => {
-      await SongBan.delete({ videoId });
-      if (cb) {
-        cb(null);
-      }
-    });
-    adminEndpoint('/systems/songs', 'stop.import', () => {
-      importInProgress = false;
-    });
-    adminEndpoint('/systems/songs', 'import.ban', async (url, cb) => {
-      try {
-        cb(null, await this.banSong({
-          isAction: false, isHighlight: false, emotesOffsets: new Map(), isFirstTimeMessage: false, parameters: this.getIdFromURL(url), sender: getUserSender(getBotId(), getBotUserName()), command: '', createdAt: Date.now(), attr: {}, discord: undefined,
-        }));
-      } catch (e: any) {
-        cb(e.stack, []);
-      }
-    });
-    adminEndpoint('/systems/songs', 'import.playlist', async ({ playlist, forcedTag }, cb) => {
-      try {
-        isCachedTagsValid = false;
-        cb(null, await this.importPlaylist({
-          isAction: false, isHighlight: false, emotesOffsets: new Map(), isFirstTimeMessage: false, parameters: playlist, sender: getUserSender(getBotId(), getBotUserName()), command: '', createdAt: Date.now(), attr: { forcedTag }, discord: undefined,
-        }));
-      } catch (e: any) {
-        cb(e.stack, null);
-      }
-    });
-    adminEndpoint('/systems/songs', 'import.video', async ({ playlist, forcedTag }, cb) => {
-      try {
-        cb(null, await this.addSongToPlaylist({
-          isAction: false, isHighlight: false, emotesOffsets: new Map(), isFirstTimeMessage: false, parameters: playlist, sender: getUserSender(getBotId(), getBotUserName()), command: '', createdAt: Date.now(), attr: { forcedTag }, discord: undefined,
-        }));
-      } catch (e: any) {
-        cb(e.stack, null);
-      }
-    });
-    adminEndpoint('/systems/songs', 'next', async () => {
-      this.sendNextSongID();
-    });
+  }
+  @Post('/', { action: 'next' })
+  async apiNextSong () {
+    this.sendNextSongID();
+  }
+
+  sockets () {
+    if (this.socket === null) {
+      setTimeout(() => this.sockets(), 100);
+      return;
+    }
 
     this.socket.on('connection', (socket: io.Socket) => {
       socket.on('disconnect', () => {

@@ -14,7 +14,7 @@ export type MenuItem = {
   name: string;
 };
 
-export const menu: (MenuItem & { this: Module | null })[] = [];
+export const menu: (MenuItem & { this: Module | null, scopeParent?: string })[] = [];
 export const menuPublic: { name: string; id: string }[] = [];
 
 menu.push({

@@ -321,7 +321,7 @@
     "responses": {
       "variable": {
         "tags": "Tags",
-        "titleOfPrediction": "Twitter Vorhersage - Titel",
+        "titleOfPrediction": "Twitch Vorhersage - Titel",
         "outcomes": "Twitch Vorhersage - Ergebnisse",
         "locksAt": "Twitch Vorhersage - Datum der Sperre",
         "winningOutcomeTitle": "Twitch Vorhersage - Gewinnergebnis Titel",

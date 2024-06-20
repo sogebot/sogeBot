@@ -3,7 +3,7 @@ import { BaseEntity } from 'typeorm';
 import { z } from 'zod';
 
 export class BotEntity extends BaseEntity {
-  schema: z.AnyZodObject | z.ZodEffects<any> | z.ZodIntersection<any, any> | null = null;
+  _schema: z.AnyZodObject | z.ZodEffects<any> | z.ZodIntersection<any, any> | null = null;
 
   static create<T extends BotEntity>(
     this: { new (): T } & typeof BotEntity,
@@ -30,8 +30,8 @@ export class BotEntity extends BaseEntity {
   save() {
     return new Promise<this>((resolve, reject) => {
       try {
-        if (this.schema) {
-          this.schema.parse(this);
+        if (this._schema) {
+          this._schema.parse(this);
         }
         super.save()
           .then(resolve)
@@ -40,7 +40,5 @@ export class BotEntity extends BaseEntity {
         reject(e);
       }
     });
-  }
-  validate(schema: z.AnyZodObject) {
   }
 }

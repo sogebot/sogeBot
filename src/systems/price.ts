@@ -11,16 +11,15 @@ import general from '../general.js';
 import { Parser } from '../parser.js';
 
 import { AppDataSource } from '~/database.js';
+import { Delete, Get, Post } from '~/decorators/endpoint.js';
 import { prepare } from '~/helpers/commons/index.js';
-import { app } from '~/helpers/panel.js';
+import { HIGH } from '~/helpers/constants.js';
+import { format } from '~/helpers/number.js';
 import defaultPermissions from '~/helpers/permissions/defaultPermissions.js';
 import { getPointsName } from '~/helpers/points/index.js';
 import * as changelog from '~/helpers/user/changelog.js';
 import { isBroadcaster, isOwner } from '~/helpers/user/index.js';
-import { adminMiddleware } from '~/socket.js';
 import { translate } from '~/translate.js';
-import { format } from '~/helpers/number.js';
-import { HIGH } from '~/helpers/constants.js';
 
 /*
  * !price                     - gets an info about price usage
@@ -36,38 +35,31 @@ class Price extends System {
   constructor () {
     super();
     this.addMenu({
-      category: 'commands', name: 'price', id: 'commands/price', this: this,
+      category: 'commands', name: 'price', id: 'commands/price', this: this, scopeParent: this.scope(),
     });
   }
 
-  sockets() {
-    if (!app) {
-      setTimeout(() => this.sockets(), 100);
-      return;
+  ///////////////////////// <! API endpoints
+  @Post('/')
+  postOne(req: any) {
+    return PriceEntity.create(req.body).save();
+  }
+  @Get('/')
+  getAll() {
+    return PriceEntity.find({ order: { price: 'ASC' } });
+  }
+  @Get('/:id')
+  getOne(req: any) {
+    return PriceEntity.findOneBy({ id: req.params.id });
+  }
+  @Delete('/:id')
+  async deleteOne(req: any) {
+    const al = await PriceEntity.findOneBy({ id: req.params.id });
+    if (al) {
+      await al.remove();
     }
-
-    app.get('/api/systems/price', adminMiddleware, async (req, res) => {
-      res.send({
-        data: await PriceEntity.find({ order: { price: 'ASC' } }),
-      });
-    });
-    app.get('/api/systems/price/:id', adminMiddleware, async (req, res) => {
-      res.send({
-        data: await PriceEntity.findOneBy({ id: req.params.id }),
-      });
-    });
-    app.delete('/api/systems/price/:id', adminMiddleware, async (req, res) => {
-      await PriceEntity.delete({ id: req.params.id });
-      res.status(404).send();
-    });
-    app.post('/api/systems/price', adminMiddleware, async (req, res) => {
-      try {
-        res.send({ data: await PriceEntity.create(req.body).save() });
-      } catch (e) {
-        res.status(400).send({ errors: e });
-      }
-    });
   }
+  ///////////////////////// API endpoints />
 
   @command('!price')
   @default_permission(defaultPermissions.CASTERS)

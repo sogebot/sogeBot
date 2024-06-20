@@ -19,7 +19,7 @@ try {
   sinon = null;
 }
 
-const isMochaTestRun = () => typeof (global as any).it === 'function';
+export const isMochaTestRun = () => typeof (global as any).it === 'function';
 
 const logDir = './logs';
 

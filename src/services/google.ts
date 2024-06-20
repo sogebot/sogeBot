@@ -1,10 +1,12 @@
 import { randomUUID } from 'node:crypto';
 
+import { Request } from 'express';
 import { GaxiosError } from 'gaxios';
 import { OAuth2Client } from 'google-auth-library/build/src/auth/oauth2client';
 import { google, youtube_v3 } from 'googleapis';
 import { TubeChat } from 'tubechat';
 import { ISuperChatSticker, ISuperChat } from 'tubechat/lib/lib/actions/superchat.js';
+import { z } from 'zod';
 
 import Service from './_interface.js';
 import eventlist from '../overlays/eventlist.js';
@@ -13,6 +15,7 @@ import alerts from '../registries/alerts.js';
 import { GooglePrivateKeys } from '~/database/entity/google.js';
 import { Currency } from '~/database/entity/user.js';
 import { AppDataSource } from '~/database.js';
+import { Delete, Get, Post } from '~/decorators/endpoint.js';
 import { onChange, onLoad, onStartup, onStreamEnd, onStreamStart } from '~/decorators/on.js';
 import { persistent, settings } from '~/decorators.js';
 import {
@@ -28,10 +31,8 @@ import { getTime } from '~/helpers/getTime.js';
 import { triggerInterfaceOnTip } from '~/helpers/interface/triggers.js';
 import { getLang } from '~/helpers/locales.js';
 import { error, info, debug, chatIn } from '~/helpers/log.js';
-import { app, ioServer } from '~/helpers/panel.js';
+import { ioServer } from '~/helpers/panel.js';
 import { parseTextWithEmotes } from '~/helpers/parseTextWithEmotes.js';
-import { adminEndpoint } from '~/helpers/socket.js';
-import { adminMiddleware } from '~/socket.js';
 
 const tubeChat = new TubeChat();
 let titleChangeRequestRetry = 0;
@@ -526,53 +527,47 @@ class Google extends Service {
     }
   }
 
-  sockets() {
-    if (!app) {
-      setTimeout(() => this.sockets(), 100);
-      return;
-    }
-
-    adminEndpoint('/services/google', 'google::revoke', async (cb) => {
-      self.channel = '';
-      self.refreshToken = '';
-      info(`YOUTUBE: User access revoked.`);
-      cb(null);
-    });
-    adminEndpoint('/services/google', 'google::token', async (tokens, cb) => {
-      self.refreshToken = tokens.refreshToken;
-      cb(null);
-    });
-
-    app.get('/api/services/google/privatekeys', adminMiddleware, async (req, res) => {
-      res.send({
-        data: await AppDataSource.getRepository(GooglePrivateKeys).find(),
-      });
-    });
-
-    app.post('/api/services/google/privatekeys', adminMiddleware, async (req, res) => {
-      const data = req.body;
-      await AppDataSource.getRepository(GooglePrivateKeys).save(data);
-      res.send({ data });
-    });
-
-    app.delete('/api/services/google/privatekeys/:id', adminMiddleware, async (req, res) => {
-      await AppDataSource.getRepository(GooglePrivateKeys).delete({ id: req.params.id });
-      res.status(404).send();
-    });
-
-    app.get('/api/services/google/streams', adminMiddleware, async (req, res) => {
-      const youtube = this.getYoutube();
-      if (youtube) {
-        const rmtps = await youtube.liveStreams.list({
-          part: ['id', 'snippet', 'cdn', 'status'],
-          mine: true,
-        });
-        res.send({ data: rmtps.data.items });
-      } else {
-        res.send({ data: [] });
-      }
-    });
+  @Post('/', { action: 'revoke', isSensitive: true })
+  async revoke() {
+    self.channel = '';
+    self.refreshToken = '';
+    info(`YOUTUBE: User access revoked.`);
   }
+
+  @Post('/', { action: 'token', isSensitive: true, zodValidator: z.object({ refreshToken: z.string() }) })
+  async token(req: Request) {
+    self.refreshToken = req.body.refreshToken;
+  }
+
+  @Get('/privatekeys', { isSensitive: true })
+  getPrivateKeys() {
+    return AppDataSource.getRepository(GooglePrivateKeys).find();
+  }
+
+  @Post('/privatekeys', { isSensitive: true })
+  async postPrivateKeys(req: Request) {
+    await AppDataSource.getRepository(GooglePrivateKeys).save(req.body);
+  }
+
+  @Delete('/privatekeys/:id', { isSensitive: true })
+  async deletePrivateKeys(req: Request) {
+    return AppDataSource.getRepository(GooglePrivateKeys).delete({ id: req.params.id });
+  }
+
+  @Get('/streams')
+  async getStreams() {
+    const youtube = this.getYoutube();
+    if (youtube) {
+      const rmtps = await youtube.liveStreams.list({
+        part: ['id', 'snippet', 'cdn', 'status'],
+        mine: true,
+      });
+      return rmtps.data.items;
+    } else {
+      return [];
+    }
+  }
+
 }
 const self = new Google();
 export default self;

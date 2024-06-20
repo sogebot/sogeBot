@@ -7,12 +7,11 @@ import { command, default_permission } from '../decorators.js';
 import users from '../users.js';
 
 import { AppDataSource } from '~/database.js';
+import { Delete, Get, Post } from '~/decorators/endpoint.js';
 import { prepare } from '~/helpers/commons/index.js';
 import { getLocalizedName } from '~/helpers/getLocalizedName.js';
-import { app } from '~/helpers/panel.js';
 import defaultPermissions from '~/helpers/permissions/defaultPermissions.js';
 import * as changelog from '~/helpers/user/changelog.js';
-import { adminMiddleware } from '~/socket.js';
 import { translate } from '~/translate.js';
 
 /*
@@ -33,43 +32,28 @@ class Ranks extends System {
   constructor () {
     super();
     this.addMenu({
-      category: 'manage', name: 'ranks', id: 'manage/ranks', this: this,
+      category: 'manage', name: 'ranks', id: 'manage/ranks', this: this, scopeParent: this.scope(),
     });
   }
 
-  sockets () {
-    if (!app) {
-      setTimeout(() => this.sockets(), 100);
-      return;
-    }
+  @Post('/')
+  saveOne(req: any) {
+    return Rank.create(req.body).save();
+  }
 
-    app.get('/api/systems/ranks', adminMiddleware, async (req, res) => {
-      res.send({
-        data: await Rank.find(),
-      });
-    });
-    app.get('/api/systems/ranks/:id', async (req, res) => {
-      res.send({
-        data: await Rank.findOne({ where: { id: req.params.id } }),
-      });
-    });
-    app.delete('/api/systems/ranks/:id', adminMiddleware, async (req, res) => {
-      const poll = await Rank.findOne({ where: { id: req.params.id } });
-      await poll?.remove();
-      res.status(404).send();
-    });
-    app.post('/api/systems/ranks', adminMiddleware, async (req, res) => {
-      try {
-        const itemToSave = Rank.create(req.body);
-        res.send({ data: await itemToSave.save() });
-      } catch (e) {
-        if (e instanceof Error) {
-          res.status(400).send({ errors: e.message });
-        } else {
-          res.status(400).send({ errors: e });
-        }
-      }
-    });
+  @Get('/')
+  getRanks() {
+    return Rank.find();
+  }
+
+  @Get('/:id')
+  getRank(req: any) {
+    return Rank.findOne({ where: { id: req.params.id } });
+  }
+
+  @Delete('/:id')
+  async deleteRank(req: any) {
+    await Rank.delete({ id: req.params.id });
   }
 
   @command('!rank add')

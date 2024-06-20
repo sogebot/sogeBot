@@ -12,7 +12,7 @@ import {
 } from '~/helpers/api/index.js';
 import exchange from '~/helpers/currency/exchange.js';
 import { mainCurrency } from '~/helpers/currency/index.js';
-import { publicEndpoint } from '~/helpers/socket.js';
+import { endpoint } from '~/helpers/socket.js';
 import { getTopClips } from '~/services/twitch/calls/getTopClips.js';
 import { variables } from '~/watchers.js';
 
@@ -31,7 +31,7 @@ export type Event = (EventListInterface & { username?: string, values?: {
 
 class Credits extends Overlay {
   sockets () {
-    publicEndpoint(this.nsp, 'getClips', async(opts, cb) => {
+    endpoint([], this.nsp, 'getClips' as any, async(opts: any, cb: any) => {
       if (opts.show) {
         const clips = await getTopClips({
           period: opts.period, days: opts.periodValue, first: opts.numOfClips,
@@ -51,7 +51,7 @@ class Credits extends Overlay {
         cb([]);
       }
     });
-    publicEndpoint(this.nsp, 'load', async (cb) => {
+    endpoint([], this.nsp, 'load' as any, async (cb: any) => {
       const when = isStreamOnline.value ? streamStatusChangeSince.value : Date.now() - 50000000000;
       const timestamp = new Date(when).getTime();
       const events: Event[] = await AppDataSource.getRepository(EventList).find({

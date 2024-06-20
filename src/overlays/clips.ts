@@ -1,14 +1,16 @@
+import { Request } from 'express';
+import { z } from 'zod';
+
 import Overlay from './_interface.js';
 
+import { Post } from '~/decorators/endpoint.js';
 import { ioServer } from '~/helpers/panel.js';
-import { adminEndpoint } from '~/helpers/socket.js';
 import twitch from '~/services/twitch.js';
 
 class Clips extends Overlay {
-  sockets() {
-    adminEndpoint('/overlays/clips', 'test', clipURL => {
-      this.showClip(clipURL);
-    });
+  @Post('/', { action: 'test', zodValidator: z.object({ clipId: z.string() }) })
+  test(req: Request) {
+    return this.showClip(req.body.clipId);
   }
 
   async showClip (clipId: string) {

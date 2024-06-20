@@ -51,10 +51,9 @@ async function setValueOf (variable: string | Variable, currentValue: any, opts:
     if ((item.readOnly && !opts.readOnlyBypass) || !permissionsAreValid) {
       const highestPermission = await getUserHighestPermission(opts.sender.userId);
       if (highestPermission) {
-        const userPermission = await get(highestPermission);
         const variablePermission = await get(item.permission);
-        if (userPermission && variablePermission) {
-          warning(`User ${opts.sender.userName}#${opts.sender.userId}(${userPermission.name}) doesn't have permission to change variable ${item.variableName}(${variablePermission.name})`);
+        if (highestPermission && variablePermission) {
+          warning(`User ${opts.sender.userName}#${opts.sender.userId}(${highestPermission.name}) doesn't have permission to change variable ${item.variableName}(${variablePermission.name})`);
         }
       }
       isOk = false;
@@ -98,7 +97,7 @@ async function setValueOf (variable: string | Variable, currentValue: any, opts:
 
   const setValue = itemCurrentValue ?? '';
   if (isOk) {
-    updateWidgetAndTitle(item.variableName);
+    await updateWidgetAndTitle(item.variableName);
     eventEmitter.emit(Types.CustomVariableOnChange, item.variableName, setValue, itemOldValue);
     if (!isEval) {
       addChangeToHistory({

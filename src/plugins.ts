@@ -1,10 +1,9 @@
 import { Plugin, PluginVariable } from './database/entity/plugins.js';
+import { Delete, ErrorNotFound, Get, Post } from './decorators/endpoint.js';
 import { SECOND } from './helpers/constants.js';
 import { eventEmitter } from './helpers/events/index.js';
 import { debug, error } from './helpers/log.js';
-import { app } from './helpers/panel.js';
 import { setImmediateAwait } from './helpers/setImmediateAwait.js';
-import { adminEndpoint, publicEndpoint } from './helpers/socket.js';
 import { Types } from './plugins/ListenTo.js';
 import { runScriptInSandbox, transpiledFiles } from './plugins/Sandbox.js';
 
@@ -234,82 +233,79 @@ class Plugins extends Core {
     }
   }
 
-  sockets() {
-    if (!app) {
-      setTimeout(() => this.sockets(), 100);
-      return;
+  @Get('/:pid/:id', {
+    scope:          'public',
+    customEndpoint: '/overlays/plugins',
+  })
+  async getOverlaySource(req: any) {
+    const plugin = plugins.find(o => o.id === req.params.pid);
+    if (!plugin) {
+      throw new ErrorNotFound();
     }
-    app.get('/overlays/plugin/:pid/:id', async (req, res) => {
-      try {
-        const plugin = plugins.find(o => o.id === req.params.pid);
-        if (!plugin) {
-          return res.status(404).send();
-        }
 
-        const files = JSON.parse(plugin.workflow);
-        const overlay = files.overlay.find((o: any) => o.id === req.params.id);
-        if (!overlay) {
-          return res.status(404).send();
-        }
+    const files = JSON.parse(plugin.workflow);
+    const overlay = files.overlay.find((o: any) => o.id === req.params.id);
+    if (!overlay) {
+      throw new ErrorNotFound();
+    }
 
-        const source = overlay.source.replace('</body>', `
-        <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"crossorigin="anonymous"></script>
-        <script type="text/javascript">
-          window.socket = io('/core/plugins', {
-            transports: [ 'websocket' ],
-          });
-          window.socket.on("connect_error", () => {
-            console.log('Socket connect_error', window.socket.id); // undefined
+    const source = overlay.source.replace('</body>', `
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"crossorigin="anonymous"></script>
+    <script type="text/javascript">
+      window.socket = io('/core/plugins', {
+        transports: [ 'websocket' ],
+      });
+      window.socket.on("connect_error", () => {
+        console.log('Socket connect_error', window.socket.id); // undefined
 
-          })
-          window.socket.on("connect", () => {
-            console.log('Socket connected', window.socket.id); // x8WIv7-mJelg7on_ALbx
-            window.socket.on("disconnect", () => {
-              console.log('Socket disconnected', window.socket.id); // undefined
-            });
-            window.socket.on('trigger::function', (functionName, args, overlayId) => {
-              if (overlayId && overlayId !== location.pathname.split('/')[location.pathname.split('/').length - 1]) {
-                // do nothing if overlay ID is defined and doesn't match
-                return;
-              }
-              console.groupCollapsed('trigger::function');
-              console.log({functionName, args});
-              console.groupEnd();
-              window[functionName](...args)
-            })
-          });
-        </script>
-        </body>
-        `);
-        res.send(source);
-      } catch (e) {
-        error(e);
-        return res.status(500).send();
-      }
-    });
-    adminEndpoint('/core/plugins', 'generic::getAll', async (cb) => {
-      cb(null, plugins);
-    });
-    publicEndpoint('/core/plugins', 'generic::getOne', async (id, cb) => {
-      cb(null, plugins.find(o => o.id === id));
-    });
-    adminEndpoint('/core/plugins', 'generic::deleteById', async (id, cb) => {
-      await Plugin.delete({ id });
-      await PluginVariable.delete({ pluginId: id });
-      await this.updateCache();
-      transpiledFiles.clear();
-      cb(null);
-    });
-    adminEndpoint('/core/plugins', 'generic::save', async (item, cb) => {
-      try {
-        const itemToSave = await Plugin.create(item).save();
-        await this.updateCache();
-        transpiledFiles.clear();
-        cb(null, itemToSave);
-      } catch (e) {
-        cb(e, undefined);
-      }
-    });
+      })
+      window.socket.on("connect", () => {
+        console.log('Socket connected', window.socket.id); // x8WIv7-mJelg7on_ALbx
+        window.socket.on("disconnect", () => {
+          console.log('Socket disconnected', window.socket.id); // undefined
+        });
+        window.socket.on('trigger::function', (functionName, args, overlayId) => {
+          if (overlayId && overlayId !== location.pathname.split('/')[location.pathname.split('/').length - 1]) {
+            // do nothing if overlay ID is defined and doesn't match
+            return;
+          }
+          console.groupCollapsed('trigger::function');
+          console.log({functionName, args});
+          console.groupEnd();
+          window[functionName](...args)
+        })
+      });
+    </script>
+    </body>
+    `);
+    return source;
+  }
+
+  @Get('/')
+  async getAll() {
+    return plugins;
+  }
+
+  @Get('/:id', { scope: 'public' })
+  async getOne(req: any) {
+    return plugins.find(o => o.id === req.params.id) ?? null;
+  }
+
+  @Delete('/:id')
+  async removeOne(req: any) {
+    const id = req.params.id;
+    await Plugin.delete({ id });
+    await PluginVariable.delete({ pluginId: id });
+    await this.updateCache();
+    transpiledFiles.clear();
+  }
+
+  @Post('/')
+  async saveOne(req: any) {
+    const plugin = await Plugin.create(req.body).save();
+    await this.updateCache();
+    transpiledFiles.clear();
+    return plugin;
   }
 
   async process(type: Types, message = '', userstate: { userName: string, userId: string } | null = null, params?: Record<string, any>) {

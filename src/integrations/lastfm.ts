@@ -6,8 +6,8 @@ import { settings } from '../decorators.js';
 
 import { isStreamOnline } from '~/helpers/api/index.js';
 import { announce, prepare } from '~/helpers/commons/index.js';
-import {  error } from '~/helpers/log.js';
 import { MINUTE } from '~/helpers/constants.js';
+import {  error } from '~/helpers/log.js';
 
 let canSendRequests = true;
 
@@ -16,10 +16,10 @@ enum NOTIFY {
 }
 
 class LastFM extends Integration {
-  @settings()
+  @settings(undefined, undefined, true)
     apiKey = '';
 
-  @settings()
+  @settings(undefined, undefined, true)
     username = '';
 
   @settings()

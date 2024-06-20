@@ -83,7 +83,7 @@ class StreamElements extends Integration {
   @persistent()
     afterDate = Date.now();
 
-  @settings()
+  @settings(undefined, undefined, true)
     jwtToken = '';
 
   @onStartup()

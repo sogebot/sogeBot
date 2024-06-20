@@ -1,22 +1,23 @@
 import { Mutex } from 'async-mutex';
 import fetch from 'node-fetch';
+import { z } from 'zod';
 
 import Integration from './_interface.js';
 import { command, persistent, settings } from '../decorators.js';
 
+import { Get, Post } from '~/decorators/endpoint.js';
 import { onStartup } from '~/decorators/on.js';
 import { prepare } from '~/helpers/commons/index.js';
 import { triggerInterfaceOnTip } from '~/helpers/interface/index.js';
 import { getLang } from '~/helpers/locales.js';
 import { error, info, tip } from '~/helpers/log.js';
-import { adminEndpoint, publicEndpoint } from '~/helpers/socket.js';
 import eventlist from '~/overlays/eventlist.js';
 import alerts from '~/registries/alerts.js';
 
 const mutex = new Mutex();
 
 class Tiltify extends Integration {
-  @settings()
+  @settings(undefined, false, true)
     access_token = '';
   @settings()
     userName = '';
@@ -177,37 +178,49 @@ class Tiltify extends Integration {
     }
   }
 
-  sockets () {
-    publicEndpoint('/integrations/tiltify', 'tiltify::campaigns', async (cb) => {
-      cb(this.campaigns);
-    });
-    adminEndpoint('/integrations/tiltify', 'tiltify::revoke', async (cb) => {
-      self.access_token = '';
-      self.userName = '';
-      self.userId = '';
-      info(`TILTIFY: User access revoked.`);
-      cb(null);
-    });
-    adminEndpoint('/integrations/tiltify', 'tiltify::code', async (token, cb) => {
-      // check if token is working ok
-      const response = await fetch(`https://tiltify.com/api/v3/user`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
+  @Post('/', {
+    action:      'revoke',
+    isSensitive: true,
+  })
+  async postRevoke(req: any) {
+    this.access_token = '';
+    this.userName = '';
+    this.userId = '';
+  }
 
-      if (response.ok) {
-        const user = await response.json() as any;
-        this.userName = user.data.username;
-        this.userId = user.data.id;
-        info(`TILTIFY: Logged in as ${this.userName}#${this.userId}.`);
-        self.access_token = token;
-      } else {
-        error(`TILTIFY: Something went wrong during setting access token. Please retry.`);
-      }
-
-      cb(null);
+  @Post('/', {
+    action:       'code',
+    isSensitive:  true,
+    zodValidator: z.object({
+      code: z.string(),
+    }),
+  })
+  async postCode(req: any) {
+    const token = req.body.code;
+    // check if token is working ok
+    const response = await fetch(`https://tiltify.com/api/v3/user`, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
     });
+
+    if (response.ok) {
+      const user = await response.json() as any;
+      this.userName = user.data.username;
+      this.userId = user.data.id;
+      info(`TILTIFY: Logged in as ${this.userName}#${this.userId}.`);
+      self.access_token = token;
+    } else {
+      error(`TILTIFY: Something went wrong during setting access token. Please retry.`);
+      throw new Error('TILTIFY: Something went wrong during setting access token. Please retry.');
+    }
+  }
+
+  @Get('/campaigns', {
+    scope: 'public',
+  })
+  async getCampaignsEndpoints() {
+    return this.campaigns;
   }
 
   @command('!charity')

@@ -2,13 +2,14 @@ import { fileURLToPath } from 'node:url';
 import path, { dirname } from 'path';
 
 import { Gallery as GalleryEntity } from '@entity/gallery.js';
+import { Request } from 'express';
 
 import Overlay from './_interface.js';
 
 import { AppDataSource } from '~/database.js';
+import { Delete, Get, Post } from '~/decorators/endpoint.js';
 import { debug } from '~/helpers/log.js';
 import { app } from '~/helpers/panel.js';
-import { adminEndpoint } from '~/helpers/socket.js';
 
 // __dirname is not available in ES6 module
 const __filename = fileURLToPath(import.meta.url);
@@ -66,76 +67,37 @@ class Gallery extends Overlay {
     init();
   }
 
-  sockets () {
-    adminEndpoint('/overlays/gallery', 'generic::getOne', async (id, cb) => {
-      try {
-        const item = await AppDataSource.getRepository(GalleryEntity).findOne({
-          where:  { id },
-          select: ['id', 'name', 'type', 'folder'],
-        });
-        cb(null, item);
-      } catch (e: any) {
-        cb(e.stack, null);
-      }
-    });
-    adminEndpoint('/overlays/gallery', 'generic::getAll', async (cb) => {
-      try {
-        const items = await AppDataSource.getRepository(GalleryEntity).find({ select: ['id', 'name', 'type', 'folder'] });
-        cb(null, items);
-      } catch (e: any) {
-        cb(e.stack, []);
-      }
-    });
-    adminEndpoint('/overlays/gallery', 'generic::deleteById', async (id, cb) => {
-      try {
-        await AppDataSource.getRepository(GalleryEntity).delete({ id: String(id) });
-        cb(null);
-      } catch (e: any) {
-        cb(e.stack);
-      }
-    });
-    adminEndpoint('/overlays/gallery', 'generic::setById', async (opts, cb) => {
-      try {
-        cb(null, await AppDataSource.getRepository(GalleryEntity).save({
-          ...(await AppDataSource.getRepository(GalleryEntity).findOneBy({ id: String(opts.id) })),
-          ...opts.item,
-        }));
-        cb(null);
-      } catch (e: any) {
-        cb(e.stack);
-      }
-    });
-    adminEndpoint('/overlays/gallery', 'gallery::upload', async (data, cb) => {
-      try {
-        const filename = data[0];
-        const filedata = data[1] as { id: string, b64data: string, folder: string };
-        const matches = filedata.b64data.match(/^data:([0-9A-Za-z-+/]+);base64,(.+)$/);
-        if (!matches) {
-          // update entity
-          const item = await AppDataSource.getRepository(GalleryEntity).findOneByOrFail({ id: filedata.id });
-          await AppDataSource.getRepository(GalleryEntity).save({
-            id:     item.id,
-            type:   item.type,
-            data:   item.data + filedata.b64data,
-            folder: filedata.folder,
-            name:   item.name,
-          });
-        } else {
-          // new entity
-          const type = matches[1];
-          await AppDataSource.getRepository(GalleryEntity).save({
-            id: filedata.id, type, data: filedata.b64data, name: filename, folder: filedata.folder,
-          });
-        }
-        if (cb) {
-          cb(null);
-        }
-      } catch (e: any) {
-        if (cb) {
-          cb(e.stack);
-        }
-      }
-    });
+  @Get('/')
+  async getAll () {
+    return AppDataSource.getRepository(GalleryEntity).find({ select: ['id', 'name', 'type', 'folder'] });
+  }
+
+  @Delete('/:id')
+  async delete (req: Request) {
+    return AppDataSource.getRepository(GalleryEntity).delete({ id: req.params.id });
+  }
+
+  @Post('/')
+  async upload (req: Request) {
+    const { id, b64data, folder, name } = req.body;
+    const matches = b64data.match(/^data:([0-9A-Za-z-+/]+);base64,(.+)$/);
+    if (!matches) {
+      // update entity
+      const item = await AppDataSource.getRepository(GalleryEntity).findOneByOrFail({ id });
+      await AppDataSource.getRepository(GalleryEntity).save({
+        id:     item.id,
+        type:   item.type,
+        data:   item.data + b64data,
+        folder: folder,
+        name:   item.name,
+      });
+    } else {
+      // new entity
+      const type = matches[1];
+      await AppDataSource.getRepository(GalleryEntity).save({
+        id, type, data: b64data, name: name, folder,
+      });
+    }
   }
 }
 

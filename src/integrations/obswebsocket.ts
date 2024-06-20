@@ -1,5 +1,7 @@
 import { OBSWebsocket as OBSWebsocketEntity } from '@entity/obswebsocket.js';
+import { Request } from 'express';
 import { EntityNotFoundError } from 'typeorm';
+import { z } from 'zod';
 
 import Integration from './_interface.js';
 import { onStartup } from '../decorators/on.js';
@@ -11,6 +13,7 @@ import { Expects } from  '../expects.js';
 
 import { Attributes, Event } from '~/database/entity/event.js';
 import { AppDataSource } from '~/database.js';
+import { Delete, Get, Post } from '~/decorators/endpoint.js';
 import { eventEmitter } from '~/helpers/events/index.js';
 import {
   error, info,
@@ -18,7 +21,6 @@ import {
 import { app, ioServer } from '~/helpers/panel.js';
 import { ParameterError } from '~/helpers/parameterError.js';
 import { defaultPermissions } from '~/helpers/permissions/defaultPermissions.js';
-import { adminEndpoint, publicEndpoint } from '~/helpers/socket.js';
 import { Types } from '~/plugins/ListenTo.js';
 import { translate } from '~/translate.js';
 
@@ -90,41 +92,37 @@ class OBSWebsocket extends Integration {
     });
   }
 
-  sockets() {
-    adminEndpoint('/', 'integration::obswebsocket::trigger', (data, cb) => {
-      this.triggerTask(data.code, data.attributes)
-        .then(() => cb(null))
-        .catch(e => cb(e));
-    });
-    adminEndpoint('/', 'integration::obswebsocket::generic::save', async (item, cb) => {
-      try {
-        cb(null, await AppDataSource.getRepository(OBSWebsocketEntity).save(item));
-      } catch (e) {
-        if (e instanceof Error) {
-          cb(e.message, undefined);
-        }
-      }
-    });
-    adminEndpoint('/', 'integration::obswebsocket::generic::getOne', async (id, cb) => {
-      cb(null, await AppDataSource.getRepository(OBSWebsocketEntity).findOneBy({ id }));
-    });
-    adminEndpoint('/', 'integration::obswebsocket::generic::deleteById', async (id, cb) => {
-      await AppDataSource.getRepository(OBSWebsocketEntity).delete({ id });
-      cb(null);
-    });
-    adminEndpoint('/', 'integration::obswebsocket::generic::getAll', async (cb) => {
-      cb(null, await AppDataSource.getRepository(OBSWebsocketEntity).find());
-    });
-    publicEndpoint('/', 'integration::obswebsocket::listener', (opts) => {
-      const { event, args } = opts;
-      eventEmitter.emit(Types.onOBSWebsocketEvent, { event, args });
-    });
-    publicEndpoint('/', 'integration::obswebsocket::event', (opts) => {
-      const { type, location, ...data } = opts;
-      eventEmitter.emit(type, {
-        linkFilter: location,
-        ...data,
-      });
+  @Post('/', { action: 'trigger', zodValidator: z.object({ code: z.string(), attributes: z.any().optional() }) })
+  trigger(req: Request) {
+    return this.triggerTask(req.body.code, req.body.attributes);
+  }
+  @Post('/')
+  save(req: Request) {
+    return OBSWebsocketEntity.create(req.body).save();
+  }
+  @Get('/:id')
+  getOne(req: Request) {
+    return OBSWebsocketEntity.findOneByOrFail({ id: req.params.id });
+  }
+  @Delete('/:id')
+  delete(req: Request) {
+    return OBSWebsocketEntity.delete({ id: req.params.id });
+  }
+  @Get('/')
+  getAll() {
+    return OBSWebsocketEntity.find();
+  }
+  @Post('/listener', { scope: 'public' })
+  async listener(req: Request) {
+    const { event, args } = req.body;
+    eventEmitter.emit(Types.onOBSWebsocketEvent, { event, args });
+  }
+  @Post('/event', { scope: 'public' })
+  async event(req: Request) {
+    const { type, location, ...data } = req.body;
+    eventEmitter.emit(type, {
+      linkFilter: location,
+      ...data,
     });
   }
 

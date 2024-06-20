@@ -2,6 +2,7 @@ import { Currency, UserTip, UserTipInterface } from '@entity/user.js';
 import axios from 'axios';
 import chalk from 'chalk';
 import { io, Socket } from 'socket.io-client';
+import { z } from 'zod';
 
 import Integration from './_interface.js';
 import { onChange, onStartup } from '../decorators/on.js';
@@ -11,6 +12,7 @@ import alerts from '../registries/alerts.js';
 import users from '../users.js';
 
 import { AppDataSource } from '~/database.js';
+import { Post } from '~/decorators/endpoint.js';
 import { isStreamOnline, stats } from '~/helpers/api/index.js';
 import exchange from '~/helpers/currency/exchange.js';
 import { mainCurrency } from '~/helpers/currency/index.js';
@@ -21,7 +23,6 @@ import {
   debug, error, info, tip, warning,
 } from '~/helpers/log.js';
 import { ioServer } from '~/helpers/panel.js';
-import { adminEndpoint } from '~/helpers/socket.js';
 import { variables } from '~/watchers.js';
 
 namespace StreamlabsEvent {
@@ -57,12 +58,10 @@ class Streamlabs extends Integration {
   @persistent()
     afterDonationId = '';
 
-  @settings()
+  @persistent()
     accessToken = '';
 
-  accessTokenBtn = null;
-
-  @settings()
+  @persistent()
     socketToken = '';
 
   @settings()
@@ -192,20 +191,26 @@ class Streamlabs extends Integration {
     }
   }
 
-  sockets() {
-    adminEndpoint('/integrations/streamlabs', 'revoke', async (cb) => {
-      this.socketToken = '';
-      this.userName = '';
-      this.accessToken = '';
-      this.disconnect();
-      info(`STREAMLABS: User access revoked.`);
-      cb(null);
-    });
-    adminEndpoint('/integrations/streamlabs', 'token', async (tokens, cb) => {
-      this.accessToken = tokens.accessToken;
-      await this.connect();
-      cb(null);
-    });
+  @Post('/', {
+    action:      'revoke',
+    isSensitive: true,
+  })
+  async postRevoke() {
+    this.socketToken = '';
+    this.userName = '';
+    this.accessToken = '';
+    this.disconnect();
+    info(`STREAMLABS: User access revoked.`);
+  }
+
+  @Post('/', {
+    zodValidator: z.object({ accessToken: z.string() }),
+    isSensitive:  true,
+  })
+  async postCode(req: any) {
+    const tokens = req.body;
+    this.accessToken = tokens.accessToken;
+    await this.connect();
   }
 
   @onChange('socketToken')

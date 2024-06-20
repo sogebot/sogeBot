@@ -22,6 +22,17 @@ export class VariableWatch extends BotEntity {
 
 @Entity()
 export class Variable extends BotEntity {
+  _schema = z.object({
+    variableName: z.union([
+      z.string().min(3),
+      z.custom<string>((value) => {
+        return typeof value === 'string'
+              && value.length > 2 && value.startsWith('$_');
+      }, 'IsCustomVariable'),
+    ]),
+    runEvery: z.number().int().optional(),
+  });
+
   @BeforeInsert()
   generateCreatedAt() {
     if (!this.runAt) {
@@ -104,14 +115,3 @@ export class Variable extends BotEntity {
   @Column({ type: 'varchar', length: '2022-07-27T00:30:34.569259834Z'.length })
     runAt: string;
 }
-
-export const variableSchema = z.object({
-  variableName: z.union([
-    z.string().min(3),
-    z.custom<string>((value) => {
-      return typeof value === 'string'
-            && value.length > 2 && value.startsWith('$_');
-    }, 'IsCustomVariable'),
-  ]),
-  runEvery: z.number().int(),
-});

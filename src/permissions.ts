@@ -1,3 +1,8 @@
+import { z } from 'zod';
+
+import { Delete, ErrorNotFound, Get, Post } from './decorators/endpoint.js';
+import { scopes } from './helpers/socket.js';
+
 import Core from '~/_interface.js';
 import { Permissions as PermissionsEntity } from '~/database/entity/permissions.js';
 import { User } from '~/database/entity/user.js';
@@ -10,7 +15,6 @@ import { error } from '~/helpers/log.js';
 import { check } from '~/helpers/permissions/check.js';
 import { defaultPermissions } from '~/helpers/permissions/defaultPermissions.js';
 import { get } from '~/helpers/permissions/get.js';
-import { adminEndpoint } from '~/helpers/socket.js';
 import * as changelog from '~/helpers/user/changelog.js';
 import users from '~/users.js';
 
@@ -18,74 +22,86 @@ class Permissions extends Core {
   @onStartup()
   onStartup() {
     this.addMenu({
-      category: 'settings', name: 'permissions', id: 'settings/permissions', this: null,
+      category: 'settings', name: 'permissions', id: 'settings/permissions', this: null, scopeParent: this.scope(),
     });
     this.ensurePreservedPermissionsInDb();
   }
 
-  public sockets() {
-    adminEndpoint('/core/permissions', 'generic::getAll', async (cb) => {
-      cb(null, await PermissionsEntity.find({
-        order: { order: 'ASC' },
-      }));
+  @Get('/', {
+    scope:       'read',
+    scopeOrigin: 'dashboard',
+  })
+  getAll() {
+    return PermissionsEntity.find({
+      order: { order: 'ASC' },
     });
-    adminEndpoint('/core/permissions', 'permission::save', async (data, cb) => {
-      // we need to remove missing permissions
-      const permissionsFromDB = await PermissionsEntity.find();
-      for (const permissionFromDB of permissionsFromDB) {
-        if (!data.find(o => o.id === permissionFromDB.id)) {
-          await PermissionsEntity.remove(permissionFromDB);
-        }
+  }
+
+  @Get('/availableScopes', {
+    scope:       'read',
+    scopeOrigin: 'dashboard',
+  })
+  async getAvailableScopes() {
+    return Array.from(scopes);
+  }
+
+  @Delete('/:id')
+  async removeOne(req: any) {
+    const al = await PermissionsEntity.findOneBy({ id: req.params.id });
+    if (al) {
+      await al.remove();
+    }
+  }
+
+  @Post('/')
+  async save(req: any) {
+    const data = req.body as PermissionsEntity[];
+    // we need to remove missing permissions
+    const permissionsFromDB = await PermissionsEntity.find();
+    for (const permissionFromDB of permissionsFromDB) {
+      if (!data.find(o => o.id === permissionFromDB.id)) {
+        await PermissionsEntity.remove(permissionFromDB);
       }
-      // then save new data
-      await PermissionsEntity.save(data);
-      if (cb) {
-        cb(null);
+    }
+    // then save new data
+    return PermissionsEntity.save(data);
+  }
+
+  @Post('/?_action=testUser', {
+    zodValidator: z.object({
+      pid:   z.string(),
+      value: z.union([z.string(), z.number()]),
+      state: z.string(),
+    }),
+  })
+  async testUser(req: any) {
+    const { pid, value, state } = req.body;
+    if (!(await PermissionsEntity.findOneBy({ id: String(pid) }))) {
+      throw new ErrorNotFound();
+    }
+    if (typeof value === 'string') {
+      await changelog.flush();
+      const userByName = await AppDataSource.getRepository(User).findOneBy({ userName: value });
+      if (userByName) {
+        const status = await check(userByName.userId, pid);
+        const partial = await check(userByName.userId, pid, true);
+        return { status, partial, state };
+
       }
-    });
-    adminEndpoint('/core/permissions', 'generic::deleteById', async (id, cb) => {
-      await PermissionsEntity.delete({ id: String(id) });
-      if (cb) {
-        cb(null);
+    } else if(isFinite(value)) {
+      const userById = await changelog.get(String(value));
+      if (userById) {
+        const status = await check(userById.userId, pid);
+        const partial = await check(userById.userId, pid, true);
+        return { status, partial, state };
       }
-    });
-    adminEndpoint('/core/permissions', 'test.user', async (opts, cb) => {
-      if (!(await PermissionsEntity.findOneBy({ id: String(opts.pid) }))) {
-        cb('permissionNotFoundInDatabase');
-        return;
-      }
-      if (typeof opts.value === 'string') {
-        await changelog.flush();
-        const userByName = await AppDataSource.getRepository(User).findOneBy({ userName: opts.value });
-        if (userByName) {
-          const status = await check(userByName.userId, opts.pid);
-          const partial = await check(userByName.userId, opts.pid, true);
-          cb(null, {
-            status,
-            partial,
-            state: opts.state,
-          });
-          return;
-        }
-      } else if(isFinite(opts.value)) {
-        const userById = await changelog.get(String(opts.value));
-        if (userById) {
-          const status = await check(userById.userId, opts.pid);
-          const partial = await check(userById.userId, opts.pid, true);
-          cb(null, {
-            status,
-            partial,
-            state: opts.state,
-          });
-          return;
-        }
-      }
-      cb(null, {
-        status:  { access: 2 },
-        partial: { access: 2 },
-        state:   opts.state,
-      });
-    });
+    }
+
+    return {
+      status:  { access: 2 },
+      partial: { access: 2 },
+      state,
+    };
   }
 
   /**
@@ -191,15 +207,18 @@ class Permissions extends Core {
 
     if (!p.find((o) => o.isCorePermission && o.automation === 'casters')) {
       await PermissionsEntity.insert({
-        id:                 defaultPermissions.CASTERS,
-        name:               'Casters',
-        automation:         'casters',
-        isCorePermission:   true,
-        isWaterfallAllowed: true,
-        order:              p.length + addedCount,
-        userIds:            [],
-        excludeUserIds:     [],
-        filters:            [],
+        id:                     defaultPermissions.CASTERS,
+        name:                   'Casters',
+        automation:             'casters',
+        isCorePermission:       true,
+        isWaterfallAllowed:     true,
+        order:                  p.length + addedCount,
+        userIds:                [],
+        excludeUserIds:         [],
+        filters:                [],
+        scopes:                 [],
+        haveAllScopes:          true,
+        excludeSensitiveScopes: false,
       });
       addedCount++;
     }
@@ -215,6 +234,7 @@ class Permissions extends Core {
         userIds:            [],
         excludeUserIds:     [],
         filters:            [],
+        scopes:             [],
       });
       addedCount++;
     }
@@ -230,6 +250,7 @@ class Permissions extends Core {
         userIds:            [],
         excludeUserIds:     [],
         filters:            [],
+        scopes:             [],
       });
       addedCount++;
     }
@@ -245,6 +266,7 @@ class Permissions extends Core {
         userIds:            [],
         excludeUserIds:     [],
         filters:            [],
+        scopes:             [],
       });
       addedCount++;
     }
@@ -260,6 +282,7 @@ class Permissions extends Core {
         userIds:            [],
         excludeUserIds:     [],
         filters:            [],
+        scopes:             [],
       });
       addedCount++;
     }

@@ -1,9 +1,9 @@
 import { CommandsCount } from '@entity/commands.js';
-import { AppDataSource } from '~/database.js';
 
 import Stats from './_interface.js';
 
-import { adminEndpoint } from '~/helpers/socket.js';
+import { AppDataSource } from '~/database.js';
+import { Get } from '~/decorators/endpoint.js';
 
 class CommandCount extends Stats {
   constructor() {
@@ -13,14 +13,9 @@ class CommandCount extends Stats {
     });
   }
 
-  sockets() {
-    adminEndpoint('/stats/commandcount', 'commands::count', async (cb) => {
-      try {
-        cb(null, await AppDataSource.getRepository(CommandsCount).find());
-      } catch (e: any) {
-        cb(e.stack, []);
-      }
-    });
+  @Get('/')
+  async getAll() {
+    return await AppDataSource.getRepository(CommandsCount).find();
   }
 }
 

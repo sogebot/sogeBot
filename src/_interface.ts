@@ -1,10 +1,11 @@
 import { existsSync } from 'fs';
+import { randomUUID } from 'node:crypto';
 import { setTimeout } from 'timers';
 
 import chalk from 'chalk';
 import _ from 'lodash-es';
 import type { Namespace } from 'socket.io/dist/namespace';
-import { randomUUID } from 'node:crypto';
+
 import { ClientToServerEventsWithNamespace } from '../d.ts/src/helpers/socket.js';
 
 import { PermissionCommands, Permissions as PermissionsEntity } from '~/database/entity/permissions.js';
@@ -22,11 +23,11 @@ import {
   error, info, warning,
 } from '~/helpers/log.js';
 import {
-  addMenu, addMenuPublic, ioServer, menu, menuPublic,
+  addMenu, addMenuPublic, app, ioServer, menu, menuPublic,
 } from '~/helpers/panel.js';
 import defaultPermissions from '~/helpers/permissions/defaultPermissions.js';
 import { register } from '~/helpers/register.js';
-import { adminEndpoint, publicEndpoint } from '~/helpers/socket.js';
+import { addScope, withScope } from '~/helpers/socket.js';
 import * as watchers from '~/watchers.js';
 
 let socket: import('~/socket').Socket | any = null;
@@ -37,7 +38,7 @@ class Module {
   public dependsOn: string[] = [];
   public showInUI = true;
   public timeouts: { [x: string]: NodeJS.Timeout } = {};
-  public settingsList: { category?: string; key: string; defaultValue: any }[] = [];
+  public settingsList: { category?: string; key: string; defaultValue: any, secret: boolean }[] = [];
   public settingsPermList: { category?: string; key: string; defaultValue: any }[] = [];
   public on: InterfaceSettings.On;
   public socket: Namespace | null = null;
@@ -113,6 +114,7 @@ class Module {
   }
 
   public _name: string;
+  private _scope: string;
   protected _ui: InterfaceSettings.UI;
   public _commands: Command[];
   public _parsers: Parser[];
@@ -135,9 +137,14 @@ class Module {
     this._ui = {};
     this._name = name;
     this._enabled = enabledArg;
+    this._scope = this.__moduleName__.toLowerCase(); // use just name of module as scope
     enabledArg ? enabled.enable(this.nsp) : enabled.disable(this.nsp);
 
     register(this._name as any, this);
+
+    // add default scopes for higher level
+    addScope(`${this._name}:read`);
+    addScope(`${this._name}:manage`);
 
     // prepare proxies for variables
     this._sockets();
@@ -189,6 +196,14 @@ class Module {
       }
     };
     load();
+  }
+
+  public scope (type?: 'read' | 'manage') {
+    // add scope if used
+    if (type) {
+      addScope(this._scope + ':' + type);
+    }
+    return this._scope + (type ? ':' + type : '');
   }
 
   public sockets() {
@@ -265,7 +280,7 @@ class Module {
         }
 
         this.settingsList.push({
-          category: 'commands', key: c.name, defaultValue: c.name,
+          category: 'commands', key: c.name, defaultValue: c.name, secret: false,
         });
 
         // load command from db
@@ -296,7 +311,7 @@ class Module {
   }
 
   public _sockets() {
-    if (socket === null || ioServer === null) {
+    if (socket === null || ioServer === null || !app) {
       setTimeout(() => this._sockets(), 100);
     } else {
       this.socket = ioServer.of(this.nsp).use(socket.authorize);
@@ -305,17 +320,46 @@ class Module {
         error(this.nsp + ': Cannot initialize sockets second time');
       };
 
-      // default socket listeners
-      adminEndpoint(this.nsp, 'settings', async (cb) => {
+      app.get(`/api/settings${this.nsp}`, withScope([`${this._name}:read`, `${this._name}:manage`]), async (req, res) => {
         try {
-          cb(null, await this.getAllSettings(), await this.getUI());
+          res.json({
+            status: 'success',
+            data:   {
+              settings: await this.getAllSettings(
+                undefined, req.headers?.scopes?.includes(`${this.nsp.split('/').map(o => o.trim()).filter(String).join(':')}:sensitive`),
+              ),
+              ui: await this.getUI(),
+            },
+          });
         } catch (e: any) {
-          cb(e.stack, {}, {});
+          res.status(500).json({ error: e.stack, status: 'error' });
         }
       });
-      adminEndpoint(this.nsp, 'settings.update', async (opts, cb) => {
-        // flatten and remove category
-        const data = flatten(opts);
+
+      app.get(`/api/settings${this.nsp}/:variable`, withScope([`${this._name}:read`, `${this._name}:manage`]), async (req, res) => {
+        try {
+          res.json({
+            status: 'success',
+            data:   await (this as any)[req.params.variable],
+          });
+        } catch (e: any) {
+          res.status(500).json({ error: e.stack, status: 'error' });
+        }
+      });
+
+      app.post(`/api/settings${this.nsp}/:variable`, withScope([`${this._name}:manage`]), async (req, res) => {
+        try {
+          (this as any)[req.params.variable] = req.body.value;
+          res.json({
+            status: 'success',
+          });
+        } catch (e: any) {
+          res.status(500).json({ error: e.stack, status: 'error' });
+        }
+      });
+
+      app.post(`/api/settings${this.nsp}`, withScope([`${this._name}:manage`]), async (req, res) => {
+        const data = flatten(req.body);
         const remap: ({ key: string; actual: string; toRemove: string[] } | { key: null; actual: null; toRemove: null })[] = Object.keys(flatten(data)).map(o => {
           // skip commands, enabled and permissions
           if (o.startsWith('commands') || o.startsWith('enabled') || o.startsWith('_permissions')) {
@@ -363,53 +407,32 @@ class Module {
             }
           }
         }
-        try {
-          for (const [key, value] of Object.entries(unflatten(data))) {
-            if (key === 'enabled' && this._enabled === null) {
-              // ignore enabled if we don't want to enable/disable at will
-              continue;
-            } else if (key === 'enabled') {
-              this.status({ state: value });
-            } else if (key === '__permission_based__') {
-              for (const vKey of Object.keys(value as any)) {
-                (this as any)['__permission_based__' + vKey] = (value as any)[vKey];
-              }
-            } else {
-              (this as any)[key] = value;
+        for (const [key, value] of Object.entries(unflatten(data))) {
+          if (key === 'enabled' && this._enabled === null) {
+            // ignore enabled if we don't want to enable/disable at will
+            continue;
+          } else if (key === 'enabled') {
+            this.status({ state: value });
+          } else if (key === '__permission_based__') {
+            for (const vKey of Object.keys(value as any)) {
+              (this as any)['__permission_based__' + vKey] = (value as any)[vKey];
             }
-          }
-        } catch (e: any) {
-          error(e.stack);
-          if (typeof cb === 'function') {
-            setTimeout(() => cb(e.stack), 1000);
+          } else {
+            (this as any)[key] = value;
           }
         }
 
         await watchers.check(true); // force watcher to refresh
 
-        if (typeof cb === 'function') {
-          setTimeout(() => cb(null), 1000);
-        }
-      });
-
-      adminEndpoint(this.nsp, 'set.value', async (opts, cb) => {
-        try {
-          (this as any)[opts.variable] = opts.value;
-          if (cb) {
-            cb(null, { variable: opts.variable, value: opts.value });
-          }
-        } catch (e: any) {
-          if (cb) {
-            cb(e.stack, null);
+        // trigger onSettingsSave
+        for (const event of getFunctionList('settingsSave', this.__moduleName__.toLowerCase())) {
+          if (typeof (this as any)[event.fName] === 'function') {
+            (this as any)[event.fName]();
+          } else {
+            error(`${event.fName}() is not function in ${this._name}/${this.__moduleName__.toLowerCase()}`);
           }
         }
-      });
-      publicEndpoint(this.nsp, 'get.value', async (variable, cb) => {
-        try {
-          cb(null, await (this as any)[variable]);
-        } catch (e: any) {
-          cb(e.stack, undefined);
-        }
+        res.json({ status: 'success' });
       });
     }
   }
@@ -474,13 +497,17 @@ class Module {
     addMenuPublic(opts);
   }
 
-  public async getAllSettings(withoutDefaults = false) {
+  public async getAllSettings(withoutDefaults = false, sensitive = false) {
     const promisedSettings: {
       [x: string]: any;
     } = {};
 
     // go through expected settings
-    for (const { category, key, defaultValue } of this.settingsList) {
+    for (const { category, key, defaultValue, secret } of this.settingsList) {
+      // skip secret settings if not sensitive scope
+      if (secret && !sensitive) {
+        continue;
+      }
       if (category) {
         if (typeof promisedSettings[category] === 'undefined') {
           promisedSettings[category] = {};

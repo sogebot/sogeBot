@@ -1,6 +1,7 @@
 import { Currency, UserTip, UserTipInterface } from '@entity/user.js';
 import axios from 'axios';
 import chalk from 'chalk';
+import { z } from 'zod';
 
 import Integration from './_interface.js';
 import { onStartup } from '../decorators/on.js';
@@ -10,6 +11,7 @@ import alerts from '../registries/alerts.js';
 import users from '../users.js';
 
 import { AppDataSource } from '~/database.js';
+import { Post } from '~/decorators/endpoint.js';
 import { isStreamOnline, stats } from '~/helpers/api/index.js';
 import { SECOND } from '~/helpers/constants.js';
 import exchange from '~/helpers/currency/exchange.js';
@@ -20,7 +22,6 @@ import { triggerInterfaceOnTip } from '~/helpers/interface/triggers.js';
 import {
   error, info, tip,
 } from '~/helpers/log.js';
-import { adminEndpoint } from '~/helpers/socket.js';
 
 const parsedTips: number[] = [];
 
@@ -158,31 +159,26 @@ class Donationalerts extends Integration {
     }
   }
 
-  sockets() {
-    adminEndpoint('/integrations/donationalerts', 'donationalerts::validate', (token, cb) => {
-      axios('https://www.donationalerts.com/api/v1/alerts/donations', {
-        method:  'GET',
-        headers: {
-          Accept:        'application/json',
-          Authorization: 'Bearer ' + token,
-        },
-      }).then(() => {
-        cb(null);
-      }).catch((e: unknown) => cb(e as Error));
-    });
-    adminEndpoint('/integrations/donationalerts', 'donationalerts::revoke', async (cb) => {
-      self.channel = '';
-      self.refresh_token = '';
-      self.access_token = '';
-      info(`DONATIONALERTS: User access revoked.`);
-      cb(null);
-    });
-    adminEndpoint('/integrations/donationalerts', 'donationalerts::token', async (tokens, cb) => {
-      self.access_token = tokens.accessToken;
-      self.refresh_token = tokens.refreshToken;
-      await this.connect();
-      cb(null);
-    });
+  @Post('/', {
+    action:      'revoke',
+    isSensitive: true,
+  })
+  async postRevoke() {
+    self.channel = '';
+    self.refresh_token = '';
+    self.access_token = '';
+    info(`DONATIONALERTS: User access revoked.`);
+  }
+
+  @Post('/', {
+    zodValidator: z.object({ accessToken: z.string(), refreshToken: z.string() }),
+    isSensitive:  true,
+  })
+  async postCode(req: any) {
+    const tokens = req.body;
+    self.access_token = tokens.accessToken;
+    self.refresh_token = tokens.refreshToken;
+    await this.connect();
   }
 
   @onStartup()

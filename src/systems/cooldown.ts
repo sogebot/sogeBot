@@ -15,19 +15,18 @@ import { Expects } from  '../expects.js';
 import { Parser } from '../parser.js';
 
 import { AppDataSource } from '~/database.js';
+import { Delete, Get, Post } from '~/decorators/endpoint.js';
 import { prepare } from '~/helpers/commons/index.js';
+import { HIGH, HOUR } from '~/helpers/constants.js';
 import { debug, error, info } from '~/helpers/log.js';
-import { app } from '~/helpers/panel.js';
 import { ParameterError } from '~/helpers/parameterError.js';
 import defaultPermissions from '~/helpers/permissions/defaultPermissions.js';
 import { getUserHighestPermission } from '~/helpers/permissions/getUserHighestPermission.js';
 import * as changelog from '~/helpers/user/changelog.js';
 import { isOwner } from '~/helpers/user/index.js';
-import { adminMiddleware } from '~/socket.js';
 import alias from '~/systems/alias.js';
 import customCommands from '~/systems/customcommands.js';
 import { translate } from '~/translate.js';
-import { HIGH, HOUR } from '~/helpers/constants.js';
 
 const cache: { id: string; cooldowns: CooldownEntity[] }[] = [];
 const defaultCooldowns: { name: string; lastRunAt: number, permId: string }[] = [];
@@ -76,39 +75,32 @@ class Cooldown extends System {
     }
   }
 
+  ///////////////////////// <! API endpoints
+  @Get('/')
+  findAll() {
+    return CooldownEntity.find();
+  }
+  @Get('/:id')
+  findOne(req: any) {
+    return CooldownEntity.findOneBy({ id: req.params.id });
+  }
+  @Delete('/:id')
+  async removeOne(req: any) {
+    const al = await CooldownEntity.findOneBy({ id: req.params.id });
+    if (al) {
+      await al.remove();
+    }
+  }
+  @Post('/')
+  saveOneGroup(req: any) {
+    return CooldownEntity.create(req.body).save();
+  }
+  ///////////////////////// API endpoints />
+
   constructor () {
     super();
     this.addMenu({
-      category: 'commands', name: 'cooldowns', id: 'commands/cooldowns', this: this,
-    });
-  }
-
-  sockets() {
-    if (!app) {
-      setTimeout(() => this.sockets(), 100);
-      return;
-    }
-
-    app.get('/api/systems/cooldown', adminMiddleware, async (req, res) => {
-      res.send({
-        data: await CooldownEntity.find(),
-      });
-    });
-    app.get('/api/systems/cooldown/:id', adminMiddleware, async (req, res) => {
-      res.send({
-        data: await CooldownEntity.findOneBy({ id: req.params.id }),
-      });
-    });
-    app.delete('/api/systems/cooldown/:id', adminMiddleware, async (req, res) => {
-      await CooldownEntity.delete({ id: req.params.id });
-      res.status(404).send();
-    });
-    app.post('/api/systems/cooldown', adminMiddleware, async (req, res) => {
-      try {
-        res.send({ data: await CooldownEntity.create(req.body).save() });
-      } catch (e) {
-        res.status(400).send({ errors: e });
-      }
+      category: 'commands', name: 'cooldowns', id: 'commands/cooldowns', this: this, scopeParent: this.scope(),
     });
   }
 
@@ -241,7 +233,7 @@ class Cooldown extends System {
         const cooldown = await AppDataSource.getRepository(CooldownEntity).findOne({ where: [{ name }, { name: In(groupName) }] });
         if (!cooldown) {
           const defaultValue = await this.getPermissionBasedSettingsValue('defaultCooldownOfCommandsInSeconds');
-          const permId = await getUserHighestPermission(opts.sender.userId);
+          const permId = (await getUserHighestPermission(opts.sender.userId)).id;
 
           // user group have some default cooldown
           if (defaultValue[permId] > 0) {
@@ -280,7 +272,7 @@ class Cooldown extends System {
               data.push(cooldown);
             } else {
               const defaultValue = await this.getPermissionBasedSettingsValue('defaultCooldownOfKeywordsInSeconds');
-              const permId = await getUserHighestPermission(opts.sender.userId);
+              const permId = (await getUserHighestPermission(opts.sender.userId)).id;
               // user group have some default cooldown
               if (defaultValue[permId] > 0) {
                 const canBeRunAt = (defaultCooldowns.find(o =>

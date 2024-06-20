@@ -1,14 +1,16 @@
+import { Request } from 'express';
+
 import Registry from './_interface.js';
 import { Message } from  '../message.js';
 
 import { Goal, Overlay } from '~/database/entity/overlay.js';
 import { AppDataSource } from '~/database.js';
+import { Delete, Get, Post } from '~/decorators/endpoint.js';
 import { stats } from '~/helpers/api/index.js';
+import { SECOND } from '~/helpers/constants.js';
 import { executeVariablesInText } from '~/helpers/customvariables/executeVariablesInText.js';
 import { isBotStarted } from '~/helpers/database.js';
 import defaultValues from '~/helpers/overlaysDefaultValues.js';
-import { adminEndpoint, publicEndpoint } from '~/helpers/socket.js';
-import { SECOND } from '~/helpers/constants.js';
 
 const ticks: string[] = [];
 
@@ -61,49 +63,51 @@ class Overlays extends Registry {
     });
   }
 
-  sockets() {
-    adminEndpoint('/registries/overlays', 'generic::deleteById', async (id, cb) => {
-      await AppDataSource.getRepository(Overlay).delete(id);
-      cb(null);
-    });
-    adminEndpoint('/registries/overlays', 'generic::save', async (opts, cb) => {
-      const data = await AppDataSource.getRepository(Overlay).save(opts);
-      cb(null, data);
-    });
-
-    publicEndpoint('/registries/overlays', 'parse', async (text, cb) => {
-      try {
-        cb(null, await new Message(await executeVariablesInText(text, null)).parse());
-      } catch (e) {
-        cb(e, '');
-      }
-    });
-    publicEndpoint('/registries/overlays', 'generic::getAll', async (cb) => {
-      const items = await AppDataSource.getRepository(Overlay).find();
-      cb(null, items.map(defaultValues) as Overlay[]);
-    });
-    publicEndpoint('/registries/overlays', 'generic::getOne', async (id, cb) => {
-      const item = await AppDataSource.getRepository(Overlay).findOneBy({ id });
-      if (item) {
-        const output = defaultValues(item);
-        output.items = updateGoalValues(output);
-        cb(null, output);
-      } else {
-        // try to find if id is part of group
-        const items = await Overlay.find();
-        for (const it of items) {
-          if (it.items.map(o => o.id).includes(id)) {
-            const output = defaultValues(it);
-            output.items = updateGoalValues(output);
-            return cb(null, output);
-          }
+  @Get('/', { scope: 'public' })
+  async getAll() {
+    const items = await AppDataSource.getRepository(Overlay).find();
+    return items.map(defaultValues) as Overlay[];
+  }
+  @Get('/:id', { scope: 'public' })
+  async getById(req: Request) {
+    const id = req.params.id;
+    const item = await AppDataSource.getRepository(Overlay).findOneBy({ id });
+    if (item) {
+      const output = defaultValues(item);
+      output.items = updateGoalValues(output);
+      return output;
+    } else {
+      // try to find if id is part of group
+      const items = await Overlay.find();
+      for (const it of items) {
+        if (it.items.map(o => o.id).includes(id)) {
+          const output = defaultValues(it);
+          output.items = updateGoalValues(output);
+          return output;
         }
-        cb(null, undefined);
       }
-    });
-    publicEndpoint('/registry/overlays', 'overlays::tick', (opts) => {
-      ticks.push(`${opts.groupId}|${opts.id}|${opts.millis}`);
-    });
+      return null;
+    }
+  }
+
+  @Delete('/:id')
+  deleteById(req: Request) {
+    const id = req.params.id;
+    return AppDataSource.getRepository(Overlay).delete(id);
+  }
+  @Post('/')
+  async save(req: Request) {
+    return Overlay.create(req.body).save();
+  }
+
+  @Post('/parse', { scope: 'public' })
+  async parse(req: Request) {
+    return new Message(await executeVariablesInText(req.body.text, null)).parse();
+  }
+
+  @Post('/tick/:groupId/:id/:millis', { scope: 'public' })
+  async tick(req: Request) {
+    ticks.push(`${req.params.groupId}|${req.params.id}|${req.params.millis}`);
   }
 }
 

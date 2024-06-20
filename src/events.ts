@@ -1,13 +1,17 @@
 import { setTimeout } from 'timers'; // tslint workaround
 
-import _, {
-  clone, cloneDeep, get, isNil, random, sample,
+import { EventList as EventListEntity } from '@entity/eventList.js';
+import { Request } from 'express';
+import {
+  clone, cloneDeep, get, isNil, random, sample, orderBy,
 } from 'lodash-es';
 import { VM }  from 'vm2';
 
+import { Delete, Get, Post } from './decorators/endpoint.js';
 import { dayjs } from './helpers/dayjsHelper.js';
 import { generateUsername } from './helpers/generateUsername.js';
 import { getLocalizedName } from './helpers/getLocalizedName.js';
+import getNameById from './helpers/user/getNameById.js';
 import { Types } from './plugins/ListenTo.js';
 import twitch from './services/twitch.js';
 
@@ -36,8 +40,6 @@ import emitter from '~/helpers/interfaceEmitter.js';
 import {
   debug, error, info, warning,
 } from '~/helpers/log.js';
-import { addUIError } from '~/helpers/panel/index.js';
-import { adminEndpoint } from '~/helpers/socket.js';
 import { tmiEmitter } from '~/helpers/tmi/index.js';
 import * as changelog from '~/helpers/user/changelog.js';
 import {
@@ -197,7 +199,7 @@ class Events extends Core {
     ];
 
     this.addMenu({
-      category: 'manage', name: 'events', id: 'manage/events', this: null,
+      category: 'manage', name: 'events', id: 'manage/events', this: null, scopeParent: this.scope(),
     });
     this.fadeOut();
 
@@ -262,6 +264,41 @@ class Events extends Core {
   @onStreamEnd()
   resetExcludedUsers() {
     excludedUsers.clear();
+  }
+
+  @Get('/user/:userId')
+  async getUserEvents(req: any) {
+    const userId = req.params.userId;
+    const eventsByUserId = await AppDataSource.getRepository(EventListEntity).findBy({ userId: userId });
+    // we also need subgifts by giver
+    const eventsByRecipientId
+        = (await AppDataSource.getRepository(EventListEntity).findBy({ event: 'subgift' }))
+          .filter(o => JSON.parse(o.values_json).fromId === userId);
+    const evs =  orderBy([ ...eventsByRecipientId, ...eventsByUserId ], 'timestamp', 'desc');
+    // we need to change userId => username and fromId => fromId username for eventlist compatibility
+    const mapping = new Map() as Map<string, string>;
+    for (const event of evs) {
+      const values = JSON.parse(event.values_json);
+      if (values.fromId && values.fromId != '0') {
+        if (!mapping.has(values.fromId)) {
+          mapping.set(values.fromId, await getNameById(values.fromId));
+        }
+      }
+      if (!mapping.has(event.userId)) {
+        mapping.set(event.userId, await getNameById(event.userId));
+      }
+    }
+    return evs.map(event => {
+      const values = JSON.parse(event.values_json);
+      if (values.fromId && values.fromId != '0') {
+        values.fromId = mapping.get(values.fromId);
+      }
+      return {
+        ...event,
+        username:    mapping.get(event.userId),
+        values_json: JSON.stringify(values),
+      };
+    });
   }
 
   public async fire(eventId: string, attributes: Attributes): Promise<void> {
@@ -408,12 +445,10 @@ class Events extends Core {
       if ([30, 60, 90, 120, 150, 180].includes(duration)) {
         if (!broadcasterCurrentScopes.includes('channel:edit:commercial')) {
           warning('Missing Broadcaster oAuth scope channel:edit:commercial to start commercial');
-          addUIError({ name: 'OAUTH', message: 'Missing Broadcaster oAuth scope channel:edit:commercial to start commercial' });
           return;
         }
         if (!broadcasterCurrentScopes.includes('channel:edit:commercial')) {
           warning('Missing Broadcaster oAuth scope channel:edit:commercial to start commercial');
-          addUIError({ name: 'OAUTH', message: 'Missing Broadcaster oAuth scope channel:edit:commercial to start commercial' });
           return;
         }
         await twitch.apiClient?.asIntent(['broadcaster'], ctx => ctx.channels.startChannelCommercial(cid, duration as 30 | 60 | 90 | 120 | 150 | 180));
@@ -480,9 +515,6 @@ class Events extends Core {
     const value = attributesReplace(attributes, String(operation.value));
     await setValueOf(String(customVariableName), value, {});
 
-    // Update widgets and titles
-    eventEmitter.emit('CustomVariable:OnRefresh');
-
     const regexp = new RegExp(`\\$_${customVariableName}`, 'ig');
     const title = rawStatus.value;
     if (title.match(regexp)) {
@@ -495,15 +527,12 @@ class Events extends Core {
 
     // check if value is number
     let currentValue: string | number = await getValueOf('$_' + customVariableName);
-    if (!_.isFinite(parseInt(currentValue, 10))) {
+    if (!isFinite(parseInt(currentValue, 10))) {
       currentValue = String(numberToIncrement);
     } else {
       currentValue = String(parseInt(currentValue, 10) + numberToIncrement);
     }
     await setValueOf(String('$_' + customVariableName), currentValue, {});
-
-    // Update widgets and titles
-    eventEmitter.emit('CustomVariable:OnRefresh');
 
     const regexp = new RegExp(`\\$_${customVariableName}`, 'ig');
     const title = rawStatus.value;
@@ -518,15 +547,13 @@ class Events extends Core {
 
     // check if value is number
     let currentValue = await getValueOf('$_' + customVariableName);
-    if (!_.isFinite(parseInt(currentValue, 10))) {
+    if (!isFinite(parseInt(currentValue, 10))) {
       currentValue = String(numberToDecrement * -1);
     } else {
       currentValue = String(parseInt(currentValue, 10) - numberToDecrement);
     }
     await setValueOf(String('$_' + customVariableName), currentValue, {});
 
-    // Update widgets and titles
-    eventEmitter.emit('CustomVariable:OnRefresh');
     const regexp = new RegExp(`\\$_${customVariableName}`, 'ig');
     const title = rawStatus.value;
     if (title.match(regexp)) {
@@ -755,143 +782,124 @@ class Events extends Core {
     return !!result; // force boolean
   }
 
-  public sockets() {
-    adminEndpoint('/core/events', 'events::getRedeemedRewards', async (cb) => {
-      try {
-        const rewards = await getCustomRewards() ?? [];
-        cb(null, [...rewards.map(o => ({ name: o.title, id: o.id }))]);
-      } catch (e: any) {
-        cb(e.stack, []);
-      }
-    });
-    adminEndpoint('/core/events', 'generic::getAll', async (cb) => {
-      try {
-        cb(null, await Event.find());
-      } catch (e: any) {
-        cb(e.stack, []);
-      }
-    });
-    adminEndpoint('/core/events', 'generic::getOne', async (id, cb) => {
-      try {
-        Event.create({ id });
-        const event = await Event.findOne({
-          where: { id },
-        });
-        cb(null, event as any);
-      } catch (e: any) {
-        cb(e.stack, undefined);
-      }
-    });
-    adminEndpoint('/core/events', 'list.supported.events', (cb) => {
-      try {
-        cb(null, this.supportedEventsList);
-      } catch (e: any) {
-        cb(e.stack, []);
-      }
-    });
-    adminEndpoint('/core/events', 'list.supported.operations', (cb) => {
-      try {
-        cb(null, this.supportedOperationsList);
-      } catch (e: any) {
-        cb(e.stack, []);
-      }
-    });
-
-    adminEndpoint('/core/events', 'test.event', async ({ id, randomized, values, variables: variablesArg }, cb) => {
-      try {
-        const attributes: Record<string, any> = {
-          test:     true,
-          userId:   '0',
-          currency: sample(['CZK', 'USD', 'EUR']),
-          ...variablesArg.map((variableMap, idx) => {
-            if (['username', 'recipient', 'target', 'topContributionsBitsUsername', 'topContributionsSubsUsername', 'lastContributionUsername'].includes(variableMap)) {
-              return { [variableMap]: randomized.includes(variableMap) ? generateUsername() : values[idx] };
-            } else if (['userInput', 'message', 'reason'].includes(variableMap)) {
-              return { [variableMap]: randomized.includes(variableMap) ? sample(['', 'Lorem Ipsum Dolor Sit Amet']) : values[idx] };
-            } else if (['source'].includes(variableMap)) {
-              return { [variableMap]: randomized.includes(variableMap) ? sample(['Twitch', 'Discord']) : values[idx] };
-            } else if (['tier'].includes(variableMap)) {
-              return { [variableMap]: randomized.includes(variableMap) ? random(0, 3, false) : (values[idx] === 'Prime' ? 0 : Number(values[idx]))  };
-            } else if (['hostViewers', 'lastContributionTotal', 'topContributionsSubsTotal', 'topContributionsBitsTotal', 'duration', 'viewers', 'bits', 'subCumulativeMonths', 'count', 'subStreak', 'amount', 'amountInBotCurrency'].includes(variableMap)) {
-              return { [variableMap]: randomized.includes(variableMap) ? random(10, 10000000000, false) : values[idx]  };
-            } else if (['game', 'oldGame'].includes(variableMap)) {
-              return {
-                [variableMap]: randomized.includes(variableMap)
-                  ? sample(['Dota 2', 'Escape From Tarkov', 'Star Citizen', 'Elite: Dangerous'])
-                  : values[idx],
-              };
-            } else if (['command'].includes(variableMap)) {
-              return { [variableMap]: randomized.includes(variableMap) ? sample(['!me', '!top', '!points']) : values[idx]  };
-            } else if (['subStreakShareEnabled'].includes(variableMap) || variableMap.startsWith('is.') || variableMap.startsWith('recipientis.')) {
-              return { [variableMap]: randomized.includes(variableMap) ? random(0, 1, false) === 0 : values[idx]  };
-            } else if (['level'].includes(variableMap)) {
-              return { [variableMap]: randomized.includes(variableMap) ? random(1, 5, false)  : values[idx]  };
-            } else if (['topContributionsSubsUserId', 'topContributionsBitsUserId', 'lastContributionUserId'].includes(variableMap)) {
-              return { [variableMap]: randomized.includes(variableMap) ? String(random(90000, 900000, false)) : values[idx]  };
-            } else if (['lastContributionType'].includes(variableMap)) {
-              return { [variableMap]: randomized.includes(variableMap) ? sample(['BITS', 'SUBS']) : values[idx]  };
-            }
-          }).reduce((prev, cur) => {
-            return { ...prev, ...cur };
-          }, {}),
-        };
-
-        if (attributes.subStreak !== undefined) {
-          attributes.subStreakName = getLocalizedName(attributes.subStreak, 'core.months');
+  @Get('/rewards', { scope: 'public' })
+  public async getRedeemedRewards() {
+    const rewards = await getCustomRewards() ?? [];
+    return [...rewards.map(o => ({ name: o.title, id: o.id }))];
+  }
+  @Post('/', { action: 'listSupportedOperations' })
+  public async listSupportedOperations() {
+    return this.supportedOperationsList;
+  }
+  @Post('/', { action: 'listSupportedEvents' })
+  public async listSupportedEvents() {
+    return this.supportedEventsList;
+  }
+  @Post('/', {
+    action: 'testEvent',
+  })
+  public async testEvent(req: Request) {
+    const { id, randomized, values, variables: variablesArg } = req.body;
+    const attributes: Record<string, any> = {
+      test:     true,
+      userId:   '0',
+      currency: sample(['CZK', 'USD', 'EUR']),
+      ...variablesArg.map((variableMap: any, idx: any) => {
+        if (['username', 'recipient', 'target', 'topContributionsBitsUsername', 'topContributionsSubsUsername', 'lastContributionUsername'].includes(variableMap)) {
+          return { [variableMap]: randomized.includes(variableMap) ? generateUsername() : values[idx] };
+        } else if (['userInput', 'message', 'reason'].includes(variableMap)) {
+          return { [variableMap]: randomized.includes(variableMap) ? sample(['', 'Lorem Ipsum Dolor Sit Amet']) : values[idx] };
+        } else if (['source'].includes(variableMap)) {
+          return { [variableMap]: randomized.includes(variableMap) ? sample(['Twitch', 'Discord']) : values[idx] };
+        } else if (['tier'].includes(variableMap)) {
+          return { [variableMap]: randomized.includes(variableMap) ? random(0, 3, false) : (values[idx] === 'Prime' ? 0 : Number(values[idx]))  };
+        } else if (['hostViewers', 'lastContributionTotal', 'topContributionsSubsTotal', 'topContributionsBitsTotal', 'duration', 'viewers', 'bits', 'subCumulativeMonths', 'count', 'subStreak', 'amount', 'amountInBotCurrency'].includes(variableMap)) {
+          return { [variableMap]: randomized.includes(variableMap) ? random(10, 10000000000, false) : values[idx]  };
+        } else if (['game', 'oldGame'].includes(variableMap)) {
+          return {
+            [variableMap]: randomized.includes(variableMap)
+              ? sample(['Dota 2', 'Escape From Tarkov', 'Star Citizen', 'Elite: Dangerous'])
+              : values[idx],
+          };
+        } else if (['command'].includes(variableMap)) {
+          return { [variableMap]: randomized.includes(variableMap) ? sample(['!me', '!top', '!points']) : values[idx]  };
+        } else if (['subStreakShareEnabled'].includes(variableMap) || variableMap.startsWith('is.') || variableMap.startsWith('recipientis.')) {
+          return { [variableMap]: randomized.includes(variableMap) ? random(0, 1, false) === 0 : values[idx]  };
+        } else if (['level'].includes(variableMap)) {
+          return { [variableMap]: randomized.includes(variableMap) ? random(1, 5, false)  : values[idx]  };
+        } else if (['topContributionsSubsUserId', 'topContributionsBitsUserId', 'lastContributionUserId'].includes(variableMap)) {
+          return { [variableMap]: randomized.includes(variableMap) ? String(random(90000, 900000, false)) : values[idx]  };
+        } else if (['lastContributionType'].includes(variableMap)) {
+          return { [variableMap]: randomized.includes(variableMap) ? sample(['BITS', 'SUBS']) : values[idx]  };
         }
+      }).reduce((prev: any, cur: any) => {
+        return { ...prev, ...cur };
+      }, {}),
+    };
 
-        if (attributes.subCumulativeMonths !== undefined) {
-          attributes.subCumulativeMonthsName = getLocalizedName(attributes.subCumulativeMonths, 'core.months');
-        }
+    if (attributes.subStreak !== undefined) {
+      attributes.subStreakName = getLocalizedName(attributes.subStreak, 'core.months');
+    }
 
-        if (attributes.subCumulativeMonths !== undefined) {
-          attributes.subCumulativeMonthsName = getLocalizedName(attributes.subCumulativeMonths, 'core.months');
-        }
+    if (attributes.subCumulativeMonths !== undefined) {
+      attributes.subCumulativeMonthsName = getLocalizedName(attributes.subCumulativeMonths, 'core.months');
+    }
 
-        if (attributes.amountInBotCurrency !== undefined) {
-          attributes.currencyInBot = mainCurrency.value;
-        }
+    if (attributes.subCumulativeMonths !== undefined) {
+      attributes.subCumulativeMonthsName = getLocalizedName(attributes.subCumulativeMonths, 'core.months');
+    }
 
-        if (attributes.amountInBotCurrency !== undefined) {
-          attributes.currencyInBot = mainCurrency.value;
-        }
+    if (attributes.amountInBotCurrency !== undefined) {
+      attributes.currencyInBot = mainCurrency.value;
+    }
 
-        if (attributes.amount !== undefined) {
-          attributes.amount = Number(attributes.amount).toFixed(2);
-        }
+    if (attributes.amountInBotCurrency !== undefined) {
+      attributes.currencyInBot = mainCurrency.value;
+    }
 
-        const event = await Event.findOne({
-          where: { id },
-        });
-        if (event) {
-          for (const operation of event.operations) {
-            const foundOp = this.supportedOperationsList.find((o) => o.id === operation.name);
-            if (foundOp) {
-              foundOp.fire(operation.definitions, attributes);
-            }
-          }
+    if (attributes.amount !== undefined) {
+      attributes.amount = Number(attributes.amount).toFixed(2);
+    }
+
+    const event = await Event.findOne({
+      where: { id },
+    });
+    if (event) {
+      for (const operation of event.operations) {
+        const foundOp = this.supportedOperationsList.find((o) => o.id === operation.name);
+        if (foundOp) {
+          foundOp.fire(operation.definitions, attributes);
         }
-        cb(null);
-      } catch (e: any) {
-        cb(e.stack);
       }
+    }
+    return null;
+  }
+
+  @Get('/')
+  getAll() {
+    return Event.find();
+  }
+  @Get('/:id')
+  async getOne(req: Request) {
+    const id = req.params.id;
+    const event = await Event.findOne({
+      where: { id },
     });
 
-    adminEndpoint('/core/events', 'events::save', async (event, cb) => {
-      try {
-        cb(null, await Event.create(event).save());
-      } catch (e: any) {
-        cb(e, event);
-      }
-    });
+    return event ?? Event.create({ id });
+  }
+  @Delete('/:id')
+  async removeOne(req: any) {
+    const al = await Event.findOneBy({ id: req.params.id });
+    if (al) {
+      await al.remove();
+    }
+  }
 
-    adminEndpoint('/core/events', 'events::remove', async (eventId, cb) => {
-      const event = await Event.findOneBy({ id: eventId });
-      if (event) {
-        await Event.remove(event);
-      }
-      cb(null);
-    });
+  @Post('/')
+  async create(req: Request) {
+    const event = Event.create(req.body);
+    return event.save();
   }
 
   protected async fadeOut() {

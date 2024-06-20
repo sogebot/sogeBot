@@ -5,11 +5,8 @@ import {
   command, default_permission, helper,
 } from '../decorators.js';
 
-import { getOwnerAsSender } from '~/helpers/commons/index.js';
 import { error, warning } from '~/helpers/log.js';
-import { addUIError } from '~/helpers/panel/alerts.js';
 import defaultPermissions from '~/helpers/permissions/defaultPermissions.js';
-import { adminEndpoint } from '~/helpers/socket.js';
 import twitch from '~/services/twitch.js';
 import { variables } from '~/watchers.js';
 
@@ -19,23 +16,6 @@ import { variables } from '~/watchers.js';
  */
 
 class Commercial extends System {
-  sockets() {
-    adminEndpoint('/systems/commercial', 'commercial.run', (data) => {
-      commercial.main({
-        parameters:         data.seconds,
-        command:            '!commercial',
-        sender:             getOwnerAsSender(),
-        attr:               {},
-        createdAt:          Date.now(),
-        emotesOffsets:      new Map(),
-        isAction:           false,
-        isHighlight:        false,
-        isFirstTimeMessage: false,
-        discord:            undefined,
-      });
-    });
-  }
-
   @command('!commercial')
   @default_permission(defaultPermissions.CASTERS)
   @helper()
@@ -61,7 +41,6 @@ class Commercial extends System {
     if ([30, 60, 90, 120, 150, 180].includes(commercial.duration ?? 0)) {
       if (!broadcasterCurrentScopes.includes('channel:edit:commercial')) {
         warning('Missing Broadcaster oAuth scope channel:edit:commercial to start commercial');
-        addUIError({ name: 'OAUTH', message: 'Missing Broadcaster oAuth scope channel:edit:commercial to start commercial' });
         return;
       }
 

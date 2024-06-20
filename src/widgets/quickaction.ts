@@ -7,7 +7,7 @@ import { setValueOf } from '../helpers/customvariables/index.js';
 import { info } from '../helpers/log.js';
 
 import { AppDataSource } from '~/database.js';
-import { adminEndpoint } from '~/helpers/socket.js';
+import { Delete, Get, Post } from '~/decorators/endpoint.js';
 
 const trigger = async (item: QuickActions.Item, user: { userId: string, userName: string }, value?: string) => {
   info(`Quick Action ${item.id} triggered by ${user.userName}#${user.userId}`);
@@ -47,27 +47,28 @@ const trigger = async (item: QuickActions.Item, user: { userId: string, userName
 };
 
 class QuickAction extends Widget {
-  public sockets() {
-    adminEndpoint('/widgets/quickaction', 'generic::deleteById', async (id, cb) => {
-      try {
-        const item = await AppDataSource.getRepository(QuickActionEntity).findOneByOrFail({ id });
-        await AppDataSource.getRepository(QuickActionEntity).remove(item);
-        cb(null);
-      } catch (e) {
-        cb(e as Error);
-      }
-    });
-    adminEndpoint('/widgets/quickaction', 'generic::save', async (item, cb) => {
-      cb(null, await AppDataSource.getRepository(QuickActionEntity).save(item));
-    });
-    adminEndpoint('/widgets/quickaction', 'generic::getAll', async (userId, cb) => {
-      const items = await AppDataSource.getRepository(QuickActionEntity).find({ where: { userId } });
-      cb(null, items);
-    });
-    adminEndpoint('/widgets/quickaction', 'trigger', async ({ user, id, value }) => {
-      const item = await AppDataSource.getRepository(QuickActionEntity).findOneByOrFail({ id, userId: user.userId });
-      trigger(item, { userId: user.userId, userName: user.userName }, value);
-    });
+  @Get('/')
+  getAll(req: any) {
+    return AppDataSource.getRepository(QuickActionEntity).findBy({ userId: req.headers.authUser.userId });
+  }
+
+  @Delete('/:id')
+  async deleteOne(req: any) {
+    const it = await AppDataSource.getRepository(QuickActionEntity).delete({ id: req.params.id, userId: req.headers.authUser.userId });
+    if (it.affected === 0) {
+      throw new Error();
+    }
+  }
+
+  @Post('/')
+  saveOne(req: any) {
+    return AppDataSource.getRepository(QuickActionEntity).save(req.body);
+  }
+
+  @Post('/:id', { action: 'trigger' })
+  async trigger(req: any) {
+    const item = await AppDataSource.getRepository(QuickActionEntity).findOneByOrFail({ id: req.params.id, userId: req.headers.authUser.userId });
+    trigger(item, { userId: req.headers.authUser.userId, userName: req.headers.authUser.userName }, req.body.value);
   }
 }
 

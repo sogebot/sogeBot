@@ -6,7 +6,7 @@ import { BotEntity } from '../BotEntity.js';
 @Entity()
 @Index('IDX_93c78c94804a13befdace81904', ['type', 'value'], { unique: true })
 export class Rank extends BotEntity {
-  schema = z.object({
+  _schema = z.object({
     value: z.number().min(0),
     rank:  z.string().min(2),
   });

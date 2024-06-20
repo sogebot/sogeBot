@@ -113,7 +113,8 @@ describe('Permissions - check() - @func1', () => {
         isWaterfallAllowed: false,
         automation:         'none',
         userIds:            [6],
-        excludeUserIds:     [],
+        scopes:     [],
+excludeUserIds:     [],
         filters:            [],
       });
     });
@@ -146,7 +147,8 @@ describe('Permissions - check() - @func1', () => {
         isWaterfallAllowed: false,
         automation:         'viewers',
         userIds:            [],
-        excludeUserIds:     [],
+        scopes:     [],
+excludeUserIds:     [],
         filters:            [{
           comparator: '==', type: 'points', value: 100,
         }],
@@ -181,7 +183,8 @@ describe('Permissions - check() - @func1', () => {
         isWaterfallAllowed: false,
         automation:         'viewers',
         userIds:            [],
-        excludeUserIds:     [],
+        scopes:     [],
+excludeUserIds:     [],
         filters:            [{
           comparator: '==', type: 'watched', value: 100,
         }],
@@ -216,7 +219,8 @@ describe('Permissions - check() - @func1', () => {
         isWaterfallAllowed: false,
         automation:         'viewers',
         userIds:            [],
-        excludeUserIds:     [],
+        scopes:     [],
+excludeUserIds:     [],
         filters:            [{
           comparator: '>=', type: 'tips', value: 100,
         }],
@@ -251,7 +255,8 @@ describe('Permissions - check() - @func1', () => {
         isWaterfallAllowed: false,
         automation:         'viewers',
         userIds:            [],
-        excludeUserIds:     [],
+        scopes:     [],
+excludeUserIds:     [],
         filters:            [{
           comparator: '>=', type: 'bits', value: 100,
         }],
@@ -286,7 +291,8 @@ describe('Permissions - check() - @func1', () => {
         isWaterfallAllowed: false,
         automation:         'viewers',
         userIds:            [],
-        excludeUserIds:     [],
+        scopes:     [],
+excludeUserIds:     [],
         filters:            [{
           comparator: '>=', type: 'messages', value: 100,
         }],
@@ -321,7 +327,8 @@ describe('Permissions - check() - @func1', () => {
         isWaterfallAllowed: false,
         automation:         'viewers',
         userIds:            [],
-        excludeUserIds:     [],
+        scopes:     [],
+excludeUserIds:     [],
         filters:            [{
           comparator: '>=', type: 'subtier', value: 2,
         }],
@@ -356,7 +363,8 @@ describe('Permissions - check() - @func1', () => {
         isWaterfallAllowed: false,
         automation:         'viewers',
         userIds:            [],
-        excludeUserIds:     [],
+        scopes:     [],
+excludeUserIds:     [],
         filters:            [{
           comparator: '>=', type: 'subcumulativemonths', value: 2,
         }],
@@ -391,7 +399,8 @@ describe('Permissions - check() - @func1', () => {
         isWaterfallAllowed: false,
         automation:         'viewers',
         userIds:            [],
-        excludeUserIds:     [],
+        scopes:     [],
+excludeUserIds:     [],
         filters:            [{
           comparator: '>=', type: 'substreakmonths', value: 2,
         }],
@@ -426,7 +435,8 @@ describe('Permissions - check() - @func1', () => {
         isWaterfallAllowed: false,
         automation:         'viewers',
         userIds:            [],
-        excludeUserIds:     [],
+        scopes:     [],
+excludeUserIds:     [],
         filters:            [{
           comparator: '==', type: 'ranks', value: 'Lorem Ipsum',
         }],
@@ -461,7 +471,8 @@ describe('Permissions - check() - @func1', () => {
         isWaterfallAllowed: false,
         automation:         'viewers',
         userIds:            [],
-        excludeUserIds:     [],
+        scopes:     [],
+excludeUserIds:     [],
         filters:            [{
           comparator: '==', type: 'level', value: 5,
         }],

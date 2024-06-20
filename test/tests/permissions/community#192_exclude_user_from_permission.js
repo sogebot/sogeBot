@@ -41,6 +41,7 @@ describe('Permissions - https://community.sogebot.xyz/t/spotify-user-banlist/192
       userIds: [],
       excludeUserIds: ['7'],
       filters: [],
+      scopes: [],
     });
   });
 

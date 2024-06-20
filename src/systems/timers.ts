@@ -16,8 +16,8 @@ import { isDbConnected } from '~/helpers/database.js';
 import { app } from '~/helpers/panel.js';
 import { linesParsed } from '~/helpers/parser.js';
 import defaultPermissions from '~/helpers/permissions/defaultPermissions.js';
-import { adminMiddleware } from '~/socket.js';
 import { translate } from '~/translate.js';
+import { withScope } from '~/helpers/socket.js';
 
 /*
  * !timers                                                                                                                                 - gets an info about timers usage
@@ -39,21 +39,21 @@ class Timers extends System {
       return;
     }
 
-    app.get('/api/systems/timer', adminMiddleware, async (req, res) => {
+    app.get('/api/systems/timer', withScope(['timers:read']), async (req, res) => {
       res.send({
         data: await Timer.find({ relations: ['messages'] }),
       });
     });
-    app.get('/api/systems/timer/:id', adminMiddleware, async (req, res) => {
+    app.get('/api/systems/timer/:id', withScope(['timers:read']), async (req, res) => {
       res.send({
         data: await Timer.findOne({ where: { id: req.params.id }, relations: ['messages'] }),
       });
     });
-    app.delete('/api/systems/timer/:id', adminMiddleware, async (req, res) => {
+    app.delete('/api/systems/timer/:id', withScope(['timers:manage']), async (req, res) => {
       await Timer.delete({ id: req.params.id });
       res.status(404).send();
     });
-    app.post('/api/systems/timer', adminMiddleware, async (req, res) => {
+    app.post('/api/systems/timer', withScope(['timers:manage']), async (req, res) => {
       try {
         const itemToSave = await Timer.create(req.body).save();
         await TimerResponse.delete({ timer: { id: itemToSave.id } });
@@ -90,7 +90,7 @@ class Timers extends System {
     }
 
     this.addMenu({
-      category: 'manage', name: 'timers', id: 'manage/timers', this: this,
+      category: 'manage', name: 'timers', id: 'manage/timers', this: this, scopeParent: this.scope(),
     });
     const timers = await Timer.find({ relations: ['messages'] });
     for (const timer of timers) {

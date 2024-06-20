@@ -1,9 +1,11 @@
 import { setTimeout } from 'timers';
 
+import { Request } from 'express';
 import {
-  Brackets, IsNull,
+  Brackets,
 } from 'typeorm';
 
+import { Delete, ErrorNotFound, Get, Post } from './decorators/endpoint.js';
 import { HOUR } from './helpers/constants.js';
 import { defaultPermissions } from './helpers/permissions/defaultPermissions.js';
 import { getUserHighestPermission } from './helpers/permissions/getUserHighestPermission.js';
@@ -19,12 +21,10 @@ import { onStartup } from '~/decorators/on.js';
 import { isStreamOnline, stats } from '~/helpers/api/index.js';
 import exchange from '~/helpers/currency/exchange.js';
 import { mainCurrency } from '~/helpers/currency/index.js';
-import rates from '~/helpers/currency/rates.js';
 import { isDebugEnabled } from '~/helpers/debug.js';
 import {
   debug, error,
 } from '~/helpers/log.js';
-import { adminEndpoint, viewerEndpoint } from '~/helpers/socket.js';
 import * as changelog from '~/helpers/user/changelog.js';
 import { getIdFromTwitch } from '~/services/twitch/calls/getIdFromTwitch.js';
 
@@ -240,259 +240,205 @@ class Users extends Core {
     return changelog.get(userId) as Promise<Readonly<Required<UserInterface>>>;
   }
 
-  sockets () {
-    adminEndpoint('/core/users', 'viewers::resetPointsAll', async (cb) => {
-      await changelog.flush();
-      await AppDataSource.getRepository(User).update({}, { points: 0 });
-      if (cb) {
-        cb(null);
-      }
-    });
-    adminEndpoint('/core/users', 'viewers::resetMessagesAll', async (cb) => {
-      await changelog.flush();
-      await AppDataSource.getRepository(User).update({}, { messages: 0, pointsByMessageGivenAt: 0 });
-      if (cb) {
-        cb(null);
-      }
-    });
-    adminEndpoint('/core/users', 'viewers::resetWatchedTimeAll', async (cb) => {
-      await changelog.flush();
-      await AppDataSource.getRepository(User).update({}, { watchedTime: 0 });
-      if (cb) {
-        cb(null);
-      }
-    });
-    adminEndpoint('/core/users', 'viewers::resetSubgiftsAll', async (cb) => {
-      await changelog.flush();
-      await AppDataSource.getRepository(User).update({}, { giftedSubscribes: 0 });
-      if (cb) {
-        cb(null);
-      }
-    });
-    adminEndpoint('/core/users', 'viewers::resetBitsAll', async (cb) => {
-      await AppDataSource.getRepository(UserBit).clear();
-      if (cb) {
-        cb(null);
-      }
-    });
-    adminEndpoint('/core/users', 'viewers::resetTipsAll', async (cb) => {
-      await AppDataSource.getRepository(UserTip).clear();
-      if (cb) {
-        cb(null);
-      }
-    });
+  @Post('/', { action: 'resetPointsAll' })
+  async resetPointsAll () {
+    await changelog.flush();
+    await AppDataSource.getRepository(User).update({}, { points: 0 });
+  }
+  @Post('/', { action: 'resetMessagesAll' })
+  async resetMessagesAll () {
+    await changelog.flush();
+    await AppDataSource.getRepository(User).update({}, { messages: 0, pointsByMessageGivenAt: 0 });
+  }
+  @Post('/', { action: 'resetWatchedTimeAll' })
+  async resetWatchedTimeAll () {
+    await changelog.flush();
+    await AppDataSource.getRepository(User).update({}, { watchedTime: 0 });
+  }
+  @Post('/', { action: 'resetSubgiftsAll' })
+  async resetSubgiftsAll () {
+    await changelog.flush();
+    await AppDataSource.getRepository(User).update({}, { giftedSubscribes: 0 });
+  }
+  @Post('/', { action: 'resetBitsAll' })
+  async resetBitsAll () {
+    await AppDataSource.getRepository(UserBit).clear();
+  }
+  @Post('/', { action: 'resetTipsAll' })
+  async resetTipsAll () {
+    await AppDataSource.getRepository(UserTip).clear();
+  }
+  @Post('/:id', { action: 'getNameById' })
+  async getNameById (req: Request) {
+    return getNameById(req.params.id);
+  }
+  @Delete('/:id')
+  async deleteOne(req: Request) {
+    const userId = req.params.id;
+    await changelog.flush();
+    await AppDataSource.getRepository(UserTip).delete({ userId });
+    await AppDataSource.getRepository(UserBit).delete({ userId });
+    await AppDataSource.getRepository(User).delete({ userId });
+  }
+  @Get('/:id', { scope: 'public' })
+  async getOne(req: Request) {
+    await changelog.flush();
+    let userId = req.params.id;
+    if (req.query._query === 'userName') {
+      userId = await this.getIdByName(userId);
+    }
 
-    adminEndpoint('/core/users', 'viewers::update', async ([userId, update], cb) => {
-      try {
-        if (typeof update.tips !== 'undefined') {
-          for (const tip of update.tips) {
-            if (typeof tip.exchangeRates === 'undefined') {
-              tip.exchangeRates = rates;
-            }
-            tip.sortAmount = exchange(Number(tip.amount), tip.currency, 'EUR');
-            if (typeof tip.id === 'string') {
-              delete tip.id; // remove tip id as it is string (we are expecting number -> autoincrement)
-            }
-            await AppDataSource.getRepository(UserTip).save({ ...tip, userId });
-          }
-          cb(null);
-          return;
-        }
+    const viewer = await changelog.get(userId);
+    const tips =  await AppDataSource.getRepository(UserTip).find({ where: { userId } });
+    const bits =  await AppDataSource.getRepository(UserBit).find({ where: { userId } });
 
-        if (typeof update.bits !== 'undefined') {
-          for (const bit of update.bits) {
-            if (typeof bit.id === 'string') {
-              delete bit.id; // remove bit id as it is string (we are expecting number -> autoincrement)
-            }
-            await AppDataSource.getRepository(UserBit).save({ ...bit, userId });
-          }
-          cb(null);
-          return;
-        }
+    if (viewer) {
+      const aggregatedTips = tips.map((o) => exchange(o.amount, o.currency, mainCurrency.value)).reduce((a, b) => a + b, 0);
+      const aggregatedBits = bits.map((o) => Number(o.amount)).reduce((a, b) => a + b, 0);
 
-        if (typeof update.messages !== 'undefined') {
-          update.pointsByMessageGivenAt = update.messages;
-        }
+      const permId = (await getUserHighestPermission(userId)).id;
+      const permissionGroup = await Permissions.findOneByOrFail({ id: permId || defaultPermissions.VIEWERS });
+      return {
+        ...viewer, aggregatedBits, aggregatedTips, permission: permissionGroup, tips, bits,
+      };
+    }
 
-        changelog.update(userId, update);
-        // as cascade remove set ID as null, we need to get rid of tips/bits
-        await AppDataSource.getRepository(UserTip).delete({ userId: IsNull() });
-        await AppDataSource.getRepository(UserBit).delete({ userId: IsNull() });
-        cb(null);
-      } catch (e: any) {
-        cb(e.stack);
-      }
-    });
-    adminEndpoint('/core/users', 'viewers::remove', async (userId, cb) => {
-      try {
-        await changelog.flush();
-        await AppDataSource.getRepository(UserTip).delete({ userId });
-        await AppDataSource.getRepository(UserBit).delete({ userId });
-        await AppDataSource.getRepository(User).delete({ userId });
-        cb(null);
-      } catch (e: any) {
-        error(e);
-        cb(e.stack);
-      }
-    });
-    adminEndpoint('/core/users', 'getNameById', async (id, cb) => {
-      try {
-        cb(null, await getNameById(id));
-      } catch (e: any) {
-        cb(e.stack, null);
-      }
-    });
-    adminEndpoint('/core/users', 'find.viewers', async (opts, cb) => {
-      try {
-        opts.page = opts.page ?? 0;
-        opts.perPage = opts.perPage ?? 25;
-        if (opts.perPage === -1) {
-          opts.perPage = Number.MAX_SAFE_INTEGER;
-        }
+    throw new ErrorNotFound();
+  }
 
-        /*
-          SQL query:
-            select user.*, COALESCE(sumTips, 0) as sumTips, COALESCE(sumBits, 0) as sumBits
-            from user
-              left join (select userId, sum(sortAmount) as sumTips from user_tip group by userId) user_tip on user.userId = user_tip.userId
-              left join (select userId, sum(amount) as sumBits from user_bit group by userId) user_bit on user.userId = user_bit.userId
-        */
-        await changelog.flush();
-        let query;
-        if (AppDataSource.options.type === 'postgres') {
-          query = AppDataSource.getRepository(User).createQueryBuilder('user')
-            .orderBy(opts.order?.orderBy ?? 'user.userName' , opts.order?.sortOrder ?? 'ASC')
-            .select('COALESCE("sumTips", 0)', 'sumTips')
-            .addSelect('COALESCE("sumBits", 0)', 'sumBits')
-            .addSelect('"user".*')
-            .offset(opts.page * opts.perPage)
-            .limit(opts.perPage)
-            .leftJoin('(select "userId", sum("amount") as "sumBits" from "user_bit" group by "userId")', 'user_bit', '"user_bit"."userId" = "user"."userId"')
-            .leftJoin('(select "userId", sum("sortAmount") as "sumTips" from "user_tip" group by "userId")', 'user_tip', '"user_tip"."userId" = "user"."userId"');
+  @Get('/')
+  async getAll(req: Request) {
+    const order: { orderBy: string, sortOrder: 'ASC' | 'DESC' } = req.query.order
+      ? (JSON.parse(String(req.query.order))) : { sortOrder: 'ASC', orderBy: 'user.username' };
+    const opts = {
+      order,
+      page:                    req.query.page ? Number(req.query.page) : 0,
+      perPage:                 req.query.perPage ? Number(req.query.perPage) : 25,
+      filter:                  req.query.filter ? JSON.parse(String(req.query.filter)) : undefined,
+      exactUsernameFromTwitch: req.query.exactUsernameFromTwitch ? Boolean(req.query.exactUsernameFromTwitch) : false,
+      search:                  req.query.search ? String(req.query.search) : undefined,
+      state:                   req.query.state ? String(req.query.state) : undefined,
+    };
+    if (opts.perPage === -1) {
+      opts.perPage = Number.MAX_SAFE_INTEGER;
+    }
+    /*
+      SQL query:
+        select user.*, COALESCE(sumTips, 0) as sumTips, COALESCE(sumBits, 0) as sumBits
+        from user
+          left join (select userId, sum(sortAmount) as sumTips from user_tip group by userId) user_tip on user.userId = user_tip.userId
+          left join (select userId, sum(amount) as sumBits from user_bit group by userId) user_bit on user.userId = user_bit.userId
+    */
+    await changelog.flush();
+    let query;
+    if (AppDataSource.options.type === 'postgres') {
+      query = AppDataSource.getRepository(User).createQueryBuilder('user')
+        .orderBy(opts.order.orderBy, opts.order?.sortOrder)
+        .select('COALESCE("sumTips", 0)', 'sumTips')
+        .addSelect('COALESCE("sumBits", 0)', 'sumBits')
+        .addSelect('"user".*')
+        .offset(opts.page * opts.perPage)
+        .limit(opts.perPage)
+        .leftJoin('(select "userId", sum("amount") as "sumBits" from "user_bit" group by "userId")', 'user_bit', '"user_bit"."userId" = "user"."userId"')
+        .leftJoin('(select "userId", sum("sortAmount") as "sumTips" from "user_tip" group by "userId")', 'user_tip', '"user_tip"."userId" = "user"."userId"');
+    } else {
+      query = AppDataSource.getRepository(User).createQueryBuilder('user')
+        .orderBy(opts.order.orderBy, opts.order?.sortOrder)
+        .select('JSON_EXTRACT(`user`.`extra`, \'$.levels.xp\')', 'levelXP')
+        .addSelect('COALESCE(sumTips, 0)', 'sumTips')
+        .addSelect('COALESCE(sumBits, 0)', 'sumBits')
+        .addSelect('user.*')
+        .offset(opts.page * opts.perPage)
+        .limit(opts.perPage)
+        .leftJoin('(select userId, sum(amount) as sumBits from user_bit group by userId)', 'user_bit', 'user_bit.userId = user.userId')
+        .leftJoin('(select userId, sum(sortAmount) as sumTips from user_tip group by userId)', 'user_tip', 'user_tip.userId = user.userId');
+    }
+
+    if (typeof req.query.orderBy !== 'undefined') {
+      if (opts.order?.orderBy === 'level') {
+        if (AppDataSource.options.type === 'better-sqlite3') {
+          query.orderBy('LENGTH("levelXP")', opts.order?.sortOrder);
+          query.addOrderBy('"levelXP"', opts.order?.sortOrder);
+        } else if (AppDataSource.options.type === 'postgres') {
+          query.orderBy('length(COALESCE(JSON_EXTRACT_PATH("extra"::json, \'levels\'), \'{}\')::text)', opts.order?.sortOrder);
+          query.addOrderBy('COALESCE(JSON_EXTRACT_PATH("extra"::json, \'levels\'), \'{}\')::text', opts.order?.sortOrder);
         } else {
-          query = AppDataSource.getRepository(User).createQueryBuilder('user')
-            .orderBy(opts.order?.orderBy ?? 'user.userName' , opts.order?.sortOrder ?? 'ASC')
-            .select('JSON_EXTRACT(`user`.`extra`, \'$.levels.xp\')', 'levelXP')
-            .addSelect('COALESCE(sumTips, 0)', 'sumTips')
-            .addSelect('COALESCE(sumBits, 0)', 'sumBits')
-            .addSelect('user.*')
-            .offset(opts.page * opts.perPage)
-            .limit(opts.perPage)
-            .leftJoin('(select userId, sum(amount) as sumBits from user_bit group by userId)', 'user_bit', 'user_bit.userId = user.userId')
-            .leftJoin('(select userId, sum(sortAmount) as sumTips from user_tip group by userId)', 'user_tip', 'user_tip.userId = user.userId');
+          query.orderBy('LENGTH(`levelXP`)', opts.order?.sortOrder);
+          query.addOrderBy('`levelXP`', opts.order?.sortOrder);
         }
+      } else if (AppDataSource.options.type === 'postgres') {
+        opts.order.orderBy = opts.order?.orderBy.split('.').map(o => `"${o}"`).join('.');
+        query.orderBy(opts.order?.orderBy, opts.order?.sortOrder);
 
-        if (typeof opts.order !== 'undefined') {
-          if (opts.order.orderBy === 'level') {
-            if (AppDataSource.options.type === 'better-sqlite3') {
-              query.orderBy('LENGTH("levelXP")', opts.order.sortOrder);
-              query.addOrderBy('"levelXP"', opts.order.sortOrder);
-            } else if (AppDataSource.options.type === 'postgres') {
-              query.orderBy('length(COALESCE(JSON_EXTRACT_PATH("extra"::json, \'levels\'), \'{}\')::text)', opts.order.sortOrder);
-              query.addOrderBy('COALESCE(JSON_EXTRACT_PATH("extra"::json, \'levels\'), \'{}\')::text', opts.order.sortOrder);
-            } else {
-              query.orderBy('LENGTH(`levelXP`)', opts.order.sortOrder);
-              query.addOrderBy('`levelXP`', opts.order.sortOrder);
+      } else {
+        query.orderBy({ [opts.order?.orderBy]: opts.order?.sortOrder });
+      }
+    }
+
+    if (typeof opts.filter !== 'undefined') {
+      for (const filter of opts.filter) {
+        query.andWhere(new Brackets(w => {
+          if (AppDataSource.options.type === 'postgres') {
+            if (filter.operation === 'contains') {
+              w.where(`CAST("user"."${filter.columnName}" AS TEXT) like :${filter.columnName}`, { [filter.columnName]: `%${filter.value}%` });
+            } else if (filter.operation === 'equal') {
+              w.where(`"user"."${filter.columnName}" = :${filter.columnName}`, { [filter.columnName]: filter.value });
+            } else if (filter.operation === 'notEqual') {
+              w.where(`"user"."${filter.columnName}" != :${filter.columnName}`, { [filter.columnName]: filter.value });
+            } else if (filter.operation === 'greaterThanOrEqual') {
+              w.where(`"user"."${filter.columnName}" >= :${filter.columnName}`, { [filter.columnName]: filter.value });
+            } else if (filter.operation === 'greaterThan') {
+              w.where(`"user"."${filter.columnName}" >= :${filter.columnName}`, { [filter.columnName]: filter.value });
+            } else if (filter.operation === 'lessThanOrEqual') {
+              w.where(`"user"."${filter.columnName}" <= :${filter.columnName}`, { [filter.columnName]: filter.value });
+            } else if (filter.operation === 'lessThan') {
+              w.where(`"user"."${filter.columnName}" <= :${filter.columnName}`, { [filter.columnName]: filter.value });
             }
-          } else if (AppDataSource.options.type === 'postgres') {
-            opts.order.orderBy = opts.order.orderBy.split('.').map(o => `"${o}"`).join('.');
-            query.orderBy(opts.order.orderBy, opts.order.sortOrder);
-
           } else {
-            query.orderBy({ [opts.order.orderBy]: opts.order.sortOrder });
-          }
-        }
-
-        if (typeof opts.filter !== 'undefined') {
-          for (const filter of opts.filter) {
-            query.andWhere(new Brackets(w => {
-              if (AppDataSource.options.type === 'postgres') {
-                if (filter.operation === 'contains') {
-                  w.where(`CAST("user"."${filter.columnName}" AS TEXT) like :${filter.columnName}`, { [filter.columnName]: `%${filter.value}%` });
-                } else if (filter.operation === 'equal') {
-                  w.where(`"user"."${filter.columnName}" = :${filter.columnName}`, { [filter.columnName]: filter.value });
-                } else if (filter.operation === 'notEqual') {
-                  w.where(`"user"."${filter.columnName}" != :${filter.columnName}`, { [filter.columnName]: filter.value });
-                } else if (filter.operation === 'greaterThanOrEqual') {
-                  w.where(`"user"."${filter.columnName}" >= :${filter.columnName}`, { [filter.columnName]: filter.value });
-                } else if (filter.operation === 'greaterThan') {
-                  w.where(`"user"."${filter.columnName}" >= :${filter.columnName}`, { [filter.columnName]: filter.value });
-                } else if (filter.operation === 'lessThanOrEqual') {
-                  w.where(`"user"."${filter.columnName}" <= :${filter.columnName}`, { [filter.columnName]: filter.value });
-                } else if (filter.operation === 'lessThan') {
-                  w.where(`"user"."${filter.columnName}" <= :${filter.columnName}`, { [filter.columnName]: filter.value });
-                }
-              } else {
-                if (filter.operation === 'contains') {
-                  w.where(`CAST(\`user\`.\`${filter.columnName}\` AS CHAR) like :${filter.columnName}`, { [filter.columnName]: `%${filter.value}%` });
-                } else if (filter.operation === 'equal') {
-                  w.where(`\`user\`.\`${filter.columnName}\` = :${filter.columnName}`, { [filter.columnName]: filter.value });
-                } else if (filter.operation === 'notEqual') {
-                  w.where(`\`user\`.\`${filter.columnName}\` != :${filter.columnName}`, { [filter.columnName]: filter.value });
-                } else if (filter.operation === 'greaterThanOrEqual') {
-                  w.where(`\`user\`.\`${filter.columnName}\` >= :${filter.columnName}`, { [filter.columnName]: filter.value });
-                } else if (filter.operation === 'greaterThan') {
-                  w.where(`\`user\`.\`${filter.columnName}\` > :${filter.columnName}`, { [filter.columnName]: filter.value });
-                } else if (filter.operation === 'lessThanOrEqual') {
-                  w.where(`\`user\`.\`${filter.columnName}\` <= :${filter.columnName}`, { [filter.columnName]: filter.value });
-                } else if (filter.operation === 'lessThan') {
-                  w.where(`\`user\`.\`${filter.columnName}\` < :${filter.columnName}`, { [filter.columnName]: filter.value });
-                }
-              }
-            }));
-          }
-        }
-
-        const viewers = await query.getRawMany();
-
-        const levels = (await import('~/systems/levels.js')).default;
-        for (const viewer of viewers) {
-          // add level to user
-          viewer.extra = JSON.parse(viewer.extra);
-          viewer.level = levels.getLevelOf(viewer);
-        }
-        let count = await query.getCount();
-
-        if (opts.exactUsernameFromTwitch && opts.search) {
-          // we need to check if viewers have already opts.search in list (we don't need to fetch twitch data)
-          if (!viewers.find(o => o.userName === opts.search)) {
-            try {
-              const userId = await getIdFromTwitch(opts.search);
-              viewers.unshift({ userId, userName: opts.search });
-              count++;
-            } catch (e: any) {
-              // we don't care if user is not found
+            if (filter.operation === 'contains') {
+              w.where(`CAST(\`user\`.\`${filter.columnName}\` AS CHAR) like :${filter.columnName}`, { [filter.columnName]: `%${filter.value}%` });
+            } else if (filter.operation === 'equal') {
+              w.where(`\`user\`.\`${filter.columnName}\` = :${filter.columnName}`, { [filter.columnName]: filter.value });
+            } else if (filter.operation === 'notEqual') {
+              w.where(`\`user\`.\`${filter.columnName}\` != :${filter.columnName}`, { [filter.columnName]: filter.value });
+            } else if (filter.operation === 'greaterThanOrEqual') {
+              w.where(`\`user\`.\`${filter.columnName}\` >= :${filter.columnName}`, { [filter.columnName]: filter.value });
+            } else if (filter.operation === 'greaterThan') {
+              w.where(`\`user\`.\`${filter.columnName}\` > :${filter.columnName}`, { [filter.columnName]: filter.value });
+            } else if (filter.operation === 'lessThanOrEqual') {
+              w.where(`\`user\`.\`${filter.columnName}\` <= :${filter.columnName}`, { [filter.columnName]: filter.value });
+            } else if (filter.operation === 'lessThan') {
+              w.where(`\`user\`.\`${filter.columnName}\` < :${filter.columnName}`, { [filter.columnName]: filter.value });
             }
           }
-        }
-
-        cb(null, viewers, count, opts.state);
-      } catch (e: any) {
-        cb(e.stack, [], 0, null);
+        }));
       }
-    });
-    viewerEndpoint('/core/users', 'viewers::findOneBy', async (userId, cb) => {
-      try {
-        const viewer = await changelog.get(userId);
-        const tips =  await AppDataSource.getRepository(UserTip).find({ where: { userId } });
-        const bits =  await AppDataSource.getRepository(UserBit).find({ where: { userId } });
+    }
 
-        if (viewer) {
-          const aggregatedTips = tips.map((o) => exchange(o.amount, o.currency, mainCurrency.value)).reduce((a, b) => a + b, 0);
-          const aggregatedBits = bits.map((o) => Number(o.amount)).reduce((a, b) => a + b, 0);
+    const viewers = await query.getRawMany();
 
-          const permId = await getUserHighestPermission(userId);
-          const permissionGroup = await Permissions.findOneByOrFail({ id: permId || defaultPermissions.VIEWERS });
-          cb(null, {
-            ...viewer, aggregatedBits, aggregatedTips, permission: permissionGroup, tips, bits,
-          });
-        } else {
-          cb(null);
+    const levels = (await import('~/systems/levels.js')).default;
+    for (const viewer of viewers) {
+      // add level to user
+      viewer.extra = JSON.parse(viewer.extra);
+      viewer.level = levels.getLevelOf(viewer);
+    }
+    let count = await query.getCount();
+
+    if (opts.exactUsernameFromTwitch && opts.search) {
+      // we need to check if viewers have already opts.search in list (we don't need to fetch twitch data)
+      if (!viewers.find(o => o.userName === opts.search)) {
+        try {
+          const userId = await getIdFromTwitch(opts.search);
+          viewers.unshift({ userId, userName: opts.search });
+          count++;
+        } catch (e: any) {
+          // we don't care if user is not found
         }
-      } catch (e: any) {
-        cb(e.stack);
       }
-    });
+    }
+
+    return { viewers, count, state: opts.state };
   }
 }
 

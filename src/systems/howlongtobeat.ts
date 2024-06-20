@@ -9,6 +9,7 @@ import { command, default_permission } from '../decorators.js';
 import { Expects } from  '../expects.js';
 
 import { AppDataSource } from '~/database.js';
+import { Delete, Get, Post } from '~/decorators/endpoint.js';
 import {
   isStreamOnline, stats, streamStatusChangeSince,
 } from '~/helpers/api/index.js';
@@ -18,9 +19,7 @@ import { timestampToObject } from '~/helpers/getTime.js';
 import {
   debug, error,
 } from '~/helpers/log.js';
-import { app } from '~/helpers/panel.js';
 import defaultPermissions from '~/helpers/permissions/defaultPermissions.js';
-import { adminMiddleware } from '~/socket.js';
 
 class HowLongToBeat extends System {
   interval: number = MINUTE;
@@ -29,7 +28,7 @@ class HowLongToBeat extends System {
   @onStartup()
   onStartup() {
     this.addMenu({
-      category: 'manage', name: 'howlongtobeat', id: 'manage/howlongtobeat', this: this,
+      category: 'manage', name: 'howlongtobeat', id: 'manage/howlongtobeat', this: this, scopeParent: this.scope(),
     });
 
     setInterval(() => {
@@ -77,79 +76,64 @@ class HowLongToBeat extends System {
     }
   }
 
-  sockets() {
-    if (!app) {
-      setTimeout(() => this.sockets(), 100);
-      return;
+  ///////////////////////// <! API endpoints
+  @Get('/')
+  async findAll() {
+    type HowLongToBeatGameWithThumbnail = HowLongToBeatGame & { thumbnail?: string | null };
+    const data = await HowLongToBeatGame.find() as HowLongToBeatGameWithThumbnail[];
+    for (const game of data) {
+      game.thumbnail = (await AppDataSource.getRepository(CacheGames).findOne({ where: { name: game.game } }))?.thumbnail as string;
     }
-
-    app.get('/api/systems/hltb', adminMiddleware, async (req, res) => {
-      res.send({
-        data:       await HowLongToBeatGame.find(),
-        thumbnails: await AppDataSource.getRepository(CacheGames).find(),
-      });
-    });
-    app.post('/api/systems/hltb/:id', async (req, res) => {
-      try {
-        delete req.body.streams; // remove streams to not change this
-
-        let game = await HowLongToBeatGame.findOne({ where: { id: req.params.id } });
-        if (!game) {
-          game = HowLongToBeatGame.create(req.body);
-        } else {
-          for (const key of Object.keys(req.body)) {
-            (game as any)[key as any] = req.body[key];
-          }
-        }
-        res.send({
-          data: await game!.save(),
-        });
-      } catch (e) {
-        res.status(400).send({ errors: e });
-      }
-    });
-    app.get('/api/systems/hltb/:id', async (req, res) => {
-      res.send({
-        data: await HowLongToBeatGame.findOne({ where: { id: req.params.id } }),
-      });
-    });
-    app.delete('/api/systems/hltb/:id', adminMiddleware, async (req, res) => {
-      const item = await HowLongToBeatGame.findOne({ where: { id: req.params.id } });
-      await item?.remove();
-      res.status(404).send();
-    });
-    app.post('/api/systems/hltb', adminMiddleware, async (req, res) => {
-      try {
-        if (req.query.search) {
-          const search = await this.hltbService.search(req.query.search as string);
-          const games = await HowLongToBeatGame.find();
-
-          res.send({
-            data: search
-              .filter((o: any) => {
-              // we need to filter already added gaems
-                return !games.map(a => a.game.toLowerCase()).includes(o.name.toLowerCase());
-              })
-              .map((o: any) => o.name),
-          });
-        } else {
-          const game = HowLongToBeatGame.create({
-            game:                  req.body.game,
-            startedAt:             new Date().toISOString(),
-            updatedAt:             new Date().toISOString(),
-            gameplayMain:          0,
-            gameplayMainExtra:     0,
-            gameplayCompletionist: 0,
-          });
-          res.send({
-            data: await game.save(),
-          });
-        }
-      } catch (e: any) {
-        res.status(400).send({ errors: e });
-      }
-    });
+    return data;
   }
+  @Get('/:id')
+  async findOne(req: any) {
+    return HowLongToBeatGame.findOne({ where: { id: req.params.id } });
+  }
+  @Post('/:id')
+  async saveOne(req: any) {
+    let game = await HowLongToBeatGame.findOne({ where: { id: req.params.id } });
+    if (!game) {
+      game = HowLongToBeatGame.create(req.body);
+    } else {
+      for (const key of Object.keys(req.body)) {
+        (game as any)[key as any] = req.body[key];
+      }
+    }
+    return await game!.save();
+  }
+  @Delete('/:id')
+  async removeOne(req: any) {
+    const al = await HowLongToBeatGame.findOneBy({ id: req.params.id });
+    if (al) {
+      await al.remove();
+    }
+  }
+  @Post('/')
+  async save(req: any) {
+    if (req.query.search) {
+      const search = await this.hltbService.search(req.query.search as string);
+      const games = await HowLongToBeatGame.find();
+
+      return search
+        .filter((o: any) => {
+          // we need to filter already added gaems
+          return !games.map(a => a.game.toLowerCase()).includes(o.name.toLowerCase());
+        })
+        .map((o: any) => o.name);
+    } else {
+      const game = HowLongToBeatGame.create({
+        game:                  req.body.game,
+        startedAt:             new Date().toISOString(),
+        updatedAt:             new Date().toISOString(),
+        gameplayMain:          0,
+        gameplayMainExtra:     0,
+        gameplayCompletionist: 0,
+      });
+      return game.save();
+    }
+  }
+  ///////////////////////// API endpoints />
 
   async addToGameTimestamp() {
     if (!stats.value.currentGame) {

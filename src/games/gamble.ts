@@ -64,7 +64,7 @@ class Gamble extends Game {
         throw Error(ERROR_NOT_ENOUGH_OPTIONS);
       }
 
-      const permId = await getUserHighestPermission(opts.sender.userId);
+      const permId = (await getUserHighestPermission(opts.sender.userId)).id;
       const pointsOfUser = await pointsSystem.getPointsOf(opts.sender.userId);
       points = parsed[1] === 'all' ? pointsOfUser : Number(parsed[1]);
 

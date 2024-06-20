@@ -1,6 +1,5 @@
 import { Alias as AliasEntity, AliasGroup } from '@entity/alias.js';
 import * as _ from 'lodash-es';
-import { merge } from 'lodash-es';
 
 import System from './_interface.js';
 import { parserReply } from '../commons.js';
@@ -11,6 +10,7 @@ import { Expects } from  '../expects.js';
 import { Parser } from '../parser.js';
 
 import { AppDataSource } from '~/database.js';
+import { Delete, Get, Post } from '~/decorators/endpoint.js';
 import { checkFilter } from '~/helpers/checkFilter.js';
 import { incrementCountOfCommandUsage } from '~/helpers/commands/count.js';
 import { prepare } from '~/helpers/commons/index.js';
@@ -22,7 +22,6 @@ import {
 import { check } from '~/helpers/permissions/check.js';
 import { defaultPermissions } from '~/helpers/permissions/defaultPermissions.js';
 import { get } from '~/helpers/permissions/get.js';
-import { adminEndpoint } from '~/helpers/socket.js';
 import { Types } from '~/plugins/ListenTo.js';
 import plugins from '~/plugins.js';
 import customCommands from '~/systems/customcommands.js';
@@ -49,80 +48,79 @@ class Alias extends System {
     super();
 
     this.addMenu({
-      category: 'commands', name: 'alias', id: 'commands/alias', this: this,
+      scopeParent: this.scope(),
+      category:    'commands',
+      name:        'alias',
+      id:          'commands/alias',
+      this:        this,
     });
   }
 
-  sockets() {
-    adminEndpoint('/systems/alias', 'generic::groups::deleteById', async (name, cb) => {
-      try {
-        const group = await AliasGroup.findOneBy({ name });
-        if (!group) {
-          throw new Error(`Group ${name} not found`);
-        }
-        await group.remove();
-        cb(null);
-      } catch (e) {
-        cb(e as Error);
-      }
-    });
-    adminEndpoint('/systems/alias', 'generic::groups::save', async (item, cb) => {
-      try {
-        const itemToSave = new AliasGroup();
-        merge(itemToSave, item);
-        await itemToSave.save();
-        cb(null, itemToSave);
-      } catch (e) {
-        if (e instanceof Error) {
-          cb(e.message, undefined);
-        }
-      }
-    });
-    adminEndpoint('/systems/alias', 'generic::groups::getAll', async (cb) => {
-      let groupsList = await AliasGroup.find();
-      for (const item of await AliasEntity.find()) {
-        if (item.group && !groupsList.find(o => o.name === item.group)) {
+  ///////////////////////// <! API endpoints
+  @Post('/')
+  saveOne(req: any) {
+    return AliasEntity.create(req.body).save();
+  }
+  @Get('/')
+  findAll() {
+    return AliasEntity.find();
+  }
+  @Get('/:id')
+  findOne(req: any) {
+    return AliasEntity.findOneBy({ id: req.params.id });
+  }
+  @Delete('/:id')
+  async removeOne(req: any) {
+    const al = await AliasEntity.findOneBy({ id: req.params.id });
+    if (al) {
+      await al.remove();
+    }
+  }
+  @Post('/', { customEndpoint: '/systems/groups/alias' })
+  saveOneGroup(req: any) {
+    return AliasGroup.create(req.body).save();
+  }
+  @Get('/', {
+    scope:          'read',
+    customEndpoint: '/systems/groups/alias',
+  })
+  findAllGroups() {
+    return new Promise((resolve, reject) => {
+      Promise.all([AliasGroup.find(), AliasEntity.find()]).then(([groupsList, aliases]) => {
+        for (const item of aliases) {
+          if (item.group && !groupsList.find(o => o.name === item.group)) {
           // we dont have any group options -> create temporary group
-          const group = new AliasGroup();
-          group.name = item.group;
-          group.options = {
-            filter:     null,
-            permission: null,
-          };
-          groupsList = [
-            ...groupsList,
-            group,
-          ];
+            const group = new AliasGroup();
+            group.name = item.group;
+            group.options = {
+              filter:     null,
+              permission: null,
+            };
+            groupsList = [
+              ...groupsList,
+              group,
+            ];
+          }
         }
-      }
-      cb(null, groupsList);
-    });
-    adminEndpoint('/systems/alias', 'generic::getAll', async (cb) => {
-      cb(null, await AliasEntity.find());
-    });
-    adminEndpoint('/systems/alias', 'generic::getOne', async (id, cb) => {
-      cb(null, await AliasEntity.findOneBy({ id }));
-    });
-    adminEndpoint('/systems/alias', 'generic::deleteById', async (id, cb) => {
-      try {
-        const alias = await AliasEntity.findOneBy({ id });
-        if (!alias) {
-          throw new Error(`Alias ${id} not found`);
-        }
-        await alias.remove();
-        cb(null);
-      } catch (e) {
-        cb(e as Error);
-      }
-    });
-    adminEndpoint('/systems/alias', 'generic::save', async (item, cb) => {
-      try {
-        cb(null, await AliasEntity.create(item).save());
-      } catch (e) {
-        cb(e, undefined);
-      }
+        resolve(groupsList);
+      });
     });
   }
+  @Get('/:name', {
+    scope:          'read',
+    customEndpoint: '/systems/groups/alias',
+  })
+  findOneGroup(req: any) {
+    return AliasGroup.findOneBy({ name: req.params.name });
+  }
+  @Delete('/:name', { customEndpoint: '/systems/groups/alias' })
+  async removeOneGroup(req: any) {
+    const al = await AliasGroup.findOneBy({ name: req.params.name });
+    if (al) {
+      await al.remove();
+    }
+  }
+  ///////////////////////// API endpoints />
 
   async search(opts: ParserOptions): Promise<[Readonly<Required<AliasEntity>> | null, string[]]> {
     let alias: Readonly<Required<AliasEntity>> | undefined;

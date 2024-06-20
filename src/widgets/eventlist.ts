@@ -1,149 +1,30 @@
 import { EventList as EventListDB } from '@entity/eventList.js';
 import type { EmitData } from '@entity/overlay.js';
 import { UserTip } from '@entity/user.js';
-import { Between } from 'typeorm';
+import { Request } from 'express';
+import { Between, MoreThan } from 'typeorm';
 
 import Widget from './_interface.js';
 import alerts from '../registries/alerts.js';
 
 import { AppDataSource } from '~/database.js';
+import { Delete, Get, Post } from '~/decorators/endpoint.js';
 import { SECOND } from '~/helpers/constants.js';
 import { getLocalizedName } from '~/helpers/getLocalizedName.js';
 import { error } from '~/helpers/log.js';
-import { adminEndpoint } from '~/helpers/socket.js';
 import getNameById from '~/helpers/user/getNameById.js';
 import { translate } from '~/translate.js';
 
 class EventList extends Widget {
-  public sockets() {
-    adminEndpoint('/widgets/eventlist', 'eventlist::removeById', async (idList, cb) => {
-      const ids = Array.isArray(idList) ? [...idList] : [idList];
-      for (const id of ids) {
-        await AppDataSource.getRepository(EventListDB).update(id, { isHidden: true });
-      }
-      if (cb) {
-        cb(null);
-      }
-    });
-    adminEndpoint('/widgets/eventlist', 'eventlist::get', async (count) => {
-      this.update(count);
-    });
+  @Get('/')
+  async getAll(req: Request) {
+    // we need to get by count and/or timestamp
+    const count = Number(req.query.count) || undefined;
+    const timestamp = Number(req.query.timestamp) || 0;
 
-    adminEndpoint('/widgets/eventlist', 'skip', () => {
-      alerts.skip();
-    });
-
-    adminEndpoint('/widgets/eventlist', 'cleanup', () => {
-      AppDataSource.getRepository(EventListDB).update({ isHidden: false }, { isHidden: true });
-    });
-
-    adminEndpoint('/widgets/eventlist', 'eventlist::resend', async (id) => {
-      const event = await AppDataSource.getRepository(EventListDB).findOneBy({ id: String(id) });
-      if (event) {
-        const values = JSON.parse(event.values_json);
-        switch(event.event) {
-          case 'follow':
-          case 'sub':
-            alerts.trigger({ eventId:    null,
-              event:      event.event,
-              name:       await getNameById(event.userId),
-              amount:     0,
-              tier:       String(values.tier) as EmitData['tier'],
-              currency:   '',
-              monthsName: '',
-              message:    '' });
-            break;
-          case 'raid':
-            alerts.trigger({ eventId:    null,
-              event:      event.event,
-              name:       await getNameById(event.userId),
-              amount:     Number(values.viewers),
-              tier:       null,
-              currency:   '',
-              monthsName: '',
-              message:    '' });
-            break;
-          case 'resub':
-            alerts.trigger({ eventId:    null,
-              event:      event.event,
-              name:       await getNameById(event.userId),
-              amount:     Number(values.subCumulativeMonths),
-              tier:       String(values.tier) as EmitData['tier'],
-              currency:   '',
-              monthsName: getLocalizedName(values.subCumulativeMonths, translate('core.months')),
-              message:    values.message });
-            break;
-          case 'subgift':
-            alerts.trigger({ eventId:    null,
-              event:      event.event,
-              name:       await getNameById(values.fromId),
-              tier:       null,
-              recipient:  await getNameById(event.userId),
-              amount:     Number(values.months),
-              monthsName: getLocalizedName(Number(values.months), translate('core.months')),
-              currency:   '',
-              message:    '' });
-            break;
-          case 'cheer':
-            alerts.trigger({ eventId:    null,
-              event:      event.event,
-              name:       await getNameById(event.userId),
-              amount:     Number(values.bits),
-              tier:       null,
-              currency:   '',
-              monthsName: '',
-              message:    values.message });
-            break;
-          case 'subcommunitygift':
-            alerts.trigger({ eventId:    null,
-              event:      event.event,
-              name:       await getNameById(event.userId),
-              amount:     Number(values.count),
-              tier:       null,
-              currency:   '',
-              monthsName: '',
-              message:    '' });
-            break;
-          case 'tip':
-            alerts.trigger({ eventId:    null,
-              event:      event.event,
-              name:       await getNameById(event.userId),
-              amount:     Number(values.amount),
-              tier:       null,
-              currency:   values.currency,
-              monthsName: '',
-              message:    values.message });
-            break;
-          case 'rewardredeem':
-            alerts.trigger({ eventId:    null,
-              event:      event.event,
-              name:       values.titleOfReward,
-              rewardId:   values.rewardId,
-              amount:     0,
-              tier:       null,
-              currency:   '',
-              monthsName: '',
-              message:    values.message,
-              recipient:  await getNameById(event.userId) });
-            break;
-          default:
-            error(`event.event ${event.event} cannot be retriggered`);
-        }
-
-      } else {
-        error(`Event ${id} not found.`);
-      }
-    });
-  }
-
-  public async askForGet() {
-    this.emit('askForGet');
-  }
-
-  public async update(count: number) {
     try {
       const events = await AppDataSource.getRepository(EventListDB).find({
-        where: { isHidden: false },
+        where: { isHidden: false, timestamp: timestamp > 0 ? MoreThan(timestamp) : undefined },
         order: { timestamp: 'DESC' },
         take:  count,
       });
@@ -184,25 +65,134 @@ class EventList extends Widget {
           tipMapping.set(event.id, tip?.sortAmount ?? 0);
         }
       }
-      this.emit('update',
-        events
-          .filter(o => !o.isHidden) // refilter as we might have new hidden events
-          .map(event => {
-            const values = JSON.parse(event.values_json);
-            if (values.fromId && values.fromId != '0') {
-              values.fromId = mapping.get(values.fromId);
-            }
-            return {
-              ...event,
-              username:    mapping.get(event.userId),
-              sortAmount:  tipMapping.get(event.id),
-              values_json: JSON.stringify(values),
-            };
-          }),
-      );
+      return events
+        .filter(o => !o.isHidden) // refilter as we might have new hidden events
+        .map(event => {
+          const values = JSON.parse(event.values_json);
+          if (values.fromId && values.fromId != '0') {
+            values.fromId = mapping.get(values.fromId);
+          }
+          return {
+            ...event,
+            username:    mapping.get(event.userId),
+            sortAmount:  tipMapping.get(event.id),
+            values_json: JSON.stringify(values),
+          };
+        });
     } catch (e: any) {
-      this.emit('update', []);
+      return [];
     }
+
+  }
+
+  @Post('/', { action: 'skip' })
+  async skip() {
+    alerts.skip();
+  }
+
+  @Post('/:id', { action: 'resend' })
+  async resend(req: Request) {
+    const id = req.params.id;
+    const event = await AppDataSource.getRepository(EventListDB).findOneBy({ id: String(id) });
+    if (event) {
+      const values = JSON.parse(event.values_json);
+      switch(event.event) {
+        case 'follow':
+        case 'sub':
+          alerts.trigger({ eventId:    null,
+            event:      event.event,
+            name:       await getNameById(event.userId),
+            amount:     0,
+            tier:       String(values.tier) as EmitData['tier'],
+            currency:   '',
+            monthsName: '',
+            message:    '' });
+          break;
+        case 'raid':
+          alerts.trigger({ eventId:    null,
+            event:      event.event,
+            name:       await getNameById(event.userId),
+            amount:     Number(values.viewers),
+            tier:       null,
+            currency:   '',
+            monthsName: '',
+            message:    '' });
+          break;
+        case 'resub':
+          alerts.trigger({ eventId:    null,
+            event:      event.event,
+            name:       await getNameById(event.userId),
+            amount:     Number(values.subCumulativeMonths),
+            tier:       String(values.tier) as EmitData['tier'],
+            currency:   '',
+            monthsName: getLocalizedName(values.subCumulativeMonths, translate('core.months')),
+            message:    values.message });
+          break;
+        case 'subgift':
+          alerts.trigger({ eventId:    null,
+            event:      event.event,
+            name:       await getNameById(values.fromId),
+            tier:       null,
+            recipient:  await getNameById(event.userId),
+            amount:     Number(values.months),
+            monthsName: getLocalizedName(Number(values.months), translate('core.months')),
+            currency:   '',
+            message:    '' });
+          break;
+        case 'cheer':
+          alerts.trigger({ eventId:    null,
+            event:      event.event,
+            name:       await getNameById(event.userId),
+            amount:     Number(values.bits),
+            tier:       null,
+            currency:   '',
+            monthsName: '',
+            message:    values.message });
+          break;
+        case 'subcommunitygift':
+          alerts.trigger({ eventId:    null,
+            event:      event.event,
+            name:       await getNameById(event.userId),
+            amount:     Number(values.count),
+            tier:       null,
+            currency:   '',
+            monthsName: '',
+            message:    '' });
+          break;
+        case 'tip':
+          alerts.trigger({ eventId:    null,
+            event:      event.event,
+            name:       await getNameById(event.userId),
+            amount:     Number(values.amount),
+            tier:       null,
+            currency:   values.currency,
+            monthsName: '',
+            message:    values.message });
+          break;
+        case 'rewardredeem':
+          alerts.trigger({ eventId:    null,
+            event:      event.event,
+            name:       values.titleOfReward,
+            rewardId:   values.rewardId,
+            amount:     0,
+            tier:       null,
+            currency:   '',
+            monthsName: '',
+            message:    values.message,
+            recipient:  await getNameById(event.userId) });
+          break;
+        default:
+          error(`event.event ${event.event} cannot be retriggered`);
+      }
+
+    } else {
+      error(`Event ${id} not found.`);
+    }
+  }
+
+  @Delete('/:id')
+  async removeById(req: Request) {
+    await AppDataSource.getRepository(EventListDB).update(req.params.id, { isHidden: true });
   }
 }
 

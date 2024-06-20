@@ -1,12 +1,13 @@
 import { Marathon as MarathonItem, Overlay as OverlayEntity } from '@entity/overlay.js';
+import { Request } from 'express';
+import { z } from 'zod';
 
 import Overlay from './_interface.js';
 import { onStartup } from '../decorators/on.js';
 
+import { Get, Post } from '~/decorators/endpoint.js';
 import { eventEmitter } from '~/helpers/events/emitter.js';
 import { error } from '~/helpers/log.js';
-import { addUIError } from '~/helpers/panel/alerts.js';
-import { adminEndpoint, publicEndpoint } from '~/helpers/socket.js';
 
 const cachedOverlays = new Map<string, MarathonItem>();
 
@@ -156,35 +157,32 @@ class Marathon extends Overlay {
     }
   }
 
-  sockets () {
-    publicEndpoint('/overlays/marathon', 'marathon::public', async (marathonId: string, cb) => {
-      // no updateCache
-      const key = Array.from(cachedOverlays.keys()).find(id => id.includes(marathonId));
-      cb(null, cachedOverlays.get(key ?? ''));
-    });
-    adminEndpoint('/overlays/marathon', 'marathon::check', async (marathonId: string, cb) => {
+  @Get('/:id', { scope: 'public' })
+  async checkMarathon(req: Request) {
+    if (req.headers.scopes?.includes('overlay:read') || req.headers.scopes?.includes('overlay:manage')) {
       await this.updateCache();
-      const key = Array.from(cachedOverlays.keys()).find(id => id.includes(marathonId));
-      cb(null, cachedOverlays.get(key ?? ''));
-    });
-    adminEndpoint('/overlays/marathon', 'marathon::update::set', async (data: { time: number, id: string }) => {
-      await this.updateCache();
-      const key = Array.from(cachedOverlays.keys()).find(id => id.includes(data.id));
-      const item = cachedOverlays.get(key ?? '');
-      if (item) {
-        if (isNaN(item.endTime) || item.endTime < Date.now()) {
-          item.endTime = Date.now();
-        }
-        item.endTime += data.time;
-        if (item.maxEndTime !== null && item.endTime) {
-          error('MARATHON: cannot set end time bigger than maximum end time');
-          addUIError({ name: 'MARATHON', message: 'Cannot set end time bigger than maximum end time.' });
-          item.endTime = item.maxEndTime;
-        }
-        cachedOverlays.set(key ?? '', item);
+    }
+    const key = Array.from(cachedOverlays.keys()).find(id => id.includes(req.params.id));
+    return cachedOverlays.get(key ?? '');
+  }
+
+  @Post('/:id', { zodValidator: z.object({ time: z.number() }) })
+  async addTime(req: Request) {
+    await this.updateCache();
+    const key = Array.from(cachedOverlays.keys()).find(id => id.includes(req.params.id));
+    const item = cachedOverlays.get(key ?? '');
+    if (item) {
+      if (isNaN(item.endTime) || item.endTime < Date.now()) {
+        item.endTime = Date.now();
       }
-      await this.flushCache();
-    });
+      item.endTime += req.body.time;
+      if (item.maxEndTime !== null && item.endTime) {
+        error('MARATHON: cannot set end time bigger than maximum end time');
+        item.endTime = item.maxEndTime;
+      }
+      cachedOverlays.set(key ?? '', item);
+    }
+    await this.flushCache();
   }
 }
 

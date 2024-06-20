@@ -19,7 +19,6 @@ import * as changelog from '~/helpers/user/changelog.js';
 import { isIgnored } from '~/helpers/user/isIgnored.js';
 import twitch from '~/services/twitch.js';
 import { variables } from '~/watchers.js';
-import joinpart from '~/widgets/joinpart.js';
 
 const getChannelChattersAll = async (chatters: HelixChatChatter[] = [], after?: HelixForwardPagination['after']): Promise<HelixChatChatter[]> => {
   const broadcasterId = variables.get('services.twitch.broadcasterId') as string;
@@ -131,13 +130,11 @@ export const getChannelChatters = async (opts: any) => {
       }));
     }
 
-    joinpart.send({ users: partedUsers, type: 'part' });
     for (const username of partedUsers) {
       await setImmediateAwait();
       eventEmitter.emit('user-parted-channel', { userName: username });
     }
 
-    joinpart.send({ users: joinedUsers.map(o => o.userDisplayName), type: 'join' });
     for (const user of joinedUsers) {
       await setImmediateAwait();
       eventEmitter.emit('user-joined-channel', { userName: user.userName });

@@ -1,13 +1,13 @@
 import { Randomizer as RandomizerEntity } from '@entity/randomizer.js';
+import { Request } from 'express';
 
 import Registry from './_interface.js';
 import { parser } from '../decorators.js';
 
 import { AppDataSource } from '~/database.js';
+import { Delete, Get, Post } from '~/decorators/endpoint.js';
 import { LOW } from '~/helpers/constants.js';
-import { app } from '~/helpers/panel.js';
 import { check } from '~/helpers/permissions/check.js';
-import { adminMiddleware } from '~/socket.js';
 
 class Randomizer extends Registry {
   constructor() {
@@ -17,54 +17,48 @@ class Randomizer extends Registry {
     });
   }
 
-  sockets () {
-    if (!app) {
-      setTimeout(() => this.sockets(), 100);
-      return;
-    }
+  @Get('/')
+  async getAll () {
+    return RandomizerEntity.find();
+  }
 
-    app.get('/api/registries/randomizer', adminMiddleware, async (req, res) => {
-      res.send({
-        data: await RandomizerEntity.find(),
-      });
+  @Get('/visible', { scope: 'public' })
+  async getVisible () {
+    return RandomizerEntity.findOneBy({ isShown: true });
+  }
+
+  @Get('/:id', { scope: 'public' })
+  async getOne (req: Request) {
+    return RandomizerEntity.findOneBy({ id: req.params.id });
+  }
+
+  @Post('/hide')
+  async hide () {
+    await AppDataSource.getRepository(RandomizerEntity).update({}, { isShown: false });
+  }
+
+  @Post('/:id/show')
+  async show (req: Request) {
+    await AppDataSource.getRepository(RandomizerEntity).update({}, { isShown: false });
+    await AppDataSource.getRepository(RandomizerEntity).update({ id: String(req.params.id) }, { isShown: true });
+  }
+
+  @Post('/:id/spin')
+  async spin (req: Request) {
+    const { generateAndAddSecureKey } = await import ('../tts.js');
+    this.socket?.emit('spin', {
+      key: generateAndAddSecureKey(),
     });
-    app.get('/api/registries/randomizer/visible', async (req, res) => {
-      res.send({
-        data: await RandomizerEntity.findOneBy({ isShown: true }),
-      });
-    });
-    app.get('/api/registries/randomizer/:id', adminMiddleware, async (req, res) => {
-      res.send({
-        data: await RandomizerEntity.findOneBy({ id: req.params.id }),
-      });
-    });
-    app.post('/api/registries/randomizer/hide', adminMiddleware, async (req, res) => {
-      await AppDataSource.getRepository(RandomizerEntity).update({}, { isShown: false });
-      res.status(204).send();
-    });
-    app.post('/api/registries/randomizer/:id/show', adminMiddleware, async (req, res) => {
-      await AppDataSource.getRepository(RandomizerEntity).update({}, { isShown: false });
-      await AppDataSource.getRepository(RandomizerEntity).update({ id: String(req.params.id) }, { isShown: true });
-      res.status(204).send();
-    });
-    app.post('/api/registries/randomizer/:id/spin', adminMiddleware, async (req, res) => {
-      const { generateAndAddSecureKey } = await import ('../tts.js');
-      this.socket?.emit('spin', {
-        key: generateAndAddSecureKey(),
-      });
-      res.status(204).send();
-    });
-    app.delete('/api/registries/randomizer/:id', adminMiddleware, async (req, res) => {
-      await RandomizerEntity.delete({ id: req.params.id });
-      res.status(404).send();
-    });
-    app.post('/api/registries/randomizer', adminMiddleware, async (req, res) => {
-      try {
-        res.send({ data: await RandomizerEntity.create(req.body).save() });
-      } catch (e) {
-        res.status(400).send({ errors: e });
-      }
-    });
+  }
+
+  @Delete('/:id')
+  async delete (req: Request) {
+    await RandomizerEntity.delete({ id: req.params.id });
+  }
+
+  @Post('/')
+  async create (req: Request) {
+    return RandomizerEntity.create(req.body).save();
   }
 
   /**
