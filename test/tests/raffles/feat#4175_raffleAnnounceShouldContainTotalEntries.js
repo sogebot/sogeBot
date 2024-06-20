@@ -68,7 +68,7 @@ describe('Raffles - announce should contain total entries #4175 - @func3', () =>
     raffles.lastAnnounceMessageCount = 0;
     raffles.lastAnnounce = 0;
     raffles.raffleAnnounceMessageInterval = 0;
-    await raffles.announce(true);
+    await raffles.announce();
     await message.isSentRaw('Raffle is running (150 entries). To enter type "!winme <1-100>". Raffle is opened for everyone.', { userName: '__bot__' })
   });
 });

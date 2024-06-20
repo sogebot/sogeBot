@@ -20,7 +20,7 @@ import {
 } from '~/helpers/commons/index.js';
 import { isDbConnected } from '~/helpers/database.js';
 import { getLocalizedName } from '~/helpers/getLocalizedName.js';
-import { debug, warning } from '~/helpers/log.js';
+import { debug, isMochaTestRun, warning } from '~/helpers/log.js';
 import { linesParsed } from '~/helpers/parser.js';
 import defaultPermissions from '~/helpers/permissions/defaultPermissions.js';
 import { tmiEmitter } from '~/helpers/tmi/index.js';
@@ -193,12 +193,12 @@ class Raffles extends System {
     announceNewEntriesCount = 0;
   }
 
-  async announce (skipLock = false) {
+  async announce () {
     if (!isDbConnected) {
       return;
     }
 
-    if (!skipLock) {
+    if (!isMochaTestRun) {
       if (announceMutex.isLocked()) {
         return;
       }
