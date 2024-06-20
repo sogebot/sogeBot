@@ -193,16 +193,18 @@ class Raffles extends System {
     announceNewEntriesCount = 0;
   }
 
-  async announce () {
+  async announce (skipLock = false) {
     if (!isDbConnected) {
       return;
     }
 
-    if (announceMutex.isLocked()) {
-      return;
+    if (!skipLock) {
+      if (announceMutex.isLocked()) {
+        return;
+      }
+      await announceMutex.acquire();
+      setTimeout(() => announceMutex.release(), 60000);
     }
-    await announceMutex.acquire();
-    setTimeout(() => announceMutex.release(), 60000);
 
     const raffle = await AppDataSource.getRepository(Raffle).findOne({ where: { winner: IsNull(), isClosed: false }, relations: ['participants'] });
     const isTimeToAnnounce = new Date().getTime() - new Date(this.lastAnnounce).getTime() >= (this.raffleAnnounceInterval * 60 * 1000);
