@@ -14,6 +14,7 @@ import {
 } from '~/helpers/api/index.js';
 import { prepare } from '~/helpers/commons/index.js';
 import { MINUTE, HOUR, DAY } from '~/helpers/constants.js';
+import { timestampToObject } from '~/helpers/getTime.js';
 import {
   debug, error,
 } from '~/helpers/log.js';
@@ -227,7 +228,7 @@ class HowLongToBeat extends System {
         gameInput = stats.value.currentGame;
       }
     }
-    const gameToShow = await HowLongToBeatGame.findOne({ where: { game: gameInput } });
+    const gameToShow = await HowLongToBeatGame.findOne({ where: { game: gameInput.trim() } });
     if (!gameToShow && !retry) {
       if (!stats.value.currentGame) {
         return this.currentGameInfo(opts, true);
@@ -247,6 +248,21 @@ class HowLongToBeat extends System {
     const gameplayMain = gameToShow.gameplayMain;
     const gameplayMainExtra = gameToShow.gameplayMainExtra;
     const gameplayCompletionist = gameToShow.gameplayCompletionist;
+
+    const data = timestampToObject(gameToShow.streams.reduce((prev, cur) => prev += cur.timestamp + cur.offset, 0));
+    const timeSpent = [];
+    if (data.days) {
+      timeSpent.push(`${data.days}d`);
+    }
+    if (data.hours) {
+      timeSpent.push(`${data.hours}h`);
+    }
+    if (data.minutes) {
+      timeSpent.push(`${data.minutes}m`);
+    }
+    if (data.seconds || timeSpent.length === 0) {
+      timeSpent.push(`${data.seconds}s`);
+    }
 
     if (gameplayMain === 0) {
       return [{
@@ -271,6 +287,7 @@ class HowLongToBeat extends System {
         percentMain:          Number((timeToBeatMain / gameplayMain) * 100).toFixed(2),
         percentMainExtra:     Number((timeToBeatMainExtra / gameplayMainExtra) * 100).toFixed(2),
         percentCompletionist: Number((timeToBeatCompletionist / gameplayCompletionist) * 100).toFixed(2),
+        timeSpent:            Number(gameToShow.streams.reduce((prev, cur) => prev += cur.timestamp + cur.offset, 0) / HOUR).toFixed(2),
       }), ...opts,
     }];
   }
