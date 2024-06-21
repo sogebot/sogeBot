@@ -5,7 +5,7 @@ import System from './_interface.js';
 import levels from './levels.js';
 import points from './points.js';
 import { command, default_permission } from '../decorators.js';
-import general from '../botcommands.js';
+import general from '../general.js';
 
 import { AppDataSource } from '~/database.js';
 import { mainCurrency } from '~/helpers/currency/index.js';

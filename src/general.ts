@@ -56,7 +56,7 @@ const gracefulExit = () => {
   }
 };
 
-class BotCommands extends Core {
+class General extends Core {
   @settings('graceful_exit')
     gracefulExitEachXHours = 0;
 
@@ -87,7 +87,7 @@ class BotCommands extends Core {
     setInterval(gracefulExit, 1000);
   }
 
-  @Get('/commands')
+  @Get('/commands', { scopeOrigin: 'botcommands' })
   async getAll() {
     const commands: Command[] = [];
     for (const type of ['overlays', 'integrations', 'core', 'systems', 'games', 'services', 'registries']) {
@@ -124,6 +124,7 @@ class BotCommands extends Core {
       command:      z.string(),
       permission:   z.string(),
     }),
+    scopeOrigin: 'botcommands',
   })
   async save(req: any) {
     // get module
@@ -299,5 +300,5 @@ class BotCommands extends Core {
   }
 }
 
-const general = new BotCommands();
+const general = new General();
 export default general;
