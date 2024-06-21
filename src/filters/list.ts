@@ -6,7 +6,7 @@ import { Rank } from '@entity/rank.js';
 import { orderBy } from 'lodash-es';
 import { IsNull } from 'typeorm';
 
-import general from '../general.js';
+import general from '../botcommands.js';
 import { Parser } from '../parser.js';
 
 import type { ResponseFilter } from './index.js';

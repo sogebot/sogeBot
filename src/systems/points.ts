@@ -13,7 +13,7 @@ import {
   command, default_permission, parser, permission_settings, persistent, settings,
 } from '../decorators.js';
 import { Expects } from  '../expects.js';
-import general from '../general.js';
+import general from '../botcommands.js';
 import users from '../users.js';
 
 import { AppDataSource } from '~/database.js';

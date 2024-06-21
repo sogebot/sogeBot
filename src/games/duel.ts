@@ -6,7 +6,7 @@ import { onStartup } from '../decorators/on.js';
 import {
   command, persistent, settings,
 } from '../decorators.js';
-import general from '../general.js';
+import general from '../botcommands.js';
 
 import { AppDataSource } from '~/database.js';
 import { announce, prepare } from '~/helpers/commons/index.js';

@@ -73,7 +73,7 @@ async function main () {
       const translate = (await import('./translate.js')).default;
 
       translate._load().then(async () => {
-        await import('./general.js');
+        await import('./botcommands.js');
         await import('./socket.js');
         await import('./ui.js');
         await import('./currency.js');

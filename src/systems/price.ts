@@ -7,7 +7,7 @@ import {
   command, default_permission, rollback,
 } from '../decorators.js';
 import { parser } from '../decorators.js';
-import general from '../general.js';
+import general from '../botcommands.js';
 import { Parser } from '../parser.js';
 
 import { AppDataSource } from '~/database.js';

@@ -8,7 +8,7 @@ import { app } from './helpers/panel.js';
 import Core from '~/_interface.js';
 import { onChange, onLoad } from '~/decorators/on.js';
 import { settings } from '~/decorators.js';
-import general from '~/general.js';
+import general from '~/botcommands.js';
 import { mainCurrency, symbol } from '~/helpers/currency/index.js';
 import { find, list } from '~/helpers/register.js';
 import { endpoint } from '~/helpers/socket.js';

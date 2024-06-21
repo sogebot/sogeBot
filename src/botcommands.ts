@@ -56,7 +56,7 @@ const gracefulExit = () => {
   }
 };
 
-class General extends Core {
+class BotCommands extends Core {
   @settings('graceful_exit')
     gracefulExitEachXHours = 0;
 
@@ -299,5 +299,5 @@ class General extends Core {
   }
 }
 
-const general = new General();
+const general = new BotCommands();
 export default general;

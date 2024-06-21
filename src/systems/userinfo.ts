@@ -11,7 +11,7 @@ import {
   command, default_permission, settings,
 } from '../decorators.js';
 import { Expects } from  '../expects.js';
-import general from '../general.js';
+import general from '../botcommands.js';
 import { isFollowerUpdate } from '../services/twitch/calls/isFollowerUpdate.js';
 import users from '../users.js';
 

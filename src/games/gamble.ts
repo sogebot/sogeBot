@@ -6,7 +6,7 @@ import Game from './_interface.js';
 import {
   command, permission_settings, persistent, settings,
 } from '../decorators.js';
-import general from '../general.js';
+import general from '../botcommands.js';
 import users from '../users.js';
 
 import { prepare } from '~/helpers/commons/index.js';
