@@ -123,7 +123,11 @@ const withScope = (requiredScopes: string[], isPublic: boolean = false) => {
       res.sendStatus(401);
     } catch (e) {
       error(e);
-      res.sendStatus(500);
+      if (e instanceof jwt.JsonWebTokenError) {
+        res.sendStatus(403);
+      } else {
+        res.sendStatus(500);
+      }
       return ;
     }
   };
