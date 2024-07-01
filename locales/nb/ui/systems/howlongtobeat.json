@@ -1,0 +1,20 @@
+{
+  "settings": {
+    "enabled": "Status"
+  },
+  "empty": "Ingen spill er sporet ennå.",
+  "emptyAfterSearch": "Ingen sporede spill ble funnet av ditt søk etter <strong>\"$search\"</strong>.",
+  "when": "Når det streames",
+  "time": "Sporet tid",
+  "overallTime": "Total tid",
+  "offset": "Forskyvning av sporet tid",
+  "main": "Hoved",
+  "extra": "Hoved+Ekstra",
+  "completionist": "Fullføringsentusiast",
+  "game": "Sporet spill",
+  "startedAt": "Sporing startet kl.",
+  "updatedAt": "Siste oppdatering",
+  "showHistory": "Vis historikk ($count)",
+  "hideHistory": "Skjul historikk ($count)",
+  "searchToAddNewGame": "Søk for å legge til nytt spill til sporing"
+}

@@ -1,0 +1,32 @@
+{
+  "settings": {
+    "cCreditsSpeed": "Hastighet",
+    "cCreditsAggregated": "Samlete kreditter",
+    "cShowGameThumbnail": "Vis miniatyrbilde for spillet",
+    "cShowFollowers": "Vis følgere",
+    "cShowRaids": "Vis raids",
+    "cShowSubscribers": "Vis abonnenter",
+    "cShowSubgifts": "Vis gaveabonnenter",
+    "cShowSubcommunitygifts": "Vis abonnement gitt til fellesskapet",
+    "cShowResubs": "Vis gjengangsabonnenter",
+    "cShowCheers": "Vis bits",
+    "cShowClips": "Vis klipp",
+    "cShowTips": "Vis tips",
+    "cTextLastMessage": "Siste melding",
+    "cTextLastSubMessage": "Siste abonnentmelding",
+    "cTextStreamBy": "Streamet av",
+    "cTextFollow": "Fulgt av",
+    "cTextRaid": "Raidet av",
+    "cTextCheer": "Bits fra",
+    "cTextSub": "Abonnert av",
+    "cTextResub": "Gjengangsabonnert av",
+    "cTextSubgift": "Gaveabonnement",
+    "cTextSubcommunitygift": "Abonnement gitt til fellesskapet",
+    "cTextTip": "Tips av",
+    "cClipsPeriod": "Tidsintervall",
+    "cClipsCustomPeriodInDays": "Egendefinert tidsintervall (dager)",
+    "cClipsNumOfClips": "Antall klipp",
+    "cClipsShouldPlay": "Klipp skal spilles",
+    "cClipsVolume": "Volum"
+  }
+}

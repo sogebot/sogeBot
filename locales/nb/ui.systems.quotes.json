@@ -1,0 +1,34 @@
+{
+  "no-quotes-found": "Vi beklager, ingen sitat ble funnet i databasen.",
+  "new": "Legg til nytt sitat",
+  "empty": "Listen over sitat er tom, lag nytt sitat.",
+  "emptyAfterSearch": "Listen over sitat er tom i søk etter \"<strong>$search</strong>\"",
+  "quote": {
+    "name": "Sitat",
+    "placeholder": "Angi ditt sitat her"
+  },
+  "by": {
+    "name": "Sitert av"
+  },
+  "tags": {
+    "name": "Etiketter",
+    "placeholder": "Angi dine etiketter her",
+    "help": "Komma-delte etiketter. Eksempel: etikett 1, etikett 2, etikett 3"
+  },
+  "date": {
+    "name": "Dato"
+  },
+  "error": {
+    "isEmpty": "Denne verdien kan ikke være tom",
+    "atLeastOneTag": "Du må angi minst en etikett"
+  },
+  "tag-filter": "Filtrerer etter etikett",
+  "warning": "Denne handlingen kan ikke angres!",
+  "settings": {
+    "enabled": "Status",
+    "urlBase": {
+      "title": "URL base",
+      "help": "Du bør bruke offentlige sluttpunkter for sitat, for at de skal være tilgjengelige for <strong>alle</strong>"
+    }
+  }
+}

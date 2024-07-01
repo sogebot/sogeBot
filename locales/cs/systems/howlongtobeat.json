@@ -1,5 +1,5 @@
 {
   "error": "$sender, hra $game nebyla nalezena v databázi.",
-  "game": "$sender, $game | Celkový čas ve hře: $timeSpenth | Hlavní příběh: $currentMain/$hltbMainh - $percentMain% | Hlavní příběh+Extra: $currentMainExtra/$hltbMainExtrah - $percentMainExtra% | Kompletně vše: $currentCompletionist/$hltbCompletionisth - $percentCompletionist%",
+  "game": "$sender, $game | Time spent in game: $timeSpenth | Main: $currentMain/$hltbMainh - $percentMain% | Main+Extra: $currentMainExtra/$hltbMainExtrah - $percentMainExtra% | Completionist: $currentCompletionist/$hltbCompletionisth - $percentCompletionist%",
   "multiplayer-game": "$sender, $game | Hlavní příběh: $currentMainh | Hlavní příběh+Extra: $currentMainExtrah | Kompletně vše: $currentCompletionisth"
 }

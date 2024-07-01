@@ -1,0 +1,12 @@
+{
+  "alias": "Alias",
+  "command": "Kommando",
+  "variableName": "Variabelnavn",
+  "price": "Pris (poeng)",
+  "priceBits": "Pris (bits)",
+  "thisvalue": "Denne verdien",
+  "promo": {
+    "shoutoutMessage": "Utropsmelding",
+    "enableShoutoutMessage": "Send utropsmelding i chatten"
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "viewers": {
+    "eventHistory": "Bruker hendelseshistorikk",
+    "hostAndRaidViewersCount": "Seere: $value",
+    "receivedSubscribeFrom": "Mottok abonnement fra <strong>$value</strong>",
+    "giftedSubscribeTo": "Ga abonnement i gave til <strong>$value</strong>"
+  }
+}

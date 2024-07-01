@@ -1,0 +1,28 @@
+{
+  "settings": {
+    "enabled": "Status",
+    "guild": "Klan",
+    "listenAtChannels": "Lytt etter kommandoer på denne kanalen",
+    "sendOnlineAnnounceToChannel": "Send online kunngjøring til denne kanalen",
+    "onlineAnnounceMessage": "Melding i online kunngjøring (du kan nevne andre)",
+    "sendAnnouncesToChannel": "Oppsett for sending av kunngjøringer til kanaler",
+    "deleteMessagesAfterWhile": "Slett melding etter en stund",
+    "clientId": "KlientID",
+    "token": "Token",
+    "joinToServerBtn": "Trykk for å legge til bot på serveren din",
+    "joinToServerBtnDisabled": "Vennligst lagre endringer for å aktivere at boten blir med på din server",
+    "cannotJoinToServerBtn": "Angi token og klientId for å kunne legge boten til din server",
+    "noChannelSelected": "ingen kanal valgt",
+    "noRoleSelected": "ingen rolle valgt",
+    "noGuildSelected": "ingen klan valgt",
+    "noGuildSelectedBox": "Velg klanen boten skal være i og du vil se flere innstillinger",
+    "onlinePresenceStatusDefault": "Standardstatus",
+    "onlinePresenceStatusDefaultName": "Standard Statusmelding",
+    "onlinePresenceStatusOnStream": "Status ved Strømming",
+    "onlinePresenceStatusOnStreamName": "Statusmelding ved Strømming",
+    "ignorelist": {
+      "title": "Ignorerliste",
+      "help": "brukernavn, brukernavn#0000 eller brukerID"
+    }
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "settings": {
+    "generalOwners": "Eiere",
+    "botAccessToken": "TilgangsToken",
+    "channelAccessToken": "TilgangsToken",
+    "botRefreshToken": "OppdateringsToken",
+    "channelRefreshToken": "OppdateringsToken",
+    "botUsername": "Brukernavn",
+    "channelUsername": "Brukernavn",
+    "botExpectedScopes": "Omfang",
+    "channelExpectedScopes": "Omfang"
+  }
+}

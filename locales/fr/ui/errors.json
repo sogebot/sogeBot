@@ -3,6 +3,7 @@
   "isNotEmpty": "$property is required.",
   "minLength": "$property must be longer than or equal to $constraint1 characters.",
   "isPositive": "$property must be greater then 0",
+  "isUnique": "$property must be unique",
   "isCommand": "$property must start with !",
   "isCommandOrCustomVariable": "$property must start with ! or $_",
   "isCustomVariable": "$property must start with $_",

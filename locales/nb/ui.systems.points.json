@@ -1,0 +1,22 @@
+{
+  "settings": {
+    "enabled": "Status",
+    "name": {
+      "title": "Navn",
+      "help": "<strong>Mulige format:</strong><br> poeng|poeng <br> bod|4:body|bodu"
+    },
+    "isPointResetIntervalEnabled": "Intervall for poengtilbakestilling",
+    "resetIntervalCron": {
+      "name": "Cron intervall",
+      "help": "<a href='https://crontab.guru/'>CronTab generator</a>"
+    },
+    "interval": "Minuttintervall for å legge til poeng til påloggede brukere når streamen er online",
+    "offlineInterval": "Minuttintervall for å legge til poeng til påloggede brukere når streamen er offline",
+    "messageInterval": "Hvor mange meldinger for å legge til poeng",
+    "messageOfflineInterval": "Hvor mange meldinger for å legge til poeng når streamen er offline",
+    "perInterval": "Hvor mye poeng å legge til per online intervall",
+    "perOfflineInterval": "Hvor mye poeng å legge til per offline intervall",
+    "perMessageInterval": "Hvor mye poeng å legge til per meldingsintervall",
+    "perMessageOfflineInterval": "Hvor mye poeng å legge til per meldingsintervall offline"
+  }
+}

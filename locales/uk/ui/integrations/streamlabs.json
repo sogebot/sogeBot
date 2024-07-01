@@ -3,7 +3,7 @@
     "enabled": "Стан",
     "socketToken": {
       "title": "Токен сокета",
-      "help": "Отримати токен сокета із Streamlabs API | Налаштування -> API Tokens -> Ваш токен API Socket"
+      "help": "Get socket token from Streamlabs dashboard API settings->API tokens->Your Socket API Token"
     },
     "accessToken": {
       "title": "Access token",

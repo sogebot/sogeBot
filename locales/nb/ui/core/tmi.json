@@ -1,0 +1,10 @@
+{
+  "settings": {
+    "ignorelist": "Ignorerliste (ID eller brukernavn)",
+    "showWithAt": "Vis brukere med @",
+    "sendWithMe": "Send meldinger med /me",
+    "sendAsReply": "Send bot meldinger som svar",
+    "mute": "Boten er lydløs",
+    "whisperListener": "Lytt på kommandoer ved hvisking"
+  }
+}

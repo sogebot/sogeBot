@@ -1,0 +1,41 @@
+{
+  "artists": "Artister",
+  "settings": {
+    "enabled": "Status",
+    "songRequests": "Sangforespørsel",
+    "fetchCurrentSongWhenOffline": {
+      "title": "Hent gjeldende sang når streamen er offline",
+      "help": "Det anbefales å ha denne deaktivert for å unngå å nå API grenser"
+    },
+    "allowApprovedArtistsOnly": "Tillat kun godkjente artister",
+    "approvedArtists": {
+      "title": "Godkjente artister",
+      "help": "Navn eller SpotifyURI til artist, én per linje"
+    },
+    "queueWhenOffline": {
+      "title": "Sett sanger i kø mens streamen er offline",
+      "help": "Det er anbefalt å ha denne deaktivert for å unngå køer når du bare hører på musikk"
+    },
+    "clientId": "clientId",
+    "clientSecret": "clientSecret",
+    "manualDeviceId": {
+      "title": "Tvunget EnhetsID",
+      "help": "Tom = deaktivert, tving bruk av Spotify enhetsID for å sette sanger i kø. Sjekk logger for aktive enheter eller trykk på knappen mens en sang spilles i minst 10 sekunder."
+    },
+    "redirectURI": "redirectURI",
+    "format": {
+      "title": "Format",
+      "help": "Tilgjengelige variabler: $song, $artist, $artists"
+    },
+    "username": "Autorisert bruker",
+    "revokeBtn": "Opphev brukerautorisasjon",
+    "authorizeBtn": "Autoriser bruker",
+    "scopes": "Omfang",
+    "playlistToPlay": {
+      "title": "Spotify URI til hovedspilleliste",
+      "help": "Hvis angitt, vil denne spillelisten fortsette etter forespørsel er fullført"
+    },
+    "continueOnPlaylistAfterRequest": "Fortsett spilling av spilleliste etter sangforespørsel",
+    "notify": "Send melding ved sangbytte"
+  }
+}

@@ -1,0 +1,58 @@
+{
+  "common-errors": {
+    "missing-sender-attributes": "Denne noden må kobles til lyttere med avsenderatributter"
+  },
+  "filter": {
+    "permission": {
+      "name": "Tilgangsfilter"
+    }
+  },
+  "cron": {
+    "name": "Cron"
+  },
+  "listener": {
+    "name": "Hendelselytter",
+    "type": {
+      "twitchChatMessage": "Twitch chat melding",
+      "twitchCheer": "Twitch cheer mottatt",
+      "twitchClearChat": "Twitch chat tømt",
+      "twitchCommand": "Twitch kommando",
+      "twitchFollow": "Ny Twitch følger",
+      "twitchSubscription": "Nytt Twitch abonnement",
+      "twitchSubgift": "Nytt Twitch gaveabonnement",
+      "twitchSubcommunitygift": "Nytt Twitch gaveabonnement til fellesskapet",
+      "twitchResub": "Nytt gjentakende Twitch abonnement",
+      "twitchGameChanged": "Twitch kategori endret",
+      "twitchStreamStarted": "Twitch stream startet",
+      "twitchStreamStopped": "Twitch stream stoppet",
+      "twitchRewardRedeem": "Twitch belønning innløst",
+      "twitchRaid": "Twitch raid på vei inn",
+      "tip": "Tippet av bruker",
+      "botStarted": "Bot startet"
+    },
+    "command": {
+      "add-parameter": "Legg til parameter",
+      "parameters": "Parametre",
+      "order-is-important": "order is important"
+    }
+  },
+  "others": {
+    "idle": {
+      "name": "Inaktiv"
+    }
+  },
+  "output": {
+    "log": {
+      "name": "Loggmelding"
+    },
+    "timeout-user": {
+      "name": "Midlertidig utesteng bruker"
+    },
+    "ban-user": {
+      "name": "Utesteng bruker"
+    },
+    "send-twitch-message": {
+      "name": "Send Twitch Melding"
+    }
+  }
+}

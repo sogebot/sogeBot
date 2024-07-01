@@ -1,5 +1,5 @@
 {
   "error": "$sender, $game не найдена в db.",
-  "game": "$sender, $game | Главное: $currentMain/$hltbMainh - $percentMain% | Главное+Экстра: $currentMainExtra/$hltbMainExtrah - $percentMainExtra% | Completionist: $currentCompletionist/$hltbCompletionisth - $percentCompletionist%",
+  "game": "$sender, $game | Time spent in game: $timeSpenth | Main: $currentMain/$hltbMainh - $percentMain% | Main+Extra: $currentMainExtra/$hltbMainExtrah - $percentMainExtra% | Completionist: $currentCompletionist/$hltbCompletionisth - $percentCompletionist%",
   "multiplayer-game": "$sender, $game | Главное: $currentMainh | Главное+Экстра: $currentMainExtrah | Completionist: $currentCompletionisth"
 }

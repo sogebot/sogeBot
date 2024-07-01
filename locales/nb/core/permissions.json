@@ -1,0 +1,8 @@
+{
+  "list": "Liste over dine tilganger:",
+  "excludeAddSuccessful": "$sender, du la til $username til ekskluderingsliste for tilgang $permissionName",
+  "excludeRmSuccessful": "$sender, du fjernet $username fra ekskluderingsliste for tilgang $permissionName",
+  "userNotFound": "$sender, bruker $username ble ikke funnet i databasen.",
+  "permissionNotFound": "$sender, tilgang $userlevel ble ikke funnet i databasen.",
+  "cannotIgnoreForCorePermission": "$sender, du kan ikke manuelt ekskludere bruker fra kjernetilgang $userlevel"
+}

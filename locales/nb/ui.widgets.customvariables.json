@@ -1,0 +1,5 @@
+{
+  "no-custom-variable-found": "Ingen egendefinerte variabler funnet, legg til i <a href=\"/#/registry/customVariables/list\">egendefinerte variabler registeret</a>",
+  "add-variable-into-watchlist": "Legg til variabel i overvåkingslisten",
+  "watchlist": "Overvåkingsliste"
+}

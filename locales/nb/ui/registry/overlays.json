@@ -1,0 +1,8 @@
+{
+  "newMapping": "Opprett nytt overlaylinkkart",
+  "emptyMapping": "Ingen overlaylinkkart har blitt opprettet ennå.",
+  "allowedIPs": {
+    "name": "Tillatte IP-adresser",
+    "help": "Tillat tilgang fra satte IP-adresser adskilt av ny linje"
+  }
+}

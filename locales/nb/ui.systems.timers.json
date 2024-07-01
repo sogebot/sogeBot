@@ -1,0 +1,10 @@
+{
+  "new": "Ny Tidtaker",
+  "empty": "Ingen tidtakere har blitt laget ennå.",
+  "emptyAfterSearch": "Ingen tidtakere ble funnet av søket ditt for <strong>\"$search\"</strong>.",
+  "add_response": "Legg til svar",
+  "settings": {
+    "enabled": "Status"
+  },
+  "warning": "Denne handlingen kan ikke angres!"
+}

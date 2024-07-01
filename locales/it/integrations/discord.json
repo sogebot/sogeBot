@@ -4,7 +4,7 @@
   "all-your-links-were-deleted-with-sender": "$sender, {integrations.discord.all-your-links-were-deleted}",
   "this-account-was-linked-with": "$sender, questo account è stato collegato a $discordTag.",
   "invalid-or-expired-token": "$sender, token non valido o scaduto.",
-  "help-message": "$sender, per collegare il tuo account su Discord: 1. Vai sul server Discord e invia $command nel canale del bot. | 2. Aspetta il messaggio privato dal bot | 3. Invia il comando dal vostro Discord PM qui in chat twitch.",
+  "help-message": "$sender, to link your account on Discord: 1. Go to Discord server and send $command in bot channel. | 2. Wait for PM from bot | 3. Send command from your Discord PM here in Twitch chat.",
   "started-at": "Iniziato alle",
   "announced-by": "Announced by sogeBot",
   "streamed-at": "Streammato alle",

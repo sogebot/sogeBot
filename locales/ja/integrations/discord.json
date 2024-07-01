@@ -4,7 +4,7 @@
   "all-your-links-were-deleted-with-sender": "$sender, {integrations.discord.all-your-links-were-deleted}",
   "this-account-was-linked-with": "$sender、このアカウントは $discordTag とリンクされました。",
   "invalid-or-expired-token": "$sender, 無効または期限切れのトークン.",
-  "help-message": "$sender、Discordであなたのアカウントをリンクするには: 1. Discordサーバーに行き、ボットチャンネルで $command を送信してください。 | 2. ボットからDMを待つ | 3. DiscordのDMから、twitchチャットでコマンドを送信してください。",
+  "help-message": "$sender, to link your account on Discord: 1. Go to Discord server and send $command in bot channel. | 2. Wait for PM from bot | 3. Send command from your Discord PM here in Twitch chat.",
   "started-at": "開始日時",
   "announced-by": "sogeBotによる通知",
   "streamed-at": "ストリーム日時",

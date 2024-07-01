@@ -4,7 +4,7 @@
   "all-your-links-were-deleted-with-sender": "$sender, {integrations.discord.all-your-links-were-deleted}",
   "this-account-was-linked-with": "$sender, tento účet byl propojen s $discordTag.",
   "invalid-or-expired-token": "$sender, neplatný nebo prošlý token.",
-  "help-message": "$sender, pro propojení účtu na Discordu: 1. Jděte na Discord server a pošlete $command v kanálu pro příkazy bota. | 2. Počkejte na SZ na Discordu od bota | 3. Pošlete příkaz z SZ na Discordu zde v Twitch chatu.",
+  "help-message": "$sender, to link your account on Discord: 1. Go to Discord server and send $command in bot channel. | 2. Wait for PM from bot | 3. Send command from your Discord PM here in Twitch chat.",
   "started-at": "Zahájeno v",
   "announced-by": "Oznámení od sogeBot",
   "streamed-at": "Streamováno v",

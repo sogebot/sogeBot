@@ -1,0 +1,12 @@
+{
+  "time": "Topp $amount (seertid): ",
+  "tips": "Topp $amount (tips): ",
+  "level": "Topp $amount (level): ",
+  "points": "Topp $amount (poeng): ",
+  "messages": "Topp $amount (meldinger): ",
+  "followage": "Topp $amount (følgealder): ",
+  "subage": "Topp $amount (abonnementsalder): ",
+  "submonths": "Topp $amount (abonnementsmåneder): ",
+  "bits": "Topp $amount (bits): ",
+  "gifts": "Topp $amount (abonnementsgaver): "
+}

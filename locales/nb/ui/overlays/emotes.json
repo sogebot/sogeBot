@@ -1,0 +1,48 @@
+{
+	"settings": {
+		"btnRemoveCache": "Slett cache",
+		"hypeMessagesEnabled": "Vis hype-meldinger i chatten",
+		"btnTestExplosion": "Test emote-eksplosjon",
+		"btnTestEmote": "Test emote",
+		"btnTestFirework": "Test emote fyrverkeri",
+		"cEmotesSize": "Emotestørrelse",
+		"cEmotesMaxEmotesPerMessage": "Maks antall emotes per melding",
+		"cEmotesMaxRotation": "Maksimum rotasjon av emote",
+		"cEmotesOffsetX": "Maksimum forskyvning på X-akse",
+		"cEmotesAnimation": "Animasjon",
+		"cEmotesAnimationTime": "Animasjon varighet",
+		"cExplosionNumOfEmotes": "Antall emotes",
+		"cExplosionNumOfEmotesPerExplosion": "Antall emotes per eksplosjon",
+		"cExplosionNumOfExplosions": "Antall eksplosjoner",
+		"enableEmotesCombo": "Aktiver emote kombinasjon",
+		"comboBreakMessages": "Combo break messages",
+		"threshold": "Terskel",
+		"noMessagesFound": "Ingen melding funnet.",
+		"message": "Melding",
+		"showEmoteInOverlayThreshold": "Minimal meldingsterskel for å vise emote i overlay",
+		"hideEmoteInOverlayAfter": {
+			"title": "Skjul emote i overlay etter inaktivitet",
+			"help": "Vil skjule emote i overlay etter en viss tid i sekunder"
+		},
+		"comboCooldown": {
+			"title": "Kombinasjon ventetid",
+			"help": "Ventetid for kombinasjoner i sekunder"
+		},
+		"comboMessageMinThreshold": {
+			"title": "Minimum meldingsterskel",
+			"help": "Minimum meldingsterskel for å telle emotes som kombinasjon (frem til da vil ikke ventetiden starte)"
+		},
+		"comboMessages": "Kombinerte meldinger"
+	},
+	"hype": {
+		"5": "Jess! Vi har $amountx $emote kombo så langt! SeemsGood",
+		"15": "Hold det gående! Klarer vi å få til mer enn $amountx $emote? TriHard"
+	},
+	"message": {
+		"3": "$amountx $emote kombo",
+		"5": "$amountx $emote kombo SeemsGood",
+		"10": "$amountx $emote kombo PogChamp",
+		"15": "$amountx $emote kombo TriHard",
+		"20": "$sender ødela $amountx $emote kombo! NotLikeThis"
+	}
+}

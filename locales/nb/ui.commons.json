@@ -1,0 +1,18 @@
+{
+  "additional-settings": "Flere innstillinger",
+  "never": "aldri",
+  "reset": "tilbakestill",
+  "moveUp": "flytt opp",
+  "moveDown": "flytt ned",
+  "stop-if-executed": "stopp, hvis utført",
+  "continue-if-executed": "fortsett, hvis utført",
+  "generate": "Generer",
+  "thumbnail": "Miniatyrbilde",
+  "yes": "Ja",
+  "no": "Nei",
+  "show-more": "Vis mer",
+  "show-less": "Vis mindre",
+  "allowed": "Tillatt",
+  "disallowed": "Ikke tillatt",
+  "back": "Tilbake"
+}

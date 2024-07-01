@@ -1,0 +1,7 @@
+{
+  "countdown": "Snikskytterkamp ($type) starter om $time $unit",
+  "go": "Starter nå! Kjør!",
+  "putMatchIdInChat": "Vennligst legg inn din match-ID i chatten => $command xxx",
+  "currentMatches": "Nåværende Kamper: $matches",
+  "stopped": "Snikskytterkamp ble avbrutt."
+}

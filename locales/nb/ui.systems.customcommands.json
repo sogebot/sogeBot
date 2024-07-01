@@ -1,0 +1,12 @@
+{
+  "no-responses-set": "Ingen respons",
+  "addResponse": "Legg til respons",
+  "response": {
+    "name": "Respons",
+    "placeholder": "Angi din respons her."
+  },
+  "filter": {
+    "name": "filter",
+    "placeholder": "Legg til filter for denne responsen"
+  }
+}

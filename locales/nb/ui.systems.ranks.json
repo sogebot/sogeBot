@@ -1,0 +1,20 @@
+{
+  "new": "Ny rang",
+  "empty": "Ingen rang har blitt opprettet ennå.",
+  "emptyAfterSearch": "Ingen rang ble funnet ved søk av <strong>\"$search\"</strong>.",
+  "rank": {
+    "name": "rang",
+    "placeholder": ""
+  },
+  "value": {
+    "name": "timer",
+    "placeholder": ""
+  },
+  "error": {
+    "isEmpty": "Denne verdien kan ikke være tom"
+  },
+  "warning": "Denne handlingen kan ikke angres!",
+  "settings": {
+    "enabled": "Status"
+  }
+}

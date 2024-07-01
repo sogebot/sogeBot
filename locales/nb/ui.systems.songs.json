@@ -1,0 +1,33 @@
+{
+  "settings": {
+    "enabled": "Status",
+    "volume": "Volum",
+    "calculateVolumeByLoudness": "Dynamisk volum ved lydstyrke",
+    "duration": {
+      "title": "Maks sang varighet",
+      "help": "I minutter"
+    },
+    "shuffle": "Stokk om",
+    "songrequest": "Spiller fra sangforespørsel",
+    "playlist": "Spiller fra spilleliste",
+    "onlyMusicCategory": "Tillat bare kategorien musikk",
+    "allowRequestsOnlyFromPlaylist": "Tillat kun sangforespørsler fra gjeldende spilleliste",
+    "notify": "Send melding ved sangendring"
+  },
+  "error": {
+    "isEmpty": "Denne verdien kan ikke være tom"
+  },
+  "startTime": "Start sang ved",
+  "endTime": "Avslutt sang ved",
+  "add_song": "Legg til sang",
+  "add_or_import": "Legg til sang eller importer fra spilleliste",
+  "importing": "Importerer",
+  "importing_done": "Importering fullført",
+  "seconds": "Sekunder",
+  "calculated": "Beregnet",
+  "set_manually": "Sett manuelt",
+  "bannedSongsEmptyAfterSearch": "Ingen blokkerte sanger ble funnet i søket ditt etter <strong>\"$search\"</strong>.",
+  "emptyAfterSearch": "Ingen sanger ble funnet i søket ditt etter <strong>\"$search\"</strong>.",
+  "empty": "Ingen sanger er lagt til ennå.",
+  "bannedSongsEmpty": "Ingen sanger er lagt til blokkeringslisten ennå."
+}

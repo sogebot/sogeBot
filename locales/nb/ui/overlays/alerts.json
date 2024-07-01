@@ -1,0 +1,6 @@
+{
+  "settings": {
+    "galleryCache": "Cache gallerioppføringer",
+    "galleryCacheLimitInMb": "Maks størrelse av gallerioppføringer (i MB) å cache"
+  }
+}

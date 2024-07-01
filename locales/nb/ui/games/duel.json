@@ -1,0 +1,12 @@
+{
+  "settings": {
+    "enabled": "Status",
+    "cooldown": "Ventetid",
+    "duration": {
+      "title": "Varighet",
+      "help": "Minutter"
+    },
+    "minimalBet": "Minimum innsats",
+    "bypassCooldownByOwnerAndMods": "Omgå ventetid av eier og moderatorer"
+  }
+}

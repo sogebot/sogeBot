@@ -1,0 +1,27 @@
+{
+  "new": "Nytt Nøkkelord",
+  "empty": "Ingen nøkkelord er opprettet ennå.",
+  "emptyAfterSearch": "Ingen nøkkelord ble funnet av ditt søk etter <strong>\"$search\"</strong>.",
+  "keyword": {
+    "name": "Nøkkelord / Vanlig Uttrykk",
+    "placeholder": "Angi ditt nøkkelord eller vanlige uttrykk for å utløse nøkkelordet.",
+    "help": "Du kan bruke regexp (uten skille på store/små bokstaver) for å bruke nøkkelord, eks. e.g. <strong>hallo.*|hei</strong>"
+  },
+  "response": {
+    "name": "Respons",
+    "placeholder": "Angi din respons her."
+  },
+  "error": {
+    "isEmpty": "Denne verdien kan ikke være tom"
+  },
+  "no-responses-set": "Ingen respons",
+  "addResponse": "Legg til respons",
+  "filter": {
+    "name": "filter",
+    "placeholder": "Legg til filter for denne responsen"
+  },
+  "warning": "Denne handlingen kan ikke angres!",
+  "settings": {
+    "enabled": "Status"
+  }
+}

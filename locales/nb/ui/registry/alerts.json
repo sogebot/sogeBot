@@ -1,0 +1,220 @@
+{
+  "enabled": "Aktivert",
+  "testDlg": {
+    "alertTester": "Varseltester",
+    "command": "Kommando",
+    "username": "Brukernavn",
+    "recipient": "Mottaker",
+    "message": "Melding",
+    "tier": "Nivå",
+    "amountOfViewers": "Antall seere",
+    "amountOfBits": "Antall bits",
+    "amountOfGifts": "Antall gaver",
+    "amountOfMonths": "Antall måneder",
+    "amountOfTips": "Tips",
+    "event": "Hendelse",
+    "service": "Tjeneste"
+  },
+  "empty": "Varslingsregisteret er tomt, lag nye varslinger.",
+  "emptyAfterSearch": "Varslingsregisteret er tomt i søk etter \"<strong>$search</strong>\"",
+  "revertcode": "Tilbakestill kode til standard",
+  "name": {
+    "name": "Navn",
+    "placeholder": "Sett navn på dine varslinger"
+  },
+  "alertDelayInMs": {
+    "name": "Varslingsforsinkelse"
+  },
+  "parryEnabled": {
+    "name": "Varslingsfortrenging"
+  },
+  "parryDelay": {
+    "name": "Forsinkelse i varslingsfortrening"
+  },
+  "profanityFilterType": {
+    "name": "Banneordfilter",
+    "disabled": "Deaktivert",
+    "replace-with-asterisk": "Erstatt med stjerne",
+    "replace-with-happy-words": "Erstatt med glade ord",
+    "hide-messages": "Skjul meldinger",
+    "disable-alerts": "Deaktiver varslinger"
+  },
+  "loadStandardProfanityList": "Last standard banneordliste",
+  "customProfanityList": {
+    "name": "Egendefinert banneordliste",
+    "help": "Ord bør skilles med komma."
+  },
+  "event": {
+    "follow": "Følg",
+    "cheer": "Cheer",
+    "sub": "Abonner",
+    "resub": "Gjengangsabonner",
+    "subgift": "Abonnentgave",
+    "subcommunitygift": "Abonnentgave til fellesskapet",
+    "tip": "Tips",
+    "raid": "Raid",
+    "custom": "Egendefinert",
+    "promo": "Promo",
+    "rewardredeem": "Innløs Belønning"
+  },
+  "title": {
+    "name": "Variantnavn",
+    "placeholder": "Angi variantnavnet ditt"
+  },
+  "variant": {
+    "name": "Variantforekomst"
+  },
+  "filter": {
+    "name": "Filter",
+    "operator": "Operatør",
+    "rule": "Regel",
+    "addRule": "Legg til regel",
+    "addGroup": "Legg til gruppe",
+    "comparator": "Sammenligner",
+    "value": "Verdi",
+    "valueSplitByComma": "Verdier skilles med komma (f.eks. verdi1, verdi2)",
+    "isEven": "er et partall",
+    "isOdd": "er et oddetall",
+    "lessThan": "mindre enn",
+    "lessThanOrEqual": "mindre enn eller lik",
+    "contain": "inneholder",
+    "contains": "inneholder",
+    "equal": "er lik",
+    "notEqual": "er ikke lik",
+    "present": "er tilstede",
+    "includes": "inkluderer",
+    "greaterThan": "større enn",
+    "greaterThanOrEqual": "større enn eller lik",
+    "noFilter": "ingen filter"
+  },
+  "speed": {
+    "name": "Hastighet"
+  },
+  "maxTimeToDecrypt": {
+    "name": "Maks tid å dekryptere"
+  },
+  "characters": {
+    "name": "Karakterer"
+  },
+  "random": "Tilfeldig",
+  "exact-amount": "Nøyaktig beløp",
+  "greater-than-or-equal-to-amount": "Større enn eller lik beløp",
+  "tier-exact-amount": "Nivå er nøyaktig",
+  "tier-greater-than-or-equal-to-amount": "Nivå er høyere enn eller lik",
+  "months-exact-amount": "Antall måneder er nøyaktig",
+  "months-greater-than-or-equal-to-amount": "Antall måneder er høyere enn eller lik",
+  "gifts-exact-amount": "Antall gaver er nøyaktig",
+  "gifts-greater-than-or-equal-to-amount": "Antall gaver er høyere enn eller lik",
+  "very-rarely": "Svært sjelden",
+  "rarely": "Sjelden",
+  "default": "Standard",
+  "frequently": "Ofte",
+  "very-frequently": "Svært ofte",
+  "exclusive": "Eksklusiv",
+  "messageTemplate": {
+    "name": "Meldingsmal",
+    "placeholder": "Angi din meldingsmal",
+    "help": "Tilgjengelige variabler: {name}, {amount} (cheers, abonnement, tips, abonnementsgaver, abonnementsgaver til fellesskapet, innløste kommandoer), {recipient} (abonnementsgaver, innløste kommandoer), {monthsName} (abonnement, abonnementsgaver), {tier} (abonnement), {currency} (tips), {game} (promo). Hvis | legges til (se promo) så vil de verdiene vises i rekkefølge."
+  },
+  "ttsTemplate": {
+    "name": "TTS mal",
+    "placeholder": "Angi din TTS mal",
+    "help": "Tilgjengelige variabler: {name}, {amount} {monthsName} {currency} {message}"
+  },
+  "animationText": {
+    "name": "Animasjonstekst"
+  },
+  "animationType": {
+    "name": "Type animasjon"
+  },
+  "animationIn": {
+    "name": "Animasjon inn"
+  },
+  "animationOut": {
+    "name": "Animasjon ut"
+  },
+  "alertDurationInMs": {
+    "name": "Varslingsvarighet"
+  },
+  "alertTextDelayInMs": {
+    "name": "Forsinkelse i varslingstekst"
+  },
+  "layoutPicker": {
+    "name": "Oppsett"
+  },
+  "loop": {
+    "name": "Spill på repeat"
+  },
+  "scale": {
+    "name": "Skala"
+  },
+  "translateY": {
+    "name": "Flytt -Opp / +Ned"
+  },
+  "translateX": {
+    "name": "Flytt -Venstre / +Høyre"
+  },
+  "image": {
+    "name": "Bilde / Video(.webm)",
+    "setting": "Bilde / Video(.webm) innstillinger"
+  },
+  "sound": {
+    "name": "Lyd",
+    "setting": "Lydinnstillinger"
+  },
+  "soundVolume": {
+    "name": "Varslingsvolum"
+  },
+  "enableAdvancedMode": "Aktiver avansert modus",
+  "font": {
+    "setting": "Skriftinnstilinger",
+    "name": "Skriftfamilie",
+    "overrideGlobal": "Overstyr globale skriftinnstillinger",
+    "align": {
+      "name": "Justering",
+      "left": "Venstre",
+      "center": "Midtstilt",
+      "right": "Høyre"
+    },
+    "size": {
+      "name": "Skriftstørrelse"
+    },
+    "weight": {
+      "name": "Skriftens vekt"
+    },
+    "borderPx": {
+      "name": "Skriftkant"
+    },
+    "borderColor": {
+      "name": "Skriftkant farge"
+    },
+    "color": {
+      "name": "Skriftfarge"
+    },
+    "highlightcolor": {
+      "name": "Skriftuthevingsfarge"
+    }
+  },
+  "minAmountToShow": {
+    "name": "Minimumsbeløp for å vise"
+  },
+  "minAmountToPlay": {
+    "name": "Minimumsbeløp for å spille"
+  },
+  "allowEmotes": {
+    "name": "Tillat emotes"
+  },
+  "message": {
+    "setting": "Meldingsinnstillinger"
+  },
+  "voice": "Stemme",
+  "keepAlertShown": "Varslinger holder seg synlig under TTS",
+  "skipUrls": "Hopp over URLer under TTS",
+  "volume": "Volum",
+  "rate": "Rate",
+  "pitch": "Tonehøyde",
+  "test": "Test",
+  "tts": {
+    "setting": "TTS innstillinger"
+  }
+}

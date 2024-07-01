@@ -1,0 +1,15 @@
+{
+  "song-not-found": "Beklager, $sender, sangen ble ikke funnet på Spotify",
+  "song-requested": "$sender, du ba om sangen $name fra $artist",
+  "not-banned-song-not-playing": "$sender, ingen sang spilles nå som kan bannes.",
+  "song-banned": "$sender, sang $name fra $artist er bannet.",
+  "song-unbanned": "$sender, sang $name fra $artist er ikke bannet lengre.",
+  "song-not-found-in-banlist": "$sender, sang av spotifyURI $uri ble ikke funnet på ban-listen.",
+  "cannot-request-song-is-banned": "$sender, kan ikke be om bannet sang $name fra $artist.",
+  "cannot-request-song-from-unapproved-artist": "$sender, kan ikke be om sang fra ikke-godkjent artist.",
+  "no-songs-found-in-history": "$sender, det er for øyeblikket ingen sanger på historikklisten.",
+  "return-one-song-from-history": "$sender, forrige sang var $name fra $artist.",
+  "return-multiple-song-from-history": "$sender, $count tidligere sanger var:",
+  "return-multiple-song-from-history-item": "$index - $name fra $artist",
+  "song-notify": "Sangen som spiller nå er $name av $artist."
+}
