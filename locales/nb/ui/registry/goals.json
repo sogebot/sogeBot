@@ -1,0 +1,86 @@
+{
+  "addGoalGroup": "Legg Til Målgruppe",
+  "addGoal": "Legg Til Mål",
+  "newGoal": "Nytt Mål",
+  "newGoalGroup": "Ny Målgruppe",
+  "goals": "Mål",
+  "general": "Generelt",
+  "display": "Vis",
+  "fontSettings": "Skriftinnstillinger",
+  "barSettings": "Barinnstillinger",
+  "selectGoalOnLeftSide": "Velg eller legg til mål på venstre side",
+  "input": {
+    "description": {
+      "title": "Beskrivelse"
+    },
+    "goalAmount": {
+      "title": "Målbeløp"
+    },
+    "countBitsAsTips": {
+      "title": "Tell Bits som Tips"
+    },
+    "currentAmount": {
+      "title": "Nåværende Beløp"
+    },
+    "endAfter": {
+      "title": "Slutt Etter"
+    },
+    "endAfterIgnore": {
+      "title": "Mål vil ikke utløpe"
+    },
+    "borderPx": {
+      "title": "Kantlinje",
+      "help": "Kantlinjestørrelse i piksler"
+    },
+    "barHeight": {
+      "title": "Barhøyde",
+      "help": "Barhøyde i piksler"
+    },
+    "color": {
+      "title": "Farge"
+    },
+    "borderColor": {
+      "title": "Kantfarge"
+    },
+    "backgroundColor": {
+      "title": "Bakgrunnsfarge"
+    },
+    "type": {
+      "title": "Type"
+    },
+    "nameGroup": {
+      "title": "Navnet til denne målgruppen"
+    },
+    "name": {
+      "title": "Navnet på dette målet"
+    },
+    "displayAs": {
+      "title": "Vis som",
+      "help": "Angir hvordan målgruppe skal vises"
+    },
+    "durationMs": {
+      "title": "Varighet",
+      "help": "Denne verdien er i millisekunder",
+      "placeholder": "Hvor lenge målet skal vises"
+    },
+    "animationInMs": {
+      "title": "Animasjon Inn varighet",
+      "help": "Denne verdien er i millisekunder",
+      "placeholder": "Angi varighet på Animasjon Inn"
+    },
+    "animationOutMs": {
+      "title": "Animasjon Ut varighet",
+      "help": "Denne verdien er i millisekunder",
+      "placeholder": "Angi varighet på Animasjon Ut"
+    },
+    "interval": {
+      "title": "Hvilken intervall skal telles"
+    },
+    "spaceBetweenGoalsInPx": {
+      "title": "Mellomrom mellom mål",
+      "help": "Denne verdien er i piksler",
+      "placeholder": "Angi mellomrom mellom målene"
+    }
+  },
+  "groupSettings": "Gruppeinnstillinger"
+}

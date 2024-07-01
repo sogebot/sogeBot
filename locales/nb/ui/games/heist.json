@@ -1,0 +1,30 @@
+{
+  "name": "Kupp",
+  "settings": {
+    "enabled": "Status",
+    "showMaxUsers": "Maks brukere å vise ved utbetaling",
+    "copsCooldownInMinutes": {
+      "title": "Ventetid mellom kupp",
+      "help": "Minutter"
+    },
+    "entryCooldownInSeconds": {
+      "title": "Time to entry heist",
+      "help": "Sekunder"
+    },
+    "started": "Kupp startmelding",
+    "nextLevelMessage": "Melding når neste level nås",
+    "maxLevelMessage": "Melding når maks level nås",
+    "copsOnPatrol": "Svar fra boten når kuppet fortsatt er på ventetid",
+    "copsCooldown": "Bot-annonsering når kuppet kan startes",
+    "singleUserSuccess": "Suksessmelding for en bruker",
+    "singleUserFailed": "Mislykketmelding for en bruker",
+    "noUser": "Melding hvis ingen bruker deltok"
+  },
+  "message": "Melding",
+  "winPercentage": "Vinnprosent",
+  "payoutMultiplier": "Utbetalingsmultiplikator",
+  "maxUsers": "Maks brukere for level",
+  "percentage": "Prosent",
+  "noResultsFound": "Ingen resultat funnet. Trykk på knappen under for å legge til nytt resultat.",
+  "noLevelsFound": "Ingen leveler funnet. Klikk på knappen under for å legge til en ny level."
+}

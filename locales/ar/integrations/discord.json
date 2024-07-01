@@ -4,7 +4,7 @@
   "all-your-links-were-deleted-with-sender": "$sender, {integrations.discord.all-your-links-were-deleted}",
   "this-account-was-linked-with": "$sender، تم ربط هذا الحساب بـ $discordTag.",
   "invalid-or-expired-token": "$sender, الرمز المميز غير صالح أو منتهي الصلاحية.",
-  "help-message": "$sender، لربط حسابك على ديسكورد: 1. اذهب إلى خادم ديسكورد وارسل $command في قناة بوت. | 2. انتظر رسالة PM من بوت| 3. أرسل الأمر من ديسكورد الخاص بك هنا في دردشة تويتش.",
+  "help-message": "$sender, to link your account on Discord: 1. Go to Discord server and send $command in bot channel. | 2. Wait for PM from bot | 3. Send command from your Discord PM here in Twitch chat.",
   "started-at": "بدأ في",
   "announced-by": "Announced by sogeBot",
   "streamed-at": "تم البث في",

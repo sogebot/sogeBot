@@ -1,0 +1,23 @@
+{
+  "addRandomizer": "Legg til Tilfeldig Velger",
+  "form": {
+    "name": "Navn",
+    "command": "Kommando",
+    "permission": "Kommandotilgang",
+    "simple": "Enkel",
+    "tape": "Bånd",
+    "wheelOfFortune": "Lykkehjul",
+    "type": "Type",
+    "options": "Alternativer",
+    "optionsAreEmpty": "Alternativer er tomme.",
+    "color": "Farge",
+    "numOfDuplicates": "Antall duplikater",
+    "minimalSpacing": "Minimum mellomrom",
+    "groupUp": "Gruppere",
+    "ungroup": "Adskill",
+    "groupedWithOptionAbove": "Gruppert med alternativ over",
+    "generatedOptionsPreview": "Forhåndsvisning av genererte alternativer",
+    "probability": "Sannsynlighet",
+    "tick": "Tikk-lyd under spinning"
+  }
+}

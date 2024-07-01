@@ -1,0 +1,14 @@
+{
+  "emitRedeemEvent": "Utløs egendefinerte varsler ved innløste bits",
+  "price": {
+    "name": "pris",
+    "placeholder": ""
+  },
+  "error": {
+    "isEmpty": "Denne verdien kan ikke være tom"
+  },
+  "warning": "Denne handlingen kan ikke angres!",
+  "settings": {
+    "enabled": "Status"
+  }
+}

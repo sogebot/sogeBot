@@ -1,0 +1,11 @@
+{
+  "settings": {
+    "purgeAllConnections": "Rens Alle Autentiserte Koblinger (dine også)",
+    "accessTokenExpirationTime": "Tilgangstoken Utløpstid (sekunder)",
+    "refreshTokenExpirationTime": "Oppdateringstoken Utløpstid (sekunder)",
+    "socketToken": {
+      "title": "Socket token",
+      "help": "Dette tokenet vil gi deg full admin tilgang gjennom sockets. Ikke del!"
+    }
+  }
+}

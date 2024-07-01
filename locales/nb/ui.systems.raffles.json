@@ -1,0 +1,36 @@
+{
+  "widget": {
+    "subscribers-luck": "Abonnenters flaks"
+  },
+  "settings": {
+    "enabled": "Status",
+    "announceNewEntries": {
+      "title": "Annonser nye oppføringer",
+      "help": "Hvis brukere blir med i lotteri, vil kunngjøringsmelding bli sendt til chatten etter en stund."
+    },
+    "announceNewEntriesBatchTime": {
+      "title": "Hvor lenge må man vente før nye oppføring annonseres (i sekunder)",
+      "help": "Lengre tid vil holde chatten ryddigere, oppføringer vil bli lagt sammen."
+    },
+    "deleteRaffleJoinCommands": {
+      "title": "Slett bruker lotteri bli med kommando",
+      "help": "Dette vil slette brukermelding hvis de bruker !yourraffle kommando. Burde holde chatten ryddigere."
+    },
+    "allowOverTicketing": {
+      "title": "Tillat overbillettering",
+      "help": "Tillat bruker å bli med i lotteri ved overbillettering av poeng. Eks. bruker har 10 poeng men kan skrive !raffle 100 som vil bruke opp alle deres poeng."
+    },
+    "raffleAnnounceInterval": {
+      "title": "Annonseringsintervall",
+      "help": "Minutter"
+    },
+    "raffleAnnounceMessageInterval": {
+      "title": "Annonser meldings intervall",
+      "help": "Hvor mange meldinger må sendes til chat før annonsering kan bli postet."
+    },
+    "subscribersPercent": {
+      "title": "Ekstra abonnement flaks",
+      "help": "i prosent"
+    }
+  }
+}

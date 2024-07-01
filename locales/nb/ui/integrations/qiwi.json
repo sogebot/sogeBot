@@ -1,0 +1,9 @@
+{
+  "settings": {
+    "enabled": "Status",
+    "secretToken": {
+      "title": "Hemmelig token",
+      "help": "Få hemmelig token på Qiwi Donate dashboard innstillinger->trykk på vis hemmelig token"
+    }
+  }
+}

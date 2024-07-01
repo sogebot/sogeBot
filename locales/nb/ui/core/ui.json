@@ -1,0 +1,13 @@
+{
+  "settings": {
+    "theme": "Standardtema",
+    "domain": {
+      "title": "Domene",
+      "help": "Format uten http/https: dittdomene.com eller ditt.domene.com"
+    },
+    "percentage": "Prosentdifferanse for statistikk",
+    "shortennumbers": "Kortformat av tall",
+    "showdiff": "Vis differanse",
+    "enablePublicPage": "Aktiver offentlig side"
+  }
+}

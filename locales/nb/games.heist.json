@@ -1,0 +1,29 @@
+{
+  "copsOnPatrol": "$sender, politiet leter fortsatt etter forrige kupp-lag. Prøv igjen om $cooldown.",
+  "copsCooldownMessage": "Okey folkens, ser ut til at politistyrkene koser seg med smultringer så vi kan snappe til oss pengene!",
+  "entryMessage": "$sender har startet planleggingen av et bankran! Ser etter en større gjeng for en større sum. Bli med! Skriv $command <points> for å bli med.",
+  "lateEntryMessage": "$sender, kupp pågår for øyeblikket!",
+  "entryInstruction": "$sender, skriv $command <points> for å bli med.",
+  "levelMessage": "Med denne gjengen, så kan vi rane $bank! La oss se om vi klarer å få nok folk til å rane $nextBank",
+  "maxLevelMessage": "Med denne gjengen, så kan vi rane $bank! Det kan ikke bli bedre!",
+  "started": "Okey folkens, sjekk utstyret, dette er det vi har trent for. Dette er ikke et spill, det er virkeligheten. Vi skal få penger fra $bank!",
+  "noUser": "Ingen blir med i en gjeng for å rane.",
+  "singleUserSuccess": "$user var som en ninja. Ingen la merke til manglende penger.",
+  "singleUserFailed": "$user klarte ikke å kvitte seg med politiet og vil tilbringe tiden i fengsel.",
+  "result": {
+    "0": "Alle ble nådeløst utslettet. Dette er slakt.",
+    "33": "Kun 1/3 av laget får pengene fra kuppet.",
+    "50": "Halve kupp-laget ble drept eller fanget av politiet.",
+    "99": "Noen tap blant kupp-laget blekner i forhold til hva resterende gjeng har i lommene sine.",
+    "100": "Gode Gud, ingen er døde, alle vant!"
+  },
+  "levels": {
+    "bankVan": "Bankbil",
+    "cityBank": "Bybank",
+    "stateBank": "Statsbank",
+    "nationalReserve": "Nasjonalbanken",
+    "federalReserve": "Sentralbanken"
+  },
+  "results": "Kuppets betalingsmottakere er: $users",
+  "andXMore": "og $count til..."
+}

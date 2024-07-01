@@ -1,0 +1,21 @@
+{
+  "settings": {
+    "enabled": "Status",
+    "conversionRate": "Konverteringsrate 1 XP for x Poeng",
+    "firstLevelStartsAt": "Første nivå starter på XP",
+    "nextLevelFormula": {
+      "title": "Neste nivå beregningsformel",
+      "help": "Tilgjengelige variabler: $prevLevel, $prevLevelXP"
+    },
+    "levelShowcaseHelp": "Nivåeksempler vil bli oppdatert ved lagring",
+    "xpName": "Navn",
+    "interval": "Minuttintervall for å legge til xp til påloggede brukere når streamen er online",
+    "offlineInterval": "Minuttintervall for å legge til xp til påloggede brukere når streamen er offline",
+    "messageInterval": "Hvor mange meldinger for å legge til xp",
+    "messageOfflineInterval": "Hvor mange meldinger for å legge til xp når streamen er offline",
+    "perInterval": "Hvor mye xp å legge til per online intervall",
+    "perOfflineInterval": "Hvor mye xp å legge til per offline intervall",
+    "perMessageInterval": "Hvor mye xp å legge til per meldingsintervall",
+    "perMessageOfflineInterval": "Hvor mye xp å legge til per meldingsintervall offline"
+  }
+}

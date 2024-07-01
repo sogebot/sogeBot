@@ -1,0 +1,13 @@
+{
+  "settings": {
+    "responsiveVoiceKeyNotSet": "Du har ikke satt <a href='#/settings/integrations/responsivevoice'>ResponsiveVoice nøkkel</a> ordentlig",
+    "voice": {
+      "title": "Stemme",
+      "help": "Hvis stemmer ikke laster som de skal etter ResponsiveVoice oppdatering, prøv å last nettsiden på nytt"
+    },
+    "volume": "Volum",
+    "rate": "Rate",
+    "pitch": "Tonehøyde",
+    "triggerTTSByHighlightedMessage": "Tekst til Tale vil utløses av uthevet melding"
+  }
+}

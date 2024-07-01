@@ -1,0 +1,8 @@
+{
+  "announce": "Denne chatten ble satt til $mode av $username for å bli kvitt hat-raid. Beklager for ulempen!",
+  "mode": {
+    "0": "kun abonnenter",
+    "1": "kun følgere",
+    "2": "kun emotes"
+  }
+}

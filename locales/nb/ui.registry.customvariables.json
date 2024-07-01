@@ -1,0 +1,79 @@
+{
+  "urls": "URLer",
+  "generateurl": "Generer ny URL",
+  "show-examples": "vis CURL eksempler",
+  "response": {
+    "show": "Vis respons etter POST",
+    "name": "Response after variable set",
+    "default": "Standard",
+    "default-placeholder": "Angi din bot respons",
+    "default-help": "Bruk $value for å få ny variabelverdi",
+    "custom": "Egendefinert",
+    "command": "Kommando"
+  },
+  "useIfInCommand": "Bruk hvis du bruker variabel i kommando. Vil returnere kun oppdatert variabel uten respons.",
+  "permissionToChange": "Tilgang til å endre",
+  "isReadOnly": "skrivebeskyttet i chatten",
+  "isNotReadOnly": "kan endres gjennom chatten",
+  "no-variables-found": "Ingen variabler funnet",
+  "additional-info": "Tilleggsinformasjon",
+  "run-script": "Kjør skript",
+  "last-run": "Sist kjørt",
+  "variable": {
+    "name": "Variabelnavn",
+    "help": "Variabelnavn må være unik, eks. $_wins, $_loses, $_top3",
+    "placeholder": "Fyll inn ditt unike variabelnavn",
+    "error": {
+      "isNotUnique": "Variabelen må ha et unikt navn.",
+      "isEmpty": "Variabelnavn kan ikke være tomt."
+    }
+  },
+  "description": {
+    "name": "Beskrivelse",
+    "help": "Valgfri beskrivelse",
+    "placeholder": "Fyll inn din valgfrie beskrivelse"
+  },
+  "type": {
+    "name": "Type",
+    "error": {
+      "isNotSelected": "Vennligst velg variabeltype."
+    }
+  },
+  "currentValue": {
+    "name": "Gjeldende verdi",
+    "help": "Hvis type er satt til <strong>Evaluert skript</strong>, så kan ikke verdien manuelt endres"
+  },
+  "usableOptions": {
+    "name": "Brukbare alternativer",
+    "placeholder": "Fyll, inn, dine, alternativer, her",
+    "help": "Alternativer, som kan brukes med denne variabelen, eksempel: <strong>SOLO, DUO, TRIO, SQUAD</strong>",
+    "error": {
+      "atLeastOneValue": "Du må angi minst 1 verdi."
+    }
+  },
+  "scriptToEvaluate": "Skript å evaluere",
+  "runScript": {
+    "name": "Kjør skript",
+    "error": {
+      "isNotSelected": "Vennligst velg et alternativ."
+    }
+  },
+  "testCurrentScript": {
+    "name": "Test gjeldende skript",
+    "help": "Trykk på <strong>Test gjeldende skript</strong> for å se verdi i <strong>Gjeldende verdi</strong> input"
+  },
+  "history": "Historikk",
+  "historyIsEmpty": "Historikk for denne variabelen er tom!",
+  "warning": "<strong>Advarsel:</strong> All data for denne verdien vil bli forkastet!",
+  "choose": "Velg...",
+  "types": {
+    "number": "Tall",
+    "text": "Tekst",
+    "options": "Alternativer",
+    "eval": "Skript"
+  },
+  "runEvery": {
+    "isUsed": "Når variabel brukes"
+  }
+}
+

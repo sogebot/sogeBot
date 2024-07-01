@@ -1,0 +1,8 @@
+{
+  "settings": {
+    "token": {
+      "title": "Token",
+      "help": "Få din token på https://donatello.to/panel/doc-api"
+    }
+  }
+}

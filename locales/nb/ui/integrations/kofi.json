@@ -1,0 +1,16 @@
+{
+  "settings": {
+    "verification_token": {
+      "title": "Bekreftelseskode",
+      "help": "Få din bekreftelseskode på <a href='https://ko-fi.com/manage/webhooks' target='_blank'>https://ko-fi.com/manage/webhooks</a>"
+    },
+    "webhook_url": {
+      "title": "Webhook URL",
+      "help": "Sett Webhook URL på <a href='https://ko-fi.com/manage/webhooks' target='_blank'>https://ko-fi.com/manage/webhooks</a>",
+      "errors": {
+        "https": "URL må ha HTTPS",
+        "origin": "Du kan ikke bruke localhost for webhooks"
+      }
+    }
+  }
+}

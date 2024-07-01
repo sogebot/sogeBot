@@ -1,0 +1,10 @@
+{
+  "notify-as-whisper": "Varsle som hvisking",
+  "settings": {
+    "enabled": "Status",
+    "cooldownNotifyAsWhisper": "Hvisking ventetid informasjon",
+    "cooldownNotifyAsChat": "Chat-melding ventetid informasjon",
+    "defaultCooldownOfCommandsInSeconds": "Standard ventetid for kommandoer (i sekunder)",
+    "defaultCooldownOfKeywordsInSeconds": "Standard ventetid for nøkkelord (i sekunder)"
+  }
+}

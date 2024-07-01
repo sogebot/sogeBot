@@ -1,0 +1,24 @@
+{
+  "options": "alternativer",
+  "popover": {
+    "are_you_sure_you_want_to_delete_this_image": "Er du sikker på at du vil <strong class='text-danger'>slette</strong> dette bildet?"
+  },
+  "button": {
+    "update": "Oppdater",
+    "fix_your_errors_first": "Fiks feil før lagring"
+  },
+  "errors": {
+    "number_greater_or_equal_than_0": "Verdi må være et tall >= 0",
+    "value_must_not_be_empty": "Verdi kan ikke være tom"
+  },
+  "titles": {
+    "waitBefore": "Vent før bildet vises (i ms)",
+    "waitAfter": "Vent etter bildet forsvinner (i ms)",
+    "duration": "Hvor lenge skal bildet vises (i ms)",
+    "animationIn": "Animasjon Inn",
+    "animationOut": "Animasjon Ut",
+    "animationInDuration": "Animasjon Inn varighet (i ms)",
+    "animationOutDuration": "Animasjon Ut varighet (i ms)",
+    "showOnlyOncePerStream": "Vis kun én gang per stream"
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "settings": {
+    "enabled": "Status",
+    "cListsEnabled": "Håndhev regelen",
+    "cLinksEnabled": "Håndhev regelen",
+    "cSymbolsEnabled": "Håndhev regelen",
+    "cLongMessageEnabled": "Håndhev regelen",
+    "cCapsEnabled": "Håndhev regelen",
+    "cSpamEnabled": "Håndhev regelen",
+    "cColorEnabled": "Håndhev regelen",
+    "cEmotesEnabled": "Håndhev regelen",
+    "cListsWhitelist": {
+      "title": "Tillatte ord",
+      "help": "For å tillate domener bruk \"domain:prtzl.io\""
+    },
+    "autobanMessages": "Autoban Meldinger",
+    "cListsBlacklist": "Forbudte ord",
+    "cListsTimeout": "Midlertidig utestenging varighet",
+    "cLinksTimeout": "Midlertidig utestenging varighet",
+    "cSymbolsTimeout": "Midlertidig utestenging varighet",
+    "cLongMessageTimeout": "Midlertidig utestenging varighet",
+    "cCapsTimeout": "Midlertidig utestenging varighet",
+    "cSpamTimeout": "Midlertidig utestenging varighet",
+    "cColorTimeout": "Midlertidig utestenging varighet",
+    "cEmotesTimeout": "Midlertidig utestenging varighet",
+    "cWarningsShouldClearChat": "Bør tømme chatten (vil gi 1s midlertidig utestenging)",
+    "cLinksIncludeSpaces": "Inkluder mellomrom",
+    "cLinksIncludeClips": "Inkluder klipp",
+    "cSymbolsTriggerLength": "Utløs lengde på melding",
+    "cLongMessageTriggerLength": "Utløs lengde på melding",
+    "cCapsTriggerLength": "Utløs lengde på melding",
+    "cSpamTriggerLength": "Utløs lengde på melding",
+    "cSymbolsMaxSymbolsConsecutively": "Maksimalt antall påfølgende symboler",
+    "cSymbolsMaxSymbolsPercent": "Maks symboler %",
+    "cCapsMaxCapsPercent": "Maks store bokstaver %",
+    "cSpamMaxLength": "Maks lengde",
+    "cEmotesMaxCount": "Maks antall",
+    "cWarningsAnnounceTimeouts": "Kunngjør midlertidige utestenginger i chatten for alle",
+    "cWarningsAllowedCount": "Antall advarsler",
+    "cEmotesEmojisAreEmotes": "Behandle Emojier som Emoter"
+  }
+}

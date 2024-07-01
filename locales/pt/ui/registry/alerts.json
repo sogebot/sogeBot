@@ -114,7 +114,7 @@
   "messageTemplate": {
     "name": "Modelo de mensagem",
     "placeholder": "Defina o seu modelo de mensagem",
-    "help": "Variáveis disponíveis: {name}, {amount} (cheers, subs, dicas, sub-presetnes, subs-presente da comunidade, resgate de comandos), {recipient} (subs-presente, resgate de comandos), {monthsName} (subs, subs-presente), {currency} (doações), {game} (promo). Se | adicionado (veja a promo) então mostrará esses valores em sequência."
+    "help": "Available variables: {name}, {amount} (cheers, subs, tips, subgifts, sub community gifts, command redeems), {recipient} (subgifts, command redeems), {monthsName} (subs, subgifts), {tier} (subs), {currency} (tips), {game} (promo). If | is added (see promo) then it will show those values in sequence."
   },
   "ttsTemplate": {
     "name": "Modelos TTS",

@@ -1,0 +1,7 @@
+{
+  "settings": {
+    "cClipsCustomPeriodInDays": "Tidsintervall (dager)",
+    "cClipsNumOfClips": "Antall klipp",
+    "cClipsTimeToNextClip": "Tid til neste klipp"
+  }
+}

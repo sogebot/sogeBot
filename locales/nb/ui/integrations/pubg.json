@@ -1,0 +1,24 @@
+{
+  "settings": {
+    "enabled": "Status",
+    "apiKey": {
+      "title": "API nøkkel",
+      "help": "Få din API Nøkkel på https://developer.pubg.com/"
+    },
+    "platform": "Plattform",
+    "playerName": "Spillernavn",
+    "playerId": "SpillerID",
+    "seasonId": {
+      "title": "SesongID",
+      "help": "Nåværende sesongID hentes hver time."
+    },
+    "rankedGameModeStatsCustomization": "Tilpasset melding for rangert statistikk",
+    "gameModeStatsCustomization": "Tilpasset melding for normal statistikk"
+  },
+  "click_to_fetch": "Trykk for å hente",
+  "something_went_wrong": "Noe gikk galt!",
+  "ok": "OK!",
+  "stats_are_automatically_refreshed_every_10_minutes": "Statistikk blir automatisk oppdatert hvert 10. minutt.",
+  "player_stats_ranked": "Spillerstatistikk (rangert)",
+  "player_stats": "Spillerstatistikk"
+}

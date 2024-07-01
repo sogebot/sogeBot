@@ -1,0 +1,11 @@
+{
+  "settings": {
+    "enabled": "Status",
+    "timeout": {
+      "title": "Tidsavbrudd varighet",
+      "help": "Sekunder"
+    },
+    "winnerWillGet": "Hvor mange poeng vil bli lagt til ved seier",
+    "loserWillLose": "Hvor mange poeng mistes ved tap"
+  }
+}

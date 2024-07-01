@@ -1,0 +1,8 @@
+{
+  "settings": {
+    "enabled": "Status",
+    "eligibilityAll": "Alle",
+    "eligibilityFollowers": "Følgere",
+    "eligibilitySubscribers": "Abonnenter"
+  }
+}

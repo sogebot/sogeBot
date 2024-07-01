@@ -1,0 +1,9 @@
+{
+  "settings": {
+    "enabled": "Status",
+    "apiKey": {
+      "title": "API nøkkel",
+      "help": "Få socket token fra TipeeeStream dashboard -> API -> Din API Nøkkel"
+    }
+  }
+}

@@ -1,0 +1,5 @@
+{
+  "error": "$sender, $game ikke funnet i db.",
+  "game": "$sender, $game | Tid tilbragt i spillet: $timeSpenth | Hoveddel: $currentMain/$hltbMainh - $percentMain% | Hoveddel+Ekstra: $currentMainExtra/$hltbMainExtrah - $percentMainExtra% | Fullføringsentusiast: $currentCompletionist/$hltbCompletionisth - $percentCompletionist%",
+  "multiplayer-game": "$sender, $game | Hoveddel: $currentMainh | Hoveddel+Ekstra: $currentMainExtrah | Fullføringsentusiast: $currentCompletionisth"
+}

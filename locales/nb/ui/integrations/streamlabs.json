@@ -1,0 +1,14 @@
+{
+  "settings": {
+    "enabled": "Status",
+    "socketToken": {
+      "title": "Hemmelig token",
+      "help": "Få socket token fra Streamlabs dashboard API innstillinger->API tokens->Din Hemmelige API Token"
+    },
+    "accessToken": {
+      "title": "Adgangstoken",
+      "help": "Få din adgangstoken på https://www.sogebot.xyz/integrations/#StreamLabs"
+    },
+    "accessTokenBtn": "Streamlabs adgangstokengenerator"
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "settings": {
+    "lang": "Bot språk",
+    "numberFormat": "Formatet til tall i chatten",
+    "gracefulExitEachXHours": {
+      "title": "Grasiøs avslutning hver X timer",
+      "help": "0 - deaktivert"
+    },
+    "shouldGracefulExitHelp": "Aktivering av grasiøs avslutning er <strong>anbefalt</strong> hvis boten din kjører uendelig på serveren. Du bør ha boten kjørende på pm2 (eller liknende tjeneste) eller få den dockerisert for å sikre automatisk omstart av boten. Bot <strong>vil ikke</strong> grasiøst avslutte når stream er online."
+  }
+}

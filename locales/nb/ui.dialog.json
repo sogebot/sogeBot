@@ -1,0 +1,70 @@
+{
+  "title": {
+    "edit": "Rediger",
+    "add": "Legg til"
+  },
+  "position": {
+    "settings": "Plasseringsinnstillinger",
+    "anchorX": "Anker X-posisjon",
+    "anchorY": "Anker Y-posisjon",
+    "left": "Venstre",
+    "right": "Høyre",
+    "middle": "Midt på",
+    "top": "Øverst",
+    "bottom": "Nederst",
+    "x": "X",
+    "y": "Y"
+  },
+  "font": {
+    "shadowShiftRight": "Forskyv mot Høyre",
+    "shadowShiftDown": "Forskyv Ned",
+    "shadowBlur": "Uklarhet",
+    "shadowOpacity": "Gjennomsiktighet",
+    "color": "Farge"
+  },
+  "errors": {
+    "required": "Inndata kan ikke være tomt.",
+    "minValue": "Laveste verdi for dette alternativet er $value."
+  },
+  "buttons": {
+    "reorder": "Endre rekkefølgen",
+    "upload": {
+      "idle": "Last opp",
+      "progress": "Laster opp",
+      "done": "Opplastet"
+    },
+    "cancel": "Avbryt",
+    "close": "Lukk",
+    "test": {
+      "idle": "Test",
+      "progress": "Testing pågår",
+      "done": "Testing utført"
+    },
+    "saveChanges": {
+      "idle": "Lagre endringer",
+      "invalid": "Kan ikke lagre endringer",
+      "progress": "Lagrer endringer",
+      "done": "Endringer lagret"
+    },
+    "something-went-wrong": "Noe gikk galt",
+    "mark-to-delete": "Merk for sletting",
+    "disable": "Deaktiver",
+    "enable": "Aktiver",
+    "disabled": "Deaktivert",
+    "enabled": "Aktivert",
+    "edit": "Rediger",
+    "delete": "Slett",
+    "play": "Spill av",
+    "stop": "Stopp",
+    "hold-to-delete": "Hold for å slette",
+    "yes": "Ja",
+    "no": "Nei",
+    "permission": "Tilgang",
+    "group": "Gruppe",
+    "visibility": "Synlighet",
+    "reset": "Tilbakestill "
+  },
+  "changesPending": "Endringene ble ikke lagret.",
+  "formNotValid": "Skjemaet er ugyldig.",
+  "nothingToShow": "Ingenting å vise her."
+}

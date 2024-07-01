@@ -1,0 +1,9 @@
+{
+  "settings": {
+    "enabled": "Status",
+    "consumerKey": "Forbrukernøkkel (API Nøkkel)",
+    "consumerSecret": "Forbrukerhemmelighet (API Hemmelighet)",
+    "accessToken": "Adgangstoken",
+    "secretToken": "Adgangstoken Hemmelighet"
+  }
+}

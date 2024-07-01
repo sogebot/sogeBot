@@ -3,7 +3,7 @@
     "enabled": "Stato",
     "socketToken": {
       "title": "Token del socket",
-      "help": "Ottieni il token del socket dalle impostazioni delle API dela dashboard streamlabs->tokens->Il tuo token API Socket"
+      "help": "Get socket token from Streamlabs dashboard API settings->API tokens->Your Socket API Token"
     },
     "accessToken": {
       "title": "Token di accesso",
