@@ -63,8 +63,9 @@ const initEndpoints = (socket: Socket, privileges: Unpacked<ReturnType<typeof ge
     if (endpoints.length > 0) {
       socket.on(on, async (opts: any, cb: (error: Error | string | null, ...response: any) => void) => {
         for (const scopedEndpoint of scopedEndpoints) {
-          if (scopedEndpoint.scopes.some(scope => privileges.scopes.includes(scope))) {
+          if (scopedEndpoint.scopes.length === 0 || scopedEndpoint.scopes.some(scope => privileges.scopes.includes(scope))) {
             scopedEndpoint.callback(opts, cb ?? socket, socket);
+            return;
           }
         }
         cb && cb('User doesn\'t have access to this endpoint', null);
