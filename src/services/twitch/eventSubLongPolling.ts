@@ -243,18 +243,23 @@ class EventSubLongPolling {
   }
 
   onChannelBan(event: EventSubChannelBanEventData) {
+    const userDisplayName = event.user_name;
     const userName = event.user_login;
     const userId = event.user_id;
-    const createdBy = event.moderator_user_login;
-    const createdById = event.moderator_user_id;
+    const moderatorName = event.moderator_user_login;
+    const moderatorDisplayName = event.moderator_user_name;
+    const moderatorId = event.moderator_user_id;
     const reason = event.reason;
     const ends_at = event.ends_at ? dayjs(event.ends_at) : null;
+    eventEmitter.emit(Types.onChannelBan, {
+      userName, userDisplayName, userId, moderatorName, moderatorId, moderatorDisplayName, reason, ends_at: ends_at ? ends_at.toISOString() : null,
+    });
     if (ends_at) {
       const duration = dayjs.duration(ends_at.diff(dayjs(event.banned_at)));
-      timeout(`${ userName }#${ userId } by ${ createdBy }#${ createdById } for ${ duration.asSeconds() } seconds`);
+      timeout(`${ userName }#${ userId } by ${ moderatorName }#${ moderatorId } for ${ duration.asSeconds() } seconds`);
       eventEmitter.emit('timeout', { userName, duration: duration.asSeconds() });
     } else {
-      ban(`${ userName }#${ userId } by ${ createdBy }: ${ reason ? reason : '<no reason>' }`);
+      ban(`${ userName }#${ userId } by ${ moderatorName }: ${ reason ? reason : '<no reason>' }`);
       eventEmitter.emit('ban', { userName, reason: reason ? reason : '<no reason>' });
     }
   }

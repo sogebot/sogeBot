@@ -261,6 +261,16 @@ export interface Events {
     requesterId:            string,
     requesterName:          string,
   }) => void;
+  [Types.onChannelBan]: (opts: {
+    moderatorName: string;
+    moderatorId: string;
+    moderatorDisplayName: string;
+    userId: string;
+    userName: string;
+    userDisplayName: string;
+    reason: string;
+    ends_at: string | null;
+  }) => void;
   [Types.onOBSWebsocketEvent]: (opts: {
     event: string,
     args: any,

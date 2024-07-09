@@ -606,18 +606,23 @@ class EventSubWebsocket {
         if (isAlreadyProcessed(event[rawDataSymbol])) {
           return;
         }
+        const userDisplayName = event.userDisplayName;
         const userName = event.userName;
         const userId = event.userId;
-        const createdBy = event.moderatorName;
-        const createdById = event.moderatorId;
+        const moderatorDisplayName = event.moderatorDisplayName;
+        const moderatorName = event.moderatorName;
+        const moderatorId = event.moderatorId;
         const reason = event.reason;
         const ends_at = event.endDate ? dayjs(event.endDate) : null;
+        eventEmitter.emit(Types.onChannelBan, {
+          userName, userDisplayName, userId, moderatorName, moderatorId, moderatorDisplayName, reason, ends_at: ends_at ? ends_at.toISOString() : null,
+        });
         if (ends_at) {
           const duration = dayjs.duration(ends_at.diff(dayjs(event.startDate)));
-          timeout(`${ userName }#${ userId } by ${ createdBy }#${ createdById } for ${ duration.asSeconds() } seconds`);
+          timeout(`${ userName }#${ userId } by ${ moderatorName }#${ moderatorId } for ${ duration.asSeconds() } seconds`);
           eventEmitter.emit('timeout', { userName, duration: duration.asSeconds() });
         } else {
-          ban(`${ userName }#${ userId } by ${ createdBy }: ${ reason ? reason : '<no reason>' }`);
+          ban(`${ userName }#${ userId } by ${ moderatorName }: ${ reason ? reason : '<no reason>' }`);
           eventEmitter.emit('ban', { userName, reason: reason ? reason : '<no reason>' });
         }
       });

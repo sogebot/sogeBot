@@ -48,6 +48,7 @@ export enum Types {
   'onChannelHypeTrainBegin',
   'onChannelHypeTrainProgress',
   'onChannelHypeTrainEnd',
+  'onChannelBan',
   'onDiscordMessage'
 }
 
@@ -88,6 +89,11 @@ export const ListenToGenerator = (pluginId: string, type: Types, message: string
     },
   },
   Twitch: {
+    onChannelBan: (callback: any) => {
+      if (type === Types.onChannelBan) {
+        params && callback(params as Parameters<Events[Types.onChannelBan]>[0]);
+      }
+    },
     onChannelHypeTrainBegin: (callback: any) => {
       if (type === Types.onChannelHypeTrainBegin) {
         callback();

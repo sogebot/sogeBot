@@ -105,6 +105,10 @@ class Plugins extends Core {
       this.process(Types.CustomVariableOnChange, undefined, undefined, { variableName, cur, prev });
     });
 
+    eventEmitter.on(Types.onChannelBan, async (args) => {
+      this.process(Types.onChannelBan, undefined, undefined, args);
+    });
+
     eventEmitter.on('clearchat', async () => {
       this.process(Types.TwitchClearChat);
     });
