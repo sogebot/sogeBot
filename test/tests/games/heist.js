@@ -179,7 +179,7 @@ describe('Heist - !bankheist - @func2', () => {
     it('Heist should be finished - result message', async () => {
       await message.isSentRaw([
         'Everyone was mercilessly obliterated. This is slaughter.',
-        'Only 1/3rd of team get its money from heist.',
+        'Only 1/3 of the team get their money from the heist.',
         'Half of heist team was killed or catched by police.',
         'Some loses of heist team is nothing of what remaining crew have in theirs pockets.',
         'God divinity, nobody is dead, everyone won!',
