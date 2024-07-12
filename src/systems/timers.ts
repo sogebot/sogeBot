@@ -2,6 +2,7 @@ import {
   Timer, TimerResponse,
 } from '@entity/timer.js';
 import { Mutex } from 'async-mutex';
+import { Request } from 'express';
 import * as _ from 'lodash-es';
 import { merge, sortBy } from 'lodash-es';
 
@@ -9,15 +10,14 @@ import System from './_interface.js';
 import { command, default_permission } from '../decorators.js';
 import { Expects } from  '../expects.js';
 
+import { Delete, Get, Post } from '~/decorators/endpoint.js';
 import { onStartup } from '~/decorators/on.js';
 import { isStreamOnline } from '~/helpers/api/index.js';
 import { announce } from '~/helpers/commons/index.js';
 import { isDbConnected } from '~/helpers/database.js';
-import { app } from '~/helpers/panel.js';
 import { linesParsed } from '~/helpers/parser.js';
 import defaultPermissions from '~/helpers/permissions/defaultPermissions.js';
 import { translate } from '~/translate.js';
-import { withScope } from '~/helpers/socket.js';
 
 /*
  * !timers                                                                                                                                 - gets an info about timers usage
@@ -33,43 +33,34 @@ import { withScope } from '~/helpers/socket.js';
 const mutex = new Mutex();
 
 class Timers extends System {
-  sockets() {
-    if (!app) {
-      setTimeout(() => this.sockets(), 100);
-      return;
+
+  @Get('/')
+  async get() {
+    return Timer.find({ relations: ['messages'] });
+  }
+  @Get('/:id')
+  async getOne(req: Request) {
+    return Timer.findOne({ where: { id: req.params.id }, relations: ['messages'] });
+  }
+  @Delete('/:id')
+  async deleteOne(req: Request) {
+    const it = await Timer.findOneBy({ id: req.params.id });
+    if (it) {
+      await it.remove();
     }
-
-    app.get('/api/systems/timer', withScope(['timers:read']), async (req, res) => {
-      res.send({
-        data: await Timer.find({ relations: ['messages'] }),
-      });
-    });
-    app.get('/api/systems/timer/:id', withScope(['timers:read']), async (req, res) => {
-      res.send({
-        data: await Timer.findOne({ where: { id: req.params.id }, relations: ['messages'] }),
-      });
-    });
-    app.delete('/api/systems/timer/:id', withScope(['timers:manage']), async (req, res) => {
-      await Timer.delete({ id: req.params.id });
-      res.status(404).send();
-    });
-    app.post('/api/systems/timer', withScope(['timers:manage']), async (req, res) => {
-      try {
-        const itemToSave = await Timer.create(req.body).save();
-        await TimerResponse.delete({ timer: { id: itemToSave.id } });
-        const responses = req.body.messages;
-        for (const response of responses) {
-          const resToSave = new TimerResponse();
-          merge(resToSave, response);
-          resToSave.timer = itemToSave;
-          await resToSave.save();
-        }
-
-        res.send({ data: itemToSave });
-      } catch (e) {
-        res.status(400).send({ errors: e });
-      }
-    });
+  }
+  @Post('/')
+  async save(req: Request) {
+    const itemToSave = await Timer.create(req.body).save();
+    await TimerResponse.delete({ timer: { id: itemToSave.id } });
+    const responses = req.body.messages;
+    for (const response of responses) {
+      const resToSave = new TimerResponse();
+      merge(resToSave, response);
+      resToSave.timer = itemToSave;
+      await resToSave.save();
+    }
+    return itemToSave;
   }
 
   @command('!timers')
