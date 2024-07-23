@@ -71,7 +71,7 @@ class OBSWebsocket extends Integration {
   @onStartup()
   initialize() {
     this.addMenu({
-      category: 'registry', name: 'obswebsocket', id: 'registry/obswebsocket', this: null,
+      category: 'registry', name: 'obswebsocket', id: 'registry/obswebsocket', this: null, scopeParent: this.scope(),
     });
   }
 

@@ -13,7 +13,7 @@ class Randomizer extends Registry {
   constructor() {
     super();
     this.addMenu({
-      category: 'registry', name: 'randomizer', id: 'registry/randomizer/', this: null,
+      category: 'registry', name: 'randomizer', id: 'registry/randomizer/', this: null, scopeParent: this.scope(),
     });
   }
 

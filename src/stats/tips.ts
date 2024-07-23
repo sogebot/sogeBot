@@ -11,7 +11,7 @@ class Tips extends Stats {
   constructor() {
     super();
     this.addMenu({
-      category: 'stats', name: 'tips', id: 'stats/tips', this: null,
+      category: 'stats', name: 'tips', id: 'stats/tips', this: null, scopeParent: this.scope(),
     });
   }
 

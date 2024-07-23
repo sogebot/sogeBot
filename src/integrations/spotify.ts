@@ -99,7 +99,7 @@ class Spotify extends Integration {
   @onStartup()
   onStartup() {
     this.addMenu({
-      category: 'manage', name: 'spotifybannedsongs', id: 'manage/spotify/bannedsongs', this: this,
+      category: 'manage', name: 'spotifybannedsongs', id: 'manage/spotify/bannedsongs', this: this, scopeParent: this.scope(),
     });
 
     setInterval(() => this.IRefreshToken(), HOUR);

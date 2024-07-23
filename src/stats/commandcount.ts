@@ -9,7 +9,7 @@ class CommandCount extends Stats {
   constructor() {
     super();
     this.addMenu({
-      category: 'stats', name: 'commandcount', id: 'stats/commandcount', this: null,
+      category: 'stats', name: 'commandcount', id: 'stats/commandcount', this: null, scopeParent: this.scope(),
     });
   }
 

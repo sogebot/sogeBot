@@ -59,7 +59,7 @@ class Overlays extends Registry {
   constructor() {
     super();
     this.addMenu({
-      category: 'registry', name: 'overlays', id: 'registry/overlays', this: null,
+      category: 'registry', name: 'overlays', id: 'registry/overlays', this: null, scopeParent: this.scope(),
     });
   }
 

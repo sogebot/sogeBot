@@ -16,7 +16,7 @@ class Plugins extends Core {
   @onStartup()
   onStartup() {
     this.addMenu({
-      category: 'registry', name: 'plugins', id: 'registry/plugins', this: null,
+      category: 'registry', name: 'plugins', id: 'registry/plugins', this: null, scopeParent: this.scope(),
     });
 
     this.updateCache().then(() => {

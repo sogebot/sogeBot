@@ -32,7 +32,7 @@ class Users extends Core {
   constructor () {
     super();
     this.addMenu({
-      category: 'manage', name: 'viewers', id: 'manage/viewers', this: null,
+      category: 'manage', name: 'viewers', id: 'manage/viewers', this: null, scopeParent: this.scope(),
     });
   }
 

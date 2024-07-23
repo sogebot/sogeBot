@@ -11,7 +11,7 @@ class Bits extends Stats {
   constructor() {
     super();
     this.addMenu({
-      category: 'stats', name: 'bits', id: 'stats/bits', this: null,
+      category: 'stats', name: 'bits', id: 'stats/bits', this: null, scopeParent: this.scope(),
     });
   }
 
