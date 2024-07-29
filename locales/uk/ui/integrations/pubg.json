@@ -10,7 +10,7 @@
     "playerId": "ID Гравця",
     "seasonId": {
       "title": "Ідентифікатор сезону",
-      "help": "Current season ID is being fetch every hour."
+      "help": "Current season ID is being fetched every hour."
     },
     "rankedGameModeStatsCustomization": "Customized message for ranked stats",
     "gameModeStatsCustomization": "Customized message for normal stats"

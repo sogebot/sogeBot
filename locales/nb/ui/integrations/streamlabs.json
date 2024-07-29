@@ -7,7 +7,7 @@
     },
     "accessToken": {
       "title": "Adgangstoken",
-      "help": "Få din adgangstoken på https://www.sogebot.xyz/integrations/#StreamLabs"
+      "help": "Få din adgangstoken på https://www.sogebot.xyz/integrations/#Streamlabs"
     },
     "accessTokenBtn": "Streamlabs adgangstokengenerator"
   }

@@ -32,7 +32,7 @@
 
 ***
 
-**Question:** Bot on docker have issues with connection to twitch or streamlabs (Error: getaddrinfo EAI_AGAIN)?
+**Question:** Bot on docker have issues with connection to twitch or Streamlabs (Error: getaddrinfo EAI_AGAIN)?
 
 **Answer:** Check https://development.robinwinslow.uk/2016/06/23/fix-docker-networking-dns/ for steps to fix your issue
 

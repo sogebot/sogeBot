@@ -7,8 +7,8 @@
     },
     "accessToken": {
       "title": "Access token",
-      "help": "Отримати свій токен доступу за адресою https://www.sogebot.xyz/integrations/#StreamLabs"
+      "help": "Отримати свій токен доступу за адресою https://www.sogebot.xyz/integrations/#Streamlabs"
     },
-    "accessTokenBtn": "Генератор токена доступу StreamLabs"
+    "accessTokenBtn": "Генератор токена доступу Streamlabs"
   }
 }

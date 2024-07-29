@@ -18,7 +18,7 @@
     },
     "allowOverTicketing": {
       "title": "Allow over ticketing",
-      "help": "Allow user join raffle with over ticket of his points. E.g. user have 10 points but can join with !raffle 100 which will use all of his points."
+      "help": "Allow user to join raffle by over ticketing their points. E.g. user has 10 points but can write !raffle 100 which will use all of their points."
     },
     "raffleAnnounceInterval": {
       "title": "Announce interval",

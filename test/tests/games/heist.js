@@ -180,8 +180,8 @@ describe('Heist - !bankheist - @func2', () => {
       await message.isSentRaw([
         'Everyone was mercilessly obliterated. This is slaughter.',
         'Only 1/3 of the team get their money from the heist.',
-        'Half of heist team was killed or catched by police.',
-        'Some loses of heist team is nothing of what remaining crew have in theirs pockets.',
+        'Half of heist team was killed or caught by police.',
+        'Some loss of heist team is nothing compared to remaining crew have in their pockets.',
         'God divinity, nobody is dead, everyone won!',
       ], { userName: '__bot__' });
     });

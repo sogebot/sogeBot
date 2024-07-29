@@ -7,8 +7,8 @@
     },
     "accessToken": {
       "title": "Access token",
-      "help": "Get your access token at https://www.sogebot.xyz/integrations/#StreamLabs"
+      "help": "Get your access token at https://www.sogebot.xyz/integrations/#Streamlabs"
     },
-    "accessTokenBtn": "StreamLabs access token generator"
+    "accessTokenBtn": "Streamlabs access token generator"
   }
 }

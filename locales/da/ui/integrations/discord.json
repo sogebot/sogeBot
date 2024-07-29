@@ -6,7 +6,7 @@
     "sendOnlineAnnounceToChannel": "Send online announcement to this channel",
     "onlineAnnounceMessage": "Message in online announcement (can include mentions)",
     "sendAnnouncesToChannel": "Setup sending of announcements to channels",
-    "deleteMessagesAfterWhile": "Delete message after while",
+    "deleteMessagesAfterWhile": "Delete message after a while",
     "clientId": "ClientId",
     "token": "Token",
     "joinToServerBtn": "Click to join bot to your server",
