@@ -11,7 +11,7 @@
   "loading": "загрузка",
   "permissionNotFoundInDatabase": "Разрешение не найдено в базе данных, пожалуйста, сохраните перед тестированием пользователя.",
   "userHaveNoAccessToThisPermissionGroup": "Пользователь <strong>$username</strong> НЕ ИМЕЕТ доступ к этому разрешению.",
-  "userHaveAccessToThisPermissionGroup": "Пользователь <strong>$username</strong> ИМЕЕТ доступ к этой группе разрешений.",
+  "userHaveAccessToThisPermissionGroup": "User <strong>$username</strong> HAS access to this permission group.",
   "accessDirectlyThrough": "<strong>Прямой</strong> доступ через",
   "accessThroughHigherPermission": "Доступ через более высокое разрешение",
   "somethingWentWrongUserWasNotFoundInBotDatabase": "Что-то пошло не так, пользователь <strong>$username</strong> не найден в базе данных бота.",

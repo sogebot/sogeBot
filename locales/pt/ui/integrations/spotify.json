@@ -20,7 +20,7 @@
     "clientSecret": "clientSecret",
     "manualDeviceId": {
       "title": "ID do Dispositivo Forçado",
-      "help": "Vazio = desabilitado, forçar o ID do dispositivo Spotify para ser usado na fila de músicas. Verifique os logs para o dispositivo ativo atual ou use o botão ao reproduzir música por pelo menos 10 segundos."
+      "help": "Empty = disabled, force Spotify device ID to be used to queue songs. Check logs for current active device or use button when playing song for at least 10 seconds."
     },
     "redirectURI": "redirectURI",
     "format": {

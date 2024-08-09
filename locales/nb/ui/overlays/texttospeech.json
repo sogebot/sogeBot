@@ -6,7 +6,7 @@
       "help": "Hvis stemmer ikke laster som de skal etter ResponsiveVoice oppdatering, prøv å last nettsiden på nytt"
     },
     "volume": "Volum",
-    "rate": "Rate",
+    "rate": "Tempo",
     "pitch": "Tonehøyde",
     "triggerTTSByHighlightedMessage": "Tekst til Tale vil utløses av uthevet melding"
   }

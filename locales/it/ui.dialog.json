@@ -64,7 +64,7 @@
     "visibility": "Visibilità",
     "reset": "Reset "
   },
-  "changesPending": "Le modifiche non sono state salvate.",
+  "changesPending": "Your changes were not saved.",
   "formNotValid": "Modulo non valido.",
   "nothingToShow": "Niente da mostrare qui."
 }

@@ -11,7 +11,7 @@
   "loading": "carregando",
   "permissionNotFoundInDatabase": "Permissão não foi encontrada no banco de dados. Por favor, salve antes de testar o usuário.",
   "userHaveNoAccessToThisPermissionGroup": "Usuário <strong>$username</strong> NÃO tem acesso a este grupo de permissões.",
-  "userHaveAccessToThisPermissionGroup": "Usuário <strong>$username</strong> TEM acesso a este grupo de permissões.",
+  "userHaveAccessToThisPermissionGroup": "User <strong>$username</strong> HAS access to this permission group.",
   "accessDirectlyThrough": "<strong>Acesso direto</strong> através de",
   "accessThroughHigherPermission": "Acesso através de permissão superior",
   "somethingWentWrongUserWasNotFoundInBotDatabase": "Algo deu errado, o usuário <strong>$username</strong> não foi encontrado no banco de dados do bot.",

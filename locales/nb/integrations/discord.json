@@ -5,9 +5,9 @@
   "this-account-was-linked-with": "$sender, denne kontoen ble linket til $discordTag.",
   "invalid-or-expired-token": "$sender, ugyldig eller utløpt token.",
   "help-message": "$sender, for å koble mot Discord-kontoen din: 1. Gå til Discord serveren og send $command i bot kanal. | 2. Vent på PM fra bot | 3. Send kommando fra din Discord PM her i Twitch chatten.",
-  "started-at": "Started At",
+  "started-at": "Startet Kl.",
   "announced-by": "Kunngjort av sogeBot",
-  "streamed-at": "Streamed At",
+  "streamed-at": "Streamet Kl.",
   "link-whisper": "Hei $tag, for å koble denne Discord kontoen med din Twitch konto i kanalen til $broadcaster, gå til <https://twitch.tv/$broadcaster>, logg inn på din konto og send denne kommandoen i chatten \n\n\t\t`$command $id`\n\nMERK: Denne utløper om 10 minutter.",
-  "check-your-dm": "check your DMs for steps to link your account."
+  "check-your-dm": "du finner stegene for å linke kontoen din i dine PMs."
 }

@@ -10,7 +10,7 @@
     "playerId": "ID do jogador",
     "seasonId": {
       "title": "ID da Temporada",
-      "help": "O ID da temporada atual sendo obtido toda hora."
+      "help": "Current season ID is being fetched every hour."
     },
     "rankedGameModeStatsCustomization": "Mensagem personalizada para estatísticas de colocação",
     "gameModeStatsCustomization": "Mensagem personalizada para estatísticas normais"

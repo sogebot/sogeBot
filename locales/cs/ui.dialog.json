@@ -64,7 +64,7 @@
     "visibility": "Viditelnost",
     "reset": "Reset"
   },
-  "changesPending": "Vaše změny nebyly uloženy.",
+  "changesPending": "Your changes were not saved.",
   "formNotValid": "Opravte chyby ve formuláři.",
   "nothingToShow": "Zde není nic k vidění"
 }

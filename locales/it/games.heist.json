@@ -12,9 +12,9 @@
   "singleUserFailed": "$user non è riuscito a sbarazzarsi della polizia e passerà il suo tempo in prigione.",
   "result": {
     "0": "Tutti sono stati annientati senza pietà. Questo è un massacro.",
-    "33": "Solo 1/3 di squadra ottiene i suoi soldi dalla rapina.",
-    "50": "La metà della squadra di rapina è stata uccisa o catturata dalla polizia.",
-    "99": "Alcune perdire della squadra di rapina non è nulla di ciò che i rimanenti membri hanno nelle loro tasche.",
+    "33": "Only 1/3 of the team get their money from the heist.",
+    "50": "Half of heist team was killed or caught by police.",
+    "99": "Some loss of heist team is nothing compared to remaining crew have in their pockets.",
     "100": "Dio divino, nessuno è morto, tutti hanno vinto!"
   },
   "levels": {
@@ -24,6 +24,6 @@
     "nationalReserve": "Riserva nazionale",
     "federalReserve": "Riserva federale"
   },
-  "results": "Le vincite della rapina sono: $users",
+  "results": "The heist payees are: $users",
   "andXMore": "e $count in più..."
 }

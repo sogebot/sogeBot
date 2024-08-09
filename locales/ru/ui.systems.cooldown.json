@@ -2,8 +2,8 @@
   "notify-as-whisper": "Уведомлять в висперсы",
   "settings": {
     "enabled": "Статус",
-    "cooldownNotifyAsWhisper": "Информация о кулдауне в висперсы",
-    "cooldownNotifyAsChat": "Информация о кулдауне в чат",
+    "cooldownNotifyAsWhisper": "Whisper cooldown information",
+    "cooldownNotifyAsChat": "Chat message cooldown information",
     "defaultCooldownOfCommandsInSeconds": "Default cooldown for commands (in seconds)",
     "defaultCooldownOfKeywordsInSeconds": "Default cooldown for keywords (in seconds)"
   }

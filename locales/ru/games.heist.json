@@ -12,9 +12,9 @@
   "singleUserFailed": "$user не смог избавиться от полиции и попадает в тюрму.",
   "result": {
     "0": "Все были безжалостно уничтожены. Это бойня.",
-    "33": "Только 1/3 от команды получат деньги.",
-    "50": "Половина команды была убита полицийскими.",
-    "99": "Такие небольшие потери команды ничто, по сравнению сколько денег мы срубили.",
+    "33": "Only 1/3 of the team get their money from the heist.",
+    "50": "Half of heist team was killed or caught by police.",
+    "99": "Some loss of heist team is nothing compared to remaining crew have in their pockets.",
     "100": "Никто не умер! Все выжили!"
   },
   "levels": {
@@ -24,6 +24,6 @@
     "nationalReserve": "Национальный резерв",
     "federalReserve": "Федеральный резерв"
   },
-  "results": "Выплаты за ограбление: $users",
+  "results": "The heist payees are: $users",
   "andXMore": "и еще $count..."
 }

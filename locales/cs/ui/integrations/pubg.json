@@ -10,7 +10,7 @@
     "playerId": "ID hráče",
     "seasonId": {
       "title": "ID sezóny",
-      "help": "ID aktuální sezóny se načítá každou hodinu."
+      "help": "Current season ID is being fetched every hour."
     },
     "rankedGameModeStatsCustomization": "Přizpůsobená zpráva pro hodnocené statistiky",
     "gameModeStatsCustomization": "Přizpůsobená zpráva pro normální statistiky"

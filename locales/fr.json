@@ -276,7 +276,7 @@
           "false": "Will not be announced"
         },
         "hasDelay": {
-          "label": "Clip should have slight delay (to be closer what viewer see)",
+          "label": "Clip should have slight delay (to be closer what viewer sees)",
           "true": "Will have delay",
           "false": "Will not have delay"
         },

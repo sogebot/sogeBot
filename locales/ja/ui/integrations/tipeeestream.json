@@ -3,7 +3,7 @@
     "enabled": "Status",
     "apiKey": {
       "title": "Api key",
-      "help": "tipeeestream ダッシュボードからソケットトークンを取得-> API -> API キー"
+      "help": "Get socket token from TipeeeStream dashboard -> API -> Your API Key"
     }
   }
 }

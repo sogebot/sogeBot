@@ -3,7 +3,7 @@
     "lang": "Bot sprog",
     "numberFormat": "Format of numbers in chat",
     "gracefulExitEachXHours": {
-      "title": "Hensynsfuld nedlukning hver X time",
+      "title": "Graceful exit every X hours",
       "help": "0 - deaktiveret"
     },
     "shouldGracefulExitHelp": "Aktivering af hensynsfuld nedlukning anbefales <strong>på det kraftigste</strong> hvis din bot kører konstant på en server. Du skal have din bot til at kører på pm2 (eller lignende service), eller have den som docker for at sikre automatisk genstart. Bot genstarter <strong>IKKE</strong>, hvis stream er online."

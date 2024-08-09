@@ -2,8 +2,8 @@
   "notify-as-whisper": "Antwort über Privat Nachricht",
   "settings": {
     "enabled": "Status",
-    "cooldownNotifyAsWhisper": "Informationen zur Abklingzeit von Whisper-Nachrichten",
-    "cooldownNotifyAsChat": "Informationen zur Abklingzeit von Chat-Nachrichten",
+    "cooldownNotifyAsWhisper": "Whisper cooldown information",
+    "cooldownNotifyAsChat": "Chat message cooldown information",
     "defaultCooldownOfCommandsInSeconds": "Standard-Abklingzeit für Befehle (in Sekunden)",
     "defaultCooldownOfKeywordsInSeconds": "Standard Abklingzeit für Keywords (in Sekunden)"
   }

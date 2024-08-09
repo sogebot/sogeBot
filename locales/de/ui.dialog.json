@@ -64,7 +64,7 @@
     "visibility": "Sichtbarkeit",
     "reset": "Zurücksetzen"
   },
-  "changesPending": "Deine Änderungen wurden nicht gespeichert.",
+  "changesPending": "Your changes were not saved.",
   "formNotValid": "Formular ist ungültig.",
   "nothingToShow": "Hier gibt es nichts zu sehen."
 }

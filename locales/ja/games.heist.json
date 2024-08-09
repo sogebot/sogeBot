@@ -12,9 +12,9 @@
   "singleUserFailed": "$user は警察の排除に失敗し、刑務所で過ごすことになる。",
   "result": {
     "0": "Everyone was mercilessly obliterated. This is slaughter.",
-    "33": "Only 1/3rd of team get its money from heist.",
-    "50": "Half of heist team was killed or catched by police.",
-    "99": "Some loses of heist team is nothing of what remaining crew have in theirs pockets.",
+    "33": "Only 1/3 of the team get their money from the heist.",
+    "50": "Half of heist team was killed or caught by police.",
+    "99": "Some loss of heist team is nothing compared to remaining crew have in their pockets.",
     "100": "God divinity, nobody is dead, everyone won!"
   },
   "levels": {
@@ -24,6 +24,6 @@
     "nationalReserve": "National reserve",
     "federalReserve": "Federal reserve"
   },
-  "results": "強盗の支払い: $users",
+  "results": "The heist payees are: $users",
   "andXMore": "and $count more..."
 }

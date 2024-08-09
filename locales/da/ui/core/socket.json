@@ -1,6 +1,6 @@
 {
   "settings": {
-    "purgeAllConnections": "Ryd Alle Godkendte Forbindelser (også din egen)",
+    "purgeAllConnections": "Purge All Authenticated Connections (yours as well)",
     "accessTokenExpirationTime": "AccessToken udløbstid (sekunder)",
     "refreshTokenExpirationTime": "RefreshToken udløbstid (sekunder)",
     "socketToken": {

@@ -64,7 +64,7 @@
     "visibility": "Видимость",
     "reset": "Сброс "
   },
-  "changesPending": "Ваши изменения не были сохранены.",
+  "changesPending": "Your changes were not saved.",
   "formNotValid": "Форма неверна.",
   "nothingToShow": "Нечего показывать"
 }

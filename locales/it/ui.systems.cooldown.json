@@ -2,8 +2,8 @@
   "notify-as-whisper": "Notifica come sussurro",
   "settings": {
     "enabled": "Stato",
-    "cooldownNotifyAsWhisper": "Sussurra informazioni della ricarica",
-    "cooldownNotifyAsChat": "Messaggio chat su informazioni della ricarica",
+    "cooldownNotifyAsWhisper": "Whisper cooldown information",
+    "cooldownNotifyAsChat": "Chat message cooldown information",
     "defaultCooldownOfCommandsInSeconds": "Ricarica predefinita per i comandi (in secondi)",
     "defaultCooldownOfKeywordsInSeconds": "Ricarica predefinita per le parole chiave (in secondi)"
   }

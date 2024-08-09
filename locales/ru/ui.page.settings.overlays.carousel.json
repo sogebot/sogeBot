@@ -1,8 +1,5 @@
 {
   "options": "параметры",
-  "popover": {
-    "are_you_sure_you_want_to_delete_this_image": "Вы уверены, что хотите <strong class='text-danger'>удалить</strong> изображение?"
-  },
   "button": {
     "update": "Обновить",
     "fix_your_errors_first": "Исправьте ошибки перед сохранением"

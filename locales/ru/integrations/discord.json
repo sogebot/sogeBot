@@ -9,5 +9,5 @@
   "announced-by": "Автоматическое оповещение | sogeBot",
   "streamed-at": "Стрим шёл",
   "link-whisper": "Здравствуйте, $tag, чтобы связать эту учётную запись Discord с Вашей учётной записью в Twitch на канале $broadcaster, перейдите на <https://twitch.tv/$broadcaster>, отправьте эту команду в чат \n\n\t\t`$command $id`\n\nПРИМЕЧАНИЕ: Срок действия токена истечёт через 10 минут.",
-  "check-your-dm": "проверьте свои ЛС для того, чтобы привязать ваш аккаунт."
+  "check-your-dm": "check your PMs for steps to link your account."
 }

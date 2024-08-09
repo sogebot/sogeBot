@@ -2,8 +2,8 @@
   "notify-as-whisper": "Notify as whisper",
   "settings": {
     "enabled": "Status",
-    "cooldownNotifyAsWhisper": "Whisper cooldown informations",
-    "cooldownNotifyAsChat": "Chat message cooldown informations",
+    "cooldownNotifyAsWhisper": "Whisper cooldown information",
+    "cooldownNotifyAsChat": "Chat message cooldown information",
     "defaultCooldownOfCommandsInSeconds": "Default cooldown for commands (in seconds)",
     "defaultCooldownOfKeywordsInSeconds": "Default cooldown for keywords (in seconds)"
   }

@@ -1,6 +1,6 @@
 {
   "settings": {
     "enabled": "Status",
-    "betPercentGain": "Add x% to bet payout each option"
+    "betPercentGain": "Legg til x% til utbetaling hvert alternativ"
   }
 }

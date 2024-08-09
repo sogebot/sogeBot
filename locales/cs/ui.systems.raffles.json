@@ -18,7 +18,7 @@
     },
     "allowOverTicketing": {
       "title": "Povolit vstup do raffle při použití více bodů",
-      "help": "Povolí vstup do raffle při použití více bodů než uživatel má. Např. uživatel má 10 bodů, ale může vstoupit do raffle pomocí !raffle 100, které použije všechny jeho body."
+      "help": "Allow user to join raffle by over ticketing their points. E.g. user has 10 points but can write !raffle 100 which will use all of their points."
     },
     "raffleAnnounceInterval": {
       "title": "Interval oznámení",

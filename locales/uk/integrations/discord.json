@@ -9,5 +9,5 @@
   "announced-by": "Оголошення від sogebot",
   "streamed-at": "Стрімить в",
   "link-whisper": "Вітаємо, $tag, щоб прив'язати цей обліковий запис Discord до вашого облікового запису Twitch на каналі $broadcaster, перейдіть на <https://twitch.tv/$broadcaster>увійдіть у свій обліковий запис і надішліть цю команду у чат \n\n\t\t`$command $id`\n\nПРИМІТКА: Це закінчується через 10 хвилин.",
-  "check-your-dm": "перевірте особисті повідомлення для прив'язки до облікового запису."
+  "check-your-dm": "check your PMs for steps to link your account."
 }

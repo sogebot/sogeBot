@@ -1,6 +1,6 @@
 {
   "settings": {
-    "purgeAllConnections": "Очистити всі автентифіковані підключення (також ваші)",
+    "purgeAllConnections": "Purge All Authenticated Connections (yours as well)",
     "accessTokenExpirationTime": "Час життя AccessToken (секунди)",
     "refreshTokenExpirationTime": "Час життя RefreshToken (секунди)",
     "socketToken": {

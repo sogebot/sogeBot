@@ -1,6 +1,6 @@
 {
   "settings": {
-    "purgeAllConnections": "Zrušit všechna současná připojení (i to tvé)",
+    "purgeAllConnections": "Purge All Authenticated Connections (yours as well)",
     "accessTokenExpirationTime": "Čas expirace access tokenu (ve vteřinách)",
     "refreshTokenExpirationTime": "Čas expirace refresh tokenu (ve vteřinách)",
     "socketToken": {

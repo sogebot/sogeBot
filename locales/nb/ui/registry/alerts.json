@@ -211,7 +211,7 @@
   "keepAlertShown": "Varslinger holder seg synlig under TTS",
   "skipUrls": "Hopp over URLer under TTS",
   "volume": "Volum",
-  "rate": "Rate",
+  "rate": "Tempo",
   "pitch": "Tonehøyde",
   "test": "Test",
   "tts": {

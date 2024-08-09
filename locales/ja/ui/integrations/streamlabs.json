@@ -7,8 +7,8 @@
     },
     "accessToken": {
       "title": "Access token",
-      "help": "アクセストークンは https://www.sogebot.xyz/integrations/#Streamlabs で入手してください"
+      "help": "Get your access token at https://www.sogebot.xyz/integrations/#Streamlabs"
     },
-    "accessTokenBtn": "Streamlabs アクセストークンジェネレーター"
+    "accessTokenBtn": "Streamlabs access token generator"
   }
 }

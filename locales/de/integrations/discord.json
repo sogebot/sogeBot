@@ -9,5 +9,5 @@
   "announced-by": "Benachrichtigung durch",
   "streamed-at": "Streamed am",
   "link-whisper": "Hallo $tag, um diesen Discord Account mit deinem Twitch Account auf dem Kanal von $broadcaster zu verknüpfen, gehe auf <https://twitch.tv/$broadcaster>, Melden Sie sich an und senden Sie diesen Befehl an den Chat \n\n\t\t`$command $id`\n\nHINWEIS: Dies läuft in 10 Minuten ab.",
-  "check-your-dm": "Überprüfen Sie Ihre Direktnachrichten auf Schritte zum Verknüpfen Ihres Kontos."
+  "check-your-dm": "check your PMs for steps to link your account."
 }
