@@ -638,7 +638,7 @@ export interface Goal {
     countBitsAsTips: boolean;
     display: 'simple' | 'full' | 'custom';
     timestamp?: string;
-    tiltifyCampaign?: number | null,
+    tiltifyCampaign?: string | null,
     interval?: 'hour' | 'day' | 'week' | 'month' | 'year';
     goalAmount?: number;
     currentAmount?: number;

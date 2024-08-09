@@ -5,14 +5,18 @@ import { z } from 'zod';
 import Integration from './_interface.js';
 import { command, persistent, settings } from '../decorators.js';
 
+import { Currency } from '~/database/entity/user.js';
 import { Get, Post } from '~/decorators/endpoint.js';
 import { onStartup } from '~/decorators/on.js';
 import { prepare } from '~/helpers/commons/index.js';
+import exchange from '~/helpers/currency/exchange.js';
+import { mainCurrency } from '~/helpers/currency/mainCurrency.js';
 import { triggerInterfaceOnTip } from '~/helpers/interface/index.js';
 import { getLang } from '~/helpers/locales.js';
 import { error, info, tip } from '~/helpers/log.js';
 import eventlist from '~/overlays/eventlist.js';
 import alerts from '~/registries/alerts.js';
+import { tiltifyCampaign } from '../../d.ts/src/helpers/socket.js';
 
 const mutex = new Mutex();
 
@@ -27,48 +31,42 @@ class Tiltify extends Integration {
   @persistent()
     lastCheckAt = Date.now();
 
-  campaigns: {
-    id: number,
-    name: string,
-    slug: string,
-    startsAt: number,
-    endsAt: null | number,
-    description: string,
-    causeId: number,
-    originalFundraiserGoal: number,
-    fundraiserGoalAmount: number,
-    supportingAmountRaised: number,
-    amountRaised: number,
-    supportable: boolean,
-    status: 'published',
-    type: 'Event',
+  fundraising_events: {
     avatar: {
-      src: string,
-      alt: string,
-      width: number,
-      height: number,
-    },
-    livestream: {
-      type: 'twitch',
-      channel: string,
-    } | null,
-    causeCurrency: 'USD',
-    totalAmountRaised: 0,
-    user: {
-      id: number,
-      username: string,
-      slug: string,
-      url: string,
-      avatar: {
-        src: string,
-        alt: string,
-        width: number,
-        height: number,
-      },
-    },
-    regionId: null,
-    metadata: Record<string, unknown>,
+      alt: string
+      height: number
+      src: string
+      width: number
+    }
+    can_publish_supporting_at: string
+    cause_id: string
+    currency_code: string
+    description: string
+    donate_url: string
+    end_supporting_at: string
+    ends_at: string
+    goal: {
+      currency: string
+      value: string
+    }
+    id: string
+    inserted_at: string
+    legacy_id: number
+    name: string
+    published_at: string
+    retired_at: any
+    slug: string
+    start_supporting_at: string
+    starts_at: string
+    status: string
+    total_amount_raised: {
+      currency: string
+      value: string
+    }
+    updated_at: string
+    url: string
   }[] = [];
+  campaigns: tiltifyCampaign[] = [];
   donations: Record<number,
   {
     'id': number,
@@ -98,7 +96,7 @@ class Tiltify extends Integration {
           await this.getCampaigns();
           await this.getDonations();
           if (loggedError) {
-            info(`TILTIFY: Successfully fetched campaigns and donations.`);
+            info(`TILTIFY: Successfully fetched integration events, campaigns and donations.`);
           }
           loggedError = false;
         } catch(e) {
@@ -113,20 +111,29 @@ class Tiltify extends Integration {
   }
 
   async getCampaigns() {
-    const response = await fetch(`https://tiltify.com/api/v3/users/${this.userId}/campaigns`, {
+    const response = await fetch(`https://v5api.tiltify.com/api/public/users/${this.userId}/integration_events`, {
       headers: {
         'Authorization': `Bearer ${this.access_token}`,
       },
     });
     if (response.status !== 200) {
-      throw new Error(`TILTIFY: Error during fetching campaigns. Status: ${response.status}`);
+      throw new Error(`TILTIFY: Error during fetching integration events. Status: ${response.status}`);
     }
     this.campaigns = (await response.json() as any).data;
   }
 
   async getDonations() {
-    for (const campaign of this.campaigns) {
-      const response = await fetch(`https://tiltify.com/api/v3/campaigns/${campaign.id}/donations`, {
+    const response_c = await fetch(`https://v5api.tiltify.com/api/public/users/${this.userId}/campaigns`, {
+      headers: {
+        'Authorization': `Bearer ${this.access_token}`,
+      },
+    });
+    if (response_c.status !== 200) {
+      throw new Error(`TILTIFY: Error during fetching campaigns. Status: ${response_c.status}`);
+    }
+
+    for (const campaign of (await response_c.json() as any).data) {
+      const response = await fetch(`https://v5api.tiltify.com/api/public/campaigns/${campaign.id}/donations`, {
         headers: {
           'Authorization': `Bearer ${this.access_token}`,
         },
@@ -135,43 +142,60 @@ class Tiltify extends Integration {
         throw new Error(`TILTIFY: Error during fetching donations. Status: ${response.status}`);
       }
       const data = (await response.json() as any).data as {
-        'id': number,
-        'amount': number,
-        'name': string,
-        'comment': string,
-        'completedAt': number,
-        'rewardId': number,
+        amount: {
+          currency: string
+          value: string
+        }
+        campaign_id: string
+        cause_id: string
+        completed_at: string
+        donor_comment: string
+        donor_name: string
+        fundraising_event_id: string
+        id: string
+        legacy_id: number
+        poll_id: string
+        poll_option_id: string
+        reward_claims: Array<{
+          id: string
+          quantity: number
+          reward_id: string
+        }>
+        reward_id: string
+        sustained: boolean
+        target_id: string
+        team_event_id: string
       }[];
 
       for (const donate of data) {
-        if (this.lastCheckAt < donate.completedAt) {
-          tip(`${donate.name} for ${campaign.name}, amount: ${Number(donate.amount).toFixed(2)}${campaign.causeCurrency}, message: ${donate.comment}`);
+        if (this.lastCheckAt < Number(donate.completed_at)) {
+          tip(`${donate.donor_name} for ${campaign.name}, amount: ${Number(donate.amount).toFixed(2)}${campaign.amount_raised.currency}, message: ${donate.donor_comment}`);
           const eventData = await eventlist.add({
             event:               'tip',
-            amount:              donate.amount,
-            currency:            campaign.causeCurrency,
-            userId:              `${donate.name}#__anonymous__`,
-            message:             donate.comment,
-            timestamp:           donate.completedAt,
+            amount:              Number(donate.amount.value),
+            currency:            donate.amount.currency,
+            userId:              `${donate.donor_name}#__anonymous__`,
+            message:             donate.donor_comment,
+            timestamp:           new Date(donate.completed_at).getTime(),
             charityCampaignName: campaign.name,
           });
           alerts.trigger({
             eventId:    eventData?.id ?? null,
             event:      'tip',
             service:    'tiltify',
-            name:       donate.name,
-            amount:     Number(donate.amount.toFixed(2)),
+            name:       donate.donor_name,
+            amount:     Number(Number(donate.amount.value).toFixed(2)),
             tier:       null,
-            currency:   campaign.causeCurrency,
+            currency:   campaign.amount_raised.currency,
             monthsName: '',
-            message:    donate.comment,
+            message:    donate.donor_comment,
           });
           triggerInterfaceOnTip({
-            userName:  donate.name,
-            amount:    donate.amount,
-            message:   donate.comment,
-            currency:  campaign.causeCurrency,
-            timestamp: donate.completedAt,
+            userName:  donate.donor_name,
+            amount:    Number(donate.amount.value),
+            message:   donate.donor_comment,
+            currency:  campaign.amount_raised.currency,
+            timestamp: new Date(donate.completed_at).getTime(),
           });
         }
       }
@@ -198,7 +222,7 @@ class Tiltify extends Integration {
   async postCode(req: any) {
     const token = req.body.code;
     // check if token is working ok
-    const response = await fetch(`https://tiltify.com/api/v3/user`, {
+    const response = await fetch(`https://v5api.tiltify.com/api/public/current-user`, {
       headers: {
         'Authorization': `Bearer ${token}`,
       },
@@ -227,7 +251,8 @@ class Tiltify extends Integration {
   commandCharity(opts: CommandOptions) {
     const responses: string[] = [];
     for (const campaign of this.campaigns) {
-      responses.push(`${responses.length+1}. ${campaign.name} - ${campaign.amountRaised.toLocaleString(getLang(), { style: 'currency', currency: campaign.causeCurrency })} of ${campaign.fundraiserGoalAmount.toLocaleString(getLang(), { style: 'currency', currency: campaign.causeCurrency })} => ${campaign.user.url}/${campaign.slug}`);
+      const totalAmountRaised = exchange(Number(campaign.total_amount_raised.value), campaign.total_amount_raised.currency as Currency, mainCurrency.value);
+      responses.push(`${responses.length+1}. ${campaign.name} - ${totalAmountRaised.toLocaleString(getLang(), { style: 'currency', currency: campaign.total_amount_raised.currency })} of ${Number(campaign.goal.value).toLocaleString(getLang(), { style: 'currency', currency: campaign.goal.currency })} => ${campaign.user.url}/${campaign.slug}`);
     }
     if (responses.length > 0) {
       return [prepare('integrations.tiltify.active_campaigns'), ...responses].map(response => ({

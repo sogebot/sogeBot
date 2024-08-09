@@ -37,7 +37,80 @@ type Configuration = {
 
 export type ViewerReturnType = UserInterface & {aggregatedBits: number, aggregatedTips: number, permission: Permissions, tips: UserTipInterface[], bits: UserBitInterface[] };
 export type possibleLists = 'systems' | 'core' | 'integrations' | 'overlays' | 'games' | 'services';
-export type tiltifyCampaign = { id: number, name: string, slug: string, startsAt: number, endsAt: null | number, description: string, causeId: number, originalFundraiserGoal: number, fundraiserGoalAmount: number, supportingAmountRaised: number, amountRaised: number, supportable: boolean, status: 'published', type: 'Event', avatar: {   src: string,   alt: string,   width: number,   height: number, }, livestream: {   type: 'twitch',   channel: string, } | null, causeCurrency: 'USD', totalAmountRaised: 0, user: {   id: number,   username: string,   slug: string,   url: string,   avatar: {     src: string,     alt: string,     width: number,     height: number,   }, }, regionId: null, metadata: Record<string, unknown>};
+export type tiltifyCampaign = {
+  amount_raised: {
+    currency: string
+    value: string
+  }
+  avatar: {
+    alt: string
+    height: number
+    src: string
+    width: number
+  }
+  cause_id: string
+  description: string
+  donate_url: string
+  fundraising_event_id: string
+  goal: {
+    currency: string
+    value: string
+  }
+  has_schedule: boolean
+  id: string
+  inserted_at: string
+  legacy_id: number
+  livestream: {
+    channel: string
+    type: string
+  }
+  name: string
+  original_goal: {
+    currency: string
+    value: string
+  }
+  published_at: string
+  retired_at: any
+  slug: string
+  status: string
+  supporting_type: string
+  total_amount_raised: {
+    currency: string
+    value: string
+  }
+  updated_at: string
+  url: string
+  user: {
+    avatar: {
+      alt: string
+      height: number
+      src: string
+      width: number
+    }
+    description: string
+    id: string
+    legacy_id: number
+    slug: string
+    social: {
+      discord: string
+      facebook: string
+      instagram: string
+      snapchat: string
+      tiktok: string
+      twitch: string
+      twitter: string
+      website: string
+      youtube: string
+    }
+    total_amount_raised: {
+      currency: string
+      value: string
+    }
+    url: string
+    username: string
+  }
+  user_id: string
+};
 
 export interface getListOfReturn {
   systems: {
