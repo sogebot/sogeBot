@@ -1,8 +1,5 @@
 {
   "options": "opzioni",
-  "popover": {
-    "are_you_sure_you_want_to_delete_this_image": "Sei sicuro di <strong class='text-danger'>eliminare</strong> questa immagine?"
-  },
   "button": {
     "update": "Aggiornamento",
     "fix_your_errors_first": "Correggi errori prima di salvare"

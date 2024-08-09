@@ -6,7 +6,7 @@
     "sendOnlineAnnounceToChannel": "Envoyer une annonce en ligne pour ce salon",
     "onlineAnnounceMessage": "Message in online announcement (can include mentions)",
     "sendAnnouncesToChannel": "Configurer l'envoi d'annonces aux salons",
-    "deleteMessagesAfterWhile": "Supprimer le message après un moment",
+    "deleteMessagesAfterWhile": "Delete message after a while",
     "clientId": "ClientId",
     "token": "Token",
     "joinToServerBtn": "Cliquez pour ajouter le bot sur votre serveur",

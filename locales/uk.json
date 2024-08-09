@@ -276,7 +276,7 @@
           "false": "Не буде сповіщено"
         },
         "hasDelay": {
-          "label": "Кліп повинен мати невелику затримку (щоб бути ближчим до того, що бачить користувач)",
+          "label": "Clip should have slight delay (to be closer what viewer sees)",
           "true": "Буде затримка",
           "false": "Не буде затримки"
         },

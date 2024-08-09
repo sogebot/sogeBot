@@ -3,7 +3,7 @@
     "enabled": "Стан",
     "apiKey": {
       "title": "Ключ API",
-      "help": "Отримати токен сокета з панелі  tipeeestream -> API -> Ваш ключ API"
+      "help": "Get socket token from TipeeeStream dashboard -> API -> Your API Key"
     }
   }
 }

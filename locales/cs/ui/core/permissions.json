@@ -11,7 +11,7 @@
   "loading": "načítám",
   "permissionNotFoundInDatabase": "Oprávnění nebylo nalezeno v databázi, před testováním uživatele uložte.",
   "userHaveNoAccessToThisPermissionGroup": "Uživatel <strong>$username</strong> NEMÁ přístup k tomuto oprávnění.",
-  "userHaveAccessToThisPermissionGroup": "Uživatel <strong>$username</strong> MÁ přístup k tomuto oprávnění.",
+  "userHaveAccessToThisPermissionGroup": "User <strong>$username</strong> HAS access to this permission group.",
   "accessDirectlyThrough": "<strong>Přímý</strong> přístup přes",
   "accessThroughHigherPermission": "Přístup přes vyšší oprávnění",
   "somethingWentWrongUserWasNotFoundInBotDatabase": "Něco se pokazilo, uživatel <strong>$username</strong> nebyl nalezen v databázi",

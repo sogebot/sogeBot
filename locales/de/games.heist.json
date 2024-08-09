@@ -12,9 +12,9 @@
   "singleUserFailed": "$user hat es versäumt, die Polizei loszuwerden und wird seine Zeit im Gefängnis verbringen müssen.",
   "result": {
     "0": "Jeder wurde gnadenlos ausgelöscht. Das war eine Schlacht.",
-    "33": "Nur 1/3 der Mannschaft bekommt ihr Geld von Raub.",
-    "50": "Die Hälfte der Mannschaft wurde von der Polizei getötet oder gefangen.",
-    "99": "Einige Verluste der Raubüberfallmannschaft sind nichts im Vergleich zu dem, was die verbleibende Mannschaft in ihren Taschen hat.",
+    "33": "Only 1/3 of the team get their money from the heist.",
+    "50": "Half of heist team was killed or caught by police.",
+    "99": "Some loss of heist team is nothing compared to remaining crew have in their pockets.",
     "100": "Oh mein Gott, niemand ist tot und jeder hat gewonnen!"
   },
   "levels": {
@@ -24,6 +24,6 @@
     "nationalReserve": "Nationale Reserve",
     "federalReserve": "Bundesreserve"
   },
-  "results": "Die Heist-Auszahlungen sind: $users",
+  "results": "The heist payees are: $users",
   "andXMore": "und $count mehr..."
 }

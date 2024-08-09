@@ -2,8 +2,8 @@
   "notify-as-whisper": "Oznámit šepotem",
   "settings": {
     "enabled": "Status",
-    "cooldownNotifyAsWhisper": "Oznámit informace o cooldown přes whisper",
-    "cooldownNotifyAsChat": "Oznámit informace o cooldown přes chat",
+    "cooldownNotifyAsWhisper": "Whisper cooldown information",
+    "cooldownNotifyAsChat": "Chat message cooldown information",
     "defaultCooldownOfCommandsInSeconds": "Výchozí nastavení pro příkazy (v sekundách)",
     "defaultCooldownOfKeywordsInSeconds": "Výchozí nastavení pro klíčová slova (v sekundách)"
   }

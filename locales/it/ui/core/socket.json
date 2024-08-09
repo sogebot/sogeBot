@@ -1,6 +1,6 @@
 {
   "settings": {
-    "purgeAllConnections": "Elimina tutta la connessione autenticata (anche tua)",
+    "purgeAllConnections": "Purge All Authenticated Connections (yours as well)",
     "accessTokenExpirationTime": "Tempo Di Scadenza Token D'Accesso (Secondi)",
     "refreshTokenExpirationTime": "Aggiorna Il Tempo Di Scadenza Token (Secondi)",
     "socketToken": {

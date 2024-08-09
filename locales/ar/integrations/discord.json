@@ -9,5 +9,5 @@
   "announced-by": "Announced by sogeBot",
   "streamed-at": "تم البث في",
   "link-whisper": "Hello $tag, to link this Discord account with your Twitch account on $broadcaster channel, go to <https://twitch.tv/$broadcaster>, login to your account and send this command to chat \n\n\t\t`$command $id`\n\nNOTE: This expires in 10 minutes.",
-  "check-your-dm": "تحقق من الرسائل الخاصة (DM) بك للحصول على خطوات لربط حسابك."
+  "check-your-dm": "check your PMs for steps to link your account."
 }

@@ -10,7 +10,7 @@
     "playerId": "Spieler ID",
     "seasonId": {
       "title": "Sitzungs ID",
-      "help": "Aktuelle Sitzungs ID wird jede Stunde abgerufen."
+      "help": "Current season ID is being fetched every hour."
     },
     "rankedGameModeStatsCustomization": "Benutzerdefinierte Nachricht für Ranked Statistiken",
     "gameModeStatsCustomization": "Benutzerdefinierte Nachricht für normale Statistiken"

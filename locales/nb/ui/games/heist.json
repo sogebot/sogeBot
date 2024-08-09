@@ -8,7 +8,7 @@
       "help": "Minutter"
     },
     "entryCooldownInSeconds": {
-      "title": "Time to entry heist",
+      "title": "Tid på å bli med på kupp",
       "help": "Sekunder"
     },
     "started": "Kupp startmelding",

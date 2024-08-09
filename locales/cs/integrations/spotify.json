@@ -1,10 +1,10 @@
 {
-  "song-not-found": "Omlouváme se, $sender, skladba nebyla nalezena na spotify",
+  "song-not-found": "Sorry, $sender, track was not found on Spotify",
   "song-requested": "$sender, požádal jste o skladbu $name od $artist",
   "not-banned-song-not-playing": "$sender, žádná skladba momentálně nehraje k zabanování.",
   "song-banned": "$sender, skladba $name od $artist je zabanována.",
   "song-unbanned": "$sender, skladba $name od $artist je odbanována.",
-  "song-not-found-in-banlist": "$sender, skladba podle spotifyURI $uri nebyla nalezena v seznamu zakázaných položek.",
+  "song-not-found-in-banlist": "$sender, song by SpotifyURI $uri was not found in ban list.",
   "cannot-request-song-is-banned": "$sender, nelze žádat o zabanovanou skladbu $name od $artist.",
   "cannot-request-song-from-unapproved-artist": "$sender, nemůže požádat o písničku od neschváleného umělce.",
   "no-songs-found-in-history": "$sender, momentálně není žádná skladba v seznamu historie.",

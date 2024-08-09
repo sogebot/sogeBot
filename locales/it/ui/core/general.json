@@ -3,7 +3,7 @@
     "lang": "Lingua del bot",
     "numberFormat": "Formato dei numeri in chat",
     "gracefulExitEachXHours": {
-      "title": "Uscita graziosa ogni X ore",
+      "title": "Graceful exit every X hours",
       "help": "0 - disattivato"
     },
     "shouldGracefulExitHelp": "Abilitare l'uscita graziosa è <strong>raccomandato</strong> se il tuo bot è in esecuzione senza fine sul server. Dovresti avere bot in esecuzione su pm2 (o servizio simile) o averlo dockerizzato per garantire il riavvio automatico del bot. Il bot <strong>non</strong> uscirà con grazia quando lo stream è online."

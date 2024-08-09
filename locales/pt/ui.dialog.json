@@ -64,7 +64,7 @@
     "visibility": "Visibilidade",
     "reset": "Redefinir "
   },
-  "changesPending": "Suas alterações não foram salvas.",
+  "changesPending": "Your changes were not saved.",
   "formNotValid": "Formulário inválido.",
   "nothingToShow": "Nada para mostrar aqui."
 }

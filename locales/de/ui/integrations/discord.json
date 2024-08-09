@@ -6,7 +6,7 @@
     "sendOnlineAnnounceToChannel": "Stream online Benachrichtigung in folgendem Channel",
     "onlineAnnounceMessage": "Nachricht in Online-Ankündigung (kann Erwähnungen enthalten)",
     "sendAnnouncesToChannel": "Senden von Ankündigungen an Kanäle einrichten",
-    "deleteMessagesAfterWhile": "Nach einiger Zeit, Nachrichten löschen",
+    "deleteMessagesAfterWhile": "Delete message after a while",
     "clientId": "Client ID",
     "token": "Token",
     "joinToServerBtn": "Hier klicken, um den Bot mit dem Server zu verbinden",

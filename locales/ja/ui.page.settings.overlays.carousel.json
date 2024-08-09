@@ -1,8 +1,5 @@
 {
   "options": "オプション",
-  "popover": {
-    "are_you_sure_you_want_to_delete_this_image": "この画像を<strong class='text-danger'>削除</strong>しますか？"
-  },
   "button": {
     "update": "アップデート",
     "fix_your_errors_first": "保存する前にエラーを修正します"

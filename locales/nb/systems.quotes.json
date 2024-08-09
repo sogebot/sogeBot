@@ -1,30 +1,30 @@
 {
   "add": {
-    "ok": "$sender, quote $id '$quote' was added. (tags: $tags)",
-    "error": "$sender, $command is not correct or missing -quote parameter"
+    "ok": "$sender, sitat $id '$quote' ble lagt til. (etiketter: $tags)",
+    "error": "$sender, $command er ikke korrekt eller mangler -sitat parameter"
   },
   "remove": {
-    "ok": "$sender, quote $id was successfully deleted.",
-    "error": "$sender, quote ID is missing.",
-    "not-found": "$sender, quote $id was not found."
+    "ok": "$sender, sitat $id ble slettet.",
+    "error": "$sender, sitat ID mangler.",
+    "not-found": "$sender, sitat $id ble ikke funnet."
   },
   "show": {
-    "ok": "Quote $id by $quotedBy '$quote'",
+    "ok": "Sitat $id av $quotedBy '$quote'",
     "error": {
-      "no-parameters": "$sender, $command is missing -id or -tag.",
-      "not-found-by-id": "$sender, quote $id was not found.",
-      "not-found-by-tag": "$sender, no quotes with tag $tag was not found."
+      "no-parameters": "$sender, $command mangler -id eller -etikett.",
+      "not-found-by-id": "$sender, sitat $id ble ikke funnet.",
+      "not-found-by-tag": "$sender, ingen sitat med etikett $tag ble funnet."
     }
   },
   "set": {
-    "ok": "$sender, quote $id tags were set. (tags: $tags)",
+    "ok": "$sender, sitat $id etiketter ble angitt. (etiketter: $tags)",
     "error": {
-      "no-parameters": "$sender, $command is missing -id or -tag.",
-      "not-found-by-id": "$sender, quote $id was not found."
+      "no-parameters": "$sender, $command mangler -id eller -etikett.",
+      "not-found-by-id": "$sender, sitat $id ble ikke funnet."
     }
   },
   "list": {
-    "ok": "$sender, You can find quote list at http://$urlBase/public/#/quotes",
-    "is-localhost": "$sender, quote list url is not properly specified."
+    "ok": "$sender, Du finner sitatliste på http://$urlBase/public/#/quotes",
+    "is-localhost": "$sender, sitatliste url er ikke riktig angitt."
   }
 }

@@ -1,8 +1,5 @@
 {
   "options": "alternativer",
-  "popover": {
-    "are_you_sure_you_want_to_delete_this_image": "Er du sikker på at du vil <strong class='text-danger'>slette</strong> dette bildet?"
-  },
   "button": {
     "update": "Oppdater",
     "fix_your_errors_first": "Fiks feil før lagring"

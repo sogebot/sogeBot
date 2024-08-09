@@ -18,7 +18,7 @@
     },
     "allowOverTicketing": {
       "title": "Allow over ticketing",
-      "help": "ユーザーが自分のポイントのチケット以上のくじに参加できるようにする。例えば、ユーザーは10ポイントを持っていますが、彼のすべてのポイントを使用する100の !raffle に参加することができます。"
+      "help": "Allow user to join raffle by over ticketing their points. E.g. user has 10 points but can write !raffle 100 which will use all of their points."
     },
     "raffleAnnounceInterval": {
       "title": "Announce interval",

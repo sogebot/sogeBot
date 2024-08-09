@@ -20,7 +20,7 @@
     "clientSecret": "clientSecret",
     "manualDeviceId": {
       "title": "ID de l'appareil forcé",
-      "help": "Vide = désactivé, force spotify device ID à être utilisé pour mettre en file d'attente. Vérifiez les logs pour le périphérique actif actuel ou utilisez le bouton lors de la lecture de la chanson pendant au moins 10 secondes."
+      "help": "Empty = disabled, force Spotify device ID to be used to queue songs. Check logs for current active device or use button when playing song for at least 10 seconds."
     },
     "redirectURI": "redirectURI",
     "format": {

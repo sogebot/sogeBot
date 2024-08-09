@@ -6,7 +6,7 @@
     "sendOnlineAnnounceToChannel": "Надіслати онлайн оголошення на цей канал",
     "onlineAnnounceMessage": "Message in online announcement (can include mentions)",
     "sendAnnouncesToChannel": "Налаштування відправки повідомлень каналам",
-    "deleteMessagesAfterWhile": "Видалити повідомлення через деякий час",
+    "deleteMessagesAfterWhile": "Delete message after a while",
     "clientId": "ClientId",
     "token": "Token",
     "joinToServerBtn": "Натисніть для приєднання бота до серверу",

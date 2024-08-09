@@ -1,8 +1,5 @@
 {
   "options": "opções",
-  "popover": {
-    "are_you_sure_you_want_to_delete_this_image": "Tem certeza que deseja <strong class='text-danger'>excluir</strong> esta imagem?"
-  },
   "button": {
     "update": "Atualize",
     "fix_your_errors_first": "Corrigir erros antes de salvar"

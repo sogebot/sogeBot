@@ -3,7 +3,7 @@
     "lang": "Langue du bot",
     "numberFormat": "Format des chiffres dans le chat",
     "gracefulExitEachXHours": {
-      "title": "Sortie gracieuse toutes les X heures",
+      "title": "Graceful exit every X hours",
       "help": "0 - Désactivé"
     },
     "shouldGracefulExitHelp": "Activer la sortie gracieuse est <strong>recommandé</strong> si votre bot fonctionne tout le temps sur le serveur. Vous devriez avoir un bot fonctionnant sur pm2 (ou un service similaire) ou le faire dockerizer pour assurer un redémarrage automatique du bot. Le bot <strong>ne quittera pas gracieusement</strong> lorsque le flux est en ligne."

@@ -46,7 +46,7 @@
   "usableOptions": {
     "name": "Brukbare alternativer",
     "placeholder": "Fyll, inn, dine, alternativer, her",
-    "help": "Alternativer, som kan brukes med denne variabelen, eksempel: <strong>SOLO, DUO, TRIO, SQUAD</strong>",
+    "help": "Alternativer, som kan brukes med denne variabelen, eksempel: <strong>SOLO, DUO, 3-SQ, SQUAD</strong>",
     "error": {
       "atLeastOneValue": "Du må angi minst 1 verdi."
     }

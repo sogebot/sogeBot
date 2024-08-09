@@ -10,7 +10,7 @@
     "playerId": "ID игрока",
     "seasonId": {
       "title": "ID сезона",
-      "help": "ID текущего сезона получается каждый час."
+      "help": "Current season ID is being fetched every hour."
     },
     "rankedGameModeStatsCustomization": "Настраиваемое сообщение для статистики рейтинга",
     "gameModeStatsCustomization": "Настраиваемое сообщение для обычной статистики"

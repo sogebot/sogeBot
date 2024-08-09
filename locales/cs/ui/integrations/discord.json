@@ -6,7 +6,7 @@
     "sendOnlineAnnounceToChannel": "Posílat online oznámení do tohoto kanálu",
     "onlineAnnounceMessage": "Zpráva v online oznámení (může obsahovat zmínky)",
     "sendAnnouncesToChannel": "Nastavení odesílání oznámení do kanálů",
-    "deleteMessagesAfterWhile": "Po chvíli smazat zprávy",
+    "deleteMessagesAfterWhile": "Delete message after a while",
     "clientId": "ClientId",
     "token": "Token",
     "joinToServerBtn": "Kliknutím připojíte bota na váš server",

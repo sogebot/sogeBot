@@ -9,5 +9,5 @@
   "announced-by": "sogeBotによる通知",
   "streamed-at": "ストリーム日時",
   "link-whisper": "こんにちは $tag, Discordアカウントと $broadcaster チャンネルのTwichアカウントをリンクさせるには、<https://twitch.tv/$broadcaster>に行って、自分のアカウントにログインしてこのコマンドをチャットに送信してください。 \n\n\t\t`$command $id`\n\nNOTE: 有効期限は10分です。",
-  "check-your-dm": "アカウントをリンクする手順についてはDMを確認してください。"
+  "check-your-dm": "check your PMs for steps to link your account."
 }

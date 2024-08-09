@@ -7,8 +7,8 @@
     },
     "accessToken": {
       "title": "Access token",
-      "help": "Получить ваш доступ по адресу https://www.sogebot.xyz/integrations/#Streamlabs"
+      "help": "Get your access token at https://www.sogebot.xyz/integrations/#Streamlabs"
     },
-    "accessTokenBtn": "Генератор токена доступа к Streamlabs"
+    "accessTokenBtn": "Streamlabs access token generator"
   }
 }

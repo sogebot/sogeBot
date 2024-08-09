@@ -276,7 +276,7 @@
           "false": "Wird nicht angekündigt"
         },
         "hasDelay": {
-          "label": "Clip sollte eine leichte Verzögerung haben (um näher zu sein, was der Betrachter sieht)",
+          "label": "Clip should have slight delay (to be closer what viewer sees)",
           "true": "Wird Verzögerung haben",
           "false": "Wird keine Verzögerung haben"
         },

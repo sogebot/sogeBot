@@ -276,7 +276,7 @@
           "false": "Vil ikke blive annonceret"
         },
         "hasDelay": {
-          "label": "Clip should have slight delay (to be closer what viewer see)",
+          "label": "Clip should have slight delay (to be closer what viewer sees)",
           "true": "Vil have forsinkelse",
           "false": "Vil ikke have forsinkelse"
         },

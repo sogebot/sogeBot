@@ -9,5 +9,5 @@
   "announced-by": "Announced by sogeBot",
   "streamed-at": "Streammato alle",
   "link-whisper": "Ciao $tag, per collegare questo account Discord al tuo account Twitch sul canale $broadcaster , vai su <https://twitch.tv/$broadcaster> , accedi al tuo account e invia questo comando in chat \n\n\t\t `$command $id`\n\nNOTA: Questo comando scadrà tra 10 minuti.",
-  "check-your-dm": "verifica i tuoi messaggi privati per continuare la procedura per collegare il tuo account."
+  "check-your-dm": "check your PMs for steps to link your account."
 }

@@ -18,7 +18,7 @@
     },
     "allowOverTicketing": {
       "title": "Consenti la sovra-emissione di biglietti",
-      "help": "Consenti all'utente di unirsi alla lotteria con sovraemissione del biglietto dei suoi punti. l'utente ha 10 punti ma può unirsi con !lotteria 100 che userà tutti i suoi punti."
+      "help": "Allow user to join raffle by over ticketing their points. E.g. user has 10 points but can write !raffle 100 which will use all of their points."
     },
     "raffleAnnounceInterval": {
       "title": "Intervallo annunci",

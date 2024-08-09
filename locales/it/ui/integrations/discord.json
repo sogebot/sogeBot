@@ -6,7 +6,7 @@
     "sendOnlineAnnounceToChannel": "Invia un annuncio online a questo canale",
     "onlineAnnounceMessage": "Message in online announcement (can include mentions)",
     "sendAnnouncesToChannel": "Imposta l'invio di annunci ai canali",
-    "deleteMessagesAfterWhile": "Elimina il messaggio dopo un po di tempo",
+    "deleteMessagesAfterWhile": "Delete message after a while",
     "clientId": "ClientId",
     "token": "Token",
     "joinToServerBtn": "Clicca per unirti al bot sul tuo server",

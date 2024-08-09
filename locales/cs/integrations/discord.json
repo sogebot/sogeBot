@@ -9,5 +9,5 @@
   "announced-by": "Oznámení od sogeBot",
   "streamed-at": "Streamováno v",
   "link-whisper": "Ahoj $tag, pro propojení tohoto Discord účtu s tvým Twitch účtem na kanálu $broadcaster, přejdi na <https://twitch.tv/$broadcaster>, přihlaste se do svého účtu a pošlete tento příkaz do chatu \n\n\t\t`$command $id`\n\nPOZNÁMKA: Platnost vyprší za 10 minut.",
-  "check-your-dm": "zkontrolujte své SZ pro kroky k propojení účtů."
+  "check-your-dm": "check your PMs for steps to link your account."
 }

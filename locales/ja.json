@@ -276,7 +276,7 @@
           "false": "アナウンスされません"
         },
         "hasDelay": {
-          "label": "クリップは少し遅延する必要があります（視聴者が見てるものに近づけるために）",
+          "label": "Clip should have slight delay (to be closer what viewer sees)",
           "true": "遅延が発生します",
           "false": "遅延はありません"
         },

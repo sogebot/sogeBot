@@ -18,7 +18,7 @@
     },
     "allowOverTicketing": {
       "title": "Разрешить чрезмерный взнос",
-      "help": "Разрешите пользователю присоединиться к розыгрышу с большим кол-вом поинтов, чем у него есть. Например пользователь имеет 10 очков, но может присоединиться используя !raffle 100, но внесётся всё равно 10."
+      "help": "Allow user to join raffle by over ticketing their points. E.g. user has 10 points but can write !raffle 100 which will use all of their points."
     },
     "raffleAnnounceInterval": {
       "title": "Интервал объявления",

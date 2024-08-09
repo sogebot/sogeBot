@@ -3,7 +3,7 @@
     "enabled": "Statut",
     "apiKey": {
       "title": "Clé d'Api",
-      "help": "Récupérer le socket token depuis le tableau de bord de tipeeestream -> API -> Votre clé d'API"
+      "help": "Get socket token from TipeeeStream dashboard -> API -> Your API Key"
     }
   }
 }

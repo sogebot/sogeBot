@@ -20,7 +20,7 @@
     "clientSecret": "clientSecret",
     "manualDeviceId": {
       "title": "Vynucené ID zařízení",
-      "help": "Prázdné = vypnuté, vynucené spotify ID zařízení, které bude použito pro skladby ve frontě. Zkontrolujte logy aktuálního aktivního zařízení nebo použijte tlačítko při přehrávání písně po dobu nejméně 10 sekund."
+      "help": "Empty = disabled, force Spotify device ID to be used to queue songs. Check logs for current active device or use button when playing song for at least 10 seconds."
     },
     "redirectURI": "redirectURI",
     "format": {
