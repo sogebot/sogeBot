@@ -37,6 +37,12 @@ import { parseTextWithEmotes } from '~/helpers/parseTextWithEmotes.js';
 const tubeChat = new TubeChat();
 let titleChangeRequestRetry = 0;
 
+export enum latency {
+  NORMAL = 'NORMAL',
+  LOW = 'LOW',
+  ULTRA_LOW = 'ULTRA_LOW',
+}
+
 class Google extends Service {
   clientId = '225380804535-gjd77dplfkbe4d3ct173d8qm0j83f8tr.apps.googleusercontent.com';
   @persistent()
@@ -48,6 +54,8 @@ class Google extends Service {
 
   @settings()
     shouldPrepareBroadcast = false;
+  @settings()
+    latency: latency = latency.ULTRA_LOW;
 
   @settings()
     onStreamTitle = '$title | $game';
@@ -217,8 +225,9 @@ class Google extends Service {
         part:        ['id','snippet','contentDetails','status'],
         requestBody: {
           ...broadcast,
-          id:     broadcast.id,
-          status: {
+          contentDetails: this.prepareContentDetails(broadcast),
+          id:             broadcast.id,
+          status:         {
             ...broadcast.status,
             privacyStatus: this.onStreamStartPrivacyStatus,
           },
@@ -244,8 +253,9 @@ class Google extends Service {
         part:        ['id','snippet','contentDetails','status'],
         requestBody: {
           ...broadcast,
-          id:      broadcast.id,
-          snippet: {
+          id:             broadcast.id,
+          contentDetails: this.prepareContentDetails(broadcast),
+          snippet:        {
             ...broadcast.snippet,
             title: this.onStreamEndTitleEnabled
               ? this.onStreamEndTitle
@@ -405,8 +415,9 @@ class Google extends Service {
       await youtube.liveBroadcasts.update({
         part:        ['id','snippet','contentDetails','status'],
         requestBody: {
+          contentDetails: this.prepareContentDetails(stream),
           ...stream,
-          snippet: {
+          snippet:        {
             ...stream.snippet,
             title,
             description,
@@ -455,6 +466,21 @@ class Google extends Service {
     return null;
   }
 
+  prepareContentDetails(broadcast: youtube_v3.Schema$LiveBroadcast) {
+    const contentDetails = broadcast.contentDetails ?? {};
+    if (self.latency === latency.NORMAL) {
+      contentDetails.latencyPreference = 'normal';
+      contentDetails.enableLowLatency = false;
+    } else if (self.latency === latency.LOW) {
+      contentDetails.latencyPreference = 'low';
+      contentDetails.enableLowLatency = true;
+    } else if (self.latency === latency.ULTRA_LOW) {
+      contentDetails.latencyPreference = 'ultraLow';
+      delete contentDetails.enableLowLatency; // should be omitted
+    }
+    return contentDetails;
+  }
+
   async prepareBroadcast() {
     if (isStreamOnline.value || this.refreshToken === '' || this.shouldPrepareBroadcast === false) {
       return; // do nothing if already streaming
@@ -485,7 +511,8 @@ class Google extends Service {
           part:        ['id','snippet','contentDetails','status'],
           requestBody: {
             ...broadcast,
-            snippet: {
+            contentDetails: self.prepareContentDetails(broadcast),
+            snippet:        {
               ...broadcast.snippet,
               title:              stats.value.currentTitle || 'n/a',
               scheduledStartTime: new Date(Date.now() + (15 * 60000)).toISOString(),
