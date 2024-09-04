@@ -78,7 +78,7 @@ class General extends Core {
       name: 'index', id: '', this: this,
     });
     this.addMenu({
-      category: 'commands', name: 'botcommands', id: 'commands/botcommands', this: this, scopeParent: this.scope(),
+      category: 'commands', name: 'botcommands', id: 'commands/botcommands', this: this, scopeParent: 'botcommands',
     });
     this.addMenu({
       category: 'settings', name: 'modules', id: 'settings/modules', this: null,
