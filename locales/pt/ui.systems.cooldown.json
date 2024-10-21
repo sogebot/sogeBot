@@ -2,8 +2,8 @@
   "notify-as-whisper": "Notificar como sussurro",
   "settings": {
     "enabled": "Situação",
-    "cooldownNotifyAsWhisper": "Whisper cooldown information",
-    "cooldownNotifyAsChat": "Chat message cooldown information",
+    "cooldownNotifyAsWhisper": "Informações de intervalo do sussurro",
+    "cooldownNotifyAsChat": "Informações de interfalo de mensagens",
     "defaultCooldownOfCommandsInSeconds": "Tempo de espera padrão para comandos (em segundos)",
     "defaultCooldownOfKeywordsInSeconds": "Tempo de espera padrão para palavras-chave (em segundos)"
   }
