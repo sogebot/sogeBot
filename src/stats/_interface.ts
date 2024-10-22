@@ -1,15 +1,16 @@
-import { addScope } from '~/helpers/socket.js';
 import Module from '../_interface.js';
+
+import { addScope } from '~/helpers/socket.js';
 
 class Overlay extends Module {
   constructor() {
     super('stats', true);
   }
 
-  scope () {
+  scope() {
     // add scope if used
     addScope('stats:read');
-    return 'stats:read';
+    return 'stats';
   }
 }
 
