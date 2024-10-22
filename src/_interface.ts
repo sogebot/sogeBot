@@ -198,12 +198,12 @@ class Module {
     load();
   }
 
-  public scope (type?: 'read' | 'manage') {
+  public scope (type?: 'read' | 'manage', customScope?: string) {
     // add scope if used
     if (type) {
-      addScope(this._scope + ':' + type);
+      addScope((customScope || this._scope) + ':' + type);
     }
-    return this._scope + (type ? ':' + type : '');
+    return customScope || this._scope + (type ? ':' + type : '');
   }
 
   public sockets() {
