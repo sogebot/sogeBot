@@ -1,4 +1,4 @@
-import { ChannelType, TextChannel } from 'discord.js';
+import { TextChannel } from 'discord.js';
 
 import { getUserSender } from './getUserSender.js';
 import { chatOut } from '../log.js';
@@ -29,13 +29,11 @@ export async function announce(messageToAnnounce: string, type: typeof announceT
   if (Discord.sendAnnouncesToChannel[type].length > 0 && Discord.client) {
     // search discord channel by ID
     for (const [ id, channel ] of Discord.client.channels.cache) {
-      if (channel.type === ChannelType.GuildText) {
-        if (id === Discord.sendAnnouncesToChannel[type] || (channel as TextChannel).name === Discord.sendAnnouncesToChannel[type]) {
-          const ch = Discord.client.channels.cache.find(o => o.id === id);
-          if (ch) {
-            (ch as TextChannel).send(await Discord.replaceLinkedUsernameInMessage(messageToAnnounce));
-            chatOut(`#${(ch as TextChannel).name}: ${messageToAnnounce} [${Discord.client.user?.tag}]`);
-          }
+      if (id === Discord.sendAnnouncesToChannel[type] || (channel as TextChannel).name === Discord.sendAnnouncesToChannel[type]) {
+        const ch = Discord.client.channels.cache.find(o => o.id === id);
+        if (ch) {
+          (ch as TextChannel).send(await Discord.replaceLinkedUsernameInMessage(messageToAnnounce));
+          chatOut(`#${(ch as TextChannel).name}: ${messageToAnnounce} [${Discord.client.user?.tag}]`);
         }
       }
     }

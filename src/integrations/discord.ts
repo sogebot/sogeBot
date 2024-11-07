@@ -680,20 +680,18 @@ class Discord extends Integration {
           if (responses) {
             for (let i = 0; i < responses.length; i++) {
               setTimeout(async () => {
-                if (channel.type === ChannelType.GuildText) {
-                  const messageToSend = await new Message(await responses[i].response).parse({
-                    ...responses[i].attr,
-                    forceWithoutAt: true, // we dont need @
-                    sender:         { ...responses[i].sender },
-                    discord:        { author, channel },
-                  }) as string;
-                  const reply = await channel.send(messageToSend);
-                  chatOut(`#${channel.name}: ${messageToSend} [${author.tag}]`);
-                  if (this.deleteMessagesAfterWhile) {
-                    setTimeout(() => {
-                      reply.delete();
-                    }, 10000);
-                  }
+                const messageToSend = await new Message(await responses[i].response).parse({
+                  ...responses[i].attr,
+                  forceWithoutAt: true, // we dont need @
+                  sender:         { ...responses[i].sender },
+                  discord:        { author, channel },
+                }) as string;
+                const reply = await channel.send(messageToSend);
+                chatOut(`#${channel.name}: ${messageToSend} [${author.tag}]`);
+                if (this.deleteMessagesAfterWhile) {
+                  setTimeout(() => {
+                    reply.delete();
+                  }, 10000);
                 }
               }, 1000 * i);
             }
@@ -771,7 +769,7 @@ class Discord extends Integration {
   async getChannels() {
     if (this.client && this.guild) {
       return this.client.guilds.cache.get(this.guild)?.channels.cache
-        .filter(o => o.type === ChannelType.GuildText)
+        .filter(o => o.type in [ChannelType.GuildText, ChannelType.GuildAnnouncement])
         .sort((a, b) => {
           const nameA = (a as DiscordJs.TextChannel).name.toUpperCase(); // ignore upper and lowercase
           const nameB = (b as DiscordJs.TextChannel).name.toUpperCase(); // ignore upper and lowercase
