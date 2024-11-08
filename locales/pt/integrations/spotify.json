@@ -1,10 +1,10 @@
 {
-  "song-not-found": "Sorry, $sender, track was not found on Spotify",
+  "song-not-found": "Desculpe, $sender, não consigo encontrar esta faixa no Spotify",
   "song-requested": "$sender, você solicitou a música $name de $artist",
   "not-banned-song-not-playing": "$sender, nenhuma música está tocando para banir agora.",
   "song-banned": "$sender, música $name de $artist está banida.",
   "song-unbanned": "$sender, música $name de $artist foi desbanida.",
-  "song-not-found-in-banlist": "$sender, song by SpotifyURI $uri was not found in ban list.",
+  "song-not-found-in-banlist": "$sender, música de spotifyURI $uri não foi encontrada na lista de banimento.",
   "cannot-request-song-is-banned": "$sender, não é possível solicitar a música $name banida de $artist.",
   "cannot-request-song-from-unapproved-artist": "$sender, não é possível solicitar música de artista não aprovado.",
   "no-songs-found-in-history": "$sender, atualmente não há música na lista de histórico.",
