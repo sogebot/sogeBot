@@ -10,7 +10,7 @@ import io from 'socket.io';
 import {
   Brackets, In, Like,
 } from 'typeorm';
-import ytdl from 'ytdl-core';
+import ytdl from '@distube/ytdl-core';
 import ytpl from 'ytpl';
 import ytsr from 'ytsr';
 import { z } from 'zod';
