@@ -194,7 +194,7 @@ describe('Heist - !bankheist - @func2', () => {
       }
     });
     it('Heist should be finished - userslist', async () => {
-      await message.sentMessageContain('The heist payouts are: ');
+      await message.sentMessageContain('The heist payees are: ');
       await message.sentMessageContain('more...');
     });
   });
