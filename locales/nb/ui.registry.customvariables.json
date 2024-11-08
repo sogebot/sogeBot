@@ -4,7 +4,7 @@
   "show-examples": "vis CURL eksempler",
   "response": {
     "show": "Vis respons etter POST",
-    "name": "Response after variable set",
+    "name": "Svar etter variabel er angitt",
     "default": "Standard",
     "default-placeholder": "Angi din bot respons",
     "default-help": "Bruk $value for å få ny variabelverdi",
