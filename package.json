@@ -79,7 +79,7 @@
     "tiny-typed-emitter": "2.1.0",
     "trigram-similarity": "^1.0.7",
     "tubechat": "^1.0.3",
-    "typeorm": "0.3.17",
+    "typeorm": "0.3.20",
     "typescript": "5.3.3",
     "url-join": "5.0.0",
     "uuid": "9.0.1",
