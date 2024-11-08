@@ -26,7 +26,7 @@
     "async-mutex": "^0.4.0",
     "axios": "1.6.2",
     "basic-auth": "2.0.1",
-    "better-sqlite3": "^8.0.0",
+    "better-sqlite3": "^11.5.0",
     "blocked-at": "1.2.0",
     "chalk": "5.3.0",
     "cors": "2.8.5",
