@@ -88,7 +88,7 @@
     "ws": "8.15.0",
     "xregexp": "5.1.1",
     "yargs": "17.7.2",
-    "ytdl-core": "4.11.5",
+    "@distube/ytdl-core": "latest",
     "ytpl": "2.3.0",
     "ytsr": "3.8.4",
     "zod": "^3.22.4"
