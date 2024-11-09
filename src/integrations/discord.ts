@@ -736,7 +736,7 @@ class Discord extends Integration {
           // names must be equal
           return 0;
         })
-        .map(o => ({ text: `<strong>${o.name}</strong> <small class="font-italic">${o.id}</small>`, value: o.id })) || [];
+        .map(o => ({ text: `<strong>${o.name}</strong>&nbsp;<small class="font-italic">${o.id}</small>`, value: o.id })) || [];
     } else {
       return [];
     }
@@ -759,7 +759,7 @@ class Discord extends Integration {
           // names must be equal
           return 0;
         })
-        .map(o => ({ text: `<strong>${o.name}</strong> <small class="font-italic">${o.id}</small>`, value: o.id }));
+        .map(o => ({ text: `<strong>${o.name}</strong>&nbsp;<small class="font-italic">${o.id}</small>`, value: o.id }));
     } else {
       return [];
     }
@@ -769,7 +769,7 @@ class Discord extends Integration {
   async getChannels() {
     if (this.client && this.guild) {
       return this.client.guilds.cache.get(this.guild)?.channels.cache
-        .filter(o => o.type in [ChannelType.GuildText, ChannelType.GuildAnnouncement])
+        .filter(o => [ChannelType.GuildText, ChannelType.GuildAnnouncement].includes(o.type))
         .sort((a, b) => {
           const nameA = (a as DiscordJs.TextChannel).name.toUpperCase(); // ignore upper and lowercase
           const nameB = (b as DiscordJs.TextChannel).name.toUpperCase(); // ignore upper and lowercase
@@ -782,7 +782,7 @@ class Discord extends Integration {
           // names must be equal
           return 0;
         })
-        .map(o => ({ text: `<strong>#${(o as DiscordJs.TextChannel).name}</strong> <small class="font-italic">${o.id}</small>`, value: o.id })) || [];
+        .map(o => ({ text: `<strong>${o.type === ChannelType.GuildText ? '💬' : '📢'} #${(o as DiscordJs.TextChannel).name}</strong>&nbsp;<small class="font-italic">${o.id}</small>`, value: o.id })) || [];
     } else {
       return [];
     }
