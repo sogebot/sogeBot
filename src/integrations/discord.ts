@@ -1,9 +1,8 @@
 import { DiscordLink } from '@entity/discord.js';
 import { Permissions as PermissionsEntity } from '@entity/permissions.js';
-import { User } from '@entity/user.js';
 import chalk from 'chalk';
 import * as DiscordJs from 'discord.js';
-import { ChannelType, GatewayIntentBits } from 'discord.js';
+import { ChannelType, GatewayIntentBits, PresenceStatusData, PresenceUpdateStatus } from 'discord.js';
 import { get } from 'lodash-es';
 import { IsNull, LessThan, Not } from 'typeorm';
 
@@ -21,6 +20,7 @@ import { Parser } from '../parser.js';
 import users from '../users.js';
 
 import { Event, Attributes } from '~/database/entity/event.js';
+import { User } from '~/database/entity/user.js';
 import { AppDataSource } from '~/database.js';
 import { Get } from '~/decorators/endpoint.js';
 import { isStreamOnline, stats } from '~/helpers/api/index.js';
@@ -94,13 +94,13 @@ class Discord extends Integration {
     ignorelist: string[] = [];
 
   @settings('status')
-    onlinePresenceStatusDefault: 'online' | 'idle' | 'invisible' | 'dnd' = 'online';
+    onlinePresenceStatusDefault: PresenceStatusData = PresenceUpdateStatus.Online;
 
   @settings('status')
     onlinePresenceStatusDefaultName = '';
 
   @settings('status')
-    onlinePresenceStatusOnStream: 'streaming' | 'online' | 'idle' | 'invisible' | 'dnd' = 'online';
+    onlinePresenceStatusOnStream: PresenceStatusData | 'streaming' = PresenceUpdateStatus.Online;
 
   @settings('status')
     onlinePresenceStatusOnStreamName = '$title';
@@ -141,10 +141,14 @@ class Discord extends Integration {
   onStartup() {
     this.addEvent();
 
+    this.changeClientOnlinePresence();
+    setInterval(() => {
+      this.changeClientOnlinePresence();
+    }, MINUTE);
+
     // embed updater
     setInterval(async () => {
       if (isStreamOnline.value && this.client && this.embedMessageId.length > 0) {
-        this.changeClientOnlinePresence();
         const channel = this.client.guilds.cache.get(this.guild)?.channels.cache.get(this.sendOnlineAnnounceToChannel);
         if (channel) {
           const message = await (channel as DiscordJs.TextChannel).messages.fetch(this.embedMessageId);
@@ -434,7 +438,6 @@ class Discord extends Integration {
       if (isStreamOnline.value) {
         const activityString = await new Message(this.onlinePresenceStatusOnStreamName).parse();
         if (this.onlinePresenceStatusOnStream === 'streaming') {
-          this.client?.user?.setStatus('online');
           this.client?.user?.setPresence({
             status:     'online',
             activities: [{
@@ -442,22 +445,26 @@ class Discord extends Integration {
             }],
           });
         } else {
-          this.client?.user?.setStatus(this.onlinePresenceStatusOnStream);
-          if (activityString !== '') {
-            this.client?.user?.setActivity('');
-          } else {
-            this.client?.user?.setPresence({ status: this.onlinePresenceStatusOnStream, activities: [{ name: activityString }] });
-          }
+          this.client?.user?.setPresence({
+            status:     this.onlinePresenceStatusOnStream,
+            activities: [{
+              name:  activityString,
+              type:  DiscordJs.ActivityType.Custom,
+              state: '',
+            }],
+          });
         }
       } else {
         const activityString = await new Message(this.onlinePresenceStatusDefaultName).parse();
-        if (activityString !== ''){
-          this.client?.user?.setStatus(this.onlinePresenceStatusDefault);
-          this.client?.user?.setPresence({ status: this.onlinePresenceStatusDefault, activities: [{ name: activityString }] });
-        } else {
-          this.client?.user?.setActivity('');
-          this.client?.user?.setStatus(this.onlinePresenceStatusDefault);
-        }
+        console.log(`Seting activity to ${activityString} and status to ${this.onlinePresenceStatusDefault}`);
+        this.client?.user?.setPresence({
+          status:     this.onlinePresenceStatusDefault,
+          activities: [{
+            name:  activityString,
+            type:  DiscordJs.ActivityType.Custom,
+            state: '',
+          }],
+        });
       }
     } catch (e: any) {
       warning(e.stack);
