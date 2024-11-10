@@ -456,7 +456,6 @@ class Discord extends Integration {
         }
       } else {
         const activityString = await new Message(this.onlinePresenceStatusDefaultName).parse();
-        console.log(`Seting activity to ${activityString} and status to ${this.onlinePresenceStatusDefault}`);
         this.client?.user?.setPresence({
           status:     this.onlinePresenceStatusDefault,
           activities: [{
