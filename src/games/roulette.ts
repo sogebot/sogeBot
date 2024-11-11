@@ -7,7 +7,7 @@ import { tmiEmitter } from '~/helpers/tmi/index.js';
 import * as changelog from '~/helpers/user/changelog.js';
 import { isBroadcaster } from '~/helpers/user/isBroadcaster.js';
 import { isModerator } from '~/helpers/user/isModerator.js';
-import { translate } from '~/translate.js';
+import { translate } from '~/translations.js';
 
 /*
  * !roulette - 50/50 chance to timeout yourself

@@ -22,7 +22,7 @@ import getBotUserName from '~/helpers/user/getBotUserName.js';
 import getBroadcasterId from '~/helpers/user/getBroadcasterId.js';
 import { createMarker } from '~/services/twitch/calls/createMarker.js';
 import twitch from '~/services/twitch.js';
-import { translate } from '~/translate.js';
+import { translate } from '~/translations.js';
 
 const ERROR_STREAM_NOT_ONLINE = '1';
 const ERROR_MISSING_TOKEN = '2';

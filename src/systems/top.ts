@@ -19,7 +19,7 @@ import { unserialize } from '~/helpers/type.js';
 import * as changelog from '~/helpers/user/changelog.js';
 import { getIgnoreList, isIgnored } from '~/helpers/user/isIgnored.js';
 import twitch from '~/services/twitch.js';
-import { translate } from '~/translate.js';
+import { translate } from '~/translations.js';
 import { variables } from '~/watchers.js';
 
 enum TYPE {

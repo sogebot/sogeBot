@@ -25,7 +25,7 @@ import { get } from '~/helpers/permissions/get.js';
 import { Types } from '~/plugins/ListenTo.js';
 import plugins from '~/plugins.js';
 import customCommands from '~/systems/customcommands.js';
-import { translate } from '~/translate.js';
+import { translate } from '~/translations.js';
 
 /*
  * !alias                                              - gets an info about alias usage

@@ -19,7 +19,7 @@ import defaultPermissions from '~/helpers/permissions/defaultPermissions.js';
 import getBotId from '~/helpers/user/getBotId.js';
 import getBotUserName from '~/helpers/user/getBotUserName.js';
 import twitch from '~/services/twitch.js';
-import { translate } from '~/translate.js';
+import { translate } from '~/translations.js';
 
 enum ERROR {
   ALREADY_OPENED,

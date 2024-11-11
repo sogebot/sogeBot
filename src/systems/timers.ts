@@ -17,7 +17,7 @@ import { announce } from '~/helpers/commons/index.js';
 import { isDbConnected } from '~/helpers/database.js';
 import { linesParsed } from '~/helpers/parser.js';
 import defaultPermissions from '~/helpers/permissions/defaultPermissions.js';
-import { translate } from '~/translate.js';
+import { translate } from '~/translations.js';
 
 /*
  * !timers                                                                                                                                 - gets an info about timers usage

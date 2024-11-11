@@ -12,7 +12,7 @@ import { prepare } from '~/helpers/commons/index.js';
 import { getLocalizedName } from '~/helpers/getLocalizedName.js';
 import defaultPermissions from '~/helpers/permissions/defaultPermissions.js';
 import * as changelog from '~/helpers/user/changelog.js';
-import { translate } from '~/translate.js';
+import { translate } from '~/translations.js';
 
 /*
  * !rank                          - show user rank

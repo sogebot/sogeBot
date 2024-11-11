@@ -70,7 +70,7 @@ async function main () {
   try {
     // Initialize all core singletons
     setTimeout(async () => {
-      const translate = (await import('./translate.js')).default;
+      const translate = (await import('./translations.js')).default;
 
       translate._load().then(async () => {
         await import('./general.js');

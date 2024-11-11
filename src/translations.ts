@@ -4,8 +4,11 @@ import { normalize } from 'path';
 import { glob } from 'glob';
 import { set, isNil, remove, isUndefined, cloneDeep, each, get } from 'lodash-es';
 
+import { Delete, Get, Post } from './decorators/endpoint.js';
+import { onStartup } from './decorators/on.js';
 import { areDecoratorsLoaded } from './decorators.js';
 
+import Core from '~/_interface.js';
 import { Settings } from '~/database/entity/settings.js';
 import { Translation } from '~/database/entity/translation.js';
 import { AppDataSource } from '~/database.js';
@@ -14,15 +17,49 @@ import { getLang, setLang } from '~/helpers/locales.js';
 import { error, warning } from '~/helpers/log.js';
 import { addMenu } from '~/helpers/panel.js';
 
-class Translate {
+class Translations extends Core {
   custom: any[] = [];
   translations: any = {};
   isLoaded = false;
 
-  constructor () {
+  @onStartup()
+  onStartup () {
     addMenu({
-      category: 'settings', name: 'translations', id: 'settings/translations', this: null,
+      category: 'settings', name: 'translations', id: 'settings/translations', this: null, scopeParent: this.scope(),
     });
+  }
+
+  @Get('/')
+  async getTranslations () {
+    const responses = flatten(this.translations[getLang()]);
+    for (const key of Object.keys(responses)) {
+      const value = {
+        default: this.translate(key, true),
+        current: this.translate(key),
+      };
+      responses[key] = value;
+    }
+    return responses;
+  }
+
+  @Post('/:key')
+  async setTranslations(req: any) {
+    const key = req.params.key;
+    const data = req.body;
+
+    remove(this.custom, function (o: any) {
+      return o.key === key;
+    });
+    this.custom.push(data);
+    await this._save();
+  }
+
+  @Delete('/:key')
+  async revertTranslations(req: any) {
+    remove(this.custom, function (o: any) {
+      return o.name === req.params.key;
+    });
+    await AppDataSource.getRepository(Translation).delete({ name: req.params.key });
   }
 
   async check(lang: string): Promise<boolean> {
@@ -128,7 +165,7 @@ class Translate {
   }
 }
 
-const translate_class = new Translate();
+const translate_class = new Translations();
 const translate = translate_class.translate;
 export default translate_class;
 export { translate };

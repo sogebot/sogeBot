@@ -31,7 +31,7 @@ import { socketsConnected } from '~/helpers/panel/index.js';
 import defaultPermissions from '~/helpers/permissions/defaultPermissions.js';
 import { list } from '~/helpers/register.js';
 import { getMuteStatus } from '~/helpers/tmi/muteStatus.js';
-import translateLib, { translate } from '~/translate.js';
+import translateLib, { translate } from '~/translations.js';
 import { variables } from '~/watchers.js';
 
 let threadStartTimestamp = Date.now();

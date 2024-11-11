@@ -18,7 +18,6 @@ import { possibleLists } from '../d.ts/src/helpers/socket.js';
 import Core from '~/_interface.js';
 import { CacheGames, CacheGamesInterface } from '~/database/entity/cacheGames.js';
 import { CacheTitles } from '~/database/entity/cacheTitles.js';
-import { Translation } from '~/database/entity/translation.js';
 import { User } from '~/database/entity/user.js';
 import { AppDataSource } from '~/database.js';
 import { onStartup } from '~/decorators/on.js';
@@ -27,9 +26,7 @@ import {
   getURL, getValueOf, isVariableSet, postURL,
 } from '~/helpers/customvariables/index.js';
 import { getIsBotStarted } from '~/helpers/database.js';
-import { flatten } from '~/helpers/flatten.js';
 import { setValue } from '~/helpers/general/index.js';
-import { getLang } from '~/helpers/locales.js';
 import {
   info,
 } from '~/helpers/log.js';
@@ -47,7 +44,7 @@ import { sendGameFromTwitch } from '~/services/twitch/calls/sendGameFromTwitch.j
 import { updateChannelInfo } from '~/services/twitch/calls/updateChannelInfo.js';
 import { processAuth, default as socketSystem } from '~/socket.js';
 import highlights from '~/systems/highlights.js';
-import translateLib, { translate } from '~/translate.js';
+import { translate } from '~/translations.js';
 import { variables } from '~/watchers.js';
 
 // __dirname is not available in ES6 module
@@ -284,39 +281,6 @@ class Panel extends Core {
           value = await getValueOf(_variable);
         }
         cb(null, value);
-      });
-
-      socket.on('responses.get', async function (at: string | null, callback: (responses: Record<string, string>) => void) {
-        const responses = flatten(!_.isNil(at) ? translateLib.translations[getLang()][at] : translateLib.translations[getLang()]);
-        _.each(responses, function (value, key) {
-          const _at = !_.isNil(at) ? at + '.' + key : key;
-          responses[key] = {}; // remap to obj
-          responses[key].default = translate(_at, true);
-          responses[key].current = translate(_at);
-        });
-        callback(responses);
-      });
-      socket.on('responses.set', function (data: { key: string }) {
-        _.remove(translateLib.custom, function (o: any) {
-          return o.key === data.key;
-        });
-        translateLib.custom.push(data);
-        translateLib._save();
-
-        const lang = {};
-        _.merge(
-          lang,
-          translate({ root: 'webpanel' }),
-          translate({ root: 'ui' }), // add ui root -> slowly refactoring to new name
-        );
-        socket.emit('lang', lang);
-      });
-      socket.on('responses.revert', async function (data: { name: string }, callback: (translation: string) => void) {
-        _.remove(translateLib.custom, function (o: any) {
-          return o.name === data.name;
-        });
-        await AppDataSource.getRepository(Translation).delete({ name: data.name });
-        callback(translate(data.name));
       });
 
       socket.on('connection_status', (cb: (status: typeof statusObj) => void) => {

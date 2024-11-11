@@ -1,4 +1,4 @@
-import { translate } from '../../translate.js';
+import { translate } from '../../translations.js';
 import { showWithAt } from '../tmi/showWithAt.js';
 
 /**

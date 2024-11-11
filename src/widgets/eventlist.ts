@@ -13,7 +13,7 @@ import { SECOND } from '~/helpers/constants.js';
 import { getLocalizedName } from '~/helpers/getLocalizedName.js';
 import { error } from '~/helpers/log.js';
 import getNameById from '~/helpers/user/getNameById.js';
-import { translate } from '~/translate.js';
+import { translate } from '~/translations.js';
 
 class EventList extends Widget {
   @Get('/')

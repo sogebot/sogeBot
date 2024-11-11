@@ -6,7 +6,7 @@ import { onStreamStart } from '~/decorators/on.js';
 import { prepare } from '~/helpers/commons/index.js';
 import { LOW, SECOND } from '~/helpers/constants.js';
 import { ioServer } from '~/helpers/panel.js';
-import { translate } from '~/translate.js';
+import { translate } from '~/translations.js';
 
 class EmotesCombo extends System {
   @settings()

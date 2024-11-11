@@ -14,7 +14,7 @@ import { getGlobalVariables } from '~/helpers/checkFilter.js';
 import { getUserSender } from '~/helpers/commons/index.js';
 import { app } from '~/helpers/panel.js';
 import twitch from '~/services/twitch.js';
-import { translate } from '~/translate.js';
+import { translate } from '~/translations.js';
 import { withScope } from './helpers/socket.js';
 
 (function initializeMessageParserAPI() {

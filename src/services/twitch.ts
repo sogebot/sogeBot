@@ -39,7 +39,7 @@ import getNameById from '~/helpers/user/getNameById.js';
 import { isIgnored } from '~/helpers/user/isIgnored.js';
 import { sendGameFromTwitch } from '~/services/twitch/calls/sendGameFromTwitch.js';
 import { updateChannelInfo } from '~/services/twitch/calls/updateChannelInfo.js';
-import { translate } from '~/translate.js';
+import { translate } from '~/translations.js';
 import { variables } from '~/watchers.js';
 
 const urls = {

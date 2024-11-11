@@ -25,7 +25,7 @@ import { ioServer } from '~/helpers/panel.js';
 import { defaultPermissions } from '~/helpers/permissions/defaultPermissions.js';
 import { itemsToEvalPart } from '~/helpers/queryFilter.js';
 import { Types } from '~/plugins/ListenTo.js';
-import { translate } from '~/translate.js';
+import { translate } from '~/translations.js';
 import { variables } from '~/watchers.js';
 
 const filterMutex = new Mutex();

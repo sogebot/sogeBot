@@ -22,7 +22,7 @@ import lastfm from '../integrations/lastfm.js';
 import spotify from '../integrations/spotify.js';
 import ranks from '../systems/ranks.js';
 import songs from '../systems/songs.js';
-import { translate } from '../translate.js';
+import { translate } from '../translations.js';
 
 import { CacheGames } from '~/database/entity/cacheGames.js';
 import { AppDataSource } from '~/database.js';

@@ -28,7 +28,7 @@ import {
 } from '~/helpers/type.js';
 import * as changelog from '~/helpers/user/changelog.js';
 import { isBotId } from '~/helpers/user/isBot.js';
-import { translate } from '~/translate.js';
+import { translate } from '~/translations.js';
 
 let cachedLevelsHash = '';
 const cachedLevels: bigint[] = [];

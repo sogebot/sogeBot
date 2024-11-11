@@ -21,7 +21,7 @@ import { linesParsed } from '~/helpers/parser.js';
 import lastfm from '~/integrations/lastfm.js';
 import spotify from '~/integrations/spotify.js';
 import songs from '~/systems/songs.js';
-import translateLib, { translate } from '~/translate.js';
+import translateLib, { translate } from '~/translations.js';
 import { variables } from '~/watchers.js';
 import { withScope } from './helpers/socket.js';
 

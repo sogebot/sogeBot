@@ -16,7 +16,7 @@ import { getFunctionName } from '~/helpers/getFunctionName.js';
 import { debug, warning } from '~/helpers/log.js';
 import { setImmediateAwait } from '~/helpers/setImmediateAwait.js';
 import twitch from '~/services/twitch.js';
-import { translate } from '~/translate.js';
+import { translate } from '~/translations.js';
 import { variables } from '~/watchers.js';
 
 async function updateChannelInfo (args: { title?: string | null; game?: string | null, tags?: string[], contentClassificationLabels?: string[] }): Promise<{ response: string; status: boolean } | null> {

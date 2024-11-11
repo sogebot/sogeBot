@@ -12,7 +12,7 @@ import { announce, prepare } from '~/helpers/commons/index.js';
 import { getLocalizedName } from '~/helpers/getLocalizedName.js';
 import { debug, warning } from '~/helpers/log.js';
 import * as changelog from '~/helpers/user/changelog.js';
-import { translate } from '~/translate.js';
+import { translate } from '~/translations.js';
 
 export type Level = { name: string; winPercentage: number; payoutMultiplier: number; maxUsers: number };
 export type Result = { percentage: number; message: string };

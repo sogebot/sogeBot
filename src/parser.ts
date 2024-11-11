@@ -17,7 +17,7 @@ import {
 import { parserEmitter } from '~/helpers/parser/emitter.js';
 import { check } from '~/helpers/permissions/check.js';
 import { getCommandPermission } from '~/helpers/permissions/getCommandPermission.js';
-import { translate } from '~/translate.js';
+import { translate } from '~/translations.js';
 
 parserEmitter.on('process', async (opts, cb) => {
   cb(await (new Parser(opts)).process());

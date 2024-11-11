@@ -46,7 +46,7 @@ import { getBadgeImagesFromBadgeSet } from '~/overlays/chat.js';
 import eventlist from '~/overlays/eventlist.js';
 import { Parser } from '~/parser.js';
 import alerts from '~/registries/alerts.js';
-import { translate } from '~/translate.js';
+import { translate } from '~/translations.js';
 import users from '~/users.js';
 import { variables } from '~/watchers.js';
 

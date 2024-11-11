@@ -34,7 +34,7 @@ import banUser from '~/services/twitch/calls/banUser.js';
 import getUserByName from '~/services/twitch/calls/getUserByName.js';
 import aliasSystem from '~/systems/alias.js';
 import songs from '~/systems/songs.js';
-import { translate } from '~/translate.js';
+import { translate } from '~/translations.js';
 
 const tlds = [...TLDs.tlds.keys()];
 

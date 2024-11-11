@@ -19,7 +19,7 @@ import defaultPermissions from '~/helpers/permissions/defaultPermissions.js';
 import { getPointsName } from '~/helpers/points/index.js';
 import * as changelog from '~/helpers/user/changelog.js';
 import { isBroadcaster, isOwner } from '~/helpers/user/index.js';
-import { translate } from '~/translate.js';
+import { translate } from '~/translations.js';
 
 /*
  * !price                     - gets an info about price usage

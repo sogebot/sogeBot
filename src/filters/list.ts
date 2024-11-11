@@ -19,7 +19,7 @@ import { format } from '~/helpers/number.js';
 import { get } from '~/helpers/permissions/get.js';
 import { getCommandPermission } from '~/helpers/permissions/getCommandPermission.js';
 import { getPointsName } from '~/helpers/points/index.js';
-import { translate } from '~/translate.js';
+import { translate } from '~/translations.js';
 
 const list: ResponseFilter = {
   '(list.#)': async function (filter: string) {

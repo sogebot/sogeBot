@@ -1,7 +1,7 @@
 import { isNil } from 'lodash-es';
 
 import { rawStatus } from './cache.js';
-import { translate } from '../../translate.js';
+import { translate } from '../../translations.js';
 import { getValueOf, isVariableSet } from '../customvariables/index.js';
 
 async function parseTitle (title: string | null) {

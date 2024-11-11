@@ -28,7 +28,7 @@ import { getUserHighestPermission } from '~/helpers/permissions/getUserHighestPe
 import { getPointsName } from '~/helpers/points/index.js';
 import * as changelog from '~/helpers/user/changelog.js';
 import twitch from '~/services/twitch.js';
-import { translate } from '~/translate.js';
+import { translate } from '~/translations.js';
 
 /*
  * !me

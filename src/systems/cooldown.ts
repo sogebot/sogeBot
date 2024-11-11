@@ -26,7 +26,7 @@ import * as changelog from '~/helpers/user/changelog.js';
 import { isOwner } from '~/helpers/user/index.js';
 import alias from '~/systems/alias.js';
 import customCommands from '~/systems/customcommands.js';
-import { translate } from '~/translate.js';
+import { translate } from '~/translations.js';
 
 const cache: { id: string; cooldowns: CooldownEntity[] }[] = [];
 const defaultCooldowns: { name: string; lastRunAt: number, permId: string }[] = [];

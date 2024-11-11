@@ -33,7 +33,7 @@ import * as changelog from '~/helpers/user/changelog.js';
 import getBotId from '~/helpers/user/getBotId.js';
 import getBotUserName from '~/helpers/user/getBotUserName.js';
 import { isModerator } from '~/helpers/user/isModerator.js';
-import { translate } from '~/translate.js';
+import { translate } from '~/translations.js';
 
 let importInProgress = false;
 const cachedTags = new Set<string>();

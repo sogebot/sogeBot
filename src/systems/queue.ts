@@ -15,7 +15,7 @@ import * as changelog from '~/helpers/user/changelog.js';
 import getBotId from '~/helpers/user/getBotId.js';
 import getBotUserName from '~/helpers/user/getBotUserName.js';
 import twitch from '~/services/twitch.js';
-import { translate } from '~/translate.js';
+import { translate } from '~/translations.js';
 
 /*
  * !queue                            - gets an info whether queue is opened or closed

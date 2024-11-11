@@ -22,7 +22,7 @@ import {
 import { check } from '~/helpers/permissions/check.js';
 import { defaultPermissions } from '~/helpers/permissions/defaultPermissions.js';
 import { get } from '~/helpers/permissions/get.js';
-import { translate } from '~/translate.js';
+import { translate } from '~/translations.js';
 
 class Keywords extends System {
   constructor() {

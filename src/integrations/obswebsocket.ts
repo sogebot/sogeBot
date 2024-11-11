@@ -22,7 +22,7 @@ import { app, ioServer } from '~/helpers/panel.js';
 import { ParameterError } from '~/helpers/parameterError.js';
 import { defaultPermissions } from '~/helpers/permissions/defaultPermissions.js';
 import { Types } from '~/plugins/ListenTo.js';
-import { translate } from '~/translate.js';
+import { translate } from '~/translations.js';
 
 class OBSWebsocket extends Integration {
   @onStartup()

@@ -33,7 +33,7 @@ import { getPointsName, name } from '~/helpers/points/index.js';
 import * as changelog from '~/helpers/user/changelog.js';
 import { isBot, isBotId } from '~/helpers/user/isBot.js';
 import { getIdFromTwitch } from '~/services/twitch/calls/getIdFromTwitch.js';
-import { translate } from '~/translate.js';
+import { translate } from '~/translations.js';
 import { variables } from '~/watchers.js';
 
 class Points extends System {
