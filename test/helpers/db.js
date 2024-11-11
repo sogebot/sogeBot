@@ -28,7 +28,7 @@ import { User, UserTip, UserBit } from '../../dest/database/entity/user.js';
 import { Variable } from '../../dest/database/entity/variable.js';
 import { getIsDbConnected, getIsBotStarted } from '../../dest/helpers/database.js';
 import emitter from '../../dest/helpers/interfaceEmitter.js';
-import translation from '../../dest/translate.js';
+import translation from '../../dest/translations.js';
 import { AppDataSource } from '../../dest/database.js';
 
 export const cleanup = async () => {

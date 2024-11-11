@@ -4,7 +4,7 @@ import assert from 'assert';
 import { getLocalizedName } from '../../../dest/helpers/getLocalizedName.js';
 
 import getBotUserName from '../../../dest/helpers/user/getBotUserName.js'
-import { translate } from '../../../dest/translate.js';
+import { translate } from '../../../dest/translations.js';
 import('../../general.js');
 import { db } from '../../general.js';
 import { message } from '../../general.js';
