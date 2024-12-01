@@ -29,7 +29,9 @@ class Translations extends Core {
     });
   }
 
-  @Get('/')
+  @Get('/', {
+    scope: 'public',
+  })
   async getTranslations () {
     const responses = flatten(this.translations[getLang()]);
     for (const key of Object.keys(responses)) {
