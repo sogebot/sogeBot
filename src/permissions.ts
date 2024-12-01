@@ -67,7 +67,8 @@ class Permissions extends Core {
     return PermissionsEntity.save(data);
   }
 
-  @Post('/?_action=testUser', {
+  @Post('/', {
+    action:       'testUser',
     zodValidator: z.object({
       pid:   z.string(),
       value: z.union([z.string(), z.number()]),
