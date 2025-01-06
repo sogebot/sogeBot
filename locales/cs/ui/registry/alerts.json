@@ -114,12 +114,12 @@
   "messageTemplate": {
     "name": "Šablona zprávy",
     "placeholder": "Zadejte svou šablonu zprávy",
-    "help": "Available variables: {name}, {amount} (cheers, subs, tips, subgifts, sub community gifts, command redeems), {recipient} (subgifts, command redeems), {monthsName} (subs, subgifts), {tier} (subs), {currency} (tips), {game} (promo). If | is added (see promo) then it will show those values in sequence."
+    "help": "Available variables: {{name}}, {{amount}} (cheers, subs, tips, subgifts, sub community gifts, command redeems), {{recipient}} (subgifts, command redeems), {{monthsName}} (subs, subgifts), {{tier}} (subs), {{currency}} (tips), {{game}} (promo). If | is added (see promo) then it will show those values in sequence."
   },
   "ttsTemplate": {
     "name": "TTS šablona",
     "placeholder": "Nastavte si šablonu TTS",
-    "help": "Dostupné proměnné: {name}, {amount} {monthsName} {currency} {message}"
+    "help": "Dostupné proměnné: {{name}}, {{amount}} {{monthsName}} {{currency}} {{message}}"
   },
   "animationText": {
     "name": "Animace textu"

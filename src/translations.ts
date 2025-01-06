@@ -157,9 +157,12 @@ class Translations extends Core {
       } else {
         translated = get(this.translations[getLang()], String(text), undefined);
       }
-      each(translated.match(/(\{[\w-.]+\})/g), (toTranslate) => {
+      // translate {something} but not {{something}}
+      each(translated.match(/(?<!\{)\{[\w-.]+\}(?!\})/g), (toTranslate) => {
         translated = translated.replace(toTranslate, this.get(toTranslate.replace('{', '').replace('}', ''), orig));
       });
+      // replace {{something}} to {something}
+      translated = translated.replace(/\{\{([\w-.]+)\}\}/g, '{$1}');
       return translated;
     } catch (err: any) {
       return '{missing_translation: ' + getLang() + '.' + String(text) + '}';

@@ -114,12 +114,12 @@
   "messageTemplate": {
     "name": "Modello messaggio",
     "placeholder": "Imposta il tuo modello di messaggi",
-    "help": "Available variables: {name}, {amount} (cheers, subs, tips, subgifts, sub community gifts, command redeems), {recipient} (subgifts, command redeems), {monthsName} (subs, subgifts), {tier} (subs), {currency} (tips), {game} (promo). If | is added (see promo) then it will show those values in sequence."
+    "help": "Available variables: {{name}}, {{amount}} (cheers, subs, tips, subgifts, sub community gifts, command redeems), {{recipient}} (subgifts, command redeems), {{monthsName}} (subs, subgifts), {{tier}} (subs), {{currency}} (tips), {{game}} (promo). If | is added (see promo) then it will show those values in sequence."
   },
   "ttsTemplate": {
     "name": "TTS template",
     "placeholder": "Set your TTS template",
-    "help": "Available variables: {name}, {amount} {monthsName} {currency} {message}"
+    "help": "Available variables: {{name}}, {{amount}} {{monthsName}} {{currency}} {{message}}"
   },
   "animationText": {
     "name": "Testo animazione"
