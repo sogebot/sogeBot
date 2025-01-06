@@ -105,11 +105,11 @@ class Streamlabs extends Integration {
     if (this.enabled && this.accessToken.length > 0) {
       this.getMe();
       const after = String(this.afterDonationId).length > 0 ? `&after=${this.afterDonationId}` : '';
-      const url = 'https://Streamlabs.com/api/v1.0/donations?access_token=' + this.accessToken + after;
+      const url = 'https://streamlabs.com/api/v1.0/donations?access_token=' + this.accessToken + after;
       try {
         const result = (await axios.get<any>(url)).data;
-        debug('Streamlabs', url);
-        debug('Streamlabs', result);
+        debug('streamlabs', url);
+        debug('streamlabs', result);
         ioServer?.emit('api.stats', {
           method: 'GET', data: result, timestamp: Date.now(), call: 'Streamlabs', api: 'other', endpoint: url, code: 200,
         });
@@ -167,12 +167,12 @@ class Streamlabs extends Integration {
   async getSocketToken() {
     if (this.enabled && this.accessToken.length > 0 ) {
       try {
-        const url = 'https://Streamlabs.com/api/v1.0/socket/token?access_token=' + this.accessToken;
+        const url = 'https://streamlabs.com/api/v1.0/socket/token?access_token=' + this.accessToken;
         const result = (await axios.get<any>(url)).data;
         this.socketToken = result.socket_token;
       } catch (e) {
         if (this.socketToken === '') {
-          warning('Streamlabs: Couldn\'t fetch socket token. Will use only REST API polling.');
+          warning('STREAMLABS: Couldn\'t fetch socket token. Will use only REST API polling.');
         }
       }
     }
@@ -180,12 +180,12 @@ class Streamlabs extends Integration {
 
   async getMe() {
     if (this.enabled && this.accessToken.length > 0) {
-      const url = 'https://Streamlabs.com/api/v1.0/user?access_token=' + this.accessToken;
+      const url = 'https://streamlabs.com/api/v1.0/user?access_token=' + this.accessToken;
       const result = (await axios.get<any>(url)).data;
-      if (this.userName !== result.Streamlabs.username) {
-        info('Streamlabs: Connected as ' + result.Streamlabs.username);
+      if (this.userName !== result.streamlabs.username) {
+        info('STREAMLABS: Connected as ' + result.streamlabs.username);
       }
-      this.userName = result.Streamlabs.username;
+      this.userName = result.streamlabs.username;
     } else {
       this.userName = '';
     }
@@ -200,12 +200,13 @@ class Streamlabs extends Integration {
     this.userName = '';
     this.accessToken = '';
     this.disconnect();
-    info(`Streamlabs: User access revoked.`);
+    info(`STREAMLABS: User access revoked.`);
   }
 
   @Post('/', {
     zodValidator: z.object({ accessToken: z.string() }),
     isSensitive:  true,
+    action:       'token',
   })
   async postCode(req: any) {
     const tokens = req.body;
@@ -221,18 +222,18 @@ class Streamlabs extends Integration {
       return;
     }
 
-    this.socketToStreamlabs = io('https://sockets.Streamlabs.com?token=' + this.socketToken);
+    this.socketToStreamlabs = io('https://sockets.streamlabs.com?token=' + this.socketToken);
 
     this.socketToStreamlabs.on('reconnect_attempt', () => {
-      info(chalk.yellow('Streamlabs:') + ' Trying to reconnect to service');
+      info(chalk.yellow('STREAMLABS:') + ' Trying to reconnect to service');
     });
 
     this.socketToStreamlabs.on('connect', () => {
-      info(chalk.yellow('Streamlabs:') + ' Successfully connected socket to service');
+      info(chalk.yellow('STREAMLABS:') + ' Successfully connected socket to service');
     });
 
     this.socketToStreamlabs.on('disconnect', () => {
-      info(chalk.yellow('Streamlabs:') + ' Socket disconnected from service');
+      info(chalk.yellow('STREAMLABS:') + ' Socket disconnected from service');
       if (this.socketToStreamlabs) {
         this.socketToStreamlabs.open();
       }
@@ -248,7 +249,7 @@ class Streamlabs extends Integration {
       for (const event of eventData.message) {
         const timestamp = (event.created_at * 1000) || Date.now();
 
-        debug('Streamlabs', event);
+        debug('streamlabs', event);
         if (!event.isTest) {
           const user = await users.getUserByUsername(event.from.toLowerCase());
           const tips = await AppDataSource.getRepository(UserTip).find({ where: { userId: user.userId } });
