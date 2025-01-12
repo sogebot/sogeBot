@@ -210,14 +210,6 @@ const processAuth = (req: { headers: { [x: string]: any; }; }, res: { sendStatus
     if (token.privileges.scopes) {
       req.headers.scopes = token.privileges.scopes;
     }
-
-    if (token.privileges.haveAdminPrivileges === true) {
-      // add all scopes to header
-      req.headers.scopes = token.privileges.excludeSensitiveScopes === true
-        ? Array.from(scopes).filter(scope => !scope.includes('sensitive'))
-        : Array.from(scopes);
-      return next();
-    }
   } catch {
     null;
   }

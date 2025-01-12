@@ -44,6 +44,13 @@ const getPrivileges = async(userId: string): Promise<{
       excludeSensitiveScopes: userPermission.excludeSensitiveScopes,
       scopes:                 userPermission.scopes ?? [],
     };
+
+    if (privileges.haveAdminPrivileges) {
+      privileges.scopes = userPermission.excludeSensitiveScopes === true
+        ? Array.from(scopes).filter(scope => !scope.includes('sensitive'))
+        : Array.from(scopes);
+    }
+
     return privileges;
   } catch (e: any) {
     return {
@@ -87,7 +94,6 @@ const withScope = (requiredScopes: string[], isPublic: boolean = false) => {
     const authHeader = req.headers.authorization;
     const authToken = authHeader && authHeader.split(' ')[1];
     try {
-
       const socket = (await import('../socket.js')).default;
 
       if (authToken === socket.socketToken || isPublic || requiredScopes.length === 0) {
