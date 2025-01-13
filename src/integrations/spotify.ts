@@ -79,7 +79,7 @@ class Spotify extends Integration {
   @settings('connection')
     clientSecret = '';
   @settings('connection')
-    redirectURI = 'http://localhost:20000/credentials/oauth/spotify'; // TODO: remove after old ui is removed
+    redirectURI = 'https://dash.sogebot.xyz/credentials/spotify';
   @settings('connection')
     username = '';
 
@@ -398,7 +398,6 @@ class Spotify extends Integration {
   }
   @Post('/', { action: 'code', zodValidator: z.object({ code: z.string() }) })
   async setCode(req: Request) {
-    this.redirectURI = 'https://dash.sogebot.xyz/credentials/spotify';
     const waitForUsername = () => {
       return new Promise((resolve) => {
         const check = async () => {
