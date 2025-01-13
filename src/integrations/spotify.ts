@@ -580,7 +580,7 @@ class Spotify extends Integration {
     }
     const state = crypto.createHash('md5').update(Math.random().toString()).digest('hex');
     this.state = state;
-    return this.client.createAuthorizeURL(this.scopes, state) + '&show_dialog=true';
+    return this.client.createAuthorizeURL(this.scopes, state) + '&show_dialog=true&redirect_uri=' + encodeURIComponent(this.redirectURI);
   }
 
   @command('!spotify unban')
