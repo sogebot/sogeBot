@@ -1,5 +1,4 @@
 import { HeistUser } from '@entity/heist.js';
-import _ from 'lodash-es';
 
 import Game from './_interface.js';
 import { onStartup } from '../decorators/on.js';
@@ -13,6 +12,7 @@ import { getLocalizedName } from '~/helpers/getLocalizedName.js';
 import { debug, warning } from '~/helpers/log.js';
 import * as changelog from '~/helpers/user/changelog.js';
 import { translate } from '~/translations.js';
+import { orderBy, isNil, random, chunk } from 'lodash-es';
 
 export type Level = { name: string; winPercentage: number; payoutMultiplier: number; maxUsers: number };
 export type Result = { percentage: number; message: string };
@@ -28,71 +28,71 @@ class Heist extends Game {
   lastAnnouncedStart = 0;
 
   @settings('options')
-    showMaxUsers = 20;
+  showMaxUsers = 20;
   @settings('options')
-    copsCooldownInMinutes = 10;
+  copsCooldownInMinutes = 10;
   @settings('options')
-    entryCooldownInSeconds = 120;
+  entryCooldownInSeconds = 120;
 
   @settings('notifications')
-    started: string = translate('games.heist.started');
+  started: string = translate('games.heist.started');
   @settings('notifications')
-    nextLevelMessage: string = translate('games.heist.levelMessage');
+  nextLevelMessage: string = translate('games.heist.levelMessage');
   @settings('notifications')
-    maxLevelMessage: string = translate('games.heist.maxLevelMessage');
+  maxLevelMessage: string = translate('games.heist.maxLevelMessage');
   @settings('notifications')
-    copsOnPatrol: string = translate('games.heist.copsOnPatrol');
+  copsOnPatrol: string = translate('games.heist.copsOnPatrol');
   @settings('notifications')
-    copsCooldown: string = translate('games.heist.copsCooldownMessage');
+  copsCooldown: string = translate('games.heist.copsCooldownMessage');
 
   @settings('results')
-    singleUserSuccess: string = translate('games.heist.singleUserSuccess');
+  singleUserSuccess: string = translate('games.heist.singleUserSuccess');
   @settings('results')
-    singleUserFailed: string = translate('games.heist.singleUserFailed');
+  singleUserFailed: string = translate('games.heist.singleUserFailed');
   @settings('results')
-    noUser: string = translate('games.heist.noUser');
+  noUser: string = translate('games.heist.noUser');
   @settings('results')
-    resultsValues: Result[] = [
-      { percentage: 0, message: translate('games.heist.result.0') },
-      { percentage: 33, message: translate('games.heist.result.33') },
-      { percentage: 50, message: translate('games.heist.result.50') },
-      { percentage: 99, message: translate('games.heist.result.99') },
-      { percentage: 100, message: translate('games.heist.result.100') },
-    ];
+  resultsValues: Result[] = [
+    { percentage: 0, message: translate('games.heist.result.0') },
+    { percentage: 33, message: translate('games.heist.result.33') },
+    { percentage: 50, message: translate('games.heist.result.50') },
+    { percentage: 99, message: translate('games.heist.result.99') },
+    { percentage: 100, message: translate('games.heist.result.100') },
+  ];
 
   @settings('levels')
-    levelsValues: Level[] = [
-      {
-        'name':             translate('games.heist.levels.bankVan'),
-        'winPercentage':    60,
-        'payoutMultiplier': 1.5,
-        'maxUsers':         5,
-      },
-      {
-        'name':             translate('games.heist.levels.cityBank'),
-        'winPercentage':    46,
-        'payoutMultiplier': 1.7,
-        'maxUsers':         10,
-      },
-      {
-        'name':             translate('games.heist.levels.stateBank'),
-        'winPercentage':    40,
-        'payoutMultiplier': 1.9,
-        'maxUsers':         20,
-      },
-      {
-        'name':             translate('games.heist.levels.nationalReserve'),
-        'winPercentage':    35,
-        'payoutMultiplier': 2.1,
-        'maxUsers':         30,
-      },
-      {
-        'name':             translate('games.heist.levels.federalReserve'),
-        'winPercentage':    31,
-        'payoutMultiplier': 2.5,
-        'maxUsers':         1000,
-      },
-    ];
+  levelsValues: Level[] = [
+    {
+      'name':             translate('games.heist.levels.bankVan'),
+      'winPercentage':    60,
+      'payoutMultiplier': 1.5,
+      'maxUsers':         5,
+    },
+    {
+      'name':             translate('games.heist.levels.cityBank'),
+      'winPercentage':    46,
+      'payoutMultiplier': 1.7,
+      'maxUsers':         10,
+    },
+    {
+      'name':             translate('games.heist.levels.stateBank'),
+      'winPercentage':    40,
+      'payoutMultiplier': 1.9,
+      'maxUsers':         20,
+    },
+    {
+      'name':             translate('games.heist.levels.nationalReserve'),
+      'winPercentage':    35,
+      'payoutMultiplier': 2.1,
+      'maxUsers':         30,
+    },
+    {
+      'name':             translate('games.heist.levels.federalReserve'),
+      'winPercentage':    31,
+      'payoutMultiplier': 2.5,
+      'maxUsers':         1000,
+    },
+  ];
 
   @onStartup()
   onStartup() {
@@ -102,14 +102,14 @@ class Heist extends Game {
   async iCheckFinished () {
     clearTimeout(this.timeouts.iCheckFinished);
 
-    const levels = _.orderBy(this.levelsValues, 'maxUsers', 'asc');
+    const levels = orderBy(this.levelsValues, 'maxUsers', 'asc');
 
     // check if heist is finished
     debug('heist', 'Checking heist if finished');
-    if (!_.isNil(this.startedAt) && Date.now() - this.startedAt > (this.entryCooldownInSeconds * 1000) + 10000) {
+    if (!isNil(this.startedAt) && Date.now() - this.startedAt > (this.entryCooldownInSeconds * 1000) + 10000) {
       debug('heist', 'Heist finished, processing');
       const users = await AppDataSource.getRepository(HeistUser).find();
-      let level = levels.find(o => o.maxUsers >= users.length || _.isNil(o.maxUsers)); // find appropriate level or max level
+      let level = levels.find(o => o.maxUsers >= users.length || isNil(o.maxUsers)); // find appropriate level or max level
 
       if (!level) {
         if (levels.length > 0) {
@@ -133,7 +133,7 @@ class Heist extends Game {
       announce(this.started.replace('$bank', level.name), 'heist');
       if (users.length === 1) {
         // only one user
-        const isSurvivor = _.random(0, 100, false) <= level.winPercentage;
+        const isSurvivor = random(0, 100, false) <= level.winPercentage;
         const user = users[0];
         const outcome = isSurvivor ? this.singleUserSuccess : this.singleUserFailed;
         global.setTimeout(async () => {
@@ -147,7 +147,7 @@ class Heist extends Game {
       } else {
         const winners: string[] = [];
         for (const user of users) {
-          const isSurvivor = _.random(0, 100, false) <= level.winPercentage;
+          const isSurvivor = random(0, 100, false) <= level.winPercentage;
 
           if (isSurvivor) {
             // add points to user
@@ -156,17 +156,17 @@ class Heist extends Game {
           }
         }
         const percentage = (100 / users.length) * winners.length;
-        const ordered = _.orderBy(this.resultsValues, [(o) => o.percentage], 'asc');
+        const ordered = orderBy(this.resultsValues, [(o) => o.percentage], 'asc');
         const result = ordered.find(o => o.percentage >= percentage);
         global.setTimeout(async () => {
-          if (!_.isNil(result)) {
+          if (!isNil(result)) {
             announce(result.message, 'heist');
           }
         }, 5000);
         if (winners.length > 0) {
           global.setTimeout(async () => {
-            const chunk: string[][] = _.chunk(winners, this.showMaxUsers);
-            const winnersList = chunk.shift() || [];
+            const chnk: string[][] = chunk(winners, this.showMaxUsers);
+            const winnersList = chnk.shift() || [];
             const andXMore = winners.length - this.showMaxUsers;
 
             let message = await translate('games.heist.results');
@@ -201,7 +201,7 @@ class Heist extends Game {
       this.lastHeistTimestamp,
       this.copsCooldownInMinutes,
     ]);
-    const levels = _.orderBy(this.levelsValues, 'maxUsers', 'asc');
+    const levels = orderBy(this.levelsValues, 'maxUsers', 'asc');
 
     // is cops patrolling?
     if (Date.now() - lastHeistTimestamp < copsCooldown * 60000) {
@@ -244,7 +244,7 @@ class Heist extends Game {
     points = points === 'all' ? userPoints : Number(points); // set all points
     points = points > userPoints ? userPoints : points; // bet only user points
 
-    if (points === 0 || _.isNil(points) || _.isNaN(points)) {
+    if (points === 0 || isNil(points) || isNaN(points)) {
       return [{ response: translate('games.heist.entryInstruction').replace('$command', opts.command), ...opts }];
     } // send entryInstruction if command is not ok
 
@@ -257,7 +257,7 @@ class Heist extends Game {
 
     // check how many users are in heist
     const users = await AppDataSource.getRepository(HeistUser).find();
-    const level = levels.find(o => o.maxUsers >= users.length || _.isNil(o.maxUsers));
+    const level = levels.find(o => o.maxUsers >= users.length || isNil(o.maxUsers));
     if (level) {
       const nextLevel = levels.find(o => o.maxUsers > level.maxUsers);
       if (this.lastAnnouncedLevel !== level.name) {

@@ -1,5 +1,3 @@
-import _ from 'lodash-es';
-
 import Game from './_interface.js';
 import { command, settings } from '../decorators.js';
 
@@ -8,6 +6,7 @@ import * as changelog from '~/helpers/user/changelog.js';
 import { isBroadcaster } from '~/helpers/user/isBroadcaster.js';
 import { isModerator } from '~/helpers/user/isModerator.js';
 import { translate } from '~/translations.js';
+import { random } from 'lodash-es';
 
 /*
  * !roulette - 50/50 chance to timeout yourself
@@ -17,16 +16,16 @@ class Roulette extends Game {
   dependsOn = [ 'systems.points' ];
 
   @settings()
-    timeout = 10;
+  timeout = 10;
 
   @settings('rewards')
-    winnerWillGet = 0;
+  winnerWillGet = 0;
   @settings('rewards')
-    loserWillLose = 0;
+  loserWillLose = 0;
 
   @command('!roulette')
   async main (opts: CommandOptions): Promise<(CommandResponse & { isAlive?: boolean })[]> {
-    const isAlive = !!_.random(0, 1, false);
+    const isAlive = !!random(0, 1, false);
     const isMod = isModerator(opts.sender);
     const responses: (CommandResponse & { isAlive?: boolean })[] = [];
 

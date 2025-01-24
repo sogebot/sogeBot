@@ -2,7 +2,7 @@ import {
   Cooldown as CooldownEntity,
 } from '@entity/cooldown.js';
 import { Keyword } from '@entity/keyword.js';
-import _, { merge } from 'lodash-es';
+import { merge, isNil, escapeRegExp, some } from 'lodash-es';
 import { In } from 'typeorm';
 
 import System from './_interface.js';
@@ -49,15 +49,15 @@ setInterval(async () => {
 
 class Cooldown extends System {
   @permission_settings('default', [ defaultPermissions.CASTERS ])
-    defaultCooldownOfCommandsInSeconds = 0;
+  defaultCooldownOfCommandsInSeconds = 0;
   @permission_settings('default', [ defaultPermissions.CASTERS ])
-    defaultCooldownOfKeywordsInSeconds = 0;
+  defaultCooldownOfKeywordsInSeconds = 0;
 
   @settings()
-    cooldownNotifyAsWhisper = false;
+  cooldownNotifyAsWhisper = false;
 
   @settings()
-    cooldownNotifyAsChat = true;
+  cooldownNotifyAsChat = true;
 
   @onChange('defaultCooldownOfKeywordsInSeconds')
   resetDefaultCooldownsKeyword() {
@@ -187,7 +187,7 @@ class Cooldown extends System {
         .string({ optional: true })
         .toArray();
 
-      if (!_.isNil(cmd)) { // command
+      if (!isNil(cmd)) { // command
         let name = subcommand ? `${cmd} ${subcommand}` : cmd;
         let isFound = false;
 
@@ -261,7 +261,7 @@ class Cooldown extends System {
         ]);
 
         keywords = keywords.filter(o => {
-          return opts.message.toLowerCase().search(new RegExp('^(?!\\!)(?:^|\\s).*(' + _.escapeRegExp(o.keyword.toLowerCase()) + ')(?=\\s|$|\\?|\\!|\\.|\\,)', 'gi')) >= 0;
+          return opts.message.toLowerCase().search(new RegExp('^(?!\\!)(?:^|\\s).*(' + escapeRegExp(o.keyword.toLowerCase()) + ')(?=\\s|$|\\?|\\!|\\.|\\,)', 'gi')) >= 0;
         });
 
         data = [];
@@ -291,7 +291,7 @@ class Cooldown extends System {
           }
         }
       }
-      if (!_.some(data, { isEnabled: true })) { // parse ok if all cooldowns are disabled
+      if (!some(data, { isEnabled: true })) { // parse ok if all cooldowns are disabled
         return true;
       }
 
@@ -376,7 +376,7 @@ class Cooldown extends System {
           }
           info(`${opts.sender.userName}#${opts.sender.userId} have ${cooldown.name} on cooldown, remaining ${Math.ceil((cooldown.miliseconds - now + new Date(timestamp).getTime()) / 1000)}s`);
           result = false;
-          break; // disable _.each and updateQueue with false
+          break; // disable each and updateQueue with false
         }
       }
 

@@ -3,7 +3,6 @@ import { randomUUID } from 'node:crypto';
 import { setTimeout } from 'timers';
 
 import chalk from 'chalk';
-import _ from 'lodash-es';
 import type { Namespace } from 'socket.io/dist/namespace';
 
 import { ClientToServerEventsWithNamespace } from '../d.ts/src/helpers/socket.js';
@@ -29,6 +28,7 @@ import defaultPermissions from '~/helpers/permissions/defaultPermissions.js';
 import { register } from '~/helpers/register.js';
 import { addScope, withScope } from '~/helpers/socket.js';
 import * as watchers from '~/watchers.js';
+import { every, isEqual, set, isNil, cloneDeep, isFunction, get } from 'lodash-es';
 
 let socket: import('~/socket').Socket | any = null;
 
@@ -63,7 +63,7 @@ class Module {
         const status: any[] = [];
         for (const dependency of this.dependsOn) {
           const module = modules.get(dependency);
-          if (!module || !_.isFunction(module.status)) {
+          if (!module || !isFunction(module.status)) {
             if (retry > 0) {
               setTimeout(() => check(--retry), 10);
             } else {
@@ -74,7 +74,7 @@ class Module {
             status.push(await module.status({ quiet: true }));
           }
         }
-        resolve(status.length === 0 || _.every(status));
+        resolve(status.length === 0 || every(status));
       };
       check(10000);
     });
@@ -86,8 +86,12 @@ class Module {
 
   get enabled(): boolean {
     if (this.areDependenciesEnabled && !this.isDisabledByEnv) {
-      const isEnabled = _.get(this, '_enabled', true);
-      isEnabled ? enabled.enable(this.nsp) : enabled.disable(this.nsp);
+      const isEnabled = get(this, '_enabled', true);
+      if (isEnabled) {
+        enabled.enable(this.nsp);
+      } else {
+        enabled.disable(this.nsp);
+      }
       return isEnabled;
     } else {
       enabled.disable(this.nsp);
@@ -96,9 +100,13 @@ class Module {
   }
 
   set enabled(value: boolean) {
-    if (!_.isEqual(_.get(this, '_enabled', true), value)) {
-      _.set(this, '_enabled', value);
-      value ? enabled.enable(this.nsp) : enabled.disable(this.nsp);
+    if (!isEqual(get(this, '_enabled', true), value)) {
+      set(this, '_enabled', value);
+      if (value) {
+        enabled.enable(this.nsp);
+      } else {
+        enabled.disable(this.nsp);
+      }
       AppDataSource.getRepository(Settings).findOneBy({
         name:      'enabled',
         namespace: this.nsp,
@@ -138,7 +146,11 @@ class Module {
     this._name = name;
     this._enabled = enabledArg;
     this._scope = this.__moduleName__.toLowerCase(); // use just name of module as scope
-    enabledArg ? enabled.enable(this.nsp) : enabled.disable(this.nsp);
+    if (enabledArg) {
+      enabled.enable(this.nsp);
+    } else {
+      enabled.disable(this.nsp);
+    }
 
     register(this._name as any, this);
 
@@ -442,8 +454,8 @@ class Module {
       return true;
     }
 
-    const isMasterAndStatusOnly = _.isNil(opts.state);
-    const isStatusChanged = !_.isNil(opts.state) && this.enabled !== opts.state;
+    const isMasterAndStatusOnly = isNil(opts.state);
+    const isStatusChanged = !isNil(opts.state) && this.enabled !== opts.state;
 
     if (existsSync('~/restart.pid') // force quiet if we have restart.pid
       || (this.enabled === opts.state && this.firstStatusSent) // force quiet if we actually don't change anything
@@ -514,12 +526,12 @@ class Module {
         }
 
         if (category === 'commands') {
-          _.set(promisedSettings, `${category}.${key}`, withoutDefaults ? this.getCommand(key) : [this.getCommand(key), defaultValue]);
+          set(promisedSettings, `${category}.${key}`, withoutDefaults ? this.getCommand(key) : [this.getCommand(key), defaultValue]);
         } else {
-          _.set(promisedSettings, `${category}.${key}`, withoutDefaults ? (this as any)[key] : [(this as any)[key], defaultValue]);
+          set(promisedSettings, `${category}.${key}`, withoutDefaults ? (this as any)[key] : [(this as any)[key], defaultValue]);
         }
       } else {
-        _.set(promisedSettings, key, withoutDefaults ? (this as any)[key] : [(this as any)[key], defaultValue]);
+        set(promisedSettings, key, withoutDefaults ? (this as any)[key] : [(this as any)[key], defaultValue]);
       }
     }
 
@@ -534,9 +546,9 @@ class Module {
           promisedSettings.__permission_based__[category] = {};
         }
 
-        _.set(promisedSettings, `__permission_based__.${category}.${key}`, withoutDefaults ? await this.getPermissionBasedSettingsValue(key, false) : [await this.getPermissionBasedSettingsValue(key, false), defaultValue]);
+        set(promisedSettings, `__permission_based_${category}.${key}`, withoutDefaults ? await this.getPermissionBasedSettingsValue(key, false) : [await this.getPermissionBasedSettingsValue(key, false), defaultValue]);
       } else {
-        _.set(promisedSettings, `__permission_based__.${key}`, withoutDefaults ? await this.getPermissionBasedSettingsValue(key, false) : [await this.getPermissionBasedSettingsValue(key, false), defaultValue]);
+        set(promisedSettings, `__permission_based_${key}`, withoutDefaults ? await this.getPermissionBasedSettingsValue(key, false) : [await this.getPermissionBasedSettingsValue(key, false), defaultValue]);
       }
     }
 
@@ -558,7 +570,7 @@ class Module {
     promisedSettings.enabled = this._enabled;
 
     // check ui ifs
-    const ui: InterfaceSettings.UI = _.cloneDeep(this._ui);
+    const ui: InterfaceSettings.UI = cloneDeep(this._ui);
     for (const categoryKey of Object.keys(promisedSettings)) {
       if (ui[categoryKey]) {
         for (const key of Object.keys(ui[categoryKey])) {
@@ -590,14 +602,14 @@ class Module {
       parser.permission = typeof parser.permission !== 'undefined' ? parser.permission : defaultPermissions.VIEWERS;
       parser.priority = typeof parser.priority !== 'undefined' ? parser.priority : 3 /* constants.LOW */;
 
-      if (_.isNil(parser.name)) {
+      if (isNil(parser.name)) {
         throw Error('Parsers name must be defined');
       }
 
       if (typeof parser.dependsOn !== 'undefined') {
         for (const dependency of parser.dependsOn) {
           // skip parser if dependency is not enabled
-          if (!_.isFunction(dependency.status) || !(await dependency.status())) {
+          if (!isFunction(dependency.status) || !(await dependency.status())) {
             continue;
           }
         }
@@ -627,7 +639,7 @@ class Module {
       fnc: (opts: ParserOptions) => any;
     }[] = [];
     for (const rollback of this._rollback) {
-      if (_.isNil(rollback.name)) {
+      if (isNil(rollback.name)) {
         throw Error('Rollback name must be defined');
       }
 
@@ -652,7 +664,7 @@ class Module {
         isHelper: boolean;
       }[] = [];
       for (const command of this._commands) {
-        if (_.isNil(command.name)) {
+        if (isNil(command.name)) {
           throw Error('Command name must be defined');
         }
 
@@ -675,7 +687,7 @@ class Module {
         if (command.dependsOn) {
           for (const dependency of command.dependsOn) {
             // skip command if dependency is not enabled
-            if (!_.isFunction(dependency.status) || !(await dependency.status())) {
+            if (!isFunction(dependency.status) || !(await dependency.status())) {
               continue;
             }
           }
@@ -702,7 +714,7 @@ class Module {
 
   public async getUI() {
     // we need to go through all ui and trigger functions and delete attr if false
-    const ui: InterfaceSettings.UI = _.cloneDeep(this._ui);
+    const ui: InterfaceSettings.UI = cloneDeep(this._ui);
     for (const [k, v] of Object.entries(ui)) {
       if (typeof v !== 'undefined' && typeof v !== 'boolean') {
         if (typeof v.type !== 'undefined') {
@@ -817,22 +829,22 @@ class Module {
         if (p.id === defaultPermissions.VIEWERS) {
           // set default value if viewers
           permId = p.id;
-          return { ...prev, [p.id]: _.get(this, `__permission_based__${key}.${p.id}`, (this as any)[key]) };
+          return { ...prev, [p.id]: get(this, `__permission_based__${key}.${p.id}`, (this as any)[key]) };
         } else {
           // set value of permission before if anything else (to have proper waterfall inheriting)
           // we should have correct values as we are desc ordering
-          const value = _.get(this, `__permission_based__${key}.${p.id}`, null);
+          const value = get(this, `__permission_based__${key}.${p.id}`, null);
           if (value === null) {
             const prevId = permId;
             permId = p.id;
-            return { ...prev, [p.id]: _.get(prev, prevId, _.get(this, `__permission_based__${key}.${p.id}`, (this as any)[key])) };
+            return { ...prev, [p.id]: get(prev, prevId, get(this, `__permission_based__${key}.${p.id}`, (this as any)[key])) };
           } else {
             permId = p.id;
-            return { ...prev, [p.id]: _.get(this, `__permission_based__${key}.${p.id}`, value) };
+            return { ...prev, [p.id]: get(this, `__permission_based__${key}.${p.id}`, value) };
           }
         }
       } else {
-        return { ...prev, [p.id]: _.get(this, `__permission_based__${key}.${p.id}`, null) };
+        return { ...prev, [p.id]: get(this, `__permission_based__${key}.${p.id}`, null) };
       }
     }, {});
   }

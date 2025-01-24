@@ -3,7 +3,7 @@ import { randomUUID } from 'node:crypto';
 import {
   Keyword, KeywordGroup,
 } from '@entity/keyword.js';
-import _, { orderBy, shuffle } from 'lodash-es';
+import { orderBy, shuffle, cloneDeep } from 'lodash-es';
 import XRegExp from 'xregexp';
 
 import System from './_interface.js';
@@ -245,7 +245,7 @@ class Keywords extends System {
     if (!keyword) {
       // print keywords
       const keywords = await Keyword.find({ where: { enabled: true } });
-      const response = (keywords.length === 0 ? translate('keywords.list-is-empty') : translate('keywords.list-is-not-empty').replace(/\$list/g, _.orderBy(keywords, 'keyword').map(o => o.keyword).join(', ')));
+      const response = (keywords.length === 0 ? translate('keywords.list-is-empty') : translate('keywords.list-is-not-empty').replace(/\$list/g, orderBy(keywords, 'keyword').map(o => o.keyword).join(', ')));
       return [{ response, ...opts }];
     } else {
       // print responses
@@ -257,7 +257,7 @@ class Keywords extends System {
       if (!keyword_with_responses || keyword_with_responses.responses.length === 0) {
         return [{ response: prepare('keywords.list-of-responses-is-empty', { keyword: keyword_with_responses?.keyword || keyword }), ...opts }];
       }
-      return Promise.all(_.orderBy(keyword_with_responses.responses, 'order', 'asc').map(async(r) => {
+      return Promise.all(orderBy(keyword_with_responses.responses, 'order', 'asc').map(async(r) => {
         const perm = r.permission ? await get(r.permission) : { name: '-- unset --' };
         const response = prepare('keywords.response', {
           keyword: keyword_with_responses.keyword, index: ++r.order, response: r.response, after: r.stopIfExecuted ? '_' : 'v', permission: perm?.name ?? 'n/a',
@@ -429,7 +429,7 @@ class Keywords extends System {
 
       debug('keywords.run', JSON.stringify({ _responses }));
 
-      this.sendResponse(_.cloneDeep(_responses), { sender: opts.sender, discord: opts.discord, id: opts.id });
+      this.sendResponse(cloneDeep(_responses), { sender: opts.sender, discord: opts.discord, id: opts.id });
     }
 
     return atLeastOnePermissionOk;

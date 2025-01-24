@@ -1,5 +1,5 @@
 import { Permissions } from '@entity/permissions.js';
-import _ from 'lodash-es';
+import { orderBy } from 'lodash-es';
 import { LessThan } from 'typeorm';
 
 import { defaultPermissions } from './defaultPermissions.js';
@@ -71,7 +71,7 @@ async function check(userId: string, permId: string, partial = false): Promise<c
     // get all higher permissions to check if not partial check only
     if (!partial && pItem.isWaterfallAllowed) {
       const partialPermission = await Permissions.find({ where: { order: LessThan(pItem.order) } });
-      for (const p of _.orderBy(partialPermission, 'order', 'asc')) {
+      for (const p of orderBy(partialPermission, 'order', 'asc')) {
         const partialCheck = await check(userId, p.id, true);
         if (partialCheck.access) {
           return { access: true, permission: p }; // we don't need to continue, user have already access with higher permission

@@ -1,5 +1,4 @@
 import { EventList, EventListInterface } from '@entity/eventList.js';
-import _ from 'lodash-es';
 import { MoreThanOrEqual } from 'typeorm';
 
 import Overlay from './_interface.js';
@@ -15,6 +14,7 @@ import { mainCurrency } from '~/helpers/currency/index.js';
 import { endpoint } from '~/helpers/socket.js';
 import { getTopClips } from '~/services/twitch/calls/getTopClips.js';
 import { variables } from '~/watchers.js';
+import { isNil } from 'lodash-es';
 
 export type Event = (EventListInterface & { username?: string, values?: {
   currency: Currency;
@@ -77,7 +77,7 @@ class Credits extends Overlay {
           if (event.values.fromId) {
             event.values.fromUsername = mapping.get(event.values.fromId) ?? 'n/a';
           }
-          if (!_.isNil(event.values.amount) && !_.isNil(event.values.currency)) {
+          if (!isNil(event.values.amount) && !isNil(event.values.currency)) {
             event.values.amount = exchange(event.values.amount, event.values.currency, mainCurrency.value);
             event.values.currency = mainCurrency.value;
           }

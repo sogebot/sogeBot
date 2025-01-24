@@ -1,7 +1,6 @@
 import { randomUUID } from 'node:crypto';
 
 import { isNil, isObject } from 'lodash-es';
-import _ from 'lodash-es';
 
 import { getOwner, getUserSender } from '../commons/index.js';
 

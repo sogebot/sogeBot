@@ -1,5 +1,4 @@
 import { rawDataSymbol } from '@twurple/common';
-import _ from 'lodash-es';
 
 import System from './_interface.js';
 import {

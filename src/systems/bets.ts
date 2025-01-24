@@ -1,5 +1,3 @@
-import _ from 'lodash-es';
-
 import System from './_interface.js';
 import {
   command, default_permission,

@@ -1,5 +1,5 @@
 import { User } from '@entity/user.js';
-import _ from 'lodash-es';
+import { chunk, isNil } from 'lodash-es';
 
 import System from './_interface.js';
 import levels from './levels.js';
@@ -282,7 +282,7 @@ class Top extends System {
 
     if (sorted.length > 0) {
       // remove ignored users
-      sorted = _.chunk(sorted, 10)[0];
+      sorted = chunk(sorted, 10)[0];
 
       for (const user of sorted) {
         message += (i + 1) + '. ' + (twitch.showWithAt ? '@' : '') + (user.userName || 'unknown') + ' - ';
@@ -311,7 +311,7 @@ class Top extends System {
             message += `${dayjs.utc(user.value).format('L')} (${dayjs.utc(user.value).fromNow()})`;
             break;
         }
-        if (i + 1 < 10 && !_.isNil(sorted[i + 1])) {
+        if (i + 1 < 10 && !isNil(sorted[i + 1])) {
           message += ', ';
         }
         i++;

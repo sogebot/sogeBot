@@ -2,7 +2,7 @@ import { existsSync, readFileSync } from 'fs';
 
 import { EventList } from '@entity/eventList.js';
 import gitCommitInfo from 'git-commit-info';
-import _, { sortBy } from 'lodash-es';
+import { sortBy, get } from 'lodash-es';
 import { In } from 'typeorm';
 import { VM } from 'vm2';
 
@@ -140,14 +140,14 @@ class HelpersFilter {
     }
 
     if (message.includes('$version')) {
-      const version = _.get(process, 'env.npm_package_version', 'x.y.z');
+      const version = get(process, 'env.npm_package_version', 'x.y.z');
       const commitFile = existsSync('./.commit') ? readFileSync('./.commit').toString() : null;
       variables.$version = version.replace('SNAPSHOT', commitFile && commitFile.length > 0 ? commitFile : gitCommitInfo().shortHash || 'SNAPSHOT');
     }
 
     if (message.includes('$latestFollower')) {
       const latestFollower = await AppDataSource.getRepository(EventList).findOne({ order: { timestamp: 'DESC' }, where: { event: 'follow' } });
-      variables.$latestFollower = !_.isNil(latestFollower) ? await getNameById(latestFollower.userId) : 'n/a';
+      variables.$latestFollower = latestFollower !== null ? await getNameById(latestFollower.userId) : 'n/a';
     }
 
     // latestSubscriber
@@ -162,24 +162,24 @@ class HelpersFilter {
         variables.$latestSubscriberMonths = latestSubscriberUser ? String(latestSubscriberUser.subscribeCumulativeMonths) : 'n/a';
         variables.$latestSubscriberStreak = latestSubscriberUser ? String(latestSubscriberUser.subscribeStreak) : 'n/a';
       }
-      variables.$latestSubscriber = !_.isNil(latestSubscriber) ? await getNameById(latestSubscriber.userId) : 'n/a';
+      variables.$latestSubscriber = latestSubscriber !== null ? await getNameById(latestSubscriber.userId) : 'n/a';
     }
 
     // latestTip, latestTipAmount, latestTipCurrency, latestTipMessage
     if (message.includes('$latestTip')) {
       const latestTip = await AppDataSource.getRepository(EventList).findOne({ order: { timestamp: 'DESC' }, where: { event: 'tip', isTest: false } });
-      variables.$latestTipAmount = !_.isNil(latestTip) ? parseFloat(JSON.parse(latestTip.values_json).amount).toFixed(2) : 'n/a';
-      variables.$latestTipCurrency = !_.isNil(latestTip) ? JSON.parse(latestTip.values_json).currency : 'n/a';
-      variables.$latestTipMessage = !_.isNil(latestTip) ? JSON.parse(latestTip.values_json).message : 'n/a';
-      variables.$latestTip = !_.isNil(latestTip) ? await getNameById(latestTip.userId) : 'n/a';
+      variables.$latestTipAmount = latestTip !== null ? parseFloat(JSON.parse(latestTip.values_json).amount).toFixed(2) : 'n/a';
+      variables.$latestTipCurrency = latestTip !== null ? JSON.parse(latestTip.values_json).currency : 'n/a';
+      variables.$latestTipMessage = latestTip !== null ? JSON.parse(latestTip.values_json).message : 'n/a';
+      variables.$latestTip = latestTip !== null ? await getNameById(latestTip.userId) : 'n/a';
     }
 
     // latestCheer, latestCheerAmount, latestCheerCurrency, latestCheerMessage
     if (message.includes('$latestCheer')) {
       const latestCheer = await AppDataSource.getRepository(EventList).findOne({ order: { timestamp: 'DESC' }, where: { event: 'cheer' } });
-      variables.$latestCheerAmount = !_.isNil(latestCheer) ? JSON.parse(latestCheer.values_json).bits : 'n/a';
-      variables.$latestCheerMessage = !_.isNil(latestCheer) ? JSON.parse(latestCheer.values_json).message : 'n/a';
-      variables.$latestCheer = !_.isNil(latestCheer) ? await getNameById(latestCheer.userId) : 'n/a';
+      variables.$latestCheerAmount = latestCheer !== null ? JSON.parse(latestCheer.values_json).bits : 'n/a';
+      variables.$latestCheerMessage = latestCheer !== null ? JSON.parse(latestCheer.values_json).message : 'n/a';
+      variables.$latestCheer = latestCheer !== null ? await getNameById(latestCheer.userId) : 'n/a';
     }
 
     const spotifySong = JSON.parse(spotify.currentSong);
@@ -200,7 +200,7 @@ class HelpersFilter {
     if (songs.enabled
         && message.includes('$ytSong')
         && Object.values(songs.isPlaying).find(o => o)) {
-      let currentSong = _.get(JSON.parse(await songs.currentSong), 'title', translate('songs.not-playing'));
+      let currentSong = get(JSON.parse(await songs.currentSong), 'title', translate('songs.not-playing'));
       if (opts.escape) {
         currentSong = currentSong.replace(new RegExp(opts.escape, 'g'), `\\${opts.escape}`);
       }

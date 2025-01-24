@@ -1,7 +1,6 @@
 import { randomUUID } from 'node:crypto';
 
 import axios from 'axios';
-import _ from 'lodash-es';
 
 import {
   operation, command, count, custom, evaluate, ifp, info, list, math, online, param, price, qs, random, ResponseFilter, stream, youtube,
@@ -16,6 +15,7 @@ import { app } from '~/helpers/panel.js';
 import twitch from '~/services/twitch.js';
 import { translate } from '~/translations.js';
 import { withScope } from './helpers/socket.js';
+import { isObject, isBuffer, isUndefined, isNil, each, escapeRegExp, cloneDeep } from 'lodash-es';
 
 (function initializeMessageParserAPI() {
   if (!app) {
@@ -63,7 +63,7 @@ export class Message {
     if (!attr.isFilter) {
       await this.global({ sender: attr.sender, discord: attr.discord  });
       // local replaces
-      if (!_.isNil(attr)) {
+      if (!isNil(attr)) {
         for (let [key, value] of Object.entries(attr)) {
           if (key === 'sender') {
             if (typeof value.userName !== 'undefined') {
@@ -107,7 +107,7 @@ export class Message {
     }
 
     const rMessage = this.message.match(/\(api\|(http\S+)\)/i);
-    if (!_.isNil(rMessage) && !_.isNil(rMessage[1])) {
+    if (!isNil(rMessage) && !isNil(rMessage[1])) {
       this.message = this.message.replace(rMessage[0], '').trim(); // remove api command from message
       const url = rMessage[1].replace(/&amp;/g, '&');
       const response = await axios.get<any>(url);
@@ -117,21 +117,21 @@ export class Message {
 
       // search for api datas in this.message
       const rData = this.message.match(/\(api\.(?!_response)(\S*?)\)/gi);
-      if (_.isNil(rData)) {
-        if (_.isObject(response.data)) {
+      if (isNil(rData)) {
+        if (isObject(response.data)) {
           // Stringify object
           this.message = this.message.replace('(api._response)', JSON.stringify(response.data));
         } else {
           this.message = this.message.replace('(api._response)', response.data.toString().replace(/^"(.*)"/, '$1'));
         }
       } else {
-        if (_.isBuffer(response.data)) {
+        if (isBuffer(response.data)) {
           response.data = JSON.parse(response.data.toString());
         }
         for (const tag of rData) {
           let path = response.data;
           const ids = tag.replace('(api.', '').replace(')', '').split('.');
-          _.each(ids, function (id) {
+          each(ids, function (id) {
             const isArray = id.match(/(\S+)\[(\d+)\]/i);
             if (isArray) {
               path = path[isArray[1]][isArray[2]];
@@ -139,7 +139,7 @@ export class Message {
               path = path[id];
             }
           });
-          this.message = this.message.replace(tag, !_.isNil(path) ? path : translate('core.api.not-available'));
+          this.message = this.message.replace(tag, !isNil(path) ? path : translate('core.api.not-available'));
         }
       }
     }
@@ -152,14 +152,14 @@ export class Message {
     }
     for (const key in filters) {
       const fnc = filters[key];
-      let regexp = _.escapeRegExp(key);
+      let regexp = escapeRegExp(key);
 
       // we want to handle # as \w - number in regexp
       regexp = regexp.replace(/#/g, '.*?');
       const rMessage = this.message.match((new RegExp('(' + regexp + ')', 'g')));
       if (rMessage !== null) {
         for (const bkey in rMessage) {
-          this.message = this.message.replace(rMessage[bkey], await fnc(rMessage[bkey], { ..._.cloneDeep(attr), sender: attr.sender })).trim();
+          this.message = this.message.replace(rMessage[bkey], await fnc(rMessage[bkey], { ...cloneDeep(attr), sender: attr.sender })).trim();
         }
       }
     }
@@ -172,14 +172,14 @@ export class Message {
     }
     for (const key in filters) {
       const fnc = filters[key];
-      let regexp = _.escapeRegExp(key);
+      let regexp = escapeRegExp(key);
 
       // we want to handle # as \w - number in regexp
       regexp = regexp.replace(/#/g, '(\\S+)');
       const rMessage = this.message.match((new RegExp('(' + regexp + ')', 'g')));
       if (rMessage !== null) {
         for (const bkey in rMessage) {
-          if (!(await fnc(rMessage[bkey], { ..._.cloneDeep(attr), sender: attr.sender }))) {
+          if (!(await fnc(rMessage[bkey], { ...cloneDeep(attr), sender: attr.sender }))) {
             this.message = '';
           } else {
             this.message = this.message.replace(rMessage[bkey], '').trim();
@@ -196,15 +196,15 @@ export class Message {
     }
     for (const key in filters) {
       const fnc = filters[key];
-      let regexp = _.escapeRegExp(key);
+      let regexp = escapeRegExp(key);
 
       // we want to handle # as \w - number in regexp
       regexp = regexp.replace(/#/g, '([\\S ]+)');
       const rMessage = this.message.match((new RegExp('(' + regexp + ')', 'g')));
       if (rMessage !== null) {
         for (const bkey in rMessage) {
-          const newString = await fnc(rMessage[bkey], { ..._.cloneDeep(attr), sender: attr.sender });
-          if (_.isUndefined(newString) || newString.length === 0) {
+          const newString = await fnc(rMessage[bkey], { ...cloneDeep(attr), sender: attr.sender });
+          if (isUndefined(newString) || newString.length === 0) {
             this.message = '';
           }
           this.message = this.message.replace(rMessage[bkey], newString).trim();
@@ -220,14 +220,14 @@ export class Message {
     }
     for (const key in filters) {
       const fnc = filters[key];
-      let regexp = _.escapeRegExp(key);
+      let regexp = escapeRegExp(key);
 
       regexp = regexp.replace(/#/g, '([a-zA-Z0-9_]+)');
       const rMessage = this.message.match((new RegExp('(' + regexp + ')', 'g')));
       if (rMessage !== null) {
         for (const bkey in rMessage) {
-          const newString = await fnc(rMessage[bkey], { ..._.cloneDeep(attr), sender: attr.sender });
-          if ((_.isNil(newString) || newString.length === 0) && removeWhenEmpty) {
+          const newString = await fnc(rMessage[bkey], { ...cloneDeep(attr), sender: attr.sender });
+          if ((isNil(newString) || newString.length === 0) && removeWhenEmpty) {
             this.message = '';
           }
           this.message = this.message.replace(rMessage[bkey], newString).trim();
@@ -243,7 +243,7 @@ export class Message {
     }
     for (const key in filters) {
       const fnc = filters[key];
-      let regexp = _.escapeRegExp(key);
+      let regexp = escapeRegExp(key);
 
       if (key.startsWith('$')) {
         regexp = regexp.replace(/#/g, '(.+?)');
@@ -253,8 +253,8 @@ export class Message {
       const rMessage = this.message.match((new RegExp('(' + regexp + ')', 'g')));
       if (rMessage !== null) {
         for (const bkey in rMessage) {
-          const newString = await fnc(rMessage[bkey], { ..._.cloneDeep(attr), sender: attr.sender });
-          if ((_.isNil(newString) || newString.length === 0) && removeWhenEmpty) {
+          const newString = await fnc(rMessage[bkey], { ...cloneDeep(attr), sender: attr.sender });
+          if ((isNil(newString) || newString.length === 0) && removeWhenEmpty) {
             this.message = '';
           }
           this.message = String(this.message.replace(rMessage[bkey], newString)).trim();

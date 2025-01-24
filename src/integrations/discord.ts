@@ -47,69 +47,69 @@ class Discord extends Integration {
   client: DiscordJs.Client | null = null;
 
   @persistent()
-    embedStartedAt = '';
+  embedStartedAt = '';
   @persistent()
-    embedMessageId = '';
+  embedMessageId = '';
 
   // set secret clientId
   @settings('general', false, true)
-    clientId = '';
+  clientId = '';
 
   // set secret token
   @settings('general', false, true)
-    token = '';
+  token = '';
 
   @settings('bot')
-    guild = '';
+  guild = '';
 
   @settings('bot')
-    listenAtChannels: string | string[] = '';
+  listenAtChannels: string | string[] = '';
 
   @settings('bot')
-    sendOnlineAnnounceToChannel = '';
+  sendOnlineAnnounceToChannel = '';
 
   @settings('bot')
-    onlineAnnounceMessage = '';
+  onlineAnnounceMessage = '';
 
   @settings('bot')
-    sendAnnouncesToChannel: { [key in typeof announceTypes[number]]: string } = {
-      bets:    '',
-      duel:    '',
-      general: '',
-      heist:   '',
-      polls:   '',
-      raffles: '',
-      scrim:   '',
-      songs:   '',
-      timers:  '',
-    };
+  sendAnnouncesToChannel: { [key in typeof announceTypes[number]]: string } = {
+    bets:    '',
+    duel:    '',
+    general: '',
+    heist:   '',
+    polls:   '',
+    raffles: '',
+    scrim:   '',
+    songs:   '',
+    timers:  '',
+  };
 
   @settings('bot')
-    fields: string[] = ['$game', '$title', '$tags', '$startedAt', '$viewers', '$followers', '$subscribers'];
+  fields: string[] = ['$game', '$title', '$tags', '$startedAt', '$viewers', '$followers', '$subscribers'];
 
   @settings('bot')
-    fieldsDisabled: string[] = [''];
+  fieldsDisabled: string[] = [''];
 
   @settings('bot')
-    ignorelist: string[] = [];
+  ignorelist: string[] = [];
 
   @settings('status')
-    onlinePresenceStatusDefault: PresenceStatusData = PresenceUpdateStatus.Online;
+  onlinePresenceStatusDefault: PresenceStatusData = PresenceUpdateStatus.Online;
 
   @settings('status')
-    onlinePresenceStatusDefaultName = '';
+  onlinePresenceStatusDefaultName = '';
 
   @settings('status')
-    onlinePresenceStatusOnStream: PresenceStatusData | 'streaming' = PresenceUpdateStatus.Online;
+  onlinePresenceStatusOnStream: PresenceStatusData | 'streaming' = PresenceUpdateStatus.Online;
 
   @settings('status')
-    onlinePresenceStatusOnStreamName = '$title';
+  onlinePresenceStatusOnStreamName = '$title';
 
   @settings('mapping')
-    rolesMapping: { [permissionId: string]: string } = {};
+  rolesMapping: { [permissionId: string]: string } = {};
 
   @settings('bot')
-    deleteMessagesAfterWhile = false;
+  deleteMessagesAfterWhile = false;
 
   generateEmbed(isOnline: boolean) {
     const broadcasterUsername = variables.get('services.twitch.broadcasterUsername') as string;
@@ -378,7 +378,7 @@ class Discord extends Integration {
       return { name: prepare('webpanel.responses.variable.title'), value: stats.value.currentTitle ?? '' };
     }
     if (o === '$tags') {
-      return { name: prepare('webpanel.responses.variable.tags'), value: `${(stats.value.currentTags ?? []).map(tag => `${tag}`).join(', ')}` ?? '' };
+      return { name: prepare('webpanel.responses.variable.tags'), value: `${(stats.value.currentTags ?? []).map(tag => `${tag}`).join(', ')}` };
     }
     if (o === '$startedAt') {
       if (isOnline) {

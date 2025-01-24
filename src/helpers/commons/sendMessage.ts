@@ -1,5 +1,5 @@
 import type { HelixChatAnnouncementColor } from '@twurple/api';
-import _ from 'lodash-es';
+import { isNil } from 'lodash-es';
 
 import { getUserSender } from './getUserSender.js';
 import { timer } from '../../decorators.js';
@@ -82,9 +82,9 @@ class HelpersCommons {
     } // we don't want to reply on bot commands
 
     if (sender) {
-      messageToSend = !_.isNil(sender.userName) ? messageToSend.replace(/\$sender/g, (showWithAt.value ? '@' : '') + sender.userName) : messageToSend;
+      messageToSend = isNil(sender.userName) ? messageToSend.replace(/\$sender/g, (showWithAt.value ? '@' : '') + sender.userName) : messageToSend;
       if (!getMuteStatus() || attr.force) {
-        if ((!_.isNil(attr.quiet) && attr.quiet)) {
+        if ((isNil(attr.quiet) && attr.quiet)) {
           return true;
         }
         if (attr.isWhisper) {

@@ -7,7 +7,7 @@ import cors from 'cors';
 import express, { Request } from 'express';
 import RateLimit from 'express-rate-limit';
 import gitCommitInfo from 'git-commit-info';
-import _ from 'lodash-es';
+import { get, each, merge } from 'lodash-es';
 import sanitize from 'sanitize-filename';
 import { z } from 'zod';
 
@@ -118,7 +118,7 @@ class Panel extends Core {
 
     app?.get('/health', (req, res) => {
       if (getIsBotStarted()) {
-        const version = _.get(process, 'env.npm_package_version', 'x.y.z');
+        const version = get(process, 'env.npm_package_version', 'x.y.z');
         const commitFile = existsSync('./.commit') ? readFileSync('./.commit').toString() : null;
         res.status(200).send(version.replace('SNAPSHOT', commitFile && commitFile.length > 0 ? commitFile : gitCommitInfo().shortHash || 'SNAPSHOT'));
       } else {
@@ -287,7 +287,7 @@ class Panel extends Core {
         cb(statusObj);
       });
       socket.on('saveConfiguration', function (data: any) {
-        _.each(data, async function (index, value) {
+        each(data, async function (index, value) {
           if (value.startsWith('_')) {
             return true;
           }
@@ -365,7 +365,7 @@ class Panel extends Core {
         cb(variables.get('services.twitch.broadcasterUsername') as string);
       });
       socket.on('version', function (cb: (version: string) => void) {
-        const version = _.get(process, 'env.npm_package_version', 'x.y.z');
+        const version = get(process, 'env.npm_package_version', 'x.y.z');
         const commitFile = existsSync('./.commit') ? readFileSync('./.commit').toString() : null;
         cb(version.replace('SNAPSHOT', commitFile && commitFile.length > 0 ? commitFile : gitCommitInfo().shortHash || 'SNAPSHOT'));
       });
@@ -376,7 +376,7 @@ class Panel extends Core {
 
       socket.on('translations', (cb: (lang: Record<string, any>) => void) => {
         const lang = {};
-        _.merge(
+        merge(
           lang,
           translate({ root: 'webpanel' }),
           translate({ root: 'ui' }), // add ui root -> slowly refactoring to new name
@@ -387,7 +387,7 @@ class Panel extends Core {
 
       // send webpanel translations
       const lang = {};
-      _.merge(
+      merge(
         lang,
         translate({ root: 'webpanel' }),
         translate({ root: 'ui' }), // add ui root -> slowly refactoring to new name,

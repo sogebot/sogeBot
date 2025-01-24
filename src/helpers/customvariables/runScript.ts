@@ -1,6 +1,6 @@
 import { User } from '@entity/user.js';
 import axios from 'axios';
-import _ from 'lodash-es';
+import * as _ from 'lodash-es';
 import {
   get, isNil,
 } from 'lodash-es';

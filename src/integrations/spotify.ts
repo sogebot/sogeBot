@@ -4,7 +4,6 @@ import { setTimeout } from 'timers/promises';
 import { SpotifySongBan } from '@entity/spotify.js';
 import chalk from 'chalk';
 import { Request } from 'express';
-import _ from 'lodash-es';
 import SpotifyWebApi from 'spotify-web-api-node';
 import { z } from 'zod';
 
@@ -24,6 +23,7 @@ import { announce, prepare } from '~/helpers/commons/index.js';
 import { HOUR, SECOND } from '~/helpers/constants.js';
 import { debug, error, info, warning } from '~/helpers/log.js';
 import { ioServer } from '~/helpers/panel.js';
+import { isNil } from 'lodash-es';
 
 /*
  * How to integrate:
@@ -46,42 +46,42 @@ class Spotify extends Integration {
 
   lastActiveDeviceId = '';
   @settings('connection')
-    manualDeviceId = '';
+  manualDeviceId = '';
 
   @persistent()
-    songsHistory: string[] = [];
+  songsHistory: string[] = [];
   currentSong = JSON.stringify(null as null | {
     started_at: number; song: string; artist: string; artists: string, uri: string; is_playing: boolean; is_enabled: boolean;
   });
 
   @persistent()
-    _accessToken: string | null = null;
+  _accessToken: string | null = null;
   @persistent()
-    _refreshToken: string | null = null;
+  _refreshToken: string | null = null;
   @settings()
-    songRequests = true;
+  songRequests = true;
   @settings()
-    fetchCurrentSongWhenOffline = false;
+  fetchCurrentSongWhenOffline = false;
   @settings()
-    queueWhenOffline = false;
+  queueWhenOffline = false;
   @settings()
-    notify = false;
+  notify = false;
   @settings()
-    allowApprovedArtistsOnly = false;
+  allowApprovedArtistsOnly = false;
   @settings()
-    approvedArtists = []; // uris or names
+  approvedArtists = []; // uris or names
 
   @settings('customization')
-    format = '$song - $artist';
+  format = '$song - $artist';
 
   @settings('connection')
-    clientId = '';
+  clientId = '';
   @settings('connection')
-    clientSecret = '';
+  clientSecret = '';
   @settings('connection')
-    redirectURI = 'https://dash.sogebot.xyz/credentials/spotify';
+  redirectURI = 'https://dash.sogebot.xyz/credentials/spotify';
   @settings('connection')
-    username = '';
+  username = '';
 
   scopes: string[] = [
     'user-read-currently-playing',
@@ -273,7 +273,7 @@ class Spotify extends Integration {
 
   async getMe () {
     try {
-      if ((this.enabled) && !_.isNil(this.client) && !this.isUnauthorized) {
+      if ((this.enabled) && !isNil(this.client) && !this.isUnauthorized) {
         const data = await this.client.getMe();
 
         this.username = data.body.display_name ? data.body.display_name : data.body.id;
@@ -349,7 +349,7 @@ class Spotify extends Integration {
   async IRefreshToken () {
     if (this.retry.IRefreshToken < 5) {
       try {
-        if (!_.isNil(this.client) && this._refreshToken) {
+        if (!isNil(this.client) && this._refreshToken) {
           const data = await this.client.refreshAccessToken();
           this.client.setAccessToken(data.body.access_token);
           this.isUnauthorized = false;
@@ -540,7 +540,7 @@ class Spotify extends Integration {
       }
 
       try {
-        if (opts.token && !_.isNil(this.client)) {
+        if (opts.token && !isNil(this.client)) {
           this.client.authorizationCodeGrant(opts.token)
             .then((data) => {
               this._accessToken = data.body.access_token;
@@ -575,7 +575,7 @@ class Spotify extends Integration {
   }
 
   authorizeURI () {
-    if (_.isNil(this.client)) {
+    if (isNil(this.client)) {
       return null;
     }
     const state = crypto.createHash('md5').update(Math.random().toString()).digest('hex');
