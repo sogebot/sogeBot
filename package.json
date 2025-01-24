@@ -17,6 +17,8 @@
   "license": "MIT",
   "dependencies": {
     "@d-fischer/shared-utils": "^3.6.3",
+    "@distube/ytdl-core": "^4.15.8",
+    "@distube/ytsr": "2.0.4",
     "@twurple/api": "7.2.0",
     "@twurple/auth": "7.2.0",
     "@twurple/chat": "7.2.0",
@@ -88,9 +90,7 @@
     "ws": "8.15.0",
     "xregexp": "5.1.1",
     "yargs": "17.7.2",
-    "@distube/ytdl-core": "latest",
     "ytpl": "2.3.0",
-    "ytsr": "3.8.4",
     "zod": "^3.22.4"
   },
   "scripts": {

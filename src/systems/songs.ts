@@ -12,7 +12,7 @@ import {
 } from 'typeorm';
 import ytdl from '@distube/ytdl-core';
 import ytpl from 'ytpl';
-import ytsr from 'ytsr';
+import ytsr from '@distube/ytsr';
 import { z } from 'zod';
 
 import System from './_interface.js';
