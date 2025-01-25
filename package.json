@@ -1,6 +1,7 @@
 {
   "name": "@sogebot/backend",
   "description": "Free Twitch Bot built on Node.js",
+  "version": "23.6.0-SNAPSHOT",
   "private": true,
   "engines": {
     "npm": ">=8.0.0",
@@ -158,7 +159,7 @@
     "escope": "4.0.0",
     "eslint": "9.19.0",
     "eslint-plugin-import": "2.31.0",
-    "git-semver-tags": "8.0.0",
+    "git-semver-tags": "7.0.1",
     "globals": "^15.14.0",
     "husky": "^9.1.7",
     "jsonlint-mod": "1.7.6",
