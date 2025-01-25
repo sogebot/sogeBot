@@ -3,7 +3,7 @@ import { Permissions as PermissionsEntity } from '@entity/permissions.js';
 import chalk from 'chalk';
 import * as DiscordJs from 'discord.js';
 import { ChannelType, GatewayIntentBits, PresenceStatusData, PresenceUpdateStatus } from 'discord.js';
-import { get } from 'lodash-es';
+import { capitalize, get } from 'lodash-es';
 import { IsNull, LessThan, Not } from 'typeorm';
 
 import Integration from './_interface.js';
@@ -33,6 +33,7 @@ import { isBotStarted, isDbConnected } from '~/helpers/database.js';
 import { dayjs, timezone } from '~/helpers/dayjsHelper.js';
 import { debounce } from '~/helpers/debounce.js';
 import { eventEmitter } from '~/helpers/events/index.js';
+import { getTime } from '~/helpers/getTime.js';
 import {
   chatIn, chatOut, debug, error, info, warning, whisperOut,
 } from '~/helpers/log.js';
@@ -41,6 +42,7 @@ import { get as getPermission } from '~/helpers/permissions/get.js';
 import * as changelog from '~/helpers/user/changelog.js';
 import { Types } from '~/plugins/ListenTo.js';
 import { getIdFromTwitch } from '~/services/twitch/calls/getIdFromTwitch.js';
+import { variables as vars } from '~/watchers.js';
 import { variables } from '~/watchers.js';
 
 class Discord extends Integration {
@@ -85,7 +87,7 @@ class Discord extends Integration {
   };
 
   @settings('bot')
-  fields: string[] = ['$game', '$title', '$tags', '$startedAt', '$viewers', '$followers', '$subscribers'];
+  fields: string[] = ['$game', '$title', '$tags', '$startedAt', '$uptime', '$viewers', '$followers', '$subscribers'];
 
   @settings('bot')
   fieldsDisabled: string[] = [''];
@@ -120,12 +122,14 @@ class Discord extends Integration {
       ? `${broadcasterUsername.charAt(0).toUpperCase() + broadcasterUsername.slice(1)} started stream! Check it out!`
       : `${broadcasterUsername.charAt(0).toUpperCase() + broadcasterUsername.slice(1)} is not streaming anymore! Check it next time!`;
 
+    const fields = this.fields
+      .filter((o) => this.filterFields(o, isOnline))
+      .map((o) => this.prepareFields(o, isOnline))
+      .filter((o) => o !== null);
+
     return new DiscordJs.EmbedBuilder()
       .setURL('https://twitch.tv/' + broadcasterUsername)
-      .addFields(
-        this.fields
-          .filter((o) => this.filterFields(o, isOnline))
-          .map((o) => this.prepareFields(o, isOnline)))
+      .addFields(fields)
     // Set the title of the field
       .setTitle('https://twitch.tv/' + broadcasterUsername)
     // Set the color of the embed
@@ -379,6 +383,15 @@ class Discord extends Integration {
     }
     if (o === '$tags') {
       return { name: prepare('webpanel.responses.variable.tags'), value: `${(stats.value.currentTags ?? []).map(tag => `${tag}`).join(', ')}` };
+    }
+    if (o === '$uptime') {
+      const uptime = vars.get('services.twitch.uptime') as number;
+
+      if (isOnline) {
+        return { name: capitalize(prepare('webpanel.uptime')), value: getTime(Date.now() - uptime, true), inline: true };
+      } else {
+        return null;
+      }
     }
     if (o === '$startedAt') {
       if (isOnline) {
