@@ -40,6 +40,8 @@ import {
 import { check } from '~/helpers/permissions/check.js';
 import { get as getPermission } from '~/helpers/permissions/get.js';
 import * as changelog from '~/helpers/user/changelog.js';
+import getBotId from '~/helpers/user/getBotId.js';
+import getBotUserName from '~/helpers/user/getBotUserName.js';
 import { Types } from '~/plugins/ListenTo.js';
 import { getIdFromTwitch } from '~/services/twitch/calls/getIdFromTwitch.js';
 import { variables as vars } from '~/watchers.js';
@@ -90,6 +92,9 @@ class Discord extends Integration {
   fields: string[] = ['$game', '$title', '$tags', '$startedAt', '$uptime', '$viewers', '$followers', '$subscribers'];
 
   @settings('bot')
+  customFields: { name: string, value: string }[] = [];
+
+  @settings('bot')
   fieldsDisabled: string[] = [''];
 
   @settings('bot')
@@ -113,7 +118,7 @@ class Discord extends Integration {
   @settings('bot')
   deleteMessagesAfterWhile = false;
 
-  generateEmbed(isOnline: boolean) {
+  async generateEmbed(isOnline: boolean) {
     const broadcasterUsername = variables.get('services.twitch.broadcasterUsername') as string;
     const profileImageUrl = variables.get('services.twitch.profileImageUrl') as string;
 
@@ -122,10 +127,10 @@ class Discord extends Integration {
       ? `${broadcasterUsername.charAt(0).toUpperCase() + broadcasterUsername.slice(1)} started stream! Check it out!`
       : `${broadcasterUsername.charAt(0).toUpperCase() + broadcasterUsername.slice(1)} is not streaming anymore! Check it next time!`;
 
-    const fields = this.fields
+    const fields = await Promise.all(this.fields
       .filter((o) => this.filterFields(o, isOnline))
-      .map((o) => this.prepareFields(o, isOnline))
-      .filter((o) => o !== null);
+      .map((o) => this.prepareFields(o, isOnline)),
+    );
 
     return new DiscordJs.EmbedBuilder()
       .setURL('https://twitch.tv/' + broadcasterUsername)
@@ -160,7 +165,7 @@ class Discord extends Integration {
           debug('discord.embed', `Trying to update message ${this.embedMessageId}.`);
           if (message) {
             debug('discord.embed', `Updating message ${this.embedMessageId}.`);
-            message.edit({ embeds: [this.generateEmbed(true)] })
+            message.edit({ embeds: [await this.generateEmbed(true)] })
               .then(() => debug('discord.embed', `Message ${this.embedMessageId} was updated.`))
               .catch((e) => debug('discord.embed', e));
           } else {
@@ -337,7 +342,7 @@ class Discord extends Integration {
         debug('discord.embed', `Trying to update message ${this.embedMessageId}.`);
         if (message) {
           debug('discord.embed', `Updating message ${this.embedMessageId}.`);
-          message.edit({ embeds: [this.generateEmbed(false)] })
+          message.edit({ embeds: [await this.generateEmbed(false)] })
             .then(() => debug('discord.embed', `Message ${this.embedMessageId} was updated.`))
             .catch((e) => debug('discord.embed', e));
         } else {
@@ -358,7 +363,7 @@ class Discord extends Integration {
     }
 
     if (!isOnline) {
-      if (['$viewers', '$followers', '$subscribers'].includes(o)) {
+      if (['$viewers', '$followers', '$subscribers', '$uptime'].includes(o)) {
         return false;
       }
     }
@@ -374,24 +379,25 @@ class Discord extends Integration {
     return true;
   }
 
-  prepareFields(o: string, isOnline: boolean) {
+  async prepareFields(o: string, isOnline: boolean) {
+    if (o.startsWith('$custom')) {
+      if (this.customFields.length > 0) {
+        const index = Number(o.replace('$custom', ''));
+        if (this.customFields[index]) {
+          const value = await new Message(this.customFields[index].value).parse({ sender: getUserSender(getBotId(), getBotUserName()), discord: undefined }) as string;
+          return { name: this.customFields[index].name, value };
+        }
+      }
+    }
     if (o === '$game') {
       return { name: prepare('webpanel.responses.variable.game'), value: stats.value.currentGame ?? '' };
     }
     if (o === '$title') {
       return { name: prepare('webpanel.responses.variable.title'), value: stats.value.currentTitle ?? '' };
     }
-    if (o === '$tags') {
-      return { name: prepare('webpanel.responses.variable.tags'), value: `${(stats.value.currentTags ?? []).map(tag => `${tag}`).join(', ')}` };
-    }
     if (o === '$uptime') {
       const uptime = vars.get('services.twitch.uptime') as number;
-
-      if (isOnline) {
-        return { name: capitalize(prepare('webpanel.uptime')), value: getTime(Date.now() - uptime, true), inline: true };
-      } else {
-        return null;
-      }
+      return { name: capitalize(prepare('webpanel.uptime')), value: getTime(Date.now() - uptime, true), inline: true };
     }
     if (o === '$startedAt') {
       if (isOnline) {
@@ -425,7 +431,7 @@ class Discord extends Integration {
         // Send the embed to the same channel as the message
         const message = await (channel as DiscordJs.TextChannel).send({
           content: this.onlineAnnounceMessage.length > 0 ? this.onlineAnnounceMessage : undefined,
-          embeds:  [this.generateEmbed(true)],
+          embeds:  [await this.generateEmbed(true)],
         });
         this.embedMessageId = message.id;
         chatOut(`#${(channel as DiscordJs.TextChannel).name}: [[online announce embed]] [${this.client.user?.tag}]`);
