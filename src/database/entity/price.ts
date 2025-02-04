@@ -21,21 +21,21 @@ export class Price extends BotEntity {
     }));
 
   @PrimaryColumn({ generated: 'uuid' })
-    id: string;
+  id: string;
 
   @Column()
   @Index('IDX_d12db23d28020784096bcb41a3', { unique: true })
-    command: string;
+  command: string;
 
   @Column({ default: true })
-    enabled: boolean;
+  enabled: boolean;
 
   @Column({ default: false })
-    emitRedeemEvent: boolean;
+  emitRedeemEvent: boolean;
 
   @Column()
-    price: number;
+  price: number;
 
   @Column({ default: 0 })
-    priceBits: number;
+  priceBits: number;
 }

@@ -19,10 +19,10 @@ export class Randomizer extends BotEntity {
   }
 
   @PrimaryColumn({ generated: 'uuid' })
-    id: string;
+  id: string;
 
   @Column({ type: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') !== 'better-sqlite3' ? 'json' : 'simple-json' })
-    items: {
+  items: {
     id: string;
     /*
      * This should hlp with grouping things like Bancrupcy, WIN, Bancrupcy, to always appear beside
@@ -36,36 +36,36 @@ export class Randomizer extends BotEntity {
   }[];
 
   @Column({ nullable: false, type: 'varchar', length: '2022-07-27T00:30:34.569259834Z'.length })
-    createdAt?: string;
+  createdAt?: string;
 
   @Column()
-    command: string;
+  command: string;
 
   @Column()
-    permissionId: string;
+  permissionId: string;
 
   @Column()
-    name: string;
+  name: string;
 
   @Column({ type: Boolean, default: false })
-    isShown?: boolean;
+  isShown?: boolean;
 
   @Column({ type: Boolean })
-    shouldPlayTick: boolean;
+  shouldPlayTick: boolean;
 
   @Column()
-    tickVolume: number;
+  tickVolume: number;
 
   @Column()
-    widgetOrder: number;
+  widgetOrder: number;
 
   @Column({
     type: 'varchar', length: 20, default: 'simple',
   })
-    type: 'simple' | 'wheelOfFortune' | 'tape';
+  type: 'simple' | 'wheelOfFortune' | 'tape';
 
   @Column({ type: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') !== 'better-sqlite3' ? 'json' : 'simple-json' })
-    position: {
+  position: {
     x: number;
     y: number;
     anchorX: 'left' | 'middle' | 'right';
@@ -73,7 +73,7 @@ export class Randomizer extends BotEntity {
   };
 
   @Column({ type: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') !== 'better-sqlite3' ? 'json' : 'simple-json' })
-    customizationFont: {
+  customizationFont: {
     family: string;
     size: number;
     borderColor: string;
@@ -89,5 +89,5 @@ export class Randomizer extends BotEntity {
   };
 
   @Column({ type: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') !== 'better-sqlite3' ? 'json' : 'simple-json' })
-    tts: Alerts['tts'] & { enabled: boolean };
+  tts: Alerts['tts'] & { enabled: boolean };
 }

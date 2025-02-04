@@ -11,26 +11,26 @@ export class Commands extends BotEntity {
   });
 
   @PrimaryColumn({ generated: 'uuid', type: 'uuid' })
-    id: string;
+  id: string;
 
   @Column()
   @Index('IDX_1a8c40f0a581447776c325cb4f')
-    command: string;
+  command: string;
 
   @Column()
-    enabled: boolean;
+  enabled: boolean;
 
   @Column()
-    visible: boolean;
+  visible: boolean;
 
   @Column({ nullable: true, type: String })
-    group: string | null;
+  group: string | null;
 
   @Column({ default: false })
-    areResponsesRandomized: boolean;
+  areResponsesRandomized: boolean;
 
   @Column({ type: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') !== 'better-sqlite3' ? 'json' : 'simple-json' })
-    responses: {
+  responses: {
     id: string;
     order: number;
     response: string;
@@ -44,10 +44,10 @@ export class Commands extends BotEntity {
 export class CommandsGroup extends BaseEntity {
   @PrimaryColumn()
   @Index('IDX_commands_group_unique_name', { unique: true })
-    name: string;
+  name: string;
 
   @Column({ type: 'simple-json' })
-    options: {
+  options: {
     filter: string | null;
     permission: string | null;
   };
@@ -56,12 +56,12 @@ export class CommandsGroup extends BaseEntity {
 @Entity()
 export class CommandsCount extends BaseEntity {
   @PrimaryColumn({ generated: 'uuid', type: 'uuid' })
-    id: string;
+  id: string;
 
   @Index('IDX_2ccf816b1dd74e9a02845c4818')
   @Column()
-    command: string;
+  command: string;
 
   @Column({ type: 'varchar', length: '2022-07-27T00:30:34.569259834Z'.length })
-    timestamp: string;
+  timestamp: string;
 }

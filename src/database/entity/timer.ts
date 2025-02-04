@@ -13,47 +13,47 @@ export class Timer extends BotEntity {
   });
 
   @PrimaryColumn({ generated: 'uuid', type: 'uuid' })
-    id: string;
+  id: string;
 
   @Column()
-    name: string = '';
+  name: string = '';
 
   @Column()
-    isEnabled: boolean = true;
+  isEnabled: boolean = true;
 
   @Column({ default: false })
-    tickOffline: boolean = false;
+  tickOffline: boolean = false;
 
   @Column()
-    triggerEveryMessage: number = 30;
+  triggerEveryMessage: number = 30;
 
   @Column()
-    triggerEverySecond: number = 60;
+  triggerEverySecond: number = 60;
 
   @Column({ type: 'varchar', length: '2022-07-27T00:30:34.569259834Z'.length, default: '1970-01-01T00:00:00.000Z' })
-    triggeredAtTimestamp?: string;
+  triggeredAtTimestamp?: string;
 
   @Column({ default: 0 })
-    triggeredAtMessages?: number;
+  triggeredAtMessages?: number;
 
   @OneToMany(() => TimerResponse, (item) => item.timer)
-    messages: TimerResponse[];
+  messages: TimerResponse[];
 }
 
 @Entity()
 export class TimerResponse extends BaseEntity {
   @PrimaryColumn({ generated: 'uuid', type: 'uuid' })
-    id: string;
+  id: string;
 
   @Column({ type: 'varchar', length: '2022-07-27T00:30:34.569259834Z'.length, default: '1970-01-01T00:00:00.000Z' })
-    timestamp: string;
+  timestamp: string;
 
   @Column({ default: true })
-    isEnabled: boolean;
+  isEnabled: boolean;
 
   @Column({ type: 'text' })
-    response: string;
+  response: string;
 
   @ManyToOne(() => Timer, (item) => item.messages, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
-    timer: Timer;
+  timer: Timer;
 }

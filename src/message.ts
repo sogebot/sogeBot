@@ -1,10 +1,12 @@
 import { randomUUID } from 'node:crypto';
 
 import axios from 'axios';
+import { isObject, isBuffer, isUndefined, isNil, each, escapeRegExp, cloneDeep } from 'lodash-es';
 
 import {
   operation, command, count, custom, evaluate, ifp, info, list, math, online, param, price, qs, random, ResponseFilter, stream, youtube,
 } from './filters/index.js';
+import { withScope } from './helpers/socket.js';
 import getBotId from './helpers/user/getBotId.js';
 import getBotUserName from './helpers/user/getBotUserName.js';
 
@@ -14,8 +16,6 @@ import { getUserSender } from '~/helpers/commons/index.js';
 import { app } from '~/helpers/panel.js';
 import twitch from '~/services/twitch.js';
 import { translate } from '~/translations.js';
-import { withScope } from './helpers/socket.js';
-import { isObject, isBuffer, isUndefined, isNil, each, escapeRegExp, cloneDeep } from 'lodash-es';
 
 (function initializeMessageParserAPI() {
   if (!app) {

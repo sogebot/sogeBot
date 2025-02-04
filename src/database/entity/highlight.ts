@@ -1,30 +1,31 @@
 import { BeforeInsert, Column, Entity, PrimaryColumn } from 'typeorm';
+
 import { BotEntity } from '../BotEntity.js';
 
 @Entity()
 export class Highlight extends BotEntity {
   @PrimaryColumn({ generated: 'uuid', type: 'uuid' })
-    id: string;
+  id: string;
 
   @Column()
-    videoId: string;
+  videoId: string;
 
   @Column()
-    game: string;
+  game: string;
 
   @Column()
-    title: string;
+  title: string;
 
   @Column({ default: false })
-    expired: boolean;
+  expired: boolean;
 
   @Column({ type: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') !== 'better-sqlite3' ? 'json' : 'simple-json' })
-    timestamp: {
+  timestamp: {
     hours: number; minutes: number; seconds: number;
   };
 
   @Column({ nullable: false, type: 'varchar', length: '2022-07-27T00:30:34.569259834Z'.length })
-    createdAt?: string;
+  createdAt?: string;
 
   @BeforeInsert()
   generateCreatedAt() {

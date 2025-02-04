@@ -13,26 +13,26 @@ export class Alias extends BotEntity {
   });
 
   @PrimaryColumn({ generated: 'uuid' })
-    id: string;
+  id: string;
 
   @Column()
   @Index('IDX_6a8a594f0a5546f8082b0c405c')
-    alias: string;
+  alias: string;
 
   @Column({ type: 'text' })
-    command: string;
+  command: string;
 
   @Column()
-    enabled: boolean;
+  enabled: boolean;
 
   @Column()
-    visible: boolean;
+  visible: boolean;
 
   @Column({ nullable: true, type: String })
-    permission: string | null;
+  permission: string | null;
 
   @Column({ nullable: true, type: String })
-    group: string | null;
+  group: string | null;
 }
 
 @Entity()
@@ -43,10 +43,10 @@ export class AliasGroup extends BotEntity {
 
   @PrimaryColumn()
   @Index('IDX_alias_group_unique_name', { unique: true })
-    name: string;
+  name: string;
 
   @Column({ type: 'simple-json' })
-    options: {
+  options: {
     filter: string | null;
     permission: string | null;
   };

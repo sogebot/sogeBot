@@ -8,7 +8,7 @@ import { Get, Post } from '~/decorators/endpoint.js';
 
 class Checklist extends System {
   @settings('customization')
-    itemsArray: any[] = [];
+  itemsArray: any[] = [];
 
   ///////////////////////// <! API endpoints
   @Get('/')

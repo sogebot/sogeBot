@@ -65,14 +65,14 @@ class Definitions {
 
 export class Generic {
   @Column({ type: 'text' })
-    name: string;
+  name: string;
 
   @Column({ type: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') !== 'better-sqlite3' ? 'json' : 'simple-json' })
-    triggered: Record<string, never>;
+  triggered: Record<string, never>;
 
   // TODO: write validator for all definitions if keys exist
   @Column({ type: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') !== 'better-sqlite3' ? 'json' : 'simple-json' })
-    definitions: Definitions;
+  definitions: Definitions;
 }
 export class CommandSendXTimes {
   name: 'command-send-x-times';
@@ -301,22 +301,22 @@ export class Event extends BotEntity {
   });
 
   @PrimaryColumn({ generated: 'uuid' })
-    id: string;
+  id: string;
 
   @Column(() => Generic)
-    event:
+  event:
   NumberOfViewersIsAtLeastX | StreamIsRunningXMinutes |
   CommandSendXTimes | KeywordSendXTimes | RewardRedeemed | Raid |
   EveryXMinutesOfStream | Generic;
 
   @Column()
-    isEnabled: boolean;
+  isEnabled: boolean;
 
   @Column()
-    filter: string;
+  filter: string;
 
   @Column({ type: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') !== 'better-sqlite3' ? 'json' : 'simple-json' })
-    operations: Operations[];
+  operations: Operations[];
 }
 
 const defaultEventValidationSchema = (key: string) => z.object({

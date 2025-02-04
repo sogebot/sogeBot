@@ -41,15 +41,15 @@ let jwtClient: null | JWT = null;
 
 class TTS extends Core {
   @settings()
-    responsiveVoiceKey = '';
+  responsiveVoiceKey = '';
 
   @settings()
-    googlePrivateKey = '';
+  googlePrivateKey = '';
   @settings()
-    googleVoices: string[] = [];
+  googleVoices: string[] = [];
 
   @settings()
-    elevenlabsApiKey = '';
+  elevenlabsApiKey = '';
 
   @onSettingsSave()
   refresh(req: any) {

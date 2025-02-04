@@ -1,5 +1,4 @@
 import { AppDataSource } from '~/database.js';
-
 import { isDbConnected } from '~/helpers/database.js';
 import { debug } from '~/helpers/log.js';
 

@@ -1,12 +1,12 @@
 import { User } from '@entity/user.js';
-import { AppDataSource } from '~/database.js';
+import { sample } from 'lodash-es';
 
 import type { ResponseFilter } from './index.js';
 
+import { AppDataSource } from '~/database.js';
 import * as changelog from '~/helpers/user/changelog.js';
 import { isIgnored } from '~/helpers/user/isIgnored.js';
 import { variables } from '~/watchers.js';
-import { sample } from 'lodash-es';
 
 const random: ResponseFilter = {
   '(random.online.viewer)': async function () {

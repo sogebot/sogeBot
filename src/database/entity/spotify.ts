@@ -1,12 +1,13 @@
-import { BotEntity } from '../BotEntity.js';
 import { Column, Entity, PrimaryColumn } from 'typeorm';
+
+import { BotEntity } from '../BotEntity.js';
 
 @Entity()
 export class SpotifySongBan extends BotEntity {
   @PrimaryColumn()
-    spotifyUri: string;
+  spotifyUri: string;
   @Column()
-    title: string;
+  title: string;
   @Column({ type: 'simple-array' })
-    artists: string[];
+  artists: string[];
 }

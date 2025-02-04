@@ -12,13 +12,13 @@ export class HowLongToBeatGame extends BotEntity {
   });
 
   @PrimaryColumn({ generated: 'uuid', type: 'uuid' })
-    id: string;
+  id: string;
 
   @Column()
-    game: string;
+  game: string;
 
   @Column({ nullable: false, type: 'varchar', length: '2022-07-27T00:30:34.569259834Z'.length })
-    startedAt?: string;
+  startedAt?: string;
 
   @BeforeInsert()
   generateStartedAt() {
@@ -26,7 +26,7 @@ export class HowLongToBeatGame extends BotEntity {
   }
 
   @Column({ nullable: false, type: 'varchar', length: '2022-07-27T00:30:34.569259834Z'.length })
-    updatedAt?: string;
+  updatedAt?: string;
 
   @BeforeInsert()
   @BeforeUpdate()
@@ -35,19 +35,19 @@ export class HowLongToBeatGame extends BotEntity {
   }
 
   @Column({ type: 'float', default: 0, precision: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') === 'mysql' ? 12 : undefined })
-    gameplayMain: number;
+  gameplayMain: number;
 
   @Column({ type: 'float', default: 0, precision: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') === 'mysql' ? 12 : undefined })
-    gameplayMainExtra: number;
+  gameplayMainExtra: number;
 
   @Column({ type: 'float', default: 0, precision: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') === 'mysql' ? 12 : undefined })
-    gameplayCompletionist: number;
+  gameplayCompletionist: number;
 
   @Column({ type: 'bigint', transformer: new ColumnNumericTransformer(), default: 0 })
-    offset: number;
+  offset: number;
 
   @Column({ type: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') !== 'better-sqlite3' ? 'json' : 'simple-json' })
-    streams: {
+  streams: {
     createdAt: string;
     timestamp: number;
     offset: number;

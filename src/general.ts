@@ -58,7 +58,7 @@ const gracefulExit = () => {
 
 class General extends Core {
   @settings('graceful_exit')
-    gracefulExitEachXHours = 0;
+  gracefulExitEachXHours = 0;
 
   @settings('general')
   @ui({
@@ -67,10 +67,10 @@ class General extends Core {
       return [...new Set(f.map((o) => o.split('.')[0]))];
     },
   })
-    lang = 'en';
+  lang = 'en';
 
   @settings('general')
-    numberFormat = '';
+  numberFormat = '';
 
   @onStartup()
   onStartup() {

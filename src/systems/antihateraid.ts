@@ -15,13 +15,13 @@ enum modes {
 
 class AntiHateRaid extends System {
   @settings()
-    clearChat = true;
+  clearChat = true;
   @settings()
-    mode: modes = modes.SUBSONLY;
+  mode: modes = modes.SUBSONLY;
   @settings()
-    minFollowTime = 10;
+  minFollowTime = 10;
   @settings()
-    customAnnounce = '';
+  customAnnounce = '';
 
   @command('!antihateraidon')
   @default_permission(defaultPermissions.MODERATORS)

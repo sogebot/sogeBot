@@ -10,24 +10,24 @@ import { translate } from '~/translations.js';
 
 class EmotesCombo extends System {
   @settings()
-    comboCooldown = 0;
+  comboCooldown = 0;
   @settings()
-    comboMessageMinThreshold = 3;
+  comboMessageMinThreshold = 3;
   @settings()
-    hypeMessagesEnabled = true;
+  hypeMessagesEnabled = true;
   @settings()
-    hypeMessages = [
-      { messagesCount: 5, message: translate('ui.overlays.emotes.hype.5') },
-      { messagesCount: 15, message: translate('ui.overlays.emotes.hype.15') },
-    ];
+  hypeMessages = [
+    { messagesCount: 5, message: translate('ui.overlays.emotes.hype.5') },
+    { messagesCount: 15, message: translate('ui.overlays.emotes.hype.15') },
+  ];
   @settings()
-    comboMessages = [
-      { messagesCount: 3, message: translate('ui.overlays.emotes.message.3') },
-      { messagesCount: 5, message: translate('ui.overlays.emotes.message.5') },
-      { messagesCount: 10, message: translate('ui.overlays.emotes.message.10') },
-      { messagesCount: 15, message: translate('ui.overlays.emotes.message.15') },
-      { messagesCount: 20, message: translate('ui.overlays.emotes.message.20') },
-    ];
+  comboMessages = [
+    { messagesCount: 3, message: translate('ui.overlays.emotes.message.3') },
+    { messagesCount: 5, message: translate('ui.overlays.emotes.message.5') },
+    { messagesCount: 10, message: translate('ui.overlays.emotes.message.10') },
+    { messagesCount: 15, message: translate('ui.overlays.emotes.message.15') },
+    { messagesCount: 20, message: translate('ui.overlays.emotes.message.20') },
+  ];
   comboEmote = '';
   comboEmoteCount = 0;
   comboLastBreak = 0;

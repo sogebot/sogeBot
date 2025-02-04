@@ -9,6 +9,7 @@ import { VM } from 'vm2';
 import { isStreamOnline, stats } from './api/index.js';
 import { getAll } from './customvariables/index.js';
 import { getTime } from './getTime.js';
+import { timer } from '../decorators.js';
 import * as changelog from './user/changelog.js';
 import getNameById from './user/getNameById.js';
 import {
@@ -17,7 +18,6 @@ import {
 import { isBot, isBotSubscriber } from './user/isBot.js';
 import { isBroadcaster } from './user/isBroadcaster.js';
 import { isModerator } from './user/isModerator.js';
-import { timer } from '../decorators.js';
 import lastfm from '../integrations/lastfm.js';
 import spotify from '../integrations/spotify.js';
 import ranks from '../systems/ranks.js';

@@ -5,8 +5,8 @@ import { BotEntity } from '../BotEntity.js';
 @Entity()
 export class Checklist extends BotEntity {
   @PrimaryColumn()
-    id: string;
+  id: string;
 
   @Column()
-    isCompleted: boolean;
+  isCompleted: boolean;
 }

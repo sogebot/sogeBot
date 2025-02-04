@@ -33,17 +33,17 @@ class Duel extends Game {
   dependsOn = ['systems.points'];
 
   @persistent()
-    _timestamp = 0;
+  _timestamp = 0;
   _cooldown = Date.now();
 
   @settings()
-    cooldown = 0;
+  cooldown = 0;
   @settings()
-    duration = 5;
+  duration = 5;
   @settings()
-    minimalBet = 0;
+  minimalBet = 0;
   @settings()
-    bypassCooldownByOwnerAndMods = false;
+  bypassCooldownByOwnerAndMods = false;
 
   @onStartup()
   onStartup() {

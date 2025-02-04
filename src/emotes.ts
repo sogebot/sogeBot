@@ -29,11 +29,11 @@ class Emotes extends Core {
   }[] = [];
 
   @settings()
-    '7tvEmoteSet' = '';
+  '7tvEmoteSet' = '';
   @settings()
-    ffz = true;
+  ffz = true;
   @settings()
-    bttv = true;
+  bttv = true;
 
   fetch = {
     global:     false,

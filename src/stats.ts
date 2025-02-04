@@ -6,6 +6,7 @@ import { get, isNil } from 'lodash-es';
 import { LessThan } from 'typeorm';
 
 import { DAY, MINUTE } from './helpers/constants.js';
+import { withScope } from './helpers/socket.js';
 
 import Core from '~/_interface.js';
 import { TwitchStats, TwitchStatsInterface } from '~/database/entity/twitch.js';
@@ -23,13 +24,12 @@ import spotify from '~/integrations/spotify.js';
 import songs from '~/systems/songs.js';
 import translateLib, { translate } from '~/translations.js';
 import { variables } from '~/watchers.js';
-import { withScope } from './helpers/socket.js';
 
 class Stats extends Core {
   @persistent()
-    currentFollowers = 0;
+  currentFollowers = 0;
   @persistent()
-    currentSubscribers = 0;
+  currentSubscribers = 0;
 
   showInUI = false;
   latestTimestamp = 0;

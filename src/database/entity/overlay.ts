@@ -696,22 +696,22 @@ export interface Group {
 @Entity()
 export class AlertQueue extends BotEntity {
   @PrimaryColumn({ generated: 'uuid' })
-    id: string;
+  id: string;
 
   @Column({ type: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') !== 'better-sqlite3' ? 'json' : 'simple-json' })
-    emitData: EmitData[];
+  emitData: EmitData[];
 
   @Column({ type: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') !== 'better-sqlite3' ? 'json' : 'simple-json', nullable: true })
-    filter: { [x: string]: Filter };
+  filter: { [x: string]: Filter };
 
   @Column()
-    passthrough: boolean;
+  passthrough: boolean;
 
   @Column()
-    play: boolean;
+  play: boolean;
 
   @Column({ nullable: false, type: 'varchar', length: '2022-07-27T00:30:34.569259834Z'.length })
-    updatedAt?: string;
+  updatedAt?: string;
 
   @BeforeInsert()
   @BeforeUpdate()
@@ -723,19 +723,19 @@ export class AlertQueue extends BotEntity {
 @Entity()
 export class Overlay extends BotEntity {
   @PrimaryColumn({ generated: 'uuid' })
-    id: string;
+  id: string;
 
   @Column()
-    name: string;
+  name: string;
 
   @Column({ type: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') !== 'better-sqlite3' ? 'json' : 'simple-json' })
-    canvas: {
+  canvas: {
     width: number;
     height: number;
   };
 
   @Column({ type: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') !== 'better-sqlite3' ? 'json' : 'simple-json' })
-    items: {
+  items: {
     id: string;
     isVisible: boolean;
     width: number;

@@ -10,19 +10,19 @@ export class Plugin extends BotEntity {
   });
 
   @PrimaryColumn()
-    id: string;
+  id: string;
 
   @Column()
-    name: string;
+  name: string;
 
   @Column()
-    enabled: boolean;
+  enabled: boolean;
 
   @Column({ type: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') === 'mysql' ? 'longtext' : 'text' })
-    workflow: string;
+  workflow: string;
 
   @Column('simple-json', { nullable: true })
-    settings: {
+  settings: {
     name: string;
     type: 'string' | 'number' | 'array' | 'boolean';
     description: string;
@@ -35,11 +35,11 @@ export class Plugin extends BotEntity {
 export class PluginVariable extends BaseEntity {
 
   @PrimaryColumn()
-    variableName: string;
+  variableName: string;
 
   @PrimaryColumn()
-    pluginId: string;
+  pluginId: string;
 
   @Column({ type: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') === 'mysql' ? 'longtext' : 'text' })
-    value: string;
+  value: string;
 }

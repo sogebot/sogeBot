@@ -35,40 +35,40 @@ const cachedLevels: bigint[] = [];
 
 class Levels extends System {
   @settings('conversion')
-    conversionRate = 10;
+  conversionRate = 10;
 
   @settings('levels')
-    firstLevelStartsAt = 100;
+  firstLevelStartsAt = 100;
 
   @settings('levels')
-    nextLevelFormula = '$prevLevelXP + ($prevLevelXP * 1.5)';
+  nextLevelFormula = '$prevLevelXP + ($prevLevelXP * 1.5)';
 
   @settings('xp')
-    xpName = 'XP';
+  xpName = 'XP';
 
   @permission_settings('xp')
-    interval = 10;
+  interval = 10;
 
   @permission_settings('xp')
-    perInterval = 10;
+  perInterval = 10;
 
   @permission_settings('xp')
-    offlineInterval = 0;
+  offlineInterval = 0;
 
   @permission_settings('xp')
-    perOfflineInterval = 0;
+  perOfflineInterval = 0;
 
   @permission_settings('xp')
-    messageInterval = 5;
+  messageInterval = 5;
 
   @permission_settings('xp')
-    perMessageInterval = 1;
+  perMessageInterval = 1;
 
   @permission_settings('xp')
-    messageOfflineInterval = 0;
+  messageOfflineInterval = 0;
 
   @permission_settings('xp')
-    perMessageOfflineInterval = 0;
+  perMessageOfflineInterval = 0;
 
   @Post('/example')
   async getLevelsExample(req: any) {

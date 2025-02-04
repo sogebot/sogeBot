@@ -10,23 +10,23 @@ export class Keyword extends BotEntity {
   });
 
   @PrimaryColumn({ generated: 'uuid', type: 'uuid' })
-    id: string;
+  id: string;
 
   @Column()
   @Index('IDX_35e3ff88225eef1d85c951e229')
-    keyword: string;
+  keyword: string;
 
   @Column()
-    enabled: boolean;
+  enabled: boolean;
 
   @Column({ nullable: true, type: String })
-    group: string | null;
+  group: string | null;
 
   @Column({ default: false })
-    areResponsesRandomized: boolean;
+  areResponsesRandomized: boolean;
 
   @Column({ type: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') !== 'better-sqlite3' ? 'json' : 'simple-json' })
-    responses: {
+  responses: {
     id: string;
     order: number;
     response: string;
@@ -40,10 +40,10 @@ export class Keyword extends BotEntity {
 export class KeywordGroup extends BaseEntity {
   @PrimaryColumn()
   @Index('IDX_keyword_group_unique_name', { unique: true })
-    name: string;
+  name: string;
 
   @Column({ type: 'simple-json' })
-    options: {
+  options: {
     filter: string | null;
     permission: string | null;
   };

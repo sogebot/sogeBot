@@ -93,11 +93,11 @@ const fetchUserForAlert = (opts: EmitData, type: 'recipient' | 'name'): Promise<
 
 class Alerts extends Registry {
   @persistent()
-    areAlertsMuted = false;
+  areAlertsMuted = false;
   @persistent()
-    isTTSMuted = false;
+  isTTSMuted = false;
   @persistent()
-    isSoundMuted = false;
+  isSoundMuted = false;
 
   @Get('/queue')
   async queue() {

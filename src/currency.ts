@@ -1,4 +1,5 @@
 import chalk from 'chalk';
+import { isNil } from 'lodash-es';
 
 import currentRates from './helpers/currency/rates.js';
 
@@ -12,7 +13,6 @@ import { settings, ui } from '~/decorators.js';
 import exchange from '~/helpers/currency/exchange.js';
 import { mainCurrency } from '~/helpers/currency/index.js';
 import { info } from '~/helpers/log.js';
-import { isNil } from 'lodash-es';
 
 class Currency extends Core {
   mainCurrencyLoaded = false;

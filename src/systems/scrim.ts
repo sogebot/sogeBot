@@ -41,7 +41,7 @@ class Scrim extends System {
   isCooldownOnly = false;
 
   @settings('customization')
-    waitForMatchIdsInSeconds = 60;
+  waitForMatchIdsInSeconds = 60;
 
   @onStartup()
   onStartup() {

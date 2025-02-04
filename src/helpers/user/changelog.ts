@@ -6,11 +6,11 @@ import {
 } from 'lodash-es';
 
 import { timer } from '../../decorators.js';
+import { MINUTE } from '../constants.js';
 import { flatten } from '../flatten.js';
 import { debug, error } from '../log.js';
 
 import { AppDataSource } from '~/database.js';
-import { MINUTE } from '../constants.js';
 
 const changelog: (Partial<UserInterface> & { userId: string, changelogType: 'set' | 'increment' })[] = [];
 const lock = new Map<string, boolean>();

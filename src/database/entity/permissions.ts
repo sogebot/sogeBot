@@ -5,54 +5,54 @@ import { BotEntity } from '../BotEntity.js';
 @Entity()
 export class Permissions extends BotEntity {
   @PrimaryColumn({ generated: 'uuid' })
-    id: string;
+  id: string;
 
   @Column()
-    name: string;
+  name: string;
 
   @Column()
-    order: number;
+  order: number;
 
   @Column()
-    isCorePermission:   boolean;
+  isCorePermission:   boolean;
 
   @Column()
-    isWaterfallAllowed: boolean;
+  isWaterfallAllowed: boolean;
 
   @Column({ type: 'varchar', length: 12 })
-    automation: string;
+  automation: string;
 
   @Column({ type: 'simple-array' })
-    userIds:            string[];
+  userIds:            string[];
   @Column({ type: 'simple-array' })
-    excludeUserIds:     string[];
+  excludeUserIds:     string[];
 
   @Column({ type: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') !== 'better-sqlite3' ? 'json' : 'simple-json' })
-    filters: {
+  filters: {
     comparator: '<' | '>' | '==' | '<=' | '>=';
     type: 'level' | 'ranks' | 'points' | 'watched' | 'tips' | 'bits' | 'messages' | 'subtier' | 'subcumulativemonths' | 'substreakmonths';
     value: string;
   }[];
 
   @Column({ default: false })
-    haveAllScopes: boolean;
+  haveAllScopes: boolean;
 
   @Column({ default: true })
-    excludeSensitiveScopes: boolean;
+  excludeSensitiveScopes: boolean;
 
   @Column({ type: 'simple-json' })
-    scopes: string[];
+  scopes: string[];
 }
 
 @Entity()
 export class PermissionCommands extends BotEntity{
   @PrimaryColumn({ generated: 'uuid' })
-    id: string;
+  id: string;
 
   @Column()
   @Index('IDX_ba6483f5c5882fa15299f22c0a')
-    name: string;
+  name: string;
 
   @Column({ type: 'varchar', length: 36, nullable: true })
-    permission: string | null;
+  permission: string | null;
 }

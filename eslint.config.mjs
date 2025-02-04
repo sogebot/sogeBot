@@ -125,6 +125,8 @@ export default [{
 
         "@typescript-eslint/camelcase": "off",
         "@typescript-eslint/no-explicit-any": "warn",
+        "@typescript-eslint/no-unused-expressions": "off",
+        "no-constant-binary-expression": "off",
         "@typescript-eslint/explicit-function-return-type": 0,
         "@typescript-eslint/no-use-before-define": 0,
         "@typescript-eslint/class-name-casing": 0,

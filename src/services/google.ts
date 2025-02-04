@@ -46,39 +46,39 @@ export enum latency {
 class Google extends Service {
   clientId = '225380804535-gjd77dplfkbe4d3ct173d8qm0j83f8tr.apps.googleusercontent.com';
   @persistent()
-    refreshToken = '';
+  refreshToken = '';
   @settings()
-    channel = '';
+  channel = '';
   @settings()
-    streamId = '';
+  streamId = '';
 
   @settings()
-    shouldPrepareBroadcast = false;
+  shouldPrepareBroadcast = false;
   @settings()
-    latency: latency = latency.ULTRA_LOW;
+  latency: latency = latency.ULTRA_LOW;
 
   @settings()
-    onStreamTitle = '$title | $game';
+  onStreamTitle = '$title | $game';
   @settings()
-    onStreamDescription = 'Streaming at https://twitch.tv/changeme\n\n=========\n$chapters\n========\n\n$tags';
+  onStreamDescription = 'Streaming at https://twitch.tv/changeme\n\n=========\n$chapters\n========\n\n$tags';
 
   @settings()
-    onStreamEndTitle = 'Archive | $gamesList | $date';
+  onStreamEndTitle = 'Archive | $gamesList | $date';
   @settings()
-    onStreamEndTitleEnabled = false;
+  onStreamEndTitleEnabled = false;
 
   @settings()
-    onStreamEndDescription = 'Streamed at https://twitch.tv/changeme\nTitle: $title\n\n=========\n$chapters\n========\n\nDate: $date\n\n$tags';
+  onStreamEndDescription = 'Streamed at https://twitch.tv/changeme\nTitle: $title\n\n=========\n$chapters\n========\n\nDate: $date\n\n$tags';
   @settings()
-    onStreamEndDescriptionEnabled = false;
+  onStreamEndDescriptionEnabled = false;
 
   @settings()
-    onStreamStartPrivacyStatus: 'private' | 'public' | 'unlisted' = 'public';
+  onStreamStartPrivacyStatus: 'private' | 'public' | 'unlisted' = 'public';
 
   @settings()
-    onStreamEndPrivacyStatus: 'private' | 'public' | 'unlisted' = 'private';
+  onStreamEndPrivacyStatus: 'private' | 'public' | 'unlisted' = 'private';
   @settings()
-    onStreamEndPrivacyStatusEnabled = false;
+  onStreamEndPrivacyStatusEnabled = false;
 
   expiryDate: null | number = null;
   accessToken: null | string = null;

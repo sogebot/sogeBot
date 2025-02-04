@@ -31,9 +31,9 @@ class Queue extends System {
   locked = false;
 
   @settings('eligibility')
-    eligibilityAll = true;
+  eligibilityAll = true;
   @settings('eligibility')
-    eligibilitySubscribers = false;
+  eligibilitySubscribers = false;
 
   pickedUsers: QueueInterface[] = [];
 

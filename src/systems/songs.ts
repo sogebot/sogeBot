@@ -1,3 +1,5 @@
+import ytdl from '@distube/ytdl-core';
+import ytsr from '@distube/ytsr';
 import {
   currentSongType,
   SongBan, SongPlaylist, SongRequest,
@@ -10,9 +12,7 @@ import io from 'socket.io';
 import {
   Brackets, In, Like,
 } from 'typeorm';
-import ytdl from '@distube/ytdl-core';
 import ytpl from 'ytpl';
-import ytsr from '@distube/ytsr';
 import { z } from 'zod';
 
 import System from './_interface.js';
@@ -49,26 +49,26 @@ class Songs extends System {
   currentSong = JSON.stringify(emptyCurrentSong as currentSongType);
   isPlaying: {[socketId: string]: boolean } = {};
   @persistent()
-    currentTag = 'general';
+  currentTag = 'general';
 
   @settings()
-    volume = 25;
+  volume = 25;
   @settings()
-    duration = 10;
+  duration = 10;
   @settings()
-    shuffle = true;
+  shuffle = true;
   @settings()
-    songrequest = true;
+  songrequest = true;
   @settings()
-    allowRequestsOnlyFromPlaylist = false;
+  allowRequestsOnlyFromPlaylist = false;
   @settings()
-    playlist = true;
+  playlist = true;
   @settings()
-    notify = false;
+  notify = false;
   @settings()
-    onlyMusicCategory = false;
+  onlyMusicCategory = false;
   @settings()
-    calculateVolumeByLoudness = true;
+  calculateVolumeByLoudness = true;
 
   @onStartup()
   startup() {

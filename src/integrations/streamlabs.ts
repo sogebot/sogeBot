@@ -56,16 +56,16 @@ class Streamlabs extends Integration {
 
   // save last donationId which rest api had
   @persistent()
-    afterDonationId = '';
+  afterDonationId = '';
 
   @persistent()
-    accessToken = '';
+  accessToken = '';
 
   @persistent()
-    socketToken = '';
+  socketToken = '';
 
   @settings()
-    userName = '';
+  userName = '';
 
   @onStartup()
   onStartup() {

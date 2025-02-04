@@ -63,10 +63,10 @@ function getTips (page: number, jwtToken: string, lastPubId: string): Promise<[i
 
 class Donatello extends Integration {
   @persistent()
-    lastPubId = '';
+  lastPubId = '';
 
   @settings(undefined, undefined, true)
-    token = '';
+  token = '';
 
   @onStartup()
   interval() {

@@ -10,10 +10,10 @@ export type currentSongType = {
 @Entity()
 export class SongBan extends BotEntity {
   @PrimaryColumn()
-    videoId: string;
+  videoId: string;
 
   @Column()
-    title: string;
+  title: string;
 }
 
 @Entity()
@@ -23,49 +23,49 @@ export class SongPlaylist extends BotEntity {
   });
 
   @PrimaryColumn()
-    videoId: string;
+  videoId: string;
 
   @Column({ type: 'varchar', length: '2022-07-27T00:30:34.569259834Z'.length, default: '1970-01-01T00:00:00.000Z' })
-    lastPlayedAt?: string;
+  lastPlayedAt?: string;
 
   @Column()
-    title: string;
+  title: string;
 
   @Column({ type: 'float', precision: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') === 'mysql' ? 12 : undefined  })
-    seed: number;
+  seed: number;
 
   @Column({ type: 'float', precision: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') === 'mysql' ? 12 : undefined  })
-    loudness: number;
+  loudness: number;
 
   @Column({ type: 'simple-array' })
-    tags: string[];
+  tags: string[];
 
   @Column()
-    length: number;
+  length: number;
 
   @Column()
-    volume: number;
+  volume: number;
 
   @Column()
-    startTime: number;
+  startTime: number;
 
   @Column()
-    endTime: number;
+  endTime: number;
 
   @Column({ type: Boolean, default: false })
-    forceVolume: boolean;
+  forceVolume: boolean;
 }
 
 @Entity()
 export class SongRequest extends BotEntity {
   @PrimaryColumn({ generated: 'uuid' })
-    id: string;
+  id: string;
 
   @Column()
-    videoId: string;
+  videoId: string;
 
   @Column({ type: 'varchar', length: '2022-07-27T00:30:34.569259834Z'.length })
-    addedAt?: string;
+  addedAt?: string;
 
   @BeforeInsert()
   generateAddedAt() {
@@ -73,11 +73,11 @@ export class SongRequest extends BotEntity {
   }
 
   @Column()
-    title: string;
+  title: string;
   @Column({ type: 'float', precision: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') === 'mysql' ? 12 : undefined  })
-    loudness: number;
+  loudness: number;
   @Column()
-    length: number;
+  length: number;
   @Column()
-    username: string;
+  username: string;
 }

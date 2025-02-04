@@ -41,38 +41,38 @@ class Points extends System {
   isLoaded: string[] = [];
 
   @settings('reset')
-    isPointResetIntervalEnabled = false;
+  isPointResetIntervalEnabled = false;
   @settings('reset')
-    resetIntervalCron = '@monthly';
+  resetIntervalCron = '@monthly';
   @persistent()
-    lastCronRun = 0;
+  lastCronRun = 0;
 
   @settings('customization')
-    name = 'point|points'; // default is <singular>|<plural> | in some languages can be set with custom <singular>|<x:multi>|<plural> where x <= 10
+  name = 'point|points'; // default is <singular>|<plural> | in some languages can be set with custom <singular>|<x:multi>|<plural> where x <= 10
 
   @permission_settings('customization')
-    interval = 10;
+  interval = 10;
 
   @permission_settings('customization')
-    perInterval = 1;
+  perInterval = 1;
 
   @permission_settings('customization')
-    offlineInterval = 30;
+  offlineInterval = 30;
 
   @permission_settings('customization')
-    perOfflineInterval = 1;
+  perOfflineInterval = 1;
 
   @permission_settings('customization')
-    messageInterval = 5;
+  messageInterval = 5;
 
   @permission_settings('customization')
-    perMessageInterval = 1;
+  perMessageInterval = 1;
 
   @permission_settings('customization')
-    messageOfflineInterval = 5;
+  messageOfflineInterval = 5;
 
   @permission_settings('customization')
-    perMessageOfflineInterval = 0;
+  perMessageOfflineInterval = 0;
 
   @onLoad('name')
   @onChange('name')

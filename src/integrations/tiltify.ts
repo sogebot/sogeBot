@@ -3,6 +3,7 @@ import fetch from 'node-fetch';
 import { z } from 'zod';
 
 import Integration from './_interface.js';
+import { tiltifyCampaign } from '../../d.ts/src/helpers/socket.js';
 import { command, persistent, settings } from '../decorators.js';
 
 import { Currency } from '~/database/entity/user.js';
@@ -16,20 +17,19 @@ import { getLang } from '~/helpers/locales.js';
 import { error, info, tip } from '~/helpers/log.js';
 import eventlist from '~/overlays/eventlist.js';
 import alerts from '~/registries/alerts.js';
-import { tiltifyCampaign } from '../../d.ts/src/helpers/socket.js';
 
 const mutex = new Mutex();
 
 class Tiltify extends Integration {
   @settings(undefined, false, true)
-    access_token = '';
+  access_token = '';
   @settings()
-    userName = '';
+  userName = '';
   @settings()
-    userId = '';
+  userId = '';
 
   @persistent()
-    lastCheckAt = Date.now();
+  lastCheckAt = Date.now();
 
   fundraising_events: {
     avatar: {
@@ -68,14 +68,14 @@ class Tiltify extends Integration {
   }[] = [];
   campaigns: tiltifyCampaign[] = [];
   donations: Record<number,
-  {
-    'id': number,
-    'amount': number,
-    'name': string,
-    'comment': string,
-    'completedAt': number,
-    'rewardId': number,
-  }> = {};
+    {
+      'id': number,
+      'amount': number,
+      'name': string,
+      'comment': string,
+      'completedAt': number,
+      'rewardId': number,
+    }> = {};
 
   @onStartup()
   onStartup() {

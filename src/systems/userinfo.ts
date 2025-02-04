@@ -42,16 +42,16 @@ import { translate } from '~/translations.js';
 
 class UserInfo extends System {
   @settings('me')
-    order: string[] = ['$sender', '$level', '$rank', '$role', '$watched', '$points', '$messages', '$tips', '$bits', '$subMonths'];
+  order: string[] = ['$sender', '$level', '$rank', '$role', '$watched', '$points', '$messages', '$tips', '$bits', '$subMonths'];
 
   @settings('me')
-    _formatDisabled: string[] = ['$role'];
+  _formatDisabled: string[] = ['$role'];
 
   @settings('me')
-    formatSeparator = ' | ';
+  formatSeparator = ' | ';
 
   @settings('customization')
-    lastSeenFormat = 'L LTS';
+  lastSeenFormat = 'L LTS';
 
   @command('!followage')
   protected async followage(opts: CommandOptions): Promise<CommandResponse[]> {

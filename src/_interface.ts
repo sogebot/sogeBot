@@ -3,6 +3,7 @@ import { randomUUID } from 'node:crypto';
 import { setTimeout } from 'timers';
 
 import chalk from 'chalk';
+import { every, isEqual, set, isNil, cloneDeep, isFunction, get } from 'lodash-es';
 import type { Namespace } from 'socket.io/dist/namespace';
 
 import { ClientToServerEventsWithNamespace } from '../d.ts/src/helpers/socket.js';
@@ -28,7 +29,6 @@ import defaultPermissions from '~/helpers/permissions/defaultPermissions.js';
 import { register } from '~/helpers/register.js';
 import { addScope, withScope } from '~/helpers/socket.js';
 import * as watchers from '~/watchers.js';
-import { every, isEqual, set, isNil, cloneDeep, isFunction, get } from 'lodash-es';
 
 let socket: import('~/socket').Socket | any = null;
 

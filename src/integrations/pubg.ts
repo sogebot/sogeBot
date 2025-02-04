@@ -21,34 +21,34 @@ import { error, info } from '~/helpers/log.js';
 class PUBG extends Integration {
   @settings(undefined, undefined, true)
   @ui({ type: 'text-input', secret: true })
-    apiKey = '';
+  apiKey = '';
 
   @settings('player')
   @ui({ type: 'selector', values: ['steam', 'console', 'kakao', 'psn', 'stadia', 'xbox'] })
-    platform: 'steam' | 'console' | 'kakao' | 'psn' | 'stadia' | 'xbox' = 'steam';
+  platform: 'steam' | 'console' | 'kakao' | 'psn' | 'stadia' | 'xbox' = 'steam';
   @settings('player')
-    playerName = '';
+  playerName = '';
   @settings('player')
   @ui({ type: 'pubg-player-id' }, 'player')
-    playerId = '';
+  playerId = '';
   seasonId = '';
   @persistent()
-    _lastSeasonIdFetch = 0;
+  _lastSeasonIdFetch = 0;
 
   @settings('customization')
-    rankedGameModeStatsCustomization = 'Rank: $currentTier.tier $currentTier.subTier ($currentRankPoint) | Wins: $wins ((toPercent|1|$winRatio)%) | Top 10: (toPercent|1|$top10Ratio)% | Avg. Rank: (toFloat|1|$avgRank) | KDA: (toFloat|1|$kda)';
+  rankedGameModeStatsCustomization = 'Rank: $currentTier.tier $currentTier.subTier ($currentRankPoint) | Wins: $wins ((toPercent|1|$winRatio)%) | Top 10: (toPercent|1|$top10Ratio)% | Avg. Rank: (toFloat|1|$avgRank) | KDA: (toFloat|1|$kda)';
   @settings('customization')
-    gameModeStatsCustomization = 'Wins: $wins | Top 10: $top10s';
+  gameModeStatsCustomization = 'Wins: $wins | Top 10: $top10s';
 
   @settings('stats')
-    rankedGameModeStats: { [x: string]: any } = {};
+  rankedGameModeStats: { [x: string]: any } = {};
   @persistent()
-    _lastRankedGameModeStats = 0;
+  _lastRankedGameModeStats = 0;
 
   @settings('stats')
-    gameModeStats: { [x: string]: any } = {};
+  gameModeStats: { [x: string]: any } = {};
   @persistent()
-    _lastGameModeStats = 0;
+  _lastGameModeStats = 0;
 
   @onStartup()
   onStartup() {

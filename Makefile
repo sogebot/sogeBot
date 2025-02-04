@@ -24,7 +24,7 @@ dependencies:
 
 eslint:
 	@echo -ne "\n\t ----- Checking eslint\n"
-	NODE_OPTIONS="--max-old-space-size=4096" npx eslint --ext .ts src --quiet
+	NODE_OPTIONS="--max-old-space-size=4096" npx eslint src --quiet
 
 jsonlint:
 	@echo -ne "\n\t ----- Checking jsonlint\n"

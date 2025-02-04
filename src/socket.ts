@@ -23,17 +23,17 @@ import * as changelog from '~/helpers/user/changelog.js';
 
 class Socket extends Core {
   @persistent()
-    JWTKey = '';
+  JWTKey = '';
 
   @settings('connection')
-    accessTokenExpirationTime = DAY;
+  accessTokenExpirationTime = DAY;
 
   @settings('connection')
-    refreshTokenExpirationTime = DAY * 31;
+  refreshTokenExpirationTime = DAY * 31;
 
   @settings('connection')
   @ui({ type: 'uuid-generator' }, 'connection')
-    socketToken = '';
+  socketToken = '';
 
   @onLoad('JWTKey')
   JWTKeyGenerator() {

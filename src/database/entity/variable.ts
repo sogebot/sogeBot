@@ -11,13 +11,13 @@ export class VariableWatch extends BotEntity {
     primary:   true,
     generated: 'increment',
   })
-    id: string;
+  id: string;
   @Column({
     type: String, nullable: false, name: 'variableId',
   })
-    variableId: string;
+  variableId: string;
   @Column()
-    order: number;
+  order: number;
 }
 
 @Entity()
@@ -54,10 +54,10 @@ export class Variable extends BotEntity {
     primary:   true,
     generated: 'uuid',
   })
-    id: string;
+  id: string;
 
   @Column({ type: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') !== 'better-sqlite3' ? 'json' : 'simple-json' })
-    history: {
+  history: {
     userId: string;
     username: string;
     currentValue: string;
@@ -66,7 +66,7 @@ export class Variable extends BotEntity {
   }[];
 
   @Column({ type: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') !== 'better-sqlite3' ? 'json' : 'simple-json' })
-    urls: {
+  urls: {
     id: string;
     GET: boolean;
     POST: boolean;
@@ -74,44 +74,44 @@ export class Variable extends BotEntity {
   }[];
 
   @Column({ unique: true })
-    variableName: string;
+  variableName: string;
 
   @Column({ default: '' })
-    description: string;
+  description: string;
 
   @Column({ type: String })
-    type: 'eval' | 'number' | 'options' | 'text';
+  type: 'eval' | 'number' | 'options' | 'text';
 
   @Column({
     type:     String,
     nullable: true,
   })
-    currentValue: string;
+  currentValue: string;
 
   @Column({ type: 'text' })
-    evalValue: string;
+  evalValue: string;
 
   @Column({ default: 60000 })
-    runEvery: number;
+  runEvery: number;
 
   @Column()
-    responseType: number;
+  responseType: number;
 
   @Column({ default: '' })
-    responseText: string;
+  responseText: string;
 
   @Column()
-    permission: string;
+  permission: string;
 
   @Column({
     type:    Boolean,
     default: false,
   })
-    readOnly: boolean;
+  readOnly: boolean;
 
   @Column({ type: 'simple-array' })
-    usableOptions: string[];
+  usableOptions: string[];
 
   @Column({ type: 'varchar', length: '2022-07-27T00:30:34.569259834Z'.length })
-    runAt: string;
+  runAt: string;
 }

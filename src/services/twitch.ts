@@ -6,6 +6,12 @@ import { capitalize } from 'lodash-es';
 import { z } from 'zod';
 
 import Service from './_interface.js';
+import { onChange, onLoad, onStreamStart } from '../decorators/on.js';
+import {
+  command, default_permission, example, persistent, settings,
+} from '../decorators.js';
+import { Expects } from  '../expects.js';
+import { debug, error, info } from '../helpers/log.js';
 import { init } from './twitch/api/interval.js';
 import { createClip } from './twitch/calls/createClip.js';
 import { createMarker } from './twitch/calls/createMarker.js';
@@ -14,12 +20,6 @@ import Chat from './twitch/chat.js';
 import EventSubLongPolling from './twitch/eventSubLongPolling.js';
 import EventSubWebsocket, { broadcasterMissingScopes } from './twitch/eventSubWebsocket.js';
 import { CustomAuthProvider } from './twitch/token/CustomAuthProvider.js';
-import { onChange, onLoad, onStreamStart } from '../decorators/on.js';
-import {
-  command, default_permission, example, persistent, settings,
-} from '../decorators.js';
-import { Expects } from  '../expects.js';
-import { debug, error, info } from '../helpers/log.js';
 
 import { AppDataSource } from '~/database.js';
 import { Get, Post } from '~/decorators/endpoint.js';
@@ -57,56 +57,56 @@ class Twitch extends Service {
   apiClient: ApiClient | null = null;
 
   @persistent()
-    uptime = 0;
+  uptime = 0;
 
   @persistent() // needs to be persistent as we are using it with variables.get
-    botTokenValid = false;
+  botTokenValid = false;
   @persistent() // needs to be persistent as we are using it with variables.get
-    broadcasterTokenValid = false;
+  broadcasterTokenValid = false;
 
   @settings('chat')
-    sendWithMe = false;
+  sendWithMe = false;
   @settings('chat')
-    sendAsReply = false;
+  sendAsReply = false;
   @settings('chat')
-    ignorelist: any[] = [];
+  ignorelist: any[] = [];
   @settings('chat')
-    showWithAt = true;
+  showWithAt = true;
   @settings('chat')
-    mute = false;
+  mute = false;
   @settings('chat')
-    whisperListener = false;
+  whisperListener = false;
 
   @settings('general')
-    tokenService: keyof typeof urls | 'Own Twitch App' = 'SogeBot Token Generator v2';
+  tokenService: keyof typeof urls | 'Own Twitch App' = 'SogeBot Token Generator v2';
   @settings('general')
-    tokenServiceCustomClientId = '';
+  tokenServiceCustomClientId = '';
   @settings('general')
-    tokenServiceCustomClientSecret = '';
+  tokenServiceCustomClientSecret = '';
   @settings('general')
-    generalOwners: string[] = [];
+  generalOwners: string[] = [];
   @settings('general')
-    createMarkerOnEvent = true;
+  createMarkerOnEvent = true;
 
   @settings('broadcaster')
-    broadcasterRefreshToken = '';
+  broadcasterRefreshToken = '';
   @settings('broadcaster')
-    broadcasterId = '';
+  broadcasterId = '';
   @settings('broadcaster')
-    broadcasterUsername = '';
+  broadcasterUsername = '';
   @settings('broadcaster')
-    broadcasterCurrentScopes: string[] = [];
+  broadcasterCurrentScopes: string[] = [];
   @persistent()
-    broadcasterType: string | null = null;
+  broadcasterType: string | null = null;
 
   @settings('bot')
-    botRefreshToken = '';
+  botRefreshToken = '';
   @settings('bot')
-    botId = '';
+  botId = '';
   @settings('bot')
-    botUsername = '';
+  botUsername = '';
   @settings('bot')
-    botCurrentScopes: string[] = [];
+  botCurrentScopes: string[] = [];
 
   @onChange('botCurrentScopes')
   onChangeBotScopes() {

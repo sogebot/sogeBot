@@ -1,3 +1,5 @@
+import { random } from 'lodash-es';
+
 import Game from './_interface.js';
 import { command, settings } from '../decorators.js';
 
@@ -6,7 +8,6 @@ import * as changelog from '~/helpers/user/changelog.js';
 import { isBroadcaster } from '~/helpers/user/isBroadcaster.js';
 import { isModerator } from '~/helpers/user/isModerator.js';
 import { translate } from '~/translations.js';
-import { random } from 'lodash-es';
 
 /*
  * !roulette - 50/50 chance to timeout yourself

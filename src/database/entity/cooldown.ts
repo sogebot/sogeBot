@@ -10,33 +10,33 @@ export class Cooldown extends BotEntity {
   });
 
   @PrimaryColumn({ generated: 'uuid', type: 'uuid' })
-    id: string;
+  id: string;
 
   @Column()
   @Index('IDX_aa85aa267ec6eaddf7f93e3665', { unique: true })
-    name: string;
+  name: string;
 
   @Column()
-    miliseconds: number;
+  miliseconds: number;
 
   @Column({ type: 'varchar', length: 10 })
-    type: 'global' | 'user';
+  type: 'global' | 'user';
 
   @Column({ type: 'varchar', length: '2022-07-27T00:30:34.569259834Z'.length })
-    timestamp: string;
+  timestamp: string;
 
   @Column()
-    isEnabled: boolean;
+  isEnabled: boolean;
 
   @Column()
-    isErrorMsgQuiet: boolean;
+  isErrorMsgQuiet: boolean;
 
   @Column()
-    isOwnerAffected: boolean;
+  isOwnerAffected: boolean;
 
   @Column()
-    isModeratorAffected: boolean;
+  isModeratorAffected: boolean;
 
   @Column()
-    isSubscriberAffected: boolean;
+  isSubscriberAffected: boolean;
 }

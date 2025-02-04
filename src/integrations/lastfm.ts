@@ -17,13 +17,13 @@ enum NOTIFY {
 
 class LastFM extends Integration {
   @settings(undefined, undefined, true)
-    apiKey = '';
+  apiKey = '';
 
   @settings(undefined, undefined, true)
-    username = '';
+  username = '';
 
   @settings()
-    notify = NOTIFY.all;
+  notify = NOTIFY.all;
 
   currentSong: null | string = null;
 

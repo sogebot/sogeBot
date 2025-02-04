@@ -1,4 +1,5 @@
 import { HeistUser } from '@entity/heist.js';
+import { orderBy, isNil, random, chunk } from 'lodash-es';
 
 import Game from './_interface.js';
 import { onStartup } from '../decorators/on.js';
@@ -12,7 +13,6 @@ import { getLocalizedName } from '~/helpers/getLocalizedName.js';
 import { debug, warning } from '~/helpers/log.js';
 import * as changelog from '~/helpers/user/changelog.js';
 import { translate } from '~/translations.js';
-import { orderBy, isNil, random, chunk } from 'lodash-es';
 
 export type Level = { name: string; winPercentage: number; payoutMultiplier: number; maxUsers: number };
 export type Result = { percentage: number; message: string };

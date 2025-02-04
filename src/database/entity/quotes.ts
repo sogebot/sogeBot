@@ -10,18 +10,18 @@ export class Quotes extends BotEntity {
   });
 
   @PrimaryColumn({ type: 'int', generated: 'increment' })
-    id: number;
+  id: number;
 
   @Column({ type: 'simple-array' })
-    tags: string[];
+  tags: string[];
 
   @Column()
-    quote: string;
+  quote: string;
 
   @Column()
-    quotedBy: string;
+  quotedBy: string;
   quotedByUserName?: string | null; // not in database
 
   @Column({ type: 'varchar', length: '2022-07-27T00:30:34.569259834Z'.length, default: '1970-01-01T00:00:00.000Z' })
-    createdAt: string;
+  createdAt: string;
 }

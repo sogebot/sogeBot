@@ -12,14 +12,14 @@ export class Rank extends BotEntity {
   });
 
   @PrimaryColumn({ generated: 'uuid' })
-    id: string;
+  id: string;
 
   @Column()
-    value: number;
+  value: number;
 
   @Column()
-    rank: string;
+  rank: string;
 
   @Column()
-    type: 'viewer' | 'subscriber';
+  type: 'viewer' | 'subscriber';
 }

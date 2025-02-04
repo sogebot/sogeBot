@@ -1,4 +1,5 @@
 import { EventList, EventListInterface } from '@entity/eventList.js';
+import { isNil } from 'lodash-es';
 import { MoreThanOrEqual } from 'typeorm';
 
 import Overlay from './_interface.js';
@@ -14,7 +15,6 @@ import { mainCurrency } from '~/helpers/currency/index.js';
 import { endpoint } from '~/helpers/socket.js';
 import { getTopClips } from '~/services/twitch/calls/getTopClips.js';
 import { variables } from '~/watchers.js';
-import { isNil } from 'lodash-es';
 
 export type Event = (EventListInterface & { username?: string, values?: {
   currency: Currency;
