@@ -415,6 +415,9 @@ class Discord extends Integration {
     if (o === '$subscribers') {
       return { name: prepare('webpanel.subscribers'), value: String(stats.value.currentSubscribers), inline: true };
     }
+    if (o === '$tags') {
+      return { name: prepare('webpanel.tags'), value: String((stats.value.currentTags ?? []).join(', ')), inline: true };
+    }
     return { name: o, value: 'unknown field' };
   }
 
