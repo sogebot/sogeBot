@@ -39,7 +39,7 @@ jobs:
         id: log
         run: node tools/changelog.js generate > body.md
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: sogeBot
           path: ${{ github.workspace }}/*.zip
@@ -77,7 +77,7 @@ jobs:
           username: ${{ secrets.DOCKER_REGISTRY_USERNAME }}
           password: ${{ secrets.DOCKER_REGISTRY_PASSWORD }}
 
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: sogeBot
           path: ${{ github.workspace }}/*.zip

@@ -39,7 +39,7 @@ jobs:
       - name: Zip node_modules
         run: make pack-modules
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: sogeBot-${{ steps.slug.outputs.SHA }}
           path: ${{ github.workspace }}/*.zip
@@ -68,7 +68,7 @@ jobs:
           username: ${{ secrets.DOCKER_REGISTRY_USERNAME }}
           password: ${{ secrets.DOCKER_REGISTRY_PASSWORD }}
 
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: sogeBot-${{ steps.slug.outputs.SHA }}
           path: ${{ github.workspace }}/*.zip
