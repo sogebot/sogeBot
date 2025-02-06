@@ -546,9 +546,9 @@ class Module {
           promisedSettings.__permission_based__[category] = {};
         }
 
-        set(promisedSettings, `__permission_based_${category}.${key}`, withoutDefaults ? await this.getPermissionBasedSettingsValue(key, false) : [await this.getPermissionBasedSettingsValue(key, false), defaultValue]);
+        set(promisedSettings, `__permission_based__.${category}.${key}`, withoutDefaults ? await this.getPermissionBasedSettingsValue(key, false) : [await this.getPermissionBasedSettingsValue(key, false), defaultValue]);
       } else {
-        set(promisedSettings, `__permission_based_${key}`, withoutDefaults ? await this.getPermissionBasedSettingsValue(key, false) : [await this.getPermissionBasedSettingsValue(key, false), defaultValue]);
+        set(promisedSettings, `__permission_based__.${key}`, withoutDefaults ? await this.getPermissionBasedSettingsValue(key, false) : [await this.getPermissionBasedSettingsValue(key, false), defaultValue]);
       }
     }
 
