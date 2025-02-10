@@ -20,6 +20,7 @@ import {
 } from '~/decorators/on.js';
 import { settings } from '~/decorators.js';
 import { error, info, warning } from '~/helpers/log.js';
+import { variables } from './watchers.js';
 
 /* secureKeys are used to authenticate use of public overlay endpoint */
 const secureKeys = new Set<string>();
@@ -214,10 +215,11 @@ class TTS extends Core {
     stability: number;
     exaggeration: number;
   }) {
+    const apiKey = variables.get('core.tts.elevenlabsApiKey');
     const response = await axios(`https://api.elevenlabs.io/v1/text-to-speech/${opts.voice}`, {
       method:  'POST',
       headers: {
-        'xi-api-key':   this.elevenlabsApiKey,
+        'xi-api-key':   apiKey,
         'Content-Type': 'application/json',
       },
       responseType: 'arraybuffer',

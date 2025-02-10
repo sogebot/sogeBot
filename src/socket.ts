@@ -204,8 +204,9 @@ const processAuth = (req: { headers: { [x: string]: any; }; }, res: { sendStatus
     }
 
     const token = jwt.verify(authToken, _self.JWTKey) as {
-      userId: string; username: string; privileges: Unpacked<ReturnType<typeof getPrivileges>>;
+      userId: string; userName: string; privileges: Unpacked<ReturnType<typeof getPrivileges>>;
     };
+    req.headers.authUser = { userId: token.userId, userName: token.userName };
 
     if (token.privileges.scopes) {
       req.headers.scopes = token.privileges.scopes;
