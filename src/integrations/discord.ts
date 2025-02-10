@@ -397,7 +397,7 @@ class Discord extends Integration {
     }
     if (o === '$uptime') {
       const uptime = vars.get('services.twitch.uptime') as number;
-      return { name: capitalize(prepare('webpanel.uptime')), value: getTime(Date.now() - uptime, true), inline: true };
+      return { name: capitalize(prepare('webpanel.uptime')), value: getTime(Date.now() - uptime, false), inline: true };
     }
     if (o === '$startedAt') {
       if (isOnline) {
