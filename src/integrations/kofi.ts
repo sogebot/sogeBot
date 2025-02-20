@@ -36,7 +36,7 @@ type KoFiData = {
 };
 
 class Kofi extends Integration {
-  @settings(undefined, undefined, true)
+  @settings(undefined, { isSecret: true })
   verification_token = '';
 
   @onStartup()

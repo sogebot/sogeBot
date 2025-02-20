@@ -144,8 +144,16 @@ export function example(opts: (string|{if?: string, message: string, replace: { 
   };
 }
 
-export function settings(category?: string, isReadOnly = false, isSecret = false) {
+export function settings(category?: string, options: {
+  isReadOnly?: boolean,
+  isSecret?: boolean,
+  keepValuesInArray?: boolean
+} = {}) {
   const { name, type } = getNameAndTypeFromStackTrace();
+
+  const isReadOnly = options?.isReadOnly ?? false;
+  const isSecret = options?.isSecret ?? false;
+  const keepValuesInArray = options?.keepValuesInArray ?? false;
 
   return (target: any, key: string) => {
     if (!isReadOnly) {
@@ -179,6 +187,16 @@ export function settings(category?: string, isReadOnly = false, isSecret = false
             }
             self.loadVariableValue(key).then((value) => {
               if (typeof value !== 'undefined') {
+                if (keepValuesInArray) {
+                  if (!Array.isArray((self as any)[key])) {
+                    throw new Error(`keepValuesInArray is set and value of ${key} is not array!`);
+                  }
+                  for (const oldVal of (self as any)[key]) {
+                    if (!value.includes(oldVal)) {
+                      value.push(oldVal);
+                    }
+                  }
+                }
                 VariableWatcher.add(path, value, isReadOnly); // rewrite value on var load
                 set(self, key, value);
                 emitter.emit('load', path, cloneDeep(value));

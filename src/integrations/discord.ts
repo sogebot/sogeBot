@@ -56,11 +56,11 @@ class Discord extends Integration {
   embedMessageId = '';
 
   // set secret clientId
-  @settings('general', false, true)
+  @settings('general', { isSecret: true })
   clientId = '';
 
   // set secret token
-  @settings('general', false, true)
+  @settings('general', { isSecret: true })
   token = '';
 
   @settings('bot')
@@ -88,7 +88,7 @@ class Discord extends Integration {
     timers:  '',
   };
 
-  @settings('bot')
+  @settings('bot', { keepValuesInArray: true })
   fields: string[] = ['$game', '$title', '$tags', '$startedAt', '$uptime', '$viewers', '$followers', '$subscribers'];
 
   @settings('bot')

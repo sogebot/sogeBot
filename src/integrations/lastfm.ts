@@ -16,10 +16,10 @@ enum NOTIFY {
 }
 
 class LastFM extends Integration {
-  @settings(undefined, undefined, true)
+  @settings(undefined, { isSecret: true })
   apiKey = '';
 
-  @settings(undefined, undefined, true)
+  @settings(undefined, { isSecret: true })
   username = '';
 
   @settings()

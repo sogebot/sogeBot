@@ -90,7 +90,7 @@ class TipeeeStream extends Integration {
   @persistent()
   afterDate = 0;
 
-  @settings(undefined, undefined, true)
+  @settings(undefined, { isSecret: true })
   apiKey = '';
 
   @onStartup()

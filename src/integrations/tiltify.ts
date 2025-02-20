@@ -21,7 +21,7 @@ import alerts from '~/registries/alerts.js';
 const mutex = new Mutex();
 
 class Tiltify extends Integration {
-  @settings(undefined, false, true)
+  @settings(undefined, { isSecret: true })
   access_token = '';
   @settings()
   userName = '';

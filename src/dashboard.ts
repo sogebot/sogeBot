@@ -5,7 +5,7 @@ import { settings } from '~/decorators.js';
 
 class Dashboard extends Core {
 
-  @settings(undefined, false)
+  @settings()
   µWidgets = [
     'twitch|status|' + randomUUID(),
     'twitch|uptime|' + randomUUID(),
