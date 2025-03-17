@@ -299,7 +299,7 @@ class Chat {
       info(`TMI: ${type} authentication failure, ${message}`);
     });
 
-    client.irc.onDisconnect((manually, reason) => {
+    client.onDisconnect((manually, reason) => {
       setStatus('TMI', DISCONNECTED);
       if (manually) {
         reason = new Error('Disconnected manually by user');
@@ -364,7 +364,7 @@ class Chat {
           id:                 msg.id,
           emotesOffsets:      msg.emoteOffsets,
           isAction:           false,
-          isFirstTimeMessage: msg.tags.get('first-msg') === '1',
+          isFirstTimeMessage: msg.isFirst,
           isHighlight:        msg.isHighlight,
         }).then(() => {
           linesParsedIncrement();
