@@ -26,6 +26,6 @@
   "channel_is_not_set": "Kanal er ikke angitt",
   "please_set_your_broadcaster_oauth_or_owners": "Vennligst angi din <a href=\"#/settings/modules/services/twitch\">kanal oauth eller eiere</a>, eller så vil alle brukere <strong>ha tilgang</strong> til dette dashboardet og vil bli betraktet som <strong>kringkastere</strong>.",
   "new_update_available": "Ny oppdatering tilgjengelig",
-  "new_bot_version_available_at": "Ny bot versjon {version} tilgjengelig på {link}.",
+  "new_bot_version_available_at": "Ny bot versjon {{version}} tilgjengelig på {{link}}.",
   "one_of_inputs_must_be_set": "En av inndataene må være angitt"
 }
