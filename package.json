@@ -84,7 +84,7 @@
     "trigram-similarity": "^1.0.7",
     "tubechat": "^1.0.3",
     "typeorm": "0.3.21",
-    "typescript": "5.8.2",
+    "typescript": "5.7.3",
     "url-join": "5.0.0",
     "uuid": "11.1.0",
     "velocity-animate": "1.5.2",
