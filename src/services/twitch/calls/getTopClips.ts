@@ -1,5 +1,6 @@
 import { HelixClip } from '@twurple/api/lib';
 import { shuffle } from 'lodash-es';
+import youtubeDlExec from 'youtube-dl-exec';
 
 import { getGameNameFromId } from './getGameNameFromId.js';
 
@@ -24,17 +25,21 @@ export async function getTopClips (opts: any): Promise<(Partial<HelixClip> & { m
         : new Date(Date.now() - opts.days * DAY).toISOString(),
       endDate: (new Date()).toISOString(),
     };
-
-    const getClipsForBroadcaster = await twitch.apiClient?.asIntent(['bot'], ctx => ctx.clips.getClipsForBroadcasterPaginated(broadcasterId, { ...period }).getAll()) as unknown as (HelixClip & { mp4: string; game: string | null })[];
+    // shuffle and pick clips before getting URLs
+    const getClipsForBroadcaster = shuffle(await twitch.apiClient?.asIntent(['broadcaster'], ctx => ctx.clips.getClipsForBroadcasterPaginated(broadcasterId, { ...period }).getAll()) as unknown as (HelixClip & { mp4: string; game: string | null })[]).slice(0, opts.first);
 
     // get mp4 from thumbnail
     const clips: (Partial<HelixClip> & { mp4: string; game: string | null })[] = [];
-    for (const c of getClipsForBroadcaster ?? []) {
-      c.mp4 = c.thumbnailUrl.replace('-preview-480x272.jpg', '.mp4');
+    await Promise.all(getClipsForBroadcaster.map(async(c) => {
+      const payload = await youtubeDlExec(c.url, {
+        getUrl: true,
+      });
+      c.mp4 = payload.toString();
+      // c.mp4 = c.thumbnailUrl.replace('-preview-480x272.jpg', '.mp4');
       c.game = await getGameNameFromId(Number(c.gameId));
       clips.push(c);
-    }
-    return shuffle(clips).slice(0, opts.first);
+    }));
+    return clips;
   } catch (e) {
     if (e instanceof Error) {
       if (e.message.includes('ETIMEDOUT')) {
