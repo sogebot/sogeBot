@@ -1,6 +1,6 @@
 FROM node:lts as builder
 
-ENV LAST_UPDATED 2023-29-10-2347
+ENV LAST_UPDATED 2025-17-04-1950
 
 # Defaults to production, docker-compose overrides this to development on build and run.
 ARG NODE_ENV=production
@@ -10,6 +10,9 @@ ENV ENV $ENV
 
 RUN apt-get update
 RUN apt-get install -y build-essential unzip nasm libtool make bash git autoconf wget zlib1g-dev python3
+
+# Install yt-dlp
+RUN apt-get install -y yt-dlp
 
 # Copy artifact
 ADD *.zip /
