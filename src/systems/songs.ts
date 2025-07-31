@@ -1,5 +1,3 @@
-import ytdl from '@distube/ytdl-core';
-import ytsr from '@distube/ytsr';
 import {
   currentSongType,
   SongBan, SongPlaylist, SongRequest,
@@ -12,6 +10,8 @@ import io from 'socket.io';
 import {
   Brackets, In, Like,
 } from 'typeorm';
+import { Innertube } from 'youtubei.js';
+import type Video from 'youtubei.js/dist/src/parser/classes/Video';
 import ytpl from 'ytpl';
 import { z } from 'zod';
 
@@ -41,6 +41,15 @@ let isCachedTagsValid = false;
 const emptyCurrentSong = {
   videoId: null, title: '', type: '', username: '', volume: 0, loudness: 0, forceVolume: false, startTime: 0, endTime: Number.MAX_SAFE_INTEGER,
 };
+
+const cachedSongs = new Map<string, Awaited<ReturnType<Innertube['getBasicInfo']>>>();
+
+const innertube = await Innertube.create({
+  lang:               'en',
+  location:           'US',
+  retrieve_player:    false,
+  enable_safety_mode: false,  // Important: avoid "video unavailable" errors
+});
 
 class Songs extends System {
   interval: { [id: string]: NodeJS.Timeout } = {};
@@ -350,7 +359,7 @@ class Songs extends System {
     if (!videoID) {
       throw new Error('Unknown videoId to ban song.');
     }
-    const videoTitle: string | null = (opts.parameters.trim().length === 0 ? JSON.parse(this.currentSong).title : (await this.getVideoDetails(videoID))?.videoDetails.title) ?? null;
+    const videoTitle: string | null = (opts.parameters.trim().length === 0 ? JSON.parse(this.currentSong).title : (await this.getVideoDetails(videoID))?.basic_info.title) ?? null;
     if (!videoTitle) {
       throw new Error('Cannot fetch video data, check your url or try again later.');
     }
@@ -395,12 +404,25 @@ class Songs extends System {
     }
   }
 
-  async getVideoDetails (id: string): Promise<ytdl.videoInfo | null> {
-    return await new Promise((resolve: (value: ytdl.videoInfo) => any, reject) => {
+  async getVideoDetails (id: string): ReturnType<Innertube['getBasicInfo']> {
+    return await new Promise((resolve: (value: Awaited<ReturnType<Innertube['getBasicInfo']>>) => any, reject) => {
       let retry = 0;
       const load = async () => {
         try {
-          resolve(await ytdl.getInfo('https://www.youtube.com/watch?v=' + id));
+          if (cachedSongs.has(id)) {
+            resolve(cachedSongs.get(id)!);
+          }
+          const video = await innertube.getBasicInfo(id);
+          cachedSongs.set(id, video);
+
+          // Remove oldest entry if we're at capacity
+          if (cachedSongs.size >= 1000) {
+            const oldestKey = cachedSongs.keys().next().value;
+            if (oldestKey !== undefined) {
+              cachedSongs.delete(oldestKey);
+            }
+          }
+          resolve(cachedSongs.get(id)!);
         } catch (e: any) {
           if (Number(retry ?? 0) < 5) {
             setTimeout(() => {
@@ -589,7 +611,7 @@ class Songs extends System {
   }
 
   @command('!songrequest')
-  async addSongToQueue (opts: CommandOptions, retry = 0): Promise<CommandResponse[]> {
+  async addSongToQueue (opts: CommandOptions): Promise<CommandResponse[]> {
     if (opts.parameters.length < 1 || !this.songrequest) {
       if (this.songrequest) {
         return [{ response: translate('core.usage') + ': !songrequest <video-id|video-url|search-string>', ...opts }];
@@ -603,16 +625,15 @@ class Songs extends System {
     const match = opts.parameters.match(urlRegex);
     const videoID = (match && match[1].length === 11) ? match[1] : opts.parameters;
 
-    if (_.isNil(videoID.match(idRegex))) { // not id or url]
+    if (_.isNil(videoID.match(idRegex))) { // not id or url
       try {
-        const search = await ytsr(opts.parameters, { limit: 1 });
-        if (search.items.length > 0 && search.items[0].type === 'video') {
-          const videoId = /^\S+(?:youtu.be\/|v\/|e\/|u\/\w+\/|embed\/|v=)(?<videoId>[^#&?]*).*/gi.exec(search.items[0].url)?.groups?.videoId;
-          if (!videoId) {
-            throw new Error('VideoID not parsed from ' + search.items[0].url);
-          }
-          opts.parameters = videoId;
+        const search = await innertube.search(opts.parameters, { type: 'video' });
+        const video = search.videos.length > 0 ? search.videos[0] : null;
+        if (video) {
+          opts.parameters = (video as Video).video_id;
           return this.addSongToQueue(opts);
+        } else {
+          throw new Error(`Song "${opts.parameters}" not found.`);
         }
       } catch (e: any) {
         error(`SONGS: ${e.message}`);
@@ -640,46 +661,31 @@ class Songs extends System {
     }
 
     try {
-      const videoInfo = await ytdl.getInfo('https://www.youtube.com/watch?v=' + videoID);
-      if (Number(videoInfo.videoDetails.lengthSeconds) / 60 > this.duration) {
+      const videoInfo = await this.getVideoDetails(videoID);
+      if (Number(videoInfo.basic_info.duration) / 60 > this.duration) {
         return [{ response: translate('songs.song-is-too-long'), ...opts }];
-      } else if (videoInfo.videoDetails.category !== 'Music' && this.onlyMusicCategory) {
-        if (Number(retry ?? 0) < 5) {
-          // try once more to be sure
-          await new Promise((resolve) => {
-            setTimeout(() => resolve(true), 500);
-          });
-          return this.addSongToQueue(opts, (retry ?? 0) + 1 );
-        }
+      } else if (videoInfo.basic_info.category !== 'Music' && this.onlyMusicCategory) {
         if (typeof (global as any).it === 'function') {
           error('-- TEST ONLY ERROR --');
-          error({ category: videoInfo.videoDetails.category });
+          error({ category: videoInfo.basic_info.category });
         }
         return [{ response: translate('songs.incorrect-category'), ...opts }];
       } else {
         const songRequest = SongRequest.create({
           videoId:  videoID,
-          title:    videoInfo.videoDetails.title,
-          loudness: Number(videoInfo.loudness ?? -15),
-          length:   Number(videoInfo.videoDetails.lengthSeconds),
+          title:    videoInfo.basic_info.title,
+          loudness: Number(videoInfo.player_config?.audio_config.loudness_db ?? -15),
+          length:   Number(videoInfo.basic_info.duration),
           username: opts.sender.userName,
         });
         await songRequest.save();
         this.getMeanLoudness();
-        const response = prepare('songs.song-was-added-to-queue', { name: videoInfo.videoDetails.title });
+        const response = prepare('songs.song-was-added-to-queue', { name: videoInfo.basic_info.title });
         return [{ response, ...opts }];
       }
     } catch (e: any) {
-      if (Number(retry ?? 0) < 5) {
-        // try once more to be sure
-        await new Promise((resolve) => {
-          setTimeout(() => resolve(true), 500);
-        });
-        return this.addSongToQueue(opts, (retry ?? 0) + 1 );
-      } else {
-        error(e);
-        return [{ response: translate('songs.song-was-not-found'), ...opts }];
-      }
+      error(e);
+      return [{ response: translate('songs.song-was-not-found'), ...opts }];
     }
   }
 
@@ -691,9 +697,6 @@ class Songs extends System {
     });
     if (sr) {
       SongRequest.remove(sr);
-      this.getMeanLoudness();
-      const response = prepare('songs.song-was-removed-from-queue', { name: sr.title });
-      return [{ response, ...opts }];
     }
     return [];
   }
@@ -719,26 +722,26 @@ class Songs extends System {
       info(`=> Skipped ${id} - Song is banned`);
       return [{ response: prepare('songs.song-is-banned', { name: (await SongPlaylist.findOneByOrFail({ videoId: id })).title }), ...opts }];
     } else {
-      const videoInfo = await ytdl.getInfo('https://www.youtube.com/watch?v=' + id);
+      const videoInfo = await this.getVideoDetails(id);
       if (videoInfo) {
-        info(`=> Imported ${id} - ${videoInfo.videoDetails.title}`);
+        info(`=> Imported ${id} - ${videoInfo.basic_info.title}`);
         const songPlaylist = SongPlaylist.create({
           videoId:      id,
-          title:        videoInfo.videoDetails.title,
-          loudness:     Number(videoInfo.loudness ?? -15),
-          length:       Number(videoInfo.videoDetails.lengthSeconds),
+          title:        videoInfo.basic_info.title,
+          loudness:     Number(videoInfo.player_config?.audio_config.loudness_db ?? -15),
+          length:       Number(videoInfo.basic_info.duration),
           lastPlayedAt: new Date().toISOString(),
           seed:         1,
           volume:       20,
           startTime:    0,
           tags:         [ opts.attr.forcedTag ? opts.attr.forcedTag : this.currentTag ],
-          endTime:      Number(videoInfo.videoDetails.lengthSeconds),
+          endTime:      Number(videoInfo.basic_info.duration),
         });
         await songPlaylist.save();
         this.refreshPlaylistVolume();
         this.getMeanLoudness();
         isCachedTagsValid = false;
-        return [{ response: prepare('songs.song-was-added-to-playlist', { name: videoInfo.videoDetails.title }), ...opts }];
+        return [{ response: prepare('songs.song-was-added-to-playlist', { name: videoInfo.basic_info.title }), ...opts }];
       } else {
         return [{ response: translate('songs.youtube-is-not-responding-correctly'), ...opts }];
       }
@@ -805,19 +808,19 @@ class Songs extends System {
         } else {
           try {
             done++;
-            const videoInfo = await ytdl.getInfo('https://www.youtube.com/watch?v=' + id);
-            info(`=> Imported ${id} - ${videoInfo.videoDetails.title}`);
+            const videoInfo = await this.getVideoDetails(id);
+            info(`=> Imported ${id} - ${videoInfo.basic_info.title}`);
             const songPlaylist = SongPlaylist.create({
               videoId:      id,
-              title:        videoInfo.videoDetails.title,
-              loudness:     Number(videoInfo.loudness ?? - 15),
-              length:       Number(videoInfo.videoDetails.lengthSeconds),
+              title:        videoInfo.basic_info.title,
+              loudness:     Number(videoInfo.player_config?.audio_config.loudness_db ?? - 15),
+              length:       Number(videoInfo.basic_info.duration),
               lastPlayedAt: new Date().toISOString(),
               seed:         1,
               volume:       20,
               startTime:    0,
               tags:         [ opts.attr.forcedTag ? opts.attr.forcedTag : this.currentTag ],
-              endTime:      Number(videoInfo.videoDetails.lengthSeconds),
+              endTime:      Number(videoInfo.basic_info.duration),
             });
             await songPlaylist.save();
             imported++;
