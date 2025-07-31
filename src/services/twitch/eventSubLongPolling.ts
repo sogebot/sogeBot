@@ -598,7 +598,7 @@ class EventSubLongPolling {
       broadcasterName:        event.broadcaster_user_login,
       categoryId:             event.category_id,
       categoryName:           event.category_name,
-      isMature:               event.is_mature,
+      isMature:               (event as any).is_mature,
       streamLanguage:         event.language,
       streamTitle:            event.title,
     });
