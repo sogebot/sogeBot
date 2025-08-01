@@ -31,6 +31,11 @@ RUN npm rebuild
 RUN npm prune --production
 
 FROM node:lts-slim
+
+# Install python3 needed for youtube-dl-exec
+RUN apt-get update
+RUN apt-get install -y python3
+
 COPY --from=builder  /app/ /app/
 
 # Add startup script
