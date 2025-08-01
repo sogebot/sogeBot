@@ -3,7 +3,7 @@
   "isNotEmpty": "$property é necessária.",
   "minLength": "$property deve ser maior ou igual a $constraint1 caracteres.",
   "isPositive": "$property deve ser maior que 0",
-  "isUnique": "$property must be unique",
+  "isUnique": "$property deve ser exclusivo",
   "isCommand": "$property deve iniciar com !",
   "isCommandOrCustomVariable": "$property deve iniciar com ! ou $_",
   "isCustomVariable": "$property deve começar com $_",
@@ -26,6 +26,6 @@
   "channel_is_not_set": "Canal não está definido",
   "please_set_your_broadcaster_oauth_or_owners": "Por favor, defina seu <a href=\"#/settings/modules/services/twitch\">auth de canal ou donos</a>, ou todos os usuários <strong>terão acesso</strong> a este painel e serão considerados como <strong>Casters</strong>.",
   "new_update_available": "Nova atualização disponível",
-  "new_bot_version_available_at": "Nova versão do bot, {{version}}, disponível em {{link}}.",
+  "new_bot_version_available_at": "New bot version {{version}} available at {{link}}.",
   "one_of_inputs_must_be_set": "Uma das entradas deve ser definida"
 }
